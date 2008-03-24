@@ -1,0 +1,27 @@
+
+# (C) Copyright Tobias Schwinger
+#
+# Use modification and distribution are subject to the boost Software License,
+# Version 1.0. (See http:/\/www.boost.org/LICENSE_1_0.txt).
+
+import testing ;
+
+project singleton-tests
+    : requirements
+        <library>/boost/thread//boost_thread <threading>multi
+    ;
+
+test-suite utility/singleton
+    :
+      [ run singleton.cpp ]
+      [ run singleton_no_threads.cpp ]
+      [ run mutexed_singleton.cpp ]
+      [ run mtxd_singleton_threading.cpp ]
+      [ run mtxd_singleton_no_threads.cpp ]
+      [ run thread_specific_singleton.cpp ]
+      [ run trd_sp_singleton_threading.cpp ]
+      [ run trd_sp_singleton_no_threads.cpp ]
+      [ run singleton_destruction.cpp ]
+      [ compile-fail singleton_fail.cpp ]
+    ;
+

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="hpx"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories="&quot;$(TBB_ROOT)\include&quot;;&quot;$(BOOST_ROOT)&quot;;&quot;$(HPX_ROOT)&quot;;&quot;$(HPX_ROOT)\external\coroutine&quot;;&quot;$(HPX_ROOT)\external\endian&quot;;&quot;$(HPX_ROOT)\external\singleton&quot;;&quot;$(HPX_ROOT)\external\function_types&quot;;&quot;$(HPX_ROOT)\external\math&quot;"
+		PreprocessorDefinitions="_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;HPX_USE_TBB=1"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		AdditionalLibraryDirectories="&quot;$(BOOST_ROOT)\stage\lib&quot;;&quot;$(TBB_ROOT)\ia32\vc8\lib&quot;"
+	/>
+	<UserMacro
+		Name="BOOST_ROOT"
+		Value="$(HPX_BOOST_ROOT)"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="HPX_ROOT"
+		Value="$(HPX_ROOT)"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="TBB_ROOT"
+		Value="$(HPX_TBB_ROOT)"
+		PerformEnvironmentSet="true"
+	/>
+</VisualStudioPropertySheet>

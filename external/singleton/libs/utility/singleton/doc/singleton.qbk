@@ -1,0 +1,586 @@
+[library Boost.Utility/Singleton
+  [quickbook 1.3]
+  [version 1.0]
+  [authors [Schwinger, Tobias]]
+  [copyright 2007 Tobias Schwinger]
+  [license
+        Distributed under the Boost Software License, Version 1.0.
+        (See accompanying file LICENSE_1_0.txt or copy at 
+        [@http://www.boost.org/LICENSE_1_0.txt])
+  ]
+  [purpose Generic templates to implement classes with a single, globally 
+      accessible instance.]
+  [category generic]
+  [category concurrent]
+  [last-revision $Date: 2007/11/05 00:13:27 $]
+]
+
+[def __unspecified__            /unspecified/]
+[def __any_singleton_header__   /any singleton header/]
+[def __boost_smart_ptr__        [@http://www.boost.org/libs/smart_ptr/smart_ptr.htm Smart Pointer]]
+[def __boost_ref_call__         [@http://www.boost.org/doc/html/ref.html `boost::ref`]]
+[def __boost_bind_call__        [@http://www.boost.org/libs/bind/bind.html `boost::bind`]]
+
+[section Description]
+
+A Singleton describes a globally accessible and unique facility, typically
+implemented as a class with inaccessible constructors and a globally acessible
+function for clients to access a single instance which is created when accessed
+for the first time.
+
+There are several reasons to use a scheme like this instead a class-typed global
+variable:
+
+* Uniqueness of the instance can be enforced,
+* on-demand initialization allows different Singleton instances to depend on
+  each other (which is impossible with globals, because their initialization
+  order is undefined and dependencies are not resolved),
+* the instances can be destroyed in a controlled order, and 
+* the invocation of the constructor can be ensured, even with ABIs that do not
+  support running initialization code for dynamic libraries.
+
+This library provides three Singleton templates that share an identical 
+interface implementing identical behavior in a single-threaded environment
+differing in the following properties in multi-threaded context: 
+
+`boost::singleton` can be used to create Singletons with synchronized
+initialization. If further synchronization is required it has to be 
+implemented by the user.
+
+`boost::mutexed_singleton` additionally ensures that concurrent access to the
+instance is mutually exclusive. In other words, only one thread can access the
+instance at a given time.
+
+`boost::thread_specific_singleton` instances exist once per thread.
+
+[endsect]
+
+[section: Usage]
+
+An exemplary Singleton declaration looks like this:
+
+  class my_singleton
+    : public boost::mutexed_singleton<my_singleton>
+  {
+      // [... private members]
+    public:
+
+      my_singleton(boost::restricted);
+
+      // public interface, e.g:
+      int foo(int);
+      int bar(int);
+      int baz;
+  };
+
+The `boost::restricted` type used for the parameter of the constructor is an
+unspecified, reserved type whose purpose is to prevent accidental construction
+and the requirement of verbose "`template...friend`-making" for client-code 
+(which may still be used, if desried - e.g. to make the constructor disappear
+with some IDEs' code completion features).
+
+A static member proxy object called `instance` and a nested class `lease` allow
+to access the instance through overloaded member access and member dereference
+operators. The static `instance` member should be used for accessing a single
+member of the instance while a typically short-lived `lease` object should be
+used instead to minimize synchronization overhead in places where the instance
+is accessed frequently. For a `mutexed_singleton` the instance will only be 
+accessible by the owning thread for the lifetime of the lease.
+
+  void use_my_singleton()
+  {
+      // ... through the instance proxy
+
+      my_singleton::instance->foo(1);
+  } 
+
+  void use_my_singleton_a_lot()
+  {
+      // ...through a lease object:
+      //
+      // - it makes accessing the object more efficient for
+      //   any boost::singleton, and
+      // - locks a mutexed_singleton's mutex for the lifetime
+      //   of the lease
+
+      my_singleton::lease my_singleton_lease;
+
+      if (! my_singleton_lease->foo(1))
+          my_singleton_lease->bar(2);
+
+      my_singleton_lease->foo(3);
+  }
+
+The `instance` object may be used in a reference wrapper (applying
+__boost_ref_call__) to __boost_bind_call__ a member pointer to the instance.
+
+  bind(& my_singleton::foo, ref(my_singleton::instance), _1)
+  // is a function object that will issue a mutexed call to
+  // my_singleton::foo (since my_singleton is a mutexed_singleton).
+
+Objects of the nested `lease` class can be used by-value in a similar context.
+In this case a `mutexed_singleton` will lock its mutex for the lifetime of 
+the function object and copies thereof.
+
+  bind(& my_singleton::foo, my_singleton::lease(), _1)
+  // is a function object that will call my_singleton:foo and
+  // whose mere existence locks mutex of 'my_singleton'. 
+
+It is possible to turn an existing object into a Singleton applying multiple
+inheritance:
+
+  class global_log
+    : public log
+    , public boost:singleton<global_log> // instead of a mutexed 
+      // one, this time, assuming log takes care of thread-safety,
+      // already...
+  {
+    public:
+      global_log(boost::restricted);
+  };
+
+We might as well have a static facility use the Singleton internally,
+by using non-public inheritance:
+
+  class global_log
+    : private boost::singleton<global_log>
+  {
+      log obj_log; 
+    public:
+
+      static void message(std::string);
+      // [...]
+
+    private:
+      // We make friends with the singleton template to also
+      // hide the constructor, this time:
+
+      global_log(boost::restricted);
+      template<class T, int DS> friend class boost::singleton;
+  };
+
+Singleton instances are normally destroyed in reverse order of their 
+construction, that is for a group of Singletons with their integral 
+`DisposalSlot` template arguments being equal, where the destruction of 
+these groups is ordered by the ascending `DisposalSlot` values.
+
+We could raise the `DisposalSlot` value of `global_log` from the previous
+examples to make sure it outlives other singletons that use 0 (the default):
+
+  class global_log
+    : private boost::singleton<global_log, 1>
+  // ...
+
+Attempts to access already destroyed Singleton instances cause the instance
+to be re-created. 
+
+These rules for destruction apply to any set of Singletons of possibly
+different variants with the same `SubsystemTag`:
+For example a `mutexed_singleton` created before a `singleton` (both using
+the same `DisposalSlot` value) is guaranteed to outlive that `singleton`.
+
+[endsect]
+
+[section: Singletons and dynamic libraries]
+
+Special constraints apply when using Singletons together with dynamic 
+libraries:
+- There must be at most one single instance of a Singleton, even if it is
+  exposed by a dynamic library,
+- the mechanism that controls the lifetime of Singleton instances must exist
+  once per dynamic library, as the dynamic library may get unloaded at any
+  time, and
+- there should be an interface to invoke Singleton destruction manually,
+  as not all operating systems' loaders guarantee execution of destructors
+  in static context.
+
+Keeping the former can be problematic if the management code gets inlined 
+into the client or if symbols are not being merged automatically.
+As a solution, this library provides two macros, `BOOST_SINGLETON_PLACEMENT`
+and `BOOST_SINGLETON_PLACEMENT_DECLARATION` to compile the effective code 
+into a specific source file.
+
+The second constraint breaks if the symbols of the internal management
+code get merged. In this case an application that contains Singletons 
+itself will "adopt" dynamic libraries' Singletons and possibly crash 
+during shutdown trying to execute already-unloaded code.
+As a solution, this library allows the user to specify a third template
+argument for the `SubsystemTag` parameter, which is used to key the
+lifetime management code; two Singletons with different `SubsystemTag`
+have independent lifetime control.
+
+To address the third constraint, the destruction mechanism can be invoked
+manually by calling `boost::destroy_singletons`. It is safe to call this 
+function even if cleanup can happen automatically so portable code can look
+the same for all platforms.
+
+[heading Example for a portable Singleton exposed by a dynamic library]
+
+Header (mylib/logger.hpp):
+
+  struct mylib_tag;
+
+  class logger
+    : public boost::singleton<logger, 1, mylib_tag>
+  {
+      // ...
+
+      BOOST_SINGLETON_PLACEMENT_DECLARATION
+  };
+
+  void before_unload();
+
+Source file (mylib/logger.cpp):
+
+  #include <mylib/logger.hpp>
+
+  BOOST_SINGLETON_PLACEMENT(logger)
+  void before_unload() { boost::destroy_singletons<library_tag>() }
+
+[endsect]
+
+[section:reference Reference]
+
+[section singleton]
+
+[heading Description]
+
+Base class template that provides global access to a single, statically
+allocated instance of the derived class. 
+
+The derived class' public constructor is invoked with a single argument that
+can be bound to the unspecified paramter type `boost::restricted`.
+
+The constructor is executed at most one time in a (possibly multi-threaded) 
+program, immediately before the instance is first accessed or leased.
+
+Once constructed, no effort is taken to synchronize concurrent access to
+class members of the single instance. 
+
+The destruction order of Singleton instances is defined by the ascending order
+of `(DisposalSlot,-t`/ctor/`)` tuples regardless of the template variant used, 
+where  `-t`/ctor/ is the negative construction time and the secondary sorting
+criterion. 
+
+Attempts to access an already destroyed Singleton instance cause the instance
+to be re-created.  
+
+Destruction takes place when static objects are destroyed on a best-effort 
+basis, that is the destruction mechanism must be invoked manually by calling 
+`boost::destroy_singletons` for dynamic libraries and ABIs that do not support
+running cleanup code.
+
+
+[heading Header]
+    #include <boost/utility/singleton.hpp>
+
+[heading Synopsis]
+
+    namespace boost
+    {
+        typedef __unspecified__ restricted;
+
+        template< class Derived, int DisposalSlot = 0 >
+        class singleton : boost::noncopyable
+        {
+            __unspecified__
+          public:
+
+            static __unspecified__ instance;
+            class lease;
+
+          protected:
+
+            singleton() { }
+
+        };
+    }
+
+[variablelist Notation 
+    [[`I`]         [an integral constant expression]]
+    [[`D`]         [a class type publicly derived from `singleton<D,I>`]]
+    [[`m`]         [a nonstatic (possibly inherited) member variable or member function of `D`]]
+    [[`mp`]        [a member pointer that describes `m` in `D` or subobject of `D`]]
+    [[`l`]         [an object of type `D::lease`]]
+]
+
+[heading Expression Semantics]
+
+[table
+    [[Expression]         [Semantics]]
+    [[`D::instance->m`]   [accesses `m` in the context of the single `D` object.]]
+    [[`D::instance->*mp`] [accesses `m` in the context of the single `D` object.]]
+    [[`D::lease`]         [is a default- and copy-constructible type.]]
+    [[`l->m`]             [accesses `m` in the context of the single `D` object.]]
+    [[`l->*mp`]           [accesses `m` in the context of the single `D` object.]]
+]
+
+[endsect]
+
+
+[section mutexed_singleton]
+
+[heading Description]
+
+Base class template that provides global access to a single, statically
+allocated instance of the derived class. 
+
+The derived class' public constructor is invoked with a single argument that
+can be bound to the unspecified paramter type `boost::restricted`.
+The constructor is executed at most one time in a (possibly multi-threaded) 
+program, immediately before the instance is first accessed or leased.
+
+Once constructed, concurrent access is mutually exclusive. In other words
+only one thread can access the instance at a given time. The creation of
+a lease object causes concurrent attempts to access the instance or to create
+`lease` objects from other threads to be block until the lease is destroyed.
+
+The destruction order of Singleton instances is defined by the ascending order
+of `(DisposalSlot,-t`/ctor/`)` tuples regardless of the template variant used, 
+where  `-t`/ctor/ is the negative construction time and the secondary sorting
+criterion. 
+
+Attempts to access an already destroyed Singleton instance cause the instance
+to be re-created.  
+
+Destruction takes place when static objects are destroyed on a best-effort 
+basis, that is the destruction mechanism must be invoked manually by calling 
+`boost::destroy_singletons` for dynamic libraries and ABIs that do not support
+running cleanup code.
+
+Thread-specific singleton instances of threads different from the program's
+initial thread may be destroyed earlier, when the corresponding thread 
+terminates.
+Above ordering rules must still hold for singleton instances specific to that
+thread, however.
+
+[heading Header]
+    #include <boost/utility/mutexed_singleton.hpp>
+
+[heading Synopsis]
+
+    namespace boost
+    {
+        typedef __unspecified__ restricted;
+
+        template< class Derived, int DisposalSlot = 0 >
+        class mutexed_singleton : boost::noncopyable
+        {
+            __unspecified__
+          public:
+
+            static __unspecified__ instance;
+            class lease;
+
+          protected:
+
+            mutexed_singleton() { }
+
+        };
+    }
+
+[variablelist Notation
+    [[`I`]         [an integral constant expression]]
+    [[`D`]         [a class type publicly derived from `mutexed_singleton<D,I>`]]
+    [[`m`]         [a nonstatic (possibly inherited) member variable or member function of `D`]]
+    [[`mp`]        [a member pointer that describes `m` in `D` or subobject of `D`]]
+    [[`l`]         [an object of type `D::lease`]]
+]
+
+[heading Expression Semantics]
+
+[table
+    [[Expression]         [Semantics]]
+    [[`D::instance->m`]   [accesses `m` in the context of the single `D` object.
+        Ensures exclusive access to the Singleton instance until the end of the
+        containing, /full expression/ (1.9) for the executing thread.]]
+    [[`D::instance->*mp`] [accesses `m` in the context of the single `D` object.
+        Ensures exclusive access to the Singleton instance until the end of the
+        containing, /full expression/ (1.9) for the executing thread.]]
+    [[`D::lease`]         [is a default- and copy-constructible type.
+        Exclusive access to the Singleton instance is ensured for the owning
+        thread for the lifetime of a `lease` object.]]
+    [[`l->m`]             [accesses `m` in the context of the single `D` object.]]
+    [[`l->*mp`]           [accesses `m` in the context of the single `D` object.]]
+]
+
+[endsect]
+
+
+[section thread_specific_singleton]
+
+[heading Description]
+
+Base class template that provides global access to a single instance of the
+derived class per thread. 
+
+The derived class' public constructor is invoked with a single argument that
+can be bound to the unspecified paramter type `boost::restricted`.
+An instance is constructed once the instance is accessed or leased by a given
+thread for the first time.
+
+The destruction order of Singleton instances is defined by the ascending order
+of `(DisposalSlot,-t`/ctor/`)` tuples regardless of the template variant used, 
+where  `-t`/ctor/ is the negative construction time and the secondary sorting
+criterion.
+
+Attempts to access an already destroyed Singleton instance cause the instance
+to be re-created. 
+
+Destruction takes place when static objects are destroyed on a best-effort 
+basis, that is the destruction mechanism must be invoked manually by calling 
+`boost::destroy_singletons` for dynamic libraries and ABIs that do not support
+running cleanup code.
+
+Thread-specific singleton instances of threads different from the program's
+initial thread may be destroyed earlier, when the corresponding thread 
+terminates.
+Above ordering rules must still hold for singleton instances specific to that
+thread, however.
+
+[heading Header]
+    #include <boost/utility/thread_specific_singleton.hpp>
+
+[heading Synopsis]
+
+    namespace boost
+    {
+        typedef __unspecified__ restricted;
+
+        template< class Derived, int DisposalSlot = 0 >
+        class thread_specific_singleton : boost::noncopyable
+        {
+            __unspecified__
+          public:
+
+            static __unspecified__ instance;
+            class lease;
+
+          protected:
+
+            thread_specific_singleton() { }
+
+        };
+    }
+
+[variablelist Notation
+    [[`I`]         [an integral constant expression]]
+    [[`D`]         [a class type publicly derived from `thread_specific_singleton<D,I>`]]
+    [[`m`]         [a nonstatic (possibly inherited) member variable or member function of `D`]]
+    [[`mp`]        [a member pointer that describes `m` in `D` or subobject of `D`]]
+    [[`l`]         [an object of type `D::lease`]]
+]
+
+[heading Expression Semantics]
+
+[table
+    [[Expression]         [Semantics]]
+    [[`D::instance->m`]   [accesses `m` in the context of the thread-specific `D` object.]]
+    [[`D::instance->*mp`] [accesses `m` in the context of the thread-specific `D` object.]]
+    [[`D::lease`]         [is the type of a default- and copy-constructible object.]]
+    [[`l->m`]             [accesses `m` in the context of the thread-specific `D` object.]]
+    [[`l->*mp`]           [accesses `m` in the context of the thread-specific `D` object.]]
+]
+
+[endsect]
+
+
+[section BOOST_SINGLETON_PLACEMENT_DECLARATION]
+
+Placement declaration.
+
+[heading Example]
+
+    class a_singleton : public singleton<a_singleton>
+    {
+        BOOST_SINGLETON_PLACEMENT_DECLARATION
+        // ...
+    };
+
+[endsect]
+
+
+[section BOOST_SINGLETON_PLACEMENT]
+
+Placement definition. 
+
+[heading Example]
+
+    // At same namespace scope as a_singleton:
+    BOOST_SINGLETON_PLACEMENT(a_singleton)
+
+[endsect]
+
+
+[section destroy_singletons()]
+
+[heading Description]
+
+Destroys all singleton instances for the subsystem specified by
+`SubsystemTag`. If no tag type is specified `void` is assumed.
+
+[heading Header]
+
+    #include <__any_singleton_header__>
+
+[heading Synopsis]
+
+    namespace boost
+    {
+        template< typename SubsystemTag >
+        void destroy_singletons();
+
+        void destroy_singletons();
+    }
+
+[endsect]
+
+[section BOOST_UTILITY_MEMBER_DEREFERENCE_MAX_ARITY]
+
+[heading Description]
+
+This macro can be defined to set the maximum arity of member functions that can
+be dereferenced by `operator->*`. It defaults to 10.
+
+[heading Header]
+
+    #include <__any_singleton_header__>
+
+[heading Synopsis]
+
+    #ifndef BOOST_UTILITY_MEMBER_DEREFERENCE_MAX_ARITY
+    #   define BOOST_UTILITY_MEMBER_DEREFERNCE_MAX_ARITY 10
+    #endif
+
+[endsect]
+
+[endsect]
+
+
+[section Acknowledgements]
+
+I would like to thank Robert Ramey, '''Joaqu&iacute;n M L&oacute;pez Mu&ntilde;oz'''
+and '''Christian B&auml;hnisch''' for their feedback and support.
+
+The discussion of Singletons in Chapter 6 of "Modern C++ Design" by Andrei
+Alexandrescu inspired certain design aspects of these components, in particular
+destruction semantics.
+
+Joel de Guzman's documentation style was copied from Fusion.
+
+[endsect]
+
+
+[section References]
+
+# [@http://en.wikipedia.org/wiki/Design_Patterns Design Patterns],
+  Gamma et al. - Addison Wesley Publishing, 1995
+
+# [@http://moderncppdesign.com Modern C++ Design],
+  Andrei Alexandrescu - Addison Wesley Publishing, 2001
+
+# [@http://www.boost.org/libs/bind/bind.html Boost.Bind], 
+  Peter Dimov, 2001-2005
+
+[endsect]
+

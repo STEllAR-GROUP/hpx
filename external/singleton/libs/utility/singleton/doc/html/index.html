@@ -1,0 +1,1059 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Chapter 1. Boost.Utility/Singleton 1.0</title>
+<link rel="stylesheet" href="boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.68.1">
+<link rel="start" href="index.html" title="Chapter 1. Boost.Utility/Singleton 1.0">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../boost.png"></td>
+<td align="center"><a href="../../../../../index.htm">Home</a></td>
+<td align="center"><a href="../../../../libraries.htm">Libraries</a></td>
+<td align="center"><a href="../../../../../people/people.htm">People</a></td>
+<td align="center"><a href="../../../../../more/faq.htm">FAQ</a></td>
+<td align="center"><a href="../../../../../more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav"></div>
+<div class="chapter" lang="en">
+<div class="titlepage"><div>
+<div><h2 class="title">
+<a name="boost_utility_singleton"></a>Chapter 1. Boost.Utility/Singleton 1.0</h2></div>
+<div><div class="author"><h3 class="author">
+<span class="firstname">Tobias</span> <span class="surname">Schwinger</span>
+</h3></div></div>
+<div><p class="copyright">Copyright © 2007 Tobias Schwinger</p></div>
+<div><div class="legalnotice">
+<a name="id905079"></a><p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></div>
+</div></div>
+<div class="toc">
+<p><b>Table of Contents</b></p>
+<dl>
+<dt><span class="section"><a href="index.html#boost_utility_singleton.description">Description</a></span></dt>
+<dt><span class="section"><a href="index.html#boost_utility_singleton._usage"> Usage</a></span></dt>
+<dt><span class="section"><a href="index.html#boost_utility_singleton._singletons_and_dynamic_libraries">
+    Singletons and dynamic libraries</a></span></dt>
+<dt><span class="section"><a href="index.html#boost_utility_singleton.reference"> Reference</a></span></dt>
+<dt><span class="section"><a href="index.html#boost_utility_singleton.acknowledgements">Acknowledgements</a></span></dt>
+<dt><span class="section"><a href="index.html#boost_utility_singleton.references">References</a></span></dt>
+</dl>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="boost_utility_singleton.description"></a><a href="index.html#boost_utility_singleton.description" title="Description">Description</a></h2></div></div></div>
+<p>
+      A Singleton describes a globally accessible and unique facility, typically
+      implemented as a class with inaccessible constructors and a globally acessible
+      function for clients to access a single instance which is created when accessed
+      for the first time.
+    </p>
+<p>
+      There are several reasons to use a scheme like this instead a class-typed global
+      variable:
+    </p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+        Uniqueness of the instance can be enforced,
+      </li>
+<li>
+        on-demand initialization allows different Singleton instances to depend on
+        each other (which is impossible with globals, because their initialization
+        order is undefined and dependencies are not resolved),
+      </li>
+<li>
+        the instances can be destroyed in a controlled order, and
+      </li>
+<li>
+        the invocation of the constructor can be ensured, even with ABIs that do
+        not support running initialization code for dynamic libraries.
+      </li>
+</ul></div>
+<p>
+      This library provides three Singleton templates that share an identical interface
+      implementing identical behavior in a single-threaded environment differing
+      in the following properties in multi-threaded context:
+    </p>
+<p>
+      <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">singleton</span></code> can be used to create Singletons
+      with synchronized initialization. If further synchronization is required it
+      has to be implemented by the user.
+    </p>
+<p>
+      <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">mutexed_singleton</span></code> additionally ensures that
+      concurrent access to the instance is mutually exclusive. In other words, only
+      one thread can access the instance at a given time.
+    </p>
+<p>
+      <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">thread_specific_singleton</span></code> instances exist
+      once per thread.
+    </p>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="boost_utility_singleton._usage"></a><a href="index.html#boost_utility_singleton._usage" title=" Usage"> Usage</a></h2></div></div></div>
+<p>
+      An exemplary Singleton declaration looks like this:
+    </p>
+<pre class="programlisting">
+<span class="keyword">class</span> <span class="identifier">my_singleton</span>
+  <span class="special">:</span> <span class="keyword">public</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">mutexed_singleton</span><span class="special">&lt;</span><span class="identifier">my_singleton</span><span class="special">&gt;</span>
+<span class="special">{</span>
+    <span class="comment">// [... private members]
+</span>  <span class="keyword">public</span><span class="special">:</span>
+
+    <span class="identifier">my_singleton</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">restricted</span><span class="special">);</span>
+
+    <span class="comment">// public interface, e.g:
+</span>    <span class="keyword">int</span> <span class="identifier">foo</span><span class="special">(</span><span class="keyword">int</span><span class="special">);</span>
+    <span class="keyword">int</span> <span class="identifier">bar</span><span class="special">(</span><span class="keyword">int</span><span class="special">);</span>
+    <span class="keyword">int</span> <span class="identifier">baz</span><span class="special">;</span>
+<span class="special">};</span>
+</pre>
+<p>
+      The <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">restricted</span></code> type used for the parameter of
+      the constructor is an unspecified, reserved type whose purpose is to prevent
+      accidental construction and the requirement of verbose "<code class="computeroutput"><span class="keyword">template</span><span class="special">...</span><span class="keyword">friend</span></code>-making" for client-code (which may
+      still be used, if desried - e.g. to make the constructor disappear with some
+      IDEs' code completion features).
+    </p>
+<p>
+      A static member proxy object called <code class="computeroutput"><span class="identifier">instance</span></code>
+      and a nested class <code class="computeroutput"><span class="identifier">lease</span></code> allow
+      to access the instance through overloaded member access and member dereference
+      operators. The static <code class="computeroutput"><span class="identifier">instance</span></code>
+      member should be used for accessing a single member of the instance while a
+      typically short-lived <code class="computeroutput"><span class="identifier">lease</span></code>
+      object should be used instead to minimize synchronization overhead in places
+      where the instance is accessed frequently. For a <code class="computeroutput"><span class="identifier">mutexed_singleton</span></code>
+      the instance will only be accessible by the owning thread for the lifetime
+      of the lease.
+    </p>
+<pre class="programlisting">
+<span class="keyword">void</span> <span class="identifier">use_my_singleton</span><span class="special">()</span>
+<span class="special">{</span>
+    <span class="comment">// ... through the instance proxy
+</span>
+    <span class="identifier">my_singleton</span><span class="special">::</span><span class="identifier">instance</span><span class="special">-&gt;</span><span class="identifier">foo</span><span class="special">(</span><span class="number">1</span><span class="special">);</span>
+<span class="special">}</span> 
+
+<span class="keyword">void</span> <span class="identifier">use_my_singleton_a_lot</span><span class="special">()</span>
+<span class="special">{</span>
+    <span class="comment">// ...through a lease object:
+</span>    <span class="comment">//
+</span>    <span class="comment">// - it makes accessing the object more efficient for
+</span>    <span class="comment">//   any boost::singleton, and
+</span>    <span class="comment">// - locks a mutexed_singleton's mutex for the lifetime
+</span>    <span class="comment">//   of the lease
+</span>
+    <span class="identifier">my_singleton</span><span class="special">::</span><span class="identifier">lease</span> <span class="identifier">my_singleton_lease</span><span class="special">;</span>
+
+    <span class="keyword">if</span> <span class="special">(!</span> <span class="identifier">my_singleton_lease</span><span class="special">-&gt;</span><span class="identifier">foo</span><span class="special">(</span><span class="number">1</span><span class="special">))</span>
+        <span class="identifier">my_singleton_lease</span><span class="special">-&gt;</span><span class="identifier">bar</span><span class="special">(</span><span class="number">2</span><span class="special">);</span>
+
+    <span class="identifier">my_singleton_lease</span><span class="special">-&gt;</span><span class="identifier">foo</span><span class="special">(</span><span class="number">3</span><span class="special">);</span>
+<span class="special">}</span>
+</pre>
+<p>
+      The <code class="computeroutput"><span class="identifier">instance</span></code> object may be
+      used in a reference wrapper (applying <a href="http://www.boost.org/doc/html/ref.html" target="_top"><code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">ref</span></code></a>)
+      to <a href="http://www.boost.org/libs/bind/bind.html" target="_top"><code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">bind</span></code></a>
+      a member pointer to the instance.
+    </p>
+<pre class="programlisting">
+<span class="identifier">bind</span><span class="special">(&amp;</span> <span class="identifier">my_singleton</span><span class="special">::</span><span class="identifier">foo</span><span class="special">,</span> <span class="identifier">ref</span><span class="special">(</span><span class="identifier">my_singleton</span><span class="special">::</span><span class="identifier">instance</span><span class="special">),</span> <span class="identifier">_1</span><span class="special">)</span>
+<span class="comment">// is a function object that will issue a mutexed call to
+</span><span class="comment">// my_singleton::foo (since my_singleton is a mutexed_singleton).
+</span></pre>
+<p>
+      Objects of the nested <code class="computeroutput"><span class="identifier">lease</span></code>
+      class can be used by-value in a similar context. In this case a <code class="computeroutput"><span class="identifier">mutexed_singleton</span></code> will lock its mutex for
+      the lifetime of the function object and copies thereof.
+    </p>
+<pre class="programlisting">
+<span class="identifier">bind</span><span class="special">(&amp;</span> <span class="identifier">my_singleton</span><span class="special">::</span><span class="identifier">foo</span><span class="special">,</span> <span class="identifier">my_singleton</span><span class="special">::</span><span class="identifier">lease</span><span class="special">(),</span> <span class="identifier">_1</span><span class="special">)</span>
+<span class="comment">// is a function object that will call my_singleton:foo and
+</span><span class="comment">// whose mere existence locks mutex of 'my_singleton'. 
+</span></pre>
+<p>
+      It is possible to turn an existing object into a Singleton applying multiple
+      inheritance:
+    </p>
+<pre class="programlisting">
+<span class="keyword">class</span> <span class="identifier">global_log</span>
+  <span class="special">:</span> <span class="keyword">public</span> <span class="identifier">log</span>
+  <span class="special">,</span> <span class="keyword">public</span> <span class="identifier">boost</span><span class="special">:</span><span class="identifier">singleton</span><span class="special">&lt;</span><span class="identifier">global_log</span><span class="special">&gt;</span> <span class="comment">// instead of a mutexed 
+</span>    <span class="comment">// one, this time, assuming log takes care of thread-safety,
+</span>    <span class="comment">// already...
+</span><span class="special">{</span>
+  <span class="keyword">public</span><span class="special">:</span>
+    <span class="identifier">global_log</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">restricted</span><span class="special">);</span>
+<span class="special">};</span>
+</pre>
+<p>
+      We might as well have a static facility use the Singleton internally, by using
+      non-public inheritance:
+    </p>
+<pre class="programlisting">
+<span class="keyword">class</span> <span class="identifier">global_log</span>
+  <span class="special">:</span> <span class="keyword">private</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">singleton</span><span class="special">&lt;</span><span class="identifier">global_log</span><span class="special">&gt;</span>
+<span class="special">{</span>
+    <span class="identifier">log</span> <span class="identifier">obj_log</span><span class="special">;</span> 
+  <span class="keyword">public</span><span class="special">:</span>
+
+    <span class="keyword">static</span> <span class="keyword">void</span> <span class="identifier">message</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">);</span>
+    <span class="comment">// [...]
+</span>
+  <span class="keyword">private</span><span class="special">:</span>
+    <span class="comment">// We make friends with the singleton template to also
+</span>    <span class="comment">// hide the constructor, this time:
+</span>
+    <span class="identifier">global_log</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">restricted</span><span class="special">);</span>
+    <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">,</span> <span class="keyword">int</span> <span class="identifier">DS</span><span class="special">&gt;</span> <span class="keyword">friend</span> <span class="keyword">class</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">singleton</span><span class="special">;</span>
+<span class="special">};</span>
+</pre>
+<p>
+      Singleton instances are normally destroyed in reverse order of their construction,
+      that is for a group of Singletons with their integral <code class="computeroutput"><span class="identifier">DisposalSlot</span></code>
+      template arguments being equal, where the destruction of these groups is ordered
+      by the ascending <code class="computeroutput"><span class="identifier">DisposalSlot</span></code>
+      values.
+    </p>
+<p>
+      We could raise the <code class="computeroutput"><span class="identifier">DisposalSlot</span></code>
+      value of <code class="computeroutput"><span class="identifier">global_log</span></code> from the
+      previous examples to make sure it outlives other singletons that use 0 (the
+      default):
+    </p>
+<pre class="programlisting">
+<span class="keyword">class</span> <span class="identifier">global_log</span>
+  <span class="special">:</span> <span class="keyword">private</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">singleton</span><span class="special">&lt;</span><span class="identifier">global_log</span><span class="special">,</span> <span class="number">1</span><span class="special">&gt;</span>
+<span class="comment">// ...
+</span></pre>
+<p>
+      Attempts to access already destroyed Singleton instances cause the instance
+      to be re-created.
+    </p>
+<p>
+      These rules for destruction apply to any set of Singletons of possibly different
+      variants with the same <code class="computeroutput"><span class="identifier">SubsystemTag</span></code>:
+      For example a <code class="computeroutput"><span class="identifier">mutexed_singleton</span></code>
+      created before a <code class="computeroutput"><span class="identifier">singleton</span></code>
+      (both using the same <code class="computeroutput"><span class="identifier">DisposalSlot</span></code>
+      value) is guaranteed to outlive that <code class="computeroutput"><span class="identifier">singleton</span></code>.
+    </p>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="boost_utility_singleton._singletons_and_dynamic_libraries"></a><a href="index.html#boost_utility_singleton._singletons_and_dynamic_libraries" title="
+    Singletons and dynamic libraries">
+    Singletons and dynamic libraries</a></h2></div></div></div>
+<p>
+      Special constraints apply when using Singletons together with dynamic libraries:
+      - There must be at most one single instance of a Singleton, even if it is exposed
+      by a dynamic library, - the mechanism that controls the lifetime of Singleton
+      instances must exist once per dynamic library, as the dynamic library may get
+      unloaded at any time, and - there should be an interface to invoke Singleton
+      destruction manually, as not all operating systems' loaders guarantee execution
+      of destructors in static context.
+    </p>
+<p>
+      Keeping the former can be problematic if the management code gets inlined into
+      the client or if symbols are not being merged automatically. As a solution,
+      this library provides two macros, <code class="computeroutput"><span class="identifier">BOOST_SINGLETON_PLACEMENT</span></code>
+      and <code class="computeroutput"><span class="identifier">BOOST_SINGLETON_PLACEMENT_DECLARATION</span></code>
+      to compile the effective code into a specific source file.
+    </p>
+<p>
+      The second constraint breaks if the symbols of the internal management code
+      get merged. In this case an application that contains Singletons itself will
+      "adopt" dynamic libraries' Singletons and possibly crash during shutdown
+      trying to execute already-unloaded code. As a solution, this library allows
+      the user to specify a third template argument for the <code class="computeroutput"><span class="identifier">SubsystemTag</span></code>
+      parameter, which is used to key the lifetime management code; two Singletons
+      with different <code class="computeroutput"><span class="identifier">SubsystemTag</span></code>
+      have independent lifetime control.
+    </p>
+<p>
+      To address the third constraint, the destruction mechanism can be invoked manually
+      by calling <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">destroy_singletons</span></code>. It is safe to call this
+      function even if cleanup can happen automatically so portable code can look
+      the same for all platforms.
+    </p>
+<a name="boost_utility_singleton._singletons_and_dynamic_libraries.example_for_a_portable_singleton_exposed_by_a_dynamic_library"></a><h3>
+<a name="id906766"></a>
+      <a href="index.html#boost_utility_singleton._singletons_and_dynamic_libraries.example_for_a_portable_singleton_exposed_by_a_dynamic_library">Example
+      for a portable Singleton exposed by a dynamic library</a>
+    </h3>
+<p>
+      Header (mylib/logger.hpp):
+    </p>
+<pre class="programlisting">
+<span class="keyword">struct</span> <span class="identifier">mylib_tag</span><span class="special">;</span>
+
+<span class="keyword">class</span> <span class="identifier">logger</span>
+  <span class="special">:</span> <span class="keyword">public</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">singleton</span><span class="special">&lt;</span><span class="identifier">logger</span><span class="special">,</span> <span class="number">1</span><span class="special">,</span> <span class="identifier">mylib_tag</span><span class="special">&gt;</span>
+<span class="special">{</span>
+    <span class="comment">// ...
+</span>
+    <span class="identifier">BOOST_SINGLETON_PLACEMENT_DECLARATION</span>
+<span class="special">};</span>
+
+<span class="keyword">void</span> <span class="identifier">before_unload</span><span class="special">();</span>
+</pre>
+<p>
+      Source file (mylib/logger.cpp):
+    </p>
+<pre class="programlisting">
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">mylib</span><span class="special">/</span><span class="identifier">logger</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="identifier">BOOST_SINGLETON_PLACEMENT</span><span class="special">(</span><span class="identifier">logger</span><span class="special">)</span>
+<span class="keyword">void</span> <span class="identifier">before_unload</span><span class="special">()</span> <span class="special">{</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">destroy_singletons</span><span class="special">&lt;</span><span class="identifier">library_tag</span><span class="special">&gt;()</span> <span class="special">}</span>
+</pre>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="boost_utility_singleton.reference"></a><a href="index.html#boost_utility_singleton.reference" title=" Reference"> Reference</a></h2></div></div></div>
+<div class="toc"><dl>
+<dt><span class="section"><a href="index.html#boost_utility_singleton.reference.singleton">singleton</a></span></dt>
+<dt><span class="section"><a href="index.html#boost_utility_singleton.reference.mutexed_singleton">mutexed_singleton</a></span></dt>
+<dt><span class="section"><a href="index.html#boost_utility_singleton.reference.thread_specific_singleton">thread_specific_singleton</a></span></dt>
+<dt><span class="section"><a href="index.html#boost_utility_singleton.reference.boost_singleton_placement_declaration">BOOST_SINGLETON_PLACEMENT_DECLARATION</a></span></dt>
+<dt><span class="section"><a href="index.html#boost_utility_singleton.reference.boost_singleton_placement">BOOST_SINGLETON_PLACEMENT</a></span></dt>
+<dt><span class="section"><a href="index.html#boost_utility_singleton.reference.destroy_singletons__">destroy_singletons()</a></span></dt>
+<dt><span class="section"><a href="index.html#boost_utility_singleton.reference.boost_utility_member_dereference_max_arity">BOOST_UTILITY_MEMBER_DEREFERENCE_MAX_ARITY</a></span></dt>
+</dl></div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_utility_singleton.reference.singleton"></a><a href="index.html#boost_utility_singleton.reference.singleton" title="singleton">singleton</a></h3></div></div></div>
+<a name="boost_utility_singleton.reference.singleton.description"></a><h4>
+<a name="id907082"></a>
+        <a href="index.html#boost_utility_singleton.reference.singleton.description">Description</a>
+      </h4>
+<p>
+        Base class template that provides global access to a single, statically allocated
+        instance of the derived class.
+      </p>
+<p>
+        The derived class' public constructor is invoked with a single argument that
+        can be bound to the unspecified paramter type <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">restricted</span></code>.
+      </p>
+<p>
+        The constructor is executed at most one time in a (possibly multi-threaded)
+        program, immediately before the instance is first accessed or leased.
+      </p>
+<p>
+        Once constructed, no effort is taken to synchronize concurrent access to
+        class members of the single instance.
+      </p>
+<p>
+        The destruction order of Singleton instances is defined by the ascending
+        order of <code class="computeroutput"><span class="special">(</span><span class="identifier">DisposalSlot</span><span class="special">,-</span><span class="identifier">t</span></code><span class="emphasis"><em>ctor</em></span><code class="computeroutput"><span class="special">)</span></code> tuples regardless of the template variant
+        used, where <code class="computeroutput"><span class="special">-</span><span class="identifier">t</span></code><span class="emphasis"><em>ctor</em></span>
+        is the negative construction time and the secondary sorting criterion.
+      </p>
+<p>
+        Attempts to access an already destroyed Singleton instance cause the instance
+        to be re-created.
+      </p>
+<p>
+        Destruction takes place when static objects are destroyed on a best-effort
+        basis, that is the destruction mechanism must be invoked manually by calling
+        <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">destroy_singletons</span></code> for dynamic libraries
+        and ABIs that do not support running cleanup code.
+      </p>
+<a name="boost_utility_singleton.reference.singleton.header"></a><h4>
+<a name="id907238"></a>
+        <a href="index.html#boost_utility_singleton.reference.singleton.header">Header</a>
+      </h4>
+<pre class="programlisting">
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">utility</span><span class="special">/</span><span class="identifier">singleton</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+</pre>
+<a name="boost_utility_singleton.reference.singleton.synopsis"></a><h4>
+<a name="id907315"></a>
+        <a href="index.html#boost_utility_singleton.reference.singleton.synopsis">Synopsis</a>
+      </h4>
+<pre class="programlisting">
+<span class="keyword">namespace</span> <span class="identifier">boost</span>
+<span class="special">{</span>
+    <span class="keyword">typedef</span> <span class="emphasis"><em>unspecified</em></span> <span class="identifier">restricted</span><span class="special">;</span>
+
+    <span class="keyword">template</span><span class="special">&lt;</span> <span class="keyword">class</span> <span class="identifier">Derived</span><span class="special">,</span> <span class="keyword">int</span> <span class="identifier">DisposalSlot</span> <span class="special">=</span> <span class="number">0</span> <span class="special">&gt;</span>
+    <span class="keyword">class</span> <span class="identifier">singleton</span> <span class="special">:</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">noncopyable</span>
+    <span class="special">{</span>
+        <span class="emphasis"><em>unspecified</em></span>
+      <span class="keyword">public</span><span class="special">:</span>
+
+        <span class="keyword">static</span> <span class="emphasis"><em>unspecified</em></span> <span class="identifier">instance</span><span class="special">;</span>
+        <span class="keyword">class</span> <span class="identifier">lease</span><span class="special">;</span>
+
+      <span class="keyword">protected</span><span class="special">:</span>
+
+        <span class="identifier">singleton</span><span class="special">()</span> <span class="special">{</span> <span class="special">}</span>
+
+    <span class="special">};</span>
+<span class="special">}</span>
+</pre>
+<div class="variablelist">
+<p class="title"><b>Notation</b></p>
+<dl>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">I</span></code></span></dt>
+<dd><p>
+            an integral constant expression
+          </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">D</span></code></span></dt>
+<dd><p>
+            a class type publicly derived from <code class="computeroutput"><span class="identifier">singleton</span><span class="special">&lt;</span><span class="identifier">D</span><span class="special">,</span><span class="identifier">I</span><span class="special">&gt;</span></code>
+          </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">m</span></code></span></dt>
+<dd><p>
+            a nonstatic (possibly inherited) member variable or member function of
+            <code class="computeroutput"><span class="identifier">D</span></code>
+          </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">mp</span></code></span></dt>
+<dd><p>
+            a member pointer that describes <code class="computeroutput"><span class="identifier">m</span></code>
+            in <code class="computeroutput"><span class="identifier">D</span></code> or subobject of
+            <code class="computeroutput"><span class="identifier">D</span></code>
+          </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">l</span></code></span></dt>
+<dd><p>
+            an object of type <code class="computeroutput"><span class="identifier">D</span><span class="special">::</span><span class="identifier">lease</span></code>
+          </p></dd>
+</dl>
+</div>
+<a name="boost_utility_singleton.reference.singleton.expression_semantics"></a><h4>
+<a name="id907761"></a>
+        <a href="index.html#boost_utility_singleton.reference.singleton.expression_semantics">Expression
+        Semantics</a>
+      </h4>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+              <p>
+                Expression
+              </p>
+              </th>
+<th>
+              <p>
+                Semantics
+              </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">D</span><span class="special">::</span><span class="identifier">instance</span><span class="special">-&gt;</span><span class="identifier">m</span></code>
+              </p>
+              </td>
+<td>
+              <p>
+                accesses <code class="computeroutput"><span class="identifier">m</span></code> in the
+                context of the single <code class="computeroutput"><span class="identifier">D</span></code>
+                object.
+              </p>
+              </td>
+</tr>
+<tr>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">D</span><span class="special">::</span><span class="identifier">instance</span><span class="special">-&gt;*</span><span class="identifier">mp</span></code>
+              </p>
+              </td>
+<td>
+              <p>
+                accesses <code class="computeroutput"><span class="identifier">m</span></code> in the
+                context of the single <code class="computeroutput"><span class="identifier">D</span></code>
+                object.
+              </p>
+              </td>
+</tr>
+<tr>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">D</span><span class="special">::</span><span class="identifier">lease</span></code>
+              </p>
+              </td>
+<td>
+              <p>
+                is a default- and copy-constructible type.
+              </p>
+              </td>
+</tr>
+<tr>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">l</span><span class="special">-&gt;</span><span class="identifier">m</span></code>
+              </p>
+              </td>
+<td>
+              <p>
+                accesses <code class="computeroutput"><span class="identifier">m</span></code> in the
+                context of the single <code class="computeroutput"><span class="identifier">D</span></code>
+                object.
+              </p>
+              </td>
+</tr>
+<tr>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">l</span><span class="special">-&gt;*</span><span class="identifier">mp</span></code>
+              </p>
+              </td>
+<td>
+              <p>
+                accesses <code class="computeroutput"><span class="identifier">m</span></code> in the
+                context of the single <code class="computeroutput"><span class="identifier">D</span></code>
+                object.
+              </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_utility_singleton.reference.mutexed_singleton"></a><a href="index.html#boost_utility_singleton.reference.mutexed_singleton" title="mutexed_singleton">mutexed_singleton</a></h3></div></div></div>
+<a name="boost_utility_singleton.reference.mutexed_singleton.description"></a><h4>
+<a name="id908114"></a>
+        <a href="index.html#boost_utility_singleton.reference.mutexed_singleton.description">Description</a>
+      </h4>
+<p>
+        Base class template that provides global access to a single, statically allocated
+        instance of the derived class.
+      </p>
+<p>
+        The derived class' public constructor is invoked with a single argument that
+        can be bound to the unspecified paramter type <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">restricted</span></code>.
+        The constructor is executed at most one time in a (possibly multi-threaded)
+        program, immediately before the instance is first accessed or leased.
+      </p>
+<p>
+        Once constructed, concurrent access is mutually exclusive. In other words
+        only one thread can access the instance at a given time. The creation of
+        a lease object causes concurrent attempts to access the instance or to create
+        <code class="computeroutput"><span class="identifier">lease</span></code> objects from other
+        threads to be block until the lease is destroyed.
+      </p>
+<p>
+        The destruction order of Singleton instances is defined by the ascending
+        order of <code class="computeroutput"><span class="special">(</span><span class="identifier">DisposalSlot</span><span class="special">,-</span><span class="identifier">t</span></code><span class="emphasis"><em>ctor</em></span><code class="computeroutput"><span class="special">)</span></code> tuples regardless of the template variant
+        used, where <code class="computeroutput"><span class="special">-</span><span class="identifier">t</span></code><span class="emphasis"><em>ctor</em></span>
+        is the negative construction time and the secondary sorting criterion.
+      </p>
+<p>
+        Attempts to access an already destroyed Singleton instance cause the instance
+        to be re-created.
+      </p>
+<p>
+        Destruction takes place when static objects are destroyed on a best-effort
+        basis, that is the destruction mechanism must be invoked manually by calling
+        <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">destroy_singletons</span></code> for dynamic libraries
+        and ABIs that do not support running cleanup code.
+      </p>
+<p>
+        Thread-specific singleton instances of threads different from the program's
+        initial thread may be destroyed earlier, when the corresponding thread terminates.
+        Above ordering rules must still hold for singleton instances specific to
+        that thread, however.
+      </p>
+<a name="boost_utility_singleton.reference.mutexed_singleton.header"></a><h4>
+<a name="id908289"></a>
+        <a href="index.html#boost_utility_singleton.reference.mutexed_singleton.header">Header</a>
+      </h4>
+<pre class="programlisting">
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">utility</span><span class="special">/</span><span class="identifier">mutexed_singleton</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+</pre>
+<a name="boost_utility_singleton.reference.mutexed_singleton.synopsis"></a><h4>
+<a name="id908365"></a>
+        <a href="index.html#boost_utility_singleton.reference.mutexed_singleton.synopsis">Synopsis</a>
+      </h4>
+<pre class="programlisting">
+<span class="keyword">namespace</span> <span class="identifier">boost</span>
+<span class="special">{</span>
+    <span class="keyword">typedef</span> <span class="emphasis"><em>unspecified</em></span> <span class="identifier">restricted</span><span class="special">;</span>
+
+    <span class="keyword">template</span><span class="special">&lt;</span> <span class="keyword">class</span> <span class="identifier">Derived</span><span class="special">,</span> <span class="keyword">int</span> <span class="identifier">DisposalSlot</span> <span class="special">=</span> <span class="number">0</span> <span class="special">&gt;</span>
+    <span class="keyword">class</span> <span class="identifier">mutexed_singleton</span> <span class="special">:</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">noncopyable</span>
+    <span class="special">{</span>
+        <span class="emphasis"><em>unspecified</em></span>
+      <span class="keyword">public</span><span class="special">:</span>
+
+        <span class="keyword">static</span> <span class="emphasis"><em>unspecified</em></span> <span class="identifier">instance</span><span class="special">;</span>
+        <span class="keyword">class</span> <span class="identifier">lease</span><span class="special">;</span>
+
+      <span class="keyword">protected</span><span class="special">:</span>
+
+        <span class="identifier">mutexed_singleton</span><span class="special">()</span> <span class="special">{</span> <span class="special">}</span>
+
+    <span class="special">};</span>
+<span class="special">}</span>
+</pre>
+<div class="variablelist">
+<p class="title"><b>Notation</b></p>
+<dl>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">I</span></code></span></dt>
+<dd><p>
+            an integral constant expression
+          </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">D</span></code></span></dt>
+<dd><p>
+            a class type publicly derived from <code class="computeroutput"><span class="identifier">mutexed_singleton</span><span class="special">&lt;</span><span class="identifier">D</span><span class="special">,</span><span class="identifier">I</span><span class="special">&gt;</span></code>
+          </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">m</span></code></span></dt>
+<dd><p>
+            a nonstatic (possibly inherited) member variable or member function of
+            <code class="computeroutput"><span class="identifier">D</span></code>
+          </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">mp</span></code></span></dt>
+<dd><p>
+            a member pointer that describes <code class="computeroutput"><span class="identifier">m</span></code>
+            in <code class="computeroutput"><span class="identifier">D</span></code> or subobject of
+            <code class="computeroutput"><span class="identifier">D</span></code>
+          </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">l</span></code></span></dt>
+<dd><p>
+            an object of type <code class="computeroutput"><span class="identifier">D</span><span class="special">::</span><span class="identifier">lease</span></code>
+          </p></dd>
+</dl>
+</div>
+<a name="boost_utility_singleton.reference.mutexed_singleton.expression_semantics"></a><h4>
+<a name="id926288"></a>
+        <a href="index.html#boost_utility_singleton.reference.mutexed_singleton.expression_semantics">Expression
+        Semantics</a>
+      </h4>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+              <p>
+                Expression
+              </p>
+              </th>
+<th>
+              <p>
+                Semantics
+              </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">D</span><span class="special">::</span><span class="identifier">instance</span><span class="special">-&gt;</span><span class="identifier">m</span></code>
+              </p>
+              </td>
+<td>
+              <p>
+                accesses <code class="computeroutput"><span class="identifier">m</span></code> in the
+                context of the single <code class="computeroutput"><span class="identifier">D</span></code>
+                object. Ensures exclusive access to the Singleton instance until
+                the end of the containing, <span class="emphasis"><em>full expression</em></span> (1.9)
+                for the executing thread.
+              </p>
+              </td>
+</tr>
+<tr>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">D</span><span class="special">::</span><span class="identifier">instance</span><span class="special">-&gt;*</span><span class="identifier">mp</span></code>
+              </p>
+              </td>
+<td>
+              <p>
+                accesses <code class="computeroutput"><span class="identifier">m</span></code> in the
+                context of the single <code class="computeroutput"><span class="identifier">D</span></code>
+                object. Ensures exclusive access to the Singleton instance until
+                the end of the containing, <span class="emphasis"><em>full expression</em></span> (1.9)
+                for the executing thread.
+              </p>
+              </td>
+</tr>
+<tr>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">D</span><span class="special">::</span><span class="identifier">lease</span></code>
+              </p>
+              </td>
+<td>
+              <p>
+                is a default- and copy-constructible type. Exclusive access to the
+                Singleton instance is ensured for the owning thread for the lifetime
+                of a <code class="computeroutput"><span class="identifier">lease</span></code> object.
+              </p>
+              </td>
+</tr>
+<tr>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">l</span><span class="special">-&gt;</span><span class="identifier">m</span></code>
+              </p>
+              </td>
+<td>
+              <p>
+                accesses <code class="computeroutput"><span class="identifier">m</span></code> in the
+                context of the single <code class="computeroutput"><span class="identifier">D</span></code>
+                object.
+              </p>
+              </td>
+</tr>
+<tr>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">l</span><span class="special">-&gt;*</span><span class="identifier">mp</span></code>
+              </p>
+              </td>
+<td>
+              <p>
+                accesses <code class="computeroutput"><span class="identifier">m</span></code> in the
+                context of the single <code class="computeroutput"><span class="identifier">D</span></code>
+                object.
+              </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_utility_singleton.reference.thread_specific_singleton"></a><a href="index.html#boost_utility_singleton.reference.thread_specific_singleton" title="thread_specific_singleton">thread_specific_singleton</a></h3></div></div></div>
+<a name="boost_utility_singleton.reference.thread_specific_singleton.description"></a><h4>
+<a name="id926664"></a>
+        <a href="index.html#boost_utility_singleton.reference.thread_specific_singleton.description">Description</a>
+      </h4>
+<p>
+        Base class template that provides global access to a single instance of the
+        derived class per thread.
+      </p>
+<p>
+        The derived class' public constructor is invoked with a single argument that
+        can be bound to the unspecified paramter type <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">restricted</span></code>.
+        An instance is constructed once the instance is accessed or leased by a given
+        thread for the first time.
+      </p>
+<p>
+        The destruction order of Singleton instances is defined by the ascending
+        order of <code class="computeroutput"><span class="special">(</span><span class="identifier">DisposalSlot</span><span class="special">,-</span><span class="identifier">t</span></code><span class="emphasis"><em>ctor</em></span><code class="computeroutput"><span class="special">)</span></code> tuples regardless of the template variant
+        used, where <code class="computeroutput"><span class="special">-</span><span class="identifier">t</span></code><span class="emphasis"><em>ctor</em></span>
+        is the negative construction time and the secondary sorting criterion.
+      </p>
+<p>
+        Attempts to access an already destroyed Singleton instance cause the instance
+        to be re-created.
+      </p>
+<p>
+        Destruction takes place when static objects are destroyed on a best-effort
+        basis, that is the destruction mechanism must be invoked manually by calling
+        <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">destroy_singletons</span></code> for dynamic libraries
+        and ABIs that do not support running cleanup code.
+      </p>
+<p>
+        Thread-specific singleton instances of threads different from the program's
+        initial thread may be destroyed earlier, when the corresponding thread terminates.
+        Above ordering rules must still hold for singleton instances specific to
+        that thread, however.
+      </p>
+<a name="boost_utility_singleton.reference.thread_specific_singleton.header"></a><h4>
+<a name="id926821"></a>
+        <a href="index.html#boost_utility_singleton.reference.thread_specific_singleton.header">Header</a>
+      </h4>
+<pre class="programlisting">
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">utility</span><span class="special">/</span><span class="identifier">thread_specific_singleton</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+</pre>
+<a name="boost_utility_singleton.reference.thread_specific_singleton.synopsis"></a><h4>
+<a name="id926899"></a>
+        <a href="index.html#boost_utility_singleton.reference.thread_specific_singleton.synopsis">Synopsis</a>
+      </h4>
+<pre class="programlisting">
+<span class="keyword">namespace</span> <span class="identifier">boost</span>
+<span class="special">{</span>
+    <span class="keyword">typedef</span> <span class="emphasis"><em>unspecified</em></span> <span class="identifier">restricted</span><span class="special">;</span>
+
+    <span class="keyword">template</span><span class="special">&lt;</span> <span class="keyword">class</span> <span class="identifier">Derived</span><span class="special">,</span> <span class="keyword">int</span> <span class="identifier">DisposalSlot</span> <span class="special">=</span> <span class="number">0</span> <span class="special">&gt;</span>
+    <span class="keyword">class</span> <span class="identifier">thread_specific_singleton</span> <span class="special">:</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">noncopyable</span>
+    <span class="special">{</span>
+        <span class="emphasis"><em>unspecified</em></span>
+      <span class="keyword">public</span><span class="special">:</span>
+
+        <span class="keyword">static</span> <span class="emphasis"><em>unspecified</em></span> <span class="identifier">instance</span><span class="special">;</span>
+        <span class="keyword">class</span> <span class="identifier">lease</span><span class="special">;</span>
+
+      <span class="keyword">protected</span><span class="special">:</span>
+
+        <span class="identifier">thread_specific_singleton</span><span class="special">()</span> <span class="special">{</span> <span class="special">}</span>
+
+    <span class="special">};</span>
+<span class="special">}</span>
+</pre>
+<div class="variablelist">
+<p class="title"><b>Notation</b></p>
+<dl>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">I</span></code></span></dt>
+<dd><p>
+            an integral constant expression
+          </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">D</span></code></span></dt>
+<dd><p>
+            a class type publicly derived from <code class="computeroutput"><span class="identifier">thread_specific_singleton</span><span class="special">&lt;</span><span class="identifier">D</span><span class="special">,</span><span class="identifier">I</span><span class="special">&gt;</span></code>
+          </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">m</span></code></span></dt>
+<dd><p>
+            a nonstatic (possibly inherited) member variable or member function of
+            <code class="computeroutput"><span class="identifier">D</span></code>
+          </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">mp</span></code></span></dt>
+<dd><p>
+            a member pointer that describes <code class="computeroutput"><span class="identifier">m</span></code>
+            in <code class="computeroutput"><span class="identifier">D</span></code> or subobject of
+            <code class="computeroutput"><span class="identifier">D</span></code>
+          </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">l</span></code></span></dt>
+<dd><p>
+            an object of type <code class="computeroutput"><span class="identifier">D</span><span class="special">::</span><span class="identifier">lease</span></code>
+          </p></dd>
+</dl>
+</div>
+<a name="boost_utility_singleton.reference.thread_specific_singleton.expression_semantics"></a><h4>
+<a name="id927346"></a>
+        <a href="index.html#boost_utility_singleton.reference.thread_specific_singleton.expression_semantics">Expression
+        Semantics</a>
+      </h4>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+              <p>
+                Expression
+              </p>
+              </th>
+<th>
+              <p>
+                Semantics
+              </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">D</span><span class="special">::</span><span class="identifier">instance</span><span class="special">-&gt;</span><span class="identifier">m</span></code>
+              </p>
+              </td>
+<td>
+              <p>
+                accesses <code class="computeroutput"><span class="identifier">m</span></code> in the
+                context of the thread-specific <code class="computeroutput"><span class="identifier">D</span></code>
+                object.
+              </p>
+              </td>
+</tr>
+<tr>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">D</span><span class="special">::</span><span class="identifier">instance</span><span class="special">-&gt;*</span><span class="identifier">mp</span></code>
+              </p>
+              </td>
+<td>
+              <p>
+                accesses <code class="computeroutput"><span class="identifier">m</span></code> in the
+                context of the thread-specific <code class="computeroutput"><span class="identifier">D</span></code>
+                object.
+              </p>
+              </td>
+</tr>
+<tr>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">D</span><span class="special">::</span><span class="identifier">lease</span></code>
+              </p>
+              </td>
+<td>
+              <p>
+                is the type of a default- and copy-constructible object.
+              </p>
+              </td>
+</tr>
+<tr>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">l</span><span class="special">-&gt;</span><span class="identifier">m</span></code>
+              </p>
+              </td>
+<td>
+              <p>
+                accesses <code class="computeroutput"><span class="identifier">m</span></code> in the
+                context of the thread-specific <code class="computeroutput"><span class="identifier">D</span></code>
+                object.
+              </p>
+              </td>
+</tr>
+<tr>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">l</span><span class="special">-&gt;*</span><span class="identifier">mp</span></code>
+              </p>
+              </td>
+<td>
+              <p>
+                accesses <code class="computeroutput"><span class="identifier">m</span></code> in the
+                context of the thread-specific <code class="computeroutput"><span class="identifier">D</span></code>
+                object.
+              </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_utility_singleton.reference.boost_singleton_placement_declaration"></a><a href="index.html#boost_utility_singleton.reference.boost_singleton_placement_declaration" title="BOOST_SINGLETON_PLACEMENT_DECLARATION">BOOST_SINGLETON_PLACEMENT_DECLARATION</a></h3></div></div></div>
+<p>
+        Placement declaration.
+      </p>
+<a name="boost_utility_singleton.reference.boost_singleton_placement_declaration.example"></a><h4>
+<a name="id927707"></a>
+        <a href="index.html#boost_utility_singleton.reference.boost_singleton_placement_declaration.example">Example</a>
+      </h4>
+<pre class="programlisting">
+<span class="keyword">class</span> <span class="identifier">a_singleton</span> <span class="special">:</span> <span class="keyword">public</span> <span class="identifier">singleton</span><span class="special">&lt;</span><span class="identifier">a_singleton</span><span class="special">&gt;</span>
+<span class="special">{</span>
+    <span class="identifier">BOOST_SINGLETON_PLACEMENT_DECLARATION</span>
+    <span class="comment">// ...
+</span><span class="special">};</span>
+</pre>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_utility_singleton.reference.boost_singleton_placement"></a><a href="index.html#boost_utility_singleton.reference.boost_singleton_placement" title="BOOST_SINGLETON_PLACEMENT">BOOST_SINGLETON_PLACEMENT</a></h3></div></div></div>
+<p>
+        Placement definition.
+      </p>
+<a name="boost_utility_singleton.reference.boost_singleton_placement.example"></a><h4>
+<a name="id927825"></a>
+        <a href="index.html#boost_utility_singleton.reference.boost_singleton_placement.example">Example</a>
+      </h4>
+<pre class="programlisting">
+<span class="comment">// At same namespace scope as a_singleton:
+</span><span class="identifier">BOOST_SINGLETON_PLACEMENT</span><span class="special">(</span><span class="identifier">a_singleton</span><span class="special">)</span>
+</pre>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_utility_singleton.reference.destroy_singletons__"></a><a href="index.html#boost_utility_singleton.reference.destroy_singletons__" title="destroy_singletons()">destroy_singletons()</a></h3></div></div></div>
+<a name="boost_utility_singleton.reference.destroy_singletons__.description"></a><h4>
+<a name="id927900"></a>
+        <a href="index.html#boost_utility_singleton.reference.destroy_singletons__.description">Description</a>
+      </h4>
+<p>
+        Destroys all singleton instances for the subsystem specified by <code class="computeroutput"><span class="identifier">SubsystemTag</span></code>. If no tag type is specified
+        <code class="computeroutput"><span class="keyword">void</span></code> is assumed.
+      </p>
+<a name="boost_utility_singleton.reference.destroy_singletons__.header"></a><h4>
+<a name="id927949"></a>
+        <a href="index.html#boost_utility_singleton.reference.destroy_singletons__.header">Header</a>
+      </h4>
+<pre class="programlisting">
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="emphasis"><em>any singleton header</em></span><span class="special">&gt;</span>
+</pre>
+<a name="boost_utility_singleton.reference.destroy_singletons__.synopsis"></a><h4>
+<a name="id927997"></a>
+        <a href="index.html#boost_utility_singleton.reference.destroy_singletons__.synopsis">Synopsis</a>
+      </h4>
+<pre class="programlisting">
+<span class="keyword">namespace</span> <span class="identifier">boost</span>
+<span class="special">{</span>
+    <span class="keyword">template</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">SubsystemTag</span> <span class="special">&gt;</span>
+    <span class="keyword">void</span> <span class="identifier">destroy_singletons</span><span class="special">();</span>
+
+    <span class="keyword">void</span> <span class="identifier">destroy_singletons</span><span class="special">();</span>
+<span class="special">}</span>
+</pre>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_utility_singleton.reference.boost_utility_member_dereference_max_arity"></a><a href="index.html#boost_utility_singleton.reference.boost_utility_member_dereference_max_arity" title="BOOST_UTILITY_MEMBER_DEREFERENCE_MAX_ARITY">BOOST_UTILITY_MEMBER_DEREFERENCE_MAX_ARITY</a></h3></div></div></div>
+<a name="boost_utility_singleton.reference.boost_utility_member_dereference_max_arity.description"></a><h4>
+<a name="id928132"></a>
+        <a href="index.html#boost_utility_singleton.reference.boost_utility_member_dereference_max_arity.description">Description</a>
+      </h4>
+<p>
+        This macro can be defined to set the maximum arity of member functions that
+        can be dereferenced by <code class="computeroutput"><span class="keyword">operator</span><span class="special">-&gt;*</span></code>. It defaults to 10.
+      </p>
+<a name="boost_utility_singleton.reference.boost_utility_member_dereference_max_arity.header"></a><h4>
+<a name="id928179"></a>
+        <a href="index.html#boost_utility_singleton.reference.boost_utility_member_dereference_max_arity.header">Header</a>
+      </h4>
+<pre class="programlisting">
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="emphasis"><em>any singleton header</em></span><span class="special">&gt;</span>
+</pre>
+<a name="boost_utility_singleton.reference.boost_utility_member_dereference_max_arity.synopsis"></a><h4>
+<a name="id928230"></a>
+        <a href="index.html#boost_utility_singleton.reference.boost_utility_member_dereference_max_arity.synopsis">Synopsis</a>
+      </h4>
+<pre class="programlisting">
+<span class="preprocessor">#ifndef</span> <span class="identifier">BOOST_UTILITY_MEMBER_DEREFERENCE_MAX_ARITY</span>
+<span class="preprocessor">#   define</span> <span class="identifier">BOOST_UTILITY_MEMBER_DEREFERNCE_MAX_ARITY</span> <span class="number">10</span>
+<span class="preprocessor">#endif</span>
+</pre>
+</div>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="boost_utility_singleton.acknowledgements"></a><a href="index.html#boost_utility_singleton.acknowledgements" title="Acknowledgements">Acknowledgements</a></h2></div></div></div>
+<p>
+      I would like to thank Robert Ramey, Joaquín M López Muñoz
+and Christian Bähnisch for their feedback and support.
+    </p>
+<p>
+      The discussion of Singletons in Chapter 6 of "Modern C++ Design"
+      by Andrei Alexandrescu inspired certain design aspects of these components,
+      in particular destruction semantics.
+    </p>
+<p>
+      Joel de Guzman's documentation style was copied from Fusion.
+    </p>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="boost_utility_singleton.references"></a><a href="index.html#boost_utility_singleton.references" title="References">References</a></h2></div></div></div>
+<div class="orderedlist"><ol type="1">
+<li>
+<a href="http://en.wikipedia.org/wiki/Design_Patterns" target="_top">Design Patterns</a>,
+        Gamma et al. - Addison Wesley Publishing, 1995
+      </li>
+<li>
+<a href="http://moderncppdesign.com" target="_top">Modern C++ Design</a>, Andrei
+        Alexandrescu - Addison Wesley Publishing, 2001
+      </li>
+<li>
+<a href="http://www.boost.org/libs/bind/bind.html" target="_top">Boost.Bind</a>,
+        Peter Dimov, 2001-2005
+      </li>
+</ol></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"><p><small>Last revised: November 05, 2007 at 00:13:27 GMT</small></p></td>
+<td align="right"><small></small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav"></div>
+</body>
+</html>
