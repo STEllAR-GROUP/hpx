@@ -29,6 +29,7 @@ namespace hpx
         unknown_component_address = 9,
         duplicate_component_address = 10,
         invalid_status = 11,
+        bad_parameter = 12,
         last_error
     };
     
@@ -46,6 +47,7 @@ namespace hpx
         "unknown_component_address",
         "duplicate_component_address",
         "invalid status",
+        "bad parameter",
         ""
     };
 

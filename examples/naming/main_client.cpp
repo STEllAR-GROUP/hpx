@@ -6,6 +6,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#define MAX_ITERATIONS 100
+
 #include <iostream>
 #include <string>
 
@@ -37,14 +39,20 @@ int main(int argc, char* argv[])
 
     try {
         using namespace hpx::naming;
-        
+
+        std::vector<double> timings;
+
         // this is our locality
         locality here("localhost", HPX_PORT);
         resolver_client resolver(host, port);
         
+#if defined(MAX_ITERATIONS)
+        for (int i = 0; i < MAX_ITERATIONS; ++i)
+        {
+#endif
         // retrieve the id prefix of this site
         boost::uint64_t prefix1 = 0;
-        BOOST_TEST(resolver.get_prefix(here, prefix1));
+        resolver.get_prefix(here, prefix1);
         BOOST_TEST(0 != prefix1);
         
         boost::uint64_t prefix2 = 0;
@@ -53,8 +61,12 @@ int main(int argc, char* argv[])
 
         // different sites should get different prefix
         boost::uint64_t prefix3 = 0;
-        BOOST_TEST(resolver.get_prefix(locality("1.1.1.1", 1), prefix3));
+        resolver.get_prefix(locality("1.1.1.1", 1), prefix3);
         BOOST_TEST(prefix3 != prefix2);   
+
+        boost::uint64_t prefix4 = 0;
+        BOOST_TEST(!resolver.get_prefix(locality("1.1.1.1", 1), prefix4));
+        BOOST_TEST(prefix3 == prefix4);   
 
         // bind an arbitrary address
         BOOST_TEST(resolver.bind(1, address(here, 1, 2)));
@@ -106,6 +118,24 @@ int main(int argc, char* argv[])
 
         // repeated remove association should fail
         BOOST_TEST(!resolver.unregisterid("/test/foo/1"));
+        
+        BOOST_TEST(resolver.get_statistics(timings));
+        
+#if defined(MAX_ITERATIONS)
+        }
+        
+        int iterations = MAX_ITERATIONS;
+#else
+        int iterations = 1;
+#endif
+
+        std::cout << "Gathered statistics for " << iterations 
+                  << " iterations: " << std::endl;
+        for (std::size_t i = 0; i < server::command_lastcommand; ++i)
+        {
+            std::cout << server::command_names[i] << ": " 
+                      << timings[i] << std::endl;
+        }
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";

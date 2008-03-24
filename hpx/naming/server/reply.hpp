@@ -98,6 +98,24 @@ namespace hpx { namespace naming { namespace server
                          command == command_registerid);
         }
 
+        reply (name_server_command command, double const* timings, 
+               std::size_t const* counts, status_type s = server::success)
+          : command_(command), status_(s),
+            error_(status_strings::get_error_text(server::success)),
+            prefix_(0), id_(0)
+        {
+            BOOST_ASSERT(s == server::success || s == server::no_success);
+            BOOST_ASSERT(command == command_statistics);
+            
+            for (std::size_t i = 0; i < command_lastcommand; ++i)
+            {
+                if (0 != counts[i])
+                    statistics_[i] = timings[i] / counts[i];
+                else
+                    statistics_[i] = 0.0;
+            }
+        }
+
         reply (name_server_command command, naming::address addr)
           : command_(command_resolve), status_(server::success), 
             error_(status_strings::get_error_text(server::success)),
@@ -138,6 +156,13 @@ namespace hpx { namespace naming { namespace server
             return id_;
         }
         
+        double get_statictics(std::size_t i) const
+        {
+            if (i >= command_lastcommand)
+                boost::throw_exception(hpx::error(bad_parameter));
+            return statistics_[i];
+        }
+        
     private:
         // serialization support    
         friend class boost::serialization::access;
@@ -148,15 +173,34 @@ namespace hpx { namespace naming { namespace server
             ar << command_;
             ar << status_;
             ar << error_;
-            if (command_ == command_resolve) {
+            
+            switch (command_) {
+            case command_resolve:
                 ar << address_.locality_;
                 ar << address_.type_;
                 ar << address_.address_;
-            }
-            else if (command_ == command_getprefix)
+                break;
+
+            case command_getprefix:
                 ar << prefix_;
-            else if (command_ == command_queryid)
+                break;
+                
+            case command_queryid:
                 ar << id_.id_;
+                break;
+
+            case command_statistics:
+                for (std::size_t i = 0; i < command_lastcommand; ++i)
+                    ar << statistics_[i];
+                break;
+                
+            case command_unbind:
+            case command_bind:
+            case command_registerid: 
+            case command_unregisterid: 
+            default:
+                break;  // nothing additional to be sent
+            }
         }
 
         template<class Archive>
@@ -170,15 +214,34 @@ namespace hpx { namespace naming { namespace server
             ar >> command_;
             ar >> status_;
             ar >> error_;
-            if (command_ == command_resolve) {
+            
+            switch (command_) {
+            case command_resolve:
                 ar >> address_.locality_;
                 ar >> address_.type_;
                 ar >> address_.address_;
-            }
-            else if (command_ == command_getprefix)
+                break;
+
+            case command_getprefix:
                 ar >> prefix_;
-            else if (command_ == command_queryid)
+                break;
+                
+            case command_queryid:
                 ar >> id_.id_;
+                break;
+                
+            case command_statistics:
+                for (std::size_t i = 0; i < command_lastcommand; ++i)
+                    ar >> statistics_[i];
+                break;
+                
+            case command_unbind:
+            case command_bind:
+            case command_registerid: 
+            case command_unregisterid: 
+            default:
+                break;  // nothing additional to be received
+            }
         }
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 
@@ -189,6 +252,7 @@ namespace hpx { namespace naming { namespace server
         naming::address address_;   /// address (for resolve only)
         boost::uint64_t prefix_;    /// prefix (for get_prefix only)
         naming::id_type id_;        /// global id (for queryid only)
+        double statistics_[command_lastcommand];       /// gathered statistics
     };
 
 ///////////////////////////////////////////////////////////////////////////////

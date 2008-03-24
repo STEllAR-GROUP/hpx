@@ -22,6 +22,7 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/container_device.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
 
 #include <hpx/naming/server/reply.hpp>
 #include <hpx/naming/server/request.hpp>
@@ -106,16 +107,22 @@ namespace hpx { namespace naming { namespace server
                 boost::get<0>(handler)(e);
             }
             else {
+            // do some timings
+                util::high_resolution_timer t;
+                boost::uint8_t command = command_unknown;
+                
             // Extract the data structure from the data just received.
                 try {
-                // Deserialize the data
+                // De-serialize the data
                     request req;
                     {
-                    // create a special io stream on top of in_buffer_
+                    // create a special io stream on top of buffer_
                         boost::iostreams::stream<io_device_type> io(buffer_);
                         util::portable_binary_iarchive archive(io);
                         archive >> req;
                     }
+                    
+                    command = req.get_command();
                     
                 // act on request and generate reply
                     reply rep;
@@ -130,6 +137,9 @@ namespace hpx { namespace naming { namespace server
                         error(boost::asio::error::invalid_argument);
                     boost::get<0>(handler)(error);
                 }
+                
+                // gather timings
+                request_handler_.add_timing(command, t.elapsed());
             }
         }
 
@@ -150,7 +160,6 @@ namespace hpx { namespace naming { namespace server
             }
             
             size_ = (boost::uint32_t)buffer_.size();
-            
 
             // Write the serialized data to the socket. We use "gather-write" 
             // to send both the header and the data in a single write operation.

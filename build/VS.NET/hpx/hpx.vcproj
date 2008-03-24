@@ -297,6 +297,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\hpx\util\high_resolution_timer.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\util\io_service_pool.hpp"
 					>
 				</File>

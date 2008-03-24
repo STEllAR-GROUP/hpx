@@ -113,6 +113,28 @@ public:
         if (size != maxsize && (l >> (size - 1) * CHAR_BIT) & 0x80) 
             l |= (-1 << (size * CHAR_BIT));
     }
+
+    template <typename T>
+    void load_impl_fp(T& l, char maxsize)
+    {
+        boost::uint8_t size;
+        this->archive_base_t::load(size);
+        if(size != maxsize)     // sizes need to match
+            throw portable_binary_archive_exception();
+
+        l = 0;
+        load_binary(&l, size);
+
+// we choose to use big endian (hey it's the network byte ordering)
+#ifdef BOOST_LITTLE_ENDIAN
+        boost::int8_t* first = 
+            static_cast<boost::int8_t*>(static_cast<void*>(&l));
+        boost::int8_t* last = first + size - 1;
+        for(/**/ ; first < last; ++first, --last)
+            std::swap(*first, *last);
+#endif
+    }
+
     // default fall through for any types not specified here
     template<class T>
     void load(T & t){
@@ -161,13 +183,13 @@ public:
     }
 #endif
     void load(float& t){
-        BOOST_ASSERT(false);    // floating point types are not implemented
+        load_impl_fp(t, sizeof(float));
     }
     void load(double& t){
-        BOOST_ASSERT(false);    // floating point types are not implemented
+        load_impl_fp(t, sizeof(double));
     }
     void load(long double& t){
-        BOOST_ASSERT(false);    // floating point types are not implemented
+        load_impl_fp(t, sizeof(long double));
     }
 public:
     portable_binary_iarchive(std::istream & is, unsigned flags = 0) :

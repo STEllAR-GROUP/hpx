@@ -89,6 +89,23 @@ public:
         save_binary(&l, size);
     }
     
+    template <typename T>
+    void save_impl_fp(T l)
+    {
+        boost::uint8_t size = sizeof(T);
+        this->archive_base_t::save(size);
+
+// we choose to use big endian (hey it's the network byte ordering)
+#ifdef BOOST_LITTLE_ENDIAN
+        boost::int8_t* first = 
+            static_cast<boost::int8_t*>(static_cast<void*>(&l));
+        boost::int8_t* last = first + size - 1;
+        for(/**/; first < last; ++first, --last)
+            std::swap(*first, *last);
+#endif
+        save_binary(&l, size);
+    }
+
     // add base class to the places considered when matching
     // save function to a specific set of arguments.  Note, this didn't
     // work on my MSVC 7.0 system so we use the sure-fire method below
@@ -126,13 +143,13 @@ public:
     }
 #endif
     void save(const float t){
-        BOOST_ASSERT(false);    // floating point types are not implemented
+        save_impl_fp(t);
     }
     void save(const double t){
-        BOOST_ASSERT(false);    // floating point types are not implemented
+        save_impl_fp(t);
     }
     void save(const long double t){
-        BOOST_ASSERT(false);    // floating point types are not implemented
+        save_impl_fp(t);
     }
 public:
     portable_binary_oarchive(std::ostream & os, unsigned flags = 0) :

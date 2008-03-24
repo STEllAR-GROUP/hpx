@@ -13,6 +13,7 @@
 #include <boost/thread.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/assert.hpp>
+#include <boost/throw_exception.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/integer/endian.hpp>
@@ -57,11 +58,13 @@ namespace hpx { namespace naming
                     break;
                 }
             }
-            if (error)
-                throw hpx::exception(network_error, error.message());
+            if (error) {
+                boost::throw_exception(
+                    hpx::exception(network_error, error.message()));
+            }
         }
         catch (boost::system::error_code const& e) {
-            throw hpx::exception(network_error, e.message());
+            boost::throw_exception(hpx::exception(network_error, e.message()));
         }
     }
     
@@ -79,7 +82,7 @@ namespace hpx { namespace naming
         
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
-            throw hpx::exception((error)s, rep.get_error());            
+            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
 
         prefix = rep.get_prefix();
         return s == success;
@@ -94,7 +97,7 @@ namespace hpx { namespace naming
         
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
-            throw hpx::exception((error)s, rep.get_error());            
+            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
 
         return s == success;
     }
@@ -108,7 +111,7 @@ namespace hpx { namespace naming
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
-            throw hpx::exception((error)s, rep.get_error());            
+            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
 
         return s == success;
     }
@@ -122,7 +125,7 @@ namespace hpx { namespace naming
         
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
-            throw hpx::exception((error)s, rep.get_error());            
+            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
 
         addr = rep.get_address();
         return s == success;
@@ -137,7 +140,7 @@ namespace hpx { namespace naming
         
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
-            throw hpx::exception((error)s, rep.get_error());            
+            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
 
         return s == success;
     }
@@ -151,7 +154,7 @@ namespace hpx { namespace naming
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
-            throw hpx::exception((error)s, rep.get_error());            
+            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
 
         return s == success;
     }
@@ -165,9 +168,26 @@ namespace hpx { namespace naming
         
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
-            throw hpx::exception((error)s, rep.get_error());            
+            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
 
         id = rep.get_id();
+        return s == success;
+    }
+
+    bool resolver_client::get_statistics(std::vector<double>& timings)
+    {
+        // send request
+        server::request req (server::command_statistics);
+        server::reply rep;            
+        execute(req, rep);
+        
+        hpx::error s = (hpx::error) rep.get_status();
+        if (s != success && s != no_success)
+            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+
+        for (std::size_t i = 0; i < server::command_lastcommand; ++i)
+            timings.push_back(rep.get_statictics(i));
+            
         return s == success;
     }
 
@@ -202,17 +222,22 @@ namespace hpx { namespace naming
             buffers.push_back(boost::asio::buffer(&size, sizeof(size)));
             buffers.push_back(boost::asio::buffer(buffer));
             if (buffer.size() + sizeof(size) != boost::asio::write(s, buffers))
-                throw hpx::exception(network_error, "network write failed");
-
+            {
+                boost::throw_exception(
+                    hpx::exception(network_error, "network write failed"));
+            }
+            
             // wait for response
             boost::system::error_code err = boost::asio::error::fault;
 
             // first read the size of the message 
             std::size_t reply_length = boost::asio::read(s,
                 boost::asio::buffer(&size, sizeof(size)));
-            if (reply_length != sizeof(size)) 
-                throw hpx::exception(network_error, "network read failed");
-
+            if (reply_length != sizeof(size)) {
+                boost::throw_exception(
+                    hpx::exception(network_error, "network read failed"));
+            }
+            
             // now read the rest of the message
             boost::uint32_t native_size = size;
             buffer.resize(native_size);
@@ -221,25 +246,31 @@ namespace hpx { namespace naming
                 err);
 
             s.close();
-            if (err)
-                throw hpx::exception(network_error, err.message());
-            if (reply_length != native_size) 
-                throw hpx::exception(network_error, "network read failed");
-                
-            // Deserialize the data
-            boost::iostreams::stream<io_device_type> io(buffer);
-            util::portable_binary_iarchive archive(io);
-            archive >> rep;
-
+            if (err) {
+                boost::throw_exception(
+                    hpx::exception(network_error, err.message()));
+            }
+            if (reply_length != native_size) {
+                boost::throw_exception(
+                    hpx::exception(network_error, "network read failed"));
+            }
+            
+            // De-serialize the data
+            {
+                boost::iostreams::stream<io_device_type> io(buffer);
+                util::portable_binary_iarchive archive(io);
+                archive >> rep;
+            }
         }
         catch (boost::system::error_code const& e) {
-            throw hpx::exception(network_error, e.message());
+            boost::throw_exception(hpx::exception(network_error, e.message()));
         }        
         catch (std::exception const& e) {
-            throw hpx::exception(network_error, e.what());
+            boost::throw_exception(hpx::exception(network_error, e.what()));
         }
         catch(...) {
-            throw hpx::exception(no_success, "unexpected error");
+            boost::throw_exception(hpx::exception(no_success, 
+                "unexpected error"));
         } 
     }
 

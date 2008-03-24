@@ -18,6 +18,8 @@ namespace hpx { namespace naming { namespace server
 {
     request_handler::request_handler()
     {
+        memset(totaltime_, 0, sizeof(totaltime_));
+        memset(totalcalls_, 0, sizeof(totalcalls_));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -188,11 +190,15 @@ namespace hpx { namespace naming { namespace server
 
     void request_handler::handle_statistics(request const& req, reply& rep)
     {
-//         statistics_reply reply;
-//         if (statistics(req, reply))
-//             reply.to_buffers(buffers);
-//         else
-//             handle_error(req, reply, buffers);
+        try {
+            rep = reply(command_statistics, totaltime_, totalcalls_);
+        }
+        catch (std::bad_alloc) {
+            rep = reply(command_statistics, out_of_memory);
+        }            
+        catch (...) {
+            rep = reply(command_statistics, internal_server_error);
+        }            
     }
 
     ///////////////////////////////////////////////////////////////////////////

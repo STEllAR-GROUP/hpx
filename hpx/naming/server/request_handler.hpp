@@ -34,6 +34,16 @@ namespace hpx { namespace naming { namespace server
         /// Handle a request and produce a reply.
         void handle_request(request const& req, reply& rep);
 
+        void add_timing(boost::uint8_t command, double elapsed)
+        {
+            if (command >= command_firstcommand && 
+                command < command_lastcommand)
+            {
+                totaltime_[command] += elapsed;
+                ++totalcalls_[command];
+            }
+        }
+        
     protected:
         void handle_getprefix(request const& req, reply& rep);
         void handle_bind(request const& req, reply& rep);
@@ -56,6 +66,10 @@ namespace hpx { namespace naming { namespace server
         registry_type registry_;
         site_prefix_map_type site_prefixes_;
         std::string msg_;
+
+        // gathered timings and counts        
+        double totaltime_[command_lastcommand];
+        std::size_t totalcalls_[command_lastcommand];
     };
 
     // compare two entries in the site_prefix_map_type above
