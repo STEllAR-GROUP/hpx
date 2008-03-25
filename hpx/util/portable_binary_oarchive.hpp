@@ -78,8 +78,8 @@ public:
         }
         this->archive_base_t::save(size);
 
-// we choose to use big endian (hey it's the network byte ordering)
-#ifdef BOOST_LITTLE_ENDIAN
+// we choose to use little endian (it's more common)
+#ifdef BOOST_BIG_ENDIAN
         boost::int8_t* first = 
             static_cast<boost::int8_t*>(static_cast<void*>(&l));
         boost::int8_t* last = first + size - 1;
@@ -95,8 +95,8 @@ public:
         boost::uint8_t size = sizeof(T);
         this->archive_base_t::save(size);
 
-// we choose to use big endian (hey it's the network byte ordering)
-#ifdef BOOST_LITTLE_ENDIAN
+// we choose to use little endian (it's more common)
+#ifdef BOOST_BIG_ENDIAN
         boost::int8_t* first = 
             static_cast<boost::int8_t*>(static_cast<void*>(&l));
         boost::int8_t* last = first + size - 1;

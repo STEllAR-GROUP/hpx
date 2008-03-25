@@ -98,8 +98,9 @@ namespace hpx { namespace naming { namespace server
                          command == command_registerid);
         }
 
-        reply (name_server_command command, double const* timings, 
-               std::size_t const* counts, status_type s = server::success)
+        reply (name_server_command command, 
+               std::vector<std::pair<double, std::size_t> > const& totals, 
+               status_type s = server::success)
           : command_(command), status_(s),
             error_(status_strings::get_error_text(server::success)),
             prefix_(0), id_(0)
@@ -109,8 +110,9 @@ namespace hpx { namespace naming { namespace server
             
             for (std::size_t i = 0; i < command_lastcommand; ++i)
             {
-                if (0 != counts[i])
-                    statistics_[i] = timings[i] / counts[i];
+                std::pair<double, std::size_t> const& p (totals[i]);
+                if (0 != p.second)
+                    statistics_[i] = p.first / p.second;
                 else
                     statistics_[i] = 0.0;
             }

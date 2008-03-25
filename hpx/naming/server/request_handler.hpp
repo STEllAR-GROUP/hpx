@@ -39,8 +39,8 @@ namespace hpx { namespace naming { namespace server
             if (command >= command_firstcommand && 
                 command < command_lastcommand)
             {
-                totaltime_[command] += elapsed;
-                ++totalcalls_[command];
+                totals_[command].first += elapsed;
+                ++totals_[command].second;
             }
         }
         
@@ -68,8 +68,7 @@ namespace hpx { namespace naming { namespace server
         std::string msg_;
 
         // gathered timings and counts        
-        double totaltime_[command_lastcommand];
-        std::size_t totalcalls_[command_lastcommand];
+        std::vector<std::pair<double, std::size_t> > totals_;
     };
 
     // compare two entries in the site_prefix_map_type above

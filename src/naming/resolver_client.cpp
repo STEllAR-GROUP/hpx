@@ -217,7 +217,7 @@ namespace hpx { namespace naming
             }
 
             // send the data
-            boost::integer::ubig32_t size = (boost::uint32_t)buffer.size();
+            boost::integer::little32_t size = (boost::uint32_t)buffer.size();
             std::vector<boost::asio::const_buffer> buffers;
             buffers.push_back(boost::asio::buffer(&size, sizeof(size)));
             buffers.push_back(boost::asio::buffer(buffer));
