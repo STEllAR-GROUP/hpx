@@ -45,6 +45,7 @@ namespace hpx { namespace naming { namespace server
         }
         ~connection()
         {
+            socket_.close();
         }
         
         /// Get the socket associated with the connection.
@@ -131,11 +132,15 @@ namespace hpx { namespace naming { namespace server
                 // send the reply back to the requesting site
                     async_write(rep, handler);
                 }
-                catch (std::exception const& /*e*/) {
+                catch (std::exception const& e) {
                     // Unable to decode data.
                     boost::system::error_code 
                         error(boost::asio::error::invalid_argument);
                     boost::get<0>(handler)(error);
+                    
+                // send the error reply back to the requesting site
+                    reply rep (server::no_success, e.what());
+                    async_write(rep, handler);
                 }
                 
                 // gather timings

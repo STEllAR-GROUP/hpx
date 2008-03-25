@@ -81,6 +81,12 @@ namespace hpx { namespace naming { namespace server
             prefix_(0), id_(0)
         {}
 
+        reply (status_type s, char const* what)
+          : command_(command_unknown), status_(s),
+            error_(std::string(status_strings::get_error_text(s)) + ": " + what),
+            prefix_(0), id_(0)
+        {}
+
         reply (name_server_command command, status_type s = server::success)
           : command_(command), status_(s), 
             error_(status_strings::get_error_text(s)),
