@@ -106,6 +106,10 @@ namespace hpx { namespace naming { namespace server
 
             if (e) {
                 boost::get<0>(handler)(e);
+                    
+            // send the error reply back to the requesting site
+                reply rep (server::no_success, e.message().c_str());
+                async_write(rep, handler);
             }
             else {
             // do some timings
@@ -186,6 +190,16 @@ namespace hpx { namespace naming { namespace server
             boost::tuple<Handler> handler)
         {
             boost::get<0>(handler)(e);
+
+            // listen for the next request
+            void (connection::*f)(boost::system::error_code const&, 
+                    boost::tuple<Handler>)
+                = &connection::handle_read_header<Handler>;
+
+            boost::asio::async_read(socket_, 
+                boost::asio::buffer(&size_, sizeof(size_)),
+                boost::bind(f, shared_from_this(), 
+                    boost::asio::placeholders::error, handler));
         }
         
     private:

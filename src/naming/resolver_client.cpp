@@ -33,6 +33,7 @@ namespace hpx { namespace naming
 {
     resolver_client::resolver_client(std::string const& address, 
         unsigned short port) 
+      : socket_(io_service_)
     {
         try {
             using boost::asio::ip::tcp;
@@ -43,22 +44,18 @@ namespace hpx { namespace naming
                 boost::lexical_cast<std::string>(port));
             
             // Try each endpoint until we successfully establish a connection.
-            tcp::socket socket(io_service_);
-            
             tcp::resolver::iterator end;
             tcp::resolver::iterator it = resolver.resolve(query);
             boost::system::error_code error = boost::asio::error::try_again;
             for (/**/; it != end; ++it)
             {
-                socket.close();
-                socket.connect(*it, error);
-                if (!error) {
-                    endpoint_ = *it;    // store this endpoints information
-                    socket.close();
+                socket_.close();
+                socket_.connect(*it, error);
+                if (!error) 
                     break;
-                }
             }
             if (error) {
+                socket_.close();
                 boost::throw_exception(
                     hpx::exception(network_error, error.message()));
             }
@@ -69,8 +66,15 @@ namespace hpx { namespace naming
     }
     
     resolver_client::resolver_client(locality l) 
-        : endpoint_(l.get_endpoint())
+      : socket_(io_service_)
     {
+        boost::system::error_code error = boost::asio::error::try_again;
+        socket_.connect(l.get_endpoint(), error);
+        if (error) {
+            socket_.close();
+            boost::throw_exception(
+                hpx::exception(network_error, error.message()));
+        }
     }
 
     bool resolver_client::get_prefix(locality l, boost::uint64_t& prefix)
@@ -205,9 +209,6 @@ namespace hpx { namespace naming
 
         try {
             // connect socket
-            boost::asio::ip::tcp::socket s (io_service_);
-            s.connect(endpoint_);
-
             std::vector<char> buffer;
             {
                 // serialize the request
@@ -221,7 +222,7 @@ namespace hpx { namespace naming
             std::vector<boost::asio::const_buffer> buffers;
             buffers.push_back(boost::asio::buffer(&size, sizeof(size)));
             buffers.push_back(boost::asio::buffer(buffer));
-            if (buffer.size() + sizeof(size) != boost::asio::write(s, buffers))
+            if (buffer.size() + sizeof(size) != boost::asio::write(socket_, buffers))
             {
                 boost::throw_exception(
                     hpx::exception(network_error, "network write failed"));
@@ -231,7 +232,7 @@ namespace hpx { namespace naming
             boost::system::error_code err = boost::asio::error::fault;
 
             // first read the size of the message 
-            std::size_t reply_length = boost::asio::read(s,
+            std::size_t reply_length = boost::asio::read(socket_,
                 boost::asio::buffer(&size, sizeof(size)));
             if (reply_length != sizeof(size)) {
                 boost::throw_exception(
@@ -241,11 +242,10 @@ namespace hpx { namespace naming
             // now read the rest of the message
             boost::uint32_t native_size = size;
             buffer.resize(native_size);
-            reply_length = boost::asio::read(s, boost::asio::buffer(buffer), 
+            reply_length = boost::asio::read(socket_, boost::asio::buffer(buffer), 
                 boost::bind(&resolver_client::read_completed, _1, _2, native_size), 
                 err);
 
-            s.close();
             if (err) {
                 boost::throw_exception(
                     hpx::exception(network_error, err.message()));

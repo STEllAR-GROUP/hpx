@@ -176,7 +176,7 @@ namespace hpx { namespace naming
 
     private:
         boost::asio::io_service io_service_;
-        boost::asio::ip::tcp::endpoint endpoint_;
+        boost::asio::ip::tcp::socket socket_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////
