@@ -6,8 +6,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(DISTPX_PARCELSET_SERVER_CONNECTION_AUG_17_2007_0757AM)
-#define DISTPX_PARCELSET_SERVER_CONNECTION_AUG_17_2007_0757AM
+#if !defined(HPX_PARCELSET_SERVER_PARCEL_CONNECTION_MAR_26_2008_1221PM)
+#define HPX_PARCELSET_SERVER_PARCEL_CONNECTION_MAR_26_2008_1221PM
 
 #include <sstream>
 #include <vector>
@@ -21,13 +21,13 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/integer/endian.hpp>
 
-#include <distpx/util/portable_binary_oarchive.hpp>
-#include <distpx/util/portable_binary_iarchive.hpp>
-#include <distpx/util/container_device.hpp>
-#include <distpx/parcelset/server/parcel_queue.hpp>
+#include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/container_device.hpp>
+#include <hpx/parcelset/server/parcel_queue.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace distpx { namespace parcelset { namespace server 
+namespace hpx { namespace parcelset { namespace server 
 {
     /// Represents a single connection from a client.
     class connection
@@ -193,6 +193,6 @@ namespace distpx { namespace parcelset { namespace server
     typedef boost::shared_ptr<connection> connection_ptr;
 
 ///////////////////////////////////////////////////////////////////////////////
-}}}  // namespace distpx::naming::server
+}}}  // namespace hpx::naming::server
 
 #endif

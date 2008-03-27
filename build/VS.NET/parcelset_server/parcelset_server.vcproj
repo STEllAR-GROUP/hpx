@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="resolver_client"
-	ProjectGUID="{80488ECE-599A-422A-86C3-FC543A75626D}"
-	RootNamespace="resolver_client"
+	Name="parcelset_server"
+	ProjectGUID="{D391E817-AABC-468C-BDDD-B632619E0647}"
+	RootNamespace="parcelset_server"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -49,6 +49,7 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4267"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -123,6 +124,7 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4267"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -177,7 +179,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\examples\naming\resolver_client.cpp"
+				RelativePath="..\..\..\examples\parcelset\parcelset_server.cpp"
 				>
 			</File>
 		</Filter>

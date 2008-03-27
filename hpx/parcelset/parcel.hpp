@@ -5,23 +5,24 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(DISTPX_PARCEL_MAY_21_2007_0729PM)
-#define DISTPX_PARCEL_MAY_21_2007_0729PM
+#if !defined(HPX_PARCELSET_PARCEL_MAR_26_2008_1051AM)
+#define HPX_PARCELSET_PARCEL_MAR_26_2008_1051AM
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/serialization.hpp>
 
-#include <distpx/components/action.hpp>
-#include <distpx/naming/name.hpp>
-#include <distpx/exception.hpp>
+#include <hpx/components/action.hpp>
+#include <hpx/naming/name.hpp>
+#include <hpx/naming/address.hpp>
+#include <hpx/exception.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 //  parcel serialization format version
-#define DISTPX_PARCEL_VERSION 0x11
+#define HPX_PARCEL_VERSION 0x20
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace distpx { namespace parcelset
+namespace hpx { namespace parcelset
 {
     ///////////////////////////////////////////////////////////////////////////
     // parcel continuation
@@ -71,6 +72,10 @@ namespace distpx { namespace parcelset
         {
             return destination_id_;
         }
+        naming::address const& get_destination_addr() const
+        {
+            return destination_addr_;
+        }
         naming::id_type get_source() const
         {
             return source_id_;
@@ -90,6 +95,12 @@ namespace distpx { namespace parcelset
         void set_source(naming::id_type source_id) const
         {
             source_id_ = source_id;
+        }
+        
+        /// set the destination address
+        void set_destination_addr(naming::address const& addr) const
+        {
+            destination_addr_ = addr;
         }
         
     private:
@@ -112,6 +123,7 @@ namespace distpx { namespace parcelset
         // may be modified even if seems to be const
         mutable naming::id_type source_id_;
         mutable parcel_id tag_;   
+        mutable naming::address destination_addr_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -120,6 +132,6 @@ namespace distpx { namespace parcelset
 ///////////////////////////////////////////////////////////////////////////////
 // this is the current version of the parcel serialization format
 // this definition needs to be in the global namespace
-BOOST_CLASS_VERSION(distpx::parcelset::parcel, DISTPX_PARCEL_VERSION)
+BOOST_CLASS_VERSION(hpx::parcelset::parcel, HPX_PARCEL_VERSION)
 
 #endif

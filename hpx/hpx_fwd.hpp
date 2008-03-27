@@ -36,17 +36,17 @@ namespace hpx
         }
     }
 
-//     namespace parcelset
-//     {
-//         class parcel;
-//         class parcelset;
-//     }
+    namespace parcelset
+    {
+        class parcel;
+        class parcelport;
+    }
     
-//     namespace threadmanager
-//     {
-//         class threadmanager;
-//     }
-//     
+    namespace threadmanager
+    {
+        class threadmanager;
+    }
+    
 //     namespace components
 //     {
 //         class component;

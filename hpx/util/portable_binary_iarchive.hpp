@@ -143,32 +143,32 @@ public:
     void load(unsigned short & t){
         boost::intmax_t l;
         load_impl(l, sizeof(unsigned short));
-        t = l;
+        t = static_cast<unsigned short>(l);
     }
     void load(short & t){
         boost::intmax_t l;
         load_impl(l, sizeof(short));
-        t = l;
+        t = static_cast<short>(l);
     }
     void load(unsigned int & t){
         boost::intmax_t l;
         load_impl(l, sizeof(unsigned int));
-        t = l;
+        t = static_cast<unsigned int>(l);
     }
     void load(int & t){
         boost::intmax_t l;
         load_impl(l, sizeof(int));
-        t = l;
+        t = static_cast<int>(l);
     }
     void load(unsigned long & t){
         boost::intmax_t l;
         load_impl(l, sizeof(unsigned long));
-        t = l;
+        t = static_cast<unsigned long>(l);
     }
     void load(long & t){
         boost::intmax_t l;
         load_impl(l, sizeof(long));
-        t = l;
+        t = static_cast<long>(l);
     }
 #if defined(BOOST_HAS_LONG_LONG)
     void load(boost::long_long_type & t){

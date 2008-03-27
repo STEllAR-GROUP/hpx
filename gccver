@@ -1,0 +1,2 @@
+#!/bin/sh
+gcc -v 2>&1| perl -n -e 'print "$1$2\n" if(/version +(\d+)\.(\d+)/);'

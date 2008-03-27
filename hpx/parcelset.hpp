@@ -6,7 +6,7 @@
 #if !defined(HPX_PARCELSET_MAR_24_2008_1031AM)
 #define HPX_PARCELSET_MAR_24_2008_1031AM
 
-#include <hpx/parcelset/parcelset.hpp>
+#include <hpx/parcelset/parcelport.hpp>
 #include <hpx/parcelset/parcel.hpp>
 #include <hpx/parcelset/server/parcel_queue.hpp>
 

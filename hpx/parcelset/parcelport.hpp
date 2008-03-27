@@ -7,51 +7,51 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(DISTPX_PARCELSET_MAY_21_2007_0729PM)
-#define DISTPX_PARCELSET_MAY_21_2007_0729PM
+#if !defined(HPX_PARCELSET_PARCELPORT_MAR_26_2008_1214PM)
+#define HPX_PARCELSET_PARCELPORT_MAR_26_2008_1214PM
 
 #include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/asio.hpp>
 
-#include <distpx/config.hpp>
-#include <distpx/naming/name.hpp>
-#include <distpx/naming/address.hpp>
-#include <distpx/naming/locality.hpp>
-#include <distpx/naming/resolver_client.hpp>
-#include <distpx/components/action.hpp>
-#include <distpx/util/generate_unique_ids.hpp>
+#include <hpx/config.hpp>
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/naming/name.hpp>
+#include <hpx/naming/address.hpp>
+#include <hpx/naming/locality.hpp>
+#include <hpx/naming/resolver_client.hpp>
+#include <hpx/util/generate_unique_ids.hpp>
 
-#include <distpx/util/io_service_pool.hpp>
-#include <distpx/parcelset/parcel.hpp>
-#include <distpx/parcelset/server/parcel_queue.hpp>
-#include <distpx/parcelset/server/parcel_connection.hpp>
+#include <hpx/util/io_service_pool.hpp>
+#include <hpx/parcelset/parcel.hpp>
+#include <hpx/parcelset/server/parcel_queue.hpp>
+#include <hpx/parcelset/server/parcel_connection.hpp>
 
-#if DISTPX_USE_TBB != 0
+#if HPX_USE_TBB != 0
 #include <tbb/atomic.h>
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace distpx { namespace parcelset
+namespace hpx { namespace parcelset
 {
-    class parcelset : boost::noncopyable
+    class parcelport : boost::noncopyable
     {
-        typedef boost::mutex mutex_type;
         static void default_write_handler(boost::system::error_code const&, 
             std::size_t) {}
+        
+        // avoid warning about using this in member initializer list
+        parcelport const& This() const { return *this; }
         
     public:
         /// Construct the server to listen on the specified TCP address and port, 
         /// and serve up requests to the address translation service.
-        explicit parcelset(naming::resolver_client& resolver, 
-            threadmanager::threadmanager& thread_manager,
-            std::string address = "localhost", unsigned short port = DISTPX_PORT, 
+        explicit parcelport(naming::resolver_client& resolver, 
+            std::string address = "localhost", unsigned short port = HPX_PORT, 
             std::size_t io_service_pool_size = 1);
 
         /// Construct the server to listen to the endpoint given by the 
         /// locality and serve up requests to the address translation service.
-        parcelset(naming::resolver_client& resolver, naming::locality here, 
-            threadmanager::threadmanager& thread_manager,
+        parcelport(naming::resolver_client& resolver, naming::locality here, 
             std::size_t io_service_pool_size = 1);
 
         void run (bool blocking = true);
@@ -83,15 +83,18 @@ namespace distpx { namespace parcelset
             if (!p.get_source())
                 p.set_source(prefix_);
                 
-            // resolve destination address
-            naming::address addr;
-            if (!resolver_.resolve(p.get_destination(), addr)) {
-                throw exception(unknown_component_address, 
-                    "Unknown destination address");
+            // resolve destination address, if needed
+            if (!p.get_destination_addr()) {
+                naming::address addr;
+                if (!resolver_.resolve(p.get_destination(), addr)) {
+                    throw exception(unknown_component_address, 
+                        "Unknown destination address");
+                }
+                p.set_destination_addr(addr);
             }
             
             // send the parcel to its destination
-            send_parcel(p, addr, f);
+            send_parcel(p, p.get_destination_addr(), f);
             
             // return parcel id of the parcel being sent
             return p.get_parcel_id();
@@ -100,7 +103,7 @@ namespace distpx { namespace parcelset
         /// This function is asynchronous, no callback functor is provided
         parcel_id put_parcel(parcel const& p)
         {
-            return put_parcel(p, &parcelset::default_write_handler);
+            return put_parcel(p, &parcelport::default_write_handler);
         }
 
         ///////////////////////////////////////////////////////////////////////////
@@ -142,6 +145,14 @@ namespace distpx { namespace parcelset
         /// Return the prefix of this locality
         boost::uint64_t get_prefix() const { return prefix_; }
         
+        /// register an event handler to be called whenever a parcel has been 
+        /// received
+        template <typename F>
+        bool register_event_handler(F sink)
+        {
+            return parcels_.register_event_handler(sink);
+        }
+
     protected:
         // helper functions for receiving parcels
         void handle_accept(boost::system::error_code const& e);
@@ -157,7 +168,7 @@ namespace distpx { namespace parcelset
 
             client_connection->socket().async_connect(
                 addr.locality_.get_endpoint(),
-                boost::bind(&parcelset::handle_connect<Handler>, this,
+                boost::bind(&parcelport::handle_connect<Handler>, this,
                     boost::asio::placeholders::error, client_connection, 
                     boost::ref(p), f));
         }

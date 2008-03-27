@@ -9,11 +9,12 @@
 #include <boost/cstdint.hpp>
 
 #include <hpx/naming/locality.hpp>
+#include <hpx/util/safe_bool.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming
 {
-    struct address
+    struct address : public util::safe_bool<address>
     {
         typedef boost::uint64_t component_type;
         typedef boost::uint64_t address_type;
@@ -26,6 +27,9 @@ namespace hpx { namespace naming
         address(locality l, component_type t, address_type a)
           : locality_(l), type_(t), address_(a) 
         {}
+        
+        // this get's called from the safe_bool base class 
+        bool operator_bool() const { return 0 != address_; }
         
         friend bool operator==(address const& lhs, address const& rhs)
         {

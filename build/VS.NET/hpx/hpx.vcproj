@@ -46,6 +46,7 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4267"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -105,6 +106,7 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4267"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -202,6 +204,34 @@
 					RelativePath="..\..\..\src\util\io_service_pool.cpp"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="Parcelset"
+				>
+				<File
+					RelativePath="..\..\..\src\parcelset\parcel.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\parcelset\parcelport.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							DisableSpecificWarnings="4503"
+						/>
+					</FileConfiguration>
+				</File>
+				<Filter
+					Name="Server"
+					>
+					<File
+						RelativePath="..\..\..\src\parcelset\server\parcel_queue.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -313,10 +343,58 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\hpx\util\safe_bool.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\util\util.hpp"
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Parcelset"
+				>
+				<File
+					RelativePath="..\..\..\hpx\parcelset\parcel.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\parcelset\parcelport.hpp"
+					>
+				</File>
+				<Filter
+					Name="Server"
+					>
+					<File
+						RelativePath="..\..\..\hpx\parcelset\server\parcel_connection.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\parcelset\server\parcel_queue.hpp"
+						>
+					</File>
+				</Filter>
+			</Filter>
+			<Filter
+				Name="Components"
+				>
+				<File
+					RelativePath="..\..\..\hpx\components\action.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\components\component_type.hpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Auxiliary Files"
+			>
+			<File
+				RelativePath="..\..\..\src\Makefile.am"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

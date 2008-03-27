@@ -1,0 +1,19 @@
+
+Predistribution version
+
+Commands to build libhpx.a
+
+  aclocal
+  autoconf
+  automake -a
+  ./configure
+  make
+
+After this, if you wish to build the examples and the tests, go to their 
+respective directories, and type make.
+
+Their directories are:
+  tests/
+  examples/.../
+
+

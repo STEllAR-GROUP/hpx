@@ -11,9 +11,9 @@
 #include <hpx/exception.hpp>
 #include <hpx/naming.hpp>
 #include <hpx/util.hpp>
+#include <hpx/parcelset.hpp>
 
 // #include <hpx/components.hpp>
-// #include <hpx/parcelset.hpp>
 // #include <hpx/threadmanager.hpp>
 // #include <hpx/core.hpp>
 

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="resolver_client"
-	ProjectGUID="{80488ECE-599A-422A-86C3-FC543A75626D}"
-	RootNamespace="resolver_client"
+	Name="parcelset_client"
+	ProjectGUID="{DDAED417-C051-44D6-B46F-49B6D4BDF28C}"
+	RootNamespace="parcelset_client"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -177,7 +177,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\examples\naming\resolver_client.cpp"
+				RelativePath="..\..\..\examples\parcelset\parcelset_client.cpp"
 				>
 			</File>
 		</Filter>
