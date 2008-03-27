@@ -7,9 +7,16 @@
 #define HPX_NAMING_ADDRESS_MAR_24_2008_0949AM
 
 #include <boost/cstdint.hpp>
+#include <boost/serialization/serialization.hpp>
 
 #include <hpx/naming/locality.hpp>
 #include <hpx/util/safe_bool.hpp>
+#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/portable_binary_oarchive.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+//  address serialization format version
+#define HPX_ADDRESS_VERSION 0x20
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming
@@ -24,6 +31,10 @@ namespace hpx { namespace naming
           : type_(0), address_(0)
         {}
 
+        address(locality l)
+          : locality_(l), type_(0), address_(0) 
+        {}
+        
         address(locality l, component_type t, address_type a)
           : locality_(l), type_(t), address_(a) 
         {}
@@ -40,9 +51,37 @@ namespace hpx { namespace naming
         locality locality_;     /// locality: ip4 address/port number
         component_type type_;   /// component type this address is referring to
         address_type address_;  /// address (sequence number)
+
+    private:
+        // serialization support    
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void save(Archive & ar, const unsigned int version) const
+        {
+            ar << locality_ << type_ << address_; 
+        }
+
+        template<class Archive>
+        void load(Archive & ar, const unsigned int version)
+        {
+            if (version > HPX_ADDRESS_VERSION) {
+                throw exception(version_too_new, 
+                    "trying to load address with unknown version");
+            }
+            
+            ar >> locality_ >> type_ >> address_; 
+        }
+
+        BOOST_SERIALIZATION_SPLIT_MEMBER()
     };
 
 ///////////////////////////////////////////////////////////////////////////////
 }}
+
+///////////////////////////////////////////////////////////////////////////////
+// this is the current version of the address serialization format
+// this definition needs to be in the global namespace
+BOOST_CLASS_VERSION(hpx::naming::address, HPX_ADDRESS_VERSION)
 
 #endif

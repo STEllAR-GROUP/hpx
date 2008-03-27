@@ -44,6 +44,12 @@ namespace hpx { namespace parcelset
         {
         }
         
+        parcel(naming::id_type apply_to)
+          : destination_id_(apply_to), action_(), 
+            cont_(none), source_id_(0), tag_(0)
+        {
+        }
+    
         parcel(naming::id_type apply_to, components::action_base* act)
           : destination_id_(apply_to), action_(act), 
             cont_(none), source_id_(0), tag_(0)
@@ -64,45 +70,51 @@ namespace hpx { namespace parcelset
         // default copy constructor is ok    
         // default assignment operator is ok
     
-        parcel_id get_parcel_id() const 
-        {
-            return tag_;
-        }
-        naming::id_type get_destination() const
-        {
-            return destination_id_;
-        }
-        naming::address const& get_destination_addr() const
-        {
-            return destination_addr_;
-        }
-        naming::id_type get_source() const
-        {
-            return source_id_;
-        }
         components::action_type get_action() const 
         {
             return action_;
         }
     
-        /// set the parcel id
-        void set_parcel_id(parcel_id id) const
+        /// get and set the parcel id
+        parcel_id get_parcel_id() const 
+        {
+            return tag_;
+        }
+        void set_parcel_id(parcel_id id) 
         {
             tag_ = id;
         }
 
-        /// set the source locality/component id
-        void set_source(naming::id_type source_id) const
+        /// get and set the source locality/component id
+        naming::id_type get_source() const
+        {
+            return source_id_;
+        }
+        void set_source(naming::id_type source_id)
         {
             source_id_ = source_id;
         }
         
-        /// set the destination address
-        void set_destination_addr(naming::address const& addr) const
+        /// get and set the destination id
+        void set_destination(naming::id_type dest)
+        {
+            destination_id_ = dest;
+        }
+        naming::id_type get_destination() const
+        {
+            return destination_id_;
+        }
+
+        /// get and set the destination address
+        void set_destination_addr(naming::address const& addr)
         {
             destination_addr_ = addr;
         }
-        
+        naming::address const& get_destination_addr() const
+        {
+            return destination_addr_;
+        }
+
     private:
         // serialization support    
         friend class boost::serialization::access;
@@ -116,14 +128,12 @@ namespace hpx { namespace parcelset
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     private:
+        parcel_id tag_;   
         naming::id_type destination_id_;
+        naming::address destination_addr_;
+        naming::id_type source_id_;
         components::action_type action_;
         continuation cont_;
-        
-        // may be modified even if seems to be const
-        mutable naming::id_type source_id_;
-        mutable parcel_id tag_;   
-        mutable naming::address destination_addr_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

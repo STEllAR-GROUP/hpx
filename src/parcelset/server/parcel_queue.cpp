@@ -13,8 +13,10 @@ namespace hpx { namespace parcelset { namespace server
 {
     void parcel_queue::add_parcel(parcel const& p)
     {
-        mutex_type::scoped_lock l(mtx_);
-        parcel_queue_.push_back(p);
+        {
+            mutex_type::scoped_lock l(mtx_);
+            parcel_queue_.push_back(p);
+        }
         notify_(parcel_port_);      // do some work (notify event handlers)
     }
 
@@ -22,7 +24,7 @@ namespace hpx { namespace parcelset { namespace server
     {
         mutex_type::scoped_lock l(mtx_);
 
-        if (!parcel_queue_.empty()) 
+        if (parcel_queue_.empty()) 
             return false;
 
         p = parcel_queue_.front();

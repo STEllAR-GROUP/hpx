@@ -8,7 +8,6 @@
 
 #include <hpx/parcelset/parcelport.hpp>
 #include <hpx/parcelset/parcel.hpp>
-#include <hpx/parcelset/server/parcel_queue.hpp>
 
 #endif
 

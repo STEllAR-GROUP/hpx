@@ -18,11 +18,12 @@ namespace hpx { namespace parcelset
     template<class Archive>
     void parcel::save(Archive & ar, const unsigned int version) const
     {
+        ar << tag_;
         ar << destination_id_.id_;
+        ar << destination_addr_;
         ar << source_id_.id_;
         ar << action_;
         ar << cont_;
-        ar << tag_;
     }
 
     template<class Archive>
@@ -33,11 +34,12 @@ namespace hpx { namespace parcelset
                 "trying to load parcel with unknown version");
         }
 
+        ar >> tag_;
         ar >> destination_id_.id_;
+        ar >> destination_addr_;
         ar >> source_id_.id_;
         ar >> action_;
         ar >> cont_;
-        ar >> tag_;
     }
 
     // explicit instantiation for the correct archive types

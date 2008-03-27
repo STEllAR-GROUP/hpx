@@ -16,6 +16,24 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming { namespace server 
 {
+    ///////////////////////////////////////////////////////////////////////////
+    //  Handle conversion to/from prefix
+    inline id_type get_id_from_prefix(boost::uint16_t prefix)
+    {
+        return boost::uint64_t(prefix) << 48;
+    }
+    
+    inline boost::uint16_t get_prefix_from_id(id_type id)
+    {
+        return boost::uint16_t(id >> 48);
+    }
+    
+    inline bool is_prefix_only(id_type id)
+    {
+        return (id & 0xFFFFFFFFFFFF) ? false : true;
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////
     request_handler::request_handler()
       : totals_(command_lastcommand)
     {
@@ -34,19 +52,33 @@ namespace hpx { namespace naming { namespace server
                 
                 // existing entry
                 rep = reply(no_success, command_getprefix, 
-                    boost::uint64_t((*it).second) << 48); 
+                    get_id_from_prefix((*it).second)); 
             }
             else {
+                // insert this prefix as being mapped to the given locality
                 boost::uint16_t prefix = (boost::uint16_t)site_prefixes_.size() + 1;
                 site_prefixes_.insert(
                     site_prefix_map_type::value_type(req.get_site(), prefix));
-                    
+
+                // now, bind this prefix to the locality address allowing to 
+                // send parcels to a locality
+                id_type id = get_id_from_prefix(prefix);
+                registry_type::iterator it = registry_.find(id);
+                if (it != registry_.end()) {
+                    // this shouldn't happen
+                    rep = reply(command_getprefix, no_success, 
+                        "prefix is already bound to local address");
+                }
+                else {
+                    registry_.insert(
+                        registry_type::value_type(id, address(req.get_site())));
+                }
+
                 // The real prefix has to be used as the 16 most 
                 // significant bits of global id's
                 
                 // created new entry
-                rep = reply(success, command_getprefix, 
-                    boost::uint64_t(prefix) << 48);   
+                rep = reply(success, command_getprefix, id);
             }
         }
         catch (std::bad_alloc) {
@@ -93,7 +125,7 @@ namespace hpx { namespace naming { namespace server
                     registry_.erase(it);
                     s = success;
                 }
-            }            
+            }
             rep = reply(command_unbind, s);
         }
         catch (std::bad_alloc) {
@@ -109,10 +141,12 @@ namespace hpx { namespace naming { namespace server
         try {
             mutex_type::scoped_lock l(mtx_);
             registry_type::iterator it = registry_.find(req.get_id());
-            if (it != registry_.end()) 
+            if (it != registry_.end()) {
                 rep = reply(command_resolve, (*it).second);
-            else
+            }
+            else {
                 rep = reply(command_resolve, no_success);
+            }
         }
         catch (std::bad_alloc) {
             rep = reply(command_resolve, out_of_memory);

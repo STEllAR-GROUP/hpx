@@ -21,26 +21,22 @@
 #include <hpx/naming/locality.hpp>
 #include <hpx/naming/resolver_client.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
-
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/parcelset/parcel.hpp>
 #include <hpx/parcelset/server/parcel_queue.hpp>
 #include <hpx/parcelset/server/parcel_connection.hpp>
-
-#if HPX_USE_TBB != 0
-#include <tbb/atomic.h>
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
     class parcelport : boost::noncopyable
     {
+    private:
         static void default_write_handler(boost::system::error_code const&, 
             std::size_t) {}
         
-        // avoid warning about using this in member initializer list
-        parcelport const& This() const { return *this; }
+        // avoid warning about using 'this' in member initializer list
+        parcelport& This() { return *this; }
         
     public:
         /// Construct the server to listen on the specified TCP address and port, 
@@ -63,7 +59,7 @@ namespace hpx { namespace parcelset
         /// A parcel is submitted for transport at the source locality site to 
         /// the parcel set of the locality with the put-parcel command
         /// This function is synchronous.
-        parcel_id sync_put_parcel(parcel const& p);
+        parcel_id sync_put_parcel(parcel& p);
         
         ///////////////////////////////////////////////////////////////////////
         /// A parcel is submitted for transport at the source locality site to 
@@ -73,7 +69,7 @@ namespace hpx { namespace parcelset
         /// Note: the parcel must be kept alive in user land for the whole 
         ///       operation, not copies are made
         template <typename Handler>
-        parcel_id put_parcel(parcel const& p, Handler f)
+        parcel_id put_parcel(parcel& p, Handler f)
         {
             // ensure parcel id is set
             if (!p.get_parcel_id())
@@ -101,7 +97,7 @@ namespace hpx { namespace parcelset
         }
 
         /// This function is asynchronous, no callback functor is provided
-        parcel_id put_parcel(parcel const& p)
+        parcel_id put_parcel(parcel& p)
         {
             return put_parcel(p, &parcelport::default_write_handler);
         }

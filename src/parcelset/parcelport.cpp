@@ -165,7 +165,7 @@ namespace hpx { namespace parcelset
         bool& finished_;
     };
     
-    parcel_id parcelport::sync_put_parcel(parcel const& p)
+    parcel_id parcelport::sync_put_parcel(parcel& p)
     {
         wait_for_put_parcel::mutex_type mtx;
         wait_for_put_parcel::condition_type cond;

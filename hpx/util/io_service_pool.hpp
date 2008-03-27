@@ -20,8 +20,7 @@
 namespace hpx { namespace util
 {
     /// A pool of io_service objects.
-    class io_service_pool
-      : private boost::noncopyable
+    class io_service_pool : private boost::noncopyable
     {
     public:
         /// Construct the io_service pool.

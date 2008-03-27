@@ -8,6 +8,7 @@
 		Name="VCCLCompilerTool"
 		AdditionalIncludeDirectories="&quot;$(TBB_ROOT)\include&quot;;&quot;$(BOOST_ROOT)&quot;;&quot;$(HPX_ROOT)&quot;;&quot;$(HPX_ROOT)\external\coroutine&quot;;&quot;$(HPX_ROOT)\external\endian&quot;;&quot;$(HPX_ROOT)\external\singleton&quot;;&quot;$(HPX_ROOT)\external\function_types&quot;;&quot;$(HPX_ROOT)\external\math&quot;"
 		PreprocessorDefinitions="_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;HPX_USE_TBB=1"
+		DisableSpecificWarnings="4267"
 	/>
 	<Tool
 		Name="VCLinkerTool"

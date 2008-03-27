@@ -27,11 +27,11 @@ namespace hpx { namespace parcelset { namespace server
         typedef std::list<parcel> parcel_list_type;
         std::list<parcel> parcel_queue_; 
 
-        hpx::parcelset::parcelport const& parcel_port_;
-        boost::signal<void(hpx::parcelset::parcelport const&)> notify_;
+        hpx::parcelset::parcelport& parcel_port_;
+        boost::signal<void(hpx::parcelset::parcelport&)> notify_;
         
     public:
-        parcel_queue(hpx::parcelset::parcelport const& ps)
+        parcel_queue(hpx::parcelset::parcelport& ps)
           : parcel_port_(ps)
         {}
                 

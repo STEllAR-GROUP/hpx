@@ -40,9 +40,18 @@ BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-//  This get's called whenever a parcel was received
-void received_parcel(hpx::parcelset::parcelport const& ps)
+//  This get's called whenever a parcel was received, it just sends back any 
+//  received parcel
+void received_parcel(hpx::parcelset::parcelport& ps)
 {
+    hpx::parcelset::parcel p;
+    if (ps.get_parcel(p))
+    {
+        std::cout << "Received parcel: " << p.get_parcel_id() << std::endl;
+        p.set_destination(p.get_source());
+        p.set_source(0);
+        ps.sync_put_parcel(p);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

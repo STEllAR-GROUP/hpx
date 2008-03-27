@@ -31,9 +31,10 @@ namespace hpx { namespace naming { namespace server
         not_implemented = hpx::not_implemented,
         out_of_memory = hpx::out_of_memory,
         internal_server_error = 4,
-        service_unavailable = 5,
-        bad_request = 6,
-        unknown_version = 7,
+        invalid_status = 5,
+        service_unavailable = 6,
+        bad_request = 7,
+        unknown_version = 8,
         // add error codes here
     };
 
@@ -48,6 +49,8 @@ namespace hpx { namespace naming { namespace server
             "hpx: address translation: internal server error";
         char const* const service_unavailable = 
             "hpx: address translation: service unavailable";
+        char const* const invalid_status = 
+            "hpx: address translation: corrupted internal status";
         char const* const bad_request = 
             "hpx: address translation: ill formatted request or unknown command";
         char const* const out_of_memory = 
@@ -61,8 +64,10 @@ namespace hpx { namespace naming { namespace server
             case server::success:               return success;
             case server::no_success:            return no_success;
             case server::service_unavailable:   return service_unavailable;
+            case server::invalid_status:        return invalid_status;
             case server::bad_request:           return bad_request;
             case server::out_of_memory:         return out_of_memory;
+            case server::unknown_version:       return unknown_version;
             default:
                 break;
             }
@@ -83,15 +88,21 @@ namespace hpx { namespace naming { namespace server
 
         reply (status_type s, char const* what)
           : command_(command_unknown), status_(s),
-            error_(std::string(status_strings::get_error_text(s)) + ": " + what),
+            error_(status_strings::get_error_text(s)),
             prefix_(0), id_(0)
-        {}
+        {
+            error_ += std::string(": ") + what;
+        }
 
-        reply (name_server_command command, status_type s = server::success)
+        reply (name_server_command command, status_type s = server::success,
+                char const* what = 0)
           : command_(command), status_(s), 
             error_(status_strings::get_error_text(s)),
             prefix_(0), id_(0)
-        {}
+        {
+            if (0 != what)
+                error_ += std::string(": ") + what;
+        }
 
         reply (name_server_command command, naming::id_type id, 
                status_type s = server::success)

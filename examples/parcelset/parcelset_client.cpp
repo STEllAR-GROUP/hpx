@@ -8,41 +8,68 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include <hpx/distpx.hpp>
+#include <hpx/hpx.hpp>
 
 int main(int argc, char* argv[])
 {
-    // Check command line arguments.
-    if (argc != 5)
-    {
-        std::cerr << "Usage: parcelset_client <px_ip> <px_port> <gas_ip> <gas_port>\n";
-        std::cerr << "       try: parcelset_client localhost 7910 localhost 7912\n";
-        return 1;
-    }
-
     try {
-        unsigned short px_port  = boost::lexical_cast<unsigned short>(argv[2]);
-        unsigned short gas_port  = boost::lexical_cast<unsigned short>(argv[4]);
+        // Check command line arguments.
+        std::string ps_host, remote_ps_host, gas_host;
+        unsigned short ps_port, remote_ps_port, gas_port;
+        
+        // Check command line arguments.
+        if (argc != 7) 
+        {
+            std::cerr << "Using default settings: localhost:7913 localhost:7912 localhost:7911" 
+                      << std::endl;
+            std::cerr << "Possible arguments: <HPX address> <HPX port> <DGAS address> <DGAS port> <remote HPX address> <remote HPX port>"
+                      << std::endl;
+
+            ps_host = "localhost";
+            ps_port = 7913;
+            gas_host = "localhost";
+            gas_port = 7912;
+            remote_ps_host = "localhost";
+            remote_ps_port = 7911;
+        }
+        else
+        {
+            ps_host = argv[1];
+            ps_port = boost::lexical_cast<unsigned short>(argv[2]);
+            gas_host = argv[3];
+            gas_port  = boost::lexical_cast<unsigned short>(argv[4]);
+            remote_ps_host = argv[5];
+            remote_ps_port = boost::lexical_cast<unsigned short>(argv[6]);
+        }
 
         // Start ParalleX services
-        hpx::px_core px(argv[3], gas_port, argv[1], px_port, false);
-        px.run(false);
-        
-        std::cout << "Parcelset (client) listening at port: " << px_port 
-                  << std::flush << std::endl;
-        
+        hpx::naming::resolver_client dgas_c(gas_host, gas_port);
+        hpx::parcelset::parcelport ps(dgas_c, hpx::naming::locality(ps_host, ps_port));
+
         // sleep for a second to give parcelset server a chance to startup
         boost::xtime xt;
         boost::xtime_get(&xt, boost::TIME_UTC);
         xt.sec += 1;
         boost::thread::sleep(xt);
                             
-        parcelset::parcel p(1, new components::accumulator::init_action());
-        parcelset::parcel_id id = px.get_parcelset().sync_put_parcel(p);
+        // retrieve prefix for remote locality
+        boost::uint64_t remote_prefix = 0;
+        hpx::naming::locality remote_l(remote_ps_host, remote_ps_port);
+        dgas_c.get_prefix(remote_l, remote_prefix);
+        
+        ps.run(false);
+
+        std::cout << "Parcelset (client) listening at port: " << ps_port 
+                  << std::flush << std::endl;
+
+        
+        // send parcel to remote locality        
+        hpx::parcelset::parcel p(remote_prefix);
+        hpx::parcelset::parcel_id id = ps.sync_put_parcel(p);
 
         std::cout << "Successfully sent parcel: " << std::hex << id << std::endl;
 
-        px.stop();
+        ps.stop();
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";
