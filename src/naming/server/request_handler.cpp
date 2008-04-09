@@ -52,17 +52,18 @@ namespace hpx { namespace naming { namespace server
                 
                 // existing entry
                 rep = reply(no_success, command_getprefix, 
-                    get_id_from_prefix((*it).second)); 
+                    get_id_from_prefix((*it).second.first)); 
             }
             else {
                 // insert this prefix as being mapped to the given locality
                 boost::uint16_t prefix = (boost::uint16_t)site_prefixes_.size() + 1;
+                id_type id = get_id_from_prefix(prefix);
                 site_prefixes_.insert(
-                    site_prefix_map_type::value_type(req.get_site(), prefix));
+                    site_prefix_map_type::value_type(req.get_site(), 
+                        std::make_pair(prefix, id)));
 
                 // now, bind this prefix to the locality address allowing to 
                 // send parcels to a locality
-                id_type id = get_id_from_prefix(prefix);
                 registry_type::iterator it = registry_.find(id);
                 if (it != registry_.end()) {
                     // this shouldn't happen
@@ -79,6 +80,67 @@ namespace hpx { namespace naming { namespace server
                 
                 // created new entry
                 rep = reply(success, command_getprefix, id);
+            }
+        }
+        catch (std::bad_alloc) {
+            rep = reply(command_getprefix, out_of_memory);
+        }            
+        catch (...) {
+            rep = reply(command_getprefix, internal_server_error);
+        }            
+    }
+
+    void request_handler::handle_getidrange(request const& req, reply& rep)
+    {
+        try {
+            mutex_type::scoped_lock l(mtx_);
+            site_prefix_map_type::iterator it = 
+                site_prefixes_.find(req.get_site());
+            if (it != site_prefixes_.end()) {
+                // The real prefix has to be used as the 16 most 
+                // significant bits of global id's
+                
+                // generate the new id range
+                boost::uint64_t lower = (*it).second.second + 1;
+                boost::uint64_t upper = lower + range_delta;
+                
+                // store the new lower bound
+                (*it).second.second = upper;
+
+                // existing entry
+                rep = reply(no_success, command_getidrange, lower, upper); 
+            }
+            else {
+                // insert this prefix as being mapped to the given locality
+                boost::uint16_t prefix = (boost::uint16_t)site_prefixes_.size() + 1;
+                id_type id = get_id_from_prefix(prefix);
+                std::pair<site_prefix_map_type::iterator, bool> p=
+                    site_prefixes_.insert(
+                        site_prefix_map_type::value_type(req.get_site(), 
+                            std::make_pair(prefix, id)));
+
+                // now, bind this prefix to the locality address allowing to 
+                // send parcels to a locality
+                registry_type::iterator it = registry_.find(id);
+                if (it != registry_.end()) {
+                    // this shouldn't happen
+                    rep = reply(command_getprefix, no_success, 
+                        "prefix is already bound to local address");
+                }
+                else {
+                    registry_.insert(
+                        registry_type::value_type(id, address(req.get_site())));
+                }
+
+                // generate the new id range
+                boost::uint64_t lower = id + 1;
+                boost::uint64_t upper = lower + range_delta;
+                
+                // store the new lower bound
+                (*p.first).second.second = upper;
+                
+                // created new entry
+                rep = reply(success, command_getidrange, lower, upper);
             }
         }
         catch (std::bad_alloc) {
@@ -240,6 +302,10 @@ namespace hpx { namespace naming { namespace server
         switch (req.get_command()) {
         case command_getprefix:
             handle_getprefix(req, rep);
+            break;
+            
+        case command_getidrange:
+            handle_getidrange(req, rep);
             break;
             
         case command_bind:

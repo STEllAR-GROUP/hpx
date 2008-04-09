@@ -21,7 +21,7 @@ namespace hpx { namespace naming
         class request;
     }
         
-    /// The top-level class of the PGAS client. This class exposes the PGAS 
+    /// The top-level class of the DGAS client. This class exposes the DGAS 
     /// server functionality on the client side.
     class resolver_client
     {
@@ -55,6 +55,35 @@ namespace hpx { namespace naming
         /// function.
         bool get_prefix(locality l, boost::uint64_t& prefix);
 
+        /// Get unique range of freely assignable global ids 
+        ///
+        /// Every locality needs to be able to assign global ids to different
+        /// components without having to consult the DGAS server for every id 
+        /// to generate. This function can be called to preallocate a range of
+        /// ids usable for this purpose.
+        /// 
+        /// locality l:       [in] The locality the locality id needs to be 
+        ///                   generated for. Repeating calls using the same 
+        ///                   locality results in identical prefix values.
+        /// uint64_t& lower_bound: 
+        ///                   [out] The lower bound of the assigned id range.
+        ///                   The returned value can be used as the first id
+        ///                   to assign. This is valid only, if the return 
+        ///                   value of this function is true.
+        /// uint64_t& upper_bound: 
+        ///                   [out] The upper bound of the assigned id range.
+        ///                   The returned value can be used as the last id
+        ///                   to assign. This is valid only, if the return 
+        ///                   value of this function is true.
+        ///
+        /// This function returns true if a new range has been generated (it 
+        /// has been called for the first time for the given locality) and 
+        /// returns false if this locality already got a range assigned in an 
+        /// earlier call. Any error results in an exception thrown from this
+        /// function.
+        bool get_id_range(locality l, boost::uint64_t& lower_bound, 
+            boost::uint64_t& upper_bound);
+        
         /// Bind a global address to a local address.
         ///
         /// Every element in the ParalleX namespace has a unique global address

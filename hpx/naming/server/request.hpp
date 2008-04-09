@@ -27,19 +27,21 @@ namespace hpx { namespace naming { namespace server
         command_unknown = -1,
         command_firstcommand = 0,
         command_getprefix = 0,      /// return a unique prefix for the requesting site
-        command_bind = 1,           /// bind an address to a global id
-        command_unbind = 2,         /// remove binding for a global id
-        command_resolve = 3,        /// resolve a global id to an address
-        command_queryid = 4,        /// query for a global id associated with a namespace name (string)
-        command_registerid = 5,     /// associate a namespace name with a global id
-        command_unregisterid = 6,   /// remove association of a namespace name with a global id
-        command_statistics = 7,     /// return some usage statistics
+        command_getidrange = 1,     /// return a unique range of ids for the requesting site
+        command_bind = 2,           /// bind an address to a global id
+        command_unbind = 3,         /// remove binding for a global id
+        command_resolve = 4,        /// resolve a global id to an address
+        command_queryid = 5,        /// query for a global id associated with a namespace name (string)
+        command_registerid = 6,     /// associate a namespace name with a global id
+        command_unregisterid = 7,   /// remove association of a namespace name with a global id
+        command_statistics = 8,     /// return some usage statistics
         command_lastcommand
     };
 
     const char* const command_names[] = 
     {
         "command_getprefix",
+        "command_getidrange",
         "command_bind",
         "command_unbind",
         "command_resolve",
@@ -137,6 +139,7 @@ namespace hpx { namespace naming { namespace server
                 break;
 
             case command_getprefix:
+            case command_getidrange:
             case command_statistics:
             default:
                 // nothing additional to be sent
@@ -179,6 +182,7 @@ namespace hpx { namespace naming { namespace server
                 break;
 
             case command_getprefix:
+            case command_getidrange:
             case command_statistics:
             default:
                 // nothing additional to be received

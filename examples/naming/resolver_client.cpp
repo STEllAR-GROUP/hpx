@@ -46,13 +46,16 @@ int main(int argc, char* argv[])
         locality here("localhost", HPX_PORT);
         resolver_client resolver(host, port);
         
+        boost::uint64_t last_lowerid = 0;
+        
 #if defined(MAX_ITERATIONS)
         for (int i = 0; i < MAX_ITERATIONS; ++i)
         {
 #endif
         // retrieve the id prefix of this site
         boost::uint64_t prefix1 = 0;
-        resolver.get_prefix(here, prefix1);
+        if (resolver.get_prefix(here, prefix1))
+            last_lowerid = prefix1;
         BOOST_TEST(0 != prefix1);
         
         boost::uint64_t prefix2 = 0;
@@ -68,6 +71,16 @@ int main(int argc, char* argv[])
         BOOST_TEST(!resolver.get_prefix(locality("1.1.1.1", 1), prefix4));
         BOOST_TEST(prefix3 == prefix4);   
 
+        // test get_id_range
+        boost::uint64_t lower1 = 0, upper1 = 0;
+        BOOST_TEST(!resolver.get_id_range(here, lower1, upper1));
+        BOOST_TEST(last_lowerid+1 == lower1);   
+        
+        boost::uint64_t lower2 = 0, upper2 = 0;
+        BOOST_TEST(!resolver.get_id_range(here, lower2, upper2));
+        BOOST_TEST(upper1+1 == lower2);   
+        last_lowerid = upper2;
+        
         // bind an arbitrary address
         BOOST_TEST(resolver.bind(1, address(here, 1, 2)));
         

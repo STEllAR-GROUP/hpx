@@ -92,6 +92,23 @@ namespace hpx { namespace naming
         return s == success;
     }
     
+    bool resolver_client::get_id_range(locality l, boost::uint64_t& lower_bound, 
+            boost::uint64_t& upper_bound)
+    {
+        // send request
+        server::request req (server::command_getidrange, l);
+        server::reply rep;            
+        execute(req, rep);
+        
+        hpx::error s = (hpx::error) rep.get_status();
+        if (s != success && s != no_success)
+            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+
+        lower_bound = rep.get_lower_bound();
+        upper_bound = rep.get_upper_bound();
+        return s == success;
+    }
+    
     bool resolver_client::bind(id_type id, address const& addr)
     {
         // send request

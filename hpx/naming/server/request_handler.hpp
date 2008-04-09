@@ -28,6 +28,10 @@ namespace hpx { namespace naming { namespace server
     /// The common handler for all incoming requests.
     class request_handler : private boost::noncopyable
     {
+        /// size of the id range returned by command_getidrange
+        /// FIXME: is this a policy?
+        enum { range_delta = 1000 };
+        
     public:
         request_handler();
 
@@ -46,6 +50,7 @@ namespace hpx { namespace naming { namespace server
         
     protected:
         void handle_getprefix(request const& req, reply& rep);
+        void handle_getidrange(request const& req, reply& rep);
         void handle_bind(request const& req, reply& rep);
         void handle_unbind(request const& req, reply& rep);
         void handle_resolve(request const& req, reply& rep);
@@ -57,7 +62,9 @@ namespace hpx { namespace naming { namespace server
     private:
         typedef std::map<std::string, boost::uint64_t> ns_registry_type;
         typedef std::map<boost::uint64_t, naming::address> registry_type;
-        typedef std::map<hpx::naming::locality, boost::uint16_t> 
+        
+        typedef std::pair<boost::uint16_t, boost::uint64_t> site_prefix_type;
+        typedef std::map<hpx::naming::locality, site_prefix_type> 
             site_prefix_map_type;
         typedef boost::mutex mutex_type;
         
