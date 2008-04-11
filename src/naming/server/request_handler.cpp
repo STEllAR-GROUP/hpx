@@ -9,6 +9,7 @@
 #include <string>
 #include <boost/lexical_cast.hpp>
 
+#include <hpx/util/dgas_logging.hpp>
 #include <hpx/naming/server/reply.hpp>
 #include <hpx/naming/server/request.hpp>
 #include <hpx/naming/server/request_handler.hpp>
@@ -39,6 +40,10 @@ namespace hpx { namespace naming { namespace server
     {
     }
 
+    request_handler::~request_handler()
+    {
+    }
+    
     ///////////////////////////////////////////////////////////////////////////
     void request_handler::handle_getprefix(request const& req, reply& rep)
     {
@@ -51,7 +56,7 @@ namespace hpx { namespace naming { namespace server
                 // significant bits of global id's
                 
                 // existing entry
-                rep = reply(no_success, command_getprefix, 
+                rep = reply(repeated_request, command_getprefix, 
                     get_id_from_prefix((*it).second.first)); 
             }
             else {
@@ -108,7 +113,7 @@ namespace hpx { namespace naming { namespace server
                 (*it).second.second = upper;
 
                 // existing entry
-                rep = reply(no_success, command_getidrange, lower, upper); 
+                rep = reply(success, command_getidrange, lower, upper); 
             }
             else {
                 // insert this prefix as being mapped to the given locality
@@ -154,7 +159,7 @@ namespace hpx { namespace naming { namespace server
     void request_handler::handle_bind(request const& req, reply& rep)
     {
         try {
-            status_type s = no_success;
+            error s = no_success;
             {
                 mutex_type::scoped_lock l(mtx_);
                 registry_type::iterator it = registry_.find(req.get_id());
@@ -179,7 +184,7 @@ namespace hpx { namespace naming { namespace server
     void request_handler::handle_unbind(request const& req, reply& rep)
     {
         try {
-            status_type s = no_success;
+            error s = no_success;
             {
                 mutex_type::scoped_lock l(mtx_);
                 registry_type::iterator it = registry_.find(req.get_id());
@@ -239,7 +244,7 @@ namespace hpx { namespace naming { namespace server
     void request_handler::handle_registerid(request const& req, reply& rep)
     {
         try {
-            status_type s = no_success;
+            error s = no_success;
             {
                 mutex_type::scoped_lock l(mtx_);
                 ns_registry_type::iterator it = ns_registry_.find(req.get_name());
@@ -264,7 +269,7 @@ namespace hpx { namespace naming { namespace server
     void request_handler::handle_unregisterid(request const& req, reply& rep)
     {
         try {
-            status_type s = no_success;
+            error s = no_success;
             {
                 mutex_type::scoped_lock l(mtx_);
                 ns_registry_type::iterator it = ns_registry_.find(req.get_name());
@@ -299,6 +304,7 @@ namespace hpx { namespace naming { namespace server
     ///////////////////////////////////////////////////////////////////////////
     void request_handler::handle_request(request const& req, reply& rep)
     {
+        LDGAS_(info) << "request: " << req;
         switch (req.get_command()) {
         case command_getprefix:
             handle_getprefix(req, rep);
@@ -339,6 +345,13 @@ namespace hpx { namespace naming { namespace server
         default:
             rep = reply(bad_request);
             break;
+        }
+        
+        if (rep.get_status() != success && rep.get_status() != repeated_request) {
+            LDGAS_(error) << "response: " << rep;
+        }
+        else {
+            LDGAS_(info) << "response: " << rep;
         }
     }
 

@@ -47,10 +47,19 @@ void received_parcel(hpx::parcelset::parcelport& ps)
     hpx::parcelset::parcel p;
     if (ps.get_parcel(p))
     {
-        std::cout << "Received parcel: " << p.get_parcel_id() << std::endl;
-        p.set_destination(p.get_source());
-        p.set_source(0);
-        ps.sync_put_parcel(p);
+        try {
+            std::cout << "Received parcel: " << std::hex << p.get_parcel_id() 
+                      << std::endl;
+            p.set_destination(p.get_source());
+            p.set_source(0);
+            p.set_parcel_id(0);
+            ps.sync_put_parcel(p);
+            std::cout << "Successfully sent parcel: " 
+                      << std::hex << p.get_parcel_id() << std::endl;
+        }
+        catch(std::exception const& e) {
+            std::cerr << "Caught std::exception: " << e.what() << std::endl;
+        }
     }
 }
 
@@ -89,7 +98,7 @@ int main(int argc, char* argv[])
         // Run the ParalleX services
         hpx::naming::resolver_server dgas_s(gas_host, gas_port, true, num_threads);
         hpx::naming::resolver_client dgas_c(gas_host, gas_port);
-        hpx::parcelset::parcelport ps(dgas_c, hpx::naming::locality(ps_host, ps_port));
+        hpx::parcelset::parcelport ps(dgas_c, ps_host, ps_port);
 
         // Set console control handler to allow server to be stopped.
         console_ctrl_function = 

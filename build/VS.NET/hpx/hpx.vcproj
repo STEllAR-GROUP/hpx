@@ -201,6 +201,10 @@
 				Name="Util"
 				>
 				<File
+					RelativePath="..\..\..\src\util\dgas_logging.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\util\io_service_pool.cpp"
 					>
 				</File>
@@ -320,6 +324,10 @@
 				>
 				<File
 					RelativePath="..\..\..\hpx\util\container_device.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\util\dgas_logging.hpp"
 					>
 				</File>
 				<File

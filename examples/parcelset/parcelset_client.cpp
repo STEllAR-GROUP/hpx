@@ -10,6 +10,21 @@
 
 #include <hpx/hpx.hpp>
 
+///////////////////////////////////////////////////////////////////////////////
+//  This get's called whenever a parcel was received, it just sets a flag
+bool received = false;
+
+void received_parcel(hpx::parcelset::parcelport& ps)
+{
+    hpx::parcelset::parcel p;
+    if (ps.get_parcel(p))
+    {
+        std::cout << "Received parcel: " << std::hex << p.get_parcel_id() 
+                  << std::endl;
+        received = true;
+    }
+}
+
 int main(int argc, char* argv[])
 {
     try {
@@ -68,6 +83,8 @@ int main(int argc, char* argv[])
         hpx::parcelset::parcel_id id = ps.sync_put_parcel(p);
 
         std::cout << "Successfully sent parcel: " << std::hex << id << std::endl;
+
+        ps.register_event_handler(received_parcel);
 
         ps.stop();
     }

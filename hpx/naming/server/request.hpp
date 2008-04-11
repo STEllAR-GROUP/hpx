@@ -52,6 +52,13 @@ namespace hpx { namespace naming { namespace server
         ""
     };
     
+    inline char const* const get_command_name(int cmd)
+    {
+        if (cmd >= command_firstcommand && cmd < command_lastcommand)
+            return command_names[cmd];
+        return "<unknown>";
+    }
+    
     /// A request received from a client.
     class request
     {
@@ -60,7 +67,7 @@ namespace hpx { namespace naming { namespace server
           : command_(c), id_(0)
         {}
         
-        request(name_server_command c, locality l) 
+        request(name_server_command c, locality const& l) 
           : command_(c), id_(0), site_(l)
         {}
         
@@ -104,8 +111,10 @@ namespace hpx { namespace naming { namespace server
         {
             return ns_name_;
         }
-        
+
     private:
+        friend std::ostream& operator<< (std::ostream& os, request const& req);
+        
         // serialization support    
         friend class boost::serialization::access;
     
@@ -198,6 +207,44 @@ namespace hpx { namespace naming { namespace server
         naming::address addr_;      /// address to associate with this id (bind only)
         std::string ns_name_;       /// namespace name (queryid only)
     };
+
+    // debug support for a request class
+    inline std::ostream& operator<< (std::ostream& os, request const& req)
+    {
+        os << get_command_name(req.command_) << ": ";
+
+        switch (req.command_) {
+        case command_unbind:
+        case command_resolve:
+            os << "id(" << std::hex << req.id_.id_ << ") ";
+            break;
+
+        case command_bind:
+            os << "id(" << std::hex << req.id_.id_ << ") ";
+            os << "addr(" << req.addr_ << ") ";
+            break;
+
+        case command_queryid:
+        case command_unregisterid: 
+            os << "name(" << req.ns_name_ << ") ";
+            break;
+
+        case command_registerid:
+            os << "id(" << std::hex << req.id_.id_ << ") ";
+            os << "name(" << req.ns_name_ << ") ";
+            break;
+
+        case command_getprefix:
+        case command_getidrange:
+            os << "site(" << req.site_ << ") ";
+            break;
+            
+        case command_statistics:
+        default:
+            break;
+        }
+        return os;
+    }
 
 }}}  // namespace hpx::naming::server
 

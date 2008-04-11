@@ -30,10 +30,11 @@ namespace hpx { namespace naming { namespace server
     {
         /// size of the id range returned by command_getidrange
         /// FIXME: is this a policy?
-        enum { range_delta = 1000 };
+        enum { range_delta = 1023 };
         
     public:
         request_handler();
+        ~request_handler();
 
         /// Handle a request and produce a reply.
         void handle_request(request const& req, reply& rep);

@@ -53,6 +53,8 @@ namespace hpx { namespace naming
         address_type address_;  /// address (sequence number)
 
     private:
+        friend std::ostream& operator<< (std::ostream& os, address const& req);
+        
         // serialization support    
         friend class boost::serialization::access;
 
@@ -75,6 +77,13 @@ namespace hpx { namespace naming
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
     };
+
+    inline std::ostream& operator<< (std::ostream& os, address const& addr)
+    {
+        os << addr.locality_ << ":" << addr.type_ << ":" << addr.address_; 
+        return os;
+    }
+        
 
 ///////////////////////////////////////////////////////////////////////////////
 }}

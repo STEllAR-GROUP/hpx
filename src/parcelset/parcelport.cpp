@@ -29,7 +29,7 @@ namespace hpx { namespace parcelset
         parcels_(This()),
         new_server_connection_(new server::connection(
               io_service_pool_.get_io_service(), parcels_)),
-        resolver_(gas), here_(here), prefix_(0)
+        resolver_(gas), here_(here), prefix_(0), id_range_(here_, resolver_)
     {
         // retrieve the prefix to be used for this site
         resolver_.get_prefix(here, prefix_);    // throws on error
@@ -54,8 +54,12 @@ namespace hpx { namespace parcelset
         parcels_(This()),
         new_server_connection_(new server::connection(
               io_service_pool_.get_io_service(), parcels_)),
-        resolver_(gas), here_(address, port), prefix_(0)
+        resolver_(gas), here_(address, port), prefix_(0), 
+        id_range_(here_, resolver_)
     {
+        // retrieve the prefix to be used for this site
+        resolver_.get_prefix(here_, prefix_);    // throws on error
+        
         // initialize network
         using boost::asio::ip::tcp;
         
@@ -65,9 +69,6 @@ namespace hpx { namespace parcelset
             boost::lexical_cast<std::string>(port));
         tcp::endpoint endpoint = *resolver.resolve(query);
 
-        // retrieve the prefix to be used for this site
-        resolver_.get_prefix(naming::locality(endpoint), prefix_);    // throws on error
-        
         acceptor_.open(endpoint.protocol());
         acceptor_.set_option(tcp::acceptor::reuse_address(true));
         acceptor_.bind(endpoint);

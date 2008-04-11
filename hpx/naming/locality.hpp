@@ -84,6 +84,8 @@ namespace hpx { namespace naming
         }
         
     private:
+        friend std::ostream& operator<< (std::ostream& os, locality const& l);
+        
         // serialization support    
         friend class boost::serialization::access;
     
@@ -152,6 +154,12 @@ namespace hpx { namespace naming
         boost::asio::ip::tcp::endpoint endpoint_;
     };
 
+    inline std::ostream& operator<< (std::ostream& os, locality const& l)
+    {
+        os << l.endpoint_;
+        return os;
+    }
+    
 ///////////////////////////////////////////////////////////////////////////////
 }}
 

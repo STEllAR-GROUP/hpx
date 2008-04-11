@@ -108,7 +108,7 @@ namespace hpx { namespace naming { namespace server
                 boost::get<0>(handler)(e);
                     
             // send the error reply back to the requesting site
-                reply rep (server::no_success, e.message().c_str());
+                reply rep (no_success, e.message().c_str());
                 async_write(rep, handler);
             }
             else {
@@ -143,7 +143,7 @@ namespace hpx { namespace naming { namespace server
                     boost::get<0>(handler)(error);
                     
                 // send the error reply back to the requesting site
-                    reply rep (server::no_success, e.what());
+                    reply rep (no_success, e.what());
                     async_write(rep, handler);
                 }
                 

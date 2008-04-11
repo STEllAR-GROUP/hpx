@@ -53,7 +53,7 @@ namespace hpx { namespace naming
         /// returns false if this locality already got a prefix assigned in an 
         /// earlier call. Any error results in an exception thrown from this
         /// function.
-        bool get_prefix(locality l, boost::uint64_t& prefix);
+        bool get_prefix(locality const& l, boost::uint64_t& prefix);
 
         /// Get unique range of freely assignable global ids 
         ///
@@ -81,7 +81,7 @@ namespace hpx { namespace naming
         /// returns false if this locality already got a range assigned in an 
         /// earlier call. Any error results in an exception thrown from this
         /// function.
-        bool get_id_range(locality l, boost::uint64_t& lower_bound, 
+        bool get_id_range(locality const& l, boost::uint64_t& lower_bound, 
             boost::uint64_t& upper_bound);
         
         /// Bind a global address to a local address.

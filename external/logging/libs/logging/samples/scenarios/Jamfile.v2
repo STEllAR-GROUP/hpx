@@ -1,0 +1,86 @@
+# Copyright (c) John Torjo 2008
+# Boost Logging Library Build Examples Jamfile
+#
+#  Distributed under the Boost Software License, Version 1.0. (See
+#  accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)
+
+import modules ;
+
+# Look for BOOST_ROOT_DIR environment variable
+local BOOST_ROOT = [ modules.peek : BOOST_ROOT_DIR ] ;
+
+use-project /boost : $(BOOST_ROOT) ; 
+
+project 
+    : requirements 
+      <include>../../../.. 
+      <include>$(BOOST_ROOT) 
+      <threading>multi 
+      <toolset>msvc:<runtime-link>static 
+      <link>static 
+      <library>/boost//thread 
+      <library>/boost//filesystem 
+      <library>/boost//date_time 
+    ;
+
+exe cache_before_init
+    : cache_before_init.cpp
+    ;
+
+exe custom_fmt_dest
+    : custom_fmt_dest.cpp
+    ;
+
+exe ded_loger_one_filter
+    : ded_loger_one_filter.cpp
+    ;
+
+exe fastest_no_ostr_like
+    : fastest_no_ostr_like.cpp
+    ;
+
+exe fastest_use_ostr_like
+    : fastest_use_ostr_like.cpp
+    ;
+
+exe mul_levels_mul_logers
+    : mul_levels_mul_logers.cpp
+    ;
+
+exe mul_levels_one_logger
+    : mul_levels_one_logger.cpp
+    ;
+
+exe mul_loggers_one_filter
+    : mul_loggers_one_filter.cpp
+    ;
+
+exe no_levels_with_route
+    : no_levels_with_route.cpp
+    ;
+
+exe one_loger_one_filter
+    : one_loger_one_filter.cpp
+    ;
+
+exe ts_loger_one_filter
+    : ts_loger_one_filter.cpp
+    ;
+
+exe use_profiler
+    : use_profiler.cpp
+    ;
+
+exe use_tss_ostringstream
+    : use_tss_ostringstream.cpp
+    ;
+
+exe using_tags
+    : using_tags.cpp
+    ;
+
+exe your_scenario
+    : your_scenario.cpp
+    ;
+

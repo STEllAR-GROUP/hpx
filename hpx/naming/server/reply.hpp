@@ -23,51 +23,39 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming { namespace server 
 {
-    /// The status of the reply.
-    enum status_type
-    {
-        success = hpx::success,
-        no_success = hpx::no_success, 
-        not_implemented = hpx::not_implemented,
-        out_of_memory = hpx::out_of_memory,
-        internal_server_error = hpx::internal_server_error,
-        invalid_status = hpx::invalid_status,
-        service_unavailable = hpx::service_unavailable,
-        bad_request = hpx::bad_request,
-        unknown_version = hpx::version_unknown,
-        // add error codes here
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     namespace status_strings 
     {
         char const* const success = 
-            "hpx: address translation: success";
+            "hpx: dgas: success";
+        char const* const repeated_request = 
+            "hpx: dgas: success (repeated request)";
         char const* const no_success = 
-            "hpx: address translation: no success";
+            "hpx: dgas: no success";
         char const* const internal_server_error = 
-            "hpx: address translation: internal server error";
+            "hpx: dgas: internal server error";
         char const* const service_unavailable = 
-            "hpx: address translation: service unavailable";
+            "hpx: dgas: service unavailable";
         char const* const invalid_status = 
-            "hpx: address translation: corrupted internal status";
+            "hpx: dgas: corrupted internal status";
         char const* const bad_request = 
-            "hpx: address translation: ill formatted request or unknown command";
+            "hpx: dgas: ill formatted request or unknown command";
         char const* const out_of_memory = 
-            "hpx: address translation: internal server error (out of memory)";
+            "hpx: dgas: internal server error (out of memory)";
         char const* const unknown_version = 
-            "hpx: address translation: ill formatted request (unknown version)";
+            "hpx: dgas: ill formatted request (unknown version)";
 
-        inline char const* const get_error_text(status_type status)
+        inline char const* const get_error_text(error status)
         {
             switch (status) {
-            case server::success:               return success;
-            case server::no_success:            return no_success;
-            case server::service_unavailable:   return service_unavailable;
-            case server::invalid_status:        return invalid_status;
-            case server::bad_request:           return bad_request;
-            case server::out_of_memory:         return out_of_memory;
-            case server::unknown_version:       return unknown_version;
+            case hpx::success:               return success;
+            case hpx::no_success:            return no_success;
+            case hpx::service_unavailable:   return service_unavailable;
+            case hpx::invalid_status:        return invalid_status;
+            case hpx::bad_request:           return bad_request;
+            case hpx::out_of_memory:         return out_of_memory;
+            case hpx::version_unknown:       return unknown_version;
+            case hpx::repeated_request:      return repeated_request;
             default:
                 break;
             }
@@ -80,13 +68,13 @@ namespace hpx { namespace naming { namespace server
     class reply
     {
     public:
-        reply (status_type s = server::no_success)
+        reply (error s = no_success)
           : command_(command_unknown), status_(s),
             error_(status_strings::get_error_text(s)),
             lower_bound_(0), upper_bound_(0), id_(0)
         {}
 
-        reply (status_type s, char const* what)
+        reply (error s, char const* what)
           : command_(command_unknown), status_(s),
             error_(status_strings::get_error_text(s)),
             lower_bound_(0), upper_bound_(0), id_(0)
@@ -94,7 +82,7 @@ namespace hpx { namespace naming { namespace server
             error_ += std::string(": ") + what;
         }
 
-        reply (name_server_command command, status_type s = server::success,
+        reply (name_server_command command, error s = success,
                 char const* what = 0)
           : command_(command), status_(s), 
             error_(status_strings::get_error_text(s)),
@@ -105,24 +93,24 @@ namespace hpx { namespace naming { namespace server
         }
 
         reply (name_server_command command, naming::id_type id, 
-               status_type s = server::success)
+               error s = success)
           : command_(command), status_(s),
-            error_(status_strings::get_error_text(server::success)),
+            error_(status_strings::get_error_text(success)),
             lower_bound_(0), upper_bound_(0), id_(id)
         {
-            BOOST_ASSERT(s == server::success || s == server::no_success);
+            BOOST_ASSERT(s == success || s == no_success);
             BOOST_ASSERT(command == command_queryid || 
                          command == command_registerid);
         }
 
         reply (name_server_command command, 
                std::vector<std::pair<double, std::size_t> > const& totals, 
-               status_type s = server::success)
+               error s = success)
           : command_(command), status_(s),
-            error_(status_strings::get_error_text(server::success)),
+            error_(status_strings::get_error_text(success)),
             lower_bound_(0), upper_bound_(0), id_(0)
         {
-            BOOST_ASSERT(s == server::success || s == server::no_success);
+            BOOST_ASSERT(s == success || s == no_success);
             BOOST_ASSERT(command == command_statistics);
             
             for (std::size_t i = 0; i < command_lastcommand; ++i)
@@ -136,38 +124,38 @@ namespace hpx { namespace naming { namespace server
         }
 
         reply (name_server_command command, naming::address addr)
-          : command_(command_resolve), status_(server::success), 
-            error_(status_strings::get_error_text(server::success)),
+          : command_(command_resolve), status_(success), 
+            error_(status_strings::get_error_text(success)),
             address_(addr),
             lower_bound_(0), upper_bound_(0), id_(0)
         {
             BOOST_ASSERT(command == command_resolve);
         }
 
-        reply (status_type s, name_server_command command, 
+        reply (error s, name_server_command command, 
                 boost::uint64_t prefix)
           : command_(command_getprefix), status_(s),
             error_(status_strings::get_error_text(s)),
             lower_bound_(prefix), upper_bound_(0), id_(0)
         {
-            BOOST_ASSERT(s == server::success || s == server::no_success);
+            BOOST_ASSERT(s == success || s == repeated_request);
             BOOST_ASSERT(command == command_getprefix);
         }
 
-        reply (status_type s, name_server_command command, 
+        reply (error s, name_server_command command, 
                 boost::uint64_t lower_bound, boost::uint64_t upper_bound)
           : command_(command_getidrange), status_(s),
             error_(status_strings::get_error_text(s)),
             lower_bound_(lower_bound), upper_bound_(upper_bound), id_(0)
         {
-            BOOST_ASSERT(s == server::success || s == server::no_success);
+            BOOST_ASSERT(s == success || s == no_success);
             BOOST_ASSERT(command == command_getidrange);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        status_type get_status() const
+        error get_status() const
         {
-            return (status_type)status_;
+            return (error)status_;
         }
         std::string get_error() const
         {
@@ -202,6 +190,8 @@ namespace hpx { namespace naming { namespace server
         }
         
     private:
+        friend std::ostream& operator<< (std::ostream& os, reply const& rep);
+        
         // serialization support    
         friend class boost::serialization::access;
     
@@ -300,6 +290,49 @@ namespace hpx { namespace naming { namespace server
         naming::id_type id_;            /// global id (for queryid only)
         double statistics_[command_lastcommand];       /// gathered statistics
     };
+
+    inline std::ostream& operator<< (std::ostream& os, reply const& rep)
+    {
+        os << get_command_name(rep.command_) << ": ";
+
+        if (rep.status_ != success && rep.status_ != repeated_request) {
+            os << "status(" << rep.error_ << ") ";
+        }
+        else {
+            switch (rep.command_) {
+            case command_resolve:
+                os << "addr(" << rep.address_ << ") ";
+                break;
+
+            case command_getidrange:
+                os << "range(" << std::hex << rep.lower_bound_ << ", "
+                   << rep.upper_bound_ << ") ";
+                break;
+                
+                // fall through
+            case command_getprefix:
+                os << "prefix(" << std::hex<< rep.lower_bound_ << ") ";
+                break;
+                
+            case command_queryid:
+                os << "id(" << std::hex << rep.id_.id_ << ") ";
+                break;
+                
+            case command_statistics:
+                break;
+                
+            case command_unbind:
+            case command_bind:
+            case command_registerid: 
+            case command_unregisterid: 
+            default:
+                break;  // nothing additional to be received
+            }
+            if (rep.status_ == repeated_request)
+                os << " (" << error_names[repeated_request] << ")";
+        }
+        return os;
+    }
 
 ///////////////////////////////////////////////////////////////////////////////
 }}}  // namespace hpx::naming::server

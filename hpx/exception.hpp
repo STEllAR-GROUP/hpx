@@ -35,6 +35,7 @@ namespace hpx
         internal_server_error = 14,
         service_unavailable = 15,
         bad_request = 16,
+        repeated_request = 17,
         last_error
     };
     
@@ -57,6 +58,7 @@ namespace hpx
         "internal_server_error",
         "service_unavailable",
         "bad_request",
+        "repeated_request",
         ""
     };
 
@@ -86,6 +88,7 @@ namespace hpx
                 case duplicate_component_address:
                 case invalid_status:
                 case bad_parameter:
+                case repeated_request:
                     return std::string("HPX(") + error_names[value] + ")";
 
                 default:

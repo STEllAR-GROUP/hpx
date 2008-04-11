@@ -1,0 +1,20 @@
+# Copyright (c) John Torjo 2008
+# Boost Logging Library Build Examples Jamfile
+#
+#  Distributed under the Boost Software License, Version 1.0. (See
+#  accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)
+
+project 
+    : requirements 
+      <include>../../../.. 
+      <include>.
+      <include>$(BOOST_ROOT) 
+      <include>D:/john/code/latest_boost 
+      <library>/boost/thread//boost_thread 
+    ;
+
+exe test_tss
+    : test_tss.cpp test_tss_objects.cpp test_tss_on_end_delete.cpp
+    ;
+

@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "loggingvc8", "loggingvc8.vcproj", "{0482E04F-64D2-4143-AAD6-96A4A9BBA4EB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+		Test|Win32 = Test|Win32
+		TestAll|Win32 = TestAll|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0482E04F-64D2-4143-AAD6-96A4A9BBA4EB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0482E04F-64D2-4143-AAD6-96A4A9BBA4EB}.Debug|Win32.Build.0 = Debug|Win32
+		{0482E04F-64D2-4143-AAD6-96A4A9BBA4EB}.Release|Win32.ActiveCfg = Release|Win32
+		{0482E04F-64D2-4143-AAD6-96A4A9BBA4EB}.Release|Win32.Build.0 = Release|Win32
+		{0482E04F-64D2-4143-AAD6-96A4A9BBA4EB}.Test|Win32.ActiveCfg = Test|Win32
+		{0482E04F-64D2-4143-AAD6-96A4A9BBA4EB}.Test|Win32.Build.0 = Test|Win32
+		{0482E04F-64D2-4143-AAD6-96A4A9BBA4EB}.TestAll|Win32.ActiveCfg = TestAll|Win32
+		{0482E04F-64D2-4143-AAD6-96A4A9BBA4EB}.TestAll|Win32.Build.0 = TestAll|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

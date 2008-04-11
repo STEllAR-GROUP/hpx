@@ -73,7 +73,7 @@ namespace hpx { namespace parcelset
         {
             // ensure parcel id is set
             if (!p.get_parcel_id())
-                p.set_parcel_id(get_next_parcel_id());
+                p.set_parcel_id(id_range_.get_id());
 
             // ensure the source locality id is set (if no component id is given)
             if (!p.get_source())
@@ -159,11 +159,26 @@ namespace hpx { namespace parcelset
         void send_parcel(parcel const& p, naming::address const& addr, Handler f)
         {
             // Start an asynchronous connect operation.
+            boost::asio::io_service& ios = io_service_pool_.get_io_service();
             server::connection_ptr client_connection (
-                new server::connection(io_service_pool_.get_io_service()));
+                new server::connection(ios));
 
+            using boost::asio::ip::tcp;
+            tcp::endpoint const& locality_endpoint = addr.locality_.get_endpoint();
+            std::string dest ("localhost"); //locality_endpoint.address().to_string());
+            std::string port = boost::lexical_cast<std::string>(locality_endpoint.port());
+            
+            tcp::resolver resolver(ios); //acceptor_.io_service());
+            tcp::resolver::query query(dest, port);
+            tcp::endpoint endpoint = *resolver.resolve(query);
+
+            std::cerr << endpoint.address().to_string() << ":" << endpoint.port() << std::endl
+                      << addr.locality_.get_endpoint().address().to_string() << ":" 
+                      << addr.locality_.get_endpoint().port()
+                      << std::endl;
+            
             client_connection->socket().async_connect(
-                addr.locality_.get_endpoint(),
+                endpoint, //addr.locality_.get_endpoint(),
                 boost::bind(&parcelport::handle_connect<Handler>, this,
                     boost::asio::placeholders::error, client_connection, 
                     boost::ref(p), f));
@@ -183,10 +198,10 @@ namespace hpx { namespace parcelset
             }
         }
 
-        // generate next unique parcel id
-        parcel_id get_next_parcel_id()
+        // generate next unique id
+        parcel_id get_next_id()
         {
-            return util::unique_ids::instance->get_id();
+            return id_range_.get_id();
         }
 
     public:
@@ -223,6 +238,9 @@ namespace hpx { namespace parcelset
         
         /// The site prefix to be used for id_type instances
         boost::uint64_t prefix_;
+
+        /// The site current range of ids to be used for id_type instances
+        util::unique_ids id_range_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

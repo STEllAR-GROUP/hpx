@@ -11,6 +11,7 @@
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include <hpx/util/dgas_logging.hpp>
 #include <hpx/naming/resolver_server.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -22,10 +23,12 @@ namespace hpx { namespace naming
         acceptor_(io_service_pool_.get_io_service()),
         new_connection_(new server::connection(
               io_service_pool_.get_io_service(), request_handler_)),
-        request_handler_()
+        request_handler_(), here_(l)
    {
+        util::init_dgas_logs();
+        
+        // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
         using boost::asio::ip::tcp;
-
         acceptor_.open(l.get_endpoint().protocol());
         acceptor_.set_option(tcp::acceptor::reuse_address(true));
         acceptor_.bind(l.get_endpoint());
@@ -45,16 +48,19 @@ namespace hpx { namespace naming
         acceptor_(io_service_pool_.get_io_service()),
         new_connection_(new server::connection(
               io_service_pool_.get_io_service(), request_handler_)),
-        request_handler_()
+        request_handler_(), here_(address, port)
     {
-        using boost::asio::ip::tcp;
+        util::init_dgas_logs();
         
+        // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
+        using boost::asio::ip::tcp;
+
         // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
         tcp::resolver resolver(acceptor_.io_service());
         tcp::resolver::query query(address, 
             boost::lexical_cast<std::string>(port));
         tcp::endpoint endpoint = *resolver.resolve(query);
-        
+
         acceptor_.open(endpoint.protocol());
         acceptor_.set_option(tcp::acceptor::reuse_address(true));
         acceptor_.bind(endpoint);
@@ -67,14 +73,20 @@ namespace hpx { namespace naming
             run(false);
     }
 
+    resolver_server::~resolver_server()
+    {
+    }
+
     void resolver_server::run(bool blocking)
     {
+        LDGAS_(info) << "startup: listening at: " << here_;
         io_service_pool_.run(blocking);
     }
 
     void resolver_server::stop()
     {
         io_service_pool_.stop();
+        LDGAS_(info) << "shutdown: stopped listening at: " << here_;
     }
 
     void resolver_server::handle_accept(boost::system::error_code const& e)

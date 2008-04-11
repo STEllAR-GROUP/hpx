@@ -43,6 +43,10 @@ namespace hpx { namespace naming
             bool start_service_asynchronously = false, 
             std::size_t io_service_pool_size = 1);
 
+        /// Destruct the object. Stops the service if it has not been stopped
+        /// already.
+        ~resolver_server();
+        
         /// Run the server's io_service loop.
         void run (bool blocking = true);
 
@@ -65,6 +69,9 @@ namespace hpx { namespace naming
 
         /// The handler for all incoming requests.
         server::request_handler request_handler_;
+        
+        /// this represents the locality this server is running on
+        naming::locality here_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

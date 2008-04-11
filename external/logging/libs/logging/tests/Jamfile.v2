@@ -1,0 +1,46 @@
+# Copyright (c) John Torjo 2008
+# Boost Logging Library Build Tests Jamfile
+#
+#  Distributed under the Boost Software License, Version 1.0. (See
+#  accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)
+
+
+import modules ;
+
+# Look for BOOST_ROOT_DIR environment variable
+local BOOST_ROOT = [ modules.peek : BOOST_ROOT_DIR ] ;
+
+use-project /boost : $(BOOST_ROOT) ; 
+
+project 
+    : requirements 
+      <include>../../.. 
+      <include>$(BOOST_ROOT) 
+      <threading>multi 
+      <toolset>msvc:<runtime-link>static 
+      <link>static 
+      <library>/boost//thread 
+      <library>/boost//filesystem 
+      <library>/boost//date_time 
+    ;
+
+# bring in rules for testing
+import testing ;
+
+test-suite log_tests :
+    [ run test_file/test.cpp ]
+    [ run test_log_output/test_log_output.cpp ]
+    [ run test_named/test.cpp : : : : test2 ]
+    [ run test_named_spacer/test.cpp : : : : test3 ]
+    [ run test_rolling_file/test.cpp : : : : test4 ]
+    [ run test_simple_tss/test_simple_tss.cpp ]
+    [ run test_tags/test_tags.cpp ]
+    [ run test_ts_resouce_with_cache/test_ts_resource.cpp ]
+    [ run test_tss/test_tss.cpp test_tss/test_tss_objects.cpp test_tss/test_tss_on_end_delete.cpp : : : : test5 ]
+    [ run test_on_ded_thread/test.cpp  : : : : test6 ]
+    [ run test_scoped_log/test.cpp  : : : : test7 ]
+#    [ run  ]
+#    [ run  ]
+    ;
+
