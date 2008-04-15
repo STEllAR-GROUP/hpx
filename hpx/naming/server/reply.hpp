@@ -18,7 +18,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 ///  version of GAS reply structure
-#define HPX_REPLY_VERSION   0x20
+#define HPX_REPLY_VERSION   0x30
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming { namespace server 
@@ -71,13 +71,13 @@ namespace hpx { namespace naming { namespace server
         reply (error s = no_success)
           : command_(command_unknown), status_(s),
             error_(status_strings::get_error_text(s)),
-            lower_bound_(0), upper_bound_(0), id_(0)
+            lower_bound_(0), upper_bound_(0)
         {}
 
         reply (error s, char const* what)
           : command_(command_unknown), status_(s),
             error_(status_strings::get_error_text(s)),
-            lower_bound_(0), upper_bound_(0), id_(0)
+            lower_bound_(0), upper_bound_(0)
         {
             error_ += std::string(": ") + what;
         }
@@ -86,13 +86,13 @@ namespace hpx { namespace naming { namespace server
                 char const* what = 0)
           : command_(command), status_(s), 
             error_(status_strings::get_error_text(s)),
-            lower_bound_(0), upper_bound_(0), id_(0)
+            lower_bound_(0), upper_bound_(0)
         {
             if (0 != what)
                 error_ += std::string(": ") + what;
         }
 
-        reply (name_server_command command, naming::id_type id, 
+        reply (name_server_command command, naming::id_type const& id, 
                error s = success)
           : command_(command), status_(s),
             error_(status_strings::get_error_text(success)),
@@ -108,7 +108,7 @@ namespace hpx { namespace naming { namespace server
                error s = success)
           : command_(command), status_(s),
             error_(status_strings::get_error_text(success)),
-            lower_bound_(0), upper_bound_(0), id_(0)
+            lower_bound_(0), upper_bound_(0)
         {
             BOOST_ASSERT(s == success || s == no_success);
             BOOST_ASSERT(command == command_statistics);
@@ -127,28 +127,28 @@ namespace hpx { namespace naming { namespace server
           : command_(command_resolve), status_(success), 
             error_(status_strings::get_error_text(success)),
             address_(addr),
-            lower_bound_(0), upper_bound_(0), id_(0)
+            lower_bound_(0), upper_bound_(0)
         {
             BOOST_ASSERT(command == command_resolve);
         }
 
         reply (error s, name_server_command command, 
-                boost::uint64_t prefix)
+                naming::id_type prefix)
           : command_(command_getprefix), status_(s),
             error_(status_strings::get_error_text(s)),
-            lower_bound_(prefix), upper_bound_(0), id_(0)
+            lower_bound_(prefix), upper_bound_(0)
         {
             BOOST_ASSERT(s == success || s == repeated_request);
             BOOST_ASSERT(command == command_getprefix);
         }
 
         reply (error s, name_server_command command, 
-                boost::uint64_t lower_bound, boost::uint64_t upper_bound)
+                naming::id_type lower_bound, naming::id_type upper_bound)
           : command_(command_getidrange), status_(s),
             error_(status_strings::get_error_text(s)),
-            lower_bound_(lower_bound), upper_bound_(upper_bound), id_(0)
+            lower_bound_(lower_bound), upper_bound_(upper_bound)
         {
-            BOOST_ASSERT(s == success || s == no_success);
+            BOOST_ASSERT(s == success || s == repeated_request);
             BOOST_ASSERT(command == command_getidrange);
         }
 
@@ -165,15 +165,15 @@ namespace hpx { namespace naming { namespace server
         {
             return address_;
         }
-        boost::uint64_t get_prefix() const
+        naming::id_type const& get_prefix() const
         {
             return lower_bound_;
         }
-        boost::uint64_t get_lower_bound() const
+        naming::id_type const& get_lower_bound() const
         {
             return lower_bound_;
         }
-        boost::uint64_t get_upper_bound() const
+        naming::id_type const& get_upper_bound() const
         {
             return upper_bound_;
         }
@@ -217,7 +217,7 @@ namespace hpx { namespace naming { namespace server
                 break;
                 
             case command_queryid:
-                ar << id_.id_;
+                ar << id_;
                 break;
 
             case command_statistics:
@@ -261,7 +261,7 @@ namespace hpx { namespace naming { namespace server
                 break;
                 
             case command_queryid:
-                ar >> id_.id_;
+                ar >> id_;
                 break;
                 
             case command_statistics:
@@ -284,9 +284,9 @@ namespace hpx { namespace naming { namespace server
         boost::uint8_t status_;         /// status of requested operation
         std::string error_;             /// descriptive error message
         naming::address address_;       /// address (for resolve only)
-        boost::uint64_t lower_bound_;   /// lower bound of id range (for get_idrange only) 
+        naming::id_type lower_bound_;   /// lower bound of id range (for get_idrange only) 
                                         /// or the prefix for the given locality (get_prefix only)
-        boost::uint64_t upper_bound_;   /// upper bound of id range (for get_idrange only)
+        naming::id_type upper_bound_;   /// upper bound of id range (for get_idrange only)
         naming::id_type id_;            /// global id (for queryid only)
         double statistics_[command_lastcommand];       /// gathered statistics
     };
@@ -315,7 +315,7 @@ namespace hpx { namespace naming { namespace server
                 break;
                 
             case command_queryid:
-                os << "id(" << std::hex << rep.id_.id_ << ") ";
+                os << "id" << std::hex << rep.id_ << " ";
                 break;
                 
             case command_statistics:

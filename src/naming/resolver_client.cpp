@@ -77,7 +77,7 @@ namespace hpx { namespace naming
         }
     }
 
-    bool resolver_client::get_prefix(locality const& l, boost::uint64_t& prefix)
+    bool resolver_client::get_prefix(locality const& l, id_type& prefix)
     {
         // send request
         server::request req (server::command_getprefix, l);
@@ -92,8 +92,8 @@ namespace hpx { namespace naming
         return s == success;
     }
     
-    bool resolver_client::get_id_range(locality const& l, 
-        boost::uint64_t& lower_bound, boost::uint64_t& upper_bound)
+    bool resolver_client::get_id_range(locality const& l, id_type& lower_bound, 
+        id_type& upper_bound)
     {
         // send request
         server::request req (server::command_getidrange, l);
@@ -101,7 +101,7 @@ namespace hpx { namespace naming
         execute(req, rep);
         
         hpx::error s = (hpx::error) rep.get_status();
-        if (s != success && s != no_success)
+        if (s != success && s != repeated_request)
             boost::throw_exception(hpx::exception((error)s, rep.get_error()));
 
         lower_bound = rep.get_lower_bound();

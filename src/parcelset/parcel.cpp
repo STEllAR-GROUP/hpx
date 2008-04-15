@@ -19,9 +19,9 @@ namespace hpx { namespace parcelset
     void parcel::save(Archive & ar, const unsigned int version) const
     {
         ar << tag_;
-        ar << destination_id_.id_;
+        ar << destination_id_;
         ar << destination_addr_;
-        ar << source_id_.id_;
+        ar << source_id_;
         ar << action_;
         ar << cont_;
     }
@@ -35,9 +35,9 @@ namespace hpx { namespace parcelset
         }
 
         ar >> tag_;
-        ar >> destination_id_.id_;
+        ar >> destination_id_;
         ar >> destination_addr_;
-        ar >> source_id_.id_;
+        ar >> source_id_;
         ar >> action_;
         ar >> cont_;
     }

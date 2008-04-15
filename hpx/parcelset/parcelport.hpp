@@ -139,7 +139,7 @@ namespace hpx { namespace parcelset
         }
         
         /// Return the prefix of this locality
-        boost::uint64_t get_prefix() const { return prefix_; }
+        naming::id_type const& get_prefix() const { return prefix_; }
         
         /// register an event handler to be called whenever a parcel has been 
         /// received
@@ -237,7 +237,7 @@ namespace hpx { namespace parcelset
         naming::locality here_;
         
         /// The site prefix to be used for id_type instances
-        boost::uint64_t prefix_;
+        naming::id_type prefix_;
 
         /// The site current range of ids to be used for id_type instances
         util::unique_ids id_range_;

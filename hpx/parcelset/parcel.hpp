@@ -19,7 +19,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 //  parcel serialization format version
-#define HPX_PARCEL_VERSION 0x20
+#define HPX_PARCEL_VERSION 0x30
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
@@ -32,7 +32,7 @@ namespace hpx { namespace parcelset
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    typedef boost::uint64_t parcel_id;
+    typedef naming::id_type parcel_id;
 
     ///////////////////////////////////////////////////////////////////////////
     class parcel
@@ -76,11 +76,11 @@ namespace hpx { namespace parcelset
         }
     
         /// get and set the parcel id
-        parcel_id get_parcel_id() const 
+        parcel_id const& get_parcel_id() const 
         {
             return tag_;
         }
-        void set_parcel_id(parcel_id id) 
+        void set_parcel_id(parcel_id const& id) 
         {
             tag_ = id;
         }

@@ -19,6 +19,7 @@
 
 #include <hpx/naming/name.hpp>
 #include <hpx/naming/address.hpp>
+#include <hpx/naming/locality.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming { namespace server 
@@ -61,28 +62,40 @@ namespace hpx { namespace naming { namespace server
         void handle_statistics(request const& req, reply& rep);
 
     private:
-        typedef std::map<std::string, boost::uint64_t> ns_registry_type;
-        typedef std::map<boost::uint64_t, naming::address> registry_type;
-        
-        typedef std::pair<boost::uint16_t, boost::uint64_t> site_prefix_type;
+        // The ns_registry_type is used to store the mappings from the 
+        // global names (strings) to global ids.
+        typedef std::map<std::string, naming::id_type> ns_registry_type;
+
+        // The registry_type is used to store the mapping from the global ids
+        // to the current local address of the corresponding component.
+        typedef std::map<naming::id_type, naming::address> registry_type;
+
+        // The site_prefix_map_type is used to store the assigned prefix and 
+        // the current upper boundary to be used for global id assignment for
+        // a particular locality.
+        typedef std::pair<boost::uint32_t, naming::id_type> site_prefix_type;
         typedef std::map<hpx::naming::locality, site_prefix_type> 
             site_prefix_map_type;
+        typedef site_prefix_map_type::value_type site_prefix_value_type;
+            
         typedef boost::mutex mutex_type;
         
+        // comparison operator for the entries stored in the site_prefix_map
+        friend bool operator< (site_prefix_value_type const& lhs,
+            site_prefix_value_type const& rhs);
+
         mutex_type mtx_;
-        ns_registry_type ns_registry_;
-        registry_type registry_;
-        site_prefix_map_type site_prefixes_;
-        std::string msg_;
+        ns_registry_type ns_registry_;        // "name" --> global_id
+        registry_type registry_;              // global_id --> local_address
+        site_prefix_map_type site_prefixes_;  // locality --> prefix, upper_boundary
 
         // gathered timings and counts        
         std::vector<std::pair<double, std::size_t> > totals_;
     };
 
     // compare two entries in the site_prefix_map_type above
-    inline bool operator< (
-        std::pair<boost::uint32_t, boost::uint16_t> const& lhs,
-        std::pair<boost::uint32_t, boost::uint16_t> const& rhs)
+    inline bool operator< (request_handler::site_prefix_value_type const& lhs,
+        request_handler::site_prefix_value_type const& rhs)
     {
         if (lhs.first < rhs.first)
             return true;

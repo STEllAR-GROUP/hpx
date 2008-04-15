@@ -19,19 +19,19 @@ namespace hpx { namespace naming { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     //  Handle conversion to/from prefix
-    inline id_type get_id_from_prefix(boost::uint16_t prefix)
+    inline id_type get_id_from_prefix(boost::uint32_t prefix)
     {
-        return boost::uint64_t(prefix) << 48;
+        return id_type(boost::uint64_t(prefix) << 32, 0);
     }
     
-    inline boost::uint16_t get_prefix_from_id(id_type id)
+    inline boost::uint32_t get_prefix_from_id(id_type id)
     {
-        return boost::uint16_t(id >> 48);
+        return boost::uint32_t(id.get_msb() >> 32);
     }
     
     inline bool is_prefix_only(id_type id)
     {
-        return (id & 0xFFFFFFFFFFFF) ? false : true;
+        return (id.get_msb() & 0xFFFFFFFFFFFF) ? false : true;
     }
     
     ///////////////////////////////////////////////////////////////////////////
@@ -52,7 +52,7 @@ namespace hpx { namespace naming { namespace server
             site_prefix_map_type::iterator it = 
                 site_prefixes_.find(req.get_site());
             if (it != site_prefixes_.end()) {
-                // The real prefix has to be used as the 16 most 
+                // The real prefix has to be used as the 32 most 
                 // significant bits of global id's
                 
                 // existing entry
@@ -61,8 +61,8 @@ namespace hpx { namespace naming { namespace server
             }
             else {
                 // insert this prefix as being mapped to the given locality
-                boost::uint16_t prefix = (boost::uint16_t)site_prefixes_.size() + 1;
-                id_type id = get_id_from_prefix(prefix);
+                boost::uint32_t prefix = site_prefixes_.size() + 1;
+                naming::id_type id = get_id_from_prefix(prefix);
                 site_prefixes_.insert(
                     site_prefix_map_type::value_type(req.get_site(), 
                         std::make_pair(prefix, id)));
@@ -80,7 +80,7 @@ namespace hpx { namespace naming { namespace server
                         registry_type::value_type(id, address(req.get_site())));
                 }
 
-                // The real prefix has to be used as the 16 most 
+                // The real prefix has to be used as the 32 most 
                 // significant bits of global id's
                 
                 // created new entry
@@ -102,23 +102,23 @@ namespace hpx { namespace naming { namespace server
             site_prefix_map_type::iterator it = 
                 site_prefixes_.find(req.get_site());
             if (it != site_prefixes_.end()) {
-                // The real prefix has to be used as the 16 most 
+                // The real prefix has to be used as the 32 most 
                 // significant bits of global id's
                 
                 // generate the new id range
-                boost::uint64_t lower = (*it).second.second + 1;
-                boost::uint64_t upper = lower + range_delta;
+                naming::id_type lower = (*it).second.second + 1;
+                naming::id_type upper = lower + range_delta;
                 
                 // store the new lower bound
                 (*it).second.second = upper;
 
                 // existing entry
-                rep = reply(success, command_getidrange, lower, upper); 
+                rep = reply(repeated_request, command_getidrange, lower, upper); 
             }
             else {
                 // insert this prefix as being mapped to the given locality
-                boost::uint16_t prefix = (boost::uint16_t)site_prefixes_.size() + 1;
-                id_type id = get_id_from_prefix(prefix);
+                boost::uint32_t prefix = (boost::uint32_t)site_prefixes_.size() + 1;
+                naming::id_type id = get_id_from_prefix(prefix);
                 std::pair<site_prefix_map_type::iterator, bool> p=
                     site_prefixes_.insert(
                         site_prefix_map_type::value_type(req.get_site(), 
@@ -138,8 +138,8 @@ namespace hpx { namespace naming { namespace server
                 }
 
                 // generate the new id range
-                boost::uint64_t lower = id + 1;
-                boost::uint64_t upper = lower + range_delta;
+                naming::id_type lower = id + 1;
+                naming::id_type upper = lower + range_delta;
                 
                 // store the new lower bound
                 (*p.first).second.second = upper;

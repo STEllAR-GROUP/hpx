@@ -16,7 +16,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 ///  version of GAS request structure
-#define HPX_REQUEST_VERSION   0x20
+#define HPX_REQUEST_VERSION   0x30
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming { namespace server 
@@ -64,26 +64,27 @@ namespace hpx { namespace naming { namespace server
     {
     public:
         request(name_server_command c = command_unknown) 
-          : command_(c), id_(0)
+          : command_(c)
         {}
         
         request(name_server_command c, locality const& l) 
-          : command_(c), id_(0), site_(l)
+          : command_(c), site_(l)
         {}
         
-        request(name_server_command c, naming::id_type id) 
+        request(name_server_command c, naming::id_type const& id) 
           : command_(c), id_(id)
         {}
 
-        request(name_server_command c, std::string const& ns_name, naming::id_type id) 
+        request(name_server_command c, std::string const& ns_name, 
+                naming::id_type const& id) 
           : command_(c), id_(id), ns_name_(ns_name)
         {}
 
         request(name_server_command c, std::string const& ns_name) 
-          : command_(c), id_(0), ns_name_(ns_name)
+          : command_(c), ns_name_(ns_name)
         {}
 
-        request(name_server_command c, boost::uint64_t id, address const& addr) 
+        request(name_server_command c, naming::id_type id, address const& addr) 
           : command_(c), id_(id), addr_(addr)
         {}
 
@@ -92,7 +93,7 @@ namespace hpx { namespace naming { namespace server
             return command_;
         }
         
-        naming::id_type get_id() const
+        naming::id_type const& get_id() const
         {
             return id_;
         }
@@ -127,11 +128,11 @@ namespace hpx { namespace naming { namespace server
             switch (command_) {
             case command_resolve:
             case command_unbind:
-                ar << id_.id_;
+                ar << id_;
                 break;
 
             case command_bind:
-                ar << id_.id_;
+                ar << id_;
                 ar << addr_.locality_;
                 ar << addr_.type_;
                 ar << addr_.address_;
@@ -143,7 +144,7 @@ namespace hpx { namespace naming { namespace server
                 break;
 
             case command_registerid:
-                ar << id_.id_;
+                ar << id_;
                 ar << ns_name_;
                 break;
 
@@ -170,11 +171,11 @@ namespace hpx { namespace naming { namespace server
             switch (command_) {
             case command_resolve:
             case command_unbind:
-                ar >> id_.id_;
+                ar >> id_;
                 break;
 
             case command_bind:
-                ar >> id_.id_;
+                ar >> id_;
                 ar >> addr_.locality_;
                 ar >> addr_.type_;
                 ar >> addr_.address_;
@@ -186,7 +187,7 @@ namespace hpx { namespace naming { namespace server
                 break;
 
             case command_registerid:
-                ar >> id_.id_;
+                ar >> id_;
                 ar >> ns_name_;
                 break;
 
@@ -216,22 +217,22 @@ namespace hpx { namespace naming { namespace server
         switch (req.command_) {
         case command_unbind:
         case command_resolve:
-            os << "id(" << std::hex << req.id_.id_ << ") ";
+            os << "id" << std::hex << req.id_ << " ";
             break;
 
         case command_bind:
-            os << "id(" << std::hex << req.id_.id_ << ") ";
+            os << "id" << std::hex << req.id_ << " ";
             os << "addr(" << req.addr_ << ") ";
             break;
 
         case command_queryid:
         case command_unregisterid: 
-            os << "name(" << req.ns_name_ << ") ";
+            os << "name(\"" << req.ns_name_ << "\") ";
             break;
 
         case command_registerid:
-            os << "id(" << std::hex << req.id_.id_ << ") ";
-            os << "name(" << req.ns_name_ << ") ";
+            os << "id" << std::hex << req.id_ << " ";
+            os << "name(\"" << req.ns_name_ << "\") ";
             break;
 
         case command_getprefix:

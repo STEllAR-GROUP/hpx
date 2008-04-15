@@ -29,7 +29,7 @@ namespace hpx { namespace util
         }
 
         /// Generate next unique component id
-        naming::id_type get_id()
+        naming::id_type const& get_id()
         {
             // create a new id
             mutex_type::scoped_lock l(mtx_);
@@ -37,15 +37,16 @@ namespace hpx { namespace util
             // ensure next_id doesn't overflow
             if (lower_ > upper_) 
                 resolver_.get_id_range(here_, lower_, upper_);
-            return lower_++;
+            ++lower_;
+            return lower_;
         }
         
     private:
         mutex_type mtx_;
         
         /// The range of available ids for components
-        boost::uint64_t lower_;
-        boost::uint64_t upper_;
+        naming::id_type lower_;
+        naming::id_type upper_;
 
         naming::locality const& here_;
         naming::resolver_client& resolver_;

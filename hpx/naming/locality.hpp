@@ -83,6 +83,11 @@ namespace hpx { namespace naming
             return lhs.endpoint_ < rhs.endpoint_;
         }
         
+        friend bool operator> (locality const& lhs, locality const& rhs)
+        {
+            return lhs.endpoint_ > rhs.endpoint_;
+        }
+        
     private:
         friend std::ostream& operator<< (std::ostream& os, locality const& l);
         
