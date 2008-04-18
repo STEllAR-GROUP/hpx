@@ -5,10 +5,8 @@
 
 #include <iostream>
 #include <string>
-
-#include <boost/lexical_cast.hpp>
-
 #include <hpx/hpx.hpp>
+#include <boost/lexical_cast.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(BOOST_WINDOWS)
