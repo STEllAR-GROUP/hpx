@@ -15,7 +15,7 @@
 #include <boost/assert.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/detail/lightweight_test.hpp>
-#include <hpx/Util/high_resolution_timer.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
 
 
 int main(int argc, char* argv[])

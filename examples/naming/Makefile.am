@@ -1,27 +1,29 @@
 # Automake file for hpx/examples/naming
 
 AUTOMAKE_OPTIONS = foreign
-bin_PROGRAMS = resolver_server resolver_client
+bin_PROGRAMS = server client
 SUFF = -gcc$(shell $(top_builddir)/gccver)-mt
 
-resolver_server_LDADD =                     \
+server_LDADD =                              \
     $(top_builddir)/src/libhpx.a            \
-    -L $(HOME)/boost/lib                    \
+    -L /home/hkaiser/packages/boost/lib/    \
+    -lboost_filesystem$(SUFF)               \
     -lboost_date_time$(SUFF)                \
     -lboost_thread$(SUFF)                   \
     -lboost_system$(SUFF)                   \
     -lboost_serialization$(SUFF)
 
-resolver_client_LDADD =                     \
+client_LDADD =                              \
     $(top_builddir)/src/libhpx.a            \
-    -L $(HOME)/boost/lib                    \
+    -L/home/hkaiser/packages/boost/lib/     \
+    -lboost_filesystem$(SUFF)               \
     -lboost_date_time$(SUFF)                \
     -lboost_thread$(SUFF)                   \
     -lboost_system$(SUFF)                   \
     -lboost_serialization$(SUFF)
 
-resolver_server_LDFLAGS = -pthread
-resolver_client_LDFLAGS = -pthread
+server_LDFLAGS = -pthread
+client_LDFLAGS = -pthread
 
-resolver_server_SOURCES = resolver_server.cpp
-resolver_client_SOURCES = resolver_client.cpp
+server_SOURCES = resolver_server.cpp
+client_SOURCES = resolver_client.cpp

@@ -4,28 +4,20 @@ AUTOMAKE_OPTIONS = foreign
 lib_LIBRARIES = libhpx.a
 
 libhpx_a_SOURCES =                                            \
-#    components/factory.cpp                                    \
-#    components/graph.cpp                                      \
-#    components/local_graph.cpp                                \
-#    components/accumulator.cpp                                \
-#    components/vertex.cpp                                     \
     util/io_service_pool.cpp                                  \
-#    core/px.cpp                                               \
+    util/dgas_logging.cpp                                     \
     parcelset/parcelport.cpp                                  \
     parcelset/parcel.cpp                                      \
     parcelset/server/parcel_queue.cpp                         \
-#    threadmanager/threadmanager.cpp                           \
     naming/resolver_server.cpp                                \
     naming/resolver_client.cpp                                \
     naming/server/request_handler.cpp                         \
-\
-#    $(top_builddir)/external/coroutine/libs/coroutine/src/swapcontext.cpp \
 \
     $(top_builddir)/hpx/components.hpp                        \
     $(top_builddir)/hpx/config.hpp                            \
     $(top_builddir)/hpx/core.hpp                              \
     $(top_builddir)/hpx/hpx.hpp                               \
-    $(top_builddir)/hpx/distpx_fwd.hpp                        \
+    $(top_builddir)/hpx/hpx_fwd.hpp                           \
     $(top_builddir)/hpx/exception.hpp                         \
     $(top_builddir)/hpx/naming.hpp                            \
     $(top_builddir)/hpx/parcelset.hpp                         \
