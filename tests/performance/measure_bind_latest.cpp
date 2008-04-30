@@ -58,20 +58,19 @@ int main(int argc, char* argv[])
         id_type prefix1;
         if (resolver.get_prefix(here, prefix1))
             last_lowerid = prefix1;
-        BOOST_TEST(prefix1 != 0);
-           
+                   
         // bind an arbitrary address
-		hpx::util::high_resolution_timer t;
-		for (int i=1; i <1000;i++)
+	hpx::util::high_resolution_timer t;
+	for (int i=1; i <1000;i++)
 		{			
-						//resolver.bind(i, address(here, 1, i));
 		resolver.bind(id_type(i), address(here, 1, i));
 		}
-		std::cout << " Time taken by measure_bind is: "<< t.elapsed() << std::endl << std::flush;
-		
-		resolver.get_statistics(timings);
-		std::cout << " Time taken by get_prefix is: " << timings[0] <<  std::endl <<std::flush;
-		std::cout << " Time taken by bind       is: " << timings[2] <<  std::endl <<std::flush;
+	std::cout << " ***************************************" << std::endl << std::flush;	
+	std::cout << " Measure_bind is: "<< t.elapsed() << std::endl << std::flush;
+	
+	resolver.get_statistics(timings);
+	std::cout << " Time taken by get_prefix is: " << timings[0] <<  std::endl <<std::flush;
+	std::cout << " Time taken by bind       is: " << timings[2] <<  std::endl <<std::flush;
 
         return 0;
 

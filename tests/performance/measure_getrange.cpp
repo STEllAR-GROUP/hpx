@@ -60,19 +60,19 @@ int main(int argc, char* argv[])
 
         // test get_id_range
         id_type lower1, upper1;
-		hpx::util::high_resolution_timer t;
-		for(int i = 1;i<1000;i++)
+	hpx::util::high_resolution_timer t;
+	for(int i = 1;i<1000;i++)
 		{
-		resolver.get_id_range(here, lower1, upper1);
+			resolver.get_id_range(here, lower1, upper1);
 		}
-		std::cout << " Time taken for Measure QueryID: "<< t.elapsed() << std::endl << std::flush;
-		
-		resolver.get_statistics(timings);
-
-		std::cout << " Time taken by get_prefix is: " << timings[0] <<  std::endl <<std::flush;
-		std::cout << " Time taken by get_id_range is: " << timings[1] <<  std::endl <<std::flush;
+	std::cout << " ***************************************"<< std::endl << std::flush;
+	std::cout << "Measure_GetRange: "<< t.elapsed() << std::endl << std::flush;
+	
+	resolver.get_statistics(timings);
+	std::cout << " Time taken by get_prefix is: " << timings[0] <<  std::endl <<std::flush;
+	std::cout << " Time taken by get_id_range is: " << timings[1] <<  std::endl <<std::flush;
         
-		return 0;	        
+	return 0;	        
 
 #if defined(MAX_ITERATIONS)
         }

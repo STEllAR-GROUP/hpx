@@ -57,20 +57,19 @@ int main(int argc, char* argv[])
         id_type prefix1;
         if (resolver.get_prefix(here, prefix1))
             last_lowerid = prefix1;
-        BOOST_TEST(prefix1 != 0);
-        
+                
         
         // bind an arbitrary address
-		for (int i=1; i <3;i++)
+	for (int i=1; i <3;i++)
 		{			
-		resolver.bind(id_type(i), address(here, 1, 2));
+			resolver.bind(id_type(i), address(here, 1, 2));
 		}
 		
-		// registerid() associates this id with a namespace name
-		// It accepts char const*, to convert string into that we use c_str() function.
+	// registerid() associates this id with a namespace name
+	// It accepts char const*, to convert string into that we use c_str() function.
 		
-		std::string s;
-		for(int a=1;a<1000;a++)
+	std::string s;
+	for(int a=1;a<1000;a++)
 		{
 			s="/test/foo/";
 			s+= boost::lexical_cast<std::string>(a);//type conversion
@@ -78,24 +77,25 @@ int main(int argc, char* argv[])
 			resolver.registerid(b, id_type(a));
 		}
  		
-		id_type id;
-		hpx::util::high_resolution_timer t;
-		for(int i = 1;i<1000;i++)
+	id_type id;
+	hpx::util::high_resolution_timer t;
+	for(int i = 1;i<1000;i++)
 		{
 			s="/test/foo/";
 			s+= boost::lexical_cast<std::string>(i);//type conversion
 			const char* b = s.c_str();
 			resolver.queryid(b, id);
 		}
-		std::cout << " Time taken for Measure QueryID: "<< t.elapsed() << std::endl << std::flush;
+	std::cout << " ***************************************"<< std::endl << std::flush;
+	std::cout << "Measure_QueryID: "<< t.elapsed() << std::endl << std::flush;
 
-		resolver.get_statistics(timings);
-		std::cout << " Time taken by get_prefix is: " << timings[0] <<  std::endl <<std::flush;
-		std::cout << " Time taken by bind       is: " << timings[2] <<  std::endl <<std::flush;
-		std::cout << " Time taken by registerid is: " << timings[6] <<  std::endl <<std::flush;
-		std::cout << " Time taken by queryid    is: " << timings[5] <<  std::endl <<std::flush;
+	resolver.get_statistics(timings);
+	std::cout << " Time taken by get_prefix is: " << timings[0] <<  std::endl <<std::flush;
+	std::cout << " Time taken by bind       is: " << timings[2] <<  std::endl <<std::flush;
+	std::cout << " Time taken by registerid is: " << timings[6] <<  std::endl <<std::flush;
+	std::cout << " Time taken by queryid    is: " << timings[5] <<  std::endl <<std::flush;
         
-		return 0;
+	return 0;
 	       
         
 #if defined(MAX_ITERATIONS)

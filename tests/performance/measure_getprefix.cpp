@@ -53,20 +53,21 @@ int main(int argc, char* argv[])
         {
 #endif
         
-		// retrieve the id prefix of this site
-		id_type prefix1;		
-		hpx::util::high_resolution_timer t;		
-		for(int i=0; i<1000;i++)
+	// retrieve the id prefix of this site
+	id_type prefix1;		
+	hpx::util::high_resolution_timer t;		
+	for(int i=0; i<1000;i++)
 		{
 		 prefix1 = id_type(i);
-         resolver.get_prefix(here, prefix1);
-        }
-		std::cout << "The time take for Measure Get Prefix: "<< t.elapsed() << std::endl << std::flush;
+        	 resolver.get_prefix(here, prefix1);
+	        }
+	std::cout << " ***************************************"<< std::endl << std::flush;
+	std::cout << "Measure_GetPrefix: "<< t.elapsed() << std::endl << std::flush;
 		
-		resolver.get_statistics(timings);
-		std::cout << " Time taken by get_prefix is: " << timings[0] <<  std::endl <<std::flush;
+	resolver.get_statistics(timings);
+	std::cout << " Time taken by get_prefix is: " << timings[0] <<  std::endl <<std::flush;
 		        
-		return 0;
+	return 0;
         
 #if defined(MAX_ITERATIONS)
         }

@@ -53,36 +53,37 @@ int main(int argc, char* argv[])
         {
 #endif
         
-		// retrieve the id prefix of this site
+	// retrieve the id prefix of this site
         id_type prefix1;
-        BOOST_TEST(resolver.get_prefix(here, prefix1));
+        resolver.get_prefix(here, prefix1);
       
         // bind an arbitrary address
-		for (int i=1; i <1000;i++)
+	for (int i=1; i <1000;i++)
 		{			
-		resolver.bind(id_type(i), address(here, 1, i));
+			resolver.bind(id_type(i), address(here, 1, i));
 		}
                 
         // registerid() associate the id with a namespace name
-		// It accepts char const*, to convert string into that we use c_str() function.
+	// It accepts char const*, to convert string into that we use c_str() function.
 				
-		std::string s;
-		hpx::util::high_resolution_timer t;		
-		for(int a=1;a<1000;a++)
+	std::string s;
+	hpx::util::high_resolution_timer t;		
+	for(int a=1;a<1000;a++)
 		{
-				s="/test/foo/";
-				s+= boost::lexical_cast<std::string>(a);//type conversion
-				const char* b = s.c_str();
-				resolver.registerid(b, id_type(a));
+			s="/test/foo/";
+			s+= boost::lexical_cast<std::string>(a);//type conversion
+			const char* b = s.c_str();
+			resolver.registerid(b, id_type(a));
 		}
-		std::cout << "Measure_registerID:"<< t.elapsed() << std::endl << std::flush;
+	std::cout << " ***************************************"<< std::endl << std::flush;
+	std::cout << "Measure_registerID:"<< t.elapsed() << std::endl << std::flush;
 		
-		resolver.get_statistics(timings);
-		std::cout << " Time taken by get_prefix is: " << timings[0] <<  std::endl <<std::flush;
-		std::cout << " Time taken by bind       is: " << timings[2] <<  std::endl <<std::flush;
-		std::cout << " Time taken by registerid is: " << timings[6] <<  std::endl <<std::flush;
+	resolver.get_statistics(timings);
+	std::cout << " Time taken by get_prefix is: " << timings[0] <<  std::endl <<std::flush;
+	std::cout << " Time taken by bind       is: " << timings[2] <<  std::endl <<std::flush;
+	std::cout << " Time taken by registerid is: " << timings[6] <<  std::endl <<std::flush;
 		        
-		return 0;
+	return 0;
 
 	        
 #if defined(MAX_ITERATIONS)

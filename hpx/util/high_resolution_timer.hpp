@@ -118,7 +118,7 @@ namespace hpx { namespace util
         high_resolution_timer(double t) 
         {
             start_time.tv_sec = time_t(t);
-            start_time.tv_nsec = (t - start_time.tv_sec) * 10e9;
+            start_time.tv_nsec = (t - start_time.tv_sec) * 1e9;
         }
         
         high_resolution_timer(high_resolution_timer const& rhs) 
@@ -138,10 +138,10 @@ namespace hpx { namespace util
                 boost::throw_exception(std::runtime_error("Couldn't get current time"));
 
             if (now.tv_sec == start_time.tv_sec)
-                return double(now.tv_nsec - start_time.tv_nsec) * 10e-9;
+                return double(now.tv_nsec - start_time.tv_nsec) * 1e-9;
                 
             return double(now.tv_sec - start_time.tv_sec) + 
-                (double(now.tv_nsec - start_time.tv_nsec) * 10e-9);
+                (double(now.tv_nsec - start_time.tv_nsec) * 1e-9);
         }
 
         double elapsed_max() const   // return estimated maximum value for elapsed()
@@ -154,7 +154,7 @@ namespace hpx { namespace util
             timespec resolution;
             if (-1 == clock_getres(CLOCK_THREAD_CPUTIME_ID, &resolution))
                 boost::throw_exception(std::runtime_error("Couldn't get resolution"));
-            return double(resolution.tv_sec + resolution.tv_nsec * 10e-9); 
+            return double(resolution.tv_sec + resolution.tv_nsec * 1e-9); 
         }
 
     private:
