@@ -87,10 +87,9 @@ int main(int argc, char* argv[])
 
 	resolver.get_statistics(timings);
 	std::cout << " Time taken by get_prefix is: " << timings[0] <<  std::endl <<std::flush;
-	std::cout << " Time taken by get_range  is: " << timings[1] <<  std::endl <<std::flush;
 	std::cout << " Time taken by bind       is: " << timings[2] <<  std::endl <<std::flush;
 	std::cout << " Time taken by registerid is: " << timings[6] <<  std::endl <<std::flush;
-	std::cout << " Time taken by resolve    is: " << timings[4] <<  std::endl <<std::flush;
+	std::cout << " Time taken by unbind     is: " << timings[3] <<  std::endl <<std::flush;
 
 	return 0;
 		
