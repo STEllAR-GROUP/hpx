@@ -49,8 +49,8 @@ void received_parcel(hpx::parcelset::parcelport& ps)
             std::cout << "Received parcel: " << std::hex << p.get_parcel_id() 
                       << std::endl;
             p.set_destination(p.get_source());
-            p.set_source(0);
-            p.set_parcel_id(0);
+            p.set_source(hpx::naming::id_type());
+            p.set_parcel_id(hpx::naming::id_type());
             ps.sync_put_parcel(p);
             std::cout << "Successfully sent parcel: " 
                       << std::hex << p.get_parcel_id() << std::endl;

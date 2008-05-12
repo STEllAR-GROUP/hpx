@@ -108,44 +108,6 @@ namespace hpx
         return instance;
     }
 
-    static const boost::system::error_category& hpx_category =
-        hpx::get_hpx_category();
-
-    ///////////////////////////////////////////////////////////////////////////
-    class exception : public std::exception
-    {
-    public:
-        exception(error e, char const* msg) 
-          : error_code_(e) 
-        {
-            BOOST_ASSERT(e >= success && e < last_error);
-            msg_ = std::string("HPX(") + error_names[e] + "): " + msg;
-        }
-        exception(error e, std::string msg) 
-          : error_code_(e) 
-        {
-            BOOST_ASSERT(e >= success && e < last_error);
-            msg_ = std::string("HPX(") + error_names[e] + "): " + msg;
-        }
-        ~exception (void) throw() 
-        {
-        }
-        
-        const char* what() const throw() 
-        { 
-            return msg_.c_str();
-        }
-
-        error get_error() const throw() 
-        { 
-            return error_code_; 
-        }
-
-    private:
-        std::string msg_;
-        error error_code_;
-    };
-    
     ///////////////////////////////////////////////////////////////////////////
     inline boost::system::error_code make_error_code(error e)
     {
@@ -153,6 +115,43 @@ namespace hpx
             static_cast<int>(e), get_hpx_category());
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    inline boost::system::error_condition make_error_condition(error e)
+    {
+        return boost::system::error_condition(
+            static_cast<int>(e), get_hpx_category());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    class exception : public boost::system::system_error
+    {
+    public:
+        explicit exception(error e) 
+          : boost::system::system_error(make_error_code(e))
+        {
+            BOOST_ASSERT(e >= success && e < last_error);
+        }
+        exception(error e, char const* msg) 
+          : boost::system::system_error(make_error_code(e), msg)
+        {
+            BOOST_ASSERT(e >= success && e < last_error);
+        }
+        exception(error e, std::string msg) 
+          : boost::system::system_error(make_error_code(e), msg)
+        {
+            BOOST_ASSERT(e >= success && e < last_error);
+        }
+        ~exception (void) throw() 
+        {
+        }
+        
+        error get_error() const throw() 
+        { 
+            return static_cast<error>(
+                this->boost::system::system_error::code().value());
+        }
+    };
+    
 ///////////////////////////////////////////////////////////////////////////////
 }
 
@@ -164,6 +163,12 @@ namespace boost { namespace system
     {
         static const bool value = true;
     };
+
+    template<> struct is_error_condition_enum<hpx::error>
+    { 
+        static const bool value = true; 
+    };
+    
 }}
 
 #endif

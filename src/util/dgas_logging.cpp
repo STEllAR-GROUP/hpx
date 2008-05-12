@@ -18,7 +18,7 @@ namespace hpx { namespace util
     void init_dgas_logs() 
     {
         using namespace std;    // some systems have getenv in namespace std
-        if (NULL != getenv("HPX_LOGLEVEL")) 
+        if (NULL != getenv("HPX_DGAS_LOGLEVEL")) 
         {
             char const* logdest = getenv("HPX_DGAS_LOGDESTINATION");
             if (NULL != logdest)

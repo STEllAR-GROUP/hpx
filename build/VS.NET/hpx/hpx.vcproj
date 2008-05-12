@@ -227,6 +227,14 @@
 							DisableSpecificWarnings="4503"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							DisableSpecificWarnings="4503"
+						/>
+					</FileConfiguration>
 				</File>
 				<Filter
 					Name="Server"
