@@ -185,7 +185,7 @@ namespace hpx { namespace naming { namespace server
         double get_statictics(std::size_t i) const
         {
             if (i >= command_lastcommand)
-                boost::throw_exception(hpx::error(bad_parameter));
+                boost::throw_exception(hpx::exception(bad_parameter));
             return statistics_[i];
         }
         

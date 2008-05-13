@@ -9,9 +9,11 @@
 
 #include <string>
 
+#include <boost/version.hpp>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
+#include <boost/thread/condition.hpp>
 
 #include <hpx/naming/locality.hpp>
 #include <hpx/naming/resolver_client.hpp>
