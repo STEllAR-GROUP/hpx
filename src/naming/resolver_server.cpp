@@ -54,20 +54,9 @@ namespace hpx { namespace naming
         
         // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
         using boost::asio::ip::tcp;
-
-        // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
-        tcp::endpoint endpoint;
-        if (!util::get_endpoint(address, port, endpoint)) {
-            tcp::resolver resolver(acceptor_.io_service());
-            tcp::resolver::query query(address, 
-                boost::lexical_cast<std::string>(port));
-        
-            endpoint = *resolver.resolve(query);
-        }
-        
-        acceptor_.open(endpoint.protocol());
+        acceptor_.open(here_.get_endpoint().protocol());
         acceptor_.set_option(tcp::acceptor::reuse_address(true));
-        acceptor_.bind(endpoint);
+        acceptor_.bind(here_.get_endpoint());
         acceptor_.listen();
         acceptor_.async_accept(new_connection_->socket(),
             boost::bind(&resolver_server::handle_accept, this,

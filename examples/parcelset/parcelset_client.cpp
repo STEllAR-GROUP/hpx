@@ -47,7 +47,7 @@ BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
 void received_parcel(hpx::parcelset::parcelport& ps)
 {
     static int count = 0;
-    static hpx::parcelset::parcel p;
+    hpx::parcelset::parcel p;
     if (ps.get_parcel(p))
     {
         try {

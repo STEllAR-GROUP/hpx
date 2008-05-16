@@ -45,17 +45,8 @@ namespace hpx { namespace parcelset { namespace server
         }
 
         /// Construct a sending connection with the given io_service.
-        connection(boost::asio::io_service& io_service)
+        connection(boost::asio::io_service& io_service, parcel const& p)
           : socket_(io_service), parcels_(NULL)
-        {
-        }
-
-        /// Get the socket associated with the connection.
-        boost::asio::ip::tcp::socket& socket() { return socket_; }
-
-        /// Asynchronously write a data structure to the socket.
-        template <typename Handler>
-        void async_write(parcel const& p, Handler handler)
         {
             {
                 // create a special io stream on top of out_buffer_
@@ -66,9 +57,16 @@ namespace hpx { namespace parcelset { namespace server
                 util::portable_binary_oarchive archive(io);
                 archive << p;
             }
-            
             out_size_ = out_buffer_.size();
-            
+        }
+
+        /// Get the socket associated with the connection.
+        boost::asio::ip::tcp::socket& socket() { return socket_; }
+
+        /// Asynchronously write a data structure to the socket.
+        template <typename Handler>
+        void async_write(Handler handler)
+        {
             // Write the serialized data to the socket. We use "gather-write" 
             // to send both the header and the data in a single write operation.
             std::vector<boost::asio::const_buffer> buffers;

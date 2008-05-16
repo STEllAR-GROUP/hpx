@@ -103,9 +103,6 @@ namespace hpx { namespace parcelset
         /// The function put_parcel() is asynchronous, the provided functor 
         /// gets invoked on completion of the send operation or on any error.
         ///
-        /// Note: the parcel must be kept alive in user land for the whole 
-        ///       operation, no internal copies are made
-        ///
         /// p               [in, out] A reference to the parcel to send. The 
         ///                 parcel 'p' will be modified in place, as it will 
         ///                 get set the resolved destination address and parcel 
@@ -151,9 +148,6 @@ namespace hpx { namespace parcelset
         /// This put_parcel() function overload is asynchronous, but no 
         /// callback functor is provided by the user. 
         ///
-        /// Note: the parcel must be kept alive in user land for the whole 
-        ///       operation, no internal copies are made
-        ///
         /// p               [in, out] A reference to the parcel to send. The 
         ///                 parcel 'p' will be modified in place, as it will 
         ///                 get set the resolved destination address and parcel 
@@ -165,9 +159,6 @@ namespace hpx { namespace parcelset
 
         /// The get_parcel command returns a parcel, or if the parcel set is 
         /// empty then false is returned. 
-        ///
-        /// The function get_pacel() is synchronous, i.e. it will return only
-        /// after the parcel has been retrieved from the parcelport.
         ///
         /// p               [out] The parcel instance to be filled with the 
         ///                 received parcel. If the functioned returns 'true' 
@@ -344,9 +335,11 @@ namespace hpx { namespace parcelset
         template <typename Handler>
         void send_parcel(parcel const& p, naming::address const& addr, Handler f)
         {
-            // Start an asynchronous connect operation.
+            // Start an asynchronous connect operation. The parcel gets 
+            // serialized inside the connection constructor, no need to keep 
+            // the original parcel alive after this call returned.
             server::connection_ptr client_connection (
-                new server::connection(io_service_pool_.get_io_service()));
+                new server::connection(io_service_pool_.get_io_service(), p));
 
 //             std::cerr << addr.locality_.get_endpoint().address().to_string() << ":" 
 //                       << addr.locality_.get_endpoint().port()
@@ -355,18 +348,17 @@ namespace hpx { namespace parcelset
             client_connection->socket().async_connect(
                 addr.locality_.get_endpoint(),
                 boost::bind(&parcelport::handle_connect<Handler>, this,
-                    boost::asio::placeholders::error, client_connection, 
-                    boost::ref(p), f));
+                    boost::asio::placeholders::error, client_connection, f));
         }
         
         // helper functions for sending parcels
         template <typename Handler>
         void handle_connect(boost::system::error_code const& e,
-            server::connection_ptr conn, parcel const& p, Handler f)
+            server::connection_ptr conn, Handler f)
         {
             if (!e) {
                 // connected successfully, now transmit the data
-                conn->async_write(p, f);
+                conn->async_write(f);
             }
             else {
                 f(e, 0);     // report the error back to the user
