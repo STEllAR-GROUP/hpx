@@ -28,7 +28,7 @@ namespace hpx { namespace util
 
         /// Run all io_service objects in the pool. If join_threads is true
         /// this will also wait for all threads to complete
-        void run(bool join_threads = true);
+        bool run(bool join_threads = true);
 
         /// Stop all io_service objects in the pool.
         void stop();

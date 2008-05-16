@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
         // Check command line arguments.
         if (argc != 6) 
         {
-            std::cerr << "Using default settings: localhost:7911 localhost:7912 threads:1" 
+            std::cerr << "Using default settings: ps:localhost:7911 dgas:localhost:7912 threads:1" 
                       << std::endl;
             std::cerr << "Possible arguments: <HPX address> <HPX port> <DGAS address> <DGAS port> <num_threads>"
                       << std::endl;

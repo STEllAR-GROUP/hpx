@@ -76,7 +76,7 @@ namespace hpx { namespace parcelset
         /// blocking        [in] If blocking is set to 'true' the routine will 
         ///                 not return before stop() has been called, otherwise
         ///                 the routine returns immediately.
-        void run (bool blocking = true);
+        bool run (bool blocking = true);
         
         /// Stop the io_service's loop and wait for all threads to join
         void stop();
@@ -183,24 +183,95 @@ namespace hpx { namespace parcelset
         /// Parcels may be typed by the action class they wish to invoke. Return
         /// next parcel of given action class (FIXME: shouldn't we add the 
         /// component type here as well?)
+        
+        /// This get_parcel() overload returns the next available parcel 
+        /// addressed to any instance of a component of type 'c'.
+        ///
+        /// The function get_pacel() is synchronous, i.e. it will return only
+        /// after the parcel has been retrieved from the parcelport.
+        ///
+        /// c               [in] The component type the parcel has to be 
+        ///                 addressed to.
+        /// p               [out] The parcel instance to be filled with the 
+        ///                 received parcel. If the functioned returns 'true' 
+        ///                 this will be the next received parcel.
+        ///
+        /// returns         'true' if the next parcel has been retrieved 
+        ///                 successfully. 
+        ///                 'false' if no corresponding parcel is available in 
+        ///                 the parcelport
+        ///
+        /// The returned parcel will be no longer available from the parcelport
+        /// as it is removed from the internal queue of received parcels.
         bool get_parcel(components::component_type c, parcel& p)
         {
             return parcels_.get_parcel(c, p);
         }
         
-        /// Return the parcel with the given parcel tag
+        /// This get_parcel() overload returns the parcel with the given parcel 
+        /// tag (id).
+        ///
+        /// The function get_pacel() is synchronous, i.e. it will return only
+        /// after the parcel has been retrieved from the parcelport.
+        ///
+        /// tag             [in] The parcel tag (id) of the parcel to retrieve.
+        /// p               [out] The parcel instance to be filled with the 
+        ///                 received parcel. If the functioned returns 'true' 
+        ///                 this will be the next received parcel.
+        ///
+        /// returns         'true' if the parcel has been retrieved 
+        ///                 successfully. 
+        ///                 'false' if no corresponding parcel is available in 
+        ///                 the parcelport
+        ///
+        /// The returned parcel will be no longer available from the parcelport
+        /// as it is removed from the internal queue of received parcels.
         bool get_parcel(parcel_id tag, parcel& p)
         {
             return parcels_.get_parcel(tag, p);
         }
         
-        /// Return the next parcel received from the given source locality
+        /// This get_parcel() overload returns the parcel being sent from the 
+        /// locality with the given source id.
+        ///
+        /// The function get_pacel() is synchronous, i.e. it will return only
+        /// after the parcel has been retrieved from the parcelport.
+        ///
+        /// source          [in] The id of the source locality.
+        /// p               [out] The parcel instance to be filled with the 
+        ///                 received parcel. If the functioned returns 'true' 
+        ///                 this will be the next received parcel.
+        ///
+        /// returns         'true' if the parcel has been retrieved 
+        ///                 successfully. 
+        ///                 'false' if no corresponding parcel is available in 
+        ///                 the parcelport
+        ///
+        /// The returned parcel will be no longer available from the parcelport
+        /// as it is removed from the internal queue of received parcels.
         bool get_parcel_from(naming::id_type source, parcel& p)
         {
             return parcels_.get_parcel_from(source, p);
         }
         
-        /// Return the next parcel for the given destination address
+        /// This get_parcel() overload returns the parcel being to the given
+        /// destination address.
+        ///
+        /// The function get_pacel() is synchronous, i.e. it will return only
+        /// after the parcel has been retrieved from the parcelport.
+        ///
+        /// dest            [in] The id of the destination component.
+        /// p               [out] The parcel instance to be filled with the 
+        ///                 received parcel. If the functioned returns 'true' 
+        ///                 this will be the next received parcel.
+        ///
+        /// returns         'true' if the parcel has been retrieved 
+        ///                 successfully. 
+        ///                 'false' if no corresponding parcel is available in 
+        ///                 the parcelport
+        ///
+        /// The returned parcel will be no longer available from the parcelport
+        /// as it is removed from the internal queue of received parcels.
         bool get_parcel_for(naming::id_type dest, parcel& p)
         {
             return parcels_.get_parcel_for(dest, p);
@@ -245,6 +316,16 @@ namespace hpx { namespace parcelset
         }
         
         /// Return the prefix of this locality
+        ///
+        /// This accessor allows to retrieve the prefix value being assigned to 
+        /// the locality this parcelport is associated with. This returns the
+        /// same value as would be returned by:
+        ///
+        ///     naming::id_type prefix;
+        ///     get_resolver().get_prefix(here, prefix);
+        /// 
+        /// but doesn't require the fully DGAS round trip as the prefix value 
+        /// is cached inside the parcelport.
         naming::id_type const& get_prefix() const 
         { 
             return prefix_; 
@@ -266,14 +347,15 @@ namespace hpx { namespace parcelset
 
             using boost::asio::ip::tcp;
             tcp::endpoint const& locality_endpoint = addr.locality_.get_endpoint();
-            std::string dest ("localhost"); //locality_endpoint.address().to_string());
+            std::string dest /*("localhost");*/ (locality_endpoint.address().to_string());
             std::string port = boost::lexical_cast<std::string>(locality_endpoint.port());
             
             tcp::resolver resolver(ios); //acceptor_.io_service());
             tcp::resolver::query query(dest, port);
             tcp::endpoint endpoint = *resolver.resolve(query);
 
-            std::cerr << endpoint.address().to_string() << ":" << endpoint.port() << std::endl
+            std::cerr << endpoint.address().to_string() << ":" 
+                      << endpoint.port() << std::endl
                       << addr.locality_.get_endpoint().address().to_string() << ":" 
                       << addr.locality_.get_endpoint().port()
                       << std::endl;
@@ -318,13 +400,13 @@ namespace hpx { namespace parcelset
         /// The next connection to be accepted.
         server::connection_ptr new_server_connection_;
         
-        /// The GAS client
+        /// The DGAS client
         naming::resolver_client& resolver_;
         
         /// The local locality
         naming::locality here_;
         
-        /// The site prefix to be used for id_type instances
+        /// The site prefix of the locality 'here_'
         naming::id_type prefix_;
 
         /// The site current range of ids to be used for id_type instances

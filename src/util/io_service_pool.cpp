@@ -35,13 +35,16 @@ namespace hpx { namespace util
         }
     }
 
-    void io_service_pool::run(bool join_threads)
+    bool io_service_pool::run(bool join_threads)
     {
         // Create a pool of threads to run all of the io_services.
         if (!threads_.empty())   // should be called only once
-            throw std::runtime_error(
-                    "io_service_pool::run() should be called only once.");
-            
+        {
+            if (join_threads)
+                join();
+            return false;
+        }
+        
         for (std::size_t i = 0; i < io_services_.size(); ++i)
         {
             boost::shared_ptr<boost::thread> thread(new boost::thread(
@@ -50,6 +53,8 @@ namespace hpx { namespace util
         }
         if (join_threads)
             join();
+            
+        return true;
     }
     
     void io_service_pool::join()

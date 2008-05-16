@@ -11,6 +11,35 @@
 #include <hpx/hpx.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+#if defined(BOOST_WINDOWS)
+
+#include <boost/function.hpp>
+
+boost::function0<void> console_ctrl_function;
+
+BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
+{
+    switch (ctrl_type) {
+    case CTRL_C_EVENT:
+    case CTRL_BREAK_EVENT:
+    case CTRL_CLOSE_EVENT:
+    case CTRL_SHUTDOWN_EVENT:
+        console_ctrl_function();
+        return TRUE;
+        
+    default:
+        return FALSE;
+    }
+}
+
+#else
+
+#include <pthread.h>
+#include <signal.h>
+
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 //  This get's called whenever a parcel was received, it just sets a flag
 bool received = false;
 
@@ -35,7 +64,7 @@ int main(int argc, char* argv[])
         // Check command line arguments.
         if (argc != 7) 
         {
-            std::cerr << "Using default settings: localhost:7913 localhost:7912 localhost:7911" 
+            std::cerr << "Using default settings: ps:localhost:7913 dgas:localhost:7912 remoteps:localhost:7911" 
                       << std::endl;
             std::cerr << "Possible arguments: <HPX address> <HPX port> <DGAS address> <DGAS port> <remote HPX address> <remote HPX port>"
                       << std::endl;
@@ -61,6 +90,11 @@ int main(int argc, char* argv[])
         hpx::naming::resolver_client dgas_c(gas_host, gas_port);
         hpx::parcelset::parcelport ps(dgas_c, hpx::naming::locality(ps_host, ps_port));
 
+        // Set console control handler to allow client to be stopped.
+        console_ctrl_function = 
+            boost::bind(&hpx::parcelset::parcelport::stop, &ps);
+        SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
+
         // sleep for a second to give parcelset server a chance to startup
         boost::xtime xt;
         boost::xtime_get(&xt, boost::TIME_UTC);
@@ -72,21 +106,19 @@ int main(int argc, char* argv[])
         hpx::naming::locality remote_l(remote_ps_host, remote_ps_port);
         dgas_c.get_prefix(remote_l, remote_prefix);
         
-        ps.run(false);
+        ps.register_event_handler(received_parcel);
+        ps.run(false);    // start parcelport receiver thread
 
         std::cout << "Parcelset (client) listening at port: " << ps_port 
                   << std::flush << std::endl;
 
-        
         // send parcel to remote locality        
         hpx::parcelset::parcel p(remote_prefix);
         hpx::parcelset::parcel_id id = ps.sync_put_parcel(p);
 
         std::cout << "Successfully sent parcel: " << std::hex << id << std::endl;
 
-        ps.register_event_handler(received_parcel);
-
-        ps.stop();
+        ps.run();         // block until stopped
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";

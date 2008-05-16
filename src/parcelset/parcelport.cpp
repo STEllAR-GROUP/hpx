@@ -80,9 +80,9 @@ namespace hpx { namespace parcelset
                 boost::asio::placeholders::error));
     }
 
-    void parcelport::run(bool blocking)
+    bool parcelport::run(bool blocking)
     {
-        io_service_pool_.run(blocking);
+        return io_service_pool_.run(blocking);
     }
 
     void parcelport::stop()
