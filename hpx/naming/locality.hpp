@@ -17,6 +17,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/util/asio_util.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 ///  version of GAS reply structure
@@ -35,16 +36,18 @@ namespace hpx { namespace naming
         locality(std::string const& addr, unsigned short port) 
         {
             try {
-                using boost::asio::ip::tcp;
-                
-                // resolve the given address
-                boost::asio::io_service io_service;
-                tcp::resolver resolver(io_service);
-                tcp::resolver::query query(
-                    addr.empty() ? addr : boost::asio::ip::host_name(), 
-                    boost::lexical_cast<std::string>(port));
+                if (!util::get_endpoint(addr, port, endpoint_)) {
+                    using boost::asio::ip::tcp;
+                    
+                    // resolve the given address
+                    boost::asio::io_service io_service;
+                    tcp::resolver resolver(io_service);
+                    tcp::resolver::query query(
+                        addr.empty() ? addr : boost::asio::ip::host_name(), 
+                        boost::lexical_cast<std::string>(port));
 
-                endpoint_ = *resolver.resolve(query);
+                    endpoint_ = *resolver.resolve(query);
+                }
             }
             catch (boost::system::error_code const& e) {
                 throw hpx::exception(network_error, e.message());

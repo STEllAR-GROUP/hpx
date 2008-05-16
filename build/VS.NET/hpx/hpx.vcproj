@@ -331,6 +331,10 @@
 				Name="Util"
 				>
 				<File
+					RelativePath="..\..\..\hpx\util\asio_util.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\util\container_device.hpp"
 					>
 				</File>

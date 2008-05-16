@@ -79,7 +79,11 @@ namespace hpx { namespace parcelset
         bool run (bool blocking = true);
         
         /// Stop the io_service's loop and wait for all threads to join
-        void stop();
+        ///
+        /// blocking        [in] If blocking is set to 'false' the routine will 
+        ///                 return immediately, otherwise it will wait for all
+        ///                 worker threads to exit.
+        void stop (bool blocking = true);
 
         /// A parcel is submitted for transport at the source locality site to 
         /// the parcel set of the locality with the put-parcel command
@@ -341,27 +345,15 @@ namespace hpx { namespace parcelset
         void send_parcel(parcel const& p, naming::address const& addr, Handler f)
         {
             // Start an asynchronous connect operation.
-            boost::asio::io_service& ios = io_service_pool_.get_io_service();
             server::connection_ptr client_connection (
-                new server::connection(ios));
+                new server::connection(io_service_pool_.get_io_service()));
 
-            using boost::asio::ip::tcp;
-            tcp::endpoint const& locality_endpoint = addr.locality_.get_endpoint();
-            std::string dest /*("localhost");*/ (locality_endpoint.address().to_string());
-            std::string port = boost::lexical_cast<std::string>(locality_endpoint.port());
-            
-            tcp::resolver resolver(ios); //acceptor_.io_service());
-            tcp::resolver::query query(dest, port);
-            tcp::endpoint endpoint = *resolver.resolve(query);
-
-            std::cerr << endpoint.address().to_string() << ":" 
-                      << endpoint.port() << std::endl
-                      << addr.locality_.get_endpoint().address().to_string() << ":" 
-                      << addr.locality_.get_endpoint().port()
-                      << std::endl;
+//             std::cerr << addr.locality_.get_endpoint().address().to_string() << ":" 
+//                       << addr.locality_.get_endpoint().port()
+//                       << std::endl;
             
             client_connection->socket().async_connect(
-                endpoint, //addr.locality_.get_endpoint(),
+                addr.locality_.get_endpoint(),
                 boost::bind(&parcelport::handle_connect<Handler>, this,
                     boost::asio::placeholders::error, client_connection, 
                     boost::ref(p), f));

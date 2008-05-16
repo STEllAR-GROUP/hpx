@@ -58,10 +58,10 @@ public:
     friend class boost::archive::basic_binary_oarchive<portable_binary_oarchive>;
     friend class boost::archive::save_access;
 #endif
-    void save_impl(boost::intmax_t l)
+    void save_impl(boost::intmax_t l, char maxsize)
     {
         boost::intmax_t ll = l;
-        boost::uint8_t size = 0;
+        boost::uint8_t size = 1;
         if (l < 0) {
             // make sure that enough of data is output
             // to include a high order bit indicating the sign
@@ -76,6 +76,9 @@ public:
                 ++size;
             } while (ll != 0);
         }
+        if (size > maxsize)
+            size = maxsize;
+
         this->archive_base_t::save(size);
 
 // we choose to use little endian (it's more common)
@@ -117,29 +120,29 @@ public:
         this->primitive_base_t::save(t);
     }
     void save(const short t){
-        save_impl(t);
+        save_impl(t, sizeof(short));
     }
     void save(const unsigned short t){
-        save_impl(t);
+        save_impl(t, sizeof(unsigned short));
     }
     void save(const unsigned int t){
-        save_impl(t);
+        save_impl(t, sizeof(unsigned int));
     }
     void save(const int t){
-        save_impl(t);
+        save_impl(t, sizeof(int));
     }
     void save(const unsigned long t){
-        save_impl(t);
+        save_impl(t, sizeof(unsigned long));
     }
     void save(const long t){
-        save_impl(t);
+        save_impl(t, sizeof(long));
     }
 #if defined(BOOST_HAS_LONG_LONG)
     void save(boost::long_long_type const t){
-        save_impl(t);
+        save_impl(t, sizeof(boost::long_long_type));
     }
     void save(boost::ulong_long_type const t){
-        save_impl(t);
+        save_impl(t, sizeof(boost::ulong_long_type));
     }
 #endif
     void save(const float t){

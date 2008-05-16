@@ -11,6 +11,7 @@
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <hpx/util/dgas_logging.hpp>
+#include <hpx/util/asio_util.hpp>
 #include <hpx/naming/resolver_server.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -55,11 +56,15 @@ namespace hpx { namespace naming
         using boost::asio::ip::tcp;
 
         // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
-        tcp::resolver resolver(acceptor_.io_service());
-        tcp::resolver::query query(address, 
-            boost::lexical_cast<std::string>(port));
-        tcp::endpoint endpoint = *resolver.resolve(query);
-
+        tcp::endpoint endpoint;
+        if (!util::get_endpoint(address, port, endpoint)) {
+            tcp::resolver resolver(acceptor_.io_service());
+            tcp::resolver::query query(address, 
+                boost::lexical_cast<std::string>(port));
+        
+            endpoint = *resolver.resolve(query);
+        }
+        
         acceptor_.open(endpoint.protocol());
         acceptor_.set_option(tcp::acceptor::reuse_address(true));
         acceptor_.bind(endpoint);

@@ -27,6 +27,7 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/container_device.hpp>
+#include <hpx/util/asio_util.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming 
@@ -36,7 +37,16 @@ namespace hpx { namespace naming
       : socket_(io_service_)
     {
         try {
-            using boost::asio::ip::tcp;
+            using namespace boost::asio::ip;
+            
+            // try to convert the address string to an IP address directly
+            boost::system::error_code error = boost::asio::error::try_again;
+            tcp::endpoint ep;
+            if (util::get_endpoint(address, port, ep)) {
+                socket_.connect(ep, error);
+                if (!error) 
+                    return;
+            }
             
             // resolve the given address
             tcp::resolver resolver(io_service_);
@@ -46,7 +56,6 @@ namespace hpx { namespace naming
             // Try each endpoint until we successfully establish a connection.
             tcp::resolver::iterator end;
             tcp::resolver::iterator it = resolver.resolve(query);
-            boost::system::error_code error = boost::asio::error::try_again;
             for (/**/; it != end; ++it)
             {
                 socket_.close();

@@ -8,6 +8,8 @@
 #include <hpx/hpx.hpp>
 #include <boost/lexical_cast.hpp>
 
+#define MAXITERATIONS 1000
+
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(BOOST_WINDOWS)
 
@@ -38,22 +40,30 @@ BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-//  This get's called whenever a parcel was received, it just sends back any 
+//  This gets called whenever a parcel was received, it just sends back any 
 //  received parcel
 void received_parcel(hpx::parcelset::parcelport& ps)
 {
-    hpx::parcelset::parcel p;
+    static int count = 0;
+    static hpx::parcelset::parcel p;
     if (ps.get_parcel(p))
     {
         try {
             std::cout << "Received parcel: " << std::hex << p.get_parcel_id() 
-                      << std::endl;
+                      << std::flush << std::endl;
+
+            if (++count > MAXITERATIONS) {
+                ps.stop(false);
+                return;
+            }
+            
             p.set_destination(p.get_source());
             p.set_source(hpx::naming::id_type());
             p.set_parcel_id(hpx::naming::id_type());
-            ps.sync_put_parcel(p);
+            ps.put_parcel(p);
             std::cout << "Successfully sent parcel: " 
-                      << std::hex << p.get_parcel_id() << std::endl;
+                      << std::hex << p.get_parcel_id() 
+                      << std::flush << std::endl;
         }
         catch(std::exception const& e) {
             std::cerr << "Caught std::exception: " << e.what() << std::endl;
@@ -100,7 +110,7 @@ int main(int argc, char* argv[])
 
         // Set console control handler to allow server to be stopped.
         console_ctrl_function = 
-            boost::bind(&hpx::parcelset::parcelport::stop, &ps);
+            boost::bind(&hpx::parcelset::parcelport::stop, &ps, true);
         SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
 
         // Run the server until stopped.

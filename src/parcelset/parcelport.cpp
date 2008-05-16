@@ -66,11 +66,14 @@ namespace hpx { namespace parcelset
         using boost::asio::ip::tcp;
         
         // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
-        tcp::resolver resolver(acceptor_.io_service());
-        tcp::resolver::query query(address, 
-            boost::lexical_cast<std::string>(port));
-        tcp::endpoint endpoint = *resolver.resolve(query);
+        tcp::endpoint endpoint;
+        if (!util::get_endpoint(address, port, endpoint)) {
+            tcp::resolver resolver(acceptor_.io_service());
+            tcp::resolver::query query(address, 
+                boost::lexical_cast<std::string>(port));
 
+            endpoint = *resolver.resolve(query);
+        }
         acceptor_.open(endpoint.protocol());
         acceptor_.set_option(tcp::acceptor::reuse_address(true));
         acceptor_.bind(endpoint);
@@ -85,10 +88,11 @@ namespace hpx { namespace parcelset
         return io_service_pool_.run(blocking);
     }
 
-    void parcelport::stop()
+    void parcelport::stop(bool blocking)
     {
         io_service_pool_.stop();
-        io_service_pool_.join();
+        if (blocking)
+            io_service_pool_.join();
     }
     
     /// accepted new incoming connection
