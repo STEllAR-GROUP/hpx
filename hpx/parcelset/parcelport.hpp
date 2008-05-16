@@ -29,45 +29,93 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
+    /// The parcelport is the lowest possible representation of the parcelset
+    /// inside a locality. It provides the minimal functionality to send and
+    /// to receive parcels.
     class parcelport : boost::noncopyable
     {
     private:
         static void default_write_handler(boost::system::error_code const&, 
             std::size_t) {}
         
-        // avoid warning about using 'this' in member initializer list
+        // avoid warnings about using 'this' in member initializer list
         parcelport& This() { return *this; }
         
     public:
-        /// Construct the server to listen on the specified TCP address and port, 
-        /// and serve up requests to the address translation service.
+        /// Construct the parcelport server to listen on the specified TCP 
+        /// address and port, and serve up requests to the parcelport.
+        ///
+        /// resolver        [in] A reference to the DGAS client to use for 
+        ///                 address translation requests to be made by the 
+        ///                 parcelport.
+        /// address         [in] The name (IP address) this instance should
+        ///                 listen at.
+        /// port            [in] The (IP) port this instance should listen at.
+        /// io_service_pool_size
+        ///                 [in] The number of threads to run to serve incoming
+        ///                 requests
         explicit parcelport(naming::resolver_client& resolver, 
             std::string address = "localhost", unsigned short port = HPX_PORT, 
             std::size_t io_service_pool_size = 1);
 
-        /// Construct the server to listen to the endpoint given by the 
-        /// locality and serve up requests to the address translation service.
+        /// Construct the parcelport server to listen to the endpoint given by 
+        /// the locality and serve up requests to the parcelport.
+        ///
+        /// resolver        [in] A reference to the DGAS client to use for 
+        ///                 address translation requests to be made by the 
+        ///                 parcelport.
+        /// here            [in] The locality this instance should listen at.
+        /// io_service_pool_size
+        ///                 [in] The number of threads to run to serve incoming
+        ///                 requests
         parcelport(naming::resolver_client& resolver, naming::locality here, 
             std::size_t io_service_pool_size = 1);
 
+        /// Start the parcelport threads, enabling the parcel receiver
+        ///
+        /// blocking        [in] If blocking is set to 'true' the routine will 
+        ///                 not return before stop() has been called, otherwise
+        ///                 the routine returns immediately.
         void run (bool blocking = true);
         
         /// Stop the io_service's loop and wait for all threads to join
         void stop();
 
-        ///////////////////////////////////////////////////////////////////////
         /// A parcel is submitted for transport at the source locality site to 
         /// the parcel set of the locality with the put-parcel command
-        /// This function is synchronous.
+        ///
+        /// The function sync_put_parcel() is synchronous.
+        ///
+        /// p               [in, out] A reference to the parcel to send. The 
+        ///                 function does not return before the parcel has been
+        ///                 transmitted. The parcel 'p' will be modified in 
+        ///                 place, as it will get set the resolved destination
+        ///                 address and parcel id (if not already set).
         parcel_id sync_put_parcel(parcel& p);
         
-        ///////////////////////////////////////////////////////////////////////
         /// A parcel is submitted for transport at the source locality site to 
         /// the parcel set of the locality with the put-parcel command
-        /// This function is asynchronous, the provided functor gets invoked on
-        /// completion of the send operation or on any error.
+        //
+        /// The function put_parcel() is asynchronous, the provided functor 
+        /// gets invoked on completion of the send operation or on any error.
+        ///
         /// Note: the parcel must be kept alive in user land for the whole 
-        ///       operation, not copies are made
+        ///       operation, no internal copies are made
+        ///
+        /// p               [in, out] A reference to the parcel to send. The 
+        ///                 parcel 'p' will be modified in place, as it will 
+        ///                 get set the resolved destination address and parcel 
+        ///                 id (if not already set).
+        /// f               [in] A function object to be invoked on successful
+        ///                 completion or on errors. The signature of this
+        ///                 function object is expected to be:
+        ///
+        ///                     void f (boost::system::error_code const& err, 
+        ///                             std::size_t );
+        ///
+        ///                 where 'err'  is the status code of the operation and
+        ///                       'size' is the number of successfully 
+        ///                              transferred bytes.
         template <typename Handler>
         parcel_id put_parcel(parcel& p, Handler f)
         {
@@ -96,17 +144,37 @@ namespace hpx { namespace parcelset
             return p.get_parcel_id();
         }
 
-        /// This function is asynchronous, no callback functor is provided
+        /// This put_parcel() function overload is asynchronous, but no 
+        /// callback functor is provided by the user. 
+        ///
+        /// Note: the parcel must be kept alive in user land for the whole 
+        ///       operation, no internal copies are made
+        ///
+        /// p               [in, out] A reference to the parcel to send. The 
+        ///                 parcel 'p' will be modified in place, as it will 
+        ///                 get set the resolved destination address and parcel 
+        ///                 id (if not already set).
         parcel_id put_parcel(parcel& p)
         {
             return put_parcel(p, &parcelport::default_write_handler);
         }
 
-        ///////////////////////////////////////////////////////////////////////////
         /// The get_parcel command returns a parcel, or if the parcel set is 
         /// empty then false is returned. 
-        
-        /// return 'next' available parcel
+        ///
+        /// The function get_pacel() is synchronous, i.e. it will return only
+        /// after the parcel has been retrieved from the parcelport.
+        ///
+        /// p               [out] The parcel instance to be filled with the 
+        ///                 received parcel. If the functioned returns 'true' 
+        ///                 this will be the next received parcel.
+        ///
+        /// returns         'true' if the next parcel has been retrieved 
+        ///                 successfully. 
+        ///                 'false' if no parcel is available in the parcelport
+        ///
+        /// The returned parcel will be no longer available from the parcelport
+        /// as it is removed from the internal queue of received parcels.
         bool get_parcel(parcel& p)
         {
             return parcels_.get_parcel(p);
@@ -138,17 +206,50 @@ namespace hpx { namespace parcelset
             return parcels_.get_parcel_for(dest, p);
         }
         
-        /// Return the prefix of this locality
-        naming::id_type const& get_prefix() const { return prefix_; }
-        
-        /// register an event handler to be called whenever a parcel has been 
+        /// Register an event handler to be called whenever a parcel has been 
         /// received
+        ///
+        /// sink            [in] A function object to be invoked whenever a 
+        ///                 parcel has been received by the parcelport. It is 
+        ///                 possible to register more than one (different) 
+        ///                 function object. The signature of this function 
+        ///                 object is expected to be:
+        ///
+        ///                     void sink(hpx::parcelset::parcelport& pp);
+        ///
+        ///                 where 'pp' is a reference to the parcelport this
+        ///                 function object instance is invoked by.
         template <typename F>
         bool register_event_handler(F sink)
         {
             return parcels_.register_event_handler(sink);
         }
 
+        /// Allow access to DGAS resolver instance. 
+        ///
+        /// This accessor returns a reference to the DGAS resolver client object
+        /// the parcelport has been initialized with (see parcelport 
+        /// constructors).
+        naming::resolver_client& get_resolver()
+        {
+            return resolver_;
+        }
+        
+        /// Allow access to locality instance.
+        ///
+        /// This accessor returns a reference to the locality this parcelport
+        /// is associated with.
+        naming::locality const& here() const
+        {
+            return here_;
+        }
+        
+        /// Return the prefix of this locality
+        naming::id_type const& get_prefix() const 
+        { 
+            return prefix_; 
+        }
+        
     protected:
         // helper functions for receiving parcels
         void handle_accept(boost::system::error_code const& e);
@@ -204,19 +305,6 @@ namespace hpx { namespace parcelset
             return id_range_.get_id();
         }
 
-    public:
-        // allow access to resolver instance
-        naming::resolver_client& get_resolver()
-        {
-            return resolver_;
-        }
-        
-        // allow access to locality instance
-        naming::locality const& here() const
-        {
-            return here_;
-        }
-        
     private:
         /// The pool of io_service objects used to perform asynchronous operations.
         util::io_service_pool io_service_pool_;
