@@ -1,8 +1,5 @@
 //  Copyright (c) 2007-2008 Hartmut Kaiser
 //
-//  Parts of this code were taken from the Boost.Asio library
-//  Copyright (c) 2003-2007 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-// 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -14,9 +11,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/assert.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/detail/lightweight_test.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-
 
 int main(int argc, char* argv[])
 {
@@ -53,44 +48,32 @@ int main(int argc, char* argv[])
         {
 #endif
         
-	// retrieve the id prefix of this site
-	id_type prefix1;		
-	hpx::util::high_resolution_timer t;		
-	for(int i=0; i<1000;i++)
-		{
-		 prefix1 = id_type(i);
-        	 resolver.get_prefix(here, prefix1);
-	        }
-	std::cout << " ***************************************"<< std::endl << std::flush;
-	std::cout << "Measure_GetPrefix: "<< t.elapsed() << std::endl << std::flush;
-		
-	resolver.get_statistics(timings);
-	std::cout << " Time taken by get_prefix is: " << timings[0] <<  std::endl <<std::flush;
-		        
-	return 0;
+        // retrieve the id prefix of this site
+        id_type prefix1;
+        hpx::util::high_resolution_timer t;
+        for(int i=0; i<1000;i++)
+        {
+            prefix1 = id_type(i);
+            resolver.get_prefix(here, prefix1);
+        }
+        std::cout << " ***************************************"<< std::endl << std::flush;
+        std::cout << "Measure_GetPrefix: "<< t.elapsed() << std::endl << std::flush;
         
+        resolver.get_statistics(timings);
+        std::cout << " Time taken by get_prefix is: " << timings[0] <<  std::endl <<std::flush;
+                
 #if defined(MAX_ITERATIONS)
         }
-        
-        int iterations = MAX_ITERATIONS;
-#else
-        int iterations = 1;
 #endif
-
-        std::cout << "Gathered statistics for " << iterations 
-                  << " iterations: " << std::endl;
-        for (std::size_t i = 0; i < server::command_lastcommand; ++i)
-        {
-            std::cout << server::command_names[i] << ": " 
-                      << timings[i] << std::endl;
-        }
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";
+        return -1;
     }
     catch (...) {
         std::cerr << "unexpected exception caught\n";
+        return -1;
     }
-    return boost::report_errors();
+    return 0;
 }
 
