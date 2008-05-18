@@ -204,10 +204,10 @@ namespace hpx { namespace naming
         return s == success;
     }
 
-    bool resolver_client::get_statistics(std::vector<double>& timings)
+    bool resolver_client::get_statistics_count(std::vector<std::size_t>& counts)
     {
         // send request
-        server::request req (server::command_statistics);
+        server::request req (server::command_statistics_count);
         server::reply rep;            
         execute(req, rep);
         
@@ -215,6 +215,43 @@ namespace hpx { namespace naming
         if (s != success && s != no_success)
             boost::throw_exception(hpx::exception((error)s, rep.get_error()));
 
+        counts.clear();
+        for (std::size_t i = 0; i < server::command_lastcommand; ++i)
+            counts.push_back(std::size_t(rep.get_statictics(i)));
+            
+        return s == success;
+    }
+
+    bool resolver_client::get_statistics_mean(std::vector<double>& timings)
+    {
+        // send request
+        server::request req (server::command_statistics_mean);
+        server::reply rep;            
+        execute(req, rep);
+        
+        hpx::error s = (hpx::error) rep.get_status();
+        if (s != success && s != no_success)
+            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+
+        timings.clear();
+        for (std::size_t i = 0; i < server::command_lastcommand; ++i)
+            timings.push_back(rep.get_statictics(i));
+            
+        return s == success;
+    }
+
+    bool resolver_client::get_statistics_moment2(std::vector<double>& timings)
+    {
+        // send request
+        server::request req (server::command_statistics_moment2);
+        server::reply rep;            
+        execute(req, rep);
+        
+        hpx::error s = (hpx::error) rep.get_status();
+        if (s != success && s != no_success)
+            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+
+        timings.clear();
         for (std::size_t i = 0; i < server::command_lastcommand; ++i)
             timings.push_back(rep.get_statictics(i));
             

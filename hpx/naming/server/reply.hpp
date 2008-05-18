@@ -103,24 +103,20 @@ namespace hpx { namespace naming { namespace server
                          command == command_registerid);
         }
 
-        reply (name_server_command command, 
-               std::vector<std::pair<double, std::size_t> > const& totals, 
+        template <typename Container, typename F>
+        reply (name_server_command command, Container const& totals, F f,
                error s = success)
           : command_(command), status_(s),
             error_(status_strings::get_error_text(success)),
             lower_bound_(0), upper_bound_(0)
         {
             BOOST_ASSERT(s == success || s == no_success);
-            BOOST_ASSERT(command == command_statistics);
+            BOOST_ASSERT(command == command_statistics_count ||
+                         command == command_statistics_mean ||
+                         command == command_statistics_moment2);
             
             for (std::size_t i = 0; i < command_lastcommand; ++i)
-            {
-                std::pair<double, std::size_t> const& p (totals[i]);
-                if (0 != p.second)
-                    statistics_[i] = p.first / p.second;
-                else
-                    statistics_[i] = 0.0;
-            }
+                statistics_[i] = f(totals[i]);
         }
 
         reply (name_server_command command, naming::address addr)
@@ -220,7 +216,9 @@ namespace hpx { namespace naming { namespace server
                 ar << id_;
                 break;
 
-            case command_statistics:
+            case command_statistics_count:
+            case command_statistics_mean:
+            case command_statistics_moment2:
                 for (std::size_t i = 0; i < command_lastcommand; ++i)
                     ar << statistics_[i];
                 break;
@@ -264,7 +262,9 @@ namespace hpx { namespace naming { namespace server
                 ar >> id_;
                 break;
                 
-            case command_statistics:
+            case command_statistics_count:
+            case command_statistics_mean:
+            case command_statistics_moment2:
                 for (std::size_t i = 0; i < command_lastcommand; ++i)
                     ar >> statistics_[i];
                 break;
@@ -318,7 +318,9 @@ namespace hpx { namespace naming { namespace server
                 os << "id" << std::hex << rep.id_ << " ";
                 break;
                 
-            case command_statistics:
+            case command_statistics_count:
+            case command_statistics_mean:
+            case command_statistics_moment2:
                 break;
                 
             case command_unbind:

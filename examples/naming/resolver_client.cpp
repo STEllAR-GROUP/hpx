@@ -132,7 +132,7 @@ int main(int argc, char* argv[])
         // repeated remove association should fail
         BOOST_TEST(!resolver.unregisterid("/test/foo/1"));
         
-        BOOST_TEST(resolver.get_statistics(timings));
+        BOOST_TEST(resolver.get_statistics_mean(timings));
         
 #if defined(MAX_ITERATIONS)
         }

@@ -33,20 +33,12 @@ namespace hpx { namespace util
     public:
         high_resolution_timer() 
         {
-            start_time.QuadPart = 0;
-            frequency.QuadPart = 0;
-
-            if (!QueryPerformanceFrequency(&frequency))
-                boost::throw_exception(std::runtime_error("Couldn't acquire frequency"));
-
             restart(); 
         } 
 
         high_resolution_timer(double t) 
         {
-            start_time.QuadPart = 0;
-            frequency.QuadPart = 0;
-
+            LARGE_INTEGER frequency;
             if (!QueryPerformanceFrequency(&frequency))
                 boost::throw_exception(std::runtime_error("Couldn't acquire frequency"));
 
@@ -54,10 +46,30 @@ namespace hpx { namespace util
         } 
 
         high_resolution_timer(high_resolution_timer const& rhs) 
-          : start_time(rhs.start_time), frequency(rhs.frequency)
+          : start_time(rhs.start_time)
         {
         } 
 
+        static double now()
+        {
+            SYSTEMTIME st;
+            GetSystemTime(&st);
+            
+            FILETIME ft;
+            SystemTimeToFileTime(&st, &ft);
+            
+            LARGE_INTEGER now;
+            now.LowPart = ft.dwLowDateTime;
+            now.HighPart = ft.dwHighDateTime;
+            
+            LARGE_INTEGER frequency;
+            if (!QueryPerformanceFrequency(&frequency))
+                boost::throw_exception(std::runtime_error("Couldn't acquire frequency"));
+
+            // SystemTime is in 100ns increments
+            return now.QuadPart * 1e-7;
+        }
+        
         void restart() 
         { 
             if (!QueryPerformanceCounter(&start_time))
@@ -69,23 +81,34 @@ namespace hpx { namespace util
             if (!QueryPerformanceCounter(&now))
                 boost::throw_exception(std::runtime_error("Couldn't get current time"));
 
+            LARGE_INTEGER frequency;
+            if (!QueryPerformanceFrequency(&frequency))
+                boost::throw_exception(std::runtime_error("Couldn't acquire frequency"));
+
             return double(now.QuadPart - start_time.QuadPart) / frequency.QuadPart;
         }
 
         double elapsed_max() const   // return estimated maximum value for elapsed()
         {
+            LARGE_INTEGER frequency;
+            if (!QueryPerformanceFrequency(&frequency))
+                boost::throw_exception(std::runtime_error("Couldn't acquire frequency"));
+
             return double((std::numeric_limits<LONGLONG>::max)() - start_time.QuadPart) / 
                 double(frequency.QuadPart); 
         }
 
         double elapsed_min() const            // return minimum value for elapsed()
         { 
+            LARGE_INTEGER frequency;
+            if (!QueryPerformanceFrequency(&frequency))
+                boost::throw_exception(std::runtime_error("Couldn't acquire frequency"));
+
             return 1.0 / frequency.QuadPart; 
         }
 
     private:
         LARGE_INTEGER start_time;
-        LARGE_INTEGER frequency;
     }; 
 
 }} // namespace hpx::util
@@ -126,6 +149,14 @@ namespace hpx { namespace util
         {
         } 
 
+        static double now()
+        {
+            timespec now;
+            if (-1 == clock_gettime(CLOCK_THREAD_CPUTIME_ID, &now))
+                boost::throw_exception(std::runtime_error("Couldn't get current time"));
+            return double(now.tv_sec) + double(now.tv_nsec) * 1e-9;
+        }
+        
         void restart() 
         { 
             if (-1 == clock_gettime(CLOCK_THREAD_CPUTIME_ID, &start_time))

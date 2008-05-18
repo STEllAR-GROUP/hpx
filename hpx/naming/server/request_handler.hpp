@@ -16,6 +16,13 @@
 #include <boost/noncopyable.hpp>
 #include <boost/thread.hpp>
 #include <boost/asio/buffer.hpp>
+#if BOOST_VERSION >= 103600
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
+#include <boost/accumulators/statistics/count.hpp>
+#include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/moment.hpp>
+#endif
 
 #include <hpx/naming/name.hpp>
 #include <hpx/naming/address.hpp>
@@ -25,6 +32,7 @@
 namespace hpx { namespace naming { namespace server 
 {
     class request;
+    class reply;
 
     /// The common handler for all incoming requests.
     class request_handler : private boost::noncopyable
@@ -40,13 +48,18 @@ namespace hpx { namespace naming { namespace server
         /// Handle a request and produce a reply.
         void handle_request(request const& req, reply& rep);
 
+        // collect statistics
         void add_timing(boost::uint8_t command, double elapsed)
         {
             if (command >= command_firstcommand && 
                 command < command_lastcommand)
             {
+#if BOOST_VERSION >= 103600
+                totals_[command](elapsed);
+#else
                 totals_[command].first += elapsed;
                 ++totals_[command].second;
+#endif
             }
         }
         
@@ -59,7 +72,9 @@ namespace hpx { namespace naming { namespace server
         void handle_queryid(request const& req, reply& rep);
         void handle_registerid(request const& req, reply& rep);
         void handle_unregisterid(request const& req, reply& rep);
-        void handle_statistics(request const& req, reply& rep);
+        void handle_statistics_count(request const& req, reply& rep);
+        void handle_statistics_mean(request const& req, reply& rep);
+        void handle_statistics_moment2(request const& req, reply& rep);
 
     private:
         // The ns_registry_type is used to store the mappings from the 
@@ -89,8 +104,24 @@ namespace hpx { namespace naming { namespace server
         registry_type registry_;              // global_id --> local_address
         site_prefix_map_type site_prefixes_;  // locality --> prefix, upper_boundary
 
-        // gathered timings and counts        
-        std::vector<std::pair<double, std::size_t> > totals_;
+        // gathered timings and counts
+#if BOOST_VERSION >= 103600
+        typedef boost::accumulators::stats<
+            boost::accumulators::tag::count, 
+            boost::accumulators::tag::mean, 
+            boost::accumulators::tag::moment<2> > accumulator_stats_type;
+        typedef boost::accumulators::accumulator_set<
+            double, accumulator_stats_type> accumulator_set_type;
+
+    public:
+        typedef std::vector<accumulator_set_type> totals_type;
+#else
+    public:
+        typedef std::vector<std::pair<double, std::size_t> > totals_type;
+#endif
+
+    private:
+        totals_type totals_;
     };
 
     // compare two entries in the site_prefix_map_type above

@@ -19,7 +19,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 //  parcel serialization format version
-#define HPX_PARCEL_VERSION 0x30
+#define HPX_PARCEL_VERSION 0x40
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
@@ -39,27 +39,27 @@ namespace hpx { namespace parcelset
     {
     public:
         parcel() 
-          : destination_id_(0), action_(), cont_(none), source_id_(), 
-            tag_(0)
+          : tag_(0), destination_id_(0), source_id_(), action_(), cont_(none),
+            start_time_(0)
         {
         }
         
         parcel(naming::id_type apply_to)
-          : destination_id_(apply_to), action_(), 
-            cont_(none), source_id_(0), tag_(0)
+          : tag_(0), destination_id_(apply_to), source_id_(0), action_(), 
+            cont_(none), start_time_(0)
         {
         }
     
         parcel(naming::id_type apply_to, components::action_base* act)
-          : destination_id_(apply_to), action_(act), 
-            cont_(none), source_id_(0), tag_(0)
+          : tag_(0), destination_id_(apply_to), source_id_(0), action_(act), 
+            cont_(none), start_time_(0)
         {
         }
     
         parcel(naming::id_type apply_to, components::action_base* act, 
                 continuation do_after) 
-          : destination_id_(apply_to), action_(act), 
-            cont_(do_after), source_id_(0), tag_(0)
+          : tag_(0), destination_id_(apply_to), source_id_(0), action_(act), 
+            cont_(do_after), start_time_(0)
         {
         }
         
@@ -115,6 +115,11 @@ namespace hpx { namespace parcelset
             return destination_addr_;
         }
 
+        void set_start_time(double starttime)
+        {
+            start_time_ = starttime;
+        }
+        
     private:
         // serialization support    
         friend class boost::serialization::access;
@@ -134,6 +139,7 @@ namespace hpx { namespace parcelset
         naming::id_type source_id_;
         components::action_type action_;
         continuation cont_;
+        double start_time_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

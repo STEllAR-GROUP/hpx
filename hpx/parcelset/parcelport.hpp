@@ -22,6 +22,7 @@
 #include <hpx/naming/resolver_client.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/io_service_pool.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/parcelset/parcel.hpp>
 #include <hpx/parcelset/server/parcel_queue.hpp>
 #include <hpx/parcelset/server/parcel_connection.hpp>
@@ -137,6 +138,9 @@ namespace hpx { namespace parcelset
                 }
                 p.set_destination_addr(addr);
             }
+            
+            // set the current local time for this locality
+            p.set_start_time(startup_time_ + timer_.elapsed());
             
             // send the parcel to its destination
             send_parcel(p, p.get_destination_addr(), f);
@@ -395,6 +399,10 @@ namespace hpx { namespace parcelset
 
         /// The site current range of ids to be used for id_type instances
         util::unique_ids id_range_;
+        
+        /// This is the timer instance for this parcelport
+        double startup_time_;
+        util::high_resolution_timer timer_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

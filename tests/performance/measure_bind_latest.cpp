@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
         std::cout << " ***************************************" << std::endl << std::flush;	
         std::cout << " Measure_bind is: "<< t.elapsed() << std::endl << std::flush;
     
-        resolver.get_statistics(timings);
+        resolver.get_statistics_mean(timings);
         std::cout << " Time taken by get_prefix is: " << timings[0] <<  std::endl <<std::flush;
         std::cout << " Time taken by bind       is: " << timings[2] <<  std::endl <<std::flush;
 

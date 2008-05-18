@@ -34,7 +34,9 @@ namespace hpx { namespace naming { namespace server
         command_queryid = 5,        /// query for a global id associated with a namespace name (string)
         command_registerid = 6,     /// associate a namespace name with a global id
         command_unregisterid = 7,   /// remove association of a namespace name with a global id
-        command_statistics = 8,     /// return some usage statistics
+        command_statistics_count = 8,    /// return some usage statistics: execution count 
+        command_statistics_mean = 9,     /// return some usage statistics: average server execution time
+        command_statistics_moment2 = 10, /// return some usage statistics: 2nd moment of server execution time
         command_lastcommand
     };
 
@@ -48,7 +50,9 @@ namespace hpx { namespace naming { namespace server
         "command_queryid",
         "command_registerid",
         "command_unregisterid",
-        "command_statistics",
+        "command_statistics_count",
+        "command_statistics_mean",
+        "command_statistics_moment2",
         ""
     };
     
@@ -150,7 +154,9 @@ namespace hpx { namespace naming { namespace server
 
             case command_getprefix:
             case command_getidrange:
-            case command_statistics:
+            case command_statistics_count:
+            case command_statistics_mean:
+            case command_statistics_moment2:
             default:
                 // nothing additional to be sent
                 break;
@@ -193,7 +199,9 @@ namespace hpx { namespace naming { namespace server
 
             case command_getprefix:
             case command_getidrange:
-            case command_statistics:
+            case command_statistics_count:
+            case command_statistics_mean:
+            case command_statistics_moment2:
             default:
                 // nothing additional to be received
                 break;
@@ -240,7 +248,9 @@ namespace hpx { namespace naming { namespace server
             os << "site(" << req.site_ << ") ";
             break;
             
-        case command_statistics:
+        case command_statistics_count:
+        case command_statistics_mean:
+        case command_statistics_moment2:
         default:
             break;
         }

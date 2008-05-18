@@ -24,6 +24,7 @@ namespace hpx { namespace parcelset
         ar << source_id_;
         ar << action_;
         ar << cont_;
+        ar << start_time_;
     }
 
     template<class Archive>
@@ -40,6 +41,7 @@ namespace hpx { namespace parcelset
         ar >> source_id_;
         ar >> action_;
         ar >> cont_;
+        ar >> start_time_;
     }
 
     // explicit instantiation for the correct archive types

@@ -188,15 +188,42 @@ namespace hpx { namespace naming
         /// name. Any error results in an exception thrown from this function.
         bool queryid(std::string const& ns_name, id_type& id);
 
-        /// Query for the gathered statistics of this DGAS instance 
+        /// Query for the gathered statistics of this DGAS instance (server 
+        /// execution count)
+        ///
+        /// This function returns the execution counts each of the commands
+        /// 
+        /// std::vector<std::size_t>& counts
+        ///                   [out] The vector will contain the server 
+        ///                   execution counts, one entry for each of the 
+        ///                   possible resolver_client commands (i.e. will be 
+        ///                   of the size 'server::command_lastcommand').
+        bool get_statistics_count(std::vector<std::size_t>& counts);
+        
+        /// Query for the gathered statistics of this DGAS instance (average
+        /// server execution time)
         ///
         /// This function returns the average timings for each of the commands
         /// 
         /// std::vector<double>& timings
-        ///                   [out] A pre-allocated array of double's of the
-        ///                   size 'server::command_lastcommand', i.e. one 
-        ///                   entry for each of the commands
-        bool get_statistics(std::vector<double>& timings);
+        ///                   [out] The vector will contain the average server 
+        ///                   execution times, one entry for each of the 
+        ///                   possible resolver_client commands (i.e. will be 
+        ///                   of the size 'server::command_lastcommand').
+        bool get_statistics_mean(std::vector<double>& timings);
+        
+        /// Query for the gathered statistics of this DGAS instance (statistical
+        /// 2nd moment of server execution time)
+        ///
+        /// This function returns the 2nd moment for the timings for each of 
+        /// the commands
+        /// 
+        /// std::vector<double>& timings
+        ///                   [out] The vector will contain the 2nd moment of 
+        ///                   the server execution times, one entry for each of 
+        ///                   the possible resolver_client commands (i.e. will 
+        ///                   be of the size 'server::command_lastcommand').
+        bool get_statistics_moment2(std::vector<double>& timings);
         
     protected:
         static bool read_completed(boost::system::error_code const& err, 

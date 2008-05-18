@@ -31,7 +31,8 @@ namespace hpx { namespace parcelset
         parcels_(This()),
         new_server_connection_(new server::connection(
               io_service_pool_.get_io_service(), parcels_)),
-        resolver_(gas), here_(here), id_range_(here_, resolver_)
+        resolver_(gas), here_(here), id_range_(here_, resolver_),
+        startup_time_(util::high_resolution_timer::now()), timer_()
     {
         // retrieve the prefix to be used for this site
         resolver_.get_prefix(here, prefix_);    // throws on error
@@ -57,7 +58,8 @@ namespace hpx { namespace parcelset
         new_server_connection_(new server::connection(
               io_service_pool_.get_io_service(), parcels_)),
         resolver_(gas), here_(address, port), 
-        id_range_(here_, resolver_)
+        id_range_(here_, resolver_),
+        startup_time_(util::high_resolution_timer::now()), timer_()
     {
         // retrieve the prefix to be used for this site
         resolver_.get_prefix(here_, prefix_);    // throws on error

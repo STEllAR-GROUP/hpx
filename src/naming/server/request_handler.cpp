@@ -95,6 +95,7 @@ namespace hpx { namespace naming { namespace server
         }            
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     void request_handler::handle_getidrange(request const& req, reply& rep)
     {
         try {
@@ -156,6 +157,7 @@ namespace hpx { namespace naming { namespace server
         }            
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     void request_handler::handle_bind(request const& req, reply& rep)
     {
         try {
@@ -181,6 +183,7 @@ namespace hpx { namespace naming { namespace server
         }            
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     void request_handler::handle_unbind(request const& req, reply& rep)
     {
         try {
@@ -203,6 +206,7 @@ namespace hpx { namespace naming { namespace server
         }            
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     void request_handler::handle_resolve(request const& req, reply& rep)
     {
         try {
@@ -223,6 +227,7 @@ namespace hpx { namespace naming { namespace server
         }            
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     void request_handler::handle_queryid(request const& req, reply& rep)
     {
         try {
@@ -241,6 +246,7 @@ namespace hpx { namespace naming { namespace server
         }            
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     void request_handler::handle_registerid(request const& req, reply& rep)
     {
         try {
@@ -266,6 +272,7 @@ namespace hpx { namespace naming { namespace server
         }            
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     void request_handler::handle_unregisterid(request const& req, reply& rep)
     {
         try {
@@ -288,16 +295,79 @@ namespace hpx { namespace naming { namespace server
         }            
     }
 
-    void request_handler::handle_statistics(request const& req, reply& rep)
+    ///////////////////////////////////////////////////////////////////////////
+#if BOOST_VERSION < 103600
+    double extract_count(std::pair<double, std::size_t> const& p)
+    {
+        return p.second;
+    }
+#endif
+    
+    void request_handler::handle_statistics_count(request const& req, reply& rep)
     {
         try {
-            rep = reply(command_statistics, totals_);
+#if BOOST_VERSION >= 103600
+            rep = reply(command_statistics_count, totals_, boost::accumulators::count);
+#else
+            rep = reply(command_statistics_count, totals_, extract_count);
+#endif
         }
         catch (std::bad_alloc) {
-            rep = reply(command_statistics, out_of_memory);
+            rep = reply(command_statistics_count, out_of_memory);
         }            
         catch (...) {
-            rep = reply(command_statistics, internal_server_error);
+            rep = reply(command_statistics_count, internal_server_error);
+        }            
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+#if BOOST_VERSION < 103600
+    double extract_mean(std::pair<double, std::size_t> const& p)
+    {
+        return (0 != p.second) ? p.first / p.second : 0.0;
+    }
+#endif
+    
+    void request_handler::handle_statistics_mean(request const& req, reply& rep)
+    {
+        try {
+#if BOOST_VERSION >= 103600
+            rep = reply(command_statistics_mean, totals_, boost::accumulators::mean);
+#else
+            rep = reply(command_statistics_mean, totals_, extract_mean);
+#endif
+        }
+        catch (std::bad_alloc) {
+            rep = reply(command_statistics_mean, out_of_memory);
+        }            
+        catch (...) {
+            rep = reply(command_statistics_mean, internal_server_error);
+        }            
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+#if BOOST_VERSION < 103600
+    double extract_moment2(std::pair<double, std::size_t> const& p)
+    {
+        return 0.0;   // not implemented yet
+    }
+#endif
+
+    void request_handler::handle_statistics_moment2(request const& req, reply& rep)
+    {
+        try {
+#if BOOST_VERSION >= 103600
+            rep = reply(command_statistics_moment2, totals_, 
+                &boost::accumulators::extract::moment<2, accumulator_set_type>);
+#else
+            rep = reply(command_statistics_moment2, totals_, extract_moment2);
+#endif
+        }
+        catch (std::bad_alloc) {
+            rep = reply(command_statistics_moment2, out_of_memory);
+        }            
+        catch (...) {
+            rep = reply(command_statistics_moment2, internal_server_error);
         }            
     }
 
@@ -338,8 +408,16 @@ namespace hpx { namespace naming { namespace server
             handle_unregisterid(req, rep);
             break;
             
-        case command_statistics:
-            handle_statistics(req, rep);
+        case command_statistics_count:
+            handle_statistics_count(req, rep);
+            break;
+            
+        case command_statistics_mean:
+            handle_statistics_mean(req, rep);
+            break;
+            
+        case command_statistics_moment2:
+            handle_statistics_moment2(req, rep);
             break;
             
         default:
