@@ -266,6 +266,14 @@
 					<File
 						RelativePath="..\..\..\src\components\server\accumulator.cpp"
 						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ShowIncludes="false"
+							/>
+						</FileConfiguration>
 					</File>
 				</Filter>
 			</Filter>

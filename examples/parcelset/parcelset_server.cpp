@@ -45,16 +45,25 @@ BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
 void received_parcel(hpx::parcelset::parcelhandler& ph, hpx::naming::address const&)
 {
     static int count = 0;
+    static double accumulated_time = 0;
+    static std::size_t accumulated_count = 0;
+
     hpx::parcelset::parcel p;
     if (ph.get_parcel(p))
     {
         try {
+            accumulated_time += ph.get_current_time() - p.get_start_time();
+            ++accumulated_count; 
+
             std::cout << "Received parcel: " << std::hex << p.get_parcel_id() 
                       << std::flush << std::endl;
 
             if (++count > MAXITERATIONS) {
                 ph.get_parcelport().stop(false);
                 return;
+                std::cout << "Average travel time: " 
+                          << accumulated_time/accumulated_count
+                          << std::flush << std::endl;
             }
             
             p.set_destination(p.get_source());

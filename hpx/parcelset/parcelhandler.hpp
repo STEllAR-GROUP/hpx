@@ -154,7 +154,7 @@ namespace hpx { namespace parcelset
             }
             
             // set the current local time for this locality
-            p.set_start_time(startup_time_ + timer_.elapsed());
+            p.set_start_time(get_current_time());
             
             // send the parcel to its destination
             pp_.put_parcel(p, f);
@@ -319,6 +319,11 @@ namespace hpx { namespace parcelset
             return parcels_.register_event_handler(sink, conn);
         }
 
+        double get_current_time() const
+        {
+            return startup_time_ + timer_.elapsed();
+        }
+        
     protected:        
         // generate next unique id
         parcel_id get_next_id()

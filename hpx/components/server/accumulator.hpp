@@ -9,6 +9,7 @@
 #include <iostream>
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/action.hpp>
+#include <boost/serialization/export.hpp>
 
 namespace hpx { namespace components { namespace server
 {
@@ -21,8 +22,8 @@ namespace hpx { namespace components { namespace server
     class accumulator 
     {
     public:
-        //  parcel action: the action to be performed on the destination object
-        //  (the accumulator)
+        // parcel action code: the action to be performed on the destination 
+        // object (the accumulator)
         enum actions
         {
             init_accumulator = 0,
@@ -30,7 +31,7 @@ namespace hpx { namespace components { namespace server
             print_accumulator = 2
         };
 
-        // This is the component id. Every component needs to have a embedded
+        // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
         // to associate this component with a given action.
         enum { value = component_accumulator };

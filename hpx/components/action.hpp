@@ -9,12 +9,13 @@
 #include <cstdlib>
 #include <stdexcept>
 
-#include <boost/shared_ptr.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/at.hpp>
 #include <boost/fusion/include/size.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <hpx/components/component_type.hpp>
 #include <hpx/exception.hpp>
@@ -134,6 +135,17 @@ namespace hpx { namespace components
         {
             return (reinterpret_cast<server::accumulator*>(component)->*F)();
         }
+
+    private:
+        // serialization support    
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            using namespace boost::serialization;
+            void_cast_register<action0, action>();
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -152,6 +164,9 @@ namespace hpx { namespace components
         base_type;
         
     public:
+        action1() 
+        {}
+        
         // construct an action from its arguments
         template <typename Arg1>
         action1(Arg1 const& arg1) 
@@ -163,6 +178,17 @@ namespace hpx { namespace components
         {
             return (reinterpret_cast<server::accumulator*>(component)->*F)(
                 this->get<0>());
+        }
+
+    private:
+        // serialization support    
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            using namespace boost::serialization;
+            void_cast_register<action1, action>();
         }
     };
 
@@ -182,6 +208,9 @@ namespace hpx { namespace components
         base_type;
         
     public:
+        action2() 
+        {}
+
         // construct an action from its arguments
         template <typename Arg1, typename Arg2>
         action2(Arg1 const& arg1, Arg2 const& arg2) 
@@ -193,6 +222,17 @@ namespace hpx { namespace components
         {
             return (reinterpret_cast<server::accumulator*>(component)->*F)(
                 this->get<0>(), this->get<1>());
+        }
+
+    private:
+        // serialization support    
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            using namespace boost::serialization;
+            void_cast_register<action2, action>();
         }
     };
 
@@ -212,6 +252,9 @@ namespace hpx { namespace components
         base_type;
         
     public:
+        action3() 
+        {}
+
         // construct an action from its arguments
         template <typename Arg1, typename Arg2, typename Arg3>
         action3(Arg1 const& arg1, Arg2 const& arg2, Arg3 const& arg3) 
@@ -223,6 +266,17 @@ namespace hpx { namespace components
         {
             return (reinterpret_cast<server::accumulator*>(component)->*F)(
                 this->get<0>(), this->get<1>(), this->get<2>());
+        }
+
+    private:
+        // serialization support    
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            using namespace boost::serialization;
+            void_cast_register<action3, action>();
         }
     };
 

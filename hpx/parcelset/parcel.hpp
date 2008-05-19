@@ -119,6 +119,10 @@ namespace hpx { namespace parcelset
         {
             start_time_ = starttime;
         }
+        double get_start_time() const
+        {
+            return start_time_;
+        }
         
     private:
         // serialization support    

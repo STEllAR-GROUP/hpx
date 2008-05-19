@@ -50,30 +50,5 @@ namespace hpx { namespace components
     
 }}
 
-///////////////////////////////////////////////////////////////////////////////
-// Helper macros for building the execute functions for a component
-#define BEGIN_EXECUTE_ACTION(name, action)                                    \
-        {                                                                     \
-            hpx::components::action_type& __act = action;                     \
-            char const* __name = name;                                        \
-            switch(__act->get_action_code()) {                                \
-    /**/
-
-#define EXECUTE_ACTION(tag, type)                                             \
-            case tag:                                                         \
-                return boost::static_pointer_cast<type>(__act)                \
-                    ->execute(*this);                                         \
-    /**/
-
-#define END_EXECUTE_ACTION()                                                  \
-            default:                                                          \
-                throw hpx::exception(hpx::bad_action_code,                    \
-                    std::string("Invalid action code during execute for ") +  \
-                        __name + boost::lexical_cast<std::string>(            \
-                            __act->get_action_code()));                       \
-            }                                                                 \
-        }                                                                     \
-    /**/
-
 #endif
 
