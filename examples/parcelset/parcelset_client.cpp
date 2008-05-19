@@ -44,11 +44,11 @@ BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
 ///////////////////////////////////////////////////////////////////////////////
 //  This gets called whenever a parcel was received, it just sends back any 
 //  received parcel
-void received_parcel(hpx::parcelset::parcelport& ps)
+void received_parcel(hpx::parcelset::parcelhandler& ph, hpx::naming::address const&)
 {
     static int count = 0;
     hpx::parcelset::parcel p;
-    if (ps.get_parcel(p))
+    if (ph.get_parcel(p))
     {
         try {
             std::cout << "Received parcel: " << std::hex << p.get_parcel_id() 
@@ -57,13 +57,13 @@ void received_parcel(hpx::parcelset::parcelport& ps)
             p.set_destination(p.get_source());
             p.set_source(hpx::naming::id_type());
             p.set_parcel_id(hpx::naming::id_type());
-            ps.put_parcel(p);
+            ph.put_parcel(p);
             std::cout << "Successfully sent parcel: " 
                       << std::hex << p.get_parcel_id() 
                       << std::flush << std::endl;
 
             if (++count >= MAXITERATIONS) {
-                ps.stop(false);
+                ph.get_parcelport().stop(false);
                 return;
             }
         }
@@ -108,11 +108,14 @@ int main(int argc, char* argv[])
 #if defined(BOOST_WINDOWS)
         // Start ParalleX services
         hpx::naming::resolver_client dgas_c(gas_host, gas_port);
-        hpx::parcelset::parcelport ps(dgas_c, hpx::naming::locality(ps_host, ps_port));
+        hpx::parcelset::parcelport pp (hpx::naming::locality(ps_host, ps_port));
+        hpx::parcelset::parcelhandler ph (dgas_c, pp);
+
+        ph.register_event_handler(received_parcel);
 
         // Set console control handler to allow client to be stopped.
         console_ctrl_function = 
-            boost::bind(&hpx::parcelset::parcelport::stop, &ps, true);
+            boost::bind(&hpx::parcelset::parcelport::stop, &pp, true);
         SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
 
         // sleep for a second to give parcelset server a chance to startup
@@ -127,20 +130,19 @@ int main(int argc, char* argv[])
         dgas_c.get_prefix(remote_l, remote_prefix);
         
         // start parcelport receiver thread
-        ps.register_event_handler(received_parcel);
-        ps.run(false);
+        pp.run(false);
 
         std::cout << "Parcelset (client) listening at port: " << ps_port 
                   << std::flush << std::endl;
 
         // send initial parcel to remote locality        
         hpx::parcelset::parcel p(remote_prefix);
-        hpx::parcelset::parcel_id id = ps.sync_put_parcel(p);
+        hpx::parcelset::parcel_id id = ph.sync_put_parcel(p);
 
         std::cout << "Successfully sent parcel: " << std::hex << id 
                   << std::flush << std::endl;
 
-        ps.run();         // block until stopped
+        pp.run();         // block until stopped
 #else
         // Block all signals for background thread.
         sigset_t new_mask;
@@ -150,7 +152,10 @@ int main(int argc, char* argv[])
         
         // Start ParalleX services
         hpx::naming::resolver_client dgas_c(gas_host, gas_port);
-        hpx::parcelset::parcelport ps(dgas_c, hpx::naming::locality(ps_host, ps_port));
+        hpx::parcelset::parcelport pp (hpx::naming::locality(ps_host, ps_port));
+        hpx::parcelset::parcelhandler ph (dgas_c, pp);
+
+        ph.register_event_handler(received_parcel);
 
         // sleep for a second to give parcelset server a chance to startup
         boost::xtime xt;
@@ -164,14 +169,14 @@ int main(int argc, char* argv[])
         dgas_c.get_prefix(remote_l, remote_prefix);
         
         // start parcelport receiver thread
-        boost::thread t1(boost::bind(&hpx::parcelset:parcelport::run, &ps, true));
+        boost::thread t1(boost::bind(&hpx::parcelset:parcelport::run, &pp, true));
 
         std::cout << "Parcelset (client) listening at port: " << ps_port 
                   << std::flush << std::endl;
 
         // send initial parcel to remote locality        
         hpx::parcelset::parcel p(remote_prefix);
-        hpx::parcelset::parcel_id id = ps.sync_put_parcel(p);
+        hpx::parcelset::parcel_id id = ph.sync_put_parcel(p);
 
         std::cout << "Successfully sent parcel: " << std::hex << id 
                   << std::flush << std::endl;
@@ -189,6 +194,7 @@ int main(int argc, char* argv[])
         int sig = 0;
         sigwait(&wait_mask, &sig);
 
+        pp.stop();
         t1.join();
 #endif
     }

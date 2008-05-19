@@ -40,6 +40,7 @@ namespace hpx
     {
         class parcel;
         class parcelport;
+        class parcelhandler;
     }
     
     namespace threadmanager

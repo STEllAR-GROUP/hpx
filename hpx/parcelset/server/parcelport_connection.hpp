@@ -6,8 +6,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARCELSET_SERVER_PARCEL_CONNECTION_MAR_26_2008_1221PM)
-#define HPX_PARCELSET_SERVER_PARCEL_CONNECTION_MAR_26_2008_1221PM
+#if !defined(HPX_PARCELSET_SERVER_PARCEL_parcelport_connection_MAR_26_2008_1221PM)
+#define HPX_PARCELSET_SERVER_PARCEL_parcelport_connection_MAR_26_2008_1221PM
 
 #include <sstream>
 #include <vector>
@@ -24,28 +24,28 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/container_device.hpp>
-#include <hpx/parcelset/server/parcel_queue.hpp>
+#include <hpx/parcelset/server/parcelport_queue.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace server 
 {
-    /// Represents a single connection from a client.
-    class connection
-      : public boost::enable_shared_from_this<connection>,
+    /// Represents a single parcelport_connection from a client.
+    class parcelport_connection
+      : public boost::enable_shared_from_this<parcelport_connection>,
         private boost::noncopyable
     {
         typedef util::container_device<std::vector<char> > io_device_type;
 
     public:
-        /// Construct a listening connection with the given io_service.
-        connection(boost::asio::io_service& io_service,
-            parcel_queue& handler)
+        /// Construct a listening parcelport_connection with the given io_service.
+        parcelport_connection(boost::asio::io_service& io_service,
+            parcelport_queue& handler)
           : socket_(io_service), parcels_(&handler)
         {
         }
 
-        /// Construct a sending connection with the given io_service.
-        connection(boost::asio::io_service& io_service, parcel const& p)
+        /// Construct a sending parcelport_connection with the given io_service.
+        parcelport_connection(boost::asio::io_service& io_service, parcel const& p)
           : socket_(io_service), parcels_(NULL)
         {
             {
@@ -60,7 +60,7 @@ namespace hpx { namespace parcelset { namespace server
             out_size_ = out_buffer_.size();
         }
 
-        /// Get the socket associated with the connection.
+        /// Get the socket associated with the parcelport_connection.
         boost::asio::ip::tcp::socket& socket() { return socket_; }
 
         /// Asynchronously write a data structure to the socket.
@@ -74,11 +74,11 @@ namespace hpx { namespace parcelset { namespace server
             buffers.push_back(boost::asio::buffer(out_buffer_));
 
             // this additional wrapping of the handler into a bind object is 
-            // needed to keep  this connection object alive for the whole
+            // needed to keep  this parcelport_connection object alive for the whole
             // write operation
-            void (connection::*f)(boost::system::error_code const&, std::size_t,
+            void (parcelport_connection::*f)(boost::system::error_code const&, std::size_t,
                     boost::tuple<Handler>)
-                = &connection::handle_write<Handler>;
+                = &parcelport_connection::handle_write<Handler>;
                 
             boost::asio::async_write(socket_, buffers,
                 boost::bind(f, shared_from_this(), 
@@ -91,9 +91,9 @@ namespace hpx { namespace parcelset { namespace server
         {
             // Issue a read operation to read exactly the number of bytes in a 
             // header.
-            void (connection::*f)(boost::system::error_code const&, 
+            void (parcelport_connection::*f)(boost::system::error_code const&, 
                     boost::tuple<Handler>)
-                = &connection::handle_read_header<Handler>;
+                = &parcelport_connection::handle_read_header<Handler>;
             
             boost::asio::async_read(socket_, 
                 boost::asio::buffer(&in_size_, sizeof(in_size_)),
@@ -118,9 +118,9 @@ namespace hpx { namespace parcelset { namespace server
 
                 // Start an asynchronous call to receive the data.
                 in_buffer_.resize(inbound_data_size);
-                void (connection::*f)(boost::system::error_code const&,
+                void (parcelport_connection::*f)(boost::system::error_code const&,
                         boost::tuple<Handler>)
-                    = &connection::handle_read_data<Handler>;
+                    = &parcelport_connection::handle_read_data<Handler>;
 
                 boost::asio::async_read(socket_, boost::asio::buffer(in_buffer_),
                     boost::bind(f, shared_from_this(), 
@@ -173,7 +173,7 @@ namespace hpx { namespace parcelset { namespace server
         }
 
     private:
-        /// Socket for the connection.
+        /// Socket for the parcelport_connection.
         boost::asio::ip::tcp::socket socket_;
 
         /// buffer for outgoing data
@@ -185,10 +185,10 @@ namespace hpx { namespace parcelset { namespace server
         std::vector<char> in_buffer_;
 
         /// The handler used to process the incoming request.
-        parcel_queue* parcels_;
+        parcelport_queue* parcels_;
     };
 
-    typedef boost::shared_ptr<connection> connection_ptr;
+    typedef boost::shared_ptr<parcelport_connection> parcelport_connection_ptr;
 
 ///////////////////////////////////////////////////////////////////////////////
 }}}  // namespace hpx::naming::server

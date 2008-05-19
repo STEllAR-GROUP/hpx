@@ -11,6 +11,9 @@ cmake_minimum_required(VERSION 2.6)
 # to the root binary directory of the project as ${hpx_BINARY_DIR}.
 project (hpx)
 
+# We need to use Boost
+find_package(Boost REQUIRED)
+
 # We need to include the hpx directory for includes
 include_directories (${hpx_SOURCE_DIR})
 include_directories (${hpx_SOURCE_DIR}/external/endian)

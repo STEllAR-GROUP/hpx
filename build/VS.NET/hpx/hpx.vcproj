@@ -217,6 +217,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\parcelset\parcelhandler.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\parcelset\parcelport.cpp"
 					>
 					<FileConfiguration
@@ -240,7 +244,23 @@
 					Name="Server"
 					>
 					<File
-						RelativePath="..\..\..\src\parcelset\server\parcel_queue.cpp"
+						RelativePath="..\..\..\src\parcelset\server\parcelhandler_queue.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\src\parcelset\server\parcelport_queue.cpp"
+						>
+					</File>
+				</Filter>
+			</Filter>
+			<Filter
+				Name="Components"
+				>
+				<Filter
+					Name="Server"
+					>
+					<File
+						RelativePath="..\..\..\src\components\server\accumulator.cpp"
 						>
 					</File>
 				</Filter>
@@ -367,6 +387,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\hpx\util\serialize_sequence.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\util\util.hpp"
 					>
 				</File>
@@ -379,6 +403,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\hpx\parcelset\parcelhandler.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\parcelset\parcelport.hpp"
 					>
 				</File>
@@ -386,11 +414,15 @@
 					Name="Server"
 					>
 					<File
-						RelativePath="..\..\..\hpx\parcelset\server\parcel_connection.hpp"
+						RelativePath="..\..\..\hpx\parcelset\server\parcelhandler_queue.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\hpx\parcelset\server\parcel_queue.hpp"
+						RelativePath="..\..\..\hpx\parcelset\server\parcelport_connection.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\parcelset\server\parcelport_queue.hpp"
 						>
 					</File>
 				</Filter>
@@ -399,6 +431,10 @@
 				Name="Components"
 				>
 				<File
+					RelativePath="..\..\..\hpx\components\accumulator.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\components\action.hpp"
 					>
 				</File>
@@ -406,6 +442,14 @@
 					RelativePath="..\..\..\hpx\components\component_type.hpp"
 					>
 				</File>
+				<Filter
+					Name="Server"
+					>
+					<File
+						RelativePath="..\..\..\hpx\components\server\accumulator.hpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter

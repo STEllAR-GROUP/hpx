@@ -6,6 +6,8 @@
 #if !defined(HPX_COMPONENT_COMPONENT_TYPE_MAR_26_2008_1057AM)
 #define HPX_COMPONENT_COMPONENT_TYPE_MAR_26_2008_1057AM
 
+#include <boost/assert.hpp>
+
 namespace hpx { namespace components
 {
     enum component_type
