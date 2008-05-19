@@ -15,6 +15,8 @@ set (hpxlib_HEADERS
     # components
     ../hpx/components/action.hpp
     ../hpx/components/component_type.hpp
+    ../hpx/components/accumulator.hpp
+    ../hpx/components/server/accumulator.hpp
     # naming
     ../hpx/naming/address.hpp
     ../hpx/naming/locality.hpp
@@ -25,9 +27,12 @@ set (hpxlib_HEADERS
     # parcelset
     ../hpx/parcelset/parcel.hpp
     ../hpx/parcelset/parcelport.hpp
-    ../hpx/parcelset/server/parcel_connection.hpp
-    ../hpx/parcelset/server/parcel_queue.hpp
+    ../hpx/parcelset/parcelhandler.hpp
+    ../hpx/parcelset/server/parcelport_connection.hpp
+    ../hpx/parcelset/server/parcelhandler_queue.hpp
+    ../hpx/parcelset/server/parcelport_queue.hpp
     # util
+    ../hpx/util/asio_util.hpp
     ../hpx/util/container_device.hpp
     ../hpx/util/dgas_logging.hpp
     ../hpx/util/generate_unique_ids.hpp
@@ -36,6 +41,7 @@ set (hpxlib_HEADERS
     ../hpx/util/portable_binary_iarchive.hpp
     ../hpx/util/portable_binary_oarchive.hpp
     ../hpx/util/safe_bool.hpp
+    ../hpx/util/serialize_sequence.hpp
     ../hpx/util/util.hpp
 )
 
@@ -46,8 +52,10 @@ set (hpxlib_SOURCES
     naming/server/request_handler.cpp
     # parcelset
     parcelset/parcel.cpp
+    parcelset/parcelhandler.cpp
     parcelset/parcelport.cpp
-    parcelset/server/parcel_queue.cpp
+    parcelset/server/parcelhandler_queue.cpp
+    parcelset/server/parcelport_queue.cpp
     # util 
     util/dgas_logging.cpp
     util/io_service_pool.cpp

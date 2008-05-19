@@ -3,6 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <boost/serialization/serialization.hpp>
+#ifndef BOOST_SERIALIZATION_DEFAULT_TYPE_INFO   
+#include <boost/serialization/extended_type_info_typeid.hpp>   
+#endif
 #include <boost/serialization/export.hpp>
 #include <hpx/components/server/accumulator.hpp>
 
