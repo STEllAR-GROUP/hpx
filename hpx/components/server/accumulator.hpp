@@ -36,6 +36,11 @@ namespace hpx { namespace components { namespace server
         // to associate this component with a given action.
         enum { value = component_accumulator };
         
+        // constructor: initialize accumulator value
+        accumulator()
+          : arg_(0)
+        {}
+        
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
         

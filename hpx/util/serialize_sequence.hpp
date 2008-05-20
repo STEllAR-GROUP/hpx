@@ -20,7 +20,7 @@ namespace hpx { namespace util
     {
         template <typename Archive, typename First, typename Last>
         static void
-        call (Archive& ar, First const&, Last const&, boost::mpl::true_)
+        call (Archive&, First const&, Last const&, boost::mpl::true_)
         {
         }
 
@@ -32,7 +32,7 @@ namespace hpx { namespace util
                 typename boost::fusion::result_of::next<First>::type, Last
             > is_last;
 
-            is & *first;
+            ar & *first;
             call(ar, boost::fusion::next(first), last, is_last);
         }
 
@@ -40,8 +40,8 @@ namespace hpx { namespace util
         static void
         call(Archive& ar, First const& first, Last const& last)
         {
-            boost::fusion::result_of::equal_to<First, Last> eq;
-            call(ar, first, last, eq);
+            boost::fusion::result_of::equal_to<First, Last> is_last;
+            call(ar, first, last, is_last);
         }
     };
 

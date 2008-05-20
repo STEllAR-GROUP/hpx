@@ -451,6 +451,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\hpx\components\action_constructors.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\components\action_implementations.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\components\component_type.hpp"
 					>
 				</File>

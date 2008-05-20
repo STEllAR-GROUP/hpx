@@ -17,6 +17,7 @@
 #include <boost/fusion/include/size.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <hpx/config.hpp>
 #include <hpx/components/component_type.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/serialize_sequence.hpp>
@@ -61,11 +62,9 @@ namespace hpx { namespace components
           : arguments_(arg1, arg2) 
         {}
 
-        template <typename Arg1, typename Arg2, typename Arg3>
-        action(Arg1 const& arg1, Arg2 const& arg2, Arg3 const& arg3) 
-          : arguments_(arg1, arg2, arg3) 
-        {}
-
+        // bring in the rest of the constructors
+        #include <hpx/components/action_constructors.hpp>
+        
         /// destructor
         ~action()
         {}
@@ -242,49 +241,8 @@ namespace hpx { namespace components
         }
     };
 
-    ///////////////////////////////////////////////////////////////////////////
-    //  three parameter version
-    template <
-        typename Component, int Action, 
-        typename Arg1, typename Arg2, typename Arg3,
-        bool (Component::*F)(Arg1, Arg2, Arg3) 
-    >
-    class action3
-      : public action<Component, Action, boost::fusion::vector<Arg1, Arg2, Arg3> >
-    {
-    private:
-        typedef 
-            action<Component, Action, boost::fusion::vector<Arg1, Arg2, Arg3> >
-        base_type;
-        
-    public:
-        action3() 
-        {}
-
-        // construct an action from its arguments
-        template <typename Arg1, typename Arg2, typename Arg3>
-        action3(Arg1 const& arg1, Arg2 const& arg2, Arg3 const& arg3) 
-          : base_type(arg1, arg2, arg3) 
-        {}
-        
-    private:
-        bool execute(void *component) const
-        {
-            return (reinterpret_cast<Component*>(component)->*F)(
-                this->get<0>(), this->get<1>(), this->get<2>());
-        }
-
-    private:
-        // serialization support    
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
-        {
-            ar & boost::serialization::base_object<action>(*this);
-        }
-    };
-
+    #include <hpx/components/action_implementations.hpp>
+    
 ///////////////////////////////////////////////////////////////////////////////
 }}
 

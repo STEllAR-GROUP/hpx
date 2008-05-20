@@ -17,6 +17,12 @@
 #define HPX_USE_TBB 0
 #endif
 
+///////////////////////////////////////////////////////////////////////////////
+/// This defines the maximum number of arguments a action can take
+#if !defined(HPX_ACTION_LIMIT)
+#define HPX_ACTION_LIMIT 6
+#endif
+
 #endif
 
 
