@@ -66,7 +66,7 @@ namespace hpx { namespace components
         ~action()
         {}
         
-    protected:        
+    public:        
         /// retrieve the N's argument
         template <int N>
         typename boost::fusion::result_of::at_c<arguments_type, N>::type 
@@ -131,9 +131,14 @@ namespace hpx { namespace components
     template <typename Component, int Action, bool (Component::*F)()>
     class action0 : public action<Component, Action, boost::fusion::vector<> >
     {
+    public:
+        action0()
+        {}
+        
+    private:
         bool execute(void *component) const
         {
-            return (reinterpret_cast<server::accumulator*>(component)->*F)();
+            return (reinterpret_cast<Component*>(component)->*F)();
         }
 
     private:
@@ -176,7 +181,7 @@ namespace hpx { namespace components
     private:
         bool execute(void *component) const
         {
-            return (reinterpret_cast<server::accumulator*>(component)->*F)(
+            return (reinterpret_cast<Component*>(component)->*F)(
                 this->get<0>());
         }
 
@@ -220,7 +225,7 @@ namespace hpx { namespace components
     private:
         bool execute(void *component) const
         {
-            return (reinterpret_cast<server::accumulator*>(component)->*F)(
+            return (reinterpret_cast<Component*>(component)->*F)(
                 this->get<0>(), this->get<1>());
         }
 
@@ -264,7 +269,7 @@ namespace hpx { namespace components
     private:
         bool execute(void *component) const
         {
-            return (reinterpret_cast<server::accumulator*>(component)->*F)(
+            return (reinterpret_cast<Component*>(component)->*F)(
                 this->get<0>(), this->get<1>(), this->get<2>());
         }
 
