@@ -55,24 +55,26 @@ void received_parcel(hpx::parcelset::parcelhandler& ph, hpx::naming::address con
             accumulated_time += ph.get_current_time() - p.get_start_time();
             ++accumulated_count; 
 
-            std::cout << "Received parcel: " << std::hex << p.get_parcel_id() 
-                      << std::flush << std::endl;
+//             std::cout << "Received parcel: " << std::hex << p.get_parcel_id() 
+//                       << std::flush << std::endl;
 
-            if (++count > MAXITERATIONS) {
-                ph.get_parcelport().stop(false);
-                return;
+            if (count >= MAXITERATIONS) {
+                std::cout << "Successfully sent " << count << " parcels!\n";
                 std::cout << "Average travel time: " 
                           << accumulated_time/accumulated_count
                           << std::flush << std::endl;
+                ph.get_parcelport().stop(false);
+                return;
             }
-            
+
             p.set_destination(p.get_source());
             p.set_source(hpx::naming::id_type());
             p.set_parcel_id(hpx::naming::id_type());
             ph.put_parcel(p);
-            std::cout << "Successfully sent parcel: " 
-                      << std::hex << p.get_parcel_id() 
-                      << std::flush << std::endl;
+            ++count;
+//             std::cout << "Successfully sent parcel: " 
+//                       << std::hex << p.get_parcel_id() 
+//                       << std::flush << std::endl;
         }
         catch(std::exception const& e) {
             std::cerr << "Caught std::exception: " << e.what() << std::endl;
