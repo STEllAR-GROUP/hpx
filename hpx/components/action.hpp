@@ -42,6 +42,10 @@ namespace hpx { namespace components
     public:
         typedef Arguments arguments_type;
         
+        // this is the action code (id) it is exposed to allow generic handling
+        // of this action 
+        enum { value = Action };
+        
         // construct an action from its arguments
         action() 
           : arguments_() 
@@ -86,7 +90,7 @@ namespace hpx { namespace components
         /// retrieve action code
         std::size_t get_action_code() const 
         { 
-            return static_cast<std::size_t>(Action); 
+            return static_cast<std::size_t>(value); 
         }
         
         /// retrieve component type
@@ -99,7 +103,7 @@ namespace hpx { namespace components
         friend class boost::serialization::access;
 
         template<class Archive>
-        void load(Archive& ar, const unsigned int /*version*/)
+        void serialize(Archive& ar, const unsigned int /*version*/)
         {
             using namespace boost::serialization;
             void_cast_register<action, action_base>();
@@ -148,8 +152,7 @@ namespace hpx { namespace components
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            using namespace boost::serialization;
-            void_cast_register<action0, action>();
+            ar & boost::serialization::base_object<action>(*this);
         }
     };
 
@@ -192,8 +195,7 @@ namespace hpx { namespace components
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            using namespace boost::serialization;
-            void_cast_register<action1, action>();
+            ar & boost::serialization::base_object<action>(*this);
         }
     };
 
@@ -236,8 +238,7 @@ namespace hpx { namespace components
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            using namespace boost::serialization;
-            void_cast_register<action2, action>();
+            ar & boost::serialization::base_object<action>(*this);
         }
     };
 
@@ -280,8 +281,7 @@ namespace hpx { namespace components
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            using namespace boost::serialization;
-            void_cast_register<action3, action>();
+            ar & boost::serialization::base_object<action>(*this);
         }
     };
 
