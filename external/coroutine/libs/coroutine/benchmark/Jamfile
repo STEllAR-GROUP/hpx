@@ -1,0 +1,14 @@
+subproject libs/coroutine/benchmark ;
+                                                                                                                                                              
+project boost : $(BOOST_ROOT) ;                                                 
+
+flags gcc CFLAGS <optimization>speed: -finline ;
+                                                                              
+template example
+	: <lib>../build/boost_coroutine
+	: <include>../../..
+	;
+
+exe call_overhead : call_overhead.cpp out_of_line.cpp <template>example ;
+
+

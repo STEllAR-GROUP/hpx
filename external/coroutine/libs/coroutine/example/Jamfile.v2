@@ -1,0 +1,67 @@
+#  Copyright (c) 2006, Giovanni P. Deretta
+#
+#  This code may be used under either of the following two licences:
+#
+#  Permission is hereby granted, free of charge, to any person obtaining a copy 
+#  of this software and associated documentation files (the "Software"), to deal 
+#  in the Software without restriction, including without limitation the rights 
+#  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+#  copies of the Software, and to permit persons to whom the Software is 
+#  furnished to do so, subject to the following conditions:
+#
+#  The above copyright notice and this permission notice shall be included in 
+#  all copies or substantial portions of the Software.
+#
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+#  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+#  THE SOFTWARE. OF SUCH DAMAGE.
+#
+#  Or:
+#
+#  Distributed under the Boost Software License, Version 1.0.
+#  (See accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)
+
+
+# bring in rules for testing
+import os ;
+
+if [ os.name ] = WINDOWS
+{
+        TARGET_SPECIFIC_DEFINE =
+          "_WIN32_WINNT=0x0400"
+          ;
+}
+
+project
+    : requirements
+      	<library>/boost/test//boost_unit_test_framework
+      	<library>../build//boost_coroutine
+      	<link>static
+	<define>"_WIN32_WINNT=0x0400" #$(TARGET_SPECIFIC_DEFINE)
+      	<include>../../..
+      	<threading>multi
+
+    ;
+
+exe factorial : factorial.cpp ;
+exe prisonerdilemma : prisonerdilemma.cpp ;
+exe banana : banana.cpp ;
+exe matcher : matcher.cpp ;
+exe samefringe : samefringe.cpp ;
+exe samefringe2 : samefringe2.cpp ;
+exe token_passing : token_passing.cpp : <cflags>-march=pentium4 ;
+exe token_passing_baseline : token_passing_baseline.cpp : <cflags>-march=pentium4 ;
+exe complex_matcher : complex_matcher.cpp ;
+exe scheduler : scheduler.cpp ;
+exe scheduler_wait : scheduler_wait.cpp ;
+exe consumer_producer_a : consumer_producer_a.cpp ;
+exe consumer_producer_b : consumer_producer_b.cpp ;
+exe consumer_producer_c : consumer_producer_c.cpp ;
+exe switch_fsm : switch_fsm.cpp ;
+exe coroutine_fsm : coroutine_fsm.cpp ;
+exe coroutine_fsm_regexp : coroutine_fsm_regexp.cpp ;

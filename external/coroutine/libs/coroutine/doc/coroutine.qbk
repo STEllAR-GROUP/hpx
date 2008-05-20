@@ -1,0 +1,3430 @@
+[library Boost.Coroutine
+	[authors [ Deretta, Giovanni P. ]]
+	[copyright 2006 Giovanni P. Deretta]
+	[purpose A coroutine class template]
+	[category higher-order]
+	[id coroutine]
+	[license
+	 Distributed under the Boost Software License, Version 1.0.
+        (See accompanying file LICENSE_1_0.txt or copy at
+        <ulink url="http://www.boost.org/LICENSE_1_0.txt">
+            http://www.boost.org/LICENSE_1_0.txt
+        </ulink>)
+	]
+]
+
+[/ QuickBook Document verion 1.0]
+[/ Aug 10, 2006]
+
+[/ blurb icons]
+[def __alert__ [$images/caution.png]]
+[def __note__ [$images/note.png]]
+
+[/ pics]
+
+[def __MeleyFSM__ [$images/meley.png]]
+
+[/ reference: classes and types]
+[def __coroutine__ [link boost::coroutines::coroutine coroutine]]
+[def __generator__ [link boost::coroutines::generator generator]]
+[def __shared_coroutine__ [link boost::coroutines::shared_coroutine
+shared_coroutine]] 
+[def __self__ [link boost::coroutines::coroutine::self self]]
+[def __future__ [link boost::coroutines::future future]]
+
+[/ reference: functions]
+[def __self_exit__  [link boost::coroutines::coroutine::self::exit exit]]
+[def __exit__  [link boost::coroutines::coroutine::exit exit]]
+[def __yield__     [link boost::coroutines::coroutine::self::yield
+yield]]
+[def __yield_to__     [link boost::coroutines::coroutine::self::yield_to yield_to]]
+[def __exited__     [link boost::coroutines::coroutine::exited
+exited]]
+[def __empty__     [link boost::coroutines::coroutine::empty empty]]
+[def __waiting__     [link boost::coroutines::coroutine::waiting
+waiting]]
+[def __pending__     [link boost::coroutines::coroutine::pending
+pending]]
+[def __result__     [link boost::coroutines::coroutine::::self::result
+result]] 
+[def __swap__     [link boost::coroutines::swap
+swap]]
+[def __mfswap__     [link boost::coroutines::coroutine::swap
+swap]]
+[def __make_callback__     [link boost::coroutines::make_callback
+make_callback]]
+[def __wait__     [link boost::coroutines::wait wait]]
+[def __wait_all__     [link boost::coroutines::wait_all wait_all]]
+[def __self_pending__     [link boost::coroutines::coroutine::self::pending
+pending]]
+
+[/ exception]
+[def __exit_exception__ [link boost::coroutines::exit_exception
+exit_exception]]
+[def __coroutine_exited__ [link boost::coroutines::coroutine_exited
+coroutine_exited]]
+[def __abnormal_exit__ [link boost::coroutines::abnormal_exit
+abnormal_exit]]
+
+[/ concepts]
+[def __Generator__ [link to-sgi-doc Generator]]
+[def __AdaptableGenerator__ [link to-concepts-doc AdaptableGenerator]]
+[def __Assignable__ [link to-concepts-doc Assignable]]
+[def __Movable__ [link to-movable-concept Movable]]
+[def __Swappable__ [link to-swappable-concept Swappable]]
+[def __DefaultConstructible__ [link to-sgi-concept
+DefaultConstructible]]
+[def __OptionalPointee__ [link to-optional-doc OptionalPointee]]
+ 
+
+[/ bibliography links]
+
+[def __marlin80__ [link marlin-doctoral-thesis \[Marlin80\]]]
+[def __moura04__ [link moura-04-04 \[Moura04\]]]
+[def __HP_coroutines__ [link itanium-coroutines \[Saboff03\]]]
+[def __Fog06__ [link agner-fog-documentation \[Fog06\]]]
+[def __Intel06__ [link intel-optimization-guide \[Intel06\]]]
+[def __Adya02__ [link cooperative-task-management \[Adya02\]]]
+[def __VonBehren03__ [link why-events-are-a-bad-idea \[VonBehren03\]]]
+[def __Ousterhout95__ [link why-threads-are-a-bad-idea \[Ousterhout95\]]]
+[def __Kegel99__ [link the-10k-problem \[Kegel99\]]]
+
+
+[/ external links]
+[def __OpenMP__ [@http://www.openmp.org OpenMP]]
+[def __Itanium_ABI__ [@http://www.codesourcery.com/cxx-abi/abi.html OpenMP]]
+[def __LLVM__ [@http:/www.llvm.org __LLVM__]]
+[def __XXX__ [@http://www.chiark.greenend.org.uk/~sgtatham/coroutines.html
+Coroutines in C]]
+[def __Pth__ [@http://www.gnu.org/software/pth/pth-manual.html Pth]]
+[def __BoostAsio__ [@link-to-boost-asio Boost.Asio]]
+[def __BoostFunction__ [@link-to-boost-asio Boost.Function]]
+[def __complex_matcher_cpp__ [@../../../coroutine/example/complex_matcher.cpp complex_matcher.cpp]]
+[def __token_passing_cpp__ [@../../../lcoroutine/example/token_passing.cpp token_passing.cpp]]
+
+
+[section:intro Introduction]
+
+The Boost.Coroutine library contains a family of class templates that
+wrap function objects in coroutines. Coroutines are a
+generalization of subroutines that can return and be reentered more
+than once without causing the destruction of automatic objects.
+
+Coroutines are useful whenever it is necessary to keep state across a
+function call, a job usually reserved to stateful function objects.
+
+[blurb __alert__ This library has been developed as part of the Google
+Summer of Code 2006, with Boost as the Mentoring association. It has
+not been subject to a formal review, and thus is not part of the Boost
+library collection. Boost.Coroutine is only the tentative name]
+
+[endsect]
+
+[section:tutorial Tutorial]
+
+While all subroutines have state, this is usually lost when a
+subroutine returns; on the other hand coroutines keep their state
+across calls. Function 
+objects, familiar to most C++ programmers, are similar to coroutines in
+the fact as they may have state that is preserved across calls; but
+while function objects store their state on class members variables, coroutines
+store the state in the stack as automatic objects. 
+
+__marlin80__ provides a widely accepted  definition of coroutines:
+
+* "The value of local data of coroutines persist between successive
+calls".
+* "The execution of a coroutine is suspended as control leaves it,
+only to carry on were it left off when control re-enters the coroutine
+at some later stage".
+
+The second point is a fundamental difference between a coroutine and
+a generic function objects. While the latter can also preserve local
+data in the form of member variables, it does not automatically preserve
+the point of suspension when it is exited; it must be manually saved
+as an extra state member variable. Coroutines automatically remember
+where they left off.
+
+Coroutines can be used in all places where function objects are used;
+this includes: as parameters to standard algorithms, as generator
+functions, as callback to asynchronous functions and much more.
+
+In this section, we will first present the __generator__ class
+template (a simplified form of coroutines). Only [link coroutine.coroutines
+later] the full __coroutine__ class template is described.
+
+[h3 Stylistic Notes]
+
+For brevity all code in this and most other sections will assume that
+the following using declaration is in effect:
+
+    using namespace coro = boost::coroutines;
+	    
+And the following include directive is present:
+    
+    #include<boost/coroutine/generator.hpp>
+
+[section:generators Generators]
+
+One of the most simple uses for coroutines is as generator functions.    
+A generator is similar to a function that returns a sequence of
+values, but instead of returning all values at once (for example as an
+array), the generator returns the values one at time. Every time the
+generator is called, it returns the next value.
+
+In standard C++ library, generators are for example used with the
+`std::generate` algorithm, that takes as third argument a function
+object that model the __Generator__ concept. 
+
+[h3 Function objects as generators]
+
+A generator can be easily implemented in C++ as a function
+object. Consider a generator that returns all integer numbers in a
+range:
+
+  class range_generator {
+  public:
+    range_generator(int min, int max) :
+      m_current(min),
+      m_max(max) {}
+  
+    int operator()() {
+      return m_current++;
+    }
+  
+    operator bool() const {
+      return m_current < m_max;
+    }
+  
+  private:
+    int m_current;
+    int m_max;
+  };
+	
+It can be used like this:
+
+  range_generator generator(100, 200);
+
+  while(generator) 
+    std::cout<<generator()<<"\n";
+
+It will print all values in the half-open range [100, 200).
+The conversion to `bool` is used to detect when the generator has
+terminated. In production code probably the safe-bool idiom would be
+used instead. 
+
+[h3 Input iterators as generators]
+A generator can also be implemented as an input iterator. 
+Recall that an input iterator only support dereferencing and incrementing.
+This is the iterator version of the [link generators.function_objects_as_generators previous function object].
+
+  class range_generator {
+  public:
+    typedef int value_type;
+
+    range_generator(int min, int max) :
+      m_current(min),
+      m_max(max) {}
+
+    range_generator() :
+      m_current(-1),
+      m_max(0) {}
+  
+    int operator*() {
+      return m_current;
+    }
+    
+    range_generator& operator++() {	
+      m_current ++;
+      if(m_current == m_max)
+        m_current = -1;
+      return *this;
+    }    
+
+    range_generator operator++(int) {
+      range_generator t(*this);
+      ++*this;
+      return t;
+    }
+
+    friend
+    bool operator==(const range_generator& rhs,
+		    const range_generator& lhs) {
+      return rhs.m_current == lhs.m_current;
+    }
+
+    friend
+    bool operator!=(const range_generator& rhs,
+		    const range_generator& lhs) {
+      return !(rhs == lhs);
+    }
+
+    private:
+    int m_current;
+    int m_max;
+  };
+	
+It can be used like this:
+
+  range_generator generator(100, 200);
+
+  while(generator != range_generator()) 
+    std::cout<<*generator++<<"\n";
+
+It will print all values in the half-open range [100, 200). Notice that
+a default constructed iterator is used to represent the past-the-end iterator.
+We will call this kind of iterator a generator iterator.
+
+[h3 The generator class template]
+
+Obviously a generator is a stateful object, and can be easily
+implemented using coroutines.
+
+Before introducing full fledged coroutines, we will introduce the
+__generator__ class template that wrap a coroutine in an input iterator
+interface.
+  
+We begin declaring its type, the generator is an iterator over 
+values of type `int`:
+
+  typedef coro::__generator__<int> generator_type;
+
+The typedef is not really required, but makes the following code more
+readable. This is the generator body: 
+
+  int range_generator(generator_type::__self__& self, 
+		      int min,
+		      int max) 
+  {
+    while(min < max-1)
+      self.__yield__(min++);
+    return min;  
+  }	
+	 
+It is a plain C++ function that takes as parameter a non const
+reference to a `__generator__::__self__` and two integers by value.
+The `self` object of type  `generator_type::__self__` identifies
+the current generator. In fact, as coroutines have state, there can be
+more than one instance of the same coroutine type. The `self` name is
+just a convention used in this documentation. You can give to it
+whatever name you want, of course.
+
+The `min` and `max` parameters are the minimum and maximum bounds of
+the iteration. 
+
+The generator body iterates between all numbers in the ranges [min,
+max-1) and invokes `__self__::__yield__()` for each number. The `yield` member
+function is responsible of returning the parameter to the caller of
+the generator.
+
+When the `while` loop terminates, a plain `return min` statement is executed.
+This both terminates the generator and returns the final value
+(i.e. max-1). We will see later how to remove this asimmetry.
+
+Given the generator body, a __generator__ iterator can be constructed:
+
+  generator_type generator
+    (boost::bind
+     (range_generator, 
+      _1, 
+      100,
+      200));
+
+The `boost::bind` facility is used to bind the `min` and `max` arguments
+of the function to the actual iterations ranges. The function object
+returned by `boost::bind` is then used to construct a __generator__
+object. The signature of the function or function object passed to the
+__generator__ constructor must be:
+
+  value_type(coro::__generator__<value_type>::__self__&)
+
+The `generator` iterator can be used exactly like the iterator object of the
+previous example.
+
+  while(generator != generator_type()) 
+    std::cout<<*generator++<<"\n";
+
+Note that `range_generator` body is entered for the first time when the
+generator is constructed (from the main entry point), then at every
+iteration `range_iterator` is reentered from `__yield__()`. In
+particular `range_iterator` is reentered when
+`__generator__::operator++` is invoked.
+
+You can have more than one generator referring to the same body:
+
+  generator_type generator_a
+    (boost::bind
+     (range_generator, 
+      _1, 
+      100,
+      200));
+
+  generator_type generator_b
+    (boost::bind
+     (range_generator, 
+      _1, 
+      100,
+      200));
+
+[blurb __alert__ Do not confuse a /generator body/ with the 
+/generator itself/. The generator body is only the code that implement the
+generator behavior. The generator is composed of the body plus the
+current state (that is, the current call stack and the set of live
+local variables). Notice that two generators with the same generator
+signature and the same body are still two different generators.]
+
+  while(generator_a != generator_type() && 
+	generator_b != generator_type()) 
+    std::cout<<"generator_a is: "<<*generator_a++<<", "
+	     <<"generator_b is: "<<*generator_b++<<"\n";
+
+The `self` parameter in `range_generator` is used to identify the
+different instances of a generator. Also `__generator__::__self__`
+encodes the type of the generator allowing the compiler to statically
+type check the argument type of `__yield__` in the same way it would
+statically type check the argument type of a `return` statement. 
+
+In addition to the normal input iterator semantics, a __generator__
+iterator is also convertible to `bool`. The conversion returns true
+while there are elements in the range:
+
+  range_generator generator(100, 200);
+
+  while(generator) 
+    std::cout<<*generator++<<"\n";
+
+__generator__ has a nested
+`result_type` typedef and an `value_type operator()` member function (`generator()` is equivalent to `*generator++`). Thus
+__generator__ also models the __AdaptableGenerator__ concept:
+
+  range_generator generator(100, 200);
+
+  while(generator) 
+    std::cout<<generator()<<"\n";
+
+[h3 Exiting a generator]
+
+The [link generators.the_generator_class_template previous example] had an asimmetry in its
+body. The last generated value had to be returned with a 'return'
+statement instead of 'yield'. In simple code this is not a problem,
+because it is easy to see what the final value will be, but in more
+complex generators this asimmetry requires a substantial obfuscation
+of the code.
+
+The `__generator__::__self__::__self_exit__()` member function provides a way
+to exit a generator without returning a value. The [link
+generators.the_generator_class_template previous generator] can thus be written like this:
+
+ int range_generator(generator_type::__self__& self, 
+		     int min,
+		     int max) 
+  {
+    while(min < max)
+      self.__yield__(min++);
+    self.__self_exit__();
+  }	
+		
+Notice that now the `while` loop iterates over the full range.
+The __generator__ class can handle both styles of exiting a generator.
+
+`__self_exit__()` works by throwing an exception of type
+__exit_exception__. Objects of this type can be normally caught, but 
+must be eventually re-thrown: once `__self_exit__()` has been called, the
+coroutine can no longer `__yield__()` nor `return`. 
+	 
+[blurb __alert__ Some compilers might not be able to recognize
+`__self_exit__()` as a function that doesn't return, and warn that
+'range_generator' returns without a value. For these compilers you may
+have to add a dummy return value at the end of the function body like
+this: `return int();`
+If the return type is not default constructible, boost optional might
+be another solution: `return *boost::optional<result_type>();`]
+
+A generator is automatically exited when the last __generator__ iterator
+that refers to it goes out of scope. In that case the generator body is resumed
+and an __exit_exception__ is thrown from `__yield__`().
+
+[blurb __alert__ Note that the __generator__ class template use the reference
+counted body/handle idiom. This is necessary because an input iterator must be
+ __Assignable__ while it is in general not possible to copy the generator state (that
+is kept in automatic variables in the generator body). This means that
+if a generator ever gets a copy of its associated __generator__
+iterator, a cycle is formed and it could cause memory not to be
+reclaimed.]
+
+
+[endsect]
+
+[section:producer_consumer1 Example: the producer/consumer pattern]
+
+Generators can be used to straightforwardly model the ['producer/consumer] pattern. In
+this scenario one function generates values and another consumes
+them. The solution presented here is consumer driven, that is, the
+consumer dictates the speed at witch the producer generates
+values. In this example the producer generates all permutations of a
+given string, while the consumer simply print the output:
+
+  typedef coro::__generator__<int> generator_type;
+
+  const std::string& producer(generator_type::self& self, std::string base) {
+    std::sort(base.begin(), base.end());
+    do {
+      self.__yield__(base);
+    } while (std::next_permutation(base.begin(), base.end()));
+    self.__self_exit__();
+  }
+  
+  template<typename Producer> 
+  void consumer(Producer producer) {
+    do {
+      std::cout <<*producer << "\n";
+    } while(++producer);
+  }
+
+  ...
+  consumer
+   (generator_type
+    (boost::bind
+     (producer, _1, std::string("hello"))));
+  ...
+
+[blurb __alert__ __generator__ correctly handle
+ const and non-const references. You can even return a reference to a local
+object, but you must make sure that the object doesn't go out of scope
+while it is in use. This is why this example uses `operator*` and
+`operator++` instead of the simpler `operator()`. In fact this last member
+function correspond to  `*(*this)++`. Consider what would happen at
+the last iteration: it would first 
+copy the iterator (and thus store a reference to the last generated
+value), then increment it, restarting the generator body that would call
+`__self_exit__()`, destroying the local string and invalidating the
+reference; finally it would 
+return the dangling reference. Splitting the calls to the two member
+functions gives us a window where the reference is live.]
+
+[h3 Filters]
+
+This pattern is very useful and can be extended to insert another
+filter function between the producer and the consumer. This filter is
+both a producer and a consumer: it return the result of a call to the
+parameter producer with the string `" world"` appended:
+
+  struct filter {
+    typedef const std::string& result_type;
+
+    template<typename Producer>
+    const std::string& operator()
+      (generator_type::self& self, Producer producer) {
+      do {
+        self.yield(*producer + " world");
+      } while(++producer);
+      self.exit();
+    }
+  };
+
+  consumer
+    (generator_type
+     (boost::bind
+      (filter(),
+       _1,
+       generator_type
+       (boost::bind
+	(producer, _1, std::string("hello"))))));
+
+[blurb __note__ We have made `filter` a function object instead of a
+plain function because it is a template. If it were a template
+function, the compiler wouldn't know which function pointer pass to
+`bind`. This is just one of the multiple solutions to this recurring
+problem.]
+
+You can obviously have as many filters functions as you want.
+
+[endsect]
+
+[section:stackful Stackful generators: Same fringe problem]
+
+[h3 Stackfulness]
+
+While generators are have seen a resurgence in recent times, for
+example both *Python* and *C#* support them, most implementations 
+require that a generator can only be
+yield from the main body: while it can
+call other functions (including other generators), they must all
+return before the generator can yield to the
+caller. That is, the generator's call stack must be empty when it
+yields. This type of coroutines is sometime called /semi/-coroutine
+(__moura04__) or simply generators. 
+
+Boost.Coroutine provides stackful coroutines and generators that
+can yield from deep inside nested functions. This makes them much more
+powerful than more limited form of generators.  
+
+We will prefer the term /semi/-coroutine to refer to these limited
+coroutines and generators. 
+
+[blurb __alert__ The term /semi/-coroutine is sometimes used to
+describe asymmetric coroutines, while symmetric coroutines are simply
+called coroutines. We will explain the difference between symmetric
+coroutines and asymmetric coroutines only in the [link
+coroutine.symmetric_coroutines advanced section]]
+
+[h3 Same Fringe: the problem]
+
+Given two binary trees, they are have the [*same fringe] if all
+leafs, read from left to right are equals. This is the classical
+coroutine killer application, because it is hard to solve in *O(N)*
+(with best case *O(1)*) in the number of leaves, without using stackful coroutines.
+The Portland Pattern Repository's [@http://c2.com/cgi/wiki?SameFringeProblem wiki] 
+contains more details on the problem and solutions on many languages.
+
+The solution presented here is an almost verbatim port of the version
+in the *Lua* language from the [@http://c2.com/cgi/wiki?SameFringeProblem wiki] 
+
+[h3 Solution]
+
+For this example a tree of integers will be represented by this
+recursive description:
+
+# a leaf is an integer.
+# a node is a pair of nodes or a leaf.
+# a tree is a node.
+
+Or, in pseudo-C++:
+
+  typedef int leaf_type;
+  typedef boost::variant<std::pair<node_type, node_type>, leaf_type> node_type;
+  typedef node_type tree_type;
+
+Note that the above typedefs aren't legal C++ because the syntax for a 
+recursive variant is lightly different. For
+the sake of exposition we will pretend that the recursive typedef works.
+The function:
+
+    bool is_leaf(node_type)
+
+will return true if the node is actually a leaf, false otherwise.
+This is the generator signature:
+
+  typedef __generator__<leaf> generator_type;
+
+This is the generator body:
+
+  leaf tree_leaves
+   (generator_type::__self__& self,
+    const node_type& node) 
+  {
+    if(is_leaf(node)) {
+      self.__yield__(boost::get<leaf_type>(tree));
+    } else {
+      tree_leaves(self, boost::get<node_type>.first);
+      tree_leaves(self, boost::get<node_type>.second);
+    }
+    self.__exit__();
+  }
+
+`tree_leaves` recursively traverses the tree and yields each leave. In
+practice it gives a flattened view of the tree. 
+Notice how  `__yield__()` can be called from anywhere in the recursion stack. 
+
+  bool same_fringe(const element& tree1, const element& tree2) {
+    generator_type tree_leaves_a(boost::bind(tree_leaves, _1, tree1));
+    generator_type tree_leaves_b(boost::bind(tree_leaves, _1, tree2));
+    while(tree_leaves_a && tree_leaves_b) {
+      if(tree_leaves_a() != tree_leaves_b())
+        return false;
+    }
+    return true && (!tree_leaves_b && !tree_leaves_a);
+  }
+
+Given two trees `same_fringe` creates two __generator__ instances,
+each bound to one of the two trees. Then, as long as there are leaves
+in the two trees it check that the current leaf of  first tree is
+equal to the one in the second tree.
+
+The return value controls that both generators have reached the end:
+to have the same fringe, both trees must have the same number of
+leaves.
+
+[blurb __alert__ [#recursive_generators] While a generator body
+can be recursive, a generator 
+is *never* recursive: a generator cannot call itself directly nor
+indirectly: a generator can freely call other functions, even other
+generators, but these cannot call back to the calling generator. This make sense
+because a generator can only be reentered after it has yielded
+control, and it is resumed at the exact point where it had yielded. An
+hypothetical recursive generator wouldn't know were to resume if it
+called itself because it had not yielded.]
+
+[h3 Solutions without coroutines]
+
+To implement `same_fringe` without coroutines you need to follow one
+of these strategies:
+
+* Store a flattened view each tree before hand, then compare the views
+for equality. You lose the ability to do an early
+exit. The best case is *O(N)* instead of *O(1)*.
+
+* Destructively traverse the first tree while traversing the second
+tree. The best case is *O(1)*, but it is a destructive algorithm.
+
+* Use an explicit stack to track the traversal of the first tree. This
+has the same characteristics of the coroutine solution but requires
+explicit stack management and is much more complex.
+
+Generators have the property of lazy evaluation (the
+tree is traversed only on request), simplicity (the recursion stack
+is implicit) and immutability (the trees are not modified) . All other
+solutions have to give up at least one of these properties.
+
+[h3 Conclusions]
+
+The `same_fringe` problem is one of the simplest problems that can be
+easily solved with stackful coroutines. The coroutine stack is
+essentially used to store the current position in the tree. In general
+recursive algorithms are the ones that benefit the most from being able
+to `yield` from anywhere in the call stack.
+
+For example, notice how the `same_fringe` function cannot be easily
+ported to *Python* generators.
+
+[/
+Next section will show a simple non recursive program that benefit from the
+stackfulness property of coroutines. It will also show how to use
+coroutines for multitasking.
+]
+
+[endsect]
+
+[section:coroutines Coroutines]
+
+[h3 From generators to coroutines]
+
+So far we have learned to use generators, a special kind of
+coroutines. We have seen that generators are function objects with no
+parameters and that return a sequence of values. 
+We can generalize this concept to function objects that have zero, one or
+more parameters and return zero, one or more values.
+A generic coroutine is, not surprisingly, implemented with the
+__coroutine__ template class.
+
+All examples in this sections will assume that the following using
+directive is in effect:
+
+  #include <boost/coroutine/coroutine.hpp>
+
+[h3 The accumulator coroutine]
+
+Let's start with a very simple coroutine that takes as parameter an
+integer and returns the sum of that integer and all integers passed
+before. In practice it acts as an accumulator.
+As usual, we start by declaring its type:
+
+  typedef coro::__coroutine__<int(int)> coroutine_type;
+
+The syntax is deliberately similar to the one used in __BoostFunction__.
+This is the coroutine body:
+
+  int accumulator_body(coroutine_type::__self__& self, int val) {
+    while(true) {
+      val += self.__yield__(val);
+    }
+  }
+  
+This is code is not very different from our first [link
+generators.the_generator_class_template generator example]. Still there
+are some differences. For example `__yield__()` now returns a
+value. Soon we will see what this value represent. The syntax used to declare
+a coroutine is not surprising:
+
+  coroutine_type accumulator(accumulator_body); 
+
+And even its usage is straight forward:
+
+  ...
+  for(int i = 0; i < 1000; ++i)
+     std::cout << accumulator(i);
+  ...
+
+This will print all values in the mathematical series `a[i] = a[i-1]
++ i`.
+Let's see how the flow control evolves. 
+
+[blurb __note__ A __coroutine__, unlike a __generator__, will enter its body only  when the
+`__coroutine__::operator()` is invoked for the first time. This is
+because, generally, a coroutine requires parameters to be passed. In
+our example the parameter is the value to accumulate. 
+__generator__ and __coroutine__ are intended for different use cases
+:generator functions and iterators the first, generalized control
+inversion the second. Their semantics are intended to be the most useful for each case.]
+
+* The `for` loop starts, `accumulator(0)` is called.
+* The coroutine body is entered for the first time.
+  The first statement of `accumulator_body` is executed. At
+  this point the parameter `val` is `0`. 
+* The `while` loop is entered and `__yield__(val)` is invoked. The coroutine
+stops and relinquishes control to the main program, back in the `for`
+loop. 
+* At the next iteration, `accumulator(1)` is called.
+* The coroutine is resumed at the point of the call to
+`__coroutine__::__yield__()`, 
+that returns the parameter passed to `accumulator`, in this case `1`.
+* The value returned by `__yield__()` is
+added to `val` and the coroutine continues to the next iteration,
+yielding `val` again, now equal to `1`. 
+* At the next iteration of the
+`for` loop `accumulator(2)` is called and the coroutine will yield `3`,
+the new value of `val`. 
+* ... and so on, until the end of the `for` loop.
+
+When `accumulator` goes out of scope, the coroutine is destroyed in
+the same way generators are destroyed: it is resumed and __yield__()
+throws an instance of `__exit_exception__`.
+
+[blurb __alert__ Coroutines have the same limitation that generators
+[link recursive_generators have]: a coroutine can
+never be recursive.]
+
+[h3 Copyability]
+ 
+While you can freely copy a generator, you can't do the same with
+coroutines: during the development of Boost.Coroutine it has been
+deemed that giving reference counted shallow copying to coroutines
+was too risky. Coroutines usually have a longer lifetime and are more
+complex. Different coroutines can interact in dynamic ways, especially
+with the ability to yield to another coroutine (`__yield_to__()` will
+be introduced in an [link coroutine.symmetric_coroutines advanced
+section]). 
+
+The possibility of creating a cycle was very high and very
+hard to debug, thus the possibility of copying a __coroutine__ object
+has been removed. Coroutines instead are __Movable__: you can return a
+coroutine from a function, copy construct and assign from a temporary,
+and explicitly `__move__()` them, but you can't for example add them
+to a standard container, unless your standard library already has
+support for movable types (currently in the draft standard). A
+coroutine is also __Swappable__ and __DefaultConstructible__.
+
+Unfortunately most libraries expect copyable types and do not support
+moving. For interoperability with this libraries you should use
+a `shared_ptr` to manage the lifetime of a
+`__coroutine__`. 
+
+Boost.Coroutine also provides the
+`__shared_coroutine__` that acts as a counted reference to a coroutine
+object. You should use this class template with care because
+potentially reopens the cycle loophole, and use it only as a temporary
+workaround for lack of movability. 
+
+[h3 Exiting a coroutine and the `__coroutine_exited__` exception]
+
+A coroutine can be exited from inside its body exactly like a
+generator by invoking `__coroutine__::__self__::__self_exit__()`, but
+the semantics from the point of view of the caller are
+different. consider this piece of code that represent a call to the
+object `my_coroutine` of type `__coroutine__<int()>()`
+
+  int i = my_coroutine();
+
+If `my_coroutine` returns to the caller by invoking `__self_exit__()`,
+there is no value can be returned from `operator()` and be assigned to
+`i`. Instead a `__coroutine_exited__ exception is thrown from
+`operator()`.
+
+[blurb __note__
+Generators never throw `__coroutine_exited__` because if a generator
+is valid it is always guaranteed that a value can be returned. We will
+see [link coroutines.behind_generators later] how this is possible.]
+
+A coroutine can also be exited by throwing any other exception from
+inside the body and letting the stack unwind below the coroutine main
+body. The coroutine is terminated and `operator()` will throw an
+instance of `__abnormal_exit__` exception.
+
+[blurb __note__ Generators too may throw `__abnormal_exit__` from
+`operator++` or `operator()`.]
+   
+Finally a coroutine can be exited from outside its body by calling
+`__coroutine__::__exit__()`. It behaves exactly as if the coroutine
+had exited out of scope.
+
+[h3 Other member and friend functions]
+
+`__coroutine__` provides a set of member functions to query its state;
+these are `__exited__()`, `__empty__()`, `__waiting__()` and
+`__pending__()`.
+`__exited__()` returns true if a coroutine has been exited (by
+throwing an exception, by calling `__self_exit__()` or by a plain
+return), `__empty__()` returns true if a coroutine has not been
+assigned. `__waiting__()` and `__pending__()` are related to the event
+waiting mechanics and will be explained [link coroutine.events later].
+
+Both `__coroutine__::__mfswap__()` and a friend `__swap__()` are
+provided with the usual semantics.
+
+`__coroutine__::__self__` provides a `__result__()` member function
+that returns the value returned by the last `__yield__()` (or as a
+parameter to the body if `__yield__()` has not been called yet).
+
+The `__coroutine__::__self__::__yield_to__()` member function will be explained in an advanced
+section about [link coroutine.symmetric_coroutines symmetric coroutines].
+
+[h3 Multiple arguments and return values]
+
+A coroutine can have more than one argument. For example the coroutine
+`accumulator2` is similar to [link
+coroutines.the_accumulator_coroutine accumulator], but it takes two
+parameters and accumulate only the larger of the two values:
+[#accumulator_2]
+
+  typedef coro::__coroutine__<int(int, int)> coroutine_type;
+
+  int accumulator2_body(coroutine_type::__self__& self,
+                        int arg1,
+                        int arg2) {
+    int i = 0;
+    while(true) {
+       i +=  std::max(arg1, arg2);
+       boost::tie(arg1, arg2) = self.__yield__(i);
+    }
+  }
+
+  coroutine_type accumulator2(accumulator2_body);
+
+Note that __yield__ now returns two values in the form of a
+`boost::tuple<int, int>`. `accumulator2` can be called like any other
+binary function or function object:
+
+  ...
+  int i = accumulator2(0, 1);
+  ...
+
+Multiple return values are also handled with tuples. The coroutine
+`muladd` returns the partial sum and the partial product of the argument
+passed so far:
+[#muladd]
+
+  typedef coro::__coroutine__<boost::tuple<int, int>(int)> coroutine_type;
+
+  boost::tuple<int, int> muladd_body
+    (coroutine_type::__self__& self, 
+     int val) {
+    int prod = 0;
+    int sum = 0;
+    while(true) {
+      prod += val;
+      sum  += val;
+      val = self.__yield__(boost::make_tuple(prod, sum));
+    }
+  }
+
+  coroutine_type muladd(muladd_body);
+
+Again, `muladd` behaves like any other function that return a tuple:
+
+  ...
+  int prod;
+  int sum;
+  boost::tie(prod, sum) = muladd(0);
+  ...
+
+Notice that there is a slight asimmetry between [link accumulator_2
+the first] and [link muladd the second] example. In the call to
+`accumulator2` there is no need to call `boost::make_tuple(...)`,
+the arguments to `operator()` are automatically packed in the tuple
+that is returned by `__yield__()`. On the other hand, in the call to
+`__yield__()` in `muladd_body`, the result types must manually packed
+in a tuple. It would be nice if this syntax could be used:
+
+  ...
+  self.__yield__(prod, sum);
+  ...
+
+Boost.Coroutine in fact allows this user friendlier syntax, but it is
+not enabled by default because it could conflict with generic code. To
+enable it `coroutine_type` must be redefined like this:
+
+  typedef coro::__coroutine__<coro::tuple_traits<int, int>(int)> coroutine_type;
+
+The `__coroutine__` class template recognizes the special
+`coro::tuple_traits` type and enables `__yield__()` to automatically
+pack its arguments.
+
+[blurb __note__ __coroutine__ can handle any number of arguments and
+return values up to a implementation defined limit. The macro
+`BOOST_COROUTINE_ARG_MAX` expands to the current limit. While it is
+technically possible to 
+increase this number by redefining this macro, it also
+requires support for more arguments from other boost components
+(at least Boost.Tuple and Boost.MPL), thus this cap
+cannot be modified easily.] 
+  
+[blurb __alert__ Both `__coroutine__::operator()` and
+`__coroutine__::__yield__` can be called with a smaller amount of
+arguments than required by the `__coroutine__` signature. The
+rightmost missing arguments are default constructed. This is an
+artifact of the current implementation, and at least in one instance
+has caused an hard to find bug. You shouldn't rely on this feature
+that will be probably removed from future versions of
+Boost.Coroutines. Finally note that non default
+constructible arguments cannot be omitted.]
+
+[h3 Behind generators]
+
+To complete the tour of the basic capabilities of Boost.Coroutine we
+will return to the __generator__ class template and explain how it is
+implemented in term of coroutines. This is its definition:
+
+  template<typename ValueType>
+  class generator : public std::iterator<std::input_iterator_tag, ValueType> {
+    typedef shared_coroutine<ValueType()> coroutine_type;
+  public:
+    typedef typename coroutine_type::result_type value_type;
+    typedef typename coroutine_type::self self;
+
+    generator() {}
+
+   generator(const generator& rhs) :
+      m_coro(rhs.m_coro),
+      m_val(rhs.m_val) {}
+
+    template<typename Functor>
+    generator(Functor f) :
+      m_coro(f), 
+      m_val(assing()) {}
+
+    value_type operator*() {
+      return *m_val;
+    }
+
+    generator& operator++() {
+      m_val = assing();
+    }
+
+    generator operator++(int) {
+       generator t(*this);
+       ++(*this);
+       return t;
+    }
+
+    friend operator==(const generator& lhs, const generator& rhs) {
+      lhs.m_val == rhs.m_val;
+    }
+  private:
+    boost::optional<vale_type> assign() {
+      try {
+        return m_coro? m_coro() :  boost::optional<value_type>();
+      } catch (__coroutine_exited__) {
+        return boost::optional<value_type>()
+      }
+    }
+
+    coroutine_type m_coro;
+    boost::optional<value_type> m_val;
+  };
+
+[blurb __note__ The code above is simplified for the sake of
+exposition. The actual __generator__ class template is a bit more
+complex: it handles correctly `void` result types and `tuple_traits`,
+it has an `operator()`, a `safe-bool` conversion and a friend
+`operator !=`]
+
+__generator__ has two members variables: 
+
+* `m_coro` of type `shared_coroutine<value_type()>` is the coroutine
+in term of which `__generator__` is implemented.
+* `m_val` of type `boost::optional<value_type>` is the next value that
+will be returned by `operator*`. An empty optional represent a
+past-the-end iterator.
+
+The first two member functions are the default constructor and the
+copy constructor. There is nothing peculiar in them. Note how a
+default constructed `__generator__` has an empty `m_val` and thus is a
+past-the-end iterator.
+
+The third member constructs the generator from a function or function
+object parameter. The argument is forwarded to the `m_coro` member
+to initialize the internal coroutine. `m_val` is then initialized by a
+call to `assing()`.
+
+`operator*` simply returns `*m_val`, that is the current value stored
+in the optional. The result of dereferencing a past-the-end iterator
+is undefined.
+
+The prefix `operator++` simply reassign the result of `assign()` to `m_val`.
+
+The postfix `operator++` is implemented in terms of the prefix
+`operator++` in the usual way.
+
+`operator==` compares two generators for equality by comparing their
+`m_val` members. Notice that two past-the-end iterators have both
+empty `m_val` and compare equally.
+
+`assign()` is responsible of returning the next value in the sequence
+by invoking the underlying coroutine and eventually signaling the end
+of iteration. It first checks the coroutine for liveness
+(through __coroutine__ `safe-bool` conversion). If the coroutine is
+live it returns the result of a call to the coroutine. If the
+coroutine is dead (it has exited or has never been initialized) it
+returns an empty optional. Notice that the call to the coroutine could
+throw a `coroutine_exited` exception if the coroutine exited, without
+yielding a value, by invoking `__self_exit__()`. In that case an empty
+optional is returned. 
+
+The `try {...} catch(__coroutine_exited__) {...}` idiom is frequent in
+code that use coroutines that are expected to terminate via
+`__self_exit__()` (that this, the `__self_exit__()` termination path is not "exceptional").
+Boost.Coroutine provides a way to simplify this code by completely
+eliminating the exception. For example
+`assign()` can be rewritten as:
+
+  boost::optional<vale_type> assing() {
+    return m_coro? m_coro(std::nothrow) :  boost::optional<value_type>();
+  }
+
+Notice the extra `std::nothrow` parameter. If the first parameter to a
+`__coroutine__<result_type(...)>::operator()` is an object of type `std::nothrow_t`, the
+return type of the operator is modified to
+`boost::optional<result_type>`. The optional will contain the normal
+result value in the case of a normal `yield()` or `return` statement,
+or will be empty if the coroutine has been exited via
+`__self_exit__()`. Notice that if `result_type` was `void` it will
+remain unchanged (no optional will be returned), but no exception will
+be thrown.
+
+If the coroutine terminates because of an uncaught exception not of
+type `__exit_exception__`, `operator()(std::nothrow)` will still throw an
+`__abnormal_exit__` exception. 
+
+If a coroutine takes one or more parameters, std::nothrow must be the
+first parameter. For example a coroutine `my_coro` of type:
+
+  typedef coro::coroutine<int(long, double, char)> coroutine_type;
+
+Will be invoked like this:
+
+  boost::optional<int> res = my_coro(std::nothrow, 10000L, 10.7, 'a');
+
+[#producer_consumer2]
+
+[h3 Example: producer/consumer revisited]
+
+A [link coroutine.producer_consumer1 previous example] presented a consumer
+driven version of the ['producer/consumer] pattern. We will now
+implement a producer driven example of the same scenario:
+
+  typedef coroutine<void(const std::string&)> coroutine_type;
+
+  template<typename Consumer>
+  void producer(Consumer consumer, std::string base) {
+    std::sort(base.begin(), base.end());
+    do {
+      consumer(base);
+    } while (std::next_permutation(base.begin(), base.end()));
+  }
+
+  void consumer(coroutine_type::self& self, const std::string& value) {
+    std::cout << value << "\n";
+    while(true) {
+      std::cout << self.yield()<< "\n";
+    } 
+  }
+
+[blurb __note__ __coroutine__ too correctly handles reference
+types. This specific example doesn't have the reference lifetimes
+issues the [link coroutine.producer_consumer1 previous] had, but coroutines
+aren't in general immune to them.]
+
+Here we take advantage of the capability to pass arguments in a
+coroutine invocation to reverse the leading role of the
+pattern. Extending this pattern to support filter functions is left as
+an exercise for the reader.
+
+[h3 Conclusions]
+
+We have now terminated our tour on the basic capabilities of
+`__coroutine__` and `__generator__`. The next section will
+describe more advanced features, including symmetric coroutines and
+event handling.
+
+[endsect]
+
+[section:multitasking Multitasking]
+
+Coroutines can be used to implement multitasking in a very simple and
+efficient way. Each coroutine represent a *job*; a scheduler is
+responsible of executing each job serially in *FIFO* order. Every job is responsible
+of yielding control to the scheduler once in a while.
+We use a `__coroutine__<void()>` to represent a job:
+
+  typedef coro::__coroutine__<void()> job_type;
+
+[#coroutine_scheduler]
+The scheduler is just a simple wrapper around a `std::queue`:
+
+  #include<queue>
+
+  class scheduler {
+  public:
+    void add(job_type job) {
+      m_queue.push(job);
+    }
+  
+    job_type& current() {
+      return m_queue.front();
+    }
+
+    void run () {
+      while(!m_queue.empty()) {
+        current()(std::nothrow);
+        if(current()) 
+          add(current());
+        m_queue.pop();
+      }
+    }
+  private:
+    std::queue<job_type> m_queue;
+  };
+
+When a job yields, it is rescheduled again unless it has
+exited. Notice the use of `std::nothrow` to correctly handle
+exiting tasks.
+For simplicity we declare a global scheduler object:
+
+  scheduler global_scheduler;
+
+Here is a generic job body:
+
+  void printer(job_type::__self__& self, std::string name, int iterations) {
+    while(iterations --) {
+      std::cout<<name <<" is running, "<<iterations<<" iterations left\n";
+      self.__yield__();
+    }
+    self.__self_exit__();
+  }
+
+
+Notice that `__self_exit__()` is in this case superfluous. When void a
+function returns it is as it had exited (that is, if std::nothrow is
+used, or else `operator()` would throw an exception). 
+Let's give some job to the scheduler:
+
+  ...
+  global_scheduler.add(boost::bind(printer, _1, "first", 10));
+  global_scheduler.add(boost::bind(printer, _1, "second", 5));
+  global_scheduler.add(boost::bind(printer, _1, "third", 3));
+  ...
+
+Calling  `global_scheduler.run();` will print:
+
+[pre
+first is running, 9 iterations left
+second is running, 4 iterations left
+third is running, 2 iterations left
+first is running, 8 iterations left
+second is running, 3 iterations left
+third is running, 1 iterations left
+first is running, 7 iterations left
+second is running, 2 iterations left
+third is running, 0 iterations left
+first is running, 6 iterations left
+second is running, 1 iterations left
+first is running, 5 iterations left
+second is running, 0 iterations left
+first is running, 4 iterations left
+first is running, 3 iterations left
+first is running, 2 iterations left
+first is running, 1 iterations left
+first is running, 0 iterations left
+]
+	
+[h3 Multitasking versus multithreading]
+
+What we have seen so far is a cooperative implementation of
+multitasking, that is, each task must explicitly yield control to
+the central scheduler to allow the next task to run. This means that a
+misbehaving task that never yields control, can starve all other
+tasks. 
+
+Multithreading on the other hand, at least on most implementations,
+implies preemptive multitasking; each task is allowed to run for a
+certain amount of time, called /time-slice/. When the time-slice is
+over the task is forcibly interrupted and the scheduler select the next
+task. If the interrupted task was manipulating some shared resource,
+this can be left in an undefined state. A task cannot control when is
+preempted, so it must be pessimistic and lock all shared resources
+that it uses. As any programmer that had to work with heavily threaded
+applications knows, dealing with complex locking is not a trivial
+task. In addition both locking and thread switching imposes some overhead.
+
+Cooperative multitasking has not such problems as long as a
+task never yields while manipulating shared state. 
+
+This does not means that multithreading has not its place, there are
+at least two scenarios where true concurrency and preemption are
+required:
+
+* *Real time applications*. Preemption is required in practice in real-time
+applications. Almost all real-time scheduling algorithms need
+preemption to guarantee that tasks always meet their deadline.
+
+* *Multiprocessing*. To take advantage of hardware parallelism tasks
+must be run in parallel. With the current trend of multi-core
+architectures this will be more and more necessary. While shared
+memory threads are not the only abstraction that take advantage of
+hardware parallelism (multiple processes, message passing and
+__OpenMP__ are other examples), they are certainly the most popular.
+
+Unfortunately threads are often abused for general
+multitasking, where preemption is a burden instead of a benefit.
+
+Cooperative multitasking implemented with coroutines is often a better
+choice.
+
+[h3 conclusions]
+
+Coroutines can act as an extremely lightweight multitasking
+abstraction. Not only they scale much better than threads, but also
+much simpler to use because they require no locking.
+
+The simple solution presented [link coroutine_scheduler above] has a
+fundamental problem: if a task blocks waiting for I/O, all tasks are
+blocked. This is can be easily solved with asynchronous functions, but
+this will be explained in an [link coroutine.events advanced
+section]. Next section will show a simplified solution.
+
+[endsect]
+
+[section:events_simple Waiting for events]
+
+In the first [link coroutine.multitasking scheduling example], when a
+task is suspended, it is always added to the back task queue. We will
+now let a task decide whether be automatically rescheduled or
+not. This way a task can wait to be rescheduled at a latter time, when
+an event arrives.
+
+We slightly modify `scheduler::run()`:
+
+  ...
+  void run () {
+    while(!m_queue.empty()) {
+      current()(std::nothrow);	
+      m_queue.pop();
+    }
+  }
+  ...
+  
+The line `add(current()):` has been removed.\n The `reschedule()` member function:
+
+  ...
+  void reschedule(job_type::__self__& self) {
+    add(current());
+    self.__yield__();
+  }
+  ...
+
+is added to `scheduler`. It is used by a task to 
+reschedule itself. We will define a message queue class now:
+
+  class message_queue {
+  public:
+    std::string pop(job_type::__self__& self) {
+      while(m_queue.empty()) {
+        m_waiters.push(m_scheduler.current());
+        self.__yield__();      
+      }
+      std::string res = m_queue.front();
+      m_queue.pop();
+      return res;
+    }
+
+    void push(const std::string& val) {
+      m_queue.push(val);
+      while(!m_waiters.empty()) {
+        m_scheduler.add(m_waiters.front());
+        m_waiters.pop();
+      }
+    }
+
+    message_queue(scheduler& s) :
+      m_scheduler(s) {}
+
+  private:
+    std::queue<std::string> m_queue;
+    std::queue<job_type> m_waiters;
+    scheduler & m_scheduler;
+  };
+
+A task can wait for a message to arrive by calling
+`message_queue::pop()`. This function returns the first element in the
+internal queue; if the queue is empty adds the current task to an internal wait
+queue and yields control to the scheduler. When `message_queue::pop()`
+is called, if the wait queue is not empty, its top element is removed
+and rescheduled. Note that we use a `while` loop instead of a simple
+`if` to check for the emptiness of the message queue. This is to
+correctly handle spurious wakeups. Consider this scenario:
+
+* /Consumer 1/ calls `pop()`. Message queue is empty, so it sleeps waiting for
+data.
+* /Consumer 2/ calls `pop()`. Message queue is empty, so it sleeps waiting for data.
+* /Producer 1/ insert data and signals 1.
+* /Producer 2/ insert data and signals 2.
+* /Consumer 1/ wakes up, consumes data produced by /Consumer 1/, then
+recall `pop()`
+without yielding control. Message queue is not empty, so it consumes
+data produced by /Consumer 2/. It calls `pop()` again. This time the message queue
+is empty and goes to sleep.
+* /Consumer 2/ wakes up, re-test the condition variable, see that the
+message queue is empty and goes to sleep. If an `if` where used
+instead, the test wouldn't be performed, and /Consumer 2/ would try to
+extract an non-existent element from the queue.
+
+This means that this implementation of the message queue could starve the second consumer
+if the first can always extract an element from the queue. A possible
+solution to the problem would be to to insert an explicit call to
+`reschedule()` in `pop()` that would give another consume a chance to
+run. This would require extra context switches though. This is a
+matter of preferring fairness or performance.
+
+[blurb __note__ The "wait while message queue is empty" and "signal
+message queue not empty" pattern is reminiscent of condition
+variables used in threaded programming. In fact the idea is the same,
+except that we need not to associate a lock with the condition variable
+given the cooperative behavior of the scheduler.] 
+
+This is our message queue object. Again a global for simplicity:
+
+  message_queue mqueue(global_scheduler);
+
+Now we will create some jobs: 
+
+  void producer(job_type::__self__& self, int id, int count) {
+    while(--count) {
+      std::cout << "In producer: "<<id<<", left: "<<count <<"\n";	
+      mqueue.push("message from " + boost::lexical_cast<std::string>(id));
+      std::cout << "\tmessage sent\n";
+      global_scheduler.reschedule(self);
+    } 
+  }
+
+  void consumer(job_type::self& self, int id) {
+    while(true) {
+      std::string result = mqueue.pop(self);
+      std::cout <<"In consumer: "<<id<<"\n";
+      std::cout <<"\tReceived: "<<result<<"\n";
+    }
+  }
+
+And add some instances of them to the scheduler:
+
+  global_scheduler.add(boost::bind(producer, _1, 0, 3));
+  global_scheduler.add(boost::bind(producer, _1, 1, 3));
+  global_scheduler.add(boost::bind(producer, _1, 2, 3));
+  global_scheduler.add(boost::bind(consumer, _1, 3));
+  global_scheduler.add(boost::bind(consumer, _1, 4));
+
+calling `global_scheduler.run()` generates the following output:
+
+[pre
+In producer: 0, left: 3
+        message sent
+In producer: 1, left: 2
+        message sent
+In producer: 2, left: 1
+        message sent
+In consumer: 3
+        Received: message from 0
+In consumer: 3
+        Received: message from 1
+In consumer: 3
+        Received: message from 2
+In producer: 0, left: 2
+        message sent
+In producer: 1, left: 1
+        message sent
+In consumer: 3
+        Received: message from 0
+In consumer: 3
+        Received: message from 1
+In producer: 0, left: 1
+        message sent
+In consumer: 3
+        Received: message from 0
+]
+
+[h3 Conclusions]
+
+While this example is very simple and can't be easily extended to
+support system events (i.e. I/O, alarms and much more), it shows how a
+more complex event framework 
+can be implemented. In the advanced session we will see how
+__BoostAsio__ can be used as a scheduler and how coroutines can be
+adapted as callbacks to asynchronous functions.
+
+[endsect]
+
+[endsect][/tutorial]
+
+[section:advanced Advanced concepts]
+
+[section:introduction Introduction]
+
+So far we have only seen some arguably simple uses of coroutines,
+mostly as generators and iterators. We have only scratched the surface
+of more advanced usage when we used generators to implement cooperative
+multitasking. In this section will now explore some more advanced
+usages, including [/as [link coroutine.actors actors in the actor model]
+and] as [link coroutine.finite_state_machines state machines]. Finally we will
+learn to use Boost.Coroutine support for [link coroutine.events events] and its integration
+with [link coroutine.asio __BoostAsio__].
+
+[endsect]
+
+[section:symmetric_coroutines Symmetric coroutines]
+
+[h3 Introduction]
+
+The type of coroutines we have described so far is usually referred as
+/asymmetric/. The asymmetry is due to the fact that the caller/callee
+relation between a coroutine's context and caller's context is
+fixed. The control flow must necessarily go from the caller context to
+the coroutine context and back to the caller. In this model a
+coroutine [*A] can obviously call coroutine [*B], but [*A] becomes the
+caller. [*B] cannot directly yield to the caller of [*A] but must
+relinquish control to [*A] by yielding. For example, this control flow is not
+possible for example:
+
+[#symmetric_example]
+
+[pre
+  [*A] yield to [*B] yield to [*C] yield to [*A] yield to [*B] ... etc
+]
+
+[blurb __alert__ This is not completely true. We will [link
+symmetric_coroutines.symmetric_and_asymmetric_coroutine_transformation
+show] a code transformation that demonstrates how /asymmetric/ coroutines have the same
+expressive power of /symmetric/ coroutines.]
+
+Control flow with /symmetric/ coroutines instead is not stack-like. A
+coroutine can always yield freely to any other coroutine and is not
+restricted to return to its caller. The [link symmetric_example
+previous] control flow is possible.
+
+[h3 Syntax]
+
+While /asymmetric/ coroutines are the main abstraction provided by
+Boost.Coroutine, a /symmetric/ coroutine facility is also provided.
+
+The __coroutine__ class template has a `__yield_to__()` member
+function that stops the current coroutine and yields
+control to a different __coroutine__. It works exactly like
+`__yield__()`, except that the control is not returned to the caller
+but is given to another coroutine, specified as the first
+argument. The target coroutine can be any other coroutine as long as
+one of these conditions is true:
+
+* Has not been started yet.
+* Is stopped in a call to `__yield__`.
+* Is stopped in a call to `__yield_to__`.
+
+From the above conditions it follows that a __coroutine__ can yield to
+itself (in this case `__yield_to__` is as if had returned immediately).
+
+If  coroutine  [*A]  yields to coroutine [*B], the caller
+of *A* becomes the caller of [*B]. If [*B] ever does a normal yield, the
+control is given back to the caller of [*A].
+
+[blurb __alert__ Do not confuse /calls/ with /yields to/. The first
+verb implies an invocation of `__coroutine__::operator()`, while the
+second an invocation of `__coroutine__::__yield_to__`. A coroutine
+that yields to a second *does not* call the second one.]
+
+As Boost.Coroutine strives for type safety, it requires that the return type
+of the yielded coroutine be the same of the yielder. For example,
+given these three coroutines:
+
+  typedef __coroutine__<int(char*, float&)> coroutine1_type;
+  typedef __coroutine__<int(int, float)> coroutine2_type;
+  typedef __coroutine__<void *(const& char)> coroutine3_type;
+
+  coroutine1_type coroutine1(coroutine1_body);
+  coroutine2_type coroutine2(coroutine2_body);
+  coroutine3_type coroutine2(coroutine3_body);
+
+This code is legal:
+
+   //in coroutine1_body:
+   self.__yield_to__(coroutine2, 10, 0.0);
+
+This is not:
+
+   //in coroutine1_body
+   self.__yield_to__(coroutine3, 'a'); // return type mismatch!
+
+There is no restriction on the argument type. 
+
+[blurb __alert__ `__yield_to__()` is like `goto` on steroid. While it
+can be extremely expressive and powerful, if it used without care and
+discipline can easily lead to spaghetti code.]
+
+[h3 Producer/consumer revisited (again)]
+
+We have explored the [link coroutine.producer_consumer1 consumer] and
+[link producer_consumer2 producer] driven versions of this path
+before. In this third installment we will implement the pattern with
+the producer and the consumer as peer symmetric
+coroutines. The implementation is straight forward. These the our
+consumer and the producer bodies: 
+
+  void producer_body(producer_type::self& self, 
+                     std::string base, 
+                     consumer_type& consumer) {
+    std::sort(base.begin(), base.end());
+    do {
+      self.yield_to(consumer, base);
+    } while (std::next_permutation(base.begin(), base.end()));
+  }
+
+  void consumer_body(consumer_type::self& self, 
+                     const std::string& value,
+                     producer_type& producer) {
+    std::cout << value << "\n";
+    while(true) {
+      std::cout << self.yield_to(producer)<< "\n";
+    } 
+  }
+
+Creating the coroutines themselves is done as usual:
+
+  producer_type producer;
+  consumer_type consumer;
+    
+  producer = producer_type
+    (boost::bind
+     (producer_body, 
+      _1, 
+      "hello", 
+      boost::ref(consumer)));
+
+  consumer = consumer_type
+    (boost::bind
+     (consumer_body, 
+      _1,
+      _2,
+      boost::ref(producer)));
+       
+Note how we default construct both `producer` and `consumer` before
+actually initializing them with the bodies: we need to pass to
+each coroutine a reference to the other. Also note the use of
+`boost::ref` to prevent `boost::bind` to try to copy our non copyable
+coroutines. 
+
+We can start the machinery indifferently from the producer:
+
+  ...
+  producer();
+  ...
+
+Or from the consumer:
+
+  ...
+  consumer (std::string());
+  ...
+
+We need to provide an argument to the consumer because it expect to
+receive a value the first time it is called. For simplicity we
+provided an empty string. A better solution would have had the
+consumer accept `boost::optional<const std::string&>`.
+
+[#symmetric_transformation]
+
+[h3 Symmetric and asymmetric coroutine transformation]
+
+It can be demonstrated __moura04__ that both symmetric and
+asymmetric coroutines have the same expressive power, that is each
+type can be expressed in term of the other. We now will show how.
+
+An asymmetric coroutine call can be implemented with `__yield_to__` by
+yielding to the called coroutine and passing as a parameter a
+reference to the caller coroutine. `__yield__` can be implemented 
+with a `__yield_to__` the caller. This transformation is extremely
+simple and intuitive. In fact the lowest levels of the
+library only deal with a special `swap_context`
+function. `swap_context` works as an
+argument-less `__yield_to__`. Both `__yield__` and `__yield_to__` are
+implemented in terms of this function.
+
+Implementing `__yield_to__` with only asymmetric coroutines is a bit
+more involved, but still straight forward. In fact we already did
+implement a form of it in our [link coroutine_scheduler scheduler
+example]. A dispatch loop invokes the first coroutine. This
+coroutine then chooses the next coroutine to run by returning to the
+dispatcher the address of the target coroutine. The dispatch loop then
+execute that coroutine and so on.
+
+In conclusion Boost.Coroutine could implement only one of the two
+models and not loose expressiveness. Given a choice we would implement
+asymmetric coroutines because they are simpler to understand, safer
+and have a broader application. We decided to provide both models for
+convenience. 
+
+[endsect]
+
+[/ section:actors Actor Model]
+
+[/ The actor model (__ActorModel__)]
+
+[/ endsect]
+
+[section:finite_state_machines Finite state machines]
+
+[h3 Introduction]
+
+Finite state machines are a model of computation that consist in a set of
+states, a set of input symbols, a function that maps every tuple
+`(input, state)` to new state  and the actions performed at each
+state. A complete exposition of the concept is beyond the scope of this
+documentation. Here we will show how coroutines are a straightforward
+implementation of this model.
+
+[h3 Sequence recognizer]
+
+Consider a state machine that implements this behavior:
+
+[:For every input, output '1' if the last three inputs where `110`, `0` otherwise .]
+
+In practice it is a sequence recognizer.
+  
+The formal description of this state machine is the following:
+
+[variablelist States:
+[[A:] [ if input == `1` then { output `0`, state = B} else { output
+`0`,  state = A}]]
+[[B:] [ if input == `1` then { output `0`, state = C} else { output
+`0`, state = A}]]
+[[C:] [ if input == `1` then { output `0`, state = C} else { output
+`1`, state = A}]]
+]
+
+The initial state is `A`. This FSM can be represented by the following
+Meley model:
+
+__MeleyFSM__
+
+For example, given the input:
+
+  0110100010010001101001000111110010011001
+
+The output will be:
+
+  0001000000000000010000000000001000000100
+
+This state machine can be implemented in `C++` directly from it
+definition, using a `switch` statement inside a stateful function
+object:
+
+[#fsm1]
+
+  struct fsm {
+    void operator() (char input_) {
+      bool input = input_ != '0';
+      switch(m_state) {
+      case A:
+        std::cout <<"A";
+        m_state = input? B : C;
+        break;
+      case B:
+        std::cout <<"B";
+        m_state = input? C : D;
+        break;
+      case C:
+        std::cout <<"C";
+        m_state = input? B : A;
+        break;
+      case D:
+        std::cout <<"D";
+        m_state = input? A : C;
+        break;
+      };
+    }
+
+    fsm() :
+      m_state(A) {}
+
+    enum state { A, B, C, D};
+    state m_state;
+  };
+
+Each `case` block directly implements its corresponding state.
+While the transformation is straightforward, it doesn't make the code
+very readable. The simplicity of the informal description is
+lost. While this code might be acceptable for machine generated and
+maintained *FSM*, it is does not scale to large finite state machines
+that must be maintained by humans.
+
+With coroutines the straight forward transformation is:
+
+  typedef coro::__coroutine__<void(char)> coroutine_type;
+
+  enum state { A, B, C};	
+  void fsm(coroutine_type::__self__& self, char input_) {
+    state m_state = A;
+    while(true) {
+      bool input = input_ != '0';
+      switch(m_state) {
+      case A:
+        std::cout << (input? '0' : '0');
+        m_state = input? B : A;
+        break;
+      case B:
+        std::cout << (input? '0' : '0');
+        m_state = input? C : A;
+        break;
+      case C:
+        std::cout << (input? '0' : '1');
+        m_state = input? C : A;
+        break;
+      }
+      input_ = self.__yield__();
+    }
+  }
+
+We haven't gained much with this transformation. We have simply
+done moved the (implicit( external loop inside the fsm and applied a
+control inversion: from its internal point of view, `fsm` is not
+longer called for each input, but calls the outside for inputs (using `__yield__()`)
+
+Let's examine the code more carefully and see if we can do better. The
+`m_state` variable and its assignments are just carefully concealed
+`goto` statements: 
+
+  void fsm_goto(coroutine_type::__self__& self, char input) {
+    while(true) {
+    A:
+      if(input != '0') {
+        std::cout << '0';
+        input = self.__yield__();
+        goto B;
+      } else {
+        std::cout << '0';
+        input = self.__yield__();
+        goto A;
+      }
+    B:
+      if(input != '0') {
+        std::cout << '0';
+        input = self.__yield__();
+        goto C;
+      } else {
+        std::cout << '0';
+        input = self.__yield__();
+        goto A;
+      }
+    C:
+      if(input != '0') {
+        std::cout << '0';
+        input = self.__yield__();
+        goto C;
+      } else {
+        std::cout << '1';
+        input = self.__yield__();
+        goto A;
+      }
+    }
+  }
+
+`fsm_goto` has lost the state variable `m_state`. The current state of
+the *FSM* is stored in the instruction pointer and need not to be
+managed explicitly. On the other hand the control flow of the code has
+become explicit and arguably more readable. Then again, calling
+readable a code full of `goto`s might be a stretch. Let's complete the opera
+and do the final transformation:
+
+[#fsm_structured]
+
+ void fsm_structured(coroutine_type::__self__& self, char) {
+  while(true) {
+    if(self.__result__() != '0') {
+      std::cout << '0';
+      self.__yield__();
+      if(self.__result__() != '0') {
+        std::cout << '0';
+        self.__yield__();
+        if(self.__result__() == '0') {
+          std::cout << '1';
+          self.__yield__();
+        } else {
+          std::cout << '0';
+          self.__yield__();
+        }
+      } else {
+        std::cout << '0';
+        self.__yield__();
+      }
+    } else { 
+      std::cout << '0';
+      self.__yield__();
+    }
+  }
+ }
+
+We used `__result__()`. The sequence of `if`s represent
+exactly the informal requirement of matching the sequence `110`. 
+
+Whether the above *FSM* implementation is more readable of
+the [link fsm1 first implementation] is arguable. But it is easier to generalize
+it. The repetition of `if` statements is a strong hint that the code
+should be refactored:
+
+  typedef boost::function<void(coroutine_type2::self&)> action_type;
+
+  typedef coroutine<char(char)> coroutine_type2;
+  
+  void terminator(coroutine_type2::self&) {}
+
+  void match(coroutine_type2::self& self, char match, char out1, char out2 , action_type act, action_type act2) {
+    if(self.result() == match) {
+      self.yield(out1);
+      act(self);
+    } else {
+      self.yield(out2);
+      act2(self);
+    }
+  }
+
+  char fsm_match(coroutine_type2::self& self, char) {
+    action_type s3 (boost::bind(match, _1, '0', '1', '0', terminator, terminator));
+    action_type s2 (boost::bind(match, _1, '1', '0', '0', s3, terminator));
+    action_type s1 (boost::bind(match, _1, '1', '0', '0', s2, terminator));
+    while(true) {
+      s1(self);
+    } 
+  }
+
+[blurb __note__
+We use `boost::function` because if `match` where templated on the
+action type, the compiler wouldn't know which `match` to pass to
+`boost::bind`. There are more efficient solutions, but this is the
+most compact and simple.]
+
+`match` chooses what symbol to yield and what action to follow
+by checking if the last parameter to the coroutine is equal to the
+symbol to be matched.
+
+The [link fsm_structured structured *FSM*] can be extended to match
+more complex patterns. For example a matcher for the regular expression `(01+010)`
+can be written as:
+
+  void fsm_regexp(coroutine_type::self& self, char) {
+    while(true) {
+      if(self.result() == '0') {
+        std::cout << '0';
+        self.yield();
+        if(self.result() == '1') {
+          std::cout << '0';
+          self.yield();
+          while(self.result() == '1') {
+            std::cout << '0';
+            self.yield();
+          }
+          std::cout <<'0';
+          self.yield();
+          if(self.result() == '1') {
+            std::cout << '0';
+            self.yield();
+            if(self.result() == '0') {
+              std::cout << '1';
+              self.yield();
+            } else {
+              std::cout <<'0';
+              self.yield();
+            } 
+          } else {
+            std::cout <<'0';
+            self.yield();
+          }
+        } else {
+          std::cout << '0';
+          self.yield();
+        }
+      } else {
+        std::cout <<'0';
+        self.yield();
+      }
+    } 
+  }
+ 
+Generalizing this example is left as an exercise for the reader.
+
+Notice that the above *FSM* will fail to match the last six digits
+of this pattern:
+
+  011011010
+
+This because when it sees the fourth `1`, while it was expecting a `0`,
+the state machine does not backtrack to match the `1+` pattern, but
+returns to the beginning of the pattern and tries to find a `0`.
+
+It is possible to implement backtracking elegantly with coroutines
+using a goal driven design, but it is beyond the scope of this
+document. See the example [^__complex_matcher_cpp__] for more details.
+
+[endsect]
+
+[section:events Events]
+
+[h3 Introduction]
+
+[link coroutine.events_simple Previously] we have seen a simple way to deal
+with the blocking behavior of coroutines when used as
+cooperative tasks. 
+
+A task is blocked if it is waiting for a some operation to
+complete. Examples are waiting for `I/O`, waiting for timers to
+expire, waiting for external signals etc..
+
+The problem of handling blocking function can be
+generalized as the problem of waiting for some events to be signaled:
+in fact a function that blocks can also be modeled as a function that
+starts an asynchronous operation and then waits for it to
+complete. The completion of the operation is the event to be signaled.
+
+Simple events are simply ['On/Off]. They have been signaled or they
+haven't. More complex events also carry information. An event that
+signal the completion of a read operation may communicate the amount
+of data read and whether an error has occurred of not.
+
+Boost.Coroutine provides generalized functionalities for event waiting.
+
+[h3 Futures]
+
+A /future/ object holds the result of an asynchronous computation. When
+an asynchronous computation is started it returns a future. At any
+time, a task can query the future object to detect if the operation
+has completed. If the operation is completed, the task can retrieve
+any extra information provided by the operation completion. If the
+operation has not completed yet, the task can wait for the operation to
+complete.
+
+The future interface is modeled in a way that it act as a substitute
+for the result of an operation. Only when the result is actually
+needed, the future causes the task to wait for an operation to
+complete. The act of waiting for the result of an operation through a
+future is called /resolving/ a future.
+
+In Boost.Coroutine a future is bound to a specific coroutine on
+creation. When this coroutine wants to wait for an event, it binds the
+future, with a callback,  with the asynchronous operation that is
+responsible of signaling the event by invoking the callback. 
+
+Then the coroutine can use the future to wait for the operation
+completion. When the coroutine tries to /resolve/ the future, the latter
+causes the former to yield to the scheduler. 
+
+When the operation completes, the callback is invoked, with the
+results of the operation as parameter, and causes the
+coroutine to be resumed. From the point of view of the coroutine it is
+as if the future had returned these values immediately.
+
+Boost.Coroutine also provides the ability to wait for more futures at
+the same time, increasing efficiency and potentially simplifying some tasks.
+
+[h3 The __future__ class template]
+
+The following `pipe` class provides a mean of sending data, of type
+`int`, to a listener. A consumer that wants to receive data from the
+pipe registers a callback  with the `listen` member function. Whenever
+a producer sends data into the pipe the callback is invoked with the
+data as parameter:
+
+  class pipe {
+  public:
+  
+    void send(int x) {
+      m_callback (x);
+    }
+
+    template<typename Callback>
+    void listen(Callback c) {
+      m_callback = c;
+    }
+  private:
+    boost::function<void(int)> m_callback;
+  };
+
+While this class is extremely simple and not really useful, the method
+of registering a callback to be notified of an event is a very general
+and common pattern. 
+In the following example a coroutine will be created and a `int` sent
+to it through the pipe:
+
+  typedef coro::__coroutine__<void()> coroutine_type;
+  void consumer_body(coroutine_type::self&, pipe&);
+  pipe my_pipe;
+  coroutine_type consumer(boost::bind(consumer_body, _1, my_pipe));
+  ...
+  consumer_body(std::nothrow);
+  my_pipe.send(1);
+  ...
+
+A coroutine of type `__coroutine__<void()>` is initialized with
+`consumer_body`.
+When the coroutine returns (we will see later why the `std::nothrow` is needed), an
+integer is sent trough the pipe to the coroutine.
+
+Let's see how the __future__ class template can be used to wait for
+the pipe to produce data. This is the implementation of `consumer_body`
+
+  void consumer_body(coroutine_type::__self__& self, pipe& my_pipe) {
+    typedef coro::__future__<int> future_type;
+    future_type future(self);
+
+    my_pipe.listen(coro::__make_callback__(future));
+    assert(!future);
+    coro::__wait__(future);
+    assert(future);
+    assert(*future == 1);
+  }
+
+`consumer_body` creates an instance of `__future__<int>` initializing
+it with a reference `self`. Then it invokes `pipe::listen()`, passing
+as a callback the result of invoking `coro::__make_callback__()`. This
+function returns a function object responsible of assigning a value to
+the future. 
+
+After the asynchronous call to `listen` has been done, the future is
+guaranteed not to be /resolved/ until the following call to
+`coro::__wait__()`. This function is responsible of /resolving/ the
+future. The current coroutine is marked as waiting and control is
+returned to the caller. It is as if the coroutine had yielded, but no
+value is returned. In fact `__coroutine__::operator()` would throw an
+exception of type `waiting` to signal that the current coroutine did
+not return a value. Passing `std::nothrow`, as usual, prevents `operator()` from
+throwing an exception.
+
+[blurb __note__ While __coroutine__<void()> are usually used for cooperative
+multitasking, Boost.Coroutine doesn't limit in any way the signature
+of coroutines used with futures.] 
+
+A waiting coroutine cannot be resumed with `operator()` and its
+conversion to `bool` will return false. Also
+`__coroutine__::__waiting__()` will return true.
+
+Finally you can't invoke `__yield__()`, `__yield_to__()`,
+`__coroutine__::__exit__()` nor
+`__coroutine__::__self__::__self_exit__()` while there are operation
+pending. Both `__coroutine__::__pending__()` and
+`__coroutine__::__self_pending__()` will return the 
+number of pending operations. 
+
+[blurb __note__ An operation is said to be pending if `make_callback`
+has been used to create a `callback` function object from a `future`
+for that operation. Also as more experience is gained with this
+functionality, the restriction of what member functions may be called
+when there are pending operations might be relaxed.]
+
+`__make_callback__()` works by returning a function object that when invoked pass its
+parameter to the future object. Then, if the future is being waited,
+the associated coroutine will be waken up directly from inside the
+callback.
+
+[blurb __alert__ The function object returned by `__make_callback__`
+will extend the life time of the coroutine until the callback is signaled. If
+the signaling causes the coroutine to be resumed, its life time will
+be extended until the coroutine relinquishes control again. The
+lifetime is extended by internally using reference counting, thus if
+the coroutine stores a copy of the callback a cycle can be formed.]
+
+[blurb __alert__ A future can only be /realized/ synchronously with the
+owner coroutine execution. That is, while the operation it is bound to
+can execute asynchronously, it can only be signaled when the coroutine
+*is not* running. This means that a coroutine must enter the wait
+state for a future to be signaled. It isn't necessarily required that
+it waits for that specific future to be signaled, only that some
+events is being waited.]
+
+[h3 Semantics of __future__]
+
+A future is not __Copyable__ but is __Movable__. 
+
+The __future__ class template models the __OptionalPointee__ concept, that is, has a similar 
+interface to `boost::optional`. 
+
+The conversion to a `safe-bool` can be used to detect if the future has
+been signaled or not. 
+
+`__future__::operator*` returns the /realized/ value. If the future has not been
+signaled yet, this operator will cause the current coroutine to wait
+as if it had invoked `__wait__(*this)`
+
+`__future__::pending()` returns `true` if the future has been bound to
+an asynchronous operation.
+
+Assigning an instance of type `boost::none_t` to a future, causes it to
+be reseted and return to the non-signaled state. Such a future can be rebound to
+another asynchronous operation. Resetting a `pending()` future is
+undefined behavior.
+
+[h3 Multiple parameter futures]
+
+It is possible to have futures that represent a tuple of values
+instead of a single value. For example:
+
+  coro::__future__<int, void*> my_future;
+
+In this `operator*` will return a tuple of type `boost::tuple<int,
+void*>`:
+
+  int a;
+  void * b;
+
+  boost::tie(a, b) = *my_future;
+
+If `my_future` is passed as parameter to `make_callback()` the
+equivalent signature of the function object returned by this function
+will be:
+
+  void(int, void*)
+
+This is useful whenever a an asynchronous function may return more
+than one parameter.
+
+[h3 Waiting for multiple futures]
+
+Boost.Coroutine allows multiple futures to be waited at the same
+time. Overloads of `__wait__()` are provided that take multiple
+futures as arguments. Up to `BOOST_COROUTINE_WAIT_MAX` futures can be
+waited at the same time. `wait` will return when at least one future
+has been signaled. See also the rationale for a [link multi_wait variable argument wait].
+
+
+Boost.Coroutine also provides a variable argument `__wait_all__` that
+blocks until all future arguments have been signaled.
+
+[endsect]
+
+[section:asio Events: Boost.Asio]
+
+[h3 Introduction]
+
+While Boost.Coroutine has grown up as general coroutine implementation,
+its original design goal was to help write asynchronous applications
+based on Boost.Asio. 
+
+For a long time, threads have been considered a bad choice for
+building high concurrency servers capable of handling an high number
+of clients at the same time. Thread switching overhead, lock
+contention, system limits on the amount of threads, and the inherent
+difficulty of writing scalable highly threaded applications have been
+cited as the reasons to prefer event driven dispatch loop based
+model. This has been the main reason Boost.Asio has been written. See
+__Ousterhout95__ and __Kegel99__ for reference.
+
+Many researchers believe today (see __Adya02__ and __VonBehren03__ for
+the most known examples) that the best way to write high
+concurrency servers is to use a cooperative task model with an
+underlying scheduler that used asynchronous dispatching. This gives
+the performance of event driven designs without the need to divide the
+processing of a job in a myriad of related callbacks.
+
+Boost.Coroutine fits perfectly the role of the cooperative task model,
+while Boost.Asio can be used seamlessly as a coroutine scheduler.
+
+[h3 Usage]
+
+A __coroutine__ cannot currently be used as an `asio::io_service` callback, because
+Asio requires all callback objects to be copyable. In the future Asio
+might relax this requirement and require only copyability. In the mean
+time `__shared_coroutine__` can be used as a workaround. 
+
+Asynchronous operations can be waited using a __future__ object. For
+example:
+
+  void foo(coro::coroutine<void()>::self& self) {
+    typedef boost::asio::ip::tcp::socket socket_type;
+    typedef boost::asio::error error_type;
+
+    char token[1024];
+    socket_type source;
+    coro::future<error_type, std::size_t> read_result(self);
+    ...
+    boost::asio::async_read(source, 
+                            boost::asio::buffer(token, 1024),
+                            coro::__make_callback__(read_error));
+    ...
+    coro::__wait__(source);
+    if(source->get<0>()) {
+      std::cout <<"Error\n!";
+    } else {
+      std::cout <<"Written "<<source->get<1>()<<" bytes";
+    }
+  }
+
+`__wait__` will appropriately cause the coroutine to be rescheduled in the
+`asio::io_service` when the read will be completed.
+
+There is no function to simply yield the CPU and be executed at a
+latter time, but the following code may be equivalent. Let `demux` be
+an instance of an `asio::io_service`:
+
+  coro::__future__<> dummy(self);
+  demux.post(coro::__make_callback__(dummy));
+  coro::wait(dummy); // the current coroutine is rescheduled
+  ...
+
+Will cause the current coroutine to be rescheduled by the
+`io_service`. Notice that simply invoking `self.yield` will not work,
+as `io_service` will not automatically reschedule the coroutine. Also,
+it is not possible to yield if there are any pending operations.
+
+For a more complex example see __token_passing_cpp__.
+
+[/should provide some examples here]
+
+[h3 Conclusions]
+
+Boost.Coroutine can potentially greatly simplify the design of event
+driven network applications when used in conjunction with
+Boost.Asio. If you plan to use multiple threads, be sure to read the
+about the [link coroutine.threads thread safety guarantees] of Boost.Coroutine.
+
+[endsect]
+
+[section:threads Coroutines and thread safety]
+
+Boost.Coroutine provides a restricted version of the distinct objects
+thread safety guarantee. The library is thread safe as long as these
+preconditions are valid:
+
+# All member functions of a coroutine can only be called from the owning
+thread (the thread where a coroutine has been created is said to be the
+owning thread; creating a coroutine means invoking any constructor).
+
+# Distinct coroutine instances can be freely called from different
+threads.
+
+It follows from 1 that:
+
+* A coroutine instance cannot be called from any thread other than the one
+where it has been created. 
+
+* A coroutine instance cannot yield to any other coroutine instance
+  unless the latter has been created in the same thread of the former.
+
+[h3 What does this means in practice]
+
+In practice a coroutine cannot migrate from one thread to another. For
+its whole lifetime it is bound to one specific thread. Other threads
+cannot safely access any coroutine member functions. 
+
+[blurb __alert__ Not even locking can be safely used to protect
+concurrent accesses to a coroutine. That is two treads cannot invoke
+the same coroutine even if the serialize access through a mutex.]
+
+If coroutines are, for example, used to implement a M on N threading
+models (M coroutines on N threads with `N < M`), coroutines cannot be
+dynamically migrated from a more loaded thread to a less loaded
+threads.
+
+[h3 Threads and Boost.Asio]
+
+From the threads guarantees of Boost.Coroutine, it follows that, if
+coroutines are ever inserted in an `asio::io_service`, no more than
+one thread can call `io_service::run()`. This thread must be the one
+that created all coroutines inserted in the `io_service`.
+
+This means that the "one `io_service` per thread" scheme must be used.
+
+[blurb __note__ This means that on Windows platforms an application
+cannot take advantage of the ability of a `Win32` completion port to
+balance the load across all threads bound to it. This might incur, in
+some applications, in a performance penalty. On the other hand the
+thread affinity of coroutines might result in better CPU affinity
+and thus a better cache utilization and memory usage especially on
+`NUMA SMP` systems.]
+
+[h3 Relaxing requirements]
+
+In the future, as more experience with the library is gained, the
+thread safety restrictions could be slightly relaxed. It is likely
+that the owning thread will become the first one to invoke
+`operator()` for that coroutine or `yield_to` that coroutine.
+
+It is unlikely that thread migration will ever be possible (nor it is
+believed to be a necessary feature).
+
+For a rationale for the current requirements see
+[link coroutine.coroutine_thread "Interaction between coroutines and threads"].
+
+[endsect]
+
+[endsect][/advanced]
+
+[section:design Design Rationale]
+[h3 Reference counting and movability]
+
+The initial version of Boost.Coroutine reference counted the
+__coroutine__ class template. Also the `__coroutine__::__self__` type
+was an alias for the `__coroutine__` class itself. The rationale was
+that, when used in a symmetric coroutine design it would be easy for a
+coroutine to pass a copy of itself to other coroutines without needing
+any explicit memory management. When all other coroutines dropped all
+references to a specific coroutine that was deleted. Unfortunately
+this same desirable behavior could backfire horribly if a cycle of
+coroutines where to be formed. 
+
+In the end reference counting behavior was removed from the coroutine
+interface and__coroutine__ where made movable. The same change lead to
+the creation of __coroutine__::__self__ to segregate coroutine
+body specific operations (like yield and yield_to). Internally
+reference counting is still used to manage coroutine lifetime when
+future are used. While this can still lead to cycles if a coroutine
+stores the result of `coro::make_callback()` in a local, this is
+explicitly prohibited in the interface, and should look suspiciously
+wrong in code.
+
+Futures were made movable for similar reasons.
+
+[h3 No `current_coroutine`]
+
+Boost.Coroutine provides no way to retrieve a reference to the current
+coroutine. This is first of all for reasons of type safety. Every
+coroutine is typed on its signature, so would be current pointer. The
+user of an hypothetical `current_coroutine` would need to pass to this
+function, as a template parameter, the signature of the coroutine that
+should be extracted. This signature would be checked at run time with
+the signature of the current coroutine. Given that `current_coroutine`
+would be most useful in generic code, the signature would need to be
+passed down to the to the function that need to access the current
+coroutine. At this point there is little benefit on passing only the
+signature instead of a reference to `self`.
+
+The second reason is that `current_coroutine` is a global object in
+disguise. Global objects lead often to non scalable code. During the
+development of the library and during testing, is has always been
+possible to do away with the need for such a global by exploring other
+solutions. The `Win32 fiber API` provides a symmetric coroutine
+interface with such a global object. Coding around the interface
+mismatch between the Boost.Coroutine `API` and the `fiber API` has 
+been difficult and a potential source of
+[link convert_thread_to_fiber inefficiency].
+
+The last reason for not providing a `current_coroutine` is that this
+could be used to `yield`. Suppose a coroutine that is manipulating
+some shared data calls a seemingly innocuous function; this coroutine
+might invoke `current_coroutine().yield()`, thus relinquishing control
+and leaving the shared state with an invalid invariant. Functions that
+may cause a coroutine to yield should documented as such. With the
+current interface, these functions need a reference to `self`. Passing
+such a reference is a strong hint that the function might yield.
+
+[h3 Main context is not a coroutine]
+
+The main context is the flow of control outside of any coroutine
+body. It is the flow of control started by `main()` or from the
+startup of any threads. Some coroutine APIs treat the main
+context itself as a coroutine. Such libraries usually provide 
+symmetric coroutines, and treating `main()` as a coroutine is the only
+way to return to the main context. Boost.Coroutine is mostly designed around
+asymmetric coroutines, so a normal `yield()` can be used to return to
+the main context. 
+
+Treating `main()` as a coroutine also opens many problems: 
+
+* It has no signature; It could be treated as a
+`__coroutine__<void()>`, but this seems too arbitrary. 
+* The main context cannot get a reference to `self`. A default
+constructed `self` is not a solution, because it breaks the invariant
+that two `self` objects always refer to two different objects. We have
+already reject the solution of a `current_coroutine()`.
+* Creating a coroutine usually requires initializing some internal
+data. Initializing the main coroutine would require calling an
+`init_main()` function. This cannot be done statically because it must
+be done for each new thread. Leaving the responsibility to the users of
+the library opens the problem of two libraries trying both to
+initialize the current context.
+
+[h3 Symmetric and asymmetric coroutines]
+
+It has been argued __moura04__ that asymmetric coroutines are the
+best coroutine abstraction, because are simpler and safer than
+symmetric coroutines, while having the same expressiveness. We agree
+with that and the library has been developed around an asymmetric
+design. 
+
+During development was apparent that symmetric functionality could be
+added without compromising the `API`, thus `__yield_to__` was
+implemented. While `__yield_to__` shouldn't be abused, it might
+simplify some scenarios. It might also be a performance optimization.
+
+[blurb __note__ "Premature optimization is the root of all evil" --
+C. A. R. Hoare.\n While working on the Boost.Asio integration, the
+author thought that the only way to get good dispatching performance
+would be to use a specialized scheduler that used `__yield_to__` to go
+from coroutine to coroutine. In the end the performance of
+invoke/yield + invoke/yield was so close to that of
+invoke/yield_to/yield that the need of a separate scheduler
+disappeared greatly simplifying performance as an `asio::io_service`
+works perfectly as a scheduler.]
+
+[h3 Asynchronous functions are not wrapped]
+
+Most cooperative threading libraries (for example the __Pth__ library)
+deal with blocking behavior by wrapping asynchronous call behind a
+synchronous interface in the belief that asynchronous calls
+are a source of problems. Your author instead believes that are not
+the asynchronous calls themselves that complicate code, but the need
+to divide related code into multiple independent callback
+functions. Thus Boost.Coroutine doesn't try to hide the powerful
+Boost.Asio asynchronous interface behind a synchronous one, but simply
+helps dealing with the control inversion complication caused by the
+proliferation of small callbacks.
+
+In fact __coroutines__ are not meant to be the silver bullet. Sometimes separated
+callbacks (maybe even defined in line with the help of Boost.Bind or
+Boost.Lambda) might be the right solution. One can even mix both
+styles together and use the best tool for each specific job.
+
+[#multi_wait]
+
+[h3 Multi-argument wait]
+
+It follows from the previous point that Boost.Coroutine is not a generalized
+asynchronous framework. Do not confuse `wait` as a general purpose 
+demultiplexer. The ability to wait for multiple futures is provided to
+simplify some scenarios, like performing an operation while waiting
+for a timer to expire, or reading and writing from two different
+pipes. A coroutine that routinely waits for more that two or three futures,
+should probably refactored in multiple coroutines. 
+
+[endsect]
+
+[section:todo Further Development]
+[h3 Introduction]
+
+The main reason behind the development of Boost.Coroutine has been to
+find a solution to the inversion control problem in event
+driven web servers. From there the library has evolved to a general
+coroutine library, whose usefulness goes beyond event driven
+applications. 
+
+Both developing the library and writing the documentation have been a
+great learning exercise. The authors feels that it has only scratched
+the possibilities of coroutine oriented design.
+
+Here are presented some useful additions to the library that have not
+been added yet for lack of time, lack of a complete understanding of
+the problem or both.
+
+[h3 Pipelining]
+
+The [link coroutine.producer_consumer1 producer/consumer example]
+briefly mention the possibility of pipelining coroutines. This could
+be a powerful way of composing coroutines (and function objects in
+general), and should be explored further. This is not necessarily
+confined to this library though.
+
+[h3 Output iterators]
+
+The __generator__ class template provides an input iterator interface
+behind coroutines. For symmetry an output iterator interface is
+conceivable. 
+
+[h3 Generator caching]
+
+With the current implementation, a compiler cannot optimize (for
+example by inlining the coroutine in the caller) across a context
+switch barrier. It might be useful thus to do more work between
+context switches. This can be accomplished by returning more than one
+value at a time.
+
+Currently the user must apply this optimization by hand, and both the
+caller and the callee must be aware of it. Boost.Coroutine might
+provide a way to do this transparently.
+
+[h3 Context caching]
+
+Creating a coroutine requires dynamically allocating both the
+coroutine implementation and the coroutine stack. This could be a
+performance hit if coroutines are created and destroyed
+frequently. Unfortunately a normal custom allocator cannot be used
+because on some systems it is not possible to create the internal
+coroutine implementation and stack on user provided memory. Thus a
+context and stack caching system should be devised. 
+
+[h3 Future allocator]
+
+A __future__ internal implementation is heap allocated. Futures should
+be considered cheap object to create, so it makes sense to provide the
+ability to specify an allocator if allocation becomes a bottleneck. An
+allocator that uses memory from the coroutine stack would be useful,
+and may be even the default. This would match well the future usage
+that requires a future not to outlive the owning coroutine.
+
+[endsect]
+
+[section:details Details]
+
+[h3 Introduction]
+
+Coroutines cannot be implemented within the rule of the
+`C++` language. This is also true for threads. But while threads are
+likely to be incorporated into the next release of the `C++` standard,
+with coroutines we are mostly on our own.
+
+This section will describe the general internal design of
+Boost.Coroutine and describe the implementation in two different
+platforms.
+
+[section:supported Supported platforms]
+
+Boost.Coroutine is known to compile on both GCC 3.4.6 and Visual C++
+8.0. 
+
+It should work on all windows variants that support the fiber API
+(that is, all NTs and all windows 9x derivatives since windows 98). 
+
+It has specific support for Linux x86 based systems using GCC and 
+zero overhead exception handling (the default). The same
+implementation should be trivially portable to most BSD derivatives.
+
+For generic Unix systems a makecontext based implementation is
+provided, but it is [link coroutine.fibers not guaranteed to work on
+all systems]. It may also not be 64 bit clean (this should be trivial
+to fix).
+
+[endsect] 
+
+[section:performance Performance]
+
+Ideally the cost of a coroutine call should be comparable to the cost
+of an indirect function call. Currently Boost.Coroutine, at least on
+Linux-x86-GCC come close to 150% of the speed of Boost.Function,
+itself comparable to the cost of an indirect function call. The Win32
+implementation has not been benchmarked, but it might be slightly slower
+because of the need to switch exception contexts and some missed
+optimization opportunities. The `makecontext` based implementation is
+at least three orders of magnitude slower than the others due to the
+need to perform a system call per context switch.
+
+To get good performance on `Win32` systems, a call to
+`ConvertThreadToFiber` should be [link
+convert_thread_to_fiber_optimization performed] on each thread that
+will 
+invoke coroutines. Else a much slower code path will be used that may
+potentially make context switches extremely expensive.
+
+[endsect]
+
+
+[section:implementation Implementation]
+
+[#duff_device]
+
+[h3 A simple trick, the Duff device]
+
+It is possible to implement a very restricted set of coroutine
+functionality entirely within the language rules, using a variation of
+the duff device. See for example__XXX__. While this
+is a cunning hack, it has some severe limitations that makes it
+unsuitable for a general purpose library like Boost.Coroutine:
+
+* Does only support /semi/-coroutines: cannot yield form inside nested
+functions. 
+* There can only be one instance of a coroutine for each coroutine body. 
+* Local variables are static. This means that they are not destroyed
+when exceptions are thrown. In general the use of statics as locals is
+questionable.
+
+[#task_switching_model]
+
+[h3 The stack switching model]
+
+Boost.Coroutine is implemented around a stack switching model; that
+is, every time a coroutine is entered, the following actions are
+carried:
+
+* The caller instruction pointer and callee clobbered registers are
+saved on the caller stack (this is done automatically as part of the
+call to the context switching routine respectively by the compiler and
+by the CPU).
+* the set of callee save registers are saved by the context switching
+routine on the caller stack.
+* The caller stack pointer is saved inside the caller context
+structure. This structure is stored on the coroutine context if a
+yield_to or yield is being performed, else it is also on the caller stack.
+* The callee stack pointer is retrieved from the callee context
+structure and set as current stack pointer.
+* Callee save registers are popped from the callee stack.
+* The context switching routine returns, restoring automatically from
+the new stack the called coroutine instruction pointer and clobbered
+registers.
+
+This process is inherently non portable, requires intimate knowledge
+of the target CPU and environment, and some assembly code. Also it
+assumes the existence of both a stack and a real CPU, neither of witch are
+required by the standard. 
+
+In practice the library should be portable to most platforms that have
+a `C++` implementation, with only minimal changes. CPUs with registers
+windows shouldn't be a problem, nor should be systems with multiple
+stack. For example HP provides assembler
+source for coroutine stack switching for the Itanium architecture,
+that has both registers windows and multiple stacks __HP_coroutines__.
+
+Implementing Boost.Coroutine on an `C++` interpreter would require
+support form the interpreter. 
+
+If all else fail, there is still the possibility of implementing
+Boost.Coroutine in top of threads, albeit at a very high performance
+penalty. 
+
+[h3 The myth of a portable coroutine library]
+
+Writing a portable coroutine library has been the subject of numerous
+studies. A part from the limited [link duff_device Duff device-based
+trick], the most promising has been the stack copying model. The
+lower and highest addresses of the current stack are calculated by
+taking the address of appropriately placed local objects. Then, when
+the stack switching is required, the current stack is copied to some
+backup location and from another location a target stack is copied in
+place of the old stack. The actual context switch is performed using
+`setjmp` and `longjmp`. As an optimization, the address of
+the stack pointer is found, in a non portable manner, in the `jmp_buf`
+and the stack is switched by modifying this pointer instead of
+performing an expensive copy.
+
+This trick has meet a moderate success in the `C` world, even if in
+practice libraries using this trick need to take special per-platform
+actions (like working around standard libraries bugs, eager
+optimizers or simply identifying the position of the stack pointer in
+`jmp_buf`). Notice that nowhere the `C` standard guarantees that the
+stack can be switched with impunity. In fact, it doesn't even
+guarantees that a stack exists at all (so does the `C++` standard).
+
+In the `C++` world things are complicated by the fact that the
+standard permits an implementation of `longjmp` to unwind the stack
+and call destructors. Usually the compiler determines how much to
+unwind the stack by comparing stack pointers. Modifying this pointer
+will wreak havoc. While most implementations do not take advantage of
+this possibilities, at least the __Itanium_ABI__ (that by no mean is
+restricted to this platform: for example is supported by the GCC
+compiler on most platforms it runs on) requires that. Also
+the __LLVM__ compiler provides a `__builtin_longjmp` builtin that is
+documented to unwind the stack (even if a standard library is not
+required to implement `longjmp` in term of this builtin, it is likely
+to do so).
+
+Also some compilers and some operating systems requires some work to
+switch exceptions context. This is true at least on `Win32` and on GCC
+`setjmp/longjmp` based exception handling. This is very system
+specific and a library that doesn't take this into account is likely
+to be defective.
+
+Finally the interaction between coroutines and threads must be taken
+into account and any incompatibilities must be documented or fixed.
+
+In conclusion, the backend of a `C++` coroutine library cannot be
+oblivious of the system it runs on, thus it might as well be system
+specific. Similar platforms common code may still be shared.
+
+Currently the library uses `fibers` on `Win32` systems, custom
+assembler code on the very specific "GCC-linux-x86 using
+frame-unwind-tables based exception handling and a generic 
+`makecontext/setcontext` based implementation on `POSIX 2001`
+compliant systems. Note that, as the `POSIX` standard
+knows nothing about `C++`, this is not guaranteed
+to work on all platforms. Also the interaction between threads and
+user contexts is not specified by the standard.
+
+[h3 Extensibility]
+
+The library has been designed to be very easily ported to other
+environments. All classes that need access to the non portable context
+switching code have a (currently undocumented) extra template
+parameter that permit the selection of the context switching
+implementation at compile time. Thus is technically possible to mix
+different context implementations in the same library.
+
+The context switching support is very simple and tightly contained. It
+only requires a context structure and two function for context setup
+and context swap (the interface is modeled around the `POSIX
+ makecontext API`). At this time the actual extension interface is not
+documented and a private detail, because it is likely to be further
+simplified (the current requirements of the `Context` concept have
+been complicated to explore potential performance optimizations).
+
+[h3 A wild dream: Compiler support for coroutines]
+
+The stack switching model, while good enough for generalized cooperative
+multitasking, prevents some useful compiler optimizations. For example
+a compiler cannot optimize across a coroutine call, nor can inline the
+coroutine in the caller. This is expected in when the target is not
+statically known, for example in an event dispatching loop, but in
+usages where the control flow can be statically determined is a
+loss. For example generators function objects can usually be inlined
+while coroutine based function objects cannot.
+
+A compiler that knows about coroutines could apply the same
+optimizations to coroutine based code, as long as a context switch
+target is known. This should not require much more power than the
+ability to inline function pointers and convert a coroutine body to
+callback based code. Even dynamic coroutine code could
+be rewritten it to callback based code, but in this case
+an indirect jump is required anyways and is not necessarily a win.
+
+Compilers capable of inlining coroutines already exist.
+For example, compilers for languages with support for continuations
+often transform the code to be complied in the so called continuation
+passing style. Coroutines in these languages can be trivially
+implemented as continuations. These compilers can then optimize
+the code in *CPS* form, potentially inlining some continuation
+calls. Thus potentially coroutines are optimized too. 
+
+Unfortunately the *CPS* form is not suitable for `C` and `C++` because
+it does not match well the execution model of these languages and even if possible it could
+impose some overhead. 
+
+The `C# 2.0` language requires compilers to be capable of transforming
+/semi/-coroutine based code to callback based code. 
+These compilers are not much different from `C++` compilers. While the
+limitation to optimize /semi/-coroutine can seem major, in practice a
+coroutine can be converted to a /semi/-coroutine if all nested
+functions that call `yield` can be inlined in the coroutine itself. A
+compiler could fall back on stack switching if it cannot inline a
+`yield` (or it doesn't know at all if a function can yield).
+
+[endsect]
+
+[section:fibers Case study 1: Win32 Fibers]
+
+[h3 Introduction]
+
+This section will shortly describe the `Win32 fibers` facility, compare
+them to the `POSIX makecontext/swapcontext API`
+and finally show how Boost.Coroutine can be implemented in term of
+fibers.
+
+[blurb __alert__ `POSIX` compliance does not guarantee the presence of
+the context [^API], as this is an optional feature. It is required by
+the `Single Unix Specification`, also known as [^X/Open System
+Interface].]
+
+[h3 The APIs]
+
+The `fiber API` in practice implements pure symmetric coroutines. While
+argument passing from coroutine to coroutine is not explicitly
+supported, it can be implemented easily on top of the existing
+facilities.
+
+The `makecontext/swapcontext API` is extremely similar as it supports
+argument-less symmetric coroutine switching.
+
+The `SwitchToFiber` function is used to yield from the current fiber
+to a new one. Notice that it requires that a fiber is already
+running. The current context is saved in the current fiber. 
+
+[blurb __note__ `Win32` also provides `SwitchToFiberEx` that can
+optionally save the floating point context. The Microsoft
+documentation warns that if the appropriate flag is not set the
+floating point context may not be saved and restored correctly. In
+practice this seems not to be needed because the calling conventions
+on this platform requires the floating point register stack to be empty before calling any
+function, `SwitchToFiber` included. The exception is that if the
+floating point control word is modified, other fibers will see the new
+floating point status. This should be expected thought, because the
+control word should be treated as any other shared
+state. Currently Boost.Coroutine does 
+not set the "save floating point" flag (saving the floating
+point control word is a very expensive operation), but seems to work
+fine anyway. To complicate the matter more, recent `Win32`
+documentation reveal that the  `FIBER_FLAG_FLOAT_SWITCH` flag is no
+longer supported since Windows XP and Windows 2000 SP4.] 
+
+The corresponding function in the `POSIX` standard is `swapcontext` that
+saves the current context in a memory area pointed by the first
+argument and restores the context pointed by the second argument. This
+function is more flexible than `SwitchToFiber` because it has no
+concept of current fiber. Unfortunately it is also deeply flawed
+because the standard requires
+requires the signal mask to be saved and restored. This in turn
+requires a function call. Because of this, at least on Linux,
+`swapcontext` is about a thousand times slower than an hand rolled
+context switch. `SwitchToFiber` has no such a problem and is close to
+optimal. 
+
+The `fiber API` requires a context to be created with a call to
+`CreateFiber`. The stack size, the address of the function that
+will be run on the new fiber, and a void pointer to pass to this
+function must be provided. This function is simple 
+to use but the user cannot provide its own stack pointer (useful if a
+custom allocator is used). The function will return a pointer to the
+initialized fiber.
+
+`POSIX` has `makecontext`, that takes as parameter a context previously
+initialized, a function pointer to bind to the context and a void
+pointer to be passed to the function. The function is a bit more
+awkward to use because the context to be initialized by a call to
+`getcontext` and some fields (specifically the stack pointer and stack
+size) to be manually initialized. On the other hand the user can
+specify the area that will be used as a stack.
+
+The `fiber API` provides a `DeleteFiber` function that must be called
+to delete a fiber. `POSIX` has no such facility, because contexts are
+not internally heap allocated and require no special cleanup. The user
+is responsible of freeing the stack area when no longer necessary.
+
+[#convert_thread_to_fiber]
+
+A quirk of the `fiber API` is the requirement that the current thread
+be converted to fiber before calling `SwitchToFiber`. (`POSIX` doesn't
+require this because `swapcontext` will initialize automatically the
+context that it is saving to). A thread is converted with a call to
+`ConvertThreadToFiber`. When the fiber is not longer needed a call to
+`ConvertFiberToThread` must be performed (It is not required that the
+fiber to be converted to thread was the original one) or fibrous
+resources are leaked. Calling `ConvertThreadToFiber`more than once
+will also leak resources. Unfortunately the `Win32` does not include a
+function to detect if a thread has been already converted. This makes
+hard for different libraries to cooperate. In practice it is
+possible, although undocumented, to detect if a thread has been
+converted, and Boost.Coroutine does so. `Longhorn` will provide an
+`IsFiber` function that can be used for this purpose.
+
+[blurb __note__ For the sake of information we document here how
+`IsFiber` can be implemented. If a thread has not been converted, `GetCurrentFiber` will
+return null on some systems (this appears to be
+the case on `Windows95` derived OSs), or 0x1E00 on others (this
+appears to be the case on NT derived systems; after a thread has been
+converted and reconverted it may then return null). What the magic
+number 0x1E00 means can only be guessed, it is probably related to the
+alternate meaning of the fiber pointer field in the Thread
+Identification Block. This field in fact is also marked as
+`TIB Verion`. What version is meant is not documented. This is
+probably related to compatibility to the common ancestor of `NT` and
+`OS/2` where this field is also identified with this name. While this
+magic number is not guaranteed to stay fixed in 
+future system (although unlikely to change as the OS vendor is very
+concerned about backward compatibility), this is not a problem as
+future `Win32` OSs will have a native `IsFiber` functions.]
+
+[h3 The environments]
+
+`Win32` explicitly guarantees that contexts will be swapped correctly
+with fibers, especially exception handlers. Exceptions, in the form of
+Structured Exception Handling, are a documented area of the operating
+system, and in practice most programming language on this environment
+use *SEH* for exception handling. Fibers guarantee that exceptions
+will work correctly. 
+
+The `POSIX API` has no concept of exceptions, thus there is no guarantee
+that they are automatically handled by `makecontext/swapcontext ` (and
+in fact on many systems they not work correctly). In practice systems
+that use fame unwind tables for exception handling (the so-called no
+overhead exception handling) should be safe, while
+systems that use a `setjmp/longjmp` based system will not without
+some compiler specific help.
+
+`Win32` guarantees that a `fiber` can be saved in one thread and
+restored on another, as long as fiber local storage is used instead of
+thread local storage. Unfortunately most third party libraries use
+only thread local storage. The standard C library should be safe
+though.
+
+`POSIX` does not specify the behavior of contexts in conjunction with
+threads, and in practice complier optimizations often prevent contexts
+to be migrated between threads.
+
+[h3 The implementation]
+
+Boost.Coroutine can be straightforwardly implemented with the
+`makecontext/swapcontext API`. These functions can be directly mapped
+to `__yield_to__()`, while a transformation similar to the one
+described [link symmetric_transformation here] is used to implement
+asymmetric functionality.
+
+It is more interesting to analyze the implementation of
+Boost.Coroutine on top `fibers`. 
+
+When a coroutine is created a new `fiber` is associated with it. This
+fiber is deleted when the coroutine is destroyed. Yielding form
+coroutine to coroutine is done straight forwardly using `SwitchToFiber`.
+
+[#convert_thread_to_fiber_optimization]
+
+Switching from the main context to a coroutine is a bit more
+involved. Boost.Coroutine does not require the main context to be a
+coroutine, thus `ConvertThreadToFiber`is only called lazily when a
+coroutine call need to be performed and `ConvertFiberToThread` is
+called immediately after the coroutine yields to the main
+context. This implies a huge performance penalty, but correctness has
+been preferred above performance. If the thread has been already
+converted by the user, the calls to the two functions above are
+skipped and there is no penalty. Thus performance
+sensitive programs should always call `ConvertThreadToFiber`
+explicitly for every thread that may use coroutines.
+
+[h3 Conclusions]
+
+Of the two `APIs`, the `POSIX` one is simpler to use and more flexible
+from a programmer point of view, but in practice it is not very useful
+because it is often very slow and there are no guarantees that it will
+work correctly on all circumstances.
+ 
+On the other hand the `fiber API` is a bit more complex, and matches
+less with the spirit of Boost.Coroutine, but the detailed description
+of the `API`, the guarantee that the operating system supports it and
+the support for migration, make it the most solid implementation of
+coroutines available.
+
+Finally, while `makecontext` and family are considered obsolescent
+since the last `POSIX` edition, the `fiber API` is here to stay,
+especially because it seems that the new `.NET` environment makes use
+of it.
+
+[endsect]
+
+[section:linuxasm Case study 2: Linux-x86-GCC]
+
+[h3 Introduction]
+
+In this section we will show an example of an assembly
+implementation of Boost.Coroutine low level context switching. While
+the example is x86 and Linux specific, it can easily generalized to
+other operating systems and CPUs. It is believed that the same code
+should work unmodified on BSDs derived systems.
+
+Notice that the examples here will use the [^AT&T] assembler syntax
+instead of the more common [^Intel] syntax. There aren't many
+differences except that the order of source and destination operands
+are reversed and the opcode name encodes the length of the operands.
+
+[h3 Initial code, [^libc swapcontext] implementation]
+
+The exploration of a possible stack switching implementation has
+started from an analysis of the [^GNU glibc swapcontext]
+implementation. We do not include the actual code here because of
+license issues, but will comment it. The actual code can be found in
+the file __swapcontext_S__ of the [^glibc] source archive.
+
+# `swapcontext` first load the address of the buffer where the context
+will be saved from the stack, where it has been pushed as part of the
+call setup. This buffer will be called the /destination buffer/.
+
+# Then `movl` is used to copy all general purpose register content to
+the destination buffer. For `EAX` a dummy value is saved because it
+will be clobbered by `swapcontext`.
+
+# The value of the instruction pointer a the time of the call
+to `makecontext` is saved in the destination buffer. The value of this register is
+retrieved from the stack, where it had been pushed by the `call
+makecontext` instruction.
+
+# The `ESP` stack pointer is saved in the destination buffer.
+
+# Then the `FS` segment register is saved in the destination
+buffer. Originally `swapcontext` 
+also saved the `GS` register, but it has been found that this
+conflicted with threading`.
+
+# The floating point environment is saved with a call to `fnstenv` in
+the destination buffer. This includes the control word, status word,
+tag word, instruction pointer, data pointer and last opcode, but
+excludes the floating point register stack. This is about 28 bytes of data.
+
+# The address of the structure that will be restore is loaded from the
+stack. This will be called the /source buffer/. All above operations
+are reversed in `LIFO` order.
+
+# The current signal mask is saved in the destination buffer. The
+signal mask to be restored is loaded from the source buffer.
+
+# The `sigprocmask` system call is invoked to restore the signal mask. 
+
+# The floating point environment is restored from the source buffer.
+
+# The `GS` register is restored from the source buffer.
+
+# The stack pointer is restored from the source buffer. This in
+practice switches stacks.
+
+# The return address (`EIP`) is restored from the source buffer and
+pushed in the stack.
+
+# All general purpose registers are restored from the source buffer.
+
+# `ret` is used to pop the instruction pointer and jump to it.
+
+[h3 Optimizing `makecontext`]
+
+The above implementation suffer from various inefficiencies. The most
+glaring one is the call to `sigprocmask` that alone wastes thousands of
+cycles. Unfortunately the `POSIX` standard requires
+it. Boost.Coroutine does not deal with the signal mask and consider it
+as any shared resource. It is the responsibility of the user to guard
+against unsafe access to it. 
+By simply removing the call the function
+can be sped up by three order of magnitude. 
+
+We can do
+better. Saving and restoring a segment register is an expensive
+operation, because requires not only the register content to be
+reloaded but also the segment descriptor entry from the segment
+table. The Linux operating system prohibits the user to change the
+`FS` register, thus we should be able to safely omit saving and
+restoring it.
+
+We also do not need save the floating point environment. This should
+be considered shared state. This saves lots of cycles as it is an
+expensive operation too.
+
+finally we do not need to save all general purpose registers. The
+Linux calling conventions state that [^EAX, ECX] and [^ECX] are callee
+clobbered and the caller should not expect these to be preserved. This
+is also true of the floating point stack that is required to be empty
+when calling a function (and in fact `makecontext` acknowledges this
+by not saving the floating pointer register stack).
+
+[h3 `swapcontext_stack`]
+
+Here we will present the `swapcontext` implementation used by
+Boost.Coroutine on Linux x86 systems. Note that this implementation is
+*not* derived from `glibc` and has been independently developed. Also
+note that this is not a drop-in replacement for `swapcontext`.
+
+The `C++` prototype for this function is:
+
+  extern "C" void swapcontext_stack (void***, void**) throw()
+  __attribute((regparm(2))); 
+
+Where `__attribute((regparm(2)))` is a `GCC` extension to require pass
+by register parameters. The first parameter is a pointer to a pointer
+to the destination stack (here identified as an array of void pointers for
+simplicity), while the second is a pointer to the source stack. In
+practice the first is a pointer to the memory area where the
+destination stack pointer is stored and the second is the stack
+pointer that will be restored.
+
+This is the body of `swapcontext_stack`
+
+[pre
+        pushl %ebp      
+        pushl %ebx      
+        pushl %esi      
+        pushl %edi      
+        movl  %esp, (%eax)
+        movl  %edx, %esp
+        popl  %edi      
+        popl  %esi      
+        popl  %ebx              
+        popl  %ebp
+        ret
+]
+
+This function requires `EAX` to point to the destination stack
+pointer, while `EDX` is the new stack pointer. `swapcontext_stack`
+first saves all caller save registers on the old stack, then saves the
+stack pointer in the location pointed by `EAX`, then load `EDX` as the
+new stack pointer and restore the caller save registers from the new
+stack. The final `ret` will pop the return address and jump to it.
+
+The amount of instructions in this implementation is close to optimal,
+also there are no register dependencies between them (all `popl`
+instructions depend on the `ESP` load, but substituting them with `movl
+offset(%ecx)` didn't increase performance).
+
+Still this function is not optimal. The last `ret` will be always
+mispredicted by most CPUs. On `NetBurst` architectures (i.e. Pentimu 4
+and derived) this implies an overhead of at least 25 cycles (but very
+often more than 50) to flush the pipeline. 
+Considering an unrealistic worst case of one instruction
+per cycle for the previous function, the misprediction alone is more
+than two times the cycle count of `swapcontext_stack` itself.
+
+[h3 Jump prediction]
+
+Before showing how `swapcontext_stack` can be further optimized we
+need to understand a little how branch prediction work on modern
+architectures.
+
+Most CPUs have special circuitry to predict complex patterns of
+conditional jumps, but usually can only predict indirect jumps
+(i.e. jumps trough a pointer) to go to the location the same
+instruction jumped the last time (the CPU keeps a table that
+associates the address of a jump instructions with the addresses it
+jumped to the last time). Thus a jump that always go to the same place
+is always predicted, while a jump that alternates between two
+different targets is always mispredicted.
+
+For example `swapcontext_stack` is used both to call a coroutine and
+to return from it. Consider a loop that repeatedly invokes a coroutine
+and return from it (for example a generator invoked by
+`std::generate`): the indirect call will be always mispredicted.
+
+`ret` instructions are usually treated specially by CPUs, and instead
+of being predicted to jump where they jumped the last time, a return
+stack buffer is used to try to predict where the jump will
+return. When a call is made, the caller address is pushed in the
+return stack buffer and when a `ret` is performed, the address in the
+top of the stack is used to predict where the `ret` will go. This
+means that the `ret` in `swapcontext_stack` will be always
+mispredicted, because it will never jump to the caller of
+`swapcontext_stack`. 
+
+Finally, it seems that new generations of processors could have more
+advanced indirect branch prediction functionality. At least the
+`Pentium M` seems to be able to predict simple patterns of indirect
+jumps.
+
+For reference see  __Intel06__ and __Fog06__.
+
+[h3 Optimizing the `ret`]
+
+We have seen that the first step to optimize `swapcontext_stack` is to
+substitute `ret` with a `popl %ecx; jmp *%ecx` pair. This gives the
+CPU a chance to predict the jump but is not enough. As a CPU will
+predict the jump to go where it did the last time, we need to have
+different jumps for each target. This is not obviously possible for
+dynamic code where at any point any coroutine could be invoked or a
+coroutine could yield to any other. But when the same coroutine is
+always called in a loop, the pattern is static and could be
+optimized. If we used two different jumps to invoke and yield from the
+coroutine, it will always be predicted. The simplest way to do that is
+to duplicate the code for `swapcontest_stack` in `swapcontext_swap_up`
+and swapcontext_swap_down`. The first is used for the invocation, the
+second for the yield. Other than that, the code is exactly the
+same. Measurements show a performance increase of at least 50% in the
+previous scenario. 
+
+In a dispatcher based scenario, the jump in `swapcontext_stack_up` will
+always be mispredicted, while the one in `swapcontext_stack_down` will
+always be predicted correctly to return to the dispatcher; thus, while
+the win is smaller, is sill better than mispredicting every time. This
+is why an "invoke + yield + invoke + yield" is not necessarily slower
+than "invoke + yield_to + yield".
+
+[h3 Inlining `swapcontext`] 
+
+If the compiler could inline `swapcontext`, we would have many more
+jumps and a much bigger chance of being predicted. Boost.Coroutine
+contains experimental code to do that, but is currently disabled
+because the inline assembler code used is not yet believed to be
+completely safe.
+
+[h3 Handling exceptions]
+
+The code is believed to work correctly with exceptions on systems that
+use the zero overhead exception handling model (as do most GCC targets
+today). In this model there are no pointers to exception chains to be manipulated
+and restored on context switch.
+
+[h3 Conclusions]
+
+We have seen one possible assembler implementation of
+`swapcontext`. While the code is very system specific, it could easily
+be ported on many more systems following a similar model. Also the
+analysis of the branch prediction functionality is by no mean limited
+to `IA32` CPUs.
+
+[endsect]
+
+[section:coroutine_thread Interaction between coroutines and threads]
+
+[h3 Introduction]
+
+On the planning stage of the library, it was believed that being able
+to migrate a coroutine from one thread to another was a desirable
+property, and even a necessary one to take full advantage of the
+completion port abstraction provided by the `Win32 API`. During
+the implementation stage it became apparent that guaranteeing this
+property was going to be a considerable challenge. 
+
+In the end the decision to prohibit migration as been taken. 
+This section shows why it is unfeasible with current
+compilers/standard libraries to allow coroutine migration.
+
+[h3 The problems]
+
+One of the problems with migrating coroutines is the handling of thread local
+storage. If such an object is accessed, the thread specific
+copy is acceded instead. Consider the following code
+(it is plain `C` to simplify the generated assembler output, but is by
+no mean restricted to it):
+
+  __thread int some_val;
+
+  void bar();
+
+  int foo () {
+    while(1) {
+      bar();
+      printf("%p", &test);
+    }
+  }
+
+The `__thread` storage class is a `GCC` extension to mark a global
+object as having thread specific storage. Most compilers that support
+threaded applications have similar facilities albeit with slightly
+different syntaxes.
+Let suppose that every time `bar()` is invoked, `foo()` is suspended
+and then resumed in another thread. We would expect that at every
+iteration `printf()` will print a different address for `test`, as
+every thread has its own specific instance. For this function GCC
+generates the current assembler output (non relevant parts have been
+omitted): 
+
+[pre
+  .L2
+        call    bar
+        movl    %gs:0, %eax
+        leal    test@NTPOFF(%eax), %eax
+        pushl   %eax
+        pushl   $.LC0
+        call    printf
+        popl    %eax
+        popl    %edx
+        jmp     .L2
+]
+
+This is straightforward. The first line calls bar, the
+second line loads from the thread register (GCC uses the `GS` segment
+register as a thread register) the address of the *TLS* area, then
+the third line load the address of the current thread instance of
+`test` in `EAX`. The fourth and fifth line push on the stack the
+parameters for printf (`$.LCO` is the symbol that contains the string
+`"%p"`). The sixth line calls it. The seventh and eight line pop the
+argument from the stack and finally the last line returns to the
+first.
+
+This code does the right thing at every iteration print the a new
+value for the address of `test`. If we compile at an higher
+optimization level things are no longer fine:
+
+[pre
+        movl    %gs:0, %eax
+        leal    test@NTPOFF(%eax), %ebx
+.L2:
+        call    bar
+        pushl   %ebx
+        pushl   $.LC0
+        call    printf
+	popl    %ebx
+        popl    %edx
+        jmp     .L2
+]
+
+Even on an optimization level as low as [^-O1] (usually considered
+safe), the compiler hoists the load of the address of `test` outside
+the loop. Now the loop will always print the same value.
+
+Unfortunately this specific compiler provides no switch to disable this
+specific optimization. Other compilers might do the same thing. The
+only compiler we know that provides a switch to explicitly disable
+this optimization is Visual C++, as this is often used with code that
+uses fibers.
+
+ It might be argued that `__thread` is not part of the
+`C++` standard, so its handling is undefined anyway. Putting aside
+the fact that something similar to `__thread` is likely to be part of
+the next release of the standard, abstaining from using it is not a
+solution. For example on many systems the `errno` macro expands to a
+symbol declared the equivalent of `__thread`. Also thread local
+variables might be used in standard library facilities (memory
+allocation is a very likely candidate), and an optimizer capable of
+inlining library functions might hoist loads of those variables
+outside loops or at least move them across yield points.
+
+Fixing compilers is unfortunately not enough. Operating systems might
+need to be fixed too; consider the following code:
+
+  mutex mtx;
+
+  void bar();
+
+  void foo() {
+    lock(mtx);
+    bar();
+    unlock(mtx);
+  }
+
+Where `mutex` is some synchronization primitive, and `bar()` a
+function may migrate the current coroutine to another thread. Aside of 
+the fact that is bad practice to hold a lock across a yield point,
+many operating systems require a mutex to be unlocked by the same
+thread that locked it, breaking the code above.
+
+[h3 Conclusion]
+
+The above scenarios are just two examples. There are many possible
+ways that coroutine migration could break otherwise perfectly fine
+code. For reference see
+[@http://blogs.msdn.com/cbrumme/archive/2004/02/21/77595.aspx this
+blog about using fibers in .NET code] and
+[@http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnsqldev/html/sqldev_02152005.asp
+MSDN article about the perils of fiber mode in SQL Server].
+
+In the end Boost.Coroutine provides the only thread safety guarantees
+that are believed to be safe on all systems. Note that, as coroutines
+are not to be shared between threads, internal reference counting is
+not thread safe (it doesn't necessarily use atomic operations).
+
+[endsect]
+
+[endsect]
+
+[section:acknowledgments Acknowledgments]
+[endsect]
+
+[section:bibliography Bibliography]
+
+
+
+# [#marlin-doctoral-thesis] [^Marlin, C. D. 1980]. ['Coroutines: A Programming Methodology, a Language Design
+  and an Implementation].\n LNCS 95, Springer-Verlag.\n\n
+
+# [#why-threads-are-a-bad-idea] [^Ousterhout, J. K. 1996]. ['Why Threads Are A Bad Idea (for most
+   purposes)].\n Presentation given at the 1996 Usenix Annual
+   Technical Conference, January 1996.\n\n
+
+# [#the-10k-problem] [^Kegel, D 1999-2006]. ['The C10K problem]. \n\n High quality web resource about
+scalability of highly concurrent Internet services. Provides a
+detailed analysis benefits and caveats of both threaded and event driven designs, plus
+pointers to many other web resources and
+papers. [@http://www.kegel.com/c10k.html]. \n\n
+
+#[#cooperative-task-management] [^Adya, A., Howell, J., Theimer, M., Bolosky, W. J., and Doucer, J. R. 2002].
+  ['Cooperative Task Management without Manual Stack Management]. \nIn Proceedings
+  of USENIX Annual Technical Conference. USENIX, Monterey, CA.\n\n
+
+#[#why-events-are-a-bad-idea] [^Behren, R., Condit, J., and Brewer, E. 2003]. ['Why Events are a Bad Idea (for high-
+  concurrency servers)]. \nIn Proceedings of the 9th Workshop on Hot Topics in Operating
+  Systems (HotOS IX). Lihue, HI.\n\n
+
+#[#moura-04-04] [^Moura, A. L., Ierusalimschy R. 2004]. ['Revisiting
+Coroutines].\n\n In
+32 pages describes coroutines, demonstrates their equivalence to
+continuation, shows the /Lua/ coroutine interface and gives high
+quality examples of coroutine usage. Highly recommended
+read. Available at [@www.inf.puc-rio.br/~roberto/docs/MCC15-04.pdf].\n\n
+
+#[#itanium-coroutines] [^Saboff, M 2003]. ['Implementing User Level Threading on the Intel
+Itanium Architecture].\n\n Explains why `setjmp/longjmp` cannot be used
+to implement coroutines on the Itanium architecture and then describe
+an alternative implementation.\n\n
+
+#[#agner-fog-documentation] [^Fog, A 2006]. ['Microarchitecture of Intel and AMD CPU's. An
+optimization guide for assembly programmers and compiler
+makers].\n\n Probably the best in-depth guide about optimizing for the
+IA-32 and IA-32E architecture. Available at [@http://www.agner.org/optimize/]\n\n
+
+#[#intel-optimization-guide] [^Intel, 2006]. ['IA-32 Intel Architecture Optimization Reference
+Manual]. Order number: 248066-013US.\n\n
+
+[endsect]
+  
+[/temporary removed for upload
+[xinclude autodoc.boostbook]
+]
+
+ 
+
+	
