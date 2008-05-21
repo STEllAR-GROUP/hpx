@@ -23,6 +23,12 @@
 #define HPX_ACTION_LIMIT 6
 #endif
 
+///////////////////////////////////////////////////////////////////////////////
+/// This defines the number kept alive of outgoing (parcel-) connections
+#if !defined(HPX_MAX_CONNECTION_CACHE_SIZE)
+#define HPX_MAX_CONNECTION_CACHE_SIZE 64
+#endif
+
 #endif
 
 

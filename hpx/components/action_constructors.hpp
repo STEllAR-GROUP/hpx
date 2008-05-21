@@ -33,4 +33,6 @@
         : arguments_(BOOST_PP_ENUM_PARAMS(N, args)) 
     {}
 
+#undef N
+
 #endif

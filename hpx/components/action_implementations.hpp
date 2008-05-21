@@ -29,6 +29,7 @@
 #else // defined(BOOST_PP_IS_ITERATING)
 
 #define N BOOST_PP_ITERATION()
+#define HPX_ATION_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n) this->get<n>()
 
     ///////////////////////////////////////////////////////////////////////////
     //  N parameter version
@@ -60,15 +61,11 @@
         {}
         
     private:
-    #define HPX_ATION_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n) this->get<n>()
-
         bool execute(void *component) const
         {
             return (reinterpret_cast<Component*>(component)->*F)(
                 BOOST_PP_REPEAT(N, HPX_ATION_ARGUMENT, _));
         }
-
-    #undef HPX_ATION_ARGUMENT
 
     private:
         // serialization support    
@@ -80,5 +77,8 @@
             ar & boost::serialization::base_object<action>(*this);
         }
     };
+
+#undef HPX_ATION_ARGUMENT
+#undef N
 
 #endif

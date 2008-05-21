@@ -16,7 +16,6 @@
 #include <hpx/naming/locality.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/parcelset/parcelport.hpp>
-#include <hpx/parcelset/server/parcelport_connection.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
@@ -28,7 +27,7 @@ namespace hpx { namespace parcelset
         parcels_(This()),
         new_server_connection_(new server::parcelport_connection(
               io_service_pool_.get_io_service(), parcels_)),
-        here_(here)
+        connection_cache_(HPX_MAX_CONNECTION_CACHE_SIZE), here_(here)
     {
         // initialize network
         using boost::asio::ip::tcp;
@@ -49,7 +48,7 @@ namespace hpx { namespace parcelset
         parcels_(This()),
         new_server_connection_(new server::parcelport_connection(
               io_service_pool_.get_io_service(), parcels_)),
-        here_(address, port)
+        connection_cache_(HPX_MAX_CONNECTION_CACHE_SIZE), here_(address, port)
     {
         // initialize network
         using boost::asio::ip::tcp;

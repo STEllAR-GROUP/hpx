@@ -17,7 +17,9 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/parcelset/parcel.hpp>
 #include <hpx/parcelset/server/parcelport_queue.hpp>
-#include <hpx/parcelset/server/parcelport_connection.hpp>
+#include <hpx/parcelset/server/parcelport_server_connection.hpp>
+#include <hpx/parcelset/parcelport_connection.hpp>
+#include <hpx/parcelset/connection_cache.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
@@ -167,26 +169,38 @@ namespace hpx { namespace parcelset
         template <typename Handler>
         void send_parcel(parcel const& p, naming::address const& addr, Handler f)
         {
+            parcelport_connection_ptr client_connection(
+                connection_cache_.get(addr.locality_.get_endpoint()));
+                
+            if (!client_connection) {
             // Start an asynchronous connect operation. The parcel gets 
             // serialized inside the connection constructor, no need to keep 
             // the original parcel alive after this call returned.
-            server::parcelport_connection_ptr client_connection (
-                new server::parcelport_connection(io_service_pool_.get_io_service(), p));
-
+                client_connection.reset(new parcelport_connection(
+                        io_service_pool_.get_io_service(), 
+                        addr.locality_.get_endpoint(), connection_cache_)); 
+                client_connection->set_parcel(p);
+                
 //             std::cerr << addr.locality_.get_endpoint().address().to_string() << ":" 
 //                       << addr.locality_.get_endpoint().port()
 //                       << std::endl;
             
-            client_connection->socket().async_connect(
-                addr.locality_.get_endpoint(),
-                boost::bind(&parcelport::handle_connect<Handler>, this,
-                    boost::asio::placeholders::error, client_connection, f));
+                client_connection->socket().async_connect(
+                    addr.locality_.get_endpoint(),
+                    boost::bind(&parcelport::handle_connect<Handler>, this,
+                        boost::asio::placeholders::error, client_connection, f));
+            }
+            else {
+            // reuse an existing connection
+                client_connection->set_parcel(p);
+                client_connection->async_write(f);
+            }
         }
         
         // helper functions for sending parcels
         template <typename Handler>
         void handle_connect(boost::system::error_code const& e,
-            server::parcelport_connection_ptr conn, Handler f)
+            parcelport_connection_ptr conn, Handler f)
         {
             if (!e) {
                 // connected successfully, now transmit the data
@@ -209,6 +223,9 @@ namespace hpx { namespace parcelset
 
         /// The next connection to be accepted.
         server::parcelport_connection_ptr new_server_connection_;
+        
+        /// The connection cache for sending connections
+        connection_cache connection_cache_;
         
         /// The local locality
         naming::locality here_;

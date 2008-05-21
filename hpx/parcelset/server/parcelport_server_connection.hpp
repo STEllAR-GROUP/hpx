@@ -6,8 +6,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARCELSET_SERVER_PARCEL_parcelport_connection_MAR_26_2008_1221PM)
-#define HPX_PARCELSET_SERVER_PARCEL_parcelport_connection_MAR_26_2008_1221PM
+#if !defined(HPX_PARCELSET_SERVER_PARCELPORT_CONNECTION_MAR_26_2008_1221PM)
+#define HPX_PARCELSET_SERVER_PARCELPORT_CONNECTION_MAR_26_2008_1221PM
 
 #include <sstream>
 #include <vector>
@@ -40,50 +40,12 @@ namespace hpx { namespace parcelset { namespace server
         /// Construct a listening parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
             parcelport_queue& handler)
-          : socket_(io_service), parcels_(&handler)
+          : socket_(io_service), parcels_(handler)
         {
-        }
-
-        /// Construct a sending parcelport_connection with the given io_service.
-        parcelport_connection(boost::asio::io_service& io_service, parcel const& p)
-          : socket_(io_service), parcels_(NULL)
-        {
-            {
-                // create a special io stream on top of out_buffer_
-                out_buffer_.clear();
-                boost::iostreams::stream<io_device_type> io(out_buffer_);
-
-                // Serialize the data
-                util::portable_binary_oarchive archive(io);
-                archive << p;
-            }
-            out_size_ = out_buffer_.size();
         }
 
         /// Get the socket associated with the parcelport_connection.
         boost::asio::ip::tcp::socket& socket() { return socket_; }
-
-        /// Asynchronously write a data structure to the socket.
-        template <typename Handler>
-        void async_write(Handler handler)
-        {
-            // Write the serialized data to the socket. We use "gather-write" 
-            // to send both the header and the data in a single write operation.
-            std::vector<boost::asio::const_buffer> buffers;
-            buffers.push_back(boost::asio::buffer(&out_size_, sizeof(out_size_)));
-            buffers.push_back(boost::asio::buffer(out_buffer_));
-
-            // this additional wrapping of the handler into a bind object is 
-            // needed to keep  this parcelport_connection object alive for the whole
-            // write operation
-            void (parcelport_connection::*f)(boost::system::error_code const&, std::size_t,
-                    boost::tuple<Handler>)
-                = &parcelport_connection::handle_write<Handler>;
-                
-            boost::asio::async_write(socket_, buffers,
-                boost::bind(f, shared_from_this(), 
-                    boost::asio::placeholders::error, _2, boost::make_tuple(handler)));
-        }
 
         /// Asynchronously read a data structure from the socket.
         template <typename Handler>
@@ -95,6 +57,8 @@ namespace hpx { namespace parcelset { namespace server
                     boost::tuple<Handler>)
                 = &parcelport_connection::handle_read_header<Handler>;
             
+            in_buffer_.clear();
+            in_size_ = 0;
             boost::asio::async_read(socket_, 
                 boost::asio::buffer(&in_size_, sizeof(in_size_)),
                 boost::bind(f, shared_from_this(), 
@@ -110,7 +74,7 @@ namespace hpx { namespace parcelset { namespace server
             boost::tuple<Handler> handler)
         {
             if (e) {
-              boost::get<0>(handler)(e);
+                boost::get<0>(handler)(e);
             }
             else {
                 // Determine the length of the serialized data.
@@ -148,8 +112,7 @@ namespace hpx { namespace parcelset { namespace server
                     archive >> p;
                 
                 // add parcel to incoming parcel queue
-                    BOOST_ASSERT(NULL != parcels_);   // needs to be set
-                    parcels_->add_parcel(p);
+                    parcels_.add_parcel(p);
                 }
                 catch (std::exception const& /*e*/) {
                     // Unable to decode data.
@@ -161,36 +124,37 @@ namespace hpx { namespace parcelset { namespace server
 
                 // Inform caller that data has been received ok.
                 boost::get<0>(handler)(e);
-            }
-        }
 
-        /// handle completed write operation
-        template <typename Handler>
-        void handle_write(boost::system::error_code const& e, std::size_t bytes,
-            boost::tuple<Handler> handler)
-        {
-            boost::get<0>(handler)(e, bytes);    // just call initial handler
+                // Issue a new read operation to read exactly the number of 
+                // bytes in a header.
+                void (parcelport_connection::*f)(boost::system::error_code const&, 
+                        boost::tuple<Handler>)
+                    = &parcelport_connection::handle_read_header<Handler>;
+                
+                in_buffer_.clear();
+                in_size_ = 0;
+                boost::asio::async_read(socket_, 
+                    boost::asio::buffer(&in_size_, sizeof(in_size_)),
+                    boost::bind(f, shared_from_this(), 
+                        boost::asio::placeholders::error, handler));
+            }
         }
 
     private:
         /// Socket for the parcelport_connection.
         boost::asio::ip::tcp::socket socket_;
 
-        /// buffer for outgoing data
-        boost::integer::ubig64_t out_size_;
-        std::vector<char> out_buffer_;
-
         /// buffer for incoming data
-        boost::integer::ubig64_t in_size_;
+        boost::integer::ulittle64_t in_size_;
         std::vector<char> in_buffer_;
 
         /// The handler used to process the incoming request.
-        parcelport_queue* parcels_;
+        parcelport_queue& parcels_;
     };
 
     typedef boost::shared_ptr<parcelport_connection> parcelport_connection_ptr;
 
 ///////////////////////////////////////////////////////////////////////////////
-}}}  // namespace hpx::naming::server
+}}}
 
 #endif

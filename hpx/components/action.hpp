@@ -159,15 +159,14 @@ namespace hpx { namespace components
     //  one parameter version
     template <
         typename Component, int Action, 
-        typename Arg1, 
-        bool (Component::*F)(Arg1) 
+        typename Arg0, bool (Component::*F)(Arg0) 
     >
     class action1 
-      : public action<Component, Action, boost::fusion::vector<Arg1> >
+      : public action<Component, Action, boost::fusion::vector<Arg0> >
     {
     private:
         typedef 
-            action<Component, Action, boost::fusion::vector<Arg1> >
+            action<Component, Action, boost::fusion::vector<Arg0> >
         base_type;
         
     public:
@@ -175,9 +174,9 @@ namespace hpx { namespace components
         {}
         
         // construct an action from its arguments
-        template <typename Arg1>
-        action1(Arg1 const& arg1) 
-          : base_type(arg1) 
+        template <typename Arg0>
+        action1(Arg0 const& arg0) 
+          : base_type(arg0) 
         {}
 
     private:
@@ -202,15 +201,14 @@ namespace hpx { namespace components
     //  two parameter version
     template <
         typename Component, int Action, 
-        typename Arg1, typename Arg2,
-        bool (Component::*F)(Arg1, Arg2) 
+        typename Arg0, typename Arg1, bool (Component::*F)(Arg0, Arg1) 
     >
     class action2
-      : public action<Component, Action, boost::fusion::vector<Arg1, Arg2> >
+      : public action<Component, Action, boost::fusion::vector<Arg0, Arg1> >
     {
     private:
         typedef 
-            action<Component, Action, boost::fusion::vector<Arg1, Arg2> >
+            action<Component, Action, boost::fusion::vector<Arg0, Arg1> >
         base_type;
         
     public:
@@ -218,9 +216,9 @@ namespace hpx { namespace components
         {}
 
         // construct an action from its arguments
-        template <typename Arg1, typename Arg2>
-        action2(Arg1 const& arg1, Arg2 const& arg2) 
-          : base_type(arg1, arg2) 
+        template <typename Arg0, typename Arg1>
+        action2(Arg0 const& arg0, Arg1 const& arg1) 
+          : base_type(arg0, arg2) 
         {}
 
     private:
@@ -241,6 +239,7 @@ namespace hpx { namespace components
         }
     };
 
+    // bring in the rest of the implementations
     #include <hpx/components/action_implementations.hpp>
     
 ///////////////////////////////////////////////////////////////////////////////
