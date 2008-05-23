@@ -14,7 +14,7 @@
 #include <hpx/parcelset.hpp>
 
 // #include <hpx/components.hpp>
-// #include <hpx/threadmanager.hpp>
+#include <hpx/threadmanager.hpp>
 // #include <hpx/core.hpp>
 
 #endif

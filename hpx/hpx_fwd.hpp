@@ -7,10 +7,12 @@
 #define HPX_HPX_FWD_MAR_24_2008_1119AM
 
 #include <boost/asio.hpp>
-// #include <boost/coroutine/shared_coroutine.hpp>
+#include <boost/coroutine/shared_coroutine.hpp>
 
 namespace hpx
 {
+
+
 //     namespace core
 //     {
 //         class px_ref;
@@ -55,7 +57,9 @@ namespace hpx
     namespace threadmanager
     {
         class threadmanager;
-    }
+		// this has to be predeclared to avoid circular header dependencies
+		typedef boost::coroutines::shared_coroutine<bool()>::self px_thread_self;
+	}
     
 //     namespace components
 //     {
