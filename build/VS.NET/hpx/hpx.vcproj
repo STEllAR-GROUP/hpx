@@ -281,6 +281,14 @@
 					</File>
 				</Filter>
 			</Filter>
+			<Filter
+				Name="Threadmanager"
+				>
+				<File
+					RelativePath="..\..\..\src\threadmanager\threadmanager.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -486,6 +494,18 @@
 						>
 					</File>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="Threadmanager"
+				>
+				<File
+					RelativePath="..\..\..\hpx\threadmanager\px_thread.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\threadmanager\threadmanager.hpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
