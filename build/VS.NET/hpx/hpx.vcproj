@@ -296,6 +296,14 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\..\hpx\action_manager.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\hpx\applier.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\hpx\config.hpp"
 				>
 			</File>
@@ -317,6 +325,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\hpx\parcelset.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\hpx\threadmanager.hpp"
 				>
 			</File>
 			<File

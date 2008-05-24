@@ -11,9 +11,12 @@ set (hpxlib_HEADERS
     ../hpx/hpx_fwd.hpp
     ../hpx/naming.hpp
     ../hpx/parcelset.hpp
+    ../hpx/threadmanager.hpp
     ../hpx/util.hpp
     # components
     ../hpx/components/action.hpp
+    ../hpx/components/action_constructors.hpp
+    ../hpx/components/action_implementations.hpp
     ../hpx/components/component_type.hpp
     ../hpx/components/accumulator.hpp
     ../hpx/components/server/accumulator.hpp
@@ -25,12 +28,17 @@ set (hpxlib_HEADERS
     ../hpx/naming/resolver_client.hpp
     ../hpx/naming/resolver_server.hpp
     # parcelset
+    ../hpx/parcelset/connection_cache.hpp
     ../hpx/parcelset/parcel.hpp
-    ../hpx/parcelset/parcelport.hpp
     ../hpx/parcelset/parcelhandler.hpp
-    ../hpx/parcelset/server/parcelport_connection.hpp
+    ../hpx/parcelset/parcelport.hpp
+    ../hpx/parcelset/parcelport_connection.hpp
     ../hpx/parcelset/server/parcelhandler_queue.hpp
     ../hpx/parcelset/server/parcelport_queue.hpp
+    ../hpx/parcelset/server/parcelport_server_connection.hpp
+    # threadmanager
+    ../hpx/threadmanager/px_thread.hpp
+    ../hpx/threadmanager/threadmanager.hpp
     # util
     ../hpx/util/asio_util.hpp
     ../hpx/util/container_device.hpp
@@ -46,16 +54,21 @@ set (hpxlib_HEADERS
 )
 
 set (hpxlib_SOURCES
+    # components
+    components/server/accumulator.cpp
     # naming 
     naming/resolver_client.cpp
     naming/resolver_server.cpp
     naming/server/request_handler.cpp
     # parcelset
+    parcelset/connection_cache.cpp
     parcelset/parcel.cpp
     parcelset/parcelhandler.cpp
     parcelset/parcelport.cpp
     parcelset/server/parcelhandler_queue.cpp
     parcelset/server/parcelport_queue.cpp
+    # threadmanager
+    threadmanager/threadmanager.cpp
     # util 
     util/dgas_logging.cpp
     util/io_service_pool.cpp
