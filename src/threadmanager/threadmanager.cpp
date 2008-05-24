@@ -13,7 +13,7 @@ namespace hpx { namespace threadmanager
 {
     ///////////////////////////////////////////////////////////////////////////
     void threadmanager::register_work( 
-		boost::function<bool (hpx::threadmanager::px_thread_self&)> threadfunc)
+    boost::function<bool (hpx::threadmanager::px_thread_self&)> threadfunc)
     {
         // create a new name for this new thread
 //        naming::id_type n = ps_.get_prefix() | 
@@ -21,7 +21,7 @@ namespace hpx { namespace threadmanager
 
         // lock queue when adding work
         mutex_type::scoped_lock lk(mtx_);
-		work_items_.push(hpx::threadmanager::px_thread(threadfunc));
+        work_items_.push(hpx::threadmanager::px_thread(threadfunc));
             
         if (running_) {
             do_some_work_ = true;
@@ -79,7 +79,7 @@ namespace hpx { namespace threadmanager
         while (running_) 
         {
             bool exited = true;
-			hpx::threadmanager::px_thread thrd (work_items_.front());
+            hpx::threadmanager::px_thread thrd (work_items_.front());
             work_items_.pop();
 
             // make sure lock is unlocked during execution of work item
