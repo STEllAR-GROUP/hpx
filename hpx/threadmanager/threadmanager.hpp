@@ -25,7 +25,7 @@ namespace hpx { namespace threadmanager
     class threadmanager : private boost::noncopyable
     {
     private:
-		typedef std::queue<hpx::threadmanager::px_thread> work_items_type;
+        typedef std::queue<hpx::threadmanager::px_thread> work_items_type;
         typedef boost::mutex mutex_type;
 
         friend struct unlock_the_lock;
@@ -45,7 +45,7 @@ namespace hpx { namespace threadmanager
 
         /// This adds a new work item to the thread manager
         void register_work(
-			boost::function<bool (hpx::threadmanager::px_thread_self&)> threadfunc);
+            boost::function<bool (hpx::threadmanager::px_thread_self&)> threadfunc);
         
         /// run the threadmanager's work queue
         bool run() 
@@ -81,12 +81,13 @@ namespace hpx { namespace threadmanager
                 run_thread_->join();
             }
         }
-		void wait()
-		{
-			if (run_thread_ && running_) {
-				run_thread_->join();
-			}
-		}
+        
+        void wait()
+        {
+            if (run_thread_ && running_) 
+                run_thread_->join();
+        }
+        
     public:
         /// this notifies the thread manager that there is some more work 
         /// available 

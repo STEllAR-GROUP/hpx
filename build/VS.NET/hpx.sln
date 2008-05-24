@@ -83,6 +83,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "accumulator_server", "accum
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "accumulator_client", "accumulator_client\accumulator_client.vcproj", "{1AB4D536-BFF4-46C4-AB3E-C5BDBE70A339}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcproj", "{1D601F73-5EF1-419A-9147-B6B5F0FE679E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -241,6 +243,16 @@ Global
 		{1AB4D536-BFF4-46C4-AB3E-C5BDBE70A339}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{1AB4D536-BFF4-46C4-AB3E-C5BDBE70A339}.Release|Win32.ActiveCfg = Release|Win32
 		{1AB4D536-BFF4-46C4-AB3E-C5BDBE70A339}.Release|Win32.Build.0 = Release|Win32
+		{1D601F73-5EF1-419A-9147-B6B5F0FE679E}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{1D601F73-5EF1-419A-9147-B6B5F0FE679E}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{1D601F73-5EF1-419A-9147-B6B5F0FE679E}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{1D601F73-5EF1-419A-9147-B6B5F0FE679E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1D601F73-5EF1-419A-9147-B6B5F0FE679E}.Debug|Win32.Build.0 = Debug|Win32
+		{1D601F73-5EF1-419A-9147-B6B5F0FE679E}.Release|Any CPU.ActiveCfg = Release|Win32
+		{1D601F73-5EF1-419A-9147-B6B5F0FE679E}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{1D601F73-5EF1-419A-9147-B6B5F0FE679E}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{1D601F73-5EF1-419A-9147-B6B5F0FE679E}.Release|Win32.ActiveCfg = Release|Win32
+		{1D601F73-5EF1-419A-9147-B6B5F0FE679E}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

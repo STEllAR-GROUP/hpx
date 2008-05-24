@@ -11,18 +11,6 @@
 
 namespace hpx
 {
-
-
-//     namespace core
-//     {
-//         class px_ref;
-//         class px_core;
-//         class px_thread;
-//         
-//         // this has to be predeclared to avoid circular header dependencies
-//         typedef boost::coroutines::shared_coroutine<bool()>::self px_thread_self;
-//     }
-
     namespace naming
     {
         struct id_type;
@@ -57,10 +45,10 @@ namespace hpx
     namespace threadmanager
     {
         class threadmanager;
-		// this has to be predeclared to avoid circular header dependencies
-		typedef boost::coroutines::shared_coroutine<bool()>::self px_thread_self;
-	}
-    
+        // this has to be predeclared to avoid circular header dependencies
+        typedef boost::coroutines::shared_coroutine<bool()>::self px_thread_self;
+    }
+
 //     namespace components
 //     {
 //         class component;

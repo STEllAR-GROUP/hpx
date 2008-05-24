@@ -496,6 +496,22 @@
 				</Filter>
 			</Filter>
 			<Filter
+				Name="Applier"
+				>
+				<File
+					RelativePath="..\..\..\hpx\applier\applier.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="ActionManager"
+				>
+				<File
+					RelativePath="..\..\..\hpx\action_manager\action_manager.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
 				Name="Threadmanager"
 				>
 				<File
