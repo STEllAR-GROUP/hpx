@@ -32,7 +32,7 @@ namespace hpx { namespace threadmanager
 
     public:
         threadmanager() 
-          : run_thread_(NULL), running_(false), do_some_work_(false)
+          : run_thread_(NULL), running_(false)
         {}
         ~threadmanager() 
         {
@@ -55,7 +55,6 @@ namespace hpx { namespace threadmanager
                 return true;    // do nothing if already running
 
             running_ = false;
-            do_some_work_ = false;
             try {
                 // run thread and wait for initialization to complete
                 run_thread_ = new boost::thread(
@@ -94,10 +93,8 @@ namespace hpx { namespace threadmanager
         void do_some_work()
         {
             mutex_type::scoped_lock lk(mtx_);
-            if (running_) {
+            if (running_) 
                 cond_.notify_one();
-                do_some_work_ = true;
-            }
         }
         
     protected:
@@ -109,7 +106,6 @@ namespace hpx { namespace threadmanager
         
         work_items_type work_items_;        /// list of active work items
         bool running_;                      /// thread manager has bee started
-        bool do_some_work_;                 /// new work item(s) arrived
         mutex_type mtx_;                    /// mutex protecting the members
         boost::condition cond_;             /// used to trigger some action
     };

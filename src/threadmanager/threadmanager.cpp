@@ -23,11 +23,8 @@ namespace hpx { namespace threadmanager
         mutex_type::scoped_lock lk(mtx_);
         work_items_.push(hpx::threadmanager::px_thread(threadfunc));
             
-        if (running_) {
-            do_some_work_ = true;
+        if (running_) 
             cond_.notify_one();           // try to execute the new work item
-        }
-//        return n;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -46,9 +43,9 @@ namespace hpx { namespace threadmanager
         threadmanager::mutex_type::scoped_lock& l_;
     };
         
+#if defined(BOOST_WINDOWS)
     ///////////////////////////////////////////////////////////////////////////
     // On Windows we need a special preparation for the main coroutines thread 
-#if defined(BOOST_WINDOWS)
     struct prepare_main_thread
     {
         prepare_main_thread() 
@@ -61,6 +58,7 @@ namespace hpx { namespace threadmanager
         }
     };
 #else
+    // All other platforms do not need any special treatment of the main thread
     struct prepare_main_thread
     {
         prepare_main_thread() {}
@@ -97,9 +95,7 @@ namespace hpx { namespace threadmanager
             if (work_items_.empty()) {
                 // wait until somebody needs some action (if no new work 
                 // arrived in the meantime)
-                if (!do_some_work_)
-                    cond_.wait(lk);
-                do_some_work_ = false;
+                cond_.wait(lk);
             }
         }
     }

@@ -17,14 +17,6 @@
 namespace hpx { namespace threadmanager 
 {
     ///////////////////////////////////////////////////////////////////////////
-    //  parcel action: the action to be performed on the destination object
-    //  (the px_thread)
-    enum px_thread_action
-    {
-        some_px_thread_action = 0,
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     /// This is the representation of a ParalleX thread
     class px_thread 
     {
@@ -32,6 +24,18 @@ namespace hpx { namespace threadmanager
         typedef boost::coroutines::shared_coroutine<bool()> coroutine_type;
         
     public:
+        /// parcel action code: the action to be performed on the destination 
+        /// object (the px_thread)
+        enum actions
+        {
+            some_action_code = 0
+        };
+
+        /// This is the component id. Every component needs to have an embedded
+        /// enumerator 'value' which is used by the generic action implementation
+        /// to associate this component with a given action.
+        enum { value = components::component_px_thread };
+
         /// 
         px_thread(boost::function<bool (px_thread_self&)> threadfunc) 
           : coroutine_(threadfunc)
