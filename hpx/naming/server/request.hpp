@@ -28,17 +28,15 @@ namespace hpx { namespace naming { namespace server
         command_firstcommand = 0,
         command_getprefix = 0,      /// return a unique prefix for the requesting site
         command_getidrange = 1,     /// return a unique range of ids for the requesting site
-        command_bind = 2,           /// bind an address to a global id
-        command_unbind = 3,         /// remove binding for a global id
-        command_bind_range = 4,     /// bind a range of addresses to a range of global ids
-        command_unbind_range = 5,   /// remove binding for a range of global ids
-        command_resolve = 6,        /// resolve a global id to an address
-        command_queryid = 7,        /// query for a global id associated with a namespace name (string)
-        command_registerid = 8,     /// associate a namespace name with a global id
-        command_unregisterid = 9,   /// remove association of a namespace name with a global id
-        command_statistics_count = 10,   /// return some usage statistics: execution count 
-        command_statistics_mean = 11,    /// return some usage statistics: average server execution time
-        command_statistics_moment2 = 12, /// return some usage statistics: 2nd moment of server execution time
+        command_bind_range = 2,     /// bind a range of addresses to a range of global ids
+        command_unbind_range = 3,   /// remove binding for a range of global ids
+        command_resolve = 4,        /// resolve a global id to an address
+        command_queryid = 5,        /// query for a global id associated with a namespace name (string)
+        command_registerid = 6,     /// associate a namespace name with a global id
+        command_unregisterid = 7,   /// remove association of a namespace name with a global id
+        command_statistics_count = 8,    /// return some usage statistics: execution count 
+        command_statistics_mean = 9,     /// return some usage statistics: average server execution time
+        command_statistics_moment2 = 10, /// return some usage statistics: 2nd moment of server execution time
         command_lastcommand
     };
 
@@ -46,8 +44,6 @@ namespace hpx { namespace naming { namespace server
     {
         "command_getprefix",
         "command_getidrange",
-        "command_bind",
-        "command_unbind",
         "command_bind_range",
         "command_unbind_range",
         "command_resolve",
@@ -80,7 +76,7 @@ namespace hpx { namespace naming { namespace server
           : command_(c), site_(l)
         {}
         
-        // unbind, resolve
+        // resolve
         request(name_server_command c, naming::id_type const& id) 
           : command_(c), id_(id)
         {}
@@ -94,11 +90,6 @@ namespace hpx { namespace naming { namespace server
         // unregisterid
         request(name_server_command c, std::string const& ns_name) 
           : command_(c), ns_name_(ns_name)
-        {}
-
-        // bind
-        request(name_server_command c, naming::id_type id, address const& addr) 
-          : command_(c), id_(id), addr_(addr)
         {}
 
         // bind_range
@@ -161,15 +152,7 @@ namespace hpx { namespace naming { namespace server
             
             switch (command_) {
             case command_resolve:
-            case command_unbind:
                 ar << id_;
-                break;
-
-            case command_bind:
-                ar << id_;
-                ar << addr_.locality_;
-                ar << addr_.type_;
-                ar << addr_.address_;
                 break;
 
             case command_bind_range:
@@ -220,15 +203,7 @@ namespace hpx { namespace naming { namespace server
             
             switch (command_) {
             case command_resolve:
-            case command_unbind:
                 ar >> id_;
-                break;
-
-            case command_bind:
-                ar >> id_;
-                ar >> addr_.locality_;
-                ar >> addr_.type_;
-                ar >> addr_.address_;
                 break;
 
             case command_bind_range:
@@ -283,26 +258,23 @@ namespace hpx { namespace naming { namespace server
         os << get_command_name(req.command_) << ": ";
 
         switch (req.command_) {
-        case command_unbind:
         case command_resolve:
             os << "id:" << std::hex << req.id_ << " ";
             break;
 
-        case command_bind:
-            os << "id:" << std::hex << req.id_ << " ";
-            os << "addr(" << req.addr_ << ") ";
-            break;
-
         case command_bind_range:
             os << "id:" << std::hex << req.id_ << " ";
-            os << "count:" << std::dec << req.count_ << " ";
+            if (req.count_ != 1)
+                os << "count:" << std::dec << req.count_ << " ";
             os << "addr(" << req.addr_ << ") ";
-            os << "offset:" << std::dec << req.offset_ << " ";
+            if (req.offset_ != 0)
+                os << "offset:" << std::dec << req.offset_ << " ";
             break;
 
         case command_unbind_range:
             os << "id:" << std::hex << req.id_ << " ";
-            os << "count:" << std::dec << req.count_ << " ";
+            if (req.count_ != 1)
+                os << "count:" << std::dec << req.count_ << " ";
             break;
 
         case command_queryid:

@@ -67,8 +67,6 @@ namespace hpx { namespace naming { namespace server
     protected:
         void handle_getprefix(request const& req, reply& rep);
         void handle_getidrange(request const& req, reply& rep);
-        void handle_bind(request const& req, reply& rep);
-        void handle_unbind(request const& req, reply& rep);
         void handle_bind_range(request const& req, reply& rep);
         void handle_unbind_range(request const& req, reply& rep);
         void handle_resolve(request const& req, reply& rep);
@@ -78,6 +76,22 @@ namespace hpx { namespace naming { namespace server
         void handle_statistics_count(request const& req, reply& rep);
         void handle_statistics_mean(request const& req, reply& rep);
         void handle_statistics_moment2(request const& req, reply& rep);
+
+        void create_new_binding(request const &req, error& s, std::string& str)
+        {
+            naming::id_type upper_bound;
+            upper_bound = req.get_id() + (req.get_count() - 1);
+            if (req.get_id().get_msb() != upper_bound.get_msb()) {
+                s = internal_server_error;
+                str = "msb's of global ids of lower and upper range bound should match";
+            }
+            else {
+                registry_.insert(registry_type::value_type(req.get_id(), 
+                    registry_data_type(req.get_address(), 
+                        req.get_count(), req.get_offset())));
+                s = success;    // created new entry
+            }
+        }
 
     private:
         // The ns_registry_type is used to store the mappings from the 

@@ -38,6 +38,8 @@ namespace hpx { namespace naming { namespace server
             "hpx: dgas: service unavailable";
         char const* const invalid_status = 
             "hpx: dgas: corrupted internal status";
+        char const* const bad_parameter = 
+            "hpx: dgas: bad parameter";
         char const* const bad_request = 
             "hpx: dgas: ill formatted request or unknown command";
         char const* const out_of_memory = 
@@ -52,6 +54,7 @@ namespace hpx { namespace naming { namespace server
             case hpx::no_success:            return no_success;
             case hpx::service_unavailable:   return service_unavailable;
             case hpx::invalid_status:        return invalid_status;
+            case hpx::bad_parameter:         return bad_parameter;
             case hpx::bad_request:           return bad_request;
             case hpx::out_of_memory:         return out_of_memory;
             case hpx::version_unknown:       return unknown_version;
@@ -223,8 +226,6 @@ namespace hpx { namespace naming { namespace server
                     ar << statistics_[i];
                 break;
                 
-            case command_bind:
-            case command_unbind:
             case command_bind_range:
             case command_unbind_range:
             case command_registerid: 
@@ -271,8 +272,6 @@ namespace hpx { namespace naming { namespace server
                     ar >> statistics_[i];
                 break;
                 
-            case command_bind:
-            case command_unbind:
             case command_bind_range:
             case command_unbind_range:
             case command_registerid: 
@@ -327,8 +326,6 @@ namespace hpx { namespace naming { namespace server
             case command_statistics_moment2:
                 break;
                 
-            case command_bind:
-            case command_unbind:
             case command_bind_range:
             case command_unbind_range:
             case command_registerid: 

@@ -134,6 +134,23 @@ int main(int argc, char* argv[])
         // repeated remove association should fail
         BOOST_TEST(!resolver.unregisterid("/test/foo/1"));
         
+        // test bind_range/unbind_range API
+        BOOST_TEST(resolver.bind_range(id_type(3), 20, address(here, 1, 2), 10));
+
+        BOOST_TEST(resolver.resolve(id_type(3), addr));
+        BOOST_TEST(addr == address(here, 1, 2));
+        
+        BOOST_TEST(resolver.resolve(id_type(6), addr));
+        BOOST_TEST(addr == address(here, 1, 32));
+
+        BOOST_TEST(resolver.resolve(id_type(22), addr));
+        BOOST_TEST(addr == address(here, 1, 192));
+        
+        BOOST_TEST(!resolver.resolve(id_type(23), addr));
+
+        BOOST_TEST(resolver.unbind_range(id_type(3), 20));
+
+        // get statistics
         BOOST_TEST(resolver.get_statistics_count(counts));
         BOOST_TEST(resolver.get_statistics_mean(timings));
         BOOST_TEST(resolver.get_statistics_moment2(moments));

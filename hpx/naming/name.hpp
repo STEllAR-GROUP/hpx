@@ -42,7 +42,7 @@ namespace hpx { namespace naming
         // this get's called from the safe_bool base class 
         bool operator_bool() const { return 0 != id_lsb_ || 0 != id_msb_; }
         
-        // we support increment and addition as operators only
+        // we support increment and addition as operators
         friend id_type operator+ (id_type const& lhs, id_type const& rhs)
         {
             boost::uint64_t lsb = lhs.id_lsb_ + rhs.id_lsb_;
@@ -80,6 +80,15 @@ namespace hpx { namespace naming
             return lhs.id_lsb_ < rhs.id_lsb_;
         }
         
+        friend bool operator<= (id_type const& lhs, id_type const& rhs)
+        {
+            if (lhs.id_msb_ < rhs.id_msb_)
+                return true;
+            if (lhs.id_msb_ > rhs.id_msb_)
+                return false;
+            return lhs.id_lsb_ <= rhs.id_lsb_;
+        }
+        
         friend bool operator> (id_type const& lhs, id_type const& rhs)
         {
             if (lhs.id_msb_ > rhs.id_msb_)
@@ -87,6 +96,15 @@ namespace hpx { namespace naming
             if (lhs.id_msb_ < rhs.id_msb_)
                 return false;
             return lhs.id_lsb_ > rhs.id_lsb_;
+        }
+        
+        friend bool operator>= (id_type const& lhs, id_type const& rhs)
+        {
+            if (lhs.id_msb_ > rhs.id_msb_)
+                return true;
+            if (lhs.id_msb_ < rhs.id_msb_)
+                return false;
+            return lhs.id_lsb_ >= rhs.id_lsb_;
         }
         
         boost::uint64_t get_msb() const

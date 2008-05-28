@@ -159,78 +159,75 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void request_handler::handle_bind(request const& req, reply& rep)
-    {
-        try {
-            error s = no_success;
-            {
-                mutex_type::scoped_lock l(mtx_);
-                registry_type::iterator it = registry_.find(req.get_id());
-                if (it != registry_.end())
-                    boost::fusion::at_c<0>((*it).second) = req.get_address();
-                else {
-                    registry_.insert(registry_type::value_type(req.get_id(), 
-                        registry_data_type(req.get_address(), 1, 0)));
-                    s = success;    // created new entry
-                }
-            }
-            rep = reply(command_bind, s);
-        }
-        catch (std::bad_alloc) {
-            rep = reply(command_bind, out_of_memory);
-        }            
-        catch (...) {
-            rep = reply(command_bind, internal_server_error);
-        }            
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    void request_handler::handle_unbind(request const& req, reply& rep)
-    {
-        try {
-            error s = no_success;
-            {
-                mutex_type::scoped_lock l(mtx_);
-                registry_type::iterator it = registry_.find(req.get_id());
-                if (it != registry_.end()) {
-                    registry_.erase(it);
-                    s = success;
-                }
-            }
-            rep = reply(command_unbind, s);
-        }
-        catch (std::bad_alloc) {
-            rep = reply(command_unbind, out_of_memory);
-        }            
-        catch (...) {
-            rep = reply(command_unbind, internal_server_error);
-        }            
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     void request_handler::handle_bind_range(request const& req, reply& rep)
     {
         try {
             error s = no_success;
-//             {
-//                 mutex_type::scoped_lock l(mtx_);
-//                 registry_type::iterator it = registry_.find(req.get_id());
-//                 if (it != registry_.end())
-//                     boost::fusion::at_c<0>((*it).second) = req.get_address();
-//                 else {
-//                     registry_.insert(registry_type::value_type(req.get_id(), 
-//                         registry_data_type(req.get_address(), 
-//                              req.get_count(), req.get_offset())));
-//                     s = success;    // created new entry
-//                 }
-//             }
-            rep = reply(command_bind, s);
+            std::string str;
+            {
+                using boost::fusion::at_c;
+                
+                mutex_type::scoped_lock l(mtx_);
+                registry_type::iterator it = registry_.lower_bound(req.get_id());
+                
+                if (it != registry_.end()) {
+                    if ((*it).first == req.get_id()) {
+                        // update existing bindings
+                        if (at_c<1>((*it).second) != req.get_count()) {
+                            // this is an error since we can't change block sizes 
+                            s = bad_parameter;
+                            str = "can't change block size of existing binding";
+                        }
+                        else {
+                            // store the new address and offsets
+                            at_c<0>((*it).second) = req.get_address();
+                            at_c<2>((*it).second) = req.get_offset();
+                        }
+                    }
+                    else if (it != registry_.begin()) {
+                        --it;
+                        if ((*it).first + at_c<1>((*it).second) >= req.get_id()) {
+                            // the previous range covers the new id
+                            s = bad_parameter;
+                            str = "the new global id is contained in an existing range";
+                        }
+                        else {
+                            // create new bindings
+                            create_new_binding(req, s, str);
+                        }
+                    }
+                    else {
+                        // create new bindings, the existing ranges are larger 
+                        // than the new global id
+                        create_new_binding(req, s, str);
+                    }
+                }
+                else {
+                    if (!registry_.empty()) {
+                        --it;
+                        if ((*it).first + at_c<1>((*it).second) >= req.get_id()) {
+                            // the previous range covers the new id
+                            s = bad_parameter;
+                            str = "the new global id is contained in an existing range";
+                        }
+                        else {
+                            // create new bindings
+                            create_new_binding(req, s, str);
+                        }
+                    }
+                    else {
+                        // create new bindings
+                        create_new_binding(req, s, str);
+                    }
+                }
+            }
+            rep = reply(command_bind_range, s, str.empty() ? NULL : str.c_str());
         }
         catch (std::bad_alloc) {
-            rep = reply(command_bind, out_of_memory);
+            rep = reply(command_bind_range, out_of_memory);
         }            
         catch (...) {
-            rep = reply(command_bind, internal_server_error);
+            rep = reply(command_bind_range, internal_server_error);
         }            
     }
 
@@ -239,21 +236,33 @@ namespace hpx { namespace naming { namespace server
     {
         try {
             error s = no_success;
-//             {
-//                 mutex_type::scoped_lock l(mtx_);
-//                 registry_type::iterator it = registry_.find(req.get_id());
-//                 if (it != registry_.end()) {
-//                     registry_.erase(it);
-//                     s = success;
-//                 }
-//             }
-            rep = reply(command_unbind, s);
+            std::string str;
+            {
+                using boost::fusion::at_c;
+
+                mutex_type::scoped_lock l(mtx_);
+                registry_type::iterator it = registry_.find(req.get_id());
+                if (it != registry_.end()) {
+                    if (at_c<1>((*it).second) != req.get_count()) {
+                        // this is an error since we can't use a different 
+                        // block size while unbinding
+                        s = bad_parameter;
+                        str = "block sizes must match";
+                    }
+                    else {
+                        registry_.erase(it);
+                        s = success;
+                    }
+                }
+            }
+            rep = reply(command_unbind_range, s, 
+                str.empty() ? NULL : str.c_str());
         }
         catch (std::bad_alloc) {
-            rep = reply(command_unbind, out_of_memory);
+            rep = reply(command_unbind_range, out_of_memory);
         }            
         catch (...) {
-            rep = reply(command_unbind, internal_server_error);
+            rep = reply(command_unbind_range, internal_server_error);
         }            
     }
 
@@ -261,10 +270,45 @@ namespace hpx { namespace naming { namespace server
     void request_handler::handle_resolve(request const& req, reply& rep)
     {
         try {
+            using boost::fusion::at_c;
+
             mutex_type::scoped_lock l(mtx_);
-            registry_type::iterator it = registry_.find(req.get_id());
+            registry_type::iterator it = registry_.lower_bound(req.get_id());
             if (it != registry_.end()) {
-                rep = reply(command_resolve, boost::fusion::at_c<0>((*it).second));
+                if ((*it).first == req.get_id()) {
+                    // found the exact match in the registry
+                    rep = reply(command_resolve, at_c<0>((*it).second));
+                }
+                else if (it != registry_.begin()) {
+                    --it;
+                    if ((*it).first + at_c<1>((*it).second) > req.get_id()) {
+                        // the previous range covers the given global id
+                        
+                        // the only limitation while binding blocks of global 
+                        // ids is that these have to have a identical msb's
+                        if (req.get_id().get_msb() != (*it).first.get_msb()) {
+                            // no existing range covers the given global id
+                            rep = reply(command_resolve, internal_server_error,
+                                "msb's of global ids should match");
+                        }
+                        else {
+                            // calculate the local address corresponding to the 
+                            // given global id
+                            naming::address addr (at_c<0>((*it).second));
+                            addr.address_ += 
+                                (req.get_id().get_lsb() - (*it).first.get_lsb()) * at_c<2>((*it).second);
+                            rep = reply(command_resolve, addr);
+                        }
+                    }
+                    else {
+                        // no existing range covers the given global id
+                        rep = reply(command_resolve, no_success);
+                    }
+                }
+                else {
+                    // all existing entries are larger than the given global id
+                    rep = reply(command_resolve, no_success);
+                }
             }
             else {
                 rep = reply(command_resolve, no_success);
@@ -435,14 +479,6 @@ namespace hpx { namespace naming { namespace server
             handle_getidrange(req, rep);
             break;
             
-        case command_bind:
-            handle_bind(req, rep);
-            break;
-            
-        case command_unbind:
-            handle_unbind(req, rep);
-            break;
-
         case command_bind_range:
             handle_bind_range(req, rep);
             break;

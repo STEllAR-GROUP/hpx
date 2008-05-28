@@ -112,7 +112,10 @@ namespace hpx { namespace naming
         ///                   and the given local address replaced the 
         ///                   previously associated local address. Any error 
         ///                   results in an exception thrown from this function.
-        bool bind(id_type id, address const& addr);
+        bool bind(id_type id, address const& addr)
+        {
+            return bind_range(id, 1, addr, 0);
+        }
         
         /// \brief Unbind a global address
         ///
@@ -131,7 +134,10 @@ namespace hpx { namespace naming
         ///                   function \a bind. Do not use this function to 
         ///                   unbind any of the global ids bound using 
         ///                   \a bind_range.
-        bool unbind(id_type id);
+        bool unbind(id_type id)
+        {
+            return unbind_range(id, 1);
+        }
         
         /// \brief Bind unique range of global ids to given base address
         ///
