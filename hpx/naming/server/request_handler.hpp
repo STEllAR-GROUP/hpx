@@ -16,6 +16,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/thread.hpp>
 #include <boost/asio/buffer.hpp>
+#include <boost/fusion/include/vector.hpp>
 #if BOOST_VERSION >= 103600
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
@@ -68,6 +69,8 @@ namespace hpx { namespace naming { namespace server
         void handle_getidrange(request const& req, reply& rep);
         void handle_bind(request const& req, reply& rep);
         void handle_unbind(request const& req, reply& rep);
+        void handle_bind_range(request const& req, reply& rep);
+        void handle_unbind_range(request const& req, reply& rep);
         void handle_resolve(request const& req, reply& rep);
         void handle_queryid(request const& req, reply& rep);
         void handle_registerid(request const& req, reply& rep);
@@ -82,8 +85,12 @@ namespace hpx { namespace naming { namespace server
         typedef std::map<std::string, naming::id_type> ns_registry_type;
 
         // The registry_type is used to store the mapping from the global ids
-        // to the current local address of the corresponding component.
-        typedef std::map<naming::id_type, naming::address> registry_type;
+        // to a range of local addresses of the corresponding component 
+        // (defined by a base address, the count and the offset).
+        typedef boost::fusion::vector<
+            naming::address, std::size_t, std::ptrdiff_t> 
+        registry_data_type;
+        typedef std::map<naming::id_type, registry_data_type> registry_type;
 
         // The site_prefix_map_type is used to store the assigned prefix and 
         // the current upper boundary to be used for global id assignment for

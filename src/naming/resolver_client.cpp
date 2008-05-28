@@ -146,6 +146,35 @@ namespace hpx { namespace naming
         return s == success;
     }
 
+    bool resolver_client::bind_range(id_type id, std::size_t count, 
+        address const& addr, std::ptrdiff_t offset)
+    {
+        // send request
+        server::request req (server::command_bind_range, id, count, addr, offset);
+        server::reply rep;            
+        execute(req, rep);
+        
+        hpx::error s = (hpx::error) rep.get_status();
+        if (s != success && s != no_success)
+            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+
+        return s == success;
+    }
+
+    bool resolver_client::unbind_range(id_type id, std::size_t count)
+    {
+        // send request
+        server::request req (server::command_unbind_range, id, count);
+        server::reply rep;            
+        execute(req, rep);
+
+        hpx::error s = (hpx::error) rep.get_status();
+        if (s != success && s != no_success)
+            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+
+        return s == success;
+    }
+
     bool resolver_client::resolve(id_type id, address& addr)
     {
         // send request

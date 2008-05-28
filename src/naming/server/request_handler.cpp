@@ -8,6 +8,7 @@
 
 #include <string>
 #include <boost/lexical_cast.hpp>
+#include <boost/fusion/include/at.hpp>
 
 #include <hpx/util/dgas_logging.hpp>
 #include <hpx/naming/server/reply.hpp>
@@ -76,8 +77,8 @@ namespace hpx { namespace naming { namespace server
                         "prefix is already bound to local address");
                 }
                 else {
-                    registry_.insert(
-                        registry_type::value_type(id, address(req.get_site())));
+                    registry_.insert(registry_type::value_type(id, 
+                        registry_data_type(address(req.get_site()), 1, 0)));
                 }
 
                 // The real prefix has to be used as the 32 most 
@@ -120,7 +121,7 @@ namespace hpx { namespace naming { namespace server
                 // insert this prefix as being mapped to the given locality
                 boost::uint32_t prefix = (boost::uint32_t)site_prefixes_.size() + 1;
                 naming::id_type id = get_id_from_prefix(prefix);
-                std::pair<site_prefix_map_type::iterator, bool> p=
+                std::pair<site_prefix_map_type::iterator, bool> p =
                     site_prefixes_.insert(
                         site_prefix_map_type::value_type(req.get_site(), 
                             std::make_pair(prefix, id)));
@@ -134,8 +135,8 @@ namespace hpx { namespace naming { namespace server
                         "prefix is already bound to local address");
                 }
                 else {
-                    registry_.insert(
-                        registry_type::value_type(id, address(req.get_site())));
+                    registry_.insert(registry_type::value_type(id, 
+                        registry_data_type(address(req.get_site()), 1, 0)));
                 }
 
                 // generate the new id range
@@ -166,10 +167,10 @@ namespace hpx { namespace naming { namespace server
                 mutex_type::scoped_lock l(mtx_);
                 registry_type::iterator it = registry_.find(req.get_id());
                 if (it != registry_.end())
-                    (*it).second = req.get_address();
+                    boost::fusion::at_c<0>((*it).second) = req.get_address();
                 else {
-                    registry_.insert(registry_type::value_type(
-                        req.get_id(), req.get_address()));
+                    registry_.insert(registry_type::value_type(req.get_id(), 
+                        registry_data_type(req.get_address(), 1, 0)));
                     s = success;    // created new entry
                 }
             }
@@ -207,13 +208,63 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    void request_handler::handle_bind_range(request const& req, reply& rep)
+    {
+        try {
+            error s = no_success;
+//             {
+//                 mutex_type::scoped_lock l(mtx_);
+//                 registry_type::iterator it = registry_.find(req.get_id());
+//                 if (it != registry_.end())
+//                     boost::fusion::at_c<0>((*it).second) = req.get_address();
+//                 else {
+//                     registry_.insert(registry_type::value_type(req.get_id(), 
+//                         registry_data_type(req.get_address(), 
+//                              req.get_count(), req.get_offset())));
+//                     s = success;    // created new entry
+//                 }
+//             }
+            rep = reply(command_bind, s);
+        }
+        catch (std::bad_alloc) {
+            rep = reply(command_bind, out_of_memory);
+        }            
+        catch (...) {
+            rep = reply(command_bind, internal_server_error);
+        }            
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void request_handler::handle_unbind_range(request const& req, reply& rep)
+    {
+        try {
+            error s = no_success;
+//             {
+//                 mutex_type::scoped_lock l(mtx_);
+//                 registry_type::iterator it = registry_.find(req.get_id());
+//                 if (it != registry_.end()) {
+//                     registry_.erase(it);
+//                     s = success;
+//                 }
+//             }
+            rep = reply(command_unbind, s);
+        }
+        catch (std::bad_alloc) {
+            rep = reply(command_unbind, out_of_memory);
+        }            
+        catch (...) {
+            rep = reply(command_unbind, internal_server_error);
+        }            
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     void request_handler::handle_resolve(request const& req, reply& rep)
     {
         try {
             mutex_type::scoped_lock l(mtx_);
             registry_type::iterator it = registry_.find(req.get_id());
             if (it != registry_.end()) {
-                rep = reply(command_resolve, (*it).second);
+                rep = reply(command_resolve, boost::fusion::at_c<0>((*it).second));
             }
             else {
                 rep = reply(command_resolve, no_success);
@@ -390,6 +441,14 @@ namespace hpx { namespace naming { namespace server
             
         case command_unbind:
             handle_unbind(req, rep);
+            break;
+
+        case command_bind_range:
+            handle_bind_range(req, rep);
+            break;
+            
+        case command_unbind_range:
+            handle_unbind_range(req, rep);
             break;
             
         case command_resolve:

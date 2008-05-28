@@ -83,6 +83,12 @@ namespace hpx { namespace naming
         ///                   if this locality already got a range assigned in 
         ///                   an earlier call. Any error results in an exception 
         ///                   thrown from this function.
+        ///
+        /// \note             This function assigns a range of global ids usable
+        ///                   by the given locality for newly created components.
+        ///                   Any of the returned global ids still has to be 
+        ///                   bound to a local address, either by calling 
+        ///                   \a bind or \a bind_range.
         bool get_id_range(locality const& l, id_type& lower_bound, 
             id_type& upper_bound);
         
@@ -120,7 +126,64 @@ namespace hpx { namespace naming
         ///                   has been removed, and it returns \a false if no 
         ///                   association existed. Any error results in an 
         ///                   exception thrown from this function.
+        ///
+        /// \note             You can unbind only global ids bound using the 
+        ///                   function \a bind. Do not use this function to 
+        ///                   unbind any of the global ids bound using 
+        ///                   \a bind_range.
         bool unbind(id_type id);
+        
+        /// \brief Bind unique range of global ids to given base address
+        ///
+        /// Every locality needs to be able to bind global ids to different
+        /// components without having to consult the DGAS server for every id 
+        /// to bind. This function can be called to bind a range of consecutive 
+        /// global ids to a range of consecutive local addresses (separated by 
+        /// a given \a offset).
+        /// 
+        /// \param lower_id   [in] The lower bound of the assigned id range.
+        ///                   The value can be used as the first id to assign. 
+        /// \param count      [in] The number of consecutive global ids to bind
+        ///                   starting at \a lower_id.
+        /// \param baseaddr   [in] The local address to bind to the global id
+        ///                   given by \a lower_id. This is the base address 
+        ///                   for all additional local addresses to bind to the
+        ///                   remaining global ids.
+        /// \param offset     [in] The offset to use to calculate the local
+        ///                   addresses to be bound to the range of global ids.
+        ///
+        /// \returns          This function returns \a true if a new range has 
+        ///                   been generated (it has been called for the first 
+        ///                   time for the given locality) and returns \a false 
+        ///                   if this locality already got a range assigned in 
+        ///                   an earlier call. Any error results in an exception 
+        ///                   thrown from this function.
+        bool bind_range(id_type lower_id, std::size_t count, 
+            address const& baseaddr, std::ptrdiff_t offset);
+
+        /// \brief Unbind the given range of global ids
+        ///
+        /// \param lower_id   [in] The lower bound of the assigned id range.
+        ///                   The value must the first id of the range as 
+        ///                   specified to the corresponding call to 
+        ///                   \a bind_range. 
+        /// \param count      [in] The number of consecutive global ids to unbind
+        ///                   starting at \a lower_id. This number must be 
+        ///                   identical to the number of global ids bound by 
+        ///                   the corresponding call to \a bind_range
+        ///
+        /// \returns          This function returns \a true if a new range has 
+        ///                   been generated (it has been called for the first 
+        ///                   time for the given locality) and returns \a false 
+        ///                   if this locality already got a range assigned in 
+        ///                   an earlier call. Any error results in an exception 
+        ///                   thrown from this function.
+        ///
+        /// \note             You can unbind only global ids bound using the 
+        ///                   function \a bind_range. Do not use this function 
+        ///                   to unbind any of the global ids bound using 
+        ///                   \a bind.
+        bool unbind_range(id_type lower_id, std::size_t count);
         
         /// \brief Resolve a given global address (id) to its associated local 
         ///        address

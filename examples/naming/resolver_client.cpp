@@ -40,7 +40,9 @@ int main(int argc, char* argv[])
     try {
         using namespace hpx::naming;
 
+        std::vector<std::size_t> counts;
         std::vector<double> timings;
+        std::vector<double> moments;
 
         // this is our locality
         locality here("localhost", HPX_PORT);
@@ -132,8 +134,10 @@ int main(int argc, char* argv[])
         // repeated remove association should fail
         BOOST_TEST(!resolver.unregisterid("/test/foo/1"));
         
+        BOOST_TEST(resolver.get_statistics_count(counts));
         BOOST_TEST(resolver.get_statistics_mean(timings));
-        
+        BOOST_TEST(resolver.get_statistics_moment2(moments));
+
 #if defined(MAX_ITERATIONS)
         }
         
@@ -147,7 +151,8 @@ int main(int argc, char* argv[])
         for (std::size_t i = 0; i < server::command_lastcommand; ++i)
         {
             std::cout << server::command_names[i] << ": " 
-                      << timings[i] << std::endl;
+                      << counts[i] << ", " << timings[i] << ", " << moments[i] 
+                      << std::endl;
         }
     }
     catch (std::exception& e) {

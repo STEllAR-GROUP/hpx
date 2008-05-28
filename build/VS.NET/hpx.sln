@@ -85,6 +85,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "accumulator_client", "accum
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcproj", "{1D601F73-5EF1-419A-9147-B6B5F0FE679E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "one_size_heap_test", "one_size_heap_test\one_size_heap_test.vcproj", "{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -253,6 +255,16 @@ Global
 		{1D601F73-5EF1-419A-9147-B6B5F0FE679E}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{1D601F73-5EF1-419A-9147-B6B5F0FE679E}.Release|Win32.ActiveCfg = Release|Win32
 		{1D601F73-5EF1-419A-9147-B6B5F0FE679E}.Release|Win32.Build.0 = Release|Win32
+		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Debug|Win32.Build.0 = Debug|Win32
+		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Release|Any CPU.ActiveCfg = Release|Win32
+		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Release|Win32.ActiveCfg = Release|Win32
+		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

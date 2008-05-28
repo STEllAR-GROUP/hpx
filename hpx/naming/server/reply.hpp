@@ -223,8 +223,10 @@ namespace hpx { namespace naming { namespace server
                     ar << statistics_[i];
                 break;
                 
-            case command_unbind:
             case command_bind:
+            case command_unbind:
+            case command_bind_range:
+            case command_unbind_range:
             case command_registerid: 
             case command_unregisterid: 
             default:
@@ -269,8 +271,10 @@ namespace hpx { namespace naming { namespace server
                     ar >> statistics_[i];
                 break;
                 
-            case command_unbind:
             case command_bind:
+            case command_unbind:
+            case command_bind_range:
+            case command_unbind_range:
             case command_registerid: 
             case command_unregisterid: 
             default:
@@ -323,8 +327,10 @@ namespace hpx { namespace naming { namespace server
             case command_statistics_moment2:
                 break;
                 
-            case command_unbind:
             case command_bind:
+            case command_unbind:
+            case command_bind_range:
+            case command_unbind_range:
             case command_registerid: 
             case command_unregisterid: 
             default:

@@ -30,13 +30,15 @@ namespace hpx { namespace naming { namespace server
         command_getidrange = 1,     /// return a unique range of ids for the requesting site
         command_bind = 2,           /// bind an address to a global id
         command_unbind = 3,         /// remove binding for a global id
-        command_resolve = 4,        /// resolve a global id to an address
-        command_queryid = 5,        /// query for a global id associated with a namespace name (string)
-        command_registerid = 6,     /// associate a namespace name with a global id
-        command_unregisterid = 7,   /// remove association of a namespace name with a global id
-        command_statistics_count = 8,    /// return some usage statistics: execution count 
-        command_statistics_mean = 9,     /// return some usage statistics: average server execution time
-        command_statistics_moment2 = 10, /// return some usage statistics: 2nd moment of server execution time
+        command_bind_range = 4,     /// bind a range of addresses to a range of global ids
+        command_unbind_range = 5,   /// remove binding for a range of global ids
+        command_resolve = 6,        /// resolve a global id to an address
+        command_queryid = 7,        /// query for a global id associated with a namespace name (string)
+        command_registerid = 8,     /// associate a namespace name with a global id
+        command_unregisterid = 9,   /// remove association of a namespace name with a global id
+        command_statistics_count = 10,   /// return some usage statistics: execution count 
+        command_statistics_mean = 11,    /// return some usage statistics: average server execution time
+        command_statistics_moment2 = 12, /// return some usage statistics: 2nd moment of server execution time
         command_lastcommand
     };
 
@@ -46,6 +48,8 @@ namespace hpx { namespace naming { namespace server
         "command_getidrange",
         "command_bind",
         "command_unbind",
+        "command_bind_range",
+        "command_unbind_range",
         "command_resolve",
         "command_queryid",
         "command_registerid",
@@ -71,25 +75,41 @@ namespace hpx { namespace naming { namespace server
           : command_(c)
         {}
         
+        // get_prefix
         request(name_server_command c, locality const& l) 
           : command_(c), site_(l)
         {}
         
+        // unbind, resolve
         request(name_server_command c, naming::id_type const& id) 
           : command_(c), id_(id)
         {}
 
+        // registerid
         request(name_server_command c, std::string const& ns_name, 
                 naming::id_type const& id) 
           : command_(c), id_(id), ns_name_(ns_name)
         {}
 
+        // unregisterid
         request(name_server_command c, std::string const& ns_name) 
           : command_(c), ns_name_(ns_name)
         {}
 
+        // bind
         request(name_server_command c, naming::id_type id, address const& addr) 
           : command_(c), id_(id), addr_(addr)
+        {}
+
+        // bind_range
+        request(name_server_command c, naming::id_type id, std::size_t count, 
+                address const& addr, std::ptrdiff_t offset) 
+          : command_(c), id_(id), count_(count), addr_(addr), offset_(offset)
+        {}
+
+        // unbind_range
+        request(name_server_command c, naming::id_type id, std::size_t count) 
+          : command_(c), id_(id), count_(count)
         {}
 
         boost::uint8_t get_command() const
@@ -102,6 +122,11 @@ namespace hpx { namespace naming { namespace server
             return id_;
         }
         
+        std::size_t const& get_count() const
+        {
+            return count_;
+        }
+        
         naming::locality get_site() const
         {
             return site_;
@@ -110,6 +135,11 @@ namespace hpx { namespace naming { namespace server
         naming::address get_address() const 
         {
             return addr_;
+        }
+        
+        std::ptrdiff_t const& get_offset() const
+        {
+            return offset_;
         }
         
         std::string get_name() const
@@ -140,6 +170,20 @@ namespace hpx { namespace naming { namespace server
                 ar << addr_.locality_;
                 ar << addr_.type_;
                 ar << addr_.address_;
+                break;
+
+            case command_bind_range:
+                ar << id_;
+                ar << count_;
+                ar << addr_.locality_;
+                ar << addr_.type_;
+                ar << addr_.address_;
+                ar << offset_;
+                break;
+
+            case command_unbind_range:
+                ar << id_;
+                ar << count_;
                 break;
 
             case command_queryid: 
@@ -187,6 +231,20 @@ namespace hpx { namespace naming { namespace server
                 ar >> addr_.address_;
                 break;
 
+            case command_bind_range:
+                ar >> id_;
+                ar >> count_;
+                ar >> addr_.locality_;
+                ar >> addr_.type_;
+                ar >> addr_.address_;
+                ar >> offset_;
+                break;
+
+            case command_unbind_range:
+                ar >> id_;
+                ar >> count_;
+                break;
+
             case command_queryid:
             case command_unregisterid: 
                 ar >> ns_name_;
@@ -212,8 +270,10 @@ namespace hpx { namespace naming { namespace server
     private:
         boost::uint8_t command_;    /// one of the name_server_command's above
         naming::id_type id_;        /// global id (resolve, bind and unbind only)
+        std::size_t count_;         /// number of global ids (bind_range, unbind_range only)
         naming::locality site_;     /// our address 
         naming::address addr_;      /// address to associate with this id (bind only)
+        std::ptrdiff_t offset_;     /// offset between local addresses of a range (bind_range only)
         std::string ns_name_;       /// namespace name (queryid only)
     };
 
@@ -225,12 +285,24 @@ namespace hpx { namespace naming { namespace server
         switch (req.command_) {
         case command_unbind:
         case command_resolve:
-            os << "id" << std::hex << req.id_ << " ";
+            os << "id:" << std::hex << req.id_ << " ";
             break;
 
         case command_bind:
-            os << "id" << std::hex << req.id_ << " ";
+            os << "id:" << std::hex << req.id_ << " ";
             os << "addr(" << req.addr_ << ") ";
+            break;
+
+        case command_bind_range:
+            os << "id:" << std::hex << req.id_ << " ";
+            os << "count:" << std::dec << req.count_ << " ";
+            os << "addr(" << req.addr_ << ") ";
+            os << "offset:" << std::dec << req.offset_ << " ";
+            break;
+
+        case command_unbind_range:
+            os << "id:" << std::hex << req.id_ << " ";
+            os << "count:" << std::dec << req.count_ << " ";
             break;
 
         case command_queryid:
@@ -239,7 +311,7 @@ namespace hpx { namespace naming { namespace server
             break;
 
         case command_registerid:
-            os << "id" << std::hex << req.id_ << " ";
+            os << "id:" << std::hex << req.id_ << " ";
             os << "name(\"" << req.ns_name_ << "\") ";
             break;
 
