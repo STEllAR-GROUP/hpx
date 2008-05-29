@@ -39,6 +39,21 @@ namespace hpx { namespace parcelset
         
         // avoid warnings about using \a this in member initializer list
         parcelhandler& This() { return *this; }
+
+        // make sure the parcel has been properly initialized        
+        void init_parcel(parcel& p)
+        {
+            // ensure parcel id is set
+            if (!p.get_parcel_id())
+                p.set_parcel_id(id_range_.get_id());
+
+            // ensure the source locality id is set (if no component id is given)
+            if (!p.get_source())
+                p.set_source(prefix_);
+
+            // set the current local time for this locality
+            p.set_start_time(get_current_time());
+        }
         
     public:
         /// \param resolver [in] A reference to the DGAS client to use for 
@@ -135,32 +150,31 @@ namespace hpx { namespace parcelset
         template <typename Handler>
         parcel_id put_parcel(parcel& p, Handler f)
         {
-            // ensure parcel id is set
-            if (!p.get_parcel_id())
-                p.set_parcel_id(id_range_.get_id());
-
-            // ensure the source locality id is set (if no component id is given)
-            if (!p.get_source())
-                p.set_source(prefix_);
-                
-            // resolve destination address, if needed
+            // asynchronously resolve destination address, if needed
+            util::unique_future<std::pair<bool, naming::address> > fut;
             if (!p.get_destination_addr()) {
-                naming::address addr;
-                if (!resolver_.resolve(p.get_destination(), addr)) {
+                util::unique_future<std::pair<bool, naming::address> > fut = 
+                    resolver_.resolve_async(p.get_destination());
+
+                // properly initialize parcel
+                init_parcel(p);
+
+                // wait for the address translation to complete
+                std::pair<bool, naming::address> result = fut.get();
+                if (!result.first) {
                     throw exception(unknown_component_address, 
                         "Unknown destination address");
                 }
-                p.set_destination_addr(addr);
+                p.set_destination_addr(result.second);
+            }
+            else {
+                // properly initialize parcel
+                init_parcel(p);
             }
             
-            // set the current local time for this locality
-            p.set_start_time(get_current_time());
-            
-            // send the parcel to its destination
-            pp_.put_parcel(p, f);
-            
-            // return parcel id of the parcel being sent
-            return p.get_parcel_id();
+            // send the parcel to its destination, return parcel id of the 
+            // parcel being sent
+            return pp_.put_parcel(p, f);
         }
 
         /// This put_parcel() function overload is asynchronous, but no 

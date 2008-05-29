@@ -17,9 +17,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming 
 {
-    resolver_server::resolver_server (locality l, 
-        bool start_service_async, std::size_t io_service_pool_size)
-      : io_service_pool_(io_service_pool_size),
+    resolver_server::resolver_server (util::io_service_pool& io_service_pool, 
+            locality l, bool start_service_async)
+      : io_service_pool_(io_service_pool),
         acceptor_(io_service_pool_.get_io_service()),
         new_connection_(new server::connection(
               io_service_pool_.get_io_service(), request_handler_)),
@@ -41,10 +41,10 @@ namespace hpx { namespace naming
             run(false);
     }
 
-    resolver_server::resolver_server(std::string const& address, 
-          unsigned short port, bool start_service_async, 
-          std::size_t io_service_pool_size)
-      : io_service_pool_(io_service_pool_size),
+    resolver_server::resolver_server(util::io_service_pool& io_service_pool, 
+            std::string const& address, unsigned short port, 
+            bool start_service_async)
+      : io_service_pool_(io_service_pool),
         acceptor_(io_service_pool_.get_io_service()),
         new_connection_(new server::connection(
               io_service_pool_.get_io_service(), request_handler_)),

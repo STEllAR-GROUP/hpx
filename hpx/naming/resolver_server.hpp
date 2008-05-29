@@ -31,17 +31,14 @@ namespace hpx { namespace naming
     public:
         /// Construct the server to listen on the specified TCP address and port, 
         /// and serve up requests to the address translation service.
-        explicit resolver_server (
-            std::string const& address = "localhost", 
-            unsigned short port = HPX_NAME_RESOLVER_PORT, 
-            bool start_service_asynchronously = false, 
-            std::size_t io_service_pool_size = 1);
+        resolver_server (util::io_service_pool& io_service_pool, 
+            std::string const& address, unsigned short port, 
+            bool start_asynchronously = false);
 
         /// Construct the server to listen to the endpoint given by the 
         /// locality and serve up requests to the address translation service.
-        resolver_server (locality l, 
-            bool start_service_asynchronously = false, 
-            std::size_t io_service_pool_size = 1);
+        resolver_server (util::io_service_pool& io_service_pool, locality l, 
+            bool start_asynchronously = false);
 
         /// Destruct the object. Stops the service if it has not been stopped
         /// already.
@@ -59,7 +56,7 @@ namespace hpx { namespace naming
         void handle_completion(boost::system::error_code const& e);
 
         /// The pool of io_service objects used to perform asynchronous operations.
-        util::io_service_pool io_service_pool_;
+        util::io_service_pool& io_service_pool_;
 
         /// Acceptor used to listen for incoming connections.
         boost::asio::ip::tcp::acceptor acceptor_;

@@ -24,7 +24,10 @@ namespace hpx { namespace util
     {
     public:
         /// Construct the io_service pool.
-        explicit io_service_pool(std::size_t pool_size);
+        /// \param pool_size
+        ///                 [in] The number of threads to run to serve incoming
+        ///                 requests
+        explicit io_service_pool(std::size_t pool_size = 1);
 
         /// Run all io_service objects in the pool. If join_threads is true
         /// this will also wait for all threads to complete

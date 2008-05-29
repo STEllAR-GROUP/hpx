@@ -12,6 +12,7 @@
 #include <hpx/naming/name.hpp>
 #include <hpx/naming/address.hpp>
 #include <hpx/util/future.hpp>
+#include <hpx/util/io_service_pool.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming 
@@ -29,11 +30,22 @@ namespace hpx { namespace naming
     public:
         /// Construct the resolver client to work with the server given by
         /// a locality
-        explicit resolver_client(locality l);
+        ///
+        /// \param io_service_pool
+        ///                 [in] The pool of networking threads to use to serve 
+        ///                 outgoing requests
+        resolver_client(util::io_service_pool& io_service_pool, locality l,
+            bool start_asynchronously = true);
         
         /// Construct the resolver client to work with the server given by
         /// its address and port number.
-        resolver_client(std::string const& address, unsigned short port);
+        ///
+        /// \param io_service_pool
+        ///                 [in] The pool of networking threads to use to serve 
+        ///                 outgoing requests
+        resolver_client(util::io_service_pool& io_service_pool, 
+            std::string const& address, unsigned short port,
+            bool start_asynchronously = true);
 
         /// \brief Get unique prefix usable as locality id (locality prefix)
         ///
@@ -409,7 +421,7 @@ namespace hpx { namespace naming
         void execute(server::request const& req, server::reply& rep);
 
     private:
-        boost::asio::io_service io_service_;
+        util::io_service_pool& io_service_pool_;
         boost::asio::ip::tcp::socket socket_;
     };
 

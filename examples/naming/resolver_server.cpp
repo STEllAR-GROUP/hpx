@@ -70,7 +70,8 @@ int main(int argc, char* argv[])
     try {
 #if defined(BOOST_WINDOWS)
         // Initialize server.
-        hpx::naming::resolver_server s(host, port, false, num_threads);
+        hpx::util::io_service_pool io_service_pool(num_threads); 
+        hpx::naming::resolver_server s(io_service_pool, host, port, false);
 
         // Set console control handler to allow server to be stopped.
         console_ctrl_function = boost::bind(&hpx::naming::resolver_server::stop, &s);
@@ -88,7 +89,8 @@ int main(int argc, char* argv[])
         pthread_sigmask(SIG_BLOCK, &new_mask, &old_mask);
         
         // Run server in background thread.
-        hpx::naming::resolver_server s(host, port, false, num_threads);
+        hpx::util::io_service_pool io_service_pool(num_threads); 
+        hpx::naming::resolver_server s(io_service_pool, host, port, false);
         boost::thread t(boost::bind(&hpx::naming::resolver_server::run, &s, true));
 
         std::cout << "Address resolver (server...)" << std::endl;

@@ -20,9 +20,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
-    parcelport::parcelport(naming::locality here, 
-            std::size_t io_service_pool_size)
-      : io_service_pool_(io_service_pool_size),
+    parcelport::parcelport(util::io_service_pool& io_service_pool, 
+            naming::locality here)
+      : io_service_pool_(io_service_pool),
         acceptor_(io_service_pool_.get_io_service()),
         parcels_(This()),
         new_server_connection_(new server::parcelport_connection(
@@ -41,9 +41,9 @@ namespace hpx { namespace parcelset
                 boost::asio::placeholders::error));
     }
 
-    parcelport::parcelport(std::string address, unsigned short port, 
-            std::size_t io_service_pool_size)
-      : io_service_pool_(io_service_pool_size),
+    parcelport::parcelport(util::io_service_pool& io_service_pool, 
+            std::string address, unsigned short port)
+      : io_service_pool_(io_service_pool),
         acceptor_(io_service_pool_.get_io_service()),
         parcels_(This()),
         new_server_connection_(new server::parcelport_connection(

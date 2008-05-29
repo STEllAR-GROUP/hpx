@@ -33,11 +33,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming 
 {
-    resolver_client::resolver_client(std::string const& address, 
-            unsigned short port) 
-      : socket_(io_service_)
+    resolver_client::resolver_client(util::io_service_pool& io_service_pool, 
+            std::string const& address, unsigned short port,
+            bool start_asynchronously) 
+      : io_service_pool_(io_service_pool), 
+        socket_(io_service_pool.get_io_service())
     {
         try {
+            if (start_asynchronously)
+                io_service_pool.run(false);
+
             using namespace boost::asio::ip;
             
             // try to convert the address string to an IP address directly
@@ -50,7 +55,7 @@ namespace hpx { namespace naming
             }
             
             // resolve the given address
-            tcp::resolver resolver(io_service_);
+            tcp::resolver resolver(io_service_pool.get_io_service());
             tcp::resolver::query query(address, 
                 boost::lexical_cast<std::string>(port));
             
@@ -75,9 +80,14 @@ namespace hpx { namespace naming
         }
     }
     
-    resolver_client::resolver_client(locality l) 
-      : socket_(io_service_)
+    resolver_client::resolver_client(util::io_service_pool& io_service_pool, 
+            locality l, bool start_asynchronously) 
+      : io_service_pool_(io_service_pool), 
+        socket_(io_service_pool.get_io_service())
     {
+        if (start_asynchronously)
+            io_service_pool.run(false);
+
         boost::system::error_code error = boost::asio::error::try_again;
         socket_.connect(l.get_endpoint(), error);
         if (error) {
@@ -349,9 +359,8 @@ namespace hpx { namespace naming
     {
         typedef resolver_client_connection<bool> connection_type;
         
-        // prepare send request
+        // prepare request
         server::request req(server::command_bind_range, lower_id, count, addr, offset);
-
         connection_type* conn = new connection_type(socket_, req);
         boost::shared_ptr<connection_type> client_conn(conn);
         
@@ -364,9 +373,8 @@ namespace hpx { namespace naming
     {
         typedef resolver_client_connection<bool> connection_type;
         
-        // prepare send request
+        // prepare request
         server::request req(server::command_unbind_range, lower_id, count);
-
         connection_type* conn = new connection_type(socket_, req);
         boost::shared_ptr<connection_type> client_conn(conn);
 
@@ -381,7 +389,7 @@ namespace hpx { namespace naming
             resolver_client_connection<std::pair<bool, address> > 
         connection_type;
         
-        // prepare send request
+        // prepare request
         server::request req(server::command_resolve, id);
         connection_type* conn = new connection_type(socket_, req);
         boost::shared_ptr<connection_type> client_conn(conn);

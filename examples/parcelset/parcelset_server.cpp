@@ -55,8 +55,8 @@ void received_parcel(hpx::parcelset::parcelhandler& ph, hpx::naming::address con
             accumulated_time += ph.get_current_time() - p.get_start_time();
             ++accumulated_count; 
 
-//             std::cout << "Received parcel: " << std::hex << p.get_parcel_id() 
-//                       << std::flush << std::endl;
+            std::cout << "Received parcel: " << std::hex << p.get_parcel_id() 
+                      << std::flush << std::endl;
 
             if (count >= MAXITERATIONS) {
                 std::cout << "Successfully sent " << count << " parcels!\n";
@@ -72,9 +72,9 @@ void received_parcel(hpx::parcelset::parcelhandler& ph, hpx::naming::address con
             p.set_parcel_id(hpx::naming::id_type());
             ph.put_parcel(p);
             ++count;
-//             std::cout << "Successfully sent parcel: " 
-//                       << std::hex << p.get_parcel_id() 
-//                       << std::flush << std::endl;
+            std::cout << "Successfully sent parcel: " 
+                      << std::hex << p.get_parcel_id() 
+                      << std::flush << std::endl;
         }
         catch(std::exception const& e) {
             std::cerr << "Caught std::exception: " << e.what() << std::endl;
@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
         // Check command line arguments.
         if (argc != 6) 
         {
-            std::cerr << "Using default settings: ps:localhost:7911 dgas:localhost:7912 threads:1" 
+            std::cerr << "Using default settings: ps:localhost:7911 dgas:localhost:7912 threads:3" 
                       << std::endl;
             std::cerr << "Possible arguments: <HPX address> <HPX port> <DGAS address> <DGAS port> <num_threads>"
                       << std::endl;
@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
             ps_port = 7911;
             gas_host = "localhost";
             gas_port = 7912;
-            num_threads = 1;
+            num_threads = 3;
         }
         else
         {
@@ -115,9 +115,12 @@ int main(int argc, char* argv[])
 
 #if defined(BOOST_WINDOWS)
         // Run the ParalleX services
-        hpx::naming::resolver_server dgas_s(gas_host, gas_port, true, num_threads);
-        hpx::naming::resolver_client dgas_c(gas_host, gas_port);
-        hpx::parcelset::parcelport pp(ps_host, ps_port);
+        hpx::util::io_service_pool dgas_pool; 
+        hpx::naming::resolver_server dgas_s(dgas_pool, gas_host, gas_port, true);
+        hpx::naming::resolver_client dgas_c(dgas_pool, gas_host, gas_port);
+        
+        hpx::util::io_service_pool io_service_pool(num_threads); 
+        hpx::parcelset::parcelport pp(io_service_pool, ps_host, ps_port);
         hpx::parcelset::parcelhandler ph(dgas_c, pp);
 
         // Set console control handler to allow server to be stopped.
@@ -143,9 +146,12 @@ int main(int argc, char* argv[])
         pthread_sigmask(SIG_BLOCK, &new_mask, &old_mask);
         
         // Run the ParalleX services in a background thread
-        hpx::naming::resolver_server dgas_s(gas_host, gas_port, true, num_threads);
-        hpx::naming::resolver_client dgas_c(gas_host, gas_port);
-        hpx::parcelset::parcelport pp(ps_host, ps_port);
+        hpx::util::io_service_pool dgas_pool; 
+        hpx::naming::resolver_server dgas_s(dgas_pool, gas_host, gas_port, true);
+        hpx::naming::resolver_client dgas_c(dgas_pool, gas_host, gas_port);
+
+        hpx::util::io_service_pool io_service_pool(num_threads); 
+        hpx::parcelset::parcelport pp(io_service_pool, ps_host, ps_port);
         hpx::parcelset::parcelhandler ph(dgas_c, pp);
 
         boost::thread t1(boost::bind(&hpx::parcelset:parcelport::run, &pp, true));

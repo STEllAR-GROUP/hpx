@@ -239,8 +239,8 @@ namespace hpx { namespace naming
         /// Socket for the resolver_client_connection.
         boost::asio::ip::tcp::socket& socket_;
 
-        /// buffer for outgoing data
-        boost::integer::ulittle64_t size_;
+        /// buffer for outgoing and incoming data
+        boost::integer::ulittle32_t size_;
         std::vector<char> buffer_;
     };
 

@@ -40,24 +40,24 @@ namespace hpx { namespace parcelset
         /// Construct the parcelport server to listen on the specified TCP 
         /// address and port, and serve up requests to the parcelport.
         ///
+        /// \param io_service_pool
+        ///                 [in] The pool of networking threads to use to serve 
+        ///                 incoming requests
         /// \param address  [in] The name (IP address) this instance should
         ///                 listen at.
         /// \param port     [in] The (IP) port this instance should listen at.
-        /// \param io_service_pool_size
-        ///                 [in] The number of threads to run to serve incoming
-        ///                 requests
-        explicit parcelport(
-            std::string address = "localhost", unsigned short port = HPX_PORT, 
-            std::size_t io_service_pool_size = 1);
+        explicit parcelport(util::io_service_pool& io_service_pool, 
+            std::string address = "localhost", unsigned short port = HPX_PORT);
 
         /// Construct the parcelport server to listen to the endpoint given by 
         /// the locality and serve up requests to the parcelport.
         ///
+        /// \param io_service_pool
+        ///                 [in] The pool of networking threads to use to serve 
+        ///                 incoming requests
         /// \param here     [in] The locality this instance should listen at.
-        /// \param io_service_pool_size
-        ///                 [in] The number of threads to run to serve incoming
-        ///                 requests
-        parcelport(naming::locality here, std::size_t io_service_pool_size = 1);
+        parcelport(util::io_service_pool& io_service_pool, 
+            naming::locality here);
 
         /// Start the parcelport threads, enabling the parcel receiver
         ///
@@ -213,7 +213,7 @@ namespace hpx { namespace parcelset
 
     private:
         /// The pool of io_service objects used to perform asynchronous operations.
-        util::io_service_pool io_service_pool_;
+        util::io_service_pool& io_service_pool_;
 
         /// Acceptor used to listen for incoming connections.
         boost::asio::ip::tcp::acceptor acceptor_;

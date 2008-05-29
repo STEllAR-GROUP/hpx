@@ -57,20 +57,20 @@ void received_parcel(hpx::parcelset::parcelhandler& ph, hpx::naming::address con
             accumulated_time += ph.get_current_time() - p.get_start_time();
             ++accumulated_count; 
             
-//             std::cout << "Received parcel: " << std::hex << p.get_parcel_id() 
-//                       << std::flush << std::endl;
+            std::cout << "Received parcel: " << std::hex << p.get_parcel_id() 
+                      << std::flush << std::endl;
 
             p.set_destination(p.get_source());
             p.set_source(hpx::naming::id_type());
             p.set_parcel_id(hpx::naming::id_type());
             ph.put_parcel(p);
-//             std::cout << "Successfully sent parcel: " 
-//                       << std::hex << p.get_parcel_id() 
-//                       << std::flush << std::endl;
+            std::cout << "Successfully sent parcel: " 
+                      << std::hex << p.get_parcel_id() 
+                      << std::flush << std::endl;
 
             if (++count >= MAXITERATIONS) {
-                std::cout << "Successfully sent " << count << " parcels!\n";
-                std::cout << "Average travel time: " 
+                std::cout << "Successfully sent " << std::dec << count
+                          << " parcels!\nAverage travel time: " 
                           << accumulated_time/accumulated_count
                           << std::flush << std::endl;
                 ph.get_parcelport().stop(false);
@@ -117,8 +117,11 @@ int main(int argc, char* argv[])
 
 #if defined(BOOST_WINDOWS)
         // Start ParalleX services
-        hpx::naming::resolver_client dgas_c(gas_host, gas_port);
-        hpx::parcelset::parcelport pp (hpx::naming::locality(ps_host, ps_port));
+        hpx::util::io_service_pool dgas_pool; 
+        hpx::naming::resolver_client dgas_c(dgas_pool, gas_host, gas_port);
+
+        hpx::util::io_service_pool io_service_pool(2); 
+        hpx::parcelset::parcelport pp (io_service_pool, hpx::naming::locality(ps_host, ps_port));
         hpx::parcelset::parcelhandler ph (dgas_c, pp);
 
         ph.register_event_handler(received_parcel);
@@ -161,8 +164,9 @@ int main(int argc, char* argv[])
         pthread_sigmask(SIG_BLOCK, &new_mask, &old_mask);
         
         // Start ParalleX services
-        hpx::naming::resolver_client dgas_c(gas_host, gas_port);
-        hpx::parcelset::parcelport pp (hpx::naming::locality(ps_host, ps_port));
+        hpx::util::io_service_pool io_service_pool(1); 
+        hpx::naming::resolver_client dgas_c(io_service_pool, gas_host, gas_port);
+        hpx::parcelset::parcelport pp (io_service_pool, hpx::naming::locality(ps_host, ps_port));
         hpx::parcelset::parcelhandler ph (dgas_c, pp);
 
         ph.register_event_handler(received_parcel);
