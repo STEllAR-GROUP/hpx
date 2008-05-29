@@ -359,6 +359,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\hpx\naming\resolver_client_connection.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\naming\resolver_server.hpp"
 					>
 				</File>

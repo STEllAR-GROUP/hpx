@@ -16,7 +16,9 @@
 #include <boost/fusion/include/at.hpp>
 #include <boost/fusion/include/size.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/bind.hpp>
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
 #include <hpx/components/component_type.hpp>
 #include <hpx/exception.hpp>
@@ -31,7 +33,8 @@ namespace hpx { namespace components
         virtual ~action_base() {}
         virtual std::size_t get_action_code() const = 0;
         virtual component_type get_component_type() const = 0;
-        virtual bool execute(void *component) const = 0;
+        virtual boost::function<bool (hpx::threadmanager::px_thread_self&)>
+            get_thread_function(void *component) const = 0;
     };
 
     typedef boost::shared_ptr<action_base> action_type;
@@ -131,7 +134,10 @@ namespace hpx { namespace components
     
     ///////////////////////////////////////////////////////////////////////////
     //  zero parameter version
-    template <typename Component, int Action, bool (Component::*F)()>
+    template <
+        typename Component, int Action, 
+        bool (Component::*F)(hpx::threadmanager::px_thread_self&)
+    >
     class action0 : public action<Component, Action, boost::fusion::vector<> >
     {
     public:
@@ -139,9 +145,10 @@ namespace hpx { namespace components
         {}
         
     private:
-        bool execute(void *component) const
+        boost::function<bool (hpx::threadmanager::px_thread_self&)>
+            get_thread_function(void *component) const
         {
-            return (reinterpret_cast<Component*>(component)->*F)();
+            return boost::bind(F, reinterpret_cast<Component*>(component), _1);
         }
 
     private:
@@ -158,8 +165,8 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     //  one parameter version
     template <
-        typename Component, int Action, 
-        typename Arg0, bool (Component::*F)(Arg0) 
+        typename Component, int Action, typename Arg0, 
+        bool (Component::*F)(hpx::threadmanager::px_thread_self&, Arg0) 
     >
     class action1 
       : public action<Component, Action, boost::fusion::vector<Arg0> >
@@ -180,9 +187,10 @@ namespace hpx { namespace components
         {}
 
     private:
-        bool execute(void *component) const
+        boost::function<bool (hpx::threadmanager::px_thread_self&)>
+            get_thread_function(void *component) const
         {
-            return (reinterpret_cast<Component*>(component)->*F)(
+            return boost::bind(F, reinterpret_cast<Component*>(component), _1,
                 this->get<0>());
         }
 
@@ -200,8 +208,8 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     //  two parameter version
     template <
-        typename Component, int Action, 
-        typename Arg0, typename Arg1, bool (Component::*F)(Arg0, Arg1) 
+        typename Component, int Action, typename Arg0, typename Arg1, 
+        bool (Component::*F)(hpx::threadmanager::px_thread_self&, Arg0, Arg1) 
     >
     class action2
       : public action<Component, Action, boost::fusion::vector<Arg0, Arg1> >
@@ -222,9 +230,10 @@ namespace hpx { namespace components
         {}
 
     private:
-        bool execute(void *component) const
+        boost::function<bool (hpx::threadmanager::px_thread_self&)>
+            get_thread_function(void *component) const
         {
-            return (reinterpret_cast<Component*>(component)->*F)(
+            return boost::bind(F, reinterpret_cast<Component*>(component), _1,
                 this->get<0>(), this->get<1>());
         }
 

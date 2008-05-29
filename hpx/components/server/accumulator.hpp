@@ -45,21 +45,21 @@ namespace hpx { namespace components { namespace server
         // exposed functionality of this component
         
         /// Initialize the accumulator
-        bool init() 
+        bool init(hpx::threadmanager::px_thread_self&) 
         {
             arg_ = 0;
             return true;
         }
         
         /// Add the given number to the accumulator
-        bool add (double arg) 
+        bool add (hpx::threadmanager::px_thread_self&, double arg) 
         {
             arg_ += arg;
             return true;
         }
         
         /// Print the current value of the accumulator
-        bool print() 
+        bool print(hpx::threadmanager::px_thread_self&) 
         {
             std::cout << arg_ << std::endl;
             return true;

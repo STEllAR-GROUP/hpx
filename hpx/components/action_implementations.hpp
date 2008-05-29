@@ -34,9 +34,8 @@
     ///////////////////////////////////////////////////////////////////////////
     //  N parameter version
     template <
-        typename Component, int Action, 
-        BOOST_PP_ENUM_PARAMS(N, typename Arg),
-        bool (Component::*F)(BOOST_PP_ENUM_PARAMS(N, Arg)) 
+        typename Component, int Action, BOOST_PP_ENUM_PARAMS(N, typename Arg),
+        bool (Component::*F)(hpx::threadmanager::px_thread_self&, BOOST_PP_ENUM_PARAMS(N, Arg)) 
     >
     class BOOST_PP_CAT(action, N)
       : public action<
@@ -61,9 +60,10 @@
         {}
         
     private:
-        bool execute(void *component) const
+        boost::function<bool (hpx::threadmanager::px_thread_self&)>
+            get_thread_function(void *component) const
         {
-            return (reinterpret_cast<Component*>(component)->*F)(
+            return boost::bind(F, reinterpret_cast<Component*>(component), _1,
                 BOOST_PP_REPEAT(N, HPX_ATION_ARGUMENT, _));
         }
 
