@@ -124,13 +124,13 @@ namespace boost { namespace coroutines {
 
     template<typename Functor>
     coroutine (Functor f, 
-               std::ptrdiff_t stack_size = detail::default_stack_size,
-               BOOST_DEDUCED_TYPENAME boost::enable_if<
-               boost::mpl::and_<
-               detail::is_callable<Functor>, 
-               boost::mpl::not_<is_coroutine<Functor> >
-               > >
-               ::type * = 0
+               std::ptrdiff_t stack_size = detail::default_stack_size
+//              , BOOST_DEDUCED_TYPENAME boost::enable_if<
+//                boost::mpl::and_<
+//                detail::is_callable<Functor>, 
+//                boost::mpl::not_<is_coroutine<Functor> >
+//                > >
+//                ::type * = 0
                ) :
       m_pimpl(impl_type::create(f, stack_size)) {}
  
