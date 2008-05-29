@@ -22,6 +22,7 @@
 #include <hpx/naming/locality.hpp>
 #include <hpx/naming/address.hpp>
 #include <hpx/naming/resolver_client.hpp>
+#include <hpx/naming/resolver_client_connection.hpp>
 #include <hpx/naming/server/reply.hpp>
 #include <hpx/naming/server/request.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
@@ -33,7 +34,7 @@
 namespace hpx { namespace naming 
 {
     resolver_client::resolver_client(std::string const& address, 
-        unsigned short port) 
+            unsigned short port) 
       : socket_(io_service_)
     {
         try {
@@ -86,6 +87,8 @@ namespace hpx { namespace naming
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // synchronous functionality
     bool resolver_client::get_prefix(locality const& l, id_type& prefix)
     {
         // send request
@@ -336,6 +339,55 @@ namespace hpx { namespace naming
             boost::throw_exception(hpx::exception(no_success, 
                 "unexpected error"));
         } 
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // asynchronous API
+    util::unique_future<bool> 
+    resolver_client::bind_range_async(id_type lower_id, std::size_t count, 
+        address const& addr, std::ptrdiff_t offset)
+    {
+        typedef resolver_client_connection<bool> connection_type;
+        
+        // prepare send request
+        server::request req(server::command_bind_range, lower_id, count, addr, offset);
+
+        connection_type* conn = new connection_type(socket_, req);
+        boost::shared_ptr<connection_type> client_conn(conn);
+        
+        conn->execute();
+        return conn->get_future();
+    }
+
+    util::unique_future<bool> 
+    resolver_client::unbind_range_async(id_type lower_id, std::size_t count)
+    {
+        typedef resolver_client_connection<bool> connection_type;
+        
+        // prepare send request
+        server::request req(server::command_unbind_range, lower_id, count);
+
+        connection_type* conn = new connection_type(socket_, req);
+        boost::shared_ptr<connection_type> client_conn(conn);
+
+        conn->execute();
+        return conn->get_future();
+    }
+
+    util::unique_future<std::pair<bool, address> >  
+    resolver_client::resolve_async(id_type id)
+    {
+        typedef 
+            resolver_client_connection<std::pair<bool, address> > 
+        connection_type;
+        
+        // prepare send request
+        server::request req(server::command_resolve, id);
+        connection_type* conn = new connection_type(socket_, req);
+        boost::shared_ptr<connection_type> client_conn(conn);
+        
+        conn->execute();
+        return conn->get_future();
     }
 
 ///////////////////////////////////////////////////////////////////////////////
