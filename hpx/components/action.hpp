@@ -34,7 +34,7 @@ namespace hpx { namespace components
         virtual std::size_t get_action_code() const = 0;
         virtual component_type get_component_type() const = 0;
         virtual boost::function<bool (hpx::threadmanager::px_thread_self&)>
-            get_thread_function(void *component) const = 0;
+            get_thread_function(naming::address::address_type lva) const = 0;
     };
 
     typedef boost::shared_ptr<action_base> action_type;
@@ -146,7 +146,7 @@ namespace hpx { namespace components
         
     private:
         boost::function<bool (hpx::threadmanager::px_thread_self&)>
-            get_thread_function(void *component) const
+            get_thread_function(naming::address::address_type lva) const
         {
             return boost::bind(F, reinterpret_cast<Component*>(component), _1);
         }
@@ -188,7 +188,7 @@ namespace hpx { namespace components
 
     private:
         boost::function<bool (hpx::threadmanager::px_thread_self&)>
-            get_thread_function(void *component) const
+            get_thread_function(naming::address::address_type lva) const
         {
             return boost::bind(F, reinterpret_cast<Component*>(component), _1,
                 this->get<0>());
@@ -231,7 +231,7 @@ namespace hpx { namespace components
 
     private:
         boost::function<bool (hpx::threadmanager::px_thread_self&)>
-            get_thread_function(void *component) const
+            get_thread_function(naming::address::address_type lva) const
         {
             return boost::bind(F, reinterpret_cast<Component*>(component), _1,
                 this->get<0>(), this->get<1>());
