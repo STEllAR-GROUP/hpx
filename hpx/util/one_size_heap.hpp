@@ -7,16 +7,15 @@
 #define HPX_UTIL_ONE_SIZE_HEAP_MAY_26_2008_1136AM
 
 #include <new>
-#include <cmemory>
+#include <memory>
 #include <string>
 
 #include <boost/noncopyable.hpp>
 #include <hpx/config.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace one_size_heap_allocators
+namespace hpx { namespace util 
 {
-
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
     namespace debug
     {
@@ -116,7 +115,7 @@ namespace hpx { namespace util { namespace one_size_heap_allocators
             BOOST_ASSERT(sizeof(data) == heap_size);
         }
         
-        ~one_size_heap();
+        ~one_size_heap()
         {
             if (pool_ != NULL) {
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
@@ -141,19 +140,20 @@ namespace hpx { namespace util { namespace one_size_heap_allocators
             if (!ensure_pool())
                 return NULL;
 
-            T *p = static_cast<T*>(&first_free_->datafield.data_);
+            T *p = reinterpret_cast<T*>(&first_free_->datafield.data_);
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
             data *item = first_free_;
 #endif
 
             BOOST_ASSERT(p != NULL);
             BOOST_ASSERT(first_free_ != first_free_->datafield.next_);
-            BOOST_ASSERT(0 == first_free_->alloc_count_);
 
             first_free_ = first_free_->datafield.next_;
             free_size_--;
 
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
+            BOOST_ASSERT(0 == first_free_->alloc_count_);
+            
             // init memory blocks
             debug::fill_bytes(&item->preguard_, preguard_value, sizeof(data.preguard_));
             debug::fill_bytes(&item->datafield.data_, initial_value, sizeof(T));
@@ -173,9 +173,11 @@ namespace hpx { namespace util { namespace one_size_heap_allocators
 
             data* p1 = (data *)((unsigned char *)p - guard_size);
 
+#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
             BOOST_ASSERT(p1->alloc_count_ > 0 && p1->alloc_count_ <= alloc_count_);
             BOOST_ASSERT(debug::test_fill_bytes(&p1->preguard_, preguard_value, guard_size));
             BOOST_ASSERT(debug::test_fill_bytes(&p1->postguard_, postguard_value, guard_size));
+#endif
 
             BOOST_ASSERT(NULL != pool_ && p1 >= pool_);
             BOOST_ASSERT(NULL != pool_ && p1 <  pool_ + size_);
@@ -324,36 +326,40 @@ namespace hpx { namespace util { namespace one_size_heap_allocators
 #endif
     };
 
-    ///////////////////////////////////////////////////////////////////
-    // simple allocator which gets the memory from malloc
-    class mallocator  
+    ///////////////////////////////////////////////////////////////////////////
+    namespace one_size_heap_allocators
     {
-    public:
-        mallocator() {}
-        ~mallocator() {}
+        ///////////////////////////////////////////////////////////////////////
+        // simple allocator which gets the memory from malloc
+        class mallocator  
+        {
+        public:
+            mallocator() {}
+            ~mallocator() {}
 
-        static void* alloc(std::size_t& size) 
-        { 
-            return malloc(size); 
-        }
-        static void free(void* p) 
-        { 
-            ::free(p); 
-        }
-        static void* realloc(std::size_t &size, void *p)
-        { 
-            return ::realloc(p, size);
-        }
-    };
-
+            static void* alloc(std::size_t& size) 
+            { 
+                return malloc(size); 
+            }
+            static void free(void* p) 
+            { 
+                ::free(p); 
+            }
+            static void* realloc(std::size_t &size, void *p)
+            { 
+                return ::realloc(p, size);
+            }
+        };
+    }
+    
     ///////////////////////////////////////////////////////////////////////////
     // heap using malloc and friends
     template<typename T>
     class one_size_malloc_heap : 
-        public one_size_heap<T, one_size_heapAllocators::mallocator>
+        public one_size_heap<T, one_size_heap_allocators::mallocator>
     {
     private:
-        typedef one_size_heap<T, one_size_heapAllocators::mallocator> base_type;
+        typedef one_size_heap<T, one_size_heap_allocators::mallocator> base_type;
         
     public:
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
@@ -367,7 +373,7 @@ namespace hpx { namespace util { namespace one_size_heap_allocators
 #endif
     };
 
-}}} // hpx::util::namespace one_size_heap_allocators
+}} // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
 // Macros to minimize typing:
@@ -389,7 +395,7 @@ namespace hpx { namespace util { namespace one_size_heap_allocators
 // helper macros for the implementation of one_size_heaps
 #define HPX_IMPLEMENT_ONE_SIZE_PRIVATE_HEAP(allocator, dataclass)             \
     namespace {                                                               \
-        one_size_heap<dataclass, allocator>                                   \
+        hpx::util::one_size_heap<dataclass, allocator>                        \
             HPX_MAKEUNIQUENAME(theHeap)(#dataclass);                          \
     };                                                                        \
     void* dataclass::operator new(std::size_t size, char const* filename,     \
@@ -423,7 +429,7 @@ namespace hpx { namespace util { namespace one_size_heap_allocators
 // helper macros for the implementation of one_size_heaps
 #define HPX_IMPLEMENT_ONE_SIZE_PRIVATE_HEAP(allocator, dataclass)             \
     namespace {                                                               \
-        one_size_heap<dataclass, allocator>                                   \
+        hpx::util::one_size_heap<dataclass, allocator>                        \
             HPX_MAKEUNIQUENAME(theHeap)(#dataclass);                          \
     };                                                                        \
     void* dataclass::operator new(std::size_t size)                           \

@@ -26,7 +26,12 @@ set (hpxlib_HEADERS
     ../hpx/naming/name.hpp
     ../hpx/naming/namespace.hpp
     ../hpx/naming/resolver_client.hpp
+    ../hpx/naming/resolver_client_connection.hpp
     ../hpx/naming/resolver_server.hpp
+    ../hpx/naming/server/connection.hpp
+    ../hpx/naming/server/reply.hpp
+    ../hpx/naming/server/request.hpp
+    ../hpx/naming/server/request_handler.hpp
     # parcelset
     ../hpx/parcelset/connection_cache.hpp
     ../hpx/parcelset/parcel.hpp
@@ -43,9 +48,12 @@ set (hpxlib_HEADERS
     ../hpx/util/asio_util.hpp
     ../hpx/util/container_device.hpp
     ../hpx/util/dgas_logging.hpp
+    ../hpx/util/future.hpp
     ../hpx/util/generate_unique_ids.hpp
     ../hpx/util/high_resolution_timer.hpp
     ../hpx/util/io_service_pool.hpp
+    ../hpx/util/one_size_heap.hpp
+    ../hpx/util/one_size_heap_list.hpp
     ../hpx/util/portable_binary_iarchive.hpp
     ../hpx/util/portable_binary_oarchive.hpp
     ../hpx/util/safe_bool.hpp
