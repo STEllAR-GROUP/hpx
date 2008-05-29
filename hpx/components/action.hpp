@@ -20,9 +20,10 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
-#include <hpx/components/component_type.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/components/component_type.hpp>
 #include <hpx/util/serialize_sequence.hpp>
+#include <hpx/naming/address.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
