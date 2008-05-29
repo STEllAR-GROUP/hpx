@@ -21,8 +21,8 @@ namespace hpx { namespace threadmanager
 
         // lock queue when adding work
         mutex_type::scoped_lock lk(mtx_);
-        work_items_.push(hpx::threadmanager::px_thread(threadfunc));
-            
+        work_items_.push(px_thread(threadfunc, px_thread::pending));
+
         if (running_) 
             cond_.notify_one();           // try to execute the new work item
     }
@@ -76,11 +76,12 @@ namespace hpx { namespace threadmanager
         prepare_main_thread main_thread;
         while (running_) 
         {
-            bool exited = true;
+            bool exited = false;
             hpx::threadmanager::px_thread thrd (work_items_.front());
             work_items_.pop();
 
             // make sure lock is unlocked during execution of work item
+            if (thrd.get_state() == px_thread::pending)
             {
                 unlock_the_lock l(lk);    
                 exited = thrd();

@@ -27,7 +27,6 @@ namespace hpx { namespace threadmanager
     private:
         typedef std::queue<hpx::threadmanager::px_thread> work_items_type;
         typedef boost::mutex mutex_type;
-
         friend struct unlock_the_lock;
 
     public:
