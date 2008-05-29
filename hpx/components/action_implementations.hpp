@@ -63,7 +63,7 @@
         boost::function<bool (hpx::threadmanager::px_thread_self&)>
             get_thread_function(naming::address::address_type lva) const
         {
-            return boost::bind(F, reinterpret_cast<Component*>(component), _1,
+            return boost::bind(F, reinterpret_cast<Component*>(lva), _1,
                 BOOST_PP_REPEAT(N, HPX_ATION_ARGUMENT, _));
         }
 

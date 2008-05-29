@@ -148,7 +148,7 @@ namespace hpx { namespace components
         boost::function<bool (hpx::threadmanager::px_thread_self&)>
             get_thread_function(naming::address::address_type lva) const
         {
-            return boost::bind(F, reinterpret_cast<Component*>(component), _1);
+            return boost::bind(F, reinterpret_cast<Component*>(lva), _1);
         }
 
     private:
@@ -190,7 +190,7 @@ namespace hpx { namespace components
         boost::function<bool (hpx::threadmanager::px_thread_self&)>
             get_thread_function(naming::address::address_type lva) const
         {
-            return boost::bind(F, reinterpret_cast<Component*>(component), _1,
+            return boost::bind(F, reinterpret_cast<Component*>(lva), _1,
                 this->get<0>());
         }
 
@@ -233,7 +233,7 @@ namespace hpx { namespace components
         boost::function<bool (hpx::threadmanager::px_thread_self&)>
             get_thread_function(naming::address::address_type lva) const
         {
-            return boost::bind(F, reinterpret_cast<Component*>(component), _1,
+            return boost::bind(F, reinterpret_cast<Component*>(lva), _1,
                 this->get<0>(), this->get<1>());
         }
 
