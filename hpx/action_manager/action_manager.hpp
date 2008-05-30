@@ -7,8 +7,6 @@
 #include <hpx/parcelset.hpp>
 #include <hpx/threadmanager.hpp>
 
-#include <boost/tuple/tuple.hpp>
-
 namespace hpx { namespace action_manager
 {
     // How are the arguments of an action stored in a parcel??
@@ -50,7 +48,7 @@ namespace hpx { namespace action_manager
             // when a new parcel is received, it calls action_manager's fetchNewParcel()
             pHandler.register_event_handler(boost::bind(
                 &hpx::action_manager::action_manager::fetchNewParcel, this, 
-                _1, _2));
+                _1, _2), conn_);
         }
 
         // Call-back function for parcelHandler to call when new parcels are received
@@ -84,6 +82,10 @@ namespace hpx { namespace action_manager
     private:
         parcelset::parcelhandler& pHandler;
         threadmanager::threadmanager& tManager;
+        
+        // this scoped connection instance ensures the event handler to be 
+        // automatically unregistered whenever it gets destroyed
+        boost::signals::scoped_connection conn_;
 
         // The following mappings are not needed in the HPX implementation.
         // They are kept for testing purposes.
