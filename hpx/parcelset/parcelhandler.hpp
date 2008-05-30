@@ -315,7 +315,7 @@ namespace hpx { namespace parcelset
         ///
         /// \code
         ///      void sink (hpx::parcelset::parcelhandler& pp
-        ///                 hpx::parcelset::parcel const& p);
+        ///                 hpx::naming::address const& );
         /// \endcode
         ///
         ///                 where \a pp is a reference to the parcelhandler this

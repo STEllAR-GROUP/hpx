@@ -5,15 +5,14 @@
 
 #include <hpx/naming.hpp>
 #include <hpx/parcelset.hpp>
-// #include <hpx/threadmanager.hpp>
-// <waiting on CND's implementation of the TM API>
+#include <hpx/threadmanager.hpp>
 
 #include <boost/tuple/tuple.hpp>
 
 namespace hpx { namespace action_manager
 {
     // How are the arguments of an action stored in a parcel??
-    class meta_action
+/*    class meta_action
     {
     public:
         meta_action (void) {}
@@ -39,34 +38,58 @@ namespace hpx { namespace action_manager
         components::action_type action_;
         continuation cont_;
     };
-
+*/
     class action_manager
     {
     public:
+        // Constructor
+        action_manager(parcelset::parcelhandler& ph, threadmanager::threadmanager& tm)
+            : pHandler(ph), tManager(tm)
+        {
+            // Need to register the call-back function in parcelHandler so that
+            // when a new parcel is received, it calls action_manager's fetchNewParcel()
+            pHandler.register_event_handler(boost::bind(
+                &hpx::action_manager::action_manager::fetchNewParcel, this, 
+                _1, _2));
+        }
+
+        // Call-back function for parcelHandler to call when new parcels are received
+        void fetchNewParcel (parcelset::parcelhandler& pHandler, naming::address const&);
+
         // Invoked by the Parcel Handler when PH has new parcels to be executed 
-        void fetchNewParcel ();
+//        void fetchNewParcel ();
 
         // Invoked by the Thread Manager when it is running out of work-items 
         // and needs something to execute on a specific starving resources 
         // specified as the argument
-        void fetchNewParcel (naming::id_type resourceID);
+//        void fetchNewParcel (naming::id_type resourceID);
         
         // Invoked by the Applier when it has a local action to be executed
-        void fetchNewAction ();
+//        void fetchNewAction ();
 
         // Invoked during run-time or setup-time to add a new resource and its 
         // associated functions
-        void addResource (naming::id_type resourceGUID, 
-            boost::tuple resourceExecuteFunctions);
+//        void addResource (naming::id_type resourceGUID, 
+//            boost::tuple resourceExecuteFunctions);
         
         // Invoked during run-time or setup-time to remove an existing resource
         // and its associated functions
-        void removeResource (naming::id_type resourceGUID);
+//        void removeResource (naming::id_type resourceGUID);
+
+        ~action_manager()
+        {
+//            pHandler.register_event_handler();
+        }
 
     private:
-        // The following mappings are not needed in the HPX implementation. They are kept for testing purposes.
+        parcelset::parcelhandler& pHandler;
+        threadmanager::threadmanager& tManager;
 
-        // First item is the name of the action, second item is the pointer to the function itself
+        // The following mappings are not needed in the HPX implementation.
+        // They are kept for testing purposes.
+
+        // First item is the name of the action,
+        // second item is the pointer to the function itself
         //typedef std::map<std::string, function_name> action_list;
         // First item is the GUID of the resource, second item is the 
         //typedef std::map<naming::id_type, action_list> registry;
