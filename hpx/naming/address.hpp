@@ -35,6 +35,11 @@ namespace hpx { namespace naming
           : locality_(l), type_(0), address_(0) 
         {}
         
+        address(locality l, component_type t, void* lva)
+          : locality_(l), type_(t), 
+            address_(reinterpret_cast<address_type>(lva)) 
+        {}
+        
         address(locality l, component_type t, address_type a)
           : locality_(l), type_(t), address_(a) 
         {}

@@ -56,14 +56,14 @@ namespace hpx { namespace components
           : arguments_() 
         {}
         
-        template <typename Arg1>
-        action(Arg1 const& arg1) 
-          : arguments_(arg1) 
+        template <typename Arg0>
+        action(Arg0 const& arg0) 
+          : arguments_(arg0) 
         {}
 
-        template <typename Arg1, typename Arg2>
-        action(Arg1 const& arg1, Arg2 const& arg2) 
-          : arguments_(arg1, arg2) 
+        template <typename Arg0, typename Arg1>
+        action(Arg0 const& arg0, Arg1 const& arg1) 
+          : arguments_(arg0, arg1) 
         {}
 
         // bring in the rest of the constructors

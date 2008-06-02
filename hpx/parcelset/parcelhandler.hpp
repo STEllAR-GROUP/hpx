@@ -315,7 +315,7 @@ namespace hpx { namespace parcelset
         ///
         /// \code
         ///      void sink (hpx::parcelset::parcelhandler& pp
-        ///                 hpx::naming::address const& );
+        ///                 hpx::naming::address const&);
         /// \endcode
         ///
         ///                 where \a pp is a reference to the parcelhandler this
@@ -327,12 +327,40 @@ namespace hpx { namespace parcelset
             return parcels_.register_event_handler(sink);
         }
 
+        /// Register an event handler to be called whenever a parcel has been 
+        /// received
+        ///
+        /// \param sink     [in] A function object to be invoked whenever a 
+        ///                 parcel has been received by the parcelhandler. It is 
+        ///                 possible to register more than one (different) 
+        ///                 function object. The signature of this function 
+        ///                 object is expected to be:
+        ///
+        /// \code
+        ///      void sink (hpx::parcelset::parcelhandler& pp
+        ///                 hpx::naming::address const&);
+        /// \endcode
+        ///
+        ///                 where \a pp is a reference to the parcelhandler this
+        ///                 function object instance is invoked by, and \a dest
+        ///                 is the local destination address of the parcel.
+        /// \param conn     [in] A instance of a unspecified type allowing to 
+        ///                 manage the lifetime of the established connection.
+        ///                 The easiest way is to pass an instance of \a
+        ///                 scoped_connection_type allowing to automatically
+        ///                 unregister this connection whenever the connection
+        ///                 instance goes out of scope.
         template <typename F, typename Connection>
         bool register_event_handler(F sink, Connection& conn)
         {
             return parcels_.register_event_handler(sink, conn);
         }
 
+        /// The 'scoped_connection_type' typedef simplifies to manage registered
+        /// event handlers. Instances of this type may be passed as the second 
+        /// parameter to the \a register_event_handler() function
+        typedef boost::signals::scoped_connection scoped_connection_type;
+        
         double get_current_time() const
         {
             return startup_time_ + timer_.elapsed();

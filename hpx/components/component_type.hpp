@@ -44,8 +44,9 @@ namespace hpx { namespace components
         
     inline char const* const get_component_type_name(component_type type)
     {
-        BOOST_ASSERT(type >= component_invalid && type < component_last);
-        return components::detail::names[type];
+        if (type >= component_invalid && type < component_last)
+            return components::detail::names[type];
+        return "<Unknown>";
     }
     
 }}

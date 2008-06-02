@@ -15,7 +15,7 @@
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (3, HPX_ACTION_LIMIT,                                                 \
+    (3, (3, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/components/action_implementations.hpp"))                             \
     /**/
     

@@ -18,9 +18,16 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This defines the maximum number of arguments a action can take
-#if !defined(HPX_ACTION_LIMIT)
-#define HPX_ACTION_LIMIT 6
+/// This defines the maximum number of constructor arguments a component 
+/// can take
+#if !defined(HPX_COMPONENT_ARGUMENT_LIMIT)
+#define HPX_COMPONENT_ARGUMENT_LIMIT 6
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// This defines the maximum number of arguments an action can take
+#if !defined(HPX_ACTION_ARGUMENT_LIMIT)
+#define HPX_ACTION_ARGUMENT_LIMIT 6
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -28,6 +35,11 @@
 #if !defined(HPX_MAX_CONNECTION_CACHE_SIZE)
 #define HPX_MAX_CONNECTION_CACHE_SIZE 64
 #endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// This defines the LSB's of the global id's some of the components in a 
+/// locality. The corresponding MSB's are set to the locality prefix
+#define HPX_FACTORY_ID    1
 
 #endif
 

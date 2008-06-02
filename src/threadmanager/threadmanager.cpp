@@ -7,7 +7,6 @@
 
 #include <hpx/threadmanager/threadmanager.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
-#include <hpx/naming/namespace.hpp>
 
 namespace hpx { namespace threadmanager
 {

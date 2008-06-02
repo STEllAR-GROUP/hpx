@@ -85,7 +85,7 @@ namespace hpx { namespace action_manager
         
         // this scoped connection instance ensures the event handler to be 
         // automatically unregistered whenever it gets destroyed
-        boost::signals::scoped_connection conn_;
+        parcelset::parcelhandler::scoped_connection_type conn_;
 
         // The following mappings are not needed in the HPX implementation.
         // They are kept for testing purposes.

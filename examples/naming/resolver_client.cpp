@@ -118,7 +118,8 @@ int main(int argc, char* argv[])
         BOOST_TEST(id == id_type(2));
 
         // unbind the address
-        BOOST_TEST(resolver.unbind(id_type(1)));
+        BOOST_TEST(resolver.unbind(id_type(1), addr));
+        BOOST_TEST(addr == address(here, 1, 3));
 
         // remove association
         BOOST_TEST(resolver.unregisterid("/test/foo/1"));
@@ -149,7 +150,8 @@ int main(int argc, char* argv[])
         
         BOOST_TEST(!resolver.resolve(id_type(23), addr));
 
-        BOOST_TEST(resolver.unbind_range(id_type(3), 20));
+        BOOST_TEST(resolver.unbind_range(id_type(3), 20, addr));
+        BOOST_TEST(addr == address(here, 1, 2));
 
         // get statistics
         BOOST_TEST(resolver.get_statistics_count(counts));

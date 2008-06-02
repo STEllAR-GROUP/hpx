@@ -67,7 +67,7 @@ namespace hpx { namespace naming
         ///                   if this locality already got a prefix assigned in 
         ///                   an earlier call. Any error results in an exception 
         ///                   thrown from this function.
-        bool get_prefix(locality const& l, id_type& prefix);
+        bool get_prefix(locality const& l, id_type& prefix) const;
 
         /// \brief Get unique range of freely assignable global ids 
         ///
@@ -103,7 +103,7 @@ namespace hpx { namespace naming
         ///                   bound to a local address, either by calling 
         ///                   \a bind or \a bind_range.
         bool get_id_range(locality const& l, id_type& lower_bound, 
-            id_type& upper_bound);
+            id_type& upper_bound) const;
         
         /// \brief Bind a global address to a local address.
         ///
@@ -125,31 +125,9 @@ namespace hpx { namespace naming
         ///                   and the given local address replaced the 
         ///                   previously associated local address. Any error 
         ///                   results in an exception thrown from this function.
-        bool bind(id_type id, address const& addr)
+        bool bind(id_type id, address const& addr) const
         {
             return bind_range(id, 1, addr, 0);
-        }
-        
-        /// \brief Unbind a global address
-        ///
-        /// Remove the association of the given global address with any local 
-        /// address, which was bound to this global address.
-        /// 
-        /// \param id         [in] The global address (id) for which the 
-        ///                   association has to be removed.
-        ///
-        /// \returns          The function returns \a true if the association 
-        ///                   has been removed, and it returns \a false if no 
-        ///                   association existed. Any error results in an 
-        ///                   exception thrown from this function.
-        ///
-        /// \note             You can unbind only global ids bound using the 
-        ///                   function \a bind. Do not use this function to 
-        ///                   unbind any of the global ids bound using 
-        ///                   \a bind_range.
-        bool unbind(id_type id)
-        {
-            return unbind_range(id, 1);
         }
         
         /// \brief Bind unique range of global ids to given base address
@@ -176,7 +154,7 @@ namespace hpx { namespace naming
         ///                   otherwise. Any error results in an exception 
         ///                   thrown from this function.
         bool bind_range(id_type lower_id, std::size_t count, 
-            address const& baseaddr, std::ptrdiff_t offset);
+            address const& baseaddr, std::ptrdiff_t offset) const;
 
         /// \brief Asynchronously bind unique range of global ids to given base 
         ///        address
@@ -215,6 +193,39 @@ namespace hpx { namespace naming
             bind_range_async(id_type lower_id, std::size_t count, 
                 address const& baseaddr, std::ptrdiff_t offset);
             
+        /// \brief Unbind a global address
+        ///
+        /// Remove the association of the given global address with any local 
+        /// address, which was bound to this global address. Additionally it 
+        /// returns the local address which was bound at the time of this call.
+        /// 
+        /// \param id         [in] The global address (id) for which the 
+        ///                   association has to be removed.
+        /// \param addr       [out] The local address which was associated with 
+        ///                   the given global address (id).
+        ///                   This is valid only if the return value of this 
+        ///                   function is true.
+        ///
+        /// \returns          The function returns \a true if the association 
+        ///                   has been removed, and it returns \a false if no 
+        ///                   association existed. Any error results in an 
+        ///                   exception thrown from this function.
+        ///
+        /// \note             You can unbind only global ids bound using the 
+        ///                   function \a bind. Do not use this function to 
+        ///                   unbind any of the global ids bound using 
+        ///                   \a bind_range.
+        bool unbind(id_type id) const
+        {
+            address addr;   // ignore the return value
+            return unbind_range(id, 1, addr);
+        }
+
+        bool unbind(id_type id, address& addr) const
+        {
+            return unbind_range(id, 1, addr);
+        }
+        
         /// \brief Unbind the given range of global ids
         ///
         /// \param lower_id   [in] The lower bound of the assigned id range.
@@ -225,6 +236,10 @@ namespace hpx { namespace naming
         ///                   starting at \a lower_id. This number must be 
         ///                   identical to the number of global ids bound by 
         ///                   the corresponding call to \a bind_range
+        /// \param addr       [out] The local address which was associated with 
+        ///                   the given global address (id).
+        ///                   This is valid only if the return value of this 
+        ///                   function is true.
         ///
         /// \returns          This function returns \a true if a new range has 
         ///                   been generated (it has been called for the first 
@@ -237,7 +252,13 @@ namespace hpx { namespace naming
         ///                   function \a bind_range. Do not use this function 
         ///                   to unbind any of the global ids bound using 
         ///                   \a bind.
-        bool unbind_range(id_type lower_id, std::size_t count);
+        bool unbind_range(id_type id, std::size_t count) const
+        {
+            address addr;   // ignore the return value
+            return unbind_range(id, 1, addr);
+        }
+
+        bool unbind_range(id_type lower_id, std::size_t count, address& addr) const;
         
         /// \brief Asynchronously unbind the given range of global ids
         ///
@@ -291,7 +312,7 @@ namespace hpx { namespace naming
         ///                   function returns \a false if no association exists 
         ///                   for the given global address. Any error results 
         ///                   in an exception thrown from this function.
-        bool resolve(id_type id, address& addr);
+        bool resolve(id_type id, address& addr) const;
 
         /// \brief Asynchronously resolve a given global address (id) to its 
         ///        associated local address
@@ -345,7 +366,7 @@ namespace hpx { namespace naming
         ///                   global address with the global address (id) 
         ///                   given as the parameter. Any error results in an 
         ///                   exception thrown from this function.
-        bool registerid(std::string const& ns_name, id_type id);
+        bool registerid(std::string const& ns_name, id_type id) const;
 
         /// \brief Unregister a global name (release any existing association)
         ///
@@ -360,7 +381,7 @@ namespace hpx { namespace naming
         ///                   this global name has been released, and it returns 
         ///                   \a false, if no association existed. Any error 
         ///                   results in an exception thrown from this function.
-        bool unregisterid(std::string const& ns_name);
+        bool unregisterid(std::string const& ns_name) const;
 
         /// Query for the global address associated with a given global name.
         ///
@@ -378,7 +399,7 @@ namespace hpx { namespace naming
         /// which is currently associated with the given global name, and it 
         /// returns false, if currently there is no association for this global 
         /// name. Any error results in an exception thrown from this function.
-        bool queryid(std::string const& ns_name, id_type& id);
+        bool queryid(std::string const& ns_name, id_type& id) const;
 
         /// \brief Query for the gathered statistics of this DGAS instance 
         ///        (server execution count)
@@ -390,7 +411,7 @@ namespace hpx { namespace naming
         ///                   execution counts, one entry for each of the 
         ///                   possible resolver_client commands (i.e. will be 
         ///                   of the size 'server::command_lastcommand').
-        bool get_statistics_count(std::vector<std::size_t>& counts);
+        bool get_statistics_count(std::vector<std::size_t>& counts) const;
         
         /// \brief Query for the gathered statistics of this DGAS instance 
         ///        (average server execution time)
@@ -401,7 +422,7 @@ namespace hpx { namespace naming
         ///                   execution times, one entry for each of the 
         ///                   possible resolver_client commands (i.e. will be 
         ///                   of the size 'server::command_lastcommand').
-        bool get_statistics_mean(std::vector<double>& timings);
+        bool get_statistics_mean(std::vector<double>& timings) const;
         
         /// \brief Query for the gathered statistics of this DGAS instance 
         ///        (statistical 2nd moment of server execution time)
@@ -413,16 +434,21 @@ namespace hpx { namespace naming
         ///                   the server execution times, one entry for each of 
         ///                   the possible resolver_client commands (i.e. will 
         ///                   be of the size 'server::command_lastcommand').
-        bool get_statistics_moment2(std::vector<double>& moments);
+        bool get_statistics_moment2(std::vector<double>& moments) const;
+        
+        /// \brief Return the locality this resolver client instance is 
+        ///        running in
+        locality const& here() const { return here_; }
         
     protected:
         static bool read_completed(boost::system::error_code const& err, 
             std::size_t bytes_transferred, boost::uint32_t size);
-        void execute(server::request const& req, server::reply& rep);
+        void execute(server::request const& req, server::reply& rep) const;
 
     private:
+        locality here_;
         util::io_service_pool& io_service_pool_;
-        boost::asio::ip::tcp::socket socket_;
+        mutable boost::asio::ip::tcp::socket socket_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

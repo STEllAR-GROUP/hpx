@@ -279,6 +279,10 @@
 							/>
 						</FileConfiguration>
 					</File>
+					<File
+						RelativePath="..\..\..\src\components\server\factory.cpp"
+						>
+					</File>
 				</Filter>
 			</Filter>
 			<Filter
@@ -527,6 +531,18 @@
 					>
 					<File
 						RelativePath="..\..\..\hpx\components\server\accumulator.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\components\server\factory.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\components\server\manage_component.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\components\server\manage_component_implementations.hpp"
 						>
 					</File>
 				</Filter>

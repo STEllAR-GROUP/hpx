@@ -5,6 +5,8 @@
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
+#include <boost/serialization/export.hpp>
+
 #include <hpx/components/server/accumulator.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

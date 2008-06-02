@@ -250,8 +250,9 @@ namespace hpx { namespace naming { namespace server
                         str = "block sizes must match";
                     }
                     else {
+                        rep = reply(command_unbind_range, at_c<0>((*it).second));
                         registry_.erase(it);
-                        s = success;
+                        return;
                     }
                 }
             }

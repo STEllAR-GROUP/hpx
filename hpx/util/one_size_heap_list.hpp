@@ -111,7 +111,7 @@ namespace hpx { namespace util
             // create new heap
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
             iterator itnew = heap_list_.push_front(
-                new heap_type(class_name_.c_str(), false, 0 != heap_list_.size(), step_));
+                new heap_type(class_name_.c_str(), false, true, step_));
 
             if (itnew == heap_list_.end())
                 throw std::bad_alloc();   // insert failed
@@ -125,7 +125,7 @@ namespace hpx { namespace util
 #else
             iterator itnew = heap_list_.insert(heap_list_.begin(),
                 typename list_type::value_type(new heap_type("<Unknown>", 
-                    false, 0 != heap_list_.size(), step_)));
+                    false, true, step_)));
 
             if (itnew == heap_list_.end())
                 throw std::bad_alloc();   // insert failed

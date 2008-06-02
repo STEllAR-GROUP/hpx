@@ -89,7 +89,8 @@ namespace hpx { namespace util
     public:
         explicit one_size_heap(char const* class_name, bool throw_on_error = true, 
                 bool test_release = true, int step = -1)
-          : pool_(NULL), first_free_ (NULL), step_(step), size_(0), free_size_(0), 
+          : pool_(NULL), first_free_(NULL), first_deleted_(NULL),
+            step_(step), size_(0), free_size_(0), 
             throw_on_error_(throw_on_error), test_release_(test_release)
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
           , class_name_(class_name)
@@ -106,8 +107,9 @@ namespace hpx { namespace util
         }
         
         one_size_heap()
-          : pool_(NULL), first_free_ (NULL), step_(heap_step), size_(0), 
-            free_size_(0), throw_on_error_(true), test_release_(true)
+          : pool_(NULL), first_free_(NULL), first_deleted_(NULL),
+            step_(heap_step), size_(0), free_size_(0), 
+            throw_on_error_(true), test_release_(true)
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
           , class_name_(""), alloc_count_(0L), free_count_(0L), heap_count_(0L)
 #endif
@@ -188,11 +190,11 @@ namespace hpx { namespace util
             debug::fill_bytes(p1, freed_value, sizeof(T));
 #endif
 
-            p1->datafield.next_ = first_free_;
+            p1->datafield.next_ = first_deleted_;
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
             p1->alloc_count_ = 0;
 #endif
-            first_free_ = p1;
+            first_deleted_ = p1;
             free_size_++;
             
             // release the pool if this one was the last allocated item
@@ -211,7 +213,7 @@ namespace hpx { namespace util
             BOOST_ASSERT(free_size_ == size_);
 
             alloc_.free(pool_);
-            pool_ = first_free_ = NULL;
+            pool_ = first_free_ = first_deleted_ = NULL;
             size_ = free_size_ = 0;
             return true;
         }
@@ -234,7 +236,7 @@ namespace hpx { namespace util
             BOOST_ASSERT(size_ == 0);
             BOOST_ASSERT(first_free_ == NULL);
 
-            std::size_t s = std::size_t(step_*heap_size);
+            std::size_t s = std::size_t(step_ * heap_size);
             pool_ = (data *)alloc_.alloc(s);
             if (NULL == pool_) {
                 if (throw_on_error_)
@@ -311,6 +313,7 @@ namespace hpx { namespace util
         Allocator alloc_;
         data* pool_;
         data* first_free_;
+        data* first_deleted_;
         int step_;
         int size_;
         int free_size_;

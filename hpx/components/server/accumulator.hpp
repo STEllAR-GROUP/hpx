@@ -9,7 +9,6 @@
 #include <iostream>
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/action.hpp>
-#include <boost/serialization/export.hpp>
 
 namespace hpx { namespace components { namespace server
 {

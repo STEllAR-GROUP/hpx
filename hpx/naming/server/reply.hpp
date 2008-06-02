@@ -123,12 +123,13 @@ namespace hpx { namespace naming { namespace server
         }
 
         reply (name_server_command command, naming::address addr)
-          : command_(command_resolve), status_(success), 
+          : command_(command), status_(success), 
             error_(status_strings::get_error_text(success)),
             address_(addr),
             lower_bound_(0), upper_bound_(0)
         {
-            BOOST_ASSERT(command == command_resolve);
+            BOOST_ASSERT(command == command_resolve ||
+                         command == command_unbind_range);
         }
 
         reply (error s, name_server_command command, 
@@ -203,6 +204,7 @@ namespace hpx { namespace naming { namespace server
             
             switch (command_) {
             case command_resolve:
+            case command_unbind_range:
                 ar << address_.locality_;
                 ar << address_.type_;
                 ar << address_.address_;
@@ -227,7 +229,6 @@ namespace hpx { namespace naming { namespace server
                 break;
                 
             case command_bind_range:
-            case command_unbind_range:
             case command_registerid: 
             case command_unregisterid: 
             default:
@@ -249,6 +250,7 @@ namespace hpx { namespace naming { namespace server
             
             switch (command_) {
             case command_resolve:
+            case command_unbind_range:
                 ar >> address_.locality_;
                 ar >> address_.type_;
                 ar >> address_.address_;
@@ -273,7 +275,6 @@ namespace hpx { namespace naming { namespace server
                 break;
                 
             case command_bind_range:
-            case command_unbind_range:
             case command_registerid: 
             case command_unregisterid: 
             default:
@@ -304,6 +305,7 @@ namespace hpx { namespace naming { namespace server
         else {
             switch (rep.command_) {
             case command_resolve:
+            case command_unbind_range:
                 os << "addr(" << rep.address_ << ") ";
                 break;
 
@@ -327,7 +329,6 @@ namespace hpx { namespace naming { namespace server
                 break;
                 
             case command_bind_range:
-            case command_unbind_range:
             case command_registerid: 
             case command_unregisterid: 
             default:

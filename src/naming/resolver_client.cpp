@@ -50,6 +50,7 @@ namespace hpx { namespace naming
             tcp::endpoint ep;
             if (util::get_endpoint(address, port, ep)) {
                 socket_.connect(ep, error);
+                here_ = locality(ep);
                 if (!error) 
                     return;
             }
@@ -66,8 +67,10 @@ namespace hpx { namespace naming
             {
                 socket_.close();
                 socket_.connect(*it, error);
-                if (!error) 
-                    break;
+                if (!error) {
+                    here_ = locality(*it);
+                    return;
+                }
             }
             if (error) {
                 socket_.close();
@@ -82,7 +85,7 @@ namespace hpx { namespace naming
     
     resolver_client::resolver_client(util::io_service_pool& io_service_pool, 
             locality l, bool start_asynchronously) 
-      : io_service_pool_(io_service_pool), 
+      : here_(l), io_service_pool_(io_service_pool), 
         socket_(io_service_pool.get_io_service())
     {
         if (start_asynchronously)
@@ -99,7 +102,7 @@ namespace hpx { namespace naming
 
     ///////////////////////////////////////////////////////////////////////////
     // synchronous functionality
-    bool resolver_client::get_prefix(locality const& l, id_type& prefix)
+    bool resolver_client::get_prefix(locality const& l, id_type& prefix) const
     {
         // send request
         server::request req (server::command_getprefix, l);
@@ -115,7 +118,7 @@ namespace hpx { namespace naming
     }
     
     bool resolver_client::get_id_range(locality const& l, id_type& lower_bound, 
-        id_type& upper_bound)
+        id_type& upper_bound) const
     {
         // send request
         server::request req (server::command_getidrange, l);
@@ -132,7 +135,7 @@ namespace hpx { namespace naming
     }
     
     bool resolver_client::bind_range(id_type id, std::size_t count, 
-        address const& addr, std::ptrdiff_t offset)
+        address const& addr, std::ptrdiff_t offset) const
     {
         // send request
         server::request req (server::command_bind_range, id, count, addr, offset);
@@ -146,7 +149,8 @@ namespace hpx { namespace naming
         return s == success;
     }
 
-    bool resolver_client::unbind_range(id_type id, std::size_t count)
+    bool resolver_client::unbind_range(id_type id, std::size_t count, 
+        address& addr) const
     {
         // send request
         server::request req (server::command_unbind_range, id, count);
@@ -157,10 +161,11 @@ namespace hpx { namespace naming
         if (s != success && s != no_success)
             boost::throw_exception(hpx::exception((error)s, rep.get_error()));
 
+        addr = rep.get_address();
         return s == success;
     }
 
-    bool resolver_client::resolve(id_type id, address& addr)
+    bool resolver_client::resolve(id_type id, address& addr) const
     {
         // send request
         server::request req (server::command_resolve, id);
@@ -175,7 +180,7 @@ namespace hpx { namespace naming
         return s == success;
     }
 
-    bool resolver_client::registerid(std::string const& ns_name, id_type id)
+    bool resolver_client::registerid(std::string const& ns_name, id_type id) const
     {
         // send request
         server::request req (server::command_registerid, ns_name, id);
@@ -189,7 +194,7 @@ namespace hpx { namespace naming
         return s == success;
     }
 
-    bool resolver_client::unregisterid(std::string const& ns_name)
+    bool resolver_client::unregisterid(std::string const& ns_name) const
     {
         // send request
         server::request req (server::command_unregisterid, ns_name);
@@ -203,7 +208,7 @@ namespace hpx { namespace naming
         return s == success;
     }
 
-    bool resolver_client::queryid(std::string const& ns_name, id_type& id)
+    bool resolver_client::queryid(std::string const& ns_name, id_type& id) const
     {
         // send request
         server::request req (server::command_queryid, ns_name);
@@ -218,7 +223,7 @@ namespace hpx { namespace naming
         return s == success;
     }
 
-    bool resolver_client::get_statistics_count(std::vector<std::size_t>& counts)
+    bool resolver_client::get_statistics_count(std::vector<std::size_t>& counts) const
     {
         // send request
         server::request req (server::command_statistics_count);
@@ -236,7 +241,7 @@ namespace hpx { namespace naming
         return s == success;
     }
 
-    bool resolver_client::get_statistics_mean(std::vector<double>& timings)
+    bool resolver_client::get_statistics_mean(std::vector<double>& timings) const
     {
         // send request
         server::request req (server::command_statistics_mean);
@@ -254,7 +259,7 @@ namespace hpx { namespace naming
         return s == success;
     }
 
-    bool resolver_client::get_statistics_moment2(std::vector<double>& timings)
+    bool resolver_client::get_statistics_moment2(std::vector<double>& timings) const
     {
         // send request
         server::request req (server::command_statistics_moment2);
@@ -280,7 +285,7 @@ namespace hpx { namespace naming
     }
     
     void resolver_client::execute(server::request const &req, 
-        server::reply& rep)
+        server::reply& rep) const
     {
         typedef util::container_device<std::vector<char> > io_device_type;
 

@@ -21,10 +21,10 @@ namespace hpx { namespace components
         /// \a server#accumulator instance with the given global id \a gid.
         accumulator(applier& app, naming::id_type gid) 
           : app_(app), gid_(gid)
-        {
-            
-        }
-        ~accumulator() {}
+        {}
+        
+        ~accumulator() 
+        {}
         
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
