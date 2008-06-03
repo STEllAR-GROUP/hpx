@@ -11,8 +11,8 @@
 namespace hpx { namespace util 
 {
     // this is required in order to use the logging library
-    BOOST_DEFINE_LOG_FILTER(g_l_level, filter_type) 
-    BOOST_DEFINE_LOG(g_l, logger_type) 
+    BOOST_DEFINE_LOG_FILTER(dgas_level, filter_type) 
+    BOOST_DEFINE_LOG(dgas_logger, logger_type) 
 
     // initialize logging for DGAS
     void init_dgas_logs() 
@@ -30,8 +30,33 @@ namespace hpx { namespace util
                 
             // formatting    : time [DGAS][idx] message \n
             // destinations  : console, file "dgas.log"
-            g_l()->writer().write(logformat, logdest);
-            g_l()->mark_as_initialized();
+            dgas_logger()->writer().write(logformat, logdest);
+            dgas_logger()->mark_as_initialized();
+        }
+    }
+
+    // this is required in order to use the logging library
+    BOOST_DEFINE_LOG_FILTER(osh_level, filter_type) 
+    BOOST_DEFINE_LOG(osh_logger, logger_type) 
+
+    // initialize logging for one size heaps
+    void init_onesizeheap_logs() 
+    {
+        using namespace std;    // some systems have getenv in namespace std
+        if (NULL != getenv("HPX_OSH_LOGLEVEL")) 
+        {
+            char const* logdest = getenv("HPX_OSH_LOGDESTINATION");
+            if (NULL != logdest)
+                logdest = "cout file(dgas.log)";
+                
+            char const* logformat = getenv("HPX_OSH_LOGFORMAT");
+            if (NULL == logformat)
+                logformat = "%time%($hh:$mm.$ss.$mili) [DGAS][%idx%] |\n";
+                
+            // formatting    : time [DGAS][idx] message \n
+            // destinations  : console, file "dgas.log"
+            osh_logger()->writer().write(logformat, logdest);
+            osh_logger()->mark_as_initialized();
         }
     }
 

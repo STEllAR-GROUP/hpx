@@ -59,7 +59,6 @@ namespace hpx { namespace util
             guard_size = 4,                 // size of guard areas
         };
 
-    private:
         struct data {
             unsigned char preguard_[guard_size];  // guard before data
             union {                         // helper for managing the pool
@@ -154,15 +153,16 @@ namespace hpx { namespace util
             free_size_--;
 
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
-            BOOST_ASSERT(0 == first_free_->alloc_count_);
-            
             // init memory blocks
-            debug::fill_bytes(&item->preguard_, preguard_value, sizeof(data.preguard_));
+            debug::fill_bytes(&item->preguard_, preguard_value, 
+                sizeof(unsigned char)*guard_size);
             debug::fill_bytes(&item->datafield.data_, initial_value, sizeof(T));
-            debug::fill_bytes(&item->postguard_, postguard_value, sizeof(data.postguard_));
+            debug::fill_bytes(&item->postguard_, postguard_value, 
+                sizeof(unsigned char)*guard_size);
+
+            BOOST_ASSERT(0 == item->alloc_count_);
             item->alloc_count_ = ++alloc_count_;
 #endif
-
             return p;
         }
         
@@ -177,8 +177,8 @@ namespace hpx { namespace util
 
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
             BOOST_ASSERT(p1->alloc_count_ > 0 && p1->alloc_count_ <= alloc_count_);
-            BOOST_ASSERT(debug::test_fill_bytes(&p1->preguard_, preguard_value, guard_size));
-            BOOST_ASSERT(debug::test_fill_bytes(&p1->postguard_, postguard_value, guard_size));
+            BOOST_ASSERT(debug::test_fill_bytes(p1->preguard_, preguard_value, guard_size));
+            BOOST_ASSERT(debug::test_fill_bytes(p1->postguard_, postguard_value, guard_size));
 #endif
 
             BOOST_ASSERT(NULL != pool_ && p1 >= pool_);
@@ -350,7 +350,10 @@ namespace hpx { namespace util
             }
             static void* realloc(std::size_t &size, void *p)
             { 
-                return ::realloc(p, size);
+                // normally this should return ::realloc(p, size), but we are 
+                // not interested in growing the allocated heaps, so we just 
+                // return NULL
+                return NULL;
             }
         };
     }
@@ -382,44 +385,7 @@ namespace hpx { namespace util
 // Macros to minimize typing:
 #if defined(HPX_USE_ONESIZEHEAPS)
 
-#define HPX_MAKEUNIQUENAME(x) BOOST_PP_CAT(x, __LINE__)
-
-# if defined(HPX_DEBUG_ONE_SIZE_HEAP) 
-
-///////////////////////////////////////////////////////////////////////////////
-// helper macros to declare the new/delete operators inside a class
-#define HPX_DECLARE_ONE_SIZE_PRIVATE_HEAP()                                   \
-    static void *operator new (std::size_t size,                              \
-        char const* filename = "", int line = 0);                             \
-    static void operator delete (void* p, std::size_t size);                  \
-    /**/
-
-///////////////////////////////////////////////////////////////////////////////
-// helper macros for the implementation of one_size_heaps
-#define HPX_IMPLEMENT_ONE_SIZE_PRIVATE_HEAP(allocator, dataclass)             \
-    namespace {                                                               \
-        hpx::util::one_size_heap<dataclass, allocator>                        \
-            HPX_MAKEUNIQUENAME(theHeap)(#dataclass);                          \
-    };                                                                        \
-    void* dataclass::operator new(std::size_t size, char const* filename,     \
-        int nLine)                                                            \
-    {                                                                         \
-        if (size != sizeof(dataclass))                                        \
-            return ::operator new(size, filename, line);                      \
-        return HPX_MAKEUNIQUENAME(theHeap).alloc();                           \
-    }                                                                         \
-    void  dataclass::operator delete (void* p, std::size_t size)              \
-    {                                                                         \
-        if (NULL == p) return; /* do nothing */                               \
-        if (size != sizeof(dataclass)) {                                      \
-            ::operator delete(p);                                             \
-            return;                                                           \
-        }                                                                     \
-        HPX_MAKEUNIQUENAME(theHeap).free(p);                                  \
-    }                                                                         \
-    /**/
-
-# else
+#include <boost/preprocessor/cat.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // helper macros to declare the new/delete operators inside a class
@@ -433,13 +399,13 @@ namespace hpx { namespace util
 #define HPX_IMPLEMENT_ONE_SIZE_PRIVATE_HEAP(allocator, dataclass)             \
     namespace {                                                               \
         hpx::util::one_size_heap<dataclass, allocator>                        \
-            HPX_MAKEUNIQUENAME(theHeap)(#dataclass);                          \
+            BOOST_PP_CAT(theHeap, dataclass)(#dataclass);                     \
     };                                                                        \
     void* dataclass::operator new(std::size_t size)                           \
     {                                                                         \
         if (size != sizeof(dataclass))                                        \
             return ::operator new(size);                                      \
-        return HPX_MAKEUNIQUENAME(theHeap).alloc();                           \
+        return BOOST_PP_CAT(theHeap, dataclass).alloc();                      \
     }                                                                         \
     void  dataclass::operator delete (void* p, std::size_t size)              \
     {                                                                         \
@@ -448,11 +414,9 @@ namespace hpx { namespace util
             ::operator delete(p);                                             \
             return;                                                           \
         }                                                                     \
-        HPX_MAKEUNIQUENAME(theHeap).free(p);                                  \
+        BOOST_PP_CAT(theHeap, dataclass).free(p);                             \
     }                                                                         \
     /**/
-
-# endif 
 
 #else 
 

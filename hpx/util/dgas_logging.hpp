@@ -14,10 +14,19 @@ namespace hpx { namespace util
     typedef boost::logging::named_logger<>::type logger_type;
     typedef boost::logging::level::holder filter_type;
 
-    BOOST_DECLARE_LOG_FILTER(g_l_level, filter_type)
-    BOOST_DECLARE_LOG(g_l, logger_type)
+    BOOST_DECLARE_LOG_FILTER(dgas_level, filter_type)
+    BOOST_DECLARE_LOG(dgas_logger, logger_type)
 
-    #define LDGAS_(lvl) BOOST_LOG_USE_LOG_IF_LEVEL(util::g_l(), util::g_l_level(), lvl)
+    #define LDGAS_(lvl)                                                       \
+        BOOST_LOG_USE_LOG_IF_LEVEL(util::dgas_logger(), util::dgas_level(), lvl)
+
+    void init_dgas_logs();
+
+    BOOST_DECLARE_LOG_FILTER(osh_level, filter_type)
+    BOOST_DECLARE_LOG(osh_logger, logger_type)
+
+    #define LOSH_(lvl)                                                        \
+        BOOST_LOG_USE_LOG_IF_LEVEL(util::osh_logger(), util::osh_level(), lvl)
 
     void init_dgas_logs();
 

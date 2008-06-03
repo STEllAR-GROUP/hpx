@@ -10,7 +10,7 @@
 #include <string>
 
 #include <boost/thread.hpp>
-#include <boost//shared_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <hpx/config.hpp>
 #include <hpx/util/one_size_heap.hpp>
@@ -55,7 +55,7 @@ namespace hpx { namespace util
         }
 
         ~one_size_heap_list()
-    {
+        {
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
 //         D_OUTF5(1, 
 //             "one_size_heap_list: %s:\r\n", 
@@ -110,13 +110,14 @@ namespace hpx { namespace util
 
             // create new heap
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
-            iterator itnew = heap_list_.push_front(
-                new heap_type(class_name_.c_str(), false, true, step_));
+            iterator itnew = heap_list_.insert(heap_list_.begin(),
+                typename list_type::value_type(
+                    new heap_type(class_name_.c_str(), false, true, step_)));
 
             if (itnew == heap_list_.end())
                 throw std::bad_alloc();   // insert failed
 
-            (*itnew).heap_count_ = ++heap_count_;
+            (*itnew)->heap_count_ = ++heap_count_;
 //         D_OUTF3(2, 
 //             "one_size_heap_list: %s:", 
 //             class_name_.size() > 0 ? class_name_.c_str() : "<Unknown>", 
@@ -198,46 +199,20 @@ namespace hpx { namespace util
 
 #if defined(HPX_USE_ONESIZEHEAPS)
 
-#if defined(HPX_DEBUG_ONE_SIZE_HEAP) 
+#include <boost/preprocessor/cat.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // helper macros for the implementation of one_size_heap_lists
 #define HPX_IMPLEMENT_ONE_SIZE_PRIVATE_HEAP_LIST(allocator, dataclass)        \
     namespace {                                                               \
         hpx::util::one_size_heap_list<dataclass, allocator>                   \
-            HPX_MAKEUNIQUENAME(theHeap)(#dataclass);                          \
-    };                                                                        \
-    void* dataclass::operator new (size_t size, char const* filename, int line) \
-    {                                                                         \
-        if (size != sizeof(dataclass))                                        \
-            return ::operator new(size, filename, line);                      \
-        return HPX_MAKEUNIQUENAME(theHeap).alloc();                           \
-    }                                                                         \
-    void  dataclass::operator delete (void* p, size_t size)                   \
-    {                                                                         \
-        if (NULL == p) return; /* do nothing */                               \
-        if (size != sizeof(dataclass)) {                                      \
-            ::operator delete(p);                                             \
-            return;                                                           \
-        }                                                                     \
-        MAKEUNIQUENAME(theHeap).free(p);                                      \
-    }                                                                         \
-    /**/
-
-#else
-
-///////////////////////////////////////////////////////////////////////////////
-// helper macros for the implementation of one_size_heap_lists
-#define HPX_IMPLEMENT_ONE_SIZE_PRIVATE_HEAP_LIST(allocator, dataclass)        \
-    namespace {                                                               \
-        hpx::util::one_size_heap_list<dataclass, allocator>                   \
-            HPX_MAKEUNIQUENAME(theHeap)(#dataclass);                          \
+            BOOST_PP_CAT(theHeap, dataclass)(#dataclass);                     \
     };                                                                        \
     void* dataclass::operator new (size_t size)                               \
     {                                                                         \
         if (size != sizeof(dataclass))                                        \
             return ::operator new(size);                                      \
-        return HPX_MAKEUNIQUENAME(theHeap).alloc();                           \
+        return BOOST_PP_CAT(theHeap, dataclass).alloc();                      \
     }                                                                         \
     void  dataclass::operator delete (void* p, size_t size)                   \
     {                                                                         \
@@ -246,11 +221,9 @@ namespace hpx { namespace util
             ::operator delete(p);                                             \
             return;                                                           \
         }                                                                     \
-        HPX_MAKEUNIQUENAME(theHeap).free(p);                                  \
+        BOOST_PP_CAT(theHeap, dataclass).free(p);                             \
     }                                                                         \
     /**/
-
-#endif
 
 #else
 

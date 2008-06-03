@@ -4,6 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #define HPX_USE_ONESIZEHEAPS
+#define HPX_DEBUG_ONE_SIZE_HEAP
+
 #include <hpx/util/one_size_heap_list.hpp>
 
 class test
@@ -17,13 +19,20 @@ private:
     int dummy;
 };
 
+///////////////////////////////////////////////////////////////////////////////
 // define the one size heap to use
 HPX_IMPLEMENT_ONE_SIZE_PRIVATE_HEAP_LIST(
     hpx::util::one_size_heap_allocators::mallocator, test);
-    
+
+///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    test* t = new test;
-    delete t;
+    std::vector<test*> d;
+    for (int i = 0; i <= 1025; ++i) 
+        d.push_back(new test);
+
+    for (int i = 0; i <= 1025; ++i) 
+        delete d[i];
+
     return 0;
 }
