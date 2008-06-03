@@ -11,6 +11,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace action_manager
 {
+    // Call-back function for parcelHandler to call when new parcels are received
     void action_manager::fetchNewParcel (parcelset::parcelhandler& pHandler, naming::address const&)
     {
         parcelset::parcel p;
@@ -26,6 +27,14 @@ namespace hpx { namespace action_manager
             // register the action and the local-virtual address with the TM
             tManager.register_work(act->get_thread_function(lva));
         }
+    }
+
+    // Invoked by the Thread Manager when it is running out of work-items 
+    // and needs something to execute on a specific starving resources 
+    // specified as the argument
+    void action_manager::fetchParcel (naming::id_type resourceID)
+    {
+
     }
     
 ///////////////////////////////////////////////////////////////////////////////
