@@ -10,7 +10,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/include/at.hpp>
 
-#include <hpx/util/dgas_logging.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/naming/server/reply.hpp>
 #include <hpx/naming/server/request.hpp>
 #include <hpx/naming/server/request_handler.hpp>

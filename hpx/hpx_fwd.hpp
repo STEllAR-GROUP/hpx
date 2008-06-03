@@ -11,6 +11,16 @@
 
 namespace hpx
 {
+    namespace applier
+    {
+        class applier;
+    }
+    
+    namespace action_manager
+    {
+        class action_manager;
+    }
+    
     namespace naming
     {
         struct id_type;
@@ -45,21 +55,18 @@ namespace hpx
     namespace threadmanager
     {
         class threadmanager;
+
         // this has to be predeclared to avoid circular header dependencies
         typedef boost::coroutines::shared_coroutine<bool()>::self px_thread_self;
     }
 
-//     namespace components
-//     {
-//         class component;
-//         struct action_base;
-// 
-//         class factory;        
-//         class accumulator;
-//         class local_graph;
-//         class graph;
-//         class vertex;
-//     }
+    namespace components
+    {
+        struct action_base;
+
+        class factory;        
+        class accumulator;
+    }
 }
 
 #endif

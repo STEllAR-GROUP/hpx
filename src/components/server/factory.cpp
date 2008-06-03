@@ -3,10 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-#include <boost/serialization/export.hpp>
-
 #include <hpx/exception.hpp>
 #include <hpx/components/server/factory.hpp>
 #include <hpx/components/server/accumulator.hpp>
@@ -32,8 +28,4 @@ namespace hpx { namespace components { namespace server
     }
     
 }}}
-
-///////////////////////////////////////////////////////////////////////////////
-// enable serialization support (these need to be in the global namespace)
-BOOST_CLASS_EXPORT(hpx::components::server::factory::create_component_action);
 

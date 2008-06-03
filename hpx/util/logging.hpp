@@ -28,7 +28,7 @@ namespace hpx { namespace util
     #define LOSH_(lvl)                                                        \
         BOOST_LOG_USE_LOG_IF_LEVEL(util::osh_logger(), util::osh_level(), lvl)
 
-    void init_dgas_logs();
+    void init_onesizeheap_logs();
 
 ///////////////////////////////////////////////////////////////////////////////
 }}

@@ -5,6 +5,7 @@
 
 set (hpxlib_HEADERS
     # global
+    ../hpx/components.hpp
     ../hpx/config.hpp
     ../hpx/exception.hpp
     ../hpx/hpx.hpp
@@ -13,13 +14,21 @@ set (hpxlib_HEADERS
     ../hpx/parcelset.hpp
     ../hpx/threadmanager.hpp
     ../hpx/util.hpp
+    # action manager
+    ../hpx/action_manager/action_manager.hpp
+    # applier
+    ../hpx/applier/applier.hpp
     # components
     ../hpx/components/action.hpp
     ../hpx/components/action_constructors.hpp
     ../hpx/components/action_implementations.hpp
     ../hpx/components/component_type.hpp
     ../hpx/components/accumulator.hpp
+    ../hpx/components/factory.hpp
     ../hpx/components/server/accumulator.hpp
+    ../hpx/components/server/factory.hpp
+    ../hpx/components/server/manage_component.hpp
+    ../hpx/components/server/manage_component_implementations.hpp
     # naming
     ../hpx/naming/address.hpp
     ../hpx/naming/locality.hpp
@@ -47,7 +56,7 @@ set (hpxlib_HEADERS
     # util
     ../hpx/util/asio_util.hpp
     ../hpx/util/container_device.hpp
-    ../hpx/util/dgas_logging.hpp
+    ../hpx/util/logging.hpp
     ../hpx/util/future.hpp
     ../hpx/util/generate_unique_ids.hpp
     ../hpx/util/high_resolution_timer.hpp
@@ -63,7 +72,7 @@ set (hpxlib_HEADERS
 
 set (hpxlib_SOURCES
     # components
-    components/server/accumulator.cpp
+    components/server/factory.cpp
     # naming 
     naming/resolver_client.cpp
     naming/resolver_server.cpp
@@ -78,7 +87,7 @@ set (hpxlib_SOURCES
     # threadmanager
     threadmanager/threadmanager.cpp
     # util 
-    util/dgas_logging.cpp
+    util/logging.cpp
     util/io_service_pool.cpp
 )
 

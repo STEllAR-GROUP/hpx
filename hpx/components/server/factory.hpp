@@ -6,6 +6,10 @@
 #if !defined(HPX_COMPONENTS_FACTORY_JUN_02_2008_1145AM)
 #define HPX_COMPONENTS_FACTORY_JUN_02_2008_1145AM
 
+#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/portable_binary_oarchive.hpp>
+#include <boost/serialization/export.hpp>
+
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/action.hpp>
 #include <hpx/naming/resolver_client.hpp>
@@ -47,12 +51,16 @@ namespace hpx { namespace components { namespace server
         typedef action2<
             factory, create_component, 
             components::component_type, naming::id_type, &factory::create
-        > create_component_action;
+        > create_action;
         
     private:
         naming::resolver_client const& dgas_;
     };
     
 }}}
+
+///////////////////////////////////////////////////////////////////////////////
+// enable serialization support (these need to be in the global namespace)
+BOOST_CLASS_EXPORT(hpx::components::server::factory::create_action);
 
 #endif

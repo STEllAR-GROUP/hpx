@@ -12,6 +12,7 @@
 
 #include <boost/noncopyable.hpp>
 #include <hpx/config.hpp>
+#include <hpx/util/logging.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util 
@@ -120,13 +121,13 @@ namespace hpx { namespace util
         {
             if (pool_ != NULL) {
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
-//             if (free_size_ != size_) {
-//                 D_OUTF3(1, 
-//                     "one_size_heap: %s:", 
-//                     class_name_.size() > 0 ? class_name_.c_str() : "<Unknown>", 
-//                     " Releasing heap(%08lx)", pool_, 
-//                     " with %ld allocated object(s)!", size_-free_size_);
-//             }
+                if (free_size_ != size_) {
+                    LOSH_(error) 
+                        << "one_size_heap " 
+                        << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
+                        << ": releasing heap (" << std::hex << pool_ << ")" 
+                        << " with " << size_-free_size_ << " allocated object(s)!";
+                }
 #endif
                 alloc_.free(pool_);
             }
@@ -244,11 +245,11 @@ namespace hpx { namespace util
                 return false;
             }
 
-//         D_OUTF3(2, 
-//             "OneSizeHeap: %s:", 
-//             class_name_.size() > 0 ? class_name_.c_str() : "<Unknown>",
-//             " init_pool (%08lx),", pool_,
-//             " size(%ld).", s);
+            LOSH_(info) 
+                << "one_size_heap " 
+                << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
+                << ": init_pool (" << std::hex << pool_ << ")" 
+                << " size: " << s << ".";
 
             s /= heap_size;
             first_free_ = pool_;
@@ -264,14 +265,19 @@ namespace hpx { namespace util
             std::size_t const s = std::size_t((size_ + step_) * heap_size);
             std::size_t s1 = s;
 
-//         D_OUTF3(2, 
-//             "OneSizeHeap: %s:", 
-//             class_name_.size() > 0 ? class_name_.c_str() : "<Unknown>",
-//             " reallocPool(%ld),", s, 
-//             " size(%ld).", size_);
+            LOSH_(info) 
+                << "one_size_heap " 
+                << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
+                << ": realloc_pool (" << std::hex << pool_ << ")" 
+                << " size: " << s << ".";
 
             data* p = (data*)alloc_.realloc(s1, pool_);
             if (NULL == p) {
+                LOSH_(error) 
+                    << "one_size_heap " 
+                    << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
+                    << ": realloc_pool (" << std::hex << pool_ << ") failed.";
+
                 if (throw_on_error_)
                     throw std::bad_alloc();
                 return false;
@@ -379,6 +385,17 @@ namespace hpx { namespace util
 #endif
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    struct init_logging
+    {
+        init_logging()
+        {
+            init_onesizeheap_logs();
+        }
+    };
+    
+    init_logging init_osh_logging;
+    
 }} // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////

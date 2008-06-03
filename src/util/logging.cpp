@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <cstdlib>
-#include <hpx/util/dgas_logging.hpp>
+#include <hpx/util/logging.hpp>
 #include <boost/logging/format/named_write.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -21,7 +21,7 @@ namespace hpx { namespace util
         if (NULL != getenv("HPX_DGAS_LOGLEVEL")) 
         {
             char const* logdest = getenv("HPX_DGAS_LOGDESTINATION");
-            if (NULL != logdest)
+            if (NULL == logdest)
                 logdest = "cout file(dgas.log)";
                 
             char const* logformat = getenv("HPX_DGAS_LOGFORMAT");
@@ -46,15 +46,15 @@ namespace hpx { namespace util
         if (NULL != getenv("HPX_OSH_LOGLEVEL")) 
         {
             char const* logdest = getenv("HPX_OSH_LOGDESTINATION");
-            if (NULL != logdest)
-                logdest = "cout file(dgas.log)";
+            if (NULL == logdest)
+                logdest = "cout file(osh.log)";
                 
             char const* logformat = getenv("HPX_OSH_LOGFORMAT");
             if (NULL == logformat)
-                logformat = "%time%($hh:$mm.$ss.$mili) [DGAS][%idx%] |\n";
+                logformat = "%time%($hh:$mm.$ss.$mili) [OSH][%idx%] |\n";
                 
-            // formatting    : time [DGAS][idx] message \n
-            // destinations  : console, file "dgas.log"
+            // formatting    : time [OSH][idx] message \n
+            // destinations  : console, file "osh.log"
             osh_logger()->writer().write(logformat, logdest);
             osh_logger()->mark_as_initialized();
         }

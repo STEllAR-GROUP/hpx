@@ -14,6 +14,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/one_size_heap.hpp>
+#include <hpx/util/logging.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util 
@@ -57,18 +58,21 @@ namespace hpx { namespace util
         ~one_size_heap_list()
         {
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
-//         D_OUTF5(1, 
-//             "one_size_heap_list: %s:\r\n", 
-//             class_name_.size() > 0 ? class_name_.c_str() : "<Unknown>", 
-//             "\tmax count: %ld", max_alloc_count_,
-//             " (in %ld heaps),", heap_count_,
-//             " alloc count: %ld,", alloc_count_,
-//             " free count: %ld.", free_count_);
-//                
-//         if (alloc_count_ != free_count_) 
-//         {
-//             D_OUTF1(1, "\treleasing heaplist with %ld allocated object(s)!", alloc_count_-free_count_);
-//         }
+            LOSH_(info) 
+                << "one_size_heap_list " 
+                << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
+                << ": releasing heap_list: max count: " << max_alloc_count_ 
+                << " (in " << heap_count_ << " heaps), alloc count: " 
+                << alloc_count_ << ", free count: " << free_count_ << ".";
+
+            if (alloc_count_ != free_count_) 
+            {
+                LOSH_(error) 
+                    << "one_size_heap_list " 
+                    << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
+                    << ": releasing heap_list with " << alloc_count_-free_count_ 
+                    << " allocated object(s)!";
+            }
 #endif
         }
         
@@ -98,14 +102,14 @@ namespace hpx { namespace util
                         heap_list_.splice(heap_list_.begin(), heap_list_, it);  
                     return p;
                 }
-//             else {
-//                 D_OUTF4(2, 
-//                     "one_size_heap_list: %s:", 
-//                     class_name_.size() > 0 ? class_name_.c_str() : "<Unknown>", 
-//                     " Failed to allocate from heap(%08lx),", (*it)->heap_count_,
-//                     " alloc(%ld),", (*it)->Size(),
-//                     " free(%ld).", (*it)->FreeSize());
-//             }
+                else {
+                    LOSH_(info) 
+                        << "one_size_heap_list " 
+                        << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
+                        << ": failed to allocate from heap (" << (*it)->heap_count_ 
+                        << "), allocated: " << (*it)->size() << ", free'd: " 
+                        << (*it)->free_size() << ".";
+                }
             }
 
             // create new heap
@@ -118,11 +122,11 @@ namespace hpx { namespace util
                 throw std::bad_alloc();   // insert failed
 
             (*itnew)->heap_count_ = ++heap_count_;
-//         D_OUTF3(2, 
-//             "one_size_heap_list: %s:", 
-//             class_name_.size() > 0 ? class_name_.c_str() : "<Unknown>", 
-//             " Creating new heap(%ld),", heap_count_,
-//             " size: %ld.", heap_list_.size());
+            LOSH_(info) 
+                << "one_size_heap_list " 
+                << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
+                << ": creating new heap (" << heap_count_ 
+                << "), size of heap_list: " << heap_list_.size() << ".";
 #else
             iterator itnew = heap_list_.insert(heap_list_.begin(),
                 typename list_type::value_type(new heap_type("<Unknown>", 
@@ -152,10 +156,11 @@ namespace hpx { namespace util
                     (*it)->free(p);
 
                     if ((*it)->is_empty()) {
-//                     D_OUTF2(2, 
-//                         "one_size_heap_list: %s:", 
-//                         class_name_.size() > 0 ? class_name_.c_str() : "<Unknown>", 
-//                         " Freeing empty heap(%ld).", (*it)->heap_count_);
+                        LOSH_(info) 
+                            << "one_size_heap_list " 
+                            << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
+                            << ": freeing empty heap (" << (*it)->heap_count_ << ").";
+
                         heap_list_.erase (it);
                     }
                     else if (it != heap_list_.begin()) {

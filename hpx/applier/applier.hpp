@@ -3,6 +3,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#if !defined(HPX_APPLIER_APPLIER_JUN_03_2008_0438PM)
+#define HPX_APPLIER_APPLIER_JUN_03_2008_0438PM
+
 #include <hpx/naming.hpp>
 #include <hpx/parcelset.hpp>
 #include <hpx/action_manager.hpp>
@@ -15,9 +18,17 @@ namespace hpx { namespace applier
     {
     public:
         // Invoked by a running PX-thread to apply an action to any resource
+        template <typename Action>
         void apply (naming::id_type resourceGUID);
 
-        void apply (naming::id_type resourceGUID, continuation cont);
+        template <typename Action, typename Arg0>
+        void apply (naming::id_type resourceGUID, Arg0 const& arg0);
+
+        template <typename Action, typename Arg0, typename Arg1>
+        void apply (naming::id_type resourceGUID, Arg0 const& arg0, 
+            Arg1 const& arg1);
+
+//         void apply (naming::id_type resourceGUID, continuation cont);
 
         // Invoked by a running PX-thread to determine whether a resource is 
         // local or remote
@@ -27,3 +38,5 @@ namespace hpx { namespace applier
 //        action_manager::meta_action getAction ()
     };
 }}
+
+#endif

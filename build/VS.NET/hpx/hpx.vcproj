@@ -205,11 +205,11 @@
 				Name="Util"
 				>
 				<File
-					RelativePath="..\..\..\src\util\dgas_logging.cpp"
+					RelativePath="..\..\..\src\util\io_service_pool.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\src\util\io_service_pool.cpp"
+					RelativePath="..\..\..\src\util\logging.cpp"
 					>
 				</File>
 			</Filter>
@@ -268,19 +268,6 @@
 					Name="Server"
 					>
 					<File
-						RelativePath="..\..\..\src\components\server\accumulator.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							ExcludedFromBuild="true"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ShowIncludes="false"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
 						RelativePath="..\..\..\src\components\server\factory.cpp"
 						>
 					</File>
@@ -314,6 +301,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\hpx\applier.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\hpx\components.hpp"
 				>
 			</File>
 			<File
@@ -412,10 +403,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\hpx\util\dgas_logging.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\hpx\util\future.hpp"
 					>
 				</File>
@@ -429,6 +416,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\hpx\util\io_service_pool.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\util\logging.hpp"
 					>
 				</File>
 				<File
@@ -525,6 +516,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\hpx\components\component_type.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\components\factory.hpp"
 					>
 				</File>
 				<Filter

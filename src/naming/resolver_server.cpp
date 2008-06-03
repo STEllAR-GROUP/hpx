@@ -10,7 +10,7 @@
 
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
-#include <hpx/util/dgas_logging.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/util/asio_util.hpp>
 #include <hpx/naming/resolver_server.hpp>
 

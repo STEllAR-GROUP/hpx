@@ -86,6 +86,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcproj", "{1D601F73-5EF1-419A-9147-B6B5F0FE679E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "one_size_heap_test", "one_size_heap_test\one_size_heap_test.vcproj", "{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E6C6C6C4-6959-4B47-B92A-6323A906CC40} = {E6C6C6C4-6959-4B47-B92A-6323A906CC40}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "am_test_client", "am_test_client\am_test_client.vcproj", "{098B27CF-ED5F-40E2-85A0-92501664595E}"
 	ProjectSection(ProjectDependencies) = postProject
