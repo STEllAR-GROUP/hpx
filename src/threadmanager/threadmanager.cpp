@@ -76,19 +76,22 @@ namespace hpx { namespace threadmanager
         while (running_) 
         {
             bool exited = false;
-            hpx::threadmanager::px_thread thrd (work_items_.front());
-            work_items_.pop();
-
-            // make sure lock is unlocked during execution of work item
-            if (thrd.get_state() == px_thread::pending)
+            if (!(work_items_.empty()))
             {
-                unlock_the_lock l(lk);    
-                exited = thrd();
+                hpx::threadmanager::px_thread thrd (work_items_.front());
+                work_items_.pop();
+
+                // make sure lock is unlocked during execution of work item
+                if (thrd.get_state() == px_thread::pending)
+                {
+                    unlock_the_lock l(lk);    
+                    exited = thrd();
+                }
+                
+                // re-add this work item to our list of work items if appropriate
+                if (!exited) 
+                    work_items_.push(thrd);
             }
-            
-            // re-add this work item to our list of work items if appropriate
-            if (!exited) 
-                work_items_.push(thrd);
             
             // try to execute as much work as available, but try not to 
             // schedule a certain component more than once
