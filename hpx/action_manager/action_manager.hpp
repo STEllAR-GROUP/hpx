@@ -54,13 +54,10 @@ namespace hpx { namespace action_manager
         // Call-back function for parcelHandler to call when new parcels are received
         void fetchNewParcel (parcelset::parcelhandler& pHandler, naming::address const&);
 
-        // Invoked by the Parcel Handler when PH has new parcels to be executed 
-//        void fetchNewParcel ();
-
         // Invoked by the Thread Manager when it is running out of work-items 
         // and needs something to execute on a specific starving resources 
         // specified as the argument
-//        void fetchNewParcel (naming::id_type resourceID);
+        void fetchParcel (naming::id_type resourceID);
         
         // Invoked by the Applier when it has a local action to be executed
 //        void fetchNewAction ();
@@ -76,7 +73,6 @@ namespace hpx { namespace action_manager
 
         ~action_manager()
         {
-//            pHandler.register_event_handler();
         }
 
     private:

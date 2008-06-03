@@ -272,6 +272,7 @@
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
+							ExcludedFromBuild="true"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -294,7 +295,7 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="action_manager"
+				Name="ActionManager"
 				>
 				<File
 					RelativePath="..\..\..\src\action_manager\action_manager.cpp"

@@ -15,15 +15,15 @@ namespace hpx { namespace applier
     {
     public:
         // Invoked by a running PX-thread to apply an action to any resource
-        void apply (naming::id_type resourceGUID, 
-            components::action_type action, continuation cont);
-        // apply (resource_GUID, thread_actions, thread_args, thread_cont)
+        void apply (naming::id_type resourceGUID);
+
+        void apply (naming::id_type resourceGUID, continuation cont);
 
         // Invoked by a running PX-thread to determine whether a resource is 
         // local or remote
-        bool isLocal (naming::id_type resourceGUID);
+//        bool isLocal (naming::id_type resourceGUID);
 
         // Invoked by the AM to request the new meta-action to execute locally
-        action_manager::meta_action getAction ()
+//        action_manager::meta_action getAction ()
     };
 }}

@@ -7,6 +7,11 @@
 #define HPX_COMPONENTS_SERVER_ACCUMULATOR_MAY_17_2008_0731PM
 
 #include <iostream>
+
+#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/portable_binary_oarchive.hpp>
+#include <boost/serialization/export.hpp>
+
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/action.hpp>
 
@@ -85,5 +90,11 @@ namespace hpx { namespace components { namespace server
     };
 
 }}}
+
+///////////////////////////////////////////////////////////////////////////////
+// enable serialization support (these need to be in the global namespace)
+BOOST_CLASS_EXPORT(hpx::components::server::accumulator::init_action);
+BOOST_CLASS_EXPORT(hpx::components::server::accumulator::add_action);
+BOOST_CLASS_EXPORT(hpx::components::server::accumulator::print_action);
 
 #endif
