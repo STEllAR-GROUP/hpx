@@ -7,7 +7,7 @@
 #define HPX_THREADMANAGER_MAY_20_2008_845AM
 
 #include <queue>
-
+#include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
