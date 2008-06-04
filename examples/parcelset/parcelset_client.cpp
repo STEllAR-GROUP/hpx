@@ -5,12 +5,12 @@
 
 #include <iostream>
 #include <string>
-
 #include <boost/lexical_cast.hpp>
-
 #include <hpx/hpx.hpp>
 
+
 #define MAXITERATIONS 1000
+double start_time;
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(BOOST_WINDOWS)
@@ -48,7 +48,8 @@ void received_parcel(hpx::parcelset::parcelhandler& ph, hpx::naming::address con
 {
     static int count = 0;
     static double accumulated_time = 0;
-    static std::size_t accumulated_count = 0;
+	static double turnaround_time =0;
+	static std::size_t accumulated_count = 0;
     
     hpx::parcelset::parcel p;
     if (ph.get_parcel(p))
@@ -56,13 +57,16 @@ void received_parcel(hpx::parcelset::parcelhandler& ph, hpx::naming::address con
         try {
             accumulated_time += ph.get_current_time() - p.get_start_time();
             ++accumulated_count; 
-            
+			turnaround_time +=  ph.get_current_time() - start_time;
+
             std::cout << "Received parcel: " << std::hex << p.get_parcel_id() 
                       << std::flush << std::endl;
 
             p.set_destination(p.get_source());
             p.set_source(hpx::naming::id_type());
             p.set_parcel_id(hpx::naming::id_type());
+            start_time = ph.get_current_time();
+
             ph.put_parcel(p);
             std::cout << "Successfully sent parcel: " 
                       << std::hex << p.get_parcel_id() 
@@ -72,6 +76,9 @@ void received_parcel(hpx::parcelset::parcelhandler& ph, hpx::naming::address con
                 std::cout << "Successfully sent " << std::dec << count
                           << " parcels!\nAverage travel time: " 
                           << accumulated_time/accumulated_count
+                          << std::flush << std::endl;
+				std::cout << "Average turnaround time: " 
+                          << turnaround_time/accumulated_count
                           << std::flush << std::endl;
                 ph.get_parcelport().stop(false);
                 return;
@@ -123,7 +130,7 @@ int main(int argc, char* argv[])
         hpx::util::io_service_pool io_service_pool(2); 
         hpx::parcelset::parcelport pp (io_service_pool, hpx::naming::locality(ps_host, ps_port));
         hpx::parcelset::parcelhandler ph (dgas_c, pp);
-
+		
         ph.register_event_handler(received_parcel);
 
         // Set console control handler to allow client to be stopped.
@@ -150,10 +157,11 @@ int main(int argc, char* argv[])
 
         // send initial parcel to remote locality        
         hpx::parcelset::parcel p(remote_prefix);
-        hpx::parcelset::parcel_id id = ph.sync_put_parcel(p);
+		start_time=ph.get_current_time();
+		hpx::parcelset::parcel_id id = ph.sync_put_parcel(p);
 
-//         std::cout << "Successfully sent parcel: " << std::hex << id 
-//                   << std::flush << std::endl;
+         //std::cout << "Successfully sent parcel: " << std::hex << id 
+         //        << std::flush << std::endl;
 
         pp.run();         // block until stopped
 #else
