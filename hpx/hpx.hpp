@@ -16,6 +16,7 @@
 #include <hpx/components.hpp>
 #include <hpx/threadmanager.hpp>
 #include <hpx/action_manager.hpp>
+#include <hpx/applier.hpp>
 // #include <hpx/core.hpp>
 
 #endif
