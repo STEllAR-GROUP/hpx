@@ -12,15 +12,11 @@ namespace hpx { namespace threadmanager
 {
     ///////////////////////////////////////////////////////////////////////////
     void threadmanager::register_work( 
-    boost::function<bool (hpx::threadmanager::px_thread_self&)> threadfunc)
+        boost::function<thread_function_type> threadfunc)
     {
-        // create a new name for this new thread
-//        naming::id_type n = ps_.get_prefix() | 
-//             util::unique_ids::instance->get_thread_id();
-
         // lock queue when adding work
         mutex_type::scoped_lock lk(mtx_);
-        work_items_.push(px_thread(threadfunc, px_thread::pending));
+        work_items_.push(px_thread(threadfunc, pending));
 
         if (running_) 
             cond_.notify_one();           // try to execute the new work item
@@ -75,21 +71,21 @@ namespace hpx { namespace threadmanager
         prepare_main_thread main_thread;
         while (running_) 
         {
-            bool exited = false;
+            thread_state new_state = unknown;
             if (!(work_items_.empty()))
             {
                 hpx::threadmanager::px_thread thrd (work_items_.front());
                 work_items_.pop();
 
                 // make sure lock is unlocked during execution of work item
-                if (thrd.get_state() == px_thread::pending)
+                if (thrd.get_state() == pending)
                 {
                     unlock_the_lock l(lk);    
-                    exited = thrd();
+                    new_state = thrd();
                 }
                 
                 // re-add this work item to our list of work items if appropriate
-                if (!exited) 
+                if (new_state == pending) 
                     work_items_.push(thrd);
             }
             

@@ -41,7 +41,8 @@ namespace hpx { namespace components { namespace server
         // exposed functionality of this component
         
         /// create a new component
-        bool create(hpx::threadmanager::px_thread_self& self,
+        threadmanager::thread_state create(
+            threadmanager::px_thread_self& self,
             components::component_type type, naming::id_type gid); 
         
         ///////////////////////////////////////////////////////////////////////

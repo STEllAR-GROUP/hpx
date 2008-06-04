@@ -3,15 +3,18 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/components/server/factory.hpp>
 #include <hpx/components/server/accumulator.hpp>
 #include <hpx/components/server/manage_component.hpp>
+#include <hpx/threadmanager/px_thread.hpp>
 
 namespace hpx { namespace components { namespace server
 {
-    bool factory::create(hpx::threadmanager::px_thread_self& self,
-            components::component_type type, naming::id_type gid)
+    threadmanager::thread_state factory::create(
+        threadmanager::px_thread_self& self,
+        components::component_type type, naming::id_type gid)
     {
         switch (type) {
         case accumulator::value:
@@ -24,7 +27,7 @@ namespace hpx { namespace components { namespace server
                     get_component_type_name(type)));
             break;
         }
-        return true;
+        return hpx::threadmanager::stopped;
     }
     
 }}}

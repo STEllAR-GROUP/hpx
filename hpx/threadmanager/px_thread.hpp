@@ -17,12 +17,57 @@
 namespace hpx { namespace threadmanager 
 {
     ///////////////////////////////////////////////////////////////////////////
+    /// \enum thread_state
+    ///
+    /// The thread_state enumerator encodes the current state of a \a px_thread
+    /// instance
+    enum thread_state
+    {
+        unknown = -1,
+        init = 0,       ///< thread is initializing
+        depleted = 1,   ///< thread has been depleted (deeply suspended)
+        suspended = 2,  ///< thread  has been suspended
+        pending = 3,    ///< thread is pending (ready to run)
+        running = 4,    ///< thread is currently running (active)
+        stopped = 5     ///< thread has been stopped an may be garbage collected
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     /// This is the representation of a ParalleX thread
     class px_thread 
     {
     private:
-        typedef boost::coroutines::shared_coroutine<bool()> coroutine_type;
+        typedef 
+            boost::coroutines::shared_coroutine<thread_state()> 
+        coroutine_type;
         
+        // helper class for switching thread state in and out during execution
+        class switch_status
+        {
+        public:
+            switch_status (thread_state& my_state, thread_state new_state)
+                : outer_state_(my_state), prev_state_(my_state)
+            { 
+                my_state = new_state;
+            }
+
+            ~switch_status ()
+            {
+                outer_state_ = prev_state_;
+            }
+
+            // allow to change the state the thread will be switched to after 
+            // execution
+            thread_state operator=(thread_state new_state)
+            {
+                return prev_state_ = new_state;
+            }
+            
+        private:
+            thread_state& outer_state_;
+            thread_state prev_state_;
+        };
+
     public:
         /// parcel action code: the action to be performed on the destination 
         /// object (the px_thread)
@@ -30,53 +75,26 @@ namespace hpx { namespace threadmanager
         {
             some_action_code = 0
         };
-        enum thread_state
-        {
-            init = 0,
-            depleted = 1,
-            pending = 2,
-            running = 3,
-            waiting = 4,
-            block = 5
-        };
-
+        
         /// This is the component id. Every component needs to have an embedded
         /// enumerator 'value' which is used by the generic action implementation
         /// to associate this component with a given action.
         enum { value = components::component_px_thread };
 
-        class switch_status
-        {
-        public:
-            switch_status (thread_state& my_state, thread_state new_state)
-                : outer_state_(my_state), prev_state(my_state)
-            { 
-                my_state = new_state;
-            }
-
-            ~switch_status ()
-            {
-                outer_state_ = prev_state;
-            }
-
-        private:
-            thread_state& outer_state_;
-            thread_state prev_state;
-        };
-
         /// 
-        px_thread(boost::function<bool (px_thread_self&)> threadfunc, thread_state new_state=init) 
-          : coroutine_ (threadfunc), current_state_ (new_state) 
-        { }
+        px_thread(boost::function<thread_function_type> threadfunc, 
+                thread_state new_state = init) 
+          : coroutine_ (threadfunc), current_state_(new_state) 
+        {}
         
         ~px_thread() 
-        { }
+        {}
 
-        // execute the thread function
-        bool operator()(void)
+        /// execute the thread function
+        thread_state operator()()
         {
             switch_status thrd_stat (current_state_, running);
-            return coroutine_();
+            return thrd_stat = coroutine_();
         }
 
         thread_state get_state() const 
@@ -87,7 +105,6 @@ namespace hpx { namespace threadmanager
         void set_state(thread_state new_state)
         {
             current_state_ = new_state ;
-            std::cout << current_state_ << std::endl;
         }
 
     private:

@@ -57,7 +57,12 @@ namespace hpx
         class threadmanager;
 
         // this has to be predeclared to avoid circular header dependencies
-        typedef boost::coroutines::shared_coroutine<bool()>::self px_thread_self;
+        enum thread_state;
+
+        typedef 
+            boost::coroutines::shared_coroutine<thread_state()>::self 
+        px_thread_self;
+        typedef thread_state thread_function_type(px_thread_self&);
     }
 
     namespace components

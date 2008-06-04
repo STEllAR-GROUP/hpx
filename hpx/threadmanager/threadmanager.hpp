@@ -43,8 +43,7 @@ namespace hpx { namespace threadmanager
         }
 
         /// This adds a new work item to the thread manager
-        void register_work(
-            boost::function<bool (hpx::threadmanager::px_thread_self&)> threadfunc);
+        void register_work(boost::function<thread_function_type> threadfunc);
         
         /// run the threadmanager's work queue
         bool run() 

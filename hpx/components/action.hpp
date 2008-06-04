@@ -34,7 +34,7 @@ namespace hpx { namespace components
         virtual ~action_base() {}
         virtual std::size_t get_action_code() const = 0;
         virtual component_type get_component_type() const = 0;
-        virtual boost::function<bool (hpx::threadmanager::px_thread_self&)>
+        virtual boost::function<threadmanager::thread_function_type> 
             get_thread_function(naming::address::address_type lva) const = 0;
     };
 
@@ -137,7 +137,7 @@ namespace hpx { namespace components
     //  zero parameter version
     template <
         typename Component, int Action, 
-        bool (Component::*F)(hpx::threadmanager::px_thread_self&)
+        threadmanager::thread_state(Component::*F)(threadmanager::px_thread_self&)
     >
     class action0 : public action<Component, Action, boost::fusion::vector<> >
     {
@@ -146,7 +146,7 @@ namespace hpx { namespace components
         {}
         
     private:
-        boost::function<bool (hpx::threadmanager::px_thread_self&)>
+        boost::function<threadmanager::thread_function_type>
             get_thread_function(naming::address::address_type lva) const
         {
             return boost::bind(F, reinterpret_cast<Component*>(lva), _1);
@@ -167,7 +167,7 @@ namespace hpx { namespace components
     //  one parameter version
     template <
         typename Component, int Action, typename Arg0, 
-        bool (Component::*F)(hpx::threadmanager::px_thread_self&, Arg0) 
+        threadmanager::thread_state(Component::*F)(threadmanager::px_thread_self&, Arg0) 
     >
     class action1 
       : public action<Component, Action, boost::fusion::vector<Arg0> >
@@ -188,7 +188,7 @@ namespace hpx { namespace components
         {}
 
     private:
-        boost::function<bool (hpx::threadmanager::px_thread_self&)>
+        boost::function<threadmanager::thread_function_type>
             get_thread_function(naming::address::address_type lva) const
         {
             return boost::bind(F, reinterpret_cast<Component*>(lva), _1,
@@ -210,7 +210,7 @@ namespace hpx { namespace components
     //  two parameter version
     template <
         typename Component, int Action, typename Arg0, typename Arg1, 
-        bool (Component::*F)(hpx::threadmanager::px_thread_self&, Arg0, Arg1) 
+        threadmanager::thread_state(Component::*F)(threadmanager::px_thread_self&, Arg0, Arg1)
     >
     class action2
       : public action<Component, Action, boost::fusion::vector<Arg0, Arg1> >
@@ -231,7 +231,7 @@ namespace hpx { namespace components
         {}
 
     private:
-        boost::function<bool (hpx::threadmanager::px_thread_self&)>
+        boost::function<threadmanager::thread_function_type>
             get_thread_function(naming::address::address_type lva) const
         {
             return boost::bind(F, reinterpret_cast<Component*>(lva), _1,

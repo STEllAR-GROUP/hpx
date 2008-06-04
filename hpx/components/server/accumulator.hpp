@@ -8,12 +8,14 @@
 
 #include <iostream>
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <boost/serialization/export.hpp>
 
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/action.hpp>
+#include <hpx/threadmanager/px_thread.hpp>
 
 namespace hpx { namespace components { namespace server
 {
@@ -49,24 +51,27 @@ namespace hpx { namespace components { namespace server
         // exposed functionality of this component
         
         /// Initialize the accumulator
-        bool init(hpx::threadmanager::px_thread_self&) 
+        threadmanager::thread_state 
+        init (threadmanager::px_thread_self&) 
         {
             arg_ = 0;
-            return true;
+            return hpx::threadmanager::stopped;
         }
         
         /// Add the given number to the accumulator
-        bool add (hpx::threadmanager::px_thread_self&, double arg) 
+        threadmanager::thread_state 
+        add (threadmanager::px_thread_self&, double arg) 
         {
             arg_ += arg;
-            return true;
+            return hpx::threadmanager::stopped;
         }
         
         /// Print the current value of the accumulator
-        bool print(hpx::threadmanager::px_thread_self&) 
+        threadmanager::thread_state 
+        print (threadmanager::px_thread_self&) 
         {
             std::cout << arg_ << std::endl;
-            return true;
+            return hpx::threadmanager::stopped;
         }
 
         ///////////////////////////////////////////////////////////////////////
