@@ -19,16 +19,14 @@ namespace hpx { namespace applier
     public:
         // Invoked by a running PX-thread to apply an action to any resource
         template <typename Action>
-        void apply (naming::id_type resourceGUID);
+        void apply (naming::id_type gid);
 
         template <typename Action, typename Arg0>
-        void apply (naming::id_type resourceGUID, Arg0 const& arg0);
+        void apply (naming::id_type gid, Arg0 const& arg0);
 
         template <typename Action, typename Arg0, typename Arg1>
-        void apply (naming::id_type resourceGUID, Arg0 const& arg0, 
+        void apply (naming::id_type gid, Arg0 const& arg0, 
             Arg1 const& arg1);
-
-//         void apply (naming::id_type resourceGUID, continuation cont);
 
         // Invoked by a running PX-thread to determine whether a resource is 
         // local or remote
