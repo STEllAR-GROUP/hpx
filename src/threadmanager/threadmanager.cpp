@@ -16,7 +16,7 @@ namespace hpx { namespace threadmanager
     {
         // lock queue when adding work
         mutex_type::scoped_lock lk(mtx_);
-        work_items_.push(px_thread(threadfunc, pending));
+        work_items_.push(boost::shared_ptr<px_thread>(new px_thread(threadfunc, pending)));
 
         if (running_) 
             cond_.notify_one();           // try to execute the new work item
@@ -74,21 +74,23 @@ namespace hpx { namespace threadmanager
             thread_state new_state = unknown;
             if (!(work_items_.empty()))
             {
-                hpx::threadmanager::px_thread thrd (work_items_.front());
+                boost::shared_ptr <hpx::threadmanager::px_thread> thrd (work_items_.front());
                 work_items_.pop();
 
                 // make sure lock is unlocked during execution of work item
-                if (thrd.get_state() == pending)
+                if (thrd->get_state() == pending)
                 {
                     unlock_the_lock l(lk);    
-                    new_state = thrd();
+                    new_state = (*thrd)();
                 }
                 
                 // re-add this work item to our list of work items if appropriate
                 if (new_state == pending) 
                     work_items_.push(thrd);
             }
-            
+            // if thread is suspended  then push to suspended map
+            //CND
+
             // try to execute as much work as available, but try not to 
             // schedule a certain component more than once
             if (work_items_.empty()) {

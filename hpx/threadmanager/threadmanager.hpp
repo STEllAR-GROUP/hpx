@@ -25,7 +25,9 @@ namespace hpx { namespace threadmanager
     class threadmanager : private boost::noncopyable
     {
     private:
-        typedef std::queue<hpx::threadmanager::px_thread> work_items_type;
+        typedef std::queue <boost::shared_ptr<hpx::threadmanager::px_thread> > work_items_type;
+// add set / map / datastructure for suspended threads
+ //       typedef std::queue<hpx::threadmanager::px_thread> work_items_type;
         typedef boost::mutex mutex_type;
         friend struct unlock_the_lock;
 
