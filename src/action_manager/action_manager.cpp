@@ -7,25 +7,27 @@
 #include <hpx/action_manager/action_manager.hpp>
 #include <hpx/components/action.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
+#include <hpx/applier/applier.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace action_manager
 {
     // Call-back function for parcelHandler to call when new parcels are received
-    void action_manager::fetchNewParcel (parcelset::parcelhandler& pHandler, naming::address const&)
+    void action_manager::fetchNewParcel (parcelset::parcelhandler& parcel_handler_, 
+        naming::address const&)
     {
         parcelset::parcel p;
-        if (pHandler.get_parcel(p))            // if new parcel is found
+        if (parcel_handler_.get_parcel(p))            // if new parcel is found
         {
             // decode the local virtual address of the parcel
             naming::address addr = p.get_destination_addr();
             naming::address::address_type lva = addr.address_;
-            
+
             // decode the action-type in the parcel
             components::action_type act = p.get_action();
 
             // register the action and the local-virtual address with the TM
-            tManager.register_work(act->get_thread_function(lva));
+            thread_manager_.register_work(act->get_thread_function(applier_, lva));
         }
     }
 

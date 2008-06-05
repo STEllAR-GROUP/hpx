@@ -8,15 +8,25 @@
 
 #include <hpx/naming.hpp>
 #include <hpx/parcelset.hpp>
-#include <hpx/action_manager.hpp>
-
-#include <boost/tuple/tuple.hpp>
+#include <hpx/threadmanager.hpp>
 
 namespace hpx { namespace applier
 {
     class applier
     {
     public:
+        // constructor
+        applier(naming::resolver_client& dgas_c, threadmanager::threadmanager& tm, 
+            parcelset::parcelhandler &ph)
+            : dgas_client_(dgas_c), thread_manager_(tm), parcel_handler_(ph)
+        {
+        }
+
+        // destructor
+        ~applier()
+        {
+        }
+
         // Invoked by a running PX-thread to apply an action to any resource
         template <typename Action>
         void apply (naming::id_type gid);
@@ -25,15 +35,12 @@ namespace hpx { namespace applier
         void apply (naming::id_type gid, Arg0 const& arg0);
 
         template <typename Action, typename Arg0, typename Arg1>
-        void apply (naming::id_type gid, Arg0 const& arg0, 
-            Arg1 const& arg1);
+        void apply (naming::id_type gid, Arg0 const& arg0, Arg1 const& arg1);
 
-        // Invoked by a running PX-thread to determine whether a resource is 
-        // local or remote
-//        bool isLocal (naming::id_type resourceGUID);
-
-        // Invoked by the AM to request the new meta-action to execute locally
-//        action_manager::meta_action getAction ()
+    private:
+        naming::resolver_client& dgas_client_;
+        threadmanager::threadmanager& thread_manager_;
+        parcelset::parcelhandler& parcel_handler_;
     };
 }}
 

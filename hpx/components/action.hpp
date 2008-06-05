@@ -17,6 +17,7 @@
 #include <boost/fusion/include/size.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/bind.hpp>
+#include <boost/ref.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
@@ -35,7 +36,7 @@ namespace hpx { namespace components
         virtual std::size_t get_action_code() const = 0;
         virtual component_type get_component_type() const = 0;
         virtual boost::function<threadmanager::thread_function_type> 
-            get_thread_function(naming::address::address_type lva) const = 0;
+            get_thread_function(applier::applier& appl, naming::address::address_type lva) const = 0;
     };
 
     typedef boost::shared_ptr<action_base> action_type;
@@ -147,9 +148,9 @@ namespace hpx { namespace components
         
     private:
         boost::function<threadmanager::thread_function_type>
-            get_thread_function(naming::address::address_type lva) const
+            get_thread_function(applier::applier& appl, naming::address::address_type lva) const
         {
-            return boost::bind(F, reinterpret_cast<Component*>(lva), _1);
+            return boost::bind(F, reinterpret_cast<Component*>(lva), _1, boost::ref(appl));
         }
 
     private:
@@ -189,10 +190,10 @@ namespace hpx { namespace components
 
     private:
         boost::function<threadmanager::thread_function_type>
-            get_thread_function(naming::address::address_type lva) const
+            get_thread_function(applier::applier& appl, naming::address::address_type lva) const
         {
             return boost::bind(F, reinterpret_cast<Component*>(lva), _1,
-                this->get<0>());
+                this->get<0>(), boost::ref(appl));
         }
 
     private:
@@ -232,10 +233,10 @@ namespace hpx { namespace components
 
     private:
         boost::function<threadmanager::thread_function_type>
-            get_thread_function(naming::address::address_type lva) const
+            get_thread_function(applier::applier& appl, naming::address::address_type lva) const
         {
             return boost::bind(F, reinterpret_cast<Component*>(lva), _1,
-                this->get<0>(), this->get<1>());
+                this->get<0>(), this->get<1>(), boost::ref(appl));
         }
 
     private:
