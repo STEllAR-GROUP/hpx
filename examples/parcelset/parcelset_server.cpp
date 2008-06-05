@@ -9,7 +9,7 @@
 #include <boost/lexical_cast.hpp>
 
 #define MAXITERATIONS 1000
-double start_time;
+double start_time = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(BOOST_WINDOWS)
@@ -47,7 +47,7 @@ void received_parcel(hpx::parcelset::parcelhandler &ph, hpx::naming::address con
 {
     static int count = 0;
     static double accumulated_time = 0;
-	static double turnaround_time =0;
+    static double turnaround_time =0;
     static std::size_t accumulated_count = 0;
 
     hpx::parcelset::parcel p;
@@ -56,8 +56,8 @@ void received_parcel(hpx::parcelset::parcelhandler &ph, hpx::naming::address con
         try {
             accumulated_time += ph.get_current_time() - p.get_start_time();
             ++accumulated_count; 
-			if (start_time !=0)
-			turnaround_time += ph.get_current_time() - start_time;
+            if (start_time !=0)
+                turnaround_time += ph.get_current_time() - start_time;
 
             std::cout << "Received parcel: " << std::hex << p.get_parcel_id() 
                       << std::flush << std::endl;
@@ -67,7 +67,7 @@ void received_parcel(hpx::parcelset::parcelhandler &ph, hpx::naming::address con
                 std::cout << "Average travel time: " 
                           << accumulated_time/accumulated_count
                           << std::flush << std::endl;
-				std::cout << "Average turnaround time: " 
+                std::cout << "Average turnaround time: " 
                           << turnaround_time/accumulated_count
                           << std::flush << std::endl;
                 ph.get_parcelport().stop(false);
@@ -77,7 +77,7 @@ void received_parcel(hpx::parcelset::parcelhandler &ph, hpx::naming::address con
             p.set_destination(p.get_source());
             p.set_source(hpx::naming::id_type());
             p.set_parcel_id(hpx::naming::id_type());
-			start_time = ph.get_current_time();
+            start_time = ph.get_current_time();
             ph.put_parcel(p);
             ++count;
             std::cout << "Successfully sent parcel: " 
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
                   << std::flush << std::endl;
 
         ph.register_event_handler(received_parcel);
-		
+
         pp.run();
         dgas_s.stop();
 #else
