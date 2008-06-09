@@ -39,7 +39,8 @@ int main(int argc, char* argv[])
 
         // this is our locality
         locality here("localhost", HPX_PORT);
-        resolver_client resolver(host, port);
+        hpx::util::io_service_pool dgas_pool; 
+        resolver_client resolver(dgas_pool, host, port);
         
         id_type last_lowerid;
         
