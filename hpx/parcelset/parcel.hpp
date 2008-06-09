@@ -34,6 +34,9 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     typedef naming::id_type parcel_id;
 
+    parcel_id const no_parcel_id = parcel_id();
+    parcel_id const bad_parcel_id = parcel_id(boost::uint64_t(-1));
+    
     ///////////////////////////////////////////////////////////////////////////
     class parcel
     {

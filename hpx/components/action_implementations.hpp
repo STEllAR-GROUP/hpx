@@ -61,7 +61,8 @@
         
     private:
         boost::function<threadmanager::thread_function_type>
-            get_thread_function(naming::address::address_type lva) const
+            get_thread_function(applier::applier& appl, 
+                naming::address::address_type lva) const
         {
             return boost::bind(F, reinterpret_cast<Component*>(lva), _1,
                 BOOST_PP_REPEAT(N, HPX_ATION_ARGUMENT, _));

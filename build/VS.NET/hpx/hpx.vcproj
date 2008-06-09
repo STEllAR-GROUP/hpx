@@ -289,6 +289,14 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Applier"
+				>
+				<File
+					RelativePath="..\..\..\src\applier\applier.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -539,6 +547,10 @@
 					</File>
 					<File
 						RelativePath="..\..\..\hpx\components\server\manage_component_implementations.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\components\server\wrapper.hpp"
 						>
 					</File>
 				</Filter>
