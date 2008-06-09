@@ -139,7 +139,8 @@ namespace hpx { namespace components
     //  zero parameter version
     template <
         typename Component, int Action, 
-        threadmanager::thread_state(Component::*F)(threadmanager::px_thread_self&)
+        threadmanager::thread_state(Component::*F)(
+            threadmanager::px_thread_self&, applier::applier&)
     >
     class action0 : public action<Component, Action, boost::fusion::vector<> >
     {
@@ -171,7 +172,8 @@ namespace hpx { namespace components
     //  one parameter version
     template <
         typename Component, int Action, typename Arg0, 
-        threadmanager::thread_state(Component::*F)(threadmanager::px_thread_self&, Arg0) 
+        threadmanager::thread_state(Component::*F)(
+            threadmanager::px_thread_self&, applier::applier&, Arg0) 
     >
     class action1 
       : public action<Component, Action, boost::fusion::vector<Arg0> >
@@ -215,7 +217,8 @@ namespace hpx { namespace components
     //  two parameter version
     template <
         typename Component, int Action, typename Arg0, typename Arg1, 
-        threadmanager::thread_state(Component::*F)(threadmanager::px_thread_self&, Arg0, Arg1)
+        threadmanager::thread_state(Component::*F)(
+            threadmanager::px_thread_self&, applier::applier&, Arg0, Arg1)
     >
     class action2
       : public action<Component, Action, boost::fusion::vector<Arg0, Arg1> >

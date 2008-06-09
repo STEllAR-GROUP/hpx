@@ -13,7 +13,7 @@
 namespace hpx { namespace components { namespace server
 {
     threadmanager::thread_state factory::create(
-        threadmanager::px_thread_self& self,
+        threadmanager::px_thread_self& self, applier::applier& app,
         components::component_type type, naming::id_type gid)
     {
         switch (type) {

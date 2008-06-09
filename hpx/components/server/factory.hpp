@@ -42,7 +42,7 @@ namespace hpx { namespace components { namespace server
         
         /// create a new component
         threadmanager::thread_state create(
-            threadmanager::px_thread_self& self,
+            threadmanager::px_thread_self& self, applier::applier& app,
             components::component_type type, naming::id_type gid); 
         
         ///////////////////////////////////////////////////////////////////////

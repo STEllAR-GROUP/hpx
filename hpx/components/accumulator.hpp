@@ -8,20 +8,22 @@
 
 #include <hpx/naming/name.hpp>
 #include <hpx/applier/applier.hpp>
-#include <hpx/components/server/accumulator.hpp>
+#include <hpx/components/stubs/accumulator.hpp>
 
 namespace hpx { namespace components 
 {
     ///////////////////////////////////////////////////////////////////////////
-    // The \a accumulator class is the client side representation of a 
-    // \a server#accumulator component
-    class accumulator
+    /// The \a accumulator class is the client side representation of a 
+    /// specific \a server#accumulator component
+    class accumulator : public stubs::accumulator
     {
+        typedef stubs::accumulator base_type;
+        
     public:
         /// Create a client side representation for the existing
         /// \a server#accumulator instance with the given global id \a gid.
         accumulator(applier::applier& app, naming::id_type gid) 
-          : app_(app), gid_(gid)
+          : stubs::accumulator(app), gid_(gid)
         {}
         
         ~accumulator() 
@@ -33,24 +35,23 @@ namespace hpx { namespace components
         /// Initialize the accumulator value
         void init() 
         {
-            app_.apply<server::accumulator::init_action>(gid_);
+            this->base_type::init(gid_);
         }
         
         /// Add the given number to the accumulator
         void add (double arg) 
         {
-            app_.apply<server::accumulator::add_action>(gid_, arg);
+            this->base_type::add(gid_, arg);
         }
         
         /// Print the current value of the accumulator
         void print() 
         {
-            app_.apply<server::accumulator::print_action>(gid_);
+            this->base_type::print(gid_);
         }
         
     private:
         naming::id_type gid_;
-        applier::applier& app_;
     };
     
 }}

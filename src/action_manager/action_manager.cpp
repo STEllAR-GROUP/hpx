@@ -27,7 +27,8 @@ namespace hpx { namespace action_manager
             components::action_type act = p.get_action();
 
             // register the action and the local-virtual address with the TM
-            thread_manager_.register_work(act->get_thread_function(applier_, lva));
+            applier_.get_thread_manager().register_work(
+                act->get_thread_function(applier_, lva));
         }
     }
 

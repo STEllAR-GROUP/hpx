@@ -17,9 +17,8 @@ namespace hpx { namespace action_manager
     {
     public:
         // Constructor
-        action_manager(parcelset::parcelhandler& ph, threadmanager::threadmanager& tm, 
-            applier::applier& appl)
-            : parcel_handler_(ph), thread_manager_(tm), applier_(appl)
+        action_manager(parcelset::parcelhandler& ph, applier::applier& appl)
+            : parcel_handler_(ph), applier_(appl)
         {
             // Need to register the call-back function in parcelHandler so that
             // when a new parcel is received, it calls action_manager's fetchNewParcel()
@@ -55,7 +54,6 @@ namespace hpx { namespace action_manager
 
     private:
         parcelset::parcelhandler& parcel_handler_;
-        threadmanager::threadmanager& thread_manager_;
         applier::applier& applier_;
 
         // this scoped connection instance ensures the event handler to be 

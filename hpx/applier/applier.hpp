@@ -23,8 +23,8 @@ namespace hpx { namespace applier
     public:
         // constructor
         applier(naming::resolver_client const& dgas_c, 
-                threadmanager::threadmanager& tm, parcelset::parcelhandler &ph)
-          : dgas_client_(dgas_c), thread_manager_(tm), parcel_handler_(ph)
+                parcelset::parcelhandler &ph, threadmanager::threadmanager& tm)
+          : dgas_client_(dgas_c), parcel_handler_(ph), thread_manager_(tm)
         {
         }
 
@@ -113,6 +113,12 @@ namespace hpx { namespace applier
         // bring in the rest of the apply<> overloads
         #include <hpx/applier/applier_implementations.hpp>
         
+        /// \brief Access the threadmanager instance associated with this applier
+        threadmanager::threadmanager& get_thread_manager() 
+        {
+            return thread_manager_;
+        }
+        
     protected:
         bool address_is_local(naming::id_type gid, naming::address& addr) const
         {
@@ -128,8 +134,8 @@ namespace hpx { namespace applier
         
     private:
         naming::resolver_client const& dgas_client_;
-        threadmanager::threadmanager& thread_manager_;
         parcelset::parcelhandler& parcel_handler_;
+        threadmanager::threadmanager& thread_manager_;
     };
 }}
 

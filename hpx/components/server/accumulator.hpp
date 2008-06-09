@@ -52,7 +52,7 @@ namespace hpx { namespace components { namespace server
         
         /// Initialize the accumulator
         threadmanager::thread_state 
-        init (threadmanager::px_thread_self&) 
+        init (threadmanager::px_thread_self&, applier::applier& app) 
         {
             arg_ = 0;
             return hpx::threadmanager::stopped;
@@ -60,7 +60,7 @@ namespace hpx { namespace components { namespace server
         
         /// Add the given number to the accumulator
         threadmanager::thread_state 
-        add (threadmanager::px_thread_self&, double arg) 
+        add (threadmanager::px_thread_self&, applier::applier& app, double arg) 
         {
             arg_ += arg;
             return hpx::threadmanager::stopped;
@@ -68,7 +68,7 @@ namespace hpx { namespace components { namespace server
         
         /// Print the current value of the accumulator
         threadmanager::thread_state 
-        print (threadmanager::px_thread_self&) 
+        print (threadmanager::px_thread_self&, applier::applier& app) 
         {
             std::cout << arg_ << std::endl;
             return hpx::threadmanager::stopped;

@@ -70,8 +70,10 @@ int main(int argc, char* argv[])
 
         // Create a new thread-manager
         hpx::threadmanager::threadmanager tm;
+        // Create a new applier
+        hpx::applier::applier app(dgas_c, ph, tm);
         // Create a new action-manager
-        hpx::action_manager::action_manager am(ph, tm);
+        hpx::action_manager::action_manager am(ph, app);
 
         // Set console control handler to allow server to be stopped.
         console_ctrl_function = 

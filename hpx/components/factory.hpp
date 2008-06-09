@@ -8,20 +8,22 @@
 
 #include <hpx/naming/name.hpp>
 #include <hpx/applier/applier.hpp>
-#include <hpx/components/server/factory.hpp>
+#include <hpx/components/stubs/factory.hpp>
 
 namespace hpx { namespace components 
 {
     ///////////////////////////////////////////////////////////////////////////
-    // The \a factory class is the client side representation of a 
-    // \a server#factory component
-    class factory
+    /// The \a factory class is the client side representation of a 
+    /// \a server#factory component
+    class factory : public stubs::factory
     {
+        typedef stubs::factory base_type;
+        
     public:
         /// Create a client side representation for the existing
-        /// \a server#accumulator instance with the given global id \a gid.
+        /// \a server#factory instance with the given global id \a gid.
         factory(applier::applier& app, naming::id_type gid) 
-          : app_(app), gid_(gid)
+          : base_type(app), gid_(gid)
         {}
         
         ~factory() 
@@ -31,14 +33,13 @@ namespace hpx { namespace components
         // exposed functionality of this component
         
         /// Create a new component using the factory 
-        void create(components::component_type type, naming::id_type gid) 
+        void create(components::component_type type, naming::id_type newgid) 
         {
-            app_.apply<server::factory::create_action>(gid_, type, gid);
+            this->base_type::create(gid_, type, newgid);
         }
         
     private:
         naming::id_type gid_;
-        applier::applier& app_;
     };
     
 }}

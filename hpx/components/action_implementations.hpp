@@ -35,7 +35,9 @@
     //  N parameter version
     template <
         typename Component, int Action, BOOST_PP_ENUM_PARAMS(N, typename Arg),
-        threadmanager::thread_state(Component::*F)(threadmanager::px_thread_self&, BOOST_PP_ENUM_PARAMS(N, Arg)) 
+        threadmanager::thread_state(Component::*F)(
+            threadmanager::px_thread_self&, applier::applier&, 
+            BOOST_PP_ENUM_PARAMS(N, Arg)) 
     >
     class BOOST_PP_CAT(action, N)
       : public action<
