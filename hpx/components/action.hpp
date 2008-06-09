@@ -192,8 +192,8 @@ namespace hpx { namespace components
         boost::function<threadmanager::thread_function_type>
             get_thread_function(applier::applier& appl, naming::address::address_type lva) const
         {
-            return boost::bind(F, reinterpret_cast<Component*>(lva), _1,
-                this->get<0>(), boost::ref(appl));
+            return boost::bind(F, reinterpret_cast<Component*>(lva), _1, boost::ref(appl),
+                this->get<0>());
         }
 
     private:
@@ -235,8 +235,8 @@ namespace hpx { namespace components
         boost::function<threadmanager::thread_function_type>
             get_thread_function(applier::applier& appl, naming::address::address_type lva) const
         {
-            return boost::bind(F, reinterpret_cast<Component*>(lva), _1,
-                this->get<0>(), this->get<1>(), boost::ref(appl));
+            return boost::bind(F, reinterpret_cast<Component*>(lva), _1, boost::ref(appl),
+                this->get<0>(), this->get<1>());
         }
 
     private:
