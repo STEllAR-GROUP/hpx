@@ -63,7 +63,7 @@ namespace hpx { namespace applier
         }
 
         template <typename Action, typename Arg0>
-        void apply (naming::id_type gid, Arg0 const& arg0)
+        parcelset::parcel_id apply (naming::id_type gid, Arg0 const& arg0)
         {
             // Determine whether the gid is local or remote
             naming::address addr;
@@ -87,7 +87,7 @@ namespace hpx { namespace applier
         }
 
         template <typename Action, typename Arg0, typename Arg1>
-        void apply (naming::id_type gid, Arg0 const& arg0, Arg1 const& arg1)
+        parcelset::parcel_id apply (naming::id_type gid, Arg0 const& arg0, Arg1 const& arg1)
         {
             // Determine whether the gid is local or remote
             naming::address addr;
@@ -129,7 +129,7 @@ namespace hpx { namespace applier
                     hpx::exception(hpx::unknown_component_address));
                 return parcelset::bad_parcel_id;
             }
-            return addr.locality_ == dgas_client_.here();
+            return addr.locality_ == parcel_handler_.here();
         }
         
     private:

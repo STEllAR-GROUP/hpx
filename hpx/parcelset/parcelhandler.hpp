@@ -365,7 +365,12 @@ namespace hpx { namespace parcelset
         {
             return startup_time_ + timer_.elapsed();
         }
-        
+
+        naming::locality const& here() const
+        {
+            return pp_.here();
+        }
+
     protected:        
         // generate next unique id
         parcel_id get_next_id()

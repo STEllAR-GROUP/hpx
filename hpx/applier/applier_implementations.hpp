@@ -30,7 +30,7 @@
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    void apply (naming::id_type gid, 
+    parcelset::parcel_id apply (naming::id_type gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         // Determine whether the gid is local or remote
