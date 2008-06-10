@@ -18,7 +18,7 @@ namespace hpx { namespace applier
     /// has to be issued on a local or a remote resource. If the target 
     /// component is local a new \a px_thread will be created, if the target is
     /// remote a parcel will be sent.
-    class applier : boost::noncopyable
+    class applier : private boost::noncopyable
     {
     public:
         // constructor

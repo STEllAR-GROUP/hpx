@@ -6,6 +6,8 @@
 #if !defined(HPX_ACTION_MANAGER_ACTION_MANAGER_JUN_03_2008_0445PM)
 #define HPX_ACTION_MANAGER_ACTION_MANAGER_JUN_03_2008_0445PM
 
+#include <boost/noncopyable.hpp>
+
 #include <hpx/naming.hpp>
 #include <hpx/parcelset.hpp>
 #include <hpx/threadmanager.hpp>
@@ -13,7 +15,7 @@
 
 namespace hpx { namespace action_manager
 {
-    class action_manager
+    class action_manager : private boost::noncopyable
     {
     public:
         // Constructor
