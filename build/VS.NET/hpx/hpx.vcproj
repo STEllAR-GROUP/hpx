@@ -600,6 +600,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\docs\Doxyfile"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\Makefile.am"
 				>
 			</File>

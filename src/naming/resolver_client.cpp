@@ -365,8 +365,8 @@ namespace hpx { namespace naming
         typedef resolver_client_connection<bool> connection_type;
         
         // prepare request
-        server::request req(server::command_bind_range, lower_id, count, addr, offset);
-        connection_type* conn = new connection_type(socket_, req);
+        connection_type* conn = new connection_type(socket_, 
+            server::command_bind_range, lower_id, count, addr, offset);
         boost::shared_ptr<connection_type> client_conn(conn);
         
         conn->execute();
@@ -379,8 +379,8 @@ namespace hpx { namespace naming
         typedef resolver_client_connection<bool> connection_type;
         
         // prepare request
-        server::request req(server::command_unbind_range, lower_id, count);
-        connection_type* conn = new connection_type(socket_, req);
+        connection_type* conn = new connection_type(socket_, 
+            server::command_unbind_range, lower_id, count);
         boost::shared_ptr<connection_type> client_conn(conn);
 
         conn->execute();
@@ -395,8 +395,8 @@ namespace hpx { namespace naming
         connection_type;
         
         // prepare request
-        server::request req(server::command_resolve, id);
-        connection_type* conn = new connection_type(socket_, req);
+        connection_type* conn = new connection_type(socket_, 
+            server::command_resolve, id);
         boost::shared_ptr<connection_type> client_conn(conn);
         
         conn->execute();

@@ -35,7 +35,8 @@ namespace hpx { namespace naming
         struct handler<bool>
         {
             static void call(boost::system::error_code const& e, 
-                util::promise<bool>* promise_, server::reply* rep) 
+                util::promise<bool>* promise_, server::request const& req, 
+                server::reply* rep) 
             {
                 if (!e) {
                     // everything is fine
@@ -54,7 +55,7 @@ namespace hpx { namespace naming
         {
             static void call(boost::system::error_code const& e, 
                 util::promise<std::pair<bool, address> >* promise_, 
-                server::reply* rep) 
+                server::request const& req, server::reply* rep) 
             {
                 if (!e) {
                     // everything is fine
@@ -82,11 +83,33 @@ namespace hpx { namespace naming
         typedef util::container_device<std::vector<char> > io_device_type;
 
     public:
-        /// Construct a sending resolver_client_connection with the given io_service.
+        /// Construct a sending resolver_client_connection (for the \a
+        /// naming#server#command_bind_range command)
         resolver_client_connection(boost::asio::ip::tcp::socket& socket,
-                server::request const& req)
-          : socket_(socket)
+                server::name_server_command c, id_type lower_id, 
+                std::size_t count, address const& addr, std::ptrdiff_t offset)
+          : socket_(socket), req_(c, lower_id, count, addr, offset)
+        {}
+        
+        /// Construct a sending resolver_client_connection (for the \a
+        /// naming#server#command_unbind_range command)
+        resolver_client_connection(boost::asio::ip::tcp::socket& socket,
+                server::name_server_command c, id_type lower_id, 
+                std::size_t count)
+          : socket_(socket), req_(c, lower_id, count)
+        {}
+        
+        /// Construct a sending resolver_client_connection (for the \a
+        /// naming#server#command_resolve command)
+        resolver_client_connection(boost::asio::ip::tcp::socket& socket,
+                server::name_server_command c, id_type id)
+          : socket_(socket), req_(c, id)
+        {}
+        
+        /// Asynchronously write a data structure to the socket.
+        void execute()
         {
+            // serialize the request into the buffer
             {
                 // create a special io stream on top of out_buffer_
                 buffer_.clear();
@@ -94,15 +117,12 @@ namespace hpx { namespace naming
 
                 // Serialize the data
                 util::portable_binary_oarchive archive(io);
-                archive << req;
+                archive << req_;
             }
             size_ = buffer_.size();
-        }
-        
-        /// Asynchronously write a data structure to the socket.
-        void execute()
-        {
-            execute(boost::bind(&detail::handler<T>::call, _1, _2, _3));
+
+            // execute the requested action
+            execute(boost::bind(&detail::handler<T>::call, _1, _2, _3, _4));
         }
         
         /// Get the socket associated with the resolver_client_connection.
@@ -149,7 +169,7 @@ namespace hpx { namespace naming
             
             if (e) {
                 // propagate error
-                boost::get<0>(handler)(e, &promise_, (server::reply *)NULL);
+                boost::get<0>(handler)(e, &promise_, req_, (server::reply *)NULL);
             }
             else {
                 // Issue a read operation to read exactly the number of bytes 
@@ -179,7 +199,7 @@ namespace hpx { namespace naming
             
             if (e) {
                 // propagate error
-                boost::get<0>(handler)(e, &promise_, (server::reply *)NULL);
+                boost::get<0>(handler)(e, &promise_, req_, (server::reply *)NULL);
             }
             else {
                 // Determine the length of the serialized data.
@@ -207,7 +227,7 @@ namespace hpx { namespace naming
             
             if (e) {
                 // propagate error
-                boost::get<0>(handler)(e, &promise_, (server::reply *)NULL);
+                boost::get<0>(handler)(e, &promise_, req_, (server::reply *)NULL);
             }
             else {
                 // Extract the data structure from the data just received.
@@ -223,12 +243,12 @@ namespace hpx { namespace naming
                 catch (std::exception const& /*e*/) {
                     // Unable to decode data.
                     system::error_code error(asio::error::invalid_argument);
-                    boost::get<0>(handler)(error, &promise_, (server::reply *)NULL);
+                    boost::get<0>(handler)(error, &promise_, req_, (server::reply *)NULL);
                     return;
                 }
 
                 // Inform caller that data has been received ok.
-                boost::get<0>(handler)(e, &promise_, &rep);
+                boost::get<0>(handler)(e, &promise_, req_, &rep);
             }
         }
 
@@ -239,6 +259,9 @@ namespace hpx { namespace naming
         /// Socket for the resolver_client_connection.
         boost::asio::ip::tcp::socket& socket_;
 
+        /// Request sent by this connection
+        server::request req_;
+        
         /// buffer for outgoing and incoming data
         boost::integer::ulittle32_t size_;
         std::vector<char> buffer_;
