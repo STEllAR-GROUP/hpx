@@ -566,6 +566,10 @@
 					RelativePath="..\..\..\hpx\applier\applier.hpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\..\hpx\applier\applier_implementations.hpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="ActionManager"

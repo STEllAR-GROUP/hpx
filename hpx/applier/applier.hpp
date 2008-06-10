@@ -49,7 +49,7 @@ namespace hpx { namespace applier
                 // Get the local-virtual address of the resource and register 
                 // the action with the TM
                 thread_manager_.register_work(
-                    Action().get_thread_function(*this, addr.address_));
+                    Action::construct_thread_function(*this, addr.address_));
                 return parcelset::no_parcel_id;     // no parcel has been sent
             }
 
@@ -73,7 +73,7 @@ namespace hpx { namespace applier
                 // Get the local-virtual address of the resource and register 
                 // the action with the TM
                 thread_manager_.register_work(
-                    Action(arg0).get_thread_function(*this, addr.address_));
+                    Action::construct_thread_function(*this, addr.address_, arg0));
                 return parcelset::no_parcel_id;     // no parcel has been sent
             }
 
@@ -97,7 +97,7 @@ namespace hpx { namespace applier
                 // Get the local-virtual address of the resource and register 
                 // the action with the TM
                 thread_manager_.register_work(
-                    Action(arg0, arg1).get_thread_function(*this, addr.address_));
+                    Action::construct_thread_function(*this, addr.address_, arg0, arg1));
                 return parcelset::no_parcel_id;     // no parcel has been sent
             }
 

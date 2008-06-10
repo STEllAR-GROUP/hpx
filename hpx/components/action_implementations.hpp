@@ -61,12 +61,21 @@
           : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
         {}
         
+        static boost::function<threadmanager::thread_function_type> 
+        construct_thread_function(applier::applier& appl, 
+            naming::address::address_type lva, 
+            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
+        {
+            return boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
+                boost::ref(appl), BOOST_PP_ENUM_PARAMS(N, arg));
+        }
+
     private:
         boost::function<threadmanager::thread_function_type>
             get_thread_function(applier::applier& appl, 
                 naming::address::address_type lva) const
         {
-            return boost::bind(F, reinterpret_cast<Component*>(lva), _1,
+            return construct_thread_function(appl, lva, 
                 BOOST_PP_REPEAT(N, HPX_ATION_ARGUMENT, _));
         }
 

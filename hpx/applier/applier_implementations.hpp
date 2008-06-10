@@ -41,7 +41,7 @@
             // Get the local-virtual address of the resource and register 
             // the action with the TM
             thread_manager_.register_work(
-                Action(BOOST_PP_ENUM_PARAMS(N, arg)).get_thread_function(*this, addr.address_));
+                Action::construct_thread_function(*this, addr.address_, BOOST_PP_ENUM_PARAMS(N, arg)));
             return parcelset::no_parcel_id;     // no parcel has been sent
         }
 

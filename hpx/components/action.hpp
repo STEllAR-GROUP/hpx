@@ -30,11 +30,32 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
+    /// The \a action_base class is a abstract class used as the base class for 
+    /// all action types. It's main purpose is to allow polymorphic 
+    /// serialization of action instances
     struct action_base
     {
         virtual ~action_base() {}
+        
+        /// The function \a get_action_code returns the code of the action 
+        /// instance it is called for.
         virtual std::size_t get_action_code() const = 0;
+
+        /// The function \a get_component_type returns the \a component_type 
+        /// of the component this action belongs to.
         virtual component_type get_component_type() const = 0;
+        
+        /// The \a get_thread_function constructs a proper thread function for 
+        /// a \a px_thread, encapsulating the functionality and the arguments 
+        /// of the action is is called for.
+        /// 
+        /// \param appl   This is a reference to the \a applier instance to be
+        ///               passed as the second parameter to the action function
+        /// \param lva    This is the local virtual address of the component 
+        ///               the action has to be invoked on.
+        ///
+        /// \returns      This function returns a proper thread function usable
+        ///               for a \a px_thread.
         virtual boost::function<threadmanager::thread_function_type> 
             get_thread_function(applier::applier& appl, 
                 naming::address::address_type lva) const = 0;
@@ -49,8 +70,8 @@ namespace hpx { namespace components
     public:
         typedef Arguments arguments_type;
         
-        // this is the action code (id) it is exposed to allow generic handling
-        // of this action 
+        // This is the action code (id) of this action. It is exposed to allow 
+        // generic handling of actions.
         enum { value = Action };
         
         // construct an action from its arguments
@@ -148,13 +169,23 @@ namespace hpx { namespace components
         action0()
         {}
         
-    private:
-        boost::function<threadmanager::thread_function_type>
-            get_thread_function(applier::applier& appl, 
-                naming::address::address_type lva) const
+        /// \brief The static \a construct_thread_function allows to construct 
+        /// a proper thread function for a \a px_thread without having to 
+        /// instantiate the action0 type. This is used by the \a applier.
+        static boost::function<threadmanager::thread_function_type> 
+        construct_thread_function(applier::applier& appl, 
+            naming::address::address_type lva)
         {
             return boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
                 boost::ref(appl));
+        }
+
+    private:
+        boost::function<threadmanager::thread_function_type>
+        get_thread_function(applier::applier& appl, 
+            naming::address::address_type lva) const
+        {
+            return construct_thread_function(appl, lva);
         }
 
     private:
@@ -193,13 +224,20 @@ namespace hpx { namespace components
           : base_type(arg0) 
         {}
 
+        static boost::function<threadmanager::thread_function_type> 
+        construct_thread_function(applier::applier& appl, 
+            naming::address::address_type lva, Arg0 const& arg0) 
+        {
+            return boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
+                boost::ref(appl), arg0);
+        }
+
     private:
         boost::function<threadmanager::thread_function_type>
             get_thread_function(applier::applier& appl, 
                 naming::address::address_type lva) const
         {
-            return boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
-                boost::ref(appl), this->get<0>());
+            return construct_thread_function(appl, lva, this->get<0>());
         }
 
     private:
@@ -238,13 +276,22 @@ namespace hpx { namespace components
           : base_type(arg0, arg2) 
         {}
 
+        static boost::function<threadmanager::thread_function_type> 
+        construct_thread_function(applier::applier& appl, 
+            naming::address::address_type lva, Arg0 const& arg0, 
+            Arg1 const& arg1) 
+        {
+            return boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
+                boost::ref(appl), arg0, arg1);
+        }
+
     private:
         boost::function<threadmanager::thread_function_type>
             get_thread_function(applier::applier& appl, 
                 naming::address::address_type lva) const
         {
-            return boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
-                boost::ref(appl), this->get<0>(), this->get<1>());
+            return construct_thread_function(appl, lva, this->get<0>(),
+                this->get<1>());
         }
 
     private:
