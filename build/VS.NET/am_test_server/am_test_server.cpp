@@ -7,7 +7,7 @@
 #include <string>
 
 #include <hpx/hpx.hpp>
-#include <hpx/components/server/accumulator.hpp>
+
 #include <boost/lexical_cast.hpp>
 #include <boost/function.hpp>
 
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
         // Create a new applier
         hpx::applier::applier app(dgas_c, ph, tm);
         // Create a new action-manager
-        hpx::action_manager::action_manager am(ph, app);
+        hpx::action_manager::action_manager am(app);
 
         // Set console control handler to allow server to be stopped.
         console_ctrl_function = 

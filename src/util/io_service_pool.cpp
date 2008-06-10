@@ -66,10 +66,12 @@ namespace hpx { namespace util
 
     void io_service_pool::stop()
     {
-        // Explicitly stop all io_services.
-        for (std::size_t i = 0; i < io_services_.size(); ++i)
-            io_services_[i]->stop();
-        stopped_ = true;
+        if (!stopped_) {
+            // Explicitly stop all io_services.
+            for (std::size_t i = 0; i < io_services_.size(); ++i)
+                io_services_[i]->stop();
+            stopped_ = true;
+        }
     }
 
     boost::asio::io_service& io_service_pool::get_io_service()

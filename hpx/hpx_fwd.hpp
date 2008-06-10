@@ -11,6 +11,8 @@
 
 namespace hpx
 {
+    class runtime;
+    
     namespace applier
     {
         class applier;

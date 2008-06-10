@@ -6,14 +6,18 @@
 #if !defined(HPX_COMPONENTS_SERVER_MANAGE_COMPONENT_JUN_02_2008_0146PM)
 #define HPX_COMPONENTS_SERVER_MANAGE_COMPONENT_JUN_02_2008_0146PM
 
+#include <hpx/runtime/runtime.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    Component* create (naming::resolver_client const& dgas, naming::id_type gid)
+    Component* create (runtime& rt, naming::id_type gid)
     {
         Component* c = new Component;
-        if (!dgas.bind(gid, naming::address(dgas.here(), Component::value, c))) 
+        if (!rt.get_dgas_client().bind(gid, 
+                naming::address(rt.here(), Component::value, c))) 
         {
             delete c;
             boost::throw_exception(
@@ -25,11 +29,12 @@ namespace hpx { namespace components { namespace server
     }
     
     template <typename Component, typename Arg0>
-    Component* create (naming::resolver_client const& dgas, naming::id_type gid,
+    Component* create (runtime& rt, naming::id_type gid,
         Arg0 const& arg0)
     {
         Component* c = new Component(arg0);
-        if (!dgas.bind(gid, naming::address(dgas.here(), Component::value, c))) 
+        if (!rt.get_dgas_client().bind(gid, 
+                naming::address(rt.here(), Component::value, c))) 
         {
             delete c;
             boost::throw_exception(
@@ -41,11 +46,12 @@ namespace hpx { namespace components { namespace server
     }
     
     template <typename Component, typename Arg0, typename Arg1>
-    Component* create (naming::resolver_client const& dgas, naming::id_type gid,
+    Component* create (runtime& rt, naming::id_type gid,
         Arg0 const& arg0, Arg1 const& arg1)
     {
         Component* c = new Component(arg0, arg1);
-        if (!dgas.bind(gid, naming::address(dgas.here(), Component::value, c))) 
+        if (!rt.get_dgas_client().bind(gid, 
+                naming::address(rt.here(), Component::value, c))) 
         {
             delete c;
             boost::throw_exception(

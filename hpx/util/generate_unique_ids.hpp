@@ -11,7 +11,7 @@
 #include <boost/cstdint.hpp>
 
 #include <hpx/config.hpp>
-#include <hpx/naming/resolver_client.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
 
 namespace hpx { namespace util
 {

@@ -12,7 +12,7 @@
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <hpx/naming/resolver_server.hpp>
+#include <hpx/hpx.hpp>
 
 #if defined(BOOST_WINDOWS)
 

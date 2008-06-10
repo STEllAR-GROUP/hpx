@@ -22,9 +22,9 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime/naming/address.hpp>
 #include <hpx/components/component_type.hpp>
 #include <hpx/util/serialize_sequence.hpp>
-#include <hpx/naming/address.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -273,7 +273,7 @@ namespace hpx { namespace components
         // construct an action from its arguments
         template <typename Arg0, typename Arg1>
         action2(Arg0 const& arg0, Arg1 const& arg1) 
-          : base_type(arg0, arg2) 
+          : base_type(arg0, arg1) 
         {}
 
         static boost::function<threadmanager::thread_function_type> 

@@ -8,17 +8,17 @@
 #include <hpx/components/server/factory.hpp>
 #include <hpx/components/server/accumulator.hpp>
 #include <hpx/components/server/manage_component.hpp>
-#include <hpx/threadmanager/px_thread.hpp>
+#include <hpx/runtime/threadmanager/px_thread.hpp>
 
 namespace hpx { namespace components { namespace server
 {
     threadmanager::thread_state factory::create(
-        threadmanager::px_thread_self& self, applier::applier& app,
+        threadmanager::px_thread_self& self, applier::applier& appl,
         components::component_type type, naming::id_type gid)
     {
         switch (type) {
         case accumulator::value:
-            server::create<accumulator>(dgas_, gid);
+            server::create<accumulator>(rt_, gid);
             break;
             
         default:

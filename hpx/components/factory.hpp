@@ -6,8 +6,7 @@
 #if !defined(HPX_COMPONENTS_FACTORY_JUN_03_2008_0438PM)
 #define HPX_COMPONENTS_FACTORY_JUN_03_2008_0438PM
 
-#include <hpx/naming/name.hpp>
-#include <hpx/applier/applier.hpp>
+#include <hpx/runtime/runtime.hpp>
 #include <hpx/components/stubs/factory.hpp>
 
 namespace hpx { namespace components 
@@ -22,8 +21,8 @@ namespace hpx { namespace components
     public:
         /// Create a client side representation for the existing
         /// \a server#factory instance with the given global id \a gid.
-        factory(applier::applier& app, naming::id_type gid) 
-          : base_type(app), gid_(gid)
+        factory(runtime& rt, naming::id_type gid) 
+          : base_type(rt), gid_(gid)
         {}
         
         ~factory() 

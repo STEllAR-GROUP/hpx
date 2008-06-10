@@ -6,8 +6,8 @@
 #if !defined(HPX_COMPONENTS_STUBS_ACCUMULATOR_JUN_09_2008_0458PM)
 #define HPX_COMPONENTS_STUBS_ACCUMULATOR_JUN_09_2008_0458PM
 
-#include <hpx/naming/name.hpp>
-#include <hpx/applier/applier.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/components/server/accumulator.hpp>
 
 namespace hpx { namespace components { namespace stubs
@@ -20,8 +20,8 @@ namespace hpx { namespace components { namespace stubs
     public:
         /// Create a client side representation for any existing
         /// \a server#accumulator instance.
-        accumulator(applier::applier& app) 
-          : app_(app)
+        accumulator(applier::applier& appl) 
+          : app_(appl)
         {}
         
         ~accumulator() 

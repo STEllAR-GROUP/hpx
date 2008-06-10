@@ -12,7 +12,7 @@
 
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/action.hpp>
-#include <hpx/naming/resolver_client.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
 
 namespace hpx { namespace components { namespace server
 {
@@ -33,8 +33,8 @@ namespace hpx { namespace components { namespace server
         enum { value = component_factory };
         
         // constructor
-        factory(naming::resolver_client const& dgas)
-          : dgas_(dgas)
+        factory(runtime& rt)
+          : rt_(rt)
         {}
 
         ///////////////////////////////////////////////////////////////////////
@@ -55,7 +55,7 @@ namespace hpx { namespace components { namespace server
         > create_action;
         
     private:
-        naming::resolver_client const& dgas_;
+        runtime& rt_;
     };
     
 }}}

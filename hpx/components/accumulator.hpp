@@ -6,8 +6,7 @@
 #if !defined(HPX_COMPONENTS_ACCUMULATOR_MAY_18_2008_0822AM)
 #define HPX_COMPONENTS_ACCUMULATOR_MAY_18_2008_0822AM
 
-#include <hpx/naming/name.hpp>
-#include <hpx/applier/applier.hpp>
+#include <hpx/runtime/runtime.hpp>
 #include <hpx/components/stubs/accumulator.hpp>
 
 namespace hpx { namespace components 
@@ -22,8 +21,8 @@ namespace hpx { namespace components
     public:
         /// Create a client side representation for the existing
         /// \a server#accumulator instance with the given global id \a gid.
-        accumulator(applier::applier& app, naming::id_type gid) 
-          : stubs::accumulator(app), gid_(gid)
+        accumulator(applier::applier& appl, naming::id_type gid) 
+          : base_type(appl), gid_(gid)
         {}
         
         ~accumulator() 

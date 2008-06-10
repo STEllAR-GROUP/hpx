@@ -11,7 +11,6 @@
 #include <boost/cstdint.hpp>
 #include <boost/assert.hpp>
 #include <boost/lexical_cast.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
 
 int main(int argc, char* argv[])
 {

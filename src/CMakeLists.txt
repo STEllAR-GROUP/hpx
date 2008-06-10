@@ -5,19 +5,19 @@
 
 set (hpxlib_HEADERS
     # global
-    ../hpx/components.hpp
     ../hpx/config.hpp
     ../hpx/exception.hpp
     ../hpx/hpx.hpp
     ../hpx/hpx_fwd.hpp
-    ../hpx/naming.hpp
-    ../hpx/parcelset.hpp
-    ../hpx/threadmanager.hpp
-    ../hpx/util.hpp
+    ../hpx/include/components.hpp
+    ../hpx/include/naming.hpp
+    ../hpx/include/parcelset.hpp
+    ../hpx/include/threadmanager.hpp
+    ../hpx/include/util.hpp
     # action manager
-    ../hpx/action_manager/action_manager.hpp
+    ../hpx/runtime/action_manager/action_manager.hpp
     # applier
-    ../hpx/applier/applier.hpp
+    ../hpx/runtime/applier/applier.hpp
     # components
     ../hpx/components/action.hpp
     ../hpx/components/action_constructors.hpp
@@ -30,29 +30,29 @@ set (hpxlib_HEADERS
     ../hpx/components/server/manage_component.hpp
     ../hpx/components/server/manage_component_implementations.hpp
     # naming
-    ../hpx/naming/address.hpp
-    ../hpx/naming/locality.hpp
-    ../hpx/naming/name.hpp
-    ../hpx/naming/namespace.hpp
-    ../hpx/naming/resolver_client.hpp
-    ../hpx/naming/resolver_client_connection.hpp
-    ../hpx/naming/resolver_server.hpp
-    ../hpx/naming/server/connection.hpp
-    ../hpx/naming/server/reply.hpp
-    ../hpx/naming/server/request.hpp
-    ../hpx/naming/server/request_handler.hpp
+    ../hpx/runtime/naming/address.hpp
+    ../hpx/runtime/naming/locality.hpp
+    ../hpx/runtime/naming/name.hpp
+    ../hpx/runtime/naming/namespace.hpp
+    ../hpx/runtime/naming/resolver_client.hpp
+    ../hpx/runtime/naming/resolver_client_connection.hpp
+    ../hpx/runtime/naming/resolver_server.hpp
+    ../hpx/runtime/naming/server/connection.hpp
+    ../hpx/runtime/naming/server/reply.hpp
+    ../hpx/runtime/naming/server/request.hpp
+    ../hpx/runtime/naming/server/request_handler.hpp
     # parcelset
-    ../hpx/parcelset/connection_cache.hpp
-    ../hpx/parcelset/parcel.hpp
-    ../hpx/parcelset/parcelhandler.hpp
-    ../hpx/parcelset/parcelport.hpp
-    ../hpx/parcelset/parcelport_connection.hpp
-    ../hpx/parcelset/server/parcelhandler_queue.hpp
-    ../hpx/parcelset/server/parcelport_queue.hpp
-    ../hpx/parcelset/server/parcelport_server_connection.hpp
+    ../hpx/runtime/parcelset/connection_cache.hpp
+    ../hpx/runtime/parcelset/parcel.hpp
+    ../hpx/runtime/parcelset/parcelhandler.hpp
+    ../hpx/runtime/parcelset/parcelport.hpp
+    ../hpx/runtime/parcelset/parcelport_connection.hpp
+    ../hpx/runtime/parcelset/server/parcelhandler_queue.hpp
+    ../hpx/runtime/parcelset/server/parcelport_queue.hpp
+    ../hpx/runtime/parcelset/server/parcelport_server_connection.hpp
     # threadmanager
-    ../hpx/threadmanager/px_thread.hpp
-    ../hpx/threadmanager/threadmanager.hpp
+    ../hpx/runtime/threadmanager/px_thread.hpp
+    ../hpx/runtime/threadmanager/threadmanager.hpp
     # util
     ../hpx/util/asio_util.hpp
     ../hpx/util/container_device.hpp
@@ -73,19 +73,21 @@ set (hpxlib_HEADERS
 set (hpxlib_SOURCES
     # components
     components/server/factory.cpp
+    # action manager
+    runtime/action_manager/action_manager.cpp
     # naming 
-    naming/resolver_client.cpp
-    naming/resolver_server.cpp
-    naming/server/request_handler.cpp
+    runtime/naming/resolver_client.cpp
+    runtime/naming/resolver_server.cpp
+    runtime/naming/server/request_handler.cpp
     # parcelset
-    parcelset/connection_cache.cpp
-    parcelset/parcel.cpp
-    parcelset/parcelhandler.cpp
-    parcelset/parcelport.cpp
-    parcelset/server/parcelhandler_queue.cpp
-    parcelset/server/parcelport_queue.cpp
+    runtime/parcelset/connection_cache.cpp
+    runtime/parcelset/parcel.cpp
+    runtime/parcelset/parcelhandler.cpp
+    runtime/parcelset/parcelport.cpp
+    runtime/parcelset/server/parcelhandler_queue.cpp
+    runtime/parcelset/server/parcelport_queue.cpp
     # threadmanager
-    threadmanager/threadmanager.cpp
+    runtime/threadmanager/threadmanager.cpp
     # util 
     util/logging.cpp
     util/io_service_pool.cpp

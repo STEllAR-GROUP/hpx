@@ -6,8 +6,7 @@
 #if !defined(HPX_COMPONENTS_STUBS_FACTORY_JUN_09_2008_0503PM)
 #define HPX_COMPONENTS_STUBS_FACTORY_JUN_09_2008_0503PM
 
-#include <hpx/naming/name.hpp>
-#include <hpx/applier/applier.hpp>
+#include <hpx/runtime/runtime.hpp>
 #include <hpx/components/server/factory.hpp>
 
 namespace hpx { namespace components { namespace stubs
@@ -20,8 +19,8 @@ namespace hpx { namespace components { namespace stubs
     public:
         /// Create a client side representation for any existing 
         /// \a server#factory instance
-        factory(applier::applier& app) 
-          : app_(app)
+        factory(runtime& rt) 
+          : rt_(rt)
         {}
         
         ~factory() 
@@ -34,11 +33,12 @@ namespace hpx { namespace components { namespace stubs
         void create(naming::id_type targetgid, components::component_type type, 
             naming::id_type newgid) 
         {
-            app_.apply<server::factory::create_action>(targetgid, type, newgid);
+            rt_.get_applier().apply<server::factory::create_action>(
+                targetgid, type, newgid);
         }
 
     private:
-        applier::applier& app_;
+        runtime& rt_;
     };
 
 }}}

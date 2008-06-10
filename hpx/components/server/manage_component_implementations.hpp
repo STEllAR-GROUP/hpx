@@ -30,11 +30,12 @@
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    Component* create (naming::resolver_client const& dgas, naming::id_type gid,
+    Component* create (runtime& rt, naming::id_type gid,
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         Component* c = new Component(BOOST_PP_ENUM_PARAMS(N, arg));
-        if (!dgas.bind(gid, naming::address(dgas.here(), Component::value, c))) 
+        if (!rt.get_dgas_client().bind(gid, 
+                naming::address(rt.here(), Component::value, c))) 
         {
             delete c;
             boost::throw_exception(

@@ -150,58 +150,6 @@
 				>
 			</File>
 			<Filter
-				Name="Naming"
-				>
-				<File
-					RelativePath="..\..\..\src\naming\resolver_client.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							DisableSpecificWarnings="4267"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							DisableSpecificWarnings="4267"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\..\..\src\naming\resolver_server.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							DisableSpecificWarnings="4267"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							DisableSpecificWarnings="4267"
-						/>
-					</FileConfiguration>
-				</File>
-				<Filter
-					Name="Server"
-					>
-					<File
-						RelativePath="..\..\..\src\naming\server\request_handler.cpp"
-						>
-					</File>
-				</Filter>
-			</Filter>
-			<Filter
 				Name="Util"
 				>
 				<File
@@ -214,54 +162,6 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="Parcelset"
-				>
-				<File
-					RelativePath="..\..\..\src\parcelset\connection_cache.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\src\parcelset\parcel.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\src\parcelset\parcelhandler.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\src\parcelset\parcelport.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							DisableSpecificWarnings="4503"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							DisableSpecificWarnings="4503"
-						/>
-					</FileConfiguration>
-				</File>
-				<Filter
-					Name="Server"
-					>
-					<File
-						RelativePath="..\..\..\src\parcelset\server\parcelhandler_queue.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\src\parcelset\server\parcelport_queue.cpp"
-						>
-					</File>
-				</Filter>
-			</Filter>
-			<Filter
 				Name="Components"
 				>
 				<Filter
@@ -269,6 +169,78 @@
 					>
 					<File
 						RelativePath="..\..\..\src\components\server\factory.cpp"
+						>
+					</File>
+				</Filter>
+			</Filter>
+			<Filter
+				Name="Runtime"
+				>
+				<Filter
+					Name="ActionManager"
+					>
+					<File
+						RelativePath="..\..\..\src\runtime\action_manager\action_manager.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Naming"
+					>
+					<File
+						RelativePath="..\..\..\src\runtime\naming\resolver_client.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\src\runtime\naming\resolver_server.cpp"
+						>
+					</File>
+					<Filter
+						Name="Server"
+						>
+						<File
+							RelativePath="..\..\..\src\runtime\naming\server\request_handler.cpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="Parcelset"
+					>
+					<File
+						RelativePath="..\..\..\src\runtime\parcelset\connection_cache.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\src\runtime\parcelset\parcel.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\src\runtime\parcelset\parcelhandler.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\src\runtime\parcelset\parcelport.cpp"
+						>
+					</File>
+					<Filter
+						Name="Server"
+						>
+						<File
+							RelativePath="..\..\..\src\runtime\parcelset\server\parcelhandler_queue.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\src\runtime\parcelset\server\parcelport_queue.cpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="Threadmanager"
+					>
+					<File
+						RelativePath="..\..\..\src\runtime\threadmanager\threadmanager.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -281,40 +253,12 @@
 					</File>
 				</Filter>
 			</Filter>
-			<Filter
-				Name="Threadmanager"
-				>
-				<File
-					RelativePath="..\..\..\src\threadmanager\threadmanager.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="ActionManager"
-				>
-				<File
-					RelativePath="..\..\..\src\action_manager\action_manager.cpp"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="..\..\..\hpx\action_manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\hpx\applier.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\hpx\components.hpp"
-				>
-			</File>
 			<File
 				RelativePath="..\..\..\hpx\config.hpp"
 				>
@@ -331,73 +275,41 @@
 				RelativePath="..\..\..\hpx\hpx_fwd.hpp"
 				>
 			</File>
-			<File
-				RelativePath="..\..\..\hpx\naming.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\hpx\parcelset.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\hpx\threadmanager.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\hpx\util.hpp"
-				>
-			</File>
 			<Filter
-				Name="Naming"
+				Name="Include"
 				>
 				<File
-					RelativePath="..\..\..\hpx\naming\address.hpp"
+					RelativePath="..\..\..\hpx\include\action_manager.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\hpx\naming\locality.hpp"
+					RelativePath="..\..\..\hpx\include\applier.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\hpx\naming\name.hpp"
+					RelativePath="..\..\..\hpx\include\components.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\hpx\naming\namespace.hpp"
+					RelativePath="..\..\..\hpx\include\naming.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\hpx\naming\resolver_client.hpp"
+					RelativePath="..\..\..\hpx\include\parcelset.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\hpx\naming\resolver_client_connection.hpp"
+					RelativePath="..\..\..\hpx\include\runtime.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\hpx\naming\resolver_server.hpp"
+					RelativePath="..\..\..\hpx\include\threadmanager.hpp"
 					>
 				</File>
-				<Filter
-					Name="Server"
+				<File
+					RelativePath="..\..\..\hpx\include\util.hpp"
 					>
-					<File
-						RelativePath="..\..\..\hpx\naming\server\connection.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\hpx\naming\server\reply.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\hpx\naming\server\request.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\hpx\naming\server\request_handler.hpp"
-						>
-					</File>
-				</Filter>
+				</File>
 			</Filter>
 			<Filter
 				Name="Util"
@@ -464,41 +376,129 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="Parcelset"
+				Name="Runtime"
 				>
 				<File
-					RelativePath="..\..\..\hpx\parcelset\connection_cache.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\hpx\parcelset\parcel.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\hpx\parcelset\parcelhandler.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\hpx\parcelset\parcelport.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\hpx\parcelset\parcelport_connection.hpp"
+					RelativePath="..\..\..\hpx\runtime\runtime.hpp"
 					>
 				</File>
 				<Filter
-					Name="Server"
+					Name="ActionManager"
 					>
 					<File
-						RelativePath="..\..\..\hpx\parcelset\server\parcelhandler_queue.hpp"
+						RelativePath="..\..\..\hpx\runtime\action_manager\action_manager.hpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Naming"
+					>
+					<File
+						RelativePath="..\..\..\hpx\runtime\naming\address.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\hpx\parcelset\server\parcelport_queue.hpp"
+						RelativePath="..\..\..\hpx\runtime\naming\locality.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\hpx\parcelset\server\parcelport_server_connection.hpp"
+						RelativePath="..\..\..\hpx\runtime\naming\name.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\naming\resolver_client.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\naming\resolver_client_connection.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\naming\resolver_server.hpp"
+						>
+					</File>
+					<Filter
+						Name="Server"
+						>
+						<File
+							RelativePath="..\..\..\hpx\runtime\naming\server\connection.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\naming\server\reply.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\naming\server\request.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\naming\server\request_handler.hpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="Applier"
+					>
+					<File
+						RelativePath="..\..\..\hpx\runtime\applier\applier.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\applier\applier_implementations.hpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Parcelset"
+					>
+					<File
+						RelativePath="..\..\..\hpx\runtime\parcelset\connection_cache.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\parcelset\parcel.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\parcelset\parcelhandler.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\parcelset\parcelport.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\parcelset\parcelport_connection.hpp"
+						>
+					</File>
+					<Filter
+						Name="Server"
+						>
+						<File
+							RelativePath="..\..\..\hpx\runtime\parcelset\server\parcelhandler_queue.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\parcelset\server\parcelport_queue.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\parcelset\server\parcelport_server_connection.hpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="Threadmanager"
+					>
+					<File
+						RelativePath="..\..\..\hpx\runtime\threadmanager\px_thread.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\threadmanager\threadmanager.hpp"
 						>
 					</File>
 				</Filter>
@@ -566,38 +566,6 @@
 						>
 					</File>
 				</Filter>
-			</Filter>
-			<Filter
-				Name="Applier"
-				>
-				<File
-					RelativePath="..\..\..\hpx\applier\applier.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\hpx\applier\applier_implementations.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="ActionManager"
-				>
-				<File
-					RelativePath="..\..\..\hpx\action_manager\action_manager.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Threadmanager"
-				>
-				<File
-					RelativePath="..\..\..\hpx\threadmanager\px_thread.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\hpx\threadmanager\threadmanager.hpp"
-					>
-				</File>
 			</Filter>
 		</Filter>
 		<Filter
