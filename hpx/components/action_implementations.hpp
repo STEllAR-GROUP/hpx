@@ -34,21 +34,21 @@
     ///////////////////////////////////////////////////////////////////////////
     //  N parameter version
     template <
-        typename Component, int Action, BOOST_PP_ENUM_PARAMS(N, typename Arg),
+        typename Component, int Action, BOOST_PP_ENUM_PARAMS(N, typename T),
         threadmanager::thread_state(Component::*F)(
             threadmanager::px_thread_self&, applier::applier&, 
-            BOOST_PP_ENUM_PARAMS(N, Arg)) 
+            BOOST_PP_ENUM_PARAMS(N, T)) 
     >
     class BOOST_PP_CAT(action, N)
       : public action<
             Component, Action, 
-            boost::fusion::vector<BOOST_PP_ENUM_PARAMS(N, Arg)> 
+            boost::fusion::vector<BOOST_PP_ENUM_PARAMS(N, T)> 
         >
     {
     private:
         typedef action<
             Component, Action, 
-            boost::fusion::vector<BOOST_PP_ENUM_PARAMS(N, Arg)> 
+            boost::fusion::vector<BOOST_PP_ENUM_PARAMS(N, T)> 
         > base_type;
         
     public:
@@ -61,6 +61,7 @@
           : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
         {}
         
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static boost::function<threadmanager::thread_function_type> 
         construct_thread_function(applier::applier& appl, 
             naming::address::address_type lva, 
@@ -86,7 +87,7 @@
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<action>(*this);
+            ar & boost::serialization::base_object<base_type>(*this);
         }
     };
 

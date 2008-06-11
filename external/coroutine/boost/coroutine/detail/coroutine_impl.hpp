@@ -56,7 +56,7 @@ namespace boost { namespace coroutines { namespace detail {
     typedef ContextImpl context_impl;
     typedef CoroutineType coroutine_type;
     typedef coroutine_impl<coroutine_type, context_impl> type;
-    typedef context_base<context_impl> context_base;
+    typedef context_base<context_impl> context_base_;
     typedef typename coroutine_type::arg_slot_type arg_slot_type;
     typedef typename coroutine_type::result_type result_type;
     typedef typename coroutine_type::result_slot_type result_slot_type;
@@ -65,7 +65,7 @@ namespace boost { namespace coroutines { namespace detail {
   
     template<typename DerivedType>
         coroutine_impl(DerivedType * this_, std::ptrdiff_t stack_size) :
-      context_base(*this_, stack_size),
+      context_base_(*this_, stack_size),
         m_arg(0),
         m_result(0){}
                 

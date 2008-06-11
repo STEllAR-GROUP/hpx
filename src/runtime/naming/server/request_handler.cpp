@@ -32,7 +32,7 @@ namespace hpx { namespace naming { namespace server
     
     inline bool is_prefix_only(id_type id)
     {
-        return (id.get_msb() & 0xFFFFFFFFFFFF) ? false : true;
+        return (id.get_msb() & 0xFFFFFFFFFFFFLL) ? false : true;
     }
     
     ///////////////////////////////////////////////////////////////////////////
@@ -442,7 +442,12 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#if BOOST_VERSION < 103600
+#if BOOST_VERSION > 103600
+    double request_handler::extract_moment2(accumulator_set_type const& p)
+    {
+        return boost::accumulators::extract::moment<2>(p);
+    }
+#else
     double extract_moment2(std::pair<double, std::size_t> const& p)
     {
         return 0.0;   // not implemented yet
@@ -454,7 +459,7 @@ namespace hpx { namespace naming { namespace server
         try {
 #if BOOST_VERSION >= 103600
             rep = reply(command_statistics_moment2, totals_, 
-                &boost::accumulators::extract::moment<2, accumulator_set_type>);
+                &request_handler::extract_moment2);
 #else
             rep = reply(command_statistics_moment2, totals_, extract_moment2);
 #endif

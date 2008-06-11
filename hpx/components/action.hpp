@@ -165,6 +165,8 @@ namespace hpx { namespace components
     >
     class action0 : public action<Component, Action, boost::fusion::vector<> >
     {
+        typedef action<Component, Action, boost::fusion::vector<> > base_type;
+        
     public:
         action0()
         {}
@@ -195,23 +197,23 @@ namespace hpx { namespace components
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<action>(*this);
+            ar & boost::serialization::base_object<base_type>(*this);
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     //  one parameter version
     template <
-        typename Component, int Action, typename Arg0, 
+        typename Component, int Action, typename T0, 
         threadmanager::thread_state(Component::*F)(
-            threadmanager::px_thread_self&, applier::applier&, Arg0) 
+            threadmanager::px_thread_self&, applier::applier&, T0) 
     >
     class action1 
-      : public action<Component, Action, boost::fusion::vector<Arg0> >
+      : public action<Component, Action, boost::fusion::vector<T0> >
     {
     private:
         typedef 
-            action<Component, Action, boost::fusion::vector<Arg0> >
+            action<Component, Action, boost::fusion::vector<T0> >
         base_type;
         
     public:
@@ -224,6 +226,7 @@ namespace hpx { namespace components
           : base_type(arg0) 
         {}
 
+        template <typename Arg0>
         static boost::function<threadmanager::thread_function_type> 
         construct_thread_function(applier::applier& appl, 
             naming::address::address_type lva, Arg0 const& arg0) 
@@ -247,23 +250,23 @@ namespace hpx { namespace components
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<action>(*this);
+            ar & boost::serialization::base_object<base_type>(*this);
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     //  two parameter version
     template <
-        typename Component, int Action, typename Arg0, typename Arg1, 
+        typename Component, int Action, typename T0, typename T1, 
         threadmanager::thread_state(Component::*F)(
-            threadmanager::px_thread_self&, applier::applier&, Arg0, Arg1)
+            threadmanager::px_thread_self&, applier::applier&, T0, T1)
     >
     class action2
-      : public action<Component, Action, boost::fusion::vector<Arg0, Arg1> >
+      : public action<Component, Action, boost::fusion::vector<T0, T1> >
     {
     private:
         typedef 
-            action<Component, Action, boost::fusion::vector<Arg0, Arg1> >
+            action<Component, Action, boost::fusion::vector<T0, T1> >
         base_type;
         
     public:
@@ -276,6 +279,7 @@ namespace hpx { namespace components
           : base_type(arg0, arg1) 
         {}
 
+        template <typename Arg0, typename Arg1>
         static boost::function<threadmanager::thread_function_type> 
         construct_thread_function(applier::applier& appl, 
             naming::address::address_type lva, Arg0 const& arg0, 
@@ -301,7 +305,7 @@ namespace hpx { namespace components
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<action>(*this);
+            ar & boost::serialization::base_object<base_type>(*this);
         }
     };
 

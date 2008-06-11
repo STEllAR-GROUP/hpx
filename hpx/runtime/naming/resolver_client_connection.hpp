@@ -152,11 +152,11 @@ namespace hpx { namespace naming
             // write operation
             void (resolver_client_connection::*f)(system::error_code const&, 
                     boost::tuple<Handler>) =
-                &resolver_client_connection::handle_write<Handler>;
+                &resolver_client_connection::handle_write;
                 
             asio::async_write(socket_, buffers, 
-                boost::bind(f, shared_from_this(), asio::placeholders::error, 
-                    boost::make_tuple(handler)));
+                boost::bind(f, this->shared_from_this(), 
+                    asio::placeholders::error, boost::make_tuple(handler)));
         }
 
         /// handle completed write operation
@@ -176,13 +176,13 @@ namespace hpx { namespace naming
                 // in a header.
                 void (resolver_client_connection::*f)(system::error_code const&, 
                         boost::tuple<Handler>)
-                    = &resolver_client_connection::handle_read_header<Handler>;
+                    = &resolver_client_connection::handle_read_header;
                 
                 buffer_.clear();
                 size_ = 0;
                 boost::asio::async_read(socket_, 
                     boost::asio::buffer(&size_, sizeof(size_)),
-                    boost::bind(f, shared_from_this(), 
+                    boost::bind(f, this->shared_from_this(), 
                         asio::placeholders::error, handler));
             }
         }
@@ -209,10 +209,10 @@ namespace hpx { namespace naming
                 buffer_.resize(inbound_data_size);
                 void (resolver_client_connection::*f)(system::error_code const&,
                         boost::tuple<Handler>)
-                    = &resolver_client_connection::handle_read_data<Handler>;
+                    = &resolver_client_connection::handle_read_data;
 
                 boost::asio::async_read(socket_, boost::asio::buffer(buffer_),
-                    boost::bind(f, shared_from_this(), 
+                    boost::bind(f, this->shared_from_this(), 
                         asio::placeholders::error, handler));
             }
         }

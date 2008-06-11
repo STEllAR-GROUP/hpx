@@ -17,22 +17,6 @@
 namespace hpx { namespace threadmanager 
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \enum thread_state
-    ///
-    /// The thread_state enumerator encodes the current state of a \a px_thread
-    /// instance
-    enum thread_state
-    {
-        unknown = -1,
-        init = 0,       ///< thread is initializing
-        depleted = 1,   ///< thread has been depleted (deeply suspended)
-        suspended = 2,  ///< thread has been suspended
-        pending = 3,    ///< thread is pending (ready to run)
-        running = 4,    ///< thread is currently running (active)
-        stopped = 5     ///< thread has been stopped an may be garbage collected
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     /// This is the representation of a ParalleX thread
     class px_thread 
     {

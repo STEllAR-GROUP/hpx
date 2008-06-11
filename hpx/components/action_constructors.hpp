@@ -30,7 +30,7 @@
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     action(BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-        : arguments_(BOOST_PP_ENUM_PARAMS(N, args)) 
+        : arguments_(BOOST_PP_ENUM_PARAMS(N, arg)) 
     {}
 
 #undef N

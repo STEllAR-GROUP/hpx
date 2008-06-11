@@ -76,6 +76,11 @@ namespace hpx { namespace naming
             return endpoint_;
         }
         
+        friend bool operator!=(locality const& lhs, locality const& rhs)
+        {
+            return lhs.endpoint_ != rhs.endpoint_;
+        }
+
         friend bool operator==(locality const& lhs, locality const& rhs)
         {
             return lhs.endpoint_ == rhs.endpoint_;
@@ -88,7 +93,7 @@ namespace hpx { namespace naming
         
         friend bool operator> (locality const& lhs, locality const& rhs)
         {
-            return lhs.endpoint_ > rhs.endpoint_;
+            return !(lhs.endpoint_ < rhs.endpoint_) && lhs.endpoint_ != rhs.endpoint_;
         }
         
     private:

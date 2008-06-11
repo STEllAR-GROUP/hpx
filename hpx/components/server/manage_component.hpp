@@ -67,11 +67,11 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    void destroy(naming::resolver_client& dgas, naming::id_type gid)
+    void destroy(runtime& rt, naming::id_type gid)
     {
         // retrieve the local address bound to the given global id
         naming::address addr;
-        if (!dgas.unbind(gid, addr)) 
+        if (!rt.get_dgas_client().unbind(gid, addr)) 
         {
             boost::throw_exception(
                 hpx::exception(hpx::unknown_component_address,
@@ -79,7 +79,7 @@ namespace hpx { namespace components { namespace server
         }
         
         // make sure this component is located here
-        if (dgas.here() != addr.locality_) 
+        if (rt.here() != addr.locality_) 
         {
             // FIXME: should the component be re-bound ?
             boost::throw_exception(

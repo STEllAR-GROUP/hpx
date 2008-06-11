@@ -22,6 +22,7 @@
 #include <boost/integer/endian.hpp>
 
 #include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
+#include <hpx/runtime/parcelset/connection_cache.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/container_device.hpp>

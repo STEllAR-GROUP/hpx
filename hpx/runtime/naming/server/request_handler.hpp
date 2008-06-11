@@ -134,6 +134,8 @@ namespace hpx { namespace naming { namespace server
         typedef boost::accumulators::accumulator_set<
             double, accumulator_stats_type> accumulator_set_type;
 
+        static double extract_moment2(accumulator_set_type const& p);
+
     public:
         typedef std::vector<accumulator_set_type> totals_type;
 #else
