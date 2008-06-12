@@ -8,6 +8,7 @@
 
 #include <hpx/runtime/runtime.hpp>
 #include <hpx/components/server/factory.hpp>
+// #include <hpx/lcos/simple_future.hpp>
 
 namespace hpx { namespace components { namespace stubs
 {
@@ -19,8 +20,8 @@ namespace hpx { namespace components { namespace stubs
     public:
         /// Create a client side representation for any existing 
         /// \a server#factory instance
-        factory(runtime& rt) 
-          : rt_(rt)
+        factory(applier::applier& app) 
+          : app_(app)
         {}
         
         ~factory() 
@@ -30,15 +31,27 @@ namespace hpx { namespace components { namespace stubs
         // exposed functionality of this component
 
         /// Create a new component using the factory with the given \a targetgid
-        void create(naming::id_type targetgid, components::component_type type, 
-            naming::id_type newgid) 
+        static naming::id_type create(
+            threadmanager::px_thread_self& self, applier::applier& appl, 
+            naming::id_type targetgid, components::component_type type) 
         {
-            rt_.get_applier().apply<server::factory::create_action>(
-                targetgid, type, newgid);
+//             lcos::simple_future<naming::id_type> lco (
+//                 self.get_thread_id(),
+//                 boost::bind(
+//                     &applier.apply<server::factory::create_action, components::component_type>,
+//                     app_, targetgid, type)
+//             );
+//             return lco.get_result();
         }
 
+        naming::id_type create(threadmanager::px_thread_self& self,
+            naming::id_type targetgid, components::component_type type) 
+        {
+            return create(self, app_, targetgid, type);
+        }
+        
     private:
-        runtime& rt_;
+        applier::applier& app_;
     };
 
 }}}
