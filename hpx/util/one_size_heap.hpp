@@ -12,7 +12,9 @@
 
 #include <boost/noncopyable.hpp>
 #include <hpx/config.hpp>
+#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
 #include <hpx/util/logging.hpp>
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util 
@@ -49,6 +51,9 @@ namespace hpx { namespace util
     class one_size_heap : private boost::noncopyable
     {
     public:
+        typedef T value_type;
+        typedef Allocator allocator_type;
+        
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
         enum guard_value {
             preguard_value = 0xfc,          // values to be used in memory guard areas
@@ -245,12 +250,13 @@ namespace hpx { namespace util
                 return false;
             }
 
+#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
             LOSH_(info) 
                 << "one_size_heap " 
                 << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
                 << ": init_pool (" << std::hex << pool_ << ")" 
                 << " size: " << s << ".";
-
+#endif
             s /= heap_size;
             first_free_ = pool_;
             size_ = s;
@@ -265,19 +271,21 @@ namespace hpx { namespace util
             std::size_t const s = std::size_t((size_ + step_) * heap_size);
             std::size_t s1 = s;
 
+#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
             LOSH_(info) 
                 << "one_size_heap " 
                 << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
                 << ": realloc_pool (" << std::hex << pool_ << ")" 
                 << " size: " << s << ".";
-
+#endif
             data* p = (data*)alloc_.realloc(s1, pool_);
             if (NULL == p) {
+#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
                 LOSH_(error) 
                     << "one_size_heap " 
                     << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
                     << ": realloc_pool (" << std::hex << pool_ << ") failed.";
-
+#endif
                 if (throw_on_error_)
                     throw std::bad_alloc();
                 return false;
@@ -340,12 +348,8 @@ namespace hpx { namespace util
     {
         ///////////////////////////////////////////////////////////////////////
         // simple allocator which gets the memory from malloc
-        class mallocator  
+        struct mallocator  
         {
-        public:
-            mallocator() {}
-            ~mallocator() {}
-
             static void* alloc(std::size_t& size) 
             { 
                 return malloc(size); 
@@ -356,10 +360,7 @@ namespace hpx { namespace util
             }
             static void* realloc(std::size_t &size, void *p)
             { 
-                // normally this should return ::realloc(p, size), but we are 
-                // not interested in growing the allocated heaps, so we just 
-                // return NULL
-                return NULL;
+                return ::realloc(p, size);
             }
         };
     }
@@ -374,17 +375,12 @@ namespace hpx { namespace util
         typedef one_size_heap<T, one_size_heap_allocators::mallocator> base_type;
         
     public:
-#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
         explicit one_size_malloc_heap(char const* class_name, int step = -1)
           : base_type(class_name, step) 
         {}
-#else
-        explicit one_size_malloc_heap(int step = -1)
-          : base_type(step) 
-        {}
-#endif
     };
 
+#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
     ///////////////////////////////////////////////////////////////////////////
     struct init_logging
     {
@@ -394,7 +390,8 @@ namespace hpx { namespace util
         }
     };
     
-    init_logging init_osh_logging;
+    init_logging const init_osh_logging;
+#endif
     
 }} // namespace hpx::util
 

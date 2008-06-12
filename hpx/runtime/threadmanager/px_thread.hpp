@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PX_THREAD_MAY_20_2008_910AM)
-#define HPX_PX_THREAD_MAY_20_2008_910AM
+#if !defined(HPX_PX_THREAD_MAY_20_2008_0910AM)
+#define HPX_PX_THREAD_MAY_20_2008_0910AM
 
 #include <boost/function.hpp>
 #include <boost/lexical_cast.hpp>
@@ -13,8 +13,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/components/component_type.hpp>
+#include <hpx/components/server/wrapper.hpp>
 
-namespace hpx { namespace threadmanager 
+namespace hpx { namespace threadmanager { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     /// This is the representation of a ParalleX thread
@@ -24,6 +25,7 @@ namespace hpx { namespace threadmanager
         typedef 
             boost::coroutines::shared_coroutine<thread_state()> 
         coroutine_type;
+        typedef coroutine_type::thread_id_type thread_id_type;
         
         // helper class for switching thread state in and out during execution
         class switch_status
@@ -67,8 +69,8 @@ namespace hpx { namespace threadmanager
 
         /// 
         px_thread(boost::function<thread_function_type> threadfunc, 
-                thread_state new_state = init) 
-          : coroutine_ (threadfunc), current_state_(new_state) 
+                thread_id_type id, thread_state new_state) 
+          : coroutine_ (threadfunc, id), current_state_(new_state) 
         {}
         
         ~px_thread() 
@@ -97,6 +99,24 @@ namespace hpx { namespace threadmanager
     };
 
 ///////////////////////////////////////////////////////////////////////////////
+}}}
+
+namespace hpx { namespace threadmanager 
+{
+    ///////////////////////////////////////////////////////////////////////////
+    class px_thread : public components::wrapper<detail::px_thread>
+    {
+        typedef components::wrapper<detail::px_thread> base_type;
+        
+        // avoid warning about using this in member initializer list 
+        px_thread* This() { return this; }
+        
+    public:
+        px_thread(boost::function<thread_function_type> threadfunc, 
+                thread_state new_state = init)
+          : base_type(new detail::px_thread(threadfunc, This(), new_state))
+        {}
+    };
 }}
 
 #endif

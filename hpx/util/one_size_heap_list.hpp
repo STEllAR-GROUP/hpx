@@ -14,22 +14,22 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/one_size_heap.hpp>
-#include <hpx/util/logging.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util 
 {
     /////////////////////////////////////////////////////////////////////////////
     //  a list of one_size_heap's
-    template<typename T, typename Allocator, typename Mutex = boost::mutex>
+    template<typename Heap, typename Mutex = boost::mutex>
     class one_size_heap_list 
     {
     public:
-        typedef one_size_heap<T, Allocator> heap_type;
-        typedef typename heap_type::data data_type;
-        typedef 
-            std::list<boost::shared_ptr<one_size_heap<T, Allocator> > > 
-        list_type;
+        typedef Heap heap_type;
+
+        typedef typename heap_type::allocator_type allocator_type;
+        typedef typename heap_type::value_type value_type;
+
+        typedef std::list<boost::shared_ptr<heap_type> > list_type;
         typedef typename list_type::iterator iterator;
 
         enum { 
@@ -39,7 +39,7 @@ namespace hpx { namespace util
 
     public:
     // ctor/dtor
-        explicit one_size_heap_list(char const* class_name, int step = -1)
+        explicit one_size_heap_list(char const* class_name = "", int step = -1)
           : step_(step)
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
           , class_name_(class_name), alloc_count_(0L), free_count_(0L)
@@ -77,7 +77,7 @@ namespace hpx { namespace util
         }
         
         // operations
-        T* alloc()
+        value_type* alloc()
         {
             typename Mutex::scoped_lock guard (mtx_);
 
@@ -88,7 +88,7 @@ namespace hpx { namespace util
 #endif
 
             for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it) {
-                T *p = NULL;
+                value_type *p = NULL;
                 
                 try {
                     p = (*it)->alloc();
@@ -102,6 +102,7 @@ namespace hpx { namespace util
                         heap_list_.splice(heap_list_.begin(), heap_list_, it);  
                     return p;
                 }
+#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
                 else {
                     LOSH_(info) 
                         << "one_size_heap_list " 
@@ -110,6 +111,7 @@ namespace hpx { namespace util
                         << "), allocated: " << (*it)->size() << ", free'd: " 
                         << (*it)->free_size() << ".";
                 }
+#endif
             }
 
             // create new heap
@@ -136,7 +138,7 @@ namespace hpx { namespace util
                 throw std::bad_alloc();   // insert failed
 #endif
 
-            T* p = (*itnew)->alloc();
+            value_type* p = (*itnew)->alloc();
             if (NULL == p)
                 throw std::bad_alloc();   // snh 
             return p;
@@ -156,11 +158,12 @@ namespace hpx { namespace util
                     (*it)->free(p);
 
                     if ((*it)->is_empty()) {
+#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
                         LOSH_(info) 
                             << "one_size_heap_list " 
                             << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
                             << ": freeing empty heap (" << (*it)->heap_count_ << ").";
-
+#endif
                         heap_list_.erase (it);
                     }
                     else if (it != heap_list_.begin()) {
@@ -197,6 +200,31 @@ namespace hpx { namespace util
 #endif
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    // heap using malloc and friends
+    template<typename T>
+    class one_size_malloc_heap_list 
+      : public one_size_heap_list<
+            one_size_heap<T, one_size_heap_allocators::mallocator> 
+        >
+    {
+    private:
+        typedef one_size_heap_list<
+            one_size_heap<T, one_size_heap_allocators::mallocator> >
+        base_type;
+        
+    public:
+#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
+        explicit one_size_malloc_heap_list(char const* class_name, int step = -1)
+          : base_type(class_name, step) 
+        {}
+#else
+        explicit one_size_malloc_heap_list(int step = -1)
+          : base_type(step) 
+        {}
+#endif
+    };
+
 }} // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -210,8 +238,9 @@ namespace hpx { namespace util
 // helper macros for the implementation of one_size_heap_lists
 #define HPX_IMPLEMENT_ONE_SIZE_PRIVATE_HEAP_LIST(allocator, dataclass)        \
     namespace {                                                               \
-        hpx::util::one_size_heap_list<dataclass, allocator>                   \
-            BOOST_PP_CAT(theHeap, dataclass)(#dataclass);                     \
+        hpx::util::one_size_heap_list<                                        \
+            hpx::util::one_size_heap<dataclass, allocator>                    \
+        > BOOST_PP_CAT(theHeap, dataclass)(#dataclass);                       \
     };                                                                        \
     void* dataclass::operator new (size_t size)                               \
     {                                                                         \

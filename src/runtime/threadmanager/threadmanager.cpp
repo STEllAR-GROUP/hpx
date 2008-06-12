@@ -75,14 +75,14 @@ namespace hpx { namespace threadmanager
             thread_state new_state = unknown;
             if (!(work_items_.empty()))
             {
-                boost::shared_ptr <hpx::threadmanager::px_thread> thrd (work_items_.front());
+                boost::shared_ptr<px_thread> thrd (work_items_.front());
                 work_items_.pop();
 
                 // make sure lock is unlocked during execution of work item
-                if (thrd->get_state() == pending)
+                if ((*thrd)->get_state() == pending)
                 {
                     unlock_the_lock l(lk);    
-                    new_state = (*thrd)();
+                    new_state = (*thrd)->operator()();
                 }
                 
                 // re-add this work item to our list of work items if appropriate
