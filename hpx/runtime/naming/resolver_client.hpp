@@ -92,6 +92,7 @@ namespace hpx { namespace naming
         /// \param l          [in] The locality the locality id needs to be 
         ///                   generated for. Repeating calls using the same 
         ///                   locality results in identical prefix values.
+        /// \param count      [in] The number of global ids to be generated.
         /// \param lower_bound 
         ///                   [out] The lower bound of the assigned id range.
         ///                   The returned value can be used as the first id
@@ -115,8 +116,8 @@ namespace hpx { namespace naming
         ///                   Any of the returned global ids still has to be 
         ///                   bound to a local address, either by calling 
         ///                   \a bind or \a bind_range.
-        bool get_id_range(locality const& l, id_type& lower_bound, 
-            id_type& upper_bound) const;
+        bool get_id_range(locality const& l, std::size_t count, 
+            id_type& lower_bound, id_type& upper_bound) const;
         
         /// \brief Bind a global address to a local address.
         ///

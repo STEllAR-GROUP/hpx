@@ -76,11 +76,11 @@ int main(int argc, char* argv[])
 
         // test get_id_range
         id_type lower1, upper1;
-        BOOST_TEST(!resolver.get_id_range(here, lower1, upper1));
+        BOOST_TEST(!resolver.get_id_range(here, 1024, lower1, upper1));
         BOOST_TEST(0 == i || last_lowerid+1 == lower1);   
         
         id_type lower2, upper2;
-        BOOST_TEST(!resolver.get_id_range(here, lower2, upper2));
+        BOOST_TEST(!resolver.get_id_range(here, 1024, lower2, upper2));
         BOOST_TEST(upper1+1 == lower2);   
         last_lowerid = upper2;
         

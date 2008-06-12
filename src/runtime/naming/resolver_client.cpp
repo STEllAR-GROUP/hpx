@@ -117,11 +117,11 @@ namespace hpx { namespace naming
         return s == success;
     }
     
-    bool resolver_client::get_id_range(locality const& l, id_type& lower_bound, 
-        id_type& upper_bound) const
+    bool resolver_client::get_id_range(locality const& l, std::size_t count, 
+        id_type& lower_bound, id_type& upper_bound) const
     {
         // send request
-        server::request req (server::command_getidrange, l);
+        server::request req (server::command_getidrange, l, count);
         server::reply rep;            
         execute(req, rep);
         

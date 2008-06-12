@@ -109,7 +109,7 @@ namespace hpx { namespace naming { namespace server
                 
                 // generate the new id range
                 naming::id_type lower = (*it).second.second + 1;
-                naming::id_type upper = lower + range_delta;
+                naming::id_type upper = lower + (req.get_count() - 1);
                 
                 // store the new lower bound
                 (*it).second.second = upper;
@@ -141,7 +141,7 @@ namespace hpx { namespace naming { namespace server
 
                 // generate the new id range
                 naming::id_type lower = id + 1;
-                naming::id_type upper = lower + range_delta;
+                naming::id_type upper = lower + (req.get_count() - 1);
                 
                 // store the new lower bound
                 (*p.first).second.second = upper;

@@ -76,6 +76,11 @@ namespace hpx { namespace naming { namespace server
           : command_(c), site_(l)
         {}
         
+        // get_id_range
+        request(name_server_command c, locality const& l, std::size_t count) 
+          : command_(c), site_(l), count_(count)
+        {}
+        
         // resolve
         request(name_server_command c, naming::id_type const& id) 
           : command_(c), id_(id)
@@ -179,8 +184,11 @@ namespace hpx { namespace naming { namespace server
                 ar << ns_name_;
                 break;
 
-            case command_getprefix:
             case command_getidrange:
+                ar << count_;
+                break;
+                
+            case command_getprefix:
             case command_statistics_count:
             case command_statistics_mean:
             case command_statistics_moment2:
@@ -230,8 +238,11 @@ namespace hpx { namespace naming { namespace server
                 ar >> ns_name_;
                 break;
 
-            case command_getprefix:
             case command_getidrange:
+                ar >> count_;
+                break;
+                
+            case command_getprefix:
             case command_statistics_count:
             case command_statistics_mean:
             case command_statistics_moment2:
@@ -290,6 +301,7 @@ namespace hpx { namespace naming { namespace server
         case command_getprefix:
         case command_getidrange:
             os << "site(" << req.site_ << ") ";
+            os << "count:" << std::dec << req.count_ << " ";
             break;
             
         case command_statistics_count:

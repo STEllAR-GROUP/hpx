@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
         hpx::util::high_resolution_timer t;
         for(int i = 1;i<1000;i++)
         {
-            resolver.get_id_range(here, lower1, upper1);
+            resolver.get_id_range(here, 1024, lower1, upper1);
         }
         std::cout << " ***************************************"<< std::endl << std::flush;
         std::cout << "Measure_GetRange: "<< t.elapsed() << std::endl << std::flush;

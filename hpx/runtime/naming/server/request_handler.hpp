@@ -38,10 +38,6 @@ namespace hpx { namespace naming { namespace server
     /// The common handler for all incoming requests.
     class request_handler : private boost::noncopyable
     {
-        /// size of the id range returned by command_getidrange
-        /// FIXME: is this a policy?
-        enum { range_delta = 1023 };
-        
     public:
         request_handler();
         ~request_handler();

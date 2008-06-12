@@ -21,22 +21,26 @@ namespace hpx { namespace util
     {
         typedef boost::mutex mutex_type;
 
+        /// size of the id range returned by command_getidrange
+        /// FIXME: is this a policy?
+        enum { range_delta = 1024 };
+        
     public:
         unique_ids(naming::locality const& here, naming::resolver_client& resolver)
           : here_(here), resolver_(resolver), lower_(0), upper_(0)
         {
-            resolver.get_id_range(here, lower_, upper_);
+            resolver.get_id_range(here, range_delta, lower_, upper_);
         }
 
         /// Generate next unique component id
-        naming::id_type const& get_id()
+        naming::id_type get_id()
         {
             // create a new id
             mutex_type::scoped_lock l(mtx_);
 
             // ensure next_id doesn't overflow
             if (lower_ > upper_) 
-                resolver_.get_id_range(here_, lower_, upper_);
+                resolver_.get_id_range(here_, range_delta, lower_, upper_);
             ++lower_;
             return lower_;
         }
