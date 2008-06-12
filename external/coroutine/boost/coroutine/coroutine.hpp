@@ -118,12 +118,14 @@ namespace boost { namespace coroutines {
         
     typedef detail::coroutine_impl<type, context_impl> impl_type;
     typedef BOOST_DEDUCED_TYPENAME  impl_type::pointer impl_ptr;  
-   
+
+    typedef typename impl_type::thread_id_type thread_id_type;
+    
     typedef detail::coroutine_self<type> self;
     coroutine() : m_pimpl(0) {}
 
     template<typename Functor>
-    coroutine (Functor f, 
+    coroutine (Functor f, thread_id_type id = 0, 
                std::ptrdiff_t stack_size = detail::default_stack_size
 //              , BOOST_DEDUCED_TYPENAME boost::enable_if<
 //                boost::mpl::and_<
@@ -132,7 +134,7 @@ namespace boost { namespace coroutines {
 //                > >
 //                ::type * = 0
                ) :
-      m_pimpl(impl_type::create(f, stack_size)) {}
+      m_pimpl(impl_type::create(f, id, stack_size)) {}
  
     coroutine(move_from<coroutine> src) 
       : m_pimpl(src->m_pimpl) {

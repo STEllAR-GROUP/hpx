@@ -60,14 +60,18 @@ namespace boost { namespace coroutines { namespace detail {
     typedef typename coroutine_type::arg_slot_type arg_slot_type;
     typedef typename coroutine_type::result_type result_type;
     typedef typename coroutine_type::result_slot_type result_slot_type;
+    typedef void* thread_id_type;
 
     typedef boost::intrusive_ptr<type> pointer;
   
     template<typename DerivedType>
-        coroutine_impl(DerivedType * this_, std::ptrdiff_t stack_size) :
-      context_base_(*this_, stack_size),
+        coroutine_impl(DerivedType * this_, thread_id_type id, 
+            std::ptrdiff_t stack_size) 
+      : context_base_(*this_, stack_size),
         m_arg(0),
-        m_result(0){}
+        m_result(0),
+        m_thread_id(id)
+    {}
                 
     arg_slot_type * args() {
       BOOST_ASSERT(m_arg);
@@ -82,7 +86,7 @@ namespace boost { namespace coroutines { namespace detail {
 
     template<typename Functor>
         static inline	
-        pointer create(Functor, std::ptrdiff_t);
+        pointer create(Functor, thread_id_type, std::ptrdiff_t);
 
     void bind_args(arg_slot_type* arg) {
       m_arg = arg;
@@ -117,13 +121,19 @@ namespace boost { namespace coroutines { namespace detail {
       bind_result_pointer(&ptr);
       this->wake_up();
     }
+    
+    thread_id_type get_thread_id() const
+    {
+        return m_thread_id;
+    }
+    
   protected:
     boost::optional<result_slot_type>  m_result_last;
 
   private:
     arg_slot_type * m_arg;
     result_slot_type ** m_result;
-
+    thread_id_type m_thread_id;
   };
 
   // This type augment coroutine_impl type with the type of the stored 
@@ -139,11 +149,15 @@ namespace boost { namespace coroutines { namespace detail {
     typedef CoroutineType coroutine_type;
     typedef typename CoroutineType::result_type result_type;
     typedef coroutine_impl<CoroutineType, ContextImpl> super_type;
+    typedef typename super_type::thread_id_type thread_id_type;
 
     typedef FunctorType functor_type;
-        coroutine_impl_wrapper(functor_type f, std::ptrdiff_t stack_size) :
-                super_type(this, stack_size),
-      m_fun(f){}
+
+    coroutine_impl_wrapper(functor_type f, thread_id_type id,
+                std::ptrdiff_t stack_size) 
+      : super_type(this, id, stack_size),
+        m_fun(f)
+    {}
 
     void operator()() {
       typedef typename super_type::context_exit_status
@@ -226,9 +240,9 @@ namespace boost { namespace coroutines { namespace detail {
   typename 
   coroutine_impl<CoroutineType, ContextImpl>::pointer
   coroutine_impl<CoroutineType, ContextImpl>::
-  create(Functor f, std::ptrdiff_t stack_size = default_stack_size) {
+  create(Functor f, thread_id_type id = 0, std::ptrdiff_t stack_size = default_stack_size) {
     return new coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl>
-      (f, stack_size);      
+      (f, id, stack_size);      
   }
 
 } } }

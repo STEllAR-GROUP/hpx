@@ -42,14 +42,15 @@ namespace boost { namespace coroutines {
   class shared_coroutine : public coroutine<Signature, ContextImpl> {
   public:
     typedef coroutine<Signature, ContextImpl> coroutine_type;
-
+    typedef typename coroutine_type::thread_id_type thread_id_type;
+    
     shared_coroutine() {}
 
     template<typename Functor>
-    shared_coroutine(Functor f, 
-		     std::ptrdiff_t stack_size = 
-		     detail::default_stack_size) :
-      coroutine_type(f, stack_size) {}
+    shared_coroutine(Functor f, thread_id_type id  = 0,
+            std::ptrdiff_t stack_size = detail::default_stack_size)
+      : coroutine_type(f, id, stack_size) 
+    {}
 
     shared_coroutine(move_from<coroutine_type> src):
       coroutine_type(src) {}
