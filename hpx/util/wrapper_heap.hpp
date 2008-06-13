@@ -52,7 +52,7 @@ namespace hpx { namespace util
         
         wrapper_heap()
           : pool_(NULL), first_free_(NULL), 
-            step_(heap_step), size_(0), free_size_(0), 
+            step_(heap_step), size_(0), free_size_(0) 
         {
             BOOST_ASSERT(sizeof(data) == heap_size);
         }
