@@ -12,10 +12,14 @@ cmake_minimum_required(VERSION 2.6)
 project (hpx)
 
 # We need to use Boost
-find_package(Boost REQUIRED)
+find_package(Boost 1.35.0 REQUIRED)
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
+LINK_DIRECTORIES(${Boost_LIBRARY_DIR})
 
 # We need to include the hpx directory for includes
 include_directories (${hpx_SOURCE_DIR})
+include_directories (${hpx_SOURCE_DIR}/external/coroutine)
+include_directories (${hpx_SOURCE_DIR}/external/exception)
 include_directories (${hpx_SOURCE_DIR}/external/endian)
 include_directories (${hpx_SOURCE_DIR}/external/logging)
 include_directories (${hpx_SOURCE_DIR}/external/singleton)
@@ -32,5 +36,5 @@ endif(WIN32)
 # cause another cmake executable to run.  The same process will walk through
 # the project's entire directory structure.
 add_subdirectory (src)
-add_subdirectory (examples)
+#add_subdirectory (examples)
 
