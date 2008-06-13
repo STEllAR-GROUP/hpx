@@ -27,7 +27,7 @@ namespace hpx { namespace util
         
     public:
         unique_ids(naming::locality const& here, naming::resolver_client& resolver)
-          : here_(here), resolver_(resolver), lower_(0), upper_(0)
+          : lower_(0), upper_(0), here_(here), resolver_(resolver)
         {
             resolver.get_id_range(here, range_delta, lower_, upper_);
         }
