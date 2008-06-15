@@ -13,6 +13,7 @@
 #include <hpx/include/util.hpp>
 #include <hpx/include/parcelset.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/applier.hpp>
 #include <hpx/include/action_manager.hpp>

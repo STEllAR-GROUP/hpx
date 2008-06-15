@@ -14,7 +14,7 @@
 namespace hpx { namespace action_manager
 {
     // Call-back function for parcelHandler to call when new parcels are received
-    void action_manager::fetchNewParcel (parcelset::parcelhandler& parcel_handler_, 
+    void action_manager::fetch_new_parcel (parcelset::parcelhandler& parcel_handler_, 
         naming::address const&)
     {
         parcelset::parcel p;
@@ -27,16 +27,27 @@ namespace hpx { namespace action_manager
             // decode the action-type in the parcel
             components::action_type act = p.get_action();
 
-            // register the action and the local-virtual address with the TM
-            applier_.get_thread_manager().register_work(
-                act->get_thread_function(applier_, lva));
+            components::continuation_type cont = p.get_continuation();
+            if (!cont) {
+                // no continuation is to be executed, register the plain action 
+                // and the local-virtual address with the TM only
+                applier_.get_thread_manager().register_work(
+                    act->get_thread_function(applier_, lva));
+            }
+            else {
+                // this parcel carries a continuation, register a wrapper which
+                // first executes the original thread function as required by 
+                // the action and triggers the continuations afterwards
+                applier_.get_thread_manager().register_work(
+                    act->get_thread_function(cont, applier_, lva));
+            }
         }
     }
 
     // Invoked by the Thread Manager when it is running out of work-items 
     // and needs something to execute on a specific starving resources 
     // specified as the argument
-    void action_manager::fetchParcel (naming::id_type resourceID)
+    void action_manager::fetch_parcel (naming::id_type resourceID)
     {
 
     }

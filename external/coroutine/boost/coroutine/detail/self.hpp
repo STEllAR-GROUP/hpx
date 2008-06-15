@@ -83,6 +83,10 @@ namespace boost { namespace coroutines { namespace detail {
 
     typedef BOOST_DEDUCED_TYPENAME coroutine_type
     ::yield_traits yield_traits;
+    
+    typedef BOOST_DEDUCED_TYPENAME coroutine_type
+    ::thread_id_type thread_id_type;
+    
 #ifndef BOOST_COROUTINE_VCPP80_WORKAROUND 
 #   define BOOST_COROUTINE_param_with_default(z, n, type_prefix)    \
     BOOST_DEDUCED_TYPENAME call_traits                              \
@@ -217,6 +221,12 @@ namespace boost { namespace coroutines { namespace detail {
       BOOST_ASSERT(m_pimpl);
       return m_pimpl->pending();
     }
+    
+    thread_id_type get_thread_id() const {
+      BOOST_ASSERT(m_pimpl);
+      return m_pimpl->get_thread_id();
+    }
+    
   private:
     coroutine_self(impl_type * pimpl, detail::init_from_impl_tag) :
       m_pimpl(pimpl) {}

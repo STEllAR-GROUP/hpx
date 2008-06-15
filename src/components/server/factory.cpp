@@ -12,13 +12,13 @@
 
 namespace hpx { namespace components { namespace server
 {
-    threadmanager::thread_state factory::create(
+    threadmanager::thread_state factory::create_proc(
         threadmanager::px_thread_self& self, applier::applier& appl,
-        components::component_type type, naming::id_type gid)
+        naming::id_type* gid, components::component_type type)
     {
         switch (type) {
         case accumulator::value:
-            server::create<accumulator>(rt_, gid);
+//            server::create<accumulator>(rt_, gid);
             break;
             
         default:
@@ -27,8 +27,8 @@ namespace hpx { namespace components { namespace server
                     get_component_type_name(type)));
             break;
         }
-        return hpx::threadmanager::stopped;
+        return hpx::threadmanager::terminated;
     }
-    
+
 }}}
 

@@ -242,13 +242,6 @@
 					<File
 						RelativePath="..\..\..\src\runtime\threadmanager\threadmanager.cpp"
 						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-							/>
-						</FileConfiguration>
 					</File>
 				</Filter>
 			</Filter>
@@ -371,10 +364,6 @@
 				</File>
 				<File
 					RelativePath="..\..\..\hpx\util\util.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\hpx\util\wrapper_heap.hpp"
 					>
 				</File>
 			</Filter>
@@ -530,6 +519,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\hpx\components\continuation.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\components\factory.hpp"
 					>
 				</File>
@@ -556,6 +549,14 @@
 						RelativePath="..\..\..\hpx\components\server\wrapper.hpp"
 						>
 					</File>
+					<File
+						RelativePath="..\..\..\hpx\components\server\wrapper_heap.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\components\server\wrapper_heap_list.hpp"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="Stubs"
@@ -569,6 +570,18 @@
 						>
 					</File>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="LCOs"
+				>
+				<File
+					RelativePath="..\..\..\hpx\lcos\base_lco.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\lcos\simple_future.hpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

@@ -22,7 +22,7 @@ namespace hpx { namespace threadmanager
 {
     ///////////////////////////////////////////////////////////////////////////
     struct unlock_the_lock;
-    
+
     ///////////////////////////////////////////////////////////////////////////
     class threadmanager : private boost::noncopyable
     {
@@ -87,13 +87,51 @@ namespace hpx { namespace threadmanager
                     run_thread_->join();
             }
         }
-        
+
         void wait()
         {
             if (run_thread_ && running_) 
                 run_thread_->join();
         }
-        
+
+        /// The set_state function is part of the thread related API and allows
+        /// to change the state of one of the threads managed by this 
+        /// threadmanager.
+        ///
+        /// \param id       [in] The thread id of the thread the state should 
+        ///                 be modified for.
+        /// \param newstate [in] The new state to be set for the thread 
+        ///                 referenced by the \a id parameter.
+        ///
+        /// \returns        This function returns the previous state of the 
+        ///                 thread referenced by the \a id parameter. It will 
+        ///                 return one of the values as defined by the 
+        ///                 \a thread_state enumeration. If the 
+        ///                 thread is not known to the threadmanager the return 
+        ///                 value will be \a thread_state#unknown.
+        thread_state set_state(px_thread::thread_id_type id, 
+            thread_state newstate)
+        {
+            return unknown;
+        }
+
+        /// The set_state function is part of the thread related API and allows
+        /// to query the state of one of the threads known to the threadmanager
+        ///
+        /// \param id       [in] The thread id of the thread the state should 
+        ///                 be returned for.
+        ///
+        /// \returns        This function returns the current state of the 
+        ///                 thread referenced by the \a id parameter. It will 
+        ///                 return one of the values as defined by the 
+        ///                 \a thread_state enumeration. If the 
+        ///                 thread is not known to the threadmanager the return 
+        ///                 value will be \a thread_state#unknown.
+        thread_state get_state(px_thread::thread_id_type id)
+        {
+            return unknown;
+        }
+
     public:
         /// this notifies the thread manager that there is some more work 
         /// available 
@@ -103,20 +141,20 @@ namespace hpx { namespace threadmanager
             if (running_) 
                 cond_.notify_one();
         }
-        
+
     protected:
         // this is the thread function executing the work items in the queue
         void tfunc();
 
     private:
         boost::thread *run_thread_;         /// this thread manager has exactly one thread
-        
+
         work_items_type work_items_;        /// list of active work items
         bool running_;                      /// thread manager has bee started
         mutex_type mtx_;                    /// mutex protecting the members
         boost::condition cond_;             /// used to trigger some action
     };
-    
+
 ///////////////////////////////////////////////////////////////////////////////
 }}
 

@@ -11,9 +11,11 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/vector.hpp>
 
 #include <hpx/exception.hpp>
 #include <hpx/components/action.hpp>
+#include <hpx/components/continuation.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 
@@ -25,59 +27,64 @@
 namespace hpx { namespace parcelset
 {
     ///////////////////////////////////////////////////////////////////////////
-    // parcel continuation
-    enum continuation
-    {
-        none = 0
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     typedef naming::id_type parcel_id;
 
     parcel_id const no_parcel_id = parcel_id();
-    parcel_id const bad_parcel_id = parcel_id(boost::uint64_t(-1));
+    parcel_id const bad_parcel_id = naming::bad_id;
     
     ///////////////////////////////////////////////////////////////////////////
     class parcel
     {
     public:
         parcel() 
-          : tag_(0), destination_id_(0), source_id_(), action_(), cont_(none),
-            start_time_(0)
+          : tag_(0), destination_id_(0), source_id_(), action_(), 
+            continuation_(), start_time_(0)
         {
         }
-        
+
         parcel(naming::id_type apply_to)
           : tag_(0), destination_id_(apply_to), source_id_(0), action_(), 
-            cont_(none), start_time_(0)
+            continuation_(), start_time_(0)
         {
         }
-    
+
         parcel(naming::id_type apply_to, components::action_base* act)
           : tag_(0), destination_id_(apply_to), source_id_(0), action_(act), 
-            cont_(none), start_time_(0)
+            continuation_(), start_time_(0)
         {
         }
-    
+
         parcel(naming::id_type apply_to, components::action_base* act, 
-                continuation do_after) 
+               components::continuation* do_after) 
           : tag_(0), destination_id_(apply_to), source_id_(0), action_(act), 
-            cont_(do_after), start_time_(0)
+            continuation_(do_after), start_time_(0)
         {
         }
-        
+
+        parcel(naming::id_type apply_to, components::action_base* act, 
+               components::continuation_type do_after) 
+          : tag_(0), destination_id_(apply_to), source_id_(0), action_(act), 
+            continuation_(do_after), start_time_(0)
+        {
+        }
+
         ~parcel()
         {
         }
-    
+
         // default copy constructor is ok    
         // default assignment operator is ok
-    
+
         components::action_type get_action() const 
         {
             return action_;
         }
-    
+
+        components::continuation_type get_continuation() const 
+        {
+            return continuation_;
+        }
+
         /// get and set the parcel id
         parcel_id const& get_parcel_id() const 
         {
@@ -97,7 +104,7 @@ namespace hpx { namespace parcelset
         {
             source_id_ = source_id;
         }
-        
+
         /// get and set the destination id
         void set_destination(naming::id_type dest)
         {
@@ -126,11 +133,11 @@ namespace hpx { namespace parcelset
         {
             return start_time_;
         }
-        
+
     private:
-        // serialization support    
+        // serialization support
         friend class boost::serialization::access;
-    
+
         template<class Archive>
         void save(Archive & ar, const unsigned int version) const;
 
@@ -145,7 +152,7 @@ namespace hpx { namespace parcelset
         naming::address destination_addr_;
         naming::id_type source_id_;
         components::action_type action_;
-        continuation cont_;
+        components::continuation_type continuation_;
         double start_time_;
     };
 

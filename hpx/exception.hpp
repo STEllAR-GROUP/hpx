@@ -132,6 +132,10 @@ namespace hpx
         {
             BOOST_ASSERT(e >= success && e < last_error);
         }
+        explicit exception(boost::system::system_error e) 
+          : boost::system::system_error(e)
+        {
+        }
         exception(error e, char const* msg) 
           : boost::system::system_error(make_error_code(e), msg)
         {

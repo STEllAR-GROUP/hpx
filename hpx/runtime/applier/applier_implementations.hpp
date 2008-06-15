@@ -13,7 +13,7 @@
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (3, HPX_COMPONENT_ARGUMENT_LIMIT,                                     \
+    (3, (2, HPX_COMPONENT_ARGUMENT_LIMIT,                                     \
     "hpx/runtime/applier/applier_implementations.hpp"))                       \
     /**/
     
@@ -55,7 +55,38 @@
         // Send the parcel through the parcel handler
         return parcel_handler_.put_parcel(p);
     }
-    
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    parcelset::parcel_id apply (components::continuation* c,
+        naming::id_type gid, BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+    {
+        // package continuation into a shared_ptr
+        components::continuation_type cont(c);
+
+        // Determine whether the gid is local or remote
+        naming::address addr;
+        if (address_is_local(gid, addr))
+        {
+            // If local, register the function with the thread-manager
+            // Get the local-virtual address of the resource and register 
+            // the action with the TM
+            thread_manager_.register_work(
+                Action::construct_thread_function(cont, *this, addr.address_, 
+                    BOOST_PP_ENUM_PARAMS(N, arg))
+            );
+            return parcelset::no_parcel_id;     // no parcel has been sent
+        }
+
+        // If remote, create a new parcel to be sent to the destination
+        // Create a new parcel with the gid, action, and arguments
+        parcelset::parcel p (gid, new Action(BOOST_PP_ENUM_PARAMS(N, arg)), cont);
+        p.set_destination_addr(addr);   // avoid to resolve address again
+
+        // Send the parcel through the parcel handler
+        return parcel_handler_.put_parcel(p);
+    }
+
 #undef N
 
 #endif

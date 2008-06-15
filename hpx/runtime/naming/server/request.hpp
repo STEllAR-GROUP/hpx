@@ -78,7 +78,7 @@ namespace hpx { namespace naming { namespace server
         
         // get_id_range
         request(name_server_command c, locality const& l, std::size_t count) 
-          : command_(c), site_(l), count_(count)
+          : command_(c), count_(count), site_(l)
         {}
         
         // resolve

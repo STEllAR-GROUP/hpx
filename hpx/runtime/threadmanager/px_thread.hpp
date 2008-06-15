@@ -25,7 +25,6 @@ namespace hpx { namespace threadmanager { namespace detail
         typedef 
             boost::coroutines::shared_coroutine<thread_state()> 
         coroutine_type;
-        typedef coroutine_type::thread_id_type thread_id_type;
         
         // helper class for switching thread state in and out during execution
         class switch_status
@@ -55,13 +54,15 @@ namespace hpx { namespace threadmanager { namespace detail
         };
 
     public:
+        typedef coroutine_type::thread_id_type thread_id_type;
+
         /// parcel action code: the action to be performed on the destination 
         /// object (the px_thread)
         enum actions
         {
             some_action_code = 0
         };
-        
+
         /// This is the component id. Every component needs to have an embedded
         /// enumerator 'value' which is used by the generic action implementation
         /// to associate this component with a given action.
@@ -72,14 +73,14 @@ namespace hpx { namespace threadmanager { namespace detail
                 thread_id_type id, thread_state new_state) 
           : coroutine_ (threadfunc, id), current_state_(new_state) 
         {}
-        
+
         ~px_thread() 
         {}
 
         /// execute the thread function
         thread_state operator()()
         {
-            switch_status thrd_stat (current_state_, running);
+            switch_status thrd_stat (current_state_, active);
             return thrd_stat = coroutine_();
         }
 
@@ -104,19 +105,39 @@ namespace hpx { namespace threadmanager { namespace detail
 namespace hpx { namespace threadmanager 
 {
     ///////////////////////////////////////////////////////////////////////////
-    class px_thread : public components::wrapper<detail::px_thread>
+    class px_thread
     {
-        typedef components::wrapper<detail::px_thread> base_type;
-        
+    private:
+        typedef detail::px_thread wrapped_type;
+        typedef components::wrapper<wrapped_type> wrapping_type;
+
         // avoid warning about using this in member initializer list 
         px_thread* This() { return this; }
         
     public:
+        typedef detail::px_thread::thread_id_type thread_id_type;
+
         px_thread(boost::function<thread_function_type> threadfunc, 
                 thread_state new_state = init)
-          : base_type(new detail::px_thread(threadfunc, This(), new_state))
-        {}
+          : impl_(new wrapping_type())
+        {
+            impl_->set_wrapped(new detail::px_thread(threadfunc, impl_, new_state));
+        }
+
+        thread_state get_state() const 
+        {
+            return (*impl_)->get_state();
+        }
+
+        thread_state operator()()
+        {
+            return (*impl_)->operator()();
+        }
+
+    private:
+        components::wrapper<detail::px_thread>* impl_;
     };
+
 }}
 
 #endif

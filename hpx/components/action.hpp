@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <stdexcept>
 
+#include <boost/version.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/shared_ptr.hpp>
@@ -18,21 +19,73 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <boost/type_traits/remove_const.hpp>
+#include <boost/type_traits/remove_reference.hpp>
+#include <boost/preprocessor/stringize.hpp>
+#include <boost/preprocessor/seq/enum.hpp> 
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/portable_binary_oarchive.hpp>
+#include <boost/serialization/export.hpp>
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/components/component_type.hpp>
+#include <hpx/components/continuation.hpp>
 #include <hpx/util/serialize_sequence.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+#if BOOST_VERSION < 103500
+#error "HPX action serialization support needs at least Boost V1.35.0"
+#elif BOOST_VERSION < 103600
+// Boost V1.35.0
+#define HPX_DEFINE_GUID_INITIALIZER(D, C, T)                                  \
+    template <BOOST_PP_SEQ_ENUM(D)>                                           \
+    boost::archive::detail::guid_initializer<C<BOOST_PP_SEQ_ENUM(T)> > const& \
+        C<BOOST_PP_SEQ_ENUM(T)>::guid_initializer_ =                          \
+            typename C<BOOST_PP_SEQ_ENUM(T)>::guid_initializer_type::         \
+                get_instance(BOOST_PP_STRINGIZE((C<BOOST_PP_SEQ_ENUM(T)>)))   \
+    /**/
+#else
+// Boost V1.36.0 and up
+#define HPX_DEFINE_GUID_INITIALIZER(D, C, T)                                  \
+    template <BOOST_PP_SEQ_ENUM(D)>                                           \
+    boost::archive::detail::guid_initializer<C<BOOST_PP_SEQ_ENUM(T)> > const& \
+        C<BOOST_PP_SEQ_ENUM(T)>::guid_initializer_ =                          \
+            boost::serialization::singleton<                                  \
+                typename C<BOOST_PP_SEQ_ENUM(T)>::guid_initializer_type       \
+            >::get_mutable_instance().export_guid(                            \
+                BOOST_PP_STRINGIZE((C<BOOST_PP_SEQ_ENUM(T)>)))                \
+    /**/
+#endif
+
+#define HPX_DECLARE_GUID_INITIALIZER(T)                                       \
+    typedef boost::archive::detail::guid_initializer<T> guid_initializer_type;\
+    static guid_initializer_type const& guid_initializer_                     \
+    /**/
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        // Helper template meta function removing any 'const' qualifier or 
+        // reference from the given type (i.e. const& T --> T)
+        template <typename T>
+        struct remove_qualifiers
+        {
+            typedef typename boost::remove_reference<T>::type no_ref_type;
+            typedef typename boost::remove_const<no_ref_type>::type type;
+        };
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////
     /// The \a action_base class is a abstract class used as the base class for 
     /// all action types. It's main purpose is to allow polymorphic 
-    /// serialization of action instances
+    /// serialization of action instances through a shared_ptr.
     struct action_base
     {
         virtual ~action_base() {}
@@ -44,21 +97,48 @@ namespace hpx { namespace components
         /// The function \a get_component_type returns the \a component_type 
         /// of the component this action belongs to.
         virtual component_type get_component_type() const = 0;
-        
+
         /// The \a get_thread_function constructs a proper thread function for 
         /// a \a px_thread, encapsulating the functionality and the arguments 
-        /// of the action is is called for.
+        /// of the action it is called for.
         /// 
-        /// \param appl   This is a reference to the \a applier instance to be
-        ///               passed as the second parameter to the action function
-        /// \param lva    This is the local virtual address of the component 
-        ///               the action has to be invoked on.
+        /// \param appl   [in] This is a reference to the \a applier instance 
+        ///               to be passed as the second parameter to the action 
+        ///               function
+        /// \param lva    [in] This is the local virtual address of the 
+        ///               component the action has to be invoked on.
         ///
         /// \returns      This function returns a proper thread function usable
         ///               for a \a px_thread.
+        ///
+        /// \note This \a get_thread_function will be invoked to retrieve the 
+        ///       thread function for an action which has to be invoked without 
+        ///       continuations.
         virtual boost::function<threadmanager::thread_function_type> 
             get_thread_function(applier::applier& appl, 
                 naming::address::address_type lva) const = 0;
+
+        /// The \a get_thread_function constructs a proper thread function for 
+        /// a \a px_thread, encapsulating the functionality, the arguments, and 
+        /// the continuations of the action it is called for.
+        /// 
+        /// \param cont   [in] This is the list of continuations to be 
+        ///               triggered after the execution of the action
+        /// \param appl   [in] This is a reference to the \a applier instance 
+        ///               to be passed as the second parameter to the action 
+        ///               function
+        /// \param lva    [in] This is the local virtual address of the 
+        ///               component the action has to be invoked on.
+        ///
+        /// \returns      This function returns a proper thread function usable
+        ///               for a \a px_thread.
+        ///
+        /// \note This \a get_thread_function will be invoked to retrieve the 
+        ///       thread function for an action which has to be invoked with 
+        ///       continuations.
+        virtual boost::function<threadmanager::thread_function_type>
+            get_thread_function(components::continuation_type cont,
+                applier::applier& appl, naming::address::address_type lva) const = 0;
     };
 
     typedef boost::shared_ptr<action_base> action_type;
@@ -69,34 +149,29 @@ namespace hpx { namespace components
     {
     public:
         typedef Arguments arguments_type;
-        
+
         // This is the action code (id) of this action. It is exposed to allow 
         // generic handling of actions.
         enum { value = Action };
-        
+
         // construct an action from its arguments
         action() 
           : arguments_() 
         {}
-        
+
         template <typename Arg0>
         action(Arg0 const& arg0) 
           : arguments_(arg0) 
         {}
 
-        template <typename Arg0, typename Arg1>
-        action(Arg0 const& arg0, Arg1 const& arg1) 
-          : arguments_(arg0, arg1) 
-        {}
-
         // bring in the rest of the constructors
         #include <hpx/components/action_constructors.hpp>
-        
+
         /// destructor
         ~action()
         {}
         
-    public:        
+    public:
         /// retrieve the N's argument
         template <int N>
         typename boost::fusion::result_of::at_c<arguments_type, N>::type 
@@ -104,12 +179,55 @@ namespace hpx { namespace components
         { 
             return boost::fusion::at_c<N>(arguments_); 
         }
-        
         template <int N>
         typename boost::fusion::result_of::at_c<arguments_type const, N>::type 
         get() const
         { 
             return boost::fusion::at_c<N>(arguments_); 
+        }
+
+    protected:
+        /// The \a continuation_thread_function will be registered as the thread
+        /// function of a px_thread. It encapsulates the execution of the 
+        /// original function (given by \a func), and afterwards triggers all
+        /// continuations without any additional argument
+        template <typename Func>
+        static threadmanager::thread_state 
+        continuation_thread_function(
+            threadmanager::px_thread_self& self, applier::applier& app, 
+            components::continuation_type cont, boost::tuple<Func> func)
+        {
+            threadmanager::thread_state newstate = boost::get<0>(func)(self);
+            cont->trigger_all(self, app);
+            return newstate;
+        }
+
+        /// The \a construct_continuation_thread_function is a helper function
+        /// for constructing the wrapped thread function needed for 
+        /// continuation support
+        template <typename Func>
+        static boost::function<threadmanager::thread_function_type>
+        construct_continuation_thread_function(Func func, 
+            applier::applier& appl, components::continuation_type cont) 
+        {
+            // we need to assign the address of the thread function to a 
+            // variable to  help the compiler to deduce the function type
+            threadmanager::thread_state (*f)(threadmanager::px_thread_self&, 
+                    applier::applier&, components::continuation_type, 
+                    boost::tuple<Func>) =
+                &action::continuation_thread_function;
+
+            // The following bind constructs the wrapped thread function
+            //   f:  is the wrapping thread function
+            //  _1:  is a placeholder which will be replaced by the reference
+            //       to px_thread_self
+            //  app: reference to the applier (pre-bound second argument to f)
+            // cont: continuation (pre-bound third argument to f)
+            // func: wrapped function object (pre-bound forth argument to f)
+            //       (this is embedded into a tuple because boost::bind can't
+            //       pre-bind another bound function as an argument)
+            return boost::bind(f, _1, boost::ref(appl), cont, 
+                boost::make_tuple(func));
         }
 
     private:
@@ -118,13 +236,14 @@ namespace hpx { namespace components
         { 
             return static_cast<std::size_t>(value); 
         }
-        
+
         /// retrieve component type
         component_type get_component_type() const
         {
             return static_cast<component_type>(Component::value);
         }
 
+    private:
         // serialization support    
         friend class boost::serialization::access;
 
@@ -136,7 +255,7 @@ namespace hpx { namespace components
             
             util::serialize_sequence(ar, arguments_);
         }
-        
+
     private:
         arguments_type arguments_;
     };
@@ -156,8 +275,132 @@ namespace hpx { namespace components
     //  arguments
     ///////////////////////////////////////////////////////////////////////////
     
+    // zero argument version
+    template <
+        typename Component, typename Result, int Action, 
+        threadmanager::thread_state(Component::*F)(
+            threadmanager::px_thread_self&, applier::applier&, Result*)
+    >
+    class result_action0 
+      : public action<Component, Action, boost::fusion::vector<> >
+    {
+        typedef action<Component, Action, boost::fusion::vector<> > base_type;
+        
+    public:
+        result_action0()
+        {}
+        
+    private:
+        /// The \a continuation_thread_function will be registered as the thread
+        /// function of a px_thread. It encapsulates the execution of the 
+        /// original function (given by \a func)
+        template <typename Func>
+        static threadmanager::thread_state 
+        continuation_thread_function(
+            threadmanager::px_thread_self& self, applier::applier& app, 
+            components::continuation_type cont, boost::tuple<Func> func)
+        {
+            Result result;
+            threadmanager::thread_state newstate = boost::get<0>(func)(self, &result);
+            cont->trigger_all(self, app, result);
+            return newstate;
+        }
+
+        /// The \a construct_continuation_thread_function is a helper function
+        /// for constructing the wrapped thread function needed for 
+        /// continuation support
+        template <typename Func>
+        static boost::function<threadmanager::thread_function_type>
+        construct_continuation_thread_function(Func func, 
+            applier::applier& appl, components::continuation_type cont) 
+        {
+            // we need to assign the address of the thread function to a 
+            // variable to  help the compiler to deduce the function type
+            threadmanager::thread_state (*f)(threadmanager::px_thread_self&, 
+                    applier::applier&, components::continuation_type, 
+                    boost::tuple<Func>) =
+                &result_action0::continuation_thread_function;
+
+            // The following bind constructs the wrapped thread function
+            //   f:  is the wrapping thread function
+            //  _1:  is a placeholder which will be replaced by the reference
+            //       to px_thread_self
+            //  app: reference to the applier (pre-bound second argument to f)
+            // cont: continuation (pre-bound third argument to f)
+            // func: wrapped function object (pre-bound forth argument to f)
+            //       (this is embedded into a tuple because boost::bind can't
+            //       pre-bind another bound function as an argument)
+            return boost::bind(f, _1, boost::ref(appl), cont, 
+                boost::make_tuple(func));
+        }
+
+    public:        
+        /// \brief This static \a construct_thread_function allows to construct 
+        /// a proper thread function for a \a px_thread without having to 
+        /// instantiate the action0 type. This is used by the \a applier in 
+        /// case no continuation has been supplied.
+        static boost::function<threadmanager::thread_function_type> 
+        construct_thread_function(applier::applier& appl, 
+            naming::address::address_type lva)
+        {
+            return boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
+                boost::ref(appl), reinterpret_cast<Result*>(NULL));
+        }
+
+        /// \brief This static \a construct_thread_function allows to construct 
+        /// a proper thread function for a \a px_thread without having to 
+        /// instantiate the action0 type. This is used by the \a applier in 
+        /// case a continuation has been supplied
+        static boost::function<threadmanager::thread_function_type> 
+        construct_thread_function(components::continuation_type cont, 
+            applier::applier& appl, naming::address::address_type lva)
+        {
+            return construct_continuation_thread_function(
+                boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
+                    boost::ref(appl), _2), appl, cont);
+        }
+
+    private:
+        /// This \a get_thread_function will be invoked to retrieve the thread 
+        /// function for an action which has to be invoked without continuations.
+        boost::function<threadmanager::thread_function_type>
+        get_thread_function(applier::applier& appl, 
+            naming::address::address_type lva) const
+        {
+            return construct_thread_function(appl, lva);
+        }
+
+        /// This \a get_thread_function will be invoked to retrieve the thread 
+        /// function for an action which has to be invoked with continuations.
+        boost::function<threadmanager::thread_function_type>
+        get_thread_function(components::continuation_type cont,
+            applier::applier& appl, naming::address::address_type lva) const
+        {
+            return construct_thread_function(cont, appl, lva);
+        }
+
+    private:
+        // serialization support    
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
+
+        HPX_DECLARE_GUID_INITIALIZER(result_action0);
+    };
+
+    HPX_DEFINE_GUID_INITIALIZER(
+        (typename Component)(typename Result)(int Action) 
+            (threadmanager::thread_state(Component::*F)(
+                threadmanager::px_thread_self&, applier::applier&, Result*)),
+        result_action0, (Component)(Result)(Action)(F)
+    );
+
     ///////////////////////////////////////////////////////////////////////////
-    //  zero parameter version
+    //  zero parameter version, no result value
     template <
         typename Component, int Action, 
         threadmanager::thread_state(Component::*F)(
@@ -171,9 +414,11 @@ namespace hpx { namespace components
         action0()
         {}
         
-        /// \brief The static \a construct_thread_function allows to construct 
+    public:
+        /// \brief This static \a construct_thread_function allows to construct 
         /// a proper thread function for a \a px_thread without having to 
-        /// instantiate the action0 type. This is used by the \a applier.
+        /// instantiate the action0 type. This is used by the \a applier in 
+        /// case no continuation has been supplied.
         static boost::function<threadmanager::thread_function_type> 
         construct_thread_function(applier::applier& appl, 
             naming::address::address_type lva)
@@ -182,12 +427,32 @@ namespace hpx { namespace components
                 boost::ref(appl));
         }
 
+        /// \brief This static \a construct_thread_function allows to construct 
+        /// a proper thread function for a \a px_thread without having to 
+        /// instantiate the action0 type. This is used by the \a applier in 
+        /// case a continuation has been supplied
+        static boost::function<threadmanager::thread_function_type> 
+        construct_thread_function(components::continuation_type cont,
+            applier::applier& appl, naming::address::address_type lva)
+        {
+            return base_type::construct_continuation_thread_function(
+                boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
+                    boost::ref(appl)), appl, cont);
+        }
+
     private:
         boost::function<threadmanager::thread_function_type>
         get_thread_function(applier::applier& appl, 
             naming::address::address_type lva) const
         {
             return construct_thread_function(appl, lva);
+        }
+
+        boost::function<threadmanager::thread_function_type>
+        get_thread_function(components::continuation_type cont,
+            applier::applier& appl, naming::address::address_type lva) const
+        {
+            return construct_thread_function(cont, appl, lva);
         }
 
     private:
@@ -199,21 +464,171 @@ namespace hpx { namespace components
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
+
+        HPX_DECLARE_GUID_INITIALIZER(action0);
     };
+
+    HPX_DEFINE_GUID_INITIALIZER(
+        (typename Component)(int Action) 
+            (threadmanager::thread_state(Component::*F)(
+                threadmanager::px_thread_self&, applier::applier&)),
+        action0, (Component)(Action)(F)
+    );
 
     ///////////////////////////////////////////////////////////////////////////
     //  one parameter version
+    template <
+        typename Component, typename Result, int Action, typename T0, 
+        threadmanager::thread_state(Component::*F)(
+            threadmanager::px_thread_self&, applier::applier&, Result*, T0) 
+    >
+    class result_action1
+      : public action<Component, Action, 
+            boost::fusion::vector<typename detail::remove_qualifiers<T0>::type> >
+    {
+    private:
+        typedef 
+            action<Component, Action, 
+                boost::fusion::vector<typename detail::remove_qualifiers<T0>::type> >
+        base_type;
+        
+    public:
+        result_action1() 
+        {}
+        
+        // construct an action from its arguments
+        template <typename Arg0>
+        result_action1(Arg0 const& arg0) 
+          : base_type(arg0) 
+        {}
+
+    private:
+        /// The \a continuation_thread_function will be registered as the thread
+        /// function of a px_thread. It encapsulates the execution of the 
+        /// original function (given by \a f)
+        template <typename Func>
+        static threadmanager::thread_state 
+        continuation_thread_function(
+            threadmanager::px_thread_self& self, applier::applier& app, 
+            components::continuation_type cont, boost::tuple<Func> f)
+        {
+            Result result;
+            threadmanager::thread_state newstate = boost::get<0>(f)(self, &result);
+            cont->trigger_all(self, app, result);
+            return newstate;
+        }
+
+        /// The \a construct_continuation_thread_function is a helper function
+        /// for constructing the wrapped thread function needed for 
+        /// continuation support
+        template <typename Func>
+        static boost::function<threadmanager::thread_function_type>
+        construct_continuation_thread_function(Func func, 
+            applier::applier& appl, components::continuation_type cont) 
+        {
+            // we need to assign the address of the thread function to a 
+            // variable to  help the compiler to deduce the function type
+            threadmanager::thread_state (*f)(threadmanager::px_thread_self&, 
+                    applier::applier&, components::continuation_type, 
+                    boost::tuple<Func>) =
+                &result_action1::continuation_thread_function;
+
+            // The following bind constructs the wrapped thread function
+            //   f:  is the wrapping thread function
+            //  _1:  is a placeholder which will be replaced by the reference
+            //       to px_thread_self
+            //  app: reference to the applier (pre-bound second argument to f)
+            // cont: continuation (pre-bound third argument to f)
+            // func: wrapped function object (pre-bound forth argument to f)
+            //       (this is embedded into a tuple because boost::bind can't
+            //       pre-bind another bound function as an argument)
+            return boost::bind(f, _1, boost::ref(appl), cont, 
+                boost::make_tuple(func));
+        }
+
+    public:
+        /// \brief This static \a construct_thread_function allows to construct 
+        /// a proper thread function for a \a px_thread without having to 
+        /// instantiate the action0 type. This is used by the \a applier in 
+        /// case no continuation has been supplied.
+        template <typename Arg0>
+        static boost::function<threadmanager::thread_function_type> 
+        construct_thread_function(applier::applier& appl, 
+            naming::address::address_type lva, Arg0 const& arg0) 
+        {
+            return boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
+                boost::ref(appl), reinterpret_cast<Result*>(NULL), arg0);
+        }
+
+        /// \brief This static \a construct_thread_function allows to construct 
+        /// a proper thread function for a \a px_thread without having to 
+        /// instantiate the action0 type. This is used by the \a applier in 
+        /// case a continuation has been supplied
+        template <typename Arg0>
+        static boost::function<threadmanager::thread_function_type> 
+        construct_thread_function(components::continuation_type cont,
+            applier::applier& appl, naming::address::address_type lva, 
+            Arg0 const& arg0) 
+        {
+            return construct_continuation_thread_function(
+                boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
+                    boost::ref(appl), _2, arg0), appl, cont);
+        }
+
+    private:
+        /// This \a get_thread_function will be invoked to retrieve the thread 
+        /// function for an action which has to be invoked without continuations.
+        boost::function<threadmanager::thread_function_type>
+        get_thread_function(applier::applier& appl, 
+            naming::address::address_type lva) const
+        {
+            return construct_thread_function(appl, lva, this->get<0>());
+        }
+
+        /// This \a get_thread_function will be invoked to retrieve the thread 
+        /// function for an action which has to be invoked with continuations.
+        boost::function<threadmanager::thread_function_type>
+        get_thread_function(components::continuation_type cont,
+            applier::applier& appl, naming::address::address_type lva) const
+        {
+            return construct_thread_function(cont, appl, lva, this->get<0>());
+        }
+
+    private:
+        // serialization support    
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
+
+        HPX_DECLARE_GUID_INITIALIZER(result_action1);
+    };
+
+    HPX_DEFINE_GUID_INITIALIZER(
+        (typename Component)(typename Result)(int Action)
+            (typename T0) 
+            (threadmanager::thread_state(Component::*F)(
+                threadmanager::px_thread_self&, applier::applier&, Result*, T0)),
+        result_action1, (Component)(Result)(Action)(T0)(F)
+    );
+
+    //  one parameter version, no result value
     template <
         typename Component, int Action, typename T0, 
         threadmanager::thread_state(Component::*F)(
             threadmanager::px_thread_self&, applier::applier&, T0) 
     >
     class action1 
-      : public action<Component, Action, boost::fusion::vector<T0> >
+      : public action<Component, Action, 
+            boost::fusion::vector<typename detail::remove_qualifiers<T0>::type> >
     {
     private:
         typedef 
-            action<Component, Action, boost::fusion::vector<T0> >
+            action<Component, Action, 
+                boost::fusion::vector<typename detail::remove_qualifiers<T0>::type> >
         base_type;
         
     public:
@@ -226,6 +641,11 @@ namespace hpx { namespace components
           : base_type(arg0) 
         {}
 
+    public:
+        /// \brief This static \a construct_thread_function allows to construct 
+        /// a proper thread function for a \a px_thread without having to 
+        /// instantiate the action0 type. This is used by the \a applier in 
+        /// case no continuation has been supplied.
         template <typename Arg0>
         static boost::function<threadmanager::thread_function_type> 
         construct_thread_function(applier::applier& appl, 
@@ -235,67 +655,36 @@ namespace hpx { namespace components
                 boost::ref(appl), arg0);
         }
 
+        /// \brief This static \a construct_thread_function allows to construct 
+        /// a proper thread function for a \a px_thread without having to 
+        /// instantiate the action0 type. This is used by the \a applier in 
+        /// case a continuation has been supplied
+        template <typename Arg0>
+        static boost::function<threadmanager::thread_function_type> 
+        construct_thread_function(components::continuation_type cont,
+            applier::applier& appl, naming::address::address_type lva, 
+            Arg0 const& arg0) 
+        {
+            return base_type::construct_continuation_thread_function(
+                boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
+                    boost::ref(appl), arg0), appl, cont);
+        }
+
     private:
+        ///
         boost::function<threadmanager::thread_function_type>
-            get_thread_function(applier::applier& appl, 
-                naming::address::address_type lva) const
+        get_thread_function(applier::applier& appl, 
+            naming::address::address_type lva) const
         {
             return construct_thread_function(appl, lva, this->get<0>());
         }
 
-    private:
-        // serialization support    
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
-        {
-            ar & boost::serialization::base_object<base_type>(*this);
-        }
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    //  two parameter version
-    template <
-        typename Component, int Action, typename T0, typename T1, 
-        threadmanager::thread_state(Component::*F)(
-            threadmanager::px_thread_self&, applier::applier&, T0, T1)
-    >
-    class action2
-      : public action<Component, Action, boost::fusion::vector<T0, T1> >
-    {
-    private:
-        typedef 
-            action<Component, Action, boost::fusion::vector<T0, T1> >
-        base_type;
-        
-    public:
-        action2() 
-        {}
-
-        // construct an action from its arguments
-        template <typename Arg0, typename Arg1>
-        action2(Arg0 const& arg0, Arg1 const& arg1) 
-          : base_type(arg0, arg1) 
-        {}
-
-        template <typename Arg0, typename Arg1>
-        static boost::function<threadmanager::thread_function_type> 
-        construct_thread_function(applier::applier& appl, 
-            naming::address::address_type lva, Arg0 const& arg0, 
-            Arg1 const& arg1) 
-        {
-            return boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
-                boost::ref(appl), arg0, arg1);
-        }
-
-    private:
+        ///
         boost::function<threadmanager::thread_function_type>
-            get_thread_function(applier::applier& appl, 
-                naming::address::address_type lva) const
+        get_thread_function(components::continuation_type cont,
+            applier::applier& appl, naming::address::address_type lva) const
         {
-            return construct_thread_function(appl, lva, this->get<0>(),
-                this->get<1>());
+            return construct_thread_function(cont, appl, lva, this->get<0>());
         }
 
     private:
@@ -307,11 +696,21 @@ namespace hpx { namespace components
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
+
+        HPX_DECLARE_GUID_INITIALIZER(action1);
     };
+
+    HPX_DEFINE_GUID_INITIALIZER(
+        (typename Component)(int Action)
+            (typename T0) 
+            (threadmanager::thread_state(Component::*F)(
+                threadmanager::px_thread_self&, applier::applier&, T0)),
+        action1, (Component)(Action)(T0)(F)
+    );
 
     // bring in the rest of the implementations
     #include <hpx/components/action_implementations.hpp>
-    
+
 ///////////////////////////////////////////////////////////////////////////////
 }}
 

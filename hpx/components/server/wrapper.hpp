@@ -7,11 +7,12 @@
 #define HPX_COMPONENTS_WRAPPER_JUN_04_2008_0901PM
 
 #include <boost/throw_exception.hpp>
+#include <boost/noncopyable.hpp>
 
 #include <hpx/exception.hpp>
 #include <hpx/util/static.hpp>
-#include <hpx/util/wrapper_heap.hpp>
-#include <hpx/util/one_size_heap_list.hpp>
+#include <hpx/components/server/wrapper_heap.hpp>
+#include <hpx/components/server/wrapper_heap_list.hpp>
 
 namespace hpx { namespace components 
 {
@@ -19,17 +20,16 @@ namespace hpx { namespace components
     /// The wrapper template is used as a indirection layer for components 
     /// allowing to gracefully handle the access to non-existing components.
     template <typename Component>
-    class wrapper
+    class wrapper : boost::noncopyable
     {
-    protected:
-        // takes ownership of the passed pointer
-        explicit wrapper(Component* c) 
-          : component_(c) 
-        {}
-        
     public:
         wrapper() 
           : component_(0) 
+        {}
+        
+        // takes ownership of the passed pointer
+        explicit wrapper(Component* c) 
+          : component_(c) 
         {}
         
         ~wrapper()
@@ -37,12 +37,17 @@ namespace hpx { namespace components
             delete component_;
         }
         
-        ///////////////////////////////////////////////////////////////////////
-        // memory management
+        // takes ownership of the passed pointer
+        void set_wrapped(Component* c) 
+        {
+            delete component_;
+            component_ = c; 
+        }
+        
     protected:
         // the memory for the wrappers is managed by a one_size_heap_list
         typedef 
-            util::one_size_heap_list<util::fixed_wrapper_heap<wrapper> > 
+            detail::wrapper_heap_list<detail::fixed_wrapper_heap<wrapper> > 
         heap_type;
 
         struct wrapper_heap_tag {};
@@ -50,7 +55,7 @@ namespace hpx { namespace components
         static heap_type& get_heap()
         {
             // ensure thread-safe initialization
-            util::static_<heap_type, wrapper_heap_tag> heap;
+            static util::static_<heap_type, wrapper_heap_tag> heap;
             return heap.get();
         }
 
@@ -74,24 +79,26 @@ namespace hpx { namespace components
             }
             get_heap().free(p);
         }
-        
+
+        ///
+        naming::id_type get_gid() const
+        {
+            return get_heap().get_gid((void*)this);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // The wrapper behaves just like the object it wraps
         Component* operator-> ()
         {
             if (0 == component_)
-            {
                 boost::throw_exception(hpx::exception(invalid_status));
-            }
             return component_;
         }
         
         Component const* operator-> () const
         {
             if (0 == component_)
-            {
                 boost::throw_exception(hpx::exception(invalid_status));
-            }
             return component_;
         }
         
@@ -99,18 +106,14 @@ namespace hpx { namespace components
         Component& operator* ()
         {
             if (0 == component_)
-            {
                 boost::throw_exception(hpx::exception(invalid_status));
-            }
             return *component_;
         }
         
         Component const& operator* () const
         {
             if (0 == component_)
-            {
                 boost::throw_exception(hpx::exception(invalid_status));
-            }
             return *component_;
         }
         

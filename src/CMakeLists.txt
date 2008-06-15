@@ -9,31 +9,46 @@ set (hpxlib_HEADERS
     ../hpx/exception.hpp
     ../hpx/hpx.hpp
     ../hpx/hpx_fwd.hpp
-    ../hpx/include/components.hpp
-    ../hpx/include/naming.hpp
-    ../hpx/include/parcelset.hpp
-    ../hpx/include/threadmanager.hpp
-    ../hpx/include/util.hpp
-    # action manager
-    ../hpx/runtime/action_manager/action_manager.hpp
-    # applier
-    ../hpx/runtime/applier/applier.hpp
     # components
+    ../hpx/components/accumulator.hpp
     ../hpx/components/action.hpp
     ../hpx/components/action_constructors.hpp
     ../hpx/components/action_implementations.hpp
     ../hpx/components/component_type.hpp
-    ../hpx/components/accumulator.hpp
+    ../hpx/components/continuation.hpp
     ../hpx/components/factory.hpp
     ../hpx/components/server/accumulator.hpp
     ../hpx/components/server/factory.hpp
     ../hpx/components/server/manage_component.hpp
     ../hpx/components/server/manage_component_implementations.hpp
+    ../hpx/components/server/wrapper.hpp
+    ../hpx/components/server/wrapper_heap.hpp
+    ../hpx/components/server/wrapper_heap_list.hpp
+    ../hpx/components/stubs/accumulator.hpp
+    ../hpx/components/stubs/factory.hpp
+    # include
+    ../hpx/include/action_manager.hpp
+    ../hpx/include/applier.hpp
+    ../hpx/include/components.hpp
+    ../hpx/include/naming.hpp
+    ../hpx/include/parcelset.hpp
+    ../hpx/include/runtime.hpp
+    ../hpx/include/threadmanager.hpp
+    ../hpx/include/util.hpp
+    # LCO's
+    ../hpx/lcos/base_lco.hpp
+    ../hpx/lcos/simple_future.hpp
+    # runtime
+    ../hpx/runtime/runtime.hpp
+    # action manager
+    ../hpx/runtime/action_manager/action_manager.hpp
+    # applier
+    ../hpx/runtime/applier/applier.hpp
+    ../hpx/runtime/applier/applier_implementations.hpp
     # naming
     ../hpx/runtime/naming/address.hpp
     ../hpx/runtime/naming/locality.hpp
     ../hpx/runtime/naming/name.hpp
-    ../hpx/runtime/naming/namespace.hpp
     ../hpx/runtime/naming/resolver_client.hpp
     ../hpx/runtime/naming/resolver_client_connection.hpp
     ../hpx/runtime/naming/resolver_server.hpp
@@ -56,11 +71,12 @@ set (hpxlib_HEADERS
     # util
     ../hpx/util/asio_util.hpp
     ../hpx/util/container_device.hpp
-    ../hpx/util/logging.hpp
     ../hpx/util/future.hpp
     ../hpx/util/generate_unique_ids.hpp
     ../hpx/util/high_resolution_timer.hpp
     ../hpx/util/io_service_pool.hpp
+    ../hpx/util/logging.hpp
+    ../hpx/util/object_cache.hpp
     ../hpx/util/one_size_heap.hpp
     ../hpx/util/one_size_heap_list.hpp
     ../hpx/util/portable_binary_iarchive.hpp
@@ -73,6 +89,7 @@ set (hpxlib_HEADERS
 set (hpxlib_SOURCES
     # components
     components/server/factory.cpp
+    # runtime
     # action manager
     runtime/action_manager/action_manager.cpp
     # naming 
@@ -89,8 +106,8 @@ set (hpxlib_SOURCES
     # threadmanager
     runtime/threadmanager/threadmanager.cpp
     # util 
-    util/logging.cpp
     util/io_service_pool.cpp
+    util/logging.cpp
 )
 
 add_library (hpx STATIC ${hpxlib_SOURCES} ${hpxlib_HEADERS})

@@ -79,10 +79,10 @@ namespace hpx { namespace threadmanager
                 work_items_.pop();
 
                 // make sure lock is unlocked during execution of work item
-                if ((*thrd)->get_state() == pending)
+                if (thrd->get_state() == pending)
                 {
                     unlock_the_lock l(lk);    
-                    new_state = (*thrd)->operator()();
+                    new_state = (*thrd)();
                 }
                 
                 // re-add this work item to our list of work items if appropriate

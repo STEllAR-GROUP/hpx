@@ -23,7 +23,10 @@ namespace hpx { namespace parcelset
         ar << destination_addr_;
         ar << source_id_;
         ar << action_;
-        ar << cont_;
+        bool has_continuations = continuation_->empty();
+        ar << has_continuations;
+        if (!continuation_->empty())
+            ar << continuation_;
         ar << start_time_;
     }
 
@@ -35,12 +38,15 @@ namespace hpx { namespace parcelset
                 "trying to load parcel with unknown version");
         }
 
+        bool has_continuation = false;
         ar >> tag_;
         ar >> destination_id_;
         ar >> destination_addr_;
         ar >> source_id_;
         ar >> action_;
-        ar >> cont_;
+        ar >> has_continuation;
+        if (has_continuation)
+            ar >> continuation_;
         ar >> start_time_;
     }
 

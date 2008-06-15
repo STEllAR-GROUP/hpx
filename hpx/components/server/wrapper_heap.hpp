@@ -15,7 +15,7 @@
 #include <hpx/util/logging.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util 
+namespace hpx { namespace components { namespace detail 
 {
     ///////////////////////////////////////////////////////////////////////////////
     template<typename T, typename Allocator>
@@ -111,6 +111,11 @@ namespace hpx { namespace util
             return NULL != pool_ && NULL != p && pool_ <= p && p < pool_ + size_;
         }
 
+        naming::id_type get_gid(void* p) const
+        {
+            return naming::bad_id;
+        }
+        
     protected:
         bool test_release()
         {
@@ -213,6 +218,6 @@ namespace hpx { namespace util
         {}
     };
 
-}} // namespace hpx::util
+}}} // namespace hpx::components::detail
 
 #endif

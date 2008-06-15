@@ -31,6 +31,7 @@ namespace hpx { namespace util
 
         typedef std::list<boost::shared_ptr<heap_type> > list_type;
         typedef typename list_type::iterator iterator;
+        typedef typename list_type::const_iterator const_iterator;
 
         enum { 
             heap_step = heap_type::heap_step,   // default grow step
@@ -185,7 +186,7 @@ namespace hpx { namespace util
             return false;
         }
 
-    private:
+    protected:
         int step_;
         Mutex mtx_;
         list_type heap_list_;

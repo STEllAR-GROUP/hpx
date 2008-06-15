@@ -9,10 +9,6 @@
 #include <iostream>
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-#include <boost/serialization/export.hpp>
-
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/action.hpp>
 #include <hpx/runtime/threadmanager/px_thread.hpp>
@@ -34,7 +30,8 @@ namespace hpx { namespace components { namespace server
         {
             init_accumulator = 0,
             add_to_accumulator = 1,
-            print_accumulator = 2
+            query_accumulator_value = 2,
+            print_accumulator = 3
         };
 
         // This is the component id. Every component needs to have an embedded
@@ -52,42 +49,57 @@ namespace hpx { namespace components { namespace server
         
         /// Initialize the accumulator
         threadmanager::thread_state 
-        init (threadmanager::px_thread_self&, applier::applier& appl) 
+        init_proc (threadmanager::px_thread_self&, applier::applier& appl) 
         {
             arg_ = 0;
-            return hpx::threadmanager::stopped;
+            return hpx::threadmanager::terminated;
         }
-        
+
         /// Add the given number to the accumulator
         threadmanager::thread_state 
-        add (threadmanager::px_thread_self&, applier::applier& appl, double arg) 
+        add_proc (threadmanager::px_thread_self&, applier::applier& appl, double arg) 
         {
             arg_ += arg;
-            return hpx::threadmanager::stopped;
+            return hpx::threadmanager::terminated;
         }
-        
+
+        /// Return the current value to the caller
+        threadmanager::thread_state 
+        query_proc (threadmanager::px_thread_self&, applier::applier& appl,
+            double* result) 
+        {
+            // this will be zero if the action got invoked without continuations
+            if (result)
+                *result = arg_;
+            return hpx::threadmanager::terminated;
+        }
+
         /// Print the current value of the accumulator
         threadmanager::thread_state 
-        print (threadmanager::px_thread_self&, applier::applier& appl) 
+        print_proc (threadmanager::px_thread_self&, applier::applier& appl) 
         {
             std::cout << arg_ << std::endl;
-            return hpx::threadmanager::stopped;
+            return hpx::threadmanager::terminated;
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // Each of the exposed functions needs to be encapsulated into a action
-        // type, allowing to generate all require boilerplate code for threads,
+        // Each of the exposed functions needs to be encapsulated into an action
+        // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef action0<
-            accumulator, init_accumulator, &accumulator::init
+            accumulator, init_accumulator, &accumulator::init_proc
         > init_action;
 
         typedef action1<
-            accumulator, add_to_accumulator, double, &accumulator::add
+            accumulator, add_to_accumulator, double, &accumulator::add_proc
         > add_action;
 
+        typedef result_action0<
+            accumulator, double, query_accumulator_value, &accumulator::query_proc
+        > query_action;
+
         typedef action0<
-            accumulator, print_accumulator, &accumulator::print
+            accumulator, print_accumulator, &accumulator::print_proc
         > print_action;
 
     private:
@@ -95,11 +107,5 @@ namespace hpx { namespace components { namespace server
     };
 
 }}}
-
-///////////////////////////////////////////////////////////////////////////////
-// enable serialization support (these need to be in the global namespace)
-BOOST_CLASS_EXPORT(hpx::components::server::accumulator::init_action);
-BOOST_CLASS_EXPORT(hpx::components::server::accumulator::add_action);
-BOOST_CLASS_EXPORT(hpx::components::server::accumulator::print_action);
 
 #endif

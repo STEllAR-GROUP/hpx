@@ -105,7 +105,7 @@ namespace hpx
         {
             return dgas_client_;
         }
-        
+
         /// 
         parcelset::parcelhandler& get_parcel_handler()
         {

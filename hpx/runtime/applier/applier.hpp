@@ -11,6 +11,7 @@
 #include <hpx/include/naming.hpp>
 #include <hpx/include/parcelset.hpp>
 #include <hpx/include/threadmanager.hpp>
+#include <hpx/components/continuation.hpp>
 
 namespace hpx { namespace applier
 {
@@ -33,7 +34,10 @@ namespace hpx { namespace applier
         {
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        // zero parameter version
         // Invoked by a running PX-thread to apply an action to any resource
+
         /// \note A call to applier's apply function would look like:
         /// \code
         ///    appl_.apply<add_action>(gid, ...);
@@ -57,11 +61,45 @@ namespace hpx { namespace applier
             // Create a new parcel with the gid, action, and arguments
             parcelset::parcel p (gid, new Action());
             p.set_destination_addr(addr);   // avoid to resolve address again
-            
+
             // Send the parcel through the parcel handler
             return parcel_handler_.put_parcel(p);
         }
 
+        /// \note A call to applier's apply function would look like:
+        /// \code
+        ///    appl_.apply<add_action>(cont, gid, ...);
+        /// \endcode
+        template <typename Action>
+        parcelset::parcel_id apply (components::continuation* c,
+            naming::id_type gid)
+        {
+            // package continuation into a shared_ptr
+            components::continuation_type cont(c);
+
+            // Determine whether the gid is local or remote
+            naming::address addr;
+            if (address_is_local(gid, addr))
+            {
+                // If local, register the function with the thread-manager
+                // Get the local-virtual address of the resource and register 
+                // the action with the TM
+                thread_manager_.register_work(
+                    Action::construct_thread_function(cont, *this, addr.address_));
+                return parcelset::no_parcel_id;     // no parcel has been sent
+            }
+
+            // If remote, create a new parcel to be sent to the destination
+            // Create a new parcel with the gid, action, and arguments
+            parcelset::parcel p (gid, new Action(), cont);
+            p.set_destination_addr(addr);   // avoid to resolve address again
+
+            // Send the parcel through the parcel handler
+            return parcel_handler_.put_parcel(p);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // one parameter version
         template <typename Action, typename Arg0>
         parcelset::parcel_id apply (naming::id_type gid, Arg0 const& arg0)
         {
@@ -86,34 +124,38 @@ namespace hpx { namespace applier
             return parcel_handler_.put_parcel(p);
         }
 
-        template <typename Action, typename Arg0, typename Arg1>
-        parcelset::parcel_id apply (naming::id_type gid, Arg0 const& arg0, 
-            Arg1 const& arg1)
+        template <typename Action, typename Arg0>
+        parcelset::parcel_id apply (components::continuation* c, 
+            naming::id_type gid, Arg0 const& arg0)
         {
+            // package continuation into a shared_ptr
+            components::continuation_type cont(c);
+
             // Determine whether the gid is local or remote
             naming::address addr;
-            if (address_is_local(gid, addr))
+            if (address_is_local(gid, addr)) 
             {
                 // If local, register the function with the thread-manager
                 // Get the local-virtual address of the resource and register 
                 // the action with the TM
                 thread_manager_.register_work(
-                    Action::construct_thread_function(*this, addr.address_, arg0, arg1));
+                    Action::construct_thread_function(cont, *this, 
+                    addr.address_, arg0));
                 return parcelset::no_parcel_id;     // no parcel has been sent
             }
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid, new Action(arg0, arg1));
+            parcelset::parcel p (gid, new Action(arg0), cont);
             p.set_destination_addr(addr);   // avoid to resolve address again
 
             // Send the parcel through the parcel handler
             return parcel_handler_.put_parcel(p);
         }
-        
+
         // bring in the rest of the apply<> overloads
         #include <hpx/runtime/applier/applier_implementations.hpp>
-        
+
         /// \brief Access the \a parcelhandler instance associated with this 
         /// \a applier
         parcelset::parcelhandler& get_parcel_handler() 

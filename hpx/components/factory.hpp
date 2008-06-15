@@ -6,7 +6,7 @@
 #if !defined(HPX_COMPONENTS_FACTORY_JUN_03_2008_0438PM)
 #define HPX_COMPONENTS_FACTORY_JUN_03_2008_0438PM
 
-#include <hpx/runtime/runtime.hpp>
+#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/components/stubs/factory.hpp>
 
 namespace hpx { namespace components 
@@ -21,8 +21,8 @@ namespace hpx { namespace components
     public:
         /// Create a client side representation for the existing
         /// \a server#factory instance with the given global id \a gid.
-        factory(runtime& rt, naming::id_type gid) 
-          : base_type(rt), gid_(gid)
+        factory(applier::applier& app, naming::id_type gid) 
+          : base_type(app), gid_(gid)
         {}
         
         ~factory() 
@@ -32,9 +32,10 @@ namespace hpx { namespace components
         // exposed functionality of this component
         
         /// Create a new component using the factory 
-        void create(components::component_type type, naming::id_type newgid) 
+        naming::id_type create(threadmanager::px_thread_self& self,
+            components::component_type type) 
         {
-            this->base_type::create(gid_, type, newgid);
+            return this->base_type::create(self, gid_, type);
         }
         
     private:

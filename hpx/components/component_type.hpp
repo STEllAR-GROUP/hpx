@@ -13,16 +13,20 @@ namespace hpx { namespace components
     enum component_type
     {
         component_invalid = 0,
-        component_factory = 1,      // predefined components needed to create components
-        component_px_thread = 2,    // a ParalleX thread
+        component_factory,          // predefined components needed to create components
+        component_px_thread,        // a ParalleX thread
 
-        // test categories
-        component_accumulator = 3,  // simple accumulator
-        component_memory = 4,       // general memory address
+        // LCO's
+        component_simple_future,    // a simple future allowing one thread to 
+                                    // wait for the result
         
-        component_graph = 5,        // logical graph (spanning several localities)
-        component_local_graph = 6,  // simple graph example component (see examples/graph_component)
-        component_graph_vertex = 7, // vertex for simple graph example 
+        // test categories
+        component_accumulator,      // simple accumulator
+        component_memory,           // general memory address
+        
+        component_graph,            // logical graph (spanning several localities)
+        component_local_graph,      // simple graph example component (see examples/graph_component)
+        component_graph_vertex,     // vertex for simple graph example 
         
         component_last
     };
@@ -34,6 +38,7 @@ namespace hpx { namespace components
             "component_invalid",
             "component_factory",
             "component_px_thread",
+            "component_simple_future",
             "component_accumulator",
             "component_memory",
             "component_graph",

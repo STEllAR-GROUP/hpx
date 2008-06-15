@@ -39,25 +39,27 @@ namespace hpx { namespace util
         typedef typename boost::call_traits<T>::reference reference;
         typedef typename boost::call_traits<T>::const_reference const_reference;
 
+    private:
+        struct destructor
+        {
+            ~destructor()
+            {
+                static_::get_address()->~value_type();
+            }
+        };
+
+        struct default_ctor
+        {
+            static void construct()
+            {
+                ::new (static_::get_address()) value_type();
+                static destructor d;
+            }
+        };
+        
+    public:
         static_(Tag = Tag())
         {
-            struct destructor
-            {
-                ~destructor()
-                {
-                    static_::get_address()->~value_type();
-                }
-            };
-
-            struct default_ctor
-            {
-                static void construct()
-                {
-                    ::new (static_::get_address()) value_type();
-                    static destructor d;
-                }
-            };
-
             boost::call_once(&default_ctor::construct, constructed_);
         }
 

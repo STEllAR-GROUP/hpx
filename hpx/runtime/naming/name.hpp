@@ -27,7 +27,7 @@ namespace hpx { namespace naming
         
         id_type& operator++()       // pre-increment
         {
-            if (~0x0 == id_lsb_) 
+            if (boost::uint64_t(~0x0) == id_lsb_) 
                 ++id_msb_;
             ++id_lsb_;
             return *this;
@@ -137,6 +137,9 @@ namespace hpx { namespace naming
         os << "(" << id.id_msb_ << ", " << id.id_lsb_ << ")";
         return os;
     }
+    
+    ///////////////////////////////////////////////////////////////////////////
+    id_type const bad_id = id_type(boost::uint64_t(-1));
     
 ///////////////////////////////////////////////////////////////////////////////
 }}
