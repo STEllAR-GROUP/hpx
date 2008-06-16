@@ -31,6 +31,7 @@ namespace hpx { namespace lcos { namespace detail
         simple_future(threadmanager::px_thread_self& self)
           : target_thread_(self), result_(), code_(hpx::success)
         {
+            not_ready_ = true;
         }
 
         Result get_result(threadmanager::px_thread_self& self) const
@@ -72,7 +73,8 @@ namespace hpx { namespace lcos { namespace detail
             not_ready_ = false;
 
             // re-activate the target thread if previously yielded
-            if (appl.get_thread_manager().get_state() == threadmanager::suspended)
+            if (appl.get_thread_manager().get_state(target_thread_.get_thread_id()) 
+                  == threadmanager::suspended)
             {
                 appl.get_thread_manager().set_state(
                     target_thread_.get_thread_id(), threadmanager::pending);
@@ -115,7 +117,7 @@ namespace hpx { namespace lcos { namespace detail
     private:
         threadmanager::px_thread_self& target_thread_;
         Result result_;
-        bool not_ready_ = true;
+        bool not_ready_;
         boost::system::error_code code_;
         std::string error_msg_;
     };
