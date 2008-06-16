@@ -29,10 +29,10 @@ namespace hpx { namespace components { namespace stubs
         ~factory() 
         {}
 
-        ///////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        /// Create a new component using the factory with the given \a 
+        /// Create a new component \a type using the factory with the given \a 
         /// targetgid
         static naming::id_type create(
             threadmanager::px_thread_self& self, applier::applier& appl, 
@@ -50,7 +50,7 @@ namespace hpx { namespace components { namespace stubs
             // The following get_result unconditionally yields control while
             // the action above is executed and the result is returned to the 
             // simple_future
-            return lco.get_result(self);
+            return lco.get_result();
         }
 
         naming::id_type create(threadmanager::px_thread_self& self,

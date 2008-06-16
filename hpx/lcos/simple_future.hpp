@@ -29,17 +29,13 @@ namespace hpx { namespace lcos { namespace detail
         enum { value = components::component_simple_future};
 
         simple_future(threadmanager::px_thread_self& self)
-          : target_thread_(self), result_(), code_(hpx::success)
+          : target_thread_(self), not_ready_(true), result_(), 
+            code_(hpx::success)
         {
-            not_ready_ = true;
         }
 
-        Result get_result(threadmanager::px_thread_self& self) const
+        Result get_result() const
         {
-            // the thread used to call get_result needs to be the same as the 
-            // one this simple_future has been initialized with
-            BOOST_ASSERT(&self == &target_thread_);
-            
             // Conditionally yield control
             if (not_ready_)
             {
@@ -92,6 +88,7 @@ namespace hpx { namespace lcos { namespace detail
             // store the error code
             code_ = make_error_code(code);
             error_msg_ = msg;
+            not_ready_ = false;
 
             // re-activate the target thread
             appl.get_thread_manager().set_state(
@@ -139,18 +136,13 @@ namespace hpx { namespace lcos
     /// construction time).
     ///
     /// \code
-    ///     // This is the function to be called during construction time of 
-    ///     // the simple_future. It is supposed to initiate the required 
-    ///     // action.
-    ///     void do_action(naming::id_type future_gid)
-    ///     {
-    ///         applier.apply<some_action>(
-    ///             new components::continuation(future_gid), target_gid);
-    ///     }
-    ///
     ///     // Create the simple_future supplying the thread to re-activate
-    ///     lcos::simple_future<naming::id_type> f(thread_self, do_action);
-    ///     // ...
+    ///     lcos::simple_future<naming::id_type> f(thread_self);
+    ///
+    ///     // initiate the action supplying the simple_future as a 
+    ///     // continuation
+    ///     applier_.appy<some_action>(new continuation(f.get_gid()), ...);
+    ///
     ///     // Wait for the result to be returned, yielding control 
     ///     // in the meantime.
     ///     naming::id_type result = f.get_result();
@@ -204,9 +196,9 @@ namespace hpx { namespace lcos
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
-        Result get_result(threadmanager::px_thread_self& self) const
+        Result get_result() const
         {
-            return (*impl_)->get_result(self);
+            return (*impl_)->get_result();
         }
 
         /// Return the global id of this \a simple_future instance
