@@ -9,7 +9,12 @@
 #include <vector>
 
 #include <boost/shared_ptr.hpp>
+
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/portable_binary_oarchive.hpp>
+#include <boost/serialization/export.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -66,5 +71,9 @@ namespace hpx { namespace components
 
     typedef boost::shared_ptr<continuation> continuation_type;
 }}
+
+///////////////////////////////////////////////////////////////////////////////
+// enable serialization of continuations through shared_ptr's
+BOOST_CLASS_EXPORT(hpx::components::continuation);
 
 #endif
