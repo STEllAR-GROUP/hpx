@@ -76,7 +76,7 @@ set (hpxlib_HEADERS
     ../hpx/util/high_resolution_timer.hpp
     ../hpx/util/io_service_pool.hpp
     ../hpx/util/logging.hpp
-    ../hpx/util/object_cache.hpp
+#   ../hpx/util/object_cache.hpp
     ../hpx/util/one_size_heap.hpp
     ../hpx/util/one_size_heap_list.hpp
     ../hpx/util/portable_binary_iarchive.hpp
