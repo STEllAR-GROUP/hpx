@@ -23,9 +23,9 @@ namespace hpx { namespace parcelset
         ar << destination_addr_;
         ar << source_id_;
         ar << action_;
-        bool has_continuations = continuation_->empty();
+        bool has_continuations = continuation_ && !continuation_->empty();
         ar << has_continuations;
-        if (!continuation_->empty())
+        if (has_continuations)
             ar << continuation_;
         ar << start_time_;
     }
