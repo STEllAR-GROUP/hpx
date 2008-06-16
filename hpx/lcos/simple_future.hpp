@@ -39,9 +39,12 @@ namespace hpx { namespace lcos { namespace detail
             // one this simple_future has been initialized with
             BOOST_ASSERT(&self == &target_thread_);
             
-            // unconditionally yield control
-            target_thread_.yield(threadmanager::suspended);
-
+            // Conditionally yield control
+            if (not_ready_)
+            {
+                target_thread_.yield(threadmanager::suspended);
+            }
+            
             // the thread has been re-activated by one of the actions 
             // supported by this simple_future (see \a simple_future#set_event
             // and simple_future#set_error).
@@ -66,11 +69,15 @@ namespace hpx { namespace lcos { namespace detail
         {
             // set the received result, reset error status
             result_ = result;
+            not_ready_ = false;
 
-            // re-activate the target thread
-            appl.get_thread_manager().set_state(
-                target_thread_.get_thread_id(), threadmanager::pending);
-
+            // re-activate the target thread if previously yielded
+            if (appl.get_thread_manager().get_state() == threadmanager::suspended)
+            {
+                appl.get_thread_manager().set_state(
+                    target_thread_.get_thread_id(), threadmanager::pending);
+            }
+            
             // this thread has nothing more to do
             return threadmanager::terminated;
         }
@@ -108,6 +115,7 @@ namespace hpx { namespace lcos { namespace detail
     private:
         threadmanager::px_thread_self& target_thread_;
         Result result_;
+        bool not_ready_ = true;
         boost::system::error_code code_;
         std::string error_msg_;
     };
@@ -141,8 +149,8 @@ namespace hpx { namespace lcos
     ///     // Create the simple_future supplying the thread to re-activate
     ///     lcos::simple_future<naming::id_type> f(thread_self, do_action);
     ///     // ...
-    ///     // Wait for the result to be returned, unconditionally yields 
-    ///     // control in the meantime.
+    ///     // Wait for the result to be returned, yielding control 
+    ///     // in the meantime.
     ///     naming::id_type result = f.get_result();
     ///     // ...
     /// \endcode
@@ -182,9 +190,9 @@ namespace hpx { namespace lcos
         }
 
         /// Get the result of the requested action. This call blocks (yields 
-        /// control) unconditionally. As soon as the result has been returned 
-        /// and the waiting thread has been re-scheduled by the thread manager
-        /// the \a get_result() will return.
+        /// control) if the result is not ready. As soon as the result has been 
+        /// returned and the waiting thread has been re-scheduled by the thread
+        /// manager the \a get_result() will return.
         ///
         /// \param self   [in] The \a px_thread which will be unconditionally
         ///               suspended while waiting for the result. This needs to 
