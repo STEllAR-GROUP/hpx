@@ -38,20 +38,18 @@ namespace hpx { namespace components { namespace stubs
             threadmanager::px_thread_self& self, applier::applier& appl, 
             naming::id_type targetgid, components::component_type type) 
         {
-            // the following assignment of the function pointer to a variable
-            // is needed to help th ecompiler to deduce the correct required 
-            // function to bind to the supplied arguments.
-            parcelset::parcel_id (applier::applier::*f)(
-                    components::continuation*, naming::id_type, 
-                    components::component_type const&) = 
-                &applier::applier::apply<server::factory::create_action, 
-                    components::component_type>;
+            // Create a simple_future, execute the required action and wait 
+            // for the result to be returned to the future.
+            lcos::simple_future<naming::id_type> lco (self);
 
-            // create a simple_future, which executes the supplied function
-            // during construction time
-            lcos::simple_future<naming::id_type> lco (
-                self, boost::bind(f, boost::ref(appl), _1, targetgid, type)
-            );
+            // The simple_future instance is associated with the following 
+            // apply action by sending it along as its continuation
+            appl.apply<server::factory::create_action>(
+                new components::continuation(lco.get_gid()), targetgid, type);
+
+            // The following get_result unconditionally yields control while
+            // the action above is executed and the result is returned to the 
+            // simple_future
             return lco.get_result(self);
         }
 

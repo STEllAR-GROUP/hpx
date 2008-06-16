@@ -7,6 +7,7 @@
 #define HPX_PX_THREAD_MAY_20_2008_0910AM
 
 #include <boost/function.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/coroutine/coroutine.hpp>
 #include <boost/coroutine/shared_coroutine.hpp>
@@ -78,7 +79,7 @@ namespace hpx { namespace threadmanager { namespace detail
         {}
 
         /// execute the thread function
-        thread_state operator()()
+        thread_state execute()
         {
             switch_status thrd_stat (current_state_, active);
             return thrd_stat = coroutine_();
@@ -119,9 +120,11 @@ namespace hpx { namespace threadmanager
 
         px_thread(boost::function<thread_function_type> threadfunc, 
                 thread_state new_state = init)
-          : impl_(new wrapping_type())
+          : impl_(new wrapping_type())    // this allocates the wrapper
         {
-            impl_->set_wrapped(new detail::px_thread(threadfunc, impl_, new_state));
+            // this allocates the component implementation
+            impl_->set_wrapped(
+                new detail::px_thread(threadfunc, impl_.get(), new_state));
         }
 
         thread_state get_state() const 
@@ -129,13 +132,18 @@ namespace hpx { namespace threadmanager
             return (*impl_)->get_state();
         }
 
+        void set_state(thread_state new_state)
+        {
+            (*impl_)->set_state(new_state);
+        }
+
         thread_state operator()()
         {
-            return (*impl_)->operator()();
+            return (*impl_)->execute();
         }
 
     private:
-        components::wrapper<detail::px_thread>* impl_;
+        boost::shared_ptr<wrapping_type> impl_;
     };
 
 }}
