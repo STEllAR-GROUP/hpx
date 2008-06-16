@@ -173,20 +173,7 @@
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
-
-        HPX_DECLARE_GUID_INITIALIZER(BOOST_PP_CAT(result_action, N));
     };
-
-    HPX_DEFINE_GUID_INITIALIZER(
-        (typename Component)(typename Result)(int Action) 
-            BOOST_PP_REPEAT(N, HPX_GUID_ARGUMENT1, _)
-            (threadmanager::thread_state(Component::*F)(
-                threadmanager::px_thread_self&, applier::applier&, Result*, 
-                BOOST_PP_ENUM_PARAMS(N, T))),
-        BOOST_PP_CAT(result_action, N),
-        (Component)(Result)(Action)
-            BOOST_PP_REPEAT(N, HPX_GUID_ARGUMENT2, _)(F)
-    );
 
     //  N parameter version, no result type
     template <
@@ -276,19 +263,7 @@
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
-
-        HPX_DECLARE_GUID_INITIALIZER(BOOST_PP_CAT(action, N));
     };
-
-    HPX_DEFINE_GUID_INITIALIZER(
-        (typename Component)(int Action) 
-            BOOST_PP_REPEAT(N, HPX_GUID_ARGUMENT1, _)
-            (threadmanager::thread_state(Component::*F)(
-                threadmanager::px_thread_self&, applier::applier&, 
-                BOOST_PP_ENUM_PARAMS(N, T))),
-        BOOST_PP_CAT(action, N),
-        (Component)(Action)BOOST_PP_REPEAT(N, HPX_GUID_ARGUMENT2, _)(F)
-    );
 
 #undef HPX_GUID_ARGUMENT1
 #undef HPX_GUID_ARGUMENT2

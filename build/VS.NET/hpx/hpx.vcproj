@@ -170,6 +170,14 @@
 					<File
 						RelativePath="..\..\..\src\components\server\factory.cpp"
 						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerOutput="0"
+							/>
+						</FileConfiguration>
 					</File>
 				</Filter>
 			</Filter>
@@ -360,6 +368,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\hpx\util\serialize_sequence.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\util\static.hpp"
 					>
 				</File>
 				<File
@@ -576,6 +588,14 @@
 				>
 				<File
 					RelativePath="..\..\..\hpx\lcos\base_lco.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\lcos\full_empty_memory.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\lcos\full_empty_store.hpp"
 					>
 				</File>
 				<File

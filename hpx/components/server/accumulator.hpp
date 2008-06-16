@@ -9,6 +9,9 @@
 #include <iostream>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/portable_binary_oarchive.hpp>
+#include <boost/serialization/export.hpp>
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/action.hpp>
 #include <hpx/runtime/threadmanager/px_thread.hpp>
@@ -107,5 +110,12 @@ namespace hpx { namespace components { namespace server
     };
 
 }}}
+
+///////////////////////////////////////////////////////////////////////////////
+// Serialization support for the accumulator actions
+BOOST_CLASS_EXPORT(hpx::components::server::accumulator::init_action);
+BOOST_CLASS_EXPORT(hpx::components::server::accumulator::add_action);
+BOOST_CLASS_EXPORT(hpx::components::server::accumulator::query_action);
+BOOST_CLASS_EXPORT(hpx::components::server::accumulator::print_action);
 
 #endif

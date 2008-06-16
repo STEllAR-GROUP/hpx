@@ -8,10 +8,15 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/throw_exception.hpp>
+#include <boost/variant.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/portable_binary_oarchive.hpp>
+#include <boost/serialization/export.hpp>
 #include <hpx/runtime/threadmanager/px_thread.hpp>
 #include <hpx/lcos/base_lco.hpp>
+#include <hpx/lcos/full_empty_memory.hpp>
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/server/wrapper.hpp>
 
@@ -29,31 +34,28 @@ namespace hpx { namespace lcos { namespace detail
         enum { value = components::component_simple_future};
 
         simple_future(threadmanager::px_thread_self& self)
-          : target_thread_(self), not_ready_(true), result_(), 
-            code_(hpx::success)
+          : target_thread_(self), data_(self)
         {
         }
 
         Result get_result() const
         {
-            // Conditionally yield control
-            if (not_ready_)
-            {
-                target_thread_.yield(threadmanager::suspended);
-            }
-            
+            // yields control if needed
+            data_type const& d = data_.read(target_thread_);
+
             // the thread has been re-activated by one of the actions 
-            // supported by this simple_future (see \a simple_future#set_event
-            // and simple_future#set_error).
-            if (code_)
+            // supported by this simple_future (see \a simple_future::set_event
+            // and simple_future::set_error).
+            if (1 == d.which())
             {
                 // an error has been reported in the meantime, throw 
+                error_type e = get<error_type>(d);
                 boost::throw_exception(
-                    boost::system::system_error(code_, error_msg_));
+                    boost::system::system_error(e.first, e.second));
             }
 
             // no error has been reported, return the result
-            return result_;
+            return get<result_type>(d);
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -61,12 +63,11 @@ namespace hpx { namespace lcos { namespace detail
         
         // trigger the future, set the result
         threadmanager::thread_state 
-        set_event_proc (threadmanager::px_thread_self&, applier::applier& appl,
-            Result const& result) 
+        set_event_proc (threadmanager::px_thread_self& self, 
+            applier::applier& appl, Result const& result) 
         {
             // set the received result, reset error status
-            result_ = result;
-            not_ready_ = false;
+            data_.set(self, result);
 
             // re-activate the target thread if previously yielded
             if (appl.get_thread_manager().get_state(target_thread_.get_thread_id()) 
@@ -82,13 +83,11 @@ namespace hpx { namespace lcos { namespace detail
 
         // trigger the future with the given error condition
         threadmanager::thread_state set_error_proc (
-            threadmanager::px_thread_self&, applier::applier& appl,
+            threadmanager::px_thread_self& self, applier::applier& appl,
             hpx::error code, std::string msg)
         {
             // store the error code
-            code_ = make_error_code(code);
-            error_msg_ = msg;
-            not_ready_ = false;
+            data_.set(self, error_type(make_error_code(code), msg));
 
             // re-activate the target thread
             appl.get_thread_manager().set_state(
@@ -112,14 +111,21 @@ namespace hpx { namespace lcos { namespace detail
         > set_error_action;
 
     private:
+        typedef Result result_type;
+        typedef std::pair<boost::system::error_code, std::string> error_type;
+        typedef boost::variant<result_type, error_type> data_type;
+
         threadmanager::px_thread_self& target_thread_;
-        Result result_;
-        bool not_ready_;
-        boost::system::error_code code_;
+        full_empty<data_type> data_;
         std::string error_msg_;
     };
 
 }}}
+
+///////////////////////////////////////////////////////////////////////////////
+// Serialization support for the simple_future actions
+BOOST_CLASS_EXPORT(hpx::lcos::detail::simple_future<hpx::naming::id_type>::set_event_action);
+BOOST_CLASS_EXPORT(hpx::lcos::detail::simple_future<hpx::naming::id_type>::set_error_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos 
@@ -201,7 +207,7 @@ namespace hpx { namespace lcos
             return (*impl_)->get_result();
         }
 
-        /// Return the global id of this \a simple_future instance
+        /// \brief Return the global id of this \a simple_future instance
         naming::id_type get_gid() const
         {
             return impl_->get_gid();

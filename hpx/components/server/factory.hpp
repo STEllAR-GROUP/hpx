@@ -7,6 +7,9 @@
 #define HPX_COMPONENTS_FACTORY_JUN_02_2008_1145AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/portable_binary_oarchive.hpp>
+#include <boost/serialization/export.hpp>
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/action.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
@@ -56,5 +59,9 @@ namespace hpx { namespace components { namespace server
     };
 
 }}}
+
+///////////////////////////////////////////////////////////////////////////////
+// Serialization support for the factory actions
+BOOST_CLASS_EXPORT(hpx::components::server::factory::create_action);
 
 #endif

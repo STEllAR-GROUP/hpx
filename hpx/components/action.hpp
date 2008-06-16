@@ -26,9 +26,6 @@
 #include <boost/preprocessor/seq/enum.hpp> 
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-#include <boost/serialization/export.hpp>
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -37,35 +34,6 @@
 #include <hpx/util/serialize_sequence.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-#if BOOST_VERSION < 103500
-#error "HPX action serialization support needs at least Boost V1.35.0"
-#elif BOOST_VERSION < 103600
-// Boost V1.35.0
-#define HPX_DEFINE_GUID_INITIALIZER(D, C, T)                                  \
-    template <BOOST_PP_SEQ_ENUM(D)>                                           \
-    boost::archive::detail::guid_initializer<C<BOOST_PP_SEQ_ENUM(T)> > const& \
-        C<BOOST_PP_SEQ_ENUM(T)>::guid_initializer_ =                          \
-            typename C<BOOST_PP_SEQ_ENUM(T)>::guid_initializer_type::         \
-                get_instance(BOOST_PP_STRINGIZE((C<BOOST_PP_SEQ_ENUM(T)>)))   \
-    /**/
-#else
-// Boost V1.36.0 and up
-#define HPX_DEFINE_GUID_INITIALIZER(D, C, T)                                  \
-    template <BOOST_PP_SEQ_ENUM(D)>                                           \
-    boost::archive::detail::guid_initializer<C<BOOST_PP_SEQ_ENUM(T)> > const& \
-        C<BOOST_PP_SEQ_ENUM(T)>::guid_initializer_ =                          \
-            boost::serialization::singleton<                                  \
-                typename C<BOOST_PP_SEQ_ENUM(T)>::guid_initializer_type       \
-            >::get_mutable_instance().export_guid(                            \
-                BOOST_PP_STRINGIZE((C<BOOST_PP_SEQ_ENUM(T)>)))                \
-    /**/
-#endif
-
-#define HPX_DECLARE_GUID_INITIALIZER(T)                                       \
-    typedef boost::archive::detail::guid_initializer<T> guid_initializer_type;\
-    static guid_initializer_type const& guid_initializer_                     \
-    /**/
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
@@ -79,6 +47,11 @@ namespace hpx { namespace components
         {
             typedef typename boost::remove_reference<T>::type no_ref_type;
             typedef typename boost::remove_const<no_ref_type>::type type;
+        };
+
+        template <typename Action>
+        struct action_guid_initializer
+        {
         };
     }
     
@@ -388,16 +361,7 @@ namespace hpx { namespace components
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
-
-        HPX_DECLARE_GUID_INITIALIZER(result_action0);
     };
-
-    HPX_DEFINE_GUID_INITIALIZER(
-        (typename Component)(typename Result)(int Action) 
-            (threadmanager::thread_state(Component::*F)(
-                threadmanager::px_thread_self&, applier::applier&, Result*)),
-        result_action0, (Component)(Result)(Action)(F)
-    );
 
     ///////////////////////////////////////////////////////////////////////////
     //  zero parameter version, no result value
@@ -464,16 +428,7 @@ namespace hpx { namespace components
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
-
-        HPX_DECLARE_GUID_INITIALIZER(action0);
     };
-
-    HPX_DEFINE_GUID_INITIALIZER(
-        (typename Component)(int Action) 
-            (threadmanager::thread_state(Component::*F)(
-                threadmanager::px_thread_self&, applier::applier&)),
-        action0, (Component)(Action)(F)
-    );
 
     ///////////////////////////////////////////////////////////////////////////
     //  one parameter version
@@ -603,17 +558,7 @@ namespace hpx { namespace components
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
-
-        HPX_DECLARE_GUID_INITIALIZER(result_action1);
     };
-
-    HPX_DEFINE_GUID_INITIALIZER(
-        (typename Component)(typename Result)(int Action)
-            (typename T0) 
-            (threadmanager::thread_state(Component::*F)(
-                threadmanager::px_thread_self&, applier::applier&, Result*, T0)),
-        result_action1, (Component)(Result)(Action)(T0)(F)
-    );
 
     //  one parameter version, no result value
     template <
@@ -696,17 +641,7 @@ namespace hpx { namespace components
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
-
-        HPX_DECLARE_GUID_INITIALIZER(action1);
     };
-
-    HPX_DEFINE_GUID_INITIALIZER(
-        (typename Component)(int Action)
-            (typename T0) 
-            (threadmanager::thread_state(Component::*F)(
-                threadmanager::px_thread_self&, applier::applier&, T0)),
-        action1, (Component)(Action)(T0)(F)
-    );
 
     // bring in the rest of the implementations
     #include <hpx/components/action_implementations.hpp>
