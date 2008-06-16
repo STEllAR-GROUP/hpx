@@ -6,7 +6,7 @@ SUFF = -gcc$(shell $(top_builddir)/gccver)-mt
 
 parcelset_server_LDADD =                        \
     $(top_builddir)/src/libhpx.a                \
-    -L $(HOME)/boost/lib                        \
+    -L $(HOME)/packages/boost/lib                        \
     -lboost_date_time$(SUFF)                    \
     -lboost_thread$(SUFF)                       \
     -lboost_system$(SUFF)                       \
@@ -14,7 +14,7 @@ parcelset_server_LDADD =                        \
 
 parcelset_client_LDADD =                        \
     $(top_builddir)/src/libhpx.a                \
-    -L $(HOME)/boost/lib                        \
+    -L $(HOME)/packages/boost/lib                        \
     -lboost_date_time$(SUFF)                    \
     -lboost_thread$(SUFF)                       \
     -lboost_system$(SUFF)                       \

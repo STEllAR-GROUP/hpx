@@ -19,6 +19,7 @@ AC_OUTPUT(Makefile                           \
           tests/performance/Makefile         \
           examples/naming/Makefile           \
           examples/parcelset/Makefile        \
+          examples/accumulator/Makefile      \
           src/Makefile)
 
 

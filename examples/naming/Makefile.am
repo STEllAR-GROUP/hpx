@@ -6,7 +6,7 @@ SUFF = -gcc$(shell $(top_builddir)/gccver)-mt
 
 server_LDADD =                              \
     $(top_builddir)/src/libhpx.a            \
-    -L /home/hkaiser/packages/boost/lib/    \
+    -L $(HOME)/packages/boost/lib/    \
     -lboost_filesystem$(SUFF)               \
     -lboost_date_time$(SUFF)                \
     -lboost_thread$(SUFF)                   \
@@ -15,7 +15,7 @@ server_LDADD =                              \
 
 client_LDADD =                              \
     $(top_builddir)/src/libhpx.a            \
-    -L/home/hkaiser/packages/boost/lib/     \
+    -L $(HOME)/packages/boost/lib/     \
     -lboost_filesystem$(SUFF)               \
     -lboost_date_time$(SUFF)                \
     -lboost_thread$(SUFF)                   \
