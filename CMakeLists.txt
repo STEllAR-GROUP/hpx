@@ -33,9 +33,12 @@ if(WIN32)
     add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
 endif(WIN32)
 
+#target_link_libraries ( libboost_system-gcc34-mt-1_35.so
+#libboost_thread-gcc34-mt.so )
+
 # Recurse into the "src" and "test" subdirectories.  This does not actually
 # cause another cmake executable to run.  The same process will walk through
 # the project's entire directory structure.
 add_subdirectory (src)
-#add_subdirectory (examples)
+add_subdirectory (examples)
 

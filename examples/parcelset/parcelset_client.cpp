@@ -191,7 +191,7 @@ int main(int argc, char* argv[])
         dgas_c.get_prefix(remote_l, remote_prefix);
         
         // start parcelport receiver thread
-        boost::thread t1(boost::bind(&hpx::parcelset:parcelport::run, &pp, true));
+        boost::thread t1(boost::bind(&hpx::parcelset::parcelport::run, &pp, true));
 
         std::cout << "Parcelset (client) listening at port: " << ps_port 
                   << std::flush << std::endl;
