@@ -49,13 +49,13 @@ namespace hpx { namespace lcos { namespace detail
             if (1 == d.which())
             {
                 // an error has been reported in the meantime, throw 
-                error_type e = get<error_type>(d);
+                error_type e = boost::get<error_type>(d);
                 boost::throw_exception(
                     boost::system::system_error(e.first, e.second));
             }
 
             // no error has been reported, return the result
-            return get<result_type>(d);
+            return boost::get<result_type>(d);
         };
 
         ///////////////////////////////////////////////////////////////////////
