@@ -127,6 +127,11 @@ namespace hpx { namespace threadmanager
                 new detail::px_thread(threadfunc, impl_.get(), new_state));
         }
 
+        thread_id_type get_thread_id() const
+        {
+            return impl_.get();
+        }
+
         thread_state get_state() const 
         {
             return (*impl_)->get_state();

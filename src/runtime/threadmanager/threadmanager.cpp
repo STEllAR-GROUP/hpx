@@ -1,4 +1,4 @@
-//  Copyright (c) 2008-2009 Chirag Dekate, Hartmut Kaiser
+//  Copyright (c) 2008-2009 Chirag Dekate, Hartmut Kaiser, Anshul Tandon
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,8 +16,13 @@ namespace hpx { namespace threadmanager
     {
         // lock queue when adding work
         mutex_type::scoped_lock lk(mtx_);
-        work_items_.push(boost::shared_ptr<px_thread>(
-            new px_thread(threadfunc, pending)));
+
+        boost::shared_ptr<px_thread> px_t_sp = 
+            boost::shared_ptr<px_thread>(new px_thread(threadfunc, pending));
+        work_items_.push(px_t_sp);
+
+        // add a new entry in the std::map for this thread
+        thread_map_.insert(map_pair(px_t_sp->get_thread_id(), px_t_sp));
 
         if (running_) 
             cond_.notify_one();           // try to execute the new work item
@@ -86,11 +91,13 @@ namespace hpx { namespace threadmanager
                 }
                 
                 // re-add this work item to our list of work items if appropriate
-                if (new_state == pending) 
+                if (new_state == pending || new_state == suspended) 
                     work_items_.push(thrd);
+
+                // remove the mapping from thread_set_ if thread is depleted or terminated
+                if (new_state == depleted || new_state == terminated)
+                    thread_map_.erase(thrd->get_thread_id());
             }
-            // if thread is suspended  then push to suspended map
-            //CND
 
             // try to execute as much work as available, but try not to 
             // schedule a certain component more than once

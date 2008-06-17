@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2008 Chirag Dekate, Hartmut Kaiser
+//  Copyright (c) 2007-2008 Chirag Dekate, Hartmut Kaiser, Anshul Tandon
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -31,8 +31,11 @@ namespace hpx { namespace threadmanager
             std::queue <boost::shared_ptr<hpx::threadmanager::px_thread> > 
         work_items_type;
 
-// add set / map / datastructure for suspended threads
- //       typedef std::queue<hpx::threadmanager::px_thread> work_items_type;
+        typedef
+            std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread>>
+        thread_map_type;
+
+        typedef std::pair <px_thread::thread_id_type, boost::shared_ptr<px_thread>> map_pair;
 
         typedef boost::mutex mutex_type;
         friend struct unlock_the_lock;
@@ -110,8 +113,20 @@ namespace hpx { namespace threadmanager
         ///                 thread is not known to the threadmanager the return 
         ///                 value will be \a thread_state#unknown.
         thread_state set_state(px_thread::thread_id_type id, 
-            thread_state newstate)
+            thread_state new_state)
         {
+            map_iter_ = thread_map_.find(id);
+            if (map_iter_ != thread_map_.end())
+            {
+                boost::shared_ptr<px_thread> px_t = map_iter_->second;
+                thread_state previous_state = px_t->get_state();
+
+                if (previous_state == active);
+                    // do some juggling
+                else
+                    px_t->set_state(new_state);
+                return previous_state;
+            }
             return unknown;
         }
 
@@ -129,6 +144,12 @@ namespace hpx { namespace threadmanager
         ///                 value will be \a thread_state#unknown.
         thread_state get_state(px_thread::thread_id_type id)
         {
+            map_iter_ = thread_map_.find(id);
+            if (map_iter_ != thread_map_.end())
+            {
+                boost::shared_ptr<px_thread> px_t = map_iter_->second;
+                return px_t->get_state();
+            }
             return unknown;
         }
 
@@ -136,7 +157,7 @@ namespace hpx { namespace threadmanager
         /// this notifies the thread manager that there is some more work 
         /// available 
         void do_some_work()
-        {
+       { 
             mutex_type::scoped_lock lk(mtx_);
             if (running_) 
                 cond_.notify_one();
@@ -148,6 +169,9 @@ namespace hpx { namespace threadmanager
 
     private:
         boost::thread *run_thread_;         /// this thread manager has exactly one thread
+        
+        thread_map_type thread_map_;        /// mapping of LVAs of threads
+        std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread>> :: const_iterator map_iter_;
 
         work_items_type work_items_;        /// list of active work items
         bool running_;                      /// thread manager has bee started
