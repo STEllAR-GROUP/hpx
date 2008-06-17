@@ -32,10 +32,10 @@ namespace hpx { namespace threadmanager
         work_items_type;
 
         typedef
-            std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread>>
+            std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread> >
         thread_map_type;
 
-        typedef std::pair <px_thread::thread_id_type, boost::shared_ptr<px_thread>> map_pair;
+        typedef std::pair <px_thread::thread_id_type, boost::shared_ptr<px_thread> > map_pair;
 
         typedef boost::mutex mutex_type;
         friend struct unlock_the_lock;
@@ -171,7 +171,7 @@ namespace hpx { namespace threadmanager
         boost::thread *run_thread_;         /// this thread manager has exactly one thread
         
         thread_map_type thread_map_;        /// mapping of LVAs of threads
-        std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread>> :: const_iterator map_iter_;
+        std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread> > :: const_iterator map_iter_;
 
         work_items_type work_items_;        /// list of active work items
         bool running_;                      /// thread manager has bee started
