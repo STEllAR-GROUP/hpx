@@ -54,7 +54,9 @@ namespace hpx { namespace threadmanager
         }
 
         /// This adds a new work item to the thread manager
-        void register_work(boost::function<thread_function_type> threadfunc);
+        px_thread::thread_id_type threadmanager::register_work( 
+            boost::function<thread_function_type> threadfunc,
+            thread_state initial_state = pending);
         
         /// run the threadmanager's work queue
         bool run() 
@@ -149,7 +151,7 @@ namespace hpx { namespace threadmanager
         
         work_items_type work_items_;        /// list of active work items
         bool running_;                      /// thread manager has bee started
-        mutex_type mtx_;                    /// mutex protecting the members
+        mutable mutex_type mtx_;            /// mutex protecting the members
         boost::condition cond_;             /// used to trigger some action
     };
 

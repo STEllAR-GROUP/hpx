@@ -12,23 +12,35 @@
 namespace hpx { namespace threadmanager
 {
     ///////////////////////////////////////////////////////////////////////////
-    void threadmanager::register_work( 
-        boost::function<thread_function_type> threadfunc)
+    px_thread::thread_id_type threadmanager::register_work( 
+        boost::function<thread_function_type> threadfunc, thread_state initial_state)
     {
+        // throw an error if the initial state is neither pending nor suspended
+        if (!(initial_state == pending || initial_state == suspended))
+        {
+            throw hpx::exception(hpx::bad_parameter);
+        }
+
+        boost::shared_ptr<px_thread> px_t_sp(new px_thread(threadfunc, initial_state));
+
         // lock queue when adding work
         mutex_type::scoped_lock lk(mtx_);
-
-        boost::shared_ptr<px_thread> px_t_sp = 
-            boost::shared_ptr<px_thread>(new px_thread(threadfunc, pending));
 
         // add a new entry in the std::map for this thread
         thread_map_.insert(map_pair(px_t_sp->get_thread_id(), px_t_sp));
 
-        // pushing the new thread in the pending queue thread
-        work_items_.push(px_t_sp);
+        // only insert in the work-items queue if it is pending
+        if (initial_state == pending)
+        {
+            // pushing the new thread in the pending queue thread
+            work_items_.push(px_t_sp);
 
-        if (running_) 
-            cond_.notify_one();           // try to execute the new work item
+            if (running_) 
+                cond_.notify_one();           // try to execute the new work item
+        }
+
+        // return the thread_id of the newly created thread
+        return px_t_sp->get_thread_id();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -75,12 +87,11 @@ namespace hpx { namespace threadmanager
     thread_state threadmanager::set_state(px_thread::thread_id_type id, thread_state new_state)
     {
         mutex_type::scoped_lock lk(mtx_);
-        unlock_the_lock l(lk);
-        std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread> > :: const_iterator map_iter_;
-        map_iter_ = thread_map_.find(id);
-        if (map_iter_ != thread_map_.end())
+        thread_map_type :: iterator map_iter;
+        map_iter = thread_map_.find(id);
+        if (map_iter != thread_map_.end())
         {
-            boost::shared_ptr<px_thread> px_t = map_iter_->second;
+            boost::shared_ptr<px_thread> px_t = map_iter->second;
             thread_state previous_state = px_t->get_state();
 
             if (previous_state == active);
@@ -98,11 +109,12 @@ namespace hpx { namespace threadmanager
     /// to query the state of one of the threads known to the threadmanager
     thread_state threadmanager::get_state(px_thread::thread_id_type id) const
     {
-        std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread> > :: const_iterator map_iter_;
-        map_iter_ = thread_map_.find(id);
-        if (map_iter_ != thread_map_.end())
+        mutex_type::scoped_lock lk(mtx_);
+        thread_map_type :: const_iterator map_iter;
+        map_iter = thread_map_.find(id);
+        if (map_iter != thread_map_.end())
         {
-            boost::shared_ptr<px_thread> px_t = map_iter_->second;
+            boost::shared_ptr<px_thread> px_t = map_iter->second;
             return px_t->get_state();
         }
         return unknown;
@@ -134,10 +146,6 @@ namespace hpx { namespace threadmanager
                 // re-add this work item to our list of work items if appropriate
                 if (new_state == pending) 
                     work_items_.push(thrd);
-
-                // don't do anything if the thread is suspended
-                if (new_state == suspended);
-                    // do something here
 
                 // remove the mapping from thread_set_ if thread is depleted or terminated
                 if (new_state == depleted || new_state == terminated)
