@@ -112,6 +112,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "applier_test_client", "appl
 		{E6C6C6C4-6959-4B47-B92A-6323A906CC40} = {E6C6C6C4-6959-4B47-B92A-6323A906CC40}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "thread_state_test_projects", "thread_state_test_projects", "{5103BA38-DBEF-4CA5-96F6-0D80EA438D2F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "thread_state_test", "thread_state_test_client\thread_state_test_client.vcproj", "{80B8F992-D8EA-4E8A-BB5D-6B62D2F453A1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E6C6C6C4-6959-4B47-B92A-6323A906CC40} = {E6C6C6C4-6959-4B47-B92A-6323A906CC40}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -320,6 +327,16 @@ Global
 		{FACAE50A-84BF-4EEC-B897-B0A2819709BB}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{FACAE50A-84BF-4EEC-B897-B0A2819709BB}.Release|Win32.ActiveCfg = Release|Win32
 		{FACAE50A-84BF-4EEC-B897-B0A2819709BB}.Release|Win32.Build.0 = Release|Win32
+		{80B8F992-D8EA-4E8A-BB5D-6B62D2F453A1}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{80B8F992-D8EA-4E8A-BB5D-6B62D2F453A1}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{80B8F992-D8EA-4E8A-BB5D-6B62D2F453A1}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{80B8F992-D8EA-4E8A-BB5D-6B62D2F453A1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{80B8F992-D8EA-4E8A-BB5D-6B62D2F453A1}.Debug|Win32.Build.0 = Debug|Win32
+		{80B8F992-D8EA-4E8A-BB5D-6B62D2F453A1}.Release|Any CPU.ActiveCfg = Release|Win32
+		{80B8F992-D8EA-4E8A-BB5D-6B62D2F453A1}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{80B8F992-D8EA-4E8A-BB5D-6B62D2F453A1}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{80B8F992-D8EA-4E8A-BB5D-6B62D2F453A1}.Release|Win32.ActiveCfg = Release|Win32
+		{80B8F992-D8EA-4E8A-BB5D-6B62D2F453A1}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -346,6 +363,6 @@ Global
 		{098B27CF-ED5F-40E2-85A0-92501664595E} = {43240C82-CC1C-4818-8338-733676739112}
 		{68071A94-19F9-442A-8CF3-364C42F990CE} = {C78C7B04-5FE5-4692-9952-733219E10B57}
 		{FACAE50A-84BF-4EEC-B897-B0A2819709BB} = {C78C7B04-5FE5-4692-9952-733219E10B57}
-		{098B27CF-ED5F-40E2-85A0-92501664595E} = {43240C82-CC1C-4818-8338-733676739112}
+		{80B8F992-D8EA-4E8A-BB5D-6B62D2F453A1} = {5103BA38-DBEF-4CA5-96F6-0D80EA438D2F}
 	EndGlobalSection
 EndGlobal
