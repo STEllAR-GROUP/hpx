@@ -100,6 +100,10 @@ namespace hpx { namespace threadmanager
             // not to what is returned by the active thread
             else
                 px_t->set_state(new_state);
+
+            if (new_state == pending)
+                work_items_.push(px_t);
+
             return previous_state;
         }
         return unknown;
