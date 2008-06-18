@@ -115,6 +115,7 @@ namespace hpx { namespace threadmanager
         thread_state set_state(px_thread::thread_id_type id, 
             thread_state new_state)
         {
+            std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread>> :: const_iterator map_iter_;
             map_iter_ = thread_map_.find(id);
             if (map_iter_ != thread_map_.end())
             {
@@ -122,7 +123,9 @@ namespace hpx { namespace threadmanager
                 thread_state previous_state = px_t->get_state();
 
                 if (previous_state == active);
-                    // do some juggling
+                    // do some juggling 
+                    // need to set the state of the thread to new_state,
+                    // not to what is returned by the active thread
                 else
                     px_t->set_state(new_state);
                 return previous_state;
@@ -142,8 +145,9 @@ namespace hpx { namespace threadmanager
         ///                 \a thread_state enumeration. If the 
         ///                 thread is not known to the threadmanager the return 
         ///                 value will be \a thread_state#unknown.
-        thread_state get_state(px_thread::thread_id_type id)
+        thread_state get_state(px_thread::thread_id_type id) const
         {
+            std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread>> :: const_iterator map_iter_;
             map_iter_ = thread_map_.find(id);
             if (map_iter_ != thread_map_.end())
             {
@@ -170,9 +174,8 @@ namespace hpx { namespace threadmanager
     private:
         boost::thread *run_thread_;         /// this thread manager has exactly one thread
         
-        thread_map_type thread_map_;        /// mapping of LVAs of threads
-        std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread> > :: const_iterator map_iter_;
-
+        thread_map_type thread_map_;        /// mapping of LVAs to thread IDs
+        
         work_items_type work_items_;        /// list of active work items
         bool running_;                      /// thread manager has bee started
         mutex_type mtx_;                    /// mutex protecting the members

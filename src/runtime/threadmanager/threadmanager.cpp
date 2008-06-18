@@ -19,10 +19,12 @@ namespace hpx { namespace threadmanager
 
         boost::shared_ptr<px_thread> px_t_sp = 
             boost::shared_ptr<px_thread>(new px_thread(threadfunc, pending));
-        work_items_.push(px_t_sp);
 
         // add a new entry in the std::map for this thread
         thread_map_.insert(map_pair(px_t_sp->get_thread_id(), px_t_sp));
+
+        // pushing the new thread in the pending queue thread
+        work_items_.push(px_t_sp);
 
         if (running_) 
             cond_.notify_one();           // try to execute the new work item
