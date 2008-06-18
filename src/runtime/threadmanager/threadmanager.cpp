@@ -75,8 +75,8 @@ namespace hpx { namespace threadmanager
     thread_state threadmanager::set_state(px_thread::thread_id_type id, thread_state new_state)
     {
         mutex_type::scoped_lock lk(mtx_);
-        unlock_the_lock l(lk);    
-        std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread>> :: const_iterator map_iter_;
+        unlock_the_lock l(lk);
+        std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread> > :: const_iterator map_iter_;
         map_iter_ = thread_map_.find(id);
         if (map_iter_ != thread_map_.end())
         {
@@ -98,7 +98,7 @@ namespace hpx { namespace threadmanager
     /// to query the state of one of the threads known to the threadmanager
     thread_state threadmanager::get_state(px_thread::thread_id_type id) const
     {
-        std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread>> :: const_iterator map_iter_;
+        std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread> > :: const_iterator map_iter_;
         map_iter_ = thread_map_.find(id);
         if (map_iter_ != thread_map_.end())
         {
