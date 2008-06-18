@@ -112,26 +112,7 @@ namespace hpx { namespace threadmanager
         ///                 \a thread_state enumeration. If the 
         ///                 thread is not known to the threadmanager the return 
         ///                 value will be \a thread_state#unknown.
-        thread_state set_state(px_thread::thread_id_type id, 
-            thread_state new_state)
-        {
-            std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread>> :: const_iterator map_iter_;
-            map_iter_ = thread_map_.find(id);
-            if (map_iter_ != thread_map_.end())
-            {
-                boost::shared_ptr<px_thread> px_t = map_iter_->second;
-                thread_state previous_state = px_t->get_state();
-
-                if (previous_state == active);
-                    // do some juggling 
-                    // need to set the state of the thread to new_state,
-                    // not to what is returned by the active thread
-                else
-                    px_t->set_state(new_state);
-                return previous_state;
-            }
-            return unknown;
-        }
+        thread_state set_state(px_thread::thread_id_type id, thread_state new_state);
 
         /// The set_state function is part of the thread related API and allows
         /// to query the state of one of the threads known to the threadmanager
@@ -145,23 +126,13 @@ namespace hpx { namespace threadmanager
         ///                 \a thread_state enumeration. If the 
         ///                 thread is not known to the threadmanager the return 
         ///                 value will be \a thread_state#unknown.
-        thread_state get_state(px_thread::thread_id_type id) const
-        {
-            std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread>> :: const_iterator map_iter_;
-            map_iter_ = thread_map_.find(id);
-            if (map_iter_ != thread_map_.end())
-            {
-                boost::shared_ptr<px_thread> px_t = map_iter_->second;
-                return px_t->get_state();
-            }
-            return unknown;
-        }
+        thread_state get_state(px_thread::thread_id_type id) const;
 
     public:
         /// this notifies the thread manager that there is some more work 
         /// available 
         void do_some_work()
-       { 
+        { 
             mutex_type::scoped_lock lk(mtx_);
             if (running_) 
                 cond_.notify_one();

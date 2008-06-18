@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/asio.hpp>
+#include <boost/assert.hpp>
 
 #include <hpx/runtime/threadmanager/threadmanager.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
@@ -69,6 +70,44 @@ namespace hpx { namespace threadmanager
     };
 #endif
 
+    /// The set_state function is part of the thread related API and allows
+    /// to change the state of one of the threads managed by this 
+    thread_state threadmanager::set_state(px_thread::thread_id_type id, thread_state new_state)
+    {
+        mutex_type::scoped_lock lk(mtx_);
+        unlock_the_lock l(lk);    
+        std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread>> :: const_iterator map_iter_;
+        map_iter_ = thread_map_.find(id);
+        if (map_iter_ != thread_map_.end())
+        {
+            boost::shared_ptr<px_thread> px_t = map_iter_->second;
+            thread_state previous_state = px_t->get_state();
+
+            if (previous_state == active);
+            // do some juggling 
+            // need to set the state of the thread to new_state,
+            // not to what is returned by the active thread
+            else
+                px_t->set_state(new_state);
+            return previous_state;
+        }
+        return unknown;
+    }
+
+    /// The set_state function is part of the thread related API and allows
+    /// to query the state of one of the threads known to the threadmanager
+    thread_state threadmanager::get_state(px_thread::thread_id_type id) const
+    {
+        std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread>> :: const_iterator map_iter_;
+        map_iter_ = thread_map_.find(id);
+        if (map_iter_ != thread_map_.end())
+        {
+            boost::shared_ptr<px_thread> px_t = map_iter_->second;
+            return px_t->get_state();
+        }
+        return unknown;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // main function executed by a OS thread
     void threadmanager::tfunc()
@@ -86,15 +125,19 @@ namespace hpx { namespace threadmanager
                 work_items_.pop();
 
                 // make sure lock is unlocked during execution of work item
-                if (thrd->get_state() == pending)
+                BOOST_ASSERT(thrd->get_state() == pending);
                 {
                     unlock_the_lock l(lk);    
                     new_state = (*thrd)();
-                }
+                }   // the lock gets locked here!
                 
                 // re-add this work item to our list of work items if appropriate
-                if (new_state == pending || new_state == suspended) 
+                if (new_state == pending) 
                     work_items_.push(thrd);
+
+                // don't do anything if the thread is suspended
+                if (new_state == suspended);
+                    // do something here
 
                 // remove the mapping from thread_set_ if thread is depleted or terminated
                 if (new_state == depleted || new_state == terminated)
