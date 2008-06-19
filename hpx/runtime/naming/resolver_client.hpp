@@ -139,7 +139,7 @@ namespace hpx { namespace naming
         ///                   and the given local address replaced the 
         ///                   previously associated local address. Any error 
         ///                   results in an exception thrown from this function.
-        bool bind(id_type id, address const& addr) const
+        bool bind(id_type const& id, address const& addr) const
         {
             return bind_range(id, 1, addr, 0);
         }
@@ -167,7 +167,7 @@ namespace hpx { namespace naming
         ///                   has been successfully bound and returns \a false 
         ///                   otherwise. Any error results in an exception 
         ///                   thrown from this function.
-        bool bind_range(id_type lower_id, std::size_t count, 
+        bool bind_range(id_type const& lower_id, std::size_t count, 
             address const& baseaddr, std::ptrdiff_t offset) const;
 
         /// \brief Asynchronously bind unique range of global ids to given base 
@@ -204,7 +204,7 @@ namespace hpx { namespace naming
         ///                   blocking. The operation is guaranteed to be 
         ///                   fully executed only after f.get() has been called.
         util::unique_future<bool> 
-            bind_range_async(id_type lower_id, std::size_t count, 
+            bind_range_async(id_type const& lower_id, std::size_t count, 
                 address const& baseaddr, std::ptrdiff_t offset);
             
         /// \brief Unbind a global address
@@ -225,7 +225,7 @@ namespace hpx { namespace naming
         ///                   function \a bind. Do not use this function to 
         ///                   unbind any of the global ids bound using 
         ///                   \a bind_range.
-        bool unbind(id_type id) const
+        bool unbind(id_type const& id) const
         {
             address addr;   // ignore the return value
             return unbind_range(id, 1, addr);
@@ -253,7 +253,7 @@ namespace hpx { namespace naming
         ///                   function \a bind. Do not use this function to 
         ///                   unbind any of the global ids bound using 
         ///                   \a bind_range.
-        bool unbind(id_type id, address& addr) const
+        bool unbind(id_type const& id, address& addr) const
         {
             return unbind_range(id, 1, addr);
         }
@@ -280,7 +280,7 @@ namespace hpx { namespace naming
         ///                   function \a bind_range. Do not use this function 
         ///                   to unbind any of the global ids bound using 
         ///                   \a bind.
-        bool unbind_range(id_type lower_id, std::size_t count) const
+        bool unbind_range(id_type const& lower_id, std::size_t count) const
         {
             address addr;   // ignore the return value
             return unbind_range(lower_id, 1, addr);
@@ -312,7 +312,8 @@ namespace hpx { namespace naming
         ///                   function \a bind_range. Do not use this function 
         ///                   to unbind any of the global ids bound using 
         ///                   \a bind.
-        bool unbind_range(id_type lower_id, std::size_t count, address& addr) const;
+        bool unbind_range(id_type const& lower_id, std::size_t count, 
+            address& addr) const;
         
         /// \brief Asynchronously unbind the given range of global ids
         ///
@@ -344,7 +345,7 @@ namespace hpx { namespace naming
         ///                   blocking. The operation is guaranteed to be 
         ///                   fully executed only after f.get() has been called.
         util::unique_future<bool> 
-            unbind_range_async(id_type lower_id, std::size_t count);
+            unbind_range_async(id_type const& lower_id, std::size_t count);
 
         /// \brief Resolve a given global address (id) to its associated local 
         ///        address
@@ -366,7 +367,7 @@ namespace hpx { namespace naming
         ///                   function returns \a false if no association exists 
         ///                   for the given global address. Any error results 
         ///                   in an exception thrown from this function.
-        bool resolve(id_type id, address& addr) const;
+        bool resolve(id_type const& id, address& addr) const;
 
         /// \brief Asynchronously resolve a given global address (id) to its 
         ///        associated local address
@@ -396,7 +397,7 @@ namespace hpx { namespace naming
         ///                   blocking. The operation is guaranteed to be 
         ///                   fully executed only after f.get() has been called.
         util::unique_future<std::pair<bool, address> >
-            resolve_async(id_type id);
+            resolve_async(id_type const& id);
 
         /// \brief Register a global name with a global address (id)
         /// 
@@ -416,7 +417,7 @@ namespace hpx { namespace naming
         ///                   global address with the global address (id) 
         ///                   given as the parameter. Any error results in an 
         ///                   exception thrown from this function.
-        bool registerid(std::string const& name, id_type id) const;
+        bool registerid(std::string const& name, id_type const& id) const;
 
         /// \brief Unregister a global name (release any existing association)
         ///

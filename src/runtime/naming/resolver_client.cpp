@@ -134,7 +134,7 @@ namespace hpx { namespace naming
         return s == success;
     }
     
-    bool resolver_client::bind_range(id_type id, std::size_t count, 
+    bool resolver_client::bind_range(id_type const& id, std::size_t count, 
         address const& addr, std::ptrdiff_t offset) const
     {
         // send request
@@ -149,7 +149,7 @@ namespace hpx { namespace naming
         return s == success;
     }
 
-    bool resolver_client::unbind_range(id_type id, std::size_t count, 
+    bool resolver_client::unbind_range(id_type const& id, std::size_t count, 
         address& addr) const
     {
         // send request
@@ -165,7 +165,7 @@ namespace hpx { namespace naming
         return s == success;
     }
 
-    bool resolver_client::resolve(id_type id, address& addr) const
+    bool resolver_client::resolve(id_type const& id, address& addr) const
     {
         // send request
         server::request req (server::command_resolve, id);
@@ -180,7 +180,8 @@ namespace hpx { namespace naming
         return s == success;
     }
 
-    bool resolver_client::registerid(std::string const& ns_name, id_type id) const
+    bool resolver_client::registerid(std::string const& ns_name, 
+        id_type const& id) const
     {
         // send request
         server::request req (server::command_registerid, ns_name, id);
@@ -359,7 +360,7 @@ namespace hpx { namespace naming
     ///////////////////////////////////////////////////////////////////////////
     // asynchronous API
     util::unique_future<bool> 
-    resolver_client::bind_range_async(id_type lower_id, std::size_t count, 
+    resolver_client::bind_range_async(id_type const& lower_id, std::size_t count, 
         address const& addr, std::ptrdiff_t offset)
     {
         typedef resolver_client_connection<bool> connection_type;
@@ -374,7 +375,7 @@ namespace hpx { namespace naming
     }
 
     util::unique_future<bool> 
-    resolver_client::unbind_range_async(id_type lower_id, std::size_t count)
+    resolver_client::unbind_range_async(id_type const& lower_id, std::size_t count)
     {
         typedef resolver_client_connection<bool> connection_type;
         
@@ -388,7 +389,7 @@ namespace hpx { namespace naming
     }
 
     util::unique_future<std::pair<bool, address> >  
-    resolver_client::resolve_async(id_type id)
+    resolver_client::resolve_async(id_type const& id)
     {
         typedef 
             resolver_client_connection<std::pair<bool, address> > 
