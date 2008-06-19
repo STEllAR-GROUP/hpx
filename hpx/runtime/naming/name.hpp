@@ -8,8 +8,13 @@
 #define HPX_NAMING_NAME_MAR_24_2008_0942AM
 
 #include <boost/cstdint.hpp>
+#include <boost/serialization/version.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <hpx/util/safe_bool.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+// Version of id_type
+#define HPX_IDTYPE_VERSION 0x10
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming
@@ -143,5 +148,10 @@ namespace hpx { namespace naming
     
 ///////////////////////////////////////////////////////////////////////////////
 }}
+
+///////////////////////////////////////////////////////////////////////////////
+// this is the current version of the id_type serialization format
+BOOST_CLASS_VERSION(hpx::naming::id_type, HPX_IDTYPE_VERSION)
+BOOST_CLASS_TRACKING(hpx::naming::id_type, boost::serialization::track_never)
 
 #endif 

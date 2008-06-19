@@ -347,5 +347,6 @@ namespace hpx { namespace naming { namespace server
 // this is the current version of the parcel serialization format
 // this definition needs to be in the global namespace
 BOOST_CLASS_VERSION(hpx::naming::server::reply, HPX_REPLY_VERSION)
+BOOST_CLASS_TRACKING(hpx::naming::server::reply, boost::serialization::track_never)
 
 #endif 

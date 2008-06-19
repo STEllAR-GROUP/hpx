@@ -46,7 +46,7 @@ threadmanager::thread_state test1(threadmanager::px_thread_self& self,
 threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self, 
     applier::applier& appl)
 {
-    // schedule test threads 
+    // schedule test threads: test1
     appl.get_thread_manager().register_work(
         boost::bind(&test1, _1, boost::ref(appl)));
 
@@ -79,10 +79,7 @@ int main(int argc, char* argv[])
         
         // initialize and start the HPX runtime
         hpx::runtime rt(host, dgas_port, host, ps_port);
-        rt.start(hpx_main);
-
-        // stop the runtime, wait for threads to finish
-        rt.stop();
+        rt.run(hpx_main);
     }
     catch (std::exception& e) {
         BOOST_TEST(false);
