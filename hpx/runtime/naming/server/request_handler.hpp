@@ -48,8 +48,8 @@ namespace hpx { namespace naming { namespace server
         // collect statistics
         void add_timing(boost::uint8_t command, double elapsed)
         {
-            if (command >= command_firstcommand && 
-                command < command_lastcommand)
+            if ((std::size_t)command >= command_firstcommand && 
+                (std::size_t)command < command_lastcommand)
             {
 #if BOOST_VERSION >= 103600
                 totals_[command](elapsed);

@@ -12,6 +12,7 @@
 #include <boost/type_traits/alignment_of.hpp>
 #include <boost/type_traits/add_pointer.hpp>
 
+#include <hpx/util/static.hpp>
 #include <hpx/lcos/full_empty_store.hpp>
 
 namespace hpx { namespace lcos
@@ -31,8 +32,6 @@ namespace hpx { namespace lcos
     /// very large number of addresses in the system, relatively few will be in 
     /// a non-default (full, no waiters) state at any one time.
     ///
-    /// \note This class is mostly not implemented yet
-    ///
     template <typename T>
     class full_empty : boost::noncopyable
     {
@@ -40,38 +39,35 @@ namespace hpx { namespace lcos
         typedef T value_type;
         
     public:
-        /// Create a new full/empty storage in empty state
-        full_empty(threadmanager::px_thread_self& self) 
+        /// \brief Create a new full/empty storage in empty state
+        full_empty() 
         {
-            empty(self);
+            set_empty();
         }
 
-        /// Create a new full/empty storage in full state, initializing it with 
-        /// the value provided
-        full_empty(threadmanager::px_thread_self& self, value_type const& t)
-        {
-            set(self, t);
-        }
-
-        /// Destruct the full/empty data item
+        /// \brief Destruct the full/empty data item
         ~full_empty()
         {
+            BOOST_ASSERT(!get_store().is_used(get_address()));
+            get_store().remove(get_address());
         }
 
-        /// Atomically set the state to empty
-        void empty(threadmanager::px_thread_self& self)
+        /// \brief Atomically set the state to empty
+        void set_empty()
         {
+            get_store().set_empty(get_address());
         }
         
-        /// Atomically set the state to full
-        void fill(threadmanager::px_thread_self& self)
+        /// \brief Atomically set the state to full
+        void set_full()
         {
+            get_store().set_full(get_address());
         }
         
-        /// Query the current state of the memory
-        bool is_empty(threadmanager::px_thread_self& self)
+        /// \brief Query the current state of the memory
+        bool is_empty() const
         {
-            return false;   // assume memory to be full (for now)
+            return get_store().is_empty(get_address());
         }
         
         /// Wait for the memory to become full and then reads it, leaves memory
@@ -80,29 +76,27 @@ namespace hpx { namespace lcos
         /// \note When memory becomes full, all \a px_threads waiting for it
         ///       to become full with a read will receive the value at once and 
         ///       will be queued to run.
-        value_type const& read(threadmanager::px_thread_self& self) const
+        void read(threadmanager::px_thread_self& self, value_type& dest)
         {
-            self.yield(threadmanager::suspended);
-            return get_data();
+            get_store().read(self, get_address(), dest);
         }
 
-        /// Wait for memory to become full and then set it to empty, returning 
-        /// new value.
+        /// Wait for memory to become full and then reads it, sets memory to 
+        /// empty.
         ///
         /// \note When memory becomes full, only one thread blocked like this 
         ///       will be queued to run.
-        value_type const& read_and_empty(threadmanager::px_thread_self& self) const
+        void read_and_empty(threadmanager::px_thread_self& self, 
+            value_type& dest) 
         {
-            self.yield(threadmanager::suspended);
-            return get_data();
+            return get_store().read_and_empty(self, get_address(), dest);
         }
 
         /// Writes memory and atomically sets its state to full without waiting 
         /// for it to become empty.
         void set(threadmanager::px_thread_self& self, value_type const& data)
         {
-            get_data() = data;
-            fill(self);
+            get_store().set(self, get_address(), data);
         }
 
         /// Wait for memory to become empty, and then fill it.
@@ -111,25 +105,34 @@ namespace hpx { namespace lcos
         ///       will be queued to run.
         void write(threadmanager::px_thread_self& self, value_type const& data)
         {
-            get_data() = data;
-            fill(self);
+            get_store().write(self, get_address(), data);
+        }
+
+    private:
+        // there is exactly one empty/full store where all memory blocks are 
+        // stored
+        typedef detail::full_empty_store store_type;
+        struct full_empty_tag {};
+        
+        static store_type& get_store()
+        {
+            // ensure thread-safe initialization
+            static util::static_<store_type, full_empty_tag> store;
+            return store.get();
         }
 
     private:
         // type safe accessors to the stored data
         typedef typename boost::add_pointer<value_type>::type pointer;
         typedef typename boost::add_pointer<value_type const>::type const_pointer;
-        
-        typedef typename boost::call_traits<T>::reference reference;
-        typedef typename boost::call_traits<T>::const_reference const_reference;
 
-        reference get_data()
+        pointer get_address()
         {
-            return *static_cast<pointer>(data_.address());
+            return static_cast<pointer>(data_.address());
         }
-        const_reference get_data() const
+        const_pointer get_address() const
         {
-            return *static_cast<const_pointer>(data_.address());
+            return static_cast<const_pointer>(data_.address());
         }
 
         // the stored data needs to be properly aligned

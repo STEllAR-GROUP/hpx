@@ -19,6 +19,37 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx 
 {
+    /// This is the signature expected to be exposed by a function registered 
+    /// as HPX's 'main' function. This main function is the easiest way of 
+    /// bootstrapping an application
+    typedef threadmanager::thread_state hpx_main_function_type(
+        threadmanager::px_thread_self&, applier::applier&);
+
+    namespace detail
+    {
+        /// The mainfunc helper template is used to encapsulate the 
+        /// function or function object passed to runtime#start to avoid using
+        /// boost::bind for this purpose (boost::bind doesn't work well if it
+        /// gets another function object passed, which has been constructed by
+        /// boost::bind as well).
+        struct mainfunc
+        {
+            mainfunc(boost::function<hpx_main_function_type> func, 
+                    applier::applier& appl)
+              : func_(func), appl_(appl)
+            {}
+
+            threadmanager::thread_state 
+            operator()(threadmanager::px_thread_self& self)
+            {
+                return func_(self, appl_);
+            }
+            
+            boost::function<hpx_main_function_type> func_;
+            applier::applier& appl_;
+        };
+    }
+
     /// The \a runtime class encapsulates the HPX runtime system in a simple to 
     /// use way. It makes sure all required parts of the HPX runtime system are
     /// properly initialized. 
@@ -67,19 +98,38 @@ namespace hpx
             action_manager_(applier_)
         {}
 
+        ~runtime()
+        {
+            // stop all services
+            parcel_port_.stop();
+            thread_manager_.stop();
+            dgas_pool_.stop();
+        }
+
         /// \brief Start the runtime system
         ///
+        /// \param func       [in] This is the main function of an HPX 
+        ///                   application. It will be scheduled for execution
+        ///                   by the thread manager as soon as the runtime has 
+        ///                   been initialized. This function is expected to 
+        ///                   expose an interface as defined by the typedef
+        ///                   \a hpx_main_function_type.
         /// \param blocking   [in] This allows to control whether this 
         ///                   call blocks until the runtime system has been 
         ///                   stopped
-        ///
-        /// \returns          The return value is \a true if \start() has been
-        ///                   called for the first time on this runtime instance
-        ///                   and will return \a false otherwise.
-        bool start(bool blocking = true)
+        void start(boost::function<hpx_main_function_type> func, 
+            bool blocking = false)
         {
-            thread_manager_.run();
-            return parcel_port_.run(blocking);     // starts parcel_pool_ as well
+            // start services (service threads)
+            thread_manager_.run();        // start the thread manager
+            parcel_port_.run(false);      // starts parcel_pool_ as well
+
+            // register the given main function with the thread manager
+            thread_manager_.register_work(detail::mainfunc(func, applier_));
+
+            // block if required
+            if (blocking)
+                parcel_port_.run(true);
         }
 
         /// Stop the runtime system
@@ -150,6 +200,7 @@ namespace hpx
         applier::applier applier_;
         action_manager::action_manager action_manager_;
     };
-}
+
+}   // namespace hpx
 
 #endif

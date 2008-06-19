@@ -375,6 +375,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\hpx\util\unlock_lock.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\util\util.hpp"
 					>
 				</File>
@@ -612,7 +616,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\docs\Doxyfile"
+				RelativePath="..\..\..\docs\hpx.doxy"
 				>
 			</File>
 			<File

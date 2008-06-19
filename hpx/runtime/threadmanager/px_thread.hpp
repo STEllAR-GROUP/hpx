@@ -26,7 +26,7 @@ namespace hpx { namespace threadmanager { namespace detail
         typedef 
             boost::coroutines::shared_coroutine<thread_state()> 
         coroutine_type;
-        
+
         // helper class for switching thread state in and out during execution
         class switch_status
         {
@@ -48,7 +48,7 @@ namespace hpx { namespace threadmanager { namespace detail
             {
                 return prev_state_ = new_state;
             }
-            
+
         private:
             thread_state& outer_state_;
             thread_state prev_state_;
@@ -71,8 +71,9 @@ namespace hpx { namespace threadmanager { namespace detail
 
         /// 
         px_thread(boost::function<thread_function_type> threadfunc, 
-                thread_id_type id, thread_state new_state) 
-          : coroutine_ (threadfunc, id), current_state_(new_state) 
+                thread_id_type id, threadmanager& tm, 
+                thread_state new_state)
+          : coroutine_(threadfunc, id), tm_(tm), current_state_(new_state) 
         {}
 
         ~px_thread() 
@@ -95,8 +96,14 @@ namespace hpx { namespace threadmanager { namespace detail
             current_state_ = new_state ;
         }
 
+        threadmanager& get_thread_manager() 
+        {
+            return tm_;
+        }
+
     private:
         coroutine_type coroutine_;
+        threadmanager& tm_;
         thread_state current_state_;
     };
 
@@ -112,19 +119,16 @@ namespace hpx { namespace threadmanager
         typedef detail::px_thread wrapped_type;
         typedef components::wrapper<wrapped_type> wrapping_type;
 
-        // avoid warning about using this in member initializer list 
-        px_thread* This() { return this; }
-        
     public:
         typedef detail::px_thread::thread_id_type thread_id_type;
 
         px_thread(boost::function<thread_function_type> threadfunc, 
-                thread_state new_state = init)
+                threadmanager& tm, thread_state new_state = init)
           : impl_(new wrapping_type())    // this allocates the wrapper
         {
             // this allocates the component implementation
             impl_->set_wrapped(
-                new detail::px_thread(threadfunc, impl_.get(), new_state));
+                new detail::px_thread(threadfunc, impl_.get(), tm, new_state));
         }
 
         thread_id_type get_thread_id() const
@@ -150,6 +154,9 @@ namespace hpx { namespace threadmanager
     private:
         boost::shared_ptr<wrapping_type> impl_;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    px_thread::thread_id_type const invalid_thread_id = 0;
 
 }}
 

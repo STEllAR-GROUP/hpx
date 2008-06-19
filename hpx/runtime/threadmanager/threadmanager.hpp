@@ -7,6 +7,8 @@
 #define HPX_THREADMANAGER_MAY_20_2008_845AM
 
 #include <queue>
+#include <map>
+
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
@@ -21,24 +23,21 @@
 namespace hpx { namespace threadmanager
 {
     ///////////////////////////////////////////////////////////////////////////
-    struct unlock_the_lock;
-
-    ///////////////////////////////////////////////////////////////////////////
     class threadmanager : private boost::noncopyable
     {
     private:
-        typedef 
-            std::queue <boost::shared_ptr<hpx::threadmanager::px_thread> > 
-        work_items_type;
+        // this is the type of the queue of pending threads
+        typedef std::queue <boost::shared_ptr<px_thread> > work_items_type;
 
+        // this is the type of a map holding all threads (except depleted ones)
         typedef
             std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread> >
         thread_map_type;
+        typedef thread_map_type::value_type map_pair;
 
-        typedef std::pair <px_thread::thread_id_type, boost::shared_ptr<px_thread> > map_pair;
-
+        // we use a simple mutex to protect the data members of the 
+        // threadmanager for now
         typedef boost::mutex mutex_type;
-        friend struct unlock_the_lock;
 
     public:
         threadmanager() 
@@ -53,12 +52,33 @@ namespace hpx { namespace threadmanager
             }
         }
 
-        /// This adds a new work item to the thread manager
-        px_thread::thread_id_type threadmanager::register_work( 
-            boost::function<thread_function_type> threadfunc,
+        /// The function \a register_work adds a new work item to the thread 
+        /// manager. It creates a new \a px_thread, adds it to the internal
+        /// management data structures, and schedules the new thread, if 
+        /// appropriate.
+        ///
+        /// \param func   [in] The function or function object to execute as 
+        ///               the thread's function. This must have a signature as
+        ///               defined by \a thread_function_type.
+        /// \param initial_state
+        ///               [in] The value of this parameter defines the initial 
+        ///               state of the newly created \a px_thread. This must be
+        ///               one of the values as defined by the \a thread_state 
+        ///               enumeration (thread_state#pending, or 
+        ///               thread_state#suspended, any other value will throw a
+        ///               hpx#bad_parameter exception).
+        ///
+        /// \returns      The function retunrs the thread id of the newly 
+        ///               created thread. 
+        px_thread::thread_id_type 
+        register_work(boost::function<thread_function_type> func,
             thread_state initial_state = pending);
-        
-        /// run the threadmanager's work queue
+
+        /// \brief Run the thread manager's work queue
+        ///
+        /// \returns      The function returns \a true if the thread manager
+        ///               has been started successfully, otherwise it returns 
+        ///               \a false.
         bool run() 
         {
             mutex_type::scoped_lock lk(mtx_);
@@ -79,7 +99,7 @@ namespace hpx { namespace threadmanager
             return running_;
         }
 
-        /// forcefully stop the threadmanager
+        /// \brief Forcefully stop the threadmanager
         void stop(bool blocking = true)
         {
             if (run_thread_) {
@@ -91,12 +111,6 @@ namespace hpx { namespace threadmanager
                 if (blocking)
                     run_thread_->join();
             }
-        }
-
-        void wait()
-        {
-            if (run_thread_ && running_) 
-                run_thread_->join();
         }
 
         /// The set_state function is part of the thread related API and allows
@@ -114,7 +128,8 @@ namespace hpx { namespace threadmanager
         ///                 \a thread_state enumeration. If the 
         ///                 thread is not known to the threadmanager the return 
         ///                 value will be \a thread_state#unknown.
-        thread_state set_state(px_thread::thread_id_type id, thread_state new_state);
+        thread_state set_state(px_thread::thread_id_type id, 
+            thread_state new_state);
 
         /// The set_state function is part of the thread related API and allows
         /// to query the state of one of the threads known to the threadmanager
@@ -134,7 +149,7 @@ namespace hpx { namespace threadmanager
         /// this notifies the thread manager that there is some more work 
         /// available 
         void do_some_work()
-        { 
+        {
             mutex_type::scoped_lock lk(mtx_);
             if (running_) 
                 cond_.notify_one();
@@ -146,14 +161,23 @@ namespace hpx { namespace threadmanager
 
     private:
         boost::thread *run_thread_;         /// this thread manager has exactly one thread
-        
-        thread_map_type thread_map_;        /// mapping of LVAs to thread IDs
-        
+
+        thread_map_type thread_map_;        /// mapping of thread id's to threads
         work_items_type work_items_;        /// list of active work items
+
         bool running_;                      /// thread manager has bee started
         mutable mutex_type mtx_;            /// mutex protecting the members
         boost::condition cond_;             /// used to trigger some action
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline void 
+    set_thread_state(px_thread::thread_id_type id, thread_state new_state)
+    {
+        components::wrapper<detail::px_thread>* t =
+            static_cast<components::wrapper<detail::px_thread>*>(id);
+        (*t)->get_thread_manager().set_state(id, new_state);
+    }
 
 ///////////////////////////////////////////////////////////////////////////////
 }}

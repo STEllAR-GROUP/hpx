@@ -14,6 +14,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <boost/serialization/export.hpp>
+#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threadmanager/px_thread.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/full_empty_memory.hpp>
@@ -34,14 +35,15 @@ namespace hpx { namespace lcos { namespace detail
         enum { value = components::component_simple_future};
 
         simple_future(threadmanager::px_thread_self& self)
-          : target_thread_(self), data_(self)
+          : target_thread_(self)
         {
         }
 
-        Result get_result() const
+        Result get_result() 
         {
             // yields control if needed
-            data_type const& d = data_.read(target_thread_);
+            data_type d;
+            data_.read(target_thread_, d);
 
             // the thread has been re-activated by one of the actions 
             // supported by this simple_future (see \a simple_future::set_event
@@ -116,7 +118,7 @@ namespace hpx { namespace lcos { namespace detail
         typedef boost::variant<result_type, error_type> data_type;
 
         threadmanager::px_thread_self& target_thread_;
-        full_empty<data_type> data_;
+        lcos::full_empty<data_type> data_;
         std::string error_msg_;
     };
 
