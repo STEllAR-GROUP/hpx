@@ -79,12 +79,12 @@ namespace hpx { namespace lcos { namespace detail
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
-            
+
             // if this entry is already full, block
             if (state_ == empty) {
                 // enqueue the request and block this thread
                 full_full_.push(self.get_thread_id());
-                
+
                 util::unlock_the_lock<scoped_lock> ul(l);
                 self.yield(threadmanager::suspended);
             }
@@ -101,7 +101,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
-            
+
             // if this entry is already full, block
             if (state_ == empty) {
                 // enqueue the request and block this thread
@@ -132,7 +132,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
-            
+
             // if this entry is already full, block
             if (state_ == full) {
                 // enqueue the request and block this thread
@@ -199,7 +199,7 @@ namespace hpx { namespace lcos { namespace detail
                 full_full_.pop();
                 threadmanager::set_thread_state(ti, threadmanager::pending);
             }
-            
+
             // since we got full now we need to re-activate one thread waiting
             // for the block to become full
             if (!full_empty_.empty()) {
@@ -218,7 +218,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             return !(empty_full_.empty() && full_empty_.empty() && full_full_.empty());
         }
-        
+
     private:
         mutable mutex_type mtx_;
         queue_type empty_full_;
@@ -235,7 +235,7 @@ namespace hpx { namespace lcos { namespace detail
         typedef threadmanager::px_thread::thread_id_type thread_id_type;
         typedef boost::shared_mutex mutex_type;
         typedef boost::ptr_map<void*, full_empty_entry> store_type;
-        
+
     public:
         full_empty_store()
         {}
@@ -243,7 +243,6 @@ namespace hpx { namespace lcos { namespace detail
         ///
         void set_empty(void* entry)
         {
-            bool created = false;
             {
                 boost::unique_lock<mutex_type> l(mtx_);
                 store_type::iterator it = store_.find(entry);
@@ -263,7 +262,6 @@ namespace hpx { namespace lcos { namespace detail
                         remove(entry);    // remove if no more threads are waiting
                 }
             }
-            
         }
 
         ///
@@ -362,7 +360,7 @@ namespace hpx { namespace lcos { namespace detail
             if (it == store_.end()) {
             // create a new entry for this unknown (full) block 
                 std::pair<store_type::iterator, bool> p = store_.insert(
-                    entry, new full_empty_entry(entry));
+                    store_type::value_type(entry, new full_empty_entry(entry)));
                 if (!p.second) {
                     boost::throw_exception(std::bad_alloc());
                     return;

@@ -7,9 +7,6 @@
 #define HPX_COMPONENTS_FACTORY_JUN_02_2008_1145AM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-#include <boost/serialization/export.hpp>
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/action.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
@@ -24,7 +21,8 @@ namespace hpx { namespace components { namespace server
         // object (the accumulator)
         enum actions
         {
-            create_component = 0,    // create a new component, no arguments
+            create_component = 0,   // create a new component, no arguments
+            free_component = 1,     // delete an existing component, no arguments
         };
 
         // This is the component id. Every component needs to have an embedded
@@ -33,35 +31,43 @@ namespace hpx { namespace components { namespace server
         enum { value = component_factory };
 
         // constructor
-        factory(runtime& rt)
-          : rt_(rt)
+        factory()
         {}
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        /// create a new component
-        threadmanager::thread_state create_proc(
+        /// \brief Action to create a new component
+        threadmanager::thread_state create(
             threadmanager::px_thread_self& self, applier::applier& app,
-            naming::id_type* gid, components::component_type type); 
+            naming::id_type* gid, components::component_type type, 
+            std::size_t count); 
+
+        /// \brief Action to delete an existing component
+        threadmanager::thread_state free(
+            threadmanager::px_thread_self& self, applier::applier& app,
+            components::component_type type, naming::id_type const& gid); 
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
-        typedef result_action1<
+        typedef result_action2<
             factory, naming::id_type, create_component, 
-            components::component_type, &factory::create_proc
+            components::component_type, std::size_t, &factory::create
         > create_action;
 
-    private:
-        runtime& rt_;
+        typedef action2<
+            factory, free_component, 
+            components::component_type, naming::id_type const&, &factory::free
+        > free_action;
     };
 
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the factory actions
-BOOST_CLASS_EXPORT(hpx::components::server::factory::create_action);
+HPX_SERIALIZE_ACTION(hpx::components::server::factory::create_action);
+HPX_SERIALIZE_ACTION(hpx::components::server::factory::free_action);
 
 #endif

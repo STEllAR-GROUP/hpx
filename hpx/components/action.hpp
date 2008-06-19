@@ -27,6 +27,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
+#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/portable_binary_oarchive.hpp>
+#include <boost/serialization/export.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/components/component_type.hpp>
@@ -34,6 +37,12 @@
 #include <hpx/util/serialize_sequence.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+// Helper macro for action serialization, each of the defined actions needs to 
+// be registered with the serialization library
+#define HPX_SERIALIZE_ACTION(action)                                          \
+        BOOST_CLASS_EXPORT(action)                                            \
+    /**/
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {

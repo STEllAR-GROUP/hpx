@@ -13,7 +13,7 @@
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (3, HPX_COMPONENT_ARGUMENT_LIMIT,                                     \
+    (3, (2, HPX_COMPONENT_ARGUMENT_LIMIT,                                     \
     "hpx/components/server/manage_component_implementations.hpp"))            \
     /**/
     
@@ -30,20 +30,22 @@
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    Component* create (runtime& rt, naming::id_type gid,
+    naming::id_type create (applier::applier& appl, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         Component* c = new Component(BOOST_PP_ENUM_PARAMS(N, arg));
-        if (!rt.get_dgas_client().bind(gid, 
-                naming::address(rt.here(), Component::value, c))) 
+        naming::id_type gid = c->get_gid();
+        if (!appl.get_dgas_client().bind(gid, 
+                naming::address(appl.here(), Component::value, c))) 
         {
             delete c;
             boost::throw_exception(
                 hpx::exception(hpx::duplicate_component_address,
                     "global id is already bound to a different "
                     "component instance"));
+            return naming::invalid_id;
         }
-        return c;
+        return gid;
     }
     
 #undef N

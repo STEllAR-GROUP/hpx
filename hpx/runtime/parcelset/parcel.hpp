@@ -30,7 +30,7 @@ namespace hpx { namespace parcelset
     typedef naming::id_type parcel_id;
 
     parcel_id const no_parcel_id = parcel_id();
-    parcel_id const bad_parcel_id = naming::bad_id;
+    parcel_id const invalid_parcel_id = naming::invalid_id;
     
     ///////////////////////////////////////////////////////////////////////////
     class parcel

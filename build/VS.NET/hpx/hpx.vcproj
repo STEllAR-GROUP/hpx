@@ -179,6 +179,7 @@
 							<Tool
 								Name="VCCLCompilerTool"
 								AssemblerOutput="0"
+								ShowIncludes="false"
 							/>
 						</FileConfiguration>
 					</File>
@@ -252,6 +253,14 @@
 					>
 					<File
 						RelativePath="..\..\..\src\runtime\threadmanager\threadmanager.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Applier"
+					>
+					<File
+						RelativePath="..\..\..\src\runtime\applier\applier.cpp"
 						>
 					</File>
 				</Filter>

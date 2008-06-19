@@ -142,9 +142,34 @@ namespace hpx { namespace naming
         os << "(" << id.id_msb_ << ", " << id.id_lsb_ << ")";
         return os;
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
-    id_type const bad_id = id_type(boost::uint64_t(-1));
+    //  Handle conversion to/from prefix
+    inline id_type get_id_from_prefix(boost::uint32_t prefix)
+    {
+        return id_type(boost::uint64_t(prefix) << 32, 0);
+    }
+
+    inline boost::uint32_t get_prefix_from_id(id_type const& id)
+    {
+        return boost::uint32_t(id.get_msb() >> 32);
+    }
+
+    inline bool is_prefix_only(id_type const& id)
+    {
+        return (id.get_msb() & 0xFFFFFFFFFFFFLL) ? false : true;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // By convention the factory has a gid identical to the prefix of the 
+    // locality the factory is responsible for
+    inline id_type get_factory_id(id_type const& id)
+    {
+        return id_type(id.get_msb() & ~0xFFFFFFFFFFFFLL, 0);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    id_type const invalid_id = id_type(boost::uint64_t(-1));
     
 ///////////////////////////////////////////////////////////////////////////////
 }}

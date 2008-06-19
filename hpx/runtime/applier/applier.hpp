@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2008 Anshul Tandon
+//  Copyright (c) 2007-2008 Hartmut Kaiser
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,10 +9,12 @@
 
 #include <boost/noncopyable.hpp>
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/include/naming.hpp>
 #include <hpx/include/parcelset.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/components/continuation.hpp>
+#include <hpx/components/server/factory.hpp>
 
 namespace hpx { namespace applier
 {
@@ -26,13 +29,11 @@ namespace hpx { namespace applier
         applier(naming::resolver_client const& dgas_c, 
                 parcelset::parcelhandler &ph, threadmanager::threadmanager& tm)
           : dgas_client_(dgas_c), parcel_handler_(ph), thread_manager_(tm)
-        {
-        }
+        {}
 
         // destructor
         ~applier()
-        {
-        }
+        {}
 
         ///////////////////////////////////////////////////////////////////////
         // zero parameter version
@@ -156,20 +157,82 @@ namespace hpx { namespace applier
         // bring in the rest of the apply<> overloads
         #include <hpx/runtime/applier/applier_implementations.hpp>
 
+        /// The \a create_async function initiates the creation of a new 
+        /// component using the factory as given by targetgid. This function is 
+        /// non-blocking as it returns a \a lcos#simple_future. The caller of 
+        /// this create_async is responsible to call 
+        /// \a lcos#simple_future#get_result to obtain the result. 
+        ///
+        /// \param self
+        /// \param targetgid
+        /// \param type
+        ///
+        /// \returns    The function returns a \a lcos#simple_future instance 
+        ///             returning the the global id of the newly created
+        ///             component when used to call get_result.
+        ///
+        /// \note       For synchronous operation use the function 
+        ///             \a applier#create_async.
+        lcos::simple_future<naming::id_type> create_async(
+            threadmanager::px_thread_self& self, 
+            naming::id_type const& targetgid, components::component_type type);
+
+        /// The \a create function creates a new component using the factory as 
+        /// given by targetgid. This function is blocking for the component to 
+        /// be created and until the global id of the new component has been 
+        /// returned. 
+        ///
+        /// \param self
+        /// \param targetgid
+        /// \param type
+        ///
+        /// \returns    The function returns the global id of the newly created
+        ///             component.
+        ///
+        /// \note       For asynchronous operation use the function 
+        ///             \a applier#create_async.
+        naming::id_type create(threadmanager::px_thread_self& self,
+            naming::id_type const& targetgid, components::component_type type);
+
+        /// \brief The \a free function frees an existing component as given by 
+        ///        its type and its gid
+        void free (components::component_type type, naming::id_type const& gid)
+        {
+            typedef components::server::factory::free_action action_type;
+            apply<action_type>(naming::get_factory_id(gid), type, gid);
+        }
+
+        /// \brief Allow access to the DGAS client instance used with this
+        ///        \a applier.
+        naming::resolver_client const& get_dgas_client() const
+        {
+            return dgas_client_;
+        }
+
         /// \brief Access the \a parcelhandler instance associated with this 
-        /// \a applier
+        ///        \a applier
         parcelset::parcelhandler& get_parcel_handler() 
         {
             return parcel_handler_;
         }
-        
+
         /// \brief Access the \a threadmanager instance associated with this 
-        /// \a applier
+        ///        \a applier
         threadmanager::threadmanager& get_thread_manager() 
         {
             return thread_manager_;
         }
-        
+
+        /// \brief Allow access to the locality this applier instance is 
+        /// associated with.
+        ///
+        /// This accessor returns a reference to the locality this applier
+        /// instance is associated with.
+        naming::locality const& here() const
+        {
+            return parcel_handler_.here();
+        }
+
     protected:
         bool address_is_local(naming::id_type gid, naming::address& addr) const
         {
@@ -187,6 +250,7 @@ namespace hpx { namespace applier
         parcelset::parcelhandler& parcel_handler_;
         threadmanager::threadmanager& thread_manager_;
     };
+
 }}
 
 #endif

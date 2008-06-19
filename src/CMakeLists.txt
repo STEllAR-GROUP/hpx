@@ -37,7 +37,10 @@ set (hpxlib_HEADERS
     ../hpx/include/util.hpp
     # LCO's
     ../hpx/lcos/base_lco.hpp
+    ../hpx/lcos/full_empty_memory.hpp
+    ../hpx/lcos/full_empty_store.hpp
     ../hpx/lcos/simple_future.hpp
+    ../hpx/lcos/simple_future_impl.hpp
     # runtime
     ../hpx/runtime/runtime.hpp
     # action manager
@@ -83,6 +86,8 @@ set (hpxlib_HEADERS
     ../hpx/util/portable_binary_oarchive.hpp
     ../hpx/util/safe_bool.hpp
     ../hpx/util/serialize_sequence.hpp
+    ../hpx/util/static.hpp
+    ../hpx/util/unlock_lock.hpp
     ../hpx/util/util.hpp
 )
 
@@ -92,6 +97,8 @@ set (hpxlib_SOURCES
     # runtime
     # action manager
     runtime/action_manager/action_manager.cpp
+    # applier
+    runtime/applier/applier.cpp
     # naming 
     runtime/naming/resolver_client.cpp
     runtime/naming/resolver_server.cpp

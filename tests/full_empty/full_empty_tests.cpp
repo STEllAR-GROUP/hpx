@@ -38,6 +38,12 @@ threadmanager::thread_state test1(threadmanager::px_thread_self& self,
     BOOST_TEST(!data.is_empty());
     BOOST_TEST(value == 1);
 
+    value = 0;
+    data.read(self, value);   // this should not block anymore
+
+    BOOST_TEST(!data.is_empty());
+    BOOST_TEST(value == 1);
+
     return threadmanager::terminated;
 }
 

@@ -9,6 +9,7 @@
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/noncopyable.hpp>
 #include <boost/coroutine/coroutine.hpp>
 #include <boost/coroutine/shared_coroutine.hpp>
 
@@ -20,7 +21,7 @@ namespace hpx { namespace threadmanager { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     /// This is the representation of a ParalleX thread
-    class px_thread 
+    class px_thread : private boost::noncopyable
     {
     private:
         typedef 
@@ -113,7 +114,7 @@ namespace hpx { namespace threadmanager { namespace detail
 namespace hpx { namespace threadmanager 
 {
     ///////////////////////////////////////////////////////////////////////////
-    class px_thread
+    class px_thread : private boost::noncopyable
     {
     private:
         typedef detail::px_thread wrapped_type;
@@ -128,12 +129,17 @@ namespace hpx { namespace threadmanager
         {
             // this allocates the component implementation
             impl_->set_wrapped(
-                new detail::px_thread(threadfunc, impl_.get(), tm, new_state));
+                new detail::px_thread(threadfunc, impl_, tm, new_state));
+        }
+
+        ~px_thread()
+        {
+            delete impl_;
         }
 
         thread_id_type get_thread_id() const
         {
-            return impl_.get();
+            return impl_;
         }
 
         thread_state get_state() const 
@@ -151,8 +157,14 @@ namespace hpx { namespace threadmanager
             return (*impl_)->execute();
         }
 
+        /// \brief Return the global id of this \a px_thread instance
+        naming::id_type get_gid() const
+        {
+            return impl_->get_gid();
+        }
+
     private:
-        boost::shared_ptr<wrapping_type> impl_;
+        wrapping_type* impl_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

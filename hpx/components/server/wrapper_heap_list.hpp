@@ -34,7 +34,7 @@ namespace hpx { namespace components { namespace detail
                 if ((*it)->did_alloc(p)) 
                     return (*it)->get_gid(p);
             }
-            return naming::bad_id;
+            return naming::invalid_id;
         }
     };
     

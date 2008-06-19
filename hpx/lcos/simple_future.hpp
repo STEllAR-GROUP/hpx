@@ -11,13 +11,11 @@
 #include <boost/variant.hpp>
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-#include <boost/serialization/export.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threadmanager/px_thread.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/full_empty_memory.hpp>
+#include <hpx/components/action.hpp>
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/server/wrapper.hpp>
 
@@ -65,26 +63,22 @@ namespace hpx { namespace lcos { namespace detail
         
         // trigger the future, set the result
         threadmanager::thread_state 
-        set_event_proc (threadmanager::px_thread_self& self, 
-            applier::applier& appl, Result const& result) 
+        set_event (threadmanager::px_thread_self& self, 
+            applier::applier& appl, Result const& result)
         {
             // set the received result, reset error status
             data_.set(self, result);
 
             // re-activate the target thread if previously yielded
-            if (appl.get_thread_manager().get_state(target_thread_.get_thread_id()) 
-                  == threadmanager::suspended)
-            {
-                appl.get_thread_manager().set_state(
-                    target_thread_.get_thread_id(), threadmanager::pending);
-            }
-            
+            appl.get_thread_manager().set_state(
+                target_thread_.get_thread_id(), threadmanager::pending);
+
             // this thread has nothing more to do
             return threadmanager::terminated;
         }
 
         // trigger the future with the given error condition
-        threadmanager::thread_state set_error_proc (
+        threadmanager::thread_state set_error (
             threadmanager::px_thread_self& self, applier::applier& appl,
             hpx::error code, std::string msg)
         {
@@ -103,13 +97,13 @@ namespace hpx { namespace lcos { namespace detail
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef components::action1<
-            simple_future, base_lco::set_event, Result const&, 
-            &simple_future::set_event_proc
+            simple_future, base_lco::set_event_action, Result const&, 
+            &simple_future::set_event
         > set_event_action;
 
         typedef components::action2<
-            simple_future, base_lco::set_error, hpx::error, std::string,
-            &simple_future::set_error_proc
+            simple_future, base_lco::set_error_action, hpx::error, std::string,
+            &simple_future::set_error
         > set_error_action;
 
     private:
@@ -126,8 +120,10 @@ namespace hpx { namespace lcos { namespace detail
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the simple_future actions
-BOOST_CLASS_EXPORT(hpx::lcos::detail::simple_future<hpx::naming::id_type>::set_event_action);
-BOOST_CLASS_EXPORT(hpx::lcos::detail::simple_future<hpx::naming::id_type>::set_error_action);
+HPX_SERIALIZE_ACTION(hpx::lcos::detail::simple_future<hpx::naming::id_type>::set_event_action);
+HPX_SERIALIZE_ACTION(hpx::lcos::detail::simple_future<hpx::naming::id_type>::set_error_action);
+HPX_SERIALIZE_ACTION(hpx::lcos::detail::simple_future<double>::set_event_action);
+HPX_SERIALIZE_ACTION(hpx::lcos::detail::simple_future<double>::set_error_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos 
@@ -162,9 +158,6 @@ namespace hpx { namespace lcos
     private:
         typedef detail::simple_future<Result> wrapped_type;
         typedef components::wrapper<wrapped_type> wrapping_type;
-        
-        // avoid warning about usage of this in member initializer list
-        simple_future* This() { return this; }
 
     public:
         /// Construct a new \a simple_future instance. The supplied 

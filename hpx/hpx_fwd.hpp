@@ -95,6 +95,11 @@ namespace hpx
         class factory;        
         class accumulator;
     }
+
+    namespace lcos
+    {
+        template <typename Result> class simple_future;
+    }
 }
 
 #endif

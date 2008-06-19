@@ -6,72 +6,64 @@
 #if !defined(HPX_COMPONENTS_SERVER_MANAGE_COMPONENT_JUN_02_2008_0146PM)
 #define HPX_COMPONENTS_SERVER_MANAGE_COMPONENT_JUN_02_2008_0146PM
 
-#include <hpx/runtime/runtime.hpp>
+#include <boost/throw_exception.hpp>
+
+#include <hpx/exception.hpp>
+#include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/naming/locality.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/applier/applier.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    Component* create (runtime& rt, naming::id_type gid)
+    naming::id_type create (applier::applier& appl)
     {
         Component* c = new Component;
-        if (!rt.get_dgas_client().bind(gid, 
-                naming::address(rt.here(), Component::value, c))) 
+        naming::id_type gid = c->get_gid();
+        if (!appl.get_dgas_client().bind(gid, 
+                naming::address(appl.here(), Component::value, c))) 
         {
             delete c;
             boost::throw_exception(
                 hpx::exception(hpx::duplicate_component_address,
                     "global id is already bound to a different "
                     "component instance"));
+            return naming::invalid_id;
         }
-        return c;
+        return gid;
     }
     
     template <typename Component, typename Arg0>
-    Component* create (runtime& rt, naming::id_type gid,
-        Arg0 const& arg0)
+    naming::id_type create (applier::applier& appl, Arg0 const& arg0)
     {
         Component* c = new Component(arg0);
-        if (!rt.get_dgas_client().bind(gid, 
-                naming::address(rt.here(), Component::value, c))) 
+        naming::id_type gid = c->get_gid();
+        if (!appl.get_dgas_client().bind(gid, 
+                naming::address(appl.here(), Component::value, c))) 
         {
             delete c;
             boost::throw_exception(
                 hpx::exception(hpx::duplicate_component_address,
                     "global id is already bound to a different "
                     "component instance"));
+            return naming::invalid_id;
         }
-        return c;
-    }
-    
-    template <typename Component, typename Arg0, typename Arg1>
-    Component* create (runtime& rt, naming::id_type gid,
-        Arg0 const& arg0, Arg1 const& arg1)
-    {
-        Component* c = new Component(arg0, arg1);
-        if (!rt.get_dgas_client().bind(gid, 
-                naming::address(rt.here(), Component::value, c))) 
-        {
-            delete c;
-            boost::throw_exception(
-                hpx::exception(hpx::duplicate_component_address,
-                    "global id is already bound to a different "
-                    "component instance"));
-        }
-        return c;
+        return gid;
     }
 
-    // bring in overload for more than 2 arguments
+    // bring in overload for 2 and more arguments
     #include <hpx/components/server/manage_component_implementations.hpp>
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    void destroy(runtime& rt, naming::id_type gid)
+    void destroy(applier::applier& appl, naming::id_type const& gid)
     {
         // retrieve the local address bound to the given global id
         naming::address addr;
-        if (!rt.get_dgas_client().unbind(gid, addr)) 
+        if (!appl.get_dgas_client().unbind(gid, addr)) 
         {
             boost::throw_exception(
                 hpx::exception(hpx::unknown_component_address,
@@ -79,7 +71,7 @@ namespace hpx { namespace components { namespace server
         }
         
         // make sure this component is located here
-        if (rt.here() != addr.locality_) 
+        if (appl.here() != addr.locality_) 
         {
             // FIXME: should the component be re-bound ?
             boost::throw_exception(

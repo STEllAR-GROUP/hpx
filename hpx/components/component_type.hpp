@@ -46,8 +46,9 @@ namespace hpx { namespace components
             "component_graph_vertex",
         };
     }
-        
-    inline char const* const get_component_type_name(component_type type)
+
+    ///
+    inline char const* const get_component_type_name(int type)
     {
         if (type >= component_invalid && type < component_last)
             return components::detail::names[type];

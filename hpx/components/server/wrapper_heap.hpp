@@ -13,6 +13,7 @@
 #include <boost/noncopyable.hpp>
 #include <hpx/config.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/runtime/naming/name.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace detail 
@@ -113,7 +114,7 @@ namespace hpx { namespace components { namespace detail
 
         naming::id_type get_gid(void* p) const
         {
-            return naming::bad_id;
+            return naming::invalid_id;
         }
         
     protected:

@@ -19,23 +19,6 @@
 namespace hpx { namespace naming { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
-    //  Handle conversion to/from prefix
-    inline id_type get_id_from_prefix(boost::uint32_t prefix)
-    {
-        return id_type(boost::uint64_t(prefix) << 32, 0);
-    }
-    
-    inline boost::uint32_t get_prefix_from_id(id_type id)
-    {
-        return boost::uint32_t(id.get_msb() >> 32);
-    }
-    
-    inline bool is_prefix_only(id_type id)
-    {
-        return (id.get_msb() & 0xFFFFFFFFFFFFLL) ? false : true;
-    }
-    
-    ///////////////////////////////////////////////////////////////////////////
     request_handler::request_handler()
       : totals_(command_lastcommand)
     {

@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <boost/shared_ptr.hpp>
+#include <boost/serialization/serialization.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>

@@ -12,15 +12,40 @@
 
 namespace hpx { namespace components { namespace server
 {
-    threadmanager::thread_state factory::create_proc(
+    threadmanager::thread_state factory::create(
         threadmanager::px_thread_self& self, applier::applier& appl,
-        naming::id_type* gid, components::component_type type)
+        naming::id_type* gid, components::component_type type,
+        std::size_t count)
+    {
+    // create new component instance
+        naming::id_type id = naming::invalid_id;
+        switch (type) {
+        case accumulator::value:
+            id = server::create<accumulator>(appl);
+            break;
+
+        default:
+            boost::throw_exception(hpx::exception(hpx::bad_component_type,
+                std::string("attempt to create component instance of invalid type: ") + 
+                    get_component_type_name(type)));
+            break;
+        }
+
+    // set result if requested
+        if (0 != gid)
+            *gid = id;
+        return hpx::threadmanager::terminated;
+    }
+
+    threadmanager::thread_state factory::free(
+        threadmanager::px_thread_self& self, applier::applier& appl,
+        components::component_type type, naming::id_type const& gid)
     {
         switch (type) {
         case accumulator::value:
-//            server::create<accumulator>(rt_, gid);
+            server::destroy<accumulator>(appl, gid);
             break;
-            
+
         default:
             boost::throw_exception(hpx::exception(hpx::bad_component_type,
                 std::string("attempt to create component instance of invalid type: ") + 

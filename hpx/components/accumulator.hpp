@@ -24,31 +24,44 @@ namespace hpx { namespace components
         accumulator(applier::applier& appl, naming::id_type gid) 
           : base_type(appl), gid_(gid)
         {}
-        
+
         ~accumulator() 
         {}
         
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
-        
+
         /// Initialize the accumulator value
         void init() 
         {
             this->base_type::init(gid_);
         }
-        
+
         /// Add the given number to the accumulator
         void add (double arg) 
         {
             this->base_type::add(gid_, arg);
         }
-        
+
         /// Print the current value of the accumulator
         void print() 
         {
             this->base_type::print(gid_);
         }
-        
+
+        /// Query the current value of the accumulator
+        double query(threadmanager::px_thread_self& self) 
+        {
+            return this->base_type::query(self, gid_);
+        }
+
+        /// Asynchronously query the current value of the accumulator
+        lcos::simple_future<double> query_async(
+            threadmanager::px_thread_self& self) 
+        {
+            return this->base_type::query_async(self, gid_);
+        }
+
     private:
         naming::id_type gid_;
     };

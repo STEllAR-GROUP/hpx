@@ -15,6 +15,7 @@
 #include <hpx/runtime/threadmanager/threadmanager.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/action_manager/action_manager.hpp>
+#include <hpx/components/server/factory.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx 
@@ -98,6 +99,11 @@ namespace hpx
             // start services (service threads)
             thread_manager_.run();        // start the thread manager
             parcel_port_.run(false);      // starts parcel_pool_ as well
+
+            // register the factory with the DGAS 
+            dgas_client_.bind(parcel_handler_.get_prefix(), 
+                naming::address(parcel_port_.here(), 
+                    components::server::factory::value, &factory_));
 
             // register the given main function with the thread manager
             thread_manager_.register_work(
@@ -196,6 +202,7 @@ namespace hpx
         threadmanager::threadmanager thread_manager_;
         applier::applier applier_;
         action_manager::action_manager action_manager_;
+        components::server::factory factory_;
     };
 
 }   // namespace hpx

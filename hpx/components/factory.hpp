@@ -17,31 +17,45 @@ namespace hpx { namespace components
     class factory : public stubs::factory
     {
         typedef stubs::factory base_type;
-        
+
     public:
         /// Create a client side representation for the existing
         /// \a server#factory instance with the given global id \a gid.
         factory(applier::applier& app, naming::id_type gid) 
           : base_type(app), gid_(gid)
         {}
-        
+
         ~factory() 
         {}
-        
+
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
-        
+
         /// Create a new component using the factory 
         naming::id_type create(threadmanager::px_thread_self& self,
-            components::component_type type) 
+            components::component_type type, std::size_t count = 1) 
         {
-            return this->base_type::create(self, gid_, type);
+            return this->base_type::create(self, gid_, type, count);
         }
-        
+
+        /// Asynchronously create a new component using the factory 
+        lcos::simple_future<naming::id_type> 
+        create_async(threadmanager::px_thread_self& self,
+            components::component_type type, std::size_t count = 1) 
+        {
+            return this->base_type::create_async(self, gid_, type, count);
+        }
+
+        /// Destroy an existing component
+        void free (components::component_type type, naming::id_type const& gid)
+        {
+            this->base_type::free(gid_, type, gid);
+        }
+
     private:
         naming::id_type gid_;
     };
-    
+
 }}
 
 #endif

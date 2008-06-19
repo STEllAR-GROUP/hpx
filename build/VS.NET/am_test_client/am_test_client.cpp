@@ -116,15 +116,15 @@ int main(int argc, char* argv[])
         hpx::naming::id_type id(99);
         
         // create an initial accumulator parcel to send to remote locality
-        hpx::parcelset::parcel p_init(id, new hpx::components::server::accumulator::init_action());
+        hpx::parcelset::parcel p_init(id, new hpx::components::server::detail::accumulator::init_action());
         hpx::parcelset::parcel_id p_id = ph.sync_put_parcel(p_init);
 
         // add 5 to the accumulator
-        hpx::parcelset::parcel p_add(id, new hpx::components::server::accumulator::add_action(15));
+        hpx::parcelset::parcel p_add(id, new hpx::components::server::detail::accumulator::add_action(15));
         hpx::parcelset::parcel_id p_id2 = ph.sync_put_parcel(p_add);
 
         // print the value of the accumulator
-        hpx::parcelset::parcel p_print(id, new hpx::components::server::accumulator::print_action());
+        hpx::parcelset::parcel p_print(id, new hpx::components::server::detail::accumulator::print_action());
         hpx::parcelset::parcel_id p_id3 = ph.sync_put_parcel(p_print);
 
         std::cout << "Successfully sent parcel: " << std::hex << id 

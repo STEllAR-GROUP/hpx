@@ -21,8 +21,8 @@ namespace hpx { namespace lcos { namespace detail
         // object 
         enum actions
         {
-            set_event = 0,
-            set_error = 1
+            set_event_action = 0,
+            set_error_action = 1
         };
 
         /// Destructor, needs to be virtual to allow for clean destruction of
@@ -30,7 +30,7 @@ namespace hpx { namespace lcos { namespace detail
         virtual ~base_lco() {}
 
         ///
-        virtual threadmanager::thread_state set_error_proc (
+        virtual threadmanager::thread_state set_error (
             threadmanager::px_thread_self&, applier::applier& appl,
             hpx::error code, std::string msg) = 0;
     };
@@ -42,7 +42,7 @@ namespace hpx { namespace lcos { namespace detail
     struct base_lco_with_value : public base_lco
     {
         ///
-        virtual threadmanager::thread_state set_event_proc (
+        virtual threadmanager::thread_state set_event (
             threadmanager::px_thread_self&, applier::applier& appl,
             EventArgument const& result) = 0;
     };
@@ -53,7 +53,7 @@ namespace hpx { namespace lcos { namespace detail
     struct base_lco_with_value<void> : public base_lco
     {
         ///
-        virtual threadmanager::thread_state set_event_proc (
+        virtual threadmanager::thread_state set_event (
             threadmanager::px_thread_self&, applier::applier& appl) = 0;
     };
 
