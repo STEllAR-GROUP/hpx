@@ -40,7 +40,6 @@ set (hpxlib_HEADERS
     ../hpx/lcos/full_empty_memory.hpp
     ../hpx/lcos/full_empty_store.hpp
     ../hpx/lcos/simple_future.hpp
-    ../hpx/lcos/simple_future_impl.hpp
     # runtime
     ../hpx/runtime/runtime.hpp
     # action manager
@@ -79,7 +78,6 @@ set (hpxlib_HEADERS
     ../hpx/util/high_resolution_timer.hpp
     ../hpx/util/io_service_pool.hpp
     ../hpx/util/logging.hpp
-#   ../hpx/util/object_cache.hpp
     ../hpx/util/one_size_heap.hpp
     ../hpx/util/one_size_heap_list.hpp
     ../hpx/util/portable_binary_iarchive.hpp
