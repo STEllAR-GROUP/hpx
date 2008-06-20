@@ -7,6 +7,7 @@
 #include <boost/assert.hpp>
 
 #include <hpx/runtime/threadmanager/threadmanager.hpp>
+#include <hpx/runtime/threadmanager/px_thread.hpp>
 #include <hpx/util/unlock_lock.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
