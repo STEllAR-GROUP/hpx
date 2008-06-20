@@ -119,11 +119,11 @@ HPX_SERIALIZE_ACTION(hpx::components::server::detail::accumulator::print_action)
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server 
 {
-    class accumulator
+    class accumulator : public components::wrapper<detail::accumulator>
     {
     private:
         typedef detail::accumulator wrapped_type;
-        typedef components::wrapper<wrapped_type> wrapping_type;
+        typedef components::wrapper<wrapped_type> base_type;
 
     public:
         // This is the component id. Every component needs to have an embedded
@@ -132,20 +132,12 @@ namespace hpx { namespace components { namespace server
         enum { value = wrapped_type::value };
 
         accumulator()
-          : impl_(new wrapping_type())    // this allocates the wrapper
-        {
-            // this allocates the component implementation
-            impl_->set_wrapped(new wrapped_type());
-        }
+          : base_type(new wrapped_type())
+        {}
 
-        /// \brief Return the global id of this \a accumulator instance
-        naming::id_type get_gid() const
-        {
-            return impl_->get_gid();
-        }
-
-    private:
-        boost::shared_ptr<wrapping_type> impl_;
+    protected:
+        base_type& base() { return *this; }
+        base_type const& base() const { return *this; }
     };
 
 }}}

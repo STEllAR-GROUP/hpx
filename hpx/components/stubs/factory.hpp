@@ -80,7 +80,7 @@ namespace hpx { namespace components { namespace stubs
         /// 
         naming::id_type create(threadmanager::px_thread_self& self,
             naming::id_type const& targetgid, components::component_type type,
-            std::size_t count) 
+            std::size_t count = 1) 
         {
             return create(self, app_, targetgid, type, count);
         }
@@ -88,15 +88,16 @@ namespace hpx { namespace components { namespace stubs
         /// Destroy an existing component
         static void free(applier::applier& appl, 
             naming::id_type const& targetgid, components::component_type type, 
-            naming::id_type const& gid) 
+            naming::id_type const& gid, std::size_t count = 1) 
         {
-            appl.apply<server::factory::free_action>(targetgid, type, gid);
+            appl.apply<server::factory::free_action>(targetgid, type, gid, count);
         }
 
         void free (naming::id_type const& targetgid, 
-            components::component_type type, naming::id_type const& gid)
+            components::component_type type, naming::id_type const& gid,
+            std::size_t count = 1)
         {
-            free(app_, targetgid, type, gid);
+            free(app_, targetgid, type, gid, count);
         }
 
     private:

@@ -47,9 +47,10 @@ namespace hpx { namespace components
         }
 
         /// Destroy an existing component
-        void free (components::component_type type, naming::id_type const& gid)
+        void free (components::component_type type, naming::id_type const& gid,
+            std::size_t count = 1)
         {
-            this->base_type::free(gid_, type, gid);
+            this->base_type::free(gid_, type, gid, count);
         }
 
     private:

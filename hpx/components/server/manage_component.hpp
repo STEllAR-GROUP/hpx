@@ -19,9 +19,9 @@ namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    naming::id_type create (applier::applier& appl)
+    naming::id_type create (applier::applier& appl, std::size_t count)
     {
-        Component* c = new Component;
+        Component* c = static_cast<Component*>(Component::create(count));
         naming::id_type gid = c->get_gid();
         if (!appl.get_dgas_client().bind(gid, 
                 naming::address(appl.here(), Component::value, c))) 
@@ -35,31 +35,11 @@ namespace hpx { namespace components { namespace server
         }
         return gid;
     }
-    
-    template <typename Component, typename Arg0>
-    naming::id_type create (applier::applier& appl, Arg0 const& arg0)
-    {
-        Component* c = new Component(arg0);
-        naming::id_type gid = c->get_gid();
-        if (!appl.get_dgas_client().bind(gid, 
-                naming::address(appl.here(), Component::value, c))) 
-        {
-            delete c;
-            boost::throw_exception(
-                hpx::exception(hpx::duplicate_component_address,
-                    "global id is already bound to a different "
-                    "component instance"));
-            return naming::invalid_id;
-        }
-        return gid;
-    }
-
-    // bring in overload for 2 and more arguments
-    #include <hpx/components/server/manage_component_implementations.hpp>
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    void destroy(applier::applier& appl, naming::id_type const& gid)
+    void destroy(applier::applier& appl, naming::id_type const& gid, 
+        std::size_t count)
     {
         // retrieve the local address bound to the given global id
         naming::address addr;
@@ -69,7 +49,7 @@ namespace hpx { namespace components { namespace server
                 hpx::exception(hpx::unknown_component_address,
                     "global id is not bound to any component instance"));
         }
-        
+
         // make sure this component is located here
         if (appl.here() != addr.locality_) 
         {
@@ -78,7 +58,7 @@ namespace hpx { namespace components { namespace server
                 hpx::exception(hpx::unknown_component_address,
                     "global id is not bound to any local component instance"));
         }
-        
+
         // make sure it's the correct component type
         if (Component::value != addr.type_)
         {
@@ -88,11 +68,11 @@ namespace hpx { namespace components { namespace server
                     std::string("global id is not bound to a component instance of type") +
                     get_component_type_name(Component::value)));
         }
-        
-        // delete the local instance
-        delete reinterpret_cast<Component*>(addr.address_);
+
+        // delete the local instances
+       Component::destroy(reinterpret_cast<Component*>(addr.address_), count);
     }
-    
+
 }}}
 
 #endif

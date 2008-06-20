@@ -114,57 +114,49 @@ namespace hpx { namespace threadmanager { namespace detail
 namespace hpx { namespace threadmanager 
 {
     ///////////////////////////////////////////////////////////////////////////
-    class px_thread : private boost::noncopyable
+    class px_thread : public components::wrapper<detail::px_thread>
     {
     private:
         typedef detail::px_thread wrapped_type;
-        typedef components::wrapper<wrapped_type> wrapping_type;
+        typedef components::wrapper<wrapped_type> base_type;
+
+        // avoid warning about using 'this' in initializer list
+        px_thread* This() { return this; }
 
     public:
         typedef detail::px_thread::thread_id_type thread_id_type;
 
         px_thread(boost::function<thread_function_type> threadfunc, 
                 threadmanager& tm, thread_state new_state = init)
-          : impl_(new wrapping_type())    // this allocates the wrapper
-        {
-            // this allocates the component implementation
-            impl_->set_wrapped(
-                new detail::px_thread(threadfunc, impl_, tm, new_state));
-        }
+          : base_type(new detail::px_thread(threadfunc, This(), tm, new_state))
+        {}
 
-        ~px_thread()
-        {
-            delete impl_;
-        }
+        ~px_thread() 
+        {}
 
         thread_id_type get_thread_id() const
         {
-            return impl_;
+            return const_cast<px_thread*>(this);
         }
 
         thread_state get_state() const 
         {
-            return (*impl_)->get_state();
+            return base()->get_state();
         }
 
         void set_state(thread_state new_state)
         {
-            (*impl_)->set_state(new_state);
+            base()->set_state(new_state);
         }
 
         thread_state operator()()
         {
-            return (*impl_)->execute();
+            return base()->execute();
         }
 
-        /// \brief Return the global id of this \a px_thread instance
-        naming::id_type get_gid() const
-        {
-            return impl_->get_gid();
-        }
-
-    private:
-        wrapping_type* impl_;
+    protected:
+        base_type& base() { return *this; }
+        base_type const& base() const { return *this; }
     };
 
     ///////////////////////////////////////////////////////////////////////////

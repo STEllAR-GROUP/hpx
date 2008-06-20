@@ -20,7 +20,6 @@ set (hpxlib_HEADERS
     ../hpx/components/server/accumulator.hpp
     ../hpx/components/server/factory.hpp
     ../hpx/components/server/manage_component.hpp
-    ../hpx/components/server/manage_component_implementations.hpp
     ../hpx/components/server/wrapper.hpp
     ../hpx/components/server/wrapper_heap.hpp
     ../hpx/components/server/wrapper_heap_list.hpp

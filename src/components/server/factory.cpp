@@ -12,6 +12,7 @@
 
 namespace hpx { namespace components { namespace server
 {
+    // create a new instance of a component
     threadmanager::thread_state factory::create(
         threadmanager::px_thread_self& self, applier::applier& appl,
         naming::id_type* gid, components::component_type type,
@@ -21,7 +22,7 @@ namespace hpx { namespace components { namespace server
         naming::id_type id = naming::invalid_id;
         switch (type) {
         case accumulator::value:
-            id = server::create<accumulator>(appl);
+            id = server::create<server::accumulator>(appl, count);
             break;
 
         default:
@@ -37,13 +38,15 @@ namespace hpx { namespace components { namespace server
         return hpx::threadmanager::terminated;
     }
 
+    // delete an existing instance of a component
     threadmanager::thread_state factory::free(
         threadmanager::px_thread_self& self, applier::applier& appl,
-        components::component_type type, naming::id_type const& gid)
+        components::component_type type, naming::id_type const& gid,
+        std::size_t count)
     {
         switch (type) {
         case accumulator::value:
-            server::destroy<accumulator>(appl, gid);
+            server::destroy<server::accumulator>(appl, gid, count);
             break;
 
         default:

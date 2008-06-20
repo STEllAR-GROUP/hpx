@@ -11,6 +11,9 @@
 #include <string>
 
 #include <boost/noncopyable.hpp>
+#include <boost/aligned_storage.hpp>
+#include <boost/type_traits/alignment_of.hpp>
+
 #include <hpx/config.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -25,14 +28,14 @@ namespace hpx { namespace components { namespace detail
     public:
         typedef T value_type;
         typedef Allocator allocator_type;
-        
-        struct data {
-            unsigned char data_[sizeof(T)];   // object place
-        };
+
+        typedef boost::aligned_storage<sizeof(value_type),
+            boost::alignment_of<value_type>::value> storage_type;
+        storage_type data;
 
         enum { 
-            heap_step = 1024,               // default grow step
-            heap_size = sizeof(data)        // size of one element in the heap
+            heap_step = 1024,                 // default grow step
+            heap_size = sizeof(storage_type)  // size of one element in the heap
         };
 
     public:
@@ -42,7 +45,7 @@ namespace hpx { namespace components { namespace detail
           , class_name_(class_name)
 #endif
         {
-            BOOST_ASSERT(sizeof(data) == heap_size);
+            BOOST_ASSERT(sizeof(storage_type) == heap_size);
 
         // adjust step to reasonable value
             if (step_ < heap_step) 
@@ -55,7 +58,7 @@ namespace hpx { namespace components { namespace detail
           : pool_(NULL), first_free_(NULL), 
             step_(heap_step), size_(0), free_size_(0) 
         {
-            BOOST_ASSERT(sizeof(data) == heap_size);
+            BOOST_ASSERT(sizeof(storage_type) == heap_size);
         }
         
         ~wrapper_heap()
@@ -78,30 +81,30 @@ namespace hpx { namespace components { namespace detail
         int free_size() const { return free_size_; }
         bool is_empty() const { return NULL == pool_; }
 
-        T* alloc()
+        T* alloc(std::size_t count = 1)
         {
-            if (!ensure_pool())
+            if (!ensure_pool(count))
                 return NULL;
 
-            T *p = reinterpret_cast<T*>(&first_free_->data_);
+            T *p = reinterpret_cast<T*>(first_free_->address());
             BOOST_ASSERT(p != NULL);
 
-            ++first_free_;
-            --free_size_;
+            first_free_ += count;
+            free_size_ -= count;
 
             return p;
         }
         
-        void free (void *p)
+        void free (void *p, std::size_t count = 1)
         {
-            data* p1 = (data *)(unsigned char *)p;
+            storage_type* p1 = (storage_type*)(unsigned char *)p;
 
             BOOST_ASSERT(NULL != pool_ && p1 >= pool_);
             BOOST_ASSERT(NULL != pool_ && p1 <  pool_ + size_);
             BOOST_ASSERT(first_free_ == NULL || p1 != first_free_);
 
             using namespace std;
-            memset(&p1->data_, 0, sizeof(data));
+            memset(p1->address(), 0, sizeof(storage_type));
             free_size_++;
             
             // release the pool if this one was the last allocated item
@@ -130,11 +133,11 @@ namespace hpx { namespace components { namespace detail
             return true;
         }
 
-        bool ensure_pool()
+        bool ensure_pool(std::size_t count)
         {
             if (NULL == pool_ && !init_pool())
                 return false;
-            if (first_free_ == pool_+size_) 
+            if (first_free_ + count >= pool_+size_) 
                 return false;
             return true;
         }
@@ -145,7 +148,7 @@ namespace hpx { namespace components { namespace detail
             BOOST_ASSERT(first_free_ == NULL);
 
             std::size_t s = std::size_t(step_ * heap_size);
-            pool_ = (data *)Allocator::alloc(s);
+            pool_ = (storage_type*)Allocator::alloc(s);
             if (NULL == pool_) 
                 return false;
 
@@ -164,8 +167,8 @@ namespace hpx { namespace components { namespace detail
         }
 
     private:
-        data* pool_;
-        data* first_free_;
+        storage_type* pool_;
+        storage_type* first_free_;
         int step_;
         int size_;
         int free_size_;

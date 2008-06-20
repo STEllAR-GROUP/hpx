@@ -7,6 +7,7 @@
 #include <boost/detail/lightweight_test.hpp>
 
 #include <hpx/hpx.hpp>
+#include <hpx/components/server/accumulator.hpp>
 
 using namespace hpx;
 
@@ -82,7 +83,7 @@ int main(int argc, char* argv[])
         // initialize the DGAS service
         hpx::util::io_service_pool dgas_pool; 
         hpx::naming::resolver_server dgas(dgas_pool, host, dgas_port, true);
-        
+
         // initialize and start the HPX runtime
         hpx::runtime rt(host, dgas_port, host, ps_port);
         rt.run(hpx_main);

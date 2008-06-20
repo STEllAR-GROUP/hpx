@@ -21,8 +21,8 @@ namespace hpx { namespace components { namespace server
         // object (the accumulator)
         enum actions
         {
-            create_component = 0,   // create a new component, no arguments
-            free_component = 1,     // delete an existing component, no arguments
+            create_components = 0,  // create a new component, no arguments
+            free_components = 1,    // delete an existing component, no arguments
         };
 
         // This is the component id. Every component needs to have an embedded
@@ -37,29 +37,30 @@ namespace hpx { namespace components { namespace server
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        /// \brief Action to create a new component
+        /// \brief Action to create new components
         threadmanager::thread_state create(
             threadmanager::px_thread_self& self, applier::applier& app,
             naming::id_type* gid, components::component_type type, 
             std::size_t count); 
 
-        /// \brief Action to delete an existing component
+        /// \brief Action to delete existing components
         threadmanager::thread_state free(
             threadmanager::px_thread_self& self, applier::applier& app,
-            components::component_type type, naming::id_type const& gid); 
+            components::component_type type, naming::id_type const& gid,
+            std::size_t count); 
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
         typedef result_action2<
-            factory, naming::id_type, create_component, 
+            factory, naming::id_type, create_components, 
             components::component_type, std::size_t, &factory::create
         > create_action;
 
-        typedef action2<
-            factory, free_component, 
-            components::component_type, naming::id_type const&, &factory::free
+        typedef action3<
+            factory, free_components, components::component_type, 
+            naming::id_type const&, std::size_t, &factory::free
         > free_action;
     };
 

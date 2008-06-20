@@ -199,7 +199,8 @@ namespace hpx { namespace applier
         void free (components::component_type type, naming::id_type const& gid)
         {
             typedef components::server::factory::free_action action_type;
-            apply<action_type>(naming::get_factory_id(gid), type, gid);
+            apply<action_type>(
+                naming::get_factory_id(gid), type, gid, std::size_t(1));
         }
 
         /// \brief Allow access to the DGAS client instance used with this

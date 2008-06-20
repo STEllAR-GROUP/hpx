@@ -47,7 +47,7 @@ namespace hpx { namespace util
           , heap_count_(0L), max_alloc_count_(0L)
 #endif
         {
-            BOOST_ASSERT(sizeof(typename heap_type::data) == heap_size);
+            BOOST_ASSERT(sizeof(typename heap_type::storage_type) == heap_size);
 
             // adjust step to reasonable value
             if (step_ < heap_step) 
@@ -78,8 +78,11 @@ namespace hpx { namespace util
         }
         
         // operations
-        value_type* alloc()
+        value_type* alloc(std::size_t count = 1)
         {
+            if (0 == count)
+                throw std::bad_alloc();   // this doesn't make sense for us
+
             typename Mutex::scoped_lock guard (mtx_);
 
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
@@ -92,7 +95,7 @@ namespace hpx { namespace util
                 value_type *p = NULL;
                 
                 try {
-                    p = (*it)->alloc();
+                    p = (*it)->alloc(count);
                 }
                 catch (std::bad_alloc const&) {
                     /**/;
@@ -139,13 +142,13 @@ namespace hpx { namespace util
                 throw std::bad_alloc();   // insert failed
 #endif
 
-            value_type* p = (*itnew)->alloc();
+            value_type* p = (*itnew)->alloc(count);
             if (NULL == p)
                 throw std::bad_alloc();   // snh 
             return p;
         }
 
-        void free(void* p)
+        void free(void* p, std::size_t count = 1)
         {
             typename Mutex::scoped_lock guard (mtx_);
 
@@ -156,7 +159,7 @@ namespace hpx { namespace util
             iterator it = heap_list_.begin();
             for (/**/; it != heap_list_.end(); ++it) {
                 if ((*it)->did_alloc(p)) {
-                    (*it)->free(p);
+                    (*it)->free(p, count);
 
                     if ((*it)->is_empty()) {
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)

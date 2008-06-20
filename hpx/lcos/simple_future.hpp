@@ -6,9 +6,10 @@
 #if !defined(HPX_LCOS_SIMPLE_FUTURE_JUN_12_2008_0654PM)
 #define HPX_LCOS_SIMPLE_FUTURE_JUN_12_2008_0654PM
 
-#include <boost/shared_ptr.hpp>
+#include <boost/intrusive_ptr.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/variant.hpp>
+#include <boost/detail/atomic_count.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -33,7 +34,7 @@ namespace hpx { namespace lcos { namespace detail
         enum { value = components::component_simple_future};
 
         simple_future(threadmanager::px_thread_self& self)
-          : target_thread_(self)
+          : target_thread_(self), use_count_(0)
         {
         }
 
@@ -114,6 +115,9 @@ namespace hpx { namespace lcos { namespace detail
         threadmanager::px_thread_self& target_thread_;
         lcos::full_empty<data_type> data_;
         std::string error_msg_;
+
+    public:
+        boost::detail::atomic_count use_count_;
     };
 
 }}}
@@ -178,11 +182,8 @@ namespace hpx { namespace lcos
         ///               simple_future instance (as it has to be sent along 
         ///               with the action as the continuation parameter).
         simple_future(threadmanager::px_thread_self& self)
-          : impl_(new wrapping_type())    // this allocates the wrapper
-        {
-            // this allocates the component implementation
-            impl_->set_wrapped(new wrapped_type(self));
-        }
+          : impl_(new wrapping_type(new wrapped_type(self)))
+        {}
 
         /// Get the result of the requested action. This call blocks (yields 
         /// control) if the result is not ready. As soon as the result has been 
@@ -209,7 +210,7 @@ namespace hpx { namespace lcos
         }
 
     private:
-        boost::shared_ptr<wrapping_type> impl_;
+        boost::intrusive_ptr<wrapping_type> impl_;
     };
 
 }}
