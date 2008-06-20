@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threadmanager/px_thread.hpp>
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/action.hpp>

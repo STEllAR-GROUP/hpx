@@ -10,8 +10,8 @@
 
 #include <hpx/include/naming.hpp>
 #include <hpx/include/parcelset.hpp>
-#include <hpx/include/threadmanager.hpp>
-#include <hpx/include/applier.hpp>
+#include <hpx/runtime/threadmanager/threadmanager.hpp>
+#include <hpx/runtime/applier/applier.hpp>
 
 namespace hpx { namespace action_manager
 {

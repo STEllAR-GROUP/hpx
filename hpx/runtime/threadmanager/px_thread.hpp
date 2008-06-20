@@ -14,6 +14,7 @@
 #include <boost/coroutine/shared_coroutine.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/server/wrapper.hpp>
 

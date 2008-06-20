@@ -56,6 +56,7 @@ namespace hpx
     
     namespace threadmanager
     {
+        class px_thread;
         class threadmanager;
 
         ///////////////////////////////////////////////////////////////////////
@@ -83,8 +84,10 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         typedef 
-            boost::coroutines::shared_coroutine<thread_state()>::self 
-        px_thread_self;
+            boost::coroutines::shared_coroutine<thread_state()>
+        coroutine_type;
+        typedef coroutine_type::thread_id_type thread_id_type;
+        typedef coroutine_type::self px_thread_self;
         typedef thread_state thread_function_type(px_thread_self&);
     }
 

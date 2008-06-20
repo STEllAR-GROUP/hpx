@@ -67,7 +67,7 @@ namespace hpx { namespace components { namespace stubs
             // The simple_future instance is associated with the following 
             // apply action by sending it along as its continuation
             appl.apply<server::detail::accumulator::query_action>(
-                new components::continuation(lco.get_gid()), gid);
+                new components::continuation(lco.get_gid(appl)), gid);
 
             // we simply return the initialized simple_future, the caller needs
             // to call get_result() on the return value to obtain the result

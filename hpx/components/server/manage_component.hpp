@@ -22,18 +22,16 @@ namespace hpx { namespace components { namespace server
     naming::id_type create (applier::applier& appl, std::size_t count)
     {
         Component* c = static_cast<Component*>(Component::create(count));
-        naming::id_type gid = c->get_gid();
-        if (!appl.get_dgas_client().bind(gid, 
-                naming::address(appl.here(), Component::value, c))) 
-        {
-            delete c;
-            boost::throw_exception(
-                hpx::exception(hpx::duplicate_component_address,
-                    "global id is already bound to a different "
-                    "component instance"));
-            return naming::invalid_id;
-        }
-        return gid;
+        naming::id_type gid = c->get_gid(appl);
+        if (gid) 
+            return gid;
+
+        delete c;
+        boost::throw_exception(
+            hpx::exception(hpx::duplicate_component_address,
+                "global id is already bound to a different "
+                "component instance"));
+        return naming::invalid_id;
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -11,6 +11,9 @@
 #include <string>
 
 #include <boost/noncopyable.hpp>
+#include <boost/aligned_storage.hpp>
+#include <boost/type_traits/alignment_of.hpp>
+
 #include <hpx/config.hpp>
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
 #include <hpx/util/logging.hpp>
@@ -54,6 +57,9 @@ namespace hpx { namespace util
         typedef T value_type;
         typedef Allocator allocator_type;
         
+        typedef boost::aligned_storage<sizeof(value_type),
+            boost::alignment_of<value_type>::value> storage_type;
+
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
         enum guard_value {
             preguard_value = 0xfc,          // values to be used in memory guard areas
@@ -68,8 +74,8 @@ namespace hpx { namespace util
         struct data {
             unsigned char preguard_[guard_size];  // guard before data
             union {                         // helper for managing the pool
-                unsigned char data_[sizeof(T)];   // object place
-                data* next_;                      // pointer to the next free chunk
+                storage_type data_;             // object place
+                data* next_;                    // pointer to the next free chunk
             } datafield;
             unsigned char postguard_[guard_size]; // guard behind data
             unsigned long alloc_count_;           // add room for allocation counter
@@ -80,8 +86,8 @@ namespace hpx { namespace util
         };
         struct data {
             union {                         // helper for managing the pool
-                unsigned char data_[sizeof(T)];   // object place
-                data* next_;                      // pointer to the next free chunk
+                storage_type data_;             // object place
+                data* next_;                    // pointer to the next free chunk
             } datafield;
         };
 #endif // defined(HPX_DEBUG_ONE_SIZE_HEAP)
@@ -147,7 +153,7 @@ namespace hpx { namespace util
             if (!ensure_pool())
                 return NULL;
 
-            T *p = reinterpret_cast<T*>(&first_free_->datafield.data_);
+            T *p = reinterpret_cast<T*>(&first_free_->datafield.data_.address());
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
             data *item = first_free_;
 #endif
@@ -162,7 +168,8 @@ namespace hpx { namespace util
             // init memory blocks
             debug::fill_bytes(&item->preguard_, preguard_value, 
                 sizeof(unsigned char)*guard_size);
-            debug::fill_bytes(&item->datafield.data_, initial_value, sizeof(T));
+            debug::fill_bytes(&item->datafield.data_.address(), initial_value, 
+                sizeof(storage_type));
             debug::fill_bytes(&item->postguard_, postguard_value, 
                 sizeof(unsigned char)*guard_size);
 

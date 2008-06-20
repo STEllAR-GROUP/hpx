@@ -185,4 +185,28 @@ namespace hpx { namespace threadmanager
         }
     }
 
+    // 
+    boost::shared_ptr<px_thread> 
+    threadmanager::get_thread(px_thread::thread_id_type id) const
+    {
+        // lock data members while getting a thread state
+        mutex_type::scoped_lock lk(mtx_);
+
+        thread_map_type::const_iterator map_iter = thread_map_.find(id);
+        map_iter = thread_map_.find(id);
+        if (map_iter != thread_map_.end())
+        {
+            return map_iter->second;
+        }
+        return boost::shared_ptr<px_thread>();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void set_thread_state(thread_id_type id, thread_state new_state)
+    {
+        components::wrapper<detail::px_thread>* t =
+            static_cast<components::wrapper<detail::px_thread>*>(id);
+        (*t)->get_thread_manager().set_state(id, new_state);
+    }
+
 }}

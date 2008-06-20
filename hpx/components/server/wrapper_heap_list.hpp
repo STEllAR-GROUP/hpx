@@ -8,6 +8,7 @@
 
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/one_size_heap_list.hpp>
+#include <hpx/util/generate_unique_ids.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace detail 
@@ -20,24 +21,27 @@ namespace hpx { namespace components { namespace detail
         typedef util::one_size_heap_list<Heap, Mutex> base_type;
 
     public:
-        wrapper_heap_list(char const* class_name = "", int step = -1)
-          : base_type(class_name, step)
+        wrapper_heap_list(char const* class_name = "")
+          : base_type(class_name)
         {}
 
         ///
-        naming::id_type get_gid(void* p) const
+        naming::id_type get_gid(applier::applier& appl, void* p)
         {
             typedef typename base_type::const_iterator iterator;
             iterator end = this->heap_list_.end();
             for (iterator it = this->heap_list_.begin(); it != end; ++it) 
             {
                 if ((*it)->did_alloc(p)) 
-                    return (*it)->get_gid(p);
+                    return (*it)->get_gid(appl, id_range_, p);
             }
             return naming::invalid_id;
         }
+
+    private:
+        util::unique_ids id_range_;
     };
-    
+
 }}} // namespace hpx::components::detail
 
 #endif

@@ -23,37 +23,35 @@ namespace hpx { namespace util
 
         /// size of the id range returned by command_getidrange
         /// FIXME: is this a policy?
-        enum { range_delta = 1024 };
+        enum { range_delta = 16392 };
         
     public:
-        unique_ids(naming::locality const& here, naming::resolver_client& resolver)
-          : lower_(0), upper_(0), here_(here), resolver_(resolver)
-        {
-            resolver.get_id_range(here, range_delta, lower_, upper_);
-        }
+        unique_ids()
+          : lower_(0), upper_(0)
+        {}
 
         /// Generate next unique component id
-        naming::id_type get_id()
+        naming::id_type get_id(naming::locality const& here,
+            naming::resolver_client const& resolver, std::size_t count = 1)
         {
             // create a new id
             mutex_type::scoped_lock l(mtx_);
 
             // ensure next_id doesn't overflow
-            if (lower_ > upper_) 
-                resolver_.get_id_range(here_, range_delta, lower_, upper_);
-            ++lower_;
-            return lower_;
+            if (lower_ + count > upper_) 
+            {
+                resolver.get_id_range(here, 
+                    (std::max)(std::size_t(range_delta), count), lower_, upper_);
+            }
+            return lower_++;
         }
-        
+
     private:
         mutex_type mtx_;
         
         /// The range of available ids for components
         naming::id_type lower_;
         naming::id_type upper_;
-
-        naming::locality const& here_;
-        naming::resolver_client& resolver_;
     };
     
 }}

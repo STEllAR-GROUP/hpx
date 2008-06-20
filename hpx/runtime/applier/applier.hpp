@@ -12,7 +12,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/naming.hpp>
 #include <hpx/include/parcelset.hpp>
-#include <hpx/include/threadmanager.hpp>
+#include <hpx/runtime/threadmanager/threadmanager.hpp>
 #include <hpx/components/continuation.hpp>
 #include <hpx/components/server/factory.hpp>
 
@@ -166,6 +166,7 @@ namespace hpx { namespace applier
         /// \param self
         /// \param targetgid
         /// \param type
+        /// \param count
         ///
         /// \returns    The function returns a \a lcos#simple_future instance 
         ///             returning the the global id of the newly created
@@ -175,7 +176,8 @@ namespace hpx { namespace applier
         ///             \a applier#create_async.
         lcos::simple_future<naming::id_type> create_async(
             threadmanager::px_thread_self& self, 
-            naming::id_type const& targetgid, components::component_type type);
+            naming::id_type const& targetgid, components::component_type type,
+            std::size_t count = 1);
 
         /// The \a create function creates a new component using the factory as 
         /// given by targetgid. This function is blocking for the component to 
@@ -185,6 +187,7 @@ namespace hpx { namespace applier
         /// \param self
         /// \param targetgid
         /// \param type
+        /// \param count
         ///
         /// \returns    The function returns the global id of the newly created
         ///             component.
@@ -192,15 +195,17 @@ namespace hpx { namespace applier
         /// \note       For asynchronous operation use the function 
         ///             \a applier#create_async.
         naming::id_type create(threadmanager::px_thread_self& self,
-            naming::id_type const& targetgid, components::component_type type);
+            naming::id_type const& targetgid, components::component_type type,
+            std::size_t count = 1);
 
         /// \brief The \a free function frees an existing component as given by 
         ///        its type and its gid
-        void free (components::component_type type, naming::id_type const& gid)
+        void free (components::component_type type, naming::id_type const& gid,
+            std::size_t count = 1)
         {
             typedef components::server::factory::free_action action_type;
             apply<action_type>(
-                naming::get_factory_id(gid), type, gid, std::size_t(1));
+                naming::get_factory_id(gid), type, gid, count);
         }
 
         /// \brief Allow access to the DGAS client instance used with this

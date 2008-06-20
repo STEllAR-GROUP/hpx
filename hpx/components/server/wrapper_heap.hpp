@@ -17,6 +17,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/util/generate_unique_ids.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace detail 
@@ -40,7 +41,8 @@ namespace hpx { namespace components { namespace detail
 
     public:
         explicit wrapper_heap(char const* class_name, bool, bool, int step = -1)
-          : pool_(NULL), first_free_(NULL), step_(step), size_(0), free_size_(0)
+          : pool_(NULL), first_free_(NULL), step_(step), size_(0), free_size_(0),
+            base_gid_(naming::invalid_id)
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
           , class_name_(class_name)
 #endif
@@ -56,7 +58,8 @@ namespace hpx { namespace components { namespace detail
         
         wrapper_heap()
           : pool_(NULL), first_free_(NULL), 
-            step_(heap_step), size_(0), free_size_(0) 
+            step_(heap_step), size_(0), free_size_(0),
+            base_gid_(naming::invalid_id)
         {
             BOOST_ASSERT(sizeof(storage_type) == heap_size);
         }
@@ -86,26 +89,29 @@ namespace hpx { namespace components { namespace detail
             if (!ensure_pool(count))
                 return NULL;
 
-            T *p = reinterpret_cast<T*>(first_free_->address());
+            value_type* p = static_cast<value_type*>(first_free_->address());
             BOOST_ASSERT(p != NULL);
 
             first_free_ += count;
             free_size_ -= count;
 
+            BOOST_ASSERT(free_size_ >= 0);
             return p;
         }
         
         void free (void *p, std::size_t count = 1)
         {
-            storage_type* p1 = (storage_type*)(unsigned char *)p;
+            BOOST_ASSERT(did_alloc(p));
+
+            storage_type* p1 = static_cast<storage_type*>(p);
 
             BOOST_ASSERT(NULL != pool_ && p1 >= pool_);
-            BOOST_ASSERT(NULL != pool_ && p1 <  pool_ + size_);
+            BOOST_ASSERT(NULL != pool_ && p1 + count <= pool_ + size_);
             BOOST_ASSERT(first_free_ == NULL || p1 != first_free_);
 
             using namespace std;
             memset(p1->address(), 0, sizeof(storage_type));
-            free_size_++;
+            free_size_ += count;
             
             // release the pool if this one was the last allocated item
             test_release();
@@ -115,11 +121,36 @@ namespace hpx { namespace components { namespace detail
             return NULL != pool_ && NULL != p && pool_ <= p && p < pool_ + size_;
         }
 
-        naming::id_type get_gid(void* p) const
+        /// \brief Get the global id of the wrapper instance given by the 
+        ///        parameter \a p. 
+        ///
+        ///
+        /// \note  The pointer given by the parameter \a p must have been 
+        ///        allocated by this instance of a \a wrapper_heap
+        naming::id_type 
+        get_gid(applier::applier& appl, util::unique_ids& ids, void* p) 
         {
-            return naming::invalid_id;
+            BOOST_ASSERT(did_alloc(p));
+
+            value_type* addr = static_cast<value_type*>(pool_->address());
+            if (base_gid_)
+                return base_gid_ + (static_cast<value_type*>(p) - addr);
+
+            // this is the first call to get_gid() for this heap - allocate 
+            // a sufficiently large range of global ids
+            base_gid_ = ids.get_id(appl.here(), appl.get_dgas_client(), step_);
+
+            // register the global ids and the base address of this heap
+            // with the DGAS
+            if (!appl.get_dgas_client().bind_range(base_gid_, step_, 
+                  naming::address(appl.here(), value_type::get_type(), addr),
+                  sizeof(value_type))) 
+            {
+                return naming::invalid_id;
+            }
+            return base_gid_ + (static_cast<value_type*>(p) - addr);
         }
-        
+
     protected:
         bool test_release()
         {
@@ -172,6 +203,10 @@ namespace hpx { namespace components { namespace detail
         int step_;
         int size_;
         int free_size_;
+
+        // these values are used for DGAS registration of all elements of this
+        // wrapper heap
+        naming::id_type base_gid_;
 
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
         std::string class_name_;

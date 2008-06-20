@@ -17,7 +17,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/threadmanager/px_thread.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threadmanager
@@ -31,7 +30,7 @@ namespace hpx { namespace threadmanager
 
         // this is the type of a map holding all threads (except depleted ones)
         typedef
-            std::map <px_thread::thread_id_type, boost::shared_ptr<px_thread> >
+            std::map<thread_id_type, boost::shared_ptr<px_thread> >
         thread_map_type;
         typedef thread_map_type::value_type map_pair;
 
@@ -70,7 +69,7 @@ namespace hpx { namespace threadmanager
         ///
         /// \returns      The function retunrs the thread id of the newly 
         ///               created thread. 
-        px_thread::thread_id_type 
+        thread_id_type 
         register_work(boost::function<thread_function_type> func,
             thread_state initial_state = pending);
 
@@ -128,8 +127,7 @@ namespace hpx { namespace threadmanager
         ///                 \a thread_state enumeration. If the 
         ///                 thread is not known to the threadmanager the return 
         ///                 value will be \a thread_state#unknown.
-        thread_state set_state(px_thread::thread_id_type id, 
-            thread_state new_state);
+        thread_state set_state(thread_id_type id, thread_state new_state);
 
         /// The set_state function is part of the thread related API and allows
         /// to query the state of one of the threads known to the threadmanager
@@ -143,7 +141,10 @@ namespace hpx { namespace threadmanager
         ///                 \a thread_state enumeration. If the 
         ///                 thread is not known to the threadmanager the return 
         ///                 value will be \a thread_state#unknown.
-        thread_state get_state(px_thread::thread_id_type id) const;
+        thread_state get_state(thread_id_type id) const;
+
+        ///
+        boost::shared_ptr<px_thread> get_thread(thread_id_type id) const;
 
     public:
         /// this notifies the thread manager that there is some more work 
@@ -171,13 +172,7 @@ namespace hpx { namespace threadmanager
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    inline void 
-    set_thread_state(px_thread::thread_id_type id, thread_state new_state)
-    {
-        components::wrapper<detail::px_thread>* t =
-            static_cast<components::wrapper<detail::px_thread>*>(id);
-        (*t)->get_thread_manager().set_state(id, new_state);
-    }
+    void set_thread_state(thread_id_type id, thread_state new_state);
 
 ///////////////////////////////////////////////////////////////////////////////
 }}

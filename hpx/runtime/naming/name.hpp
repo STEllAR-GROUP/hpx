@@ -29,7 +29,7 @@ namespace hpx { namespace naming
         explicit id_type (boost::uint64_t msb_id, boost::uint64_t lsb_id) 
           : id_msb_(msb_id), id_lsb_(lsb_id)
         {}
-        
+
         id_type& operator++()       // pre-increment
         {
             if (boost::uint64_t(~0x0) == id_lsb_) 
@@ -37,16 +37,16 @@ namespace hpx { namespace naming
             ++id_lsb_;
             return *this;
         }
-        id_type operator++(int)    // post-increment
+        id_type operator++(int)     // post-increment
         {
             id_type t(*this);
             ++(*this);
             return t;
         }
-        
+
         // this get's called from the safe_bool base class 
         bool operator_bool() const { return 0 != id_lsb_ || 0 != id_msb_; }
-        
+
         // we support increment and addition as operators
         friend id_type operator+ (id_type const& lhs, id_type const& rhs)
         {
@@ -56,7 +56,7 @@ namespace hpx { namespace naming
                 ++msb;
             return id_type(msb, lsb);
         }
-        
+
         friend id_type operator+ (id_type const& lhs, boost::uint64_t rhs)
         {
             boost::uint64_t lsb = lhs.id_lsb_ + rhs;
@@ -65,7 +65,7 @@ namespace hpx { namespace naming
                 ++msb;
             return id_type(msb, lsb);
         }
-        
+
         // comparison is required as well
         friend bool operator== (id_type const& lhs, id_type const& rhs)
         {
@@ -84,7 +84,7 @@ namespace hpx { namespace naming
                 return false;
             return lhs.id_lsb_ < rhs.id_lsb_;
         }
-        
+
         friend bool operator<= (id_type const& lhs, id_type const& rhs)
         {
             if (lhs.id_msb_ < rhs.id_msb_)
@@ -93,7 +93,7 @@ namespace hpx { namespace naming
                 return false;
             return lhs.id_lsb_ <= rhs.id_lsb_;
         }
-        
+
         friend bool operator> (id_type const& lhs, id_type const& rhs)
         {
             if (lhs.id_msb_ > rhs.id_msb_)
@@ -102,7 +102,7 @@ namespace hpx { namespace naming
                 return false;
             return lhs.id_lsb_ > rhs.id_lsb_;
         }
-        
+
         friend bool operator>= (id_type const& lhs, id_type const& rhs)
         {
             if (lhs.id_msb_ > rhs.id_msb_)
@@ -111,7 +111,7 @@ namespace hpx { namespace naming
                 return false;
             return lhs.id_lsb_ >= rhs.id_lsb_;
         }
-        
+
         boost::uint64_t get_msb() const
         {
             return id_msb_;
@@ -120,7 +120,7 @@ namespace hpx { namespace naming
         {
             return id_lsb_;
         }
-        
+
     private:
         boost::uint64_t id_msb_;    // Type that we use for global IDs
         boost::uint64_t id_lsb_;
@@ -169,8 +169,8 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    id_type const invalid_id = id_type(boost::uint64_t(-1));
-    
+    id_type const invalid_id = id_type();
+
 ///////////////////////////////////////////////////////////////////////////////
 }}
 

@@ -27,7 +27,7 @@ namespace hpx { namespace naming { namespace server
     request_handler::~request_handler()
     {
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
     void request_handler::handle_getprefix(request const& req, reply& rep)
     {
@@ -38,7 +38,7 @@ namespace hpx { namespace naming { namespace server
             if (it != site_prefixes_.end()) {
                 // The real prefix has to be used as the 32 most 
                 // significant bits of global id's
-                
+
                 // existing entry
                 rep = reply(repeated_request, command_getprefix, 
                     get_id_from_prefix((*it).second.first)); 
@@ -66,17 +66,17 @@ namespace hpx { namespace naming { namespace server
 
                 // The real prefix has to be used as the 32 most 
                 // significant bits of global id's
-                
+
                 // created new entry
                 rep = reply(success, command_getprefix, id);
             }
         }
         catch (std::bad_alloc) {
             rep = reply(command_getprefix, out_of_memory);
-        }            
+        }
         catch (...) {
             rep = reply(command_getprefix, internal_server_error);
-        }            
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -89,7 +89,7 @@ namespace hpx { namespace naming { namespace server
             if (it != site_prefixes_.end()) {
                 // The real prefix has to be used as the 32 most 
                 // significant bits of global id's
-                
+
                 // generate the new id range
                 naming::id_type lower = (*it).second.second + 1;
                 naming::id_type upper = lower + (req.get_count() - 1);
@@ -135,10 +135,10 @@ namespace hpx { namespace naming { namespace server
         }
         catch (std::bad_alloc) {
             rep = reply(command_getprefix, out_of_memory);
-        }            
+        }
         catch (...) {
             rep = reply(command_getprefix, internal_server_error);
-        }            
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -149,10 +149,10 @@ namespace hpx { namespace naming { namespace server
             std::string str;
             {
                 using boost::fusion::at_c;
-                
+
                 mutex_type::scoped_lock l(mtx_);
                 registry_type::iterator it = registry_.lower_bound(req.get_id());
-                
+
                 if (it != registry_.end()) {
                     if ((*it).first == req.get_id()) {
                         // update existing bindings
@@ -169,7 +169,7 @@ namespace hpx { namespace naming { namespace server
                     }
                     else if (it != registry_.begin()) {
                         --it;
-                        if ((*it).first + at_c<1>((*it).second) >= req.get_id()) {
+                        if ((*it).first + at_c<1>((*it).second) > req.get_id()) {
                             // the previous range covers the new id
                             s = bad_parameter;
                             str = "the new global id is contained in an existing range";
@@ -188,7 +188,7 @@ namespace hpx { namespace naming { namespace server
                 else {
                     if (!registry_.empty()) {
                         --it;
-                        if ((*it).first + at_c<1>((*it).second) >= req.get_id()) {
+                        if ((*it).first + at_c<1>((*it).second) > req.get_id()) {
                             // the previous range covers the new id
                             s = bad_parameter;
                             str = "the new global id is contained in an existing range";
@@ -208,10 +208,10 @@ namespace hpx { namespace naming { namespace server
         }
         catch (std::bad_alloc) {
             rep = reply(command_bind_range, out_of_memory);
-        }            
+        }
         catch (...) {
             rep = reply(command_bind_range, internal_server_error);
-        }            
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -244,10 +244,10 @@ namespace hpx { namespace naming { namespace server
         }
         catch (std::bad_alloc) {
             rep = reply(command_unbind_range, out_of_memory);
-        }            
+        }
         catch (...) {
             rep = reply(command_unbind_range, internal_server_error);
-        }            
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -300,10 +300,10 @@ namespace hpx { namespace naming { namespace server
         }
         catch (std::bad_alloc) {
             rep = reply(command_resolve, out_of_memory);
-        }            
+        }
         catch (...) {
             rep = reply(command_resolve, internal_server_error);
-        }            
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -319,10 +319,10 @@ namespace hpx { namespace naming { namespace server
         }
         catch (std::bad_alloc) {
             rep = reply(command_queryid, out_of_memory);
-        }            
+        }
         catch (...) {
             rep = reply(command_queryid, internal_server_error);
-        }            
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -345,10 +345,10 @@ namespace hpx { namespace naming { namespace server
         }
         catch (std::bad_alloc) {
             rep = reply(command_registerid, out_of_memory);
-        }            
+        }
         catch (...) {
             rep = reply(command_registerid, internal_server_error);
-        }            
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -363,15 +363,15 @@ namespace hpx { namespace naming { namespace server
                     ns_registry_.erase(it);
                     s = success;
                 }
-            }            
+            }
             rep = reply(command_unregisterid, s);
         }
         catch (std::bad_alloc) {
             rep = reply(command_unregisterid, out_of_memory);
-        }            
+        }
         catch (...) {
             rep = reply(command_unregisterid, internal_server_error);
-        }            
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -393,10 +393,10 @@ namespace hpx { namespace naming { namespace server
         }
         catch (std::bad_alloc) {
             rep = reply(command_statistics_count, out_of_memory);
-        }            
+        }
         catch (...) {
             rep = reply(command_statistics_count, internal_server_error);
-        }            
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -418,10 +418,10 @@ namespace hpx { namespace naming { namespace server
         }
         catch (std::bad_alloc) {
             rep = reply(command_statistics_mean, out_of_memory);
-        }            
+        }
         catch (...) {
             rep = reply(command_statistics_mean, internal_server_error);
-        }            
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -449,10 +449,10 @@ namespace hpx { namespace naming { namespace server
         }
         catch (std::bad_alloc) {
             rep = reply(command_statistics_moment2, out_of_memory);
-        }            
+        }
         catch (...) {
             rep = reply(command_statistics_moment2, internal_server_error);
-        }            
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -463,52 +463,52 @@ namespace hpx { namespace naming { namespace server
         case command_getprefix:
             handle_getprefix(req, rep);
             break;
-            
+
         case command_getidrange:
             handle_getidrange(req, rep);
             break;
-            
+
         case command_bind_range:
             handle_bind_range(req, rep);
             break;
-            
+
         case command_unbind_range:
             handle_unbind_range(req, rep);
             break;
-            
+
         case command_resolve:
             handle_resolve(req, rep);
             break;
-            
+
         case command_queryid:
             handle_queryid(req, rep);
             break;
-            
+
         case command_registerid:
             handle_registerid(req, rep);
             break;
-            
+
         case command_unregisterid:
             handle_unregisterid(req, rep);
             break;
-            
+
         case command_statistics_count:
             handle_statistics_count(req, rep);
             break;
-            
+
         case command_statistics_mean:
             handle_statistics_mean(req, rep);
             break;
-            
+
         case command_statistics_moment2:
             handle_statistics_moment2(req, rep);
             break;
-            
+
         default:
             rep = reply(bad_request);
             break;
         }
-        
+
         if (rep.get_status() != success && rep.get_status() != repeated_request) {
             LDGAS_(error) << "response: " << rep;
         }

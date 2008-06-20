@@ -23,6 +23,8 @@ namespace hpx { namespace components
     class wrapper : boost::noncopyable
     {
     public:
+        typedef Component wrapped_type;
+        
         wrapper() 
           : component_(0) 
         {}
@@ -36,6 +38,9 @@ namespace hpx { namespace components
         {
             delete component_;
         }
+
+        Component* get() { return component_; }
+        Component const* get() const { return component_; }
 
     protected:
         // the memory for the wrappers is managed by a one_size_heap_list
@@ -132,14 +137,15 @@ namespace hpx { namespace components
             get_heap().free(p, count);
         }
 
+    public:
         ///
-        naming::id_type get_gid() const
+        naming::id_type get_gid(applier::applier& appl) const
         {
-            return get_heap().get_gid((void*)this);
+            return get_heap().get_gid(appl, const_cast<wrapper*>(this));
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // The wrapper behaves just like the object it wraps
+        // The wrapper behaves just like the wrapped object
         Component* operator-> ()
         {
             if (0 == component_)
@@ -167,6 +173,12 @@ namespace hpx { namespace components
             if (0 == component_)
                 boost::throw_exception(hpx::exception(invalid_status));
             return *component_;
+        }
+
+        /// \brief Return the type of the embedded component
+        static components::component_type get_type() 
+        {
+            return static_cast<components::component_type>(Component::value);
         }
 
     private:

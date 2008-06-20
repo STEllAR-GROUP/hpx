@@ -45,7 +45,7 @@ namespace hpx { namespace parcelset
         {
             // ensure parcel id is set
             if (!p.get_parcel_id())
-                p.set_parcel_id(id_range_.get_id());
+                p.set_parcel_id(get_next_id());
 
             // ensure the source locality id is set (if no component id is given)
             if (!p.get_source())
@@ -61,7 +61,6 @@ namespace hpx { namespace parcelset
         ///                 parcelhandler.
         parcelhandler(naming::resolver_client& resolver, parcelport& pp) 
           : resolver_(resolver), pp_(pp), parcels_(This()),
-            id_range_(pp.here(), resolver),
             startup_time_(util::high_resolution_timer::now()), timer_()
         {
             // retrieve the prefix to be used for this site
@@ -380,7 +379,7 @@ namespace hpx { namespace parcelset
         // generate next unique id
         parcel_id get_next_id()
         {
-            return id_range_.get_id();
+            return id_range_.get_id(pp_.here(), resolver_);
         }
 
     private:

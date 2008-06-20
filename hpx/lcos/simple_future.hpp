@@ -204,9 +204,9 @@ namespace hpx { namespace lcos
         }
 
         /// \brief Return the global id of this \a simple_future instance
-        naming::id_type get_gid() const
+        naming::id_type get_gid(applier::applier& appl) const
         {
-            return impl_->get_gid();
+            return impl_->get_gid(appl);
         }
 
     private:

@@ -13,8 +13,14 @@ using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
 threadmanager::thread_state test1_helper(threadmanager::px_thread_self& self, 
-    applier::applier&, hpx::lcos::full_empty<int>& data)
+    applier::applier& appl, hpx::lcos::full_empty<int>& data)
 {
+    // retrieve gid for this thread
+    boost::shared_ptr<threadmanager::px_thread> t (
+        appl.get_thread_manager().get_thread(self.get_thread_id()));
+    naming::id_type gid = t->get_gid(appl);
+    BOOST_TEST(gid);
+
     data.set(self, 1);
     BOOST_TEST(!data.is_empty());
 
@@ -24,6 +30,12 @@ threadmanager::thread_state test1_helper(threadmanager::px_thread_self& self,
 threadmanager::thread_state test1(threadmanager::px_thread_self& self, 
     applier::applier& appl)
 {
+    // retrieve gid for this thread
+    boost::shared_ptr<threadmanager::px_thread> t (
+        appl.get_thread_manager().get_thread(self.get_thread_id()));
+    naming::id_type gid = t->get_gid(appl);
+    BOOST_TEST(gid);
+
     // create a full_empty data item
     hpx::lcos::full_empty<int> data;
     BOOST_TEST(data.is_empty());
@@ -53,6 +65,12 @@ threadmanager::thread_state test1(threadmanager::px_thread_self& self,
 threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self, 
     applier::applier& appl)
 {
+    // retrieve gid for this thread
+    boost::shared_ptr<threadmanager::px_thread> t (
+        appl.get_thread_manager().get_thread(self.get_thread_id()));
+    naming::id_type gid = t->get_gid(appl);
+    BOOST_TEST(gid);
+
     // schedule test threads: test1
     appl.get_thread_manager().register_work(
         boost::bind(&test1, _1, boost::ref(appl)));
