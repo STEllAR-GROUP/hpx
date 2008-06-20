@@ -17,6 +17,8 @@ namespace hpx { namespace components
         component_px_thread,        // a ParalleX thread
 
         // LCO's
+        component_base_lco,         // the base of all LCO's not waiting on a value
+        component_base_lco_with_value,  // base LCO's blocking on a value
         component_simple_future,    // a simple future allowing one thread to 
                                     // wait for the result
         

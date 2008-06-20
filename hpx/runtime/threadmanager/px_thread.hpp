@@ -17,12 +17,15 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/server/wrapper.hpp>
+#include <hpx/lcos/base_lco.hpp>
 
 namespace hpx { namespace threadmanager { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     /// This is the representation of a ParalleX thread
-    class px_thread : private boost::noncopyable
+    class px_thread 
+      : public lcos::detail::base_lco,
+        private boost::noncopyable
     {
     private:
         typedef 
@@ -57,50 +60,89 @@ namespace hpx { namespace threadmanager { namespace detail
         };
 
     public:
-        typedef coroutine_type::thread_id_type thread_id_type;
-
-        /// parcel action code: the action to be performed on the destination 
-        /// object (the px_thread)
-        enum actions
-        {
-            some_action_code = 0
-        };
-
-        /// This is the component id. Every component needs to have an embedded
-        /// enumerator 'value' which is used by the generic action implementation
-        /// to associate this component with a given action.
-        enum { value = components::component_px_thread };
-
-        /// 
-        px_thread(boost::function<thread_function_type> threadfunc, 
-                thread_id_type id, threadmanager& tm, 
-                thread_state new_state)
-          : coroutine_(threadfunc, id), tm_(tm), current_state_(new_state) 
+        /// \brief Construct a new \a px_thread
+        ///
+        /// \param func     [in] The thread function to execute by this 
+        ///                 \a px_thread.
+        /// \param id       [in] The thread id assigned to this \a px_thread 
+        ///                 instance.
+        /// \param tm       [in] A reference to the thread manager this 
+        ///                 \a px_thread will be associated with.
+        /// \param newstate [in] The initial thread state this instance will
+        ///                 be initialized with.
+        px_thread(boost::function<thread_function_type> func, 
+                thread_id_type id, threadmanager& tm, thread_state newstate)
+          : coroutine_(func, id), tm_(tm), current_state_(newstate) 
         {}
 
         ~px_thread() 
         {}
 
-        /// execute the thread function
+        /// \brief Execute the thread function
+        ///
+        /// \returns        This function returns the thread state the thread
+        ///                 should be scheduled from this point on. The thread
+        ///                 manager will use the returned value to set the 
+        ///                 thread's scheduling status.
         thread_state execute()
         {
             switch_status thrd_stat (current_state_, active);
             return thrd_stat = coroutine_();
         }
 
+        /// The set_state function allows to query the state of this thread
+        /// instance.
+        ///
+        /// \returns        This function returns the current state of this
+        ///                 thread. It will return one of the values as defined 
+        ///                 by the \a thread_state enumeration.
         thread_state get_state() const 
         {
             return current_state_ ;
         }
 
-        void set_state(thread_state new_state)
+        /// The set_state function allows to change the state this thread 
+        /// instance.
+        ///
+        /// \param newstate [in] The new state to be set for the thread 
+        ///                 referenced by the \a id parameter.
+        ///
+        /// \note           Changing the thread state using this function does
+        ///                 not change it's scheduling status. It only sets the
+        ///                 thread's status word. To change the thread's 
+        ///                 scheduling status \a threadmanager#set_state should
+        ///                 be used.
+        void set_state(thread_state newstate)
         {
-            current_state_ = new_state ;
+            current_state_ = newstate;
         }
 
+        thread_id_type get_thread_id() const
+        {
+            return coroutine_.get_thread_id();
+        }
+
+        /// \brief Allow access to the thread manager instance this thread has 
+        ///        been associated with.
         threadmanager& get_thread_manager() 
         {
             return tm_;
+        }
+
+    public:
+        // action support
+
+        // This is the component id. Every component needs to have an embedded
+        // enumerator 'value' which is used by the generic action implementation
+        // to associate this component with a given action.
+        enum { value = components::component_px_thread };
+
+        /// 
+        thread_state set_event (px_thread_self&, applier::applier&)
+        {
+            // we need to reactivate the thread itself
+            tm_.set_state(get_thread_id(), pending);
+            return terminated;
         }
 
     private:
@@ -112,21 +154,20 @@ namespace hpx { namespace threadmanager { namespace detail
 ///////////////////////////////////////////////////////////////////////////////
 }}}
 
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threadmanager 
 {
     ///////////////////////////////////////////////////////////////////////////
-    class px_thread : public components::wrapper<detail::px_thread>
+    class px_thread : public components::wrapper<px_thread, detail::px_thread>
     {
     private:
         typedef detail::px_thread wrapped_type;
-        typedef components::wrapper<wrapped_type> base_type;
+        typedef components::wrapper<px_thread, wrapped_type> base_type;
 
         // avoid warning about using 'this' in initializer list
         px_thread* This() { return this; }
 
     public:
-        typedef detail::px_thread::thread_id_type thread_id_type;
-
         px_thread(boost::function<thread_function_type> threadfunc, 
                 threadmanager& tm, thread_state new_state = init)
           : base_type(new detail::px_thread(threadfunc, This(), tm, new_state))
@@ -161,7 +202,7 @@ namespace hpx { namespace threadmanager
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    px_thread::thread_id_type const invalid_thread_id = 0;
+    thread_id_type const invalid_thread_id = 0;
 
 }}
 

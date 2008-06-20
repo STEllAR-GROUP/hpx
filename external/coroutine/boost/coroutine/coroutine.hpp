@@ -156,6 +156,11 @@ namespace boost { namespace coroutines {
       lhs.swap(rhs);
     }
 
+    thread_id_type get_thread_id() const
+    {
+        return m_pimpl->get_thread_id();
+    }
+
 #   define BOOST_COROUTINE_generate_argument_n_type(z, n, traits_type) \
     typedef BOOST_DEDUCED_TYPENAME traits_type ::template at<n>::type  \
     BOOST_PP_CAT(BOOST_PP_CAT(arg, n), _type);                         \

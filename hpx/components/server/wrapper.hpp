@@ -19,7 +19,7 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     /// The wrapper template is used as a indirection layer for components 
     /// allowing to gracefully handle the access to non-existing components.
-    template <typename Component>
+    template <typename Derived, typename Component>
     class wrapper : boost::noncopyable
     {
     public:
@@ -95,22 +95,22 @@ namespace hpx { namespace components
             // allocate the memory
             wrapper* p = get_heap().alloc(count);
             if (1 == count)
-                return new (p) wrapper;
+                return new (p) Derived;
 
             // call constructors
             std::size_t succeeded = 0;
             try {
-                wrapper* curr = p;
+                Derived* curr = static_cast<Derived*>(p);
                 for (std::size_t i = 0; i < count; ++i, ++curr) {
-                    new (curr) wrapper;     // call placement new, might throw
+                    new (curr) Derived;     // call placement new, might throw
                     ++succeeded;
                 }
             }
             catch (...) {
                 // call destructors for successfully constructed objects
-                wrapper* curr = p;
+                Derived* curr = static_cast<Derived*>(p);
                 for (std::size_t i = 0; i < succeeded; ++i)
-                    curr->~wrapper();
+                    curr->~Derived();
                 get_heap().free(p, count);     // free memory
                 throw;      // rethrow
             }
@@ -118,19 +118,19 @@ namespace hpx { namespace components
         }
         // The function destroy() is used for deletion and de-allocation of 
         // wrappers
-        static void destroy(wrapper* p, std::size_t count)
+        static void destroy(Derived* p, std::size_t count)
         {
             if (NULL == p || 0 == count) 
                 return;     // do nothing if given a NULL pointer
 
             if (1 == count) {
-                p->~wrapper();
+                p->~Derived();
             }
             else {
                 // call destructors for all wrapper instances
-                wrapper* curr = p;
+                Derived* curr = static_cast<Derived*>(p);
                 for (std::size_t i = 0; i < count; ++i)
-                    curr->~wrapper();
+                    curr->~Derived();
             }
 
             // free memory itself
@@ -186,16 +186,16 @@ namespace hpx { namespace components
     };
 
     // support for boost::intrusive_ptr<wrapper<...> >
-    template <typename Component>
+    template <typename Derived, typename Component>
     inline void
-    intrusive_ptr_add_ref(wrapper<Component>* p)
+    intrusive_ptr_add_ref(wrapper<Derived, Component>* p)
     {
         ++(*p)->use_count_;
     }
 
-    template <typename Component>
+    template <typename Derived, typename Component>
     inline void
-    intrusive_ptr_release(wrapper<Component>* p)
+    intrusive_ptr_release(wrapper<Derived, Component>* p)
     {
         if (--(*p)->use_count_ == 0)
             delete p;

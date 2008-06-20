@@ -30,10 +30,10 @@ namespace hpx { namespace components { namespace server { namespace detail
         // object (the accumulator)
         enum actions
         {
-            init_accumulator = 0,
-            add_to_accumulator = 1,
-            query_accumulator_value = 2,
-            print_accumulator = 3
+            accumulator_init = 0,
+            accumulator_add = 1,
+            accumulator_query_value = 2,
+            accumulator_print = 3
         };
 
         // This is the component id. Every component needs to have an embedded
@@ -89,19 +89,19 @@ namespace hpx { namespace components { namespace server { namespace detail
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef action0<
-            accumulator, init_accumulator, &accumulator::init
+            accumulator, accumulator_init, &accumulator::init
         > init_action;
 
         typedef action1<
-            accumulator, add_to_accumulator, double, &accumulator::add
+            accumulator, accumulator_add, double, &accumulator::add
         > add_action;
 
         typedef result_action0<
-            accumulator, double, query_accumulator_value, &accumulator::query
+            accumulator, double, accumulator_query_value, &accumulator::query
         > query_action;
 
         typedef action0<
-            accumulator, print_accumulator, &accumulator::print
+            accumulator, accumulator_print, &accumulator::print
         > print_action;
 
     private:
@@ -111,20 +111,14 @@ namespace hpx { namespace components { namespace server { namespace detail
 }}}}
 
 ///////////////////////////////////////////////////////////////////////////////
-// Serialization support for the accumulator actions
-HPX_SERIALIZE_ACTION(hpx::components::server::detail::accumulator::init_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::detail::accumulator::add_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::detail::accumulator::query_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::detail::accumulator::print_action);
-
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server 
 {
-    class accumulator : public components::wrapper<detail::accumulator>
+    class accumulator 
+      : public components::wrapper<accumulator, detail::accumulator>
     {
     private:
         typedef detail::accumulator wrapped_type;
-        typedef components::wrapper<wrapped_type> base_type;
+        typedef components::wrapper<accumulator, wrapped_type> base_type;
 
     public:
         // This is the component id. Every component needs to have an embedded
@@ -142,5 +136,12 @@ namespace hpx { namespace components { namespace server
     };
 
 }}}
+
+///////////////////////////////////////////////////////////////////////////////
+// Serialization support for the accumulator actions
+HPX_SERIALIZE_ACTION(hpx::components::server::detail::accumulator::init_action);
+HPX_SERIALIZE_ACTION(hpx::components::server::detail::accumulator::add_action);
+HPX_SERIALIZE_ACTION(hpx::components::server::detail::accumulator::query_action);
+HPX_SERIALIZE_ACTION(hpx::components::server::detail::accumulator::print_action);
 
 #endif

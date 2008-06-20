@@ -129,7 +129,7 @@ namespace hpx { namespace threadmanager
         ///                 value will be \a thread_state#unknown.
         thread_state set_state(thread_id_type id, thread_state new_state);
 
-        /// The set_state function is part of the thread related API and allows
+        /// The get_state function is part of the thread related API and allows
         /// to query the state of one of the threads known to the threadmanager
         ///
         /// \param id       [in] The thread id of the thread the state should 

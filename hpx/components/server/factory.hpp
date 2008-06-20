@@ -21,8 +21,8 @@ namespace hpx { namespace components { namespace server
         // object (the accumulator)
         enum actions
         {
-            create_components = 0,  // create a new component, no arguments
-            free_components = 1,    // delete an existing component, no arguments
+            factory_create = 0,  // create a new component, no arguments
+            factory_free = 1,    // delete an existing component, no arguments
         };
 
         // This is the component id. Every component needs to have an embedded
@@ -54,12 +54,12 @@ namespace hpx { namespace components { namespace server
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
         typedef result_action2<
-            factory, naming::id_type, create_components, 
+            factory, naming::id_type, factory_create, 
             components::component_type, std::size_t, &factory::create
         > create_action;
 
         typedef action3<
-            factory, free_components, components::component_type, 
+            factory, factory_free, components::component_type, 
             naming::id_type const&, std::size_t, &factory::free
         > free_action;
     };

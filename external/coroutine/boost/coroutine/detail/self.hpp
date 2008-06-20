@@ -98,15 +98,15 @@ namespace boost { namespace coroutines { namespace detail {
     yield_result_type yield
     (BOOST_PP_ENUM
        (BOOST_COROUTINE_ARG_MAX,
-	BOOST_COROUTINE_param_with_default,
-	BOOST_DEDUCED_TYPENAME yield_traits::arg))
+        BOOST_COROUTINE_param_with_default,
+        BOOST_DEDUCED_TYPENAME yield_traits::arg))
     {
       return yield_impl
-	(BOOST_DEDUCED_TYPENAME 
-	 coroutine_type::result_slot_type
-	 (BOOST_PP_ENUM_PARAMS
-	  (BOOST_COROUTINE_ARG_MAX, 
-	   arg)));
+        (BOOST_DEDUCED_TYPENAME 
+         coroutine_type::result_slot_type
+         (BOOST_PP_ENUM_PARAMS
+          (BOOST_COROUTINE_ARG_MAX, 
+           arg)));
     }
     
     template<typename Target>
@@ -119,9 +119,9 @@ namespace boost { namespace coroutines { namespace detail {
     {
       typedef BOOST_DEDUCED_TYPENAME Target::arg_slot_type slot_type;
       return yield_to_impl
-	(target, slot_type(BOOST_PP_ENUM_PARAMS
-	  (BOOST_COROUTINE_ARG_MAX, 
-	   arg)));
+        (target, slot_type(BOOST_PP_ENUM_PARAMS
+          (BOOST_COROUTINE_ARG_MAX, 
+           arg)));
     }
 #else
         
@@ -150,37 +150,37 @@ namespace boost { namespace coroutines { namespace detail {
      * 'typedef typename call_traits<typename coroutine_type::yield_traits::argN_type>::param_type yield_call_argN_type;'
      */
     BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX, 
-		    BOOST_COROUTINE_param_typedef, 
-		    (BOOST_DEDUCED_TYPENAME 
-		     coroutine_type::yield_traits::arg, yield_call_arg));
+                    BOOST_COROUTINE_param_typedef, 
+                    (BOOST_DEDUCED_TYPENAME 
+                     coroutine_type::yield_traits::arg, yield_call_arg));
 
     /*
      * Generate lines like this:
      * 'typedef typename call_traits<typename coroutine_type::argN_type>::param_type call_argN_type;'
      */
     BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX,
-		    BOOST_COROUTINE_param_typedef,
-		    (BOOST_DEDUCED_TYPENAME 
-		     coroutine_type::arg, call_arg));
+                    BOOST_COROUTINE_param_typedef,
+                    (BOOST_DEDUCED_TYPENAME 
+                     coroutine_type::arg, call_arg));
 
 #undef BOOST_COROUTINE_param_typedef
 #undef  BOOST_COROUTINE_param_with_default
 #define BOOST_COROUTINE_param_with_default(z, n, prefix_tuple) \
     BOOST_PP_CAT(BOOST_PP_CAT                                  \
-		 (BOOST_PP_TUPLE_ELEM(2, 0, prefix_tuple),     \
-		  n), _type)                                   \
+                 (BOOST_PP_TUPLE_ELEM(2, 0, prefix_tuple),     \
+                  n), _type)                                   \
       BOOST_PP_CAT(arg, n) =                                   \
     BOOST_PP_CAT(BOOST_PP_CAT                                  \
-		 (BOOST_PP_TUPLE_ELEM(2, 1, prefix_tuple),     \
-		  n), _type)()                                 \
+                 (BOOST_PP_TUPLE_ELEM(2, 1, prefix_tuple),     \
+                  n), _type)()                                 \
       /**/
      
     yield_result_type yield
     (BOOST_PP_ENUM(BOOST_COROUTINE_ARG_MAX,
-		   BOOST_COROUTINE_param_with_default,
-		   (yield_call_arg ,
-		    BOOST_COROUTINE_DEDUCED_TYPENAME_DEFAULT 
-		    coroutine_type::yield_traits::arg))) 
+                   BOOST_COROUTINE_param_with_default,
+                   (yield_call_arg ,
+                    BOOST_COROUTINE_DEDUCED_TYPENAME_DEFAULT 
+                    coroutine_type::yield_traits::arg))) 
     {
       return yield_impl
       (result_slot_type
@@ -198,9 +198,9 @@ namespace boost { namespace coroutines { namespace detail {
     {
       typedef typename Target::arg_slot_type type;
       return yield_to_impl
-	(target, type
-	 (BOOST_PP_ENUM_PARAMS
-	  (BOOST_COROUTINE_ARG_MAX, arg)));
+        (target, type
+         (BOOST_PP_ENUM_PARAMS
+          (BOOST_COROUTINE_ARG_MAX, arg)));
     }
 #endif
 
@@ -213,8 +213,8 @@ namespace boost { namespace coroutines { namespace detail {
 
     yield_result_type result() {
       return detail::fix_result<
-	BOOST_DEDUCED_TYPENAME
-	coroutine_type::arg_slot_traits>(*m_pimpl->args());
+        BOOST_DEDUCED_TYPENAME
+        coroutine_type::arg_slot_traits>(*m_pimpl->args());
     }
 
     bool pending() const {
@@ -232,23 +232,23 @@ namespace boost { namespace coroutines { namespace detail {
       m_pimpl(pimpl) {}
 
     yield_result_type yield_impl(BOOST_DEDUCED_TYPENAME 
-				 coroutine_type::result_slot_type result) {
+                                 coroutine_type::result_slot_type result) {
       typedef BOOST_DEDUCED_TYPENAME
-	coroutine_type::result_slot_type slot_type;
+        coroutine_type::result_slot_type slot_type;
 
       BOOST_ASSERT(m_pimpl);
 
       this->m_pimpl->bind_result(&result);
       this->m_pimpl->yield();    
       return detail::fix_result<
-	BOOST_DEDUCED_TYPENAME
-	coroutine_type::arg_slot_traits>(*m_pimpl->args());
+        BOOST_DEDUCED_TYPENAME
+        coroutine_type::arg_slot_traits>(*m_pimpl->args());
     }
 
     template<typename TargetCoroutine>
     yield_result_type yield_to_impl(TargetCoroutine& target, 
-			   BOOST_DEDUCED_TYPENAME TargetCoroutine
-			   ::arg_slot_type args) {
+                           BOOST_DEDUCED_TYPENAME TargetCoroutine
+                           ::arg_slot_type args) {
       BOOST_ASSERT(m_pimpl);
 
       coroutine_accessor::get_impl(target)->bind_args(&args);
@@ -257,8 +257,8 @@ namespace boost { namespace coroutines { namespace detail {
       this->m_pimpl->yield_to(*coroutine_accessor::get_impl(target));
 
       return detail::fix_result<
-	BOOST_DEDUCED_TYPENAME
-	coroutine_type::arg_slot_traits>(*m_pimpl->args());
+        BOOST_DEDUCED_TYPENAME
+        coroutine_type::arg_slot_traits>(*m_pimpl->args());
     }
 
     impl_ptr get_impl() {

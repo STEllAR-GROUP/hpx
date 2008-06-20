@@ -64,7 +64,7 @@ namespace hpx { namespace lcos { namespace detail
         
         // trigger the future, set the result
         threadmanager::thread_state 
-        set_event (threadmanager::px_thread_self& self, 
+        set_result (threadmanager::px_thread_self& self, 
             applier::applier& appl, Result const& result)
         {
             // set the received result, reset error status
@@ -79,8 +79,8 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         // trigger the future with the given error condition
-        threadmanager::thread_state set_error (
-            threadmanager::px_thread_self& self, applier::applier& appl,
+        threadmanager::thread_state 
+        set_error (threadmanager::px_thread_self& self, applier::applier& appl,
             hpx::error code, std::string msg)
         {
             // store the error code
@@ -93,19 +93,6 @@ namespace hpx { namespace lcos { namespace detail
             // this thread has nothing more to do
             return threadmanager::terminated;
         }
-
-        // Each of the exposed functions needs to be encapsulated into an action
-        // type, allowing to generate all required boilerplate code for threads,
-        // serialization, etc.
-        typedef components::action1<
-            simple_future, base_lco::set_event_action, Result const&, 
-            &simple_future::set_event
-        > set_event_action;
-
-        typedef components::action2<
-            simple_future, base_lco::set_error_action, hpx::error, std::string,
-            &simple_future::set_error
-        > set_error_action;
 
     private:
         typedef Result result_type;
@@ -124,10 +111,10 @@ namespace hpx { namespace lcos { namespace detail
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the simple_future actions
-HPX_SERIALIZE_ACTION(hpx::lcos::detail::simple_future<hpx::naming::id_type>::set_event_action);
-HPX_SERIALIZE_ACTION(hpx::lcos::detail::simple_future<hpx::naming::id_type>::set_error_action);
-HPX_SERIALIZE_ACTION(hpx::lcos::detail::simple_future<double>::set_event_action);
-HPX_SERIALIZE_ACTION(hpx::lcos::detail::simple_future<double>::set_error_action);
+HPX_SERIALIZE_ACTION(hpx::lcos::detail::base_lco_with_value<hpx::naming::id_type>::set_result_action);
+HPX_SERIALIZE_ACTION(hpx::lcos::detail::base_lco_with_value<hpx::naming::id_type>::set_error_action);
+HPX_SERIALIZE_ACTION(hpx::lcos::detail::base_lco_with_value<double>::set_result_action);
+HPX_SERIALIZE_ACTION(hpx::lcos::detail::base_lco_with_value<double>::set_error_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos 
@@ -161,7 +148,7 @@ namespace hpx { namespace lcos
     {
     private:
         typedef detail::simple_future<Result> wrapped_type;
-        typedef components::wrapper<wrapped_type> wrapping_type;
+        typedef components::wrapper<simple_future, wrapped_type> wrapping_type;
 
     public:
         /// Construct a new \a simple_future instance. The supplied 

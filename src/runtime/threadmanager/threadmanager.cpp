@@ -14,7 +14,7 @@
 namespace hpx { namespace threadmanager
 {
     ///////////////////////////////////////////////////////////////////////////
-    px_thread::thread_id_type threadmanager::register_work(
+    thread_id_type threadmanager::register_work(
         boost::function<thread_function_type> threadfunc, 
         thread_state initial_state)
     {
@@ -72,7 +72,7 @@ namespace hpx { namespace threadmanager
 
     /// The set_state function is part of the thread related API and allows
     /// to change the state of one of the threads managed by this 
-    thread_state threadmanager::set_state(px_thread::thread_id_type id, 
+    thread_state threadmanager::set_state(thread_id_type id, 
         thread_state new_state)
     {
         // set_state can't be used to force a thread into active state
@@ -119,7 +119,7 @@ namespace hpx { namespace threadmanager
 
     /// The set_state function is part of the thread related API and allows
     /// to query the state of one of the threads known to the threadmanager
-    thread_state threadmanager::get_state(px_thread::thread_id_type id) const
+    thread_state threadmanager::get_state(thread_id_type id) const
     {
         // lock data members while getting a thread state
         mutex_type::scoped_lock lk(mtx_);
@@ -188,7 +188,7 @@ namespace hpx { namespace threadmanager
 
     // 
     boost::shared_ptr<px_thread> 
-    threadmanager::get_thread(px_thread::thread_id_type id) const
+    threadmanager::get_thread(thread_id_type id) const
     {
         // lock data members while getting a thread state
         mutex_type::scoped_lock lk(mtx_);
@@ -205,8 +205,8 @@ namespace hpx { namespace threadmanager
     ///////////////////////////////////////////////////////////////////////////
     void set_thread_state(thread_id_type id, thread_state new_state)
     {
-        components::wrapper<detail::px_thread>* t =
-            static_cast<components::wrapper<detail::px_thread>*>(id);
+        components::wrapper<px_thread, detail::px_thread>* t =
+            static_cast<components::wrapper<px_thread, detail::px_thread>*>(id);
         (*t)->get_thread_manager().set_state(id, new_state);
     }
 
