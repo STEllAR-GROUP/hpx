@@ -99,6 +99,7 @@ namespace hpx { namespace lcos { namespace detail
             return set_full_locked();
         }
 
+        ///////////////////////////////////////////////////////////////////////
         // enqueue a get operation if full/full queue if entry is empty
         template <typename Lock, typename T>
         void enqueue_full_full(Lock& outer_lock, 
@@ -122,6 +123,26 @@ namespace hpx { namespace lcos { namespace detail
                 dest = *static_cast<T const*>(entry_);
         }
 
+        // same as above, but for entries without associated data
+        template <typename Lock>
+        void enqueue_full_full(Lock& outer_lock, 
+            threadmanager::px_thread_self& self)
+        {
+            scoped_lock l(mtx_);
+            outer_lock.unlock();
+
+            // block if this entry is empty
+            if (state_ == empty) {
+                // enqueue the request and block this thread
+                full_empty_queue_entry f(self.get_thread_id());
+                full_full_.push_back(f);
+
+                util::unlock_the_lock<scoped_lock> ul(l);
+                self.yield(threadmanager::suspended);
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         // enqueue a get operation in full/empty queue if entry is empty
         template <typename Lock, typename T>
         void enqueue_full_empty(Lock& outer_lock, 
@@ -154,6 +175,30 @@ namespace hpx { namespace lcos { namespace detail
             }
         }
 
+        // same as above, but for entries without associated data
+        template <typename Lock>
+        void enqueue_full_empty(Lock& outer_lock, 
+            threadmanager::px_thread_self& self)
+        {
+            scoped_lock l(mtx_);
+            outer_lock.unlock();
+
+            // block if this entry is empty
+            if (state_ == empty) {
+                // enqueue the request and block this thread
+                full_empty_queue_entry f(self.get_thread_id());
+                full_empty_.push_back(f);
+
+                // yield this thread
+                util::unlock_the_lock<scoped_lock> ul(l);
+                self.yield(threadmanager::suspended);
+            }
+            else {
+                set_empty_locked();
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         // enqueue if entry is full, otherwise fill it
         template <typename Lock, typename T>
         void enqueue_if_full(Lock& outer_lock, 
@@ -180,6 +225,29 @@ namespace hpx { namespace lcos { namespace detail
             set_full_locked();
         }
 
+        // same as above, but for entries without associated data
+        template <typename Lock>
+        void enqueue_if_full(Lock& outer_lock, 
+            threadmanager::px_thread_self& self)
+        {
+            scoped_lock l(mtx_);
+            outer_lock.unlock();
+
+            // block if this entry is already full
+            if (state_ == full) {
+                // enqueue the request and block this thread
+                full_empty_queue_entry f(self.get_thread_id());
+                empty_full_.push_back(f);
+
+                util::unlock_the_lock<scoped_lock> ul(l);
+                self.yield(threadmanager::suspended);
+            }
+
+            // make sure the entry is full
+            set_full_locked();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         // unconditionally set the data and set the entry to full
         template <typename Lock, typename T>
         void set_and_fill(Lock& outer_lock, 
@@ -191,6 +259,18 @@ namespace hpx { namespace lcos { namespace detail
             // set the data
             if (entry_ && entry_ != &src) 
                 *static_cast<T*>(entry_) = src;
+
+            // make sure the entry is full
+            set_full_locked();
+        }
+
+        // same as above, but for entries without associated data
+        template <typename Lock>
+        void set_and_fill(Lock& outer_lock, 
+            threadmanager::px_thread_self& self)
+        {
+            scoped_lock l(mtx_);
+            outer_lock.unlock();
 
             // make sure the entry is full
             set_full_locked();
@@ -358,11 +438,28 @@ namespace hpx { namespace lcos { namespace detail
             return false;   // not existing entries are not used by any thread
         }
 
+    protected:
+        store_type::iterator find_or_create(void* entry)
+        {
+            store_type::iterator it = store_.find(entry);
+            if (it == store_.end()) {
+                // create a new entry for this unknown (full) block 
+                std::pair<store_type::iterator, bool> p = store_.insert(
+                    entry, new full_empty_entry(entry));
+                if (!p.second) {
+                    boost::throw_exception(std::bad_alloc());
+                    return store_type::iterator();
+                }
+                it = p.first;
+            }
+            return it;
+        }
+
+    public:
         /// \brief Wait for the memory to become full and then reads it, leaves 
         /// memory in full state.
         template <typename T>
-        void read(threadmanager::px_thread_self& self, void* entry, 
-            T& dest) 
+        void read(threadmanager::px_thread_self& self, void* entry, T& dest) 
         {
             boost::shared_lock<mutex_type> l(mtx_);
             store_type::iterator it = store_.find(entry);
@@ -376,45 +473,47 @@ namespace hpx { namespace lcos { namespace detail
             }
         }
 
-        /// \brief Wait for memory to become full and then reads it, sets 
-        /// memory to empty.
-        template <typename T>
-        void read_and_empty(threadmanager::px_thread_self& self, 
-            void const* entry, T& dest)
+        void read(threadmanager::px_thread_self& self, void* entry) 
         {
             boost::shared_lock<mutex_type> l(mtx_);
             store_type::iterator it = store_.find(entry);
-            if (it == store_.end()) {
-            // create a new entry for this unknown (full) block 
-                std::pair<store_type::iterator, bool> p = store_.insert(
-                    store_type::value_type(entry, new full_empty_entry(entry)));
-                if (!p.second) {
-                    boost::throw_exception(std::bad_alloc());
-                    return;
-                }
-                it = p.first;
-            }
+            if (it != store_.end()) 
+                (*it).second->enqueue_full_full(l, self);
+        }
+
+        /// \brief Wait for memory to become full and then reads it, sets 
+        /// memory to empty.
+        template <typename T>
+        void read_and_empty(threadmanager::px_thread_self& self, void* entry, 
+            T& dest)
+        {
+            boost::shared_lock<mutex_type> l(mtx_);
+            store_type::iterator it = find_or_create(entry);
             (*it).second->enqueue_full_empty(l, self, dest);
         }
-        
+
+        void read_and_empty(threadmanager::px_thread_self& self, void* entry)
+        {
+            boost::shared_lock<mutex_type> l(mtx_);
+            store_type::iterator it = find_or_create(entry);
+            (*it).second->enqueue_full_empty(l, self);
+        }
+
         /// \brief Writes memory and atomically sets its state to full without 
         /// waiting for it to become empty.
         template <typename T>
         void set(threadmanager::px_thread_self& self, void* entry, T const& src)
         {
             boost::unique_lock<mutex_type> l(mtx_);
-            store_type::iterator it = store_.find(entry);
-            if (it == store_.end()) {
-            // create a new entry for this unknown (full) block 
-                std::pair<store_type::iterator, bool> p = store_.insert(
-                    entry, new full_empty_entry(entry));
-                if (!p.second) {
-                    boost::throw_exception(std::bad_alloc());
-                    return;
-                }
-                it = p.first;
-            }
+            store_type::iterator it = find_or_create(entry);
             (*it).second->set_and_fill(l, self, src);
+        }
+
+        void set(threadmanager::px_thread_self& self, void* entry)
+        {
+            boost::unique_lock<mutex_type> l(mtx_);
+            store_type::iterator it = find_or_create(entry);
+            (*it).second->set_and_fill(l, self);
         }
 
         /// \brief Wait for memory to become empty, and then fill it.
@@ -423,20 +522,17 @@ namespace hpx { namespace lcos { namespace detail
             T const& src)
         {
             boost::unique_lock<mutex_type> l(mtx_);
-            store_type::iterator it = store_.find(entry);
-            if (it == store_.end()) {
-            // create a new entry for this unknown (full) block 
-                std::pair<store_type::iterator, bool> p = store_.insert(
-                    entry, new full_empty_entry(entry));
-                if (!p.second) {
-                    boost::throw_exception(std::bad_alloc());
-                    return;
-                }
-                it = p.first;
-            }
+            store_type::iterator it = find_or_create(entry);
             (*it).second->enqueue_if_full(l, self, src);
         }
-        
+
+        void write(threadmanager::px_thread_self& self, void* entry)
+        {
+            boost::unique_lock<mutex_type> l(mtx_);
+            store_type::iterator it = find_or_create(entry);
+            (*it).second->enqueue_if_full(l, self);
+        }
+
     private:
         mutable mutex_type mtx_;
         store_type store_;

@@ -17,6 +17,25 @@
 
 namespace hpx { namespace lcos
 {
+    namespace detail
+    {
+        class full_empty_base : boost::noncopyable
+        {
+        protected:
+            // there is exactly one empty/full store where all memory blocks are 
+            // stored
+            typedef detail::full_empty_store store_type;
+            struct full_empty_tag {};
+            
+            static store_type& get_store()
+            {
+                // ensure thread-safe initialization
+                static util::static_<store_type, full_empty_tag> store;
+                return store.get();
+            }
+        };
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// The \a full_empty data type is a implementation of memory areas guarded
     /// by full/empty bits, a very low level synchronization primitive. The 
@@ -33,7 +52,7 @@ namespace hpx { namespace lcos
     /// a non-default (full, no waiters) state at any one time.
     ///
     template <typename T>
-    class full_empty : boost::noncopyable
+    class full_empty : public detail::full_empty_base
     {
     private:
         typedef T value_type;
@@ -109,19 +128,6 @@ namespace hpx { namespace lcos
         }
 
     private:
-        // there is exactly one empty/full store where all memory blocks are 
-        // stored
-        typedef detail::full_empty_store store_type;
-        struct full_empty_tag {};
-        
-        static store_type& get_store()
-        {
-            // ensure thread-safe initialization
-            static util::static_<store_type, full_empty_tag> store;
-            return store.get();
-        }
-
-    private:
         // type safe accessors to the stored data
         typedef typename boost::add_pointer<value_type>::type pointer;
         typedef typename boost::add_pointer<value_type const>::type const_pointer;
@@ -141,7 +147,89 @@ namespace hpx { namespace lcos
 
         storage_type data_;
     };
-    
+
+    /// The full_empty<void> is a specialization useful as a synchronization 
+    /// primitive only.
+    template <>
+    class full_empty<void> : public detail::full_empty_base
+    {
+    public:
+        /// \brief Create a new full/empty storage in empty state
+        full_empty() 
+        {
+            set_empty();
+        }
+
+        /// \brief Destruct the full/empty data item
+        ~full_empty()
+        {
+            BOOST_ASSERT(!get_store().is_used(get_address()));
+            get_store().remove(get_address());
+        }
+
+        /// \brief Atomically set the state to empty
+        /// 
+        /// \note    This function will create a new full/empty entry in the 
+        ///          store if it doesn't exist yet.
+        void set_empty()
+        {
+            get_store().set_empty(get_address());
+        }
+        
+        /// \brief Atomically set the state to full
+        /// 
+        /// \note    This function will not create a new full/empty entry in 
+        ///          the store if it doesn't exist yet.
+        void set_full()
+        {
+            get_store().set_full(get_address());
+        }
+        
+        /// \brief Query the current state of the memory
+        bool is_empty() const
+        {
+            return get_store().is_empty(get_address());
+        }
+        
+        /// Wait for the memory to become full, leaves memory in full state.
+        ///
+        /// \note When memory becomes full, all \a px_threads waiting for it
+        ///       to become full with a read will be queued to run.
+        void read(threadmanager::px_thread_self& self)
+        {
+            get_store().read(self, get_address());
+        }
+
+        /// Wait for memory to become full, sets memory to empty.
+        ///
+        /// \note When memory becomes full, only one thread blocked like this 
+        ///       will be queued to run.
+        void read_and_empty(threadmanager::px_thread_self& self) 
+        {
+            return get_store().read_and_empty(self, get_address());
+        }
+
+        /// Writes memory and atomically sets its state to full without waiting 
+        /// for it to become empty.
+        void set(threadmanager::px_thread_self& self)
+        {
+            get_store().set(self, get_address());
+        }
+
+        /// Wait for memory to become empty, and then fill it.
+        ///
+        /// \note When memory becomes empty only one thread blocked like this 
+        ///       will be queued to run.
+        void write(threadmanager::px_thread_self& self)
+        {
+            get_store().write(self, get_address());
+        }
+
+    private:
+        void* get_address() { return this; }
+        void const* get_address() const { return this; }
+    };
+
 }}
 
 #endif
