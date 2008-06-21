@@ -8,7 +8,7 @@
 #include <hpx/components/server/factory.hpp>
 #include <hpx/components/server/accumulator.hpp>
 #include <hpx/components/server/manage_component.hpp>
-#include <hpx/runtime/threadmanager/px_thread.hpp>
+#include <hpx/components/continuation_impl.hpp>
 
 namespace hpx { namespace components { namespace server
 {

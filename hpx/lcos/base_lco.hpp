@@ -11,7 +11,7 @@
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/action.hpp>
 
-namespace hpx { namespace lcos { namespace detail
+namespace hpx { namespace lcos 
 {
     // parcel action code: the action to be performed on the destination 
     // object 
@@ -118,10 +118,10 @@ namespace hpx { namespace lcos { namespace detail
         > set_error_action;
     };
 
-}}}
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the simple_future actions
-HPX_SERIALIZE_ACTION(hpx::lcos::detail::base_lco::set_event_action);
+HPX_SERIALIZE_ACTION(hpx::lcos::base_lco::set_event_action);
 
 #endif

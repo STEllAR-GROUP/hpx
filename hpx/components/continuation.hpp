@@ -43,19 +43,11 @@ namespace hpx { namespace components
         }
 
         ///
-        void trigger_all(threadmanager::px_thread_self& self, 
-            applier::applier& app)
-        {
-        
-        }
+        void trigger_all(applier::applier& app);
 
         ///
         template <typename Arg0>
-        void trigger_all(threadmanager::px_thread_self& self, 
-            applier::applier& app, Arg0 const& arg0)
-        {
-        
-        }
+        void trigger_all(applier::applier& app, Arg0 const& arg0);
 
     private:
         // serialization support    
@@ -70,7 +62,6 @@ namespace hpx { namespace components
         std::vector<naming::id_type> gids_;
     };
 
-    typedef boost::shared_ptr<continuation> continuation_type;
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -25,7 +25,7 @@ namespace hpx { namespace lcos { namespace detail
     // A simple_future can be used by a single thread to invoke a (remote) 
     // action and wait for the result. 
     template <typename Result>
-    class simple_future : public base_lco_with_value<Result>
+    class simple_future : public lcos::base_lco_with_value<Result>
     {
     private:
         typedef Result result_type;
@@ -102,10 +102,10 @@ namespace hpx { namespace lcos { namespace detail
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the simple_future actions
-HPX_SERIALIZE_ACTION(hpx::lcos::detail::base_lco_with_value<hpx::naming::id_type>::set_result_action);
-HPX_SERIALIZE_ACTION(hpx::lcos::detail::base_lco_with_value<hpx::naming::id_type>::set_error_action);
-HPX_SERIALIZE_ACTION(hpx::lcos::detail::base_lco_with_value<double>::set_result_action);
-HPX_SERIALIZE_ACTION(hpx::lcos::detail::base_lco_with_value<double>::set_error_action);
+HPX_SERIALIZE_ACTION(hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_result_action);
+HPX_SERIALIZE_ACTION(hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_error_action);
+HPX_SERIALIZE_ACTION(hpx::lcos::base_lco_with_value<double>::set_result_action);
+HPX_SERIALIZE_ACTION(hpx::lcos::base_lco_with_value<double>::set_error_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos 

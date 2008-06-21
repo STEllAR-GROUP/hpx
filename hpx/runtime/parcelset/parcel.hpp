@@ -13,9 +13,9 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/vector.hpp>
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/components/action.hpp>
-#include <hpx/components/continuation.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 

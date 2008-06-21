@@ -57,13 +57,8 @@ namespace hpx { namespace components
             typedef typename boost::remove_reference<T>::type no_ref_type;
             typedef typename boost::remove_const<no_ref_type>::type type;
         };
-
-        template <typename Action>
-        struct action_guid_initializer
-        {
-        };
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
     /// The \a action_base class is a abstract class used as the base class for 
     /// all action types. It's main purpose is to allow polymorphic 
@@ -123,8 +118,6 @@ namespace hpx { namespace components
                 applier::applier& appl, naming::address::address_type lva) const = 0;
     };
 
-    typedef boost::shared_ptr<action_base> action_type;
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, int Action, typename Arguments>
     class action : public action_base
@@ -180,7 +173,7 @@ namespace hpx { namespace components
             components::continuation_type cont, boost::tuple<Func> func)
         {
             threadmanager::thread_state newstate = boost::get<0>(func)(self);
-            cont->trigger_all(self, app);
+            cont->trigger_all(app);
             return newstate;
         }
 
@@ -283,8 +276,9 @@ namespace hpx { namespace components
             components::continuation_type cont, boost::tuple<Func> func)
         {
             Result result;
-            threadmanager::thread_state newstate = boost::get<0>(func)(self, &result);
-            cont->trigger_all(self, app, result);
+            threadmanager::thread_state newstate = 
+                boost::get<0>(func)(self, &result);
+            cont->trigger_all(app, result);
             return newstate;
         }
 
@@ -469,16 +463,17 @@ namespace hpx { namespace components
     private:
         /// The \a continuation_thread_function will be registered as the thread
         /// function of a px_thread. It encapsulates the execution of the 
-        /// original function (given by \a f)
+        /// original function (given by \a func)
         template <typename Func>
         static threadmanager::thread_state 
         continuation_thread_function(
             threadmanager::px_thread_self& self, applier::applier& app, 
-            components::continuation_type cont, boost::tuple<Func> f)
+            components::continuation_type cont, boost::tuple<Func> func)
         {
             Result result;
-            threadmanager::thread_state newstate = boost::get<0>(f)(self, &result);
-            cont->trigger_all(self, app, result);
+            threadmanager::thread_state newstate = 
+                boost::get<0>(func)(self, &result);
+            cont->trigger_all(app, result);
             return newstate;
         }
 

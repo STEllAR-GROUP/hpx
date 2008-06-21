@@ -7,6 +7,7 @@
 #define HPX_HPX_FWD_MAR_24_2008_1119AM
 
 #include <boost/asio.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/coroutine/shared_coroutine.hpp>
 
 namespace hpx
@@ -94,8 +95,12 @@ namespace hpx
     namespace components
     {
         struct action_base;
+        typedef boost::shared_ptr<action_base> action_type;
 
-        class factory;        
+        class continuation;
+        typedef boost::shared_ptr<continuation> continuation_type;
+
+        class factory;
         class accumulator;
     }
 

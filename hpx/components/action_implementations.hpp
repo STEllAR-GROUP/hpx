@@ -82,7 +82,7 @@
             Result result;
             threadmanager::thread_state newstate = 
                 boost::get<0>(func)(self, &result);
-            cont->trigger_all(self, app, result);
+            cont->trigger_all(app, result);
             return newstate;
         }
 

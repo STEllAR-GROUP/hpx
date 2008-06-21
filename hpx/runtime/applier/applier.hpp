@@ -13,7 +13,7 @@
 #include <hpx/include/naming.hpp>
 #include <hpx/include/parcelset.hpp>
 #include <hpx/runtime/threadmanager/threadmanager.hpp>
-#include <hpx/components/continuation.hpp>
+#include <hpx/components/action.hpp>
 #include <hpx/components/server/factory.hpp>
 
 namespace hpx { namespace applier
@@ -174,9 +174,9 @@ namespace hpx { namespace applier
         ///
         /// \note       For synchronous operation use the function 
         ///             \a applier#create_async.
-        lcos::simple_future<naming::id_type> create_async(
-            naming::id_type const& targetgid, components::component_type type,
-            std::size_t count = 1);
+        lcos::simple_future<naming::id_type> 
+        create_async(naming::id_type const& targetgid, 
+            components::component_type type, std::size_t count = 1);
 
         /// The \a create function creates a new component using the factory as 
         /// given by targetgid. This function is blocking for the component to 
@@ -193,7 +193,8 @@ namespace hpx { namespace applier
         ///
         /// \note       For asynchronous operation use the function 
         ///             \a applier#create_async.
-        naming::id_type create(threadmanager::px_thread_self& self,
+        naming::id_type 
+        create(threadmanager::px_thread_self& self, 
             naming::id_type const& targetgid, components::component_type type,
             std::size_t count = 1);
 

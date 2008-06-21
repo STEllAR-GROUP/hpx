@@ -547,6 +547,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\hpx\components\continuation_impl.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\components\factory.hpp"
 					>
 				</File>
