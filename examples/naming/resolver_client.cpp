@@ -60,7 +60,12 @@ int main(int argc, char* argv[])
         if (resolver.get_prefix(here, prefix1))
             last_lowerid = prefix1;
         BOOST_TEST(prefix1 != 0);
-        
+
+        std::vector<boost::uint32_t> prefixes;
+        resolver.get_prefixes(prefixes);
+        BOOST_TEST(((0 == i) ? 1 : 2) == prefixes.size());
+        BOOST_TEST(hpx::naming::get_id_from_prefix(prefixes.back()) == prefix1);
+
         id_type prefix2;
         BOOST_TEST(!resolver.get_prefix(here, prefix2));
         BOOST_TEST(prefix2 == prefix1);   // same site should get same prefix
@@ -69,6 +74,10 @@ int main(int argc, char* argv[])
         id_type prefix3;
         resolver.get_prefix(locality("1.1.1.1", 1), prefix3);
         BOOST_TEST(prefix3 != prefix2);   
+
+        resolver.get_prefixes(prefixes);
+        BOOST_TEST(2 == prefixes.size());
+        BOOST_TEST(hpx::naming::get_id_from_prefix(prefixes.front()) == prefix3);
 
         id_type prefix4;
         BOOST_TEST(!resolver.get_prefix(locality("1.1.1.1", 1), prefix4));

@@ -1,8 +1,5 @@
 //  Copyright (c) 2007-2008 Hartmut Kaiser
 //
-//  Parts of this code were taken from the Boost.Asio library
-//  Copyright (c) 2003-2007 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-// 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -76,6 +73,32 @@ namespace hpx { namespace naming { namespace server
         }
         catch (...) {
             rep = reply(command_getprefix, internal_server_error);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void request_handler::handle_getprefixes(request const& req, reply& rep)
+    {
+        try {
+            mutex_type::scoped_lock l(mtx_);
+
+            std::vector<boost::uint32_t> prefixes;
+            prefixes.reserve(site_prefixes_.size());
+
+            site_prefix_map_type::iterator end = site_prefixes_.end();
+            for (site_prefix_map_type::iterator it = site_prefixes_.begin();
+                 it != end; ++it)
+            {
+                prefixes.push_back((*it).second.first);
+            }
+
+            rep = reply(prefixes, prefixes.empty() ? no_success : success); 
+        }
+        catch (std::bad_alloc) {
+            rep = reply(command_getprefixes, out_of_memory);
+        }
+        catch (...) {
+            rep = reply(command_getprefixes, internal_server_error);
         }
     }
 
@@ -462,6 +485,10 @@ namespace hpx { namespace naming { namespace server
         switch (req.get_command()) {
         case command_getprefix:
             handle_getprefix(req, rep);
+            break;
+
+        case command_getprefixes:
+            handle_getprefixes(req, rep);
             break;
 
         case command_getidrange:

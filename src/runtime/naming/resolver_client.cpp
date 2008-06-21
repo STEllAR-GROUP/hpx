@@ -82,7 +82,7 @@ namespace hpx { namespace naming
             boost::throw_exception(hpx::exception(network_error, e.message()));
         }
     }
-    
+
     resolver_client::resolver_client(util::io_service_pool& io_service_pool, 
             locality l, bool start_asynchronously) 
       : there_(l), io_service_pool_(io_service_pool), 
@@ -108,7 +108,7 @@ namespace hpx { namespace naming
         server::request req (server::command_getprefix, l);
         server::reply rep;            
         execute(req, rep);
-        
+
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != repeated_request)
             boost::throw_exception(hpx::exception((error)s, rep.get_error()));
@@ -116,7 +116,22 @@ namespace hpx { namespace naming
         prefix = rep.get_prefix();
         return s == success;
     }
-    
+
+    bool resolver_client::get_prefixes(std::vector<boost::uint32_t>& prefixes) const
+    {
+        // send request
+        server::request req (server::command_getprefixes);
+        server::reply rep;            
+        execute(req, rep);
+
+        hpx::error s = (hpx::error) rep.get_status();
+        if (s != success && s != no_success)
+            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+
+        std::swap(prefixes, rep.get_prefixes());
+        return s == success;
+    }
+
     bool resolver_client::get_id_range(locality const& l, std::size_t count, 
         id_type& lower_bound, id_type& upper_bound) const
     {
@@ -124,7 +139,7 @@ namespace hpx { namespace naming
         server::request req (server::command_getidrange, l, count);
         server::reply rep;            
         execute(req, rep);
-        
+
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != repeated_request)
             boost::throw_exception(hpx::exception((error)s, rep.get_error()));
@@ -141,7 +156,7 @@ namespace hpx { namespace naming
         server::request req (server::command_bind_range, id, count, addr, offset);
         server::reply rep;            
         execute(req, rep);
-        
+
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
             boost::throw_exception(hpx::exception((error)s, rep.get_error()));
@@ -171,7 +186,7 @@ namespace hpx { namespace naming
         server::request req (server::command_resolve, id);
         server::reply rep;            
         execute(req, rep);
-        
+
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
             boost::throw_exception(hpx::exception((error)s, rep.get_error()));
@@ -187,7 +202,7 @@ namespace hpx { namespace naming
         server::request req (server::command_registerid, ns_name, id);
         server::reply rep;            
         execute(req, rep);
-        
+
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
             boost::throw_exception(hpx::exception((error)s, rep.get_error()));
@@ -215,7 +230,7 @@ namespace hpx { namespace naming
         server::request req (server::command_queryid, ns_name);
         server::reply rep;            
         execute(req, rep);
-        
+
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
             boost::throw_exception(hpx::exception((error)s, rep.get_error()));
@@ -238,7 +253,7 @@ namespace hpx { namespace naming
         counts.clear();
         for (std::size_t i = 0; i < server::command_lastcommand; ++i)
             counts.push_back(std::size_t(rep.get_statictics(i)));
-            
+
         return s == success;
     }
 
@@ -253,10 +268,7 @@ namespace hpx { namespace naming
         if (s != success && s != no_success)
             boost::throw_exception(hpx::exception((error)s, rep.get_error()));
 
-        timings.clear();
-        for (std::size_t i = 0; i < server::command_lastcommand; ++i)
-            timings.push_back(rep.get_statictics(i));
-            
+        std::swap(timings, rep.get_statictics());
         return s == success;
     }
 
@@ -271,10 +283,7 @@ namespace hpx { namespace naming
         if (s != success && s != no_success)
             boost::throw_exception(hpx::exception((error)s, rep.get_error()));
 
-        timings.clear();
-        for (std::size_t i = 0; i < server::command_lastcommand; ++i)
-            timings.push_back(rep.get_statictics(i));
-            
+        std::swap(timings, rep.get_statictics());
         return s == success;
     }
 
@@ -284,7 +293,7 @@ namespace hpx { namespace naming
     {
         return bytes_transferred >= size;
     }
-    
+
     void resolver_client::execute(server::request const &req, 
         server::reply& rep) const
     {

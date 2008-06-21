@@ -1,8 +1,5 @@
 //  Copyright (c) 2007-2008 Hartmut Kaiser
 //
-//  Parts of this code were taken from the Boost.Asio library
-//  Copyright (c) 2003-2007 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-// 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -62,6 +59,7 @@ namespace hpx { namespace naming { namespace server
         
     protected:
         void handle_getprefix(request const& req, reply& rep);
+        void handle_getprefixes(request const& req, reply& rep);
         void handle_getidrange(request const& req, reply& rep);
         void handle_bind_range(request const& req, reply& rep);
         void handle_unbind_range(request const& req, reply& rep);

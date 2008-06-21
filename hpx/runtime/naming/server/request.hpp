@@ -26,23 +26,25 @@ namespace hpx { namespace naming { namespace server
     {
         command_unknown = -1,
         command_firstcommand = 0,
-        command_getprefix = 0,      /// return a unique prefix for the requesting site
-        command_getidrange = 1,     /// return a unique range of ids for the requesting site
-        command_bind_range = 2,     /// bind a range of addresses to a range of global ids
-        command_unbind_range = 3,   /// remove binding for a range of global ids
-        command_resolve = 4,        /// resolve a global id to an address
-        command_queryid = 5,        /// query for a global id associated with a namespace name (string)
-        command_registerid = 6,     /// associate a namespace name with a global id
-        command_unregisterid = 7,   /// remove association of a namespace name with a global id
-        command_statistics_count = 8,    /// return some usage statistics: execution count 
-        command_statistics_mean = 9,     /// return some usage statistics: average server execution time
-        command_statistics_moment2 = 10, /// return some usage statistics: 2nd moment of server execution time
+        command_getprefix = 0,      ///< return a unique prefix for the requesting site
+        command_getprefixes = 1,    ///< return prefixes for all known localities in the system
+        command_getidrange = 2,     ///< return a unique range of ids for the requesting site
+        command_bind_range = 3,     ///< bind a range of addresses to a range of global ids
+        command_unbind_range = 4,   ///< remove binding for a range of global ids
+        command_resolve = 5,        ///< resolve a global id to an address
+        command_queryid = 6,        ///< query for a global id associated with a namespace name (string)
+        command_registerid = 7,     ///< associate a namespace name with a global id
+        command_unregisterid = 8,   ///< remove association of a namespace name with a global id
+        command_statistics_count = 9,    ///< return some usage statistics: execution count 
+        command_statistics_mean = 10,    ///< return some usage statistics: average server execution time
+        command_statistics_moment2 = 11, ///< return some usage statistics: 2nd moment of server execution time
         command_lastcommand
     };
 
     const char* const command_names[] = 
     {
         "command_getprefix",
+        "command_getprefixes",
         "command_getidrange",
         "command_bind_range",
         "command_unbind_range",
@@ -189,6 +191,7 @@ namespace hpx { namespace naming { namespace server
                 break;
                 
             case command_getprefix:
+            case command_getprefixes:
             case command_statistics_count:
             case command_statistics_mean:
             case command_statistics_moment2:
@@ -243,6 +246,7 @@ namespace hpx { namespace naming { namespace server
                 break;
                 
             case command_getprefix:
+            case command_getprefixes:
             case command_statistics_count:
             case command_statistics_mean:
             case command_statistics_moment2:
@@ -303,7 +307,8 @@ namespace hpx { namespace naming { namespace server
             os << "site(" << req.site_ << ") ";
             os << "count:" << std::dec << req.count_ << " ";
             break;
-            
+
+        case command_getprefixes:
         case command_statistics_count:
         case command_statistics_mean:
         case command_statistics_moment2:

@@ -11,6 +11,7 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/vector.hpp>
 
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -106,6 +107,14 @@ namespace hpx { namespace naming { namespace server
                          command == command_registerid);
         }
 
+        reply (std::vector<boost::uint32_t>& prefixes, error s = success)
+          : command_(command_getprefixes), status_(s),
+            error_(status_strings::get_error_text(success))
+        {
+            BOOST_ASSERT(s == success || s == no_success);
+            std::swap(prefixes_, prefixes);
+        }
+
         template <typename Container, typename F>
         reply (name_server_command command, Container const& totals, F f,
                error s = success)
@@ -119,7 +128,7 @@ namespace hpx { namespace naming { namespace server
                          command == command_statistics_moment2);
             
             for (std::size_t i = 0; i < command_lastcommand; ++i)
-                statistics_[i] = f(totals[i]);
+                statistics_.push_back(f(totals[i]));
         }
 
         reply (name_server_command command, naming::address addr)
@@ -181,14 +190,24 @@ namespace hpx { namespace naming { namespace server
         {
             return id_;
         }
-        
+
         double get_statictics(std::size_t i) const
         {
             if (i >= command_lastcommand)
                 boost::throw_exception(hpx::exception(bad_parameter));
             return statistics_[i];
         }
-        
+
+        std::vector<double>& get_statictics() 
+        {
+            return statistics_;
+        }
+
+        std::vector<boost::uint32_t>& get_prefixes() 
+        {
+            return prefixes_;
+        }
+
     private:
         friend std::ostream& operator<< (std::ostream& os, reply const& rep);
         
@@ -201,7 +220,7 @@ namespace hpx { namespace naming { namespace server
             ar << command_;
             ar << status_;
             ar << error_;
-            
+
             switch (command_) {
             case command_resolve:
             case command_unbind_range:
@@ -216,7 +235,11 @@ namespace hpx { namespace naming { namespace server
             case command_getprefix:
                 ar << lower_bound_;
                 break;
-                
+
+            case command_getprefixes:
+                ar << prefixes_;
+                break;
+
             case command_queryid:
                 ar << id_;
                 break;
@@ -224,10 +247,9 @@ namespace hpx { namespace naming { namespace server
             case command_statistics_count:
             case command_statistics_mean:
             case command_statistics_moment2:
-                for (std::size_t i = 0; i < command_lastcommand; ++i)
-                    ar << statistics_[i];
+                ar << statistics_;
                 break;
-                
+
             case command_bind_range:
             case command_registerid: 
             case command_unregisterid: 
@@ -243,11 +265,11 @@ namespace hpx { namespace naming { namespace server
                 throw exception(version_too_new, 
                     "trying to load reply with unknown version");
             }
-    
+
             ar >> command_;
             ar >> status_;
             ar >> error_;
-            
+
             switch (command_) {
             case command_resolve:
             case command_unbind_range:
@@ -262,18 +284,21 @@ namespace hpx { namespace naming { namespace server
             case command_getprefix:
                 ar >> lower_bound_;
                 break;
-                
+
+            case command_getprefixes:
+                ar >> prefixes_;
+                break;
+
             case command_queryid:
                 ar >> id_;
                 break;
-                
+
             case command_statistics_count:
             case command_statistics_mean:
             case command_statistics_moment2:
-                for (std::size_t i = 0; i < command_lastcommand; ++i)
-                    ar >> statistics_[i];
+                ar >> statistics_;
                 break;
-                
+
             case command_bind_range:
             case command_registerid: 
             case command_unregisterid: 
@@ -284,15 +309,16 @@ namespace hpx { namespace naming { namespace server
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     private:
-        boost::uint8_t command_;        /// the command this is a reply for
-        boost::uint8_t status_;         /// status of requested operation
-        std::string error_;             /// descriptive error message
-        naming::address address_;       /// address (for resolve only)
-        naming::id_type lower_bound_;   /// lower bound of id range (for get_idrange only) 
-                                        /// or the prefix for the given locality (get_prefix only)
-        naming::id_type upper_bound_;   /// upper bound of id range (for get_idrange only)
-        naming::id_type id_;            /// global id (for queryid only)
-        double statistics_[command_lastcommand];       /// gathered statistics
+        boost::uint8_t command_;        ///< the command this is a reply for
+        boost::uint8_t status_;         ///< status of requested operation
+        std::string error_;             ///< descriptive error message
+        naming::address address_;       ///< address (for resolve only)
+        naming::id_type lower_bound_;   ///< lower bound of id range (for get_idrange only) 
+                                        ///< or the prefix for the given locality (get_prefix only)
+        naming::id_type upper_bound_;   ///< upper bound of id range (for get_idrange only)
+        naming::id_type id_;            ///< global id (for queryid only)
+        std::vector<double> statistics_;        ///< gathered statistics
+        std::vector<boost::uint32_t> prefixes_; ///< all site prefixes know to this server
     };
 
     inline std::ostream& operator<< (std::ostream& os, reply const& rep)
@@ -313,21 +339,21 @@ namespace hpx { namespace naming { namespace server
                 os << "range(" << std::hex << rep.lower_bound_ << ", "
                    << rep.upper_bound_ << ") ";
                 break;
-                
-                // fall through
+
             case command_getprefix:
                 os << "prefix(" << std::hex<< rep.lower_bound_ << ") ";
                 break;
-                
+
             case command_queryid:
                 os << "id" << std::hex << rep.id_ << " ";
                 break;
-                
+
             case command_statistics_count:
             case command_statistics_mean:
             case command_statistics_moment2:
                 break;
-                
+
+            case command_getprefixes:
             case command_bind_range:
             case command_registerid: 
             case command_unregisterid: 

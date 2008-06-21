@@ -22,7 +22,8 @@ namespace hpx { namespace naming
         class reply;
         class request;
     }
-        
+
+    /// \class resolver_client resolver_client.hpp hpx/runtime/naming/resolver_client.hpp
     /// The top-level class of the DGAS client. This class exposes the DGAS 
     /// server functionality on the client side.
     class resolver_client
@@ -41,7 +42,7 @@ namespace hpx { namespace naming
         ///                 the resolver client instance immediately.
         resolver_client(util::io_service_pool& io_service_pool, locality l,
             bool start_asynchronously = true);
-        
+
         /// Construct the resolver client to work with the server given by
         /// its address and port number.
         ///
@@ -82,6 +83,18 @@ namespace hpx { namespace naming
         ///                   thrown from this function.
         bool get_prefix(locality const& l, id_type& prefix) const;
 
+        /// \brief Query for the prefixes of all known localities.
+        ///
+        /// This function returns the prefixes of all localities known to the 
+        /// DGAS server.
+        /// 
+        /// \param prefixes   [out] The vector will contain the prefixes of all
+        ///                   localities registered with the DGAS server. The
+        ///                   returned prefixes can be used to create a list of
+        ///                   \a name#id_type values representing the factory
+        ///                   components of these localities.
+        bool get_prefixes(std::vector<boost::uint32_t>& prefixes) const;
+
         /// \brief Get unique range of freely assignable global ids 
         ///
         /// Every locality needs to be able to assign global ids to different
@@ -118,7 +131,7 @@ namespace hpx { namespace naming
         ///                   \a bind or \a bind_range.
         bool get_id_range(locality const& l, std::size_t count, 
             id_type& lower_bound, id_type& upper_bound) const;
-        
+
         /// \brief Bind a global address to a local address.
         ///
         /// Every element in the ParalleX namespace has a unique global address
@@ -143,7 +156,7 @@ namespace hpx { namespace naming
         {
             return bind_range(id, 1, addr, 0);
         }
-        
+
         /// \brief Bind unique range of global ids to given base address
         ///
         /// Every locality needs to be able to bind global ids to different
@@ -206,7 +219,7 @@ namespace hpx { namespace naming
         util::unique_future<bool> 
             bind_range_async(id_type const& lower_id, std::size_t count, 
                 address const& baseaddr, std::ptrdiff_t offset);
-            
+
         /// \brief Unbind a global address
         ///
         /// Remove the association of the given global address with any local 
@@ -257,7 +270,7 @@ namespace hpx { namespace naming
         {
             return unbind_range(id, 1, addr);
         }
-        
+
         /// \brief Unbind the given range of global ids
         ///
         /// \param lower_id   [in] The lower bound of the assigned id range.
@@ -314,7 +327,7 @@ namespace hpx { namespace naming
         ///                   \a bind.
         bool unbind_range(id_type const& lower_id, std::size_t count, 
             address& addr) const;
-        
+
         /// \brief Asynchronously unbind the given range of global ids
         ///
         /// \param lower_id   [in] The lower bound of the assigned id range.
@@ -463,7 +476,7 @@ namespace hpx { namespace naming
         ///                   possible resolver_client commands (i.e. will be 
         ///                   of the size 'server::command_lastcommand').
         bool get_statistics_count(std::vector<std::size_t>& counts) const;
-        
+
         /// \brief Query for the gathered statistics of this DGAS instance 
         ///        (average server execution time)
         ///
@@ -474,7 +487,7 @@ namespace hpx { namespace naming
         ///                   possible resolver_client commands (i.e. will be 
         ///                   of the size 'server::command_lastcommand').
         bool get_statistics_mean(std::vector<double>& timings) const;
-        
+
         /// \brief Query for the gathered statistics of this DGAS instance 
         ///        (statistical 2nd moment of server execution time)
         ///
@@ -486,11 +499,11 @@ namespace hpx { namespace naming
         ///                   the possible resolver_client commands (i.e. will 
         ///                   be of the size 'server::command_lastcommand').
         bool get_statistics_moment2(std::vector<double>& moments) const;
-        
+
         /// \brief Return the locality of the resolver server this resolver 
         ///        client instance is using to serve requests
         locality const& there() const { return there_; }
-        
+
     protected:
         static bool read_completed(boost::system::error_code const& err, 
             std::size_t bytes_transferred, boost::uint32_t size);
