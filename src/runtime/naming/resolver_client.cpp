@@ -44,7 +44,7 @@ namespace hpx { namespace naming
                 io_service_pool.run(false);
 
             using namespace boost::asio::ip;
-            
+
             // try to convert the address string to an IP address directly
             boost::system::error_code error = boost::asio::error::try_again;
             tcp::endpoint ep;
@@ -54,12 +54,12 @@ namespace hpx { namespace naming
                 if (!error) 
                     return;
             }
-            
+
             // resolve the given address
             tcp::resolver resolver(io_service_pool.get_io_service());
             tcp::resolver::query query(address, 
                 boost::lexical_cast<std::string>(port));
-            
+
             // Try each endpoint until we successfully establish a connection.
             tcp::resolver::iterator end;
             tcp::resolver::iterator it = resolver.resolve(query);
@@ -106,7 +106,7 @@ namespace hpx { namespace naming
     {
         // send request
         server::request req (server::command_getprefix, l);
-        server::reply rep;            
+        server::reply rep;
         execute(req, rep);
 
         hpx::error s = (hpx::error) rep.get_status();
@@ -117,18 +117,22 @@ namespace hpx { namespace naming
         return s == success;
     }
 
-    bool resolver_client::get_prefixes(std::vector<boost::uint32_t>& prefixes) const
+    bool resolver_client::get_prefixes(std::vector<id_type>& prefixes) const
     {
         // send request
         server::request req (server::command_getprefixes);
-        server::reply rep;            
+        server::reply rep;
         execute(req, rep);
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
             boost::throw_exception(hpx::exception((error)s, rep.get_error()));
 
-        std::swap(prefixes, rep.get_prefixes());
+        typedef std::vector<boost::uint32_t>::const_iterator iterator;
+        iterator end = rep.get_prefixes().end();
+        for (iterator it = rep.get_prefixes().begin(); it != end; ++it)
+            prefixes.push_back(get_id_from_prefix(*it));
+
         return s == success;
     }
 
@@ -137,7 +141,7 @@ namespace hpx { namespace naming
     {
         // send request
         server::request req (server::command_getidrange, l, count);
-        server::reply rep;            
+        server::reply rep;
         execute(req, rep);
 
         hpx::error s = (hpx::error) rep.get_status();
@@ -154,7 +158,7 @@ namespace hpx { namespace naming
     {
         // send request
         server::request req (server::command_bind_range, id, count, addr, offset);
-        server::reply rep;            
+        server::reply rep;
         execute(req, rep);
 
         hpx::error s = (hpx::error) rep.get_status();
@@ -169,7 +173,7 @@ namespace hpx { namespace naming
     {
         // send request
         server::request req (server::command_unbind_range, id, count);
-        server::reply rep;            
+        server::reply rep;
         execute(req, rep);
 
         hpx::error s = (hpx::error) rep.get_status();
@@ -184,7 +188,7 @@ namespace hpx { namespace naming
     {
         // send request
         server::request req (server::command_resolve, id);
-        server::reply rep;            
+        server::reply rep;
         execute(req, rep);
 
         hpx::error s = (hpx::error) rep.get_status();
@@ -200,7 +204,7 @@ namespace hpx { namespace naming
     {
         // send request
         server::request req (server::command_registerid, ns_name, id);
-        server::reply rep;            
+        server::reply rep;
         execute(req, rep);
 
         hpx::error s = (hpx::error) rep.get_status();
@@ -214,7 +218,7 @@ namespace hpx { namespace naming
     {
         // send request
         server::request req (server::command_unregisterid, ns_name);
-        server::reply rep;            
+        server::reply rep;
         execute(req, rep);
 
         hpx::error s = (hpx::error) rep.get_status();
@@ -228,7 +232,7 @@ namespace hpx { namespace naming
     {
         // send request
         server::request req (server::command_queryid, ns_name);
-        server::reply rep;            
+        server::reply rep;
         execute(req, rep);
 
         hpx::error s = (hpx::error) rep.get_status();
@@ -243,9 +247,9 @@ namespace hpx { namespace naming
     {
         // send request
         server::request req (server::command_statistics_count);
-        server::reply rep;            
+        server::reply rep;
         execute(req, rep);
-        
+
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
             boost::throw_exception(hpx::exception((error)s, rep.get_error()));
@@ -261,9 +265,9 @@ namespace hpx { namespace naming
     {
         // send request
         server::request req (server::command_statistics_mean);
-        server::reply rep;            
+        server::reply rep;
         execute(req, rep);
-        
+
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
             boost::throw_exception(hpx::exception((error)s, rep.get_error()));
@@ -276,9 +280,9 @@ namespace hpx { namespace naming
     {
         // send request
         server::request req (server::command_statistics_moment2);
-        server::reply rep;            
+        server::reply rep;
         execute(req, rep);
-        
+
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
             boost::throw_exception(hpx::exception((error)s, rep.get_error()));
@@ -319,7 +323,7 @@ namespace hpx { namespace naming
                 boost::throw_exception(
                     hpx::exception(network_error, "network write failed"));
             }
-            
+
             // wait for response
             boost::system::error_code err = boost::asio::error::fault;
 
@@ -330,7 +334,7 @@ namespace hpx { namespace naming
                 boost::throw_exception(
                     hpx::exception(network_error, "network read failed"));
             }
-            
+
             // now read the rest of the message
             boost::uint32_t native_size = size;
             buffer.resize(native_size);
@@ -346,7 +350,7 @@ namespace hpx { namespace naming
                 boost::throw_exception(
                     hpx::exception(network_error, "network read failed"));
             }
-            
+
             // De-serialize the data
             {
                 boost::iostreams::stream<io_device_type> io(buffer);
@@ -363,7 +367,7 @@ namespace hpx { namespace naming
         catch(...) {
             boost::throw_exception(hpx::exception(no_success, 
                 "unexpected error"));
-        } 
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -373,12 +377,12 @@ namespace hpx { namespace naming
         address const& addr, std::ptrdiff_t offset)
     {
         typedef resolver_client_connection<bool> connection_type;
-        
+
         // prepare request
         connection_type* conn = new connection_type(socket_, 
             server::command_bind_range, lower_id, count, addr, offset);
         boost::shared_ptr<connection_type> client_conn(conn);
-        
+
         conn->execute();
         return conn->get_future();
     }
@@ -387,7 +391,7 @@ namespace hpx { namespace naming
     resolver_client::unbind_range_async(id_type const& lower_id, std::size_t count)
     {
         typedef resolver_client_connection<bool> connection_type;
-        
+
         // prepare request
         connection_type* conn = new connection_type(socket_, 
             server::command_unbind_range, lower_id, count);
@@ -403,12 +407,12 @@ namespace hpx { namespace naming
         typedef 
             resolver_client_connection<std::pair<bool, address> > 
         connection_type;
-        
+
         // prepare request
         connection_type* conn = new connection_type(socket_, 
             server::command_resolve, id);
         boost::shared_ptr<connection_type> client_conn(conn);
-        
+
         conn->execute();
         return conn->get_future();
     }

@@ -75,6 +75,9 @@ threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self,
     appl.get_thread_manager().register_work(
         boost::bind(&test1, _1, boost::ref(appl)));
 
+    // initiate shutdown of the runtime system
+    components::stubs::runtime_support::shutdown(appl, appl.get_prefix());
+
     return threadmanager::terminated;
 }
 

@@ -13,7 +13,7 @@ namespace hpx { namespace components
     enum component_type
     {
         component_invalid = 0,
-        component_factory,          // predefined components needed to create components
+        component_runtime_support,  // runtime support (needed to create components, etc.)
         component_px_thread,        // a ParalleX thread
 
         // LCO's
@@ -21,7 +21,9 @@ namespace hpx { namespace components
         component_base_lco_with_value,  // base LCO's blocking on a value
         component_simple_future,    // a simple future allowing one thread to 
                                     // wait for the result
-        
+
+        component_distributing_factory,   // factory combined with load balancing
+
         // test categories
         component_accumulator,      // simple accumulator
         component_memory,           // general memory address
@@ -38,7 +40,7 @@ namespace hpx { namespace components
         char const* const names[] =
         {
             "component_invalid",
-            "component_factory",
+            "component_runtime_support",
             "component_px_thread",
             "component_simple_future",
             "component_accumulator",

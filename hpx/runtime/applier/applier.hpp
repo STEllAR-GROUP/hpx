@@ -14,7 +14,7 @@
 #include <hpx/include/parcelset.hpp>
 #include <hpx/runtime/threadmanager/threadmanager.hpp>
 #include <hpx/components/action.hpp>
-#include <hpx/components/server/factory.hpp>
+#include <hpx/components/server/runtime_support.hpp>
 
 namespace hpx { namespace applier
 {
@@ -158,7 +158,7 @@ namespace hpx { namespace applier
         #include <hpx/runtime/applier/applier_implementations.hpp>
 
         /// The \a create_async function initiates the creation of a new 
-        /// component using the factory as given by targetgid. This function is 
+        /// component using the runtime_support as given by targetgid. This function is 
         /// non-blocking as it returns a \a lcos#simple_future. The caller of 
         /// this create_async is responsible to call 
         /// \a lcos#simple_future#get_result to obtain the result. 
@@ -178,7 +178,7 @@ namespace hpx { namespace applier
         create_async(naming::id_type const& targetgid, 
             components::component_type type, std::size_t count = 1);
 
-        /// The \a create function creates a new component using the factory as 
+        /// The \a create function creates a new component using the runtime_support as 
         /// given by targetgid. This function is blocking for the component to 
         /// be created and until the global id of the new component has been 
         /// returned. 
@@ -200,13 +200,12 @@ namespace hpx { namespace applier
 
         /// \brief The \a free function frees an existing component as given by 
         ///        its type and its gid
+        ///
+        /// \param type
+        /// \param count
+        /// \param gid
         void free (components::component_type type, naming::id_type const& gid,
-            std::size_t count = 1)
-        {
-            typedef components::server::factory::free_action action_type;
-            apply<action_type>(
-                naming::get_factory_id(gid), type, gid, count);
-        }
+            std::size_t count = 1);
 
         /// \brief Allow access to the DGAS client instance used with this
         ///        \a applier.
@@ -230,13 +229,23 @@ namespace hpx { namespace applier
         }
 
         /// \brief Allow access to the locality this applier instance is 
-        /// associated with.
+        ///        associated with.
         ///
         /// This accessor returns a reference to the locality this applier
         /// instance is associated with.
         naming::locality const& here() const
         {
             return parcel_handler_.here();
+        }
+
+        /// \brief Allow access to the prefix of the locality this applier 
+        ///        instance is associated with.
+        ///
+        /// This accessor returns a reference to the locality this applier
+        /// instance is associated with.
+        naming::id_type const& get_prefix() const
+        {
+            return parcel_handler_.get_prefix();
         }
 
     protected:

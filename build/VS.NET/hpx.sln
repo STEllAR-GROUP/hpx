@@ -119,6 +119,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "full_empty_tests", "full_em
 		{E6C6C6C4-6959-4B47-B92A-6323A906CC40} = {E6C6C6C4-6959-4B47-B92A-6323A906CC40}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HPX Runtime", "HPX Runtime", "{03B1522E-0ACA-4BE6-B935-A7EBD550C896}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hpx_runtime", "hpx_runtime\hpx_runtime.vcproj", "{7A1A51F1-6629-41DB-94AD-E7420EE0F894}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E6C6C6C4-6959-4B47-B92A-6323A906CC40} = {E6C6C6C4-6959-4B47-B92A-6323A906CC40}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -337,6 +344,16 @@ Global
 		{75E1A255-D73C-4735-80FA-34C5E9760C8E}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{75E1A255-D73C-4735-80FA-34C5E9760C8E}.Release|Win32.ActiveCfg = Release|Win32
 		{75E1A255-D73C-4735-80FA-34C5E9760C8E}.Release|Win32.Build.0 = Release|Win32
+		{7A1A51F1-6629-41DB-94AD-E7420EE0F894}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{7A1A51F1-6629-41DB-94AD-E7420EE0F894}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{7A1A51F1-6629-41DB-94AD-E7420EE0F894}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{7A1A51F1-6629-41DB-94AD-E7420EE0F894}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7A1A51F1-6629-41DB-94AD-E7420EE0F894}.Debug|Win32.Build.0 = Debug|Win32
+		{7A1A51F1-6629-41DB-94AD-E7420EE0F894}.Release|Any CPU.ActiveCfg = Release|Win32
+		{7A1A51F1-6629-41DB-94AD-E7420EE0F894}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{7A1A51F1-6629-41DB-94AD-E7420EE0F894}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{7A1A51F1-6629-41DB-94AD-E7420EE0F894}.Release|Win32.ActiveCfg = Release|Win32
+		{7A1A51F1-6629-41DB-94AD-E7420EE0F894}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -364,5 +381,6 @@ Global
 		{68071A94-19F9-442A-8CF3-364C42F990CE} = {C78C7B04-5FE5-4692-9952-733219E10B57}
 		{FACAE50A-84BF-4EEC-B897-B0A2819709BB} = {C78C7B04-5FE5-4692-9952-733219E10B57}
 		{75E1A255-D73C-4735-80FA-34C5E9760C8E} = {88559B87-7B2A-4FFE-9FA5-6FA7AF23EA71}
+		{7A1A51F1-6629-41DB-94AD-E7420EE0F894} = {03B1522E-0ACA-4BE6-B935-A7EBD550C896}
 	EndGlobalSection
 EndGlobal

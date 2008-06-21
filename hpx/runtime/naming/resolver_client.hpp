@@ -90,10 +90,10 @@ namespace hpx { namespace naming
         /// 
         /// \param prefixes   [out] The vector will contain the prefixes of all
         ///                   localities registered with the DGAS server. The
-        ///                   returned prefixes can be used to create a list of
-        ///                   \a name#id_type values representing the factory
-        ///                   components of these localities.
-        bool get_prefixes(std::vector<boost::uint32_t>& prefixes) const;
+        ///                   returned vector holds the prefixes representing 
+        ///                   the runtime_support components of these 
+        ///                   localities.
+        bool get_prefixes(std::vector<id_type>& prefixes) const;
 
         /// \brief Get unique range of freely assignable global ids 
         ///

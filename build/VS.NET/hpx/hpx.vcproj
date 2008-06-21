@@ -171,7 +171,11 @@
 					Name="Server"
 					>
 					<File
-						RelativePath="..\..\..\src\components\server\factory.cpp"
+						RelativePath="..\..\..\src\components\server\distributing_factory.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\src\components\server\runtime_support.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -551,7 +555,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\hpx\components\factory.hpp"
+					RelativePath="..\..\..\hpx\components\runtime_support.hpp"
 					>
 				</File>
 				<Filter
@@ -562,11 +566,15 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\hpx\components\server\factory.hpp"
+						RelativePath="..\..\..\hpx\components\server\distributing_factory.hpp"
 						>
 					</File>
 					<File
 						RelativePath="..\..\..\hpx\components\server\manage_component.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\components\server\runtime_support.hpp"
 						>
 					</File>
 					<File
@@ -590,7 +598,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\hpx\components\stubs\factory.hpp"
+						RelativePath="..\..\..\hpx\components\stubs\runtime_support.hpp"
 						>
 					</File>
 				</Filter>

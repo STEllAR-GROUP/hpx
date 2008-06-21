@@ -100,7 +100,7 @@ namespace hpx
         class continuation;
         typedef boost::shared_ptr<continuation> continuation_type;
 
-        class factory;
+        class runtime_support;
         class accumulator;
     }
 

@@ -8,7 +8,7 @@
 
 #include <hpx/components/action.hpp>
 #include <hpx/components/component_type.hpp>
-#include <hpx/components/factory.hpp>
+#include <hpx/components/runtime_support.hpp>
 #include <hpx/components/accumulator.hpp>
 #include <hpx/components/continuation_impl.hpp>
 

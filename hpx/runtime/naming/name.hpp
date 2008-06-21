@@ -161,9 +161,9 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // By convention the factory has a gid identical to the prefix of the 
-    // locality the factory is responsible for
-    inline id_type get_factory_id(id_type const& id)
+    // By convention the runtime_support has a gid identical to the prefix of the 
+    // locality the runtime_support is responsible for
+    inline id_type get_runtime_support_id(id_type const& id)
     {
         return id_type(id.get_msb() & ~0xFFFFFFFFFFFFLL, 0);
     }

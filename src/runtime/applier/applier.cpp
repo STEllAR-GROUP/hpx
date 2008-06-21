@@ -23,7 +23,7 @@ namespace hpx { namespace applier
 
         // The simple_future instance is associated with the following 
         // apply action by sending it along as its continuation
-        apply<components::server::factory::create_action>(
+        apply<components::server::runtime_support::create_component_action>(
             new components::continuation(lco.get_gid(*this)), targetgid, 
             type, count);
 
@@ -39,6 +39,18 @@ namespace hpx { namespace applier
         std::size_t count)
     {
         return create_async(targetgid, type, count).get_result(self);
+    }
+
+    //
+    void 
+    applier::free (components::component_type type, naming::id_type const& gid,
+        std::size_t count)
+    {
+        typedef 
+            components::server::runtime_support::free_component_action 
+        action_type;
+        apply<action_type>(naming::get_runtime_support_id(gid), 
+            type, gid, count);
     }
 
 ///////////////////////////////////////////////////////////////////////////////

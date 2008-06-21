@@ -203,7 +203,7 @@ namespace hpx { namespace naming { namespace server
             return statistics_;
         }
 
-        std::vector<boost::uint32_t>& get_prefixes() 
+        std::vector<boost::uint32_t> const& get_prefixes() 
         {
             return prefixes_;
         }

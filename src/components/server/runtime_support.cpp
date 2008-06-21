@@ -5,15 +5,18 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/components/server/factory.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/components/server/runtime_support.hpp>
+#include <hpx/components/stubs/runtime_support.hpp>
 #include <hpx/components/server/accumulator.hpp>
+#include <hpx/components/server/distributing_factory.hpp>
 #include <hpx/components/server/manage_component.hpp>
 #include <hpx/components/continuation_impl.hpp>
 
 namespace hpx { namespace components { namespace server
 {
     // create a new instance of a component
-    threadmanager::thread_state factory::create(
+    threadmanager::thread_state runtime_support::create_component(
         threadmanager::px_thread_self& self, applier::applier& appl,
         naming::id_type* gid, components::component_type type,
         std::size_t count)
@@ -23,6 +26,10 @@ namespace hpx { namespace components { namespace server
         switch (type) {
         case accumulator::value:
             id = server::create<server::accumulator>(appl, count);
+            break;
+
+        case distributing_factory::value:
+            id = server::create<server::distributing_factory>(appl, count);
             break;
 
         default:
@@ -39,7 +46,7 @@ namespace hpx { namespace components { namespace server
     }
 
     // delete an existing instance of a component
-    threadmanager::thread_state factory::free(
+    threadmanager::thread_state runtime_support::free_component(
         threadmanager::px_thread_self& self, applier::applier& appl,
         components::component_type type, naming::id_type const& gid,
         std::size_t count)
@@ -49,6 +56,10 @@ namespace hpx { namespace components { namespace server
             server::destroy<server::accumulator>(appl, gid, count);
             break;
 
+        case distributing_factory::value:
+            server::destroy<server::distributing_factory>(appl, gid, count);
+            break;
+
         default:
             boost::throw_exception(hpx::exception(hpx::bad_component_type,
                 std::string("attempt to create component instance of invalid type: ") + 
@@ -56,6 +67,23 @@ namespace hpx { namespace components { namespace server
             break;
         }
         return hpx::threadmanager::terminated;
+    }
+
+    // initiate system shutdown for all localities
+    threadmanager::thread_state runtime_support::shutdown_all(
+        threadmanager::px_thread_self& self, applier::applier& app)
+    {
+        std::vector<naming::id_type> prefixes;
+        app.get_dgas_client().get_prefixes(prefixes);
+
+        components::stubs::runtime_support rts(app);
+        std::vector<naming::id_type>::iterator end = prefixes.end();
+        for (std::vector<naming::id_type>::iterator it = prefixes.begin(); 
+             it != end; ++it)
+        {
+            rts.shutdown(*it);
+        }
+        return threadmanager::terminated;
     }
 
 }}}
