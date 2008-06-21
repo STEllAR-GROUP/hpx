@@ -9,18 +9,6 @@
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
-threadmanager::thread_state 
-hpx_main(threadmanager::px_thread_self&, applier::applier&)
-{
-    // This main px_thread isn't doing anything.
-
-    // The main thread (the one executing main()) is waiting for the shutdown 
-    // action and the threadmanager is serving incoming requests in the 
-    // meantime.
-    return threadmanager::terminated;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     try {
@@ -53,12 +41,15 @@ int main(int argc, char* argv[])
 
             // initialize and start the HPX runtime
             hpx::runtime rt(dgas_host, dgas_port, hpx_host, hpx_port);
-            rt.run(hpx_main);
+
+            // the main thread will wait (block) for the shutdown action and 
+            // the threadmanager is serving incoming requests in the meantime
+            rt.run();
         }
         else {
             // initialize and start the HPX runtime
             hpx::runtime rt(dgas_host, dgas_port, hpx_host, hpx_port);
-            rt.run(hpx_main);
+            rt.run();
         }
     }
     catch (std::exception& e) {

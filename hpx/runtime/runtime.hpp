@@ -107,20 +107,29 @@ namespace hpx
                     &runtime_support_));
 
             // register the given main function with the thread manager
-            thread_manager_.register_work(
-                boost::bind(func, _1, boost::ref(applier_)));
+            if (!func.empty())
+            {
+                thread_manager_.register_work(
+                    boost::bind(func, _1, boost::ref(applier_)));
+            }
 
             // block if required
-            if (blocking)
-                parcel_port_.run(true);
+            if (blocking) 
+                wait();     // wait for the shutdown_action to be executed
         }
 
-        /// Stop the runtime system
+        /// \brief Wait for the shutdown action to be executed
+        void wait()
+        {
+            runtime_support_.wait();
+        }
+
+        /// \brief Stop the runtime system
         ///
         /// \param blocking   [in] This allows to control whether this 
         ///                   call blocks until the runtime system has been 
         ///                   fully stopped. If this parameter is \a false then 
-        ///                   this call will initialize the stop action but will
+        ///                   this call will initiate the stop action but will
         ///                   return immediately. Use a second call to stop 
         ///                   with this parameter set to \a true to wait for 
         ///                   all internal work to be completed.
@@ -141,11 +150,16 @@ namespace hpx
         ///                   been initialized. This function is expected to 
         ///                   expose an interface as defined by the typedef
         ///                   \a hpx_main_function_type.
-        void run(boost::function<hpx_main_function_type> func)
+        ///
+        /// \note             The parameter \a func is optional. If no function
+        ///                   is supplied, the runtime system will simply wait
+        ///                   for the shutdown action without explicitly 
+        ///                   executing any main thread.
+        void run(boost::function<hpx_main_function_type> func =
+            boost::function<hpx_main_function_type>())
         {
             start(func);
-            // wait for the shutdown_action to be executed
-            runtime_support_.wait();
+            wait();
             stop();
         }
 
