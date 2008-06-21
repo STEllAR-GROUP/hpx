@@ -12,8 +12,11 @@ using namespace hpx;
 threadmanager::thread_state 
 hpx_main(threadmanager::px_thread_self&, applier::applier&)
 {
-    // the main thread isn't doing anything, it is waiting for the shutdown 
-    // action and is serving incoming requests in the meantime
+    // This main px_thread isn't doing anything.
+
+    // The main thread (the one executing main()) is waiting for the shutdown 
+    // action and the threadmanager is serving incoming requests in the 
+    // meantime.
     return threadmanager::terminated;
 }
 
@@ -30,8 +33,8 @@ int main(int argc, char* argv[])
         if (argc != 6) {
             std::cerr << "Usage: hpx_runtime hpx_addr hpx_port dgas_addr "
                          "dgas_port is_dgas_server" << std::endl;
-            std::cerr << "Try: hpx_runtime 127.0.0.0 7911 127.0.0.0 7912 1"
-                      << std::endl;
+            std::cerr << "Try: hpx_runtime <your_ip_addr> 7911 "
+                         "<your_ip_addr> 7912 1" << std::endl;
             return -3;
         }
         else {
