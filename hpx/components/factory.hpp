@@ -40,10 +40,9 @@ namespace hpx { namespace components
 
         /// Asynchronously create a new component using the factory 
         lcos::simple_future<naming::id_type> 
-        create_async(threadmanager::px_thread_self& self,
-            components::component_type type, std::size_t count = 1) 
+        create_async(components::component_type type, std::size_t count = 1) 
         {
-            return this->base_type::create_async(self, gid_, type, count);
+            return this->base_type::create_async(gid_, type, count);
         }
 
         /// Destroy an existing component

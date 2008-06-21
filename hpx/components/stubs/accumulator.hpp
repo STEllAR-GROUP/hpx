@@ -57,12 +57,11 @@ namespace hpx { namespace components { namespace stubs
         /// needs to call \a simple_future#get_result on the result of this 
         /// function to obtain the result as returned by the accumulator.
         static lcos::simple_future<double> query_async(
-            threadmanager::px_thread_self& self, applier::applier& appl, 
-            naming::id_type gid) 
+            applier::applier& appl, naming::id_type gid) 
         {
             // Create a simple_future, execute the required action and wait 
             // for the result to be returned to the future.
-            lcos::simple_future<double> lco (self);
+            lcos::simple_future<double> lco;
 
             // The simple_future instance is associated with the following 
             // apply action by sending it along as its continuation
@@ -82,14 +81,13 @@ namespace hpx { namespace components { namespace stubs
         {
             // The following get_result yields control while the action above 
             // is executed and the result is returned to the simple_future
-            return query_async(self, appl, gid).get_result();
+            return query_async(appl, gid).get_result(self);
         }
 
         ///
-        lcos::simple_future<double> query_async(
-            threadmanager::px_thread_self& self, naming::id_type targetgid) 
+        lcos::simple_future<double> query_async(naming::id_type targetgid) 
         {
-            return query_async(self, app_, targetgid);
+            return query_async(app_, targetgid);
         }
 
         ///

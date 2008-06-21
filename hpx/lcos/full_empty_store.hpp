@@ -250,8 +250,7 @@ namespace hpx { namespace lcos { namespace detail
         ///////////////////////////////////////////////////////////////////////
         // unconditionally set the data and set the entry to full
         template <typename Lock, typename T>
-        void set_and_fill(Lock& outer_lock, 
-            threadmanager::px_thread_self& self, T const& src)
+        void set_and_fill(Lock& outer_lock, T const& src)
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
@@ -266,8 +265,7 @@ namespace hpx { namespace lcos { namespace detail
 
         // same as above, but for entries without associated data
         template <typename Lock>
-        void set_and_fill(Lock& outer_lock, 
-            threadmanager::px_thread_self& self)
+        void set_and_fill(Lock& outer_lock)
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
@@ -502,18 +500,18 @@ namespace hpx { namespace lcos { namespace detail
         /// \brief Writes memory and atomically sets its state to full without 
         /// waiting for it to become empty.
         template <typename T>
-        void set(threadmanager::px_thread_self& self, void* entry, T const& src)
+        void set(void* entry, T const& src)
         {
             boost::unique_lock<mutex_type> l(mtx_);
             store_type::iterator it = find_or_create(entry);
-            (*it).second->set_and_fill(l, self, src);
+            (*it).second->set_and_fill(l, src);
         }
 
-        void set(threadmanager::px_thread_self& self, void* entry)
+        void set(void* entry)
         {
             boost::unique_lock<mutex_type> l(mtx_);
             store_type::iterator it = find_or_create(entry);
-            (*it).second->set_and_fill(l, self);
+            (*it).second->set_and_fill(l);
         }
 
         /// \brief Wait for memory to become empty, and then fill it.

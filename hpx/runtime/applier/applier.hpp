@@ -175,7 +175,6 @@ namespace hpx { namespace applier
         /// \note       For synchronous operation use the function 
         ///             \a applier#create_async.
         lcos::simple_future<naming::id_type> create_async(
-            threadmanager::px_thread_self& self, 
             naming::id_type const& targetgid, components::component_type type,
             std::size_t count = 1);
 

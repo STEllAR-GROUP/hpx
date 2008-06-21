@@ -37,13 +37,12 @@ namespace hpx { namespace components { namespace stubs
         /// \a simple_future#get_result on the result of this function to 
         /// obtain the global id of the newly created object.
         static lcos::simple_future<naming::id_type> create_async(
-            threadmanager::px_thread_self& self, applier::applier& appl, 
-            naming::id_type const& targetgid, components::component_type type,
-            std::size_t count = 1) 
+            applier::applier& appl, naming::id_type const& targetgid, 
+            components::component_type type, std::size_t count = 1) 
         {
             // Create a simple_future, execute the required action and wait 
             // for the result to be returned to the future.
-            lcos::simple_future<naming::id_type> lco (self);
+            lcos::simple_future<naming::id_type> lco;
 
             // The simple_future instance is associated with the following 
             // apply action by sending it along as its continuation
@@ -65,16 +64,15 @@ namespace hpx { namespace components { namespace stubs
         {
             // The following get_result yields control while the action above 
             // is executed and the result is returned to the simple_future
-            return create_async(self, appl, targetgid, type, count).get_result();
+            return create_async(appl, targetgid, type, count).get_result(self);
         }
 
         ///
         lcos::simple_future<naming::id_type> create_async(
-            threadmanager::px_thread_self& self, 
             naming::id_type const& targetgid, components::component_type type,
             std::size_t count = 1) 
         {
-            return create_async(self, app_, targetgid, type, count);
+            return create_async(app_, targetgid, type, count);
         }
 
         /// 

@@ -27,22 +27,27 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Result>
     class simple_future : public base_lco_with_value<Result>
     {
+    private:
+        typedef Result result_type;
+        typedef std::pair<boost::system::error_code, std::string> error_type;
+        typedef boost::variant<result_type, error_type> data_type;
+
     public:
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
         // to associate this component with a given action.
         enum { value = components::component_simple_future};
 
-        simple_future(threadmanager::px_thread_self& self)
-          : target_thread_(self), use_count_(0)
+        simple_future()
+          : use_count_(0)
         {
         }
 
-        Result get_result() 
+        Result get_result(threadmanager::px_thread_self& self) 
         {
             // yields control if needed
             data_type d;
-            data_.read(target_thread_, d);
+            data_.read(self, d);
 
             // the thread has been re-activated by one of the actions 
             // supported by this simple_future (see \a simple_future::set_event
@@ -68,11 +73,7 @@ namespace hpx { namespace lcos { namespace detail
             applier::applier& appl, Result const& result)
         {
             // set the received result, reset error status
-            data_.set(self, result);
-
-            // re-activate the target thread if previously yielded
-            appl.get_thread_manager().set_state(
-                target_thread_.get_thread_id(), threadmanager::pending);
+            data_.set(result);
 
             // this thread has nothing more to do
             return threadmanager::terminated;
@@ -84,24 +85,14 @@ namespace hpx { namespace lcos { namespace detail
             hpx::error code, std::string msg)
         {
             // store the error code
-            data_.set(self, error_type(make_error_code(code), msg));
-
-            // re-activate the target thread
-            appl.get_thread_manager().set_state(
-                target_thread_.get_thread_id(), threadmanager::pending);
+            data_.set(error_type(make_error_code(code), msg));
 
             // this thread has nothing more to do
             return threadmanager::terminated;
         }
 
     private:
-        typedef Result result_type;
-        typedef std::pair<boost::system::error_code, std::string> error_type;
-        typedef boost::variant<result_type, error_type> data_type;
-
-        threadmanager::px_thread_self& target_thread_;
         lcos::full_empty<data_type> data_;
-        std::string error_msg_;
 
     public:
         boost::detail::atomic_count use_count_;
@@ -120,6 +111,8 @@ HPX_SERIALIZE_ACTION(hpx::lcos::detail::base_lco_with_value<double>::set_error_a
 namespace hpx { namespace lcos 
 {
     ///////////////////////////////////////////////////////////////////////////
+    /// \class simple_future simple_future.hpp hpx/lcos/simple_future.hpp
+    ///
     /// A simple_future can be used by a single \a px_thread to invoke a 
     /// (remote) action and wait for the result. The result is expected to be 
     /// sent back to the simple_future using the LCO's set_event action
@@ -131,8 +124,8 @@ namespace hpx { namespace lcos
     /// construction time).
     ///
     /// \code
-    ///     // Create the simple_future supplying the thread to re-activate
-    ///     lcos::simple_future<naming::id_type> f(thread_self);
+    ///     // Create the simple_future (the expected result is a id_type)
+    ///     lcos::simple_future<naming::id_type> f;
     ///
     ///     // initiate the action supplying the simple_future as a 
     ///     // continuation
@@ -140,9 +133,18 @@ namespace hpx { namespace lcos
     ///
     ///     // Wait for the result to be returned, yielding control 
     ///     // in the meantime.
-    ///     naming::id_type result = f.get_result();
+    ///     naming::id_type result = f.get_result(thread_self);
     ///     // ...
     /// \endcode
+    ///
+    /// \tparam Result   The template parameter \Result defines the type this 
+    ///                  simple_future is expected to return from 
+    ///                  \a simple_future#get_result.
+    ///
+    /// \note            The action executed using the simple_future as a 
+    ///                  continuation must return a value of a type convertible 
+    ///                  to the type as specified by the template parameter 
+    ///                  \a Result
     template <typename Result>
     class simple_future 
     {
@@ -156,20 +158,15 @@ namespace hpx { namespace lcos
         /// operation associated with this simple_future instance has been 
         /// returned.
         /// 
-        /// \param self   [in] The \a px_thread which will be notified as soon 
-        ///               as the result has been returned. This thread will be
-        ///               notified (re-activated) as soon as this simple_future
-        ///               instance receives the result.
-        ///
         /// \note         The result of the requested operation is expected to 
         ///               be returned as the first parameter using a 
-        ///               \a base_lco#set_event action. Any error has to be 
+        ///               \a base_lco#set_result action. Any error has to be 
         ///               reported using a \a base_lco::set_error action. The 
         ///               target for either of these actions has to be this 
         ///               simple_future instance (as it has to be sent along 
         ///               with the action as the continuation parameter).
-        simple_future(threadmanager::px_thread_self& self)
-          : impl_(new wrapping_type(new wrapped_type(self)))
+        simple_future()
+          : impl_(new wrapping_type(new wrapped_type()))
         {}
 
         /// Get the result of the requested action. This call blocks (yields 
@@ -178,16 +175,15 @@ namespace hpx { namespace lcos
         /// manager the \a get_result() will return.
         ///
         /// \param self   [in] The \a px_thread which will be unconditionally
-        ///               suspended while waiting for the result. This needs to 
-        ///               be the same thread as has been used to 
+        ///               while waiting for the result. 
         ///
         /// \note         If there has been an error reported (using the action
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
-        Result get_result() const
+        Result get_result(threadmanager::px_thread_self& self) const
         {
-            return (*impl_)->get_result();
+            return (*impl_)->get_result(self);
         }
 
         /// \brief Return the global id of this \a simple_future instance

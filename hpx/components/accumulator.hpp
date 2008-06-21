@@ -56,10 +56,9 @@ namespace hpx { namespace components
         }
 
         /// Asynchronously query the current value of the accumulator
-        lcos::simple_future<double> query_async(
-            threadmanager::px_thread_self& self) 
+        lcos::simple_future<double> query_async() 
         {
-            return this->base_type::query_async(self, gid_);
+            return this->base_type::query_async(gid_);
         }
 
     private:

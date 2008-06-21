@@ -21,7 +21,7 @@ threadmanager::thread_state test1_helper(threadmanager::px_thread_self& self,
     naming::id_type gid = t->get_gid(appl);
     BOOST_TEST(gid);
 
-    data.set(self, 1);
+    data.set(1);
     BOOST_TEST(!data.is_empty());
 
     return threadmanager::terminated;

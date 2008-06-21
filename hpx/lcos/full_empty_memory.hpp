@@ -37,26 +37,47 @@ namespace hpx { namespace lcos
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \class full_empty full_empty_memory.hpp hpx/lcos/full_empty_memory.hpp
+    ///
     /// The \a full_empty data type is a implementation of memory areas guarded
     /// by full/empty bits, a very low level synchronization primitive. The 
     /// class has been modeled after the FEB implementation in the QThread
     /// library (see here: http://www.cs.sandia.gov/qthreads/).
     ///
-    /// All member functions but \a empty and \a fill have the potential of 
-    /// blocking until the corresponding precondition is met. Memory is assumed
-    /// to be full unless otherwise asserted, and as such memory that is full 
-    /// and does not have dependencies (i.e. no threads are waiting for it to 
-    /// become empty) does not require state data to be stored. It is expected 
-    /// that while there may be locks instantiated at one time or another for a 
-    /// very large number of addresses in the system, relatively few will be in 
-    /// a non-default (full, no waiters) state at any one time.
+    /// All member functions but \a set_empty and \a set_full have the potential 
+    /// of blocking until the corresponding precondition is met. Memory is 
+    /// assumed to be full unless otherwise asserted, and as such memory that 
+    /// is full and does not have dependencies (i.e. no threads are waiting for 
+    /// it to become empty) does not require state data to be stored. It is 
+    /// expected that while there may be locks instantiated at one time or 
+    /// another for a very large number of addresses in the system, relatively 
+    /// few will be in a non-default (full, no waiters) state at any one time.
     ///
+    /// The main idea is, that a memory location can be either empty or full.
+    /// setting or writing a value to a location sets it to full. Reading from 
+    /// a location retrieves the value and (optionally) sets it to empty. A 
+    /// write will block if the location is full and will wait for it to become
+    /// empty. If several write's are waiting for a location to become empty 
+    /// only one thread will be re-activated the moment it gets empty. A read 
+    /// will block if the location is empty and will wait for it to become
+    /// full. If several read's are waiting for a location to become full 
+    /// all threads will be re-activated the moment it gets full. 
+    /// 
+    /// full_empty memory locations are very useful for synchronization and 
+    /// data delivery (especially in producer/consumer scenarios).
+    ///
+    /// \tparam  T  The template parameter defines the type of the memory 
+    ///             location to be guarded by an empty/full bit. It is possible 
+    ///             to use any C++ data type with the empty/full mechanism.
+    ///             If you want to use the full/empty synchronization facilities
+    ///             without having to transfer (read/write) any data you can
+    ///             use the specialization lcos#full_empty<void>.
     template <typename T>
     class full_empty : public detail::full_empty_base
     {
     private:
         typedef T value_type;
-        
+
     public:
         /// \brief Create a new full/empty storage in empty state
         full_empty() 
@@ -71,24 +92,34 @@ namespace hpx { namespace lcos
             get_store().remove(get_address());
         }
 
-        /// \brief Atomically set the state to empty
+        /// \brief Atomically set the state to empty without releasing any 
+        ///        waiting \a px_threads. This function is mainly usable for
+        ///        initialization and debugging purposes.
+        /// 
+        /// \note    This function will create a new full/empty entry in the 
+        ///          store if it doesn't exist yet.
         void set_empty()
         {
             get_store().set_empty(get_address());
         }
-        
-        /// \brief Atomically set the state to full
+
+        /// \brief Atomically set the state to full without releasing any 
+        ///        waiting \a px_threads. This function is mainly usable for
+        ///        initialization and debugging purposes.
+        /// 
+        /// \note    This function will not create a new full/empty entry in 
+        ///          the store if it doesn't exist yet.
         void set_full()
         {
             get_store().set_full(get_address());
         }
-        
+
         /// \brief Query the current state of the memory
         bool is_empty() const
         {
             return get_store().is_empty(get_address());
         }
-        
+
         /// Wait for the memory to become full and then reads it, leaves memory
         /// in full state.
         ///
@@ -113,9 +144,9 @@ namespace hpx { namespace lcos
 
         /// Writes memory and atomically sets its state to full without waiting 
         /// for it to become empty.
-        void set(threadmanager::px_thread_self& self, value_type const& data)
+        void set(value_type const& data)
         {
-            get_store().set(self, get_address(), data);
+            get_store().set(get_address(), data);
         }
 
         /// Wait for memory to become empty, and then fill it.
@@ -148,8 +179,9 @@ namespace hpx { namespace lcos
         storage_type data_;
     };
 
-    /// The full_empty<void> is a specialization useful as a synchronization 
-    /// primitive only.
+    /// \class full_empty full_empty_memory.hpp hpx/lcos/full_empty_memory.hpp
+    /// The full_empty<void> is a specialization of the lcos#full_empty 
+    /// template which is useful mainly as a synchronization primitive.
     template <>
     class full_empty<void> : public detail::full_empty_base
     {
@@ -167,7 +199,9 @@ namespace hpx { namespace lcos
             get_store().remove(get_address());
         }
 
-        /// \brief Atomically set the state to empty
+        /// \brief Atomically set the state to empty without releasing any 
+        ///        waiting \a px_threads. This function is mainly usable for
+        ///        initialization and debugging purposes.
         /// 
         /// \note    This function will create a new full/empty entry in the 
         ///          store if it doesn't exist yet.
@@ -175,8 +209,10 @@ namespace hpx { namespace lcos
         {
             get_store().set_empty(get_address());
         }
-        
-        /// \brief Atomically set the state to full
+
+        /// \brief Atomically set the state to full without releasing any 
+        ///        waiting \a px_threads. This function is mainly usable for
+        ///        initialization and debugging purposes.
         /// 
         /// \note    This function will not create a new full/empty entry in 
         ///          the store if it doesn't exist yet.
@@ -184,13 +220,13 @@ namespace hpx { namespace lcos
         {
             get_store().set_full(get_address());
         }
-        
+
         /// \brief Query the current state of the memory
         bool is_empty() const
         {
             return get_store().is_empty(get_address());
         }
-        
+
         /// Wait for the memory to become full, leaves memory in full state.
         ///
         /// \note When memory becomes full, all \a px_threads waiting for it
@@ -211,9 +247,9 @@ namespace hpx { namespace lcos
 
         /// Writes memory and atomically sets its state to full without waiting 
         /// for it to become empty.
-        void set(threadmanager::px_thread_self& self)
+        void set()
         {
-            get_store().set(self, get_address());
+            get_store().set(get_address());
         }
 
         /// Wait for memory to become empty, and then fill it.
