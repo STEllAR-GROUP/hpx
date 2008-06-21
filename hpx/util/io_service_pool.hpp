@@ -55,7 +55,7 @@ namespace hpx { namespace util
 
         /// The next io_service to use for a connection.
         std::size_t next_io_service_;
-        
+
         /// set to true if stopped
         bool stopped_;
     };

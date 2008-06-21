@@ -13,17 +13,17 @@
 namespace hpx
 {
     class runtime;
-    
+
     namespace applier
     {
         class applier;
     }
-    
+
     namespace action_manager
     {
         class action_manager;
     }
-    
+
     namespace naming
     {
         struct id_type;
@@ -54,7 +54,7 @@ namespace hpx
             class parcelhandler_queue;
         }
     }
-    
+
     namespace threadmanager
     {
         class px_thread;
@@ -101,11 +101,22 @@ namespace hpx
         typedef boost::shared_ptr<continuation> continuation_type;
 
         class runtime_support;
-        class accumulator;
+
+        namespace stubs 
+        {
+            class runtime_support;
+        }
+
+        namespace server
+        {
+            class runtime_support;
+        }
     }
 
     namespace lcos
     {
+        struct base_lco;
+        template <typename Result> struct base_lco_with_value;
         template <typename Result> class simple_future;
     }
 }

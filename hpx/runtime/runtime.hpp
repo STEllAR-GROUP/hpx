@@ -47,15 +47,7 @@ namespace hpx
         ///                       instance will use to listen for incoming 
         ///                       parcels.
         runtime(std::string const& dgas_address, unsigned short dgas_port,
-                std::string const& address, unsigned short port) 
-          : dgas_pool_(), parcel_pool_(),
-            dgas_client_(dgas_pool_, dgas_address, dgas_port),
-            parcel_port_(parcel_pool_, address, port),
-            parcel_handler_(dgas_client_, parcel_port_),
-            thread_manager_(),
-            applier_(dgas_client_, parcel_handler_, thread_manager_),
-            action_manager_(applier_)
-        {}
+                std::string const& address, unsigned short port);
 
         /// Construct a new HPX runtime instance 
         ///
@@ -64,23 +56,11 @@ namespace hpx
         /// \param address        [in] This is the locality the new runtime 
         ///                       instance should be associated with. It is 
         ///                       used for receiving parcels.
-        runtime(naming::locality dgas_address, naming::locality address) 
-          : dgas_pool_(), parcel_pool_(),
-            dgas_client_(dgas_pool_, dgas_address),
-            parcel_port_(parcel_pool_, address),
-            parcel_handler_(dgas_client_, parcel_port_),
-            thread_manager_(),
-            applier_(dgas_client_, parcel_handler_, thread_manager_),
-            action_manager_(applier_)
-        {}
+        runtime(naming::locality dgas_address, naming::locality address);
 
-        ~runtime()
-        {
-            // stop all services
-            parcel_port_.stop();
-            thread_manager_.stop();
-            dgas_pool_.stop();
-        }
+        /// \brief The destructor makes sure all HPX runtime services are 
+        ///        properly shut down before existing.
+        ~runtime();
 
         /// \brief Start the runtime system
         ///
@@ -92,37 +72,14 @@ namespace hpx
         ///                   \a hpx_main_function_type.
         /// \param blocking   [in] This allows to control whether this 
         ///                   call blocks until the runtime system has been 
-        ///                   stopped
+        ///                   stopped. If this parameter is \a true the 
+        ///                   function \a runtime#start internally will call 
+        ///                   \a runtime#wait.
         void start(boost::function<hpx_main_function_type> func, 
-            bool blocking = false)
-        {
-            // start services (service threads)
-            thread_manager_.run();        // start the thread manager
-            parcel_port_.run(false);      // starts parcel_pool_ as well
-
-            // register the runtime_support with the DGAS 
-            dgas_client_.bind(parcel_handler_.get_prefix(), 
-                naming::address(parcel_port_.here(), 
-                    components::server::runtime_support::value, 
-                    &runtime_support_));
-
-            // register the given main function with the thread manager
-            if (!func.empty())
-            {
-                thread_manager_.register_work(
-                    boost::bind(func, _1, boost::ref(applier_)));
-            }
-
-            // block if required
-            if (blocking) 
-                wait();     // wait for the shutdown_action to be executed
-        }
+            bool blocking = false);
 
         /// \brief Wait for the shutdown action to be executed
-        void wait()
-        {
-            runtime_support_.wait();
-        }
+        void wait();
 
         /// \brief Stop the runtime system
         ///
@@ -133,12 +90,7 @@ namespace hpx
         ///                   return immediately. Use a second call to stop 
         ///                   with this parameter set to \a true to wait for 
         ///                   all internal work to be completed.
-        void stop(bool blocking = true)
-        {
-            thread_manager_.stop(blocking);
-            parcel_port_.stop(blocking);    // stops parcel_pool_ as well
-            dgas_pool_.stop();
-        }
+        void stop(bool blocking = true);
 
         /// \brief Run the HPX runtime system, use the given function for the 
         ///        main \a px_thread and block waiting for all px_threads to 
@@ -156,12 +108,7 @@ namespace hpx
         ///                   for the shutdown action without explicitly 
         ///                   executing any main thread.
         void run(boost::function<hpx_main_function_type> func =
-            boost::function<hpx_main_function_type>())
-        {
-            start(func);
-            wait();
-            stop();
-        }
+            boost::function<hpx_main_function_type>());
 
         ///////////////////////////////////////////////////////////////////////
 

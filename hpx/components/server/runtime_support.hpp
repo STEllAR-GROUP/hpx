@@ -38,7 +38,8 @@ namespace hpx { namespace components { namespace server
         enum { value = component_runtime_support };
 
         // constructor
-        runtime_support()
+        runtime_support() 
+          : stopped_(false)
         {}
 
         ///////////////////////////////////////////////////////////////////////
@@ -61,7 +62,7 @@ namespace hpx { namespace components { namespace server
             threadmanager::px_thread_self& self, applier::applier& app)
         {
             // initiate system shutdown
-            condition_.notify_all();
+            stop();
             return threadmanager::terminated;
         }
 
@@ -105,12 +106,27 @@ namespace hpx { namespace components { namespace server
         void wait()
         {
             mutex_type::scoped_lock l(mtx_);
+            stopped_ = false;
             condition_.wait(l);
+        }
+
+        /// \brief Notify all waiting (blocking) threads allowing the system to 
+        ///        be properly stopped.
+        ///
+        /// \note      This function can be called from any thread.
+        void stop()
+        {
+            mutex_type::scoped_lock l(mtx_);
+            if (!stopped_) {
+                condition_.notify_all();
+                stopped_ = true;
+            }
         }
 
     private:
         mutex_type mtx_;
         boost::condition condition_;
+        bool stopped_;
     };
 
 }}}

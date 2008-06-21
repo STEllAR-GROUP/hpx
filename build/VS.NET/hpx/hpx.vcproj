@@ -192,6 +192,10 @@
 			<Filter
 				Name="Runtime"
 				>
+				<File
+					RelativePath="..\..\..\src\runtime\runtime.cpp"
+					>
+				</File>
 				<Filter
 					Name="ActionManager"
 					>
