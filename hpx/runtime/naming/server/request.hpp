@@ -6,12 +6,16 @@
 #if !defined(HPX_NAMING_SERVER_REQUEST_MAR_24_2008_0941AM)
 #define HPX_NAMING_SERVER_REQUEST_MAR_24_2008_0941AM
 
+#include <iosfwd>
+#include <string>
+
 #include <boost/cstdint.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/serialization.hpp>
 
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -21,8 +25,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming { namespace server 
 {
-    /// the commands supported by the name server
-    enum name_server_command
+    /// the commands supported by the DGAS server
+    enum dgas_server_command
     {
         command_unknown = -1,
         command_firstcommand = 0,
@@ -41,72 +45,53 @@ namespace hpx { namespace naming { namespace server
         command_lastcommand
     };
 
-    const char* const command_names[] = 
+    namespace command_strings
     {
-        "command_getprefix",
-        "command_getprefixes",
-        "command_getidrange",
-        "command_bind_range",
-        "command_unbind_range",
-        "command_resolve",
-        "command_queryid",
-        "command_registerid",
-        "command_unregisterid",
-        "command_statistics_count",
-        "command_statistics_mean",
-        "command_statistics_moment2",
-        ""
-    };
-    
-    inline char const* const get_command_name(int cmd)
-    {
-        if (cmd >= command_firstcommand && cmd < command_lastcommand)
-            return command_names[cmd];
-        return "<unknown>";
+        char const* const get_command_name(int cmd);
     }
-    
+
     /// A request received from a client.
     class request
     {
     public:
-        request(name_server_command c = command_unknown) 
+        request(dgas_server_command c = command_unknown) 
           : command_(c)
         {}
-        
+
         // get_prefix
-        request(name_server_command c, locality const& l) 
+        request(dgas_server_command c, locality const& l) 
           : command_(c), site_(l)
         {}
-        
+
         // get_id_range
-        request(name_server_command c, locality const& l, std::size_t count) 
+        request(dgas_server_command c, locality const& l, std::size_t count) 
           : command_(c), count_(count), site_(l)
         {}
-        
+
         // resolve
-        request(name_server_command c, naming::id_type const& id) 
+        request(dgas_server_command c, naming::id_type const& id) 
           : command_(c), id_(id)
         {}
 
         // registerid
-        request(name_server_command c, std::string const& ns_name, 
+        request(dgas_server_command c, std::string const& ns_name, 
                 naming::id_type const& id) 
           : command_(c), id_(id), ns_name_(ns_name)
         {}
 
         // unregisterid
-        request(name_server_command c, std::string const& ns_name) 
+        request(dgas_server_command c, std::string const& ns_name) 
           : command_(c), ns_name_(ns_name)
         {}
 
         // bind_range
-        request(name_server_command c, naming::id_type id, std::size_t count, 
+        request(dgas_server_command c, naming::id_type id, std::size_t count, 
                 address const& addr, std::ptrdiff_t offset) 
           : command_(c), id_(id), count_(count), addr_(addr), offset_(offset)
         {}
 
         // unbind_range
-        request(name_server_command c, naming::id_type id, std::size_t count) 
+        request(dgas_server_command c, naming::id_type id, std::size_t count) 
           : command_(c), id_(id), count_(count)
         {}
 
@@ -114,32 +99,32 @@ namespace hpx { namespace naming { namespace server
         {
             return command_;
         }
-        
+
         naming::id_type const& get_id() const
         {
             return id_;
         }
-        
+
         std::size_t const& get_count() const
         {
             return count_;
         }
-        
+
         naming::locality get_site() const
         {
             return site_;
         }
-        
+
         naming::address get_address() const 
         {
             return addr_;
         }
-        
+
         std::ptrdiff_t const& get_offset() const
         {
             return offset_;
         }
-        
+
         std::string get_name() const
         {
             return ns_name_;
@@ -147,16 +132,16 @@ namespace hpx { namespace naming { namespace server
 
     private:
         friend std::ostream& operator<< (std::ostream& os, request const& req);
-        
+
         // serialization support    
         friend class boost::serialization::access;
-    
+
         template<class Archive>
         void save(Archive & ar, const unsigned int version) const
         {
             ar << command_;
             ar << site_;
-            
+
             switch (command_) {
             case command_resolve:
                 ar << id_;
@@ -189,7 +174,7 @@ namespace hpx { namespace naming { namespace server
             case command_getidrange:
                 ar << count_;
                 break;
-                
+
             case command_getprefix:
             case command_getprefixes:
             case command_statistics_count:
@@ -208,10 +193,10 @@ namespace hpx { namespace naming { namespace server
                 throw exception(version_too_new, 
                     "trying to load request with unknown version");
             }
-    
+
             ar >> command_;
             ar >> site_;
-            
+
             switch (command_) {
             case command_resolve:
                 ar >> id_;
@@ -244,7 +229,7 @@ namespace hpx { namespace naming { namespace server
             case command_getidrange:
                 ar >> count_;
                 break;
-                
+
             case command_getprefix:
             case command_getprefixes:
             case command_statistics_count:
@@ -258,7 +243,7 @@ namespace hpx { namespace naming { namespace server
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     private:
-        boost::uint8_t command_;    /// one of the name_server_command's above
+        boost::uint8_t command_;    /// one of the dgas_server_command's above
         naming::id_type id_;        /// global id (resolve, bind and unbind only)
         std::size_t count_;         /// number of global ids (bind_range, unbind_range only)
         naming::locality site_;     /// our address 
@@ -267,59 +252,9 @@ namespace hpx { namespace naming { namespace server
         std::string ns_name_;       /// namespace name (queryid only)
     };
 
-    // debug support for a request class
-    inline std::ostream& operator<< (std::ostream& os, request const& req)
-    {
-        os << get_command_name(req.command_) << ": ";
-
-        switch (req.command_) {
-        case command_resolve:
-            os << "id" << req.id_ << " ";
-            break;
-
-        case command_bind_range:
-            os << "id" << req.id_ << " ";
-            if (req.count_ != 1)
-                os << "count:" << std::dec << req.count_ << " ";
-            os << "addr(" << req.addr_ << ") ";
-            if (req.offset_ != 0)
-                os << "offset:" << std::dec << req.offset_ << " ";
-            break;
-
-        case command_unbind_range:
-            os << "id" << req.id_ << " ";
-            if (req.count_ != 1)
-                os << "count:" << std::dec << req.count_ << " ";
-            break;
-
-        case command_queryid:
-        case command_unregisterid: 
-            os << "name(\"" << req.ns_name_ << "\") ";
-            break;
-
-        case command_registerid:
-            os << "id" << req.id_ << " ";
-            os << "name(\"" << req.ns_name_ << "\") ";
-            break;
-
-        case command_getprefix:
-            os << "site(" << req.site_ << ") ";
-            break;
-
-        case command_getidrange:
-            os << "site(" << req.site_ << ") ";
-            os << "count:" << std::dec << req.count_ << " ";
-            break;
-
-        case command_getprefixes:
-        case command_statistics_count:
-        case command_statistics_mean:
-        case command_statistics_moment2:
-        default:
-            break;
-        }
-        return os;
-    }
+    /// The \a operator<< is used for logging purposes, dumping the internal 
+    /// data structures of a \a request instance to the given ostream.
+    std::ostream& operator<< (std::ostream& os, request const& req);
 
 }}}  // namespace hpx::naming::server
 

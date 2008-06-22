@@ -47,7 +47,7 @@ namespace hpx { namespace naming { namespace server
         {
             socket_.close();
         }
-        
+
         /// Get the socket associated with the connection.
         boost::asio::ip::tcp::socket& socket() { return socket_; }
 
@@ -63,7 +63,7 @@ namespace hpx { namespace naming { namespace server
             void (connection::*f)(boost::system::error_code const&, 
                     boost::tuple<Handler>)
                 = &connection::handle_read_header<Handler>;
-            
+
             boost::asio::async_read(socket_, 
                 boost::asio::buffer(&size_, sizeof(size_)),
                 boost::bind(f, shared_from_this(), 
@@ -106,7 +106,7 @@ namespace hpx { namespace naming { namespace server
 
             if (e) {
                 boost::get<0>(handler)(e);
-                    
+
             // send the error reply back to the requesting site
                 reply rep (no_success, e.message().c_str());
                 async_write(rep, handler);
@@ -115,7 +115,7 @@ namespace hpx { namespace naming { namespace server
             // do some timings
                 util::high_resolution_timer t;
                 boost::uint8_t command = command_unknown;
-                
+
             // Extract the data structure from the data just received.
                 try {
                 // De-serialize the data
@@ -126,9 +126,9 @@ namespace hpx { namespace naming { namespace server
                         util::portable_binary_iarchive archive(io);
                         archive >> req;
                     }
-                    
+
                     command = req.get_command();
-                    
+
                 // act on request and generate reply
                     reply rep;
                     request_handler_.handle_request(req, rep);
@@ -141,12 +141,12 @@ namespace hpx { namespace naming { namespace server
                     boost::system::error_code 
                         error(boost::asio::error::invalid_argument);
                     boost::get<0>(handler)(error);
-                    
+
                 // send the error reply back to the requesting site
                     reply rep (no_success, e.what());
                     async_write(rep, handler);
                 }
-                
+
                 // gather timings
                 request_handler_.add_timing(command, t.elapsed());
             }
@@ -167,7 +167,7 @@ namespace hpx { namespace naming { namespace server
                 util::portable_binary_oarchive archive(io);
                 archive << rep;
             }
-            
+
             size_ = (boost::uint32_t)buffer_.size();
 
             // Write the serialized data to the socket. We use "gather-write" 
@@ -179,7 +179,7 @@ namespace hpx { namespace naming { namespace server
             void (connection::*f)(boost::system::error_code const&,
                     boost::tuple<Handler>)
                 = &connection::handle_write_completion<Handler>;
-                
+
             boost::asio::async_write(socket_, buffers, 
                     boost::bind(f, shared_from_this(), 
                         boost::asio::placeholders::error, handler));
@@ -201,7 +201,7 @@ namespace hpx { namespace naming { namespace server
                 boost::bind(f, shared_from_this(), 
                     boost::asio::placeholders::error, handler));
         }
-        
+
     private:
         /// Socket for the connection.
         boost::asio::ip::tcp::socket socket_;

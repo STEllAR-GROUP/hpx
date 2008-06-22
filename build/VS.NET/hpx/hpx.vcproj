@@ -219,6 +219,14 @@
 						Name="Server"
 						>
 						<File
+							RelativePath="..\..\..\src\runtime\naming\server\reply.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\src\runtime\naming\server\request.cpp"
+							>
+						</File>
+						<File
 							RelativePath="..\..\..\src\runtime\naming\server\request_handler.cpp"
 							>
 						</File>

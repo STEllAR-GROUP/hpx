@@ -99,6 +99,8 @@ set (hpxlib_SOURCES
     # naming 
     runtime/naming/resolver_client.cpp
     runtime/naming/resolver_server.cpp
+    runtime/naming/server/reply.cpp
+    runtime/naming/server/request.cpp
     runtime/naming/server/request_handler.cpp
     # parcelset
     runtime/parcelset/connection_cache.cpp
