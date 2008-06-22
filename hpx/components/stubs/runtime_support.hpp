@@ -124,7 +124,7 @@ namespace hpx { namespace components { namespace stubs
             shutdown_all(app_, targetgid);
         }
 
-    private:
+    protected:
         applier::applier& app_;
     };
 

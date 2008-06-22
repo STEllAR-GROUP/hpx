@@ -274,11 +274,11 @@ namespace hpx { namespace naming { namespace server
 
         switch (req.command_) {
         case command_resolve:
-            os << "id:" << std::hex << req.id_ << " ";
+            os << "id" << req.id_ << " ";
             break;
 
         case command_bind_range:
-            os << "id:" << std::hex << req.id_ << " ";
+            os << "id" << req.id_ << " ";
             if (req.count_ != 1)
                 os << "count:" << std::dec << req.count_ << " ";
             os << "addr(" << req.addr_ << ") ";
@@ -287,7 +287,7 @@ namespace hpx { namespace naming { namespace server
             break;
 
         case command_unbind_range:
-            os << "id:" << std::hex << req.id_ << " ";
+            os << "id" << req.id_ << " ";
             if (req.count_ != 1)
                 os << "count:" << std::dec << req.count_ << " ";
             break;
@@ -298,11 +298,14 @@ namespace hpx { namespace naming { namespace server
             break;
 
         case command_registerid:
-            os << "id:" << std::hex << req.id_ << " ";
+            os << "id" << req.id_ << " ";
             os << "name(\"" << req.ns_name_ << "\") ";
             break;
 
         case command_getprefix:
+            os << "site(" << req.site_ << ") ";
+            break;
+
         case command_getidrange:
             os << "site(" << req.site_ << ") ";
             os << "count:" << std::dec << req.count_ << " ";

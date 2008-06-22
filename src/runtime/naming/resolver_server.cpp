@@ -69,6 +69,7 @@ namespace hpx { namespace naming
 
     resolver_server::~resolver_server()
     {
+        stop();       // stop services if not stopped already
     }
 
     void resolver_server::run(bool blocking)

@@ -150,7 +150,7 @@ namespace hpx { namespace lcos
     {
     private:
         typedef detail::simple_future<Result> wrapped_type;
-        typedef components::wrapper<simple_future, wrapped_type> wrapping_type;
+        typedef components::wrapper<wrapped_type> wrapping_type;
 
     public:
         /// Construct a new \a simple_future instance. The supplied 

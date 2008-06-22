@@ -292,7 +292,7 @@ namespace hpx { namespace naming { namespace server
                         // the previous range covers the given global id
                         
                         // the only limitation while binding blocks of global 
-                        // ids is that these have to have a identical msb's
+                        // ids is that these have to have identical msb's
                         if (req.get_id().get_msb() != (*it).first.get_msb()) {
                             // no existing range covers the given global id
                             rep = reply(command_resolve, internal_server_error,
@@ -314,6 +314,20 @@ namespace hpx { namespace naming { namespace server
                 }
                 else {
                     // all existing entries are larger than the given global id
+                    rep = reply(command_resolve, no_success);
+                }
+            }
+            else if (!registry_.empty()) {
+                --it;
+                if ((*it).first + at_c<1>((*it).second) >= req.get_id()) {
+                    // the previous range covers the id to resolve
+                    naming::address addr (at_c<0>((*it).second));
+                    addr.address_ += 
+                        (req.get_id().get_lsb() - (*it).first.get_lsb()) * 
+                            at_c<2>((*it).second);
+                    rep = reply(command_resolve, addr);
+                }
+                else {
                     rep = reply(command_resolve, no_success);
                 }
             }

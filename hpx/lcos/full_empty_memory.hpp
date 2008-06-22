@@ -82,6 +82,7 @@ namespace hpx { namespace lcos
         /// \brief Create a new full/empty storage in empty state
         full_empty() 
         {
+            ::new (get_address()) T();    // properly initialize memory
             set_empty();
         }
 
@@ -90,6 +91,7 @@ namespace hpx { namespace lcos
         {
             BOOST_ASSERT(!get_store().is_used(get_address()));
             get_store().remove(get_address());
+            get_address()->T::~T();       // properly destruct value in memory
         }
 
         /// \brief Atomically set the state to empty without releasing any 

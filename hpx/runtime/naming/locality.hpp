@@ -169,7 +169,7 @@ namespace hpx { namespace naming
 
     inline std::ostream& operator<< (std::ostream& os, locality const& l)
     {
-        os << l.endpoint_;
+        os << std::dec << l.endpoint_;
         return os;
     }
     

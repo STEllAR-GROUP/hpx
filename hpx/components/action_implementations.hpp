@@ -122,7 +122,7 @@
             naming::address::address_type lva, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
         {
-            return boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
+            return boost::bind(F, Component::get_lva(lva), _1, 
                 boost::ref(appl), reinterpret_cast<Result*>(NULL), 
                 BOOST_PP_ENUM_PARAMS(N, arg));
         }
@@ -138,9 +138,9 @@
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
         {
             return construct_continuation_thread_function(
-                boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
-                    boost::ref(appl), _2, 
-                    BOOST_PP_ENUM_PARAMS(N, arg)), appl, cont);
+                boost::bind(F, Component::get_lva(lva), _1, boost::ref(appl), 
+                    _2, BOOST_PP_ENUM_PARAMS(N, arg)), 
+                appl, cont);
         }
 
     private:
@@ -216,8 +216,8 @@
             naming::address::address_type lva, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
         {
-            return boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
-                boost::ref(appl), BOOST_PP_ENUM_PARAMS(N, arg));
+            return boost::bind(F, Component::get_lva(lva), _1, boost::ref(appl), 
+                BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
         // This static construct_thread_function allows to construct 
@@ -231,9 +231,9 @@
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
         {
             return base_type::construct_continuation_thread_function(
-                boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
-                    boost::ref(appl), BOOST_PP_ENUM_PARAMS(N, arg)), 
-                    appl, cont);
+                boost::bind(F, Component::get_lva(lva), _1, boost::ref(appl), 
+                    BOOST_PP_ENUM_PARAMS(N, arg)), 
+                appl, cont);
         }
 
     private:

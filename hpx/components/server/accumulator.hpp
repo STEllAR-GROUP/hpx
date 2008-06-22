@@ -80,7 +80,7 @@ namespace hpx { namespace components { namespace server { namespace detail
         threadmanager::thread_state 
         print (threadmanager::px_thread_self&, applier::applier& appl) 
         {
-            std::cout << arg_ << std::endl;
+            std::cout << arg_ << std::flush << std::endl;
             return hpx::threadmanager::terminated;
         }
 
@@ -104,6 +104,15 @@ namespace hpx { namespace components { namespace server { namespace detail
             accumulator, accumulator_print, &accumulator::print
         > print_action;
 
+        ///
+        static accumulator* get_lva(naming::address::address_type lva)
+        {
+            typedef 
+                wrapper<detail::accumulator, server::accumulator> 
+            wrapping_type;
+            return reinterpret_cast<wrapping_type*>(lva)->get();
+        }
+
     private:
         double arg_;
     };
@@ -114,11 +123,11 @@ namespace hpx { namespace components { namespace server { namespace detail
 namespace hpx { namespace components { namespace server 
 {
     class accumulator 
-      : public components::wrapper<accumulator, detail::accumulator>
+      : public wrapper<detail::accumulator, accumulator>
     {
     private:
         typedef detail::accumulator wrapped_type;
-        typedef components::wrapper<accumulator, wrapped_type> base_type;
+        typedef wrapper<wrapped_type, accumulator> base_type;
 
     public:
         // This is the component id. Every component needs to have an embedded

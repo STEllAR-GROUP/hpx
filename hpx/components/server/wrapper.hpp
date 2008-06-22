@@ -8,6 +8,8 @@
 
 #include <boost/throw_exception.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/mpl/if.hpp>
+#include <boost/type_traits/is_same.hpp>
 
 #include <hpx/exception.hpp>
 #include <hpx/util/static.hpp>
@@ -16,12 +18,19 @@
 
 namespace hpx { namespace components 
 {
+    struct this_type {};
+
     ///////////////////////////////////////////////////////////////////////////
     /// The wrapper template is used as a indirection layer for components 
     /// allowing to gracefully handle the access to non-existing components.
-    template <typename Derived, typename Component>
+    template <typename Component, typename Derived = this_type>
     class wrapper : boost::noncopyable
     {
+    private:
+        typedef typename boost::mpl::if_<
+                boost::is_same<Derived, this_type>, wrapper, Derived
+            >::type derived_type;
+
     public:
         typedef Component wrapped_type;
         
@@ -39,8 +48,18 @@ namespace hpx { namespace components
             delete component_;
         }
 
-        Component* get() { return component_; }
-        Component const* get() const { return component_; }
+        Component* get()
+        {
+            if (0 == component_)
+                boost::throw_exception(hpx::exception(invalid_status));
+            return component_;
+        }
+        Component const* get() const
+        {
+            if (0 == component_)
+                boost::throw_exception(hpx::exception(invalid_status));
+            return component_;
+        }
 
     protected:
         // the memory for the wrappers is managed by a one_size_heap_list
@@ -95,22 +114,22 @@ namespace hpx { namespace components
             // allocate the memory
             wrapper* p = get_heap().alloc(count);
             if (1 == count)
-                return new (p) Derived;
+                return new (p) derived_type;
 
             // call constructors
             std::size_t succeeded = 0;
             try {
-                Derived* curr = static_cast<Derived*>(p);
+                derived_type* curr = static_cast<derived_type*>(p);
                 for (std::size_t i = 0; i < count; ++i, ++curr) {
-                    new (curr) Derived;     // call placement new, might throw
+                    new (curr) derived_type;     // call placement new, might throw
                     ++succeeded;
                 }
             }
             catch (...) {
                 // call destructors for successfully constructed objects
-                Derived* curr = static_cast<Derived*>(p);
+                derived_type* curr = static_cast<derived_type*>(p);
                 for (std::size_t i = 0; i < succeeded; ++i)
-                    curr->~Derived();
+                    curr->~derived_type();
                 get_heap().free(p, count);     // free memory
                 throw;      // rethrow
             }
@@ -118,19 +137,19 @@ namespace hpx { namespace components
         }
         // The function destroy() is used for deletion and de-allocation of 
         // wrappers
-        static void destroy(Derived* p, std::size_t count)
+        static void destroy(derived_type* p, std::size_t count)
         {
             if (NULL == p || 0 == count) 
                 return;     // do nothing if given a NULL pointer
 
             if (1 == count) {
-                p->~Derived();
+                p->~derived_type();
             }
             else {
                 // call destructors for all wrapper instances
-                Derived* curr = static_cast<Derived*>(p);
+                derived_type* curr = static_cast<derived_type*>(p);
                 for (std::size_t i = 0; i < count; ++i)
-                    curr->~Derived();
+                    curr->~derived_type();
             }
 
             // free memory itself
@@ -186,16 +205,16 @@ namespace hpx { namespace components
     };
 
     // support for boost::intrusive_ptr<wrapper<...> >
-    template <typename Derived, typename Component>
+    template <typename Component, typename Derived>
     inline void
-    intrusive_ptr_add_ref(wrapper<Derived, Component>* p)
+    intrusive_ptr_add_ref(wrapper<Component, Derived>* p)
     {
         ++(*p)->use_count_;
     }
 
-    template <typename Derived, typename Component>
+    template <typename Component, typename Derived>
     inline void
-    intrusive_ptr_release(wrapper<Derived, Component>* p)
+    intrusive_ptr_release(wrapper<Component, Derived>* p)
     {
         if (--(*p)->use_count_ == 0)
             delete p;

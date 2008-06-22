@@ -42,7 +42,7 @@ namespace hpx { namespace components { namespace detail
     public:
         explicit wrapper_heap(char const* class_name, bool, bool, int step = -1)
           : pool_(NULL), first_free_(NULL), step_(step), size_(0), free_size_(0),
-            base_gid_(naming::invalid_id)
+            base_gid_(naming::invalid_id), get_dgas_client_(NULL)
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
           , class_name_(class_name)
 #endif
@@ -55,15 +55,15 @@ namespace hpx { namespace components { namespace detail
             else 
                 step_ = ((step_ + heap_step - 1)/heap_step)*heap_step;
         }
-        
+
         wrapper_heap()
           : pool_(NULL), first_free_(NULL), 
             step_(heap_step), size_(0), free_size_(0),
-            base_gid_(naming::invalid_id)
+            base_gid_(naming::invalid_id), get_dgas_client_(NULL)
         {
             BOOST_ASSERT(sizeof(storage_type) == heap_size);
         }
-        
+
         ~wrapper_heap()
         {
             if (pool_ != NULL) {
@@ -98,8 +98,8 @@ namespace hpx { namespace components { namespace detail
             BOOST_ASSERT(free_size_ >= 0);
             return p;
         }
-        
-        void free (void *p, std::size_t count = 1)
+
+        void free(void *p, std::size_t count = 1)
         {
             BOOST_ASSERT(did_alloc(p));
 
@@ -139,6 +139,7 @@ namespace hpx { namespace components { namespace detail
             // this is the first call to get_gid() for this heap - allocate 
             // a sufficiently large range of global ids
             base_gid_ = ids.get_id(appl.here(), appl.get_dgas_client(), step_);
+            get_dgas_client_ = &appl.get_dgas_client();
 
             // register the global ids and the base address of this heap
             // with the DGAS
@@ -154,9 +155,16 @@ namespace hpx { namespace components { namespace detail
     protected:
         bool test_release()
         {
-            if (pool_ == NULL || free_size_ < size_)
+            if (pool_ == NULL || free_size_ < size_ || first_free_ < pool_+size_)
                 return false;
             BOOST_ASSERT(free_size_ == size_);
+
+            // unbind in DGAS service 
+            if (base_gid_) {
+                BOOST_ASSERT(NULL != get_dgas_client_);
+                get_dgas_client_->unbind_range(base_gid_, step_);
+                base_gid_ = naming::invalid_id;
+            }
 
             Allocator::free(pool_);
             pool_ = first_free_ = NULL;
@@ -207,6 +215,7 @@ namespace hpx { namespace components { namespace detail
         // these values are used for DGAS registration of all elements of this
         // wrapper heap
         naming::id_type base_gid_;
+        naming::resolver_client const* get_dgas_client_;
 
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
         std::string class_name_;
@@ -238,7 +247,7 @@ namespace hpx { namespace components { namespace detail
             }
         };
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
     // heap using malloc and friends
     template<typename T>
@@ -249,7 +258,7 @@ namespace hpx { namespace components { namespace detail
         typedef 
             wrapper_heap<T, one_size_heap_allocators::fixed_mallocator> 
         base_type;
-        
+
     public:
         explicit fixed_wrapper_heap(char const* class_name = "<Unknown>", 
                 bool f1 = false, bool f2 = false, int step = -1)

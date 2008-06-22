@@ -23,7 +23,9 @@ namespace hpx { namespace components
         /// \a server#runtime_support instance with the given global id \a gid.
         runtime_support(applier::applier& app, naming::id_type gid) 
           : base_type(app), gid_(gid)
-        {}
+        {
+            BOOST_ASSERT(gid_);
+        }
 
         ~runtime_support() 
         {}

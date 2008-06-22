@@ -111,8 +111,9 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
-                full_empty_queue_entry f(self.get_thread_id());
-                full_full_.push_back(f);
+                full_empty_queue_entry* f = 
+                    new full_empty_queue_entry(self.get_thread_id());
+                full_full_.push_back(*f);
 
                 util::unlock_the_lock<scoped_lock> ul(l);
                 self.yield(threadmanager::suspended);
@@ -134,8 +135,9 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
-                full_empty_queue_entry f(self.get_thread_id());
-                full_full_.push_back(f);
+                full_empty_queue_entry* f = 
+                    new full_empty_queue_entry(self.get_thread_id());
+                full_full_.push_back(*f);
 
                 util::unlock_the_lock<scoped_lock> ul(l);
                 self.yield(threadmanager::suspended);
@@ -154,8 +156,9 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
-                full_empty_queue_entry f(self.get_thread_id());
-                full_empty_.push_back(f);
+                full_empty_queue_entry* f = 
+                    new full_empty_queue_entry(self.get_thread_id());
+                full_empty_.push_back(*f);
 
                 // yield this thread
                 {
@@ -186,8 +189,9 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
-                full_empty_queue_entry f(self.get_thread_id());
-                full_empty_.push_back(f);
+                full_empty_queue_entry* f = 
+                    new full_empty_queue_entry(self.get_thread_id());
+                full_empty_.push_back(*f);
 
                 // yield this thread
                 util::unlock_the_lock<scoped_lock> ul(l);
@@ -210,8 +214,9 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is already full
             if (state_ == full) {
                 // enqueue the request and block this thread
-                full_empty_queue_entry f(self.get_thread_id());
-                empty_full_.push_back(f);
+                full_empty_queue_entry* f = 
+                    new full_empty_queue_entry(self.get_thread_id());
+                empty_full_.push_back(*f);
 
                 util::unlock_the_lock<scoped_lock> ul(l);
                 self.yield(threadmanager::suspended);
@@ -236,8 +241,9 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is already full
             if (state_ == full) {
                 // enqueue the request and block this thread
-                full_empty_queue_entry f(self.get_thread_id());
-                empty_full_.push_back(f);
+                full_empty_queue_entry* f = 
+                    new full_empty_queue_entry(self.get_thread_id());
+                empty_full_.push_back(*f);
 
                 util::unlock_the_lock<scoped_lock> ul(l);
                 self.yield(threadmanager::suspended);
@@ -286,10 +292,11 @@ namespace hpx { namespace lcos { namespace detail
         {
             state_ = empty;
             if (!empty_full_.empty()) {
-                thread_id_type ti = empty_full_.front().id_;
+                full_empty_queue_entry* f = &empty_full_.front();
                 empty_full_.pop_front();
                 state_ = full;
-                threadmanager::set_thread_state(ti, threadmanager::pending);
+                threadmanager::set_thread_state(f->id_, threadmanager::pending);
+                delete f;
                 set_full_locked();
             }
 
@@ -303,18 +310,20 @@ namespace hpx { namespace lcos { namespace detail
 
             // handle all threads waiting for the block to become full
             while (!full_full_.empty()) {
-                thread_id_type ti = full_full_.front().id_;
+                full_empty_queue_entry* f = &full_full_.front();
                 full_full_.pop_front();
-                threadmanager::set_thread_state(ti, threadmanager::pending);
+                threadmanager::set_thread_state(f->id_, threadmanager::pending);
+                delete f;
             }
 
             // since we got full now we need to re-activate one thread waiting
             // for the block to become full
             if (!full_empty_.empty()) {
-                thread_id_type ti = full_empty_.front().id_;
+                full_empty_queue_entry* f = &full_empty_.front();
                 full_empty_.pop_front();
                 state_ = empty;
-                threadmanager::set_thread_state(ti, threadmanager::pending);
+                threadmanager::set_thread_state(f->id_, threadmanager::pending);
+                delete f;
                 set_empty_locked();
             }
 

@@ -45,6 +45,13 @@ namespace hpx { namespace lcos
         typedef components::action0<
             base_lco, lco_set_event, &base_lco::set_event
         > set_event_action;
+
+        ///
+        static base_lco* get_lva(naming::address::address_type lva)
+        {
+            typedef components::wrapper<base_lco> wrapping_type;
+            return reinterpret_cast<wrapping_type*>(lva)->get();
+        }
     };
 
     /// The \a base_lco_with_value class is the common base class for all LCO's 
@@ -85,6 +92,13 @@ namespace hpx { namespace lcos
             base_lco_with_value, lco_set_error, hpx::error, std::string,
             &base_lco_with_value::set_error
         > set_error_action;
+
+        ///
+        static base_lco_with_value* get_lva(naming::address::address_type lva)
+        {
+            typedef components::wrapper<base_lco_with_value> wrapping_type;
+            return reinterpret_cast<wrapping_type*>(lva)->get();
+        }
     };
 
     /// The base_lco<void> specialization is used whenever the set_event action
@@ -116,6 +130,13 @@ namespace hpx { namespace lcos
             base_lco_with_value, lco_set_error, hpx::error, std::string,
             &base_lco_with_value::set_error
         > set_error_action;
+
+        ///
+        static base_lco_with_value* get_lva(naming::address::address_type lva)
+        {
+            typedef components::wrapper<base_lco_with_value> wrapping_type;
+            return reinterpret_cast<wrapping_type*>(lva)->get();
+        }
     };
 
 }}

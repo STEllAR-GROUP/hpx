@@ -27,31 +27,50 @@ namespace hpx { namespace components
 
         ~accumulator() 
         {}
-        
+
+        /// Create a new instance of an accumulator on the locality as given by
+        /// the parameter \a targetgid
+        static accumulator 
+        create(threadmanager::px_thread_self& self, applier::applier& appl, 
+            naming::id_type const& targetgid)
+        {
+            return accumulator(appl, base_type::create(self, appl, targetgid));
+        }
+
+        void free(naming::id_type const& targetgid)
+        {
+            stubs::accumulator::free(app_, targetgid, gid_);
+            gid_ = naming::invalid_id;
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
         /// Initialize the accumulator value
         void init() 
         {
+            BOOST_ASSERT(gid_);
             this->base_type::init(gid_);
         }
 
         /// Add the given number to the accumulator
         void add (double arg) 
         {
+            BOOST_ASSERT(gid_);
             this->base_type::add(gid_, arg);
         }
 
         /// Print the current value of the accumulator
         void print() 
         {
+            BOOST_ASSERT(gid_);
             this->base_type::print(gid_);
         }
 
         /// Query the current value of the accumulator
         double query(threadmanager::px_thread_self& self) 
         {
+            BOOST_ASSERT(gid_);
             return this->base_type::query(self, gid_);
         }
 

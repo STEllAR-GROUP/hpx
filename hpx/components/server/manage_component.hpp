@@ -41,7 +41,7 @@ namespace hpx { namespace components { namespace server
     {
         // retrieve the local address bound to the given global id
         naming::address addr;
-        if (!appl.get_dgas_client().unbind(gid, addr)) 
+        if (!appl.get_dgas_client().resolve(gid, addr)) 
         {
             boost::throw_exception(
                 hpx::exception(hpx::unknown_component_address,

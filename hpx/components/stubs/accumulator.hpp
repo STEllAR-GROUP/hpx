@@ -8,6 +8,7 @@
 
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/applier/applier.hpp>
+#include <hpx/components/stubs/runtime_support.hpp>
 #include <hpx/components/server/accumulator.hpp>
 #include <hpx/lcos/simple_future.hpp>
 
@@ -28,34 +29,38 @@ namespace hpx { namespace components { namespace stubs
         ~accumulator() 
         {}
 
-        ///////////////////////////////////////////////////////////////////////
-        // exposed functionality of this component
-
-        /// Initialize the accumulator value of the server#accumulator instance 
-        /// with the given \a gid
-        void init(naming::id_type gid) 
+        /// Asynchronously create a new instance of an accumulator
+        static lcos::simple_future<naming::id_type>
+        create_async(applier::applier& appl, naming::id_type const& targetgid)
         {
-            app_.apply<server::detail::accumulator::init_action>(gid);
+            return stubs::runtime_support::create_component_async(
+                appl, targetgid, 
+                (components::component_type)server::accumulator::value);
         }
 
-        /// Add the given number to the server#accumulator instance 
-        /// with the given \a gid
-        void add (naming::id_type gid, double arg) 
+        /// Create a new instance of an accumulator
+        static naming::id_type 
+        create(threadmanager::px_thread_self& self, applier::applier& appl, 
+            naming::id_type const& targetgid)
         {
-            app_.apply<server::detail::accumulator::add_action>(gid, arg);
+            return stubs::runtime_support::create_component(
+                self, appl, targetgid, 
+                (components::component_type)server::accumulator::value);
         }
 
-        /// Print the current value of the server#accumulator instance 
-        /// with the given \a gid
-        void print(naming::id_type gid) 
+        /// Delete an existing component
+        static void
+        free(applier::applier& appl, naming::id_type const& targetgid, 
+            naming::id_type const& gid)
         {
-            app_.apply<server::detail::accumulator::print_action>(gid);
+            stubs::runtime_support::free_component(appl, targetgid, 
+                (components::component_type)server::accumulator::value, gid);
         }
 
         /// Query the current value of the server#accumulator instance 
         /// with the given \a gid. This is a non-blocking call. The caller 
-        /// needs to call \a simple_future#get_result on the result of this 
-        /// function to obtain the result as returned by the accumulator.
+        /// needs to call \a simple_future#get_result on the return value of 
+        /// this function to obtain the result as returned by the accumulator.
         static lcos::simple_future<double> query_async(
             applier::applier& appl, naming::id_type gid) 
         {
@@ -84,20 +89,49 @@ namespace hpx { namespace components { namespace stubs
             return query_async(appl, gid).get_result(self);
         }
 
-        ///
-        lcos::simple_future<double> query_async(naming::id_type targetgid) 
+        ///////////////////////////////////////////////////////////////////////
+        // exposed functionality of this component
+
+        /// Initialize the accumulator value of the server#accumulator instance 
+        /// with the given \a gid
+        void init(naming::id_type gid) 
         {
-            return query_async(app_, targetgid);
+            app_.apply<server::detail::accumulator::init_action>(gid);
         }
 
-        ///
-        double query(threadmanager::px_thread_self& self,
-            naming::id_type targetgid) 
+        /// Add the given number to the server#accumulator instance 
+        /// with the given \a gid
+        void add (naming::id_type gid, double arg) 
         {
-            return query(self, app_, targetgid);
+            app_.apply<server::detail::accumulator::add_action>(gid, arg);
         }
 
-    private:
+        /// Print the current value of the server#accumulator instance 
+        /// with the given \a gid
+        void print(naming::id_type gid) 
+        {
+            app_.apply<server::detail::accumulator::print_action>(gid);
+        }
+
+        /// Query the current value of the server#accumulator instance 
+        /// with the given \a gid. This is a non-blocking call. The 
+        /// caller needs to call \a simple_future#get_result on the return 
+        /// value of this function to obtain the result as returned by the 
+        /// accumulator.
+        lcos::simple_future<double> query_async(naming::id_type gid) 
+        {
+            return query_async(app_, gid);
+        }
+
+        /// Query the current value of the server#accumulator instance 
+        /// with the given \a gid. Block for the current accumulator 
+        /// value to be returned.
+        double query(threadmanager::px_thread_self& self,naming::id_type gid) 
+        {
+            return query(self, app_, gid);
+        }
+
+    protected:
         applier::applier& app_;
     };
     

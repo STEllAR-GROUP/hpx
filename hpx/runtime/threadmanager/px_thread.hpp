@@ -156,11 +156,11 @@ namespace hpx { namespace threadmanager { namespace detail
 namespace hpx { namespace threadmanager 
 {
     ///////////////////////////////////////////////////////////////////////////
-    class px_thread : public components::wrapper<px_thread, detail::px_thread>
+    class px_thread : public components::wrapper<detail::px_thread, px_thread>
     {
     private:
         typedef detail::px_thread wrapped_type;
-        typedef components::wrapper<px_thread, wrapped_type> base_type;
+        typedef components::wrapper<wrapped_type, px_thread> base_type;
 
         // avoid warning about using 'this' in initializer list
         px_thread* This() { return this; }

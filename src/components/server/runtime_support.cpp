@@ -69,6 +69,15 @@ namespace hpx { namespace components { namespace server
         return hpx::threadmanager::terminated;
     }
 
+    /// \brief Action shut down this runtime system instance
+    threadmanager::thread_state runtime_support::shutdown(
+        threadmanager::px_thread_self& self, applier::applier& app)
+    {
+        // initiate system shutdown
+        stop();
+        return threadmanager::terminated;
+    }
+
     // initiate system shutdown for all localities
     threadmanager::thread_state runtime_support::shutdown_all(
         threadmanager::px_thread_self& self, applier::applier& app)
@@ -84,6 +93,23 @@ namespace hpx { namespace components { namespace server
             rts.shutdown(*it);
         }
         return threadmanager::terminated;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void runtime_support::wait()
+    {
+        mutex_type::scoped_lock l(mtx_);
+        stopped_ = false;
+        condition_.wait(l);
+    }
+
+    void runtime_support::stop()
+    {
+        mutex_type::scoped_lock l(mtx_);
+        if (!stopped_) {
+            condition_.notify_all();
+            stopped_ = true;
+        }
     }
 
 }}}

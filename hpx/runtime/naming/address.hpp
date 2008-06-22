@@ -14,6 +14,7 @@
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/components/component_type.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 //  address serialization format version
@@ -86,7 +87,10 @@ namespace hpx { namespace naming
 
     inline std::ostream& operator<< (std::ostream& os, address const& addr)
     {
-        os << addr.locality_ << ":" << addr.type_ << ":" << addr.address_; 
+        os << addr.locality_ << ":" 
+           << components::get_component_type_name((int)addr.type_) 
+              << "(" << std::dec << addr.type_ << "):" 
+           << "0x" << std::hex << addr.address_; 
         return os;
     }
         

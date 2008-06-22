@@ -23,8 +23,8 @@ namespace hpx { namespace util
 
         /// size of the id range returned by command_getidrange
         /// FIXME: is this a policy?
-        enum { range_delta = 16392 };
-        
+        enum { range_delta = 16384 };
+
     public:
         unique_ids()
           : lower_(0), upper_(0)
@@ -48,7 +48,7 @@ namespace hpx { namespace util
 
     private:
         mutex_type mtx_;
-        
+
         /// The range of available ids for components
         naming::id_type lower_;
         naming::id_type upper_;

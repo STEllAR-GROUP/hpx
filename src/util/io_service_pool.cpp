@@ -68,7 +68,7 @@ namespace hpx { namespace util
     {
         if (!stopped_) {
             // Explicitly stop all io_services.
-            for (std::size_t i = 0; i < io_services_.size(); ++i)
+            for (std::size_t i = 0; !stopped_ && i < io_services_.size(); ++i)
                 io_services_[i]->stop();
             stopped_ = true;
         }

@@ -11,12 +11,11 @@
 
 #include <hpx/include/runtime.hpp>
 
+///////////////////////////////////////////////////////////////////////////////
+// Make sure the system gets properly shut down while handling Ctrl-C and other
+// system signals
 #if defined(BOOST_WINDOWS)
 
-#include <boost/function.hpp>
-
-///////////////////////////////////////////////////////////////////////////////
-// Make sure the system gets properly shut down while handling Ctrl-C.
 static boost::function0<void> console_ctrl_function;
 
 BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
@@ -151,10 +150,19 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     void runtime::stop(bool blocking)
     {
-        runtime_support_.stop();        // re-activate main thread 
+        try {
+            // unregister the runtime_support instance from the DGAS 
+            dgas_client_.unbind(parcel_handler_.get_prefix());
+        }
+        catch(hpx::exception const&) {
+            // ignore errors during system shutdown (DGAS might be down already)
+        }
+
+        // stop runtime services (threads)
         thread_manager_.stop(blocking);
         parcel_port_.stop(blocking);    // stops parcel_pool_ as well
         dgas_pool_.stop();
+        runtime_support_.stop();        // re-activate main thread 
     }
 
     ///////////////////////////////////////////////////////////////////////////

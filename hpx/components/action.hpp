@@ -10,9 +10,6 @@
 #include <stdexcept>
 
 #include <boost/version.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/shared_ptr.hpp>
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/at.hpp>
 #include <boost/fusion/include/size.hpp>
@@ -22,14 +19,9 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/remove_reference.hpp>
-#include <boost/preprocessor/stringize.hpp>
-#include <boost/preprocessor/seq/enum.hpp> 
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-#include <boost/serialization/export.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/components/component_type.hpp>
@@ -219,7 +211,7 @@ namespace hpx { namespace components
         }
 
     private:
-        // serialization support    
+        // serialization support
         friend class boost::serialization::access;
 
         template<class Archive>
@@ -319,7 +311,7 @@ namespace hpx { namespace components
         construct_thread_function(applier::applier& appl, 
             naming::address::address_type lva)
         {
-            return boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
+            return boost::bind(F, Component::get_lva(lva), _1, 
                 boost::ref(appl), reinterpret_cast<Result*>(NULL));
         }
 
@@ -332,8 +324,9 @@ namespace hpx { namespace components
             applier::applier& appl, naming::address::address_type lva)
         {
             return construct_continuation_thread_function(
-                boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
-                    boost::ref(appl), _2), appl, cont);
+                boost::bind(F, Component::get_lva(lva), _1, 
+                    boost::ref(appl), _2), 
+                appl, cont);
         }
 
     private:
@@ -390,8 +383,7 @@ namespace hpx { namespace components
         construct_thread_function(applier::applier& appl, 
             naming::address::address_type lva)
         {
-            return boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
-                boost::ref(appl));
+            return boost::bind(F, Component::get_lva(lva), _1, boost::ref(appl));
         }
 
         /// \brief This static \a construct_thread_function allows to construct 
@@ -403,8 +395,8 @@ namespace hpx { namespace components
             applier::applier& appl, naming::address::address_type lva)
         {
             return base_type::construct_continuation_thread_function(
-                boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
-                    boost::ref(appl)), appl, cont);
+                boost::bind(F, Component::get_lva(lva), _1, boost::ref(appl)), 
+                appl, cont);
         }
 
     private:
@@ -515,7 +507,7 @@ namespace hpx { namespace components
         construct_thread_function(applier::applier& appl, 
             naming::address::address_type lva, Arg0 const& arg0) 
         {
-            return boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
+            return boost::bind(F, Component::get_lva(lva), _1, 
                 boost::ref(appl), reinterpret_cast<Result*>(NULL), arg0);
         }
 
@@ -530,8 +522,9 @@ namespace hpx { namespace components
             Arg0 const& arg0) 
         {
             return construct_continuation_thread_function(
-                boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
-                    boost::ref(appl), _2, arg0), appl, cont);
+                boost::bind(F, Component::get_lva(lva), _1, boost::ref(appl), 
+                    _2, arg0), 
+                appl, cont);
         }
 
     private:
@@ -600,7 +593,7 @@ namespace hpx { namespace components
         construct_thread_function(applier::applier& appl, 
             naming::address::address_type lva, Arg0 const& arg0) 
         {
-            return boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
+            return boost::bind(F, Component::get_lva(lva), _1, 
                 boost::ref(appl), arg0);
         }
 
@@ -615,8 +608,9 @@ namespace hpx { namespace components
             Arg0 const& arg0) 
         {
             return base_type::construct_continuation_thread_function(
-                boost::bind(F, reinterpret_cast<Component*>(lva), _1, 
-                    boost::ref(appl), arg0), appl, cont);
+                boost::bind(F, Component::get_lva(lva), _1, boost::ref(appl), 
+                    arg0), 
+                appl, cont);
         }
 
     private:

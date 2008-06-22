@@ -59,12 +59,7 @@ namespace hpx { namespace components { namespace server
 
         /// \brief Action shut down this runtime system instance
         threadmanager::thread_state shutdown(
-            threadmanager::px_thread_self& self, applier::applier& app)
-        {
-            // initiate system shutdown
-            stop();
-            return threadmanager::terminated;
-        }
+            threadmanager::px_thread_self& self, applier::applier& app);
 
         /// \brief Action shut down runtime system instances on all localities
         threadmanager::thread_state shutdown_all(
@@ -96,6 +91,12 @@ namespace hpx { namespace components { namespace server
             &runtime_support::shutdown_all
         > shutdown_all_action;
 
+        ///
+        static runtime_support* get_lva(naming::address::address_type lva)
+        {
+            return reinterpret_cast<runtime_support*>(lva);
+        }
+
         /// \brief Wait for the runtime_support component to notify the calling
         ///        thread.
         ///
@@ -103,25 +104,13 @@ namespace hpx { namespace components { namespace server
         /// block while the HPX functionality is executed. The main thread will
         /// block until the shutdown_action is executed, which in turn notifies
         /// all waiting threads.
-        void wait()
-        {
-            mutex_type::scoped_lock l(mtx_);
-            stopped_ = false;
-            condition_.wait(l);
-        }
+        void wait();
 
         /// \brief Notify all waiting (blocking) threads allowing the system to 
         ///        be properly stopped.
         ///
         /// \note      This function can be called from any thread.
-        void stop()
-        {
-            mutex_type::scoped_lock l(mtx_);
-            if (!stopped_) {
-                condition_.notify_all();
-                stopped_ = true;
-            }
-        }
+        void stop();
 
     private:
         mutex_type mtx_;

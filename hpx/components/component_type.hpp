@@ -27,11 +27,11 @@ namespace hpx { namespace components
         // test categories
         component_accumulator,      // simple accumulator
         component_memory,           // general memory address
-        
+
         component_graph,            // logical graph (spanning several localities)
         component_local_graph,      // simple graph example component (see examples/graph_component)
         component_graph_vertex,     // vertex for simple graph example 
-        
+
         component_last
     };
     
@@ -42,7 +42,10 @@ namespace hpx { namespace components
             "component_invalid",
             "component_runtime_support",
             "component_px_thread",
+            "component_base_lco",
+            "component_base_lco_with_value",
             "component_simple_future",
+            "component_distributing_factory",
             "component_accumulator",
             "component_memory",
             "component_graph",
@@ -58,7 +61,7 @@ namespace hpx { namespace components
             return components::detail::names[type];
         return "<Unknown>";
     }
-    
+
 }}
 
 #endif

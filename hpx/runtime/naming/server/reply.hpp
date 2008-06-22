@@ -203,7 +203,7 @@ namespace hpx { namespace naming { namespace server
             return statistics_;
         }
 
-        std::vector<boost::uint32_t> const& get_prefixes() 
+        std::vector<boost::uint32_t> const& get_prefixes() const
         {
             return prefixes_;
         }
@@ -336,16 +336,16 @@ namespace hpx { namespace naming { namespace server
                 break;
 
             case command_getidrange:
-                os << "range(" << std::hex << rep.lower_bound_ << ", "
+                os << "range(" << rep.lower_bound_ << ", "
                    << rep.upper_bound_ << ") ";
                 break;
 
             case command_getprefix:
-                os << "prefix(" << std::hex<< rep.lower_bound_ << ") ";
+                os << "prefix" << rep.lower_bound_;
                 break;
 
             case command_queryid:
-                os << "id" << std::hex << rep.id_ << " ";
+                os << "id" << rep.id_ << " ";
                 break;
 
             case command_statistics_count:
@@ -354,6 +354,20 @@ namespace hpx { namespace naming { namespace server
                 break;
 
             case command_getprefixes:
+                {
+                    os << "prefixes(";
+                    typedef std::vector<boost::uint32_t>::const_iterator iterator;
+                    iterator end = rep.get_prefixes().end(); 
+                    for (iterator it = rep.get_prefixes().begin(); it != end; )
+                    {
+                        os << std::hex << get_id_from_prefix(*it);
+                        if (++it != end)
+                            os << ", ";
+                    }
+                    os << ")";
+                }
+                break;
+
             case command_bind_range:
             case command_registerid: 
             case command_unregisterid: 

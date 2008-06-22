@@ -101,15 +101,21 @@ namespace hpx
         typedef boost::shared_ptr<continuation> continuation_type;
 
         class runtime_support;
+        class accumulator;
+        class distributing_factory;
 
         namespace stubs 
         {
             class runtime_support;
+            class accumulator;
+            class distributing_factory;
         }
 
         namespace server
         {
             class runtime_support;
+            class accumulator;
+            class distributing_factory;
         }
     }
 
