@@ -176,16 +176,8 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\applier_test_client.cpp"
+				RelativePath="..\..\..\tests\applier_test_client\applier_test_client.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AssemblerOutput="0"
-					/>
-				</FileConfiguration>
 			</File>
 		</Filter>
 	</Files>
