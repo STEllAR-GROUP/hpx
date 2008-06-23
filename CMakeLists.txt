@@ -13,9 +13,7 @@ cmake_minimum_required(VERSION 2.6)
 project (hpx)
 
 # We need to use Boost
-find_package(Boost 1.35.0 REQUIRED)
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
-LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
+find_package(Boost 1.35.0 COMPONENTS date_time filesystem graph regex serialization thread system signals)
 
 # We need to include the hpx directory for includes
 include_directories (${hpx_SOURCE_DIR})
@@ -32,9 +30,6 @@ if(WIN32)
     add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
     add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
 endif(WIN32)
-
-#target_link_libraries ( libboost_system-gcc34-mt-1_35.so
-#libboost_thread-gcc34-mt.so )
 
 # Recurse into the "src" and "test" subdirectories.  This does not actually
 # cause another cmake executable to run.  The same process will walk through
