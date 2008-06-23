@@ -8,6 +8,8 @@
 
 #include <set>
 #include <queue>
+#include <memory>
+
 #include <boost/thread.hpp>
 #include <boost/thread/shared_mutex.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
@@ -174,7 +176,7 @@ namespace hpx { namespace lcos { namespace detail
                 // copy the data to the destination
                 if (entry_ && entry_ != &dest) 
                     dest = *static_cast<T const*>(entry_);
-                set_empty_locked();
+                set_empty_locked();   // state_ = empty;
             }
         }
 
@@ -198,7 +200,7 @@ namespace hpx { namespace lcos { namespace detail
                 self.yield(threadmanager::suspended);
             }
             else {
-                set_empty_locked();
+                set_empty_locked();   // state_ = empty
             }
         }
 
@@ -227,7 +229,7 @@ namespace hpx { namespace lcos { namespace detail
                 *static_cast<T*>(entry_) = src;
 
             // make sure the entry is full
-            set_full_locked();
+            set_full_locked();    // state_ = full
         }
 
         // same as above, but for entries without associated data
@@ -250,7 +252,7 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             // make sure the entry is full
-            set_full_locked();
+            set_full_locked();    // state_ = full
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -266,7 +268,7 @@ namespace hpx { namespace lcos { namespace detail
                 *static_cast<T*>(entry_) = src;
 
             // make sure the entry is full
-            set_full_locked();
+            set_full_locked();    // state_ = full
         }
 
         // same as above, but for entries without associated data
@@ -277,7 +279,7 @@ namespace hpx { namespace lcos { namespace detail
             outer_lock.unlock();
 
             // make sure the entry is full
-            set_full_locked();
+            set_full_locked();    // state_ = full
         }
 
         // returns whether this entry is still in use
@@ -292,12 +294,10 @@ namespace hpx { namespace lcos { namespace detail
         {
             state_ = empty;
             if (!empty_full_.empty()) {
-                full_empty_queue_entry* f = &empty_full_.front();
+                std::auto_ptr<full_empty_queue_entry> f (&full_empty_.front());
                 empty_full_.pop_front();
-                state_ = full;
                 threadmanager::set_thread_state(f->id_, threadmanager::pending);
-                delete f;
-                set_full_locked();
+                set_full_locked();    // state_ = full
             }
 
             // return whether this block needs to be removed
@@ -310,21 +310,18 @@ namespace hpx { namespace lcos { namespace detail
 
             // handle all threads waiting for the block to become full
             while (!full_full_.empty()) {
-                full_empty_queue_entry* f = &full_full_.front();
+                std::auto_ptr<full_empty_queue_entry> f (&full_empty_.front());
                 full_full_.pop_front();
                 threadmanager::set_thread_state(f->id_, threadmanager::pending);
-                delete f;
             }
 
             // since we got full now we need to re-activate one thread waiting
             // for the block to become full
             if (!full_empty_.empty()) {
-                full_empty_queue_entry* f = &full_empty_.front();
+                std::auto_ptr<full_empty_queue_entry> f (&full_empty_.front());
                 full_empty_.pop_front();
-                state_ = empty;
                 threadmanager::set_thread_state(f->id_, threadmanager::pending);
-                delete f;
-                set_empty_locked();
+                set_empty_locked();   // state_ = empty
             }
 
             // return whether this block needs to be removed
@@ -338,9 +335,9 @@ namespace hpx { namespace lcos { namespace detail
 
     private:
         mutable mutex_type mtx_;
-        queue_type empty_full_;
-        queue_type full_empty_;
-        queue_type full_full_;
+        queue_type empty_full_;     // threads waiting in write
+        queue_type full_empty_;     // threads waiting in read_and_empty
+        queue_type full_full_;      // threads waiting in read
         void* entry_;
         full_empty state_;
     };

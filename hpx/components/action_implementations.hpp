@@ -70,9 +70,11 @@
         {}
 
     private:
-        // The continuation_thread_function will be registered as the thread
+        // The \a continuation_thread_function will be registered as the thread
         // function of a px_thread. It encapsulates the execution of the 
-        // original function (given by func)
+        // original function (given by \a func), and afterwards triggers all
+        // continuations using the result value obtained from the execution
+        // of the original thread function.
         template <typename Func>
         static threadmanager::thread_state 
         continuation_thread_function(
@@ -114,7 +116,7 @@
     public:
         // This static construct_thread_function allows to construct 
         // a proper thread function for a px_thread without having to 
-        // instantiate the action0 type. This is used by the applier in 
+        // instantiate the result_actionN type. This is used by the applier in 
         // case no continuation has been supplied.
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static boost::function<threadmanager::thread_function_type> 
@@ -122,14 +124,14 @@
             naming::address::address_type lva, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
         {
-            return boost::bind(F, Component::get_lva(lva), _1, 
+            return boost::bind(F, get_lva<Component>::call(lva), _1, 
                 boost::ref(appl), reinterpret_cast<Result*>(NULL), 
                 BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
         // This static construct_thread_function allows to construct 
         // a proper thread function for a px_thread without having to 
-        // instantiate the action0 type. This is used by the applier in 
+        // instantiate the result_actionN type. This is used by the applier in 
         // case a continuation has been supplied
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static boost::function<threadmanager::thread_function_type> 
@@ -138,8 +140,8 @@
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
         {
             return construct_continuation_thread_function(
-                boost::bind(F, Component::get_lva(lva), _1, boost::ref(appl), 
-                    _2, BOOST_PP_ENUM_PARAMS(N, arg)), 
+                boost::bind(F, get_lva<Component>::call(lva), _1, 
+                    boost::ref(appl), _2, BOOST_PP_ENUM_PARAMS(N, arg)), 
                 appl, cont);
         }
 
@@ -165,7 +167,7 @@
         }
 
     private:
-        // serialization support    
+        // serialization support
         friend class boost::serialization::access;
 
         template<class Archive>
@@ -208,7 +210,7 @@
     public:
         // This static construct_thread_function allows to construct 
         // a proper thread function for a px_thread without having to 
-        // instantiate the action0 type. This is used by the applier in 
+        // instantiate the actionN type. This is used by the applier in 
         // case no continuation has been supplied.
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static boost::function<threadmanager::thread_function_type> 
@@ -216,13 +218,13 @@
             naming::address::address_type lva, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
         {
-            return boost::bind(F, Component::get_lva(lva), _1, boost::ref(appl), 
-                BOOST_PP_ENUM_PARAMS(N, arg));
+            return boost::bind(F, get_lva<Component>::call(lva), _1, 
+                boost::ref(appl), BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
         // This static construct_thread_function allows to construct 
         // a proper thread function for a px_thread without having to 
-        // instantiate the action0 type. This is used by the applier in 
+        // instantiate the actionN type. This is used by the applier in 
         // case a continuation has been supplied
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static boost::function<threadmanager::thread_function_type> 
@@ -231,8 +233,8 @@
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
         {
             return base_type::construct_continuation_thread_function(
-                boost::bind(F, Component::get_lva(lva), _1, boost::ref(appl), 
-                    BOOST_PP_ENUM_PARAMS(N, arg)), 
+                boost::bind(F, get_lva<Component>::call(lva), _1, 
+                    boost::ref(appl), BOOST_PP_ENUM_PARAMS(N, arg)), 
                 appl, cont);
         }
 
@@ -255,7 +257,7 @@
         }
 
     private:
-        // serialization support    
+        // serialization support
         friend class boost::serialization::access;
 
         template<class Archive>

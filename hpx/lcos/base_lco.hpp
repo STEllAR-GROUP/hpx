@@ -26,6 +26,10 @@ namespace hpx { namespace lcos
     /// implementing a simple set_event action
     struct base_lco
     {
+        // components must contain a typedef for wrapping_type defining the
+        // wrapper type used to encapsulate instances of this component
+        typedef components::wrapper<base_lco> wrapping_type;
+
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
         // to associate this component with a given action.
@@ -45,13 +49,6 @@ namespace hpx { namespace lcos
         typedef components::action0<
             base_lco, lco_set_event, &base_lco::set_event
         > set_event_action;
-
-        ///
-        static base_lco* get_lva(naming::address::address_type lva)
-        {
-            typedef components::wrapper<base_lco> wrapping_type;
-            return reinterpret_cast<wrapping_type*>(lva)->get();
-        }
     };
 
     /// The \a base_lco_with_value class is the common base class for all LCO's 
@@ -61,6 +58,10 @@ namespace hpx { namespace lcos
     template <typename Result>
     struct base_lco_with_value
     {
+        // components must contain a typedef for wrapping_type defining the
+        // wrapper type used to encapsulate instances of this component
+        typedef components::wrapper<base_lco_with_value> wrapping_type;
+
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
         // to associate this component with a given action.
@@ -92,13 +93,6 @@ namespace hpx { namespace lcos
             base_lco_with_value, lco_set_error, hpx::error, std::string,
             &base_lco_with_value::set_error
         > set_error_action;
-
-        ///
-        static base_lco_with_value* get_lva(naming::address::address_type lva)
-        {
-            typedef components::wrapper<base_lco_with_value> wrapping_type;
-            return reinterpret_cast<wrapping_type*>(lva)->get();
-        }
     };
 
     /// The base_lco<void> specialization is used whenever the set_event action
@@ -106,6 +100,10 @@ namespace hpx { namespace lcos
     template<>
     struct base_lco_with_value<void> : public base_lco
     {
+        // components must contain a typedef for wrapping_type defining the
+        // wrapper type used to encapsulate instances of this component
+        typedef components::wrapper<base_lco_with_value> wrapping_type;
+
         /// Destructor, needs to be virtual to allow for clean destruction of
         /// derived objects
         virtual ~base_lco_with_value() {}
@@ -130,13 +128,6 @@ namespace hpx { namespace lcos
             base_lco_with_value, lco_set_error, hpx::error, std::string,
             &base_lco_with_value::set_error
         > set_error_action;
-
-        ///
-        static base_lco_with_value* get_lva(naming::address::address_type lva)
-        {
-            typedef components::wrapper<base_lco_with_value> wrapping_type;
-            return reinterpret_cast<wrapping_type*>(lva)->get();
-        }
     };
 
 }}

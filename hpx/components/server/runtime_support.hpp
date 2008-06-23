@@ -91,12 +91,6 @@ namespace hpx { namespace components { namespace server
             &runtime_support::shutdown_all
         > shutdown_all_action;
 
-        ///
-        static runtime_support* get_lva(naming::address::address_type lva)
-        {
-            return reinterpret_cast<runtime_support*>(lva);
-        }
-
         /// \brief Wait for the runtime_support component to notify the calling
         ///        thread.
         ///

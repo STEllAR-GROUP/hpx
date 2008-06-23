@@ -26,6 +26,10 @@ namespace hpx { namespace components { namespace server { namespace detail
     class accumulator 
     {
     public:
+        // components must contain a typedef for wrapping_type defining the
+        // wrapper type used to encapsulate instances of this component
+        typedef wrapper<accumulator, server::accumulator> wrapping_type;
+
         // parcel action code: the action to be performed on the destination 
         // object (the accumulator)
         enum actions
@@ -103,15 +107,6 @@ namespace hpx { namespace components { namespace server { namespace detail
         typedef action0<
             accumulator, accumulator_print, &accumulator::print
         > print_action;
-
-        ///
-        static accumulator* get_lva(naming::address::address_type lva)
-        {
-            typedef 
-                wrapper<detail::accumulator, server::accumulator> 
-            wrapping_type;
-            return reinterpret_cast<wrapping_type*>(lva)->get();
-        }
 
     private:
         double arg_;

@@ -122,39 +122,50 @@ namespace hpx { namespace lcos
             return get_store().is_empty(get_address());
         }
 
-        /// Wait for the memory to become full and then reads it, leaves memory
-        /// in full state.
+        /// \brief  Waits for the memory to become full and then reads it, 
+        ///         leaves memory in full state. If the location is empty the 
+        ///         calling thread will wait (block) for another thread to call 
+        ///         either the function \a set or the function \a write.
         ///
-        /// \note When memory becomes full, all \a px_threads waiting for it
-        ///       to become full with a read will receive the value at once and 
-        ///       will be queued to run.
+        /// \note   When memory becomes full, all \a px_threads waiting for it
+        ///         to become full with a read will receive the value at once 
+        ///         and will be queued to run.
         void read(threadmanager::px_thread_self& self, value_type& dest)
         {
             get_store().read(self, get_address(), dest);
         }
 
-        /// Wait for memory to become full and then reads it, sets memory to 
-        /// empty.
+        /// \brief  Waits for memory to become full and then reads it, sets 
+        ///         memory to empty. If the location is empty the calling 
+        ///         thread will wait (block) for another thread to call either
+        ///         the function \a set or the function \a write.
         ///
-        /// \note When memory becomes full, only one thread blocked like this 
-        ///       will be queued to run.
+        /// \note   When memory becomes empty, only one thread blocked like this 
+        ///         will be queued to run (one thread waiting in a \a write 
+        ///         function).
         void read_and_empty(threadmanager::px_thread_self& self, 
             value_type& dest) 
         {
             return get_store().read_and_empty(self, get_address(), dest);
         }
 
-        /// Writes memory and atomically sets its state to full without waiting 
-        /// for it to become empty.
+        /// \brief  Writes memory and atomically sets its state to full without 
+        ///         waiting for it to become empty.
+        /// 
+        /// \note   Even if the function itself doesn't block, setting the 
+        ///         location to full using \a set might re-activate threads 
+        ///         waiting on this in a \a read or \a read_and_empty function.
         void set(value_type const& data)
         {
             get_store().set(get_address(), data);
         }
 
-        /// Wait for memory to become empty, and then fill it.
+        /// \brief  Waits for memory to become empty, and then fills it. If the 
+        ///         location is filled the calling thread will wait (block) for 
+        ///         another thread to call the function \a read_and_empty.
         ///
-        /// \note When memory becomes empty only one thread blocked like this 
-        ///       will be queued to run.
+        /// \note   When memory becomes empty only one thread blocked like this 
+        ///         will be queued to run.
         void write(threadmanager::px_thread_self& self, value_type const& data)
         {
             get_store().write(self, get_address(), data);
@@ -240,15 +251,20 @@ namespace hpx { namespace lcos
 
         /// Wait for memory to become full, sets memory to empty.
         ///
-        /// \note When memory becomes full, only one thread blocked like this 
-        ///       will be queued to run.
+        /// \note When memory becomes empty, only one thread blocked like this 
+        ///       will be queued to run (one thread waiting in a \a write 
+        ///       function).
         void read_and_empty(threadmanager::px_thread_self& self) 
         {
             return get_store().read_and_empty(self, get_address());
         }
 
-        /// Writes memory and atomically sets its state to full without waiting 
-        /// for it to become empty.
+        /// \brief Writes memory and atomically sets its state to full without 
+        ///        waiting for it to become empty.
+        /// 
+        /// \note  Even if the function itself doesn't block, setting the 
+        ///        location to full using \a set might re-activate threads 
+        ///        waiting on this in a \a read or \a read_and_empty function.
         void set()
         {
             get_store().set(get_address());

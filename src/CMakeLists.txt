@@ -16,15 +16,16 @@ set (hpxlib_HEADERS
     ../hpx/components/action_implementations.hpp
     ../hpx/components/component_type.hpp
     ../hpx/components/continuation.hpp
-    ../hpx/components/factory.hpp
+    ../hpx/components/runtime_support.hpp
     ../hpx/components/server/accumulator.hpp
-    ../hpx/components/server/factory.hpp
+    ../hpx/components/server/distributing_factory.hpp
+    ../hpx/components/server/runtime_support.hpp
     ../hpx/components/server/manage_component.hpp
     ../hpx/components/server/wrapper.hpp
     ../hpx/components/server/wrapper_heap.hpp
     ../hpx/components/server/wrapper_heap_list.hpp
     ../hpx/components/stubs/accumulator.hpp
-    ../hpx/components/stubs/factory.hpp
+    ../hpx/components/stubs/runtime_support.hpp
     # include
     ../hpx/include/action_manager.hpp
     ../hpx/include/applier.hpp
@@ -90,7 +91,8 @@ set (hpxlib_HEADERS
 
 set (hpxlib_SOURCES
     # components
-    components/server/factory.cpp
+    components/server/distributing_factory.cpp
+    components/server/runtime_support.cpp
     # runtime
     # action manager
     runtime/action_manager/action_manager.cpp
