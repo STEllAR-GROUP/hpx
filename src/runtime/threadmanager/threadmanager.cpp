@@ -111,6 +111,8 @@ namespace hpx { namespace threadmanager
                 px_t->set_state(new_state);
                 if (new_state == pending)
                     work_items_.push(px_t);
+                if (running_) 
+                    cond_.notify_one();
             }
             return previous_state;
         }
