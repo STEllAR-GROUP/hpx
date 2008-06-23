@@ -4,9 +4,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(__GNUC__)
-#error This file requires compilation using gcc.
-#endif
+#if defined(__GNUC__)
 
 #if defined(__i386__)
 #include "swapcontext32.cpp"
@@ -16,3 +14,4 @@
 #error Undefined platform (should be __386__ or __x86_64__)
 #endif
 
+#endif

@@ -117,6 +117,8 @@ set (hpxlib_SOURCES
     # util 
     util/io_service_pool.cpp
     util/logging.cpp
+    # source file from coroutine library
+    ../external/coroutine/libs/coroutine/src/swapcontext.cpp
 )
 
 add_library (hpx STATIC ${hpxlib_SOURCES} ${hpxlib_HEADERS})
