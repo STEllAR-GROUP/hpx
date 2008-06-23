@@ -16,7 +16,7 @@ set (hpxlib_HEADERS
     ../hpx/components/action_implementations.hpp
     ../hpx/components/component_type.hpp
     ../hpx/components/continuation.hpp
-    ../hpx/components/get_lva.hpp.hpp
+    ../hpx/components/get_lva.hpp
     ../hpx/components/runtime_support.hpp
     ../hpx/components/server/accumulator.hpp
     ../hpx/components/server/distributing_factory.hpp
