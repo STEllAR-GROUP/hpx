@@ -28,12 +28,9 @@
 namespace hpx { namespace naming { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
-    namespace status_strings 
-    {
-        /// The function \a get_error_text returns the textual representation 
-        /// of the passed error code.
-        char const* const get_error_text(error status);
-    }
+    /// The function \a get_error_text returns the textual representation 
+    /// of the passed error code.
+    char const* const get_error_text(error status);
 
     ///////////////////////////////////////////////////////////////////////////
     /// a reply to be sent to a client
@@ -42,13 +39,13 @@ namespace hpx { namespace naming { namespace server
     public:
         reply (error s = no_success)
           : command_(command_unknown), status_(s),
-            error_(status_strings::get_error_text(s)),
+            error_(get_error_text(s)),
             lower_bound_(0), upper_bound_(0)
         {}
 
         reply (error s, char const* what)
           : command_(command_unknown), status_(s),
-            error_(status_strings::get_error_text(s)),
+            error_(get_error_text(s)),
             lower_bound_(0), upper_bound_(0)
         {
             error_ += std::string(": ") + what;
@@ -57,7 +54,7 @@ namespace hpx { namespace naming { namespace server
         reply (dgas_server_command command, error s = success,
                 char const* what = 0)
           : command_(command), status_(s), 
-            error_(status_strings::get_error_text(s)),
+            error_(get_error_text(s)),
             lower_bound_(0), upper_bound_(0)
         {
             if (0 != what)
@@ -67,7 +64,7 @@ namespace hpx { namespace naming { namespace server
         reply (dgas_server_command command, naming::id_type const& id, 
                error s = success)
           : command_(command), status_(s),
-            error_(status_strings::get_error_text(success)),
+            error_(get_error_text(success)),
             lower_bound_(0), upper_bound_(0), id_(id)
         {
             BOOST_ASSERT(s == success || s == no_success);
@@ -77,7 +74,7 @@ namespace hpx { namespace naming { namespace server
 
         reply (std::vector<boost::uint32_t>& prefixes, error s = success)
           : command_(command_getprefixes), status_(s),
-            error_(status_strings::get_error_text(success))
+            error_(get_error_text(success))
         {
             BOOST_ASSERT(s == success || s == no_success);
             std::swap(prefixes_, prefixes);
@@ -87,7 +84,7 @@ namespace hpx { namespace naming { namespace server
         reply (dgas_server_command command, Container const& totals, F f,
                error s = success)
           : command_(command), status_(s),
-            error_(status_strings::get_error_text(success)),
+            error_(get_error_text(success)),
             lower_bound_(0), upper_bound_(0)
         {
             BOOST_ASSERT(s == success || s == no_success);
@@ -101,7 +98,7 @@ namespace hpx { namespace naming { namespace server
 
         reply (dgas_server_command command, naming::address addr)
           : command_(command), status_(success), 
-            error_(status_strings::get_error_text(success)),
+            error_(get_error_text(success)),
             address_(addr),
             lower_bound_(0), upper_bound_(0)
         {
@@ -112,7 +109,7 @@ namespace hpx { namespace naming { namespace server
         reply (error s, dgas_server_command command, 
                 naming::id_type prefix)
           : command_(command_getprefix), status_(s),
-            error_(status_strings::get_error_text(s)),
+            error_(get_error_text(s)),
             lower_bound_(prefix), upper_bound_(0)
         {
             BOOST_ASSERT(s == success || s == repeated_request);
@@ -122,7 +119,7 @@ namespace hpx { namespace naming { namespace server
         reply (error s, dgas_server_command command, 
                 naming::id_type lower_bound, naming::id_type upper_bound)
           : command_(command_getidrange), status_(s),
-            error_(status_strings::get_error_text(s)),
+            error_(get_error_text(s)),
             lower_bound_(lower_bound), upper_bound_(upper_bound)
         {
             BOOST_ASSERT(s == success || s == repeated_request);

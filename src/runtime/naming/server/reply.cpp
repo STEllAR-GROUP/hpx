@@ -32,31 +32,31 @@ namespace hpx { namespace naming { namespace server
             "hpx: dgas: internal server error (out of memory)";
         char const* const unknown_version = 
             "hpx: dgas: ill formatted request (unknown version)";
+    }
 
-        char const* const get_error_text(error status)
-        {
-            switch (status) {
-            case hpx::success:               return success;
-            case hpx::no_success:            return no_success;
-            case hpx::service_unavailable:   return service_unavailable;
-            case hpx::invalid_status:        return invalid_status;
-            case hpx::bad_parameter:         return bad_parameter;
-            case hpx::bad_request:           return bad_request;
-            case hpx::out_of_memory:         return out_of_memory;
-            case hpx::version_unknown:       return unknown_version;
-            case hpx::repeated_request:      return repeated_request;
-            case hpx::internal_server_error: return internal_server_error;
-            default:
-                break;
-            }
-            return internal_server_error;
+    char const* const get_error_text(error status)
+    {
+        switch (status) {
+        case hpx::success:               return success;
+        case hpx::no_success:            return no_success;
+        case hpx::service_unavailable:   return service_unavailable;
+        case hpx::invalid_status:        return invalid_status;
+        case hpx::bad_parameter:         return bad_parameter;
+        case hpx::bad_request:           return bad_request;
+        case hpx::out_of_memory:         return out_of_memory;
+        case hpx::version_unknown:       return unknown_version;
+        case hpx::repeated_request:      return repeated_request;
+        case hpx::internal_server_error: return internal_server_error;
+        default:
+            break;
         }
+        return internal_server_error;
     }
 
     // Streaming operator, used by logging
     std::ostream& operator<< (std::ostream& os, reply const& rep)
     {
-        os << command_strings::get_command_name(rep.command_) << ": ";
+        os << get_command_name(rep.command_) << ": ";
 
         if (rep.status_ != success && rep.status_ != repeated_request) {
             os << "status(" << rep.error_ << ") ";

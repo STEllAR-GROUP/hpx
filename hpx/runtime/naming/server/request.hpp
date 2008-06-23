@@ -45,10 +45,8 @@ namespace hpx { namespace naming { namespace server
         command_lastcommand
     };
 
-    namespace command_strings
-    {
-        char const* const get_command_name(int cmd);
-    }
+    ///////////////////////////////////////////////////////////////////////////
+    char const* const get_command_name(int cmd);
 
     /// A request received from a client.
     class request

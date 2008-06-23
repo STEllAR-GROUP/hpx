@@ -27,20 +27,20 @@ namespace hpx { namespace naming { namespace server
             "command_statistics_moment2",
             ""
         };
+    }
 
-        char const* const get_command_name(int cmd)
-        {
-            if (cmd >= command_firstcommand && cmd < command_lastcommand)
-                return command_names[cmd];
-            return "<unknown>";
-        }
+    char const* const get_command_name(int cmd)
+    {
+        if (cmd >= command_firstcommand && cmd < command_lastcommand)
+            return command_names[cmd];
+        return "<unknown>";
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // debug support for a request class
     std::ostream& operator<< (std::ostream& os, request const& req)
     {
-        os << command_strings::get_command_name(req.command_) << ": ";
+        os << get_command_name(req.command_) << ": ";
 
         switch (req.command_) {
         case command_resolve:
