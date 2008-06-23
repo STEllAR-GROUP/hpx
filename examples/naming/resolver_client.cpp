@@ -61,10 +61,10 @@ int main(int argc, char* argv[])
             last_lowerid = prefix1;
         BOOST_TEST(prefix1 != 0);
 
-        std::vector<boost::uint32_t> prefixes;
+        std::vector<hpx::naming::id_type> prefixes;
         resolver.get_prefixes(prefixes);
         BOOST_TEST(((0 == i) ? 1 : 2) == prefixes.size());
-        BOOST_TEST(hpx::naming::get_id_from_prefix(prefixes.back()) == prefix1);
+        BOOST_TEST(prefixes.back() == prefix1);
 
         id_type prefix2;
         BOOST_TEST(!resolver.get_prefix(here, prefix2));
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 
         resolver.get_prefixes(prefixes);
         BOOST_TEST(2 == prefixes.size());
-        BOOST_TEST(hpx::naming::get_id_from_prefix(prefixes.front()) == prefix3);
+        BOOST_TEST(prefixes.front() == prefix3);
 
         id_type prefix4;
         BOOST_TEST(!resolver.get_prefix(locality("1.1.1.1", 1), prefix4));
@@ -179,7 +179,7 @@ int main(int argc, char* argv[])
                   << " iterations: " << std::endl;
         for (std::size_t i = 0; i < server::command_lastcommand; ++i)
         {
-            std::cout << server::command_names[i] << ": " 
+            std::cout << server::get_command_name(i) << ": " 
                       << counts[i] << ", " << timings[i] << ", " << moments[i] 
                       << std::endl;
         }
