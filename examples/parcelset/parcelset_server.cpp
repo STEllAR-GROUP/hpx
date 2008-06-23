@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
         hpx::parcelset::parcelport pp(io_service_pool, ps_host, ps_port);
         hpx::parcelset::parcelhandler ph(dgas_c, pp);
 
-        boost::thread t1(boost::bind(&hpx::parcelset:parcelport::run, &pp, true));
+        boost::thread t1(boost::bind(& hpx::parcelset::parcelport::run, &pp, true));
 
         ph.register_event_handler(received_parcel);
         
