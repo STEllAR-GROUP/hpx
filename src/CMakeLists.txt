@@ -95,6 +95,7 @@ set (hpxlib_SOURCES
     components/server/distributing_factory.cpp
     components/server/runtime_support.cpp
     # runtime
+    runtime/runtime.cpp
     # action manager
     runtime/action_manager/action_manager.cpp
     # applier

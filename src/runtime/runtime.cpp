@@ -143,7 +143,7 @@ namespace hpx
         int sig = 0;
         sigwait(&wait_mask, &sig);
 
-        t1.join();
+        t.join();
 #endif
     }
 
