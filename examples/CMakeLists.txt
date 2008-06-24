@@ -5,17 +5,17 @@
 
 set (resolver_client_SOURCES naming/resolver_client.cpp)
 add_executable (resolver_client ${resolver_client_SOURCES})
-target_link_libraries(resolver_client hpx)
+target_link_libraries(resolver_client hpx ${Boost_LIBRARIES})
 
 set (resolver_server_SOURCES naming/resolver_server.cpp)
 add_executable (resolver_server ${resolver_server_SOURCES})
-target_link_libraries(resolver_server hpx)
+target_link_libraries(resolver_server hpx ${Boost_LIBRARIES})
 
 set (parcelset_client_SOURCES parcelset/parcelset_client.cpp)
 add_executable (parcelset_client ${parcelset_client_SOURCES})
-target_link_libraries(parcelset_client hpx)
+target_link_libraries(parcelset_client hpx ${Boost_LIBRARIES})
 
 set (parcelset_server_SOURCES parcelset/parcelset_server.cpp)
 add_executable (parcelset_server ${parcelset_server_SOURCES})
-target_link_libraries(parcelset_server hpx)
+target_link_libraries(parcelset_server hpx ${Boost_LIBRARIES})
 
