@@ -11,22 +11,22 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/function.hpp>
 
-boost::function0<void> console_ctrl_function;
-
-BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
-{
-    switch (ctrl_type) {
-    case CTRL_C_EVENT:
-    case CTRL_BREAK_EVENT:
-    case CTRL_CLOSE_EVENT:
-    case CTRL_SHUTDOWN_EVENT:
-        console_ctrl_function();
-        return TRUE;
-
-    default:
-        return FALSE;
-    }
-}
+//boost::function0<void> console_ctrl_function;
+//
+//BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
+//{
+//    switch (ctrl_type) {
+//    case CTRL_C_EVENT:
+//    case CTRL_BREAK_EVENT:
+//    case CTRL_CLOSE_EVENT:
+//    case CTRL_SHUTDOWN_EVENT:
+//        console_ctrl_function();
+//        return TRUE;
+//
+//    default:
+//        return FALSE;
+//    }
+//}
 
 ///////////////////////////////////////////////////////////////////////////////
 //  This gets called whenever a parcel was received, it just sends back any 
@@ -80,9 +80,9 @@ int main(int argc, char* argv[])
         hpx::action_manager::action_manager am(app);
 
         // Set console control handler to allow client to be stopped.
-        console_ctrl_function = 
-            boost::bind(&hpx::parcelset::parcelport::stop, &pp, true);
-        SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
+        //console_ctrl_function = 
+        //    boost::bind(&hpx::parcelset::parcelport::stop, &pp, true);
+        //SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
 
         // sleep for a second to give parcelset server a chance to startup
         boost::xtime xt;
