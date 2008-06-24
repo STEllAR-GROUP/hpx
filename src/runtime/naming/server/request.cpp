@@ -32,7 +32,7 @@ namespace hpx { namespace naming { namespace server
     char const* const get_command_name(int cmd)
     {
         if (cmd >= command_firstcommand && cmd < command_lastcommand)
-            return command_names[cmd];
+            return command_strings::command_names[cmd];
         return "<unknown>";
     }
 

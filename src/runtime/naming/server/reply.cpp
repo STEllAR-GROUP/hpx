@@ -37,20 +37,20 @@ namespace hpx { namespace naming { namespace server
     char const* const get_error_text(error status)
     {
         switch (status) {
-        case hpx::success:               return success;
-        case hpx::no_success:            return no_success;
-        case hpx::service_unavailable:   return service_unavailable;
-        case hpx::invalid_status:        return invalid_status;
-        case hpx::bad_parameter:         return bad_parameter;
-        case hpx::bad_request:           return bad_request;
-        case hpx::out_of_memory:         return out_of_memory;
-        case hpx::version_unknown:       return unknown_version;
-        case hpx::repeated_request:      return repeated_request;
-        case hpx::internal_server_error: return internal_server_error;
+        case hpx::success:               return status_strings::success;
+        case hpx::no_success:            return status_strings::no_success;
+        case hpx::service_unavailable:   return status_strings::service_unavailable;
+        case hpx::invalid_status:        return status_strings::invalid_status;
+        case hpx::bad_parameter:         return status_strings::bad_parameter;
+        case hpx::bad_request:           return status_strings::bad_request;
+        case hpx::out_of_memory:         return status_strings::out_of_memory;
+        case hpx::version_unknown:       return status_strings::unknown_version;
+        case hpx::repeated_request:      return status_strings::repeated_request;
+        case hpx::internal_server_error: return status_strings::internal_server_error;
         default:
             break;
         }
-        return internal_server_error;
+        return status_strings::internal_server_error;
     }
 
     // Streaming operator, used by logging
