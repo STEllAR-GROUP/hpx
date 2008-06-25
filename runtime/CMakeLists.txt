@@ -5,5 +5,4 @@
 
 set (hpx_runtime_SOURCES hpx_runtime.cpp)
 add_executable (hpx_runtime ${hpx_runtime_SOURCES})
-target_link_libraries(hpx_runtime hpx)
-
+target_link_libraries(hpx_runtime hpx ${Boost_LIBRARIES})
