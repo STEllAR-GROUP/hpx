@@ -175,10 +175,10 @@ namespace hpx { namespace naming { namespace server
 
     private:
         friend std::ostream& operator<< (std::ostream& os, reply const& rep);
-        
-        // serialization support    
+
+        // serialization support
         friend class boost::serialization::access;
-    
+
         template<class Archive>
         void save(Archive & ar, const unsigned int version) const
         {

@@ -87,8 +87,10 @@ namespace hpx { namespace naming
         /// naming#server#command_bind_range command)
         resolver_client_connection(boost::asio::ip::tcp::socket& socket,
                 server::dgas_server_command c, id_type lower_id, 
-                std::size_t count, address const& addr, std::ptrdiff_t offset)
-          : socket_(socket), req_(c, lower_id, count, addr, offset)
+                std::size_t count, address const& addr, std::ptrdiff_t offset,
+                std::size_t bits_per_object)
+          : socket_(socket), 
+            req_(c, lower_id, count, addr, offset, bits_per_object)
         {}
         
         /// Construct a sending resolver_client_connection (for the \a
@@ -203,7 +205,7 @@ namespace hpx { namespace naming
             }
             else {
                 // Determine the length of the serialized data.
-                std::size_t inbound_data_size = size_;
+                boost::uint32_t inbound_data_size = size_;
 
                 // Start an asynchronous call to receive the data.
                 buffer_.resize(inbound_data_size);

@@ -30,6 +30,17 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    struct no_full_empty_action_type
+    {
+        full_empty operator()(full_empty state) const
+        {
+            return state;
+        }
+    };
+    no_full_empty_action_type const no_full_empty_action = 
+        no_full_empty_action_type();
+
+    ///////////////////////////////////////////////////////////////////////////
     class full_empty_entry
     {
     private:
@@ -84,21 +95,21 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         // sets this entry to empty
-        template <typename Lock>
-        bool set_empty(Lock& outer_lock) 
+        template <typename Lock, typename Action>
+        bool set_empty(Lock& outer_lock, Action const& f) 
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
-            return set_empty_locked();
+            return set_empty_locked(f);
         }
 
         // sets this entry to full
-        template <typename Lock>
-        bool set_full(Lock& outer_lock) 
+        template <typename Lock, typename Action>
+        bool set_full(Lock& outer_lock, Action const& f) 
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
-            return set_full_locked();
+            return set_full_locked(f);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -148,9 +159,9 @@ namespace hpx { namespace lcos { namespace detail
 
         ///////////////////////////////////////////////////////////////////////
         // enqueue a get operation in full/empty queue if entry is empty
-        template <typename Lock, typename T>
+        template <typename Lock, typename T, typename Action>
         void enqueue_full_empty(Lock& outer_lock, 
-            threadmanager::px_thread_self& self, T& dest)
+            threadmanager::px_thread_self& self, T& dest, Action const& f)
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
@@ -176,14 +187,14 @@ namespace hpx { namespace lcos { namespace detail
                 // copy the data to the destination
                 if (entry_ && entry_ != &dest) 
                     dest = *static_cast<T const*>(entry_);
-                set_empty_locked();   // state_ = empty;
+                set_empty_locked(f);   // state_ = empty;
             }
         }
 
         // same as above, but for entries without associated data
-        template <typename Lock>
+        template <typename Lock, typename Action>
         void enqueue_full_empty(Lock& outer_lock, 
-            threadmanager::px_thread_self& self)
+            threadmanager::px_thread_self& self, Action const& f)
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
@@ -200,15 +211,15 @@ namespace hpx { namespace lcos { namespace detail
                 self.yield(threadmanager::suspended);
             }
             else {
-                set_empty_locked();   // state_ = empty
+                set_empty_locked(f);   // state_ = empty
             }
         }
 
         ///////////////////////////////////////////////////////////////////////
         // enqueue if entry is full, otherwise fill it
-        template <typename Lock, typename T>
+        template <typename Lock, typename T, typename Action>
         void enqueue_if_full(Lock& outer_lock, 
-            threadmanager::px_thread_self& self, T const& src)
+            threadmanager::px_thread_self& self, T const& src, Action const& f)
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
@@ -229,13 +240,13 @@ namespace hpx { namespace lcos { namespace detail
                 *static_cast<T*>(entry_) = src;
 
             // make sure the entry is full
-            set_full_locked();    // state_ = full
+            set_full_locked(f);    // state_ = full
         }
 
         // same as above, but for entries without associated data
-        template <typename Lock>
+        template <typename Lock, typename Action>
         void enqueue_if_full(Lock& outer_lock, 
-            threadmanager::px_thread_self& self)
+            threadmanager::px_thread_self& self, Action const& f)
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
@@ -252,13 +263,13 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             // make sure the entry is full
-            set_full_locked();    // state_ = full
+            set_full_locked(f);    // state_ = full
         }
 
         ///////////////////////////////////////////////////////////////////////
         // unconditionally set the data and set the entry to full
-        template <typename Lock, typename T>
-        void set_and_fill(Lock& outer_lock, T const& src)
+        template <typename Lock, typename T, typename Action>
+        void set_and_fill(Lock& outer_lock, T const& src, Action const& f)
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
@@ -268,18 +279,18 @@ namespace hpx { namespace lcos { namespace detail
                 *static_cast<T*>(entry_) = src;
 
             // make sure the entry is full
-            set_full_locked();    // state_ = full
+            set_full_locked(f);    // state_ = full
         }
 
         // same as above, but for entries without associated data
-        template <typename Lock>
-        void set_and_fill(Lock& outer_lock)
+        template <typename Lock, typename Action>
+        void set_and_fill(Lock& outer_lock, Action const& f)
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
 
             // make sure the entry is full
-            set_full_locked();    // state_ = full
+            set_full_locked(f);    // state_ = full
         }
 
         // returns whether this entry is still in use
@@ -290,38 +301,45 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     protected:
-        bool set_empty_locked()
+        template <typename Action>
+        bool set_empty_locked(Action const& f)
         {
-            state_ = empty;
+            state_ = f(empty);
+            if (state_ != empty)
+                return !is_used_locked();  // callback routine prevented state change
+
             if (!empty_full_.empty()) {
-                std::auto_ptr<full_empty_queue_entry> f (&full_empty_.front());
+                std::auto_ptr<full_empty_queue_entry> e(&empty_full_.front());
                 empty_full_.pop_front();
-                threadmanager::set_thread_state(f->id_, threadmanager::pending);
-                set_full_locked();    // state_ = full
+                threadmanager::set_thread_state(e->id_, threadmanager::pending);
+                set_full_locked(f);    // state_ = full
             }
 
             // return whether this block needs to be removed
             return state_ == full && !is_used_locked();
         }
 
-        bool set_full_locked()
+        template <typename Action>
+        bool set_full_locked(Action const& f)
         {
-            state_ = full;
+            state_ = f(full);
+            if (state_ != full)
+                return false;         // callback routine prevented state change
 
             // handle all threads waiting for the block to become full
             while (!full_full_.empty()) {
-                std::auto_ptr<full_empty_queue_entry> f (&full_empty_.front());
+                std::auto_ptr<full_empty_queue_entry> e(&full_full_.front());
                 full_full_.pop_front();
-                threadmanager::set_thread_state(f->id_, threadmanager::pending);
+                threadmanager::set_thread_state(e->id_, threadmanager::pending);
             }
 
             // since we got full now we need to re-activate one thread waiting
             // for the block to become full
             if (!full_empty_.empty()) {
-                std::auto_ptr<full_empty_queue_entry> f (&full_empty_.front());
+                std::auto_ptr<full_empty_queue_entry> e(&full_empty_.front());
                 full_empty_.pop_front();
-                threadmanager::set_thread_state(f->id_, threadmanager::pending);
-                set_empty_locked();   // state_ = empty
+                threadmanager::set_thread_state(e->id_, threadmanager::pending);
+                set_empty_locked(f);   // state_ = empty
             }
 
             // return whether this block needs to be removed
@@ -349,67 +367,99 @@ namespace hpx { namespace lcos { namespace detail
         typedef boost::shared_mutex mutex_type;
         typedef boost::ptr_map<void*, full_empty_entry> store_type;
 
-    public:
-        full_empty_store()
-        {}
-
-        ///
-        void set_empty(void* entry)
+    protected:
+        template <typename Lock>
+        store_type::iterator create(Lock& l, void* entry)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
-            store_type::iterator it = store_.find(entry);
-            if (it == store_.end()) {
+            boost::upgrade_to_unique_lock<mutex_type> ul(l);
+            std::pair<store_type::iterator, bool> p = 
+                store_.insert(entry, new full_empty_entry(entry));
+            if (!p.second) {
+                boost::throw_exception(std::bad_alloc());
+                return store_type::iterator();
+            }
+            return p.first;
+        }
+
+        template <typename Lock>
+        store_type::iterator find_or_create(Lock& l, void* entry)
+        {
             // create a new entry for this unknown (full) block 
-                std::pair<store_type::iterator, bool> p = store_.insert(
-                    entry, new full_empty_entry(entry));
-                if (!p.second) {
-                    boost::throw_exception(std::bad_alloc());
-                    return;
-                }
-                (*p.first).second->set_empty(l);
-            }
-            else {
-                // set the entry to empty state if it's not newly created
-                if ((*it).second->set_empty(l)) 
-                    remove(entry);    // remove if no more threads are waiting
-            }
+            store_type::iterator it = store_.find(entry);
+            if (it == store_.end()) 
+                return create(l, entry);
+            return it;
         }
 
-        ///
-        void set_full(void* entry)
+        template <typename Lock>
+        bool remove(Lock& l, void* entry)
         {
-            store_type::iterator it;
-            {
-                boost::unique_lock<mutex_type> l(mtx_);
-                store_type::iterator it = store_.find(entry);
-                if (it == store_.end()) 
-                    return;       // entry doesn't exist
-
-                // set the entry to full state
-                if ((*it).second->set_full(l))
-                    remove(entry);    // remove if no more threads are waiting
-            }
-        }
-
-        /// The function \a remove erases the given entry from the store if it
-        /// is not used by any other thread anymore.
-        ///
-        /// \returns  This returns \a true if the entry has been removed from
-        ///           the store, otherwise it returns \a false, which either 
-        ///           means that the entry is unknown to the store or that the 
-        ///           entry is still in use (other threads are waiting on this
-        ///           entry).
-        bool remove(void*entry)
-        {
-            boost::unique_lock<mutex_type> l(mtx_);
             store_type::iterator it = store_.find(entry);
             if (it != store_.end() && !(*it).second->is_used()) {
+                boost::upgrade_to_unique_lock<mutex_type> ul(l);
                 store_.erase(it);
                 return true;
             }
             return false;
         }
-        
+
+    public:
+        full_empty_store()
+        {}
+
+        ///
+        template <typename Action>
+        void set_empty(Action const& f, void* entry)
+        {
+            boost::upgrade_lock<mutex_type> l(mtx_);
+            store_type::iterator it = store_.find(entry);
+            if (it == store_.end()) {
+                // create a new entry for this unknown (full) block 
+                it = create(l, entry);
+                (*it).second->set_empty(l, f);
+            }
+            else {
+                // set the entry to empty state if it's not newly created
+                if ((*it).second->set_empty(l, f)) 
+                    remove(entry);    // remove if no more threads are waiting
+            }
+        }
+        void set_empty(void* entry)
+        {
+            boost::upgrade_lock<mutex_type> l(mtx_);
+            store_type::iterator it = store_.find(entry);
+            if (it == store_.end()) {
+                // create a new entry for this unknown (full) block 
+                it = create(l, entry);
+                (*it).second->set_empty(l, no_full_empty_action);
+            }
+            else {
+                // set the entry to empty state if it's not newly created
+                if ((*it).second->set_empty(l, no_full_empty_action)) 
+                    remove(entry);    // remove if no more threads are waiting
+            }
+        }
+
+        ///
+        template <typename Action>
+        void set_full(Action const& f, void* entry)
+        {
+            boost::shared_lock<mutex_type> l(mtx_);
+            store_type::iterator it = store_.find(entry);
+            if (it != store_.end() && (*it).second->set_full(l, f)) 
+                remove(entry);    // remove if no more threads are waiting
+        }
+        void set_full(void* entry)
+        {
+            boost::shared_lock<mutex_type> l(mtx_);
+            store_type::iterator it = store_.find(entry);
+            if (it != store_.end() && 
+                (*it).second->set_full(l, no_full_empty_action)) 
+            {
+                remove(entry);    // remove if no more threads are waiting
+            }
+        }
+
         /// The function \a is_empty returns whether the given memory block is 
         /// currently known to be empty.
         ///
@@ -442,26 +492,23 @@ namespace hpx { namespace lcos { namespace detail
             return false;   // not existing entries are not used by any thread
         }
 
-    protected:
-        store_type::iterator find_or_create(void* entry)
+        /// The function \a remove erases the given entry from the store if it
+        /// is not used by any other thread anymore.
+        ///
+        /// \returns  This returns \a true if the entry has been removed from
+        ///           the store, otherwise it returns \a false, which either 
+        ///           means that the entry is unknown to the store or that the 
+        ///           entry is still in use (other threads are waiting on this
+        ///           entry).
+        bool remove(void* entry)
         {
-            store_type::iterator it = store_.find(entry);
-            if (it == store_.end()) {
-                // create a new entry for this unknown (full) block 
-                std::pair<store_type::iterator, bool> p = store_.insert(
-                    entry, new full_empty_entry(entry));
-                if (!p.second) {
-                    boost::throw_exception(std::bad_alloc());
-                    return store_type::iterator();
-                }
-                it = p.first;
-            }
-            return it;
+            boost::upgrade_lock<mutex_type> l(mtx_);
+            return remove(l, entry);
         }
 
     public:
-        /// \brief Wait for the memory to become full and then reads it, leaves 
-        /// memory in full state.
+        /// \brief  Waits for the memory to become full and then reads it, 
+        ///         leaves memory in full state.
         template <typename T>
         void read(threadmanager::px_thread_self& self, void* entry, T& dest) 
         {
@@ -487,61 +534,108 @@ namespace hpx { namespace lcos { namespace detail
 
         /// \brief Wait for memory to become full and then reads it, sets 
         /// memory to empty.
+        template <typename Action, typename T>
+        void read_and_empty(Action const& f, threadmanager::px_thread_self& self, 
+            void* entry, T& dest)
+        {
+            boost::upgrade_lock<mutex_type> l(mtx_);
+            store_type::iterator it = find_or_create(l, entry);
+            (*it).second->enqueue_full_empty(l, self, dest, f);
+        }
         template <typename T>
         void read_and_empty(threadmanager::px_thread_self& self, void* entry, 
             T& dest)
         {
-            boost::shared_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(entry);
-            (*it).second->enqueue_full_empty(l, self, dest);
+            boost::upgrade_lock<mutex_type> l(mtx_);
+            store_type::iterator it = find_or_create(l, entry);
+            (*it).second->enqueue_full_empty(l, self, dest, no_full_empty_action);
         }
 
+        template <typename Action>
+        void read_and_empty(Action const& f, threadmanager::px_thread_self& self, 
+            void* entry)
+        {
+            boost::upgrade_lock<mutex_type> l(mtx_);
+            store_type::iterator it = find_or_create(l, entry);
+            (*it).second->enqueue_full_empty(l, self, f);
+        }
         void read_and_empty(threadmanager::px_thread_self& self, void* entry)
         {
-            boost::shared_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(entry);
-            (*it).second->enqueue_full_empty(l, self);
+            boost::upgrade_lock<mutex_type> l(mtx_);
+            store_type::iterator it = find_or_create(l, entry);
+            (*it).second->enqueue_full_empty(l, self, no_full_empty_action);
         }
 
         /// \brief Writes memory and atomically sets its state to full without 
         /// waiting for it to become empty.
+        template <typename Action, typename T>
+        void set(Action const& f, void* entry, T const& src)
+        {
+            boost::upgrade_lock<mutex_type> l(mtx_);
+            store_type::iterator it = find_or_create(l, entry);
+            (*it).second->set_and_fill(l, src, f);
+        }
         template <typename T>
         void set(void* entry, T const& src)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(entry);
-            (*it).second->set_and_fill(l, src);
+            boost::upgrade_lock<mutex_type> l(mtx_);
+            store_type::iterator it = find_or_create(l, entry);
+            (*it).second->set_and_fill(l, src, no_full_empty_action);
         }
 
+
+        template <typename Action>
+        void set(Action const& f, void* entry)
+        {
+            boost::upgrade_lock<mutex_type> l(mtx_);
+            store_type::iterator it = find_or_create(l, entry);
+            (*it).second->set_and_fill(l, f);
+        }
         void set(void* entry)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(entry);
-            (*it).second->set_and_fill(l);
+            boost::upgrade_lock<mutex_type> l(mtx_);
+            store_type::iterator it = find_or_create(l, entry);
+            (*it).second->set_and_fill(l, no_full_empty_action);
         }
 
         /// \brief Wait for memory to become empty, and then fill it.
+        template <typename Action, typename T>
+        void write(threadmanager::px_thread_self& self, Action const& f, 
+            void* entry, T const& src)
+        {
+            boost::upgrade_lock<mutex_type> l(mtx_);
+            store_type::iterator it = find_or_create(l, entry);
+            (*it).second->enqueue_if_full(l, self, src, f);
+        }
         template <typename T>
         void write(threadmanager::px_thread_self& self, void* entry, 
             T const& src)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(entry);
-            (*it).second->enqueue_if_full(l, self, src);
+            boost::upgrade_lock<mutex_type> l(mtx_);
+            store_type::iterator it = find_or_create(l, entry);
+            (*it).second->enqueue_if_full(l, self, src, no_full_empty_action);
         }
 
+        template <typename Action>
+        void write(threadmanager::px_thread_self& self, Action const& f, 
+            void* entry)
+        {
+            boost::upgrade_lock<mutex_type> l(mtx_);
+            store_type::iterator it = find_or_create(l, entry);
+            (*it).second->enqueue_if_full(l, self, f);
+        }
         void write(threadmanager::px_thread_self& self, void* entry)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(entry);
-            (*it).second->enqueue_if_full(l, self);
+            boost::upgrade_lock<mutex_type> l(mtx_);
+            store_type::iterator it = find_or_create(l, entry);
+            (*it).second->enqueue_if_full(l, self, no_full_empty_action);
         }
 
     private:
         mutable mutex_type mtx_;
         store_type store_;
     };
-    
+
 }}}
 
 #endif

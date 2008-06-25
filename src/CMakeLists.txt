@@ -74,6 +74,7 @@ set (hpxlib_HEADERS
     # util
     ../hpx/util/asio_util.hpp
     ../hpx/util/container_device.hpp
+    ../hpx/util/find_msb.hpp
     ../hpx/util/future.hpp
     ../hpx/util/generate_unique_ids.hpp
     ../hpx/util/high_resolution_timer.hpp

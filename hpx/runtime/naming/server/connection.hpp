@@ -210,7 +210,7 @@ namespace hpx { namespace naming { namespace server
         request_handler& request_handler_;
 
         /// buffer for incoming and outgoing data
-        boost::integer::little32_t size_;
+        boost::integer::ulittle32_t size_;
         std::vector<char> buffer_;
     };
 

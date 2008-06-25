@@ -351,6 +351,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\hpx\util\find_msb.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\util\future.hpp"
 					>
 				</File>
@@ -632,6 +636,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\hpx\lcos\full_empty_store.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\lcos\simple_dataflow_template.hpp"
 					>
 				</File>
 				<File

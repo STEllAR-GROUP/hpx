@@ -54,6 +54,8 @@ namespace hpx { namespace naming { namespace server
             os << "addr(" << req.addr_ << ") ";
             if (req.offset_ != 0)
                 os << "offset:" << std::dec << req.offset_ << " ";
+            if (req.gids_per_object_ != 1)
+                os << "gids/object:" << std::dec << req.gids_per_object_ << " ";
             break;
 
         case command_unbind_range:

@@ -26,14 +26,15 @@ namespace hpx { namespace components { namespace detail
         {}
 
         ///
-        naming::id_type get_gid(applier::applier& appl, void* p)
+        naming::id_type 
+        get_gid(applier::applier& appl, void* p, std::size_t gids_per_object)
         {
             typedef typename base_type::const_iterator iterator;
             iterator end = this->heap_list_.end();
             for (iterator it = this->heap_list_.begin(); it != end; ++it) 
             {
                 if ((*it)->did_alloc(p)) 
-                    return (*it)->get_gid(appl, id_range_, p);
+                    return (*it)->get_gid(appl, id_range_, p, gids_per_object);
             }
             return naming::invalid_id;
         }

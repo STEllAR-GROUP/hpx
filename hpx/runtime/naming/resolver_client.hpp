@@ -181,7 +181,8 @@ namespace hpx { namespace naming
         ///                   otherwise. Any error results in an exception 
         ///                   thrown from this function.
         bool bind_range(id_type const& lower_id, std::size_t count, 
-            address const& baseaddr, std::ptrdiff_t offset) const;
+            address const& baseaddr, std::ptrdiff_t offset,
+            std::size_t gids_per_object = 1) const;
 
         /// \brief Asynchronously bind unique range of global ids to given base 
         ///        address
@@ -218,7 +219,8 @@ namespace hpx { namespace naming
         ///                   fully executed only after f.get() has been called.
         util::unique_future<bool> 
             bind_range_async(id_type const& lower_id, std::size_t count, 
-                address const& baseaddr, std::ptrdiff_t offset);
+                address const& baseaddr, std::ptrdiff_t offset, 
+                std::size_t bits_per_object);
 
         /// \brief Unbind a global address
         ///
@@ -507,6 +509,9 @@ namespace hpx { namespace naming
     protected:
         static bool read_completed(boost::system::error_code const& err, 
             std::size_t bytes_transferred, boost::uint32_t size);
+        static bool write_completed(boost::system::error_code const& err, 
+            std::size_t bytes_transferred, boost::uint32_t size);
+
         void execute(server::request const& req, server::reply& rep) const;
 
     private:

@@ -62,6 +62,12 @@ namespace hpx { namespace components
         return "<Unknown>";
     }
 
+    ///
+    inline bool is_valid_component_type(int type)
+    {
+        return type > component_invalid && type < component_last;
+    }
+
 }}
 
 #endif

@@ -150,21 +150,31 @@ namespace hpx { namespace parcelset
         parcel_id put_parcel(parcel& p, Handler f)
         {
             // asynchronously resolve destination address, if needed
-            util::unique_future<std::pair<bool, naming::address> > fut;
             if (!p.get_destination_addr()) {
-                util::unique_future<std::pair<bool, naming::address> > fut = 
-                    resolver_.resolve_async(p.get_destination());
+//                 util::unique_future<std::pair<bool, naming::address> > fut = 
+//                     resolver_.resolve_async(p.get_destination());
+// 
+//                 // properly initialize parcel
+//                 init_parcel(p);
+// 
+//                 // wait for the address translation to complete
+//                 std::pair<bool, naming::address> result = fut.get();
+//                 if (!result.first) {
+//                     throw exception(unknown_component_address, 
+//                         "Unknown destination address");
+//                 }
+//                 p.set_destination_addr(result.second);
 
                 // properly initialize parcel
                 init_parcel(p);
 
-                // wait for the address translation to complete
-                std::pair<bool, naming::address> result = fut.get();
-                if (!result.first) {
+                // resolve the remote address
+                naming::address addr;
+                if (!resolver_.resolve(p.get_destination(), addr)) {
                     throw exception(unknown_component_address, 
                         "Unknown destination address");
                 }
-                p.set_destination_addr(result.second);
+                p.set_destination_addr(addr);
             }
             else {
                 // properly initialize parcel

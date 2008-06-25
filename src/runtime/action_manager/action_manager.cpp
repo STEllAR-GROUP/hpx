@@ -14,8 +14,8 @@
 namespace hpx { namespace action_manager
 {
     // Call-back function for parcelHandler to call when new parcels are received
-    void action_manager::fetch_new_parcel (parcelset::parcelhandler& parcel_handler_, 
-        naming::address const&)
+    void action_manager::fetch_new_parcel (
+        parcelset::parcelhandler& parcel_handler_, naming::address const& dest)
     {
         parcelset::parcel p;
         if (parcel_handler_.get_parcel(p))  // if new parcel is found

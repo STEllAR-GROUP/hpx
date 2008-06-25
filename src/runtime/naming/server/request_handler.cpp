@@ -58,7 +58,7 @@ namespace hpx { namespace naming { namespace server
                 }
                 else {
                     registry_.insert(registry_type::value_type(id, 
-                        registry_data_type(address(req.get_site()), 1, 0)));
+                        registry_data_type(address(req.get_site()), 1, 0, 1)));
                 }
 
                 // The real prefix has to be used as the 32 most 
@@ -142,7 +142,7 @@ namespace hpx { namespace naming { namespace server
                 }
                 else {
                     registry_.insert(registry_type::value_type(id, 
-                        registry_data_type(address(req.get_site()), 1, 0)));
+                        registry_data_type(address(req.get_site()), 1, 0, 1)));
                 }
 
                 // generate the new id range
@@ -188,6 +188,7 @@ namespace hpx { namespace naming { namespace server
                             // store the new address and offsets
                             at_c<0>((*it).second) = req.get_address();
                             at_c<2>((*it).second) = req.get_offset();
+                            at_c<3>((*it).second) = req.get_gids_per_object();
                         }
                     }
                     else if (it != registry_.begin()) {
@@ -290,7 +291,7 @@ namespace hpx { namespace naming { namespace server
                     --it;
                     if ((*it).first + at_c<1>((*it).second) > req.get_id()) {
                         // the previous range covers the given global id
-                        
+
                         // the only limitation while binding blocks of global 
                         // ids is that these have to have identical msb's
                         if (req.get_id().get_msb() != (*it).first.get_msb()) {
@@ -302,8 +303,10 @@ namespace hpx { namespace naming { namespace server
                             // calculate the local address corresponding to the 
                             // given global id
                             naming::address addr (at_c<0>((*it).second));
-                            addr.address_ += 
-                                (req.get_id().get_lsb() - (*it).first.get_lsb()) * at_c<2>((*it).second);
+                            boost::uint64_t gid_offset = 
+                                (req.get_id().get_lsb() - (*it).first.get_lsb()) / 
+                                    at_c<3>((*it).second);
+                            addr.address_ += gid_offset * at_c<2>((*it).second);
                             rep = reply(command_resolve, addr);
                         }
                     }
@@ -322,9 +325,10 @@ namespace hpx { namespace naming { namespace server
                 if ((*it).first + at_c<1>((*it).second) >= req.get_id()) {
                     // the previous range covers the id to resolve
                     naming::address addr (at_c<0>((*it).second));
-                    addr.address_ += 
-                        (req.get_id().get_lsb() - (*it).first.get_lsb()) * 
-                            at_c<2>((*it).second);
+                    boost::uint64_t gid_offset = 
+                        (req.get_id().get_lsb() - (*it).first.get_lsb()) / 
+                            at_c<3>((*it).second);
+                    addr.address_ += gid_offset * at_c<2>((*it).second);
                     rep = reply(command_resolve, addr);
                 }
                 else {

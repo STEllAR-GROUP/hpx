@@ -66,7 +66,7 @@ namespace hpx { namespace lcos
     /// full_empty memory locations are very useful for synchronization and 
     /// data delivery (especially in producer/consumer scenarios).
     ///
-    /// \tparam  T  The template parameter defines the type of the memory 
+    /// \tparam  <b>T</b>  The template a T parameter defines the type of the memory 
     ///             location to be guarded by an empty/full bit. It is possible 
     ///             to use any C++ data type with the empty/full mechanism.
     ///             If you want to use the full/empty synchronization facilities

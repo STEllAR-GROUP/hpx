@@ -242,7 +242,7 @@ namespace hpx { namespace components
     //  Specialized generic action types allowing to hold a different number of
     //  arguments
     ///////////////////////////////////////////////////////////////////////////
-    
+
     // zero argument version
     template <
         typename Component, typename Result, int Action, 

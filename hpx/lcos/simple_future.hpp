@@ -36,7 +36,7 @@ namespace hpx { namespace lcos { namespace detail
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
         // to associate this component with a given action.
-        enum { value = components::component_simple_future};
+        enum { value = components::component_simple_future };
 
         simple_future()
           : use_count_(0)
@@ -66,7 +66,7 @@ namespace hpx { namespace lcos { namespace detail
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
-        
+
         // trigger the future, set the result
         threadmanager::thread_state 
         set_result (threadmanager::px_thread_self& self, 

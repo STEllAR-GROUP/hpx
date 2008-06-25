@@ -84,8 +84,10 @@ namespace hpx { namespace naming { namespace server
 
         // bind_range
         request(dgas_server_command c, naming::id_type id, std::size_t count, 
-                address const& addr, std::ptrdiff_t offset) 
-          : command_(c), id_(id), count_(count), addr_(addr), offset_(offset)
+                address const& addr, std::ptrdiff_t offset, 
+                std::size_t gids_per_object) 
+          : command_(c), id_(id), count_(count), 
+            addr_(addr), offset_(offset), gids_per_object_(gids_per_object)
         {}
 
         // unbind_range
@@ -123,6 +125,11 @@ namespace hpx { namespace naming { namespace server
             return offset_;
         }
 
+        std::size_t const& get_gids_per_object() const
+        {
+            return gids_per_object_;
+        }
+
         std::string get_name() const
         {
             return ns_name_;
@@ -152,6 +159,7 @@ namespace hpx { namespace naming { namespace server
                 ar << addr_.type_;
                 ar << addr_.address_;
                 ar << offset_;
+                ar << gids_per_object_;
                 break;
 
             case command_unbind_range:
@@ -207,6 +215,7 @@ namespace hpx { namespace naming { namespace server
                 ar >> addr_.type_;
                 ar >> addr_.address_;
                 ar >> offset_;
+                ar >> gids_per_object_;
                 break;
 
             case command_unbind_range:
@@ -247,6 +256,7 @@ namespace hpx { namespace naming { namespace server
         naming::locality site_;     /// our address 
         naming::address addr_;      /// address to associate with this id (bind only)
         std::ptrdiff_t offset_;     /// offset between local addresses of a range (bind_range only)
+        std::size_t gids_per_object_;   /// number of global ids assigned to the same address (bind_range only)
         std::string ns_name_;       /// namespace name (queryid only)
     };
 

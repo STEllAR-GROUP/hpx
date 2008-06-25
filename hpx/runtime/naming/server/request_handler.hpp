@@ -45,8 +45,7 @@ namespace hpx { namespace naming { namespace server
         // collect statistics
         void add_timing(boost::uint8_t command, double elapsed)
         {
-            if ((std::size_t)command >= command_firstcommand && 
-                (std::size_t)command < command_lastcommand)
+            if (components::is_valid_component_type(command))
             {
 #if BOOST_VERSION >= 103600
                 totals_[command](elapsed);
@@ -71,6 +70,16 @@ namespace hpx { namespace naming { namespace server
         void handle_statistics_mean(request const& req, reply& rep);
         void handle_statistics_moment2(request const& req, reply& rep);
 
+    private:
+        // The registry_type is used to store the mapping from the global ids
+        // to a range of local addresses of the corresponding component 
+        // (defined by a base address, the count, the offset and the number
+        // of gids assigned to the same object).
+        typedef boost::fusion::vector<
+            naming::address, std::size_t, std::ptrdiff_t, std::size_t> 
+        registry_data_type;
+
+    protected:
         void create_new_binding(request const &req, error& s, std::string& str)
         {
             naming::id_type upper_bound;
@@ -80,9 +89,12 @@ namespace hpx { namespace naming { namespace server
                 str = "msb's of global ids of lower and upper range bound should match";
             }
             else {
-                registry_.insert(registry_type::value_type(req.get_id(), 
-                    registry_data_type(req.get_address(), 
-                        req.get_count(), req.get_offset())));
+                registry_.insert(
+                    registry_type::value_type(req.get_id(), 
+                        registry_data_type(req.get_address(), 
+                            req.get_count(), req.get_offset(), 
+                            req.get_gids_per_object()
+                        )));
                 s = success;    // created new entry
             }
         }
@@ -91,13 +103,6 @@ namespace hpx { namespace naming { namespace server
         // The ns_registry_type is used to store the mappings from the 
         // global names (strings) to global ids.
         typedef std::map<std::string, naming::id_type> ns_registry_type;
-
-        // The registry_type is used to store the mapping from the global ids
-        // to a range of local addresses of the corresponding component 
-        // (defined by a base address, the count and the offset).
-        typedef boost::fusion::vector<
-            naming::address, std::size_t, std::ptrdiff_t> 
-        registry_data_type;
         typedef std::map<naming::id_type, registry_data_type> registry_type;
 
         // The site_prefix_map_type is used to store the assigned prefix and 

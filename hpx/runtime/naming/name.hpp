@@ -66,6 +66,11 @@ namespace hpx { namespace naming
             return id_type(msb, lsb);
         }
 
+        friend id_type operator& (id_type const& lhs, boost::uint64_t rhs)
+        {
+            return id_type(lhs.id_msb_, lhs.id_lsb_ & rhs);
+        }
+
         // comparison is required as well
         friend bool operator== (id_type const& lhs, id_type const& rhs)
         {

@@ -29,6 +29,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/container_device.hpp>
 #include <hpx/util/asio_util.hpp>
+#include <hpx/util/find_msb.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming 
@@ -152,12 +153,17 @@ namespace hpx { namespace naming
         upper_bound = rep.get_upper_bound();
         return s == success;
     }
-    
+
     bool resolver_client::bind_range(id_type const& id, std::size_t count, 
-        address const& addr, std::ptrdiff_t offset) const
+        address const& addr, std::ptrdiff_t offset,
+        std::size_t gids_per_object) const
     {
+        // make sure gids_per_object is dividable by 2
+        BOOST_ASSERT(gids_per_object == util::find_msb_value(gids_per_object));
+
         // send request
-        server::request req (server::command_bind_range, id, count, addr, offset);
+        server::request req (server::command_bind_range, id, count, addr, 
+            offset, gids_per_object);
         server::reply rep;
         execute(req, rep);
 
@@ -298,6 +304,12 @@ namespace hpx { namespace naming
         return bytes_transferred >= size;
     }
 
+    bool resolver_client::write_completed(boost::system::error_code const& err, 
+        std::size_t bytes_transferred, boost::uint32_t size)
+    {
+        return bytes_transferred >= size;
+    }
+
     void resolver_client::execute(server::request const &req, 
         server::reply& rep) const
     {
@@ -313,23 +325,36 @@ namespace hpx { namespace naming
                 archive << req;
             }
 
+            boost::system::error_code err = boost::asio::error::fault;
+
             // send the data
-            boost::integer::little32_t size = (boost::uint32_t)buffer.size();
+            boost::integer::ulittle32_t size = buffer.size();
             std::vector<boost::asio::const_buffer> buffers;
             buffers.push_back(boost::asio::buffer(&size, sizeof(size)));
             buffers.push_back(boost::asio::buffer(buffer));
-            if (buffer.size() + sizeof(size) != boost::asio::write(socket_, buffers))
-            {
+            std::size_t written_bytes = boost::asio::write(socket_, buffers,
+                boost::bind(&resolver_client::write_completed, _1, _2, 
+                    buffer.size() + sizeof(size)),
+                err);
+            if (err) {
+                boost::throw_exception(
+                    hpx::exception(network_error, err.message()));
+            }
+            if (buffer.size() + sizeof(size) != written_bytes) {
                 boost::throw_exception(
                     hpx::exception(network_error, "network write failed"));
             }
 
             // wait for response
-            boost::system::error_code err = boost::asio::error::fault;
-
             // first read the size of the message 
             std::size_t reply_length = boost::asio::read(socket_,
-                boost::asio::buffer(&size, sizeof(size)));
+                boost::asio::buffer(&size, sizeof(size)),
+                boost::bind(&resolver_client::read_completed, _1, _2, sizeof(size)),
+                err);
+            if (err) {
+                boost::throw_exception(
+                    hpx::exception(network_error, err.message()));
+            }
             if (reply_length != sizeof(size)) {
                 boost::throw_exception(
                     hpx::exception(network_error, "network read failed"));
@@ -374,13 +399,17 @@ namespace hpx { namespace naming
     // asynchronous API
     util::unique_future<bool> 
     resolver_client::bind_range_async(id_type const& lower_id, std::size_t count, 
-        address const& addr, std::ptrdiff_t offset)
+        address const& addr, std::ptrdiff_t offset, std::size_t gids_per_object)
     {
         typedef resolver_client_connection<bool> connection_type;
 
+        // make sure gids_per_object is dividable by 2
+        BOOST_ASSERT(gids_per_object == util::find_msb_value(gids_per_object));
+
         // prepare request
         connection_type* conn = new connection_type(socket_, 
-            server::command_bind_range, lower_id, count, addr, offset);
+            server::command_bind_range, lower_id, count, addr, offset, 
+            gids_per_object);
         boost::shared_ptr<connection_type> client_conn(conn);
 
         conn->execute();

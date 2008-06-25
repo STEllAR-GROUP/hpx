@@ -18,6 +18,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
+#include <hpx/util/find_msb.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace detail 
@@ -42,7 +43,8 @@ namespace hpx { namespace components { namespace detail
     public:
         explicit wrapper_heap(char const* class_name, bool, bool, int step = -1)
           : pool_(NULL), first_free_(NULL), step_(step), size_(0), free_size_(0),
-            base_gid_(naming::invalid_id), get_dgas_client_(NULL)
+            base_gid_(naming::invalid_id), get_dgas_client_(NULL), 
+            gids_per_object_(1)
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
           , class_name_(class_name)
 #endif
@@ -59,7 +61,8 @@ namespace hpx { namespace components { namespace detail
         wrapper_heap()
           : pool_(NULL), first_free_(NULL), 
             step_(heap_step), size_(0), free_size_(0),
-            base_gid_(naming::invalid_id), get_dgas_client_(NULL)
+            base_gid_(naming::invalid_id), get_dgas_client_(NULL), 
+            gids_per_object_(1)
         {
             BOOST_ASSERT(sizeof(storage_type) == heap_size);
         }
@@ -128,28 +131,39 @@ namespace hpx { namespace components { namespace detail
         /// \note  The pointer given by the parameter \a p must have been 
         ///        allocated by this instance of a \a wrapper_heap
         naming::id_type 
-        get_gid(applier::applier& appl, util::unique_ids& ids, void* p) 
+        get_gid(applier::applier& appl, util::unique_ids& ids, void* p,
+            std::size_t gids_per_object) 
         {
             BOOST_ASSERT(did_alloc(p));
 
             value_type* addr = static_cast<value_type*>(pool_->address());
-            if (base_gid_)
-                return base_gid_ + (static_cast<value_type*>(p) - addr);
+            if (!base_gid_) {
+                // store a pointer to the DGAS client
+                get_dgas_client_ = &appl.get_dgas_client();
 
-            // this is the first call to get_gid() for this heap - allocate 
-            // a sufficiently large range of global ids
-            base_gid_ = ids.get_id(appl.here(), appl.get_dgas_client(), step_);
-            get_dgas_client_ = &appl.get_dgas_client();
+                // make sure gids_per_object is dividable by 2
+                gids_per_object_ = util::find_msb_value(gids_per_object);
 
-            // register the global ids and the base address of this heap
-            // with the DGAS
-            if (!appl.get_dgas_client().bind_range(base_gid_, step_, 
-                  naming::address(appl.here(), value_type::get_type(), addr),
-                  sizeof(value_type))) 
-            {
-                return naming::invalid_id;
+                // this is the first call to get_gid() for this heap - allocate 
+                // a sufficiently large range of global ids
+                base_gid_ = ids.get_id(appl.here(), *get_dgas_client_, 
+                    step_*gids_per_object + gids_per_object-1);
+
+                // the base gid needs to be properly 'aligned', i.e. the last 
+                // bits need to be zero depending on the number of gids/object
+                // requested
+                base_gid_ = base_gid_ & ~(gids_per_object_-1);
+
+                // register the global ids and the base address of this heap
+                // with the DGAS
+                if (!appl.get_dgas_client().bind_range(base_gid_, step_, 
+                      naming::address(appl.here(), value_type::get_type(), addr),
+                      sizeof(value_type))) 
+                {
+                    return naming::invalid_id;
+                }
             }
-            return base_gid_ + (static_cast<value_type*>(p) - addr);
+            return base_gid_ + ((static_cast<value_type*>(p) - addr) * gids_per_object_);
         }
 
     protected:
@@ -216,7 +230,8 @@ namespace hpx { namespace components { namespace detail
         // wrapper heap
         naming::id_type base_gid_;
         naming::resolver_client const* get_dgas_client_;
-
+        std::size_t gids_per_object_;
+        
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
         std::string class_name_;
 #endif

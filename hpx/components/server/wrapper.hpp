@@ -158,9 +158,11 @@ namespace hpx { namespace components
 
     public:
         ///
-        naming::id_type get_gid(applier::applier& appl) const
+        naming::id_type 
+        get_gid(applier::applier& appl, std::size_t gids_per_object = 1) const
         {
-            return get_heap().get_gid(appl, const_cast<wrapper*>(this));
+            return get_heap().get_gid(
+                appl, const_cast<wrapper*>(this), gids_per_object);
         }
 
         ///////////////////////////////////////////////////////////////////////
