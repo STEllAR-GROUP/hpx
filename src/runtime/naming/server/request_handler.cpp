@@ -44,7 +44,7 @@ namespace hpx { namespace naming { namespace server
                 // insert this prefix as being mapped to the given locality
                 boost::uint32_t prefix = site_prefixes_.size() + 1;
                 naming::id_type id = get_id_from_prefix(prefix);
-                naming::id_type lower_id(get_runtime_support_id(id));
+                naming::id_type lower_id(get_runtime_support_gid(id));
                 site_prefixes_.insert(
                     site_prefix_map_type::value_type(req.get_site(), 
                         std::make_pair(prefix, lower_id)));
@@ -129,7 +129,7 @@ namespace hpx { namespace naming { namespace server
                 // insert this prefix as being mapped to the given locality
                 boost::uint32_t prefix = (boost::uint32_t)site_prefixes_.size() + 1;
                 naming::id_type id = get_id_from_prefix(prefix);
-                naming::id_type lower_id (get_runtime_support_id(id));
+                naming::id_type lower_id (get_runtime_support_gid(id));
                 std::pair<site_prefix_map_type::iterator, bool> p =
                     site_prefixes_.insert(
                         site_prefix_map_type::value_type(req.get_site(), 

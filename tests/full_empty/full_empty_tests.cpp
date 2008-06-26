@@ -77,7 +77,7 @@ threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self,
 
     // initiate shutdown of the runtime system
     components::stubs::runtime_support::shutdown_all(appl,
-        naming::get_runtime_support_id(appl.get_prefix()));
+        naming::get_runtime_support_gid(appl.get_prefix()));
 
     return threadmanager::terminated;
 }

@@ -19,6 +19,8 @@
 
 namespace hpx { namespace applier
 {
+    /// \class applier applier.hpp hpx/runtime/applier/applier.hpp
+    ///
     /// The \a applier class is used to decide whether a particular action
     /// has to be issued on a local or a remote resource. If the target 
     /// component is local a new \a px_thread will be created, if the target is
@@ -195,6 +197,9 @@ namespace hpx { namespace applier
 
         /// \brief Allow access to the DGAS client instance used with this
         ///        \a applier.
+        ///
+        /// This accessor returns a reference to the resolver client this 
+        /// applier instance has been created with.
         naming::resolver_client const& get_dgas_client() const
         {
             return dgas_client_;
@@ -202,6 +207,9 @@ namespace hpx { namespace applier
 
         /// \brief Access the \a parcelhandler instance associated with this 
         ///        \a applier
+        ///
+        /// This accessor returns a reference to the parcel handler this 
+        /// applier instance has been created with.
         parcelset::parcelhandler& get_parcel_handler() 
         {
             return parcel_handler_;
@@ -209,6 +217,9 @@ namespace hpx { namespace applier
 
         /// \brief Access the \a threadmanager instance associated with this 
         ///        \a applier
+        ///
+        /// This accessor returns a reference to the thread manager this 
+        /// applier instance has been created with.
         threadmanager::threadmanager& get_thread_manager() 
         {
             return thread_manager_;
@@ -238,13 +249,6 @@ namespace hpx { namespace applier
         bool 
         address_is_local(naming::id_type const& gid, naming::address& addr) const
         {
-//             // test if local memory is addressed
-//             if (naming::is_local_memory(gid, parcel_handler_.get_prefix())) 
-//             {
-//                 addr.address_ = gid.get_lsb();
-//                 return true;
-//             }
-
             // Resolve the address of the gid
             if (!dgas_client_.resolve(gid, addr))
             {

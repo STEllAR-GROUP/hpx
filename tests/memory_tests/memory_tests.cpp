@@ -16,7 +16,7 @@ threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self,
 {
     // try to access some memory directly
     boost::uint32_t value = 0;
-    naming::id_type value_gid (naming::get_memory_id(appl.get_prefix()));
+    naming::id_type value_gid (naming::get_memory_gid(appl.get_prefix()));
 
     appl.apply<components::server::memory::store32_action>(value_gid, 
         boost::uint64_t(&value), 1);
@@ -24,7 +24,7 @@ threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self,
 
     // initiate shutdown of the runtime system
     components::stubs::runtime_support::shutdown_all(appl, 
-        naming::get_runtime_support_id(appl.get_prefix()));
+        naming::get_runtime_support_gid(appl.get_prefix()));
 
     return threadmanager::terminated;
 }

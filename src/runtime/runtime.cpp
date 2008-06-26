@@ -84,16 +84,15 @@ namespace hpx
         parcel_port_.run(false);      // starts parcel_pool_ as well
 
         // register the runtime_support and memory instances with the DGAS 
-        naming::id_type factoryid (parcel_handler_.get_prefix().get_msb()+1, 0);
-        dgas_client_.bind(factoryid, 
+        dgas_client_.bind(
+            naming::get_runtime_support_gid(parcel_handler_.get_prefix()), 
             naming::address(parcel_port_.here(), 
-                components::server::runtime_support::value, 
-                &runtime_support_));
+                components::server::runtime_support::value, &runtime_support_));
 
-        dgas_client_.bind_range(parcel_handler_.get_prefix(), 1, 
+        dgas_client_.bind(
+            naming::get_memory_gid(parcel_handler_.get_prefix()), 
             naming::address(parcel_port_.here(), 
-                components::server::runtime_support::value, 
-                &memory_), 0);
+                components::server::memory::value, &memory_));
 
         // register the given main function with the thread manager
         if (!func.empty())
