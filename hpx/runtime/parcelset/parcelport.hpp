@@ -105,19 +105,19 @@ namespace hpx { namespace parcelset
             return p.get_parcel_id();
         }
 
-        /// The get_parcel command returns a parcel, or if the parcel set is 
-        /// empty then false is returned. 
-        ///
-        /// \param p        [out] The parcel instance to be filled with the 
-        ///                 received parcel. If the functioned returns \a true 
-        ///                 this will be the next received parcel.
-        ///
-        /// \returns        \a true if the next parcel has been retrieved 
-        ///                 successfully. 
-        ///                 \a false if no parcel is available in the parcelport
-        ///
-        /// The returned parcel will be no longer available from the parcelport
-        /// as it is removed from the internal queue of received parcels.
+        // The get_parcel command returns a parcel, or if the parcel set is 
+        // empty then false is returned. 
+        //
+        // \param p        [out] The parcel instance to be filled with the 
+        //                 received parcel. If the functioned returns \a true 
+        //                 this will be the next received parcel.
+        //
+        // \returns        \a true if the next parcel has been retrieved 
+        //                 successfully. 
+        //                 \a false if no parcel is available in the parcelport
+        //
+        // The returned parcel will be no longer available from the parcelport
+        // as it is removed from the internal queue of received parcels.
 //         bool get_parcel(parcel& p)
 //         {
 //             return parcels_.get_parcel(p);

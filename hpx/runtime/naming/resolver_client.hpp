@@ -81,7 +81,7 @@ namespace hpx { namespace naming
         ///                   if this locality already got a prefix assigned in 
         ///                   an earlier call. Any error results in an exception 
         ///                   thrown from this function.
-        bool get_prefix(locality const& l, id_type& prefix) const;
+        bool get_prefix(locality const& l, id_type& prefix);
 
         /// \brief Query for the prefixes of all known localities.
         ///
@@ -175,6 +175,11 @@ namespace hpx { namespace naming
         ///                   remaining global ids.
         /// \param offset     [in] The offset to use to calculate the local
         ///                   addresses to be bound to the range of global ids.
+        /// \param gids_per_object
+        ///                   [in] The number of gid's to assign to each local
+        ///                   of the addresses. This number must be either 
+        ///                   equal to 1 or dividable by 2. This parameter is 
+        ///                   optional and defaults to 1 (one).
         ///
         /// \returns          This function returns \a true if the given range 
         ///                   has been successfully bound and returns \a false 
@@ -203,6 +208,11 @@ namespace hpx { namespace naming
         ///                   remaining global ids.
         /// \param offset     [in] The offset to use to calculate the local
         ///                   addresses to be bound to the range of global ids.
+        /// \param gids_per_object
+        ///                   [in] The number of gid's to assign to each local
+        ///                   of the addresses. This number must be either 
+        ///                   equal to 1 or dividable by 2. This parameter is 
+        ///                   optional and defaults to 1 (one).
         ///
         /// \returns          This function returns a future object allowing to
         ///                   defer the evaluation of the outcome of the 
@@ -220,7 +230,7 @@ namespace hpx { namespace naming
         util::unique_future<bool> 
             bind_range_async(id_type const& lower_id, std::size_t count, 
                 address const& baseaddr, std::ptrdiff_t offset, 
-                std::size_t bits_per_object);
+                std::size_t bits_per_object = 1);
 
         /// \brief Unbind a global address
         ///
@@ -414,6 +424,14 @@ namespace hpx { namespace naming
         util::unique_future<std::pair<bool, address> >
             resolve_async(id_type const& id);
 
+        ///
+        ///
+        bool is_local(naming::id_type const& gid) const
+        {
+            BOOST_ASSERT(prefix_);      // must be cached already
+            return gid.get_msb() == prefix_.get_msb();
+        }
+
         /// \brief Register a global name with a global address (id)
         /// 
         /// This function registers an association between a global name 
@@ -516,6 +534,7 @@ namespace hpx { namespace naming
 
     private:
         locality there_;
+        naming::id_type prefix_;      ///< The site prefix of the locality 
         util::io_service_pool& io_service_pool_;
         mutable boost::asio::ip::tcp::socket socket_;
     };

@@ -45,11 +45,24 @@ namespace hpx { namespace components
     struct get_lva<server::runtime_support>
     {
         // for server::runtime_support the provided lva is directly usable
-        // as the require d local address
+        // as the required local address
         static server::runtime_support* 
         call(naming::address::address_type lva)
         {
             return reinterpret_cast<server::runtime_support*>(lva);
+        }
+    };
+
+    // specialization for server::memory
+    template <>
+    struct get_lva<server::memory>
+    {
+        // for server::memory the provided lva is directly usable as the 
+        // required local address
+        static server::memory* 
+        call(naming::address::address_type lva)
+        {
+            return reinterpret_cast<server::memory*>(lva);
         }
     };
 

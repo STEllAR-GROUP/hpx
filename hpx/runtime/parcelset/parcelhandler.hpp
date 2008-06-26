@@ -23,9 +23,11 @@
 
 namespace hpx { namespace parcelset
 {
-    /// The parcelhandler is the representation of the parcelset inside a 
+    /// \class parcelhandler parcelhandler.hpp hpx/runtime/parcelset/parcelhandler.hpp
+    ///
+    /// The \a parcelhandler is the representation of the parcelset inside a 
     /// locality. It is built on top of a single parcelport. Several 
-    /// parcelhandler's may be connected to a parcelport
+    /// parcelhandler's may be connected to a single parcelport.
     class parcelhandler : boost::noncopyable
     {
     private:
@@ -56,9 +58,17 @@ namespace hpx { namespace parcelset
         }
         
     public:
+        /// Construct a new \a parcelhandler initializing it from a DGAS client
+        /// instance (parameter \a resolver) and the parcelport to be used for
+        /// parcel send and receive (parameter \a pp).
+        ///
         /// \param resolver [in] A reference to the DGAS client to use for 
         ///                 address translation requests to be made by the 
         ///                 parcelhandler.
+        /// \param pp       [in] A reference to the \a parcelport this \a
+        ///                 parcelhandler is connected to. This \a parcelport 
+        ///                 instance will be used for any parcel related 
+        ///                 transport operations the parcelhandler carries out.
         parcelhandler(naming::resolver_client& resolver, parcelport& pp) 
           : resolver_(resolver), pp_(pp), parcels_(This()),
             startup_time_(util::high_resolution_timer::now()), timer_()
@@ -73,27 +83,29 @@ namespace hpx { namespace parcelset
         ~parcelhandler() 
         {
         }
-        
-        /// Allow access to DGAS resolver instance. 
+
+        /// \brief Allow access to DGAS resolver instance. 
         ///
-        /// This accessor returns a reference to the DGAS resolver client object
-        /// the parcelhandler has been initialized with (see parcelhandler 
-        /// constructors).
+        /// This accessor returns a reference to the DGAS resolver client 
+        /// object the parcelhandler has been initialized with (see 
+        /// parcelhandler constructors). This is the same resolver instance 
+        /// this parcelhandler has been initialized with.
         naming::resolver_client& get_resolver()
         {
             return resolver_;
         }
-        
+
         /// Allow access to parcelport instance. 
         ///
         /// This accessor returns a reference to the parcelport object
         /// the parcelhandler has been initialized with (see parcelhandler 
-        /// constructors).
+        /// constructors). This is the same \a parcelport instance this 
+        /// parcelhandler has been initialized with.
         parcelport& get_parcelport()
         {
             return pp_;
         }
-        
+
         /// Return the prefix of this locality
         ///
         /// This accessor allows to retrieve the prefix value being assigned to 
@@ -115,7 +127,9 @@ namespace hpx { namespace parcelset
         /// A parcel is submitted for transport at the source locality site to 
         /// the parcel set of the locality with the put-parcel command
         ///
-        /// \note The function sync_put_parcel() is synchronous.
+        /// \note The function \a sync_put_parcel() is synchronous, it blocks 
+        ///       until the parcel has been sent by the underlying \a 
+        ///       parcelport.
         ///
         /// \param p        [in, out] A reference to the parcel to send. The 
         ///                 function does not return before the parcel has been
@@ -127,7 +141,7 @@ namespace hpx { namespace parcelset
         /// A parcel is submitted for transport at the source locality site to 
         /// the parcel set of the locality with the put-parcel command
         //
-        /// \note The function put_parcel() is asynchronous, the provided 
+        /// \note The function \a put_parcel() is asynchronous, the provided 
         /// function or function object gets invoked on completion of the send 
         /// operation or on any error.
         ///
@@ -189,6 +203,8 @@ namespace hpx { namespace parcelset
         /// This put_parcel() function overload is asynchronous, but no 
         /// callback functor is provided by the user. 
         ///
+        /// \note   The function \a put_parcel() is asynchronous.
+        ///
         /// \param p        [in, out] A reference to the parcel to send. The 
         ///                 parcel \a p will be modified in place, as it will 
         ///                 get set the resolved destination address and parcel 
@@ -198,19 +214,22 @@ namespace hpx { namespace parcelset
             return put_parcel(p, &parcelhandler::default_write_handler);
         }
 
-        /// The get_parcel command returns a parcel, or if the parcel set is 
-        /// empty then false is returned. 
+        /// The function \a get_parcel returns the next available parcel
         ///
         /// \param p        [out] The parcel instance to be filled with the 
         ///                 received parcel. If the functioned returns \a true 
         ///                 this will be the next received parcel.
         ///
-        /// \returns        \a true if the next parcel has been retrieved 
-        ///                 successfully. 
-        ///                 \a false if no parcel is available in the parcelhandler
+        /// \returns        Returns \a true if the next parcel has been 
+        ///                 retrieved successfully. The reference given by 
+        ///                 parameter \a p will be initialized with the 
+        ///                 received parcel data.
+        ///                 Return \a false if no parcel is available in the 
+        ///                 parcelhandler, the reference \a p is not touched.
         ///
-        /// The returned parcel will be no longer available from the parcelhandler
-        /// as it is removed from the internal queue of received parcels.
+        /// The returned parcel will be no longer available from the 
+        /// parcelhandler as it is removed from the internal queue of received 
+        /// parcels.
         bool get_parcel(parcel& p)
         {
             return parcels_.get_parcel(p);
@@ -237,8 +256,9 @@ namespace hpx { namespace parcelset
         ///                 \a false if no corresponding parcel is available in 
         ///                 the parcelhandler
         ///
-        /// The returned parcel will be no longer available from the parcelhandler
-        /// as it is removed from the internal queue of received parcels.
+        /// The returned parcel will be no longer available from the 
+        /// parcelhandler as it is removed from the internal queue of received 
+        /// parcels.
         bool get_parcel(components::component_type c, parcel& p)
         {
             return parcels_.get_parcel(c, p);
@@ -260,8 +280,9 @@ namespace hpx { namespace parcelset
         ///                 \a false if no corresponding parcel is available in 
         ///                 the parcelhandler
         ///
-        /// The returned parcel will be no longer available from the parcelhandler
-        /// as it is removed from the internal queue of received parcels.
+        /// The returned parcel will be no longer available from the 
+        /// parcelhandler as it is removed from the internal queue of received 
+        /// parcels.
         bool get_parcel(parcel_id tag, parcel& p)
         {
             return parcels_.get_parcel(tag, p);
@@ -283,8 +304,9 @@ namespace hpx { namespace parcelset
         ///                 \a false if no corresponding parcel is available in 
         ///                 the parcelhandler
         ///
-        /// The returned parcel will be no longer available from the parcelhandler
-        /// as it is removed from the internal queue of received parcels.
+        /// The returned parcel will be no longer available from the 
+        /// parcelhandler as it is removed from the internal queue of received 
+        /// parcels.
         bool get_parcel_from(naming::id_type source, parcel& p)
         {
             return parcels_.get_parcel_from(source, p);
@@ -306,8 +328,9 @@ namespace hpx { namespace parcelset
         ///                 \a false if no corresponding parcel is available in 
         ///                 the parcelhandler
         ///
-        /// The returned parcel will be no longer available from the parcelhandler
-        /// as it is removed from the internal queue of received parcels.
+        /// The returned parcel will be no longer available from the 
+        /// parcelhandler as it is removed from the internal queue of received 
+        /// parcels.
         bool get_parcel_for(naming::id_type dest, parcel& p)
         {
             return parcels_.get_parcel_for(dest, p);

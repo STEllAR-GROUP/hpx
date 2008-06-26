@@ -30,7 +30,7 @@
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    parcelset::parcel_id apply (naming::id_type gid, 
+    bool apply (naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         // Determine whether the gid is local or remote
@@ -44,7 +44,7 @@
                 Action::construct_thread_function(*this, addr.address_, 
                     BOOST_PP_ENUM_PARAMS(N, arg))
             );
-            return parcelset::no_parcel_id;     // no parcel has been sent
+            return true;     // no parcel has been sent (dest is local)
         }
 
         // If remote, create a new parcel to be sent to the destination
@@ -53,13 +53,15 @@
         p.set_destination_addr(addr);   // avoid to resolve address again
 
         // Send the parcel through the parcel handler
-        return parcel_handler_.put_parcel(p);
+        parcel_handler_.put_parcel(p);
+        return false;     // destination is remote
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    parcelset::parcel_id apply (components::continuation* c,
-        naming::id_type gid, BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+    bool apply (components::continuation* c,
+        naming::id_type const& gid, 
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         // package continuation into a shared_ptr
         components::continuation_type cont(c);
@@ -75,7 +77,7 @@
                 Action::construct_thread_function(cont, *this, addr.address_, 
                     BOOST_PP_ENUM_PARAMS(N, arg))
             );
-            return parcelset::no_parcel_id;     // no parcel has been sent
+            return true;     // no parcel has been sent (dest is local)
         }
 
         // If remote, create a new parcel to be sent to the destination
@@ -84,7 +86,8 @@
         p.set_destination_addr(addr);   // avoid to resolve address again
 
         // Send the parcel through the parcel handler
-        return parcel_handler_.put_parcel(p);
+        parcel_handler_.put_parcel(p);
+        return false;     // destination is remote
     }
 
 #undef N

@@ -103,8 +103,14 @@ namespace hpx { namespace naming
 
     ///////////////////////////////////////////////////////////////////////////
     // synchronous functionality
-    bool resolver_client::get_prefix(locality const& l, id_type& prefix) const
+    bool resolver_client::get_prefix(locality const& l, id_type& prefix) 
     {
+        // prefix might be cached already
+        if (prefix_) {
+            prefix = prefix_;
+            return true;
+        }
+
         // send request
         server::request req (server::command_getprefix, l);
         server::reply rep;
@@ -114,7 +120,7 @@ namespace hpx { namespace naming
         if (s != success && s != repeated_request)
             boost::throw_exception(hpx::exception((error)s, rep.get_error()));
 
-        prefix = rep.get_prefix();
+        prefix_ = prefix = rep.get_prefix();
         return s == success;
     }
 

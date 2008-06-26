@@ -156,6 +156,7 @@ namespace hpx { namespace threadmanager { namespace detail
 namespace hpx { namespace threadmanager 
 {
     ///////////////////////////////////////////////////////////////////////////
+    /// \class px_thread px_thread.hpp hpx/runtime/threadmanager/px_thread.hpp
     class px_thread : public components::wrapper<detail::px_thread, px_thread>
     {
     private:

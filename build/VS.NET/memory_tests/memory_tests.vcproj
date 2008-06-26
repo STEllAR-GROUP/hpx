@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="hpx_runtime"
-	ProjectGUID="{7A1A51F1-6629-41DB-94AD-E7420EE0F894}"
-	RootNamespace="hpx_runtime"
+	Name="memory_tests"
+	ProjectGUID="{D17E0022-4BBF-4BEF-BD90-373F2E717D2C}"
+	RootNamespace="memory_tests"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -177,16 +177,8 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\runtime\hpx_runtime.cpp"
+				RelativePath="..\..\..\tests\memory_tests\memory_tests.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AssemblerOutput="0"
-					/>
-				</FileConfiguration>
 			</File>
 		</Filter>
 	</Files>

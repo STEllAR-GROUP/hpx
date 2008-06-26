@@ -44,12 +44,13 @@ namespace hpx { namespace naming { namespace server
                 // insert this prefix as being mapped to the given locality
                 boost::uint32_t prefix = site_prefixes_.size() + 1;
                 naming::id_type id = get_id_from_prefix(prefix);
+                naming::id_type lower_id(id.get_msb() + 1, 0);
                 site_prefixes_.insert(
                     site_prefix_map_type::value_type(req.get_site(), 
-                        std::make_pair(prefix, id)));
+                        std::make_pair(prefix, lower_id)));
 
                 // now, bind this prefix to the locality address allowing to 
-                // send parcels to a locality
+                // send parcels to the memory of a locality
                 registry_type::iterator it = registry_.find(id);
                 if (it != registry_.end()) {
                     // this shouldn't happen
@@ -57,8 +58,9 @@ namespace hpx { namespace naming { namespace server
                         "prefix is already bound to local address");
                 }
                 else {
+                    // the zero as last parameter means 'all' lsb gids
                     registry_.insert(registry_type::value_type(id, 
-                        registry_data_type(address(req.get_site()), 1, 0, 1)));
+                        registry_data_type(address(req.get_site()), 1, 0, 0)));
                 }
 
                 // The real prefix has to be used as the 32 most 
@@ -127,13 +129,14 @@ namespace hpx { namespace naming { namespace server
                 // insert this prefix as being mapped to the given locality
                 boost::uint32_t prefix = (boost::uint32_t)site_prefixes_.size() + 1;
                 naming::id_type id = get_id_from_prefix(prefix);
+                naming::id_type lower_id (id.get_msb() + 1, 0);
                 std::pair<site_prefix_map_type::iterator, bool> p =
                     site_prefixes_.insert(
                         site_prefix_map_type::value_type(req.get_site(), 
-                            std::make_pair(prefix, id)));
+                            std::make_pair(prefix, lower_id)));
 
                 // now, bind this prefix to the locality address allowing to 
-                // send parcels to a locality
+                // send parcels to the memory of a locality
                 registry_type::iterator it = registry_.find(id);
                 if (it != registry_.end()) {
                     // this shouldn't happen
@@ -141,12 +144,13 @@ namespace hpx { namespace naming { namespace server
                         "prefix is already bound to local address");
                 }
                 else {
+                    // the zero as last parameter means 'all' lsb gids
                     registry_.insert(registry_type::value_type(id, 
-                        registry_data_type(address(req.get_site()), 1, 0, 1)));
+                        registry_data_type(address(req.get_site()), 1, 0, 0)));
                 }
 
                 // generate the new id range
-                naming::id_type lower = id + 1;
+                naming::id_type lower = lower_id + 1;
                 naming::id_type upper = lower + (req.get_count() - 1);
                 
                 // store the new lower bound
@@ -179,10 +183,13 @@ namespace hpx { namespace naming { namespace server
                 if (it != registry_.end()) {
                     if ((*it).first == req.get_id()) {
                         // update existing bindings
-                        if (at_c<1>((*it).second) != req.get_count()) {
+                        if (at_c<1>((*it).second) != req.get_count() ||
+                            at_c<3>((*it).second) != req.get_gids_per_object()) 
+                        {
                             // this is an error since we can't change block sizes 
                             s = bad_parameter;
-                            str = "can't change block size of existing binding";
+                            str = "can't change block size or number of gids per "
+                                  "object of existing binding";
                         }
                         else {
                             // store the new address and offsets
@@ -303,9 +310,15 @@ namespace hpx { namespace naming { namespace server
                             // calculate the local address corresponding to the 
                             // given global id
                             naming::address addr (at_c<0>((*it).second));
-                            boost::uint64_t gid_offset = 
-                                (req.get_id().get_lsb() - (*it).first.get_lsb()) / 
-                                    at_c<3>((*it).second);
+                            boost::uint64_t gid_offset = 0;
+                            if (0 != at_c<3>((*it).second)) {
+                                // this 'if' handles a special case to cover 
+                                // the memory component, which allocates a full 
+                                // range of gids (gids_per_object is 0)
+                                gid_offset = 
+                                    (req.get_id().get_lsb() - (*it).first.get_lsb()) / 
+                                        at_c<3>((*it).second);
+                            }
                             addr.address_ += gid_offset * at_c<2>((*it).second);
                             rep = reply(command_resolve, addr);
                         }
@@ -325,9 +338,15 @@ namespace hpx { namespace naming { namespace server
                 if ((*it).first + at_c<1>((*it).second) >= req.get_id()) {
                     // the previous range covers the id to resolve
                     naming::address addr (at_c<0>((*it).second));
-                    boost::uint64_t gid_offset = 
-                        (req.get_id().get_lsb() - (*it).first.get_lsb()) / 
-                            at_c<3>((*it).second);
+                    boost::uint64_t gid_offset = 0;
+                    if (0 != at_c<3>((*it).second)) {
+                        // this 'if' handles a special case to cover 
+                        // the memory component, which allocates a full 
+                        // range of gids (gids_per_object is 0)
+                        gid_offset = 
+                            (req.get_id().get_lsb() - (*it).first.get_lsb()) / 
+                                at_c<3>((*it).second);
+                    }
                     addr.address_ += gid_offset * at_c<2>((*it).second);
                     rep = reply(command_resolve, addr);
                 }

@@ -83,11 +83,17 @@ namespace hpx
         thread_manager_.run();        // start the thread manager
         parcel_port_.run(false);      // starts parcel_pool_ as well
 
-        // register the runtime_support with the DGAS 
-        dgas_client_.bind(parcel_handler_.get_prefix(), 
+        // register the runtime_support and memory instances with the DGAS 
+        naming::id_type factoryid (parcel_handler_.get_prefix().get_msb()+1, 0);
+        dgas_client_.bind(factoryid, 
             naming::address(parcel_port_.here(), 
                 components::server::runtime_support::value, 
                 &runtime_support_));
+
+        dgas_client_.bind_range(parcel_handler_.get_prefix(), 1, 
+            naming::address(parcel_port_.here(), 
+                components::server::runtime_support::value, 
+                &memory_), 0, 0);   // the zero as last parameter means 'all'
 
         // register the given main function with the thread manager
         if (!func.empty())
@@ -151,7 +157,9 @@ namespace hpx
     void runtime::stop(bool blocking)
     {
         try {
-            // unregister the runtime_support instance from the DGAS 
+            // unregister the runtime_support and memory instances from the DGAS 
+            naming::id_type factoryid (parcel_handler_.get_prefix().get_msb()+1, 0);
+            dgas_client_.unbind(factoryid);
             dgas_client_.unbind(parcel_handler_.get_prefix());
         }
         catch(hpx::exception const&) {

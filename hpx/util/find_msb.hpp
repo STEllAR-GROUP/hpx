@@ -87,6 +87,9 @@ namespace hpx { namespace util
     ///
     inline std::size_t find_msb_value(std::size_t value)
     {
+        if (0 == value)
+            return 0;     // special case not properly handled bby code below
+
         int i = find_msb(value);
         std::size_t msb = (0x01 << i);
         if (0 != (value & ~msb)) {

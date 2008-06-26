@@ -367,10 +367,12 @@ namespace hpx { namespace components
     template <
         typename Component, int Action, 
         threadmanager::thread_state(Component::*F)(
-            threadmanager::px_thread_self&, applier::applier&)
+            threadmanager::px_thread_self&, applier::applier&),
+        typename ExecuteDirectly = boost::mpl::false_
     >
     class action0 : public action<Component, Action, boost::fusion::vector<> >
     {
+    private:
         typedef action<Component, Action, boost::fusion::vector<> > base_type;
 
     public:
@@ -378,6 +380,8 @@ namespace hpx { namespace components
         {}
 
     public:
+        typedef ExecuteDirectly direct_execution;
+
         /// \brief This static \a construct_thread_function allows to construct 
         /// a proper thread function for a \a px_thread without having to 
         /// instantiate the action0 type. This is used by the \a applier in 
@@ -417,6 +421,41 @@ namespace hpx { namespace components
             applier::applier& appl, naming::address::address_type lva) const
         {
             return construct_thread_function(cont, appl, lva);
+        }
+
+    private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
+    };
+
+    template <
+        typename Component, int Action, 
+        threadmanager::thread_state(Component::*F)(
+            threadmanager::px_thread_self&, applier::applier&),
+        void (Component::*DirectF)(naming::address::address_type)
+    >
+    class direct_action0 
+      : public action0<Component, Action, F, boost::mpl::true_>
+    {
+    private:
+        typedef action0<Component, Action, F, boost::mpl::true_> base_type;
+
+    public:
+        direct_action0()
+        {}
+
+    public:
+        ///
+        static void execute_function(naming::address::address_type lva,
+            naming::address::address_type gidlsb)
+        {
+            (get_lva<Component>::call(lva)->*DirectF)(gidlsb);
         }
 
     private:
@@ -568,7 +607,8 @@ namespace hpx { namespace components
     template <
         typename Component, int Action, typename T0, 
         threadmanager::thread_state(Component::*F)(
-            threadmanager::px_thread_self&, applier::applier&, T0) 
+            threadmanager::px_thread_self&, applier::applier&, T0),
+        typename ExecuteDirectly = boost::mpl::false_
     >
     class action1 
       : public action<Component, Action, 
@@ -591,6 +631,8 @@ namespace hpx { namespace components
         {}
 
     public:
+        typedef ExecuteDirectly direct_execution;
+
         /// \brief This static \a construct_thread_function allows to construct 
         /// a proper thread function for a \a px_thread without having to 
         /// instantiate the \a action1 type. This is used by the \a applier in 
@@ -635,6 +677,49 @@ namespace hpx { namespace components
             applier::applier& appl, naming::address::address_type lva) const
         {
             return construct_thread_function(cont, appl, lva, this->get<0>());
+        }
+
+    private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Component, int Action, typename T0, 
+        threadmanager::thread_state(Component::*F)(
+            threadmanager::px_thread_self&, applier::applier&, T0),
+        void (Component::*DirectF)(naming::address::address_type, T0)
+    >
+    class direct_action1
+      : public action1<Component, Action, T0, F, boost::mpl::true_>
+    {
+    private:
+        typedef action1<Component, Action, T0, F, boost::mpl::true_> base_type;
+
+    public:
+        direct_action1()
+        {}
+
+        // construct an action from its arguments
+        template <typename Arg0>
+        direct_action1(Arg0 const& arg0) 
+          : base_type(arg0) 
+        {}
+
+    public:
+        ///
+        template <typename Arg0>
+        static void execute_function(naming::address::address_type lva, 
+            naming::address::address_type gidlsb, Arg0 const& arg0)
+        {
+            (get_lva<Component>::call(lva)->*DirectF)(gidlsb, arg0);
         }
 
     private:

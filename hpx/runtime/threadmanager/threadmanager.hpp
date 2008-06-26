@@ -22,6 +22,10 @@
 namespace hpx { namespace threadmanager
 {
     ///////////////////////////////////////////////////////////////////////////
+    /// \class threadmanager threadmanager.hpp hpx/runtime/threadmanager/threadmanager.hpp
+    ///
+    /// The \a threadmanager class is the central instance of management for
+    /// all (non-depleted) \a px_thread's
     class threadmanager : private boost::noncopyable
     {
     private:
@@ -99,6 +103,9 @@ namespace hpx { namespace threadmanager
         }
 
         /// \brief Forcefully stop the threadmanager
+        ///
+        /// \param blocking
+        ///
         void stop(bool blocking = true)
         {
             if (run_thread_) {
@@ -127,7 +134,7 @@ namespace hpx { namespace threadmanager
         ///                 \a thread_state enumeration. If the 
         ///                 thread is not known to the threadmanager the return 
         ///                 value will be \a thread_state#unknown.
-        thread_state set_state(thread_id_type id, thread_state new_state);
+        thread_state set_state(thread_id_type id, thread_state newstate);
 
         /// The get_state function is part of the thread related API and allows
         /// to query the state of one of the threads known to the threadmanager

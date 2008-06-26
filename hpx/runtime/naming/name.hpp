@@ -30,6 +30,20 @@ namespace hpx { namespace naming
           : id_msb_(msb_id), id_lsb_(lsb_id)
         {}
 
+        id_type& operator=(boost::uint64_t lsb_id)
+        {
+            id_msb_ = 0;
+            id_lsb_ = lsb_id;
+            return *this;
+        }
+
+        id_type& operator=(id_type const& rhs)
+        {
+            id_msb_ = rhs.id_msb_;
+            id_lsb_ = rhs.id_lsb_;
+            return *this;
+        }
+
         id_type& operator++()       // pre-increment
         {
             if (boost::uint64_t(~0x0) == id_lsb_) 
@@ -121,9 +135,17 @@ namespace hpx { namespace naming
         {
             return id_msb_;
         }
+        void set_msb(boost::uint64_t msb) 
+        {
+            id_msb_ = msb;
+        }
         boost::uint64_t get_lsb() const
         {
             return id_lsb_;
+        }
+        void set_lsb(boost::uint64_t lsb) 
+        {
+            id_lsb_ = lsb;
         }
 
     private:

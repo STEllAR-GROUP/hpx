@@ -16,6 +16,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/action_manager/action_manager.hpp>
 #include <hpx/components/server/runtime_support.hpp>
+#include <hpx/components/server/memory.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx 
@@ -167,6 +168,7 @@ namespace hpx
         applier::applier applier_;
         action_manager::action_manager action_manager_;
         components::server::runtime_support runtime_support_;
+        components::server::memory memory_;
     };
 
 }   // namespace hpx

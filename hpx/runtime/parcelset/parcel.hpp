@@ -33,6 +33,9 @@ namespace hpx { namespace parcelset
     parcel_id const invalid_parcel_id = naming::invalid_id;
     
     ///////////////////////////////////////////////////////////////////////////
+    /// \class parcel parcel.hpp hpx/runtime/parcelset/parcel.hpp
+    ///
+    ///
     class parcel
     {
     public:

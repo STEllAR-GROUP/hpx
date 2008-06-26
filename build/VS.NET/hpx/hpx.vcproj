@@ -195,6 +195,14 @@
 				<File
 					RelativePath="..\..\..\src\runtime\runtime.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AssemblerOutput="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<Filter
 					Name="ActionManager"
@@ -591,6 +599,10 @@
 					</File>
 					<File
 						RelativePath="..\..\..\hpx\components\server\manage_component.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\components\server\memory.hpp"
 						>
 					</File>
 					<File
