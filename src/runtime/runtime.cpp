@@ -93,7 +93,7 @@ namespace hpx
         dgas_client_.bind_range(parcel_handler_.get_prefix(), 1, 
             naming::address(parcel_port_.here(), 
                 components::server::runtime_support::value, 
-                &memory_), 0, 0);   // the zero as last parameter means 'all'
+                &memory_), 0);
 
         // register the given main function with the thread manager
         if (!func.empty())

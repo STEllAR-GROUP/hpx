@@ -87,10 +87,9 @@ namespace hpx { namespace naming
         /// naming#server#command_bind_range command)
         resolver_client_connection(boost::asio::ip::tcp::socket& socket,
                 server::dgas_server_command c, id_type lower_id, 
-                std::size_t count, address const& addr, std::ptrdiff_t offset,
-                std::size_t bits_per_object)
+                std::size_t count, address const& addr, std::ptrdiff_t offset)
           : socket_(socket), 
-            req_(c, lower_id, count, addr, offset, bits_per_object)
+            req_(c, lower_id, count, addr, offset)
         {}
         
         /// Construct a sending resolver_client_connection (for the \a

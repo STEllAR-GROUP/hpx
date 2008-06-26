@@ -50,11 +50,8 @@ namespace hpx { namespace applier
             // Determine whether the gid is local or remote
             naming::address addr;
             if (address_is_local(gid, addr)) {
-                // If local, register the function with the thread-manager
-                // Get the local-virtual address of the resource and register 
-                // the action with the TM
-                thread_manager_.register_work(
-                    Action::construct_thread_function(*this, addr.address_));
+                detail::apply_helper0<Action>::call(thread_manager_, 
+                    *this, addr.address_);
                 return true;     // no parcel has been sent (dest is local)
             }
 
@@ -80,11 +77,8 @@ namespace hpx { namespace applier
             // Determine whether the gid is local or remote
             naming::address addr;
             if (address_is_local(gid, addr)) {
-                // If local, register the function with the thread-manager
-                // Get the local-virtual address of the resource and register 
-                // the action with the TM
-                thread_manager_.register_work(
-                    Action::construct_thread_function(cont, *this, addr.address_));
+                detail::apply_helper0<Action>::call(cont, thread_manager_, 
+                    *this, addr.address_);
                 return true;     // no parcel has been sent (dest is local)
             }
 
@@ -131,8 +125,8 @@ namespace hpx { namespace applier
             // Determine whether the gid is local or remote
             naming::address addr;
             if (address_is_local(gid, addr)) {
-                detail::apply_helper1<Action, Arg0>::call(cont, *this, 
-                    addr.address_, arg0);
+                detail::apply_helper1<Action, Arg0>::call(cont, thread_manager_,
+                    *this, addr.address_, arg0);
                 return true;     // no parcel has been sent (dest is local)
             }
 
@@ -244,9 +238,12 @@ namespace hpx { namespace applier
         bool 
         address_is_local(naming::id_type const& gid, naming::address& addr) const
         {
-            // try local cache first
-            if (dgas_client_.is_local_memory(gid, addr)) 
-                return true;
+//             // test if local memory is addressed
+//             if (naming::is_local_memory(gid, parcel_handler_.get_prefix())) 
+//             {
+//                 addr.address_ = gid.get_lsb();
+//                 return true;
+//             }
 
             // Resolve the address of the gid
             if (!dgas_client_.resolve(gid, addr))
@@ -256,7 +253,7 @@ namespace hpx { namespace applier
             }
             return addr.locality_ == parcel_handler_.here();
         }
-        
+
     private:
         naming::resolver_client const& dgas_client_;
         parcelset::parcelhandler& parcel_handler_;

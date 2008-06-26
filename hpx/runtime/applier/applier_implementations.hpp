@@ -37,13 +37,10 @@
         naming::address addr;
         if (address_is_local(gid, addr))
         {
-            // If local, register the function with the thread-manager
-            // Get the local-virtual address of the resource and register 
-            // the action with the TM
-            thread_manager_.register_work(
-                Action::construct_thread_function(*this, addr.address_, 
-                    BOOST_PP_ENUM_PARAMS(N, arg))
-            );
+            detail::BOOST_PP_CAT(apply_helper, N)<
+                    Action, BOOST_PP_ENUM_PARAMS(N, Arg)
+            >::call(thread_manager_, *this, addr.address_,
+                BOOST_PP_ENUM_PARAMS(N, arg));
             return true;     // no parcel has been sent (dest is local)
         }
 
@@ -68,13 +65,10 @@
         naming::address addr;
         if (address_is_local(gid, addr))
         {
-            // If local, register the function with the thread-manager
-            // Get the local-virtual address of the resource and register 
-            // the action with the TM
-            thread_manager_.register_work(
-                Action::construct_thread_function(cont, *this, addr.address_, 
-                    BOOST_PP_ENUM_PARAMS(N, arg))
-            );
+            detail::BOOST_PP_CAT(apply_helper, N)<
+                    Action, BOOST_PP_ENUM_PARAMS(N, Arg)
+            >::call(cont, thread_manager_, *this, addr.address_,
+                BOOST_PP_ENUM_PARAMS(N, arg));
             return true;     // no parcel has been sent (dest is local)
         }
 

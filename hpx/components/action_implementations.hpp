@@ -44,7 +44,8 @@
         BOOST_PP_ENUM_PARAMS(N, typename T),
         threadmanager::thread_state(Component::*F)(
             threadmanager::px_thread_self&, applier::applier&, Result*,
-            BOOST_PP_ENUM_PARAMS(N, T)) 
+            BOOST_PP_ENUM_PARAMS(N, T)),
+        typename ExecuteDirectly = boost::mpl::false_
     >
     class BOOST_PP_CAT(result_action, N)
       : public action<
@@ -114,6 +115,8 @@
         }
 
     public:
+        typedef ExecuteDirectly direct_execution;
+
         // This static construct_thread_function allows to construct 
         // a proper thread function for a px_thread without having to 
         // instantiate the result_actionN type. This is used by the applier in 
@@ -182,7 +185,8 @@
         typename Component, int Action, BOOST_PP_ENUM_PARAMS(N, typename T),
         threadmanager::thread_state(Component::*F)(
             threadmanager::px_thread_self&, applier::applier&, 
-            BOOST_PP_ENUM_PARAMS(N, T)) 
+            BOOST_PP_ENUM_PARAMS(N, T)), 
+        typename ExecuteDirectly = boost::mpl::false_
     >
     class BOOST_PP_CAT(action, N)
       : public action<
@@ -208,6 +212,8 @@
         {}
 
     public:
+        typedef ExecuteDirectly direct_execution;
+
         // This static construct_thread_function allows to construct 
         // a proper thread function for a px_thread without having to 
         // instantiate the actionN type. This is used by the applier in 
@@ -254,6 +260,57 @@
         {
             return construct_thread_function(cont, appl, lva, 
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+        }
+
+    private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Component, int Action, BOOST_PP_ENUM_PARAMS(N, typename T),
+        threadmanager::thread_state(Component::*F)(
+            threadmanager::px_thread_self&, applier::applier&, BOOST_PP_ENUM_PARAMS(N, T)),
+        void (Component::*DirectF)(applier::applier&, BOOST_PP_ENUM_PARAMS(N, T))
+    >
+    class BOOST_PP_CAT(direct_action, N)
+      : public BOOST_PP_CAT(action, N)<
+            Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, boost::mpl::true_
+        >
+    {
+    private:
+        typedef BOOST_PP_CAT(action, N)<
+            Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, 
+            boost::mpl::true_> 
+        base_type;
+
+    public:
+        BOOST_PP_CAT(direct_action, N)()
+        {}
+
+        // construct an action from its arguments
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        BOOST_PP_CAT(direct_action, N)(
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+        {}
+
+    public:
+        ///
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        static void execute_function(
+            applier::applier& appl, naming::address::address_type lva, 
+            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        {
+            (get_lva<Component>::call(lva)->*DirectF)(
+                appl, BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
     private:

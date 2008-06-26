@@ -120,6 +120,9 @@ namespace hpx { namespace applier { namespace detail
         }
     };
 
+    // bring in the rest of the apply<> overloads
+    #include <hpx/runtime/applier/apply_helper_implementations.hpp>
+
 }}}
 
 #endif

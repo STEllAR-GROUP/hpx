@@ -60,7 +60,7 @@ namespace hpx { namespace naming { namespace server
                 else {
                     // the zero as last parameter means 'all' lsb gids
                     registry_.insert(registry_type::value_type(id, 
-                        registry_data_type(address(req.get_site()), 1, 0, 0)));
+                        registry_data_type(address(req.get_site()), 1, 0)));
                 }
 
                 // The real prefix has to be used as the 32 most 
@@ -146,7 +146,7 @@ namespace hpx { namespace naming { namespace server
                 else {
                     // the zero as last parameter means 'all' lsb gids
                     registry_.insert(registry_type::value_type(id, 
-                        registry_data_type(address(req.get_site()), 1, 0, 0)));
+                        registry_data_type(address(req.get_site()), 1, 0)));
                 }
 
                 // generate the new id range
@@ -183,8 +183,7 @@ namespace hpx { namespace naming { namespace server
                 if (it != registry_.end()) {
                     if ((*it).first == req.get_id()) {
                         // update existing bindings
-                        if (at_c<1>((*it).second) != req.get_count() ||
-                            at_c<3>((*it).second) != req.get_gids_per_object()) 
+                        if (at_c<1>((*it).second) != req.get_count()) 
                         {
                             // this is an error since we can't change block sizes 
                             s = bad_parameter;
@@ -195,7 +194,6 @@ namespace hpx { namespace naming { namespace server
                             // store the new address and offsets
                             at_c<0>((*it).second) = req.get_address();
                             at_c<2>((*it).second) = req.get_offset();
-                            at_c<3>((*it).second) = req.get_gids_per_object();
                         }
                     }
                     else if (it != registry_.begin()) {
@@ -310,15 +308,8 @@ namespace hpx { namespace naming { namespace server
                             // calculate the local address corresponding to the 
                             // given global id
                             naming::address addr (at_c<0>((*it).second));
-                            boost::uint64_t gid_offset = 0;
-                            if (0 != at_c<3>((*it).second)) {
-                                // this 'if' handles a special case to cover 
-                                // the memory component, which allocates a full 
-                                // range of gids (gids_per_object is 0)
-                                gid_offset = 
-                                    (req.get_id().get_lsb() - (*it).first.get_lsb()) / 
-                                        at_c<3>((*it).second);
-                            }
+                            boost::uint64_t gid_offset = 
+                                req.get_id().get_lsb() - (*it).first.get_lsb();
                             addr.address_ += gid_offset * at_c<2>((*it).second);
                             rep = reply(command_resolve, addr);
                         }
@@ -338,15 +329,8 @@ namespace hpx { namespace naming { namespace server
                 if ((*it).first + at_c<1>((*it).second) >= req.get_id()) {
                     // the previous range covers the id to resolve
                     naming::address addr (at_c<0>((*it).second));
-                    boost::uint64_t gid_offset = 0;
-                    if (0 != at_c<3>((*it).second)) {
-                        // this 'if' handles a special case to cover 
-                        // the memory component, which allocates a full 
-                        // range of gids (gids_per_object is 0)
-                        gid_offset = 
-                            (req.get_id().get_lsb() - (*it).first.get_lsb()) / 
-                                at_c<3>((*it).second);
-                    }
+                    boost::uint64_t gid_offset = 
+                        req.get_id().get_lsb() - (*it).first.get_lsb();
                     addr.address_ += gid_offset * at_c<2>((*it).second);
                     rep = reply(command_resolve, addr);
                 }

@@ -105,12 +105,6 @@ namespace hpx { namespace naming
     // synchronous functionality
     bool resolver_client::get_prefix(locality const& l, id_type& prefix) 
     {
-        // prefix might be cached already
-        if (prefix_) {
-            prefix = prefix_;
-            return true;
-        }
-
         // send request
         server::request req (server::command_getprefix, l);
         server::reply rep;
@@ -120,7 +114,7 @@ namespace hpx { namespace naming
         if (s != success && s != repeated_request)
             boost::throw_exception(hpx::exception((error)s, rep.get_error()));
 
-        prefix_ = prefix = rep.get_prefix();
+        prefix = rep.get_prefix();
         return s == success;
     }
 
@@ -161,15 +155,10 @@ namespace hpx { namespace naming
     }
 
     bool resolver_client::bind_range(id_type const& id, std::size_t count, 
-        address const& addr, std::ptrdiff_t offset,
-        std::size_t gids_per_object) const
+        address const& addr, std::ptrdiff_t offset) const
     {
-        // make sure gids_per_object is dividable by 2
-        BOOST_ASSERT(gids_per_object == util::find_msb_value(gids_per_object));
-
         // send request
-        server::request req (server::command_bind_range, id, count, addr, 
-            offset, gids_per_object);
+        server::request req (server::command_bind_range, id, count, addr, offset);
         server::reply rep;
         execute(req, rep);
 
@@ -405,17 +394,13 @@ namespace hpx { namespace naming
     // asynchronous API
     util::unique_future<bool> 
     resolver_client::bind_range_async(id_type const& lower_id, std::size_t count, 
-        address const& addr, std::ptrdiff_t offset, std::size_t gids_per_object)
+        address const& addr, std::ptrdiff_t offset)
     {
         typedef resolver_client_connection<bool> connection_type;
 
-        // make sure gids_per_object is dividable by 2
-        BOOST_ASSERT(gids_per_object == util::find_msb_value(gids_per_object));
-
         // prepare request
         connection_type* conn = new connection_type(socket_, 
-            server::command_bind_range, lower_id, count, addr, offset, 
-            gids_per_object);
+            server::command_bind_range, lower_id, count, addr, offset);
         boost::shared_ptr<connection_type> client_conn(conn);
 
         conn->execute();

@@ -39,7 +39,7 @@ namespace hpx { namespace components { namespace server
         /// \brief Action to store a value to a memory location
         threadmanager::thread_state store32(
             threadmanager::px_thread_self& self, applier::applier& app,
-            boost::uint32_t value)
+            boost::uint64_t addr, boost::uint32_t value)
         {
             BOOST_ASSERT(false);    // should never be called
             return threadmanager::terminated;
@@ -47,34 +47,36 @@ namespace hpx { namespace components { namespace server
 
         threadmanager::thread_state store64(
             threadmanager::px_thread_self& self, applier::applier& app,
-            boost::uint64_t value)
+            boost::uint64_t addr, boost::uint64_t value)
         {
             BOOST_ASSERT(false);    // should never be called
             return threadmanager::terminated;
         }
 
         ///
-        void local_store32(applier::applier& app, boost::uint32_t value)
+        void local_store32(applier::applier& app, boost::uint64_t addr, 
+            boost::uint32_t value)
         {
-            *reinterpret_cast<boost::uint32_t*>(this) = value;
+            *reinterpret_cast<boost::uint32_t*>(addr) = value;
         }
 
-        void local_store64(applier::applier& app, boost::uint64_t value)
+        void local_store64(applier::applier& app, boost::uint64_t addr, 
+            boost::uint64_t value)
         {
-            *reinterpret_cast<boost::uint64_t*>(this) = value;
+            *reinterpret_cast<boost::uint64_t*>(addr) = value;
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // Each of the exposed functions needs to be encapsulated into a action
+        // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
-        typedef direct_action1<
-            memory, memory_store32, boost::uint32_t, 
+        typedef direct_action2<
+            memory, memory_store32, boost::uint64_t, boost::uint32_t, 
             &memory::store32, &memory::local_store32
         > store32_action;
 
-        typedef direct_action1<
-            memory, memory_store64, boost::uint64_t, 
+        typedef direct_action2<
+            memory, memory_store64, boost::uint64_t, boost::uint64_t, 
             &memory::store64, &memory::local_store64
         > store64_action;
     };

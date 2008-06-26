@@ -73,10 +73,9 @@ namespace hpx { namespace naming { namespace server
     private:
         // The registry_type is used to store the mapping from the global ids
         // to a range of local addresses of the corresponding component 
-        // (defined by a base address, the count, the offset and the number
-        // of gids assigned to the same object).
+        // (defined by a base address, the count, and the offset).
         typedef boost::fusion::vector<
-            naming::address, std::size_t, std::ptrdiff_t, std::size_t> 
+            naming::address, std::size_t, std::ptrdiff_t> 
         registry_data_type;
 
     protected:
@@ -92,8 +91,7 @@ namespace hpx { namespace naming { namespace server
                 registry_.insert(
                     registry_type::value_type(req.get_id(), 
                         registry_data_type(req.get_address(), 
-                            req.get_count(), req.get_offset(), 
-                            req.get_gids_per_object()
+                            req.get_count(), req.get_offset()
                         )));
                 s = success;    // created new entry
             }

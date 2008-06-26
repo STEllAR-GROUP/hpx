@@ -16,9 +16,10 @@ threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self,
 {
     // try to access some memory directly
     boost::uint32_t value = 0;
-    naming::id_type value_gid (naming::get_memory_id(appl.get_prefix(), &value));
+    naming::id_type value_gid (naming::get_memory_id(appl.get_prefix()));
 
-    appl.apply<components::server::memory::store32_action>(value_gid, 1);
+    appl.apply<components::server::memory::store32_action>(value_gid, 
+        boost::uint64_t(&value), 1);
     BOOST_TEST(value == 1);
 
     // initiate shutdown of the runtime system
