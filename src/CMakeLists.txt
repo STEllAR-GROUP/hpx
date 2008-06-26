@@ -22,6 +22,7 @@ set (hpxlib_HEADERS
     ../hpx/components/server/distributing_factory.hpp
     ../hpx/components/server/runtime_support.hpp
     ../hpx/components/server/manage_component.hpp
+    ../hpx/components/server/memory.hpp
     ../hpx/components/server/wrapper.hpp
     ../hpx/components/server/wrapper_heap.hpp
     ../hpx/components/server/wrapper_heap_list.hpp
@@ -47,6 +48,7 @@ set (hpxlib_HEADERS
     ../hpx/runtime/action_manager/action_manager.hpp
     # applier
     ../hpx/runtime/applier/applier.hpp
+    ../hpx/runtime/applier/apply_helper.hpp
     ../hpx/runtime/applier/applier_implementations.hpp
     # naming
     ../hpx/runtime/naming/address.hpp
