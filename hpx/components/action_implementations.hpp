@@ -135,7 +135,7 @@
         // case a continuation has been supplied
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static boost::function<threadmanager::thread_function_type> 
-        construct_thread_function(components::continuation_type cont,
+        construct_thread_function(components::continuation_type& cont,
             applier::applier& appl, naming::address::address_type lva, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
         {
@@ -159,7 +159,7 @@
         // This get_thread_function will be invoked to retrieve the thread 
         // function for an action which has to be invoked with continuations.
         boost::function<threadmanager::thread_function_type>
-        get_thread_function(components::continuation_type cont,
+        get_thread_function(components::continuation_type& cont,
             applier::applier& appl, naming::address::address_type lva) const
         {
             return construct_thread_function(cont, appl, lva, 
@@ -228,7 +228,7 @@
         // case a continuation has been supplied
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static boost::function<threadmanager::thread_function_type> 
-        construct_thread_function(components::continuation_type cont,
+        construct_thread_function(components::continuation_type& cont,
             applier::applier& appl, naming::address::address_type lva, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
         {
@@ -249,7 +249,7 @@
 
         ///
         boost::function<threadmanager::thread_function_type>
-        get_thread_function(components::continuation_type cont,
+        get_thread_function(components::continuation_type& cont,
             applier::applier& appl, naming::address::address_type lva) const
         {
             return construct_thread_function(cont, appl, lva, 

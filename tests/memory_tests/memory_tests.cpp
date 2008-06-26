@@ -16,11 +16,14 @@ threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self,
 {
     // try to access some memory directly
     boost::uint32_t value = 0;
-    hpx::naming::id_type value_gid (appl.get_prefix());
-    value_gid.set_lsb(boost::uint64_t(&value));
+    naming::id_type value_gid (naming::get_memory_id(appl.get_prefix(), &value));
 
-    appl.apply<hpx::components::server::memory::store32_action>(value_gid, 1);
+    appl.apply<components::server::memory::store32_action>(value_gid, 1);
     BOOST_TEST(value == 1);
+
+    // initiate shutdown of the runtime system
+    components::stubs::runtime_support::shutdown_all(appl, 
+        naming::get_runtime_support_id(appl.get_prefix()));
 
     return threadmanager::terminated;
 }

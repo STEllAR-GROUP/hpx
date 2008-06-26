@@ -54,16 +54,14 @@ namespace hpx { namespace components { namespace server
         }
 
         ///
-        void local_store32(naming::address::address_type gidlsb, 
-            boost::uint32_t value)
+        void local_store32(applier::applier& app, boost::uint32_t value)
         {
-            *reinterpret_cast<boost::uint32_t*>(gidlsb) = value;
+            *reinterpret_cast<boost::uint32_t*>(this) = value;
         }
 
-        void local_store64(naming::address::address_type gidlsb, 
-            boost::uint64_t value)
+        void local_store64(applier::applier& app, boost::uint64_t value)
         {
-            *reinterpret_cast<boost::uint64_t*>(gidlsb) = value;
+            *reinterpret_cast<boost::uint64_t*>(this) = value;
         }
 
         ///////////////////////////////////////////////////////////////////////

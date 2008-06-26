@@ -85,13 +85,21 @@ namespace hpx { namespace components { namespace server
         std::vector<naming::id_type> prefixes;
         app.get_dgas_client().get_prefixes(prefixes);
 
+        // shut down all localities except the the local one
         components::stubs::runtime_support rts(app);
         std::vector<naming::id_type>::iterator end = prefixes.end();
         for (std::vector<naming::id_type>::iterator it = prefixes.begin(); 
              it != end; ++it)
         {
-            rts.shutdown(*it);
+            if (naming::get_prefix_from_id(app.get_prefix()) !=
+                naming::get_prefix_from_id(*it))
+            {
+                rts.shutdown(*it);
+            }
         }
+
+        // now make sure the local locality gets shut down as well.
+        stop();
         return threadmanager::terminated;
     }
 

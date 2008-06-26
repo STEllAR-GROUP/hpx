@@ -185,15 +185,24 @@ namespace hpx { namespace naming
 
     inline bool is_prefix_only(id_type const& id)
     {
-        return (id.get_msb() & 0xFFFFFFFFFFFFLL) ? false : true;
+        return (id.get_msb() & 0xFFFFFFFFLL) ? false : true;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // By convention the runtime_support has a gid identical to the prefix of the 
-    // locality the runtime_support is responsible for
+    // By convention the runtime_support has a gid identical to the prefix 
+    // of the locality the runtime_support is responsible for, with the 65th
+    // bit set
     inline id_type get_runtime_support_id(id_type const& id)
     {
-        return id_type(id.get_msb() & ~0xFFFFFFFFFFFFLL, 0);
+        return id_type((id.get_msb() & ~0xFFFFFFFFLL) | 0x1, 0);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // By convention every memory address has a corresponding gid formed by
+    // the locality prefix and the address itself.
+    inline id_type get_memory_id(id_type const& id, void* addr)
+    {
+        return id_type(id.get_msb() & ~0xFFFFFFFFLL, boost::uint64_t(addr));
     }
 
     ///////////////////////////////////////////////////////////////////////////

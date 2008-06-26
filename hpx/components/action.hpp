@@ -107,7 +107,7 @@ namespace hpx { namespace components
         ///       thread function for an action which has to be invoked with 
         ///       continuations.
         virtual boost::function<threadmanager::thread_function_type>
-            get_thread_function(components::continuation_type cont,
+            get_thread_function(components::continuation_type& cont,
                 applier::applier& appl, naming::address::address_type lva) const = 0;
     };
 
@@ -323,7 +323,7 @@ namespace hpx { namespace components
         /// instantiate the \a result_action0 type. This is used by the \a 
         /// applier in case a continuation has been supplied
         static boost::function<threadmanager::thread_function_type> 
-        construct_thread_function(components::continuation_type cont, 
+        construct_thread_function(components::continuation_type& cont, 
             applier::applier& appl, naming::address::address_type lva)
         {
             return construct_continuation_thread_function(
@@ -345,7 +345,7 @@ namespace hpx { namespace components
         /// This \a get_thread_function will be invoked to retrieve the thread 
         /// function for an action which has to be invoked with continuations.
         boost::function<threadmanager::thread_function_type>
-        get_thread_function(components::continuation_type cont,
+        get_thread_function(components::continuation_type& cont,
             applier::applier& appl, naming::address::address_type lva) const
         {
             return construct_thread_function(cont, appl, lva);
@@ -399,7 +399,7 @@ namespace hpx { namespace components
         /// instantiate the action0 type. This is used by the \a applier in 
         /// case a continuation has been supplied
         static boost::function<threadmanager::thread_function_type> 
-        construct_thread_function(components::continuation_type cont,
+        construct_thread_function(components::continuation_type& cont,
             applier::applier& appl, naming::address::address_type lva)
         {
             return base_type::construct_continuation_thread_function(
@@ -417,7 +417,7 @@ namespace hpx { namespace components
         }
 
         boost::function<threadmanager::thread_function_type>
-        get_thread_function(components::continuation_type cont,
+        get_thread_function(components::continuation_type& cont,
             applier::applier& appl, naming::address::address_type lva) const
         {
             return construct_thread_function(cont, appl, lva);
@@ -434,40 +434,40 @@ namespace hpx { namespace components
         }
     };
 
-    template <
-        typename Component, int Action, 
-        threadmanager::thread_state(Component::*F)(
-            threadmanager::px_thread_self&, applier::applier&),
-        void (Component::*DirectF)(naming::address::address_type)
-    >
-    class direct_action0 
-      : public action0<Component, Action, F, boost::mpl::true_>
-    {
-    private:
-        typedef action0<Component, Action, F, boost::mpl::true_> base_type;
-
-    public:
-        direct_action0()
-        {}
-
-    public:
-        ///
-        static void execute_function(naming::address::address_type lva,
-            naming::address::address_type gidlsb)
-        {
-            (get_lva<Component>::call(lva)->*DirectF)(gidlsb);
-        }
-
-    private:
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
-        {
-            ar & boost::serialization::base_object<base_type>(*this);
-        }
-    };
+//     template <
+//         typename Component, int Action, 
+//         threadmanager::thread_state(Component::*F)(
+//             threadmanager::px_thread_self&, applier::applier&),
+//         void (Component::*DirectF)(naming::address::address_type)
+//     >
+//     class direct_action0 
+//       : public action0<Component, Action, F, boost::mpl::true_>
+//     {
+//     private:
+//         typedef action0<Component, Action, F, boost::mpl::true_> base_type;
+// 
+//     public:
+//         direct_action0()
+//         {}
+// 
+//     public:
+//         ///
+//         static void execute_function(naming::address::address_type lva,
+//             naming::address::address_type gidlsb)
+//         {
+//             (get_lva<Component>::call(lva)->*DirectF)(gidlsb);
+//         }
+// 
+//     private:
+//         // serialization support
+//         friend class boost::serialization::access;
+// 
+//         template<class Archive>
+//         void serialize(Archive& ar, const unsigned int /*version*/)
+//         {
+//             ar & boost::serialization::base_object<base_type>(*this);
+//         }
+//     };
 
     ///////////////////////////////////////////////////////////////////////////
     //  one parameter version
@@ -563,7 +563,7 @@ namespace hpx { namespace components
         /// applier in case a continuation has been supplied
         template <typename Arg0>
         static boost::function<threadmanager::thread_function_type> 
-        construct_thread_function(components::continuation_type cont,
+        construct_thread_function(components::continuation_type& cont,
             applier::applier& appl, naming::address::address_type lva, 
             Arg0 const& arg0) 
         {
@@ -586,7 +586,7 @@ namespace hpx { namespace components
         /// This \a get_thread_function will be invoked to retrieve the thread 
         /// function for an action which has to be invoked with continuations.
         boost::function<threadmanager::thread_function_type>
-        get_thread_function(components::continuation_type cont,
+        get_thread_function(components::continuation_type& cont,
             applier::applier& appl, naming::address::address_type lva) const
         {
             return construct_thread_function(cont, appl, lva, this->get<0>());
@@ -652,7 +652,7 @@ namespace hpx { namespace components
         /// case a continuation has been supplied
         template <typename Arg0>
         static boost::function<threadmanager::thread_function_type> 
-        construct_thread_function(components::continuation_type cont,
+        construct_thread_function(components::continuation_type& cont,
             applier::applier& appl, naming::address::address_type lva, 
             Arg0 const& arg0) 
         {
@@ -673,7 +673,7 @@ namespace hpx { namespace components
 
         ///
         boost::function<threadmanager::thread_function_type>
-        get_thread_function(components::continuation_type cont,
+        get_thread_function(components::continuation_type& cont,
             applier::applier& appl, naming::address::address_type lva) const
         {
             return construct_thread_function(cont, appl, lva, this->get<0>());
@@ -695,7 +695,7 @@ namespace hpx { namespace components
         typename Component, int Action, typename T0, 
         threadmanager::thread_state(Component::*F)(
             threadmanager::px_thread_self&, applier::applier&, T0),
-        void (Component::*DirectF)(naming::address::address_type, T0)
+        void (Component::*DirectF)(applier::applier&, T0)
     >
     class direct_action1
       : public action1<Component, Action, T0, F, boost::mpl::true_>
@@ -716,10 +716,11 @@ namespace hpx { namespace components
     public:
         ///
         template <typename Arg0>
-        static void execute_function(naming::address::address_type lva, 
-            naming::address::address_type gidlsb, Arg0 const& arg0)
+        static void execute_function(
+            applier::applier& appl, naming::address::address_type lva, 
+            Arg0 const& arg0)
         {
-            (get_lva<Component>::call(lva)->*DirectF)(gidlsb, arg0);
+            (get_lva<Component>::call(lva)->*DirectF)(appl, arg0);
         }
 
     private:

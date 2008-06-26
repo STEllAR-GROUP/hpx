@@ -493,6 +493,10 @@
 						RelativePath="..\..\..\hpx\runtime\applier\applier_implementations.hpp"
 						>
 					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\applier\apply_helper.hpp"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="Parcelset"

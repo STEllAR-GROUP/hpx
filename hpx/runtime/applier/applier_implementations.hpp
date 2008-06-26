@@ -59,13 +59,11 @@
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    bool apply (components::continuation* c,
-        naming::id_type const& gid, 
+    bool apply (components::continuation* c, naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        // package continuation into a shared_ptr
         components::continuation_type cont(c);
-
+        
         // Determine whether the gid is local or remote
         naming::address addr;
         if (address_is_local(gid, addr))

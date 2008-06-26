@@ -426,10 +426,14 @@ namespace hpx { namespace naming
 
         ///
         ///
-        bool is_local(naming::id_type const& gid) const
+        bool is_local_memory(naming::id_type const& gid, address& addr) const
         {
-            BOOST_ASSERT(prefix_);      // must be cached already
-            return gid.get_msb() == prefix_.get_msb();
+            BOOST_ASSERT(prefix_);      // must have been cached already
+            if (gid.get_msb() == prefix_.get_msb()) {
+                addr.address_ = gid.get_lsb();
+                return true;
+            }
+            return false;
         }
 
         /// \brief Register a global name with a global address (id)

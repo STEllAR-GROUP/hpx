@@ -8,53 +8,17 @@
 #define HPX_APPLIER_APPLIER_JUN_03_2008_0438PM
 
 #include <boost/noncopyable.hpp>
-#include <boost/mpl/bool.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/naming.hpp>
 #include <hpx/include/parcelset.hpp>
 #include <hpx/runtime/threadmanager/threadmanager.hpp>
+#include <hpx/runtime/applier/apply_helper.hpp>
 #include <hpx/components/action.hpp>
 #include <hpx/components/server/runtime_support.hpp>
 
 namespace hpx { namespace applier
 {
-    ///////////////////////////////////////////////////////////////////////
-    template <
-        typename Action, typename Arg0, 
-        typename DirectExecute = typename Action::direct_execution
-    >
-    struct local_apply1;
-
-    template <typename Action, typename Arg0>
-    struct local_apply1<Action, Arg0, boost::mpl::false_>
-    {
-        // If local, register the function with the thread-manager
-        // Get the local-virtual address of the resource and register 
-        // the action with the TM
-        static void 
-        call (threadmanager::threadmanager& tm, applier& appl, 
-             naming::address::address_type gidlsb, 
-             naming::address::address_type addr, Arg0 const& arg0)
-        {
-            tm.register_work(
-                Action::construct_thread_function(appl, addr, arg0));
-        }
-    };
-
-    template <typename Action, typename Arg0>
-    struct local_apply1<Action, Arg0, boost::mpl::true_>
-    {
-        // If local and to be directly executed, just call the function
-        static void
-        call (threadmanager::threadmanager&, applier&, 
-             naming::address::address_type gidlsb, 
-             naming::address::address_type addr, Arg0 const& arg0)
-        {
-            Action::execute_function(addr, gidlsb, arg0);
-        }
-    };
-
     /// The \a applier class is used to decide whether a particular action
     /// has to be issued on a local or a remote resource. If the target 
     /// component is local a new \a px_thread will be created, if the target is
@@ -109,12 +73,10 @@ namespace hpx { namespace applier
         ///    appl_.apply<add_action>(cont, gid, ...);
         /// \endcode
         template <typename Action>
-        bool apply (components::continuation* c,
-            naming::id_type const& gid)
+        bool apply (components::continuation* c, naming::id_type const& gid)
         {
-            // package continuation into a shared_ptr
             components::continuation_type cont(c);
-
+            
             // Determine whether the gid is local or remote
             naming::address addr;
             if (address_is_local(gid, addr)) {
@@ -145,8 +107,8 @@ namespace hpx { namespace applier
             // Determine whether the gid is local or remote
             naming::address addr;
             if (address_is_local(gid, addr)) {
-                local_apply1<Action, Arg0>::call(
-                    thread_manager_, *this, gid.get_lsb(), addr.address_, arg0);
+                detail::apply_helper1<Action, Arg0>::call(thread_manager_, 
+                    *this, addr.address_, arg0);
                 return true;     // no parcel has been sent (dest is local)
             }
 
@@ -161,21 +123,16 @@ namespace hpx { namespace applier
         }
 
         template <typename Action, typename Arg0>
-        bool apply (components::continuation* c, 
-            naming::id_type const& gid, Arg0 const& arg0)
+        bool apply (components::continuation* c, naming::id_type const& gid, 
+            Arg0 const& arg0)
         {
-            // package continuation into a shared_ptr
             components::continuation_type cont(c);
-
+            
             // Determine whether the gid is local or remote
             naming::address addr;
             if (address_is_local(gid, addr)) {
-                // If local, register the function with the thread-manager
-                // Get the local-virtual address of the resource and register 
-                // the action with the TM
-                thread_manager_.register_work(
-                    Action::construct_thread_function(cont, *this, 
-                    addr.address_, arg0));
+                detail::apply_helper1<Action, Arg0>::call(cont, *this, 
+                    addr.address_, arg0);
                 return true;     // no parcel has been sent (dest is local)
             }
 
@@ -288,7 +245,7 @@ namespace hpx { namespace applier
         address_is_local(naming::id_type const& gid, naming::address& addr) const
         {
             // try local cache first
-            if (dgas_client_.is_local(gid))
+            if (dgas_client_.is_local_memory(gid, addr)) 
                 return true;
 
             // Resolve the address of the gid
