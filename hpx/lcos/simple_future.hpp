@@ -137,7 +137,7 @@ namespace hpx { namespace lcos
     ///     // ...
     /// \endcode
     ///
-    /// \tparam Result   The template parameter \Result defines the type this 
+    /// \tparam Result   The template parameter \a Result defines the type this 
     ///                  simple_future is expected to return from 
     ///                  \a simple_future#get_result.
     ///

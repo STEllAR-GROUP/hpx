@@ -10,6 +10,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/detail/atomic_count.hpp>
 #include <boost/coroutine/coroutine.hpp>
 #include <boost/coroutine/shared_coroutine.hpp>
 
@@ -169,7 +170,8 @@ namespace hpx { namespace threadmanager
     public:
         px_thread(boost::function<thread_function_type> threadfunc, 
                 threadmanager& tm, thread_state new_state = init)
-          : base_type(new detail::px_thread(threadfunc, This(), tm, new_state))
+          : base_type(new detail::px_thread(threadfunc, This(), tm, new_state)),
+            use_count_(0)
         {}
 
         ~px_thread() 
@@ -198,10 +200,25 @@ namespace hpx { namespace threadmanager
     protected:
         base_type& base() { return *this; }
         base_type const& base() const { return *this; }
+
+    public:
+        boost::detail::atomic_count use_count_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     thread_id_type const invalid_thread_id = 0;
+
+    // support for boost::intrusive_ptr<px_thread>
+    inline void intrusive_ptr_add_ref(px_thread* p)
+    {
+        ++p->use_count_;
+    }
+
+    inline void intrusive_ptr_release(px_thread* p)
+    {
+        if (--p->use_count_ == 0)
+            delete p;
+    }
 
 }}
 

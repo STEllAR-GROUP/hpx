@@ -16,7 +16,7 @@ threadmanager::thread_state test1_helper(threadmanager::px_thread_self& self,
     applier::applier& appl, hpx::lcos::full_empty<int>& data)
 {
     // retrieve gid for this thread
-    boost::shared_ptr<threadmanager::px_thread> t (
+    boost::intrusive_ptr<threadmanager::px_thread> t (
         appl.get_thread_manager().get_thread(self.get_thread_id()));
     naming::id_type gid = t->get_gid(appl);
     BOOST_TEST(gid);
@@ -31,7 +31,7 @@ threadmanager::thread_state test1(threadmanager::px_thread_self& self,
     applier::applier& appl)
 {
     // retrieve gid for this thread
-    boost::shared_ptr<threadmanager::px_thread> t (
+    boost::intrusive_ptr<threadmanager::px_thread> t (
         appl.get_thread_manager().get_thread(self.get_thread_id()));
     naming::id_type gid = t->get_gid(appl);
     BOOST_TEST(gid);
@@ -66,7 +66,7 @@ threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self,
     applier::applier& appl)
 {
     // retrieve gid for this thread
-    boost::shared_ptr<threadmanager::px_thread> t (
+    boost::intrusive_ptr<threadmanager::px_thread> t (
         appl.get_thread_manager().get_thread(self.get_thread_id()));
     naming::id_type gid = t->get_gid(appl);
     BOOST_TEST(gid);
@@ -76,8 +76,8 @@ threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self,
         boost::bind(&test1, _1, boost::ref(appl)));
 
     // initiate shutdown of the runtime system
-    components::stubs::runtime_support::shutdown_all(appl,
-        naming::get_runtime_support_gid(appl.get_prefix()));
+    components::stubs::runtime_support::shutdown_all(appl, 
+        appl.get_runtime_support_gid());
 
     return threadmanager::terminated;
 }
@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
 
         // initialize and start the HPX runtime
         hpx::runtime rt(host, dgas_port, host, ps_port);
-        rt.run(hpx_main);
+        rt.run(hpx_main, 2);
     }
     catch (std::exception& e) {
         BOOST_TEST(false);

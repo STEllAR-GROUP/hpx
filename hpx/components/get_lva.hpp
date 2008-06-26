@@ -27,8 +27,8 @@ namespace hpx { namespace components
     /// because this is not wrapped by a separate type as all the other 
     /// components.
     ///
-    /// \tparam <b>Component</b>  This is the type of the component 
-    ///                           implementing the action to execute.
+    /// \tparam Component  This is the type of the component implementing the 
+    ///                    action to execute.
     template <typename Component>
     struct get_lva
     {

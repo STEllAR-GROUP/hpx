@@ -71,13 +71,16 @@ namespace hpx
         ///                   been initialized. This function is expected to 
         ///                   expose an interface as defined by the typedef
         ///                   \a hpx_main_function_type.
+        /// \param num_threads [in] The initial number of threads to be started 
+        ///                   by the threadmanager. This parameter is optional 
+        ///                   and defaults to 1.
         /// \param blocking   [in] This allows to control whether this 
         ///                   call blocks until the runtime system has been 
         ///                   stopped. If this parameter is \a true the 
         ///                   function \a runtime#start internally will call 
         ///                   \a runtime#wait.
         void start(boost::function<hpx_main_function_type> func, 
-            bool blocking = false);
+            std::size_t num_threads = 1, bool blocking = false);
 
         /// \brief Wait for the shutdown action to be executed
         void wait();
@@ -102,14 +105,29 @@ namespace hpx
         ///                   by the thread manager as soon as the runtime has 
         ///                   been initialized. This function is expected to 
         ///                   expose an interface as defined by the typedef
-        ///                   \a hpx_main_function_type.
+        ///                   \a hpx_main_function_type. This parameter is 
+        ///                   optional and defaults to none main thread 
+        ///                   function, in which case all px_threads have to be 
+        ///                   scheduled explicitly.
+        /// \param num_threads [in] The initial number of threads to be started 
+        ///                   by the threadmanager. This parameter is optional 
+        ///                   and defaults to 1.
         ///
         /// \note             The parameter \a func is optional. If no function
         ///                   is supplied, the runtime system will simply wait
         ///                   for the shutdown action without explicitly 
         ///                   executing any main thread.
         void run(boost::function<hpx_main_function_type> func =
-            boost::function<hpx_main_function_type>());
+            boost::function<hpx_main_function_type>(), 
+            std::size_t num_threads = 1);
+
+        /// \brief Run the HPX runtime system, initially use the given number 
+        ///        of (OS) threads in the threadmanager and block waiting for
+        ///        all px_threads to finish.
+        ///
+        /// \param num_threads [in] The initial number of threads to be started 
+        ///                   by the threadmanager. 
+        void run(std::size_t num_threads);
 
         ///////////////////////////////////////////////////////////////////////
 

@@ -44,7 +44,9 @@ namespace hpx { namespace naming { namespace server
                 // insert this prefix as being mapped to the given locality
                 boost::uint32_t prefix = site_prefixes_.size() + 1;
                 naming::id_type id = get_id_from_prefix(prefix);
-                naming::id_type lower_id(get_runtime_support_gid(id));
+
+                // start assigning ids with the second block of 64Bit numbers only
+                naming::id_type lower_id (id.get_msb() + 1, 0);
                 site_prefixes_.insert(
                     site_prefix_map_type::value_type(req.get_site(), 
                         std::make_pair(prefix, lower_id)));
@@ -116,9 +118,20 @@ namespace hpx { namespace naming { namespace server
                 // significant bits of global id's
 
                 // generate the new id range
-                naming::id_type lower = (*it).second.second + 1;
-                naming::id_type upper = lower + (req.get_count() - 1);
-                
+                naming::id_type lower ((*it).second.second + 1);
+                naming::id_type upper (lower + (req.get_count() - 1));
+
+                if (upper.get_msb() != lower.get_msb()) {
+                    if ((lower.get_msb() & ~0xFFFFFFFF) == 0xFFFFFFFF)
+                    {
+                        rep = reply(command_getprefix, internal_server_error,
+                            "global ids have been exhausted");
+                        return;
+                    }
+                    lower = naming::id_type(upper.get_msb(), 0);
+                    upper = lower + (req.get_count() - 1);
+                }
+
                 // store the new lower bound
                 (*it).second.second = upper;
 
@@ -129,7 +142,10 @@ namespace hpx { namespace naming { namespace server
                 // insert this prefix as being mapped to the given locality
                 boost::uint32_t prefix = (boost::uint32_t)site_prefixes_.size() + 1;
                 naming::id_type id = get_id_from_prefix(prefix);
-                naming::id_type lower_id (get_runtime_support_gid(id));
+
+                // start assigning ids with the second block of 64Bit numbers only
+                naming::id_type lower_id (id.get_msb() + 1, 0);
+
                 std::pair<site_prefix_map_type::iterator, bool> p =
                     site_prefixes_.insert(
                         site_prefix_map_type::value_type(req.get_site(), 
@@ -144,7 +160,6 @@ namespace hpx { namespace naming { namespace server
                         "prefix is already bound to local address");
                 }
                 else {
-                    // the zero as last parameter means 'all' lsb gids
                     registry_.insert(registry_type::value_type(id, 
                         registry_data_type(address(req.get_site()), 1, 0)));
                 }

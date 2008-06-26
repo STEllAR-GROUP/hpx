@@ -25,7 +25,7 @@ namespace hpx { namespace threadmanager
             return invalid_thread_id;
         }
 
-        boost::shared_ptr<px_thread> px_t_sp (
+        boost::intrusive_ptr<px_thread> px_t_sp (
             new px_thread(threadfunc, *this, initial_state));
 
         // lock data members while adding work
@@ -89,7 +89,7 @@ namespace hpx { namespace threadmanager
         map_iter = thread_map_.find(id);
         if (map_iter != thread_map_.end())
         {
-            boost::shared_ptr<px_thread> px_t = map_iter->second;
+            boost::intrusive_ptr<px_thread> px_t = map_iter->second;
             thread_state previous_state = px_t->get_state();
 
             // nothing to do here if the state doesn't change
@@ -148,7 +148,7 @@ namespace hpx { namespace threadmanager
             if (!work_items_.empty())
             {
                 // Get the next thread from the queue
-                boost::shared_ptr<px_thread> thrd (work_items_.front());
+                boost::intrusive_ptr<px_thread> thrd (work_items_.front());
                 work_items_.pop();
 
                 // Only pending threads will be executed.
@@ -189,7 +189,7 @@ namespace hpx { namespace threadmanager
     }
 
     // 
-    boost::shared_ptr<px_thread> 
+    boost::intrusive_ptr<px_thread> 
     threadmanager::get_thread(thread_id_type id) const
     {
         // lock data members while getting a thread state
@@ -201,7 +201,7 @@ namespace hpx { namespace threadmanager
         {
             return map_iter->second;
         }
-        return boost::shared_ptr<px_thread>();
+        return boost::intrusive_ptr<px_thread>();
     }
 
     ///////////////////////////////////////////////////////////////////////////

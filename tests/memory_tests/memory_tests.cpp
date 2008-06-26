@@ -16,15 +16,15 @@ threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self,
 {
     // try to access some memory directly
     boost::uint32_t value = 0;
-    naming::id_type value_gid (naming::get_memory_gid(appl.get_prefix()));
 
-    appl.apply<components::server::memory::store32_action>(value_gid, 
-        boost::uint64_t(&value), 1);
+    appl.apply<components::server::memory::store32_action>(
+        appl.get_memory_gid(), boost::uint64_t(&value), 1);
+
     BOOST_TEST(value == 1);
 
     // initiate shutdown of the runtime system
     components::stubs::runtime_support::shutdown_all(appl, 
-        naming::get_runtime_support_gid(appl.get_prefix()));
+        appl.get_runtime_support_gid());
 
     return threadmanager::terminated;
 }
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 
         // initialize and start the HPX runtime
         hpx::runtime rt(host, dgas_port, host, ps_port);
-        rt.run(hpx_main);
+        rt.run(hpx_main, 2);
     }
     catch (std::exception& e) {
         BOOST_TEST(false);

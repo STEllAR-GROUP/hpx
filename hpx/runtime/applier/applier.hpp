@@ -30,8 +30,11 @@ namespace hpx { namespace applier
     public:
         // constructor
         applier(naming::resolver_client const& dgas_c, 
-                parcelset::parcelhandler &ph, threadmanager::threadmanager& tm)
-          : dgas_client_(dgas_c), parcel_handler_(ph), thread_manager_(tm)
+                parcelset::parcelhandler &ph, threadmanager::threadmanager& tm,
+                components::server::runtime_support const& rts,
+                components::server::memory const& mem)
+          : dgas_client_(dgas_c), parcel_handler_(ph), thread_manager_(tm),
+            runtime_support_(rts), memory_(mem)
         {}
 
         // destructor
@@ -245,10 +248,35 @@ namespace hpx { namespace applier
             return parcel_handler_.get_prefix();
         }
 
+        /// By convention the runtime_support has a gid identical to the prefix 
+        /// of the locality the runtime_support is responsible for
+        naming::id_type get_runtime_support_gid() const
+        {
+            return naming::id_type(parcel_handler_.get_prefix().get_msb(), 
+                boost::uint64_t(&runtime_support_));
+        }
+
+        /// By convention every memory address has gid identical to the prefix 
+        /// of the locality the runtime_support is responsible for
+        naming::id_type get_memory_gid() const
+        {
+            return naming::id_type(parcel_handler_.get_prefix().get_msb(), 
+                boost::uint64_t(&memory_));
+        }
+
     protected:
         bool 
         address_is_local(naming::id_type const& gid, naming::address& addr) const
         {
+            // test if the gid is of one of the non-movable objects
+            // this is certainly an optimization relying on the fact that the 
+            // lsb of the local objects is equal to their address
+            if (gid.get_msb() == parcel_handler_.get_prefix().get_msb())
+            {
+                addr.address_ = gid.get_lsb();
+                return true;
+            }
+
             // Resolve the address of the gid
             if (!dgas_client_.resolve(gid, addr))
             {
@@ -262,6 +290,8 @@ namespace hpx { namespace applier
         naming::resolver_client const& dgas_client_;
         parcelset::parcelhandler& parcel_handler_;
         threadmanager::threadmanager& thread_manager_;
+        components::server::runtime_support const& runtime_support_;
+        components::server::memory const& memory_;
     };
 
 }}

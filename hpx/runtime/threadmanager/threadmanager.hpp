@@ -8,12 +8,15 @@
 
 #include <queue>
 #include <map>
+#include <vector>
+#include <memory>
 
-#include <boost/shared_ptr.hpp>
+#include <boost/intrusive_ptr.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -21,6 +24,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threadmanager
 {
+    // forward declaration only (needed for intrusive_ptr<px_thread>)
+    void intrusive_ptr_add_ref(px_thread* p);
+    void intrusive_ptr_release(px_thread* p);
+
     ///////////////////////////////////////////////////////////////////////////
     /// \class threadmanager threadmanager.hpp hpx/runtime/threadmanager/threadmanager.hpp
     ///
@@ -30,11 +37,11 @@ namespace hpx { namespace threadmanager
     {
     private:
         // this is the type of the queue of pending threads
-        typedef std::queue <boost::shared_ptr<px_thread> > work_items_type;
+        typedef std::queue <boost::intrusive_ptr<px_thread> > work_items_type;
 
         // this is the type of a map holding all threads (except depleted ones)
         typedef
-            std::map<thread_id_type, boost::shared_ptr<px_thread> >
+            std::map<thread_id_type, boost::intrusive_ptr<px_thread> >
         thread_map_type;
         typedef thread_map_type::value_type map_pair;
 
@@ -44,14 +51,14 @@ namespace hpx { namespace threadmanager
 
     public:
         threadmanager() 
-          : run_thread_(NULL), running_(false)
+          : running_(false)
         {}
         ~threadmanager() 
         {
-            if(run_thread_) {
+            if (!threads_.empty()) {
                 if (running_) 
                     stop();
-                delete run_thread_;
+                threads_.clear();
             }
         }
 
@@ -71,7 +78,7 @@ namespace hpx { namespace threadmanager
         ///               thread_state#suspended, any other value will throw a
         ///               hpx#bad_parameter exception).
         ///
-        /// \returns      The function retunrs the thread id of the newly 
+        /// \returns      The function returns the thread id of the newly 
         ///               created thread. 
         thread_id_type 
         register_work(boost::function<thread_function_type> func,
@@ -79,25 +86,30 @@ namespace hpx { namespace threadmanager
 
         /// \brief Run the thread manager's work queue
         ///
+        /// \param num_threads
+        ///               [in] The initial number of threads to be started by
+        ///               this thread manager instance.
+        ///
         /// \returns      The function returns \a true if the thread manager
         ///               has been started successfully, otherwise it returns 
         ///               \a false.
-        bool run() 
+        bool run(std::size_t num_threads = 1) 
         {
             mutex_type::scoped_lock lk(mtx_);
-            if (run_thread_ || running_) 
+            if (!threads_.empty() || running_) 
                 return true;    // do nothing if already running
 
             running_ = false;
             try {
-                // run thread and wait for initialization to complete
-                run_thread_ = new boost::thread(
-                    boost::bind(&threadmanager::tfunc, this));
+                // run threads and wait for initialization to complete
+                while (num_threads-- != 0) {
+                    threads_.push_back(new boost::thread(
+                        boost::bind(&threadmanager::tfunc, this)));
+                }
                 running_ = true;
             }
             catch (std::exception const& /*e*/) {
-                delete run_thread_;
-                run_thread_ = NULL;
+                threads_.clear();
             }
             return running_;
         }
@@ -106,16 +118,19 @@ namespace hpx { namespace threadmanager
         ///
         /// \param blocking
         ///
-        void stop(bool blocking = true)
+        void stop (bool blocking = true)
         {
-            if (run_thread_) {
+            if (!threads_.empty()) {
                 if (running_) {
                     mutex_type::scoped_lock lk(mtx_);
                     running_ = false;
                     cond_.notify_all();     // make sure we're not waiting
                 }
-                if (blocking)
-                    run_thread_->join();
+
+                if (blocking) {
+                    for (std::size_t i = 0; i < threads_.size(); ++i)
+                        threads_[i].join();
+                }
             }
         }
 
@@ -151,7 +166,7 @@ namespace hpx { namespace threadmanager
         thread_state get_state(thread_id_type id) const;
 
         ///
-        boost::shared_ptr<px_thread> get_thread(thread_id_type id) const;
+        boost::intrusive_ptr<px_thread> get_thread(thread_id_type id) const;
 
     public:
         /// this notifies the thread manager that there is some more work 
@@ -168,14 +183,15 @@ namespace hpx { namespace threadmanager
         void tfunc();
 
     private:
-        boost::thread *run_thread_;         /// this thread manager has exactly one thread
+        /// this thread manager has exactly as much threads as requested
+        boost::ptr_vector<boost::thread> threads_;
 
-        thread_map_type thread_map_;        /// mapping of thread id's to threads
-        work_items_type work_items_;        /// list of active work items
+        thread_map_type thread_map_;        ///< mapping of thread id's to threads
+        work_items_type work_items_;        ///< list of active work items
 
-        bool running_;                      /// thread manager has bee started
-        mutable mutex_type mtx_;            /// mutex protecting the members
-        boost::condition cond_;             /// used to trigger some action
+        bool running_;                      ///< thread manager has bee started
+        mutable mutex_type mtx_;            ///< mutex protecting the members
+        boost::condition cond_;             ///< used to trigger some action
     };
 
     ///////////////////////////////////////////////////////////////////////////

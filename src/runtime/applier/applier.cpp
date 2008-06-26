@@ -50,8 +50,7 @@ namespace hpx { namespace applier
         typedef 
             components::server::runtime_support::free_component_action 
         action_type;
-        apply<action_type>(naming::get_runtime_support_gid(gid), 
-            type, gid, count);
+        apply<action_type>(get_runtime_support_gid(), type, gid, count);
     }
 
 ///////////////////////////////////////////////////////////////////////////////

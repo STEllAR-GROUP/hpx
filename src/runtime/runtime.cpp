@@ -51,7 +51,8 @@ namespace hpx
         parcel_port_(parcel_pool_, address, port),
         parcel_handler_(dgas_client_, parcel_port_),
         thread_manager_(),
-        applier_(dgas_client_, parcel_handler_, thread_manager_),
+        applier_(dgas_client_, parcel_handler_, thread_manager_, 
+            runtime_support_, memory_),
         action_manager_(applier_)
     {}
 
@@ -62,7 +63,8 @@ namespace hpx
         parcel_port_(parcel_pool_, address),
         parcel_handler_(dgas_client_, parcel_port_),
         thread_manager_(),
-        applier_(dgas_client_, parcel_handler_, thread_manager_),
+        applier_(dgas_client_, parcel_handler_, thread_manager_, 
+            runtime_support_, memory_),
         action_manager_(applier_)
     {}
 
@@ -77,20 +79,18 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     void runtime::start(boost::function<hpx_main_function_type> func, 
-        bool blocking)
+        std::size_t num_threads, bool blocking)
     {
         // start services (service threads)
-        thread_manager_.run();        // start the thread manager
-        parcel_port_.run(false);      // starts parcel_pool_ as well
+        thread_manager_.run(num_threads);   // start the thread manager
+        parcel_port_.run(false);            // starts parcel_pool_ as well
 
         // register the runtime_support and memory instances with the DGAS 
-        dgas_client_.bind(
-            naming::get_runtime_support_gid(parcel_handler_.get_prefix()), 
+        dgas_client_.bind(applier_.get_runtime_support_gid(), 
             naming::address(parcel_port_.here(), 
                 components::server::runtime_support::value, &runtime_support_));
 
-        dgas_client_.bind(
-            naming::get_memory_gid(parcel_handler_.get_prefix()), 
+        dgas_client_.bind(applier_.get_memory_gid(), 
             naming::address(parcel_port_.here(), 
                 components::server::memory::value, &memory_));
 
@@ -162,7 +162,7 @@ namespace hpx
             dgas_client_.unbind(parcel_handler_.get_prefix());
         }
         catch(hpx::exception const&) {
-            // ignore errors during system shutdown (DGAS might be down already)
+            ; // ignore errors during system shutdown (DGAS might be down already)
         }
 
         // stop runtime services (threads)
@@ -173,9 +173,18 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void runtime::run(boost::function<hpx_main_function_type> func)
+    void runtime::run(boost::function<hpx_main_function_type> func,
+        std::size_t num_threads)
     {
-        start(func);
+        start(func, num_threads);
+        wait();
+        stop();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void runtime::run(std::size_t num_threads)
+    {
+        start(boost::function<hpx_main_function_type>(), num_threads);
         wait();
         stop();
     }
