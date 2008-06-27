@@ -7,6 +7,7 @@
 #define HPX_DISTPX_MAR_24_2008_1118AM
 
 #include <hpx/config.hpp>
+#include <hpx/version.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/include/naming.hpp>
