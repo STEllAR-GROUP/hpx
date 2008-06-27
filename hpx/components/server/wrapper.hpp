@@ -9,6 +9,8 @@
 #include <boost/throw_exception.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/mpl/if.hpp>
+#include <boost/mpl/bool.hpp>
+#include <boost/detail/atomic_count.hpp>
 #include <boost/type_traits/is_same.hpp>
 
 #include <hpx/exception.hpp>
@@ -18,17 +20,43 @@
 
 namespace hpx { namespace components 
 {
-    struct this_type {};
+    namespace detail
+    {
+        ///////////////////////////////////////////////////////////////////////
+        struct this_type {};
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename HasUseCount>
+        struct wrapper_use_count;
+
+        template <>
+        struct wrapper_use_count<boost::mpl::false_> : boost::noncopyable
+        {
+        };
+
+        template <>
+        struct wrapper_use_count<boost::mpl::true_> : boost::noncopyable
+        {
+            wrapper_use_count() 
+              : use_count_(0) 
+            {}
+
+            boost::detail::atomic_count use_count_;
+        };
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /// The wrapper template is used as a indirection layer for components 
     /// allowing to gracefully handle the access to non-existing components.
-    template <typename Component, typename Derived = this_type>
-    class wrapper : boost::noncopyable
+    template <
+        typename Component, typename Derived = detail::this_type, 
+        typename HasUseCount = boost::mpl::false_
+    >
+    class wrapper : public detail::wrapper_use_count<HasUseCount>
     {
     private:
         typedef typename boost::mpl::if_<
-                boost::is_same<Derived, this_type>, wrapper, Derived
+                boost::is_same<Derived, detail::this_type>, wrapper, Derived
             >::type derived_type;
 
     public:
@@ -206,18 +234,18 @@ namespace hpx { namespace components
     };
 
     // support for boost::intrusive_ptr<wrapper<...> >
-    template <typename Component, typename Derived>
+    template <typename Component, typename Derived, typename HasUseCount>
     inline void
-    intrusive_ptr_add_ref(wrapper<Component, Derived>* p)
+    intrusive_ptr_add_ref(wrapper<Component, Derived, HasUseCount>* p)
     {
-        ++(*p)->use_count_;
+        ++p->use_count_;
     }
 
-    template <typename Component, typename Derived>
+    template <typename Component, typename Derived, typename HasUseCount>
     inline void
-    intrusive_ptr_release(wrapper<Component, Derived>* p)
+    intrusive_ptr_release(wrapper<Component, Derived, HasUseCount>* p)
     {
-        if (--(*p)->use_count_ == 0)
+        if (--p->use_count_ == 0)
             delete p;
     }
 

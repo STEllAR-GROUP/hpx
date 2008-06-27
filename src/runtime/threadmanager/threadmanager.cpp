@@ -207,9 +207,8 @@ namespace hpx { namespace threadmanager
     ///////////////////////////////////////////////////////////////////////////
     void set_thread_state(thread_id_type id, thread_state new_state)
     {
-        components::wrapper<detail::px_thread, px_thread>* t =
-            static_cast<components::wrapper<detail::px_thread, px_thread>*>(id);
-        (*t)->get_thread_manager().set_state(id, new_state);
+        px_thread* t = static_cast<px_thread*>(id);
+        t->get_thread_manager().set_state(id, new_state);
     }
 
 }}

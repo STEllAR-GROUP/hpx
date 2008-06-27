@@ -9,7 +9,6 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/variant.hpp>
-#include <boost/detail/atomic_count.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -39,7 +38,6 @@ namespace hpx { namespace lcos { namespace detail
         enum { value = components::component_simple_future };
 
         simple_future()
-          : use_count_(0)
         {
         }
 
@@ -93,9 +91,6 @@ namespace hpx { namespace lcos { namespace detail
 
     private:
         lcos::full_empty<data_type> data_;
-
-    public:
-        boost::detail::atomic_count use_count_;
     };
 
 }}}
@@ -150,7 +145,9 @@ namespace hpx { namespace lcos
     {
     private:
         typedef detail::simple_future<Result> wrapped_type;
-        typedef components::wrapper<wrapped_type> wrapping_type;
+        typedef components::wrapper<
+            wrapped_type, components::detail::this_type, boost::mpl::true_> 
+        wrapping_type;
 
     public:
         /// Construct a new \a simple_future instance. The supplied 

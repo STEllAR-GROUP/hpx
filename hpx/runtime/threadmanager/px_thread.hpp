@@ -10,7 +10,6 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/detail/atomic_count.hpp>
 #include <boost/coroutine/coroutine.hpp>
 #include <boost/coroutine/shared_coroutine.hpp>
 
@@ -59,58 +58,25 @@ namespace hpx { namespace threadmanager { namespace detail
         };
 
     public:
-        /// \brief Construct a new \a px_thread
-        ///
-        /// \param func     [in] The thread function to execute by this 
-        ///                 \a px_thread.
-        /// \param id       [in] The thread id assigned to this \a px_thread 
-        ///                 instance.
-        /// \param tm       [in] A reference to the thread manager this 
-        ///                 \a px_thread will be associated with.
-        /// \param newstate [in] The initial thread state this instance will
-        ///                 be initialized with.
         px_thread(boost::function<thread_function_type> func, 
                 thread_id_type id, threadmanager& tm, thread_state newstate)
-          : coroutine_(func, id), tm_(tm), current_state_(newstate) 
+          : coroutine_(func, id), tm_(tm), current_state_(newstate)
         {}
 
         ~px_thread() 
         {}
 
-        /// \brief Execute the thread function
-        ///
-        /// \returns        This function returns the thread state the thread
-        ///                 should be scheduled from this point on. The thread
-        ///                 manager will use the returned value to set the 
-        ///                 thread's scheduling status.
         thread_state execute()
         {
             switch_status thrd_stat (current_state_, active);
             return thrd_stat = coroutine_();
         }
 
-        /// The set_state function allows to query the state of this thread
-        /// instance.
-        ///
-        /// \returns        This function returns the current state of this
-        ///                 thread. It will return one of the values as defined 
-        ///                 by the \a thread_state enumeration.
         thread_state get_state() const 
         {
             return current_state_ ;
         }
 
-        /// The set_state function allows to change the state this thread 
-        /// instance.
-        ///
-        /// \param newstate [in] The new state to be set for the thread 
-        ///                 referenced by the \a id parameter.
-        ///
-        /// \note           Changing the thread state using this function does
-        ///                 not change it's scheduling status. It only sets the
-        ///                 thread's status word. To change the thread's 
-        ///                 scheduling status \a threadmanager#set_state should
-        ///                 be used.
         void set_state(thread_state newstate)
         {
             current_state_ = newstate;
@@ -121,8 +87,6 @@ namespace hpx { namespace threadmanager { namespace detail
             return coroutine_.get_thread_id();
         }
 
-        /// \brief Allow access to the thread manager instance this thread has 
-        ///        been associated with.
         threadmanager& get_thread_manager() 
         {
             return tm_;
@@ -140,7 +104,10 @@ namespace hpx { namespace threadmanager { namespace detail
         thread_state set_event (px_thread_self&, applier::applier&)
         {
             // we need to reactivate the thread itself
-            tm_.set_state(get_thread_id(), pending);
+            if (suspended == current_state_)
+                tm_.set_state(get_thread_id(), pending);
+
+            // FIXME: implement functionality required for depleted state
             return terminated;
         }
 
@@ -158,20 +125,47 @@ namespace hpx { namespace threadmanager
 {
     ///////////////////////////////////////////////////////////////////////////
     /// \class px_thread px_thread.hpp hpx/runtime/threadmanager/px_thread.hpp
-    class px_thread : public components::wrapper<detail::px_thread, px_thread>
+    ///
+    /// A \a px_thread is the representation of a ParalleX thread. It's a first
+    /// class object in ParalleX. In our implementation this is a user level 
+    /// thread running on top of one of the OS threads spawned by the \a 
+    /// threadmanager.
+    ///
+    /// A \a px_thread encapsulates:
+    ///  - A thread status word (see the functions \a px_thread#get_state and 
+    ///    \a px_thread#set_state)
+    ///  - A function to execute (the thread function)
+    ///  - A frame (in this implementation this is a block of memory used as 
+    ///    the threads stack)
+    ///  - A block of registers (not implemented yet)
+    ///
+    /// Generally, \a px_threads are not created or executed directly. All 
+    /// functionality related to the management of \a px_thread's is 
+    /// implemented by the \a threadmanager.
+    class px_thread 
+      : public components::wrapper<detail::px_thread, px_thread, boost::mpl::true_>
     {
     private:
         typedef detail::px_thread wrapped_type;
-        typedef components::wrapper<wrapped_type, px_thread> base_type;
+        typedef components::wrapper<
+            wrapped_type, px_thread, boost::mpl::true_> 
+        base_type;
 
         // avoid warning about using 'this' in initializer list
         px_thread* This() { return this; }
 
     public:
+        /// \brief Construct a new \a px_thread
+        ///
+        /// \param func     [in] The thread function to execute by this 
+        ///                 \a px_thread.
+        /// \param tm       [in] A reference to the thread manager this 
+        ///                 \a px_thread will be associated with.
+        /// \param newstate [in] The initial thread state this instance will
+        ///                 be initialized with.
         px_thread(boost::function<thread_function_type> threadfunc, 
                 threadmanager& tm, thread_state new_state = init)
-          : base_type(new detail::px_thread(threadfunc, This(), tm, new_state)),
-            use_count_(0)
+          : base_type(new detail::px_thread(threadfunc, This(), tm, new_state))
         {}
 
         ~px_thread() 
@@ -182,16 +176,53 @@ namespace hpx { namespace threadmanager
             return const_cast<px_thread*>(this);
         }
 
+        /// \brief Allow to access the thread manager instance this thread has 
+        ///        been associated with.
+        threadmanager& get_thread_manager() 
+        {
+            return base()->get_thread_manager();
+        }
+
+        /// The get_state function allows to query the state of this thread
+        /// instance.
+        ///
+        /// \returns        This function returns the current state of this
+        ///                 thread. It will return one of the values as defined 
+        ///                 by the \a thread_state enumeration.
+        ///
+        /// \note           This function will be seldom used directly. Most of 
+        ///                 the time the state of a thread will be retrieved
+        ///                 by using the function \a threadmanager#get_state.
         thread_state get_state() const 
         {
             return base()->get_state();
         }
 
+        /// The set_state function allows to change the state this thread 
+        /// instance.
+        ///
+        /// \param newstate [in] The new state to be set for the thread 
+        ///                 referenced by the \a id parameter.
+        ///
+        /// \note           This function will be seldom used directly. Most of 
+        ///                 the time the state of a thread will have to be 
+        ///                 changed using the threadmanager. Moreover,
+        ///                 changing the thread state using this function does
+        ///                 not change its scheduling status. It only sets the
+        ///                 thread's status word. To change the thread's 
+        ///                 scheduling status \a threadmanager#set_state should
+        ///                 be used.
         void set_state(thread_state new_state)
         {
             base()->set_state(new_state);
         }
 
+        /// \brief Execute the thread function
+        ///
+        /// \returns        This function returns the thread state the thread
+        ///                 should be scheduled from this point on. The thread
+        ///                 manager will use the returned value to set the 
+        ///                 thread's scheduling status.
         thread_state operator()()
         {
             return base()->execute();
@@ -200,9 +231,6 @@ namespace hpx { namespace threadmanager
     protected:
         base_type& base() { return *this; }
         base_type const& base() const { return *this; }
-
-    public:
-        boost::detail::atomic_count use_count_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
