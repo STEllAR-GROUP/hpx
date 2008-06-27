@@ -59,8 +59,8 @@ void received_parcel(hpx::parcelset::parcelhandler& ph, hpx::naming::address con
             ++accumulated_count; 
             turnaround_time +=  ph.get_current_time() - start_time;
 
-            std::cout << "Received parcel: " << std::hex << p.get_parcel_id() 
-                      << std::flush << std::endl;
+            //std::cout << "Received parcel: " << std::hex << p.get_parcel_id() 
+            //          << std::flush << std::endl;
 
             p.set_destination(p.get_source());
             p.set_source(hpx::naming::id_type());
@@ -68,9 +68,9 @@ void received_parcel(hpx::parcelset::parcelhandler& ph, hpx::naming::address con
             start_time = ph.get_current_time();
 
             ph.put_parcel(p);
-            std::cout << "Successfully sent parcel: " 
-                      << std::hex << p.get_parcel_id() 
-                      << std::flush << std::endl;
+			//std::cout << "Successfully sent parcel: " 
+            //        << std::hex << p.get_parcel_id() 
+            //        << std::flush << std::endl;
 
             if (++count >= MAXITERATIONS) {
                 std::cout << "Successfully sent " << std::dec << count
