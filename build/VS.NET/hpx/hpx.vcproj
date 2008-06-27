@@ -311,6 +311,10 @@
 				RelativePath="..\..\..\hpx\hpx_fwd.hpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\hpx\version.hpp"
+				>
+			</File>
 			<Filter
 				Name="Include"
 				>

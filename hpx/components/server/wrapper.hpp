@@ -46,8 +46,22 @@ namespace hpx { namespace components
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \class wrapper wrapper.hpp hpx/components/server/wrapper.hpp
+    ///
     /// The wrapper template is used as a indirection layer for components 
     /// allowing to gracefully handle the access to non-existing components.
+    ///
+    /// Additionally it provides memory management capabilities for the 
+    /// wrapping instances, and it integrates the memory management with the 
+    /// DGAS service. Every instance of a wrapper gets assigned a global id.
+    /// The provided memory management allocates the wrapper instances from a
+    /// special heap, ensuring fast allocation and avoids a full network 
+    /// round trip to the DGAS service for each of the allocated instances.
+    ///
+    /// \tparam Component
+    /// \tparam Derived
+    /// \tparam HasUseCount
+    ///
     template <
         typename Component, typename Derived = detail::this_type, 
         typename HasUseCount = boost::mpl::false_
@@ -61,21 +75,28 @@ namespace hpx { namespace components
 
     public:
         typedef Component wrapped_type;
-        
+
+        /// \brief Construct an empty wrapper
         wrapper() 
           : component_(0) 
         {}
 
-        // takes ownership of the passed pointer
+        /// \brief Construct a wrapper instance holding a wrapped instance. 
+        ///        This constructor takes ownership of the passed pointer.
+        ///
+        /// \param c    [in] The pointer to the wrapped instance. The wrapper
+        ///             takes ownership of this pointer.
         explicit wrapper(Component* c) 
           : component_(c) 
         {}
 
+        /// \brief The destructor releases any wrapped instances
         ~wrapper()
         {
             delete component_;
         }
 
+        /// \brief Return a pointer to the wrapped instance
         Component* get()
         {
             if (0 == component_)
@@ -105,8 +126,14 @@ namespace hpx { namespace components
         }
 
     public:
-        /// The memory for wrapper objects is managed by a class specific 
-        /// allocator 
+        /// \brief  The memory for wrapper objects is managed by a class 
+        ///         specific allocator. This allocator uses a one size heap 
+        ///         implementation, ensuring fast memory allocation.
+        ///         Additionally the heap registers the allocated wrapper 
+        ///         instance with the DGAS service.
+        ///
+        /// \param size   [in] The parameter \a size is supplied by the 
+        ///               compiler and contains the number of bytes to allocate.
         static void* operator new(std::size_t size)
         {
             if (size > sizeof(wrapper))
@@ -125,18 +152,20 @@ namespace hpx { namespace components
             get_heap().free(p);
         }
 
-        // Overload placement operators as well (the global placement operators
-        // are hidden because of the new/delete overloads above)
+        /// \brief  The placement operator new have to be overloaded as well 
+        ///         (the global placement operators are hidden because of the 
+        ///         new/delete overloads above).
         static void* operator new(std::size_t, void *p)
         {
             return p;
         }
-        // delete if placement new fails
+        /// \brief  This operator delete is called only if the placement new 
+        ///         fails.
         static void operator delete(void*, void*)
         {}
 
-        // The function create() is used for allocation and initialization of 
-        // arrays of wrappers
+        /// \brief  The function \a create is used for allocation and 
+        //          initialization of arrays of wrappers.
         static wrapper* create(std::size_t count)
         {
             // allocate the memory
@@ -163,8 +192,8 @@ namespace hpx { namespace components
             }
             return p;
         }
-        // The function destroy() is used for deletion and de-allocation of 
-        // wrappers
+        /// \brief  The function \a destroy is used for deletion and 
+        //          de-allocation of arrays of wrappers
         static void destroy(derived_type* p, std::size_t count)
         {
             if (NULL == p || 0 == count) 

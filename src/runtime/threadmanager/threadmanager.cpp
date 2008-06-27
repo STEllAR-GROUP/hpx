@@ -16,7 +16,7 @@ namespace hpx { namespace threadmanager
     ///////////////////////////////////////////////////////////////////////////
     thread_id_type threadmanager::register_work(
         boost::function<thread_function_type> threadfunc, 
-        thread_state initial_state)
+        thread_state initial_state, bool run_now)
     {
         // verify parameters
         if (initial_state != pending && initial_state != suspended)
@@ -39,7 +39,7 @@ namespace hpx { namespace threadmanager
         {
             // pushing the new thread in the pending queue thread
             work_items_.push(px_t_sp);
-            if (running_) 
+            if (running_ && run_now) 
                 cond_.notify_one();       // try to execute the new work item
         }
 

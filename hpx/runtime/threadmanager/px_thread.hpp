@@ -22,7 +22,7 @@
 namespace hpx { namespace threadmanager { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// This is the representation of a ParalleX thread
+    // This is the representation of a ParalleX thread
     class px_thread : public lcos::base_lco, private boost::noncopyable
     {
     private:

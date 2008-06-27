@@ -74,21 +74,32 @@ namespace hpx { namespace threadmanager
         ///               [in] The value of this parameter defines the initial 
         ///               state of the newly created \a px_thread. This must be
         ///               one of the values as defined by the \a thread_state 
-        ///               enumeration (thread_state#pending, or 
+        ///               enumeration (thread_state#pending, or \a
         ///               thread_state#suspended, any other value will throw a
         ///               hpx#bad_parameter exception).
+        /// \param run_now [in] If this parameter is \a true and the initial 
+        ///               state is given as \a thread_state#pending the thread 
+        ///               will be run immediately, otherwise it will be 
+        ///               scheduled to run later (either this function is 
+        ///               called for another thread using \a true for the
+        ///               parameter \a run_now or the function \a 
+        ///               threadmanager#do_some_work is called). This parameter
+        ///               is optional and defaults to \a true.
         ///
         /// \returns      The function returns the thread id of the newly 
         ///               created thread. 
         thread_id_type 
         register_work(boost::function<thread_function_type> func,
-            thread_state initial_state = pending);
+            thread_state initial_state = pending, bool run_now = true);
 
-        /// \brief Run the thread manager's work queue
+        /// \brief  Run the thread manager's work queue. This function 
+        ///         instantiates the specified number of OS threads. All OS
+        ///         threads are started to execute the function \a tfunc.
         ///
         /// \param num_threads
         ///               [in] The initial number of threads to be started by
-        ///               this thread manager instance.
+        ///               this thread manager instance. This parameter is 
+        ///               optional and defaults to 1 (one).
         ///
         /// \returns      The function returns \a true if the thread manager
         ///               has been started successfully, otherwise it returns 
@@ -168,19 +179,22 @@ namespace hpx { namespace threadmanager
         ///
         boost::intrusive_ptr<px_thread> get_thread(thread_id_type id) const;
 
-    public:
-        /// this notifies the thread manager that there is some more work 
-        /// available 
-        void do_some_work()
-        {
-            mutex_type::scoped_lock lk(mtx_);
-            if (running_) 
-                cond_.notify_one();
-        }
-
     protected:
         // this is the thread function executing the work items in the queue
         void tfunc();
+
+    public:
+        /// this notifies the thread manager that there is some more work 
+        /// available 
+        void do_some_work(bool runall = true)
+        {
+            if (running_) {
+                if (runall)
+                    cond_.notify_all();
+                else
+                    cond_.notify_one();
+            }
+        }
 
     private:
         /// this thread manager has exactly as much threads as requested
