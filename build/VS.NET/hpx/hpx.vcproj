@@ -278,6 +278,14 @@
 					<File
 						RelativePath="..\..\..\src\runtime\threadmanager\threadmanager.cpp"
 						>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerOutput="0"
+							/>
+						</FileConfiguration>
 					</File>
 				</Filter>
 				<Filter
@@ -328,6 +336,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\hpx\include\components.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\include\lcos.hpp"
 					>
 				</File>
 				<File
@@ -655,6 +667,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\hpx\lcos\eager_future.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\lcos\eager_future_constructors.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\lcos\full_empty_memory.hpp"
 					>
 				</File>
@@ -663,7 +683,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\hpx\lcos\simple_dataflow_template.hpp"
+					RelativePath="..\..\..\hpx\lcos\lazy_future.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\lcos\lazy_future_get_results.hpp"
 					>
 				</File>
 				<File

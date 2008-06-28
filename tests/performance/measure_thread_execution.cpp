@@ -6,8 +6,6 @@
 #include <boost/lexical_cast.hpp>
 #include <hpx/hpx.hpp>
 
-#define NUMBER_OF_PX_THREADS 1000
-
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -20,11 +18,12 @@ threadmanager::thread_state null_thread(threadmanager::px_thread_self& self,
 
 ///////////////////////////////////////////////////////////////////////////////
 threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self, 
-    applier::applier& appl, util::high_resolution_timer& timer)
+    applier::applier& appl, util::high_resolution_timer& timer,
+    std::size_t num_px_threads)
 {
     // schedule a couple of threads
     threadmanager::threadmanager& tm = appl.get_thread_manager();
-    for (int i = 0; i < NUMBER_OF_PX_THREADS; ++i) {
+    for (std::size_t i = 0; i < num_px_threads; ++i) {
         tm.register_work(boost::bind(&null_thread, _1, boost::ref(appl)),
             threadmanager::pending, false);
     }
@@ -48,13 +47,15 @@ int main(int argc, char* argv[])
         std::string hpx_host, dgas_host;
         unsigned short hpx_port, dgas_port;
         std::size_t num_threads = 1;
+        std::size_t num_px_threads = 1;
 
         // Check command line arguments.
-        if (argc != 6) {
+        if (argc != 7) {
             std::cerr << "Usage: hpx_runtime hpx_addr hpx_port dgas_addr "
-                         "dgas_port number_of_threads" << std::endl;
+                         "dgas_port number_of_threads number_of_px_threads" 
+                      << std::endl;
             std::cerr << "Try: hpx_runtime <your_ip_addr> 7911 "
-                         "<your_ip_addr> 7912 1" << std::endl;
+                         "<your_ip_addr> 7912 1 1000" << std::endl;
             return -3;
         }
         else {
@@ -62,7 +63,8 @@ int main(int argc, char* argv[])
             hpx_port = boost::lexical_cast<unsigned short>(argv[2]);
             dgas_host = argv[3];
             dgas_port  = boost::lexical_cast<unsigned short>(argv[4]);
-            num_threads = boost::lexical_cast<int>(argv[5]) ? true : false;
+            num_threads = boost::lexical_cast<int>(argv[5]);
+            num_px_threads = boost::lexical_cast<int>(argv[6]);
         }
 
         // run the DGAS server instance here
@@ -75,9 +77,12 @@ int main(int argc, char* argv[])
         // the main thread will wait (block) for the shutdown action and 
         // the threadmanager is serving incoming requests in the meantime
         util::high_resolution_timer timer;
-        rt.run(boost::bind(hpx_main, _1, _2, boost::ref(timer)), num_threads);
-        std::cout << "Elapsed time for " << NUMBER_OF_PX_THREADS 
-                  << " px_threads: " << timer.elapsed() << std::endl;
+        rt.run(boost::bind(hpx_main, _1, _2, boost::ref(timer), num_px_threads), 
+            num_threads);
+        double elapsed = timer.elapsed();
+        std::cout << "Elapsed time [s] for " << num_px_threads 
+                  << " px_threads: " << elapsed << " (" 
+                  << elapsed/num_px_threads << " per px_thread)" << std::endl;
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";

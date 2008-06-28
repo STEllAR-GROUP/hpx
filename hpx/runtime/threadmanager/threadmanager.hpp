@@ -19,6 +19,7 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -106,6 +107,11 @@ namespace hpx { namespace threadmanager
         ///               \a false.
         bool run(std::size_t num_threads = 1) 
         {
+            if (0 == num_threads) {
+                boost::throw_exception(hpx::exception(
+                    bad_parameter, "Number of threads shouldn't be zero"));
+            }
+
             mutex_type::scoped_lock lk(mtx_);
             if (!threads_.empty() || running_) 
                 return true;    // do nothing if already running

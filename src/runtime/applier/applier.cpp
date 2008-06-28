@@ -7,7 +7,7 @@
 #include <hpx/include/applier.hpp>
 #include <hpx/components/server/wrapper.hpp>
 #include <hpx/components/continuation_impl.hpp>
-#include <hpx/lcos/simple_future.hpp>
+#include <hpx/lcos/eager_future.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace applier
@@ -18,19 +18,14 @@ namespace hpx { namespace applier
         naming::id_type const& targetgid, components::component_type type,
         std::size_t count)
     {
-        // Create a simple_future, execute the required action and wait 
-        // for the result to be returned to the future.
-        lcos::simple_future<naming::id_type> lco;
-
-        // The simple_future instance is associated with the following 
-        // apply action by sending it along as its continuation
-        apply<components::server::runtime_support::create_component_action>(
-            new components::continuation(lco.get_gid(*this)), targetgid, 
-            type, count);
-
+        // Create a simple_future, execute the required action, 
         // we simply return the initialized simple_future, the caller needs
         // to call get_result() on the return value to obtain the result
-        return lco;
+        typedef 
+            components::server::runtime_support::create_component_action
+        action_type;
+        return lcos::eager_future<action_type, naming::id_type>(*this, 
+            targetgid, type, count);
     }
 
     // 

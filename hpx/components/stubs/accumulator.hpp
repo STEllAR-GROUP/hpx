@@ -10,7 +10,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/components/stubs/runtime_support.hpp>
 #include <hpx/components/server/accumulator.hpp>
-#include <hpx/lcos/simple_future.hpp>
+#include <hpx/lcos/eager_future.hpp>
 
 namespace hpx { namespace components { namespace stubs
 {
@@ -64,18 +64,11 @@ namespace hpx { namespace components { namespace stubs
         static lcos::simple_future<double> query_async(
             applier::applier& appl, naming::id_type gid) 
         {
-            // Create a simple_future, execute the required action and wait 
-            // for the result to be returned to the future.
-            lcos::simple_future<double> lco;
-
-            // The simple_future instance is associated with the following 
-            // apply action by sending it along as its continuation
-            appl.apply<server::detail::accumulator::query_action>(
-                new components::continuation(lco.get_gid(appl)), gid);
-
-            // we simply return the initialized simple_future, the caller needs
+            // Create an eager_future, execute the required action,
+            // we simply return the initialized eager_future, the caller needs
             // to call get_result() on the return value to obtain the result
-            return lco;
+            typedef server::detail::accumulator::query_action action_type;
+            return lcos::eager_future<action_type, double>(appl, gid);
         }
 
         /// Query the current value of the server#accumulator instance 

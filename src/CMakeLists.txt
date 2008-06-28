@@ -39,8 +39,12 @@ set (hpxlib_HEADERS
     ../hpx/include/util.hpp
     # LCO's
     ../hpx/lcos/base_lco.hpp
+    ../hpx/lcos/eager_future.hpp
+    ../hpx/lcos/eager_future_constructors.hpp
     ../hpx/lcos/full_empty_memory.hpp
     ../hpx/lcos/full_empty_store.hpp
+    ../hpx/lcos/lazy_future.hpp
+    ../hpx/lcos/lazy_future_get_results.hpp
     ../hpx/lcos/simple_future.hpp
     # runtime
     ../hpx/runtime/runtime.hpp

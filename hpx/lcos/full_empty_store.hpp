@@ -124,9 +124,8 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
-                full_empty_queue_entry* f = 
-                    new full_empty_queue_entry(self.get_thread_id());
-                full_full_.push_back(*f);
+                full_empty_queue_entry f(self.get_thread_id());
+                read_queue_.push_back(f);
 
                 util::unlock_the_lock<scoped_lock> ul(l);
                 self.yield(threadmanager::suspended);
@@ -148,9 +147,8 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
-                full_empty_queue_entry* f = 
-                    new full_empty_queue_entry(self.get_thread_id());
-                full_full_.push_back(*f);
+                full_empty_queue_entry f(self.get_thread_id());
+                read_queue_.push_back(f);
 
                 util::unlock_the_lock<scoped_lock> ul(l);
                 self.yield(threadmanager::suspended);
@@ -169,9 +167,8 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
-                full_empty_queue_entry* f = 
-                    new full_empty_queue_entry(self.get_thread_id());
-                full_empty_.push_back(*f);
+                full_empty_queue_entry f(self.get_thread_id());
+                read_and_empty_queue_.push_back(f);
 
                 // yield this thread
                 {
@@ -202,9 +199,8 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
-                full_empty_queue_entry* f = 
-                    new full_empty_queue_entry(self.get_thread_id());
-                full_empty_.push_back(*f);
+                full_empty_queue_entry f(self.get_thread_id());
+                read_and_empty_queue_.push_back(f);
 
                 // yield this thread
                 util::unlock_the_lock<scoped_lock> ul(l);
@@ -227,9 +223,8 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is already full
             if (state_ == full) {
                 // enqueue the request and block this thread
-                full_empty_queue_entry* f = 
-                    new full_empty_queue_entry(self.get_thread_id());
-                empty_full_.push_back(*f);
+                full_empty_queue_entry f(self.get_thread_id());
+                write_queue_.push_back(f);
 
                 util::unlock_the_lock<scoped_lock> ul(l);
                 self.yield(threadmanager::suspended);
@@ -254,9 +249,8 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is already full
             if (state_ == full) {
                 // enqueue the request and block this thread
-                full_empty_queue_entry* f = 
-                    new full_empty_queue_entry(self.get_thread_id());
-                empty_full_.push_back(*f);
+                full_empty_queue_entry f(self.get_thread_id());
+                write_queue_.push_back(f);
 
                 util::unlock_the_lock<scoped_lock> ul(l);
                 self.yield(threadmanager::suspended);
@@ -308,10 +302,10 @@ namespace hpx { namespace lcos { namespace detail
             if (state_ != empty)
                 return !is_used_locked();  // callback routine prevented state change
 
-            if (!empty_full_.empty()) {
-                std::auto_ptr<full_empty_queue_entry> e(&empty_full_.front());
-                empty_full_.pop_front();
-                threadmanager::set_thread_state(e->id_, threadmanager::pending);
+            if (!write_queue_.empty()) {
+                full_empty_queue_entry& e (write_queue_.front());
+                write_queue_.pop_front();
+                threadmanager::set_thread_state(e.id_, threadmanager::pending);
                 set_full_locked(f);    // state_ = full
             }
 
@@ -327,18 +321,18 @@ namespace hpx { namespace lcos { namespace detail
                 return false;         // callback routine prevented state change
 
             // handle all threads waiting for the block to become full
-            while (!full_full_.empty()) {
-                std::auto_ptr<full_empty_queue_entry> e(&full_full_.front());
-                full_full_.pop_front();
-                threadmanager::set_thread_state(e->id_, threadmanager::pending);
+            while (!read_queue_.empty()) {
+                full_empty_queue_entry& e(read_queue_.front());
+                read_queue_.pop_front();
+                threadmanager::set_thread_state(e.id_, threadmanager::pending);
             }
 
             // since we got full now we need to re-activate one thread waiting
             // for the block to become full
-            if (!full_empty_.empty()) {
-                std::auto_ptr<full_empty_queue_entry> e(&full_empty_.front());
-                full_empty_.pop_front();
-                threadmanager::set_thread_state(e->id_, threadmanager::pending);
+            if (!read_and_empty_queue_.empty()) {
+                full_empty_queue_entry& e(read_and_empty_queue_.front());
+                read_and_empty_queue_.pop_front();
+                threadmanager::set_thread_state(e.id_, threadmanager::pending);
                 set_empty_locked(f);   // state_ = empty
             }
 
@@ -348,16 +342,16 @@ namespace hpx { namespace lcos { namespace detail
 
         bool is_used_locked() const
         {
-            return !(empty_full_.empty() && full_empty_.empty() && full_full_.empty());
+            return !(write_queue_.empty() && read_and_empty_queue_.empty() && read_queue_.empty());
         }
 
     private:
         mutable mutex_type mtx_;
-        queue_type empty_full_;     // threads waiting in write
-        queue_type full_empty_;     // threads waiting in read_and_empty
-        queue_type full_full_;      // threads waiting in read
-        void* entry_;
-        full_empty state_;
+        queue_type write_queue_;              // threads waiting in write
+        queue_type read_and_empty_queue_;     // threads waiting in read_and_empty
+        queue_type read_queue_;               // threads waiting in read
+        void* entry_;                         // pointer to protected data item
+        full_empty state_;                    // current full/empty state
     };
 
     ///////////////////////////////////////////////////////////////////////////

@@ -126,6 +126,8 @@ namespace hpx
         struct base_lco;
         template <typename Result> struct base_lco_with_value;
         template <typename Result> class simple_future;
+        template <typename Action, typename Result> class eager_future;
+        template <typename Action, typename Result> class lazy_future;
     }
 }
 

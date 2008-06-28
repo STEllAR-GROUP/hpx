@@ -82,6 +82,14 @@
         return false;     // destination is remote
     }
 
+    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    bool apply_c (naming::id_type const& targetgid, naming::id_type const& gid,
+         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+    {
+        return apply<Action>(new components::continuation(targetgid), 
+            gid, BOOST_PP_ENUM_PARAMS(N, arg));
+    }
+
 #undef N
 
 #endif

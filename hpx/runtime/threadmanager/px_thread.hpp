@@ -68,8 +68,7 @@ namespace hpx { namespace threadmanager { namespace detail
 
         thread_state execute()
         {
-            switch_status thrd_stat (current_state_, active);
-            return thrd_stat = coroutine_();
+            return coroutine_();
         }
 
         thread_state get_state() const 

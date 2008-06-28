@@ -135,6 +135,35 @@ namespace hpx { namespace threadmanager
         return unknown;
     }
 
+    // helper class for switching thread state in and out during execution
+    class switch_status
+    {
+    public:
+        switch_status (px_thread* t, thread_state new_state)
+            : thread_(t), prev_state_(t->get_state())
+        { 
+            t->set_state(new_state);
+        }
+
+        ~switch_status ()
+        {
+            thread_->set_state(prev_state_);
+        }
+
+        // allow to change the state the thread will be switched to after 
+        // execution
+        thread_state operator=(thread_state new_state)
+        {
+            return prev_state_ = new_state;
+        }
+
+    private:
+        // it is safe to store a plain pointer here since this class will be 
+        // used inside a block holding a intrusive_ptr to this thread
+        px_thread* thread_;
+        thread_state prev_state_;
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     // main function executed by a OS thread
     void threadmanager::tfunc()
@@ -157,10 +186,20 @@ namespace hpx { namespace threadmanager
                 thread_state state = thrd->get_state();
                 if (state == pending)
                 {
-                    // make sure lock is unlocked during execution of work item
-                    util::unlock_the_lock<mutex_type::scoped_lock> l(lk);    
-                    state = (*thrd)();    // thread returns new required state
-                }   // the lock gets locked again here!
+                    // switch the state of the thread to active and back to 
+                    // what the thread reports as its return value
+                    switch_status thrd_stat (thrd.get(), active);
+
+                    {
+                        // make sure lock is unlocked during execution of the 
+                        // work item
+                        util::unlock_the_lock<mutex_type::scoped_lock> l(lk);
+                        state = (*thrd)();  // thread returns new required state
+                    } // the lock gets locked again here!
+
+                    // store the returned state in the thread
+                    thrd_stat = state;
+                }   // this stores the new state in the thread
 
                 // Re-add this work item to our list of work items if thread
                 // should be re-scheduled. If the thread is suspended now we

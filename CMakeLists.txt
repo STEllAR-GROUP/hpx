@@ -14,14 +14,18 @@ project (hpx)
 
 # We need to use Boost
 find_package(Boost 1.35.0 COMPONENTS date_time filesystem graph regex serialization thread system signals)
+
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 LINK_DIRECTORIES(${Boost_LIBRARY_DIR})
+
+# We need Intels Thread Building Blocks library as well
+#find_package(TBB)
 
 # We need to include the hpx directory for includes
 include_directories (${hpx_SOURCE_DIR})
 include_directories (${hpx_SOURCE_DIR}/external/coroutine)
-include_directories (${hpx_SOURCE_DIR}/external/exception)
 include_directories (${hpx_SOURCE_DIR}/external/endian)
+include_directories (${hpx_SOURCE_DIR}/external/exception)
 include_directories (${hpx_SOURCE_DIR}/external/logging)
 include_directories (${hpx_SOURCE_DIR}/external/singleton)
 

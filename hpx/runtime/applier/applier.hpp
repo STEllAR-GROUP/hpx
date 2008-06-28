@@ -97,6 +97,13 @@ namespace hpx { namespace applier
             return false;     // destination is remote
         }
 
+        template <typename Action>
+        bool apply_c (naming::id_type const& targetgid, 
+            naming::id_type const& gid)
+        {
+            return apply<Action>(new components::continuation(targetgid), gid);
+        }
+
     public:
         ///////////////////////////////////////////////////////////////////////
         // one parameter version
@@ -143,6 +150,14 @@ namespace hpx { namespace applier
             // Send the parcel through the parcel handler
             parcel_handler_.put_parcel(p);
             return false;     // destination is remote
+        }
+
+        template <typename Action, typename Arg0>
+        bool apply_c (naming::id_type const& targetgid, 
+            naming::id_type const& gid, Arg0 const& arg0)
+        {
+            return apply<Action>(new components::continuation(targetgid), 
+                gid, arg0);
         }
 
         // bring in the rest of the apply<> overloads

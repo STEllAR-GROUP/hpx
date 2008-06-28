@@ -14,19 +14,18 @@ namespace hpx { namespace components
     {
         component_invalid = 0,
         component_runtime_support,  // runtime support (needed to create components, etc.)
+        component_memory,           // general memory address
         component_px_thread,        // a ParalleX thread
 
         // LCO's
         component_base_lco,         // the base of all LCO's not waiting on a value
         component_base_lco_with_value,  // base LCO's blocking on a value
-        component_simple_future,    // a simple future allowing one thread to 
-                                    // wait for the result
+        component_future,           // a future executing the action and allowing to wait for the resul
 
         component_distributing_factory,   // factory combined with load balancing
 
         // test categories
         component_accumulator,      // simple accumulator
-        component_memory,           // general memory address
 
         component_graph,            // logical graph (spanning several localities)
         component_local_graph,      // simple graph example component (see examples/graph_component)
@@ -41,13 +40,13 @@ namespace hpx { namespace components
         {
             "component_invalid",
             "component_runtime_support",
+            "component_memory",
             "component_px_thread",
             "component_base_lco",
             "component_base_lco_with_value",
-            "component_simple_future",
+            "component_future",
             "component_distributing_factory",
             "component_accumulator",
-            "component_memory",
             "component_graph",
             "component_local_graph",
             "component_graph_vertex",

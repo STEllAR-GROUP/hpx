@@ -35,11 +35,10 @@ namespace hpx { namespace lcos { namespace detail
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
         // to associate this component with a given action.
-        enum { value = components::component_simple_future };
+        enum { value = components::component_future };
 
         simple_future()
-        {
-        }
+        {}
 
         Result get_result(threadmanager::px_thread_self& self) 
         {
@@ -96,13 +95,6 @@ namespace hpx { namespace lcos { namespace detail
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-// Serialization support for the simple_future actions
-HPX_SERIALIZE_ACTION(hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_result_action);
-HPX_SERIALIZE_ACTION(hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_error_action);
-HPX_SERIALIZE_ACTION(hpx::lcos::base_lco_with_value<double>::set_result_action);
-HPX_SERIALIZE_ACTION(hpx::lcos::base_lco_with_value<double>::set_error_action);
-
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos 
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -143,16 +135,15 @@ namespace hpx { namespace lcos
     template <typename Result>
     class simple_future 
     {
-    private:
+    protected:
         typedef detail::simple_future<Result> wrapped_type;
         typedef components::wrapper<
             wrapped_type, components::detail::this_type, boost::mpl::true_> 
         wrapping_type;
 
-    public:
-        /// Construct a new \a simple_future instance. The supplied 
+        /// Construct a new \a future instance. The supplied 
         /// \a px_thread will be notified as soon as the result of the 
-        /// operation associated with this simple_future instance has been 
+        /// operation associated with this future instance has been 
         /// returned.
         /// 
         /// \note         The result of the requested operation is expected to 
@@ -160,16 +151,24 @@ namespace hpx { namespace lcos
         ///               \a base_lco#set_result action. Any error has to be 
         ///               reported using a \a base_lco::set_error action. The 
         ///               target for either of these actions has to be this 
-        ///               simple_future instance (as it has to be sent along 
+        ///               future instance (as it has to be sent along 
         ///               with the action as the continuation parameter).
         simple_future()
           : impl_(new wrapping_type(new wrapped_type()))
         {}
 
+        /// \brief Return the global id of this \a future instance
+        naming::id_type get_gid(applier::applier& appl) const
+        {
+            return impl_->get_gid(appl);
+        }
+
+    public:
+
         /// Get the result of the requested action. This call blocks (yields 
         /// control) if the result is not ready. As soon as the result has been 
         /// returned and the waiting thread has been re-scheduled by the thread
-        /// manager the \a get_result() will return.
+        /// manager the function \a eager_future#get_result will return.
         ///
         /// \param self   [in] The \a px_thread which will be unconditionally
         ///               while waiting for the result. 
@@ -183,13 +182,7 @@ namespace hpx { namespace lcos
             return (*impl_)->get_result(self);
         }
 
-        /// \brief Return the global id of this \a simple_future instance
-        naming::id_type get_gid(applier::applier& appl) const
-        {
-            return impl_->get_gid(appl);
-        }
-
-    private:
+    protected:
         boost::intrusive_ptr<wrapping_type> impl_;
     };
 

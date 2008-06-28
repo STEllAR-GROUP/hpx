@@ -10,7 +10,7 @@
 
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/components/server/runtime_support.hpp>
-#include <hpx/lcos/simple_future.hpp>
+#include <hpx/lcos/eager_future.hpp>
 
 namespace hpx { namespace components { namespace stubs
 {
@@ -40,19 +40,12 @@ namespace hpx { namespace components { namespace stubs
             applier::applier& appl, naming::id_type const& targetgid, 
             components::component_type type, std::size_t count = 1) 
         {
-            // Create a simple_future, execute the required action and wait 
-            // for the result to be returned to the future.
-            lcos::simple_future<naming::id_type> lco;
-
-            // The simple_future instance is associated with the following 
-            // apply action by sending it along as its continuation
-            appl.apply<server::runtime_support::create_component_action>(
-                new components::continuation(lco.get_gid(appl)), 
-                targetgid, type, count);
-
+            // Create an eager_future, execute the required action,
             // we simply return the initialized simple_future, the caller needs
             // to call get_result() on the return value to obtain the result
-            return lco;
+            typedef server::runtime_support::create_component_action action_type;
+            return lcos::eager_future<action_type, naming::id_type>(appl, 
+                targetgid, type, count);
         }
 
         /// Create a new component \a type using the runtime_support with the 
@@ -63,7 +56,7 @@ namespace hpx { namespace components { namespace stubs
             std::size_t count = 1) 
         {
             // The following get_result yields control while the action above 
-            // is executed and the result is returned to the simple_future
+            // is executed and the result is returned to the eager_future
             return create_component_async(appl, targetgid, type, count)
                 .get_result(self);
         }
