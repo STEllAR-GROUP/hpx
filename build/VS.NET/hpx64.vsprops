@@ -2,7 +2,7 @@
 <VisualStudioPropertySheet
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="hpx"
+	Name="hpx64"
 	>
 	<Tool
 		Name="VCCLCompilerTool"
@@ -12,7 +12,7 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalLibraryDirectories="&quot;$(BOOST_ROOT)\stage\lib&quot;;&quot;$(TBB_ROOT)\ia32\vc8\lib&quot;"
+		AdditionalLibraryDirectories="&quot;$(BOOST_ROOT)\stage\lib64&quot;;&quot;$(TBB_ROOT)\ia32\vc8\lib64&quot;"
 	/>
 	<UserMacro
 		Name="BOOST_ROOT"
