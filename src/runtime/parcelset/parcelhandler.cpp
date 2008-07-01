@@ -15,7 +15,11 @@
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 
+#include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/container_device.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/runtime/threadmanager/threadmanager.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
@@ -86,6 +90,47 @@ namespace hpx { namespace parcelset
             throw exception(network_error, saved_error.message());
         return id;
     }
-    
+
+    void parcelhandler::parcel_sink(parcelport& pp, 
+        boost::shared_ptr<std::vector<char> > const& parcel_data)
+    {
+        if (NULL == tm_) {
+            // this is supported for debugging purposes mainly, it results in
+            // the direct execution of the parcel decoding
+            decode_parcel(parcel_data);
+        }
+        else {
+            // create a new px_thread which decodes and handles the parcel
+            tm_->register_work(
+                boost::bind(&parcelhandler::decode, this, _1, parcel_data));
+        }
+    }
+
+    threadmanager::thread_state parcelhandler::decode(
+        threadmanager::px_thread_self&, 
+        boost::shared_ptr<std::vector<char> > const& parcel_data)
+    {
+        decode_parcel(parcel_data);
+        return threadmanager::terminated;
+    }
+
+    void parcelhandler::decode_parcel(
+        boost::shared_ptr<std::vector<char> > const& parcel_data)
+    {
+        parcel p;
+        {
+            // create a special io stream on top of in_buffer_
+            typedef util::container_device<std::vector<char> > io_device_type;
+            boost::iostreams::stream<io_device_type> io (*parcel_data.get());
+
+            // De-serialize the parcel data
+            util::portable_binary_iarchive archive(io);
+            archive >> p;
+        }
+
+        // add parcel to incoming parcel queue
+        parcels_.add_parcel(p);
+    }
+
 ///////////////////////////////////////////////////////////////////////////////
 }}

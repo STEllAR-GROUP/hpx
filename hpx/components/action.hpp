@@ -366,6 +366,44 @@ namespace hpx { namespace components
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Component, typename Result, int Action, 
+        threadmanager::thread_state(Component::*F)(
+            threadmanager::px_thread_self&, applier::applier&, Result*),
+        Result (Component::*DirectF)(applier::applier&)
+    >
+    class direct_result_action0 
+      : public result_action0<Component, Result, Action, F, boost::mpl::true_>
+    {
+    private:
+        typedef 
+            result_action0<Component, Result, Action, F, boost::mpl::true_> 
+        base_type;
+
+    public:
+        direct_result_action0()
+        {}
+
+    public:
+        ///
+        static Result execute_function(
+            applier::applier& appl, naming::address::address_type lva)
+        {
+            return (get_lva<Component>::call(lva)->*DirectF)(appl);
+        }
+
+    private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     //  zero parameter version, no result value
     template <
         typename Component, int Action, 
@@ -596,6 +634,51 @@ namespace hpx { namespace components
             applier::applier& appl, naming::address::address_type lva) const
         {
             return construct_thread_function(cont, appl, lva, this->get<0>());
+        }
+
+    private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Component, typename Result, int Action, typename T0, 
+        threadmanager::thread_state(Component::*F)(
+            threadmanager::px_thread_self&, applier::applier&, Result*, T0),
+        Result (Component::*DirectF)(applier::applier&, T0)
+    >
+    class direct_result_action1 
+      : public result_action1<Component, Result, Action, T0, F, boost::mpl::true_>
+    {
+    private:
+        typedef 
+            result_action1<Component, Result, Action, T0, F, boost::mpl::true_> 
+        base_type;
+
+    public:
+        direct_result_action1()
+        {}
+
+        template <typename Arg0>
+        direct_result_action1(Arg0 const& arg0)
+            :  result_action1(arg0)
+        {}
+
+    public:
+        ///
+        template <typename Arg0>
+        static Result execute_function(
+            applier::applier& appl, naming::address::address_type lva,
+            Arg0 const& arg0)
+        {
+            return (get_lva<Component>::call(lva)->*DirectF)(appl, arg0);
         }
 
     private:

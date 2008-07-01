@@ -68,7 +68,7 @@ void received_parcel(hpx::parcelset::parcelhandler& ph, hpx::naming::address con
             start_time = ph.get_current_time();
 
             ph.put_parcel(p);
-			//std::cout << "Successfully sent parcel: " 
+            //std::cout << "Successfully sent parcel: " 
             //        << std::hex << p.get_parcel_id() 
             //        << std::flush << std::endl;
 

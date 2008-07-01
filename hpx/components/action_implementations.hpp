@@ -38,7 +38,7 @@
 #define HPX_GUID_ARGUMENT2(z, n, data) (BOOST_PP_CAT(T, n))
 
     ///////////////////////////////////////////////////////////////////////////
-    //  N parameter version
+    //  N parameter version, with result
     template <
         typename Component, typename Result, int Action, 
         BOOST_PP_ENUM_PARAMS(N, typename T),
@@ -167,6 +167,60 @@
         {
             return construct_thread_function(cont, appl, lva, 
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+        }
+
+    private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    //  N parameter version, direct execution with result
+    template <
+        typename Component, typename Result, int Action, 
+        BOOST_PP_ENUM_PARAMS(N, typename T), 
+        threadmanager::thread_state(Component::*F)(
+            threadmanager::px_thread_self&, applier::applier&, Result*, 
+            BOOST_PP_ENUM_PARAMS(N, T)),
+        Result (Component::*DirectF)(applier::applier&, 
+            BOOST_PP_ENUM_PARAMS(N, T))
+    >
+    class BOOST_PP_CAT(direct_result_action, N)
+      : public BOOST_PP_CAT(result_action, N)<Component, Result, Action, 
+          BOOST_PP_ENUM_PARAMS(N, T), F, boost::mpl::true_>
+    {
+    private:
+        typedef BOOST_PP_CAT(result_action, N)<
+            Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F, 
+            boost::mpl::true_> 
+        base_type;
+
+    public:
+        BOOST_PP_CAT(direct_result_action, N)()
+        {}
+
+        // construct an action from its arguments
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        BOOST_PP_CAT(direct_result_action, N)(
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+        {}
+
+    public:
+        ///
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        static Result execute_function(
+            applier::applier& appl, naming::address::address_type lva,
+            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        {
+            return (get_lva<Component>::call(lva)->*DirectF)(appl, 
+                BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
     private:

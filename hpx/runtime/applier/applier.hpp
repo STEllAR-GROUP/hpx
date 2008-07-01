@@ -133,7 +133,7 @@ namespace hpx { namespace applier
             Arg0 const& arg0)
         {
             components::continuation_type cont(c);
-            
+
             // Determine whether the gid is local or remote
             naming::address addr;
             if (address_is_local(gid, addr)) {
@@ -279,9 +279,9 @@ namespace hpx { namespace applier
                 boost::uint64_t(&memory_));
         }
 
-    protected:
-        bool 
-        address_is_local(naming::id_type const& gid, naming::address& addr) const
+        /// Test whether the given address (gid) is local or remote
+        bool address_is_local(naming::id_type const& gid, 
+            naming::address& addr) const
         {
             // test if the gid is of one of the non-movable objects
             // this is certainly an optimization relying on the fact that the 

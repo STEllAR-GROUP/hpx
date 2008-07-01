@@ -49,8 +49,8 @@ namespace hpx
       : dgas_pool_(), parcel_pool_(),
         dgas_client_(dgas_pool_, dgas_address, dgas_port),
         parcel_port_(parcel_pool_, address, port),
-        parcel_handler_(dgas_client_, parcel_port_),
         thread_manager_(),
+        parcel_handler_(dgas_client_, parcel_port_, &thread_manager_),
         applier_(dgas_client_, parcel_handler_, thread_manager_, 
             runtime_support_, memory_),
         action_manager_(applier_)
@@ -61,8 +61,8 @@ namespace hpx
       : dgas_pool_(), parcel_pool_(),
         dgas_client_(dgas_pool_, dgas_address),
         parcel_port_(parcel_pool_, address),
-        parcel_handler_(dgas_client_, parcel_port_),
         thread_manager_(),
+        parcel_handler_(dgas_client_, parcel_port_, &thread_manager_),
         applier_(dgas_client_, parcel_handler_, thread_manager_, 
             runtime_support_, memory_),
         action_manager_(applier_)

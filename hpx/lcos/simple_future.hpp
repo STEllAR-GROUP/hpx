@@ -61,6 +61,12 @@ namespace hpx { namespace lcos { namespace detail
             return boost::get<result_type>(d);
         };
 
+        void set_data(Result const& result)
+        {
+            // set the received result, reset error status
+            data_.set(result);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
@@ -70,7 +76,7 @@ namespace hpx { namespace lcos { namespace detail
             applier::applier& appl, Result const& result)
         {
             // set the received result, reset error status
-            data_.set(result);
+            set_data(result);
 
             // this thread has nothing more to do
             return threadmanager::terminated;

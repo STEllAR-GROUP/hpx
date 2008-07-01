@@ -96,7 +96,7 @@ namespace hpx { namespace util
              || next >= ((boost::iostreams::stream_offset)container_.size()))
                 throw std::ios_base::failure("bad seek offset");
 
-            pos_ = next;
+            pos_ = (size_type)next;
             return pos_;
         }
 

@@ -34,11 +34,14 @@ namespace hpx { namespace parcelset
         static void default_write_handler(boost::system::error_code const&, 
             std::size_t) {}
 
-        void parcel_sink(parcelport& pp, parcel const& p)
-        {
-            parcels_.add_parcel(p);
-        }
-        
+        threadmanager::thread_state decode(threadmanager::px_thread_self&, 
+            boost::shared_ptr<std::vector<char> > const&);
+
+        void parcel_sink(parcelport& pp, 
+            boost::shared_ptr<std::vector<char> > const& parcel_data);
+
+        void decode_parcel(boost::shared_ptr<std::vector<char> > const&);
+
         // avoid warnings about using \a this in member initializer list
         parcelhandler& This() { return *this; }
 
@@ -69,8 +72,9 @@ namespace hpx { namespace parcelset
         ///                 parcelhandler is connected to. This \a parcelport 
         ///                 instance will be used for any parcel related 
         ///                 transport operations the parcelhandler carries out.
-        parcelhandler(naming::resolver_client& resolver, parcelport& pp) 
-          : resolver_(resolver), pp_(pp), parcels_(This()),
+        parcelhandler(naming::resolver_client& resolver, parcelport& pp,
+                threadmanager::threadmanager* tm = NULL) 
+          : resolver_(resolver), pp_(pp), tm_(tm), parcels_(This()),
             startup_time_(util::high_resolution_timer::now()), timer_()
         {
             // retrieve the prefix to be used for this site
@@ -425,12 +429,15 @@ namespace hpx { namespace parcelset
         /// the parcelport this handler is associated with
         parcelport& pp_;
 
+        /// the threadmanager to use (optional)
+        threadmanager::threadmanager* tm_;
+
         /// 
         server::parcelhandler_queue parcels_;
-        
+
         /// The site current range of ids to be used for id_type instances
         util::unique_ids id_range_;
-        
+
         boost::signals::scoped_connection conn_;
 
         /// This is the timer instance for this parcelhandler

@@ -25,7 +25,7 @@ namespace hpx { namespace parcelset { namespace server
         {}
                 
         /// add a new parcel to the end of the parcel queue
-        void add_parcel(parcel const& p);
+        void add_parcel(boost::shared_ptr<std::vector<char> > const& p);
     
 //         /// return next available parcel
 //         bool get_parcel (parcel& p);
@@ -47,12 +47,15 @@ namespace hpx { namespace parcelset { namespace server
         // list of pending parcels
 //         typedef boost::mutex mutex_type;
 //         mutex_type mtx_;
-//         
-//         typedef std::list<parcel> parcel_list_type;
-//         std::list<parcel> parcel_queue_; 
+// 
+//         typedef 
+//             std::list<boost::shared_ptr<std::vector<char> > > 
+//         parcel_list_type;
+//         parcel_list_type parcel_queue_; 
 
         hpx::parcelset::parcelport& parcel_port_;
-        typedef void callback_type(parcelport&, parcel const&);
+        typedef void callback_type(parcelport&, 
+            boost::shared_ptr<std::vector<char> > const&);
         boost::signal<callback_type> notify_;
     };
 
