@@ -1,0 +1,46 @@
+HPX Installation QuickStart:
+============================
+
+Please make sure you have the following packages installed BEFORE 
+compiling HPX: 
+    1) CMake Ver. 2.6.0 URL: http://www.cmake.org
+    2) BOOST C++ Libraries Ver. 1.35.0 URL: http://www.boost.org
+
+Installation Instructions:
+==========================
+Download the latest Subversion release of HPX sourcecode from:
+    https://svn.cct.lsu.edu/repos/projects/parallex/trunk/hpx
+    
+Export the BOOST_ROOT environment to point to your BOOST installation 
+directory:
+    [bash]$ export BOOST_ROOT=<path_to_your_boost_installation>>
+    [csh] % setenv BOOST_ROOT <path_to_your_boost_installation>
+    
+In your HPX_ROOT directory generate makefiles using "cmake":
+    $ cmake .
+
+Compile the HPX sourcecode and example using "make":
+    $ make
+
+The compilation messages should provide information on progress rate
+and the success of compilation & linking of HPX code. 
+
+If you have difficulty in compiling the code, please email 
+the HPX developers at:
+
+   px_dev@cct.lsu.edu
+
+
+Known Issues
+************
+On some Unix Systems, CMake 2.6 fails to locate the installed BOOST 
+library instance. One of the known issues that causes the failure to locate 
+the libraries is due to regular expression issues in FindBoost.cmake module of 
+the default CMake install. 
+
+In HPX_ROOT/misc/ please find a modified FindBoost.cmake that helps resolve this 
+problem and a description on how install the module. 
+
+
+For questions and/or Comments; email:
+   px_dev@cct.lsu.edu
