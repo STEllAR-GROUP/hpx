@@ -38,7 +38,11 @@ namespace hpx { namespace threadmanager
         if (initial_state == pending)
         {
             // pushing the new thread in the pending queue thread
+#if defined(HPX_USE_LOCKFREE)
+            work_items_.enqueue(px_t_sp);
+#else
             work_items_.push(px_t_sp);
+#endif
             if (running_ && run_now) 
                 cond_.notify_one();       // try to execute the new work item
         }
@@ -110,7 +114,13 @@ namespace hpx { namespace threadmanager
             // So all what we do here is to set the new state.
                 px_t->set_state(new_state);
                 if (new_state == pending)
+                {
+#if defined(HPX_USE_LOCKFREE)
+                    work_items_.enqueue(px_t);
+#else
                     work_items_.push(px_t);
+#endif
+                }
                 if (running_) 
                     cond_.notify_one();
             }
@@ -140,10 +150,8 @@ namespace hpx { namespace threadmanager
     {
     public:
         switch_status (px_thread* t, thread_state new_state)
-            : thread_(t), prev_state_(t->get_state())
-        { 
-            t->set_state(new_state);
-        }
+            : thread_(t), prev_state_(t->set_state(new_state))
+        {}
 
         ~switch_status ()
         {
@@ -157,6 +165,12 @@ namespace hpx { namespace threadmanager
             return prev_state_ = new_state;
         }
 
+        // allow to compare against the previous state of the thread
+        bool operator== (thread_state rhs)
+        {
+            return prev_state_ == rhs;
+        }
+
     private:
         // it is safe to store a plain pointer here since this class will be 
         // used inside a block holding a intrusive_ptr to this thread
@@ -168,6 +182,62 @@ namespace hpx { namespace threadmanager
     // main function executed by a OS thread
     void threadmanager::tfunc()
     {
+#if defined(HPX_USE_LOCKFREE)
+        // run the work queue
+        prepare_main_thread main_thread;
+        while (running_ || !work_items_.empty()) 
+        {
+            // Get the next thread from the queue
+            boost::intrusive_ptr<px_thread> thrd;
+            if (work_items_.dequeue(&thrd))
+            {
+                // Only pending threads will be executed.
+                // Any non-pending threads are leftovers from a set_state() 
+                // call for a previously pending thread (see comments above).
+                thread_state state = thrd->get_state();
+                if (pending == state) 
+                {
+                    // switch the state of the thread to active and back to 
+                    // what the thread reports as its return value
+
+                    switch_status thrd_stat (thrd.get(), active);
+                    if (thrd_stat == pending) 
+                    {
+                        // thread returns new required state
+                        // store the returned state in the thread
+                        thrd_stat = state = (*thrd)();
+                    }
+
+                }   // this stores the new state in the thread
+
+                // Re-add this work item to our list of work items if thread
+                // should be re-scheduled. If the thread is suspended now we
+                // just keep it in the map of threads.
+                if (state == pending) 
+                    work_items_.enqueue(thrd);
+
+                // Remove the mapping from thread_map_ if thread is depleted or 
+                // terminated, this will delete the px_thread as all references
+                // go out of scope.
+                // FIXME: what has to be done with depleted threads?
+                if (state == depleted || state == terminated) {
+                    mutex_type::scoped_lock lk(mtx_);
+                    thread_map_.erase(thrd->get_thread_id());
+                }
+            }
+
+            if (work_items_.empty()) {
+                // stop running after all px_threads have been terminated
+                if (!running_)
+                    break;
+
+                // wait until somebody needs some action (if no new work 
+                // arrived in the meantime)
+                mutex_type::scoped_lock lk(mtx_);
+                cond_.wait(lk);
+            }
+        }
+#else
         mutex_type::scoped_lock lk(mtx_);
 
         // run the work queue
@@ -225,6 +295,7 @@ namespace hpx { namespace threadmanager
                 cond_.wait(lk);
             }
         }
+#endif
     }
 
     // 

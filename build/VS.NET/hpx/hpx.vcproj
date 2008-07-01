@@ -675,6 +675,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\hpx\lcos\eager_future_constructors_direct.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\lcos\full_empty_memory.hpp"
 					>
 				</File>

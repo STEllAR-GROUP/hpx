@@ -6,12 +6,19 @@
 #if !defined(HPX_PX_THREAD_MAY_20_2008_0910AM)
 #define HPX_PX_THREAD_MAY_20_2008_0910AM
 
+#include <hpx/config.hpp>
+
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/lockfree/atomic_int.hpp>
 #include <boost/coroutine/coroutine.hpp>
 #include <boost/coroutine/shared_coroutine.hpp>
+#if defined(HPX_USE_LOCKFREE)
+#include <boost/lockfree/cas.hpp>
+#include <boost/lockfree/branch_hints.hpp>
+#endif
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -30,33 +37,6 @@ namespace hpx { namespace threadmanager { namespace detail
             boost::coroutines::shared_coroutine<thread_state()> 
         coroutine_type;
 
-        // helper class for switching thread state in and out during execution
-        class switch_status
-        {
-        public:
-            switch_status (thread_state& my_state, thread_state new_state)
-                : outer_state_(my_state), prev_state_(my_state)
-            { 
-                my_state = new_state;
-            }
-
-            ~switch_status ()
-            {
-                outer_state_ = prev_state_;
-            }
-
-            // allow to change the state the thread will be switched to after 
-            // execution
-            thread_state operator=(thread_state new_state)
-            {
-                return prev_state_ = new_state;
-            }
-
-        private:
-            thread_state& outer_state_;
-            thread_state prev_state_;
-        };
-
     public:
         px_thread(boost::function<thread_function_type> func, 
                 thread_id_type id, threadmanager& tm, thread_state newstate)
@@ -73,12 +53,26 @@ namespace hpx { namespace threadmanager { namespace detail
 
         thread_state get_state() const 
         {
-            return current_state_ ;
+#if defined(HPX_USE_LOCKFREE)
+            boost::lockfree::memory_barrier();
+#endif
+            return static_cast<thread_state>(current_state_);
         }
 
-        void set_state(thread_state newstate)
+        thread_state set_state(thread_state newstate)
         {
+#if defined(HPX_USE_LOCKFREE)
+            using namespace boost::lockfree;
+            for (;;) {
+                long prev_state = current_state_;
+                if (likely(CAS(&current_state_, prev_state, (long)newstate)))
+                    return static_cast<thread_state>(prev_state);
+            }
+#else
+            thread_state old_state = static_cast<thread_state>(current_state_);
             current_state_ = newstate;
+            return old_state;
+#endif
         }
 
         thread_id_type get_thread_id() const
@@ -103,7 +97,7 @@ namespace hpx { namespace threadmanager { namespace detail
         thread_state set_event (px_thread_self&, applier::applier&)
         {
             // we need to reactivate the thread itself
-            if (suspended == current_state_)
+            if (suspended == static_cast<thread_state>(current_state_))
                 tm_.set_state(get_thread_id(), pending);
 
             // FIXME: implement functionality required for depleted state
@@ -113,7 +107,8 @@ namespace hpx { namespace threadmanager { namespace detail
     private:
         coroutine_type coroutine_;
         threadmanager& tm_;
-        thread_state current_state_;
+        // the state is stored as a long to allow to use CAS
+        long current_state_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -211,9 +206,9 @@ namespace hpx { namespace threadmanager
         ///                 thread's status word. To change the thread's 
         ///                 scheduling status \a threadmanager#set_state should
         ///                 be used.
-        void set_state(thread_state new_state)
+        thread_state set_state(thread_state new_state)
         {
-            base()->set_state(new_state);
+            return base()->set_state(new_state);
         }
 
         /// \brief Execute the thread function

@@ -89,10 +89,10 @@ namespace hpx { namespace lcos
             applier::applier& appl, naming::id_type const& gid) const
         {
             // initialize the operation
-            appl.apply_c<Action>(get_gid(appl), gid);
+            appl.apply_c<Action>(this->get_gid(appl), gid);
 
             // wait for the result (yield control)
-            return (*impl_)->get_result(self);
+            return (*this->impl_)->get_result(self);
         }
 
         /// Get the result of the requested action. This call blocks (yields 
@@ -119,10 +119,10 @@ namespace hpx { namespace lcos
             Arg0 const& arg0) const
         {
             // initialize the operation
-            appl.apply_c<Action>(get_gid(appl), gid, arg0);
+            appl.apply_c<Action>(this->get_gid(appl), gid, arg0);
 
             // wait for the result (yield control)
-            return (*impl_)->get_result(self);
+            return (*this->impl_)->get_result(self);
         }
 
         // pull in remaining get_result's

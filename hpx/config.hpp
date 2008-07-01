@@ -18,6 +18,12 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This defines if the Boost lockfree fifo will be used
+#if !defined(HPX_USE_LOCKFREE)
+#define HPX_USE_LOCKFREE 0
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 /// This defines the maximum number of constructor arguments a component 
 /// can take
 #if !defined(HPX_COMPONENT_ARGUMENT_LIMIT)

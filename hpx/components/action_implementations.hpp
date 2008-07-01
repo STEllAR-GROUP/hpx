@@ -44,8 +44,7 @@
         BOOST_PP_ENUM_PARAMS(N, typename T),
         threadmanager::thread_state(Component::*F)(
             threadmanager::px_thread_self&, applier::applier&, Result*,
-            BOOST_PP_ENUM_PARAMS(N, T)),
-        typename ExecuteDirectly = boost::mpl::false_
+            BOOST_PP_ENUM_PARAMS(N, T))
     >
     class BOOST_PP_CAT(result_action, N)
       : public action<
@@ -115,7 +114,8 @@
         }
 
     public:
-        typedef ExecuteDirectly direct_execution;
+        typedef boost::mpl::false_ direct_execution;
+        typedef Result result_type;
 
         // This static construct_thread_function allows to construct 
         // a proper thread function for a px_thread without having to 
@@ -193,12 +193,11 @@
     >
     class BOOST_PP_CAT(direct_result_action, N)
       : public BOOST_PP_CAT(result_action, N)<Component, Result, Action, 
-          BOOST_PP_ENUM_PARAMS(N, T), F, boost::mpl::true_>
+          BOOST_PP_ENUM_PARAMS(N, T), F>
     {
     private:
         typedef BOOST_PP_CAT(result_action, N)<
-            Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F, 
-            boost::mpl::true_> 
+            Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F> 
         base_type;
 
     public:
@@ -213,6 +212,8 @@
         {}
 
     public:
+        typedef boost::mpl::true_ direct_execution;
+
         ///
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static Result execute_function(
@@ -234,13 +235,13 @@
         }
     };
 
+    ///////////////////////////////////////////////////////////////////////////
     //  N parameter version, no result type
     template <
         typename Component, int Action, BOOST_PP_ENUM_PARAMS(N, typename T),
         threadmanager::thread_state(Component::*F)(
             threadmanager::px_thread_self&, applier::applier&, 
-            BOOST_PP_ENUM_PARAMS(N, T)), 
-        typename ExecuteDirectly = boost::mpl::false_
+            BOOST_PP_ENUM_PARAMS(N, T))
     >
     class BOOST_PP_CAT(action, N)
       : public action<
@@ -266,7 +267,8 @@
         {}
 
     public:
-        typedef ExecuteDirectly direct_execution;
+        typedef boost::mpl::false_ direct_execution;
+        typedef void result_type;
 
         // This static construct_thread_function allows to construct 
         // a proper thread function for a px_thread without having to 
@@ -336,13 +338,12 @@
     >
     class BOOST_PP_CAT(direct_action, N)
       : public BOOST_PP_CAT(action, N)<
-            Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, boost::mpl::true_
+            Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F
         >
     {
     private:
         typedef BOOST_PP_CAT(action, N)<
-            Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, 
-            boost::mpl::true_> 
+            Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F> 
         base_type;
 
     public:
@@ -357,6 +358,8 @@
         {}
 
     public:
+        typedef boost::mpl::true_ direct_execution;
+
         ///
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static void execute_function(

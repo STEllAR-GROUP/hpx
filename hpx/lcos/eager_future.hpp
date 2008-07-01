@@ -72,7 +72,7 @@ namespace hpx { namespace lcos
         ///               with the action as the continuation parameter).
         eager_future(applier::applier& appl, naming::id_type const& gid)
         {
-            appl.apply_c<Action>(get_gid(appl), gid);
+            appl.apply_c<Action>(this->get_gid(appl), gid);
         }
 
         /// Construct a new \a eager_future instance. The \a px_thread 
@@ -90,7 +90,7 @@ namespace hpx { namespace lcos
         eager_future(applier::applier& appl, naming::id_type const& gid, 
                 Arg0 const& arg0)
         {
-            appl.apply_c<Action>(get_gid(appl), gid, arg0);
+            appl.apply_c<Action>(this->get_gid(appl), gid, arg0);
         }
 
         // pull in remaining constructors
@@ -124,11 +124,11 @@ namespace hpx { namespace lcos
             naming::address addr;
             if (appl.address_is_local(gid, addr)) {
                 // local, direct execution
-                (*impl_)->set_data(Action::execute_function(appl, addr));
+                (*this->impl_)->set_data(Action::execute_function(appl, addr));
             }
             else {
                 // remote execution
-                appl.apply_c<Action>(get_gid(appl), gid);
+                appl.apply_c<Action>(this->get_gid(appl), gid);
             }
         }
 
@@ -151,16 +151,16 @@ namespace hpx { namespace lcos
             naming::address addr;
             if (appl.address_is_local(gid, addr)) {
                 // local, direct execution
-                (*impl_)->set_data(Action::execute_function(appl, addr, arg0));
+                (*this->impl_)->set_data(Action::execute_function(appl, addr, arg0));
             }
             else {
                 // remote execution
-                appl.apply_c<Action>(get_gid(appl), gid, arg0);
+                appl.apply_c<Action>(this->get_gid(appl), gid, arg0);
             }
         }
 
         // pull in remaining constructors
-//        #include <hpx/lcos/eager_future_constructors_direct.hpp>
+        #include <hpx/lcos/eager_future_constructors_direct.hpp>
     };
 
 }}

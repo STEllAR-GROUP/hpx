@@ -36,10 +36,11 @@
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         // initialize the operation
-        appl.apply_c<Action>(get_gid(appl), gid, BOOST_PP_ENUM_PARAMS(N, arg));
+        appl.apply_c<Action>(this->get_gid(appl), gid, 
+            BOOST_PP_ENUM_PARAMS(N, arg));
 
         // wait for the result (yield control)
-        return (*impl_)->get_result(self);
+        return (*this->impl_)->get_result(self);
     }
 
 #undef N

@@ -5,8 +5,8 @@
 
 #ifndef BOOST_PP_IS_ITERATING
 
-#if !defined(HPX_LCOS_EAGER_FUTURE_CONSTRUCTORS_JUN_27_2008_0440PM)
-#define HPX_LCOS_EAGER_FUTURE_CONSTRUCTORS_JUN_27_2008_0440PM
+#if !defined(HPX_LCOS_EAGER_FUTURE_CONSTRUCTORS_DIRECT_JUL_01_2008_0116PM)
+#define HPX_LCOS_EAGER_FUTURE_CONSTRUCTORS_DIRECT_JUL_01_2008_0116PM
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
@@ -16,7 +16,7 @@
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
-    "hpx/lcos/eager_future_constructors.hpp"))                                \
+    "hpx/lcos/eager_future_constructors_direct.hpp"))                         \
     /**/
     
 #include BOOST_PP_ITERATE()
@@ -34,8 +34,17 @@
     eager_future(applier::applier& appl, naming::id_type const& gid, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        appl.apply_c<Action>(this->get_gid(appl), gid, 
-            BOOST_PP_ENUM_PARAMS(N, arg));
+        naming::address addr;
+        if (appl.address_is_local(gid, addr)) {
+            // local, direct execution
+            (*this->impl_)->set_data(Action::execute_function(
+                appl, addr, BOOST_PP_ENUM_PARAMS(N, arg)));
+        }
+        else {
+            // remote execution
+            appl.apply_c<Action>(this->get_gid(appl), gid, 
+                BOOST_PP_ENUM_PARAMS(N, arg));
+        }
     }
 
 #undef N

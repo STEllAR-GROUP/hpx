@@ -64,12 +64,11 @@ namespace hpx { namespace applier { namespace detail
             Action::execute_function(appl, addr);
         }
 
-        static void 
+        static typename Action::result_type 
         call (components::continuation_type& c, threadmanager::threadmanager&, 
             applier& appl, naming::address::address_type addr)
         {
-            Action::execute_function(appl, addr);
-            // FIXME: handle continuations
+            return Action::execute_function(appl, addr);
         }
     };
 
@@ -110,13 +109,12 @@ namespace hpx { namespace applier { namespace detail
             Action::execute_function(appl, addr, arg0);
         }
 
-        static void 
+        static typename Action::result_type  
         call (components::continuation_type& c, threadmanager::threadmanager&, 
             applier& appl, naming::address::address_type addr, 
             Arg0 const& arg0)
         {
-            Action::execute_function(appl, addr, arg0);
-            // FIXME: handle continuations
+            return Action::execute_function(appl, addr, arg0);
         }
     };
 

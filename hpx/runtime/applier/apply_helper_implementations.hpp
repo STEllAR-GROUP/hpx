@@ -75,13 +75,13 @@
             Action::execute_function(appl, addr, BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
-        static void 
+        static typename Action::result_type  
         call (components::continuation_type& c, threadmanager::threadmanager&, 
             applier& appl, naming::address::address_type addr,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            Action::execute_function(appl, addr, BOOST_PP_ENUM_PARAMS(N, arg));
-            // FIXME: handle continuations
+            return Action::execute_function(appl, addr, 
+                BOOST_PP_ENUM_PARAMS(N, arg));
         }
     };
 

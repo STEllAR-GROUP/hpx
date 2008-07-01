@@ -1,0 +1,268 @@
+
+[library Boost.Lockfree
+    [quickbook 1.4]
+    [authors [Blechmann, Tim]]
+    [copyright 2008 Tim Blechmann]
+    [category algorithms]
+    [purpose 
+        lockfree concurrent data structures
+    ]
+    [id lockfree]
+    [dirname lockfree]
+    [license
+        Distributed under the Boost Software License, Version 1.0.
+        (See accompanying file LICENSE_1_0.txt or copy at
+        [@http://www.boost.org/LICENSE_1_0.txt])
+    ]
+]
+
+[c++] 
+
+
+[/  Images   ]
+
+[def _note_                         [$images/note.png]]
+[def _alert_                        [$images/caution.png]]
+[def _detail_                       [$images/note.png]]
+[def _tip_                          [$images/tip.png]]
+
+[/  Links   ]
+
+[def _lockfree_                      [^boost.lockfree]] 
+
+[section:disclaimer Disclaimer]
+_lockfree_ is NOT a boost library!
+[endsect]
+
+[section Introduction]
+
+[h2 What is _lockfree_?]
+_lockfree_ provides implementations of lock-free data structures. Lock-free data structures can be accessed by multiple threads without the necessity of blocking synchronization primitives such as guards. 
+Lock-free data structures can be used in real-time systems, where blocking algorithms may lead to high worst-case execution times, or to avoid priority inversion.
+
+[endsect]
+
+[section Reference]
+
+[section boost.lockfree fifo]
+    template <typename T>
+    class boost::lockfree::fifo
+    {
+    public:
+        fifo(void);
+        fifo(std::size_t initial_nodes);
+        ~fifo(void);
+
+        bool empty(void) const;
+
+        void enqueue(T const & t);
+        bool dequeue (T * ret);
+    };
+
+Lockfree fifo class.
+
+    template <typename T>
+    class boost::lockfree::fifo<T*>
+    {
+    public:
+        fifo(void);
+        fifo(std::size_t initial_nodes);
+        ~fifo(void);
+
+        bool empty(void) const;
+
+        void enqueue(T * t);
+
+        bool dequeue (T ** ret);
+
+        bool dequeue (std::auto_ptr<T> & ret);
+
+        bool dequeue (boost::scoped_ptr<T> & ret);
+
+        bool dequeue (boost::shared_ptr<T> & ret);
+    };
+
+Specialization of fifo class for pointer argument. Dequeue support for smart boost- and stl-style smart pointer classes.
+
+[endsect]
+[endsect]
+
+[section Building blocks]
+The Boost.Lockfree library provides several building blocks, used in lockfree algorithms.
+
+
+[section tagged_ptr]
+    template <class T>
+    class boost::lockfree::tagged_ptr
+    {
+    public:
+        typedef int_type tag_t;
+
+        /** uninitialized constructor */
+        tagged_ptr(void);
+
+        /** copy constructor */
+        tagged_ptr(tagged_ptr const & p);
+        tagged_ptr(T * p, tag_t t = 0);
+
+        /** atomic set operations */
+        /* @{ */
+        void operator= (tagged_ptr const & p);
+        void atomic_set(tagged_ptr const & p);
+        void atomic_set(T * p, tag_t t);
+        /* @} */
+
+        /** unsafe set operation */
+        /* @{ */
+        void set(tagged_ptr const & p);
+        void set(T * p, tag_t t);
+        /* @} */
+
+        /** comparing semantics */
+        /* @{ */
+        bool operator== (tagged_ptr const & p) const;
+        bool operator!= (tagged_ptr const & p) const;
+        /* @} */
+
+        /** pointer access */
+        /* @{ */
+        T * get_ptr() const;
+        void set_ptr(T * p);
+        /* @} */
+
+        /** tag access */
+        /* @{ */
+        tag_t get_tag() const;
+        void set_tag(tag_t t);
+        /* @} */
+
+        /** compare and swap  */
+        /* @{ */
+        bool CAS(tagged_ptr const & oldval, tagged_ptr const & newval);
+        bool CAS(tagged_ptr const & oldval, T * newptr);
+        bool CAS(tagged_ptr const & oldval, T * newptr, tag_t t);
+        bool CAS(T * oldptr, tag_t oldtag, T * newptr);
+        /* @} */
+
+        /** smart pointer support  */
+        /* @{ */
+        T & operator*() const;
+        T * operator->() const;
+        operator bool(void) const;
+        /* @} */
+    };
+
+Tagged pointer implementation as smart pointer class, as it is required by several lockfree algorithms.
+
+[endsect]
+
+[section Freelist]
+
+    template <typename T>
+    struct boost::lockfree::dummy_freelist
+    {
+        T * allocate (void);
+        void deallocate (T * n);
+    };
+
+Wrapper class with freelist api to operators new and delete.
+
+    template <typename T>
+    class caching_freelist
+    {   
+    public:
+        caching_freelist(void);
+        caching_freelist(std::size_t initial_nodes)
+        ~caching_freelist(void);
+
+        T * allocate (void);
+        void deallocate (T * n);
+    };
+
+Caching freelist class. Uses an internal lockfree stack to cache objects. Deallocation never frees objects.
+
+    template <typename T, std::size_t max_size = 64>
+    class freelist
+    {
+    public:
+        freelist(void);
+        freelist(std::size_t initial_nodes);
+        ~freelist(void);
+
+        T * allocate (void);
+        void deallocate (T * n);
+    };
+
+Freelist class, with a maximum size of max_size.
+
+[endsect]
+[endsect]
+
+
+[section Primitives]
+The Boost.Lockfree library provides platform-specific wrappers for low-level operations.
+
+[section Memory Barriers]
+    void boost::lockfree::detail::memory_barrier(void);
+
+Full Memory Barrier.
+
+[endsect]
+
+[section Compare-and-Swap]
+    template <class C, class D>
+    inline bool boost::lockfree::detail::CAS(volatile C * addr, D old, D nw);
+
+    template <class C, class D, class E>
+    inline bool boost::lockfree::detail::CAS2(volatile C * addr, D old1, E old2, D new1, E new2);
+
+Atomic compare-and-swap. Lockfree on supported platforms, otherwise blocking emulation. Versions for single-word and
+double-word machines. 
+
+[endsect]
+
+[section atomic_int]
+    template <typename T>
+    class boost::lockfree::atomic_int
+    {
+    public:
+        explicit atomic_int(T v = 0);
+
+        operator T(void) const;
+        void operator =(T v);
+
+        T operator +=(T v);
+        T operator -=(T v);
+
+        /* prefix operators */
+        T operator ++(void);
+        T operator --(void);
+
+        /* postfix operators */
+        T operator ++(int);
+        T operator --(int);
+    };
+
+Atomic Integer Class.
+
+[endsect]
+
+[endsect]
+
+[section Portability]
+
+Tested architectures:
+
+# x86
+# x86_64
+
+Tested compilers:
+
+# gcc-4.2, gcc-4.3
+
+Tested operating systems:
+
+# linux
+
+[endsect]
+

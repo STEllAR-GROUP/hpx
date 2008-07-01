@@ -247,8 +247,7 @@ namespace hpx { namespace components
     template <
         typename Component, typename Result, int Action, 
         threadmanager::thread_state(Component::*F)(
-            threadmanager::px_thread_self&, applier::applier&, Result*),
-        typename ExecuteDirectly = boost::mpl::false_
+            threadmanager::px_thread_self&, applier::applier&, Result*)
     >
     class result_action0 
       : public action<Component, Action, boost::fusion::vector<> >
@@ -307,7 +306,8 @@ namespace hpx { namespace components
         }
 
     public:
-        typedef ExecuteDirectly direct_execution;
+        typedef boost::mpl::false_ direct_execution;
+        typedef Result result_type;
 
         /// \brief This static \a construct_thread_function allows to construct 
         /// a proper thread function for a \a px_thread without having to 
@@ -373,18 +373,18 @@ namespace hpx { namespace components
         Result (Component::*DirectF)(applier::applier&)
     >
     class direct_result_action0 
-      : public result_action0<Component, Result, Action, F, boost::mpl::true_>
+      : public result_action0<Component, Result, Action, F>
     {
     private:
-        typedef 
-            result_action0<Component, Result, Action, F, boost::mpl::true_> 
-        base_type;
+        typedef result_action0<Component, Result, Action, F> base_type;
 
     public:
         direct_result_action0()
         {}
 
     public:
+        typedef boost::mpl::true_ direct_execution;
+
         ///
         static Result execute_function(
             applier::applier& appl, naming::address::address_type lva)
@@ -408,8 +408,7 @@ namespace hpx { namespace components
     template <
         typename Component, int Action, 
         threadmanager::thread_state(Component::*F)(
-            threadmanager::px_thread_self&, applier::applier&),
-        typename ExecuteDirectly = boost::mpl::false_
+            threadmanager::px_thread_self&, applier::applier&)
     >
     class action0 : public action<Component, Action, boost::fusion::vector<> >
     {
@@ -421,7 +420,8 @@ namespace hpx { namespace components
         {}
 
     public:
-        typedef ExecuteDirectly direct_execution;
+        typedef boost::mpl::false_ direct_execution;
+        typedef void result_type;
 
         /// \brief This static \a construct_thread_function allows to construct 
         /// a proper thread function for a \a px_thread without having to 
@@ -481,17 +481,18 @@ namespace hpx { namespace components
             threadmanager::px_thread_self&, applier::applier&),
         void (Component::*DirectF)(applier::applier&)
     >
-    class direct_action0 
-      : public action0<Component, Action, F, boost::mpl::true_>
+    class direct_action0 : public action0<Component, Action, F>
     {
     private:
-        typedef action0<Component, Action, F, boost::mpl::true_> base_type;
+        typedef action0<Component, Action, F> base_type;
 
     public:
         direct_action0()
         {}
 
     public:
+        typedef boost::mpl::true_ direct_execution;
+
         ///
         static void execute_function(
             applier::applier& appl, naming::address::address_type lva)
@@ -515,8 +516,7 @@ namespace hpx { namespace components
     template <
         typename Component, typename Result, int Action, typename T0, 
         threadmanager::thread_state(Component::*F)(
-            threadmanager::px_thread_self&, applier::applier&, Result*, T0),
-        typename ExecuteDirectly = boost::mpl::false_
+            threadmanager::px_thread_self&, applier::applier&, Result*, T0)
     >
     class result_action1
       : public action<Component, Action, 
@@ -586,7 +586,8 @@ namespace hpx { namespace components
         }
 
     public:
-        typedef ExecuteDirectly direct_execution;
+        typedef boost::mpl::false_ direct_execution;
+        typedef Result result_type;
 
         /// \brief This static \a construct_thread_function allows to construct 
         /// a proper thread function for a \a px_thread without having to 
@@ -655,11 +656,11 @@ namespace hpx { namespace components
         Result (Component::*DirectF)(applier::applier&, T0)
     >
     class direct_result_action1 
-      : public result_action1<Component, Result, Action, T0, F, boost::mpl::true_>
+      : public result_action1<Component, Result, Action, T0, F>
     {
     private:
         typedef 
-            result_action1<Component, Result, Action, T0, F, boost::mpl::true_> 
+            result_action1<Component, Result, Action, T0, F> 
         base_type;
 
     public:
@@ -668,10 +669,12 @@ namespace hpx { namespace components
 
         template <typename Arg0>
         direct_result_action1(Arg0 const& arg0)
-            :  result_action1(arg0)
+          : base_type(arg0)
         {}
 
     public:
+        typedef boost::mpl::true_ direct_execution;
+
         ///
         template <typename Arg0>
         static Result execute_function(
@@ -696,8 +699,7 @@ namespace hpx { namespace components
     template <
         typename Component, int Action, typename T0, 
         threadmanager::thread_state(Component::*F)(
-            threadmanager::px_thread_self&, applier::applier&, T0),
-        typename ExecuteDirectly = boost::mpl::false_
+            threadmanager::px_thread_self&, applier::applier&, T0)
     >
     class action1 
       : public action<Component, Action, 
@@ -720,7 +722,8 @@ namespace hpx { namespace components
         {}
 
     public:
-        typedef ExecuteDirectly direct_execution;
+        typedef boost::mpl::false_ direct_execution;
+        typedef void result_type;
 
         /// \brief This static \a construct_thread_function allows to construct 
         /// a proper thread function for a \a px_thread without having to 
@@ -786,11 +789,10 @@ namespace hpx { namespace components
             threadmanager::px_thread_self&, applier::applier&, T0),
         void (Component::*DirectF)(applier::applier&, T0)
     >
-    class direct_action1
-      : public action1<Component, Action, T0, F, boost::mpl::true_>
+    class direct_action1 : public action1<Component, Action, T0, F>
     {
     private:
-        typedef action1<Component, Action, T0, F, boost::mpl::true_> base_type;
+        typedef action1<Component, Action, T0, F> base_type;
 
     public:
         direct_action1()
@@ -803,6 +805,8 @@ namespace hpx { namespace components
         {}
 
     public:
+        typedef boost::mpl::true_ direct_execution;
+
         ///
         template <typename Arg0>
         static void execute_function(

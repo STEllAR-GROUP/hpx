@@ -9,6 +9,7 @@
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/coroutine/shared_coroutine.hpp>
+#include <hpx/config.hpp>
 
 namespace hpx
 {

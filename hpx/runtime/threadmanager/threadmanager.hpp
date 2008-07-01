@@ -11,12 +11,17 @@
 #include <vector>
 #include <memory>
 
+#include <hpx/config.hpp>
+
 #include <boost/intrusive_ptr.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
+#if defined(HPX_USE_LOCKFREE)
+#include <boost/lockfree/fifo.hpp>
+#endif
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
@@ -38,7 +43,11 @@ namespace hpx { namespace threadmanager
     {
     private:
         // this is the type of the queue of pending threads
+#if defined(HPX_USE_LOCKFREE)
+        typedef boost::lockfree::fifo<boost::intrusive_ptr<px_thread> > work_items_type;
+#else
         typedef std::queue <boost::intrusive_ptr<px_thread> > work_items_type;
+#endif
 
         // this is the type of a map holding all threads (except depleted ones)
         typedef

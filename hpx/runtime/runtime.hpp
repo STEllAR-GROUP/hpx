@@ -181,8 +181,8 @@ namespace hpx
         util::io_service_pool parcel_pool_; 
         naming::resolver_client dgas_client_;
         parcelset::parcelport parcel_port_;
-        parcelset::parcelhandler parcel_handler_;
         threadmanager::threadmanager thread_manager_;
+        parcelset::parcelhandler parcel_handler_;
         applier::applier applier_;
         action_manager::action_manager action_manager_;
         components::server::runtime_support runtime_support_;
