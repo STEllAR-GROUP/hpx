@@ -1,0 +1,23 @@
+On some Unix machines, the default FindBoost.cmake file fails to correctly
+identify the boost libraries installed on the system (libboost_*). One 
+possible reason for this is the failure map the existing libraries due to 
+a buggy REGEX expression.
+
+Included is a FindBoost.cmake file that helps address this specific problem. 
+The differences from the original FindBoost.cmake are: 
+   Original Line 360 : 
+     STRING(REGEX REPLACE ".* ([0-9])\\.([0-9])\\.[0-9] .*" "\\1\\2"
+
+   Fixed Line 360:
+     STRING(REGEX REPLACE ".*\\(GCC\\) ([0-9])\\.([0-9])\\.[0-9].*" "\\1\\2"
+
+In order to utilise this solution; either edit the above Line in 
+your FindBoost.cmake files. Alternatively a corrected FindBoost.cmake file 
+has been provided in hpx/misc for your convenience. 
+
+FindBoost.cmake is usually found in :
+ <CMake_install_path>/share/cmake-2.6/Modules/
+
+
+Thanks to RaviTej, CMake Mailing lists, BOOST-CMake Mailing Lists for 
+their support in identification and resolution of this problem. 
