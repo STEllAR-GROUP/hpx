@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 2.6)
 # The name of our project is "hpx".  CMakeLists files in this project can
 # refer to the root source directory of the project as ${hpx_SOURCE_DIR} and
 # to the root binary directory of the project as ${hpx_BINARY_DIR}.
-project (hpx)
+project (hpx CXX C)
 
 # We need to use Boost
 find_package(Boost 1.35.0 COMPONENTS date_time filesystem graph regex serialization thread system signals)
@@ -28,6 +28,7 @@ include_directories (${hpx_SOURCE_DIR}/external/endian)
 include_directories (${hpx_SOURCE_DIR}/external/exception)
 include_directories (${hpx_SOURCE_DIR}/external/logging)
 include_directories (${hpx_SOURCE_DIR}/external/singleton)
+include_directories (${hpx_SOURCE_DIR}/external/lockfree)
 
 if(WIN32)
     add_definitions(-D_WIN32_WINNT=0x0501)
