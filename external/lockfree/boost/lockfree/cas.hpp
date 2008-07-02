@@ -11,6 +11,11 @@
 
 #include <boost/lockfree/prefix.hpp>
 #include <boost/detail/lightweight_mutex.hpp>
+#if defined(_MSC_VER) && (_MSC_VER >= 1300)
+#include <intrin.h>
+#pragma intrinsic(_ReadWriteBarrier)
+#pragma intrinsic(_InterlockedCompareExchange)
+#endif
 
 namespace boost
 {
@@ -58,11 +63,15 @@ inline bool CAS(volatile C * addr, D old, D nw)
         *addr = nw;
         return true;
     }
-    else
-        return false;
 #endif
 }
 
+#if defined(_MSC_VER) && (defined(_M_IA64) || defined(_WIN64))
+#if defined(HAS_CMPXCHG16B)
+extern "C" bool CAS2_windows64(volatile __int64* addr, 
+    __int64 old1, __int64 old2, __int64 new1, __int64 new2) throw();
+#endif
+#endif
 
 template <class C, class D, class E>
 inline bool CAS2(volatile C * addr, D old1, E old2, D new1, E new2)
@@ -95,9 +104,43 @@ inline bool CAS2(volatile C * addr, D old1, E old2, D new1, E new2)
                                           old.l,
                                           nw.l);
 #elif defined(_MSC_VER)
-    bool ok;
-#if defined(_M_X64)
+#if defined(_M_IA64) || defined(_WIN64)
+// early AMD processors do not support the cmpxchg16b instruction
+#if defined(HAS_CMPXCHG16B)
+
+    return CAS2_windows64(reinterpret_cast<volatile __int64*>(addr), 
+        (__int64)old1, (__int64)old2, (__int64)new1, (__int64)new2);
+
 #else
+
+    struct packed_c
+    {
+        D d;
+        E e;
+    };
+
+    volatile packed_c * packed_addr = reinterpret_cast<volatile packed_c*>(addr);
+
+    boost::detail::lightweight_mutex guard;
+    boost::detail::lightweight_mutex::scoped_lock lock(guard);
+
+    if (packed_addr->d == old1 &&
+        packed_addr->e == old2)
+    {
+        packed_addr->d = new1;
+        packed_addr->e = new2;
+        return true;
+    }
+    return false;
+
+//     _InterlockedCompare64Exchange128(
+//         reinterpret_cast<volatile __int64*>(addr), 
+//         (__int64)new2, (__int64)new1, (__int64)old1);
+//     return true;
+
+#endif
+#else
+    bool ok;
     __asm {
         mov eax,[old1]
         mov edx,[old2]
@@ -107,8 +150,8 @@ inline bool CAS2(volatile C * addr, D old1, E old2, D new1, E new2)
         lock cmpxchg8b [edi]
         setz [ok]
     }
-#endif
     return ok;
+#endif
 #elif defined(__GNUC__) && (defined(__i686__) || defined(__pentiumpro__)  || defined(__nocona__ ))
     char result;
 #ifndef __PIC__

@@ -437,7 +437,7 @@ namespace hpx { namespace naming { namespace server
 #if BOOST_VERSION < 103600
     double extract_count(std::pair<double, std::size_t> const& p)
     {
-        return p.second;
+        return double(p.second);
     }
 #endif
     

@@ -38,7 +38,7 @@ namespace hpx { namespace threadmanager
         if (initial_state == pending)
         {
             // pushing the new thread in the pending queue thread
-#if defined(HPX_USE_LOCKFREE)
+#if HPX_USE_LOCKFREE != 0
             work_items_.enqueue(px_t_sp);
 #else
             work_items_.push(px_t_sp);
@@ -115,7 +115,7 @@ namespace hpx { namespace threadmanager
                 px_t->set_state(new_state);
                 if (new_state == pending)
                 {
-#if defined(HPX_USE_LOCKFREE)
+#if HPX_USE_LOCKFREE != 0
                     work_items_.enqueue(px_t);
 #else
                     work_items_.push(px_t);
@@ -182,7 +182,7 @@ namespace hpx { namespace threadmanager
     // main function executed by a OS thread
     void threadmanager::tfunc()
     {
-#if defined(HPX_USE_LOCKFREE)
+#if HPX_USE_LOCKFREE != 0
         // run the work queue
         prepare_main_thread main_thread;
         while (running_ || !work_items_.empty()) 

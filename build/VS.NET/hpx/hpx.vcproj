@@ -884,6 +884,22 @@
 			<File
 				RelativePath="..\..\..\external\lockfree\libs\lockfree\src\CAS2.asm"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="MASM"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="MASM"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\external\coroutine\libs\coroutine\src\swapcontext_windows.asm"

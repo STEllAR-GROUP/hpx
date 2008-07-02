@@ -19,7 +19,7 @@
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
-#if defined(HPX_USE_LOCKFREE)
+#if HPX_USE_LOCKFREE != 0
 #include <boost/lockfree/fifo.hpp>
 #endif
 
@@ -43,7 +43,7 @@ namespace hpx { namespace threadmanager
     {
     private:
         // this is the type of the queue of pending threads
-#if defined(HPX_USE_LOCKFREE)
+#if HPX_USE_LOCKFREE != 0
         typedef boost::lockfree::fifo<boost::intrusive_ptr<px_thread> > work_items_type;
 #else
         typedef std::queue <boost::intrusive_ptr<px_thread> > work_items_type;

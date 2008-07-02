@@ -15,7 +15,7 @@
 #include <boost/lockfree/atomic_int.hpp>
 #include <boost/coroutine/coroutine.hpp>
 #include <boost/coroutine/shared_coroutine.hpp>
-#if defined(HPX_USE_LOCKFREE)
+#if HPX_USE_LOCKFREE != 0
 #include <boost/lockfree/cas.hpp>
 #include <boost/lockfree/branch_hints.hpp>
 #endif
@@ -53,7 +53,7 @@ namespace hpx { namespace threadmanager { namespace detail
 
         thread_state get_state() const 
         {
-#if defined(HPX_USE_LOCKFREE)
+#if HPX_USE_LOCKFREE != 0
             boost::lockfree::memory_barrier();
 #endif
             return static_cast<thread_state>(current_state_);
@@ -61,7 +61,7 @@ namespace hpx { namespace threadmanager { namespace detail
 
         thread_state set_state(thread_state newstate)
         {
-#if defined(HPX_USE_LOCKFREE)
+#if HPX_USE_LOCKFREE != 0
             using namespace boost::lockfree;
             for (;;) {
                 long prev_state = current_state_;
