@@ -61,9 +61,10 @@ namespace boost { namespace coroutines { namespace detail {
     typedef void deleter_type(const type*);
     
     template<typename Derived>
-	context_base(Derived& derived, 
-		     std::ptrdiff_t stack_size) :
+        context_base(Derived& derived, 
+                     std::ptrdiff_t stack_size) :
       context_impl(derived, stack_size),
+      m_caller(),
       m_counter(0),
       m_deleter(&deleter<Derived>),
       m_state(ctx_ready), 
@@ -98,7 +99,7 @@ namespace boost { namespace coroutines { namespace detail {
     void release() const {
       BOOST_ASSERT(m_counter);
       if(--m_counter == 0) {
-	m_deleter(this);
+        m_deleter(this);
       }
     }
 
@@ -130,7 +131,7 @@ namespace boost { namespace coroutines { namespace detail {
 
       --m_wait_counter;
       if(!m_wait_counter && m_state == ctx_waiting)
-	m_state = ctx_ready;      
+        m_state = ctx_ready;      
       return ready();
     }
 
@@ -152,19 +153,19 @@ namespace boost { namespace coroutines { namespace detail {
       // shortcut evaluation (and a branch), but maybe the compiler is
       // smart enough to do it anyway as there are no side effects.
       if(m_exit_status || m_state == ctx_waiting) {
-	if(m_state == ctx_waiting)
-	  return false;
-	if(m_exit_status == ctx_exited_return)
-	  return true;
-	if(m_exit_status == ctx_exited_abnormally) {
-	std::type_info const * tinfo =0;
-	std::swap(m_type_info, tinfo);
-	throw abnormal_exit(tinfo?*tinfo: typeid(unknown_exception_tag));
-	} else if(m_exit_status == ctx_exited_exit)
-	  return false;
-	else {
-	  BOOST_ASSERT(0 && "unkonw exit status");
-	}
+        if(m_state == ctx_waiting)
+          return false;
+        if(m_exit_status == ctx_exited_return)
+          return true;
+        if(m_exit_status == ctx_exited_abnormally) {
+        std::type_info const * tinfo =0;
+        std::swap(m_type_info, tinfo);
+        throw abnormal_exit(tinfo?*tinfo: typeid(unknown_exception_tag));
+        } else if(m_exit_status == ctx_exited_exit)
+          return false;
+        else {
+          BOOST_ASSERT(0 && "unkonw exit status");
+        }
       }
       return true;
     }
@@ -209,19 +210,19 @@ namespace boost { namespace coroutines { namespace detail {
       // shortcut evaluation (and a branch), but maybe the compiler is
       // smart enough to do it anyway as there are no side effects.
       if(m_exit_status || m_state == ctx_waiting) {
-	if(m_state == ctx_waiting)
-	  throw waiting();
-	if(m_exit_status == ctx_exited_return)
-	  return;
-	if(m_exit_status == ctx_exited_abnormally) {
-	std::type_info const * tinfo =0;
-	std::swap(m_type_info, tinfo);
-	throw abnormal_exit(tinfo?*tinfo: typeid(unknown_exception_tag));
-	} else if(m_exit_status == ctx_exited_exit)
-	  throw coroutine_exited();
-      	else {
-	  BOOST_ASSERT(0 && "unknown exit status");
-	}
+        if(m_state == ctx_waiting)
+          throw waiting();
+        if(m_exit_status == ctx_exited_return)
+          return;
+        if(m_exit_status == ctx_exited_abnormally) {
+        std::type_info const * tinfo =0;
+        std::swap(m_type_info, tinfo);
+        throw abnormal_exit(tinfo?*tinfo: typeid(unknown_exception_tag));
+        } else if(m_exit_status == ctx_exited_exit)
+          throw coroutine_exited();
+        else {
+          BOOST_ASSERT(0 && "unknown exit status");
+        }
       }
     }
 
@@ -306,7 +307,7 @@ namespace boost { namespace coroutines { namespace detail {
       BOOST_ASSERT(!pending());
       BOOST_ASSERT(ready()) ;
       if(m_exit_state < ctx_exit_pending) 
-	m_exit_state = ctx_exit_pending;	
+        m_exit_state = ctx_exit_pending;	
       do_invoke();
       BOOST_ASSERT(exited()); //at this point the coroutine MUST have exited.
     }
@@ -324,9 +325,9 @@ namespace boost { namespace coroutines { namespace detail {
     ~context_base() throw() {
       BOOST_ASSERT(!running());
       try {
-	if(!exited())
-	  exit();
-	BOOST_ASSERT(exited());
+        if(!exited())
+          exit();
+        BOOST_ASSERT(exited());
       } catch(...) {}
     }
 

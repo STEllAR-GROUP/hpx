@@ -63,15 +63,15 @@ namespace boost { namespace coroutines {
      */
     struct tuple_workaround : boost::tuple<> {
 #     define BOOST_COROUTINE_arg_null_typecr(z, n, unused)\
-	const boost::tuples::null_type&                   \
+        const boost::tuples::null_type&                   \
       /**/
-	
+        
       tuple_workaround
       (BOOST_PP_ENUM
        (BOOST_COROUTINE_ARG_MAX, 
-	BOOST_COROUTINE_arg_null_typecr,
-	~)){}
-	
+        BOOST_COROUTINE_arg_null_typecr,
+        ~)){}
+        
       tuple_workaround(const tuple_workaround&) {}
       tuple_workaround() {}
 #     undef BOOST_COROUTINE_arg_null_typecr

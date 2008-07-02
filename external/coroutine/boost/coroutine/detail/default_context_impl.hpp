@@ -123,10 +123,21 @@ namespace boost { namespace coroutines { namespace detail {
 
 #elif defined(BOOST_WINDOWS)
 
+#if defined(_M_IA64) || defined(_WIN64)
+
+#include <boost/coroutine/detail/context_windows64.hpp>
+namespace boost { namespace coroutines { namespace detail {
+  typedef windows64::context_impl default_context_impl;
+} } }
+
+#else
+
 #include <boost/coroutine/detail/context_windows.hpp>
 namespace boost { namespace coroutines { namespace detail {
   typedef windows::context_impl default_context_impl;
 } } }
+
+#endif  // _WIN64
 
 #else 
 
