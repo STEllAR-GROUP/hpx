@@ -96,15 +96,18 @@ inline bool CAS2(volatile C * addr, D old1, E old2, D new1, E new2)
                                           nw.l);
 #elif defined(_MSC_VER)
     bool ok;
+#if defined(_M_X64)
+#else
     __asm {
         mov eax,[old1]
-            mov edx,[old2]
-            mov ebx,[new1]
-            mov ecx,[new2]
-            mov edi,[addr]
-            lock cmpxchg8b [edi]
-            setz [ok]
-            }
+        mov edx,[old2]
+        mov ebx,[new1]
+        mov ecx,[new2]
+        mov edi,[addr]
+        lock cmpxchg8b [edi]
+        setz [ok]
+    }
+#endif
     return ok;
 #elif defined(__GNUC__) && (defined(__i686__) || defined(__pentiumpro__)  || defined(__nocona__ ))
     char result;

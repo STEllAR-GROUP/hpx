@@ -114,51 +114,13 @@ namespace hpx { namespace threadmanager
         /// \returns      The function returns \a true if the thread manager
         ///               has been started successfully, otherwise it returns 
         ///               \a false.
-        bool run(std::size_t num_threads = 1) 
-        {
-            if (0 == num_threads) {
-                boost::throw_exception(hpx::exception(
-                    bad_parameter, "Number of threads shouldn't be zero"));
-            }
-
-            mutex_type::scoped_lock lk(mtx_);
-            if (!threads_.empty() || running_) 
-                return true;    // do nothing if already running
-
-            running_ = false;
-            try {
-                // run threads and wait for initialization to complete
-                while (num_threads-- != 0) {
-                    threads_.push_back(new boost::thread(
-                        boost::bind(&threadmanager::tfunc, this)));
-                }
-                running_ = true;
-            }
-            catch (std::exception const& /*e*/) {
-                threads_.clear();
-            }
-            return running_;
-        }
+        bool run(std::size_t num_threads = 1);
 
         /// \brief Forcefully stop the threadmanager
         ///
         /// \param blocking
         ///
-        void stop (bool blocking = true)
-        {
-            if (!threads_.empty()) {
-                if (running_) {
-                    mutex_type::scoped_lock lk(mtx_);
-                    running_ = false;
-                    cond_.notify_all();     // make sure we're not waiting
-                }
-
-                if (blocking) {
-                    for (std::size_t i = 0; i < threads_.size(); ++i)
-                        threads_[i].join();
-                }
-            }
-        }
+        void stop (bool blocking = true);
 
         /// The set_state function is part of the thread related API and allows
         /// to change the state of one of the threads managed by this 
@@ -217,6 +179,7 @@ namespace hpx { namespace threadmanager
 
         thread_map_type thread_map_;        ///< mapping of thread id's to threads
         work_items_type work_items_;        ///< list of active work items
+        work_items_type terminated_items_;  ///< list of terminated threads
 
         bool running_;                      ///< thread manager has bee started
         mutable mutex_type mtx_;            ///< mutex protecting the members

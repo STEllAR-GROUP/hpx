@@ -220,9 +220,22 @@ namespace hpx { namespace threadmanager
                 // terminated, this will delete the px_thread as all references
                 // go out of scope.
                 // FIXME: what has to be done with depleted threads?
-                if (state == depleted || state == terminated) {
-                    mutex_type::scoped_lock lk(mtx_);
-                    thread_map_.erase(thrd->get_thread_id());
+                if (state == depleted || state == terminated) 
+                {
+                    if (boost::this_thread::get_id() == threads_[0].get_id()) 
+                    {
+                    // only one dedicated OS thread is allowed to acquire the 
+                    // lock for the purpose of deleting all terminated threads
+                        mutex_type::scoped_lock lk(mtx_);
+                        boost::intrusive_ptr<px_thread> todelete;
+                        while (terminated_items_.dequeue(&todelete))
+                            thread_map_.erase(todelete->get_thread_id());
+                    }
+                    else {
+                    // all other OS threads put their terminated threads into
+                    // a separate queue
+                        terminated_items_.enqueue(thrd);
+                    }
                 }
             }
 
@@ -312,6 +325,49 @@ namespace hpx { namespace threadmanager
             return map_iter->second;
         }
         return boost::intrusive_ptr<px_thread>();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    bool threadmanager::run(std::size_t num_threads) 
+    {
+        if (0 == num_threads) {
+            boost::throw_exception(hpx::exception(
+                bad_parameter, "Number of threads shouldn't be zero"));
+        }
+
+        mutex_type::scoped_lock lk(mtx_);
+        if (!threads_.empty() || running_) 
+            return true;    // do nothing if already running
+
+        running_ = false;
+        try {
+            // run threads and wait for initialization to complete
+            while (num_threads-- != 0) {
+                threads_.push_back(new boost::thread(
+                    boost::bind(&threadmanager::tfunc, this)));
+            }
+            running_ = true;
+        }
+        catch (std::exception const& /*e*/) {
+            threads_.clear();
+        }
+        return running_;
+    }
+
+    void threadmanager::stop (bool blocking)
+    {
+        if (!threads_.empty()) {
+            if (running_) {
+                mutex_type::scoped_lock lk(mtx_);
+                running_ = false;
+                cond_.notify_all();     // make sure we're not waiting
+            }
+
+            if (blocking) {
+                for (std::size_t i = 0; i < threads_.size(); ++i)
+                    threads_[i].join();
+            }
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
