@@ -47,10 +47,18 @@
 #include <boost/coroutine/exception.hpp>
 #include <boost/coroutine/detail/posix_utility.hpp>
 #include <boost/coroutine/detail/swap_context.hpp>
-namespace boost { namespace coroutines { namespace detail {
-  namespace posix {
 
+namespace boost { namespace coroutines { 
 
+  // some platforms need special praparation of the main thread
+  struct prepare_main_thread
+  {
+      prepare_main_thread() {}
+      ~prepare_main_thread() {}
+  };
+
+  namespace detail { namespace posix 
+  {
     /*
      * Posix implementation for the context_impl_base class.
      * @note context_impl is not required to be consistent

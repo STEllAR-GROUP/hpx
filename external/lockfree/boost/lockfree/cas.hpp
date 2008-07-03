@@ -9,8 +9,16 @@
 #ifndef BOOST_LOCKFREE_CAS_HPP_INCLUDED
 #define BOOST_LOCKFREE_CAS_HPP_INCLUDED
 
+#include <boost/noncopyable.hpp>
+#include <boost/thread/once.hpp>
+#include <boost/call_traits.hpp>
+#include <boost/aligned_storage.hpp>
+#include <boost/type_traits/add_pointer.hpp>
+#include <boost/type_traits/alignment_of.hpp>
+
 #include <boost/lockfree/prefix.hpp>
 #include <boost/detail/lightweight_mutex.hpp>
+
 #if defined(_MSC_VER) && (_MSC_VER >= 1300)
 #include <intrin.h>
 #pragma intrinsic(_ReadWriteBarrier)
@@ -70,6 +78,91 @@ inline bool CAS(volatile C * addr, D old, D nw)
 #if defined(HAS_CMPXCHG16B)
 extern "C" bool CAS2_windows64(volatile __int64* addr, 
     __int64 old1, __int64 old2, __int64 new1, __int64 new2) throw();
+#else
+
+namespace detail
+{
+    template <class T, class Tag>
+    struct static_ : boost::noncopyable
+    {
+        typedef T value_type;
+        typedef typename boost::call_traits<T>::reference reference;
+        typedef typename boost::call_traits<T>::const_reference const_reference;
+
+    private:
+        struct destructor
+        {
+            ~destructor()
+            {
+                static_::get_address()->~value_type();
+            }
+        };
+
+        struct default_ctor
+        {
+            static void construct()
+            {
+                ::new (static_::get_address()) value_type();
+                static destructor d;
+            }
+        };
+        
+    public:
+        static_(Tag = Tag())
+        {
+            boost::call_once(&default_ctor::construct, constructed_);
+        }
+
+        operator reference()
+        {
+            return this->get();
+        }
+
+        operator const_reference() const
+        {
+            return this->get();
+        }
+
+        reference get()
+        {
+            return *this->get_address();
+        }
+
+        const_reference get() const
+        {
+            return *this->get_address();
+        }
+
+    private:
+        typedef typename boost::add_pointer<value_type>::type pointer;
+
+        static pointer get_address()
+        {
+            return static_cast<pointer>(data_.address());
+        }
+
+        typedef boost::aligned_storage<sizeof(value_type),
+            boost::alignment_of<value_type>::value> storage_type;
+
+        static storage_type data_;
+        static boost::once_flag constructed_;
+    };
+
+    template <class T, class Tag>
+    typename static_<T, Tag>::storage_type static_<T, Tag>::data_;
+
+    template <class T, class Tag>
+    boost::once_flag static_<T, Tag>::constructed_ = BOOST_ONCE_INIT;
+}
+
+struct lw_mutex_tag {};
+
+inline boost::detail::lightweight_mutex& get_mutex()
+{
+    static detail::static_<boost::detail::lightweight_mutex, lw_mutex_tag> mtx;
+    return mtx;
+}
+
 #endif
 #endif
 
@@ -121,8 +214,7 @@ inline bool CAS2(volatile C * addr, D old1, E old2, D new1, E new2)
 
     volatile packed_c * packed_addr = reinterpret_cast<volatile packed_c*>(addr);
 
-    boost::detail::lightweight_mutex guard;
-    boost::detail::lightweight_mutex::scoped_lock lock(guard);
+    boost::detail::lightweight_mutex::scoped_lock lock(get_mutex());
 
     if (packed_addr->d == old1 &&
         packed_addr->e == old2)
@@ -132,11 +224,6 @@ inline bool CAS2(volatile C * addr, D old1, E old2, D new1, E new2)
         return true;
     }
     return false;
-
-//     _InterlockedCompare64Exchange128(
-//         reinterpret_cast<volatile __int64*>(addr), 
-//         (__int64)new2, (__int64)new1, (__int64)old1);
-//     return true;
 
 #endif
 #else
@@ -230,7 +317,7 @@ inline bool CAS2(volatile C * addr, D old1, E old2, D new1, E new2)
 
     volatile packed_c * packed_addr = reinterpret_cast<volatile packed_c*>(addr);
 
-    boost::detail::lightweight_mutex guard;
+    static boost::detail::lightweight_mutex guard;
     boost::detail::lightweight_mutex::scoped_lock lock(guard);
 
     if (packed_addr->d == old1 &&
@@ -240,8 +327,7 @@ inline bool CAS2(volatile C * addr, D old1, E old2, D new1, E new2)
         packed_addr->e = new2;
         return true;
     }
-    else
-        return false;
+    return false;
 #endif
 }
 

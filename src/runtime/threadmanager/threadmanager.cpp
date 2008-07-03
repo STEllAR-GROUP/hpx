@@ -51,29 +51,6 @@ namespace hpx { namespace threadmanager
         return px_t_sp->get_thread_id();
     }
 
-#if defined(BOOST_WINDOWS)
-    ///////////////////////////////////////////////////////////////////////////
-    // On Windows we need a special preparation for the main coroutines thread 
-    struct prepare_main_thread
-    {
-        prepare_main_thread() 
-        {
-            ConvertThreadToFiber(0);
-        }
-        ~prepare_main_thread() 
-        {
-            ConvertFiberToThread();
-        }
-    };
-#else
-    // All other platforms do not need any special treatment of the main thread
-    struct prepare_main_thread
-    {
-        prepare_main_thread() {}
-        ~prepare_main_thread() {}
-    };
-#endif
-
     /// The set_state function is part of the thread related API and allows
     /// to change the state of one of the threads managed by this 
     thread_state threadmanager::set_state(thread_id_type id, 
@@ -184,7 +161,7 @@ namespace hpx { namespace threadmanager
     {
 #if HPX_USE_LOCKFREE != 0
         // run the work queue
-        prepare_main_thread main_thread;
+        boost::coroutines::prepare_main_thread main_thread;
         while (running_ || !work_items_.empty()) 
         {
             // Get the next thread from the queue
@@ -222,19 +199,18 @@ namespace hpx { namespace threadmanager
                 // FIXME: what has to be done with depleted threads?
                 if (state == depleted || state == terminated) 
                 {
-                    if (boost::this_thread::get_id() == threads_[0].get_id()) 
-                    {
+                    // all OS threads put their terminated threads into a 
+                    // separate queue
+                    terminated_items_.enqueue(thrd);
+
                     // only one dedicated OS thread is allowed to acquire the 
                     // lock for the purpose of deleting all terminated threads
+                    if (boost::this_thread::get_id() == threads_[0].get_id()) 
+                    {
                         mutex_type::scoped_lock lk(mtx_);
                         boost::intrusive_ptr<px_thread> todelete;
                         while (terminated_items_.dequeue(&todelete))
                             thread_map_.erase(todelete->get_thread_id());
-                    }
-                    else {
-                    // all other OS threads put their terminated threads into
-                    // a separate queue
-                        terminated_items_.enqueue(thrd);
                     }
                 }
             }
@@ -254,7 +230,7 @@ namespace hpx { namespace threadmanager
         mutex_type::scoped_lock lk(mtx_);
 
         // run the work queue
-        prepare_main_thread main_thread;
+        boost::coroutines::prepare_main_thread main_thread;
         while (running_ || !work_items_.empty()) 
         {
             if (!work_items_.empty())
@@ -327,6 +303,28 @@ namespace hpx { namespace threadmanager
         return boost::intrusive_ptr<px_thread>();
     }
 
+#if defined(_WIN32) || defined(_WIN64)
+    void set_affinity(boost::thread& thrd, unsigned int affinity)
+    {
+        DWORD_PTR process_affinity = 0, system_affinity = 0;
+        if (GetProcessAffinityMask(GetCurrentProcess(), &process_affinity, 
+              &system_affinity))
+        {
+            DWORD_PTR mask = 0x1 << affinity;
+            while (!(mask & process_affinity)) {
+                mask <<= 1;
+                if (0 == mask)
+                    mask = 0x01;
+            }
+            SetThreadAffinityMask(thrd.native_handle(), mask);
+        }
+    }
+#else
+    void set_affinity(boost::thread& thrd, unsigned int affinity)
+    {
+    }
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     bool threadmanager::run(std::size_t num_threads) 
     {
@@ -342,13 +340,19 @@ namespace hpx { namespace threadmanager
         running_ = false;
         try {
             // run threads and wait for initialization to complete
+            unsigned int num_of_cores = boost::thread::hardware_concurrency();
+            if (0 == num_of_cores)
+                num_of_cores = 1;     // assume one core
+
+            running_ = true;
             while (num_threads-- != 0) {
                 threads_.push_back(new boost::thread(
                     boost::bind(&threadmanager::tfunc, this)));
+                set_affinity(threads_.back(), num_threads % num_of_cores);
             }
-            running_ = true;
         }
         catch (std::exception const& /*e*/) {
+            stop();
             threads_.clear();
         }
         return running_;
@@ -358,14 +362,16 @@ namespace hpx { namespace threadmanager
     {
         if (!threads_.empty()) {
             if (running_) {
-                mutex_type::scoped_lock lk(mtx_);
                 running_ = false;
                 cond_.notify_all();     // make sure we're not waiting
             }
 
             if (blocking) {
-                for (std::size_t i = 0; i < threads_.size(); ++i)
+                for (std::size_t i = 0; i < threads_.size(); ++i) 
+                {
                     threads_[i].join();
+                    cond_.notify_all();     // make sure we're not waiting
+                }
             }
         }
     }

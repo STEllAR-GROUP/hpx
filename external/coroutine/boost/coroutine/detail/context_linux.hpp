@@ -149,8 +149,16 @@ swapcontext_stack2(void***from_sp, void**to_sp) throw() {
 
 #endif
 
-namespace boost { namespace coroutines { namespace detail {
-  namespace oslinux {
+namespace boost { namespace coroutines { 
+
+  // some platforms need special praparation of the main thread
+  struct prepare_main_thread
+  {
+      prepare_main_thread() {}
+      ~prepare_main_thread() {}
+  };
+
+  namespace detail { namespace oslinux {
     template<typename T>
     void trampoline(T* fun);
     

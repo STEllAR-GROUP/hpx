@@ -35,9 +35,24 @@
 #include <boost/noncopyable.hpp>
 #include <boost/coroutine/exception.hpp>
 #include <boost/coroutine/detail/swap_context.hpp>
-namespace boost {namespace coroutines {namespace detail{
-  namespace windows {
 
+namespace boost {namespace coroutines {
+
+  // On Windows we need a special preparation for the main coroutines thread 
+  struct prepare_main_thread
+  {
+      prepare_main_thread() 
+      {
+          ConvertThreadToFiber(0);
+      }
+      ~prepare_main_thread() 
+      {
+          ConvertFiberToThread();
+      }
+  };
+
+  namespace detail { namespace windows 
+  {
     typedef LPVOID fiber_ptr;
 
     /*

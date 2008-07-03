@@ -36,7 +36,7 @@
    
      template<typename Functor>
      ContextImpl(Functor f, std::ptrdiff_t stack_size);
-	 
+         
      Preconditions:
      f is a generic function object (support for function pointers
      is not required.
@@ -52,7 +52,7 @@
      any other clean up action required.	 
        
    - ContextImpl is not required to be DefaultConstructible nor Copyable.
-	 
+         
    - ContextImpl must expose the following typedef:
 
      typedef unspecified-type context_impl_base;
@@ -69,10 +69,10 @@
        is used as an argument to swap_context, all its copies become stale.
        (that is, only one copy of ContextImplBase can be used).
        A ContextImpl cannot be sliced by copying it to a ContextImplBase.
-	   
+           
      - void swap_context(ContextImplBase& from, 
-	                 const ContextImplBase& to) 
-	 
+                         const ContextImplBase& to) 
+         
        This free function is called unqualified (via ADL).
        Preconditions:
        Its 'to' argument must be an initialized ContextImplBase.
@@ -83,7 +83,7 @@
        'to' context is restored. 
        It is undefined behavior if the 'to' argument is an invalid 
        (uninitialized) swap context.
-	   
+           
      A ContextImplBase is meant to be used when an empty temporary
      context is needed to store the current context before
      restoring a ContextImpl and no current context is
@@ -123,7 +123,7 @@ namespace boost { namespace coroutines { namespace detail {
 
 #elif defined(BOOST_WINDOWS)
 
-#if defined(_M_IA64) || defined(_WIN64)
+#if (defined(_M_IA64) || defined(_WIN64)) && !defined(BOOST_COROUTINES_USE_FIBERS)
 
 #include <boost/coroutine/detail/context_windows64.hpp>
 namespace boost { namespace coroutines { namespace detail {

@@ -1,4 +1,4 @@
-//  Copyright (c) 2006 João Abecasis
+//  Copyright (c) 2006 Joao Abecasis
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -28,7 +28,7 @@ namespace hpx { namespace util
     //  Requirements:
     //      T is default constructible
     //          (There's an alternate implementation that relaxes this
-    //              requirement -- João Abecasis)
+    //              requirement -- Joao Abecasis)
     //      T::T() MUST not throw!
     //          this is a requirement of boost::call_once.
     //
