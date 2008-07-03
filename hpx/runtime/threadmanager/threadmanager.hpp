@@ -26,6 +26,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/util/full_empty_memory.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threadmanager
@@ -126,6 +127,8 @@ namespace hpx { namespace threadmanager
         /// to change the state of one of the threads managed by this 
         /// threadmanager.
         ///
+        /// \param self     [in] A reference to the px_thread executing this 
+        ///                 function. 
         /// \param id       [in] The thread id of the thread the state should 
         ///                 be modified for.
         /// \param newstate [in] The new state to be set for the thread 
@@ -137,6 +140,33 @@ namespace hpx { namespace threadmanager
         ///                 \a thread_state enumeration. If the 
         ///                 thread is not known to the threadmanager the return 
         ///                 value will be \a thread_state#unknown.
+        ///
+        /// \note           This function yields the \a px_thread specified by
+        ///                 the parameter \a self if the thread referenced by 
+        ///                 the parameter \a id is in \a thread_state#active 
+        ///                 state.
+        thread_state set_state(px_thread_self& self, thread_id_type id, 
+            thread_state newstate);
+
+        /// The set_state function is part of the thread related API and allows
+        /// to change the state of one of the threads managed by this 
+        /// threadmanager.
+        ///
+        /// \param id       [in] The thread id of the thread the state should 
+        ///                 be modified for.
+        /// \param newstate [in] The new state to be set for the thread 
+        ///                 referenced by the \a id parameter.
+        ///
+        /// \returns        This function returns the previous state of the 
+        ///                 thread referenced by the \a id parameter. It will 
+        ///                 return one of the values as defined by the 
+        ///                 \a thread_state enumeration. If the 
+        ///                 thread is not known to the threadmanager the return 
+        ///                 value will be \a thread_state#unknown.
+        ///
+        /// \note           This function throws a \a error#invalid_status 
+        ///                 exception if the thread referenced by the parameter 
+        ///                 \a id is in \a thread_state#active state. 
         thread_state set_state(thread_id_type id, thread_state newstate);
 
         /// The get_state function is part of the thread related API and allows
@@ -152,6 +182,10 @@ namespace hpx { namespace threadmanager
         ///                 thread is not known to the threadmanager the return 
         ///                 value will be \a thread_state#unknown.
         thread_state get_state(thread_id_type id) const;
+
+        ///
+        naming::id_type get_thread_gid(thread_id_type id, 
+            applier::applier& appl) const;
 
         ///
         boost::intrusive_ptr<px_thread> get_thread(thread_id_type id) const;
@@ -180,14 +214,13 @@ namespace hpx { namespace threadmanager
         thread_map_type thread_map_;        ///< mapping of thread id's to threads
         work_items_type work_items_;        ///< list of active work items
         work_items_type terminated_items_;  ///< list of terminated threads
+        util::full_empty<void> active_set_state_;   ///< full/empty bit to 
+                                            ///< synchronize set_state on active thread
 
         bool running_;                      ///< thread manager has bee started
         mutable mutex_type mtx_;            ///< mutex protecting the members
         boost::condition cond_;             ///< used to trigger some action
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    void set_thread_state(thread_id_type id, thread_state new_state);
 
 ///////////////////////////////////////////////////////////////////////////////
 }}

@@ -13,6 +13,8 @@ using namespace hpx;
 threadmanager::thread_state null_thread(threadmanager::px_thread_self& self, 
     applier::applier& appl)
 {
+    naming::id_type gid = 
+        appl.get_thread_manager().get_thread_gid(self.get_thread_id(), appl);
     return threadmanager::terminated;
 }
 
@@ -22,12 +24,17 @@ threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self,
     std::size_t num_px_threads)
 {
     // schedule a couple of threads
+    timer.restart();
     threadmanager::threadmanager& tm = appl.get_thread_manager();
     for (std::size_t i = 0; i < num_px_threads; ++i) {
         tm.register_work(boost::bind(&null_thread, _1, boost::ref(appl)),
             threadmanager::pending, false);
     }
-
+    double elapsed = timer.elapsed();
+    std::cerr << "Elapsed time [s] for thread initialization of " 
+              << num_px_threads << " px_threads: " << elapsed << " (" 
+              << elapsed/num_px_threads << " per px_thread)" << std::endl;
+    
     // initiate shutdown of the runtime system
     components::stubs::runtime_support::shutdown_all(appl, 
         appl.get_runtime_support_gid());

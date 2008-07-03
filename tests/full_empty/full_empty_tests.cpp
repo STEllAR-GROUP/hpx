@@ -13,7 +13,7 @@ using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
 threadmanager::thread_state test1_helper(threadmanager::px_thread_self& self, 
-    applier::applier& appl, hpx::lcos::full_empty<int>& data)
+    applier::applier& appl, hpx::util::full_empty<int>& data)
 {
     // retrieve gid for this thread
     boost::intrusive_ptr<threadmanager::px_thread> t (
@@ -37,7 +37,7 @@ threadmanager::thread_state test1(threadmanager::px_thread_self& self,
     BOOST_TEST(gid);
 
     // create a full_empty data item
-    hpx::lcos::full_empty<int> data;
+    hpx::util::full_empty<int> data;
     BOOST_TEST(data.is_empty());
 
     // schedule the helper thread

@@ -14,7 +14,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threadmanager/px_thread.hpp>
 #include <hpx/lcos/base_lco.hpp>
-#include <hpx/lcos/full_empty_memory.hpp>
+#include <hpx/util/full_empty_memory.hpp>
 #include <hpx/components/action.hpp>
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/server/wrapper.hpp>

@@ -52,7 +52,64 @@ namespace hpx { namespace threadmanager
     }
 
     /// The set_state function is part of the thread related API and allows
-    /// to change the state of one of the threads managed by this 
+    /// to change the state of one of the threads managed by this threadmanager
+    thread_state threadmanager::set_state(px_thread_self& self, 
+        thread_id_type id, thread_state new_state)
+    {
+        // set_state can't be used to force a thread into active state
+        if (new_state == active)
+        {
+            boost::throw_exception(hpx::exception(hpx::bad_parameter));
+            return unknown;
+        }
+
+        // lock data members while setting a thread state
+        mutex_type::scoped_lock lk(mtx_);
+
+        thread_map_type::iterator map_iter = thread_map_.find(id);
+        if (map_iter != thread_map_.end())
+        {
+            boost::intrusive_ptr<px_thread> px_t = map_iter->second;
+            thread_state previous_state = px_t->get_state();
+
+            // nothing to do here if the state doesn't change
+            if (new_state == previous_state)
+                return new_state;
+
+            // the thread to set the state for is currently running, so we 
+            // yield control for the main thread manager loop to release this
+            // px_thread
+            if (previous_state == active) {
+                do {
+                    util::unlock_the_lock<mutex_type::scoped_lock> ul(lk);
+                    active_set_state_.write(self);
+                } while ((previous_state = px_t->get_state()) == active);
+            }
+
+            // If the previous state was pending we are supposed to remove the
+            // thread from the queue. But in order to avoid linearly looking 
+            // through the queue we defer this to the thread function, which 
+            // at some point will ignore this thread by simply skipping it 
+            // (if it's not pending anymore). 
+
+            // So all what we do here is to set the new state.
+            px_t->set_state(new_state);
+            if (new_state == pending) {
+#if HPX_USE_LOCKFREE != 0
+                work_items_.enqueue(px_t);
+#else
+                work_items_.push(px_t);
+#endif
+                if (running_) 
+                    cond_.notify_one();
+            }
+            return previous_state;
+        }
+        return unknown;
+    }
+
+    /// The set_state function is part of the thread related API and allows
+    /// to change the state of one of the threads managed by this threadmanager
     thread_state threadmanager::set_state(thread_id_type id, 
         thread_state new_state)
     {
@@ -67,7 +124,6 @@ namespace hpx { namespace threadmanager
         mutex_type::scoped_lock lk(mtx_);
 
         thread_map_type::iterator map_iter = thread_map_.find(id);
-        map_iter = thread_map_.find(id);
         if (map_iter != thread_map_.end())
         {
             boost::intrusive_ptr<px_thread> px_t = map_iter->second;
@@ -77,27 +133,27 @@ namespace hpx { namespace threadmanager
             if (new_state == previous_state)
                 return new_state;
 
+            // if the thread to set the state for is currently active we throw
+            // an invalid status exception
             if (previous_state == active) {
-            // do some juggling 
-            // need to set the state of the thread to new_state,
-            // not to what is returned by the active thread
+                boost::throw_exception(hpx::exception(hpx::invalid_status));
+                return unknown;
             }
-            else {
+
             // If the previous state was pending we are supposed to remove the
             // thread from the queue. But in order to avoid linearly looking 
             // through the queue we defer this to the thread function, which 
             // at some point will come across this thread simply skipping it 
             // (if it's not pending anymore). 
             // So all what we do here is to set the new state.
-                px_t->set_state(new_state);
-                if (new_state == pending)
-                {
+            px_t->set_state(new_state);
+            if (new_state == pending)
+            {
 #if HPX_USE_LOCKFREE != 0
-                    work_items_.enqueue(px_t);
+                work_items_.enqueue(px_t);
 #else
-                    work_items_.push(px_t);
+                work_items_.push(px_t);
 #endif
-                }
                 if (running_) 
                     cond_.notify_one();
             }
@@ -114,12 +170,26 @@ namespace hpx { namespace threadmanager
         mutex_type::scoped_lock lk(mtx_);
 
         thread_map_type::const_iterator map_iter = thread_map_.find(id);
-        map_iter = thread_map_.find(id);
         if (map_iter != thread_map_.end())
         {
             return map_iter->second->get_state();
         }
         return unknown;
+    }
+
+    ///
+    naming::id_type threadmanager::get_thread_gid(thread_id_type id, 
+        applier::applier& appl) const
+    {
+        // lock data members while getting a thread state
+        mutex_type::scoped_lock lk(mtx_);
+
+        thread_map_type::const_iterator map_iter = thread_map_.find(id);
+        if (map_iter != thread_map_.end())
+        {
+            return map_iter->second->get_gid(appl);
+        }
+        return naming::invalid_id;
     }
 
     // helper class for switching thread state in and out during execution
@@ -160,6 +230,10 @@ namespace hpx { namespace threadmanager
     void threadmanager::tfunc()
     {
 #if HPX_USE_LOCKFREE != 0
+        // figure out, if this thread is the master thread
+        bool is_master_thread = 
+            (boost::this_thread::get_id() == threads_[0].get_id());
+
         // run the work queue
         boost::coroutines::prepare_main_thread main_thread;
         while (running_ || !work_items_.empty()) 
@@ -205,14 +279,17 @@ namespace hpx { namespace threadmanager
 
                     // only one dedicated OS thread is allowed to acquire the 
                     // lock for the purpose of deleting all terminated threads
-                    if (boost::this_thread::get_id() == threads_[0].get_id()) 
-                    {
+                    if (is_master_thread) {
                         mutex_type::scoped_lock lk(mtx_);
                         boost::intrusive_ptr<px_thread> todelete;
                         while (terminated_items_.dequeue(&todelete))
                             thread_map_.erase(todelete->get_thread_id());
                     }
                 }
+
+                // make sure to handle pending set_state requests
+                if (is_master_thread) 
+                    active_set_state_.get_and_empty();
             }
 
             if (work_items_.empty()) {
@@ -295,7 +372,6 @@ namespace hpx { namespace threadmanager
         mutex_type::scoped_lock lk(mtx_);
 
         thread_map_type::const_iterator map_iter = thread_map_.find(id);
-        map_iter = thread_map_.find(id);
         if (map_iter != thread_map_.end())
         {
             return map_iter->second;
@@ -377,10 +453,18 @@ namespace hpx { namespace threadmanager
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void set_thread_state(thread_id_type id, thread_state new_state)
+    thread_state set_thread_state(thread_id_type id, thread_state new_state)
     {
         px_thread* t = static_cast<px_thread*>(id);
-        t->get_thread_manager().set_state(id, new_state);
+        return t->get_thread_manager().set_state(id, new_state);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    thread_state set_thread_state(px_thread_self& self, thread_id_type id, 
+        thread_state new_state)
+    {
+        px_thread* t = static_cast<px_thread*>(id);
+        return t->get_thread_manager().set_state(self, id, new_state);
     }
 
 }}

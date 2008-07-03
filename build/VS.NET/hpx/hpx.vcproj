@@ -541,6 +541,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\hpx\util\full_empty_memory.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\util\full_empty_store.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\util\future.hpp"
 					>
 				</File>

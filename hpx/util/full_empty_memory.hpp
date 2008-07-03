@@ -13,9 +13,9 @@
 #include <boost/type_traits/add_pointer.hpp>
 
 #include <hpx/util/static.hpp>
-#include <hpx/lcos/full_empty_store.hpp>
+#include <hpx/util/full_empty_store.hpp>
 
-namespace hpx { namespace lcos
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -146,7 +146,19 @@ namespace hpx { namespace lcos
         void read_and_empty(threadmanager::px_thread_self& self, 
             value_type& dest) 
         {
-            return get_store().read_and_empty(self, get_address(), dest);
+            get_store().read_and_empty(self, get_address(), dest);
+        }
+
+        /// \brief  Reads memory if it is full, sets memory to empty. If the 
+        ///         location is empty the calling thread will return \a false
+        ///         immediately.
+        ///
+        /// \note   When memory becomes empty, only one thread blocked like this 
+        ///         will be queued to run (one thread waiting in a \a write 
+        ///         function).
+        bool get_and_empty(value_type& dest) 
+        {
+            return get_store().get_and_empty(get_address(), dest);
         }
 
         /// \brief  Writes memory and atomically sets its state to full without 
@@ -257,6 +269,18 @@ namespace hpx { namespace lcos
         void read_and_empty(threadmanager::px_thread_self& self) 
         {
             return get_store().read_and_empty(self, get_address());
+        }
+
+        /// \brief  Reads memory if it is full, sets memory to empty. If the 
+        ///         location is empty the calling thread will return \a false
+        ///         immediately.
+        ///
+        /// \note   When memory becomes empty, only one thread blocked like this 
+        ///         will be queued to run (one thread waiting in a \a write 
+        ///         function).
+        bool get_and_empty() 
+        {
+            return get_store().get_and_empty(get_address());
         }
 
         /// \brief Writes memory and atomically sets its state to full without 

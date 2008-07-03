@@ -91,6 +91,14 @@ namespace hpx
         typedef coroutine_type::thread_id_type thread_id_type;
         typedef coroutine_type::self px_thread_self;
         typedef thread_state thread_function_type(px_thread_self&);
+
+        ///////////////////////////////////////////////////////////////////////
+        thread_state set_thread_state(px_thread_self& self, thread_id_type id, 
+            thread_state new_state);
+
+        ///////////////////////////////////////////////////////////////////////
+        thread_state set_thread_state(thread_id_type id, thread_state new_state);
+
     }
 
     namespace components
