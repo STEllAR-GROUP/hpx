@@ -395,13 +395,11 @@ namespace boost { namespace coroutines { namespace detail {
             
     typedef typename context_impl::context_impl_base ctx_type;
     ctx_type m_caller;
-    mutable 
 #ifndef BOOST_COROUTINE_USE_ATOMIC_COUNT
-    std::size_t
+    mutable std::size_t m_counter;
 #else
-    boost::detail::atomic_count
+    mutable  boost::detail::atomic_count m_counter;
 #endif
-    m_counter;
     deleter_type * m_deleter;
     context_state m_state;
     context_exit_state m_exit_state;

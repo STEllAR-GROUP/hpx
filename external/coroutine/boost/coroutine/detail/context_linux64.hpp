@@ -30,7 +30,7 @@ extern "C" void swapcontext_stack3 (void***, void**) throw();
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost { namespace coroutines { 
 
-  // some platforms need special praparation of the main thread
+  // some platforms need special preparation of the main thread
   struct prepare_main_thread
   {
       prepare_main_thread() {}

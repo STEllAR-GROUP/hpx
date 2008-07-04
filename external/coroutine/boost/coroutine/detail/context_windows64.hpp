@@ -13,6 +13,8 @@
 #include <boost/type_traits.hpp>
 #include <boost/coroutine/detail/swap_context.hpp>
 
+// #pragma intrinsic(__lfetch, __lfetch_excl)
+
 /*
  * Defining BOOST_COROUTINE_INLINE_ASM will enable the inline
  * assembler version of swapcontext_stack.
@@ -40,7 +42,7 @@ extern "C" void swapcontext_stack3 (void***, void**) throw();
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost { namespace coroutines { 
 
-  // some platforms need special praparation of the main thread
+  // some platforms need special preparation of the main thread
   struct prepare_main_thread
   {
       prepare_main_thread() {}
@@ -49,9 +51,6 @@ namespace boost { namespace coroutines {
 
   namespace detail { namespace windows64 
   {
-    template<typename T>
-    void trampoline(T* fun);
-    
     template<typename T>
     inline void
     trampoline(T* fun) 
@@ -67,6 +66,16 @@ namespace boost { namespace coroutines {
 
       void prefetch() const 
       {
+//         __lfetch_excl (3, m_sp);
+//         __lfetch (3, m_sp);
+//         __lfetch_excl (3, (void**)m_sp+64/8);
+//         __lfetch (3, (void**)m_sp+64/8);
+//         __lfetch_excl (3, (void**)m_sp+32/8);
+//         __lfetch (3, (void**)m_sp+32/8);
+//         __lfetch_excl (3, (void**)m_sp-32/8);
+//         __lfetch (3, (void**)m_sp-32/8);
+//         __lfetch_excl (3, (void**)m_sp-64/8);
+//         __lfetch (3, (void**)m_sp-64/8);
       }
 
       /**
@@ -107,22 +116,17 @@ namespace boost { namespace coroutines {
       void ** m_sp;
     };
 
-    //this should be a fine default.
-    static const std::size_t stack_alignment = sizeof(void*) > 8 ? sizeof(void*) : 8;
+    // MS documentation requires the stack pointer to be aligned to 16Byte 
+    // boundaries, but this gives static assertions in type_with_alignment
+    // below. FIIXME: figure out why
+    static const std::size_t stack_alignment = 8;
 
     struct stack_aligner {
       boost::type_with_alignment<stack_alignment>::type dummy;
     };
 
-    /**
-     * Stack allocator and deleter functions.
-     * Better implementations are possible using
-     * mmap (might be required on some systems) and/or
-     * using a pooling allocator.
-     * NOTE: the SuSv3 documentation explicitly allows
-     * the use of malloc to allocate stacks for makectx.
-     * We use new/delete for guaranteed alignment.
-     */
+    // Stack allocator and deleter functions.
+    // We use new/delete for guaranteed alignment.
     inline
     void* alloc_stack(std::size_t size) {
       return new stack_aligner[size/sizeof(stack_aligner)];
@@ -136,7 +140,7 @@ namespace boost { namespace coroutines {
     class ia64_win_context_impl : public ia64_win_context_impl_base
     {
     public:
-      enum { default_stack_size = 8192 };
+      enum { default_stack_size = 2*8192 };
       
       typedef ia64_win_context_impl_base context_impl_base;
 
@@ -162,10 +166,14 @@ namespace boost { namespace coroutines {
         *--m_sp = &cb;     // parm 0 of trampoline;
         *--m_sp = 0;       // dummy return address for trampoline
         *--m_sp = (void*) funp ;// return addr (here: start addr)  NOTE: the unsafe cast is safe on IA64
-        *--m_sp = 0;       // rbp                                  
-        *--m_sp = 0;       // rbx                                  
-        *--m_sp = 0;       // rsi                                  
-        *--m_sp = 0;       // rdi        
+        *--m_sp = 0;       // rbp
+        *--m_sp = 0;       // rbx
+        *--m_sp = 0;       // rsi
+        *--m_sp = 0;       // rdi
+        *--m_sp = 0;       // r12
+        *--m_sp = 0;       // r13
+        *--m_sp = 0;       // r14
+        *--m_sp = 0;       // r15
       }
       
       ~ia64_win_context_impl() 

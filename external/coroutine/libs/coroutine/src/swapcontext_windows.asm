@@ -8,7 +8,7 @@ PUBLIC swapcontext_stack
 PUBLIC swapcontext_stack2
 PUBLIC swapcontext_stack3
 
-;   RCX is &from.sp	
+;   RCX is &from.sp
 ;   RDX is to.sp
 ;
 ;   This simple version of swapcontext_stack saves registers 
@@ -27,7 +27,7 @@ PUBLIC swapcontext_stack3
 ;   We try to make its address available as soon as possible
 ;   to try to reduce the penalty. Doing a return instead of a
 ;
-;      add rsp, 8'
+;      add rsp, 8
 ;      jmp rax
 ;
 ;   really kills performance.
@@ -39,61 +39,84 @@ PUBLIC swapcontext_stack3
 _TEXT	SEGMENT
 swapcontext_stack proc
 ;
-    mov rax, qword ptr [rdx+32]
+    mov rax, qword ptr [rdx+64]     ; prefetch return address
     push rbp
     push rbx
     push rsi
     push rdi
+    push r12
+    push r13
+    push r14
+    push r15
     mov [rcx], rsp
     mov rsp, rdx
+    pop r15
+    pop r14
+    pop r13
+    pop r12
     pop rdi
     pop rsi
     pop rbx
     pop rbp
     add rsp, 8
-    mov rcx, qword ptr [rdx+48]
+    mov rcx, qword ptr [rdx+80]
     jmp rax
 ;
 swapcontext_stack endp
 ;
 swapcontext_stack2 proc
 ;
-    mov rax, qword ptr [rdx+32]
+    mov rax, qword ptr [rdx+64]     ; prefetch return address
     push rbp
     push rbx
     push rsi
     push rdi
+    push r12
+    push r13
+    push r14
+    push r15
     mov [rcx], rsp
     mov rsp, rdx
+    pop r15
+    pop r14
+    pop r13
+    pop r12
     pop rdi
     pop rsi
     pop rbx
     pop rbp
     add rsp, 8
-    mov rcx, qword ptr [rdx+48]
+    mov rcx, qword ptr [rdx+80]
     jmp rax
 ;
 swapcontext_stack2 endp
 ;
 swapcontext_stack3 proc
 ;
-    mov rax, qword ptr [rdx+32]
+    mov rax, qword ptr [rdx+64]     ; prefetch return address
     push rbp
     push rbx
     push rsi
     push rdi
+    push r12
+    push r13
+    push r14
+    push r15
     mov [rcx], rsp
     mov rsp, rdx
+    pop r15
+    pop r14
+    pop r13
+    pop r12
     pop rdi
     pop rsi
     pop rbx
     pop rbp
     add rsp, 8
-    mov rcx, qword ptr [rdx+48]
+    mov rcx, qword ptr [rdx+80]
     jmp rax
 ;
 swapcontext_stack3 endp
 _TEXT ends
 
     end
-    
