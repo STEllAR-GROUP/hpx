@@ -296,7 +296,7 @@ namespace hpx { namespace naming
         bool unbind_range(id_type const& lower_id, std::size_t count) const
         {
             address addr;   // ignore the return value
-            return unbind_range(lower_id, 1, addr);
+            return unbind_range(lower_id, count, addr);
         }
 
         /// \brief Unbind the given range of global ids
