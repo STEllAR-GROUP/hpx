@@ -66,19 +66,37 @@ namespace hpx { namespace naming
         {
             boost::uint64_t lsb = lhs.id_lsb_ + rhs.id_lsb_;
             boost::uint64_t msb = lhs.id_msb_ + rhs.id_msb_;
-            if (lsb < lhs.id_lsb_ && lsb < rhs.id_lsb_)
+            if (lsb < lhs.id_lsb_ || lsb < rhs.id_lsb_)
                 ++msb;
             return id_type(msb, lsb);
+        }
+        id_type operator+= (id_type const& rhs)
+        {
+            boost::uint64_t lsb = id_lsb_ + rhs.id_lsb_;
+            id_msb_ += rhs.id_msb_;
+            if (lsb < id_lsb_ || lsb < rhs.id_lsb_)
+                ++id_msb_;
+            id_lsb_ = lsb;
+            return *this;
         }
 
         friend id_type operator+ (id_type const& lhs, boost::uint64_t rhs)
         {
             boost::uint64_t lsb = lhs.id_lsb_ + rhs;
             boost::uint64_t msb = lhs.id_msb_;
-            if (lsb < lhs.id_lsb_ && lsb < rhs)
+            if (lsb < lhs.id_lsb_ || lsb < rhs)
                 ++msb;
             return id_type(msb, lsb);
         }
+        id_type operator+= (boost::uint64_t rhs)
+        {
+            boost::uint64_t lsb = id_lsb_ + rhs;
+            if (lsb < id_lsb_ || lsb < rhs)
+                ++id_msb_;
+            id_lsb_ = lsb;
+            return *this;
+        }
+
 
         friend id_type operator& (id_type const& lhs, boost::uint64_t rhs)
         {
