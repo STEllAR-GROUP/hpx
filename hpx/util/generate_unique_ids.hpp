@@ -17,9 +17,10 @@ namespace hpx { namespace util
 {
     /// The unique_ids class is a singleton type responsible for generating 
     /// unique ids for components, parcels, px_threads etc.
+    template <typename Mutex = boost::mutex>
     class unique_ids 
     {
-        typedef boost::mutex mutex_type;
+        typedef Mutex mutex_type;
 
         /// size of the id range returned by command_getidrange
         /// FIXME: is this a policy?
@@ -43,7 +44,10 @@ namespace hpx { namespace util
                 resolver.get_id_range(here, 
                     (std::max)(std::size_t(range_delta), count), lower_, upper_);
             }
-            return lower_++;
+
+            naming::id_type result = lower_;
+            lower_ += count;
+            return result;
         }
 
     private:

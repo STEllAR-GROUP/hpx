@@ -29,6 +29,8 @@ namespace hpx { namespace components { namespace detail
         naming::id_type 
         get_gid(applier::applier& appl, void* p)
         {
+            typename Mutex::scoped_lock guard (mtx_);
+
             typedef typename base_type::const_iterator iterator;
             iterator end = this->heap_list_.end();
             for (iterator it = this->heap_list_.begin(); it != end; ++it) 
@@ -40,7 +42,20 @@ namespace hpx { namespace components { namespace detail
         }
 
     private:
-        util::unique_ids id_range_;
+        // dummy structure implementing the Lockable concept
+        struct no_mutex
+        {
+            struct no_lock
+            {
+                no_lock(no_mutex&) {}
+                void lock() {}
+                void unlock() {}
+            };
+
+            typedef no_lock scoped_lock;
+        };
+
+        util::unique_ids<no_mutex> id_range_;
     };
 
 }}} // namespace hpx::components::detail

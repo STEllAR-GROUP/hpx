@@ -128,8 +128,9 @@ namespace hpx { namespace components { namespace detail
         ///
         /// \note  The pointer given by the parameter \a p must have been 
         ///        allocated by this instance of a \a wrapper_heap
+        template <typename Mutex>
         naming::id_type 
-        get_gid(applier::applier& appl, util::unique_ids& ids, void* p) 
+        get_gid(applier::applier& appl, util::unique_ids<Mutex>& ids, void* p) 
         {
             BOOST_ASSERT(did_alloc(p));
 
@@ -178,7 +179,7 @@ namespace hpx { namespace components { namespace detail
         {
             if (NULL == pool_ && !init_pool())
                 return false;
-            if (first_free_ + count >= pool_+size_) 
+            if (first_free_ + count > pool_+size_) 
                 return false;
             return true;
         }
