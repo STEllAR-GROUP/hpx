@@ -77,10 +77,20 @@ namespace hpx
         dgas_pool_.stop();
     }
 
+#if (defined(_WIN32) ||defined(_WIN64)) && defined (_DEBUG)
+#include <io.h>
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     void runtime::start(boost::function<hpx_main_function_type> func, 
         std::size_t num_threads, bool blocking)
     {
+#if (defined(_WIN32) ||defined(_WIN64)) && defined (_DEBUG)
+        // needs to be called to avoid problems at system startup
+        // see: http://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=100319
+        _isatty(0);
+#endif
+
         // start services (service threads)
         thread_manager_.run(num_threads);   // start the thread manager
         parcel_port_.run(false);            // starts parcel_pool_ as well
