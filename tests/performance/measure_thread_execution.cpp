@@ -13,8 +13,8 @@ using namespace hpx;
 threadmanager::thread_state null_thread(threadmanager::px_thread_self& self, 
     applier::applier& appl)
 {
-    naming::id_type gid = 
-        appl.get_thread_manager().get_thread_gid(self.get_thread_id(), appl);
+//     naming::id_type gid = 
+//         appl.get_thread_manager().get_thread_gid(self.get_thread_id(), appl);
     return threadmanager::terminated;
 }
 

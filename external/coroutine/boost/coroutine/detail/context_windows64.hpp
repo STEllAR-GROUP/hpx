@@ -140,7 +140,7 @@ namespace boost { namespace coroutines {
     class ia64_win_context_impl : public ia64_win_context_impl_base
     {
     public:
-      enum { default_stack_size = 2*8192 };
+      enum { default_stack_size = 12288 };
       
       typedef ia64_win_context_impl_base context_impl_base;
 

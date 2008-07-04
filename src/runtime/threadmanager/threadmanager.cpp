@@ -226,9 +226,9 @@ namespace hpx { namespace threadmanager
     };
 
     template <typename Mutex, typename Queue, typename Map>
-    inline void cleanup(Mutex& mtx_, Queue& terminated_items, Map& thread_map)
+    inline void cleanup(Mutex& mtx, Queue& terminated_items, Map& thread_map)
     {
-        typename Mutex::scoped_lock lk(mtx_);
+        typename Mutex::scoped_lock lk(mtx);
         boost::intrusive_ptr<px_thread> todelete;
         while (terminated_items.dequeue(&todelete))
             thread_map.erase(todelete->get_thread_id());
