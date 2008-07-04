@@ -34,16 +34,16 @@ namespace boost { namespace coroutines { namespace detail {
     inline
     void
     fix_result(const typename Traits::as_tuple&, 
-	       typename 
-	       boost::enable_if_c<Traits::length == 0>::type * = 0){}
+               typename 
+               boost::enable_if_c<Traits::length == 0>::type * = 0){}
 
 
     template<typename Traits>
     inline
     typename Traits::template at<0>::type
     fix_result(const typename Traits::as_tuple& x, 
-	       typename 
-	       boost::enable_if_c<Traits::length == 1>::type * = 0){
+               typename 
+               boost::enable_if_c<Traits::length == 1>::type * = 0){
       using boost::get;
       return get<0>(x);
     }
@@ -53,8 +53,8 @@ namespace boost { namespace coroutines { namespace detail {
     inline
     typename Traits::as_tuple
     fix_result(const typename Traits::as_tuple& x, 
-	       typename 
-	       boost::enable_if_c<(Traits::length > 1)>::type* =0){
+               typename 
+               boost::enable_if_c<(Traits::length > 1)>::type* =0){
       return x;
     }
 } } }

@@ -51,22 +51,22 @@ namespace boost { namespace coroutines { namespace detail {
   public:
     typedef BOOST_DEDUCED_TYPENAME
     boost::mpl::eval_if<is_tuple_traits<signature_result_type>,
-			as_tuple<signature_result_type>,
-			boost::mpl::identity<signature_result_type> >
+                        as_tuple<signature_result_type>,
+                        boost::mpl::identity<signature_result_type> >
     ::type result_type;
 
     typedef BOOST_DEDUCED_TYPENAME
     boost::mpl::eval_if<is_tuple_traits<signature_result_type>,
-			boost::mpl::identity<signature_result_type>,
-			boost::mpl::if_
-			<boost::is_same<signature_result_type, void>,
-			 tuple_traits<>,
-			 tuple_traits<signature_result_type> > >
+                        boost::mpl::identity<signature_result_type>,
+                        boost::mpl::if_
+                        <boost::is_same<signature_result_type, void>,
+                         tuple_traits<>,
+                         tuple_traits<signature_result_type> > >
     ::type result_slot_traits;
     
     typedef BOOST_DEDUCED_TYPENAME result_slot_traits
     ::as_tuple result_slot_type;
-    	     
+             
     typedef BOOST_DEDUCED_TYPENAME detail::make_tuple_traits
     <typename detail::signature<Signature>::type >
     ::type arg_slot_traits;

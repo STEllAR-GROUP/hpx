@@ -243,15 +243,11 @@ namespace hpx { namespace threadmanager
     
     ///////////////////////////////////////////////////////////////////////////
     // main function executed by a OS thread
-    void threadmanager::tfunc()
+    void threadmanager::tfunc(bool is_master_thread)
     {
 #if HPX_DEBUG != 0
         ++thread_count_;
 #endif
-        // figure out, if this thread is the master thread
-        bool is_master_thread = 
-            (boost::this_thread::get_id() == threads_[0].get_id());
-
         // run the work queue
         boost::coroutines::prepare_main_thread main_thread;
         while (running_ || !work_items_.empty() || !active_set_state_.empty()) 
@@ -382,8 +378,12 @@ namespace hpx { namespace threadmanager
 
             running_ = true;
             while (num_threads-- != 0) {
+                // the last thread i sthe master
+                bool is_master = (0 == num_threads);
+
+                // create a new thread and set its affinity
                 threads_.push_back(new boost::thread(
-                    boost::bind(&threadmanager::tfunc, this)));
+                    boost::bind(&threadmanager::tfunc, this, is_master)));
                 set_affinity(threads_.back(), num_threads % num_of_cores);
             }
         }

@@ -195,7 +195,7 @@ namespace hpx { namespace threadmanager
 
     protected:
         // this is the thread function executing the work items in the queue
-        void tfunc();
+        void tfunc(bool is_master_thread);
 
     public:
         /// this notifies the thread manager that there is some more work 

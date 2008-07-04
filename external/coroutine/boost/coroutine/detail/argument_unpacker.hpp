@@ -47,19 +47,19 @@ namespace boost { namespace coroutines { namespace detail {
     struct unpacker_n<Traits, len> {                                   \
         template<typename Functor, typename Tuple>                     \
       struct result {/*for result_of compatibility*/                   \
-	  typedef typename  boost::result_of                           \
+          typedef typename  boost::result_of                           \
              <Functor(BOOST_PP_ENUM_BINARY_PARAMS                      \
-		      (len, typename Traits::template at<index_ , >    \
-		       ::type BOOST_PP_INTERCEPT))>::type type;        \
+                      (len, typename Traits::template at<index_ , >    \
+                       ::type BOOST_PP_INTERCEPT))>::type type;        \
       };                                                               \
       template<typename Functor, typename Tuple>                       \
       typename result<Functor, Tuple>::type operator()                 \
        (Functor& f, Tuple& parms){                                     \
            using boost::get; /*tuples::get cannot be found via ADL*/   \
            return f(BOOST_PP_ENUM_BINARY_PARAMS                        \
-		    (len,                                              \
-		     get<index_, >                                     \
-		     (parms) BOOST_PP_INTERCEPT));                     \
+                    (len,                                              \
+                     get<index_, >                                     \
+                     (parms) BOOST_PP_INTERCEPT));                     \
       }                                                                \
     };                                                                 \
 /**/
@@ -69,45 +69,45 @@ namespace boost { namespace coroutines { namespace detail {
     struct unpacker_ex_n<Traits, len >           {                     \
     template<typename Functor,                                         \
              typename First,                                           \
-	     typename Tuple>                                           \
+             typename Tuple>                                           \
       struct result {                                                  \
-	  typedef typename  boost::result_of                           \
+          typedef typename  boost::result_of                           \
              <Functor(First BOOST_PP_COMMA_IF(len)                     \
-		      BOOST_PP_ENUM_BINARY_PARAMS                      \
-		      (len, typename Traits                            \
-		       ::template at<index_ , >::type BOOST_PP_INTERCEPT))>     \
+                      BOOST_PP_ENUM_BINARY_PARAMS                      \
+                      (len, typename Traits                            \
+                       ::template at<index_ , >::type BOOST_PP_INTERCEPT))>     \
           ::type type;                                                 \
-	};                                                             \
+        };                                                             \
                                                                        \
       template<typename Functor,                                       \
                typename First,                                         \
-	       typename Tuple>                                         \
+               typename Tuple>                                         \
       typename result<Functor, First, Tuple>::type                     \
       operator()(Functor& f, First& arg0, Tuple& parms){                \
            using boost::get; /*tuples::get cannot be found via ADL*/  \
            return f(arg0                                               \
-		    BOOST_PP_COMMA_IF(len)                             \
-		    BOOST_PP_ENUM_BINARY_PARAMS                        \
-		    (len,                                              \
-		     get<index_, >                                     \
-		     (parms) BOOST_PP_INTERCEPT) );                    \
+                    BOOST_PP_COMMA_IF(len)                             \
+                    BOOST_PP_ENUM_BINARY_PARAMS                        \
+                    (len,                                              \
+                     get<index_, >                                     \
+                     (parms) BOOST_PP_INTERCEPT) );                    \
       }                                                                \
     };                                                                 \
 /**/
 
   BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX, 
-		  BOOST_COROUTINE_ARGUMENT_UNPACKER, ~);
+                  BOOST_COROUTINE_ARGUMENT_UNPACKER, ~);
   BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX, 
-		  BOOST_COROUTINE_ARGUMENT_UNPACKER_EX, ~);
+                  BOOST_COROUTINE_ARGUMENT_UNPACKER_EX, ~);
 
-  // Somehow VCPP 8.0 chockes if the Trait for unpack[_ex]
+  // Somehow VCPP 8.0 chokes if the Trait for unpack[_ex]
   // is explicitly specified. We use an empty dispatch 
   // tag to let the compiler deduce it.
   template<typename Trait>
   struct trait_tag {};
 
   /**
-   * Inovoke function object @p f passing  all 
+   * Invoke function object @p f passing  all 
    * elements in tuple @p parms as distinct parameters.
    */
   template<typename Traits, typename Functor, typename Tuple>
