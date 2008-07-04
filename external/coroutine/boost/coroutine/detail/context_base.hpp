@@ -158,9 +158,9 @@ namespace boost { namespace coroutines { namespace detail {
         if(m_exit_status == ctx_exited_return)
           return true;
         if(m_exit_status == ctx_exited_abnormally) {
-        std::type_info const * tinfo =0;
-        std::swap(m_type_info, tinfo);
-        throw abnormal_exit(tinfo?*tinfo: typeid(unknown_exception_tag));
+          std::type_info const * tinfo =0;
+          std::swap(m_type_info, tinfo);
+          throw abnormal_exit(tinfo?*tinfo: typeid(unknown_exception_tag));
         } else if(m_exit_status == ctx_exited_exit)
           return false;
         else {
@@ -215,9 +215,9 @@ namespace boost { namespace coroutines { namespace detail {
         if(m_exit_status == ctx_exited_return)
           return;
         if(m_exit_status == ctx_exited_abnormally) {
-        std::type_info const * tinfo =0;
-        std::swap(m_type_info, tinfo);
-        throw abnormal_exit(tinfo?*tinfo: typeid(unknown_exception_tag));
+          std::type_info const * tinfo =0;
+          std::swap(m_type_info, tinfo);
+          throw abnormal_exit(tinfo?*tinfo: typeid(unknown_exception_tag));
         } else if(m_exit_status == ctx_exited_exit)
           throw coroutine_exited();
         else {

@@ -43,11 +43,15 @@ namespace boost {namespace coroutines {
   {
       prepare_main_thread() 
       {
-          ConvertThreadToFiber(0);
+          LPVOID result = ConvertThreadToFiber(0);
+          BOOST_ASSERT(0 != result);
+          (void)result;
       }
       ~prepare_main_thread() 
       {
-          ConvertFiberToThread();
+          BOOL result = ConvertFiberToThread();
+          BOOST_ASSERT(FALSE != result);
+          (void)result;
       }
   };
 
@@ -55,6 +59,7 @@ namespace boost {namespace coroutines {
   {
     typedef LPVOID fiber_ptr;
 
+#if _WIN32_WINNT < 0x0600 
     /*
      * This number (0x1E00) has been sighted in the wild (at least on windows XP systems)
      * as return value from GetCurrentFiber() on non fibrous threads. This is somehow related
@@ -62,14 +67,19 @@ namespace boost {namespace coroutines {
      * On non-NT systems, 0 is returned. 
      */
     fiber_ptr const fiber_magic = reinterpret_cast<fiber_ptr>(0x1E00);
+#endif
                 
     /*
      * Return true if current thread is a fiber.
      * FIXME: on longhorn should use IsThreadAFiber
      */
     inline bool is_fiber() {
+#if _WIN32_WINNT >= 0x0600 
+      return IsThreadAFiber();
+#else
       fiber_ptr current = GetCurrentFiber();
       return current != 0 && current != fiber_magic;
+#endif
     }
 
     /*

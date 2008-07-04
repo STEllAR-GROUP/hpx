@@ -72,7 +72,7 @@ namespace boost { namespace coroutines { namespace detail {
   void wait_impl(Tuple wt) {
     try {
       if(marker<boost::tuples::length<Tuple>::value>::mark(wt, true) > 0) 
-	wait_n(wt, 1);
+        wait_n(wt, 1);
     } catch (...) {
       marker<boost::tuples::length<Tuple>::value>::mark(wt, false);
       throw;

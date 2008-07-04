@@ -81,8 +81,8 @@ namespace boost { namespace coroutines { namespace detail {
 /**/
 
     BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX,
-		    BOOST_COROUTINE_gen_argn_type,
-		    ~);
+                    BOOST_COROUTINE_gen_argn_type,
+                    ~);
       
 #define BOOST_COROUTINE_param_with_default(z, n, type_prefix) \
     BOOST_DEDUCED_TYPENAME call_traits                   \
@@ -95,11 +95,11 @@ namespace boost { namespace coroutines { namespace detail {
     void operator() 
       (BOOST_PP_ENUM
        (BOOST_COROUTINE_ARG_MAX,
-	BOOST_COROUTINE_param_with_default,
-	arg)) {
+        BOOST_COROUTINE_param_with_default,
+        arg)) {
       m_future_pimpl->assign(tuple_type
-	(BOOST_PP_ENUM_PARAMS
-	 (BOOST_COROUTINE_ARG_MAX, arg)));
+        (BOOST_PP_ENUM_PARAMS
+         (BOOST_COROUTINE_ARG_MAX, arg)));
     }
 
   private:

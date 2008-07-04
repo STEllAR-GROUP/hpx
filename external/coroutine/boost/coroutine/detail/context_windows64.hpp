@@ -118,7 +118,7 @@ namespace boost { namespace coroutines {
 
     // MS documentation requires the stack pointer to be aligned to 16Byte 
     // boundaries, but this gives static assertions in type_with_alignment
-    // below. FIIXME: figure out why
+    // below. FIXME: figure out why
     static const std::size_t stack_alignment = 8;
 
     struct stack_aligner {
