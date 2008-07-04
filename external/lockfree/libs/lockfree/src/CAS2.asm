@@ -6,7 +6,7 @@
 
 PUBLIC CAS2_windows64
 
-_TEXT	SEGMENT
+_TEXT SEGMENT
 CAS2_windows64 proc
 ;
     mov rax, qword ptr [rsp+28h] 
@@ -15,7 +15,6 @@ CAS2_windows64 proc
     mov rdi, rcx
     mov rcx, rdx 
     lock cmpxchg16b qword ptr [rdi]
-    xor rax, rax
     ret
 ;
 CAS2_windows64 endp
