@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_FULLEMPTYSTORE_JUN_16_2008_0128APM)
-#define HPX_LCOS_FULLEMPTYSTORE_JUN_16_2008_0128APM
+#if !defined(HPX_UTIL_FULLEMPTYSTORE_JUN_16_2008_0128APM)
+#define HPX_UTIL_FULLEMPTYSTORE_JUN_16_2008_0128APM
 
 #include <set>
 #include <queue>
@@ -208,38 +208,6 @@ namespace hpx { namespace util { namespace detail
             else {
                 set_empty_locked(f);   // state_ = empty
             }
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // get data and empty if memory if full, otherwise return false
-        template <typename Lock, typename T, typename Action>
-        bool get_if_full(Lock& outer_lock, T& dest, Action const& f)
-        {
-            scoped_lock l(mtx_);
-            outer_lock.unlock();
-
-            if (state_ == empty) 
-                return false;
-
-            // copy the data to the destination
-            if (entry_ && entry_ != &dest) 
-                dest = *static_cast<T const*>(entry_);
-            set_empty_locked(f);   // state_ = empty;
-            return true;
-        }
-
-        // same as above, but for entries without associated data
-        template <typename Lock, typename Action>
-        bool get_if_full(Lock& outer_lock, Action const& f)
-        {
-            scoped_lock l(mtx_);
-            outer_lock.unlock();
-
-            if (state_ == empty) 
-                return false;
-
-            set_empty_locked(f);   // state_ = empty
-            return true;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -589,37 +557,6 @@ namespace hpx { namespace util { namespace detail
             boost::upgrade_lock<mutex_type> l(mtx_);
             store_type::iterator it = find_or_create(l, entry);
             (*it).second->enqueue_full_empty(l, self, no_full_empty_action);
-        }
-
-        /// \brief Wait for memory to become full and then reads it, sets 
-        /// memory to empty.
-        template <typename Action, typename T>
-        bool get_and_empty(Action const& f, void* entry, T& dest)
-        {
-            boost::upgrade_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(l, entry);
-            return (*it).second->get_if_full(l, dest, f);
-        }
-        template <typename T>
-        bool get_and_empty(void* entry, T& dest)
-        {
-            boost::upgrade_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(l, entry);
-            return(*it).second->get_if_full(l, dest, no_full_empty_action);
-        }
-
-        template <typename Action>
-        bool get_and_empty(Action const& f, void* entry)
-        {
-            boost::upgrade_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(l, entry);
-            return(*it).second->get_if_full(l, f);
-        }
-        bool get_and_empty(void* entry)
-        {
-            boost::upgrade_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(l, entry);
-            return(*it).second->get_if_full(l, no_full_empty_action);
         }
 
         /// \brief Writes memory and atomically sets its state to full without 

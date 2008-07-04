@@ -128,7 +128,7 @@ public:
     {
         for (;;)
         {
-            atomic_node_ptr head (head_);
+            atomic_node_ptr head(head_);
             memory_barrier();
 
             atomic_node_ptr tail(tail_);

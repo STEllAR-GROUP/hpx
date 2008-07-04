@@ -9,6 +9,7 @@ set (hpxlib_HEADERS
     ../hpx/exception.hpp
     ../hpx/hpx.hpp
     ../hpx/hpx_fwd.hpp
+    ../hpx/version.hpp
     # components
     ../hpx/components/accumulator.hpp
     ../hpx/components/action.hpp
@@ -16,13 +17,14 @@ set (hpxlib_HEADERS
     ../hpx/components/action_implementations.hpp
     ../hpx/components/component_type.hpp
     ../hpx/components/continuation.hpp
+    ../hpx/components/continuation_impl.hpp
     ../hpx/components/get_lva.hpp
     ../hpx/components/runtime_support.hpp
     ../hpx/components/server/accumulator.hpp
     ../hpx/components/server/distributing_factory.hpp
-    ../hpx/components/server/runtime_support.hpp
     ../hpx/components/server/manage_component.hpp
     ../hpx/components/server/memory.hpp
+    ../hpx/components/server/runtime_support.hpp
     ../hpx/components/server/wrapper.hpp
     ../hpx/components/server/wrapper_heap.hpp
     ../hpx/components/server/wrapper_heap_list.hpp
@@ -32,19 +34,22 @@ set (hpxlib_HEADERS
     ../hpx/include/action_manager.hpp
     ../hpx/include/applier.hpp
     ../hpx/include/components.hpp
+    ../hpx/include/lcos.hpp
     ../hpx/include/naming.hpp
     ../hpx/include/parcelset.hpp
     ../hpx/include/runtime.hpp
     ../hpx/include/threadmanager.hpp
     ../hpx/include/util.hpp
     # LCO's
+    ../hpx/lcos/barrier.hpp
     ../hpx/lcos/base_lco.hpp
+    ../hpx/lcos/condition.hpp
     ../hpx/lcos/eager_future.hpp
     ../hpx/lcos/eager_future_constructors.hpp
-    ../hpx/lcos/full_empty_memory.hpp
-    ../hpx/lcos/full_empty_store.hpp
+    ../hpx/lcos/eager_future_constructors_direct.hpp
     ../hpx/lcos/lazy_future.hpp
     ../hpx/lcos/lazy_future_get_results.hpp
+    ../hpx/lcos/mutex.hpp
     ../hpx/lcos/simple_future.hpp
     # runtime
     ../hpx/runtime/runtime.hpp
@@ -52,8 +57,9 @@ set (hpxlib_HEADERS
     ../hpx/runtime/action_manager/action_manager.hpp
     # applier
     ../hpx/runtime/applier/applier.hpp
-    ../hpx/runtime/applier/apply_helper.hpp
     ../hpx/runtime/applier/applier_implementations.hpp
+    ../hpx/runtime/applier/apply_helper.hpp
+    ../hpx/runtime/applier/apply_helper_implementations.hpp
     # naming
     ../hpx/runtime/naming/address.hpp
     ../hpx/runtime/naming/locality.hpp
@@ -81,6 +87,8 @@ set (hpxlib_HEADERS
     ../hpx/util/asio_util.hpp
     ../hpx/util/container_device.hpp
     ../hpx/util/find_msb.hpp
+    ../hpx/util/full_empty_memory.hpp
+    ../hpx/util/full_empty_store.hpp
     ../hpx/util/future.hpp
     ../hpx/util/generate_unique_ids.hpp
     ../hpx/util/high_resolution_timer.hpp

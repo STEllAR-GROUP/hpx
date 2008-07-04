@@ -38,11 +38,7 @@ namespace hpx { namespace threadmanager
         if (initial_state == pending)
         {
             // pushing the new thread in the pending queue thread
-#if HPX_USE_LOCKFREE != 0
             work_items_.enqueue(px_t_sp);
-#else
-            work_items_.push(px_t_sp);
-#endif
             if (running_ && run_now) 
                 cond_.notify_one();       // try to execute the new work item
         }
@@ -81,10 +77,17 @@ namespace hpx { namespace threadmanager
             // px_thread
             if (previous_state == active) {
                 do {
+                    active_set_state_.enqueue(self.get_thread_id());
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(lk);
-                    active_set_state_.write(self);
+                    self.yield(suspended);
                 } while ((previous_state = px_t->get_state()) == active);
             }
+
+            // If the thread has been terminated while this set_state was 
+            // waiting in the active_set_state_ queue nothing has to be done 
+            // anymore.
+            if (previous_state == terminated)
+                return terminated;
 
             // If the previous state was pending we are supposed to remove the
             // thread from the queue. But in order to avoid linearly looking 
@@ -95,11 +98,7 @@ namespace hpx { namespace threadmanager
             // So all what we do here is to set the new state.
             px_t->set_state(new_state);
             if (new_state == pending) {
-#if HPX_USE_LOCKFREE != 0
                 work_items_.enqueue(px_t);
-#else
-                work_items_.push(px_t);
-#endif
                 if (running_) 
                     cond_.notify_one();
             }
@@ -133,12 +132,10 @@ namespace hpx { namespace threadmanager
             if (new_state == previous_state)
                 return new_state;
 
-            // if the thread to set the state for is currently active we throw
-            // an invalid status exception
-            if (previous_state == active) {
-                boost::throw_exception(hpx::exception(hpx::invalid_status));
+            // if the thread to set the state for is currently active we do
+            // nothing but return \a thread_state#unknown
+            if (previous_state == active) 
                 return unknown;
-            }
 
             // If the previous state was pending we are supposed to remove the
             // thread from the queue. But in order to avoid linearly looking 
@@ -149,11 +146,7 @@ namespace hpx { namespace threadmanager
             px_t->set_state(new_state);
             if (new_state == pending)
             {
-#if HPX_USE_LOCKFREE != 0
                 work_items_.enqueue(px_t);
-#else
-                work_items_.push(px_t);
-#endif
                 if (running_) 
                     cond_.notify_one();
             }
@@ -225,6 +218,7 @@ namespace hpx { namespace threadmanager
         thread_state prev_state_;
     };
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Mutex, typename Queue, typename Map>
     inline void cleanup(Mutex& mtx, Queue& terminated_items, Map& thread_map)
     {
@@ -235,17 +229,32 @@ namespace hpx { namespace threadmanager
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    inline void handle_pending_set_state(threadmanager& tm, 
+        threadmanager::set_state_queue_type& active_set_state)
+    {
+        thread_id_type id = 0;
+        while (active_set_state.dequeue(&id)) {
+            // if the thread is still active, just re-queue the 
+            // set_state request
+            if (unknown == tm.set_state(id, pending))
+                active_set_state.enqueue(id);
+        }
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////
     // main function executed by a OS thread
     void threadmanager::tfunc()
     {
-#if HPX_USE_LOCKFREE != 0
+#if HPX_DEBUG != 0
+        ++thread_count_;
+#endif
         // figure out, if this thread is the master thread
         bool is_master_thread = 
             (boost::this_thread::get_id() == threads_[0].get_id());
 
         // run the work queue
         boost::coroutines::prepare_main_thread main_thread;
-        while (running_ || !work_items_.empty()) 
+        while (running_ || !work_items_.empty() || !active_set_state_.empty()) 
         {
             // Get the next thread from the queue
             boost::intrusive_ptr<px_thread> thrd;
@@ -283,17 +292,17 @@ namespace hpx { namespace threadmanager
                     terminated_items_.enqueue(thrd);
                 }
 
-                if (is_master_thread) {
-                    // only one dedicated OS thread is allowed to acquire the 
-                    // lock for the purpose of deleting all terminated threads
+                // only one dedicated OS thread is allowed to acquire the 
+                // lock for the purpose of deleting all terminated threads
+                if (is_master_thread) 
                     cleanup(mtx_, terminated_items_, thread_map_);
-
-                    // make sure to handle pending set_state requests
-                    active_set_state_.get_and_empty();
-                }
             }
 
-            if (work_items_.empty()) {
+            // make sure to handle pending set_state requests
+            handle_pending_set_state(*this, active_set_state_);
+
+            // if nothing else has to be done either wait or terminate
+            if (work_items_.empty() && active_set_state_.empty()) {
                 // stop running after all px_threads have been terminated
                 if (!running_) 
                     break;
@@ -305,66 +314,13 @@ namespace hpx { namespace threadmanager
             }
         }
 
-        // Before exiting each of the threads deletes the remaining px_threads. 
+        // Before exiting each of the threads deletes the remaining terminated
+        // px_threads 
         cleanup(mtx_, terminated_items_, thread_map_);
-#else
-        mutex_type::scoped_lock lk(mtx_);
 
-        // run the work queue
-        boost::coroutines::prepare_main_thread main_thread;
-        while (running_ || !work_items_.empty()) 
-        {
-            if (!work_items_.empty())
-            {
-                // Get the next thread from the queue
-                boost::intrusive_ptr<px_thread> thrd (work_items_.front());
-                work_items_.pop();
-
-                // Only pending threads will be executed.
-                // Any non-pending threads are leftovers from a set_state() 
-                // call for a previously pending thread (see comments above).
-                thread_state state = thrd->get_state();
-                if (state == pending)
-                {
-                    // switch the state of the thread to active and back to 
-                    // what the thread reports as its return value
-                    switch_status thrd_stat (thrd.get(), active);
-
-                    {
-                        // make sure lock is unlocked during execution of the 
-                        // work item
-                        util::unlock_the_lock<mutex_type::scoped_lock> l(lk);
-                        state = (*thrd)();  // thread returns new required state
-                    } // the lock gets locked again here!
-
-                    // store the returned state in the thread
-                    thrd_stat = state;
-                }   // this stores the new state in the thread
-
-                // Re-add this work item to our list of work items if thread
-                // should be re-scheduled. If the thread is suspended now we
-                // just keep it in the map of threads.
-                if (state == pending) 
-                    work_items_.push(thrd);
-
-                // Remove the mapping from thread_map_ if thread is depleted or 
-                // terminated, this will delete the px_thread as all references
-                // go out of scope.
-                // FIXME: what has to be done with depleted threads?
-                if (state == depleted || state == terminated)
-                    thread_map_.erase(thrd->get_thread_id());
-            }
-
-            if (work_items_.empty()) {
-                // stop running after all px_threads have been terminated
-                if (!running_)
-                    break;
-
-                // wait until somebody needs some action (if no new work 
-                // arrived in the meantime)
-                cond_.wait(lk);
-            }
-        }
+#if HPX_DEBUG != 0
+        // the last thread is allowed to exit only if no more px_threads exist
+        BOOST_ASSERT(0 != --thread_count_ || thread_map_.empty());
 #endif
     }
 

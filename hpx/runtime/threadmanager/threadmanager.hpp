@@ -6,7 +6,6 @@
 #if !defined(HPX_THREADMANAGER_MAY_20_2008_845AM)
 #define HPX_THREADMANAGER_MAY_20_2008_845AM
 
-#include <queue>
 #include <map>
 #include <vector>
 #include <memory>
@@ -19,8 +18,9 @@
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
-#if HPX_USE_LOCKFREE != 0
 #include <boost/lockfree/fifo.hpp>
+#if defined(HPX_DEBUG)
+#include <boost/detail/atomic_count.hpp>
 #endif
 
 #include <hpx/hpx_fwd.hpp>
@@ -44,12 +44,10 @@ namespace hpx { namespace threadmanager
     {
     private:
         // this is the type of the queue of pending threads
-#if HPX_USE_LOCKFREE != 0
-        typedef boost::lockfree::fifo<boost::intrusive_ptr<px_thread> > work_items_type;
-#else
-        typedef std::queue <boost::intrusive_ptr<px_thread> > work_items_type;
-#endif
-
+        typedef 
+            boost::lockfree::fifo<boost::intrusive_ptr<px_thread> > 
+        work_items_type;
+        
         // this is the type of a map holding all threads (except depleted ones)
         typedef
             std::map<thread_id_type, boost::intrusive_ptr<px_thread> >
@@ -63,6 +61,9 @@ namespace hpx { namespace threadmanager
     public:
         threadmanager() 
           : running_(false)
+#if HPX_DEBUG != 0
+          , thread_count_(0)
+#endif
         {}
         ~threadmanager() 
         {
@@ -72,6 +73,8 @@ namespace hpx { namespace threadmanager
                 threads_.clear();
             }
         }
+
+        typedef boost::lockfree::fifo<thread_id_type> set_state_queue_type;
 
         /// The function \a register_work adds a new work item to the thread 
         /// manager. It creates a new \a px_thread, adds it to the internal
@@ -164,9 +167,9 @@ namespace hpx { namespace threadmanager
         ///                 thread is not known to the threadmanager the return 
         ///                 value will be \a thread_state#unknown.
         ///
-        /// \note           This function throws a \a error#invalid_status 
-        ///                 exception if the thread referenced by the parameter 
-        ///                 \a id is in \a thread_state#active state. 
+        /// \note           If the thread referenced by the parameter \a id is 
+        ///                 in \a thread_state#active state this function does 
+        ///                 nothing except returning thread_state#unknown. 
         thread_state set_state(thread_id_type id, thread_state newstate);
 
         /// The get_state function is part of the thread related API and allows
@@ -214,12 +217,16 @@ namespace hpx { namespace threadmanager
         thread_map_type thread_map_;        ///< mapping of thread id's to threads
         work_items_type work_items_;        ///< list of active work items
         work_items_type terminated_items_;  ///< list of terminated threads
-        util::full_empty<void> active_set_state_;   ///< full/empty bit to 
-                                            ///< synchronize set_state on active thread
+        set_state_queue_type active_set_state_;  ///< list of threads waiting for 
+                                            ///< set_state on an active thread
 
         bool running_;                      ///< thread manager has bee started
         mutable mutex_type mtx_;            ///< mutex protecting the members
         boost::condition cond_;             ///< used to trigger some action
+
+#if HPX_DEBUG != 0
+        boost::detail::atomic_count thread_count_;
+#endif
     };
 
 ///////////////////////////////////////////////////////////////////////////////

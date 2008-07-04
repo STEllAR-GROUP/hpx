@@ -87,12 +87,13 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			Name="Release|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
-			InheritedPropertySheets="..\hpx64.vsprops"
+			InheritedPropertySheets="..\hpx.vsprops"
 			CharacterSet="0"
+			WholeProgramOptimization="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -111,15 +112,12 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="3"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;LIB"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				AdditionalIncludeDirectories=""
+				PreprocessorDefinitions=" WIN32;NDEBUG;LIB"
+				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
@@ -154,13 +152,12 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			Name="Debug|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
-			InheritedPropertySheets="..\hpx.vsprops"
+			InheritedPropertySheets="..\hpx64.vsprops"
 			CharacterSet="0"
-			WholeProgramOptimization="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -179,12 +176,15 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
+				TargetEnvironment="3"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions=" WIN32;NDEBUG;LIB"
-				RuntimeLibrary="2"
+				Optimization="0"
+				PreprocessorDefinitions="WIN32;_DEBUG;LIB"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
@@ -585,6 +585,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\hpx\util\px_thread_queue.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\util\safe_bool.hpp"
 					>
 				</File>
@@ -833,7 +837,15 @@
 				Name="LCOs"
 				>
 				<File
+					RelativePath="..\..\..\hpx\lcos\barrier.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\lcos\base_lco.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\lcos\condition.hpp"
 					>
 				</File>
 				<File
@@ -849,19 +861,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\hpx\lcos\full_empty_memory.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\hpx\lcos\full_empty_store.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\hpx\lcos\lazy_future.hpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\..\hpx\lcos\lazy_future_get_results.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\lcos\mutex.hpp"
 					>
 				</File>
 				<File
@@ -914,6 +922,14 @@
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="MASM"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
 					<Tool

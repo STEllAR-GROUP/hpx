@@ -110,12 +110,12 @@ namespace hpx { namespace lcos
 
         ///
         virtual threadmanager::thread_state set_event (
-            threadmanager::px_thread_self&, applier::applier& appl) = 0;
+            threadmanager::px_thread_self&, applier::applier&) = 0;
 
         ///
         virtual threadmanager::thread_state set_error (
-            threadmanager::px_thread_self&, applier::applier& appl,
-            hpx::error code, std::string msg) = 0;
+            threadmanager::px_thread_self&, applier::applier&,
+            hpx::error, std::string) = 0;
 
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,

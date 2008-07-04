@@ -299,14 +299,24 @@ inline bool CAS2(volatile C * addr, D old1, E old2, D new1, E new2)
                                            old.l,
                                            nw.l);
 
-#elif defined(__GNUC__) && defined(__x86_64__)
-    /* handcoded asm, will crash on early amd processors */
+#elif defined(__GNUC__) 
+#if defined(__x86_64__)
+    /* 64Bit system: handcoded asm, will crash on early amd processors */
     char result;
     __asm__ __volatile__("lock; cmpxchg16b %0; setz %1"
                          : "=m"(*addr), "=q"(result)
                          : "m"(*addr), "d" (old2), "a" (old1),
                            "c" (new2), "b" (new1) : "memory");
     return result != 0;
+#else
+    /* 32Bit system: handcoded asm */
+    char result;
+    __asm__ __volatile__("lock; cmpxchg8b %0; setz %1"
+                         : "=m"(*addr), "=q"(result)
+                         : "m"(*addr), "d" (old2), "a" (old1),
+                           "c" (new2), "b" (new1) : "memory");
+    return result != 0;
+#endif
 #else
 #warning ("blocking CAS2 emulation")
     struct packed_c

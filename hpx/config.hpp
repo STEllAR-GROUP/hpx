@@ -12,6 +12,11 @@
 #define HPX_NAME_RESOLVER_PORT 7911
 
 ///////////////////////////////////////////////////////////////////////////////
+#if !defined(HPX_DEBUG) && defined(_DEBUG)
+#define HPX_DEBUG 1
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 /// This defines if the Intel Thread Building Blocks library will be used
 #if !defined(HPX_USE_TBB)
 #define HPX_USE_TBB 0

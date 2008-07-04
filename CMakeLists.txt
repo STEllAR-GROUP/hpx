@@ -12,8 +12,18 @@ cmake_minimum_required(VERSION 2.6)
 # to the root binary directory of the project as ${hpx_BINARY_DIR}.
 project (hpx CXX C)
 
-# We need to use Boost
-find_package(Boost 1.35.0 COMPONENTS date_time filesystem graph regex serialization thread system signals)
+# We need to use Boost, namely the following Boost libraries
+set (Boost_COMPONENTS_NEEDED
+    date_time 
+    filesystem 
+    graph 
+    regex 
+    serialization 
+    thread 
+    system 
+    signals
+)
+find_package(Boost 1.35.0 COMPONENTS ${Boost_COMPONENTS_NEEDED})
 
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 LINK_DIRECTORIES(${Boost_LIBRARY_DIR})

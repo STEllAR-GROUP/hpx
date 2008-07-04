@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_FULLEMPTYMEMORY_JUN_16_2008_1102AM)
-#define HPX_LCOS_FULLEMPTYMEMORY_JUN_16_2008_1102AM
+#if !defined(HPX_UTIL_FULLEMPTYMEMORY_JUN_16_2008_1102AM)
+#define HPX_UTIL_FULLEMPTYMEMORY_JUN_16_2008_1102AM
 
 #include <boost/noncopyable.hpp>
 #include <boost/call_traits.hpp>
@@ -149,18 +149,6 @@ namespace hpx { namespace util
             get_store().read_and_empty(self, get_address(), dest);
         }
 
-        /// \brief  Reads memory if it is full, sets memory to empty. If the 
-        ///         location is empty the calling thread will return \a false
-        ///         immediately.
-        ///
-        /// \note   When memory becomes empty, only one thread blocked like this 
-        ///         will be queued to run (one thread waiting in a \a write 
-        ///         function).
-        bool get_and_empty(value_type& dest) 
-        {
-            return get_store().get_and_empty(get_address(), dest);
-        }
-
         /// \brief  Writes memory and atomically sets its state to full without 
         ///         waiting for it to become empty.
         /// 
@@ -269,18 +257,6 @@ namespace hpx { namespace util
         void read_and_empty(threadmanager::px_thread_self& self) 
         {
             return get_store().read_and_empty(self, get_address());
-        }
-
-        /// \brief  Reads memory if it is full, sets memory to empty. If the 
-        ///         location is empty the calling thread will return \a false
-        ///         immediately.
-        ///
-        /// \note   When memory becomes empty, only one thread blocked like this 
-        ///         will be queued to run (one thread waiting in a \a write 
-        ///         function).
-        bool get_and_empty() 
-        {
-            return get_store().get_and_empty(get_address());
         }
 
         /// \brief Writes memory and atomically sets its state to full without 
