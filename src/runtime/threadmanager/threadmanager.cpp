@@ -225,6 +225,15 @@ namespace hpx { namespace threadmanager
         thread_state prev_state_;
     };
 
+    template <typename Mutex, typename Queue, typename Map>
+    inline void cleanup(Mutex& mtx_, Queue& terminated_items, Map& thread_map)
+    {
+        typename Mutex::scoped_lock lk(mtx_);
+        boost::intrusive_ptr<px_thread> todelete;
+        while (terminated_items.dequeue(&todelete))
+            thread_map.erase(todelete->get_thread_id());
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // main function executed by a OS thread
     void threadmanager::tfunc()
@@ -240,20 +249,17 @@ namespace hpx { namespace threadmanager
         {
             // Get the next thread from the queue
             boost::intrusive_ptr<px_thread> thrd;
-            if (work_items_.dequeue(&thrd))
-            {
+            if (work_items_.dequeue(&thrd)) {
                 // Only pending threads will be executed.
                 // Any non-pending threads are leftovers from a set_state() 
                 // call for a previously pending thread (see comments above).
                 thread_state state = thrd->get_state();
-                if (pending == state) 
-                {
+                if (pending == state) {
                     // switch the state of the thread to active and back to 
                     // what the thread reports as its return value
 
                     switch_status thrd_stat (thrd.get(), active);
-                    if (thrd_stat == pending) 
-                    {
+                    if (thrd_stat == pending) {
                         // thread returns new required state
                         // store the returned state in the thread
                         thrd_stat = state = (*thrd)();
@@ -271,30 +277,25 @@ namespace hpx { namespace threadmanager
                 // terminated, this will delete the px_thread as all references
                 // go out of scope.
                 // FIXME: what has to be done with depleted threads?
-                if (state == depleted || state == terminated) 
-                {
+                if (state == depleted || state == terminated) {
                     // all OS threads put their terminated threads into a 
                     // separate queue
                     terminated_items_.enqueue(thrd);
-
-                    // only one dedicated OS thread is allowed to acquire the 
-                    // lock for the purpose of deleting all terminated threads
-                    if (is_master_thread) {
-                        mutex_type::scoped_lock lk(mtx_);
-                        boost::intrusive_ptr<px_thread> todelete;
-                        while (terminated_items_.dequeue(&todelete))
-                            thread_map_.erase(todelete->get_thread_id());
-                    }
                 }
 
-                // make sure to handle pending set_state requests
-                if (is_master_thread) 
+                if (is_master_thread) {
+                    // only one dedicated OS thread is allowed to acquire the 
+                    // lock for the purpose of deleting all terminated threads
+                    cleanup(mtx_, terminated_items_, thread_map_);
+
+                    // make sure to handle pending set_state requests
                     active_set_state_.get_and_empty();
+                }
             }
 
             if (work_items_.empty()) {
                 // stop running after all px_threads have been terminated
-                if (!running_)
+                if (!running_) 
                     break;
 
                 // wait until somebody needs some action (if no new work 
@@ -303,6 +304,9 @@ namespace hpx { namespace threadmanager
                 cond_.wait(lk);
             }
         }
+
+        // Before exiting each of the threads deletes the remaining px_threads. 
+        cleanup(mtx_, terminated_items_, thread_map_);
 #else
         mutex_type::scoped_lock lk(mtx_);
 

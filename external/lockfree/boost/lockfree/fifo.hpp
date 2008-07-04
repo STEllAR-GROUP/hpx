@@ -29,6 +29,9 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/noncopyable.hpp>
+#if defined(_DEBUG)
+#include <boost/detail/atomic_count.hpp>
+#endif
 
 namespace boost
 {
@@ -63,6 +66,9 @@ class fifo:
 
 public:
     fifo(void)
+#if defined(_DEBUG)
+      : count_(-1)
+#endif
     {
         node * n = alloc_node();
         head_.set_ptr(n);
@@ -71,6 +77,9 @@ public:
 
     explicit fifo(std::size_t initial_nodes):
         pool(initial_nodes)
+#if defined(_DEBUG)
+      , count_(-1)
+#endif
     {
         node * n = alloc_node();
         head_.set_ptr(n);
@@ -154,6 +163,9 @@ private:
     {
         node * chunk = pool.allocate();
         new(chunk) node();
+#if defined(_DEBUG)
+        ++count_;
+#endif
         return chunk;
     }
 
@@ -161,11 +173,17 @@ private:
     {
         node * chunk = pool.allocate();
         new(chunk) node(t);
+#if defined(_DEBUG)
+        ++count_;
+#endif
         return chunk;
     }
 
     void dealloc_node(node * n)
     {
+#if defined(_DEBUG)
+        --count_;
+#endif
         n->~node();
         pool.deallocate(n);
     }
@@ -177,6 +195,10 @@ private:
     /* force head_ and tail_ to different cache lines! */
     atomic_node_ptr head_;
     BOOST_LOCKFREE_CACHELINE_ALIGNMENT_PREFIX atomic_node_ptr tail_ BOOST_LOCKFREE_CACHELINE_ALIGNMENT; 
+
+#if defined(_DEBUG)
+    boost::detail::atomic_count count_;
+#endif
 };
 
 } /* namespace detail */
