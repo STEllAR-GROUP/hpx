@@ -378,12 +378,10 @@ namespace hpx { namespace threadmanager
 
             running_ = true;
             while (num_threads-- != 0) {
-                // the last thread i sthe master
-                bool is_master = (0 == num_threads);
-
-                // create a new thread and set its affinity
+                // create a new thread and set its affinity, the last thread 
+                // is the master
                 threads_.push_back(new boost::thread(
-                    boost::bind(&threadmanager::tfunc, this, is_master)));
+                    boost::bind(&threadmanager::tfunc, this, !num_threads)));
                 set_affinity(threads_.back(), num_threads % num_of_cores);
             }
         }

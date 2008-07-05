@@ -25,7 +25,7 @@ namespace hpx { namespace lcos
     class barrier 
     {
     public:
-        barrier(int number_of_threads)
+        barrier(long number_of_threads)
           : number_of_threads_(number_of_threads), count_(0)
         {
         }
@@ -41,16 +41,16 @@ namespace hpx { namespace lcos
                 self.yield(threadmanager::suspended);
             }
             else {
-                thread_id_type id = 0;
+                threadmanager::thread_id_type id = 0;
                 while (--count_ > 0 && queue_.dequeue(&id)) 
-                    threadmanager::set_state(self, id, threadmanager::pending);
+                    set_thread_state(self, id, threadmanager::pending);
             }
         }
 
     private:
-        std::size_t number_of_threads_;
+        long number_of_threads_;
         boost::detail::atomic_count count_;
-        boost::lockfree::fifo<thread_id_type> queue_;
+        boost::lockfree::fifo<threadmanager::thread_id_type> queue_;
     };
 
 }}

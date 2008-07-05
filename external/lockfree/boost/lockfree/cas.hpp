@@ -51,9 +51,9 @@ inline bool CAS(volatile C * addr, D old, D nw)
 #if defined(__GNUC__) && ( (__GNUC__ > 4) || ((__GNUC__ >= 4) && (__GNUC_MINOR__ >= 1)) )
     return __sync_bool_compare_and_swap(addr, old, nw);
 #elif defined(_MSC_VER)
-    return _InterlockedCompareExchange(addr,old,nw) == old;
+    return _InterlockedCompareExchange(addr, nw, old) == old;
 #elif defined(_WIN32)
-    return InterlockedCompareExchange(addr,old,nw) == old;
+    return InterlockedCompareExchange(addr, nw, old) == old;
 #elif defined(__APPLE__)
     return OSAtomicCompareAndSwap32((int32_t) old, (int32_t)nw, (int32_t*)addr);
 #elif defined(AO_HAVE_compare_and_swap_full)
