@@ -22,3 +22,11 @@ target_link_libraries(applier_test_server_exe hpx ${Boost_LIBRARIES})
 set (thread_state_test_SOURCES thread_state_test/thread_state_test.cpp)
 add_executable (thread_state_test_exe ${thread_state_test_SOURCES})
 target_link_libraries(thread_state_test_exe hpx ${Boost_LIBRARIES})
+
+set (barrier_tests_SOURCES lco_tests/barrier_tests.cpp)
+add_executable (barrier_tests_exe ${barrier_tests_SOURCES})
+target_link_libraries(barrier_tests_exe hpx ${Boost_LIBRARIES})
+
+set (memory_tests_SOURCES memory_tests/memory_tests.cpp)
+add_executable (memory_tests_exe ${memory_tests_SOURCES})
+target_link_libraries(memory_tests_exe hpx ${Boost_LIBRARIES})

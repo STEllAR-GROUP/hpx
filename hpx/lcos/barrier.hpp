@@ -6,51 +6,102 @@
 #if !defined(HPX_LCOS_BARRIER_JUN_23_2008_0530PM)
 #define HPX_LCOS_BARRIER_JUN_23_2008_0530PM
 
-#include <boost/detail/atomic_count.hpp>
-#include <boost/lockfree/fifo.hpp>
+#include <boost/intrusive/slist.hpp>
+#include <boost/thread.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos 
 {
-    /// \class barrier barrier hpx/lcos/barrier.hpp
+    /// \class barrier barrier.hpp hpx/lcos/barrier.hpp
     ///
     /// A barrier can be used to synchronize a specific number of threads, 
     /// blocking all of the entering threads until all of the threads have 
     /// entered the barrier.
     ///
-    /// \note   A \a barrier is not a LCO in the sense that it has a global id
-    ///         or can be triggered using the action (parcel) mechanism. It
-    ///         is just a low level synchronization primitive allowing to 
-    ///         synchronize \a px_threads.
+    /// \note   A \a barrier is not a LCO in the sense that it has no global id
+    ///         and it can't be triggered using the action (parcel) mechanism. 
+    ///         It is just a low level synchronization primitive allowing to 
+    ///         synchronize a given number of \a px_threads.
     class barrier 
     {
-    public:
-        barrier(long number_of_threads)
-          : number_of_threads_(number_of_threads), count_(0)
-        {
-        }
+    private:
+        typedef boost::mutex mutex_type;
 
-        /// The function \a wait will block the first number entering threads
+        // define data structures needed for intrusive slist container used for
+        // the queues
+        struct barrier_queue_entry
+        {
+            typedef boost::intrusive::slist_member_hook<
+                boost::intrusive::link_mode<boost::intrusive::normal_link>
+            > hook_type;
+
+            barrier_queue_entry(threadmanager::thread_id_type id)
+              : id_(id)
+            {}
+
+            threadmanager::thread_id_type id_;
+            hook_type slist_hook_;
+        };
+
+        typedef boost::intrusive::member_hook<
+            barrier_queue_entry, barrier_queue_entry::hook_type,
+            &barrier_queue_entry::slist_hook_
+        > slist_option_type;
+
+        typedef boost::intrusive::slist<
+            barrier_queue_entry, slist_option_type, 
+            boost::intrusive::cache_last<true>, 
+            boost::intrusive::constant_time_size<true>
+        > queue_type;
+
+    public:
+        barrier(std::size_t number_of_threads)
+          : number_of_threads_(number_of_threads)
+        {}
+
+        /// The function \a wait will block the a number of entering \a px_threads
         /// (as given by the constructor parameter \a number_of_threads), 
         /// releasing all waiting threads as soon as the last \a px_thread
         /// entered this function.
         void wait(threadmanager::px_thread_self& self)
         {
-            if (++count_ < number_of_threads_) {
-                queue_.enqueue(self.get_thread_id());
+            mutex_type::scoped_lock l(mtx_);
+            if (queue_.size() < number_of_threads_-1) {
+                barrier_queue_entry e(self.get_thread_id());
+                queue_.push_back(e);
+
+                l.unlock();
                 self.yield(threadmanager::suspended);
             }
             else {
-                threadmanager::thread_id_type id = 0;
-                while (--count_ > 0 && queue_.dequeue(&id)) 
+            // slist::swap has a bug in Boost 1.35.0
+#if BOOST_VERSION < 103600
+                // release the threads
+                while (!queue_.empty()) {
+                    threadmanager::thread_id_type id = queue_.front().id_;
+                    queue_.pop_front();
                     set_thread_state(self, id, threadmanager::pending);
+                }
+#else
+                // swap the list
+                queue_type queue;
+                queue.swap(queue_);
+                l.unlock();
+
+                // release the threads
+                while (!queue.empty()) {
+                    threadmanager::thread_id_type id = queue.front().id_;
+                    queue.pop_front();
+                    set_thread_state(self, id, threadmanager::pending);
+                }
+#endif
             }
         }
 
     private:
-        long number_of_threads_;
-        boost::detail::atomic_count count_;
-        boost::lockfree::fifo<threadmanager::thread_id_type> queue_;
+        mutex_type mtx_;
+        std::size_t const number_of_threads_;
+        queue_type queue_;
     };
 
 }}

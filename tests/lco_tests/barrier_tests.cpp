@@ -27,16 +27,14 @@ threadmanager::thread_state barrier_test(threadmanager::px_thread_self& self,
 
 ///////////////////////////////////////////////////////////////////////////////
 threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self, 
-    applier::applier& appl, boost::detail::atomic_count& counter)
+    applier::applier& appl, 
+    lcos::barrier& b, boost::detail::atomic_count& counter)
 {
-    // create a barrier waiting on 5 threads
-    lcos::barrier b(5);
-
     // create the 4 threads which will have to wait on the barrier
     threadmanager::threadmanager& tm = appl.get_thread_manager();
     for (std::size_t i = 0; i < 4; ++i) {
-        tm.register_work(boost::bind(&barrier_test, _1, 
-            boost::ref(appl), boost::ref(b), boost::ref(counter)));
+        tm.register_work(boost::bind(&barrier_test, _1, boost::ref(appl),
+            boost::ref(b), boost::ref(counter)));
     }
 
     b.wait(self);     // wait for all threads to enter the barrier
@@ -78,8 +76,12 @@ int main(int argc, char* argv[])
         // start the HPX runtime using different number of threads
         for (int i = 1; i <= 8; ++i) {
             hpx::runtime rt(host, dgas_port, host, ps_port);
+
+            lcos::barrier b(5);       // create a barrier waiting on 5 threads
             boost::detail::atomic_count counter(0);
-            rt.run(boost::bind(hpx_main, _1, _2, boost::ref(counter)), i);
+
+            rt.run(boost::bind(hpx_main, _1, _2, boost::ref(b), 
+                boost::ref(counter)), i);
         }
     }
     catch (std::exception& e) {
