@@ -37,6 +37,7 @@ namespace hpx
         service_unavailable = 15,
         bad_request = 16,
         repeated_request = 17,
+        lock_error = 18,
         last_error
     };
     
@@ -60,6 +61,7 @@ namespace hpx
         "service_unavailable",
         "bad_request",
         "repeated_request",
+        "lock_error",
         ""
     };
 

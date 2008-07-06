@@ -26,7 +26,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util/full_empty_memory.hpp>
+#include <hpx/util/io_service_pool.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threadmanager
@@ -58,9 +58,16 @@ namespace hpx { namespace threadmanager
         // threadmanager for now
         typedef boost::mutex mutex_type;
 
+        // we use the boost::posix_time::ptime type for time representation
+        typedef boost::posix_time::ptime time_type;
+
+        // we use the boost::posix_time::time_duration type as the duration 
+        // representation
+        typedef boost::posix_time::time_duration duration_type;
+
     public:
-        threadmanager() 
-          : running_(false)
+        threadmanager(util::io_service_pool& timer_pool) 
+          : running_(false), timer_pool_(timer_pool)
 #if HPX_DEBUG != 0
           , thread_count_(0)
 #endif
@@ -190,8 +197,15 @@ namespace hpx { namespace threadmanager
         naming::id_type get_thread_gid(thread_id_type id, 
             applier::applier& appl) const;
 
-        ///
-        boost::intrusive_ptr<px_thread> get_thread(thread_id_type id) const;
+        /// Set a timer to set the state of the given \a px_thread to the given 
+        /// new value after it expired (at the given time)
+        thread_id_type timed_set_state (time_type const& expire_at, 
+            thread_id_type id, thread_state newstate = pending);
+
+        /// Set a timer to set the state of the given \a px_thread to the given
+        /// new value after it expired (after the given duration)
+        thread_id_type timed_set_state (duration_type const& expire_from_now, 
+            thread_id_type id, thread_state newstate = pending);
 
     protected:
         // this is the thread function executing the work items in the queue
@@ -202,13 +216,23 @@ namespace hpx { namespace threadmanager
         /// available 
         void do_some_work(bool runall = true)
         {
-            if (running_) {
-                if (runall)
-                    cond_.notify_all();
-                else
-                    cond_.notify_one();
-            }
+            if (runall)
+                cond_.notify_all();
+            else
+                cond_.notify_one();
         }
+
+    protected:
+        /// This thread function is used by the at_timer thread below to trigger
+        /// the required action.
+        thread_state wake_timer_thread (px_thread_self& self, 
+            thread_id_type id, thread_state newstate, thread_id_type timer_id);
+
+        /// This thread function initiates the required set_state action (on 
+        /// behalf of one of the threadmanager#timed_set_state functions).
+        template <typename TimeType>
+        thread_state at_timer (px_thread_self& self, TimeType const& expire, 
+            thread_id_type id, thread_state newstate);
 
     private:
         /// this thread manager has exactly as much threads as requested
@@ -223,6 +247,8 @@ namespace hpx { namespace threadmanager
         bool running_;                      ///< thread manager has bee started
         mutable mutex_type mtx_;            ///< mutex protecting the members
         boost::condition cond_;             ///< used to trigger some action
+
+        util::io_service_pool& timer_pool_; ///< used for timed_set_state
 
 #if HPX_DEBUG != 0
         boost::detail::atomic_count thread_count_;

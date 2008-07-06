@@ -16,9 +16,8 @@ threadmanager::thread_state test1_helper(threadmanager::px_thread_self& self,
     applier::applier& appl, hpx::util::full_empty<int>& data)
 {
     // retrieve gid for this thread
-    boost::intrusive_ptr<threadmanager::px_thread> t (
-        appl.get_thread_manager().get_thread(self.get_thread_id()));
-    naming::id_type gid = t->get_gid(appl);
+    naming::id_type gid = 
+        appl.get_thread_manager().get_thread_gid(self.get_thread_id()));
     BOOST_TEST(gid);
 
     data.set(1);
@@ -31,9 +30,8 @@ threadmanager::thread_state test1(threadmanager::px_thread_self& self,
     applier::applier& appl)
 {
     // retrieve gid for this thread
-    boost::intrusive_ptr<threadmanager::px_thread> t (
-        appl.get_thread_manager().get_thread(self.get_thread_id()));
-    naming::id_type gid = t->get_gid(appl);
+    naming::id_type gid = 
+        appl.get_thread_manager().get_thread_gid(self.get_thread_id()));
     BOOST_TEST(gid);
 
     // create a full_empty data item
@@ -66,9 +64,8 @@ threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self,
     applier::applier& appl)
 {
     // retrieve gid for this thread
-    boost::intrusive_ptr<threadmanager::px_thread> t (
-        appl.get_thread_manager().get_thread(self.get_thread_id()));
-    naming::id_type gid = t->get_gid(appl);
+    naming::id_type gid = 
+        appl.get_thread_manager().get_thread_gid(self.get_thread_id()));
     BOOST_TEST(gid);
 
     // schedule test threads: test1

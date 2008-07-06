@@ -46,10 +46,10 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(std::string const& dgas_address, unsigned short dgas_port,
             std::string const& address, unsigned short port) 
-      : dgas_pool_(), parcel_pool_(),
+      : dgas_pool_(), parcel_pool_(), timer_pool_(),
         dgas_client_(dgas_pool_, dgas_address, dgas_port),
         parcel_port_(parcel_pool_, address, port),
-        thread_manager_(),
+        thread_manager_(timer_pool_),
         parcel_handler_(dgas_client_, parcel_port_, &thread_manager_),
         applier_(dgas_client_, parcel_handler_, thread_manager_, 
             runtime_support_, memory_),
@@ -58,10 +58,10 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(naming::locality dgas_address, naming::locality address) 
-      : dgas_pool_(), parcel_pool_(),
+      : dgas_pool_(), parcel_pool_(), timer_pool_(),
         dgas_client_(dgas_pool_, dgas_address),
         parcel_port_(parcel_pool_, address),
-        thread_manager_(),
+        thread_manager_(timer_pool_),
         parcel_handler_(dgas_client_, parcel_port_, &thread_manager_),
         applier_(dgas_client_, parcel_handler_, thread_manager_, 
             runtime_support_, memory_),
@@ -72,8 +72,8 @@ namespace hpx
     runtime::~runtime()
     {
         // stop all services
-        parcel_port_.stop();
-        thread_manager_.stop();
+        parcel_port_.stop();      // stops parcel_pool_ as well
+        thread_manager_.stop();   // stops timer_pool_ as well
         dgas_pool_.stop();
     }
 
@@ -92,7 +92,7 @@ namespace hpx
 #endif
 
         // start services (service threads)
-        thread_manager_.run(num_threads);   // start the thread manager
+        thread_manager_.run(num_threads);   // start the thread manager, timer_pool_ as well
         parcel_port_.run(false);            // starts parcel_pool_ as well
 
         // register the runtime_support and memory instances with the DGAS 

@@ -46,16 +46,63 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos 
 {
-    // A mutex can be used to synchronize the access to a arbitrary resource
+    /// unique_lock is a simple exclusive scoped lock usable with the mutex as
+    /// defined below
+    template <typename Mutex>
+    class unique_lock
+    {
+    public:
+        unique_lock(Mutex& mtx)
+          : mtx_(mtx), is_locked_(false)
+        {
+            lock();
+        }
+        ~unique_lock()
+        {
+            if (owns_lock())
+                unlock();
+        }
+
+        void lock()
+        {
+            if(owns_lock())
+                boost::throw_exception(hpx::exception(lock_error));
+            mtx_.lock();
+            is_locked_ = true;
+        }
+        void unlock()
+        {
+            if(owns_lock())
+                boost::throw_exception(hpx::exception(lock_error));
+            mtx_.unlock();
+            is_locked_ = false;
+        }
+        bool owns_lock() const
+        {
+            return is_locked_;
+        }
+
+    private:
+        Mutex& mtx_;
+        bool is_locked_;
+
+        // this class is not copyable and not copy constructible
+        explicit unique_lock(unique_lock&);
+        unique_lock& operator=(unique_lock&);
+    };
+
+    // A mutex can be used to synchronize the access to an arbitrary resource
     class mutex 
     {
     public:
         mutex()
         {}
 
-        void lock() {}
+        void lock(threadmanager::px_thread_self& self) {}
         void unlock() {}
         bool locked() { return false; }
+
+        typedef unique_lock<mutex> scoped_lock;
 
     private:
     };

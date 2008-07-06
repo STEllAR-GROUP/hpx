@@ -164,9 +164,9 @@ namespace hpx { namespace applier
         #include <hpx/runtime/applier/applier_implementations.hpp>
 
         /// The \a create_async function initiates the creation of a new 
-        /// component using the runtime_support as given by targetgid. This function is 
-        /// non-blocking as it returns a \a lcos#simple_future. The caller of 
-        /// this create_async is responsible to call 
+        /// component using the runtime_support as given by targetgid. This 
+        /// function is non-blocking as it returns a \a lcos#simple_future. The 
+        /// caller of this create_async is responsible to call 
         /// \a lcos#simple_future#get_result to obtain the result. 
         ///
         /// \param self
@@ -184,10 +184,10 @@ namespace hpx { namespace applier
         create_async(naming::id_type const& targetgid, 
             components::component_type type, std::size_t count = 1);
 
-        /// The \a create function creates a new component using the runtime_support as 
-        /// given by targetgid. This function is blocking for the component to 
-        /// be created and until the global id of the new component has been 
-        /// returned. 
+        /// The \a create function creates a new component using the \a 
+        /// runtime_support as given by targetgid. This function is blocking 
+        /// for the component to be created and until the global id of the new 
+        /// component has been returned. 
         ///
         /// \param self
         /// \param targetgid

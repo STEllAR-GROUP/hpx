@@ -39,7 +39,7 @@ namespace hpx { namespace threadmanager
         {
             // pushing the new thread in the pending queue thread
             work_items_.enqueue(px_t_sp);
-            if (running_ && run_now) 
+            if (run_now) 
                 cond_.notify_one();       // try to execute the new work item
         }
 
@@ -97,10 +97,10 @@ namespace hpx { namespace threadmanager
 
             // So all what we do here is to set the new state.
             px_t->set_state(new_state);
-            if (new_state == pending) {
+            if (new_state == pending) 
+            {
                 work_items_.enqueue(px_t);
-                if (running_) 
-                    cond_.notify_one();
+                cond_.notify_one();
             }
             return previous_state;
         }
@@ -142,13 +142,13 @@ namespace hpx { namespace threadmanager
             // through the queue we defer this to the thread function, which 
             // at some point will come across this thread simply skipping it 
             // (if it's not pending anymore). 
+
             // So all what we do here is to set the new state.
             px_t->set_state(new_state);
             if (new_state == pending)
             {
                 work_items_.enqueue(px_t);
-                if (running_) 
-                    cond_.notify_one();
+                cond_.notify_one();
             }
             return previous_state;
         }
@@ -170,7 +170,74 @@ namespace hpx { namespace threadmanager
         return unknown;
     }
 
-    ///
+    /// This thread function is used by the at_timer thread below to trigger
+    /// the required action.
+    thread_state threadmanager::wake_timer_thread (px_thread_self& self, 
+        thread_id_type id, thread_state newstate, thread_id_type timer_id) 
+    {
+        // first trigger the requested set_state 
+        set_state(self, id, newstate);
+
+        // then re-activate the thread holding the deadline_timer
+        set_state(self, timer_id, pending);
+        return terminated;
+    }
+
+    /// This thread function initiates the required set_state action (on 
+    /// behalf of one of the threadmanager#timed_set_state functions).
+    template <typename TimeType>
+    thread_state threadmanager::at_timer (px_thread_self& self, 
+        TimeType const& expire, thread_id_type id, thread_state newstate)
+    {
+        // create timer firing in correspondence with given time
+        boost::asio::deadline_timer t (timer_pool_.get_io_service(), expire);
+
+        // create a new thread in suspended state, which will execute the 
+        // requested set_state when timer fires and will re-awaken this thread, 
+        // allowing the deadline_timer to go out of scope gracefully
+        thread_id_type wake_id = register_work(boost::bind(
+            &threadmanager::wake_timer_thread, this, _1, id, newstate,
+            self.get_thread_id()), suspended);
+
+        // let the timer invoke the set_state on the new (suspended) thread
+        t.async_wait(boost::bind(
+            &threadmanager::set_state, this, wake_id, pending));
+
+        // this waits for the thread executed when the timer fired
+        self.yield(suspended);
+        return terminated;
+    }
+
+    /// Set a timer to set the state of the given \a px_thread to the given 
+    /// new value after it expired (at the given time)
+    thread_id_type threadmanager::timed_set_state (time_type const& expire_at, 
+        thread_id_type id, thread_state newstate)
+    {
+        // this creates a new px_thread which creates the timer and handles the
+        // requested actions
+        thread_state (threadmanager::*f)(px_thread_self&, time_type const&,
+                thread_id_type, thread_state)
+            = &threadmanager::at_timer<time_type>;
+
+        return register_work(boost::bind(f, this, _1, expire_at, id, newstate));
+    }
+
+    /// Set a timer to set the state of the given \a px_thread to the given
+    /// new value after it expired (after the given duration)
+    thread_id_type threadmanager::timed_set_state (
+        duration_type const& from_now, thread_id_type id, 
+        thread_state newstate)
+    {
+        // this creates a new px_thread which creates the timer and handles the
+        // requested actions
+        thread_state (threadmanager::*f)(px_thread_self&, duration_type const&,
+                thread_id_type, thread_state)
+            = &threadmanager::at_timer<duration_type>;
+
+        return register_work(boost::bind(f, this, _1, from_now, id, newstate));
+    }
+
+    /// Retrieve the global id of the given px_thread
     naming::id_type threadmanager::get_thread_gid(thread_id_type id, 
         applier::applier& appl) const
     {
@@ -220,27 +287,39 @@ namespace hpx { namespace threadmanager
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Mutex, typename Queue, typename Map>
-    inline void cleanup(Mutex& mtx, Queue& terminated_items, Map& thread_map)
+    inline bool cleanup(Mutex& mtx, Queue& terminated_items, Map& thread_map)
     {
         typename Mutex::scoped_lock lk(mtx);
         boost::intrusive_ptr<px_thread> todelete;
         while (terminated_items.dequeue(&todelete))
             thread_map.erase(todelete->get_thread_id());
+        return thread_map.empty();
     }
 
     ///////////////////////////////////////////////////////////////////////////
     inline void handle_pending_set_state(threadmanager& tm, 
         threadmanager::set_state_queue_type& active_set_state)
     {
-        thread_id_type id = 0;
-        while (active_set_state.dequeue(&id)) {
-            // if the thread is still active, just re-queue the 
-            // set_state request
-            if (unknown == tm.set_state(id, pending))
-                active_set_state.enqueue(id);
+        if (!active_set_state.empty()) {
+            threadmanager::set_state_queue_type still_active;
+            thread_id_type id = 0;
+
+            // try to reactivate the threads in the set_state queue
+            while (active_set_state.dequeue(&id)) {
+                // if the thread is still active, just re-queue the 
+                // set_state request
+                if (unknown == tm.set_state(id, pending))
+                    still_active.enqueue(id);
+            }
+
+            // copy the threads which are still active to the main queue
+            if (!still_active.empty()) {
+                while (still_active.dequeue(&id)) 
+                    active_set_state.enqueue(id);
+            }
         }
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
     // main function executed by a OS thread
     void threadmanager::tfunc(bool is_master_thread)
@@ -250,8 +329,7 @@ namespace hpx { namespace threadmanager
 #endif
         // run the work queue
         boost::coroutines::prepare_main_thread main_thread;
-        while (running_ || !work_items_.empty() || !active_set_state_.empty()) 
-        {
+        while (true) {
             // Get the next thread from the queue
             boost::intrusive_ptr<px_thread> thrd;
             if (work_items_.dequeue(&thrd)) {
@@ -276,7 +354,10 @@ namespace hpx { namespace threadmanager
                 // should be re-scheduled. If the thread is suspended now we
                 // just keep it in the map of threads.
                 if (state == pending) 
+                {
                     work_items_.enqueue(thrd);
+                    cond_.notify_one();
+                }
 
                 // Remove the mapping from thread_map_ if thread is depleted or 
                 // terminated, this will delete the px_thread as all references
@@ -295,44 +376,35 @@ namespace hpx { namespace threadmanager
             }
 
             // make sure to handle pending set_state requests
-            handle_pending_set_state(*this, active_set_state_);
+            if (is_master_thread) 
+                handle_pending_set_state(*this, active_set_state_);
 
             // if nothing else has to be done either wait or terminate
             if (work_items_.empty() && active_set_state_.empty()) {
                 // stop running after all px_threads have been terminated
-                if (!running_) 
-                    break;
+                if (!running_) {
+                    // Before exiting each of the threads deletes the remaining 
+                    // terminated px_threads 
+                    if (cleanup(mtx_, terminated_items_, thread_map_)) {
+                        cond_.notify_all();   // notify possibly waiting threads
+                        break;                // terminate scheduling loop
+                    }
+                }
 
-                // wait until somebody needs some action (if no new work 
-                // arrived in the meantime)
+                // Wait until somebody needs some action (if no new work 
+                // arrived in the meantime).
+                // Ask again if queues are empty to avoid race conditions (we 
+                // need to lock anyways...), this way no notify_one() gets lost
                 mutex_type::scoped_lock lk(mtx_);
-                cond_.wait(lk);
+                if (work_items_.empty() && active_set_state_.empty())
+                    cond_.wait(lk);
             }
         }
-
-        // Before exiting each of the threads deletes the remaining terminated
-        // px_threads 
-        cleanup(mtx_, terminated_items_, thread_map_);
 
 #if HPX_DEBUG != 0
         // the last thread is allowed to exit only if no more px_threads exist
         BOOST_ASSERT(0 != --thread_count_ || thread_map_.empty());
 #endif
-    }
-
-    // 
-    boost::intrusive_ptr<px_thread> 
-    threadmanager::get_thread(thread_id_type id) const
-    {
-        // lock data members while getting a thread state
-        mutex_type::scoped_lock lk(mtx_);
-
-        thread_map_type::const_iterator map_iter = thread_map_.find(id);
-        if (map_iter != thread_map_.end())
-        {
-            return map_iter->second;
-        }
-        return boost::intrusive_ptr<px_thread>();
     }
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -369,6 +441,7 @@ namespace hpx { namespace threadmanager
         if (!threads_.empty() || running_) 
             return true;    // do nothing if already running
 
+        timer_pool_.run(false);
         running_ = false;
         try {
             // run threads and wait for initialization to complete
@@ -384,6 +457,9 @@ namespace hpx { namespace threadmanager
                     boost::bind(&threadmanager::tfunc, this, !num_threads)));
                 set_affinity(threads_.back(), num_threads % num_of_cores);
             }
+
+            // start timer pool as well
+            timer_pool_.run(false);
         }
         catch (std::exception const& /*e*/) {
             stop();
@@ -397,16 +473,20 @@ namespace hpx { namespace threadmanager
         if (!threads_.empty()) {
             if (running_) {
                 running_ = false;
-                cond_.notify_all();     // make sure we're not waiting
+                cond_.notify_all();         // make sure we're not waiting
             }
 
             if (blocking) {
                 for (std::size_t i = 0; i < threads_.size(); ++i) 
                 {
-                    threads_[i].join();
                     cond_.notify_all();     // make sure we're not waiting
+                    threads_[i].join();
                 }
             }
+
+            timer_pool_.stop();             // stop timer pool as well
+            if (blocking) 
+                timer_pool_.join();
         }
     }
 

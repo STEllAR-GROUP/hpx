@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
         hpx::util::io_service_pool dgas_pool; 
         hpx::naming::resolver_server dgas(dgas_pool, host, dgas_port, true);
 
-        // start the HPX runtime using different number of threads
+        // start the HPX runtime using different numbers of threads
         for (int i = 1; i <= 8; ++i) {
             hpx::runtime rt(host, dgas_port, host, ps_port);
 

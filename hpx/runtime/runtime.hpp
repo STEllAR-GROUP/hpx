@@ -179,6 +179,7 @@ namespace hpx
     private:
         util::io_service_pool dgas_pool_; 
         util::io_service_pool parcel_pool_; 
+        util::io_service_pool timer_pool_; 
         naming::resolver_client dgas_client_;
         parcelset::parcelport parcel_port_;
         threadmanager::threadmanager thread_manager_;
