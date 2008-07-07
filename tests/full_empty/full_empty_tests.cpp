@@ -17,7 +17,7 @@ threads::thread_state test1_helper(threads::thread_self& self,
 {
     // retrieve gid for this thread
     naming::id_type gid = 
-        appl.get_thread_manager().get_thread_gid(self.get_thread_id()));
+        appl.get_thread_manager().get_thread_gid(self.get_thread_id(), appl);
     BOOST_TEST(gid);
 
     data.set(1);
@@ -31,7 +31,7 @@ threads::thread_state test1(threads::thread_self& self,
 {
     // retrieve gid for this thread
     naming::id_type gid = 
-        appl.get_thread_manager().get_thread_gid(self.get_thread_id()));
+        appl.get_thread_manager().get_thread_gid(self.get_thread_id(), appl);
     BOOST_TEST(gid);
 
     // create a full_empty data item
@@ -39,7 +39,7 @@ threads::thread_state test1(threads::thread_self& self,
     BOOST_TEST(data.is_empty());
 
     // schedule the helper thread
-    appl.get_thread_manager().register_work(
+    register_work(appl, 
         boost::bind(&test1_helper, _1, boost::ref(appl), boost::ref(data)));
 
     // wait for the other thread to set 'data' to full
@@ -65,16 +65,14 @@ threads::thread_state hpx_main(threads::thread_self& self,
 {
     // retrieve gid for this thread
     naming::id_type gid = 
-        appl.get_thread_manager().get_thread_gid(self.get_thread_id()));
+        appl.get_thread_manager().get_thread_gid(self.get_thread_id(), appl);
     BOOST_TEST(gid);
 
     // schedule test threads: test1
-    appl.get_thread_manager().register_work(
-        boost::bind(&test1, _1, boost::ref(appl)));
+    register_work(appl, test1);
 
     // initiate shutdown of the runtime system
-    components::stubs::runtime_support::shutdown_all(appl, 
-        appl.get_runtime_support_gid());
+    components::stubs::runtime_support::shutdown_all(appl);
 
     return threads::terminated;
 }

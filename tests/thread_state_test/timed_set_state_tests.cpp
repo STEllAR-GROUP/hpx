@@ -70,10 +70,10 @@ threads::thread_state time_set_state_test(
 threads::thread_state hpx_main(threads::thread_self& self, 
     applier::applier& appl)
 {
-    // test timed_set_state using a time duration
+    // test timed set_state using a time duration
     register_work(appl, duration_set_state_test);
 
-    // test timed_set_state using a fixed time 
+    // test timed set_state using a fixed time 
     register_work(appl, time_set_state_test);
 
     // initiate shutdown of the runtime system

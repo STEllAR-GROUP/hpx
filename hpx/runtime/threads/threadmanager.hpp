@@ -199,12 +199,12 @@ namespace hpx { namespace threads
 
         /// Set a timer to set the state of the given \a thread to the given 
         /// new value after it expired (at the given time)
-        thread_id_type timed_set_state (time_type const& expire_at, 
+        thread_id_type set_state (time_type const& expire_at, 
             thread_id_type id, thread_state newstate = pending);
 
         /// Set a timer to set the state of the given \a thread to the given
         /// new value after it expired (after the given duration)
-        thread_id_type timed_set_state (duration_type const& expire_from_now, 
+        thread_id_type set_state (duration_type const& expire_from_now, 
             thread_id_type id, thread_state newstate = pending);
 
     protected:
@@ -229,7 +229,7 @@ namespace hpx { namespace threads
             thread_id_type id, thread_state newstate, thread_id_type timer_id);
 
         /// This thread function initiates the required set_state action (on 
-        /// behalf of one of the threadmanager#timed_set_state functions).
+        /// behalf of one of the threadmanager#set_state functions).
         template <typename TimeType>
         thread_state at_timer (thread_self& self, TimeType const& expire, 
             thread_id_type id, thread_state newstate);
@@ -248,7 +248,7 @@ namespace hpx { namespace threads
         mutable mutex_type mtx_;            ///< mutex protecting the members
         boost::condition cond_;             ///< used to trigger some action
 
-        util::io_service_pool& timer_pool_; ///< used for timed_set_state
+        util::io_service_pool& timer_pool_; ///< used for timed set_state
 
 #if HPX_DEBUG != 0
         boost::detail::atomic_count thread_count_;

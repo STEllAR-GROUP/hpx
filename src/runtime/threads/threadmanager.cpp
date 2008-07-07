@@ -185,7 +185,7 @@ namespace hpx { namespace threads
     }
 
     /// This thread function initiates the required set_state action (on 
-    /// behalf of one of the threadmanager#timed_set_state functions).
+    /// behalf of one of the threadmanager#set_state functions).
     template <typename TimeType>
     thread_state threadmanager::at_timer (thread_self& self, 
         TimeType const& expire, thread_id_type id, thread_state newstate)
@@ -211,7 +211,7 @@ namespace hpx { namespace threads
 
     /// Set a timer to set the state of the given \a thread to the given 
     /// new value after it expired (at the given time)
-    thread_id_type threadmanager::timed_set_state (time_type const& expire_at, 
+    thread_id_type threadmanager::set_state (time_type const& expire_at, 
         thread_id_type id, thread_state newstate)
     {
         // this creates a new thread which creates the timer and handles the
@@ -225,7 +225,7 @@ namespace hpx { namespace threads
 
     /// Set a timer to set the state of the given \a thread to the given
     /// new value after it expired (after the given duration)
-    thread_id_type threadmanager::timed_set_state (
+    thread_id_type threadmanager::set_state (
         duration_type const& from_now, thread_id_type id, 
         thread_state newstate)
     {
@@ -281,7 +281,7 @@ namespace hpx { namespace threads
 
     private:
         // it is safe to store a plain pointer here since this class will be 
-        // used inside a block holding a intrusive_ptr to this thread
+        // used inside a block holding a intrusive_ptr to this PX thread
         thread* thread_;
         thread_state prev_state_;
     };
@@ -312,7 +312,7 @@ namespace hpx { namespace threads
                     still_active.enqueue(id);
             }
 
-            // copy the threads which are still active to the main queue
+            // copy the PX threads which are still active to the main queue
             if (!still_active.empty()) {
                 while (still_active.dequeue(&id)) 
                     active_set_state.enqueue(id);
@@ -321,7 +321,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // main function executed by a OS thread
+    // main function executed by all OS threads managed by this threadmanager
     void threadmanager::tfunc(bool is_master_thread)
     {
 #if HPX_DEBUG != 0
@@ -330,12 +330,12 @@ namespace hpx { namespace threads
         // run the work queue
         boost::coroutines::prepare_main_thread main_thread;
         while (true) {
-            // Get the next thread from the queue
+            // Get the next PX thread from the queue
             boost::intrusive_ptr<thread> thrd;
             if (work_items_.dequeue(&thrd)) {
-                // Only pending threads will be executed.
-                // Any non-pending threads are leftovers from a set_state() 
-                // call for a previously pending thread (see comments above).
+                // Only pending PX threads will be executed.
+                // Any non-pending PX threads are leftovers from a set_state() 
+                // call for a previously pending PX thread (see comments above).
                 thread_state state = thrd->get_state();
                 if (pending == state) {
                     // switch the state of the thread to active and back to 
@@ -348,23 +348,23 @@ namespace hpx { namespace threads
                         thrd_stat = state = (*thrd)();
                     }
 
-                }   // this stores the new state in the thread
+                }   // this stores the new state in the PX thread
 
-                // Re-add this work item to our list of work items if thread
-                // should be re-scheduled. If the thread is suspended now we
-                // just keep it in the map of threads.
+                // Re-add this work item to our list of work items if the PX
+                // thread should be re-scheduled. If the PX thread is suspended 
+                // now we just keep it in the map of threads.
                 if (state == pending) 
                 {
                     work_items_.enqueue(thrd);
                     cond_.notify_one();
                 }
 
-                // Remove the mapping from thread_map_ if thread is depleted or 
-                // terminated, this will delete the thread as all references
-                // go out of scope.
-                // FIXME: what has to be done with depleted threads?
+                // Remove the mapping from thread_map_ if PX thread is depleted 
+                // or terminated, this will delete the PX thread as all 
+                // references go out of scope.
+                // FIXME: what has to be done with depleted PX threads?
                 if (state == depleted || state == terminated) {
-                    // all OS threads put their terminated threads into a 
+                    // all OS threads put their terminated PX threads into a 
                     // separate queue
                     terminated_items_.enqueue(thrd);
                 }
@@ -386,10 +386,10 @@ namespace hpx { namespace threads
                 // no obvious work has to be done, so a lock won't hurt to much
                 mutex_type::scoped_lock lk(mtx_);
 
-                // stop running after all threads have been terminated
+                // stop running after all PX threads have been terminated
                 if (!running_) {
-                    // Before exiting each of the threads deletes the remaining 
-                    // terminated threads 
+                    // Before exiting each of the OS threads deletes the 
+                    // remaining terminated PX threads 
                     if (cleanup(terminated_items_, thread_map_)) {
                         cond_.notify_all();   // notify possibly waiting threads
                         break;                // terminate scheduling loop
@@ -514,7 +514,7 @@ namespace hpx { namespace threads
         boost::posix_time::ptime const& at_time)
     {
         thread* t = static_cast<thread*>(id);
-        return t->get_thread_manager().timed_set_state(at_time, id, state);
+        return t->get_thread_manager().set_state(at_time, id, state);
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -522,7 +522,7 @@ namespace hpx { namespace threads
         boost::posix_time::time_duration const& after)
     {
         thread* t = static_cast<thread*>(id);
-        return t->get_thread_manager().timed_set_state(after, id, state);
+        return t->get_thread_manager().set_state(after, id, state);
     }
 
 }}

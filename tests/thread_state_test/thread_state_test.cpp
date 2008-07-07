@@ -4,82 +4,83 @@
 
 
 #include <iostream>
-#include <conio.h>
+#include <boost/detail/lightweight_test.hpp>
 #include <hpx/hpx.hpp>
 
 using namespace hpx;
 using namespace hpx::threads;
 
-thread_state my_gcd (hpx::threads::thread_self&, int m, int n);
+thread_state my_gcd (hpx::threads::thread_self&, int m, int n, int gcd);
 void print_state (thread_state t_s);
-void sleep (unsigned int mseconds);
 
 int main(int argc, char* argv[])
 {
-    hpx::threads::threadmanager my_tm;
+    hpx::util::io_service_pool timer_pool;
+    hpx::threads::threadmanager my_tm(timer_pool);
 
-    my_tm.register_work(boost::bind (my_gcd, _1, 13, 14));                      // GCD = 1
+    my_tm.register_work(boost::bind (my_gcd, _1, 13, 14, 1));                      // GCD = 1
     hpx::threads::thread_id_type t_id = 
-        my_tm.register_work(boost::bind (my_gcd, _1, 7, 343), suspended);       // GCD = 7
+        my_tm.register_work(boost::bind (my_gcd, _1, 7, 343, 7), suspended);       // GCD = 7
     hpx::threads::thread_id_type t2_id = 
-        my_tm.register_work(boost::bind (my_gcd, _1, 120, 115), suspended);     // GCD = 5
-    my_tm.register_work(boost::bind (my_gcd, _1, 9, 15), pending);              // GCD = 3
+        my_tm.register_work(boost::bind (my_gcd, _1, 120, 115, 5), suspended);     // GCD = 5
+    my_tm.register_work(boost::bind (my_gcd, _1, 9, 15, 3), pending);              // GCD = 3
 
+    BOOST_TEST(my_tm.get_state(t2_id) == suspended);
     my_tm.set_state(t2_id, pending);
+    BOOST_TEST(my_tm.get_state(t2_id) == pending);
 
+    BOOST_TEST(my_tm.get_state(t_id) == suspended);
     if (my_tm.get_state(t_id) == pending)
         std::cout << "Error, thread ID invalid" << std::endl;
-    
+
     if (my_tm.get_state(t_id) == suspended)
         my_tm.set_state(t_id, pending);
+    BOOST_TEST(my_tm.get_state(t_id) == pending);
 
     thread_state t_s = my_tm.get_state(t2_id);
-    print_state (t_s);
+    BOOST_TEST(t_s == pending);
+//     print_state (t_s);
 
-    my_tm.run();
-
-//    sleep(1);
-    while (my_tm.get_state(t2_id) != unknown)
-    {
-        print_state (my_tm.get_state(t2_id));
+    for (int i = 1; i <= 8; ++i) {
+        my_tm.run(i);
+        while ((t_s = my_tm.get_state(t2_id)) != unknown)
+        {
+            BOOST_TEST(t_s == pending || t_s == active || t_s == terminated);
+        }
+        my_tm.stop();
     }
 
-    my_tm.stop();
-
-    return 0;
+    return boost::report_errors();
 }
 
-thread_state my_gcd (hpx::threads::thread_self& s, int m, int n)
+thread_state my_gcd (hpx::threads::thread_self& s, int m, int n, int gcd)
 {
     int r;
     while(n != 0){
-        r = m%n;
+        r = m % n;
         m = n;
         n = r;
     }
-    s.yield(pending);
-    std::cout << "GCD for the two numbers is: " << m << std::endl;
+
+    s.yield(pending);   // just reschedule
+
+    BOOST_TEST(m == gcd);
+//     std::cout << "GCD for the two numbers is: " << m << std::endl;
     return terminated;
 }
 
 void print_state (thread_state t_s)
 {
-    switch (t_s)
-    {
-        case unknown:       std::cout << "Unknown" << std::endl;      break;
-        case init:          std::cout << "Init" << std::endl;         break;
-        case active:        std::cout << "Active" << std::endl;       break;
-        case pending:       std::cout << "Pending" << std::endl;      break;
-        case suspended:     std::cout << "Suspended" << std::endl;    break;
-        case depleted:      std::cout << "Depleted" << std::endl;     break;
-        case terminated:    std::cout << "Terminated" << std::endl;   break;
-        default:            std::cout << "ERROR!!!!" << std::endl;    break;
+    switch (t_s) {
+    case unknown:    std::cout << "Unknown" << std::endl << std::flush;    break;
+    case init:       std::cout << "Init" << std::endl << std::flush;       break;
+    case active:     std::cout << "Active" << std::endl << std::flush;     break;
+    case pending:    std::cout << "Pending" << std::endl << std::flush;    break;
+    case suspended:  std::cout << "Suspended" << std::endl << std::flush;  break;
+    case depleted:   std::cout << "Depleted" << std::endl << std::flush;   break;
+    case terminated: std::cout << "Terminated" << std::endl << std::flush; break;
+    default:         std::cout << "ERROR!!!!" << std::endl << std::flush;  break;
     }
     return;
 }
 
-void sleep (unsigned int mseconds)
-{
-    clock_t goal = mseconds + clock();
-    while (goal > clock());
-}
