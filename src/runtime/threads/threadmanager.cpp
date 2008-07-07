@@ -287,10 +287,9 @@ namespace hpx { namespace threads
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Mutex, typename Queue, typename Map>
-    inline bool cleanup(Mutex& mtx, Queue& terminated_items, Map& thread_map)
+    template <typename Queue, typename Map>
+    inline bool cleanup(Queue& terminated_items, Map& thread_map)
     {
-        typename Mutex::scoped_lock lk(mtx);
         boost::intrusive_ptr<thread> todelete;
         while (terminated_items.dequeue(&todelete))
             thread_map.erase(todelete->get_thread_id());
@@ -372,8 +371,10 @@ namespace hpx { namespace threads
 
                 // only one dedicated OS thread is allowed to acquire the 
                 // lock for the purpose of deleting all terminated threads
-                if (is_master_thread) 
-                    cleanup(mtx_, terminated_items_, thread_map_);
+                if (is_master_thread && !terminated_items_.empty()) {
+                    mutex_type::scoped_lock lk(mtx_);
+                    cleanup(terminated_items_, thread_map_);
+                }
             }
 
             // make sure to handle pending set_state requests
@@ -382,11 +383,14 @@ namespace hpx { namespace threads
 
             // if nothing else has to be done either wait or terminate
             if (work_items_.empty() && active_set_state_.empty()) {
+                // no obvious work has to be done, so a lock won't hurt to much
+                mutex_type::scoped_lock lk(mtx_);
+
                 // stop running after all threads have been terminated
                 if (!running_) {
                     // Before exiting each of the threads deletes the remaining 
                     // terminated threads 
-                    if (cleanup(mtx_, terminated_items_, thread_map_)) {
+                    if (cleanup(terminated_items_, thread_map_)) {
                         cond_.notify_all();   // notify possibly waiting threads
                         break;                // terminate scheduling loop
                     }
@@ -396,7 +400,6 @@ namespace hpx { namespace threads
                 // arrived in the meantime).
                 // Ask again if queues are empty to avoid race conditions (we 
                 // need to lock anyways...), this way no notify_one() gets lost
-                mutex_type::scoped_lock lk(mtx_);
                 if (work_items_.empty() && active_set_state_.empty())
                     cond_.wait(lk);
             }

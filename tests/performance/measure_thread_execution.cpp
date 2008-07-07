@@ -34,15 +34,13 @@ threads::thread_state hpx_main(threads::thread_self& self,
     std::cerr << "Elapsed time [s] for thread initialization of " 
               << num_threads << " threads: " << elapsed << " (" 
               << elapsed/num_threads << " per thread)" << std::endl;
-    
-    // initiate shutdown of the runtime system
-    components::stubs::runtime_support::shutdown_all(appl, 
-        appl.get_runtime_support_gid());
 
     // start measuring
     timer.restart();
     tm.do_some_work();
 
+    // initiate shutdown of the runtime system
+    components::stubs::runtime_support::shutdown_all(appl);
     return threads::terminated;
 }
 
@@ -54,7 +52,7 @@ int main(int argc, char* argv[])
         std::string hpx_host, dgas_host;
         unsigned short hpx_port, dgas_port;
         std::size_t num_threads = 1;
-        std::size_t num_threads = 1;
+        std::size_t num_hpx_threads = 1;
 
         // Check command line arguments.
         if (argc != 7) {
@@ -71,7 +69,7 @@ int main(int argc, char* argv[])
             dgas_host = argv[3];
             dgas_port  = boost::lexical_cast<unsigned short>(argv[4]);
             num_threads = boost::lexical_cast<int>(argv[5]);
-            num_threads = boost::lexical_cast<int>(argv[6]);
+            num_hpx_threads = boost::lexical_cast<int>(argv[6]);
         }
 
         // run the DGAS server instance here
@@ -84,12 +82,12 @@ int main(int argc, char* argv[])
         // the main thread will wait (block) for the shutdown action and 
         // the threadmanager is serving incoming requests in the meantime
         util::high_resolution_timer timer;
-        rt.run(boost::bind(hpx_main, _1, _2, boost::ref(timer), num_threads), 
+        rt.run(boost::bind(hpx_main, _1, _2, boost::ref(timer), num_hpx_threads), 
             num_threads);
         double elapsed = timer.elapsed();
-        std::cout << "Elapsed time [s] for " << num_threads 
+        std::cout << "Elapsed time [s] for " << num_hpx_threads 
                   << " threads: " << elapsed << " (" 
-                  << elapsed/num_threads << " per thread)" << std::endl;
+                  << elapsed/num_hpx_threads << " per thread)" << std::endl;
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";
