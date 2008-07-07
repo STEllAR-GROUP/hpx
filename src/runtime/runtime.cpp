@@ -77,7 +77,7 @@ namespace hpx
         dgas_pool_.stop();
     }
 
-#if (defined(_WIN32) ||defined(_WIN64)) && defined (_DEBUG)
+#if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINES_USE_FIBERS)
 #include <io.h>
 #endif
 
@@ -85,7 +85,7 @@ namespace hpx
     void runtime::start(boost::function<hpx_main_function_type> func, 
         std::size_t num_threads, bool blocking)
     {
-#if (defined(_WIN32) ||defined(_WIN64)) && defined (_DEBUG)
+#if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINES_USE_FIBERS)
         // needs to be called to avoid problems at system startup
         // see: http://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=100319
         _isatty(0);

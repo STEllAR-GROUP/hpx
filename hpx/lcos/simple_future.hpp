@@ -12,10 +12,10 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/threadmanager/px_thread.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/util/full_empty_memory.hpp>
-#include <hpx/components/action.hpp>
+#include <hpx/runtime/actions/action.hpp>
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/server/wrapper.hpp>
 
@@ -40,7 +40,7 @@ namespace hpx { namespace lcos { namespace detail
         simple_future()
         {}
 
-        Result get_result(threadmanager::px_thread_self& self) 
+        Result get_result(threads::thread_self& self) 
         {
             // yields control if needed
             data_type d;
@@ -71,27 +71,27 @@ namespace hpx { namespace lcos { namespace detail
         // exposed functionality of this component
 
         // trigger the future, set the result
-        threadmanager::thread_state 
-        set_result (threadmanager::px_thread_self& self, 
+        threads::thread_state 
+        set_result (threads::thread_self& self, 
             applier::applier& appl, Result const& result)
         {
             // set the received result, reset error status
             set_data(result);
 
             // this thread has nothing more to do
-            return threadmanager::terminated;
+            return threads::terminated;
         }
 
         // trigger the future with the given error condition
-        threadmanager::thread_state 
-        set_error (threadmanager::px_thread_self& self, applier::applier& appl,
+        threads::thread_state 
+        set_error (threads::thread_self& self, applier::applier& appl,
             hpx::error code, std::string msg)
         {
             // store the error code
             data_.set(error_type(make_error_code(code), msg));
 
             // this thread has nothing more to do
-            return threadmanager::terminated;
+            return threads::terminated;
         }
 
     private:
@@ -106,14 +106,14 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     /// \class simple_future simple_future.hpp hpx/lcos/simple_future.hpp
     ///
-    /// A simple_future can be used by a single \a px_thread to invoke a 
+    /// A simple_future can be used by a single \a thread to invoke a 
     /// (remote) action and wait for the result. The result is expected to be 
     /// sent back to the simple_future using the LCO's set_event action
     ///
     /// A simple_future is one of the simplest synchronization primitives 
     /// provided by HPX. It allows to synchronize on a eager evaluated remote
     /// operation returning a result of the type \a Result. The \a simple_future
-    /// allows to synchronize exactly one \a px_thread (the one passed during 
+    /// allows to synchronize exactly one \a thread (the one passed during 
     /// construction time).
     ///
     /// \code
@@ -148,7 +148,7 @@ namespace hpx { namespace lcos
         wrapping_type;
 
         /// Construct a new \a future instance. The supplied 
-        /// \a px_thread will be notified as soon as the result of the 
+        /// \a thread will be notified as soon as the result of the 
         /// operation associated with this future instance has been 
         /// returned.
         /// 
@@ -176,14 +176,14 @@ namespace hpx { namespace lcos
         /// returned and the waiting thread has been re-scheduled by the thread
         /// manager the function \a eager_future#get_result will return.
         ///
-        /// \param self   [in] The \a px_thread which will be unconditionally
+        /// \param self   [in] The \a thread which will be unconditionally
         ///               while waiting for the result. 
         ///
         /// \note         If there has been an error reported (using the action
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
-        Result get_result(threadmanager::px_thread_self& self) const
+        Result get_result(threads::thread_self& self) const
         {
             return (*impl_)->get_result(self);
         }

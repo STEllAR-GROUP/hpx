@@ -10,20 +10,20 @@
 #include <hpx/components/server/accumulator.hpp>
 #include <hpx/components/server/distributing_factory.hpp>
 #include <hpx/components/server/manage_component.hpp>
-#include <hpx/components/continuation_impl.hpp>
+#include <hpx/runtime/actions/continuation_impl.hpp>
 
 namespace hpx { namespace components { namespace server { namespace detail
 {
     // create a new instance of a component
-    threadmanager::thread_state distributing_factory::create(
-        threadmanager::px_thread_self& self, applier::applier& appl,
+    threads::thread_state distributing_factory::create(
+        threads::thread_self& self, applier::applier& appl,
         naming::id_type* gid, components::component_type type,
         std::size_t count)
     {
     // set result if requested
         if (0 != gid)
             *gid = naming::invalid_id;
-        return hpx::threadmanager::terminated;
+        return threads::terminated;
     }
 
 }}}}

@@ -42,7 +42,7 @@
     >
     {
         static void 
-        call (threadmanager::threadmanager& tm, applier& appl, 
+        call (threads::threadmanager& tm, applier& appl, 
             naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
@@ -51,8 +51,8 @@
         }
 
         static void 
-        call (components::continuation_type& c, 
-            threadmanager::threadmanager& tm, applier& appl, 
+        call (actions::continuation_type& c, 
+            threads::threadmanager& tm, applier& appl, 
             naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
@@ -68,7 +68,7 @@
     {
         // If local and to be directly executed, just call the function
         static void
-        call (threadmanager::threadmanager&, applier& appl, 
+        call (threads::threadmanager&, applier& appl, 
             naming::address::address_type addr,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
@@ -76,7 +76,7 @@
         }
 
         static typename Action::result_type  
-        call (components::continuation_type& c, threadmanager::threadmanager&, 
+        call (actions::continuation_type& c, threads::threadmanager&, 
             applier& appl, naming::address::address_type addr,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {

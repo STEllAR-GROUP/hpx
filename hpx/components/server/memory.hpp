@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/components/component_type.hpp>
-#include <hpx/components/action.hpp>
+#include <hpx/runtime/actions/action.hpp>
 
 namespace hpx { namespace components { namespace server
 {
@@ -37,20 +37,20 @@ namespace hpx { namespace components { namespace server
         // exposed functionality of this component
 
         /// \brief Action to store a value to a memory location
-        threadmanager::thread_state store32(
-            threadmanager::px_thread_self& self, applier::applier& app,
+        threads::thread_state store32(
+            threads::thread_self& self, applier::applier& app,
             boost::uint64_t addr, boost::uint32_t value)
         {
             BOOST_ASSERT(false);    // should never be called
-            return threadmanager::terminated;
+            return threads::terminated;
         }
 
-        threadmanager::thread_state store64(
-            threadmanager::px_thread_self& self, applier::applier& app,
+        threads::thread_state store64(
+            threads::thread_self& self, applier::applier& app,
             boost::uint64_t addr, boost::uint64_t value)
         {
             BOOST_ASSERT(false);    // should never be called
-            return threadmanager::terminated;
+            return threads::terminated;
         }
 
         ///
@@ -70,12 +70,12 @@ namespace hpx { namespace components { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
-        typedef direct_action2<
+        typedef hpx::actions::direct_action2<
             memory, memory_store32, boost::uint64_t, boost::uint32_t, 
             &memory::store32, &memory::local_store32
         > store32_action;
 
-        typedef direct_action2<
+        typedef hpx::actions::direct_action2<
             memory, memory_store64, boost::uint64_t, boost::uint64_t, 
             &memory::store64, &memory::local_store64
         > store64_action;

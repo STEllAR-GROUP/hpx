@@ -12,13 +12,7 @@ set (hpxlib_HEADERS
     ../hpx/version.hpp
     # components
     ../hpx/components/accumulator.hpp
-    ../hpx/components/action.hpp
-    ../hpx/components/action_constructors.hpp
-    ../hpx/components/action_implementations.hpp
     ../hpx/components/component_type.hpp
-    ../hpx/components/continuation.hpp
-    ../hpx/components/continuation_impl.hpp
-    ../hpx/components/get_lva.hpp
     ../hpx/components/runtime_support.hpp
     ../hpx/components/server/accumulator.hpp
     ../hpx/components/server/distributing_factory.hpp
@@ -31,7 +25,7 @@ set (hpxlib_HEADERS
     ../hpx/components/stubs/accumulator.hpp
     ../hpx/components/stubs/runtime_support.hpp
     # include
-    ../hpx/include/action_manager.hpp
+    ../hpx/include/actions.hpp
     ../hpx/include/applier.hpp
     ../hpx/include/components.hpp
     ../hpx/include/lcos.hpp
@@ -52,9 +46,15 @@ set (hpxlib_HEADERS
     ../hpx/lcos/mutex.hpp
     ../hpx/lcos/simple_future.hpp
     # runtime
+    ../hpx/runtime/get_lva.hpp
     ../hpx/runtime/runtime.hpp
-    # action manager
-    ../hpx/runtime/action_manager/action_manager.hpp
+    # actions 
+    ../hpx/runtime/actions/action.hpp
+    ../hpx/runtime/actions/action_constructors.hpp
+    ../hpx/runtime/actions/action_implementations.hpp
+    ../hpx/runtime/actions/continuation.hpp
+    ../hpx/runtime/actions/continuation_impl.hpp
+    ../hpx/runtime/actions/action_manager.hpp
     # applier
     ../hpx/runtime/applier/applier.hpp
     ../hpx/runtime/applier/applier_implementations.hpp
@@ -81,8 +81,8 @@ set (hpxlib_HEADERS
     ../hpx/runtime/parcelset/server/parcelport_queue.hpp
     ../hpx/runtime/parcelset/server/parcelport_server_connection.hpp
     # threadmanager
-    ../hpx/runtime/threadmanager/px_thread.hpp
-    ../hpx/runtime/threadmanager/threadmanager.hpp
+    ../hpx/runtime/threads/thread.hpp
+    ../hpx/runtime/threads/threadmanager.hpp
     # util
     ../hpx/util/asio_util.hpp
     ../hpx/util/container_device.hpp
@@ -112,7 +112,7 @@ set (hpxlib_SOURCES
     # runtime
     runtime/runtime.cpp
     # action manager
-    runtime/action_manager/action_manager.cpp
+    runtime/actions/action_manager.cpp
     # applier
     runtime/applier/applier.cpp
     # naming 
@@ -129,7 +129,7 @@ set (hpxlib_SOURCES
     runtime/parcelset/server/parcelhandler_queue.cpp
     runtime/parcelset/server/parcelport_queue.cpp
     # threadmanager
-    runtime/threadmanager/threadmanager.cpp
+    runtime/threads/threadmanager.cpp
     # util 
     util/io_service_pool.cpp
     util/logging.cpp

@@ -13,7 +13,7 @@
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
-threadmanager::thread_state barrier_test(threadmanager::px_thread_self& self, 
+threads::thread_state barrier_test(threads::thread_self& self, 
     applier::applier& appl, lcos::barrier& b, boost::detail::atomic_count& c)
 {
     ++c;
@@ -22,18 +22,18 @@ threadmanager::thread_state barrier_test(threadmanager::px_thread_self& self,
     // all of the 4 threads need to have incremented the counter
     BOOST_TEST(4 == c);
 
-    return threadmanager::terminated;
+    return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self, 
+threads::thread_state hpx_main(threads::thread_self& self, 
     applier::applier& appl, 
     lcos::barrier& b, boost::detail::atomic_count& counter)
 {
     // create the 4 threads which will have to wait on the barrier
-    threadmanager::threadmanager& tm = appl.get_thread_manager();
+    threads::threadmanager& tm = appl.get_thread_manager();
     for (std::size_t i = 0; i < 4; ++i) {
-        tm.register_work(boost::bind(&barrier_test, _1, boost::ref(appl),
+        register_work(appl, boost::bind(&barrier_test, _1, boost::ref(appl),
             boost::ref(b), boost::ref(counter)));
     }
 
@@ -43,10 +43,9 @@ threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self,
     BOOST_TEST(4 == counter);
 
     // initiate shutdown of the runtime system
-    components::stubs::runtime_support::shutdown_all(appl, 
-        appl.get_runtime_support_gid());
+    components::stubs::runtime_support::shutdown_all(appl);
 
-    return threadmanager::terminated;
+    return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -11,13 +11,13 @@
 #include <hpx/components/server/accumulator.hpp>
 #include <hpx/components/server/distributing_factory.hpp>
 #include <hpx/components/server/manage_component.hpp>
-#include <hpx/components/continuation_impl.hpp>
+#include <hpx/runtime/actions/continuation_impl.hpp>
 
 namespace hpx { namespace components { namespace server
 {
     // create a new instance of a component
-    threadmanager::thread_state runtime_support::create_component(
-        threadmanager::px_thread_self& self, applier::applier& appl,
+    threads::thread_state runtime_support::create_component(
+        threads::thread_self& self, applier::applier& appl,
         naming::id_type* gid, components::component_type type,
         std::size_t count)
     {
@@ -42,12 +42,12 @@ namespace hpx { namespace components { namespace server
     // set result if requested
         if (0 != gid)
             *gid = id;
-        return hpx::threadmanager::terminated;
+        return threads::terminated;
     }
 
     // delete an existing instance of a component
-    threadmanager::thread_state runtime_support::free_component(
-        threadmanager::px_thread_self& self, applier::applier& appl,
+    threads::thread_state runtime_support::free_component(
+        threads::thread_self& self, applier::applier& appl,
         components::component_type type, naming::id_type const& gid,
         std::size_t count)
     {
@@ -66,21 +66,21 @@ namespace hpx { namespace components { namespace server
                     get_component_type_name(type)));
             break;
         }
-        return hpx::threadmanager::terminated;
+        return threads::terminated;
     }
 
     /// \brief Action shut down this runtime system instance
-    threadmanager::thread_state runtime_support::shutdown(
-        threadmanager::px_thread_self& self, applier::applier& app)
+    threads::thread_state runtime_support::shutdown(
+        threads::thread_self& self, applier::applier& app)
     {
         // initiate system shutdown
         stop();
-        return threadmanager::terminated;
+        return threads::terminated;
     }
 
     // initiate system shutdown for all localities
-    threadmanager::thread_state runtime_support::shutdown_all(
-        threadmanager::px_thread_self& self, applier::applier& app)
+    threads::thread_state runtime_support::shutdown_all(
+        threads::thread_self& self, applier::applier& app)
     {
         std::vector<naming::id_type> prefixes;
         app.get_dgas_client().get_prefixes(prefixes);
@@ -100,7 +100,7 @@ namespace hpx { namespace components { namespace server
 
         // now make sure the local locality gets shut down as well.
         stop();
-        return threadmanager::terminated;
+        return threads::terminated;
     }
 
     ///////////////////////////////////////////////////////////////////////////

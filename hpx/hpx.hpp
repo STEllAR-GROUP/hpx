@@ -10,15 +10,10 @@
 #include <hpx/version.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/include/naming.hpp>
 #include <hpx/include/util.hpp>
-#include <hpx/include/parcelset.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/include/threadmanager.hpp>
-#include <hpx/include/applier.hpp>
-#include <hpx/include/action_manager.hpp>
-#include <hpx/include/runtime.hpp>
 
 /// \mainpage
 ///

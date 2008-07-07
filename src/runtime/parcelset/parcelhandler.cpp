@@ -19,7 +19,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/container_device.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime/threadmanager/threadmanager.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
@@ -100,18 +100,18 @@ namespace hpx { namespace parcelset
             decode_parcel(parcel_data);
         }
         else {
-            // create a new px_thread which decodes and handles the parcel
+            // create a new thread which decodes and handles the parcel
             tm_->register_work(
                 boost::bind(&parcelhandler::decode, this, _1, parcel_data));
         }
     }
 
-    threadmanager::thread_state parcelhandler::decode(
-        threadmanager::px_thread_self&, 
+    threads::thread_state parcelhandler::decode(
+        threads::thread_self&, 
         boost::shared_ptr<std::vector<char> > const& parcel_data)
     {
         decode_parcel(parcel_data);
-        return threadmanager::terminated;
+        return threads::terminated;
     }
 
     void parcelhandler::decode_parcel(

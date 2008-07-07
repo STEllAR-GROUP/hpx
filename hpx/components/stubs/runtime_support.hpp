@@ -51,7 +51,7 @@ namespace hpx { namespace components { namespace stubs
         /// Create a new component \a type using the runtime_support with the 
         /// given \a targetgid. Block for the creation to finish.
         static naming::id_type create_component(
-            threadmanager::px_thread_self& self, applier::applier& appl, 
+            threads::thread_self& self, applier::applier& appl, 
             naming::id_type const& targetgid, components::component_type type,
             std::size_t count = 1) 
         {
@@ -70,7 +70,7 @@ namespace hpx { namespace components { namespace stubs
         }
 
         /// 
-        naming::id_type create_component(threadmanager::px_thread_self& self,
+        naming::id_type create_component(threads::thread_self& self,
             naming::id_type const& targetgid, components::component_type type,
             std::size_t count = 1) 
         {
@@ -112,9 +112,20 @@ namespace hpx { namespace components { namespace stubs
             appl.apply<server::runtime_support::shutdown_all_action>(targetgid);
         }
 
+        static void shutdown_all(applier::applier& appl)
+        {
+            appl.apply<server::runtime_support::shutdown_all_action>(
+                appl.get_runtime_support_gid());
+        }
+
         void shutdown_all(naming::id_type const& targetgid)
         {
             shutdown_all(app_, targetgid);
+        }
+
+        void shutdown_all()
+        {
+            shutdown_all(app_);
         }
 
     protected:

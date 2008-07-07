@@ -31,7 +31,7 @@ namespace hpx { namespace components
         /// Create a new instance of an accumulator on the locality as given by
         /// the parameter \a targetgid
         static accumulator 
-        create(threadmanager::px_thread_self& self, applier::applier& appl, 
+        create(threads::thread_self& self, applier::applier& appl, 
             naming::id_type const& targetgid)
         {
             return accumulator(appl, base_type::create(self, appl, targetgid));
@@ -68,7 +68,7 @@ namespace hpx { namespace components
         }
 
         /// Query the current value of the accumulator
-        double query(threadmanager::px_thread_self& self) 
+        double query(threads::thread_self& self) 
         {
             BOOST_ASSERT(gid_);
             return this->base_type::query(self, gid_);

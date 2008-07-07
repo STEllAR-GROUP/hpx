@@ -26,11 +26,11 @@
 #include <hpx/components/server/wrapper.hpp>
 #include <hpx/lcos/base_lco.hpp>
 
-namespace hpx { namespace threadmanager { namespace detail
+namespace hpx { namespace threads { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     // This is the representation of a ParalleX thread
-    class px_thread : public lcos::base_lco, private boost::noncopyable
+    class thread : public lcos::base_lco, private boost::noncopyable
     {
     private:
         typedef 
@@ -38,12 +38,12 @@ namespace hpx { namespace threadmanager { namespace detail
         coroutine_type;
 
     public:
-        px_thread(boost::function<thread_function_type> func, 
+        thread(boost::function<thread_function_type> func, 
                 thread_id_type id, threadmanager& tm, thread_state newstate)
           : coroutine_(func, id), tm_(tm), current_state_(newstate)
         {}
 
-        ~px_thread() 
+        ~thread() 
         {}
 
         thread_state execute()
@@ -91,10 +91,10 @@ namespace hpx { namespace threadmanager { namespace detail
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
         // to associate this component with a given action.
-        enum { value = components::component_px_thread };
+        enum { value = components::component_thread };
 
         /// 
-        thread_state set_event (px_thread_self&, applier::applier&)
+        thread_state set_event (thread_self&, applier::applier&)
         {
             // we need to reactivate the thread itself
             if (suspended == static_cast<thread_state>(current_state_))
@@ -115,59 +115,59 @@ namespace hpx { namespace threadmanager { namespace detail
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threadmanager 
+namespace hpx { namespace threads 
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class px_thread px_thread.hpp hpx/runtime/threadmanager/px_thread.hpp
+    /// \class thread thread.hpp hpx/runtime/threads/thread.hpp
     ///
-    /// A \a px_thread is the representation of a ParalleX thread. It's a first
+    /// A \a thread is the representation of a ParalleX thread. It's a first
     /// class object in ParalleX. In our implementation this is a user level 
     /// thread running on top of one of the OS threads spawned by the \a 
     /// threadmanager.
     ///
-    /// A \a px_thread encapsulates:
-    ///  - A thread status word (see the functions \a px_thread#get_state and 
-    ///    \a px_thread#set_state)
+    /// A \a thread encapsulates:
+    ///  - A thread status word (see the functions \a thread#get_state and 
+    ///    \a thread#set_state)
     ///  - A function to execute (the thread function)
     ///  - A frame (in this implementation this is a block of memory used as 
     ///    the threads stack)
     ///  - A block of registers (not implemented yet)
     ///
-    /// Generally, \a px_threads are not created or executed directly. All 
-    /// functionality related to the management of \a px_thread's is 
+    /// Generally, \a threads are not created or executed directly. All 
+    /// functionality related to the management of \a thread's is 
     /// implemented by the \a threadmanager.
-    class px_thread 
-      : public components::wrapper<detail::px_thread, px_thread, boost::mpl::true_>
+    class thread 
+      : public components::wrapper<detail::thread, thread, boost::mpl::true_>
     {
     private:
-        typedef detail::px_thread wrapped_type;
+        typedef detail::thread wrapped_type;
         typedef components::wrapper<
-            wrapped_type, px_thread, boost::mpl::true_> 
+            wrapped_type, thread, boost::mpl::true_> 
         base_type;
 
         // avoid warning about using 'this' in initializer list
-        px_thread* This() { return this; }
+        thread* This() { return this; }
 
     public:
-        /// \brief Construct a new \a px_thread
+        /// \brief Construct a new \a thread
         ///
         /// \param func     [in] The thread function to execute by this 
-        ///                 \a px_thread.
+        ///                 \a thread.
         /// \param tm       [in] A reference to the thread manager this 
-        ///                 \a px_thread will be associated with.
+        ///                 \a thread will be associated with.
         /// \param newstate [in] The initial thread state this instance will
         ///                 be initialized with.
-        px_thread(boost::function<thread_function_type> threadfunc, 
+        thread(boost::function<thread_function_type> threadfunc, 
                 threadmanager& tm, thread_state new_state = init)
-          : base_type(new detail::px_thread(threadfunc, This(), tm, new_state))
+          : base_type(new detail::thread(threadfunc, This(), tm, new_state))
         {}
 
-        ~px_thread() 
+        ~thread() 
         {}
 
         thread_id_type get_thread_id() const
         {
-            return const_cast<px_thread*>(this);
+            return const_cast<thread*>(this);
         }
 
         /// \brief Allow to access the thread manager instance this thread has 
@@ -230,13 +230,13 @@ namespace hpx { namespace threadmanager
     ///////////////////////////////////////////////////////////////////////////
     thread_id_type const invalid_thread_id = 0;
 
-    // support for boost::intrusive_ptr<px_thread>
-    inline void intrusive_ptr_add_ref(px_thread* p)
+    // support for boost::intrusive_ptr<thread>
+    inline void intrusive_ptr_add_ref(thread* p)
     {
         ++p->use_count_;
     }
 
-    inline void intrusive_ptr_release(px_thread* p)
+    inline void intrusive_ptr_release(thread* p)
     {
         if (--p->use_count_ == 0)
             delete p;

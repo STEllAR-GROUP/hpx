@@ -12,7 +12,7 @@
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
-threadmanager::thread_state test1_helper(threadmanager::px_thread_self& self, 
+threads::thread_state test1_helper(threads::thread_self& self, 
     applier::applier& appl, hpx::util::full_empty<int>& data)
 {
     // retrieve gid for this thread
@@ -23,10 +23,10 @@ threadmanager::thread_state test1_helper(threadmanager::px_thread_self& self,
     data.set(1);
     BOOST_TEST(!data.is_empty());
 
-    return threadmanager::terminated;
+    return threads::terminated;
 }
 
-threadmanager::thread_state test1(threadmanager::px_thread_self& self, 
+threads::thread_state test1(threads::thread_self& self, 
     applier::applier& appl)
 {
     // retrieve gid for this thread
@@ -55,12 +55,12 @@ threadmanager::thread_state test1(threadmanager::px_thread_self& self,
     BOOST_TEST(!data.is_empty());
     BOOST_TEST(value == 1);
 
-    return threadmanager::terminated;
+    return threads::terminated;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self, 
+threads::thread_state hpx_main(threads::thread_self& self, 
     applier::applier& appl)
 {
     // retrieve gid for this thread
@@ -76,7 +76,7 @@ threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self,
     components::stubs::runtime_support::shutdown_all(appl, 
         appl.get_runtime_support_gid());
 
-    return threadmanager::terminated;
+    return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

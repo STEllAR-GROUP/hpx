@@ -13,80 +13,73 @@
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
-threadmanager::thread_state timed_set_state_test(
-    threadmanager::px_thread_self& self, applier::applier& appl,
+threads::thread_state timed_set_state_test(
+    threads::thread_self& self, applier::applier& appl,
     util::high_resolution_timer& timer, double wait_time)
 {
     double elapsed = timer.elapsed();
-    BOOST_TEST(elapsed >= wait_time);
+    BOOST_TEST(elapsed + 0.01 >= wait_time);    // we need some leeway here...
     std::cerr << "Elapsed: " << elapsed << std::endl;
-    return threadmanager::terminated;
+    return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threadmanager::thread_state duration_set_state_test(
-    threadmanager::px_thread_self& self, applier::applier& appl)
+threads::thread_state duration_set_state_test(
+    threads::thread_self& self, applier::applier& appl)
 {
     util::high_resolution_timer timer;
 
-    threadmanager::thread_id_type id1 = appl.get_thread_manager().register_work(
+    threads::thread_id_type id1 = register_work(appl, 
         boost::bind(timed_set_state_test, _1, boost::ref(appl), timer, 1.0), 
-        threadmanager::suspended);
+        threads::suspended);
 
-    threadmanager::thread_id_type id2 = appl.get_thread_manager().register_work(
+    threads::thread_id_type id2 = register_work(appl, 
         boost::bind(timed_set_state_test, _1, boost::ref(appl), timer, 2.0), 
-        threadmanager::suspended);
+        threads::suspended);
 
-    appl.get_thread_manager().timed_set_state(
-        boost::posix_time::seconds(1), id1, threadmanager::pending);
-    appl.get_thread_manager().timed_set_state(
-        boost::posix_time::seconds(2), id2, threadmanager::pending);
+    set_thread_state(id1, threads::pending, boost::posix_time::seconds(1));
+    set_thread_state(id2, threads::pending, boost::posix_time::seconds(2));
 
-    return threadmanager::terminated;
+    return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threadmanager::thread_state time_set_state_test(
-    threadmanager::px_thread_self& self, applier::applier& appl)
+threads::thread_state time_set_state_test(
+    threads::thread_self& self, applier::applier& appl)
 {
     util::high_resolution_timer timer;
 
-    threadmanager::thread_id_type id1 = appl.get_thread_manager().register_work(
+    threads::thread_id_type id1 = register_work(appl, 
         boost::bind(timed_set_state_test, _1, boost::ref(appl), timer, 1.0), 
-        threadmanager::suspended);
+        threads::suspended);
 
-    threadmanager::thread_id_type id2 = appl.get_thread_manager().register_work(
+    threads::thread_id_type id2 = register_work(appl, 
         boost::bind(timed_set_state_test, _1, boost::ref(appl), timer, 2.0), 
-        threadmanager::suspended);
+        threads::suspended);
 
     boost::posix_time::ptime now (
         boost::posix_time::microsec_clock::universal_time());
 
-    appl.get_thread_manager().timed_set_state(
-        now + boost::posix_time::seconds(1), id1, threadmanager::pending);
-    appl.get_thread_manager().timed_set_state(
-        now + boost::posix_time::seconds(2), id2, threadmanager::pending);
+    set_thread_state(id1, threads::pending, now + boost::posix_time::seconds(1));
+    set_thread_state(id2, threads::pending, now + boost::posix_time::seconds(2));
 
-    return threadmanager::terminated;
+    return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self, 
+threads::thread_state hpx_main(threads::thread_self& self, 
     applier::applier& appl)
 {
     // test timed_set_state using a time duration
-    appl.get_thread_manager().register_work(
-        boost::bind(duration_set_state_test, _1, boost::ref(appl)));
+    register_work(appl, duration_set_state_test);
 
     // test timed_set_state using a fixed time 
-    appl.get_thread_manager().register_work(
-        boost::bind(time_set_state_test, _1, boost::ref(appl)));
+    register_work(appl, time_set_state_test);
 
     // initiate shutdown of the runtime system
-    components::stubs::runtime_support::shutdown_all(appl, 
-        appl.get_runtime_support_gid());
+    components::stubs::runtime_support::shutdown_all(appl);
 
-    return threadmanager::terminated;
+    return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

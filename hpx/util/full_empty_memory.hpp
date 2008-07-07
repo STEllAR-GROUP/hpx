@@ -95,7 +95,7 @@ namespace hpx { namespace util
         }
 
         /// \brief Atomically set the state to empty without releasing any 
-        ///        waiting \a px_threads. This function is mainly usable for
+        ///        waiting \a threads. This function is mainly usable for
         ///        initialization and debugging purposes.
         /// 
         /// \note    This function will create a new full/empty entry in the 
@@ -106,7 +106,7 @@ namespace hpx { namespace util
         }
 
         /// \brief Atomically set the state to full without releasing any 
-        ///        waiting \a px_threads. This function is mainly usable for
+        ///        waiting \a threads. This function is mainly usable for
         ///        initialization and debugging purposes.
         /// 
         /// \note    This function will not create a new full/empty entry in 
@@ -127,10 +127,10 @@ namespace hpx { namespace util
         ///         calling thread will wait (block) for another thread to call 
         ///         either the function \a set or the function \a write.
         ///
-        /// \note   When memory becomes full, all \a px_threads waiting for it
+        /// \note   When memory becomes full, all \a threads waiting for it
         ///         to become full with a read will receive the value at once 
         ///         and will be queued to run.
-        void read(threadmanager::px_thread_self& self, value_type& dest)
+        void read(threads::thread_self& self, value_type& dest)
         {
             get_store().read(self, get_address(), dest);
         }
@@ -143,8 +143,7 @@ namespace hpx { namespace util
         /// \note   When memory becomes empty, only one thread blocked like this 
         ///         will be queued to run (one thread waiting in a \a write 
         ///         function).
-        void read_and_empty(threadmanager::px_thread_self& self, 
-            value_type& dest) 
+        void read_and_empty(threads::thread_self& self, value_type& dest) 
         {
             get_store().read_and_empty(self, get_address(), dest);
         }
@@ -166,7 +165,7 @@ namespace hpx { namespace util
         ///
         /// \note   When memory becomes empty only one thread blocked like this 
         ///         will be queued to run.
-        void write(threadmanager::px_thread_self& self, value_type const& data)
+        void write(threads::thread_self& self, value_type const& data)
         {
             get_store().write(self, get_address(), data);
         }
@@ -213,7 +212,7 @@ namespace hpx { namespace util
         }
 
         /// \brief Atomically set the state to empty without releasing any 
-        ///        waiting \a px_threads. This function is mainly usable for
+        ///        waiting \a threads. This function is mainly usable for
         ///        initialization and debugging purposes.
         /// 
         /// \note    This function will create a new full/empty entry in the 
@@ -224,7 +223,7 @@ namespace hpx { namespace util
         }
 
         /// \brief Atomically set the state to full without releasing any 
-        ///        waiting \a px_threads. This function is mainly usable for
+        ///        waiting \a threads. This function is mainly usable for
         ///        initialization and debugging purposes.
         /// 
         /// \note    This function will not create a new full/empty entry in 
@@ -242,9 +241,9 @@ namespace hpx { namespace util
 
         /// Wait for the memory to become full, leaves memory in full state.
         ///
-        /// \note When memory becomes full, all \a px_threads waiting for it
+        /// \note When memory becomes full, all \a threads waiting for it
         ///       to become full with a read will be queued to run.
-        void read(threadmanager::px_thread_self& self)
+        void read(threads::thread_self& self)
         {
             get_store().read(self, get_address());
         }
@@ -254,7 +253,7 @@ namespace hpx { namespace util
         /// \note When memory becomes empty, only one thread blocked like this 
         ///       will be queued to run (one thread waiting in a \a write 
         ///       function).
-        void read_and_empty(threadmanager::px_thread_self& self) 
+        void read_and_empty(threads::thread_self& self) 
         {
             return get_store().read_and_empty(self, get_address());
         }
@@ -274,7 +273,7 @@ namespace hpx { namespace util
         ///
         /// \note When memory becomes empty only one thread blocked like this 
         ///       will be queued to run.
-        void write(threadmanager::px_thread_self& self)
+        void write(threads::thread_self& self)
         {
             get_store().write(self, get_address());
         }

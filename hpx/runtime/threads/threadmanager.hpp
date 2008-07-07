@@ -29,28 +29,28 @@
 #include <hpx/util/io_service_pool.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threadmanager
+namespace hpx { namespace threads
 {
-    // forward declaration only (needed for intrusive_ptr<px_thread>)
-    void intrusive_ptr_add_ref(px_thread* p);
-    void intrusive_ptr_release(px_thread* p);
+    // forward declaration only (needed for intrusive_ptr<thread>)
+    void intrusive_ptr_add_ref(thread* p);
+    void intrusive_ptr_release(thread* p);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \class threadmanager threadmanager.hpp hpx/runtime/threadmanager/threadmanager.hpp
+    /// \class threadmanager threadmanager.hpp hpx/runtime/threads/threadmanager.hpp
     ///
     /// The \a threadmanager class is the central instance of management for
-    /// all (non-depleted) \a px_thread's
+    /// all (non-depleted) \a thread's
     class threadmanager : private boost::noncopyable
     {
     private:
         // this is the type of the queue of pending threads
         typedef 
-            boost::lockfree::fifo<boost::intrusive_ptr<px_thread> > 
+            boost::lockfree::fifo<boost::intrusive_ptr<thread> > 
         work_items_type;
         
         // this is the type of a map holding all threads (except depleted ones)
         typedef
-            std::map<thread_id_type, boost::intrusive_ptr<px_thread> >
+            std::map<thread_id_type, boost::intrusive_ptr<thread> >
         thread_map_type;
         typedef thread_map_type::value_type map_pair;
 
@@ -84,7 +84,7 @@ namespace hpx { namespace threadmanager
         typedef boost::lockfree::fifo<thread_id_type> set_state_queue_type;
 
         /// The function \a register_work adds a new work item to the thread 
-        /// manager. It creates a new \a px_thread, adds it to the internal
+        /// manager. It creates a new \a thread, adds it to the internal
         /// management data structures, and schedules the new thread, if 
         /// appropriate.
         ///
@@ -93,7 +93,7 @@ namespace hpx { namespace threadmanager
         ///               defined by \a thread_function_type.
         /// \param initial_state
         ///               [in] The value of this parameter defines the initial 
-        ///               state of the newly created \a px_thread. This must be
+        ///               state of the newly created \a thread. This must be
         ///               one of the values as defined by the \a thread_state 
         ///               enumeration (thread_state#pending, or \a
         ///               thread_state#suspended, any other value will throw a
@@ -137,7 +137,7 @@ namespace hpx { namespace threadmanager
         /// to change the state of one of the threads managed by this 
         /// threadmanager.
         ///
-        /// \param self     [in] A reference to the px_thread executing this 
+        /// \param self     [in] A reference to the thread executing this 
         ///                 function. 
         /// \param id       [in] The thread id of the thread the state should 
         ///                 be modified for.
@@ -151,11 +151,11 @@ namespace hpx { namespace threadmanager
         ///                 thread is not known to the threadmanager the return 
         ///                 value will be \a thread_state#unknown.
         ///
-        /// \note           This function yields the \a px_thread specified by
+        /// \note           This function yields the \a thread specified by
         ///                 the parameter \a self if the thread referenced by 
         ///                 the parameter \a id is in \a thread_state#active 
         ///                 state.
-        thread_state set_state(px_thread_self& self, thread_id_type id, 
+        thread_state set_state(thread_self& self, thread_id_type id, 
             thread_state newstate);
 
         /// The set_state function is part of the thread related API and allows
@@ -197,12 +197,12 @@ namespace hpx { namespace threadmanager
         naming::id_type get_thread_gid(thread_id_type id, 
             applier::applier& appl) const;
 
-        /// Set a timer to set the state of the given \a px_thread to the given 
+        /// Set a timer to set the state of the given \a thread to the given 
         /// new value after it expired (at the given time)
         thread_id_type timed_set_state (time_type const& expire_at, 
             thread_id_type id, thread_state newstate = pending);
 
-        /// Set a timer to set the state of the given \a px_thread to the given
+        /// Set a timer to set the state of the given \a thread to the given
         /// new value after it expired (after the given duration)
         thread_id_type timed_set_state (duration_type const& expire_from_now, 
             thread_id_type id, thread_state newstate = pending);
@@ -225,13 +225,13 @@ namespace hpx { namespace threadmanager
     protected:
         /// This thread function is used by the at_timer thread below to trigger
         /// the required action.
-        thread_state wake_timer_thread (px_thread_self& self, 
+        thread_state wake_timer_thread (thread_self& self, 
             thread_id_type id, thread_state newstate, thread_id_type timer_id);
 
         /// This thread function initiates the required set_state action (on 
         /// behalf of one of the threadmanager#timed_set_state functions).
         template <typename TimeType>
-        thread_state at_timer (px_thread_self& self, TimeType const& expire, 
+        thread_state at_timer (thread_self& self, TimeType const& expire, 
             thread_id_type id, thread_state newstate);
 
     private:

@@ -69,11 +69,11 @@ int main(int argc, char* argv[])
         hpx::parcelset::parcelhandler ph(dgas_c, pp);
 
         // Create a new thread-manager
-        hpx::threadmanager::threadmanager tm;
+        hpx::threads::threadmanager tm;
         // Create a new applier
         hpx::applier::applier app(dgas_c, ph, tm);
         // Create a new action-manager
-        hpx::action_manager::action_manager am(app);
+        hpx::actions::action_manager am(app);
 
         // Set console control handler to allow server to be stopped.
         //console_ctrl_function = 

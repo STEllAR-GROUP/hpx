@@ -3,16 +3,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_GET_LVA_JUN_22_2008_0451PM)
-#define HPX_COMPONENTS_GET_LVA_JUN_22_2008_0451PM
+#if !defined(HPX_RUNTIME_GET_LVA_JUN_22_2008_0451PM)
+#define HPX_RUNTIME_GET_LVA_JUN_22_2008_0451PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components
+namespace hpx 
 {
-    /// \class get_lva get_lva.hpp hpx/components/get_lva.hpp
+    /// \class get_lva get_lva.hpp hpx/runtime/get_lva.hpp
     ///
     /// The \a get_lva template is a helper structure allowing to convert a 
     /// local virtual address as stored in a local address (returned from 
@@ -40,33 +40,40 @@ namespace hpx { namespace components
         }
     };
 
-    // specialization for server::runtime_support
+    // forward declaration
+    namespace components { namespace server
+    {
+        class runtime_support;
+        class memory;
+    }}
+
+    // specialization for components::server::runtime_support
     template <>
-    struct get_lva<server::runtime_support>
+    struct get_lva<components::server::runtime_support>
     {
         // for server::runtime_support the provided lva is directly usable
         // as the required local address
-        static server::runtime_support* 
+        static components::server::runtime_support* 
         call(naming::address::address_type lva)
         {
-            return reinterpret_cast<server::runtime_support*>(lva);
+            return reinterpret_cast<components::server::runtime_support*>(lva);
         }
     };
 
-    // specialization for server::memory
+    // specialization for components::server::memory
     template <>
-    struct get_lva<server::memory>
+    struct get_lva<components::server::memory>
     {
         // for server::memory the provided lva is directly usable as the 
         // required local address
-        static server::memory* 
+        static components::server::memory* 
         call(naming::address::address_type lva)
         {
-            return reinterpret_cast<server::memory*>(lva);
+            return reinterpret_cast<components::server::memory*>(lva);
         }
     };
 
-}}
+}
 
 #endif
 

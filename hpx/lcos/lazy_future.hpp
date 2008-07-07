@@ -12,10 +12,10 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/threadmanager/px_thread.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/util/full_empty_memory.hpp>
-#include <hpx/components/action.hpp>
+#include <hpx/runtime/actions/action.hpp>
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/server/wrapper.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -27,7 +27,7 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     /// \class lazy_future lazy_future.hpp hpx/lcos/lazy_future.hpp
     ///
-    /// A lazy_future can be used by a single \a px_thread to invoke a 
+    /// A lazy_future can be used by a single \a thread to invoke a 
     /// (remote) action and wait for the result. The result is expected to be 
     /// sent back to the lazy_future using the LCO's set_event action
     ///
@@ -54,7 +54,7 @@ namespace hpx { namespace lcos
         typedef simple_future<Result> base_type;
 
     public:
-        /// Construct a new \a lazy_future instance. The \a px_thread 
+        /// Construct a new \a lazy_future instance. The \a thread 
         /// supplied to the function \a lazy_future#get_result will be 
         /// notified as soon as the result of the operation associated with 
         /// this lazy_future instance has been returned.
@@ -74,7 +74,7 @@ namespace hpx { namespace lcos
         /// returned and the waiting thread has been re-scheduled by the thread
         /// manager the function \a lazy_future#get_result will return.
         ///
-        /// \param self   [in] The \a px_thread which will be unconditionally
+        /// \param self   [in] The \a thread which will be unconditionally
         ///               while waiting for the result. 
         /// \param appl   [in] The \a applier instance to be used to execute 
         ///               the embedded action.
@@ -85,7 +85,7 @@ namespace hpx { namespace lcos
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
-        Result get_result(threadmanager::px_thread_self& self,
+        Result get_result(threads::thread_self& self,
             applier::applier& appl, naming::id_type const& gid) const
         {
             // initialize the operation
@@ -100,7 +100,7 @@ namespace hpx { namespace lcos
         /// returned and the waiting thread has been re-scheduled by the thread
         /// manager the function \a lazy_future#get_result will return.
         ///
-        /// \param self   [in] The \a px_thread which will be unconditionally
+        /// \param self   [in] The \a thread which will be unconditionally
         ///               while waiting for the result. 
         /// \param appl   [in] The \a applier instance to be used to execute 
         ///               the embedded action.
@@ -114,7 +114,7 @@ namespace hpx { namespace lcos
         ///               exception encapsulating the reported error code and 
         ///               error description.
         template <typename Arg0>
-        Result get_result(threadmanager::px_thread_self& self,
+        Result get_result(threads::thread_self& self,
             applier::applier& appl, naming::id_type const& gid,
             Arg0 const& arg0) const
         {

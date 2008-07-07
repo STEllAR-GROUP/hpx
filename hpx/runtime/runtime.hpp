@@ -12,9 +12,9 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime/threadmanager/threadmanager.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/action_manager/action_manager.hpp>
+#include <hpx/runtime/actions/action_manager.hpp>
 #include <hpx/components/server/runtime_support.hpp>
 #include <hpx/components/server/memory.hpp>
 
@@ -24,9 +24,11 @@ namespace hpx
     /// This is the signature expected to be exposed by a function registered 
     /// as HPX's 'main' function. This main function is the easiest way of 
     /// bootstrapping an application
-    typedef threadmanager::thread_state hpx_main_function_type(
-        threadmanager::px_thread_self&, applier::applier&);
+    typedef threads::thread_state hpx_main_function_type(
+        threads::thread_self&, applier::applier&);
 
+    /// \class runtime runtime.hpp hpx/runtime/runtime.hpp
+    ///
     /// The \a runtime class encapsulates the HPX runtime system in a simple to 
     /// use way. It makes sure all required parts of the HPX runtime system are
     /// properly initialized. 
@@ -97,7 +99,7 @@ namespace hpx
         void stop(bool blocking = true);
 
         /// \brief Run the HPX runtime system, use the given function for the 
-        ///        main \a px_thread and block waiting for all px_threads to 
+        ///        main \a thread and block waiting for all threads to 
         ///        finish
         ///
         /// \param func       [in] This is the main function of an HPX 
@@ -107,7 +109,7 @@ namespace hpx
         ///                   expose an interface as defined by the typedef
         ///                   \a hpx_main_function_type. This parameter is 
         ///                   optional and defaults to none main thread 
-        ///                   function, in which case all px_threads have to be 
+        ///                   function, in which case all threads have to be 
         ///                   scheduled explicitly.
         /// \param num_threads [in] The initial number of threads to be started 
         ///                   by the threadmanager. This parameter is optional 
@@ -123,7 +125,7 @@ namespace hpx
 
         /// \brief Run the HPX runtime system, initially use the given number 
         ///        of (OS) threads in the threadmanager and block waiting for
-        ///        all px_threads to finish.
+        ///        all threads to finish.
         ///
         /// \param num_threads [in] The initial number of threads to be started 
         ///                   by the threadmanager. 
@@ -147,7 +149,7 @@ namespace hpx
 
         /// \brief Allow access to the thread manager instance used by the HPX
         ///        runtime.
-        threadmanager::threadmanager& get_thread_manager()
+        threads::threadmanager& get_thread_manager()
         {
             return thread_manager_;
         }
@@ -161,7 +163,7 @@ namespace hpx
 
         /// \brief Allow access to the action manager instance used by the HPX
         ///        runtime.
-        action_manager::action_manager& get_action_manager()
+        actions::action_manager& get_action_manager()
         {
             return action_manager_;
         }
@@ -182,10 +184,10 @@ namespace hpx
         util::io_service_pool timer_pool_; 
         naming::resolver_client dgas_client_;
         parcelset::parcelport parcel_port_;
-        threadmanager::threadmanager thread_manager_;
+        threads::threadmanager thread_manager_;
         parcelset::parcelhandler parcel_handler_;
         applier::applier applier_;
-        action_manager::action_manager action_manager_;
+        actions::action_manager action_manager_;
         components::server::runtime_support runtime_support_;
         components::server::memory memory_;
     };

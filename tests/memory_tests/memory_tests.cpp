@@ -11,7 +11,7 @@
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
-threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self, 
+threads::thread_state hpx_main(threads::thread_self& self, 
     applier::applier& appl)
 {
     // try to access some memory directly
@@ -26,7 +26,7 @@ threadmanager::thread_state hpx_main(threadmanager::px_thread_self& self,
     components::stubs::runtime_support::shutdown_all(appl, 
         appl.get_runtime_support_gid());
 
-    return threadmanager::terminated;
+    return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

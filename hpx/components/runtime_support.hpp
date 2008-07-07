@@ -34,7 +34,7 @@ namespace hpx { namespace components
         // exposed functionality of this component
 
         /// Create a new component using the runtime_support 
-        naming::id_type create_component(threadmanager::px_thread_self& self,
+        naming::id_type create_component(threads::thread_self& self,
             components::component_type type, std::size_t count = 1) 
         {
             return this->base_type::create_component(self, gid_, type, count);

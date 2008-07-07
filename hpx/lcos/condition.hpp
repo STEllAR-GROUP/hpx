@@ -100,35 +100,35 @@ namespace hpx { namespace lcos { namespace detail
         condition()
         {}
 
-        void wait(threadmanager::px_thread_self& self)
+        void wait(threads::thread_self& self)
         {
             queue_.enqueue(self.get_thread_id());
-            self.yield(threadmanager::suspended);
+            self.yield(threads::suspended);
         }
 
-        void notify_one(threadmanager::px_thread_self& self)
+        void notify_one(threads::thread_self& self)
         {
             thread_id_type id = 0;
             if (queue_.dequeue(&id))
-                threadmanager::set_state(self, id, threadmanager::pending);
+                threads::set_state(self, id, threads::pending);
         }
 
-        void notify_all(threadmanager::px_thread_self& self)
+        void notify_all(threads::thread_self& self)
         {
             thread_id_type id = 0;
             while (queue_.dequeue(&id))
-                threadmanager::set_state(self, id, threadmanager::pending);
+                threads::set_state(self, id, threads::pending);
         }
 
         // standard LCO action implementations
-        threadmanager::thread_state set_event (
-            threadmanager::px_thread_self& self, applier::applier&)
+        threads::thread_state set_event (
+            threads::thread_self& self, applier::applier&)
         {
             notify_one(self);
         }
 
-        threadmanager::thread_state set_error (
-            threadmanager::px_thread_self& self, applier::applier&
+        threads::thread_state set_error (
+            threads::thread_self& self, applier::applier&
             hpx::error code, std::string msg)
         {
             boost::throw_exception(hpx::exception(code, msg));
@@ -154,17 +154,17 @@ namespace hpx { namespace lcos
           : impl_(new wrapping_type(new wrapped_type()))
         {}
 
-        void wait(threadmanager::px_thread_self& self)
+        void wait(threads::thread_self& self)
         {
             impl_->wait(self);
         }
 
-        void notify_one(threadmanager::px_thread_self& self)
+        void notify_one(threads::thread_self& self)
         {
             impl_->notify_one(self);
         }
 
-        void notify_all(threadmanager::px_thread_self& self)
+        void notify_all(threads::thread_self& self)
         {
             impl_->notify_one(self);
         }

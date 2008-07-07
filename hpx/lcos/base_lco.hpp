@@ -9,7 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/components/component_type.hpp>
-#include <hpx/components/action.hpp>
+#include <hpx/runtime/actions/action.hpp>
 
 namespace hpx { namespace lcos 
 {
@@ -40,13 +40,13 @@ namespace hpx { namespace lcos
         virtual ~base_lco() {}
 
         ///
-        virtual threadmanager::thread_state set_event (
-            threadmanager::px_thread_self&, applier::applier& appl) = 0;
+        virtual threads::thread_state set_event (
+            threads::thread_self&, applier::applier& appl) = 0;
 
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef components::action0<
+        typedef hpx::actions::action0<
             base_lco, lco_set_event, &base_lco::set_event
         > set_event_action;
     };
@@ -72,24 +72,24 @@ namespace hpx { namespace lcos
         virtual ~base_lco_with_value() {}
 
         ///
-        virtual threadmanager::thread_state set_result (
-            threadmanager::px_thread_self&, applier::applier& appl,
+        virtual threads::thread_state set_result (
+            threads::thread_self&, applier::applier& appl,
             Result const& result) = 0;
 
         ///
-        virtual threadmanager::thread_state set_error (
-            threadmanager::px_thread_self&, applier::applier& appl,
+        virtual threads::thread_state set_error (
+            threads::thread_self&, applier::applier& appl,
             hpx::error code, std::string msg) = 0;
 
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef components::action1<
+        typedef hpx::actions::action1<
             base_lco_with_value, lco_set_result, Result const&, 
             &base_lco_with_value::set_result
         > set_result_action;
 
-        typedef components::action2<
+        typedef hpx::actions::action2<
             base_lco_with_value, lco_set_error, hpx::error, std::string,
             &base_lco_with_value::set_error
         > set_error_action;
@@ -109,22 +109,22 @@ namespace hpx { namespace lcos
         virtual ~base_lco_with_value() {}
 
         ///
-        virtual threadmanager::thread_state set_event (
-            threadmanager::px_thread_self&, applier::applier&) = 0;
+        virtual threads::thread_state set_event (
+            threads::thread_self&, applier::applier&) = 0;
 
         ///
-        virtual threadmanager::thread_state set_error (
-            threadmanager::px_thread_self&, applier::applier&,
+        virtual threads::thread_state set_error (
+            threads::thread_self&, applier::applier&,
             hpx::error, std::string) = 0;
 
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef components::action0<
+        typedef hpx::actions::action0<
             base_lco_with_value, lco_set_result, &base_lco_with_value::set_event
         > set_result_action;
 
-        typedef components::action2<
+        typedef hpx::actions::action2<
             base_lco_with_value, lco_set_error, hpx::error, std::string,
             &base_lco_with_value::set_error
         > set_error_action;

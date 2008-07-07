@@ -11,7 +11,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/components/component_type.hpp>
-#include <hpx/components/action.hpp>
+#include <hpx/runtime/actions/action.hpp>
 
 namespace hpx { namespace components { namespace server
 {
@@ -46,47 +46,47 @@ namespace hpx { namespace components { namespace server
         // exposed functionality of this component
 
         /// \brief Action to create new components
-        threadmanager::thread_state create_component(
-            threadmanager::px_thread_self& self, applier::applier& app,
+        threads::thread_state create_component(
+            threads::thread_self& self, applier::applier& app,
             naming::id_type* gid, components::component_type type, 
             std::size_t count); 
 
         /// \brief Action to delete existing components
-        threadmanager::thread_state free_component(
-            threadmanager::px_thread_self& self, applier::applier& app,
+        threads::thread_state free_component(
+            threads::thread_self& self, applier::applier& app,
             components::component_type type, naming::id_type const& gid,
             std::size_t count); 
 
         /// \brief Action shut down this runtime system instance
-        threadmanager::thread_state shutdown(
-            threadmanager::px_thread_self& self, applier::applier& app);
+        threads::thread_state shutdown(
+            threads::thread_self& self, applier::applier& app);
 
         /// \brief Action shut down runtime system instances on all localities
-        threadmanager::thread_state shutdown_all(
-            threadmanager::px_thread_self& self, applier::applier& app);
+        threads::thread_state shutdown_all(
+            threads::thread_self& self, applier::applier& app);
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
-        typedef result_action2<
+        typedef hpx::actions::result_action2<
             runtime_support, naming::id_type, runtime_support_create_component, 
             components::component_type, std::size_t, 
             &runtime_support::create_component
         > create_component_action;
 
-        typedef action3<
+        typedef hpx::actions::action3<
             runtime_support, runtime_support_free_component, 
             components::component_type, naming::id_type const&, std::size_t, 
             &runtime_support::free_component
         > free_component_action;
 
-        typedef action0<
+        typedef hpx::actions::action0<
             runtime_support, runtime_support_shutdown, 
             &runtime_support::shutdown
         > shutdown_action;
 
-        typedef action0<
+        typedef hpx::actions::action0<
             runtime_support, runtime_support_shutdown_all, 
             &runtime_support::shutdown_all
         > shutdown_all_action;

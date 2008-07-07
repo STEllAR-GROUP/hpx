@@ -12,10 +12,10 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/threadmanager/px_thread.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/util/full_empty_memory.hpp>
-#include <hpx/components/action.hpp>
+#include <hpx/runtime/actions/action.hpp>
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/server/wrapper.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -27,7 +27,7 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     /// \class eager_future eager_future.hpp hpx/lcos/eager_future.hpp
     ///
-    /// A eager_future can be used by a single \a px_thread to invoke a 
+    /// A eager_future can be used by a single \a thread to invoke a 
     /// (remote) action and wait for the result. The result is expected to be 
     /// sent back to the eager_future using the LCO's set_event action
     ///
@@ -58,7 +58,7 @@ namespace hpx { namespace lcos
         typedef simple_future<Result> base_type;
 
     public:
-        /// Construct a new \a eager_future instance. The \a px_thread 
+        /// Construct a new \a eager_future instance. The \a thread 
         /// supplied to the function \a eager_future#get_result will be 
         /// notified as soon as the result of the operation associated with 
         /// this eager_future instance has been returned.
@@ -75,7 +75,7 @@ namespace hpx { namespace lcos
             appl.apply_c<Action>(this->get_gid(appl), gid);
         }
 
-        /// Construct a new \a eager_future instance. The \a px_thread 
+        /// Construct a new \a eager_future instance. The \a thread 
         /// supplied to the function \a eager_future#get_result will be 
         /// notified as soon as the result of the operation associated with 
         /// this eager_future instance has been returned.
@@ -106,7 +106,7 @@ namespace hpx { namespace lcos
         typedef simple_future<Result> base_type;
 
     public:
-        /// Construct a new \a eager_future instance. The \a px_thread 
+        /// Construct a new \a eager_future instance. The \a thread 
         /// supplied to the function \a eager_future#get_result will be 
         /// notified as soon as the result of the operation associated with 
         /// this eager_future instance has been returned.
@@ -132,7 +132,7 @@ namespace hpx { namespace lcos
             }
         }
 
-        /// Construct a new \a eager_future instance. The \a px_thread 
+        /// Construct a new \a eager_future instance. The \a thread 
         /// supplied to the function \a eager_future#get_result will be 
         /// notified as soon as the result of the operation associated with 
         /// this eager_future instance has been returned.

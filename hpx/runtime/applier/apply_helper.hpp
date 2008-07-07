@@ -24,22 +24,22 @@ namespace hpx { namespace applier { namespace detail
     struct apply_helper0<Action, boost::mpl::false_>
     {
         static void 
-        call (Action* act, threadmanager::threadmanager& tm, applier& appl, 
+        call (Action* act, threads::threadmanager& tm, applier& appl, 
             naming::address::address_type lva)
         {
             tm.register_work(act->get_thread_function(appl, lva));
         }
 
         static void 
-        call (threadmanager::threadmanager& tm, applier& appl, 
+        call (threads::threadmanager& tm, applier& appl, 
             naming::address::address_type lva)
         {
             tm.register_work(Action::construct_thread_function(appl, lva));
         }
 
         static void 
-        call (components::continuation_type& c, 
-            threadmanager::threadmanager& tm, applier& appl, 
+        call (actions::continuation_type& c, 
+            threads::threadmanager& tm, applier& appl, 
             naming::address::address_type lva)
         {
             tm.register_work(Action::construct_thread_function(c, appl, lva));
@@ -50,7 +50,7 @@ namespace hpx { namespace applier { namespace detail
     struct apply_helper0<Action, boost::mpl::true_>
     {
         static void 
-        call (Action* act, threadmanager::threadmanager&, applier& appl, 
+        call (Action* act, threads::threadmanager&, applier& appl, 
             naming::address::address_type lva)
         {
             BOOST_ASSERT(false);    // shouldn't be called at all
@@ -58,14 +58,14 @@ namespace hpx { namespace applier { namespace detail
 
         // If local and to be directly executed, just call the function
         static void
-        call (threadmanager::threadmanager&, applier& appl, 
+        call (threads::threadmanager&, applier& appl, 
             naming::address::address_type addr)
         {
             Action::execute_function(appl, addr);
         }
 
         static typename Action::result_type 
-        call (components::continuation_type& c, threadmanager::threadmanager&, 
+        call (actions::continuation_type& c, threads::threadmanager&, 
             applier& appl, naming::address::address_type addr)
         {
             return Action::execute_function(appl, addr);
@@ -83,15 +83,15 @@ namespace hpx { namespace applier { namespace detail
     struct apply_helper1<Action, Arg0, boost::mpl::false_>
     {
         static void 
-        call (threadmanager::threadmanager& tm, applier& appl, 
+        call (threads::threadmanager& tm, applier& appl, 
             naming::address::address_type addr, Arg0 const& arg0)
         {
             tm.register_work(Action::construct_thread_function(appl, addr, arg0));
         }
 
         static void 
-        call (components::continuation_type& c, 
-            threadmanager::threadmanager& tm, applier& appl, 
+        call (actions::continuation_type& c, 
+            threads::threadmanager& tm, applier& appl, 
             naming::address::address_type addr, Arg0 const& arg0)
         {
             tm.register_work(Action::construct_thread_function(c, appl, addr, arg0));
@@ -103,14 +103,14 @@ namespace hpx { namespace applier { namespace detail
     {
         // If local and to be directly executed, just call the function
         static void
-        call (threadmanager::threadmanager&, applier& appl, 
+        call (threads::threadmanager&, applier& appl, 
             naming::address::address_type addr, Arg0 const& arg0)
         {
             Action::execute_function(appl, addr, arg0);
         }
 
         static typename Action::result_type  
-        call (components::continuation_type& c, threadmanager::threadmanager&, 
+        call (actions::continuation_type& c, threads::threadmanager&, 
             applier& appl, naming::address::address_type addr, 
             Arg0 const& arg0)
         {

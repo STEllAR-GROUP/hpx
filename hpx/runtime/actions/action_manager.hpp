@@ -10,10 +10,10 @@
 
 #include <hpx/include/naming.hpp>
 #include <hpx/include/parcelset.hpp>
-#include <hpx/runtime/threadmanager/threadmanager.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 
-namespace hpx { namespace action_manager
+namespace hpx { namespace actions
 {
     class action_manager : private boost::noncopyable
     {
@@ -23,10 +23,10 @@ namespace hpx { namespace action_manager
             : applier_(appl)
         {
             // Need to register the call-back function in parcelHandler so that
-            // when a new parcel is received, it calls action_manager's fetchNewParcel()
+            // when a new parcel is received, it calls action_manager's 
+            // fetchNewParcel()
             appl.get_parcel_handler().register_event_handler(boost::bind(
-                &hpx::action_manager::action_manager::fetch_new_parcel, this, 
-                _1, _2), conn_);
+                &action_manager::fetch_new_parcel, this, _1, _2), conn_);
         }
 
         // Call-back function for parcelHandler to call when new parcels are received
@@ -51,8 +51,7 @@ namespace hpx { namespace action_manager
 //        void removeResource (naming::id_type resourceGUID);
 
         ~action_manager()
-        {
-        }
+        {}
 
     private:
         applier::applier& applier_;

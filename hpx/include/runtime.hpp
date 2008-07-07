@@ -6,6 +6,11 @@
 #if !defined(HPX_RUNTIME_JUN_210_2008_1018AM)
 #define HPX_RUNTIME_JUN_210_2008_1018AM
 
+#include <hpx/include/naming.hpp>
+#include <hpx/include/parcelset.hpp>
+#include <hpx/include/threadmanager.hpp>
+#include <hpx/include/applier.hpp>
+#include <hpx/include/actions.hpp>
 #include <hpx/runtime/runtime.hpp>
 
 #endif

@@ -56,11 +56,11 @@
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    bool apply (components::continuation* c, naming::id_type const& gid, 
+    bool apply (actions::continuation* c, naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        components::continuation_type cont(c);
-        
+        actions::continuation_type cont(c);
+
         // Determine whether the gid is local or remote
         naming::address addr;
         if (address_is_local(gid, addr))
@@ -86,7 +86,7 @@
     bool apply_c (naming::id_type const& targetgid, naming::id_type const& gid,
          BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        return apply<Action>(new components::continuation(targetgid), 
+        return apply<Action>(new actions::continuation(targetgid), 
             gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 

@@ -15,7 +15,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/components/action.hpp>
+#include <hpx/runtime/actions/action.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 
@@ -51,21 +51,21 @@ namespace hpx { namespace parcelset
         {
         }
 
-        parcel(naming::id_type apply_to, components::action_base* act)
+        parcel(naming::id_type apply_to, actions::action_base* act)
           : tag_(0), destination_id_(apply_to), source_id_(0), action_(act), 
             continuation_(), start_time_(0)
         {
         }
 
-        parcel(naming::id_type apply_to, components::action_base* act, 
-               components::continuation* do_after) 
+        parcel(naming::id_type apply_to, actions::action_base* act, 
+               actions::continuation* do_after) 
           : tag_(0), destination_id_(apply_to), source_id_(0), action_(act), 
             continuation_(do_after), start_time_(0)
         {
         }
 
-        parcel(naming::id_type apply_to, components::action_base* act, 
-               components::continuation_type do_after) 
+        parcel(naming::id_type apply_to, actions::action_base* act, 
+               actions::continuation_type do_after) 
           : tag_(0), destination_id_(apply_to), source_id_(0), action_(act), 
             continuation_(do_after), start_time_(0)
         {
@@ -78,12 +78,12 @@ namespace hpx { namespace parcelset
         // default copy constructor is ok    
         // default assignment operator is ok
 
-        components::action_type get_action() const 
+        actions::action_type get_action() const 
         {
             return action_;
         }
 
-        components::continuation_type get_continuation() const 
+        actions::continuation_type get_continuation() const 
         {
             return continuation_;
         }
@@ -154,8 +154,8 @@ namespace hpx { namespace parcelset
         naming::id_type destination_id_;
         naming::address destination_addr_;
         naming::id_type source_id_;
-        components::action_type action_;
-        components::continuation_type continuation_;
+        actions::action_type action_;
+        actions::continuation_type continuation_;
         double start_time_;
     };
 

@@ -11,20 +11,44 @@
 #include <boost/coroutine/shared_coroutine.hpp>
 #include <hpx/config.hpp>
 
+/// \namespace hpx
+///
+/// The namespace \a hpx is the main namespace of the HPX library. All classes
+/// functions and variables are defined inside this namespace.
 namespace hpx
 {
     class runtime;
 
+    /// \namespace applier
+    ///
+    /// The namespace \a applier contains all definitions needed for the
+    /// class \a hpx#applier#applier and its related functionality. This 
+    /// namespace is part of the HPX core module.
     namespace applier
     {
         class applier;
     }
 
-    namespace action_manager
+    /// \namespace actions
+    ///
+    /// The namespace \a actions contains all definitions needed for the
+    /// class \a hpx#action_manager#action_manager and its related 
+    /// functionality. This namespace is part of the HPX core module.
+    namespace actions
     {
+        struct action_base;
+        typedef boost::shared_ptr<action_base> action_type;
+
+        class continuation;
+        typedef boost::shared_ptr<continuation> continuation_type;
+
         class action_manager;
     }
 
+    /// \namespace naming
+    ///
+    /// The namespace \a naming contains all definitions needed for the DGAS
+    /// (Distributed Global Address Space) service.
     namespace naming
     {
         struct id_type;
@@ -40,6 +64,7 @@ namespace hpx
         }
     }
 
+    /// \namespace parcelset
     namespace parcelset
     {
         class parcel;
@@ -56,16 +81,21 @@ namespace hpx
         }
     }
 
-    namespace threadmanager
+    /// \namespace threads
+    ///
+    /// The namespace \a threadmanager contains all the definitions required 
+    /// for the scheduling, execution and general management of \a 
+    /// hpx#threadmanager#thread's.
+    namespace threads
     {
-        class px_thread;
+        class thread;
         class threadmanager;
 
         ///////////////////////////////////////////////////////////////////////
         /// \enum thread_state
         ///
         /// The thread_state enumerator encodes the current state of a \a 
-        /// px_thread instance
+        /// thread instance
         enum thread_state
         {
             unknown = -1,
@@ -89,26 +119,91 @@ namespace hpx
             boost::coroutines::shared_coroutine<thread_state()>
         coroutine_type;
         typedef coroutine_type::thread_id_type thread_id_type;
-        typedef coroutine_type::self px_thread_self;
-        typedef thread_state thread_function_type(px_thread_self&);
+        typedef coroutine_type::self thread_self;
+        typedef thread_state thread_function_type(thread_self&);
 
         ///////////////////////////////////////////////////////////////////////
-        thread_state set_thread_state(px_thread_self& self, thread_id_type id, 
-            thread_state new_state);
+        /// \brief  Set the thread state of the \a thread referenced by the 
+        ///         thread_id \a id.
+        ///
+        /// \param self       [in] A reference to the \a thread executing 
+        ///                   this function. 
+        /// \param id         [in] The thread id of the thread the state should 
+        ///                   be modified for.
+        /// \param newstate   [in] The new state to be set for the thread 
+        ///                   referenced by the \a id parameter.
+        ///
+        /// \returns          This function returns the previous state of the 
+        ///                   thread referenced by the \a id parameter. It will 
+        ///                   return one of the values as defined by the 
+        ///                   \a thread_state enumeration. If the 
+        ///                   thread is not known to the threadmanager the 
+        ///                   return value will be \a thread_state#unknown.
+        ///
+        /// \note             This function yields the \a thread specified 
+        ///                   by the parameter \a self if the thread referenced 
+        ///                   by  the parameter \a id is in \a 
+        ///                   thread_state#active state.
+        thread_state set_thread_state(thread_self& self, thread_id_type id, 
+            thread_state newstate);
 
         ///////////////////////////////////////////////////////////////////////
-        thread_state set_thread_state(thread_id_type id, thread_state new_state);
+        /// \brief  Set the thread state of the \a thread referenced by the 
+        ///         thread_id \a id.
+        ///
+        /// \param id         [in] The thread id of the thread the state should 
+        ///                   be modified for.
+        /// \param newstate   [in] The new state to be set for the thread 
+        ///                   referenced by the \a id parameter.
+        ///
+        /// \returns          This function returns the previous state of the 
+        ///                   thread referenced by the \a id parameter. It will 
+        ///                   return one of the values as defined by the 
+        ///                   \a thread_state enumeration. If the 
+        ///                   thread is not known to the threadmanager the 
+        ///                   return value will be \a thread_state#unknown.
+        ///
+        /// \note             If the thread referenced by the parameter \a id 
+        ///                   is in \a thread_state#active state this function 
+        ///                   does nothing except returning 
+        ///                   thread_state#unknown. 
+        thread_state set_thread_state(thread_id_type id, thread_state newstate);
+
+        ///////////////////////////////////////////////////////////////////////
+        /// \brief  Set the thread state of the \a thread referenced by the 
+        ///         thread_id \a id.
+        ///
+        /// \param id         [in] The thread id of the thread the state should 
+        ///                   be modified for.
+        /// \param newstate   [in] The new state to be set for the thread 
+        ///                   referenced by the \a id parameter.
+        /// \param at_time
+        ///
+        /// \returns
+        thread_id_type set_thread_state(thread_id_type id, thread_state newstate, 
+            boost::posix_time::ptime const& at_time);
+
+        ///////////////////////////////////////////////////////////////////////
+        /// \brief  Set the thread state of the \a thread referenced by the 
+        ///         thread_id \a id.
+        ///
+        /// \param id         [in] The thread id of the thread the state should 
+        ///                   be modified for.
+        /// \param newstate   [in] The new state to be set for the thread 
+        ///                   referenced by the \a id parameter.
+        /// \param after_duration
+        ///                   
+        ///
+        /// \returns
+        ///////////////////////////////////////////////////////////////////////
+        thread_id_type set_thread_state(thread_id_type id, thread_state newstate,
+            boost::posix_time::time_duration const& after_duration);
 
     }
 
+    /// \namespace components
     namespace components
     {
-        struct action_base;
-        typedef boost::shared_ptr<action_base> action_type;
-
-        class continuation;
-        typedef boost::shared_ptr<continuation> continuation_type;
-
         class runtime_support;
 
         class accumulator;
@@ -130,15 +225,15 @@ namespace hpx
         }
     }
 
+    /// \namespace lcos
     namespace lcos
     {
         struct base_lco;
         template <typename Result> struct base_lco_with_value;
         template <typename Result> class simple_future;
-        template <
-            typename Action, typename Result,
-            typename DirectExecute = typename Action::direct_execution
-        > class eager_future;
+        template <typename Action, typename Result,
+            typename DirectExecute = typename Action::direct_execution> 
+        class eager_future;
         template <typename Action, typename Result> class lazy_future;
     }
 }

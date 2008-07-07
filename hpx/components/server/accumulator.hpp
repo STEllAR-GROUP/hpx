@@ -10,9 +10,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/threadmanager/px_thread.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/components/component_type.hpp>
-#include <hpx/components/action.hpp>
+#include <hpx/runtime/actions/action.hpp>
 #include <hpx/components/server/wrapper.hpp>
 
 namespace hpx { namespace components { namespace server { namespace detail
@@ -54,57 +54,57 @@ namespace hpx { namespace components { namespace server { namespace detail
         // exposed functionality of this component
 
         /// Initialize the accumulator
-        threadmanager::thread_state 
-        init (threadmanager::px_thread_self&, applier::applier& appl) 
+        threads::thread_state 
+        init (threads::thread_self&, applier::applier& appl) 
         {
             arg_ = 0;
-            return hpx::threadmanager::terminated;
+            return threads::terminated;
         }
 
         /// Add the given number to the accumulator
-        threadmanager::thread_state 
-        add (threadmanager::px_thread_self&, applier::applier& appl, double arg) 
+        threads::thread_state 
+        add (threads::thread_self&, applier::applier& appl, double arg) 
         {
             arg_ += arg;
-            return hpx::threadmanager::terminated;
+            return threads::terminated;
         }
 
         /// Return the current value to the caller
-        threadmanager::thread_state 
-        query (threadmanager::px_thread_self&, applier::applier& appl,
+        threads::thread_state 
+        query (threads::thread_self&, applier::applier& appl,
             double* result) 
         {
             // this will be zero if the action got invoked without continuations
             if (result)
                 *result = arg_;
-            return hpx::threadmanager::terminated;
+            return threads::terminated;
         }
 
         /// Print the current value of the accumulator
-        threadmanager::thread_state 
-        print (threadmanager::px_thread_self&, applier::applier& appl) 
+        threads::thread_state 
+        print (threads::thread_self&, applier::applier& appl) 
         {
             std::cout << arg_ << std::flush << std::endl;
-            return hpx::threadmanager::terminated;
+            return threads::terminated;
         }
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef action0<
+        typedef hpx::actions::action0<
             accumulator, accumulator_init, &accumulator::init
         > init_action;
 
-        typedef action1<
+        typedef hpx::actions::action1<
             accumulator, accumulator_add, double, &accumulator::add
         > add_action;
 
-        typedef result_action0<
+        typedef hpx::actions::result_action0<
             accumulator, double, accumulator_query_value, &accumulator::query
         > query_action;
 
-        typedef action0<
+        typedef hpx::actions::action0<
             accumulator, accumulator_print, &accumulator::print
         > print_action;
 

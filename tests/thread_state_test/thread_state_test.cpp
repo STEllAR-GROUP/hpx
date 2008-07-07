@@ -8,20 +8,20 @@
 #include <hpx/hpx.hpp>
 
 using namespace hpx;
-using namespace hpx::threadmanager;
+using namespace hpx::threads;
 
-thread_state my_gcd (hpx::threadmanager::px_thread_self&, int m, int n);
+thread_state my_gcd (hpx::threads::thread_self&, int m, int n);
 void print_state (thread_state t_s);
 void sleep (unsigned int mseconds);
 
 int main(int argc, char* argv[])
 {
-    hpx::threadmanager::threadmanager my_tm;
+    hpx::threads::threadmanager my_tm;
 
     my_tm.register_work(boost::bind (my_gcd, _1, 13, 14));                      // GCD = 1
-    hpx::threadmanager::thread_id_type t_id = 
+    hpx::threads::thread_id_type t_id = 
         my_tm.register_work(boost::bind (my_gcd, _1, 7, 343), suspended);       // GCD = 7
-    hpx::threadmanager::thread_id_type t2_id = 
+    hpx::threads::thread_id_type t2_id = 
         my_tm.register_work(boost::bind (my_gcd, _1, 120, 115), suspended);     // GCD = 5
     my_tm.register_work(boost::bind (my_gcd, _1, 9, 15), pending);              // GCD = 3
 
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-thread_state my_gcd (hpx::threadmanager::px_thread_self& s, int m, int n)
+thread_state my_gcd (hpx::threads::thread_self& s, int m, int n)
 {
     int r;
     while(n != 0){

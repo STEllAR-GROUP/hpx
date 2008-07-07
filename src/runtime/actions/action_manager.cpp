@@ -5,13 +5,13 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#include <hpx/runtime/action_manager/action_manager.hpp>
+#include <hpx/runtime/actions/action_manager.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/components/action.hpp>
+#include <hpx/runtime/actions/action.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace action_manager
+namespace hpx { namespace actions
 {
     // Call-back function for parcelHandler to call when new parcels are received
     void action_manager::fetch_new_parcel (
@@ -25,20 +25,20 @@ namespace hpx { namespace action_manager
             naming::address::address_type lva = addr.address_;
 
             // decode the action-type in the parcel
-            components::action_type act = p.get_action();
+            action_type act = p.get_action();
 
-            components::continuation_type cont = p.get_continuation();
+            continuation_type cont = p.get_continuation();
             if (!cont) {
                 // no continuation is to be executed, register the plain action 
                 // and the local-virtual address with the TM only
-                applier_.get_thread_manager().register_work(
+                register_work(applier_, 
                     act->get_thread_function(applier_, lva));
             }
             else {
                 // this parcel carries a continuation, register a wrapper which
                 // first executes the original thread function as required by 
                 // the action and triggers the continuations afterwards
-                applier_.get_thread_manager().register_work(
+                register_work(applier_, 
                     act->get_thread_function(cont, applier_, lva));
             }
         }

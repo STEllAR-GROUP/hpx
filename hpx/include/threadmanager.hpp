@@ -6,8 +6,8 @@
 #if !defined(HPX_THREADMANAGER_MAY_20_2008_840AM)
 #define HPX_THREADMANAGER_MAY_20_2008_840AM
 
-#include <hpx/runtime/threadmanager/threadmanager.hpp>
-#include <hpx/runtime/threadmanager/px_thread.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 
 #endif
 

@@ -15,7 +15,7 @@ namespace hpx { namespace components
         component_invalid = 0,
         component_runtime_support,  // runtime support (needed to create components, etc.)
         component_memory,           // general memory address
-        component_px_thread,        // a ParalleX thread
+        component_thread,        // a ParalleX thread
 
         // LCO's
         component_base_lco,         ///< the base of all LCO's not waiting on a value
@@ -46,7 +46,7 @@ namespace hpx { namespace components
             "component_invalid",
             "component_runtime_support",
             "component_memory",
-            "component_px_thread",
+            "component_thread",
             "component_base_lco",
             "component_base_lco_with_value",
             "component_future",

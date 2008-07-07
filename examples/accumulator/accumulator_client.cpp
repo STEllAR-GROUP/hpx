@@ -13,8 +13,8 @@ using namespace hpx;
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
-threadmanager::thread_state 
-hpx_main(threadmanager::px_thread_self& self, applier::applier& appl)
+threads::thread_state 
+hpx_main(threads::thread_self& self, applier::applier& appl)
 {
     // create an accumulator locally
     using hpx::components::accumulator;
@@ -64,7 +64,7 @@ hpx_main(threadmanager::px_thread_self& self, applier::applier& appl)
     // initiate shutdown of the runtime systems on all localities
     components::stubs::runtime_support::shutdown_all(appl, appl.get_prefix());
 
-    return threadmanager::terminated;
+    return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

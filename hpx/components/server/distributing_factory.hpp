@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/components/component_type.hpp>
-#include <hpx/components/action.hpp>
+#include <hpx/runtime/actions/action.hpp>
 
 namespace hpx { namespace components { namespace server { namespace detail
 {
@@ -42,8 +42,8 @@ namespace hpx { namespace components { namespace server { namespace detail
         // exposed functionality of this component
 
         /// \brief Action to create new components
-        threadmanager::thread_state create(
-            threadmanager::px_thread_self& self, applier::applier& app,
+        threads::thread_state create(
+            threads::thread_self& self, applier::applier& app,
             naming::id_type* gid, components::component_type type, 
             std::size_t count); 
 
@@ -51,7 +51,7 @@ namespace hpx { namespace components { namespace server { namespace detail
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
-        typedef result_action2<
+        typedef hpx::actions::result_action2<
             distributing_factory, naming::id_type, factory_create_component, 
             components::component_type, std::size_t, 
             &distributing_factory::create

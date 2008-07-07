@@ -21,7 +21,7 @@ namespace hpx { namespace lcos
     /// \note   A \a barrier is not a LCO in the sense that it has no global id
     ///         and it can't be triggered using the action (parcel) mechanism. 
     ///         It is just a low level synchronization primitive allowing to 
-    ///         synchronize a given number of \a px_threads.
+    ///         synchronize a given number of \a threads.
     class barrier 
     {
     private:
@@ -35,11 +35,11 @@ namespace hpx { namespace lcos
                 boost::intrusive::link_mode<boost::intrusive::normal_link>
             > hook_type;
 
-            barrier_queue_entry(threadmanager::thread_id_type id)
+            barrier_queue_entry(threads::thread_id_type id)
               : id_(id)
             {}
 
-            threadmanager::thread_id_type id_;
+            threads::thread_id_type id_;
             hook_type slist_hook_;
         };
 
@@ -59,11 +59,11 @@ namespace hpx { namespace lcos
           : number_of_threads_(number_of_threads)
         {}
 
-        /// The function \a wait will block the a number of entering \a px_threads
+        /// The function \a wait will block the a number of entering \a threads
         /// (as given by the constructor parameter \a number_of_threads), 
-        /// releasing all waiting threads as soon as the last \a px_thread
+        /// releasing all waiting threads as soon as the last \a thread
         /// entered this function.
-        void wait(threadmanager::px_thread_self& self)
+        void wait(threads::thread_self& self)
         {
             mutex_type::scoped_lock l(mtx_);
             if (queue_.size() < number_of_threads_-1) {
@@ -71,16 +71,16 @@ namespace hpx { namespace lcos
                 queue_.push_back(e);
 
                 l.unlock();
-                self.yield(threadmanager::suspended);
+                self.yield(threads::suspended);
             }
             else {
             // slist::swap has a bug in Boost 1.35.0
 #if BOOST_VERSION < 103600
                 // release the threads
                 while (!queue_.empty()) {
-                    threadmanager::thread_id_type id = queue_.front().id_;
+                    threads::thread_id_type id = queue_.front().id_;
                     queue_.pop_front();
-                    set_thread_state(self, id, threadmanager::pending);
+                    set_thread_state(self, id, threads::pending);
                 }
 #else
                 // swap the list
@@ -90,9 +90,9 @@ namespace hpx { namespace lcos
 
                 // release the threads
                 while (!queue.empty()) {
-                    threadmanager::thread_id_type id = queue.front().id_;
+                    threads::thread_id_type id = queue.front().id_;
                     queue.pop_front();
-                    set_thread_state(self, id, threadmanager::pending);
+                    set_thread_state(self, id, threads::pending);
                 }
 #endif
             }

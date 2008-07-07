@@ -40,7 +40,7 @@ namespace hpx { namespace components { namespace stubs
 
         /// Create a new instance of an accumulator
         static naming::id_type 
-        create(threadmanager::px_thread_self& self, applier::applier& appl, 
+        create(threads::thread_self& self, applier::applier& appl, 
             naming::id_type const& targetgid)
         {
             return stubs::runtime_support::create_component(
@@ -74,7 +74,7 @@ namespace hpx { namespace components { namespace stubs
         /// Query the current value of the server#accumulator instance 
         /// with the given \a gid. Block for the current accumulator value to 
         /// be returned.
-        static double query(threadmanager::px_thread_self& self, 
+        static double query(threads::thread_self& self, 
             applier::applier& appl, naming::id_type gid) 
         {
             // The following get_result yields control while the action above 
@@ -119,7 +119,7 @@ namespace hpx { namespace components { namespace stubs
         /// Query the current value of the server#accumulator instance 
         /// with the given \a gid. Block for the current accumulator 
         /// value to be returned.
-        double query(threadmanager::px_thread_self& self,naming::id_type gid) 
+        double query(threads::thread_self& self,naming::id_type gid) 
         {
             return query(self, app_, gid);
         }

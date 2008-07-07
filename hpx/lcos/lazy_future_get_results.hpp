@@ -31,7 +31,7 @@
 #define N BOOST_PP_ITERATION()
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    Result get_result(threadmanager::px_thread_self& self,
+    Result get_result(threads::thread_self& self,
         applier::applier& appl, naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {

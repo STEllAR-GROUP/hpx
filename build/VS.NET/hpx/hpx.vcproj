@@ -367,10 +367,10 @@
 					</FileConfiguration>
 				</File>
 				<Filter
-					Name="ActionManager"
+					Name="Actions"
 					>
 					<File
-						RelativePath="..\..\..\src\runtime\action_manager\action_manager.cpp"
+						RelativePath="..\..\..\src\runtime\actions\action_manager.cpp"
 						>
 					</File>
 				</Filter>
@@ -435,19 +435,11 @@
 					</Filter>
 				</Filter>
 				<Filter
-					Name="Threadmanager"
+					Name="Threads"
 					>
 					<File
-						RelativePath="..\..\..\src\runtime\threadmanager\threadmanager.cpp"
+						RelativePath="..\..\..\src\runtime\threads\threadmanager.cpp"
 						>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerOutput="0"
-							/>
-						</FileConfiguration>
 					</File>
 				</Filter>
 				<Filter
@@ -489,7 +481,7 @@
 				Name="Include"
 				>
 				<File
-					RelativePath="..\..\..\hpx\include\action_manager.hpp"
+					RelativePath="..\..\..\hpx\include\actions.hpp"
 					>
 				</File>
 				<File
@@ -613,14 +605,38 @@
 				Name="Runtime"
 				>
 				<File
+					RelativePath="..\..\..\hpx\runtime\get_lva.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\runtime\runtime.hpp"
 					>
 				</File>
 				<Filter
-					Name="ActionManager"
+					Name="Actions"
 					>
 					<File
-						RelativePath="..\..\..\hpx\runtime\action_manager\action_manager.hpp"
+						RelativePath="..\..\..\hpx\runtime\actions\action.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\actions\action_constructors.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\actions\action_implementations.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\actions\action_manager.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\actions\continuation.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\actions\continuation_impl.hpp"
 						>
 					</File>
 				</Filter>
@@ -733,14 +749,14 @@
 					</Filter>
 				</Filter>
 				<Filter
-					Name="Threadmanager"
+					Name="Threads"
 					>
 					<File
-						RelativePath="..\..\..\hpx\runtime\threadmanager\px_thread.hpp"
+						RelativePath="..\..\..\hpx\runtime\threads\px_thread.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\hpx\runtime\threadmanager\threadmanager.hpp"
+						RelativePath="..\..\..\hpx\runtime\threads\threadmanager.hpp"
 						>
 					</File>
 				</Filter>
@@ -753,31 +769,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\hpx\components\action.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\hpx\components\action_constructors.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\hpx\components\action_implementations.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\hpx\components\component_type.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\hpx\components\continuation.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\hpx\components\continuation_impl.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\hpx\components\get_lva.hpp"
 					>
 				</File>
 				<File
