@@ -209,7 +209,7 @@ namespace hpx { namespace threads
 
     protected:
         // this is the thread function executing the work items in the queue
-        void tfunc(bool is_master_thread);
+        void tfunc(std::size_t num_thread);
 
     public:
         /// this notifies the thread manager that there is some more work 

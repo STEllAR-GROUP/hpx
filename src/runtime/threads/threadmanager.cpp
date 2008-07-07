@@ -320,13 +320,68 @@ namespace hpx { namespace threads
         }
     }
 
+#if defined(_WIN32) || defined(_WIN64)
+    bool set_affinity(boost::thread& thrd, unsigned int num_thread)
+    {
+        unsigned int num_of_cores = boost::thread::hardware_concurrency();
+        if (0 == num_of_cores)
+            num_of_cores = 1;     // assume one core
+        unsigned int affinity = num_thread % num_of_cores;
+
+        DWORD_PTR process_affinity = 0, system_affinity = 0;
+        if (GetProcessAffinityMask(GetCurrentProcess(), &process_affinity, 
+              &system_affinity))
+        {
+            DWORD_PTR mask = 0x1 << affinity;
+            while (!(mask & process_affinity)) {
+                mask <<= 1;
+                if (0 == mask)
+                    mask = 0x01;
+            }
+            return SetThreadAffinityMask(thrd.native_handle(), mask) != 0;
+        }
+        return false;
+    }
+    inline bool set_affinity(unsigned int affinity)
+    {
+        return true;
+    }
+#else
+    #include <sched.h>    // declares the scheduling interface
+
+    inline bool set_affinity(boost::thread& thrd, unsigned int affinity)
+    {
+        return true;
+    }
+    bool set_affinity(unsigned int num_thread)
+    {
+        unsigned int num_of_cores = boost::thread::hardware_concurrency();
+        if (0 == num_of_cores)
+            num_of_cores = 1;     // assume one core
+        unsigned int affinity = num_thread % num_of_cores;
+
+        cpu_set_t cpu;
+        CPU_ZERO(&cpu);
+        CPU_SET(affinity, &cpu);
+        if (sched_setaffinity (0, sizeof(cpu), &cpu) == 0) {
+            sleep(0);   // allow the OS to pick up the change
+            return true;
+        }
+        return false;
+    }
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     // main function executed by all OS threads managed by this threadmanager
-    void threadmanager::tfunc(bool is_master_thread)
+    void threadmanager::tfunc(std::size_t num_thread)
     {
 #if HPX_DEBUG != 0
         ++thread_count_;
 #endif
+        // the thread with number zero is the master
+        bool is_master_thread = (0 == num_thread) ? true : false;
+        set_affinity(num_thread);     // set affinity on Linux systems
+
         // run the work queue
         boost::coroutines::prepare_main_thread main_thread;
         while (true) {
@@ -411,28 +466,6 @@ namespace hpx { namespace threads
 #endif
     }
 
-#if defined(_WIN32) || defined(_WIN64)
-    void set_affinity(boost::thread& thrd, unsigned int affinity)
-    {
-        DWORD_PTR process_affinity = 0, system_affinity = 0;
-        if (GetProcessAffinityMask(GetCurrentProcess(), &process_affinity, 
-              &system_affinity))
-        {
-            DWORD_PTR mask = 0x1 << affinity;
-            while (!(mask & process_affinity)) {
-                mask <<= 1;
-                if (0 == mask)
-                    mask = 0x01;
-            }
-            SetThreadAffinityMask(thrd.native_handle(), mask);
-        }
-    }
-#else
-    void set_affinity(boost::thread& thrd, unsigned int affinity)
-    {
-    }
-#endif
-
     ///////////////////////////////////////////////////////////////////////////
     bool threadmanager::run(std::size_t num_threads) 
     {
@@ -449,17 +482,12 @@ namespace hpx { namespace threads
         running_ = false;
         try {
             // run threads and wait for initialization to complete
-            unsigned int num_of_cores = boost::thread::hardware_concurrency();
-            if (0 == num_of_cores)
-                num_of_cores = 1;     // assume one core
-
             running_ = true;
             while (num_threads-- != 0) {
-                // create a new thread and set its affinity, the last thread 
-                // is the master
+                // create a new thread and set its affinity
                 threads_.push_back(new boost::thread(
-                    boost::bind(&threadmanager::tfunc, this, !num_threads)));
-                set_affinity(threads_.back(), num_threads % num_of_cores);
+                    boost::bind(&threadmanager::tfunc, this, num_threads)));
+                set_affinity(threads_.back(), num_threads);
             }
 
             // start timer pool as well
