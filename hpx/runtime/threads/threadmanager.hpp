@@ -234,6 +234,11 @@ namespace hpx { namespace threads
         thread_state at_timer (thread_self& self, TimeType const& expire, 
             thread_id_type id, thread_state newstate);
 
+        /// This function is the workhorse behind the two public set_state 
+        /// functions 
+        thread_state set_state(thread_self* self, thread_id_type id, 
+            thread_state new_state);
+
     private:
         /// this thread manager has exactly as much threads as requested
         boost::ptr_vector<boost::thread> threads_;

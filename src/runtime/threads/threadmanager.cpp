@@ -50,12 +50,25 @@ namespace hpx { namespace threads
 
     /// The set_state function is part of the thread related API and allows
     /// to change the state of one of the threads managed by this threadmanager
-    thread_state threadmanager::set_state(thread_self& self, 
-        thread_id_type id, thread_state new_state)
+    inline thread_state threadmanager::set_state(thread_self& self, 
+        thread_id_type id, thread_state newstate)
+    {
+        return set_state(&self, id, newstate);
+    }
+
+    /// The set_state function is part of the thread related API and allows
+    /// to change the state of one of the threads managed by this threadmanager
+    inline thread_state threadmanager::set_state(thread_id_type id, 
+        thread_state newstate)
+    {
+        return set_state(NULL, id, newstate);
+    }
+
+    thread_state threadmanager::set_state(thread_self* self, thread_id_type id, 
+        thread_state new_state)
     {
         // set_state can't be used to force a thread into active state
-        if (new_state == active)
-        {
+        if (new_state == active) {
             boost::throw_exception(hpx::exception(hpx::bad_parameter));
             return unknown;
         }
@@ -77,10 +90,15 @@ namespace hpx { namespace threads
             // yield control for the main thread manager loop to release this
             // thread
             if (previous_state == active) {
+                // if we can't suspend (because we don't know the PX thread
+                // executing this function) we need to return 'unknown'
+                if (NULL == self) 
+                    return unknown;
+
                 do {
-                    active_set_state_.enqueue(self.get_thread_id());
+                    active_set_state_.enqueue(self->get_thread_id());
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(lk);
-                    self.yield(suspended);
+                    self->yield(suspended);
                 } while ((previous_state = thrd->get_state()) == active);
             }
 
@@ -98,56 +116,7 @@ namespace hpx { namespace threads
 
             // So all what we do here is to set the new state.
             thrd->set_state(new_state);
-            if (new_state == pending) 
-            {
-                work_items_.enqueue(thrd);
-                cond_.notify_one();
-            }
-            return previous_state;
-        }
-        return unknown;
-    }
-
-    /// The set_state function is part of the thread related API and allows
-    /// to change the state of one of the threads managed by this threadmanager
-    thread_state threadmanager::set_state(thread_id_type id, 
-        thread_state new_state)
-    {
-        // set_state can't be used to force a thread into active state
-        if (new_state == active)
-        {
-            boost::throw_exception(hpx::exception(hpx::bad_parameter));
-            return unknown;
-        }
-
-        // lock data members while setting a thread state
-        mutex_type::scoped_lock lk(mtx_);
-
-        thread_map_type::iterator map_iter = thread_map_.find(id);
-        if (map_iter != thread_map_.end())
-        {
-            boost::intrusive_ptr<thread> thrd = map_iter->second;
-            thread_state previous_state = thrd->get_state();
-
-            // nothing to do here if the state doesn't change
-            if (new_state == previous_state)
-                return new_state;
-
-            // if the thread to set the state for is currently active we do
-            // nothing but return \a thread_state#unknown
-            if (previous_state == active) 
-                return unknown;
-
-            // If the previous state was pending we are supposed to remove the
-            // thread from the queue. But in order to avoid linearly looking 
-            // through the queue we defer this to the thread function, which 
-            // at some point will come across this thread simply skipping it 
-            // (if it's not pending anymore). 
-
-            // So all what we do here is to set the new state.
-            thrd->set_state(new_state);
-            if (new_state == pending)
-            {
+            if (new_state == pending) {
                 work_items_.enqueue(thrd);
                 cond_.notify_one();
             }
@@ -408,8 +377,7 @@ namespace hpx { namespace threads
                 // Re-add this work item to our list of work items if the PX
                 // thread should be re-scheduled. If the PX thread is suspended 
                 // now we just keep it in the map of threads.
-                if (state == pending) 
-                {
+                if (state == pending) {
                     work_items_.enqueue(thrd);
                     cond_.notify_one();
                 }
@@ -438,7 +406,7 @@ namespace hpx { namespace threads
 
             // if nothing else has to be done either wait or terminate
             if (work_items_.empty() && active_set_state_.empty()) {
-                // no obvious work has to be done, so a lock won't hurt to much
+                // no obvious work has to be done, so a lock won't hurt too much
                 mutex_type::scoped_lock lk(mtx_);
 
                 // stop running after all PX threads have been terminated
@@ -461,7 +429,7 @@ namespace hpx { namespace threads
         }
 
 #if HPX_DEBUG != 0
-        // the last thread is allowed to exit only if no more threads exist
+        // the last OS thread is allowed to exit only if no more PX threads exist
         BOOST_ASSERT(0 != --thread_count_ || thread_map_.empty());
 #endif
     }
@@ -484,9 +452,11 @@ namespace hpx { namespace threads
             // run threads and wait for initialization to complete
             running_ = true;
             while (num_threads-- != 0) {
-                // create a new thread and set its affinity
+                // create a new thread
                 threads_.push_back(new boost::thread(
                     boost::bind(&threadmanager::tfunc, this, num_threads)));
+
+                // set the new threads affinity (on Windows systems)
                 set_affinity(threads_.back(), num_threads);
             }
 

@@ -38,11 +38,11 @@
         if (appl.address_is_local(gid, addr)) {
             // local, direct execution
             (*this->impl_)->set_data(Action::execute_function(
-                appl, addr, BOOST_PP_ENUM_PARAMS(N, arg)));
+                appl, addr.address_, BOOST_PP_ENUM_PARAMS(N, arg)));
         }
         else {
             // remote execution
-            appl.apply_c<Action>(this->get_gid(appl), gid, 
+            appl.apply_c<Action>(addr, this->get_gid(appl), gid, 
                 BOOST_PP_ENUM_PARAMS(N, arg));
         }
     }

@@ -50,16 +50,8 @@ namespace hpx { namespace applier
         ///    appl_.apply<add_action>(gid, ...);
         /// \endcode
         template <typename Action>
-        bool apply (naming::id_type const& gid)
+        bool apply (naming::address const& addr, naming::id_type const& gid)
         {
-            // Determine whether the gid is local or remote
-            naming::address addr;
-            if (address_is_local(gid, addr)) {
-                detail::apply_helper0<Action>::call(thread_manager_, 
-                    *this, addr.address_);
-                return true;     // no parcel has been sent (dest is local)
-            }
-
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
             parcelset::parcel p (gid, new Action());
@@ -70,22 +62,30 @@ namespace hpx { namespace applier
             return false;     // destination is remote
         }
 
+        template <typename Action>
+        bool apply (naming::id_type const& gid)
+        {
+            // Determine whether the gid is local or remote
+            naming::address addr;
+            if (address_is_local(gid, addr)) {
+                detail::apply_helper0<Action>::call(thread_manager_, 
+                    *this, addr.address_);
+                return true;     // no parcel has been sent (dest is local)
+            }
+
+            // apply remotely
+            return apply<Action>(addr, gid);
+        }
+
         /// \note A call to applier's apply function would look like:
         /// \code
         ///    appl_.apply<add_action>(cont, gid, ...);
         /// \endcode
         template <typename Action>
-        bool apply (actions::continuation* c, naming::id_type const& gid)
+        bool apply (naming::address const& addr, actions::continuation* c, 
+            naming::id_type const& gid)
         {
             actions::continuation_type cont(c);
-            
-            // Determine whether the gid is local or remote
-            naming::address addr;
-            if (address_is_local(gid, addr)) {
-                detail::apply_helper0<Action>::call(cont, thread_manager_, 
-                    *this, addr.address_);
-                return true;     // no parcel has been sent (dest is local)
-            }
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
@@ -95,6 +95,30 @@ namespace hpx { namespace applier
             // Send the parcel through the parcel handler
             parcel_handler_.put_parcel(p);
             return false;     // destination is remote
+        }
+
+        template <typename Action>
+        bool apply (actions::continuation* c, naming::id_type const& gid)
+        {
+            actions::continuation_type cont(c);
+
+            // Determine whether the gid is local or remote
+            naming::address addr;
+            if (address_is_local(gid, addr)) {
+                detail::apply_helper0<Action>::call(cont, thread_manager_, 
+                    *this, addr.address_);
+                return true;     // no parcel has been sent (dest is local)
+            }
+
+            // apply remotely
+            return apply<Action>(addr, c, gid);
+        }
+
+        template <typename Action>
+        bool apply_c (naming::address const& addr, 
+            naming::id_type const& targetgid, naming::id_type const& gid)
+        {
+            return apply<Action>(addr, new actions::continuation(targetgid), gid);
         }
 
         template <typename Action>
@@ -108,6 +132,20 @@ namespace hpx { namespace applier
         ///////////////////////////////////////////////////////////////////////
         // one parameter version
         template <typename Action, typename Arg0>
+        bool apply (naming::address const& addr, naming::id_type const& gid, 
+            Arg0 const& arg0)
+        {
+            // If remote, create a new parcel to be sent to the destination
+            // Create a new parcel with the gid, action, and arguments
+            parcelset::parcel p (gid, new Action(arg0));
+            p.set_destination_addr(addr);   // avoid to resolve address again
+
+            // Send the parcel through the parcel handler
+            parcel_handler_.put_parcel(p);
+            return false;     // destination is remote
+        }
+
+        template <typename Action, typename Arg0>
         bool apply (naming::id_type const& gid, Arg0 const& arg0)
         {
             // Determine whether the gid is local or remote
@@ -118,9 +156,19 @@ namespace hpx { namespace applier
                 return true;     // no parcel has been sent (dest is local)
             }
 
+            // apply remotely
+            return apply<Action>(addr, gid, arg0);
+        }
+
+        template <typename Action, typename Arg0>
+        bool apply (naming::address const& addr, actions::continuation* c, 
+            naming::id_type const& gid, Arg0 const& arg0)
+        {
+            actions::continuation_type cont(c);
+
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid, new Action(arg0));
+            parcelset::parcel p (gid, new Action(arg0), cont);
             p.set_destination_addr(addr);   // avoid to resolve address again
 
             // Send the parcel through the parcel handler
@@ -142,14 +190,17 @@ namespace hpx { namespace applier
                 return true;     // no parcel has been sent (dest is local)
             }
 
-            // If remote, create a new parcel to be sent to the destination
-            // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid, new Action(arg0), cont);
-            p.set_destination_addr(addr);   // avoid to resolve address again
+            // apply remotely
+            return apply<Action>(addr, c, gid, arg0);
+        }
 
-            // Send the parcel through the parcel handler
-            parcel_handler_.put_parcel(p);
-            return false;     // destination is remote
+        template <typename Action, typename Arg0>
+        bool apply_c (naming::address const& addr, 
+            naming::id_type const& targetgid, naming::id_type const& gid, 
+            Arg0 const& arg0)
+        {
+            return apply<Action>(addr, new actions::continuation(targetgid), 
+                gid, arg0);
         }
 
         template <typename Action, typename Arg0>

@@ -17,14 +17,29 @@ threads::thread_state hpx_main(threads::thread_self& self,
     // try to access some memory directly
     boost::uint32_t value = 0;
 
-    appl.apply<components::server::memory::store32_action>(
-        appl.get_memory_gid(), boost::uint64_t(&value), 1);
+    // store a value to memory
+    typedef components::server::memory::store32_action store_action_type;
+    appl.apply<store_action_type>(appl.get_memory_gid(), boost::uint64_t(&value), 1);
 
     BOOST_TEST(value == 1);
 
+    // read the value back from memory (using an eager_future)
+    typedef components::server::memory::load32_action load_action_type;
+    lcos::eager_future<load_action_type, boost::uint32_t> ef(
+        appl, appl.get_memory_gid(), boost::uint64_t(&value));
+
+    boost::uint32_t result1 = ef.get_result(self);
+    BOOST_TEST(result1 == value);
+
+    // read the value back from memory (using a lazy_future)
+    lcos::lazy_future<load_action_type, boost::uint32_t> lf;
+
+    boost::uint32_t result2 = lf.get_result(self, appl, appl.get_memory_gid(), 
+        boost::uint64_t(&value));
+    BOOST_TEST(result2 == value);
+
     // initiate shutdown of the runtime system
-    components::stubs::runtime_support::shutdown_all(appl, 
-        appl.get_runtime_support_gid());
+    components::stubs::runtime_support::shutdown_all(appl);
 
     return threads::terminated;
 }

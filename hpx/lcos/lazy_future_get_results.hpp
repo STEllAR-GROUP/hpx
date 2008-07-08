@@ -35,8 +35,16 @@
         applier::applier& appl, naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        // initialize the operation
-        appl.apply_c<Action>(this->get_gid(appl), gid, 
+        // Determine whether the gid is local or remote
+        naming::address addr;
+        if (appl.address_is_local(gid, addr)) {
+            // local, direct execution
+            return Action::execute_function(appl, addr,
+                BOOST_PP_ENUM_PARAMS(N, arg));
+        }
+
+        // initialize the remote operation
+        appl.apply_c<Action>(addr, this->get_gid(appl), gid, 
             BOOST_PP_ENUM_PARAMS(N, arg));
 
         // wait for the result (yield control)

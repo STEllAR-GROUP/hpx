@@ -30,6 +30,20 @@
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    bool apply (naming::address const& addr, naming::id_type const& gid, 
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+    {
+        // If remote, create a new parcel to be sent to the destination
+        // Create a new parcel with the gid, action, and arguments
+        parcelset::parcel p (gid, new Action(BOOST_PP_ENUM_PARAMS(N, arg)));
+        p.set_destination_addr(addr);   // avoid to resolve address again
+
+        // Send the parcel through the parcel handler
+        parcel_handler_.put_parcel(p);
+        return false;     // destination is remote
+    }
+
+    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     bool apply (naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
@@ -44,9 +58,21 @@
             return true;     // no parcel has been sent (dest is local)
         }
 
+        // apply remotely
+        return apply<Action>(addr, gid, BOOST_PP_ENUM_PARAMS(N, arg));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    bool apply (naming::address const& addr, actions::continuation* c, 
+        naming::id_type const& gid, 
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+    {
+        actions::continuation_type cont(c);
+
         // If remote, create a new parcel to be sent to the destination
         // Create a new parcel with the gid, action, and arguments
-        parcelset::parcel p (gid, new Action(BOOST_PP_ENUM_PARAMS(N, arg)));
+        parcelset::parcel p (gid, new Action(BOOST_PP_ENUM_PARAMS(N, arg)), cont);
         p.set_destination_addr(addr);   // avoid to resolve address again
 
         // Send the parcel through the parcel handler
@@ -54,7 +80,6 @@
         return false;     // destination is remote
     }
 
-    ///////////////////////////////////////////////////////////////////////////
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     bool apply (actions::continuation* c, naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
@@ -72,14 +97,17 @@
             return true;     // no parcel has been sent (dest is local)
         }
 
-        // If remote, create a new parcel to be sent to the destination
-        // Create a new parcel with the gid, action, and arguments
-        parcelset::parcel p (gid, new Action(BOOST_PP_ENUM_PARAMS(N, arg)), cont);
-        p.set_destination_addr(addr);   // avoid to resolve address again
+        // apply remotely
+        return apply<Action>(addr, c, gid, BOOST_PP_ENUM_PARAMS(N, arg));
+    }
 
-        // Send the parcel through the parcel handler
-        parcel_handler_.put_parcel(p);
-        return false;     // destination is remote
+    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    bool apply_c (naming::address const& addr, naming::id_type const& targetgid, 
+        naming::id_type const& gid,
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+    {
+        return apply<Action>(addr, new actions::continuation(targetgid), 
+            gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>

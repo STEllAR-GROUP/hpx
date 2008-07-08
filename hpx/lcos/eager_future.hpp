@@ -50,6 +50,7 @@ namespace hpx { namespace lcos
     template <typename Action, typename Result, typename DirectExecute>
     class eager_future;
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
     class eager_future<Action, Result, boost::mpl::false_> 
         : public simple_future<Result>
@@ -128,7 +129,7 @@ namespace hpx { namespace lcos
             }
             else {
                 // remote execution
-                appl.apply_c<Action>(this->get_gid(appl), gid);
+                appl.apply_c<Action>(addr, this->get_gid(appl), gid);
             }
         }
 
@@ -151,11 +152,12 @@ namespace hpx { namespace lcos
             naming::address addr;
             if (appl.address_is_local(gid, addr)) {
                 // local, direct execution
-                (*this->impl_)->set_data(Action::execute_function(appl, addr, arg0));
+                (*this->impl_)->set_data(
+                    Action::execute_function(appl, addr.address_, arg0));
             }
             else {
                 // remote execution
-                appl.apply_c<Action>(this->get_gid(appl), gid, arg0);
+                appl.apply_c<Action>(addr, this->get_gid(appl), gid, arg0);
             }
         }
 
