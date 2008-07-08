@@ -69,9 +69,10 @@ int main(int argc, char* argv[])
         hpx::parcelset::parcelhandler ph(dgas_c, pp);
 
         // Create a new thread-manager
-        hpx::threads::threadmanager tm;
+        hpx::util::io_service_pool timerpool;
+        hpx::threads::threadmanager tm(timerpool);
         // Create a new applier
-        hpx::applier::applier app(dgas_c, ph, tm);
+        hpx::applier::applier app(ph, tm, 0, 0);
         // Create a new action-manager
         hpx::actions::action_manager am(app);
 

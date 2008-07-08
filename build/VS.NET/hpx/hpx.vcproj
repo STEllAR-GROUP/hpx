@@ -865,10 +865,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\hpx\lcos\simple_dataflow_template.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\hpx\lcos\simple_future.hpp"
 					>
 				</File>
@@ -883,10 +879,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\docs\hpx.doxy"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\Makefile.am"
 				>
 			</File>
 		</Filter>

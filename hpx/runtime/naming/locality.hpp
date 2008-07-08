@@ -43,7 +43,7 @@ namespace hpx { namespace naming
                     boost::asio::io_service io_service;
                     tcp::resolver resolver(io_service);
                     tcp::resolver::query query(
-                        addr.empty() ? addr : boost::asio::ip::host_name(), 
+                        !addr.empty() ? addr : boost::asio::ip::host_name(), 
                         boost::lexical_cast<std::string>(port));
 
                     endpoint_ = *resolver.resolve(query);

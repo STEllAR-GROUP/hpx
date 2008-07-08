@@ -29,6 +29,8 @@ namespace hpx { namespace components
 
         component_distributing_factory,   // factory combined with load balancing
 
+        component_process,          ///< global representation of a process
+
         // test categories
         component_accumulator,      // simple accumulator
 

@@ -29,12 +29,11 @@ namespace hpx { namespace applier
     {
     public:
         // constructor
-        applier(naming::resolver_client const& dgas_c, 
-                parcelset::parcelhandler &ph, threads::threadmanager& tm,
-                components::server::runtime_support const& rts,
-                components::server::memory const& mem)
-          : dgas_client_(dgas_c), parcel_handler_(ph), thread_manager_(tm),
-            runtime_support_(rts), memory_(mem)
+        applier(parcelset::parcelhandler &ph, threads::threadmanager& tm,
+                boost::uint64_t rts, boost::uint64_t mem)
+          : parcel_handler_(ph), thread_manager_(tm),
+            runtime_support_id_(parcel_handler_.get_prefix().get_msb(), rts), 
+            memory_id_(parcel_handler_.get_prefix().get_msb(), mem)
         {}
 
         // destructor
@@ -221,7 +220,7 @@ namespace hpx { namespace applier
         /// applier instance has been created with.
         naming::resolver_client const& get_dgas_client() const
         {
-            return dgas_client_;
+            return parcel_handler_.get_resolver();
         }
 
         /// \brief Access the \a parcelhandler instance associated with this 
@@ -266,18 +265,16 @@ namespace hpx { namespace applier
 
         /// By convention the runtime_support has a gid identical to the prefix 
         /// of the locality the runtime_support is responsible for
-        naming::id_type get_runtime_support_gid() const
+        naming::id_type const& get_runtime_support_gid() const
         {
-            return naming::id_type(parcel_handler_.get_prefix().get_msb(), 
-                boost::uint64_t(&runtime_support_));
+            return runtime_support_id_;
         }
 
         /// By convention every memory address has gid identical to the prefix 
         /// of the locality the runtime_support is responsible for
-        naming::id_type get_memory_gid() const
+        naming::id_type const& get_memory_gid() const
         {
-            return naming::id_type(parcel_handler_.get_prefix().get_msb(), 
-                boost::uint64_t(&memory_));
+            return memory_id_;
         }
 
         /// Test whether the given address (gid) is local or remote
@@ -294,7 +291,7 @@ namespace hpx { namespace applier
             }
 
             // Resolve the address of the gid
-            if (!dgas_client_.resolve(gid, addr))
+            if (!parcel_handler_.get_resolver().resolve(gid, addr))
             {
                 boost::throw_exception(
                     hpx::exception(hpx::unknown_component_address));
@@ -303,11 +300,10 @@ namespace hpx { namespace applier
         }
 
     private:
-        naming::resolver_client const& dgas_client_;
         parcelset::parcelhandler& parcel_handler_;
         threads::threadmanager& thread_manager_;
-        components::server::runtime_support const& runtime_support_;
-        components::server::memory const& memory_;
+        naming::id_type runtime_support_id_;
+        naming::id_type memory_id_;
     };
 
     typedef threads::thread_state full_thread_function_type(

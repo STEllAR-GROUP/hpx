@@ -51,8 +51,8 @@ namespace hpx
         parcel_port_(parcel_pool_, address, port),
         thread_manager_(timer_pool_),
         parcel_handler_(dgas_client_, parcel_port_, &thread_manager_),
-        applier_(dgas_client_, parcel_handler_, thread_manager_, 
-            runtime_support_, memory_),
+        applier_(parcel_handler_, thread_manager_, 
+            boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_)
     {}
 
@@ -63,8 +63,8 @@ namespace hpx
         parcel_port_(parcel_pool_, address),
         thread_manager_(timer_pool_),
         parcel_handler_(dgas_client_, parcel_port_, &thread_manager_),
-        applier_(dgas_client_, parcel_handler_, thread_manager_, 
-            runtime_support_, memory_),
+        applier_(parcel_handler_, thread_manager_, 
+            boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_)
     {}
 

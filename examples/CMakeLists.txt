@@ -19,3 +19,7 @@ set (parcelset_server_SOURCES parcelset/parcelset_server.cpp)
 add_executable (parcelset_server ${parcelset_server_SOURCES})
 target_link_libraries(parcelset_server hpx ${Boost_LIBRARIES})
 
+set (accumulator_SOURCES accumulator/accumulator_client.cpp)
+add_executable (accumulator ${accumulator_SOURCES})
+target_link_libraries(accumulator hpx ${Boost_LIBRARIES})
+
