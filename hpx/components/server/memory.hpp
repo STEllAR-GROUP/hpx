@@ -78,7 +78,7 @@ namespace hpx { namespace components { namespace server
         threads::thread_state load8(threads::thread_self& self, 
             applier::applier& app, boost::uint8_t* value, boost::uint64_t addr)
         {
-            value = local_load8(app, addr);
+            *value = local_load8(app, addr);
             return threads::terminated;
         }
 
@@ -86,7 +86,7 @@ namespace hpx { namespace components { namespace server
         threads::thread_state load16(threads::thread_self& self, 
             applier::applier& app, boost::uint16_t* value, boost::uint64_t addr)
         {
-            value = local_load16(app, addr);
+            *value = local_load16(app, addr);
             return threads::terminated;
         }
 
@@ -94,7 +94,7 @@ namespace hpx { namespace components { namespace server
         threads::thread_state load32(threads::thread_self& self, 
             applier::applier& app, boost::uint32_t* value, boost::uint64_t addr)
         {
-            value = local_load32(app, addr);
+            *value = local_load32(app, addr);
             return threads::terminated;
         }
 
@@ -102,7 +102,7 @@ namespace hpx { namespace components { namespace server
         threads::thread_state load64(threads::thread_self& self, 
             applier::applier& app, boost::uint64_t* value, boost::uint64_t addr)
         {
-            value = local_load64(app, addr);
+            *value = local_load64(app, addr);
             return threads::terminated;
         }
 
