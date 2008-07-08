@@ -515,7 +515,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename Result, int Action, typename T0, 
         threads::thread_state(Component::*F)(
-            threads::thread_self&, applier::applier&, Result*, T0)
+            threads::thread_self&, applier::applier&, Result*, T0) 
     >
     class result_action1
       : public action<Component, Action, 
