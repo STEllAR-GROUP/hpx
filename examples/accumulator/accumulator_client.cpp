@@ -18,7 +18,8 @@ hpx_main(threads::thread_self& self, applier::applier& appl)
 {
     // create an accumulator locally
     using hpx::components::accumulator;
-    accumulator accu (accumulator::create(self, appl, appl.get_prefix()));
+    accumulator accu (accumulator::create(self, appl, 
+        appl.get_runtime_support_gid()));
 
     // print some message
     std::cout << "accumulator client, you may enter some commands "
@@ -62,7 +63,7 @@ hpx_main(threads::thread_self& self, applier::applier& appl)
     accu.free(appl.get_prefix());     // this invalidates the remote reference
 
     // initiate shutdown of the runtime systems on all localities
-    components::stubs::runtime_support::shutdown_all(appl, appl.get_prefix());
+    components::stubs::runtime_support::shutdown_all(appl);
 
     return threads::terminated;
 }

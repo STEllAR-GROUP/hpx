@@ -60,7 +60,10 @@ namespace hpx { namespace lcos
     {
         // components must contain a typedef for wrapping_type defining the
         // wrapper type used to encapsulate instances of this component
-        typedef components::wrapper<base_lco_with_value> wrapping_type;
+        typedef components::wrapper<
+            base_lco_with_value, components::detail::this_type, 
+            boost::mpl::true_> 
+        wrapping_type;
 
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
@@ -102,7 +105,10 @@ namespace hpx { namespace lcos
     {
         // components must contain a typedef for wrapping_type defining the
         // wrapper type used to encapsulate instances of this component
-        typedef components::wrapper<base_lco_with_value> wrapping_type;
+        typedef components::wrapper<
+            base_lco_with_value, components::detail::this_type, 
+            boost::mpl::true_> 
+        wrapping_type;
 
         /// Destructor, needs to be virtual to allow for clean destruction of
         /// derived objects

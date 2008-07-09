@@ -117,6 +117,12 @@ namespace hpx { namespace components { namespace server { namespace detail
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server 
 {
+    /// \class accumulator accumulator.hpp hpx/components/accumulator.hpp
+    ///
+    /// The accumulator class is a small example components demonstrating the
+    /// main principles of writing your own components. It exposes 4 different
+    /// actions: init, add, query, and print, showing how to used and implement
+    /// functionality in a way conformant with the HPX runtime system. 
     class accumulator 
       : public wrapper<detail::accumulator, accumulator>
     {
