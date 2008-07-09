@@ -3,6 +3,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+# Single file tests
 set (am_test_client_SOURCES am_test_client/am_test_client.cpp)
 add_executable (am_test_client_exe ${am_test_client_SOURCES})
 target_link_libraries(am_test_client_exe hpx ${Boost_LIBRARIES})
@@ -30,3 +31,8 @@ target_link_libraries(barrier_tests_exe hpx ${Boost_LIBRARIES})
 set (memory_tests_SOURCES memory_tests/memory_tests.cpp)
 add_executable (memory_tests_exe ${memory_tests_SOURCES})
 target_link_libraries(memory_tests_exe hpx ${Boost_LIBRARIES})
+
+# performance/measurement tests
+set (measure_thread_execution_SOURCES performance/measure_thread_execution.cpp)
+add_executable (measure_thread_execution_exe ${measure_thread_execution_SOURCES})
+target_link_libraries(measure_thread_execution_exe hpx ${Boost_LIBRARIES})
