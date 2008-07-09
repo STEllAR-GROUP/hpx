@@ -91,6 +91,10 @@ int main(int argc, char* argv[])
             dgas_port  = boost::lexical_cast<unsigned short>(argv[4]);
         }
 
+        // run the DGAS server instance here
+        hpx::util::io_service_pool dgas_pool; 
+        hpx::naming::resolver_server dgas(dgas_pool, dgas_host, dgas_port, true);
+
         // initialize and start the HPX runtime
         hpx::runtime rt(dgas_host, dgas_port, hpx_host, hpx_port);
         rt.run(hpx_main);
