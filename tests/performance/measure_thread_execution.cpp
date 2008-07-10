@@ -30,10 +30,10 @@ threads::thread_state hpx_main(threads::thread_self& self,
         tm.register_work(boost::bind(&null_thread, _1, boost::ref(appl)),
             threads::pending, false);
     }
-    double elapsed = timer.elapsed();
-    std::cerr << "Elapsed time [s] for thread initialization of " 
-              << num_threads << " threads: " << elapsed << " (" 
-              << elapsed/num_threads << " per thread)" << std::endl;
+//     double elapsed = timer.elapsed();
+//     std::cerr << "Elapsed time [s] for thread initialization of " 
+//               << num_threads << " threads: " << elapsed << " (" 
+//               << elapsed/num_threads << " per thread)" << std::endl;
 
     // start measuring
     timer.restart();

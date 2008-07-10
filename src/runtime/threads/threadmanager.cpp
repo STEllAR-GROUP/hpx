@@ -472,6 +472,7 @@ namespace hpx { namespace threads
 
     void threadmanager::stop (bool blocking)
     {
+        mutex_type::scoped_lock l(mtx_);
         if (!threads_.empty()) {
             if (running_) {
                 running_ = false;
@@ -481,7 +482,11 @@ namespace hpx { namespace threads
             if (blocking) {
                 for (std::size_t i = 0; i < threads_.size(); ++i) 
                 {
-                    cond_.notify_all();     // make sure we're not waiting
+                    // make sure no oS thread is waiting
+                    cond_.notify_all();
+
+                    // unlock the lock while joining
+                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                     threads_[i].join();
                 }
             }
