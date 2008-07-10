@@ -517,8 +517,7 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     bool threadmanager::run(std::size_t num_threads) 
     {
-        LTM_(info) << "run: creating " << num_threads 
-                   << " threads";
+        LTM_(info) << "run: creating " << num_threads << " threads";
 
         if (0 == num_threads) {
             boost::throw_exception(hpx::exception(
@@ -537,8 +536,7 @@ namespace hpx { namespace threads
             // run threads and wait for initialization to complete
             running_ = true;
             while (num_threads-- != 0) {
-                LTM_(info) << "run: create OS thread: "
-                           << num_threads; 
+                LTM_(info) << "run: create OS thread: " << num_threads; 
 
                 // create a new thread
                 threads_.push_back(new boost::thread(
@@ -564,8 +562,7 @@ namespace hpx { namespace threads
 
     void threadmanager::stop (bool blocking)
     {
-        LTM_(info) << "stop: blocking(" 
-                   << std::boolalpha << blocking << ")"; 
+        LTM_(info) << "stop: blocking(" << std::boolalpha << blocking << ")"; 
 
         mutex_type::scoped_lock l(mtx_);
         if (!threads_.empty()) {

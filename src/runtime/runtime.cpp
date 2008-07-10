@@ -117,10 +117,19 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
+#if defined(BOOST_WINDOWS)
     static void wait_helper(components::server::runtime_support& rts)
     {
         rts.wait();
     }
+#else
+    static void wait_helper(components::server::runtime_support& rts,
+        pthread_t id)
+    {
+        rts.wait();
+        pthread_kill(id, SIGTERM);
+    }
+#endif
 
     void runtime::wait()
     {
@@ -137,10 +146,11 @@ namespace hpx
         sigfillset(&new_mask);
         sigset_t old_mask;
         pthread_sigmask(SIG_BLOCK, &new_mask, &old_mask);
+        pthread_t id = pthread_self();
 
         // start the wait_helper in a separate thread
         boost::thread t (
-            boost::bind(&wait_helper, boost::ref(runtime_support_)));
+            boost::bind(&wait_helper, boost::ref(runtime_support_), id));
 
         // Restore previous signals.
         pthread_sigmask(SIG_SETMASK, &old_mask, 0);
