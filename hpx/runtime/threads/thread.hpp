@@ -15,10 +15,8 @@
 #include <boost/lockfree/atomic_int.hpp>
 #include <boost/coroutine/coroutine.hpp>
 #include <boost/coroutine/shared_coroutine.hpp>
-#if HPX_USE_LOCKFREE != 0
 #include <boost/lockfree/cas.hpp>
 #include <boost/lockfree/branch_hints.hpp>
-#endif
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -53,26 +51,18 @@ namespace hpx { namespace threads { namespace detail
 
         thread_state get_state() const 
         {
-#if HPX_USE_LOCKFREE != 0
             boost::lockfree::memory_barrier();
-#endif
             return static_cast<thread_state>(current_state_);
         }
 
         thread_state set_state(thread_state newstate)
         {
-#if HPX_USE_LOCKFREE != 0
             using namespace boost::lockfree;
             for (;;) {
                 long prev_state = current_state_;
                 if (likely(CAS(&current_state_, prev_state, (long)newstate)))
                     return static_cast<thread_state>(prev_state);
             }
-#else
-            thread_state old_state = static_cast<thread_state>(current_state_);
-            current_state_ = newstate;
-            return old_state;
-#endif
         }
 
         thread_id_type get_thread_id() const

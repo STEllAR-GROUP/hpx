@@ -752,7 +752,7 @@
 					Name="Threads"
 					>
 					<File
-						RelativePath="..\..\..\hpx\runtime\threads\px_thread.hpp"
+						RelativePath="..\..\..\hpx\runtime\threads\thread.hpp"
 						>
 					</File>
 					<File

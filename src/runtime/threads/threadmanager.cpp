@@ -284,7 +284,7 @@ namespace hpx { namespace threads
     class switch_status
     {
     public:
-        switch_status (thread* t, thread_state new_state)
+        switch_status (boost::intrusive_ptr<thread> t, thread_state new_state)
             : thread_(t), prev_state_(t->set_state(new_state))
         {}
 
@@ -309,7 +309,7 @@ namespace hpx { namespace threads
     private:
         // it is safe to store a plain pointer here since this class will be 
         // used inside a block holding a intrusive_ptr to this PX thread
-        thread* thread_;
+        boost::intrusive_ptr<thread> thread_;
         thread_state prev_state_;
     };
 
@@ -409,6 +409,7 @@ namespace hpx { namespace threads
 #endif
         std::size_t num_px_threads = 0;
 
+        try {
         // the thread with number zero is the master
         bool is_master_thread = (0 == num_thread) ? true : false;
         set_affinity(num_thread);     // set affinity on Linux systems
@@ -509,6 +510,15 @@ namespace hpx { namespace threads
                     LTM_(info) << "tfunc(" << num_thread << "): exiting wait";
                 }
             }
+        }
+        }
+        catch (hpx::exception const& e) {
+            LTM_(info) << "tfunc(" << num_thread << "): caught hpx::exception: " 
+                       << e.what();
+        }
+        catch (std::exception const& e) {
+            LTM_(info) << "tfunc(" << num_thread << "): caught std::exception: " 
+                       << e.what();
         }
 
 #if HPX_DEBUG != 0
