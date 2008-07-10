@@ -117,12 +117,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#if defined(BOOST_WINDOWS)
-    static void wait_helper(components::server::runtime_support& rts)
-    {
-        rts.wait();
-    }
-#else
+#if !defined(BOOST_WINDOWS)
     static void wait_helper(components::server::runtime_support& rts,
         pthread_t id)
     {
@@ -139,7 +134,7 @@ namespace hpx
         SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
 
         // wait for the shutdown action to be executed
-        wait_helper(runtime_support_);
+        runtime_support_.wait();
 #else
         // Block all signals for background thread.
         sigset_t new_mask;

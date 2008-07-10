@@ -202,12 +202,9 @@ namespace hpx { namespace threads
     public:
         /// this notifies the thread manager that there is some more work 
         /// available 
-        void do_some_work(bool runall = true)
+        void do_some_work()
         {
-            if (runall)
-                cond_.notify_all();
-            else
-                cond_.notify_one();
+            cond_.notify_all();
         }
 
     protected:

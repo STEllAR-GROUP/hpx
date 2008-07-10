@@ -99,7 +99,7 @@ namespace hpx { namespace threads
             // pushing the new thread in the pending queue thread
             work_items_.enqueue(thrd);
             if (run_now) 
-                cond_.notify_one();       // try to execute the new work item
+                cond_.notify_all();       // try to execute the new work item
         }
 
         // return the thread_id of the newly created thread
@@ -176,7 +176,7 @@ namespace hpx { namespace threads
             thrd->set_state(new_state);
             if (new_state == pending) {
                 work_items_.enqueue(thrd);
-                cond_.notify_one();
+                cond_.notify_all();
             }
             return previous_state;
         }
@@ -407,6 +407,8 @@ namespace hpx { namespace threads
 #if HPX_DEBUG != 0
         ++thread_count_;
 #endif
+        std::size_t num_px_threads = 0;
+
         // the thread with number zero is the master
         bool is_master_thread = (0 == num_thread) ? true : false;
         set_affinity(num_thread);     // set affinity on Linux systems
@@ -422,9 +424,9 @@ namespace hpx { namespace threads
                 // call for a previously pending PX thread (see comments above).
                 thread_state state = thrd->get_state();
 
-                LTM_(info) << "tfunc(" << num_thread << "): "
-                           << "thread(" << thrd->get_thread_id() << "), "
-                           << "old state(" << get_thread_state_name(state) << ")";
+//                 LTM_(info) << "tfunc(" << num_thread << "): "
+//                            << "thread(" << thrd->get_thread_id() << "), "
+//                            << "old state(" << get_thread_state_name(state) << ")";
 
                 if (pending == state) {
                     // switch the state of the thread to active and back to 
@@ -435,20 +437,21 @@ namespace hpx { namespace threads
                         // thread returns new required state
                         // store the returned state in the thread
                         thrd_stat = state = (*thrd)();
+                        ++num_px_threads;
                     }
 
                 }   // this stores the new state in the PX thread
 
-                LTM_(info) << "tfunc(" << num_thread << "): "
-                           << "thread(" << thrd->get_thread_id() << "), "
-                           << "new state(" << get_thread_state_name(state) << ")";
+//                 LTM_(info) << "tfunc(" << num_thread << "): "
+//                            << "thread(" << thrd->get_thread_id() << "), "
+//                            << "new state(" << get_thread_state_name(state) << ")";
 
                 // Re-add this work item to our list of work items if the PX
                 // thread should be re-scheduled. If the PX thread is suspended 
                 // now we just keep it in the map of threads.
                 if (state == pending) {
                     work_items_.enqueue(thrd);
-                    cond_.notify_one();
+                    cond_.notify_all();
                 }
 
                 // Remove the mapping from thread_map_ if PX thread is depleted 
@@ -497,12 +500,13 @@ namespace hpx { namespace threads
                 // Wait until somebody needs some action (if no new work 
                 // arrived in the meantime).
                 // Ask again if queues are empty to avoid race conditions (we 
-                // need to lock anyways...), this way no notify_one() gets lost
+                // need to lock anyways...), this way no notify_all() gets lost
                 if (work_items_.empty() && active_set_state_.empty())
                 {
                     LTM_(info) << "tfunc(" << num_thread << "): "
                                << "queues empty, entering wait";
                     cond_.wait(lk);
+                    LTM_(info) << "tfunc(" << num_thread << "): exiting wait";
                 }
             }
         }
@@ -511,7 +515,8 @@ namespace hpx { namespace threads
         // the last OS thread is allowed to exit only if no more PX threads exist
         BOOST_ASSERT(0 != --thread_count_ || thread_map_.empty());
 #endif
-        LTM_(info) << "tfunc(" << num_thread << "): end";
+        LTM_(info) << "tfunc(" << num_thread << "): end, executed " 
+                   << num_px_threads << " HPX threads";
     }
 
     ///////////////////////////////////////////////////////////////////////////
