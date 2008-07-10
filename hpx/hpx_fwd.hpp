@@ -113,6 +113,7 @@ namespace hpx
             terminated = 5  ///< thread has been stopped an may be garbage 
                             ///< collected
         };
+        char const* const get_thread_state_name(thread_state state);
 
         ///////////////////////////////////////////////////////////////////////
         typedef 

@@ -9,15 +9,73 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/unlock_lock.hpp>
+#include <hpx/util/logging.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
+    namespace strings
+    {
+        char const* const thread_state_names[] = 
+        {
+            "init",
+            "active",
+            "pending",
+            "suspended",
+            "depleted",
+            "terminated"
+        };
+    }
+
+    char const* const get_thread_state_name(thread_state state)
+    {
+        if (state < init || state > terminated)
+            return "unknown";
+        return strings::thread_state_names[state];
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct init_logging
+    {
+        init_logging()
+        {
+            util::init_threadmanager_logs();
+        }
+    };
+    
+    init_logging const init_tm_logging;
+
+    ///////////////////////////////////////////////////////////////////////////
+    threadmanager::threadmanager(util::io_service_pool& timer_pool)
+      : running_(false), timer_pool_(timer_pool)
+#if HPX_DEBUG != 0
+      , thread_count_(0)
+#endif
+    {
+        LTM_(info) << "threadmanager ctor";
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    threadmanager::~threadmanager() 
+    {
+        LTM_(info) << "~threadmanager";
+        if (!threads_.empty()) {
+            if (running_) 
+                stop();
+            threads_.clear();
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     thread_id_type threadmanager::register_work(
         boost::function<thread_function_type> threadfunc, 
         thread_state initial_state, bool run_now)
     {
+        LTM_(info) << "register_work: initial_state(" 
+                   << get_thread_state_name(initial_state) << "), "
+                   << std::boolalpha << "run_now(" << run_now << ")";
+
         // verify parameters
         if (initial_state != pending && initial_state != suspended)
         {
@@ -344,6 +402,8 @@ namespace hpx { namespace threads
     // main function executed by all OS threads managed by this threadmanager
     void threadmanager::tfunc(std::size_t num_thread)
     {
+        LTM_(info) << "tfunc(" << num_thread << "): start";
+
 #if HPX_DEBUG != 0
         ++thread_count_;
 #endif
@@ -361,6 +421,11 @@ namespace hpx { namespace threads
                 // Any non-pending PX threads are leftovers from a set_state() 
                 // call for a previously pending PX thread (see comments above).
                 thread_state state = thrd->get_state();
+
+                LTM_(info) << "tfunc(" << num_thread << "): "
+                           << "thread(" << thrd->get_thread_id() << "), "
+                           << "old state(" << get_thread_state_name(state) << ")";
+
                 if (pending == state) {
                     // switch the state of the thread to active and back to 
                     // what the thread reports as its return value
@@ -373,6 +438,10 @@ namespace hpx { namespace threads
                     }
 
                 }   // this stores the new state in the PX thread
+
+                LTM_(info) << "tfunc(" << num_thread << "): "
+                           << "thread(" << thrd->get_thread_id() << "), "
+                           << "new state(" << get_thread_state_name(state) << ")";
 
                 // Re-add this work item to our list of work items if the PX
                 // thread should be re-scheduled. If the PX thread is suspended 
@@ -409,6 +478,9 @@ namespace hpx { namespace threads
                 // no obvious work has to be done, so a lock won't hurt too much
                 mutex_type::scoped_lock lk(mtx_);
 
+                LTM_(info) << "tfunc(" << num_thread << "): "
+                           << "queues empty";
+
                 // stop running after all PX threads have been terminated
                 if (!running_) {
                     // Before exiting each of the OS threads deletes the 
@@ -417,6 +489,9 @@ namespace hpx { namespace threads
                         cond_.notify_all();   // notify possibly waiting threads
                         break;                // terminate scheduling loop
                     }
+
+                    LTM_(info) << "tfunc(" << num_thread << "): "
+                               << "threadmap not empty";
                 }
 
                 // Wait until somebody needs some action (if no new work 
@@ -424,7 +499,11 @@ namespace hpx { namespace threads
                 // Ask again if queues are empty to avoid race conditions (we 
                 // need to lock anyways...), this way no notify_one() gets lost
                 if (work_items_.empty() && active_set_state_.empty())
+                {
+                    LTM_(info) << "tfunc(" << num_thread << "): "
+                               << "queues empty, entering wait";
                     cond_.wait(lk);
+                }
             }
         }
 
@@ -432,11 +511,15 @@ namespace hpx { namespace threads
         // the last OS thread is allowed to exit only if no more PX threads exist
         BOOST_ASSERT(0 != --thread_count_ || thread_map_.empty());
 #endif
+        LTM_(info) << "tfunc(" << num_thread << "): end";
     }
 
     ///////////////////////////////////////////////////////////////////////////
     bool threadmanager::run(std::size_t num_threads) 
     {
+        LTM_(info) << "run: creating " << num_threads 
+                   << " threads";
+
         if (0 == num_threads) {
             boost::throw_exception(hpx::exception(
                 bad_parameter, "Number of threads shouldn't be zero"));
@@ -446,12 +529,17 @@ namespace hpx { namespace threads
         if (!threads_.empty() || running_) 
             return true;    // do nothing if already running
 
+        LTM_(info) << "run: running timer pool"; 
         timer_pool_.run(false);
+
         running_ = false;
         try {
             // run threads and wait for initialization to complete
             running_ = true;
             while (num_threads-- != 0) {
+                LTM_(info) << "run: create OS thread: "
+                           << num_threads; 
+
                 // create a new thread
                 threads_.push_back(new boost::thread(
                     boost::bind(&threadmanager::tfunc, this, num_threads)));
@@ -463,18 +551,26 @@ namespace hpx { namespace threads
             // start timer pool as well
             timer_pool_.run(false);
         }
-        catch (std::exception const& /*e*/) {
+        catch (std::exception const& e) {
+            LTM_(error) << "run: failed with:" << e.what(); 
             stop();
             threads_.clear();
+            return false;
         }
+
+        LTM_(info) << "run: running"; 
         return running_;
     }
 
     void threadmanager::stop (bool blocking)
     {
+        LTM_(info) << "stop: blocking(" 
+                   << std::boolalpha << blocking << ")"; 
+
         mutex_type::scoped_lock l(mtx_);
         if (!threads_.empty()) {
             if (running_) {
+                LTM_(info) << "stop: set running_ = false"; 
                 running_ = false;
                 cond_.notify_all();         // make sure we're not waiting
             }
@@ -482,15 +578,20 @@ namespace hpx { namespace threads
             if (blocking) {
                 for (std::size_t i = 0; i < threads_.size(); ++i) 
                 {
-                    // make sure no oS thread is waiting
+                    // make sure no OS thread is waiting
+                    LTM_(info) << "stop: notify_all"; 
                     cond_.notify_all();
+
+                    LTM_(info) << "stop(" << i << "): join"; 
 
                     // unlock the lock while joining
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                     threads_[i].join();
                 }
             }
+            threads_.clear();
 
+            LTM_(info) << "stop: stopping timer pool"; 
             timer_pool_.stop();             // stop timer pool as well
             if (blocking) 
                 timer_pool_.join();

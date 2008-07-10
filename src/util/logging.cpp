@@ -35,7 +35,6 @@ namespace hpx { namespace util
         }
     }
 
-    // this is required in order to use the logging library
     BOOST_DEFINE_LOG_FILTER(osh_level, filter_type) 
     BOOST_DEFINE_LOG(osh_logger, logger_type) 
 
@@ -57,6 +56,30 @@ namespace hpx { namespace util
             // destinations  : console, file "osh.log"
             osh_logger()->writer().write(logformat, logdest);
             osh_logger()->mark_as_initialized();
+        }
+    }
+
+    BOOST_DEFINE_LOG_FILTER(tm_level, filter_type) 
+    BOOST_DEFINE_LOG(tm_logger, logger_type) 
+
+    // initialize logging for threadmanager
+    void init_threadmanager_logs() 
+    {
+        using namespace std;    // some systems have getenv in namespace std
+        if (NULL != getenv("HPX_TM_LOGLEVEL")) 
+        {
+            char const* logdest = getenv("HPX_TM_LOGDESTINATION");
+            if (NULL == logdest)
+                logdest = "file(tm.log)";
+                
+            char const* logformat = getenv("HPX_TM_LOGFORMAT");
+            if (NULL == logformat)
+                logformat = "%time%($hh:$mm.$ss.$mili) [TM][%idx%] |\n";
+                
+            // formatting    : time [TM][idx] message \n
+            // destinations  : console, file "tm.log"
+            tm_logger()->writer().write(logformat, logdest);
+            tm_logger()->mark_as_initialized();
         }
     }
 

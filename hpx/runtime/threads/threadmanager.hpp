@@ -66,20 +66,8 @@ namespace hpx { namespace threads
         typedef boost::posix_time::time_duration duration_type;
 
     public:
-        threadmanager(util::io_service_pool& timer_pool) 
-          : running_(false), timer_pool_(timer_pool)
-#if HPX_DEBUG != 0
-          , thread_count_(0)
-#endif
-        {}
-        ~threadmanager() 
-        {
-            if (!threads_.empty()) {
-                if (running_) 
-                    stop();
-                threads_.clear();
-            }
-        }
+        threadmanager(util::io_service_pool& timer_pool);
+        ~threadmanager();
 
         typedef boost::lockfree::fifo<thread_id_type> set_state_queue_type;
 

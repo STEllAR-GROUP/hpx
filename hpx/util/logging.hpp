@@ -30,6 +30,14 @@ namespace hpx { namespace util
 
     void init_onesizeheap_logs();
 
+    BOOST_DECLARE_LOG_FILTER(tm_level, filter_type)
+    BOOST_DECLARE_LOG(tm_logger, logger_type)
+
+    #define LTM_(lvl)                                                         \
+        BOOST_LOG_USE_LOG_IF_LEVEL(util::tm_logger(), util::tm_level(), lvl)
+
+    void init_threadmanager_logs();
+
 ///////////////////////////////////////////////////////////////////////////////
 }}
 
