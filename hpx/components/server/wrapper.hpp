@@ -94,6 +94,7 @@ namespace hpx { namespace components
         ~wrapper()
         {
             delete component_;
+            component_ = 0;
         }
 
         /// \brief Return a pointer to the wrapped instance
