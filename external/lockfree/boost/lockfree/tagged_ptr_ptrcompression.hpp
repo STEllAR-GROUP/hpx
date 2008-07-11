@@ -23,7 +23,7 @@ namespace boost
 namespace lockfree
 {
 
-#ifdef __x86_64__
+#if defined(__x86_64__) || defined(_M_IA64) || defined(_WIN64)
 
 template <class T>
 class BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr

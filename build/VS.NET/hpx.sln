@@ -148,6 +148,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "timed_set_state_tests", "ti
 		{E6C6C6C4-6959-4B47-B92A-6323A906CC40} = {E6C6C6C4-6959-4B47-B92A-6323A906CC40}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lockfree", "lockfree\lockfree.vcproj", "{7D649D08-4F76-4F4E-AA15-40BE749A41F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -517,6 +519,18 @@ Global
 		{F1A80F9E-CCF8-4138-8334-61CC8FE2AFF1}.Release|Win32.ActiveCfg = Release|Win32
 		{F1A80F9E-CCF8-4138-8334-61CC8FE2AFF1}.Release|Win32.Build.0 = Release|Win32
 		{F1A80F9E-CCF8-4138-8334-61CC8FE2AFF1}.Release|x64.ActiveCfg = Release|Win32
+		{7D649D08-4F76-4F4E-AA15-40BE749A41F8}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{7D649D08-4F76-4F4E-AA15-40BE749A41F8}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{7D649D08-4F76-4F4E-AA15-40BE749A41F8}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{7D649D08-4F76-4F4E-AA15-40BE749A41F8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7D649D08-4F76-4F4E-AA15-40BE749A41F8}.Debug|Win32.Build.0 = Debug|Win32
+		{7D649D08-4F76-4F4E-AA15-40BE749A41F8}.Debug|x64.ActiveCfg = Debug|Win32
+		{7D649D08-4F76-4F4E-AA15-40BE749A41F8}.Release|Any CPU.ActiveCfg = Release|Win32
+		{7D649D08-4F76-4F4E-AA15-40BE749A41F8}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{7D649D08-4F76-4F4E-AA15-40BE749A41F8}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{7D649D08-4F76-4F4E-AA15-40BE749A41F8}.Release|Win32.ActiveCfg = Release|Win32
+		{7D649D08-4F76-4F4E-AA15-40BE749A41F8}.Release|Win32.Build.0 = Release|Win32
+		{7D649D08-4F76-4F4E-AA15-40BE749A41F8}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
