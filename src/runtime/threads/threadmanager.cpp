@@ -84,7 +84,7 @@ namespace hpx { namespace threads
         }
 
         // create the new thread
-        boost::intrusive_ptr<thread> thrd (
+        boost::shared_ptr<thread> thrd (
             new thread(threadfunc, *this, initial_state));
 
         // lock data members while adding work
@@ -97,7 +97,7 @@ namespace hpx { namespace threads
         if (initial_state == pending)
         {
             // pushing the new thread in the pending queue thread
-            work_items_.enqueue(thrd.get());
+            work_items_.enqueue(thrd);
             if (run_now) 
                 cond_.notify_all();       // try to execute the new work item
         }
@@ -137,7 +137,7 @@ namespace hpx { namespace threads
         thread_map_type::iterator map_iter = thread_map_.find(id);
         if (map_iter != thread_map_.end())
         {
-            boost::intrusive_ptr<thread> thrd = map_iter->second;
+            boost::shared_ptr<thread> thrd = map_iter->second;
             thread_state previous_state = thrd->get_state();
 
             // nothing to do here if the state doesn't change
@@ -175,7 +175,7 @@ namespace hpx { namespace threads
             // So all what we do here is to set the new state.
             thrd->set_state(new_state);
             if (new_state == pending) {
-                work_items_.enqueue(thrd.get());
+                work_items_.enqueue(thrd);
                 cond_.notify_all();
             }
             return previous_state;
@@ -284,7 +284,7 @@ namespace hpx { namespace threads
     class switch_status
     {
     public:
-        switch_status (thread* t, thread_state new_state)
+        switch_status (boost::shared_ptr<thread> t, thread_state new_state)
             : thread_(t), prev_state_(t->set_state(new_state))
         {}
 
@@ -307,7 +307,7 @@ namespace hpx { namespace threads
         }
 
     private:
-        thread* thread_;
+        boost::shared_ptr<thread> thread_;
         thread_state prev_state_;
     };
 
@@ -315,7 +315,7 @@ namespace hpx { namespace threads
     template <typename Queue, typename Map>
     inline bool cleanup(Queue& terminated_items, Map& thread_map)
     {
-        thread* todelete = NULL;
+        boost::shared_ptr<thread> todelete;
         while (terminated_items.dequeue(&todelete))
             thread_map.erase(todelete->get_thread_id());
         return thread_map.empty();
@@ -441,16 +441,16 @@ namespace hpx { namespace threads
         boost::coroutines::prepare_main_thread main_thread;
         while (true) {
             // Get the next PX thread from the queue
-            thread* thrd = NULL;
+            boost::shared_ptr<thread> thrd;
             if (work_items_.dequeue(&thrd)) {
                 // Only pending PX threads will be executed.
                 // Any non-pending PX threads are leftovers from a set_state() 
                 // call for a previously pending PX thread (see comments above).
                 thread_state state = thrd->get_state();
 
-//                 LTM_(info) << "tfunc(" << num_thread << "): "
-//                            << "thread(" << thrd->get_thread_id() << "), "
-//                            << "old state(" << get_thread_state_name(state) << ")";
+                LTM_(debug) << "tfunc(" << num_thread << "): "
+                           << "thread(" << thrd->get_thread_id() << "), "
+                           << "old state(" << get_thread_state_name(state) << ")";
 
                 if (pending == state) {
                     // switch the state of the thread to active and back to 
@@ -466,9 +466,9 @@ namespace hpx { namespace threads
 
                 }   // this stores the new state in the PX thread
 
-//                 LTM_(info) << "tfunc(" << num_thread << "): "
-//                            << "thread(" << thrd->get_thread_id() << "), "
-//                            << "new state(" << get_thread_state_name(state) << ")";
+                LTM_(debug) << "tfunc(" << num_thread << "): "
+                           << "thread(" << thrd->get_thread_id() << "), "
+                           << "new state(" << get_thread_state_name(state) << ")";
 
                 // Re-add this work item to our list of work items if the PX
                 // thread should be re-scheduled. If the PX thread is suspended 

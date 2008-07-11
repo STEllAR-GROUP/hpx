@@ -150,10 +150,14 @@ namespace hpx { namespace threads
         thread(boost::function<thread_function_type> threadfunc, 
                 threadmanager& tm, thread_state new_state = init)
           : base_type(new detail::thread(threadfunc, This(), tm, new_state))
-        {}
+        {
+            LTM_(debug) << "thread::thread(" << this << ")";
+        }
 
         ~thread() 
-        {}
+        {
+            LTM_(debug) << "~thread(" << this << ")";
+        }
 
         thread_id_type get_thread_id() const
         {

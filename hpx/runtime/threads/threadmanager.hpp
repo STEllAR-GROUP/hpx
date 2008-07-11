@@ -12,7 +12,7 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/intrusive_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/function.hpp>
@@ -44,11 +44,13 @@ namespace hpx { namespace threads
     {
     private:
         // this is the type of the queue of pending threads
-        typedef boost::lockfree::fifo<thread*> work_items_type;
+        typedef 
+            boost::lockfree::fifo<boost::shared_ptr<thread> > 
+        work_items_type;
 
         // this is the type of a map holding all threads (except depleted ones)
         typedef
-            std::map<thread_id_type, boost::intrusive_ptr<thread> >
+            std::map<thread_id_type, boost::shared_ptr<thread> >
         thread_map_type;
         typedef thread_map_type::value_type map_pair;
 
