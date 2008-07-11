@@ -97,7 +97,7 @@ namespace hpx { namespace threads
         if (initial_state == pending)
         {
             // pushing the new thread in the pending queue thread
-            work_items_.enqueue(thrd);
+            work_items_.enqueue(thrd.get());
             if (run_now) 
                 cond_.notify_all();       // try to execute the new work item
         }
@@ -175,7 +175,7 @@ namespace hpx { namespace threads
             // So all what we do here is to set the new state.
             thrd->set_state(new_state);
             if (new_state == pending) {
-                work_items_.enqueue(thrd);
+                work_items_.enqueue(thrd.get());
                 cond_.notify_all();
             }
             return previous_state;
@@ -284,7 +284,7 @@ namespace hpx { namespace threads
     class switch_status
     {
     public:
-        switch_status (boost::intrusive_ptr<thread> t, thread_state new_state)
+        switch_status (thread* t, thread_state new_state)
             : thread_(t), prev_state_(t->set_state(new_state))
         {}
 
@@ -307,9 +307,7 @@ namespace hpx { namespace threads
         }
 
     private:
-        // it is safe to store a plain pointer here since this class will be 
-        // used inside a block holding a intrusive_ptr to this PX thread
-        boost::intrusive_ptr<thread> thread_;
+        thread* thread_;
         thread_state prev_state_;
     };
 
@@ -317,7 +315,7 @@ namespace hpx { namespace threads
     template <typename Queue, typename Map>
     inline bool cleanup(Queue& terminated_items, Map& thread_map)
     {
-        boost::intrusive_ptr<thread> todelete;
+        thread* todelete = NULL;
         while (terminated_items.dequeue(&todelete))
             thread_map.erase(todelete->get_thread_id());
         return thread_map.empty();
@@ -403,13 +401,38 @@ namespace hpx { namespace threads
     void threadmanager::tfunc(std::size_t num_thread)
     {
         LTM_(info) << "tfunc(" << num_thread << "): start";
+        std::size_t num_px_threads = 0;
+        try {
+            num_px_threads = tfunc_impl(num_thread);
+        }
+        catch (hpx::exception const& e) {
+            LTM_(error) << "tfunc(" << num_thread 
+                        << "): caught hpx::exception: " 
+                        << e.what() << ", aborted execution";;
+            return;
+        }
+        catch (std::exception const& e) {
+            LTM_(error) << "tfunc(" << num_thread 
+                        << "): caught std::exception: " 
+                        << e.what() << ", aborted execution";
+            return;
+        }
+        catch (...) {
+            LTM_(error) << "tfunc(" << num_thread 
+                        << "): caught unexpected exception, aborted execution";
+            return;
+        }
+        LTM_(info) << "tfunc(" << num_thread << "): end, executed " 
+                   << num_px_threads << " HPX threads";
+    }
 
+    std::size_t threadmanager::tfunc_impl(std::size_t num_thread)
+    {
 #if HPX_DEBUG != 0
         ++thread_count_;
 #endif
         std::size_t num_px_threads = 0;
 
-        try {
         // the thread with number zero is the master
         bool is_master_thread = (0 == num_thread) ? true : false;
         set_affinity(num_thread);     // set affinity on Linux systems
@@ -418,7 +441,7 @@ namespace hpx { namespace threads
         boost::coroutines::prepare_main_thread main_thread;
         while (true) {
             // Get the next PX thread from the queue
-            boost::intrusive_ptr<thread> thrd;
+            thread* thrd = NULL;
             if (work_items_.dequeue(&thrd)) {
                 // Only pending PX threads will be executed.
                 // Any non-pending PX threads are leftovers from a set_state() 
@@ -433,7 +456,7 @@ namespace hpx { namespace threads
                     // switch the state of the thread to active and back to 
                     // what the thread reports as its return value
 
-                    switch_status thrd_stat (thrd.get(), active);
+                    switch_status thrd_stat (thrd, active);
                     if (thrd_stat == pending) {
                         // thread returns new required state
                         // store the returned state in the thread
@@ -511,22 +534,12 @@ namespace hpx { namespace threads
                 }
             }
         }
-        }
-        catch (hpx::exception const& e) {
-            LTM_(info) << "tfunc(" << num_thread << "): caught hpx::exception: " 
-                       << e.what();
-        }
-        catch (std::exception const& e) {
-            LTM_(info) << "tfunc(" << num_thread << "): caught std::exception: " 
-                       << e.what();
-        }
 
 #if HPX_DEBUG != 0
         // the last OS thread is allowed to exit only if no more PX threads exist
         BOOST_ASSERT(0 != --thread_count_ || thread_map_.empty());
 #endif
-        LTM_(info) << "tfunc(" << num_thread << "): end, executed " 
-                   << num_px_threads << " HPX threads";
+        return num_px_threads;
     }
 
     ///////////////////////////////////////////////////////////////////////////

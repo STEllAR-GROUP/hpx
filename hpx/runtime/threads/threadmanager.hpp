@@ -44,10 +44,8 @@ namespace hpx { namespace threads
     {
     private:
         // this is the type of the queue of pending threads
-        typedef 
-            boost::lockfree::fifo<boost::intrusive_ptr<thread> > 
-        work_items_type;
-        
+        typedef boost::lockfree::fifo<thread*> work_items_type;
+
         // this is the type of a map holding all threads (except depleted ones)
         typedef
             std::map<thread_id_type, boost::intrusive_ptr<thread> >
@@ -198,6 +196,7 @@ namespace hpx { namespace threads
     protected:
         // this is the thread function executing the work items in the queue
         void tfunc(std::size_t num_thread);
+        std::size_t tfunc_impl(std::size_t num_thread);
 
     public:
         /// this notifies the thread manager that there is some more work 
