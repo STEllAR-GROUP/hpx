@@ -61,6 +61,7 @@ private:
     {
         cast_unit ret;
         ret.value = compressed_ptr_t(ptr);
+        BOOST_ASSERT(0 == (~ptr_mask & ret.value));
         ret.tag[tag_index] = tag;
         return ret.value;
     }
