@@ -17,6 +17,7 @@
 #include <cstddef>              /* for std::size_t */
 
 #include <boost/cstdint.hpp>
+#include <boost/assert.hpp>
 
 # if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
 #warning "using tagged_ptr_ptrcompression"
