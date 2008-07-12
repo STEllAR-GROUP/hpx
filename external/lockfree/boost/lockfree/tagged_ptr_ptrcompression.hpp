@@ -18,6 +18,10 @@
 
 #include <boost/cstdint.hpp>
 
+# if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "using tagged_ptr_ptrcompression"
+#endif
+
 namespace boost
 {
 namespace lockfree
