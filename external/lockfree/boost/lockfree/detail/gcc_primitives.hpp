@@ -125,8 +125,8 @@ namespace boost { namespace lockfree
                                "c" (new1), "m" (new2) : "memory");
 #endif
         return result != 0;
-#elif defined(__x86_64__) &&                                                  \
-    ( __GCC_HAVE_SYNC_COMPARE_AND_SWAP_16 ) ||                                \
+#elif defined(__x86_64__)
+#if ( __GCC_HAVE_SYNC_COMPARE_AND_SWAP_16 ) || \
     ( (__GNUC__ >  4) || ( (__GNUC__ >= 4) && (__GNUC_MINOR__ >= 2) ) && defined(__nocona__ ) )
 
 #if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
@@ -160,7 +160,6 @@ namespace boost { namespace lockfree
         return __sync_bool_compare_and_swap_16(
             reinterpret_cast<volatile TItype*>(addr), old.l, nw.l);
 #else 
-#if defined(__x86_64__)
 #if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
 #warning "CAS2: 64Bit system: handcoded asm, will crash on early amd processors"
 #endif
