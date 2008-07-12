@@ -73,11 +73,18 @@ namespace boost { namespace lockfree
 #if defined(_M_IA64) || defined(_WIN64)
 // early AMD processors do not support the cmpxchg16b instruction
 #if defined(BOOST_LOCKFREE_HAS_CMPXCHG16B)
+#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "CAS2: using CAS2_windows64, may crash on old AMD systems"
+#endif
 
         return CAS2_windows64(reinterpret_cast<volatile __int64*>(addr), 
             (__int64)old1, (__int64)old2, (__int64)new1, (__int64)new2);
 
 #else
+#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "CAS2: blocking cas emulation"
+#endif
+
         struct packed_c
         {
             D d;
@@ -96,6 +103,10 @@ namespace boost { namespace lockfree
         return false;
 #endif
 #else
+#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "CAS2: 32Bit hand coded asm"
+#endif
+
         bool ok;
         __asm {
             mov eax, [old1]

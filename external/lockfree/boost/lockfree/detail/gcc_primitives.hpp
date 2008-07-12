@@ -53,9 +53,15 @@ namespace boost { namespace lockfree
     inline bool CAS(volatile C * addr, D old, D nw)
     {
 #if defined(__GNUC__) && ( (__GNUC__ > 4) || ((__GNUC__ >= 4) && (__GNUC_MINOR__ >= 1)) )
+#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "CAS: using __sync_bool_compare_and_swap"
+#endif
         return __sync_bool_compare_and_swap(addr, old, nw);
 #else
-#warning ("blocking cas emulation")
+#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "CAS: blocking cas emulation"
+#endif
+
         boost::detail::lightweight_mutex::scoped_lock lock(detail::get_CAS_mutex());
         if (*addr == old)
         {
@@ -72,6 +78,10 @@ namespace boost { namespace lockfree
 #if ((__GNUC__ >  4) || ( (__GNUC__ >= 4) && (__GNUC_MINOR__ >= 2) ) ) && defined(__i386__) && \
         (defined(__i686__) || defined(__pentiumpro__) || defined(__nocona__ ) || \
         defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8))
+
+#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "CAS2: using __sync_bool_compare_and_swap_8"
+#endif
 
         struct packed_c
         {
@@ -98,11 +108,17 @@ namespace boost { namespace lockfree
 #elif (defined(__i686__) || defined(__pentiumpro__)  || defined(__nocona__ ))
         char result;
 #ifndef __PIC__
+#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "CAS2: using 32Bit hand coded asm (__PIC__)"
+#endif
         __asm__ __volatile__("lock; cmpxchg8b %0; setz %1"
                              : "=m"(*addr), "=q"(result)
                              : "m"(*addr), "d" (old1), "a" (old2),
                                "c" (new1), "b" (new2) : "memory");
 #else
+#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "CAS2: using 32Bit hand coded asm"
+#endif
         __asm__ __volatile__("push %%ebx; movl %6,%%ebx; lock; cmpxchg8b %0; setz %1; pop %%ebx"
                              : "=m"(*addr), "=q"(result)
                              : "m"(*addr), "d" (old1), "a" (old2),
@@ -112,6 +128,10 @@ namespace boost { namespace lockfree
 #elif defined(__x86_64__) &&                                                  \
     ( __GCC_HAVE_SYNC_COMPARE_AND_SWAP_16 ) ||                                \
     ( (__GNUC__ >  4) || ( (__GNUC__ >= 4) && (__GNUC_MINOR__ >= 2) ) && defined(__nocona__ ) )
+
+#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "CAS2: using __sync_bool_compare_and_swap_16"
+#endif
 
         struct packed_c
         {
@@ -141,6 +161,9 @@ namespace boost { namespace lockfree
             reinterpret_cast<volatile TItype*>(addr), old.l, nw.l);
 #else 
 #if defined(__x86_64__)
+#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "CAS2: 64Bit system: handcoded asm, will crash on early amd processors"
+#endif
     // 64Bit system: handcoded asm, will crash on early amd processors 
         char result;
         __asm__ __volatile__("lock; cmpxchg16b %0; setz %1"
@@ -149,6 +172,9 @@ namespace boost { namespace lockfree
                                "c" (new2), "b" (new1) : "memory");
         return result != 0;
 #else
+#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "CAS2: 32Bit system: handcoded asm"
+#endif
     // 32Bit system: handcoded asm 
         char result;
         __asm__ __volatile__("lock; cmpxchg8b %0; setz %1"
@@ -158,7 +184,10 @@ namespace boost { namespace lockfree
         return result != 0;
 #endif
 #else
-#warning ("blocking CAS2 emulation")
+#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "CAS2: blocking CAS2 emulation"
+#endif
+
         struct packed_c
         {
             D d;

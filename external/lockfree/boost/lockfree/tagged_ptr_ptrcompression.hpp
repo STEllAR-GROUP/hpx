@@ -39,7 +39,7 @@ private:
     };
 
     static const int tag_index = 3;
-    static const compressed_ptr_t ptr_mask = (1L<<48)-1;
+    static const compressed_ptr_t ptr_mask = (1LL << 48)-1;
 
     static T* extract_ptr(compressed_ptr_t const & i)
     {
