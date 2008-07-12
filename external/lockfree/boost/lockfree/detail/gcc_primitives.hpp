@@ -105,33 +105,37 @@ namespace boost { namespace lockfree
 
         return __sync_bool_compare_and_swap_8(
             reinterpret_cast<volatile long long*>(addr), old.l, nw.l);
-#elif (defined(__i686__) || defined(__pentiumpro__)  || defined(__nocona__ ))
+
+#elif defined(__i686__) || defined(__pentiumpro__)  || defined(__nocona__ )
+
         char result;
-#ifndef __PIC__
-#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
-#warning "CAS2: using 32Bit hand coded asm (__PIC__)"
-#endif
+# ifndef __PIC__
+# if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+# warning "CAS2: using 32Bit hand coded asm (__PIC__)"
+# endif
         __asm__ __volatile__("lock; cmpxchg8b %0; setz %1"
                              : "=m"(*addr), "=q"(result)
                              : "m"(*addr), "d" (old1), "a" (old2),
                                "c" (new1), "b" (new2) : "memory");
-#else
-#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
-#warning "CAS2: using 32Bit hand coded asm"
-#endif
+# else
+# if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+# warning "CAS2: using 32Bit hand coded asm"
+# endif
         __asm__ __volatile__("push %%ebx; movl %6,%%ebx; lock; cmpxchg8b %0; setz %1; pop %%ebx"
                              : "=m"(*addr), "=q"(result)
                              : "m"(*addr), "d" (old1), "a" (old2),
                                "c" (new1), "m" (new2) : "memory");
-#endif
+# endif
         return result != 0;
+
 #elif defined(__x86_64__)
-#if ( __GCC_HAVE_SYNC_COMPARE_AND_SWAP_16 ) || \
+
+# if ( __GCC_HAVE_SYNC_COMPARE_AND_SWAP_16 ) || \
     ( (__GNUC__ >  4) || ( (__GNUC__ >= 4) && (__GNUC_MINOR__ >= 2) ) && defined(__nocona__ ) )
 
-#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
-#warning "CAS2: using __sync_bool_compare_and_swap_16"
-#endif
+# if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+# warning "CAS2: using __sync_bool_compare_and_swap_16"
+# endif
 
         struct packed_c
         {
@@ -159,10 +163,12 @@ namespace boost { namespace lockfree
 
         return __sync_bool_compare_and_swap_16(
             reinterpret_cast<volatile TItype*>(addr), old.l, nw.l);
-#else 
-#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
-#warning "CAS2: 64Bit system: handcoded asm, will crash on early amd processors"
-#endif
+
+# else 
+# if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+# warning "CAS2: 64Bit system: handcoded asm, will crash on early amd processors"
+# endif
+
     // 64Bit system: handcoded asm, will crash on early amd processors 
         char result;
         __asm__ __volatile__("lock; cmpxchg16b %0; setz %1"
@@ -170,10 +176,13 @@ namespace boost { namespace lockfree
                              : "m"(*addr), "d" (old2), "a" (old1),
                                "c" (new2), "b" (new1) : "memory");
         return result != 0;
+# endif
+
 #else
-#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
-#warning "CAS2: 32Bit system: handcoded asm"
-#endif
+
+# if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+# warning "CAS2: 32Bit system: handcoded asm"
+# endif
     // 32Bit system: handcoded asm 
         char result;
         __asm__ __volatile__("lock; cmpxchg8b %0; setz %1"
@@ -181,30 +190,31 @@ namespace boost { namespace lockfree
                              : "m"(*addr), "d" (old2), "a" (old1),
                                "c" (new2), "b" (new1) : "memory");
         return result != 0;
+
 #endif
-#else
-#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
-#warning "CAS2: blocking CAS2 emulation"
-#endif
-
-        struct packed_c
-        {
-            D d;
-            E e;
-        };
-
-        volatile packed_c * packed_addr = reinterpret_cast<volatile packed_c*>(addr);
-
-        boost::detail::lightweight_mutex::scoped_lock lock(detail::get_CAS2_mutex());
-
-        if (packed_addr->d == old1 && packed_addr->e == old2)
-        {
-            packed_addr->d = new1;
-            packed_addr->e = new2;
-            return true;
-        }
-        return false;
-#endif
+// #else
+// #if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+// #warning "CAS2: blocking CAS2 emulation"
+// #endif
+// 
+//         struct packed_c
+//         {
+//             D d;
+//             E e;
+//         };
+// 
+//         volatile packed_c * packed_addr = reinterpret_cast<volatile packed_c*>(addr);
+// 
+//         boost::detail::lightweight_mutex::scoped_lock lock(detail::get_CAS2_mutex());
+// 
+//         if (packed_addr->d == old1 && packed_addr->e == old2)
+//         {
+//             packed_addr->d = new1;
+//             packed_addr->e = new2;
+//             return true;
+//         }
+//         return false;
+// #endif
     }
 
 }}
