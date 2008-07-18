@@ -6,6 +6,8 @@
 #if !defined(HPX_RUNTIME_GET_LVA_JUN_22_2008_0451PM)
 #define HPX_RUNTIME_GET_LVA_JUN_22_2008_0451PM
 
+#include <boost/type_traits/is_base_and_derived.hpp>
+
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
 
@@ -32,20 +34,31 @@ namespace hpx
     template <typename Component>
     struct get_lva
     {
+        struct is_simple_component
+          : boost::is_base_and_derived<
+                components::simple_component_base<Component>, Component
+            >
+        {};
+
         static Component* 
-        call(naming::address::address_type lva)
+        call(naming::address::address_type lva, mpl::false_)
         {
             typedef typename Component::wrapping_type wrapping_type;
             return reinterpret_cast<wrapping_type*>(lva)->get();
         }
-    };
 
-    // forward declaration
-    namespace components { namespace server
-    {
-        class runtime_support;
-        class memory;
-    }}
+        static Component* 
+        call(naming::address::address_type lva, mpl::true_)
+        {
+            return reinterpret_cast<Component*>(lva);
+        }
+
+        static Component* 
+        call(naming::address::address_type lva)
+        {
+            return call(lva, is_simple_component());
+        }
+    };
 
     // specialization for components::server::runtime_support
     template <>

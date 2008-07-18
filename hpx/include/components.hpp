@@ -10,7 +10,6 @@
 #include <hpx/components/component_type.hpp>
 #include <hpx/components/runtime_support.hpp>
 #include <hpx/components/server/memory.hpp>
-#include <hpx/components/accumulator.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 
 #endif

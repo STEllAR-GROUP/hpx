@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/include/applier.hpp>
+#include <hpx/components/server/simple_component_base.hpp>
 #include <hpx/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/lcos/eager_future.hpp>

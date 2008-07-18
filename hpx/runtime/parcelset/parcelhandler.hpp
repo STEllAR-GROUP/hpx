@@ -412,8 +412,7 @@ namespace hpx { namespace parcelset
             return pp_.here();
         }
 
-    protected:        
-        // generate next unique id
+        /// generate next unique id
         parcel_id get_next_id()
         {
             return id_range_.get_id(pp_.here(), resolver_);

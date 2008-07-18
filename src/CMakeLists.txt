@@ -14,16 +14,20 @@ set (hpxlib_HEADERS
     ../hpx/components/accumulator.hpp
     ../hpx/components/component_type.hpp
     ../hpx/components/runtime_support.hpp
+    ../hpx/components/simple_accumulator.hpp
     ../hpx/components/server/accumulator.hpp
     ../hpx/components/server/distributing_factory.hpp
     ../hpx/components/server/manage_component.hpp
     ../hpx/components/server/managed_component_base.hpp
     ../hpx/components/server/memory.hpp
     ../hpx/components/server/runtime_support.hpp
+    ../hpx/components/server/simple_accumulator.hpp
+    ../hpx/components/server/simple_component_base.hpp
     ../hpx/components/server/wrapper_heap.hpp
     ../hpx/components/server/wrapper_heap_list.hpp
     ../hpx/components/stubs/accumulator.hpp
     ../hpx/components/stubs/runtime_support.hpp
+    ../hpx/components/stubs/simple_accumulator.hpp
     # include
     ../hpx/include/actions.hpp
     ../hpx/include/applier.hpp

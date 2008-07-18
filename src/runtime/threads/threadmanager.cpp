@@ -6,6 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <boost/assert.hpp>
 
+#include <hpx/components/server/simple_component_base.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/unlock_lock.hpp>

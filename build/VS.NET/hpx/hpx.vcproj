@@ -776,6 +776,10 @@
 					RelativePath="..\..\..\hpx\components\runtime_support.hpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\..\hpx\components\simple_accumulator.hpp"
+					>
+				</File>
 				<Filter
 					Name="Server"
 					>
@@ -804,6 +808,14 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\..\hpx\components\server\simple_accumulator.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\components\server\simple_component_base.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\hpx\components\server\wrapper_heap.hpp"
 						>
 					</File>
@@ -821,6 +833,10 @@
 					</File>
 					<File
 						RelativePath="..\..\..\hpx\components\stubs\runtime_support.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\components\stubs\simple_accumulator.hpp"
 						>
 					</File>
 				</Filter>

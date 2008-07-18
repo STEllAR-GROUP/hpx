@@ -6,11 +6,13 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/components/server/simple_component_base.hpp>
 #include <hpx/components/server/runtime_support.hpp>
-#include <hpx/components/stubs/runtime_support.hpp>
 #include <hpx/components/server/accumulator.hpp>
+#include <hpx/components/server/simple_accumulator.hpp>
 #include <hpx/components/server/distributing_factory.hpp>
 #include <hpx/components/server/manage_component.hpp>
+#include <hpx/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 
 namespace hpx { namespace components { namespace server
@@ -26,6 +28,10 @@ namespace hpx { namespace components { namespace server
         switch (type) {
         case accumulator::value:
             id = server::create<server::accumulator>(appl, count);
+            break;
+
+        case simple_accumulator::value:
+            id = server::create<server::simple_accumulator>(appl, count);
             break;
 
         case distributing_factory::value:
@@ -54,6 +60,10 @@ namespace hpx { namespace components { namespace server
         switch (type) {
         case accumulator::value:
             server::destroy<server::accumulator>(appl, gid, count);
+            break;
+
+        case simple_accumulator::value:
+            server::destroy<server::simple_accumulator>(appl, gid, count);
             break;
 
         case distributing_factory::value:

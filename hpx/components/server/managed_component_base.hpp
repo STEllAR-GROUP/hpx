@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_WRAPPER_JUN_04_2008_0901PM)
-#define HPX_COMPONENTS_WRAPPER_JUN_04_2008_0901PM
+#if !defined(HPX_COMPONENTS_MANAGED_COMPONENT_BASE_JUN_04_2008_0901PM)
+#define HPX_COMPONENTS_MANAGED_COMPONENT_BASE_JUN_04_2008_0901PM
 
 #include <boost/throw_exception.hpp>
 #include <boost/noncopyable.hpp>

@@ -32,7 +32,8 @@ namespace hpx { namespace components
         component_process,          ///< global representation of a process
 
         // test categories
-        component_accumulator,      // simple accumulator
+        component_managed_accumulator,     // managed accumulator
+        component_simple_accumulator,      // simple accumulator
 
         component_graph,            // logical graph (spanning several localities)
         component_local_graph,      // simple graph example component (see examples/graph_component)
@@ -53,7 +54,8 @@ namespace hpx { namespace components
             "component_base_lco_with_value",
             "component_future",
             "component_distributing_factory",
-            "component_accumulator",
+            "component_managed_accumulator",
+            "component_simple_accumulator",
             "component_graph",
             "component_local_graph",
             "component_graph_vertex",

@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_SERVER_ACCUMULATOR_MAY_17_2008_0731PM)
-#define HPX_COMPONENTS_SERVER_ACCUMULATOR_MAY_17_2008_0731PM
+#if !defined(HPX_COMPONENTS_SERVER_SIMPLE_ACCUMULATOR_JUL_18_2008_1154AM)
+#define HPX_COMPONENTS_SERVER_SIMPLE_ACCUMULATOR_JUL_18_2008_1154AM
 
 #include <iostream>
 
@@ -13,26 +13,28 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/components/component_type.hpp>
 #include <hpx/runtime/actions/action.hpp>
-#include <hpx/components/server/managed_component_base.hpp>
+#include <hpx/components/server/simple_component_base.hpp>
 
-namespace hpx { namespace components { namespace server { namespace detail
+namespace hpx { namespace components { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// The accumulator is a very simple example of a HPX component. 
+    /// \class simple_accumulator simple_accumulator.hpp hpx/components/simple_accumulator.hpp
     ///
-    /// Note that the implementation of the accumulator does not require any 
-    /// special data members or virtual functions.
+    /// The simple_accumulatorclass is a small example components demonstrating 
+    /// the main principles of writing your own components. It exposes 4 
+    /// different actions: init, add, query, and print, showing how to used and 
+    /// implement functionality in a way conformant with the HPX runtime system. 
+    /// The simple_accumulator is a very simple example of an HPX component. 
     ///
-    class accumulator 
+    /// Note that the implementation of the simple_accumulator does not require 
+    /// special data members or virtual functions. All specifics are embedded 
+    /// in the simple_component_base class the simple_accumulator is derived 
+    /// from.
+    ///
+    class simple_accumulator 
+      : public components::simple_component_base<simple_accumulator>
     {
     public:
-        // components must contain a typedef for wrapping_type defining the
-        // managed_component_base type used to encapsulate instances of this 
-        // component
-        typedef 
-            managed_component_base<accumulator, server::accumulator> 
-        wrapping_type;
-
         // parcel action code: the action to be performed on the destination 
         // object (the accumulator)
         enum actions
@@ -46,10 +48,10 @@ namespace hpx { namespace components { namespace server { namespace detail
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
         // to associate this component with a given action.
-        enum { value = component_managed_accumulator };
+        enum { value = component_simple_accumulator };
 
         // constructor: initialize accumulator value
-        accumulator()
+        simple_accumulator()
           : arg_(0)
         {}
         
@@ -96,65 +98,36 @@ namespace hpx { namespace components { namespace server { namespace detail
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::action0<
-            accumulator, accumulator_init, &accumulator::init
+            simple_accumulator, accumulator_init, 
+            &simple_accumulator::init
         > init_action;
 
         typedef hpx::actions::action1<
-            accumulator, accumulator_add, double, &accumulator::add
+            simple_accumulator, accumulator_add, double, 
+            &simple_accumulator::add
         > add_action;
 
         typedef hpx::actions::result_action0<
-            accumulator, double, accumulator_query_value, &accumulator::query
+            simple_accumulator, double, accumulator_query_value, 
+            &simple_accumulator::query
         > query_action;
 
         typedef hpx::actions::action0<
-            accumulator, accumulator_print, &accumulator::print
+            simple_accumulator, accumulator_print, 
+            &simple_accumulator::print
         > print_action;
 
     private:
         double arg_;
     };
 
-}}}}
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server 
-{
-    /// \class accumulator accumulator.hpp hpx/components/accumulator.hpp
-    ///
-    /// The accumulator class is a small example components demonstrating the
-    /// main principles of writing your own components. It exposes 4 different
-    /// actions: init, add, query, and print, showing how to used and implement
-    /// functionality in a way conformant with the HPX runtime system. 
-    class accumulator 
-      : public managed_component_base<detail::accumulator, accumulator>
-    {
-    private:
-        typedef detail::accumulator wrapped_type;
-        typedef managed_component_base<wrapped_type, accumulator> base_type;
-
-    public:
-        // This is the component id. Every component needs to have an embedded
-        // enumerator 'value' which is used by the generic action implementation
-        // to associate this component with a given action.
-        enum { value = wrapped_type::value };
-
-        accumulator()
-          : base_type(new wrapped_type())
-        {}
-
-    protected:
-        base_type& base() { return *this; }
-        base_type const& base() const { return *this; }
-    };
-
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-// Serialization support for the accumulator actions
-HPX_SERIALIZE_ACTION(hpx::components::server::detail::accumulator::init_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::detail::accumulator::add_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::detail::accumulator::query_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::detail::accumulator::print_action);
+// Serialization support for the simple_accumulator actions
+HPX_SERIALIZE_ACTION(hpx::components::server::simple_accumulator::init_action);
+HPX_SERIALIZE_ACTION(hpx::components::server::simple_accumulator::add_action);
+HPX_SERIALIZE_ACTION(hpx::components::server::simple_accumulator::query_action);
+HPX_SERIALIZE_ACTION(hpx::components::server::simple_accumulator::print_action);
 
 #endif

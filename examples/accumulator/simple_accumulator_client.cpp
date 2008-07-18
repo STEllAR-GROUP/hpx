@@ -8,7 +8,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/components/accumulator.hpp>
+#include <hpx/components/simple_accumulator.hpp>
 
 using namespace hpx;
 using namespace std;
@@ -18,8 +18,8 @@ threads::thread_state
 hpx_main(threads::thread_self& self, applier::applier& appl)
 {
     // create an accumulator locally
-    using hpx::components::accumulator;
-    accumulator accu (accumulator::create(self, appl, 
+    using hpx::components::simple_accumulator;
+    simple_accumulator accu (simple_accumulator::create(self, appl, 
         appl.get_runtime_support_gid()));
 
     // print some message
