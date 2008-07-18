@@ -6,6 +6,7 @@
 #if !defined(HPX_RUNTIME_GET_LVA_JUN_22_2008_0451PM)
 #define HPX_RUNTIME_GET_LVA_JUN_22_2008_0451PM
 
+#include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_base_and_derived.hpp>
 
 #include <hpx/hpx_fwd.hpp>
@@ -36,19 +37,19 @@ namespace hpx
     {
         struct is_simple_component
           : boost::is_base_and_derived<
-                components::simple_component_base<Component>, Component
+                components::simple_component_tag, Component
             >
         {};
 
         static Component* 
-        call(naming::address::address_type lva, mpl::false_)
+        call(naming::address::address_type lva, boost::mpl::false_)
         {
             typedef typename Component::wrapping_type wrapping_type;
             return reinterpret_cast<wrapping_type*>(lva)->get();
         }
 
         static Component* 
-        call(naming::address::address_type lva, mpl::true_)
+        call(naming::address::address_type lva, boost::mpl::true_)
         {
             return reinterpret_cast<Component*>(lva);
         }

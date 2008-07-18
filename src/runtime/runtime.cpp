@@ -9,7 +9,6 @@
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 
-#include <hpx/components/server/simple_component_base.hpp>
 #include <hpx/include/runtime.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

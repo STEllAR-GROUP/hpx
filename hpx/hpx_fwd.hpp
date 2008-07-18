@@ -209,6 +209,7 @@ namespace hpx
 
         class accumulator;
         class distributing_factory;
+        struct simple_component_tag {};
         template <typename Component> class simple_component_base;
 
         namespace stubs 

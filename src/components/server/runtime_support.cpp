@@ -6,7 +6,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/components/server/simple_component_base.hpp>
 #include <hpx/components/server/runtime_support.hpp>
 #include <hpx/components/server/accumulator.hpp>
 #include <hpx/components/server/simple_accumulator.hpp>

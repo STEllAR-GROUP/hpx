@@ -6,13 +6,16 @@
 #if !defined(HPX_COMPONENTS_SIMPLE_COMPONENT_BASE_JUL_18_2008_0948PM)
 #define HPX_COMPONENTS_SIMPLE_COMPONENT_BASE_JUL_18_2008_0948PM
 
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming/address.hpp>
+
 namespace hpx { namespace components 
 {
     ///////////////////////////////////////////////////////////////////////////
     /// \class simple_component_base simple_component_base.hpp hpx/components/server/simple_component_base.hpp
     ///
     template <typename Component>
-    class simple_component_base
+    class simple_component_base : public simple_component_tag
     {
     public:
         /// \brief Construct an empty managed_component_base
