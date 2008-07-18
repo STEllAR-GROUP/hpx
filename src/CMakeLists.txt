@@ -17,9 +17,9 @@ set (hpxlib_HEADERS
     ../hpx/components/server/accumulator.hpp
     ../hpx/components/server/distributing_factory.hpp
     ../hpx/components/server/manage_component.hpp
+    ../hpx/components/server/managed_component_base.hpp
     ../hpx/components/server/memory.hpp
     ../hpx/components/server/runtime_support.hpp
-    ../hpx/components/server/wrapper.hpp
     ../hpx/components/server/wrapper_heap.hpp
     ../hpx/components/server/wrapper_heap_list.hpp
     ../hpx/components/stubs/accumulator.hpp

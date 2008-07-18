@@ -13,7 +13,7 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/components/component_type.hpp>
 #include <hpx/runtime/actions/action.hpp>
-#include <hpx/components/server/wrapper.hpp>
+#include <hpx/components/server/managed_component_base.hpp>
 
 namespace hpx { namespace components { namespace server { namespace detail
 {
@@ -27,8 +27,11 @@ namespace hpx { namespace components { namespace server { namespace detail
     {
     public:
         // components must contain a typedef for wrapping_type defining the
-        // wrapper type used to encapsulate instances of this component
-        typedef wrapper<accumulator, server::accumulator> wrapping_type;
+        // managed_component_base type used to encapsulate instances of this 
+        // component
+        typedef 
+            managed_component_base<accumulator, server::accumulator> 
+        wrapping_type;
 
         // parcel action code: the action to be performed on the destination 
         // object (the accumulator)
@@ -124,11 +127,11 @@ namespace hpx { namespace components { namespace server
     /// actions: init, add, query, and print, showing how to used and implement
     /// functionality in a way conformant with the HPX runtime system. 
     class accumulator 
-      : public wrapper<detail::accumulator, accumulator>
+      : public managed_component_base<detail::accumulator, accumulator>
     {
     private:
         typedef detail::accumulator wrapped_type;
-        typedef wrapper<wrapped_type, accumulator> base_type;
+        typedef managed_component_base<wrapped_type, accumulator> base_type;
 
     public:
         // This is the component id. Every component needs to have an embedded

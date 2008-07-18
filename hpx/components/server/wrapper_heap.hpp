@@ -122,8 +122,8 @@ namespace hpx { namespace components { namespace detail
             return NULL != pool_ && NULL != p && pool_ <= p && p < pool_ + size_;
         }
 
-        /// \brief Get the global id of the wrapper instance given by the 
-        ///        parameter \a p. 
+        /// \brief Get the global id of the managed_component_base instance 
+        ///        given by the parameter \a p. 
         ///
         ///
         /// \note  The pointer given by the parameter \a p must have been 
@@ -216,7 +216,7 @@ namespace hpx { namespace components { namespace detail
         int free_size_;
 
         // these values are used for DGAS registration of all elements of this
-        // wrapper heap
+        // managed_component_base heap
         naming::id_type base_gid_;
         naming::resolver_client const* get_dgas_client_;
 

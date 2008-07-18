@@ -792,15 +792,15 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\..\hpx\components\server\managed_component_base.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\hpx\components\server\memory.hpp"
 						>
 					</File>
 					<File
 						RelativePath="..\..\..\hpx\components\server\runtime_support.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\hpx\components\server\wrapper.hpp"
 						>
 					</File>
 					<File

@@ -27,8 +27,9 @@ namespace hpx { namespace lcos
     struct base_lco
     {
         // components must contain a typedef for wrapping_type defining the
-        // wrapper type used to encapsulate instances of this component
-        typedef components::wrapper<base_lco> wrapping_type;
+        // managed_component_base type used to encapsulate instances of this 
+        // component
+        typedef components::managed_component_base<base_lco> wrapping_type;
 
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
@@ -59,8 +60,9 @@ namespace hpx { namespace lcos
     struct base_lco_with_value
     {
         // components must contain a typedef for wrapping_type defining the
-        // wrapper type used to encapsulate instances of this component
-        typedef components::wrapper<
+        // managed_component_base type used to encapsulate instances of this 
+        // component
+        typedef components::managed_component_base<
             base_lco_with_value, components::detail::this_type, 
             boost::mpl::true_> 
         wrapping_type;
@@ -104,8 +106,9 @@ namespace hpx { namespace lcos
     struct base_lco_with_value<void> : public base_lco
     {
         // components must contain a typedef for wrapping_type defining the
-        // wrapper type used to encapsulate instances of this component
-        typedef components::wrapper<
+        // managed_component_base type used to encapsulate instances of this 
+        // component
+        typedef components::managed_component_base<
             base_lco_with_value, components::detail::this_type, 
             boost::mpl::true_> 
         wrapping_type;

@@ -21,7 +21,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/components/component_type.hpp>
-#include <hpx/components/server/wrapper.hpp>
+#include <hpx/components/server/managed_component_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
 
 namespace hpx { namespace threads { namespace detail
@@ -127,11 +127,13 @@ namespace hpx { namespace threads
     /// functionality related to the management of \a thread's is 
     /// implemented by the \a threadmanager.
     class thread 
-      : public components::wrapper<detail::thread, thread, boost::mpl::true_>
+      : public components::managed_component_base<
+            detail::thread, thread, boost::mpl::true_
+        >
     {
     private:
         typedef detail::thread wrapped_type;
-        typedef components::wrapper<
+        typedef components::managed_component_base<
             wrapped_type, thread, boost::mpl::true_> 
         base_type;
 

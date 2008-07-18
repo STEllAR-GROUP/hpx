@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/components/component_type.hpp>
 #include <hpx/runtime/actions/action.hpp>
+#include <hpx/components/server/managed_component_base.hpp>
 
 namespace hpx { namespace components { namespace server { namespace detail
 {
@@ -17,9 +18,10 @@ namespace hpx { namespace components { namespace server { namespace detail
     {
     public:
         // components must contain a typedef for wrapping_type defining the
-        // wrapper type used to encapsulate instances of this component
+        // managed_component_base type used to encapsulate instances of this 
+        // component
         typedef 
-            wrapper<distributing_factory, server::distributing_factory> 
+            managed_component_base<distributing_factory, server::distributing_factory> 
         wrapping_type;
 
         // parcel action code: the action to be performed on the destination 
@@ -64,11 +66,11 @@ namespace hpx { namespace components { namespace server { namespace detail
 namespace hpx { namespace components { namespace server 
 {
     class distributing_factory 
-      : public wrapper<detail::distributing_factory, distributing_factory>
+      : public managed_component_base<detail::distributing_factory, distributing_factory>
     {
     private:
         typedef detail::distributing_factory wrapped_type;
-        typedef wrapper<wrapped_type, distributing_factory> base_type;
+        typedef managed_component_base<wrapped_type, distributing_factory> base_type;
 
     public:
         // This is the component id. Every component needs to have an embedded

@@ -46,17 +46,20 @@ namespace hpx { namespace components
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \class wrapper wrapper.hpp hpx/components/server/wrapper.hpp
+    /// \class managed_component_base managed_component_base.hpp hpx/components/server/managed_component_base.hpp
     ///
-    /// The wrapper template is used as a indirection layer for components 
-    /// allowing to gracefully handle the access to non-existing components.
+    /// The managed_component_base template is used as a indirection layer 
+    /// for components allowing to gracefully handle the access to non-existing 
+    /// components.
     ///
     /// Additionally it provides memory management capabilities for the 
     /// wrapping instances, and it integrates the memory management with the 
-    /// DGAS service. Every instance of a wrapper gets assigned a global id.
-    /// The provided memory management allocates the wrapper instances from a
-    /// special heap, ensuring fast allocation and avoids a full network 
-    /// round trip to the DGAS service for each of the allocated instances.
+    /// DGAS service. Every instance of a managed_component_base gets assigned 
+    /// a global id.
+    /// The provided memory management allocates the managed_component_base 
+    /// instances from a special heap, ensuring fast allocation and avoids a 
+    /// full network round trip to the DGAS service for each of the allocated 
+    /// instances.
     ///
     /// \tparam Component
     /// \tparam Derived
@@ -66,32 +69,35 @@ namespace hpx { namespace components
         typename Component, typename Derived = detail::this_type, 
         typename HasUseCount = boost::mpl::false_
     >
-    class wrapper : public detail::wrapper_use_count<HasUseCount>
+    class managed_component_base 
+      : public detail::wrapper_use_count<HasUseCount>
     {
     private:
         typedef typename boost::mpl::if_<
-                boost::is_same<Derived, detail::this_type>, wrapper, Derived
+                boost::is_same<Derived, detail::this_type>, 
+                managed_component_base, Derived
             >::type derived_type;
 
     public:
         typedef Component wrapped_type;
 
-        /// \brief Construct an empty wrapper
-        wrapper() 
+        /// \brief Construct an empty managed_component_base
+        managed_component_base() 
           : component_(0) 
         {}
 
-        /// \brief Construct a wrapper instance holding a wrapped instance. 
-        ///        This constructor takes ownership of the passed pointer.
+        /// \brief Construct a managed_component_base instance holding a 
+        ///        wrapped instance. This constructor takes ownership of the 
+        ///        passed pointer.
         ///
-        /// \param c    [in] The pointer to the wrapped instance. The wrapper
-        ///             takes ownership of this pointer.
-        explicit wrapper(Component* c) 
+        /// \param c    [in] The pointer to the wrapped instance. The 
+        ///             managed_component_base takes ownership of this pointer.
+        explicit managed_component_base(Component* c) 
           : component_(c) 
         {}
 
         /// \brief The destructor releases any wrapped instances
-        ~wrapper()
+        ~managed_component_base()
         {
             delete component_;
             component_ = 0;
@@ -113,8 +119,8 @@ namespace hpx { namespace components
 
     protected:
         // the memory for the wrappers is managed by a one_size_heap_list
-        typedef 
-            detail::wrapper_heap_list<detail::fixed_wrapper_heap<wrapper> > 
+        typedef detail::wrapper_heap_list<
+            detail::fixed_wrapper_heap<managed_component_base> > 
         heap_type;
 
         struct wrapper_heap_tag {};
@@ -127,17 +133,17 @@ namespace hpx { namespace components
         }
 
     public:
-        /// \brief  The memory for wrapper objects is managed by a class 
-        ///         specific allocator. This allocator uses a one size heap 
-        ///         implementation, ensuring fast memory allocation.
-        ///         Additionally the heap registers the allocated wrapper 
-        ///         instance with the DGAS service.
+        /// \brief  The memory for managed_component_base objects is managed by 
+        ///         a class specific allocator. This allocator uses a one size 
+        ///         heap implementation, ensuring fast memory allocation.
+        ///         Additionally the heap registers the allocated  
+        ///         managed_component_base instance with the DGAS service.
         ///
         /// \param size   [in] The parameter \a size is supplied by the 
         ///               compiler and contains the number of bytes to allocate.
         static void* operator new(std::size_t size)
         {
-            if (size > sizeof(wrapper))
+            if (size > sizeof(managed_component_base))
                 return ::operator new(size);
             return get_heap().alloc();
         }
@@ -146,7 +152,7 @@ namespace hpx { namespace components
             if (NULL == p) 
                 return;     // do nothing if given a NULL pointer
 
-            if (size != sizeof(wrapper)) {
+            if (size != sizeof(managed_component_base)) {
                 ::operator delete(p);
                 return;
             }
@@ -167,10 +173,10 @@ namespace hpx { namespace components
 
         /// \brief  The function \a create is used for allocation and 
         //          initialization of arrays of wrappers.
-        static wrapper* create(std::size_t count)
+        static managed_component_base* create(std::size_t count)
         {
             // allocate the memory
-            wrapper* p = get_heap().alloc(count);
+            managed_component_base* p = get_heap().alloc(count);
             if (1 == count)
                 return new (p) derived_type;
 
@@ -204,7 +210,7 @@ namespace hpx { namespace components
                 p->~derived_type();
             }
             else {
-                // call destructors for all wrapper instances
+                // call destructors for all managed_component_base instances
                 derived_type* curr = static_cast<derived_type*>(p);
                 for (std::size_t i = 0; i < count; ++i)
                     curr->~derived_type();
@@ -219,11 +225,12 @@ namespace hpx { namespace components
         naming::id_type 
         get_gid(applier::applier& appl) const
         {
-            return get_heap().get_gid(appl, const_cast<wrapper*>(this));
+            return get_heap().get_gid(appl, 
+                const_cast<managed_component_base*>(this));
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // The wrapper behaves just like the wrapped object
+        // The managed_component_base behaves just like the wrapped object
         Component* operator-> ()
         {
             if (0 == component_)
@@ -263,17 +270,17 @@ namespace hpx { namespace components
         Component* component_;
     };
 
-    // support for boost::intrusive_ptr<wrapper<...> >
+    // support for boost::intrusive_ptr<managed_component_base<...> >
     template <typename Component, typename Derived, typename HasUseCount>
     inline void
-    intrusive_ptr_add_ref(wrapper<Component, Derived, HasUseCount>* p)
+    intrusive_ptr_add_ref(managed_component_base<Component, Derived, HasUseCount>* p)
     {
         ++p->use_count_;
     }
 
     template <typename Component, typename Derived, typename HasUseCount>
     inline void
-    intrusive_ptr_release(wrapper<Component, Derived, HasUseCount>* p)
+    intrusive_ptr_release(managed_component_base<Component, Derived, HasUseCount>* p)
     {
         if (--p->use_count_ == 0)
             delete p;

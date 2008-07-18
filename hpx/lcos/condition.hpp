@@ -147,7 +147,7 @@ namespace hpx { namespace lcos
     {
     private:
         typedef detail::condition wrapped_type;
-        typedef components::wrapper<wrapped_type> wrapping_type;
+        typedef components::managed_component_base<wrapped_type> wrapping_type;
 
     public:
         condition()

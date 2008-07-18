@@ -17,7 +17,7 @@
 #include <hpx/util/full_empty_memory.hpp>
 #include <hpx/runtime/actions/action.hpp>
 #include <hpx/components/component_type.hpp>
-#include <hpx/components/server/wrapper.hpp>
+#include <hpx/components/server/managed_component_base.hpp>
 
 namespace hpx { namespace lcos { namespace detail 
 {
@@ -143,7 +143,7 @@ namespace hpx { namespace lcos
     {
     protected:
         typedef detail::simple_future<Result> wrapped_type;
-        typedef components::wrapper<
+        typedef components::managed_component_base<
             wrapped_type, components::detail::this_type, boost::mpl::true_> 
         wrapping_type;
 
