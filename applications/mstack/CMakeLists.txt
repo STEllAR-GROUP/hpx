@@ -18,6 +18,6 @@ INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 LINK_DIRECTORIES(${Boost_LIBRARY_DIR})
 
 set (mstack_SOURCES /home/mark/mstack_hpx/mstack.cpp)
-set (hpx_LIBRARIES /home/mark/mstack_hpx/libhpx.a)
+set (hpx_LIBRARIES /home/mark/hpx/src/libhpx.a)
 add_executable (mstack ${mstack_SOURCES})
 target_link_libraries(mstack ${hpx_LIBRARIES} ${Boost_LIBRARIES})
