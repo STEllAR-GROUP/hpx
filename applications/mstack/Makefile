@@ -36,10 +36,10 @@ CMAKE_COMMAND = /usr/local/bin/cmake
 RM = /usr/local/bin/cmake -E remove -f
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/mark/mstack_hpx
+CMAKE_SOURCE_DIR = /home/mark/hpx/applications/mstack
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/mark/mstack_hpx
+CMAKE_BINARY_DIR = /home/mark/hpx/applications/mstack
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -66,9 +66,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/mark/mstack_hpx/CMakeFiles /home/mark/mstack_hpx/CMakeFiles/progress.make
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/mark/hpx/applications/mstack/CMakeFiles /home/mark/hpx/applications/mstack/CMakeFiles/progress.make
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/mark/mstack_hpx/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/mark/hpx/applications/mstack/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -108,29 +108,29 @@ mstack/fast:
 	$(MAKE) -f CMakeFiles/mstack.dir/build.make CMakeFiles/mstack.dir/build
 .PHONY : mstack/fast
 
-mstack.o: mstack.cpp.o
-.PHONY : mstack.o
+home/mark/mstack_hpx/mstack.o: home/mark/mstack_hpx/mstack.cpp.o
+.PHONY : home/mark/mstack_hpx/mstack.o
 
 # target to build an object file
-mstack.cpp.o:
-	$(MAKE) -f CMakeFiles/mstack.dir/build.make CMakeFiles/mstack.dir/mstack.cpp.o
-.PHONY : mstack.cpp.o
+home/mark/mstack_hpx/mstack.cpp.o:
+	$(MAKE) -f CMakeFiles/mstack.dir/build.make CMakeFiles/mstack.dir/home/mark/mstack_hpx/mstack.cpp.o
+.PHONY : home/mark/mstack_hpx/mstack.cpp.o
 
-mstack.i: mstack.cpp.i
-.PHONY : mstack.i
+home/mark/mstack_hpx/mstack.i: home/mark/mstack_hpx/mstack.cpp.i
+.PHONY : home/mark/mstack_hpx/mstack.i
 
 # target to preprocess a source file
-mstack.cpp.i:
-	$(MAKE) -f CMakeFiles/mstack.dir/build.make CMakeFiles/mstack.dir/mstack.cpp.i
-.PHONY : mstack.cpp.i
+home/mark/mstack_hpx/mstack.cpp.i:
+	$(MAKE) -f CMakeFiles/mstack.dir/build.make CMakeFiles/mstack.dir/home/mark/mstack_hpx/mstack.cpp.i
+.PHONY : home/mark/mstack_hpx/mstack.cpp.i
 
-mstack.s: mstack.cpp.s
-.PHONY : mstack.s
+home/mark/mstack_hpx/mstack.s: home/mark/mstack_hpx/mstack.cpp.s
+.PHONY : home/mark/mstack_hpx/mstack.s
 
 # target to generate assembly for a file
-mstack.cpp.s:
-	$(MAKE) -f CMakeFiles/mstack.dir/build.make CMakeFiles/mstack.dir/mstack.cpp.s
-.PHONY : mstack.cpp.s
+home/mark/mstack_hpx/mstack.cpp.s:
+	$(MAKE) -f CMakeFiles/mstack.dir/build.make CMakeFiles/mstack.dir/home/mark/mstack_hpx/mstack.cpp.s
+.PHONY : home/mark/mstack_hpx/mstack.cpp.s
 
 # Help Target
 help:
@@ -141,9 +141,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... mstack"
 	@echo "... rebuild_cache"
-	@echo "... mstack.o"
-	@echo "... mstack.i"
-	@echo "... mstack.s"
+	@echo "... home/mark/mstack_hpx/mstack.o"
+	@echo "... home/mark/mstack_hpx/mstack.i"
+	@echo "... home/mark/mstack_hpx/mstack.s"
 .PHONY : help
 
 
