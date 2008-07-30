@@ -108,29 +108,29 @@ mstack/fast:
 	$(MAKE) -f CMakeFiles/mstack.dir/build.make CMakeFiles/mstack.dir/build
 .PHONY : mstack/fast
 
-home/mark/mstack_hpx/mstack.o: home/mark/mstack_hpx/mstack.cpp.o
-.PHONY : home/mark/mstack_hpx/mstack.o
+mstack.o: mstack.cpp.o
+.PHONY : mstack.o
 
 # target to build an object file
-home/mark/mstack_hpx/mstack.cpp.o:
-	$(MAKE) -f CMakeFiles/mstack.dir/build.make CMakeFiles/mstack.dir/home/mark/mstack_hpx/mstack.cpp.o
-.PHONY : home/mark/mstack_hpx/mstack.cpp.o
+mstack.cpp.o:
+	$(MAKE) -f CMakeFiles/mstack.dir/build.make CMakeFiles/mstack.dir/mstack.cpp.o
+.PHONY : mstack.cpp.o
 
-home/mark/mstack_hpx/mstack.i: home/mark/mstack_hpx/mstack.cpp.i
-.PHONY : home/mark/mstack_hpx/mstack.i
+mstack.i: mstack.cpp.i
+.PHONY : mstack.i
 
 # target to preprocess a source file
-home/mark/mstack_hpx/mstack.cpp.i:
-	$(MAKE) -f CMakeFiles/mstack.dir/build.make CMakeFiles/mstack.dir/home/mark/mstack_hpx/mstack.cpp.i
-.PHONY : home/mark/mstack_hpx/mstack.cpp.i
+mstack.cpp.i:
+	$(MAKE) -f CMakeFiles/mstack.dir/build.make CMakeFiles/mstack.dir/mstack.cpp.i
+.PHONY : mstack.cpp.i
 
-home/mark/mstack_hpx/mstack.s: home/mark/mstack_hpx/mstack.cpp.s
-.PHONY : home/mark/mstack_hpx/mstack.s
+mstack.s: mstack.cpp.s
+.PHONY : mstack.s
 
 # target to generate assembly for a file
-home/mark/mstack_hpx/mstack.cpp.s:
-	$(MAKE) -f CMakeFiles/mstack.dir/build.make CMakeFiles/mstack.dir/home/mark/mstack_hpx/mstack.cpp.s
-.PHONY : home/mark/mstack_hpx/mstack.cpp.s
+mstack.cpp.s:
+	$(MAKE) -f CMakeFiles/mstack.dir/build.make CMakeFiles/mstack.dir/mstack.cpp.s
+.PHONY : mstack.cpp.s
 
 # Help Target
 help:
@@ -141,9 +141,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... mstack"
 	@echo "... rebuild_cache"
-	@echo "... home/mark/mstack_hpx/mstack.o"
-	@echo "... home/mark/mstack_hpx/mstack.i"
-	@echo "... home/mark/mstack_hpx/mstack.s"
+	@echo "... mstack.o"
+	@echo "... mstack.i"
+	@echo "... mstack.s"
 .PHONY : help
 
 
