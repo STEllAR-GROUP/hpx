@@ -1,3 +1,13 @@
+/* 
+Mstack is a benchmark that simulates one stage of post-processing 
+(by means of median stacking) done on seismic reflection data. 
+More information is available here: 
+http://www.eecis.udel.edu/~mpellegr/mstack/
+
+-Mark Pellegrini (markpell@udel.edu)
+August, 2008 
+*/
+
 #include <iostream>
 #include <cstdio>
 #include <hpx/hpx.hpp> 
@@ -137,7 +147,9 @@ mstack::do_run (hpx::threads::thread_self& s, hpx::applier::applier &app, return
 hpx::threads::thread_state 
 onepass (hpx::threads::thread_self& s, hpx::applier::applier &app, int numchn, int j)
 {
-  hpx::naming::id_type gid0 = nonlocal_gids[j];  
+  printf("Invoking onepass - %d\n", j);
+
+  hpx::naming::id_type gid0 = nonlocal_gids[0]; //should be [j-1] instead of 0 -- debugging  
   hpx::naming::id_type gid = create (app, s, gid0, MAGICNUM2);  
   hpx::lcos::eager_future <mstack::do_run_action, return_set> ef (app, gid, j, numchn); 
   return_set r = ef.get_result(s);
@@ -207,9 +219,9 @@ int main(int argc, char* argv[])
 
     // Check command line arguments.
     if (argc != 5) {
-      std::cerr << "Usage: accumulator_client hpx_addr hpx_port dgas_addr "
+      std::cerr << "Usage: mstack hpx_addr hpx_port dgas_addr "
 	"dgas_port" << std::endl;
-      std::cerr << "Try: accumulator_client <your_ip_addr> 7911 "
+      std::cerr << "Try: mstack <your_ip_addr> 7911 "
 	"<your_ip_addr> 7912" << std::endl;
       return -3;
     }

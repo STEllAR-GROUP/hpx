@@ -1,12 +1,25 @@
-To compile Mstack: 
+This file contains:
+I.   Instructions for compiling Mstack
+II.  Instructions for running Mstack. 
+III. Details on the current HPX limitations where Mstack is concerned. 
+
+Note: Because the HPX toolchain currently lacks a "factory", the benchmark will not execute correctly. 
+
+-Mark Pellegrini (markpell@udel.edu)
+August 2008
+------------------------------------------------------------------
+
+
+I.  To compile Mstack: 
 ------------------
 (1) cmake .
 (2) make 
 
-To run Mstack:
+
+II.  To run Mstack:
 ------------------
 (1) Start the DGAS server:
-../../runtime/hpx_runtime <DGAS HOST IP> <PORT 1> <DGAS HOST IP> <PORT 2> 
+../../runtime/hpx_runtime <DGAS HOST IP> <PORT 1> <DGAS HOST IP> <PORT 2> 1
 
  The DGAS server listens on two ports. On the first port, it instantiates a full copy of the HPX runtime (just like any computation node). On the second, it provides the actual DGAS service. 
 
@@ -19,8 +32,10 @@ PORT 1 is the port on which Mstack will listen for packets. It is arbitrary. On 
 
 The DGAS SERVER IP and PORT 2 are the same as from step 1. 
 
+(3) Mstack will prompt the user to enter the number of channels (an int from 2 to 128, inclusive). These determine how much work the benchmark will do. The runtime increases as the square of the number of channels. 
 
-Current HPX Limitations:
+
+III.   Current HPX Limitations:
 ------------
 
 (1) The big one: The "Factory" lacks the ability to dynamically create components
