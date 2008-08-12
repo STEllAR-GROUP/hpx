@@ -13,6 +13,7 @@
 #include <hpx/components/server/manage_component.hpp>
 #include <hpx/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
+#include "../../../applications/mstack/mstack.hpp"
 
 namespace hpx { namespace components { namespace server
 {
@@ -36,6 +37,9 @@ namespace hpx { namespace components { namespace server
         case distributing_factory::value:
             id = server::create<server::distributing_factory>(appl, count);
             break;
+	
+        case MAGICNUM2:
+	  id = server::create<mstack>(appl, count);
 
         default:
             boost::throw_exception(hpx::exception(hpx::bad_component_type,
