@@ -17,7 +17,7 @@ find_package(Boost 1.35.0 COMPONENTS ${Boost_COMPONENTS_NEEDED})
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 LINK_DIRECTORIES(${Boost_LIBRARY_DIR})
 
-set (mstack_SOURCES mstack.cpp)
+set (mstack_SOURCES main.cpp)
 set (hpx_LIBRARIES /home/mark/hpx/src/libhpx.a)
 add_executable (mstack ${mstack_SOURCES})
 target_link_libraries(mstack ${hpx_LIBRARIES} ${Boost_LIBRARIES})
