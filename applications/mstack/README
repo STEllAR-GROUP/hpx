@@ -3,8 +3,6 @@ I.   Instructions for compiling Mstack
 II.  Instructions for running Mstack. 
 III. Details on the current HPX limitations where Mstack is concerned. 
 
-Note: Because the HPX toolchain currently lacks a "factory", the benchmark will not execute correctly. 
-
 -Mark Pellegrini (markpell@udel.edu)
 August 2008
 ------------------------------------------------------------------
@@ -19,11 +17,9 @@ I.  To compile Mstack:
 II.  To run Mstack:
 ------------------
 (1) Start the DGAS server:
-../../runtime/hpx_runtime <DGAS HOST IP> <PORT 1> <DGAS HOST IP> <PORT 2> 1
-
-The DGAS server listens on two ports. On the first port, it instantiates a full copy of the HPX runtime (just like any computation node). On the second, it provides the actual DGAS service. To avoid this, use the pure (DGAS only) runtime: 
 ../../runtime/hpx_runtime_pure <DGAS HOST IP> <PORT 1> <DGAS HOST IP> <PORT 2> 1
 
+The normal DGAS server (../../runtime/hpx_runtime) listens on two ports. On the first port, it instantiates a full copy of the HPX runtime (just like any computation node). On the second, it provides the actual DGAS service. The pure version instantiates only a DGAS server. 
 
 (2) Now run Mstack: 
 ./mstack <COMPUTATION NODE IP> <PORT 1> <DGAS SERVER IP> <PORT 2>  
