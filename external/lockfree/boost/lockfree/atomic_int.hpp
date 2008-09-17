@@ -188,7 +188,7 @@ public:
         for(;;)
         {
             T oldv = value;
-            T newv = oldv + v;
+            T newv = oldv - v;
 
             if(likely(CAS(&value, oldv, newv)))
                 return newv;

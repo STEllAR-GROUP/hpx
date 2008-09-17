@@ -42,6 +42,12 @@ namespace hpx { namespace lcos
     /// \tparam Result   The template parameter \a Result defines the type this 
     ///                  eager_future is expected to return from 
     ///                  \a eager_future#get_result.
+    /// \tparam DirectExecute The template parameter \a DirectExecute is an
+    ///                  optimization aid allowing to execute the action 
+    ///                  directly if the target is local (without spawning a 
+    ///                  new thread for this). This template does not have to be
+    ///                  supplied explicitly as it is derived from the template 
+    ///                  parameter \a Action.
     ///
     /// \note            The action executed using the eager_future as a 
     ///                  continuation must return a value of a type convertible 

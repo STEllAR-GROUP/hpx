@@ -47,6 +47,7 @@ set (hpxlib_HEADERS
     ../hpx/lcos/eager_future_constructors_direct.hpp
     ../hpx/lcos/lazy_future.hpp
     ../hpx/lcos/lazy_future_get_results.hpp
+    ../hpx/lcos/lazy_future_get_results_direct.hpp
     ../hpx/lcos/mutex.hpp
     ../hpx/lcos/simple_future.hpp
     # runtime

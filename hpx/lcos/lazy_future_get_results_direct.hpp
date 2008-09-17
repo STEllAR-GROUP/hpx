@@ -5,8 +5,8 @@
 
 #ifndef BOOST_PP_IS_ITERATING
 
-#if !defined(HPX_LCOS_LAZY_FUTURE_GET_RESULTS_JUN_27_2008_0448PM)
-#define HPX_LCOS_LAZY_FUTURE_GET_RESULTS_JUN_27_2008_0448PM
+#if !defined(HPX_LCOS_LAZY_FUTURE_GET_RESULTS_DIRCET_SEP_17_2008_0126PM)
+#define HPX_LCOS_LAZY_FUTURE_GET_RESULTS_DIRCET_SEP_17_2008_0126PM
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
@@ -16,7 +16,7 @@
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
-    "hpx/lcos/lazy_future_get_results.hpp"))                                  \
+    "hpx/lcos/lazy_future_get_results_direct.hpp"))                           \
     /**/
     
 #include BOOST_PP_ITERATE()
@@ -35,6 +35,14 @@
         applier::applier& appl, naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
+        // Determine whether the gid is local or remote
+        naming::address addr;
+        if (appl.address_is_local(gid, addr)) {
+            // local, direct execution
+            return Action::execute_function(appl, addr,
+                BOOST_PP_ENUM_PARAMS(N, arg));
+        }
+
         // initialize the remote operation
         appl.apply_c<Action>(addr, this->get_gid(appl), gid, 
             BOOST_PP_ENUM_PARAMS(N, arg));
