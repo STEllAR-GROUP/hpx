@@ -41,33 +41,33 @@ namespace hpx { namespace parcelset
     public:
         parcel() 
           : tag_(0), destination_id_(0), source_id_(), action_(), 
-            continuation_(), start_time_(0)
+            continuation_(), start_time_(0), creation_time_(0)
         {
         }
 
         parcel(naming::id_type apply_to)
           : tag_(0), destination_id_(apply_to), source_id_(0), action_(), 
-            continuation_(), start_time_(0)
+            continuation_(), start_time_(0), creation_time_(0)
         {
         }
 
         parcel(naming::id_type apply_to, actions::action_base* act)
           : tag_(0), destination_id_(apply_to), source_id_(0), action_(act), 
-            continuation_(), start_time_(0)
+            continuation_(), start_time_(0), creation_time_(0)
         {
         }
 
         parcel(naming::id_type apply_to, actions::action_base* act, 
                actions::continuation* do_after) 
           : tag_(0), destination_id_(apply_to), source_id_(0), action_(act), 
-            continuation_(do_after), start_time_(0)
+            continuation_(do_after), start_time_(0), creation_time_(0)
         {
         }
 
         parcel(naming::id_type apply_to, actions::action_base* act, 
                actions::continuation_type do_after) 
           : tag_(0), destination_id_(apply_to), source_id_(0), action_(act), 
-            continuation_(do_after), start_time_(0)
+            continuation_(do_after), start_time_(0), creation_time_(0)
         {
         }
 
@@ -131,10 +131,16 @@ namespace hpx { namespace parcelset
         void set_start_time(double starttime)
         {
             start_time_ = starttime;
+            if (creation_time_ == 0)
+                creation_time_ = starttime;
         }
         double get_start_time() const
         {
             return start_time_;
+        }
+        double get_creation_time() const
+        {
+            return creation_time_;
         }
 
     private:
@@ -157,6 +163,7 @@ namespace hpx { namespace parcelset
         actions::action_type action_;
         actions::continuation_type continuation_;
         double start_time_;
+        double creation_time_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

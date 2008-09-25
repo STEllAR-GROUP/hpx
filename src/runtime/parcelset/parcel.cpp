@@ -28,6 +28,7 @@ namespace hpx { namespace parcelset
         if (has_continuations)
             ar << continuation_;
         ar << start_time_;
+        ar << creation_time_;
     }
 
     template<class Archive>
@@ -48,6 +49,7 @@ namespace hpx { namespace parcelset
         if (has_continuation)
             ar >> continuation_;
         ar >> start_time_;
+        ar >> creation_time_;
     }
 
     // explicit instantiation for the correct archive types
