@@ -51,6 +51,7 @@ namespace hpx
         parcel_port_(parcel_pool_, address, port),
         thread_manager_(timer_pool_),
         parcel_handler_(dgas_client_, parcel_port_, &thread_manager_),
+        runtime_support_(dgas_client_),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_)
@@ -63,6 +64,7 @@ namespace hpx
         parcel_port_(parcel_pool_, address),
         thread_manager_(timer_pool_),
         parcel_handler_(dgas_client_, parcel_port_, &thread_manager_),
+        runtime_support_(dgas_client_),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_)
@@ -98,11 +100,12 @@ namespace hpx
         // register the runtime_support and memory instances with the DGAS 
         dgas_client_.bind(applier_.get_runtime_support_gid(), 
             naming::address(parcel_port_.here(), 
-                components::server::runtime_support::value, &runtime_support_));
+                components::server::runtime_support::get_component_type(), 
+                &runtime_support_));
 
         dgas_client_.bind(applier_.get_memory_gid(), 
             naming::address(parcel_port_.here(), 
-                components::server::memory::value, &memory_));
+                components::server::memory::get_component_type(), &memory_));
 
         // register the given main function with the thread manager
         if (!func.empty())

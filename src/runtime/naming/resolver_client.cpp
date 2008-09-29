@@ -18,6 +18,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/integer/endian.hpp>
 
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -135,6 +136,21 @@ namespace hpx { namespace naming
             prefixes.push_back(get_id_from_prefix(*it));
 
         return s == success;
+    }
+
+    components::component_type resolver_client::get_component_id(
+        std::string const& componentname) const
+    {
+        // send request
+        server::request req (server::command_get_component_id, componentname);
+        server::reply rep;
+        execute(req, rep);
+
+        hpx::error s = (hpx::error) rep.get_status();
+        if (s != success && s != no_success)
+            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+
+        return rep.get_component_id();
     }
 
     bool resolver_client::get_id_range(locality const& l, std::size_t count, 

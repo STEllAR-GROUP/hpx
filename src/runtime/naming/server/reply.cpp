@@ -81,6 +81,10 @@ namespace hpx { namespace naming { namespace server
                 os << "id" << rep.id_ << " ";
                 break;
 
+            case command_get_component_id:
+                os << "type(" << (int)rep.type_ << ") ";
+                break;
+
             case command_statistics_count:
             case command_statistics_mean:
             case command_statistics_moment2:

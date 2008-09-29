@@ -11,10 +11,12 @@
 #include <boost/serialization/serialization.hpp>
 
 #include <hpx/runtime/naming/locality.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
-#include <hpx/components/component_type.hpp>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 //  address serialization format version
@@ -23,11 +25,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming
 {
-    struct address : public util::safe_bool<address>
+    struct HPX_EXPORT address : public util::safe_bool<address>
     {
         typedef boost::uint64_t component_type;
         typedef boost::uint64_t address_type;
-        
+
         ///////////////////////////////////////////////////////////////////////
         address()
           : type_(0), address_(0)
@@ -36,32 +38,32 @@ namespace hpx { namespace naming
         address(locality l)
           : locality_(l), type_(0), address_(0) 
         {}
-        
+
         address(locality l, component_type t, void* lva)
           : locality_(l), type_(t), 
             address_(reinterpret_cast<address_type>(lva)) 
         {}
-        
+
         address(locality l, component_type t, address_type a)
           : locality_(l), type_(t), address_(a) 
         {}
-        
+
         // this get's called from the safe_bool base class 
         bool operator_bool() const { return 0 != address_; }
-        
+
         friend bool operator==(address const& lhs, address const& rhs)
         {
             return lhs.locality_ == rhs.locality_ &&
                    lhs.type_ == rhs.type_ && lhs.address_ == rhs.address_;
         }
-        
+
         locality locality_;     /// locality: ip4 address/port number
         component_type type_;   /// component type this address is referring to
         address_type address_;  /// address (sequence number)
 
     private:
         friend std::ostream& operator<< (std::ostream& os, address const& req);
-        
+
         // serialization support    
         friend class boost::serialization::access;
 
@@ -78,7 +80,7 @@ namespace hpx { namespace naming
                 throw exception(version_too_new, 
                     "trying to load address with unknown version");
             }
-            
+
             ar >> locality_ >> type_ >> address_; 
         }
 
@@ -93,7 +95,6 @@ namespace hpx { namespace naming
            << "0x" << std::hex << addr.address_; 
         return os;
     }
-        
 
 ///////////////////////////////////////////////////////////////////////////////
 }}
@@ -103,5 +104,7 @@ namespace hpx { namespace naming
 // this definition needs to be in the global namespace
 BOOST_CLASS_VERSION(hpx::naming::address, HPX_ADDRESS_VERSION)
 BOOST_CLASS_TRACKING(hpx::naming::address, boost::serialization::track_never)
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

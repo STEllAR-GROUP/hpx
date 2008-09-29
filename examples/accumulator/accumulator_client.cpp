@@ -8,7 +8,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/components/accumulator.hpp>
+#include <hpx/components/accumulator/accumulator.hpp>
 
 using namespace hpx;
 using namespace std;

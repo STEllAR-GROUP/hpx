@@ -7,6 +7,7 @@
 #if !defined(HPX_NAMING_LOCALITY_MAR_24_2008_0942AM)
 #define HPX_NAMING_LOCALITY_MAR_24_2008_0942AM
 
+#include <boost/config.hpp>
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <boost/cstdint.hpp>
@@ -19,6 +20,8 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/asio_util.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 ///  version of GAS reply structure
 #define HPX_LOCALITY_VERSION   0x20
@@ -27,7 +30,7 @@
 namespace hpx { namespace naming
 {
     ///////////////////////////////////////////////////////////////////////////
-    class locality
+    class HPX_EXPORT locality
     {
     public:
         locality() 
@@ -181,6 +184,8 @@ namespace hpx { namespace naming
 // this definition needs to be in the global namespace
 BOOST_CLASS_VERSION(hpx::naming::locality, HPX_LOCALITY_VERSION)
 BOOST_CLASS_TRACKING(hpx::naming::locality, boost::serialization::track_never)
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif
 

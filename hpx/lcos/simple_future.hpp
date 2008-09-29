@@ -13,11 +13,11 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/actions/action.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/util/full_empty_memory.hpp>
-#include <hpx/runtime/actions/action.hpp>
-#include <hpx/components/component_type.hpp>
-#include <hpx/components/server/managed_component_base.hpp>
 
 namespace hpx { namespace lcos { namespace detail 
 {
@@ -170,6 +170,9 @@ namespace hpx { namespace lcos
         }
 
     public:
+
+        ~simple_future()
+        {}
 
         /// Get the result of the requested action. This call blocks (yields 
         /// control) if the result is not ready. As soon as the result has been 

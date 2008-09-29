@@ -59,6 +59,7 @@ namespace hpx { namespace naming { namespace server
     protected:
         void handle_getprefix(request const& req, reply& rep);
         void handle_getprefixes(request const& req, reply& rep);
+        void handle_get_component_id(request const& req, reply& rep);
         void handle_getidrange(request const& req, reply& rep);
         void handle_bind_range(request const& req, reply& rep);
         void handle_unbind_range(request const& req, reply& rep);
@@ -110,17 +111,26 @@ namespace hpx { namespace naming { namespace server
         typedef std::map<hpx::naming::locality, site_prefix_type> 
             site_prefix_map_type;
         typedef site_prefix_map_type::value_type site_prefix_value_type;
-            
-        typedef boost::mutex mutex_type;
-        
+
         // comparison operator for the entries stored in the site_prefix_map
         friend bool operator< (site_prefix_value_type const& lhs,
             site_prefix_value_type const& rhs);
 
-        mutex_type mtx_;
+        // Store all registered component types 
+        typedef std::map<std::string, int> component_type_map;
+
+        typedef boost::mutex mutex_type;
+
+        mutex_type ns_registry_mtx_;
         ns_registry_type ns_registry_;        // "name" --> global_id
+
+        mutex_type registry_mtx_;
         registry_type registry_;              // global_id --> local_address
         site_prefix_map_type site_prefixes_;  // locality --> prefix, upper_boundary
+
+        mutex_type component_types_mtx_;
+        int component_type_;
+        component_type_map component_types_;  // component names --> type id
 
         // gathered timings and counts
 #if BOOST_VERSION >= 103600

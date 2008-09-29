@@ -6,11 +6,12 @@
 #if !defined(HPX_COMPONENTS_JUN_01_2007_0526PM)
 #define HPX_COMPONENTS_JUN_01_2007_0526PM
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/actions/action.hpp>
-#include <hpx/components/component_type.hpp>
-#include <hpx/components/runtime_support.hpp>
-#include <hpx/components/server/simple_component_base.hpp>
-#include <hpx/components/server/memory.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/simple_component_base.hpp>
+#include <hpx/runtime/components/server/runtime_support.hpp>
+#include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 
 #endif

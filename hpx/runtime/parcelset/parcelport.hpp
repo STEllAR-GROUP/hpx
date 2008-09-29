@@ -21,13 +21,15 @@
 #include <hpx/runtime/parcelset/connection_cache.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
     /// The parcelport is the lowest possible representation of the parcelset
     /// inside a locality. It provides the minimal functionality to send and
     /// to receive parcels.
-    class parcelport : boost::noncopyable
+    class HPX_EXPORT parcelport : boost::noncopyable
     {
     private:
         static void default_write_handler(boost::system::error_code const&, 
@@ -235,5 +237,7 @@ namespace hpx { namespace parcelset
 
 ///////////////////////////////////////////////////////////////////////////////
 }}
-    
+
+#include <hpx/config/warnings_suffix.hpp>
+
 #endif

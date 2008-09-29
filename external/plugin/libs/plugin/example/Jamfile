@@ -1,0 +1,4 @@
+
+dll library : library.cpp : <include>../../.. <include>$(BOOST_ROOT) ;
+exe application : application.cpp : <include>../../.. <include>$(BOOST_ROOT) 
+   <find-library>dl <linkflags>"-Wl,-E" ;

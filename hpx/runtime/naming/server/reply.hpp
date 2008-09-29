@@ -64,7 +64,7 @@ namespace hpx { namespace naming { namespace server
         reply (dgas_server_command command, naming::id_type const& id, 
                error s = success)
           : command_(command), status_(s),
-            error_(get_error_text(success)),
+            error_(get_error_text(s)),
             lower_bound_(0), upper_bound_(0), id_(id)
         {
             BOOST_ASSERT(s == success || s == no_success);
@@ -72,9 +72,16 @@ namespace hpx { namespace naming { namespace server
                          command == command_registerid);
         }
 
+        reply (components::component_type type, error s = success)
+          : command_(command_get_component_id), status_(s),
+            error_(get_error_text(s)), 
+            type_(type)
+        {
+        }
+
         reply (std::vector<boost::uint32_t>& prefixes, error s = success)
           : command_(command_getprefixes), status_(s),
-            error_(get_error_text(success))
+            error_(get_error_text(s))
         {
             BOOST_ASSERT(s == success || s == no_success);
             std::swap(prefixes_, prefixes);
@@ -84,7 +91,7 @@ namespace hpx { namespace naming { namespace server
         reply (dgas_server_command command, Container const& totals, F f,
                error s = success)
           : command_(command), status_(s),
-            error_(get_error_text(success)),
+            error_(get_error_text(s)),
             lower_bound_(0), upper_bound_(0)
         {
             BOOST_ASSERT(s == success || s == no_success);
@@ -156,6 +163,11 @@ namespace hpx { namespace naming { namespace server
             return id_;
         }
 
+        components::component_type get_component_id() const
+        {
+            return type_;
+        }
+
         double get_statictics(std::size_t i) const
         {
             if (i >= command_lastcommand)
@@ -209,6 +221,10 @@ namespace hpx { namespace naming { namespace server
                 ar << id_;
                 break;
 
+            case command_get_component_id:
+                ar << type_;
+                break;
+
             case command_statistics_count:
             case command_statistics_mean:
             case command_statistics_moment2:
@@ -258,6 +274,10 @@ namespace hpx { namespace naming { namespace server
                 ar >> id_;
                 break;
 
+            case command_get_component_id:
+                ar >> type_;
+                break;
+
             case command_statistics_count:
             case command_statistics_mean:
             case command_statistics_moment2:
@@ -283,7 +303,8 @@ namespace hpx { namespace naming { namespace server
         naming::id_type upper_bound_;   ///< upper bound of id range (for get_idrange only)
         naming::id_type id_;            ///< global id (for queryid only)
         std::vector<double> statistics_;        ///< gathered statistics
-        std::vector<boost::uint32_t> prefixes_; ///< all site prefixes know to this server
+        std::vector<boost::uint32_t> prefixes_; ///< all site prefixes known to this server
+        components::component_type type_;       ///< the component type (command_get_component_id only)
     };
 
     /// The \a operator<< is used for logging purposes, dumping the internal 

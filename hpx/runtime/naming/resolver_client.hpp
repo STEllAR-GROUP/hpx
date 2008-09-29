@@ -11,8 +11,11 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/util/future.hpp>
 #include <hpx/util/io_service_pool.hpp>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming 
@@ -26,7 +29,7 @@ namespace hpx { namespace naming
     /// \class resolver_client resolver_client.hpp hpx/runtime/naming/resolver_client.hpp
     /// The top-level class of the DGAS client. This class exposes the DGAS 
     /// server functionality on the client side.
-    class resolver_client
+    class HPX_EXPORT resolver_client
     {
     public:
         /// Construct the resolver client to work with the server given by
@@ -94,6 +97,21 @@ namespace hpx { namespace naming
         ///                   the runtime_support components of these 
         ///                   localities.
         bool get_prefixes(std::vector<id_type>& prefixes) const;
+
+        /// \brief Return a unique id usable as a component type.
+        /// 
+        /// This function returns the component type id associated with the 
+        /// given component name. If this is the first request for this 
+        /// component name a new unique id will be created
+        ///
+        /// \param name       [in] The component name (string) to get the 
+        ///                   component type for.
+        /// 
+        /// \returns          The function returns the currently associated 
+        ///                   component type. Any error results in an 
+        ///                   exception thrown from this function.
+        components::component_type 
+            get_component_id(std::string const& componentname) const;
 
         /// \brief Get unique range of freely assignable global ids 
         ///
@@ -520,5 +538,7 @@ namespace hpx { namespace naming
 
 ///////////////////////////////////////////////////////////////////////////////
 }}  // namespace hpx::naming
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

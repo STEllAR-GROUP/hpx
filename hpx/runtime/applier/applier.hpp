@@ -15,7 +15,9 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/applier/apply_helper.hpp>
 #include <hpx/runtime/actions/action.hpp>
-#include <hpx/components/server/runtime_support.hpp>
+#include <hpx/runtime/components/server/runtime_support.hpp>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace applier
 {
@@ -25,7 +27,7 @@ namespace hpx { namespace applier
     /// has to be issued on a local or a remote resource. If the target 
     /// component is local a new \a thread will be created, if the target is
     /// remote a parcel will be sent.
-    class applier : private boost::noncopyable
+    class HPX_EXPORT applier : private boost::noncopyable
     {
     public:
         // constructor
@@ -374,5 +376,7 @@ namespace hpx { namespace applier
         naming::id_type const& gid, std::size_t count = 1);
 
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

@@ -6,6 +6,7 @@
 #if !defined(HPX_ACTION_MANAGER_MAY_14_2008_0924AM)
 #define HPX_ACTION_MANAGER_MAY_14_2008_0924AM
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/actions/action_manager.hpp>
 
 #endif

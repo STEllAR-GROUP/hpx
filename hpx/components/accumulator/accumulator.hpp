@@ -7,7 +7,7 @@
 #define HPX_COMPONENTS_ACCUMULATOR_MAY_18_2008_0822AM
 
 #include <hpx/runtime/runtime.hpp>
-#include <hpx/components/stubs/accumulator.hpp>
+#include <hpx/components/accumulator/stubs/accumulator.hpp>
 
 namespace hpx { namespace components 
 {

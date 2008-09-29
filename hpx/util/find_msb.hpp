@@ -55,7 +55,7 @@ namespace hpx { namespace util
                 std::size_t t = v >> 16;
                 if (t != 0) 
                     return 16 + find_msb<boost::mpl::int_<2> >::call(t);
-                return find_msb<boost::mpl::int_<2> >::call(v);
+                return find_msb<boost::mpl::int_<2> >::call(boost::uint16_t(v));
             }
         };
 
@@ -65,10 +65,10 @@ namespace hpx { namespace util
             static int call(boost::uint64_t v)
             {
                 // 64Bit size_t
-                std::size_t t = v >> 32;
+                std::size_t t = std::size_t(v >> 32);
                 if (t != 0)
                     return 32 + find_msb<boost::mpl::int_<4> >::call(t);
-                return find_msb<boost::mpl::int_<4> >::call(v);
+                return find_msb<boost::mpl::int_<4> >::call(boost::uint32_t(v));
             }
         };
     }

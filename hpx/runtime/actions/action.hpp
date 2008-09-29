@@ -28,6 +28,8 @@
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Helper macro for action serialization, each of the defined actions needs to 
 // be registered with the serialization library
@@ -58,7 +60,7 @@ namespace hpx { namespace actions
     struct action_base
     {
         virtual ~action_base() {}
-        
+
         /// The function \a get_action_code returns the code of the action 
         /// instance it is called for.
         virtual std::size_t get_action_code() const = 0;
@@ -207,7 +209,7 @@ namespace hpx { namespace actions
         /// retrieve component type
         int get_component_type() const
         {
-            return static_cast<int>(Component::value);
+            return static_cast<int>(Component::get_component_type());
         }
 
     private:
@@ -409,7 +411,8 @@ namespace hpx { namespace actions
         threads::thread_state(Component::*F)(
             threads::thread_self&, applier::applier&)
     >
-    class action0 : public action<Component, Action, boost::fusion::vector<> >
+    class action0 
+      : public action<Component, Action, boost::fusion::vector<> >
     {
     private:
         typedef action<Component, Action, boost::fusion::vector<> > base_type;
@@ -831,6 +834,8 @@ namespace hpx { namespace actions
 
 ///////////////////////////////////////////////////////////////////////////////
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif
 

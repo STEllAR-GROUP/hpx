@@ -21,12 +21,13 @@
 #include <hpx/runtime/naming/server/connection.hpp>
 #include <hpx/runtime/naming/server/request_handler.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming 
 {
     /// The top-level class of the GAC server.
-    class resolver_server
-      : private boost::noncopyable
+    class HPX_EXPORT resolver_server : private boost::noncopyable
     {
     public:
         /// Construct the server to listen on the specified TCP address and port, 
@@ -73,5 +74,7 @@ namespace hpx { namespace naming
 
 ///////////////////////////////////////////////////////////////////////////////
 }}  // namespace hpx::naming
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif 

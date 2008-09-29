@@ -19,6 +19,8 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 //  parcel serialization format version
 #define HPX_PARCEL_VERSION 0x40
@@ -36,7 +38,7 @@ namespace hpx { namespace parcelset
     /// \class parcel parcel.hpp hpx/runtime/parcelset/parcel.hpp
     ///
     ///
-    class parcel
+    class HPX_EXPORT parcel
     {
     public:
         parcel() 
@@ -174,5 +176,7 @@ namespace hpx { namespace parcelset
 // this definition needs to be in the global namespace
 BOOST_CLASS_VERSION(hpx::parcelset::parcel, HPX_PARCEL_VERSION)
 BOOST_CLASS_TRACKING(hpx::parcelset::parcel, boost::serialization::track_never)
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

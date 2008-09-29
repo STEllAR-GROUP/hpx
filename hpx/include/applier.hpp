@@ -6,6 +6,7 @@
 #if !defined(HPX_APPLIER_JUNE_05_0115PM)
 #define HPX_APPLIER_JUNE_05_0115PM
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 
 #endif

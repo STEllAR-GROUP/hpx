@@ -53,10 +53,10 @@ namespace hpx { namespace parcelset
     }
 
     // explicit instantiation for the correct archive types
-    template void 
+    template HPX_EXPORT void 
     parcel::save(util::portable_binary_oarchive&, const unsigned int version) const;
 
-    template void 
+    template HPX_EXPORT void 
     parcel::load(util::portable_binary_iarchive&, const unsigned int version);
     
 ///////////////////////////////////////////////////////////////////////////////

@@ -16,8 +16,8 @@
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/util/full_empty_memory.hpp>
 #include <hpx/runtime/actions/action.hpp>
-#include <hpx/components/component_type.hpp>
-#include <hpx/components/server/managed_component_base.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/lcos/simple_future.hpp>
 

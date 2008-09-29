@@ -24,7 +24,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="4"
+			ConfigurationType="2"
 			InheritedPropertySheets="..\hpx.vsprops"
 			CharacterSet="0"
 			>
@@ -49,7 +49,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;LIB"
+				PreprocessorDefinitions="WIN32;_DEBUG;_DLL;HPX_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -68,10 +68,16 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
+				Name="VCLinkerTool"
+				OutputFile="$(OutDir)\$(ProjectName)d.dll"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -83,6 +89,12 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -90,7 +102,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="4"
+			ConfigurationType="2"
 			InheritedPropertySheets="..\hpx.vsprops"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
@@ -116,7 +128,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions=" WIN32;NDEBUG;LIB"
+				PreprocessorDefinitions=" WIN32;NDEBUG;_DLL;HPX_EXPORTS"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -133,10 +145,14 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
+				Name="VCLinkerTool"
+				GenerateDebugInformation="true"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -146,6 +162,12 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -301,6 +323,10 @@
 				Name="Util"
 				>
 				<File
+					RelativePath="..\..\..\src\util\ini.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\util\io_service_pool.cpp"
 					>
 				</File>
@@ -308,40 +334,6 @@
 					RelativePath="..\..\..\src\util\logging.cpp"
 					>
 				</File>
-			</Filter>
-			<Filter
-				Name="Components"
-				>
-				<Filter
-					Name="Server"
-					>
-					<File
-						RelativePath="..\..\..\src\components\server\distributing_factory.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\src\components\server\runtime_support.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerOutput="0"
-								ShowIncludes="false"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Debug|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerOutput="0"
-								ShowIncludes="false"
-							/>
-						</FileConfiguration>
-					</File>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="Runtime"
@@ -450,6 +442,30 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="Components"
+					>
+					<Filter
+						Name="Server"
+						>
+						<File
+							RelativePath="..\..\..\src\runtime\components\server\memory.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\src\runtime\components\server\runtime_support.cpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
+			</Filter>
+			<Filter
+				Name="LCOs"
+				>
+				<File
+					RelativePath="..\..\..\src\lcos\base_lco.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -550,6 +566,14 @@
 				</File>
 				<File
 					RelativePath="..\..\..\hpx\util\high_resolution_timer.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\util\ini.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\util\init_ini_data.hpp"
 					>
 				</File>
 				<File
@@ -760,85 +784,65 @@
 						>
 					</File>
 				</Filter>
-			</Filter>
-			<Filter
-				Name="Components"
-				>
-				<File
-					RelativePath="..\..\..\hpx\components\accumulator.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\hpx\components\component_type.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\hpx\components\runtime_support.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\hpx\components\simple_accumulator.hpp"
-					>
-				</File>
 				<Filter
-					Name="Server"
+					Name="Components"
 					>
 					<File
-						RelativePath="..\..\..\hpx\components\server\accumulator.hpp"
+						RelativePath="..\..\..\hpx\runtime\components\component_factory.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\hpx\components\server\distributing_factory.hpp"
+						RelativePath="..\..\..\hpx\runtime\components\component_factory_base.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\hpx\components\server\manage_component.hpp"
+						RelativePath="..\..\..\hpx\runtime\components\component_type.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\hpx\components\server\managed_component_base.hpp"
+						RelativePath="..\..\..\hpx\runtime\components\runtime_support.hpp"
 						>
 					</File>
-					<File
-						RelativePath="..\..\..\hpx\components\server\memory.hpp"
+					<Filter
+						Name="Server"
 						>
-					</File>
-					<File
-						RelativePath="..\..\..\hpx\components\server\runtime_support.hpp"
+						<File
+							RelativePath="..\..\..\hpx\runtime\components\server\manage_component.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\components\server\managed_component_base.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\components\server\memory.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\components\server\runtime_support.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\components\server\simple_component_base.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\components\server\wrapper_heap.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\components\server\wrapper_heap_list.hpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="Stubs"
 						>
-					</File>
-					<File
-						RelativePath="..\..\..\hpx\components\server\simple_accumulator.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\hpx\components\server\simple_component_base.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\hpx\components\server\wrapper_heap.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\hpx\components\server\wrapper_heap_list.hpp"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="Stubs"
-					>
-					<File
-						RelativePath="..\..\..\hpx\components\stubs\accumulator.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\hpx\components\stubs\runtime_support.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\hpx\components\stubs\simple_accumulator.hpp"
-						>
-					</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\components\stubs\runtime_support.hpp"
+							>
+						</File>
+					</Filter>
 				</Filter>
 			</Filter>
 			<Filter
@@ -877,11 +881,35 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\hpx\lcos\lazy_future_get_results_direct.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\lcos\mutex.hpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\..\hpx\lcos\simple_future.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Config"
+				>
+				<File
+					RelativePath="..\..\..\hpx\config\defaults.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\config\export_definitions.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\config\warnings_prefix.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\config\warnings_suffix.hpp"
 					>
 				</File>
 			</Filter>

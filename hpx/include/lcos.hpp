@@ -6,6 +6,7 @@
 #if !defined(HPX_LCOS_JUN_27_2008_0820PM)
 #define HPX_LCOS_JUN_27_2008_0820PM
 
+#include <hpx/config.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/lcos/lazy_future.hpp>
 

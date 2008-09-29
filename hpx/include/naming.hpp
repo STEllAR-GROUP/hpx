@@ -6,6 +6,7 @@
 #if !defined(HPX_NAMING_MAR_24_2008_0930AM)
 #define HPX_NAMING_MAR_24_2008_0930AM
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/naming/name.hpp>

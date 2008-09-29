@@ -4,6 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <iostream>
+
+#include <hpx/config.hpp>
 #include <hpx/runtime/naming/server/request.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -15,6 +17,7 @@ namespace hpx { namespace naming { namespace server
         {
             "command_getprefix",
             "command_getprefixes",
+            "command_get_component_id",
             "command_getidrange",
             "command_bind_range",
             "command_unbind_range",
@@ -62,14 +65,15 @@ namespace hpx { namespace naming { namespace server
                 os << "count:" << std::dec << req.count_ << " ";
             break;
 
+        case command_get_component_id:
         case command_queryid:
         case command_unregisterid: 
-            os << "name(\"" << req.ns_name_ << "\") ";
+            os << "name(\"" << req.name_ << "\") ";
             break;
 
         case command_registerid:
             os << "id" << req.id_ << " ";
-            os << "name(\"" << req.ns_name_ << "\") ";
+            os << "name(\"" << req.name_ << "\") ";
             break;
 
         case command_getprefix:

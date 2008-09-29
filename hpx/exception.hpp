@@ -13,6 +13,8 @@
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx  
 {
@@ -126,7 +128,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    class exception : public boost::system::system_error
+    class HPX_EXCEPTION_EXPORT exception : public boost::system::system_error
     {
     public:
         explicit exception(error e) 
@@ -177,6 +179,8 @@ namespace boost { namespace system
     };
     
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif
 

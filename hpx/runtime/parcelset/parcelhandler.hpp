@@ -21,6 +21,8 @@
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace parcelset
 {
     /// \class parcelhandler parcelhandler.hpp hpx/runtime/parcelset/parcelhandler.hpp
@@ -28,7 +30,7 @@ namespace hpx { namespace parcelset
     /// The \a parcelhandler is the representation of the parcelset inside a 
     /// locality. It is built on top of a single parcelport. Several 
     /// parcelhandler's may be connected to a single parcelport.
-    class parcelhandler : boost::noncopyable
+    class HPX_EXPORT parcelhandler : boost::noncopyable
     {
     private:
         static void default_write_handler(boost::system::error_code const&, 
@@ -445,6 +447,8 @@ namespace hpx { namespace parcelset
     };
 
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif
 

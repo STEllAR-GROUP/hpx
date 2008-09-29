@@ -12,6 +12,8 @@
 #include <boost/serialization/serialization.hpp>
 #include <hpx/util/safe_bool.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Version of id_type
 #define HPX_IDTYPE_VERSION 0x10
@@ -20,7 +22,7 @@
 namespace hpx { namespace naming
 {
     /// Global identifier for components across the PX system
-    struct id_type : public util::safe_bool<id_type>
+    struct HPX_EXPORT id_type : public util::safe_bool<id_type>
     {
         explicit id_type (boost::uint64_t lsb_id = 0) 
           : id_msb_(0), id_lsb_(lsb_id)
@@ -217,5 +219,7 @@ namespace hpx { namespace naming
 // this is the current version of the id_type serialization format
 BOOST_CLASS_VERSION(hpx::naming::id_type, HPX_IDTYPE_VERSION)
 BOOST_CLASS_TRACKING(hpx::naming::id_type, boost::serialization::track_never)
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif 

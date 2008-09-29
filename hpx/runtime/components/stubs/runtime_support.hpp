@@ -9,7 +9,7 @@
 #include <boost/bind.hpp>
 
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/components/server/runtime_support.hpp>
+#include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/lcos/eager_future.hpp>
 
 namespace hpx { namespace components { namespace stubs

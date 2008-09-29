@@ -6,28 +6,16 @@
 set (hpxlib_HEADERS
     # global
     ../hpx/config.hpp
+    ../hpx/defaults.hpp
     ../hpx/exception.hpp
     ../hpx/hpx.hpp
     ../hpx/hpx_fwd.hpp
     ../hpx/version.hpp
-    # components
-    ../hpx/components/accumulator.hpp
-    ../hpx/components/component_type.hpp
-    ../hpx/components/runtime_support.hpp
-    ../hpx/components/simple_accumulator.hpp
-    ../hpx/components/server/accumulator.hpp
-    ../hpx/components/server/distributing_factory.hpp
-    ../hpx/components/server/manage_component.hpp
-    ../hpx/components/server/managed_component_base.hpp
-    ../hpx/components/server/memory.hpp
-    ../hpx/components/server/runtime_support.hpp
-    ../hpx/components/server/simple_accumulator.hpp
-    ../hpx/components/server/simple_component_base.hpp
-    ../hpx/components/server/wrapper_heap.hpp
-    ../hpx/components/server/wrapper_heap_list.hpp
-    ../hpx/components/stubs/accumulator.hpp
-    ../hpx/components/stubs/runtime_support.hpp
-    ../hpx/components/stubs/simple_accumulator.hpp
+    # config
+    ../hpx/config/defaults.hpp
+    ../hpx/config/export_definitions.hpp
+    ../hpx/config/warnings_prefix.hpp
+    ../hpx/config/warnings_suffix.hpp
     # include
     ../hpx/include/actions.hpp
     ../hpx/include/applier.hpp
@@ -65,6 +53,19 @@ set (hpxlib_HEADERS
     ../hpx/runtime/applier/applier_implementations.hpp
     ../hpx/runtime/applier/apply_helper.hpp
     ../hpx/runtime/applier/apply_helper_implementations.hpp
+    # components
+    ../hpx/runtime/components/component_type.hpp
+    ../hpx/runtime/components/component_factory_base.hpp
+    ../hpx/runtime/components/component_factory.hpp
+    ../hpx/runtime/components/runtime_support.hpp
+    ../hpx/runtime/components/server/manage_component.hpp
+    ../hpx/runtime/components/server/managed_component_base.hpp
+    ../hpx/runtime/components/server/memory.hpp
+    ../hpx/runtime/components/server/runtime_support.hpp
+    ../hpx/runtime/components/server/simple_component_base.hpp
+    ../hpx/runtime/components/server/wrapper_heap.hpp
+    ../hpx/runtime/components/server/wrapper_heap_list.hpp
+    ../hpx/runtime/components/stubs/runtime_support.hpp
     # naming
     ../hpx/runtime/naming/address.hpp
     ../hpx/runtime/naming/locality.hpp
@@ -97,6 +98,8 @@ set (hpxlib_HEADERS
     ../hpx/util/future.hpp
     ../hpx/util/generate_unique_ids.hpp
     ../hpx/util/high_resolution_timer.hpp
+    ../hpx/util/ini.hpp
+    ../hpx/util/init_ini_data.hpp
     ../hpx/util/io_service_pool.hpp
     ../hpx/util/logging.hpp
     ../hpx/util/one_size_heap.hpp
@@ -111,15 +114,17 @@ set (hpxlib_HEADERS
 )
 
 set (hpxlib_SOURCES
-    # components
-    components/server/distributing_factory.cpp
-    components/server/runtime_support.cpp
+    # lcos
+    lcos/base_lco.cpp
     # runtime
     runtime/runtime.cpp
     # action manager
     runtime/actions/action_manager.cpp
     # applier
     runtime/applier/applier.cpp
+    # components
+    runtime/components/server/memory.cpp
+    runtime/components/server/runtime_support.cpp
     # naming 
     runtime/naming/resolver_client.cpp
     runtime/naming/resolver_server.cpp
@@ -136,11 +141,13 @@ set (hpxlib_SOURCES
     # threadmanager
     runtime/threads/threadmanager.cpp
     # util 
+    util/ini.cpp
     util/io_service_pool.cpp
     util/logging.cpp
     # source file from coroutine library
     ../external/coroutine/libs/coroutine/src/swapcontext.cpp
 )
 
-add_library (hpx STATIC ${hpxlib_SOURCES} ${hpxlib_HEADERS})
+add_definitions(-DHPX_EXPORTS)
+add_library (hpx SHARED ${hpxlib_SOURCES} ${hpxlib_HEADERS})
 

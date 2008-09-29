@@ -11,13 +11,14 @@
 #include <hpx/runtime/naming/server/reply.hpp>
 #include <hpx/runtime/naming/server/request.hpp>
 #include <hpx/runtime/naming/server/request_handler.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
     request_handler::request_handler()
-      : totals_(command_lastcommand)
+      : totals_(command_lastcommand), component_type_(components::component_last)
     {
     }
 
@@ -29,7 +30,7 @@ namespace hpx { namespace naming { namespace server
     void request_handler::handle_getprefix(request const& req, reply& rep)
     {
         try {
-            mutex_type::scoped_lock l(mtx_);
+            mutex_type::scoped_lock l(registry_mtx_);
             site_prefix_map_type::iterator it = 
                 site_prefixes_.find(req.get_site());
             if (it != site_prefixes_.end()) {
@@ -84,7 +85,7 @@ namespace hpx { namespace naming { namespace server
     void request_handler::handle_getprefixes(request const& req, reply& rep)
     {
         try {
-            mutex_type::scoped_lock l(mtx_);
+            mutex_type::scoped_lock l(registry_mtx_);
 
             std::vector<boost::uint32_t> prefixes;
             prefixes.reserve(site_prefixes_.size());
@@ -107,10 +108,40 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    void request_handler::handle_get_component_id(request const& req, reply& rep)
+    {
+        try {
+            mutex_type::scoped_lock l(component_types_mtx_);
+
+            component_type_map::iterator it = component_types_.find(req.get_name());
+            if (it == component_types_.end()) {
+                // first request: create a new component type and store it
+                std::pair<component_type_map::iterator, bool> p = 
+                    component_types_.insert(component_type_map::value_type(
+                        req.get_name(), ++component_type_));
+                if (!p.second) {
+                    rep = reply(command_get_component_id, out_of_memory);
+                    return;
+                }
+                it = p.first;
+            }
+
+            // return the registered component type
+            rep = reply((components::component_type)(*it).second); 
+        }
+        catch (std::bad_alloc) {
+            rep = reply(command_get_component_id, out_of_memory);
+        }
+        catch (...) {
+            rep = reply(command_get_component_id, internal_server_error);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     void request_handler::handle_getidrange(request const& req, reply& rep)
     {
         try {
-            mutex_type::scoped_lock l(mtx_);
+            mutex_type::scoped_lock l(registry_mtx_);
             site_prefix_map_type::iterator it = 
                 site_prefixes_.find(req.get_site());
             if (it != site_prefixes_.end()) {
@@ -192,7 +223,7 @@ namespace hpx { namespace naming { namespace server
             {
                 using boost::fusion::at_c;
 
-                mutex_type::scoped_lock l(mtx_);
+                mutex_type::scoped_lock l(registry_mtx_);
                 registry_type::iterator it = registry_.lower_bound(req.get_id());
 
                 if (it != registry_.end()) {
@@ -267,7 +298,7 @@ namespace hpx { namespace naming { namespace server
             {
                 using boost::fusion::at_c;
 
-                mutex_type::scoped_lock l(mtx_);
+                mutex_type::scoped_lock l(registry_mtx_);
                 registry_type::iterator it = registry_.find(req.get_id());
                 if (it != registry_.end()) {
                     if (at_c<1>((*it).second) != req.get_count()) {
@@ -300,7 +331,7 @@ namespace hpx { namespace naming { namespace server
         try {
             using boost::fusion::at_c;
 
-            mutex_type::scoped_lock l(mtx_);
+            mutex_type::scoped_lock l(registry_mtx_);
             registry_type::iterator it = registry_.lower_bound(req.get_id());
             if (it != registry_.end()) {
                 if ((*it).first == req.get_id()) {
@@ -369,7 +400,7 @@ namespace hpx { namespace naming { namespace server
     void request_handler::handle_queryid(request const& req, reply& rep)
     {
         try {
-            mutex_type::scoped_lock l(mtx_);
+            mutex_type::scoped_lock l(ns_registry_mtx_);
             ns_registry_type::iterator it = ns_registry_.find(req.get_name());
             if (it != ns_registry_.end()) 
                 rep = reply(command_queryid, (*it).second);
@@ -390,7 +421,7 @@ namespace hpx { namespace naming { namespace server
         try {
             error s = no_success;
             {
-                mutex_type::scoped_lock l(mtx_);
+                mutex_type::scoped_lock l(ns_registry_mtx_);
                 ns_registry_type::iterator it = ns_registry_.find(req.get_name());
                 if (it != ns_registry_.end())
                     (*it).second = req.get_id();
@@ -416,7 +447,7 @@ namespace hpx { namespace naming { namespace server
         try {
             error s = no_success;
             {
-                mutex_type::scoped_lock l(mtx_);
+                mutex_type::scoped_lock l(ns_registry_mtx_);
                 ns_registry_type::iterator it = ns_registry_.find(req.get_name());
                 if (it != ns_registry_.end()) {
                     ns_registry_.erase(it);
@@ -525,6 +556,10 @@ namespace hpx { namespace naming { namespace server
 
         case command_getprefixes:
             handle_getprefixes(req, rep);
+            break;
+
+        case command_get_component_id:
+            handle_get_component_id(req, rep);
             break;
 
         case command_getidrange:

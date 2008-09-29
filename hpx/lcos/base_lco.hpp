@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/components/component_type.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/actions/action.hpp>
 
 namespace hpx { namespace lcos 
@@ -34,7 +34,10 @@ namespace hpx { namespace lcos
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
         // to associate this component with a given action.
-        enum { value = components::component_base_lco };
+        static components::component_type get_component_type() 
+        { 
+            return components::component_base_lco; 
+        }
 
         /// Destructor, needs to be virtual to allow for clean destruction of
         /// derived objects
@@ -77,7 +80,10 @@ namespace hpx { namespace lcos
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
         // to associate this component with a given action.
-        enum { value = components::component_base_lco_with_value };
+        static components::component_type get_component_type() 
+        { 
+            return components::component_base_lco_with_value; 
+        }
 
         /// Destructor, needs to be virtual to allow for clean destruction of
         /// derived objects
@@ -179,14 +185,5 @@ namespace hpx { namespace lcos
     };
 
 }}
-
-///////////////////////////////////////////////////////////////////////////////
-// Serialization support for the future actions
-HPX_SERIALIZE_ACTION(hpx::lcos::base_lco::set_event_action);
-
-HPX_SERIALIZE_ACTION(hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_result_action);
-HPX_SERIALIZE_ACTION(hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_error_action);
-HPX_SERIALIZE_ACTION(hpx::lcos::base_lco_with_value<double>::set_result_action);
-HPX_SERIALIZE_ACTION(hpx::lcos::base_lco_with_value<double>::set_error_action);
 
 #endif

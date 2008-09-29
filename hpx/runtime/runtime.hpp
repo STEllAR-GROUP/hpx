@@ -15,8 +15,8 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/action_manager.hpp>
-#include <hpx/components/server/runtime_support.hpp>
-#include <hpx/components/server/memory.hpp>
+#include <hpx/runtime/components/server/runtime_support.hpp>
+#include <hpx/runtime/components/server/memory.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx 
@@ -32,7 +32,7 @@ namespace hpx
     /// The \a runtime class encapsulates the HPX runtime system in a simple to 
     /// use way. It makes sure all required parts of the HPX runtime system are
     /// properly initialized. 
-    class runtime
+    class HPX_EXPORT runtime
     {
     public:
         /// Construct a new HPX runtime instance 
@@ -186,10 +186,10 @@ namespace hpx
         parcelset::parcelport parcel_port_;
         threads::threadmanager thread_manager_;
         parcelset::parcelhandler parcel_handler_;
-        applier::applier applier_;
-        actions::action_manager action_manager_;
         components::server::runtime_support runtime_support_;
         components::server::memory memory_;
+        applier::applier applier_;
+        actions::action_manager action_manager_;
     };
 
 }   // namespace hpx

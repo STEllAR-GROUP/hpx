@@ -17,12 +17,14 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <boost/serialization/export.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
     // parcel continuations are simply lists of global ids of LCO's to call 
     // set_event on
-    class continuation
+    class HPX_EXPORT continuation
     {
     public:
         continuation()
@@ -67,5 +69,7 @@ namespace hpx { namespace actions
 ///////////////////////////////////////////////////////////////////////////////
 // enable serialization of continuations through shared_ptr's
 BOOST_CLASS_EXPORT(hpx::actions::continuation);
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

@@ -28,6 +28,8 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
@@ -248,5 +250,7 @@ namespace hpx { namespace threads
 
 ///////////////////////////////////////////////////////////////////////////////
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif 

@@ -40,13 +40,17 @@ include_directories (${hpx_SOURCE_DIR}/external/logging)
 include_directories (${hpx_SOURCE_DIR}/external/singleton)
 include_directories (${hpx_SOURCE_DIR}/external/lockfree)
 
-if(WIN32)
+if(MSVC)
     add_definitions(-D_WIN32_WINNT=0x0501)
     add_definitions(-D_SCL_SECURE_NO_WARNINGS)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
     add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
     add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
-endif(WIN32)
+endif(MSVC)
+
+if(UNIX OR APPLE OR CYGWIN)
+    add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
+endif(UNIX OR APPLE OR CYGWIN)
 
 # Recurse into the "src" and "test" subdirectories.  This does not actually
 # cause another cmake executable to run.  The same process will walk through

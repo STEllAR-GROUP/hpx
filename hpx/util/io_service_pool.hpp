@@ -16,11 +16,14 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <hpx/config.hpp>
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
     /// A pool of io_service objects.
-    class io_service_pool : private boost::noncopyable
+    class HPX_EXPORT io_service_pool : private boost::noncopyable
     {
     public:
         /// Construct the io_service pool.
@@ -62,5 +65,7 @@ namespace hpx { namespace util
 
 ///////////////////////////////////////////////////////////////////////////////
 }}  // namespace hpx::util
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif 

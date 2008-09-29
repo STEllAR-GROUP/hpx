@@ -13,9 +13,11 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace actions
 {
-    class action_manager : private boost::noncopyable
+    class HPX_EXPORT action_manager : private boost::noncopyable
     {
     public:
         // Constructor
@@ -61,5 +63,7 @@ namespace hpx { namespace actions
         parcelset::parcelhandler::scoped_connection_type conn_;
     };
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif
