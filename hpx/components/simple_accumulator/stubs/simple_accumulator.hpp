@@ -9,14 +9,15 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
-#include <hpx/runtime/components/server/simple_accumulator.hpp>
 #include <hpx/lcos/eager_future.hpp>
+
+#include <hpx/components/simple_accumulator/server/simple_accumulator.hpp>
 
 namespace hpx { namespace components { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// The \a stubs#simple_accumulator class is the client side representation of all
-    /// \a server#simple_accumulator components
+    /// The \a stubs#simple_accumulator class is the client side representation 
+    /// of all \a server#simple_accumulator components
     class simple_accumulator
     {
     public:
@@ -35,7 +36,7 @@ namespace hpx { namespace components { namespace stubs
         {
             return stubs::runtime_support::create_component_async(
                 appl, targetgid, 
-                (components::component_type)server::simple_accumulator::value);
+                server::simple_accumulator::get_component_type());
         }
 
         /// Create a new instance of an simple_accumulator
@@ -45,16 +46,15 @@ namespace hpx { namespace components { namespace stubs
         {
             return stubs::runtime_support::create_component(
                 self, appl, targetgid, 
-                (components::component_type)server::simple_accumulator::value);
+                server::simple_accumulator::get_component_type());
         }
 
         /// Delete an existing component
         static void
-        free(applier::applier& appl, naming::id_type const& targetgid, 
-            naming::id_type const& gid)
+        free(applier::applier& appl, naming::id_type const& gid)
         {
-            stubs::runtime_support::free_component(appl, targetgid, 
-                (components::component_type)server::simple_accumulator::value, gid);
+            stubs::runtime_support::free_component(appl, 
+                server::simple_accumulator::get_component_type(), gid);
         }
 
         /// Query the current value of the server#simple_accumulator instance 
@@ -127,7 +127,7 @@ namespace hpx { namespace components { namespace stubs
     protected:
         applier::applier& app_;
     };
-    
+
 }}}
 
 #endif

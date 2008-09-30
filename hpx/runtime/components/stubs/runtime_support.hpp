@@ -79,18 +79,34 @@ namespace hpx { namespace components { namespace stubs
 
         /// Destroy an existing component
         static void free_component(applier::applier& appl, 
-            naming::id_type const& targetgid, components::component_type type, 
-            naming::id_type const& gid, std::size_t count = 1) 
+            components::component_type type, naming::id_type const& gid, 
+            std::size_t count = 1) 
         {
             typedef server::runtime_support::free_component_action action_type;
-            appl.apply<action_type>(targetgid, type, gid, count);
+
+            // Determine whether the gid of the component to delete is local or remote
+            naming::address addr;
+            if (appl.address_is_local(gid, addr)) {
+                // apply locally
+                applier::detail::apply_helper3<
+                    action_type, 
+                    components::component_type, naming::id_type, std::size_t
+                >::call(appl.get_thread_manager(), appl, 
+                    appl.get_runtime_support_gid().get_lsb(), type, gid, count);
+            }
+            else {
+                // apply remotely
+                // zero address will be interpreted as a reference to the 
+                // remote runtime support object
+                addr.address_ = 0;
+                appl.apply<action_type>(addr, naming::invalid_id, type, gid, count);
+            }
         }
 
-        void free_component(naming::id_type const& targetgid, 
-            components::component_type type, naming::id_type const& gid,
-            std::size_t count = 1)
+        void free_component(components::component_type type, 
+            naming::id_type const& gid, std::size_t count = 1)
         {
-            free_component(app_, targetgid, type, gid, count);
+            free_component(app_, type, gid, count);
         }
 
         /// \brief Shutdown the given runtime system

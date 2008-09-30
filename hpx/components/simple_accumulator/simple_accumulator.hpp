@@ -7,7 +7,7 @@
 #define HPX_COMPONENTS_SIMPLE_ACCUMULATOR_JUL_18_2008_1123AM
 
 #include <hpx/runtime/runtime.hpp>
-#include <hpx/components/stubs/simple_accumulator.hpp>
+#include <hpx/components/simple_accumulator/stubs/simple_accumulator.hpp>
 
 namespace hpx { namespace components 
 {
@@ -37,9 +37,9 @@ namespace hpx { namespace components
             return simple_accumulator(appl, base_type::create(self, appl, targetgid));
         }
 
-        void free(naming::id_type const& targetgid)
+        void free()
         {
-            stubs::simple_accumulator::free(app_, targetgid, gid_);
+            stubs::simple_accumulator::free(app_, gid_);
             gid_ = naming::invalid_id;
         }
 

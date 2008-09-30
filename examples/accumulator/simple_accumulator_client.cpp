@@ -8,7 +8,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/components/simple_accumulator.hpp>
+#include <hpx/components/simple_accumulator/simple_accumulator.hpp>
 
 using namespace hpx;
 using namespace std;
@@ -61,7 +61,7 @@ hpx_main(threads::thread_self& self, applier::applier& appl)
     }
 
     // free the accumulator component
-    accu.free(appl.get_prefix());     // this invalidates the remote reference
+    accu.free();     // this invalidates the remote reference
 
     // initiate shutdown of the runtime systems on all localities
     components::stubs::runtime_support::shutdown_all(appl);

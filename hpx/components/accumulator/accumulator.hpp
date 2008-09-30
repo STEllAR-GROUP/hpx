@@ -37,9 +37,9 @@ namespace hpx { namespace components
             return accumulator(appl, base_type::create(self, appl, targetgid));
         }
 
-        void free(naming::id_type const& targetgid)
+        void free()
         {
-            stubs::accumulator::free(app_, targetgid, gid_);
+            stubs::accumulator::free(app_, gid_);
             gid_ = naming::invalid_id;
         }
 

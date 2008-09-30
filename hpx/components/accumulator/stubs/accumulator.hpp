@@ -51,10 +51,9 @@ namespace hpx { namespace components { namespace stubs
 
         /// Delete an existing component
         static void
-        free(applier::applier& appl, naming::id_type const& targetgid, 
-            naming::id_type const& gid)
+        free(applier::applier& appl, naming::id_type const& gid)
         {
-            stubs::runtime_support::free_component(appl, targetgid, 
+            stubs::runtime_support::free_component(appl, 
                 server::accumulator::get_component_type(), gid);
         }
 

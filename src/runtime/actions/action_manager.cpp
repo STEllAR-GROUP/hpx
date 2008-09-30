@@ -24,6 +24,11 @@ namespace hpx { namespace actions
             naming::address addr = p.get_destination_addr();
             naming::address::address_type lva = addr.address_;
 
+            if (0 == lva) {
+            // a zero address references the local runtime support component
+                lva = applier_.get_runtime_support_gid().get_lsb();
+            }
+
             // decode the action-type in the parcel
             action_type act = p.get_action();
 
