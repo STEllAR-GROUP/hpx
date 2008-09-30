@@ -77,11 +77,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "accumulator_client", "accum
 		{973C51D3-F306-4C6F-B9B6-A8420A20A6F1} = {973C51D3-F306-4C6F-B9B6-A8420A20A6F1}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "one_size_heap_test", "one_size_heap_test\one_size_heap_test.vcproj", "{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E6C6C6C4-6959-4B47-B92A-6323A906CC40} = {E6C6C6C4-6959-4B47-B92A-6323A906CC40}
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AM Tests", "AM Tests", "{43240C82-CC1C-4818-8338-733676739112}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Applier Tests", "Applier Tests", "{C78C7B04-5FE5-4692-9952-733219E10B57}"
@@ -381,20 +376,6 @@ Global
 		{1AB4D536-BFF4-46C4-AB3E-C5BDBE70A339}.Release|Win32.ActiveCfg = Release|Win32
 		{1AB4D536-BFF4-46C4-AB3E-C5BDBE70A339}.Release|Win32.Build.0 = Release|Win32
 		{1AB4D536-BFF4-46C4-AB3E-C5BDBE70A339}.Release|x64.ActiveCfg = Release|Win32
-		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Debug|Win32.ActiveCfg = Debug|Win32
-		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Debug|Win32.Build.0 = Debug|Win32
-		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Debug|x64.ActiveCfg = Debug|x64
-		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Debug|x64.Build.0 = Debug|x64
-		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Release|Any CPU.ActiveCfg = Release|Win32
-		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Release|Win32.ActiveCfg = Release|Win32
-		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Release|Win32.Build.0 = Release|Win32
-		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Release|x64.ActiveCfg = Release|x64
-		{6718FC7D-E8F4-400B-ACE9-9F4326BE1A4A}.Release|x64.Build.0 = Release|x64
 		{75E1A255-D73C-4735-80FA-34C5E9760C8E}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{75E1A255-D73C-4735-80FA-34C5E9760C8E}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{75E1A255-D73C-4735-80FA-34C5E9760C8E}.Debug|Mixed Platforms.Build.0 = Debug|Win32

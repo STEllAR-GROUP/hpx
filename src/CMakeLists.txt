@@ -102,7 +102,6 @@ set (hpxlib_HEADERS
     ../hpx/util/init_ini_data.hpp
     ../hpx/util/io_service_pool.hpp
     ../hpx/util/logging.hpp
-    ../hpx/util/one_size_heap.hpp
     ../hpx/util/one_size_heap_list.hpp
     ../hpx/util/portable_binary_iarchive.hpp
     ../hpx/util/portable_binary_oarchive.hpp
