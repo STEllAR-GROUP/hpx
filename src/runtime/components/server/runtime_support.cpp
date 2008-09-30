@@ -178,12 +178,20 @@ namespace hpx { namespace components { namespace server
     void runtime_support::load_components(naming::resolver_client& dgas_client)
     {
         util::section ini;
-        if (!util::init_ini_data(ini)) {
-            // no ini files found, try to build default ini structure from
-            // shared libraries in default installation location
-            init_ini_data_default(HPX_DEFAULT_COMPONENT_PATH, ini);
-        }
-        else {
+
+        // pre-initialize location entry with a compile time based value
+        util::section hpxsec;
+        hpxsec.add_entry("location", HPX_PREFIX);
+        ini.add_section("hpx", hpxsec);
+        ini.get_section("hpx")->add_entry("ini_path", "$[hpx.location]/share/hpx/ini");
+
+        // try to build default ini structure from shared libraries in default 
+        // installation location, this allows to install simple components
+        // without the need to install an ini file
+        init_ini_data_default(HPX_DEFAULT_COMPONENT_PATH, ini);
+
+        // add explicit configuration information if its provided
+        if (!util::init_ini_data_base(ini)) {
             // merge all found ini files of all components
             util::merge_component_inis(ini);
 
@@ -196,7 +204,7 @@ namespace hpx { namespace components { namespace server
         if (!ini.has_section("hpx.components"))
             return;     // no components to load
 
-        // each shared library containing components must have a ini section
+        // each shared library containing components may have a ini section
         //
         // # mandatory section describing the component module
         // [hpx.components.instance_name]

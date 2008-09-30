@@ -81,20 +81,6 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // global function to read component ini information
-    inline bool init_ini_data (section& ini)
-    {
-        namespace fs = boost::filesystem;
-
-        // pre-initialize location entry with a compile time based value
-        section sec;
-        sec.add_entry("location", HPX_PREFIX);
-        ini.add_section("hpx", sec);
-        ini.get_section("hpx")->add_entry("ini_path", "$[hpx.location]/share/hpx/ini");
-
-        // read system and user ini files
-        return init_ini_data_base(ini);
-    }
-
     inline void merge_component_inis(section& ini)
     {
         namespace fs = boost::filesystem;
