@@ -12,6 +12,7 @@
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
+#include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 
 #endif

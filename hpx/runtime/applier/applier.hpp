@@ -308,7 +308,7 @@ namespace hpx { namespace applier
         naming::id_type memory_id_;
     };
 
-    typedef threads::thread_state full_thread_function_type(
+    HPX_EXPORT typedef threads::thread_state full_thread_function_type(
         threads::thread_self&, applier&);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -316,12 +316,12 @@ namespace hpx { namespace applier
     ///        work to be executed
     ///
     ///
-    threads::thread_id_type register_work(applier& appl,
+    HPX_EXPORT threads::thread_id_type register_work(applier& appl,
         boost::function<threads::thread_function_type> func,
         threads::thread_state initial_state = threads::pending, 
         bool run_now = true);
 
-    threads::thread_id_type register_work(applier& appl,
+    HPX_EXPORT threads::thread_id_type register_work(applier& appl,
         full_thread_function_type* func, 
         threads::thread_state initial_state = threads::pending, 
         bool run_now = true);
@@ -343,7 +343,7 @@ namespace hpx { namespace applier
     ///
     /// \note       For synchronous operation use the function 
     ///             \a applier#create_async.
-    lcos::simple_future<naming::id_type> create_async(applier& appl, 
+    HPX_EXPORT lcos::simple_future<naming::id_type> create_async(applier& appl, 
         naming::id_type const& targetgid, components::component_type type, 
         std::size_t count = 1);
 
@@ -362,7 +362,7 @@ namespace hpx { namespace applier
     ///
     /// \note       For asynchronous operation use the function 
     ///             \a applier#create_async.
-    naming::id_type create(applier& appl, threads::thread_self& self, 
+    HPX_EXPORT naming::id_type create(applier& appl, threads::thread_self& self, 
         naming::id_type const& targetgid, components::component_type type,
         std::size_t count = 1);
 
@@ -372,7 +372,7 @@ namespace hpx { namespace applier
     /// \param type
     /// \param count
     /// \param gid
-    void destroy (applier& appl, components::component_type type, 
+    HPX_EXPORT void destroy (applier& appl, components::component_type type, 
         naming::id_type const& gid, std::size_t count = 1);
 
 }}
