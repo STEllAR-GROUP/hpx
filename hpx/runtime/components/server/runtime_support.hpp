@@ -56,6 +56,12 @@ namespace hpx { namespace components { namespace server
             load_components(dgas_client);
         }
 
+        ~runtime_support()
+        {
+            components_.clear();    // make sure components get released first
+            modules_.clear();       // only then we are allowed to release the modules
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
@@ -132,8 +138,8 @@ namespace hpx { namespace components { namespace server
         boost::condition condition_;
         bool stopped_;
 
-        module_list_type modules_;
         component_map_type components_;
+        module_list_type modules_;
     };
 
 }}}

@@ -7,7 +7,7 @@
 #include <boost/detail/lightweight_test.hpp>
 
 #include <hpx/hpx.hpp>
-#include <hpx/components/server/accumulator.hpp>
+#include <hpx/components/accumulator/server/accumulator.hpp>
 
 using namespace hpx;
 
@@ -57,7 +57,6 @@ threads::thread_state test1(threads::thread_self& self,
 
     return threads::terminated;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 threads::thread_state hpx_main(threads::thread_self& self, 

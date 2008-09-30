@@ -307,7 +307,7 @@ namespace hpx { namespace components { namespace server
             std::pair<component_map_type::iterator, bool> p = 
                 components_.insert(component_map_type::value_type(t, factory));
 
-            if (p.second) 
+            if (!p.second) 
                 return false;   // duplicate component id?
 
             // store the reference to the shared library if everything is fine
