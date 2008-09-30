@@ -11,8 +11,16 @@
 #include <hpx/runtime/components/server/manage_component.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 
+#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/portable_binary_oarchive.hpp>
+
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
+
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/version.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/export.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the runtime_support actions

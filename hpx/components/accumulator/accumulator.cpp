@@ -5,6 +5,11 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/portable_binary_oarchive.hpp>
+
+#include <boost/serialization/version.hpp>
+#include <boost/serialization/export.hpp>
 
 #include "server/accumulator.hpp"
 

@@ -11,6 +11,15 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
+#include <boost/serialization/version.hpp>
+#include <boost/serialization/export.hpp>
+#include <boost/serialization/vector.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+// this is the current version of the parcel serialization format
+// this definition needs to be in the global namespace
+BOOST_CLASS_VERSION(hpx::parcelset::parcel, HPX_PARCEL_VERSION)
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {

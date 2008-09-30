@@ -1,5 +1,5 @@
-//  Copyright (c) 2007 Richard D. Guidry Jr.
 //  Copyright (c) 2007-2008 Hartmut Kaiser
+//  Copyright (c) 2007 Richard D. Guidry Jr.
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -215,9 +215,6 @@ namespace hpx { namespace naming
 ///////////////////////////////////////////////////////////////////////////////
 }}
 
-///////////////////////////////////////////////////////////////////////////////
-// this is the current version of the id_type serialization format
-BOOST_CLASS_VERSION(hpx::naming::id_type, HPX_IDTYPE_VERSION)
 BOOST_CLASS_TRACKING(hpx::naming::id_type, boost::serialization::track_never)
 
 #include <hpx/config/warnings_suffix.hpp>

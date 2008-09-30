@@ -13,9 +13,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-#include <boost/serialization/export.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -65,10 +62,6 @@ namespace hpx { namespace actions
     };
 
 }}
-
-///////////////////////////////////////////////////////////////////////////////
-// enable serialization of continuations through shared_ptr's
-BOOST_CLASS_EXPORT(hpx::actions::continuation);
 
 #include <hpx/config/warnings_suffix.hpp>
 

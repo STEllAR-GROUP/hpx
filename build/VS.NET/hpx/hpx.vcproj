@@ -365,10 +365,26 @@
 						RelativePath="..\..\..\src\runtime\actions\action_manager.cpp"
 						>
 					</File>
+					<File
+						RelativePath="..\..\..\src\runtime\actions\continuation.cpp"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="Naming"
 					>
+					<File
+						RelativePath="..\..\..\src\runtime\naming\address.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\src\runtime\naming\locality.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\src\runtime\naming\name.cpp"
+						>
+					</File>
 					<File
 						RelativePath="..\..\..\src\runtime\naming\resolver_client.cpp"
 						>

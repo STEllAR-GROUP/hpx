@@ -37,8 +37,9 @@ include_directories (${hpx_SOURCE_DIR}/external/coroutine)
 include_directories (${hpx_SOURCE_DIR}/external/endian)
 include_directories (${hpx_SOURCE_DIR}/external/exception)
 include_directories (${hpx_SOURCE_DIR}/external/logging)
-include_directories (${hpx_SOURCE_DIR}/external/singleton)
 include_directories (${hpx_SOURCE_DIR}/external/lockfree)
+include_directories (${hpx_SOURCE_DIR}/external/plugin)
+include_directories (${hpx_SOURCE_DIR}/external/singleton)
 
 if(MSVC)
     add_definitions(-D_WIN32_WINNT=0x0501)
@@ -52,11 +53,16 @@ if(UNIX OR APPLE OR CYGWIN)
     add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
 endif(UNIX OR APPLE OR CYGWIN)
 
-# Recurse into the "src" and "test" subdirectories.  This does not actually
-# cause another cmake executable to run.  The same process will walk through
-# the project's entire directory structure.
+# Recurse into some subdirectories. This does not actually cause another cmake 
+# executable to run. The same process will walk through the project's entire 
+# directory structure.
 add_subdirectory (src)
 add_subdirectory (tests)
 add_subdirectory (examples)
 add_subdirectory (runtime)
+
+# Components are to build separately
+add_subdirectory (hpx/components/accumulator)
+add_subdirectory (hpx/components/simple_accumulator)
+add_subdirectory (hpx/components/distributed_factory)
 

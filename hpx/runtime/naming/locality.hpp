@@ -12,7 +12,6 @@
 #include <boost/thread.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/serialization/version.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/serialization.hpp>
 
@@ -179,10 +178,6 @@ namespace hpx { namespace naming
 ///////////////////////////////////////////////////////////////////////////////
 }}
 
-///////////////////////////////////////////////////////////////////////////////
-// this is the current version of the parcel serialization format
-// this definition needs to be in the global namespace
-BOOST_CLASS_VERSION(hpx::naming::locality, HPX_LOCALITY_VERSION)
 BOOST_CLASS_TRACKING(hpx::naming::locality, boost::serialization::track_never)
 
 #include <hpx/config/warnings_suffix.hpp>

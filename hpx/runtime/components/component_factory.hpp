@@ -74,6 +74,7 @@ namespace hpx { namespace components
         component_type get_component_type(naming::resolver_client& dgas_client)
         {
             if (component_invalid == Component::get_component_type()) {
+                // first call to get_component_type, ask DGAS for a unique id
                 Component::set_component_type(
                     dgas_client.get_component_id(unique_component_name));
             }

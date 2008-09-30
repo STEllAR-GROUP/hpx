@@ -49,6 +49,9 @@ int main(int argc, char* argv[])
         else {
             // initialize and start the HPX runtime
             hpx::runtime rt(dgas_host, dgas_port, hpx_host, hpx_port);
+
+            // the main thread will wait (block) for the shutdown action and 
+            // the threadmanager is serving incoming requests in the meantime
             rt.run();
         }
     }

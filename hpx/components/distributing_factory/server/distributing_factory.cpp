@@ -10,6 +10,11 @@
 #include <hpx/runtime/components/server/manage_component.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
+#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/portable_binary_oarchive.hpp>
+
+#include <boost/serialization/version.hpp>
+#include <boost/serialization/export.hpp>
 
 #include "distributing_factory.hpp"
 

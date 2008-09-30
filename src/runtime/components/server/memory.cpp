@@ -6,7 +6,11 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
 
+#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/portable_binary_oarchive.hpp>
+
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/version.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/export.hpp>
 

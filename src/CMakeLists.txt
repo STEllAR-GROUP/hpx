@@ -120,12 +120,16 @@ set (hpxlib_SOURCES
     runtime/runtime.cpp
     # action manager
     runtime/actions/action_manager.cpp
+    runtime/actions/continuation.cpp
     # applier
     runtime/applier/applier.cpp
     # components
     runtime/components/server/memory.cpp
     runtime/components/server/runtime_support.cpp
     # naming 
+    runtime/naming/address.cpp
+    runtime/naming/locality.cpp
+    runtime/naming/name.cpp
     runtime/naming/resolver_client.cpp
     runtime/naming/resolver_server.cpp
     runtime/naming/server/reply.cpp
