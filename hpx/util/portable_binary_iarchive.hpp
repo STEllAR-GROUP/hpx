@@ -213,24 +213,4 @@ public:
     BOOST_SERIALIZATION_REGISTER_ARCHIVE(hpx::util::portable_binary_iarchive)
 #endif
 
-// required by export in boost <= 1.34
-#define BOOST_ARCHIVE_CUSTOM_IARCHIVE_TYPES hpx::util::portable_binary_iarchive
-
-// explicitly instantiate for this type of text stream
-#include <boost/archive/impl/basic_binary_iarchive.ipp>
-#include <boost/archive/impl/archive_pointer_iserializer.ipp>
-#include <boost/archive/impl/basic_binary_iprimitive.ipp>
-
-namespace boost { namespace archive 
-{
-    template class binary_iarchive_impl<
-        hpx::util::portable_binary_iarchive, 
-        std::istream::char_type, 
-        std::istream::traits_type
-    >;
-    template class detail::archive_pointer_iserializer<
-        hpx::util::portable_binary_iarchive>;
-
-}} // namespace boost::archive
-
 #endif // PORTABLE_BINARY_IARCHIVE_HPP

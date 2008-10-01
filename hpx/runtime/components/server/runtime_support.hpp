@@ -19,6 +19,8 @@
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/actions/action.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -143,5 +145,7 @@ namespace hpx { namespace components { namespace server
     };
 
 }}}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

@@ -23,7 +23,7 @@ set (Boost_COMPONENTS_NEEDED
     system 
     signals
 )
-find_package(Boost 1.35.0 COMPONENTS ${Boost_COMPONENTS_NEEDED})
+find_package(Boost 1.36.0 COMPONENTS ${Boost_COMPONENTS_NEEDED})
 
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 LINK_DIRECTORIES(${Boost_LIBRARY_DIR})
@@ -52,6 +52,9 @@ endif(MSVC)
 if(UNIX OR APPLE OR CYGWIN)
     add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
 endif(UNIX OR APPLE OR CYGWIN)
+
+# the Boost serialization library needs to be linked as a shared library
+add_definition(-DBOOST_SERIALIZATION_DYN_LINK)
 
 # Recurse into some subdirectories. This does not actually cause another cmake 
 # executable to run. The same process will walk through the project's entire 

@@ -2,9 +2,10 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="barrier_tests"
-	ProjectGUID="{CBE66815-854E-475C-9DA8-8C2DF39215A2}"
-	RootNamespace="barrier_tests"
+	Name="hpx_serialization"
+	ProjectGUID="{163E7F8F-1A47-488F-AB83-21183A70B0BD}"
+	RootNamespace="hpx_serialization"
+	Keyword="Win32Proj"
 	>
 	<Platforms>
 		<Platform
@@ -18,8 +19,8 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			InheritedPropertySheets="..\hpx_application.vsprops"
+			ConfigurationType="2"
+			InheritedPropertySheets="..\hpx.vsprops"
 			CharacterSet="0"
 			>
 			<Tool
@@ -40,13 +41,14 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;HPX_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -59,8 +61,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\$(ProjectName)d.exe"
+				AdditionalDependencies="boost_serialization-vc80-mt-gd.lib"
+				OutputFile="$(OutDir)\$(ProjectName)d.dll"
+				LinkIncremental="2"
 				GenerateDebugInformation="true"
+				SubSystem="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -92,8 +97,8 @@
 			Name="Release|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			InheritedPropertySheets="..\hpx_application.vsprops"
+			ConfigurationType="2"
+			InheritedPropertySheets="..\hpx.vsprops"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
 			>
@@ -114,8 +119,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;HPX_SERIALIZATION_EXPORTS"
 				RuntimeLibrary="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
@@ -131,7 +137,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="boost_serialization-vc80-mt.lib"
+				LinkIncremental="1"
 				GenerateDebugInformation="true"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -171,7 +180,21 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\tests\lco_tests\barrier_tests.cpp"
+				RelativePath="..\..\..\src\util\binary_portable_archives.cpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+			>
+			<File
+				RelativePath="..\..\..\hpx\util\portable_binary_iarchive.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\hpx\util\portable_binary_oarchive.hpp"
 				>
 			</File>
 		</Filter>

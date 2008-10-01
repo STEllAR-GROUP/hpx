@@ -110,7 +110,7 @@ namespace hpx { namespace parcelset { namespace server
                         boost::tuple<Handler>)
                     = &parcelport_connection::handle_read_header<Handler>;
 
-                in_buffer_->clear();
+                in_buffer_.reset(new std::vector<char>());
                 in_size_ = 0;
                 boost::asio::async_read(socket_, 
                     boost::asio::buffer(&in_size_, sizeof(in_size_)),

@@ -5,6 +5,7 @@
 
 #include <iostream>
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/server/request.hpp>
 

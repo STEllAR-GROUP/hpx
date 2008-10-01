@@ -8,12 +8,16 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <string>
+#include <algorithm>
+
+#include <hpx/hpx_fwd.hpp>
 
 #include <boost/version.hpp>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
+#include <boost/lambda/lambda.hpp>
 
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -130,6 +134,19 @@ namespace hpx { namespace parcelset
 
         // add parcel to incoming parcel queue
         parcels_.add_parcel(p);
+    }
+
+    bool parcelhandler::get_remote_prefixes(
+        std::vector<naming::id_type>& prefixes) const
+    {
+        std::vector<naming::id_type> allprefixes;
+        bool result = resolver_.get_prefixes(allprefixes);
+        if (!result) return false;
+
+        using boost::lambda::_1;
+        std::remove_copy_if(allprefixes.begin(), allprefixes.end(), 
+            std::back_inserter(prefixes), _1 == prefix_);
+        return !prefixes.empty();
     }
 
 ///////////////////////////////////////////////////////////////////////////////

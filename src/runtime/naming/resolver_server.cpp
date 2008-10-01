@@ -8,6 +8,8 @@
 
 #include<iostream>
 
+#include <hpx/hpx_fwd.hpp>
+
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 

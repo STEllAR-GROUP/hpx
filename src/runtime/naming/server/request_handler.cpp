@@ -4,6 +4,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <string>
+
+#include <hpx/hpx_fwd.hpp>
+
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/include/at.hpp>
 
@@ -515,7 +518,7 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#if BOOST_VERSION > 103600
+#if BOOST_VERSION >= 103600
     double request_handler::extract_moment2(accumulator_set_type const& p)
     {
         return boost::accumulators::extract::moment<2>(p);

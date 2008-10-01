@@ -8,6 +8,8 @@
 
 #include <vector>
 
+#include <hpx/hpx_fwd.hpp>
+
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>

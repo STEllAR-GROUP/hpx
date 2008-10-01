@@ -6,9 +6,10 @@
 #include <cstring>
 #include <iostream>
 
-#include <boost/lexical_cast.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/components/accumulator/accumulator.hpp>
+
+#include <boost/lexical_cast.hpp>
 
 using namespace hpx;
 using namespace std;

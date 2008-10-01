@@ -9,6 +9,8 @@
 
 #include <string>
 
+#include <hpx/hpx_fwd.hpp>
+
 #include <boost/version.hpp>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>

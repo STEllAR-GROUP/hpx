@@ -6,9 +6,10 @@
 #include <cstring>
 #include <iostream>
 
-#include <boost/lexical_cast.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/components/simple_accumulator/simple_accumulator.hpp>
+
+#include <boost/lexical_cast.hpp>
 
 using namespace hpx;
 using namespace std;
@@ -17,10 +18,20 @@ using namespace std;
 threads::thread_state 
 hpx_main(threads::thread_self& self, applier::applier& appl)
 {
-    // create an accumulator locally
+    // get list of all known localities
+    std::vector<naming::id_type> prefixes;
+    naming::id_type prefix;
+    if (appl.get_remote_prefixes(prefixes)) {
+        // create accumulator on any of the remote localities
+        prefix = prefixes[0];
+    }
+    else {
+        // create an accumulator locally
+        prefix = appl.get_runtime_support_gid();
+    }
+
     using hpx::components::simple_accumulator;
-    simple_accumulator accu (simple_accumulator::create(self, appl, 
-        appl.get_runtime_support_gid()));
+    simple_accumulator accu(simple_accumulator::create(self, appl, prefix));
 
     // print some message
     std::cout << "accumulator client, you may enter some commands "

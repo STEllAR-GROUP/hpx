@@ -36,6 +36,8 @@ namespace hpx { namespace actions
           : gids_(gids)
         {}
 
+        virtual ~continuation() {}
+
         bool empty() const
         {
             return gids_.empty();

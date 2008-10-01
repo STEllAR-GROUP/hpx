@@ -176,24 +176,4 @@ public:
     BOOST_SERIALIZATION_REGISTER_ARCHIVE(hpx::util::portable_binary_oarchive)
 #endif
 
-// required by export in boost <= 1.34
-#define BOOST_ARCHIVE_CUSTOM_OARCHIVE_TYPES hpx::util::portable_binary_oarchive
-
-#include <boost/archive/impl/basic_binary_oarchive.ipp>
-#include <boost/archive/impl/archive_pointer_oserializer.ipp>
-#include <boost/archive/impl/basic_binary_oprimitive.ipp>
-
-namespace boost { namespace archive 
-{
-    // explicitly instantiate for this type of binary stream
-    template class binary_oarchive_impl<
-        hpx::util::portable_binary_oarchive, 
-        std::ostream::char_type, 
-        std::ostream::traits_type
-    >;
-    template class detail::archive_pointer_oserializer<
-        hpx::util::portable_binary_oarchive>;
-
-}} // namespace boost::archive
-
 #endif // PORTABLE_BINARY_OARCHIVE_HPP

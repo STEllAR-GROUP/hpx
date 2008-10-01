@@ -6,6 +6,11 @@
 #if !defined(HPX_HPX_FWD_MAR_24_2008_1119AM)
 #define HPX_HPX_FWD_MAR_24_2008_1119AM
 
+#include <boost/config.hpp>
+#if defined(BOOST_WINDOWS)
+#include <winsock2.h>
+#endif
+
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/coroutine/shared_coroutine.hpp>

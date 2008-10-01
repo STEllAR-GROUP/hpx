@@ -18,6 +18,8 @@
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx 
 {
@@ -193,5 +195,7 @@ namespace hpx
     };
 
 }   // namespace hpx
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

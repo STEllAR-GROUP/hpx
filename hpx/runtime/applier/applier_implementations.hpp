@@ -84,12 +84,11 @@
     bool apply (actions::continuation* c, naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        actions::continuation_type cont(c);
-
         // Determine whether the gid is local or remote
         naming::address addr;
         if (address_is_local(gid, addr))
         {
+            actions::continuation_type cont(c);
             detail::BOOST_PP_CAT(apply_helper, N)<
                     Action, BOOST_PP_ENUM_PARAMS(N, Arg)
             >::call(cont, thread_manager_, *this, addr.address_,

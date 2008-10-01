@@ -151,6 +151,19 @@ set (hpxlib_SOURCES
     ../external/coroutine/libs/coroutine/src/swapcontext.cpp
 )
 
+# separate shared module containing our portable serialization archives
+set (hpxserializationlib_HEADERS
+    ../hpx/hpx_fwd.hpp
+    ../hpx/util/portable_binary_iarchive.hpp
+    ../hpx/util/portable_binary_oarchive.hpp
+)
+
+set (hpxserializationlib_SOURCES
+    util/binary_portable_archives.cpp
+)
+
 add_definitions(-DHPX_EXPORTS)
+
+add_library (hpx_serialization SHARED ${hpxserializationlib_SOURCES} ${hpxserializationlib_HEADERS})
 add_library (hpx SHARED ${hpxlib_SOURCES} ${hpxlib_HEADERS})
 

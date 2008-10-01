@@ -123,12 +123,22 @@ namespace hpx { namespace parcelset
         ///     get_resolver().get_prefix(here, prefix);
         /// \endcode
         /// 
-        /// but doesn't require the fully DGAS round trip as the prefix value 
+        /// but doesn't require the full DGAS round trip as the prefix value 
         /// is cached inside the parcelhandler.
         naming::id_type const& get_prefix() const 
         { 
             return prefix_; 
         }
+
+        /// Return the list of all remote localities
+        ///
+        /// \param prefixes [out] The reference to a vector of id_types filled
+        ///                 by the function.
+        ///
+        /// \returns The function returns \a true if there is at least one 
+        ///          remote locality known to the DGASservice 
+        ///          (!prefixes.empty()).
+        bool get_remote_prefixes(std::vector<naming::id_type>& prefixes) const;
 
         /// A parcel is submitted for transport at the source locality site to 
         /// the parcel set of the locality with the put-parcel command

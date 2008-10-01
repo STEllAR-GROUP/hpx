@@ -24,6 +24,8 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace threads { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -242,5 +244,7 @@ namespace hpx { namespace threads
     }
 
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

@@ -101,11 +101,10 @@ namespace hpx { namespace applier
         template <typename Action>
         bool apply (actions::continuation* c, naming::id_type const& gid)
         {
-            actions::continuation_type cont(c);
-
             // Determine whether the gid is local or remote
             naming::address addr;
             if (address_is_local(gid, addr)) {
+                actions::continuation_type cont(c);
                 detail::apply_helper0<Action>::call(cont, thread_manager_, 
                     *this, addr.address_);
                 return true;     // no parcel has been sent (dest is local)
@@ -181,11 +180,10 @@ namespace hpx { namespace applier
         bool apply (actions::continuation* c, naming::id_type const& gid, 
             Arg0 const& arg0)
         {
-            actions::continuation_type cont(c);
-
             // Determine whether the gid is local or remote
             naming::address addr;
             if (address_is_local(gid, addr)) {
+                actions::continuation_type cont(c);
                 detail::apply_helper1<Action, Arg0>::call(cont, thread_manager_,
                     *this, addr.address_, arg0);
                 return true;     // no parcel has been sent (dest is local)
@@ -263,6 +261,23 @@ namespace hpx { namespace applier
         naming::id_type const& get_prefix() const
         {
             return parcel_handler_.get_prefix();
+        }
+
+        /// \brief Allow access to the prefixes of all remote localities 
+        ///        registered with the DGAS service.
+        ///
+        /// This accessor returns a list of all remote localities (all 
+        /// localities known to DGAS except the local one).
+        ///
+        /// \param prefixes [out] The reference to a vector of id_types filled
+        ///                 by the function.
+        ///
+        /// \returns The function returns \a true if there is at least one 
+        ///          remote locality known to the DGASservice 
+        ///          (!prefixes.empty()).
+        bool get_remote_prefixes(std::vector<naming::id_type>& prefixes) const
+        {
+            return parcel_handler_.get_remote_prefixes(prefixes);
         }
 
         /// By convention the runtime_support has a gid identical to the prefix 
