@@ -9,7 +9,7 @@ set (distributing_factorylib_HEADERS
 #    stubs/distributing_factory.hpp
 )
 
-set (acumulatorlib_SOURCES
+set (distributing_factorylib_SOURCES
     server/distributing_factory.cpp
     distributing_factory.cpp
 )
@@ -24,3 +24,4 @@ add_library (
     ${distributing_factorylib_HEADERS}
 )
 
+target_link_libraries(distributing_factory ${hpx_LIBRARIES} ${Boost_LIBRARIES})

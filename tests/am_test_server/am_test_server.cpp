@@ -7,7 +7,7 @@
 #include <string>
 
 #include <hpx/hpx.hpp>
-#include <hpx/components/server/accumulator.hpp>
+#include <hpx/components/accumulator/server/accumulator.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/function.hpp>
@@ -101,7 +101,8 @@ int main(int argc, char* argv[])
         // Get the local virtual address of the accumulator object
 //        hpx::naming::address::address_type lva = &accu;
         // Bind the accumulator with the resolver-client
-        dgas_c.bind(id, hpx::naming::address(l, hpx::components::server::accumulator::value, &accu));
+        dgas_c.bind(id, hpx::naming::address(l, 
+            hpx::components::server::accumulator::get_component_type(), &accu));
 
         tm.run();
         pp.run();

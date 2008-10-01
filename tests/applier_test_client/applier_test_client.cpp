@@ -7,7 +7,7 @@
 #include <string>
 
 #include <hpx/hpx.hpp>
-#include <hpx/components/server/accumulator.hpp>
+#include <hpx/components/accumulator/server/accumulator.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/function.hpp>
 
@@ -122,7 +122,8 @@ int main(int argc, char* argv[])
         hpx::components::server::accumulator accu;
         hpx::naming::id_type local_id(44);
         hpx::naming::locality l(ps_host, ps_port);
-        dgas_c.bind(local_id, hpx::naming::address(l, hpx::components::server::accumulator::value, &accu));
+        dgas_c.bind(local_id, hpx::naming::address(l, 
+            hpx::components::server::accumulator::get_component_type(), &accu));
 
         // Test code to verify that the applier can successfully apply to local components
         bool p_l1 = app.apply<hpx::components::server::detail::accumulator::init_action>(local_id);

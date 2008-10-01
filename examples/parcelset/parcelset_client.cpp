@@ -3,11 +3,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <iostream>
-#include <string>
-#include <boost/lexical_cast.hpp>
 #include <hpx/hpx.hpp>
 
+#include <iostream>
+#include <string>
+
+#include <boost/lexical_cast.hpp>
 
 #define MAXITERATIONS 1000
 double start_time = 0;

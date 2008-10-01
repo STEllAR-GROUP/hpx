@@ -9,7 +9,7 @@ set (accumulatorlib_HEADERS
     stubs/accumulator.hpp
 )
 
-set (acumulatorlib_SOURCES
+set (accumulatorlib_SOURCES
     accumulator.cpp
 )
 
@@ -23,3 +23,4 @@ add_library (
     ${accumulatorlib_HEADERS}
 )
 
+target_link_libraries(accumulator ${hpx_LIBRARIES} ${Boost_LIBRARIES})

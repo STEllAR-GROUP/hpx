@@ -9,7 +9,7 @@ set (simple_accumulatorlib_HEADERS
     stubs/simple_accumulator.hpp
 )
 
-set (acumulatorlib_SOURCES
+set (simple_accumulatorlib_SOURCES
     simple_accumulator.cpp
 )
 
@@ -23,3 +23,4 @@ add_library (
     ${simple_accumulatorlib_HEADERS}
 )
 
+target_link_libraries(simple_accumulator ${hpx_LIBRARIES} ${Boost_LIBRARIES})

@@ -7,7 +7,7 @@
 #include <string>
 
 #include <hpx/hpx.hpp>
-#include <hpx/components/server/accumulator.hpp>
+#include <hpx/components/accumulator/server/accumulator.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/function.hpp>

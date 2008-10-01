@@ -9,10 +9,10 @@
 #include <iostream>
 #include <string>
 
+#include <hpx/hpx.hpp>
+
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
-
-#include <hpx/hpx.hpp>
 
 #if defined(BOOST_WINDOWS)
 

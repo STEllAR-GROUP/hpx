@@ -46,7 +46,7 @@ namespace hpx { namespace naming { namespace server
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    char const* const get_command_name(int cmd);
+    HPX_EXPORT char const* const get_command_name(int cmd);
 
     /// A request received from a client.
     class request

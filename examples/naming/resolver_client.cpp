@@ -11,12 +11,12 @@
 #include <iostream>
 #include <string>
 
+#include <hpx/hpx.hpp>
+
 #include <boost/cstdint.hpp>
 #include <boost/assert.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/detail/lightweight_test.hpp>
-
-#include <hpx/hpx.hpp>
 
 int main(int argc, char* argv[])
 {

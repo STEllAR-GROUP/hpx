@@ -11,7 +11,8 @@ The differences from the original FindBoost.cmake are:
    Fixed Line 360:
      STRING(REGEX REPLACE ".*\\(GCC\\) ([0-9])\\.([0-9])\\.[0-9].*" "\\1\\2"
 
-In order to utilise this solution; either edit the above Line in 
+This file should be used automatically by HPX's build system (instead of the 
+default one). If you experience problems please either edit the above Line in 
 your FindBoost.cmake files. Alternatively a corrected FindBoost.cmake file 
 has been provided in hpx/misc for your convenience. 
 

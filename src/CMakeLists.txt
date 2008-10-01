@@ -6,7 +6,6 @@
 set (hpxlib_HEADERS
     # global
     ../hpx/config.hpp
-    ../hpx/defaults.hpp
     ../hpx/exception.hpp
     ../hpx/hpx.hpp
     ../hpx/hpx_fwd.hpp
@@ -147,9 +146,15 @@ set (hpxlib_SOURCES
     util/ini.cpp
     util/io_service_pool.cpp
     util/logging.cpp
-    # source file from coroutine library
-    ../external/coroutine/libs/coroutine/src/swapcontext.cpp
 )
+
+# add source file from coroutine library (needed for gcc only)
+if (CMAKE_COMPILER_IS_GNUCXX)
+    SET(hpxlib_SOURCES 
+        ${hpxlib_SOURCES} 
+        ../external/coroutine/libs/coroutine/src/swapcontext.cpp
+    )
+endif(CMAKE_COMPILER_IS_GNUCXX)
 
 # separate shared module containing our portable serialization archives
 set (hpxserializationlib_HEADERS
@@ -164,6 +169,14 @@ set (hpxserializationlib_SOURCES
 
 add_definitions(-DHPX_EXPORTS)
 
+# build instructions
 add_library (hpx_serialization SHARED ${hpxserializationlib_SOURCES} ${hpxserializationlib_HEADERS})
+target_link_libraries(hpx_serialization ${Boost_LIBRARIES})
+
 add_library (hpx SHARED ${hpxlib_SOURCES} ${hpxlib_HEADERS})
+target_link_libraries(hpx hpx_serialization ${Boost_LIBRARIES})
+
+# installation instructions
+install_files(/include ${hpxlib_SOURCES})
+install_files(/lib hpx hpx_serialization)
 

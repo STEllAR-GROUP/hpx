@@ -4,8 +4,8 @@
 
 
 #include <iostream>
-#include <boost/detail/lightweight_test.hpp>
 #include <hpx/hpx.hpp>
+#include <boost/detail/lightweight_test.hpp>
 
 using namespace hpx;
 using namespace hpx::threads;
