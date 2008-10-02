@@ -16,4 +16,5 @@
 // this is the current version of the parcel serialization format
 // this definition needs to be in the global namespace
 BOOST_CLASS_VERSION(hpx::naming::locality, HPX_LOCALITY_VERSION)
+BOOST_CLASS_TRACKING(hpx::naming::locality, boost::serialization::track_never)
 

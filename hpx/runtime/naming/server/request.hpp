@@ -260,6 +260,4 @@ namespace hpx { namespace naming { namespace server
 
 }}}  // namespace hpx::naming::server
 
-BOOST_CLASS_TRACKING(hpx::naming::server::request, boost::serialization::track_never)
-
 #endif

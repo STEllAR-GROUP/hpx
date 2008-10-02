@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
+#include <hpx/runtime/actions/continuation_impl.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
@@ -21,8 +22,8 @@ HPX_SERIALIZE_ACTION(hpx::components::server::memory::store16_action);
 HPX_SERIALIZE_ACTION(hpx::components::server::memory::store32_action);
 HPX_SERIALIZE_ACTION(hpx::components::server::memory::store64_action);
 
-HPX_SERIALIZE_ACTION(hpx::components::server::memory::store8_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::memory::store16_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::memory::store32_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::memory::store64_action);
+HPX_SERIALIZE_ACTION(hpx::components::server::memory::load8_action);
+HPX_SERIALIZE_ACTION(hpx::components::server::memory::load16_action);
+HPX_SERIALIZE_ACTION(hpx::components::server::memory::load32_action);
+HPX_SERIALIZE_ACTION(hpx::components::server::memory::load64_action);
 

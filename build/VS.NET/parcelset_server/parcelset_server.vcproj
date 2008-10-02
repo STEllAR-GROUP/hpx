@@ -343,6 +343,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath="..\..\..\examples\parcelset\CMakeLists.txt"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

@@ -355,6 +355,10 @@
 				</FileConfiguration>
 			</File>
 		</Filter>
+		<File
+			RelativePath="..\..\..\runtime\CMakeLists.txt"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

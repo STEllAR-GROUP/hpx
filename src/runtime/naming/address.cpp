@@ -16,4 +16,5 @@
 // this is the current version of the address serialization format
 // this definition needs to be in the global namespace
 BOOST_CLASS_VERSION(hpx::naming::address, HPX_ADDRESS_VERSION)
+BOOST_CLASS_TRACKING(hpx::naming::address, boost::serialization::track_never)
 

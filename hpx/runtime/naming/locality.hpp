@@ -178,8 +178,6 @@ namespace hpx { namespace naming
 ///////////////////////////////////////////////////////////////////////////////
 }}
 
-BOOST_CLASS_TRACKING(hpx::naming::locality, boost::serialization::track_never)
-
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
