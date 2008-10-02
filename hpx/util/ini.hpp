@@ -8,7 +8,8 @@
 #define HPX_UTIL_SECTION_SEP_17_2008_022PM
 
 #include <map>
-#include <iostream>
+#include <iosfwd>
+#include <boost/lexical_cast.hpp>
 
 // suppress warnings about dependent classes not being exported from the dll
 #if defined(BOOST_MSVC)
@@ -45,6 +46,8 @@ namespace hpx { namespace util
         section(const section& in);
         ~section() {}
 
+        void parse(std::string const& sourcename, 
+            std::vector<std::string> const& lines);
         void read(std::string const& filename);
         void merge(std::string const& second);
         void merge(section& second);
@@ -57,6 +60,7 @@ namespace hpx { namespace util
 
         section* get_section (std::string const& sec_name);
         section const* get_section (std::string const& sec_name) const;
+
         section_map const& get_sections() const
             { return sections_; }
 
@@ -64,6 +68,11 @@ namespace hpx { namespace util
         bool has_entry(std::string const& key) const;
         std::string get_entry(std::string const& key) const;
         std::string get_entry(std::string key, std::string const& dflt) const;
+        template <typename T>
+        std::string get_entry(std::string key, T dflt) const
+        {
+            return get_entry(key, boost::lexical_cast<std::string>(dflt));
+        }
 
         entry_map const& get_entries() const
             { return entries_; }

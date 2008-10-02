@@ -17,6 +17,7 @@
 #include <hpx/runtime/actions/action_manager.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
+#include <hpx/util/ini.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -39,11 +40,6 @@ namespace hpx
     public:
         /// Construct a new HPX runtime instance 
         ///
-        /// \param dgas_address   [in] This is the address (IP address or 
-        ///                       host name) of the locality the DGAS server is 
-        ///                       running on.
-        /// \param dgas_port      [in] This is the port number the DGAS server
-        ///                       is listening on.
         /// \param address        [in] This is the address (IP address or 
         ///                       host name) of the locality the new runtime 
         ///                       instance should be associated with. It is 
@@ -51,17 +47,36 @@ namespace hpx
         /// \param port           [in] This is the port number the new runtime
         ///                       instance will use to listen for incoming 
         ///                       parcels.
-        runtime(std::string const& dgas_address, unsigned short dgas_port,
-                std::string const& address, unsigned short port);
+        /// \param dgas_address   [in] This is the address (IP address or 
+        ///                       host name) of the locality the DGAS server is 
+        ///                       running on. If this value is not 
+        ///                       specified the actual address will be 
+        ///                       taken from the configuration file (hpx.ini).
+        /// \param dgas_port      [in] This is the port number the DGAS server 
+        ///                       is listening on. If this value is not 
+        ///                       specified the actual port number will be 
+        ///                       taken from the configuration file (hpx.ini).
+        runtime(std::string const& address, unsigned short port,
+                std::string const& dgas_address = "", 
+                unsigned short dgas_port = -1);
 
         /// Construct a new HPX runtime instance 
         ///
-        /// \param dgas_address   [in] This is the locality the DGAS server is 
-        ///                       running on.
         /// \param address        [in] This is the locality the new runtime 
         ///                       instance should be associated with. It is 
-        ///                       used for receiving parcels.
-        runtime(naming::locality dgas_address, naming::locality address);
+        ///                       used for receiving parcels. 
+        /// \note The DGAS locality to use will be taken from the configuration 
+        ///       file (hpx.ini).
+        runtime(naming::locality address);
+
+        /// Construct a new HPX runtime instance 
+        ///
+        /// \param address        [in] This is the locality the new runtime 
+        ///                       instance should be associated with. It is 
+        ///                       used for receiving parcels. 
+        /// \param dgas_address   [in] This is the locality the DGAS server is 
+        ///                       running on. 
+        runtime(naming::locality address, naming::locality dgas_address);
 
         /// \brief The destructor makes sure all HPX runtime services are 
         ///        properly shut down before existing.
@@ -181,6 +196,26 @@ namespace hpx
         }
 
     private:
+        // The runtime_config class is a wrapper for the runtime configuration 
+        // data allowing to extract configuration information in a more 
+        // convenient way
+        class runtime_config : public util::section
+        {
+        public:
+            // initialize and load configuration information
+            runtime_config();
+
+            // Get the DGAS locality to use 
+            naming::locality get_dgas_locality();
+
+            // Get the DGAS locality to use (default_address/default_port are 
+            // the default values describing the locality to use if no 
+            // configuration info can be found).
+            naming::locality get_dgas_locality(
+                std::string default_address, unsigned short default_port);
+        };
+
+        runtime_config ini_;
         util::io_service_pool dgas_pool_; 
         util::io_service_pool parcel_pool_; 
         util::io_service_pool timer_pool_; 

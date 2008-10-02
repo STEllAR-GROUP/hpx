@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
         hpx::naming::resolver_server dgas(dgas_pool, dgas_host, dgas_port, true);
 
         // initialize and start the HPX runtime
-        hpx::runtime rt(dgas_host, dgas_port, hpx_host, hpx_port);
+        hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port);
 
         // the main thread will wait (block) for the shutdown action and 
         // the threadmanager is serving incoming requests in the meantime

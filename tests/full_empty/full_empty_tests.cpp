@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
         hpx::naming::resolver_server dgas(dgas_pool, host, dgas_port, true);
 
         // initialize and start the HPX runtime
-        hpx::runtime rt(host, dgas_port, host, ps_port);
+        hpx::runtime rt(host, ps_port, host, dgas_port);
         rt.run(hpx_main, 2);
     }
     catch (std::exception& e) {

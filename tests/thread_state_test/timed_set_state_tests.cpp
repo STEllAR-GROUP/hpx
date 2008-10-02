@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
 
         // start the HPX runtime using different numbers of threads
         for (int i = 1; i <= 8; ++i) {
-            hpx::runtime rt(host, dgas_port, host, ps_port);
+            hpx::runtime rt(host, ps_port, host, dgas_port);
             rt.run(hpx_main, i);
         }
     }

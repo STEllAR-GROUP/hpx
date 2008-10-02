@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/util/init_ini_data.hpp>
+#include <hpx/util/ini.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/manage_component.hpp>
@@ -126,85 +126,15 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // iterate over all shared libraries in the given directory and construct
-    // default ini settings assuming all of those are components
-    inline void init_ini_data_default(std::string const& libs, util::section& ini)
-    {
-        namespace fs = boost::filesystem;
-
-        try {
-            fs::directory_iterator nodir;
-            fs::path libs_path (libs, fs::native);
-
-            if (!fs::exists(libs_path)) 
-                return;     // give directory doesn't exist
-
-            for (fs::directory_iterator dir(libs_path); dir != nodir; ++dir)
-            {
-                fs::path curr(*dir);
-                if (fs::extension(curr) != HPX_SHARED_LIB_EXTENSION) 
-                    continue;
-
-                // instance name and module name are the same
-                std::string name (fs::basename(curr));
-#if defined(BOOST_WINDOWS) && defined(_DEBUG)
-                // remove the 'd' suffix 
-                if (name[name.size()-1] == 'd')
-                    name = name.substr(0, name.size()-1);
-#endif
-
-                if (!ini.has_section("hpx.components")) {
-                    util::section* hpx_sec = ini.get_section("hpx");
-                    BOOST_ASSERT(NULL != hpx_sec);
-
-                    util::section comp_sec;
-                    hpx_sec->add_section("components", comp_sec);
-                }
-
-                util::section* components_sec = ini.get_section("hpx.components");
-                util::section sec;
-                sec.add_entry("name", name);
-                sec.add_entry("path", libs);
-                components_sec->add_section(name, sec);
-            }
-        }
-        catch (fs::filesystem_error const& /*e*/) {
-            ;
-        }
-     }
-
-    ///////////////////////////////////////////////////////////////////////////
     // Load all components from the ini files found in the configuration
-    void runtime_support::load_components(naming::resolver_client& dgas_client)
+    void runtime_support::load_components(util::section& ini, 
+        naming::resolver_client& dgas_client)
     {
-        util::section ini;
-
-        // pre-initialize location entry with a compile time based value
-        util::section hpxsec;
-        hpxsec.add_entry("location", HPX_PREFIX);
-        ini.add_section("hpx", hpxsec);
-        ini.get_section("hpx")->add_entry("ini_path", "$[hpx.location]/share/hpx/ini");
-
-        // try to build default ini structure from shared libraries in default 
-        // installation location, this allows to install simple components
-        // without the need to install an ini file
-        init_ini_data_default(HPX_DEFAULT_COMPONENT_PATH, ini);
-
-        // add explicit configuration information if its provided
-        if (!util::init_ini_data_base(ini)) {
-            // merge all found ini files of all components
-            util::merge_component_inis(ini);
-
-            // read system and user ini files _again_, to allow the user to 
-            // overwrite the settings from the default component ini's. 
-            util::init_ini_data_base(ini);
-        }
-
-        // now, load all components
+        // load all components as described in the configuration information
         if (!ini.has_section("hpx.components"))
             return;     // no components to load
 
-        // each shared library containing components may have a ini section
+        // each shared library containing components may have an ini section
         //
         // # mandatory section describing the component module
         // [hpx.components.instance_name]
@@ -237,12 +167,11 @@ namespace hpx { namespace components { namespace server
             else
                 component = HPX_MANGLE_COMPONENT_NAME_STR(instance);
 
-            bool enabled = true;
             if (i->second.has_entry("enabled")) {
                 std::string tmp = i->second.get_entry("enabled");
                 boost::to_lower (tmp);
                 if (tmp == "no" || tmp == "false" || tmp == "0")
-                    enabled = false;
+                    continue;     // this component has been disabled
             }
 
             fs::path lib;
@@ -251,9 +180,6 @@ namespace hpx { namespace components { namespace server
                     lib = fs::path(i->second.get_entry("path"), fs::native);
                 else
                     lib = fs::path(HPX_DEFAULT_COMPONENT_PATH, fs::native);
-
-                if (!enabled) 
-                    continue;
 
                 if (!load_component(ini, instance, component, lib, dgas_client)) {
                     // build path to component to load

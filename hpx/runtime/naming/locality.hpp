@@ -34,7 +34,7 @@ namespace hpx { namespace naming
     public:
         locality() 
         {}
-        
+
         locality(std::string const& addr, unsigned short port) 
         {
             try {
@@ -55,29 +55,29 @@ namespace hpx { namespace naming
                 throw hpx::exception(network_error, e.message());
             }
         }
-        
+
         locality(boost::asio::ip::address addr, unsigned short port) 
           : endpoint_(addr, port) 
         {
         }
-        
+
         locality(boost::asio::ip::tcp::endpoint ep) 
           : endpoint_(ep) 
         {
         }
-        
+
         locality& operator= (boost::asio::ip::tcp::endpoint ep)
         {
             endpoint_ = ep;
             return *this;
         }
-        
+
         /// access the stored IP address
         boost::asio::ip::tcp::endpoint const& get_endpoint() const 
         {
             return endpoint_;
         }
-        
+
         friend bool operator!=(locality const& lhs, locality const& rhs)
         {
             return lhs.endpoint_ != rhs.endpoint_;
@@ -92,42 +92,42 @@ namespace hpx { namespace naming
         {
             return lhs.endpoint_ < rhs.endpoint_;
         }
-        
+
         friend bool operator> (locality const& lhs, locality const& rhs)
         {
             return !(lhs.endpoint_ < rhs.endpoint_) && lhs.endpoint_ != rhs.endpoint_;
         }
-        
+
     private:
         friend std::ostream& operator<< (std::ostream& os, locality const& l);
-        
+
         // serialization support    
         friend class boost::serialization::access;
-    
+
         template<class Archive>
         void save(Archive & ar, const unsigned int version) const
         {
-        boost::uint16_t port = endpoint_.port();    
-            
+            boost::uint16_t port = endpoint_.port();
+
             if (endpoint_.address().is_v4()) {
-            boost::uint32_t ip = endpoint_.address().to_v4().to_ulong();
-            bool is_v4 = true;
-            
+                boost::uint32_t ip = endpoint_.address().to_v4().to_ulong();
+                bool is_v4 = true;
+
                 ar << is_v4 << ip << port;
             }
             else {
-            boost::asio::ip::address_v6 addr = endpoint_.address().to_v6();
-            
+                boost::asio::ip::address_v6 addr = endpoint_.address().to_v6();
+
                 if (addr.is_v4_mapped() || addr.is_v4_compatible()) {
-                boost::uint32_t ip = addr.to_v4().to_ulong();
-                bool is_v4 = true;
-                
+                    boost::uint32_t ip = addr.to_v4().to_ulong();
+                    bool is_v4 = true;
+
                     ar << is_v4 << ip << port;
                 }
                 else {
-                std::string bytes (addr.to_string());
-                bool is_v4 = false;
-                
+                    std::string bytes (addr.to_string());
+                    bool is_v4 = false;
+
                     ar << is_v4 << bytes << port;
                 }
             }
@@ -140,23 +140,23 @@ namespace hpx { namespace naming
                 throw exception(version_too_new, 
                     "trying to load locality with unknown version");
             }
-            
-        bool is_v4 = false;
-        boost::uint16_t port = 0;    
-            
+
+            bool is_v4 = false;
+            boost::uint16_t port = 0;    
+
             ar >> is_v4;
             if (is_v4) {
-            boost::uint32_t ip = 0;
+                boost::uint32_t ip = 0;
 
                 ar >> ip;
                 ar >> port;
-            
+
                 endpoint_.address(boost::asio::ip::address_v4(ip));
                 endpoint_.port(port);
             }
             else {
-            std::string bytes;
-            
+                std::string bytes;
+
                 ar >> bytes;
                 ar >> port;
                 endpoint_.address(boost::asio::ip::address_v6::from_string(bytes));
@@ -174,7 +174,7 @@ namespace hpx { namespace naming
         os << std::dec << l.endpoint_;
         return os;
     }
-    
+
 ///////////////////////////////////////////////////////////////////////////////
 }}
 

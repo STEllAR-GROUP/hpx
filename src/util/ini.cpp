@@ -123,7 +123,6 @@ void section::read (std::string const& filename)
 #endif
 
     // build ini - open file and parse each line
-    int linenum = 0;
     std::ifstream input(filename.c_str (), std::ios::in);
     if (!input.is_open())
         line_msg("Cannot open file: ", filename);
@@ -132,19 +131,35 @@ void section::read (std::string const& filename)
     if (!regex_init())
         line_msg ("Cannot init regex for ", filename);
 
-    // parse file
-    section * current = this;
+    // read file 
     std::string line;
+    std::vector <std::string> lines;
+    while (std::getline(input, line))
+        lines.push_back (line);
+
+    // parse file
+    parse(filename, lines);
+}
+
+// parse file
+void section::parse (std::string const& sourcename, 
+    std::vector<std::string> const& lines)
+{
+    int linenum = 0;
+    section* current = this;
 
     boost::regex regex_comment (pattern_comment, boost::regex::perl | boost::regex::icase);
     boost::regex regex_section (pattern_section, boost::regex::perl | boost::regex::icase);
     boost::regex regex_entry (pattern_entry,   boost::regex::perl | boost::regex::icase);
-    while (std::getline (input, line))
+
+    std::vector<std::string>::const_iterator end = lines.end();
+    for (std::vector<std::string>::const_iterator it = lines.begin(); 
+         it != end; ++it)
     {
         ++linenum;
 
         // remove trailing new lines and white spaces
-        line = trim_whitespace (line);
+        std::string line(trim_whitespace (*it));
 
         // skip if empty line
         if (line.empty())
@@ -169,7 +184,7 @@ void section::read (std::string const& filename)
             // found a section line
             if(2 != what.size())
             {
-                line_msg("Cannot parse sec in ", filename, linenum);
+                line_msg("Cannot parse section in ", sourcename, linenum);
             }
 
             current = this;     // start adding sections at the root
@@ -194,7 +209,7 @@ void section::read (std::string const& filename)
             // found a entry line
             if (3 != what.size())
             {
-                line_msg("Cannot parse key/value in ", filename, linenum);
+                line_msg("Cannot parse key/value in ", sourcename, linenum);
             }
 
             // add key/val to current section
@@ -202,7 +217,7 @@ void section::read (std::string const& filename)
         }
         else {
             // Hmm, is not a section, is not an entry, is not empty - must be an error!
-            line_msg ("Cannot parse line at ", filename, linenum);
+            line_msg ("Cannot parse line at ", sourcename, linenum);
         }
     }
 }

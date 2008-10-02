@@ -6,21 +6,17 @@
 set (simple_accumulatorlib_HEADERS
     simple_accumulator.hpp
     server/simple_accumulator.hpp
-    stubs/simple_accumulator.hpp
-)
+    stubs/simple_accumulator.hpp)
 
 set (simple_accumulatorlib_SOURCES
-    simple_accumulator.cpp
-)
+    simple_accumulator.cpp)
 
 add_definitions(-DHPX_COMPONENT_NAME=simple_accumulator)
 add_definitions(-DHPX_COMPONENT_EXPORTS)
 
-add_library (
-    simple_accumulator 
-    SHARED 
-    ${simple_accumulatorlib_SOURCES} 
-    ${simple_accumulatorlib_HEADERS}
-)
-
-target_link_libraries(simple_accumulator ${hpx_LIBRARIES} ${Boost_LIBRARIES})
+add_library (simple_accumulator_component SHARED 
+    ${simple_accumulatorlib_SOURCES} ${simple_accumulatorlib_HEADERS})
+set_target_properties(simple_accumulator_component PROPERTIES
+    OUTPUT_NAME ${component_LIBRARY_PREFIX}simple_accumulator)
+target_link_libraries(simple_accumulator_component 
+    ${hpx_LIBRARIES} ${Boost_LIBRARIES})

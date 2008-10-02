@@ -61,7 +61,7 @@ namespace hpx { namespace util
         namespace fs = boost::filesystem;
 
         // fall back: use compile time prefix
-        bool result = handle_ini_file (ini, std::string(HPX_DEFAULT_INI_PATH) + "/hpx.ini");
+        bool result = handle_ini_file (ini, HPX_DEFAULT_INI_PATH "/hpx.ini");
 
         // look in the current directory first
         std::string cwd = fs::current_path().string() + "/.hpx.ini";
@@ -130,6 +130,56 @@ namespace hpx { namespace util
             catch (fs::filesystem_error const& /*e*/) {
                 ;
             }
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // iterate over all shared libraries in the given directory and construct
+    // default ini settings assuming all of those are components
+    inline void init_ini_data_default(std::string const& libs, util::section& ini)
+    {
+        namespace fs = boost::filesystem;
+
+        try {
+            fs::directory_iterator nodir;
+            fs::path libs_path (libs, fs::native);
+
+            if (!fs::exists(libs_path)) 
+                return;     // give directory doesn't exist
+
+            for (fs::directory_iterator dir(libs_path); dir != nodir; ++dir)
+            {
+                fs::path curr(*dir);
+                if (fs::extension(curr) != HPX_SHARED_LIB_EXTENSION) 
+                    continue;
+
+                // instance name and module name are the same
+                std::string name (fs::basename(curr));
+#if defined(BOOST_WINDOWS) && defined(_DEBUG)
+                // remove the 'd' suffix 
+                if (name[name.size()-1] == 'd')
+                    name = name.substr(0, name.size()-1);
+#endif
+
+                if (!ini.has_section("hpx.components")) {
+                    util::section* hpx_sec = ini.get_section("hpx");
+                    BOOST_ASSERT(NULL != hpx_sec);
+
+                    util::section comp_sec;
+                    hpx_sec->add_section("components", comp_sec);
+                }
+
+                util::section* components_sec = ini.get_section("hpx.components");
+                BOOST_ASSERT(NULL != components_sec);
+
+                util::section sec;
+                sec.add_entry("name", name);
+                sec.add_entry("path", libs);
+                components_sec->add_section(name, sec);
+            }
+        }
+        catch (fs::filesystem_error const& /*e*/) {
+            ;
         }
     }
 

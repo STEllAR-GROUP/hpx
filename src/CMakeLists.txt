@@ -108,75 +108,86 @@ set (hpxlib_HEADERS
     ../hpx/util/serialize_sequence.hpp
     ../hpx/util/static.hpp
     ../hpx/util/unlock_lock.hpp
-    ../hpx/util/util.hpp
-)
+    ../hpx/util/util.hpp)
 
 set (hpxlib_SOURCES
     # lcos
-    lcos/base_lco.cpp
+    ../src/lcos/base_lco.cpp
     # runtime
-    runtime/runtime.cpp
+    ../src/runtime/runtime.cpp
     # action manager
-    runtime/actions/action_manager.cpp
-    runtime/actions/continuation.cpp
+    ../src/runtime/actions/action_manager.cpp
+    ../src/runtime/actions/continuation.cpp
     # applier
-    runtime/applier/applier.cpp
+    ../src/runtime/applier/applier.cpp
     # components
-    runtime/components/server/memory.cpp
-    runtime/components/server/runtime_support.cpp
+    ../src/runtime/components/server/memory.cpp
+    ../src/runtime/components/server/runtime_support.cpp
     # naming 
-    runtime/naming/address.cpp
-    runtime/naming/locality.cpp
-    runtime/naming/name.cpp
-    runtime/naming/resolver_client.cpp
-    runtime/naming/resolver_server.cpp
-    runtime/naming/server/reply.cpp
-    runtime/naming/server/request.cpp
-    runtime/naming/server/request_handler.cpp
+    ../src/runtime/naming/address.cpp
+    ../src/runtime/naming/locality.cpp
+    ../src/runtime/naming/name.cpp
+    ../src/runtime/naming/resolver_client.cpp
+    ../src/runtime/naming/resolver_server.cpp
+    ../src/runtime/naming/server/reply.cpp
+    ../src/runtime/naming/server/request.cpp
+    ../src/runtime/naming/server/request_handler.cpp
     # parcelset
-    runtime/parcelset/connection_cache.cpp
-    runtime/parcelset/parcel.cpp
-    runtime/parcelset/parcelhandler.cpp
-    runtime/parcelset/parcelport.cpp
-    runtime/parcelset/server/parcelhandler_queue.cpp
-    runtime/parcelset/server/parcelport_queue.cpp
+    ../src/runtime/parcelset/connection_cache.cpp
+    ../src/runtime/parcelset/parcel.cpp
+    ../src/runtime/parcelset/parcelhandler.cpp
+    ../src/runtime/parcelset/parcelport.cpp
+    ../src/runtime/parcelset/server/parcelhandler_queue.cpp
+    ../src/runtime/parcelset/server/parcelport_queue.cpp
     # threadmanager
-    runtime/threads/threadmanager.cpp
+    ../src/runtime/threads/threadmanager.cpp
     # util 
-    util/ini.cpp
-    util/io_service_pool.cpp
-    util/logging.cpp
-)
+    ../src/util/ini.cpp
+    ../src/util/io_service_pool.cpp
+    ../src/util/logging.cpp)
 
 # add source file from coroutine library (needed for gcc only)
 if (CMAKE_COMPILER_IS_GNUCXX)
     SET(hpxlib_SOURCES 
         ${hpxlib_SOURCES} 
-        ../external/coroutine/libs/coroutine/src/swapcontext.cpp
-    )
-endif(CMAKE_COMPILER_IS_GNUCXX)
+        ../external/coroutine/libs/coroutine/src/swapcontext.cpp)
+endif()
 
 # separate shared module containing our portable serialization archives
 set (hpxserializationlib_HEADERS
     ../hpx/hpx_fwd.hpp
     ../hpx/util/portable_binary_iarchive.hpp
-    ../hpx/util/portable_binary_oarchive.hpp
-)
+    ../hpx/util/portable_binary_oarchive.hpp)
 
 set (hpxserializationlib_SOURCES
-    util/binary_portable_archives.cpp
-)
+    util/binary_portable_archives.cpp)
 
 add_definitions(-DHPX_EXPORTS)
 
 # build instructions
-add_library (hpx_serialization SHARED ${hpxserializationlib_SOURCES} ${hpxserializationlib_HEADERS})
+add_library(hpx_serialization SHARED 
+    ${hpxserializationlib_SOURCES} ${hpxserializationlib_HEADERS})
 target_link_libraries(hpx_serialization ${Boost_LIBRARIES})
 
-add_library (hpx SHARED ${hpxlib_SOURCES} ${hpxlib_HEADERS})
+add_library(hpx SHARED 
+    ${hpxlib_SOURCES} ${hpxlib_HEADERS})
 target_link_libraries(hpx hpx_serialization ${Boost_LIBRARIES})
 
 # installation instructions
-install_files(/include ${hpxlib_SOURCES})
-install_files(/lib hpx hpx_serialization)
+install(
+    TARGETS hpx hpx_serialization
+    RUNTIME DESTINATION bin
+    ARCHIVE DESTINATION lib
+    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                GROUP_READ GROUP_EXECUTE
+                WORLD_READ WORLD_EXECUTE)
 
+
+#set_target_properties(lib_${PROJECT_NAME} PROPERTIES
+# create *nix style library versions + symbolic links
+#   VERSION ${${PROJECT_NAME}_VERSION}
+#   SOVERSION ${${PROJECT_NAME}_SOVERSION}
+# allow creating static and shared libs without conflicts
+#   CLEAN_DIRECT_OUTPUT 1
+# avoid conflicts between library and binary target names
+#   OUTPUT_NAME ${PROJECT_NAME})
