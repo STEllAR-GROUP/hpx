@@ -337,16 +337,8 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\tests\memory_tests\memory_tests.cpp"
+				RelativePath="..\..\..\tests\component_tests\memory_tests.cpp"
 				>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AssemblerOutput="0"
-					/>
-				</FileConfiguration>
 			</File>
 		</Filter>
 	</Files>

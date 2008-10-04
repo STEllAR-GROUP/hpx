@@ -335,7 +335,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\tests\applier_test_server\applier_test_server.cpp"
+				RelativePath="..\..\..\tests\applier_tests\applier_test_server.cpp"
 				>
 			</File>
 		</Filter>
