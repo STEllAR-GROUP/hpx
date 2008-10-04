@@ -7,7 +7,7 @@ set (am_test_client_SOURCES am_test_client/am_test_client.cpp)
 add_executable (am_test_client_exe ${am_test_client_SOURCES})
 target_link_libraries(
     am_test_client_exe                    # executable
-    accumulator                           # components it depends on
+    accumulator_component                 # components it depends on
     ${hpx_LIBRARIES} ${Boost_LIBRARIES}   # libraries it dependson
 )
 
@@ -15,7 +15,7 @@ set (am_test_server_SOURCES am_test_server/am_test_server.cpp)
 add_executable (am_test_server_exe ${am_test_server_SOURCES})
 target_link_libraries(
     am_test_server_exe                    # executable
-    accumulator                           # components it depends on
+    accumulator_component                 # components it depends on
     ${hpx_LIBRARIES} ${Boost_LIBRARIES}   # libraries it dependson
 )
 
@@ -25,7 +25,7 @@ set (applier_test_client_SOURCES applier_test_client/applier_test_client.cpp)
 add_executable (applier_test_client_exe ${applier_test_client_SOURCES})
 target_link_libraries(
     applier_test_client_exe               # executable
-    accumulator                           # components it depends on
+    accumulator_component                 # components it depends on
     ${hpx_LIBRARIES} ${Boost_LIBRARIES}   # libraries it dependson
 )
 
@@ -33,7 +33,7 @@ set (applier_test_server_SOURCES applier_test_server/applier_test_server.cpp)
 add_executable (applier_test_server_exe ${applier_test_server_SOURCES})
 target_link_libraries(
     applier_test_server_exe               # executable
-    accumulator                           # components it depends on
+    accumulator_component                 # components it depends on
     ${hpx_LIBRARIES} ${Boost_LIBRARIES}   # libraries it dependson
 )
 
@@ -56,3 +56,4 @@ target_link_libraries(memory_tests_exe ${hpx_LIBRARIES} ${Boost_LIBRARIES})
 set (measure_thread_execution_SOURCES performance/measure_thread_execution.cpp)
 add_executable (measure_thread_execution_exe ${measure_thread_execution_SOURCES})
 target_link_libraries(measure_thread_execution_exe ${hpx_LIBRARIES} ${Boost_LIBRARIES})
+

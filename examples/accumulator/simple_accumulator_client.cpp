@@ -34,7 +34,7 @@ hpx_main(threads::thread_self& self, applier::applier& appl)
     simple_accumulator accu(simple_accumulator::create(self, appl, prefix));
 
     // print some message
-    std::cout << "accumulator client, you may enter some commands "
+    std::cout << "simple accumulator client, you may enter some commands "
                  "(try 'help' if in doubt...)" << std::endl;
 
     // execute a couple of commands on this component
@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
         if (argc != 5) {
             std::cerr << "Usage: simple_accumulator_client hpx_addr hpx_port dgas_addr "
                          "dgas_port" << std::endl;
-            std::cerr << "Try: accumulator_client <your_ip_addr> 7911 "
+            std::cerr << "Try: simple_accumulator_client <your_ip_addr> 7911 "
                          "<your_ip_addr> 7912" << std::endl;
             return -3;
         }

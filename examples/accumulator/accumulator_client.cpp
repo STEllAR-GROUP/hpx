@@ -18,10 +18,21 @@ using namespace std;
 threads::thread_state 
 hpx_main(threads::thread_self& self, applier::applier& appl)
 {
+    // get list of all known localities
+    std::vector<naming::id_type> prefixes;
+    naming::id_type prefix;
+    if (appl.get_remote_prefixes(prefixes)) {
+        // create accumulator on any of the remote localities
+        prefix = prefixes[0];
+    }
+    else {
+        // create an accumulator locally
+        prefix = appl.get_runtime_support_gid();
+    }
+
     // create an accumulator locally
     using hpx::components::accumulator;
-    accumulator accu (accumulator::create(self, appl, 
-        appl.get_runtime_support_gid()));
+    accumulator accu (accumulator::create(self, appl, prefix));
 
     // print some message
     std::cout << "accumulator client, you may enter some commands "

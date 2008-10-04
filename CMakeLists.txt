@@ -131,12 +131,14 @@ endif()
 # executable to run. The same process will walk through the project's entire 
 # directory structure.
 add_subdirectory(src)
-add_subdirectory(tests)
-add_subdirectory(examples)
-add_subdirectory(runtime)
 
 # Components are to build separately
 add_subdirectory(hpx/components)
+
+# executables depend on libraries above
+add_subdirectory(tests)
+add_subdirectory(examples)
+add_subdirectory(runtime)
 
 # installation instructions
 install(

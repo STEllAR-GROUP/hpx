@@ -15,7 +15,7 @@ set_target_properties(accumulator_client_exe PROPERTIES
 
 target_link_libraries(
     accumulator_client_exe                # executable
-    accumulator                           # components it depends on
+    accumulator_component                 # components it depends on
     ${hpx_LIBRARIES} ${Boost_LIBRARIES})  # libraries it dependson
 
 # installation instructions
@@ -38,7 +38,7 @@ set_target_properties(simple_accumulator_client_exe PROPERTIES
 
 target_link_libraries(
     simple_accumulator_client_exe         # executable
-    simple_accumulator                    # components it depends on
+    simple_accumulator_component          # components it depends on
     ${hpx_LIBRARIES} ${Boost_LIBRARIES})  # libraries it dependson
 
 install(TARGETS simple_accumulator_client_exe
