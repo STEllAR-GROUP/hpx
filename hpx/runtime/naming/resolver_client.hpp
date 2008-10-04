@@ -27,6 +27,7 @@ namespace hpx { namespace naming
     }
 
     /// \class resolver_client resolver_client.hpp hpx/runtime/naming/resolver_client.hpp
+    ///
     /// The top-level class of the DGAS client. This class exposes the DGAS 
     /// server functionality on the client side.
     class HPX_EXPORT resolver_client

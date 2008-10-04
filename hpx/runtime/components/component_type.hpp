@@ -7,7 +7,9 @@
 #define HPX_COMPONENT_COMPONENT_TYPE_MAR_26_2008_1058AM
 
 #include <boost/assert.hpp>
+#include <boost/lexical_cast.hpp>
 
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
     enum component_type
@@ -23,7 +25,8 @@ namespace hpx { namespace components
         component_future,           ///< a future executing the action and 
                                     ///< allowing to wait for the result
 
-        component_last
+        component_last,
+        component_first_dynamic = component_last
     };
     
     namespace detail
@@ -41,11 +44,11 @@ namespace hpx { namespace components
     }
 
     ///
-    inline char const* const get_component_type_name(int type)
+    inline std::string const get_component_type_name(int type)
     {
         if (type >= component_invalid && type < component_last)
             return components::detail::names[type+1];
-        return "<Unknown>";
+        return "component: " + boost::lexical_cast<std::string>(type);
     }
 
     ///

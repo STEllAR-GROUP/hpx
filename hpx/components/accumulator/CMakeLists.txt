@@ -20,3 +20,10 @@ set_target_properties(accumulator_component PROPERTIES
     OUTPUT_NAME ${component_LIBRARY_PREFIX}accumulator)
 target_link_libraries(accumulator_component 
     ${hpx_LIBRARIES} ${Boost_LIBRARIES})
+
+install(TARGETS accumulator_component
+    RUNTIME DESTINATION bin
+    ARCHIVE DESTINATION lib
+    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                GROUP_READ GROUP_EXECUTE
+                WORLD_READ WORLD_EXECUTE)

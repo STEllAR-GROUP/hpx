@@ -1,8 +1,5 @@
 //  Copyright (c) 2007-2008 Hartmut Kaiser
 //
-//  Parts of this code were taken from the Boost.Asio library
-//  Copyright (c) 2003-2007 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-// 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -15,6 +12,7 @@
 
 #include <hpx/util/logging.hpp>
 #include <hpx/util/asio_util.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 #include <hpx/runtime/naming/resolver_server.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -37,7 +35,7 @@ namespace hpx { namespace naming
         request_handler_(), here_(l)
    {
         util::init_dgas_logs();
-        
+
         // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
         using boost::asio::ip::tcp;
         acceptor_.open(l.get_endpoint().protocol());
@@ -59,10 +57,11 @@ namespace hpx { namespace naming
         acceptor_(io_service_pool_.get_io_service()),
         new_connection_(new server::connection(
               io_service_pool_.get_io_service(), request_handler_)),
-        request_handler_(), here_(address, port)
+        request_handler_(), 
+        here_(util::runtime_configuration().get_dgas_locality(address, port))
     {
         util::init_dgas_logs();
-        
+
         // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
         using boost::asio::ip::tcp;
         acceptor_.open(here_.get_endpoint().protocol());
@@ -101,7 +100,7 @@ namespace hpx { namespace naming
             new_connection_->async_read(
                 boost::bind(&resolver_server::handle_completion, this,
                 boost::asio::placeholders::error));
-            
+
         // create new connection waiting for next incoming request
             new_connection_.reset(new server::connection(
                   io_service_pool_.get_io_service(), request_handler_));
@@ -117,6 +116,8 @@ namespace hpx { namespace naming
         if (e && e != boost::asio::error::operation_aborted)
         {
             // FIXME: add error handling
+            LDGAS_(error) << "handle read operation completion: error: " 
+                          << e.message();
         }
     }
 

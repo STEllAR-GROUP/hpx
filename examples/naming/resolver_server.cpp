@@ -71,14 +71,14 @@ int main(int argc, char* argv[])
 #if defined(BOOST_WINDOWS)
         // Initialize server.
         hpx::util::io_service_pool io_service_pool(num_threads); 
-        hpx::naming::resolver_server s(io_service_pool, host, port);
+        hpx::naming::resolver_server s(io_service_pool, host, port, false);
 
         // Set console control handler to allow server to be stopped.
         console_ctrl_function = boost::bind(&hpx::naming::resolver_server::stop, &s);
         SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
 
         std::cout << "Address resolver (server...)" << std::flush << std::endl;
-        
+
         // Run the server until stopped.
         s.run();
 #else

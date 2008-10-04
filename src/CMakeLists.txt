@@ -104,6 +104,7 @@ set (hpxlib_HEADERS
     ../hpx/util/one_size_heap_list.hpp
     ../hpx/util/portable_binary_iarchive.hpp
     ../hpx/util/portable_binary_oarchive.hpp
+    ../hpx/util/runtime_configuration.hpp
     ../hpx/util/safe_bool.hpp
     ../hpx/util/serialize_sequence.hpp
     ../hpx/util/static.hpp
@@ -144,7 +145,8 @@ set (hpxlib_SOURCES
     # util 
     ../src/util/ini.cpp
     ../src/util/io_service_pool.cpp
-    ../src/util/logging.cpp)
+    ../src/util/logging.cpp
+    ../src/util/runtime_configuration.cpp)
 
 # add source file from coroutine library (needed for gcc only)
 if (CMAKE_COMPILER_IS_GNUCXX)
@@ -174,8 +176,7 @@ add_library(hpx SHARED
 target_link_libraries(hpx hpx_serialization ${Boost_LIBRARIES})
 
 # installation instructions
-install(
-    TARGETS hpx hpx_serialization
+install(TARGETS hpx hpx_serialization
     RUNTIME DESTINATION bin
     ARCHIVE DESTINATION lib
     PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE

@@ -11,12 +11,19 @@ add_executable(accumulator_client_exe
 
 # avoid conflicts between source and binary target names
 set_target_properties(accumulator_client_exe PROPERTIES
-    OUTPUT_NAME accumulator_client)
+    OUTPUT_NAME accumulator_client${CMAKE_DEBUG_POSTFIX})
 
 target_link_libraries(
     accumulator_client_exe                # executable
     accumulator                           # components it depends on
     ${hpx_LIBRARIES} ${Boost_LIBRARIES})  # libraries it dependson
+
+# installation instructions
+install(TARGETS accumulator_client_exe
+    RUNTIME DESTINATION bin
+    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                GROUP_READ GROUP_EXECUTE
+                WORLD_READ WORLD_EXECUTE)
 
 
 # simple_accumulator_client example
@@ -27,10 +34,15 @@ add_executable(simple_accumulator_client_exe
 
 # avoid conflicts between source and binary target names
 set_target_properties(simple_accumulator_client_exe PROPERTIES
-    OUTPUT_NAME simple_accumulator_client)
+    OUTPUT_NAME simple_accumulator_client${CMAKE_DEBUG_POSTFIX})
 
 target_link_libraries(
     simple_accumulator_client_exe         # executable
     simple_accumulator                    # components it depends on
     ${hpx_LIBRARIES} ${Boost_LIBRARIES})  # libraries it dependson
 
+install(TARGETS simple_accumulator_client_exe
+    RUNTIME DESTINATION bin
+    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                GROUP_READ GROUP_EXECUTE
+                WORLD_READ WORLD_EXECUTE)

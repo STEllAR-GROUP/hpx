@@ -21,7 +21,7 @@ namespace hpx { namespace naming { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     request_handler::request_handler()
-      : totals_(command_lastcommand), component_type_(components::component_last)
+      : totals_(command_lastcommand), component_type_(components::component_first_dynamic)
     {
     }
 
@@ -121,7 +121,7 @@ namespace hpx { namespace naming { namespace server
                 // first request: create a new component type and store it
                 std::pair<component_type_map::iterator, bool> p = 
                     component_types_.insert(component_type_map::value_type(
-                        req.get_name(), ++component_type_));
+                        req.get_name(), component_type_++));
                 if (!p.second) {
                     rep = reply(command_get_component_id, out_of_memory);
                     return;

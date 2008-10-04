@@ -22,6 +22,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming
 {
+    /// \class address address.hpp hpx/runtime/naming/address.hpp
+    ///
+    /// 
     struct HPX_EXPORT address : public util::safe_bool<address>
     {
         typedef boost::uint64_t component_type;

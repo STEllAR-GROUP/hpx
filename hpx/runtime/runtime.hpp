@@ -17,7 +17,7 @@
 #include <hpx/runtime/actions/action_manager.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
-#include <hpx/util/ini.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -196,26 +196,7 @@ namespace hpx
         }
 
     private:
-        // The runtime_config class is a wrapper for the runtime configuration 
-        // data allowing to extract configuration information in a more 
-        // convenient way
-        class runtime_config : public util::section
-        {
-        public:
-            // initialize and load configuration information
-            runtime_config();
-
-            // Get the DGAS locality to use 
-            naming::locality get_dgas_locality();
-
-            // Get the DGAS locality to use (default_address/default_port are 
-            // the default values describing the locality to use if no 
-            // configuration info can be found).
-            naming::locality get_dgas_locality(
-                std::string default_address, unsigned short default_port);
-        };
-
-        runtime_config ini_;
+        util::runtime_configuration ini_;
         util::io_service_pool dgas_pool_; 
         util::io_service_pool parcel_pool_; 
         util::io_service_pool timer_pool_; 

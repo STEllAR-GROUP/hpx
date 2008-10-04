@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
         hpx::util::io_service_pool dgas_pool; 
         hpx::naming::resolver_server dgas_s(dgas_pool, gas_host, gas_port, true);
         hpx::naming::resolver_client dgas_c(dgas_pool, gas_host, gas_port);
-        
+
         hpx::util::io_service_pool io_service_pool(num_threads); 
         hpx::parcelset::parcelport pp(io_service_pool, ps_host, ps_port);
         hpx::parcelset::parcelhandler ph(dgas_c, pp);

@@ -1,9 +1,6 @@
 //  Copyright (c) 2007-2008 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
 // 
-//  Parts of this code were taken from the Boost.Asio library
-//  Copyright (c) 2003-2007 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-// 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 

@@ -334,6 +334,10 @@
 					RelativePath="..\..\..\src\util\logging.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\..\src\util\runtime_configuration.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Runtime"
@@ -614,6 +618,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\hpx\util\px_thread_queue.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\util\runtime_configuration.hpp"
 					>
 				</File>
 				<File

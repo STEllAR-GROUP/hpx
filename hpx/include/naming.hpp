@@ -10,7 +10,6 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/naming/resolver_server.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 
 #endif
