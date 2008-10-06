@@ -131,9 +131,10 @@ namespace hpx { namespace components
         HPX_REGISTER_COMPONENT_FACTORY(                                       \
             hpx::components::component_factory<ComponentType>,                \
             componentname);                                                   \
-        template hpx::components::component_factory<ComponentType>;           \
-        char const* const hpx::components::component_factory<ComponentType>:: \
-            unique_component_name = BOOST_PP_STRINGIZE(ComponentType);        \
+        template class hpx::components::component_factory<ComponentType>;     \
+        template<> char const* const                                          \
+            hpx::components::component_factory<ComponentType>::               \
+                unique_component_name = BOOST_PP_STRINGIZE(ComponentType);    \
     /**/
 
 #endif
