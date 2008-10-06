@@ -126,7 +126,7 @@ if(MSVC)
     set(CMAKE_DEBUG_POSTFIX "d")
 endif()
 if(UNIX)
-    set(component_LIBRARY_PREFIX "libhpx_component_")
+    set(component_LIBRARY_PREFIX "hpx_component_")
 endif()
 
 # Recurse into some subdirectories. This does not actually cause another cmake 
