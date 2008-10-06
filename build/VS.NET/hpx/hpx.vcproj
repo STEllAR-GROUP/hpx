@@ -319,9 +319,17 @@
 				RelativePath="..\..\..\src\CMakeLists.txt"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\src\exception_list.cpp"
+				>
+			</File>
 			<Filter
 				Name="Util"
 				>
+				<File
+					RelativePath="..\..\..\src\util\asio_util.cpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\..\src\util\ini.cpp"
 					>
@@ -499,6 +507,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\hpx\exception.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\hpx\exception_list.hpp"
 				>
 			</File>
 			<File

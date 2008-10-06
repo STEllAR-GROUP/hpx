@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
     try {
         // Check command line arguments.
         std::string host;
-        unsigned short ps_port, dgas_port;
+        boost::uint16_t ps_port, dgas_port;
 
         // Check command line arguments.
         if (argc != 4) {
@@ -92,13 +92,13 @@ int main(int argc, char* argv[])
         }
         else {
             host = argv[1];
-            ps_port = boost::lexical_cast<unsigned short>(argv[2]);
-            dgas_port  = boost::lexical_cast<unsigned short>(argv[3]);
+            ps_port = boost::lexical_cast<boost::uint16_t>(argv[2]);
+            dgas_port  = boost::lexical_cast<boost::uint16_t>(argv[3]);
         }
 
         // initialize the DGAS service
         hpx::util::io_service_pool dgas_pool; 
-        hpx::naming::resolver_server dgas(dgas_pool, host, dgas_port, true);
+        hpx::naming::resolver_server dgas(dgas_pool, host, dgas_port);
 
         // initialize and start the HPX runtime
         hpx::runtime rt(host, ps_port, host, dgas_port);

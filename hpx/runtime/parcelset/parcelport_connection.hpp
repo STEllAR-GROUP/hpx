@@ -41,9 +41,8 @@ namespace hpx { namespace parcelset
     public:
         /// Construct a sending parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
-                boost::asio::ip::tcp::endpoint const& endp,
-                connection_cache& cache)
-          : socket_(io_service), endpoint_(endp), connection_cache_(cache)
+                naming::locality const& l, connection_cache& cache)
+          : socket_(io_service), there_(l), connection_cache_(cache)
         {
         }
         
@@ -99,7 +98,7 @@ namespace hpx { namespace parcelset
             // now we can give this connection back to the cache
             out_buffer_.clear();
             out_size_ = 0;
-            connection_cache_.add(endpoint_, shared_from_this());
+            connection_cache_.add(there_, shared_from_this());
         }
 
     private:
@@ -111,7 +110,7 @@ namespace hpx { namespace parcelset
         std::vector<char> out_buffer_;
 
         /// the other (receiving) end of this connection
-        boost::asio::ip::tcp::endpoint endpoint_;
+        naming::locality there_;
         
         /// The connection cache for sending connections
         connection_cache& connection_cache_;

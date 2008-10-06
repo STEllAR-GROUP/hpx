@@ -10,7 +10,7 @@ set(performance_TESTS
     measure_thread_execution)
 
 foreach(measure ${performance_TESTS})
-    set(${measure}_SOURCES ${measure}.cpp)
+    set(${measure}_SOURCES ${measure}.cpp high_resolution_timer.hpp)
     add_executable(${measure}_exe ${${measure}_SOURCES})
     set_target_properties(${measure}_exe PROPERTIES OUTPUT_NAME ${measure})
     target_link_libraries(${measure}_exe ${hpx_LIBRARIES} ${Boost_LIBRARIES})

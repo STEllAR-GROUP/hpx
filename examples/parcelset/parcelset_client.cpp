@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
     try {
         // Check command line arguments.
         std::string ps_host, remote_ps_host, gas_host;
-        unsigned short ps_port, remote_ps_port, gas_port;
+        boost::uint16_t ps_port, remote_ps_port, gas_port;
         
         // Check command line arguments.
         if (argc != 7) 
@@ -116,20 +116,22 @@ int main(int argc, char* argv[])
         else
         {
             ps_host = argv[1];
-            ps_port = boost::lexical_cast<unsigned short>(argv[2]);
+            ps_port = boost::lexical_cast<boost::uint16_t>(argv[2]);
             gas_host = argv[3];
-            gas_port  = boost::lexical_cast<unsigned short>(argv[4]);
+            gas_port  = boost::lexical_cast<boost::uint16_t>(argv[4]);
             remote_ps_host = argv[5];
-            remote_ps_port = boost::lexical_cast<unsigned short>(argv[6]);
+            remote_ps_port = boost::lexical_cast<boost::uint16_t>(argv[6]);
         }
 
 #if defined(BOOST_WINDOWS)
         // Start ParalleX services
         hpx::util::io_service_pool dgas_pool; 
-        hpx::naming::resolver_client dgas_c(dgas_pool, gas_host, gas_port);
+        hpx::naming::resolver_client dgas_c(dgas_pool, 
+            hpx::naming::locality(gas_host, gas_port));
 
         hpx::util::io_service_pool io_service_pool(2); 
-        hpx::parcelset::parcelport pp (io_service_pool, hpx::naming::locality(ps_host, ps_port));
+        hpx::parcelset::parcelport pp (io_service_pool, 
+            hpx::naming::locality(ps_host, ps_port));
         hpx::parcelset::parcelhandler ph (dgas_c, pp);
 
         ph.register_event_handler(received_parcel);
@@ -174,8 +176,10 @@ int main(int argc, char* argv[])
         
         // Start ParalleX services
         hpx::util::io_service_pool io_service_pool(1); 
-        hpx::naming::resolver_client dgas_c(io_service_pool, gas_host, gas_port);
-        hpx::parcelset::parcelport pp (io_service_pool, hpx::naming::locality(ps_host, ps_port));
+        hpx::naming::resolver_client dgas_c(io_service_pool, 
+            hpx::naming::locality(gas_host, gas_port));
+        hpx::parcelset::parcelport pp (io_service_pool, 
+            hpx::naming::locality(ps_host, ps_port));
         hpx::parcelset::parcelhandler ph (dgas_c, pp);
 
         ph.register_event_handler(received_parcel);

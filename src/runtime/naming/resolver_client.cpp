@@ -32,75 +32,45 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/container_device.hpp>
 #include <hpx/util/asio_util.hpp>
-#include <hpx/util/find_msb.hpp>
+#include <hpx/util/util.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming 
 {
     resolver_client::resolver_client(util::io_service_pool& io_service_pool, 
-            std::string const& address, unsigned short port,
-            bool start_asynchronously) 
-      : io_service_pool_(io_service_pool), 
+            locality l) 
+      : there_(l), 
+        io_service_pool_(io_service_pool), 
         socket_(io_service_pool.get_io_service())
     {
+        boost::system::error_code error = boost::asio::error::try_again;
         try {
-            if (start_asynchronously)
-                io_service_pool.run(false);
+            // start the io service pool
+            io_service_pool.run(false);
 
-            using namespace boost::asio::ip;
-
-            // try to convert the address string to an IP address directly
-            boost::system::error_code error = boost::asio::error::try_again;
-            tcp::endpoint ep;
-            if (util::get_endpoint(address, port, ep)) {
-                socket_.connect(ep, error);
-                there_ = locality(ep);
-                if (!error) 
-                    return;
-            }
-
-            // resolve the given address
-            tcp::resolver resolver(io_service_pool.get_io_service());
-            tcp::resolver::query query(address, 
-                boost::lexical_cast<std::string>(port));
-
-            // Try each endpoint until we successfully establish a connection.
-            tcp::resolver::iterator end;
-            tcp::resolver::iterator it = resolver.resolve(query);
-            for (/**/; it != end; ++it)
+            locality::iterator_type end = there_.connect_end();
+            for (locality::iterator_type it = 
+                    there_.connect_begin(io_service_pool.get_io_service()); 
+                 it != end; ++it)
             {
                 socket_.close();
                 socket_.connect(*it, error);
-                if (!error) {
-                    there_ = locality(*it);
-                    return;
-                }
-            }
-            if (error) {
-                socket_.close();
-                boost::throw_exception(
-                    hpx::exception(network_error, error.message()));
+                if (!error) 
+                    break;
             }
         }
         catch (boost::system::error_code const& e) {
             boost::throw_exception(hpx::exception(network_error, e.message()));
         }
-    }
 
-    resolver_client::resolver_client(util::io_service_pool& io_service_pool, 
-            locality l, bool start_asynchronously) 
-      : there_(l), io_service_pool_(io_service_pool), 
-        socket_(io_service_pool.get_io_service())
-    {
-        if (start_asynchronously)
-            io_service_pool.run(false);
-
-        boost::system::error_code error = boost::asio::error::try_again;
-        socket_.connect(l.get_endpoint(), error);
         if (error) {
             socket_.close();
+
+            HPX_OSSTREAM strm;
+            strm << error.message() << " (while trying to connect to: " 
+                 << there_ << ")";
             boost::throw_exception(
-                hpx::exception(network_error, error.message()));
+                hpx::exception(network_error, HPX_OSSTREAM_GETSTRING(strm)));
         }
     }
 

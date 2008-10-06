@@ -62,14 +62,14 @@ namespace hpx { namespace util
 
                 return naming::locality(
                     sec->get_entry("dgas_address", HPX_NAME_RESOLVER_ADDRESS),
-                    boost::lexical_cast<unsigned short>(cfg_port));
+                    boost::lexical_cast<boost::uint16_t>(cfg_port));
             }
         }
         return naming::locality(HPX_NAME_RESOLVER_ADDRESS, HPX_NAME_RESOLVER_PORT);
     }
 
     naming::locality runtime_configuration::get_dgas_locality(
-        std::string default_address, unsigned short default_port)
+        std::string default_address, boost::uint16_t default_port)
     {
         // load all components as described in the configuration information
         if (has_section("hpx")) {
@@ -80,8 +80,8 @@ namespace hpx { namespace util
                     default_address = 
                         sec->get_entry("dgas_address", HPX_NAME_RESOLVER_ADDRESS);
                 }
-                if (-1 == default_port) {
-                    default_port = boost::lexical_cast<unsigned short>(
+                if (0 == default_port) {
+                    default_port = boost::lexical_cast<boost::uint16_t>(
                         sec->get_entry("dgas_port", HPX_NAME_RESOLVER_PORT));
                 }
                 return naming::locality(default_address, default_port);

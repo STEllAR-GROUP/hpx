@@ -11,25 +11,19 @@
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    inline bool
-    get_endpoint(std::string const& addr, unsigned short port,
-        boost::asio::ip::tcp::endpoint& ep)
-    {
-        using namespace boost::asio::ip;
-        boost::system::error_code ec;
-        address_v4 addr4 = address_v4::from_string(addr.c_str(), ec);
-        if (!ec) {  // it's an IPV4 address
-            ep = tcp::endpoint(address(addr4), port);
-            return true;
-        }
-        
-        address_v6 addr6 = address_v6::from_string(addr.c_str(), ec);
-        if (!ec) {  // it's an IPV6 address
-            ep = tcp::endpoint(address(addr6), port);
-            return true;
-        }
-        return false;
-    }
+    bool get_endpoint(std::string const& addr, boost::uint16_t port,
+        boost::asio::ip::tcp::endpoint& ep);
+
+    ///////////////////////////////////////////////////////////////////////////
+    typedef 
+        std::pair<
+            boost::asio::ip::tcp::resolver::iterator, 
+            boost::asio::ip::tcp::resolver::iterator
+        >
+    tcp_iterator_range_type;
+
+    tcp_iterator_range_type accept();
+    tcp_iterator_range_type connect();
     
 }}
 

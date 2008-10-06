@@ -45,7 +45,7 @@ BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
 int main(int argc, char* argv[])
 {
     std::string host;
-    unsigned short port;
+    boost::uint16_t port;
     std::size_t num_threads;
     
     // Check command line arguments.
@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
     else
     {
         host = argv[1];
-        port = boost::lexical_cast<unsigned short>(argv[2]);
+        port = boost::lexical_cast<boost::uint16_t>(argv[2]);
         num_threads = boost::lexical_cast<std::size_t>(argv[3]);
     }
 
@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
 #if defined(BOOST_WINDOWS)
         // Initialize server.
         hpx::util::io_service_pool io_service_pool(num_threads); 
-        hpx::naming::resolver_server s(io_service_pool, host, port, false);
+        hpx::naming::resolver_server s(io_service_pool, host, port);
 
         // Set console control handler to allow server to be stopped.
         console_ctrl_function = boost::bind(&hpx::naming::resolver_server::stop, &s);
@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
         
         // Run server in background thread.
         hpx::util::io_service_pool io_service_pool(num_threads); 
-        hpx::naming::resolver_server s(io_service_pool, host, port, false);
+        hpx::naming::resolver_server s(io_service_pool, host, port);
         boost::thread t(boost::bind(&hpx::naming::resolver_server::run, &s, true));
 
         std::cout << "Address resolver (server...)" << std::endl;

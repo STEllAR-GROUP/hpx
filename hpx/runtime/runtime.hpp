@@ -56,9 +56,9 @@ namespace hpx
         ///                       is listening on. If this value is not 
         ///                       specified the actual port number will be 
         ///                       taken from the configuration file (hpx.ini).
-        runtime(std::string const& address, unsigned short port,
+        runtime(std::string const& address, boost::uint16_t port,
                 std::string const& dgas_address = "", 
-                unsigned short dgas_port = -1);
+                boost::uint16_t dgas_port = 0);
 
         /// Construct a new HPX runtime instance 
         ///

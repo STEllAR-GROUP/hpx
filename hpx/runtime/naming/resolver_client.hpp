@@ -44,26 +44,7 @@ namespace hpx { namespace naming
         /// \param start_asynchronously 
         ///                 [in] This parameter allows to start 
         ///                 the resolver client instance immediately.
-        resolver_client(util::io_service_pool& io_service_pool, locality l,
-            bool start_asynchronously = true);
-
-        /// Construct the resolver client to work with the server given by
-        /// its address and port number.
-        ///
-        /// \param io_service_pool
-        ///                 [in] The pool of networking threads to use to serve 
-        ///                 outgoing requests
-        /// \param address  [in] This is the address (IP address or 
-        ///                 host name) of the locality the DGAS server is 
-        ///                 running on.
-        /// \param port     [in] This is the port number the DGAS server
-        ///                 is listening on.
-        /// \param start_asynchronously 
-        ///                 [in] This parameter allows to start 
-        ///                 the resolver client instance immediately.
-        resolver_client(util::io_service_pool& io_service_pool, 
-            std::string const& address, unsigned short port,
-            bool start_asynchronously = true);
+        resolver_client(util::io_service_pool& io_service_pool, locality l);
 
         /// \brief Get unique prefix usable as locality id (locality prefix)
         ///

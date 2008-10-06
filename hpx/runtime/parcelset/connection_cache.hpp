@@ -28,7 +28,7 @@ namespace hpx { namespace parcelset
     {
     public:
         typedef boost::shared_ptr<parcelport_connection> connection_type;
-        typedef boost::asio::ip::tcp::endpoint key_type;
+        typedef naming::locality key_type;
         
         typedef std::pair<connection_type, key_type const*> value_type;
         typedef std::list<value_type> list_type;

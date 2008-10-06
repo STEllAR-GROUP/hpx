@@ -26,23 +26,26 @@ namespace hpx { namespace util
     class HPX_EXPORT io_service_pool : private boost::noncopyable
     {
     public:
-        /// Construct the io_service pool.
+        /// \brief Construct the io_service pool.
         /// \param pool_size
         ///                 [in] The number of threads to run to serve incoming
         ///                 requests
         explicit io_service_pool(std::size_t pool_size = 1);
 
-        /// Run all io_service objects in the pool. If join_threads is true
-        /// this will also wait for all threads to complete
+        /// \brief Run all io_service objects in the pool. If join_threads is true
+        ///        this will also wait for all threads to complete
         bool run(bool join_threads = true);
 
-        /// Stop all io_service objects in the pool.
+        /// \brief Stop all io_service objects in the pool.
         void stop();
 
-        /// Join all io_service threads in the pool.
+        /// \brief Join all io_service threads in the pool.
         void join();
 
-        /// Get an io_service to use.
+        /// \brief 
+        bool is_running() const { return !threads_.empty(); }
+
+        /// \brief Get an io_service to use.
         boost::asio::io_service& get_io_service();
 
     private:

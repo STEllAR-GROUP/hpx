@@ -46,11 +46,11 @@ BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
 namespace hpx 
 {
     ///////////////////////////////////////////////////////////////////////////
-    runtime::runtime(std::string const& address, unsigned short port,
-            std::string const& dgas_address, unsigned short dgas_port) 
+    runtime::runtime(std::string const& address, boost::uint16_t port,
+            std::string const& dgas_address, boost::uint16_t dgas_port) 
       : ini_(), dgas_pool_(), parcel_pool_(), timer_pool_(),
         dgas_client_(dgas_pool_, ini_.get_dgas_locality(dgas_address, dgas_port)),
-        parcel_port_(parcel_pool_, address, port),
+        parcel_port_(parcel_pool_, naming::locality(address, port)),
         thread_manager_(timer_pool_),
         parcel_handler_(dgas_client_, parcel_port_, &thread_manager_),
         runtime_support_(ini_, dgas_client_),

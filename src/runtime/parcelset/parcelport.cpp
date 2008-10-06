@@ -12,6 +12,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 
+#include <hpx/exception_list.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/util/io_service_pool.hpp>
@@ -24,41 +25,44 @@ namespace hpx { namespace parcelset
       : io_service_pool_(io_service_pool),
         acceptor_(io_service_pool_.get_io_service()),
         parcels_(This()),
-        new_server_connection_(new server::parcelport_connection(
-              io_service_pool_.get_io_service(), parcels_)),
         connection_cache_(HPX_MAX_CONNECTION_CACHE_SIZE), here_(here)
     {
         // initialize network
         using boost::asio::ip::tcp;
         
-        acceptor_.open(here.get_endpoint().protocol());
-        acceptor_.set_option(tcp::acceptor::reuse_address(true));
-        acceptor_.bind(here.get_endpoint());
-        acceptor_.listen();
-        acceptor_.async_accept(new_server_connection_->socket(),
-            boost::bind(&parcelport::handle_accept, this,
-                boost::asio::placeholders::error));
-    }
+        int tried = 0;
+        exception_list errors;
+        naming::locality::iterator_type end = here.accept_end();
+        for (naming::locality::iterator_type it = 
+                here.accept_begin(io_service_pool_.get_io_service()); 
+             it != end; ++it, ++tried)
+        {
+            try {
+                server::parcelport_connection_ptr conn(
+                    new server::parcelport_connection(
+                        io_service_pool_.get_io_service(), parcels_)
+                );
 
-    parcelport::parcelport(util::io_service_pool& io_service_pool, 
-            std::string const& address, unsigned short port)
-      : io_service_pool_(io_service_pool),
-        acceptor_(io_service_pool_.get_io_service()),
-        parcels_(This()),
-        new_server_connection_(new server::parcelport_connection(
-              io_service_pool_.get_io_service(), parcels_)),
-        connection_cache_(HPX_MAX_CONNECTION_CACHE_SIZE), here_(address, port)
-    {
-        // initialize network
-        using boost::asio::ip::tcp;
-        
-        acceptor_.open(here_.get_endpoint().protocol());
-        acceptor_.set_option(tcp::acceptor::reuse_address(true));
-        acceptor_.bind(here_.get_endpoint());
-        acceptor_.listen();
-        acceptor_.async_accept(new_server_connection_->socket(),
-            boost::bind(&parcelport::handle_accept, this,
-                boost::asio::placeholders::error));
+                tcp::endpoint ep = *it;
+                acceptor_.open(ep.protocol());
+                acceptor_.set_option(tcp::acceptor::reuse_address(true));
+                acceptor_.bind(ep);
+                acceptor_.listen();
+                acceptor_.async_accept(conn->socket(),
+                    boost::bind(&parcelport::handle_accept, this,
+                        boost::asio::placeholders::error, conn));
+            }
+            catch (boost::system::system_error const& e) {
+                errors.add(e);   // store all errors
+                continue;
+            }
+        }
+
+        if (errors.get_error_count() == tried) {
+            // all tries failed
+            boost::throw_exception(
+                hpx::exception(network_error, errors.get_message()));
+        }
     }
 
     bool parcelport::run(bool blocking)
@@ -74,20 +78,21 @@ namespace hpx { namespace parcelset
     }
     
     /// accepted new incoming connection
-    void parcelport::handle_accept(boost::system::error_code const& e)
+    void parcelport::handle_accept(boost::system::error_code const& e,
+        server::parcelport_connection_ptr conn)
     {
         if (!e) {
         // handle this incoming parcel
-            new_server_connection_->async_read(
+            conn->async_read(
                 boost::bind(&parcelport::handle_read_completion, this,
                 boost::asio::placeholders::error));
 
         // create new connection waiting for next incoming parcel
-            new_server_connection_.reset(new server::parcelport_connection(
+            conn.reset(new server::parcelport_connection(
                 io_service_pool_.get_io_service(), parcels_));
-            acceptor_.async_accept(new_server_connection_->socket(),
+            acceptor_.async_accept(conn->socket(),
                 boost::bind(&parcelport::handle_accept, this,
-                    boost::asio::placeholders::error));
+                    boost::asio::placeholders::error, conn));
         }
     }
 

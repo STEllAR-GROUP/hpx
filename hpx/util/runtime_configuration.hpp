@@ -29,7 +29,7 @@ namespace hpx { namespace util
         // the default values describing the locality to use if no 
         // configuration info can be found).
         naming::locality get_dgas_locality(
-            std::string default_address, unsigned short default_port);
+            std::string default_address, boost::uint16_t default_port);
     };
 
 }}

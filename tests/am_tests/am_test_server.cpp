@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 {
     try {
         std::string ps_host, gas_host;
-        unsigned short ps_port, gas_port;
+        boost::uint16_t ps_port, gas_port;
         std::size_t num_threads;
 
         // Check command line arguments.
@@ -54,19 +54,21 @@ int main(int argc, char* argv[])
         else
         {
             ps_host = argv[1];
-            ps_port = boost::lexical_cast<unsigned short>(argv[2]);
+            ps_port = boost::lexical_cast<boost::uint16_t>(argv[2]);
             gas_host = argv[3];
-            gas_port  = boost::lexical_cast<unsigned short>(argv[4]);
+            gas_port  = boost::lexical_cast<boost::uint16_t>(argv[4]);
             num_threads = boost::lexical_cast<std::size_t>(argv[5]);
         }
 
         // Run the ParalleX services
         hpx::util::io_service_pool dgas_pool; 
-        hpx::naming::resolver_server dgas_s(dgas_pool, gas_host, gas_port, true);
-        hpx::naming::resolver_client dgas_c(dgas_pool, gas_host, gas_port);
+        hpx::naming::resolver_server dgas_s(dgas_pool, gas_host, gas_port);
+        hpx::naming::resolver_client dgas_c(dgas_pool, 
+            hpx::naming::locality(gas_host, gas_port));
 
         hpx::util::io_service_pool io_service_pool(num_threads); 
-        hpx::parcelset::parcelport pp(io_service_pool, ps_host, ps_port);
+        hpx::parcelset::parcelport pp(io_service_pool, 
+            hpx::naming::locality(ps_host, ps_port));
         hpx::parcelset::parcelhandler ph(dgas_c, pp);
 
         // Create a new thread-manager

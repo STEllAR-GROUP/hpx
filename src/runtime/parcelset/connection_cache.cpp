@@ -14,14 +14,14 @@ namespace hpx { namespace parcelset
 {
     ///////////////////////////////////////////////////////////////////////////////
     connection_cache::connection_type 
-    connection_cache::get (key_type const& endp)
+    connection_cache::get (key_type const& l)
     {
-        boost::mutex::scoped_lock l(mtx_);
+        boost::mutex::scoped_lock lock(mtx_);
 
-//         std::cerr << "get: " << endp.address().to_string() << ":" << endp.port();
+//         std::cerr << "get: " << l.address().to_string() << ":" << l.port();
 
         // see if the object is already in the cache:
-        map_iterator mpos = index_.find(endp);
+        map_iterator mpos = index_.find(l);
         if (mpos != index_.end()) {
         // We have a cached item, return it
             connection_type result(mpos->second->first);
@@ -41,18 +41,18 @@ namespace hpx { namespace parcelset
     
     ///////////////////////////////////////////////////////////////////////////
     void
-    connection_cache::add (key_type const& endp, connection_type conn)
+    connection_cache::add (key_type const& l, connection_type conn)
     {
-        boost::mutex::scoped_lock l(mtx_);
+        boost::mutex::scoped_lock lock(mtx_);
 
 //         std::cerr << "add: "
-//                   << endp.address().to_string() << ":" << endp.port()
+//                   << l.address().to_string() << ":" << l.port()
 //                   << std::flush << std::endl;
 
         // Add it to the list, and index it
         cont_.push_back(value_type(conn, NULL));
-        index_.insert(std::make_pair(endp, --(cont_.end())));
-        cont_.back().second = &(index_.find(endp)->first);
+        index_.insert(std::make_pair(l, --(cont_.end())));
+        cont_.back().second = &(index_.find(l)->first);
         
         map_size_type s = index_.size();
         if (s > max_cache_size_) {

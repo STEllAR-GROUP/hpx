@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
 {
     // Check command line arguments.
     std::string host;
-    unsigned short port;
+    boost::uint16_t port;
     if (argc != 3)
     {
         std::cerr << "Using default settings: localhost:7911" << std::endl;
@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
     else
     {
         host = argv[1];
-        port = boost::lexical_cast<unsigned short>(argv[2]);
+        port = boost::lexical_cast<boost::uint16_t>(argv[2]);
     }
 
     try {
@@ -47,7 +47,8 @@ int main(int argc, char* argv[])
         // this is our locality
         locality here("localhost", HPX_PORT);
         hpx::util::io_service_pool io_service_pool; 
-        resolver_client resolver(io_service_pool, host, port);
+        resolver_client resolver(io_service_pool, 
+            hpx::naming::locality(host, port));
         
         id_type last_lowerid;
         

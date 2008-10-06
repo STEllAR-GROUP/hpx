@@ -7,6 +7,7 @@ set (hpxlib_HEADERS
     # global
     ../hpx/config.hpp
     ../hpx/exception.hpp
+    ../hpx/exception_list.hpp
     ../hpx/hpx.hpp
     ../hpx/hpx_fwd.hpp
     ../hpx/version.hpp
@@ -112,6 +113,7 @@ set (hpxlib_HEADERS
     ../hpx/util/util.hpp)
 
 set (hpxlib_SOURCES
+    ../src/exception_list.cpp
     # lcos
     ../src/lcos/base_lco.cpp
     # runtime
@@ -143,6 +145,7 @@ set (hpxlib_SOURCES
     # threadmanager
     ../src/runtime/threads/threadmanager.cpp
     # util 
+    ../src/util/asio_util.cpp
     ../src/util/ini.cpp
     ../src/util/io_service_pool.cpp
     ../src/util/logging.cpp

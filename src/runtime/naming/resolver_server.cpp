@@ -10,6 +10,7 @@
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include <hpx/exception_list.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/asio_util.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -27,53 +28,98 @@
 namespace hpx { namespace naming 
 {
     resolver_server::resolver_server (util::io_service_pool& io_service_pool, 
-            locality l, bool start_service_async)
+            locality l)
       : io_service_pool_(io_service_pool),
         acceptor_(io_service_pool_.get_io_service()),
-        new_connection_(new server::connection(
-              io_service_pool_.get_io_service(), request_handler_)),
         request_handler_(), here_(l)
    {
         util::init_dgas_logs();
 
+        // start the io_service
+        run(false);
+
         // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
         using boost::asio::ip::tcp;
-        acceptor_.open(l.get_endpoint().protocol());
-        acceptor_.set_option(tcp::acceptor::reuse_address(true));
-        acceptor_.bind(l.get_endpoint());
-        acceptor_.listen();
-        acceptor_.async_accept(new_connection_->socket(),
-            boost::bind(&resolver_server::handle_accept, this,
-                boost::asio::placeholders::error));
 
-        if (start_service_async) 
-            run(false);
+        int tried = 0;
+        exception_list errors;
+        locality::iterator_type end = here_.accept_end();
+        for (locality::iterator_type it = 
+                here_.accept_begin(io_service_pool_.get_io_service()); 
+             it != end; ++it, ++tried)
+        {
+            try {
+                server::connection_ptr conn(new server::connection(
+                    io_service_pool_.get_io_service(), request_handler_));
+
+                tcp::endpoint ep = *it;
+                acceptor_.open(ep.protocol());
+                acceptor_.set_option(tcp::acceptor::reuse_address(true));
+                acceptor_.bind(ep);
+                acceptor_.listen();
+                acceptor_.async_accept(conn->socket(),
+                    boost::bind(&resolver_server::handle_accept, this,
+                        boost::asio::placeholders::error, conn));
+            }
+            catch (boost::system::system_error const& e) {
+                errors.add(e);   // store all errors
+                continue;
+            }
+        }
+
+        if (errors.get_error_count() == tried) {
+            // all tries failed
+            boost::throw_exception(
+                hpx::exception(network_error, errors.get_message()));
+        }
     }
 
     resolver_server::resolver_server(util::io_service_pool& io_service_pool, 
-            std::string const& address, unsigned short port, 
-            bool start_service_async)
+            std::string const& address, boost::uint16_t port)
       : io_service_pool_(io_service_pool),
         acceptor_(io_service_pool_.get_io_service()),
-        new_connection_(new server::connection(
-              io_service_pool_.get_io_service(), request_handler_)),
         request_handler_(), 
         here_(util::runtime_configuration().get_dgas_locality(address, port))
     {
         util::init_dgas_logs();
 
+        // start the io_service
+        run(false);
+
         // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
         using boost::asio::ip::tcp;
-        acceptor_.open(here_.get_endpoint().protocol());
-        acceptor_.set_option(tcp::acceptor::reuse_address(true));
-        acceptor_.bind(here_.get_endpoint());
-        acceptor_.listen();
-        acceptor_.async_accept(new_connection_->socket(),
-            boost::bind(&resolver_server::handle_accept, this,
-                boost::asio::placeholders::error));
 
-        if (start_service_async) 
-            run(false);
+        int tried = 0;
+        exception_list errors;
+        locality::iterator_type end = here_.accept_end();
+        for (locality::iterator_type it = 
+                here_.accept_begin(io_service_pool_.get_io_service()); 
+             it != end; ++it, ++tried)
+        {
+            try {
+                server::connection_ptr conn(new server::connection(
+                    io_service_pool_.get_io_service(), request_handler_));
+
+                tcp::endpoint ep = *it;
+                acceptor_.open(ep.protocol());
+                acceptor_.set_option(tcp::acceptor::reuse_address(true));
+                acceptor_.bind(ep);
+                acceptor_.listen();
+                acceptor_.async_accept(conn->socket(),
+                    boost::bind(&resolver_server::handle_accept, this,
+                        boost::asio::placeholders::error, conn));
+            }
+            catch (boost::system::system_error const& e) {
+                errors.add(e);   // store all errors
+                continue;
+            }
+        }
+
+        if (errors.get_error_count() == tried) {
+            // all tries failed
+            boost::throw_exception(
+                hpx::exception(network_error, errors.get_message()));
+        }
     }
 
     resolver_server::~resolver_server()
@@ -83,30 +129,34 @@ namespace hpx { namespace naming
 
     void resolver_server::run(bool blocking)
     {
-        LDGAS_(info) << "startup: listening at: " << here_;
-        io_service_pool_.run(blocking);
+        if (!io_service_pool_.is_running()) {
+            LDGAS_(info) << "startup: listening at: " << here_;
+            io_service_pool_.run(blocking);
+        }
     }
 
     void resolver_server::stop()
     {
-        io_service_pool_.stop();
-        LDGAS_(info) << "shutdown: stopped listening at: " << here_;
+        if (io_service_pool_.is_running()) {
+            io_service_pool_.stop();
+            LDGAS_(info) << "shutdown: stopped listening at: " << here_;
+        }
     }
 
-    void resolver_server::handle_accept(boost::system::error_code const& e)
+    void resolver_server::handle_accept(boost::system::error_code const& e,
+        server::connection_ptr conn)
     {
         if (!e) {
         // handle incoming request
-            new_connection_->async_read(
-                boost::bind(&resolver_server::handle_completion, this,
-                boost::asio::placeholders::error));
+            conn->async_read(boost::bind(&resolver_server::handle_completion, 
+                this, boost::asio::placeholders::error));
 
         // create new connection waiting for next incoming request
-            new_connection_.reset(new server::connection(
-                  io_service_pool_.get_io_service(), request_handler_));
-            acceptor_.async_accept(new_connection_->socket(),
+            conn.reset(new server::connection(
+                io_service_pool_.get_io_service(), request_handler_));
+            acceptor_.async_accept(conn->socket(),
                 boost::bind(&resolver_server::handle_accept, this,
-                  boost::asio::placeholders::error));
+                  boost::asio::placeholders::error, conn));
         }
     }
 

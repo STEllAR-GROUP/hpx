@@ -33,11 +33,12 @@ set(Boost_COMPONENTS_NEEDED
     date_time
     filesystem
     graph
+    program_options
     regex
     serialization
-    thread
     system
-    signals)
+    signals
+    thread)
 set(Boost_USE_STATIC_LIBS OFF)
 find_package(Boost 1.36.0 COMPONENTS ${Boost_COMPONENTS_NEEDED})
 
@@ -92,10 +93,11 @@ add_definitions(-DBOOST_ARCHIVE_DYN_LINK)
 # it's easier configuration wise to do so)
 add_definitions(-DBOOST_FILESYSTEM_DYN_LINK)
 add_definitions(-DBOOST_DATE_TIME_DYN_LINK)
-add_definitions(-DBOOST_THREAD_DYN_DLL)
+add_definitions(-DBOOST_PROGRAM_OPTIONS_DYN_LINK)
 add_definitions(-DBOOST_REGEX_DYN_LINK)
 add_definitions(-DBOOST_SYSTEM_DYN_LINK)
 add_definitions(-DBOOST_SIGNALS_DYN_LINK)
+add_definitions(-DBOOST_THREAD_DYN_DLL)
 
 # compiler/platform specific configuration
 if(MSVC)

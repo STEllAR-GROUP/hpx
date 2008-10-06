@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
     try {
         // Check command line arguments.
         std::string hpx_host, dgas_host;
-        unsigned short hpx_port, dgas_port;
+        boost::uint16_t hpx_port, dgas_port;
         std::size_t num_threads = 1;
         std::size_t num_hpx_threads = 1;
 
@@ -65,16 +65,17 @@ int main(int argc, char* argv[])
         }
         else {
             hpx_host = argv[1];
-            hpx_port = boost::lexical_cast<unsigned short>(argv[2]);
+            hpx_port = boost::lexical_cast<boost::uint16_t>(argv[2]);
             dgas_host = argv[3];
-            dgas_port  = boost::lexical_cast<unsigned short>(argv[4]);
+            dgas_port  = boost::lexical_cast<boost::uint16_t>(argv[4]);
             num_threads = boost::lexical_cast<int>(argv[5]);
             num_hpx_threads = boost::lexical_cast<int>(argv[6]);
         }
 
         // run the DGAS server instance here
         hpx::util::io_service_pool dgas_pool; 
-        hpx::naming::resolver_server dgas(dgas_pool, dgas_host, dgas_port, true);
+        hpx::naming::resolver_server dgas(dgas_pool, 
+            hpx::naming::locality(dgas_host, dgas_port));
 
         // initialize and start the HPX runtime
         hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port);

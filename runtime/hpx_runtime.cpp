@@ -3,50 +3,120 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <memory>
 #include <hpx/hpx.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/program_options.hpp>
 
-using namespace hpx;
+namespace po = boost::program_options;
+
+///////////////////////////////////////////////////////////////////////////////
+bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
+{
+    try {
+        po::options_description desc_cmdline ("Usage: hpx_runtime [options]");
+        desc_cmdline.add_options()
+            ("help,h", "print out program usage (this message)")
+            ("run_dgas_server,r", "run DGAS server as part of this runtime instance")
+            ("no_hpx_runtime,n", "do not run hpx runtime as part of this runtime instance")
+            ("dgas_address,d", po::value<std::string>(), 
+                "the IP address the DGAS server is running on (default taken "
+                "from hpx.ini), expected format: 192.168.1.1:7912")
+            ("hpx_address,h", po::value<std::string>(), 
+                "the IP address the DGAS server is running on (default taken "
+                "from hpx.ini), expected format: 192.168.1.1:7913")
+        ;
+
+        po::store(po::command_line_parser(argc, argv)
+            .options(desc_cmdline).run(), vm);
+        po::notify(vm);
+
+        // print help screen
+        if (vm.count("help")) {
+            std::cout << desc_cmdline;
+            return false;
+        }
+    }
+    catch (std::exception const& e) {
+        std::cerr << "hpx_runtime: exception caught: " << e.what() << std::endl;
+        return false;
+    }
+    return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// helper class for DGAS server initialization
+class dgas_server_helper
+{
+public:
+    dgas_server_helper(std::string host, boost::uint16_t port)
+      : dgas_pool_(), dgas_(dgas_pool_, host, port)
+    {}
+
+    void run (bool blocking)
+    {
+        dgas_.run(blocking);
+    }
+
+private:
+    hpx::util::io_service_pool dgas_pool_; 
+    hpx::naming::resolver_server dgas_;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+inline void 
+split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
+{
+    try {
+        std::string::size_type p = v.find_first_of(":");
+        if (p != std::string::npos) {
+            addr = v.substr(0, p);
+            port = boost::lexical_cast<boost::uint16_t>(v.substr(p+1));
+        }
+        else {
+            addr = v;
+        }
+    }
+    catch (boost::bad_lexical_cast const& /*e*/) {
+        ;   // ignore bad_cast exceptions
+    }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     try {
+        // analyze the command line
+        po::variables_map vm;
+        if (!parse_commandline(argc, argv, vm))
+            return -1;
+
         // Check command line arguments.
         std::string hpx_host, dgas_host;
-        unsigned short hpx_port, dgas_port;
-        bool is_dgas_server = false;
+        boost::uint16_t hpx_port = 0, dgas_port = 0;
 
-        // Check command line arguments.
-        if (argc != 6) {
-            std::cerr << "Usage: hpx_runtime hpx_addr hpx_port dgas_addr "
-                         "dgas_port is_dgas_server" << std::endl;
-            std::cerr << "Try: hpx_runtime <your_ip_addr> 7911 "
-                         "<your_ip_addr> 7912 1" << std::endl;
-            return -3;
-        }
-        else {
-            hpx_host = argv[1];
-            hpx_port = boost::lexical_cast<unsigned short>(argv[2]);
-            dgas_host = argv[3];
-            dgas_port  = boost::lexical_cast<unsigned short>(argv[4]);
-            is_dgas_server = boost::lexical_cast<int>(argv[5]) ? true : false;
-        }
+        // extract IP address/port arguments
+        if (vm.count("dgas_address")) 
+            split_ip_address(vm["dgas_address"].as<std::string>(), dgas_host, dgas_port);
 
-        // initialize the DGAS service
-        if (is_dgas_server) {
+        if (vm.count("hpx_address")) 
+            split_ip_address(vm["hpx_address"].as<std::string>(), hpx_host, hpx_port);
+
+        // do we need to execute the HPX runtime
+        bool no_hpx_runtime = vm.count("no_hpx_runtime");
+
+        // initialize and run the DGAS service, if appropriate
+        std::auto_ptr<dgas_server_helper> dgas_server;
+        if (vm.count("run_dgas_server")) { 
             // run the DGAS server instance here
-            hpx::util::io_service_pool dgas_pool; 
-            hpx::naming::resolver_server dgas(dgas_pool, dgas_host, dgas_port, true);
+            dgas_server.reset(new dgas_server_helper(dgas_host, dgas_port));
 
-            // initialize and start the HPX runtime
-            hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port);
-
-            // the main thread will wait (block) for the shutdown action and 
-            // the threadmanager is serving incoming requests in the meantime
-            rt.run();
+            // block if no HPX runtime is needed
+            dgas_server->run(no_hpx_runtime);
         }
-        else {
+
+        // execute HPX runtime, if appropriate
+        if (!no_hpx_runtime) {
             // initialize and start the HPX runtime
             hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port);
 

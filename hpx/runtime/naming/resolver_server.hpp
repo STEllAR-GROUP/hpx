@@ -46,17 +46,8 @@ namespace hpx { namespace naming
         ///                 instance is listening on. If this value is not 
         ///                 specified the actual address will be taken from 
         ///                 the configuration file (hpx.ini).
-        /// \param start_asynchronously 
-        ///                 [in] This parameter allows to start the resolver 
-        ///                 server instance immediately. The default is to 
-        ///                 start immediately (the constructor blocks
-        ///                 until the \a resolver_server#stop function has 
-        ///                 been called). If this parameter is \a false the 
-        ///                 server instance needs to be started explicitly 
-        ///                 using a call to the \a resolver_server#run function.
         resolver_server (util::io_service_pool& io_service_pool, 
-            std::string const& address = "", unsigned short port = -1, 
-            bool start_asynchronously = true);
+            std::string const& address = "", boost::uint16_t port = 0);
 
         /// Construct the server to listen to the endpoint given by the 
         /// locality and serve up requests to the address translation service.
@@ -66,16 +57,7 @@ namespace hpx { namespace naming
         ///                 outgoing requests
         /// \param l        [in] This is the locality this DGAS server instance
         ///                 is running on.
-        /// \param start_asynchronously 
-        ///                 [in] This parameter allows to start the resolver 
-        ///                 server instance immediately. The default is to 
-        ///                 start immediately (the constructor blocks
-        ///                 until the \a resolver_server#stop function has 
-        ///                 been called). If this parameter is \a false the 
-        ///                 server instance needs to be started explicitly 
-        ///                 using a call to the \a resolver_server#run function.
-        resolver_server (util::io_service_pool& io_service_pool, locality l, 
-            bool start_asynchronously = false);
+        resolver_server (util::io_service_pool& io_service_pool, locality l);
 
         /// Destruct the object. Stops the service if it has not been stopped
         /// already.
@@ -93,7 +75,8 @@ namespace hpx { namespace naming
 
     private:
         /// Handle completion of an asynchronous accept and read operations.
-        void handle_accept(boost::system::error_code const& e);
+        void handle_accept(boost::system::error_code const& e, 
+            server::connection_ptr conn);
         void handle_completion(boost::system::error_code const& e);
 
         /// The pool of io_service objects used to perform asynchronous operations.
@@ -101,9 +84,6 @@ namespace hpx { namespace naming
 
         /// Acceptor used to listen for incoming connections.
         boost::asio::ip::tcp::acceptor acceptor_;
-
-        /// The next connection to be accepted.
-        server::connection_ptr new_connection_;
 
         /// The handler for all incoming requests.
         server::request_handler request_handler_;

@@ -7,95 +7,125 @@
 #if !defined(HPX_NAMING_LOCALITY_MAR_24_2008_0942AM)
 #define HPX_NAMING_LOCALITY_MAR_24_2008_0942AM
 
+#include <hpx/hpx_fwd.hpp>
+
 #include <boost/config.hpp>
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/iterator/filter_iterator.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/serialization.hpp>
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/util/asio_util.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-///  version of GAS reply structure
-#define HPX_LOCALITY_VERSION   0x20
+///  version of locality class
+#define HPX_LOCALITY_VERSION   0x10
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming
 {
+    namespace detail
+    {
+        struct is_valid_endpoint
+        {
+            is_valid_endpoint(std::string const& pattern = "")
+              : pattern_(pattern)
+            {
+            }
+
+            bool operator()(boost::asio::ip::tcp::endpoint ep) const
+            { 
+                return true; 
+            }
+
+            std::string pattern_;
+        };
+
+        typedef 
+            boost::filter_iterator<
+                is_valid_endpoint, boost::asio::ip::tcp::resolver::iterator
+            >
+        locality_iterator_type;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
+    /// \class locality locality.hpp hpx/runtime/naming/locality.hpp
+    ///
+    /// The class \a locality is a helper class storing the address and the 
+    /// port number of a HPX locality.
     class HPX_EXPORT locality
     {
     public:
         locality() 
         {}
 
-        locality(std::string const& addr, unsigned short port) 
-        {
-            try {
-                if (!util::get_endpoint(addr, port, endpoint_)) {
-                    using boost::asio::ip::tcp;
-                    
-                    // resolve the given address
-                    boost::asio::io_service io_service;
-                    tcp::resolver resolver(io_service);
-                    tcp::resolver::query query(
-                        !addr.empty() ? addr : boost::asio::ip::host_name(), 
-                        boost::lexical_cast<std::string>(port));
+        locality(std::string const& addr, boost::uint16_t port)
+          : address_(addr), port_(port)
+        {}
 
-                    endpoint_ = *resolver.resolve(query);
-                }
-            }
-            catch (boost::system::error_code const& e) {
-                throw hpx::exception(network_error, e.message());
-            }
-        }
-
-        locality(boost::asio::ip::address addr, unsigned short port) 
-          : endpoint_(addr, port) 
-        {
-        }
+        locality(boost::asio::ip::address addr, boost::uint16_t port) 
+          : address_(addr.to_string()), port_(port)
+        {}
 
         locality(boost::asio::ip::tcp::endpoint ep) 
-          : endpoint_(ep) 
-        {
-        }
+          : address_(ep.address().to_string()), port_(ep.port()) 
+        {}
 
         locality& operator= (boost::asio::ip::tcp::endpoint ep)
         {
-            endpoint_ = ep;
+            address_ = ep.address().to_string();
+            port_ = ep.port();
             return *this;
         }
 
-        /// access the stored IP address
-        boost::asio::ip::tcp::endpoint const& get_endpoint() const 
+        ///////////////////////////////////////////////////////////////////////
+        typedef detail::locality_iterator_type iterator_type;
+
+        /// \brief Returns an iterator which when dereferenced will give an
+        ///        endpoint suitable for a call to accept() related to this 
+        ///        locality
+        iterator_type accept_begin(boost::asio::io_service& io_service) const;
+
+        iterator_type accept_end() const
         {
-            return endpoint_;
+            return locality::iterator_type();
+        }
+
+        /// \brief Returns an iterator which when dereferenced will give an
+        ///        endpoint suitable for a call to connect() related to this 
+        ///        locality
+        iterator_type connect_begin(boost::asio::io_service& io_service) const;
+
+        iterator_type connect_end() const
+        {
+            return locality::iterator_type();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        friend bool operator==(locality const& lhs, locality const& rhs)
+        {
+            return lhs.address_ == rhs.address_ && lhs.port_ == rhs.port_;
         }
 
         friend bool operator!=(locality const& lhs, locality const& rhs)
         {
-            return lhs.endpoint_ != rhs.endpoint_;
-        }
-
-        friend bool operator==(locality const& lhs, locality const& rhs)
-        {
-            return lhs.endpoint_ == rhs.endpoint_;
+            return !(lhs == rhs);
         }
 
         friend bool operator< (locality const& lhs, locality const& rhs)
         {
-            return lhs.endpoint_ < rhs.endpoint_;
+            return lhs.address_ < rhs.address_ || lhs.port_ > rhs.port_;
         }
 
         friend bool operator> (locality const& lhs, locality const& rhs)
         {
-            return !(lhs.endpoint_ < rhs.endpoint_) && lhs.endpoint_ != rhs.endpoint_;
+            return !(lhs < rhs) && !(lhs == rhs);
         }
 
     private:
@@ -107,30 +137,8 @@ namespace hpx { namespace naming
         template<class Archive>
         void save(Archive & ar, const unsigned int version) const
         {
-            boost::uint16_t port = endpoint_.port();
-
-            if (endpoint_.address().is_v4()) {
-                boost::uint32_t ip = endpoint_.address().to_v4().to_ulong();
-                bool is_v4 = true;
-
-                ar << is_v4 << ip << port;
-            }
-            else {
-                boost::asio::ip::address_v6 addr = endpoint_.address().to_v6();
-
-                if (addr.is_v4_mapped() || addr.is_v4_compatible()) {
-                    boost::uint32_t ip = addr.to_v4().to_ulong();
-                    bool is_v4 = true;
-
-                    ar << is_v4 << ip << port;
-                }
-                else {
-                    std::string bytes (addr.to_string());
-                    bool is_v4 = false;
-
-                    ar << is_v4 << bytes << port;
-                }
-            }
+            ar << address_;
+            ar << port_;
         }
 
         template<class Archive>
@@ -141,37 +149,19 @@ namespace hpx { namespace naming
                     "trying to load locality with unknown version");
             }
 
-            bool is_v4 = false;
-            boost::uint16_t port = 0;    
-
-            ar >> is_v4;
-            if (is_v4) {
-                boost::uint32_t ip = 0;
-
-                ar >> ip;
-                ar >> port;
-
-                endpoint_.address(boost::asio::ip::address_v4(ip));
-                endpoint_.port(port);
-            }
-            else {
-                std::string bytes;
-
-                ar >> bytes;
-                ar >> port;
-                endpoint_.address(boost::asio::ip::address_v6::from_string(bytes));
-                endpoint_.port(port);
-            }
+            ar >> address_;
+            ar >> port_;
         }
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     private:
-        boost::asio::ip::tcp::endpoint endpoint_;
+        std::string address_;
+        boost::uint16_t port_;
     };
 
     inline std::ostream& operator<< (std::ostream& os, locality const& l)
     {
-        os << std::dec << l.endpoint_;
+        os << std::dec << l.address_ << ":" << l.port_;
         return os;
     }
 
