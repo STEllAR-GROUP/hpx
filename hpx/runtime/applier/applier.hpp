@@ -323,7 +323,7 @@ namespace hpx { namespace applier
         naming::id_type memory_id_;
     };
 
-    HPX_EXPORT typedef threads::thread_state full_thread_function_type(
+    HPX_API_EXPORT typedef threads::thread_state full_thread_function_type(
         threads::thread_self&, applier&);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -331,12 +331,12 @@ namespace hpx { namespace applier
     ///        work to be executed
     ///
     ///
-    HPX_EXPORT threads::thread_id_type register_work(applier& appl,
+    HPX_API_EXPORT threads::thread_id_type register_work(applier& appl,
         boost::function<threads::thread_function_type> func,
         threads::thread_state initial_state = threads::pending, 
         bool run_now = true);
 
-    HPX_EXPORT threads::thread_id_type register_work(applier& appl,
+    HPX_API_EXPORT threads::thread_id_type register_work(applier& appl,
         full_thread_function_type* func, 
         threads::thread_state initial_state = threads::pending, 
         bool run_now = true);
@@ -358,9 +358,9 @@ namespace hpx { namespace applier
     ///
     /// \note       For synchronous operation use the function 
     ///             \a applier#create_async.
-    HPX_EXPORT lcos::simple_future<naming::id_type> create_async(applier& appl, 
-        naming::id_type const& targetgid, components::component_type type, 
-        std::size_t count = 1);
+    HPX_API_EXPORT lcos::simple_future<naming::id_type> 
+        create_async(applier& appl, naming::id_type const& targetgid, 
+            components::component_type type, std::size_t count = 1);
 
     /// The \a create function creates a new component using the \a 
     /// runtime_support as given by targetgid. This function is blocking 
@@ -377,9 +377,9 @@ namespace hpx { namespace applier
     ///
     /// \note       For asynchronous operation use the function 
     ///             \a applier#create_async.
-    HPX_EXPORT naming::id_type create(applier& appl, threads::thread_self& self, 
-        naming::id_type const& targetgid, components::component_type type,
-        std::size_t count = 1);
+    HPX_API_EXPORT naming::id_type create(applier& appl, 
+        threads::thread_self& self, naming::id_type const& targetgid, 
+        components::component_type type, std::size_t count = 1);
 
     /// \brief The \a destroy function frees an existing component as given by 
     ///        its type and its gid
@@ -387,7 +387,7 @@ namespace hpx { namespace applier
     /// \param type
     /// \param count
     /// \param gid
-    HPX_EXPORT void destroy (applier& appl, components::component_type type, 
+    HPX_API_EXPORT void destroy (applier& appl, components::component_type type, 
         naming::id_type const& gid, std::size_t count = 1);
 
 }}

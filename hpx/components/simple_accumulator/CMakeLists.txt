@@ -24,6 +24,7 @@ target_link_libraries(simple_accumulator_component
 install(TARGETS simple_accumulator_component
     RUNTIME DESTINATION bin
     ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
     PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                 GROUP_READ GROUP_EXECUTE
                 WORLD_READ WORLD_EXECUTE)

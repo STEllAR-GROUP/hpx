@@ -415,7 +415,7 @@ section section::clone(section* root) const
     for (section_map::const_iterator i  = sections_.begin(); i != send; ++i)
     {
         section sub = i->second.clone();
-        out.add_section (i->first, i->second.clone(), root);
+        out.add_section (i->first, sub, root);
     }
     return out;
 }
