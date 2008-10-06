@@ -120,6 +120,9 @@ endif()
 # default, there may be more for individual modules, but this is the mandatory
 # set
 set(hpx_LIBRARIES hpx hpx_serialization)
+if(UNIX)
+    set(hpx_LIBRARIES ${hpx_LIBRARIES} dl)
+endif()
 
 # set variable helping in naming the target library names
 if(MSVC)
