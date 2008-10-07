@@ -18,6 +18,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/ini.hpp>
+#include <hpx/util/util.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util 
@@ -154,12 +155,7 @@ namespace hpx { namespace util
                     continue;
 
                 // instance name and module name are the same
-                std::string name (fs::basename(curr));
-#if defined(BOOST_WINDOWS) && defined(_DEBUG)
-                // remove the 'd' suffix 
-                if (name[name.size()-1] == 'd')
-                    name = name.substr(0, name.size()-1);
-#endif
+                std::string name (unmangle_name(fs::basename(curr)));
 
                 if (!ini.has_section("hpx.components")) {
                     util::section* hpx_sec = ini.get_section("hpx");

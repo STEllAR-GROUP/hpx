@@ -13,13 +13,13 @@
 // architectures
 #ifdef BOOST_NO_STRINGSTREAM
 # include <strstream>
-  inline std::string HPX_OSSTREAM_GETSTRING (std::ostrstream& ss)
-  {
+inline std::string HPX_OSSTREAM_GETSTRING (std::ostrstream& ss)
+{
     ss << std::ends;
     std::string rval = ss.str ();
     ss.freeze (false);
     return (rval);
-  }
+}
 # define HPX_OSSTREAM std::ostrstream
 # define HPX_ISSTREAM std::istrstream
 #else
@@ -28,6 +28,37 @@
 # define HPX_OSSTREAM std::ostringstream
 # define HPX_ISSTREAM std::istringstream
 #endif
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace util
+{
+    ///////////////////////////////////////////////////////////////////////////
+    // reverse the effect of the HPX_MANGLE_... macros in config.hpp
+#if !defined(BOOST_WINDOWS)
+    inline std::string unmangle_name(std::string& name)
+    {
+        // remove the 'libhpx_component_' prefix
+        std::string::size_type p = name.find(BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME_PREFIX));
+        if (p == 0)
+            return name.substr(sizeof(BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME_PREFIX)));
+        return name;
+    }
+#elif defined(_DEBUG)
+    inline std::string unmangle_name(std::string& name)
+    {
+        // remove the 'd' suffix 
+        if (name[name.size()-1] == 'd')
+            return name.substr(0, name.size()-1);
+        return name;
+    }
+#else
+    inline std::string const& unmangle_name(std::string const& name)
+    {
+        return name;    // nothing to do here
+    }
+#endif
+
+}}
 
 #endif
 

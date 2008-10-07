@@ -6,6 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/ini.hpp>
+#include <hpx/util/util.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/manage_component.hpp>
@@ -221,13 +222,7 @@ namespace hpx { namespace components { namespace server
             if (ini.has_section(component_section))
                 component_ini = ini.get_section(component_section);
 
-            std::string component_name(component);
-
-#if defined(BOOST_WINDOWS) && defined(_DEBUG)
-            // remove the 'd' suffix 
-            if (component_name[component_name.size()-1] == 'd')
-                component_name = component_name.substr(0, component_name.size()-1);
-#endif
+            std::string component_name(util::unmangle_name(component));
 
             // create the component factory object
             component_factory_type factory (

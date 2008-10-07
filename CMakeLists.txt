@@ -150,7 +150,8 @@ install(
     DIRECTORY hpx/                    # install all hpx header files
     DESTINATION include 
     FILES_MATCHING PATTERN "*.hpp"
-    REGEX ".svn" EXCLUDE)
+    REGEX ".svn" EXCLUDE
+    REGEX "CMakeFiles" EXCLUDE)
 
 # export build settings
 include(CMakeExportBuildSettings)

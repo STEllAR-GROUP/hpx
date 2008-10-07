@@ -26,7 +26,7 @@
 #define HPX_DEFAULT_INI_FILE          HPX_PREFIX "/share/hpx/hpx.ini"
 #endif
 #if !defined(HPX_DEFAULT_COMPONENT_PATH)
-#define HPX_DEFAULT_COMPONENT_PATH    HPX_PREFIX "/bin"
+#define HPX_DEFAULT_COMPONENT_PATH    HPX_PREFIX "/lib"
 #endif
 
 #endif 

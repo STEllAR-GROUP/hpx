@@ -6,6 +6,7 @@
 #if !defined(HPX_CONFIG_MAR_24_2008_0943AM)
 #define HPX_CONFIG_MAR_24_2008_0943AM
 
+#include <string>
 #include <hpx/config/export_definitions.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -72,8 +73,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 // on Windows the debug versions of the libraries have mangled entry points 
 #if !defined(BOOST_WINDOWS)
-#  define HPX_MANGLE_COMPONENT_NAME(n)      BOOST_PP_CAT(libhpx_component_, n)
-#  define HPX_MANGLE_COMPONENT_NAME_STR(n)  "libhpx_component_" + n
+#  define HPX_MANGLE_COMPONENT_NAME_PREFIX  libhpx_component_
+#  define HPX_MANGLE_COMPONENT_NAME(n)                                        \
+    BOOST_PP_CAT(HPX_MANGLE_COMPONENT_NAME_PREFIX, n)                         \
+    /**/
+#  define HPX_MANGLE_COMPONENT_NAME_STR(n)                                    \
+    BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME_PREFIX) + n                  \
+    /**/
 #elif defined(_DEBUG)
 #  define HPX_MANGLE_COMPONENT_NAME(n)      BOOST_PP_CAT(n, d)
 #  define HPX_MANGLE_COMPONENT_NAME_STR(n)  n + "d"
