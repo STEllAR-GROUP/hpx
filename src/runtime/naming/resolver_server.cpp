@@ -129,10 +129,9 @@ namespace hpx { namespace naming
 
     void resolver_server::run(bool blocking)
     {
-        if (!io_service_pool_.is_running()) {
+        if (!io_service_pool_.is_running()) 
             LDGAS_(info) << "startup: listening at: " << here_;
-            io_service_pool_.run(blocking);
-        }
+        io_service_pool_.run(blocking);
     }
 
     void resolver_server::stop()
