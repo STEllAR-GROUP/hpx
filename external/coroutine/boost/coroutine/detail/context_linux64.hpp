@@ -110,7 +110,7 @@ namespace boost { namespace coroutines {
     class ia64_gcc_context_impl : public ia64_gcc_context_impl_base
     {
     public:
-      enum { default_stack_size = 8*8192 };
+      enum { default_stack_size = 2*8192 };
       
       typedef ia64_gcc_context_impl_base context_impl_base;
 
@@ -132,7 +132,11 @@ namespace boost { namespace coroutines {
         typedef void fun(Functor*);
         fun * funp = trampoline;
 
+        // we have to make sure that the stack pointer is aligned on a 16 Byte
+        // boundary when the code is entering the trampoline (the stack itself
+        // already is properly aligned)
         *--m_sp = 0;       // additional alignment
+
         *--m_sp = &cb;     // parm 0 of trampoline;
         *--m_sp = 0;       // dummy return address for trampoline
         *--m_sp = (void*) funp ;// return addr (here: start addr)  NOTE: the unsafe cast is safe on IA64
