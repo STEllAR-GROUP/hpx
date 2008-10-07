@@ -6,7 +6,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 
-#include "server/distributing_factory.hpp"
+#include <hpx/components/distributing_factory/server/distributing_factory.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
