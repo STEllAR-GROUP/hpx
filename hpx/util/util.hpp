@@ -40,7 +40,7 @@ namespace hpx { namespace util
         // remove the 'libhpx_component_' prefix
         std::string::size_type p = name.find(BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME_PREFIX));
         if (p == 0)
-            return name.substr(sizeof(BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME_PREFIX)));
+            return name.substr(sizeof(BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME_PREFIX))-1);
         return name;
     }
 #elif defined(_DEBUG)
