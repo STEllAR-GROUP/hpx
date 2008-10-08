@@ -18,7 +18,7 @@
     (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/runtime/actions/action_implementations.hpp"))                        \
     /**/
-    
+
 #include BOOST_PP_ITERATE()
 
 #endif
@@ -46,7 +46,7 @@
             threads::thread_self&, applier::applier&, Result*,
             BOOST_PP_ENUM_PARAMS(N, T))
     >
-    class BOOST_PP_CAT(result_action, N)
+    class BOOST_PP_CAT(base_result_action, N)
       : public action<
             Component, Action, 
             boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QULIFIERS, _)> 
@@ -59,12 +59,12 @@
         > base_type;
 
     public:
-        BOOST_PP_CAT(result_action, N)() 
+        BOOST_PP_CAT(base_result_action, N)() 
         {}
 
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        BOOST_PP_CAT(result_action, N)(
+        BOOST_PP_CAT(base_result_action, N)(
                 BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
           : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
         {}
@@ -98,7 +98,7 @@
             threads::thread_state (*f)(threads::thread_self&, 
                     applier::applier&, continuation_type, 
                     boost::tuple<Func>) =
-                &BOOST_PP_CAT(result_action, N)::continuation_thread_function;
+                &BOOST_PP_CAT(base_result_action, N)::continuation_thread_function;
 
             // The following bind constructs the wrapped thread function
             //   f:  is the wrapping thread function
@@ -119,7 +119,7 @@
 
         // This static construct_thread_function allows to construct 
         // a proper thread function for a thread without having to 
-        // instantiate the result_actionN type. This is used by the applier in 
+        // instantiate the base_result_actionN type. This is used by the applier in 
         // case no continuation has been supplied.
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static boost::function<threads::thread_function_type> 
@@ -134,7 +134,7 @@
 
         // This static construct_thread_function allows to construct 
         // a proper thread function for a thread without having to 
-        // instantiate the result_actionN type. This is used by the applier in 
+        // instantiate the base_result_actionN type. This is used by the applier in 
         // case a continuation has been supplied
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static boost::function<threads::thread_function_type> 
@@ -187,16 +187,64 @@
         BOOST_PP_ENUM_PARAMS(N, typename T), 
         threads::thread_state(Component::*F)(
             threads::thread_self&, applier::applier&, Result*, 
+            BOOST_PP_ENUM_PARAMS(N, T))
+    >
+    class BOOST_PP_CAT(result_action, N)
+      : public BOOST_PP_CAT(base_result_action, N)<Component, Result, Action, 
+          BOOST_PP_ENUM_PARAMS(N, T), F>
+    {
+    private:
+        typedef BOOST_PP_CAT(base_result_action, N)<
+            Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F> 
+        base_type;
+
+    public:
+        BOOST_PP_CAT(result_action, N)()
+        {}
+
+        // construct an action from its arguments
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        BOOST_PP_CAT(result_action, N)(
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+        {}
+
+    private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name(*this);
+        }
+
+    private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    //  N parameter version, direct execution with result
+    template <
+        typename Component, typename Result, int Action, 
+        BOOST_PP_ENUM_PARAMS(N, typename T), 
+        threads::thread_state(Component::*F)(
+            threads::thread_self&, applier::applier&, Result*, 
             BOOST_PP_ENUM_PARAMS(N, T)),
         Result (Component::*DirectF)(applier::applier&, 
             BOOST_PP_ENUM_PARAMS(N, T))
     >
     class BOOST_PP_CAT(direct_result_action, N)
-      : public BOOST_PP_CAT(result_action, N)<Component, Result, Action, 
+      : public BOOST_PP_CAT(base_result_action, N)<Component, Result, Action, 
           BOOST_PP_ENUM_PARAMS(N, T), F>
     {
     private:
-        typedef BOOST_PP_CAT(result_action, N)<
+        typedef BOOST_PP_CAT(base_result_action, N)<
             Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F> 
         base_type;
 
@@ -225,6 +273,14 @@
         }
 
     private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name(*this);
+        }
+
+    private:
         // serialization support
         friend class boost::serialization::access;
 
@@ -243,7 +299,7 @@
             threads::thread_self&, applier::applier&, 
             BOOST_PP_ENUM_PARAMS(N, T))
     >
-    class BOOST_PP_CAT(action, N)
+    class BOOST_PP_CAT(base_action, N)
       : public action<
             Component, Action, 
             boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QULIFIERS, _)> 
@@ -256,12 +312,12 @@
         > base_type;
 
     public:
-        BOOST_PP_CAT(action, N)() 
+        BOOST_PP_CAT(base_action, N)() 
         {}
 
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        BOOST_PP_CAT(action, N)(
+        BOOST_PP_CAT(base_action, N)(
                 BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
           : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
         {}
@@ -272,7 +328,7 @@
 
         // This static construct_thread_function allows to construct 
         // a proper thread function for a thread without having to 
-        // instantiate the actionN type. This is used by the applier in 
+        // instantiate the base_actionN type. This is used by the applier in 
         // case no continuation has been supplied.
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static boost::function<threads::thread_function_type> 
@@ -286,7 +342,7 @@
 
         // This static construct_thread_function allows to construct 
         // a proper thread function for a thread without having to 
-        // instantiate the actionN type. This is used by the applier in 
+        // instantiate the base_actionN type. This is used by the applier in 
         // case a continuation has been supplied
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static boost::function<threads::thread_function_type> 
@@ -333,16 +389,62 @@
     template <
         typename Component, int Action, BOOST_PP_ENUM_PARAMS(N, typename T),
         threads::thread_state(Component::*F)(
-            threads::thread_self&, applier::applier&, BOOST_PP_ENUM_PARAMS(N, T)),
-        void (Component::*DirectF)(applier::applier&, BOOST_PP_ENUM_PARAMS(N, T))
+            threads::thread_self&, applier::applier&, BOOST_PP_ENUM_PARAMS(N, T))
     >
-    class BOOST_PP_CAT(direct_action, N)
-      : public BOOST_PP_CAT(action, N)<
+    class BOOST_PP_CAT(action, N)
+      : public BOOST_PP_CAT(base_action, N)<
             Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F
         >
     {
     private:
-        typedef BOOST_PP_CAT(action, N)<
+        typedef BOOST_PP_CAT(base_action, N)<
+            Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F> 
+        base_type;
+
+    public:
+        BOOST_PP_CAT(action, N)()
+        {}
+
+        // construct an action from its arguments
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        BOOST_PP_CAT(action, N)(
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+        {}
+
+    private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name(*this);
+        }
+
+    private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Component, int Action, BOOST_PP_ENUM_PARAMS(N, typename T),
+        threads::thread_state(Component::*F)(
+            threads::thread_self&, applier::applier&, BOOST_PP_ENUM_PARAMS(N, T)),
+        void (Component::*DirectF)(applier::applier&, BOOST_PP_ENUM_PARAMS(N, T))
+    >
+    class BOOST_PP_CAT(direct_action, N)
+      : public BOOST_PP_CAT(base_action, N)<
+            Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F
+        >
+    {
+    private:
+        typedef BOOST_PP_CAT(base_action, N)<
             Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F> 
         base_type;
 
@@ -368,6 +470,14 @@
         {
             (get_lva<Component>::call(lva)->*DirectF)(
                 appl, BOOST_PP_ENUM_PARAMS(N, arg));
+        }
+
+    private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name(*this);
         }
 
     private:

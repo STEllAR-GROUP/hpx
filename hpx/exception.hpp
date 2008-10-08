@@ -9,6 +9,9 @@
 #include <exception>
 #include <string>
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/util/logging.hpp>
+
 #include <boost/assert.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>
@@ -42,7 +45,7 @@ namespace hpx
         lock_error = 18,
         last_error
     };
-    
+
     char const* const error_names[] = 
     {
         "success",
@@ -135,25 +138,29 @@ namespace hpx
           : boost::system::system_error(make_error_code(e))
         {
             BOOST_ASSERT(e >= success && e < last_error);
+            LERR_(error) << "created exception: " << this->what();
         }
         explicit exception(boost::system::system_error e) 
           : boost::system::system_error(e)
         {
+            LERR_(error) << "created exception: " << this->what();
         }
         exception(error e, char const* msg) 
           : boost::system::system_error(make_error_code(e), msg)
         {
             BOOST_ASSERT(e >= success && e < last_error);
+            LERR_(error) << "created exception: " << this->what();
         }
         exception(error e, std::string msg) 
           : boost::system::system_error(make_error_code(e), msg)
         {
             BOOST_ASSERT(e >= success && e < last_error);
+            LERR_(error) << "created exception: " << this->what();
         }
         ~exception (void) throw() 
         {
         }
-        
+
         error get_error() const throw() 
         { 
             return static_cast<error>(
@@ -177,7 +184,7 @@ namespace boost { namespace system
     { 
         static const bool value = true; 
     };
-    
+
 }}
 
 #include <hpx/config/warnings_suffix.hpp>

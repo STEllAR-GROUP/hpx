@@ -41,8 +41,8 @@ namespace hpx
     /// functionality. This namespace is part of the HPX core module.
     namespace actions
     {
-        struct HPX_EXPORT action_base;
-        typedef boost::shared_ptr<action_base> action_type;
+        struct HPX_EXPORT base_action;
+        typedef boost::shared_ptr<base_action> action_type;
 
         class HPX_EXPORT continuation;
         typedef boost::shared_ptr<continuation> continuation_type;

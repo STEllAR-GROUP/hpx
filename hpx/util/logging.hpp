@@ -15,29 +15,34 @@ namespace hpx { namespace util
     typedef boost::logging::named_logger<>::type logger_type;
     typedef boost::logging::level::holder filter_type;
 
+    ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT BOOST_DECLARE_LOG_FILTER(dgas_level, filter_type)
     HPX_EXPORT BOOST_DECLARE_LOG(dgas_logger, logger_type)
 
     #define LDGAS_(lvl)                                                       \
-        BOOST_LOG_USE_LOG_IF_LEVEL(util::dgas_logger(), util::dgas_level(), lvl)
+        BOOST_LOG_USE_LOG_IF_LEVEL(util::dgas_logger(), util::dgas_level(), lvl) \
+    /**/
 
     HPX_EXPORT void init_dgas_logs();
 
-    HPX_EXPORT BOOST_DECLARE_LOG_FILTER(osh_level, filter_type)
-    HPX_EXPORT BOOST_DECLARE_LOG(osh_logger, logger_type)
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT BOOST_DECLARE_LOG_FILTER(hpx_level, filter_type)
+    HPX_EXPORT BOOST_DECLARE_LOG(hpx_logger, logger_type)
 
-    #define LOSH_(lvl)                                                        \
-        BOOST_LOG_USE_LOG_IF_LEVEL(util::osh_logger(), util::osh_level(), lvl)
+    #define LHPX_(lvl, cat)                                                   \
+        BOOST_LOG_USE_LOG_IF_LEVEL(util::hpx_logger(), util::hpx_level(), lvl)\
+        << (cat)                                                              \
+    /**/
 
-    HPX_EXPORT void init_onesizeheap_logs();
+    HPX_EXPORT void init_hpx_logs();
 
-    HPX_EXPORT BOOST_DECLARE_LOG_FILTER(tm_level, filter_type)
-    HPX_EXPORT BOOST_DECLARE_LOG(tm_logger, logger_type)
-
-    #define LTM_(lvl)                                                         \
-        BOOST_LOG_USE_LOG_IF_LEVEL(util::tm_logger(), util::tm_level(), lvl)
-
-    HPX_EXPORT void init_threadmanager_logs();
+    ///////////////////////////////////////////////////////////////////////////
+    // specific logging
+    #define LTM_(lvl)   LHPX_(lvl, "  [TM] ")   /* thread manager */
+    #define LRT_(lvl)   LHPX_(lvl, "  [RT] ")   /* runtime support */
+    #define LERR_(lvl)  LHPX_(lvl, " [ERR] ")   /* exception */
+    #define LOSH_(lvl)  LHPX_(lvl, " [OSH] ")   /* one size heap */
+    #define LPT_(lvl)   LHPX_(lvl, "  [PT] ")   /* parcel transport */
 
 ///////////////////////////////////////////////////////////////////////////////
 }}

@@ -18,10 +18,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the future actions
-HPX_SERIALIZE_ACTION(hpx::lcos::base_lco::set_event_action);
+HPX_REGISTER_ACTION(hpx::lcos::base_lco::set_event_action);
 
-HPX_SERIALIZE_ACTION(hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_result_action);
-HPX_SERIALIZE_ACTION(hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_error_action);
-HPX_SERIALIZE_ACTION(hpx::lcos::base_lco_with_value<double>::set_result_action);
-HPX_SERIALIZE_ACTION(hpx::lcos::base_lco_with_value<double>::set_error_action);
+HPX_REGISTER_ACTION(hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_result_action);
+HPX_REGISTER_ACTION(hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_error_action);
+HPX_REGISTER_ACTION(hpx::lcos::base_lco_with_value<double>::set_result_action);
+HPX_REGISTER_ACTION(hpx::lcos::base_lco_with_value<double>::set_error_action);
 

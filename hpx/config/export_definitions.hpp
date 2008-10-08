@@ -9,44 +9,53 @@
 // For symbol import/export macros
 #include <boost/config.hpp>
 
-# if defined(BOOST_WINDOWS)
-#   define HPX_SYMBOL_EXPORT      __declspec(dllexport)
-#   define HPX_SYMBOL_IMPORT      __declspec(dllimport)
-#   define HPX_SYMBOL_INTERNAL    /* empty */
-#   define HPX_APISYMBOL_EXPORT   __declspec(dllexport)
-#   define HPX_APISYMBOL_IMPORT   __declspec(dllimport)
-# elif defined(HPX_GCC_HAVE_VISIBILITY)
-#   define HPX_SYMBOL_EXPORT      __attribute__((visibility("default")))
-#   define HPX_SYMBOL_IMPORT      __attribute__((visibility("default")))
-#   define HPX_SYMBOL_INTERNAL    __attribute__((visibility("hidden")))
-#   define HPX_APISYMBOL_EXPORT   /* empty */
-#   define HPX_APISYMBOL_IMPORT   /* empty */
-# else
-#   define HPX_SYMBOL_EXPORT      /* empty */
-#   define HPX_SYMBOL_IMPORT      /* empty */
-#   define HPX_SYMBOL_INTERNAL    /* empty */
-#   define HPX_APISYMBOL_EXPORT   /* empty */
-#   define HPX_APISYMBOL_IMPORT   /* empty */
-# endif
+#if defined(BOOST_WINDOWS)
+# define HPX_SYMBOL_EXPORT      __declspec(dllexport)
+# define HPX_SYMBOL_IMPORT      __declspec(dllimport)
+# define HPX_SYMBOL_INTERNAL    /* empty */
+# define HPX_APISYMBOL_EXPORT   __declspec(dllexport)
+# define HPX_APISYMBOL_IMPORT   __declspec(dllimport)
+#elif defined(HPX_GCC_HAVE_VISIBILITY)
+# define HPX_SYMBOL_EXPORT      __attribute__((visibility("default")))
+# define HPX_SYMBOL_IMPORT      __attribute__((visibility("default")))
+# define HPX_SYMBOL_INTERNAL    __attribute__((visibility("hidden")))
+# define HPX_APISYMBOL_EXPORT   /* empty */
+# define HPX_APISYMBOL_IMPORT   /* empty */
+#else
+# define HPX_SYMBOL_EXPORT      /* empty */
+# define HPX_SYMBOL_IMPORT      /* empty */
+# define HPX_SYMBOL_INTERNAL    /* empty */
+# define HPX_APISYMBOL_EXPORT   /* empty */
+# define HPX_APISYMBOL_IMPORT   /* empty */
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // define the export/import helper macros used by the runtime module
-# if defined(HPX_EXPORTS)
-#   define  HPX_EXPORT             HPX_SYMBOL_EXPORT
-#   define  HPX_EXCEPTION_EXPORT   HPX_SYMBOL_EXPORT
-#   define  HPX_API_EXPORT         HPX_APISYMBOL_EXPORT
-# else
-#   define  HPX_EXPORT             HPX_SYMBOL_IMPORT
-#   define  HPX_EXCEPTION_EXPORT   HPX_SYMBOL_IMPORT
-#   define  HPX_API_EXPORT         HPX_APISYMBOL_IMPORT
-# endif
+#if defined(HPX_EXPORTS)
+# define  HPX_EXPORT             HPX_SYMBOL_EXPORT
+# define  HPX_EXCEPTION_EXPORT   HPX_SYMBOL_EXPORT
+# define  HPX_API_EXPORT         HPX_APISYMBOL_EXPORT
+#else
+# define  HPX_EXPORT             HPX_SYMBOL_IMPORT
+# define  HPX_EXCEPTION_EXPORT   HPX_SYMBOL_IMPORT
+# define  HPX_API_EXPORT         HPX_APISYMBOL_IMPORT
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // define the export/import helper macros to be used for component modules
-# if defined(HPX_COMPONENT_EXPORTS)
-#   define  HPX_COMPONENT_EXPORT   HPX_SYMBOL_EXPORT
-# else
-#   define  HPX_COMPONENT_EXPORT   HPX_SYMBOL_IMPORT
-# endif
+#if defined(HPX_COMPONENT_EXPORTS)
+# define  HPX_COMPONENT_EXPORT   HPX_SYMBOL_EXPORT
+#else
+# define  HPX_COMPONENT_EXPORT   HPX_SYMBOL_IMPORT
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// helper macro for symbols which have to be exported from the runtime and all 
+// components
+#if defined(HPX_EXPORTS) || defined(HPX_COMPONENT_EXPORTS)
+# define HPX_ALWAYS_EXPORT       HPX_SYMBOL_EXPORT
+#else
+# define HPX_ALWAYS_EXPORT       HPX_SYMBOL_IMPORT
+#endif
 
 #endif

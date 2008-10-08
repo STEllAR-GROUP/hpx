@@ -36,17 +36,6 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct init_logging
-    {
-        init_logging()
-        {
-            util::init_threadmanager_logs();
-        }
-    };
-    
-    init_logging const init_tm_logging;
-
-    ///////////////////////////////////////////////////////////////////////////
     threadmanager::threadmanager(util::io_service_pool& timer_pool)
       : running_(false), timer_pool_(timer_pool)
 #if HPX_DEBUG != 0

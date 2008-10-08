@@ -33,8 +33,6 @@ namespace hpx { namespace naming
         acceptor_(io_service_pool_.get_io_service()),
         request_handler_(), here_(l)
    {
-        util::init_dgas_logs();
-
         // start the io_service
         run(false);
 
@@ -81,8 +79,6 @@ namespace hpx { namespace naming
         request_handler_(), 
         here_(util::runtime_configuration().get_dgas_locality(address, port))
     {
-        util::init_dgas_logs();
-
         // start the io_service
         run(false);
 

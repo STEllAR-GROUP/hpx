@@ -42,8 +42,9 @@ namespace hpx { namespace applier
         ~applier()
         {}
 
+    public:
         ///////////////////////////////////////////////////////////////////////
-        // zero parameter version
+        // zero parameter version of apply()
         // Invoked by a running PX-thread to apply an action to any resource
 
         /// \note A call to applier's apply function would look like:

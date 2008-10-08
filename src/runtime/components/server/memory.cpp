@@ -16,14 +16,21 @@
 #include <boost/serialization/export.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Serialization support for the runtime_support actions
-HPX_SERIALIZE_ACTION(hpx::components::server::memory::store8_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::memory::store16_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::memory::store32_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::memory::store64_action);
+// make sure all needed action::get_action_name() functions get defined
+HPX_DEFINE_ACTION_NAME(hpx::lcos::base_lco_with_value<boost::uint8_t>::set_result_action);
+HPX_DEFINE_ACTION_NAME(hpx::lcos::base_lco_with_value<boost::uint16_t>::set_result_action);
+HPX_DEFINE_ACTION_NAME(hpx::lcos::base_lco_with_value<boost::uint32_t>::set_result_action);
+HPX_DEFINE_ACTION_NAME(hpx::lcos::base_lco_with_value<boost::uint64_t>::set_result_action);
 
-HPX_SERIALIZE_ACTION(hpx::components::server::memory::load8_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::memory::load16_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::memory::load32_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::memory::load64_action);
+///////////////////////////////////////////////////////////////////////////////
+// Serialization support for the runtime_support actions
+HPX_REGISTER_ACTION(hpx::components::server::memory::store8_action);
+HPX_REGISTER_ACTION(hpx::components::server::memory::store16_action);
+HPX_REGISTER_ACTION(hpx::components::server::memory::store32_action);
+HPX_REGISTER_ACTION(hpx::components::server::memory::store64_action);
+
+HPX_REGISTER_ACTION(hpx::components::server::memory::load8_action);
+HPX_REGISTER_ACTION(hpx::components::server::memory::load16_action);
+HPX_REGISTER_ACTION(hpx::components::server::memory::load32_action);
+HPX_REGISTER_ACTION(hpx::components::server::memory::load64_action);
 

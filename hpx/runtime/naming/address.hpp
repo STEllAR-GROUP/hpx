@@ -91,9 +91,9 @@ namespace hpx { namespace naming
 
     inline std::ostream& operator<< (std::ostream& os, address const& addr)
     {
-        os << addr.locality_ << ":" 
+        os << "(" << addr.locality_ << ":" 
            << components::get_component_type_name((int)addr.type_) 
-           << ": 0x" << std::hex << addr.address_; 
+           << ": 0x" << std::hex << addr.address_ << ")"; 
         return os;
     }
 

@@ -80,7 +80,7 @@ namespace hpx { namespace naming { namespace server
             switch (rep.command_) {
             case command_resolve:
             case command_unbind_range:
-                os << "addr(" << rep.address_ << ") ";
+                os << "addr" << rep.address_ << " ";
                 break;
 
             case command_getidrange:

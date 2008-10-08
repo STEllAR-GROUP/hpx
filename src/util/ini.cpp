@@ -16,6 +16,10 @@
 #include <iostream>
 #include <fstream>
 
+#include <hpx/config.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/util/ini.hpp>
+
 #include <boost/assert.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -23,10 +27,6 @@
 #include <boost/bind.hpp>
 #include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp>
-
-#include <hpx/config.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/util/ini.hpp>
 
 #ifdef _APPLE
 #include <crt_externs.h>

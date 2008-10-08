@@ -9,16 +9,17 @@
 #include <string>
 #include <iostream>
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/util/ini.hpp>
+#include <hpx/util/util.hpp>
+
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/exception.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/tokenizer.hpp>
-
-#include <hpx/config.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/util/ini.hpp>
-#include <hpx/util/util.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util 

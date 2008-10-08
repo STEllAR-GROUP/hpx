@@ -7,6 +7,8 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/util.hpp>
+#include <hpx/util/logging.hpp>
+
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/manage_component.hpp>
@@ -25,10 +27,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the runtime_support actions
-HPX_SERIALIZE_ACTION(hpx::components::server::runtime_support::create_component_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::runtime_support::free_component_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::runtime_support::shutdown_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::runtime_support::shutdown_all_action);
+HPX_REGISTER_ACTION(hpx::components::server::runtime_support::create_component_action);
+HPX_REGISTER_ACTION(hpx::components::server::runtime_support::free_component_action);
+HPX_REGISTER_ACTION(hpx::components::server::runtime_support::shutdown_action);
+HPX_REGISTER_ACTION(hpx::components::server::runtime_support::shutdown_all_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
@@ -53,6 +55,9 @@ namespace hpx { namespace components { namespace server
     // set result if requested
         if (0 != gid)
             *gid = id;
+
+        LRT_(info) << "successfully created " << count << " component(s) of " 
+                   << "type: " << components::get_component_type_name(type);
         return threads::terminated;
     }
 
@@ -72,6 +77,9 @@ namespace hpx { namespace components { namespace server
         }
 
         (*it).second->destroy(appl, gid, count);
+
+        LRT_(info) << "successfully destroyed " << count << " component(s) of " 
+                   << "type: " << components::get_component_type_name(type);
         return threads::terminated;
     }
 
@@ -132,8 +140,11 @@ namespace hpx { namespace components { namespace server
         naming::resolver_client& dgas_client)
     {
         // load all components as described in the configuration information
-        if (!ini.has_section("hpx.components"))
+        if (!ini.has_section("hpx.components")) {
+            LRT_(info) << "No components found/loaded, HPX will be mostly "
+                          "non-functional (no section [hpx.components] found).";
             return;     // no components to load
+        }
 
         // each shared library containing components may have an ini section
         //
@@ -171,8 +182,10 @@ namespace hpx { namespace components { namespace server
             if (i->second.has_entry("enabled")) {
                 std::string tmp = i->second.get_entry("enabled");
                 boost::to_lower (tmp);
-                if (tmp == "no" || tmp == "false" || tmp == "0")
+                if (tmp == "no" || tmp == "false" || tmp == "0"){
+                    LRT_(info) << "dynamic loading disabled: " << instance;
                     continue;     // this component has been disabled
+                }
             }
 
             fs::path lib;
@@ -229,20 +242,31 @@ namespace hpx { namespace components { namespace server
                 pf.create(component_name, glob_ini, component_ini)); 
 
             component_type t = factory->get_component_type(dgas_client);
-            if (0 == t) 
+            if (0 == t) {
+                LRT_(info) << "component refused to load: "  << instance;
                 return false;   // module refused to load
+            }
 
             // store component factory for later use
             std::pair<component_map_type::iterator, bool> p = 
                 components_.insert(component_map_type::value_type(t, factory));
 
-            if (!p.second) 
+            if (!p.second) {
+                LRT_(error) << "duplicate component id: " << instance
+                           << ": " << components::get_component_type_name(t);
                 return false;   // duplicate component id?
+            }
 
             // store the reference to the shared library if everything is fine
             modules_.push_back (d); 
+
+            LRT_(info) << "dynamic loading succeeded: " << lib.string() 
+                       << ": " << instance << ": " 
+                       << components::get_component_type_name(t);
         }
-        catch (std::logic_error const& /*e*/) {
+        catch (std::logic_error const& e) {
+            LRT_(warning) << "dynamic loading failed: " << lib.string() 
+                        << ": " << instance << ": " << e.what();
             return false;
         }
         return true;    // component got loaded

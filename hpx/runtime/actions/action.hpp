@@ -9,6 +9,14 @@
 #include <cstdlib>
 #include <stdexcept>
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/get_lva.hpp>
+#include <hpx/util/serialize_sequence.hpp>
+
 #include <boost/version.hpp>
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/at.hpp>
@@ -19,22 +27,25 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/remove_reference.hpp>
-
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/config.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/get_lva.hpp>
-#include <hpx/util/serialize_sequence.hpp>
+#include <boost/preprocessor/stringize.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Helper macro for action serialization, each of the defined actions needs to 
 // be registered with the serialization library
-#define HPX_SERIALIZE_ACTION(action)                                          \
+#define HPX_DEFINE_ACTION_NAME(action)                                        \
+        namespace hpx { namespace actions { namespace detail {                \
+            template<> HPX_ALWAYS_EXPORT                                      \
+            char const* const get_action_name(action const&)                  \
+            { return BOOST_PP_STRINGIZE(action); }                            \
+        }}}                                                                   \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_ACTION(action)                                           \
         BOOST_CLASS_EXPORT(action)                                            \
+        HPX_DEFINE_ACTION_NAME(action)                                        \
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -51,15 +62,19 @@ namespace hpx { namespace actions
             typedef typename boost::remove_reference<T>::type no_ref_type;
             typedef typename boost::remove_const<no_ref_type>::type type;
         };
+
+        template <typename Action>
+        HPX_ALWAYS_EXPORT char const* const get_action_name(Action const&);
+
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// The \a action_base class is a abstract class used as the base class for 
+    /// The \a base_action class is a abstract class used as the base class for 
     /// all action types. It's main purpose is to allow polymorphic 
     /// serialization of action instances through a shared_ptr.
-    struct action_base
+    struct base_action
     {
-        virtual ~action_base() {}
+        virtual ~base_action() {}
 
         /// The function \a get_action_code returns the code of the action 
         /// instance it is called for.
@@ -68,6 +83,10 @@ namespace hpx { namespace actions
         /// The function \a get_component_type returns the \a component_type 
         /// of the component this action belongs to.
         virtual int get_component_type() const = 0;
+
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        virtual char const* const get_action_name() const = 0;
 
         /// The \a get_thread_function constructs a proper thread function for 
         /// a \a thread, encapsulating the functionality and the arguments 
@@ -114,7 +133,7 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, int Action, typename Arguments>
-    class action : public action_base
+    class action : public base_action
     {
     public:
         typedef Arguments arguments_type;
@@ -139,7 +158,7 @@ namespace hpx { namespace actions
         /// destructor
         ~action()
         {}
-        
+
     public:
         /// retrieve the N's argument
         template <int N>
@@ -212,7 +231,14 @@ namespace hpx { namespace actions
             return static_cast<int>(Component::get_component_type());
         }
 
-    private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return "<Unknown action type>";
+        }
+
+   private:
         // serialization support
         friend class boost::serialization::access;
 
@@ -220,8 +246,8 @@ namespace hpx { namespace actions
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
             using namespace boost::serialization;
-            void_cast_register<action, action_base>();
-            
+            void_cast_register<action, base_action>();
+
             util::serialize_sequence(ar, arguments_);
         }
 
@@ -250,13 +276,13 @@ namespace hpx { namespace actions
         threads::thread_state(Component::*F)(
             threads::thread_self&, applier::applier&, Result*)
     >
-    class result_action0 
+    class base_result_action0 
       : public action<Component, Action, boost::fusion::vector<> >
     {
         typedef action<Component, Action, boost::fusion::vector<> > base_type;
 
     public:
-        result_action0()
+        base_result_action0()
         {}
 
     private:
@@ -291,7 +317,7 @@ namespace hpx { namespace actions
             threads::thread_state (*f)(threads::thread_self&, 
                     applier::applier&, continuation_type, 
                     boost::tuple<Func>) =
-                &result_action0::continuation_thread_function;
+                &base_result_action0::continuation_thread_function;
 
             // The following bind constructs the wrapped thread function
             //   f:  is the wrapping thread function
@@ -312,7 +338,7 @@ namespace hpx { namespace actions
 
         /// \brief This static \a construct_thread_function allows to construct 
         /// a proper thread function for a \a thread without having to 
-        /// instantiate the \a result_action0 type. This is used by the \a 
+        /// instantiate the \a base_result_action0 type. This is used by the \a 
         /// applier in case no continuation has been supplied.
         static boost::function<threads::thread_function_type> 
         construct_thread_function(applier::applier& appl, 
@@ -324,7 +350,7 @@ namespace hpx { namespace actions
 
         /// \brief This static \a construct_thread_function allows to construct 
         /// a proper thread function for a \a thread without having to 
-        /// instantiate the \a result_action0 type. This is used by the \a 
+        /// instantiate the \a base_result_action0 type. This is used by the \a 
         /// applier in case a continuation has been supplied
         static boost::function<threads::thread_function_type> 
         construct_thread_function(continuation_type& cont, 
@@ -370,14 +396,49 @@ namespace hpx { namespace actions
     template <
         typename Component, typename Result, int Action, 
         threads::thread_state(Component::*F)(
+            threads::thread_self&, applier::applier&, Result*)
+    >
+    class result_action0 
+      : public base_result_action0<Component, Result, Action, F>
+    {
+    private:
+        typedef base_result_action0<Component, Result, Action, F> base_type;
+
+    public:
+        result_action0()
+        {}
+
+    private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name(*this);
+        }
+
+    private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Component, typename Result, int Action, 
+        threads::thread_state(Component::*F)(
             threads::thread_self&, applier::applier&, Result*),
         Result (Component::*DirectF)(applier::applier&)
     >
     class direct_result_action0 
-      : public result_action0<Component, Result, Action, F>
+      : public base_result_action0<Component, Result, Action, F>
     {
     private:
-        typedef result_action0<Component, Result, Action, F> base_type;
+        typedef base_result_action0<Component, Result, Action, F> base_type;
 
     public:
         direct_result_action0()
@@ -391,6 +452,14 @@ namespace hpx { namespace actions
             applier::applier& appl, naming::address::address_type lva)
         {
             return (get_lva<Component>::call(lva)->*DirectF)(appl);
+        }
+
+    private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name(*this);
         }
 
     private:
@@ -411,14 +480,14 @@ namespace hpx { namespace actions
         threads::thread_state(Component::*F)(
             threads::thread_self&, applier::applier&)
     >
-    class action0 
+    class base_action0 
       : public action<Component, Action, boost::fusion::vector<> >
     {
     private:
         typedef action<Component, Action, boost::fusion::vector<> > base_type;
 
     public:
-        action0()
+        base_action0()
         {}
 
     public:
@@ -427,7 +496,7 @@ namespace hpx { namespace actions
 
         /// \brief This static \a construct_thread_function allows to construct 
         /// a proper thread function for a \a thread without having to 
-        /// instantiate the action0 type. This is used by the \a applier in 
+        /// instantiate the base_action0 type. This is used by the \a applier in 
         /// case no continuation has been supplied.
         static boost::function<threads::thread_function_type> 
         construct_thread_function(applier::applier& appl, 
@@ -439,7 +508,7 @@ namespace hpx { namespace actions
 
         /// \brief This static \a construct_thread_function allows to construct 
         /// a proper thread function for a \a thread without having to 
-        /// instantiate the action0 type. This is used by the \a applier in 
+        /// instantiate the base_action0 type. This is used by the \a applier in 
         /// case a continuation has been supplied
         static boost::function<threads::thread_function_type> 
         construct_thread_function(continuation_type& cont,
@@ -477,16 +546,51 @@ namespace hpx { namespace actions
         }
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Component, int Action, 
+        threads::thread_state(Component::*F)(
+            threads::thread_self&, applier::applier&)
+    >
+    class action0 : public base_action0<Component, Action, F>
+    {
+    private:
+        typedef base_action0<Component, Action, F> base_type;
+
+    public:
+        action0()
+        {}
+
+    private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name(*this);
+        }
+
+    private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, int Action, 
         threads::thread_state(Component::*F)(
             threads::thread_self&, applier::applier&),
         void (Component::*DirectF)(applier::applier&)
     >
-    class direct_action0 : public action0<Component, Action, F>
+    class direct_action0 : public base_action0<Component, Action, F>
     {
     private:
-        typedef action0<Component, Action, F> base_type;
+        typedef base_action0<Component, Action, F> base_type;
 
     public:
         direct_action0()
@@ -500,6 +604,14 @@ namespace hpx { namespace actions
             applier::applier& appl, naming::address::address_type lva)
         {
             (get_lva<Component>::call(lva)->*DirectF)(appl);
+        }
+
+    private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name(*this);
         }
 
     private:
@@ -520,7 +632,7 @@ namespace hpx { namespace actions
         threads::thread_state(Component::*F)(
             threads::thread_self&, applier::applier&, Result*, T0) 
     >
-    class result_action1
+    class base_result_action1
       : public action<Component, Action, 
             boost::fusion::vector<typename detail::remove_qualifiers<T0>::type> >
     {
@@ -531,12 +643,12 @@ namespace hpx { namespace actions
         base_type;
 
     public:
-        result_action1() 
+        base_result_action1() 
         {}
 
         // construct an action from its arguments
         template <typename Arg0>
-        result_action1(Arg0 const& arg0) 
+        base_result_action1(Arg0 const& arg0) 
           : base_type(arg0) 
         {}
 
@@ -572,7 +684,7 @@ namespace hpx { namespace actions
             threads::thread_state (*f)(threads::thread_self&, 
                     applier::applier&, continuation_type, 
                     boost::tuple<Func>) =
-                &result_action1::continuation_thread_function;
+                &base_result_action1::continuation_thread_function;
 
             // The following bind constructs the wrapped thread function
             //   f:  is the wrapping thread function
@@ -593,7 +705,7 @@ namespace hpx { namespace actions
 
         /// \brief This static \a construct_thread_function allows to construct 
         /// a proper thread function for a \a thread without having to 
-        /// instantiate the \a result_action1 type. This is used by the \a 
+        /// instantiate the \a base_result_action1 type. This is used by the \a 
         /// applier in case no continuation has been supplied.
         template <typename Arg0>
         static boost::function<threads::thread_function_type> 
@@ -606,7 +718,7 @@ namespace hpx { namespace actions
 
         /// \brief This static \a construct_thread_function allows to construct 
         /// a proper thread function for a \a thread without having to 
-        /// instantiate the \a result_action1 type. This is used by the \a 
+        /// instantiate the \a base_result_action1 type. This is used by the \a 
         /// applier in case a continuation has been supplied
         template <typename Arg0>
         static boost::function<threads::thread_function_type> 
@@ -654,15 +766,57 @@ namespace hpx { namespace actions
     template <
         typename Component, typename Result, int Action, typename T0, 
         threads::thread_state(Component::*F)(
+            threads::thread_self&, applier::applier&, Result*, T0)
+    >
+    class result_action1 
+      : public base_result_action1<Component, Result, Action, T0, F>
+    {
+    private:
+        typedef 
+            base_result_action1<Component, Result, Action, T0, F> 
+        base_type;
+
+    public:
+        result_action1()
+        {}
+
+        template <typename Arg0>
+        result_action1(Arg0 const& arg0)
+          : base_type(arg0)
+        {}
+
+    private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name(*this);
+        }
+
+    private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Component, typename Result, int Action, typename T0, 
+        threads::thread_state(Component::*F)(
             threads::thread_self&, applier::applier&, Result*, T0),
         Result (Component::*DirectF)(applier::applier&, T0)
     >
     class direct_result_action1 
-      : public result_action1<Component, Result, Action, T0, F>
+      : public base_result_action1<Component, Result, Action, T0, F>
     {
     private:
         typedef 
-            result_action1<Component, Result, Action, T0, F> 
+            base_result_action1<Component, Result, Action, T0, F> 
         base_type;
 
     public:
@@ -687,6 +841,14 @@ namespace hpx { namespace actions
         }
 
     private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name(*this);
+        }
+
+    private:
         // serialization support
         friend class boost::serialization::access;
 
@@ -703,7 +865,7 @@ namespace hpx { namespace actions
         threads::thread_state(Component::*F)(
             threads::thread_self&, applier::applier&, T0)
     >
-    class action1 
+    class base_action1 
       : public action<Component, Action, 
             boost::fusion::vector<typename detail::remove_qualifiers<T0>::type> >
     {
@@ -714,12 +876,12 @@ namespace hpx { namespace actions
         base_type;
 
     public:
-        action1() 
+        base_action1() 
         {}
 
         // construct an action from its arguments
         template <typename Arg0>
-        action1(Arg0 const& arg0) 
+        base_action1(Arg0 const& arg0) 
           : base_type(arg0) 
         {}
 
@@ -729,7 +891,7 @@ namespace hpx { namespace actions
 
         /// \brief This static \a construct_thread_function allows to construct 
         /// a proper thread function for a \a thread without having to 
-        /// instantiate the \a action1 type. This is used by the \a applier in 
+        /// instantiate the \a base_action1 type. This is used by the \a applier in 
         /// case no continuation has been supplied.
         template <typename Arg0>
         static boost::function<threads::thread_function_type> 
@@ -742,7 +904,7 @@ namespace hpx { namespace actions
 
         /// \brief This static \a construct_thread_function allows to construct 
         /// a proper thread function for a \a thread without having to 
-        /// instantiate the \a action1 type. This is used by the \a applier in 
+        /// instantiate the \a base_action1 type. This is used by the \a applier in 
         /// case a continuation has been supplied
         template <typename Arg0>
         static boost::function<threads::thread_function_type> 
@@ -788,13 +950,53 @@ namespace hpx { namespace actions
     template <
         typename Component, int Action, typename T0, 
         threads::thread_state(Component::*F)(
+            threads::thread_self&, applier::applier&, T0)
+    >
+    class action1 : public base_action1<Component, Action, T0, F>
+    {
+    private:
+        typedef base_action1<Component, Action, T0, F> base_type;
+
+    public:
+        action1()
+        {}
+
+        // construct an action from its arguments
+        template <typename Arg0>
+        action1(Arg0 const& arg0) 
+          : base_type(arg0) 
+        {}
+
+    private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name(*this);
+        }
+
+    private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Component, int Action, typename T0, 
+        threads::thread_state(Component::*F)(
             threads::thread_self&, applier::applier&, T0),
         void (Component::*DirectF)(applier::applier&, T0)
     >
-    class direct_action1 : public action1<Component, Action, T0, F>
+    class direct_action1 : public base_action1<Component, Action, T0, F>
     {
     private:
-        typedef action1<Component, Action, T0, F> base_type;
+        typedef base_action1<Component, Action, T0, F> base_type;
 
     public:
         direct_action1()
@@ -816,6 +1018,14 @@ namespace hpx { namespace actions
             Arg0 const& arg0)
         {
             (get_lva<Component>::call(lva)->*DirectF)(appl, arg0);
+        }
+
+    private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name(*this);
         }
 
     private:

@@ -26,6 +26,7 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/container_device.hpp>
+#include <hpx/util/util.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset 
@@ -45,10 +46,11 @@ namespace hpx { namespace parcelset
           : socket_(io_service), there_(l), connection_cache_(cache)
         {
         }
-        
+
         void set_parcel (parcel const& p)
         {
-            {
+            // guard against serialization errors
+            try {
                 // create a special io stream on top of out_buffer_
                 out_buffer_.clear();
                 boost::iostreams::stream<io_device_type> io(out_buffer_);
@@ -56,6 +58,13 @@ namespace hpx { namespace parcelset
                 // Serialize the data
                 util::portable_binary_oarchive archive(io);
                 archive << p;
+            }
+            catch (std::exception const& e) {
+                HPX_OSSTREAM strm;
+                strm << "parcelport: parcel serialization failed: " << e.what();
+                boost::throw_exception(
+                    hpx::exception(no_success, HPX_OSSTREAM_GETSTRING(strm)));
+                return;
             }
             out_size_ = out_buffer_.size();
         }
@@ -79,7 +88,7 @@ namespace hpx { namespace parcelset
             void (parcelport_connection::*f)(boost::system::error_code const&, std::size_t,
                     boost::tuple<Handler>)
                 = &parcelport_connection::handle_write<Handler>;
-                
+
             boost::asio::async_write(socket_, buffers,
                 boost::bind(f, shared_from_this(), 
                     boost::asio::placeholders::error, _2, 
@@ -92,9 +101,17 @@ namespace hpx { namespace parcelset
         void handle_write(boost::system::error_code const& e, std::size_t bytes,
             boost::tuple<Handler> handler)
         {
+            if (e) {
+                LPT_(error) << "parcelhandler: put parcel failed: " 
+                            << e.message();
+            }
+            else {
+                LPT_(info) << "parcelhandler: put parcel succeeded";
+            }
+
             // just call initial handler
             boost::get<0>(handler)(e, bytes);
-            
+
             // now we can give this connection back to the cache
             out_buffer_.clear();
             out_size_ = 0;
@@ -111,7 +128,7 @@ namespace hpx { namespace parcelset
 
         /// the other (receiving) end of this connection
         naming::locality there_;
-        
+
         /// The connection cache for sending connections
         connection_cache& connection_cache_;
     };

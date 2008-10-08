@@ -10,6 +10,7 @@
 #include <hpx/runtime/components/server/manage_component.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
+
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
@@ -19,8 +20,12 @@
 #include "distributing_factory.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+// make sure all needed action::get_action_name() functions get defined
+HPX_DEFINE_ACTION_NAME(hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_result_action);
+
+///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the accumulator actions
-HPX_SERIALIZE_ACTION(hpx::components::server::detail::distributing_factory::create_action);
+HPX_REGISTER_ACTION(hpx::components::server::detail::distributing_factory::create_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server { namespace detail

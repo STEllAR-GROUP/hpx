@@ -7,6 +7,7 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/runtime/actions/continuation_impl.hpp>
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
@@ -20,11 +21,16 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::server::accumulator, "accumulator");
 
 ///////////////////////////////////////////////////////////////////////////////
+// make sure all needed action::get_action_name() functions get defined
+HPX_DEFINE_ACTION_NAME(hpx::lcos::base_lco_with_value<double>::set_result_action);
+HPX_DEFINE_ACTION_NAME(hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_result_action);
+
+///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the accumulator actions
-HPX_SERIALIZE_ACTION(hpx::components::server::detail::accumulator::init_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::detail::accumulator::add_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::detail::accumulator::query_action);
-HPX_SERIALIZE_ACTION(hpx::components::server::detail::accumulator::print_action);
+HPX_REGISTER_ACTION(hpx::components::server::detail::accumulator::init_action);
+HPX_REGISTER_ACTION(hpx::components::server::detail::accumulator::add_action);
+HPX_REGISTER_ACTION(hpx::components::server::detail::accumulator::query_action);
+HPX_REGISTER_ACTION(hpx::components::server::detail::accumulator::print_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server { namespace detail

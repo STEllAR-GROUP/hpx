@@ -70,6 +70,23 @@ namespace hpx { namespace parcelset
 
     template HPX_EXPORT void 
     parcel::load(util::portable_binary_iarchive&, const unsigned int version);
-    
+
+    ///////////////////////////////////////////////////////////////////////////
+    std::ostream& operator<< (std::ostream& os, parcel const& p)
+    {
+        os << "parcelid" << p.tag_;
+        os << ", destination: gid" << p.destination_id_;
+        os << ", address" << p.destination_addr_;
+//         os << source_id_;
+        os << ", action(" << p.action_->get_action_name() << ")";
+//         bool has_continuations = continuation_ && !continuation_->empty();
+//         os << has_continuations;
+//         if (has_continuations)
+//             os << continuation_;
+//         os << start_time_;
+//         os << creation_time_;
+        return os;
+    }
+
 ///////////////////////////////////////////////////////////////////////////////
 }}

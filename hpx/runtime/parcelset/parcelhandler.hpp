@@ -20,6 +20,7 @@
 #include <hpx/runtime/parcelset/server/parcelhandler_queue.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/logging.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -33,8 +34,9 @@ namespace hpx { namespace parcelset
     class HPX_EXPORT parcelhandler : boost::noncopyable
     {
     private:
-        static void default_write_handler(boost::system::error_code const&, 
-            std::size_t) {}
+        static void default_write_handler(boost::system::error_code const& e, 
+            std::size_t) 
+        {}
 
         threads::thread_state decode(threads::thread_self&, 
             boost::shared_ptr<std::vector<char> > const&);
@@ -210,7 +212,10 @@ namespace hpx { namespace parcelset
                 // properly initialize parcel
                 init_parcel(p);
             }
-            
+
+            // write this parcel to the log
+            LPT_(info) << "parcelhandler: put_parcel: " << p;
+
             // send the parcel to its destination, return parcel id of the 
             // parcel being sent
             return pp_.put_parcel(p, f);
@@ -279,7 +284,7 @@ namespace hpx { namespace parcelset
         {
             return parcels_.get_parcel(c, p);
         }
-        
+
         /// This get_parcel() overload returns the parcel with the given parcel 
         /// tag (id).
         ///
@@ -303,7 +308,7 @@ namespace hpx { namespace parcelset
         {
             return parcels_.get_parcel(tag, p);
         }
-        
+
         /// This get_parcel() overload returns the parcel being sent from the 
         /// locality with the given source id.
         ///
@@ -327,7 +332,7 @@ namespace hpx { namespace parcelset
         {
             return parcels_.get_parcel_from(source, p);
         }
-        
+
         /// This get_parcel() overload returns the parcel being to the given
         /// destination address.
         ///
@@ -351,7 +356,7 @@ namespace hpx { namespace parcelset
         {
             return parcels_.get_parcel_for(dest, p);
         }
-        
+
         /// Register an event handler to be called whenever a parcel has been 
         /// received
         ///
@@ -408,7 +413,7 @@ namespace hpx { namespace parcelset
         /// event handlers. Instances of this type may be passed as the second 
         /// parameter to the \a register_event_handler() function
         typedef boost::signals::scoped_connection scoped_connection_type;
-        
+
         double get_current_time() const
         {
             return startup_time_ + timer_.elapsed();

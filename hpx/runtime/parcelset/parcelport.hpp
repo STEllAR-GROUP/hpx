@@ -21,6 +21,7 @@
 #include <hpx/runtime/parcelset/connection_cache.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/util.hpp>
+#include <hpx/util/logging.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -33,12 +34,9 @@ namespace hpx { namespace parcelset
     class HPX_EXPORT parcelport : boost::noncopyable
     {
     private:
-        static void default_write_handler(boost::system::error_code const&, 
-            std::size_t) {}
-        
         // avoid warnings about using \a this in member initializer list
         parcelport& This() { return *this; }
-        
+
     public:
         /// Construct the parcelport server to listen to the endpoint given by 
         /// the locality and serve up requests to the parcelport.
@@ -56,7 +54,7 @@ namespace hpx { namespace parcelset
         ///                 not return before stop() has been called, otherwise
         ///                 the routine returns immediately.
         bool run (bool blocking = true);
-        
+
         /// Stop the io_service's loop and wait for all threads to join
         ///
         /// \param blocking [in] If blocking is set to \a false the routine will 
@@ -90,7 +88,7 @@ namespace hpx { namespace parcelset
         {
             // send the parcel to its destination
             send_parcel(p, p.get_destination_addr(), f);
-            
+
             // return parcel id of the parcel being sent
             return p.get_parcel_id();
         }
@@ -151,7 +149,7 @@ namespace hpx { namespace parcelset
         {
             return here_;
         }
-        
+
     protected:
         // helper functions for receiving parcels
         void handle_accept(boost::system::error_code const& e,
@@ -164,8 +162,11 @@ namespace hpx { namespace parcelset
         {
             parcelport_connection_ptr client_connection(
                 connection_cache_.get(addr.locality_));
-                
+
             if (!client_connection) {
+                LPT_(info) << "parcelport: creating new connection to: " 
+                           << addr.locality_;
+
             // The parcel gets serialized inside the connection constructor, no 
             // need to keep the original parcel alive after this call returned.
                 client_connection.reset(new parcelport_connection(
@@ -197,16 +198,19 @@ namespace hpx { namespace parcelset
                         hpx::exception(network_error, HPX_OSSTREAM_GETSTRING(strm)));
                 }
 
-            // Start an asynchronous write operation.                 
+            // Start an asynchronous write operation.
                 client_connection->async_write(f);
             }
             else {
+                LPT_(info) << "parcelport: reusing existing connection to: " 
+                           << addr.locality_;
+
             // reuse an existing connection
                 client_connection->set_parcel(p);
                 client_connection->async_write(f);
             }
         }
-        
+
     private:
         /// The pool of io_service objects used to perform asynchronous operations.
         util::io_service_pool& io_service_pool_;
@@ -219,7 +223,7 @@ namespace hpx { namespace parcelset
 
         /// The connection cache for sending connections
         connection_cache connection_cache_;
-        
+
         /// The local locality
         naming::locality here_;
     };

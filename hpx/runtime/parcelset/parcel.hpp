@@ -51,20 +51,20 @@ namespace hpx { namespace parcelset
         {
         }
 
-        parcel(naming::id_type apply_to, actions::action_base* act)
+        parcel(naming::id_type apply_to, actions::base_action* act)
           : tag_(0), destination_id_(apply_to), source_id_(0), action_(act), 
             continuation_(), start_time_(0), creation_time_(0)
         {
         }
 
-        parcel(naming::id_type apply_to, actions::action_base* act, 
+        parcel(naming::id_type apply_to, actions::base_action* act, 
                actions::continuation* do_after) 
           : tag_(0), destination_id_(apply_to), source_id_(0), action_(act), 
             continuation_(do_after), start_time_(0), creation_time_(0)
         {
         }
 
-        parcel(naming::id_type apply_to, actions::action_base* act, 
+        parcel(naming::id_type apply_to, actions::base_action* act, 
                actions::continuation_type do_after) 
           : tag_(0), destination_id_(apply_to), source_id_(0), action_(act), 
             continuation_(do_after), start_time_(0), creation_time_(0)
@@ -144,6 +144,8 @@ namespace hpx { namespace parcelset
         }
 
     private:
+        friend std::ostream& operator<< (std::ostream& os, parcel const& req);
+
         // serialization support
         friend class boost::serialization::access;
 

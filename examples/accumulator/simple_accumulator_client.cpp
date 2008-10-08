@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include <hpx/hpx.hpp>
+#include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/components/simple_accumulator/simple_accumulator.hpp>
 
 #include <boost/lexical_cast.hpp>

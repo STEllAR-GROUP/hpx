@@ -33,7 +33,8 @@ namespace hpx { namespace util
             }
         }
     }
-    
+
+    ///////////////////////////////////////////////////////////////////////////
     // this is required in order to use the logging library
     BOOST_DEFINE_LOG_FILTER(dgas_level, filter_type) 
     BOOST_DEFINE_LOG(dgas_logger, logger_type) 
@@ -48,12 +49,12 @@ namespace hpx { namespace util
             char const* logdest = getenv("HPX_DGAS_LOGDESTINATION");
             if (NULL == logdest)
                 logdest = "file(dgas.log)";
-                
+
             char const* logformat = getenv("HPX_DGAS_LOGFORMAT");
             if (NULL == logformat)
-                logformat = "%time%($hh:$mm.$ss.$mili) [DGAS][%idx%] |\n";
-                
-            // formatting    : time [DGAS][idx] message \n
+                logformat = "%time%($hh:$mm.$ss.$mili) [%idx%][DGAS] |\n";
+
+            // formatting    : time [idx][DGAS] message \n
             // destinations  : file "dgas.log"
             dgas_logger()->writer().write(logformat, logdest);
             dgas_logger()->mark_as_initialized();
@@ -61,57 +62,43 @@ namespace hpx { namespace util
         }
     }
 
-    BOOST_DEFINE_LOG_FILTER(osh_level, filter_type) 
-    BOOST_DEFINE_LOG(osh_logger, logger_type) 
-
-    // initialize logging for one size heaps
-    void init_onesizeheap_logs() 
-    {
-        using namespace std;    // some systems have getenv in namespace std
-        char const* osh_level_env = getenv("HPX_OSH_LOGLEVEL");
-        if (NULL != osh_level_env) 
-        {
-            char const* logdest = getenv("HPX_OSH_LOGDESTINATION");
-            if (NULL == logdest)
-                logdest = "file(osh.log)";
-                
-            char const* logformat = getenv("HPX_OSH_LOGFORMAT");
-            if (NULL == logformat)
-                logformat = "%time%($hh:$mm.$ss.$mili) [OSH][%idx%] |\n";
-                
-            // formatting    : time [OSH][idx] message \n
-            // destinations  : file "osh.log"
-            osh_logger()->writer().write(logformat, logdest);
-            osh_logger()->mark_as_initialized();
-            osh_level()->set_enabled(detail::get_log_level(osh_level_env));
-        }
-    }
-
-    BOOST_DEFINE_LOG_FILTER(tm_level, filter_type) 
-    BOOST_DEFINE_LOG(tm_logger, logger_type) 
+    ///////////////////////////////////////////////////////////////////////////
+    BOOST_DEFINE_LOG_FILTER(hpx_level, filter_type) 
+    BOOST_DEFINE_LOG(hpx_logger, logger_type) 
 
     // initialize logging for threadmanager
-    void init_threadmanager_logs() 
+    void init_hpx_logs() 
     {
         using namespace std;    // some systems have getenv in namespace std
-        char const* tm_level_env = getenv("HPX_TM_LOGLEVEL");
-        if (NULL != tm_level_env) 
+        char const* hpx_level_env = getenv("HPX_LOGLEVEL");
+        if (NULL != hpx_level_env) 
         {
-            char const* logdest = getenv("HPX_TM_LOGDESTINATION");
+            char const* logdest = getenv("HPX_LOGDESTINATION");
             if (NULL == logdest)
-                logdest = "file(tm.log)";
-                
-            char const* logformat = getenv("HPX_TM_LOGFORMAT");
+                logdest = "file(hpx.log)";
+
+            char const* logformat = getenv("HPX_LOGFORMAT");
             if (NULL == logformat)
-                logformat = "%time%($hh:$mm.$ss.$mili) [TM][%idx%] |\n";
-                
-            // formatting    : time [TM][idx] message \n
-            // destinations  : file "tm.log"
-            tm_logger()->writer().write(logformat, logdest);
-            tm_logger()->mark_as_initialized();
-            tm_level()->set_enabled(detail::get_log_level(tm_level_env));
+                logformat = "%time%($hh:$mm.$ss.$mili) [%idx%]|\n";
+
+            // formatting    : time [idx][...] message \n
+            // destinations  : file "hpx.log"
+            hpx_logger()->writer().write(logformat, logdest);
+            hpx_logger()->mark_as_initialized();
+            hpx_level()->set_enabled(detail::get_log_level(hpx_level_env));
         }
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct init_logging
+    {
+        init_logging()
+        {
+            util::init_dgas_logs();
+            util::init_hpx_logs();
+        }
+    };
+    init_logging const init_logging_;
 
 ///////////////////////////////////////////////////////////////////////////////
 }}
