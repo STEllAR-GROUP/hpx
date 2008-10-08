@@ -12,8 +12,8 @@
 	/>
 	<Tool
 		Name="VCCustomBuildTool"
-		CommandLine="if not exist &quot;$(HPX_ROOT)\bin&quot; mkdir &quot;$(HPX_ROOT)\bin&quot;&#x0D;&#x0A;if not exist &quot;$(HPX_ROOT)\bin\bin&quot; mkdir &quot;$(HPX_ROOT)\bin\bin&quot;&#x0D;&#x0A;if not exist &quot;$(HPX_ROOT)\bin\libs&quot; mkdir &quot;$(HPX_ROOT)\bin\libs&quot;&#x0D;&#x0A;xcopy /Y/F &quot;$(TargetPath)&quot; &quot;$(HPX_ROOT)\bin\bin&quot;&#x0D;&#x0A;xcopy /Y/F &quot;$(TargetDir)\$(TargetName).pdb&quot; &quot;$(HPX_ROOT)\bin\bin&quot;&#x0D;&#x0A;xcopy /Y/F &quot;$(TargetDir)\$(TargetName).lib&quot; &quot;$(HPX_ROOT)\bin\libs&quot;&#x0D;&#x0A;"
-		Outputs="&quot;$(HPX_ROOT)\bin\bin\$(TargetFileName)&quot;"
+		CommandLine="if not exist &quot;$(HPX_ROOT)\bin&quot; mkdir &quot;$(HPX_ROOT)\bin&quot;&#x0D;&#x0A;if not exist &quot;$(HPX_ROOT)\bin\lib&quot; mkdir &quot;$(HPX_ROOT)\bin\lib&quot;&#x0D;&#x0A;if not exist &quot;$(HPX_ROOT)\bin\libs&quot; mkdir &quot;$(HPX_ROOT)\bin\libs&quot;&#x0D;&#x0A;xcopy /Y/F &quot;$(TargetPath)&quot; &quot;$(HPX_ROOT)\bin\lib&quot;&#x0D;&#x0A;xcopy /Y/F &quot;$(TargetDir)\$(TargetName).pdb&quot; &quot;$(HPX_ROOT)\bin\lib&quot;&#x0D;&#x0A;xcopy /Y/F &quot;$(TargetDir)\$(TargetName).lib&quot; &quot;$(HPX_ROOT)\bin\libs&quot;&#x0D;&#x0A;"
+		Outputs="&quot;$(HPX_ROOT)\bin\lib\$(TargetFileName)&quot;"
 	/>
 	<Tool
 		Name="VCLinkerTool"

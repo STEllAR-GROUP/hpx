@@ -46,9 +46,13 @@ namespace hpx { namespace components
     ///
     inline std::string const get_component_type_name(int type)
     {
+        std::string result;
         if (type >= component_invalid && type < component_last)
-            return components::detail::names[type+1];
-        return "component: " + boost::lexical_cast<std::string>(type);
+            result = components::detail::names[type+1];
+        else
+            result = "component";
+        result += ": " + type;
+        return result;
     }
 
     ///

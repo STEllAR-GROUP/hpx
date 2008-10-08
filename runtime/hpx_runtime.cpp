@@ -23,8 +23,8 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "the IP address the DGAS server is running on (default taken "
                 "from hpx.ini), expected format: 192.168.1.1:7912")
             ("hpx_address,h", po::value<std::string>(), 
-                "the IP address the DGAS server is running on (default taken "
-                "from hpx.ini), expected format: 192.168.1.1:7913")
+                "the IP address the HPX parcelport is listening on (default "
+                "is localhost:7910), expected format: 192.168.1.1:7913")
         ;
 
         po::store(po::command_line_parser(argc, argv)
@@ -92,8 +92,8 @@ int main(int argc, char* argv[])
             return -1;
 
         // Check command line arguments.
-        std::string hpx_host, dgas_host;
-        boost::uint16_t hpx_port = 0, dgas_port = 0;
+        std::string hpx_host("localhost"), dgas_host;
+        boost::uint16_t hpx_port = HPX_PORT, dgas_port = 0;
 
         // extract IP address/port arguments
         if (vm.count("dgas_address")) 

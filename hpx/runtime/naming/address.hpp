@@ -27,16 +27,16 @@ namespace hpx { namespace naming
     /// 
     struct HPX_EXPORT address : public util::safe_bool<address>
     {
-        typedef boost::uint64_t component_type;
+        typedef boost::int64_t component_type;
         typedef boost::uint64_t address_type;
 
         ///////////////////////////////////////////////////////////////////////
         address()
-          : type_(0), address_(0)
+          : type_(-1), address_(0)
         {}
 
         address(locality l)
-          : locality_(l), type_(0), address_(0) 
+          : locality_(l), type_(-1), address_(0) 
         {}
 
         address(locality l, component_type t, void* lva)
@@ -48,8 +48,11 @@ namespace hpx { namespace naming
           : locality_(l), type_(t), address_(a) 
         {}
 
-        // this get's called from the safe_bool base class 
-        bool operator_bool() const { return 0 != address_; }
+        // this gets called from the safe_bool base class 
+        bool operator_bool() const 
+        { 
+            return -1 != type_ || 0 != address_; 
+        }
 
         friend bool operator==(address const& lhs, address const& rhs)
         {
@@ -80,7 +83,6 @@ namespace hpx { namespace naming
                 throw exception(version_too_new, 
                     "trying to load address with unknown version");
             }
-
             ar >> locality_ >> type_ >> address_; 
         }
 
@@ -91,8 +93,7 @@ namespace hpx { namespace naming
     {
         os << addr.locality_ << ":" 
            << components::get_component_type_name((int)addr.type_) 
-              << "(" << std::dec << addr.type_ << "):" 
-           << "0x" << std::hex << addr.address_; 
+           << ": 0x" << std::hex << addr.address_; 
         return os;
     }
 

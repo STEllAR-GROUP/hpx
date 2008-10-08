@@ -35,7 +35,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // reverse the effect of the HPX_MANGLE_... macros in config.hpp
 #if !defined(BOOST_WINDOWS)
-    inline std::string unmangle_name(std::string name)
+    inline std::string unmangle_name(std::string const& name)
     {
         // remove the 'libhpx_component_' prefix
         std::string::size_type p = name.find(BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME_PREFIX));
@@ -44,7 +44,7 @@ namespace hpx { namespace util
         return name;
     }
 #elif defined(_DEBUG)
-    inline std::string unmangle_name(std::string name)
+    inline std::string unmangle_name(std::string const& name)
     {
         // remove the 'd' suffix 
         if (name[name.size()-1] == 'd')

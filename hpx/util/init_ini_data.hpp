@@ -148,6 +148,21 @@ namespace hpx { namespace util
             if (!fs::exists(libs_path)) 
                 return;     // give directory doesn't exist
 
+            // retrieve/create section [hpx.components]
+            if (!ini.has_section("hpx.components")) {
+                util::section* hpx_sec = ini.get_section("hpx");
+                BOOST_ASSERT(NULL != hpx_sec);
+
+                util::section comp_sec;
+                hpx_sec->add_section("components", comp_sec);
+            }
+
+            util::section* components_sec = ini.get_section("hpx.components");
+            BOOST_ASSERT(NULL != components_sec);
+
+            // generate component sections for all found shared libraries
+            // this will create too many sections, but the non-components will 
+            // be filtered out during loading
             for (fs::directory_iterator dir(libs_path); dir != nodir; ++dir)
             {
                 fs::path curr(*dir);
@@ -156,17 +171,6 @@ namespace hpx { namespace util
 
                 // instance name and module name are the same
                 std::string name (unmangle_name(fs::basename(curr)));
-
-                if (!ini.has_section("hpx.components")) {
-                    util::section* hpx_sec = ini.get_section("hpx");
-                    BOOST_ASSERT(NULL != hpx_sec);
-
-                    util::section comp_sec;
-                    hpx_sec->add_section("components", comp_sec);
-                }
-
-                util::section* components_sec = ini.get_section("hpx.components");
-                BOOST_ASSERT(NULL != components_sec);
 
                 util::section sec;
                 sec.add_entry("name", name);
