@@ -18,12 +18,12 @@ int main(int argc, char* argv[])
     hpx::util::io_service_pool timer_pool;
     hpx::threads::threadmanager my_tm(timer_pool);
 
-    my_tm.register_work(boost::bind (my_gcd, _1, 13, 14, 1));                      // GCD = 1
+    my_tm.register_work(boost::bind (my_gcd, _1, 13, 14, 1), "gcd");                      // GCD = 1
     hpx::threads::thread_id_type t_id = 
-        my_tm.register_work(boost::bind (my_gcd, _1, 7, 343, 7), suspended);       // GCD = 7
+        my_tm.register_work(boost::bind (my_gcd, _1, 7, 343, 7), "gcd", suspended);       // GCD = 7
     hpx::threads::thread_id_type t2_id = 
-        my_tm.register_work(boost::bind (my_gcd, _1, 120, 115, 5), suspended);     // GCD = 5
-    my_tm.register_work(boost::bind (my_gcd, _1, 9, 15, 3), pending);              // GCD = 3
+        my_tm.register_work(boost::bind (my_gcd, _1, 120, 115, 5), "gcd", suspended);     // GCD = 5
+    my_tm.register_work(boost::bind (my_gcd, _1, 9, 15, 3), "gcd", pending);              // GCD = 3
 
     BOOST_TEST(my_tm.get_state(t2_id) == suspended);
     my_tm.set_state(t2_id, pending);
