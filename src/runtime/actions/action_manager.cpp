@@ -37,14 +37,16 @@ namespace hpx { namespace actions
                 // no continuation is to be executed, register the plain action 
                 // and the local-virtual address with the TM only
                 register_work(applier_, 
-                    act->get_thread_function(applier_, lva));
+                    act->get_thread_function(applier_, lva),
+                    act->get_action_name());
             }
             else {
                 // this parcel carries a continuation, register a wrapper which
                 // first executes the original thread function as required by 
                 // the action and triggers the continuations afterwards
                 register_work(applier_, 
-                    act->get_thread_function(cont, applier_, lva));
+                    act->get_thread_function(cont, applier_, lva),
+                    act->get_action_name());
             }
         }
     }

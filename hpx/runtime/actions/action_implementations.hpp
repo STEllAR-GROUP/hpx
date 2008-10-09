@@ -209,12 +209,11 @@
           : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
         {}
 
-    private:
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
         char const* const get_action_name() const
         {
-            return detail::get_action_name(*this);
+            return detail::get_action_name<BOOST_PP_CAT(result_action, N)>();
         }
 
     private:
@@ -272,12 +271,11 @@
                 BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
-    private:
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
         char const* const get_action_name() const
         {
-            return detail::get_action_name(*this);
+            return detail::get_action_name<BOOST_PP_CAT(direct_result_action, N)>();
         }
 
     private:
@@ -412,12 +410,11 @@
           : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
         {}
 
-    private:
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
         char const* const get_action_name() const
         {
-            return detail::get_action_name(*this);
+            return detail::get_action_name<BOOST_PP_CAT(action, N)>();
         }
 
     private:
@@ -472,12 +469,11 @@
                 appl, BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
-    private:
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
         char const* const get_action_name() const
         {
-            return detail::get_action_name(*this);
+            return detail::get_action_name<BOOST_PP_CAT(direct_action, N)>();
         }
 
     private:

@@ -52,11 +52,13 @@ namespace hpx { namespace applier
         ///    appl_.apply<add_action>(gid, ...);
         /// \endcode
         template <typename Action>
-        bool apply (naming::address const& addr, naming::id_type const& gid)
+        bool apply (naming::address& addr, naming::id_type const& gid)
         {
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
             parcelset::parcel p (gid, new Action());
+            if (components::component_invalid == addr.type_)
+                addr.type_ = Action::component_type::get_component_type();
             p.set_destination_addr(addr);   // avoid to resolve address again
 
             // Send the parcel through the parcel handler
@@ -84,7 +86,7 @@ namespace hpx { namespace applier
         ///    appl_.apply<add_action>(cont, gid, ...);
         /// \endcode
         template <typename Action>
-        bool apply (naming::address const& addr, actions::continuation* c, 
+        bool apply (naming::address& addr, actions::continuation* c, 
             naming::id_type const& gid)
         {
             actions::continuation_type cont(c);
@@ -92,6 +94,8 @@ namespace hpx { namespace applier
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
             parcelset::parcel p (gid, new Action(), cont);
+            if (components::component_invalid == addr.type_)
+                addr.type_ = Action::component_type::get_component_type();
             p.set_destination_addr(addr);   // avoid to resolve address again
 
             // Send the parcel through the parcel handler
@@ -116,8 +120,8 @@ namespace hpx { namespace applier
         }
 
         template <typename Action>
-        bool apply_c (naming::address const& addr, 
-            naming::id_type const& targetgid, naming::id_type const& gid)
+        bool apply_c (naming::address& addr, naming::id_type const& targetgid, 
+            naming::id_type const& gid)
         {
             return apply<Action>(addr, new actions::continuation(targetgid), gid);
         }
@@ -133,12 +137,14 @@ namespace hpx { namespace applier
         ///////////////////////////////////////////////////////////////////////
         // one parameter version
         template <typename Action, typename Arg0>
-        bool apply (naming::address const& addr, naming::id_type const& gid, 
+        bool apply (naming::address& addr, naming::id_type const& gid, 
             Arg0 const& arg0)
         {
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
             parcelset::parcel p (gid, new Action(arg0));
+            if (components::component_invalid == addr.type_)
+                addr.type_ = Action::component_type::get_component_type();
             p.set_destination_addr(addr);   // avoid to resolve address again
 
             // Send the parcel through the parcel handler
@@ -162,7 +168,7 @@ namespace hpx { namespace applier
         }
 
         template <typename Action, typename Arg0>
-        bool apply (naming::address const& addr, actions::continuation* c, 
+        bool apply (naming::address& addr, actions::continuation* c, 
             naming::id_type const& gid, Arg0 const& arg0)
         {
             actions::continuation_type cont(c);
@@ -170,6 +176,8 @@ namespace hpx { namespace applier
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
             parcelset::parcel p (gid, new Action(arg0), cont);
+            if (components::component_invalid == addr.type_)
+                addr.type_ = Action::component_type::get_component_type();
             p.set_destination_addr(addr);   // avoid to resolve address again
 
             // Send the parcel through the parcel handler
@@ -195,7 +203,7 @@ namespace hpx { namespace applier
         }
 
         template <typename Action, typename Arg0>
-        bool apply_c (naming::address const& addr, 
+        bool apply_c (naming::address& addr, 
             naming::id_type const& targetgid, naming::id_type const& gid, 
             Arg0 const& arg0)
         {
@@ -334,11 +342,12 @@ namespace hpx { namespace applier
     ///
     HPX_API_EXPORT threads::thread_id_type register_work(applier& appl,
         boost::function<threads::thread_function_type> func,
+        char const* description = "", 
         threads::thread_state initial_state = threads::pending, 
         bool run_now = true);
 
     HPX_API_EXPORT threads::thread_id_type register_work(applier& appl,
-        full_thread_function_type* func, 
+        full_thread_function_type* func, char const* description = "", 
         threads::thread_state initial_state = threads::pending, 
         bool run_now = true);
 

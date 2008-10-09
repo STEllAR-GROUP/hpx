@@ -103,7 +103,8 @@ namespace hpx { namespace parcelset
         else {
             // create a new thread which decodes and handles the parcel
             tm_->register_work(
-                boost::bind(&parcelhandler::decode, this, _1, parcel_data));
+                boost::bind(&parcelhandler::decode, this, _1, parcel_data),
+                "decode_parcel");
         }
     }
 

@@ -32,11 +32,11 @@ namespace hpx { namespace naming
 
         ///////////////////////////////////////////////////////////////////////
         address()
-          : type_(-1), address_(0)
+          : type_(components::component_invalid), address_(0)
         {}
 
         address(locality l)
-          : locality_(l), type_(-1), address_(0) 
+          : locality_(l), type_(components::component_invalid), address_(0) 
         {}
 
         address(locality l, component_type t, void* lva)
@@ -51,7 +51,7 @@ namespace hpx { namespace naming
         // this gets called from the safe_bool base class 
         bool operator_bool() const 
         { 
-            return -1 != type_ || 0 != address_; 
+            return components::component_invalid != type_ || 0 != address_; 
         }
 
         friend bool operator==(address const& lhs, address const& rhs)
@@ -93,7 +93,7 @@ namespace hpx { namespace naming
     {
         os << "(" << addr.locality_ << ":" 
            << components::get_component_type_name((int)addr.type_) 
-           << ": 0x" << std::hex << addr.address_ << ")"; 
+           << ":0x" << std::hex << addr.address_ << ")"; 
         return os;
     }
 

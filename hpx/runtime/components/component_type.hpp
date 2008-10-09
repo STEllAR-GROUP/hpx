@@ -51,7 +51,7 @@ namespace hpx { namespace components
             result = components::detail::names[type+1];
         else
             result = "component";
-        result += ": " + boost::lexical_cast<std::string>(type);
+        result += "[" + boost::lexical_cast<std::string>(type) + "]";
         return result;
     }
 

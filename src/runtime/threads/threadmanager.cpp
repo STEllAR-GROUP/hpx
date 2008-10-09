@@ -59,22 +59,31 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     thread_id_type threadmanager::register_work(
         boost::function<thread_function_type> threadfunc, 
-        thread_state initial_state, bool run_now)
+        char const* const description, thread_state initial_state, bool run_now)
     {
-        LTM_(info) << "register_work: initial_state(" 
-                   << get_thread_state_name(initial_state) << "), "
-                   << std::boolalpha << "run_now(" << run_now << ")";
-
         // verify parameters
         if (initial_state != pending && initial_state != suspended)
         {
-            boost::throw_exception(hpx::exception(hpx::bad_parameter));
+            boost::throw_exception(hpx::exception(hpx::bad_parameter,
+                std::string("invalid initial state: ") + 
+                    get_thread_state_name(initial_state)));
+            return invalid_thread_id;
+        }
+        if (0 == description)
+        {
+            boost::throw_exception(hpx::exception(hpx::bad_parameter,
+                "description is NULL"));
             return invalid_thread_id;
         }
 
+        LTM_(info) << "register_work: initial_state(" 
+                   << get_thread_state_name(initial_state) << "), "
+                   << std::boolalpha << "run_now(" << run_now << "), "
+                   << "description(" << description << ")";
+
         // create the new thread
         boost::shared_ptr<thread> thrd (
-            new thread(threadfunc, *this, initial_state));
+            new thread(threadfunc, *this, initial_state, description));
 
         // lock data members while adding work
         mutex_type::scoped_lock lk(mtx_);
@@ -116,7 +125,9 @@ namespace hpx { namespace threads
     {
         // set_state can't be used to force a thread into active state
         if (new_state == active) {
-            boost::throw_exception(hpx::exception(hpx::bad_parameter));
+            boost::throw_exception(hpx::exception(hpx::bad_parameter,
+                std::string("invalid new state: ") + 
+                    get_thread_state_name(new_state)));
             return unknown;
         }
 
@@ -142,11 +153,18 @@ namespace hpx { namespace threads
                 if (NULL == self) 
                     return unknown;
 
+                LTM_(info) << "set_state: " << "thread(" << id << "), "
+                           << "is currently active, yielding control...";
+
                 do {
                     active_set_state_.enqueue(self->get_thread_id());
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(lk);
                     self->yield(suspended);
                 } while ((previous_state = thrd->get_state()) == active);
+
+                LTM_(info) << "set_state: " << "thread(" << id << "), "
+                           << "reactivating..." << "current state(" 
+                           << get_thread_state_name(previous_state) << ")";
             }
 
             // If the thread has been terminated while this set_state was 
@@ -160,6 +178,10 @@ namespace hpx { namespace threads
             // through the queue we defer this to the thread function, which 
             // at some point will ignore this thread by simply skipping it 
             // (if it's not pending anymore). 
+
+            LTM_(info) << "set_state: " << "thread(" << id << "), "
+                       << "description(" << thrd->get_description() << "), "
+                       << "new state(" << get_thread_state_name(new_state) << ")";
 
             // So all what we do here is to set the new state.
             thrd->set_state(new_state);
@@ -214,7 +236,7 @@ namespace hpx { namespace threads
         // allowing the deadline_timer to go out of scope gracefully
         thread_id_type wake_id = register_work(boost::bind(
             &threadmanager::wake_timer_thread, this, _1, id, newstate,
-            self.get_thread_id()), suspended);
+            self.get_thread_id()), "", suspended);
 
         // let the timer invoke the set_state on the new (suspended) thread
         t.async_wait(boost::bind(
@@ -438,7 +460,8 @@ namespace hpx { namespace threads
                 thread_state state = thrd->get_state();
 
                 LTM_(debug) << "tfunc(" << num_thread << "): "
-                           << "thread(" << thrd->get_thread_id() << "), "
+                           << "thread(" << thrd->get_thread_id() << "), " 
+                           << "description(" << thrd->get_description() << "), "
                            << "old state(" << get_thread_state_name(state) << ")";
 
                 if (pending == state) {
@@ -457,6 +480,7 @@ namespace hpx { namespace threads
 
                 LTM_(debug) << "tfunc(" << num_thread << "): "
                            << "thread(" << thrd->get_thread_id() << "), "
+                           << "description(" << thrd->get_description() << "), "
                            << "new state(" << get_thread_state_name(state) << ")";
 
                 // Re-add this work item to our list of work items if the PX
@@ -494,8 +518,7 @@ namespace hpx { namespace threads
                 // no obvious work has to be done, so a lock won't hurt too much
                 mutex_type::scoped_lock lk(mtx_);
 
-                LTM_(info) << "tfunc(" << num_thread << "): "
-                           << "queues empty";
+                LTM_(info) << "tfunc(" << num_thread << "): queues empty";
 
                 // stop running after all PX threads have been terminated
                 if (!running_) {
@@ -506,8 +529,8 @@ namespace hpx { namespace threads
                         break;                // terminate scheduling loop
                     }
 
-                    LTM_(info) << "tfunc(" << num_thread << "): "
-                               << "threadmap not empty";
+                    LTM_(info) << "tfunc(" << num_thread 
+                               << "): threadmap not empty";
                 }
 
                 // Wait until somebody needs some action (if no new work 
@@ -516,8 +539,8 @@ namespace hpx { namespace threads
                 // need to lock anyways...), this way no notify_all() gets lost
                 if (work_items_.empty() && active_set_state_.empty())
                 {
-                    LTM_(info) << "tfunc(" << num_thread << "): "
-                               << "queues empty, entering wait";
+                    LTM_(info) << "tfunc(" << num_thread 
+                               << "): queues empty, entering wait";
                     cond_.wait(lk);
                     LTM_(info) << "tfunc(" << num_thread << "): exiting wait";
                 }
@@ -534,11 +557,11 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     bool threadmanager::run(std::size_t num_threads) 
     {
-        LTM_(info) << "run: creating " << num_threads << " threads";
+        LTM_(info) << "run: creating " << num_threads << " OS thread(s)";
 
         if (0 == num_threads) {
             boost::throw_exception(hpx::exception(
-                bad_parameter, "Number of threads shouldn't be zero"));
+                bad_parameter, "number of threads is zero"));
         }
 
         mutex_type::scoped_lock lk(mtx_);

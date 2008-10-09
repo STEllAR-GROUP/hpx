@@ -37,7 +37,7 @@
 #define HPX_DEFINE_ACTION_NAME(action)                                        \
         namespace hpx { namespace actions { namespace detail {                \
             template<> HPX_ALWAYS_EXPORT                                      \
-            char const* const get_action_name(action const&)                  \
+            char const* const get_action_name<action>()                       \
             { return BOOST_PP_STRINGIZE(action); }                            \
         }}}                                                                   \
     /**/
@@ -64,7 +64,7 @@ namespace hpx { namespace actions
         };
 
         template <typename Action>
-        HPX_ALWAYS_EXPORT char const* const get_action_name(Action const&);
+        HPX_ALWAYS_EXPORT char const* const get_action_name();
 
     }
 
@@ -136,6 +136,7 @@ namespace hpx { namespace actions
     class action : public base_action
     {
     public:
+        typedef Component component_type;
         typedef Arguments arguments_type;
 
         // This is the action code (id) of this action. It is exposed to allow 
@@ -408,12 +409,11 @@ namespace hpx { namespace actions
         result_action0()
         {}
 
-    private:
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
         char const* const get_action_name() const
         {
-            return detail::get_action_name(*this);
+            return detail::get_action_name<result_action0>();
         }
 
     private:
@@ -454,12 +454,11 @@ namespace hpx { namespace actions
             return (get_lva<Component>::call(lva)->*DirectF)(appl);
         }
 
-    private:
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
         char const* const get_action_name() const
         {
-            return detail::get_action_name(*this);
+            return detail::get_action_name<direct_result_action0>();
         }
 
     private:
@@ -561,12 +560,11 @@ namespace hpx { namespace actions
         action0()
         {}
 
-    private:
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
         char const* const get_action_name() const
         {
-            return detail::get_action_name(*this);
+            return detail::get_action_name<action0>();
         }
 
     private:
@@ -606,12 +604,11 @@ namespace hpx { namespace actions
             (get_lva<Component>::call(lva)->*DirectF)(appl);
         }
 
-    private:
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
         char const* const get_action_name() const
         {
-            return detail::get_action_name(*this);
+            return detail::get_action_name<direct_action0>();
         }
 
     private:
@@ -785,12 +782,11 @@ namespace hpx { namespace actions
           : base_type(arg0)
         {}
 
-    private:
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
         char const* const get_action_name() const
         {
-            return detail::get_action_name(*this);
+            return detail::get_action_name<result_action1>();
         }
 
     private:
@@ -840,12 +836,11 @@ namespace hpx { namespace actions
             return (get_lva<Component>::call(lva)->*DirectF)(appl, arg0);
         }
 
-    private:
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
         char const* const get_action_name() const
         {
-            return detail::get_action_name(*this);
+            return detail::get_action_name<direct_result_action1>();
         }
 
     private:
@@ -967,12 +962,11 @@ namespace hpx { namespace actions
           : base_type(arg0) 
         {}
 
-    private:
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
         char const* const get_action_name() const
         {
-            return detail::get_action_name(*this);
+            return detail::get_action_name<action1>();
         }
 
     private:
@@ -1020,12 +1014,11 @@ namespace hpx { namespace actions
             (get_lva<Component>::call(lva)->*DirectF)(appl, arg0);
         }
 
-    private:
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
         char const* const get_action_name() const
         {
-            return detail::get_action_name(*this);
+            return detail::get_action_name<direct_action1>();
         }
 
     private:

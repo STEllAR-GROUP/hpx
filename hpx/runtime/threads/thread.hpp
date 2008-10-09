@@ -39,8 +39,10 @@ namespace hpx { namespace threads { namespace detail
 
     public:
         thread(boost::function<thread_function_type> func, 
-                thread_id_type id, threadmanager& tm, thread_state newstate)
-          : coroutine_(func, id), tm_(tm), current_state_(newstate)
+                thread_id_type id, threadmanager& tm, thread_state newstate,
+                char const* const description)
+          : coroutine_(func, id), tm_(tm), current_state_(newstate),
+            description_(description)
         {}
 
         ~thread() 
@@ -77,6 +79,11 @@ namespace hpx { namespace threads { namespace detail
             return tm_;
         }
 
+        char const* const get_description() const
+        {
+            return description_;
+        }
+
     public:
         // action support
 
@@ -101,6 +108,7 @@ namespace hpx { namespace threads { namespace detail
         threadmanager& tm_;
         // the state is stored as a long to allow to use CAS
         long current_state_;
+        char const* const description_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -155,15 +163,18 @@ namespace hpx { namespace threads
         /// \param newstate [in] The initial thread state this instance will
         ///                 be initialized with.
         thread(boost::function<thread_function_type> threadfunc, 
-                threadmanager& tm, thread_state new_state = init)
-          : base_type(new detail::thread(threadfunc, This(), tm, new_state))
+                threadmanager& tm, thread_state new_state = init,
+                char const* const desc = "")
+          : base_type(new detail::thread(threadfunc, This(), tm, new_state, desc))
         {
-            LTM_(debug) << "thread::thread(" << this << ")";
+            LTM_(debug) << "thread::thread(" << this << "), description(" 
+                        << desc << ")";
         }
 
         ~thread() 
         {
-            LTM_(debug) << "~thread(" << this << ")";
+            LTM_(debug) << "~thread(" << this << "), description(" 
+                        << base()->get_description() << ")";
         }
 
         thread_id_type get_thread_id() const
@@ -221,6 +232,12 @@ namespace hpx { namespace threads
         thread_state operator()()
         {
             return base()->execute();
+        }
+
+        /// \brief Get the (optional) description of this thread
+        char const* const get_description() const
+        {
+            return base()->get_description();
         }
 
     protected:

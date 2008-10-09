@@ -27,14 +27,16 @@ namespace hpx { namespace applier { namespace detail
         call (Action* act, threads::threadmanager& tm, applier& appl, 
             naming::address::address_type lva)
         {
-            tm.register_work(act->get_thread_function(appl, lva));
+            tm.register_work(act->get_thread_function(appl, lva),
+              act->get_action_name());
         }
 
         static void 
         call (threads::threadmanager& tm, applier& appl, 
             naming::address::address_type lva)
         {
-            tm.register_work(Action::construct_thread_function(appl, lva));
+            tm.register_work(Action::construct_thread_function(appl, lva),
+                actions::detail::get_action_name<Action>());
         }
 
         static void 
@@ -42,7 +44,8 @@ namespace hpx { namespace applier { namespace detail
             threads::threadmanager& tm, applier& appl, 
             naming::address::address_type lva)
         {
-            tm.register_work(Action::construct_thread_function(c, appl, lva));
+            tm.register_work(Action::construct_thread_function(c, appl, lva),
+                actions::detail::get_action_name<Action>());
         }
     };
 
@@ -86,7 +89,8 @@ namespace hpx { namespace applier { namespace detail
         call (threads::threadmanager& tm, applier& appl, 
             naming::address::address_type addr, Arg0 const& arg0)
         {
-            tm.register_work(Action::construct_thread_function(appl, addr, arg0));
+            tm.register_work(Action::construct_thread_function(appl, addr, arg0),
+                actions::detail::get_action_name<Action>());
         }
 
         static void 
@@ -94,7 +98,8 @@ namespace hpx { namespace applier { namespace detail
             threads::threadmanager& tm, applier& appl, 
             naming::address::address_type addr, Arg0 const& arg0)
         {
-            tm.register_work(Action::construct_thread_function(c, appl, addr, arg0));
+            tm.register_work(Action::construct_thread_function(c, appl, addr, arg0),
+                actions::detail::get_action_name<Action>());
         }
     };
 

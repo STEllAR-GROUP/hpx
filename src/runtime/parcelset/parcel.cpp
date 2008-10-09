@@ -75,8 +75,8 @@ namespace hpx { namespace parcelset
     std::ostream& operator<< (std::ostream& os, parcel const& p)
     {
         os << "parcelid" << p.tag_;
-        os << ", destination: gid" << p.destination_id_;
-        os << ", address" << p.destination_addr_;
+        os << ", destination(gid" << p.destination_id_;
+        os << ", address" << p.destination_addr_ << ")";
 //         os << source_id_;
         os << ", action(" << p.action_->get_action_name() << ")";
 //         bool has_continuations = continuation_ && !continuation_->empty();

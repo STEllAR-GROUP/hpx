@@ -688,10 +688,6 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\hpx\runtime\actions\action_name.hpp"
-						>
-					</File>
-					<File
 						RelativePath="..\..\..\hpx\runtime\actions\continuation.hpp"
 						>
 					</File>

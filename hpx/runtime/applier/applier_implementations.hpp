@@ -30,12 +30,14 @@
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    bool apply (naming::address const& addr, naming::id_type const& gid, 
+    bool apply (naming::address& addr, naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         // If remote, create a new parcel to be sent to the destination
         // Create a new parcel with the gid, action, and arguments
         parcelset::parcel p (gid, new Action(BOOST_PP_ENUM_PARAMS(N, arg)));
+        if (components::component_invalid == addr.type_)
+            addr.type_ = Action::component_type::get_component_type();
         p.set_destination_addr(addr);   // avoid to resolve address again
 
         // Send the parcel through the parcel handler
@@ -64,7 +66,7 @@
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    bool apply (naming::address const& addr, actions::continuation* c, 
+    bool apply (naming::address& addr, actions::continuation* c, 
         naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
@@ -73,6 +75,8 @@
         // If remote, create a new parcel to be sent to the destination
         // Create a new parcel with the gid, action, and arguments
         parcelset::parcel p (gid, new Action(BOOST_PP_ENUM_PARAMS(N, arg)), cont);
+        if (components::component_invalid == addr.type_)
+            addr.type_ = Action::component_type::get_component_type();
         p.set_destination_addr(addr);   // avoid to resolve address again
 
         // Send the parcel through the parcel handler
@@ -101,7 +105,7 @@
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    bool apply_c (naming::address const& addr, naming::id_type const& targetgid, 
+    bool apply_c (naming::address& addr, naming::id_type const& targetgid, 
         naming::id_type const& gid,
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {

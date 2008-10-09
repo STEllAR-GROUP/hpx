@@ -47,7 +47,8 @@
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             tm.register_work(Action::construct_thread_function(
-                appl, lva, BOOST_PP_ENUM_PARAMS(N, arg)));
+                appl, lva, BOOST_PP_ENUM_PARAMS(N, arg)),
+                actions::detail::get_action_name<Action>());
         }
 
         static void 
@@ -57,7 +58,8 @@
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             tm.register_work(Action::construct_thread_function(
-                c, appl, lva, BOOST_PP_ENUM_PARAMS(N, arg)));
+                c, appl, lva, BOOST_PP_ENUM_PARAMS(N, arg)),
+                actions::detail::get_action_name<Action>());
         }
     };
 

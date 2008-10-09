@@ -81,6 +81,11 @@ namespace hpx { namespace threads
         /// \param func   [in] The function or function object to execute as 
         ///               the thread's function. This must have a signature as
         ///               defined by \a thread_function_type.
+        /// \param description [in] The value of this parameter allows to 
+        ///               specify a description of the thread to create. This 
+        ///               information is used for logging purposes mainly, but 
+        ///               might be useful for debugging as well. This parameter 
+        ///               is optional and defaults to an empty string.
         /// \param initial_state
         ///               [in] The value of this parameter defines the initial 
         ///               state of the newly created \a thread. This must be
@@ -101,6 +106,7 @@ namespace hpx { namespace threads
         ///               created thread. 
         thread_id_type 
         register_work(boost::function<thread_function_type> func,
+            char const* const description = "", 
             thread_state initial_state = pending, bool run_now = true);
 
         /// \brief  Run the thread manager's work queue. This function 

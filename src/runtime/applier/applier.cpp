@@ -48,17 +48,17 @@ namespace hpx { namespace applier
 
     threads::thread_id_type register_work(applier& appl,
         boost::function<threads::thread_function_type> func,
-        threads::thread_state state, bool run_now)
+        char const* desc, threads::thread_state state, bool run_now)
     {
-        return appl.get_thread_manager().register_work(func, state, run_now);
+        return appl.get_thread_manager().register_work(func, desc, state, run_now);
     }
 
     threads::thread_id_type register_work(applier& appl,
-        full_thread_function_type* func, threads::thread_state state, 
-        bool run_now)
+        full_thread_function_type* func, char const* desc, 
+        threads::thread_state state, bool run_now)
     {
         return appl.get_thread_manager().register_work(
-            boost::bind(func, _1, boost::ref(appl)), state, run_now);
+            boost::bind(func, _1, boost::ref(appl)), desc, state, run_now);
     }
 
 ///////////////////////////////////////////////////////////////////////////////
