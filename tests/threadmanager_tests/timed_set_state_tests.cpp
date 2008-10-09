@@ -31,11 +31,11 @@ threads::thread_state duration_set_state_test(
 
     threads::thread_id_type id1 = register_work(appl, 
         boost::bind(timed_set_state_test, _1, boost::ref(appl), timer, 1.0), 
-        threads::suspended);
+        "duration_set_state_test1", threads::suspended);
 
     threads::thread_id_type id2 = register_work(appl, 
         boost::bind(timed_set_state_test, _1, boost::ref(appl), timer, 2.0), 
-        threads::suspended);
+        "duration_set_state_test2", threads::suspended);
 
     set_thread_state(id1, threads::pending, boost::posix_time::seconds(1));
     set_thread_state(id2, threads::pending, boost::posix_time::seconds(2));
@@ -51,11 +51,11 @@ threads::thread_state time_set_state_test(
 
     threads::thread_id_type id1 = register_work(appl, 
         boost::bind(timed_set_state_test, _1, boost::ref(appl), timer, 1.0), 
-        threads::suspended);
+        "timed_set_state_test1", threads::suspended);
 
     threads::thread_id_type id2 = register_work(appl, 
         boost::bind(timed_set_state_test, _1, boost::ref(appl), timer, 2.0), 
-        threads::suspended);
+        "timed_set_state_test2", threads::suspended);
 
     boost::posix_time::ptime now (
         boost::posix_time::microsec_clock::universal_time());
@@ -71,10 +71,10 @@ threads::thread_state hpx_main(threads::thread_self& self,
     applier::applier& appl)
 {
     // test timed set_state using a time duration
-    register_work(appl, duration_set_state_test);
+    register_work(appl, duration_set_state_test, "duration_set_state_test_driver");
 
     // test timed set_state using a fixed time 
-    register_work(appl, time_set_state_test);
+    register_work(appl, time_set_state_test, "time_set_state_test_driver");
 
     // initiate shutdown of the runtime system
     components::stubs::runtime_support::shutdown_all(appl);
