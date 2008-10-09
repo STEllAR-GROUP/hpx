@@ -96,7 +96,7 @@ namespace hpx { namespace components { namespace server
             wrapped_type::set_component_type(t);
         }
 
-        distributing_factory()
+        distributing_factory(applier::applier&)
           : base_type(new wrapped_type())
         {}
 

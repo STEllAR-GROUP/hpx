@@ -159,7 +159,7 @@ namespace hpx { namespace components
             get_heap().free(p);
         }
 
-        /// \brief  The placement operator new have to be overloaded as well 
+        /// \brief  The placement operator new has to be overloaded as well 
         ///         (the global placement operators are hidden because of the 
         ///         new/delete overloads above).
         static void* operator new(std::size_t, void *p)
@@ -173,19 +173,21 @@ namespace hpx { namespace components
 
         /// \brief  The function \a create is used for allocation and 
         //          initialization of arrays of wrappers.
-        static managed_component_base* create(std::size_t count)
+        static managed_component_base* 
+        create(applier::applier& appl, std::size_t count)
         {
             // allocate the memory
             managed_component_base* p = get_heap().alloc(count);
             if (1 == count)
-                return new (p) derived_type;
+                return new (p) derived_type(appl);
 
             // call constructors
             std::size_t succeeded = 0;
             try {
                 derived_type* curr = static_cast<derived_type*>(p);
                 for (std::size_t i = 0; i < count; ++i, ++curr) {
-                    new (curr) derived_type;     // call placement new, might throw
+                    // call placement new, might throw
+                    new (curr) derived_type(appl);
                     ++succeeded;
                 }
             }
@@ -199,6 +201,7 @@ namespace hpx { namespace components
             }
             return p;
         }
+
         /// \brief  The function \a destroy is used for deletion and 
         //          de-allocation of arrays of wrappers
         static void destroy(derived_type* p, std::size_t count)

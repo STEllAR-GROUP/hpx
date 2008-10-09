@@ -28,7 +28,7 @@ namespace hpx { namespace applier { namespace detail
             naming::address::address_type lva)
         {
             tm.register_work(act->get_thread_function(appl, lva),
-              act->get_action_name());
+                actions::detail::get_action_name<Action>());
         }
 
         static void 

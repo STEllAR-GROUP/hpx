@@ -159,7 +159,7 @@ namespace hpx { namespace components { namespace server
             wrapped_type::set_component_type(t);
         }
 
-        accumulator()
+        accumulator(applier::applier&)
           : base_type(new wrapped_type())
         {}
 

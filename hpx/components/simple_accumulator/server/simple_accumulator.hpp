@@ -55,7 +55,7 @@ namespace hpx { namespace components { namespace server
         HPX_COMPONENT_EXPORT static void set_component_type(component_type);
 
         // constructor: initialize accumulator value
-        simple_accumulator()
+        simple_accumulator(applier::applier&)
           : arg_(0)
         {}
         

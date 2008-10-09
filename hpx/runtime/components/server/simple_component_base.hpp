@@ -59,11 +59,14 @@ namespace hpx { namespace components
             return gid_;
         }
 
-        static simple_component_base* create(std::size_t count)
+        /// \brief  The function \a create is used for allocation and 
+        //          initialization of components.
+        static simple_component_base* 
+        create(applier::applier& appl, std::size_t count)
         {
             // simple components can be created individually only
             BOOST_ASSERT(1 == count);
-            return new Component;
+            return new Component(appl);
         }
 
         static void destroy(Component* p, std::size_t count)

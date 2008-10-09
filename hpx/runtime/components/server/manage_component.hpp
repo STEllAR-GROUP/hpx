@@ -23,11 +23,11 @@ namespace hpx { namespace components { namespace server
     {
         if (0 == count) {
             boost::throw_exception(
-                hpx::exception(hpx::bad_parameter, "count shouldn#t be zero"));
+                hpx::exception(hpx::bad_parameter, "count shouldn't be zero"));
             return naming::invalid_id;
         }
 
-        Component* c = static_cast<Component*>(Component::create(count));
+        Component* c = static_cast<Component*>(Component::create(appl, count));
         naming::id_type gid = c->get_gid(appl);
         if (gid) 
             return gid;
@@ -47,7 +47,7 @@ namespace hpx { namespace components { namespace server
     {
         if (0 == count) {
             boost::throw_exception(
-                hpx::exception(hpx::bad_parameter, "count shouldn#t be zero"));
+                hpx::exception(hpx::bad_parameter, "count shouldn't be zero"));
             return;
         }
 
@@ -75,7 +75,7 @@ namespace hpx { namespace components { namespace server
             // FIXME: should the component be re-bound ?
             boost::throw_exception(
                 hpx::exception(hpx::unknown_component_address,
-                    std::string("global id is not bound to a component instance of type") +
+                    std::string("global id is not bound to a component instance of type: ") +
                     get_component_type_name(Component::get_component_type())));
         }
 
