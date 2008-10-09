@@ -47,7 +47,7 @@ namespace hpx { namespace components { namespace server
             // we don't know anything about this component
             boost::throw_exception(hpx::exception(hpx::bad_component_type,
                 std::string("attempt to create component instance of invalid type: ") + 
-                    boost::lexical_cast<std::string>((int)type)));
+                    components::get_component_type_name(type)));
             return threads::terminated;
         }
         naming::id_type id = (*it).second->create(appl, count);
@@ -72,7 +72,7 @@ namespace hpx { namespace components { namespace server
             // we don't know anything about this component
             boost::throw_exception(hpx::exception(hpx::bad_component_type,
                 std::string("attempt to destroy component instance of invalid type: ") + 
-                    boost::lexical_cast<std::string>((int)type)));
+                    components::get_component_type_name(type)));
             return threads::terminated;
         }
 

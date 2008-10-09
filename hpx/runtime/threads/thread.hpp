@@ -154,6 +154,16 @@ namespace hpx { namespace threads
         thread()
         {}
 
+        /// This constructor is provided just for compatibility with the scheme
+        /// of component creation, which requires to pass a applier instance to
+        /// the component constructor. But since threads never get created 
+        /// by a factory (runtime_support) instance, we can leave this 
+        /// constructor empty
+        thread(applier::applier&)
+        {
+            BOOST_ASSERT(false);    // shouldn't ever be called
+        }
+
         /// \brief Construct a new \a thread
         ///
         /// \param func     [in] The thread function to execute by this 

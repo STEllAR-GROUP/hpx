@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
         // 10. Client calls the client's accumulator to print out the value
 
         // Create a accumulator with static gid of 44 on the client side
-        hpx::components::server::accumulator accu;
+        hpx::components::server::accumulator accu(app);
         hpx::naming::id_type local_id(44);
         hpx::naming::locality l(ps_host, ps_port);
         dgas_c.bind(local_id, hpx::naming::address(l, 

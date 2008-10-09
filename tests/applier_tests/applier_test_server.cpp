@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
 ///////////////////////////////////////////////////////////////////////////////
 
         // Create a new accumulator object
-        hpx::components::server::accumulator accu;
+        hpx::components::server::accumulator accu(app);
         // Statically assign a new global-id, should be dynamically done in the future
         hpx::naming::id_type id(11);
         // Put together the host-name and the port-number of the locality
