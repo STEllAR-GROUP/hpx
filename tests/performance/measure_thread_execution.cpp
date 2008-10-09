@@ -28,7 +28,7 @@ threads::thread_state hpx_main(threads::thread_self& self,
     threads::threadmanager& tm = appl.get_thread_manager();
     for (std::size_t i = 0; i < num_threads; ++i) {
         tm.register_work(boost::bind(&null_thread, _1, boost::ref(appl)),
-            threads::pending, false);
+            "null_thread", threads::pending, false);
     }
 //     double elapsed = timer.elapsed();
 //     std::cerr << "Elapsed time [s] for thread initialization of " 
