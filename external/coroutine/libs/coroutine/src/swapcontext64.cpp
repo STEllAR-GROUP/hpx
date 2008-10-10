@@ -53,18 +53,26 @@
         ".type " #name ", @function\n\t"                                      \
         ".align 16\n"                                                         \
     #name ":\n\t"                                                             \
-        "movq  32(%rsi), %rcx\n\t"                                            \
+        "movq  64(%rsi), %rcx\n\t"                                            \
         "pushq %rbp\n\t"                                                      \
         "pushq %rbx\n\t"                                                      \
         "pushq %rax\n\t"                                                      \
         "pushq %rdx\n\t"                                                      \
+        "pushq %r12\n\t"                                                      \
+        "pushq %r13\n\t"                                                      \
+        "pushq %r14\n\t"                                                      \
+        "pushq %r15\n\t"                                                      \
         "movq  %rsp, (%rdi)\n\t"                                              \
         "movq  %rsi, %rsp\n\t"                                                \
+        "popq  %r15\n\t"                                                      \
+        "popq  %r14\n\t"                                                      \
+        "popq  %r13\n\t"                                                      \
+        "popq  %r12\n\t"                                                      \
         "popq  %rdx\n\t"                                                      \
         "popq  %rax\n\t"                                                      \
         "popq  %rbx\n\t"                                                      \
         "popq  %rbp\n\t"                                                      \
-        "movq 48(%rsi), %rdi\n\t"                                             \
+        "movq 80(%rsi), %rdi\n\t"                                             \
         "add   $8, %rsp\n\t"                                                  \
         "jmp   *%rcx\n\t"                                                     \
         "ud2\n\t"                                                             \

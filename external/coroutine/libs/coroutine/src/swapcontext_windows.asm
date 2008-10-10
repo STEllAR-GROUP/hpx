@@ -36,7 +36,7 @@ PUBLIC swapcontext_stack3
 ;         so is pushl rather than mov+sub.
 ;
 
-_TEXT	SEGMENT
+_TEXT SEGMENT
 swapcontext_stack proc
 ;
     mov rax, qword ptr [rdx+64]     ; prefetch return address
