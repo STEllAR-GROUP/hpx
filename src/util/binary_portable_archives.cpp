@@ -48,7 +48,13 @@ namespace boost { namespace archive
         std::ostream::traits_type
     >;
     template class detail::archive_pointer_oserializer<
-        hpx::util::portable_binary_oarchive>;
+        hpx::util::portable_binary_oarchive
+    >;
+    template class basic_binary_oprimitive<
+        hpx::util::portable_binary_oarchive,
+        std::ostream::char_type, 
+        std::ostream::traits_type
+    >;
 
 }} // namespace boost::archive
 
@@ -71,7 +77,13 @@ namespace boost { namespace archive
         std::istream::traits_type
     >;
     template class detail::archive_pointer_iserializer<
-        hpx::util::portable_binary_iarchive>;
+        hpx::util::portable_binary_iarchive
+    >;
+    template class basic_binary_iprimitive<
+        hpx::util::portable_binary_iarchive,
+        std::istream::char_type, 
+        std::istream::traits_type
+    >;
 
 }} // namespace boost::archive
 
