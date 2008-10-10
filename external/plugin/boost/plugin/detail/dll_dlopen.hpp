@@ -207,8 +207,7 @@ namespace boost { namespace plugin {
             if (!dll_handle) {
                 BOOST_PLUGIN_OSSTREAM str;
                 str << "Boost.Plugin: Could not open shared library '" 
-                    << dll_name << "'\n"
-                    << "            : " << dlerror() << "\n";
+                    << dll_name << << ": dlerror: " << dlerror();
                 throw std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str));
             }
             init_library(dll_handle);    // initialize library
