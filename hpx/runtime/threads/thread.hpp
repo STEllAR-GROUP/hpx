@@ -182,7 +182,7 @@ namespace hpx { namespace threads
         ~thread() 
         {
             LTM_(debug) << "~thread(" << this << "), description(" 
-                        << base()->get_description() << ")";
+                        << get()->get_description() << ")";
         }
 
         thread_id_type get_thread_id() const
@@ -194,7 +194,7 @@ namespace hpx { namespace threads
         ///        been associated with.
         threadmanager& get_thread_manager() 
         {
-            return base()->get_thread_manager();
+            return get()->get_thread_manager();
         }
 
         /// The get_state function allows to query the state of this thread
@@ -209,7 +209,7 @@ namespace hpx { namespace threads
         ///                 by using the function \a threadmanager#get_state.
         thread_state get_state() const 
         {
-            return base()->get_state();
+            return get()->get_state();
         }
 
         /// The set_state function allows to change the state this thread 
@@ -228,7 +228,7 @@ namespace hpx { namespace threads
         ///                 be used.
         thread_state set_state(thread_state new_state)
         {
-            return base()->set_state(new_state);
+            return get()->set_state(new_state);
         }
 
         /// \brief Execute the thread function
@@ -239,34 +239,18 @@ namespace hpx { namespace threads
         ///                 thread's scheduling status.
         thread_state operator()()
         {
-            return base()->execute();
+            return get()->execute();
         }
 
         /// \brief Get the (optional) description of this thread
         char const* const get_description() const
         {
-            return base()->get_description();
+            return get()->get_description();
         }
-
-    protected:
-        base_type& base() { return *this; }
-        base_type const& base() const { return *this; }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     thread_id_type const invalid_thread_id = 0;
-
-//     // support for boost::intrusive_ptr<thread>
-//     inline void intrusive_ptr_add_ref(thread* p)
-//     {
-//         ++p->use_count_;
-//     }
-// 
-//     inline void intrusive_ptr_release(thread* p)
-//     {
-//         if (--p->use_count_ == 0)
-//             delete p;
-//     }
 
 }}
 
