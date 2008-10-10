@@ -170,7 +170,7 @@ namespace hpx { namespace naming { namespace server
         double get_statictics(std::size_t i) const
         {
             if (i >= command_lastcommand)
-                boost::throw_exception(hpx::exception(bad_parameter));
+                HPX_THROW_EXCEPTION(bad_parameter, "unknown DGAS command");
             return statistics_[i];
         }
 

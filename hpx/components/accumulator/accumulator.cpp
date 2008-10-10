@@ -7,7 +7,6 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>

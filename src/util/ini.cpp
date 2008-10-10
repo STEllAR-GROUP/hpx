@@ -270,8 +270,8 @@ section* section::get_section (std::string const& sec_name)
         if (name.empty())
             name = "<root>";
 
-        boost::throw_exception(hpx::exception(bad_parameter, 
-            "No such section (" + sec_name + ") in section: " + name));
+        HPX_THROW_EXCEPTION(bad_parameter, 
+            "No such section (" + sec_name + ") in section: " + name);
         return NULL;
     }
 
@@ -279,8 +279,8 @@ section* section::get_section (std::string const& sec_name)
     if (it != sections_.end())
         return &((*it).second);
 
-    boost::throw_exception(hpx::exception(bad_parameter, 
-        "No such section (" + sec_name + ") in section: " + get_name()));
+    HPX_THROW_EXCEPTION(bad_parameter, 
+        "No such section (" + sec_name + ") in section: " + get_name());
     return NULL;
 }
 
@@ -301,8 +301,8 @@ section const* section::get_section (std::string const& sec_name) const
         if (name.empty())
             name = "<root>";
 
-        boost::throw_exception(hpx::exception(bad_parameter, 
-            "No such section (" + sec_name + ") in section: " + name));
+        HPX_THROW_EXCEPTION(bad_parameter, 
+            "No such section (" + sec_name + ") in section: " + name);
         return NULL;
     }
 
@@ -310,8 +310,8 @@ section const* section::get_section (std::string const& sec_name) const
     if (it != sections_.end())
         return &((*it).second);
 
-    boost::throw_exception(hpx::exception(bad_parameter, 
-        "No such section (" + sec_name + ") in section: " + get_name()));
+    HPX_THROW_EXCEPTION(bad_parameter, 
+        "No such section (" + sec_name + ") in section: " + get_name());
     return NULL;
 }
 
@@ -358,8 +358,8 @@ std::string section::get_entry (std::string const& key) const
             return (*cit).second.get_entry(sub_key);
         }
 
-        boost::throw_exception(hpx::exception(bad_parameter, 
-            "No such key (" + key + ") in section: " + get_name()));
+        HPX_THROW_EXCEPTION(bad_parameter, 
+            "No such key (" + key + ") in section: " + get_name());
         return "";
     }
 
@@ -370,8 +370,8 @@ std::string section::get_entry (std::string const& key) const
         return (*cit).second;
     }
 
-    boost::throw_exception(hpx::exception(bad_parameter, 
-        "No such section (" + key + ") in section: " + get_name()));
+    HPX_THROW_EXCEPTION(bad_parameter, 
+        "No such section (" + key + ") in section: " + get_name());
     return "";
 }
 
@@ -537,10 +537,10 @@ void section::line_msg(std::string const& msg, std::string const& file,
 {
     if (lnum > 0)
     {
-        boost::throw_exception(hpx::exception(no_success, 
-            msg + " " + file + ":" + boost::lexical_cast<std::string>(lnum)));
+        HPX_THROW_EXCEPTION(no_success, 
+            msg + " " + file + ":" + boost::lexical_cast<std::string>(lnum));
     }
-    boost::throw_exception(hpx::exception(no_success, msg + " " + file));
+    HPX_THROW_EXCEPTION(no_success, msg + " " + file);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

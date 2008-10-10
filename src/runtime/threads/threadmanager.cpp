@@ -64,15 +64,15 @@ namespace hpx { namespace threads
         // verify parameters
         if (initial_state != pending && initial_state != suspended)
         {
-            boost::throw_exception(hpx::exception(hpx::bad_parameter,
-                std::string("invalid initial state: ") + 
-                    get_thread_state_name(initial_state)));
+            HPX_OSSTREAM strm;
+            strm << "invalid initial state: " 
+                 << get_thread_state_name(initial_state);
+            HPX_THROW_EXCEPTION(bad_parameter, HPX_OSSTREAM_GETSTRING(strm));
             return invalid_thread_id;
         }
         if (0 == description)
         {
-            boost::throw_exception(hpx::exception(hpx::bad_parameter,
-                "description is NULL"));
+            HPX_THROW_EXCEPTION(bad_parameter, "description is NULL");
             return invalid_thread_id;
         }
 
@@ -125,9 +125,9 @@ namespace hpx { namespace threads
     {
         // set_state can't be used to force a thread into active state
         if (new_state == active) {
-            boost::throw_exception(hpx::exception(hpx::bad_parameter,
-                std::string("invalid new state: ") + 
-                    get_thread_state_name(new_state)));
+            HPX_OSSTREAM strm;
+            strm << "invalid new state: " << get_thread_state_name(new_state);
+            HPX_THROW_EXCEPTION(bad_parameter, HPX_OSSTREAM_GETSTRING(strm));
             return unknown;
         }
 
@@ -560,8 +560,7 @@ namespace hpx { namespace threads
         LTM_(info) << "run: creating " << num_threads << " OS thread(s)";
 
         if (0 == num_threads) {
-            boost::throw_exception(hpx::exception(
-                bad_parameter, "number of threads is zero"));
+            HPX_THROW_EXCEPTION(bad_parameter, "number of threads is zero");
         }
 
         mutex_type::scoped_lock lk(mtx_);

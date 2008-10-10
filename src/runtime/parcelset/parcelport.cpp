@@ -59,9 +59,8 @@ namespace hpx { namespace parcelset
         }
 
         if (errors.get_error_count() == tried) {
-            // all tries failed
-            boost::throw_exception(
-                hpx::exception(network_error, errors.get_message()));
+            // all attempts failed
+            HPX_THROW_EXCEPTION(network_error, errors.get_message());
         }
     }
 

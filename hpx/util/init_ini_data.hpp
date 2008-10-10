@@ -28,6 +28,9 @@ namespace hpx { namespace util
     inline bool handle_ini_file (section& ini, std::string const& loc)
     {
         try { 
+            namespace fs = boost::filesystem;
+            if (!fs::exists(loc))
+                return false;       // avoid exception on missing file
             ini.read (loc); 
         }
         catch (hpx::exception const& /*e*/) { 

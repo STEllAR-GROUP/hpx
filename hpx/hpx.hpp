@@ -15,6 +15,7 @@
 #include <hpx/runtime/naming/resolver_server.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/runtime/actions/continuation_impl.hpp>
 
 /// \mainpage
 ///

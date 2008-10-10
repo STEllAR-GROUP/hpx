@@ -7,6 +7,8 @@
 #define HPX_UTIL_UTIL_MAR_24_2008_1009AM
 
 #include <boost/config.hpp>
+#include <boost/version.hpp>
+#include <boost/filesystem/path.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Helper macros/functions to overcome the lack of stringstream on certain 
@@ -57,6 +59,16 @@ namespace hpx { namespace util
         return name;    // nothing to do here
     }
 #endif
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline HPX_EXPORT std::string leaf(boost::filesystem::path const& p)
+    {
+#if BOOST_VERSION >= 103600
+        return p.empty() ? std::string() : *--p.end();
+#else
+        return p.leaf();
+#endif
+    }
 
 }}
 

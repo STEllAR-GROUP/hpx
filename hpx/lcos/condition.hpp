@@ -131,7 +131,7 @@ namespace hpx { namespace lcos { namespace detail
             threads::thread_self& self, applier::applier&
             hpx::error code, std::string msg)
         {
-            boost::throw_exception(hpx::exception(code, msg));
+            HPX_THROW_EXCEPTION(code, msg);
         }
 
     private:

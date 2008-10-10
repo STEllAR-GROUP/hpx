@@ -194,8 +194,7 @@ namespace hpx { namespace parcelset
                     HPX_OSSTREAM strm;
                     strm << error.message() << " (while trying to connect to: " 
                          << addr.locality_ << ")";
-                    boost::throw_exception(
-                        hpx::exception(network_error, HPX_OSSTREAM_GETSTRING(strm)));
+                    HPX_THROW_EXCEPTION(network_error, HPX_OSSTREAM_GETSTRING(strm));
                 }
 
             // Start an asynchronous write operation.

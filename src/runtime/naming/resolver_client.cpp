@@ -60,7 +60,7 @@ namespace hpx { namespace naming
             }
         }
         catch (boost::system::error_code const& e) {
-            boost::throw_exception(hpx::exception(network_error, e.message()));
+            HPX_THROW_EXCEPTION(network_error, e.message());
         }
 
         if (error) {
@@ -69,8 +69,7 @@ namespace hpx { namespace naming
             HPX_OSSTREAM strm;
             strm << error.message() << " (while trying to connect to: " 
                  << there_ << ")";
-            boost::throw_exception(
-                hpx::exception(network_error, HPX_OSSTREAM_GETSTRING(strm)));
+            HPX_THROW_EXCEPTION(network_error, HPX_OSSTREAM_GETSTRING(strm));
         }
     }
 
@@ -85,7 +84,7 @@ namespace hpx { namespace naming
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != repeated_request)
-            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+            HPX_THROW_EXCEPTION((error)s, rep.get_error());
 
         prefix = rep.get_prefix();
         return s == success;
@@ -100,7 +99,7 @@ namespace hpx { namespace naming
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
-            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+            HPX_THROW_EXCEPTION((error)s, rep.get_error());
 
         typedef std::vector<boost::uint32_t>::const_iterator iterator;
         iterator end = rep.get_prefixes().end();
@@ -120,7 +119,7 @@ namespace hpx { namespace naming
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
-            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+            HPX_THROW_EXCEPTION((error)s, rep.get_error());
 
         return rep.get_component_id();
     }
@@ -135,7 +134,7 @@ namespace hpx { namespace naming
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != repeated_request)
-            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+            HPX_THROW_EXCEPTION((error)s, rep.get_error());
 
         lower_bound = rep.get_lower_bound();
         upper_bound = rep.get_upper_bound();
@@ -152,7 +151,7 @@ namespace hpx { namespace naming
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
-            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+            HPX_THROW_EXCEPTION((error)s, rep.get_error());
 
         return s == success;
     }
@@ -167,7 +166,7 @@ namespace hpx { namespace naming
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
-            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+            HPX_THROW_EXCEPTION((error)s, rep.get_error());
 
         addr = rep.get_address();
         return s == success;
@@ -182,7 +181,7 @@ namespace hpx { namespace naming
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
-            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+            HPX_THROW_EXCEPTION((error)s, rep.get_error());
 
         addr = rep.get_address();
         return s == success;
@@ -198,7 +197,7 @@ namespace hpx { namespace naming
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
-            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+            HPX_THROW_EXCEPTION((error)s, rep.get_error());
 
         return s == success;
     }
@@ -212,7 +211,7 @@ namespace hpx { namespace naming
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
-            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+            HPX_THROW_EXCEPTION((error)s, rep.get_error());
 
         return s == success;
     }
@@ -226,7 +225,7 @@ namespace hpx { namespace naming
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
-            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+            HPX_THROW_EXCEPTION((error)s, rep.get_error());
 
         id = rep.get_id();
         return s == success;
@@ -241,7 +240,7 @@ namespace hpx { namespace naming
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
-            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+            HPX_THROW_EXCEPTION((error)s, rep.get_error());
 
         counts.clear();
         for (std::size_t i = 0; i < server::command_lastcommand; ++i)
@@ -259,7 +258,7 @@ namespace hpx { namespace naming
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
-            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+            HPX_THROW_EXCEPTION((error)s, rep.get_error());
 
         std::swap(timings, rep.get_statictics());
         return s == success;
@@ -274,7 +273,7 @@ namespace hpx { namespace naming
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
-            boost::throw_exception(hpx::exception((error)s, rep.get_error()));
+            HPX_THROW_EXCEPTION((error)s, rep.get_error());
 
         std::swap(timings, rep.get_statictics());
         return s == success;
@@ -320,12 +319,10 @@ namespace hpx { namespace naming
                     buffer.size() + sizeof(size)),
                 err);
             if (err) {
-                boost::throw_exception(
-                    hpx::exception(network_error, err.message()));
+                HPX_THROW_EXCEPTION(network_error, err.message());
             }
             if (buffer.size() + sizeof(size) != written_bytes) {
-                boost::throw_exception(
-                    hpx::exception(network_error, "network write failed"));
+                HPX_THROW_EXCEPTION(network_error, "network write failed");
             }
 
             // wait for response
@@ -335,12 +332,10 @@ namespace hpx { namespace naming
                 boost::bind(&resolver_client::read_completed, _1, _2, sizeof(size)),
                 err);
             if (err) {
-                boost::throw_exception(
-                    hpx::exception(network_error, err.message()));
+                HPX_THROW_EXCEPTION(network_error, err.message());
             }
             if (reply_length != sizeof(size)) {
-                boost::throw_exception(
-                    hpx::exception(network_error, "network read failed"));
+                HPX_THROW_EXCEPTION(network_error, "network read failed");
             }
 
             // now read the rest of the message
@@ -351,12 +346,10 @@ namespace hpx { namespace naming
                 err);
 
             if (err) {
-                boost::throw_exception(
-                    hpx::exception(network_error, err.message()));
+                HPX_THROW_EXCEPTION(network_error, err.message());
             }
             if (reply_length != native_size) {
-                boost::throw_exception(
-                    hpx::exception(network_error, "network read failed"));
+                HPX_THROW_EXCEPTION(network_error, "network read failed");
             }
 
             // De-serialize the data
@@ -367,14 +360,13 @@ namespace hpx { namespace naming
             }
         }
         catch (boost::system::error_code const& e) {
-            boost::throw_exception(hpx::exception(network_error, e.message()));
+            HPX_THROW_EXCEPTION(network_error, e.message());
         }        
         catch (std::exception const& e) {
-            boost::throw_exception(hpx::exception(network_error, e.what()));
+            HPX_THROW_EXCEPTION(network_error, e.what());
         }
         catch(...) {
-            boost::throw_exception(hpx::exception(no_success, 
-                "unexpected error"));
+            HPX_THROW_EXCEPTION(no_success, "unexpected error");
         }
     }
 

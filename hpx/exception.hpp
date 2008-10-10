@@ -11,8 +11,10 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/util.hpp>
 
 #include <boost/assert.hpp>
+#include <boost/throw_exception.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>
 
@@ -97,6 +99,7 @@ namespace hpx
                 case invalid_status:
                 case bad_parameter:
                 case repeated_request:
+                case lock_error:
                     return std::string("HPX(") + error_names[value] + ")";
 
                 default:
@@ -186,6 +189,28 @@ namespace boost { namespace system
     };
 
 }}
+
+///////////////////////////////////////////////////////////////////////////////
+// helper macro allowing to prepend file name and line number to a generated 
+// exception
+#define HPX_THROW_EXCEPTION_EX(except, errcode, msg)                          \
+    {                                                                         \
+        std::string __s;                                                      \
+        if (LHPX_ENABLED(debug))                                              \
+        {                                                                     \
+            boost::filesystem::path __p(__FILE__, boost::filesystem::native); \
+            __s = hpx::util::leaf(__p);                                       \
+            __s += std::string("(") + BOOST_PP_STRINGIZE(__LINE__) + "): ";   \
+        }                                                                     \
+        __s += msg;                                                           \
+        boost::throw_exception(except(errcode, __s));                         \
+    }                                                                         \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_THROW_EXCEPTION(errcode, msg)                                     \
+    HPX_THROW_EXCEPTION_EX(hpx::exception, errcode, msg)                      \
+    /**/
 
 #include <hpx/config/warnings_suffix.hpp>
 

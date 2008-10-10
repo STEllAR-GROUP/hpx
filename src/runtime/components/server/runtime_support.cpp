@@ -46,9 +46,11 @@ namespace hpx { namespace components { namespace server
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
             // we don't know anything about this component
-            boost::throw_exception(hpx::exception(hpx::bad_component_type,
-                std::string("attempt to create component instance of invalid type: ") + 
-                    components::get_component_type_name(type)));
+            HPX_OSSTREAM strm;
+            strm << "attempt to create component instance of invalid type: "
+                 << components::get_component_type_name(type);
+            HPX_THROW_EXCEPTION(hpx::bad_component_type, 
+                HPX_OSSTREAM_GETSTRING(strm));
             return threads::terminated;
         }
         naming::id_type id = (*it).second->create(appl, count);
@@ -71,9 +73,11 @@ namespace hpx { namespace components { namespace server
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
             // we don't know anything about this component
-            boost::throw_exception(hpx::exception(hpx::bad_component_type,
-                std::string("attempt to destroy component instance of invalid type: ") + 
-                    components::get_component_type_name(type)));
+            HPX_OSSTREAM strm;
+            strm << "attempt to destroy component instance of invalid type: "
+                 << components::get_component_type_name(type);
+            HPX_THROW_EXCEPTION(hpx::bad_component_type, 
+                HPX_OSSTREAM_GETSTRING(strm));
             return threads::terminated;
         }
 

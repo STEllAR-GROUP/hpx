@@ -50,10 +50,14 @@ namespace hpx { namespace components
                 gid_ = appl.get_parcel_handler().get_next_id();
                 if (!appl.get_dgas_client().bind(gid_, addr))
                 {
+                    HPX_OSSTREAM strm;
+                    strm << gid_;
+
                     appl_ = NULL;
                     gid_ = naming::id_type();   // invalidate GID
-                    boost::throw_exception(
-                        hpx::exception(duplicate_component_address));
+
+                    HPX_THROW_EXCEPTION(duplicate_component_address,
+                        HPX_OSSTREAM_GETSTRING(strm));
                 }
             }
             return gid_;

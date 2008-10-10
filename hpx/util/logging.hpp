@@ -23,6 +23,10 @@ namespace hpx { namespace util
         BOOST_LOG_USE_LOG_IF_LEVEL(util::dgas_logger(), util::dgas_level(), lvl) \
     /**/
 
+    #define LDGAS_ENABLED(lvl)                                                \
+        util::dgas_level()->is_enabled(::boost::logging::level::lvl)          \
+    /**/
+
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT BOOST_DECLARE_LOG_FILTER(hpx_level, filter_type)
     HPX_EXPORT BOOST_DECLARE_LOG(hpx_logger, logger_type)
@@ -30,6 +34,10 @@ namespace hpx { namespace util
     #define LHPX_(lvl, cat)                                                   \
         BOOST_LOG_USE_LOG_IF_LEVEL(util::hpx_logger(), util::hpx_level(), lvl)\
         << (cat)                                                              \
+    /**/
+
+    #define LHPX_ENABLED(lvl)                                                 \
+        util::hpx_level()->is_enabled(::boost::logging::level::lvl)           \
     /**/
 
     ///////////////////////////////////////////////////////////////////////////

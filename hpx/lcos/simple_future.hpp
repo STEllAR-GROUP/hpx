@@ -53,8 +53,8 @@ namespace hpx { namespace lcos { namespace detail
             {
                 // an error has been reported in the meantime, throw 
                 error_type e = boost::get<error_type>(d);
-                boost::throw_exception(
-                    boost::system::system_error(e.first, e.second));
+                HPX_THROW_EXCEPTION_EX(
+                    boost::system::system_error, e.first, e.second);
             }
 
             // no error has been reported, return the result

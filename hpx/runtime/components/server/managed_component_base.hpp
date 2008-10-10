@@ -17,6 +17,7 @@
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
 #include <hpx/util/static.hpp>
+#include <hpx/util/util.hpp>
 
 namespace hpx { namespace components 
 {
@@ -106,14 +107,24 @@ namespace hpx { namespace components
         /// \brief Return a pointer to the wrapped instance
         Component* get()
         {
-            if (0 == component_)
-                boost::throw_exception(hpx::exception(invalid_status));
+            if (0 == component_) {
+                HPX_OSSTREAM strm;
+                strm << "component is NULL (" 
+                     << components::get_component_type_name(get_type()) 
+                     << ")";
+                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+            }
             return component_;
         }
         Component const* get() const
         {
-            if (0 == component_)
-                boost::throw_exception(hpx::exception(invalid_status));
+            if (0 == component_) {
+                HPX_OSSTREAM strm;
+                strm << "component is NULL (" 
+                     << components::get_component_type_name(get_type())
+                     << ")";
+                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+            }
             return component_;
         }
 
@@ -236,30 +247,50 @@ namespace hpx { namespace components
         // The managed_component_base behaves just like the wrapped object
         Component* operator-> ()
         {
-            if (0 == component_)
-                boost::throw_exception(hpx::exception(invalid_status));
+            if (0 == component_) {
+                HPX_OSSTREAM strm;
+                strm << "component is NULL (" 
+                     << components::get_component_type_name(get_type())
+                     << ")";
+                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+            }
             return component_;
         }
 
         Component const* operator-> () const
         {
-            if (0 == component_)
-                boost::throw_exception(hpx::exception(invalid_status));
+            if (0 == component_) {
+                HPX_OSSTREAM strm;
+                strm << "component is NULL (" 
+                     << components::get_component_type_name(get_type())
+                     << ")";
+                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+            }
             return component_;
         }
 
         ///////////////////////////////////////////////////////////////////////
         Component& operator* ()
         {
-            if (0 == component_)
-                boost::throw_exception(hpx::exception(invalid_status));
+            if (0 == component_) {
+                HPX_OSSTREAM strm;
+                strm << "component is NULL (" 
+                     << components::get_component_type_name(get_type())
+                     << ")";
+                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+            }
             return *component_;
         }
 
         Component const& operator* () const
         {
-            if (0 == component_)
-                boost::throw_exception(hpx::exception(invalid_status));
+            if (0 == component_) {
+                HPX_OSSTREAM strm;
+                strm << "component is NULL (" 
+                     << components::get_component_type_name(get_type())
+                     << ")";
+                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+            }
             return *component_;
         }
 

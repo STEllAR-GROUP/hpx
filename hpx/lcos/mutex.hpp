@@ -66,14 +66,14 @@ namespace hpx { namespace lcos
         void lock()
         {
             if(owns_lock())
-                boost::throw_exception(hpx::exception(lock_error));
+                HPX_THROW_EXCEPTION(lock_error);
             mtx_.lock();
             is_locked_ = true;
         }
         void unlock()
         {
             if(owns_lock())
-                boost::throw_exception(hpx::exception(lock_error));
+                HPX_THROW_EXCEPTION(lock_error);
             mtx_.unlock();
             is_locked_ = false;
         }

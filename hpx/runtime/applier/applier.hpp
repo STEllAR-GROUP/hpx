@@ -319,8 +319,10 @@ namespace hpx { namespace applier
             // Resolve the address of the gid
             if (!parcel_handler_.get_resolver().resolve(gid, addr))
             {
-                boost::throw_exception(
-                    hpx::exception(hpx::unknown_component_address));
+                HPX_OSSTREAM strm;
+                strm << gid;
+                HPX_THROW_EXCEPTION(unknown_component_address, 
+                    HPX_OSSTREAM_GETSTRING(strm));
             }
             return addr.locality_ == parcel_handler_.here();
         }
