@@ -13,6 +13,7 @@
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/manage_component.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
+#include <hpx/runtime/actions/continuation_impl.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
