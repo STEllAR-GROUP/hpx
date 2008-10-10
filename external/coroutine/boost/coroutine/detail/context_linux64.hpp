@@ -144,6 +144,10 @@ namespace boost { namespace coroutines {
         *--m_sp = 0;       // rbx                                  
         *--m_sp = 0;       // rsi                                  
         *--m_sp = 0;       // rdi        
+        *--m_sp = 0;       // r12
+        *--m_sp = 0;       // r13
+        *--m_sp = 0;       // r14
+        *--m_sp = 0;       // r15
       }
       
       ~ia64_gcc_context_impl() 
