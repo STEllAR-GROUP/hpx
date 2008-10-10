@@ -256,17 +256,17 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     thread_id_type const invalid_thread_id = 0;
 
-    // support for boost::intrusive_ptr<thread>
-    inline void intrusive_ptr_add_ref(thread* p)
-    {
-        ++p->use_count_;
-    }
-
-    inline void intrusive_ptr_release(thread* p)
-    {
-        if (--p->use_count_ == 0)
-            delete p;
-    }
+//     // support for boost::intrusive_ptr<thread>
+//     inline void intrusive_ptr_add_ref(thread* p)
+//     {
+//         ++p->use_count_;
+//     }
+// 
+//     inline void intrusive_ptr_release(thread* p)
+//     {
+//         if (--p->use_count_ == 0)
+//             delete p;
+//     }
 
 }}
 
