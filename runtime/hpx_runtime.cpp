@@ -125,7 +125,11 @@ int main(int argc, char* argv[])
             rt.run();
         }
     }
-    catch (std::exception& e) {
+    catch (hpx::exception const& e) {
+        std::cerr << "hpx::exception caught: " << e.what() << "\n";
+        return -1;
+    }
+    catch (std::exception const& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";
         return -1;
     }

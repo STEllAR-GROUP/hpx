@@ -27,6 +27,7 @@
 #include <boost/bind.hpp>
 #include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/assign/std/vector.hpp>
 
 #ifdef _APPLE
 #include <crt_externs.h>
@@ -84,13 +85,16 @@ namespace
 } // namespace
 
 ///////////////////////////////////////////////////////////////////////////////
+section::section ()
+  : root_(this_())
+{
+    regex_init();
+}
+
 section::section (std::string const& filename)
   : root_(this_()), name_(filename)
 {
-    if (!filename.empty())
-        read(filename);
-    else
-        regex_init();
+    read(filename);
 }
 
 section::section (const section & in)
@@ -539,63 +543,84 @@ void section::line_msg(std::string const& msg, std::string const& file,
     boost::throw_exception(hpx::exception(no_success, msg + " " + file));
 }
 
+///////////////////////////////////////////////////////////////////////////////
+void section::expand_entry(std::string& value, std::string::size_type begin) const
+{
+    std::string::size_type p = value.find_first_of("$", begin+1);
+    while (p != std::string::npos && value.size()-1 != p) {
+        if ('[' == value[p+1])
+            expand_bracket(value, p);
+        else if ('{' == value[p+1])
+            expand_brace(value, p);
+        p = value.find_first_of("$", p+1);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// find the matching closing brace starting from 'begin', escaped braces will 
+// be un-escaped
+inline std::string::size_type 
+find_next(char const* ch, std::string& value, 
+    std::string::size_type begin = (std::string::size_type)(-1))
+{
+    std::string::size_type end = value.find_first_of(ch, begin+1);
+    while (end != std::string::npos) {
+        if (end != 0 && value[end-1] != '\\')
+            break;
+        value.replace(end-1, 2, ch);
+        end = value.find_first_of(ch, end);
+    } 
+    return end;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void section::expand_bracket(std::string& value, std::string::size_type begin) const
+{
+    // expand all keys embedded inside this key
+    expand_entry(value, begin);
+
+    // now expand the key itself
+    std::string::size_type end = find_next("]", value, begin+1);
+    if (end != std::string::npos) 
+    {
+        std::string to_expand = value.substr(begin+2, end-begin-2);
+        std::string::size_type colon = find_next(":", to_expand);
+        if (colon == std::string::npos) {
+            value.replace(begin, end-begin+1, root_->get_entry(to_expand, ""));
+        }
+        else {
+            value.replace(begin, end-begin+1, 
+                root_->get_entry(to_expand.substr(0, colon), to_expand.substr(colon+1)));
+        }
+    }
+}
+
+void section::expand_brace(std::string& value, std::string::size_type begin) const
+{
+    // expand all keys embedded inside this key
+    expand_entry(value, begin);
+
+    // now expand the key itself
+    std::string::size_type end = find_next("}", value, begin+1);
+    if (end != std::string::npos) 
+    {
+        std::string to_expand = value.substr(begin+2, end-begin-2);
+        std::string::size_type colon = find_next(":", to_expand);
+        if (colon == std::string::npos) {
+            char* env = getenv(to_expand.c_str());
+            value.replace(begin, end-begin+1, 0 != env ? env : "");
+        }
+        else {
+            char* env = getenv(to_expand.substr(0, colon).c_str());
+            value.replace(begin, end-begin+1, 
+                0 != env ? std::string(env) : to_expand.substr(colon+1));
+        }
+    }
+}
+
 std::string section::expand_entry (std::string value) const
 {
-    static const boost::regex re(
-        // Variable expansion:
-        "(?<!\\$)"          //  an even number of dollar signs inhibits variable
-/*1*/   "((?:\\$\\$)*)"     //  expansion.
-
-        "\\$"               //  starts with the dollar sign ($);
-/*2*/   "(?:\\{|(\\[))"     //  curly brackets ({) for environment variables,
-                            //  square brackets ([) for other entries;
-/*3*/   "([._[:alnum:]]+)"  //  an alpha-numeric identifier;
-        "(?::"              //  an optional default value, starts with a colon
-                            //  (:), is used when the variable isn't defined.
-/*4*/     "((?:"
-/*.*/       "[^\\\\\\{\\[\\]}]" //  Anything goes in here, but brackets ({[]})
-/*.*/       "|\\\\[\\{\\[\\]}]" //  and backslashes (\) must be escaped. This
-/*.*/                           //  has the nice side effect of allowing
-/*.*/                           //  recursion (shhh! :-)
-/*.*/     ")*)"
-        ")?"
-        "(?(2)\\]|\\})"     //  and the corresponding closing bracket (]}).
-    );
-
-    boost::smatch match;
-    while (boost::regex_search(value, match, re))
-    {
-        // Get default value
-        std::string subst = match.str(4);
-        if ("[" == match.str(2))
-        {
-            std::string setting = get_root()->get_entry(match.str(3), "");
-            // Expand with another entry. Empty is considered as undefined, to
-            // allow settings to be disabled.
-            if (!setting.empty())
-            {
-                subst = setting;
-                // Escape dollar signs to avoid (infinite) recursion
-                boost::replace_all(subst, "$", "$$");
-            }
-        }
-        else
-        {
-            char const * var = ::getenv(match.str(3).c_str());
-            if (var)
-            {
-                subst = var;
-                // Escape dollar signs to avoid (infinite) recursion
-                boost::replace_all(subst, "$", "$$");
-            }
-        }
-
-        // Put back prefixing dollar signs, if any.
-        subst = match.str(1) + subst;
-        value = match.prefix() + subst + match.suffix();
-    }
-
-    boost::replace_all(value, "$$", "$");
+    expand_entry(value, (std::string::size_type)-1);
     return value;
 }
 

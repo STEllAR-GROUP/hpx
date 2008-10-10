@@ -42,8 +42,9 @@ namespace hpx { namespace util
             int lnum = 0);
 
     public:
-        section(std::string const& filename = "");
-        section(const section& in);
+        section();
+        explicit section(std::string const& filename);
+        section(section const& in);
         ~section() {}
 
         void parse(std::string const& sourcename, 
@@ -69,7 +70,7 @@ namespace hpx { namespace util
         std::string get_entry(std::string const& key) const;
         std::string get_entry(std::string key, std::string const& dflt) const;
         template <typename T>
-        std::string get_entry(std::string key, T dflt) const
+        std::string get_entry(std::string const& key, T dflt) const
         {
             return get_entry(key, boost::lexical_cast<std::string>(dflt));
         }
@@ -77,6 +78,10 @@ namespace hpx { namespace util
         entry_map const& get_entries() const
             { return entries_; }
         std::string expand_entry(std::string in) const;
+
+        void expand_entry(std::string&, std::string::size_type) const;
+        void expand_bracket(std::string&, std::string::size_type) const;
+        void expand_brace(std::string&, std::string::size_type) const;
 
         void set_root(section* r) { root_ = r; }
         section* get_root() const { return root_; }

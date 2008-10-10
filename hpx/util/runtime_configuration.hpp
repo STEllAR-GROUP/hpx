@@ -21,6 +21,7 @@ namespace hpx { namespace util
     public:
         // initialize and load configuration information
         runtime_configuration();
+        runtime_configuration(std::vector<std::string> const& prefill);
 
         // Get the DGAS locality to use 
         naming::locality get_dgas_locality();

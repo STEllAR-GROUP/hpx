@@ -23,8 +23,6 @@ namespace hpx { namespace util
         BOOST_LOG_USE_LOG_IF_LEVEL(util::dgas_logger(), util::dgas_level(), lvl) \
     /**/
 
-    HPX_EXPORT void init_dgas_logs();
-
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT BOOST_DECLARE_LOG_FILTER(hpx_level, filter_type)
     HPX_EXPORT BOOST_DECLARE_LOG(hpx_logger, logger_type)
@@ -33,8 +31,6 @@ namespace hpx { namespace util
         BOOST_LOG_USE_LOG_IF_LEVEL(util::hpx_logger(), util::hpx_level(), lvl)\
         << (cat)                                                              \
     /**/
-
-    HPX_EXPORT void init_hpx_logs();
 
     ///////////////////////////////////////////////////////////////////////////
     // specific logging

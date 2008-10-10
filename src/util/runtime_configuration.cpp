@@ -13,35 +13,62 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
-    ///////////////////////////////////////////////////////////////////////////
-    runtime_configuration::runtime_configuration()
+    // pre-initialize entries with compile time based values
+    void pre_initialize_ini(section& ini)
     {
-        // pre-initialize entries with compile time based values
         using namespace boost::assign;
         std::vector<std::string> lines; 
         lines +=
-                "[hpx]",
-                "location = " HPX_PREFIX,
-                "ini_path = $[hpx.location]/share/hpx/ini",
-                "dgas_address = ${HPX_DGAS_SERVER_ADRESS:" HPX_NAME_RESOLVER_ADDRESS "}",
-                "dgas_port = ${HPX_DGAS_SERVER_PORT:" BOOST_PP_STRINGIZE(HPX_NAME_RESOLVER_PORT) "}"
-            ;
-        this->parse("static defaults", lines);
+            "[system]",
+            "pid = " + boost::lexical_cast<std::string>(getpid()),
+            "prefix = " HPX_PREFIX,
 
+            "[hpx]",
+            "location = $[system.prefix]",
+            "ini_path = $[hpx.location]/share/hpx/ini",
+            "dgas_address = ${HPX_DGAS_SERVER_ADRESS:" 
+                HPX_NAME_RESOLVER_ADDRESS "}",
+            "dgas_port = ${HPX_DGAS_SERVER_PORT:" 
+                BOOST_PP_STRINGIZE(HPX_NAME_RESOLVER_PORT) "}"
+        ;
+        ini.parse("static defaults", lines);
+    }
+
+    void post_initialize_ini(section& ini)
+    {
         // try to build default ini structure from shared libraries in default 
         // installation location, this allows to install simple components
         // without the need to install an ini file
-        util::init_ini_data_default(HPX_DEFAULT_COMPONENT_PATH, *this);
+        util::init_ini_data_default(HPX_DEFAULT_COMPONENT_PATH, ini);
 
         // add explicit configuration information if its provided
-        if (util::init_ini_data_base(*this)) {
+        if (util::init_ini_data_base(ini)) {
             // merge all found ini files of all components
-            util::merge_component_inis(*this);
+            util::merge_component_inis(ini);
 
             // read system and user ini files _again_, to allow the user to 
             // overwrite the settings from the default component ini's. 
-            util::init_ini_data_base(*this);
+            util::init_ini_data_base(ini);
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    runtime_configuration::runtime_configuration()
+    {
+        pre_initialize_ini(*this);
+        post_initialize_ini(*this);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    runtime_configuration::runtime_configuration(
+        std::vector<std::string> const& prefill)
+    {
+        pre_initialize_ini(*this);
+
+        if (!prefill.empty())
+            this->parse("static prefill defaults", prefill);
+
+        post_initialize_ini(*this);
     }
 
     // DGAS configuration information has to be stored in the global HPX 
