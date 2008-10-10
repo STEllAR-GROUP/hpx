@@ -31,7 +31,7 @@ namespace hpx { namespace components
         struct wrapper_use_count;
 
         template <>
-        struct wrapper_use_count<boost::mpl::false_> : boost::noncopyable
+        struct wrapper_use_count<boost::mpl::false_> 
         {
         };
 

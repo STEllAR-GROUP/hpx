@@ -137,14 +137,12 @@ namespace hpx { namespace threads
     /// functionality related to the management of \a thread's is 
     /// implemented by the \a threadmanager.
     class thread 
-      : public components::managed_component_base<
-            detail::thread, thread, boost::mpl::true_
-        >
+      : public components::managed_component_base<detail::thread, thread>
     {
     private:
         typedef detail::thread wrapped_type;
-        typedef components::managed_component_base<
-            wrapped_type, thread, boost::mpl::true_> 
+        typedef 
+            components::managed_component_base<wrapped_type, thread> 
         base_type;
 
         // avoid warning about using 'this' in initializer list
