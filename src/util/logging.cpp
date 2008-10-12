@@ -8,6 +8,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <boost/version.hpp>
 #include <boost/config.hpp>
+#include <boost/filesystem/operations.hpp>
 
 #include <boost/assign/std/vector.hpp>
 #include <boost/logging/format/named_write.hpp>
@@ -22,7 +23,7 @@ namespace hpx { namespace util
             try {
                 int env_val = boost::lexical_cast<int>(env);
                 if (env_val <= 0)
-                    return -1;      // disable all
+                    return boost::logging::level::disable_all;
 
                 switch (env_val) {
                 case 1:   return boost::logging::level::fatal;
@@ -35,7 +36,7 @@ namespace hpx { namespace util
                 return boost::logging::level::debug;
             }
             catch (boost::bad_lexical_cast const&) {
-                return -1;          // disable all
+                return boost::logging::level::disable_all;
             }
         }
 
@@ -77,6 +78,25 @@ namespace hpx { namespace util
         }
     }
 
+    std::string levelname(int level)
+    {
+        switch (level) {
+        case boost::logging::level::enable_all:
+            return "     <all>";
+        case boost::logging::level::debug:
+            return "   <debug>";
+        case boost::logging::level::info:
+            return "    <info>";
+        case boost::logging::level::warning:
+            return " <warning>";
+        case boost::logging::level::error:
+            return "   <error>";
+        case boost::logging::level::fatal:
+            return "   <fatal>";
+        }
+        return "<" + boost::lexical_cast<std::string>(level) + ">";
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // this is required in order to use the logging library
     BOOST_DEFINE_LOG_FILTER(dgas_level, filter_type) 
@@ -96,7 +116,9 @@ namespace hpx { namespace util
             logformat = detail::unescape(logini->get_entry("format"));
         }
 
-        if (!loglevel.empty()) {
+        if (!loglevel.empty() && 
+            boost::logging::level::disable_all != detail::get_log_level(loglevel)) 
+        {
             dgas_logger()->writer().write(logformat, logdest);
             dgas_logger()->mark_as_initialized();
             dgas_level()->set_enabled(detail::get_log_level(loglevel));
@@ -121,7 +143,9 @@ namespace hpx { namespace util
             logformat = detail::unescape(logini->get_entry("format"));
         }
 
-        if (!loglevel.empty()) {
+        if (!loglevel.empty() && 
+            boost::logging::level::disable_all != detail::get_log_level(loglevel)) 
+        {
             hpx_logger()->writer().write(logformat, logdest);
             hpx_logger()->mark_as_initialized();
             hpx_level()->set_enabled(detail::get_log_level(loglevel));
@@ -165,10 +189,10 @@ namespace hpx { namespace util
                 util::init_dgas_logs(ini);
                 util::init_hpx_logs(ini);
             }
-            catch (std::exception const& e) {
+            catch (std::exception const&) {
                 // just in case something goes wrong
-                std::cerr << "caught std::exception during initialization: " 
-                          << e.what() << std::endl;
+                std::cerr << "caught std::exception during initialization" 
+                          << std::endl;
             }
         }
     };

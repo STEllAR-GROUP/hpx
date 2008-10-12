@@ -20,11 +20,12 @@ namespace hpx { namespace util
     HPX_EXPORT BOOST_DECLARE_LOG(dgas_logger, logger_type)
 
     #define LDGAS_(lvl)                                                       \
-        BOOST_LOG_USE_LOG_IF_LEVEL(util::dgas_logger(), util::dgas_level(), lvl) \
+        BOOST_LOG_USE_LOG_IF_LEVEL(hpx::util::dgas_logger(),                  \
+            hpx::util::dgas_level(), lvl)                                     \
     /**/
 
     #define LDGAS_ENABLED(lvl)                                                \
-        util::dgas_level()->is_enabled(::boost::logging::level::lvl)          \
+        hpx::util::dgas_level()->is_enabled(::boost::logging::level::lvl)     \
     /**/
 
     ///////////////////////////////////////////////////////////////////////////
@@ -32,13 +33,18 @@ namespace hpx { namespace util
     HPX_EXPORT BOOST_DECLARE_LOG(hpx_logger, logger_type)
 
     #define LHPX_(lvl, cat)                                                   \
-        BOOST_LOG_USE_LOG_IF_LEVEL(util::hpx_logger(), util::hpx_level(), lvl)\
+        BOOST_LOG_USE_LOG_IF_LEVEL(hpx::util::hpx_logger(),                   \
+            hpx::util::hpx_level(), lvl)                                      \
+        << hpx::util::levelname(::boost::logging::level::lvl)                 \
         << (cat)                                                              \
     /**/
 
     #define LHPX_ENABLED(lvl)                                                 \
-        util::hpx_level()->is_enabled(::boost::logging::level::lvl)           \
+        hpx::util::hpx_level()->is_enabled(::boost::logging::level::lvl)      \
     /**/
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_API_EXPORT std::string levelname(int level);
 
     ///////////////////////////////////////////////////////////////////////////
     // specific logging
