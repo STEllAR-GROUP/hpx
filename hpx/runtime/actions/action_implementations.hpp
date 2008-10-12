@@ -81,10 +81,16 @@
             threads::thread_self& self, applier::applier& app, 
             continuation_type cont, boost::tuple<Func> func)
         {
-            Result result;
-            threads::thread_state newstate = 
-                boost::get<0>(func)(self, &result);
-            cont->trigger_all(app, result);
+            threads::thread_state newstate = threads::unknown;
+            try {
+                Result result;
+                newstate = boost::get<0>(func)(self, &result);
+                cont->trigger_all(app, result);
+            }
+            catch (hpx::exception const& e) {
+                // make sure hpx::exceptions are propagated back to the client
+                cont->trigger_error(app, e);
+            }
             return newstate;
         }
 

@@ -36,7 +36,9 @@
  * we will play it safe and use an atomic count. The overhead shouldn't
  * be big.
  */
+#if !defined(BOOST_COROUTINE_USE_ATOMIC_COUNT)
 #define BOOST_COROUTINE_USE_ATOMIC_COUNT
+#endif
 
 #ifdef BOOST_COROUTINE_USE_ATOMIC_COUNT
 #  include <boost/detail/atomic_count.hpp>
@@ -45,6 +47,7 @@
 #include <algorithm> //for swap
 #include <boost/coroutine/detail/swap_context.hpp> //for swap hints
 #include <boost/intrusive_ptr.hpp>
+#include <boost/exception.hpp>
 #include <boost/coroutine/exception.hpp>
 #include <boost/coroutine/detail/noreturn.hpp>
 namespace boost { namespace coroutines { namespace detail {
@@ -72,7 +75,7 @@ namespace boost { namespace coroutines { namespace detail {
       m_exit_status(ctx_not_exited),
       m_wait_counter(0),
       m_operation_counter(0),
-      m_type_info(0) {}
+      m_type_info() {}
     
     friend
     void intrusive_ptr_add_ref(type * ctx) {
@@ -119,7 +122,7 @@ namespace boost { namespace coroutines { namespace detail {
 
     /*
      * A signal may occur only when a context is 
-     * not running (is delivered sinchrononously).
+     * not running (is delivered synchrononously).
      * This means that state MUST NOT be busy.
      * It may be ready or waiting.
      * returns 'ready()'.
@@ -158,9 +161,10 @@ namespace boost { namespace coroutines { namespace detail {
         if(m_exit_status == ctx_exited_return)
           return true;
         if(m_exit_status == ctx_exited_abnormally) {
-          std::type_info const * tinfo =0;
-          std::swap(m_type_info, tinfo);
-          throw abnormal_exit(tinfo?*tinfo: typeid(unknown_exception_tag));
+          boost::rethrow_exception(m_type_info);
+//           std::type_info const * tinfo =0;
+//           std::swap(m_type_info, tinfo);
+//           throw abnormal_exit(tinfo ? *tinfo: typeid(unknown_exception_tag));
         } else if(m_exit_status == ctx_exited_exit)
           return false;
         else {
@@ -211,15 +215,16 @@ namespace boost { namespace coroutines { namespace detail {
       // smart enough to do it anyway as there are no side effects.
       if(m_exit_status || m_state == ctx_waiting) {
         if(m_state == ctx_waiting)
-          throw waiting();
+          boost::throw_exception(coroutines::waiting());
         if(m_exit_status == ctx_exited_return)
           return;
         if(m_exit_status == ctx_exited_abnormally) {
-          std::type_info const * tinfo =0;
-          std::swap(m_type_info, tinfo);
-          throw abnormal_exit(tinfo?*tinfo: typeid(unknown_exception_tag));
+          boost::rethrow_exception(m_type_info);
+//           std::type_info const * tinfo =0;
+//           std::swap(m_type_info, tinfo);
+//           throw abnormal_exit(tinfo ? *tinfo : typeid(unknown_exception_tag));
         } else if(m_exit_status == ctx_exited_exit)
-          throw coroutine_exited();
+          boost::throw_exception(coroutine_exited());
         else {
           BOOST_ASSERT(0 && "unknown exit status");
         }
@@ -317,8 +322,8 @@ namespace boost { namespace coroutines { namespace detail {
     BOOST_COROUTINE_NORETURN(void exit_self()) {
       BOOST_ASSERT(!pending());
       BOOST_ASSERT(running());
-      m_exit_state = ctx_exit_pending;	
-      throw exit_exception();
+      m_exit_state = ctx_exit_pending;
+      boost::throw_exception(exit_exception());
     }
 
     // Nothrow.
@@ -361,11 +366,11 @@ namespace boost { namespace coroutines { namespace detail {
     void check_exit_state() {
       BOOST_ASSERT(running());
       if(!m_exit_state) return;
-      throw exit_exception();
+      boost::throw_exception(exit_exception());
     }
 
     // Nothrow.
-    void do_return(context_exit_status status, std::type_info const* info) throw() {
+    void do_return(context_exit_status status, boost::exception_ptr& info) throw() {
       BOOST_ASSERT(status != ctx_not_exited);
       BOOST_ASSERT(m_state == ctx_running);
       m_type_info = info;
@@ -408,7 +413,7 @@ namespace boost { namespace coroutines { namespace detail {
     int m_operation_counter;    
 
     // This is used to generate a meaningful exception trace.
-    std::type_info const* m_type_info;
+    boost::exception_ptr m_type_info;
   };
 
 } } }

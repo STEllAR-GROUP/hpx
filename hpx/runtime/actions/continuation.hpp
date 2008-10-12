@@ -12,6 +12,7 @@
 #include <boost/serialization/serialization.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -49,6 +50,9 @@ namespace hpx { namespace actions
         ///
         template <typename Arg0>
         void trigger_all(applier::applier& app, Arg0 const& arg0);
+
+        ///
+        void trigger_error(applier::applier& app, hpx::exception const& e);
 
     private:
         // serialization support    

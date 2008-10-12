@@ -121,11 +121,11 @@ namespace boost { namespace coroutines { namespace detail {
       if(!pending()) return;
       mark_wait(true);
       try {
-	m_coro_impl->wait(1);
-	BOOST_ASSERT(!pending());
+        m_coro_impl->wait(1);
+        BOOST_ASSERT(!pending());
       } catch (...) {
-	mark_wait(false);
-	throw;
+        mark_wait(false);
+        throw;
       }
       mark_wait(false);
     }

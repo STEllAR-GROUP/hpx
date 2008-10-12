@@ -163,21 +163,26 @@ namespace boost { namespace coroutines { namespace detail {
       typedef typename super_type::context_exit_status
         context_exit_status;
       context_exit_status status = super_type::ctx_exited_return;
-      std::type_info const* tinfo = 0;
+      boost::exception_ptr tinfo;
       try {
         this->check_exit_state();
         do_call<result_type>();
-      } catch (const exit_exception&) {
+      } catch (exit_exception const&) {
         status = super_type::ctx_exited_exit;
-      } catch (std::exception const& e) {
+        tinfo = boost::current_exception();
+      } catch (boost::exception const&) {
         status = super_type::ctx_exited_abnormally;
-        tinfo = &typeid(e);
+        tinfo = boost::current_exception();
+      } catch (std::exception const&) {
+        status = super_type::ctx_exited_abnormally;
+        tinfo = boost::current_exception();
       } catch (...) {
         status = super_type::ctx_exited_abnormally;
+        tinfo = boost::current_exception();
       }
-      this->do_return(status, tinfo);	  
+      this->do_return(status, tinfo);
     }
-  public:    
+  public:
 
     //GCC workaround as per enable_if docs 
     template <int> struct dummy { dummy(int) {} };

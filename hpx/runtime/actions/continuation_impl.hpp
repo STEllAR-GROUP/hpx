@@ -18,6 +18,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
+    ///////////////////////////////////////////////////////////////////////////
     inline 
     void continuation::trigger_all(applier::applier& app)
     {
@@ -30,6 +31,24 @@ namespace hpx { namespace actions
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    inline 
+    void continuation::trigger_error(applier::applier& app, 
+        hpx::exception const& e)
+    {
+        std::vector<naming::id_type>::iterator end = gids_.end();
+        for (std::vector<naming::id_type>::iterator it = gids_.begin();
+             it != end; ++it)
+        {
+            if (!app.apply<lcos::base_lco::set_error_action>(
+                    *it, e.get_error(), e.what()))
+            {
+                break;
+            }
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Arg0>
     inline void 
     continuation::trigger_all(applier::applier& app, Arg0 const& arg0)

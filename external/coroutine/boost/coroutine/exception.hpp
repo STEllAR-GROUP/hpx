@@ -42,19 +42,19 @@ namespace boost { namespace coroutines {
   // This exception is thrown on a coroutine invocation
   // if a coroutine exits without
   // returning a result. Note that calling invoke()
-  // on an already exited coroutine is undefined behaviour.
+  // on an already exited coroutine is undefined behavior.
   class coroutine_exited: public exception_base {};  
   
   // This exception is thrown on a coroutine invocation
   // if a coroutine enter the wait state without
   // returning a result. Note that calling invoke()
-  // on a waiting coroutine is undefined behaviour.
+  // on a waiting coroutine is undefined behavior.
   class waiting : public exception_base {};
 
   class unknown_exception_tag {};
 
   // This exception is thrown on a coroutine invocation
-  // if the coroutine is exited by an uncatched exception
+  // if the coroutine is exited by an un-catched exception
   // (not derived from exit_exception). abnormal_exit::type()
   // returns the typeid of that exception if it is derived
   // from std::exception, else returns typeid(unknonw_exception_tag)
@@ -64,9 +64,8 @@ namespace boost { namespace coroutines {
       m_e (e) {};
 
     const char* what() const throw() {
-      return m_e == typeid(unknown_exception_tag)? 
-	"unknown exception" :
-	m_e.name();
+      return m_e == typeid(unknown_exception_tag) ? 
+          "unknown exception" : m_e.name();
     }
 
     std::type_info const& type() const throw() {
