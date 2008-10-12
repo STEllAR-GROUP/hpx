@@ -36,8 +36,9 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    threadmanager::threadmanager(util::io_service_pool& timer_pool)
-      : running_(false), timer_pool_(timer_pool)
+    threadmanager::threadmanager(util::io_service_pool& timer_pool,
+            boost::function<void()> stop)
+      : running_(false), timer_pool_(timer_pool), stop_(stop)
 #if HPX_DEBUG != 0
       , thread_count_(0)
 #endif
@@ -417,20 +418,26 @@ namespace hpx { namespace threads
             num_px_threads = tfunc_impl(num_thread);
         }
         catch (hpx::exception const& e) {
-            LTM_(error) << "tfunc(" << num_thread 
+            LTM_(fatal) << "tfunc(" << num_thread 
                         << "): caught hpx::exception: " 
-                        << e.what() << ", aborted execution";;
+                        << e.what() << ", aborted execution";
+            if (stop_) 
+                stop_();
             return;
         }
         catch (std::exception const& e) {
-            LTM_(error) << "tfunc(" << num_thread 
+            LTM_(fatal) << "tfunc(" << num_thread 
                         << "): caught std::exception: " 
                         << e.what() << ", aborted execution";
+            if (stop_) 
+                stop_();
             return;
         }
         catch (...) {
-            LTM_(error) << "tfunc(" << num_thread 
+            LTM_(fatal) << "tfunc(" << num_thread 
                         << "): caught unexpected exception, aborted execution";
+            if (stop_) 
+                stop_();
             return;
         }
         LTM_(info) << "tfunc(" << num_thread << "): end, executed " 
@@ -589,7 +596,7 @@ namespace hpx { namespace threads
             timer_pool_.run(false);
         }
         catch (std::exception const& e) {
-            LTM_(error) << "run: failed with:" << e.what(); 
+            LTM_(fatal) << "run: failed with:" << e.what(); 
             stop();
             threads_.clear();
             return false;

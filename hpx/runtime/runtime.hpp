@@ -37,6 +37,9 @@ namespace hpx
     /// properly initialized. 
     class HPX_EXPORT runtime
     {
+        // avoid warnings about usage of this in member initializer list
+        runtime* This() { return this; }
+
     public:
         /// Construct a new HPX runtime instance 
         ///

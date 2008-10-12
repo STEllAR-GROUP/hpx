@@ -68,7 +68,9 @@ namespace hpx { namespace threads
         typedef boost::posix_time::time_duration duration_type;
 
     public:
-        threadmanager(util::io_service_pool& timer_pool);
+        ///
+        threadmanager(util::io_service_pool& timer_pool, 
+            boost::function<void()> stop = boost::function<void()>());
         ~threadmanager();
 
         typedef boost::lockfree::fifo<thread_id_type> set_state_queue_type;
@@ -248,6 +250,7 @@ namespace hpx { namespace threads
         boost::condition cond_;             ///< used to trigger some action
 
         util::io_service_pool& timer_pool_; ///< used for timed set_state
+        boost::function<void()> stop_;  ///< function to call in case of error
 
 #if HPX_DEBUG != 0
         boost::detail::atomic_count thread_count_;
