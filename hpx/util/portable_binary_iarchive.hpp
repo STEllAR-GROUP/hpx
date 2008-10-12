@@ -1,33 +1,41 @@
 #ifndef PORTABLE_BINARY_IARCHIVE_HPP
 #define PORTABLE_BINARY_IARCHIVE_HPP
 
+#include <boost/version.hpp>
+
+#if BOOST_VERSION < 103700
+#include <hpx/util/binary_portable_iarchive.hpp>
+#else
+
 // MS compatible compilers support #pragma once
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif
 
+#if defined(_MSC_VER)
+#pragma warning( push )
+#pragma warning( disable : 4244 )
+#endif
+
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // portable_binary_iarchive.hpp
 
-// (C) Copyright 2002 Robert Ramey - http://www.rrsd.com . 
+// (C) Copyright 2002-7 Robert Ramey - http://www.rrsd.com . 
 // Use, modification and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org for updates, documentation, and revision history.
 
-#include <ostream>
-#include <algorithm>
-#include <climits>
-#include <boost/version.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#if BOOST_VERSION >= 103500
+#include <istream>
+#include <boost/serialization/string.hpp>
+#include <boost/archive/archive_exception.hpp>
+#include <boost/archive/basic_binary_iprimitive.hpp>
+#include <boost/archive/detail/common_iarchive.hpp>
 #include <boost/archive/shared_ptr_helper.hpp>
-#else
-#include <boost/serialization/shared_ptr.hpp>
-#endif
-#include <boost/detail/endian.hpp>
-#include <boost/cstdint.hpp>
+#include <boost/archive/detail/register_archive.hpp>
+
+#include <hpx/util/portable_binary_archive.hpp>
 
 namespace hpx { namespace util
 {
@@ -35,14 +43,14 @@ namespace hpx { namespace util
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // exception to be thrown if integer read from archive doesn't fit
 // variable being loaded
-class portable_binary_archive_exception : 
+class portable_binary_iarchive_exception : 
     public virtual boost::archive::archive_exception
 {
 public:
     typedef enum {
         incompatible_integer_size 
     } exception_code;
-    portable_binary_archive_exception(exception_code c = incompatible_integer_size)
+    portable_binary_iarchive_exception(exception_code c = incompatible_integer_size )
     {}
     virtual const char *what( ) const throw( )
     {
@@ -58,159 +66,139 @@ public:
 };
 
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
-// "Portable" input binary archive.  This is a variation of the native binary 
-// archive. it addresses integer size and endianness so that binary archives can
-// be passed across systems. Note:floating point types not addressed here
+// "Portable" input binary archive.  It addresses integer size and endienness so 
+// that binary archives can be passed across systems. Note:floating point types
+// not addressed here
 class portable_binary_iarchive :
-    // don't derive from binary_iarchive !!!
-    public boost::archive::binary_iarchive_impl<
-        portable_binary_iarchive, 
+    public boost::archive::basic_binary_iprimitive<
+        portable_binary_iarchive,
         std::istream::char_type, 
         std::istream::traits_type
+    >,
+    public boost::archive::detail::common_iarchive<
+        portable_binary_iarchive
     >
-#if BOOST_VERSION >= 103500
-  , public boost::archive::detail::shared_ptr_helper
-#else
-  , public boost::serialization::detail::shared_ptr_helper
-#endif
-{
-    typedef boost::archive::binary_iarchive_impl<
-        portable_binary_iarchive, 
+      ,
+    public boost::archive::detail::shared_ptr_helper
+      {
+    typedef boost::archive::basic_binary_iprimitive<
+        portable_binary_iarchive,
         std::istream::char_type, 
         std::istream::traits_type
-    > archive_base_t;
-    typedef boost::archive::basic_binary_iprimitive<
-        portable_binary_iarchive, 
-        std::ostream::char_type, 
-        std::ostream::traits_type
     > primitive_base_t;
+    typedef boost::archive::detail::common_iarchive<
+        portable_binary_iarchive
+    > archive_base_t;
 #ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
 public:
 #else
     friend archive_base_t;
     friend primitive_base_t; // since with override load below
-    friend class boost::archive::basic_binary_iarchive<portable_binary_iarchive>;
+    friend class boost::archive::detail::interface_iarchive<
+        portable_binary_iarchive
+    >;
     friend class boost::archive::load_access;
+protected:
 #endif
-    void load_impl(boost::intmax_t& l, char maxsize){
-        boost::uint8_t size;
-        this->archive_base_t::load(size);
-        if(size > maxsize || size > sizeof(boost::intmax_t))
-            throw portable_binary_archive_exception();
-        l = 0;
-        load_binary(&l, size);
-
-// we choose to use little endian (it's more common)
-#ifdef BOOST_BIG_ENDIAN
-        boost::int8_t* first = 
-            static_cast<boost::int8_t*>(static_cast<void*>(&l));
-        boost::int8_t* last = first + size - 1;
-        for(/**/ ; first < last; ++first, --last)
-            std::swap(*first, *last);
-#endif
-
-        // extend sign if necessary 
-        if (size != maxsize && (l >> (size - 1) * CHAR_BIT) & 0x80) 
-            l |= (-1 << (size * CHAR_BIT));
-    }
-
-    template <typename T>
-    void load_impl_fp(T& l, char maxsize)
-    {
-        boost::uint8_t size;
-        this->archive_base_t::load(size);
-        if(size != maxsize)     // sizes need to match
-            throw portable_binary_archive_exception();
-
-        l = 0;
-        load_binary(&l, size);
-
-// we choose to use little endian (it's more common)
-#ifdef BOOST_BIG_ENDIAN
-        boost::int8_t* first = 
-            static_cast<boost::int8_t*>(static_cast<void*>(&l));
-        boost::int8_t* last = first + size - 1;
-        for(/**/ ; first < last; ++first, --last)
-            std::swap(*first, *last);
-#endif
-    }
+    unsigned int m_flags;
+    BOOST_ARCHIVE_OR_WARCHIVE_DECL(void)
+    load_impl(boost::intmax_t & l, char maxsize);
 
     // default fall through for any types not specified here
     template<class T>
     void load(T & t){
+        boost::intmax_t l;
+        load_impl(l, sizeof(T));
+        // use cast to avoid compile time warning
+        t = static_cast<T>(l);
+    }
+    void load(std::string & t){
         this->primitive_base_t::load(t);
     }
-    void load(unsigned short & t){
-        boost::intmax_t l;
-        load_impl(l, sizeof(unsigned short));
-        t = static_cast<unsigned short>(l);
+    #ifndef BOOST_NO_STD_WSTRING
+    void load(std::wstring & t){
+        this->primitive_base_t::load(t);
     }
-    void load(short & t){
-        boost::intmax_t l;
-        load_impl(l, sizeof(short));
-        t = static_cast<short>(l);
+    #endif
+    void load(float & t){
+        this->primitive_base_t::load(t);
+        // floats not supported
+        //BOOST_STATIC_ASSERT(false);
     }
-    void load(unsigned int & t){
-        boost::intmax_t l;
-        load_impl(l, sizeof(unsigned int));
-        t = static_cast<unsigned int>(l);
+    void load(double & t){
+        this->primitive_base_t::load(t);
+        // doubles not supported
+        //BOOST_STATIC_ASSERT(false);
     }
-    void load(int & t){
-        boost::intmax_t l;
-        load_impl(l, sizeof(int));
-        t = static_cast<int>(l);
+    void load(char & t){
+        this->primitive_base_t::load(t);
     }
-    void load(unsigned long & t){
-        boost::intmax_t l;
-        load_impl(l, sizeof(unsigned long));
-        t = static_cast<unsigned long>(l);
+    void load(unsigned char & t){
+        this->primitive_base_t::load(t);
     }
-    void load(long & t){
-        boost::intmax_t l;
-        load_impl(l, sizeof(long));
-        t = static_cast<long>(l);
+    // intermediate level to support override of operators
+    // fot templates in the absence of partial function 
+    // template ordering
+    typedef boost::archive::detail::common_iarchive<portable_binary_iarchive> 
+        detail_common_iarchive;
+    template<class T>
+    void load_override(T & t, BOOST_PFTO int){
+        this->detail_common_iarchive::load_override(t, 0);
     }
-#if defined(BOOST_HAS_LONG_LONG)
-    void load(boost::long_long_type & t){
-        boost::intmax_t l;
-        load_impl(l, sizeof(boost::long_long_type));
-        t = l;
-    }
-    void load(boost::ulong_long_type & t){
-        boost::intmax_t l;
-        load_impl(l, sizeof(boost::ulong_long_type));
-        t = l;
-    }
-#endif
-    void load(float& t){
-        load_impl_fp(t, sizeof(float));
-    }
-    void load(double& t){
-        load_impl_fp(t, sizeof(double));
-    }
-    void load(long double& t){
-        load_impl_fp(t, sizeof(long double));
-    }
+    BOOST_ARCHIVE_OR_WARCHIVE_DECL(void) 
+    load_override(boost::archive::class_name_type & t, int);
+    // binary files don't include the optional information 
+    void load_override(
+        boost::archive::class_id_optional_type & /* t */, 
+        int
+    ){}
+
+    BOOST_ARCHIVE_OR_WARCHIVE_DECL(void)
+    init(unsigned int flags);
+
 public:
     portable_binary_iarchive(std::istream & is, unsigned flags = 0) :
-        archive_base_t(
-            is, 
-            flags | boost::archive::no_header // skip default header checking 
-        )
+        primitive_base_t(
+            * is.rdbuf(), 
+            0 != (flags & boost::archive::no_codecvt)
+        ),
+        archive_base_t(flags),
+        m_flags(0)
     {
-        // use our own header checking
-        if(0 != (flags & boost::archive::no_header)){
-            this->archive_base_t::init(flags);
-            // skip the following for "portable" binary archives
-            // boost::archive::basic_binary_oprimitive<derived_t, std::ostream>::init();
-        }
+        init(flags);
+    }
+
+    portable_binary_iarchive(
+        std::basic_streambuf<
+            std::istream::char_type, 
+            std::istream::traits_type
+        > & bsb, 
+        unsigned int flags
+    ) :
+        primitive_base_t(
+            bsb, 
+            0 != (flags & boost::archive::no_codecvt)
+        ),
+        archive_base_t(flags),
+        m_flags(0)
+    {
+        init(flags);
     }
 };
 
-}}  // namespace hpx::util
+}}
 
+// required by export in boost version > 1.34
 #ifdef BOOST_SERIALIZATION_REGISTER_ARCHIVE
     BOOST_SERIALIZATION_REGISTER_ARCHIVE(hpx::util::portable_binary_iarchive)
 #endif
 
+// required by export in boost <= 1.34
+#define BOOST_ARCHIVE_CUSTOM_IARCHIVE_TYPES hpx::util::portable_binary_iarchive
+
+#if defined(_MSC_VER)
+#pragma warning( pop )
+#endif
+
+#endif // BOOST_VERSION < 103700
 #endif // PORTABLE_BINARY_IARCHIVE_HPP

@@ -12,6 +12,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/version.hpp>
 
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -259,5 +260,11 @@ namespace hpx { namespace naming { namespace server
     std::ostream& operator<< (std::ostream& os, request const& req);
 
 }}}  // namespace hpx::naming::server
+
+///////////////////////////////////////////////////////////////////////////////
+// this is the current version of the parcel serialization format
+// this definition needs to be in the global namespace
+BOOST_CLASS_VERSION(hpx::naming::server::request, HPX_REQUEST_VERSION)
+BOOST_CLASS_TRACKING(hpx::naming::server::request, boost::serialization::track_never)
 
 #endif

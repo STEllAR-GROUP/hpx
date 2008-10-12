@@ -954,6 +954,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\misc\FindBoost.cmake"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\docs\hpx.doxy"
 				>
 			</File>

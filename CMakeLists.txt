@@ -73,6 +73,7 @@ endif()
 set(CMAKE_INSTALL_PREFIX "${CMAKE_PREFIX}" 
     CACHE PATH "Where to install ${PROJECT_NAME}" 
     FORCE)
+mark_as_advanced(CMAKE_INSTALL_PREFIX)
 set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" 
     CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." 
     FORCE)
@@ -109,8 +110,11 @@ if(MSVC)
     add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
     add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
     # suppress certain warnings
-    add_definitions(-wd4251 -wd4231 -wd4275 -wd4660)
+    add_definitions(-wd4251 -wd4231 -wd4275 -wd4660 -wd4094)
 endif()
+
+# additionally needed preprocessor definitions
+add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT)
 
 if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions(-DHPX_GCC_HAVE_VISIBILITY)

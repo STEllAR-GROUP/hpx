@@ -91,6 +91,8 @@ set (hpxlib_HEADERS
     ../hpx/runtime/threads/threadmanager.hpp
     # util
     ../hpx/util/asio_util.hpp
+    ../hpx/util/binary_portable_iarchive.hpp
+    ../hpx/util/binary_portable_oarchive.hpp
     ../hpx/util/container_device.hpp
     ../hpx/util/find_msb.hpp
     ../hpx/util/full_empty_memory.hpp
@@ -103,6 +105,7 @@ set (hpxlib_HEADERS
     ../hpx/util/io_service_pool.hpp
     ../hpx/util/logging.hpp
     ../hpx/util/one_size_heap_list.hpp
+    ../hpx/util/portable_binary_archive.hpp
     ../hpx/util/portable_binary_iarchive.hpp
     ../hpx/util/portable_binary_oarchive.hpp
     ../hpx/util/runtime_configuration.hpp
@@ -161,11 +164,16 @@ endif()
 # separate shared module containing our portable serialization archives
 set (hpxserializationlib_HEADERS
     ../hpx/hpx_fwd.hpp
+    ../hpx/util/binary_portable_iarchive.hpp
+    ../hpx/util/binary_portable_oarchive.hpp
+    ../hpx/util/portable_binary_archive.hpp
     ../hpx/util/portable_binary_iarchive.hpp
     ../hpx/util/portable_binary_oarchive.hpp)
 
 set (hpxserializationlib_SOURCES
-    util/binary_portable_archives.cpp)
+    util/binary_portable_archives.cpp
+    util/portable_binary_iarchive.cpp
+    util/portable_binary_oarchive.cpp)
 
 add_definitions(-DHPX_EXPORTS)
 

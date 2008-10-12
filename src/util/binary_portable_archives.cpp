@@ -3,10 +3,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <boost/version.hpp>
+
+#if BOOST_VERSION < 103700
+
 // export the defined functions
 #define BOOST_ARCHIVE_SOURCE
 
-// this hack is needed to properly compiler this shared library, allowing to 
+// this hack is needed to properly compile this shared library, allowing to 
 // export the symbols and auto link with the serialization 
 #if !defined(BOOST_ALL_NO_LIB) && !defined(BOOST_SERIALIZATION_NO_LIB)
 // Set the name of our library, this will get undef'ed by auto_link.hpp
@@ -25,8 +29,8 @@
 #include <hpx/hpx_fwd.hpp>
 
 #include <boost/serialization/serialization.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/util/binary_portable_iarchive.hpp>
+#include <hpx/util/binary_portable_oarchive.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // explicit template instantiations for our portable archives
@@ -87,4 +91,4 @@ namespace boost { namespace archive
 
 }} // namespace boost::archive
 
-
+#endif // BOOST_VERSION < 103700
