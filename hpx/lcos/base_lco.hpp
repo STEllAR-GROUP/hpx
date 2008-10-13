@@ -50,7 +50,7 @@ namespace hpx { namespace lcos
 
         ///
         virtual threads::thread_state set_error (
-            threads::thread_self&, applier::applier&,
+            threads::thread_self& self, applier::applier& appl,
             hpx::error code, std::string msg)
         {
             // just rethrow the exception
@@ -76,14 +76,13 @@ namespace hpx { namespace lcos
     /// The \a Result template argument should be set to the type of the 
     /// argument expected for the set_result action.
     template <typename Result>
-    struct base_lco_with_value
+    struct base_lco_with_value : base_lco
     {
         // components must contain a typedef for wrapping_type defining the
         // managed_component_base type used to encapsulate instances of this 
         // component
-        typedef components::managed_component_base<
-            base_lco_with_value, components::detail::this_type, 
-            boost::mpl::true_> 
+        typedef 
+            components::managed_component_base<base_lco_with_value> 
         wrapping_type;
 
         // This is the component id. Every component needs to have an embedded
@@ -97,6 +96,13 @@ namespace hpx { namespace lcos
         /// Destructor, needs to be virtual to allow for clean destruction of
         /// derived objects
         virtual ~base_lco_with_value() {}
+
+        /// actions
+        virtual threads::thread_state set_event (
+            threads::thread_self& self, applier::applier& appl)
+        {
+            return set_result(self, appl, Result());
+        }
 
         ///
         virtual threads::thread_state set_result (
@@ -120,26 +126,13 @@ namespace hpx { namespace lcos
         // components must contain a typedef for wrapping_type defining the
         // managed_component_base type used to encapsulate instances of this 
         // component
-        typedef components::managed_component_base<
-            base_lco_with_value, components::detail::this_type, 
-            boost::mpl::true_> 
+        typedef 
+            components::managed_component_base<base_lco_with_value> 
         wrapping_type;
 
         /// Destructor, needs to be virtual to allow for clean destruction of
         /// derived objects
         virtual ~base_lco_with_value() {}
-
-        ///
-        virtual threads::thread_state set_event (
-            threads::thread_self&, applier::applier&) = 0;
-
-        // Each of the exposed functions needs to be encapsulated into an action
-        // type, allowing to generate all required boilerplate code for threads,
-        // serialization, etc.
-        typedef hpx::actions::action0<
-            base_lco_with_value, lco_set_result, 
-            &base_lco_with_value::set_event
-        > set_result_action;
     };
 
 }}

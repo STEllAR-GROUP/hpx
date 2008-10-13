@@ -43,7 +43,7 @@ namespace hpx { namespace util
 
     public:
         section();
-        explicit section(std::string const& filename);
+        explicit section(std::string const& filename, section* root = NULL);
         section(section const& in);
         ~section() {}
 

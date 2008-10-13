@@ -17,6 +17,9 @@ namespace hpx { namespace components
     template <typename Component>
     class simple_component_base : public simple_component_tag
     {
+    private:
+        static component_type value;
+
     public:
         /// \brief Construct an empty managed_component_base
         simple_component_base() 
@@ -29,6 +32,12 @@ namespace hpx { namespace components
             if (gid_ && appl_)
                 appl_->get_dgas_client().unbind(gid_);
         }
+
+        // This is the component id. Every component needs to have an embedded
+        // enumerator 'value' which is used by the generic action implementation
+        // to associate this component with a given action.
+        HPX_COMPONENT_EXPORT static component_type get_component_type();
+        HPX_COMPONENT_EXPORT static void set_component_type(component_type);
 
         /// \brief Create a new GID (if called for the first time), assign this 
         ///        GID to this instance of a component and register this gid 
@@ -86,5 +95,20 @@ namespace hpx { namespace components
     };
 
 }}
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_SIMPLE_COMPONENT(component)                              \
+    hpx::components::component_type                                           \
+    hpx::components::simple_component_base<component>::value =                \
+        component_invalid;                                                    \
+                                                                              \
+    hpx::components::component_type                                           \
+    hpx::components::simple_component_base<component>::get_component_type()   \
+    { return value; }                                                         \
+                                                                              \
+    void hpx::components::simple_component_base<component>::                  \
+        set_component_type(hpx::components::component_type type)              \
+    { value = type; }                                                         \
+    /**/
 
 #endif

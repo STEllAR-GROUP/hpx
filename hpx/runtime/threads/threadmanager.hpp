@@ -33,10 +33,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
-    // forward declaration only (needed for intrusive_ptr<thread>)
-    void intrusive_ptr_add_ref(thread* p);
-    void intrusive_ptr_release(thread* p);
-
     ///////////////////////////////////////////////////////////////////////////
     /// \class threadmanager threadmanager.hpp hpx/runtime/threads/threadmanager.hpp
     ///

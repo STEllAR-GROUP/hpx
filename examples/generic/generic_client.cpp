@@ -7,7 +7,10 @@
 #include <iostream>
 
 #include <hpx/hpx.hpp>
-#include <hpx/components/simple_accumulator/simple_accumulator.hpp>
+
+#include <hpx/components/generic/generic_component_noresult.hpp>
+#include <hpx/components/generic/generic_component_result.hpp>
+#include <hpx/runtime/components/generic_component.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
@@ -21,6 +24,9 @@ using namespace std;
 threads::thread_state 
 hpx_main(threads::thread_self& self, applier::applier& appl)
 {
+    typedef components::generic_component<print_number_wrapper> print_component_type;
+    typedef components::generic_component<generate_number_wrapper> generator_component_type;
+
     // get list of all known localities
     std::vector<naming::id_type> prefixes;
     naming::id_type prefix;
@@ -33,49 +39,18 @@ hpx_main(threads::thread_self& self, applier::applier& appl)
         prefix = appl.get_runtime_support_gid();
     }
 
-    using hpx::components::simple_accumulator;
-    simple_accumulator accu(simple_accumulator::create(self, appl, prefix));
-
-    // print some message
-    std::cout << "simple accumulator client, you may enter some commands\n"
-                 "(try 'help' if in doubt...)" << std::endl;
-
-    // execute a couple of commands on this component
-    std::string cmd;
-    std::cin >> cmd;
-    while (true)
+    // we need to wrap the following into a separate block, because the
+    // generator and printer objects will free the server side instances in 
+    // their destructors, which without this block would be invoked too late
     {
-        if(cmd == "init") {
-            accu.init();
-        }
-        else if (cmd == "add") {
-            std::string arg;
-            std::cin >> arg;
-            accu.add(boost::lexical_cast<double>(arg));
-        }
-        else if (cmd == "print") {
-            accu.print();
-        }
-        else if (cmd == "query") {
-            std::cout << accu.query(self) << std::endl;
-        }
-        else if (cmd == "help") {
-            std::cout << "commands: init, add [amount], print, query, help, quit" 
-                      << std::endl;
-        }
-        else if (cmd == "quit") {
-            break;
-        }
-        else {
-            std::cout << "Invalid command." << std::endl;
-            std::cout << "commands: init, add [amount], print, help, quit" 
-                      << std::endl;
-        }
-        std::cin >> cmd;
-    }
+        // create new instances of the generator and printer components
+        generator_component_type generator(generator_component_type::create(self, appl, prefix));
+        print_component_type printer(print_component_type::create(self, appl, prefix));
 
-    // free the accumulator component
-    accu.free();     // this invalidates the remote reference
+        // invoke both generic component's actions
+        double val = generator.eval(self);
+        printer.eval(self, val);
+    }
 
     // initiate shutdown of the runtime systems on all localities
     components::stubs::runtime_support::shutdown_all(appl);
@@ -110,7 +85,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
         }
     }
     catch (std::exception const& e) {
-        std::cerr << "accumulator_client: exception caught: " << e.what() << std::endl;
+        std::cerr << "generic_client: exception caught: " << e.what() << std::endl;
         return false;
     }
     return true;

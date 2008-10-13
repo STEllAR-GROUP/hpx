@@ -359,8 +359,8 @@ namespace hpx { namespace naming
                 archive >> rep;
             }
         }
-        catch (boost::system::error_code const& e) {
-            HPX_THROW_EXCEPTION(network_error, e.message());
+        catch (boost::system::system_error const& e) {
+            HPX_THROW_EXCEPTION(network_error, e.what());
         }        
         catch (std::exception const& e) {
             HPX_THROW_EXCEPTION(network_error, e.what());

@@ -91,8 +91,8 @@ section::section ()
     regex_init();
 }
 
-section::section (std::string const& filename)
-  : root_(this_()), name_(filename)
+section::section (std::string const& filename, section* root)
+  : root_(NULL != root ? root : this_()), name_(filename)
 {
     read(filename);
 }
@@ -469,7 +469,7 @@ void section::dump(int ind, std::ostream& strm) const
 
 void section::merge(std::string const& filename)
 {
-    section tmp(filename);
+    section tmp(filename, root_);
     merge(tmp);
 }
 

@@ -6,10 +6,6 @@
 #if !defined(HPX_LCOS_SIMPLE_FUTURE_JUN_12_2008_0654PM)
 #define HPX_LCOS_SIMPLE_FUTURE_JUN_12_2008_0654PM
 
-#include <boost/intrusive_ptr.hpp>
-#include <boost/throw_exception.hpp>
-#include <boost/variant.hpp>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread.hpp>
@@ -18,6 +14,9 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/util/full_empty_memory.hpp>
+
+#include <boost/shared_ptr.hpp>
+#include <boost/variant.hpp>
 
 namespace hpx { namespace lcos { namespace detail 
 {
@@ -143,9 +142,7 @@ namespace hpx { namespace lcos
     {
     protected:
         typedef detail::simple_future<Result> wrapped_type;
-        typedef components::managed_component_base<
-            wrapped_type, components::detail::this_type, boost::mpl::true_> 
-        wrapping_type;
+        typedef components::managed_component_base<wrapped_type> wrapping_type;
 
         /// Construct a new \a future instance. The supplied 
         /// \a thread will be notified as soon as the result of the 
@@ -192,7 +189,7 @@ namespace hpx { namespace lcos
         }
 
     protected:
-        boost::intrusive_ptr<wrapping_type> impl_;
+        boost::shared_ptr<wrapping_type> impl_;
     };
 
 }}

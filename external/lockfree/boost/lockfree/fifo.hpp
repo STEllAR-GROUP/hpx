@@ -27,7 +27,6 @@
 #include <memory>               /* std::auto_ptr */
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/intrusive_ptr.hpp>
 #include <boost/noncopyable.hpp>
 #if defined(_DEBUG)
 #include <boost/detail/atomic_count.hpp>
@@ -274,11 +273,6 @@ public:
     }
 
     bool dequeue (boost::shared_ptr<T> & ret)
-    {
-        return dequeue_smart_ptr(ret);
-    }
-
-    bool dequeue (boost::intrusive_ptr<T>& ret)
     {
         return dequeue_smart_ptr(ret);
     }

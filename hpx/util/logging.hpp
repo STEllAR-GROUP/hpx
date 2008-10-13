@@ -6,6 +6,7 @@
 #if !defined(HPX_UTIL_DGAS_LOGGING_APR_10_2008_1032AM)
 #define HPX_UTIL_DGAS_LOGGING_APR_10_2008_1032AM
 
+#include <string>
 #include <hpx/config.hpp>
 #include <boost/logging/format/named_write_fwd.hpp>
 

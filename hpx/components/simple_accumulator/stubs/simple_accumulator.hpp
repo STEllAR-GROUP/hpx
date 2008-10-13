@@ -57,6 +57,11 @@ namespace hpx { namespace components { namespace stubs
                 server::simple_accumulator::get_component_type(), gid);
         }
 
+        void free(naming::id_type const& gid)
+        {
+            free(appl_, gid);
+        }
+
         /// Query the current value of the server#simple_accumulator instance 
         /// with the given \a gid. This is a non-blocking call. The caller 
         /// needs to call \a simple_future#get_result on the return value of 

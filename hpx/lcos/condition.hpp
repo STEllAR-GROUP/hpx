@@ -170,7 +170,7 @@ namespace hpx { namespace lcos
         }
 
     private:
-        boost::intrusive_ptr<wrapping_type> impl_;
+        boost::shared_ptr<wrapping_type> impl_;
     };
 
 }}

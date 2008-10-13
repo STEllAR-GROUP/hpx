@@ -4,12 +4,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <boost/assert.hpp>
-
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/logging.hpp>
+
+#include <boost/assert.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
@@ -58,6 +60,32 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        // we provide our own make_shared for threads because the 
+        // boost::make_shared allows to use only const references.
+        boost::shared_ptr<threads::thread> 
+        make_shared(boost::function<thread_function_type> threadfunc, 
+            threadmanager& tm, thread_state new_state, char const* const desc)
+        {
+            boost::shared_ptr<threads::thread> pt(
+                static_cast<threads::thread*>(0), 
+                boost::detail::sp_ms_deleter<threads::thread>());
+
+            boost::detail::sp_ms_deleter<threads::thread>* pd = 
+                boost::get_deleter<boost::detail::sp_ms_deleter<threads::thread> >(pt);
+
+            void* pv = pd->address();
+
+            new(pv) threads::thread(threadfunc, tm, new_state, desc);
+            pd->set_initialized();
+
+            return boost::shared_ptr<threads::thread>(pt, 
+                static_cast<threads::thread*>(pv));
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     thread_id_type threadmanager::register_work(
         boost::function<thread_function_type> threadfunc, 
         char const* const description, thread_state initial_state, bool run_now)
@@ -83,8 +111,8 @@ namespace hpx { namespace threads
                    << "description(" << description << ")";
 
         // create the new thread
-        boost::shared_ptr<thread> thrd (
-            new thread(threadfunc, *this, initial_state, description));
+        boost::shared_ptr<threads::thread> thrd (
+            detail::make_shared(threadfunc, *this, initial_state, description));
 
         // lock data members while adding work
         mutex_type::scoped_lock lk(mtx_);
@@ -420,6 +448,14 @@ namespace hpx { namespace threads
         catch (hpx::exception const& e) {
             LTM_(fatal) << "tfunc(" << num_thread 
                         << "): caught hpx::exception: " 
+                        << e.what() << ", aborted execution";
+            if (stop_) 
+                stop_();
+            return;
+        }
+        catch (boost::system::system_error const& e) {
+            LTM_(fatal) << "tfunc(" << num_thread 
+                        << "): caught boost::system::system_error: " 
                         << e.what() << ", aborted execution";
             if (stop_) 
                 stop_();

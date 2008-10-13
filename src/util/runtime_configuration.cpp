@@ -42,14 +42,14 @@ namespace hpx { namespace util
         util::init_ini_data_default(HPX_DEFAULT_COMPONENT_PATH, ini);
 
         // add explicit configuration information if its provided
-        if (util::init_ini_data_base(ini)) {
-            // merge all found ini files of all components
-            util::merge_component_inis(ini);
+        util::init_ini_data_base(ini); 
 
-            // read system and user ini files _again_, to allow the user to 
-            // overwrite the settings from the default component ini's. 
-            util::init_ini_data_base(ini);
-        }
+        // merge all found ini files of all components
+        util::merge_component_inis(ini);
+
+        // read system and user ini files _again_, to allow the user to 
+        // overwrite the settings from the default component ini's. 
+        util::init_ini_data_base(ini);
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -832,12 +832,28 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\..\hpx\runtime\components\generic_component.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\components\generic_component_eval.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\hpx\runtime\components\runtime_support.hpp"
 						>
 					</File>
 					<Filter
 						Name="Server"
 						>
+						<File
+							RelativePath="..\..\..\hpx\runtime\components\server\generic_component.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\components\server\generic_component_implementation.hpp"
+							>
+						</File>
 						<File
 							RelativePath="..\..\..\hpx\runtime\components\server\manage_component.hpp"
 							>
@@ -870,6 +886,14 @@
 					<Filter
 						Name="Stubs"
 						>
+						<File
+							RelativePath="..\..\..\hpx\runtime\components\stubs\generic_component.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\components\stubs\generic_component_eval.hpp"
+							>
+						</File>
 						<File
 							RelativePath="..\..\..\hpx\runtime\components\stubs\runtime_support.hpp"
 							>

@@ -25,25 +25,6 @@ namespace hpx { namespace components
     {
         ///////////////////////////////////////////////////////////////////////
         struct this_type {};
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename HasUseCount>
-        struct wrapper_use_count;
-
-        template <>
-        struct wrapper_use_count<boost::mpl::false_> 
-        {
-        };
-
-        template <>
-        struct wrapper_use_count<boost::mpl::true_> : boost::noncopyable
-        {
-            wrapper_use_count() 
-              : use_count_(0) 
-            {}
-
-            boost::detail::atomic_count use_count_;
-        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -66,12 +47,8 @@ namespace hpx { namespace components
     /// \tparam Derived
     /// \tparam HasUseCount
     ///
-    template <
-        typename Component, typename Derived = detail::this_type, 
-        typename HasUseCount = boost::mpl::false_
-    >
+    template <typename Component, typename Derived = detail::this_type>
     class managed_component_base 
-      : public detail::wrapper_use_count<HasUseCount>
     {
     private:
         typedef typename boost::mpl::if_<
@@ -303,22 +280,6 @@ namespace hpx { namespace components
     private:
         Component* component_;
     };
-
-    // support for boost::intrusive_ptr<managed_component_base<...> >
-    template <typename Component, typename Derived, typename HasUseCount>
-    inline void
-    intrusive_ptr_add_ref(managed_component_base<Component, Derived, HasUseCount>* p)
-    {
-        ++p->use_count_;
-    }
-
-    template <typename Component, typename Derived, typename HasUseCount>
-    inline void
-    intrusive_ptr_release(managed_component_base<Component, Derived, HasUseCount>* p)
-    {
-        if (--p->use_count_ == 0)
-            delete p;
-    }
 
 }}
 

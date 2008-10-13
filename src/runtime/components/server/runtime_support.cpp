@@ -240,11 +240,9 @@ namespace hpx { namespace components { namespace server
             if (ini.has_section(component_section))
                 component_ini = ini.get_section(component_section);
 
-            std::string component_name(util::unmangle_name(component));
-
             // create the component factory object
             component_factory_type factory (
-                pf.create(component_name, glob_ini, component_ini)); 
+                pf.create(instance, glob_ini, component_ini)); 
 
             component_type t = factory->get_component_type(dgas_client);
             if (0 == t) {

@@ -6,21 +6,18 @@
 #if !defined(HPX_LCOS_LAZY_FUTURE_JUN_27_2008_0446PM)
 #define HPX_LCOS_LAZY_FUTURE_JUN_27_2008_0446PM
 
-#include <boost/intrusive_ptr.hpp>
-#include <boost/throw_exception.hpp>
-#include <boost/variant.hpp>
-#include <boost/mpl/bool.hpp>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/actions/action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/simple_future.hpp>
 #include <hpx/util/full_empty_memory.hpp>
+
+#include <boost/variant.hpp>
+#include <boost/mpl/bool.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos 

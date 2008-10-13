@@ -12,12 +12,37 @@
 #include <boost/fusion/iterator/deref.hpp>
 #include <boost/fusion/iterator/next.hpp>
 #include <boost/fusion/iterator/equal_to.hpp>
+#include <boost/fusion/include/is_sequence.hpp>
 
 namespace hpx { namespace util
 {
+    template <typename Archive, typename Sequence>
+    void serialize_sequence(Archive& ar, Sequence& seq);
+
     /// serialization support for a boost::fusion::sequence
     struct serialize_sequence_loop
     {
+        template <typename Archive, typename Element>
+        static void serialize(Archive& ar, Element& e, boost::mpl::false_)
+        {
+            ar & e;
+        }
+
+        template <typename Archive, typename Element>
+        static void serialize(Archive& ar, Element& e, boost::mpl::true_)
+        {
+            serialize_sequence(ar, e);
+        }
+
+        template <typename Archive, typename Element>
+        static void serialize(Archive& ar, Element& e)
+        {
+            typedef 
+                typename boost::fusion::traits::is_sequence<Element>::type
+            is_sequence;
+            serialize(ar, e, is_sequence());
+        }
+
         template <typename Archive, typename First, typename Last>
         static void
         call (Archive&, First const&, Last const&, boost::mpl::true_)
@@ -32,7 +57,7 @@ namespace hpx { namespace util
                 typename boost::fusion::result_of::next<First>::type, Last
             > is_last;
 
-            ar & *first;
+            serialize(ar, *first);
             call(ar, boost::fusion::next(first), last, is_last);
         }
 
@@ -52,7 +77,7 @@ namespace hpx { namespace util
         serialize_sequence_loop::call(ar, boost::fusion::begin(seq), 
             boost::fusion::end(seq));
     }
-    
+
 }}
 
 #endif

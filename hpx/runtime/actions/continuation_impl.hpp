@@ -41,7 +41,7 @@ namespace hpx { namespace actions
              it != end; ++it)
         {
             if (!app.apply<lcos::base_lco::set_error_action>(
-                    *it, e.get_error(), e.what()))
+                    *it, e.get_error(), std::string(e.what())))
             {
                 break;
             }

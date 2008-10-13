@@ -57,7 +57,11 @@ set (hpxlib_HEADERS
     ../hpx/runtime/components/component_type.hpp
     ../hpx/runtime/components/component_factory_base.hpp
     ../hpx/runtime/components/component_factory.hpp
+    ../hpx/runtime/components/generic_component.hpp
+    ../hpx/runtime/components/generic_component_eval.hpp
     ../hpx/runtime/components/runtime_support.hpp
+    ../hpx/runtime/components/server/generic_component.hpp
+    ../hpx/runtime/components/server/generic_component_implementation.hpp
     ../hpx/runtime/components/server/manage_component.hpp
     ../hpx/runtime/components/server/managed_component_base.hpp
     ../hpx/runtime/components/server/memory.hpp
@@ -66,6 +70,8 @@ set (hpxlib_HEADERS
     ../hpx/runtime/components/server/wrapper_heap.hpp
     ../hpx/runtime/components/server/wrapper_heap_list.hpp
     ../hpx/runtime/components/stubs/runtime_support.hpp
+    ../hpx/runtime/components/stubs/generic_component.hpp
+    ../hpx/runtime/components/stubs/generic_component_eval.hpp
     # naming
     ../hpx/runtime/naming/address.hpp
     ../hpx/runtime/naming/locality.hpp

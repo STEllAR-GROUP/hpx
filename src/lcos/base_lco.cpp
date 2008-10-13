@@ -5,7 +5,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>

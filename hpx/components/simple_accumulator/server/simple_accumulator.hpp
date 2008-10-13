@@ -34,9 +34,6 @@ namespace hpx { namespace components { namespace server
     class simple_accumulator 
       : public components::simple_component_base<simple_accumulator>
     {
-    private:
-        static component_type value;
-
     public:
         // parcel action code: the action to be performed on the destination 
         // object (the accumulator)
@@ -47,12 +44,6 @@ namespace hpx { namespace components { namespace server
             accumulator_query_value = 2,
             accumulator_print = 3
         };
-
-        // This is the component id. Every component needs to have an embedded
-        // enumerator 'value' which is used by the generic action implementation
-        // to associate this component with a given action.
-        HPX_COMPONENT_EXPORT static component_type get_component_type();
-        HPX_COMPONENT_EXPORT static void set_component_type(component_type);
 
         // constructor: initialize accumulator value
         simple_accumulator(applier::applier&)

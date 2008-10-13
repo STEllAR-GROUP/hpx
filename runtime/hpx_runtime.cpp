@@ -11,18 +11,23 @@
 namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
-bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
+bool parse_commandline(char const* name, int argc, char *argv[], 
+    po::variables_map& vm)
 {
     try {
-        po::options_description desc_cmdline ("Usage: hpx_runtime [options]");
+        std::string usage("Usage: ");
+        usage += name;
+        usage += " [options]";
+
+        po::options_description desc_cmdline (usage);
         desc_cmdline.add_options()
             ("help,h", "print out program usage (this message)")
             ("run_dgas_server,r", "run DGAS server as part of this runtime instance")
             ("no_hpx_runtime,n", "do not run hpx runtime as part of this runtime instance")
-            ("dgas_address,d", po::value<std::string>(), 
+            ("dgas", po::value<std::string>(), 
                 "the IP address the DGAS server is running on (default taken "
                 "from hpx.ini), expected format: 192.168.1.1:7912")
-            ("hpx_address,h", po::value<std::string>(), 
+            ("hpx", po::value<std::string>(), 
                 "the IP address the HPX parcelport is listening on (default "
                 "is localhost:7910), expected format: 192.168.1.1:7913")
         ;
@@ -88,7 +93,7 @@ int main(int argc, char* argv[])
     try {
         // analyze the command line
         po::variables_map vm;
-        if (!parse_commandline(argc, argv, vm))
+        if (!parse_commandline("hpx_runtime", argc, argv, vm))
             return -1;
 
         // Check command line arguments.
@@ -96,14 +101,14 @@ int main(int argc, char* argv[])
         boost::uint16_t hpx_port = HPX_PORT, dgas_port = 0;
 
         // extract IP address/port arguments
-        if (vm.count("dgas_address")) 
-            split_ip_address(vm["dgas_address"].as<std::string>(), dgas_host, dgas_port);
+        if (vm.count("dgas")) 
+            split_ip_address(vm["dgas"].as<std::string>(), dgas_host, dgas_port);
 
-        if (vm.count("hpx_address")) 
-            split_ip_address(vm["hpx_address"].as<std::string>(), hpx_host, hpx_port);
+        if (vm.count("hpx")) 
+            split_ip_address(vm["hpx"].as<std::string>(), hpx_host, hpx_port);
 
         // do we need to execute the HPX runtime
-        bool no_hpx_runtime = vm.count("no_hpx_runtime");
+        bool no_hpx_runtime = vm.count("no_hpx_runtime") != 0;
 
         // initialize and run the DGAS service, if appropriate
         std::auto_ptr<dgas_server_helper> dgas_server;
