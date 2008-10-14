@@ -158,13 +158,6 @@ install(
     REGEX ".svn" EXCLUDE
     REGEX "CMakeFiles" EXCLUDE)
 
-install(
-    DIRECTORY hpx/                    # install all hpx configuration (ini) files
-    DESTINATION share/hpx/ini 
-    FILES_MATCHING PATTERN "*.ini"
-    REGEX ".svn" EXCLUDE
-    REGEX "CMakeFiles" EXCLUDE)
-
 # export build settings
 include(CMakeExportBuildSettings)
 cmake_export_build_settings("${PROJECT_NAME}BuildSettings.cmake")
