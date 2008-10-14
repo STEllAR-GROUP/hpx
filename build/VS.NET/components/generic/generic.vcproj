@@ -202,6 +202,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath="..\..\..\..\hpx\components\generic\generic.ini"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

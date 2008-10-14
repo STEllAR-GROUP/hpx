@@ -150,7 +150,6 @@ set (hpxlib_SOURCES
     ../src/runtime/parcelset/parcelhandler.cpp
     ../src/runtime/parcelset/parcelport.cpp
     ../src/runtime/parcelset/server/parcelhandler_queue.cpp
-    ../src/runtime/parcelset/server/parcelport_queue.cpp
     # threadmanager
     ../src/runtime/threads/threadmanager.cpp
     # util 

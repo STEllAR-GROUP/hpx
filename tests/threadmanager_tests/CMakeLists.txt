@@ -10,7 +10,7 @@ set(TESTS
     exception_test)
 
 # build and install each of the tests
-foreach(test ${TESTS])
+foreach(test ${TESTS})
     set(${test}_SOURCES ${test}.cpp)
     add_executable(${test}_exe ${${test}_SOURCES})
     set_target_properties(${test}_exe PROPERTIES OUTPUT_NAME ${test})

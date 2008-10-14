@@ -10,9 +10,11 @@
 #include <hpx/components/accumulator/accumulator.hpp>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/program_options.hpp>
 
 using namespace hpx;
 using namespace std;
+namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
 threads::thread_state 

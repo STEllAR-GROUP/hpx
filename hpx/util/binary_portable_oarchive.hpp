@@ -1,5 +1,5 @@
-#ifndef PORTABLE_BINARY_OARCHIVE_HPP
-#define PORTABLE_BINARY_OARCHIVE_HPP
+#ifndef PORTABLE_BINARY_OARCHIVE_HPP_V1_36
+#define PORTABLE_BINARY_OARCHIVE_HPP_V1_36
 
 // MS compatible compilers support #pragma once
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
@@ -176,4 +176,4 @@ public:
     BOOST_SERIALIZATION_REGISTER_ARCHIVE(hpx::util::portable_binary_oarchive)
 #endif
 
-#endif // PORTABLE_BINARY_OARCHIVE_HPP
+#endif // PORTABLE_BINARY_OARCHIVE_HPP_V1_36

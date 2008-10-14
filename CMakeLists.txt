@@ -109,6 +109,7 @@ if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
     add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
     add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
+    add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
     # suppress certain warnings
     add_definitions(-wd4251 -wd4231 -wd4275 -wd4660 -wd4094)
 endif()
@@ -154,6 +155,13 @@ install(
     DIRECTORY hpx/                    # install all hpx header files
     DESTINATION include 
     FILES_MATCHING PATTERN "*.hpp"
+    REGEX ".svn" EXCLUDE
+    REGEX "CMakeFiles" EXCLUDE)
+
+install(
+    DIRECTORY hpx/                    # install all hpx configuration (ini) files
+    DESTINATION share/hpx/ini 
+    FILES_MATCHING PATTERN "*.ini"
     REGEX ".svn" EXCLUDE
     REGEX "CMakeFiles" EXCLUDE)
 

@@ -59,7 +59,7 @@ namespace hpx { namespace components { namespace stubs
 
         void free(naming::id_type const& gid)
         {
-            free(appl_, gid);
+            free(app_, gid);
         }
 
         /// Query the current value of the server#accumulator instance 

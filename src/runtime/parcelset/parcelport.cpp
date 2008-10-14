@@ -100,8 +100,8 @@ namespace hpx { namespace parcelset
     {
         if (e && e != boost::asio::error::operation_aborted)
         {
-            // FIXME: add error handling
-            std::cerr << "Error: " << e.message() << std::endl;
+            LPT_(error) << "handle read operation completion: error: " 
+                        << e.message();
         }
     }
 

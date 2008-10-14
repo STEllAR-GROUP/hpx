@@ -81,6 +81,17 @@ namespace hpx { namespace components
             return Component::get_component_type();
         }
 
+        /// \brief Return the name of the component type this factory is 
+        ///        responsible for
+        ///
+        /// \return Returns the name of the component type this factory 
+        ///         instance is responsible for. This function throws on any 
+        ///         error.
+        std::string get_component_name() const
+        {
+            return unique_component_name;
+        }
+
         /// \brief Create one or more new component instances.
         ///
         /// \param appl         [in] The applier instance to be used to create

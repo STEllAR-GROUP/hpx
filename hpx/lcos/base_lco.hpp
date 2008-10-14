@@ -44,7 +44,6 @@ namespace hpx { namespace lcos
         /// derived objects
         virtual ~base_lco() {}
 
-        /// actions
         virtual threads::thread_state set_event (
             threads::thread_self& self, applier::applier& appl) = 0;
 
@@ -58,16 +57,30 @@ namespace hpx { namespace lcos
             return threads::terminated;
         }
 
+        /// actions
+        threads::thread_state set_event_nonvirt (
+            threads::thread_self& self, applier::applier& appl)
+        {
+            return set_event(self, appl);
+        }
+
+        threads::thread_state set_error_nonvirt (
+            threads::thread_self& self, applier::applier& appl,
+            hpx::error code, std::string msg)
+        {
+            return set_error(self, appl, code, msg);
+        }
+
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::action0<
-            base_lco, lco_set_event, &base_lco::set_event
+            base_lco, lco_set_event, &base_lco::set_event_nonvirt
         > set_event_action;
 
         typedef hpx::actions::action2<
             base_lco, lco_set_error, hpx::error, std::string,
-            &base_lco::set_error
+            &base_lco::set_error_nonvirt
         > set_error_action;
     };
 
@@ -97,7 +110,6 @@ namespace hpx { namespace lcos
         /// derived objects
         virtual ~base_lco_with_value() {}
 
-        /// actions
         virtual threads::thread_state set_event (
             threads::thread_self& self, applier::applier& appl)
         {
@@ -109,12 +121,20 @@ namespace hpx { namespace lcos
             threads::thread_self&, applier::applier& appl,
             Result const& result) = 0;
 
+        /// actions
+        threads::thread_state set_result_nonvirt (
+            threads::thread_self& self, applier::applier& appl,
+            Result const& result) 
+        {
+            return set_result(self, appl, result);
+        }
+
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::action1<
             base_lco_with_value, lco_set_result, Result const&, 
-            &base_lco_with_value::set_result
+            &base_lco_with_value::set_result_nonvirt
         > set_result_action;
     };
 

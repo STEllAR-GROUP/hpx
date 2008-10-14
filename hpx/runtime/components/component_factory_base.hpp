@@ -52,6 +52,14 @@ namespace hpx { namespace components
         virtual component_type get_component_type(
             naming::resolver_client& dgas_client) = 0;
 
+        /// \brief Return the name of the component type this factory is 
+        ///        responsible for
+        ///
+        /// \return Returns the name of the component type this factory 
+        ///         instance is responsible for. This function throws on any 
+        ///         error.
+        virtual std::string get_component_name() const = 0;
+
         /// \brief Create one or more new component instances.
         ///
         /// \param appl         [in] The applier instance to be used to create

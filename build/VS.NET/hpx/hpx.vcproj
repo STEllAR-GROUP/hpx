@@ -448,10 +448,6 @@
 							RelativePath="..\..\..\src\runtime\parcelset\server\parcelhandler_queue.cpp"
 							>
 						</File>
-						<File
-							RelativePath="..\..\..\src\runtime\parcelset\server\parcelport_queue.cpp"
-							>
-						</File>
 					</Filter>
 				</Filter>
 				<Filter
