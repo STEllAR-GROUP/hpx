@@ -58,7 +58,7 @@ namespace hpx { namespace applier
             // Create a new parcel with the gid, action, and arguments
             parcelset::parcel p (gid, new Action());
             if (components::component_invalid == addr.type_)
-                addr.type_ = Action::component_type::get_component_type();
+                addr.type_ = components::get_component_type<typename Action::component_type>();
             p.set_destination_addr(addr);   // avoid to resolve address again
 
             // Send the parcel through the parcel handler
@@ -95,7 +95,7 @@ namespace hpx { namespace applier
             // Create a new parcel with the gid, action, and arguments
             parcelset::parcel p (gid, new Action(), cont);
             if (components::component_invalid == addr.type_)
-                addr.type_ = Action::component_type::get_component_type();
+                addr.type_ = components::get_component_type<typename Action::component_type>();
             p.set_destination_addr(addr);   // avoid to resolve address again
 
             // Send the parcel through the parcel handler
@@ -144,7 +144,7 @@ namespace hpx { namespace applier
             // Create a new parcel with the gid, action, and arguments
             parcelset::parcel p (gid, new Action(arg0));
             if (components::component_invalid == addr.type_)
-                addr.type_ = Action::component_type::get_component_type();
+                addr.type_ = components::get_component_type<typename Action::component_type>();
             p.set_destination_addr(addr);   // avoid to resolve address again
 
             // Send the parcel through the parcel handler
@@ -177,7 +177,7 @@ namespace hpx { namespace applier
             // Create a new parcel with the gid, action, and arguments
             parcelset::parcel p (gid, new Action(arg0), cont);
             if (components::component_invalid == addr.type_)
-                addr.type_ = Action::component_type::get_component_type();
+                addr.type_ = components::get_component_type<typename Action::component_type>();
             p.set_destination_addr(addr);   // avoid to resolve address again
 
             // Send the parcel through the parcel handler
@@ -355,22 +355,22 @@ namespace hpx { namespace applier
 
     /// The \a create_async function initiates the creation of a new 
     /// component using the runtime_support as given by targetgid. This 
-    /// function is non-blocking as it returns a \a lcos#simple_future. The 
+    /// function is non-blocking as it returns a \a lcos#future_value. The 
     /// caller of this create_async is responsible to call 
-    /// \a lcos#simple_future#get_result to obtain the result. 
+    /// \a lcos#future_value#get_result to obtain the result. 
     ///
     /// \param self
     /// \param targetgid
     /// \param type
     /// \param count
     ///
-    /// \returns    The function returns a \a lcos#simple_future instance 
+    /// \returns    The function returns a \a lcos#future_value instance 
     ///             returning the the global id of the newly created
     ///             component when used to call get_result.
     ///
     /// \note       For synchronous operation use the function 
     ///             \a applier#create_async.
-    HPX_API_EXPORT lcos::simple_future<naming::id_type> 
+    HPX_API_EXPORT lcos::future_value<naming::id_type> 
         create_async(applier& appl, naming::id_type const& targetgid, 
             components::component_type type, std::size_t count = 1);
 

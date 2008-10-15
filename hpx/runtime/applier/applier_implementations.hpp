@@ -37,7 +37,7 @@
         // Create a new parcel with the gid, action, and arguments
         parcelset::parcel p (gid, new Action(BOOST_PP_ENUM_PARAMS(N, arg)));
         if (components::component_invalid == addr.type_)
-            addr.type_ = Action::component_type::get_component_type();
+            addr.type_ = components::get_component_type<typename Action::component_type>();
         p.set_destination_addr(addr);   // avoid to resolve address again
 
         // Send the parcel through the parcel handler
@@ -76,7 +76,7 @@
         // Create a new parcel with the gid, action, and arguments
         parcelset::parcel p (gid, new Action(BOOST_PP_ENUM_PARAMS(N, arg)), cont);
         if (components::component_invalid == addr.type_)
-            addr.type_ = Action::component_type::get_component_type();
+            addr.type_ = components::get_component_type<typename Action::component_type>();
         p.set_destination_addr(addr);   // avoid to resolve address again
 
         // Send the parcel through the parcel handler

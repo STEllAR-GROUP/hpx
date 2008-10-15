@@ -13,7 +13,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/lcos/base_lco.hpp>
-#include <hpx/lcos/simple_future.hpp>
+#include <hpx/lcos/future_value.hpp>
 #include <hpx/util/full_empty_memory.hpp>
 
 #include <boost/variant.hpp>
@@ -57,10 +57,10 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
     class lazy_future<Action, Result, boost::mpl::false_> 
-      : public simple_future<Result>
+      : public future_value<Result, 1>
     {
     private:
-        typedef simple_future<Result> base_type;
+        typedef future_value<Result, 1> base_type;
 
     public:
         /// Construct a new \a lazy_future instance. The \a thread 
@@ -84,7 +84,7 @@ namespace hpx { namespace lcos
         /// manager the function \a lazy_future#get_result will return.
         ///
         /// \param self   [in] The \a thread which will be unconditionally
-        ///               while waiting for the result. 
+        ///               blocked (yielded) while waiting for the result. 
         /// \param appl   [in] The \a applier instance to be used to execute 
         ///               the embedded action.
         /// \param gid    [in] The global id of the target component to use to
@@ -101,7 +101,7 @@ namespace hpx { namespace lcos
             appl.apply_c<Action>(this->get_gid(appl), gid);
 
             // wait for the result (yield control)
-            return (*this->impl_)->get_result(self);
+            return (*this->impl_)->get_result(self, 0);
         }
 
         /// Get the result of the requested action. This call blocks (yields 
@@ -110,7 +110,7 @@ namespace hpx { namespace lcos
         /// manager the function \a lazy_future#get_result will return.
         ///
         /// \param self   [in] The \a thread which will be unconditionally
-        ///               while waiting for the result. 
+        ///               blocked (yielded) while waiting for the result. 
         /// \param appl   [in] The \a applier instance to be used to execute 
         ///               the embedded action.
         /// \param gid    [in] The global id of the target component to use to
@@ -131,7 +131,7 @@ namespace hpx { namespace lcos
             appl.apply_c<Action>(this->get_gid(appl), gid, arg0);
 
             // wait for the result (yield control)
-            return (*this->impl_)->get_result(self);
+            return (*this->impl_)->get_result(self, 0);
         }
 
         // pull in remaining get_result's
@@ -141,10 +141,10 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
     class lazy_future<Action, Result, boost::mpl::true_> 
-      : public simple_future<Result>
+      : public future_value<Result, 1>
     {
     private:
-        typedef simple_future<Result> base_type;
+        typedef future_value<Result, 1> base_type;
 
     public:
         /// Construct a new \a lazy_future instance. The \a thread 
@@ -168,7 +168,7 @@ namespace hpx { namespace lcos
         /// manager the function \a lazy_future#get_result will return.
         ///
         /// \param self   [in] The \a thread which will be unconditionally
-        ///               while waiting for the result. 
+        ///               blocked (yielded) while waiting for the result. 
         /// \param appl   [in] The \a applier instance to be used to execute 
         ///               the embedded action.
         /// \param gid    [in] The global id of the target component to use to
@@ -192,7 +192,7 @@ namespace hpx { namespace lcos
             appl.apply_c<Action>(addr, this->get_gid(appl), gid);
 
             // wait for the result (yield control)
-            return (*this->impl_)->get_result(self);
+            return (*this->impl_)->get_result(self, 0);
         }
 
         /// Get the result of the requested action. This call blocks (yields 
@@ -201,7 +201,7 @@ namespace hpx { namespace lcos
         /// manager the function \a lazy_future#get_result will return.
         ///
         /// \param self   [in] The \a thread which will be unconditionally
-        ///               while waiting for the result. 
+        ///               blocked (yielded) while waiting for the result. 
         /// \param appl   [in] The \a applier instance to be used to execute 
         ///               the embedded action.
         /// \param gid    [in] The global id of the target component to use to
@@ -229,7 +229,7 @@ namespace hpx { namespace lcos
             appl.apply_c<Action>(addr, this->get_gid(appl), gid, arg0);
 
             // wait for the result (yield control)
-            return (*this->impl_)->get_result(self);
+            return (*this->impl_)->get_result(self, 0);
         }
 
         // pull in remaining get_result's

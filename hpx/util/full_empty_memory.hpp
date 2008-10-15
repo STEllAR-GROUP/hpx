@@ -26,7 +26,7 @@ namespace hpx { namespace util
             // stored
             typedef detail::full_empty_store store_type;
             struct full_empty_tag {};
-            
+
             static store_type& get_store()
             {
                 // ensure thread-safe initialization

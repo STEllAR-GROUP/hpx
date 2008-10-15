@@ -15,7 +15,7 @@ namespace hpx { namespace components
     /// \class simple_component_base simple_component_base.hpp hpx/runtime/components/server/simple_component_base.hpp
     ///
     template <typename Component>
-    class simple_component_base : public simple_component_tag
+    class simple_component_base : public detail::simple_component_tag
     {
     private:
         static component_type value;
@@ -98,17 +98,22 @@ namespace hpx { namespace components
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_SIMPLE_COMPONENT(component)                              \
-    hpx::components::component_type                                           \
-    hpx::components::simple_component_base<component>::value =                \
-        component_invalid;                                                    \
+    namespace hpx { namespace components {                                    \
+        component_type                                                        \
+        simple_component_base<component>::value = component_invalid;          \
                                                                               \
-    hpx::components::component_type                                           \
-    hpx::components::simple_component_base<component>::get_component_type()   \
-    { return value; }                                                         \
+        component_type                                                        \
+        simple_component_base<component>::get_component_type()                \
+        { return value; }                                                     \
                                                                               \
-    void hpx::components::simple_component_base<component>::                  \
-        set_component_type(hpx::components::component_type type)              \
-    { value = type; }                                                         \
+        void simple_component_base<component>::                               \
+            set_component_type(component_type type)                           \
+        { value = type; }                                                     \
+                                                                              \
+        template<> HPX_ALWAYS_EXPORT                                          \
+        component_type get_component_type<component>()                        \
+        { return component::get_component_type(); }                           \
+    }}                                                                        \
     /**/
 
 #endif

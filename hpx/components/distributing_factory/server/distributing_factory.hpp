@@ -45,7 +45,7 @@ namespace hpx { namespace components { namespace server { namespace detail
         // enumerator 'value' which is used by the generic action implementation
         // to associate this component with a given action.
         HPX_COMPONENT_EXPORT static component_type get_component_type();
-        HPX_COMPONENT_EXPORT static void set_component_type(component_type);
+        static void set_component_type(component_type);
 
         // constructor
         distributing_factory()

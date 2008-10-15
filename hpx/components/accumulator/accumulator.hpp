@@ -79,7 +79,7 @@ namespace hpx { namespace components
         }
 
         /// Asynchronously query the current value of the accumulator
-        lcos::simple_future<double> query_async() 
+        lcos::future_value<double> query_async() 
         {
             return this->base_type::query_async(gid_);
         }

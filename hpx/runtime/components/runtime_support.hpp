@@ -42,7 +42,7 @@ namespace hpx { namespace components
         }
 
         /// Asynchronously create a new component using the runtime_support 
-        lcos::simple_future<naming::id_type> 
+        lcos::future_value<naming::id_type> 
         create_component_async(components::component_type type, 
             std::size_t count = 1) 
         {

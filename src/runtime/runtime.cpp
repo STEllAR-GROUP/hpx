@@ -115,12 +115,13 @@ namespace hpx
         // register the runtime_support and memory instances with the DGAS 
         dgas_client_.bind(applier_.get_runtime_support_gid(), 
             naming::address(parcel_port_.here(), 
-                components::server::runtime_support::get_component_type(), 
+                components::get_component_type<components::server::runtime_support>(), 
                 &runtime_support_));
 
         dgas_client_.bind(applier_.get_memory_gid(), 
             naming::address(parcel_port_.here(), 
-                components::server::memory::get_component_type(), &memory_));
+                components::get_component_type<components::server::memory>(), 
+                &memory_));
 
         // register the given main function with the thread manager
         if (!func.empty())

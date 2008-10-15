@@ -37,7 +37,7 @@ namespace hpx
     {
         struct is_simple_component
           : boost::is_base_and_derived<
-                components::simple_component_tag, Component
+                components::detail::simple_component_tag, Component
             >
         {};
 

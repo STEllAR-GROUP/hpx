@@ -34,9 +34,6 @@
         naming::id_type const& targetgid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        typedef typename ServerComponent::eval_action action_type;
-        typedef typename ServerComponent::parameter_block_type params_type;
-
         return detail::eval<action_type, result_type>::call(self, appl, 
             targetgid, params_type(BOOST_PP_ENUM_PARAMS(N, arg)));
     }

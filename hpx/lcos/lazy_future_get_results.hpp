@@ -40,7 +40,7 @@
             BOOST_PP_ENUM_PARAMS(N, arg));
 
         // wait for the result (yield control)
-        return (*this->impl_)->get_result(self);
+        return (*this->impl_)->get_result(self, 0);
     }
 
 #undef N

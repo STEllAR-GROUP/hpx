@@ -18,6 +18,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
+#include <boost/assert.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
 
@@ -32,6 +33,9 @@ HPX_REGISTER_ACTION(hpx::components::server::runtime_support::create_component_a
 HPX_REGISTER_ACTION(hpx::components::server::runtime_support::free_component_action);
 HPX_REGISTER_ACTION(hpx::components::server::runtime_support::shutdown_action);
 HPX_REGISTER_ACTION(hpx::components::server::runtime_support::shutdown_all_action);
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::runtime_support);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server

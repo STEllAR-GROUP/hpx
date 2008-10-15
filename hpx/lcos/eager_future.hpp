@@ -14,7 +14,7 @@
 #include <hpx/runtime/actions/action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/lcos/simple_future.hpp>
+#include <hpx/lcos/future_value.hpp>
 
 #include <boost/variant.hpp>
 
@@ -56,10 +56,10 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
     class eager_future<Action, Result, boost::mpl::false_> 
-        : public simple_future<Result>
+        : public future_value<Result>
     {
     private:
-        typedef simple_future<Result> base_type;
+        typedef future_value<Result> base_type;
 
     public:
         /// Construct a new \a eager_future instance. The \a thread 
@@ -104,10 +104,10 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
     class eager_future<Action, Result, boost::mpl::true_> 
-        : public simple_future<Result>
+        : public future_value<Result>
     {
     private:
-        typedef simple_future<Result> base_type;
+        typedef future_value<Result> base_type;
 
     public:
         /// Construct a new \a eager_future instance. The \a thread 

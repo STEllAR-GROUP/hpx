@@ -33,11 +33,11 @@ set (hpxlib_HEADERS
     ../hpx/lcos/eager_future.hpp
     ../hpx/lcos/eager_future_constructors.hpp
     ../hpx/lcos/eager_future_constructors_direct.hpp
+    ../hpx/lcos/future_value.hpp
     ../hpx/lcos/lazy_future.hpp
     ../hpx/lcos/lazy_future_get_results.hpp
     ../hpx/lcos/lazy_future_get_results_direct.hpp
     ../hpx/lcos/mutex.hpp
-    ../hpx/lcos/simple_future.hpp
     # runtime
     ../hpx/runtime/get_lva.hpp
     ../hpx/runtime/runtime.hpp
@@ -151,6 +151,7 @@ set (hpxlib_SOURCES
     ../src/runtime/parcelset/parcelport.cpp
     ../src/runtime/parcelset/server/parcelhandler_queue.cpp
     # threadmanager
+    ../src/runtime/threads/thread.cpp
     ../src/runtime/threads/threadmanager.cpp
     # util 
     ../src/util/asio_util.cpp

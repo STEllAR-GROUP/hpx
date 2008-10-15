@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_SIMPLE_FUTURE_JUN_12_2008_0654PM)
-#define HPX_LCOS_SIMPLE_FUTURE_JUN_12_2008_0654PM
+#if !defined(HPX_LCOS_FUTURE_VALUE_JUN_12_2008_0654PM)
+#define HPX_LCOS_FUTURE_VALUE_JUN_12_2008_0654PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -17,14 +17,20 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/variant.hpp>
+#include <boost/static_assert.hpp>
 
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail 
 {
-    // A simple_future can be used by a single thread to invoke a (remote) 
-    // action and wait for the result. 
-    template <typename Result>
-    class simple_future : public lcos::base_lco_with_value<Result>
+    /// A future_value can be used by a single thread to invoke a (remote) 
+    /// action and wait for the result. 
+    template <typename Result, int N>
+    class future_value : public lcos::base_lco_with_value<Result>
     {
+    private:
+        // make sure N is in a reasonable range
+        BOOST_STATIC_ASSERT(N > 0);   // N must be greater than zero
+
     private:
         typedef Result result_type;
         typedef std::pair<boost::system::error_code, std::string> error_type;
@@ -36,18 +42,38 @@ namespace hpx { namespace lcos { namespace detail
         // to associate this component with a given action.
         enum { value = components::component_future };
 
-        simple_future()
+        future_value()
         {}
 
-        Result get_result(threads::thread_self& self) 
+        /// Get the result of the requested action. This call blocks (yields 
+        /// control) if the result is not ready. As soon as the result has been 
+        /// returned and the waiting thread has been re-scheduled by the thread
+        /// manager the function \a lazy_future#get_result will return.
+        ///
+        /// \param slot   [in] The number of the slot the value has to be 
+        ///               returned for. This number must be positive, but 
+        ///               smaller than the template parameter \a N.
+        /// \param self   [in] The \a thread which will be unconditionally
+        ///               blocked (yielded) while waiting for the result. 
+        ///
+        /// \note         If there has been an error reported (using the action
+        ///               \a base_lco#set_error), this function will throw an
+        ///               exception encapsulating the reported error code and 
+        ///               error description.
+        Result get_result(threads::thread_self& self, int slot) 
         {
+            if (slot < 0 || slot >= N) {
+                HPX_THROW_EXCEPTION(bad_parameter, "slot index out of range");
+                return Result();
+            }
+
             // yields control if needed
             data_type d;
-            data_.read(self, d);
+            data_[slot].read(self, d);
 
             // the thread has been re-activated by one of the actions 
-            // supported by this simple_future (see \a simple_future::set_event
-            // and simple_future::set_error).
+            // supported by this future_value (see \a future_value::set_event
+            // and future_value::set_error).
             if (1 == d.which())
             {
                 // an error has been reported in the meantime, throw 
@@ -60,10 +86,28 @@ namespace hpx { namespace lcos { namespace detail
             return boost::get<result_type>(d);
         };
 
-        void set_data(Result const& result)
+        void set_data(int slot, Result const& result)
         {
             // set the received result, reset error status
-            data_.set(result);
+            if (slot < 0 || slot >= N) {
+                HPX_THROW_EXCEPTION(bad_parameter, "slot index out of range");
+                return;
+            }
+
+            // store the value
+            data_[slot].set(result);
+        }
+
+        // trigger the future with the given error condition
+        void set_error (int slot, hpx::error code, std::string const& msg)
+        {
+            if (slot < 0 || slot >= N) {
+                HPX_THROW_EXCEPTION(bad_parameter, "slot index out of range");
+                return;
+            }
+
+            // store the error code
+            data_[slot].set(error_type(make_error_code(code), msg));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -71,11 +115,11 @@ namespace hpx { namespace lcos { namespace detail
 
         // trigger the future, set the result
         threads::thread_state 
-        set_result (threads::thread_self& self, 
-            applier::applier& appl, Result const& result)
+        set_result (threads::thread_self& self, applier::applier& appl, 
+            Result const& result)
         {
             // set the received result, reset error status
-            set_data(result);
+            set_data(0, result);
 
             // this thread has nothing more to do
             return threads::terminated;
@@ -84,17 +128,16 @@ namespace hpx { namespace lcos { namespace detail
         // trigger the future with the given error condition
         threads::thread_state 
         set_error (threads::thread_self& self, applier::applier& appl,
-            hpx::error code, std::string msg)
+            hpx::error code, std::string const& msg)
         {
-            // store the error code
-            data_.set(error_type(make_error_code(code), msg));
+            set_error(0, code, msg);
 
             // this thread has nothing more to do
             return threads::terminated;
         }
 
     private:
-        util::full_empty<data_type> data_;
+        util::full_empty<data_type> data_[N];
     };
 
 }}}
@@ -103,23 +146,23 @@ namespace hpx { namespace lcos { namespace detail
 namespace hpx { namespace lcos 
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class simple_future simple_future.hpp hpx/lcos/simple_future.hpp
+    /// \class future_value future_value.hpp hpx/lcos/future_value.hpp
     ///
-    /// A simple_future can be used by a single \a thread to invoke a 
+    /// A future_value can be used by a single \a thread to invoke a 
     /// (remote) action and wait for the result. The result is expected to be 
-    /// sent back to the simple_future using the LCO's set_event action
+    /// sent back to the future_value using the LCO's set_event action
     ///
-    /// A simple_future is one of the simplest synchronization primitives 
+    /// A future_value is one of the simplest synchronization primitives 
     /// provided by HPX. It allows to synchronize on a eager evaluated remote
-    /// operation returning a result of the type \a Result. The \a simple_future
+    /// operation returning a result of the type \a Result. The \a future_value
     /// allows to synchronize exactly one \a thread (the one passed during 
     /// construction time).
     ///
     /// \code
-    ///     // Create the simple_future (the expected result is a id_type)
-    ///     lcos::simple_future<naming::id_type> f;
+    ///     // Create the future_value (the expected result is a id_type)
+    ///     lcos::future_value<naming::id_type> f;
     ///
-    ///     // initiate the action supplying the simple_future as a 
+    ///     // initiate the action supplying the future_value as a 
     ///     // continuation
     ///     applier_.appy<some_action>(new continuation(f.get_gid()), ...);
     ///
@@ -130,18 +173,18 @@ namespace hpx { namespace lcos
     /// \endcode
     ///
     /// \tparam Result   The template parameter \a Result defines the type this 
-    ///                  simple_future is expected to return from 
-    ///                  \a simple_future#get_result.
+    ///                  future_value is expected to return from 
+    ///                  \a future_value#get_result.
     ///
-    /// \note            The action executed using the simple_future as a 
+    /// \note            The action executed using the future_value as a 
     ///                  continuation must return a value of a type convertible 
     ///                  to the type as specified by the template parameter 
     ///                  \a Result
-    template <typename Result>
-    class simple_future 
+    template <typename Result, int N>
+    class future_value 
     {
     protected:
-        typedef detail::simple_future<Result> wrapped_type;
+        typedef detail::future_value<Result, N> wrapped_type;
         typedef components::managed_component_base<wrapped_type> wrapping_type;
 
         /// Construct a new \a future instance. The supplied 
@@ -156,7 +199,7 @@ namespace hpx { namespace lcos
         ///               target for either of these actions has to be this 
         ///               future instance (as it has to be sent along 
         ///               with the action as the continuation parameter).
-        simple_future()
+        future_value()
           : impl_(new wrapping_type(new wrapped_type()))
         {}
 
@@ -167,8 +210,7 @@ namespace hpx { namespace lcos
         }
 
     public:
-
-        ~simple_future()
+        ~future_value()
         {}
 
         /// Get the result of the requested action. This call blocks (yields 
@@ -177,15 +219,15 @@ namespace hpx { namespace lcos
         /// manager the function \a eager_future#get_result will return.
         ///
         /// \param self   [in] The \a thread which will be unconditionally
-        ///               while waiting for the result. 
+        ///               blocked (yielded) while waiting for the result. 
         ///
         /// \note         If there has been an error reported (using the action
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
-        Result get_result(threads::thread_self& self) const
+        Result get_result(threads::thread_self& self, int slot = 0) const
         {
-            return (*impl_)->get_result(self);
+            return (*this->impl_)->get_result(self, slot);
         }
 
     protected:

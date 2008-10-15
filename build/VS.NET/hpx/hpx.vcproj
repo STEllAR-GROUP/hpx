@@ -454,6 +454,10 @@
 					Name="Threads"
 					>
 					<File
+						RelativePath="..\..\..\src\runtime\threads\thread.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\src\runtime\threads\threadmanager.cpp"
 						>
 					</File>
@@ -925,6 +929,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\hpx\lcos\future_value.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\lcos\lazy_future.hpp"
 					>
 				</File>
@@ -941,7 +949,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\hpx\lcos\simple_future.hpp"
+					RelativePath="..\..\..\hpx\lcos\value_adaptor.hpp"
 					>
 				</File>
 			</Filter>
@@ -962,6 +970,14 @@
 				</File>
 				<File
 					RelativePath="..\..\..\hpx\config\warnings_suffix.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Dataflow"
+				>
+				<File
+					RelativePath="..\..\..\hpx\dataflow\dataflow.hpp"
 					>
 				</File>
 			</Filter>

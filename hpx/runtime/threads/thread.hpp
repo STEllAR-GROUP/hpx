@@ -48,6 +48,12 @@ namespace hpx { namespace threads { namespace detail
         ~thread() 
         {}
 
+        // This is the component id. Every component needs to have an embedded
+        // enumerator 'value' which is used by the generic action implementation
+        // to associate this component with a given action.
+        static components::component_type get_component_type();
+        static void set_component_type(components::component_type);
+
         thread_state execute()
         {
             return coroutine_();

@@ -64,12 +64,12 @@ namespace hpx { namespace components { namespace server
         }
 
         // make sure it's the correct component type
-        if (Component::get_component_type() != addr.type_)
+        if (components::get_component_type<Component>() != addr.type_)
         {
             // FIXME: should the component be re-bound ?
             HPX_OSSTREAM strm;
             strm << "global id is not bound to a component instance of type: "
-                 << get_component_type_name(Component::get_component_type());
+                 << get_component_type_name(components::get_component_type<Component>());
             HPX_THROW_EXCEPTION(hpx::unknown_component_address,
                 HPX_OSSTREAM_GETSTRING(strm));
         }

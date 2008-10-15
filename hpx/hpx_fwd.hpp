@@ -214,11 +214,22 @@ namespace hpx
     /// \namespace components
     namespace components
     {
-        struct simple_component_tag {};
-        template <typename Component> class simple_component_base;
+        namespace detail 
+        { 
+            struct this_type {};
+            struct simple_component_tag {};
+        }
+
+        template <typename Component> 
+        class simple_component_base;
+
+        template <typename Component, typename Derived = detail::this_type>
+        class managed_component_base;
 
         struct HPX_EXPORT component_factory_base;
-        template <typename Component> struct component_factory;
+
+        template <typename Component> 
+        struct component_factory;
 
         class runtime_support;
         class memory;
@@ -239,9 +250,12 @@ namespace hpx
     /// \namespace lcos
     namespace lcos
     {
-        struct base_lco;
-        template <typename Result> struct base_lco_with_value;
-        template <typename Result> class simple_future;
+        class base_lco;
+        template <typename Result> 
+        class base_lco_with_value;
+
+        template <typename Result, int N = 1> 
+        class future_value;
 
         template <typename Action, typename Result,
             typename DirectExecute = typename Action::direct_execution> 

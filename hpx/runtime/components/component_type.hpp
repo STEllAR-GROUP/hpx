@@ -24,6 +24,7 @@ namespace hpx { namespace components
         component_base_lco_with_value,  ///< base LCO's blocking on a value
         component_future,           ///< a future executing the action and 
                                     ///< allowing to wait for the result
+        component_value_adaptor,    ///< a adaptor to access specific slot of an LCO
 
         component_last,
         component_first_dynamic = component_last
@@ -61,7 +62,21 @@ namespace hpx { namespace components
         return type > component_invalid && type < component_last;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// This needs to be specialized for each of the components
+    template <typename Component>
+    HPX_ALWAYS_EXPORT component_type get_component_type();
+
 }}
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_DEFINE_GET_COMPONENT_TYPE(component)                              \
+    namespace hpx { namespace components {                                    \
+        template<> HPX_ALWAYS_EXPORT component_type                           \
+        get_component_type<component>()                                       \
+        { return component::get_component_type(); }                           \
+    }}                                                                        \
+    /**/
 
 #endif
 

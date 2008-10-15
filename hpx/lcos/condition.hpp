@@ -127,13 +127,6 @@ namespace hpx { namespace lcos { namespace detail
             notify_one(self);
         }
 
-        threads::thread_state set_error (
-            threads::thread_self& self, applier::applier&
-            hpx::error code, std::string msg)
-        {
-            HPX_THROW_EXCEPTION(code, msg);
-        }
-
     private:
         boost::lockfree::fifo<thread_id_type> queue_;
     };

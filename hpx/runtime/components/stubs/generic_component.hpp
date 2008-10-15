@@ -54,11 +54,22 @@ namespace hpx { namespace components { namespace stubs
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ServerComponent>
+    template <
+        typename ServerComponent, 
+        typename Action = typename ServerComponent::eval_action,
+        typename Result = typename ServerComponent::result_type, 
+        typename Parameters = typename ServerComponent::parameter_block_type
+    > class generic_component;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename ServerComponent, typename Action, typename Result, 
+        typename Parameters>
     class generic_component
     {
     protected:
-        typedef typename ServerComponent::result_type result_type;
+        typedef Action action_type;
+        typedef Result result_type;
+        typedef Parameters params_type;
 
     public:
         /// Create a client side representation for any existing 
@@ -87,11 +98,11 @@ namespace hpx { namespace components { namespace stubs
         #include <hpx/runtime/components/stubs/generic_component_eval.hpp>
 
         /// Asynchronously create a new instance of an simple_accumulator
-        static lcos::simple_future<naming::id_type>
+        static lcos::future_value<naming::id_type>
         create_async(applier::applier& appl, naming::id_type const& targetgid)
         {
             return stubs::runtime_support::create_component_async(
-                appl, targetgid, ServerComponent::get_component_type());
+                appl, targetgid, get_component_type<ServerComponent>());
         }
 
         /// Create a new instance of an simple_accumulator
@@ -100,7 +111,7 @@ namespace hpx { namespace components { namespace stubs
             naming::id_type const& targetgid)
         {
             return stubs::runtime_support::create_component(
-                self, appl, targetgid, ServerComponent::get_component_type());
+                self, appl, targetgid, get_component_type<ServerComponent>());
         }
 
         /// Delete an existing component
@@ -108,7 +119,7 @@ namespace hpx { namespace components { namespace stubs
         free(applier::applier& appl, naming::id_type const& gid)
         {
             stubs::runtime_support::free_component(appl, 
-                ServerComponent::get_component_type(), gid);
+                get_component_type<ServerComponent>(), gid);
         }
 
         void free(naming::id_type const& gid)

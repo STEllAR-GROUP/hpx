@@ -31,12 +31,12 @@ namespace hpx { namespace components { namespace stubs
         {}
 
         /// Asynchronously create a new instance of an simple_accumulator
-        static lcos::simple_future<naming::id_type>
+        static lcos::future_value<naming::id_type>
         create_async(applier::applier& appl, naming::id_type const& targetgid)
         {
             return stubs::runtime_support::create_component_async(
                 appl, targetgid, 
-                server::simple_accumulator::get_component_type());
+                components::get_component_type<server::simple_accumulator>());
         }
 
         /// Create a new instance of an simple_accumulator
@@ -46,7 +46,7 @@ namespace hpx { namespace components { namespace stubs
         {
             return stubs::runtime_support::create_component(
                 self, appl, targetgid, 
-                server::simple_accumulator::get_component_type());
+                components::get_component_type<server::simple_accumulator>());
         }
 
         /// Delete an existing component
@@ -54,7 +54,8 @@ namespace hpx { namespace components { namespace stubs
         free(applier::applier& appl, naming::id_type const& gid)
         {
             stubs::runtime_support::free_component(appl, 
-                server::simple_accumulator::get_component_type(), gid);
+                components::get_component_type<server::simple_accumulator>(), 
+                gid);
         }
 
         void free(naming::id_type const& gid)
@@ -64,9 +65,9 @@ namespace hpx { namespace components { namespace stubs
 
         /// Query the current value of the server#simple_accumulator instance 
         /// with the given \a gid. This is a non-blocking call. The caller 
-        /// needs to call \a simple_future#get_result on the return value of 
+        /// needs to call \a future_value#get_result on the return value of 
         /// this function to obtain the result as returned by the simple_accumulator.
-        static lcos::simple_future<double> query_async(
+        static lcos::future_value<double> query_async(
             applier::applier& appl, naming::id_type gid) 
         {
             // Create an eager_future, execute the required action,
@@ -83,7 +84,7 @@ namespace hpx { namespace components { namespace stubs
             applier::applier& appl, naming::id_type gid) 
         {
             // The following get_result yields control while the action above 
-            // is executed and the result is returned to the simple_future
+            // is executed and the result is returned to the future_value
             return query_async(appl, gid).get_result(self);
         }
 
@@ -113,10 +114,10 @@ namespace hpx { namespace components { namespace stubs
 
         /// Query the current value of the server#simple_accumulator instance 
         /// with the given \a gid. This is a non-blocking call. The 
-        /// caller needs to call \a simple_future#get_result on the return 
+        /// caller needs to call \a future_value#get_result on the return 
         /// value of this function to obtain the result as returned by the 
         /// simple_accumulator.
-        lcos::simple_future<double> query_async(naming::id_type gid) 
+        lcos::future_value<double> query_async(naming::id_type gid) 
         {
             return query_async(app_, gid);
         }

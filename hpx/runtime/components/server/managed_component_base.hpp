@@ -21,12 +21,6 @@
 
 namespace hpx { namespace components 
 {
-    namespace detail
-    {
-        ///////////////////////////////////////////////////////////////////////
-        struct this_type {};
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     /// \class managed_component_base managed_component_base.hpp hpx/runtime/components/server/managed_component_base.hpp
     ///
@@ -47,7 +41,7 @@ namespace hpx { namespace components
     /// \tparam Derived
     /// \tparam HasUseCount
     ///
-    template <typename Component, typename Derived = detail::this_type>
+    template <typename Component, typename Derived>
     class managed_component_base 
     {
     private:
@@ -79,6 +73,18 @@ namespace hpx { namespace components
         {
             delete component_;
             component_ = 0;
+        }
+
+        // This is the component id. Every component needs to have an embedded
+        // enumerator 'value' which is used by the generic action implementation
+        // to associate this component with a given action.
+        static component_type get_component_type()
+        {
+            return wrapped_type::get_component_type();
+        }
+        static void set_component_type(component_type t)
+        {
+            wrapped_type::set_component_type(t);
         }
 
         /// \brief Return a pointer to the wrapped instance
@@ -282,6 +288,15 @@ namespace hpx { namespace components
     };
 
 }}
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_MANAGED_COMPONENT(component)                             \
+    namespace hpx { namespace components {                                    \
+        template<> HPX_ALWAYS_EXPORT                                          \
+        component_type get_component_type<component>()                        \
+        { return component::get_component_type(); }                           \
+    }}                                                                        \
+    /**/
 
 #endif
 

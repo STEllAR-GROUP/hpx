@@ -58,8 +58,8 @@ namespace hpx { namespace components { namespace server { namespace detail
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
         // to associate this component with a given action.
-        HPX_COMPONENT_EXPORT static component_type get_component_type();
-        HPX_COMPONENT_EXPORT static void set_component_type(component_type);
+        static HPX_COMPONENT_EXPORT component_type get_component_type();
+        static void set_component_type(component_type);
 
         // constructor: initialize accumulator value
         accumulator()
@@ -147,17 +147,6 @@ namespace hpx { namespace components { namespace server
         typedef managed_component_base<wrapped_type, accumulator> base_type;
 
     public:
-        // This is the component id. Every component needs to have an embedded
-        // enumerator 'value' which is used by the generic action implementation
-        // to associate this component with a given action.
-        static component_type get_component_type()
-        {
-            return wrapped_type::get_component_type();
-        }
-        static void set_component_type(component_type t)
-        {
-            wrapped_type::set_component_type(t);
-        }
 
         accumulator(applier::applier&)
           : base_type(new wrapped_type())
