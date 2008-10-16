@@ -7,6 +7,7 @@
 #define BOOST_LOCKFREE_DETAIL_WINDOWS_PRIMITIVES_JUL_11_2008_0407PM
 
 #include <boost/config.hpp>
+#include <boost/mpl/bool.hpp>
 
 #if !defined(BOOST_MSVC)
 #error "do not include this file on non-MSVC platforms"
@@ -17,12 +18,18 @@
 #if BOOST_MSVC < 1400
 extern "C" void __cdecl _ReadWriteBarrier();
 extern "C" LONG __cdecl _InterlockedCompareExchange(LONG volatile*, LONG Exchange, LONG Comp);
+#if defined(_M_IA64) || defined(_WIN64)
+extern "C" LONG64 __cdecl _InterlockedCompareExchange64(LONG64 volatile*, LONG64 Exchange, LONG64 Comp);
+#endif
 #else
 #include <intrin.h>
 #endif
 
 #pragma intrinsic(_ReadWriteBarrier)
 #pragma intrinsic(_InterlockedCompareExchange)
+#if defined(_M_IA64) || defined(_WIN64)
+#pragma intrinsic(_InterlockedCompareExchange64)
+#endif
 
 #define BOOST_LOCKFREE_CACHELINE_ALIGNMENT 
 #define BOOST_LOCKFREE_CACHELINE_ALIGNMENT_PREFIX __declspec(align(64))
@@ -55,15 +62,23 @@ namespace boost { namespace lockfree
 
     ///////////////////////////////////////////////////////////////////////////
     template <class C, class D>
-    inline bool CAS (volatile C * addr, D old, D nw)
+    inline bool CAS (volatile C * addr, D old, D nw, boost::mpl::true_)
     {
         return _InterlockedCompareExchange(addr, nw, old) == old;
     }
 
+#if defined(_M_IA64) || defined(_WIN64)
     template <class C, class D>
-    inline bool CAS (volatile C ** addr, D* old, D* nw)
+    inline bool CAS (volatile C * addr, D old, D nw, boost::mpl::false_)
     {
-        return _InterlockedCompareExchange64(addr, nw, old) == old;
+        return _InterlockedCompareExchange64((LONG64 volatile*)addr, (LONG64)nw, (LONG64)old) == old;
+    }
+#endif
+
+    template <class C, class D>
+    inline bool CAS (volatile C * addr, D old, D nw)
+    {
+        return CAS (addr, old, nw, boost::mpl::bool_<sizeof(C) == 4>());
     }
 
     ///////////////////////////////////////////////////////////////////////////
