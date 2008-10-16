@@ -190,7 +190,7 @@ public:
 
     operator bool(void) const
     {
-        return bool (get_ptr());
+        return bool (0 != get_ptr());
     }
     /* @} */
 

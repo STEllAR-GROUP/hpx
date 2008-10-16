@@ -78,7 +78,7 @@ namespace boost { namespace lockfree
     template <class C, class D>
     inline bool CAS (volatile C * addr, D old, D nw)
     {
-        return CAS (addr, old, nw, boost::mpl::bool_<sizeof(C) == 4>());
+        return CAS (addr, old, nw, boost::mpl::bool_<sizeof(C) == sizeof(long)>());
     }
 
     ///////////////////////////////////////////////////////////////////////////
