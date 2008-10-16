@@ -30,6 +30,7 @@ set (hpxlib_HEADERS
     ../hpx/lcos/barrier.hpp
     ../hpx/lcos/base_lco.hpp
     ../hpx/lcos/condition.hpp
+    ../hpx/lcos/counting_semaphore.hpp
     ../hpx/lcos/eager_future.hpp
     ../hpx/lcos/eager_future_constructors.hpp
     ../hpx/lcos/eager_future_constructors_direct.hpp
