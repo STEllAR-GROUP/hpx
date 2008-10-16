@@ -101,7 +101,7 @@ namespace hpx { namespace lcos
             appl.apply_c<Action>(this->get_gid(appl), gid);
 
             // wait for the result (yield control)
-            return (*this->impl_)->get_result(self, 0);
+            return (*this->impl_)->get_data(self, 0);
         }
 
         /// Get the result of the requested action. This call blocks (yields 
@@ -131,7 +131,7 @@ namespace hpx { namespace lcos
             appl.apply_c<Action>(this->get_gid(appl), gid, arg0);
 
             // wait for the result (yield control)
-            return (*this->impl_)->get_result(self, 0);
+            return (*this->impl_)->get_data(self, 0);
         }
 
         // pull in remaining get_result's
@@ -192,7 +192,7 @@ namespace hpx { namespace lcos
             appl.apply_c<Action>(addr, this->get_gid(appl), gid);
 
             // wait for the result (yield control)
-            return (*this->impl_)->get_result(self, 0);
+            return (*this->impl_)->get_data(self, 0);
         }
 
         /// Get the result of the requested action. This call blocks (yields 
@@ -229,7 +229,7 @@ namespace hpx { namespace lcos
             appl.apply_c<Action>(addr, this->get_gid(appl), gid, arg0);
 
             // wait for the result (yield control)
-            return (*this->impl_)->get_result(self, 0);
+            return (*this->impl_)->get_data(self, 0);
         }
 
         // pull in remaining get_result's

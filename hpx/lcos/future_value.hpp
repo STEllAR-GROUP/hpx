@@ -60,7 +60,7 @@ namespace hpx { namespace lcos { namespace detail
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
-        Result get_result(threads::thread_self& self, int slot) 
+        Result get_data(threads::thread_self& self, int slot) 
         {
             if (slot < 0 || slot >= N) {
                 HPX_THROW_EXCEPTION(bad_parameter, "slot index out of range");
@@ -227,7 +227,7 @@ namespace hpx { namespace lcos
         ///               error description.
         Result get_result(threads::thread_self& self, int slot = 0) const
         {
-            return (*this->impl_)->get_result(self, slot);
+            return (*this->impl_)->get_data(self, slot);
         }
 
     protected:
