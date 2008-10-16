@@ -2,7 +2,7 @@
 <VisualStudioPropertySheet
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="hpx_application"
+	Name="hpx_application64"
 	InheritedPropertySheets=".\hpx64.vsprops"
 	>
 	<Tool
@@ -12,12 +12,12 @@
 	/>
 	<Tool
 		Name="VCCustomBuildTool"
-		CommandLine="if not exist &quot;$(HPX_ROOT)\bin&quot; mkdir &quot;$(HPX_ROOT)\bin&quot;&#x0D;&#x0A;if not exist &quot;$(HPX_ROOT)\bin\lib&quot; mkdir &quot;$(HPX_ROOT)\bin\lib&quot;&#x0D;&#x0A;xcopy /Y/F &quot;$(TargetPath)&quot; &quot;$(HPX_ROOT)\bin\lib&quot;&#x0D;&#x0A;xcopy /Y/F &quot;$(TargetDir)\$(TargetName).pdb&quot; &quot;$(HPX_ROOT)\bin\lib&quot;&#x0D;&#x0A;"
-		Outputs="&quot;$(HPX_ROOT)\bin\lib\$(TargetFileName)&quot;"
+		CommandLine="if not exist &quot;$(HPX_ROOT)\bin&quot; mkdir &quot;$(HPX_ROOT)\bin&quot;&#x0D;&#x0A;if not exist &quot;$(HPX_ROOT)\bin\lib64&quot; mkdir &quot;$(HPX_ROOT)\bin\lib64&quot;&#x0D;&#x0A;xcopy /Y/F &quot;$(TargetPath)&quot; &quot;$(HPX_ROOT)\bin\lib64&quot;&#x0D;&#x0A;xcopy /Y/F &quot;$(TargetDir)\$(TargetName).pdb&quot; &quot;$(HPX_ROOT)\bin\lib64&quot;&#x0D;&#x0A;"
+		Outputs="&quot;$(HPX_ROOT)\bin\lib64\$(TargetFileName)&quot;"
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalLibraryDirectories="&quot;$(BOOST_ROOT)\stage\lib&quot;;&quot;$(TBB_ROOT)\ia32\vc8\lib&quot;"
+		AdditionalLibraryDirectories="&quot;$(BOOST_ROOT)\stage\lib64&quot;;&quot;$(TBB_ROOT)\ia32\vc8\lib&quot;"
 	/>
 	<UserMacro
 		Name="BOOST_ROOT"
