@@ -128,7 +128,7 @@ namespace hpx { namespace lcos
             naming::address addr;
             if (appl.address_is_local(gid, addr)) {
                 // local, direct execution
-                (*this->impl_)->set_data(Action::execute_function(appl, addr));
+                (*this->impl_)->set_data(0, Action::execute_function(appl, addr));
             }
             else {
                 // remote execution
@@ -156,7 +156,7 @@ namespace hpx { namespace lcos
             if (appl.address_is_local(gid, addr)) {
                 // local, direct execution
                 (*this->impl_)->set_data(
-                    Action::execute_function(appl, addr.address_, arg0));
+                    0, Action::execute_function(appl, addr.address_, arg0));
             }
             else {
                 // remote execution

@@ -386,7 +386,7 @@ namespace hpx { namespace threads
     }
 
 #if defined(_WIN32) || defined(_WIN64)
-    bool set_affinity(boost::thread& thrd, unsigned int num_thread)
+    bool set_affinity(boost::thread& thrd, std::size_t num_thread)
     {
         unsigned int num_of_cores = boost::thread::hardware_concurrency();
         if (0 == num_of_cores)

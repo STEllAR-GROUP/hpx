@@ -310,7 +310,7 @@ namespace hpx { namespace naming
             boost::system::error_code err = boost::asio::error::fault;
 
             // send the data
-            boost::integer::ulittle32_t size = buffer.size();
+            boost::integer::ulittle32_t size = (boost::integer::ulittle32_t)buffer.size();
             std::vector<boost::asio::const_buffer> buffers;
             buffers.push_back(boost::asio::buffer(&size, sizeof(size)));
             buffers.push_back(boost::asio::buffer(buffer));

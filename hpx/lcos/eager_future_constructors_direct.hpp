@@ -37,7 +37,7 @@
         naming::address addr;
         if (appl.address_is_local(gid, addr)) {
             // local, direct execution
-            (*this->impl_)->set_data(Action::execute_function(
+            (*this->impl_)->set_data(0, Action::execute_function(
                 appl, addr.address_, BOOST_PP_ENUM_PARAMS(N, arg)));
         }
         else {

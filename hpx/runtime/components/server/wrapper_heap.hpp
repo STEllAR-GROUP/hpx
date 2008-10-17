@@ -41,7 +41,8 @@ namespace hpx { namespace components { namespace detail
         };
 
     public:
-        explicit wrapper_heap(char const* class_name, bool, bool, int step = -1)
+        explicit wrapper_heap(char const* class_name, bool, bool, 
+                std::size_t step = (std::size_t)-1)
           : pool_(NULL), first_free_(NULL), step_(step), size_(0), free_size_(0),
             base_gid_(naming::invalid_id), get_dgas_client_(NULL)
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
@@ -51,7 +52,7 @@ namespace hpx { namespace components { namespace detail
             BOOST_ASSERT(sizeof(storage_type) == heap_size);
 
         // adjust step to reasonable value
-            if (step_ < heap_step) 
+            if ((std::size_t)(-1) == step_ || step_ < heap_step) 
                 step_ = heap_step;
             else 
                 step_ = ((step_ + heap_step - 1)/heap_step)*heap_step;
@@ -94,7 +95,7 @@ namespace hpx { namespace components { namespace detail
             BOOST_ASSERT(p != NULL);
 
             first_free_ += count;
-            free_size_ -= count;
+            free_size_ -= (int)count;
 
             BOOST_ASSERT(free_size_ >= 0);
             return p;
@@ -112,7 +113,7 @@ namespace hpx { namespace components { namespace detail
 
             using namespace std;
             memset(p1->address(), 0, sizeof(storage_type));
-            free_size_ += count;
+            free_size_ += (int)count;
             
             // release the pool if this one was the last allocated item
             test_release();
@@ -189,7 +190,7 @@ namespace hpx { namespace components { namespace detail
             BOOST_ASSERT(size_ == 0);
             BOOST_ASSERT(first_free_ == NULL);
 
-            std::size_t s = std::size_t(step_ * heap_size);
+            std::size_t s = step_ * heap_size;
             pool_ = (storage_type*)Allocator::alloc(s);
             if (NULL == pool_) 
                 return false;
@@ -204,15 +205,15 @@ namespace hpx { namespace components { namespace detail
             s /= heap_size;
             first_free_ = pool_;
             size_ = s;
-            free_size_ = size_;
+            free_size_ = (int)size_;
             return true;
         }
 
     private:
         storage_type* pool_;
         storage_type* first_free_;
-        int step_;
-        int size_;
+        std::size_t step_;
+        std::size_t size_;
         int free_size_;
 
         // these values are used for DGAS registration of all elements of this
@@ -264,7 +265,8 @@ namespace hpx { namespace components { namespace detail
 
     public:
         explicit fixed_wrapper_heap(char const* class_name = "<Unknown>", 
-                bool f1 = false, bool f2 = false, int step = -1)
+                bool f1 = false, bool f2 = false, 
+                std::size_t step = (std::size_t)-1)
           : base_type(class_name, f1, f2, step) 
         {}
     };

@@ -46,7 +46,7 @@ namespace hpx { namespace naming { namespace server
             }
             else {
                 // insert this prefix as being mapped to the given locality
-                boost::uint32_t prefix = site_prefixes_.size() + 1;
+                boost::uint32_t prefix = (boost::uint32_t)(site_prefixes_.size() + 1);
                 naming::id_type id = get_id_from_prefix(prefix);
 
                 // start assigning ids with the second block of 64Bit numbers only

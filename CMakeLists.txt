@@ -112,6 +112,9 @@ if(MSVC)
     add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
     # suppress certain warnings
     add_definitions(-wd4251 -wd4231 -wd4275 -wd4660 -wd4094)
+    if(CMAKE_CL_64)
+        add_definitions(-DBOOST_COROUTINES_USE_FIBERS)
+    endif()
 endif()
 
 # additionally needed preprocessor definitions
