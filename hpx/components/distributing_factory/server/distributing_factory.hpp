@@ -11,6 +11,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/action.hpp>
 
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server 
 {
     // forward declaration
@@ -18,6 +19,7 @@ namespace hpx { namespace components { namespace server
 
 }}}
 
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -44,8 +46,14 @@ namespace hpx { namespace components { namespace server { namespace detail
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
         // to associate this component with a given action.
-        HPX_COMPONENT_EXPORT static component_type get_component_type();
-        static void set_component_type(component_type);
+        static component_type get_component_type()
+        {
+            return value;
+        }
+        static void set_component_type(component_type type)
+        {
+            value = type;
+        }
 
         // constructor
         distributing_factory()
@@ -57,16 +65,16 @@ namespace hpx { namespace components { namespace server { namespace detail
         /// \brief Action to create new components
         threads::thread_state create(
             threads::thread_self& self, applier::applier& app,
-            naming::id_type* gid, components::component_type type, 
-            std::size_t count); 
+            std::vector<std::pair<naming::id_type, std::size_t> >* gids, 
+            components::component_type type, std::size_t count); 
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::result_action2<
-            distributing_factory, naming::id_type, factory_create_component, 
-            components::component_type, std::size_t, 
+            distributing_factory, std::vector<std::pair<naming::id_type, std::size_t> >, 
+            factory_create_component, components::component_type, std::size_t, 
             &distributing_factory::create
         > create_action;
     };
@@ -77,32 +85,17 @@ namespace hpx { namespace components { namespace server { namespace detail
 namespace hpx { namespace components { namespace server 
 {
     class distributing_factory 
-      : public managed_component_base<detail::distributing_factory, distributing_factory>
+      : public managed_component_base<
+            detail::distributing_factory, distributing_factory
+        >
     {
-    private:
+    public:
         typedef detail::distributing_factory wrapped_type;
         typedef managed_component_base<wrapped_type, distributing_factory> base_type;
-
-    public:
-        // This is the component id. Every component needs to have an embedded
-        // enumerator 'value' which is used by the generic action implementation
-        // to associate this component with a given action.
-        static component_type get_component_type() 
-        { 
-            return wrapped_type::get_component_type(); 
-        }
-        static void set_component_type(component_type t)
-        {
-            wrapped_type::set_component_type(t);
-        }
 
         distributing_factory(applier::applier&)
           : base_type(new wrapped_type())
         {}
-
-    protected:
-        base_type& base() { return *this; }
-        base_type const& base() const { return *this; }
     };
 
 }}}

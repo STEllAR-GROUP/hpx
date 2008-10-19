@@ -3,12 +3,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/runtime/components/server/manage_component.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <vector>
+
+#include <hpx/hpx.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -17,18 +14,23 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
-#include "distributing_factory.hpp"
+#include <hpx/components/distributing_factory/server/distributing_factory.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // make sure all needed action::get_action_name() functions get defined
-HPX_DEFINE_GET_ACTION_NAME(hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_result_action);
+typedef hpx::lcos::base_lco_with_value<
+        std::vector<std::pair<hpx::naming::id_type, std::size_t> > 
+    > create_result_type;
 
-///////////////////////////////////////////////////////////////////////////////
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::detail::distributing_factory);
+HPX_DEFINE_GET_ACTION_NAME(create_result_type::set_result_action);
+HPX_DEFINE_GET_COMPONENT_TYPE(create_result_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the accumulator actions
 HPX_REGISTER_ACTION(hpx::components::server::detail::distributing_factory::create_action);
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::detail::distributing_factory);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server { namespace detail
@@ -36,26 +38,62 @@ namespace hpx { namespace components { namespace server { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     component_type distributing_factory::value = component_invalid;
 
-    HPX_COMPONENT_EXPORT component_type distributing_factory::get_component_type()
-    {
-        return value;
-    }
-
-    void distributing_factory::set_component_type(component_type type)
-    {
-        value = type;
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // create a new instance of a component
     threads::thread_state distributing_factory::create(
         threads::thread_self& self, applier::applier& appl,
-        naming::id_type* gid, components::component_type type,
-        std::size_t count)
+        std::vector<std::pair<naming::id_type, std::size_t> >* gids, 
+        components::component_type type, std::size_t count)
     {
-    // set result if requested
-        if (0 != gid)
-            *gid = naming::invalid_id;
+        // get list of locality prefixes
+        std::vector<naming::id_type> prefixes;
+        appl.get_dgas_client().get_prefixes(prefixes);
+
+        std::size_t created_count = 0;
+        std::size_t count_on_locality = count / prefixes.size();
+        if (0 == count_on_locality)
+            count_on_locality = 1;
+
+        // distribute the number of components to create evenly on all 
+        // available localities
+        typedef 
+            std::vector<std::pair<lcos::future_value<naming::id_type>, int> > 
+        future_values_type;
+
+        // start an asynchronous operation for each of the localities
+        future_values_type v;
+        components::stubs::runtime_support rts(appl);
+
+        std::vector<naming::id_type>::iterator end = prefixes.end();
+        for (std::vector<naming::id_type>::iterator it = prefixes.begin(); 
+             it != end; ++it)
+        {
+            std::size_t create = count_on_locality;
+            if (created_count + create > count)
+                create = count - created_count;
+
+            lcos::future_value<naming::id_type> f (
+                rts.create_component_async(*it, type, create));
+            v.push_back(future_values_type::value_type(f, create));
+
+            created_count += create;
+            if (created_count >= count)
+                break;
+        }
+
+        // now wait for the results
+        typedef 
+            std::vector<std::pair<naming::id_type, std::size_t> >
+        result_type;
+
+        // set results
+        future_values_type::iterator vend = v.end();
+        for (future_values_type::iterator vit = v.begin(); vit != vend; ++vit)
+        {
+            gids->push_back(result_type::value_type(
+                (*vit).first.get_result(self), (*vit).second));
+        }
+
         return threads::terminated;
     }
 
