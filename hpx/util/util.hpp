@@ -61,7 +61,7 @@ namespace hpx { namespace util
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_EXPORT std::string leaf(boost::filesystem::path const& p)
+    inline std::string leaf(boost::filesystem::path const& p)
     {
 #if BOOST_VERSION >= 103600
         return p.empty() ? std::string() : *--p.end();

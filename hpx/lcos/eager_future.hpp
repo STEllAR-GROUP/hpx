@@ -62,11 +62,33 @@ namespace hpx { namespace lcos
         typedef future_value<Result> base_type;
 
     public:
+        /// Construct a (non-functional) instance of an \a eager_future. To use
+        /// this instance 
+        eager_future()
+        {}
+
+        /// The apply function starts the asynchronous operations encapsulated
+        /// by this eager future.
+        ///
+        /// \param appl   [in] The \a applier instance to be used to execute 
+        ///               the embedded action.
+        /// \param gid    [in] The global id of the target component to use to
+        ///               apply the action.
+        void apply(applier::applier& appl, naming::id_type const& gid)
+        {
+            appl.apply_c<Action>(this->get_gid(appl), gid);
+        }
+
         /// Construct a new \a eager_future instance. The \a thread 
         /// supplied to the function \a eager_future#get_result will be 
         /// notified as soon as the result of the operation associated with 
         /// this eager_future instance has been returned.
         /// 
+        /// \param appl   [in] The \a applier instance to be used to execute 
+        ///               the embedded action.
+        /// \param gid    [in] The global id of the target component to use to
+        ///               apply the action.
+        ///
         /// \note         The result of the requested operation is expected to 
         ///               be returned as the first parameter using a 
         ///               \a base_lco#set_result action. Any error has to be 
@@ -76,7 +98,23 @@ namespace hpx { namespace lcos
         ///               with the action as the continuation parameter).
         eager_future(applier::applier& appl, naming::id_type const& gid)
         {
-            appl.apply_c<Action>(this->get_gid(appl), gid);
+            apply(appl, gid);
+        }
+
+        /// The apply function starts the asynchronous operations encapsulated
+        /// by this eager future.
+        ///
+        /// \param appl   [in] The \a applier instance to be used to execute 
+        ///               the embedded action.
+        /// \param gid    [in] The global id of the target component to use to
+        ///               apply the action.
+        /// \param arg0   [in] The parameter \a arg0 will be passed on to the 
+        ///               apply operation for the embedded action.
+        template <typename Arg0>
+        void apply(applier::applier& appl, naming::id_type const& gid,
+            Arg0 const arg0)
+        {
+            appl.apply_c<Action>(this->get_gid(appl), gid, arg0);
         }
 
         /// Construct a new \a eager_future instance. The \a thread 
@@ -90,11 +128,19 @@ namespace hpx { namespace lcos
         ///               apply the action.
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the 
         ///               apply operation for the embedded action.
+        ///
+        /// \note         The result of the requested operation is expected to 
+        ///               be returned as the first parameter using a 
+        ///               \a base_lco#set_result action. Any error has to be 
+        ///               reported using a \a base_lco::set_error action. The 
+        ///               target for either of these actions has to be this 
+        ///               eager_future instance (as it has to be sent along 
+        ///               with the action as the continuation parameter).
         template <typename Arg0>
         eager_future(applier::applier& appl, naming::id_type const& gid, 
                 Arg0 const& arg0)
         {
-            appl.apply_c<Action>(this->get_gid(appl), gid, arg0);
+            apply(appl, gid, arg0);
         }
 
         // pull in remaining constructors
@@ -110,19 +156,14 @@ namespace hpx { namespace lcos
         typedef future_value<Result> base_type;
 
     public:
-        /// Construct a new \a eager_future instance. The \a thread 
-        /// supplied to the function \a eager_future#get_result will be 
-        /// notified as soon as the result of the operation associated with 
-        /// this eager_future instance has been returned.
-        /// 
-        /// \note         The result of the requested operation is expected to 
-        ///               be returned as the first parameter using a 
-        ///               \a base_lco#set_result action. Any error has to be 
-        ///               reported using a \a base_lco::set_error action. The 
-        ///               target for either of these actions has to be this 
-        ///               eager_future instance (as it has to be sent along 
-        ///               with the action as the continuation parameter).
-        eager_future(applier::applier& appl, naming::id_type const& gid)
+        /// The apply function starts the asynchronous operations encapsulated
+        /// by this eager future.
+        ///
+        /// \param appl   [in] The \a applier instance to be used to execute 
+        ///               the embedded action.
+        /// \param gid    [in] The global id of the target component to use to
+        ///               apply the action.
+        void apply(applier::applier& appl, naming::id_type const& gid)
         {
             // Determine whether the gid is local or remote
             naming::address addr;
@@ -145,11 +186,31 @@ namespace hpx { namespace lcos
         ///               the embedded action.
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
+        /// 
+        /// \note         The result of the requested operation is expected to 
+        ///               be returned as the first parameter using a 
+        ///               \a base_lco#set_result action. Any error has to be 
+        ///               reported using a \a base_lco::set_error action. The 
+        ///               target for either of these actions has to be this 
+        ///               eager_future instance (as it has to be sent along 
+        ///               with the action as the continuation parameter).
+        eager_future(applier::applier& appl, naming::id_type const& gid)
+        {
+            apply(appl, gid);
+        }
+
+        /// The apply function starts the asynchronous operations encapsulated
+        /// by this eager future.
+        ///
+        /// \param appl   [in] The \a applier instance to be used to execute 
+        ///               the embedded action.
+        /// \param gid    [in] The global id of the target component to use to
+        ///               apply the action.
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the 
         ///               apply operation for the embedded action.
         template <typename Arg0>
-        eager_future(applier::applier& appl, naming::id_type const& gid, 
-                Arg0 const& arg0)
+        void apply(applier::applier& appl, naming::id_type const& gid,
+            Arg0 const& arg0)
         {
             // Determine whether the gid is local or remote
             naming::address addr;
@@ -162,6 +223,32 @@ namespace hpx { namespace lcos
                 // remote execution
                 appl.apply_c<Action>(addr, this->get_gid(appl), gid, arg0);
             }
+        }
+
+        /// Construct a new \a eager_future instance. The \a thread 
+        /// supplied to the function \a eager_future#get_result will be 
+        /// notified as soon as the result of the operation associated with 
+        /// this eager_future instance has been returned.
+        ///
+        /// \param appl   [in] The \a applier instance to be used to execute 
+        ///               the embedded action.
+        /// \param gid    [in] The global id of the target component to use to
+        ///               apply the action.
+        /// \param arg0   [in] The parameter \a arg0 will be passed on to the 
+        ///               apply operation for the embedded action.
+        /// 
+        /// \note         The result of the requested operation is expected to 
+        ///               be returned as the first parameter using a 
+        ///               \a base_lco#set_result action. Any error has to be 
+        ///               reported using a \a base_lco::set_error action. The 
+        ///               target for either of these actions has to be this 
+        ///               eager_future instance (as it has to be sent along 
+        ///               with the action as the continuation parameter).
+        template <typename Arg0>
+        eager_future(applier::applier& appl, naming::id_type const& gid, 
+                Arg0 const& arg0)
+        {
+            apply(appl, gid, arg0);
         }
 
         // pull in remaining constructors

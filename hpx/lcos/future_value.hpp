@@ -43,7 +43,15 @@ namespace hpx { namespace lcos { namespace detail
         enum { value = components::component_future };
 
         future_value()
-        {}
+        {
+        }
+
+        /// Reset the future_value to allow to restart an asynchronous 
+        /// operation. Allows any subsequent set_data operation to succeed.
+        void reset()
+        {
+            data_->set_empty();
+        }
 
         /// Get the result of the requested action. This call blocks (yields 
         /// control) if the result is not ready. As soon as the result has been 
@@ -86,6 +94,8 @@ namespace hpx { namespace lcos { namespace detail
             return boost::get<result_type>(d);
         };
 
+        // helper functions for setting data (if successful) or the error (if
+        // non-successful)
         void set_data(int slot, Result const& result)
         {
             // set the received result, reset error status
@@ -209,6 +219,13 @@ namespace hpx { namespace lcos
             return impl_->get_gid(appl);
         }
 
+        /// Reset the future_value to allow to restart an asynchronous 
+        /// operation. Allows any subsequent set_data operation to succeed.
+        void reset()
+        {
+            (*impl_)->reset();
+        }
+
     public:
         ~future_value()
         {}
@@ -227,7 +244,7 @@ namespace hpx { namespace lcos
         ///               error description.
         Result get_result(threads::thread_self& self, int slot = 0) const
         {
-            return (*this->impl_)->get_data(self, slot);
+            return (*impl_)->get_data(self, slot);
         }
 
     protected:

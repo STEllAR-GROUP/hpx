@@ -147,14 +147,9 @@ namespace hpx { namespace components { namespace server
         typedef managed_component_base<wrapped_type, accumulator> base_type;
 
     public:
-
         accumulator(applier::applier&)
           : base_type(new wrapped_type())
         {}
-
-    protected:
-        base_type& base() { return *this; }
-        base_type const& base() const { return *this; }
     };
 
 }}}

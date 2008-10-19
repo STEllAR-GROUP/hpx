@@ -31,11 +31,18 @@
 #define N BOOST_PP_ITERATION()
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    eager_future(applier::applier& appl, naming::id_type const& gid, 
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+    void apply(applier::applier& appl, naming::id_type const& gid,
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         appl.apply_c<Action>(this->get_gid(appl), gid, 
             BOOST_PP_ENUM_PARAMS(N, arg));
+    }
+
+    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    eager_future(applier::applier& appl, naming::id_type const& gid, 
+            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+    {
+        apply(appl, gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
 #undef N

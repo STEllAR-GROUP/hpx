@@ -283,7 +283,7 @@ namespace hpx { namespace components
             return Component::get_component_type();
         }
 
-    private:
+    protected:
         Component* component_;
     };
 

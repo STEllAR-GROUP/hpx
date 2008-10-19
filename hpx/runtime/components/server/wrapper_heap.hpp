@@ -159,7 +159,7 @@ namespace hpx { namespace components { namespace detail
     protected:
         bool test_release()
         {
-            if (pool_ == NULL || free_size_ < size_ || first_free_ < pool_+size_)
+            if (pool_ == NULL || (std::size_t)free_size_ < size_ || first_free_ < pool_+size_)
                 return false;
             BOOST_ASSERT(free_size_ == size_);
 

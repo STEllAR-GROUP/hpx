@@ -203,6 +203,10 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath="..\..\..\..\hpx\components\generic\CMakeLists.txt"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\..\hpx\components\generic\generic.ini"
 			>
 		</File>
