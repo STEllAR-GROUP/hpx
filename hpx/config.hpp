@@ -27,16 +27,9 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This defines the maximum number of constructor arguments a component 
-/// can take
-#if !defined(HPX_COMPONENT_ARGUMENT_LIMIT)
-#  define HPX_COMPONENT_ARGUMENT_LIMIT 4
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 /// This defines the maximum number of arguments an action can take
 #if !defined(HPX_ACTION_ARGUMENT_LIMIT)
-#  define HPX_ACTION_ARGUMENT_LIMIT 4
+#  define HPX_ACTION_ARGUMENT_LIMIT 5
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

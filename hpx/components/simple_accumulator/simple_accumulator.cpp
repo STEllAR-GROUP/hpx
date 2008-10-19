@@ -18,7 +18,7 @@
 // Add factory registration functionality
 HPX_REGISTER_COMPONENT_MODULE();
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::server::simple_accumulator, "simple_accumulator");
+    hpx::components::server::simple_accumulator, simple_accumulator);
 
 ///////////////////////////////////////////////////////////////////////////////
 // For any component derived from simple_component_base we must use the 

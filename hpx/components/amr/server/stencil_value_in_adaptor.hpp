@@ -16,7 +16,7 @@
 #include <hpx/components/amr/server/stencil_value_out_adaptor.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server 
+namespace hpx { namespace components { namespace amr { namespace server 
 {
     template <typename T>
     class stencil_value_in_adaptor 
@@ -47,7 +47,7 @@ namespace hpx { namespace components { namespace server
         naming::id_type gid_;
     };
 
-}}}
+}}}}
 
 #endif
 

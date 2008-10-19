@@ -181,13 +181,13 @@
 				RelativePath="..\..\..\..\hpx\components\amr\amr.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\..\..\..\hpx\components\amr\stencil.cpp"
-				>
-			</File>
 			<Filter
 				Name="Server"
 				>
+				<File
+					RelativePath="..\..\..\..\hpx\components\amr\server\functional_component_base.cpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\..\..\hpx\components\amr\server\stencil_value.cpp"
 					>
@@ -203,13 +203,25 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="..\..\..\..\hpx\components\amr\stencil.hpp"
-				>
-			</File>
 			<Filter
 				Name="Server"
 				>
+				<File
+					RelativePath="..\..\..\..\hpx\components\amr\server\functional_component.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\..\hpx\components\amr\server\functional_component.ipp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\..\hpx\components\amr\server\functional_component_base.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\..\hpx\components\amr\server\functional_component_base.ipp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\..\..\hpx\components\AMR\server\stencil_value.hpp"
 					>

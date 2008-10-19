@@ -93,7 +93,7 @@ namespace hpx { namespace components
             if (0 == component_) {
                 HPX_OSSTREAM strm;
                 strm << "component is NULL (" 
-                     << components::get_component_type_name(get_type()) 
+                     << components::get_component_type_name(get_component_type()) 
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
             }
@@ -104,7 +104,7 @@ namespace hpx { namespace components
             if (0 == component_) {
                 HPX_OSSTREAM strm;
                 strm << "component is NULL (" 
-                     << components::get_component_type_name(get_type())
+                     << components::get_component_type_name(get_component_type())
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
             }
@@ -233,7 +233,7 @@ namespace hpx { namespace components
             if (0 == component_) {
                 HPX_OSSTREAM strm;
                 strm << "component is NULL (" 
-                     << components::get_component_type_name(get_type())
+                     << components::get_component_type_name(get_component_type())
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
             }
@@ -245,7 +245,7 @@ namespace hpx { namespace components
             if (0 == component_) {
                 HPX_OSSTREAM strm;
                 strm << "component is NULL (" 
-                     << components::get_component_type_name(get_type())
+                     << components::get_component_type_name(get_component_type())
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
             }
@@ -258,7 +258,7 @@ namespace hpx { namespace components
             if (0 == component_) {
                 HPX_OSSTREAM strm;
                 strm << "component is NULL (" 
-                     << components::get_component_type_name(get_type())
+                     << components::get_component_type_name(get_component_type())
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
             }
@@ -270,17 +270,11 @@ namespace hpx { namespace components
             if (0 == component_) {
                 HPX_OSSTREAM strm;
                 strm << "component is NULL (" 
-                     << components::get_component_type_name(get_type())
+                     << components::get_component_type_name(get_component_type())
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
             }
             return *component_;
-        }
-
-        /// \brief Return the type of the embedded component
-        static components::component_type get_type() 
-        {
-            return Component::get_component_type();
         }
 
     protected:
@@ -291,11 +285,7 @@ namespace hpx { namespace components
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_MANAGED_COMPONENT(component)                             \
-    namespace hpx { namespace components {                                    \
-        template<> HPX_ALWAYS_EXPORT                                          \
-        component_type get_component_type<component>()                        \
-        { return component::get_component_type(); }                           \
-    }}                                                                        \
+    HPX_DEFINE_GET_COMPONENT_TYPE(component)                                  \
     /**/
 
 #endif

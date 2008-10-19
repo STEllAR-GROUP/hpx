@@ -147,7 +147,7 @@ namespace hpx { namespace components { namespace detail
                 // register the global ids and the base address of this heap
                 // with the DGAS
                 if (!appl.get_dgas_client().bind_range(base_gid_, step_, 
-                      naming::address(appl.here(), value_type::get_type(), addr),
+                      naming::address(appl.here(), value_type::get_component_type(), addr),
                       sizeof(value_type))) 
                 {
                     return naming::invalid_id;

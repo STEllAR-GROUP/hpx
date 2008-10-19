@@ -6,10 +6,10 @@
 #if !defined(HPX_COMPONENTS_AMR_STENCIL_OCT_17_2008_0847AM)
 #define HPX_COMPONENTS_AMR_STENCIL_OCT_17_2008_0847AM
 
-#include <hpx/components/amr/server/stencil_value.hpp>
+#include <hpx/components/amr/server/functional_component.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr { namespace detail
+namespace hpx { namespace components { namespace amr 
 {
     /// This class implements the time step evolution functionality. It has to
     /// expose two functions: \a eval() and \a is_last_timestep(). The function
@@ -18,14 +18,11 @@ namespace hpx { namespace components { namespace amr { namespace detail
     /// decides whether the current time step is the last one (the computation
     /// has reached the final time step).
     class stencil 
-      : public server::detail::stencil_value<stencil, double, 3>
+      : public amr::server::detail::functional_component<stencil, double, 3>
     {
-    private:
-        typedef server::detail::stencil_value<stencil, double, 3> base_type;
-
     public:
         stencil(applier::applier& appl)
-          : base_type(appl), timestep_(0)
+          : timestep_(0)
         {}
 
         /// This is the function implementing the actual time step functionality
@@ -43,24 +40,6 @@ namespace hpx { namespace components { namespace amr { namespace detail
 
     private:
         int timestep_;    // count evaluated time steps
-    };
-
-}}}}
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr 
-{
-    /// This class defines the overall component type. It is needed to build
-    /// the proper infrastructure for the HPX component architecture
-    struct stencil 
-      : public managed_component_base<amr::detail::stencil, stencil>
-    {
-        typedef amr::detail::stencil wrapped_type;
-        typedef managed_component_base<wrapped_type, stencil> base_type;
-
-        stencil(applier::applier& appl) 
-          : base_type(new wrapped_type(appl)) 
-        {}
     };
 
 }}}

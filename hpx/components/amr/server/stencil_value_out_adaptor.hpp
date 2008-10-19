@@ -15,7 +15,7 @@
 #include <boost/function.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server { namespace detail
+namespace hpx { namespace components { namespace amr { namespace server { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Value>
@@ -92,10 +92,10 @@ namespace hpx { namespace components { namespace server { namespace detail
     template<typename Value> 
     component_type stencil_value_out_adaptor<Value>::value = component_invalid;
 
-}}}}
+}}}}}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server 
+namespace hpx { namespace components { namespace amr { namespace server 
 {
     template <typename T>
     struct stencil_value_out_adaptor
@@ -103,8 +103,10 @@ namespace hpx { namespace components { namespace server
             detail::stencil_value_out_adaptor<T>, stencil_value_out_adaptor<T>
         >
     {
-    private:
+    public:
         typedef detail::stencil_value_out_adaptor<T> wrapped_type;
+
+    private:
         typedef 
             managed_component_base<wrapped_type, stencil_value_out_adaptor> 
         base_type;
@@ -120,7 +122,7 @@ namespace hpx { namespace components { namespace server
         }
     };
 
-}}}
+}}}}
 
 #endif
 

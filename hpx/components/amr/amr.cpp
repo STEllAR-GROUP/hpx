@@ -19,3 +19,5 @@ HPX_REGISTER_COMPONENT_MODULE();
 HPX_REGISTER_ACTION(hpx::lcos::base_lco_with_value<std::vector<hpx::naming::id_type> >::set_result_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<std::vector<hpx::naming::id_type> >);
 
+HPX_REGISTER_ACTION(hpx::lcos::base_lco_with_value<bool>::set_result_action);
+HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<bool>);

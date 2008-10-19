@@ -4,7 +4,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(amr_HEADERS
-    stencil.hpp
     server/stencil_value.hpp
     server/stencil_value.ipp
     server/stencil_value_in_adaptor.hpp
@@ -12,7 +11,6 @@ set(amr_HEADERS
 
 set(amr_SOURCES
     amr.cpp
-    stencil.cpp
     server/stencil_value.cpp
     server/stencil_value_out_adaptor.cpp)
 

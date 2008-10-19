@@ -14,17 +14,21 @@
 #include <hpx/components/amr/server/stencil_value_out_adaptor.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Add factory registration functionality
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::server::stencil_value_out_adaptor<double>, 
-    "stencil_value_out_adaptor");
+/// Define types of stencil_value_out_adaptor components exposed by this module
+typedef hpx::components::amr::server::stencil_value_out_adaptor<double> stencil_value_out_adaptor_type;
+
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(stencil_value_out_adaptor_type, stencil_value_out_adaptor);
 
 ///////////////////////////////////////////////////////////////////////////////
 // For any component derived from manage_component_base we must use the 
 // following in exactly one source file
-HPX_REGISTER_MANAGED_COMPONENT(hpx::components::server::stencil_value_out_adaptor<double>);
+HPX_REGISTER_MANAGED_COMPONENT(stencil_value_out_adaptor_type);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION(hpx::components::server::detail::stencil_value_out_adaptor<double>::get_value_action);
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::detail::stencil_value_out_adaptor<double>);
+typedef stencil_value_out_adaptor_type::wrapped_type stencil_value_out_adaptor_impl_type;
+
+HPX_REGISTER_ACTION(stencil_value_out_adaptor_impl_type::get_value_action);
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_DEFINE_GET_COMPONENT_TYPE(stencil_value_out_adaptor_impl_type);
 

@@ -8,11 +8,21 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 
-#include <hpx/components/amr/stencil.hpp>
-#include <hpx/components/amr/server/stencil_value.ipp>
+#include <hpx/components/amr/server/functional_component.hpp>
+#include <hpx/components/amr/server/functional_component.ipp>
+#include <hpx/components/amr_test/stencil.hpp>
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+// Add factory registration functionality
+HPX_REGISTER_COMPONENT_MODULE();
+
+///////////////////////////////////////////////////////////////////////////////
+typedef hpx::components::amr::server::functional_component<
+    hpx::components::amr::stencil, double, 3
+> stencil_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// The following construct registers a minimal factory needed for the creation
@@ -22,40 +32,24 @@
 /// like:
 /// 
 /// [hpx.components.stencil]      # this must match the string below
-/// name = amr                    # this must match the name of the shared library
+/// name = amr_test               # this must match the name of the shared library
 /// path = $[hpx.location]/lib    # this is the default location where to find the shared library
 ///
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::amr::stencil, "stencil");
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(stencil_type, stencil);
 
 ///////////////////////////////////////////////////////////////////////////////
 // For any component derived from manage_component_base we must use the 
 // following in exactly one source file
-HPX_REGISTER_MANAGED_COMPONENT(hpx::components::amr::stencil);
+HPX_REGISTER_MANAGED_COMPONENT(stencil_type);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION(hpx::components::amr::detail::stencil::call_action);
-HPX_REGISTER_ACTION(hpx::components::amr::detail::stencil::get_output_ports_action);
-HPX_REGISTER_ACTION(hpx::components::amr::detail::stencil::connect_input_ports_action);
+typedef stencil_type::wrapped_type stencil_impl_type;
+
+HPX_REGISTER_ACTION(stencil_impl_type::eval_action);
+HPX_REGISTER_ACTION(stencil_impl_type::is_last_timestep_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr { namespace detail
-{
-    ///////////////////////////////////////////////////////////////////////////////
-    // Implement actual functionality of this stencil
-
-    // Compute the result value for the current time step
-    double stencil::eval(double x, double y, double z)
-    {
-        ++timestep_;
-        return (x + y + z) / 3;
-    }
-
-    // Return, whether the current time step is the final one
-    bool stencil::is_last_timestep() const
-    {
-        return timestep_ == 2;
-    }
-
-}}}}
+// additional action definitions required by the stencil_value base class
+// HPX_REGISTER_ACTION(hpx::lcos::base_lco_with_value<std::vector<hpx::naming::id_type> >::set_result_action);
+// HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<std::vector<hpx::naming::id_type> >);
 

@@ -19,13 +19,21 @@
 
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/bind.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server { namespace detail
+namespace hpx { namespace components { namespace amr { namespace server 
 {
+    template <typename T, int N>
+    struct stencil_value;           // forward declaration only
 
+}}}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace components { namespace amr { namespace server { namespace detail
+{
     /// \class stencil_value stencil_value.hpp hpx/components/amr/server/stencil_value.hpp
-    template <typename Derived, typename T, int N>
+    template <typename T, int N>
     class stencil_value : boost::noncopyable
     {
     private:
@@ -34,36 +42,22 @@ namespace hpx { namespace components { namespace server { namespace detail
     protected:
         typedef T result_type;
 
-        // the in_adaptors_type is a fusion sequence of stencil_value_in_adaptor's
-        // of the proper types, one in_adaptor for each parameter of the call
-        // function
-        typedef server::stencil_value_in_adaptor<T> in_adaptor_type;
+        // the in_adaptors_type is the concrete stencil_value_in_adaptor
+        // of the proper type
+        typedef amr::server::stencil_value_in_adaptor<T> in_adaptor_type;
 
-        /// 
-        typedef server::stencil_value_out_adaptor<T> out_adaptor_type;
-
-        Derived& derived() { return *static_cast<Derived*>(this); }
-        Derived const& derived() const { return *static_cast<Derived const*>(this); }
+        // the out_adaptors_type is the concrete stencil_value_out_adaptor
+        // of the proper type
+        typedef amr::server::stencil_value_out_adaptor<T> out_adaptor_type;
 
     public:
         // components must contain a typedef for wrapping_type defining the
         // managed_component_base type used to encapsulate instances of this 
         // component
-        typedef managed_component_base<stencil_value> wrapping_type;
+        typedef amr::server::stencil_value<T, N> wrapping_type;
 
         /// Construct a new stencil_value instance
-        stencil_value(applier::applier& appl)
-          : sem_in_(N), sem_out_(0)
-        {
-            // create adaptors
-            for (std::size_t i = 0; i < N; ++i)
-            {
-                in_[i].reset(new in_adaptor_type(appl));
-                out_[i].reset(new out_adaptor_type(appl));
-                out_[i]->set_callback(
-                    boost::bind(&stencil_value::get_value, this, _1, _2));
-            }
-        }
+        stencil_value(applier::applier& appl);
 
         /// The function get_result will be called by the out-ports whenever 
         /// the current value has been requested.
@@ -89,6 +83,7 @@ namespace hpx { namespace components { namespace server { namespace detail
             stencil_value_call = 0,
             stencil_value_get_output_ports = 1,
             stencil_value_connect_input_ports = 2,
+            stencil_value_set_functional_component = 3,
         };
 
         /// This is the main entry point of this component. Calling this 
@@ -111,6 +106,12 @@ namespace hpx { namespace components { namespace server { namespace detail
         connect_input_ports(threads::thread_self&, applier::applier&, 
             std::vector<naming::id_type> const& gids);
 
+        /// Set the gid of the component implementing the actual time evolution
+        /// functionality
+        threads::thread_state 
+        set_functional_component(threads::thread_self&, applier::applier&, 
+            naming::id_type const& gid);
+
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
@@ -131,19 +132,47 @@ namespace hpx { namespace components { namespace server { namespace detail
             &stencil_value::connect_input_ports
         > connect_input_ports_action;
 
+        typedef hpx::actions::action1<
+            stencil_value, stencil_value_set_functional_component, 
+            naming::id_type const&, &stencil_value::set_functional_component
+        > set_functional_component_action;
+
     private:
         lcos::counting_semaphore sem_in_;
         lcos::counting_semaphore sem_out_;
 
-        boost::scoped_ptr<in_adaptor_type> in_[N];     // adaptors used to gather input
-        boost::scoped_ptr<out_adaptor_type> out_[N];   // adaptors used to provide result
+        boost::scoped_ptr<in_adaptor_type> in_[N];    // adaptors used to gather input
+        boost::scoped_ptr<out_adaptor_type> out_[N];  // adaptors used to provide result
 
-        result_type value_;     // current value
+        result_type value_;                           // current value
+
+        naming::id_type functional_gid_;              // 
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Derived, typename T, int N>
-    component_type stencil_value<Derived, T, N>::value = component_invalid;
+    template <typename T, int N>
+    component_type stencil_value<T, N>::value = component_invalid;
+
+}}}}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace components { namespace amr { namespace server
+{
+    /// This class defines the overall component type. It is needed to build
+    /// the proper infrastructure for the HPX component architecture
+    template <typename T, int N>
+    struct stencil_value 
+      : public managed_component_base<
+            detail::stencil_value<T, N>, stencil_value<T, N> 
+        >
+    {
+        typedef detail::stencil_value<T, N> wrapped_type;
+        typedef managed_component_base<wrapped_type, stencil_value> base_type;
+
+        stencil_value(applier::applier& appl) 
+          : base_type(new wrapped_type(appl)) 
+        {}
+    };
 
 }}}}
 

@@ -44,15 +44,15 @@
                BOOST_PLUGIN_API BOOST_PLUGIN_LIST_NAME(name, classname)();    \
                                                                               \
     namespace {                                                               \
-        struct BOOST_PLUGIN_EXPORTER_NAME(name, classname) {                  \
-            BOOST_PLUGIN_EXPORTER_NAME(name, classname)()                     \
+        struct BOOST_PLUGIN_EXPORTER_NAME(name, actualname) {                 \
+            BOOST_PLUGIN_EXPORTER_NAME(name, actualname)()                    \
             {                                                                 \
                 static boost::plugin::concrete_factory<BaseType, ActualType> cf; \
                 boost::plugin::abstract_factory<BaseType>* w = &cf;           \
                 BOOST_PLUGIN_LIST_NAME(name, classname)().insert(             \
-                    std::make_pair(actualname, w));                           \
+                    std::make_pair(BOOST_PP_STRINGIZE(actualname), w));       \
             }                                                                 \
-        } BOOST_PLUGIN_EXPORTER_INSTANCE_NAME(name, classname);               \
+        } BOOST_PLUGIN_EXPORTER_INSTANCE_NAME(name, actualname);              \
     }                                                                         \
     /**/
 

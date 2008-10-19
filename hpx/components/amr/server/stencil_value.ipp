@@ -3,49 +3,101 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#if !defined(HPX_COMPONENTS_AMR_STENCIL_VALUE_IMPL_OCT_17_2008_0848AM)
+#define HPX_COMPONENTS_AMR_STENCIL_VALUE_IMPL_OCT_17_2008_0848AM
+
+#include <hpx/components/amr/server/stencil_value.hpp>
+#include <hpx/components/amr/server/functional_component_base.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server { namespace detail
+namespace hpx { namespace components { namespace amr { namespace server { namespace detail
 {
+    ///////////////////////////////////////////////////////////////////////////
     template <typename T, int N>
-    struct call_helper;
+    struct eval_helper;
 
     template <typename T>
-    struct call_helper<T, 1>
+    struct eval_helper<T, 1>
     {
-        template <typename Derived, typename Adaptor>
-        static T eval(threads::thread_self& self, Derived& derived, Adaptor* in)
+        template <typename Adaptor>
+        static T 
+        call(threads::thread_self& self, applier::applier& appl, 
+            naming::id_type const& gid, Adaptor* in)
         {
-            return derived.eval(in[0]->get_result(self));
+            typedef functional_component_base<T, 1>::eval_action action_type;
+            lcos::eager_future<action_type, T> f(appl, gid, in[0]->get_result(self));
+            return f.get_result(self); 
         }
     };
 
     template <typename T>
-    struct call_helper<T, 3>
+    struct eval_helper<T, 3>
     {
-        template <typename Derived, typename Adaptor>
-        static T eval(threads::thread_self& self, Derived& derived, Adaptor* in)
+        template <typename Adaptor>
+        static T
+        call(threads::thread_self& self, applier::applier& appl, 
+            naming::id_type const& gid, Adaptor* in)
         {
-            return derived.eval(in[0]->get_result(self), 
-                in[1]->get_result(self), in[2]->get_result(self));
+            typedef functional_component_base<T, 3>::eval_action action_type;
+            lcos::eager_future<action_type, T> f(appl, gid, 
+                in[0]->get_result(self), in[1]->get_result(self), 
+                in[2]->get_result(self));
+            return f.get_result(self); 
         }
     };
 
     template <typename T>
-    struct call_helper<T, 5>
+    struct eval_helper<T, 5>
     {
-        template <typename Derived, typename Adaptor>
-        static T eval(threads::thread_self& self, Derived& derived, Adaptor* in)
+        template <typename Adaptor>
+        static T 
+        call(threads::thread_self& self, applier::applier& appl, 
+            naming::id_type const& gid, Adaptor* in)
         {
-            return derived.eval(in[0]->get_result(self), 
-                in[1]->get_result(self), in[2]->get_result(self), 
-                in[3]->get_result(self), in[4]->get_result(self));
+            typedef functional_component_base<T, 5>::eval_action action_type;
+            lcos::eager_future<action_type, T> f(appl, gid, 
+                in[0]->get_result(self), in[1]->get_result(self), 
+                in[2]->get_result(self), in[3]->get_result(self), 
+                in[4]->get_result(self));
+            return f.get_result(self); 
+        }
+    };
+
+    template <typename T, int N>
+    struct is_last_timestep_helper
+    {
+        static bool 
+        call(threads::thread_self& self, applier::applier& appl, 
+            naming::id_type const& gid)
+        {
+            typedef 
+                functional_component_base<T, N>::is_last_timestep_action 
+            action_type;
+
+            lcos::eager_future<action_type, bool> f(appl, gid);
+            return f.get_result(self); 
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Derived, typename T, int N>
+    template <typename T, int N>
+    stencil_value<T, N>::stencil_value(applier::applier& appl)
+      : sem_in_(N), sem_out_(0)
+    {
+        // create adaptors
+        for (std::size_t i = 0; i < N; ++i)
+        {
+            in_[i].reset(new in_adaptor_type(appl));
+            out_[i].reset(new out_adaptor_type(appl));
+            out_[i]->set_callback(
+                boost::bind(&stencil_value::get_value, this, _1, _2));
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, int N>
     threads::thread_state  
-    stencil_value<Derived, T, N>::call(threads::thread_self& self, 
+    stencil_value<T, N>::call(threads::thread_self& self, 
         applier::applier& appl, result_type* result, T const& initial)
     {
         T next_value = initial;
@@ -64,9 +116,10 @@ namespace hpx { namespace components { namespace server { namespace detail
             sem_out_.signal(self, N);
 
             // compute the next value
-            next_value = call_helper<result_type, N>::eval(self, derived(), in_);
+            next_value = eval_helper<result_type, N>::call(self, appl, 
+                functional_gid_, in_);
 
-        } while (!derived().is_last_timestep());
+        } while (!is_last_timestep_helper<result_type, N>::call(self, appl, functional_gid_));
 
         if (0 != result)
             *result = value_;
@@ -77,9 +130,9 @@ namespace hpx { namespace components { namespace server { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_result will be called by the out-ports whenever 
     /// the current value has been requested.
-    template <typename Derived, typename T, int N>
+    template <typename T, int N>
     void
-    stencil_value<Derived, T, N>::get_value(threads::thread_self& self, 
+    stencil_value<T, N>::get_value(threads::thread_self& self, 
         result_type* result)
     {
         sem_out_.wait(self, 1);     // wait for the current value to be valid
@@ -88,9 +141,9 @@ namespace hpx { namespace components { namespace server { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Derived, typename T, int N>
+    template <typename T, int N>
     threads::thread_state 
-    stencil_value<Derived, T, N>::get_output_ports(threads::thread_self& self, 
+    stencil_value<T, N>::get_output_ports(threads::thread_self& self, 
         applier::applier& appl, std::vector<naming::id_type> *gids)
     {
         gids->clear();
@@ -100,13 +153,14 @@ namespace hpx { namespace components { namespace server { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Derived, typename T, int N>
+    template <typename T, int N>
     threads::thread_state 
-    stencil_value<Derived, T, N>::connect_input_ports(threads::thread_self& self, 
+    stencil_value<T, N>::connect_input_ports(threads::thread_self& self, 
         applier::applier& appl, std::vector<naming::id_type> const& gids)
     {
         if (gids.size() < N) {
-            HPX_THROW_EXCEPTION(bad_parameter, "insufficient gid's supplied");
+            HPX_THROW_EXCEPTION(bad_parameter, 
+                "insufficient numnber of gid's supplied");
             return threads::terminated;
         }
         for (std::size_t i = 0; i < N; ++i)
@@ -114,5 +168,16 @@ namespace hpx { namespace components { namespace server { namespace detail
         return threads::terminated;
     }
 
-}}}}
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, int N>
+    threads::thread_state 
+    stencil_value<T, N>::set_functional_component(threads::thread_self& self, 
+        applier::applier& appl, naming::id_type const& gid)
+    {
+        functional_gid_ = gid;
+        return threads::terminated;
+    }
 
+}}}}}
+
+#endif
