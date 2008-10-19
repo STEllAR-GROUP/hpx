@@ -17,19 +17,15 @@
 #include <hpx/components/distributing_factory/server/distributing_factory.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-// make sure all needed action::get_action_name() functions get defined
+// Serialization support for the distributing_factory action
 typedef hpx::lcos::base_lco_with_value<
-        std::vector<std::pair<hpx::naming::id_type, std::size_t> > 
+        hpx::components::server::detail::distributing_factory::result_type 
     > create_result_type;
 
-HPX_DEFINE_GET_ACTION_NAME(create_result_type::set_result_action);
+HPX_REGISTER_ACTION(create_result_type::set_result_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(create_result_type);
 
-///////////////////////////////////////////////////////////////////////////////
-// Serialization support for the accumulator actions
-HPX_REGISTER_ACTION(hpx::components::server::detail::distributing_factory::create_action);
-
-///////////////////////////////////////////////////////////////////////////////
+HPX_REGISTER_ACTION(hpx::components::server::detail::distributing_factory::create_components_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::detail::distributing_factory);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -38,12 +34,25 @@ namespace hpx { namespace components { namespace server { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     component_type distributing_factory::value = component_invalid;
 
+    struct lazy_result
+    {
+        lazy_result(naming::id_type const& prefix, 
+                lcos::future_value<naming::id_type> gids,
+                std::size_t count)
+          : prefix_(prefix), gids_(gids), count_(count)
+        {}
+
+        naming::id_type prefix_;
+        lcos::future_value<naming::id_type> gids_;
+        std::size_t count_;
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     // create a new instance of a component
-    threads::thread_state distributing_factory::create(
+    threads::thread_state distributing_factory::create_components(
         threads::thread_self& self, applier::applier& appl,
-        std::vector<std::pair<naming::id_type, std::size_t> >* gids, 
-        components::component_type type, std::size_t count)
+        result_type* gids, components::component_type type, 
+        std::size_t count)
     {
         // get list of locality prefixes
         std::vector<naming::id_type> prefixes;
@@ -56,9 +65,7 @@ namespace hpx { namespace components { namespace server { namespace detail
 
         // distribute the number of components to create evenly on all 
         // available localities
-        typedef 
-            std::vector<std::pair<lcos::future_value<naming::id_type>, int> > 
-        future_values_type;
+        typedef std::vector<lazy_result> future_values_type;
 
         // start an asynchronous operation for each of the localities
         future_values_type v;
@@ -74,7 +81,7 @@ namespace hpx { namespace components { namespace server { namespace detail
 
             lcos::future_value<naming::id_type> f (
                 rts.create_component_async(*it, type, create));
-            v.push_back(future_values_type::value_type(f, create));
+            v.push_back(future_values_type::value_type(*it, f, create));
 
             created_count += create;
             if (created_count >= count)
@@ -82,16 +89,11 @@ namespace hpx { namespace components { namespace server { namespace detail
         }
 
         // now wait for the results
-        typedef 
-            std::vector<std::pair<naming::id_type, std::size_t> >
-        result_type;
-
-        // set results
         future_values_type::iterator vend = v.end();
         for (future_values_type::iterator vit = v.begin(); vit != vend; ++vit)
         {
             gids->push_back(result_type::value_type(
-                (*vit).first.get_result(self), (*vit).second));
+                (*vit).prefix_, (*vit).gids_.get_result(self), (*vit).count_));
         }
 
         return threads::terminated;

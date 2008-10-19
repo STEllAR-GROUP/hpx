@@ -14,8 +14,3 @@ HPX_REGISTER_COMPONENT_MODULE();
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::server::distributing_factory, distributing_factory);
 
-///////////////////////////////////////////////////////////////////////////////
-// For any component derived from manage_component_base we must use the 
-// following in exactly one source file
-HPX_REGISTER_MANAGED_COMPONENT(hpx::components::server::distributing_factory);
-
