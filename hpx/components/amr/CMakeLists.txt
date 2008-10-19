@@ -4,6 +4,10 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(amr_HEADERS
+    server/functional_component.hpp
+    server/functional_component.ipp
+    server/functional_component_base.hpp
+    server/functional_component_base.ipp
     server/stencil_value.hpp
     server/stencil_value.ipp
     server/stencil_value_in_adaptor.hpp
@@ -11,6 +15,7 @@ set(amr_HEADERS
 
 set(amr_SOURCES
     amr.cpp
+    server/functional_component_base.cpp
     server/stencil_value.cpp
     server/stencil_value_out_adaptor.cpp)
 
@@ -18,7 +23,7 @@ add_definitions(-DHPX_COMPONENT_NAME=amr)
 add_definitions(-DHPX_COMPONENT_EXPORTS)
 
 add_library (amr_component SHARED 
-    ${amr_SOURCES} ${genericlib_HEADERS})
+    ${amr_SOURCES} ${amr_HEADERS})
 set_target_properties(amr_component PROPERTIES
     OUTPUT_NAME ${component_LIBRARY_PREFIX}amr)
 target_link_libraries(amr_component 
