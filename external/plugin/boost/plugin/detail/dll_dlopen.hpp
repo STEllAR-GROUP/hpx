@@ -40,7 +40,7 @@ typedef void* HMODULE;
 
 ///////////////////////////////////////////////////////////////////////////////
 #define MyFreeLibrary(x)      dlclose (x)
-#define MyLoadLibrary(x)      dlopen  (x, RTLD_LAZY | RTLD_LOCAL | RTLD_DEEPBIND) 
+#define MyLoadLibrary(x)      dlopen  (x, RTLD_GLOBAL | RTLD_LAZY)
 #define MyGetProcAddress(x,y) dlsym   (x, y)
 
 ///////////////////////////////////////////////////////////////////////////////
