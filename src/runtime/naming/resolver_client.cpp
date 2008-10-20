@@ -355,7 +355,11 @@ namespace hpx { namespace naming
             // De-serialize the data
             {
                 boost::iostreams::stream<io_device_type> io(buffer);
+#if defined(HPX_USE_PORTABLE_ARCHIVES)
                 util::portable_binary_iarchive archive(io);
+#else
+                boost::archive::binary_iarchive archive(io);
+#endif
                 archive >> rep;
             }
         }

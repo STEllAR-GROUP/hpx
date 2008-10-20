@@ -117,7 +117,11 @@ namespace hpx { namespace naming
                 boost::iostreams::stream<io_device_type> io(buffer_);
 
                 // Serialize the data
+#if defined(HPX_USE_PORTABLE_ARCHIVES)
                 util::portable_binary_oarchive archive(io);
+#else
+                boost::archive::binary_oarchive archive(io);
+#endif
                 archive << req_;
             }
             size_ = buffer_.size();
@@ -238,7 +242,11 @@ namespace hpx { namespace naming
                     boost::iostreams::stream<io_device_type> io(buffer_);
 
                 // de-serialize the data
+#if defined(HPX_USE_PORTABLE_ARCHIVES)
                     util::portable_binary_iarchive archive(io);
+#else
+                    boost::archive::binary_iarchive archive(io);
+#endif
                     archive >> rep;
                 }
                 catch (std::exception const& /*e*/) {

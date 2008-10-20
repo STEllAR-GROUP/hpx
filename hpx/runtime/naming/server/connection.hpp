@@ -123,7 +123,11 @@ namespace hpx { namespace naming { namespace server
                     {
                     // create a special io stream on top of buffer_
                         boost::iostreams::stream<io_device_type> io(buffer_);
+#if defined(HPX_USE_PORTABLE_ARCHIVES)
                         util::portable_binary_iarchive archive(io);
+#else
+                        boost::archive::binary_iarchive archive(io);
+#endif
                         archive >> req;
                     }
 
@@ -164,7 +168,11 @@ namespace hpx { namespace naming { namespace server
                 boost::iostreams::stream<io_device_type> io(buffer_);
 
                 // Serialize the data
+#if defined(HPX_USE_PORTABLE_ARCHIVES)
                 util::portable_binary_oarchive archive(io);
+#else
+                boost::archive::binary_oarchive archive(io);
+#endif
                 archive << rep;
             }
 
