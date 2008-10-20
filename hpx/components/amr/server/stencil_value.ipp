@@ -24,7 +24,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         call(threads::thread_self& self, applier::applier& appl, 
             naming::id_type const& gid, Adaptor* in)
         {
-            typedef functional_component_base<T, 1>::eval_action action_type;
+            typedef typename functional_component_base<T, 1>::eval_action action_type;
             lcos::eager_future<action_type, T> f(appl, gid, in[0]->get_result(self));
             return f.get_result(self); 
         }
@@ -38,7 +38,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         call(threads::thread_self& self, applier::applier& appl, 
             naming::id_type const& gid, Adaptor* in)
         {
-            typedef functional_component_base<T, 3>::eval_action action_type;
+            typedef typename functional_component_base<T, 3>::eval_action action_type;
             lcos::eager_future<action_type, T> f(appl, gid, 
                 in[0]->get_result(self), in[1]->get_result(self), 
                 in[2]->get_result(self));
@@ -54,7 +54,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         call(threads::thread_self& self, applier::applier& appl, 
             naming::id_type const& gid, Adaptor* in)
         {
-            typedef functional_component_base<T, 5>::eval_action action_type;
+            typedef typename functional_component_base<T, 5>::eval_action action_type;
             lcos::eager_future<action_type, T> f(appl, gid, 
                 in[0]->get_result(self), in[1]->get_result(self), 
                 in[2]->get_result(self), in[3]->get_result(self), 
@@ -71,7 +71,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             naming::id_type const& gid)
         {
             typedef 
-                functional_component_base<T, N>::is_last_timestep_action 
+                typename functional_component_base<T, N>::is_last_timestep_action 
             action_type;
 
             lcos::eager_future<action_type, bool> f(appl, gid);

@@ -245,7 +245,8 @@ namespace hpx { namespace threads
         ///                 be used.
         thread_state set_state(thread_state new_state)
         {
-            return get()->set_state(new_state);
+            detail::thread* t = get();
+            return t->set_state(new_state);
         }
 
         /// \brief Execute the thread function

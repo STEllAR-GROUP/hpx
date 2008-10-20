@@ -110,7 +110,7 @@ namespace hpx { namespace components { namespace server
             generic_component_action = 0
         };
 
-        generic_component0(applier::applier&)
+        generic_component0(applier::applier& appl)
           : simple_component_base<generic_component0<void, F> >(appl)
         {}
 
