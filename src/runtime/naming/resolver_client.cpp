@@ -303,7 +303,7 @@ namespace hpx { namespace naming
             {
                 // serialize the request
                 boost::iostreams::stream<io_device_type> io(buffer);
-#if defined(HPX_USE_PORTABLE_ARCHIVES)
+#if HPX_USE_PORTABLE_ARCHIVES != 0
                 util::portable_binary_oarchive archive(io);
 #else
                 boost::archive::binary_oarchive archive(io);
@@ -359,7 +359,7 @@ namespace hpx { namespace naming
             // De-serialize the data
             {
                 boost::iostreams::stream<io_device_type> io(buffer);
-#if defined(HPX_USE_PORTABLE_ARCHIVES)
+#if HPX_USE_PORTABLE_ARCHIVES != 0
                 util::portable_binary_iarchive archive(io);
 #else
                 boost::archive::binary_iarchive archive(io);

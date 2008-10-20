@@ -56,7 +56,7 @@ namespace hpx { namespace parcelset
                 boost::iostreams::stream<io_device_type> io(out_buffer_);
 
                 // Serialize the data
-#if defined(HPX_USE_PORTABLE_ARCHIVES)
+#if HPX_USE_PORTABLE_ARCHIVES != 0
                 util::portable_binary_oarchive archive(io);
 #else
                 boost::archive::binary_oarchive archive(io);

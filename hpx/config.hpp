@@ -33,9 +33,16 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This defines the number kept alive of outgoing (parcel-) connections
+/// This defines the number of outgoing (parcel-) connections kept alive 
 #if !defined(HPX_MAX_CONNECTION_CACHE_SIZE)
 #  define HPX_MAX_CONNECTION_CACHE_SIZE 64
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// This defines whether to use the portable binary archives for parcel 
+/// serialization
+#if !defined(HPX_USE_PORTABLE_ARCHIVES)
+#  define HPX_USE_PORTABLE_ARCHIVES 1
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

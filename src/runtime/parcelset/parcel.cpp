@@ -60,7 +60,7 @@ namespace hpx { namespace parcelset
 
     ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
-#if defined(HPX_USE_PORTABLE_ARCHIVES)
+#if HPX_USE_PORTABLE_ARCHIVES != 0
     template HPX_EXPORT void 
     parcel::save(util::portable_binary_oarchive&, const unsigned int version) const;
 

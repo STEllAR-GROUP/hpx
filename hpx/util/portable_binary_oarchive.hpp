@@ -4,7 +4,7 @@
 #include <boost/version.hpp>
 #include <hpx/config.hpp>
 
-#if !defined(HPX_USE_PORTABLE_ARCHIVES)
+#if HPX_USE_PORTABLE_ARCHIVES == 0
 #include <boost/archive/binary_oarchive.hpp>
 #else
 
@@ -210,5 +210,5 @@ public:
 #endif // BOOST_VERSION < 103700
 #endif // PORTABLE_BINARY_OARCHIVE_HPP
 
-#endif // !HPX_USE_PORTABLE_ARCHIVES
+#endif // HPX_USE_PORTABLE_ARCHIVES == 0
 

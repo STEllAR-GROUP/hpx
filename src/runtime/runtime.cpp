@@ -130,6 +130,8 @@ namespace hpx
                 boost::bind(func, _1, boost::ref(applier_)), "hpx_main");
         }
 
+        LRT_(info) << "runtime started using "  << num_threads << " OS threads";
+
         // block if required
         if (blocking) 
             wait();     // wait for the shutdown_action to be executed
@@ -147,6 +149,8 @@ namespace hpx
 
     void runtime::wait()
     {
+        LRT_(info) << "runtime about to enter wait state";
+
 #if defined(BOOST_WINDOWS)
         // Set console control handler to allow server to be stopped.
         console_ctrl_function = boost::bind(&runtime::stop, this, true);
@@ -184,11 +188,14 @@ namespace hpx
 
         t.join();
 #endif
+        LRT_(info) << "runtime exiting wait state";
     }
 
     ///////////////////////////////////////////////////////////////////////////
     void runtime::stop(bool blocking)
     {
+        LRT_(info) << "runtime about to stop services";
+
         try {
             // unregister the runtime_support and memory instances from the DGAS 
             dgas_client_.unbind(applier_.get_runtime_support_gid());
@@ -203,6 +210,8 @@ namespace hpx
         parcel_port_.stop(blocking);    // stops parcel_pool_ as well
         dgas_pool_.stop();
         runtime_support_.stop();        // re-activate main thread 
+
+        LRT_(info) << "runtime stopped all services";
     }
 
     ///////////////////////////////////////////////////////////////////////////
