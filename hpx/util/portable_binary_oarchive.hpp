@@ -2,6 +2,11 @@
 #define PORTABLE_BINARY_OARCHIVE_HPP
 
 #include <boost/version.hpp>
+#include <hpx/config.hpp>
+
+#if !defined(HPX_USE_PORTABLE_ARCHIVES)
+#include <boost/archive/binary_oarchive.hpp>
+#else
 
 #if BOOST_VERSION < 103700
 #include <hpx/util/binary_portable_oarchive.hpp>
@@ -204,3 +209,6 @@ public:
 
 #endif // BOOST_VERSION < 103700
 #endif // PORTABLE_BINARY_OARCHIVE_HPP
+
+#endif // !HPX_USE_PORTABLE_ARCHIVES
+
