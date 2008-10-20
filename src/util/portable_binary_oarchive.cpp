@@ -10,7 +10,7 @@
 
 #include <boost/version.hpp>
 
-#if BOOST_VERSION >= 103700
+#if BOOST_VERSION >= 103700 && defined(HPX_USE_PORTABLE_ARCHIVES)
 
 // export the defined functions
 #define BOOST_ARCHIVE_SOURCE
@@ -123,4 +123,4 @@ template class basic_binary_oprimitive<
 } // namespace archive
 } // namespace boost
 
-#endif // BOOST_VERSION >= 103700
+#endif // BOOST_VERSION >= 103700 && defined(HPX_USE_PORTABLE_ARCHIVES)
