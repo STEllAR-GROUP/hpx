@@ -24,21 +24,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server 
 {
-    template <typename T, int N>
-    struct stencil_value;           // forward declaration only
-
-}}}}
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr { namespace server { namespace detail
-{
     /// \class stencil_value stencil_value.hpp hpx/components/amr/server/stencil_value.hpp
     template <typename T, int N>
-    class stencil_value : boost::noncopyable
+    class stencil_value 
+      : public components::detail::managed_component_base<
+            stencil_value<T, N>
+        >
     {
-    private:
-        static component_type value;
-
     protected:
         typedef T result_type;
 
@@ -48,14 +40,11 @@ namespace hpx { namespace components { namespace amr { namespace server { namesp
 
         // the out_adaptors_type is the concrete stencil_value_out_adaptor
         // of the proper type
-        typedef amr::server::stencil_value_out_adaptor<T> out_adaptor_type;
+        typedef 
+            managed_component<amr::server::stencil_value_out_adaptor<T> >
+        out_adaptor_type;
 
     public:
-        // components must contain a typedef for wrapping_type defining the
-        // managed_component_base type used to encapsulate instances of this 
-        // component
-        typedef amr::server::stencil_value<T, N> wrapping_type;
-
         /// Construct a new stencil_value instance
         stencil_value(applier::applier& appl);
 
@@ -64,18 +53,6 @@ namespace hpx { namespace components { namespace amr { namespace server { namesp
         void get_value(threads::thread_self& self, result_type*);
 
         ///////////////////////////////////////////////////////////////////////
-        // This is the component id. Every component needs to have an embedded
-        // enumerator 'value' which is used by the generic action implementation
-        // to associate this component with a given action.
-        static component_type get_component_type()
-        {
-            return value;
-        }
-        static void set_component_type(component_type type)
-        {
-            value = type;
-        }
-
         // parcel action code: the action to be performed on the destination 
         // object (the accumulator)
         enum actions
@@ -112,7 +89,6 @@ namespace hpx { namespace components { namespace amr { namespace server { namesp
         set_functional_component(threads::thread_self&, applier::applier&, 
             naming::id_type const& gid);
 
-        ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
@@ -147,31 +123,6 @@ namespace hpx { namespace components { namespace amr { namespace server { namesp
         result_type value_;                           // current value
 
         naming::id_type functional_gid_;              // 
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T, int N>
-    component_type stencil_value<T, N>::value = component_invalid;
-
-}}}}}
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr { namespace server
-{
-    /// This class defines the overall component type. It is needed to build
-    /// the proper infrastructure for the HPX component architecture
-    template <typename T, int N>
-    struct stencil_value 
-      : public managed_component_base<
-            detail::stencil_value<T, N>, stencil_value<T, N> 
-        >
-    {
-        typedef detail::stencil_value<T, N> wrapped_type;
-        typedef managed_component_base<wrapped_type, stencil_value> base_type;
-
-        stencil_value(applier::applier& appl) 
-          : base_type(new wrapped_type(appl)) 
-        {}
     };
 
 }}}}

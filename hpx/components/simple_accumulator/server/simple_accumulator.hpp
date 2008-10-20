@@ -32,7 +32,7 @@ namespace hpx { namespace components { namespace server
     /// from.
     ///
     class simple_accumulator 
-      : public components::simple_component_base<simple_accumulator>
+      : public simple_component_base<simple_accumulator>
     {
     public:
         // parcel action code: the action to be performed on the destination 
@@ -46,10 +46,11 @@ namespace hpx { namespace components { namespace server
         };
 
         // constructor: initialize accumulator value
-        simple_accumulator(applier::applier&)
-          : arg_(0)
+        simple_accumulator(applier::applier& appl)
+          : simple_component_base<simple_accumulator>(appl),
+            arg_(0)
         {}
-        
+
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 

@@ -72,7 +72,7 @@ namespace hpx { namespace components { namespace stubs
             // Create an eager_future, execute the required action,
             // we simply return the initialized eager_future, the caller needs
             // to call get_result() on the return value to obtain the result
-            typedef server::detail::accumulator::query_action action_type;
+            typedef server::accumulator::query_action action_type;
             return lcos::eager_future<action_type, double>(appl, gid);
         }
 
@@ -94,21 +94,21 @@ namespace hpx { namespace components { namespace stubs
         /// with the given \a gid
         void init(naming::id_type gid) 
         {
-            app_.apply<server::detail::accumulator::init_action>(gid);
+            app_.apply<server::accumulator::init_action>(gid);
         }
 
         /// Add the given number to the server#accumulator instance 
         /// with the given \a gid
         void add (naming::id_type gid, double arg) 
         {
-            app_.apply<server::detail::accumulator::add_action>(gid, arg);
+            app_.apply<server::accumulator::add_action>(gid, arg);
         }
 
         /// Print the current value of the server#accumulator instance 
         /// with the given \a gid
         void print(naming::id_type gid) 
         {
-            app_.apply<server::detail::accumulator::print_action>(gid);
+            app_.apply<server::accumulator::print_action>(gid);
         }
 
         /// Query the current value of the server#accumulator instance 

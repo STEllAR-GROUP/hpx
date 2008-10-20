@@ -37,19 +37,8 @@ typedef hpx::components::amr::server::functional_component<
 ///
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(stencil_type, stencil);
 
-///////////////////////////////////////////////////////////////////////////////
-// For any component derived from manage_component_base we must use the 
-// following in exactly one source file
-HPX_REGISTER_MANAGED_COMPONENT(stencil_type);
+HPX_REGISTER_ACTION(stencil_type::eval_action);
+HPX_REGISTER_ACTION(stencil_type::is_last_timestep_action);
+HPX_DEFINE_GET_COMPONENT_TYPE(stencil_type);
 
-///////////////////////////////////////////////////////////////////////////////
-typedef stencil_type::wrapped_type stencil_impl_type;
-
-HPX_REGISTER_ACTION(stencil_impl_type::eval_action);
-HPX_REGISTER_ACTION(stencil_impl_type::is_last_timestep_action);
-
-///////////////////////////////////////////////////////////////////////////////
-// additional action definitions required by the stencil_value base class
-// HPX_REGISTER_ACTION(hpx::lcos::base_lco_with_value<std::vector<hpx::naming::id_type> >::set_result_action);
-// HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<std::vector<hpx::naming::id_type> >);
 

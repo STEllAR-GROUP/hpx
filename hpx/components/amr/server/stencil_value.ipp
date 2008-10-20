@@ -10,7 +10,7 @@
 #include <hpx/components/amr/server/functional_component_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr { namespace server { namespace detail
+namespace hpx { namespace components { namespace amr { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, int N>
@@ -89,7 +89,7 @@ namespace hpx { namespace components { namespace amr { namespace server { namesp
         {
             in_[i].reset(new in_adaptor_type(appl));
             out_[i].reset(new out_adaptor_type(appl));
-            out_[i]->set_callback(
+            out_[i]->get()->set_callback(
                 boost::bind(&stencil_value::get_value, this, _1, _2));
         }
     }
@@ -178,6 +178,6 @@ namespace hpx { namespace components { namespace amr { namespace server { namesp
         return threads::terminated;
     }
 
-}}}}}
+}}}}
 
 #endif

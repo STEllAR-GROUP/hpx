@@ -8,32 +8,12 @@
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/export.hpp>
-
 #include <hpx/components/distributing_factory/server/distributing_factory.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Serialization support for the distributing_factory action
-typedef hpx::lcos::base_lco_with_value<
-        hpx::components::server::detail::distributing_factory::result_type 
-    > create_result_type;
-
-HPX_REGISTER_ACTION(create_result_type::set_result_action);
-HPX_DEFINE_GET_COMPONENT_TYPE(create_result_type);
-
-HPX_REGISTER_ACTION(hpx::components::server::detail::distributing_factory::create_components_action);
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::detail::distributing_factory);
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server { namespace detail
+namespace hpx { namespace components { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
-    component_type distributing_factory::value = component_invalid;
-
     struct lazy_result
     {
         lazy_result(naming::id_type const& prefix, 
@@ -99,5 +79,5 @@ namespace hpx { namespace components { namespace server { namespace detail
         return threads::terminated;
     }
 
-}}}}
+}}}
 

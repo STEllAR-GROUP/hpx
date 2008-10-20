@@ -18,11 +18,14 @@ namespace hpx { namespace components { namespace amr
     /// decides whether the current time step is the last one (the computation
     /// has reached the final time step).
     class stencil 
-      : public amr::server::detail::functional_component<stencil, double, 3>
+      : public amr::server::functional_component<stencil, double, 3>
     {
+    private:
+        typedef amr::server::functional_component<stencil, double, 3> base_type;
+
     public:
         stencil(applier::applier& appl)
-          : timestep_(0)
+          : base_type(appl), timestep_(0)
         {}
 
         /// This is the function implementing the actual time step functionality
@@ -35,7 +38,10 @@ namespace hpx { namespace components { namespace amr
         /// this evolution is computing.
         double eval(double, double, double);
 
-        ///
+        /// This function is executed right after the eval() function has 
+        /// returned the value for the current time step. The function has to
+        /// return \a false in order to continue to the next time step and 
+        /// needs to return \a true to stop the computation.
         bool is_last_timestep() const;
 
     private:

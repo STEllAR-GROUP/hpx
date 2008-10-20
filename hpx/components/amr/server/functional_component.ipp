@@ -10,7 +10,7 @@
 #include <hpx/components/amr/server/functional_component_base.ipp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr { namespace server { namespace detail
+namespace hpx { namespace components { namespace amr { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived, typename T>
@@ -71,7 +71,7 @@ namespace hpx { namespace components { namespace amr { namespace server { namesp
         return threads::terminated;
     }
 
-}}}}}
+}}}}
 
 #endif
 

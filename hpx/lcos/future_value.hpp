@@ -195,7 +195,7 @@ namespace hpx { namespace lcos
     {
     protected:
         typedef detail::future_value<Result, N> wrapped_type;
-        typedef components::managed_component_base<wrapped_type> wrapping_type;
+        typedef components::managed_component<wrapped_type> wrapping_type;
 
         /// Construct a new \a future instance. The supplied 
         /// \a thread will be notified as soon as the result of the 

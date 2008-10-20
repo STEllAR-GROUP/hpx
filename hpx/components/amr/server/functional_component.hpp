@@ -12,14 +12,6 @@
 namespace hpx { namespace components { namespace amr { namespace server 
 {
     template <typename Derived, typename T, int N>
-    struct functional_component;           // forward declaration only
-
-}}}}
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr { namespace server { namespace detail
-{
-    template <typename Derived, typename T, int N>
     class functional_component;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -34,8 +26,12 @@ namespace hpx { namespace components { namespace amr { namespace server { namesp
             { return *static_cast<derived const*>(this); }
 
     public:
+        functional_component(applier::applier& appl)
+          : functional_component_base<T, 1>(appl)
+        {}
+
         // components must contain a typedef for wrapping_type defining the
-        // managed_component_base type used to encapsulate instances of this 
+        // managed_component type used to encapsulate instances of this 
         // component
         typedef amr::server::functional_component<Derived, T, 1> wrapping_type;
 
@@ -62,8 +58,12 @@ namespace hpx { namespace components { namespace amr { namespace server { namesp
             { return *static_cast<derived const*>(this); }
 
     public:
+        functional_component(applier::applier& appl)
+          : functional_component_base<T, 3>(appl)
+        {}
+
         // components must contain a typedef for wrapping_type defining the
-        // managed_component_base type used to encapsulate instances of this 
+        // managed_component type used to encapsulate instances of this 
         // component
         typedef amr::server::functional_component<Derived, T, 3> wrapping_type;
 
@@ -91,8 +91,12 @@ namespace hpx { namespace components { namespace amr { namespace server { namesp
             { return *static_cast<derived const*>(this); }
 
     public:
+        functional_component(applier::applier& appl)
+          : functional_component_base<T, 5>(appl)
+        {}
+
         // components must contain a typedef for wrapping_type defining the
-        // managed_component_base type used to encapsulate instances of this 
+        // managed_component type used to encapsulate instances of this 
         // component
         typedef amr::server::functional_component<Derived, T, 5> wrapping_type;
 
@@ -106,30 +110,6 @@ namespace hpx { namespace components { namespace amr { namespace server { namesp
 
         threads::thread_state 
         is_last_timestep(threads::thread_self&, applier::applier&, bool*);
-    };
-
-}}}}}
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr { namespace server
-{
-    /// This class defines the overall component type. It is needed to build
-    /// the proper infrastructure for the HPX component architecture
-    template <typename Derived, typename T, int N>
-    struct functional_component 
-      : public managed_component_base<
-            detail::functional_component_base<T, N>, 
-            functional_component<Derived, T, N> 
-        >
-    {
-        typedef detail::functional_component_base<T, N> wrapped_type;
-        typedef managed_component_base<
-            wrapped_type, functional_component
-        > base_type;
-
-        functional_component(applier::applier& appl) 
-          : base_type(new detail::functional_component<Derived, T, N>()) 
-        {}
     };
 
 }}}}

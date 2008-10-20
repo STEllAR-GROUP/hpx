@@ -14,7 +14,7 @@
 namespace hpx { namespace components { namespace detail 
 {
     ///////////////////////////////////////////////////////////////////////////
-    // list of managed_component_base heaps
+    // list of managed_component heaps
     template<typename Heap, typename Mutex = boost::mutex>
     class wrapper_heap_list : public util::one_size_heap_list<Heap, Mutex>
     {

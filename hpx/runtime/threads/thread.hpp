@@ -45,6 +45,17 @@ namespace hpx { namespace threads { namespace detail
             description_(description)
         {}
 
+        /// This constructor is provided just for compatibility with the scheme
+        /// of component creation, which requires to pass a applier instance to
+        /// the component constructor. But since threads never get created 
+        /// by a factory (runtime_support) instance, we can leave this 
+        /// constructor empty
+        thread(applier::applier& appl)
+          : tm_(appl.get_thread_manager()), description_("")
+        {
+            BOOST_ASSERT(false);    // shouldn't ever be called
+        }
+
         ~thread() 
         {}
 
@@ -143,12 +154,12 @@ namespace hpx { namespace threads
     /// functionality related to the management of \a thread's is 
     /// implemented by the \a threadmanager.
     class thread 
-      : public components::managed_component_base<detail::thread, thread>
+      : public components::managed_component<detail::thread, thread>
     {
     private:
         typedef detail::thread wrapped_type;
         typedef 
-            components::managed_component_base<wrapped_type, thread> 
+            components::managed_component<wrapped_type, thread> 
         base_type;
 
         // avoid warning about using 'this' in initializer list
@@ -163,7 +174,7 @@ namespace hpx { namespace threads
         /// the component constructor. But since threads never get created 
         /// by a factory (runtime_support) instance, we can leave this 
         /// constructor empty
-        thread(applier::applier&)
+        thread(applier::applier& appl)
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
         }

@@ -18,33 +18,20 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server 
 {
-    // forward declaration
-    class accumulator;
-
-}}}
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server { namespace detail
-{
     ///////////////////////////////////////////////////////////////////////////
     /// The accumulator is a very simple example of a HPX component. 
+    ///
+    /// The accumulator class is a small example components demonstrating the
+    /// main principles of writing your own components. It exposes 4 different
+    /// actions: init, add, query, and print, showing how to used and implement
+    /// functionality in a way conformant with the HPX runtime system. 
     ///
     /// Note that the implementation of the accumulator does not require any 
     /// special data members or virtual functions.
     ///
-    class accumulator 
+    class accumulator : public detail::managed_component_base<accumulator> 
     {
-    private:
-        static component_type value;
-
     public:
-        // components must contain a typedef for wrapping_type defining the
-        // managed_component_base type used to encapsulate instances of this 
-        // component
-        typedef 
-            managed_component_base<accumulator, server::accumulator> 
-        wrapping_type;
-
         // parcel action code: the action to be performed on the destination 
         // object (the accumulator)
         enum actions
@@ -55,14 +42,8 @@ namespace hpx { namespace components { namespace server { namespace detail
             accumulator_print = 3
         };
 
-        // This is the component id. Every component needs to have an embedded
-        // enumerator 'value' which is used by the generic action implementation
-        // to associate this component with a given action.
-        static HPX_COMPONENT_EXPORT component_type get_component_type();
-        static void set_component_type(component_type);
-
         // constructor: initialize accumulator value
-        accumulator()
+        accumulator(applier::applier&)
           : arg_(0)
         {}
 
@@ -126,30 +107,6 @@ namespace hpx { namespace components { namespace server { namespace detail
 
     private:
         double arg_;
-    };
-
-}}}}
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server 
-{
-    /// \class accumulator accumulator.hpp hpx/components/accumulator.hpp
-    ///
-    /// The accumulator class is a small example components demonstrating the
-    /// main principles of writing your own components. It exposes 4 different
-    /// actions: init, add, query, and print, showing how to used and implement
-    /// functionality in a way conformant with the HPX runtime system. 
-    class accumulator 
-      : public managed_component_base<detail::accumulator, accumulator>
-    {
-    private:
-        typedef detail::accumulator wrapped_type;
-        typedef managed_component_base<wrapped_type, accumulator> base_type;
-
-    public:
-        accumulator(applier::applier&)
-          : base_type(new wrapped_type())
-        {}
     };
 
 }}}

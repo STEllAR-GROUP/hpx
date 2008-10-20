@@ -16,42 +16,19 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
 HPX_REGISTER_COMPONENT_MODULE();
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::server::accumulator, accumulator);
 
 ///////////////////////////////////////////////////////////////////////////////
-// For any component derived from manage_component_base we must use the 
-// following in exactly one source file
-HPX_REGISTER_MANAGED_COMPONENT(hpx::components::server::accumulator);
+typedef hpx::components::managed_component<
+    hpx::components::server::accumulator
+> accumulator_type;
 
-///////////////////////////////////////////////////////////////////////////////
-// make sure all needed action::get_action_name() functions get defined
-// HPX_DEFINE_GET_ACTION_NAME(hpx::lcos::base_lco_with_value<double>::set_result_action);
-// HPX_DEFINE_GET_ACTION_NAME(hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_result_action);
-
-///////////////////////////////////////////////////////////////////////////////
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::detail::accumulator);
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(accumulator_type, accumulator);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the accumulator actions
-HPX_REGISTER_ACTION(hpx::components::server::detail::accumulator::init_action);
-HPX_REGISTER_ACTION(hpx::components::server::detail::accumulator::add_action);
-HPX_REGISTER_ACTION(hpx::components::server::detail::accumulator::query_action);
-HPX_REGISTER_ACTION(hpx::components::server::detail::accumulator::print_action);
+HPX_REGISTER_ACTION(accumulator_type::wrapped_type::init_action);
+HPX_REGISTER_ACTION(accumulator_type::wrapped_type::add_action);
+HPX_REGISTER_ACTION(accumulator_type::wrapped_type::query_action);
+HPX_REGISTER_ACTION(accumulator_type::wrapped_type::print_action);
+HPX_DEFINE_GET_COMPONENT_TYPE(accumulator_type::wrapped_type);
 
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server { namespace detail
-{
-    component_type accumulator::value = component_invalid;
-
-    HPX_COMPONENT_EXPORT component_type accumulator::get_component_type()
-    {
-        return value;
-    }
-
-    void accumulator::set_component_type(component_type type)
-    {
-        value = type;
-    }
-
-}}}}

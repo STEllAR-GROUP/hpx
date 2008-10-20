@@ -10,7 +10,6 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/lcos/eager_future.hpp>
 
 #include <hpx/components/amr/server/stencil_value_out_adaptor.hpp>
@@ -21,7 +20,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     template <typename T>
     class stencil_value_in_adaptor 
       : public lcos::eager_future<
-            typename detail::stencil_value_out_adaptor<T>::get_value_action, T
+            typename stencil_value_out_adaptor<T>::get_value_action, T
         >
     {
     public:

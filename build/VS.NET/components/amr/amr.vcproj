@@ -189,6 +189,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\..\hpx\components\amr\server\functional_timestep.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\..\hpx\components\amr\server\stencil_value.cpp"
 					>
 				</File>
@@ -220,6 +224,14 @@
 				</File>
 				<File
 					RelativePath="..\..\..\..\hpx\components\amr\server\functional_component_base.ipp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\..\hpx\components\amr\server\functional_timestep.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\..\hpx\components\amr\server\functional_timestep.ipp"
 					>
 				</File>
 				<File

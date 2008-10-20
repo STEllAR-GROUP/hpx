@@ -123,7 +123,7 @@ namespace hpx { namespace components { namespace detail
             return NULL != pool_ && NULL != p && pool_ <= p && p < pool_ + size_;
         }
 
-        /// \brief Get the global id of the managed_component_base instance 
+        /// \brief Get the global id of the managed_component instance 
         ///        given by the parameter \a p. 
         ///
         ///
@@ -217,7 +217,7 @@ namespace hpx { namespace components { namespace detail
         int free_size_;
 
         // these values are used for DGAS registration of all elements of this
-        // managed_component_base heap
+        // managed_component heap
         naming::id_type base_gid_;
         naming::resolver_client const* get_dgas_client_;
 

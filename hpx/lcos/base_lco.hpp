@@ -27,7 +27,7 @@ namespace hpx { namespace lcos
     /// 
     /// The \a base_lco class is the common base class for all LCO's 
     /// implementing a simple set_event action
-    class base_lco
+    class base_lco 
     {
     protected:
         virtual threads::thread_state set_event (
@@ -44,9 +44,9 @@ namespace hpx { namespace lcos
 
     public:
         // components must contain a typedef for wrapping_type defining the
-        // managed_component_base type used to encapsulate instances of this 
+        // managed_component type used to encapsulate instances of this 
         // component
-        typedef components::managed_component_base<base_lco> wrapping_type;
+        typedef components::managed_component<base_lco> wrapping_type;
 
         // This is the component id. Every component needs to have a function
         // \a get_component_type() which is used by the generic action 
@@ -152,10 +152,10 @@ namespace hpx { namespace lcos
 
     public:
         // components must contain a typedef for wrapping_type defining the
-        // managed_component_base type used to encapsulate instances of this 
+        // managed_component type used to encapsulate instances of this 
         // component
         typedef 
-            components::managed_component_base<base_lco_with_value> 
+            components::managed_component<base_lco_with_value> 
         wrapping_type;
 
         // This is the component id. Every component needs to have a function
@@ -218,10 +218,10 @@ namespace hpx { namespace lcos
 
     public:
         // components must contain a typedef for wrapping_type defining the
-        // managed_component_base type used to encapsulate instances of this 
+        // managed_component type used to encapsulate instances of this 
         // component
         typedef 
-            components::managed_component_base<base_lco_with_value> 
+            components::managed_component<base_lco_with_value> 
         wrapping_type;
     };
 

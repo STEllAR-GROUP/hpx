@@ -13,31 +13,16 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/action.hpp>
 
+#include <boost/serialization/serialization.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server 
 {
-    // forward declaration
-    class distributing_factory;
-
-}}}
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server { namespace detail
-{
     ///////////////////////////////////////////////////////////////////////////
     class distributing_factory
+      : public simple_component_base<distributing_factory>
     {
-    private:
-        static component_type value;
-
     public:
-        // components must contain a typedef for wrapping_type defining the
-        // managed_component_base type used to encapsulate instances of this 
-        // component
-        typedef 
-            managed_component_base<distributing_factory, server::distributing_factory> 
-        wrapping_type;
-
         // parcel action code: the action to be performed on the destination 
         // object 
         enum actions
@@ -45,20 +30,9 @@ namespace hpx { namespace components { namespace server { namespace detail
             factory_create_component = 0,  // create new components
         };
 
-        // This is the component id. Every component needs to have an embedded
-        // enumerator 'value' which is used by the generic action implementation
-        // to associate this component with a given action.
-        static component_type get_component_type()
-        {
-            return value;
-        }
-        static void set_component_type(component_type type)
-        {
-            value = type;
-        }
-
         // constructor
-        distributing_factory()
+        distributing_factory(applier::applier& appl)
+          : simple_component_base<distributing_factory>(appl)
         {}
 
         ///////////////////////////////////////////////////////////////////////
@@ -105,25 +79,6 @@ namespace hpx { namespace components { namespace server { namespace detail
             components::component_type, std::size_t, 
             &distributing_factory::create_components
         > create_components_action;
-    };
-
-}}}}
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server 
-{
-    class distributing_factory 
-      : public managed_component_base<
-            detail::distributing_factory, distributing_factory
-        >
-    {
-    public:
-        typedef detail::distributing_factory wrapped_type;
-        typedef managed_component_base<wrapped_type, distributing_factory> base_type;
-
-        distributing_factory(applier::applier&)
-          : base_type(new wrapped_type())
-        {}
     };
 
 }}}

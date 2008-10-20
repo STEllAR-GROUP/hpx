@@ -218,13 +218,14 @@ namespace hpx
         { 
             struct this_type {};
             struct simple_component_tag {};
+            struct managed_component_tag {};
         }
 
         template <typename Component> 
         class simple_component_base;
 
         template <typename Component, typename Derived = detail::this_type>
-        class managed_component_base;
+        class managed_component;
 
         struct HPX_EXPORT component_factory_base;
 

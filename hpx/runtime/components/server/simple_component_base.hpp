@@ -21,23 +21,31 @@ namespace hpx { namespace components
         static component_type value;
 
     public:
-        /// \brief Construct an empty managed_component_base
-        simple_component_base() 
-          : appl_(NULL)
+        typedef Component wrapped_type;
+
+        /// \brief Construct an empty simple_component
+        simple_component_base(applier::applier& appl) 
+          : appl_(appl)
         {}
 
-        /// \brief Destruct an empty managed_component_base
+        /// \brief Destruct a simple_component
         ~simple_component_base()
         {
-            if (gid_ && appl_)
-                appl_->get_dgas_client().unbind(gid_);
+            if (gid_)
+                appl_.get_dgas_client().unbind(gid_);
         }
 
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
         // to associate this component with a given action.
-        HPX_COMPONENT_EXPORT static component_type get_component_type();
-        HPX_COMPONENT_EXPORT static void set_component_type(component_type);
+        static component_type get_component_type()
+        {
+            return value;
+        }
+        static void set_component_type(component_type type)
+        {
+            value = type;
+        }
 
         /// \brief Create a new GID (if called for the first time), assign this 
         ///        GID to this instance of a component and register this gid 
@@ -51,18 +59,16 @@ namespace hpx { namespace components
         naming::id_type const&
         get_gid(applier::applier& appl) const
         {
-            if (!gid_ || !appl_) 
+            if (!gid_) 
             {
                 naming::address addr(appl.here(), Component::get_component_type(), 
                     boost::uint64_t(static_cast<Component const*>(this)));
-                appl_ = &appl;
-                gid_ = appl.get_parcel_handler().get_next_id();
-                if (!appl.get_dgas_client().bind(gid_, addr))
+                gid_ = appl_.get_parcel_handler().get_next_id();
+                if (!appl_.get_dgas_client().bind(gid_, addr))
                 {
                     HPX_OSSTREAM strm;
                     strm << gid_;
 
-                    appl_ = NULL;
                     gid_ = naming::id_type();   // invalidate GID
 
                     HPX_THROW_EXCEPTION(duplicate_component_address,
@@ -91,29 +97,13 @@ namespace hpx { namespace components
 
     private:
         mutable naming::id_type gid_;
-        mutable applier::applier const* appl_;
+        applier::applier& appl_;
     };
 
-}}
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Component>
+    component_type simple_component_base<Component>::value = component_invalid;
 
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_SIMPLE_COMPONENT(component)                              \
-    namespace hpx { namespace components {                                    \
-        component_type                                                        \
-        simple_component_base<component>::value = component_invalid;          \
-                                                                              \
-        component_type                                                        \
-        simple_component_base<component>::get_component_type()                \
-        { return value; }                                                     \
-                                                                              \
-        void simple_component_base<component>::                               \
-            set_component_type(component_type type)                           \
-        { value = type; }                                                     \
-                                                                              \
-        template<> HPX_ALWAYS_EXPORT                                          \
-        component_type get_component_type<component>()                        \
-        { return component::get_component_type(); }                           \
-    }}                                                                        \
-    /**/
+}}
 
 #endif

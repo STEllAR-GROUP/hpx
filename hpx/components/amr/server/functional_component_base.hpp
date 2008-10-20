@@ -6,8 +6,14 @@
 #if !defined(HPX_COMPONENTS_AMR_FUNCTIONAL_COMPONENT_BASE_OCT_19_2008_1234PM)
 #define HPX_COMPONENTS_AMR_FUNCTIONAL_COMPONENT_BASE_OCT_19_2008_1234PM
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/simple_component_base.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr { namespace server { namespace detail
+namespace hpx { namespace components { namespace amr { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, int N>
@@ -16,28 +22,12 @@ namespace hpx { namespace components { namespace amr { namespace server { namesp
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     class functional_component_base<T, 1>
+      : public simple_component_base<functional_component_base<T, 1> >
     {
-    private:
-        static component_type value;
-
     public:
-        // components must contain a typedef for wrapping_type defining the
-        // managed_component_base type used to encapsulate instances of this 
-        // component
-        typedef managed_component_base<functional_component_base> wrapping_type;
-
-        ///////////////////////////////////////////////////////////////////////
-        // This is the component id. Every component needs to have an embedded
-        // enumerator 'value' which is used by the generic action implementation
-        // to associate this component with a given action.
-        static component_type get_component_type()
-        {
-            return value;
-        }
-        static void set_component_type(component_type type)
-        {
-            value = type;
-        }
+        functional_component_base(applier::applier& appl)
+          : simple_component_base<functional_component_base<T, 1> >(appl)
+        {}
 
         // parcel action code: the action to be performed on the destination 
         // object (the accumulator)
@@ -84,33 +74,13 @@ namespace hpx { namespace components { namespace amr { namespace server { namesp
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    component_type functional_component_base<T, 1>::value = component_invalid;
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
     class functional_component_base<T, 3>
+      : public simple_component_base<functional_component_base<T, 3> >
     {
-    private:
-        static component_type value;
-
     public:
-        // components must contain a typedef for wrapping_type defining the
-        // managed_component_base type used to encapsulate instances of this 
-        // component
-        typedef managed_component_base<functional_component_base> wrapping_type;
-
-        ///////////////////////////////////////////////////////////////////////
-        // This is the component id. Every component needs to have an embedded
-        // enumerator 'value' which is used by the generic action implementation
-        // to associate this component with a given action.
-        static component_type get_component_type()
-        {
-            return value;
-        }
-        static void set_component_type(component_type type)
-        {
-            value = type;
-        }
+        functional_component_base(applier::applier& appl)
+          : simple_component_base<functional_component_base<T, 3> >(appl)
+        {}
 
         // parcel action code: the action to be performed on the destination 
         // object (the accumulator)
@@ -160,33 +130,13 @@ namespace hpx { namespace components { namespace amr { namespace server { namesp
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    component_type functional_component_base<T, 3>::value = component_invalid;
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
     class functional_component_base<T, 5>
+      : public simple_component_base<functional_component_base<T, 5> >
     {
-    private:
-        static component_type value;
-
     public:
-        // components must contain a typedef for wrapping_type defining the
-        // managed_component_base type used to encapsulate instances of this 
-        // component
-        typedef managed_component_base<functional_component_base> wrapping_type;
-
-        ///////////////////////////////////////////////////////////////////////
-        // This is the component id. Every component needs to have an embedded
-        // enumerator 'value' which is used by the generic action implementation
-        // to associate this component with a given action.
-        static component_type get_component_type()
-        {
-            return value;
-        }
-        static void set_component_type(component_type type)
-        {
-            value = type;
-        }
+        functional_component_base(applier::applier& appl)
+          : simple_component_base<functional_component_base<T, 5> >(appl)
+        {}
 
         // parcel action code: the action to be performed on the destination 
         // object (the accumulator)
@@ -234,10 +184,6 @@ namespace hpx { namespace components { namespace amr { namespace server { namesp
         > eval_action;
     };
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    component_type functional_component_base<T, 5>::value = component_invalid;
-
-}}}}}
+}}}}
 
 #endif

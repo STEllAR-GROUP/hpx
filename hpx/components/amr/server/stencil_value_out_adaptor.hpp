@@ -15,26 +15,21 @@
 #include <boost/function.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr { namespace server { namespace detail
+namespace hpx { namespace components { namespace amr { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Value>
+    template <typename T>
     class stencil_value_out_adaptor
+      : public components::detail::managed_component_base<
+            stencil_value_out_adaptor<T>
+        >
     {
     private:
         typedef 
-            boost::function<void(threads::thread_self&, Value*)>
+            boost::function<void(threads::thread_self&, T*)>
         callback_function_type;
 
-    private:
-        static component_type value;
-
     public:
-        // components must contain a typedef for wrapping_type defining the
-        // managed_component_base type used to encapsulate instances of this 
-        // component
-        typedef managed_component_base<stencil_value_out_adaptor> wrapping_type;
-
         stencil_value_out_adaptor(applier::applier& appl)
         {}
 
@@ -45,18 +40,6 @@ namespace hpx { namespace components { namespace amr { namespace server { namesp
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // This is the component id. Every component needs to have an embedded
-        // enumerator 'value' which is used by the generic action implementation
-        // to associate this component with a given action.
-        static component_type get_component_type()
-        {
-            return value;
-        }
-        static void set_component_type(component_type type)
-        {
-            value = type;
-        }
-
         // parcel action code: the action to be performed on the destination 
         // object (the accumulator)
         enum actions
@@ -69,57 +52,23 @@ namespace hpx { namespace components { namespace amr { namespace server { namesp
         /// computed by the current time step.
         threads::thread_state 
         get_value (threads::thread_self& self, applier::applier& appl, 
-            Value* result)
+            T* result)
         {
             BOOST_ASSERT(eval_);      // must have been initialized
             eval_(self, result);
             return threads::terminated;
         }
 
-        ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::result_action0<
-            stencil_value_out_adaptor, Value, stencil_value_out_get_value, 
+            stencil_value_out_adaptor, T, stencil_value_out_get_value, 
             &stencil_value_out_adaptor::get_value
         > get_value_action;
 
     private:
         callback_function_type eval_;
-    };
-
-    template<typename Value> 
-    component_type stencil_value_out_adaptor<Value>::value = component_invalid;
-
-}}}}}
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr { namespace server 
-{
-    template <typename T>
-    struct stencil_value_out_adaptor
-      : public managed_component_base<
-            detail::stencil_value_out_adaptor<T>, stencil_value_out_adaptor<T>
-        >
-    {
-    public:
-        typedef detail::stencil_value_out_adaptor<T> wrapped_type;
-
-    private:
-        typedef 
-            managed_component_base<wrapped_type, stencil_value_out_adaptor> 
-        base_type;
-
-    public:
-        stencil_value_out_adaptor(applier::applier& appl)
-          : base_type(new wrapped_type(appl))
-        {}
-
-        void set_callback(boost::function<void(threads::thread_self&, T*)> eval)
-        {
-            this->get()->set_callback(eval);
-        }
     };
 
 }}}}

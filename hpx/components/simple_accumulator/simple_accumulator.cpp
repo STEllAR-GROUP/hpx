@@ -21,19 +21,10 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::server::simple_accumulator, simple_accumulator);
 
 ///////////////////////////////////////////////////////////////////////////////
-// For any component derived from simple_component_base we must use the 
-// following in exactly one source file
-HPX_REGISTER_SIMPLE_COMPONENT(hpx::components::server::simple_accumulator);
-
-///////////////////////////////////////////////////////////////////////////////
-// make sure all needed action::get_action_name() functions get defined
-HPX_DEFINE_GET_ACTION_NAME(hpx::lcos::base_lco_with_value<double>::set_result_action);
-HPX_DEFINE_GET_ACTION_NAME(hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_result_action);
-
-///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the simple_accumulator actions
 HPX_REGISTER_ACTION(hpx::components::server::simple_accumulator::init_action);
 HPX_REGISTER_ACTION(hpx::components::server::simple_accumulator::add_action);
 HPX_REGISTER_ACTION(hpx::components::server::simple_accumulator::query_action);
 HPX_REGISTER_ACTION(hpx::components::server::simple_accumulator::print_action);
+HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::simple_accumulator);
 

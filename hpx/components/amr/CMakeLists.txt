@@ -8,6 +8,8 @@ set(amr_HEADERS
     server/functional_component.ipp
     server/functional_component_base.hpp
     server/functional_component_base.ipp
+    server/functional_timestep.hpp
+    server/functional_timestep.ipp
     server/stencil_value.hpp
     server/stencil_value.ipp
     server/stencil_value_in_adaptor.hpp
@@ -16,6 +18,7 @@ set(amr_HEADERS
 set(amr_SOURCES
     amr.cpp
     server/functional_component_base.cpp
+    server/functional_timestep.cpp
     server/stencil_value.cpp
     server/stencil_value_out_adaptor.cpp)
 

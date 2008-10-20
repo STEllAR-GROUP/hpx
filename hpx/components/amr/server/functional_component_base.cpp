@@ -16,25 +16,26 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef 
-    hpx::components::amr::server::detail::functional_component_base<double, 1> 
+    hpx::components::amr::server::functional_component_base<double, 1> 
 functional_component_double_1_type;
 typedef 
-    hpx::components::amr::server::detail::functional_component_base<double, 3> 
+    hpx::components::amr::server::functional_component_base<double, 3> 
 functional_component_double_3_type;
 typedef 
-    hpx::components::amr::server::detail::functional_component_base<double, 5> 
+    hpx::components::amr::server::functional_component_base<double, 5> 
 functional_component_double_5_type;
 
 ///////////////////////////////////////////////////////////////////////////////
+// Serialization support for the actions
 HPX_REGISTER_ACTION(functional_component_double_1_type::eval_action);
 HPX_REGISTER_ACTION(functional_component_double_1_type::is_last_timestep_action);
+HPX_DEFINE_GET_COMPONENT_TYPE(functional_component_double_1_type);
 
 HPX_REGISTER_ACTION(functional_component_double_3_type::eval_action);
 HPX_REGISTER_ACTION(functional_component_double_3_type::is_last_timestep_action);
+HPX_DEFINE_GET_COMPONENT_TYPE(functional_component_double_3_type);
 
 HPX_REGISTER_ACTION(functional_component_double_5_type::eval_action);
 HPX_REGISTER_ACTION(functional_component_double_5_type::is_last_timestep_action);
-
-HPX_DEFINE_GET_COMPONENT_TYPE(functional_component_double_1_type);
-HPX_DEFINE_GET_COMPONENT_TYPE(functional_component_double_3_type);
 HPX_DEFINE_GET_COMPONENT_TYPE(functional_component_double_5_type);
+

@@ -59,9 +59,7 @@ namespace hpx { namespace components { namespace server
         Result (*F)(threads::thread_self&, applier::applier&)
     > 
     class generic_component0
-      : public components::simple_component_base<
-            generic_component0<Result, F> 
-        >
+      : public simple_component_base<generic_component0<Result, F> >
     {
     public:
         typedef Result result_type;
@@ -75,7 +73,8 @@ namespace hpx { namespace components { namespace server
             generic_component_action = 0
         };
 
-        generic_component0(applier::applier&)
+        generic_component0(applier::applier& appl)
+          : simple_component_base<generic_component0<Result, F> >(appl)
         {}
 
         threads::thread_state
@@ -97,9 +96,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     template <void (*F)(threads::thread_self&, applier::applier&)>
     class generic_component0<void, F>
-      : public components::simple_component_base<
-            generic_component0<void, F> 
-        >
+      : public simple_component_base<generic_component0<void, F> >
     {
     public:
         typedef void result_type;
@@ -114,6 +111,7 @@ namespace hpx { namespace components { namespace server
         };
 
         generic_component0(applier::applier&)
+          : simple_component_base<generic_component0<void, F> >(appl)
         {}
 
         threads::thread_state 
@@ -136,11 +134,11 @@ namespace hpx { namespace components { namespace server
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Define a helper macro allowing to define all additional facilities needed 
-/// for a generic component declared using the n generic_componenN templates
+/// for a generic component declared using the generic_componentN templates
 #define HPX_REGISTER_GENERIC_COMPONENT(c)                                     \
         HPX_REGISTER_ACTION(c::eval_action)                                   \
-        HPX_REGISTER_SIMPLE_COMPONENT(c)                                      \
-        HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(c, BOOST_PP_STRINGIZE(c))      \
+        HPX_DEFINE_GET_COMPONENT_TYPE(c)                                      \
+        HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(c, c)                          \
     /**/
 
 #endif

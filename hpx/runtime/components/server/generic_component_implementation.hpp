@@ -43,10 +43,15 @@
             BOOST_PP_ENUM_PARAMS(N, T))
     >
     class BOOST_PP_CAT(generic_component, N)
-      : public components::simple_component_base<
+      : public simple_component_base<
             BOOST_PP_CAT(generic_component, N)<Result, BOOST_PP_ENUM_PARAMS(N, T), F> 
         >
     {
+    private:
+        typedef simple_component_base<
+            BOOST_PP_CAT(generic_component, N)<Result, BOOST_PP_ENUM_PARAMS(N, T), F> 
+        > base_type;
+
     public:
         typedef Result result_type;
         typedef typename 
@@ -61,7 +66,8 @@
             generic_component_action = N
         };
 
-        BOOST_PP_CAT(generic_component, N)(applier::applier&)
+        BOOST_PP_CAT(generic_component, N)(applier::applier& appl)
+          : base_type(appl)
         {}
 
         threads::thread_state
@@ -91,10 +97,15 @@
             BOOST_PP_ENUM_PARAMS(N, T))
     >
     class BOOST_PP_CAT(generic_component, N)<void, BOOST_PP_ENUM_PARAMS(N, T), F>
-      : public components::simple_component_base<
+      : public simple_component_base<
             BOOST_PP_CAT(generic_component, N)<void, BOOST_PP_ENUM_PARAMS(N, T), F> 
         >
     {
+    private:
+        typedef simple_component_base<
+            BOOST_PP_CAT(generic_component, N)<void, BOOST_PP_ENUM_PARAMS(N, T), F> 
+        > base_type;
+
     public:
         typedef void result_type;
         typedef typename 
@@ -109,7 +120,8 @@
             generic_component_action = N
         };
 
-        BOOST_PP_CAT(generic_component, N)(applier::applier&)
+        BOOST_PP_CAT(generic_component, N)(applier::applier& appl)
+          : base_type(appl)
         {}
 
         threads::thread_state 
