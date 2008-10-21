@@ -18,22 +18,21 @@
 namespace hpx { namespace components { namespace amr { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
     class stencil_value_out_adaptor
       : public components::detail::managed_component_base<
-            stencil_value_out_adaptor<T>
+            stencil_value_out_adaptor
         >
     {
     private:
         typedef 
-            boost::function<void(threads::thread_self&, T*)>
+            boost::function<void(threads::thread_self&, naming::id_type*)>
         callback_function_type;
 
     public:
         stencil_value_out_adaptor(applier::applier& appl)
         {}
 
-        /// set 
+        /// set function to call whenever the result is requested
         void set_callback(callback_function_type eval)
         {
             eval_ = eval;
@@ -52,7 +51,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// computed by the current time step.
         threads::thread_state 
         get_value (threads::thread_self& self, applier::applier& appl, 
-            T* result)
+            naming::id_type* result)
         {
             BOOST_ASSERT(eval_);      // must have been initialized
             eval_(self, result);
@@ -63,8 +62,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::result_action0<
-            stencil_value_out_adaptor, T, stencil_value_out_get_value, 
-            &stencil_value_out_adaptor::get_value
+            stencil_value_out_adaptor, naming::id_type, 
+            stencil_value_out_get_value, &stencil_value_out_adaptor::get_value
         > get_value_action;
 
     private:

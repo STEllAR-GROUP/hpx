@@ -185,12 +185,20 @@
 				Name="Server"
 				>
 				<File
-					RelativePath="..\..\..\..\hpx\components\amr\server\functional_component_base.cpp"
+					RelativePath="..\..\..\..\hpx\components\amr\server\functional_component.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\..\..\hpx\components\amr\server\functional_timestep.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\..\..\hpx\components\amr\server\stencil_value.cpp"
@@ -215,15 +223,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\..\hpx\components\amr\server\functional_component.ipp"
+					RelativePath="..\..\..\..\hpx\components\amr\server\functional_component_1.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\..\hpx\components\amr\server\functional_component_base.hpp"
+					RelativePath="..\..\..\..\hpx\components\amr\server\functional_component_3.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\..\hpx\components\amr\server\functional_component_base.ipp"
+					RelativePath="..\..\..\..\hpx\components\amr\server\functional_component_5.hpp"
 					>
 				</File>
 				<File

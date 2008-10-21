@@ -25,23 +25,19 @@
 namespace hpx { namespace components { namespace amr { namespace server 
 {
     /// \class stencil_value stencil_value.hpp hpx/components/amr/server/stencil_value.hpp
-    template <typename T, int N>
+    template <int N>
     class stencil_value 
-      : public components::detail::managed_component_base<
-            stencil_value<T, N>
-        >
+      : public components::detail::managed_component_base<stencil_value<N> >
     {
     protected:
-        typedef T result_type;
-
         // the in_adaptors_type is the concrete stencil_value_in_adaptor
         // of the proper type
-        typedef amr::server::stencil_value_in_adaptor<T> in_adaptor_type;
+        typedef amr::server::stencil_value_in_adaptor in_adaptor_type;
 
         // the out_adaptors_type is the concrete stencil_value_out_adaptor
         // of the proper type
         typedef 
-            managed_component<amr::server::stencil_value_out_adaptor<T> >
+            managed_component<amr::server::stencil_value_out_adaptor>
         out_adaptor_type;
 
     public:
@@ -50,7 +46,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         /// The function get_result will be called by the out-ports whenever 
         /// the current value has been requested.
-        void get_value(threads::thread_self& self, result_type*);
+        void get_value(threads::thread_self& self, naming::id_type*);
 
         ///////////////////////////////////////////////////////////////////////
         // parcel action code: the action to be performed on the destination 
@@ -66,9 +62,14 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// This is the main entry point of this component. Calling this 
         /// function (by applying the call_action) will trigger the repeated 
         /// execution of the whole time step evolution functionality.
+        ///
+        /// It invokes the time series evolution for this data point using the
+        /// data referred to by the parameter \a initial. After finishing 
+        /// execution it returns a reference to the result as its return value
+        /// (parameter \a result)
         threads::thread_state 
-        call (threads::thread_self&, applier::applier&, result_type*, 
-            T const& initial);
+        call (threads::thread_self&, applier::applier&, naming::id_type* result, 
+            naming::id_type const& initial);
 
         /// Return the gid's of the output ports associated with this 
         /// \a stencil_value instance.
@@ -93,8 +94,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::result_action1<
-            stencil_value, result_type, stencil_value_call, T const&, 
-            &stencil_value::call
+            stencil_value, naming::id_type, stencil_value_call, 
+            naming::id_type const&, &stencil_value::call
         > call_action;
 
         typedef hpx::actions::result_action0<
@@ -120,9 +121,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         boost::scoped_ptr<in_adaptor_type> in_[N];    // adaptors used to gather input
         boost::scoped_ptr<out_adaptor_type> out_[N];  // adaptors used to provide result
 
-        result_type value_;                           // current value
-
-        naming::id_type functional_gid_;              // 
+        naming::id_type value_gid_;                   // reference to current value
+        naming::id_type functional_gid_;              // reference to functional code
     };
 
 }}}}

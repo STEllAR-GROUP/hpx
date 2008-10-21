@@ -16,7 +16,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Define types of stencil_value_out_adaptor components exposed by this module
 typedef hpx::components::managed_component<
-    hpx::components::amr::server::stencil_value_out_adaptor<double>
+    hpx::components::amr::server::stencil_value_out_adaptor
 > stencil_value_out_adaptor_type;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(

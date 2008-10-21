@@ -17,15 +17,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Define types of stencil components exposed by this module
 typedef hpx::components::managed_component<
-    hpx::components::amr::server::stencil_value<double, 1> 
+    hpx::components::amr::server::stencil_value<1> 
 > stencil_value_double_1_type;
 
 typedef hpx::components::managed_component<
-    hpx::components::amr::server::stencil_value<double, 3> 
+    hpx::components::amr::server::stencil_value<3> 
 > stencil_value_double_3_type;
 
 typedef hpx::components::managed_component<
-    hpx::components::amr::server::stencil_value<double, 5> 
+    hpx::components::amr::server::stencil_value<5> 
 > stencil_value_double_5_type;
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -7,55 +7,58 @@
 #define HPX_COMPONENTS_AMR_STENCIL_VALUE_IMPL_OCT_17_2008_0848AM
 
 #include <hpx/components/amr/server/stencil_value.hpp>
-#include <hpx/components/amr/server/functional_component_base.hpp>
+#include <hpx/components/amr/server/functional_component_1.hpp>
+#include <hpx/components/amr/server/functional_component_3.hpp>
+#include <hpx/components/amr/server/functional_component_5.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, int N>
+    template <int N>
     struct eval_helper;
 
-    template <typename T>
-    struct eval_helper<T, 1>
+    template <>
+    struct eval_helper<1>
     {
         template <typename Adaptor>
-        static T 
+        static naming::id_type 
         call(threads::thread_self& self, applier::applier& appl, 
             naming::id_type const& gid, Adaptor* in)
         {
-            typedef typename functional_component_base<T, 1>::eval_action action_type;
-            lcos::eager_future<action_type, T> f(appl, gid, in[0]->get_result(self));
+            typedef typename functional_component<1>::eval_action action_type;
+            lcos::eager_future<action_type, naming::id_type> f(appl, gid, 
+                in[0]->get_result(self));
             return f.get_result(self); 
         }
     };
 
-    template <typename T>
-    struct eval_helper<T, 3>
+    template <>
+    struct eval_helper<3>
     {
         template <typename Adaptor>
-        static T
+        static naming::id_type
         call(threads::thread_self& self, applier::applier& appl, 
             naming::id_type const& gid, Adaptor* in)
         {
-            typedef typename functional_component_base<T, 3>::eval_action action_type;
-            lcos::eager_future<action_type, T> f(appl, gid, 
+            typedef typename functional_component<3>::eval_action action_type;
+            lcos::eager_future<action_type, naming::id_type> f(appl, gid, 
                 in[0]->get_result(self), in[1]->get_result(self), 
                 in[2]->get_result(self));
             return f.get_result(self); 
         }
     };
 
-    template <typename T>
-    struct eval_helper<T, 5>
+    template <>
+    struct eval_helper<5>
     {
         template <typename Adaptor>
-        static T 
+        static naming::id_type 
         call(threads::thread_self& self, applier::applier& appl, 
             naming::id_type const& gid, Adaptor* in)
         {
-            typedef typename functional_component_base<T, 5>::eval_action action_type;
-            lcos::eager_future<action_type, T> f(appl, gid, 
+            typedef typename functional_component<5>::eval_action action_type;
+            lcos::eager_future<action_type, naming::id_type> f(appl, gid, 
                 in[0]->get_result(self), in[1]->get_result(self), 
                 in[2]->get_result(self), in[3]->get_result(self), 
                 in[4]->get_result(self));
@@ -63,7 +66,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
     };
 
-    template <typename T, int N>
+    template <int N>
     struct is_last_timestep_helper
     {
         static bool 
@@ -71,7 +74,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             naming::id_type const& gid)
         {
             typedef 
-                typename functional_component_base<T, N>::is_last_timestep_action 
+                typename functional_component<N>::is_last_timestep_action 
             action_type;
 
             lcos::eager_future<action_type, bool> f(appl, gid);
@@ -80,8 +83,8 @@ namespace hpx { namespace components { namespace amr { namespace server
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, int N>
-    stencil_value<T, N>::stencil_value(applier::applier& appl)
+    template <int N>
+    stencil_value<N>::stencil_value(applier::applier& appl)
       : sem_in_(N), sem_out_(0)
     {
         // create adaptors
@@ -95,12 +98,12 @@ namespace hpx { namespace components { namespace amr { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, int N>
+    template <int N>
     threads::thread_state  
-    stencil_value<T, N>::call(threads::thread_self& self, 
-        applier::applier& appl, result_type* result, T const& initial)
+    stencil_value<N>::call(threads::thread_self& self, applier::applier& appl, 
+        naming::id_type* result, naming::id_type const& initial)
     {
-        T next_value = initial;
+        naming::id_type next_value = initial;
         do {
             // start acquire operations on input ports
             for (std::size_t i = 0; i < N; ++i)
@@ -110,19 +113,18 @@ namespace hpx { namespace components { namespace amr { namespace server
             sem_in_.wait(self, N);
 
             // write new current value
-            value_ = next_value;
+            value_gid_ = next_value;
 
             // signal all output threads it's safe to read value
             sem_out_.signal(self, N);
 
             // compute the next value
-            next_value = eval_helper<result_type, N>::call(self, appl, 
-                functional_gid_, in_);
+            next_value = eval_helper<N>::call(self, appl, functional_gid_, in_);
 
-        } while (!is_last_timestep_helper<result_type, N>::call(self, appl, functional_gid_));
+        } while (!is_last_timestep_helper<N>::call(self, appl, functional_gid_));
 
         if (0 != result)
-            *result = value_;
+            *result = value_gid_;
 
         return threads::terminated;
     }
@@ -130,20 +132,20 @@ namespace hpx { namespace components { namespace amr { namespace server
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_result will be called by the out-ports whenever 
     /// the current value has been requested.
-    template <typename T, int N>
+    template <int N>
     void
-    stencil_value<T, N>::get_value(threads::thread_self& self, 
-        result_type* result)
+    stencil_value<N>::get_value(threads::thread_self& self, 
+        naming::id_type* result)
     {
         sem_out_.wait(self, 1);     // wait for the current value to be valid
-        *result = value_;           // acquire the current value
+        *result = value_gid_;       // acquire the current value
         sem_in_.signal(self, 1);    // signal to have read the value
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, int N>
+    template <int N>
     threads::thread_state 
-    stencil_value<T, N>::get_output_ports(threads::thread_self& self, 
+    stencil_value<N>::get_output_ports(threads::thread_self& self, 
         applier::applier& appl, std::vector<naming::id_type> *gids)
     {
         gids->clear();
@@ -153,9 +155,9 @@ namespace hpx { namespace components { namespace amr { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, int N>
+    template <int N>
     threads::thread_state 
-    stencil_value<T, N>::connect_input_ports(threads::thread_self& self, 
+    stencil_value<N>::connect_input_ports(threads::thread_self& self, 
         applier::applier& appl, std::vector<naming::id_type> const& gids)
     {
         if (gids.size() < N) {
@@ -169,9 +171,9 @@ namespace hpx { namespace components { namespace amr { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, int N>
+    template <int N>
     threads::thread_state 
-    stencil_value<T, N>::set_functional_component(threads::thread_self& self, 
+    stencil_value<N>::set_functional_component(threads::thread_self& self, 
         applier::applier& appl, naming::id_type const& gid)
     {
         functional_gid_ = gid;

@@ -17,10 +17,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server 
 {
-    template <typename T>
     class stencil_value_in_adaptor 
       : public lcos::eager_future<
-            typename stencil_value_out_adaptor<T>::get_value_action, T
+            typename stencil_value_out_adaptor::get_value_action, 
+            naming::id_type
         >
     {
     public:
