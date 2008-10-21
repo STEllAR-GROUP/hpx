@@ -95,6 +95,8 @@ namespace hpx
         thread_manager_.stop();   // stops timer_pool_ as well
         dgas_pool_.stop();
 
+        runtime_support_.tidy();  // unload libraries
+
         LRT_(debug) << "~runtime(finished)";
     }
 

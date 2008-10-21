@@ -60,6 +60,11 @@ namespace hpx { namespace components { namespace server
 
         ~runtime_support()
         {
+            tidy();
+        }
+
+        void tidy()
+        {
             components_.clear();    // make sure components get released first
 
             // Only after releasing the components we are allowed to release 
