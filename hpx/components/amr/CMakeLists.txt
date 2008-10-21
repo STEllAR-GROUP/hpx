@@ -17,7 +17,7 @@ set(amr_HEADERS
 
 set(amr_SOURCES
     amr.cpp
-    server/functional_component_base.cpp
+    server/functional_component.cpp
 #    server/functional_timestep.cpp
     server/stencil_value.cpp
     server/stencil_value_out_adaptor.cpp)
