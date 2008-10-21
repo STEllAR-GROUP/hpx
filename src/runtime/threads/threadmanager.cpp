@@ -45,13 +45,13 @@ namespace hpx { namespace threads
       , thread_count_(0)
 #endif
     {
-        LTM_(info) << "threadmanager ctor";
+        LTM_(debug) << "threadmanager ctor";
     }
 
     ///////////////////////////////////////////////////////////////////////////
     threadmanager::~threadmanager() 
     {
-        LTM_(info) << "~threadmanager";
+        LTM_(debug) << "~threadmanager";
         if (!threads_.empty()) {
             if (running_) 
                 stop();
