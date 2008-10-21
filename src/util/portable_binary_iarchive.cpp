@@ -9,6 +9,7 @@
 //  See http://www.boost.org for updates, documentation, and revision history.
 
 #include <boost/version.hpp>
+#include <hpx/config.hpp>
 
 #if BOOST_VERSION >= 103700 && HPX_USE_PORTABLE_ARCHIVES != 0
 
