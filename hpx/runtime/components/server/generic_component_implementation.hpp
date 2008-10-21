@@ -9,7 +9,7 @@
 #define HPX_COMPONENTS_SERVER_GENERIC_COMPONENT_IMPLEMENTTAION_OCT_12_2008_0845PM
 
 #include <boost/fusion/include/vector.hpp>
-#include <boost/fusion/include/at_c.hpp>
+#include <boost/fusion/include/at.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/comma_if.hpp>
