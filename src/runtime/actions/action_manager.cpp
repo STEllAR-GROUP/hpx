@@ -14,14 +14,14 @@
 namespace hpx { namespace actions
 {
     // Call-back function for parcelHandler to call when new parcels are received
-    void action_manager::fetch_new_parcel (
+    void action_manager::fetch_parcel(
         parcelset::parcelhandler& parcel_handler_, naming::address const& dest)
     {
         parcelset::parcel p;
         if (parcel_handler_.get_parcel(p))  // if new parcel is found
         {
             // write this parcel to the log
-            LPT_(info) << "action_manager: fetch_new_parcel: " << p;
+            LPT_(info) << "action_manager: fetch_parcel: " << p;
 
             // decode the local virtual address of the parcel
             naming::address addr = p.get_destination_addr();

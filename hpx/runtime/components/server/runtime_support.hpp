@@ -7,7 +7,7 @@
 #define HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM
 
 #include <map>
-#include <vector>
+#include <list>
 
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
@@ -28,7 +28,7 @@ namespace hpx { namespace components { namespace server
     {
     private:
         typedef boost::mutex mutex_type;
-        typedef std::vector<boost::plugin::dll> module_list_type;
+        typedef std::list<boost::plugin::dll> module_list_type;
         typedef boost::shared_ptr<component_factory_base> component_factory_type;
         typedef std::map<component_type, component_factory_type> component_map_type;
 
@@ -61,7 +61,16 @@ namespace hpx { namespace components { namespace server
         ~runtime_support()
         {
             components_.clear();    // make sure components get released first
-            modules_.clear();       // only then we are allowed to release the modules
+
+            // Only after releasing the components we are allowed to release 
+            // the modules. This is done in reverse order of loading.
+            module_list_type::iterator end = modules_.end();
+            for (module_list_type::iterator it = modules_.begin(); it != end; /**/)
+            {
+                module_list_type::iterator curr = it;
+                ++it;
+                modules_.erase(curr);
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////

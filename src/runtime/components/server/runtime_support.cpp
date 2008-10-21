@@ -264,8 +264,10 @@ namespace hpx { namespace components { namespace server
                 return false;   // duplicate component id?
             }
 
-            // store the reference to the shared library if everything is fine
-            modules_.push_back (d); 
+            // Store the reference to the shared library if everything is fine.
+            // We store the library at front of the list so we can unload the 
+            // modules in reverse order.
+            modules_.push_front(d); 
 
             LRT_(info) << "dynamic loading succeeded: " << lib.string() 
                        << ": " << instance << ": " 

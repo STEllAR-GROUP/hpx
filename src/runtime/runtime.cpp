@@ -88,14 +88,14 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     runtime::~runtime()
     {
-        LRT_(info) << "~runtime(entering)";
+        LRT_(debug) << "~runtime(entering)";
 
         // stop all services
         parcel_port_.stop();      // stops parcel_pool_ as well
         thread_manager_.stop();   // stops timer_pool_ as well
         dgas_pool_.stop();
 
-        LRT_(info) << "~runtime(finished)";
+        LRT_(debug) << "~runtime(finished)";
     }
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINES_USE_FIBERS)
