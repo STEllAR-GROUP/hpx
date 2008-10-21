@@ -6,7 +6,7 @@
 set(amr_HEADERS
     server/functional_component_1.hpp
     server/functional_component_3.hpp
-    server/functional_component_4.hpp
+#    server/functional_component_4.hpp
     server/functional_component.hpp
 #    server/functional_timestep.hpp
 #    server/functional_timestep.ipp
