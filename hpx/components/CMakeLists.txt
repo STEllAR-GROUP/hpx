@@ -5,7 +5,7 @@
 
 # just recurse into all components subdirectories and execute the scripts there
 set(component_SUDIRS 
-    accumulator amr amr_test distributing_factory generic simple_accumulator)
+    accumulator distributing_factory generic simple_accumulator)
 
 FOREACH(subdir ${component_SUDIRS})
     add_subdirectory(${subdir})
