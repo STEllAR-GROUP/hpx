@@ -10,9 +10,9 @@
 #include <hpx/runtime/actions/action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
-#include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
-#include <hpx/runtime/components/stubs/runtime_support.hpp>
+#include <hpx/runtime/components/runtime_support.hpp>
+#include <hpx/runtime/components/memory_block.hpp>
 
 #endif
 

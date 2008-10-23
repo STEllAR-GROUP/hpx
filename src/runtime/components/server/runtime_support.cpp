@@ -191,10 +191,19 @@ namespace hpx { namespace components { namespace server
             if (i->second.has_entry("enabled")) {
                 std::string tmp = i->second.get_entry("enabled");
                 boost::to_lower (tmp);
-                if (tmp == "no" || tmp == "false" || tmp == "0"){
+                if (tmp == "no" || tmp == "false" || tmp == "0") {
                     LRT_(info) << "dynamic loading disabled: " << instance;
                     continue;     // this component has been disabled
                 }
+            }
+
+            // test whether this component section was generated 
+            bool isdefault = false;
+            if (i->second.has_entry("isdefault")) {
+                std::string tmp = i->second.get_entry("isdefault");
+                boost::to_lower (tmp);
+                if (tmp == "true") 
+                    isdefault = true;
             }
 
             fs::path lib;
@@ -204,11 +213,11 @@ namespace hpx { namespace components { namespace server
                 else
                     lib = fs::path(HPX_DEFAULT_COMPONENT_PATH, fs::native);
 
-                if (!load_component(ini, instance, component, lib, dgas_client)) {
+                if (!load_component(ini, instance, component, lib, dgas_client, isdefault)) {
                     // build path to component to load
                     std::string libname(component + HPX_SHARED_LIB_EXTENSION);
                     lib /= fs::path(libname, fs::native);
-                    if (!load_component (ini, instance, component, lib, dgas_client))
+                    if (!load_component (ini, instance, component, lib, dgas_client, isdefault))
                         continue;   // next please :-P
                 }
             } 
@@ -220,7 +229,8 @@ namespace hpx { namespace components { namespace server
 
     bool runtime_support::load_component(util::section& ini, 
         std::string const& instance, std::string const& component, 
-        boost::filesystem::path lib, naming::resolver_client& dgas_client)
+        boost::filesystem::path lib, naming::resolver_client& dgas_client,
+        bool isdefault)
     {
         namespace fs = boost::filesystem;
         if (fs::extension(lib) != HPX_SHARED_LIB_EXTENSION)
@@ -274,8 +284,10 @@ namespace hpx { namespace components { namespace server
                        << components::get_component_type_name(t);
         }
         catch (std::logic_error const& e) {
-            LRT_(warning) << "dynamic loading failed: " << lib.string() 
-                        << ": " << instance << ": " << e.what();
+            if (!isdefault) {
+                LRT_(warning) << "dynamic loading failed: " << lib.string() 
+                            << ": " << instance << ": " << e.what();
+            }
             return false;
         }
         return true;    // component got loaded

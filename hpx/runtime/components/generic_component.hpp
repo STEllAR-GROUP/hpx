@@ -46,11 +46,11 @@ namespace hpx { namespace components
         // bring in higher order eval functions
         #include <hpx/runtime/components/generic_component_eval.hpp>
 
-        /// Create a new instance of an simple_accumulator on the locality as given by
-        /// the parameter \a targetgid
+        /// Create a new instance of an generic_component on the locality as 
+        /// given by the parameter \a targetgid
         static generic_component 
         create(threads::thread_self& self, applier::applier& appl, 
-            naming::id_type const& targetgid, bool freeonexit = true)
+            naming::id_type const& targetgid, bool freeonexit = false)
         {
             return generic_component(appl, 
                 base_type::create(self, appl, targetgid), freeonexit);
@@ -60,6 +60,12 @@ namespace hpx { namespace components
         {
             base_type::free(gid_);
             gid_ = naming::invalid_id;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        naming::id_type const& get_gid() const
+        {
+            return gid_;
         }
 
     private:

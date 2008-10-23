@@ -8,8 +8,6 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 
-#include <hpx/components/amr/server/functional_component.hpp>
-#include <hpx/components/amr/server/functional_component.ipp>
 #include <hpx/components/amr_test/stencil.hpp>
 
 #include <boost/serialization/version.hpp>
@@ -20,9 +18,7 @@
 HPX_REGISTER_COMPONENT_MODULE();
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::amr::server::functional_component<
-    hpx::components::amr::stencil, double, 3
-> stencil_type;
+typedef hpx::components::amr::server::functional_component<3> stencil_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// The following construct registers a minimal factory needed for the creation

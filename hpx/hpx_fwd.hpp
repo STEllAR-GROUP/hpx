@@ -234,17 +234,20 @@ namespace hpx
 
         class runtime_support;
         class memory;
-        
+        class memory_block;
+
         namespace stubs 
         {
             class runtime_support;
             class memory;
+            class memory_block;
         }
 
         namespace server
         {
             class HPX_EXPORT runtime_support;
             class memory;
+            class memory_block;
         }
     }
 

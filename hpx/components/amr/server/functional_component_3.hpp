@@ -35,10 +35,24 @@ namespace hpx { namespace components { namespace amr { namespace server
         // functional component derived from this class
         virtual threads::thread_state eval(threads::thread_self&, 
             applier::applier&, naming::id_type*, naming::id_type const&, 
-            naming::id_type const&, naming::id_type const&) = 0;
+            naming::id_type const&, naming::id_type const&)
+        {
+            // This shouldn't ever be called. If you're seeing this assertion 
+            // you probably forgot to overload this function in your stencil 
+            // class.
+            BOOST_ASSERT(false);
+            return threads::terminated;
+        }
 
         virtual threads::thread_state is_last_timestep(threads::thread_self&, 
-            applier::applier&, bool*) = 0;
+            applier::applier&, bool*) 
+        {
+            // This shouldn't ever be called. If you're seeing this assertion 
+            // you probably forgot to overload this function in your stencil 
+            // class.
+            BOOST_ASSERT(false);
+            return threads::terminated;
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // parcel action code: the action to be performed on the destination 

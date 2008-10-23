@@ -148,7 +148,7 @@ namespace hpx { namespace components { namespace server
             naming::resolver_client& dgas_client);
         bool load_component(util::section& ini, std::string const& instance, 
             std::string const& component, boost::filesystem::path lib,
-            naming::resolver_client& dgas_client);
+            naming::resolver_client& dgas_client, bool isdefault);
 
     private:
         mutex_type mtx_;

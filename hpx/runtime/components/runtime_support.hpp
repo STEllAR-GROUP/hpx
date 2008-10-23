@@ -17,6 +17,7 @@ namespace hpx { namespace components
     /// \a server#runtime_support component
     class runtime_support : public stubs::runtime_support
     {
+    private:
         typedef stubs::runtime_support base_type;
 
     public:
@@ -53,7 +54,7 @@ namespace hpx { namespace components
         void free_component (components::component_type type, 
             naming::id_type const& gid, std::size_t count = 1)
         {
-            this->base_type::free_component(gid_, type, gid, count);
+            this->base_type::free_component(/*gid_, */type, gid, count);
         }
 
         /// \brief Shutdown the given runtime system
@@ -66,6 +67,12 @@ namespace hpx { namespace components
         void shutdown_all()
         {
             this->base_type::shutdown_all(gid_);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        naming::id_type const& get_gid() const
+        {
+            return gid_;
         }
 
     private:

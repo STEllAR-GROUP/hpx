@@ -17,6 +17,7 @@ namespace hpx { namespace components
         component_invalid = -1,
         component_runtime_support = 0,  // runtime support (needed to create components, etc.)
         component_memory,               // general memory address
+        component_memory_block,         // general memory block
         component_thread,               // a ParalleX thread
 
         // LCO's
@@ -29,38 +30,9 @@ namespace hpx { namespace components
         component_last,
         component_first_dynamic = component_last
     };
-    
-    namespace detail
-    {
-        char const* const names[] =
-        {
-            "component_invalid",
-            "component_runtime_support",
-            "component_memory",
-            "component_thread",
-            "component_base_lco",
-            "component_base_lco_with_value",
-            "component_future",
-        };
-    }
 
-    ///
-    inline std::string const get_component_type_name(int type)
-    {
-        std::string result;
-        if (type >= component_invalid && type < component_last)
-            result = components::detail::names[type+1];
-        else
-            result = "component";
-        result += "[" + boost::lexical_cast<std::string>(type) + "]";
-        return result;
-    }
-
-    ///
-    inline bool is_valid_component_type(int type)
-    {
-        return type > component_invalid && type < component_last;
-    }
+    /// \brief Return the string representation for a given component type id
+    HPX_EXPORT std::string const get_component_type_name(int type);
 
     ///////////////////////////////////////////////////////////////////////////
     /// This needs to be specialized for each of the components

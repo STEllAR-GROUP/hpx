@@ -19,17 +19,25 @@ namespace hpx { namespace util
         using namespace boost::assign;
         std::vector<std::string> lines; 
         lines +=
+            // create system and application instance specific entries
             "[system]",
             "pid = " + boost::lexical_cast<std::string>(getpid()),
             "prefix = " HPX_PREFIX,
 
+            // create default installation location and logging settings
             "[hpx]",
             "location = $[system.prefix]",
             "ini_path = $[hpx.location]/share/hpx/ini",
             "dgas_address = ${HPX_DGAS_SERVER_ADRESS:" 
                 HPX_NAME_RESOLVER_ADDRESS "}",
             "dgas_port = ${HPX_DGAS_SERVER_PORT:" 
-                BOOST_PP_STRINGIZE(HPX_NAME_RESOLVER_PORT) "}"
+                BOOST_PP_STRINGIZE(HPX_NAME_RESOLVER_PORT) "}",
+
+            // create default ini entries for memory_block component hosted in 
+            // the main hpx shared library
+            "[hpx.components.memory_block]",
+            "name = hpx",
+            "path = $[hpx.location]/lib"
         ;
         ini.parse("static defaults", lines);
     }

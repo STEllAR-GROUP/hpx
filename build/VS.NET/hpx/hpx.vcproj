@@ -49,7 +49,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;HPX_EXPORTS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;HPX_EXPORTS;HPX_COMPONENT_NAME=$(ProjectName)"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -473,11 +473,19 @@
 				<Filter
 					Name="Components"
 					>
+					<File
+						RelativePath="..\..\..\src\runtime\components\component_type.cpp"
+						>
+					</File>
 					<Filter
 						Name="Server"
 						>
 						<File
 							RelativePath="..\..\..\src\runtime\components\server\memory.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\src\runtime\components\server\memory_block.cpp"
 							>
 						</File>
 						<File
@@ -800,6 +808,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\..\hpx\runtime\components\memory_block.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\hpx\runtime\components\runtime_support.hpp"
 						>
 					</File>
@@ -824,6 +836,10 @@
 						</File>
 						<File
 							RelativePath="..\..\..\hpx\runtime\components\server\memory.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\components\server\memory_block.hpp"
 							>
 						</File>
 						<File
@@ -852,6 +868,10 @@
 						</File>
 						<File
 							RelativePath="..\..\..\hpx\runtime\components\stubs\generic_component_eval.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\components\stubs\memory_block.hpp"
 							>
 						</File>
 						<File

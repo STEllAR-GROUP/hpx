@@ -13,16 +13,41 @@ namespace hpx { namespace components { namespace amr
     // Implement actual functionality of this stencil
 
     // Compute the result value for the current time step
-    double stencil::eval(double x, double y, double z)
+    threads::thread_state stencil::eval(threads::thread_self& self, 
+        applier::applier& appl, naming::id_type* result, 
+        naming::id_type const& gid1, naming::id_type const& gid2, 
+        naming::id_type const& gid3)
     {
+        // count timesteps
         ++timestep_;
-        return (x + y + z) / 3;
+
+        // start asynchronous get operations
+        lcos::future_value<memory_block_data> mf1(stubs::memory_block::get_async(appl, gid1));
+        lcos::future_value<memory_block_data> mf2(stubs::memory_block::get_async(appl, gid2));
+        lcos::future_value<memory_block_data> mf3(stubs::memory_block::get_async(appl, gid3));
+
+        // get all input memory_block_data instances
+        memory_data<double> const val1 (mf1.get_result(self));
+        memory_data<double> const val2 (mf2.get_result(self));
+        memory_data<double> const val3 (mf3.get_result(self));
+
+        // create new dataset and store result value
+        memory_block retval(memory_block::create(self, appl, appl.get_prefix()));
+
+        // do the actual computation
+        memory_data<double> r(retval.get(self));
+        *r = (*val1 + *val2 + *val3) / 3;
+
+        *result = retval.get_gid();
+        return threads::terminated;
     }
 
     // Return, whether the current time step is the final one
-    bool stencil::is_last_timestep() const
+    threads::thread_state stencil::is_last_timestep(threads::thread_self&, 
+            applier::applier&, bool* result)
     {
-        return timestep_ == 2;
+        *result = (timestep_ == 2) ? true : false;
+        return threads::terminated;
     }
 
 }}}

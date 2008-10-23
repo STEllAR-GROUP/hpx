@@ -6,7 +6,7 @@
 #if !defined(HPX_COMPONENTS_AMR_STENCIL_OCT_17_2008_0847AM)
 #define HPX_COMPONENTS_AMR_STENCIL_OCT_17_2008_0847AM
 
-#include <hpx/components/amr/server/functional_component.hpp>
+#include <hpx/components/amr/server/functional_component_3.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
@@ -17,11 +17,10 @@ namespace hpx { namespace components { namespace amr
     /// as computed by the previous time step. The functions is_last_timestep()
     /// decides whether the current time step is the last one (the computation
     /// has reached the final time step).
-    class stencil 
-      : public amr::server::functional_component<stencil, double, 3>
+    class stencil : public amr::server::functional_component<3>
     {
     private:
-        typedef amr::server::functional_component<stencil, double, 3> base_type;
+        typedef amr::server::functional_component<3> base_type;
 
     public:
         stencil(applier::applier& appl)
@@ -36,13 +35,16 @@ namespace hpx { namespace components { namespace amr
         /// must match the degree of the stencil, and the types of the return
         /// value and the parameters must match the types of the grid functions
         /// this evolution is computing.
-        double eval(double, double, double);
+        threads::thread_state eval(threads::thread_self&, applier::applier&, 
+            naming::id_type*, naming::id_type const&, naming::id_type const&, 
+            naming::id_type const&);
 
         /// This function is executed right after the eval() function has 
         /// returned the value for the current time step. The function has to
         /// return \a false in order to continue to the next time step and 
         /// needs to return \a true to stop the computation.
-        bool is_last_timestep() const;
+        threads::thread_state is_last_timestep(threads::thread_self&, 
+            applier::applier&, bool*);
 
     private:
         int timestep_;    // count evaluated time steps

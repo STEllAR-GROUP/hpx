@@ -199,6 +199,9 @@ public:
 #ifdef BOOST_SERIALIZATION_REGISTER_ARCHIVE
     BOOST_SERIALIZATION_REGISTER_ARCHIVE(hpx::util::portable_binary_oarchive)
 #endif
+#ifdef BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION
+    BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION(hpx::util::portable_binary_oarchive)
+#endif
 
 // required by export in boost <= 1.34
 #define BOOST_ARCHIVE_CUSTOM_OARCHIVE_TYPES hpx::util::portable_binary_oarchive

@@ -8,10 +8,6 @@
 
 #include <hpx/hpx.hpp>
 
-#include <hpx/components/generic/generic_component_noresult.hpp>
-#include <hpx/components/generic/generic_component_result.hpp>
-#include <hpx/runtime/components/generic_component.hpp>
-
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 
@@ -24,35 +20,8 @@ using namespace std;
 threads::thread_state 
 hpx_main(threads::thread_self& self, applier::applier& appl)
 {
-    typedef components::generic_component<print_number_wrapper> print_component_type;
-    typedef components::generic_component<generate_number_wrapper> generator_component_type;
-
-    // get list of all known localities
-    std::vector<naming::id_type> prefixes;
-    naming::id_type prefix;
-    if (appl.get_remote_prefixes(prefixes)) {
-        // create accumulator on any of the remote localities
-        prefix = prefixes[0];
-    }
-    else {
-        // create an accumulator locally
-        prefix = appl.get_runtime_support_gid();
-    }
-
-    // we need to wrap the following into a separate block, because the
-    // generator and printer objects will free the server side instances in 
-    // their destructors, which without this block would be invoked too late
-    {
-        // create new instances of the generator and printer components
-        generator_component_type generator(
-            generator_component_type::create(self, appl, prefix, true));
-        print_component_type printer(
-            print_component_type::create(self, appl, prefix, true));
-
-        // invoke both generic component's actions
-        double val = generator.eval(self);
-        printer.eval(self, val);
-    }
+    // create a stencil component
+    
 
     // initiate shutdown of the runtime systems on all localities
     components::stubs::runtime_support::shutdown_all(appl);

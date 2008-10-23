@@ -60,19 +60,22 @@ set (hpxlib_HEADERS
     ../hpx/runtime/components/component_factory.hpp
     ../hpx/runtime/components/generic_component.hpp
     ../hpx/runtime/components/generic_component_eval.hpp
+    ../hpx/runtime/components/memory_block.hpp
     ../hpx/runtime/components/runtime_support.hpp
     ../hpx/runtime/components/server/generic_component.hpp
     ../hpx/runtime/components/server/generic_component_implementation.hpp
     ../hpx/runtime/components/server/manage_component.hpp
     ../hpx/runtime/components/server/managed_component_base.hpp
     ../hpx/runtime/components/server/memory.hpp
+    ../hpx/runtime/components/server/memory_block.hpp
     ../hpx/runtime/components/server/runtime_support.hpp
     ../hpx/runtime/components/server/simple_component_base.hpp
     ../hpx/runtime/components/server/wrapper_heap.hpp
     ../hpx/runtime/components/server/wrapper_heap_list.hpp
-    ../hpx/runtime/components/stubs/runtime_support.hpp
     ../hpx/runtime/components/stubs/generic_component.hpp
     ../hpx/runtime/components/stubs/generic_component_eval.hpp
+    ../hpx/runtime/components/stubs/memory_block.hpp
+    ../hpx/runtime/components/stubs/runtime_support.hpp
     # naming
     ../hpx/runtime/naming/address.hpp
     ../hpx/runtime/naming/locality.hpp
@@ -134,7 +137,9 @@ set (hpxlib_SOURCES
     # applier
     ../src/runtime/applier/applier.cpp
     # components
+    ../src/runtime/components/component_type.cpp
     ../src/runtime/components/server/memory.cpp
+    ../src/runtime/components/server/memory_block.cpp
     ../src/runtime/components/server/runtime_support.cpp
     # naming 
     ../src/runtime/naming/address.cpp

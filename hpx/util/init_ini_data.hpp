@@ -179,6 +179,7 @@ namespace hpx { namespace util
                 util::section sec;
                 sec.add_entry("name", name);
                 sec.add_entry("path", libs);
+                sec.add_entry("isdefault", "true");
                 components_sec->add_section(name, sec);
             }
         }
