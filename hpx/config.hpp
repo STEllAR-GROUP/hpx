@@ -80,12 +80,15 @@
 #  define HPX_MANGLE_COMPONENT_NAME_STR(n)                                    \
     BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME_PREFIX) + n                  \
     /**/
+#  define HPX_MANGLE_NAME(n)                BOOST_PP_CAT(lib, n)
 #elif defined(_DEBUG)
 #  define HPX_MANGLE_COMPONENT_NAME(n)      BOOST_PP_CAT(n, d)
 #  define HPX_MANGLE_COMPONENT_NAME_STR(n)  n + "d"
+#  define HPX_MANGLE_NAME(n)                BOOST_PP_CAT(n, d)
 #else
 #  define HPX_MANGLE_COMPONENT_NAME(n)      n
 #  define HPX_MANGLE_COMPONENT_NAME_STR(n)  n
+#  define HPX_MANGLE_NAME(n)                n
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

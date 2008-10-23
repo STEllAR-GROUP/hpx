@@ -173,6 +173,10 @@ if (CMAKE_COMPILER_IS_GNUCXX)
         ../external/coroutine/libs/coroutine/src/swapcontext.cpp)
 endif()
 
+# yes, the main shared library contains components as well
+add_definitions(-DHPX_COMPONENT_NAME=hpx)
+add_definitions(-DHPX_EXPORTS)
+
 # separate shared module containing our portable serialization archives
 set (hpxserializationlib_HEADERS
     ../hpx/hpx_fwd.hpp
@@ -186,8 +190,6 @@ set (hpxserializationlib_SOURCES
     util/binary_portable_archives.cpp
     util/portable_binary_iarchive.cpp
     util/portable_binary_oarchive.cpp)
-
-add_definitions(-DHPX_EXPORTS)
 
 # build instructions
 add_library(hpx_serialization SHARED 
