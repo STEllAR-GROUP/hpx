@@ -39,7 +39,7 @@ namespace hpx { namespace lcos
     ///                  for this action.
     /// \tparam Result   The template parameter \a Result defines the type this 
     ///                  lazy_future is expected to return from 
-    ///                  \a lazy_future#get_result.
+    ///                  \a lazy_future#get.
     /// \tparam DirectExecute The template parameter \a DirectExecute is an
     ///                  optimization aid allowing to execute the action 
     ///                  directly if the target is local (without spawning a 
@@ -64,7 +64,7 @@ namespace hpx { namespace lcos
 
     public:
         /// Construct a new \a lazy_future instance. The \a thread 
-        /// supplied to the function \a lazy_future#get_result will be 
+        /// supplied to the function \a lazy_future#get will be 
         /// notified as soon as the result of the operation associated with 
         /// this lazy_future instance has been returned.
         /// 
@@ -81,7 +81,7 @@ namespace hpx { namespace lcos
         /// Get the result of the requested action. This call blocks (yields 
         /// control) if the result is not ready. As soon as the result has been 
         /// returned and the waiting thread has been re-scheduled by the thread
-        /// manager the function \a lazy_future#get_result will return.
+        /// manager the function \a lazy_future#get will return.
         ///
         /// \param self   [in] The \a thread which will be unconditionally
         ///               blocked (yielded) while waiting for the result. 
@@ -94,7 +94,7 @@ namespace hpx { namespace lcos
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
-        Result get_result(threads::thread_self& self,
+        Result get(threads::thread_self& self,
             applier::applier& appl, naming::id_type const& gid) const
         {
             // initialize the operation
@@ -107,7 +107,7 @@ namespace hpx { namespace lcos
         /// Get the result of the requested action. This call blocks (yields 
         /// control) if the result is not ready. As soon as the result has been 
         /// returned and the waiting thread has been re-scheduled by the thread
-        /// manager the function \a lazy_future#get_result will return.
+        /// manager the function \a lazy_future#get will return.
         ///
         /// \param self   [in] The \a thread which will be unconditionally
         ///               blocked (yielded) while waiting for the result. 
@@ -123,7 +123,7 @@ namespace hpx { namespace lcos
         ///               exception encapsulating the reported error code and 
         ///               error description.
         template <typename Arg0>
-        Result get_result(threads::thread_self& self,
+        Result get(threads::thread_self& self,
             applier::applier& appl, naming::id_type const& gid,
             Arg0 const& arg0) const
         {
@@ -134,7 +134,7 @@ namespace hpx { namespace lcos
             return (*this->impl_)->get_data(self, 0);
         }
 
-        // pull in remaining get_result's
+        // pull in remaining get's
         #include <hpx/lcos/lazy_future_get_results.hpp>
     };
 
@@ -148,7 +148,7 @@ namespace hpx { namespace lcos
 
     public:
         /// Construct a new \a lazy_future instance. The \a thread 
-        /// supplied to the function \a lazy_future#get_result will be 
+        /// supplied to the function \a lazy_future#get will be 
         /// notified as soon as the result of the operation associated with 
         /// this lazy_future instance has been returned.
         /// 
@@ -165,7 +165,7 @@ namespace hpx { namespace lcos
         /// Get the result of the requested action. This call blocks (yields 
         /// control) if the result is not ready. As soon as the result has been 
         /// returned and the waiting thread has been re-scheduled by the thread
-        /// manager the function \a lazy_future#get_result will return.
+        /// manager the function \a lazy_future#get will return.
         ///
         /// \param self   [in] The \a thread which will be unconditionally
         ///               blocked (yielded) while waiting for the result. 
@@ -178,7 +178,7 @@ namespace hpx { namespace lcos
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
-        Result get_result(threads::thread_self& self,
+        Result get(threads::thread_self& self,
             applier::applier& appl, naming::id_type const& gid) const
         {
             // Determine whether the gid is local or remote
@@ -198,7 +198,7 @@ namespace hpx { namespace lcos
         /// Get the result of the requested action. This call blocks (yields 
         /// control) if the result is not ready. As soon as the result has been 
         /// returned and the waiting thread has been re-scheduled by the thread
-        /// manager the function \a lazy_future#get_result will return.
+        /// manager the function \a lazy_future#get will return.
         ///
         /// \param self   [in] The \a thread which will be unconditionally
         ///               blocked (yielded) while waiting for the result. 
@@ -214,7 +214,7 @@ namespace hpx { namespace lcos
         ///               exception encapsulating the reported error code and 
         ///               error description.
         template <typename Arg0>
-        Result get_result(threads::thread_self& self,
+        Result get(threads::thread_self& self,
             applier::applier& appl, naming::id_type const& gid,
             Arg0 const& arg0) const
         {
@@ -232,7 +232,7 @@ namespace hpx { namespace lcos
             return (*this->impl_)->get_data(self, 0);
         }
 
-        // pull in remaining get_result's
+        // pull in remaining get's
         #include <hpx/lcos/lazy_future_get_results_direct.hpp>
     };
 

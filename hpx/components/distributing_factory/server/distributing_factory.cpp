@@ -73,7 +73,7 @@ namespace hpx { namespace components { namespace server
         for (future_values_type::iterator vit = v.begin(); vit != vend; ++vit)
         {
             gids->push_back(result_type::value_type(
-                (*vit).prefix_, (*vit).gids_.get_result(self), (*vit).count_));
+                (*vit).prefix_, (*vit).gids_.get(self), (*vit).count_));
         }
 
         return threads::terminated;

@@ -23,7 +23,7 @@ namespace hpx { namespace components { namespace stubs
         /// Create a client side representation for any existing 
         /// \a server#memory_block instance
         memory_block(applier::applier& app) 
-          : app_(app)
+          : appl_(app)
         {}
 
         ~memory_block() 
@@ -37,7 +37,7 @@ namespace hpx { namespace components { namespace stubs
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
-            // to call get_result() on the return value to obtain the result
+            // to call get() on the return value to obtain the result
             typedef server::memory_block::get_action action_type;
             return lcos::eager_future<action_type, memory_block_data>(appl, 
                 targetgid);
@@ -46,40 +46,53 @@ namespace hpx { namespace components { namespace stubs
         static memory_block_data get(threads::thread_self& self, 
             applier::applier& appl, naming::id_type const& targetgid) 
         {
-            // The following get_result yields control while the action above 
+            // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future
-            return get_async(appl, targetgid).get_result(self);
+            return get_async(appl, targetgid).get(self);
         }
 
-        ///
+        /// Exposed functionality: get returns either the local memory pointers
+        /// or a copy of the remote data.
         lcos::future_value<memory_block_data> get_async(
-            naming::id_type const& targetgid) 
+            naming::id_type const& gid) 
         {
-            return get_async(app_, targetgid);
+            return get_async(appl_, gid);
         }
 
         /// 
         memory_block_data get(threads::thread_self& self, 
-            naming::id_type const& targetgid) 
+            naming::id_type const& gid) 
         {
-            return get(self, app_, targetgid);
+            return get(self, appl_, gid);
         }
 
         /// Asynchronously create a new instance of an simple_accumulator
         static lcos::future_value<naming::id_type>
-        create_async(applier::applier& appl, naming::id_type const& targetgid)
+        create_async(applier::applier& appl, naming::id_type const& gid)
         {
             return stubs::runtime_support::create_component_async(
-                appl, targetgid, get_component_type<server::memory_block>());
+                appl, gid, get_component_type<server::memory_block>());
+        }
+
+        lcos::future_value<naming::id_type>
+        create_async(naming::id_type const& gid)
+        {
+            return create_async(appl_, gid);
         }
 
         /// Create a new instance of an simple_accumulator
         static naming::id_type 
         create(threads::thread_self& self, applier::applier& appl, 
-            naming::id_type const& targetgid)
+            naming::id_type const& gid)
         {
             return stubs::runtime_support::create_component(self, appl, 
-                targetgid, get_component_type<server::memory_block>());
+                gid, get_component_type<server::memory_block>());
+        }
+
+        naming::id_type 
+        create(threads::thread_self& self, naming::id_type const& gid)
+        {
+            return create(self, appl_, gid);
         }
 
         /// Delete an existing component
@@ -92,11 +105,11 @@ namespace hpx { namespace components { namespace stubs
 
         void free(naming::id_type const& gid)
         {
-            free(app_, gid);
+            free(appl_, gid);
         }
 
     protected:
-        applier::applier& app_;
+        applier::applier& appl_;
     };
 
 }}}

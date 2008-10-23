@@ -28,8 +28,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         {
             typedef typename functional_component<1>::eval_action action_type;
             lcos::eager_future<action_type, naming::id_type> f(appl, gid, 
-                in[0]->get_result(self));
-            return f.get_result(self); 
+                in[0]->get(self));
+            return f.get(self); 
         }
     };
 
@@ -43,9 +43,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         {
             typedef typename functional_component<3>::eval_action action_type;
             lcos::eager_future<action_type, naming::id_type> f(appl, gid, 
-                in[0]->get_result(self), in[1]->get_result(self), 
-                in[2]->get_result(self));
-            return f.get_result(self); 
+                in[0]->get(self), in[1]->get(self), in[2]->get(self));
+            return f.get(self); 
         }
     };
 
@@ -59,10 +58,9 @@ namespace hpx { namespace components { namespace amr { namespace server
         {
             typedef typename functional_component<5>::eval_action action_type;
             lcos::eager_future<action_type, naming::id_type> f(appl, gid, 
-                in[0]->get_result(self), in[1]->get_result(self), 
-                in[2]->get_result(self), in[3]->get_result(self), 
-                in[4]->get_result(self));
-            return f.get_result(self); 
+                in[0]->get(self), in[1]->get(self), in[2]->get(self), 
+                in[3]->get(self), in[4]->get(self));
+            return f.get(self); 
         }
     };
 
@@ -78,7 +76,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             action_type;
 
             lcos::eager_future<action_type, bool> f(appl, gid);
-            return f.get_result(self); 
+            return f.get(self); 
         }
     };
 
@@ -130,7 +128,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// The function get_result will be called by the out-ports whenever 
+    /// The function get will be called by the out-ports whenever 
     /// the current value has been requested.
     template <int N>
     void

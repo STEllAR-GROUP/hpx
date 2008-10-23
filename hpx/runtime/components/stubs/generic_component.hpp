@@ -22,7 +22,7 @@ namespace hpx { namespace components { namespace stubs
                 applier::applier& appl, naming::id_type const& gid)
             {
                 lcos::eager_future<Action, Result> f(appl, gid);
-                return f.get_result(self);
+                return f.get(self);
             }
 
             template <typename ParameterBlock>
@@ -31,7 +31,7 @@ namespace hpx { namespace components { namespace stubs
                 ParameterBlock const& params)
             {
                 lcos::eager_future<Action, Result> f(appl, gid, params);
-                return f.get_result(self);
+                return f.get(self);
             }
         };
 

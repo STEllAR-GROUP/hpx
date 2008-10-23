@@ -18,7 +18,7 @@ namespace hpx { namespace applier
     {
         // Create a future_value, execute the required action, 
         // we simply return the initialized future_value, the caller needs
-        // to call get_result() on the return value to obtain the result
+        // to call get() on the return value to obtain the result
         typedef 
             components::server::runtime_support::create_component_action
         action_type;
@@ -31,7 +31,7 @@ namespace hpx { namespace applier
         naming::id_type const& targetgid, components::component_type type,
         std::size_t count)
     {
-        return create_async(appl, targetgid, type, count).get_result(self);
+        return create_async(appl, targetgid, type, count).get(self);
     }
 
     //

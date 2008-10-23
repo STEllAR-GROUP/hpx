@@ -28,13 +28,13 @@ threads::thread_state hpx_main(threads::thread_self& self,
     lcos::eager_future<load_action_type, boost::uint32_t> ef(
         appl, appl.get_memory_gid(), boost::uint64_t(&value));
 
-    boost::uint32_t result1 = ef.get_result(self);
+    boost::uint32_t result1 = ef.get(self);
     BOOST_TEST(result1 == value);
 
     // read the value back from memory (using a lazy_future)
     lcos::lazy_future<load_action_type, boost::uint32_t> lf;
 
-    boost::uint32_t result2 = lf.get_result(self, appl, appl.get_memory_gid(), 
+    boost::uint32_t result2 = lf.get(self, appl, appl.get_memory_gid(), 
         boost::uint64_t(&value));
     BOOST_TEST(result2 == value);
 

@@ -38,7 +38,7 @@ namespace hpx { namespace lcos
     ///                  for this action.
     /// \tparam Result   The template parameter \a Result defines the type this 
     ///                  eager_future is expected to return from 
-    ///                  \a eager_future#get_result.
+    ///                  \a eager_future#get.
     /// \tparam DirectExecute The template parameter \a DirectExecute is an
     ///                  optimization aid allowing to execute the action 
     ///                  directly if the target is local (without spawning a 
@@ -80,7 +80,7 @@ namespace hpx { namespace lcos
         }
 
         /// Construct a new \a eager_future instance. The \a thread 
-        /// supplied to the function \a eager_future#get_result will be 
+        /// supplied to the function \a eager_future#get will be 
         /// notified as soon as the result of the operation associated with 
         /// this eager_future instance has been returned.
         /// 
@@ -118,7 +118,7 @@ namespace hpx { namespace lcos
         }
 
         /// Construct a new \a eager_future instance. The \a thread 
-        /// supplied to the function \a eager_future#get_result will be 
+        /// supplied to the function \a eager_future#get will be 
         /// notified as soon as the result of the operation associated with 
         /// this eager_future instance has been returned.
         ///
@@ -179,7 +179,7 @@ namespace hpx { namespace lcos
         }
 
         /// Construct a new \a eager_future instance. The \a thread 
-        /// supplied to the function \a eager_future#get_result will be 
+        /// supplied to the function \a eager_future#get will be 
         /// notified as soon as the result of the operation associated with 
         /// this eager_future instance has been returned.
         ///
@@ -227,7 +227,7 @@ namespace hpx { namespace lcos
         }
 
         /// Construct a new \a eager_future instance. The \a thread 
-        /// supplied to the function \a eager_future#get_result will be 
+        /// supplied to the function \a eager_future#get will be 
         /// notified as soon as the result of the operation associated with 
         /// this eager_future instance has been returned.
         ///

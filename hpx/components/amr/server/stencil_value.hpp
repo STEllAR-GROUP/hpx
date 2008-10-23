@@ -44,7 +44,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// Construct a new stencil_value instance
         stencil_value(applier::applier& appl);
 
-        /// The function get_result will be called by the out-ports whenever 
+        /// The function get will be called by the out-ports whenever 
         /// the current value has been requested.
         void get_value(threads::thread_self& self, naming::id_type*);
 

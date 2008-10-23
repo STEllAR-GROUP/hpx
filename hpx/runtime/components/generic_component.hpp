@@ -26,7 +26,7 @@ namespace hpx { namespace components
         /// \a server#generic_component instance with the given global id 
         /// \a gid.
         generic_component(applier::applier& app, naming::id_type const& gid,
-                bool freeonexit = true) 
+                bool freeonexit = false) 
           : base_type(app), gid_(gid), freeonexit_(freeonexit)
         {
             BOOST_ASSERT(gid_);

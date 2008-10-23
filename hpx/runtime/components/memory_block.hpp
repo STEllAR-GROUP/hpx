@@ -24,7 +24,7 @@ namespace hpx { namespace components
         /// Create a client side representation for the existing
         /// \a server#memory_block instance with the given global id \a gid.
         memory_block(applier::applier& app, naming::id_type gid,
-                bool freeonexit = true) 
+                bool freeonexit = false) 
           : base_type(app), gid_(gid), freeonexit_(freeonexit)
         {
             BOOST_ASSERT(gid_);
@@ -47,7 +47,7 @@ namespace hpx { namespace components
 
         /// Asynchronously get the \a memory_block_data maintained by this 
         /// memory_block
-        lcos::future_value<memory_block_data> get() 
+        lcos::future_value<memory_block_data> get_async() 
         {
             return this->base_type::get_async(gid_);
         }
@@ -84,9 +84,17 @@ namespace hpx { namespace components
     class memory_data
     {
     public:
-        memory_data(memory_block_data& mb)
+        memory_data()
+        {}
+        memory_data(memory_block_data const& mb)
           : mb_(mb)
         {}
+
+        memory_data& operator=(memory_block_data const& mb)
+        {
+            mb_ = mb;
+            return *this;
+        }
 
         T& operator*()
         {

@@ -37,7 +37,9 @@ namespace hpx { namespace util
             // the main hpx shared library
             "[hpx.components.memory_block]",
             "name = hpx",
-            "path = $[hpx.location]/lib"
+            "path = $[hpx.location]/lib/" 
+                BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(HPX_COMPONENT_NAME))
+                HPX_SHARED_LIB_EXTENSION
         ;
         ini.parse("static defaults", lines);
     }

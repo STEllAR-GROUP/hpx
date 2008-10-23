@@ -56,7 +56,7 @@ namespace hpx { namespace lcos { namespace detail
         /// Get the result of the requested action. This call blocks (yields 
         /// control) if the result is not ready. As soon as the result has been 
         /// returned and the waiting thread has been re-scheduled by the thread
-        /// manager the function \a lazy_future#get_result will return.
+        /// manager the function \a lazy_future#get will return.
         ///
         /// \param slot   [in] The number of the slot the value has to be 
         ///               returned for. This number must be positive, but 
@@ -178,13 +178,13 @@ namespace hpx { namespace lcos
     ///
     ///     // Wait for the result to be returned, yielding control 
     ///     // in the meantime.
-    ///     naming::id_type result = f.get_result(thread_self);
+    ///     naming::id_type result = f.get(thread_self);
     ///     // ...
     /// \endcode
     ///
     /// \tparam Result   The template parameter \a Result defines the type this 
     ///                  future_value is expected to return from 
-    ///                  \a future_value#get_result.
+    ///                  \a future_value#get.
     ///
     /// \note            The action executed using the future_value as a 
     ///                  continuation must return a value of a type convertible 
@@ -233,7 +233,7 @@ namespace hpx { namespace lcos
         /// Get the result of the requested action. This call blocks (yields 
         /// control) if the result is not ready. As soon as the result has been 
         /// returned and the waiting thread has been re-scheduled by the thread
-        /// manager the function \a eager_future#get_result will return.
+        /// manager the function \a eager_future#get will return.
         ///
         /// \param self   [in] The \a thread which will be unconditionally
         ///               blocked (yielded) while waiting for the result. 
@@ -242,7 +242,7 @@ namespace hpx { namespace lcos
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
-        Result get_result(threads::thread_self& self, int slot = 0) const
+        Result get(threads::thread_self& self, int slot = 0) const
         {
             return (*impl_)->get_data(self, slot);
         }
