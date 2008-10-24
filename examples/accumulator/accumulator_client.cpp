@@ -94,7 +94,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("dgas,d", po::value<std::string>(), 
                 "the IP address the DGAS server is running on (default taken "
                 "from hpx.ini), expected format: 192.168.1.1:7912")
-            ("hpx,h", po::value<std::string>(), 
+            ("hpx,x", po::value<std::string>(), 
                 "the IP address the HPX parcelport is listening on (default "
                 "is localhost:7910), expected format: 192.168.1.1:7913")
         ;
@@ -142,11 +142,8 @@ class dgas_server_helper
 public:
     dgas_server_helper(std::string host, boost::uint16_t port)
       : dgas_pool_(), dgas_(dgas_pool_, host, port)
-    {}
-
-    void run (bool blocking)
     {
-        dgas_.run(blocking);
+        dgas_.run(false);
     }
 
 private:
