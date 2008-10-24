@@ -24,10 +24,10 @@ bool parse_commandline(char const* name, int argc, char *argv[],
             ("help,h", "print out program usage (this message)")
             ("run_dgas_server,r", "run DGAS server as part of this runtime instance")
             ("no_hpx_runtime,n", "do not run hpx runtime as part of this runtime instance")
-            ("dgas", po::value<std::string>(), 
+            ("dgas,d", po::value<std::string>(), 
                 "the IP address the DGAS server is running on (default taken "
                 "from hpx.ini), expected format: 192.168.1.1:7912")
-            ("hpx", po::value<std::string>(), 
+            ("hpx,x", po::value<std::string>(), 
                 "the IP address the HPX parcelport is listening on (default "
                 "is localhost:7910), expected format: 192.168.1.1:7913")
         ;

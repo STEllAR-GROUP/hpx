@@ -94,7 +94,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("dgas,d", po::value<std::string>(), 
                 "the IP address the DGAS server is running on (default taken "
                 "from hpx.ini), expected format: 192.168.1.1:7912")
-            ("hpx,h", po::value<std::string>(), 
+            ("hpx,x", po::value<std::string>(), 
                 "the IP address the HPX parcelport is listening on (default "
                 "is localhost:7910), expected format: 192.168.1.1:7913")
         ;
