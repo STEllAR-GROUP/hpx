@@ -99,7 +99,8 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // this is required in order to use the logging library
-    BOOST_DEFINE_LOG_FILTER(dgas_level, filter_type) 
+    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(dgas_level, filter_type, 
+        boost::logging::level::disable_all) 
     BOOST_DEFINE_LOG(dgas_logger, logger_type) 
 
     // initialize logging for DGAS
@@ -126,7 +127,8 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    BOOST_DEFINE_LOG_FILTER(hpx_level, filter_type) 
+    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(hpx_level, filter_type,
+        boost::logging::level::disable_all) 
     BOOST_DEFINE_LOG(hpx_logger, logger_type) 
 
     // initialize logging for HPX runtime
