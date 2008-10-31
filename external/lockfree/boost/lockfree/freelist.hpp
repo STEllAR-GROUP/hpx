@@ -97,7 +97,7 @@ public:
 
     T * allocate (void)
     {
-        for(;;)
+        for (unsigned char i = 0; /**/; boost::lockfree::spin(++i))
         {
             tagged_ptr_ old_pool(pool_);
 
@@ -122,7 +122,7 @@ public:
             return;
         }
 
-        for(;;)
+        for (unsigned char i = 0; /**/; boost::lockfree::spin(++i))
         {
             tagged_ptr_ old_pool (pool_);
 
@@ -188,7 +188,7 @@ public:
 
     T * allocate (void)
     {
-        for(;;)
+        for (unsigned char i = 0; /**/; boost::lockfree::spin(++i))
         {
             tagged_ptr_ old_pool(pool_);
 
@@ -204,7 +204,7 @@ public:
 
     void deallocate (T * n)
     {
-        for(;;)
+        for (unsigned char i = 0; /**/; boost::lockfree::spin(++i))
         {
             tagged_ptr_ old_pool (pool_);
 
