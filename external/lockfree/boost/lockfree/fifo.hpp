@@ -97,7 +97,8 @@ public:
     {
         node * n = alloc_node(t);
 
-        for (unsigned char i = 0; /**/; boost::lockfree::spin(++i))
+        for (unsigned char i = reinterpret_cast<unsigned char>(&t); /**/; 
+             boost::lockfree::spin(++i))
         {
             atomic_node_ptr tail (tail_);
             memory_barrier();
@@ -122,7 +123,8 @@ public:
 
     bool dequeue (T * ret)
     {
-        for (unsigned char i = 0; /**/; boost::lockfree::spin(++i))
+        for (unsigned char i = reinterpret_cast<unsigned char>(ret); /**/; 
+             boost::lockfree::spin(++i))
         {
             atomic_node_ptr head(head_);
             memory_barrier();
