@@ -28,9 +28,6 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
-#if defined(_DEBUG)
-#include <boost/detail/atomic_count.hpp>
-#endif
 
 namespace boost
 {
@@ -100,7 +97,7 @@ public:
     {
         node * n = alloc_node(t);
 
-        for (;;)
+        for (unsigned char i = 0; /**/; boost::lockfree::spin(++i))
         {
             atomic_node_ptr tail (tail_);
             memory_barrier();
@@ -125,7 +122,7 @@ public:
 
     bool dequeue (T * ret)
     {
-        for (;;)
+        for (unsigned char i = 0; /**/; boost::lockfree::spin(++i))
         {
             atomic_node_ptr head(head_);
             memory_barrier();
@@ -196,7 +193,7 @@ private:
     BOOST_LOCKFREE_CACHELINE_ALIGNMENT_PREFIX atomic_node_ptr tail_ BOOST_LOCKFREE_CACHELINE_ALIGNMENT; 
 
 #if defined(_DEBUG)
-    boost::detail::atomic_count count_;
+    atomic_int<long> count_;
 #endif
 };
 

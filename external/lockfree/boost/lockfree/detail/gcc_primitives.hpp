@@ -37,6 +37,18 @@ namespace boost { namespace lockfree
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    inline void spin(unsigned char i)
+    {
+#if defined(__i386__)
+        asm volatile("movb %0,%ax; $l1: pause; dec %%ax; jnz $l1;");
+#elif defined(__x86_64__)
+        asm volatile("movb %0,%ax; $l1: pause; dec %%ax; jnz $l1;");
+#else
+        // do nothing
+#endif
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <class C, class D>
     inline bool CAS(volatile C * addr, D old, D nw)
     {
@@ -152,7 +164,7 @@ namespace boost { namespace lockfree
         return __sync_bool_compare_and_swap_16(
             reinterpret_cast<volatile TItype*>(addr), old.l, nw.l);
 
-# elif !defined(__nocona__ ) 
+# elif defined(__nocona__ ) 
 
 # if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
 # warning "CAS2: 64Bit system: handcoded asm, will crash on early amd processors"

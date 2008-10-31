@@ -30,6 +30,12 @@ namespace boost { lockfree
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    inline void spin(unsigned char i)
+    {
+        // do nothing
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <class C, class D>
     inline bool CAS (volatile C * addr, D old, D nw)
     {

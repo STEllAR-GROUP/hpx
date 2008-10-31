@@ -19,6 +19,10 @@ namespace lockfree
 
 #if defined(__GNUC__) && ( (__GNUC__ > 4) || ((__GNUC__ >= 4) && (__GNUC_MINOR__ >= 1)) )
 
+#if defined(BOOST_LOCKFREE_IDENTIFY_ATOMIC_INT_METHOD)
+#warning "atomic_int: using __sync_fetch_and_add et.al."
+#endif
+
 template <typename T>
 class atomic_int:
     boost::noncopyable
@@ -79,6 +83,10 @@ private:
 
 #elif defined(__GLIBCPP__) || defined(__GLIBCXX__)
 
+#if defined(BOOST_LOCKFREE_IDENTIFY_ATOMIC_INT_METHOD)
+#warning "atomic_int: using __gnu_cxx::__exchange_and_add et.al."
+#endif
+
 template <typename T>
 class atomic_int:
     boost::noncopyable
@@ -138,6 +146,10 @@ private:
 
 #else /* emulate via CAS */
 
+#if defined(BOOST_LOCKFREE_IDENTIFY_ATOMIC_INT_METHOD)
+#warning "atomic_int: emulate via CAS"
+#endif
+
 template <typename T>
 class atomic_int:
     boost::noncopyable
@@ -189,7 +201,6 @@ public:
         {
             T oldv = value;
             T newv = oldv - v;
-
             if(likely(CAS(&value, oldv, newv)))
                 return newv;
         }
@@ -220,7 +231,6 @@ public:
 private:
     T value;
 };
-
 
 #endif
 
