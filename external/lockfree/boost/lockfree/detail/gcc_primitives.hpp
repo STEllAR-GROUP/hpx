@@ -18,10 +18,9 @@
 #elif defined(__ppc__)
     #define BOOST_LOCKFREE_DCAS_ALIGNMENT
 #elif defined(__x86_64__)
-
-    #if !(defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_16) || defined (__nocona__))
-        #define BOOST_LOCKFREE_PTR_COMPRESSION 1
-    #endif
+//     #if !(defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_16) || defined (__nocona__))
+//         #define BOOST_LOCKFREE_PTR_COMPRESSION 1
+//     #endif
     #define BOOST_LOCKFREE_DCAS_ALIGNMENT __attribute__((aligned(16)))
 #endif
 
@@ -36,17 +35,6 @@ namespace boost { namespace lockfree
 #warning "no memory barrier implemented for this platform"
 #endif
     }
-
-#if !(defined(__GNUC__) && ( (__GNUC__ > 4) || ((__GNUC__ >= 4) && (__GNUC_MINOR__ >= 1)) ) )
-    ///////////////////////////////////////////////////////////////////////////
-    struct lw_CAS_mutex_tag {};
-
-    inline boost::detail::lightweight_mutex& get_mutex()
-    {
-        static detail::static_<boost::detail::lightweight_mutex, lw_CAS_mutex_tag> mtx;
-        return mtx;
-    }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <class C, class D>
@@ -164,7 +152,8 @@ namespace boost { namespace lockfree
         return __sync_bool_compare_and_swap_16(
             reinterpret_cast<volatile TItype*>(addr), old.l, nw.l);
 
-# else 
+# elif !defined(__nocona__ ) 
+
 # if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
 # warning "CAS2: 64Bit system: handcoded asm, will crash on early amd processors"
 # endif
@@ -176,6 +165,34 @@ namespace boost { namespace lockfree
                              : "m"(*addr), "d" (old2), "a" (old1),
                                "c" (new2), "b" (new1) : "memory");
         return result != 0;
+
+# else
+
+# if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+# warning "CAS2: blocking CAS2 emulation"
+# endif
+
+        struct packed_c
+        {
+            D d;
+            E e;
+        };
+
+        volatile packed_c * packed_addr = reinterpret_cast<volatile packed_c*>(addr);
+
+        boost::detail::lightweight_mutex::scoped_lock lock(detail::get_CAS2_mutex());
+
+        if (packed_addr->d == old1 && packed_addr->e == old2)
+        {
+            packed_addr->d = new1;
+            packed_addr->e = new2;
+            return true;
+        }
+        return false;
+
+// this is the only case where we need to use compressed pointers on 64Bit systems
+#define BOOST_LOCKFREE_PTR_COMPRESSION 1
+
 # endif
 
 #else
@@ -192,29 +209,6 @@ namespace boost { namespace lockfree
         return result != 0;
 
 #endif
-// #else
-// #if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
-// #warning "CAS2: blocking CAS2 emulation"
-// #endif
-// 
-//         struct packed_c
-//         {
-//             D d;
-//             E e;
-//         };
-// 
-//         volatile packed_c * packed_addr = reinterpret_cast<volatile packed_c*>(addr);
-// 
-//         boost::detail::lightweight_mutex::scoped_lock lock(detail::get_CAS2_mutex());
-// 
-//         if (packed_addr->d == old1 && packed_addr->e == old2)
-//         {
-//             packed_addr->d = new1;
-//             packed_addr->e = new2;
-//             return true;
-//         }
-//         return false;
-// #endif
     }
 
 }}
