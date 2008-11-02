@@ -32,7 +32,7 @@
     result_type eval(threads::thread_self& self, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        return this->base_type::eval(self, gid_, BOOST_PP_ENUM_PARAMS(N, arg));
+        return this->base_type::eval(self, this->gid_, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
 #undef N

@@ -41,7 +41,7 @@ namespace hpx { namespace components
         /// Invoke the action exposed by this generic component
         result_type eval(threads::thread_self& self)
         {
-            return this->base_type::eval(self, gid_);
+            return this->base_type::eval(self, this->gid_);
         }
 
         // bring in higher order eval functions

@@ -432,7 +432,7 @@ namespace hpx { namespace components { namespace server
         }
 
     private:
-        friend detail::memory_block;
+        friend class detail::memory_block;
 
         /// \brief We use a intrusive pointer here to make sure the size of the
         ///        overall memory_block class is exactly equal to the size of

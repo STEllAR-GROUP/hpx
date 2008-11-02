@@ -92,7 +92,7 @@ namespace hpx { namespace components { namespace stubs
         result_type eval(threads::thread_self& self, 
             naming::id_type const& targetgid)
         {
-            return eval(self, appl_, targetgid);
+            return eval(self, this->appl_, targetgid);
         }
 
         // bring in higher order eval functions
