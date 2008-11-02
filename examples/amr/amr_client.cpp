@@ -19,32 +19,80 @@ using namespace hpx;
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
+// Create functional components, one for each data point, use those to 
+// initialize stencil instances
+void init_stencils(
+    components::distributing_factory::result_type const& stencils)
+{
+    typedef components::distributing_factory::result_type result_type;
+
+    result_type::const_iterator end = stencils.end();
+    for (result_type::const_iterator it = stencils.begin(); it != end; ++it) 
+    {
+        
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Get gids of output ports of all stencils
+void get_output_ports(
+    components::distributing_factory::result_type const& stencils,
+    std::vector<std::vector<naming::id_type> >& outputs)
+{
+    typedef components::distributing_factory::result_type result_type;
+
+    result_type::const_iterator end = stencils.end();
+    for (result_type::const_iterator it = stencils.begin(); it != end; ++it) 
+    {
+        
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// connectthe given output ports with the correct input ports, creating the 
+// required static dataflow structure
+void connect_input_ports(
+    components::distributing_factory::result_type const& stencils,
+    std::vector<std::vector<naming::id_type> > const& outputs)
+{
+    typedef components::distributing_factory::result_type result_type;
+
+    result_type::const_iterator end = stencils.end();
+    for (result_type::const_iterator it = stencils.begin(); it != end; ++it) 
+    {
+        
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 threads::thread_state 
 hpx_main(threads::thread_self& self, applier::applier& appl)
 {
     {
-        // create a distributing factory
+        // locally create a distributing factory
         components::distributing_factory dist_factory(
             components::distributing_factory::create(self, appl, 
                 appl.get_runtime_support_gid(), true));
 
-        // create a couple of stencil component
+        // create a couple of stencil components
         typedef components::distributing_factory::result_type result_type;
 
         components::component_type stencil_type = 
             components::get_component_type<components::amr::stencil>();
         result_type stencils = dist_factory.create_components(self, stencil_type, 3);
 
+        // create functional components and and use those to initialize stencils
+        init_stencils(stencils);
 
+        // ask stencil instances for their output gids
+        std::vector<std::vector<naming::id_type> > outputs;
+        get_output_ports(stencils, outputs);
+
+        // connect output gids with corresponding stencil inputs
+        connect_input_ports(stencils, outputs);
 
         // free all stencil components
-        result_type::iterator end = stencils.end();
-        for (result_type::iterator it = stencils.begin(); it != end; ++it) {
-            for (std::size_t i = 0; i < (*it).count_; ++i) {
-                components::stubs::runtime_support::free_component(appl, 
-                    stencil_type, (*it).first_gid_ + i);
-            }
-        }
+        dist_factory.free_components(stencils);
 
     }   // distributing_factory needs to go out of scope before shutdown
 

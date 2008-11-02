@@ -36,12 +36,12 @@ namespace hpx { namespace applier
 
     //
     void destroy (applier& appl, components::component_type type, 
-        naming::id_type const& gid, std::size_t count)
+        naming::id_type const& gid)
     {
         typedef 
             components::server::runtime_support::free_component_action 
         action_type;
-        appl.apply<action_type>(appl.get_runtime_support_gid(), type, gid, count);
+        appl.apply<action_type>(appl.get_runtime_support_gid(), type, gid);
     }
 
     threads::thread_id_type register_work(applier& appl,

@@ -244,7 +244,7 @@ namespace hpx { namespace components
 
         /// \brief  The function \a destroy is used for deletion and 
         //          de-allocation of arrays of wrappers
-        static void destroy(derived_type* p, std::size_t count)
+        static void destroy(derived_type* p, std::size_t count = 1)
         {
             if (NULL == p || 0 == count) 
                 return;     // do nothing if given a NULL pointer

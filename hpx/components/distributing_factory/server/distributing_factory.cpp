@@ -92,11 +92,35 @@ namespace hpx { namespace components { namespace server
         for (future_values_type::iterator vit = v.begin(); vit != vend; ++vit)
         {
             gids->push_back(result_type::value_type(
-                (*vit).prefix_, (*vit).gids_.get(self), (*vit).count_));
+                (*vit).prefix_, (*vit).gids_.get(self), (*vit).count_, type));
         }
 
         return threads::terminated;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Action to delete existing components
+    threads::thread_state distributing_factory::free_components(
+        threads::thread_self& self, applier::applier& appl,
+        result_type const& gids)
+    {
+        components::stubs::runtime_support rts(appl);
+
+        result_type::const_iterator end = gids.end();
+        for (result_type::const_iterator it = gids.begin(); it != end; ++it) 
+        {
+            for (std::size_t i = 0; i < (*it).count_; ++i) 
+            {
+                // We need to free every components separately because it may
+                // have been moved to a different locality than it was 
+                // initially created on.
+                rts.free_component((*it).type_, (*it).first_gid_ + i);
+            }
+        }
+
+        return threads::terminated;
+    }
+
 
 }}}
 

@@ -39,14 +39,8 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    void destroy(applier::applier& appl, naming::id_type const& gid, 
-        std::size_t count)
+    void destroy(applier::applier& appl, naming::id_type const& gid)
     {
-        if (0 == count) {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter, "count shouldn't be zero");
-            return;
-        }
-
         // retrieve the local address bound to the given global id
         naming::address addr;
         if (!appl.get_dgas_client().resolve(gid, addr)) 
@@ -77,7 +71,7 @@ namespace hpx { namespace components { namespace server
         }
 
         // delete the local instances
-        Component::destroy(reinterpret_cast<Component*>(addr.address_), count);
+        Component::destroy(reinterpret_cast<Component*>(addr.address_));
     }
 
 }}}

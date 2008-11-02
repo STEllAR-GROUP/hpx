@@ -50,6 +50,12 @@ namespace hpx { namespace components
         {
             return this->base_type::create_components(self, gid_, type, count);
         }
+
+        ///
+        void free_components(result_type const& gids) 
+        {
+            this->base_type::free_components(gid_, gids);
+        }
     };
 
 }}

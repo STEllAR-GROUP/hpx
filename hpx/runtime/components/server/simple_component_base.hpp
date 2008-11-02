@@ -90,7 +90,7 @@ namespace hpx { namespace components
 
         /// \brief  The function \a destroy is used for destruction and 
         ///         de-allocation of instances of the derived components.
-        static void destroy(Component* p, std::size_t count)
+        static void destroy(Component* p, std::size_t count = 1)
         {
             // simple components can be deleted individually only
             BOOST_ASSERT(1 == count);

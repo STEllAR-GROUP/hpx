@@ -27,7 +27,8 @@ namespace hpx { namespace components { namespace server
         // object 
         enum actions
         {
-            factory_create_component = 0,  // create new components
+            factory_create_components = 0,  // create new components
+            factory_free_components = 1,    // free existing components
         };
 
         // constructor
@@ -43,13 +44,16 @@ namespace hpx { namespace components { namespace server
             {}
 
             locality_result(naming::id_type const& prefix, 
-                    naming::id_type const& first_gid, std::size_t count)
-              : prefix_(prefix), first_gid_(first_gid), count_(count)
+                    naming::id_type const& first_gid, std::size_t count,
+                    components::component_type type)
+              : prefix_(prefix), first_gid_(first_gid), count_(count), 
+                type_(type)
             {}
 
             naming::id_type prefix_;    ///< prefix of the locality 
             naming::id_type first_gid_; ///< gid of the first created component
             std::size_t count_;         ///< number of created components
+            components::component_type type_; ///< type of created components
 
         private:
             // serialization support
@@ -70,15 +74,25 @@ namespace hpx { namespace components { namespace server
             result_type* gids, components::component_type type, 
             std::size_t count); 
 
+        /// \brief Action to delete existing components
+        threads::thread_state free_components(
+            threads::thread_self& self, applier::applier& app,
+            result_type const& gids); 
+
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::result_action2<
-            distributing_factory, result_type, factory_create_component, 
+            distributing_factory, result_type, factory_create_components, 
             components::component_type, std::size_t, 
             &distributing_factory::create_components
         > create_components_action;
+
+        typedef hpx::actions::action1<
+            distributing_factory, factory_free_components, 
+            result_type const&, &distributing_factory::free_components
+        > free_components_action;
     };
 
 }}}

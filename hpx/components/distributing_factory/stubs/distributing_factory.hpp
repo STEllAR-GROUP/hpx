@@ -14,8 +14,8 @@
 namespace hpx { namespace components { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////
-    // The \a runtime_support class is the client side representation of a 
-    // \a server#runtime_support component
+    // The \a stubs#distributing_factory class is the client side 
+    // representation of a \a server#distributing_factory component
     class distributing_factory
       : public stub_base<server::distributing_factory>
     {
@@ -24,7 +24,7 @@ namespace hpx { namespace components { namespace stubs
 
     public:
         /// Create a client side representation for any existing 
-        /// \a server#runtime_support instance
+        /// \a server#distributing_factory instance
         distributing_factory(applier::applier& app) 
           : base_type(app)
         {}
@@ -77,6 +77,23 @@ namespace hpx { namespace components { namespace stubs
             std::size_t count = 1) 
         {
             return create_components(self, appl_, targetgid, type, count);
+        }
+
+        /// Free components 
+        static void free_components(applier::applier& appl, 
+            naming::id_type const& factory, result_type const& gids) 
+        {
+            typedef 
+                server::distributing_factory::free_components_action 
+            action_type;
+            appl.apply<action_type>(factory, gids);
+        }
+
+        ///
+        void free_components(naming::id_type const& factory, 
+            result_type const& gids) 
+        {
+            free_components(appl_, factory, gids);
         }
     };
 

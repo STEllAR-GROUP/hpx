@@ -98,8 +98,7 @@ namespace hpx { namespace components { namespace server
     // delete an existing instance of a component
     threads::thread_state runtime_support::free_component(
         threads::thread_self& self, applier::applier& appl,
-        components::component_type type, naming::id_type const& gid,
-        std::size_t count)
+        components::component_type type, naming::id_type const& gid)
     {
     // locate the factory for the requested component type
         component_map_type::const_iterator it = components_.find(type);
@@ -114,9 +113,9 @@ namespace hpx { namespace components { namespace server
         }
 
     // destroy the component instance
-        (*it).second->destroy(appl, gid, count);
+        (*it).second->destroy(appl, gid);
 
-        LRT_(info) << "successfully destroyed " << count << " component(s) of " 
+        LRT_(info) << "successfully destroyed 1 component of " 
                    << "type: " << components::get_component_type_name(type);
         return threads::terminated;
     }

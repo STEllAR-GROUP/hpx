@@ -98,8 +98,7 @@ namespace hpx { namespace components { namespace server
         /// \brief Action to delete existing components
         threads::thread_state free_component(
             threads::thread_self& self, applier::applier& app,
-            components::component_type type, naming::id_type const& gid,
-            std::size_t count); 
+            components::component_type type, naming::id_type const& gid); 
 
         /// \brief Action shut down this runtime system instance
         threads::thread_state shutdown(
@@ -125,9 +124,9 @@ namespace hpx { namespace components { namespace server
             &runtime_support::create_component
         > create_component_action;
 
-        typedef hpx::actions::action3<
+        typedef hpx::actions::action2<
             runtime_support, runtime_support_free_component, 
-            components::component_type, naming::id_type const&, std::size_t, 
+            components::component_type, naming::id_type const&, 
             &runtime_support::free_component
         > free_component_action;
 

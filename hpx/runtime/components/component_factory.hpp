@@ -125,13 +125,9 @@ namespace hpx { namespace components
         ///                     the component instances.
         /// \param gid          [in] The gid of the first component instance to 
         ///                     destroy. 
-        /// \param count        [in] The number of component instances to 
-        ///                     create. The value of this parameter should not 
-        ///                     be zero.
-        void destroy(applier::applier& appl, naming::id_type const& gid, 
-            std::size_t count)
+        void destroy(applier::applier& appl, naming::id_type const& gid)
         {
-            server::destroy<Component>(appl, gid, count);
+            server::destroy<Component>(appl, gid);
         }
 
     protected:
