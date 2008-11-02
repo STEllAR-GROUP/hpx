@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/eager_future.hpp>
+#include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/components/distributing_factory/server/distributing_factory.hpp>
 
 namespace hpx { namespace components { namespace stubs
@@ -16,15 +17,16 @@ namespace hpx { namespace components { namespace stubs
     // The \a runtime_support class is the client side representation of a 
     // \a server#runtime_support component
     class distributing_factory
+      : public stub_base<server::distributing_factory>
     {
+    private:
+        typedef stub_base<server::distributing_factory> base_type;
+
     public:
         /// Create a client side representation for any existing 
         /// \a server#runtime_support instance
         distributing_factory(applier::applier& app) 
-          : app_(app)
-        {}
-
-        ~distributing_factory() 
+          : base_type(app)
         {}
 
         ///////////////////////////////////////////////////////////////////////
@@ -43,7 +45,7 @@ namespace hpx { namespace components { namespace stubs
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
-            typedef server::distributing_factory::create_component_action action_type;
+            typedef server::distributing_factory::create_components_action action_type;
             return lcos::eager_future<action_type, result_type>(appl, 
                 targetgid, type, count);
         }
@@ -66,7 +68,7 @@ namespace hpx { namespace components { namespace stubs
             naming::id_type const& targetgid, components::component_type type,
             std::size_t count = 1) 
         {
-            return create_components_async(app_, targetgid, type, count);
+            return create_components_async(appl_, targetgid, type, count);
         }
 
         /// 
@@ -74,11 +76,8 @@ namespace hpx { namespace components { namespace stubs
             naming::id_type const& targetgid, components::component_type type,
             std::size_t count = 1) 
         {
-            return create_components(self, app_, targetgid, type, count);
+            return create_components(self, appl_, targetgid, type, count);
         }
-
-    protected:
-        applier::applier& app_;
     };
 
 }}}

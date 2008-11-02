@@ -26,7 +26,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 {
     /// \class stencil_value stencil_value.hpp hpx/components/amr/server/stencil_value.hpp
     template <int N>
-    class stencil_value 
+    class HPX_COMPONENT_EXPORT stencil_value 
       : public components::detail::managed_component_base<stencil_value<N> >
     {
     protected:
@@ -58,6 +58,10 @@ namespace hpx { namespace components { namespace amr { namespace server
             stencil_value_connect_input_ports = 2,
             stencil_value_set_functional_component = 3,
         };
+
+        /// Main thread function looping through all timesteps
+        threads::thread_state  
+        main(threads::thread_self& self, applier::applier& appl);
 
         /// This is the main entry point of this component. Calling this 
         /// function (by applying the call_action) will trigger the repeated 
@@ -117,11 +121,13 @@ namespace hpx { namespace components { namespace amr { namespace server
     private:
         lcos::counting_semaphore sem_in_;
         lcos::counting_semaphore sem_out_;
+        lcos::counting_semaphore sem_result_;
 
         boost::scoped_ptr<in_adaptor_type> in_[N];    // adaptors used to gather input
         boost::scoped_ptr<out_adaptor_type> out_[N];  // adaptors used to provide result
 
         naming::id_type value_gid_;                   // reference to current value
+        naming::id_type backup_value_gid_;            // reference to previous value
         naming::id_type functional_gid_;              // reference to functional code
     };
 

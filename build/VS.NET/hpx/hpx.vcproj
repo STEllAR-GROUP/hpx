@@ -788,6 +788,10 @@
 					Name="Components"
 					>
 					<File
+						RelativePath="..\..\..\hpx\runtime\components\client_base.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\hpx\runtime\components\component_factory.hpp"
 						>
 					</File>
@@ -878,6 +882,10 @@
 							RelativePath="..\..\..\hpx\runtime\components\stubs\runtime_support.hpp"
 							>
 						</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\components\stubs\stub_base.hpp"
+							>
+						</File>
 					</Filter>
 				</Filter>
 			</Filter>
@@ -910,6 +918,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\hpx\lcos\future_value.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\lcos\future_wait.hpp"
 					>
 				</File>
 				<File

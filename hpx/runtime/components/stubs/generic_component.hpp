@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/server/generic_component.hpp>
+#include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/lcos/eager_future.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -64,7 +65,7 @@ namespace hpx { namespace components { namespace stubs
     ///////////////////////////////////////////////////////////////////////////
     template <typename ServerComponent, typename Action, typename Result, 
         typename Parameters>
-    class generic_component
+    class generic_component : public stub_base<ServerComponent>
     {
     protected:
         typedef Action action_type;
@@ -75,7 +76,7 @@ namespace hpx { namespace components { namespace stubs
         /// Create a client side representation for any existing 
         /// \a server#generic_component0 instance
         generic_component(applier::applier& app) 
-          : app_(app)
+          : stub_base<ServerComponent>(app)
         {}
 
         /// Invoke the action exposed by this generic component
@@ -91,44 +92,12 @@ namespace hpx { namespace components { namespace stubs
         result_type eval(threads::thread_self& self, 
             naming::id_type const& targetgid)
         {
-            return eval(self, app_, targetgid);
+            return eval(self, appl_, targetgid);
         }
 
         // bring in higher order eval functions
         #include <hpx/runtime/components/stubs/generic_component_eval.hpp>
 
-        /// Asynchronously create a new instance of an simple_accumulator
-        static lcos::future_value<naming::id_type>
-        create_async(applier::applier& appl, naming::id_type const& targetgid)
-        {
-            return stubs::runtime_support::create_component_async(
-                appl, targetgid, get_component_type<ServerComponent>());
-        }
-
-        /// Create a new instance of an simple_accumulator
-        static naming::id_type 
-        create(threads::thread_self& self, applier::applier& appl, 
-            naming::id_type const& targetgid)
-        {
-            return stubs::runtime_support::create_component(
-                self, appl, targetgid, get_component_type<ServerComponent>());
-        }
-
-        /// Delete an existing component
-        static void
-        free(applier::applier& appl, naming::id_type const& gid)
-        {
-            stubs::runtime_support::free_component(appl, 
-                get_component_type<ServerComponent>(), gid);
-        }
-
-        void free(naming::id_type const& gid)
-        {
-            free(app_, gid);
-        }
-
-    protected:
-        applier::applier& app_;
     };
 
 }}}

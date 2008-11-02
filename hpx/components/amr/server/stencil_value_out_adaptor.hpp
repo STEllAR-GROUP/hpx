@@ -18,7 +18,7 @@
 namespace hpx { namespace components { namespace amr { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
-    class stencil_value_out_adaptor
+    class HPX_COMPONENT_EXPORT stencil_value_out_adaptor
       : public components::detail::managed_component_base<
             stencil_value_out_adaptor
         >

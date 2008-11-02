@@ -18,7 +18,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     /// This component is responsible for the creation an the deletion of a
     /// appropriate number of stencil_value components, connecting them, and 
     /// generally controlling the flow of execution.
-    class functional_timestep
+    class HPX_COMPONENT_EXPORT functional_timestep
       : public simple_component_base<functional_timestep>
     {
     public:

@@ -3,7 +3,7 @@ HPX Installation QuickStart:
 
 Please make sure you have the following packages installed BEFORE 
 compiling HPX: 
-    1) CMake Ver. 2.6.0 URL: http://www.cmake.org
+    1) CMake Ver. 2.6.2 URL: http://www.cmake.org
     2) BOOST C++ Libraries Ver. 1.35.0 URL: http://www.boost.org
 
 Installation Instructions:
@@ -28,7 +28,7 @@ and the success of compilation & linking of HPX code.
 If you have difficulty in compiling the code, please email 
 the HPX developers at:
 
-   px_dev@cct.lsu.edu
+   gopx@cct.lsu.edu
 
 
 Known Issues
@@ -43,4 +43,4 @@ problem and a description on how install the module.
 
 
 For questions and/or Comments; email:
-   px_dev@cct.lsu.edu
+   gopx@cct.lsu.edu

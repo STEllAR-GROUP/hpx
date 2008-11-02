@@ -19,7 +19,7 @@
 namespace hpx { namespace components { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
-    class distributing_factory
+    class HPX_COMPONENT_EXPORT distributing_factory
       : public simple_component_base<distributing_factory>
     {
     public:

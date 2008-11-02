@@ -29,17 +29,6 @@ namespace hpx { namespace util { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    struct no_full_empty_action_type
-    {
-        full_empty operator()(full_empty state) const
-        {
-            return state;
-        }
-    };
-    no_full_empty_action_type const no_full_empty_action = 
-        no_full_empty_action_type();
-
-    ///////////////////////////////////////////////////////////////////////////
     class full_empty_entry
     {
     private:
@@ -94,21 +83,21 @@ namespace hpx { namespace util { namespace detail
         }
 
         // sets this entry to empty
-        template <typename Lock, typename Action>
-        bool set_empty(Lock& outer_lock, Action const& f) 
+        template <typename Lock>
+        bool set_empty(Lock& outer_lock) 
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
-            return set_empty_locked(f);
+            return set_empty_locked();
         }
 
         // sets this entry to full
-        template <typename Lock, typename Action>
-        bool set_full(Lock& outer_lock, Action const& f) 
+        template <typename Lock>
+        bool set_full(Lock& outer_lock) 
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
-            return set_full_locked(f);
+            return set_full_locked();
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -155,9 +144,9 @@ namespace hpx { namespace util { namespace detail
 
         ///////////////////////////////////////////////////////////////////////
         // enqueue a get operation in full/empty queue if entry is empty
-        template <typename Lock, typename T, typename Action>
+        template <typename Lock, typename T>
         void enqueue_full_empty(Lock& outer_lock, 
-            threads::thread_self& self, T& dest, Action const& f)
+            threads::thread_self& self, T& dest)
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
@@ -182,14 +171,13 @@ namespace hpx { namespace util { namespace detail
                 // copy the data to the destination
                 if (entry_ && entry_ != &dest) 
                     dest = *static_cast<T const*>(entry_);
-                set_empty_locked(f);   // state_ = empty;
+                set_empty_locked();   // state_ = empty;
             }
         }
 
         // same as above, but for entries without associated data
-        template <typename Lock, typename Action>
-        void enqueue_full_empty(Lock& outer_lock, 
-            threads::thread_self& self, Action const& f)
+        template <typename Lock>
+        void enqueue_full_empty(Lock& outer_lock, threads::thread_self& self)
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
@@ -205,15 +193,15 @@ namespace hpx { namespace util { namespace detail
                 self.yield(threads::suspended);
             }
             else {
-                set_empty_locked(f);   // state_ = empty
+                set_empty_locked();   // state_ = empty
             }
         }
 
         ///////////////////////////////////////////////////////////////////////
         // enqueue if entry is full, otherwise fill it
-        template <typename Lock, typename T, typename Action>
+        template <typename Lock, typename T>
         void enqueue_if_full(Lock& outer_lock, 
-            threads::thread_self& self, T const& src, Action const& f)
+            threads::thread_self& self, T const& src)
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
@@ -233,13 +221,13 @@ namespace hpx { namespace util { namespace detail
                 *static_cast<T*>(entry_) = src;
 
             // make sure the entry is full
-            set_full_locked(f);    // state_ = full
+            set_full_locked();    // state_ = full
         }
 
         // same as above, but for entries without associated data
-        template <typename Lock, typename Action>
+        template <typename Lock>
         void enqueue_if_full(Lock& outer_lock, 
-            threads::thread_self& self, Action const& f)
+            threads::thread_self& self)
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
@@ -255,13 +243,13 @@ namespace hpx { namespace util { namespace detail
             }
 
             // make sure the entry is full
-            set_full_locked(f);    // state_ = full
+            set_full_locked();    // state_ = full
         }
 
         ///////////////////////////////////////////////////////////////////////
         // unconditionally set the data and set the entry to full
-        template <typename Lock, typename T, typename Action>
-        void set_and_fill(Lock& outer_lock, T const& src, Action const& f)
+        template <typename Lock, typename T>
+        void set_and_fill(Lock& outer_lock, T const& src)
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
@@ -271,18 +259,18 @@ namespace hpx { namespace util { namespace detail
                 *static_cast<T*>(entry_) = src;
 
             // make sure the entry is full
-            set_full_locked(f);    // state_ = full
+            set_full_locked();    // state_ = full
         }
 
         // same as above, but for entries without associated data
-        template <typename Lock, typename Action>
-        void set_and_fill(Lock& outer_lock, Action const& f)
+        template <typename Lock>
+        void set_and_fill(Lock& outer_lock)
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
 
             // make sure the entry is full
-            set_full_locked(f);    // state_ = full
+            set_full_locked();    // state_ = full
         }
 
         // returns whether this entry is still in use
@@ -293,30 +281,24 @@ namespace hpx { namespace util { namespace detail
         }
 
     protected:
-        template <typename Action>
-        bool set_empty_locked(Action const& f)
+        bool set_empty_locked()
         {
-            state_ = f(empty);
-            if (state_ != empty)
-                return !is_used_locked();  // callback routine prevented state change
+            state_ = empty;
 
             if (!write_queue_.empty()) {
                 full_empty_queue_entry& e (write_queue_.front());
                 write_queue_.pop_front();
                 threads::set_thread_state(e.id_, threads::pending);
-                set_full_locked(f);    // state_ = full
+                set_full_locked();    // state_ = full
             }
 
             // return whether this block needs to be removed
             return state_ == full && !is_used_locked();
         }
 
-        template <typename Action>
-        bool set_full_locked(Action const& f)
+        bool set_full_locked()
         {
-            state_ = f(full);
-            if (state_ != full)
-                return false;         // callback routine prevented state change
+            state_ = full;
 
             // handle all threads waiting for the block to become full
             while (!read_queue_.empty()) {
@@ -331,7 +313,7 @@ namespace hpx { namespace util { namespace detail
                 full_empty_queue_entry& e(read_and_empty_queue_.front());
                 read_and_empty_queue_.pop_front();
                 threads::set_thread_state(e.id_, threads::pending);
-                set_empty_locked(f);   // state_ = empty
+                set_empty_locked();   // state_ = empty
             }
 
             // return whether this block needs to be removed
@@ -400,22 +382,6 @@ namespace hpx { namespace util { namespace detail
         {}
 
         ///
-        template <typename Action>
-        void set_empty(Action const& f, void* entry)
-        {
-            boost::upgrade_lock<mutex_type> l(mtx_);
-            store_type::iterator it = store_.find(entry);
-            if (it == store_.end()) {
-                // create a new entry for this unknown (full) block 
-                it = create(l, entry);
-                (*it).second->set_empty(l, f);
-            }
-            else {
-                // set the entry to empty state if it's not newly created
-                if ((*it).second->set_empty(l, f)) 
-                    remove(entry);    // remove if no more threads are waiting
-            }
-        }
         void set_empty(void* entry)
         {
             boost::upgrade_lock<mutex_type> l(mtx_);
@@ -423,30 +389,22 @@ namespace hpx { namespace util { namespace detail
             if (it == store_.end()) {
                 // create a new entry for this unknown (full) block 
                 it = create(l, entry);
-                (*it).second->set_empty(l, no_full_empty_action);
+                (*it).second->set_empty(l);
             }
             else {
                 // set the entry to empty state if it's not newly created
-                if ((*it).second->set_empty(l, no_full_empty_action)) 
+                if ((*it).second->set_empty(l)) 
                     remove(entry);    // remove if no more threads are waiting
             }
         }
 
         ///
-        template <typename Action>
-        void set_full(Action const& f, void* entry)
-        {
-            boost::shared_lock<mutex_type> l(mtx_);
-            store_type::iterator it = store_.find(entry);
-            if (it != store_.end() && (*it).second->set_full(l, f)) 
-                remove(entry);    // remove if no more threads are waiting
-        }
         void set_full(void* entry)
         {
             boost::shared_lock<mutex_type> l(mtx_);
             store_type::iterator it = store_.find(entry);
             if (it != store_.end() && 
-                (*it).second->set_full(l, no_full_empty_action)) 
+                (*it).second->set_full(l)) 
             {
                 remove(entry);    // remove if no more threads are waiting
             }
@@ -526,101 +484,55 @@ namespace hpx { namespace util { namespace detail
 
         /// \brief Wait for memory to become full and then reads it, sets 
         /// memory to empty.
-        template <typename Action, typename T>
-        void read_and_empty(Action const& f, threads::thread_self& self, 
-            void* entry, T& dest)
-        {
-            boost::upgrade_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(l, entry);
-            (*it).second->enqueue_full_empty(l, self, dest, f);
-        }
         template <typename T>
         void read_and_empty(threads::thread_self& self, void* entry, 
             T& dest)
         {
             boost::upgrade_lock<mutex_type> l(mtx_);
             store_type::iterator it = find_or_create(l, entry);
-            (*it).second->enqueue_full_empty(l, self, dest, no_full_empty_action);
+            (*it).second->enqueue_full_empty(l, self, dest);
         }
 
-        template <typename Action>
-        void read_and_empty(Action const& f, threads::thread_self& self, 
-            void* entry)
-        {
-            boost::upgrade_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(l, entry);
-            (*it).second->enqueue_full_empty(l, self, f);
-        }
         void read_and_empty(threads::thread_self& self, void* entry)
         {
             boost::upgrade_lock<mutex_type> l(mtx_);
             store_type::iterator it = find_or_create(l, entry);
-            (*it).second->enqueue_full_empty(l, self, no_full_empty_action);
+            (*it).second->enqueue_full_empty(l, self);
         }
 
         /// \brief Writes memory and atomically sets its state to full without 
         /// waiting for it to become empty.
-        template <typename Action, typename T>
-        void set(Action const& f, void* entry, T const& src)
-        {
-            boost::upgrade_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(l, entry);
-            (*it).second->set_and_fill(l, src, f);
-        }
         template <typename T>
         void set(void* entry, T const& src)
         {
             boost::upgrade_lock<mutex_type> l(mtx_);
             store_type::iterator it = find_or_create(l, entry);
-            (*it).second->set_and_fill(l, src, no_full_empty_action);
+            (*it).second->set_and_fill(l, src);
         }
 
 
-        template <typename Action>
-        void set(Action const& f, void* entry)
-        {
-            boost::upgrade_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(l, entry);
-            (*it).second->set_and_fill(l, f);
-        }
         void set(void* entry)
         {
             boost::upgrade_lock<mutex_type> l(mtx_);
             store_type::iterator it = find_or_create(l, entry);
-            (*it).second->set_and_fill(l, no_full_empty_action);
+            (*it).second->set_and_fill(l);
         }
 
         /// \brief Wait for memory to become empty, and then fill it.
-        template <typename Action, typename T>
-        void write(threads::thread_self& self, Action const& f, 
-            void* entry, T const& src)
-        {
-            boost::upgrade_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(l, entry);
-            (*it).second->enqueue_if_full(l, self, src, f);
-        }
         template <typename T>
         void write(threads::thread_self& self, void* entry, 
             T const& src)
         {
             boost::upgrade_lock<mutex_type> l(mtx_);
             store_type::iterator it = find_or_create(l, entry);
-            (*it).second->enqueue_if_full(l, self, src, no_full_empty_action);
+            (*it).second->enqueue_if_full(l, self, src);
         }
 
-        template <typename Action>
-        void write(threads::thread_self& self, Action const& f, 
-            void* entry)
-        {
-            boost::upgrade_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(l, entry);
-            (*it).second->enqueue_if_full(l, self, f);
-        }
         void write(threads::thread_self& self, void* entry)
         {
             boost::upgrade_lock<mutex_type> l(mtx_);
             store_type::iterator it = find_or_create(l, entry);
-            (*it).second->enqueue_if_full(l, self, no_full_empty_action);
+            (*it).second->enqueue_if_full(l, self);
         }
 
     private:

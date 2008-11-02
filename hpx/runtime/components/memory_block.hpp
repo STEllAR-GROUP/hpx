@@ -9,32 +9,29 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/memory_block.hpp>
+#include <hpx/runtime/components/client_base.hpp>
 
+#include <boost/type_traits/remove_const.hpp>
+#include <boost/type_traits/is_const.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components 
 {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a runtime_support class is the client side representation of a 
     /// \a server#memory_block component
-    class memory_block : public stubs::memory_block
+    class memory_block : public client_base<memory_block, stubs::memory_block>
     {
     private:
-        typedef stubs::memory_block base_type;
+        typedef client_base<memory_block, stubs::memory_block> base_type;
 
     public:
         /// Create a client side representation for the existing
         /// \a server#memory_block instance with the given global id \a gid.
         memory_block(applier::applier& app, naming::id_type gid,
                 bool freeonexit = false) 
-          : base_type(app), gid_(gid), freeonexit_(freeonexit)
-        {
-            BOOST_ASSERT(gid_);
-        }
-
-        ~memory_block() 
-        {
-            if (freeonexit_)
-                this->base_type::free(gid_);
-        }
+          : base_type(app, gid, freeonexit)
+        {}
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
@@ -51,58 +48,67 @@ namespace hpx { namespace components
         {
             return this->base_type::get_async(gid_);
         }
-
-        /// Create a new instance of an memory_block on the locality as 
-        /// given by the parameter \a targetgid
-        static memory_block 
-        create(threads::thread_self& self, applier::applier& appl, 
-            naming::id_type const& targetgid, bool freeonexit = false)
-        {
-            return memory_block(appl, 
-                base_type::create(self, appl, targetgid), freeonexit);
-        }
-
-        void free()
-        {
-            base_type::free(gid_);
-            gid_ = naming::invalid_id;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        naming::id_type const& get_gid() const
-        {
-            return gid_;
-        }
-
-    private:
-        naming::id_type gid_;
-        bool freeonexit_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    class memory_data
+    class access_memory_block;
+
+    template <typename T>
+    class access_memory_block_proxy
+    {
+    private:
+        typedef typename boost::remove_const<T>::type target_type;
+        typedef typename 
+            boost::mpl::if_<
+                boost::is_const<T>, memory_block_data const&, memory_block_data&
+            >::type
+        wrapped_type;
+
+    public:
+        explicit access_memory_block_proxy(wrapped_type block)
+          : block_(block)
+        {}
+
+        access_memory_block_proxy& operator=(target_type const& rhs)
+        {
+            block_.set<target_type>(rhs);
+            return *this;
+        }
+
+        operator target_type const&() const
+        {
+            return block_.get<target_type>();
+        }
+
+    private:
+        wrapped_type block_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    class access_memory_block
     {
     public:
-        memory_data()
+        access_memory_block()
         {}
-        memory_data(memory_block_data const& mb)
+        access_memory_block(memory_block_data const& mb)
           : mb_(mb)
         {}
 
-        memory_data& operator=(memory_block_data const& mb)
+        access_memory_block& operator=(memory_block_data const& mb)
         {
             mb_ = mb;
             return *this;
         }
 
-        T& operator*()
+        access_memory_block_proxy<T> operator*()
         {
-            return *mb_.get<T>();
+            return access_memory_block_proxy<T>(mb_);
         }
-        T const& operator*() const
+        access_memory_block_proxy<T const> operator*() const
         {
-            return *mb_.get<T>();
+            return access_memory_block_proxy<T>(mb_);
         }
 
     private:

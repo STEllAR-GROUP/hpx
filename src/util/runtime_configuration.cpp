@@ -28,9 +28,11 @@ namespace hpx { namespace util
             "[hpx]",
             "location = $[system.prefix]",
             "ini_path = $[hpx.location]/share/hpx/ini",
-            "dgas_address = ${HPX_DGAS_SERVER_ADRESS:" 
+
+            "[hpx.dgas]",
+            "address = ${HPX_DGAS_SERVER_ADRESS:" 
                 HPX_NAME_RESOLVER_ADDRESS "}",
-            "dgas_port = ${HPX_DGAS_SERVER_PORT:" 
+            "port = ${HPX_DGAS_SERVER_PORT:" 
                 BOOST_PP_STRINGIZE(HPX_NAME_RESOLVER_PORT) "}",
 
             // create default ini entries for memory_block component hosted in 
@@ -81,24 +83,24 @@ namespace hpx { namespace util
         post_initialize_ini(*this);
     }
 
-    // DGAS configuration information has to be stored in the global HPX 
+    // DGAS configuration information has to be stored in the global hpx.dgas
     // configuration section:
     // 
-    //    [hpx]
-    //    dgas_address=<ip address>   # this defaults to HPX_NAME_RESOLVER_ADDRESS
-    //    dgas_port=<ip port>         # this defaults to HPX_NAME_RESOLVER_PORT
+    //    [hpx.dgas]
+    //    address=<ip address>   # this defaults to HPX_NAME_RESOLVER_ADDRESS
+    //    port=<ip port>         # this defaults to HPX_NAME_RESOLVER_PORT
     //
     naming::locality runtime_configuration::get_dgas_locality()
     {
         // load all components as described in the configuration information
-        if (has_section("hpx")) {
-            util::section* sec = get_section("hpx");
+        if (has_section("hpx.dgas")) {
+            util::section* sec = get_section("hpx.dgas");
             if (NULL != sec) {
                 std::string cfg_port(
-                    sec->get_entry("dgas_port", HPX_NAME_RESOLVER_PORT));
+                    sec->get_entry("port", HPX_NAME_RESOLVER_PORT));
 
                 return naming::locality(
-                    sec->get_entry("dgas_address", HPX_NAME_RESOLVER_ADDRESS),
+                    sec->get_entry("address", HPX_NAME_RESOLVER_ADDRESS),
                     boost::lexical_cast<boost::uint16_t>(cfg_port));
             }
         }
@@ -109,17 +111,17 @@ namespace hpx { namespace util
         std::string default_address, boost::uint16_t default_port)
     {
         // load all components as described in the configuration information
-        if (has_section("hpx")) {
-            util::section* sec = get_section("hpx");
+        if (has_section("hpx.dgas")) {
+            util::section* sec = get_section("hpx.dgas");
             if (NULL != sec) {
-                // read fall back values from cfg file, if needed
+                // read fall back values from configuration file, if needed
                 if (default_address.empty()) {
                     default_address = 
-                        sec->get_entry("dgas_address", HPX_NAME_RESOLVER_ADDRESS);
+                        sec->get_entry("address", HPX_NAME_RESOLVER_ADDRESS);
                 }
                 if (0 == default_port) {
                     default_port = boost::lexical_cast<boost::uint16_t>(
-                        sec->get_entry("dgas_port", HPX_NAME_RESOLVER_PORT));
+                        sec->get_entry("port", HPX_NAME_RESOLVER_PORT));
                 }
                 return naming::locality(default_address, default_port);
             }

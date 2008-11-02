@@ -4,8 +4,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# We require at least CMake V2.6
-cmake_minimum_required(VERSION 2.6)
+# We require at least CMake V2.6.2
+cmake_minimum_required(VERSION 2.6.2 FATAL_ERROR)
 
 # allow more human readable "if then else" constructs
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
@@ -122,12 +122,12 @@ if(MSVC)
     endif()
 endif()
 
-# additionally needed preprocessor definitions
-add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT)
-
 if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
 endif()
+
+# additionally needed preprocessor definitions
+add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT)
 
 # hpx_LIBRARIES lists all libraries a HPX module needs to be linked with by 
 # default, there may be more for individual modules, but this is the mandatory

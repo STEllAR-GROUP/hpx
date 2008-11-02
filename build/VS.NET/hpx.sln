@@ -183,6 +183,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simple_accumulator_client",
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HPX components", "HPX components", "{A983FC47-1DE5-4F0F-A330-30D683F4E0D8}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\hpx\components\CMakeLists.txt = ..\..\hpx\components\CMakeLists.txt
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "accumulator", "components\accumulator\accumulator.vcproj", "{973C51D3-F306-4C6F-B9B6-A8420A20A6F1}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -250,6 +253,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "amr_test", "components\amr_
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "amr_client", "amr_client\amr_client.vcproj", "{252C885C-DAE2-4DB2-9181-5B0DDE0CDDF6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0C02CB3A-4D1B-4C2F-943B-D289A29DB161} = {0C02CB3A-4D1B-4C2F-943B-D289A29DB161}
+		{86995A39-ECBE-4620-A98D-64E3FA7E0393} = {86995A39-ECBE-4620-A98D-64E3FA7E0393}
+		{46E027F2-3AFC-4F13-B8C8-35A8E8559CD5} = {46E027F2-3AFC-4F13-B8C8-35A8E8559CD5}
+		{E6C6C6C4-6959-4B47-B92A-6323A906CC40} = {E6C6C6C4-6959-4B47-B92A-6323A906CC40}
+		{163E7F8F-1A47-488F-AB83-21183A70B0BD} = {163E7F8F-1A47-488F-AB83-21183A70B0BD}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

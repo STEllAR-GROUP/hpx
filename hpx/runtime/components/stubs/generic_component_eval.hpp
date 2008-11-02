@@ -42,7 +42,7 @@
     void eval(threads::thread_self& self, naming::id_type const& targetgid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        eval(self, app_, targetgid, BOOST_PP_ENUM_PARAMS(N, arg));
+        eval(self, appl_, targetgid, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
 #undef N

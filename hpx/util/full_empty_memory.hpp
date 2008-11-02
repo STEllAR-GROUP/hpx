@@ -82,7 +82,14 @@ namespace hpx { namespace util
         /// \brief Create a new full/empty storage in empty state
         full_empty() 
         {
-            ::new (get_address()) T();    // properly initialize memory
+            ::new (get_address()) T();      // properly initialize memory
+            set_empty();
+        }
+
+        template <typename T0>
+        full_empty(T0 const& t0) 
+        {
+            ::new (get_address()) T(t0);    // properly initialize memory
             set_empty();
         }
 
@@ -130,7 +137,8 @@ namespace hpx { namespace util
         /// \note   When memory becomes full, all \a threads waiting for it
         ///         to become full with a read will receive the value at once 
         ///         and will be queued to run.
-        void read(threads::thread_self& self, value_type& dest)
+        template <typename Target>
+        void read(threads::thread_self& self, Target& dest)
         {
             get_store().read(self, get_address(), dest);
         }
@@ -143,7 +151,8 @@ namespace hpx { namespace util
         /// \note   When memory becomes empty, only one thread blocked like this 
         ///         will be queued to run (one thread waiting in a \a write 
         ///         function).
-        void read_and_empty(threads::thread_self& self, value_type& dest) 
+        template <typename Target>
+        void read_and_empty(threads::thread_self& self, Target& dest) 
         {
             get_store().read_and_empty(self, get_address(), dest);
         }
@@ -154,7 +163,8 @@ namespace hpx { namespace util
         /// \note   Even if the function itself doesn't block, setting the 
         ///         location to full using \a set might re-activate threads 
         ///         waiting on this in a \a read or \a read_and_empty function.
-        void set(value_type const& data)
+        template <typename Target>
+        void set(Target const& data)
         {
             get_store().set(get_address(), data);
         }
@@ -165,7 +175,8 @@ namespace hpx { namespace util
         ///
         /// \note   When memory becomes empty only one thread blocked like this 
         ///         will be queued to run.
-        void write(threads::thread_self& self, value_type const& data)
+        template <typename Target>
+        void write(threads::thread_self& self, Target const& data)
         {
             get_store().write(self, get_address(), data);
         }

@@ -7,6 +7,7 @@
 #define HPX_COMPONENTS_SIMPLE_ACCUMULATOR_JUL_18_2008_1123AM
 
 #include <hpx/runtime/runtime.hpp>
+#include <hpx/runtime/components/client_base.hpp>
 #include <hpx/components/simple_accumulator/stubs/simple_accumulator.hpp>
 
 namespace hpx { namespace components 
@@ -14,34 +15,23 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     /// The \a simple_accumulator class is the client side representation of a 
     /// specific \a server#simple_accumulator component
-    class simple_accumulator : public stubs::simple_accumulator
+    class simple_accumulator 
+      : public client_base<simple_accumulator, stubs::simple_accumulator>
     {
-        typedef stubs::simple_accumulator base_type;
-        
+        typedef 
+            client_base<simple_accumulator, stubs::simple_accumulator> 
+        base_type;
+
     public:
         /// Create a client side representation for the existing
         /// \a server#simple_accumulator instance with the given global id \a gid.
-        simple_accumulator(applier::applier& appl, naming::id_type gid) 
-          : base_type(appl), gid_(gid)
+        simple_accumulator(applier::applier& appl, naming::id_type gid,
+                bool freeonexit = false) 
+          : base_type(appl, gid, freeonexit)
         {}
 
         ~simple_accumulator() 
         {}
-
-        /// Create a new instance of an simple_accumulator on the locality as given by
-        /// the parameter \a targetgid
-        static simple_accumulator 
-        create(threads::thread_self& self, applier::applier& appl, 
-            naming::id_type const& targetgid)
-        {
-            return simple_accumulator(appl, base_type::create(self, appl, targetgid));
-        }
-
-        void free()
-        {
-            stubs::simple_accumulator::free(app_, gid_);
-            gid_ = naming::invalid_id;
-        }
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
@@ -79,9 +69,6 @@ namespace hpx { namespace components
         {
             return this->base_type::query_async(gid_);
         }
-
-    private:
-        naming::id_type gid_;
     };
     
 }}

@@ -11,7 +11,6 @@
 
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
@@ -60,32 +59,6 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        // we provide our own make_shared for threads because the 
-        // boost::make_shared allows to use only const references.
-        boost::shared_ptr<threads::thread> 
-        make_shared(boost::function<thread_function_type> threadfunc, 
-            threadmanager& tm, thread_state new_state, char const* const desc)
-        {
-            boost::shared_ptr<threads::thread> pt(
-                static_cast<threads::thread*>(0), 
-                boost::detail::sp_ms_deleter<threads::thread>());
-
-            boost::detail::sp_ms_deleter<threads::thread>* pd = 
-                boost::get_deleter<boost::detail::sp_ms_deleter<threads::thread> >(pt);
-
-            void* pv = pd->address();
-
-            new(pv) threads::thread(threadfunc, tm, new_state, desc);
-            pd->set_initialized();
-
-            return boost::shared_ptr<threads::thread>(pt, 
-                static_cast<threads::thread*>(pv));
-        }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     thread_id_type threadmanager::register_work(
         boost::function<thread_function_type> threadfunc, 
         char const* const description, thread_state initial_state, bool run_now)
@@ -112,7 +85,7 @@ namespace hpx { namespace threads
 
         // create the new thread
         boost::shared_ptr<threads::thread> thrd (
-            detail::make_shared(threadfunc, *this, initial_state, description));
+            new threads::thread(threadfunc, *this, initial_state, description));
 
         // lock data members while adding work
         mutex_type::scoped_lock lk(mtx_);
@@ -287,7 +260,8 @@ namespace hpx { namespace threads
                 thread_id_type, thread_state)
             = &threadmanager::at_timer<time_type>;
 
-        return register_work(boost::bind(f, this, _1, expire_at, id, newstate));
+        return register_work(boost::bind(f, this, _1, expire_at, id, newstate),
+            "at_timer (expire at)");
     }
 
     /// Set a timer to set the state of the given \a thread to the given
@@ -302,7 +276,8 @@ namespace hpx { namespace threads
                 thread_id_type, thread_state)
             = &threadmanager::at_timer<duration_type>;
 
-        return register_work(boost::bind(f, this, _1, from_now, id, newstate));
+        return register_work(boost::bind(f, this, _1, from_now, id, newstate),
+            "at_timer (from now)");
     }
 
     /// Retrieve the global id of the given thread
@@ -407,23 +382,23 @@ namespace hpx { namespace threads
         }
         return false;
     }
-    inline bool set_affinity(unsigned int affinity)
+    inline bool set_affinity(std::size_t affinity)
     {
         return true;
     }
 #else
     #include <sched.h>    // declares the scheduling interface
 
-    inline bool set_affinity(boost::thread& thrd, unsigned int affinity)
+    inline bool set_affinity(boost::thread& thrd, std::size_t affinity)
     {
         return true;
     }
-    bool set_affinity(unsigned int num_thread)
+    bool set_affinity(std::size_t num_thread)
     {
-        unsigned int num_of_cores = boost::thread::hardware_concurrency();
+        std::size_t num_of_cores = boost::thread::hardware_concurrency();
         if (0 == num_of_cores)
             num_of_cores = 1;     // assume one core
-        unsigned int affinity = num_thread % num_of_cores;
+        std::size_t affinity = num_thread % num_of_cores;
 
         cpu_set_t cpu;
         CPU_ZERO(&cpu);
@@ -568,6 +543,7 @@ namespace hpx { namespace threads
                     // Before exiting each of the OS threads deletes the 
                     // remaining terminated PX threads 
                     if (cleanup(terminated_items_, thread_map_)) {
+                        // we don't have any registered work items anymore
                         cond_.notify_all();   // notify possibly waiting threads
                         break;                // terminate scheduling loop
                     }

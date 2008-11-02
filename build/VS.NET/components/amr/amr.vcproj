@@ -223,18 +223,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\..\hpx\components\amr\server\functional_component_1.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\..\hpx\components\amr\server\functional_component_3.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\..\hpx\components\amr\server\functional_component_5.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\..\hpx\components\amr\server\functional_timestep.hpp"
 					>
 				</File>

@@ -20,7 +20,7 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/lockfree/fifo.hpp>
 #if defined(HPX_DEBUG)
-#include <boost/detail/atomic_count.hpp>
+#include <boost/lockfree/atomic_int.hpp>
 #endif
 
 #include <hpx/hpx_fwd.hpp>
@@ -249,7 +249,7 @@ namespace hpx { namespace threads
         boost::function<void()> stop_;  ///< function to call in case of error
 
 #if HPX_DEBUG != 0
-        boost::detail::atomic_count thread_count_;
+        boost::lockfree::atomic_int<long> thread_count_;
 #endif
     };
 

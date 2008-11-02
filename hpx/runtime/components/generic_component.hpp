@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/stubs/generic_component.hpp>
+#include <hpx/runtime/components/client_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components 
@@ -15,10 +16,16 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     template <typename ServerComponent>
     class generic_component 
-      : public stubs::generic_component<ServerComponent>
+      : public client_base<
+            generic_component<ServerComponent>, 
+            stubs::generic_component<ServerComponent>
+        >
     {
     private:
-        typedef stubs::generic_component<ServerComponent> base_type;
+        typedef client_base<
+            generic_component<ServerComponent>, 
+            stubs::generic_component<ServerComponent>
+        > base_type;
         typedef typename base_type::result_type result_type;
 
     public:
@@ -27,14 +34,8 @@ namespace hpx { namespace components
         /// \a gid.
         generic_component(applier::applier& app, naming::id_type const& gid,
                 bool freeonexit = false) 
-          : base_type(app), gid_(gid), freeonexit_(freeonexit)
+          : base_type(app, gid, freeonexit)
         {
-            BOOST_ASSERT(gid_);
-        }
-        ~generic_component()
-        {
-            if (freeonexit_)
-                this->base_type::free(gid_);
         }
 
         /// Invoke the action exposed by this generic component
@@ -46,31 +47,6 @@ namespace hpx { namespace components
         // bring in higher order eval functions
         #include <hpx/runtime/components/generic_component_eval.hpp>
 
-        /// Create a new instance of an generic_component on the locality as 
-        /// given by the parameter \a targetgid
-        static generic_component 
-        create(threads::thread_self& self, applier::applier& appl, 
-            naming::id_type const& targetgid, bool freeonexit = false)
-        {
-            return generic_component(appl, 
-                base_type::create(self, appl, targetgid), freeonexit);
-        }
-
-        void free()
-        {
-            base_type::free(gid_);
-            gid_ = naming::invalid_id;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        naming::id_type const& get_gid() const
-        {
-            return gid_;
-        }
-
-    private:
-        naming::id_type gid_;
-        bool freeonexit_;
     };
 
 }}

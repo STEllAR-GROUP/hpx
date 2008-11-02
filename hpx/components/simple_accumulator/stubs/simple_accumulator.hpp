@@ -9,6 +9,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
+#include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/lcos/eager_future.hpp>
 
 #include <hpx/components/simple_accumulator/server/simple_accumulator.hpp>
@@ -18,50 +19,15 @@ namespace hpx { namespace components { namespace stubs
     ///////////////////////////////////////////////////////////////////////////
     /// The \a stubs#simple_accumulator class is the client side representation 
     /// of all \a server#simple_accumulator components
-    class simple_accumulator
+    class simple_accumulator 
+      : public stub_base<server::simple_accumulator>
     {
     public:
         /// Create a client side representation for any existing
         /// \a server#simple_accumulator instance.
         simple_accumulator(applier::applier& appl) 
-          : app_(appl)
+          : stub_base<server::simple_accumulator>(appl)
         {}
-
-        ~simple_accumulator() 
-        {}
-
-        /// Asynchronously create a new instance of an simple_accumulator
-        static lcos::future_value<naming::id_type>
-        create_async(applier::applier& appl, naming::id_type const& targetgid)
-        {
-            return stubs::runtime_support::create_component_async(
-                appl, targetgid, 
-                components::get_component_type<server::simple_accumulator>());
-        }
-
-        /// Create a new instance of an simple_accumulator
-        static naming::id_type 
-        create(threads::thread_self& self, applier::applier& appl, 
-            naming::id_type const& targetgid)
-        {
-            return stubs::runtime_support::create_component(
-                self, appl, targetgid, 
-                components::get_component_type<server::simple_accumulator>());
-        }
-
-        /// Delete an existing component
-        static void
-        free(applier::applier& appl, naming::id_type const& gid)
-        {
-            stubs::runtime_support::free_component(appl, 
-                components::get_component_type<server::simple_accumulator>(), 
-                gid);
-        }
-
-        void free(naming::id_type const& gid)
-        {
-            free(app_, gid);
-        }
 
         /// Query the current value of the server#simple_accumulator instance 
         /// with the given \a gid. This is a non-blocking call. The caller 
@@ -95,21 +61,21 @@ namespace hpx { namespace components { namespace stubs
         /// with the given \a gid
         void init(naming::id_type gid) 
         {
-            app_.apply<server::simple_accumulator::init_action>(gid);
+            appl_.apply<server::simple_accumulator::init_action>(gid);
         }
 
         /// Add the given number to the server#simple_accumulator instance 
         /// with the given \a gid
         void add (naming::id_type gid, double arg) 
         {
-            app_.apply<server::simple_accumulator::add_action>(gid, arg);
+            appl_.apply<server::simple_accumulator::add_action>(gid, arg);
         }
 
         /// Print the current value of the server#simple_accumulator instance 
         /// with the given \a gid
         void print(naming::id_type gid) 
         {
-            app_.apply<server::simple_accumulator::print_action>(gid);
+            appl_.apply<server::simple_accumulator::print_action>(gid);
         }
 
         /// Query the current value of the server#simple_accumulator instance 
@@ -119,7 +85,7 @@ namespace hpx { namespace components { namespace stubs
         /// simple_accumulator.
         lcos::future_value<double> query_async(naming::id_type gid) 
         {
-            return query_async(app_, gid);
+            return query_async(appl_, gid);
         }
 
         /// Query the current value of the server#simple_accumulator instance 
@@ -127,11 +93,8 @@ namespace hpx { namespace components { namespace stubs
         /// value to be returned.
         double query(threads::thread_self& self,naming::id_type gid) 
         {
-            return query(self, app_, gid);
+            return query(self, appl_, gid);
         }
-
-    protected:
-        applier::applier& app_;
     };
 
 }}}

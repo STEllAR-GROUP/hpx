@@ -18,7 +18,7 @@
 HPX_REGISTER_COMPONENT_MODULE();
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::amr::server::functional_component<3> stencil_type;
+typedef hpx::components::amr::stencil stencil_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// The following construct registers a minimal factory needed for the creation
@@ -33,8 +33,8 @@ typedef hpx::components::amr::server::functional_component<3> stencil_type;
 ///
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(stencil_type, stencil);
 
-HPX_REGISTER_ACTION(stencil_type::eval_action);
-HPX_REGISTER_ACTION(stencil_type::is_last_timestep_action);
+// HPX_REGISTER_ACTION(stencil_type::eval_action);
+// HPX_REGISTER_ACTION(stencil_type::init_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(stencil_type);
 
 

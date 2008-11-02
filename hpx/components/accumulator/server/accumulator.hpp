@@ -29,7 +29,8 @@ namespace hpx { namespace components { namespace server
     /// Note that the implementation of the accumulator does not require any 
     /// special data members or virtual functions.
     ///
-    class accumulator : public detail::managed_component_base<accumulator> 
+    class accumulator 
+      : public components::detail::managed_component_base<accumulator> 
     {
     public:
         // parcel action code: the action to be performed on the destination 

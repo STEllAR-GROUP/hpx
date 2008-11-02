@@ -246,8 +246,8 @@ namespace hpx
         namespace server
         {
             class HPX_EXPORT runtime_support;
-            class memory;
-            class memory_block;
+            class HPX_EXPORT memory;
+            class HPX_EXPORT memory_block;
         }
     }
 

@@ -240,13 +240,13 @@ bool section::has_section (std::string const& sec_name) const
     std::string::size_type i = sec_name.find(".");
     if (i != std::string::npos)
     {
-        std::string cor_sec_name = sec_name.substr (0,  i);
-        std::string sub_sec_name = sec_name.substr (1 + i);
+        std::string cor_sec_name = sec_name.substr (0, i);
 
         section_map::const_iterator it = sections_.find(cor_sec_name);
         if (it != sections_.end())
         {
-            return (*it).second.has_section (sub_sec_name);
+            std::string sub_sec_name = sec_name.substr(i+1);
+            return (*it).second.has_section(sub_sec_name);
         }
         return false;
     }
@@ -258,7 +258,7 @@ section* section::get_section (std::string const& sec_name)
     std::string::size_type i  = sec_name.find (".");
     if (i != std::string::npos)
     {
-        std::string cor_sec_name = sec_name.substr (0,  i);
+        std::string cor_sec_name = sec_name.substr (0, i);
         section_map::iterator it = sections_.find(cor_sec_name);
         if (it != sections_.end())
         {

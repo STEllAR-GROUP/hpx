@@ -4,8 +4,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set (distributing_factorylib_HEADERS
-#    distributing_factory.hpp
-#    stubs/distributing_factory.hpp
+    distributing_factory.hpp
+    stubs/distributing_factory.hpp
     server/distributing_factory.hpp)
 
 set (distributing_factorylib_SOURCES
