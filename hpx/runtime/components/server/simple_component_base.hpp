@@ -79,7 +79,7 @@ namespace hpx { namespace components
         }
 
         /// \brief  The function \a create is used for allocation and 
-        //          initialization of components.
+        ///         initialization of instances of the derived components.
         static simple_component_base* 
         create(applier::applier& appl, std::size_t count)
         {
@@ -88,11 +88,25 @@ namespace hpx { namespace components
             return new Component(appl);
         }
 
+        /// \brief  The function \a destroy is used for destruction and 
+        ///         de-allocation of instances of the derived components.
         static void destroy(Component* p, std::size_t count)
         {
             // simple components can be deleted individually only
             BOOST_ASSERT(1 == count);
             delete p;
+        }
+
+        /// \brief  The function \a has_multi_instance_factory is used to 
+        ///         determine, whether instances of the derived component can 
+        ///         be created in blocks (i.e. more than one instance at once). 
+        ///         This function is used by the \a distributing_factory to 
+        ///         determine a correct allocation strategy
+        static bool has_multi_instance_factory()
+        {
+            // components derived from this template have to be allocated one
+            // at a time
+            return false;
         }
 
     private:

@@ -24,6 +24,9 @@ namespace hpx { namespace components { namespace amr
         typedef amr::server::functional_component base_type;
 
     public:
+        typedef stencil wrapped_type;
+        typedef stencil wrapping_type;
+
         stencil(applier::applier& appl)
           : base_type(appl)
         {}

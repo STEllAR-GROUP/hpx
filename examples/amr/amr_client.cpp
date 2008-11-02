@@ -22,16 +22,31 @@ using namespace std;
 threads::thread_state 
 hpx_main(threads::thread_self& self, applier::applier& appl)
 {
-    // create a distributing factory
-    components::distributing_factory dist_factory(
-        components::distributing_factory::create(self, appl, appl.get_prefix(), true));
+    {
+        // create a distributing factory
+        components::distributing_factory dist_factory(
+            components::distributing_factory::create(self, appl, 
+                appl.get_runtime_support_gid(), true));
 
-    // create a stencil component
-    typedef components::distributing_factory::result_type result_type;
+        // create a couple of stencil component
+        typedef components::distributing_factory::result_type result_type;
 
-    result_type stencils = dist_factory.create_components(self, 
-        components::get_component_type<components::amr::stencil>());
+        components::component_type stencil_type = 
+            components::get_component_type<components::amr::stencil>();
+        result_type stencils = dist_factory.create_components(self, stencil_type, 3);
 
+
+
+        // free all stencil components
+        result_type::iterator end = stencils.end();
+        for (result_type::iterator it = stencils.begin(); it != end; ++it) {
+            for (std::size_t i = 0; i < (*it).count_; ++i) {
+                components::stubs::runtime_support::free_component(appl, 
+                    stencil_type, (*it).first_gid_ + i);
+            }
+        }
+
+    }   // distributing_factory needs to go out of scope before shutdown
 
     // initiate shutdown of the runtime systems on all localities
     components::stubs::runtime_support::shutdown_all(appl);

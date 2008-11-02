@@ -60,6 +60,13 @@ namespace hpx { namespace components
         ///         error.
         virtual std::string get_component_name() const = 0;
 
+        /// \brief  The function \a has_multi_instance_factory is used to 
+        ///         determine, whether instances of the derived component can 
+        ///         be created in blocks (i.e. more than one instance at once). 
+        ///         This function is used by the \a distributing_factory to 
+        ///         determine a correct allocation strategy
+        virtual bool has_multi_instance_factory() const = 0;
+
         /// \brief Create one or more new component instances.
         ///
         /// \param appl         [in] The applier instance to be used to create

@@ -29,6 +29,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the runtime_support actions
+HPX_REGISTER_ACTION(hpx::components::server::runtime_support::has_multi_instance_factory_action);
 HPX_REGISTER_ACTION(hpx::components::server::runtime_support::create_component_action);
 HPX_REGISTER_ACTION(hpx::components::server::runtime_support::free_component_action);
 HPX_REGISTER_ACTION(hpx::components::server::runtime_support::shutdown_action);
@@ -40,13 +41,13 @@ HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::runtime_support);
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
-    // create a new instance of a component
-    threads::thread_state runtime_support::create_component(
-        threads::thread_self& self, applier::applier& appl,
-        naming::id_type* gid, components::component_type type,
-        std::size_t count)
+    // return, whether more than one instance of the given component can be 
+    // created at the same time
+    threads::thread_state runtime_support::has_multi_instance_factory(
+        threads::thread_self& self, applier::applier& app,
+        bool* has_multi_instance_factory, components::component_type type)
     {
-    // create new component instance
+    // locate the factory for the requested component type
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
             // we don't know anything about this component
@@ -57,6 +58,32 @@ namespace hpx { namespace components { namespace server
                 HPX_OSSTREAM_GETSTRING(strm));
             return threads::terminated;
         }
+
+    // ask for the factory's capabilities
+        *has_multi_instance_factory = 
+            (*it).second->has_multi_instance_factory();
+        return threads::terminated;
+    }
+
+    // create a new instance of a component
+    threads::thread_state runtime_support::create_component(
+        threads::thread_self& self, applier::applier& appl,
+        naming::id_type* gid, components::component_type type,
+        std::size_t count)
+    {
+    // locate the factory for the requested component type
+        component_map_type::const_iterator it = components_.find(type);
+        if (it == components_.end()) {
+            // we don't know anything about this component
+            HPX_OSSTREAM strm;
+            strm << "attempt to create component instance of invalid type: "
+                 << components::get_component_type_name(type);
+            HPX_THROW_EXCEPTION(hpx::bad_component_type, 
+                HPX_OSSTREAM_GETSTRING(strm));
+            return threads::terminated;
+        }
+
+    // create new component instance
         naming::id_type id = (*it).second->create(appl, count);
 
     // set result if requested
@@ -74,6 +101,7 @@ namespace hpx { namespace components { namespace server
         components::component_type type, naming::id_type const& gid,
         std::size_t count)
     {
+    // locate the factory for the requested component type
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
             // we don't know anything about this component
@@ -85,6 +113,7 @@ namespace hpx { namespace components { namespace server
             return threads::terminated;
         }
 
+    // destroy the component instance
         (*it).second->destroy(appl, gid, count);
 
         LRT_(info) << "successfully destroyed " << count << " component(s) of " 
@@ -92,7 +121,7 @@ namespace hpx { namespace components { namespace server
         return threads::terminated;
     }
 
-    /// \brief Action shut down this runtime system instance
+    // Action: shut down this runtime system instance
     threads::thread_state runtime_support::shutdown(
         threads::thread_self& self, applier::applier& app)
     {

@@ -23,7 +23,7 @@ namespace hpx { namespace components { namespace stubs
         /// Create a client side representation for any existing 
         /// \a server#runtime_support instance
         runtime_support(applier::applier& app) 
-          : app_(app)
+          : appl_(app)
         {}
 
         ~runtime_support() 
@@ -31,6 +31,46 @@ namespace hpx { namespace components { namespace stubs
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
+
+        /// \brief  The function \a has_multi_instance_factory is used to 
+        ///         determine, whether instances of the derived component can 
+        ///         be created in blocks (i.e. more than one instance at once). 
+        ///         This function is used by the \a distributing_factory to 
+        ///         determine a correct allocation strategy
+        static lcos::future_value<bool> has_multi_instance_factory_async(
+            applier::applier& appl, naming::id_type const& targetgid, 
+            components::component_type type) 
+        {
+            // Create an eager_future, execute the required action,
+            // we simply return the initialized future_value, the caller needs
+            // to call get() on the return value to obtain the result
+            typedef 
+                server::runtime_support::has_multi_instance_factory_action 
+            action_type;
+            return lcos::eager_future<action_type, bool>(appl, targetgid, type);
+        }
+
+        static bool has_multi_instance_factory(
+            threads::thread_self& self, applier::applier& appl, 
+            naming::id_type const& targetgid, components::component_type type) 
+        {
+            // The following get yields control while the action above 
+            // is executed and the result is returned to the eager_future
+            return has_multi_instance_factory_async(appl, targetgid, type)
+                .get(self);
+        }
+
+        lcos::future_value<bool> has_multi_instance_factory_async(
+            naming::id_type const& targetgid, components::component_type type) 
+        {
+            return has_multi_instance_factory_async(appl_, targetgid, type);
+        }
+
+        bool has_multi_instance_factory(threads::thread_self& self,
+            naming::id_type const& targetgid, components::component_type type) 
+        {
+            return has_multi_instance_factory(self, appl_, targetgid, type);
+        }
 
         /// Create a new component \a type using the runtime_support with the 
         /// given \a targetgid. This is a non-blocking call. The caller needs 
@@ -66,7 +106,7 @@ namespace hpx { namespace components { namespace stubs
             naming::id_type const& targetgid, components::component_type type,
             std::size_t count = 1) 
         {
-            return create_component_async(app_, targetgid, type, count);
+            return create_component_async(appl_, targetgid, type, count);
         }
 
         /// 
@@ -74,7 +114,7 @@ namespace hpx { namespace components { namespace stubs
             naming::id_type const& targetgid, components::component_type type,
             std::size_t count = 1) 
         {
-            return create_component(self, app_, targetgid, type, count);
+            return create_component(self, appl_, targetgid, type, count);
         }
 
         /// Destroy an existing component
@@ -106,7 +146,7 @@ namespace hpx { namespace components { namespace stubs
         void free_component(components::component_type type, 
             naming::id_type const& gid, std::size_t count = 1)
         {
-            free_component(app_, type, gid, count);
+            free_component(appl_, type, gid, count);
         }
 
         /// \brief Shutdown the given runtime system
@@ -118,7 +158,7 @@ namespace hpx { namespace components { namespace stubs
 
         void shutdown(naming::id_type const& targetgid)
         {
-            shutdown(app_, targetgid);
+            shutdown(appl_, targetgid);
         }
 
         /// \brief Shutdown the runtime systems of all localities
@@ -136,16 +176,16 @@ namespace hpx { namespace components { namespace stubs
 
         void shutdown_all(naming::id_type const& targetgid)
         {
-            shutdown_all(app_, targetgid);
+            shutdown_all(appl_, targetgid);
         }
 
         void shutdown_all()
         {
-            shutdown_all(app_);
+            shutdown_all(appl_);
         }
 
     protected:
-        applier::applier& app_;
+        applier::applier& appl_;
     };
 
 }}}

@@ -312,7 +312,11 @@ namespace hpx { namespace applier
             // lsb of the local objects is equal to their address
             if (gid.get_msb() == parcel_handler_.get_prefix().get_msb())
             {
-                addr.address_ = gid.get_lsb();
+                // a zero address references the local runtime support component
+                if (0 != gid.get_lsb())
+                    addr.address_ = gid.get_lsb();
+                else
+                    addr.address_ = runtime_support_id_.get_lsb();
                 return true;
             }
 

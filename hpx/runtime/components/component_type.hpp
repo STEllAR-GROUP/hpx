@@ -46,7 +46,7 @@ namespace hpx { namespace components
     namespace hpx { namespace components {                                    \
         template<> HPX_ALWAYS_EXPORT component_type                           \
         get_component_type<component>()                                       \
-        { return component::get_component_type(); }                           \
+            { return component::get_component_type(); }                       \
     }}                                                                        \
     /**/
 

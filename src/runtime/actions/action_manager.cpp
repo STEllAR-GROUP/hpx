@@ -28,7 +28,7 @@ namespace hpx { namespace actions
             naming::address::address_type lva = addr.address_;
 
             if (0 == lva) {
-            // a zero address references the local runtime support component
+                // a zero address references the local runtime support component
                 lva = applier_.get_runtime_support_gid().get_lsb();
             }
 

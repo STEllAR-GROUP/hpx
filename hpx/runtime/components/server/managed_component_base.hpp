@@ -263,6 +263,17 @@ namespace hpx { namespace components
             get_heap().free(p, count);
         }
 
+        /// \brief  The function \a has_multi_instance_factory is used to 
+        ///         determine, whether instances of the derived component can 
+        ///         be created in blocks (i.e. more than one instance at once). 
+        ///         This function is used by the \a distributing_factory to 
+        ///         determine a correct allocation strategy
+        static bool has_multi_instance_factory()
+        {
+            // components derived from this template can be allocated in blocks
+            return true;
+        }
+
     public:
         ///
         naming::id_type 

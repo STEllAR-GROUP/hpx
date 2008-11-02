@@ -55,15 +55,34 @@ namespace hpx { namespace components { namespace server
         for (std::vector<naming::id_type>::iterator it = prefixes.begin(); 
              it != end; ++it)
         {
-            std::size_t create = count_on_locality;
-            if (created_count + create > count)
-                create = count - created_count;
+            std::size_t numcreate = count_on_locality;
+            if (created_count + numcreate > count)
+                numcreate = count - created_count;
 
-            lcos::future_value<naming::id_type> f (
-                rts.create_component_async(*it, type, create));
-            v.push_back(future_values_type::value_type(*it, f, create));
+            // figure out, whether we can create more than one instance of the 
+            // component at once
+            bool has_multi_instance_factory = false;
+            if (1 != numcreate) {
+                has_multi_instance_factory = 
+                    rts.has_multi_instance_factory(self, *it, type);
+            }
 
-            created_count += create;
+            if (has_multi_instance_factory) {
+                // create all component instances at once
+                lcos::future_value<naming::id_type> f (
+                    rts.create_component_async(*it, type, numcreate));
+                v.push_back(future_values_type::value_type(*it, f, numcreate));
+            }
+            else {
+                // create one component at a time
+                for (std::size_t i = 0; i < numcreate; ++i) {
+                    lcos::future_value<naming::id_type> f (
+                        rts.create_component_async(*it, type));
+                    v.push_back(future_values_type::value_type(*it, f, 1));
+                }
+            }
+
+            created_count += numcreate;
             if (created_count >= count)
                 break;
         }

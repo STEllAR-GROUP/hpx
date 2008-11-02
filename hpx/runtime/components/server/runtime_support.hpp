@@ -37,10 +37,12 @@ namespace hpx { namespace components { namespace server
         // object 
         enum actions
         {
-            runtime_support_create_component = 0,   ///< create new components
-            runtime_support_free_component = 1,     ///< delete existing components
-            runtime_support_shutdown = 2,           ///< shut down this runtime instance
-            runtime_support_shutdown_all = 3,       ///< shut down the runtime instances of all localities
+            runtime_support_has_multi_instance_factory = 0,  ///< return whether more than 
+                                                    ///< one instance of a component can be created at once
+            runtime_support_create_component = 1,   ///< create new components
+            runtime_support_free_component = 2,     ///< delete existing components
+            runtime_support_shutdown = 3,           ///< shut down this runtime instance
+            runtime_support_shutdown_all = 4,       ///< shut down the runtime instances of all localities
         };
 
         // This is the component id. Every component needs to have an embedded
@@ -81,6 +83,12 @@ namespace hpx { namespace components { namespace server
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
+        /// \brief Action to figure out, whether we can create more than one 
+        ///        instance at once
+        threads::thread_state has_multi_instance_factory(
+            threads::thread_self& self, applier::applier& app,
+            bool* has_multi_instance_factory, components::component_type type); 
+
         /// \brief Action to create new components
         threads::thread_state create_component(
             threads::thread_self& self, applier::applier& app,
@@ -105,6 +113,12 @@ namespace hpx { namespace components { namespace server
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
+        typedef hpx::actions::result_action1<
+            runtime_support, bool, runtime_support_has_multi_instance_factory, 
+            components::component_type, 
+            &runtime_support::has_multi_instance_factory
+        > has_multi_instance_factory_action;
+
         typedef hpx::actions::result_action2<
             runtime_support, naming::id_type, runtime_support_create_component, 
             components::component_type, std::size_t, 

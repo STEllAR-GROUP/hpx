@@ -35,7 +35,24 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        /// Create a new component using the runtime_support 
+        /// \brief  The function \a has_multi_instance_factory is used to 
+        ///         determine, whether instances of the derived component can 
+        ///         be created in blocks (i.e. more than one instance at once). 
+        ///         This function is used by the \a distributing_factory to 
+        ///         determine a correct allocation strategy
+        bool has_multi_instance_factory(threads::thread_self& self,
+            components::component_type type) 
+        {
+            return this->base_type::has_multi_instance_factory(self, gid_, type);
+        }
+
+        lcos::future_value<bool> 
+        has_multi_instance_factory_async(components::component_type type) 
+        {
+            return this->base_type::has_multi_instance_factory_async(gid_, type);
+        }
+
+        /// Create a new component type using the runtime_support 
         naming::id_type create_component(threads::thread_self& self,
             components::component_type type, std::size_t count = 1) 
         {

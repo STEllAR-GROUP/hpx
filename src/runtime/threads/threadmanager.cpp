@@ -643,8 +643,8 @@ namespace hpx { namespace threads
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                     threads_[i].join();
                 }
+                threads_.clear();
             }
-            threads_.clear();
 
             LTM_(info) << "stop: stopping timer pool"; 
             timer_pool_.stop();             // stop timer pool as well

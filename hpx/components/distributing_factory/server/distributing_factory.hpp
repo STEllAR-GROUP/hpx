@@ -49,7 +49,7 @@ namespace hpx { namespace components { namespace server
 
             naming::id_type prefix_;    ///< prefix of the locality 
             naming::id_type first_gid_; ///< gid of the first created component
-            std::size_t count_;         ///< nu,ber of created components
+            std::size_t count_;         ///< number of created components
 
         private:
             // serialization support

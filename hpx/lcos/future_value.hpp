@@ -105,7 +105,7 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             // store the value
-            data_[slot].set(result);
+            data_[slot].set(data_type(result));
         }
 
         // trigger the future with the given error condition
@@ -117,7 +117,7 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             // store the error code
-            data_[slot].set(error_type(make_error_code(code), msg));
+            data_[slot].set(data_type(error_type(make_error_code(code), msg)));
         }
 
         ///////////////////////////////////////////////////////////////////////
