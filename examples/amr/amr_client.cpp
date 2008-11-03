@@ -92,7 +92,7 @@ hpx_main(threads::thread_self& self, applier::applier& appl)
     {
         typedef components::distributing_factory::result_type result_type;
 
-        // locally create a distributing factory
+        // create a distributing factory locally
         components::distributing_factory factory(
             components::distributing_factory::create(self, appl, 
                 appl.get_runtime_support_gid(), true));
@@ -141,7 +141,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "the IP address the HPX parcelport is listening on (default "
                 "is localhost:7910), expected format: 192.168.1.1:7913")
             ("threads,t", po::value<int>(), 
-                "the number of operating system threads to be spawn for this"
+                "the number of operating system threads to spawn for this"
                 "HPX locality")
         ;
 

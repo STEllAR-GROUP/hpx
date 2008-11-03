@@ -30,7 +30,7 @@ bool parse_commandline(char const* name, int argc, char *argv[],
                 "the IP address the HPX parcelport is listening on (default "
                 "is localhost:7910), expected format: 192.168.1.1:7913")
             ("threads,t", po::value<int>(), 
-                "the number of operating system threads to be spawn for this"
+                "the number of operating system threads to spawn for this"
                 "HPX locality")
             ("no_hpx_runtime,n", "do not run hpx runtime as part of this runtime instance")
         ;
