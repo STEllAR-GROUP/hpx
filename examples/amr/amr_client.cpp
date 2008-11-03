@@ -188,11 +188,8 @@ class dgas_server_helper
 public:
     dgas_server_helper(std::string host, boost::uint16_t port)
       : dgas_pool_(), dgas_(dgas_pool_, host, port)
-    {}
-
-    void run (bool blocking)
     {
-        dgas_.run(blocking);
+        dgas_.run(false);
     }
 
 private:
