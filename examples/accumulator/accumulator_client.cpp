@@ -97,6 +97,9 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("hpx,x", po::value<std::string>(), 
                 "the IP address the HPX parcelport is listening on (default "
                 "is localhost:7910), expected format: 192.168.1.1:7913")
+            ("threads,t", po::value<int>(), 
+                "the number of operating system threads to be spawn for this"
+                "HPX locality")
         ;
 
         po::store(po::command_line_parser(argc, argv)
@@ -163,6 +166,7 @@ int main(int argc, char* argv[])
         // Check command line arguments.
         std::string hpx_host("localhost"), dgas_host;
         boost::uint16_t hpx_port = HPX_PORT, dgas_port = 0;
+        int num_threads = 1;
 
         // extract IP address/port arguments
         if (vm.count("dgas")) 
@@ -171,6 +175,9 @@ int main(int argc, char* argv[])
         if (vm.count("hpx")) 
             split_ip_address(vm["hpx"].as<std::string>(), hpx_host, hpx_port);
 
+        if (vm.count("threads"))
+            num_threads = vm["threads"].as<int>();
+
         // initialize and run the DGAS service, if appropriate
         std::auto_ptr<dgas_server_helper> dgas_server;
         if (vm.count("run_dgas_server"))  // run the DGAS server instance here
@@ -178,7 +185,7 @@ int main(int argc, char* argv[])
 
         // initialize and start the HPX runtime
         hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port);
-        rt.run(hpx_main);
+        rt.run(hpx_main, num_threads);
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";

@@ -23,13 +23,16 @@ bool parse_commandline(char const* name, int argc, char *argv[],
         desc_cmdline.add_options()
             ("help,h", "print out program usage (this message)")
             ("run_dgas_server,r", "run DGAS server as part of this runtime instance")
-            ("no_hpx_runtime,n", "do not run hpx runtime as part of this runtime instance")
             ("dgas,d", po::value<std::string>(), 
                 "the IP address the DGAS server is running on (default taken "
                 "from hpx.ini), expected format: 192.168.1.1:7912")
             ("hpx,x", po::value<std::string>(), 
                 "the IP address the HPX parcelport is listening on (default "
                 "is localhost:7910), expected format: 192.168.1.1:7913")
+            ("threads,t", po::value<int>(), 
+                "the number of operating system threads to be spawn for this"
+                "HPX locality")
+            ("no_hpx_runtime,n", "do not run hpx runtime as part of this runtime instance")
         ;
 
         po::store(po::command_line_parser(argc, argv)
@@ -99,6 +102,7 @@ int main(int argc, char* argv[])
         // Check command line arguments.
         std::string hpx_host("localhost"), dgas_host;
         boost::uint16_t hpx_port = HPX_PORT, dgas_port = 0;
+        int num_threads = 1;
 
         // extract IP address/port arguments
         if (vm.count("dgas")) 
@@ -106,6 +110,9 @@ int main(int argc, char* argv[])
 
         if (vm.count("hpx")) 
             split_ip_address(vm["hpx"].as<std::string>(), hpx_host, hpx_port);
+
+        if (vm.count("threads"))
+            num_threads = vm["threads"].as<int>();
 
         // do we need to execute the HPX runtime
         bool no_hpx_runtime = vm.count("no_hpx_runtime") != 0;
@@ -127,7 +134,7 @@ int main(int argc, char* argv[])
 
             // the main thread will wait (block) for the shutdown action and 
             // the threadmanager is serving incoming requests in the meantime
-            rt.run();
+            rt.run(num_threads);
         }
     }
     catch (hpx::exception const& e) {
