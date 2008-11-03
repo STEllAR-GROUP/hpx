@@ -12,7 +12,7 @@
 #include <boost/serialization/export.hpp>
 
 #include <hpx/components/amr/server/functional_timestep.hpp>
-#include <hpx/components/amr/server/functional_timestep.ipp>
+#include <hpx/components/amr/server/functional_timestep_impl.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef 

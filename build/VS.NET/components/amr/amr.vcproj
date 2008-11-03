@@ -215,6 +215,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\..\..\..\hpx\components\amr\stencil_value.hpp"
+				>
+			</File>
 			<Filter
 				Name="Server"
 				>
@@ -227,7 +231,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\..\hpx\components\amr\server\functional_timestep.ipp"
+					RelativePath="..\..\..\..\hpx\components\amr\server\functional_timestep_impl.hpp"
 					>
 				</File>
 				<File
@@ -235,7 +239,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\..\hpx\components\AMR\server\stencil_value.ipp"
+					RelativePath="..\..\..\..\hpx\components\amr\server\stencil_value_impl.hpp"
 					>
 				</File>
 				<File
@@ -244,6 +248,14 @@
 				</File>
 				<File
 					RelativePath="..\..\..\..\hpx\components\amr\server\stencil_value_out_adaptor.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Stubs"
+				>
+				<File
+					RelativePath="..\..\..\..\hpx\components\amr\stubs\stencil_value.hpp"
 					>
 				</File>
 			</Filter>

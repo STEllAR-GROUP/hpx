@@ -108,12 +108,8 @@ namespace hpx { namespace components { namespace amr { namespace server
             out_[i]->get()->set_callback(
                 boost::bind(&stencil_value::get_value, this, _1, _2));
         }
-
-        // run the thread which collects the input, executes the provided
-        // functional element and sets the value for the next time step
-        applier::register_work(appl, 
-            boost::bind(&stencil_value<N>::main, this, _1, boost::ref(appl)), 
-            "stencil_value::main");
+        // the threads driving the computation are created in 
+        // set_functional_component only (see below)
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -136,6 +132,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // wait for final result 
         sem_result_.wait(self, 1);
+
         *result = value_gid_;
         value_gid_ = naming::invalid_id;
 
@@ -158,7 +155,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             for (std::size_t i = 0; i < N; ++i)
                 in_[i]->aquire_value(appl);         // non-blocking!
 
-            // the valid_gid_ get's initialized for the first time step only
+            // the valid_gid_ gets initialized for the first time step only
             if (naming::invalid_id == value_gid_)
                 value_gid_ = init_helper(self, appl, functional_gid_);
 
@@ -240,6 +237,12 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // ask functional component to create the local data value
         backup_value_gid_ = init_helper(self, appl, functional_gid_);
+
+        // run the thread which collects the input, executes the provided
+        // functional element and sets the value for the next time step
+        applier::register_work(appl, 
+            boost::bind(&stencil_value<N>::main, this, _1, boost::ref(appl)), 
+            "stencil_value::main");
 
         return threads::terminated;
     }

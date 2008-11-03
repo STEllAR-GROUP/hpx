@@ -8,6 +8,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
+#include <hpx/components/amr/stencil_value.hpp>
 #include <hpx/components/amr_test/stencil.hpp>
 
 #include <boost/lexical_cast.hpp>
@@ -20,38 +21,52 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Create functional components, one for each data point, use those to 
-// initialize stencil instances
-void init_stencils(
+// initialize the stencil value instances
+void init_stencils(applier::applier& appl,
+    components::distributing_factory::result_type const& values,
     components::distributing_factory::result_type const& stencils)
 {
-    typedef components::distributing_factory::result_type result_type;
-
-    result_type::const_iterator end = stencils.end();
-    for (result_type::const_iterator it = stencils.begin(); it != end; ++it) 
+    BOOST_ASSERT(values.size() == stencils.size());
+    for (std::size_t i = 0; i < values.size(); ++i) 
     {
-        
+        BOOST_ASSERT(1 == values[i].count_ && 1 == stencils[i].count_);
+        components::amr::stubs::stencil_value<3>::set_functional_component(
+            appl, values[i].first_gid_, stencils[i].first_gid_);
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get gids of output ports of all stencils
-void get_output_ports(
+void get_output_ports(threads::thread_self& self, applier::applier& appl,
     components::distributing_factory::result_type const& stencils,
     std::vector<std::vector<naming::id_type> >& outputs)
 {
     typedef components::distributing_factory::result_type result_type;
+    typedef 
+        std::vector<lcos::future_value<std::vector<naming::id_type> > >
+    lazyvals_type;
 
+    // start an asynchronous operation for each of the stencil value instances
+    lazyvals_type lazyvals;
     result_type::const_iterator end = stencils.end();
     for (result_type::const_iterator it = stencils.begin(); it != end; ++it) 
     {
-        
+        lazyvals.push_back(components::amr::stubs::stencil_value<3>::
+            get_output_ports_async(appl, (*it).first_gid_));
+    }
+
+    // now wait for the results
+    lazyvals_type::iterator lend = lazyvals.end();
+    for (lazyvals_type::iterator lit = lazyvals.begin(); lit != lend; ++lit) 
+    {
+        outputs.push_back((*lit).get(self));
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // connectthe given output ports with the correct input ports, creating the 
 // required static dataflow structure
-void connect_input_ports(
+void connect_input_ports(threads::thread_self& self, applier::applier& appl,
     components::distributing_factory::result_type const& stencils,
     std::vector<std::vector<naming::id_type> > const& outputs)
 {
@@ -68,31 +83,40 @@ void connect_input_ports(
 threads::thread_state 
 hpx_main(threads::thread_self& self, applier::applier& appl)
 {
+    // get component types needed below
+    components::component_type stencil_type = 
+        components::get_component_type<components::amr::stencil>();
+    components::component_type stencil_value_type = 
+        components::get_component_type<components::amr::server::stencil_value<3> >();
+
     {
+        typedef components::distributing_factory::result_type result_type;
+
         // locally create a distributing factory
-        components::distributing_factory dist_factory(
+        components::distributing_factory factory(
             components::distributing_factory::create(self, appl, 
                 appl.get_runtime_support_gid(), true));
 
-        // create a couple of stencil components
-        typedef components::distributing_factory::result_type result_type;
+        // create a couple of stencil (functional) components and the same 
+        // amount of stencil_value components
+        result_type stencils = factory.create_components(self, stencil_type, 3);
+        result_type values = factory.create_components(self, stencil_value_type, 3);
 
-        components::component_type stencil_type = 
-            components::get_component_type<components::amr::stencil>();
-        result_type stencils = dist_factory.create_components(self, stencil_type, 3);
-
-        // create functional components and and use those to initialize stencils
-        init_stencils(stencils);
+        // initialize stencil_values using the stencil (functional) components
+        init_stencils(appl, values, stencils);
 
         // ask stencil instances for their output gids
         std::vector<std::vector<naming::id_type> > outputs;
-        get_output_ports(stencils, outputs);
+        get_output_ports(self, appl, stencils, outputs);
 
         // connect output gids with corresponding stencil inputs
-        connect_input_ports(stencils, outputs);
+        connect_input_ports(self, appl, stencils, outputs);
 
-        // free all stencil components
-        dist_factory.free_components(stencils);
+
+
+        // free all allocated components
+        factory.free_components(values);
+        factory.free_components(stencils);
 
     }   // distributing_factory needs to go out of scope before shutdown
 

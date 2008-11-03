@@ -4,14 +4,13 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(amr_HEADERS
-    server/functional_component_1.hpp
-    server/functional_component_3.hpp
-    server/functional_component_5.hpp
+    stencil_value.hpp
+    stubs/stencil_value.hpp
     server/functional_component.hpp
 #    server/functional_timestep.hpp
-#    server/functional_timestep.ipp
+#    server/functional_timestep_impl.hpp
     server/stencil_value.hpp
-    server/stencil_value.ipp
+    server/stencil_value_impl.hpp
     server/stencil_value_in_adaptor.hpp
     server/stencil_value_out_adaptor.hpp)
 

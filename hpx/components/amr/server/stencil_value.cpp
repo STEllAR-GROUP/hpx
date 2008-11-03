@@ -12,7 +12,7 @@
 #include <boost/serialization/export.hpp>
 
 #include <hpx/components/amr/server/stencil_value.hpp>
-#include <hpx/components/amr/server/stencil_value.ipp>
+#include <hpx/components/amr/server/stencil_value_impl.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Define types of stencil components exposed by this module
