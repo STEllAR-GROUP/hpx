@@ -34,8 +34,16 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the number of outgoing (parcel-) connections kept alive 
-#if !defined(HPX_MAX_CONNECTION_CACHE_SIZE)
-#  define HPX_MAX_CONNECTION_CACHE_SIZE 64
+#if !defined(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE)
+#  define HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE 64
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// This defines the number of outgoing (agas-) connections kept alive 
+/// This generally shouldn't be much larger than the number of OS threads used
+/// in the runtime system.
+#if !defined(HPX_MAX_AGAS_CONNECTION_CACHE_SIZE)
+#  define HPX_MAX_AGAS_CONNECTION_CACHE_SIZE 8
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

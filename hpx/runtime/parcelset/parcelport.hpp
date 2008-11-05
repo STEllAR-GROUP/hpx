@@ -18,7 +18,7 @@
 #include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
 #include <hpx/runtime/parcelset/server/parcelport_server_connection.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
-#include <hpx/runtime/parcelset/connection_cache.hpp>
+#include <hpx/util/connection_cache.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/util.hpp>
 #include <hpx/util/logging.hpp>
@@ -221,7 +221,7 @@ namespace hpx { namespace parcelset
         server::parcelport_queue parcels_;
 
         /// The connection cache for sending connections
-        connection_cache connection_cache_;
+        util::connection_cache<parcelport_connection> connection_cache_;
 
         /// The local locality
         naming::locality here_;

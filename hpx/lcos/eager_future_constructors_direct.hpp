@@ -37,8 +37,8 @@
         naming::address addr;
         if (appl.address_is_local(gid, addr)) {
             // local, direct execution
-            BOOST_ASSERT(components::component_invalid == addr.type_ ||
-                         Action::get_static_component_type() == addr.type_);
+            BOOST_ASSERT(components::types_are_compatible(
+                addr.type_, Action::get_static_component_type()));
             (*this->impl_)->set_data(0, Action::execute_function(
                 appl, addr.address_, BOOST_PP_ENUM_PARAMS(N, arg)));
         }

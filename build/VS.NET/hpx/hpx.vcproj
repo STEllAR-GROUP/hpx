@@ -422,10 +422,6 @@
 					Name="Parcelset"
 					>
 					<File
-						RelativePath="..\..\..\src\runtime\parcelset\connection_cache.cpp"
-						>
-					</File>
-					<File
 						RelativePath="..\..\..\src\runtime\parcelset\parcel.cpp"
 						>
 					</File>
@@ -510,10 +506,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\hpx\exception.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\hpx\exception_list.hpp"
 				>
 			</File>
@@ -534,6 +526,10 @@
 				>
 				<File
 					RelativePath="..\..\..\hpx\util\asio_util.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\util\connection_cache.hpp"
 					>
 				</File>
 				<File
@@ -732,10 +728,6 @@
 					Name="Parcelset"
 					>
 					<File
-						RelativePath="..\..\..\hpx\runtime\parcelset\connection_cache.hpp"
-						>
-					</File>
-					<File
 						RelativePath="..\..\..\hpx\runtime\parcelset\parcel.hpp"
 						>
 					</File>
@@ -797,6 +789,14 @@
 					</File>
 					<File
 						RelativePath="..\..\..\hpx\runtime\components\component_type.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\components\derived_component_factory.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\exception.hpp"
 						>
 					</File>
 					<File

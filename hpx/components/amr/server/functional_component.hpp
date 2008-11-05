@@ -20,10 +20,19 @@ namespace hpx { namespace components { namespace amr { namespace server
     class HPX_COMPONENT_EXPORT functional_component
       : public simple_component_base<functional_component>
     {
+    private:
+        typedef simple_component_base<functional_component> base_type;
+
     public:
         functional_component(applier::applier& appl)
-          : simple_component_base<functional_component>(appl)
-        {}
+          : base_type(appl)
+        {
+            if (component_invalid == base_type::get_component_type()) {
+                // first call to get_component_type, ask AGAS for a unique id
+                base_type::set_component_type(appl.get_agas_client().
+                    get_component_id("functional_component_double_type"));
+            }
+        }
 
         // components must contain a typedef for wrapping_type defining the
         // managed_component type used to encapsulate instances of this 

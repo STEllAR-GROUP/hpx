@@ -72,8 +72,8 @@ namespace hpx { namespace applier
             // Determine whether the gid is local or remote
             naming::address addr;
             if (address_is_local(gid, addr)) {
-                BOOST_ASSERT(components::component_invalid == addr.type_ ||
-                             Action::get_static_component_type() == addr.type_);
+                BOOST_ASSERT(components::types_are_compatible(
+                    addr.type_, Action::get_static_component_type()));
                 detail::apply_helper0<Action>::call(thread_manager_, 
                     *this, addr.address_);
                 return true;     // no parcel has been sent (dest is local)
@@ -111,8 +111,8 @@ namespace hpx { namespace applier
             // Determine whether the gid is local or remote
             naming::address addr;
             if (address_is_local(gid, addr)) {
-                BOOST_ASSERT(components::component_invalid == addr.type_ ||
-                             Action::get_static_component_type() == addr.type_);
+                BOOST_ASSERT(components::types_are_compatible(
+                    addr.type_, Action::get_static_component_type()));
                 actions::continuation_type cont(c);
                 detail::apply_helper0<Action>::call(cont, thread_manager_, 
                     *this, addr.address_);
@@ -162,8 +162,8 @@ namespace hpx { namespace applier
             // Determine whether the gid is local or remote
             naming::address addr;
             if (address_is_local(gid, addr)) {
-                BOOST_ASSERT(components::component_invalid == addr.type_ ||
-                             Action::get_static_component_type() == addr.type_);
+                BOOST_ASSERT(components::types_are_compatible(
+                    addr.type_, Action::get_static_component_type()));
                 detail::apply_helper1<Action, Arg0>::call(thread_manager_, 
                     *this, addr.address_, arg0);
                 return true;     // no parcel has been sent (dest is local)
@@ -198,8 +198,8 @@ namespace hpx { namespace applier
             // Determine whether the gid is local or remote
             naming::address addr;
             if (address_is_local(gid, addr)) {
-                BOOST_ASSERT(components::component_invalid == addr.type_ ||
-                             Action::get_static_component_type() == addr.type_);
+                BOOST_ASSERT(components::types_are_compatible(
+                    addr.type_, Action::get_static_component_type()));
                 actions::continuation_type cont(c);
                 detail::apply_helper1<Action, Arg0>::call(cont, thread_manager_,
                     *this, addr.address_, arg0);

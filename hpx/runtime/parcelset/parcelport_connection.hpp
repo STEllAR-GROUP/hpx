@@ -22,7 +22,7 @@
 #include <boost/integer/endian.hpp>
 
 #include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
-#include <hpx/runtime/parcelset/connection_cache.hpp>
+#include <hpx/util/connection_cache.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/container_device.hpp>
@@ -42,7 +42,8 @@ namespace hpx { namespace parcelset
     public:
         /// Construct a sending parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
-                naming::locality const& l, connection_cache& cache)
+                naming::locality const& l, 
+                util::connection_cache<parcelport_connection>& cache)
           : socket_(io_service), there_(l), connection_cache_(cache)
         {
         }
@@ -133,7 +134,7 @@ namespace hpx { namespace parcelset
         naming::locality there_;
 
         /// The connection cache for sending connections
-        connection_cache& connection_cache_;
+        util::connection_cache<parcelport_connection>& connection_cache_;
     };
 
     typedef boost::shared_ptr<parcelport_connection> parcelport_connection_ptr;

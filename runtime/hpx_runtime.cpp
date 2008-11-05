@@ -32,6 +32,8 @@ bool parse_commandline(char const* name, int argc, char *argv[],
             ("threads,t", po::value<int>(), 
                 "the number of operating system threads to spawn for this"
                 "HPX locality")
+            ("pid,p", po::value<int>(), 
+                "the number of the node as supplied by the scheduler")
             ("no_hpx_runtime,n", "do not run hpx runtime as part of this runtime instance")
         ;
 

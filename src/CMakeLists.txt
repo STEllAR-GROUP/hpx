@@ -59,6 +59,7 @@ set (hpxlib_HEADERS
     ${hpx_SOURCE_DIR}/hpx/runtime/components/component_type.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/component_factory_base.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/component_factory.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/components/derived_component_factory.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/generic_component.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/generic_component_eval.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/memory_block.hpp

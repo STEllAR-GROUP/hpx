@@ -34,7 +34,15 @@ namespace hpx { namespace components
             result = components::detail::names[type+1];
         else
             result = "component";
-        result += "[" + boost::lexical_cast<std::string>(type) + "]";
+
+        if (type == get_base_type(type))
+            result += "[" + boost::lexical_cast<std::string>(type) + "]";
+        else {
+            result += "[" + 
+                boost::lexical_cast<std::string>(get_derived_type(type)) + 
+                "(" + boost::lexical_cast<std::string>(get_base_type(type)) + ")"
+                "]";
+        }
         return result;
     }
 

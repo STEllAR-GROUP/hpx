@@ -6,7 +6,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
-#include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/runtime/components/derived_component_factory.hpp>
 
 #include <hpx/components/amr_test/stencil.hpp>
 
@@ -31,7 +31,8 @@ typedef hpx::components::amr::stencil stencil_type;
 /// name = amr_test               # this must match the name of the shared library
 /// path = $[hpx.location]/lib    # this is the default location where to find the shared library
 ///
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(stencil_type, stencil);
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(stencil_type, stencil, 
+    "functional_component_double_type");
 
 // HPX_REGISTER_ACTION(stencil_type::eval_action);
 // HPX_REGISTER_ACTION(stencil_type::init_action);

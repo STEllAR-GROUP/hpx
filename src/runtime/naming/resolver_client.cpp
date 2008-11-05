@@ -25,7 +25,6 @@
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/naming/resolver_client_connection.hpp>
 #include <hpx/runtime/naming/server/reply.hpp>
 #include <hpx/runtime/naming/server/request.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
@@ -39,38 +38,11 @@ namespace hpx { namespace naming
 {
     resolver_client::resolver_client(util::io_service_pool& io_service_pool, 
             locality l) 
-      : there_(l), 
-        io_service_pool_(io_service_pool), 
-        socket_(io_service_pool.get_io_service())
+      : there_(l), io_service_pool_(io_service_pool), 
+        connection_cache_(HPX_MAX_AGAS_CONNECTION_CACHE_SIZE, "[AGAS] ")
     {
-        boost::system::error_code error = boost::asio::error::try_again;
-        try {
-            // start the io service pool
-            io_service_pool.run(false);
-
-            locality::iterator_type end = there_.connect_end();
-            for (locality::iterator_type it = 
-                    there_.connect_begin(io_service_pool.get_io_service()); 
-                 it != end; ++it)
-            {
-                socket_.close();
-                socket_.connect(*it, error);
-                if (!error) 
-                    break;
-            }
-        }
-        catch (boost::system::error_code const& e) {
-            HPX_THROW_EXCEPTION(network_error, e.message());
-        }
-
-        if (error) {
-            socket_.close();
-
-            HPX_OSSTREAM strm;
-            strm << error.message() << " (while trying to connect to: " 
-                 << there_ << ")";
-            HPX_THROW_EXCEPTION(network_error, HPX_OSSTREAM_GETSTRING(strm));
-        }
+        // start the io service pool
+        io_service_pool.run(false);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -292,6 +264,47 @@ namespace hpx { namespace naming
         return bytes_transferred >= size;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    boost::shared_ptr<resolver_client_connection> 
+    resolver_client::get_client_connection() const
+    {
+        boost::shared_ptr<resolver_client_connection> client_connection(
+            connection_cache_.get(there_));
+
+        if (!client_connection) {
+            // establish a new connection
+            boost::system::error_code error = boost::asio::error::fault;
+            try {
+                client_connection.reset(new resolver_client_connection(
+                        io_service_pool_.get_io_service())); 
+
+                locality::iterator_type end = there_.connect_end();
+                for (locality::iterator_type it = 
+                        there_.connect_begin(io_service_pool_.get_io_service()); 
+                     it != end; ++it)
+                {
+                    client_connection->socket().close();
+                    client_connection->socket().connect(*it, error);
+                    if (!error) 
+                        break;
+                }
+            }
+            catch (boost::system::error_code const& e) {
+                HPX_THROW_EXCEPTION(network_error, e.message());
+            }
+
+            if (error) {
+                client_connection->socket().close();
+
+                HPX_OSSTREAM strm;
+                strm << error.message() << " (while trying to connect to: " 
+                     << there_ << ")";
+                HPX_THROW_EXCEPTION(network_error, HPX_OSSTREAM_GETSTRING(strm));
+            }
+        }
+        return client_connection;
+    }
+
     void resolver_client::execute(server::request const &req, 
         server::reply& rep) const
     {
@@ -311,14 +324,19 @@ namespace hpx { namespace naming
                 archive << req;
             }
 
-            boost::system::error_code err = boost::asio::error::fault;
+            // get existing connection to AGAS server or establish a new one
+            boost::system::error_code err = boost::asio::error::try_again;
+
+            boost::shared_ptr<resolver_client_connection> client_connection =
+                get_client_connection();
 
             // send the data
             boost::integer::ulittle32_t size = (boost::integer::ulittle32_t)buffer.size();
             std::vector<boost::asio::const_buffer> buffers;
             buffers.push_back(boost::asio::buffer(&size, sizeof(size)));
             buffers.push_back(boost::asio::buffer(buffer));
-            std::size_t written_bytes = boost::asio::write(socket_, buffers,
+            std::size_t written_bytes = boost::asio::write(
+                client_connection->socket(), buffers,
                 boost::bind(&resolver_client::write_completed, _1, _2, 
                     buffer.size() + sizeof(size)),
                 err);
@@ -331,7 +349,8 @@ namespace hpx { namespace naming
 
             // wait for response
             // first read the size of the message 
-            std::size_t reply_length = boost::asio::read(socket_,
+            std::size_t reply_length = boost::asio::read(
+                client_connection->socket(),
                 boost::asio::buffer(&size, sizeof(size)),
                 boost::bind(&resolver_client::read_completed, _1, _2, sizeof(size)),
                 err);
@@ -345,7 +364,8 @@ namespace hpx { namespace naming
             // now read the rest of the message
             boost::uint32_t native_size = size;
             buffer.resize(native_size);
-            reply_length = boost::asio::read(socket_, boost::asio::buffer(buffer), 
+            reply_length = boost::asio::read(client_connection->socket(), 
+                boost::asio::buffer(buffer), 
                 boost::bind(&resolver_client::read_completed, _1, _2, native_size), 
                 err);
 
@@ -355,6 +375,9 @@ namespace hpx { namespace naming
             if (reply_length != native_size) {
                 HPX_THROW_EXCEPTION(network_error, "network read failed");
             }
+
+            // return the connection to the cache
+            connection_cache_.add(there_, client_connection);
 
             // De-serialize the data
             {
@@ -376,53 +399,6 @@ namespace hpx { namespace naming
         catch(...) {
             HPX_THROW_EXCEPTION(no_success, "unexpected error");
         }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // asynchronous API
-    util::unique_future<bool> 
-    resolver_client::bind_range_async(id_type const& lower_id, std::size_t count, 
-        address const& addr, std::ptrdiff_t offset)
-    {
-        typedef resolver_client_connection<bool> connection_type;
-
-        // prepare request
-        connection_type* conn = new connection_type(socket_, 
-            server::command_bind_range, lower_id, count, addr, offset);
-        boost::shared_ptr<connection_type> client_conn(conn);
-
-        conn->execute();
-        return conn->get_future();
-    }
-
-    util::unique_future<bool> 
-    resolver_client::unbind_range_async(id_type const& lower_id, std::size_t count)
-    {
-        typedef resolver_client_connection<bool> connection_type;
-
-        // prepare request
-        connection_type* conn = new connection_type(socket_, 
-            server::command_unbind_range, lower_id, count);
-        boost::shared_ptr<connection_type> client_conn(conn);
-
-        conn->execute();
-        return conn->get_future();
-    }
-
-    util::unique_future<std::pair<bool, address> >  
-    resolver_client::resolve_async(id_type const& id)
-    {
-        typedef 
-            resolver_client_connection<std::pair<bool, address> > 
-        connection_type;
-
-        // prepare request
-        connection_type* conn = new connection_type(socket_, 
-            server::command_resolve, id);
-        boost::shared_ptr<connection_type> client_conn(conn);
-
-        conn->execute();
-        return conn->get_future();
     }
 
 ///////////////////////////////////////////////////////////////////////////////

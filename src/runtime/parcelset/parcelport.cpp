@@ -25,7 +25,8 @@ namespace hpx { namespace parcelset
       : io_service_pool_(io_service_pool),
         acceptor_(io_service_pool_.get_io_service()),
         parcels_(This()),
-        connection_cache_(HPX_MAX_CONNECTION_CACHE_SIZE), here_(here)
+        connection_cache_(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE, "  [PT] "), 
+        here_(here)
     {
         // initialize network
         using boost::asio::ip::tcp;

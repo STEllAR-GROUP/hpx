@@ -11,9 +11,10 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/naming/resolver_client_connection.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/util/future.hpp>
 #include <hpx/util/io_service_pool.hpp>
+#include <hpx/util/connection_cache.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -183,43 +184,6 @@ namespace hpx { namespace naming
         bool bind_range(id_type const& lower_id, std::size_t count, 
             address const& baseaddr, std::ptrdiff_t offset) const;
 
-        /// \brief Asynchronously bind unique range of global ids to given base 
-        ///        address
-        ///
-        /// Every locality needs to be able to bind global ids to different
-        /// components without having to consult the AGAS server for every id 
-        /// to bind. This function can be called to asynchronously bind a range 
-        /// of consecutive global ids to a range of consecutive local addresses 
-        /// (separated by a given \a offset).
-        /// 
-        /// \param lower_id   [in] The lower bound of the assigned id range.
-        ///                   The value can be used as the first id to assign. 
-        /// \param count      [in] The number of consecutive global ids to bind
-        ///                   starting at \a lower_id.
-        /// \param baseaddr   [in] The local address to bind to the global id
-        ///                   given by \a lower_id. This is the base address 
-        ///                   for all additional local addresses to bind to the
-        ///                   remaining global ids.
-        /// \param offset     [in] The offset to use to calculate the local
-        ///                   addresses to be bound to the range of global ids.
-        ///
-        /// \returns          This function returns a future object allowing to
-        ///                   defer the evaluation of the outcome of the 
-        ///                   function. The actual return value can be retrieved
-        ///                   by calling f.get(), where f is the returned future 
-        ///                   instance, and f.get() returns \a true the given
-        ///                   range has been successfully bound and returns 
-        ///                   \a false otherwise. Any error results in an 
-        ///                   exception thrown from f.get().
-        ///
-        /// \note             The difference to \a bind_range is that the 
-        ///                   function call returns immediately without 
-        ///                   blocking. The operation is guaranteed to be 
-        ///                   fully executed only after f.get() has been called.
-        util::unique_future<bool> 
-            bind_range_async(id_type const& lower_id, std::size_t count, 
-                address const& baseaddr, std::ptrdiff_t offset);
-
         /// \brief Unbind a global address
         ///
         /// Remove the association of the given global address with any local 
@@ -328,38 +292,6 @@ namespace hpx { namespace naming
         bool unbind_range(id_type const& lower_id, std::size_t count, 
             address& addr) const;
 
-        /// \brief Asynchronously unbind the given range of global ids
-        ///
-        /// \param lower_id   [in] The lower bound of the assigned id range.
-        ///                   The value must the first id of the range as 
-        ///                   specified to the corresponding call to 
-        ///                   \a bind_range. 
-        /// \param count      [in] The number of consecutive global ids to unbind
-        ///                   starting at \a lower_id. This number must be 
-        ///                   identical to the number of global ids bound by 
-        ///                   the corresponding call to \a bind_range
-        ///
-        /// \returns          This function returns a future object allowing to
-        ///                   defer the evaluation of the outcome of the 
-        ///                   function. The actual return value can be retrieved
-        ///                   by calling f.get(), where f is the returned future 
-        ///                   instance, and f.get() returns \a true the given
-        ///                   range has been successfully bound and returns 
-        ///                   \a false otherwise. Any error results in an 
-        ///                   exception thrown from f.get().
-        ///
-        /// \note             You can unbind only global ids bound using the 
-        ///                   function \a bind_range. Do not use this function 
-        ///                   to unbind any of the global ids bound using 
-        ///                   \a bind.
-        ///
-        /// \note             The difference to \a unbind_range is that the 
-        ///                   function call returns immediately without 
-        ///                   blocking. The operation is guaranteed to be 
-        ///                   fully executed only after f.get() has been called.
-        util::unique_future<bool> 
-            unbind_range_async(id_type const& lower_id, std::size_t count);
-
         /// \brief Resolve a given global address (id) to its associated local 
         ///        address
         ///
@@ -381,36 +313,6 @@ namespace hpx { namespace naming
         ///                   for the given global address. Any error results 
         ///                   in an exception thrown from this function.
         bool resolve(id_type const& id, address& addr) const;
-
-        /// \brief Asynchronously resolve a given global address (id) to its 
-        ///        associated local address
-        ///
-        /// This function returns the local address which is currently 
-        /// associated with the given global address (id).
-        ///
-        /// \param id         [in] The global address (id) for which the 
-        ///                   associated local address should be returned.
-        ///
-        /// \returns          This function returns future object allowing to
-        ///                   defer the evaluation of the outcome of the 
-        ///                   function. The actual return value can be retrieved
-        ///                   by calling f.get(), where f is the returned future 
-        ///                   instance, and f.get() returns a pair containing a 
-        ///                   bool and the resolved address, where the bool is
-        ///                   \a true if the global address has been resolved 
-        ///                   successfully (there exists an association to a 
-        ///                   local address) and the associated local address 
-        ///                   has been returned as the second member of this 
-        ///                   pair. The bool is \a false if no association exists 
-        ///                   for the given global address. Any error results 
-        ///                   in an exception thrown from the f.get() function.
-        ///
-        /// \note             The difference to \a resolve is that the 
-        ///                   function call returns immediately without 
-        ///                   blocking. The operation is guaranteed to be 
-        ///                   fully executed only after f.get() has been called.
-        util::unique_future<std::pair<bool, address> >
-            resolve_async(id_type const& id);
 
         /// \brief Register a global name with a global address (id)
         /// 
@@ -512,10 +414,15 @@ namespace hpx { namespace naming
 
         void execute(server::request const& req, server::reply& rep) const;
 
+        boost::shared_ptr<resolver_client_connection> 
+        resolver_client::get_client_connection() const;
+
     private:
         locality there_;
         util::io_service_pool& io_service_pool_;
-        mutable boost::asio::ip::tcp::socket socket_;
+
+        /// The connection cache for sending connections
+        mutable util::connection_cache<resolver_client_connection> connection_cache_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////
