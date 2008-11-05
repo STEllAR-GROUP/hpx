@@ -123,8 +123,8 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
 inline void 
 split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
 {
+    std::string::size_type p = v.find_first_of(":");
     try {
-        std::string::size_type p = v.find_first_of(":");
         if (p != std::string::npos) {
             addr = v.substr(0, p);
             port = boost::lexical_cast<boost::uint16_t>(v.substr(p+1));
