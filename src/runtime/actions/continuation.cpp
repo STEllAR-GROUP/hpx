@@ -17,3 +17,36 @@
 // enable serialization of continuations through shared_ptr's
 BOOST_CLASS_EXPORT(hpx::actions::continuation);
 
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace actions
+{
+    ///////////////////////////////////////////////////////////////////////////
+    void continuation::trigger_all(applier::applier& app)
+    {
+        std::vector<naming::id_type>::iterator end = gids_.end();
+        for (std::vector<naming::id_type>::iterator it = gids_.begin();
+             it != end; ++it)
+        {
+            if (!app.apply<lcos::base_lco::set_event_action>(*it))
+                break;
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void continuation::trigger_error(applier::applier& app, 
+        hpx::exception const& e)
+    {
+        std::vector<naming::id_type>::iterator end = gids_.end();
+        for (std::vector<naming::id_type>::iterator it = gids_.begin();
+             it != end; ++it)
+        {
+            if (!app.apply<lcos::base_lco::set_error_action>(
+                    *it, e.get_error(), std::string(e.what())))
+            {
+                break;
+            }
+        }
+    }
+
+}}
+

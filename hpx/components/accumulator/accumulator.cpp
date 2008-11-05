@@ -5,6 +5,8 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/runtime/actions/continuation_impl.hpp>
+
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
