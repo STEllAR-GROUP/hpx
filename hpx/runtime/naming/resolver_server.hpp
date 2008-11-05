@@ -25,8 +25,8 @@ namespace hpx { namespace naming
 {
     /// \class resolver_server resolver_server.hpp hpx/runtime/naming/resolver_server.hpp
     /// 
-    /// The \a resolver_server implements the top-level class of the DGAS server.
-    /// It can be used to instantiate a DGAS server listening at the given 
+    /// The \a resolver_server implements the top-level class of the AGAS server.
+    /// It can be used to instantiate a AGAS server listening at the given 
     /// network address.
     class HPX_EXPORT resolver_server : private boost::noncopyable
     {
@@ -38,11 +38,11 @@ namespace hpx { namespace naming
         ///                 [in] The pool of networking threads to use to serve 
         ///                 outgoing requests
         /// \param address  [in] This is the address (IP address or 
-        ///                 host name) of the locality this DGAS server 
+        ///                 host name) of the locality this AGAS server 
         ///                 instance is listening on. If this value is not 
         ///                 specified the actual address will be taken from 
         ///                 the configuration file (hpx.ini).
-        /// \param port     [in] This is the port number this DGAS server
+        /// \param port     [in] This is the port number this AGAS server
         ///                 instance is listening on. If this value is not 
         ///                 specified the actual address will be taken from 
         ///                 the configuration file (hpx.ini).
@@ -55,7 +55,7 @@ namespace hpx { namespace naming
         /// \param io_service_pool 
         ///                 [in] The pool of networking threads to use to serve 
         ///                 outgoing requests
-        /// \param l        [in] This is the locality this DGAS server instance
+        /// \param l        [in] This is the locality this AGAS server instance
         ///                 is running on.
         resolver_server (util::io_service_pool& io_service_pool, locality l);
 

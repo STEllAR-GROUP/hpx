@@ -44,9 +44,9 @@ int main(int argc, char* argv[])
         // Check command line arguments.
         if (argc != 7) 
         {
-            std::cerr << "Using default settings: ps:localhost:7913 dgas:localhost:7912 remoteps:localhost:7911" 
+            std::cerr << "Using default settings: ps:localhost:7913 agas:localhost:7912 remoteps:localhost:7911" 
                 << std::endl;
-            std::cerr << "Possible arguments: <HPX address> <HPX port> <DGAS address> <DGAS port> <remote HPX address> <remote HPX port>"
+            std::cerr << "Possible arguments: <HPX address> <HPX port> <AGAS address> <AGAS port> <remote HPX address> <remote HPX port>"
                 << std::endl;
 
             ps_host = "130.39.128.55";
@@ -67,14 +67,14 @@ int main(int argc, char* argv[])
         }
 
         // Start ParalleX services
-        hpx::util::io_service_pool dgas_pool; 
-        hpx::naming::resolver_client dgas_c(dgas_pool, 
+        hpx::util::io_service_pool agas_pool; 
+        hpx::naming::resolver_client agas_c(agas_pool, 
             hpx::naming::locality(gas_host, gas_port));
 
         hpx::util::io_service_pool io_service_pool(2); 
         hpx::parcelset::parcelport pp (io_service_pool, 
             hpx::naming::locality(ps_host, ps_port));
-        hpx::parcelset::parcelhandler ph (dgas_c, pp);
+        hpx::parcelset::parcelhandler ph (agas_c, pp);
 
         // Create a new thread-manager
         hpx::util::io_service_pool timerpool;
@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
         // retrieve prefix for remote locality
         hpx::naming::id_type remote_prefix;
         hpx::naming::locality remote_l(remote_ps_host, remote_ps_port);
-        dgas_c.get_prefix(remote_l, remote_prefix);
+        agas_c.get_prefix(remote_l, remote_prefix);
 
         // start parcelport receiver thread
         pp.run(false);

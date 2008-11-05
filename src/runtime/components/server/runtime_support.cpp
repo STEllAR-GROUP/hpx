@@ -134,7 +134,7 @@ namespace hpx { namespace components { namespace server
         threads::thread_self& self, applier::applier& app)
     {
         std::vector<naming::id_type> prefixes;
-        app.get_dgas_client().get_prefixes(prefixes);
+        app.get_agas_client().get_prefixes(prefixes);
 
         // shut down all localities except the the local one
         components::stubs::runtime_support rts(app);
@@ -174,7 +174,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     // Load all components from the ini files found in the configuration
     void runtime_support::load_components(util::section& ini, 
-        naming::resolver_client& dgas_client)
+        naming::resolver_client& agas_client)
     {
         // load all components as described in the configuration information
         if (!ini.has_section("hpx.components")) {
@@ -241,11 +241,11 @@ namespace hpx { namespace components { namespace server
                 else
                     lib = fs::path(HPX_DEFAULT_COMPONENT_PATH, fs::native);
 
-                if (!load_component(ini, instance, component, lib, dgas_client, isdefault)) {
+                if (!load_component(ini, instance, component, lib, agas_client, isdefault)) {
                     // build path to component to load
                     std::string libname(component + HPX_SHARED_LIB_EXTENSION);
                     lib /= fs::path(libname, fs::native);
-                    if (!load_component (ini, instance, component, lib, dgas_client, isdefault))
+                    if (!load_component (ini, instance, component, lib, agas_client, isdefault))
                         continue;   // next please :-P
                 }
             } 
@@ -257,7 +257,7 @@ namespace hpx { namespace components { namespace server
 
     bool runtime_support::load_component(util::section& ini, 
         std::string const& instance, std::string const& component, 
-        boost::filesystem::path lib, naming::resolver_client& dgas_client,
+        boost::filesystem::path lib, naming::resolver_client& agas_client,
         bool isdefault)
     {
         namespace fs = boost::filesystem;
@@ -286,7 +286,7 @@ namespace hpx { namespace components { namespace server
             component_factory_type factory (
                 pf.create(instance, glob_ini, component_ini)); 
 
-            component_type t = factory->get_component_type(dgas_client);
+            component_type t = factory->get_component_type(agas_client);
             if (0 == t) {
                 LRT_(info) << "component refused to load: "  << instance;
                 return false;   // module refused to load

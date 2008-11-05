@@ -86,7 +86,7 @@ namespace hpx { namespace naming
         /// Construct a sending resolver_client_connection (for the \a
         /// naming#server#command_bind_range command)
         resolver_client_connection(boost::asio::ip::tcp::socket& socket,
-                server::dgas_server_command c, id_type lower_id, 
+                server::agas_server_command c, id_type lower_id, 
                 std::size_t count, address const& addr, std::ptrdiff_t offset)
           : socket_(socket), 
             req_(c, lower_id, count, addr, offset)
@@ -95,7 +95,7 @@ namespace hpx { namespace naming
         /// Construct a sending resolver_client_connection (for the \a
         /// naming#server#command_unbind_range command)
         resolver_client_connection(boost::asio::ip::tcp::socket& socket,
-                server::dgas_server_command c, id_type lower_id, 
+                server::agas_server_command c, id_type lower_id, 
                 std::size_t count)
           : socket_(socket), req_(c, lower_id, count)
         {}
@@ -103,7 +103,7 @@ namespace hpx { namespace naming
         /// Construct a sending resolver_client_connection (for the \a
         /// naming#server#command_resolve command)
         resolver_client_connection(boost::asio::ip::tcp::socket& socket,
-                server::dgas_server_command c, id_type id)
+                server::agas_server_command c, id_type id)
           : socket_(socket), req_(c, id)
         {}
         

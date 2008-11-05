@@ -22,25 +22,25 @@ namespace hpx { namespace naming { namespace server
     namespace status_strings 
     {
         char const* const success = 
-            "hpx: dgas: success";
+            "hpx: agas: success";
         char const* const repeated_request = 
-            "hpx: dgas: success (repeated request)";
+            "hpx: agas: success (repeated request)";
         char const* const no_success = 
-            "hpx: dgas: no success";
+            "hpx: agas: no success";
         char const* const internal_server_error = 
-            "hpx: dgas: internal server error";
+            "hpx: agas: internal server error";
         char const* const service_unavailable = 
-            "hpx: dgas: service unavailable";
+            "hpx: agas: service unavailable";
         char const* const invalid_status = 
-            "hpx: dgas: corrupted internal status";
+            "hpx: agas: corrupted internal status";
         char const* const bad_parameter = 
-            "hpx: dgas: bad parameter";
+            "hpx: agas: bad parameter";
         char const* const bad_request = 
-            "hpx: dgas: ill formatted request or unknown command";
+            "hpx: agas: ill formatted request or unknown command";
         char const* const out_of_memory = 
-            "hpx: dgas: internal server error (out of memory)";
+            "hpx: agas: internal server error (out of memory)";
         char const* const unknown_version = 
-            "hpx: dgas: ill formatted request (unknown version)";
+            "hpx: agas: ill formatted request (unknown version)";
     }
 
     char const* const get_error_text(error status)

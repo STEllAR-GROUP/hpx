@@ -67,11 +67,11 @@ namespace hpx { namespace components
     ///
     /// Additionally it provides memory management capabilities for the 
     /// wrapping instances, and it integrates the memory management with the 
-    /// DGAS service. Every instance of a managed_component gets assigned 
+    /// AGAS service. Every instance of a managed_component gets assigned 
     /// a global id.
     /// The provided memory management allocates the managed_component 
     /// instances from a special heap, ensuring fast allocation and avoids a 
-    /// full network round trip to the DGAS service for each of the allocated 
+    /// full network round trip to the AGAS service for each of the allocated 
     /// instances.
     ///
     /// \tparam Component
@@ -177,7 +177,7 @@ namespace hpx { namespace components
         ///         a class specific allocator. This allocator uses a one size 
         ///         heap implementation, ensuring fast memory allocation.
         ///         Additionally the heap registers the allocated  
-        ///         managed_component instance with the DGAS service.
+        ///         managed_component instance with the AGAS service.
         ///
         /// \param size   [in] The parameter \a size is supplied by the 
         ///               compiler and contains the number of bytes to allocate.

@@ -21,9 +21,9 @@ hpx_main(threads::thread_self& self, applier::applier& appl)
 int main(int argc, char* argv[])
 {
     try {
-        // initialize the DGAS service
-        hpx::util::io_service_pool dgas_pool; 
-        hpx::naming::resolver_server dgas(dgas_pool);
+        // initialize the AGAS service
+        hpx::util::io_service_pool agas_pool; 
+        hpx::naming::resolver_server agas(agas_pool);
 
         // start the HPX runtime
         hpx::runtime rt("localhost", HPX_PORT);

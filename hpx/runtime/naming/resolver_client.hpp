@@ -28,7 +28,7 @@ namespace hpx { namespace naming
 
     /// \class resolver_client resolver_client.hpp hpx/runtime/naming/resolver_client.hpp
     ///
-    /// The top-level class of the DGAS client. This class exposes the DGAS 
+    /// The top-level class of the AGAS client. This class exposes the AGAS 
     /// server functionality on the client side.
     class HPX_EXPORT resolver_client
     {
@@ -39,7 +39,7 @@ namespace hpx { namespace naming
         /// \param io_service_pool
         ///                 [in] The pool of networking threads to use to serve 
         ///                 outgoing requests
-        /// \param l        [in] This is the locality the DGAS server is 
+        /// \param l        [in] This is the locality the AGAS server is 
         ///                 running on.
         /// \param start_asynchronously 
         ///                 [in] This parameter allows to start 
@@ -71,10 +71,10 @@ namespace hpx { namespace naming
         /// \brief Query for the prefixes of all known localities.
         ///
         /// This function returns the prefixes of all localities known to the 
-        /// DGAS server.
+        /// AGAS server.
         /// 
         /// \param prefixes   [out] The vector will contain the prefixes of all
-        ///                   localities registered with the DGAS server. The
+        ///                   localities registered with the AGAS server. The
         ///                   returned vector holds the prefixes representing 
         ///                   the runtime_support components of these 
         ///                   localities.
@@ -98,7 +98,7 @@ namespace hpx { namespace naming
         /// \brief Get unique range of freely assignable global ids 
         ///
         /// Every locality needs to be able to assign global ids to different
-        /// components without having to consult the DGAS server for every id 
+        /// components without having to consult the AGAS server for every id 
         /// to generate. This function can be called to preallocate a range of
         /// ids usable for this purpose.
         /// 
@@ -160,7 +160,7 @@ namespace hpx { namespace naming
         /// \brief Bind unique range of global ids to given base address
         ///
         /// Every locality needs to be able to bind global ids to different
-        /// components without having to consult the DGAS server for every id 
+        /// components without having to consult the AGAS server for every id 
         /// to bind. This function can be called to bind a range of consecutive 
         /// global ids to a range of consecutive local addresses (separated by 
         /// a given \a offset).
@@ -187,7 +187,7 @@ namespace hpx { namespace naming
         ///        address
         ///
         /// Every locality needs to be able to bind global ids to different
-        /// components without having to consult the DGAS server for every id 
+        /// components without having to consult the AGAS server for every id 
         /// to bind. This function can be called to asynchronously bind a range 
         /// of consecutive global ids to a range of consecutive local addresses 
         /// (separated by a given \a offset).
@@ -465,7 +465,7 @@ namespace hpx { namespace naming
         /// name. Any error results in an exception thrown from this function.
         bool queryid(std::string const& ns_name, id_type& id) const;
 
-        /// \brief Query for the gathered statistics of this DGAS instance 
+        /// \brief Query for the gathered statistics of this AGAS instance 
         ///        (server execution count)
         ///
         /// This function returns the execution counts for each of the 
@@ -477,7 +477,7 @@ namespace hpx { namespace naming
         ///                   of the size 'server::command_lastcommand').
         bool get_statistics_count(std::vector<std::size_t>& counts) const;
 
-        /// \brief Query for the gathered statistics of this DGAS instance 
+        /// \brief Query for the gathered statistics of this AGAS instance 
         ///        (average server execution time)
         ///
         /// This function returns the average timings for each of the commands
@@ -488,7 +488,7 @@ namespace hpx { namespace naming
         ///                   of the size 'server::command_lastcommand').
         bool get_statistics_mean(std::vector<double>& timings) const;
 
-        /// \brief Query for the gathered statistics of this DGAS instance 
+        /// \brief Query for the gathered statistics of this AGAS instance 
         ///        (statistical 2nd moment of server execution time)
         ///
         /// This function returns the 2nd moment for the timings for each of 

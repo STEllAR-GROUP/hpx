@@ -36,7 +36,7 @@ namespace hpx { namespace components { namespace server
     {
         // get list of locality prefixes
         std::vector<naming::id_type> prefixes;
-        appl.get_dgas_client().get_prefixes(prefixes);
+        appl.get_agas_client().get_prefixes(prefixes);
 
         std::size_t created_count = 0;
         std::size_t count_on_locality = count / prefixes.size();

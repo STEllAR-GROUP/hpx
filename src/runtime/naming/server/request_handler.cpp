@@ -551,7 +551,7 @@ namespace hpx { namespace naming { namespace server
     ///////////////////////////////////////////////////////////////////////////
     void request_handler::handle_request(request const& req, reply& rep)
     {
-        LDGAS_(info) << "request: " << req;
+        LAGAS_(info) << "request: " << req;
         switch (req.get_command()) {
         case command_getprefix:
             handle_getprefix(req, rep);
@@ -611,10 +611,10 @@ namespace hpx { namespace naming { namespace server
         }
 
         if (rep.get_status() != success && rep.get_status() != repeated_request) {
-            LDGAS_(error) << "response: " << rep;
+            LAGAS_(error) << "response: " << rep;
         }
         else {
-            LDGAS_(info) << "response: " << rep;
+            LAGAS_(info) << "response: " << rep;
         }
     }
 

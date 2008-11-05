@@ -52,7 +52,7 @@ namespace hpx
 
     /// \namespace naming
     ///
-    /// The namespace \a naming contains all definitions needed for the DGAS
+    /// The namespace \a naming contains all definitions needed for the AGAS
     /// (Distributed Global Address Space) service.
     namespace naming
     {

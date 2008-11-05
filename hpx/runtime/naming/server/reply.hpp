@@ -51,7 +51,7 @@ namespace hpx { namespace naming { namespace server
             error_ += std::string(": ") + what;
         }
 
-        reply (dgas_server_command command, error s = success,
+        reply (agas_server_command command, error s = success,
                 char const* what = 0)
           : command_(command), status_(s), 
             error_(get_error_text(s)),
@@ -61,7 +61,7 @@ namespace hpx { namespace naming { namespace server
                 error_ += std::string(": ") + what;
         }
 
-        reply (dgas_server_command command, naming::id_type const& id, 
+        reply (agas_server_command command, naming::id_type const& id, 
                error s = success)
           : command_(command), status_(s),
             error_(get_error_text(s)),
@@ -88,7 +88,7 @@ namespace hpx { namespace naming { namespace server
         }
 
         template <typename Container, typename F>
-        reply (dgas_server_command command, Container const& totals, F f,
+        reply (agas_server_command command, Container const& totals, F f,
                error s = success)
           : command_(command), status_(s),
             error_(get_error_text(s)),
@@ -103,7 +103,7 @@ namespace hpx { namespace naming { namespace server
                 statistics_.push_back(f(totals[i]));
         }
 
-        reply (dgas_server_command command, naming::address addr)
+        reply (agas_server_command command, naming::address addr)
           : command_(command), status_(success), 
             error_(get_error_text(success)),
             address_(addr),
@@ -113,7 +113,7 @@ namespace hpx { namespace naming { namespace server
                          command == command_unbind_range);
         }
 
-        reply (error s, dgas_server_command command, 
+        reply (error s, agas_server_command command, 
                 naming::id_type prefix)
           : command_(command_getprefix), status_(s),
             error_(get_error_text(s)),
@@ -123,7 +123,7 @@ namespace hpx { namespace naming { namespace server
             BOOST_ASSERT(command == command_getprefix);
         }
 
-        reply (error s, dgas_server_command command, 
+        reply (error s, agas_server_command command, 
                 naming::id_type lower_bound, naming::id_type upper_bound)
           : command_(command_getidrange), status_(s),
             error_(get_error_text(s)),
@@ -171,7 +171,7 @@ namespace hpx { namespace naming { namespace server
         double get_statictics(std::size_t i) const
         {
             if (i >= command_lastcommand)
-                HPX_THROW_EXCEPTION(bad_parameter, "unknown DGAS command");
+                HPX_THROW_EXCEPTION(bad_parameter, "unknown AGAS command");
             return statistics_[i];
         }
 

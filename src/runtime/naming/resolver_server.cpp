@@ -76,7 +76,7 @@ namespace hpx { namespace naming
       : io_service_pool_(io_service_pool),
         acceptor_(io_service_pool_.get_io_service()),
         request_handler_(), 
-        here_(util::runtime_configuration().get_dgas_locality(address, port))
+        here_(util::runtime_configuration().get_agas_locality(address, port))
     {
         // start the io_service
         run(false);
@@ -124,7 +124,7 @@ namespace hpx { namespace naming
     void resolver_server::run(bool blocking)
     {
         if (!io_service_pool_.is_running()) 
-            LDGAS_(info) << "startup: listening at: " << here_;
+            LAGAS_(info) << "startup: listening at: " << here_;
         io_service_pool_.run(blocking);
     }
 
@@ -132,7 +132,7 @@ namespace hpx { namespace naming
     {
         if (io_service_pool_.is_running()) {
             io_service_pool_.stop();
-            LDGAS_(info) << "shutdown: stopped listening at: " << here_;
+            LAGAS_(info) << "shutdown: stopped listening at: " << here_;
         }
     }
 
@@ -159,7 +159,7 @@ namespace hpx { namespace naming
         if (e && e != boost::asio::error::operation_aborted)
         {
             // FIXME: add error handling
-            LDGAS_(error) << "handle read operation completion: error: " 
+            LAGAS_(error) << "handle read operation completion: error: " 
                           << e.message();
         }
     }

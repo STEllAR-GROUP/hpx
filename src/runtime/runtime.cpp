@@ -47,26 +47,26 @@ namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(std::string const& address, boost::uint16_t port,
-            std::string const& dgas_address, boost::uint16_t dgas_port) 
-      : ini_(), dgas_pool_(), parcel_pool_(), timer_pool_(),
-        dgas_client_(dgas_pool_, ini_.get_dgas_locality(dgas_address, dgas_port)),
+            std::string const& agas_address, boost::uint16_t agas_port) 
+      : ini_(), agas_pool_(), parcel_pool_(), timer_pool_(),
+        agas_client_(agas_pool_, ini_.get_agas_locality(agas_address, agas_port)),
         parcel_port_(parcel_pool_, naming::locality(address, port)),
         thread_manager_(timer_pool_, boost::bind(&runtime::stop, This(), false)),
-        parcel_handler_(dgas_client_, parcel_port_, &thread_manager_),
-        runtime_support_(ini_, dgas_client_),
+        parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
+        runtime_support_(ini_, agas_client_),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_)
     {}
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime::runtime(naming::locality address, naming::locality dgas_address) 
-      : ini_(), dgas_pool_(), parcel_pool_(), timer_pool_(),
-        dgas_client_(dgas_pool_, dgas_address),
+    runtime::runtime(naming::locality address, naming::locality agas_address) 
+      : ini_(), agas_pool_(), parcel_pool_(), timer_pool_(),
+        agas_client_(agas_pool_, agas_address),
         parcel_port_(parcel_pool_, address),
         thread_manager_(timer_pool_, boost::bind(&runtime::stop, This(), false)),
-        parcel_handler_(dgas_client_, parcel_port_, &thread_manager_),
-        runtime_support_(ini_, dgas_client_),
+        parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
+        runtime_support_(ini_, agas_client_),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_)
@@ -74,12 +74,12 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(naming::locality address) 
-      : ini_(), dgas_pool_(), parcel_pool_(), timer_pool_(),
-        dgas_client_(dgas_pool_, ini_.get_dgas_locality()),
+      : ini_(), agas_pool_(), parcel_pool_(), timer_pool_(),
+        agas_client_(agas_pool_, ini_.get_agas_locality()),
         parcel_port_(parcel_pool_, address),
         thread_manager_(timer_pool_),
-        parcel_handler_(dgas_client_, parcel_port_, &thread_manager_),
-        runtime_support_(ini_, dgas_client_),
+        parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
+        runtime_support_(ini_, agas_client_),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_)
@@ -93,7 +93,7 @@ namespace hpx
         // stop all services
         parcel_port_.stop();      // stops parcel_pool_ as well
         thread_manager_.stop();   // stops timer_pool_ as well
-        dgas_pool_.stop();
+        agas_pool_.stop();
 
         runtime_support_.tidy();  // unload libraries
 
@@ -118,13 +118,13 @@ namespace hpx
         thread_manager_.run(num_threads);   // start the thread manager, timer_pool_ as well
         parcel_port_.run(false);            // starts parcel_pool_ as well
 
-        // register the runtime_support and memory instances with the DGAS 
-        dgas_client_.bind(applier_.get_runtime_support_gid(), 
+        // register the runtime_support and memory instances with the AGAS 
+        agas_client_.bind(applier_.get_runtime_support_gid(), 
             naming::address(parcel_port_.here(), 
                 components::get_component_type<components::server::runtime_support>(), 
                 &runtime_support_));
 
-        dgas_client_.bind(applier_.get_memory_gid(), 
+        agas_client_.bind(applier_.get_memory_gid(), 
             naming::address(parcel_port_.here(), 
                 components::get_component_type<components::server::memory>(), 
                 &memory_));
@@ -203,18 +203,18 @@ namespace hpx
         LRT_(info) << "runtime: about to stop services";
 
         try {
-            // unregister the runtime_support and memory instances from the DGAS 
-            dgas_client_.unbind(applier_.get_runtime_support_gid());
-            dgas_client_.unbind(applier_.get_memory_gid());
+            // unregister the runtime_support and memory instances from the AGAS 
+            agas_client_.unbind(applier_.get_runtime_support_gid());
+            agas_client_.unbind(applier_.get_memory_gid());
         }
         catch(hpx::exception const&) {
-            ; // ignore errors during system shutdown (DGAS might be down already)
+            ; // ignore errors during system shutdown (AGAS might be down already)
         }
 
         // stop runtime services (threads)
         thread_manager_.stop(blocking);
         parcel_port_.stop(blocking);    // stops parcel_pool_ as well
-        dgas_pool_.stop();
+        agas_pool_.stop();
         runtime_support_.stop();        // re-activate main thread 
 
         LRT_(info) << "runtime: stopped all services";

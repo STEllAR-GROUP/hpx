@@ -54,28 +54,28 @@ int main(int argc, char* argv[])
     try {
         // Check command line arguments.
         std::string host;
-        boost::uint16_t ps_port, dgas_port;
+        boost::uint16_t ps_port, agas_port;
 
         // Check command line arguments.
         if (argc != 4) {
-            std::cerr << "Usage: barrier_tests hpx_addr hpx_port dgas_port" 
+            std::cerr << "Usage: barrier_tests hpx_addr hpx_port agas_port" 
                 << std::endl;
             return -1;
         }
         else {
             host = argv[1];
             ps_port = boost::lexical_cast<boost::uint16_t>(argv[2]);
-            dgas_port  = boost::lexical_cast<boost::uint16_t>(argv[3]);
+            agas_port  = boost::lexical_cast<boost::uint16_t>(argv[3]);
         }
 
-        // initialize the DGAS service
-        hpx::util::io_service_pool dgas_pool; 
-        hpx::naming::resolver_server dgas(dgas_pool, 
-            hpx::naming::locality(host, dgas_port));
+        // initialize the AGAS service
+        hpx::util::io_service_pool agas_pool; 
+        hpx::naming::resolver_server agas(agas_pool, 
+            hpx::naming::locality(host, agas_port));
 
         // start the HPX runtime using different numbers of threads
         for (int i = 1; i <= 8; ++i) {
-            hpx::runtime rt(host, ps_port, host, dgas_port);
+            hpx::runtime rt(host, ps_port, host, agas_port);
 
             lcos::barrier b(5);       // create a barrier waiting on 5 threads
             boost::detail::atomic_count counter(0);

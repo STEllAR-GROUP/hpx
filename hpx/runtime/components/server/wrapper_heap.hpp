@@ -44,7 +44,7 @@ namespace hpx { namespace components { namespace detail
         explicit wrapper_heap(char const* class_name, bool, bool, 
                 std::size_t step = (std::size_t)-1)
           : pool_(NULL), first_free_(NULL), step_(step), size_(0), free_size_(0),
-            base_gid_(naming::invalid_id), get_dgas_client_(NULL)
+            base_gid_(naming::invalid_id), get_agas_client_(NULL)
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
           , class_name_(class_name)
 #endif
@@ -61,7 +61,7 @@ namespace hpx { namespace components { namespace detail
         wrapper_heap()
           : pool_(NULL), first_free_(NULL), 
             step_(heap_step), size_(0), free_size_(0),
-            base_gid_(naming::invalid_id), get_dgas_client_(NULL)
+            base_gid_(naming::invalid_id), get_agas_client_(NULL)
         {
             BOOST_ASSERT(sizeof(storage_type) == heap_size);
         }
@@ -137,16 +137,16 @@ namespace hpx { namespace components { namespace detail
 
             value_type* addr = static_cast<value_type*>(pool_->address());
             if (!base_gid_) {
-                // store a pointer to the DGAS client
-                get_dgas_client_ = &appl.get_dgas_client();
+                // store a pointer to the AGAS client
+                get_agas_client_ = &appl.get_agas_client();
 
                 // this is the first call to get_gid() for this heap - allocate 
                 // a sufficiently large range of global ids
-                base_gid_ = ids.get_id(appl.here(), *get_dgas_client_, step_);
+                base_gid_ = ids.get_id(appl.here(), *get_agas_client_, step_);
 
                 // register the global ids and the base address of this heap
-                // with the DGAS
-                if (!appl.get_dgas_client().bind_range(base_gid_, step_, 
+                // with the AGAS
+                if (!appl.get_agas_client().bind_range(base_gid_, step_, 
                       naming::address(appl.here(), value_type::get_component_type(), addr),
                       sizeof(value_type))) 
                 {
@@ -163,10 +163,10 @@ namespace hpx { namespace components { namespace detail
                 return false;
             BOOST_ASSERT(free_size_ == size_);
 
-            // unbind in DGAS service 
+            // unbind in AGAS service 
             if (base_gid_) {
-                BOOST_ASSERT(NULL != get_dgas_client_);
-                get_dgas_client_->unbind_range(base_gid_, step_);
+                BOOST_ASSERT(NULL != get_agas_client_);
+                get_agas_client_->unbind_range(base_gid_, step_);
                 base_gid_ = naming::invalid_id;
             }
 
@@ -216,10 +216,10 @@ namespace hpx { namespace components { namespace detail
         std::size_t size_;
         int free_size_;
 
-        // these values are used for DGAS registration of all elements of this
+        // these values are used for AGAS registration of all elements of this
         // managed_component heap
         naming::id_type base_gid_;
-        naming::resolver_client const* get_dgas_client_;
+        naming::resolver_client const* get_agas_client_;
 
 #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
         std::string class_name_;

@@ -49,15 +49,15 @@ int main(int argc, char* argv[])
 {
     try {
         // Check command line arguments.
-        std::string hpx_host, dgas_host;
-        boost::uint16_t hpx_port, dgas_port;
+        std::string hpx_host, agas_host;
+        boost::uint16_t hpx_port, agas_port;
         std::size_t num_threads = 1;
         std::size_t num_hpx_threads = 1;
 
         // Check command line arguments.
         if (argc != 7) {
-            std::cerr << "Usage: hpx_runtime hpx_addr hpx_port dgas_addr "
-                         "dgas_port number_of_threads number_of_threads" 
+            std::cerr << "Usage: hpx_runtime hpx_addr hpx_port agas_addr "
+                         "agas_port number_of_threads number_of_threads" 
                       << std::endl;
             std::cerr << "Try: hpx_runtime <your_ip_addr> 7911 "
                          "<your_ip_addr> 7912 1 1000" << std::endl;
@@ -66,19 +66,19 @@ int main(int argc, char* argv[])
         else {
             hpx_host = argv[1];
             hpx_port = boost::lexical_cast<boost::uint16_t>(argv[2]);
-            dgas_host = argv[3];
-            dgas_port  = boost::lexical_cast<boost::uint16_t>(argv[4]);
+            agas_host = argv[3];
+            agas_port  = boost::lexical_cast<boost::uint16_t>(argv[4]);
             num_threads = boost::lexical_cast<int>(argv[5]);
             num_hpx_threads = boost::lexical_cast<int>(argv[6]);
         }
 
-        // run the DGAS server instance here
-        hpx::util::io_service_pool dgas_pool; 
-        hpx::naming::resolver_server dgas(dgas_pool, 
-            hpx::naming::locality(dgas_host, dgas_port));
+        // run the AGAS server instance here
+        hpx::util::io_service_pool agas_pool; 
+        hpx::naming::resolver_server agas(agas_pool, 
+            hpx::naming::locality(agas_host, agas_port));
 
         // initialize and start the HPX runtime
-        hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port);
+        hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port);
 
         // the main thread will wait (block) for the shutdown action and 
         // the threadmanager is serving incoming requests in the meantime

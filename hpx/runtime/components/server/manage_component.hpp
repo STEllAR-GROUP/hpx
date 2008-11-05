@@ -43,7 +43,7 @@ namespace hpx { namespace components { namespace server
     {
         // retrieve the local address bound to the given global id
         naming::address addr;
-        if (!appl.get_dgas_client().resolve(gid, addr)) 
+        if (!appl.get_agas_client().resolve(gid, addr)) 
         {
             HPX_THROW_EXCEPTION(hpx::unknown_component_address,
                 "global id is not bound to any component instance");

@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
     {
         std::cerr << "Using default settings: localhost:7911, threads:1" 
                   << std::endl;
-        std::cerr << "Possible arguments: <DGAS address> <DGAS port> <num_threads>"
+        std::cerr << "Possible arguments: <AGAS address> <AGAS port> <num_threads>"
                   << std::endl;
 
         host = "localhost";

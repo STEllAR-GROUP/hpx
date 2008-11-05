@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
     if (argc != 3)
     {
         std::cerr << "Using default settings: localhost:7911" << std::endl;
-        std::cerr << "Possible arguments: <DGAS address> <DGAS port>" << std::endl;
+        std::cerr << "Possible arguments: <AGAS address> <AGAS port>" << std::endl;
 
         host = "localhost";
         port = 7911;

@@ -65,11 +65,11 @@ namespace hpx { namespace parcelset
         }
         
     public:
-        /// Construct a new \a parcelhandler initializing it from a DGAS client
+        /// Construct a new \a parcelhandler initializing it from a AGAS client
         /// instance (parameter \a resolver) and the parcelport to be used for
         /// parcel send and receive (parameter \a pp).
         ///
-        /// \param resolver [in] A reference to the DGAS client to use for 
+        /// \param resolver [in] A reference to the AGAS client to use for 
         ///                 address translation requests to be made by the 
         ///                 parcelhandler.
         /// \param pp       [in] A reference to the \a parcelport this \a
@@ -92,9 +92,9 @@ namespace hpx { namespace parcelset
         {
         }
 
-        /// \brief Allow access to DGAS resolver instance. 
+        /// \brief Allow access to AGAS resolver instance. 
         ///
-        /// This accessor returns a reference to the DGAS resolver client 
+        /// This accessor returns a reference to the AGAS resolver client 
         /// object the parcelhandler has been initialized with (see 
         /// parcelhandler constructors). This is the same resolver instance 
         /// this parcelhandler has been initialized with.
@@ -125,7 +125,7 @@ namespace hpx { namespace parcelset
         ///     get_resolver().get_prefix(here, prefix);
         /// \endcode
         /// 
-        /// but doesn't require the full DGAS round trip as the prefix value 
+        /// but doesn't require the full AGAS round trip as the prefix value 
         /// is cached inside the parcelhandler.
         naming::id_type const& get_prefix() const 
         { 
@@ -138,7 +138,7 @@ namespace hpx { namespace parcelset
         ///                 by the function.
         ///
         /// \returns The function returns \a true if there is at least one 
-        ///          remote locality known to the DGASservice 
+        ///          remote locality known to the AGASservice 
         ///          (!prefixes.empty()).
         bool get_remote_prefixes(std::vector<naming::id_type>& prefixes) const;
 
@@ -436,7 +436,7 @@ namespace hpx { namespace parcelset
         }
 
     private:
-        /// The DGAS client
+        /// The AGAS client
         naming::resolver_client& resolver_;
         
         /// The site prefix of the locality 

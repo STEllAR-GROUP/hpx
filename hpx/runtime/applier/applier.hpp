@@ -230,12 +230,12 @@ namespace hpx { namespace applier
         // bring in the rest of the apply<> overloads
         #include <hpx/runtime/applier/applier_implementations.hpp>
 
-        /// \brief Allow access to the DGAS client instance used with this
+        /// \brief Allow access to the AGAS client instance used with this
         ///        \a applier.
         ///
         /// This accessor returns a reference to the resolver client this 
         /// applier instance has been created with.
-        naming::resolver_client const& get_dgas_client() const
+        naming::resolver_client const& get_agas_client() const
         {
             return parcel_handler_.get_resolver();
         }
@@ -281,16 +281,16 @@ namespace hpx { namespace applier
         }
 
         /// \brief Allow access to the prefixes of all remote localities 
-        ///        registered with the DGAS service.
+        ///        registered with the AGAS service.
         ///
         /// This accessor returns a list of all remote localities (all 
-        /// localities known to DGAS except the local one).
+        /// localities known to AGAS except the local one).
         ///
         /// \param prefixes [out] The reference to a vector of id_types filled
         ///                 by the function.
         ///
         /// \returns The function returns \a true if there is at least one 
-        ///          remote locality known to the DGASservice 
+        ///          remote locality known to the AGASservice 
         ///          (!prefixes.empty()).
         bool get_remote_prefixes(std::vector<naming::id_type>& prefixes) const
         {

@@ -3,7 +3,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# dgas examples (resolver_server/resolver_client)
+# agas examples (resolver_server/resolver_client)
 set(resolver_client_SOURCES resolver_client.cpp)
 add_executable(resolver_client_exe ${resolver_client_SOURCES})
 set_target_properties(resolver_client_exe PROPERTIES OUTPUT_NAME resolver_client)

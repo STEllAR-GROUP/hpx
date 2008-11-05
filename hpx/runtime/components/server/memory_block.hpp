@@ -363,7 +363,7 @@ namespace hpx { namespace components { namespace server
         ///         a class specific allocator. This allocator uses a one size 
         ///         heap implementation, ensuring fast memory allocation.
         ///         Additionally the heap registers the allocated  
-        ///         managed_component instance with the DGAS service.
+        ///         managed_component instance with the AGAS service.
         ///
         /// \param size   [in] The parameter \a size is supplied by the 
         ///               compiler and contains the number of bytes to allocate.

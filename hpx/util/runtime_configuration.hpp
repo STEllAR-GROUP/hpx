@@ -23,13 +23,13 @@ namespace hpx { namespace util
         runtime_configuration();
         runtime_configuration(std::vector<std::string> const& prefill);
 
-        // Get the DGAS locality to use 
-        naming::locality get_dgas_locality();
+        // Get the AGAS locality to use 
+        naming::locality get_agas_locality();
 
-        // Get the DGAS locality to use (default_address/default_port are 
+        // Get the AGAS locality to use (default_address/default_port are 
         // the default values describing the locality to use if no 
         // configuration info can be found).
-        naming::locality get_dgas_locality(
+        naming::locality get_agas_locality(
             std::string default_address, boost::uint16_t default_port);
     };
 

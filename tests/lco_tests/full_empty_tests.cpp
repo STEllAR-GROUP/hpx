@@ -82,26 +82,26 @@ int main(int argc, char* argv[])
     try {
         // Check command line arguments.
         std::string host;
-        boost::uint16_t ps_port, dgas_port;
+        boost::uint16_t ps_port, agas_port;
 
         // Check command line arguments.
         if (argc != 4) {
-            std::cerr << "Usage: full_empty_test hpx_addr hpx_port dgas_port" 
+            std::cerr << "Usage: full_empty_test hpx_addr hpx_port agas_port" 
                 << std::endl;
             return -1;
         }
         else {
             host = argv[1];
             ps_port = boost::lexical_cast<boost::uint16_t>(argv[2]);
-            dgas_port  = boost::lexical_cast<boost::uint16_t>(argv[3]);
+            agas_port  = boost::lexical_cast<boost::uint16_t>(argv[3]);
         }
 
-        // initialize the DGAS service
-        hpx::util::io_service_pool dgas_pool; 
-        hpx::naming::resolver_server dgas(dgas_pool, host, dgas_port);
+        // initialize the AGAS service
+        hpx::util::io_service_pool agas_pool; 
+        hpx::naming::resolver_server agas(agas_pool, host, agas_port);
 
         // initialize and start the HPX runtime
-        hpx::runtime rt(host, ps_port, host, dgas_port);
+        hpx::runtime rt(host, ps_port, host, agas_port);
         rt.run(hpx_main, 2);
     }
     catch (std::exception& e) {

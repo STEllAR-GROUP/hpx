@@ -25,8 +25,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming { namespace server 
 {
-    /// the commands supported by the DGAS server
-    enum dgas_server_command
+    /// the commands supported by the AGAS server
+    enum agas_server_command
     {
         command_unknown = -1,
         command_firstcommand = 0,
@@ -53,46 +53,46 @@ namespace hpx { namespace naming { namespace server
     class request
     {
     public:
-        request(dgas_server_command c = command_unknown) 
+        request(agas_server_command c = command_unknown) 
           : command_(c)
         {}
 
         // get_prefix
-        request(dgas_server_command c, locality const& l) 
+        request(agas_server_command c, locality const& l) 
           : command_(c), site_(l)
         {}
 
         // get_id_range
-        request(dgas_server_command c, locality const& l, std::size_t count) 
+        request(agas_server_command c, locality const& l, std::size_t count) 
           : command_(c), count_(count), site_(l)
         {}
 
         // resolve
-        request(dgas_server_command c, naming::id_type const& id) 
+        request(agas_server_command c, naming::id_type const& id) 
           : command_(c), id_(id)
         {}
 
         // registerid
-        request(dgas_server_command c, std::string const& ns_name, 
+        request(agas_server_command c, std::string const& ns_name, 
                 naming::id_type const& id) 
           : command_(c), id_(id), name_(ns_name)
         {}
 
         // get_component_id
         // unregisterid
-        request(dgas_server_command c, std::string const& ns_name) 
+        request(agas_server_command c, std::string const& ns_name) 
           : command_(c), name_(ns_name)
         {}
 
         // bind_range
-        request(dgas_server_command c, naming::id_type id, std::size_t count, 
+        request(agas_server_command c, naming::id_type id, std::size_t count, 
                 address const& addr, std::ptrdiff_t offset) 
           : command_(c), id_(id), count_(count), 
             addr_(addr), offset_(offset)
         {}
 
         // unbind_range
-        request(dgas_server_command c, naming::id_type id, std::size_t count) 
+        request(agas_server_command c, naming::id_type id, std::size_t count) 
           : command_(c), id_(id), count_(count)
         {}
 
@@ -246,7 +246,7 @@ namespace hpx { namespace naming { namespace server
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     private:
-        boost::uint8_t command_;    /// one of the dgas_server_command's above
+        boost::uint8_t command_;    /// one of the agas_server_command's above
         naming::id_type id_;        /// global id (resolve, bind and unbind only)
         std::size_t count_;         /// number of global ids (bind_range, unbind_range only)
         naming::locality site_;     /// our address 

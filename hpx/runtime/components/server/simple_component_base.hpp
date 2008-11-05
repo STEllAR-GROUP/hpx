@@ -32,7 +32,7 @@ namespace hpx { namespace components
         ~simple_component_base()
         {
             if (gid_)
-                appl_.get_dgas_client().unbind(gid_);
+                appl_.get_agas_client().unbind(gid_);
         }
 
         // This is the component id. Every component needs to have an embedded
@@ -49,10 +49,10 @@ namespace hpx { namespace components
 
         /// \brief Create a new GID (if called for the first time), assign this 
         ///        GID to this instance of a component and register this gid 
-        ///        with the DGAS service
+        ///        with the AGAS service
         ///
         /// \param appl   The applier instance to be used for accessing the 
-        ///               DGAS service.
+        ///               AGAS service.
         ///
         /// \returns      The global id (GID)  assigned to this instance of a 
         ///               component
@@ -64,7 +64,7 @@ namespace hpx { namespace components
                 naming::address addr(appl.here(), Component::get_component_type(), 
                     boost::uint64_t(static_cast<Component const*>(this)));
                 gid_ = appl_.get_parcel_handler().get_next_id();
-                if (!appl_.get_dgas_client().bind(gid_, addr))
+                if (!appl_.get_agas_client().bind(gid_, addr))
                 {
                     HPX_OSSTREAM strm;
                     strm << gid_;

@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
     if (argc != 3)
     {
         std::cerr << "Using default settings: localhost:7911" << std::endl;
-        std::cerr << "Possible arguments: <DGAS address> <DGAS port>" << std::endl;
+        std::cerr << "Possible arguments: <AGAS address> <AGAS port>" << std::endl;
 
         host = "localhost";
         port = 7911;
@@ -40,8 +40,8 @@ int main(int argc, char* argv[])
 
         // this is our locality
         locality here("localhost", HPX_PORT);
-        hpx::util::io_service_pool dgas_pool; 
-        resolver_client resolver(dgas_pool, hpx::naming::locality(host, port));
+        hpx::util::io_service_pool agas_pool; 
+        resolver_client resolver(agas_pool, hpx::naming::locality(host, port));
         
         id_type last_lowerid;
         

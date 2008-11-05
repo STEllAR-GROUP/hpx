@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_DGAS_LOGGING_APR_10_2008_1032AM)
-#define HPX_UTIL_DGAS_LOGGING_APR_10_2008_1032AM
+#if !defined(HPX_UTIL_AGAS_LOGGING_APR_10_2008_1032AM)
+#define HPX_UTIL_AGAS_LOGGING_APR_10_2008_1032AM
 
 #include <string>
 #include <hpx/config.hpp>
@@ -17,16 +17,16 @@ namespace hpx { namespace util
     typedef boost::logging::level::holder filter_type;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT BOOST_DECLARE_LOG_FILTER(dgas_level, filter_type)
-    HPX_EXPORT BOOST_DECLARE_LOG(dgas_logger, logger_type)
+    HPX_EXPORT BOOST_DECLARE_LOG_FILTER(agas_level, filter_type)
+    HPX_EXPORT BOOST_DECLARE_LOG(agas_logger, logger_type)
 
-    #define LDGAS_(lvl)                                                       \
-        BOOST_LOG_USE_LOG_IF_LEVEL(hpx::util::dgas_logger(),                  \
-            hpx::util::dgas_level(), lvl)                                     \
+    #define LAGAS_(lvl)                                                       \
+        BOOST_LOG_USE_LOG_IF_LEVEL(hpx::util::agas_logger(),                  \
+            hpx::util::agas_level(), lvl)                                     \
     /**/
 
-    #define LDGAS_ENABLED(lvl)                                                \
-        hpx::util::dgas_level()->is_enabled(::boost::logging::level::lvl)     \
+    #define LAGAS_ENABLED(lvl)                                                \
+        hpx::util::agas_level()->is_enabled(::boost::logging::level::lvl)     \
     /**/
 
     ///////////////////////////////////////////////////////////////////////////

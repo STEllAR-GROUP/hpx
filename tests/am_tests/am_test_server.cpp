@@ -40,9 +40,9 @@ int main(int argc, char* argv[])
         // Check command line arguments.
         if (argc != 6) 
         {
-            std::cerr << "Using default settings: ps:localhost:7911 dgas:localhost:7912 threads:3" 
+            std::cerr << "Using default settings: ps:localhost:7911 agas:localhost:7912 threads:3" 
                 << std::endl;
-            std::cerr << "Possible arguments: <HPX address> <HPX port> <DGAS address> <DGAS port> <num_threads>"
+            std::cerr << "Possible arguments: <HPX address> <HPX port> <AGAS address> <AGAS port> <num_threads>"
                 << std::endl;
 
             ps_host = "130.39.128.55";;
@@ -61,15 +61,15 @@ int main(int argc, char* argv[])
         }
 
         // Run the ParalleX services
-        hpx::util::io_service_pool dgas_pool; 
-        hpx::naming::resolver_server dgas_s(dgas_pool, gas_host, gas_port);
-        hpx::naming::resolver_client dgas_c(dgas_pool, 
+        hpx::util::io_service_pool agas_pool; 
+        hpx::naming::resolver_server agas_s(agas_pool, gas_host, gas_port);
+        hpx::naming::resolver_client agas_c(agas_pool, 
             hpx::naming::locality(gas_host, gas_port));
 
         hpx::util::io_service_pool io_service_pool(num_threads); 
         hpx::parcelset::parcelport pp(io_service_pool, 
             hpx::naming::locality(ps_host, ps_port));
-        hpx::parcelset::parcelhandler ph(dgas_c, pp);
+        hpx::parcelset::parcelhandler ph(agas_c, pp);
 
         // Create a new thread-manager
         hpx::util::io_service_pool timerpool;
@@ -103,12 +103,12 @@ int main(int argc, char* argv[])
         // Get the local virtual address of the accumulator object
 //        hpx::naming::address::address_type lva = &accu;
         // Bind the accumulator with the resolver-client
-        dgas_c.bind(id, hpx::naming::address(l, 
+        agas_c.bind(id, hpx::naming::address(l, 
             hpx::components::server::accumulator::get_component_type(), &accu));
 
         tm.run();
         pp.run();
-        dgas_s.stop();
+        agas_s.stop();
 
 ///////////////////////////////////////////////////////////////////////////////
 // End test code

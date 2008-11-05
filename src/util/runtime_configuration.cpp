@@ -29,10 +29,10 @@ namespace hpx { namespace util
             "location = $[system.prefix]",
             "ini_path = $[hpx.location]/share/hpx/ini",
 
-            "[hpx.dgas]",
-            "address = ${HPX_DGAS_SERVER_ADRESS:" 
+            "[hpx.agas]",
+            "address = ${HPX_AGAS_SERVER_ADRESS:" 
                 HPX_NAME_RESOLVER_ADDRESS "}",
-            "port = ${HPX_DGAS_SERVER_PORT:" 
+            "port = ${HPX_AGAS_SERVER_PORT:" 
                 BOOST_PP_STRINGIZE(HPX_NAME_RESOLVER_PORT) "}",
 
             // create default ini entries for memory_block component hosted in 
@@ -83,18 +83,18 @@ namespace hpx { namespace util
         post_initialize_ini(*this);
     }
 
-    // DGAS configuration information has to be stored in the global hpx.dgas
+    // AGAS configuration information has to be stored in the global hpx.agas
     // configuration section:
     // 
-    //    [hpx.dgas]
+    //    [hpx.agas]
     //    address=<ip address>   # this defaults to HPX_NAME_RESOLVER_ADDRESS
     //    port=<ip port>         # this defaults to HPX_NAME_RESOLVER_PORT
     //
-    naming::locality runtime_configuration::get_dgas_locality()
+    naming::locality runtime_configuration::get_agas_locality()
     {
         // load all components as described in the configuration information
-        if (has_section("hpx.dgas")) {
-            util::section* sec = get_section("hpx.dgas");
+        if (has_section("hpx.agas")) {
+            util::section* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 std::string cfg_port(
                     sec->get_entry("port", HPX_NAME_RESOLVER_PORT));
@@ -107,12 +107,12 @@ namespace hpx { namespace util
         return naming::locality(HPX_NAME_RESOLVER_ADDRESS, HPX_NAME_RESOLVER_PORT);
     }
 
-    naming::locality runtime_configuration::get_dgas_locality(
+    naming::locality runtime_configuration::get_agas_locality(
         std::string default_address, boost::uint16_t default_port)
     {
         // load all components as described in the configuration information
-        if (has_section("hpx.dgas")) {
-            util::section* sec = get_section("hpx.dgas");
+        if (has_section("hpx.agas")) {
+            util::section* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 // read fall back values from configuration file, if needed
                 if (default_address.empty()) {

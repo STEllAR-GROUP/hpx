@@ -50,25 +50,25 @@ namespace hpx
         /// \param port           [in] This is the port number the new runtime
         ///                       instance will use to listen for incoming 
         ///                       parcels.
-        /// \param dgas_address   [in] This is the address (IP address or 
-        ///                       host name) of the locality the DGAS server is 
+        /// \param agas_address   [in] This is the address (IP address or 
+        ///                       host name) of the locality the AGAS server is 
         ///                       running on. If this value is not 
         ///                       specified the actual address will be 
         ///                       taken from the configuration file (hpx.ini).
-        /// \param dgas_port      [in] This is the port number the DGAS server 
+        /// \param agas_port      [in] This is the port number the AGAS server 
         ///                       is listening on. If this value is not 
         ///                       specified the actual port number will be 
         ///                       taken from the configuration file (hpx.ini).
         runtime(std::string const& address, boost::uint16_t port,
-                std::string const& dgas_address = "", 
-                boost::uint16_t dgas_port = 0);
+                std::string const& agas_address = "", 
+                boost::uint16_t agas_port = 0);
 
         /// Construct a new HPX runtime instance 
         ///
         /// \param address        [in] This is the locality the new runtime 
         ///                       instance should be associated with. It is 
         ///                       used for receiving parcels. 
-        /// \note The DGAS locality to use will be taken from the configuration 
+        /// \note The AGAS locality to use will be taken from the configuration 
         ///       file (hpx.ini).
         runtime(naming::locality address);
 
@@ -77,9 +77,9 @@ namespace hpx
         /// \param address        [in] This is the locality the new runtime 
         ///                       instance should be associated with. It is 
         ///                       used for receiving parcels. 
-        /// \param dgas_address   [in] This is the locality the DGAS server is 
+        /// \param agas_address   [in] This is the locality the AGAS server is 
         ///                       running on. 
-        runtime(naming::locality address, naming::locality dgas_address);
+        runtime(naming::locality address, naming::locality agas_address);
 
         /// \brief The destructor makes sure all HPX runtime services are 
         ///        properly shut down before existing.
@@ -153,11 +153,11 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
 
-        /// \brief Allow access to the DGAS client instance used by the HPX
+        /// \brief Allow access to the AGAS client instance used by the HPX
         ///        runtime.
-        naming::resolver_client const& get_dgas_client() const
+        naming::resolver_client const& get_agas_client() const
         {
-            return dgas_client_;
+            return agas_client_;
         }
 
         /// \brief Allow access to the parcel handler instance used by the HPX
@@ -200,10 +200,10 @@ namespace hpx
 
     private:
         util::runtime_configuration ini_;
-        util::io_service_pool dgas_pool_; 
+        util::io_service_pool agas_pool_; 
         util::io_service_pool parcel_pool_; 
         util::io_service_pool timer_pool_; 
-        naming::resolver_client dgas_client_;
+        naming::resolver_client agas_client_;
         parcelset::parcelport parcel_port_;
         threads::threadmanager thread_manager_;
         parcelset::parcelhandler parcel_handler_;

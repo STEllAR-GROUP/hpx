@@ -103,9 +103,9 @@ int main(int argc, char* argv[])
         // Check command line arguments.
         if (argc != 6) 
         {
-            std::cerr << "Using default settings: ps:localhost:7911 dgas:localhost:7912 threads:3" 
+            std::cerr << "Using default settings: ps:localhost:7911 agas:localhost:7912 threads:3" 
                       << std::endl;
-            std::cerr << "Possible arguments: <HPX address> <HPX port> <DGAS address> <DGAS port> <num_threads>"
+            std::cerr << "Possible arguments: <HPX address> <HPX port> <AGAS address> <AGAS port> <num_threads>"
                       << std::endl;
 
             ps_host = "localhost";
@@ -125,15 +125,15 @@ int main(int argc, char* argv[])
 
 #if defined(BOOST_WINDOWS)
         // Run the ParalleX services
-        hpx::util::io_service_pool dgas_pool; 
-        hpx::naming::resolver_server dgas_s(dgas_pool, gas_host, gas_port);
-        hpx::naming::resolver_client dgas_c(dgas_pool, 
+        hpx::util::io_service_pool agas_pool; 
+        hpx::naming::resolver_server agas_s(agas_pool, gas_host, gas_port);
+        hpx::naming::resolver_client agas_c(agas_pool, 
             hpx::naming::locality(gas_host, gas_port));
 
         hpx::util::io_service_pool io_service_pool(num_threads); 
         hpx::parcelset::parcelport pp(io_service_pool, 
             hpx::naming::locality(ps_host, ps_port));
-        hpx::parcelset::parcelhandler ph(dgas_c, pp);
+        hpx::parcelset::parcelhandler ph(agas_c, pp);
 
         // Set console control handler to allow server to be stopped.
         console_ctrl_function = 
@@ -149,7 +149,7 @@ int main(int argc, char* argv[])
         ph.register_event_handler(received_parcel);
 
         pp.run();
-        dgas_s.stop();
+        agas_s.stop();
 #else
         // Block all signals for background thread.
         sigset_t new_mask;
@@ -158,15 +158,15 @@ int main(int argc, char* argv[])
         pthread_sigmask(SIG_BLOCK, &new_mask, &old_mask);
         
         // Run the ParalleX services in a background thread
-        hpx::util::io_service_pool dgas_pool; 
-        hpx::naming::resolver_server dgas_s(dgas_pool, gas_host, gas_port);
-        hpx::naming::resolver_client dgas_c(dgas_pool, 
+        hpx::util::io_service_pool agas_pool; 
+        hpx::naming::resolver_server agas_s(agas_pool, gas_host, gas_port);
+        hpx::naming::resolver_client agas_c(agas_pool, 
             hpx::naming::locality(gas_host, gas_port));
 
         hpx::util::io_service_pool io_service_pool(num_threads); 
         hpx::parcelset::parcelport pp(io_service_pool, 
             hpx::naming::locality(ps_host, ps_port));
-        hpx::parcelset::parcelhandler ph(dgas_c, pp);
+        hpx::parcelset::parcelhandler ph(agas_c, pp);
 
         boost::thread t1(boost::bind(& hpx::parcelset::parcelport::run, &pp, true));
 
@@ -193,7 +193,7 @@ int main(int argc, char* argv[])
 
         // Stop the servers.
         pp.stop();
-        dgas_s.stop();
+        agas_s.stop();
         
         t1.join();
 #endif
