@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+# Program for executing hpx under PBS
+# Starts a agas server, as well as an hpx_runtime on each node
+# except the mother superior, where the user application is
+# started instead.
+#
+# Needs getopts and a full listing of possible options. For
+# now it's just:
+#   hpx_exec user_app
+#
+use strict;
+use FileHandle;
+
+my $agas_port = 7912;
+my $parcel_port = 7913;
+
+my $node_file = $ENV{PBS_NODEFILE};
+
+die "usage: hpx_exec user_app" unless($#ARGV==0);
+
+die "Missing node file" unless(-e $node_file);
+
+my $hpx_runtime = find("hpx_runtime");
+my $user_prog = find($ARGV[0]);
+my $ssh = find("ssh");
+
+my $fd = new FileHandle;
+my @nodes = ();
+my %nodes = ();
+open($fd,$node_file) or die "Could not read node file";
+while(my $node = <$fd>) {
+    chomp($node);
+    unless(defined($nodes{$node})) {
+        push @nodes, $node;
+    }
+    $nodes{$node}++;
+}
+close($fd);
+
+my @pids = ();
+
+# Start the Agas server
+my $anode = $nodes[0];
+my $pid = fork();
+if($pid == 0) {
+    run($hpx_runtime,"-r","-a","$anode:$agas_port");
+    exit(0);
+};
+push @pids, $pid;
+
+# Start the hpx procs -- one per node, using -t $tc to pass thread count
+for(my $i=$#nodes;$i>=0;$i--) {
+    my $node = $nodes[$i];
+    my $id = $i+1;
+
+    # Find the thread count
+    my $tc = $nodes{$node};
+
+    my $pid = fork();
+    my $cmd = $user_prog;
+    
+    if($i > 0) {
+        $cmd = $hpx_runtime;
+    }
+    if($pid == 0) {
+        run($ssh,"-o","NumberOfPasswordPrompts=0",$node,$cmd,"-a","$anode:$agas_port","-x","$node:$parcel_port","-t","$tc"); 
+    };
+    push @pids, $pid;
+}
+print "all runtime engines started\n";
+for my $pid (@pids) {
+    waitpid($pid,0);
+}
+print "all runtimes stopped.\n";
+
+sub run {
+    print join(" ",@_),"\n";
+    exec(@_);
+    die "Exec failed.";
+}
+
+sub find {
+    my $file = shift;
+    for my $path (split(/:/,$ENV{PATH})) {
+        my $cmd = "$path/$file";
+        return $cmd if(-x $cmd and !-d $cmd);
+    }
+    die "could not locate $file on path";
+}
