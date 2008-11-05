@@ -168,7 +168,7 @@ namespace boost { namespace coroutines { namespace detail {
         } else if(m_exit_status == ctx_exited_exit)
           return false;
         else {
-          BOOST_ASSERT(0 && "unkonw exit status");
+          BOOST_ASSERT(0 && "unknown exit status");
         }
       }
       return true;

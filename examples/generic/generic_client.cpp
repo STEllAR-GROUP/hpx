@@ -100,8 +100,8 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
 inline void 
 split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
 {
+    std::string::size_type p = v.find_first_of(":");
     try {
-        std::string::size_type p = v.find_first_of(":");
         if (p != std::string::npos) {
             addr = v.substr(0, p);
             port = boost::lexical_cast<boost::uint16_t>(v.substr(p+1));
@@ -111,7 +111,8 @@ split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
         }
     }
     catch (boost::bad_lexical_cast const& /*e*/) {
-        ;   // ignore bad_cast exceptions
+        std::cerr << "generic_client: illegal port number given: " << v.substr(p+1) << std::endl;
+        std::cerr << "                using default value instead: " << port << std::endl;
     }
 }
 

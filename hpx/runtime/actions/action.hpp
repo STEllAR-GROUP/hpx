@@ -209,6 +209,13 @@ namespace hpx { namespace actions
                 boost::make_tuple(func));
         }
 
+    public:
+        /// retrieve component type
+        static int get_static_component_type() 
+        {
+            return static_cast<int>(components::get_component_type<Component>());
+        }
+
     private:
         /// retrieve action code
         std::size_t get_action_code() const 
@@ -219,7 +226,7 @@ namespace hpx { namespace actions
         /// retrieve component type
         int get_component_type() const
         {
-            return static_cast<int>(components::get_component_type<Component>());
+            return get_static_component_type();
         }
 
         /// The function \a get_action_name returns the name of this action
@@ -229,7 +236,7 @@ namespace hpx { namespace actions
             return "<Unknown action type>";
         }
 
-   private:
+    private:
         // serialization support
         friend class boost::serialization::access;
 

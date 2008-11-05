@@ -10,7 +10,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
 {
-    ///////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+    struct timestep_data
+    {
+        double value_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
     // Compute the result value for the current time step
     threads::thread_state stencil::eval(threads::thread_self& self, 
@@ -33,9 +39,19 @@ namespace hpx { namespace components { namespace amr
         return threads::terminated;
     }
 
-    threads::thread_state stencil::init(threads::thread_self&, 
-        applier::applier&, naming::id_type* result)
+    threads::thread_state stencil::init(threads::thread_self& self, 
+        applier::applier& appl, naming::id_type* result)
     {
+        *result = components::stubs::memory_block::create(self, appl, 
+            appl.get_runtime_support_gid(), sizeof(timestep_data));
+        return threads::terminated;
+    }
+
+    /// The free function releases the memory allocated by init
+    threads::thread_state stencil::free(threads::thread_self& self, 
+        applier::applier& appl, naming::id_type const& gid)
+    {
+        components::stubs::memory_block::free(appl, gid);
         return threads::terminated;
     }
 

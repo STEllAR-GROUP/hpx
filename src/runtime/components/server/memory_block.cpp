@@ -29,6 +29,7 @@ HPX_REGISTER_ACTION(hpx::components::server::detail::memory_block::checkout_acti
 HPX_REGISTER_ACTION(hpx::components::server::detail::memory_block::checkin_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::detail::memory_block_header);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::detail::memory_block);
+HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::memory_block);
 
 typedef hpx::components::memory_block_data memory_data_type;
 HPX_REGISTER_ACTION(hpx::lcos::base_lco_with_value<memory_data_type>::set_result_action);

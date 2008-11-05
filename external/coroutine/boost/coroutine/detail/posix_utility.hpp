@@ -127,12 +127,12 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
   void * 
   alloc_stack_mmap(std::size_t size) {
     void * stack = ::mmap(NULL,
-			  size,
-			  PROT_EXEC|PROT_READ|PROT_WRITE,
-			  MAP_PRIVATE|MAP_ANONYMOUS,
-			  -1,
-			  0
-			  );
+                          size,
+                          PROT_EXEC|PROT_READ|PROT_WRITE,
+                          MAP_PRIVATE|MAP_ANONYMOUS,
+                          -1,
+                          0
+                          );
     if(stack == MAP_FAILED) {
       std::cerr <<strerror(errno)<<"\n";
       abort();

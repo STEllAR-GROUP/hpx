@@ -20,33 +20,39 @@ namespace hpx { namespace actions
         parcelset::parcel p;
         if (parcel_handler_.get_parcel(p))  // if new parcel is found
         {
-            // write this parcel to the log
+        // write this parcel to the log
             LPT_(info) << "action_manager: fetch_parcel: " << p;
 
-            // decode the local virtual address of the parcel
+        // decode the local virtual address of the parcel
             naming::address addr = p.get_destination_addr();
             naming::address::address_type lva = addr.address_;
 
             if (0 == lva) {
-                // a zero address references the local runtime support component
+            // a zero address references the local runtime support component
                 lva = applier_.get_runtime_support_gid().get_lsb();
             }
 
-            // decode the action-type in the parcel
+        // decode the action-type in the parcel
             action_type act = p.get_action();
-
             continuation_type cont = p.get_continuation();
+
+        // make sure the component_type of the action matches the component
+        // type in the destination address
+            BOOST_ASSERT(dest.type_ == act->get_component_type());
+
+        // dispatch action, register work item either with or without 
+        // continuation support
             if (!cont) {
-                // no continuation is to be executed, register the plain action 
-                // and the local-virtual address with the TM only
+            // no continuation is to be executed, register the plain action 
+            // and the local-virtual address with the TM only
                 register_work(applier_, 
                     act->get_thread_function(applier_, lva),
                     act->get_action_name());
             }
             else {
-                // this parcel carries a continuation, register a wrapper which
-                // first executes the original thread function as required by 
-                // the action and triggers the continuations afterwards
+            // this parcel carries a continuation, register a wrapper which
+            // first executes the original thread function as required by 
+            // the action and triggers the continuations afterwards
                 register_work(applier_, 
                     act->get_thread_function(cont, applier_, lva),
                     act->get_action_name());

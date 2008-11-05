@@ -49,6 +49,10 @@ namespace hpx { namespace components { namespace amr
         /// suitable for storing all data needed for a single time step.
         threads::thread_state init(threads::thread_self&, applier::applier&, 
             naming::id_type* result);
+
+        /// The free function releases the memory allocated by init
+        threads::thread_state free(threads::thread_self&, applier::applier&, 
+            naming::id_type const&);
     };
 
 }}}

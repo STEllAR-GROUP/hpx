@@ -185,6 +185,8 @@ namespace hpx { namespace lcos
             naming::address addr;
             if (appl.address_is_local(gid, addr)) {
                 // local, direct execution
+                BOOST_ASSERT(components::component_invalid == addr.type_ ||
+                             Action::get_static_component_type() == addr.type_);
                 return Action::execute_function(appl, addr);
             }
 
@@ -222,6 +224,8 @@ namespace hpx { namespace lcos
             naming::address addr;
             if (appl.address_is_local(gid, addr)) {
                 // local, direct execution
+                BOOST_ASSERT(components::component_invalid == addr.type_ ||
+                             Action::get_static_component_type() == addr.type_);
                 return Action::execute_function(appl, addr.address_, arg0);
             }
 

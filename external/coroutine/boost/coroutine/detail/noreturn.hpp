@@ -31,8 +31,8 @@
 /*
  * The BOOST_COROUTINE_NORETURN macro provides a way to 
  * tell the compiler that a function will not return through
- * the normal return path (it could return throgh a thrown exception).
- * This not only provieds a possible optimization hint, but also
+ * the normal return path (it could return through a thrown exception).
+ * This not only provides a possible optimization hint, but also
  * prevents the compiler from complaining if a function that call
  * a noreturn function does not call return itself.
  */

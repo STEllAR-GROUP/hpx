@@ -24,31 +24,33 @@ namespace hpx { namespace components { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         /// Asynchronously create a new instance of a distributing_factory
         static lcos::future_value<naming::id_type>
-        create_async(applier::applier& appl, naming::id_type const& gid)
+        create_async(applier::applier& appl, naming::id_type const& gid, 
+            std::size_t count = 1)
         {
             return stubs::runtime_support::create_component_async(
-                appl, gid, get_component_type<ServerComponent>());
+                appl, gid, get_component_type<ServerComponent>(), count);
         }
 
         lcos::future_value<naming::id_type>
-        create_async(naming::id_type const& gid)
+        create_async(naming::id_type const& gids, std::size_t count = 1)
         {
-            return create_async(appl_, gid);
+            return create_async(appl_, gid, count);
         }
 
         /// Create a new instance of an simple_accumulator
         static naming::id_type 
         create(threads::thread_self& self, applier::applier& appl, 
-            naming::id_type const& gid)
+            naming::id_type const& gid, std::size_t count = 1)
         {
             return stubs::runtime_support::create_component(self, appl, 
-                gid, get_component_type<ServerComponent>());
+                gid, get_component_type<ServerComponent>(), count);
         }
 
         naming::id_type 
-        create(threads::thread_self& self, naming::id_type const& gid)
+        create(threads::thread_self& self, naming::id_type const& gid,
+            std::size_t count = 1)
         {
-            return create(self, appl_, gid);
+            return create(self, appl_, gid, count);
         }
 
         /// Delete an existing component

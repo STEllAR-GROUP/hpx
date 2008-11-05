@@ -134,16 +134,16 @@ namespace boost { namespace coroutines {
 
         // we have to make sure that the stack pointer is aligned on a 16 Byte
         // boundary when the code is entering the trampoline (the stack itself
-        // already is properly aligned)
+        // is already properly aligned)
         *--m_sp = 0;       // additional alignment
 
         *--m_sp = &cb;     // parm 0 of trampoline;
         *--m_sp = 0;       // dummy return address for trampoline
         *--m_sp = (void*) funp ;// return addr (here: start addr)  NOTE: the unsafe cast is safe on IA64
-        *--m_sp = 0;       // rbp                                  
-        *--m_sp = 0;       // rbx                                  
-        *--m_sp = 0;       // rsi                                  
-        *--m_sp = 0;       // rdi        
+        *--m_sp = 0;       // rbp
+        *--m_sp = 0;       // rbx
+        *--m_sp = 0;       // rsi
+        *--m_sp = 0;       // rdi
         *--m_sp = 0;       // r12
         *--m_sp = 0;       // r13
         *--m_sp = 0;       // r14

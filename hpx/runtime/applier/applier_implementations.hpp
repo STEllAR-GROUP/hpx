@@ -53,6 +53,8 @@
         naming::address addr;
         if (address_is_local(gid, addr))
         {
+            BOOST_ASSERT(components::component_invalid == addr.type_ ||
+                         Action::get_static_component_type() == addr.type_);
             detail::BOOST_PP_CAT(apply_helper, N)<
                     Action, BOOST_PP_ENUM_PARAMS(N, Arg)
             >::call(thread_manager_, *this, addr.address_,
@@ -92,6 +94,8 @@
         naming::address addr;
         if (address_is_local(gid, addr))
         {
+            BOOST_ASSERT(components::component_invalid == addr.type_ ||
+                         Action::get_static_component_type() == addr.type_);
             actions::continuation_type cont(c);
             detail::BOOST_PP_CAT(apply_helper, N)<
                     Action, BOOST_PP_ENUM_PARAMS(N, Arg)

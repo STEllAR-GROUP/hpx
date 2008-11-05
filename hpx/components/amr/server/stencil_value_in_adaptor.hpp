@@ -42,6 +42,12 @@ namespace hpx { namespace components { namespace amr { namespace server
             gid_ = gid;
         }
 
+        // return whether this input port has been bound to an output port
+        bool is_bound() const
+        {
+            return gid_ != naming::invalid_id;
+        }
+
     private:
         naming::id_type gid_;
     };

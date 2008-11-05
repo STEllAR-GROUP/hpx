@@ -93,10 +93,18 @@ namespace hpx { namespace components { namespace amr { namespace server
         return f.get(self); 
     }
 
+    inline void free_helper(applier::applier& appl, naming::id_type const& fgid,
+        naming::id_type& gid)
+    {
+        typedef functional_component::free_action action_type;
+        appl.apply<action_type>(fgid, gid);
+        gid = naming::invalid_id;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <int N>
     stencil_value<N>::stencil_value(applier::applier& appl)
-      : sem_in_(N), sem_out_(0), sem_result_(0), 
+      : driver_thread_(0), sem_in_(N), sem_out_(0), sem_result_(0), 
         value_gid_(naming::invalid_id), backup_value_gid_(naming::invalid_id),
         functional_gid_(naming::invalid_id)
     {
@@ -112,6 +120,11 @@ namespace hpx { namespace components { namespace amr { namespace server
         // set_functional_component only (see below)
     }
 
+    template <int N>
+    stencil_value<N>::~stencil_value()
+    {
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // The call action is used for the first time step only. It sets the 
     // initial value and waits for the whole evolution to finish, returning the
@@ -125,6 +138,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         sem_in_.wait(self, N);
 
         // set new current value
+        BOOST_ASSERT(value_gid_ == naming::invalid_id);   // shouldn't be initialized yet
         value_gid_ = initial;
 
         // signal all output threads it's safe to read value
@@ -133,6 +147,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // wait for final result 
         sem_result_.wait(self, 1);
 
+        // return the final value computed to the caller
         *result = value_gid_;
         value_gid_ = naming::invalid_id;
 
@@ -149,15 +164,21 @@ namespace hpx { namespace components { namespace amr { namespace server
     threads::thread_state  
     stencil_value<N>::main(threads::thread_self& self, applier::applier& appl)
     {
+        // all but the first time steps need to free the value_gid_ on exit
+        bool free_value_gid = false;
+
+        // ask functional component to create the local data value
+        backup_value_gid_ = init_helper(self, appl, functional_gid_);
+
+        // this is the main loop of the computation, gathering the values
+        // from the previous time step, computing the result of the current
+        // time step and storing the computed value in the memory_block 
+        // referenced by value_gid_
         bool is_last = false;
         while (!is_last) {
             // start acquire operations on input ports
             for (std::size_t i = 0; i < N; ++i)
                 in_[i]->aquire_value(appl);         // non-blocking!
-
-            // the valid_gid_ gets initialized for the first time step only
-            if (naming::invalid_id == value_gid_)
-                value_gid_ = init_helper(self, appl, functional_gid_);
 
             // at this point all gid's have to be initialized
             BOOST_ASSERT(naming::invalid_id != functional_gid_);
@@ -174,7 +195,14 @@ namespace hpx { namespace components { namespace amr { namespace server
             // to immediately set the value.
             sem_in_.wait(self, N);
 
-            // set new current value
+            // set new current value, allocate space for next current value
+            // if needed (this may happen for all time steps except the first 
+            // one, where the first gets it's initial value during the 
+            // call_action)
+            if (naming::invalid_id == value_gid_) {
+                value_gid_ = init_helper(self, appl, functional_gid_);
+                free_value_gid = true;
+            }
             std::swap(value_gid_, backup_value_gid_);
 
             // signal all output threads it's safe to read value
@@ -182,6 +210,10 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
 
         sem_result_.signal(self, 1);        // final result has been set
+
+        free_helper(appl, functional_gid_, backup_value_gid_);
+        if (free_value_gid)
+            free_helper(appl, functional_gid_, value_gid_);
         return threads::terminated;
     }
 
@@ -223,6 +255,16 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
         for (std::size_t i = 0; i < N; ++i)
             in_[i]->connect(gids[i]);
+
+        // if the functional component already has been set we need to start 
+        // the driver thread
+        if (functional_gid_ != naming::invalid_id && 0 == driver_thread_) {
+            // run the thread which collects the input, executes the provided
+            // functional element and sets the value for the next time step
+            driver_thread_ = applier::register_work(appl, 
+                boost::bind(&stencil_value<N>::main, this, _1, boost::ref(appl)), 
+                "stencil_value::main");
+        }
         return threads::terminated;
     }
 
@@ -235,14 +277,19 @@ namespace hpx { namespace components { namespace amr { namespace server
         // store gid of functional component
         functional_gid_ = gid;
 
-        // ask functional component to create the local data value
-        backup_value_gid_ = init_helper(self, appl, functional_gid_);
+        // if all inputs have been bound already we need to start the driver 
+        // thread
+        bool inputs_bound = true;
+        for (std::size_t i = 0; i < N && inputs_bound; ++i)
+            inputs_bound = in_[i]->is_bound();
 
-        // run the thread which collects the input, executes the provided
-        // functional element and sets the value for the next time step
-        applier::register_work(appl, 
-            boost::bind(&stencil_value<N>::main, this, _1, boost::ref(appl)), 
-            "stencil_value::main");
+        if (inputs_bound && 0 == driver_thread_) {
+            // run the thread which collects the input, executes the provided
+            // functional element and sets the value for the next time step
+            driver_thread_ = applier::register_work(appl, 
+                boost::bind(&stencil_value<N>::main, this, _1, boost::ref(appl)), 
+                "stencil_value::main");
+        }
 
         return threads::terminated;
     }

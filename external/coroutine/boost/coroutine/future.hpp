@@ -129,7 +129,7 @@ namespace boost { namespace coroutines {
     operator safe_bool() const {    
       BOOST_ASSERT(m_ptr);
       return m_ptr->get()?                     
-	&future::safe_bool_true: 0;                 
+        &future::safe_bool_true: 0;                 
     }       
 
     BOOST_DEDUCED_TYPENAME
@@ -156,8 +156,8 @@ namespace boost { namespace coroutines {
     // pending it will be destroyed.
     ~future() {
       if(m_ptr) {
-	wait();
-      	delete m_ptr;
+        wait();
+        delete m_ptr;
       }
     }
 
@@ -224,8 +224,8 @@ namespace boost { namespace coroutines {
    * detail::call_impl<future<...> >(function, coroutine)
    */
   BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX,
-		  BOOST_COROUTINE_gen_call_overload,
-		  ~);
+                  BOOST_COROUTINE_gen_call_overload,
+                  ~);
     
 #define BOOST_COROUTINE_empty(z, n, name) \
 /**/
@@ -245,8 +245,8 @@ namespace boost { namespace coroutines {
 
 #define BOOST_COROUTINE_gen_wait(z, n, name)     \
   BOOST_PP_IF(n,                                 \
-	      BOOST_COROUTINE_gen_wait_non_zero, \
-	      BOOST_COROUTINE_empty)(z, n, name) \
+              BOOST_COROUTINE_gen_wait_non_zero, \
+              BOOST_COROUTINE_empty)(z, n, name) \
 /**/
 
   /*
@@ -255,8 +255,8 @@ namespace boost { namespace coroutines {
    * forward to detail::wait_impl(coro, tuple<...>)
    */
   BOOST_PP_REPEAT(BOOST_COROUTINE_WAIT_MAX,
-		  BOOST_COROUTINE_gen_wait,
-		  wait);
+                  BOOST_COROUTINE_gen_wait,
+                  wait);
 
   /*
    * Generate wait_all(coro, ...) for an arbitrary arguement
@@ -264,8 +264,8 @@ namespace boost { namespace coroutines {
    * detail::wait_all_impl(coro, tuple<...>)
    */
   BOOST_PP_REPEAT(BOOST_COROUTINE_WAIT_MAX,
-		  BOOST_COROUTINE_gen_wait,
-		  wait_all);
+                  BOOST_COROUTINE_gen_wait,
+                  wait_all);
 
 #undef BOOST_COROUTINE_gen_wait
 #undef BOOST_COROUTINE_empty

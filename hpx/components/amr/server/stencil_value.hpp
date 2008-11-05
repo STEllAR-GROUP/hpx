@@ -44,6 +44,9 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// Construct a new stencil_value instance
         stencil_value(applier::applier& appl);
 
+        /// Destruct this stencil instance
+        ~stencil_value();
+
         /// The function get will be called by the out-ports whenever 
         /// the current value has been requested.
         void get_value(threads::thread_self& self, naming::id_type*);
@@ -119,6 +122,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         > set_functional_component_action;
 
     private:
+        threads::thread_id_type driver_thread_;
+
         lcos::counting_semaphore sem_in_;
         lcos::counting_semaphore sem_out_;
         lcos::counting_semaphore sem_result_;

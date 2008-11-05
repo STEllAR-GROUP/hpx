@@ -53,13 +53,24 @@ namespace hpx { namespace components { namespace amr { namespace server
             return threads::terminated;
         }
 
+        virtual threads::thread_state free(threads::thread_self&, 
+            applier::applier&, naming::id_type const&)
+        {
+            // This shouldn't ever be called. If you're seeing this assertion 
+            // you probably forgot to overload this function in your stencil 
+            // class.
+            BOOST_ASSERT(false);
+            return threads::terminated;
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // parcel action code: the action to be performed on the destination 
         // object (the accumulator)
         enum actions
         {
             functional_component_init = 0,
-            functional_component_eval = 1
+            functional_component_eval = 1,
+            functional_component_free = 2,
         };
 
         /// This is the main entry point of this component. Calling this 
@@ -79,6 +90,12 @@ namespace hpx { namespace components { namespace amr { namespace server
             return init(self, appl, result);
         }
 
+        threads::thread_state free_nv(threads::thread_self& self, 
+            applier::applier& appl, naming::id_type const& gid)
+        {
+            return free(self, appl, gid);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
@@ -93,6 +110,11 @@ namespace hpx { namespace components { namespace amr { namespace server
             naming::id_type const&, std::vector<naming::id_type> const&, 
             &functional_component::eval_nv
         > eval_action;
+
+        typedef hpx::actions::action1<
+            functional_component, functional_component_free, 
+            naming::id_type const&, &functional_component::free_nv
+        > free_action;
     };
 
 }}}}

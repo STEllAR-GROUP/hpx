@@ -113,7 +113,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
         }
     }
     catch (std::exception const& e) {
-        std::cerr << "accumulator_client: exception caught: " << e.what() << std::endl;
+        std::cerr << "simple_accumulator_client: exception caught: " << e.what() << std::endl;
         return false;
     }
     return true;
@@ -134,7 +134,8 @@ split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
         }
     }
     catch (boost::bad_lexical_cast const& /*e*/) {
-        ;   // ignore bad_cast exceptions
+        std::cerr << "simple_accumulator_client: illegal port number given: " << v.substr(p+1) << std::endl;
+        std::cerr << "                            using default value instead: " << port << std::endl;
     }
 }
 

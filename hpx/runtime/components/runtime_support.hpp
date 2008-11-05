@@ -23,11 +23,11 @@ namespace hpx { namespace components
     public:
         /// Create a client side representation for the existing
         /// \a server#runtime_support instance with the given global id \a gid.
-        runtime_support(applier::applier& app, naming::id_type gid) 
-          : base_type(app), gid_(gid)
-        {
-            BOOST_ASSERT(gid_);
-        }
+        runtime_support(applier::applier& app, 
+                naming::id_type gid = naming::invalid_id) 
+          : base_type(app), 
+            gid_(naming::invalid_id == gid ? app.get_runtime_support_gid() : gid)
+        {}
 
         ~runtime_support() 
         {}

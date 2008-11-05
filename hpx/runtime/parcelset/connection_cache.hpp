@@ -29,23 +29,23 @@ namespace hpx { namespace parcelset
     public:
         typedef boost::shared_ptr<parcelport_connection> connection_type;
         typedef naming::locality key_type;
-        
+
         typedef std::pair<connection_type, key_type const*> value_type;
         typedef std::list<value_type> list_type;
         typedef list_type::iterator list_iterator;
         typedef list_type::size_type size_type;
 
-        typedef std::map<key_type, list_iterator> map_type;
+        typedef std::multimap<key_type, list_iterator> map_type;
         typedef map_type::iterator map_iterator;
         typedef map_type::size_type map_size_type;
 
         connection_cache(size_type max_cache_size)
           : max_cache_size_(max_cache_size < 2 ? 2 : max_cache_size)
         {}
-        
+
         connection_type get (key_type const& endp);
         void add (key_type const& endp, connection_type conn);
-        
+
     private:
         boost::mutex mtx_;
         size_type max_cache_size_;

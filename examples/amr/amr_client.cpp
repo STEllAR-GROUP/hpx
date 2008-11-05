@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2008 Hartmut Kaiser, Richard D Guidry Jr
+//  Copyright (c) 2007-2008 Hartmut Kaiser
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,6 +13,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
+#include <boost/assign/std/vector.hpp>
 
 namespace po = boost::program_options;
 
@@ -26,19 +27,20 @@ void init_stencils(applier::applier& appl,
     components::distributing_factory::result_type const& values,
     components::distributing_factory::result_type const& stencils)
 {
-    BOOST_ASSERT(values.size() == stencils.size());
-    for (std::size_t i = 0; i < values.size(); ++i) 
+    // values are allocated in blocks, stencil_values are allocated separately
+    BOOST_ASSERT(values[0].count_ == stencils.size());
+    for (std::size_t i = 0; i < stencils.size(); ++i) 
     {
-        BOOST_ASSERT(1 == values[i].count_ && 1 == stencils[i].count_);
+        BOOST_ASSERT(1 == stencils[i].count_);
         components::amr::stubs::stencil_value<3>::set_functional_component(
-            appl, values[i].first_gid_, stencils[i].first_gid_);
+            appl, values[0].first_gid_ + i, stencils[i].first_gid_);
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get gids of output ports of all stencils
 void get_output_ports(threads::thread_self& self, applier::applier& appl,
-    components::distributing_factory::result_type const& stencils,
+    components::distributing_factory::result_type const& values,
     std::vector<std::vector<naming::id_type> >& outputs)
 {
     typedef components::distributing_factory::result_type result_type;
@@ -48,11 +50,10 @@ void get_output_ports(threads::thread_self& self, applier::applier& appl,
 
     // start an asynchronous operation for each of the stencil value instances
     lazyvals_type lazyvals;
-    result_type::const_iterator end = stencils.end();
-    for (result_type::const_iterator it = stencils.begin(); it != end; ++it) 
+    for (std::size_t i = 0; i < values[0].count_; ++i) 
     {
         lazyvals.push_back(components::amr::stubs::stencil_value<3>::
-            get_output_ports_async(appl, (*it).first_gid_));
+            get_output_ports_async(appl, values[0].first_gid_ + i));
     }
 
     // now wait for the results
@@ -64,18 +65,37 @@ void get_output_ports(threads::thread_self& self, applier::applier& appl,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// connectthe given output ports with the correct input ports, creating the 
-// required static dataflow structure
-void connect_input_ports(threads::thread_self& self, applier::applier& appl,
-    components::distributing_factory::result_type const& stencils,
+// Connect the given output ports with the correct input ports, creating the 
+// required static dataflow structure.
+//
+// Currently we have exactly one stencil_value instance per data point, where 
+// the output ports of a stencil_value are connected to the input ports of the 
+// direct neighbors of itself.
+inline std::size_t mod(int idx, std::size_t maxidx = 3)
+{
+    return (idx < 0) ? (idx + maxidx) % maxidx : idx % maxidx;
+}
+
+void connect_input_ports(applier::applier& appl,
+    components::distributing_factory::result_type const& values,
     std::vector<std::vector<naming::id_type> > const& outputs)
 {
     typedef components::distributing_factory::result_type result_type;
 
-    result_type::const_iterator end = stencils.end();
-    for (result_type::const_iterator it = stencils.begin(); it != end; ++it) 
+    BOOST_ASSERT(outputs.size() == values[0].count_);
+    for (int i = 0; i < (int)values[0].count_; ++i) 
     {
-        
+        using namespace boost::assign;
+
+        std::vector<naming::id_type> output_ports;
+        output_ports += 
+                outputs[mod(i-1)][2],    // sw input is connected to the ne output of the w element
+                outputs[i][1],           // s input is connected to the n output of the element itself
+                outputs[mod(i+1)][0]     // se input is connected to the nw output of the e element
+            ;
+
+        components::amr::stubs::stencil_value<3>::
+            connect_input_ports(appl, values[0].first_gid_ + i, output_ports);
     }
 }
 
@@ -107,16 +127,16 @@ hpx_main(threads::thread_self& self, applier::applier& appl)
 
         // ask stencil instances for their output gids
         std::vector<std::vector<naming::id_type> > outputs;
-        get_output_ports(self, appl, stencils, outputs);
+        get_output_ports(self, appl, values, outputs);
 
         // connect output gids with corresponding stencil inputs
-        connect_input_ports(self, appl, stencils, outputs);
+        connect_input_ports(appl, values, outputs);
 
 
 
         // free all allocated components
-        factory.free_components(values);
-        factory.free_components(stencils);
+//         factory.free_components(values);
+//         factory.free_components(stencils);
 
     }   // distributing_factory needs to go out of scope before shutdown
 
@@ -156,7 +176,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
         }
     }
     catch (std::exception const& e) {
-        std::cerr << "generic_client: exception caught: " << e.what() << std::endl;
+        std::cerr << "amr_client: exception caught: " << e.what() << std::endl;
         return false;
     }
     return true;
@@ -166,8 +186,8 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
 inline void 
 split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
 {
+    std::string::size_type p = v.find_first_of(":");
     try {
-        std::string::size_type p = v.find_first_of(":");
         if (p != std::string::npos) {
             addr = v.substr(0, p);
             port = boost::lexical_cast<boost::uint16_t>(v.substr(p+1));
@@ -177,7 +197,8 @@ split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
         }
     }
     catch (boost::bad_lexical_cast const& /*e*/) {
-        ;   // ignore bad_cast exceptions
+        std::cerr << "amr_client: illegal port number given: " << v.substr(p+1) << std::endl;
+        std::cerr << "            using default value instead: " << port << std::endl;
     }
 }
 

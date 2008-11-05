@@ -68,7 +68,7 @@ namespace boost {namespace coroutines {
      */
     fiber_ptr const fiber_magic = reinterpret_cast<fiber_ptr>(0x1E00);
 #endif
-                
+
     /*
      * Return true if current thread is a fiber.
      * FIXME: on longhorn should use IsThreadAFiber
@@ -97,7 +97,7 @@ namespace boost {namespace coroutines {
        */
       fibers_context_impl_base() :
         m_ctx(0) {}
-        
+
       /*
        * Free function. Saves the current context in @p from
        * and restores the context in @p to. On windows the from
@@ -110,7 +110,7 @@ namespace boost {namespace coroutines {
        * Note that we can't leave the thread unconverted on return or else we 
        * will leak resources on thread destruction. Do the right thing by
        * default.
-       */     
+       */
       friend 
       void 
       swap_context(fibers_context_impl_base& from, 
@@ -120,9 +120,9 @@ namespace boost {namespace coroutines {
           BOOST_ASSERT(from.m_ctx == 0);
           from.m_ctx = ConvertThreadToFiber(0);
           BOOST_ASSERT(from.m_ctx != 0);
-          
+
           SwitchToFiber(to.m_ctx); 
-          
+
           BOOL result = ConvertFiberToThread();
           BOOST_ASSERT(result);
           (void)result;
@@ -177,11 +177,11 @@ namespace boost {namespace coroutines {
       {
         BOOST_ASSERT(m_ctx);
       }
-                  
+
       ~fibers_context_impl() {
         DeleteFiber(m_ctx);
       }
-                  
+
     private:
     };
 
