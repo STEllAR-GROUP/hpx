@@ -93,7 +93,6 @@ set (hpxlib_HEADERS
     ${hpx_SOURCE_DIR}/hpx/runtime/naming/server/request.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/naming/server/request_handler.hpp
     # parcelset
-    ${hpx_SOURCE_DIR}/hpx/runtime/parcelset/connection_cache.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/parcelset/parcel.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/parcelset/parcelhandler.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/parcelset/parcelport.hpp
@@ -108,6 +107,7 @@ set (hpxlib_HEADERS
     ${hpx_SOURCE_DIR}/hpx/util/asio_util.hpp
     ${hpx_SOURCE_DIR}/hpx/util/binary_portable_iarchive.hpp
     ${hpx_SOURCE_DIR}/hpx/util/binary_portable_oarchive.hpp
+    ${hpx_SOURCE_DIR}/hpx/util/connection_cache.hpp
     ${hpx_SOURCE_DIR}/hpx/util/container_device.hpp
     ${hpx_SOURCE_DIR}/hpx/util/find_msb.hpp
     ${hpx_SOURCE_DIR}/hpx/util/full_empty_memory.hpp
@@ -156,7 +156,6 @@ set (hpxlib_SOURCES
     ${hpx_SOURCE_DIR}/src/runtime/naming/server/request.cpp
     ${hpx_SOURCE_DIR}/src/runtime/naming/server/request_handler.cpp
     # parcelset
-    ${hpx_SOURCE_DIR}/src/runtime/parcelset/connection_cache.cpp
     ${hpx_SOURCE_DIR}/src/runtime/parcelset/parcel.cpp
     ${hpx_SOURCE_DIR}/src/runtime/parcelset/parcelhandler.cpp
     ${hpx_SOURCE_DIR}/src/runtime/parcelset/parcelport.cpp
