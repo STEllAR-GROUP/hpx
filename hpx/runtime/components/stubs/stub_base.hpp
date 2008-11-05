@@ -32,7 +32,7 @@ namespace hpx { namespace components { namespace stubs
         }
 
         lcos::future_value<naming::id_type>
-        create_async(naming::id_type const& gids, std::size_t count = 1)
+        create_async(naming::id_type const& gid, std::size_t count = 1)
         {
             return create_async(appl_, gid, count);
         }
