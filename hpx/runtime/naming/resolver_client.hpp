@@ -415,7 +415,7 @@ namespace hpx { namespace naming
         void execute(server::request const& req, server::reply& rep) const;
 
         boost::shared_ptr<resolver_client_connection> 
-        resolver_client::get_client_connection() const;
+        get_client_connection() const;
 
     private:
         locality there_;
