@@ -113,7 +113,7 @@ namespace hpx { namespace components
 
         /// \brief  The function \a create is used for allocation and 
         ///         initialization of instances of the derived components.
-        static simple_component_base<Component>* 
+        static Component* 
         create(applier::applier& appl, std::size_t count)
         {
             // simple components can be created individually only
