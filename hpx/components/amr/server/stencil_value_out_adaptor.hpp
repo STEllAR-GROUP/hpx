@@ -27,10 +27,19 @@ namespace hpx { namespace components { namespace amr { namespace server
         typedef 
             boost::function<void(threads::thread_self&, naming::id_type*)>
         callback_function_type;
-
+        typedef components::detail::managed_component_base<
+            stencil_value_out_adaptor
+        > base_type;
+        
     public:
         stencil_value_out_adaptor(applier::applier& appl)
-        {}
+        {
+            if (component_invalid == base_type::get_component_type()) {
+                // first call to get_component_type, ask AGAS for a unique id
+                base_type::set_component_type(appl.get_agas_client().
+                    get_component_id("stencil_value_out_adaptor"));
+            }
+        }
 
         /// set function to call whenever the result is requested
         void set_callback(callback_function_type eval)

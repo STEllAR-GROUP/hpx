@@ -120,7 +120,7 @@ namespace hpx { namespace components
         {}
 
         /// \brief Return a pointer to the wrapped memory_block_data instance
-        boost::uint8_t* get()
+        boost::uint8_t* get_ptr()
         {
             if (!data_) {
                 HPX_OSSTREAM strm;
@@ -131,7 +131,7 @@ namespace hpx { namespace components
             }
             return data_->get_ptr();
         }
-        boost::uint8_t const* get() const
+        boost::uint8_t const* get_ptr() const
         {
             if (!data_) {
                 HPX_OSSTREAM strm;
@@ -141,6 +141,45 @@ namespace hpx { namespace components
                 HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
             }
             return data_->get_ptr();
+        }
+
+        std::size_t get_size() const 
+        { 
+            if (!data_) {
+                HPX_OSSTREAM strm;
+                strm << "memory_block_data data is NULL (" 
+                     << components::get_component_type_name(component_memory_block)
+                     << ")";
+                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+            }
+            return data_->get_size();
+        }
+
+        template <typename T>
+        T get() const
+        {
+            return *reinterpret_cast<T const*>(get_ptr());
+        }
+
+        template <typename T>
+        void set (T const& val)
+        {
+            if (!data_) {
+                HPX_OSSTREAM strm;
+                strm << "memory_block_data data is NULL (" 
+                     << components::get_component_type_name(component_memory_block) 
+                     << ")";
+                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+            }
+            if (!data_->is_master())
+            {
+                HPX_OSSTREAM strm;
+                strm << "memory_block_data data is not checked out (" 
+                     << components::get_component_type_name(component_memory_block)
+                     << ")";
+                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+            }
+            *reinterpret_cast<T*>(data_->get_ptr()) = val;
         }
 
     private:
@@ -192,7 +231,7 @@ namespace hpx { namespace components { namespace server { namespace detail
     ///
     /// The memory block this structure it is managing is constructed from a 
     /// memory_block_header directly followed by the actual raw memory.
-    class memory_block : public memory_block_header
+    class HPX_EXPORT memory_block : public memory_block_header
     {
     public:
         // parcel action code: the action to be performed on the destination 
@@ -434,11 +473,6 @@ namespace hpx { namespace components { namespace server
             // meaning of the count parameter passed to create is different.
             // In this case it specifies the number of bytes to allocate for a
             // new memory block.
-
-            // This assertion is in place to avoid creating this component
-            // using the distributed factory (currently the only place this
-            // function gets invoked from).
-            BOOST_ASSERT(false);
             return true;
         }
 

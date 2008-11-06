@@ -31,11 +31,10 @@ typedef hpx::components::amr::stencil stencil_type;
 /// name = amr_test               # this must match the name of the shared library
 /// path = $[hpx.location]/lib    # this is the default location where to find the shared library
 ///
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY(stencil_type, stencil, 
-    "functional_component_double_type");
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
+    hpx::components::simple_component<stencil_type>, 
+    stencil, "functional_component_double_type");
 
-// HPX_REGISTER_ACTION(stencil_type::eval_action);
-// HPX_REGISTER_ACTION(stencil_type::init_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(stencil_type);
 
 

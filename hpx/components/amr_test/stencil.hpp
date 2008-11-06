@@ -45,13 +45,15 @@ namespace hpx { namespace components { namespace amr
             bool* islast, naming::id_type const& result, 
             std::vector<naming::id_type> const& gids);
 
-        /// The init function is supposed to create a new memory block instance 
-        /// suitable for storing all data needed for a single time step.
-        threads::thread_state init(threads::thread_self&, applier::applier&, 
-            naming::id_type* result);
+        /// The alloc function is supposed to create a new memory block instance 
+        /// suitable for storing all data needed for a single time step. 
+        /// Additionally it fills the memory with initial data for the data 
+        /// item given by the parameter \a item (if item != -1).
+        threads::thread_state alloc_data(threads::thread_self&, applier::applier&, 
+            naming::id_type* result, int item);
 
         /// The free function releases the memory allocated by init
-        threads::thread_state free(threads::thread_self&, applier::applier&, 
+        threads::thread_state free_data(threads::thread_self&, applier::applier&, 
             naming::id_type const&);
     };
 

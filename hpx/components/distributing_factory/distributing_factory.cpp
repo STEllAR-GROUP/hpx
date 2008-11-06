@@ -20,7 +20,9 @@ HPX_REGISTER_COMPONENT_MODULE();
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::server::distributing_factory distributing_factory_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(distributing_factory_type, distributing_factory);
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+    hpx::components::simple_component<distributing_factory_type>, 
+    distributing_factory);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the distributing_factory actions

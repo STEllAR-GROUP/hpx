@@ -7,7 +7,7 @@
 #define HPX_COMPONENTS_AMR_STENCIL_VALUE_IMPL_OCT_17_2008_0848AM
 
 #include <hpx/components/amr/server/stencil_value.hpp>
-#include <hpx/components/amr/server/functional_component.hpp>
+#include <hpx/components/amr/functional_component.hpp>
 
 #include <boost/bind.hpp>
 #include <boost/assert.hpp>
@@ -30,13 +30,12 @@ namespace hpx { namespace components { namespace amr { namespace server
             Adaptor* in)
         {
             using namespace boost::assign;
-            typedef typename functional_component::eval_action action_type;
 
             std::vector<naming::id_type> input_gids;
             input_gids += in[0]->get(self);
 
-            lcos::eager_future<action_type, bool> f(appl, gid, value_gid, input_gids);
-            return f.get(self); 
+            return components::amr::stubs::functional_component::eval(
+                self, appl, gid, value_gid, input_gids);
         }
     };
 
@@ -50,13 +49,12 @@ namespace hpx { namespace components { namespace amr { namespace server
             Adaptor* in)
         {
             using namespace boost::assign;
-            typedef typename functional_component::eval_action action_type;
 
             std::vector<naming::id_type> input_gids;
             input_gids += in[0]->get(self), in[1]->get(self), in[2]->get(self);
 
-            lcos::eager_future<action_type, bool> f(appl, gid, value_gid, input_gids);
-            return f.get(self); 
+            return components::amr::stubs::functional_component::eval(
+                self, appl, gid, value_gid, input_gids);
         }
     };
 
@@ -70,7 +68,6 @@ namespace hpx { namespace components { namespace amr { namespace server
             Adaptor* in)
         {
             using namespace boost::assign;
-            typedef typename functional_component::eval_action action_type;
 
             std::vector<naming::id_type> input_gids;
             input_gids += 
@@ -78,26 +75,23 @@ namespace hpx { namespace components { namespace amr { namespace server
                 in[2]->get(self), in[3]->get(self), 
                 in[4]->get(self);
 
-            lcos::eager_future<action_type, bool> f(appl, gid, value_gid, input_gids);
-            return f.get(self); 
+            return components::amr::stubs::functional_component::eval(
+                self, appl, gid, value_gid, input_gids);
         }
     };
 
     inline naming::id_type 
-    init_helper(threads::thread_self& self, applier::applier& appl, 
+    alloc_helper(threads::thread_self& self, applier::applier& appl, 
         naming::id_type const& gid)
     {
-        typedef functional_component::init_action action_type;
-
-        lcos::eager_future<action_type, naming::id_type> f(appl, gid);
-        return f.get(self); 
+        return components::amr::stubs::functional_component::alloc_data(
+            self, appl, gid);
     }
 
     inline void free_helper(applier::applier& appl, naming::id_type const& fgid,
         naming::id_type& gid)
     {
-        typedef functional_component::free_action action_type;
-        appl.apply<action_type>(fgid, gid);
+        components::amr::stubs::functional_component::free_data(appl, fgid, gid);
         gid = naming::invalid_id;
     }
 
@@ -168,7 +162,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         bool free_value_gid = false;
 
         // ask functional component to create the local data value
-        backup_value_gid_ = init_helper(self, appl, functional_gid_);
+        backup_value_gid_ = alloc_helper(self, appl, functional_gid_);
 
         // this is the main loop of the computation, gathering the values
         // from the previous time step, computing the result of the current
@@ -182,7 +176,6 @@ namespace hpx { namespace components { namespace amr { namespace server
 
             // at this point all gid's have to be initialized
             BOOST_ASSERT(naming::invalid_id != functional_gid_);
-            BOOST_ASSERT(naming::invalid_id != value_gid_);
             BOOST_ASSERT(naming::invalid_id != backup_value_gid_);
 
             // Compute the next value, store it in backup_value_gid_
@@ -200,7 +193,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             // one, where the first gets it's initial value during the 
             // call_action)
             if (naming::invalid_id == value_gid_) {
-                value_gid_ = init_helper(self, appl, functional_gid_);
+                value_gid_ = alloc_helper(self, appl, functional_gid_);
                 free_value_gid = true;
             }
             std::swap(value_gid_, backup_value_gid_);

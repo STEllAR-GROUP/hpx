@@ -138,7 +138,8 @@ namespace hpx { namespace components { namespace server
 #define HPX_REGISTER_GENERIC_COMPONENT(c)                                     \
         HPX_REGISTER_ACTION(c::eval_action)                                   \
         HPX_DEFINE_GET_COMPONENT_TYPE(c)                                      \
-        HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(c, c)                          \
+        HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(                               \
+            hpx::components::simple_component<c>, c)                          \
     /**/
 
 #endif

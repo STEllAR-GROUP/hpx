@@ -78,25 +78,6 @@ namespace hpx { namespace components
             return gid_;
         }
 
-        /// \brief  The function \a create is used for allocation and 
-        ///         initialization of instances of the derived components.
-        static simple_component_base* 
-        create(applier::applier& appl, std::size_t count)
-        {
-            // simple components can be created individually only
-            BOOST_ASSERT(1 == count);
-            return new Component(appl);
-        }
-
-        /// \brief  The function \a destroy is used for destruction and 
-        ///         de-allocation of instances of the derived components.
-        static void destroy(Component* p, std::size_t count = 1)
-        {
-            // simple components can be deleted individually only
-            BOOST_ASSERT(1 == count);
-            delete p;
-        }
-
         /// \brief  The function \a has_multi_instance_factory is used to 
         ///         determine, whether instances of the derived component can 
         ///         be created in blocks (i.e. more than one instance at once). 
@@ -117,6 +98,39 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
     component_type simple_component_base<Component>::value = component_invalid;
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \class simple_component simple_component.hpp hpx/runtime/components/server/simple_component_base.hpp
+    ///
+    template <typename Component>
+    class simple_component : public Component
+    {
+    public:
+        simple_component(applier::applier& appl)
+          : Component(appl)
+        {}
+
+        /// \brief  The function \a create is used for allocation and 
+        ///         initialization of instances of the derived components.
+        static simple_component_base* 
+        create(applier::applier& appl, std::size_t count)
+        {
+            // simple components can be created individually only
+            BOOST_ASSERT(1 == count);
+            return new Component(appl);
+        }
+
+        /// \brief  The function \a destroy is used for destruction and 
+        ///         de-allocation of instances of the derived components.
+        static void destroy(Component* p, std::size_t count = 1)
+        {
+            // simple components can be deleted individually only
+            BOOST_ASSERT(1 == count);
+            delete p;
+        }
+
+    };
 
 }}
 

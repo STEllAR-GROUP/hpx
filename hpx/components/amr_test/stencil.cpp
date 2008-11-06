@@ -13,6 +13,7 @@ namespace hpx { namespace components { namespace amr
     ///////////////////////////////////////////////////////////////////////////
     struct timestep_data
     {
+        int timestep_;
         double value_;
     };
 
@@ -39,16 +40,28 @@ namespace hpx { namespace components { namespace amr
         return threads::terminated;
     }
 
-    threads::thread_state stencil::init(threads::thread_self& self, 
-        applier::applier& appl, naming::id_type* result)
+    threads::thread_state stencil::alloc_data(threads::thread_self& self, 
+        applier::applier& appl, naming::id_type* result, int item)
     {
         *result = components::stubs::memory_block::create(self, appl, 
             appl.get_runtime_support_gid(), sizeof(timestep_data));
+
+        if (-1 != item) {
+            // provide initial data for the given data value 
+            access_memory_block<timestep_data> val(
+                components::stubs::memory_block::checkout(self, appl, *result));
+
+            timestep_data data;
+            data.timestep_ = 0;
+            data.value_ = item;
+
+            *val = data;
+        }
         return threads::terminated;
     }
 
     /// The free function releases the memory allocated by init
-    threads::thread_state stencil::free(threads::thread_self& self, 
+    threads::thread_state stencil::free_data(threads::thread_self& self, 
         applier::applier& appl, naming::id_type const& gid)
     {
         components::stubs::memory_block::free(appl, gid);

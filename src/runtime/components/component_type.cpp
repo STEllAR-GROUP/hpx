@@ -35,7 +35,7 @@ namespace hpx { namespace components
         else
             result = "component";
 
-        if (type == get_base_type(type))
+        if (type == get_base_type(type) || component_invalid == type)
             result += "[" + boost::lexical_cast<std::string>(type) + "]";
         else {
             result += "[" + 

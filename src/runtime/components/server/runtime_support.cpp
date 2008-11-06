@@ -90,8 +90,18 @@ namespace hpx { namespace components { namespace server
         if (0 != gid)
             *gid = id;
 
-        LRT_(info) << "successfully created " << count << " component(s) of " 
-                   << "type: " << components::get_component_type_name(type);
+        if (LHPX_ENABLED(info)) {
+            if ((*it).second->has_multi_instance_factory()) {
+                LRT_(info) << "successfully created " << count 
+                           << " component(s) of type: " 
+                           << components::get_component_type_name(type);
+            }
+            else {
+                LRT_(info) << "successfully created 1 component of type: " 
+                           << components::get_component_type_name(type) 
+                           << " (size: " << count << ")";
+            }
+        }
         return threads::terminated;
     }
 

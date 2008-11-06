@@ -3,15 +3,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_AMR_FUNCTIONAL_COMPONENT_OCT_19_2008_1234PM)
-#define HPX_COMPONENTS_AMR_FUNCTIONAL_COMPONENT_OCT_19_2008_1234PM
+#if !defined(HPX_COMPONENTS_AMR_SERVER_FUNCTIONAL_COMPONENT_OCT_19_2008_1234PM)
+#define HPX_COMPONENTS_AMR_SERVER_FUNCTIONAL_COMPONENT_OCT_19_2008_1234PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
-#include <hpx/components/amr/server/functional_component.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server 
@@ -52,8 +51,8 @@ namespace hpx { namespace components { namespace amr { namespace server
             return threads::terminated;
         }
 
-        virtual threads::thread_state init(threads::thread_self&, 
-            applier::applier&, naming::id_type*)
+        virtual threads::thread_state alloc_data(threads::thread_self&, 
+            applier::applier&, naming::id_type*, int item)
         {
             // This shouldn't ever be called. If you're seeing this assertion 
             // you probably forgot to overload this function in your stencil 
@@ -62,7 +61,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             return threads::terminated;
         }
 
-        virtual threads::thread_state free(threads::thread_self&, 
+        virtual threads::thread_state free_data(threads::thread_self&, 
             applier::applier&, naming::id_type const&)
         {
             // This shouldn't ever be called. If you're seeing this assertion 
@@ -77,9 +76,10 @@ namespace hpx { namespace components { namespace amr { namespace server
         // object (the accumulator)
         enum actions
         {
-            functional_component_init = 0,
+            functional_component_alloc_data = 0,
             functional_component_eval = 1,
-            functional_component_free = 2,
+            functional_component_free_data = 2,
+            functional_component_initial = 3
         };
 
         /// This is the main entry point of this component. Calling this 
@@ -93,26 +93,26 @@ namespace hpx { namespace components { namespace amr { namespace server
             return eval(self, appl, retval, result, gids);
         }
 
-        threads::thread_state init_nv(threads::thread_self& self, 
-            applier::applier& appl, naming::id_type* result)
+        threads::thread_state alloc_data_nv(threads::thread_self& self, 
+            applier::applier& appl, naming::id_type* result, int item)
         {
-            return init(self, appl, result);
+            return alloc_data(self, appl, result, item);
         }
 
-        threads::thread_state free_nv(threads::thread_self& self, 
+        threads::thread_state free_data_nv(threads::thread_self& self, 
             applier::applier& appl, naming::id_type const& gid)
         {
-            return free(self, appl, gid);
+            return free_data(self, appl, gid);
         }
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::result_action0<
-            functional_component, naming::id_type, functional_component_init, 
-            &functional_component::init_nv
-        > init_action;
+        typedef hpx::actions::result_action1<
+            functional_component, naming::id_type, functional_component_alloc_data, 
+            int, &functional_component::alloc_data_nv
+        > alloc_data_action;
 
         typedef hpx::actions::result_action2<
             functional_component, bool, functional_component_eval, 
@@ -121,9 +121,9 @@ namespace hpx { namespace components { namespace amr { namespace server
         > eval_action;
 
         typedef hpx::actions::action1<
-            functional_component, functional_component_free, 
-            naming::id_type const&, &functional_component::free_nv
-        > free_action;
+            functional_component, functional_component_free_data, 
+            naming::id_type const&, &functional_component::free_data_nv
+        > free_data_action;
     };
 
 }}}}

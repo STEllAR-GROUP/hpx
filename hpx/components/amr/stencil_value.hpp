@@ -45,7 +45,7 @@ namespace hpx { namespace components { namespace amr
             return this->base_type::call_async(this->gid_, initial);
         }
 
-        static naming::id_type call(threads::thread_self& self, 
+        naming::id_type call(threads::thread_self& self, 
             naming::id_type const& initial)
         {
             return this->base_type::call(self, this->gid_, initial);

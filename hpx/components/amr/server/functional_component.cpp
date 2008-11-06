@@ -20,8 +20,8 @@ functional_component_double_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
-HPX_REGISTER_ACTION(functional_component_double_type::init_action);
+HPX_REGISTER_ACTION(functional_component_double_type::alloc_data_action);
 HPX_REGISTER_ACTION(functional_component_double_type::eval_action);
-HPX_REGISTER_ACTION(functional_component_double_type::free_action);
+HPX_REGISTER_ACTION(functional_component_double_type::free_data_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(functional_component_double_type);
 

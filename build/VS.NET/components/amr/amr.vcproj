@@ -48,7 +48,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -216,6 +216,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\..\..\hpx\components\amr\functional_component.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\hpx\components\amr\stencil_value.hpp"
 				>
 			</File>
@@ -254,6 +258,10 @@
 			<Filter
 				Name="Stubs"
 				>
+				<File
+					RelativePath="..\..\..\..\hpx\components\amr\stubs\functional_component.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\..\..\hpx\components\amr\stubs\stencil_value.hpp"
 					>

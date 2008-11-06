@@ -9,6 +9,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/components/amr/stencil_value.hpp>
+#include <hpx/components/amr/functional_component.hpp>
 #include <hpx/components/amr_test/stencil.hpp>
 
 #include <boost/lexical_cast.hpp>
@@ -100,6 +101,57 @@ void connect_input_ports(applier::applier& appl,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+void prepare_initial_data(threads::thread_self& self, applier::applier& appl, 
+    components::distributing_factory::result_type const& stencils, 
+    std::vector<naming::id_type>& initial_data)
+{
+    typedef std::vector<lcos::future_value<naming::id_type> > lazyvals_type;
+
+    // create a data item value type for each of the stencils
+    lazyvals_type lazyvals;
+    for (std::size_t i = 0; i < stencils.size(); ++i) 
+    {
+        BOOST_ASSERT(1 == stencils[i].count_);
+        lazyvals.push_back(components::amr::stubs::functional_component::
+            alloc_data_async(appl, stencils[i].first_gid_, i));
+    }
+
+    // now wait for the results
+    lazyvals_type::iterator lend = lazyvals.end();
+    for (lazyvals_type::iterator lit = lazyvals.begin(); lit != lend; ++lit) 
+    {
+        initial_data.push_back((*lit).get(self));
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// do actual work
+void execute(threads::thread_self& self, applier::applier& appl, 
+    components::distributing_factory::result_type const& values, 
+    std::vector<naming::id_type> const& initial_data, 
+    std::vector<naming::id_type>& result_data)
+{
+    BOOST_ASSERT(values[0].count_ == initial_data.size());
+
+    // start the execution of all stencil values (data items)
+    typedef std::vector<lcos::future_value<naming::id_type> > lazyvals_type;
+
+    lazyvals_type lazyvals;
+    for (int i = 0; i < (int)values[0].count_; ++i) 
+    {
+        lazyvals.push_back(components::amr::stubs::stencil_value<3>::
+            call_async(appl, values[0].first_gid_ + i, initial_data[i]));
+    }
+
+    // now wait for the results
+    lazyvals_type::iterator lend = lazyvals.end();
+    for (lazyvals_type::iterator lit = lazyvals.begin(); lit != lend; ++lit) 
+    {
+        result_data.push_back((*lit).get(self));
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 threads::thread_state 
 hpx_main(threads::thread_self& self, applier::applier& appl)
 {
@@ -132,11 +184,17 @@ hpx_main(threads::thread_self& self, applier::applier& appl)
         // connect output gids with corresponding stencil inputs
         connect_input_ports(appl, values, outputs);
 
+        // prepare initial data
+        std::vector<naming::id_type> initial_data;
+        prepare_initial_data(self, appl, stencils, initial_data);
 
+        // do actual work
+        std::vector<naming::id_type> result_data;
+        execute(self, appl, values, initial_data, result_data);
 
         // free all allocated components
-//         factory.free_components(values);
-//         factory.free_components(stencils);
+        factory.free_components(values);
+        factory.free_components(stencils);
 
     }   // distributing_factory needs to go out of scope before shutdown
 

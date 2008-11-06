@@ -63,6 +63,41 @@ namespace hpx { namespace components { namespace stubs
         {
             return get(self, appl_, gid);
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        static lcos::future_value<components::memory_block_data> checkout_async(
+            applier::applier& appl, naming::id_type const& targetgid) 
+        {
+            // Create an eager_future, execute the required action,
+            // we simply return the initialized future_value, the caller needs
+            // to call get() on the return value to obtain the result
+            typedef server::detail::memory_block::checkout_action action_type;
+            typedef components::memory_block_data data_type;
+            return lcos::eager_future<action_type, data_type>(appl, targetgid);
+        }
+
+        static components::memory_block_data checkout(threads::thread_self& self, 
+            applier::applier& appl, naming::id_type const& targetgid) 
+        {
+            // The following get yields control while the action above 
+            // is executed and the result is returned to the eager_future
+            return checkout_async(appl, targetgid).get(self);
+        }
+
+        /// Exposed functionality: get returns either the local memory pointers
+        /// or a copy of the remote data.
+        lcos::future_value<components::memory_block_data> checkout_async(
+            naming::id_type const& gid) 
+        {
+            return checkout_async(appl_, gid);
+        }
+
+        /// 
+        components::memory_block_data checkout(threads::thread_self& self, 
+            naming::id_type const& gid) 
+        {
+            return checkout(self, appl_, gid);
+        }
     };
 
 }}}
