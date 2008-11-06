@@ -37,8 +37,9 @@ namespace hpx { namespace components { namespace server
         // object 
         enum actions
         {
-            runtime_support_has_multi_instance_factory = 0,  ///< return whether more than 
-                                                    ///< one instance of a component can be created at once
+            runtime_support_factory_properties = 0, ///< return whether more than 
+                                                    ///< one instance of a component 
+                                                    ///< can be created at once
             runtime_support_create_component = 1,   ///< create new components
             runtime_support_free_component = 2,     ///< delete existing components
             runtime_support_shutdown = 3,           ///< shut down this runtime instance
@@ -85,9 +86,9 @@ namespace hpx { namespace components { namespace server
 
         /// \brief Action to figure out, whether we can create more than one 
         ///        instance at once
-        threads::thread_state has_multi_instance_factory(
+        threads::thread_state factory_properties(
             threads::thread_self& self, applier::applier& app,
-            bool* has_multi_instance_factory, components::component_type type); 
+            factory_property*, components::component_type type); 
 
         /// \brief Action to create new components
         threads::thread_state create_component(
@@ -113,10 +114,10 @@ namespace hpx { namespace components { namespace server
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::result_action1<
-            runtime_support, bool, runtime_support_has_multi_instance_factory, 
-            components::component_type, 
-            &runtime_support::has_multi_instance_factory
-        > has_multi_instance_factory_action;
+            runtime_support, factory_property, 
+            runtime_support_factory_properties, components::component_type, 
+            &runtime_support::factory_properties
+        > factory_properties_action;
 
         typedef hpx::actions::result_action2<
             runtime_support, naming::id_type, runtime_support_create_component, 

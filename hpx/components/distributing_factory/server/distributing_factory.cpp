@@ -61,13 +61,12 @@ namespace hpx { namespace components { namespace server
 
             // figure out, whether we can create more than one instance of the 
             // component at once
-            bool has_multi_instance_factory = false;
+            bool factory_props = factory_none;
             if (1 != numcreate) {
-                has_multi_instance_factory = 
-                    rts.has_multi_instance_factory(self, *it, type);
+                factory_props = rts.get_factory_properties(self, *it, type);
             }
 
-            if (has_multi_instance_factory) {
+            if (factory_props & factory_is_multi_instance) {
                 // create all component instances at once
                 lcos::future_value<naming::id_type> f (
                     rts.create_component_async(*it, type, numcreate));

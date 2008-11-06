@@ -29,7 +29,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the runtime_support actions
-HPX_REGISTER_ACTION(hpx::components::server::runtime_support::has_multi_instance_factory_action);
+HPX_REGISTER_ACTION(hpx::components::server::runtime_support::factory_properties_action);
 HPX_REGISTER_ACTION(hpx::components::server::runtime_support::create_component_action);
 HPX_REGISTER_ACTION(hpx::components::server::runtime_support::free_component_action);
 HPX_REGISTER_ACTION(hpx::components::server::runtime_support::shutdown_action);
@@ -43,9 +43,9 @@ namespace hpx { namespace components { namespace server
 {
     // return, whether more than one instance of the given component can be 
     // created at the same time
-    threads::thread_state runtime_support::has_multi_instance_factory(
+    threads::thread_state runtime_support::factory_properties(
         threads::thread_self& self, applier::applier& app,
-        bool* has_multi_instance_factory, components::component_type type)
+        factory_property* factoryprops, components::component_type type)
     {
     // locate the factory for the requested component type
         component_map_type::const_iterator it = components_.find(type);
@@ -60,8 +60,7 @@ namespace hpx { namespace components { namespace server
         }
 
     // ask for the factory's capabilities
-        *has_multi_instance_factory = 
-            (*it).second->has_multi_instance_factory();
+        *factoryprops = (*it).second->get_factory_properties();
         return threads::terminated;
     }
 
@@ -91,15 +90,15 @@ namespace hpx { namespace components { namespace server
             *gid = id;
 
         if (LHPX_ENABLED(info)) {
-            if ((*it).second->has_multi_instance_factory()) {
-                LRT_(info) << "successfully created " << count 
-                           << " component(s) of type: " 
-                           << components::get_component_type_name(type);
-            }
-            else {
+            if ((*it).second->get_factory_properties() & factory_instance_count_is_size) {
                 LRT_(info) << "successfully created 1 component of type: " 
                            << components::get_component_type_name(type) 
                            << " (size: " << count << ")";
+            }
+            else {
+                LRT_(info) << "successfully created " << count 
+                           << " component(s) of type: " 
+                           << components::get_component_type_name(type);
             }
         }
         return threads::terminated;

@@ -462,18 +462,18 @@ namespace hpx { namespace components { namespace server
             get_heap().free(p);
         }
 
-        /// \brief  The function \a has_multi_instance_factory is used to 
+        /// \brief  The function \a get_factory_properties is used to 
         ///         determine, whether instances of the derived component can 
         ///         be created in blocks (i.e. more than one instance at once). 
         ///         This function is used by the \a distributing_factory to 
         ///         determine a correct allocation strategy
-        static bool has_multi_instance_factory()
+        static factory_property get_factory_properties()
         {
             // this component can be allocated one at a time only, but the 
             // meaning of the count parameter passed to create is different.
             // In this case it specifies the number of bytes to allocate for a
             // new memory block.
-            return true;
+            return factory_instance_count_is_size;
         }
 
     public:

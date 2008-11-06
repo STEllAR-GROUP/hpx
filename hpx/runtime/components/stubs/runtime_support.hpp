@@ -32,12 +32,12 @@ namespace hpx { namespace components { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        /// \brief  The function \a has_multi_instance_factory is used to 
+        /// \brief  The function \a get_factory_properties is used to 
         ///         determine, whether instances of the derived component can 
         ///         be created in blocks (i.e. more than one instance at once). 
         ///         This function is used by the \a distributing_factory to 
         ///         determine a correct allocation strategy
-        static lcos::future_value<bool> has_multi_instance_factory_async(
+        static lcos::future_value<factory_property> get_factory_properties_async(
             applier::applier& appl, naming::id_type const& targetgid, 
             components::component_type type) 
         {
@@ -45,31 +45,32 @@ namespace hpx { namespace components { namespace stubs
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
             typedef 
-                server::runtime_support::has_multi_instance_factory_action 
+                server::runtime_support::factory_properties_action 
             action_type;
-            return lcos::eager_future<action_type, bool>(appl, targetgid, type);
+            return lcos::eager_future<action_type, factory_property>(
+                appl, targetgid, type);
         }
 
-        static bool has_multi_instance_factory(
+        static factory_property get_factory_properties(
             threads::thread_self& self, applier::applier& appl, 
             naming::id_type const& targetgid, components::component_type type) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future
-            return has_multi_instance_factory_async(appl, targetgid, type)
+            return get_factory_properties_async(appl, targetgid, type)
                 .get(self);
         }
 
-        lcos::future_value<bool> has_multi_instance_factory_async(
+        lcos::future_value<factory_property> get_factory_properties_async(
             naming::id_type const& targetgid, components::component_type type) 
         {
-            return has_multi_instance_factory_async(appl_, targetgid, type);
+            return get_factory_properties_async(appl_, targetgid, type);
         }
 
-        bool has_multi_instance_factory(threads::thread_self& self,
+        factory_property get_factory_properties(threads::thread_self& self,
             naming::id_type const& targetgid, components::component_type type) 
         {
-            return has_multi_instance_factory(self, appl_, targetgid, type);
+            return get_factory_properties(self, appl_, targetgid, type);
         }
 
         /// Create a new component \a type using the runtime_support with the 
