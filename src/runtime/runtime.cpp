@@ -53,7 +53,7 @@ namespace hpx
         parcel_port_(parcel_pool_, naming::locality(address, port)),
         thread_manager_(timer_pool_, boost::bind(&runtime::stop, This(), false)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
-        runtime_support_(ini_, parcel_port_.here(), agas_client_),
+        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_)
@@ -66,7 +66,7 @@ namespace hpx
         parcel_port_(parcel_pool_, address),
         thread_manager_(timer_pool_, boost::bind(&runtime::stop, This(), false)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
-        runtime_support_(ini_, parcel_port_.here(), agas_client_),
+        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_)
@@ -79,7 +79,7 @@ namespace hpx
         parcel_port_(parcel_pool_, address),
         thread_manager_(timer_pool_),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
-        runtime_support_(ini_, parcel_port_.here(), agas_client_),
+        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_)

@@ -189,7 +189,7 @@ namespace hpx { namespace naming { namespace server
             }
 
             // return the registered component type
-            rep = reply(command_get_component_id, 
+            rep = reply(command_register_factory, 
                 (components::component_type)(*it).second); 
         }
         catch (std::bad_alloc) {

@@ -55,11 +55,11 @@ namespace hpx { namespace components { namespace server
         }
 
         // constructor
-        runtime_support(util::section& ini, naming::locality const& l, 
+        runtime_support(util::section& ini, naming::id_type const& prefix, 
                 naming::resolver_client& agas_client) 
           : stopped_(false)
         {
-            load_components(ini, l, agas_client);
+            load_components(ini, prefix, agas_client);
         }
 
         ~runtime_support()
@@ -159,11 +159,11 @@ namespace hpx { namespace components { namespace server
 
     protected:
         // Load all components from the ini files found in the configuration
-        void load_components(util::section& ini, naming::locality const& l, 
+        void load_components(util::section& ini, naming::id_type const& prefix, 
             naming::resolver_client& agas_client);
         bool load_component(util::section& ini, std::string const& instance, 
             std::string const& component, boost::filesystem::path lib,
-            naming::locality const& l, naming::resolver_client& agas_client, 
+            naming::id_type const& prefix, naming::resolver_client& agas_client, 
             bool isdefault);
 
     private:

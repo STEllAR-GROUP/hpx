@@ -43,15 +43,15 @@ namespace hpx { namespace components
         /// \brief Return the unique identifier of the component type this 
         ///        factory is responsible for
         ///
-        /// \param l            [in] The locality this factory is responsible 
-        ///                     for.
+        /// \param prefix       [in] The prefix of the locality this factory 
+        ///                     is responsible for.
         /// \param agas_client  [in] The AGAS client to use for component id 
         ///                     registration (if needed).
         ///
         /// \return Returns the unique identifier of the component type this 
         ///         factory instance is responsible for. This function throws
         ///         on any error.
-        virtual component_type get_component_type(naming::locality const& l, 
+        virtual component_type get_component_type(naming::id_type const& prefix, 
             naming::resolver_client& agas_client) = 0;
 
         /// \brief Return the name of the component type this factory is 
