@@ -13,8 +13,9 @@ namespace hpx { namespace components { namespace amr
     ///////////////////////////////////////////////////////////////////////////
     struct timestep_data
     {
-        int timestep_;
-        double value_;
+        int index_;       // sequential number of this datapoint
+        int timestep_;    // current time step
+        double value_;    // current value
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -24,19 +25,34 @@ namespace hpx { namespace components { namespace amr
         applier::applier& appl, bool* is_last, naming::id_type const& result, 
         std::vector<naming::id_type> const& gids)
     {
-//         // start asynchronous get operations
-//         stubs::memory_block stub(appl);
-// 
-//         // get all input memory_block_data instances, create new dataset
-//         access_memory_block<double> val1, val2, val3;
-//         boost::tie(val1, val2, val3) = wait(self, 
-//             stub.get_async(gid1), stub.get_async(gid2), stub.get_async(gid3));
-// 
-//         // we reuse the spot of the middle point
-//         *val2 = (*val1 + *val2 + *val3) / 3;
-// 
-//         // store result value
-//         *result = gid2;
+        BOOST_ASSERT(gids.size() == 3);
+
+        // start asynchronous get operations
+        stubs::memory_block stub(appl);
+
+        // get all input memory_block_data instances
+        access_memory_block<timestep_data> val1, val2, val3, resultval;
+        boost::tie(val1, val2, val3, resultval) = 
+            wait(self, stub.get_async(gids[0]), 
+                stub.get_async(gids[1]), stub.get_async(gids[2]),
+                stub.get_async(result));
+
+        // the middle point is our direct predecessor
+        if (resultval->timestep_ < 2) {
+            // make sure all input data items agree on the time step number
+            BOOST_ASSERT(val1->timestep_ == val2->timestep_);
+            BOOST_ASSERT(val1->timestep_ == val3->timestep_);
+
+            // this is the actual calculation
+            resultval->index_ = val2->index_;
+            resultval->timestep_ = val1->timestep_ + 1;
+            resultval->value_ = (val1->value_ + val2->value_ + val3->value_) / 3;
+        }
+
+        // set return value to true if this is the last time lkstep
+        *is_last = resultval->timestep_ >= 2;
+
+        // store result value
         return threads::terminated;
     }
 
@@ -51,11 +67,9 @@ namespace hpx { namespace components { namespace amr
             access_memory_block<timestep_data> val(
                 components::stubs::memory_block::checkout(self, appl, *result));
 
-            timestep_data data;
-            data.timestep_ = 0;
-            data.value_ = item;
-
-            *val = data;
+            val->index_ = item;
+            val->timestep_ = 0;
+            val->value_ = item;
         }
         return threads::terminated;
     }

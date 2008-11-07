@@ -35,6 +35,7 @@ set (hpxlib_HEADERS
     ${hpx_SOURCE_DIR}/hpx/lcos/eager_future_constructors.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/eager_future_constructors_direct.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/future_value.hpp
+    ${hpx_SOURCE_DIR}/hpx/lcos/future_wait.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/lazy_future.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/lazy_future_get_results.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/lazy_future_get_results_direct.hpp

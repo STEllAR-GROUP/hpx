@@ -17,6 +17,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/locality.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 ///  version of GAS request structure
@@ -32,17 +33,18 @@ namespace hpx { namespace naming { namespace server
         command_firstcommand = 0,
         command_getprefix = 0,      ///< return a unique prefix for the requesting site
         command_getprefixes = 1,    ///< return prefixes for all known localities in the system
-        command_get_component_id = 2,    ///< return an unique component type
-        command_getidrange = 3,     ///< return a unique range of ids for the requesting site
-        command_bind_range = 4,     ///< bind a range of addresses to a range of global ids
-        command_unbind_range = 5,   ///< remove binding for a range of global ids
-        command_resolve = 6,        ///< resolve a global id to an address
-        command_queryid = 7,        ///< query for a global id associated with a namespace name (string)
-        command_registerid = 8,     ///< associate a namespace name with a global id
-        command_unregisterid = 9,   ///< remove association of a namespace name with a global id
-        command_statistics_count = 10,   ///< return some usage statistics: execution count 
-        command_statistics_mean = 11,    ///< return some usage statistics: average server execution time
-        command_statistics_moment2 = 12, ///< return some usage statistics: 2nd moment of server execution time
+        command_get_component_id = 2,   ///< return an unique component type
+        command_register_factory = 3,   ///< register a factory for a component type
+        command_getidrange = 4,     ///< return a unique range of ids for the requesting site
+        command_bind_range = 5,     ///< bind a range of addresses to a range of global ids
+        command_unbind_range = 6,   ///< remove binding for a range of global ids
+        command_resolve = 7,        ///< resolve a global id to an address
+        command_queryid = 8,        ///< query for a global id associated with a namespace name (string)
+        command_registerid = 9,     ///< associate a namespace name with a global id
+        command_unregisterid = 10,  ///< remove association of a namespace name with a global id
+        command_statistics_count = 11,   ///< return some usage statistics: execution count 
+        command_statistics_mean = 12,    ///< return some usage statistics: average server execution time
+        command_statistics_moment2 = 13, ///< return some usage statistics: 2nd moment of server execution time
         command_lastcommand
     };
 
@@ -62,6 +64,11 @@ namespace hpx { namespace naming { namespace server
           : command_(c), site_(l)
         {}
 
+        // get_prefixes
+        request(agas_server_command c, components::component_type type) 
+          : command_(c), type_(type)
+        {}
+
         // get_id_range
         request(agas_server_command c, locality const& l, std::size_t count) 
           : command_(c), count_(count), site_(l)
@@ -72,7 +79,7 @@ namespace hpx { namespace naming { namespace server
           : command_(c), id_(id)
         {}
 
-        // registerid
+        // registerid, register_factory
         request(agas_server_command c, std::string const& ns_name, 
                 naming::id_type const& id) 
           : command_(c), id_(id), name_(ns_name)
@@ -131,6 +138,11 @@ namespace hpx { namespace naming { namespace server
             return name_;
         }
 
+        components::component_type get_type() const
+        {
+            return type_;
+        }
+
     private:
         friend std::ostream& operator<< (std::ostream& os, request const& req);
 
@@ -168,6 +180,7 @@ namespace hpx { namespace naming { namespace server
                 ar << name_;
                 break;
 
+            case command_register_factory:
             case command_registerid:
                 ar << id_;
                 ar << name_;
@@ -177,8 +190,11 @@ namespace hpx { namespace naming { namespace server
                 ar << count_;
                 break;
 
-            case command_getprefix:
             case command_getprefixes:
+                ar << type_;
+                break;
+
+            case command_getprefix:
             case command_statistics_count:
             case command_statistics_mean:
             case command_statistics_moment2:
@@ -224,6 +240,7 @@ namespace hpx { namespace naming { namespace server
                 ar >> name_;
                 break;
 
+            case command_register_factory:
             case command_registerid:
                 ar >> id_;
                 ar >> name_;
@@ -233,8 +250,11 @@ namespace hpx { namespace naming { namespace server
                 ar >> count_;
                 break;
 
-            case command_getprefix:
             case command_getprefixes:
+                ar >> type_;
+                break;
+
+            case command_getprefix:
             case command_statistics_count:
             case command_statistics_mean:
             case command_statistics_moment2:
@@ -247,12 +267,13 @@ namespace hpx { namespace naming { namespace server
 
     private:
         boost::uint8_t command_;    /// one of the agas_server_command's above
-        naming::id_type id_;        /// global id (resolve, bind and unbind only)
+        naming::id_type id_;        /// global id (resolve, register_factory, bind and unbind only)
         std::size_t count_;         /// number of global ids (bind_range, unbind_range only)
         naming::locality site_;     /// our address 
         naming::address addr_;      /// address to associate with this id (bind only)
         std::ptrdiff_t offset_;     /// offset between local addresses of a range (bind_range only)
-        std::string name_;       /// namespace name (queryid only)
+        std::string name_;          /// namespace name (get_component_id, register_factory, queryid only)
+        components::component_type type_; /// component_type (optional for get_prefixes only)
     };
 
     /// The \a operator<< is used for logging purposes, dumping the internal 

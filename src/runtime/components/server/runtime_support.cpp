@@ -183,7 +183,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     // Load all components from the ini files found in the configuration
     void runtime_support::load_components(util::section& ini, 
-        naming::resolver_client& agas_client)
+        naming::locality const& l, naming::resolver_client& agas_client)
     {
         // load all components as described in the configuration information
         if (!ini.has_section("hpx.components")) {
@@ -250,11 +250,11 @@ namespace hpx { namespace components { namespace server
                 else
                     lib = fs::path(HPX_DEFAULT_COMPONENT_PATH, fs::native);
 
-                if (!load_component(ini, instance, component, lib, agas_client, isdefault)) {
+                if (!load_component(ini, instance, component, lib, l, agas_client, isdefault)) {
                     // build path to component to load
                     std::string libname(component + HPX_SHARED_LIB_EXTENSION);
                     lib /= fs::path(libname, fs::native);
-                    if (!load_component (ini, instance, component, lib, agas_client, isdefault))
+                    if (!load_component (ini, instance, component, lib, l, agas_client, isdefault))
                         continue;   // next please :-P
                 }
             } 
@@ -266,8 +266,8 @@ namespace hpx { namespace components { namespace server
 
     bool runtime_support::load_component(util::section& ini, 
         std::string const& instance, std::string const& component, 
-        boost::filesystem::path lib, naming::resolver_client& agas_client,
-        bool isdefault)
+        boost::filesystem::path lib, naming::locality const& l, 
+        naming::resolver_client& agas_client, bool isdefault)
     {
         namespace fs = boost::filesystem;
         if (fs::extension(lib) != HPX_SHARED_LIB_EXTENSION)
@@ -295,7 +295,7 @@ namespace hpx { namespace components { namespace server
             component_factory_type factory (
                 pf.create(instance, glob_ini, component_ini)); 
 
-            component_type t = factory->get_component_type(agas_client);
+            component_type t = factory->get_component_type(l, agas_client);
             if (0 == t) {
                 LRT_(info) << "component refused to load: "  << instance;
                 return false;   // module refused to load

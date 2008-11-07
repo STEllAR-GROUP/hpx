@@ -25,6 +25,7 @@ namespace hpx { namespace naming { namespace server
             "command_getprefix",
             "command_getprefixes",
             "command_get_component_id",
+            "command_register_factory",
             "command_getidrange",
             "command_bind_range",
             "command_unbind_range",
@@ -78,6 +79,7 @@ namespace hpx { namespace naming { namespace server
             os << "name(\"" << req.name_ << "\") ";
             break;
 
+        case command_register_factory:
         case command_registerid:
             os << "id" << req.id_ << " ";
             os << "name(\"" << req.name_ << "\") ";
@@ -93,6 +95,9 @@ namespace hpx { namespace naming { namespace server
             break;
 
         case command_getprefixes:
+            os << "type(" << components::get_component_type_name(req.type_) << ") ";
+            break;
+
         case command_statistics_count:
         case command_statistics_mean:
         case command_statistics_moment2:

@@ -72,11 +72,13 @@ namespace hpx { namespace naming { namespace server
                          command == command_registerid);
         }
 
-        reply (components::component_type type, error s = success)
-          : command_(command_get_component_id), status_(s),
-            error_(get_error_text(s)), 
+        reply (agas_server_command command, components::component_type type, 
+                error s = success)
+          : command_(command), status_(s), error_(get_error_text(s)), 
             type_(type)
         {
+            BOOST_ASSERT(command == command_get_component_id || 
+                         command == command_register_factory);
         }
 
         reply (std::vector<boost::uint32_t>& prefixes, error s = success)
@@ -222,6 +224,7 @@ namespace hpx { namespace naming { namespace server
                 break;
 
             case command_get_component_id:
+            case command_register_factory:
                 ar << type_;
                 break;
 
@@ -275,6 +278,7 @@ namespace hpx { namespace naming { namespace server
                 break;
 
             case command_get_component_id:
+            case command_register_factory:
                 ar >> type_;
                 break;
 
@@ -304,7 +308,7 @@ namespace hpx { namespace naming { namespace server
         naming::id_type id_;            ///< global id (for queryid only)
         std::vector<double> statistics_;        ///< gathered statistics
         std::vector<boost::uint32_t> prefixes_; ///< all site prefixes known to this server
-        components::component_type type_;       ///< the component type (command_get_component_id only)
+        components::component_type type_;       ///< the component type (command_get_component_id, command_register_factory only)
     };
 
     /// The \a operator<< is used for logging purposes, dumping the internal 

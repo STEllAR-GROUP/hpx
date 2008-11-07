@@ -91,6 +91,7 @@ namespace hpx { namespace naming { namespace server
                 break;
 
             case command_get_component_id:
+            case command_register_factory:
                 os << "type(" << (int)rep.type_ << ") ";
                 break;
 

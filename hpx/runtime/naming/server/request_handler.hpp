@@ -60,6 +60,7 @@ namespace hpx { namespace naming { namespace server
         void handle_getprefix(request const& req, reply& rep);
         void handle_getprefixes(request const& req, reply& rep);
         void handle_get_component_id(request const& req, reply& rep);
+        void handle_register_factory(request const& req, reply& rep);
         void handle_getidrange(request const& req, reply& rep);
         void handle_bind_range(request const& req, reply& rep);
         void handle_unbind_range(request const& req, reply& rep);
@@ -116,8 +117,9 @@ namespace hpx { namespace naming { namespace server
         friend bool operator< (site_prefix_value_type const& lhs,
             site_prefix_value_type const& rhs);
 
-        // Store all registered component types 
+        // Store all registered component types and registered factories
         typedef std::map<std::string, int> component_type_map;
+        typedef std::multimap<int, boost::uint32_t> factory_map;
 
         typedef boost::mutex mutex_type;
 
@@ -131,6 +133,7 @@ namespace hpx { namespace naming { namespace server
         mutex_type component_types_mtx_;
         int component_type_;
         component_type_map component_types_;  // component names --> type id
+        factory_map factories_;               // type id --> prefixes
 
         // gathered timings and counts
 #if BOOST_VERSION >= 103600

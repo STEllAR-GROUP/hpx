@@ -89,6 +89,9 @@ namespace hpx { namespace components
     template <typename T>
     class access_memory_block
     {
+    private:
+        typedef typename boost::remove_const<T>::type target_type;
+
     public:
         access_memory_block()
         {}
@@ -102,6 +105,7 @@ namespace hpx { namespace components
             return *this;
         }
 
+        ///////////////////////////////////////////////////////////////////////
         access_memory_block_proxy<T> operator*()
         {
             return access_memory_block_proxy<T>(mb_);
@@ -109,6 +113,16 @@ namespace hpx { namespace components
         access_memory_block_proxy<T const> operator*() const
         {
             return access_memory_block_proxy<T>(mb_);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        target_type* operator->() 
+        {
+            return reinterpret_cast<target_type*>(mb_.get_ptr());
+        }
+        target_type const* operator->() const
+        {
+            return reinterpret_cast<target_type const*>(mb_.get_ptr());
         }
 
     private:

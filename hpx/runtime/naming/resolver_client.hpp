@@ -50,7 +50,7 @@ namespace hpx { namespace naming
         /// \brief Get unique prefix usable as locality id (locality prefix)
         ///
         /// Every locality needs to have an unique locality id, which may be 
-        /// used to issue unique global ids without having to consult the PGAS
+        /// used to issue unique global ids without having to consult the AGAS
         /// server for every id to generate.
         /// 
         /// \param l          [in] The locality the locality id needs to be 
@@ -72,14 +72,21 @@ namespace hpx { namespace naming
         /// \brief Query for the prefixes of all known localities.
         ///
         /// This function returns the prefixes of all localities known to the 
-        /// AGAS server.
+        /// AGAS server or all localities having a registered factory for a 
+        /// given component type.
         /// 
         /// \param prefixes   [out] The vector will contain the prefixes of all
         ///                   localities registered with the AGAS server. The
         ///                   returned vector holds the prefixes representing 
         ///                   the runtime_support components of these 
         ///                   localities.
-        bool get_prefixes(std::vector<id_type>& prefixes) const;
+        /// \param type       [in] The component type will be used to determine
+        ///                   the set of prefixes having a registered factory
+        ///                   for this component. The default value for this 
+        ///                   parameter is \a components#component_invalid, 
+        ///                   which will return prefixes of all localities.
+        bool get_prefixes(std::vector<id_type>& prefixes,
+            components::component_type type = components::component_invalid) const;
 
         /// \brief Return a unique id usable as a component type.
         /// 
@@ -94,7 +101,27 @@ namespace hpx { namespace naming
         ///                   component type. Any error results in an 
         ///                   exception thrown from this function.
         components::component_type 
-            get_component_id(std::string const& componentname) const;
+            get_component_id(std::string const& name) const;
+
+        /// \brief Register a factory for a specific component type
+        ///
+        /// This function allows to register a component factory for a given
+        /// locality and component type.
+        ///
+        /// \param prefix     [in] The prefix value uniquely identifying the 
+        ///                   given locality the factory needs to be registered 
+        ///                   for. 
+        /// \param name       [in] The component name (string) to register a
+        ///                   factory for the given component type for.
+        /// 
+        /// \returns          The function returns the currently associated 
+        ///                   component type. Any error results in an 
+        ///                   exception thrown from this function. The returned
+        ///                   component type is the same as if the function
+        ///                   \a get_component_id was called using the same 
+        ///                   component name.
+        components::component_type register_factory(id_type const& prefix, 
+            std::string const& name) const;
 
         /// \brief Get unique range of freely assignable global ids 
         ///

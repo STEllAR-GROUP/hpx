@@ -177,6 +177,7 @@ namespace hpx { namespace actions
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
                 cont->trigger_error(app, e);
+                return threads::terminated;
             }
             return newstate;
         }
@@ -304,6 +305,7 @@ namespace hpx { namespace actions
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
                 cont->trigger_error(app, e);
+                return threads::terminated;
             }
             return newstate;
         }
@@ -673,6 +675,7 @@ namespace hpx { namespace actions
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
                 cont->trigger_error(app, e);
+                return threads::terminated;
             }
             return newstate;
         }

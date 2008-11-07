@@ -62,10 +62,11 @@ namespace hpx { namespace naming
         return s == success;
     }
 
-    bool resolver_client::get_prefixes(std::vector<id_type>& prefixes) const
+    bool resolver_client::get_prefixes(std::vector<id_type>& prefixes,
+        components::component_type type) const
     {
         // send request
-        server::request req (server::command_getprefixes);
+        server::request req (server::command_getprefixes, type);
         server::reply rep;
         execute(req, rep);
 
@@ -86,6 +87,21 @@ namespace hpx { namespace naming
     {
         // send request
         server::request req (server::command_get_component_id, componentname);
+        server::reply rep;
+        execute(req, rep);
+
+        hpx::error s = (hpx::error) rep.get_status();
+        if (s != success && s != no_success)
+            HPX_THROW_EXCEPTION((error)s, rep.get_error());
+
+        return rep.get_component_id();
+    }
+
+    components::component_type resolver_client::register_factory(
+        id_type const& prefix, std::string const& name) const
+    {
+        // send request
+        server::request req (server::command_register_factory, name, prefix);
         server::reply rep;
         execute(req, rep);
 

@@ -93,11 +93,27 @@ namespace hpx { namespace naming { namespace server
             std::vector<boost::uint32_t> prefixes;
             prefixes.reserve(site_prefixes_.size());
 
-            site_prefix_map_type::iterator end = site_prefixes_.end();
-            for (site_prefix_map_type::iterator it = site_prefixes_.begin();
-                 it != end; ++it)
-            {
-                prefixes.push_back((*it).second.first);
+            components::component_type t = req.get_type();
+            if (components::component_invalid == t) {
+                // return all prefixes
+                site_prefix_map_type::iterator end = site_prefixes_.end();
+                for (site_prefix_map_type::iterator it = site_prefixes_.begin();
+                     it != end; ++it)
+                {
+                    prefixes.push_back((*it).second.first);
+                }
+            }
+            else {
+                l.unlock();
+
+                // return prefixes which have a factory for the given type
+                mutex_type::scoped_lock fl(component_types_mtx_);
+                std::pair<factory_map::iterator, factory_map::iterator> p = 
+                    factories_.equal_range(t);
+                for (/**/; p.first != p.second; ++p.first) 
+                {
+                    prefixes.push_back((*p.first).second);
+                }
             }
 
             rep = reply(prefixes, prefixes.empty() ? no_success : success); 
@@ -130,13 +146,57 @@ namespace hpx { namespace naming { namespace server
             }
 
             // return the registered component type
-            rep = reply((components::component_type)(*it).second); 
+            rep = reply(command_get_component_id, 
+                (components::component_type)(*it).second); 
         }
         catch (std::bad_alloc) {
             rep = reply(command_get_component_id, out_of_memory);
         }
         catch (...) {
             rep = reply(command_get_component_id, internal_server_error);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void request_handler::handle_register_factory(request const& req, reply& rep)
+    {
+        try {
+            mutex_type::scoped_lock l(component_types_mtx_);
+
+            // ensure component type
+            component_type_map::iterator it = component_types_.find(req.get_name());
+            if (it == component_types_.end()) {
+                // first request: create a new component type and store it
+                std::pair<component_type_map::iterator, bool> p = 
+                    component_types_.insert(component_type_map::value_type(
+                        req.get_name(), component_type_++));
+                if (!p.second) {
+                    rep = reply(command_register_factory, out_of_memory);
+                    return;
+                }
+                it = p.first;
+            }
+
+            // store prefix in factory map
+            boost::uint32_t prefix = get_prefix_from_id(req.get_id());
+            factory_map::iterator itf = factories_.insert(
+                factory_map::value_type((*it).second, prefix));
+
+            if (itf == factories_.end()) 
+            {
+                rep = reply(command_register_factory, out_of_memory);
+                return;
+            }
+
+            // return the registered component type
+            rep = reply(command_get_component_id, 
+                (components::component_type)(*it).second); 
+        }
+        catch (std::bad_alloc) {
+            rep = reply(command_register_factory, out_of_memory);
+        }
+        catch (...) {
+            rep = reply(command_register_factory, internal_server_error);
         }
     }
 
@@ -563,6 +623,10 @@ namespace hpx { namespace naming { namespace server
 
         case command_get_component_id:
             handle_get_component_id(req, rep);
+            break;
+
+        case command_register_factory:
+            handle_register_factory(req, rep);
             break;
 
         case command_getidrange:

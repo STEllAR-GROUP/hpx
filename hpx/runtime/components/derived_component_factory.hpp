@@ -75,19 +75,29 @@ namespace hpx { namespace components
         /// \brief Return the unique identifier of the component type this 
         ///        factory is responsible for
         ///
+        /// \param l            [in] The locality this factory is responsible 
+        ///                     for.
         /// \param agas_client  [in] The AGAS client to use for component id 
         ///                     registration (if needed).
         ///
         /// \return Returns the unique identifier of the component type this 
         ///         factory instance is responsible for. This function throws
         ///         on any error.
-        component_type get_component_type(naming::resolver_client& agas_client)
+        component_type get_component_type(naming::locality const& l, 
+            naming::resolver_client& agas_client)
         {
             if (component_invalid == Component::get_component_type()) {
                 // first call to get_component_type, ask AGAS for a unique id
+                naming::id_type prefix;
+                agas_client.get_prefix(l, prefix);
+
+                component_type this_type = agas_client.register_factory(
+                    prefix, unique_component_name);
+                component_type base_type = agas_client.get_component_id(
+                    unique_base_component_name);
+
                 Component::set_component_type(derived_component_type(
-                    agas_client.get_component_id(unique_component_name),
-                    agas_client.get_component_id(unique_base_component_name)));
+                    this_type, base_type));
             }
             return Component::get_component_type();
         }

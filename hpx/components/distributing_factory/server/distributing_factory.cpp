@@ -34,16 +34,28 @@ namespace hpx { namespace components { namespace server
         result_type* gids, components::component_type type, 
         std::size_t count)
     {
+        // make sure we get prefixes for derived component type, if any
+        components::component_type prefix_type = type;
+        if (type != components::get_base_type(type))
+            prefix_type = components::get_derived_type(type);
+
         // get list of locality prefixes
         std::vector<naming::id_type> prefixes;
-        appl.get_agas_client().get_prefixes(prefixes);
+        appl.get_agas_client().get_prefixes(prefixes, prefix_type);
+
+        if (prefixes.empty())
+        {
+            HPX_THROW_EXCEPTION(bad_component_type, 
+                "attempt to create component instance of invalid type: " +
+                components::get_component_type_name(type));
+        }
 
         std::size_t created_count = 0;
         std::size_t count_on_locality = count / prefixes.size();
         if (0 == count_on_locality)
             count_on_locality = 1;
 
-        // distribute the number of components to create evenly on all 
+        // distribute the number of components to create evenly over all 
         // available localities
         typedef std::vector<lazy_result> future_values_type;
 

@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include <hpx/hpx.hpp>
+#include <hpx/lcos/future_wait.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/components/amr/stencil_value.hpp>
 #include <hpx/components/amr/functional_component.hpp>
@@ -72,7 +73,7 @@ void get_output_ports(threads::thread_self& self, applier::applier& appl,
 // Currently we have exactly one stencil_value instance per data point, where 
 // the output ports of a stencil_value are connected to the input ports of the 
 // direct neighbors of itself.
-inline std::size_t mod(int idx, std::size_t maxidx = 3)
+inline std::size_t mod(int idx, std::size_t maxidx)
 {
     return (idx < 0) ? (idx + maxidx) % maxidx : idx % maxidx;
 }
@@ -83,16 +84,17 @@ void connect_input_ports(applier::applier& appl,
 {
     typedef components::distributing_factory::result_type result_type;
 
-    BOOST_ASSERT(outputs.size() == values[0].count_);
-    for (int i = 0; i < (int)values[0].count_; ++i) 
+    std::size_t numvals = values[0].count_;
+    BOOST_ASSERT(outputs.size() == numvals);
+    for (int i = 0; i < (int)numvals; ++i) 
     {
         using namespace boost::assign;
 
         std::vector<naming::id_type> output_ports;
         output_ports += 
-                outputs[mod(i-1)][2],    // sw input is connected to the ne output of the w element
-                outputs[i][1],           // s input is connected to the n output of the element itself
-                outputs[mod(i+1)][0]     // se input is connected to the nw output of the e element
+                outputs[mod(i-1, numvals)][2],    // sw input is connected to the ne output of the w element
+                outputs[mod(i  , numvals)][1],    // s input is connected to the n output of the element itself
+                outputs[mod(i+1, numvals)][0]     // se input is connected to the nw output of the e element
             ;
 
         components::amr::stubs::stencil_value<3>::
@@ -152,8 +154,16 @@ void execute(threads::thread_self& self, applier::applier& appl,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+struct timestep_data
+{
+    int index_;       // sequential number of this datapoint
+    int timestep_;    // current time step
+    double value_;    // current value
+};
+
+///////////////////////////////////////////////////////////////////////////////
 threads::thread_state 
-hpx_main(threads::thread_self& self, applier::applier& appl)
+hpx_main(threads::thread_self& self, applier::applier& appl, std::size_t numvals)
 {
     // get component types needed below
     components::component_type stencil_type = 
@@ -171,8 +181,8 @@ hpx_main(threads::thread_self& self, applier::applier& appl)
 
         // create a couple of stencil (functional) components and the same 
         // amount of stencil_value components
-        result_type stencils = factory.create_components(self, stencil_type, 3);
-        result_type values = factory.create_components(self, stencil_value_type, 3);
+        result_type stencils = factory.create_components(self, stencil_type, numvals);
+        result_type values = factory.create_components(self, stencil_value_type, numvals);
 
         // initialize stencil_values using the stencil (functional) components
         init_stencils(appl, values, stencils);
@@ -192,7 +202,26 @@ hpx_main(threads::thread_self& self, applier::applier& appl)
         std::vector<naming::id_type> result_data;
         execute(self, appl, values, initial_data, result_data);
 
+        // start asynchronous get operations
+        components::stubs::memory_block stub(appl);
+
+        // get some output memory_block_data instances
+        components::access_memory_block<timestep_data> val1, val2, val3;
+        boost::tie(val1, val2, val3) = 
+            components::wait(self, stub.get_async(result_data[0]), 
+                stub.get_async(result_data[1]), stub.get_async(result_data[2]));
+
+        std::cout << "Result: " 
+                  << val1->value_ << ", " 
+                  << val2->value_ << ", " 
+                  << val3->value_ << std::endl;
+
         // free all allocated components
+        for (std::size_t i = 0; i < stencils.size(); ++i) 
+        {
+            components::amr::stubs::functional_component::
+                free_data(appl, stencils[i].first_gid_, result_data[i]);
+        }
         factory.free_components(values);
         factory.free_components(stencils);
 
@@ -221,6 +250,8 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("threads,t", po::value<int>(), 
                 "the number of operating system threads to spawn for this"
                 "HPX locality")
+            ("numvals,n", po::value<std::size_t>(), 
+                "the number of data points to use for the computation")
         ;
 
         po::store(po::command_line_parser(argc, argv)
@@ -305,9 +336,13 @@ int main(int argc, char* argv[])
         if (vm.count("run_agas_server"))  // run the AGAS server instance here
             agas_server.reset(new agas_server_helper(agas_host, agas_port));
 
+        std::size_t numvals = 3;
+        if (vm.count("numvals"))
+            numvals = vm["numvals"].as<std::size_t>();
+
         // initialize and start the HPX runtime
         hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port);
-        rt.run(hpx_main, num_threads);
+        rt.run(boost::bind (hpx_main, _1, _2, numvals), num_threads);
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";

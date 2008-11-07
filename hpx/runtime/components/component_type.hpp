@@ -17,16 +17,18 @@ namespace hpx { namespace components
     {
         component_invalid = -1,
         component_runtime_support = 0,  // runtime support (needed to create components, etc.)
-        component_memory,               // general memory address
-        component_memory_block,         // general memory block
-        component_thread,               // a ParalleX thread
+        component_memory = 1,           // general memory address
+        component_memory_block = 2,     // general memory block
+        component_thread = 3,           // a ParalleX thread
 
         // LCO's
-        component_base_lco,         ///< the base of all LCO's not waiting on a value
-        component_base_lco_with_value,  ///< base LCO's blocking on a value
-        component_future,           ///< a future executing the action and 
-                                    ///< allowing to wait for the result
-        component_value_adaptor,    ///< a adaptor to access specific slot of an LCO
+        component_base_lco = 4,         ///< the base of all LCO's not waiting on a value
+        component_base_lco_with_value = 
+            component_type((component_base_lco+1) << 16 | component_base_lco),
+                                        ///< base LCO's blocking on a value
+        component_future = 6,           ///< a future executing the action and 
+                                        ///< allowing to wait for the result
+        component_value_adaptor = 7,    ///< a adaptor to access specific slot of an LCO
 
         component_last,
         component_first_dynamic = component_last
