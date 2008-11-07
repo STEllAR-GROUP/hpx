@@ -24,7 +24,7 @@ namespace hpx { namespace components
         // LCO's
         component_base_lco = 4,         ///< the base of all LCO's not waiting on a value
         component_base_lco_with_value = 
-            component_type((component_base_lco+1) << 16 | component_base_lco),
+            ((component_base_lco+1) << 16 | component_base_lco),
                                         ///< base LCO's blocking on a value
         component_future = 6,           ///< a future executing the action and 
                                         ///< allowing to wait for the result
