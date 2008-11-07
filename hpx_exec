@@ -16,18 +16,35 @@
 #
 use strict;
 use FileHandle;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper;
 
 my $agas_port = 7912;
 my $parcel_port = 7913;
+my $host_suffix = "";
 
 my $node_file = $ENV{PBS_NODEFILE};
+my $result = GetOptions(
+    "agas_port|a=i" => \$agas_port,
+    "parcel_port|p=i" => \$parcel_port,
+    "host_suffix|h=s" => \$host_suffix,
+    "help|?" => sub { pod2usage(-verbose => 2, -exitval=> 2); },
+    "node_file|n=s" => \$node_file) or pod2usage(2);
 
-die "usage: hpx_exec user_app" unless($#ARGV==0);
+my $prog = $ARGV[0];
 
-die "Missing node file" unless(-e $node_file);
+print Dumper($result);
+print Dumper(\@ARGV);
+
+#pod2usage(-verbose => 1,  -exitval=>2) unless($#ARGV == 0 and -e $ARGV[0]);
+
+unless(-e $node_file) {
+    pod2usage(-verbose => 1, -exitval => 2);
+}
 
 my $hpx_runtime = find("hpx_runtime");
-my $user_prog = find($ARGV[0]);
+my $user_prog = find($prog);
 my $ssh = find("ssh");
 
 my $fd = new FileHandle;
@@ -46,7 +63,7 @@ close($fd);
 my @pids = ();
 
 # Start the Agas server
-my $anode = $nodes[0];
+my $anode = $nodes[0].$host_suffix;
 my $pid = fork();
 if($pid == 0) {
     run($hpx_runtime,"-r","-a","$anode:$agas_port");
@@ -56,7 +73,7 @@ push @pids, $pid;
 
 # Start the hpx procs -- one per node, using -t $tc to pass thread count
 for(my $i=$#nodes;$i>=0;$i--) {
-    my $node = $nodes[$i];
+    my $node = $nodes[$i].$host_suffix;
     my $id = $i+1;
 
     # Find the thread count
@@ -93,3 +110,27 @@ sub find {
     }
     die "could not locate $file on path";
 }
+__END__
+
+=head1 NAME
+
+hpx_exec - launch hpx jobs under PBS
+
+=head1 SYNOPSIS
+
+hpx_exec [options] [file...]
+
+=head1 OPTIONS
+
+Options:
+    -agas_port|a=i
+    -parcel_port|p=i
+    -host_suffix|h=s
+    -help|?
+    -node_file|n=s
+
+=head1 DESCRIPTION
+
+stuff
+
+=cut
