@@ -10,6 +10,9 @@
 #include <boost/call_traits.hpp>
 #include <boost/aligned_storage.hpp>
 
+#include <boost/utility/enable_if.hpp>
+#include <boost/utility/addressof.hpp>
+
 #include <boost/type_traits/add_pointer.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 
@@ -26,19 +29,13 @@ namespace hpx { namespace util
     //  thread-safe manner, on the first call to the constructor of static_.
     //
     //  Requirements:
-    //      T is default constructible
-    //          (There's an alternate implementation that relaxes this
-    //              requirement -- Joao Abecasis)
+    //      T is default constructible or has one argument
     //      T::T() MUST not throw!
     //          this is a requirement of boost::call_once.
     //
-    template <class T, class Tag>
+    template <typename T, typename Tag>
     struct static_ : boost::noncopyable
     {
-        typedef T value_type;
-        typedef typename boost::call_traits<T>::reference reference;
-        typedef typename boost::call_traits<T>::const_reference const_reference;
-
     private:
         struct destructor
         {
@@ -48,19 +45,42 @@ namespace hpx { namespace util
             }
         };
 
-        struct default_ctor
+        struct default_constructor
         {
             static void construct()
             {
-                ::new (static_::get_address()) value_type();
+                new (static_::get_address()) value_type();
                 static destructor d;
             }
         };
-        
+
+        template <typename U>
+        struct copy_constructor
+        {
+            static U const* pv;
+
+            static void construct()
+            {
+                new (get_address()) value_type(*pv);
+                static destructor d;
+            }
+        };
+
     public:
+        typedef T value_type;
+        typedef typename boost::call_traits<T>::reference reference;
+        typedef typename boost::call_traits<T>::const_reference const_reference;
+
         static_(Tag = Tag())
         {
-            boost::call_once(&default_ctor::construct, constructed_);
+            boost::call_once(&default_constructor::construct, constructed_);
+        }
+
+        template <typename U>
+        static_(U const & val, Tag = Tag())
+        {
+            copy_constructor<U>::pv = boost::addressof(val);
+            boost::call_once(&copy_constructor<U>::construct, constructed_);
         }
 
         operator reference()
@@ -98,10 +118,14 @@ namespace hpx { namespace util
         static boost::once_flag constructed_;
     };
 
-    template <class T, class Tag>
+    template <typename T, typename Tag>
+    template <typename U>
+    U const* static_<T, Tag>::copy_constructor<U>::pv = NULL;
+
+    template <typename T, typename Tag>
     typename static_<T, Tag>::storage_type static_<T, Tag>::data_;
 
-    template <class T, class Tag>
+    template <typename T, typename Tag>
     boost::once_flag static_<T, Tag>::constructed_ = BOOST_ONCE_INIT;
 
 }}

@@ -40,8 +40,15 @@ namespace hpx { namespace util
     public:
     // ctor/dtor
         explicit one_size_heap_list(char const* class_name = "")
-          : class_name_(class_name), alloc_count_(0L), free_count_(0L)
-          , heap_count_(0L), max_alloc_count_(0L)
+          : class_name_(class_name), alloc_count_(0L), free_count_(0L),
+            heap_count_(0L), max_alloc_count_(0L)
+        {
+            BOOST_ASSERT(sizeof(typename heap_type::storage_type) == heap_size);
+        }
+
+        explicit one_size_heap_list(std::string const& class_name)
+          : class_name_(class_name), alloc_count_(0L), free_count_(0L),
+            heap_count_(0L), max_alloc_count_(0L)
         {
             BOOST_ASSERT(sizeof(typename heap_type::storage_type) == heap_size);
         }
@@ -49,18 +56,18 @@ namespace hpx { namespace util
         ~one_size_heap_list()
         {
             LOSH_(info) 
-                << "one_size_heap_list " 
+                << "one_size_heap_list (" 
                 << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-                << ": releasing heap_list: max count: " << max_alloc_count_ 
+                << "): releasing heap_list: max count: " << max_alloc_count_ 
                 << " (in " << heap_count_ << " heaps), alloc count: " 
                 << alloc_count_ << ", free count: " << free_count_ << ".";
 
             if (alloc_count_ != free_count_) 
             {
                 LOSH_(warning) 
-                    << "one_size_heap_list " 
+                    << "one_size_heap_list (" 
                     << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-                    << ": releasing heap_list with " << alloc_count_-free_count_ 
+                    << "): releasing heap_list with " << alloc_count_-free_count_ 
                     << " allocated object(s)!";
             }
         }
@@ -73,7 +80,7 @@ namespace hpx { namespace util
 
             typename Mutex::scoped_lock guard (mtx_);
 
-            alloc_count_++;
+            alloc_count_ += count;
             if (alloc_count_-free_count_ > max_alloc_count_)
                 max_alloc_count_ = alloc_count_-free_count_;
 
@@ -95,9 +102,9 @@ namespace hpx { namespace util
                 }
                 else {
                     LOSH_(info) 
-                        << "one_size_heap_list " 
+                        << "one_size_heap_list (" 
                         << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-                        << ": failed to allocate from heap (" << (*it)->heap_count_ 
+                        << "): failed to allocate from heap (" << (*it)->heap_count_ 
                         << "), allocated: " << (*it)->size() << ", free'd: " 
                         << (*it)->free_size() << ".";
                 }
@@ -113,9 +120,9 @@ namespace hpx { namespace util
 
             (*itnew)->heap_count_ = ++heap_count_;
             LOSH_(info) 
-                << "one_size_heap_list " 
+                << "one_size_heap_list (" 
                 << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-                << ": creating new heap (" << heap_count_ 
+                << "): creating new heap (" << heap_count_ 
                 << "), size of heap_list: " << heap_list_.size() << ".";
 
             value_type* p = (*itnew)->alloc(count);
@@ -128,7 +135,7 @@ namespace hpx { namespace util
         {
             typename Mutex::scoped_lock guard (mtx_);
 
-            ++free_count_;
+            free_count_ += count;
 
             // find heap which allocated this pointer
             iterator it = heap_list_.begin();
@@ -138,9 +145,9 @@ namespace hpx { namespace util
 
                     if ((*it)->is_empty()) {
                         LOSH_(info) 
-                            << "one_size_heap_list " 
+                            << "one_size_heap_list (" 
                             << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-                            << ": freeing empty heap (" << (*it)->heap_count_ << ").";
+                            << "): freeing empty heap (" << (*it)->heap_count_ << ").";
 
                         heap_list_.erase (it);
                     }

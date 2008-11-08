@@ -21,8 +21,8 @@ namespace hpx { namespace components { namespace detail
         typedef util::one_size_heap_list<Heap, Mutex> base_type;
 
     public:
-        wrapper_heap_list(char const* class_name = "")
-          : base_type(class_name)
+        wrapper_heap_list(component_type type)
+          : base_type(get_component_type_name(type))
         {}
 
         ///

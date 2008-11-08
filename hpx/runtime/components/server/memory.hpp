@@ -35,7 +35,7 @@ namespace hpx { namespace components { namespace server
         // to associate this component with a given action.
         static component_type get_component_type() 
         { 
-            return component_memory; 
+            return components::component_memory; 
         }
 
         // constructor

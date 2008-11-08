@@ -70,16 +70,16 @@ namespace hpx { namespace components { namespace detail
         {
             if (pool_ != NULL) {
                 LOSH_(debug) 
-                    << "wrapper_heap " 
+                    << "wrapper_heap (" 
                     << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-                    << ": releasing heap: alloc count: " << alloc_count_ 
+                    << "): releasing heap: alloc count: " << alloc_count_ 
                     << ", free count: " << free_count_ << ".";
 
                 if (free_size_ != size_ || alloc_count_ != free_count_) {
                     LOSH_(warning) 
-                        << "wrapper_heap " 
+                        << "wrapper_heap (" 
                         << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-                        << ": releasing heap (" << std::hex << pool_ << ")" 
+                        << "): releasing heap (" << std::hex << pool_ << ")" 
                         << " with " << size_-free_size_ << " allocated object(s)!";
                 }
                 Allocator::free(pool_);
@@ -95,7 +95,7 @@ namespace hpx { namespace components { namespace detail
             if (!ensure_pool(count))
                 return NULL;
 
-            --alloc_count_;
+            alloc_count_ += (int)count;
 
             value_type* p = static_cast<value_type*>(first_free_->address());
             BOOST_ASSERT(p != NULL);
@@ -111,7 +111,7 @@ namespace hpx { namespace components { namespace detail
         {
             BOOST_ASSERT(did_alloc(p));
 
-            ++free_count_;
+            free_count_ += (int)count;
 
             storage_type* p1 = static_cast<storage_type*>(p);
 
@@ -204,9 +204,9 @@ namespace hpx { namespace components { namespace detail
                 return false;
 
             LOSH_(info) 
-                << "wrapper_heap " 
+                << "wrapper_heap (" 
                 << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-                << ": init_pool (" << std::hex << pool_ << ")" 
+                << "): init_pool (" << std::hex << pool_ << ")" 
                 << " size: " << s << ".";
 
             s /= heap_size;
