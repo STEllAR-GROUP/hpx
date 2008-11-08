@@ -21,25 +21,6 @@ namespace hpx { namespace components { namespace amr { namespace server
     struct eval_helper;
 
     template <>
-    struct eval_helper<1>
-    {
-        template <typename Adaptor>
-        static bool
-        call(threads::thread_self& self, applier::applier& appl, 
-            naming::id_type const& gid, naming::id_type const& value_gid, 
-            Adaptor* in)
-        {
-            using namespace boost::assign;
-
-            std::vector<naming::id_type> input_gids;
-            input_gids += in[0]->get(self);
-
-            return components::amr::stubs::functional_component::eval(
-                self, appl, gid, value_gid, input_gids);
-        }
-    };
-
-    template <>
     struct eval_helper<3>
     {
         template <typename Adaptor>
@@ -100,7 +81,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     stencil_value<N>::stencil_value(applier::applier& appl)
       : driver_thread_(0), sem_in_(N), sem_out_(0), sem_result_(0), 
         value_gid_(naming::invalid_id), backup_value_gid_(naming::invalid_id),
-        functional_gid_(naming::invalid_id)
+        functional_gid_(naming::invalid_id), is_called_(false)
     {
         // create adaptors
         for (std::size_t i = 0; i < N; ++i)
@@ -128,6 +109,10 @@ namespace hpx { namespace components { namespace amr { namespace server
     stencil_value<N>::call(threads::thread_self& self, applier::applier& appl, 
         naming::id_type* result, naming::id_type const& initial)
     {
+        // remember that this instance is used as the first (and last) step in
+        // the computation
+        is_called_ = true;
+
         // sem_in_ is pre-initialized to N, so we need to reset it
         sem_in_.wait(self, N);
 
@@ -158,9 +143,6 @@ namespace hpx { namespace components { namespace amr { namespace server
     threads::thread_state  
     stencil_value<N>::main(threads::thread_self& self, applier::applier& appl)
     {
-        // all but the first time steps need to free the value_gid_ on exit
-        bool free_value_gid = false;
-
         // ask functional component to create the local data value
         backup_value_gid_ = alloc_helper(self, appl, functional_gid_);
 
@@ -183,6 +165,15 @@ namespace hpx { namespace components { namespace amr { namespace server
             is_last = eval_helper<N>::call(self, appl, functional_gid_, 
                 backup_value_gid_, in_);
 
+            // if the computation finished in an instance which has been used
+            // as the target for the initial call_action we can't exit right
+            // away, because all other instances need to be executed one more 
+            // time allowing them to free all their resources
+            if (is_last && is_called_) {
+                is_called_ = false;
+                is_last = false;
+            }
+
             // Wait for all output threads to have read the current value.
             // On the first time step the semaphore is preset to allow 
             // to immediately set the value.
@@ -192,10 +183,8 @@ namespace hpx { namespace components { namespace amr { namespace server
             // if needed (this may happen for all time steps except the first 
             // one, where the first gets it's initial value during the 
             // call_action)
-            if (naming::invalid_id == value_gid_) {
+            if (naming::invalid_id == value_gid_) 
                 value_gid_ = alloc_helper(self, appl, functional_gid_);
-                free_value_gid = true;
-            }
             std::swap(value_gid_, backup_value_gid_);
 
             // signal all output threads it's safe to read value
@@ -205,8 +194,6 @@ namespace hpx { namespace components { namespace amr { namespace server
         sem_result_.signal(self, 1);        // final result has been set
 
         free_helper(appl, functional_gid_, backup_value_gid_);
-        if (free_value_gid)
-            free_helper(appl, functional_gid_, value_gid_);
         return threads::terminated;
     }
 

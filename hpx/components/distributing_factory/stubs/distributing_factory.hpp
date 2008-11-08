@@ -32,6 +32,8 @@ namespace hpx { namespace components { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
         typedef server::distributing_factory::result_type result_type;
+        typedef server::distributing_factory::iterator_type iterator_type;
+        typedef server::distributing_factory::iterator_range_type iterator_range_type;
 
         /// Create a number of new components of the given \a type distributed
         /// evenly over all available localities. This is a non-blocking call. 

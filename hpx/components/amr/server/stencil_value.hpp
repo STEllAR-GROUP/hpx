@@ -134,6 +134,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         naming::id_type value_gid_;                   // reference to current value
         naming::id_type backup_value_gid_;            // reference to previous value
         naming::id_type functional_gid_;              // reference to functional code
+
+        bool is_called_;      // this instance is used as target for call_action
     };
 
 }}}}

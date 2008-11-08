@@ -36,6 +36,8 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
         typedef base_type::result_type result_type;
+        typedef base_type::iterator_type iterator_type;
+        typedef base_type::iterator_range_type iterator_range_type;
 
         ///
         lcos::future_value<result_type> create_components_async(

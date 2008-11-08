@@ -26,23 +26,25 @@ using namespace std;
 // Create functional components, one for each data point, use those to 
 // initialize the stencil value instances
 void init_stencils(applier::applier& appl,
-    components::distributing_factory::result_type const& values,
-    components::distributing_factory::result_type const& stencils)
+    components::distributing_factory::iterator_range_type const& stencils,
+    components::distributing_factory::iterator_range_type const& functions)
 {
-    // values are allocated in blocks, stencil_values are allocated separately
-    BOOST_ASSERT(values[0].count_ == stencils.size());
-    for (std::size_t i = 0; i < stencils.size(); ++i) 
+    components::distributing_factory::iterator_type stencil = stencils.first;
+    components::distributing_factory::iterator_type function = functions.first;
+
+    for (/**/; stencil != stencils.second; ++stencil, ++function)
     {
-        BOOST_ASSERT(1 == stencils[i].count_);
+        BOOST_ASSERT(function != functions.second);
         components::amr::stubs::stencil_value<3>::set_functional_component(
-            appl, values[0].first_gid_ + i, stencils[i].first_gid_);
+            appl, *stencil, *function);
     }
+    BOOST_ASSERT(function == functions.second);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get gids of output ports of all stencils
+// Get gids of output ports of all functions
 void get_output_ports(threads::thread_self& self, applier::applier& appl,
-    components::distributing_factory::result_type const& values,
+    components::distributing_factory::iterator_range_type const& stencils,
     std::vector<std::vector<naming::id_type> >& outputs)
 {
     typedef components::distributing_factory::result_type result_type;
@@ -52,10 +54,11 @@ void get_output_ports(threads::thread_self& self, applier::applier& appl,
 
     // start an asynchronous operation for each of the stencil value instances
     lazyvals_type lazyvals;
-    for (std::size_t i = 0; i < values[0].count_; ++i) 
+    components::distributing_factory::iterator_type stencil = stencils.first;
+    for (/**/; stencil != stencils.second; ++stencil)
     {
         lazyvals.push_back(components::amr::stubs::stencil_value<3>::
-            get_output_ports_async(appl, values[0].first_gid_ + i));
+            get_output_ports_async(appl, *stencil));
     }
 
     // now wait for the results
@@ -68,7 +71,7 @@ void get_output_ports(threads::thread_self& self, applier::applier& appl,
 
 ///////////////////////////////////////////////////////////////////////////////
 // Connect the given output ports with the correct input ports, creating the 
-// required static dataflow structure.
+// required static data-flow structure.
 //
 // Currently we have exactly one stencil_value instance per data point, where 
 // the output ports of a stencil_value are connected to the input ports of the 
@@ -79,43 +82,51 @@ inline std::size_t mod(int idx, std::size_t maxidx)
 }
 
 void connect_input_ports(applier::applier& appl,
-    components::distributing_factory::result_type const& values,
-    std::vector<std::vector<naming::id_type> > const& outputs)
+    components::distributing_factory::result_type const* stencils,
+    std::vector<std::vector<std::vector<naming::id_type> > > const& outputs)
 {
     typedef components::distributing_factory::result_type result_type;
 
-    std::size_t numvals = values[0].count_;
-    BOOST_ASSERT(outputs.size() == numvals);
-    for (int i = 0; i < (int)numvals; ++i) 
+    int steps = (int)outputs.size();
+    for (int step = 0; step < steps; ++step) 
     {
-        using namespace boost::assign;
+        std::size_t numvals = outputs[0].size();
+        components::distributing_factory::iterator_range_type r = 
+            locality_results(stencils[step]);
+        components::distributing_factory::iterator_type stencil = r.first;
+        for (int i = 0; stencil != r.second; ++stencil, ++i)
+        {
+            using namespace boost::assign;
+            int outstep = mod(step-1, steps);
 
-        std::vector<naming::id_type> output_ports;
-        output_ports += 
-                outputs[mod(i-1, numvals)][2],    // sw input is connected to the ne output of the w element
-                outputs[mod(i  , numvals)][1],    // s input is connected to the n output of the element itself
-                outputs[mod(i+1, numvals)][0]     // se input is connected to the nw output of the e element
-            ;
+            std::vector<naming::id_type> output_ports;
+            output_ports += 
+                    outputs[outstep][mod(i-1, numvals)][2],    // sw input is connected to the ne output of the sw element
+                    outputs[outstep][mod(i  , numvals)][1],    // s input is connected to the n output of the s element 
+                    outputs[outstep][mod(i+1, numvals)][0]     // se input is connected to the nw output of the se element
+                ;
 
-        components::amr::stubs::stencil_value<3>::
-            connect_input_ports(appl, values[0].first_gid_ + i, output_ports);
+            components::amr::stubs::stencil_value<3>::
+                connect_input_ports(appl, *stencil, output_ports);
+        }
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void prepare_initial_data(threads::thread_self& self, applier::applier& appl, 
-    components::distributing_factory::result_type const& stencils, 
+    components::distributing_factory::iterator_range_type const& functions, 
     std::vector<naming::id_type>& initial_data)
 {
     typedef std::vector<lcos::future_value<naming::id_type> > lazyvals_type;
 
-    // create a data item value type for each of the stencils
+    // create a data item value type for each of the functions
     lazyvals_type lazyvals;
-    for (std::size_t i = 0; i < stencils.size(); ++i) 
+    components::distributing_factory::iterator_type function = functions.first;
+
+    for (std::size_t i = 0; function != functions.second; ++function, ++i)
     {
-        BOOST_ASSERT(1 == stencils[i].count_);
         lazyvals.push_back(components::amr::stubs::functional_component::
-            alloc_data_async(appl, stencils[i].first_gid_, i));
+            alloc_data_async(appl, *function, i));
     }
 
     // now wait for the results
@@ -129,20 +140,20 @@ void prepare_initial_data(threads::thread_self& self, applier::applier& appl,
 ///////////////////////////////////////////////////////////////////////////////
 // do actual work
 void execute(threads::thread_self& self, applier::applier& appl, 
-    components::distributing_factory::result_type const& values, 
+    components::distributing_factory::iterator_range_type const& stencils, 
     std::vector<naming::id_type> const& initial_data, 
     std::vector<naming::id_type>& result_data)
 {
-    BOOST_ASSERT(values[0].count_ == initial_data.size());
-
-    // start the execution of all stencil values (data items)
+    // start the execution of all stencil stencils (data items)
     typedef std::vector<lcos::future_value<naming::id_type> > lazyvals_type;
 
     lazyvals_type lazyvals;
-    for (int i = 0; i < (int)values[0].count_; ++i) 
+    components::distributing_factory::iterator_type stencil = stencils.first;
+    for (std::size_t i = 0; stencil != stencils.second; ++stencil, ++i)
     {
+        BOOST_ASSERT(i < initial_data.size());
         lazyvals.push_back(components::amr::stubs::stencil_value<3>::
-            call_async(appl, values[0].first_gid_ + i, initial_data[i]));
+            call_async(appl, *stencil, initial_data[i]));
     }
 
     // now wait for the results
@@ -166,9 +177,9 @@ threads::thread_state
 hpx_main(threads::thread_self& self, applier::applier& appl, std::size_t numvals)
 {
     // get component types needed below
-    components::component_type stencil_type = 
+    components::component_type function_type = 
         components::get_component_type<components::amr::stencil>();
-    components::component_type stencil_value_type = 
+    components::component_type stencil_type = 
         components::get_component_type<components::amr::server::stencil_value<3> >();
 
     {
@@ -181,26 +192,32 @@ hpx_main(threads::thread_self& self, applier::applier& appl, std::size_t numvals
 
         // create a couple of stencil (functional) components and the same 
         // amount of stencil_value components
-        result_type stencils = factory.create_components(self, stencil_type, numvals);
-        result_type values = factory.create_components(self, stencil_value_type, numvals);
+        result_type functions = factory.create_components(self, function_type, numvals);
+        result_type stencils[2] = 
+        {
+            factory.create_components(self, stencil_type, numvals),
+            factory.create_components(self, stencil_type, numvals)
+        };
 
         // initialize stencil_values using the stencil (functional) components
-        init_stencils(appl, values, stencils);
+        init_stencils(appl, locality_results(stencils[0]), locality_results(functions));
+        init_stencils(appl, locality_results(stencils[1]), locality_results(functions));
 
         // ask stencil instances for their output gids
-        std::vector<std::vector<naming::id_type> > outputs;
-        get_output_ports(self, appl, values, outputs);
+        std::vector<std::vector<std::vector<naming::id_type> > > outputs(2);
+        get_output_ports(self, appl, locality_results(stencils[0]), outputs[0]);
+        get_output_ports(self, appl, locality_results(stencils[1]), outputs[1]);
 
         // connect output gids with corresponding stencil inputs
-        connect_input_ports(appl, values, outputs);
+        connect_input_ports(appl, stencils, outputs);
 
         // prepare initial data
         std::vector<naming::id_type> initial_data;
-        prepare_initial_data(self, appl, stencils, initial_data);
+        prepare_initial_data(self, appl, locality_results(functions), initial_data);
 
         // do actual work
         std::vector<naming::id_type> result_data;
-        execute(self, appl, values, initial_data, result_data);
+        execute(self, appl, locality_results(stencils[0]), initial_data, result_data);
 
         // start asynchronous get operations
         components::stubs::memory_block stub(appl);
@@ -217,13 +234,14 @@ hpx_main(threads::thread_self& self, applier::applier& appl, std::size_t numvals
                   << val3->value_ << std::endl;
 
         // free all allocated components
-        for (std::size_t i = 0; i < stencils.size(); ++i) 
+        for (std::size_t i = 0; i < functions.size(); ++i) 
         {
             components::amr::stubs::functional_component::
-                free_data(appl, stencils[i].first_gid_, result_data[i]);
+                free_data(appl, functions[i].first_gid_, result_data[i]);
         }
-        factory.free_components(values);
-        factory.free_components(stencils);
+        factory.free_components(stencils[1]);
+        factory.free_components(stencils[0]);
+        factory.free_components(functions);
 
     }   // distributing_factory needs to go out of scope before shutdown
 

@@ -40,17 +40,14 @@ namespace hpx { namespace util
     public:
     // ctor/dtor
         explicit one_size_heap_list(char const* class_name = "")
-#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
           : class_name_(class_name), alloc_count_(0L), free_count_(0L)
           , heap_count_(0L), max_alloc_count_(0L)
-#endif
         {
             BOOST_ASSERT(sizeof(typename heap_type::storage_type) == heap_size);
         }
 
         ~one_size_heap_list()
         {
-#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
             LOSH_(info) 
                 << "one_size_heap_list " 
                 << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
@@ -60,13 +57,12 @@ namespace hpx { namespace util
 
             if (alloc_count_ != free_count_) 
             {
-                LOSH_(error) 
+                LOSH_(warning) 
                     << "one_size_heap_list " 
                     << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
                     << ": releasing heap_list with " << alloc_count_-free_count_ 
                     << " allocated object(s)!";
             }
-#endif
         }
         
         // operations
@@ -77,11 +73,9 @@ namespace hpx { namespace util
 
             typename Mutex::scoped_lock guard (mtx_);
 
-#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
             alloc_count_++;
             if (alloc_count_-free_count_ > max_alloc_count_)
                 max_alloc_count_ = alloc_count_-free_count_;
-#endif
 
             for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it) {
                 value_type *p = NULL;
@@ -92,13 +86,13 @@ namespace hpx { namespace util
                 catch (std::bad_alloc const&) {
                     /**/;
                 }
+
                 if (NULL != p) {
                     // will be used as first heap in the future
                     if (it != heap_list_.begin())
                         heap_list_.splice(heap_list_.begin(), heap_list_, it);  
                     return p;
                 }
-#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
                 else {
                     LOSH_(info) 
                         << "one_size_heap_list " 
@@ -107,11 +101,9 @@ namespace hpx { namespace util
                         << "), allocated: " << (*it)->size() << ", free'd: " 
                         << (*it)->free_size() << ".";
                 }
-#endif
             }
 
             // create new heap
-#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
             iterator itnew = heap_list_.insert(heap_list_.begin(),
                 typename list_type::value_type(
                     new heap_type(class_name_.c_str(), false, true, count)));
@@ -125,14 +117,6 @@ namespace hpx { namespace util
                 << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
                 << ": creating new heap (" << heap_count_ 
                 << "), size of heap_list: " << heap_list_.size() << ".";
-#else
-            iterator itnew = heap_list_.insert(heap_list_.begin(),
-                typename list_type::value_type(new heap_type("<Unknown>", 
-                    false, true, count)));
-
-            if (itnew == heap_list_.end())
-                throw std::bad_alloc();   // insert failed
-#endif
 
             value_type* p = (*itnew)->alloc(count);
             if (NULL == p)
@@ -144,9 +128,8 @@ namespace hpx { namespace util
         {
             typename Mutex::scoped_lock guard (mtx_);
 
-#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
             ++free_count_;
-#endif
+
             // find heap which allocated this pointer
             iterator it = heap_list_.begin();
             for (/**/; it != heap_list_.end(); ++it) {
@@ -154,12 +137,11 @@ namespace hpx { namespace util
                     (*it)->free(p, count);
 
                     if ((*it)->is_empty()) {
-#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
                         LOSH_(info) 
                             << "one_size_heap_list " 
                             << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
                             << ": freeing empty heap (" << (*it)->heap_count_ << ").";
-#endif
+
                         heap_list_.erase (it);
                     }
                     else if (it != heap_list_.begin()) {
@@ -185,40 +167,13 @@ namespace hpx { namespace util
         Mutex mtx_;
         list_type heap_list_;
 
-#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
     public:
         std::string class_name_;
         unsigned long alloc_count_;
         unsigned long free_count_;
         unsigned long heap_count_;
         unsigned long max_alloc_count_;
-#endif
     };
-
-//     ///////////////////////////////////////////////////////////////////////////
-//     // heap using malloc and friends
-//     template<typename T>
-//     class one_size_malloc_heap_list 
-//       : public one_size_heap_list<
-//             one_size_heap<T, one_size_heap_allocators::mallocator> 
-//         >
-//     {
-//     private:
-//         typedef one_size_heap_list<
-//             one_size_heap<T, one_size_heap_allocators::mallocator> >
-//         base_type;
-//         
-//     public:
-// #if defined(HPX_DEBUG_ONE_SIZE_HEAP)
-//         explicit one_size_malloc_heap_list(char const* class_name, int step = -1)
-//           : base_type(class_name, step) 
-//         {}
-// #else
-//         explicit one_size_malloc_heap_list(int step = -1)
-//           : base_type(step) 
-//         {}
-// #endif
-//     };
 
 }} // namespace hpx::util
 

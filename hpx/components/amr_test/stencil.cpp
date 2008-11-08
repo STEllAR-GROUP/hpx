@@ -37,19 +37,24 @@ namespace hpx { namespace components { namespace amr
                 stub.get_async(gids[1]), stub.get_async(gids[2]),
                 stub.get_async(result));
 
-        // the middle point is our direct predecessor
-        if (resultval->timestep_ < 2) {
-            // make sure all input data items agree on the time step number
-            BOOST_ASSERT(val1->timestep_ == val2->timestep_);
-            BOOST_ASSERT(val1->timestep_ == val3->timestep_);
+        // make sure all input data items agree on the time step number
+        BOOST_ASSERT(val1->timestep_ == val2->timestep_);
+        BOOST_ASSERT(val1->timestep_ == val3->timestep_);
 
+        // the middle point is our direct predecessor
+        resultval->index_ = val2->index_;
+        if (val2->timestep_ < 2) {
             // this is the actual calculation
-            resultval->index_ = val2->index_;
-            resultval->timestep_ = val1->timestep_ + 1;
+            resultval->timestep_ = val2->timestep_ + 1;
             resultval->value_ = (val1->value_ + val2->value_ + val3->value_) / 3;
         }
+        else {
+            // the last time step has been reached, just copy over the data
+            resultval->timestep_ = val2->timestep_;
+            resultval->value_ = val2->value_;
+        }
 
-        // set return value to true if this is the last time lkstep
+        // set return value to true if this is the last time step
         *is_last = resultval->timestep_ >= 2;
 
         // store result value

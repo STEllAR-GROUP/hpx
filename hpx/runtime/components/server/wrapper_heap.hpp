@@ -42,12 +42,11 @@ namespace hpx { namespace components { namespace detail
 
     public:
         explicit wrapper_heap(char const* class_name, bool, bool, 
-                std::size_t step = (std::size_t)-1)
+                int count, std::size_t step = (std::size_t)-1)
           : pool_(NULL), first_free_(NULL), step_(step), size_(0), free_size_(0),
-            base_gid_(naming::invalid_id), get_agas_client_(NULL)
-#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
-          , class_name_(class_name)
-#endif
+            base_gid_(naming::invalid_id), get_agas_client_(NULL),
+            class_name_(class_name), alloc_count_(0), free_count_(0),
+            heap_count_(count)
         {
             BOOST_ASSERT(sizeof(storage_type) == heap_size);
 
@@ -61,7 +60,8 @@ namespace hpx { namespace components { namespace detail
         wrapper_heap()
           : pool_(NULL), first_free_(NULL), 
             step_(heap_step), size_(0), free_size_(0),
-            base_gid_(naming::invalid_id), get_agas_client_(NULL)
+            base_gid_(naming::invalid_id), get_agas_client_(NULL),
+            alloc_count_(0), free_count_(0), heap_count_(0)
         {
             BOOST_ASSERT(sizeof(storage_type) == heap_size);
         }
@@ -69,15 +69,19 @@ namespace hpx { namespace components { namespace detail
         ~wrapper_heap()
         {
             if (pool_ != NULL) {
-#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
-                if (free_size_ != size_) {
-                    LOSH_(error) 
+                LOSH_(debug) 
+                    << "wrapper_heap " 
+                    << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
+                    << ": releasing heap: alloc count: " << alloc_count_ 
+                    << ", free count: " << free_count_ << ".";
+
+                if (free_size_ != size_ || alloc_count_ != free_count_) {
+                    LOSH_(warning) 
                         << "wrapper_heap " 
                         << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
                         << ": releasing heap (" << std::hex << pool_ << ")" 
                         << " with " << size_-free_size_ << " allocated object(s)!";
                 }
-#endif
                 Allocator::free(pool_);
             }
         }
@@ -90,6 +94,8 @@ namespace hpx { namespace components { namespace detail
         {
             if (!ensure_pool(count))
                 return NULL;
+
+            --alloc_count_;
 
             value_type* p = static_cast<value_type*>(first_free_->address());
             BOOST_ASSERT(p != NULL);
@@ -105,6 +111,8 @@ namespace hpx { namespace components { namespace detail
         {
             BOOST_ASSERT(did_alloc(p));
 
+            ++free_count_;
+
             storage_type* p1 = static_cast<storage_type*>(p);
 
             BOOST_ASSERT(NULL != pool_ && p1 >= pool_);
@@ -114,7 +122,7 @@ namespace hpx { namespace components { namespace detail
             using namespace std;
             memset(p1->address(), 0, sizeof(storage_type));
             free_size_ += (int)count;
-            
+
             // release the pool if this one was the last allocated item
             test_release();
         }
@@ -195,13 +203,12 @@ namespace hpx { namespace components { namespace detail
             if (NULL == pool_) 
                 return false;
 
-#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
             LOSH_(info) 
                 << "wrapper_heap " 
                 << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
                 << ": init_pool (" << std::hex << pool_ << ")" 
                 << " size: " << s << ".";
-#endif
+
             s /= heap_size;
             first_free_ = pool_;
             size_ = s;
@@ -221,9 +228,11 @@ namespace hpx { namespace components { namespace detail
         naming::id_type base_gid_;
         naming::resolver_client const* get_agas_client_;
 
-#if defined(HPX_DEBUG_ONE_SIZE_HEAP)
+    public:
         std::string class_name_;
-#endif
+        int alloc_count_;
+        int free_count_;
+        int heap_count_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

@@ -17,10 +17,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Define types of stencil components exposed by this module
 typedef hpx::components::managed_component<
-    hpx::components::amr::server::stencil_value<1> 
-> stencil_value_double_1_type;
-
-typedef hpx::components::managed_component<
     hpx::components::amr::server::stencil_value<3> 
 > stencil_value_double_3_type;
 
@@ -39,17 +35,10 @@ typedef hpx::components::managed_component<
 /// name = amr                    # this must match the name of the shared library
 /// path = $[hpx.location]/lib    # this is the default location where to find the shared library
 ///
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(stencil_value_double_1_type, stencil_double_1);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(stencil_value_double_3_type, stencil_double_3);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(stencil_value_double_5_type, stencil_double_5);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION(stencil_value_double_1_type::wrapped_type::call_action);
-HPX_REGISTER_ACTION(stencil_value_double_1_type::wrapped_type::get_output_ports_action);
-HPX_REGISTER_ACTION(stencil_value_double_1_type::wrapped_type::connect_input_ports_action);
-HPX_REGISTER_ACTION(stencil_value_double_1_type::wrapped_type::set_functional_component_action);
-HPX_DEFINE_GET_COMPONENT_TYPE(stencil_value_double_1_type::wrapped_type);
-
 HPX_REGISTER_ACTION(stencil_value_double_3_type::wrapped_type::call_action);
 HPX_REGISTER_ACTION(stencil_value_double_3_type::wrapped_type::get_output_ports_action);
 HPX_REGISTER_ACTION(stencil_value_double_3_type::wrapped_type::connect_input_ports_action);

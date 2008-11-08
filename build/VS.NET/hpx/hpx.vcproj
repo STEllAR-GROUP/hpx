@@ -506,6 +506,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\hpx\exception.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\hpx\exception_list.hpp"
 				>
 			</File>
@@ -793,10 +797,6 @@
 					</File>
 					<File
 						RelativePath="..\..\..\hpx\runtime\components\derived_component_factory.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\hpx\exception.hpp"
 						>
 					</File>
 					<File
