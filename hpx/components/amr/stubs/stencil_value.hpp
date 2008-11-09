@@ -142,7 +142,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         void set_functional_component(naming::id_type const& gid, 
             naming::id_type const& functiongid)
         {
-            set_functional_component(this->appl_, gids, functiongid);
+            set_functional_component(this->appl_, gid, functiongid);
         }
     };
 

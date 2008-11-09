@@ -22,6 +22,9 @@ foreach(example ${component_EXAMPLES})
     target_link_libraries(
         ${example}_client_exe                 # executable
         ${example}_component                  # components it depends on
+        distributing_factory_component
+        amr_component
+        amr_test_component
         ${hpx_LIBRARIES} ${Boost_LIBRARIES})  # libraries it dependson
 
     # installation instructions
