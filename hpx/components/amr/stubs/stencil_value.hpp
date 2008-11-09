@@ -45,7 +45,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
-            typedef amr::server::stencil_value<N>::call_action action_type;
+            typedef typename amr::server::stencil_value<N>::call_action action_type;
             return lcos::eager_future<action_type, naming::id_type>(appl, 
                 targetgid, initial);
         }
@@ -81,7 +81,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
             typedef 
-                amr::server::stencil_value<N>::get_output_ports_action 
+                typename amr::server::stencil_value<N>::get_output_ports_action 
             action_type;
             typedef std::vector<naming::id_type> return_type;
             return lcos::eager_future<action_type, return_type>(appl, gid);
@@ -116,7 +116,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             naming::id_type const& gid, std::vector<naming::id_type> const& gids)
         {
             typedef 
-                amr::server::stencil_value<N>::connect_input_ports_action 
+                typename amr::server::stencil_value<N>::connect_input_ports_action 
             action_type;
             appl.apply<action_type>(gid, gids);
         }
@@ -134,7 +134,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             naming::id_type const& gid, naming::id_type const& functiongid)
         {
             typedef 
-                amr::server::stencil_value<N>::set_functional_component_action 
+                typename amr::server::stencil_value<N>::set_functional_component_action 
             action_type;
             appl.apply<action_type>(gid, functiongid);
         }
