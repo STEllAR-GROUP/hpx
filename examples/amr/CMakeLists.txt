@@ -4,7 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(component_EXAMPLES 
-    amr_client)  # amr_client example
+    amr)  # amr_client example
 
 foreach(example ${component_EXAMPLES})
     # define build target
