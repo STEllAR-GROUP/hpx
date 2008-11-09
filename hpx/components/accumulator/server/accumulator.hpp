@@ -44,6 +44,10 @@ namespace hpx { namespace components { namespace server
         };
 
         // constructor: initialize accumulator value
+        accumulator(applier::applier&)
+          : arg_(0)
+        {}
+
         accumulator(threads::thread_self& self, applier::applier&)
           : arg_(0)
         {}
