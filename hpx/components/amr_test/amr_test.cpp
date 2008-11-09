@@ -27,7 +27,7 @@ typedef hpx::components::amr::stencil stencil_type;
 /// for this component. For instance the configuration file amr.ini may look 
 /// like:
 /// 
-/// [hpx.components.stencil]      # this must match the string below
+/// [hpx.components.functional_component_double_type]      # this must match the string below
 /// name = amr_test               # this must match the name of the shared library
 /// path = $[hpx.location]/lib    # this is the default location where to find the shared library
 ///

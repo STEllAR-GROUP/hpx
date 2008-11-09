@@ -83,7 +83,7 @@ namespace hpx { namespace components { namespace server
         }
 
     // create new component instance
-        naming::id_type id = (*it).second->create(appl, count);
+        naming::id_type id = (*it).second->create(self, appl, count);
 
     // set result if requested
         if (0 != gid)
@@ -122,7 +122,7 @@ namespace hpx { namespace components { namespace server
         }
 
     // destroy the component instance
-        (*it).second->destroy(appl, gid);
+        (*it).second->destroy(self, appl, gid);
 
         LRT_(info) << "successfully destroyed 1 component of " 
                    << "type: " << components::get_component_type_name(type);

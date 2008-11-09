@@ -46,11 +46,11 @@ namespace hpx { namespace threads { namespace detail
         {}
 
         /// This constructor is provided just for compatibility with the scheme
-        /// of component creation, which requires to pass a applier instance to
-        /// the component constructor. But since threads never get created 
+        /// of component creation, which requires to pass an applier instance 
+        /// to the component constructor. But since threads never get created 
         /// by a factory (runtime_support) instance, we can leave this 
         /// constructor empty
-        thread(applier::applier& appl)
+        thread(threads::thread_self& self, applier::applier& appl)
           : tm_(appl.get_thread_manager()), description_("")
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
@@ -170,11 +170,11 @@ namespace hpx { namespace threads
         {}
 
         /// This constructor is provided just for compatibility with the scheme
-        /// of component creation, which requires to pass a applier instance to
-        /// the component constructor. But since threads never get created 
+        /// of component creation, which requires to pass an applier instance 
+        /// to the component constructor. But since threads never get created 
         /// by a factory (runtime_support) instance, we can leave this 
         /// constructor empty
-        thread(applier::applier& appl)
+        thread(threads::thread_self& self, applier::applier& appl)
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
         }

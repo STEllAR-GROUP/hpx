@@ -73,8 +73,8 @@ namespace hpx { namespace components { namespace server
             generic_component_action = 0
         };
 
-        generic_component0(applier::applier& appl)
-          : simple_component_base<generic_component0<Result, F> >(appl)
+        generic_component0(threads::thread_self& self, applier::applier& appl)
+          : simple_component_base<generic_component0<Result, F> >(self, appl)
         {}
 
         threads::thread_state
@@ -110,8 +110,8 @@ namespace hpx { namespace components { namespace server
             generic_component_action = 0
         };
 
-        generic_component0(applier::applier& appl)
-          : simple_component_base<generic_component0<void, F> >(appl)
+        generic_component0(threads::thread_self& self, applier::applier& appl)
+          : simple_component_base<generic_component0<void, F> >(self, appl)
         {}
 
         threads::thread_state 

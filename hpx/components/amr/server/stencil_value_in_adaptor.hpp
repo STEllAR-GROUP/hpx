@@ -25,6 +25,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     {
     public:
         stencil_value_in_adaptor(applier::applier& appl)
+          : gid_(naming::invalid_id)
         {}
 
         // start the asynchronous data acquisition

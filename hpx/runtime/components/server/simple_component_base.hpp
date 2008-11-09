@@ -24,7 +24,7 @@ namespace hpx { namespace components
         typedef Component wrapped_type;
 
         /// \brief Construct an empty simple_component
-        simple_component_base(applier::applier& appl) 
+        simple_component_base(threads::thread_self& self, applier::applier& appl) 
           : appl_(appl)
         {}
 
@@ -34,6 +34,14 @@ namespace hpx { namespace components
             if (gid_)
                 appl_.get_agas_client().unbind(gid_);
         }
+
+        /// \brief finalize() will be called just before the instance gets 
+        ///        destructed
+        ///
+        /// \param self [in] The PX \a thread used to execute this function.
+        /// \param appl [in] The applier to be used for finalization of the 
+        ///             component instance. 
+        void finalize(threads::thread_self& self, applier::applier& appl) {}
 
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
@@ -114,19 +122,22 @@ namespace hpx { namespace components
         /// \brief  The function \a create is used for allocation and 
         ///         initialization of instances of the derived components.
         static Component* 
-        create(applier::applier& appl, std::size_t count)
+        create(threads::thread_self& self, applier::applier& appl, 
+            std::size_t count)
         {
             // simple components can be created individually only
             BOOST_ASSERT(1 == count);
-            return new Component(appl);
+            return new Component(self, appl);
         }
 
         /// \brief  The function \a destroy is used for destruction and 
         ///         de-allocation of instances of the derived components.
-        static void destroy(Component* p, std::size_t count = 1)
+        static void destroy(threads::thread_self& self, applier::applier& appl, 
+            Component* p, std::size_t count = 1)
         {
             // simple components can be deleted individually only
             BOOST_ASSERT(1 == count);
+            p->finalize(self, appl);
             delete p;
         }
 

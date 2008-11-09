@@ -66,8 +66,8 @@
             generic_component_action = N
         };
 
-        BOOST_PP_CAT(generic_component, N)(applier::applier& appl)
-          : base_type(appl)
+        BOOST_PP_CAT(generic_component, N)(threads::thread_self& self, applier::applier& appl)
+          : base_type(self, appl)
         {}
 
         threads::thread_state
@@ -120,8 +120,8 @@
             generic_component_action = N
         };
 
-        BOOST_PP_CAT(generic_component, N)(applier::applier& appl)
-          : base_type(appl)
+        BOOST_PP_CAT(generic_component, N)(threads::thread_self& self, applier::applier& appl)
+          : base_type(self, appl)
         {}
 
         threads::thread_state 

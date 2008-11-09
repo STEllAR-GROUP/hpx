@@ -32,7 +32,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         > base_type;
         
     public:
-        stencil_value_out_adaptor(applier::applier& appl)
+        stencil_value_out_adaptor(threads::thread_self& self, applier::applier& appl)
         {
             if (component_invalid == base_type::get_component_type()) {
                 // first call to get_component_type, ask AGAS for a unique id

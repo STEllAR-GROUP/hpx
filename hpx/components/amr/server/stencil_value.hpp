@@ -42,10 +42,18 @@ namespace hpx { namespace components { namespace amr { namespace server
 
     public:
         /// Construct a new stencil_value instance
-        stencil_value(applier::applier& appl);
+        stencil_value(threads::thread_self& self, applier::applier& appl);
 
         /// Destruct this stencil instance
         ~stencil_value();
+
+        /// \brief finalize() will be called just before the instance gets 
+        ///        destructed
+        ///
+        /// \param self [in] The PX \a thread used to execute this function.
+        /// \param appl [in] The applier to be used for finalization of the 
+        ///             component instance. 
+        void finalize(threads::thread_self& self, applier::applier& appl);
 
         /// The function get will be called by the out-ports whenever 
         /// the current value has been requested.

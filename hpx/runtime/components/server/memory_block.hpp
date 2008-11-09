@@ -334,7 +334,7 @@ namespace hpx { namespace components { namespace server
         ///
         /// \param appl [in] The applier to be used for construction of the new
         ///             wrapped instance. 
-        memory_block(applier::applier& appl, std::size_t size) 
+        memory_block(threads::thread_self& self, applier::applier& appl, std::size_t size) 
           : component_(0) 
         {
             boost::uint8_t* p = new boost::uint8_t[size + sizeof(detail::memory_block_header)];
@@ -345,6 +345,14 @@ namespace hpx { namespace components { namespace server
         /// \brief The destructor releases any wrapped instances
         ~memory_block()
         {}
+
+        /// \brief finalize() will be called just before the instance gets 
+        ///        destructed
+        ///
+        /// \param self [in] The PX \a thread used to execute this function.
+        /// \param appl [in] The applier to be used for finalization of the 
+        ///             component instance. 
+        void finalize(threads::thread_self& self, applier::applier& appl) {}
 
         /// \brief Return a pointer to the wrapped memory_block instance
         detail::memory_block* get()
@@ -442,20 +450,22 @@ namespace hpx { namespace components { namespace server
         ///         be created. It is interpreted as the number of bytes to 
         ///         allocate for the new memory_block.
         static memory_block* 
-        create(applier::applier& appl, std::size_t count)
+        create(threads::thread_self& self, applier::applier& appl, std::size_t count)
         {
             // allocate the memory
             memory_block* p = get_heap().alloc();
-            return new (p) memory_block(appl, count);
+            return new (p) memory_block(self, appl, count);
         }
 
         /// \brief  The function \a destroy is used for deletion and 
         //          de-allocation of arrays of wrappers
-        static void destroy(memory_block* p, std::size_t count = 1)
+        static void destroy(threads::thread_self& self, applier::applier& appl, 
+            memory_block* p, std::size_t count = 1)
         {
             if (NULL == p || 0 == count) 
                 return;     // do nothing if given a NULL pointer
 
+            p->finalize(self, appl);
             p->~memory_block();
 
             // free memory itself

@@ -67,6 +67,14 @@ namespace hpx { namespace components { namespace server
             tidy();
         }
 
+        /// \brief finalize() will be called just before the instance gets 
+        ///        destructed
+        ///
+        /// \param self [in] The PX \a thread used to execute this function.
+        /// \param appl [in] The applier to be used for finalization of the 
+        ///             component instance. 
+        void finalize(threads::thread_self& self, applier::applier& appl) {}
+
         void tidy()
         {
             components_.clear();    // make sure components get released first

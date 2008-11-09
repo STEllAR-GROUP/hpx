@@ -76,9 +76,17 @@ namespace hpx { namespace components { namespace amr { namespace server
         gid = naming::invalid_id;
     }
 
+    inline void free_helper_sync(threads::thread_self& self, 
+        applier::applier& appl, naming::id_type const& fgid, naming::id_type& gid)
+    {
+        components::amr::stubs::functional_component::free_data_sync(self,
+            appl, fgid, gid);
+        gid = naming::invalid_id;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <int N>
-    stencil_value<N>::stencil_value(applier::applier& appl)
+    stencil_value<N>::stencil_value(threads::thread_self& self, applier::applier& appl)
       : driver_thread_(0), sem_in_(N), sem_out_(0), sem_result_(0), 
         value_gid_(naming::invalid_id), backup_value_gid_(naming::invalid_id),
         functional_gid_(naming::invalid_id), is_called_(false)
@@ -87,7 +95,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         for (std::size_t i = 0; i < N; ++i)
         {
             in_[i].reset(new in_adaptor_type(appl));
-            out_[i].reset(new out_adaptor_type(appl));
+            out_[i].reset(new out_adaptor_type(self, appl));
             out_[i]->get()->set_callback(
                 boost::bind(&stencil_value::get_value, this, _1, _2));
         }
@@ -98,6 +106,14 @@ namespace hpx { namespace components { namespace amr { namespace server
     template <int N>
     stencil_value<N>::~stencil_value()
     {
+    }
+
+    template <int N>
+    void stencil_value<N>::finalize(threads::thread_self& self, 
+        applier::applier& appl) 
+    {
+        if (naming::invalid_id != value_gid_) 
+            free_helper_sync(self, appl, functional_gid_, value_gid_);
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -23,7 +23,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     {
     public:
         /// Construct a new stencil_value instance
-        functional_timestep(applier::applier& appl);
+        functional_timestep(threads::thread_self& self, applier::applier& appl);
 
         // parcel action code: the action to be performed on the destination 
         // object (the accumulator)

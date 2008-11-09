@@ -37,8 +37,8 @@ namespace hpx { namespace components { namespace server
         };
 
         // constructor
-        distributing_factory(applier::applier& appl)
-          : simple_component_base<distributing_factory>(appl)
+        distributing_factory(threads::thread_self& self, applier::applier& appl)
+          : simple_component_base<distributing_factory>(self, appl)
         {}
 
         ///////////////////////////////////////////////////////////////////////

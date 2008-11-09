@@ -111,6 +111,20 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         {
             free_data(this->appl_, gid, val);
         }
+
+        static void free_data_sync(threads::thread_self& self, 
+            applier::applier& appl, naming::id_type const& gid, 
+            naming::id_type const& val)
+        {
+            typedef amr::server::functional_component::free_data_action action_type;
+            lcos::eager_future<action_type, void>(appl, gid, val).get(self);
+        }
+
+        void free_data_sync(threads::thread_self& self, 
+            naming::id_type const& gid, naming::id_type const& val)
+        {
+            free_data_sync(self, this->appl_, gid, val);
+        }
     };
 
 }}}}

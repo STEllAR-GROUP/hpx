@@ -23,8 +23,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         typedef simple_component_base<functional_component> base_type;
 
     public:
-        functional_component(applier::applier& appl)
-          : base_type(appl)
+        functional_component(threads::thread_self& self, applier::applier& appl)
+          : base_type(self, appl)
         {
             if (component_invalid == base_type::get_component_type()) {
                 // first call to get_component_type, ask AGAS for a unique id
@@ -78,28 +78,27 @@ namespace hpx { namespace components { namespace amr { namespace server
         {
             functional_component_alloc_data = 0,
             functional_component_eval = 1,
-            functional_component_free_data = 2,
-            functional_component_initial = 3
+            functional_component_free_data = 2
         };
 
         /// This is the main entry point of this component. Calling this 
         /// function (by applying the eval_action) will compute the next 
         /// time step value based on the result values of the previous time 
         /// steps.
-        threads::thread_state eval_nv(threads::thread_self& self, 
+        threads::thread_state eval_nonvirt(threads::thread_self& self, 
             applier::applier& appl, bool* retval, naming::id_type const& result, 
             std::vector<naming::id_type> const& gids)
         {
             return eval(self, appl, retval, result, gids);
         }
 
-        threads::thread_state alloc_data_nv(threads::thread_self& self, 
+        threads::thread_state alloc_data_nonvirt(threads::thread_self& self, 
             applier::applier& appl, naming::id_type* result, int item)
         {
             return alloc_data(self, appl, result, item);
         }
 
-        threads::thread_state free_data_nv(threads::thread_self& self, 
+        threads::thread_state free_data_nonvirt(threads::thread_self& self, 
             applier::applier& appl, naming::id_type const& gid)
         {
             return free_data(self, appl, gid);
@@ -111,18 +110,18 @@ namespace hpx { namespace components { namespace amr { namespace server
         // serialization, etc.
         typedef hpx::actions::result_action1<
             functional_component, naming::id_type, functional_component_alloc_data, 
-            int, &functional_component::alloc_data_nv
+            int, &functional_component::alloc_data_nonvirt
         > alloc_data_action;
 
         typedef hpx::actions::result_action2<
             functional_component, bool, functional_component_eval, 
             naming::id_type const&, std::vector<naming::id_type> const&, 
-            &functional_component::eval_nv
+            &functional_component::eval_nonvirt
         > eval_action;
 
         typedef hpx::actions::action1<
             functional_component, functional_component_free_data, 
-            naming::id_type const&, &functional_component::free_data_nv
+            naming::id_type const&, &functional_component::free_data_nonvirt
         > free_data_action;
     };
 

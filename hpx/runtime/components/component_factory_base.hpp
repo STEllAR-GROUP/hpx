@@ -71,27 +71,29 @@ namespace hpx { namespace components
 
         /// \brief Create one or more new component instances.
         ///
-        /// \param appl         [in] The applier instance to be used to create
-        ///                     the new component instances.
-        /// \param count        [in] The number of component instances to 
-        ///                     create. The value of this parameter should not 
-        ///                     be zero.
+        /// \param self   [in] The PX \a thread used to execute this function.
+        /// \param appl   [in] The applier instance to be used to create
+        ///               the new component instances.
+        /// \param count  [in] The number of component instances to 
+        ///               create. The value of this parameter should not 
+        ///               be zero.
         ///
         /// \return Returns the GID of the first newly created component 
         ///         instance. If more than one component instance has been 
         ///         created (\a count > 1) the GID's of all new instances are
         ///         sequential in a row.
-        virtual naming::id_type create (applier::applier& appl, 
-            std::size_t count) = 0;
+        virtual naming::id_type create (threads::thread_self& self, 
+            applier::applier& appl, std::size_t count) = 0;
 
         /// \brief Destroy one or more component instances
         ///
-        /// \param appl         [in] The applier instance to be used to destroy
-        ///                     the component instances.
-        /// \param gid          [in] The gid of the first component instance to 
-        ///                     destroy. 
-        virtual void destroy(applier::applier& appl, 
-            naming::id_type const& gid) = 0;
+        /// \param self   [in] The PX \a thread used to execute this function.
+        /// \param appl   [in] The applier instance to be used to destroy
+        ///               the component instances.
+        /// \param gid    [in] The gid of the first component instance to 
+        ///               destroy. 
+        virtual void destroy(threads::thread_self& self, 
+            applier::applier& appl, naming::id_type const& gid) = 0;
     };
 
 }}

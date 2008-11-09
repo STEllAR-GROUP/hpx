@@ -150,6 +150,137 @@ namespace hpx { namespace lcos { namespace detail
         util::full_empty<data_type> data_[N];
     };
 
+    /// A future_value can be used by a single thread to invoke a (remote) 
+    /// action and wait for the operation to finish. No result is expected.
+    template <int N>
+    class future_value<void, N> : public lcos::base_lco
+    {
+    private:
+        // make sure N is in a reasonable range
+        BOOST_STATIC_ASSERT(N > 0);   // N must be greater than zero
+
+    private:
+        struct void_type 
+        {
+            void_type() {}
+        };
+
+        typedef void_type result_type;
+        typedef std::pair<boost::system::error_code, std::string> error_type;
+        typedef boost::variant<result_type, error_type> data_type;
+
+    public:
+        // This is the component id. Every component needs to have an embedded
+        // enumerator 'value' which is used by the generic action implementation
+        // to associate this component with a given action.
+        enum { value = components::component_future };
+
+        future_value()
+        {
+        }
+
+        /// Reset the future_value to allow to restart an asynchronous 
+        /// operation. Allows any subsequent set_data operation to succeed.
+        void reset()
+        {
+            data_->set_empty();
+        }
+
+        /// Get the result of the requested action. This call blocks (yields 
+        /// control) if the result is not ready. As soon as the result has been 
+        /// returned and the waiting thread has been re-scheduled by the thread
+        /// manager the function \a lazy_future#get will return.
+        ///
+        /// \param slot   [in] The number of the slot the value has to be 
+        ///               returned for. This number must be positive, but 
+        ///               smaller than the template parameter \a N.
+        /// \param self   [in] The \a thread which will be unconditionally
+        ///               blocked (yielded) while waiting for the result. 
+        ///
+        /// \note         If there has been an error reported (using the action
+        ///               \a base_lco#set_error), this function will throw an
+        ///               exception encapsulating the reported error code and 
+        ///               error description.
+        void get_data(threads::thread_self& self, int slot) 
+        {
+            if (slot < 0 || slot >= N) {
+                HPX_THROW_EXCEPTION(bad_parameter, "slot index out of range");
+                return;
+            }
+
+            // yields control if needed
+            data_type d;
+            data_[slot].read(self, d);
+
+            // the thread has been re-activated by one of the actions 
+            // supported by this future_value (see \a future_value::set_event
+            // and future_value::set_error).
+            if (1 == d.which())
+            {
+                // an error has been reported in the meantime, throw 
+                error_type e = boost::get<error_type>(d);
+                HPX_THROW_EXCEPTION_EX(
+                    boost::system::system_error, e.first, e.second);
+            }
+
+            // no error has been reported, just return 
+        };
+
+        // helper functions for setting data (if successful) or the error (if
+        // non-successful)
+        void set_data(int slot)
+        {
+            // set the received result, reset error status
+            if (slot < 0 || slot >= N) {
+                HPX_THROW_EXCEPTION(bad_parameter, "slot index out of range");
+                return;
+            }
+
+            // store the value
+            data_[slot].set(data_type(result_type()));
+        }
+
+        // trigger the future with the given error condition
+        void set_error (int slot, hpx::error code, std::string const& msg)
+        {
+            if (slot < 0 || slot >= N) {
+                HPX_THROW_EXCEPTION(bad_parameter, "slot index out of range");
+                return;
+            }
+
+            // store the error code
+            data_[slot].set(data_type(error_type(make_error_code(code), msg)));
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // exposed functionality of this component
+
+        // trigger the future, set the result
+        threads::thread_state 
+        set_event (threads::thread_self& self, applier::applier& appl)
+        {
+            // set the received result, reset error status
+            set_data(0);
+
+            // this thread has nothing more to do
+            return threads::terminated;
+        }
+
+        // trigger the future with the given error condition
+        threads::thread_state 
+        set_error (threads::thread_self& self, applier::applier& appl,
+            hpx::error code, std::string const& msg)
+        {
+            set_error(0, code, msg);
+
+            // this thread has nothing more to do
+            return threads::terminated;
+        }
+
+    private:
+        util::full_empty<data_type> data_[N];
+    };
+
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////

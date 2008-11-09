@@ -18,14 +18,15 @@ namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    naming::id_type create (applier::applier& appl, std::size_t count)
+    naming::id_type create (threads::thread_self& self, applier::applier& appl, 
+        std::size_t count)
     {
         if (0 == count) {
             HPX_THROW_EXCEPTION(hpx::bad_parameter, "count shouldn't be zero");
             return naming::invalid_id;
         }
 
-        Component* c = static_cast<Component*>(Component::create(appl, count));
+        Component* c = static_cast<Component*>(Component::create(self, appl, count));
         naming::id_type gid = c->get_gid(appl);
         if (gid) 
             return gid;
@@ -39,7 +40,8 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    void destroy(applier::applier& appl, naming::id_type const& gid)
+    void destroy(threads::thread_self& self, applier::applier& appl, 
+        naming::id_type const& gid)
     {
         // retrieve the local address bound to the given global id
         naming::address addr;
@@ -71,7 +73,7 @@ namespace hpx { namespace components { namespace server
         }
 
         // delete the local instances
-        Component::destroy(reinterpret_cast<Component*>(addr.address_));
+        Component::destroy(self, appl, reinterpret_cast<Component*>(addr.address_));
     }
 
 }}}

@@ -27,8 +27,8 @@ namespace hpx { namespace components { namespace amr
         typedef stencil wrapped_type;
         typedef stencil wrapping_type;
 
-        stencil(applier::applier& appl)
-          : base_type(appl)
+        stencil(threads::thread_self& self, applier::applier& appl)
+          : base_type(self, appl)
         {}
 
         /// This is the function implementing the actual time step functionality

@@ -60,6 +60,14 @@ namespace hpx { namespace lcos
         /// derived objects
         virtual ~base_lco() {}
 
+        /// \brief finalize() will be called just before the instance gets 
+        ///        destructed
+        ///
+        /// \param self [in] The PX \a thread used to execute this function.
+        /// \param appl [in] The applier to be used for finalization of the 
+        ///             component instance. 
+        void finalize(threads::thread_self& self, applier::applier& appl) {}
+
         /// The \a function set_event_nonvirt is called whenever a 
         /// \a set_event_action is applied on a instance of a LCO. This function
         /// just forwards to the virtual function \a set_event, which is 
