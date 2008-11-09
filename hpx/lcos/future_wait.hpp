@@ -23,15 +23,15 @@ namespace hpx { namespace components
     /// expected value directly (without wrapping it into a tuple).
     template <typename T1>
     inline T1
-    wait (threads::thread_self& self, lcos::future_value<T1>& f1)
+    wait (threads::thread_self& self, lcos::future_value<T1> const& f1)
     {
         return f1.get(self);
     }
 
     template <typename T1, typename T2>
     inline boost::tuple<T1, T2>
-    wait (threads::thread_self& self, lcos::future_value<T1>& f1, 
-        lcos::future_value<T2>& f2)
+    wait (threads::thread_self& self, lcos::future_value<T1> const& f1, 
+        lcos::future_value<T2> const& f2)
     {
         return boost::make_tuple(f1.get(self), f2.get(self));
     }
@@ -54,7 +54,7 @@ namespace hpx { namespace components
 
 #define N BOOST_PP_ITERATION()
 #define HPX_FUTURE_WAIT_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n)             \
-        lcos::future_value<BOOST_PP_CAT(T, n)>& BOOST_PP_CAT(f, n)            \
+        lcos::future_value<BOOST_PP_CAT(T, n)> const& BOOST_PP_CAT(f, n)      \
     /**/
 #define HPX_FUTURE_TUPLE_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n)            \
         BOOST_PP_CAT(f, n).get(self)                                          \
