@@ -125,7 +125,7 @@ macro(ADD_HPX_COMPONENT name)
 
     # install hpx configuration (ini) file
     if(${name}_INI)
-        install(FILES ${name}_${ini} DESTINATION share/hpx/ini)
+        install(FILES ${${name}_INI} DESTINATION share/hpx/ini)
     endif()
 
 endmacro()
