@@ -91,9 +91,16 @@ macro(ADD_HPX_COMPONENT name)
     # retrieve arguments
     parse_arguments(${name}
         "SOURCES;HEADERS;DEPENDENCIES;INI"
-        "HAS_SOURCES;HAS_HEADERS;HAS_DEPENDENCIES;HAS_INI"
+        "DEBUG"
         ${ARGN}
     )
+
+    if(${name}_DEBUG)
+        message(STATUS ${name}_SOURCES " " ${${name}_SOURCES})
+        message(STATUS ${name}_HEADERS " " ${${name}_HEADERS})
+        message(STATUS ${name}_DEPENDENCIES " " ${${name}_DEPENDENCIES})
+        message(STATUS ${name}_INI " " ${${name}_INI})
+    endif()
 
     add_definitions(-DHPX_COMPONENT_NAME=${name})
     add_definitions(-DHPX_COMPONENT_EXPORTS)
@@ -117,7 +124,7 @@ macro(ADD_HPX_COMPONENT name)
                     WORLD_READ WORLD_EXECUTE)
 
     # install hpx configuration (ini) file
-    if(${HAS_INI})
+    if(${name}_INI)
         install(FILES ${ini} DESTINATION share/hpx/ini)
     endif()
 
@@ -129,13 +136,15 @@ macro(ADD_HPX_EXECUTABLE name)
     # retrieve arguments
     parse_arguments(${name}
         "SOURCES;HEADERS;DEPENDENCIES"
-        "HAS_SOURCES;HAS_HEADERS;HAS_DEPENDENCIES"
+        "DEBUG"
         ${ARGN}
     )
 
-message(STATUS ${name}_SOURCES " " ${${name}_SOURCES})
-message(STATUS ${name}_HEADERS " " ${${name}_HEADERS})
-message(STATUS ${name}_DEPENDENCIES " " ${${name}_DEPENDENCIES})
+    if(${name}_DEBUG)
+        message(STATUS ${name}_SOURCES " " ${${name}_SOURCES})
+        message(STATUS ${name}_HEADERS " " ${${name}_HEADERS})
+        message(STATUS ${name}_DEPENDENCIES " " ${${name}_DEPENDENCIES})
+    endif()
 
     # add the executable build target
     add_executable(${name}_exe 
