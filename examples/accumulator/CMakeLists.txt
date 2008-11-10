@@ -17,6 +17,5 @@ foreach(example ${component_EXAMPLES})
     # add example executable
     add_hpx_executable(${example}_client 
         SOURCES ${${example}_client_SOURCES}
-        DEPENDENCIES ${example}_component
-        DEBUG TRUE)
+        DEPENDENCIES ${example}_component)
 endforeach()
