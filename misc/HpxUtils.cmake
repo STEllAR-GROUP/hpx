@@ -127,11 +127,15 @@ endmacro()
 # This macro allows to build a HPX executable
 macro(ADD_HPX_EXECUTABLE name)
     # retrieve arguments
-    parse_arguments(THIS_PROJECT
+    parse_arguments(${name}
         "SOURCES;HEADERS;DEPENDENCIES"
         "HAS_SOURCES;HAS_HEADERS;HAS_DEPENDENCIES"
         ${ARGN}
     )
+
+message(STATUS ${name}_SOURCES " " ${${name}_SOURCES})
+message(STATUS ${name}_HEADERS " " ${${name}_HEADERS})
+message(STATUS ${name}_DEPENDENCIES " " ${${name}_DEPENDENCIES})
 
     # add the executable build target
     add_executable(${name}_exe 
