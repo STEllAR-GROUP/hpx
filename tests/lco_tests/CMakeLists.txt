@@ -12,13 +12,6 @@ set(TESTS
 # build and install each of the tests
 foreach(test ${TESTS})
     set(${test}_SOURCES ${test}.cpp)
-    add_executable(${test}_exe ${${test}_SOURCES})
-    set_target_properties(${test}_exe PROPERTIES OUTPUT_NAME ${test})
-    target_link_libraries(${test}_exe ${hpx_LIBRARIES} ${Boost_LIBRARIES})
-    install(TARGETS ${test}_exe
-        RUNTIME DESTINATION bin
-        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                    GROUP_READ GROUP_EXECUTE
-                    WORLD_READ WORLD_EXECUTE)
+    add_hpx_executable(${test} SOURCES ${${test}_SOURCES})
 endforeach()
 

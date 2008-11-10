@@ -1025,6 +1025,10 @@
 				RelativePath="..\..\..\docs\hpx.doxy"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\misc\HpxUtils.cmake"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Assembly Files"

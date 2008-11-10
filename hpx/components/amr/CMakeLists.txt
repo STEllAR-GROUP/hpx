@@ -21,26 +21,11 @@ set(amr_SOURCES
     server/stencil_value.cpp
     server/stencil_value_out_adaptor.cpp)
 
-add_definitions(-DHPX_COMPONENT_NAME=amr)
-add_definitions(-DHPX_COMPONENT_EXPORTS)
+set(amr_INI
+    amr.ini)
 
-add_library (amr_component SHARED 
-    ${amr_SOURCES} ${amr_HEADERS})
-set_target_properties(amr_component PROPERTIES
-    OUTPUT_NAME ${component_LIBRARY_PREFIX}amr)
-target_link_libraries(amr_component 
-    ${hpx_LIBRARIES} ${Boost_LIBRARIES})
-
-# install binary
-install(TARGETS amr_component
-    RUNTIME DESTINATION bin
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                GROUP_READ GROUP_EXECUTE
-                WORLD_READ WORLD_EXECUTE)
-
-# install hpx configuration (ini) file
-install(FILES amr.ini
-    DESTINATION share/hpx/ini)
+add_hpx_component(amr 
+    SOURCES ${amr_SOURCES} 
+    HEADERS ${amr_HEADERS}
+    INI ${amr_INI})
 

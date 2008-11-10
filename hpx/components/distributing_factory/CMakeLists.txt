@@ -3,29 +3,16 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set (distributing_factorylib_HEADERS
+set (distributing_factory_HEADERS
     distributing_factory.hpp
     stubs/distributing_factory.hpp
     server/distributing_factory.hpp)
 
-set (distributing_factorylib_SOURCES
+set (distributing_factory_SOURCES
     server/distributing_factory.cpp
     distributing_factory.cpp)
 
-add_definitions(-DHPX_COMPONENT_NAME=distributing_factory)
-add_definitions(-DHPX_COMPONENT_EXPORTS)
+add_hpx_component(distributing_factory 
+    SOURCES ${distributing_factory_SOURCES} 
+    HEADERS ${distributing_factory_HEADERS})
 
-add_library (distributing_factory_component SHARED 
-    ${distributing_factorylib_SOURCES} ${distributing_factorylib_HEADERS})
-set_target_properties(distributing_factory_component PROPERTIES
-    OUTPUT_NAME ${component_LIBRARY_PREFIX}distributing_factory)
-target_link_libraries(distributing_factory_component 
-    ${hpx_LIBRARIES} ${Boost_LIBRARIES})
-
-install(TARGETS distributing_factory_component
-    RUNTIME DESTINATION bin
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                GROUP_READ GROUP_EXECUTE
-                WORLD_READ WORLD_EXECUTE)

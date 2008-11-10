@@ -10,23 +10,28 @@ cmake_minimum_required(VERSION 2.6.2 FATAL_ERROR)
 # allow more human readable "if then else" constructs
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 
+# We have a patched BoostFIND module, and other files to include, look for 
+# these in our misc directory
+list(APPEND CMAKE_MODULE_PATH ${hpx_SOURCE_DIR}/misc)
+
 # The name of our project is "hpx".  CMakeLists files in this project can
 # refer to the root source directory of the project as ${hpx_SOURCE_DIR} and
 # to the root binary directory of the project as ${hpx_BINARY_DIR}.
 project(hpx CXX C)
 
 # project version
-set(${PROJECT_NAME}_MAJOR_VERSION 0)
-set(${PROJECT_NAME}_MINOR_VERSION 2)
-set(${PROJECT_NAME}_PATCH_LEVEL   0)
+set(HPX_MAJOR_VERSION 0)
+set(HPX_MINOR_VERSION 2)
+set(HPX_PATCH_LEVEL   0)
+set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
+
+# include additional macro definitions
+include(HpxUtils)
 
 # set default cmake build type to RelWithDebInfo (None Debug Release RelWithDebInfo MinSizeRel)
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
-
-# We have a patched BoostFIND module, look for it in our misc directory
-set(CMAKE_MODULE_PATH ${hpx_SOURCE_DIR}/misc)
 
 # We need to use Boost, namely the following Boost libraries
 set(Boost_FIND_VERSION_EXACT ON)
