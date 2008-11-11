@@ -29,7 +29,7 @@ namespace boost { namespace lockfree
     ///////////////////////////////////////////////////////////////////////////
     inline void memory_barrier()
     {
-#if defined(__GNUC__) && ( (__GNUC__ > 4) || ((__GNUC__ >= 4) && (__GNUC_MINOR__ >= 1)) )
+#if defined(__GNUC__) && ( (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)) )
         __sync_synchronize();
 #else
 #warning "no memory barrier implemented for this platform"
@@ -57,7 +57,7 @@ namespace boost { namespace lockfree
     template <class C, class D>
     inline bool CAS(volatile C * addr, D old, D nw)
     {
-#if defined(__GNUC__) && ( (__GNUC__ > 4) || ((__GNUC__ >= 4) && (__GNUC_MINOR__ >= 1)) )
+#if defined(__GNUC__) && ( (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)) )
 #if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
 #warning "CAS: using __sync_bool_compare_and_swap"
 #endif
@@ -80,7 +80,7 @@ namespace boost { namespace lockfree
     template <class C, class D, class E>
     inline bool CAS2(volatile C * addr, D old1, E old2, D new1, E new2)
     {
-#if ((__GNUC__ >  4) || ( (__GNUC__ >= 4) && (__GNUC_MINOR__ >= 2) ) ) && defined(__i386__) && \
+#if ((__GNUC__ >  4) || ( (__GNUC__ == 4) && (__GNUC_MINOR__ >= 2) ) ) && defined(__i386__) && \
         (defined(__i686__) || defined(__pentiumpro__) || defined(__nocona__ ) || \
         defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8))
 
@@ -136,7 +136,7 @@ namespace boost { namespace lockfree
 #elif defined(__x86_64__)
 
 # if ( __GCC_HAVE_SYNC_COMPARE_AND_SWAP_16 ) || \
-    ( (__GNUC__ >  4) || ( (__GNUC__ >= 4) && (__GNUC_MINOR__ >= 2) ) && defined(__nocona__ ) )
+    ( (__GNUC__ >  4) || ( (__GNUC__ == 4) && (__GNUC_MINOR__ >= 2) ) && defined(__nocona__ ) )
 
 # if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
 # warning "CAS2: using __sync_bool_compare_and_swap_16"

@@ -35,12 +35,12 @@ namespace boost { namespace lockfree { namespace detail
 
 #if defined(USE_ATOMIC_OPS)
 #include <boost/lockfree/detail/ao_primitives.hpp>
+#elif defined(__APPLE__)
+#include <boost/lockfree/detail/apple_primitives.hpp>
 #elif defined(__GNUC__)
 #include <boost/lockfree/detail/gcc_primitives.hpp>
 #elif defined(BOOST_MSVC)
 #include <boost/lockfree/detail/windows_primitives.hpp>
-#elif defined(__APPLE__)
-#include <boost/lockfree/detail/apple_primitives.hpp>
 #endif
 
 #endif

@@ -122,6 +122,15 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
 
 #if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
 #include <sys/mman.h>
+
+#if defined(MAP_ANONYMOUS)
+# define HPX_MAP_ANONYMOUS MAP_ANONYMOUS
+#elif defined(MAP_ANON)
+# define HPX_MAP_ANONYMOUS MAP_ANON
+#else
+# error "Anonymous mmap not available on this platform!"
+#endif
+
 namespace boost { namespace coroutines { namespace detail { namespace posix {
   inline 
   void * 
@@ -129,7 +138,7 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
     void * stack = ::mmap(NULL,
                           size,
                           PROT_EXEC|PROT_READ|PROT_WRITE,
-                          MAP_PRIVATE|MAP_ANONYMOUS,
+                          MAP_PRIVATE|HPX_MAP_ANONYMOUS,
                           -1,
                           0
                           );

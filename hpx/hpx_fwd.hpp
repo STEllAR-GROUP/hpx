@@ -22,7 +22,7 @@
 /// functions and variables are defined inside this namespace.
 namespace hpx
 {
-    class HPX_EXPORT runtime;
+    class HPX_API_EXPORT runtime;
 
     /// \namespace applier
     ///
@@ -31,7 +31,7 @@ namespace hpx
     /// namespace is part of the HPX core module.
     namespace applier
     {
-        class HPX_EXPORT applier;
+        class HPX_API_EXPORT applier;
     }
 
     /// \namespace actions
@@ -41,13 +41,13 @@ namespace hpx
     /// functionality. This namespace is part of the HPX core module.
     namespace actions
     {
-        struct HPX_EXPORT base_action;
+        struct HPX_API_EXPORT base_action;
         typedef boost::shared_ptr<base_action> action_type;
 
-        class HPX_EXPORT continuation;
+        class HPX_API_EXPORT continuation;
         typedef boost::shared_ptr<continuation> continuation_type;
 
-        class HPX_EXPORT action_manager;
+        class HPX_API_EXPORT action_manager;
     }
 
     /// \namespace naming
@@ -56,11 +56,11 @@ namespace hpx
     /// (Distributed Global Address Space) service.
     namespace naming
     {
-        struct HPX_EXPORT id_type;
-        struct HPX_EXPORT address;
-        class HPX_EXPORT locality;
-        class HPX_EXPORT resolver_client;
-        class HPX_EXPORT resolver_server;
+        struct HPX_API_EXPORT id_type;
+        struct HPX_API_EXPORT address;
+        class HPX_API_EXPORT locality;
+        class HPX_API_EXPORT resolver_client;
+        class HPX_API_EXPORT resolver_server;
 
         namespace server
         {
@@ -72,11 +72,11 @@ namespace hpx
     /// \namespace parcelset
     namespace parcelset
     {
-        class HPX_EXPORT parcel;
-        class HPX_EXPORT parcelport;
+        class HPX_API_EXPORT parcel;
+        class HPX_API_EXPORT parcelport;
         class parcelport_connection;
         class connection_cache;
-        class HPX_EXPORT parcelhandler;
+        class HPX_API_EXPORT parcelhandler;
         
         namespace server
         {
@@ -93,8 +93,8 @@ namespace hpx
     /// hpx#threadmanager#thread's.
     namespace threads
     {
-        class HPX_EXPORT thread;
-        class HPX_EXPORT threadmanager;
+        class HPX_API_EXPORT thread;
+        class HPX_API_EXPORT threadmanager;
 
         ///////////////////////////////////////////////////////////////////////
         /// \enum thread_state
@@ -118,7 +118,7 @@ namespace hpx
             terminated = 5  ///< thread has been stopped an may be garbage 
                             ///< collected
         };
-        HPX_EXPORT char const* const get_thread_state_name(thread_state state);
+        HPX_API_EXPORT char const* const get_thread_state_name(thread_state state);
 
         ///////////////////////////////////////////////////////////////////////
         typedef 
@@ -150,7 +150,7 @@ namespace hpx
         ///                   by the parameter \a self if the thread referenced 
         ///                   by  the parameter \a id is in \a 
         ///                   thread_state#active state.
-        HPX_EXPORT thread_state 
+        HPX_API_EXPORT thread_state 
             set_thread_state(thread_self& self, thread_id_type id, 
                 thread_state newstate);
 
@@ -174,7 +174,7 @@ namespace hpx
         ///                   is in \a thread_state#active state this function 
         ///                   does nothing except returning 
         ///                   thread_state#unknown. 
-        HPX_EXPORT thread_state 
+        HPX_API_EXPORT thread_state 
             set_thread_state(thread_id_type id, thread_state newstate);
 
         ///////////////////////////////////////////////////////////////////////
@@ -188,7 +188,7 @@ namespace hpx
         /// \param at_time
         ///
         /// \returns
-        HPX_EXPORT thread_id_type 
+        HPX_API_EXPORT thread_id_type 
             set_thread_state(thread_id_type id, thread_state newstate, 
                 boost::posix_time::ptime const& at_time);
 
@@ -205,7 +205,7 @@ namespace hpx
         ///
         /// \returns
         ///////////////////////////////////////////////////////////////////////
-        HPX_EXPORT thread_id_type 
+        HPX_API_EXPORT thread_id_type 
             set_thread_state(thread_id_type id, thread_state newstate, 
                 boost::posix_time::time_duration const& after_duration);
 
@@ -227,7 +227,7 @@ namespace hpx
         template <typename Component, typename Derived = detail::this_type>
         class managed_component;
 
-        struct HPX_EXPORT component_factory_base;
+        struct HPX_API_EXPORT component_factory_base;
 
         template <typename Component> 
         struct component_factory;
@@ -245,9 +245,9 @@ namespace hpx
 
         namespace server
         {
-            class HPX_EXPORT runtime_support;
-            class HPX_EXPORT memory;
-            class HPX_EXPORT memory_block;
+            class HPX_API_EXPORT runtime_support;
+            class HPX_API_EXPORT memory;
+            class HPX_API_EXPORT memory_block;
         }
     }
 
@@ -273,7 +273,7 @@ namespace hpx
     /// \namespace util
     namespace util
     {
-        class HPX_EXPORT section;
+        class HPX_API_EXPORT section;
     }
 }
 

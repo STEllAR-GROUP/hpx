@@ -78,7 +78,7 @@ asm volatile (                            \
 "pushl %esi\n\t"                          \
 "pushl %edi\n\t"                          \
 "movl  %esp, (%eax)\n\t"                  \
-"movl  %edx, %esp\n\r"                    \
+"movl  %edx, %esp\n\t"                    \
 "popl  %edi\n\t"                          \
 "popl  %esi\n\t"                          \
 "popl  %ebx\n\t"                          \

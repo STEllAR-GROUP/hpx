@@ -10,10 +10,6 @@ cmake_minimum_required(VERSION 2.6.2 FATAL_ERROR)
 # allow more human readable "if then else" constructs
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 
-# We have a patched BoostFIND module, and other files to include, look for 
-# these in our misc directory
-list(APPEND CMAKE_MODULE_PATH ${hpx_SOURCE_DIR}/misc)
-
 # The name of our project is "hpx".  CMakeLists files in this project can
 # refer to the root source directory of the project as ${hpx_SOURCE_DIR} and
 # to the root binary directory of the project as ${hpx_BINARY_DIR}.
@@ -24,6 +20,10 @@ set(HPX_MAJOR_VERSION 0)
 set(HPX_MINOR_VERSION 2)
 set(HPX_PATCH_LEVEL   0)
 set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
+
+# We have a patched BoostFIND module, and other files to include, look for 
+# these in our misc directory
+list(APPEND CMAKE_MODULE_PATH ${hpx_SOURCE_DIR}/misc)
 
 # include additional macro definitions
 include(HpxUtils)

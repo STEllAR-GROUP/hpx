@@ -113,7 +113,8 @@ namespace hpx { namespace util
 
 }} // namespace hpx::util
 
-#elif defined(_POSIX_TIMERS)
+#elif defined(_POSIX_TIMERS) && _POSIX_TIMERS > 0 \
+    && defined(_POSIX_THREAD_CPUTIME) && _POSIX_THREAD_CPUTIME > 0
 
 #include <time.h>
 
@@ -194,14 +195,24 @@ namespace hpx { namespace util
 
 }} // namespace hpx::util
 
-#else // !defined(BOOST_WINDOWS) && !defined(_POSIX_TIMERS)
+#else   //  !defined(BOOST_WINDOWS) && (!defined(_POSIX_TIMERS)
+        //      || _POSIX_TIMERS <= 0
+        //      || !defined(_POSIX_THREAD_CPUTIME)
+        //      || _POSIX_THREAD_CPUTIME <= 0)
 
 //  For platforms other than Windows or Linux, simply fall back to boost::timer
 #include <boost/timer.hpp>
 
 namespace hpx { namespace util
 {
-    typedef boost::timer high_resolution_timer;
+    struct high_resolution_timer
+        : boost::timer
+    {
+        static double now()
+        {
+            return double(std::clock());
+        }
+    };
 }}
 
 #endif
