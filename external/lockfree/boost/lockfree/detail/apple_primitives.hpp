@@ -42,7 +42,10 @@ namespace boost { namespace lockfree
     template <class C, class D, class E>
     inline bool CAS2(volatile C * addr, D old1, E old2, D new1, E new2)
     {
-#warning ("blocking CAS2 emulation")
+# if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+# warning ("CAS2: blocking CAS2 emulation")
+# endif
+
         struct packed_c
         {
             D d;
