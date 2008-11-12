@@ -12,11 +12,12 @@
 namespace hpx { namespace components { namespace amr 
 {
     /// This class implements the time step evolution functionality. It has to
-    /// expose two functions: \a eval() and \a is_last_timestep(). The function
-    /// eval computes the value for the current time step based on the values
-    /// as computed by the previous time step. The functions is_last_timestep()
-    /// decides whether the current time step is the last one (the computation
-    /// has reached the final time step).
+    /// expose several functions: \a eval, \a alloc_data and \a free_data. 
+    /// The function \a eval computes the value for the current time step based 
+    /// on the values as computed by the previous time step. The functions 
+    /// \a alloc_data is used to allocate the data needed to store one 
+    /// datapoint, while the function \a free_data is used to free the memory
+    /// allocated using alloc_data.
     class HPX_COMPONENT_EXPORT stencil 
       : public amr::server::functional_component
     {
@@ -50,7 +51,7 @@ namespace hpx { namespace components { namespace amr
         /// Additionally it fills the memory with initial data for the data 
         /// item given by the parameter \a item (if item != -1).
         threads::thread_state alloc_data(threads::thread_self&, applier::applier&, 
-            naming::id_type* result, int item);
+            naming::id_type* result, int item, int maxitems);
 
         /// The free function releases the memory allocated by init
         threads::thread_state free_data(threads::thread_self&, applier::applier&, 

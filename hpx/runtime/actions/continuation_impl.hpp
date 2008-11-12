@@ -20,7 +20,7 @@ namespace hpx { namespace actions
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Arg0>
-    inline void 
+    inline Arg0 const& 
     continuation::trigger_all(applier::applier& app, Arg0 const& arg0)
     {
         typedef typename 
@@ -34,6 +34,7 @@ namespace hpx { namespace actions
             if (!app.apply<action_type>(*it, arg0))
                 break;
         }
+        return arg0;
     }
 
 }}

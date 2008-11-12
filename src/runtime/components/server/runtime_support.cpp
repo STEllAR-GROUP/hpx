@@ -52,7 +52,8 @@ namespace hpx { namespace components { namespace server
         if (it == components_.end()) {
             // we don't know anything about this component
             HPX_OSSTREAM strm;
-            strm << "attempt to create component instance of invalid type: "
+            strm << "attempt to query factory properties for components "
+                    "invalid type: "
                  << components::get_component_type_name(type);
             HPX_THROW_EXCEPTION(hpx::bad_component_type, 
                 HPX_OSSTREAM_GETSTRING(strm));
@@ -91,7 +92,8 @@ namespace hpx { namespace components { namespace server
 
         if (LHPX_ENABLED(info)) {
             if ((*it).second->get_factory_properties() & factory_instance_count_is_size) {
-                LRT_(info) << "successfully created 1 component of type: " 
+                LRT_(info) << "successfully created component (" << gid 
+                           << ") of type: " 
                            << components::get_component_type_name(type) 
                            << " (size: " << count << ")";
             }
@@ -114,7 +116,8 @@ namespace hpx { namespace components { namespace server
         if (it == components_.end()) {
             // we don't know anything about this component
             HPX_OSSTREAM strm;
-            strm << "attempt to destroy component instance of invalid type: "
+            strm << "attempt to destroy component (" << gid 
+                 << ") of invalid type: " 
                  << components::get_component_type_name(type);
             HPX_THROW_EXCEPTION(hpx::bad_component_type, 
                 HPX_OSSTREAM_GETSTRING(strm));
@@ -124,8 +127,8 @@ namespace hpx { namespace components { namespace server
     // destroy the component instance
         (*it).second->destroy(self, appl, gid);
 
-        LRT_(info) << "successfully destroyed 1 component of " 
-                   << "type: " << components::get_component_type_name(type);
+        LRT_(info) << "successfully destroyed component (" << gid 
+            << ") of type: " << components::get_component_type_name(type);
         return threads::terminated;
     }
 

@@ -35,9 +35,7 @@ namespace hpx { namespace components
             // components must contain a typedef for wrapping_type defining the
             // managed_component type used to encapsulate instances of this 
             // component
-            typedef 
-                managed_component<Component, Wrapper> 
-            wrapping_type;
+            typedef managed_component<Component, Wrapper> wrapping_type;
 
             // This is the component id. Every component needs to have an embedded
             // enumerator 'value' which is used by the generic action implementation
@@ -97,6 +95,7 @@ namespace hpx { namespace components
 
     public:
         typedef Component wrapped_type;
+        typedef Component type_holder;
 
         /// \brief Construct an empty managed_component
         managed_component() 

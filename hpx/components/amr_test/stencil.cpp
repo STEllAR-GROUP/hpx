@@ -7,17 +7,11 @@
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/components/amr_test/stencil.hpp>
 
+#include "stencil_data.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
 {
-    ///////////////////////////////////////////////////////////////////////////
-    struct timestep_data
-    {
-        int index_;       // sequential number of this datapoint
-        int timestep_;    // current time step
-        double value_;    // current value
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
     // Compute the result value for the current time step
@@ -42,11 +36,12 @@ namespace hpx { namespace components { namespace amr
         BOOST_ASSERT(val1->timestep_ == val3->timestep_);
 
         // the middle point is our direct predecessor
+        resultval->max_index_ = val2->max_index_;
         resultval->index_ = val2->index_;
         if (val2->timestep_ < 2) {
             // this is the actual calculation
             resultval->timestep_ = val2->timestep_ + 1;
-            resultval->value_ = (val1->value_ + val2->value_ + val3->value_) / 3;
+            resultval->value_ = 0.25 * val1->value_ + 0.75 * val3->value_;
         }
         else {
             // the last time step has been reached, just copy over the data
@@ -57,12 +52,11 @@ namespace hpx { namespace components { namespace amr
         // set return value to true if this is the last time step
         *is_last = resultval->timestep_ >= 2;
 
-        // store result value
         return threads::terminated;
     }
 
     threads::thread_state stencil::alloc_data(threads::thread_self& self, 
-        applier::applier& appl, naming::id_type* result, int item)
+        applier::applier& appl, naming::id_type* result, int item, int maxitems)
     {
         *result = components::stubs::memory_block::create(self, appl, 
             appl.get_runtime_support_gid(), sizeof(timestep_data));
@@ -72,9 +66,13 @@ namespace hpx { namespace components { namespace amr
             access_memory_block<timestep_data> val(
                 components::stubs::memory_block::checkout(self, appl, *result));
 
+            val->max_index_ = maxitems;
             val->index_ = item;
             val->timestep_ = 0;
-            val->value_ = item;
+            if (item < int(maxitems / 3.) || item >= int(2. * maxitems / 3.))
+                val->value_ = 0;
+            else
+                val->value_ = std::pow(item - 1/3, 4.) * std::pow(item - 2/3, 4.);
         }
         return threads::terminated;
     }

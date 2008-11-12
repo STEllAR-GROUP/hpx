@@ -25,10 +25,18 @@ namespace hpx { namespace components { namespace stubs
         /// Asynchronously create a new instance of a distributing_factory
         static lcos::future_value<naming::id_type>
         create_async(applier::applier& appl, naming::id_type const& gid, 
-            std::size_t count = 1)
+            component_type type, std::size_t count = 1)
         {
             return stubs::runtime_support::create_component_async(
-                appl, gid, get_component_type<ServerComponent>(), count);
+                appl, gid, type, count);
+        }
+
+        static lcos::future_value<naming::id_type>
+        create_async(applier::applier& appl, naming::id_type const& gid, 
+            std::size_t count = 1)
+        {
+            return create_async(appl, gid, 
+                get_component_type<ServerComponent>(), count);
         }
 
         lcos::future_value<naming::id_type>
@@ -40,10 +48,19 @@ namespace hpx { namespace components { namespace stubs
         /// Create a new instance of an simple_accumulator
         static naming::id_type 
         create(threads::thread_self& self, applier::applier& appl, 
-            naming::id_type const& gid, std::size_t count = 1)
+            naming::id_type const& gid, component_type type, 
+            std::size_t count = 1)
         {
             return stubs::runtime_support::create_component(self, appl, 
-                gid, get_component_type<ServerComponent>(), count);
+                gid, type, count);
+        }
+
+        static naming::id_type 
+        create(threads::thread_self& self, applier::applier& appl, 
+            naming::id_type const& gid, std::size_t count = 1)
+        {
+            return create(self, appl, gid, 
+                get_component_type<ServerComponent>(), count);
         }
 
         naming::id_type 
@@ -55,10 +72,21 @@ namespace hpx { namespace components { namespace stubs
 
         /// Delete an existing component
         static void
+        free(applier::applier& appl, component_type type,
+            naming::id_type const& gid)
+        {
+            stubs::runtime_support::free_component(appl, type, gid);
+        }
+
+        static void
         free(applier::applier& appl, naming::id_type const& gid)
         {
-            stubs::runtime_support::free_component(appl, 
-                get_component_type<ServerComponent>(), gid);
+            free(appl, get_component_type<ServerComponent>(), gid);
+        }
+
+        void free(component_type type, naming::id_type const& gid)
+        {
+            free(appl_, type, gid);
         }
 
         void free(naming::id_type const& gid)

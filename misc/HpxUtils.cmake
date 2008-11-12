@@ -92,14 +92,13 @@ macro(ADD_HPX_COMPONENT name)
     parse_arguments(${name}
         "SOURCES;HEADERS;DEPENDENCIES;INI"
         "DEBUG"
-        ${ARGN}
-    )
+        ${ARGN})
 
     if(${name}_DEBUG)
-        message(STATUS ${name}_SOURCES " " ${${name}_SOURCES})
-        message(STATUS ${name}_HEADERS " " ${${name}_HEADERS})
-        message(STATUS ${name}_DEPENDENCIES " " ${${name}_DEPENDENCIES})
-        message(STATUS ${name}_INI " " ${${name}_INI})
+        message(STATUS ${name}_SOURCES ": " ${${name}_SOURCES})
+        message(STATUS ${name}_HEADERS ": " ${${name}_HEADERS})
+        message(STATUS ${name}_DEPENDENCIES ": " ${${name}_DEPENDENCIES})
+        message(STATUS ${name}_INI ": " ${${name}_INI})
     endif()
 
     add_definitions(-DHPX_COMPONENT_NAME=${name})
@@ -128,7 +127,7 @@ macro(ADD_HPX_COMPONENT name)
         install(FILES ${${name}_INI} DESTINATION share/hpx/ini)
     endif()
 
-endmacro()
+endmacro(ADD_HPX_COMPONENT)
 
 ###############################################################################
 # This macro allows to build a HPX executable
@@ -137,13 +136,12 @@ macro(ADD_HPX_EXECUTABLE name)
     parse_arguments(${name}
         "SOURCES;HEADERS;DEPENDENCIES"
         "DEBUG"
-        ${ARGN}
-    )
+        ${ARGN})
 
     if(${name}_DEBUG)
-        message(STATUS ${name}_SOURCES " " ${${name}_SOURCES})
-        message(STATUS ${name}_HEADERS " " ${${name}_HEADERS})
-        message(STATUS ${name}_DEPENDENCIES " " ${${name}_DEPENDENCIES})
+        message(STATUS ${name}_SOURCES ": " ${${name}_SOURCES})
+        message(STATUS ${name}_HEADERS ": " ${${name}_HEADERS})
+        message(STATUS ${name}_DEPENDENCIES ": " ${${name}_DEPENDENCIES})
     endif()
 
     # add the executable build target
@@ -167,4 +165,5 @@ macro(ADD_HPX_EXECUTABLE name)
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                     GROUP_READ GROUP_EXECUTE
                     WORLD_READ WORLD_EXECUTE)
-endmacro()
+
+endmacro(ADD_HPX_EXECUTABLE)

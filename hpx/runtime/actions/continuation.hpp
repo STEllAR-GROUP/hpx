@@ -49,7 +49,7 @@ namespace hpx { namespace actions
 
         ///
         template <typename Arg0>
-        void trigger_all(applier::applier& app, Arg0 const& arg0);
+        Arg0 const& trigger_all(applier::applier& app, Arg0 const& arg0);
 
         ///
         void trigger_error(applier::applier& app, hpx::exception const& e);

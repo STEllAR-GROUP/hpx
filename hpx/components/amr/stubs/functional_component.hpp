@@ -72,31 +72,34 @@ namespace hpx { namespace components { namespace amr { namespace stubs
 
         ///////////////////////////////////////////////////////////////////////
         static lcos::future_value<naming::id_type> alloc_data_async(
-            applier::applier& appl, naming::id_type const& gid, int item = -1)
+            applier::applier& appl, naming::id_type const& gid, int item = -1,
+            int maxitems = -1)
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::functional_component::alloc_data_action action_type;
-            return lcos::eager_future<action_type, naming::id_type>(appl, gid, item);
+            return lcos::eager_future<action_type, naming::id_type>(appl, gid, 
+                item, maxitems);
         }
 
         static naming::id_type alloc_data(threads::thread_self& self, 
-            applier::applier& appl, naming::id_type const& gid, int item = -1)
+            applier::applier& appl, naming::id_type const& gid, int item = -1,
+            int maxitems = -1)
         {
-            return alloc_data_async(appl, gid, item).get(self);
+            return alloc_data_async(appl, gid, item, maxitems).get(self);
         }
 
         lcos::future_value<naming::id_type> alloc_data_async(
-            naming::id_type const& gid, int item = -1)
+            naming::id_type const& gid, int item = -1, int maxitems = -1)
         {
-            return alloc_data_async(this->appl_, gid, item);
+            return alloc_data_async(this->appl_, gid, item, maxitems);
         }
 
         naming::id_type alloc_data(threads::thread_self& self, 
-            naming::id_type const& gid, int item = -1)
+            naming::id_type const& gid, int item = -1, int maxitems = -1)
         {
-            return alloc_data(self, this->appl_, gid, item);
+            return alloc_data(self, this->appl_, gid, item, maxitems);
         }
 
         ///////////////////////////////////////////////////////////////////////

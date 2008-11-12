@@ -33,6 +33,8 @@ namespace hpx { namespace components { namespace server
         typedef std::map<component_type, component_factory_type> component_map_type;
 
     public:
+        typedef runtime_support type_holder;
+
         // parcel action code: the action to be performed on the destination 
         // object 
         enum actions
@@ -52,6 +54,9 @@ namespace hpx { namespace components { namespace server
         static component_type get_component_type() 
         { 
             return component_runtime_support; 
+        }
+        static void set_component_type(component_type) 
+        { 
         }
 
         // constructor

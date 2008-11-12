@@ -10,6 +10,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/naming.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 
 namespace hpx { namespace applier { namespace detail
 {
@@ -71,7 +72,14 @@ namespace hpx { namespace applier { namespace detail
         call (actions::continuation_type& c, threads::threadmanager&, 
             applier& appl, naming::address::address_type addr)
         {
-            return Action::execute_function(appl, addr);
+            try {
+                return c->trigger_all(appl, Action::execute_function(appl, addr));
+            }
+            catch (hpx::exception const& e) {
+                // make sure hpx::exceptions are propagated back to the client
+                c->trigger_error(appl, e);
+                return typename Action::result_type();
+            }
         }
     };
 
@@ -119,7 +127,15 @@ namespace hpx { namespace applier { namespace detail
             applier& appl, naming::address::address_type addr, 
             Arg0 const& arg0)
         {
-            return Action::execute_function(appl, addr, arg0);
+            try {
+                return c->trigger_all(appl, 
+                    Action::execute_function(appl, addr, arg0));
+            }
+            catch (hpx::exception const& e) {
+                // make sure hpx::exceptions are propagated back to the client
+                c->trigger_error(appl, e);
+                return typename Action::result_type();
+            }
         }
     };
 

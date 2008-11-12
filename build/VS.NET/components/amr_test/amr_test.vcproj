@@ -182,6 +182,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\hpx\components\amr_test\logging.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\hpx\components\amr_test\stencil.cpp"
 				>
 			</File>
@@ -192,7 +196,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\..\..\hpx\components\amr_test\logging.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\hpx\components\amr_test\stencil.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\hpx\components\amr_test\stencil_data.hpp"
 				>
 			</File>
 		</Filter>

@@ -4,10 +4,13 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(amr_test_HEADERS
-    stencil.hpp)
+    logging.hpp
+    stencil.hpp
+    stencil_data.hpp)
 
 set(amr_test_SOURCES
     amr_test.cpp
+    logging.cpp
     stencil.cpp)
 
 set(amr_test_INI

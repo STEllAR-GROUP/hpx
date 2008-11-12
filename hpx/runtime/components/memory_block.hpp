@@ -48,6 +48,20 @@ namespace hpx { namespace components
         {
             return this->base_type::get_async(gid_);
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        /// Clone the \a memory_block_data maintained by this memory_block
+        naming::id_type clone(threads::thread_self& self) 
+        {
+            return this->base_type::clone(self, gid_);
+        }
+
+        /// Asynchronously clone the \a memory_block_data maintained by this 
+        /// memory_block
+        lcos::future_value<naming::id_type> clone_async() 
+        {
+            return this->base_type::clone_async(gid_);
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////

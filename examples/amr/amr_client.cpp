@@ -11,7 +11,9 @@
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/components/amr/stencil_value.hpp>
 #include <hpx/components/amr/functional_component.hpp>
+#include <hpx/components/amr/logging_component.hpp>
 #include <hpx/components/amr_test/stencil.hpp>
+#include <hpx/components/amr_test/logging.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
@@ -27,7 +29,8 @@ using namespace std;
 // initialize the stencil value instances
 void init_stencils(applier::applier& appl,
     components::distributing_factory::iterator_range_type const& stencils,
-    components::distributing_factory::iterator_range_type const& functions)
+    components::distributing_factory::iterator_range_type const& functions,
+    naming::id_type const& log)
 {
     components::distributing_factory::iterator_type stencil = stencils.first;
     components::distributing_factory::iterator_type function = functions.first;
@@ -36,7 +39,7 @@ void init_stencils(applier::applier& appl,
     {
         BOOST_ASSERT(function != functions.second);
         components::amr::stubs::stencil_value<3>::set_functional_component(
-            appl, *stencil, *function);
+            appl, *stencil, *function, log);
     }
     BOOST_ASSERT(function == functions.second);
 }
@@ -115,7 +118,7 @@ void connect_input_ports(applier::applier& appl,
 ///////////////////////////////////////////////////////////////////////////////
 void prepare_initial_data(threads::thread_self& self, applier::applier& appl, 
     components::distributing_factory::iterator_range_type const& functions, 
-    std::vector<naming::id_type>& initial_data)
+    std::vector<naming::id_type>& initial_data, int maxindex)
 {
     typedef std::vector<lcos::future_value<naming::id_type> > lazyvals_type;
 
@@ -126,7 +129,7 @@ void prepare_initial_data(threads::thread_self& self, applier::applier& appl,
     for (std::size_t i = 0; function != functions.second; ++function, ++i)
     {
         lazyvals.push_back(components::amr::stubs::functional_component::
-            alloc_data_async(appl, *function, i));
+            alloc_data_async(appl, *function, i, maxindex));
     }
 
     // now wait for the results
@@ -167,6 +170,7 @@ void execute(threads::thread_self& self, applier::applier& appl,
 ///////////////////////////////////////////////////////////////////////////////
 struct timestep_data
 {
+    int max_index_;   // overall number of datapoints
     int index_;       // sequential number of this datapoint
     int timestep_;    // current time step
     double value_;    // current value
@@ -174,11 +178,14 @@ struct timestep_data
 
 ///////////////////////////////////////////////////////////////////////////////
 threads::thread_state 
-hpx_main(threads::thread_self& self, applier::applier& appl, std::size_t numvals)
+hpx_main(threads::thread_self& self, applier::applier& appl, 
+    std::size_t numvals)
 {
     // get component types needed below
     components::component_type function_type = 
         components::get_component_type<components::amr::stencil>();
+    components::component_type logging_type = 
+        components::get_component_type<components::amr::logging>();
     components::component_type stencil_type = 
         components::get_component_type<components::amr::server::stencil_value<3> >();
 
@@ -190,6 +197,11 @@ hpx_main(threads::thread_self& self, applier::applier& appl, std::size_t numvals
             components::distributing_factory::create(self, appl, 
                 appl.get_runtime_support_gid(), true));
 
+        // create a logging instance
+        components::amr::logging_component log(
+            components::amr::logging_component::create(self, appl,
+                appl.get_runtime_support_gid(), logging_type, true));
+
         // create a couple of stencil (functional) components and the same 
         // amount of stencil_value components
         result_type functions = factory.create_components(self, function_type, numvals);
@@ -200,8 +212,10 @@ hpx_main(threads::thread_self& self, applier::applier& appl, std::size_t numvals
         };
 
         // initialize stencil_values using the stencil (functional) components
-        init_stencils(appl, locality_results(stencils[0]), locality_results(functions));
-        init_stencils(appl, locality_results(stencils[1]), locality_results(functions));
+        init_stencils(appl, locality_results(stencils[0]), 
+            locality_results(functions), log.get_gid());
+        init_stencils(appl, locality_results(stencils[1]), 
+            locality_results(functions), log.get_gid());
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(2);
@@ -213,7 +227,8 @@ hpx_main(threads::thread_self& self, applier::applier& appl, std::size_t numvals
 
         // prepare initial data
         std::vector<naming::id_type> initial_data;
-        prepare_initial_data(self, appl, locality_results(functions), initial_data);
+        prepare_initial_data(self, appl, locality_results(functions), 
+            initial_data, numvals);
 
         // do actual work
         std::vector<naming::id_type> result_data;

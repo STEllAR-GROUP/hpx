@@ -72,6 +72,9 @@ namespace hpx { namespace components
     template <typename Component>
     HPX_ALWAYS_EXPORT component_type get_component_type();
 
+    template <typename Component>
+    HPX_ALWAYS_EXPORT void set_component_type(component_type);
+
     ///////////////////////////////////////////////////////////////////////////
     enum factory_property
     {
@@ -93,6 +96,9 @@ namespace hpx { namespace components
         template<> HPX_ALWAYS_EXPORT component_type                           \
         get_component_type<component>()                                       \
             { return component::get_component_type(); }                       \
+        template<> HPX_ALWAYS_EXPORT void                                     \
+        set_component_type<component>(component_type t)                       \
+            { return component::set_component_type(t); }                      \
     }}                                                                        \
     /**/
 

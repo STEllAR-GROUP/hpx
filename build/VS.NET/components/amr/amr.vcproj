@@ -209,6 +209,10 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath="..\..\..\..\hpx\components\amr\server\logging_component.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\..\hpx\components\amr\server\stencil_value.cpp"
 					>
 				</File>
@@ -228,6 +232,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\hpx\components\amr\logging_component.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\hpx\components\amr\stencil_value.hpp"
 				>
 			</File>
@@ -244,6 +252,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\..\hpx\components\amr\server\functional_timestep_impl.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\..\hpx\components\amr\server\logging_component.hpp"
 					>
 				</File>
 				<File
@@ -268,6 +280,10 @@
 				>
 				<File
 					RelativePath="..\..\..\..\hpx\components\amr\stubs\functional_component.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\..\hpx\components\amr\stubs\logging_component.hpp"
 					>
 				</File>
 				<File

@@ -55,6 +55,9 @@ namespace hpx { namespace lcos
         { 
             return components::component_base_lco; 
         }
+        static void set_component_type(components::component_type) 
+        { 
+        }
 
         /// Destructor, needs to be virtual to allow for clean destruction of
         /// derived objects
@@ -141,7 +144,7 @@ namespace hpx { namespace lcos
     /// \tparam Result The type of the result value to be carried back to the 
     ///                LCO instance.
     template <typename Result>
-    class base_lco_with_value : base_lco
+    class base_lco_with_value : public base_lco
     {
     protected:
         /// Destructor, needs to be virtual to allow for clean destruction of
@@ -162,9 +165,7 @@ namespace hpx { namespace lcos
         // components must contain a typedef for wrapping_type defining the
         // managed_component type used to encapsulate instances of this 
         // component
-        typedef 
-            components::managed_component<base_lco_with_value> 
-        wrapping_type;
+        typedef components::managed_component<base_lco_with_value> wrapping_type;
 
         // This is the component id. Every component needs to have a function
         // \a get_component_type() which is used by the generic action 
@@ -216,7 +217,7 @@ namespace hpx { namespace lcos
     ///
     /// \tparam void This specialization expects no result value and is almost
     ///              completely equivalent to the plain \a base_lco.
-    template<>
+    template <>
     class base_lco_with_value<void> : public base_lco
     {
     protected:
@@ -228,9 +229,7 @@ namespace hpx { namespace lcos
         // components must contain a typedef for wrapping_type defining the
         // managed_component type used to encapsulate instances of this 
         // component
-        typedef 
-            components::managed_component<base_lco_with_value> 
-        wrapping_type;
+        typedef components::managed_component<base_lco_with_value> wrapping_type;
     };
 
 }}

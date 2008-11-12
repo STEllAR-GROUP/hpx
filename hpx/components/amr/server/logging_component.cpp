@@ -11,15 +11,13 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
-#include <hpx/components/amr/server/functional_component.hpp>
+#include <hpx/components/amr/server/logging_component.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::amr::server::functional_component functional_component_type;
+typedef hpx::components::amr::server::logging_component logging_component_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
-HPX_REGISTER_ACTION(functional_component_type::alloc_data_action);
-HPX_REGISTER_ACTION(functional_component_type::eval_action);
-HPX_REGISTER_ACTION(functional_component_type::free_data_action);
-HPX_DEFINE_GET_COMPONENT_TYPE(functional_component_type);
+HPX_REGISTER_ACTION(logging_component_type::logentry_action);
+HPX_DEFINE_GET_COMPONENT_TYPE(logging_component_type);
 

@@ -27,6 +27,7 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
 HPX_REGISTER_ACTION(hpx::components::server::detail::memory_block::get_action);
 HPX_REGISTER_ACTION(hpx::components::server::detail::memory_block::checkout_action);
 HPX_REGISTER_ACTION(hpx::components::server::detail::memory_block::checkin_action);
+HPX_REGISTER_ACTION(hpx::components::server::detail::memory_block::clone_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::detail::memory_block_header);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::detail::memory_block);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::memory_block);
@@ -77,6 +78,35 @@ namespace hpx { namespace components { namespace server { namespace detail
     void memory_block::local_checkin (applier::applier& appl, 
         components::memory_block_data const& data) 
     {
+    }
+
+    /// Clone this memory_block
+    naming::id_type create_memory_block (applier::applier& appl, 
+        detail::memory_block_header const* rhs)
+    {
+        server::memory_block* c = server::memory_block::create(rhs);
+        naming::id_type gid = c->get_gid(appl);
+        if (gid) 
+            return gid;
+
+        delete c;
+        HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
+            "global id is already bound to a different "
+            "component instance");
+        return naming::invalid_id;
+    }
+
+    threads::thread_state memory_block::clone (threads::thread_self&, 
+        applier::applier& appl, naming::id_type* result) 
+    {
+        *result = create_memory_block(appl, wrapper_->component_.get());
+        return threads::terminated;
+    }
+
+    naming::id_type 
+    memory_block::local_clone(applier::applier& appl) 
+    {
+        return create_memory_block(appl, wrapper_->component_.get());
     }
 
 }}}}

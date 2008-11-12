@@ -31,7 +31,6 @@ namespace hpx { namespace components { namespace amr
           : base_type(app, gid, freeonexit)
         {}
 
-
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
@@ -50,14 +49,16 @@ namespace hpx { namespace components { namespace amr
         }
 
         ///////////////////////////////////////////////////////////////////////
-        lcos::future_value<naming::id_type> alloc_data_async(int item = -1)
+        lcos::future_value<naming::id_type> alloc_data_async(int item = -1,
+            int maxitems = -1)
         {
-            return this->base_type::alloc_data_async(this->gid_, item);
+            return this->base_type::alloc_data_async(this->gid_, item, maxitems);
         }
 
-        naming::id_type alloc_data(threads::thread_self& self, int item = -1)
+        naming::id_type alloc_data(threads::thread_self& self, int item = -1,
+            int maxitems = -1)
         {
-            return this->base_type::alloc_data(self, this->gid_, item);
+            return this->base_type::alloc_data(self, this->gid_, item, maxitems);
         }
 
         ///////////////////////////////////////////////////////////////////////

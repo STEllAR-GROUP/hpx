@@ -772,6 +772,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\..\hpx\runtime\threads\thread_affinity.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\hpx\runtime\threads\threadmanager.hpp"
 						>
 					</File>

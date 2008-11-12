@@ -86,17 +86,19 @@ namespace hpx { namespace components
         component_type get_component_type(naming::id_type const& prefix, 
             naming::resolver_client& agas_client)
         {
-            if (component_invalid == Component::get_component_type()) {
+            typedef typename Component::type_holder type_holder;
+            if (component_invalid == components::get_component_type<type_holder>()) 
+            {
                 // first call to get_component_type, ask AGAS for a unique id
                 component_type base_type = agas_client.get_component_id(
                     unique_base_component_name);
                 component_type this_type = agas_client.register_factory(
                     prefix, unique_component_name);
 
-                Component::set_component_type(derived_component_type(
-                    this_type, base_type));
+                components::set_component_type<type_holder>(
+                    derived_component_type(this_type, base_type));
             }
-            return Component::get_component_type();
+            return components::get_component_type<type_holder>();
         }
 
         /// \brief Return the name of the component type this factory is 

@@ -29,7 +29,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             if (component_invalid == base_type::get_component_type()) {
                 // first call to get_component_type, ask AGAS for a unique id
                 base_type::set_component_type(appl.get_agas_client().
-                    get_component_id("functional_component_double_type"));
+                    get_component_id("functional_component_type"));
             }
         }
 
@@ -52,7 +52,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
 
         virtual threads::thread_state alloc_data(threads::thread_self&, 
-            applier::applier&, naming::id_type*, int item)
+            applier::applier&, naming::id_type*, int item, int maxitems)
         {
             // This shouldn't ever be called. If you're seeing this assertion 
             // you probably forgot to overload this function in your stencil 
@@ -93,9 +93,10 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
 
         threads::thread_state alloc_data_nonvirt(threads::thread_self& self, 
-            applier::applier& appl, naming::id_type* result, int item)
+            applier::applier& appl, naming::id_type* result, int item,
+            int maxitems)
         {
-            return alloc_data(self, appl, result, item);
+            return alloc_data(self, appl, result, item, maxitems);
         }
 
         threads::thread_state free_data_nonvirt(threads::thread_self& self, 
@@ -108,9 +109,9 @@ namespace hpx { namespace components { namespace amr { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::result_action1<
+        typedef hpx::actions::result_action2<
             functional_component, naming::id_type, functional_component_alloc_data, 
-            int, &functional_component::alloc_data_nonvirt
+            int, int, &functional_component::alloc_data_nonvirt
         > alloc_data_action;
 
         typedef hpx::actions::result_action2<

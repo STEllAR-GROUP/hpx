@@ -82,8 +82,15 @@
             applier& appl, naming::address::address_type addr,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            return Action::execute_function(appl, addr, 
-                BOOST_PP_ENUM_PARAMS(N, arg));
+            try {
+                return c->trigger_all(appl, Action::execute_function(
+                    appl, addr, BOOST_PP_ENUM_PARAMS(N, arg)));
+            }
+            catch (hpx::exception const& e) {
+                // make sure hpx::exceptions are propagated back to the client
+                c->trigger_error(appl, e);
+                return typename Action::result_type();
+            }
         }
     };
 

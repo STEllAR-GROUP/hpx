@@ -9,6 +9,7 @@
 #include <hpx/runtime/components/derived_component_factory.hpp>
 
 #include <hpx/components/amr_test/stencil.hpp>
+#include <hpx/components/amr_test/logging.hpp>
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
@@ -19,6 +20,7 @@ HPX_REGISTER_COMPONENT_MODULE();
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::amr::stencil stencil_type;
+typedef hpx::components::amr::logging logging_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// The following construct registers a minimal factory needed for the creation
@@ -27,14 +29,24 @@ typedef hpx::components::amr::stencil stencil_type;
 /// for this component. For instance the configuration file amr.ini may look 
 /// like:
 /// 
-/// [hpx.components.functional_component_double_type]      # this must match the string below
+/// [hpx.components.stencil]      # this must match the string below
 /// name = amr_test               # this must match the name of the shared library
 /// path = $[hpx.location]/lib    # this is the default location where to find the shared library
 ///
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
     hpx::components::simple_component<stencil_type>, 
-    stencil, "functional_component_double_type");
+    stencil, "functional_component_type");
 
 HPX_DEFINE_GET_COMPONENT_TYPE(stencil_type);
+
+/// [hpx.components.logging]      # this must match the string below
+/// name = amr_test               # this must match the name of the shared library
+/// path = $[hpx.location]/lib    # this is the default location where to find the shared library
+///
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
+    hpx::components::simple_component<logging_type>, 
+    logging, "logging_component_type");
+
+HPX_DEFINE_GET_COMPONENT_TYPE(logging_type);
 
 

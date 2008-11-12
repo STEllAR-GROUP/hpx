@@ -16,6 +16,8 @@ namespace hpx { namespace components { namespace server
     class memory
     {
     public:
+        typedef memory type_holder;
+
         // parcel action code: the action to be performed on the destination 
         // object 
         enum actions
@@ -36,6 +38,9 @@ namespace hpx { namespace components { namespace server
         static component_type get_component_type() 
         { 
             return components::component_memory; 
+        }
+        static void set_component_type(component_type) 
+        { 
         }
 
         // constructor

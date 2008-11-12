@@ -98,6 +98,41 @@ namespace hpx { namespace components { namespace stubs
         {
             return checkout(self, appl_, gid);
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        static lcos::future_value<naming::id_type> clone_async(
+            applier::applier& appl, naming::id_type const& targetgid) 
+        {
+            // Create an eager_future, execute the required action,
+            // we simply return the initialized future_value, the caller needs
+            // to call get() on the return value to obtain the result
+            typedef server::detail::memory_block::clone_action action_type;
+            typedef naming::id_type data_type;
+            return lcos::eager_future<action_type, data_type>(appl, targetgid);
+        }
+
+        static naming::id_type clone(threads::thread_self& self, 
+            applier::applier& appl, naming::id_type const& targetgid) 
+        {
+            // The following get yields control while the action above 
+            // is executed and the result is returned to the eager_future
+            return clone_async(appl, targetgid).get(self);
+        }
+
+        /// Exposed functionality: get returns either the local memory pointers
+        /// or a copy of the remote data.
+        lcos::future_value<naming::id_type> clone_async(
+            naming::id_type const& gid) 
+        {
+            return clone_async(appl_, gid);
+        }
+
+        /// 
+        naming::id_type clone(threads::thread_self& self, 
+            naming::id_type const& gid) 
+        {
+            return clone(self, appl_, gid);
+        }
     };
 
 }}}

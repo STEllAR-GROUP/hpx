@@ -62,7 +62,7 @@ namespace hpx { namespace components { namespace server
         // make sure it's the correct component type
         components::component_type type = 
             components::get_component_type<typename Component::wrapped_type>();
-        if (type != addr.type_)
+        if (!types_are_compatible(type, addr.type_))
         {
             // FIXME: should the component be re-bound ?
             HPX_OSSTREAM strm;

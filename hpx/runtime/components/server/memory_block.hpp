@@ -241,6 +241,7 @@ namespace hpx { namespace components { namespace server { namespace detail
             memory_block_get = 0,
             memory_block_checkout = 1,
             memory_block_checkin = 2,
+            memory_block_clone = 3
         };
 
         memory_block(server::memory_block* wrapper, std::size_t size)
@@ -281,6 +282,13 @@ namespace hpx { namespace components { namespace server { namespace detail
         void local_checkin (applier::applier& appl, 
             components::memory_block_data const& data);
 
+        /// Clone this memory_block
+        threads::thread_state 
+        clone (threads::thread_self&, applier::applier& appl, 
+            naming::id_type* result);
+
+        naming::id_type local_clone (applier::applier& appl);
+
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
@@ -300,6 +308,11 @@ namespace hpx { namespace components { namespace server { namespace detail
             components::memory_block_data const&, 
             &memory_block::checkin, &memory_block::local_checkin
         > checkin_action;
+
+        typedef hpx::actions::direct_result_action0<
+            memory_block, naming::id_type, memory_block_clone, 
+            &memory_block::clone, &memory_block::local_clone
+        > clone_action;
     };
 
 }}}}
@@ -313,12 +326,14 @@ namespace hpx { namespace components { namespace server
     {
     public:
         typedef detail::memory_block_header wrapped_type;
+        typedef memory_block type_holder;
 
         /// \brief Construct an empty managed_component
         memory_block() 
           : component_(0) 
         {}
 
+    private:
         /// \brief Construct a memory_block instance holding a memory_block 
         ///        instance. This constructor takes ownership of the 
         ///        passed pointer.
@@ -329,7 +344,7 @@ namespace hpx { namespace components { namespace server
           : component_(c) 
         {}
 
-        /// \brief Construct a managed_component instance holding a new wrapped
+        /// \brief Construct a memory_block instance holding a new wrapped
         ///        instance
         ///
         /// \param appl [in] The applier to be used for construction of the new
@@ -342,9 +357,19 @@ namespace hpx { namespace components { namespace server
             component_.reset((detail::memory_block_header*)p);
         }
 
-        /// \brief The destructor releases any wrapped instances
-        ~memory_block()
-        {}
+        /// \brief Construct a memory_block instance as a plain copy of the 
+        ///        parameter
+        memory_block(detail::memory_block_header const* rhs) 
+          : component_(0) 
+        {
+            std::size_t size = rhs->get_size();
+            boost::uint8_t* p = new boost::uint8_t[size + sizeof(detail::memory_block_header)];
+            new ((detail::memory_block*)p) detail::memory_block(this, size);
+
+            using namespace std;    // some systems have memcpy in std
+            memcpy(p, rhs, size + sizeof(detail::memory_block_header));
+            component_.reset((detail::memory_block_header*)p);
+        }
 
         /// \brief finalize() will be called just before the instance gets 
         ///        destructed
@@ -353,6 +378,11 @@ namespace hpx { namespace components { namespace server
         /// \param appl [in] The applier to be used for finalization of the 
         ///             component instance. 
         void finalize(threads::thread_self& self, applier::applier& appl) {}
+
+    public:
+        /// \brief The destructor releases any wrapped instances
+        ~memory_block()
+        {}
 
         /// \brief Return a pointer to the wrapped memory_block instance
         detail::memory_block* get()
@@ -455,6 +485,14 @@ namespace hpx { namespace components { namespace server
             // allocate the memory
             memory_block* p = get_heap().alloc();
             return new (p) memory_block(self, appl, count);
+        }
+
+        static memory_block* 
+        create(detail::memory_block_header const* rhs)
+        {
+            // allocate the memory
+            memory_block* p = get_heap().alloc();
+            return new (p) memory_block(rhs);
         }
 
         /// \brief  The function \a destroy is used for deletion and 

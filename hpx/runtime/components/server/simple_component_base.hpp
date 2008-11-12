@@ -14,14 +14,19 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     /// \class simple_component_base simple_component_base.hpp hpx/runtime/components/server/simple_component_base.hpp
     ///
-    template <typename Component>
+    template <typename Component = detail::this_type>
     class simple_component_base : public detail::simple_component_tag
     {
     private:
+        typedef typename boost::mpl::if_<
+                boost::is_same<Component, detail::this_type>, 
+                simple_component_base, Component
+            >::type this_component_type;
+
         static component_type value;
 
     public:
-        typedef Component wrapped_type;
+        typedef this_component_type wrapped_type;
 
         /// \brief Construct an empty simple_component
         simple_component_base(threads::thread_self& self, applier::applier& appl) 
@@ -69,8 +74,9 @@ namespace hpx { namespace components
         {
             if (!gid_) 
             {
-                naming::address addr(appl.here(), Component::get_component_type(), 
-                    boost::uint64_t(static_cast<Component const*>(this)));
+                naming::address addr(appl.here(), 
+                    this_component_type::get_component_type(), 
+                    boost::uint64_t(static_cast<this_component_type const*>(this)));
                 gid_ = appl_.get_parcel_handler().get_next_id();
                 if (!appl_.get_agas_client().bind(gid_, addr))
                 {
@@ -115,6 +121,8 @@ namespace hpx { namespace components
     class simple_component : public Component
     {
     public:
+        typedef Component type_holder;
+
         simple_component(applier::applier& appl)
           : Component(appl)
         {}
