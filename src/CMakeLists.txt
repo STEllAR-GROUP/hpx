@@ -103,6 +103,7 @@ set (hpxlib_HEADERS
     ${hpx_SOURCE_DIR}/hpx/runtime/parcelset/server/parcelport_server_connection.hpp
     # threadmanager
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread_affinity.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/threadmanager.hpp
     # util
     ${hpx_SOURCE_DIR}/hpx/util/asio_util.hpp

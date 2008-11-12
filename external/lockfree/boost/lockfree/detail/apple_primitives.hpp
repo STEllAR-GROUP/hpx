@@ -42,6 +42,9 @@ namespace boost { namespace lockfree
     template <class C, class D, class E>
     inline bool CAS2(volatile C * addr, D old1, E old2, D new1, E new2)
     {
+    // FIXME: for 32 bit processes on Intel hardware we can add a specialization 
+    // using OSAtomicCompareAndSwap64
+
 # if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
 # warning ("CAS2: blocking CAS2 emulation")
 # endif

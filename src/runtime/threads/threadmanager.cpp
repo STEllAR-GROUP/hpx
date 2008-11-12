@@ -6,6 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_affinity.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/logging.hpp>
 
@@ -196,7 +197,7 @@ namespace hpx { namespace threads
         return unknown;
     }
 
-    /// The set_state function is part of the thread related API and allows
+    /// The get_state function is part of the thread related API and allows
     /// to query the state of one of the threads known to the threadmanager
     thread_state threadmanager::get_state(thread_id_type id) const
     {
@@ -359,57 +360,6 @@ namespace hpx { namespace threads
             }
         }
     }
-
-#if defined(_WIN32) || defined(_WIN64)
-    bool set_affinity(boost::thread& thrd, std::size_t num_thread)
-    {
-        unsigned int num_of_cores = boost::thread::hardware_concurrency();
-        if (0 == num_of_cores)
-            num_of_cores = 1;     // assume one core
-        unsigned int affinity = num_thread % num_of_cores;
-
-        DWORD_PTR process_affinity = 0, system_affinity = 0;
-        if (GetProcessAffinityMask(GetCurrentProcess(), &process_affinity, 
-              &system_affinity))
-        {
-            DWORD_PTR mask = 0x1 << affinity;
-            while (!(mask & process_affinity)) {
-                mask <<= 1;
-                if (0 == mask)
-                    mask = 0x01;
-            }
-            return SetThreadAffinityMask(thrd.native_handle(), mask) != 0;
-        }
-        return false;
-    }
-    inline bool set_affinity(std::size_t affinity)
-    {
-        return true;
-    }
-#else
-    #include <sched.h>    // declares the scheduling interface
-
-    inline bool set_affinity(boost::thread& thrd, std::size_t affinity)
-    {
-        return true;
-    }
-    bool set_affinity(std::size_t num_thread)
-    {
-        std::size_t num_of_cores = boost::thread::hardware_concurrency();
-        if (0 == num_of_cores)
-            num_of_cores = 1;     // assume one core
-        std::size_t affinity = num_thread % num_of_cores;
-
-        cpu_set_t cpu;
-        CPU_ZERO(&cpu);
-        CPU_SET(affinity, &cpu);
-        if (sched_setaffinity (0, sizeof(cpu), &cpu) == 0) {
-            sleep(0);   // allow the OS to pick up the change
-            return true;
-        }
-        return false;
-    }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     // main function executed by all OS threads managed by this threadmanager
