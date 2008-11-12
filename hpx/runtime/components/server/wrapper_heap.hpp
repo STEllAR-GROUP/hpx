@@ -86,7 +86,7 @@ namespace hpx { namespace components { namespace detail
             }
         }
 
-        int size() const { return size_ - free_size_; }
+        int size() const { return int(size_ - free_size_); }
         int free_size() const { return free_size_; }
         bool is_empty() const { return NULL == pool_; }
 
@@ -276,7 +276,7 @@ namespace hpx { namespace components { namespace detail
         explicit fixed_wrapper_heap(char const* class_name = "<Unknown>", 
                 bool f1 = false, bool f2 = false, 
                 std::size_t step = (std::size_t)-1)
-          : base_type(class_name, f1, f2, step) 
+          : base_type(class_name, f1, f2, 0, step) 
         {}
     };
 

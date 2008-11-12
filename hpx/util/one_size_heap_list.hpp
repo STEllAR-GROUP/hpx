@@ -80,7 +80,7 @@ namespace hpx { namespace util
 
             typename Mutex::scoped_lock guard (mtx_);
 
-            alloc_count_ += count;
+            alloc_count_ += (int)count;
             if (alloc_count_-free_count_ > max_alloc_count_)
                 max_alloc_count_ = alloc_count_-free_count_;
 
@@ -135,7 +135,7 @@ namespace hpx { namespace util
         {
             typename Mutex::scoped_lock guard (mtx_);
 
-            free_count_ += count;
+            free_count_ += (int)count;
 
             // find heap which allocated this pointer
             iterator it = heap_list_.begin();

@@ -18,7 +18,7 @@ namespace hpx { namespace threads
         unsigned int num_of_cores = boost::thread::hardware_concurrency();
         if (0 == num_of_cores)
             num_of_cores = 1;     // assume one core
-        unsigned int affinity = num_thread % num_of_cores;
+        std::size_t affinity = num_thread % num_of_cores;
 
         DWORD_PTR process_affinity = 0, system_affinity = 0;
         if (GetProcessAffinityMask(GetCurrentProcess(), &process_affinity, 
