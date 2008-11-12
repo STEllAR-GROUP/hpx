@@ -41,6 +41,9 @@ namespace hpx { namespace threads
 
 #elif defined(__APPLE__)
 
+    // the thread affinity code is taken from the example:
+    // http://www.opensource.apple.com/darwinsource/projects/other/xnu-1228.3.13/tools/tests/affinity/pool.c
+
     #include <AvailabilityMacros.h>
     #include <mach/mach.h>
     #include <mach/mach_error.h>
@@ -56,10 +59,20 @@ namespace hpx { namespace threads
     inline bool set_affinity(std::size_t num_thread)
     {
 #ifdef AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
-        thread_affinity_policy_data_t policy;
+        thread_extended_policy_data_t epolicy;
+        epolicy.timeshare = FALSE;
 
-        policy.affinity_tag = num_thread;
         kern_return_t ret = thread_policy_set(mach_thread_self(), 
+            THREAD_EXTENDED_POLICY, (thread_policy_t) &epolicy,
+            THREAD_EXTENDED_POLICY_COUNT);
+
+        if (ret != KERN_SUCCESS)
+            return false;
+
+        thread_affinity_policy_data_t policy;
+        policy.affinity_tag = num_thread + 1;   // 1...N
+
+        ret = thread_policy_set(mach_thread_self(), 
             THREAD_AFFINITY_POLICY, (thread_policy_t) &policy, 
             THREAD_AFFINITY_POLICY_COUNT);
 
