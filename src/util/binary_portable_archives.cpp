@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/version.hpp>
+#include <hpx/config.hpp>
 
 #if BOOST_VERSION < 103700 && HPX_USE_PORTABLE_ARCHIVES != 0
 

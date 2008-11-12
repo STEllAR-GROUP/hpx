@@ -49,9 +49,9 @@
 #define BOOST_COROUTINE_SWAPCONTEXT(name)                                     \
     asm volatile (                                                            \
         ".text \n\t"                                                          \
-        ".global " #name "\n\t"                                               \
-        ".type " #name ", @function\n\t"                                      \
         ".align 16\n"                                                         \
+        ".globl " #name "\n\t"                                                \
+        ".type " #name ", @function\n\t"                                      \
     #name ":\n\t"                                                             \
         "movq  64(%rsi), %rcx\n\t"                                            \
         "pushq %rbp\n\t"                                                      \

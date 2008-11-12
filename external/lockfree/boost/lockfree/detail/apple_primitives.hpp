@@ -35,7 +35,11 @@ namespace boost { namespace lockfree
     template <class C, class D>
     inline bool CAS(volatile C * addr, D old, D nw)
     {
-        return OSAtomicCompareAndSwap32((int32_t) old, (int32_t)nw, (int32_t*)addr);
+#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "CAS: using OSAtomicCompareAndSwap32"
+#endif
+        return OSAtomicCompareAndSwap32((int32_t)old, (int32_t)nw, 
+            (volatile int32_t*)addr);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -43,7 +47,37 @@ namespace boost { namespace lockfree
     inline bool CAS2(volatile C * addr, D old1, E old2, D new1, E new2)
     {
     // FIXME: for 32 bit processes on Intel hardware we can add a specialization 
-    // using OSAtomicCompareAndSwap64
+    // using OSAtomicCompareAndSwap64 (what PP constants do we need to use?):
+
+// # if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+// # warning ("CAS2: using OSAtomicCompareAndSwap64")
+// # endif
+//         struct packed_c
+//         {
+//             boost::int32_t d;
+//             boost::int32_t e;
+//         };
+// 
+//         typedef int DItype __attribute__ ((mode (DI)));
+// 
+//         BOOST_STATIC_ASSERT(sizeof(packed_c) == sizeof(TItype));
+// 
+//         union cu
+//         {
+//             packed_c c;
+//             DItype l;
+//         };
+// 
+//         cu old;
+//         old.c.d = (boost::int32_t)old1;
+//         old.c.e = (boost::int32_t)old2;
+// 
+//         cu nw;
+//         nw.c.d = (boost::int32_t)new1;
+//         nw.c.e = (boost::int32_t)new2;
+// 
+//         return OSAtomicCompareAndSwap64(old.l, nw.l,
+//             reinterpret_cast<volatile DItype*>(addr));
 
 # if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
 # warning ("CAS2: blocking CAS2 emulation")

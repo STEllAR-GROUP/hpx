@@ -71,7 +71,7 @@
 #else                 // unix like
 #  define HPX_INI_PATH_DELIMITER            ":"
 #  define HPX_PATH_DELIMITERS               "/"
-#  ifdef _APPLE       // apple
+#  ifdef __APPLE__    // apple
 #    define HPX_SHARED_LIB_EXTENSION        ".dylib"
 #  else               // linux & co
 #    define HPX_SHARED_LIB_EXTENSION        ".so"

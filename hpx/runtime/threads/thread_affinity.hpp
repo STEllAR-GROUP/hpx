@@ -55,7 +55,6 @@ namespace hpx { namespace threads
     {
         return true;
     }
-
     inline bool set_affinity(std::size_t num_thread)
     {
 #ifdef AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER

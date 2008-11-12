@@ -55,37 +55,37 @@
    The first time EAX is the first parameter of the trampoline.
    Otherwise it is simply discarded.
    NOTE: This function should work on any IA32 CPU.
-   NOTE: The biggest penality is the last jump that
-   will be always mispredicted (~50 cycles on P4).
+   NOTE: The biggest penalty is the last jump that
+   will be always mis-predicted (~50 cycles on P4).
    We try to make its address available as soon as possible
-   to try to reduce the penality. Doing a ret instead of a 
+   to try to reduce the penalty. Doing a ret instead of a 
    'add $4, %esp'
    'jmp *%ecx'
    really kills performance.
    NOTE: popl is slightly better than mov+add to pop registers
    so is pushl rather than mov+sub.
    */
-#define BOOST_COROUTINE_swapcontext(name) \
-asm volatile (                            \
-".text \n\t"                              \
-".global " #name "\n\t"                   \
-".type " #name "@function\n\t"            \
-".align 16\n\t"                           \
-#name":\n\t"                              \
-"movl  16(%edx), %ecx\n\t"                \
-"pushl %ebp\n\t"                          \
-"pushl %ebx\n\t"                          \
-"pushl %esi\n\t"                          \
-"pushl %edi\n\t"                          \
-"movl  %esp, (%eax)\n\t"                  \
-"movl  %edx, %esp\n\t"                    \
-"popl  %edi\n\t"                          \
-"popl  %esi\n\t"                          \
-"popl  %ebx\n\t"                          \
-"popl  %ebp\n\t"                          \
-"add   $4, %esp\n\t"                      \
-"jmp   *%ecx\n\t"                         \
-"ud2\n\t")                                \
+#define BOOST_COROUTINE_swapcontext(name)                                     \
+    asm volatile (                                                            \
+        ".text \n\t"                                                          \
+        ".align 16\n\t"                                                       \
+        ".globl " #name "\n\t"                                                \
+    #name":\n\t"                                                              \
+        "movl  16(%edx), %ecx\n\t"                                            \
+        "pushl %ebp\n\t"                                                      \
+        "pushl %ebx\n\t"                                                      \
+        "pushl %esi\n\t"                                                      \
+        "pushl %edi\n\t"                                                      \
+        "movl  %esp, (%eax)\n\t"                                              \
+        "movl  %edx, %esp\n\t"                                                \
+        "popl  %edi\n\t"                                                      \
+        "popl  %esi\n\t"                                                      \
+        "popl  %ebx\n\t"                                                      \
+        "popl  %ebp\n\t"                                                      \
+        "add   $4, %esp\n\t"                                                  \
+        "jmp   *%ecx\n\t"                                                     \
+        "ud2\n\t"                                                             \
+    )                                                                         \
 /**/
 
 BOOST_COROUTINE_swapcontext(swapcontext_stack);
