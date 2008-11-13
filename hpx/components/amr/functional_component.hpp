@@ -72,6 +72,18 @@ namespace hpx { namespace components { namespace amr
         {
             this->base_type::free_data_sync(self, this->gid_, val);
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        void init_logging(naming::id_type const& val)
+        {
+            this->base_type::init_logging(this->gid_, val);
+        }
+
+        void init_logging_sync(threads::thread_self& self, 
+            naming::id_type const& val)
+        {
+            this->base_type::init_logging_sync(self, this->gid_, val);
+        }
     };
 
 }}}

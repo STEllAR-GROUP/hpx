@@ -113,12 +113,15 @@ namespace hpx { namespace util
             // create new heap
             iterator itnew = heap_list_.insert(heap_list_.begin(),
                 typename list_type::value_type(
-                    new heap_type(class_name_.c_str(), false, true, count)));
+                    new heap_type(class_name_.c_str(), false, true, 
+                            heap_count_+1, heap_step
+                        )
+                ));
 
             if (itnew == heap_list_.end())
                 throw std::bad_alloc();   // insert failed
 
-            (*itnew)->heap_count_ = ++heap_count_;
+            ++heap_count_;
             LOSH_(info) 
                 << "one_size_heap_list (" 
                 << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")

@@ -139,6 +139,12 @@ namespace hpx { namespace components
             return reinterpret_cast<target_type const*>(mb_.get_ptr());
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        target_type const& get() const
+        {
+            return *reinterpret_cast<target_type const*>(mb_.get_ptr());
+        }
+
     private:
         memory_block_data mb_;
     };

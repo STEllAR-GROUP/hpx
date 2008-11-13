@@ -8,7 +8,6 @@
 
 #include <hpx/components/amr/server/stencil_value.hpp>
 #include <hpx/components/amr/functional_component.hpp>
-#include <hpx/components/amr/logging_component.hpp>
 
 #include <boost/bind.hpp>
 #include <boost/assert.hpp>
@@ -87,22 +86,11 @@ namespace hpx { namespace components { namespace amr { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline void send_value (threads::thread_self& self, applier::applier& appl, 
-        naming::id_type const& logging, naming::id_type const& memblock)
-    {
-        // synchronously clone the result
-        naming::id_type clone = components::stubs::memory_block::clone(self, 
-            appl, memblock);
-        amr::stubs::logging_component::logentry(appl, logging, clone);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     template <int N>
     stencil_value<N>::stencil_value(threads::thread_self& self, applier::applier& appl)
       : driver_thread_(0), sem_in_(N), sem_out_(0), sem_result_(0), 
         value_gid_(naming::invalid_id), backup_value_gid_(naming::invalid_id),
-        functional_gid_(naming::invalid_id), logging_gid_(naming::invalid_id),
-        is_called_(false)
+        functional_gid_(naming::invalid_id), is_called_(false)
     {
         // create adaptors
         for (std::size_t i = 0; i < N; ++i)
@@ -216,18 +204,13 @@ namespace hpx { namespace components { namespace amr { namespace server
                 value_gid_ = alloc_helper(self, appl, functional_gid_);
             std::swap(value_gid_, backup_value_gid_);
 
-            // if a logging element is defined, take a snapshot of the result 
-            // and forward it there
-            if (logging_gid_ != naming::invalid_id) 
-                send_value(self, appl, logging_gid_, value_gid_);
-
             // signal all output threads it's safe to read value
             sem_out_.signal(self, N);
         }
 
         sem_result_.signal(self, 1);        // final result has been set
 
-        free_helper(appl, functional_gid_, backup_value_gid_);
+        free_helper_sync(self, appl, functional_gid_, backup_value_gid_);
         return threads::terminated;
     }
 
@@ -286,12 +269,10 @@ namespace hpx { namespace components { namespace amr { namespace server
     template <int N>
     threads::thread_state 
     stencil_value<N>::set_functional_component(threads::thread_self& self, 
-        applier::applier& appl, naming::id_type const& gid, 
-        naming::id_type const& logging)
+        applier::applier& appl, naming::id_type const& gid)
     {
         // store gid of functional component
         functional_gid_ = gid;
-        logging_gid_ = logging;
 
         // if all inputs have been bound already we need to start the driver 
         // thread

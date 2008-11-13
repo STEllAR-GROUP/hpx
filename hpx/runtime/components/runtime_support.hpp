@@ -74,6 +74,12 @@ namespace hpx { namespace components
             this->base_type::free_component(type, gid);
         }
 
+        void free_component_sync(threads::thread_self& self, 
+            components::component_type type, naming::id_type const& gid)
+        {
+            this->base_type::free_component_sync(self, type, gid);
+        }
+
         /// \brief Shutdown the given runtime system
         void shutdown()
         {

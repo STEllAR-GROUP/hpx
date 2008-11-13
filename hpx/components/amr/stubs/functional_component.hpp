@@ -128,6 +128,33 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         {
             free_data_sync(self, this->appl_, gid, val);
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        static void init_logging(applier::applier& appl, 
+            naming::id_type const& gid, naming::id_type const& val)
+        {
+            typedef amr::server::functional_component::init_logging_action action_type;
+            appl.apply<action_type>(gid, val);
+        }
+
+        void init_logging(naming::id_type const& gid, naming::id_type const& val)
+        {
+            init_logging(this->appl_, gid, val);
+        }
+
+        static void init_logging_sync(threads::thread_self& self, 
+            applier::applier& appl, naming::id_type const& gid, 
+            naming::id_type const& val)
+        {
+            typedef amr::server::functional_component::init_logging_action action_type;
+            lcos::eager_future<action_type, void>(appl, gid, val).get(self);
+        }
+
+        void init_logging_sync(threads::thread_self& self, 
+            naming::id_type const& gid, naming::id_type const& val)
+        {
+            init_logging_sync(self, this->appl_, gid, val);
+        }
     };
 
 }}}}

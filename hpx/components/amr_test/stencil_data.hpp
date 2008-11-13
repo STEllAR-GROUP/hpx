@@ -6,16 +6,28 @@
 #if !defined(HPX_COMPONENTS_AMR_STENCIL_DATA_NOV_10_2008_0719PM)
 #define HPX_COMPONENTS_AMR_STENCIL_DATA_NOV_10_2008_0719PM
 
+#include <boost/serialization/serialization.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
 {
     ///////////////////////////////////////////////////////////////////////////
     struct timestep_data
     {
-        int max_index_;   // overall number of datapoints
-        int index_;       // sequential number of this datapoint (0 <= index_ < max_values_)
+        int max_index_;   // overall number of data points
+        int index_;       // sequential number of this data point (0 <= index_ < max_values_)
         int timestep_;    // current time step
         double value_;    // current value
+
+    private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
+            ar & max_index_ & index_ & timestep_ & value_; 
+        }
     };
 
 }}}

@@ -103,7 +103,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// functionality
         threads::thread_state 
         set_functional_component(threads::thread_self&, applier::applier&, 
-            naming::id_type const& gid, naming::id_type const& logging);
+            naming::id_type const& gid);
 
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
@@ -124,10 +124,9 @@ namespace hpx { namespace components { namespace amr { namespace server
             &stencil_value::connect_input_ports
         > connect_input_ports_action;
 
-        typedef hpx::actions::action2<
+        typedef hpx::actions::action1<
             stencil_value, stencil_value_set_functional_component, 
-            naming::id_type const&, naming::id_type const&, 
-            &stencil_value::set_functional_component
+            naming::id_type const&, &stencil_value::set_functional_component
         > set_functional_component_action;
 
     private:
@@ -143,8 +142,6 @@ namespace hpx { namespace components { namespace amr { namespace server
         naming::id_type value_gid_;                   // reference to current value
         naming::id_type backup_value_gid_;            // reference to previous value
         naming::id_type functional_gid_;              // reference to functional code
-
-        naming::id_type logging_gid_;                 // send value snapshots here
 
         bool is_called_;      // this instance is used as target for call_action
     };

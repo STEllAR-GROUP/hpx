@@ -148,6 +148,34 @@ namespace hpx { namespace components { namespace stubs
             free_component(appl_, type, gid);
         }
 
+        static void free_component_sync(threads::thread_self& self,
+            applier::applier& appl, components::component_type type, 
+            naming::id_type const& gid) 
+        {
+            typedef server::runtime_support::free_component_action action_type;
+
+            // Determine whether the gid of the component to delete is local or remote
+            naming::address addr;
+            if (appl.address_is_local(gid, addr)) {
+                // apply locally
+                applier::detail::apply_helper2<
+                    action_type, components::component_type, naming::id_type
+                >::call(appl.get_thread_manager(), appl, 
+                    appl.get_runtime_support_gid().get_lsb(), type, gid);
+            }
+            else {
+                // apply remotely
+                lcos::eager_future<action_type, void>(appl, 
+                    naming::invalid_id, type, gid).get(self);
+            }
+        }
+
+        void free_component_sync(threads::thread_self& self,
+            components::component_type type, naming::id_type const& gid)
+        {
+            free_component_sync(self, appl_, type, gid);
+        }
+
         /// \brief Shutdown the given runtime system
         static void 
         shutdown(applier::applier& appl, naming::id_type const& targetgid)

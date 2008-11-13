@@ -274,9 +274,9 @@ namespace hpx { namespace components { namespace detail
 
     public:
         explicit fixed_wrapper_heap(char const* class_name = "<Unknown>", 
-                bool f1 = false, bool f2 = false, 
+                bool f1 = false, bool f2 = false, int count = 0, 
                 std::size_t step = (std::size_t)-1)
-          : base_type(class_name, f1, f2, 0, step) 
+          : base_type(class_name, f1, f2, count, step) 
         {}
     };
 

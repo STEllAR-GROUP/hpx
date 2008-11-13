@@ -86,7 +86,7 @@ namespace hpx { namespace components { namespace server
         /// \brief Action to delete existing components
         threads::thread_state free_components(
             threads::thread_self& self, applier::applier& app,
-            result_type const& gids); 
+            result_type const& gids, bool sync); 
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action
@@ -98,9 +98,9 @@ namespace hpx { namespace components { namespace server
             &distributing_factory::create_components
         > create_components_action;
 
-        typedef hpx::actions::action1<
+        typedef hpx::actions::action2<
             distributing_factory, factory_free_components, 
-            result_type const&, &distributing_factory::free_components
+            result_type const&, bool, &distributing_factory::free_components
         > free_components_action;
     };
 

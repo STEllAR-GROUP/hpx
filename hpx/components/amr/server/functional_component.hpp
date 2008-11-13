@@ -71,6 +71,16 @@ namespace hpx { namespace components { namespace amr { namespace server
             return threads::terminated;
         }
 
+        virtual threads::thread_state init_logging(threads::thread_self&, 
+            applier::applier&, naming::id_type const&)
+        {
+            // This shouldn't ever be called. If you're seeing this assertion 
+            // you probably forgot to overload this function in your stencil 
+            // class.
+            BOOST_ASSERT(false);
+            return threads::terminated;
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // parcel action code: the action to be performed on the destination 
         // object (the accumulator)
@@ -78,7 +88,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         {
             functional_component_alloc_data = 0,
             functional_component_eval = 1,
-            functional_component_free_data = 2
+            functional_component_free_data = 2,
+            functional_component_init_logging = 3
         };
 
         /// This is the main entry point of this component. Calling this 
@@ -105,6 +116,12 @@ namespace hpx { namespace components { namespace amr { namespace server
             return free_data(self, appl, gid);
         }
 
+        threads::thread_state init_logging_nonvirt(threads::thread_self& self, 
+            applier::applier& appl, naming::id_type const& gid)
+        {
+            return init_logging(self, appl, gid);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
@@ -124,6 +141,11 @@ namespace hpx { namespace components { namespace amr { namespace server
             functional_component, functional_component_free_data, 
             naming::id_type const&, &functional_component::free_data_nonvirt
         > free_data_action;
+
+        typedef hpx::actions::action1<
+            functional_component, functional_component_init_logging, 
+            naming::id_type const&, &functional_component::init_logging_nonvirt
+        > init_logging_action;
     };
 
 }}}}

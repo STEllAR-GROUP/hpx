@@ -12,13 +12,12 @@
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/server/generic_component.hpp>
 
-// This is the function to wrap into the component. It's purpose is to print
+// This is the function to wrap into the component. Its purpose is to print
 // the floating point number it receives as its argument
 HPX_COMPONENT_EXPORT void 
 print_number (hpx::threads::thread_self&, hpx::applier::applier&, double arg);
 
-// This has to be placed into a source file (needs to be compiled 
-// once). We use generic_component1 here because the function 
+// We use generic_component1 here because the function 
 // print_number() takes one additional argument. The number of additional
 // arguments N needs to be reflected in the name of the generic_componentN.
 typedef 

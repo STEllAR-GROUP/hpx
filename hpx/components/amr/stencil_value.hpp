@@ -78,11 +78,9 @@ namespace hpx { namespace components { namespace amr
         ///////////////////////////////////////////////////////////////////////
         /// Set the gid of the component implementing the actual time evolution
         /// functionality
-        void set_functional_component(naming::id_type const& functiongid,
-            naming::id_type const& logging = naming::invalid_id)
+        void set_functional_component(naming::id_type const& functiongid)
         {
-            this->base_type::set_functional_component(this->gid_, 
-                functiongid, logging);
+            this->base_type::set_functional_component(this->gid_, functiongid);
         }
     };
 

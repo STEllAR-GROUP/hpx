@@ -431,7 +431,7 @@ namespace hpx { namespace components { namespace server
         static heap_type& get_heap()
         {
             // ensure thread-safe initialization
-            static util::static_<heap_type, wrapper_heap_tag> heap(get_component_type());
+            util::static_<heap_type, wrapper_heap_tag> heap(get_component_type());
             return heap.get();
         }
 

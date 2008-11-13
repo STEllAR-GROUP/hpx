@@ -7,28 +7,20 @@
 #include <hpx/hpx.hpp>
 #include <hpx/components/amr_test/logging.hpp>
 
-#include "stencil_data.hpp"
-
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr 
+namespace hpx { namespace components { namespace amr { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
     // Compute the result value for the current time step
     threads::thread_state logging::logentry(threads::thread_self& self, 
-        applier::applier& appl, naming::id_type const& memblock_gid)
+        applier::applier& appl, timestep_data const& val)
     {
-        // start asynchronous get operations
-        components::memory_block mb(appl, memblock_gid, true);
-
-        // get the input memory_block_data instance
-        access_memory_block<timestep_data> val (mb.get(self));
-
-        std::cout << val->max_index_ << ", " << val->index_ << ", " 
-                  << val->timestep_ << ", "<< val->value_ << std::endl;
+        std::cout << val.max_index_ << ", " << val.index_ << ", " 
+                  << val.timestep_ << ", "<< val.value_ << std::endl;
 
         return threads::terminated;
     }
 
-}}}
+}}}}
 

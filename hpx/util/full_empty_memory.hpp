@@ -30,7 +30,7 @@ namespace hpx { namespace util
             static store_type& get_store()
             {
                 // ensure thread-safe initialization
-                static util::static_<store_type, full_empty_tag> store;
+                util::static_<store_type, full_empty_tag> store;
                 return store.get();
             }
         };

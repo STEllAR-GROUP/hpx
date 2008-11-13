@@ -5,13 +5,18 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/future_wait.hpp>
-#include <hpx/components/amr_test/stencil.hpp>
 
-#include "stencil_data.hpp"
+#include <hpx/components/amr_test/stencil.hpp>
+#include <hpx/components/amr_test/logging.hpp>
+#include <hpx/components/amr_test/stencil_data.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
 {
+    stencil::stencil(threads::thread_self& self, applier::applier& appl)
+      : base_type(self, appl)
+    {}
+
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
     // Compute the result value for the current time step
@@ -22,7 +27,7 @@ namespace hpx { namespace components { namespace amr
         BOOST_ASSERT(gids.size() == 3);
 
         // start asynchronous get operations
-        stubs::memory_block stub(appl);
+        components::stubs::memory_block stub(appl);
 
         // get all input memory_block_data instances
         access_memory_block<timestep_data> val1, val2, val3, resultval;
@@ -42,6 +47,9 @@ namespace hpx { namespace components { namespace amr
             // this is the actual calculation
             resultval->timestep_ = val2->timestep_ + 1;
             resultval->value_ = 0.25 * val1->value_ + 0.75 * val3->value_;
+
+            if (log_)     // send result to logging instance
+                stubs::logging::logentry(appl, log_, resultval.get());
         }
         else {
             // the last time step has been reached, just copy over the data
@@ -82,6 +90,14 @@ namespace hpx { namespace components { namespace amr
         applier::applier& appl, naming::id_type const& gid)
     {
         components::stubs::memory_block::free(appl, gid);
+        return threads::terminated;
+    }
+
+    /// The free function releases the memory allocated by init
+    threads::thread_state stencil::init_logging(threads::thread_self&, 
+        applier::applier&, naming::id_type const& logging)
+    {
+        log_ = logging;
         return threads::terminated;
     }
 

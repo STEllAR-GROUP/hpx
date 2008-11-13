@@ -58,6 +58,12 @@ namespace hpx { namespace components
         {
             this->base_type::free_components(gid_, gids);
         }
+
+        void free_components_sync(threads::thread_self& self, 
+            result_type const& gids)
+        {
+            this->base_type::free_components_sync(self, gid_, gids);
+        }
     };
 
 }}

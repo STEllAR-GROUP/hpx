@@ -21,5 +21,6 @@ typedef hpx::components::amr::server::functional_component functional_component_
 HPX_REGISTER_ACTION(functional_component_type::alloc_data_action);
 HPX_REGISTER_ACTION(functional_component_type::eval_action);
 HPX_REGISTER_ACTION(functional_component_type::free_data_action);
+HPX_REGISTER_ACTION(functional_component_type::init_logging_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(functional_component_type);
 

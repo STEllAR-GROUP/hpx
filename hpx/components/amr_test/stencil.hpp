@@ -28,9 +28,7 @@ namespace hpx { namespace components { namespace amr
         typedef stencil wrapped_type;
         typedef stencil wrapping_type;
 
-        stencil(threads::thread_self& self, applier::applier& appl)
-          : base_type(self, appl)
-        {}
+        stencil(threads::thread_self& self, applier::applier& appl);
 
         /// This is the function implementing the actual time step functionality
         /// It takes the values as calculated during the previous time step 
@@ -56,6 +54,13 @@ namespace hpx { namespace components { namespace amr
         /// The free function releases the memory allocated by init
         threads::thread_state free_data(threads::thread_self&, applier::applier&, 
             naming::id_type const&);
+
+        /// The free function releases the memory allocated by init
+        threads::thread_state init_logging(threads::thread_self&, 
+            applier::applier&, naming::id_type const&);
+
+    private:
+        naming::id_type log_;
     };
 
 }}}

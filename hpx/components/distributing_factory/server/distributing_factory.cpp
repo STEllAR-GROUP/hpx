@@ -46,7 +46,7 @@ namespace hpx { namespace components { namespace server
         if (prefixes.empty())
         {
             HPX_THROW_EXCEPTION(bad_component_type, 
-                "attempt to create component instance of invalid type: " +
+                "attempt to create component instance of unknown type: " +
                 components::get_component_type_name(type));
         }
 
@@ -113,7 +113,7 @@ namespace hpx { namespace components { namespace server
     // Action to delete existing components
     threads::thread_state distributing_factory::free_components(
         threads::thread_self& self, applier::applier& appl,
-        result_type const& gids)
+        result_type const& gids, bool sync)
     {
         components::stubs::runtime_support rts(appl);
 
@@ -125,7 +125,10 @@ namespace hpx { namespace components { namespace server
                 // We need to free every components separately because it may
                 // have been moved to a different locality than it was 
                 // initially created on.
-                rts.free_component((*it).type_, (*it).first_gid_ + i);
+                if (sync)
+                    rts.free_component_sync(self, (*it).type_, (*it).first_gid_ + i);
+                else
+                    rts.free_component((*it).type_, (*it).first_gid_ + i);
             }
         }
 

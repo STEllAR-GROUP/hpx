@@ -88,7 +88,7 @@ namespace hpx { namespace components { namespace stubs
             typedef 
                 server::distributing_factory::free_components_action 
             action_type;
-            appl.apply<action_type>(factory, gids);
+            appl.apply<action_type>(factory, gids, false);
         }
 
         ///
@@ -96,6 +96,23 @@ namespace hpx { namespace components { namespace stubs
             result_type const& gids) 
         {
             free_components(appl_, factory, gids);
+        }
+
+        static void free_components_sync(threads::thread_self& self, 
+            applier::applier& appl, naming::id_type const& factory, 
+            result_type const& gids) 
+        {
+            typedef 
+                server::distributing_factory::free_components_action 
+            action_type;
+            lcos::eager_future<action_type, void>(appl, factory, gids, true).get(self);
+        }
+
+        ///
+        void free_components_sync(threads::thread_self& self, 
+            naming::id_type const& factory, result_type const& gids) 
+        {
+            free_components_sync(self, appl_, factory, gids);
         }
     };
 

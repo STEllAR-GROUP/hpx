@@ -11,7 +11,6 @@
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/components/amr/stencil_value.hpp>
 #include <hpx/components/amr/functional_component.hpp>
-#include <hpx/components/amr/logging_component.hpp>
 #include <hpx/components/amr_test/stencil.hpp>
 #include <hpx/components/amr_test/logging.hpp>
 
@@ -25,12 +24,27 @@ using namespace hpx;
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
+// Initialize functional components by setting the logging component to use
+void init_logging(applier::applier& appl,
+    components::distributing_factory::iterator_range_type const& functions,
+    components::distributing_factory::iterator_range_type const& logging)
+{
+    components::distributing_factory::iterator_type function = functions.first;
+    naming::id_type log = *logging.first;
+
+    for (/**/; function != functions.second; ++function)
+    {
+        components::amr::stubs::functional_component::
+            init_logging(appl, *function, log);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Create functional components, one for each data point, use those to 
 // initialize the stencil value instances
 void init_stencils(applier::applier& appl,
     components::distributing_factory::iterator_range_type const& stencils,
-    components::distributing_factory::iterator_range_type const& functions,
-    naming::id_type const& log)
+    components::distributing_factory::iterator_range_type const& functions)
 {
     components::distributing_factory::iterator_type stencil = stencils.first;
     components::distributing_factory::iterator_type function = functions.first;
@@ -39,7 +53,7 @@ void init_stencils(applier::applier& appl,
     {
         BOOST_ASSERT(function != functions.second);
         components::amr::stubs::stencil_value<3>::set_functional_component(
-            appl, *stencil, *function, log);
+            appl, *stencil, *function);
     }
     BOOST_ASSERT(function == functions.second);
 }
@@ -185,7 +199,7 @@ hpx_main(threads::thread_self& self, applier::applier& appl,
     components::component_type function_type = 
         components::get_component_type<components::amr::stencil>();
     components::component_type logging_type = 
-        components::get_component_type<components::amr::logging>();
+        components::get_component_type<components::amr::server::logging>();
     components::component_type stencil_type = 
         components::get_component_type<components::amr::server::stencil_value<3> >();
 
@@ -197,11 +211,6 @@ hpx_main(threads::thread_self& self, applier::applier& appl,
             components::distributing_factory::create(self, appl, 
                 appl.get_runtime_support_gid(), true));
 
-        // create a logging instance
-        components::amr::logging_component log(
-            components::amr::logging_component::create(self, appl,
-                appl.get_runtime_support_gid(), logging_type, true));
-
         // create a couple of stencil (functional) components and the same 
         // amount of stencil_value components
         result_type functions = factory.create_components(self, function_type, numvals);
@@ -210,12 +219,16 @@ hpx_main(threads::thread_self& self, applier::applier& appl,
             factory.create_components(self, stencil_type, numvals),
             factory.create_components(self, stencil_type, numvals)
         };
+        result_type logging = factory.create_components(self, logging_type);
+
+        // initialize logging functionality in functions
+        init_logging(appl, locality_results(functions), locality_results(logging));
 
         // initialize stencil_values using the stencil (functional) components
         init_stencils(appl, locality_results(stencils[0]), 
-            locality_results(functions), log.get_gid());
+            locality_results(functions));
         init_stencils(appl, locality_results(stencils[1]), 
-            locality_results(functions), log.get_gid());
+            locality_results(functions));
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(2);
@@ -248,15 +261,16 @@ hpx_main(threads::thread_self& self, applier::applier& appl,
                   << val2->value_ << ", " 
                   << val3->value_ << std::endl;
 
-        // free all allocated components
+        // free all allocated components (we can do that synchronously)
         for (std::size_t i = 0; i < functions.size(); ++i) 
         {
             components::amr::stubs::functional_component::
-                free_data(appl, functions[i].first_gid_, result_data[i]);
+                free_data_sync(self, appl, functions[i].first_gid_, result_data[i]);
         }
-        factory.free_components(stencils[1]);
-        factory.free_components(stencils[0]);
-        factory.free_components(functions);
+        factory.free_components_sync(self, logging);
+        factory.free_components_sync(self, stencils[1]);
+        factory.free_components_sync(self, stencils[0]);
+        factory.free_components_sync(self, functions);
 
     }   // distributing_factory needs to go out of scope before shutdown
 

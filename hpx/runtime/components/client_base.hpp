@@ -28,7 +28,7 @@ namespace hpx { namespace components
 
         ~client_base() 
         {
-            if (freeonexit_)
+            if (freeonexit_ && gid_)
                 this->stub_type::free(gid_);
         }
 
@@ -54,14 +54,18 @@ namespace hpx { namespace components
 
         void free(component_type type)
         {
-            stub_type::free(type, gid_);
-            gid_ = naming::invalid_id;
+            if (gid_) {
+                this->stub_type::free(type, gid_);
+                gid_ = naming::invalid_id;
+            }
         }
 
         void free()
         {
-            stub_type::free(gid_);
-            gid_ = naming::invalid_id;
+            if (gid_) {
+                this->stub_type::free(gid_);
+                gid_ = naming::invalid_id;
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////
