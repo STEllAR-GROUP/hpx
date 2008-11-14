@@ -14,10 +14,10 @@ namespace hpx { namespace components { namespace amr
     ///////////////////////////////////////////////////////////////////////////
     struct timestep_data
     {
-        int max_index_;   // overall number of data points
-        int index_;       // sequential number of this data point (0 <= index_ < max_values_)
-        int timestep_;    // current time step
-        double value_;    // current value
+        std::size_t max_index_;   // overall number of data points
+        std::size_t index_;       // sequential number of this data point (0 <= index_ < max_values_)
+        std::size_t timestep_;    // current time step
+        double value_;            // current value
 
     private:
         // serialization support

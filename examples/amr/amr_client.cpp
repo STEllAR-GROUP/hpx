@@ -25,9 +25,10 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Initialize functional components by setting the logging component to use
-void init_logging(applier::applier& appl,
+void init(applier::applier& appl,
     components::distributing_factory::iterator_range_type const& functions,
-    components::distributing_factory::iterator_range_type const& logging)
+    components::distributing_factory::iterator_range_type const& logging,
+    std::size_t numsteps)
 {
     components::distributing_factory::iterator_type function = functions.first;
     naming::id_type log = *logging.first;
@@ -35,7 +36,7 @@ void init_logging(applier::applier& appl,
     for (/**/; function != functions.second; ++function)
     {
         components::amr::stubs::functional_component::
-            init_logging(appl, *function, log);
+            init(appl, *function, numsteps, log);
     }
 }
 
@@ -193,7 +194,7 @@ struct timestep_data
 ///////////////////////////////////////////////////////////////////////////////
 threads::thread_state 
 hpx_main(threads::thread_self& self, applier::applier& appl, 
-    std::size_t numvals)
+    std::size_t numvals, std::size_t numsteps)
 {
     // get component types needed below
     components::component_type function_type = 
@@ -222,7 +223,7 @@ hpx_main(threads::thread_self& self, applier::applier& appl,
         result_type logging = factory.create_components(self, logging_type);
 
         // initialize logging functionality in functions
-        init_logging(appl, locality_results(functions), locality_results(logging));
+        init(appl, locality_results(functions), locality_results(logging), numsteps);
 
         // initialize stencil_values using the stencil (functional) components
         init_stencils(appl, locality_results(stencils[0]), 
@@ -299,6 +300,8 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "HPX locality")
             ("numvals,n", po::value<std::size_t>(), 
                 "the number of data points to use for the computation")
+            ("numsteps,s", po::value<std::size_t>(), 
+                "the number of time steps to use for the computation")
         ;
 
         po::store(po::command_line_parser(argc, argv)
@@ -387,9 +390,13 @@ int main(int argc, char* argv[])
         if (vm.count("numvals"))
             numvals = vm["numvals"].as<std::size_t>();
 
+        std::size_t numsteps = 3;
+        if (vm.count("numsteps"))
+            numsteps = vm["numsteps"].as<std::size_t>();
+
         // initialize and start the HPX runtime
         hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port);
-        rt.run(boost::bind (hpx_main, _1, _2, numvals), num_threads);
+        rt.run(boost::bind (hpx_main, _1, _2, numvals, numsteps), num_threads);
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";

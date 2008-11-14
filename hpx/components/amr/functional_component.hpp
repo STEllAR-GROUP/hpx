@@ -74,15 +74,15 @@ namespace hpx { namespace components { namespace amr
         }
 
         ///////////////////////////////////////////////////////////////////////
-        void init_logging(naming::id_type const& val)
+        void init(std::size_t numsteps, naming::id_type const& val)
         {
-            this->base_type::init_logging(this->gid_, val);
+            this->base_type::init(this->gid_, numsteps, val);
         }
 
-        void init_logging_sync(threads::thread_self& self, 
+        void init_sync(threads::thread_self& self, std::size_t numsteps, 
             naming::id_type const& val)
         {
-            this->base_type::init_logging_sync(self, this->gid_, val);
+            this->base_type::init_sync(self, this->gid_, numsteps, val);
         }
     };
 

@@ -14,7 +14,7 @@
 namespace hpx { namespace components { namespace amr 
 {
     stencil::stencil(threads::thread_self& self, applier::applier& appl)
-      : base_type(self, appl)
+      : base_type(self, appl), numsteps_(0)
     {}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -43,7 +43,7 @@ namespace hpx { namespace components { namespace amr
         // the middle point is our direct predecessor
         resultval->max_index_ = val2->max_index_;
         resultval->index_ = val2->index_;
-        if (val2->timestep_ < 2) {
+        if (val2->timestep_ < numsteps_) {
             // this is the actual calculation
             resultval->timestep_ = val2->timestep_ + 1;
             resultval->value_ = 0.25 * val1->value_ + 0.75 * val3->value_;
@@ -58,7 +58,7 @@ namespace hpx { namespace components { namespace amr
         }
 
         // set return value to true if this is the last time step
-        *is_last = resultval->timestep_ >= 2;
+        *is_last = resultval->timestep_ >= numsteps_;
 
         return threads::terminated;
     }
@@ -94,9 +94,10 @@ namespace hpx { namespace components { namespace amr
     }
 
     /// The free function releases the memory allocated by init
-    threads::thread_state stencil::init_logging(threads::thread_self&, 
-        applier::applier&, naming::id_type const& logging)
+    threads::thread_state stencil::init(threads::thread_self&, 
+        applier::applier&, std::size_t numsteps, naming::id_type const& logging)
     {
+        numsteps_ = numsteps;
         log_ = logging;
         return threads::terminated;
     }

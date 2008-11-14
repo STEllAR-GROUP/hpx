@@ -55,11 +55,12 @@ namespace hpx { namespace components { namespace amr
         threads::thread_state free_data(threads::thread_self&, applier::applier&, 
             naming::id_type const&);
 
-        /// The free function releases the memory allocated by init
-        threads::thread_state init_logging(threads::thread_self&, 
-            applier::applier&, naming::id_type const&);
+        /// The init function initializes this stencil point
+        threads::thread_state init(threads::thread_self&, 
+            applier::applier&, std::size_t, naming::id_type const&);
 
     private:
+        std::size_t numsteps_;
         naming::id_type log_;
     };
 
