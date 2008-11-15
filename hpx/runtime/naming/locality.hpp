@@ -8,9 +8,11 @@
 #define HPX_NAMING_LOCALITY_MAR_24_2008_0942AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/exception.hpp>
 
 #include <boost/config.hpp>
-#include <boost/asio.hpp>
+#include <boost/asio/ip/tcp.hpp>
 #include <boost/thread.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
@@ -18,9 +20,6 @@
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/version.hpp>
-
-#include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

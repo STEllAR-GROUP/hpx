@@ -40,13 +40,13 @@ namespace hpx { namespace components
         ///         be created in blocks (i.e. more than one instance at once). 
         ///         This function is used by the \a distributing_factory to 
         ///         determine a correct allocation strategy
-        factory_property get_factory_properties(threads::thread_self& self,
+        int get_factory_properties(threads::thread_self& self,
             components::component_type type) 
         {
             return this->base_type::get_factory_properties(self, gid_, type);
         }
 
-        lcos::future_value<factory_property> 
+        lcos::future_value<int> 
         get_factory_properties_async(components::component_type type) 
         {
             return this->base_type::get_factory_properties_async(gid_, type);

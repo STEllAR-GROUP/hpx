@@ -10,13 +10,14 @@
 #include <queue>
 #include <memory>
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/util/unlock_lock.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
+
 #include <boost/thread.hpp>
 #include <boost/thread/shared_mutex.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/intrusive/slist.hpp>
-
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/util/unlock_lock.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace detail

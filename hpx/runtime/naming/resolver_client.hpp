@@ -6,8 +6,7 @@
 #if !defined(HPX_NAMING_CLIENT_RESOLVER_MAR_24_2008_0952AM)
 #define HPX_NAMING_CLIENT_RESOLVER_MAR_24_2008_0952AM
 
-#include <boost/asio.hpp>
-
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -15,6 +14,12 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
+
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/buffer.hpp>
+#include <boost/asio/read.hpp>
+#include <boost/asio/write.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

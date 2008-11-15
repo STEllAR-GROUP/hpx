@@ -6,12 +6,14 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_affinity.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/logging.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/asio/deadline_timer.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads

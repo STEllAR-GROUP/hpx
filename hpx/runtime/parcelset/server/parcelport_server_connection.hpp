@@ -12,7 +12,13 @@
 #include <sstream>
 #include <vector>
 
-#include <boost/asio.hpp>
+#include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
+
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/buffer.hpp>
+#include <boost/asio/read.hpp>
+#include <boost/asio/write.hpp>
+#include <boost/asio/ip/tcp.hpp>
 #include <boost/bind.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -20,8 +26,6 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/integer/endian.hpp>
-
-#include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace server 

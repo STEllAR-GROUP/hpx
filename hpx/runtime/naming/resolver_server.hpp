@@ -9,14 +9,18 @@
 #include <string>
 #include <vector>
 
-#include <boost/asio.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
-
 #include <hpx/config.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/runtime/naming/server/connection.hpp>
 #include <hpx/runtime/naming/server/request_handler.hpp>
+
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/buffer.hpp>
+#include <boost/asio/read.hpp>
+#include <boost/asio/write.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

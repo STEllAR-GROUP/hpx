@@ -1,8 +1,5 @@
 //  Copyright (c) 2007-2008 Hartmut Kaiser
 //
-//  Parts of this code were taken from the Boost.Asio library
-//  Copyright (c) 2003-2007 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-// 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,21 +9,21 @@
 #include <sstream>
 #include <vector>
 
-#include <boost/asio.hpp>
+#include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
+#include <hpx/util/connection_cache.hpp>
+
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/buffer.hpp>
+#include <boost/asio/read.hpp>
+#include <boost/asio/write.hpp>
+#include <boost/asio/placeholders.hpp>
+#include <boost/asio/ip/tcp.hpp>
 #include <boost/bind.hpp>
-#include <boost/iostreams/stream.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/integer/endian.hpp>
-
-#include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
-#include <hpx/util/connection_cache.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/container_device.hpp>
-#include <hpx/util/util.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset 
@@ -36,9 +33,6 @@ namespace hpx { namespace parcelset
       : public boost::enable_shared_from_this<parcelport_connection>,
         private boost::noncopyable
     {
-    private:
-        typedef util::container_device<std::vector<char> > io_device_type;
-
     public:
         /// Construct a sending parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
@@ -48,30 +42,7 @@ namespace hpx { namespace parcelset
         {
         }
 
-        void set_parcel (parcel const& p)
-        {
-            // guard against serialization errors
-            try {
-                // create a special io stream on top of out_buffer_
-                out_buffer_.clear();
-                boost::iostreams::stream<io_device_type> io(out_buffer_);
-
-                // Serialize the data
-#if HPX_USE_PORTABLE_ARCHIVES != 0
-                util::portable_binary_oarchive archive(io);
-#else
-                boost::archive::binary_oarchive archive(io);
-#endif
-                archive << p;
-            }
-            catch (std::exception const& e) {
-                HPX_OSSTREAM strm;
-                strm << "parcelport: parcel serialization failed: " << e.what();
-                HPX_THROW_EXCEPTION(no_success, HPX_OSSTREAM_GETSTRING(strm));
-                return;
-            }
-            out_size_ = out_buffer_.size();
-        }
+        void set_parcel (parcel const& p);
 
         /// Get the socket associated with the parcelport_connection.
         boost::asio::ip::tcp::socket& socket() { return socket_; }

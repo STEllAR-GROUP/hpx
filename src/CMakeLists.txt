@@ -102,6 +102,7 @@ set (hpxlib_HEADERS
     # threadmanager
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread_affinity.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread_helper.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/threadmanager.hpp
     # util
     ${hpx_SOURCE_DIR}/hpx/util/asio_util.hpp
@@ -160,6 +161,7 @@ set (hpxlib_SOURCES
     ${hpx_SOURCE_DIR}/src/runtime/parcelset/parcel.cpp
     ${hpx_SOURCE_DIR}/src/runtime/parcelset/parcelhandler.cpp
     ${hpx_SOURCE_DIR}/src/runtime/parcelset/parcelport.cpp
+    ${hpx_SOURCE_DIR}/src/runtime/parcelset/parcelport_connection.cpp
     ${hpx_SOURCE_DIR}/src/runtime/parcelset/server/parcelhandler_queue.cpp
     # threadmanager
     ${hpx_SOURCE_DIR}/src/runtime/threads/thread.cpp

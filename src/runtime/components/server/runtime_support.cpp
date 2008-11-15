@@ -45,7 +45,7 @@ namespace hpx { namespace components { namespace server
     // created at the same time
     threads::thread_state runtime_support::factory_properties(
         threads::thread_self& self, applier::applier& app,
-        factory_property* factoryprops, components::component_type type)
+        int* factoryprops, components::component_type type)
     {
     // locate the factory for the requested component type
         component_map_type::const_iterator it = components_.find(type);

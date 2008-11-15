@@ -7,15 +7,18 @@
 #include <string>
 
 #include <hpx/hpx_fwd.hpp>
-
-#include <boost/version.hpp>
-#include <boost/asio.hpp>
-#include <boost/bind.hpp>
-
 #include <hpx/exception_list.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/util/io_service_pool.hpp>
+
+#include <boost/version.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/buffer.hpp>
+#include <boost/asio/read.hpp>
+#include <boost/asio/write.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/bind.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset

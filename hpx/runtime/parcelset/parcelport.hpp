@@ -7,10 +7,6 @@
 #if !defined(HPX_PARCELSET_PARCELPORT_MAR_26_2008_1214PM)
 #define HPX_PARCELSET_PARCELPORT_MAR_26_2008_1214PM
 
-#include <boost/cstdint.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/asio.hpp>
-
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/locality.hpp>
@@ -22,6 +18,14 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/util.hpp>
 #include <hpx/util/logging.hpp>
+
+#include <boost/cstdint.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/buffer.hpp>
+#include <boost/asio/read.hpp>
+#include <boost/asio/write.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

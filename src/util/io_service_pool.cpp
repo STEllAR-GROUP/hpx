@@ -11,7 +11,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
-#include <boost/asio.hpp>
+#include <boost/asio/io_service.hpp>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>

@@ -6,7 +6,7 @@
 #if !defined(HPX_UTIL_ASIOUTIL_MAY_16_2008_1212PM)
 #define HPX_UTIL_ASIOUTIL_MAY_16_2008_1212PM
 
-#include <boost/asio.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 namespace hpx { namespace util
 {

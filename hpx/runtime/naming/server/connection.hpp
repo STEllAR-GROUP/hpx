@@ -9,13 +9,18 @@
 #if !defined(HPX_NAMING_SERVER_CONNECTION_MAR_24_2008_1006AM)
 #define HPX_NAMING_SERVER_CONNECTION_MAR_24_2008_1006AM
 
+#include <hpx/hpx_fwd.hpp>
+
 #include <boost/bind.hpp>
-#include <boost/asio.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/buffer.hpp>
+#include <boost/asio/read.hpp>
+#include <boost/asio/write.hpp>
+#include <boost/asio/ip/tcp.hpp>
 #include <boost/array.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/iostreams/stream.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/integer/endian.hpp>
 

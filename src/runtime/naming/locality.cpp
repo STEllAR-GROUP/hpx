@@ -12,6 +12,9 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/ip/host_name.hpp>
+
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 

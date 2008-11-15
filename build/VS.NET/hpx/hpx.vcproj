@@ -432,6 +432,10 @@
 						RelativePath="..\..\..\src\runtime\parcelset\parcelport.cpp"
 						>
 					</File>
+					<File
+						RelativePath="..\..\..\src\runtime\parcelset\parcelport_connection.cpp"
+						>
+					</File>
 					<Filter
 						Name="Server"
 						>
@@ -788,6 +792,10 @@
 					</File>
 					<File
 						RelativePath="..\..\..\hpx\runtime\threads\thread_affinity.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\threads\thread_helpers.hpp"
 						>
 					</File>
 					<File

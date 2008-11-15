@@ -19,6 +19,8 @@
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
@@ -253,6 +255,8 @@ namespace hpx { namespace actions
     }
 
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Helper macro for action serialization, each of the defined actions needs to 

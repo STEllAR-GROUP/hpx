@@ -37,7 +37,7 @@ namespace hpx { namespace components { namespace stubs
         ///         be created in blocks (i.e. more than one instance at once). 
         ///         This function is used by the \a distributing_factory to 
         ///         determine a correct allocation strategy
-        static lcos::future_value<factory_property> get_factory_properties_async(
+        static lcos::future_value<int> get_factory_properties_async(
             applier::applier& appl, naming::id_type const& targetgid, 
             components::component_type type) 
         {
@@ -47,11 +47,10 @@ namespace hpx { namespace components { namespace stubs
             typedef 
                 server::runtime_support::factory_properties_action 
             action_type;
-            return lcos::eager_future<action_type, factory_property>(
-                appl, targetgid, type);
+            return lcos::eager_future<action_type>(appl, targetgid, type);
         }
 
-        static factory_property get_factory_properties(
+        static int get_factory_properties(
             threads::thread_self& self, applier::applier& appl, 
             naming::id_type const& targetgid, components::component_type type) 
         {
@@ -61,13 +60,13 @@ namespace hpx { namespace components { namespace stubs
                 .get(self);
         }
 
-        lcos::future_value<factory_property> get_factory_properties_async(
+        lcos::future_value<int> get_factory_properties_async(
             naming::id_type const& targetgid, components::component_type type) 
         {
             return get_factory_properties_async(appl_, targetgid, type);
         }
 
-        factory_property get_factory_properties(threads::thread_self& self,
+        int get_factory_properties(threads::thread_self& self,
             naming::id_type const& targetgid, components::component_type type) 
         {
             return get_factory_properties(self, appl_, targetgid, type);
@@ -85,8 +84,7 @@ namespace hpx { namespace components { namespace stubs
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::runtime_support::create_component_action action_type;
-            return lcos::eager_future<action_type, naming::id_type>(appl, 
-                targetgid, type, count);
+            return lcos::eager_future<action_type>(appl, targetgid, type, count);
         }
 
         /// Create a new component \a type using the runtime_support with the 

@@ -102,7 +102,7 @@ namespace hpx { namespace components { namespace server
         ///        instance at once
         threads::thread_state factory_properties(
             threads::thread_self& self, applier::applier& app,
-            factory_property*, components::component_type type); 
+            int*, components::component_type type); 
 
         /// \brief Action to create new components
         threads::thread_state create_component(
@@ -128,7 +128,7 @@ namespace hpx { namespace components { namespace server
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::result_action1<
-            runtime_support, factory_property, 
+            runtime_support, int, 
             runtime_support_factory_properties, components::component_type, 
             &runtime_support::factory_properties
         > factory_properties_action;

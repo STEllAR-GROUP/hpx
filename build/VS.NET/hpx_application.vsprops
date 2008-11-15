@@ -8,6 +8,7 @@
 	<Tool
 		Name="VCCLCompilerTool"
 		AdditionalIncludeDirectories=""
+		PreprocessorDefinitions="HPX_APPLICATION_EXPORTS=1"
 		DisableSpecificWarnings="4267;4503"
 	/>
 	<Tool

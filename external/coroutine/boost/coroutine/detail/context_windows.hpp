@@ -33,6 +33,7 @@
 #include <boost/config.hpp>
 #include <boost/config.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/throw_exception.hpp>
 #include <boost/coroutine/exception.hpp>
 #include <boost/coroutine/detail/swap_context.hpp>
 
@@ -138,10 +139,11 @@ namespace boost {namespace coroutines {
       }
 
       ~fibers_context_impl_base() {}
+
     protected:
-      explicit
-      fibers_context_impl_base(fiber_ptr ctx) :
-        m_ctx(ctx) {}
+      explicit fibers_context_impl_base(fiber_ptr ctx) 
+        : m_ctx(ctx) 
+      {}
 
       fiber_ptr m_ctx;
     };
@@ -155,13 +157,17 @@ namespace boost {namespace coroutines {
       (*fun)();
     }
 
-    class fibers_context_impl :
-      public fibers_context_impl_base,
-      private boost::noncopyable {
+    // initial stack size (grows as needed)
+    static const std::size_t stack_size = sizeof(void*) >=8 ? 2048 : 1024;
+
+    class fibers_context_impl 
+      : public fibers_context_impl_base,
+        private boost::noncopyable 
+    {
     public:
       typedef fibers_context_impl_base context_impl_base;
 
-      enum {default_stack_size = 8192};
+      enum { default_stack_size = stack_size };
 
       /**
        * Create a context that on restore invokes Functor on
@@ -169,17 +175,22 @@ namespace boost {namespace coroutines {
        */
       template<typename Functor>
       explicit
-      fibers_context_impl(Functor& cb, std::ptrdiff_t stack_size) :
-        fibers_context_impl_base
-      (CreateFiber(stack_size== -1? default_stack_size : stack_size,
-                   static_cast<LPFIBER_START_ROUTINE>(&trampoline<Functor>),
-                   static_cast<LPVOID>(&cb)))
+      fibers_context_impl(Functor& cb, std::ptrdiff_t stack_size) 
+        : fibers_context_impl_base(
+              CreateFiberEx(stack_size == -1 ? default_stack_size : stack_size,
+                  stack_size == -1 ? default_stack_size : stack_size, 0,
+                  static_cast<LPFIBER_START_ROUTINE>(&trampoline<Functor>),
+                  static_cast<LPVOID>(&cb))
+          )
       {
-        BOOST_ASSERT(m_ctx);
+        if (0 == m_ctx)
+          boost::throw_exception(std::bad_alloc());
       }
 
-      ~fibers_context_impl() {
-        DeleteFiber(m_ctx);
+      ~fibers_context_impl() 
+      {
+        if (m_ctx)
+          DeleteFiber(m_ctx);
       }
 
     private:

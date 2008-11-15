@@ -816,23 +816,6 @@ namespace hpx { namespace actions
 ///////////////////////////////////////////////////////////////////////////////
 }}
 
-///////////////////////////////////////////////////////////////////////////////
-// Helper macro for action serialization, each of the defined actions needs to 
-// be registered with the serialization library
-#define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
-        namespace hpx { namespace actions { namespace detail {                \
-            template<> HPX_ALWAYS_EXPORT                                      \
-            char const* const get_action_name<action>()                       \
-            { return BOOST_PP_STRINGIZE(action); }                            \
-        }}}                                                                   \
-    /**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_ACTION(action)                                           \
-        BOOST_CLASS_EXPORT(action)                                            \
-        HPX_DEFINE_GET_ACTION_NAME(action)                                    \
-    /**/
-
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
