@@ -14,7 +14,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime/actions/action.hpp>
+#include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 

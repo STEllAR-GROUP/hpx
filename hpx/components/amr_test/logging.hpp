@@ -47,6 +47,9 @@ namespace hpx { namespace components { namespace amr { namespace server
         typedef hpx::actions::action1<
             logging, logging_logentry, timestep_data const&, &logging::logentry
         > logentry_action;
+
+    private:
+        boost::mutex mtx_;
     };
 
 }}}}

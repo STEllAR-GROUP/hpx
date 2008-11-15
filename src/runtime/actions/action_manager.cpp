@@ -8,7 +8,7 @@
 #include <hpx/runtime/actions/action_manager.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/actions/action.hpp>
+#include <hpx/runtime/actions/component_action.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions

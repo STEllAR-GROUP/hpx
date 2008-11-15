@@ -7,7 +7,6 @@
 #define HPX_COMPONENTS_AMR_STENCIL_VALUE_NOV_02_2008_0506PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/components/amr/stubs/stencil_value.hpp>
 

@@ -282,7 +282,8 @@ namespace hpx { namespace components { namespace server
             boost::plugin::dll d (lib.string(), component);
 
             // get the factory
-            boost::plugin::plugin_factory<component_factory_base> pf (d, "factory");
+            boost::plugin::plugin_factory<component_factory_base> pf (d, 
+                BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(factory)));
 
             // initialize the factory instance using the preferences from the 
             // ini files

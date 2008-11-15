@@ -11,7 +11,7 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/util/full_empty_memory.hpp>
-#include <hpx/runtime/actions/action.hpp>
+#include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/lcos/future_value.hpp>

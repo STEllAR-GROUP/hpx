@@ -12,7 +12,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
-#include <hpx/runtime/actions/action.hpp>
+#include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/static.hpp>
 #include <hpx/util/util.hpp>
 

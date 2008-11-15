@@ -46,8 +46,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
             typedef typename amr::server::stencil_value<N>::call_action action_type;
-            return lcos::eager_future<action_type, naming::id_type>(appl, 
-                targetgid, initial);
+            return lcos::eager_future<action_type>(appl, targetgid, initial);
         }
 
         static naming::id_type call(threads::thread_self& self, 

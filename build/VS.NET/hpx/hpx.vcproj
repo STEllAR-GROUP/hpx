@@ -194,7 +194,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions=" WIN32;NDEBUG;_WINDOWS;_USRDLL;HPX_EXPORTS;BOOST_ALL_DYN_LINK"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;HPX_EXPORTS;BOOST_ALL_DYN_LINK;HPX_COMPONENT_NAME=$(ProjectName)"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -460,29 +460,33 @@
 						RelativePath="..\..\..\src\runtime\applier\applier.cpp"
 						>
 					</File>
-				</Filter>
-				<Filter
-					Name="Components"
-					>
-					<File
-						RelativePath="..\..\..\src\runtime\components\component_type.cpp"
-						>
-					</File>
 					<Filter
-						Name="Server"
+						Name="Components"
 						>
 						<File
-							RelativePath="..\..\..\src\runtime\components\server\memory.cpp"
+							RelativePath="..\..\..\src\runtime\components\component_type.cpp"
 							>
 						</File>
-						<File
-							RelativePath="..\..\..\src\runtime\components\server\memory_block.cpp"
+						<Filter
+							Name="Server"
 							>
-						</File>
-						<File
-							RelativePath="..\..\..\src\runtime\components\server\runtime_support.cpp"
-							>
-						</File>
+							<File
+								RelativePath="..\..\..\src\runtime\components\server\memory.cpp"
+								>
+							</File>
+							<File
+								RelativePath="..\..\..\src\runtime\components\server\memory_block.cpp"
+								>
+							</File>
+							<File
+								RelativePath="..\..\..\src\runtime\components\server\plain_function.cpp"
+								>
+							</File>
+							<File
+								RelativePath="..\..\..\src\runtime\components\server\runtime_support.cpp"
+								>
+							</File>
+						</Filter>
 					</Filter>
 				</Filter>
 			</Filter>
@@ -635,19 +639,23 @@
 					Name="Actions"
 					>
 					<File
-						RelativePath="..\..\..\hpx\runtime\actions\action.hpp"
-						>
-					</File>
-					<File
 						RelativePath="..\..\..\hpx\runtime\actions\action_constructors.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\hpx\runtime\actions\action_implementations.hpp"
+						RelativePath="..\..\..\hpx\runtime\actions\action_manager.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\hpx\runtime\actions\action_manager.hpp"
+						RelativePath="..\..\..\hpx\runtime\actions\action_support.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\actions\component_action.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\actions\component_action_implementations.hpp"
 						>
 					</File>
 					<File
@@ -656,6 +664,14 @@
 					</File>
 					<File
 						RelativePath="..\..\..\hpx\runtime\actions\continuation_impl.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\actions\plain_action.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\actions\plain_action_implementations.hpp"
 						>
 					</File>
 				</Filter>
@@ -803,14 +819,6 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\hpx\runtime\components\generic_component.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\hpx\runtime\components\generic_component_eval.hpp"
-						>
-					</File>
-					<File
 						RelativePath="..\..\..\hpx\runtime\components\memory_block.hpp"
 						>
 					</File>
@@ -821,14 +829,6 @@
 					<Filter
 						Name="Server"
 						>
-						<File
-							RelativePath="..\..\..\hpx\runtime\components\server\generic_component.hpp"
-							>
-						</File>
-						<File
-							RelativePath="..\..\..\hpx\runtime\components\server\generic_component_implementation.hpp"
-							>
-						</File>
 						<File
 							RelativePath="..\..\..\hpx\runtime\components\server\manage_component.hpp"
 							>
@@ -843,6 +843,10 @@
 						</File>
 						<File
 							RelativePath="..\..\..\hpx\runtime\components\server\memory_block.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\components\server\plain_function.hpp"
 							>
 						</File>
 						<File
@@ -865,14 +869,6 @@
 					<Filter
 						Name="Stubs"
 						>
-						<File
-							RelativePath="..\..\..\hpx\runtime\components\stubs\generic_component.hpp"
-							>
-						</File>
-						<File
-							RelativePath="..\..\..\hpx\runtime\components\stubs\generic_component_eval.hpp"
-							>
-						</File>
 						<File
 							RelativePath="..\..\..\hpx\runtime\components\stubs\memory_block.hpp"
 							>

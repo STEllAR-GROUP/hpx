@@ -14,7 +14,7 @@
 #include <hpx/include/parcelset.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/applier/apply_helper.hpp>
-#include <hpx/runtime/actions/action.hpp>
+#include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>

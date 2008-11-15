@@ -22,8 +22,7 @@ namespace hpx { namespace applier
         typedef 
             components::server::runtime_support::create_component_action
         action_type;
-        return lcos::eager_future<action_type, naming::id_type>(appl, 
-            targetgid, type, count);
+        return lcos::eager_future<action_type>(appl, targetgid, type, count);
     }
 
     // 

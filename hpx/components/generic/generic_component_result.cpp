@@ -7,19 +7,21 @@
 // related facilities.
 
 #include <hpx/hpx.hpp>
-#include <hpx/components/generic/generic_component_result.hpp>
+#include "generic_component_result.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 // This is the function to wrap into the component. It's purpose is to print
 // the floating point number it receives as its argument
-double generate_number (hpx::threads::thread_self&, hpx::applier::applier&)
+hpx::threads::thread_state generate_number (hpx::threads::thread_self&, 
+    hpx::applier::applier&, double* result)
 {
-    return 42;
+    *result = 42;
+    return hpx::threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define all additional facilities needed for the generate_number_wrapper 
 // component.
-HPX_REGISTER_GENERIC_COMPONENT(generate_number_wrapper)
+HPX_REGISTER_ACTION(generate_number_action);
 
 

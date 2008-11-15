@@ -42,7 +42,7 @@ namespace hpx { namespace components { namespace stubs
             // we simply return the initialized eager_future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::accumulator::query_action action_type;
-            return lcos::eager_future<action_type, double>(appl, gid);
+            return lcos::eager_future<action_type>(appl, gid);
         }
 
         /// Query the current value of the server#accumulator instance 

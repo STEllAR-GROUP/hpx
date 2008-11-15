@@ -10,19 +10,14 @@
 #define HPX_COMPONENTS_GENERIC_NORESULT_OCT_13_2008_0853AM
 
 #include <hpx/hpx.hpp>
-#include <hpx/runtime/components/server/generic_component.hpp>
+#include <hpx/runtime/actions/plain_action.hpp>
 
 // This is the function to wrap into the component. Its purpose is to print
 // the floating point number it receives as its argument
-HPX_COMPONENT_EXPORT void 
-print_number (hpx::threads::thread_self&, hpx::applier::applier&, double arg);
+HPX_COMPONENT_EXPORT hpx::threads::thread_state
+print_number(hpx::threads::thread_self&, hpx::applier::applier&, double arg);
 
-// We use generic_component1 here because the function 
-// print_number() takes one additional argument. The number of additional
-// arguments N needs to be reflected in the name of the generic_componentN.
-typedef 
-    hpx::components::server::generic_component1<void, double, print_number> 
-print_number_wrapper;
+typedef hpx::actions::plain_action1<double, print_number> print_number_action;
 
 #endif
 

@@ -25,14 +25,14 @@ threads::thread_state hpx_main(threads::thread_self& self,
 
     // read the value back from memory (using an eager_future)
     typedef components::server::memory::load32_action load_action_type;
-    lcos::eager_future<load_action_type, boost::uint32_t> ef(
+    lcos::eager_future<load_action_type> ef(
         appl, appl.get_memory_gid(), boost::uint64_t(&value));
 
     boost::uint32_t result1 = ef.get(self);
     BOOST_TEST(result1 == value);
 
     // read the value back from memory (using a lazy_future)
-    lcos::lazy_future<load_action_type, boost::uint32_t> lf;
+    lcos::lazy_future<load_action_type> lf;
 
     boost::uint32_t result2 = lf.get(self, appl, appl.get_memory_gid(), 
         boost::uint64_t(&value));

@@ -10,7 +10,6 @@
 
 #include <hpx/components/generic/generic_component_noresult.hpp>
 #include <hpx/components/generic/generic_component_result.hpp>
-#include <hpx/runtime/components/generic_component.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
@@ -24,9 +23,6 @@ using namespace std;
 threads::thread_state 
 hpx_main(threads::thread_self& self, applier::applier& appl)
 {
-    typedef components::generic_component<print_number_wrapper> print_component_type;
-    typedef components::generic_component<generate_number_wrapper> generator_component_type;
-
     // get list of all known localities
     std::vector<naming::id_type> prefixes;
     naming::id_type prefix;
@@ -39,19 +35,9 @@ hpx_main(threads::thread_self& self, applier::applier& appl)
         prefix = appl.get_runtime_support_gid();
     }
 
-    // we need to wrap the following into a separate block, because the
-    // generator and printer objects will free the server side instances in 
-    // their destructors, which without this block would be invoked too late
     {
-        // create new instances of the generator and printer components
-        generator_component_type generator(
-            generator_component_type::create(self, appl, prefix, true));
-        print_component_type printer(
-            print_component_type::create(self, appl, prefix, true));
-
-        // invoke both generic component's actions
-        double val = generator.eval(self);
-        printer.eval(self, val);
+        lcos::eager_future<generate_number_action> gen(appl, prefix);
+        appl.apply<print_number_action>(prefix, gen.get(self));
     }
 
     // initiate shutdown of the runtime systems on all localities

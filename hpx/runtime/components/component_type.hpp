@@ -29,6 +29,7 @@ namespace hpx { namespace components
         component_future = 6,           ///< a future executing the action and 
                                         ///< allowing to wait for the result
         component_value_adaptor = 7,    ///< a adaptor to access specific slot of an LCO
+        component_plain_function = 8,   ///< a plain remotely callable function 
 
         component_last,
         component_first_dynamic = component_last

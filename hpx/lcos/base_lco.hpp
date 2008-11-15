@@ -10,7 +10,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
-#include <hpx/runtime/actions/action.hpp>
+#include <hpx/runtime/actions/component_action.hpp>
 
 namespace hpx { namespace lcos 
 {

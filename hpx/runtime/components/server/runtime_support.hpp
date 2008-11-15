@@ -17,7 +17,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
-#include <hpx/runtime/actions/action.hpp>
+#include <hpx/runtime/actions/component_action.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

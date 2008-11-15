@@ -11,7 +11,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/actions/action.hpp>
+#include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/lcos/base_lco.hpp>
 

@@ -68,22 +68,7 @@ namespace hpx { namespace components { namespace detail
 
         ~wrapper_heap()
         {
-            if (pool_ != NULL) {
-                LOSH_(debug) 
-                    << "wrapper_heap (" 
-                    << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-                    << "): releasing heap: alloc count: " << alloc_count_ 
-                    << ", free count: " << free_count_ << ".";
-
-                if (free_size_ != size_ || alloc_count_ != free_count_) {
-                    LOSH_(warning) 
-                        << "wrapper_heap (" 
-                        << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-                        << "): releasing heap (" << std::hex << pool_ << ")" 
-                        << " with " << size_-free_size_ << " allocated object(s)!";
-                }
-                Allocator::free(pool_);
-            }
+            tidy();
         }
 
         int size() const { return int(size_ - free_size_); }
@@ -178,9 +163,7 @@ namespace hpx { namespace components { namespace detail
                 base_gid_ = naming::invalid_id;
             }
 
-            Allocator::free(pool_);
-            pool_ = first_free_ = NULL;
-            size_ = free_size_ = 0;
+            tidy();
             return true;
         }
 
@@ -214,6 +197,28 @@ namespace hpx { namespace components { namespace detail
             size_ = s;
             free_size_ = (int)size_;
             return true;
+        }
+
+        void tidy()
+        {
+            if (pool_ != NULL) {
+                LOSH_(debug) 
+                    << "wrapper_heap (" 
+                    << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
+                    << "): releasing heap: alloc count: " << alloc_count_ 
+                    << ", free count: " << free_count_ << ".";
+
+                if (free_size_ != size_ || alloc_count_ != free_count_) {
+                    LOSH_(warning) 
+                        << "wrapper_heap (" 
+                        << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
+                        << "): releasing heap (" << std::hex << pool_ << ")" 
+                        << " with " << size_-free_size_ << " allocated object(s)!";
+                }
+                Allocator::free(pool_);
+                pool_ = first_free_ = NULL;
+                size_ = free_size_ = 0;
+            }
         }
 
     private:

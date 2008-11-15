@@ -7,7 +7,7 @@
 #define HPX_COMPONENTS_JUN_01_2007_0526PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/actions/action.hpp>
+#include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/components/server/memory.hpp>

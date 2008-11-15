@@ -44,8 +44,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::functional_component::eval_action action_type;
-            return lcos::eager_future<action_type, bool>(appl, gid, 
-                result, gids);
+            return lcos::eager_future<action_type>(appl, gid, result, gids);
         }
 
         static bool eval(threads::thread_self& self, 
@@ -79,8 +78,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::functional_component::alloc_data_action action_type;
-            return lcos::eager_future<action_type, naming::id_type>(appl, gid, 
-                item, maxitems);
+            return lcos::eager_future<action_type>(appl, gid, item, maxitems);
         }
 
         static naming::id_type alloc_data(threads::thread_self& self, 
@@ -120,7 +118,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             naming::id_type const& val)
         {
             typedef amr::server::functional_component::free_data_action action_type;
-            lcos::eager_future<action_type, void>(appl, gid, val).get(self);
+            lcos::eager_future<action_type>(appl, gid, val).get(self);
         }
 
         void free_data_sync(threads::thread_self& self, 
@@ -147,7 +145,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             std::size_t numsteps, naming::id_type const& val)
         {
             typedef amr::server::functional_component::init_action action_type;
-            lcos::eager_future<action_type, void>(appl, gid, numsteps, val).get(self);
+            lcos::eager_future<action_type>(appl, gid, numsteps, val).get(self);
         }
 
         void init_sync(threads::thread_self& self, naming::id_type const& gid, 

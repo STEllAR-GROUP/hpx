@@ -16,6 +16,8 @@ namespace hpx { namespace components { namespace amr { namespace server
     threads::thread_state logging::logentry(threads::thread_self& self, 
         applier::applier& appl, timestep_data const& val)
     {
+        boost::mutex::scoped_lock l(mtx_);
+
         std::cout << val.max_index_ << ", " << val.index_ << ", " 
                   << val.timestep_ << ", "<< val.value_ << std::endl;
 

@@ -23,6 +23,8 @@ namespace hpx { namespace components
             "component_base_lco",
             "component_base_lco_with_value",
             "component_future",
+            "component_value_adaptor",
+            "component_plain_function",
         };
     }
 

@@ -44,12 +44,15 @@ set (hpxlib_HEADERS
     ${hpx_SOURCE_DIR}/hpx/runtime/get_lva.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/runtime.hpp
     # actions 
-    ${hpx_SOURCE_DIR}/hpx/runtime/actions/action.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/action_constructors.hpp
-    ${hpx_SOURCE_DIR}/hpx/runtime/actions/action_implementations.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/actions/action_manager.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/actions/action_support.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/actions/component_action.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/actions/component_action_implementations.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/continuation.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/continuation_impl.hpp
-    ${hpx_SOURCE_DIR}/hpx/runtime/actions/action_manager.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action_implementations.hpp
     # applier
     ${hpx_SOURCE_DIR}/hpx/runtime/applier/applier.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/applier/applier_implementations.hpp
@@ -61,24 +64,19 @@ set (hpxlib_HEADERS
     ${hpx_SOURCE_DIR}/hpx/runtime/components/component_factory_base.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/component_factory.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/derived_component_factory.hpp
-    ${hpx_SOURCE_DIR}/hpx/runtime/components/generic_component.hpp
-    ${hpx_SOURCE_DIR}/hpx/runtime/components/generic_component_eval.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/memory_block.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/runtime_support.hpp
 
-    ${hpx_SOURCE_DIR}/hpx/runtime/components/server/generic_component.hpp
-    ${hpx_SOURCE_DIR}/hpx/runtime/components/server/generic_component_implementation.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/server/manage_component.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/server/managed_component_base.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/server/memory.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/server/memory_block.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/components/server/plain_function.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/server/runtime_support.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/server/simple_component_base.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/server/wrapper_heap.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/server/wrapper_heap_list.hpp
 
-    ${hpx_SOURCE_DIR}/hpx/runtime/components/stubs/generic_component.hpp
-    ${hpx_SOURCE_DIR}/hpx/runtime/components/stubs/generic_component_eval.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/stubs/memory_block.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/stubs/runtime_support.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/stubs/stub_base.hpp
@@ -147,6 +145,7 @@ set (hpxlib_SOURCES
     ${hpx_SOURCE_DIR}/src/runtime/components/component_type.cpp
     ${hpx_SOURCE_DIR}/src/runtime/components/server/memory.cpp
     ${hpx_SOURCE_DIR}/src/runtime/components/server/memory_block.cpp
+    ${hpx_SOURCE_DIR}/src/runtime/components/server/plain_function.cpp
     ${hpx_SOURCE_DIR}/src/runtime/components/server/runtime_support.cpp
     # naming 
     ${hpx_SOURCE_DIR}/src/runtime/naming/address.cpp

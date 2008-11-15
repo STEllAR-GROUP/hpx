@@ -7,20 +7,18 @@
 // related facilities.
 
 #include <iostream>
-
 #include <hpx/hpx.hpp>
-#include <hpx/components/generic/generic_component_noresult.hpp>
+#include "generic_component_noresult.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 // This is the function to wrap into the component. It's purpose is to print
 // the floating point number it receives as its argument
-void print_number (hpx::threads::thread_self&, hpx::applier::applier&, double arg)
+hpx::threads::thread_state print_number(
+    hpx::threads::thread_self&, hpx::applier::applier&, double arg)
 {
     std::cout << arg << std::endl;
+    return hpx::threads::terminated;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Define all additional facilities needed for the print_number_wrapper 
-// component.
-HPX_REGISTER_GENERIC_COMPONENT(print_number_wrapper)
+HPX_REGISTER_ACTION(print_number_action);
 

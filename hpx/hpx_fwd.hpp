@@ -261,11 +261,13 @@ namespace hpx
         template <typename Result, int N = 1> 
         class future_value;
 
-        template <typename Action, typename Result,
+        template <typename Action, 
+            typename Result = typename Action::result_type,
             typename DirectExecute = typename Action::direct_execution> 
         class eager_future;
 
-        template <typename Action, typename Result,
+        template <typename Action, 
+            typename Result = typename Action::result_type,
             typename DirectExecute = typename Action::direct_execution> 
         class lazy_future;
     }
