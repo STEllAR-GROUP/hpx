@@ -102,7 +102,7 @@ set (hpxlib_HEADERS
     # threadmanager
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread_affinity.hpp
-    ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread_helper.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread_helpers.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/threadmanager.hpp
     # util
     ${hpx_SOURCE_DIR}/hpx/util/asio_util.hpp

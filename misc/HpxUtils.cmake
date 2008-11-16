@@ -144,6 +144,8 @@ macro(ADD_HPX_EXECUTABLE name)
         message(STATUS ${name}_DEPENDENCIES ": " ${${name}_DEPENDENCIES})
     endif()
 
+    add_definitions(-DHPX_APPLICATION_EXPORTS)
+
     # add the executable build target
     add_executable(${name}_exe 
         ${${name}_SOURCES} 

@@ -73,7 +73,7 @@ namespace hpx { namespace components { namespace server
 
             // figure out, whether we can create more than one instance of the 
             // component at once
-            factory_property factory_props = factory_none;
+            int factory_props = factory_none;
             if (1 != numcreate) {
                 factory_props = rts.get_factory_properties(self, *it, type);
             }
