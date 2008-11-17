@@ -79,7 +79,7 @@ hpx_main(threads::thread_self& self, applier::applier& appl)
 
     {
         util::high_resolution_timer t;
-        lcos::eager_future<fibonacci_action> n(appl, prefix, prefix, 41);
+        lcos::eager_future<fibonacci_action> n(appl, prefix, prefix, 15);
         int result = n.get(self);
         double elapsed = t.elapsed();
         std::cout << "elapsed: " << elapsed << ", result: " << result << std::endl;

@@ -540,6 +540,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\hpx\util\block_profiler.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\util\connection_cache.hpp"
 					>
 				</File>

@@ -76,17 +76,17 @@ namespace boost { namespace coroutines { namespace detail {
       m_wait_counter(0),
       m_operation_counter(0),
       m_type_info() {}
-    
+
     friend
     void intrusive_ptr_add_ref(type * ctx) {
       ctx->acquire();
     }
-    
+
     friend
     void intrusive_ptr_release(type * ctx) {
       ctx->release();
     }
-      
+
     bool unique() const {
       return count() == 1;
     }
@@ -94,11 +94,11 @@ namespace boost { namespace coroutines { namespace detail {
     std::size_t count() const {
       return m_counter;
     }
-      
+
     void acquire() const {
       ++m_counter;
     }
-      
+
     void release() const {
       BOOST_ASSERT(m_counter);
       if(--m_counter == 0) {
@@ -122,7 +122,7 @@ namespace boost { namespace coroutines { namespace detail {
 
     /*
      * A signal may occur only when a context is 
-     * not running (is delivered synchrononously).
+     * not running (is delivered synchronously).
      * This means that state MUST NOT be busy.
      * It may be ready or waiting.
      * returns 'ready()'.
@@ -134,7 +134,7 @@ namespace boost { namespace coroutines { namespace detail {
 
       --m_wait_counter;
       if(!m_wait_counter && m_state == ctx_waiting)
-        m_state = ctx_ready;      
+        m_state = ctx_ready;
       return ready();
     }
 
@@ -360,6 +360,14 @@ namespace boost { namespace coroutines { namespace detail {
       ctx_exited_abnormally // process exited uncleanly.
     };
 
+    void rebind()
+    {
+      BOOST_ASSERT(exited() && 0 == m_wait_counter && !pending());
+      m_state = ctx_ready;
+      m_exit_state = ctx_exit_not_requested;
+      m_exit_status = ctx_not_exited;
+    }
+
     // Cause the coroutine to exit if 
     // a exit request is pending.
     // Throws: exit_exception if an exit request is pending.
@@ -409,8 +417,8 @@ namespace boost { namespace coroutines { namespace detail {
     context_state m_state;
     context_exit_state m_exit_state;
     context_exit_status m_exit_status;
-    int m_wait_counter;   
-    int m_operation_counter;    
+    int m_wait_counter;
+    int m_operation_counter;
 
     // This is used to generate a meaningful exception trace.
     boost::exception_ptr m_type_info;

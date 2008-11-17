@@ -154,8 +154,9 @@ namespace hpx { namespace util
 
                         heap_list_.erase (it);
                     }
-                    else if (it != heap_list_.begin()) {
-                        heap_list_.splice (heap_list_.begin(), heap_list_, it);	
+                    else if (it != heap_list_.begin() && 0 != (*it)->size()) {
+                        // move the heap to the front if it has empty slots
+                        heap_list_.splice (heap_list_.begin(), heap_list_, it);
                     }
                     return;
                 }

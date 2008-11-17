@@ -85,13 +85,15 @@ namespace boost { namespace coroutines { namespace detail {
     } 
 
     template<typename Functor>
-        static inline	
-        pointer create(Functor, thread_id_type, std::ptrdiff_t);
+    static inline pointer create(Functor, thread_id_type, std::ptrdiff_t);
+
+    template<typename Functor>
+    static inline void rebind(pointer, Functor, thread_id_type);
 
     void bind_args(arg_slot_type* arg) {
       m_arg = arg;
     }
-    
+
     void bind_result(result_slot_type* res) {
       *m_result = res;
     }
@@ -121,12 +123,19 @@ namespace boost { namespace coroutines { namespace detail {
       bind_result_pointer(&ptr);
       this->wake_up();
     }
-    
+
     thread_id_type get_thread_id() const
     {
         return m_thread_id;
     }
-    
+
+  protected:
+    void rebind(thread_id_type id)
+    {
+        m_thread_id = id;
+        this->context_base_::rebind();
+    }
+
   protected:
     boost::optional<result_slot_type>  m_result_last;
 
@@ -193,7 +202,8 @@ namespace boost { namespace coroutines { namespace detail {
      */
     template<typename ResultType>
     typename boost::enable_if<boost::is_void<ResultType> >::type
-    do_call(dummy<0> = 0) {
+    do_call(dummy<0> = 0) 
+    {
       BOOST_ASSERT(this->count() > 0);
       typedef BOOST_DEDUCED_TYPENAME
         coroutine_type::self self_type;
@@ -207,7 +217,7 @@ namespace boost { namespace coroutines { namespace detail {
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::result_slot_type 
         result_slot_type;
 
-      // In this particulare case result_slot_type is guaranteed to be
+      // In this particular case result_slot_type is guaranteed to be
       // default constructible.
       this->m_result_last = result_slot_type();
       this->bind_result(&*this->m_result_last);
@@ -216,7 +226,8 @@ namespace boost { namespace coroutines { namespace detail {
     // Same as above, but for non void result types.
     template<typename ResultType>
     typename boost::disable_if<boost::is_void<ResultType> >::type
-    do_call(dummy<1> = 1) {
+    do_call(dummy<1> = 1) 
+    {
       BOOST_ASSERT(this->count() > 0);
       typedef BOOST_DEDUCED_TYPENAME
       coroutine_type::self self_type;
@@ -226,16 +237,22 @@ namespace boost { namespace coroutines { namespace detail {
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::arg_slot_traits traits;
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::result_slot_type 
         result_slot_type;
-          
+
       this->m_result_last = boost::in_place(result_slot_type(detail::unpack_ex
                            (m_fun, 
                             *self, 
                             *this->args(), 
-                            detail::trait_tag<traits>())));      
-      
+                            detail::trait_tag<traits>())));
+
       this->bind_result(&*this->m_result_last);
     }
-  
+
+    void rebind(FunctorType f, thread_id_type id)
+    {
+        m_fun = f;
+        this->super_type::rebind(id);
+    }
+
     FunctorType m_fun;
   };
 
@@ -248,6 +265,19 @@ namespace boost { namespace coroutines { namespace detail {
   create(Functor f, thread_id_type id = 0, std::ptrdiff_t stack_size = default_stack_size) {
     return new coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl>
       (f, id, stack_size);      
+  }
+
+  template<typename CoroutineType, typename ContextImpl>
+  template<typename Functor>
+  inline void 
+  coroutine_impl<CoroutineType, ContextImpl>::rebind(
+      typename coroutine_impl<CoroutineType, ContextImpl>::pointer p,
+      Functor f, thread_id_type id) 
+  {
+      typedef 
+          coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl> 
+      derived_type;
+      boost::static_pointer_cast<derived_type>(p)->rebind(f, id);
   }
 
 } } }

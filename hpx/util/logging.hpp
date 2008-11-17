@@ -54,6 +54,7 @@ namespace hpx { namespace util
     #define LERR_(lvl)  LHPX_(lvl, " [ERR] ")   /* exception */
     #define LOSH_(lvl)  LHPX_(lvl, " [OSH] ")   /* one size heap */
     #define LPT_(lvl)   LHPX_(lvl, "  [PT] ")   /* parcel transport */
+    #define LAUX_(lvl)  LHPX_(lvl, " [AUX] ")   /* auxilliary */
 
 ///////////////////////////////////////////////////////////////////////////////
 }}

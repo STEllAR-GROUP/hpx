@@ -33,6 +33,9 @@
 #include <hpx/util/asio_util.hpp>
 #include <hpx/util/util.hpp>
 
+#define HPX_USE_ACCUMULATOR_LIBRARY 1
+#include <hpx/util/block_profiler.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming 
 {
@@ -162,6 +165,9 @@ namespace hpx { namespace naming
 
     bool resolver_client::resolve(id_type const& id, address& addr) const
     {
+        struct resolve_tag {};
+        util::block_profiler<resolve_tag> bp("resolver_client::resolve");
+
         // send request
         server::request req (server::command_resolve, id);
         server::reply rep;

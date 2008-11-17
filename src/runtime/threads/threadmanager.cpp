@@ -10,6 +10,8 @@
 #include <hpx/runtime/threads/thread_affinity.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/logging.hpp>
+#define HPX_USE_ACCUMULATOR_LIBRARY 1
+#include <hpx/util/block_profiler.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
@@ -66,6 +68,9 @@ namespace hpx { namespace threads
         boost::function<thread_function_type> threadfunc, 
         char const* const description, thread_state initial_state, bool run_now)
     {
+        struct register_work_tag {};
+        util::block_profiler<register_work_tag> bp("threadmanager::register_work");
+
         // verify parameters
         if (initial_state != pending && initial_state != suspended)
         {
@@ -87,8 +92,13 @@ namespace hpx { namespace threads
                    << "description(" << description << ")";
 
         // create the new thread
+        struct create_thread_tag {};
+        util::block_profiler<create_thread_tag> ct("threadmanager::create_thread");
+
         boost::shared_ptr<threads::thread> thrd (
             new threads::thread(threadfunc, *this, initial_state, description));
+
+        ct.measure();
 
         // lock data members while adding work
         mutex_type::scoped_lock lk(mtx_);
@@ -128,6 +138,9 @@ namespace hpx { namespace threads
     thread_state threadmanager::set_state(thread_self* self, thread_id_type id, 
         thread_state new_state)
     {
+        struct set_state_tag {};
+        util::block_profiler<set_state_tag> bp("threadmanager::set_state");
+
         // set_state can't be used to force a thread into active state
         if (new_state == active) {
             HPX_OSSTREAM strm;
@@ -424,6 +437,9 @@ namespace hpx { namespace threads
             // Get the next PX thread from the queue
             boost::shared_ptr<thread> thrd;
             if (work_items_.dequeue(&thrd)) {
+                struct tfunc_tag {};
+                util::block_profiler<tfunc_tag> bp("threadmanager::tfunc(inner loop)");
+
                 // Only pending PX threads will be executed.
                 // Any non-pending PX threads are leftovers from a set_state() 
                 // call for a previously pending PX thread (see comments above).

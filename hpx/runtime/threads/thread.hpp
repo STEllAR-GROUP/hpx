@@ -33,16 +33,14 @@ namespace hpx { namespace threads { namespace detail
     class thread : public lcos::base_lco, private boost::noncopyable
     {
     private:
-        typedef 
-            boost::coroutines::shared_coroutine<thread_state()> 
-        coroutine_type;
+        typedef boost::coroutines::shared_coroutine<thread_state()> coroutine_type;
 
     public:
         thread(boost::function<thread_function_type> func, 
                 thread_id_type id, threadmanager& tm, thread_state newstate,
                 char const* const description)
-          : coroutine_(func, id), tm_(tm), current_state_(newstate),
-            description_(description)
+          : coroutine_(func, id), 
+            tm_(tm), current_state_(newstate), description_(description)
         {}
 
         /// This constructor is provided just for compatibility with the scheme
