@@ -74,6 +74,7 @@ namespace hpx { namespace components { namespace detail
         int size() const { return int(size_ - free_size_); }
         int free_size() const { return free_size_; }
         bool is_empty() const { return NULL == pool_; }
+        bool has_allocatable_slots() const { return first_free_ < pool_+size_; }
 
         T* alloc(std::size_t count = 1)
         {

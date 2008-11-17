@@ -108,6 +108,7 @@ set (hpxlib_HEADERS
     ${hpx_SOURCE_DIR}/hpx/util/asio_util.hpp
     ${hpx_SOURCE_DIR}/hpx/util/binary_portable_iarchive.hpp
     ${hpx_SOURCE_DIR}/hpx/util/binary_portable_oarchive.hpp
+    ${hpx_SOURCE_DIR}/hpx/util/block_profiler.hpp
     ${hpx_SOURCE_DIR}/hpx/util/connection_cache.hpp
     ${hpx_SOURCE_DIR}/hpx/util/container_device.hpp
     ${hpx_SOURCE_DIR}/hpx/util/find_msb.hpp
