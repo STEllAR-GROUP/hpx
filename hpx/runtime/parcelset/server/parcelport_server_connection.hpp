@@ -19,6 +19,7 @@
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/placeholders.hpp>
 #include <boost/bind.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/tuple/tuple.hpp>

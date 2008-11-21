@@ -13,8 +13,8 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 
