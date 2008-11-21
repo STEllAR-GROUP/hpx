@@ -64,11 +64,13 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    struct register_work_tag {};
+    struct create_thread_tag {};
+
     thread_id_type threadmanager::register_work(
         boost::function<thread_function_type> threadfunc, 
         char const* const description, thread_state initial_state, bool run_now)
     {
-        struct register_work_tag {};
         util::block_profiler<register_work_tag> bp("threadmanager::register_work");
 
         // verify parameters
@@ -92,7 +94,6 @@ namespace hpx { namespace threads
                    << "description(" << description << ")";
 
         // create the new thread
-        struct create_thread_tag {};
         util::block_profiler<create_thread_tag> ct("threadmanager::create_thread");
 
         boost::shared_ptr<threads::thread> thrd (
@@ -135,10 +136,11 @@ namespace hpx { namespace threads
         return set_state(NULL, id, newstate);
     }
 
+    struct set_state_tag {};
+
     thread_state threadmanager::set_state(thread_self* self, thread_id_type id, 
         thread_state new_state)
     {
-        struct set_state_tag {};
         util::block_profiler<set_state_tag> bp("threadmanager::set_state");
 
         // set_state can't be used to force a thread into active state
@@ -420,6 +422,8 @@ namespace hpx { namespace threads
                    << num_px_threads << " HPX threads";
     }
 
+    struct tfunc_tag {};
+
     std::size_t threadmanager::tfunc_impl(std::size_t num_thread)
     {
 #if HPX_DEBUG != 0
@@ -437,7 +441,6 @@ namespace hpx { namespace threads
             // Get the next PX thread from the queue
             boost::shared_ptr<thread> thrd;
             if (work_items_.dequeue(&thrd)) {
-                struct tfunc_tag {};
                 util::block_profiler<tfunc_tag> bp("threadmanager::tfunc(inner loop)");
 
                 // Only pending PX threads will be executed.

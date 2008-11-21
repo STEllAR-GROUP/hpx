@@ -163,9 +163,9 @@ namespace hpx { namespace naming
         return s == success;
     }
 
+    struct resolve_tag {};
     bool resolver_client::resolve(id_type const& id, address& addr) const
     {
-        struct resolve_tag {};
         util::block_profiler<resolve_tag> bp("resolver_client::resolve");
 
         // send request
