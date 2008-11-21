@@ -18,6 +18,7 @@
 #include <boost/asio/write.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/array.hpp>
+#include <boost/asio/placeholders.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/iostreams/stream.hpp>
