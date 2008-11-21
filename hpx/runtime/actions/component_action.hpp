@@ -15,8 +15,6 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/get_lva.hpp>
-#include <hpx/util/serialize_sequence.hpp>
 
 #include <boost/version.hpp>
 #include <boost/shared_ptr.hpp>

@@ -19,6 +19,9 @@
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 
+#include <hpx/runtime/get_lva.hpp>
+#include <hpx/util/serialize_sequence.hpp>
+
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
