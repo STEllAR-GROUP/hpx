@@ -79,6 +79,12 @@ else()
         CACHE PATH "Prefix prepended to install directories")
 endif()
 
+# Mac systems headers have some dependency on XOPEN_SOURCE being defined
+# let's better be on the safe side...
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    add_definitions(-DXOPEN_SOURCE=1)
+endif()
+
 # force some variables that could be defined in the command line to be written 
 # to cache
 set(CMAKE_INSTALL_PREFIX "${CMAKE_PREFIX}" 
