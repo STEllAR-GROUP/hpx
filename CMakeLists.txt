@@ -173,7 +173,7 @@ add_subdirectory(runtime)
 # installation instructions
 install(
     DIRECTORY hpx/                    # install all hpx header files
-    DESTINATION include 
+    DESTINATION include/hpx 
     FILES_MATCHING PATTERN "*.hpp"
     REGEX ".svn" EXCLUDE
     REGEX "CMakeFiles" EXCLUDE)
