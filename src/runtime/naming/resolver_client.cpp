@@ -32,9 +32,9 @@
 #include <hpx/util/container_device.hpp>
 #include <hpx/util/asio_util.hpp>
 #include <hpx/util/util.hpp>
-
-#define HPX_USE_ACCUMULATOR_LIBRARY 1
 #include <hpx/util/block_profiler.hpp>
+
+#define HPX_USE_AGAS_CACHE 1
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming 
@@ -42,7 +42,8 @@ namespace hpx { namespace naming
     resolver_client::resolver_client(util::io_service_pool& io_service_pool, 
             locality l) 
       : there_(l), io_service_pool_(io_service_pool), 
-        connection_cache_(HPX_MAX_AGAS_CONNECTION_CACHE_SIZE, "[AGAS] ")
+        connection_cache_(HPX_MAX_AGAS_CONNECTION_CACHE_SIZE, "[AGAS] "),
+        agas_cache_(HPX_INITIAL_AGAS_CACHE_SIZE)
     {
         // start the io service pool
         io_service_pool.run(false);
@@ -144,8 +145,33 @@ namespace hpx { namespace naming
         if (s != success && s != no_success)
             HPX_THROW_EXCEPTION((error)s, rep.get_error());
 
+#if defined(HPX_USE_AGAS_CACHE)
+        // add the new range to the local cache
+        cache_key k(id, count);
+        agas_cache_.insert(k, std::make_pair(addr, offset));
+#endif
+
         return s == success;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct erase_policy
+    {
+        erase_policy(id_type const& id, std::size_t count)
+          : entry_(id, count)
+        {}
+
+        typedef 
+            std::pair<resolver_client::cache_key, resolver_client::entry_type>
+        cache_storage_entry_type;
+
+        bool operator()(cache_storage_entry_type const& p) const
+        {
+            return p.first == entry_;
+        }
+
+        resolver_client::cache_key entry_;
+    };
 
     bool resolver_client::unbind_range(id_type const& id, std::size_t count, 
         address& addr) const
@@ -160,6 +186,13 @@ namespace hpx { namespace naming
             HPX_THROW_EXCEPTION((error)s, rep.get_error());
 
         addr = rep.get_address();
+
+#if defined(HPX_USE_AGAS_CACHE)
+        // remove this entry from the cache
+        erase_policy ep(id, count);
+        agas_cache_.erase(ep);
+#endif
+
         return s == success;
     }
 
@@ -167,6 +200,19 @@ namespace hpx { namespace naming
     bool resolver_client::resolve(id_type const& id, address& addr) const
     {
         util::block_profiler<resolve_tag> bp("resolver_client::resolve");
+
+#if defined(HPX_USE_AGAS_CACHE)
+        // first look up the requested item in the cache
+        cache_key k(id), realkey;
+        cache_type::entry_type e;
+        if (agas_cache_.get_entry(k, realkey, e)) {
+            // This entry is currently in the cache
+            BOOST_ASSERT(id.get_msb() == realkey.id_.get_msb());
+            addr = e.get().first;
+            addr.address_ += (id.get_lsb() - realkey.id_.get_lsb()) * e.get().second;
+            return true;
+        }
+#endif
 
         // send request
         server::request req (server::command_resolve, id);

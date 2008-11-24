@@ -53,6 +53,14 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This defines the number of AGAS address translations kept in the local 
+/// cache. This is just the initial siye which maz be adjusted depending on the 
+/// load of the system, etc.
+#if !defined(HPX_INITIAL_AGAS_CACHE_SIZE)
+#  define HPX_INITIAL_AGAS_CACHE_SIZE 128
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 /// This defines whether to use the portable binary archives for parcel 
 /// serialization
 #if !defined(HPX_USE_PORTABLE_ARCHIVES)

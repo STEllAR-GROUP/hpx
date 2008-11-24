@@ -20,6 +20,8 @@
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/cache/entries/lfu_entry.hpp>
+#include <boost/cache/local_cache.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -455,6 +457,42 @@ namespace hpx { namespace naming
 
         /// The connection cache for sending connections
         mutable util::connection_cache<resolver_client_connection> connection_cache_;
+
+    public:
+        /// The cache of recently looked up entries
+        struct cache_key
+        {
+            cache_key()
+              : id_(naming::invalid_id), count_(0)
+            {}
+
+            explicit cache_key(naming::id_type const& id, std::size_t count = 1)
+              : id_(id), count_(count)
+            {}
+
+            naming::id_type id_;
+            std::size_t count_;
+
+            friend bool operator<(cache_key const& lhs, cache_key const& rhs)
+            {
+                return lhs.id_ + (lhs.count_ - 1) < rhs.id_;
+            }
+            friend bool operator==(cache_key const& lhs, cache_key const& rhs)
+            {
+                return lhs.id_ == rhs.id_ && lhs.count_ == rhs.count_;
+            }
+        };
+
+        typedef std::pair<naming::address, std::ptrdiff_t> cache_data_type;
+        typedef boost::cache::entries::lfu_entry<cache_data_type> entry_type;
+
+    private:
+        typedef boost::cache::local_cache<
+            cache_key, entry_type, 
+            std::less<entry_type>, boost::cache::policies::always<entry_type>,
+            std::map<cache_key, entry_type>
+        > cache_type;
+        mutable cache_type agas_cache_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

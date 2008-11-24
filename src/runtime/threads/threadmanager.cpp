@@ -10,7 +10,6 @@
 #include <hpx/runtime/threads/thread_affinity.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/logging.hpp>
-#define HPX_USE_ACCUMULATOR_LIBRARY 1
 #include <hpx/util/block_profiler.hpp>
 
 #include <boost/assert.hpp>

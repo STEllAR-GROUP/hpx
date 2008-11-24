@@ -11,7 +11,7 @@
 #include <hpx/util/logging.hpp>
 
 #include <boost/version.hpp>
-#if BOOST_VERSION >= 103600 && defined(HPX_USE_ACCUMULATOR_LIBRARY)
+#if BOOST_VERSION >= 103600
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/sum.hpp>
@@ -26,7 +26,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-#if BOOST_VERSION >= 103600 && defined(HPX_USE_ACCUMULATOR_LIBRARY)
+#if BOOST_VERSION >= 103600
         class accumulator_stats
         {
         private:
