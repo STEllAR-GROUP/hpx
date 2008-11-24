@@ -181,32 +181,32 @@ install(
 # install external dependencies
 install(
     DIRECTORY external/cache/boost
-    DESTINATION include/boost 
+    DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
     REGEX ".svn" EXCLUDE)
 install(
     DIRECTORY external/coroutine/boost
-    DESTINATION include/boost 
+    DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
     REGEX ".svn" EXCLUDE)
 install(
     DIRECTORY external/endian/boost
-    DESTINATION include/boost 
+    DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
     REGEX ".svn" EXCLUDE)
 install(
     DIRECTORY external/lockfree/boost
-    DESTINATION include/boost 
+    DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
     REGEX ".svn" EXCLUDE)
 install(
     DIRECTORY external/logging/boost
-    DESTINATION include/boost 
+    DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
     REGEX ".svn" EXCLUDE)
 install(
     DIRECTORY external/plugin/boost
-    DESTINATION include/boost 
+    DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
     REGEX ".svn" EXCLUDE)
 
