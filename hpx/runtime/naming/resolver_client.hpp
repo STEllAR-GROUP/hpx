@@ -488,7 +488,7 @@ namespace hpx { namespace naming
 
     private:
         // protect the cache from race conditions
-        boost::mutex mtx_;
+        mutable boost::mutex mtx_;
 
         typedef boost::cache::local_cache<
             cache_key, entry_type, 
