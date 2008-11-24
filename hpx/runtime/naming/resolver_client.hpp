@@ -487,6 +487,9 @@ namespace hpx { namespace naming
         typedef boost::cache::entries::lfu_entry<cache_data_type> entry_type;
 
     private:
+        // protect the cache from race conditions
+        boost::mutex mtx_;
+
         typedef boost::cache::local_cache<
             cache_key, entry_type, 
             std::less<entry_type>, boost::cache::policies::always<entry_type>,

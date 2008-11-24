@@ -147,6 +147,7 @@ namespace hpx { namespace naming
 
 #if defined(HPX_USE_AGAS_CACHE)
         // add the new range to the local cache
+        boost::mutex::scoped_lock lock(mtx_);
         cache_key k(id, count);
         agas_cache_.insert(k, std::make_pair(addr, offset));
 #endif
@@ -189,6 +190,7 @@ namespace hpx { namespace naming
 
 #if defined(HPX_USE_AGAS_CACHE)
         // remove this entry from the cache
+        boost::mutex::scoped_lock lock(mtx_);
         erase_policy ep(id, count);
         agas_cache_.erase(ep);
 #endif
@@ -203,14 +205,18 @@ namespace hpx { namespace naming
 
 #if defined(HPX_USE_AGAS_CACHE)
         // first look up the requested item in the cache
-        cache_key k(id), realkey;
-        cache_type::entry_type e;
-        if (agas_cache_.get_entry(k, realkey, e)) {
-            // This entry is currently in the cache
-            BOOST_ASSERT(id.get_msb() == realkey.id_.get_msb());
-            addr = e.get().first;
-            addr.address_ += (id.get_lsb() - realkey.id_.get_lsb()) * e.get().second;
-            return true;
+        cache_key k(id);
+        {
+            boost::mutex::scoped_lock lock(mtx_);
+            cache_key realkey;
+            cache_type::entry_type e;
+            if (agas_cache_.get_entry(k, realkey, e)) {
+                // This entry is currently in the cache
+                BOOST_ASSERT(id.get_msb() == realkey.id_.get_msb());
+                addr = e.get().first;
+                addr.address_ += (id.get_lsb() - realkey.id_.get_lsb()) * e.get().second;
+                return true;
+            }
         }
 #endif
 
@@ -224,6 +230,13 @@ namespace hpx { namespace naming
             HPX_THROW_EXCEPTION((error)s, rep.get_error());
 
         addr = rep.get_address();
+
+#if defined(HPX_USE_AGAS_CACHE)
+        // add the requested item to the cache
+        boost::mutex::scoped_lock lock(mtx_);
+        agas_cache_.insert(k, std::make_pair(addr, 1));
+#endif
+
         return s == success;
     }
 
