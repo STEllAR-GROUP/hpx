@@ -178,6 +178,38 @@ install(
     REGEX ".svn" EXCLUDE
     REGEX "CMakeFiles" EXCLUDE)
 
+# install external dependencies
+install(
+    DIRECTORY external/cache/boost
+    DESTINATION include/boost 
+    FILES_MATCHING PATTERN "*.hpp"
+    REGEX ".svn" EXCLUDE)
+install(
+    DIRECTORY external/coroutine/boost
+    DESTINATION include/boost 
+    FILES_MATCHING PATTERN "*.hpp"
+    REGEX ".svn" EXCLUDE)
+install(
+    DIRECTORY external/endian/boost
+    DESTINATION include/boost 
+    FILES_MATCHING PATTERN "*.hpp"
+    REGEX ".svn" EXCLUDE)
+install(
+    DIRECTORY external/lockfree/boost
+    DESTINATION include/boost 
+    FILES_MATCHING PATTERN "*.hpp"
+    REGEX ".svn" EXCLUDE)
+install(
+    DIRECTORY external/logging/boost
+    DESTINATION include/boost 
+    FILES_MATCHING PATTERN "*.hpp"
+    REGEX ".svn" EXCLUDE)
+install(
+    DIRECTORY external/plugin/boost
+    DESTINATION include/boost 
+    FILES_MATCHING PATTERN "*.hpp"
+    REGEX ".svn" EXCLUDE)
+
 # export build settings
 include(CMakeExportBuildSettings)
 cmake_export_build_settings("${PROJECT_NAME}BuildSettings.cmake")
