@@ -63,11 +63,12 @@ include_directories(${hpx_SOURCE_DIR})
 include_directories(${hpx_SOURCE_DIR}/external/cache)
 include_directories(${hpx_SOURCE_DIR}/external/coroutine)
 include_directories(${hpx_SOURCE_DIR}/external/endian)
-include_directories(${hpx_SOURCE_DIR}/external/exception)
+if(${Boost_MINOR_VERSION} LESS 36)
+    include_directories(${hpx_SOURCE_DIR}/external/exception)
+endif()
 include_directories(${hpx_SOURCE_DIR}/external/logging)
 include_directories(${hpx_SOURCE_DIR}/external/lockfree)
 include_directories(${hpx_SOURCE_DIR}/external/plugin)
-include_directories(${hpx_SOURCE_DIR}/external/singleton)
 
 # initialize installation directory (can be changed via ccmake or 
 # 'cmake -DCMAKE_PREFIX=...')
@@ -77,12 +78,6 @@ if(UNIX)
 else()
     SET(CMAKE_PREFIX "C:/Program Files/hpx" 
         CACHE PATH "Prefix prepended to install directories")
-endif()
-
-# Mac systems headers have some dependency on XOPEN_SOURCE being defined
-# let's better be on the safe side...
-if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    add_definitions(-DXOPEN_SOURCE=1)
 endif()
 
 # force some variables that could be defined in the command line to be written 
@@ -138,8 +133,14 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
 endif()
 
-# additionally needed preprocessor definitions
+# additional preprocessor definitions
 add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT)
+
+# Mac systems headers have some dependency on XOPEN_SOURCE being defined
+# let's better be on the safe side...
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    add_definitions(-DXOPEN_SOURCE=1)
+endif()
 
 # hpx_LIBRARIES lists all libraries a HPX module needs to be linked with by 
 # default, there may be more for individual modules, but this is the mandatory
@@ -194,6 +195,13 @@ install(
     DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
     REGEX ".svn" EXCLUDE)
+if(${Boost_MINOR_VERSION} LESS 36)
+    install(
+        DIRECTORY external/exception/boost
+        DESTINATION include
+        FILES_MATCHING PATTERN "*.hpp"
+        REGEX ".svn" EXCLUDE)
+endif()
 install(
     DIRECTORY external/lockfree/boost
     DESTINATION include
