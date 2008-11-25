@@ -32,9 +32,6 @@ namespace hpx { namespace threads { namespace detail
     // This is the representation of a ParalleX thread
     class thread : public lcos::base_lco, private boost::noncopyable
     {
-    private:
-        typedef boost::coroutines::shared_coroutine<thread_state()> coroutine_type;
-
     public:
         thread(boost::function<thread_function_type> func, 
                 thread_id_type id, threadmanager& tm, thread_state newstate,
@@ -267,6 +264,9 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     thread_id_type const invalid_thread_id = 0;
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_API_EXPORT thread_self& get_self();
 
 }}
 

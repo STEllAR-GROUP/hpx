@@ -51,7 +51,9 @@ namespace hpx
       : ini_(), agas_pool_(), parcel_pool_(), timer_pool_(),
         agas_client_(agas_pool_, ini_.get_agas_locality(agas_address, agas_port)),
         parcel_port_(parcel_pool_, naming::locality(address, port)),
-        thread_manager_(timer_pool_, boost::bind(&runtime::stop, This(), false)),
+        thread_manager_(timer_pool_, 
+            boost::bind(&runtime::init_applier, This()),
+            boost::bind(&runtime::stop, This(), false)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_),
         applier_(parcel_handler_, thread_manager_, 
@@ -64,7 +66,9 @@ namespace hpx
       : ini_(), agas_pool_(), parcel_pool_(), timer_pool_(),
         agas_client_(agas_pool_, agas_address),
         parcel_port_(parcel_pool_, address),
-        thread_manager_(timer_pool_, boost::bind(&runtime::stop, This(), false)),
+        thread_manager_(timer_pool_, 
+            boost::bind(&runtime::init_applier, This()),
+            boost::bind(&runtime::stop, This(), false)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_),
         applier_(parcel_handler_, thread_manager_, 
@@ -77,7 +81,9 @@ namespace hpx
       : ini_(), agas_pool_(), parcel_pool_(), timer_pool_(),
         agas_client_(agas_pool_, ini_.get_agas_locality()),
         parcel_port_(parcel_pool_, address),
-        thread_manager_(timer_pool_),
+        thread_manager_(timer_pool_, 
+            boost::bind(&runtime::init_applier, This()),
+            boost::bind(&runtime::stop, This(), false)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_),
         applier_(parcel_handler_, thread_manager_, 
@@ -98,6 +104,12 @@ namespace hpx
         runtime_support_.tidy();  // unload libraries
 
         LRT_(debug) << "~runtime(finished)";
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void runtime::init_applier()
+    {
+        applier_.init_tss();
     }
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINES_USE_FIBERS)

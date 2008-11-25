@@ -66,6 +66,7 @@ namespace hpx { namespace threads
     public:
         ///
         threadmanager(util::io_service_pool& timer_pool, 
+            boost::function<void()> start_thread = boost::function<void()>(),
             boost::function<void()> stop = boost::function<void()>());
         ~threadmanager();
 
@@ -256,6 +257,8 @@ namespace hpx { namespace threads
         boost::condition cond_;             ///< used to trigger some action
 
         util::io_service_pool& timer_pool_; ///< used for timed set_state
+
+        boost::function<void()> start_thread_;    ///< function to call for each created thread
         boost::function<void()> stop_;  ///< function to call in case of error
 
 #if HPX_DEBUG != 0

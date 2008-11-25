@@ -24,3 +24,13 @@ namespace hpx { namespace threads { namespace detail
 
 }}}
 
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace threads 
+{
+    thread_self& get_self()
+    {
+        return **thread_self::impl_type::self_;
+    }
+
+}}
+

@@ -58,6 +58,21 @@ namespace hpx { namespace applier
             boost::bind(func, _1, boost::ref(appl)), desc, state, run_now);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    boost::thread_specific_ptr<applier*> applier::applier_;
+
+    void applier::init_tss()
+    {
+        BOOST_ASSERT(NULL == applier::applier_.get());    // shouldn't be initialized yet
+        applier::applier_.reset(new applier* (this));
+    }
+
+    applier& get_applier()
+    {
+        BOOST_ASSERT(NULL != applier::applier_.get());   // should have been initialized
+        return **applier::applier_;
+    }
+
 ///////////////////////////////////////////////////////////////////////////////
 }}
 

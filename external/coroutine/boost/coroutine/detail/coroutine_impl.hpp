@@ -35,9 +35,11 @@
 
 #include <cstddef>
 #include <boost/optional.hpp>
+#include <boost/thread/tss.hpp>
 #include <boost/coroutine/detail/argument_unpacker.hpp>
 #include <boost/coroutine/detail/coroutine_accessor.hpp>
 #include <boost/coroutine/detail/context_base.hpp>
+#include <boost/coroutine/detail/self.hpp>
 
 namespace boost { namespace coroutines { namespace detail {
         
@@ -129,6 +131,10 @@ namespace boost { namespace coroutines { namespace detail {
         return m_thread_id;
     }
 
+  public:
+    typedef detail::coroutine_self<coroutine_type> self_type;
+    static boost::thread_specific_ptr<self_type*> self_;
+
   protected:
     void rebind(thread_id_type id)
     {
@@ -144,6 +150,12 @@ namespace boost { namespace coroutines { namespace detail {
     result_slot_type ** m_result;
     thread_id_type m_thread_id;
   };
+
+  // the TSS holds a pointer to the self instance as stored on the stack
+  template<typename CoroutineType, typename ContextImpl>
+  boost::thread_specific_ptr<
+      typename coroutine_impl<CoroutineType, ContextImpl>::self_type*
+  > coroutine_impl<CoroutineType, ContextImpl>::self_;
 
   // This type augment coroutine_impl type with the type of the stored 
   // functor. The type of this object is erased right after construction
@@ -191,6 +203,7 @@ namespace boost { namespace coroutines { namespace detail {
       }
       this->do_return(status, tinfo);
     }
+
   public:
 
     //GCC workaround as per enable_if docs 
@@ -205,13 +218,15 @@ namespace boost { namespace coroutines { namespace detail {
     do_call(dummy<0> = 0) 
     {
       BOOST_ASSERT(this->count() > 0);
-      typedef BOOST_DEDUCED_TYPENAME
-        coroutine_type::self self_type;
+
+      typedef BOOST_DEDUCED_TYPENAME coroutine_type::self self_type;
       boost::optional<self_type> self (coroutine_accessor::in_place(this));
-      detail::unpack_ex
-        (m_fun, 
-         *self, 
-         *this->args(), 
+      if (NULL == super_type::self_.get())
+          super_type::self_.reset(new self_type* (&*self));
+      else
+          *super_type::self_ = &*self;
+
+      detail::unpack_ex(m_fun, **super_type::self_, *this->args(), 
          detail::trait_tag<typename coroutine_type::arg_slot_traits>());
 
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::result_slot_type 
@@ -229,20 +244,21 @@ namespace boost { namespace coroutines { namespace detail {
     do_call(dummy<1> = 1) 
     {
       BOOST_ASSERT(this->count() > 0);
-      typedef BOOST_DEDUCED_TYPENAME
-      coroutine_type::self self_type;
 
+      typedef BOOST_DEDUCED_TYPENAME coroutine_type::self self_type;
       boost::optional<self_type> self (coroutine_accessor::in_place(this));
+      if (NULL == super_type::self_.get())
+          super_type::self_.reset(new self_type* (&*self));
+      else
+          *super_type::self_ = &*self;
 
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::arg_slot_traits traits;
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::result_slot_type 
         result_slot_type;
 
-      this->m_result_last = boost::in_place(result_slot_type(detail::unpack_ex
-                           (m_fun, 
-                            *self, 
-                            *this->args(), 
-                            detail::trait_tag<traits>())));
+      this->m_result_last = boost::in_place(result_slot_type(
+              detail::unpack_ex(m_fun, **super_type::self_, *this->args(), detail::trait_tag<traits>())
+          ));
 
       this->bind_result(&*this->m_result_last);
     }
@@ -281,6 +297,7 @@ namespace boost { namespace coroutines { namespace detail {
   }
 
 } } }
+
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif

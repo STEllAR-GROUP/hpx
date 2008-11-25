@@ -34,6 +34,8 @@
 #include <boost/config.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/throw_exception.hpp>
+#include <boost/system/system_error.hpp>
+#include <boost/system/error_code.hpp>
 #include <boost/coroutine/exception.hpp>
 #include <boost/coroutine/detail/swap_context.hpp>
 

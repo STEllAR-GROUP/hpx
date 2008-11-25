@@ -50,6 +50,9 @@ threads::thread_state
 fib (threads::thread_self& self, applier::applier& appl, 
     int* result, naming::id_type prefix, int n)
 {
+    BOOST_ASSERT(&self == &threads::get_self());
+    BOOST_ASSERT(&appl == &applier::get_applier());
+
     if (n < 2) {
         *result = n;
     }
@@ -65,15 +68,18 @@ fib (threads::thread_self& self, applier::applier& appl,
 threads::thread_state 
 hpx_main(threads::thread_self& self, applier::applier& appl)
 {
+    BOOST_ASSERT(&self == &threads::get_self());
+    BOOST_ASSERT(&appl == &applier::get_applier());
+
     // get list of all known localities
     std::vector<naming::id_type> prefixes;
     naming::id_type prefix;
     if (appl.get_remote_prefixes(prefixes)) {
-        // create accumulator on any of the remote localities
+        // execute the fib() function on any of the remote localities
         prefix = prefixes[0];
     }
     else {
-        // create an accumulator locally
+        // execute the fib() function locally
         prefix = appl.get_runtime_support_gid();
     }
 
@@ -121,7 +127,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
         }
     }
     catch (std::exception const& e) {
-        std::cerr << "generic_client: exception caught: " << e.what() << std::endl;
+        std::cerr << "fibonacci: exception caught: " << e.what() << std::endl;
         return false;
     }
     return true;
@@ -142,8 +148,8 @@ split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
         }
     }
     catch (boost::bad_lexical_cast const& /*e*/) {
-        std::cerr << "generic_client: illegal port number given: " << v.substr(p+1) << std::endl;
-        std::cerr << "                using default value instead: " << port << std::endl;
+        std::cerr << "fibonacci: illegal port number given: " << v.substr(p+1) << std::endl;
+        std::cerr << "           using default value instead: " << port << std::endl;
     }
 }
 
@@ -197,11 +203,11 @@ int main(int argc, char* argv[])
         rt.run(hpx_main, num_threads);
     }
     catch (std::exception& e) {
-        std::cerr << "std::exception caught: " << e.what() << "\n";
+        std::cerr << "fibonacci: std::exception caught: " << e.what() << "\n";
         return -1;
     }
     catch (...) {
-        std::cerr << "unexpected exception caught\n";
+        std::cerr << "fibonacci: unexpected exception caught\n";
         return -2;
     }
     return 0;

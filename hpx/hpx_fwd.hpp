@@ -31,6 +31,10 @@ namespace hpx
     namespace applier
     {
         class HPX_API_EXPORT applier;
+
+        /// The function \a get_applier returns a reference to the (thread
+        /// specific) applier instance.
+        HPX_API_EXPORT applier& get_applier();
     }
 
     /// \namespace actions
@@ -126,6 +130,10 @@ namespace hpx
         typedef coroutine_type::thread_id_type thread_id_type;
         typedef coroutine_type::self thread_self;
         typedef thread_state thread_function_type(thread_self&);
+
+        /// The function \a get_self returns a reference to the (OS thread 
+        /// specific) self reference to the current PX thread.
+        HPX_API_EXPORT thread_self& get_self();
     }
 
     /// \namespace components

@@ -120,7 +120,7 @@ namespace boost { namespace coroutines {
     typedef BOOST_DEDUCED_TYPENAME  impl_type::pointer impl_ptr;  
 
     typedef typename impl_type::thread_id_type thread_id_type;
-    
+
     typedef detail::coroutine_self<type> self;
     coroutine() : m_pimpl(0) {}
 

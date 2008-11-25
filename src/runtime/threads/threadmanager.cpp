@@ -42,8 +42,9 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     threadmanager::threadmanager(util::io_service_pool& timer_pool,
-            boost::function<void()> stop)
-      : running_(false), timer_pool_(timer_pool), stop_(stop)
+            boost::function<void()> start_thread, boost::function<void()> stop)
+      : running_(false), timer_pool_(timer_pool), 
+        start_thread_(start_thread), stop_(stop)
 #if HPX_DEBUG != 0
       , thread_count_(0)
 #endif
@@ -411,6 +412,9 @@ namespace hpx { namespace threads
         LTM_(info) << "tfunc(" << num_thread << "): start";
         std::size_t num_px_threads = 0;
         try {
+            if (start_thread_)    // notify runtime system of started thread
+                start_thread_();
+
             num_px_threads = tfunc_impl(num_thread);
         }
         catch (hpx::exception const& e) {

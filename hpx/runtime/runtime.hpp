@@ -37,8 +37,12 @@ namespace hpx
     /// properly initialized. 
     class HPX_EXPORT runtime
     {
+    private:
         // avoid warnings about usage of this in member initializer list
         runtime* This() { return this; }
+
+        // init the TSS for the applier
+        void init_applier();
 
     public:
         /// Construct a new HPX runtime instance 

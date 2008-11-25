@@ -17,6 +17,8 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 
+#include <boost/thread/tss.hpp>
+
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace applier
@@ -341,6 +343,12 @@ namespace hpx { namespace applier
             return addr.locality_ == parcel_handler_.here();
         }
 
+    public:
+        // the TSS holds a pointer to the applier associated with a given 
+        // OS thread
+        static boost::thread_specific_ptr<applier*> applier_;
+        void init_tss();
+
     private:
         parcelset::parcelhandler& parcel_handler_;
         threads::threadmanager& thread_manager_;
@@ -348,6 +356,7 @@ namespace hpx { namespace applier
         naming::id_type memory_id_;
     };
 
+    ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT typedef threads::thread_state full_thread_function_type(
         threads::thread_self&, applier&);
 
