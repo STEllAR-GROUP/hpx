@@ -41,7 +41,7 @@ namespace hpx { namespace threads
     class threadmanager : private boost::noncopyable
     {
     private:
-        // this is the type of the queue of pending threads
+        // this is the type of the queues of new or pending threads
         typedef 
             boost::lockfree::fifo<boost::shared_ptr<thread> > 
         work_items_type;
@@ -185,11 +185,11 @@ namespace hpx { namespace threads
         ///                 \a thread_state enumeration. If the 
         ///                 thread is not known to the threadmanager the return 
         ///                 value will be \a thread_state#unknown.
-        thread_state get_state(thread_id_type id) const;
+        thread_state get_state(thread_id_type id);
 
         ///
         naming::id_type get_thread_gid(thread_id_type id, 
-            applier::applier& appl) const;
+            applier::applier& appl);
 
         /// Set a timer to set the state of the given \a thread to the given 
         /// new value after it expired (at the given time)
@@ -231,6 +231,14 @@ namespace hpx { namespace threads
         thread_state set_state(thread_self* self, thread_id_type id, 
             thread_state new_state);
 
+        /// This function adds threads stored in the new_items queue to the 
+        /// thread map and the work_items queue (if appropriate)
+        bool add_new();
+
+        /// This function makes sure alle threads which are marked for deletion
+        /// (state is terminated) are properly destroyed
+        bool cleanup_terminated();
+
     private:
         /// this thread manager has exactly as much threads as requested
         boost::ptr_vector<boost::thread> threads_;
@@ -240,6 +248,8 @@ namespace hpx { namespace threads
         work_items_type terminated_items_;  ///< list of terminated threads
         set_state_queue_type active_set_state_;  ///< list of threads waiting for 
                                             ///< set_state on an active thread
+
+        work_items_type new_items_;         ///< list of threads to run
 
         bool running_;                      ///< thread manager has bee started
         mutable mutex_type mtx_;            ///< mutex protecting the members

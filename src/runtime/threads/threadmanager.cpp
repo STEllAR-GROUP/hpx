@@ -64,7 +64,6 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     struct register_work_tag {};
-    struct create_thread_tag {};
 
     thread_id_type threadmanager::register_work(
         boost::function<thread_function_type> threadfunc, 
@@ -93,32 +92,43 @@ namespace hpx { namespace threads
                    << "description(" << description << ")";
 
         // create the new thread
-        util::block_profiler<create_thread_tag> ct("threadmanager::create_thread");
-
         boost::shared_ptr<threads::thread> thrd (
             new threads::thread(threadfunc, *this, initial_state, description));
 
-        ct.measure();
-
-        // lock data members while adding work
-        mutex_type::scoped_lock lk(mtx_);
-
-        // add a new entry in the map for this thread
-        thread_map_.insert(map_pair(thrd->get_thread_id(), thrd));
-
-        // only insert in the work-items queue if it is in pending state
-        if (initial_state == pending)
-        {
-            // pushing the new thread in the pending queue thread
-            work_items_.enqueue(thrd);
-            if (run_now) 
-                cond_.notify_all();       // try to execute the new work item
-        }
+        // add the new thread to the queue of new items it will get picked up
+        // by the master thread and added to the map
+        new_items_.enqueue(thrd);
+        if (run_now)
+            cond_.notify_all();
 
         // return the thread_id of the newly created thread
         return thrd->get_thread_id();
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    inline bool threadmanager::add_new()
+    {
+        if (new_items_.empty()) 
+            return false;
+
+        bool found_one = false;
+        boost::shared_ptr<thread> toadd;
+        while (new_items_.dequeue(&toadd)) {
+            // add the new entry in the map of all threads
+            thread_map_.insert(map_pair(toadd->get_thread_id(), toadd));
+
+            // only insert the thread into the work-items queue if it is in 
+            // pending state
+            if (toadd->get_state() == pending) {
+                // pushing the new thread into the pending queue 
+                work_items_.enqueue(toadd);
+            }
+            found_one = true;
+        }
+        return found_one;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     /// The set_state function is part of the thread related API and allows
     /// to change the state of one of the threads managed by this threadmanager
     inline thread_state threadmanager::set_state(thread_self& self, 
@@ -154,9 +164,18 @@ namespace hpx { namespace threads
         mutex_type::scoped_lock lk(mtx_);
 
         thread_map_type::iterator map_iter = thread_map_.find(id);
+
+        // the id may reference a new thread not yet stored in the map
+        if (map_iter == thread_map_.end() && add_new())
+            map_iter = thread_map_.find(id);
+
         if (map_iter != thread_map_.end())
         {
             boost::shared_ptr<thread> thrd = map_iter->second;
+
+            lk.unlock();
+
+            // action depends on the current state
             thread_state previous_state = thrd->get_state();
 
             // nothing to do here if the state doesn't change
@@ -177,7 +196,6 @@ namespace hpx { namespace threads
 
                 do {
                     active_set_state_.enqueue(self->get_thread_id());
-                    util::unlock_the_lock<mutex_type::scoped_lock> ul(lk);
                     self->yield(suspended);
                 } while ((previous_state = thrd->get_state()) == active);
 
@@ -215,16 +233,20 @@ namespace hpx { namespace threads
 
     /// The get_state function is part of the thread related API and allows
     /// to query the state of one of the threads known to the threadmanager
-    thread_state threadmanager::get_state(thread_id_type id) const
+    thread_state threadmanager::get_state(thread_id_type id) 
     {
         // lock data members while getting a thread state
         mutex_type::scoped_lock lk(mtx_);
 
-        thread_map_type::const_iterator map_iter = thread_map_.find(id);
+        thread_map_type::iterator map_iter = thread_map_.find(id);
+
+        // the id may reference a new thread not yet stored in the map
+        if (map_iter == thread_map_.end() && add_new())
+            map_iter = thread_map_.find(id);
+
         if (map_iter != thread_map_.end())
-        {
             return map_iter->second->get_state();
-        }
+
         return unknown;
     }
 
@@ -299,16 +321,20 @@ namespace hpx { namespace threads
 
     /// Retrieve the global id of the given thread
     naming::id_type threadmanager::get_thread_gid(thread_id_type id, 
-        applier::applier& appl) const
+        applier::applier& appl) 
     {
         // lock data members while getting a thread state
         mutex_type::scoped_lock lk(mtx_);
 
-        thread_map_type::const_iterator map_iter = thread_map_.find(id);
+        thread_map_type::iterator map_iter = thread_map_.find(id);
+
+        // the id may reference a new thread not yet stored in the map
+        if (map_iter == thread_map_.end() && add_new())
+            map_iter = thread_map_.find(id);
+
         if (map_iter != thread_map_.end())
-        {
             return map_iter->second->get_gid(appl);
-        }
+
         return naming::invalid_id;
     }
 
@@ -344,16 +370,6 @@ namespace hpx { namespace threads
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Queue, typename Map>
-    inline bool cleanup(Queue& terminated_items, Map& thread_map)
-    {
-        boost::shared_ptr<thread> todelete;
-        while (terminated_items.dequeue(&todelete))
-            thread_map.erase(todelete->get_thread_id());
-        return thread_map.empty();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     inline void handle_pending_set_state(threadmanager& tm, 
         threadmanager::set_state_queue_type& active_set_state)
     {
@@ -375,6 +391,17 @@ namespace hpx { namespace threads
                     active_set_state.enqueue(id);
             }
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline bool threadmanager::cleanup_terminated()
+    {
+        if (!terminated_items_.empty()) {
+            boost::shared_ptr<thread> todelete;
+            while (terminated_items_.dequeue(&todelete))
+                thread_map_.erase(todelete->get_thread_id());
+        }
+        return thread_map_.empty();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -488,18 +515,22 @@ namespace hpx { namespace threads
                     // separate queue
                     terminated_items_.enqueue(thrd);
                 }
-
-                // only one dedicated OS thread is allowed to acquire the 
-                // lock for the purpose of deleting all terminated threads
-                if (is_master_thread && !terminated_items_.empty()) {
-                    mutex_type::scoped_lock lk(mtx_);
-                    cleanup(terminated_items_, thread_map_);
-                }
             }
 
-            // make sure to handle pending set_state requests
-            if (is_master_thread) 
+            // only one dedicated OS thread is allowed to acquire the 
+            // lock for the purpose of inserting the new threads into the 
+            // thread-map and deleting all terminated threads
+            if (is_master_thread) {
+                {
+                    mutex_type::scoped_lock lk(mtx_);
+                    if (add_new())
+                        cond_.notify_all();
+                    cleanup_terminated();
+                }
+
+                // make sure to handle pending set_state requests
                 handle_pending_set_state(*this, active_set_state_);
+            }
 
             // if nothing else has to be done either wait or terminate
             if (work_items_.empty() && active_set_state_.empty()) {
@@ -509,10 +540,10 @@ namespace hpx { namespace threads
                 LTM_(info) << "tfunc(" << num_thread << "): queues empty";
 
                 // stop running after all PX threads have been terminated
-                if (!running_) {
+                if (!add_new() && !running_) {
                     // Before exiting each of the OS threads deletes the 
                     // remaining terminated PX threads 
-                    if (cleanup(terminated_items_, thread_map_)) {
+                    if (cleanup_terminated()) {
                         // we don't have any registered work items anymore
                         cond_.notify_all();   // notify possibly waiting threads
                         break;                // terminate scheduling loop
@@ -532,6 +563,9 @@ namespace hpx { namespace threads
                                << "): queues empty, entering wait";
                     cond_.wait(lk);
                     LTM_(info) << "tfunc(" << num_thread << "): exiting wait";
+
+                    // make sure all pending new threads are properly queued
+                    add_new();
                 }
             }
         }

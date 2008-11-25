@@ -183,8 +183,13 @@ namespace boost {namespace coroutines {
                   static_cast<LPVOID>(&cb))
           )
       {
-        if (0 == m_ctx)
-          boost::throw_exception(std::bad_alloc());
+        if (0 == m_ctx) {
+          boost::throw_exception(boost::system::system_error(
+              boost::system::error_code(
+                  GetLastError(), boost::system::system_category
+              )
+          ));
+        }
       }
 
       ~fibers_context_impl() 

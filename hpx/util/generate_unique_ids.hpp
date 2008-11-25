@@ -15,7 +15,7 @@
 
 namespace hpx { namespace util
 {
-    /// The unique_ids class is a singleton type responsible for generating 
+    /// The unique_ids class is a type responsible for generating 
     /// unique ids for components, parcels, threads etc.
     template <typename Mutex = boost::mutex>
     class unique_ids 
