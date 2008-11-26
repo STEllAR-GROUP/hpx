@@ -312,7 +312,7 @@ namespace boost { namespace coroutines { namespace detail {
       BOOST_ASSERT(!pending());
       BOOST_ASSERT(ready()) ;
       if(m_exit_state < ctx_exit_pending) 
-        m_exit_state = ctx_exit_pending;	
+        m_exit_state = ctx_exit_pending;
       do_invoke();
       BOOST_ASSERT(exited()); //at this point the coroutine MUST have exited.
     }

@@ -55,20 +55,16 @@ namespace hpx { namespace util
         {
             SYSTEMTIME st;
             GetSystemTime(&st);
-            
+
             FILETIME ft;
             SystemTimeToFileTime(&st, &ft);
-            
+
             LARGE_INTEGER now;
             now.LowPart = ft.dwLowDateTime;
             now.HighPart = ft.dwHighDateTime;
-            
-            LARGE_INTEGER frequency;
-            if (!QueryPerformanceFrequency(&frequency))
-                boost::throw_exception(std::runtime_error("Couldn't acquire frequency"));
 
-            // SystemTime is in 100ns increments
-            return now.QuadPart * 1e-7;
+            // FileTime is in 100ns increments, result needs to be in [s]
+            return now.QuadPart / 1e-7;
         }
         
         void restart() 
@@ -198,18 +194,6 @@ namespace hpx { namespace util
 
 #include <boost/timer.hpp>
 
-namespace hpx { namespace util
-{
-    struct high_resolution_timer
-        : boost::timer
-    {
-        static double now()
-        {
-            return double(std::clock());
-        }
-    };
-}}
-
 // availability of high performance timers must be checked at runtime
 namespace hpx { namespace util
 {
@@ -250,7 +234,7 @@ namespace hpx { namespace util
         static double now()
         {
             if (sysconf(_SC_THREAD_CPUTIME) <= 0)
-                return std::clock();
+                return double(std::clock());
 
             timespec now;
             if (-1 == clock_gettime(CLOCK_THREAD_CPUTIME_ID, &now))

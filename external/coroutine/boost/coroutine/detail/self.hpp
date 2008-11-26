@@ -231,34 +231,54 @@ namespace boost { namespace coroutines { namespace detail {
     coroutine_self(impl_type * pimpl, detail::init_from_impl_tag) :
       m_pimpl(pimpl) {}
 
+    // store the current this and write it to the TSS on exit
+    struct reset_self_on_exit
+    {
+        reset_self_on_exit(coroutine_self* self)
+          : self_(self)
+        {
+        }
+        ~reset_self_on_exit()
+        {
+            *impl_type::self_ = self_;
+        }
+
+        coroutine_self* self_;
+    };
+
     yield_result_type yield_impl(BOOST_DEDUCED_TYPENAME 
-                                 coroutine_type::result_slot_type result) {
-      typedef BOOST_DEDUCED_TYPENAME
-        coroutine_type::result_slot_type slot_type;
+                                 coroutine_type::result_slot_type result) 
+    {
+      typedef BOOST_DEDUCED_TYPENAME coroutine_type::result_slot_type slot_type;
 
       BOOST_ASSERT(m_pimpl);
 
       this->m_pimpl->bind_result(&result);
-      this->m_pimpl->yield();    
-      return detail::fix_result<
-        BOOST_DEDUCED_TYPENAME
-        coroutine_type::arg_slot_traits>(*m_pimpl->args());
+      {
+        reset_self_on_exit on_exit(this);
+        this->m_pimpl->yield();
+      }
+
+      typedef BOOST_DEDUCED_TYPENAME coroutine_type::arg_slot_traits traits_type;
+      return detail::fix_result<traits_type>(*m_pimpl->args());
     }
 
     template<typename TargetCoroutine>
     yield_result_type yield_to_impl(TargetCoroutine& target, 
-                           BOOST_DEDUCED_TYPENAME TargetCoroutine
-                           ::arg_slot_type args) {
+        BOOST_DEDUCED_TYPENAME TargetCoroutine::arg_slot_type args) 
+    {
       BOOST_ASSERT(m_pimpl);
 
       coroutine_accessor::get_impl(target)->bind_args(&args);
-      coroutine_accessor::get_impl(target)->bind_result_pointer(m_pimpl->result_pointer());    
+      coroutine_accessor::get_impl(target)->bind_result_pointer(m_pimpl->result_pointer());
 
-      this->m_pimpl->yield_to(*coroutine_accessor::get_impl(target));
+      {
+        reset_self_on_exit on_exit(this);
+        this->m_pimpl->yield_to(*coroutine_accessor::get_impl(target));
+      }
 
-      return detail::fix_result<
-        BOOST_DEDUCED_TYPENAME
-        coroutine_type::arg_slot_traits>(*m_pimpl->args());
+      typedef BOOST_DEDUCED_TYPENAME coroutine_type::arg_slot_traits traits_type;
+      return detail::fix_result<traits_type>(*m_pimpl->args());
     }
 
     impl_ptr get_impl() {
@@ -266,6 +286,7 @@ namespace boost { namespace coroutines { namespace detail {
     }
     impl_ptr m_pimpl;
   };
+
 } } }
 
 #endif
