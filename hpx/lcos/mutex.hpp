@@ -98,7 +98,7 @@ namespace hpx { namespace lcos
         mutex()
         {}
 
-        void lock(threads::thread_self& self) {}
+        void lock() {}
         void unlock() {}
         bool locked() { return false; }
 

@@ -104,8 +104,7 @@ namespace hpx { namespace util { namespace detail
         ///////////////////////////////////////////////////////////////////////
         // enqueue a get operation if full/full queue if entry is empty
         template <typename Lock, typename T>
-        void enqueue_full_full(Lock& outer_lock, 
-            threads::thread_self& self, T& dest)
+        void enqueue_full_full(Lock& outer_lock, T& dest)
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
@@ -113,6 +112,7 @@ namespace hpx { namespace util { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
+                threads::thread_self& self = threads::get_self();
                 full_empty_queue_entry f(self.get_thread_id());
                 read_queue_.push_back(f);
 
@@ -127,7 +127,7 @@ namespace hpx { namespace util { namespace detail
 
         // same as above, but for entries without associated data
         template <typename Lock>
-        void enqueue_full_full(Lock& outer_lock, threads::thread_self& self)
+        void enqueue_full_full(Lock& outer_lock)
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
@@ -135,6 +135,7 @@ namespace hpx { namespace util { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
+                threads::thread_self& self = threads::get_self();
                 full_empty_queue_entry f(self.get_thread_id());
                 read_queue_.push_back(f);
 
@@ -146,8 +147,7 @@ namespace hpx { namespace util { namespace detail
         ///////////////////////////////////////////////////////////////////////
         // enqueue a get operation in full/empty queue if entry is empty
         template <typename Lock, typename T>
-        void enqueue_full_empty(Lock& outer_lock, 
-            threads::thread_self& self, T& dest)
+        void enqueue_full_empty(Lock& outer_lock, T& dest)
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
@@ -155,6 +155,7 @@ namespace hpx { namespace util { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
+                threads::thread_self& self = threads::get_self();
                 full_empty_queue_entry f(self.get_thread_id());
                 read_and_empty_queue_.push_back(f);
 
@@ -178,7 +179,7 @@ namespace hpx { namespace util { namespace detail
 
         // same as above, but for entries without associated data
         template <typename Lock>
-        void enqueue_full_empty(Lock& outer_lock, threads::thread_self& self)
+        void enqueue_full_empty(Lock& outer_lock)
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
@@ -186,6 +187,7 @@ namespace hpx { namespace util { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
+                threads::thread_self& self = threads::get_self();
                 full_empty_queue_entry f(self.get_thread_id());
                 read_and_empty_queue_.push_back(f);
 
@@ -201,8 +203,7 @@ namespace hpx { namespace util { namespace detail
         ///////////////////////////////////////////////////////////////////////
         // enqueue if entry is full, otherwise fill it
         template <typename Lock, typename T>
-        void enqueue_if_full(Lock& outer_lock, 
-            threads::thread_self& self, T const& src)
+        void enqueue_if_full(Lock& outer_lock, T const& src)
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
@@ -210,6 +211,7 @@ namespace hpx { namespace util { namespace detail
             // block if this entry is already full
             if (state_ == full) {
                 // enqueue the request and block this thread
+                threads::thread_self& self = threads::get_self();
                 full_empty_queue_entry f(self.get_thread_id());
                 write_queue_.push_back(f);
 
@@ -227,8 +229,7 @@ namespace hpx { namespace util { namespace detail
 
         // same as above, but for entries without associated data
         template <typename Lock>
-        void enqueue_if_full(Lock& outer_lock, 
-            threads::thread_self& self)
+        void enqueue_if_full(Lock& outer_lock)
         {
             scoped_lock l(mtx_);
             outer_lock.unlock();
@@ -236,6 +237,7 @@ namespace hpx { namespace util { namespace detail
             // block if this entry is already full
             if (state_ == full) {
                 // enqueue the request and block this thread
+                threads::thread_self& self = threads::get_self();
                 full_empty_queue_entry f(self.get_thread_id());
                 write_queue_.push_back(f);
 
@@ -461,7 +463,7 @@ namespace hpx { namespace util { namespace detail
         /// \brief  Waits for the memory to become full and then reads it, 
         ///         leaves memory in full state.
         template <typename T>
-        void read(threads::thread_self& self, void* entry, T& dest) 
+        void read(void* entry, T& dest) 
         {
             boost::shared_lock<mutex_type> l(mtx_);
             store_type::iterator it = store_.find(entry);
@@ -471,34 +473,33 @@ namespace hpx { namespace util { namespace detail
                     dest = *static_cast<T const*>(entry);
             }
             else {
-                (*it).second->enqueue_full_full(l, self, dest);
+                (*it).second->enqueue_full_full(l, dest);
             }
         }
 
-        void read(threads::thread_self& self, void* entry) 
+        void read(void* entry) 
         {
             boost::shared_lock<mutex_type> l(mtx_);
             store_type::iterator it = store_.find(entry);
             if (it != store_.end()) 
-                (*it).second->enqueue_full_full(l, self);
+                (*it).second->enqueue_full_full(l);
         }
 
         /// \brief Wait for memory to become full and then reads it, sets 
         /// memory to empty.
         template <typename T>
-        void read_and_empty(threads::thread_self& self, void* entry, 
-            T& dest)
+        void read_and_empty(void* entry, T& dest)
         {
             boost::upgrade_lock<mutex_type> l(mtx_);
             store_type::iterator it = find_or_create(l, entry);
-            (*it).second->enqueue_full_empty(l, self, dest);
+            (*it).second->enqueue_full_empty(l, dest);
         }
 
-        void read_and_empty(threads::thread_self& self, void* entry)
+        void read_and_empty(void* entry)
         {
             boost::upgrade_lock<mutex_type> l(mtx_);
             store_type::iterator it = find_or_create(l, entry);
-            (*it).second->enqueue_full_empty(l, self);
+            (*it).second->enqueue_full_empty(l);
         }
 
         /// \brief Writes memory and atomically sets its state to full without 
@@ -521,19 +522,18 @@ namespace hpx { namespace util { namespace detail
 
         /// \brief Wait for memory to become empty, and then fill it.
         template <typename T>
-        void write(threads::thread_self& self, void* entry, 
-            T const& src)
+        void write(void* entry, T const& src)
         {
             boost::upgrade_lock<mutex_type> l(mtx_);
             store_type::iterator it = find_or_create(l, entry);
-            (*it).second->enqueue_if_full(l, self, src);
+            (*it).second->enqueue_if_full(l, src);
         }
 
-        void write(threads::thread_self& self, void* entry)
+        void write(void* entry)
         {
             boost::upgrade_lock<mutex_type> l(mtx_);
             store_type::iterator it = find_or_create(l, entry);
-            (*it).second->enqueue_if_full(l, self);
+            (*it).second->enqueue_if_full(l);
         }
 
     private:

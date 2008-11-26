@@ -41,12 +41,12 @@ namespace hpx { namespace components { namespace stubs
             return lcos::eager_future<action_type, data_type>(appl, targetgid);
         }
 
-        static components::memory_block_data get(threads::thread_self& self, 
+        static components::memory_block_data get(
             applier::applier& appl, naming::id_type const& targetgid) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future
-            return get_async(appl, targetgid).get(self);
+            return get_async(appl, targetgid).get();
         }
 
         /// Exposed functionality: get returns either the local memory pointers
@@ -58,10 +58,9 @@ namespace hpx { namespace components { namespace stubs
         }
 
         /// 
-        components::memory_block_data get(threads::thread_self& self, 
-            naming::id_type const& gid) 
+        components::memory_block_data get(naming::id_type const& gid) 
         {
-            return get(self, appl_, gid);
+            return get(appl_, gid);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -76,12 +75,12 @@ namespace hpx { namespace components { namespace stubs
             return lcos::eager_future<action_type, data_type>(appl, targetgid);
         }
 
-        static components::memory_block_data checkout(threads::thread_self& self, 
+        static components::memory_block_data checkout(
             applier::applier& appl, naming::id_type const& targetgid) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future
-            return checkout_async(appl, targetgid).get(self);
+            return checkout_async(appl, targetgid).get();
         }
 
         /// Exposed functionality: get returns either the local memory pointers
@@ -93,10 +92,9 @@ namespace hpx { namespace components { namespace stubs
         }
 
         /// 
-        components::memory_block_data checkout(threads::thread_self& self, 
-            naming::id_type const& gid) 
+        components::memory_block_data checkout(naming::id_type const& gid) 
         {
-            return checkout(self, appl_, gid);
+            return checkout(appl_, gid);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -111,12 +109,12 @@ namespace hpx { namespace components { namespace stubs
             return lcos::eager_future<action_type, data_type>(appl, targetgid);
         }
 
-        static naming::id_type clone(threads::thread_self& self, 
+        static naming::id_type clone(
             applier::applier& appl, naming::id_type const& targetgid) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future
-            return clone_async(appl, targetgid).get(self);
+            return clone_async(appl, targetgid).get();
         }
 
         /// Exposed functionality: get returns either the local memory pointers
@@ -128,10 +126,9 @@ namespace hpx { namespace components { namespace stubs
         }
 
         /// 
-        naming::id_type clone(threads::thread_self& self, 
-            naming::id_type const& gid) 
+        naming::id_type clone(naming::id_type const& gid) 
         {
-            return clone(self, appl_, gid);
+            return clone(appl_, gid);
         }
     };
 

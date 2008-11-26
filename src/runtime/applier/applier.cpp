@@ -26,11 +26,11 @@ namespace hpx { namespace applier
     }
 
     // 
-    naming::id_type create(threads::thread_self& self, applier& appl, 
+    naming::id_type create(applier& appl, 
         naming::id_type const& targetgid, components::component_type type,
         std::size_t count)
     {
-        return create_async(appl, targetgid, type, count).get(self);
+        return create_async(appl, targetgid, type, count).get();
     }
 
     //
@@ -55,7 +55,7 @@ namespace hpx { namespace applier
         threads::thread_state state, bool run_now)
     {
         return appl.get_thread_manager().register_work(
-            boost::bind(func, _1, boost::ref(appl)), desc, state, run_now);
+            boost::bind(func, boost::ref(appl)), desc, state, run_now);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -76,3 +76,27 @@ namespace hpx { namespace applier
 ///////////////////////////////////////////////////////////////////////////////
 }}
 
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace threads
+{
+    ///////////////////////////////////////////////////////////////////////////
+    thread_state set_thread_state(thread_id_type id, thread_state new_state)
+    {
+        return applier::get_applier().get_thread_manager().set_state(id, new_state);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    thread_id_type set_thread_state(thread_id_type id, thread_state state, 
+        boost::posix_time::ptime const& at_time)
+    {
+        return applier::get_applier().get_thread_manager().set_state(at_time, id, state);
+    }
+
+    ///////////////////////////////////////////////////////////////////////
+    thread_id_type set_thread_state(thread_id_type id, thread_state state,
+        boost::posix_time::time_duration const& after)
+    {
+        return applier::get_applier().get_thread_manager().set_state(after, id, state);
+    }
+
+}}

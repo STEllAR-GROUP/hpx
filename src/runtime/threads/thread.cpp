@@ -32,5 +32,10 @@ namespace hpx { namespace threads
         return **thread_self::impl_type::self_;
     }
 
+    thread_self* get_self_ptr()
+    {
+        return *thread_self::impl_type::self_;
+    }
+
 }}
 

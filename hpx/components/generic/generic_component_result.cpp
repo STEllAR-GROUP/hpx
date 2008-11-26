@@ -14,8 +14,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // This is the function to wrap into the component. It's purpose is to print
 // the floating point number it receives as its argument
-hpx::threads::thread_state generate_number (hpx::threads::thread_self&, 
-    hpx::applier::applier&, double* result)
+hpx::threads::thread_state generate_number (hpx::applier::applier&, double* result)
 {
     *result = 42;
     return hpx::threads::terminated;

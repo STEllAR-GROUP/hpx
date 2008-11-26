@@ -357,8 +357,7 @@ namespace hpx { namespace applier
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT typedef threads::thread_state full_thread_function_type(
-        threads::thread_self&, applier&);
+    typedef threads::thread_state full_thread_function_type(applier&);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new \a thread using the given function as the 
@@ -382,7 +381,6 @@ namespace hpx { namespace applier
     /// caller of this create_async is responsible to call 
     /// \a lcos#future_value#get to obtain the result. 
     ///
-    /// \param self
     /// \param targetgid
     /// \param type
     /// \param count
@@ -402,7 +400,6 @@ namespace hpx { namespace applier
     /// for the component to be created and until the global id of the new 
     /// component has been returned. 
     ///
-    /// \param self
     /// \param targetgid
     /// \param type
     /// \param count
@@ -412,7 +409,7 @@ namespace hpx { namespace applier
     ///
     /// \note       For asynchronous operation use the function 
     ///             \a applier#create_async.
-    HPX_API_EXPORT naming::id_type create(threads::thread_self& self, 
+    HPX_API_EXPORT naming::id_type create(
         applier& appl, naming::id_type const& targetgid, 
         components::component_type type, std::size_t count = 1);
 

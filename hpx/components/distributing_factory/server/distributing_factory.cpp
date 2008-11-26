@@ -30,9 +30,8 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     // create a new instance of a component
     threads::thread_state distributing_factory::create_components(
-        threads::thread_self& self, applier::applier& appl,
-        result_type* gids, components::component_type type, 
-        std::size_t count)
+        applier::applier& appl, result_type* gids, 
+        components::component_type type, std::size_t count)
     {
         // make sure we get prefixes for derived component type, if any
         components::component_type prefix_type = type;
@@ -75,7 +74,7 @@ namespace hpx { namespace components { namespace server
             // component at once
             int factory_props = factory_none;
             if (1 != numcreate) {
-                factory_props = rts.get_factory_properties(self, *it, type);
+                factory_props = rts.get_factory_properties(*it, type);
             }
 
             if (factory_props & factory_is_multi_instance) {
@@ -103,7 +102,7 @@ namespace hpx { namespace components { namespace server
         for (future_values_type::iterator vit = v.begin(); vit != vend; ++vit)
         {
             gids->push_back(result_type::value_type(
-                (*vit).prefix_, (*vit).gids_.get(self), (*vit).count_, type));
+                (*vit).prefix_, (*vit).gids_.get(), (*vit).count_, type));
         }
 
         return threads::terminated;
@@ -112,8 +111,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     // Action to delete existing components
     threads::thread_state distributing_factory::free_components(
-        threads::thread_self& self, applier::applier& appl,
-        result_type const& gids, bool sync)
+        applier::applier& appl, result_type const& gids, bool sync)
     {
         components::stubs::runtime_support rts(appl);
 
@@ -126,7 +124,7 @@ namespace hpx { namespace components { namespace server
                 // have been moved to a different locality than it was 
                 // initially created on.
                 if (sync)
-                    rts.free_component_sync(self, (*it).type_, (*it).first_gid_ + i);
+                    rts.free_component_sync((*it).type_, (*it).first_gid_ + i);
                 else
                     rts.free_component((*it).type_, (*it).first_gid_ + i);
             }

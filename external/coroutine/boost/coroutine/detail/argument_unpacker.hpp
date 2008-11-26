@@ -42,63 +42,63 @@ namespace boost { namespace coroutines { namespace detail {
   struct unpacker_ex_n;
 
 
-#define BOOST_COROUTINE_ARGUMENT_UNPACKER(z, len, unused)              \
-    template<typename Traits>                                          \
-    struct unpacker_n<Traits, len> {                                   \
-        template<typename Functor, typename Tuple>                     \
-      struct result {/*for result_of compatibility*/                   \
-          typedef typename  boost::result_of                           \
-             <Functor(BOOST_PP_ENUM_BINARY_PARAMS                      \
-                      (len, typename Traits::template at<index_ , >    \
-                       ::type BOOST_PP_INTERCEPT))>::type type;        \
-      };                                                               \
-      template<typename Functor, typename Tuple>                       \
-      typename result<Functor, Tuple>::type operator()                 \
-       (Functor& f, Tuple& parms){                                     \
-           using boost::get; /*tuples::get cannot be found via ADL*/   \
-           return f(BOOST_PP_ENUM_BINARY_PARAMS                        \
-                    (len,                                              \
-                     get<index_, >                                     \
-                     (parms) BOOST_PP_INTERCEPT));                     \
-      }                                                                \
-    };                                                                 \
+#define BOOST_COROUTINE_ARGUMENT_UNPACKER(z, len, unused)                     \
+    template<typename Traits>                                                 \
+    struct unpacker_n<Traits, len> {                                          \
+        template<typename Functor, typename Tuple>                            \
+      struct result {/*for result_of compatibility*/                          \
+          typedef typename  boost::result_of                                  \
+             <Functor(BOOST_PP_ENUM_BINARY_PARAMS                             \
+                      (len, typename Traits::template at<index_ , >           \
+                       ::type BOOST_PP_INTERCEPT))>::type type;               \
+      };                                                                      \
+      template<typename Functor, typename Tuple>                              \
+      typename result<Functor, Tuple>::type operator()                        \
+       (Functor& f, Tuple& parms){                                            \
+           using boost::get; /*tuples::get cannot be found via ADL*/          \
+           return f(BOOST_PP_ENUM_BINARY_PARAMS                               \
+                    (len,                                                     \
+                     get<index_, >                                            \
+                     (parms) BOOST_PP_INTERCEPT));                            \
+      }                                                                       \
+    };                                                                        \
 /**/
     
-#define BOOST_COROUTINE_ARGUMENT_UNPACKER_EX(z, len, unused)           \
-    template<typename Traits>                                          \
-    struct unpacker_ex_n<Traits, len >           {                     \
-    template<typename Functor,                                         \
-             typename First,                                           \
-             typename Tuple>                                           \
-      struct result {                                                  \
-          typedef typename  boost::result_of                           \
-             <Functor(First BOOST_PP_COMMA_IF(len)                     \
-                      BOOST_PP_ENUM_BINARY_PARAMS                      \
-                      (len, typename Traits                            \
-                       ::template at<index_ , >::type BOOST_PP_INTERCEPT))>     \
-          ::type type;                                                 \
-        };                                                             \
-                                                                       \
-      template<typename Functor,                                       \
-               typename First,                                         \
-               typename Tuple>                                         \
-      typename result<Functor, First, Tuple>::type                     \
-      operator()(Functor& f, First& arg0, Tuple& parms){                \
-           using boost::get; /*tuples::get cannot be found via ADL*/  \
-           return f(arg0                                               \
-                    BOOST_PP_COMMA_IF(len)                             \
-                    BOOST_PP_ENUM_BINARY_PARAMS                        \
-                    (len,                                              \
-                     get<index_, >                                     \
-                     (parms) BOOST_PP_INTERCEPT) );                    \
-      }                                                                \
-    };                                                                 \
+#define BOOST_COROUTINE_ARGUMENT_UNPACKER_EX(z, len, unused)                  \
+    template<typename Traits>                                                 \
+    struct unpacker_ex_n<Traits, len >           {                            \
+    template<typename Functor,                                                \
+             typename First,                                                  \
+             typename Tuple>                                                  \
+      struct result {                                                         \
+          typedef typename  boost::result_of                                  \
+             <Functor(First BOOST_PP_COMMA_IF(len)                            \
+                      BOOST_PP_ENUM_BINARY_PARAMS                             \
+                      (len, typename Traits                                   \
+                       ::template at<index_ , >::type BOOST_PP_INTERCEPT))>   \
+          ::type type;                                                        \
+        };                                                                    \
+                                                                              \
+      template<typename Functor,                                              \
+               typename First,                                                \
+               typename Tuple>                                                \
+      typename result<Functor, First, Tuple>::type                            \
+      operator()(Functor& f, First& arg0, Tuple& parms){                      \
+           using boost::get; /*tuples::get cannot be found via ADL*/          \
+           return f(arg0                                                      \
+                    BOOST_PP_COMMA_IF(len)                                    \
+                    BOOST_PP_ENUM_BINARY_PARAMS                               \
+                    (len,                                                     \
+                     get<index_, >                                            \
+                     (parms) BOOST_PP_INTERCEPT) );                           \
+      }                                                                       \
+    };                                                                        \
 /**/
 
-  BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX, 
-                  BOOST_COROUTINE_ARGUMENT_UNPACKER, ~);
-  BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX, 
-                  BOOST_COROUTINE_ARGUMENT_UNPACKER_EX, ~);
+BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX, 
+                BOOST_COROUTINE_ARGUMENT_UNPACKER, ~);
+BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX, 
+                BOOST_COROUTINE_ARGUMENT_UNPACKER_EX, ~);
 
   // Somehow VCPP 8.0 chokes if the Trait for unpack[_ex]
   // is explicitly specified. We use an empty dispatch 
@@ -112,8 +112,8 @@ namespace boost { namespace coroutines { namespace detail {
    */
   template<typename Traits, typename Functor, typename Tuple>
   inline
-  typename unpacker_n<Traits, Traits::length>
-  ::template result<Functor, Tuple>::type
+  typename unpacker_n<Traits, Traits::length>::
+      template result<Functor, Tuple>::type
   unpack(Functor f, Tuple& parms, trait_tag<Traits>) {
     return unpacker_n<Traits, Traits::length>()(f, parms);
   }
@@ -125,10 +125,10 @@ namespace boost { namespace coroutines { namespace detail {
   template<typename Traits, typename Functor, typename First, typename Tuple>
   inline
   typename unpacker_ex_n<Traits, Traits::length>::
-  template result<Functor, First, Tuple>::type 
+      template result<Functor, First, Tuple>::type 
   unpack_ex(Functor f, First& arg0, Tuple& parms, trait_tag<Traits>) {
-    return unpacker_ex_n<Traits, Traits::length>()
-      (f, arg0, parms);
+    return unpacker_ex_n<Traits, Traits::length>()(f, arg0, parms);
   }
+
 } } }
 #endif

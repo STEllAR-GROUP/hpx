@@ -38,7 +38,7 @@ namespace hpx { namespace parcelset
             std::size_t) 
         {}
 
-        threads::thread_state decode(threads::thread_self&, 
+        threads::thread_state decode(
             boost::shared_ptr<std::vector<char> > const&);
 
         void parcel_sink(parcelport& pp, 

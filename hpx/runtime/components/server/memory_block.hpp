@@ -261,30 +261,26 @@ namespace hpx { namespace components { namespace server { namespace detail
         // exposed functionality of this component
 
         /// Get the current data for reading
-        threads::thread_state 
-        get (threads::thread_self&, applier::applier& appl, 
+        threads::thread_state get (applier::applier& appl, 
             memory_block_data* result);
 
         components::memory_block_data local_get (applier::applier& appl);
 
         /// Get the current data for reading
-        threads::thread_state 
-        checkout (threads::thread_self& self, applier::applier& appl, 
+        threads::thread_state checkout (applier::applier& appl, 
             components::memory_block_data* result);
 
         components::memory_block_data local_checkout (applier::applier& appl);
 
         /// Write back data
-        threads::thread_state 
-        checkin (threads::thread_self&, applier::applier& appl, 
+        threads::thread_state checkin (applier::applier& appl, 
             components::memory_block_data const& newdata);
 
         void local_checkin (applier::applier& appl, 
             components::memory_block_data const& data);
 
         /// Clone this memory_block
-        threads::thread_state 
-        clone (threads::thread_self&, applier::applier& appl, 
+        threads::thread_state clone (applier::applier& appl, 
             naming::id_type* result);
 
         naming::id_type local_clone (applier::applier& appl);
@@ -349,7 +345,7 @@ namespace hpx { namespace components { namespace server
         ///
         /// \param appl [in] The applier to be used for construction of the new
         ///             wrapped instance. 
-        memory_block(threads::thread_self& self, applier::applier& appl, std::size_t size) 
+        memory_block(applier::applier& appl, std::size_t size) 
           : component_(0) 
         {
             boost::uint8_t* p = new boost::uint8_t[size + sizeof(detail::memory_block_header)];
@@ -377,7 +373,7 @@ namespace hpx { namespace components { namespace server
         /// \param self [in] The PX \a thread used to execute this function.
         /// \param appl [in] The applier to be used for finalization of the 
         ///             component instance. 
-        void finalize(threads::thread_self& self, applier::applier& appl) {}
+        void finalize(applier::applier& appl) {}
 
     public:
         /// \brief The destructor releases any wrapped instances
@@ -480,11 +476,11 @@ namespace hpx { namespace components { namespace server
         ///         be created. It is interpreted as the number of bytes to 
         ///         allocate for the new memory_block.
         static memory_block* 
-        create(threads::thread_self& self, applier::applier& appl, std::size_t count)
+        create(applier::applier& appl, std::size_t count)
         {
             // allocate the memory
             memory_block* p = get_heap().alloc();
-            return new (p) memory_block(self, appl, count);
+            return new (p) memory_block(appl, count);
         }
 
         static memory_block* 
@@ -497,13 +493,13 @@ namespace hpx { namespace components { namespace server
 
         /// \brief  The function \a destroy is used for deletion and 
         //          de-allocation of arrays of wrappers
-        static void destroy(threads::thread_self& self, applier::applier& appl, 
+        static void destroy(applier::applier& appl, 
             memory_block* p, std::size_t count = 1)
         {
             if (NULL == p || 0 == count) 
                 return;     // do nothing if given a NULL pointer
 
-            p->finalize(self, appl);
+            p->finalize(appl);
             p->~memory_block();
 
             // free memory itself

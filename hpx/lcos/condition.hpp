@@ -100,31 +100,33 @@ namespace hpx { namespace lcos { namespace detail
         condition()
         {}
 
-        void wait(threads::thread_self& self)
+        void wait()
         {
+            thread_self& self = threads::get_self();
             queue_.enqueue(self.get_thread_id());
             self.yield(threads::suspended);
         }
 
-        void notify_one(threads::thread_self& self)
+        void notify_one()
         {
             thread_id_type id = 0;
+            thread_self& self = threads::get_self();
             if (queue_.dequeue(&id))
                 threads::set_state(self, id, threads::pending);
         }
 
-        void notify_all(threads::thread_self& self)
+        void notify_all()
         {
             thread_id_type id = 0;
+            thread_self& self = threads::get_self();
             while (queue_.dequeue(&id))
                 threads::set_state(self, id, threads::pending);
         }
 
         // standard LCO action implementations
-        threads::thread_state set_event (
-            threads::thread_self& self, applier::applier&)
+        threads::thread_state set_event (applier::applier&)
         {
-            notify_one(self);
+            notify_one();
         }
 
     private:
@@ -147,19 +149,19 @@ namespace hpx { namespace lcos
           : impl_(new wrapping_type(new wrapped_type()))
         {}
 
-        void wait(threads::thread_self& self)
+        void wait()
         {
-            impl_->wait(self);
+            impl_->wait();
         }
 
-        void notify_one(threads::thread_self& self)
+        void notify_one()
         {
-            impl_->notify_one(self);
+            impl_->notify_one();
         }
 
-        void notify_all(threads::thread_self& self)
+        void notify_all()
         {
-            impl_->notify_one(self);
+            impl_->notify_one();
         }
 
     private:

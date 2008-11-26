@@ -55,7 +55,7 @@ namespace hpx { namespace components
             /// \param self [in] The PX \a thread used to execute this function.
             /// \param appl [in] The applier to be used for finalization of the 
             ///             component instance. 
-            void finalize(threads::thread_self& self, applier::applier& appl) {}
+            void finalize(applier::applier& appl) {}
         };
 
         ///////////////////////////////////////////////////////////////////////////
@@ -117,8 +117,8 @@ namespace hpx { namespace components
         ///
         /// \param appl [in] The applier to be used for construction of the new
         ///             wrapped instance. 
-        explicit managed_component(threads::thread_self& self, applier::applier& appl) 
-          : component_(new wrapped_type(self, appl)) 
+        explicit managed_component(applier::applier& appl) 
+          : component_(new wrapped_type(appl)) 
         {}
 
         /// \brief The destructor releases any wrapped instances
@@ -131,12 +131,11 @@ namespace hpx { namespace components
         /// \brief finalize() will be called just before the instance gets 
         ///        destructed
         ///
-        /// \param self [in] The PX \a thread used to execute this function.
         /// \param appl [in] The applier to be used for finalization of the 
         ///             component instance. 
-        void finalize(threads::thread_self& self, applier::applier& appl) 
+        void finalize(applier::applier& appl) 
         { 
-            component_->finalize(self, appl);
+            component_->finalize(appl);
         }
 
         // This is the component id. Every component needs to have an embedded
@@ -232,12 +231,12 @@ namespace hpx { namespace components
         /// \brief  The function \a create is used for allocation and 
         //          initialization of arrays of wrappers.
         static managed_component* 
-        create(threads::thread_self& self, applier::applier& appl, std::size_t count)
+        create(applier::applier& appl, std::size_t count)
         {
             // allocate the memory
             managed_component* p = get_heap().alloc(count);
             if (1 == count)
-                return new (p) derived_type(self, appl);
+                return new (p) derived_type(appl);
 
             // call constructors
             std::size_t succeeded = 0;
@@ -245,7 +244,7 @@ namespace hpx { namespace components
                 derived_type* curr = static_cast<derived_type*>(p);
                 for (std::size_t i = 0; i < count; ++i, ++curr) {
                     // call placement new, might throw
-                    new (curr) derived_type(self, appl);
+                    new (curr) derived_type(appl);
                     ++succeeded;
                 }
             }
@@ -254,7 +253,7 @@ namespace hpx { namespace components
                 derived_type* curr = static_cast<derived_type*>(p);
                 for (std::size_t i = 0; i < succeeded; ++i)
                 {
-                    curr->finalize(self, appl);
+                    curr->finalize(appl);
                     curr->~derived_type();
                 }
                 get_heap().free(p, count);     // free memory
@@ -265,14 +264,14 @@ namespace hpx { namespace components
 
         /// \brief  The function \a destroy is used for deletion and 
         //          de-allocation of arrays of wrappers
-        static void destroy(threads::thread_self& self, applier::applier& appl, 
-            derived_type* p, std::size_t count = 1)
+        static void destroy(applier::applier& appl, derived_type* p, 
+            std::size_t count = 1)
         {
             if (NULL == p || 0 == count) 
                 return;     // do nothing if given a NULL pointer
 
             if (1 == count) {
-                p->finalize(self, appl);
+                p->finalize(appl);
                 p->~derived_type();
             }
             else {
@@ -280,7 +279,7 @@ namespace hpx { namespace components
                 derived_type* curr = static_cast<derived_type*>(p);
                 for (std::size_t i = 0; i < count; ++i)
                 {
-                    curr->finalize(self, appl);
+                    curr->finalize(appl);
                     curr->~derived_type();
                 }
             }

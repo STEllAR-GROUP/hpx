@@ -23,17 +23,16 @@ namespace hpx { namespace components
     /// expected value directly (without wrapping it into a tuple).
     template <typename T1>
     inline T1
-    wait (threads::thread_self& self, lcos::future_value<T1> const& f1)
+    wait (lcos::future_value<T1> const& f1)
     {
-        return f1.get(self);
+        return f1.get();
     }
 
     template <typename T1, typename T2>
     inline boost::tuple<T1, T2>
-    wait (threads::thread_self& self, lcos::future_value<T1> const& f1, 
-        lcos::future_value<T2> const& f2)
+    wait (lcos::future_value<T1> const& f1, lcos::future_value<T2> const& f2)
     {
-        return boost::make_tuple(f1.get(self), f2.get(self));
+        return boost::make_tuple(f1.get(), f2.get());
     }
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
@@ -57,13 +56,12 @@ namespace hpx { namespace components
         lcos::future_value<BOOST_PP_CAT(T, n)> const& BOOST_PP_CAT(f, n)      \
     /**/
 #define HPX_FUTURE_TUPLE_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n)            \
-        BOOST_PP_CAT(f, n).get(self)                                          \
+        BOOST_PP_CAT(f, n).get()                                              \
     /**/
 
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
     inline boost::tuple<BOOST_PP_ENUM_PARAMS(N, T)>
-    wait (threads::thread_self& self, 
-        BOOST_PP_REPEAT(N, HPX_FUTURE_WAIT_ARGUMENT, _))
+    wait (BOOST_PP_REPEAT(N, HPX_FUTURE_WAIT_ARGUMENT, _))
     {
         return boost::make_tuple(BOOST_PP_REPEAT(N, HPX_FUTURE_TUPLE_ARGUMENT, _));
     }

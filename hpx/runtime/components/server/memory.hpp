@@ -53,13 +53,13 @@ namespace hpx { namespace components { namespace server
         /// \param self [in] The PX \a thread used to execute this function.
         /// \param appl [in] The applier to be used for finalization of the 
         ///             component instance. 
-        void finalize(threads::thread_self& self, applier::applier& appl) {}
+        void finalize(applier::applier& appl) {}
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
         /// \brief Action to store an 8 bit value to a memory location
-        threads::thread_state store8(threads::thread_self& self, 
+        threads::thread_state store8(
             applier::applier& app, boost::uint64_t addr, boost::uint8_t value)
         {
             local_store8(app, addr, value);
@@ -67,7 +67,7 @@ namespace hpx { namespace components { namespace server
         }
 
         /// \brief Action to store a 16 bit value to a memory location
-        threads::thread_state store16(threads::thread_self& self, 
+        threads::thread_state store16(
             applier::applier& app, boost::uint64_t addr, boost::uint16_t value)
         {
             local_store16(app, addr, value);
@@ -75,7 +75,7 @@ namespace hpx { namespace components { namespace server
         }
 
         /// \brief Action to store a 32 value value to a memory location
-        threads::thread_state store32(threads::thread_self& self, 
+        threads::thread_state store32(
             applier::applier& app, boost::uint64_t addr, boost::uint32_t value)
         {
             local_store32(app, addr, value);
@@ -83,7 +83,7 @@ namespace hpx { namespace components { namespace server
         }
 
         /// \brief Action to store a 64 value value to a memory location
-        threads::thread_state store64(threads::thread_self& self, 
+        threads::thread_state store64(
             applier::applier& app, boost::uint64_t addr, boost::uint64_t value)
         {
             local_store64(app, addr, value);
@@ -91,7 +91,7 @@ namespace hpx { namespace components { namespace server
         }
 
         /// \brief Action to load an 8 bit value to a memory location
-        threads::thread_state load8(threads::thread_self& self, 
+        threads::thread_state load8(
             applier::applier& app, boost::uint8_t* value, boost::uint64_t addr)
         {
             *value = local_load8(app, addr);
@@ -99,7 +99,7 @@ namespace hpx { namespace components { namespace server
         }
 
         /// \brief Action to load a 16 bit value to a memory location
-        threads::thread_state load16(threads::thread_self& self, 
+        threads::thread_state load16(
             applier::applier& app, boost::uint16_t* value, boost::uint64_t addr)
         {
             *value = local_load16(app, addr);
@@ -107,7 +107,7 @@ namespace hpx { namespace components { namespace server
         }
 
         /// \brief Action to load a 32 bit value to a memory location
-        threads::thread_state load32(threads::thread_self& self, 
+        threads::thread_state load32(
             applier::applier& app, boost::uint32_t* value, boost::uint64_t addr)
         {
             *value = local_load32(app, addr);
@@ -115,7 +115,7 @@ namespace hpx { namespace components { namespace server
         }
 
         /// \brief Action to load a 64 bit value to a memory location
-        threads::thread_state load64(threads::thread_self& self, 
+        threads::thread_state load64(
             applier::applier& app, boost::uint64_t* value, boost::uint64_t addr)
         {
             *value = local_load64(app, addr);

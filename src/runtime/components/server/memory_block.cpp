@@ -40,7 +40,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<memory_data_type>);
 namespace hpx { namespace components { namespace server { namespace detail
 {
     /// Get the current data for reading
-    threads::thread_state memory_block::get (threads::thread_self&, 
+    threads::thread_state memory_block::get (
         applier::applier& appl, components::memory_block_data* result) 
     {
         *result = components::memory_block_data(wrapper_->component_);
@@ -55,8 +55,7 @@ namespace hpx { namespace components { namespace server { namespace detail
 
     /// Get the current data for reading
     threads::thread_state memory_block::checkout (
-        threads::thread_self& self, applier::applier& appl, 
-        components::memory_block_data* result) 
+        applier::applier& appl, components::memory_block_data* result) 
     {
         *result = components::memory_block_data(wrapper_->component_);
         return threads::terminated;
@@ -69,7 +68,7 @@ namespace hpx { namespace components { namespace server { namespace detail
     }
 
     /// Write back data
-    threads::thread_state memory_block::checkin (threads::thread_self&, 
+    threads::thread_state memory_block::checkin (
         applier::applier& appl, components::memory_block_data const& newdata) 
     {
         return threads::terminated;
@@ -96,7 +95,7 @@ namespace hpx { namespace components { namespace server { namespace detail
         return naming::invalid_id;
     }
 
-    threads::thread_state memory_block::clone (threads::thread_self&, 
+    threads::thread_state memory_block::clone (
         applier::applier& appl, naming::id_type* result) 
     {
         *result = create_memory_block(appl, wrapper_->component_.get());

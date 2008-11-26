@@ -37,9 +37,9 @@ namespace hpx { namespace components
         // exposed functionality of this component
 
         /// Get the \a memory_block_data maintained by this memory_block
-        memory_block_data get(threads::thread_self& self) 
+        memory_block_data get() 
         {
-            return this->base_type::get(self, gid_);
+            return this->base_type::get(gid_);
         }
 
         /// Asynchronously get the \a memory_block_data maintained by this 
@@ -51,9 +51,9 @@ namespace hpx { namespace components
 
         ///////////////////////////////////////////////////////////////////////
         /// Clone the \a memory_block_data maintained by this memory_block
-        naming::id_type clone(threads::thread_self& self) 
+        naming::id_type clone() 
         {
-            return this->base_type::clone(self, gid_);
+            return this->base_type::clone(gid_);
         }
 
         /// Asynchronously clone the \a memory_block_data maintained by this 

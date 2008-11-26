@@ -30,12 +30,10 @@ namespace hpx { namespace lcos
     class base_lco 
     {
     protected:
-        virtual threads::thread_state set_event (
-            threads::thread_self& self, applier::applier& appl) = 0;
+        virtual threads::thread_state set_event (applier::applier& appl) = 0;
 
         virtual threads::thread_state set_error (
-            threads::thread_self& self, applier::applier& appl,
-            hpx::error code, std::string const& msg)
+            applier::applier& appl, hpx::error code, std::string const& msg)
         {
             // just rethrow the exception
             HPX_THROW_EXCEPTION(code, msg);
@@ -69,7 +67,7 @@ namespace hpx { namespace lcos
         /// \param self [in] The PX \a thread used to execute this function.
         /// \param appl [in] The applier to be used for finalization of the 
         ///             component instance. 
-        void finalize(threads::thread_self& self, applier::applier& appl) {}
+        void finalize(applier::applier& appl) {}
 
         /// The \a function set_event_nonvirt is called whenever a 
         /// \a set_event_action is applied on a instance of a LCO. This function
@@ -82,10 +80,9 @@ namespace hpx { namespace lcos
         ///
         /// \returns      The thread state the calling thread needs to be set
         ///               to after returning from this function.
-        threads::thread_state set_event_nonvirt (
-            threads::thread_self& self, applier::applier& appl)
+        threads::thread_state set_event_nonvirt (applier::applier& appl)
         {
-            return set_event(self, appl);
+            return set_event(appl);
         }
 
         /// The \a function set_error_nonvirt is called whenever a 
@@ -104,10 +101,9 @@ namespace hpx { namespace lcos
         /// \returns      The thread state the calling thread needs to be set
         ///               to after returning from this function.
         threads::thread_state set_error_nonvirt (
-            threads::thread_self& self, applier::applier& appl,
-            hpx::error code, std::string const& msg)
+            applier::applier& appl, hpx::error code, std::string const& msg)
         {
-            return set_error(self, appl, code, msg);
+            return set_error(appl, code, msg);
         }
 
         /// Each of the exposed functions needs to be encapsulated into an action
@@ -151,15 +147,13 @@ namespace hpx { namespace lcos
         /// derived objects
         virtual ~base_lco_with_value() {}
 
-        virtual threads::thread_state set_event (
-            threads::thread_self& self, applier::applier& appl)
+        virtual threads::thread_state set_event (applier::applier& appl)
         {
-            return set_result(self, appl, Result());
+            return set_result(appl, Result());
         }
 
         virtual threads::thread_state set_result (
-            threads::thread_self&, applier::applier& appl,
-            Result const& result) = 0;
+            applier::applier& appl, Result const& result) = 0;
 
     public:
         // components must contain a typedef for wrapping_type defining the
@@ -189,10 +183,9 @@ namespace hpx { namespace lcos
         /// \returns      The thread state the calling thread needs to be set
         ///               to after returning from this function.
         threads::thread_state set_result_nonvirt (
-            threads::thread_self& self, applier::applier& appl,
-            Result const& result) 
+            applier::applier& appl, Result const& result) 
         {
-            return set_result(self, appl, result);
+            return set_result(appl, result);
         }
 
         /// Each of the exposed functions needs to be encapsulated into an action

@@ -42,10 +42,10 @@ namespace hpx { namespace components { namespace amr
             return this->base_type::eval_async(this->gid_, result, gids);
         }
 
-        bool eval(threads::thread_self& self, naming::id_type const& result, 
+        bool eval(naming::id_type const& result, 
             std::vector<naming::id_type> const& gids)
         {
-            return this->base_type::eval(self, this->gid_, result, gids);
+            return this->base_type::eval(this->gid_, result, gids);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -55,10 +55,9 @@ namespace hpx { namespace components { namespace amr
             return this->base_type::alloc_data_async(this->gid_, item, maxitems);
         }
 
-        naming::id_type alloc_data(threads::thread_self& self, int item = -1,
-            int maxitems = -1)
+        naming::id_type alloc_data(int item = -1, int maxitems = -1)
         {
-            return this->base_type::alloc_data(self, this->gid_, item, maxitems);
+            return this->base_type::alloc_data(this->gid_, item, maxitems);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -67,10 +66,9 @@ namespace hpx { namespace components { namespace amr
             this->base_type::free_data(this->gid_, val);
         }
 
-        void free_data_sync(threads::thread_self& self, 
-            naming::id_type const& val)
+        void free_data_sync(naming::id_type const& val)
         {
-            this->base_type::free_data_sync(self, this->gid_, val);
+            this->base_type::free_data_sync(this->gid_, val);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -79,10 +77,9 @@ namespace hpx { namespace components { namespace amr
             this->base_type::init(this->gid_, numsteps, val);
         }
 
-        void init_sync(threads::thread_self& self, std::size_t numsteps, 
-            naming::id_type const& val)
+        void init_sync(std::size_t numsteps, naming::id_type const& val)
         {
-            this->base_type::init_sync(self, this->gid_, numsteps, val);
+            this->base_type::init_sync(this->gid_, numsteps, val);
         }
     };
 

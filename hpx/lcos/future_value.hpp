@@ -68,7 +68,7 @@ namespace hpx { namespace lcos { namespace detail
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
-        Result get_data(threads::thread_self& self, int slot) 
+        Result get_data(int slot) 
         {
             if (slot < 0 || slot >= N) {
                 HPX_THROW_EXCEPTION(bad_parameter, "slot index out of range");
@@ -77,7 +77,7 @@ namespace hpx { namespace lcos { namespace detail
 
             // yields control if needed
             data_type d;
-            data_[slot].read(self, d);
+            data_[slot].read(d);
 
             // the thread has been re-activated by one of the actions 
             // supported by this future_value (see \a future_value::set_event
@@ -125,8 +125,7 @@ namespace hpx { namespace lcos { namespace detail
 
         // trigger the future, set the result
         threads::thread_state 
-        set_result (threads::thread_self& self, applier::applier& appl, 
-            Result const& result)
+        set_result (applier::applier& appl, Result const& result)
         {
             // set the received result, reset error status
             set_data(0, result);
@@ -136,9 +135,8 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         // trigger the future with the given error condition
-        threads::thread_state 
-        set_error (threads::thread_self& self, applier::applier& appl,
-            hpx::error code, std::string const& msg)
+        threads::thread_state set_error (applier::applier& appl, hpx::error code, 
+            std::string const& msg)
         {
             set_error(0, code, msg);
 
@@ -201,7 +199,7 @@ namespace hpx { namespace lcos { namespace detail
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
-        void get_data(threads::thread_self& self, int slot) 
+        void get_data(int slot) 
         {
             if (slot < 0 || slot >= N) {
                 HPX_THROW_EXCEPTION(bad_parameter, "slot index out of range");
@@ -210,7 +208,7 @@ namespace hpx { namespace lcos { namespace detail
 
             // yields control if needed
             data_type d;
-            data_[slot].read(self, d);
+            data_[slot].read(d);
 
             // the thread has been re-activated by one of the actions 
             // supported by this future_value (see \a future_value::set_event
@@ -256,8 +254,7 @@ namespace hpx { namespace lcos { namespace detail
         // exposed functionality of this component
 
         // trigger the future, set the result
-        threads::thread_state 
-        set_event (threads::thread_self& self, applier::applier& appl)
+        threads::thread_state set_event (applier::applier& appl)
         {
             // set the received result, reset error status
             set_data(0);
@@ -267,8 +264,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         // trigger the future with the given error condition
-        threads::thread_state 
-        set_error (threads::thread_self& self, applier::applier& appl,
+        threads::thread_state set_error (applier::applier& appl,
             hpx::error code, std::string const& msg)
         {
             set_error(0, code, msg);
@@ -373,9 +369,9 @@ namespace hpx { namespace lcos
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
-        Result get(threads::thread_self& self, int slot = 0) const
+        Result get(int slot = 0) const
         {
-            return (*impl_)->get_data(self, slot);
+            return (*impl_)->get_data(slot);
         }
 
     protected:

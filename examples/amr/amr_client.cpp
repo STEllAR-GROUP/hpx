@@ -61,7 +61,7 @@ void init_stencils(applier::applier& appl,
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get gids of output ports of all functions
-void get_output_ports(threads::thread_self& self, applier::applier& appl,
+void get_output_ports(applier::applier& appl,
     components::distributing_factory::iterator_range_type const& stencils,
     std::vector<std::vector<naming::id_type> >& outputs)
 {
@@ -83,7 +83,7 @@ void get_output_ports(threads::thread_self& self, applier::applier& appl,
     lazyvals_type::iterator lend = lazyvals.end();
     for (lazyvals_type::iterator lit = lazyvals.begin(); lit != lend; ++lit) 
     {
-        outputs.push_back((*lit).get(self));
+        outputs.push_back((*lit).get());
     }
 }
 
@@ -131,7 +131,7 @@ void connect_input_ports(applier::applier& appl,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void prepare_initial_data(threads::thread_self& self, applier::applier& appl, 
+void prepare_initial_data(applier::applier& appl, 
     components::distributing_factory::iterator_range_type const& functions, 
     std::vector<naming::id_type>& initial_data, int maxindex)
 {
@@ -151,13 +151,13 @@ void prepare_initial_data(threads::thread_self& self, applier::applier& appl,
     lazyvals_type::iterator lend = lazyvals.end();
     for (lazyvals_type::iterator lit = lazyvals.begin(); lit != lend; ++lit) 
     {
-        initial_data.push_back((*lit).get(self));
+        initial_data.push_back((*lit).get());
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // do actual work
-void execute(threads::thread_self& self, applier::applier& appl, 
+void execute(applier::applier& appl, 
     components::distributing_factory::iterator_range_type const& stencils, 
     std::vector<naming::id_type> const& initial_data, 
     std::vector<naming::id_type>& result_data)
@@ -178,7 +178,7 @@ void execute(threads::thread_self& self, applier::applier& appl,
     lazyvals_type::iterator lend = lazyvals.end();
     for (lazyvals_type::iterator lit = lazyvals.begin(); lit != lend; ++lit) 
     {
-        result_data.push_back((*lit).get(self));
+        result_data.push_back((*lit).get());
     }
 }
 
@@ -193,8 +193,7 @@ struct timestep_data
 
 ///////////////////////////////////////////////////////////////////////////////
 threads::thread_state 
-hpx_main(threads::thread_self& self, applier::applier& appl, 
-    std::size_t numvals, std::size_t numsteps)
+hpx_main(applier::applier& appl, std::size_t numvals, std::size_t numsteps)
 {
     // get component types needed below
     components::component_type function_type = 
@@ -209,18 +208,18 @@ hpx_main(threads::thread_self& self, applier::applier& appl,
 
         // create a distributing factory locally
         components::distributing_factory factory(
-            components::distributing_factory::create(self, appl, 
+            components::distributing_factory::create(appl, 
                 appl.get_runtime_support_gid(), true));
 
         // create a couple of stencil (functional) components and the same 
         // amount of stencil_value components
-        result_type functions = factory.create_components(self, function_type, numvals);
+        result_type functions = factory.create_components(function_type, numvals);
         result_type stencils[2] = 
         {
-            factory.create_components(self, stencil_type, numvals),
-            factory.create_components(self, stencil_type, numvals)
+            factory.create_components(stencil_type, numvals),
+            factory.create_components(stencil_type, numvals)
         };
-        result_type logging = factory.create_components(self, logging_type);
+        result_type logging = factory.create_components(logging_type);
 
         // initialize logging functionality in functions
         init(appl, locality_results(functions), locality_results(logging), numsteps);
@@ -233,20 +232,20 @@ hpx_main(threads::thread_self& self, applier::applier& appl,
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(2);
-        get_output_ports(self, appl, locality_results(stencils[0]), outputs[0]);
-        get_output_ports(self, appl, locality_results(stencils[1]), outputs[1]);
+        get_output_ports(appl, locality_results(stencils[0]), outputs[0]);
+        get_output_ports(appl, locality_results(stencils[1]), outputs[1]);
 
         // connect output gids with corresponding stencil inputs
         connect_input_ports(appl, stencils, outputs);
 
         // prepare initial data
         std::vector<naming::id_type> initial_data;
-        prepare_initial_data(self, appl, locality_results(functions), 
+        prepare_initial_data(appl, locality_results(functions), 
             initial_data, numvals);
 
         // do actual work
         std::vector<naming::id_type> result_data;
-        execute(self, appl, locality_results(stencils[0]), initial_data, result_data);
+        execute(appl, locality_results(stencils[0]), initial_data, result_data);
 
         // start asynchronous get operations
         components::stubs::memory_block stub(appl);
@@ -254,7 +253,7 @@ hpx_main(threads::thread_self& self, applier::applier& appl,
         // get some output memory_block_data instances
         components::access_memory_block<timestep_data> val1, val2, val3;
         boost::tie(val1, val2, val3) = 
-            components::wait(self, stub.get_async(result_data[0]), 
+            components::wait(stub.get_async(result_data[0]), 
                 stub.get_async(result_data[1]), stub.get_async(result_data[2]));
 
         std::cout << "Result: " 
@@ -266,12 +265,12 @@ hpx_main(threads::thread_self& self, applier::applier& appl,
         for (std::size_t i = 0; i < functions.size(); ++i) 
         {
             components::amr::stubs::functional_component::
-                free_data_sync(self, appl, functions[i].first_gid_, result_data[i]);
+                free_data_sync(appl, functions[i].first_gid_, result_data[i]);
         }
-        factory.free_components_sync(self, logging);
-        factory.free_components_sync(self, stencils[1]);
-        factory.free_components_sync(self, stencils[0]);
-        factory.free_components_sync(self, functions);
+        factory.free_components_sync(logging);
+        factory.free_components_sync(stencils[1]);
+        factory.free_components_sync(stencils[0]);
+        factory.free_components_sync(functions);
 
     }   // distributing_factory needs to go out of scope before shutdown
 
@@ -396,7 +395,7 @@ int main(int argc, char* argv[])
 
         // initialize and start the HPX runtime
         hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port);
-        rt.run(boost::bind (hpx_main, _1, _2, numvals, numsteps), num_threads);
+        rt.run(boost::bind (hpx_main, _1, numvals, numsteps), num_threads);
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";

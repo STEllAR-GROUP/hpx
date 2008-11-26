@@ -19,14 +19,14 @@ namespace hpx { namespace components { namespace amr { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     inline threads::thread_state 
-    functional_timestep::initialize(threads::thread_self&, applier::applier&)
+    functional_timestep::initialize(applier::applier&)
     {
         return threads::terminated;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     inline threads::thread_state 
-    functional_timestep::execute(threads::thread_self&, applier::applier&)
+    functional_timestep::execute(applier::applier&)
     {
         return threads::terminated;
     }

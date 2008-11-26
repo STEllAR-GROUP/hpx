@@ -912,6 +912,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\hpx\lcos\counting_semaphore.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\lcos\eager_future.hpp"
 					>
 				</File>
@@ -945,10 +949,6 @@
 				</File>
 				<File
 					RelativePath="..\..\..\hpx\lcos\mutex.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\hpx\lcos\value_adaptor.hpp"
 					>
 				</File>
 			</Filter>

@@ -63,8 +63,7 @@ namespace hpx { namespace actions
     // zero argument version
     template <
         typename Result, 
-        threads::thread_state (*F)(
-            threads::thread_self&, applier::applier&, Result*)
+        threads::thread_state (*F)(applier::applier&, Result*)
     >
     class plain_base_result_action0 
       : public action<
@@ -89,14 +88,13 @@ namespace hpx { namespace actions
         /// of the original thread function.
         template <typename Func>
         static threads::thread_state 
-        continuation_thread_function(
-            threads::thread_self& self, applier::applier& appl, 
+        continuation_thread_function(applier::applier& appl, 
             continuation_type cont, boost::tuple<Func> func)
         {
             threads::thread_state newstate = threads::unknown;
             try {
                 Result result;
-                newstate = boost::get<0>(func)(self, &result);
+                newstate = boost::get<0>(func)(&result);
                 cont->trigger_all(appl, result);
             }
             catch (hpx::exception const& e) {
@@ -117,21 +115,18 @@ namespace hpx { namespace actions
         {
             // we need to assign the address of the thread function to a 
             // variable to  help the compiler to deduce the function type
-            threads::thread_state (*f)(threads::thread_self&, 
-                    applier::applier&, continuation_type, 
+            threads::thread_state (*f)(applier::applier&, continuation_type, 
                     boost::tuple<Func>) =
                 &plain_base_result_action0::continuation_thread_function;
 
             // The following bind constructs the wrapped thread function
             //   f:  is the wrapping thread function
-            //  _1:  is a placeholder which will be replaced by the reference
-            //       to thread_self
             //  app: reference to the applier (pre-bound second argument to f)
             // cont: continuation (pre-bound third argument to f)
             // func: wrapped function object (pre-bound forth argument to f)
             //       (this is embedded into a tuple because boost::bind can't
             //       pre-bind another bound function as an argument)
-            return boost::bind(f, _1, boost::ref(appl), cont, 
+            return boost::bind(f, boost::ref(appl), cont, 
                 boost::make_tuple(func));
         }
 
@@ -147,7 +142,7 @@ namespace hpx { namespace actions
         construct_thread_function(applier::applier& appl, 
             naming::address::address_type lva)
         {
-            return boost::bind(F, _1, boost::ref(appl), 
+            return boost::bind(F, boost::ref(appl), 
                 reinterpret_cast<Result*>(NULL));
         }
 
@@ -160,7 +155,7 @@ namespace hpx { namespace actions
             applier::applier& appl, naming::address::address_type lva)
         {
             return construct_continuation_thread_function(
-                boost::bind(F, _1, boost::ref(appl), _2), appl, cont);
+                boost::bind(F, boost::ref(appl), _1), appl, cont);
         }
 
     private:
@@ -196,8 +191,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Result, 
-        threads::thread_state(*F)(
-            threads::thread_self&, applier::applier&, Result*)
+        threads::thread_state(*F)(applier::applier&, Result*)
     >
     class plain_result_action0 
       : public plain_base_result_action0<Result, F>
@@ -230,8 +224,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Result, 
-        threads::thread_state(*F)(
-            threads::thread_self&, applier::applier&, Result*),
+        threads::thread_state(*F)(applier::applier&, Result*),
         Result (*DirectF)(applier::applier&)
     >
     class plain_direct_result_action0 
@@ -275,7 +268,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     //  zero parameter version, no result value
     template <
-        threads::thread_state (*F)(threads::thread_self&, applier::applier&)
+        threads::thread_state (*F)(applier::applier&)
     >
     class plain_base_action0 
       : public action<
@@ -305,7 +298,7 @@ namespace hpx { namespace actions
         construct_thread_function(applier::applier& appl, 
             naming::address::address_type lva)
         {
-            return boost::bind(F, _1, boost::ref(appl));
+            return boost::bind(F, boost::ref(appl));
         }
 
         /// \brief This static \a construct_thread_function allows to construct 
@@ -317,7 +310,7 @@ namespace hpx { namespace actions
             applier::applier& appl, naming::address::address_type lva)
         {
             return base_type::construct_continuation_thread_function(
-                boost::bind(F, _1, boost::ref(appl)), appl, cont);
+                boost::bind(F, boost::ref(appl)), appl, cont);
         }
 
     private:
@@ -348,7 +341,7 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <
-        threads::thread_state (*F)(threads::thread_self&, applier::applier&)
+        threads::thread_state (*F)(applier::applier&)
     >
     class plain_action0 : public plain_base_action0<F>
     {
@@ -379,7 +372,7 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <
-        threads::thread_state (*F)(threads::thread_self&, applier::applier&),
+        threads::thread_state (*F)(applier::applier&),
         void (*DirectF)(applier::applier&)
     >
     class plain_direct_action0 : public plain_base_action0<F>
@@ -423,8 +416,7 @@ namespace hpx { namespace actions
     //  one parameter version
     template <
         typename Result, typename T0, 
-        threads::thread_state (*F)(
-            threads::thread_self&, applier::applier&, Result*, T0) 
+        threads::thread_state (*F)(applier::applier&, Result*, T0) 
     >
     class plain_base_result_action1
       : public action<
@@ -456,14 +448,13 @@ namespace hpx { namespace actions
         /// of the original thread function.
         template <typename Func>
         static threads::thread_state 
-        continuation_thread_function(
-            threads::thread_self& self, applier::applier& app, 
+        continuation_thread_function(applier::applier& app, 
             continuation_type cont, boost::tuple<Func> func)
         {
             threads::thread_state newstate = threads::unknown;
             try {
                 Result result;
-                newstate = boost::get<0>(func)(self, &result);
+                newstate = boost::get<0>(func)(&result);
                 cont->trigger_all(app, result);
             }
             catch (hpx::exception const& e) {
@@ -484,21 +475,18 @@ namespace hpx { namespace actions
         {
             // we need to assign the address of the thread function to a 
             // variable to  help the compiler to deduce the function type
-            threads::thread_state (*f)(threads::thread_self&, 
-                    applier::applier&, continuation_type, 
+            threads::thread_state (*f)(applier::applier&, continuation_type, 
                     boost::tuple<Func>) =
                 &plain_base_result_action1::continuation_thread_function;
 
             // The following bind constructs the wrapped thread function
             //   f:  is the wrapping thread function
-            //  _1:  is a placeholder which will be replaced by the reference
-            //       to thread_self
             //  app: reference to the applier (pre-bound second argument to f)
             // cont: continuation (pre-bound third argument to f)
             // func: wrapped function object (pre-bound forth argument to f)
             //       (this is embedded into a tuple because boost::bind can't
             //       pre-bind another bound function as an argument)
-            return boost::bind(f, _1, boost::ref(appl), cont, 
+            return boost::bind(f, boost::ref(appl), cont, 
                 boost::make_tuple(func));
         }
 
@@ -515,7 +503,7 @@ namespace hpx { namespace actions
         construct_thread_function(applier::applier& appl, 
             naming::address::address_type lva, Arg0 const& arg0) 
         {
-            return boost::bind(F, _1, boost::ref(appl), 
+            return boost::bind(F, boost::ref(appl), 
                 reinterpret_cast<Result*>(NULL), arg0);
         }
 
@@ -530,7 +518,7 @@ namespace hpx { namespace actions
             Arg0 const& arg0) 
         {
             return construct_continuation_thread_function(
-                boost::bind(F, _1, boost::ref(appl), _2, arg0), appl, cont);
+                boost::bind(F, boost::ref(appl), _1, arg0), appl, cont);
         }
 
     private:
@@ -566,8 +554,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Result, typename T0, 
-        threads::thread_state (*F)(
-            threads::thread_self&, applier::applier&, Result*, T0)
+        threads::thread_state (*F)(applier::applier&, Result*, T0)
     >
     class plain_result_action1 
       : public plain_base_result_action1<Result, T0, F>
@@ -605,8 +592,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Result, typename T0, 
-        threads::thread_state (*F)(
-            threads::thread_self&, applier::applier&, Result*, T0),
+        threads::thread_state (*F)(applier::applier&, Result*, T0),
         Result (*DirectF)(applier::applier&, T0)
     >
     class plain_direct_result_action1 
@@ -657,8 +643,7 @@ namespace hpx { namespace actions
     //  one parameter version, no result value
     template <
         typename T0, 
-        threads::thread_state (*F)(
-            threads::thread_self&, applier::applier&, T0)
+        threads::thread_state (*F)(applier::applier&, T0)
     >
     class plain_base_action1 
       : public action<
@@ -695,7 +680,7 @@ namespace hpx { namespace actions
         construct_thread_function(applier::applier& appl, 
             naming::address::address_type lva, Arg0 const& arg0) 
         {
-            return boost::bind(F, _1, boost::ref(appl), arg0);
+            return boost::bind(F, boost::ref(appl), arg0);
         }
 
         /// \brief This static \a construct_thread_function allows to construct 
@@ -709,7 +694,7 @@ namespace hpx { namespace actions
             Arg0 const& arg0) 
         {
             return base_type::construct_continuation_thread_function(
-                boost::bind(F, _1, boost::ref(appl), arg0), appl, cont);
+                boost::bind(F, boost::ref(appl), arg0), appl, cont);
         }
 
     private:
@@ -743,8 +728,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename T0, 
-        threads::thread_state (*F)(
-            threads::thread_self&, applier::applier&, T0)
+        threads::thread_state (*F)(applier::applier&, T0)
     >
     class plain_action1 : public plain_base_action1<T0, F>
     {
@@ -782,8 +766,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename T0, 
-        threads::thread_state (*F)(
-            threads::thread_self&, applier::applier&, T0),
+        threads::thread_state (*F)(applier::applier&, T0),
         void (*DirectF)(applier::applier&, T0)
     >
     class plain_direct_action1 : public plain_base_action1<T0, F>

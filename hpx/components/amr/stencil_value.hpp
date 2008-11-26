@@ -44,10 +44,9 @@ namespace hpx { namespace components { namespace amr
             return this->base_type::call_async(this->gid_, initial);
         }
 
-        naming::id_type call(threads::thread_self& self, 
-            naming::id_type const& initial)
+        naming::id_type call(naming::id_type const& initial)
         {
-            return this->base_type::call(self, this->gid_, initial);
+            return this->base_type::call(this->gid_, initial);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -60,9 +59,9 @@ namespace hpx { namespace components { namespace amr
         }
 
         std::vector<naming::id_type> 
-        get_output_ports(threads::thread_self& self)
+        get_output_ports()
         {
-            return this->base_type::get_output_ports(self, this->gid_);
+            return this->base_type::get_output_ports(this->gid_);
         }
 
         ///////////////////////////////////////////////////////////////////////

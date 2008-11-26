@@ -12,12 +12,12 @@
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state test1_helper(threads::thread_self& self, 
-    applier::applier& appl, hpx::util::full_empty<int>& data)
+threads::thread_state test1_helper(applier::applier& appl, 
+    hpx::util::full_empty<int>& data)
 {
     // retrieve gid for this thread
     naming::id_type gid = 
-        appl.get_thread_manager().get_thread_gid(self.get_thread_id(), appl);
+        appl.get_thread_manager().get_thread_gid(threads::get_self().get_thread_id(), appl);
     BOOST_TEST(gid);
 
     data.set(1);
@@ -26,12 +26,11 @@ threads::thread_state test1_helper(threads::thread_self& self,
     return threads::terminated;
 }
 
-threads::thread_state test1(threads::thread_self& self, 
-    applier::applier& appl)
+threads::thread_state test1(applier::applier& appl)
 {
     // retrieve gid for this thread
     naming::id_type gid = 
-        appl.get_thread_manager().get_thread_gid(self.get_thread_id(), appl);
+        appl.get_thread_manager().get_thread_gid(threads::get_self().get_thread_id(), appl);
     BOOST_TEST(gid);
 
     // create a full_empty data item
@@ -39,18 +38,17 @@ threads::thread_state test1(threads::thread_self& self,
     BOOST_TEST(data.is_empty());
 
     // schedule the helper thread
-    register_work(appl, 
-        boost::bind(&test1_helper, _1, boost::ref(appl), boost::ref(data)));
+    register_work(appl, boost::bind(&test1_helper, boost::ref(appl), boost::ref(data)));
 
     // wait for the other thread to set 'data' to full
     int value = 0;
-    data.read(self, value);   // this blocks for test1_helper to set value
+    data.read(value);   // this blocks for test1_helper to set value
 
     BOOST_TEST(!data.is_empty());
     BOOST_TEST(value == 1);
 
     value = 0;
-    data.read(self, value);   // this should not block anymore
+    data.read(value);   // this should not block anymore
 
     BOOST_TEST(!data.is_empty());
     BOOST_TEST(value == 1);
@@ -59,12 +57,11 @@ threads::thread_state test1(threads::thread_self& self,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(threads::thread_self& self, 
-    applier::applier& appl)
+threads::thread_state hpx_main(applier::applier& appl)
 {
     // retrieve gid for this thread
     naming::id_type gid = 
-        appl.get_thread_manager().get_thread_gid(self.get_thread_id(), appl);
+        appl.get_thread_manager().get_thread_gid(threads::get_self().get_thread_id(), appl);
     BOOST_TEST(gid);
 
     // schedule test threads: test1

@@ -10,8 +10,7 @@ using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
 // this is a empty test thread
-threads::thread_state null_thread(threads::thread_self& self, 
-    applier::applier& appl)
+threads::thread_state null_thread(applier::applier& appl)
 {
 //     naming::id_type gid = 
 //         appl.get_thread_manager().get_thread_gid(self.get_thread_id(), appl);
@@ -19,7 +18,7 @@ threads::thread_state null_thread(threads::thread_self& self,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(threads::thread_self& self, 
+threads::thread_state hpx_main(
     applier::applier& appl, util::high_resolution_timer& timer,
     std::size_t num_threads)
 {
@@ -27,7 +26,7 @@ threads::thread_state hpx_main(threads::thread_self& self,
     timer.restart();
     threads::threadmanager& tm = appl.get_thread_manager();
     for (std::size_t i = 0; i < num_threads; ++i) {
-        tm.register_work(boost::bind(&null_thread, _1, boost::ref(appl)),
+        tm.register_work(boost::bind(&null_thread, boost::ref(appl)),
             "null_thread", threads::pending, false);
     }
 //     double elapsed = timer.elapsed();
@@ -83,7 +82,7 @@ int main(int argc, char* argv[])
         // the main thread will wait (block) for the shutdown action and 
         // the threadmanager is serving incoming requests in the meantime
         util::high_resolution_timer timer;
-        rt.run(boost::bind(hpx_main, _1, _2, boost::ref(timer), num_hpx_threads), 
+        rt.run(boost::bind(hpx_main, _1, boost::ref(timer), num_hpx_threads), 
             num_threads);
         double elapsed = timer.elapsed();
         std::cout << "Elapsed time [s] for " << num_hpx_threads 

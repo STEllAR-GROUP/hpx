@@ -94,7 +94,7 @@ namespace hpx { namespace threads
 
         // create the new thread
         boost::shared_ptr<threads::thread> thrd (
-            new threads::thread(threadfunc, *this, initial_state, description));
+            new threads::thread(threadfunc, initial_state, description));
 
         // add the new thread to the queue of new items it will get picked up
         // by the master thread and added to the map
@@ -132,23 +132,9 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     /// The set_state function is part of the thread related API and allows
     /// to change the state of one of the threads managed by this threadmanager
-    inline thread_state threadmanager::set_state(thread_self& self, 
-        thread_id_type id, thread_state newstate)
-    {
-        return set_state(&self, id, newstate);
-    }
-
-    /// The set_state function is part of the thread related API and allows
-    /// to change the state of one of the threads managed by this threadmanager
-    inline thread_state threadmanager::set_state(thread_id_type id, 
-        thread_state newstate)
-    {
-        return set_state(NULL, id, newstate);
-    }
-
     struct set_state_tag {};
 
-    thread_state threadmanager::set_state(thread_self* self, thread_id_type id, 
+    thread_state threadmanager::set_state(thread_id_type id, 
         thread_state new_state)
     {
         util::block_profiler<set_state_tag> bp("threadmanager::set_state");
@@ -189,15 +175,16 @@ namespace hpx { namespace threads
             if (previous_state == active) {
                 // if we can't suspend (because we don't know the PX thread
                 // executing this function) we need to return 'unknown'
-                if (NULL == self) 
+                if (NULL == get_self_ptr()) 
                     return unknown;
 
                 LTM_(info) << "set_state: " << "thread(" << id << "), "
                            << "is currently active, yielding control...";
 
                 do {
-                    active_set_state_.enqueue(self->get_thread_id());
-                    self->yield(suspended);
+                    thread_self& self = get_self();
+                    active_set_state_.enqueue(self.get_thread_id());
+                    self.yield(suspended);
                 } while ((previous_state = thrd->get_state()) == active);
 
                 LTM_(info) << "set_state: " << "thread(" << id << "), "
@@ -253,22 +240,22 @@ namespace hpx { namespace threads
 
     /// This thread function is used by the at_timer thread below to trigger
     /// the required action.
-    thread_state threadmanager::wake_timer_thread (thread_self& self, 
-        thread_id_type id, thread_state newstate, thread_id_type timer_id) 
+    thread_state threadmanager::wake_timer_thread (thread_id_type id, 
+        thread_state newstate, thread_id_type timer_id) 
     {
         // first trigger the requested set_state 
-        set_state(self, id, newstate);
+        set_state(id, newstate);
 
         // then re-activate the thread holding the deadline_timer
-        set_state(self, timer_id, pending);
+        set_state(timer_id, pending);
         return terminated;
     }
 
     /// This thread function initiates the required set_state action (on 
     /// behalf of one of the threadmanager#set_state functions).
     template <typename TimeType>
-    thread_state threadmanager::at_timer (thread_self& self, 
-        TimeType const& expire, thread_id_type id, thread_state newstate)
+    thread_state threadmanager::at_timer (TimeType const& expire, 
+        thread_id_type id, thread_state newstate)
     {
         // create timer firing in correspondence with given time
         boost::asio::deadline_timer t (timer_pool_.get_io_service(), expire);
@@ -276,13 +263,14 @@ namespace hpx { namespace threads
         // create a new thread in suspended state, which will execute the 
         // requested set_state when timer fires and will re-awaken this thread, 
         // allowing the deadline_timer to go out of scope gracefully
+        thread_self& self = get_self();
         thread_id_type wake_id = register_work(boost::bind(
-            &threadmanager::wake_timer_thread, this, _1, id, newstate,
+            &threadmanager::wake_timer_thread, this, id, newstate,
             self.get_thread_id()), "", suspended);
 
         // let the timer invoke the set_state on the new (suspended) thread
-        t.async_wait(boost::bind(
-            &threadmanager::set_state, this, wake_id, pending));
+        t.async_wait(boost::bind(&threadmanager::set_state, this, wake_id, 
+            pending));
 
         // this waits for the thread executed when the timer fired
         self.yield(suspended);
@@ -296,27 +284,26 @@ namespace hpx { namespace threads
     {
         // this creates a new thread which creates the timer and handles the
         // requested actions
-        thread_state (threadmanager::*f)(thread_self&, time_type const&,
-                thread_id_type, thread_state)
+        thread_state (threadmanager::*f)(time_type const&, thread_id_type, 
+                thread_state)
             = &threadmanager::at_timer<time_type>;
 
-        return register_work(boost::bind(f, this, _1, expire_at, id, newstate),
+        return register_work(boost::bind(f, this, expire_at, id, newstate),
             "at_timer (expire at)");
     }
 
     /// Set a timer to set the state of the given \a thread to the given
     /// new value after it expired (after the given duration)
-    thread_id_type threadmanager::set_state (
-        duration_type const& from_now, thread_id_type id, 
-        thread_state newstate)
+    thread_id_type threadmanager::set_state (duration_type const& from_now, 
+        thread_id_type id, thread_state newstate)
     {
         // this creates a new thread which creates the timer and handles the
         // requested actions
-        thread_state (threadmanager::*f)(thread_self&, duration_type const&,
-                thread_id_type, thread_state)
+        thread_state (threadmanager::*f)(duration_type const&, thread_id_type, 
+                thread_state)
             = &threadmanager::at_timer<duration_type>;
 
-        return register_work(boost::bind(f, this, _1, from_now, id, newstate),
+        return register_work(boost::bind(f, this, from_now, id, newstate),
             "at_timer (from now)");
     }
 
@@ -659,37 +646,6 @@ namespace hpx { namespace threads
             if (blocking) 
                 timer_pool_.join();
         }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    thread_state set_thread_state(thread_id_type id, thread_state new_state)
-    {
-        thread* t = static_cast<thread*>(id);
-        return t->get_thread_manager().set_state(id, new_state);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    thread_state set_thread_state(thread_self& self, thread_id_type id, 
-        thread_state new_state)
-    {
-        thread* t = static_cast<thread*>(id);
-        return t->get_thread_manager().set_state(self, id, new_state);
-    }
-
-    ///////////////////////////////////////////////////////////////////////
-    thread_id_type set_thread_state(thread_id_type id, thread_state state, 
-        boost::posix_time::ptime const& at_time)
-    {
-        thread* t = static_cast<thread*>(id);
-        return t->get_thread_manager().set_state(at_time, id, state);
-    }
-
-    ///////////////////////////////////////////////////////////////////////
-    thread_id_type set_thread_state(thread_id_type id, thread_state state,
-        boost::posix_time::time_duration const& after)
-    {
-        thread* t = static_cast<thread*>(id);
-        return t->get_thread_manager().set_state(after, id, state);
     }
 
 }}

@@ -23,8 +23,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         typedef simple_component_base<functional_component> base_type;
 
     public:
-        functional_component(threads::thread_self& self, applier::applier& appl)
-          : base_type(self, appl)
+        functional_component(applier::applier& appl)
+          : base_type(appl)
         {
             if (component_invalid == base_type::get_component_type()) {
                 // first call to get_component_type, ask AGAS for a unique id
@@ -40,7 +40,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // The eval and is_last_timestep functions have to be overloaded by any
         // functional component derived from this class
-        virtual threads::thread_state eval(threads::thread_self&, 
+        virtual threads::thread_state eval(
             applier::applier&, bool*, naming::id_type const&, 
             std::vector<naming::id_type> const&)
         {
@@ -51,7 +51,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             return threads::terminated;
         }
 
-        virtual threads::thread_state alloc_data(threads::thread_self&, 
+        virtual threads::thread_state alloc_data(
             applier::applier&, naming::id_type*, int item, int maxitems)
         {
             // This shouldn't ever be called. If you're seeing this assertion 
@@ -61,7 +61,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             return threads::terminated;
         }
 
-        virtual threads::thread_state free_data(threads::thread_self&, 
+        virtual threads::thread_state free_data(
             applier::applier&, naming::id_type const&)
         {
             // This shouldn't ever be called. If you're seeing this assertion 
@@ -71,7 +71,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             return threads::terminated;
         }
 
-        virtual threads::thread_state init(threads::thread_self&, 
+        virtual threads::thread_state init(
             applier::applier&, std::size_t, naming::id_type const&)
         {
             // This shouldn't ever be called. If you're seeing this assertion 
@@ -96,30 +96,29 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// function (by applying the eval_action) will compute the next 
         /// time step value based on the result values of the previous time 
         /// steps.
-        threads::thread_state eval_nonvirt(threads::thread_self& self, 
-            applier::applier& appl, bool* retval, naming::id_type const& result, 
+        threads::thread_state eval_nonvirt(applier::applier& appl, 
+            bool* retval, naming::id_type const& result, 
             std::vector<naming::id_type> const& gids)
         {
-            return eval(self, appl, retval, result, gids);
+            return eval(appl, retval, result, gids);
         }
 
-        threads::thread_state alloc_data_nonvirt(threads::thread_self& self, 
-            applier::applier& appl, naming::id_type* result, int item,
-            int maxitems)
+        threads::thread_state alloc_data_nonvirt(applier::applier& appl, 
+            naming::id_type* result, int item, int maxitems)
         {
-            return alloc_data(self, appl, result, item, maxitems);
+            return alloc_data(appl, result, item, maxitems);
         }
 
-        threads::thread_state free_data_nonvirt(threads::thread_self& self, 
-            applier::applier& appl, naming::id_type const& gid)
+        threads::thread_state free_data_nonvirt(applier::applier& appl, 
+            naming::id_type const& gid)
         {
-            return free_data(self, appl, gid);
+            return free_data(appl, gid);
         }
 
-        threads::thread_state init_nonvirt(threads::thread_self& self, 
-            applier::applier& appl, std::size_t numsteps, naming::id_type const& gid)
+        threads::thread_state init_nonvirt(applier::applier& appl, 
+            std::size_t numsteps, naming::id_type const& gid)
         {
-            return init(self, appl, numsteps, gid);
+            return init(appl, numsteps, gid);
         }
 
         ///////////////////////////////////////////////////////////////////////

@@ -21,8 +21,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         typedef simple_component_base<logging> base_type;
 
     public:
-        logging(threads::thread_self& self, applier::applier& appl)
-          : base_type(self, appl)
+        logging(applier::applier& appl)
+          : base_type(appl)
         {}
 
         enum actions
@@ -32,8 +32,8 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         /// This is the function implementing the logging functionality
         /// It takes the values as calculated during the current time step.
-        threads::thread_state logentry(threads::thread_self&, 
-            applier::applier&, timestep_data const& memblock_gid);
+        threads::thread_state logentry(applier::applier&, 
+            timestep_data const& memblock_gid);
 
         /// Each of the exposed functions needs to be encapsulated into an action
         /// type, allowing to generate all required boilerplate code for threads,

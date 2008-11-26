@@ -54,15 +54,13 @@ namespace hpx { namespace components { namespace stubs
 
         /// Create a number of new components of the given \a type distributed
         /// evenly over all available localities. Block for the creation to finish.
-        static result_type create_components(
-            threads::thread_self& self, applier::applier& appl, 
+        static result_type create_components(applier::applier& appl, 
             naming::id_type const& targetgid, components::component_type type,
             std::size_t count = 1) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future
-            return create_components_async(appl, targetgid, type, count)
-                .get(self);
+            return create_components_async(appl, targetgid, type, count).get();
         }
 
         ///
@@ -74,11 +72,11 @@ namespace hpx { namespace components { namespace stubs
         }
 
         /// 
-        result_type create_components(threads::thread_self& self,
+        result_type create_components(
             naming::id_type const& targetgid, components::component_type type,
             std::size_t count = 1) 
         {
-            return create_components(self, appl_, targetgid, type, count);
+            return create_components(appl_, targetgid, type, count);
         }
 
         /// Free components 
@@ -98,21 +96,20 @@ namespace hpx { namespace components { namespace stubs
             free_components(appl_, factory, gids);
         }
 
-        static void free_components_sync(threads::thread_self& self, 
+        static void free_components_sync(
             applier::applier& appl, naming::id_type const& factory, 
             result_type const& gids) 
         {
             typedef 
                 server::distributing_factory::free_components_action 
             action_type;
-            lcos::eager_future<action_type, void>(appl, factory, gids, true).get(self);
+            lcos::eager_future<action_type, void>(appl, factory, gids, true).get();
         }
 
         ///
-        void free_components_sync(threads::thread_self& self, 
-            naming::id_type const& factory, result_type const& gids) 
+        void free_components_sync(naming::id_type const& factory, result_type const& gids) 
         {
-            free_components_sync(self, appl_, factory, gids);
+            free_components_sync(appl_, factory, gids);
         }
     };
 

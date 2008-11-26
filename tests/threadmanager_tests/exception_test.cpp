@@ -11,7 +11,7 @@ using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
 threads::thread_state 
-hpx_main(threads::thread_self& self, applier::applier& appl)
+hpx_main(applier::applier& appl)
 {
     boost::throw_exception(hpx::exception(hpx::no_success, "Some error occured"));
     return threads::terminated;

@@ -24,15 +24,13 @@ namespace hpx { namespace components { namespace amr { namespace server
         >
     {
     private:
-        typedef 
-            boost::function<void(threads::thread_self&, naming::id_type*)>
-        callback_function_type;
+        typedef boost::function<void(naming::id_type*)> callback_function_type;
         typedef components::detail::managed_component_base<
             stencil_value_out_adaptor
         > base_type;
         
     public:
-        stencil_value_out_adaptor(threads::thread_self& self, applier::applier& appl)
+        stencil_value_out_adaptor(applier::applier& appl)
         {
             if (component_invalid == base_type::get_component_type()) {
                 // first call to get_component_type, ask AGAS for a unique id
@@ -59,11 +57,10 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// function (by applying the get_value) will return the value as 
         /// computed by the current time step.
         threads::thread_state 
-        get_value (threads::thread_self& self, applier::applier& appl, 
-            naming::id_type* result)
+        get_value (applier::applier& appl, naming::id_type* result)
         {
             BOOST_ASSERT(eval_);      // must have been initialized
-            eval_(self, result);
+            eval_(result);
             return threads::terminated;
         }
 

@@ -40,10 +40,9 @@ namespace hpx { namespace components
         ///         be created in blocks (i.e. more than one instance at once). 
         ///         This function is used by the \a distributing_factory to 
         ///         determine a correct allocation strategy
-        int get_factory_properties(threads::thread_self& self,
-            components::component_type type) 
+        int get_factory_properties(components::component_type type) 
         {
-            return this->base_type::get_factory_properties(self, gid_, type);
+            return this->base_type::get_factory_properties(gid_, type);
         }
 
         lcos::future_value<int> 
@@ -53,10 +52,10 @@ namespace hpx { namespace components
         }
 
         /// Create a new component type using the runtime_support 
-        naming::id_type create_component(threads::thread_self& self,
+        naming::id_type create_component(
             components::component_type type, std::size_t count = 1) 
         {
-            return this->base_type::create_component(self, gid_, type, count);
+            return this->base_type::create_component(gid_, type, count);
         }
 
         /// Asynchronously create a new component using the runtime_support 
@@ -74,10 +73,10 @@ namespace hpx { namespace components
             this->base_type::free_component(type, gid);
         }
 
-        void free_component_sync(threads::thread_self& self, 
+        void free_component_sync(
             components::component_type type, naming::id_type const& gid)
         {
-            this->base_type::free_component_sync(self, type, gid);
+            this->base_type::free_component_sync(type, gid);
         }
 
         /// \brief Shutdown the given runtime system

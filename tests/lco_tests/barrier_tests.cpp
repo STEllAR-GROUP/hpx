@@ -13,11 +13,11 @@
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state barrier_test(threads::thread_self& self, 
-    applier::applier& appl, lcos::barrier& b, boost::detail::atomic_count& c)
+threads::thread_state barrier_test(applier::applier& appl, lcos::barrier& b, 
+    boost::detail::atomic_count& c)
 {
     ++c;
-    b.wait(self);
+    b.wait();
 
     // all of the 4 threads need to have incremented the counter
     BOOST_TEST(4 == c);
@@ -26,18 +26,17 @@ threads::thread_state barrier_test(threads::thread_self& self,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(threads::thread_self& self, 
-    applier::applier& appl, 
+threads::thread_state hpx_main(applier::applier& appl, 
     lcos::barrier& b, boost::detail::atomic_count& counter)
 {
     // create the 4 threads which will have to wait on the barrier
     threads::threadmanager& tm = appl.get_thread_manager();
     for (std::size_t i = 0; i < 4; ++i) {
-        register_work(appl, boost::bind(&barrier_test, _1, boost::ref(appl),
+        register_work(appl, boost::bind(&barrier_test, boost::ref(appl),
             boost::ref(b), boost::ref(counter)));
     }
 
-    b.wait(self);     // wait for all threads to enter the barrier
+    b.wait();     // wait for all threads to enter the barrier
 
     // all of the 4 threads need to have incremented the counter
     BOOST_TEST(4 == counter);
@@ -80,7 +79,7 @@ int main(int argc, char* argv[])
             lcos::barrier b(5);       // create a barrier waiting on 5 threads
             boost::detail::atomic_count counter(0);
 
-            rt.run(boost::bind(hpx_main, _1, _2, boost::ref(b), 
+            rt.run(boost::bind(hpx_main, _1, boost::ref(b), 
                 boost::ref(counter)), i);
         }
     }

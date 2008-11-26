@@ -18,8 +18,7 @@ using namespace hpx;
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state 
-hpx_main(threads::thread_self& self, applier::applier& appl)
+threads::thread_state hpx_main(applier::applier& appl)
 {
     // get list of all known localities
     std::vector<naming::id_type> prefixes;
@@ -34,7 +33,7 @@ hpx_main(threads::thread_self& self, applier::applier& appl)
     }
 
     using hpx::components::simple_accumulator;
-    simple_accumulator accu(simple_accumulator::create(self, appl, prefix));
+    simple_accumulator accu(simple_accumulator::create(appl, prefix));
 
     // print some message
     std::cout << "simple accumulator client, you may enter some commands\n"
@@ -57,7 +56,7 @@ hpx_main(threads::thread_self& self, applier::applier& appl)
             accu.print();
         }
         else if (cmd == "query") {
-            std::cout << accu.query(self) << std::endl;
+            std::cout << accu.query() << std::endl;
         }
         else if (cmd == "help") {
             std::cout << "commands: init, add [amount], print, query, help, quit" 

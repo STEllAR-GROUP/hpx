@@ -36,8 +36,8 @@ namespace po = boost::program_options;
 // }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state fib(threads::thread_self&, applier::applier&,
-    int* result, naming::id_type prefix, int n);
+threads::thread_state 
+    fib(applier::applier&, int* result, naming::id_type prefix, int n);
 
 typedef 
     actions::plain_result_action2<int, naming::id_type, int, fib> 
@@ -47,30 +47,22 @@ HPX_REGISTER_ACTION(fibonacci_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 threads::thread_state 
-fib (threads::thread_self& self, applier::applier& appl, 
-    int* result, naming::id_type prefix, int n)
+fib (applier::applier& appl, int* result, naming::id_type prefix, int n)
 {
-    BOOST_ASSERT(&self == &threads::get_self());
-    BOOST_ASSERT(&appl == &applier::get_applier());
-
     if (n < 2) {
         *result = n;
     }
     else {
         lcos::eager_future<fibonacci_action> n1(appl, prefix, prefix, n - 1);
         lcos::eager_future<fibonacci_action> n2(appl, prefix, prefix, n - 2);
-        *result = n1.get(self) + n2.get(self);
+        *result = n1.get() + n2.get();
     }
     return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state 
-hpx_main(threads::thread_self& self, applier::applier& appl)
+threads::thread_state hpx_main(applier::applier& appl)
 {
-    BOOST_ASSERT(&self == &threads::get_self());
-    BOOST_ASSERT(&appl == &applier::get_applier());
-
     // get list of all known localities
     std::vector<naming::id_type> prefixes;
     naming::id_type prefix;
@@ -86,7 +78,7 @@ hpx_main(threads::thread_self& self, applier::applier& appl)
     {
         util::high_resolution_timer t;
         lcos::eager_future<fibonacci_action> n(appl, prefix, prefix, 15);
-        int result = n.get(self);
+        int result = n.get();
         double elapsed = t.elapsed();
         std::cout << "elapsed: " << elapsed << ", result: " << result << std::endl;
     }

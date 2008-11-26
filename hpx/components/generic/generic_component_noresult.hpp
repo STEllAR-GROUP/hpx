@@ -15,7 +15,7 @@
 // This is the function to wrap into the component. Its purpose is to print
 // the floating point number it receives as its argument
 HPX_COMPONENT_EXPORT hpx::threads::thread_state
-print_number(hpx::threads::thread_self&, hpx::applier::applier&, double arg);
+print_number(hpx::applier::applier&, double arg);
 
 typedef hpx::actions::plain_action1<double, print_number> print_number_action;
 

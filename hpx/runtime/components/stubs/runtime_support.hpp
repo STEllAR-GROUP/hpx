@@ -51,13 +51,12 @@ namespace hpx { namespace components { namespace stubs
         }
 
         static int get_factory_properties(
-            threads::thread_self& self, applier::applier& appl, 
+            applier::applier& appl, 
             naming::id_type const& targetgid, components::component_type type) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future
-            return get_factory_properties_async(appl, targetgid, type)
-                .get(self);
+            return get_factory_properties_async(appl, targetgid, type).get();
         }
 
         lcos::future_value<int> get_factory_properties_async(
@@ -66,10 +65,10 @@ namespace hpx { namespace components { namespace stubs
             return get_factory_properties_async(appl_, targetgid, type);
         }
 
-        int get_factory_properties(threads::thread_self& self,
+        int get_factory_properties(
             naming::id_type const& targetgid, components::component_type type) 
         {
-            return get_factory_properties(self, appl_, targetgid, type);
+            return get_factory_properties(appl_, targetgid, type);
         }
 
         /// Create a new component \a type using the runtime_support with the 
@@ -90,14 +89,12 @@ namespace hpx { namespace components { namespace stubs
         /// Create a new component \a type using the runtime_support with the 
         /// given \a targetgid. Block for the creation to finish.
         static naming::id_type create_component(
-            threads::thread_self& self, applier::applier& appl, 
-            naming::id_type const& targetgid, components::component_type type,
-            std::size_t count = 1) 
+            applier::applier& appl, naming::id_type const& targetgid, 
+            components::component_type type, std::size_t count = 1) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future
-            return create_component_async(appl, targetgid, type, count)
-                .get(self);
+            return create_component_async(appl, targetgid, type, count).get();
         }
 
         ///
@@ -109,11 +106,11 @@ namespace hpx { namespace components { namespace stubs
         }
 
         /// 
-        naming::id_type create_component(threads::thread_self& self,
+        naming::id_type create_component(
             naming::id_type const& targetgid, components::component_type type,
             std::size_t count = 1) 
         {
-            return create_component(self, appl_, targetgid, type, count);
+            return create_component(appl_, targetgid, type, count);
         }
 
         /// Destroy an existing component
@@ -146,7 +143,7 @@ namespace hpx { namespace components { namespace stubs
             free_component(appl_, type, gid);
         }
 
-        static void free_component_sync(threads::thread_self& self,
+        static void free_component_sync(
             applier::applier& appl, components::component_type type, 
             naming::id_type const& gid) 
         {
@@ -164,14 +161,14 @@ namespace hpx { namespace components { namespace stubs
             else {
                 // apply remotely
                 lcos::eager_future<action_type, void>(appl, 
-                    naming::invalid_id, type, gid).get(self);
+                    naming::invalid_id, type, gid).get();
             }
         }
 
-        void free_component_sync(threads::thread_self& self,
+        void free_component_sync(
             components::component_type type, naming::id_type const& gid)
         {
-            free_component_sync(self, appl_, type, gid);
+            free_component_sync(appl_, type, gid);
         }
 
         /// \brief Shutdown the given runtime system

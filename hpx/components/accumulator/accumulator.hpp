@@ -53,10 +53,10 @@ namespace hpx { namespace components
         }
 
         /// Query the current value of the accumulator
-        double query(threads::thread_self& self) 
+        double query() 
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::query(self, gid_);
+            return this->base_type::query(gid_);
         }
 
         /// Asynchronously query the current value of the accumulator

@@ -34,10 +34,10 @@ namespace hpx { namespace threads { namespace detail
     {
     public:
         thread(boost::function<thread_function_type> func, 
-                thread_id_type id, threadmanager& tm, thread_state newstate,
+                thread_id_type id, thread_state newstate,
                 char const* const description)
           : coroutine_(func, id), 
-            tm_(tm), current_state_(newstate), description_(description)
+            current_state_(newstate), description_(description)
         {}
 
         /// This constructor is provided just for compatibility with the scheme
@@ -45,8 +45,8 @@ namespace hpx { namespace threads { namespace detail
         /// to the component constructor. But since threads never get created 
         /// by a factory (runtime_support) instance, we can leave this 
         /// constructor empty
-        thread(threads::thread_self& self, applier::applier& appl)
-          : tm_(appl.get_thread_manager()), description_("")
+        thread(applier::applier& appl)
+          : description_("")
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
         }
@@ -86,11 +86,6 @@ namespace hpx { namespace threads { namespace detail
             return coroutine_.get_thread_id();
         }
 
-        threadmanager& get_thread_manager() 
-        {
-            return tm_;
-        }
-
         char const* const get_description() const
         {
             return description_;
@@ -105,11 +100,11 @@ namespace hpx { namespace threads { namespace detail
         enum { value = components::component_thread };
 
         /// 
-        thread_state set_event (thread_self&, applier::applier&)
+        thread_state set_event (applier::applier& appl)
         {
             // we need to reactivate the thread itself
             if (suspended == static_cast<thread_state>(current_state_))
-                tm_.set_state(get_thread_id(), pending);
+                appl.get_thread_manager().set_state(get_thread_id(), pending);
 
             // FIXME: implement functionality required for depleted state
             return terminated;
@@ -117,7 +112,6 @@ namespace hpx { namespace threads { namespace detail
 
     private:
         coroutine_type coroutine_;
-        threadmanager& tm_;
         // the state is stored as a long to allow to use CAS
         long current_state_;
         char const* const description_;
@@ -169,7 +163,7 @@ namespace hpx { namespace threads
         /// to the component constructor. But since threads never get created 
         /// by a factory (runtime_support) instance, we can leave this 
         /// constructor empty
-        thread(threads::thread_self& self, applier::applier& appl)
+        thread(applier::applier& appl)
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
         }
@@ -183,9 +177,8 @@ namespace hpx { namespace threads
         /// \param newstate [in] The initial thread state this instance will
         ///                 be initialized with.
         thread(boost::function<thread_function_type> threadfunc, 
-                threadmanager& tm, thread_state new_state = init,
-                char const* const desc = "")
-          : base_type(new detail::thread(threadfunc, This(), tm, new_state, desc))
+               thread_state new_state = init, char const* const desc = "")
+          : base_type(new detail::thread(threadfunc, This(), new_state, desc))
         {
             LTM_(debug) << "thread::thread(" << this << "), description(" 
                         << desc << ")";
@@ -200,13 +193,6 @@ namespace hpx { namespace threads
         thread_id_type get_thread_id() const
         {
             return const_cast<thread*>(this);
-        }
-
-        /// \brief Allow to access the thread manager instance this thread has 
-        ///        been associated with.
-        threadmanager& get_thread_manager() 
-        {
-            return get()->get_thread_manager();
         }
 
         /// The get_state function allows to query the state of this thread
@@ -264,9 +250,6 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     thread_id_type const invalid_thread_id = 0;
-
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT thread_self& get_self();
 
 }}
 

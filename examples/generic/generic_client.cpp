@@ -20,8 +20,7 @@ using namespace hpx;
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state 
-hpx_main(threads::thread_self& self, applier::applier& appl)
+threads::thread_state hpx_main(applier::applier& appl)
 {
     // get list of all known localities
     std::vector<naming::id_type> prefixes;
@@ -37,7 +36,7 @@ hpx_main(threads::thread_self& self, applier::applier& appl)
 
     {
         lcos::eager_future<generate_number_action> gen(appl, prefix);
-        appl.apply<print_number_action>(prefix, gen.get(self));
+        appl.apply<print_number_action>(prefix, gen.get());
     }
 
     // initiate shutdown of the runtime systems on all localities

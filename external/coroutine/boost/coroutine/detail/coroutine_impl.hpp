@@ -226,7 +226,7 @@ namespace boost { namespace coroutines { namespace detail {
       else
           *super_type::self_ = &*self;
 
-      detail::unpack_ex(m_fun, **super_type::self_, *this->args(), 
+      detail::unpack(m_fun, *this->args(), 
          detail::trait_tag<typename coroutine_type::arg_slot_traits>());
 
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::result_slot_type 
@@ -257,7 +257,7 @@ namespace boost { namespace coroutines { namespace detail {
         result_slot_type;
 
       this->m_result_last = boost::in_place(result_slot_type(
-              detail::unpack_ex(m_fun, **super_type::self_, *this->args(), detail::trait_tag<traits>())
+              detail::unpack(m_fun, *this->args(), detail::trait_tag<traits>())
           ));
 
       this->bind_result(&*this->m_result_last);

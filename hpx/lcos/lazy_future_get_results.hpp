@@ -31,8 +31,7 @@
 #define N BOOST_PP_ITERATION()
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    Result get(threads::thread_self& self,
-        applier::applier& appl, naming::id_type const& gid, 
+    Result get(applier::applier& appl, naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         // initialize the remote operation
@@ -40,7 +39,7 @@
             BOOST_PP_ENUM_PARAMS(N, arg));
 
         // wait for the result (yield control)
-        return (*this->impl_)->get_data(self, 0);
+        return (*this->impl_)->get_data(0);
     }
 
 #undef N

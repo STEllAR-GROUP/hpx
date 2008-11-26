@@ -47,10 +47,10 @@ namespace hpx { namespace components
         }
 
         /// 
-        result_type create_components(threads::thread_self& self,
-            components::component_type type, std::size_t count = 1) 
+        result_type create_components(components::component_type type, 
+            std::size_t count = 1) 
         {
-            return this->base_type::create_components(self, gid_, type, count);
+            return this->base_type::create_components(gid_, type, count);
         }
 
         ///
@@ -59,10 +59,9 @@ namespace hpx { namespace components
             this->base_type::free_components(gid_, gids);
         }
 
-        void free_components_sync(threads::thread_self& self, 
-            result_type const& gids)
+        void free_components_sync(result_type const& gids)
         {
-            this->base_type::free_components_sync(self, gid_, gids);
+            this->base_type::free_components_sync(gid_, gids);
         }
     };
 

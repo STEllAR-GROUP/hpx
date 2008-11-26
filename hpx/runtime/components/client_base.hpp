@@ -36,20 +36,18 @@ namespace hpx { namespace components
         /// Create a new instance of an distributing_factory on the locality as 
         /// given by the parameter \a targetgid
         static Derived 
-        create(threads::thread_self& self, applier::applier& appl, 
+        create(applier::applier& appl, 
             naming::id_type const& targetgid, component_type type,
             bool freeonexit = false)
         {
-            return Derived(appl, 
-                stub_type::create(self, appl, targetgid, type), freeonexit);
+            return Derived(appl, stub_type::create(appl, targetgid, type), freeonexit);
         }
 
         static Derived 
-        create(threads::thread_self& self, applier::applier& appl, 
+        create(applier::applier& appl, 
             naming::id_type const& targetgid, bool freeonexit = false)
         {
-            return Derived(appl, 
-                stub_type::create(self, appl, targetgid), freeonexit);
+            return Derived(appl, stub_type::create(appl, targetgid), freeonexit);
         }
 
         void free(component_type type)

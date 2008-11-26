@@ -11,8 +11,7 @@
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(threads::thread_self& self, 
-    applier::applier& appl)
+threads::thread_state hpx_main(applier::applier& appl)
 {
     // try to access some memory directly
     boost::uint32_t value = 0;
@@ -28,13 +27,13 @@ threads::thread_state hpx_main(threads::thread_self& self,
     lcos::eager_future<load_action_type> ef(
         appl, appl.get_memory_gid(), boost::uint64_t(&value));
 
-    boost::uint32_t result1 = ef.get(self);
+    boost::uint32_t result1 = ef.get();
     BOOST_TEST(result1 == value);
 
     // read the value back from memory (using a lazy_future)
     lcos::lazy_future<load_action_type> lf;
 
-    boost::uint32_t result2 = lf.get(self, appl, appl.get_memory_gid(), 
+    boost::uint32_t result2 = lf.get(appl, appl.get_memory_gid(), 
         boost::uint64_t(&value));
     BOOST_TEST(result2 == value);
 

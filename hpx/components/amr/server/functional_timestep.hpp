@@ -23,7 +23,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     {
     public:
         /// Construct a new stencil_value instance
-        functional_timestep(threads::thread_self& self, applier::applier& appl);
+        functional_timestep(applier::applier& appl);
 
         // parcel action code: the action to be performed on the destination 
         // object (the accumulator)
@@ -36,14 +36,12 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// This is the main entry point of this component. Calling this 
         /// function (by applying the call_action) will trigger the repeated 
         /// execution of the whole time step evolution functionality.
-        threads::thread_state 
-        initialize(threads::thread_self&, applier::applier&);
+        threads::thread_state initialize(applier::applier&);
 
         /// This is called to execute a full time step based evolution based on
         /// a network of \a stencil_value components set up during a previous 
         /// call to initialize.
-        threads::thread_state 
-        execute(threads::thread_self&, applier::applier&);
+        threads::thread_state execute(applier::applier&);
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action

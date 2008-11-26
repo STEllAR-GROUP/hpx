@@ -27,8 +27,7 @@ namespace hpx
     /// This is the signature expected to be exposed by a function registered 
     /// as HPX's 'main' function. This main function is the easiest way of 
     /// bootstrapping an application
-    typedef threads::thread_state hpx_main_function_type(
-        threads::thread_self&, applier::applier&);
+    typedef threads::thread_state hpx_main_function_type(applier::applier&);
 
     /// \class runtime runtime.hpp hpx/runtime/runtime.hpp
     ///

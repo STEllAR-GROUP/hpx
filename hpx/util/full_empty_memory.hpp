@@ -138,9 +138,9 @@ namespace hpx { namespace util
         ///         to become full with a read will receive the value at once 
         ///         and will be queued to run.
         template <typename Target>
-        void read(threads::thread_self& self, Target& dest)
+        void read(Target& dest)
         {
-            get_store().read(self, get_address(), dest);
+            get_store().read(get_address(), dest);
         }
 
         /// \brief  Waits for memory to become full and then reads it, sets 
@@ -152,9 +152,9 @@ namespace hpx { namespace util
         ///         will be queued to run (one thread waiting in a \a write 
         ///         function).
         template <typename Target>
-        void read_and_empty(threads::thread_self& self, Target& dest) 
+        void read_and_empty(Target& dest) 
         {
-            get_store().read_and_empty(self, get_address(), dest);
+            get_store().read_and_empty(get_address(), dest);
         }
 
         /// \brief  Writes memory and atomically sets its state to full without 
@@ -176,9 +176,9 @@ namespace hpx { namespace util
         /// \note   When memory becomes empty only one thread blocked like this 
         ///         will be queued to run.
         template <typename Target>
-        void write(threads::thread_self& self, Target const& data)
+        void write(Target const& data)
         {
-            get_store().write(self, get_address(), data);
+            get_store().write(get_address(), data);
         }
 
     private:
@@ -254,9 +254,9 @@ namespace hpx { namespace util
         ///
         /// \note When memory becomes full, all \a threads waiting for it
         ///       to become full with a read will be queued to run.
-        void read(threads::thread_self& self)
+        void read()
         {
-            get_store().read(self, get_address());
+            get_store().read(get_address());
         }
 
         /// Wait for memory to become full, sets memory to empty.
@@ -264,9 +264,9 @@ namespace hpx { namespace util
         /// \note When memory becomes empty, only one thread blocked like this 
         ///       will be queued to run (one thread waiting in a \a write 
         ///       function).
-        void read_and_empty(threads::thread_self& self) 
+        void read_and_empty() 
         {
-            return get_store().read_and_empty(self, get_address());
+            return get_store().read_and_empty(get_address());
         }
 
         /// \brief Writes memory and atomically sets its state to full without 
@@ -284,9 +284,9 @@ namespace hpx { namespace util
         ///
         /// \note When memory becomes empty only one thread blocked like this 
         ///       will be queued to run.
-        void write(threads::thread_self& self)
+        void write()
         {
-            get_store().write(self, get_address());
+            get_store().write(get_address());
         }
 
     private:

@@ -55,19 +55,14 @@ namespace hpx { namespace lcos
 
         /// \brief Wait for the semaphore to be signalled
         ///
-        /// \param self     [in] The PX thread which will be blocked (yielded) 
-        ///                 if the internal lock count of the semaphore is 
-        ///                 currently negative. If the internal lock count is 
-        ///                 not negative this thread will not be yielded and
-        ///                 returns immediately after decrementing the lock 
-        ///                 count.
         /// \param count    [in] The value by which the internal lock count will 
         ///                 be decremented. At the same time this is the minimum 
         ///                 value of the lock count at which th ethread is not 
         ///                 yielded.
-        void wait(threads::thread_self& self, long count = 1)
+        void wait(long count = 1)
         {
             mutex_type::scoped_lock l(mtx_);
+            threads::thread_self& self = threads::get_self();
 
             while (value_ < 0) {
                 queue_.enqueue(self.get_thread_id());
@@ -89,15 +84,15 @@ namespace hpx { namespace lcos
         /// \brief Signal the semaphore
         ///
         /// 
-        void signal(threads::thread_self& self, long count = 1)
+        void signal(long count = 1)
         {
             value_ += count;
-            
+
             mutex_type::scoped_lock l(mtx_);
             if (value_ >= 0) {
                 threads::thread_id_type id = 0;
                 while (queue_.dequeue(&id)) 
-                    threads::set_thread_state(self, id, threads::pending);
+                    threads::set_thread_state(id, threads::pending);
             }
         }
 

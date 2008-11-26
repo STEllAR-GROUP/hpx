@@ -10,7 +10,7 @@
 using namespace hpx;
 using namespace hpx::threads;
 
-thread_state my_gcd (hpx::threads::thread_self&, int m, int n, int gcd);
+thread_state my_gcd (int m, int n, int gcd);
 void print_state (thread_state t_s);
 
 int main(int argc, char* argv[])
@@ -18,12 +18,12 @@ int main(int argc, char* argv[])
     hpx::util::io_service_pool timer_pool;
     hpx::threads::threadmanager my_tm(timer_pool);
 
-    my_tm.register_work(boost::bind (my_gcd, _1, 13, 14, 1), "gcd");                      // GCD = 1
+    my_tm.register_work(boost::bind (my_gcd, 13, 14, 1), "gcd");                      // GCD = 1
     hpx::threads::thread_id_type t_id = 
-        my_tm.register_work(boost::bind (my_gcd, _1, 7, 343, 7), "gcd", suspended);       // GCD = 7
+        my_tm.register_work(boost::bind (my_gcd, 7, 343, 7), "gcd", suspended);       // GCD = 7
     hpx::threads::thread_id_type t2_id = 
-        my_tm.register_work(boost::bind (my_gcd, _1, 120, 115, 5), "gcd", suspended);     // GCD = 5
-    my_tm.register_work(boost::bind (my_gcd, _1, 9, 15, 3), "gcd", pending);              // GCD = 3
+        my_tm.register_work(boost::bind (my_gcd, 120, 115, 5), "gcd", suspended);     // GCD = 5
+    my_tm.register_work(boost::bind (my_gcd, 9, 15, 3), "gcd", pending);              // GCD = 3
 
     BOOST_TEST(my_tm.get_state(t2_id) == suspended);
     my_tm.set_state(t2_id, pending);
@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
     return boost::report_errors();
 }
 
-thread_state my_gcd (hpx::threads::thread_self& s, int m, int n, int gcd)
+thread_state my_gcd (int m, int n, int gcd)
 {
     int r;
     while(n != 0){
@@ -62,7 +62,7 @@ thread_state my_gcd (hpx::threads::thread_self& s, int m, int n, int gcd)
         n = r;
     }
 
-    s.yield(pending);   // just reschedule
+    get_self().yield(pending);   // just reschedule
 
     BOOST_TEST(m == gcd);
 //     std::cout << "GCD for the two numbers is: " << m << std::endl;

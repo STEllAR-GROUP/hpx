@@ -49,13 +49,12 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             return lcos::eager_future<action_type>(appl, targetgid, initial);
         }
 
-        static naming::id_type call(threads::thread_self& self, 
-            applier::applier& appl, naming::id_type const& targetgid, 
-            naming::id_type const& initial)
+        static naming::id_type call(applier::applier& appl, 
+            naming::id_type const& targetgid, naming::id_type const& initial)
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future
-            return call_async(appl, targetgid, initial).get(self);
+            return call_async(appl, targetgid, initial).get();
         }
 
         lcos::future_value<naming::id_type> call_async(
@@ -64,10 +63,10 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             return call_async(this->appl_, targetgid, initial);
         }
 
-        naming::id_type call(threads::thread_self& self, 
-            naming::id_type const& targetgid, naming::id_type const& initial)
+        naming::id_type call(naming::id_type const& targetgid, 
+            naming::id_type const& initial)
         {
-            return call(self, this->appl_, targetgid, initial);
+            return call(this->appl_, targetgid, initial);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -87,12 +86,11 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         }
 
         static std::vector<naming::id_type> 
-        get_output_ports(threads::thread_self& self, applier::applier& appl, 
-            naming::id_type const& gid)
+        get_output_ports(applier::applier& appl, naming::id_type const& gid)
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future
-            return get_output_ports_async(appl, gid).get(self);
+            return get_output_ports_async(appl, gid).get();
         }
 
         lcos::future_value<std::vector<naming::id_type> > 
@@ -102,9 +100,9 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         }
 
         std::vector<naming::id_type> 
-        get_output_ports(threads::thread_self& self, naming::id_type const& gid)
+        get_output_ports(naming::id_type const& gid)
         {
-            return get_output_ports(self, this->appl_, gid);
+            return get_output_ports(this->appl_, gid);
         }
 
         ///////////////////////////////////////////////////////////////////////

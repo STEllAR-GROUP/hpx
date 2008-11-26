@@ -145,7 +145,7 @@ namespace hpx
         if (!func.empty())
         {
             thread_manager_.register_work(
-                boost::bind(func, _1, boost::ref(applier_)), "hpx_main");
+                boost::bind(func, boost::ref(applier_)), "hpx_main");
         }
 
         LRT_(info) << "runtime: started using "  << num_threads << " OS threads";

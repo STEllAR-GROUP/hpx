@@ -37,8 +37,8 @@ namespace hpx { namespace components { namespace server
         };
 
         // constructor
-        distributing_factory(threads::thread_self& self, applier::applier& appl)
-          : simple_component_base<distributing_factory>(self, appl)
+        distributing_factory(applier::applier& appl)
+          : simple_component_base<distributing_factory>(appl)
         {}
 
         ///////////////////////////////////////////////////////////////////////
@@ -79,13 +79,11 @@ namespace hpx { namespace components { namespace server
 
         /// \brief Action to create new components
         threads::thread_state create_components(
-            threads::thread_self& self, applier::applier& app, 
-            result_type* gids, components::component_type type, 
-            std::size_t count); 
+            applier::applier& app, result_type* gids, 
+            components::component_type type, std::size_t count); 
 
         /// \brief Action to delete existing components
-        threads::thread_state free_components(
-            threads::thread_self& self, applier::applier& app,
+        threads::thread_state free_components(applier::applier& app,
             result_type const& gids, bool sync); 
 
         ///////////////////////////////////////////////////////////////////////
@@ -171,7 +169,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     HPX_COMPONENT_EXPORT 
     std::pair<locality_result_iterator, locality_result_iterator>
-    locality_results(distributing_factory::result_type const& v);
+        locality_results(distributing_factory::result_type const& v);
 
 }}}
 

@@ -47,27 +47,26 @@ namespace hpx { namespace components { namespace stubs
 
         /// Create a new instance of an simple_accumulator
         static naming::id_type 
-        create(threads::thread_self& self, applier::applier& appl, 
+        create(applier::applier& appl, 
             naming::id_type const& gid, component_type type, 
             std::size_t count = 1)
         {
-            return stubs::runtime_support::create_component(self, appl, 
+            return stubs::runtime_support::create_component(appl, 
                 gid, type, count);
         }
 
         static naming::id_type 
-        create(threads::thread_self& self, applier::applier& appl, 
+        create(applier::applier& appl, 
             naming::id_type const& gid, std::size_t count = 1)
         {
-            return create(self, appl, gid, 
+            return create(appl, gid, 
                 get_component_type<ServerComponent>(), count);
         }
 
         naming::id_type 
-        create(threads::thread_self& self, naming::id_type const& gid,
-            std::size_t count = 1)
+        create(naming::id_type const& gid, std::size_t count = 1)
         {
-            return create(self, appl_, gid, count);
+            return create(appl_, gid, count);
         }
 
         /// Delete an existing component

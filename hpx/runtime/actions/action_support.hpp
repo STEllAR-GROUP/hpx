@@ -158,13 +158,12 @@ namespace hpx { namespace actions
         /// continuations without any additional argument
         template <typename Func>
         static threads::thread_state 
-        continuation_thread_function(
-            threads::thread_self& self, applier::applier& app, 
+        continuation_thread_function(applier::applier& app, 
             continuation_type cont, boost::tuple<Func> func)
         {
             threads::thread_state newstate = threads::unknown;
             try {
-                newstate = boost::get<0>(func)(self);
+                newstate = boost::get<0>(func)();
                 cont->trigger_all(app);
             }
             catch (hpx::exception const& e) {
@@ -185,21 +184,18 @@ namespace hpx { namespace actions
         {
             // we need to assign the address of the thread function to a 
             // variable to  help the compiler to deduce the function type
-            threads::thread_state (*f)(threads::thread_self&, 
-                    applier::applier&, continuation_type, 
+            threads::thread_state (*f)(applier::applier&, continuation_type, 
                     boost::tuple<Func>) =
                 &action::continuation_thread_function;
 
             // The following bind constructs the wrapped thread function
-            //   f:  is the wrapping thread function
-            //  _1:  is a placeholder which will be replaced by the reference
-            //       to thread_self
+            //    f:  is the wrapping thread function
             //  app: reference to the applier (pre-bound second argument to f)
             // cont: continuation (pre-bound third argument to f)
             // func: wrapped function object (pre-bound forth argument to f)
             //       (this is embedded into a tuple because boost::bind can't
             //       pre-bind another bound function as an argument)
-            return boost::bind(f, _1, boost::ref(appl), cont, 
+            return boost::bind(f, boost::ref(appl), cont, 
                 boost::make_tuple(func));
         }
 

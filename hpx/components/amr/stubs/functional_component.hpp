@@ -47,13 +47,12 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             return lcos::eager_future<action_type>(appl, gid, result, gids);
         }
 
-        static bool eval(threads::thread_self& self, 
-            applier::applier& appl, naming::id_type const& gid, 
+        static bool eval(applier::applier& appl, naming::id_type const& gid, 
             naming::id_type const& result, std::vector<naming::id_type> const& gids)
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future
-            return eval_async(appl, gid, result, gids).get(self);
+            return eval_async(appl, gid, result, gids).get();
         }
 
         lcos::future_value<bool> eval_async(naming::id_type const& gid, 
@@ -63,10 +62,10 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             return eval_async(this->appl_, gid, result, gids);
         }
 
-        bool eval(threads::thread_self& self, naming::id_type const& gid, 
-            naming::id_type const& result, std::vector<naming::id_type> const& gids)
+        bool eval(naming::id_type const& gid, naming::id_type const& result, 
+            std::vector<naming::id_type> const& gids)
         {
-            return eval(self, this->appl_, gid, result, gids);
+            return eval(this->appl_, gid, result, gids);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -81,11 +80,10 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             return lcos::eager_future<action_type>(appl, gid, item, maxitems);
         }
 
-        static naming::id_type alloc_data(threads::thread_self& self, 
-            applier::applier& appl, naming::id_type const& gid, int item = -1,
-            int maxitems = -1)
+        static naming::id_type alloc_data(applier::applier& appl, 
+            naming::id_type const& gid, int item = -1, int maxitems = -1)
         {
-            return alloc_data_async(appl, gid, item, maxitems).get(self);
+            return alloc_data_async(appl, gid, item, maxitems).get();
         }
 
         lcos::future_value<naming::id_type> alloc_data_async(
@@ -94,10 +92,10 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             return alloc_data_async(this->appl_, gid, item, maxitems);
         }
 
-        naming::id_type alloc_data(threads::thread_self& self, 
-            naming::id_type const& gid, int item = -1, int maxitems = -1)
+        naming::id_type alloc_data(naming::id_type const& gid, int item = -1, 
+            int maxitems = -1)
         {
-            return alloc_data(self, this->appl_, gid, item, maxitems);
+            return alloc_data(this->appl_, gid, item, maxitems);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -113,18 +111,17 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             free_data(this->appl_, gid, val);
         }
 
-        static void free_data_sync(threads::thread_self& self, 
-            applier::applier& appl, naming::id_type const& gid, 
-            naming::id_type const& val)
-        {
-            typedef amr::server::functional_component::free_data_action action_type;
-            lcos::eager_future<action_type>(appl, gid, val).get(self);
-        }
-
-        void free_data_sync(threads::thread_self& self, 
+        static void free_data_sync(applier::applier& appl, 
             naming::id_type const& gid, naming::id_type const& val)
         {
-            free_data_sync(self, this->appl_, gid, val);
+            typedef amr::server::functional_component::free_data_action action_type;
+            lcos::eager_future<action_type>(appl, gid, val).get();
+        }
+
+        void free_data_sync(naming::id_type const& gid, 
+            naming::id_type const& val)
+        {
+            free_data_sync(this->appl_, gid, val);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -140,18 +137,17 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             init(this->appl_, gid, numsteps, val);
         }
 
-        static void init_sync(threads::thread_self& self, 
-            applier::applier& appl, naming::id_type const& gid, 
+        static void init_sync(applier::applier& appl, naming::id_type const& gid, 
             std::size_t numsteps, naming::id_type const& val)
         {
             typedef amr::server::functional_component::init_action action_type;
-            lcos::eager_future<action_type>(appl, gid, numsteps, val).get(self);
+            lcos::eager_future<action_type>(appl, gid, numsteps, val).get();
         }
 
-        void init_sync(threads::thread_self& self, naming::id_type const& gid, 
-            std::size_t numsteps, naming::id_type const& val)
+        void init_sync(naming::id_type const& gid, std::size_t numsteps, 
+            naming::id_type const& val)
         {
-            init_sync(self, this->appl_, gid, numsteps, val);
+            init_sync(this->appl_, gid, numsteps, val);
         }
     };
 

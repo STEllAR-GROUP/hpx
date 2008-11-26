@@ -78,7 +78,7 @@ namespace hpx { namespace components { namespace server
         /// \param self [in] The PX \a thread used to execute this function.
         /// \param appl [in] The applier to be used for finalization of the 
         ///             component instance. 
-        void finalize(threads::thread_self& self, applier::applier& appl) {}
+        void finalize(applier::applier& appl) {}
 
         void tidy()
         {
@@ -100,28 +100,23 @@ namespace hpx { namespace components { namespace server
 
         /// \brief Action to figure out, whether we can create more than one 
         ///        instance at once
-        threads::thread_state factory_properties(
-            threads::thread_self& self, applier::applier& app,
+        threads::thread_state factory_properties(applier::applier& app,
             int*, components::component_type type); 
 
         /// \brief Action to create new components
-        threads::thread_state create_component(
-            threads::thread_self& self, applier::applier& app,
+        threads::thread_state create_component(applier::applier& app,
             naming::id_type* gid, components::component_type type, 
             std::size_t count); 
 
         /// \brief Action to delete existing components
-        threads::thread_state free_component(
-            threads::thread_self& self, applier::applier& app,
+        threads::thread_state free_component(applier::applier& app,
             components::component_type type, naming::id_type const& gid); 
 
         /// \brief Action shut down this runtime system instance
-        threads::thread_state shutdown(
-            threads::thread_self& self, applier::applier& app);
+        threads::thread_state shutdown(applier::applier& app);
 
         /// \brief Action shut down runtime system instances on all localities
-        threads::thread_state shutdown_all(
-            threads::thread_self& self, applier::applier& app);
+        threads::thread_state shutdown_all(applier::applier& app);
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action

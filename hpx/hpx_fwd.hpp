@@ -129,11 +129,15 @@ namespace hpx
         coroutine_type;
         typedef coroutine_type::thread_id_type thread_id_type;
         typedef coroutine_type::self thread_self;
-        typedef thread_state thread_function_type(thread_self&);
+        typedef thread_state thread_function_type();
 
         /// The function \a get_self returns a reference to the (OS thread 
         /// specific) self reference to the current PX thread.
         HPX_API_EXPORT thread_self& get_self();
+
+        /// The function \a get_self returns a pointer to the (OS thread 
+        /// specific) self reference to the current PX thread.
+        HPX_API_EXPORT thread_self* get_self_ptr();
     }
 
     /// \namespace components

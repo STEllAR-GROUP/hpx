@@ -63,9 +63,10 @@ namespace hpx { namespace lcos
         /// (as given by the constructor parameter \a number_of_threads), 
         /// releasing all waiting threads as soon as the last \a thread
         /// entered this function.
-        void wait(threads::thread_self& self)
+        void wait()
         {
             mutex_type::scoped_lock l(mtx_);
+            threads::thread_self& self = threads::get_self();
             if (queue_.size() < number_of_threads_-1) {
                 barrier_queue_entry e(self.get_thread_id());
                 queue_.push_back(e);
@@ -80,7 +81,7 @@ namespace hpx { namespace lcos
                 while (!queue_.empty()) {
                     threads::thread_id_type id = queue_.front().id_;
                     queue_.pop_front();
-                    set_thread_state(self, id, threads::pending);
+                    set_thread_state(id, threads::pending);
                 }
 #else
                 // swap the list
@@ -92,7 +93,7 @@ namespace hpx { namespace lcos
                 while (!queue.empty()) {
                     threads::thread_id_type id = queue.front().id_;
                     queue.pop_front();
-                    set_thread_state(self, id, threads::pending);
+                    set_thread_state(id, threads::pending);
                 }
 #endif
             }

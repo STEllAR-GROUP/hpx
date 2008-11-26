@@ -13,8 +13,7 @@
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state timed_set_state_test(
-    threads::thread_self& self, applier::applier& appl,
+threads::thread_state timed_set_state_test(applier::applier& appl,
     util::high_resolution_timer& timer, double wait_time)
 {
     double elapsed = timer.elapsed();
@@ -24,17 +23,16 @@ threads::thread_state timed_set_state_test(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state duration_set_state_test(
-    threads::thread_self& self, applier::applier& appl)
+threads::thread_state duration_set_state_test(applier::applier& appl)
 {
     util::high_resolution_timer timer;
 
     threads::thread_id_type id1 = register_work(appl, 
-        boost::bind(timed_set_state_test, _1, boost::ref(appl), timer, 1.0), 
+        boost::bind(timed_set_state_test, boost::ref(appl), timer, 1.0), 
         "duration_set_state_test1", threads::suspended);
 
     threads::thread_id_type id2 = register_work(appl, 
-        boost::bind(timed_set_state_test, _1, boost::ref(appl), timer, 2.0), 
+        boost::bind(timed_set_state_test, boost::ref(appl), timer, 2.0), 
         "duration_set_state_test2", threads::suspended);
 
     set_thread_state(id1, threads::pending, boost::posix_time::seconds(1));
@@ -44,17 +42,16 @@ threads::thread_state duration_set_state_test(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state time_set_state_test(
-    threads::thread_self& self, applier::applier& appl)
+threads::thread_state time_set_state_test(applier::applier& appl)
 {
     util::high_resolution_timer timer;
 
     threads::thread_id_type id1 = register_work(appl, 
-        boost::bind(timed_set_state_test, _1, boost::ref(appl), timer, 1.0), 
+        boost::bind(timed_set_state_test, boost::ref(appl), timer, 1.0), 
         "timed_set_state_test1", threads::suspended);
 
     threads::thread_id_type id2 = register_work(appl, 
-        boost::bind(timed_set_state_test, _1, boost::ref(appl), timer, 2.0), 
+        boost::bind(timed_set_state_test, boost::ref(appl), timer, 2.0), 
         "timed_set_state_test2", threads::suspended);
 
     boost::posix_time::ptime now (
@@ -67,8 +64,7 @@ threads::thread_state time_set_state_test(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(threads::thread_self& self, 
-    applier::applier& appl)
+threads::thread_state hpx_main(applier::applier& appl)
 {
     // test timed set_state using a time duration
     register_work(appl, duration_set_state_test, "duration_set_state_test_driver");

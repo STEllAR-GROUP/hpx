@@ -132,8 +132,6 @@ namespace hpx { namespace threads
         /// to change the state of one of the threads managed by this 
         /// threadmanager.
         ///
-        /// \param self     [in] A reference to the thread executing this 
-        ///                 function. 
         /// \param id       [in] The thread id of the thread the state should 
         ///                 be modified for.
         /// \param newstate [in] The new state to be set for the thread 
@@ -150,28 +148,6 @@ namespace hpx { namespace threads
         ///                 the parameter \a self if the thread referenced by 
         ///                 the parameter \a id is in \a thread_state#active 
         ///                 state.
-        thread_state set_state(thread_self& self, thread_id_type id, 
-            thread_state newstate);
-
-        /// The set_state function is part of the thread related API and allows
-        /// to change the state of one of the threads managed by this 
-        /// threadmanager.
-        ///
-        /// \param id       [in] The thread id of the thread the state should 
-        ///                 be modified for.
-        /// \param newstate [in] The new state to be set for the thread 
-        ///                 referenced by the \a id parameter.
-        ///
-        /// \returns        This function returns the previous state of the 
-        ///                 thread referenced by the \a id parameter. It will 
-        ///                 return one of the values as defined by the 
-        ///                 \a thread_state enumeration. If the 
-        ///                 thread is not known to the threadmanager the return 
-        ///                 value will be \a thread_state#unknown.
-        ///
-        /// \note           If the thread referenced by the parameter \a id is 
-        ///                 in \a thread_state#active state this function does 
-        ///                 nothing except returning thread_state#unknown. 
         thread_state set_state(thread_id_type id, thread_state newstate);
 
         /// The get_state function is part of the thread related API and allows
@@ -218,25 +194,20 @@ namespace hpx { namespace threads
     protected:
         /// This thread function is used by the at_timer thread below to trigger
         /// the required action.
-        thread_state wake_timer_thread (thread_self& self, 
-            thread_id_type id, thread_state newstate, thread_id_type timer_id);
+        thread_state wake_timer_thread (thread_id_type id, 
+            thread_state newstate, thread_id_type timer_id);
 
         /// This thread function initiates the required set_state action (on 
         /// behalf of one of the threadmanager#set_state functions).
         template <typename TimeType>
-        thread_state at_timer (thread_self& self, TimeType const& expire, 
-            thread_id_type id, thread_state newstate);
-
-        /// This function is the workhorse behind the two public set_state 
-        /// functions 
-        thread_state set_state(thread_self* self, thread_id_type id, 
-            thread_state new_state);
+        thread_state at_timer (TimeType const& expire, thread_id_type id, 
+            thread_state newstate);
 
         /// This function adds threads stored in the new_items queue to the 
         /// thread map and the work_items queue (if appropriate)
         bool add_new();
 
-        /// This function makes sure alle threads which are marked for deletion
+        /// This function makes sure all threads which are marked for deletion
         /// (state is terminated) are properly destroyed
         bool cleanup_terminated();
 

@@ -48,12 +48,11 @@ namespace hpx { namespace components { namespace stubs
         /// Query the current value of the server#accumulator instance 
         /// with the given \a gid. Block for the current accumulator value to 
         /// be returned.
-        static double query(threads::thread_self& self, 
-            applier::applier& appl, naming::id_type gid) 
+        static double query(applier::applier& appl, naming::id_type gid) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the future_value
-            return query_async(appl, gid).get(self);
+            return query_async(appl, gid).get();
         }
 
         /// Initialize the accumulator value of the server#accumulator instance 
@@ -90,9 +89,9 @@ namespace hpx { namespace components { namespace stubs
         /// Query the current value of the server#accumulator instance 
         /// with the given \a gid. Block for the current accumulator 
         /// value to be returned.
-        double query(threads::thread_self& self,naming::id_type gid) 
+        double query(naming::id_type gid) 
         {
-            return query(self, appl_, gid);
+            return query(appl_, gid);
         }
     };
 
