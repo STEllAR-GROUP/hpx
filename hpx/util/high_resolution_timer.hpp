@@ -12,6 +12,7 @@
 #if defined(BOOST_HAS_UNISTD_H)
 #include <unistd.h>
 #endif
+#include <time.h>
 
 #if defined(BOOST_WINDOWS)
 
@@ -115,8 +116,6 @@ namespace hpx { namespace util
 
 #elif defined(_POSIX_TIMERS) && _POSIX_TIMERS > 0 \
     && defined(_POSIX_THREAD_CPUTIME) && _POSIX_THREAD_CPUTIME > 0
-
-#include <time.h>
 
 namespace hpx { namespace util
 {
