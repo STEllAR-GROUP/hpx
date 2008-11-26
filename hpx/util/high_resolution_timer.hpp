@@ -223,7 +223,7 @@ namespace hpx { namespace util
     {
     public:
         high_resolution_timer() 
-          : use_backup(sysconf(_SC_THREAD_CPUTIME) > 0)
+          : use_backup(sysconf(_SC_THREAD_CPUTIME) <= 0)
         {
             if (!use_backup) {
                 start_time.tv_sec = 0;
@@ -233,7 +233,7 @@ namespace hpx { namespace util
         } 
 
         high_resolution_timer(double t) 
-          : use_backup(sysconf(_SC_THREAD_CPUTIME) > 0)
+          : use_backup(sysconf(_SC_THREAD_CPUTIME) <= 0)
         {
             if (!use_backup) {
                 start_time.tv_sec = time_t(t);
@@ -242,14 +242,14 @@ namespace hpx { namespace util
         }
         
         high_resolution_timer(high_resolution_timer const& rhs) 
-          : use_backup(sysconf(_SC_THREAD_CPUTIME) > 0),
+          : use_backup(sysconf(_SC_THREAD_CPUTIME) <= 0),
             start_time(rhs.start_time)
         {
         } 
 
         static double now()
         {
-            if (use_backup)
+            if (sysconf(_SC_THREAD_CPUTIME) <= 0)
                 return std::clock();
 
             timespec now;
