@@ -114,8 +114,9 @@ namespace hpx { namespace util
 
 }} // namespace hpx::util
 
-#elif defined(_POSIX_TIMERS) && _POSIX_TIMERS > 0 \
-    && defined(_POSIX_THREAD_CPUTIME) && _POSIX_THREAD_CPUTIME > 0
+#elif defined(_POSIX_TIMERS) && _POSIX_TIMERS > 0 && defined(_POSIX_THREAD_CPUTIME)
+
+#if _POSIX_THREAD_CPUTIME > 0   // timer slways supported
 
 namespace hpx { namespace util
 {
@@ -124,7 +125,6 @@ namespace hpx { namespace util
     //
     //  high_resolution_timer 
     //      A timer object measures elapsed time.
-    //      CAUTION: Linux only!
     //
     ///////////////////////////////////////////////////////////////////////////////
     class high_resolution_timer
@@ -193,6 +193,122 @@ namespace hpx { namespace util
     }; 
 
 }} // namespace hpx::util
+
+#else   // _POSIX_THREAD_CPUTIME > 0
+
+#include <boost/timer.hpp>
+
+namespace hpx { namespace util
+{
+    struct high_resolution_timer
+        : boost::timer
+    {
+        static double now()
+        {
+            return double(std::clock());
+        }
+    };
+}}
+
+// availability of high performance timers must be checked at runtime
+namespace hpx { namespace util
+{
+    ///////////////////////////////////////////////////////////////////////////////
+    //
+    //  high_resolution_timer 
+    //      A timer object measures elapsed time.
+    //
+    ///////////////////////////////////////////////////////////////////////////////
+    class high_resolution_timer
+    {
+    public:
+        high_resolution_timer() 
+          : use_backup(sysconf(_SC_THREAD_CPUTIME) > 0)
+        {
+            if (!use_backup) {
+                start_time.tv_sec = 0;
+                start_time.tv_nsec = 0;
+            }
+            restart(); 
+        } 
+
+        high_resolution_timer(double t) 
+          : use_backup(sysconf(_SC_THREAD_CPUTIME) > 0)
+        {
+            if (!use_backup) {
+                start_time.tv_sec = time_t(t);
+                start_time.tv_nsec = (t - start_time.tv_sec) * 1e9;
+            }
+        }
+        
+        high_resolution_timer(high_resolution_timer const& rhs) 
+          : use_backup(sysconf(_SC_THREAD_CPUTIME) > 0),
+            start_time(rhs.start_time)
+        {
+        } 
+
+        static double now()
+        {
+            if (use_backup)
+                return std::clock();
+
+            timespec now;
+            if (-1 == clock_gettime(CLOCK_THREAD_CPUTIME_ID, &now))
+                boost::throw_exception(std::runtime_error("Couldn't get current time"));
+            return double(now.tv_sec) + double(now.tv_nsec) * 1e-9;
+        }
+        
+        void restart() 
+        { 
+            if (use_backup)
+                start_time_backup.restart();
+            else if (-1 == clock_gettime(CLOCK_THREAD_CPUTIME_ID, &start_time))
+                boost::throw_exception(std::runtime_error("Couldn't initialize start_time"));
+        } 
+        double elapsed() const                  // return elapsed time in seconds
+        { 
+            if (use_backup)
+                return start_time_backup.elapsed();
+
+            timespec now;
+            if (-1 == clock_gettime(CLOCK_THREAD_CPUTIME_ID, &now))
+                boost::throw_exception(std::runtime_error("Couldn't get current time"));
+
+            if (now.tv_sec == start_time.tv_sec)
+                return double(now.tv_nsec - start_time.tv_nsec) * 1e-9;
+                
+            return double(now.tv_sec - start_time.tv_sec) + 
+                (double(now.tv_nsec - start_time.tv_nsec) * 1e-9);
+        }
+
+        double elapsed_max() const   // return estimated maximum value for elapsed()
+        {
+            if (use_backup)
+                start_time_backup.elapsed_max();
+
+            return double((std::numeric_limits<time_t>::max)() - start_time.tv_sec); 
+        }
+
+        double elapsed_min() const            // return minimum value for elapsed()
+        { 
+            if (use_backup)
+                start_time_backup.elapsed_min();
+
+            timespec resolution;
+            if (-1 == clock_getres(CLOCK_THREAD_CPUTIME_ID, &resolution))
+                boost::throw_exception(std::runtime_error("Couldn't get resolution"));
+            return double(resolution.tv_sec + resolution.tv_nsec * 1e-9); 
+        }
+
+    private:
+        bool use_backup;
+        timespec start_time;
+        boost::timer start_time_backup;
+    }; 
+
+}} // namespace hpx::util
+
+#endif  // _POSIX_THREAD_CPUTIME > 0
 
 #else   //  !defined(BOOST_WINDOWS) && (!defined(_POSIX_TIMERS)
         //      || _POSIX_TIMERS <= 0
