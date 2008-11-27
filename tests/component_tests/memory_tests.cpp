@@ -11,21 +11,21 @@
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(applier::applier& appl)
+threads::thread_state hpx_main()
 {
     // try to access some memory directly
     boost::uint32_t value = 0;
 
     // store a value to memory
+    naming::id_type memid = applier::get_applier().get_memory_gid();
     typedef components::server::memory::store32_action store_action_type;
-    appl.apply<store_action_type>(appl.get_memory_gid(), boost::uint64_t(&value), 1);
+    applier::apply<store_action_type>(memid, boost::uint64_t(&value), 1);
 
     BOOST_TEST(value == 1);
 
     // read the value back from memory (using an eager_future)
     typedef components::server::memory::load32_action load_action_type;
-    lcos::eager_future<load_action_type> ef(
-        appl, appl.get_memory_gid(), boost::uint64_t(&value));
+    lcos::eager_future<load_action_type> ef(memid, boost::uint64_t(&value));
 
     boost::uint32_t result1 = ef.get();
     BOOST_TEST(result1 == value);
@@ -33,12 +33,11 @@ threads::thread_state hpx_main(applier::applier& appl)
     // read the value back from memory (using a lazy_future)
     lcos::lazy_future<load_action_type> lf;
 
-    boost::uint32_t result2 = lf.get(appl, appl.get_memory_gid(), 
-        boost::uint64_t(&value));
+    boost::uint32_t result2 = lf.get(memid, boost::uint64_t(&value));
     BOOST_TEST(result2 == value);
 
     // initiate shutdown of the runtime system
-    components::stubs::runtime_support::shutdown_all(appl);
+    components::stubs::runtime_support::shutdown_all();
 
     return threads::terminated;
 }

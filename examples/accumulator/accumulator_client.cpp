@@ -17,11 +17,12 @@ using namespace std;
 namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(applier::applier& appl)
+threads::thread_state hpx_main()
 {
     // get list of all known localities
     std::vector<naming::id_type> prefixes;
     naming::id_type prefix;
+    applier::applier& appl = applier::get_applier();
     if (appl.get_remote_prefixes(prefixes)) {
         // create accumulator on any of the remote localities
         prefix = prefixes[0];
@@ -33,7 +34,7 @@ threads::thread_state hpx_main(applier::applier& appl)
 
     // create an accumulator locally
     using hpx::components::accumulator;
-    accumulator accu (accumulator::create(appl, prefix));
+    accumulator accu (accumulator::create(prefix));
 
     // print some message
     std::cout << "accumulator client, you may enter some commands "
@@ -77,7 +78,7 @@ threads::thread_state hpx_main(applier::applier& appl)
     accu.free();     // this invalidates the remote reference
 
     // initiate shutdown of the runtime systems on all localities
-    components::stubs::runtime_support::shutdown_all(appl);
+    components::stubs::runtime_support::shutdown_all();
 
     return threads::terminated;
 }

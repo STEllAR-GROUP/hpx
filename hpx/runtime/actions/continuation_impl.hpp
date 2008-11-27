@@ -12,7 +12,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/lcos/base_lco.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -21,7 +21,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <typename Arg0>
     inline Arg0 const& 
-    continuation::trigger_all(applier::applier& app, Arg0 const& arg0)
+    continuation::trigger_all(Arg0 const& arg0)
     {
         typedef typename 
             lcos::template base_lco_with_value<Arg0>::set_result_action 
@@ -31,7 +31,7 @@ namespace hpx { namespace actions
         for (std::vector<naming::id_type>::iterator it = gids_.begin();
              it != end; ++it)
         {
-            if (!app.apply<action_type>(*it, arg0))
+            if (!applier::apply<action_type>(*it, arg0))
                 break;
         }
         return arg0;

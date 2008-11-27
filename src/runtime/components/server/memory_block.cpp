@@ -41,50 +41,50 @@ namespace hpx { namespace components { namespace server { namespace detail
 {
     /// Get the current data for reading
     threads::thread_state memory_block::get (
-        applier::applier& appl, components::memory_block_data* result) 
+        components::memory_block_data* result) 
     {
         *result = components::memory_block_data(wrapper_->component_);
         return threads::terminated;
     }
 
     components::memory_block_data 
-    memory_block::local_get (applier::applier& appl) 
+    memory_block::local_get () 
     {
         return components::memory_block_data(wrapper_->component_);
     }
 
     /// Get the current data for reading
     threads::thread_state memory_block::checkout (
-        applier::applier& appl, components::memory_block_data* result) 
+        components::memory_block_data* result) 
     {
         *result = components::memory_block_data(wrapper_->component_);
         return threads::terminated;
     }
 
     components::memory_block_data 
-    memory_block::local_checkout (applier::applier& appl) 
+    memory_block::local_checkout () 
     {
         return components::memory_block_data(wrapper_->component_);
     }
 
     /// Write back data
     threads::thread_state memory_block::checkin (
-        applier::applier& appl, components::memory_block_data const& newdata) 
+        components::memory_block_data const& newdata) 
     {
         return threads::terminated;
     }
 
-    void memory_block::local_checkin (applier::applier& appl, 
+    void memory_block::local_checkin (
         components::memory_block_data const& data) 
     {
     }
 
     /// Clone this memory_block
-    naming::id_type create_memory_block (applier::applier& appl, 
+    naming::id_type create_memory_block (
         detail::memory_block_header const* rhs)
     {
         server::memory_block* c = server::memory_block::create(rhs);
-        naming::id_type gid = c->get_gid(appl);
+        naming::id_type gid = c->get_gid();
         if (gid) 
             return gid;
 
@@ -95,17 +95,16 @@ namespace hpx { namespace components { namespace server { namespace detail
         return naming::invalid_id;
     }
 
-    threads::thread_state memory_block::clone (
-        applier::applier& appl, naming::id_type* result) 
+    threads::thread_state memory_block::clone (naming::id_type* result) 
     {
-        *result = create_memory_block(appl, wrapper_->component_.get());
+        *result = create_memory_block(wrapper_->component_.get());
         return threads::terminated;
     }
 
     naming::id_type 
-    memory_block::local_clone(applier::applier& appl) 
+    memory_block::local_clone() 
     {
-        return create_memory_block(appl, wrapper_->component_.get());
+        return create_memory_block(wrapper_->component_.get());
     }
 
 }}}}

@@ -26,9 +26,8 @@ namespace hpx { namespace components { namespace amr
         base_type;
 
     public:
-        functional_component(applier::applier& app, naming::id_type gid,
-                bool freeonexit = false)
-          : base_type(app, gid, freeonexit)
+        functional_component(naming::id_type gid, bool freeonexit = false)
+          : base_type(gid, freeonexit)
         {}
 
         ///////////////////////////////////////////////////////////////////////

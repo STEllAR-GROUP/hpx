@@ -25,27 +25,23 @@ namespace hpx { namespace applier { namespace detail
     struct apply_helper0<Action, boost::mpl::false_>
     {
         static void 
-        call (Action* act, threads::threadmanager& tm, applier& appl, 
-            naming::address::address_type lva)
+        call (Action* act, naming::address::address_type lva)
         {
-            tm.register_work(act->get_thread_function(appl, lva),
+            hpx::applier::register_work(act->get_thread_function(lva),
                 actions::detail::get_action_name<Action>());
         }
 
         static void 
-        call (threads::threadmanager& tm, applier& appl, 
-            naming::address::address_type lva)
+        call (naming::address::address_type lva)
         {
-            tm.register_work(Action::construct_thread_function(appl, lva),
+            hpx::applier::register_work(Action::construct_thread_function(lva),
                 actions::detail::get_action_name<Action>());
         }
 
         static void 
-        call (actions::continuation_type& c, 
-            threads::threadmanager& tm, applier& appl, 
-            naming::address::address_type lva)
+        call (actions::continuation_type& c, naming::address::address_type lva)
         {
-            tm.register_work(Action::construct_thread_function(c, appl, lva),
+            hpx::applier::register_work(Action::construct_thread_function(c, lva),
                 actions::detail::get_action_name<Action>());
         }
     };
@@ -54,30 +50,27 @@ namespace hpx { namespace applier { namespace detail
     struct apply_helper0<Action, boost::mpl::true_>
     {
         static void 
-        call (Action* act, threads::threadmanager&, applier& appl, 
-            naming::address::address_type lva)
+        call (Action* act, naming::address::address_type lva)
         {
             BOOST_ASSERT(false);    // shouldn't be called at all
         }
 
         // If local and to be directly executed, just call the function
         static void
-        call (threads::threadmanager&, applier& appl, 
-            naming::address::address_type addr)
+        call (naming::address::address_type addr)
         {
-            Action::execute_function(appl, addr);
+            Action::execute_function(addr);
         }
 
         static typename Action::result_type 
-        call (actions::continuation_type& c, threads::threadmanager&, 
-            applier& appl, naming::address::address_type addr)
+        call (actions::continuation_type& c, naming::address::address_type addr)
         {
             try {
-                return c->trigger_all(appl, Action::execute_function(appl, addr));
+                return c->trigger_all(Action::execute_function(addr));
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
-                c->trigger_error(appl, e);
+                c->trigger_error(e);
                 return typename Action::result_type();
             }
         }
@@ -94,19 +87,17 @@ namespace hpx { namespace applier { namespace detail
     struct apply_helper1<Action, Arg0, boost::mpl::false_>
     {
         static void 
-        call (threads::threadmanager& tm, applier& appl, 
-            naming::address::address_type addr, Arg0 const& arg0)
+        call (naming::address::address_type addr, Arg0 const& arg0)
         {
-            tm.register_work(Action::construct_thread_function(appl, addr, arg0),
+            hpx::applier::register_work(Action::construct_thread_function(addr, arg0),
                 actions::detail::get_action_name<Action>());
         }
 
         static void 
-        call (actions::continuation_type& c, 
-            threads::threadmanager& tm, applier& appl, 
-            naming::address::address_type addr, Arg0 const& arg0)
+        call (actions::continuation_type& c, naming::address::address_type addr, 
+            Arg0 const& arg0)
         {
-            tm.register_work(Action::construct_thread_function(c, appl, addr, arg0),
+            hpx::applier::register_work(Action::construct_thread_function(c, addr, arg0),
                 actions::detail::get_action_name<Action>());
         }
     };
@@ -116,24 +107,21 @@ namespace hpx { namespace applier { namespace detail
     {
         // If local and to be directly executed, just call the function
         static void
-        call (threads::threadmanager&, applier& appl, 
-            naming::address::address_type addr, Arg0 const& arg0)
+        call (naming::address::address_type addr, Arg0 const& arg0)
         {
-            Action::execute_function(appl, addr, arg0);
+            Action::execute_function(addr, arg0);
         }
 
         static typename Action::result_type  
-        call (actions::continuation_type& c, threads::threadmanager&, 
-            applier& appl, naming::address::address_type addr, 
+        call (actions::continuation_type& c, naming::address::address_type addr, 
             Arg0 const& arg0)
         {
             try {
-                return c->trigger_all(appl, 
-                    Action::execute_function(appl, addr, arg0));
+                return c->trigger_all(Action::execute_function(addr, arg0));
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
-                c->trigger_error(appl, e);
+                c->trigger_error(e);
                 return typename Action::result_type();
             }
         }

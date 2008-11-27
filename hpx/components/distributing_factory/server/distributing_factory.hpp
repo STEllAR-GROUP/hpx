@@ -37,8 +37,7 @@ namespace hpx { namespace components { namespace server
         };
 
         // constructor
-        distributing_factory(applier::applier& appl)
-          : simple_component_base<distributing_factory>(appl)
+        distributing_factory()
         {}
 
         ///////////////////////////////////////////////////////////////////////
@@ -78,13 +77,11 @@ namespace hpx { namespace components { namespace server
         iterator_range_type;
 
         /// \brief Action to create new components
-        threads::thread_state create_components(
-            applier::applier& app, result_type* gids, 
+        threads::thread_state create_components(result_type* gids, 
             components::component_type type, std::size_t count); 
 
         /// \brief Action to delete existing components
-        threads::thread_state free_components(applier::applier& app,
-            result_type const& gids, bool sync); 
+        threads::thread_state free_components(result_type const& gids, bool sync); 
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action

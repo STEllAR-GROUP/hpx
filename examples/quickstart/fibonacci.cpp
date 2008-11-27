@@ -36,8 +36,7 @@ namespace po = boost::program_options;
 // }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state 
-    fib(applier::applier&, int* result, naming::id_type prefix, int n);
+threads::thread_state fib(int* result, naming::id_type prefix, int n);
 
 typedef 
     actions::plain_result_action2<int, naming::id_type, int, fib> 
@@ -46,15 +45,14 @@ fibonacci_action;
 HPX_REGISTER_ACTION(fibonacci_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state 
-fib (applier::applier& appl, int* result, naming::id_type prefix, int n)
+threads::thread_state fib (int* result, naming::id_type prefix, int n)
 {
     if (n < 2) {
         *result = n;
     }
     else {
-        lcos::eager_future<fibonacci_action> n1(appl, prefix, prefix, n - 1);
-        lcos::eager_future<fibonacci_action> n2(appl, prefix, prefix, n - 2);
+        lcos::eager_future<fibonacci_action> n1(prefix, prefix, n - 1);
+        lcos::eager_future<fibonacci_action> n2(prefix, prefix, n - 2);
         int r1 = n1.get();
         int r2 = n2.get();
         *result = r1 + r2;
@@ -63,11 +61,12 @@ fib (applier::applier& appl, int* result, naming::id_type prefix, int n)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(applier::applier& appl)
+threads::thread_state hpx_main()
 {
     // get list of all known localities
     std::vector<naming::id_type> prefixes;
     naming::id_type prefix;
+    applier::applier& appl = applier::get_applier();
     if (appl.get_remote_prefixes(prefixes)) {
         // execute the fib() function on any of the remote localities
         prefix = prefixes[0];
@@ -79,14 +78,14 @@ threads::thread_state hpx_main(applier::applier& appl)
 
     {
         util::high_resolution_timer t;
-        lcos::eager_future<fibonacci_action> n(appl, prefix, prefix, 10);
+        lcos::eager_future<fibonacci_action> n(prefix, prefix, 10);
         int result = n.get();
         double elapsed = t.elapsed();
         std::cout << "elapsed: " << elapsed << ", result: " << result << std::endl;
     }
 
     // initiate shutdown of the runtime systems on all localities
-    components::stubs::runtime_support::shutdown_all(appl);
+    components::stubs::runtime_support::shutdown_all();
 
     return threads::terminated;
 }

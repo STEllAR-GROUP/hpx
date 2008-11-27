@@ -165,8 +165,7 @@ namespace hpx { namespace threads
         thread_state get_state(thread_id_type id);
 
         ///
-        naming::id_type get_thread_gid(thread_id_type id, 
-            applier::applier& appl);
+        naming::id_type get_thread_gid(thread_id_type id);
 
         /// Set a timer to set the state of the given \a thread to the given 
         /// new value after it expired (at the given time)

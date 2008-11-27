@@ -25,8 +25,8 @@ namespace hpx { namespace components { namespace amr { namespace server
     {
         template <typename Adaptor>
         static bool
-        call(applier::applier& appl, naming::id_type const& gid, 
-            naming::id_type const& value_gid, Adaptor* in)
+        call(naming::id_type const& gid, naming::id_type const& value_gid, 
+            Adaptor* in)
         {
             using namespace boost::assign;
 
@@ -34,7 +34,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             input_gids += in[0]->get(), in[1]->get(), in[2]->get();
 
             return components::amr::stubs::functional_component::eval(
-                appl, gid, value_gid, input_gids);
+               gid, value_gid, input_gids);
         }
     };
 
@@ -43,8 +43,8 @@ namespace hpx { namespace components { namespace amr { namespace server
     {
         template <typename Adaptor>
         static bool
-        call(applier::applier& appl, naming::id_type const& gid, 
-            naming::id_type const& value_gid, Adaptor* in)
+        call(naming::id_type const& gid, naming::id_type const& value_gid, 
+            Adaptor* in)
         {
             using namespace boost::assign;
 
@@ -54,36 +54,33 @@ namespace hpx { namespace components { namespace amr { namespace server
                 in[4]->get();
 
             return components::amr::stubs::functional_component::eval(
-                appl, gid, value_gid, input_gids);
+                gid, value_gid, input_gids);
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     inline naming::id_type 
-    alloc_helper(applier::applier& appl, naming::id_type const& gid)
+    alloc_helper(naming::id_type const& gid)
     {
-        return components::amr::stubs::functional_component::alloc_data(
-            appl, gid);
+        return components::amr::stubs::functional_component::alloc_data(gid);
     }
 
-    inline void free_helper(applier::applier& appl, naming::id_type const& fgid,
-        naming::id_type& gid)
+    inline void free_helper(naming::id_type const& fgid, naming::id_type& gid)
     {
-        components::amr::stubs::functional_component::free_data(appl, fgid, gid);
+        components::amr::stubs::functional_component::free_data(fgid, gid);
         gid = naming::invalid_id;
     }
 
-    inline void free_helper_sync(applier::applier& appl, 
-        naming::id_type const& fgid, naming::id_type& gid)
+    inline void free_helper_sync(naming::id_type const& fgid, 
+        naming::id_type& gid)
     {
-        components::amr::stubs::functional_component::free_data_sync(appl, 
-            fgid, gid);
+        components::amr::stubs::functional_component::free_data_sync(fgid, gid);
         gid = naming::invalid_id;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <int N>
-    stencil_value<N>::stencil_value(applier::applier& appl)
+    stencil_value<N>::stencil_value()
       : driver_thread_(0), sem_in_(N), sem_out_(0), sem_result_(0), 
         value_gid_(naming::invalid_id), backup_value_gid_(naming::invalid_id),
         functional_gid_(naming::invalid_id), is_called_(false)
@@ -91,8 +88,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         // create adaptors
         for (std::size_t i = 0; i < N; ++i)
         {
-            in_[i].reset(new in_adaptor_type(appl));
-            out_[i].reset(new out_adaptor_type(appl));
+            in_[i].reset(new in_adaptor_type());
+            out_[i].reset(new out_adaptor_type());
             out_[i]->get()->set_callback(
                 boost::bind(&stencil_value::get_value, this, _1));
         }
@@ -106,10 +103,10 @@ namespace hpx { namespace components { namespace amr { namespace server
     }
 
     template <int N>
-    void stencil_value<N>::finalize(applier::applier& appl) 
+    void stencil_value<N>::finalize() 
     {
         if (naming::invalid_id != value_gid_) 
-            free_helper_sync(appl, functional_gid_, value_gid_);
+            free_helper_sync(functional_gid_, value_gid_);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -118,8 +115,8 @@ namespace hpx { namespace components { namespace amr { namespace server
     // result
     template <int N>
     threads::thread_state  
-    stencil_value<N>::call(applier::applier& appl, 
-        naming::id_type* result, naming::id_type const& initial)
+    stencil_value<N>::call(naming::id_type* result, 
+        naming::id_type const& initial)
     {
         // remember that this instance is used as the first (and last) step in
         // the computation
@@ -153,10 +150,10 @@ namespace hpx { namespace components { namespace amr { namespace server
     // - set the result for the next time step
     template <int N>
     threads::thread_state  
-    stencil_value<N>::main(applier::applier& appl)
+    stencil_value<N>::main()
     {
         // ask functional component to create the local data value
-        backup_value_gid_ = alloc_helper(appl, functional_gid_);
+        backup_value_gid_ = alloc_helper(functional_gid_);
 
         // this is the main loop of the computation, gathering the values
         // from the previous time step, computing the result of the current
@@ -166,7 +163,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         while (!is_last) {
             // start acquire operations on input ports
             for (std::size_t i = 0; i < N; ++i)
-                in_[i]->aquire_value(appl);         // non-blocking!
+                in_[i]->aquire_value();         // non-blocking!
 
             // at this point all gid's have to be initialized
             BOOST_ASSERT(naming::invalid_id != functional_gid_);
@@ -174,7 +171,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
             // Compute the next value, store it in backup_value_gid_
             // The eval action returns true for the last time step.
-            is_last = eval_helper<N>::call(appl, functional_gid_, 
+            is_last = eval_helper<N>::call(functional_gid_, 
                 backup_value_gid_, in_);
 
             // if the computation finished in an instance which has been used
@@ -196,7 +193,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             // one, where the first gets it's initial value during the 
             // call_action)
             if (naming::invalid_id == value_gid_) 
-                value_gid_ = alloc_helper(appl, functional_gid_);
+                value_gid_ = alloc_helper(functional_gid_);
             std::swap(value_gid_, backup_value_gid_);
 
             // signal all output threads it's safe to read value
@@ -205,7 +202,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         sem_result_.signal(1);        // final result has been set
 
-        free_helper_sync(appl, functional_gid_, backup_value_gid_);
+        free_helper_sync(functional_gid_, backup_value_gid_);
         return threads::terminated;
     }
 
@@ -224,19 +221,19 @@ namespace hpx { namespace components { namespace amr { namespace server
     ///////////////////////////////////////////////////////////////////////////
     template <int N>
     threads::thread_state 
-    stencil_value<N>::get_output_ports(applier::applier& appl, 
+    stencil_value<N>::get_output_ports(
         std::vector<naming::id_type> *gids)
     {
         gids->clear();
         for (std::size_t i = 0; i < N; ++i)
-            gids->push_back(out_[i]->get_gid(appl));
+            gids->push_back(out_[i]->get_gid());
         return threads::terminated;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <int N>
     threads::thread_state 
-    stencil_value<N>::connect_input_ports(applier::applier& appl, 
+    stencil_value<N>::connect_input_ports(
         std::vector<naming::id_type> const& gids)
     {
         if (gids.size() < N) {
@@ -252,8 +249,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         if (functional_gid_ != naming::invalid_id && 0 == driver_thread_) {
             // run the thread which collects the input, executes the provided
             // functional element and sets the value for the next time step
-            driver_thread_ = applier::register_work(appl, 
-                boost::bind(&stencil_value<N>::main, this, boost::ref(appl)), 
+            driver_thread_ = applier::register_work(
+                boost::bind(&stencil_value<N>::main, this), 
                 "stencil_value::main");
         }
         return threads::terminated;
@@ -262,8 +259,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     ///////////////////////////////////////////////////////////////////////////
     template <int N>
     threads::thread_state 
-    stencil_value<N>::set_functional_component(applier::applier& appl, 
-        naming::id_type const& gid)
+    stencil_value<N>::set_functional_component(naming::id_type const& gid)
     {
         // store gid of functional component
         functional_gid_ = gid;
@@ -277,8 +273,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         if (inputs_bound && 0 == driver_thread_) {
             // run the thread which collects the input, executes the provided
             // functional element and sets the value for the next time step
-            driver_thread_ = applier::register_work(appl, 
-                boost::bind(&stencil_value<N>::main, this, boost::ref(appl)), 
+            driver_thread_ = applier::register_work(
+                boost::bind(&stencil_value<N>::main, this), 
                 "stencil_value::main");
         }
 

@@ -13,6 +13,7 @@
 #include <hpx/components/amr/functional_component.hpp>
 #include <hpx/components/amr_test/stencil.hpp>
 #include <hpx/components/amr_test/logging.hpp>
+#include <hpx/components/amr_test/stencil_data.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
@@ -25,8 +26,7 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Initialize functional components by setting the logging component to use
-void init(applier::applier& appl,
-    components::distributing_factory::iterator_range_type const& functions,
+void init(components::distributing_factory::iterator_range_type const& functions,
     components::distributing_factory::iterator_range_type const& logging,
     std::size_t numsteps)
 {
@@ -36,14 +36,14 @@ void init(applier::applier& appl,
     for (/**/; function != functions.second; ++function)
     {
         components::amr::stubs::functional_component::
-            init(appl, *function, numsteps, log);
+            init(*function, numsteps, log);
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Create functional components, one for each data point, use those to 
 // initialize the stencil value instances
-void init_stencils(applier::applier& appl,
+void init_stencils(
     components::distributing_factory::iterator_range_type const& stencils,
     components::distributing_factory::iterator_range_type const& functions)
 {
@@ -54,14 +54,14 @@ void init_stencils(applier::applier& appl,
     {
         BOOST_ASSERT(function != functions.second);
         components::amr::stubs::stencil_value<3>::set_functional_component(
-            appl, *stencil, *function);
+            *stencil, *function);
     }
     BOOST_ASSERT(function == functions.second);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get gids of output ports of all functions
-void get_output_ports(applier::applier& appl,
+void get_output_ports(
     components::distributing_factory::iterator_range_type const& stencils,
     std::vector<std::vector<naming::id_type> >& outputs)
 {
@@ -76,7 +76,7 @@ void get_output_ports(applier::applier& appl,
     for (/**/; stencil != stencils.second; ++stencil)
     {
         lazyvals.push_back(components::amr::stubs::stencil_value<3>::
-            get_output_ports_async(appl, *stencil));
+            get_output_ports_async(*stencil));
     }
 
     // now wait for the results
@@ -99,7 +99,7 @@ inline std::size_t mod(int idx, std::size_t maxidx)
     return (idx < 0) ? (idx + maxidx) % maxidx : idx % maxidx;
 }
 
-void connect_input_ports(applier::applier& appl,
+void connect_input_ports(
     components::distributing_factory::result_type const* stencils,
     std::vector<std::vector<std::vector<naming::id_type> > > const& outputs)
 {
@@ -125,13 +125,13 @@ void connect_input_ports(applier::applier& appl,
                 ;
 
             components::amr::stubs::stencil_value<3>::
-                connect_input_ports(appl, *stencil, output_ports);
+                connect_input_ports(*stencil, output_ports);
         }
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void prepare_initial_data(applier::applier& appl, 
+void prepare_initial_data(
     components::distributing_factory::iterator_range_type const& functions, 
     std::vector<naming::id_type>& initial_data, int maxindex)
 {
@@ -144,7 +144,7 @@ void prepare_initial_data(applier::applier& appl,
     for (std::size_t i = 0; function != functions.second; ++function, ++i)
     {
         lazyvals.push_back(components::amr::stubs::functional_component::
-            alloc_data_async(appl, *function, i, maxindex));
+            alloc_data_async(*function, i, maxindex));
     }
 
     // now wait for the results
@@ -157,7 +157,7 @@ void prepare_initial_data(applier::applier& appl,
 
 ///////////////////////////////////////////////////////////////////////////////
 // do actual work
-void execute(applier::applier& appl, 
+void execute(
     components::distributing_factory::iterator_range_type const& stencils, 
     std::vector<naming::id_type> const& initial_data, 
     std::vector<naming::id_type>& result_data)
@@ -171,7 +171,7 @@ void execute(applier::applier& appl,
     {
         BOOST_ASSERT(i < initial_data.size());
         lazyvals.push_back(components::amr::stubs::stencil_value<3>::
-            call_async(appl, *stencil, initial_data[i]));
+            call_async(*stencil, initial_data[i]));
     }
 
     // now wait for the results
@@ -183,17 +183,7 @@ void execute(applier::applier& appl,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-struct timestep_data
-{
-    int max_index_;   // overall number of datapoints
-    int index_;       // sequential number of this datapoint
-    int timestep_;    // current time step
-    double value_;    // current value
-};
-
-///////////////////////////////////////////////////////////////////////////////
-threads::thread_state 
-hpx_main(applier::applier& appl, std::size_t numvals, std::size_t numsteps)
+threads::thread_state hpx_main(std::size_t numvals, std::size_t numsteps)
 {
     // get component types needed below
     components::component_type function_type = 
@@ -208,8 +198,8 @@ hpx_main(applier::applier& appl, std::size_t numvals, std::size_t numsteps)
 
         // create a distributing factory locally
         components::distributing_factory factory(
-            components::distributing_factory::create(appl, 
-                appl.get_runtime_support_gid(), true));
+            components::distributing_factory::create(
+                applier::get_applier().get_runtime_support_gid(), true));
 
         // create a couple of stencil (functional) components and the same 
         // amount of stencil_value components
@@ -222,39 +212,39 @@ hpx_main(applier::applier& appl, std::size_t numvals, std::size_t numsteps)
         result_type logging = factory.create_components(logging_type);
 
         // initialize logging functionality in functions
-        init(appl, locality_results(functions), locality_results(logging), numsteps);
+        init(locality_results(functions), locality_results(logging), numsteps);
 
         // initialize stencil_values using the stencil (functional) components
-        init_stencils(appl, locality_results(stencils[0]), 
+        init_stencils(locality_results(stencils[0]), 
             locality_results(functions));
-        init_stencils(appl, locality_results(stencils[1]), 
+        init_stencils(locality_results(stencils[1]), 
             locality_results(functions));
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(2);
-        get_output_ports(appl, locality_results(stencils[0]), outputs[0]);
-        get_output_ports(appl, locality_results(stencils[1]), outputs[1]);
+        get_output_ports(locality_results(stencils[0]), outputs[0]);
+        get_output_ports(locality_results(stencils[1]), outputs[1]);
 
         // connect output gids with corresponding stencil inputs
-        connect_input_ports(appl, stencils, outputs);
+        connect_input_ports(stencils, outputs);
 
         // prepare initial data
         std::vector<naming::id_type> initial_data;
-        prepare_initial_data(appl, locality_results(functions), 
-            initial_data, numvals);
+        prepare_initial_data(locality_results(functions), initial_data, numvals);
 
         // do actual work
         std::vector<naming::id_type> result_data;
-        execute(appl, locality_results(stencils[0]), initial_data, result_data);
+        execute(locality_results(stencils[0]), initial_data, result_data);
 
         // start asynchronous get operations
-        components::stubs::memory_block stub(appl);
 
         // get some output memory_block_data instances
-        components::access_memory_block<timestep_data> val1, val2, val3;
+        components::access_memory_block<components::amr::timestep_data> val1, val2, val3;
         boost::tie(val1, val2, val3) = 
-            components::wait(stub.get_async(result_data[0]), 
-                stub.get_async(result_data[1]), stub.get_async(result_data[2]));
+            components::wait(
+                components::stubs::memory_block::get_async(result_data[0]), 
+                components::stubs::memory_block::get_async(result_data[1]), 
+                components::stubs::memory_block::get_async(result_data[2]));
 
         std::cout << "Result: " 
                   << val1->value_ << ", " 
@@ -265,7 +255,7 @@ hpx_main(applier::applier& appl, std::size_t numvals, std::size_t numsteps)
         for (std::size_t i = 0; i < functions.size(); ++i) 
         {
             components::amr::stubs::functional_component::
-                free_data_sync(appl, functions[i].first_gid_, result_data[i]);
+                free_data_sync(functions[i].first_gid_, result_data[i]);
         }
         factory.free_components_sync(logging);
         factory.free_components_sync(stencils[1]);
@@ -275,7 +265,7 @@ hpx_main(applier::applier& appl, std::size_t numvals, std::size_t numsteps)
     }   // distributing_factory needs to go out of scope before shutdown
 
     // initiate shutdown of the runtime systems on all localities
-    components::stubs::runtime_support::shutdown_all(appl);
+    components::stubs::runtime_support::shutdown_all();
 
     return threads::terminated;
 }
@@ -395,7 +385,7 @@ int main(int argc, char* argv[])
 
         // initialize and start the HPX runtime
         hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port);
-        rt.run(boost::bind (hpx_main, _1, numvals, numsteps), num_threads);
+        rt.run(boost::bind (hpx_main, numvals, numsteps), num_threads);
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";

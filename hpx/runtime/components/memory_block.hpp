@@ -7,7 +7,6 @@
 #define HPX_COMPONENTS_MEMORY_BLOCK_OCT_22_2008_0416PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/memory_block.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
@@ -28,9 +27,8 @@ namespace hpx { namespace components
     public:
         /// Create a client side representation for the existing
         /// \a server#memory_block instance with the given global id \a gid.
-        memory_block(applier::applier& app, naming::id_type gid,
-                bool freeonexit = false) 
-          : base_type(app, gid, freeonexit)
+        memory_block(naming::id_type gid, bool freeonexit = false) 
+          : base_type(gid, freeonexit)
         {}
 
         ///////////////////////////////////////////////////////////////////////

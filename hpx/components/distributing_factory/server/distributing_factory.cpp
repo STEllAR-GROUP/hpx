@@ -6,8 +6,6 @@
 #include <vector>
 
 #include <hpx/hpx.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
-
 #include <hpx/components/distributing_factory/server/distributing_factory.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -30,8 +28,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     // create a new instance of a component
     threads::thread_state distributing_factory::create_components(
-        applier::applier& appl, result_type* gids, 
-        components::component_type type, std::size_t count)
+        result_type* gids, components::component_type type, std::size_t count)
     {
         // make sure we get prefixes for derived component type, if any
         components::component_type prefix_type = type;
@@ -40,7 +37,7 @@ namespace hpx { namespace components { namespace server
 
         // get list of locality prefixes
         std::vector<naming::id_type> prefixes;
-        appl.get_agas_client().get_prefixes(prefixes, prefix_type);
+        hpx::applier::get_applier().get_agas_client().get_prefixes(prefixes, prefix_type);
 
         if (prefixes.empty())
         {
@@ -60,7 +57,6 @@ namespace hpx { namespace components { namespace server
 
         // start an asynchronous operation for each of the localities
         future_values_type v;
-        components::stubs::runtime_support rts(appl);
 
         std::vector<naming::id_type>::iterator end = prefixes.end();
         for (std::vector<naming::id_type>::iterator it = prefixes.begin(); 
@@ -74,20 +70,23 @@ namespace hpx { namespace components { namespace server
             // component at once
             int factory_props = factory_none;
             if (1 != numcreate) {
-                factory_props = rts.get_factory_properties(*it, type);
+                factory_props = components::stubs::runtime_support::
+                    get_factory_properties(*it, type);
             }
 
             if (factory_props & factory_is_multi_instance) {
                 // create all component instances at once
                 lcos::future_value<naming::id_type> f (
-                    rts.create_component_async(*it, type, numcreate));
+                    components::stubs::runtime_support::create_component_async(
+                        *it, type, numcreate));
                 v.push_back(future_values_type::value_type(*it, f, numcreate));
             }
             else {
                 // create one component at a time
                 for (std::size_t i = 0; i < numcreate; ++i) {
                     lcos::future_value<naming::id_type> f (
-                        rts.create_component_async(*it, type));
+                        components::stubs::runtime_support::
+                            create_component_async(*it, type));
                     v.push_back(future_values_type::value_type(*it, f, 1));
                 }
             }
@@ -111,10 +110,8 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     // Action to delete existing components
     threads::thread_state distributing_factory::free_components(
-        applier::applier& appl, result_type const& gids, bool sync)
+        result_type const& gids, bool sync)
     {
-        components::stubs::runtime_support rts(appl);
-
         result_type::const_iterator end = gids.end();
         for (result_type::const_iterator it = gids.begin(); it != end; ++it) 
         {
@@ -123,10 +120,14 @@ namespace hpx { namespace components { namespace server
                 // We need to free every components separately because it may
                 // have been moved to a different locality than it was 
                 // initially created on.
-                if (sync)
-                    rts.free_component_sync((*it).type_, (*it).first_gid_ + i);
-                else
-                    rts.free_component((*it).type_, (*it).first_gid_ + i);
+                if (sync) {
+                    components::stubs::runtime_support::free_component_sync(
+                        (*it).type_, (*it).first_gid_ + i);
+                }
+                else {
+                    components::stubs::runtime_support::free_component(
+                        (*it).type_, (*it).first_gid_ + i);
+                }
             }
         }
 

@@ -55,9 +55,10 @@ set (hpxlib_HEADERS
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action_implementations.hpp
     # applier
     ${hpx_SOURCE_DIR}/hpx/runtime/applier/applier.hpp
-    ${hpx_SOURCE_DIR}/hpx/runtime/applier/applier_implementations.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/applier/apply_helper.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/applier/apply_helper_implementations.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/applier/apply.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/applier/apply_implementations.hpp
     # components
     ${hpx_SOURCE_DIR}/hpx/runtime/components/client_base.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/component_type.hpp

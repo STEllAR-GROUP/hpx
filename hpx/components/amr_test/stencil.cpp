@@ -13,21 +13,20 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
 {
-    stencil::stencil(applier::applier& appl)
-      : base_type(appl), numsteps_(0)
+    stencil::stencil()
+      : numsteps_(0)
     {}
 
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
     // Compute the result value for the current time step
-    threads::thread_state stencil::eval(
-        applier::applier& appl, bool* is_last, naming::id_type const& result, 
-        std::vector<naming::id_type> const& gids)
+    threads::thread_state stencil::eval(bool* is_last, 
+        naming::id_type const& result, std::vector<naming::id_type> const& gids)
     {
         BOOST_ASSERT(gids.size() == 3);
 
         // start asynchronous get operations
-        components::stubs::memory_block stub(appl);
+        components::stubs::memory_block stub;
 
         // get all input memory_block_data instances
         access_memory_block<timestep_data> val1, val2, val3, resultval;
@@ -49,7 +48,7 @@ namespace hpx { namespace components { namespace amr
             resultval->value_ = 0.25 * val1->value_ + 0.75 * val3->value_;
 
             if (log_)     // send result to logging instance
-                stubs::logging::logentry(appl, log_, resultval.get());
+                stubs::logging::logentry(log_, resultval.get());
         }
         else {
             // the last time step has been reached, just copy over the data
@@ -63,16 +62,16 @@ namespace hpx { namespace components { namespace amr
         return threads::terminated;
     }
 
-    threads::thread_state stencil::alloc_data(
-        applier::applier& appl, naming::id_type* result, int item, int maxitems)
+    threads::thread_state stencil::alloc_data(naming::id_type* result, 
+        int item, int maxitems)
     {
-        *result = components::stubs::memory_block::create(appl, 
-            appl.get_runtime_support_gid(), sizeof(timestep_data));
+        *result = components::stubs::memory_block::create(
+            applier::get_applier().get_runtime_support_gid(), sizeof(timestep_data));
 
         if (-1 != item) {
             // provide initial data for the given data value 
             access_memory_block<timestep_data> val(
-                components::stubs::memory_block::checkout(appl, *result));
+                components::stubs::memory_block::checkout(*result));
 
             val->max_index_ = maxitems;
             val->index_ = item;
@@ -87,15 +86,15 @@ namespace hpx { namespace components { namespace amr
 
     /// The free function releases the memory allocated by init
     threads::thread_state stencil::free_data(
-        applier::applier& appl, naming::id_type const& gid)
+        naming::id_type const& gid)
     {
-        components::stubs::memory_block::free(appl, gid);
+        components::stubs::memory_block::free(gid);
         return threads::terminated;
     }
 
     /// The free function releases the memory allocated by init
     threads::thread_state stencil::init(
-        applier::applier&, std::size_t numsteps, naming::id_type const& logging)
+        std::size_t numsteps, naming::id_type const& logging)
     {
         numsteps_ = numsteps;
         log_ = logging;

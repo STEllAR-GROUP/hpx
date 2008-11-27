@@ -18,15 +18,15 @@ namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    naming::id_type create (applier::applier& appl, std::size_t count)
+    naming::id_type create (std::size_t count)
     {
         if (0 == count) {
             HPX_THROW_EXCEPTION(hpx::bad_parameter, "count shouldn't be zero");
             return naming::invalid_id;
         }
 
-        Component* c = static_cast<Component*>(Component::create(appl, count));
-        naming::id_type gid = c->get_gid(appl);
+        Component* c = static_cast<Component*>(Component::create(count));
+        naming::id_type gid = c->get_gid();
         if (gid) 
             return gid;
 
@@ -39,9 +39,10 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    void destroy(applier::applier& appl, naming::id_type const& gid)
+    void destroy(naming::id_type const& gid)
     {
         // retrieve the local address bound to the given global id
+        applier::applier& appl = hpx::applier::get_applier();
         naming::address addr;
         if (!appl.get_agas_client().resolve(gid, addr)) 
         {
@@ -71,7 +72,7 @@ namespace hpx { namespace components { namespace server
         }
 
         // delete the local instances
-        Component::destroy(appl, reinterpret_cast<Component*>(addr.address_));
+        Component::destroy(reinterpret_cast<Component*>(addr.address_));
     }
 
 }}}

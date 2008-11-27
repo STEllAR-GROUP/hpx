@@ -45,14 +45,14 @@ namespace hpx { namespace actions
         }
 
         ///
-        void trigger_all(applier::applier& app);
+        void trigger_all();
 
         ///
         template <typename Arg0>
-        Arg0 const& trigger_all(applier::applier& app, Arg0 const& arg0);
+        Arg0 const& trigger_all(Arg0 const& arg0);
 
         ///
-        void trigger_error(applier::applier& app, hpx::exception const& e);
+        void trigger_error(hpx::exception const& e);
 
     private:
         // serialization support    

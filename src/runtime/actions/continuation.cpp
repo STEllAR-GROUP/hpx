@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/lcos/base_lco.hpp>
 
@@ -23,26 +23,25 @@ BOOST_CLASS_EXPORT(hpx::actions::continuation);
 namespace hpx { namespace actions
 {
     ///////////////////////////////////////////////////////////////////////////
-    void continuation::trigger_all(applier::applier& app)
+    void continuation::trigger_all()
     {
         std::vector<naming::id_type>::iterator end = gids_.end();
         for (std::vector<naming::id_type>::iterator it = gids_.begin();
              it != end; ++it)
         {
-            if (!app.apply<lcos::base_lco::set_event_action>(*it))
+            if (!hpx::applier::apply<lcos::base_lco::set_event_action>(*it))
                 break;
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void continuation::trigger_error(applier::applier& app, 
-        hpx::exception const& e)
+    void continuation::trigger_error(hpx::exception const& e)
     {
         std::vector<naming::id_type>::iterator end = gids_.end();
         for (std::vector<naming::id_type>::iterator it = gids_.begin();
              it != end; ++it)
         {
-            if (!app.apply<lcos::base_lco::set_error_action>(
+            if (!hpx::applier::apply<lcos::base_lco::set_error_action>(
                     *it, e.get_error(), std::string(e.what())))
             {
                 break;

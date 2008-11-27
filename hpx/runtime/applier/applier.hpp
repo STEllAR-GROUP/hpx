@@ -13,9 +13,6 @@
 #include <hpx/include/naming.hpp>
 #include <hpx/include/parcelset.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime/applier/apply_helper.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/components/server/runtime_support.hpp>
 
 #include <boost/thread/tss.hpp>
 
@@ -44,198 +41,10 @@ namespace hpx { namespace applier
         ~applier()
         {}
 
-    public:
-        ///////////////////////////////////////////////////////////////////////
-        // zero parameter version of apply()
-        // Invoked by a running PX-thread to apply an action to any resource
-
-        /// \note A call to applier's apply function would look like:
-        /// \code
-        ///    appl_.apply<add_action>(gid, ...);
-        /// \endcode
-        template <typename Action>
-        bool apply (naming::address& addr, naming::id_type const& gid)
-        {
-            // If remote, create a new parcel to be sent to the destination
-            // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid, new Action());
-            if (components::component_invalid == addr.type_)
-                addr.type_ = components::get_component_type<typename Action::component_type>();
-            p.set_destination_addr(addr);   // avoid to resolve address again
-
-            // Send the parcel through the parcel handler
-            parcel_handler_.put_parcel(p);
-            return false;     // destination is remote
-        }
-
-        template <typename Action>
-        bool apply (naming::id_type const& gid)
-        {
-            // Determine whether the gid is local or remote
-            naming::address addr;
-            if (address_is_local(gid, addr)) {
-                BOOST_ASSERT(components::types_are_compatible(
-                    addr.type_, Action::get_static_component_type()));
-                detail::apply_helper0<Action>::call(thread_manager_, 
-                    *this, addr.address_);
-                return true;     // no parcel has been sent (dest is local)
-            }
-
-            // apply remotely
-            return apply<Action>(addr, gid);
-        }
-
-        /// \note A call to applier's apply function would look like:
-        /// \code
-        ///    appl_.apply<add_action>(cont, gid, ...);
-        /// \endcode
-        template <typename Action>
-        bool apply (naming::address& addr, actions::continuation* c, 
-            naming::id_type const& gid)
-        {
-            actions::continuation_type cont(c);
-
-            // If remote, create a new parcel to be sent to the destination
-            // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid, new Action(), cont);
-            if (components::component_invalid == addr.type_)
-                addr.type_ = components::get_component_type<typename Action::component_type>();
-            p.set_destination_addr(addr);   // avoid to resolve address again
-
-            // Send the parcel through the parcel handler
-            parcel_handler_.put_parcel(p);
-            return false;     // destination is remote
-        }
-
-        template <typename Action>
-        bool apply (actions::continuation* c, naming::id_type const& gid)
-        {
-            // Determine whether the gid is local or remote
-            naming::address addr;
-            if (address_is_local(gid, addr)) {
-                BOOST_ASSERT(components::types_are_compatible(
-                    addr.type_, Action::get_static_component_type()));
-                actions::continuation_type cont(c);
-                detail::apply_helper0<Action>::call(cont, thread_manager_, 
-                    *this, addr.address_);
-                return true;     // no parcel has been sent (dest is local)
-            }
-
-            // apply remotely
-            return apply<Action>(addr, c, gid);
-        }
-
-        template <typename Action>
-        bool apply_c (naming::address& addr, naming::id_type const& targetgid, 
-            naming::id_type const& gid)
-        {
-            return apply<Action>(addr, new actions::continuation(targetgid), gid);
-        }
-
-        template <typename Action>
-        bool apply_c (naming::id_type const& targetgid, 
-            naming::id_type const& gid)
-        {
-            return apply<Action>(new actions::continuation(targetgid), gid);
-        }
-
-    public:
-        ///////////////////////////////////////////////////////////////////////
-        // one parameter version
-        template <typename Action, typename Arg0>
-        bool apply (naming::address& addr, naming::id_type const& gid, 
-            Arg0 const& arg0)
-        {
-            // If remote, create a new parcel to be sent to the destination
-            // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid, new Action(arg0));
-            if (components::component_invalid == addr.type_)
-                addr.type_ = components::get_component_type<typename Action::component_type>();
-            p.set_destination_addr(addr);   // avoid to resolve address again
-
-            // Send the parcel through the parcel handler
-            parcel_handler_.put_parcel(p);
-            return false;     // destination is remote
-        }
-
-        template <typename Action, typename Arg0>
-        bool apply (naming::id_type const& gid, Arg0 const& arg0)
-        {
-            // Determine whether the gid is local or remote
-            naming::address addr;
-            if (address_is_local(gid, addr)) {
-                BOOST_ASSERT(components::types_are_compatible(
-                    addr.type_, Action::get_static_component_type()));
-                detail::apply_helper1<Action, Arg0>::call(thread_manager_, 
-                    *this, addr.address_, arg0);
-                return true;     // no parcel has been sent (dest is local)
-            }
-
-            // apply remotely
-            return apply<Action>(addr, gid, arg0);
-        }
-
-        template <typename Action, typename Arg0>
-        bool apply (naming::address& addr, actions::continuation* c, 
-            naming::id_type const& gid, Arg0 const& arg0)
-        {
-            actions::continuation_type cont(c);
-
-            // If remote, create a new parcel to be sent to the destination
-            // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid, new Action(arg0), cont);
-            if (components::component_invalid == addr.type_)
-                addr.type_ = components::get_component_type<typename Action::component_type>();
-            p.set_destination_addr(addr);   // avoid to resolve address again
-
-            // Send the parcel through the parcel handler
-            parcel_handler_.put_parcel(p);
-            return false;     // destination is remote
-        }
-
-        template <typename Action, typename Arg0>
-        bool apply (actions::continuation* c, naming::id_type const& gid, 
-            Arg0 const& arg0)
-        {
-            // Determine whether the gid is local or remote
-            naming::address addr;
-            if (address_is_local(gid, addr)) {
-                BOOST_ASSERT(components::types_are_compatible(
-                    addr.type_, Action::get_static_component_type()));
-                actions::continuation_type cont(c);
-                detail::apply_helper1<Action, Arg0>::call(cont, thread_manager_,
-                    *this, addr.address_, arg0);
-                return true;     // no parcel has been sent (dest is local)
-            }
-
-            // apply remotely
-            return apply<Action>(addr, c, gid, arg0);
-        }
-
-        template <typename Action, typename Arg0>
-        bool apply_c (naming::address& addr, 
-            naming::id_type const& targetgid, naming::id_type const& gid, 
-            Arg0 const& arg0)
-        {
-            return apply<Action>(addr, new actions::continuation(targetgid), 
-                gid, arg0);
-        }
-
-        template <typename Action, typename Arg0>
-        bool apply_c (naming::id_type const& targetgid, 
-            naming::id_type const& gid, Arg0 const& arg0)
-        {
-            return apply<Action>(new actions::continuation(targetgid), 
-                gid, arg0);
-        }
-
-        // bring in the rest of the apply<> overloads
-        #include <hpx/runtime/applier/applier_implementations.hpp>
-
         /// \brief Allow access to the AGAS client instance used with this
         ///        \a applier.
         ///
-        /// This accessor returns a reference to the resolver client this 
+        /// This function returns a reference to the resolver client this 
         /// applier instance has been created with.
         naming::resolver_client const& get_agas_client() const
         {
@@ -245,7 +54,7 @@ namespace hpx { namespace applier
         /// \brief Access the \a parcelhandler instance associated with this 
         ///        \a applier
         ///
-        /// This accessor returns a reference to the parcel handler this 
+        /// This function returns a reference to the parcel handler this 
         /// applier instance has been created with.
         parcelset::parcelhandler& get_parcel_handler() 
         {
@@ -255,7 +64,7 @@ namespace hpx { namespace applier
         /// \brief Access the \a threadmanager instance associated with this 
         ///        \a applier
         ///
-        /// This accessor returns a reference to the thread manager this 
+        /// This function returns a reference to the thread manager this 
         /// applier instance has been created with.
         threads::threadmanager& get_thread_manager() 
         {
@@ -265,7 +74,7 @@ namespace hpx { namespace applier
         /// \brief Allow access to the locality this applier instance is 
         ///        associated with.
         ///
-        /// This accessor returns a reference to the locality this applier
+        /// This function returns a reference to the locality this applier
         /// instance is associated with.
         naming::locality const& here() const
         {
@@ -275,7 +84,7 @@ namespace hpx { namespace applier
         /// \brief Allow access to the prefix of the locality this applier 
         ///        instance is associated with.
         ///
-        /// This accessor returns a reference to the locality this applier
+        /// This function returns a reference to the locality this applier
         /// instance is associated with.
         naming::id_type const& get_prefix() const
         {
@@ -285,7 +94,7 @@ namespace hpx { namespace applier
         /// \brief Allow access to the prefixes of all remote localities 
         ///        registered with the AGAS service.
         ///
-        /// This accessor returns a list of all remote localities (all 
+        /// This function returns a list of all remote localities (all 
         /// localities known to AGAS except the local one).
         ///
         /// \param prefixes [out] The reference to a vector of id_types filled
@@ -357,21 +166,13 @@ namespace hpx { namespace applier
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    typedef threads::thread_state full_thread_function_type(applier&);
-
-    ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new \a thread using the given function as the 
     ///        work to be executed
     ///
     ///
-    HPX_API_EXPORT threads::thread_id_type register_work(applier& appl,
+    HPX_API_EXPORT threads::thread_id_type register_work(
         boost::function<threads::thread_function_type> func,
         char const* description = "", 
-        threads::thread_state initial_state = threads::pending, 
-        bool run_now = true);
-
-    HPX_API_EXPORT threads::thread_id_type register_work(applier& appl,
-        full_thread_function_type* func, char const* description = "", 
         threads::thread_state initial_state = threads::pending, 
         bool run_now = true);
 
@@ -392,7 +193,7 @@ namespace hpx { namespace applier
     /// \note       For synchronous operation use the function 
     ///             \a applier#create_async.
     HPX_API_EXPORT lcos::future_value<naming::id_type> 
-        create_async(applier& appl, naming::id_type const& targetgid, 
+        create_async(naming::id_type const& targetgid, 
             components::component_type type, std::size_t count = 1);
 
     /// The \a create function creates a new component using the \a 
@@ -409,8 +210,7 @@ namespace hpx { namespace applier
     ///
     /// \note       For asynchronous operation use the function 
     ///             \a applier#create_async.
-    HPX_API_EXPORT naming::id_type create(
-        applier& appl, naming::id_type const& targetgid, 
+    HPX_API_EXPORT naming::id_type create(naming::id_type const& targetgid, 
         components::component_type type, std::size_t count = 1);
 
     /// \brief The \a destroy function frees an existing component as given by 
@@ -419,7 +219,7 @@ namespace hpx { namespace applier
     /// \param type
     /// \param count
     /// \param gid
-    HPX_API_EXPORT void destroy (applier& appl, components::component_type type, 
+    HPX_API_EXPORT void destroy (components::component_type type, 
         naming::id_type const& gid, std::size_t count = 1);
 
 }}

@@ -10,10 +10,9 @@
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state 
-hpx_main(applier::applier& appl)
+threads::thread_state hpx_main()
 {
-    boost::throw_exception(hpx::exception(hpx::no_success, "Some error occured"));
+    boost::throw_exception(hpx::exception(hpx::no_success, "Some error occurred"));
     return threads::terminated;
 }
 

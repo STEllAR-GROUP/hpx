@@ -12,21 +12,18 @@
 namespace hpx { namespace components { namespace amr { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
-    inline functional_timestep::functional_timestep(applier::applier& appl)
-      : simple_component_base<functional_timestep>(appl)
+    inline functional_timestep::functional_timestep()
     {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline threads::thread_state 
-    functional_timestep::initialize(applier::applier&)
+    inline threads::thread_state functional_timestep::initialize()
     {
         return threads::terminated;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline threads::thread_state 
-    functional_timestep::execute(applier::applier&)
+    inline threads::thread_state functional_timestep::execute()
     {
         return threads::terminated;
     }

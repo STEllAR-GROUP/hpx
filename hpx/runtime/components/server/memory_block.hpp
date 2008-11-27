@@ -261,29 +261,20 @@ namespace hpx { namespace components { namespace server { namespace detail
         // exposed functionality of this component
 
         /// Get the current data for reading
-        threads::thread_state get (applier::applier& appl, 
-            memory_block_data* result);
-
-        components::memory_block_data local_get (applier::applier& appl);
+        threads::thread_state get (memory_block_data* result);
+        components::memory_block_data local_get ();
 
         /// Get the current data for reading
-        threads::thread_state checkout (applier::applier& appl, 
-            components::memory_block_data* result);
-
-        components::memory_block_data local_checkout (applier::applier& appl);
+        threads::thread_state checkout (components::memory_block_data* result);
+        components::memory_block_data local_checkout();
 
         /// Write back data
-        threads::thread_state checkin (applier::applier& appl, 
-            components::memory_block_data const& newdata);
-
-        void local_checkin (applier::applier& appl, 
-            components::memory_block_data const& data);
+        threads::thread_state checkin (components::memory_block_data const& newdata);
+        void local_checkin (components::memory_block_data const& data);
 
         /// Clone this memory_block
-        threads::thread_state clone (applier::applier& appl, 
-            naming::id_type* result);
-
-        naming::id_type local_clone (applier::applier& appl);
+        threads::thread_state clone (naming::id_type* result);
+        naming::id_type local_clone ();
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
@@ -345,7 +336,7 @@ namespace hpx { namespace components { namespace server
         ///
         /// \param appl [in] The applier to be used for construction of the new
         ///             wrapped instance. 
-        memory_block(applier::applier& appl, std::size_t size) 
+        memory_block(std::size_t size) 
           : component_(0) 
         {
             boost::uint8_t* p = new boost::uint8_t[size + sizeof(detail::memory_block_header)];
@@ -373,7 +364,7 @@ namespace hpx { namespace components { namespace server
         /// \param self [in] The PX \a thread used to execute this function.
         /// \param appl [in] The applier to be used for finalization of the 
         ///             component instance. 
-        void finalize(applier::applier& appl) {}
+        void finalize() {}
 
     public:
         /// \brief The destructor releases any wrapped instances
@@ -475,12 +466,11 @@ namespace hpx { namespace components { namespace server
         ///         parameter normally used to specify the number of objects to 
         ///         be created. It is interpreted as the number of bytes to 
         ///         allocate for the new memory_block.
-        static memory_block* 
-        create(applier::applier& appl, std::size_t count)
+        static memory_block* create(std::size_t count)
         {
             // allocate the memory
             memory_block* p = get_heap().alloc();
-            return new (p) memory_block(appl, count);
+            return new (p) memory_block(count);
         }
 
         static memory_block* 
@@ -493,13 +483,12 @@ namespace hpx { namespace components { namespace server
 
         /// \brief  The function \a destroy is used for deletion and 
         //          de-allocation of arrays of wrappers
-        static void destroy(applier::applier& appl, 
-            memory_block* p, std::size_t count = 1)
+        static void destroy(memory_block* p, std::size_t count = 1)
         {
             if (NULL == p || 0 == count) 
                 return;     // do nothing if given a NULL pointer
 
-            p->finalize(appl);
+            p->finalize();
             p->~memory_block();
 
             // free memory itself
@@ -523,9 +512,9 @@ namespace hpx { namespace components { namespace server
     public:
         ///
         naming::id_type 
-        get_gid(applier::applier& appl) const
+        get_gid() const
         {
-            return get_heap().get_gid(appl, const_cast<memory_block*>(this));
+            return get_heap().get_gid(const_cast<memory_block*>(this));
         }
 
     private:

@@ -27,7 +27,7 @@ namespace hpx { namespace components { namespace detail
 
         ///
         naming::id_type 
-        get_gid(applier::applier& appl, void* p)
+        get_gid(void* p)
         {
             typename Mutex::scoped_lock guard (this->mtx_);
 
@@ -36,7 +36,7 @@ namespace hpx { namespace components { namespace detail
             for (iterator it = this->heap_list_.begin(); it != end; ++it) 
             {
                 if ((*it)->did_alloc(p)) 
-                    return (*it)->get_gid(appl, id_range_, p);
+                    return (*it)->get_gid(id_range_, p);
             }
             return naming::invalid_id;
         }

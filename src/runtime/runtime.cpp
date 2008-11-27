@@ -57,8 +57,7 @@ namespace hpx
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_),
         applier_(parcel_handler_, thread_manager_, 
-            boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
-        action_manager_(applier_)
+            boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_))
     {}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -72,8 +71,7 @@ namespace hpx
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_),
         applier_(parcel_handler_, thread_manager_, 
-            boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
-        action_manager_(applier_)
+            boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_))
     {}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -87,8 +85,7 @@ namespace hpx
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_),
         applier_(parcel_handler_, thread_manager_, 
-            boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
-        action_manager_(applier_)
+            boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_))
     {}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -117,7 +114,7 @@ namespace hpx
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    void runtime::start(boost::function<hpx_main_function_type> func, 
+    void runtime::start(boost::function<threads::thread_function_type> func, 
         std::size_t num_threads, bool blocking)
     {
 #if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINES_USE_FIBERS)
@@ -143,10 +140,7 @@ namespace hpx
 
         // register the given main function with the thread manager
         if (!func.empty())
-        {
-            thread_manager_.register_work(
-                boost::bind(func, boost::ref(applier_)), "hpx_main");
-        }
+            thread_manager_.register_work(func, "hpx_main");
 
         LRT_(info) << "runtime: started using "  << num_threads << " OS threads";
 
@@ -233,7 +227,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void runtime::run(boost::function<hpx_main_function_type> func,
+    void runtime::run(boost::function<threads::thread_function_type> func,
         std::size_t num_threads)
     {
         start(func, num_threads);
@@ -244,7 +238,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     void runtime::run(std::size_t num_threads)
     {
-        start(boost::function<hpx_main_function_type>(), num_threads);
+        start(boost::function<threads::thread_function_type>(), num_threads);
         wait();
         stop();
     }

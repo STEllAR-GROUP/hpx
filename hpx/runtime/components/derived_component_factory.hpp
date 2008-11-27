@@ -124,8 +124,6 @@ namespace hpx { namespace components
 
         /// \brief Create one or more new component instances.
         ///
-        /// \param appl   [in] The applier instance to be used to create
-        ///               the new component instances.
         /// \param count  [in] The number of component instances to 
         ///               create. The value of this parameter should not 
         ///               be zero.
@@ -134,20 +132,18 @@ namespace hpx { namespace components
         ///         instance. If more than one component instance has been 
         ///         created (\a count > 1) the GID's of all new instances are
         ///         sequential in a row.
-        naming::id_type create (applier::applier& appl, std::size_t count)
+        naming::id_type create (std::size_t count)
         {
-            return server::create<Component>(appl, count);
+            return server::create<Component>(count);
         }
 
         /// \brief Destroy one or more component instances
         ///
-        /// \param appl   [in] The applier instance to be used to destroy
-        ///               the component instances.
         /// \param gid    [in] The gid of the first component instance to 
         ///               destroy. 
-        void destroy(applier::applier& appl, naming::id_type const& gid)
+        void destroy(naming::id_type const& gid)
         {
-            server::destroy<Component>(appl, gid);
+            server::destroy<Component>(gid);
         }
 
     protected:

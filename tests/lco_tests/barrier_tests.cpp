@@ -13,8 +13,7 @@
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state barrier_test(applier::applier& appl, lcos::barrier& b, 
-    boost::detail::atomic_count& c)
+threads::thread_state barrier_test(lcos::barrier& b, boost::detail::atomic_count& c)
 {
     ++c;
     b.wait();
@@ -26,23 +25,21 @@ threads::thread_state barrier_test(applier::applier& appl, lcos::barrier& b,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(applier::applier& appl, 
-    lcos::barrier& b, boost::detail::atomic_count& counter)
+threads::thread_state hpx_main(lcos::barrier& b, boost::detail::atomic_count& c)
 {
     // create the 4 threads which will have to wait on the barrier
-    threads::threadmanager& tm = appl.get_thread_manager();
     for (std::size_t i = 0; i < 4; ++i) {
-        register_work(appl, boost::bind(&barrier_test, boost::ref(appl),
-            boost::ref(b), boost::ref(counter)));
+        applier::register_work(
+            boost::bind(&barrier_test, boost::ref(b), boost::ref(c)));
     }
 
     b.wait();     // wait for all threads to enter the barrier
 
     // all of the 4 threads need to have incremented the counter
-    BOOST_TEST(4 == counter);
+    BOOST_TEST(4 == c);
 
     // initiate shutdown of the runtime system
-    components::stubs::runtime_support::shutdown_all(appl);
+    components::stubs::runtime_support::shutdown_all();
 
     return threads::terminated;
 }
@@ -77,10 +74,9 @@ int main(int argc, char* argv[])
             hpx::runtime rt(host, ps_port, host, agas_port);
 
             lcos::barrier b(5);       // create a barrier waiting on 5 threads
-            boost::detail::atomic_count counter(0);
+            boost::detail::atomic_count c(0);
 
-            rt.run(boost::bind(hpx_main, _1, boost::ref(b), 
-                boost::ref(counter)), i);
+            rt.run(boost::bind(hpx_main, boost::ref(b), boost::ref(c)), i);
         }
     }
     catch (std::exception& e) {

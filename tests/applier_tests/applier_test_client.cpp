@@ -79,8 +79,9 @@ int main(int argc, char* argv[])
         hpx::threads::threadmanager tm(timerpool);
         // Create a new applier
         hpx::applier::applier app(ph, tm, 0, 0);
+
         // Create a new action-manager
-        hpx::actions::action_manager am(app);
+        hpx::actions::action_manager am;
 
         // Set console control handler to allow client to be stopped.
         //console_ctrl_function = 
@@ -121,24 +122,24 @@ int main(int argc, char* argv[])
         // 10. Client calls the client's accumulator to print out the value
 
         // Create a accumulator with static gid of 44 on the client side
-        hpx::components::server::accumulator accu(app);
+        hpx::components::server::accumulator accu;
         hpx::naming::id_type local_id(44);
         hpx::naming::locality l(ps_host, ps_port);
         agas_c.bind(local_id, hpx::naming::address(l, 
             hpx::components::server::accumulator::get_component_type(), &accu));
 
         // Test code to verify that the applier can successfully apply to local components
-        bool p_l1 = app.apply<hpx::components::server::accumulator::init_action>(local_id);
-        bool p_l2 = app.apply<hpx::components::server::accumulator::add_action>(local_id, 12);
-        bool p_l3 = app.apply<hpx::components::server::accumulator::print_action>(local_id);
+        bool p_l1 = hpx::applier::apply<hpx::components::server::accumulator::init_action>(local_id);
+        bool p_l2 = hpx::applier::apply<hpx::components::server::accumulator::add_action>(local_id, 12);
+        bool p_l3 = hpx::applier::apply<hpx::components::server::accumulator::print_action>(local_id);
 
         // Create a static gid for remote accumulator on server
         hpx::naming::id_type remote_id(11);
 
         // Test code to verify that the applier can successfully apply to remote components
-        bool p_r1 = app.apply<hpx::components::server::accumulator::init_action>(remote_id);
-        bool p_r2 = app.apply<hpx::components::server::accumulator::add_action>(remote_id, 13);
-        bool p_r3 = app.apply<hpx::components::server::accumulator::print_action>(remote_id);
+        bool p_r1 = hpx::applier::apply<hpx::components::server::accumulator::init_action>(remote_id);
+        bool p_r2 = hpx::applier::apply<hpx::components::server::accumulator::add_action>(remote_id, 13);
+        bool p_r3 = hpx::applier::apply<hpx::components::server::accumulator::print_action>(remote_id);
 
         //// Send a parcel from client to server, destined at the accumulator (gid = 11)
         //hpx::naming::id_type remote_id(11);

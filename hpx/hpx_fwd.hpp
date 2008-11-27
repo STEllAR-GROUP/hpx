@@ -167,9 +167,9 @@ namespace hpx
 
         namespace stubs 
         {
-            class runtime_support;
-            class memory;
-            class memory_block;
+            struct runtime_support;
+            struct memory;
+            struct memory_block;
         }
 
         namespace server

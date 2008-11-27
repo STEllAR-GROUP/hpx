@@ -8,7 +8,7 @@
 
 #include <boost/bind.hpp>
 
-#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/lcos/eager_future.hpp>
 
@@ -17,18 +17,8 @@ namespace hpx { namespace components { namespace stubs
     ///////////////////////////////////////////////////////////////////
     // The \a runtime_support class is the client side representation of a 
     // \a server#runtime_support component
-    class runtime_support
+    struct runtime_support
     {
-    public:
-        /// Create a client side representation for any existing 
-        /// \a server#runtime_support instance
-        runtime_support(applier::applier& app) 
-          : appl_(app)
-        {}
-
-        ~runtime_support() 
-        {}
-
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
@@ -38,8 +28,7 @@ namespace hpx { namespace components { namespace stubs
         ///         This function is used by the \a distributing_factory to 
         ///         determine a correct allocation strategy
         static lcos::future_value<int> get_factory_properties_async(
-            applier::applier& appl, naming::id_type const& targetgid, 
-            components::component_type type) 
+            naming::id_type const& targetgid, components::component_type type) 
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
@@ -47,28 +36,15 @@ namespace hpx { namespace components { namespace stubs
             typedef 
                 server::runtime_support::factory_properties_action 
             action_type;
-            return lcos::eager_future<action_type>(appl, targetgid, type);
+            return lcos::eager_future<action_type>(targetgid, type);
         }
 
-        static int get_factory_properties(
-            applier::applier& appl, 
-            naming::id_type const& targetgid, components::component_type type) 
+        static int get_factory_properties(naming::id_type const& targetgid, 
+            components::component_type type) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future
-            return get_factory_properties_async(appl, targetgid, type).get();
-        }
-
-        lcos::future_value<int> get_factory_properties_async(
-            naming::id_type const& targetgid, components::component_type type) 
-        {
-            return get_factory_properties_async(appl_, targetgid, type);
-        }
-
-        int get_factory_properties(
-            naming::id_type const& targetgid, components::component_type type) 
-        {
-            return get_factory_properties(appl_, targetgid, type);
+            return get_factory_properties_async(targetgid, type).get();
         }
 
         /// Create a new component \a type using the runtime_support with the 
@@ -76,138 +52,92 @@ namespace hpx { namespace components { namespace stubs
         /// to call \a future_value#get on the result of this function 
         /// to obtain the global id of the newly created object.
         static lcos::future_value<naming::id_type> create_component_async(
-            applier::applier& appl, naming::id_type const& targetgid, 
-            components::component_type type, std::size_t count = 1) 
+            naming::id_type const& targetgid, components::component_type type, 
+            std::size_t count = 1) 
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::runtime_support::create_component_action action_type;
-            return lcos::eager_future<action_type>(appl, targetgid, type, count);
+            return lcos::eager_future<action_type>(targetgid, type, count);
         }
 
         /// Create a new component \a type using the runtime_support with the 
         /// given \a targetgid. Block for the creation to finish.
         static naming::id_type create_component(
-            applier::applier& appl, naming::id_type const& targetgid, 
-            components::component_type type, std::size_t count = 1) 
+            naming::id_type const& targetgid, components::component_type type, 
+            std::size_t count = 1) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future
-            return create_component_async(appl, targetgid, type, count).get();
-        }
-
-        ///
-        lcos::future_value<naming::id_type> create_component_async(
-            naming::id_type const& targetgid, components::component_type type,
-            std::size_t count = 1) 
-        {
-            return create_component_async(appl_, targetgid, type, count);
-        }
-
-        /// 
-        naming::id_type create_component(
-            naming::id_type const& targetgid, components::component_type type,
-            std::size_t count = 1) 
-        {
-            return create_component(appl_, targetgid, type, count);
+            return create_component_async(targetgid, type, count).get();
         }
 
         /// Destroy an existing component
-        static void free_component(applier::applier& appl, 
-            components::component_type type, naming::id_type const& gid) 
+        static void free_component(components::component_type type, 
+            naming::id_type const& gid) 
         {
             typedef server::runtime_support::free_component_action action_type;
 
-            // Determine whether the gid of the component to delete is local or remote
+            // Determine whether the gid of the component to delete is local or 
+            // remote
             naming::address addr;
+            applier::applier& appl = hpx::applier::get_applier();
             if (appl.address_is_local(gid, addr)) {
                 // apply locally
                 applier::detail::apply_helper2<
                     action_type, components::component_type, naming::id_type
-                >::call(appl.get_thread_manager(), appl, 
-                    appl.get_runtime_support_gid().get_lsb(), type, gid);
+                >::call(appl.get_runtime_support_gid().get_lsb(), type, gid);
             }
             else {
                 // apply remotely
                 // zero address will be interpreted as a reference to the 
                 // remote runtime support object
                 addr.address_ = 0;
-                appl.apply<action_type>(addr, naming::invalid_id, type, gid);
+                hpx::applier::apply<action_type>(addr, naming::invalid_id, type, gid);
             }
         }
 
-        void free_component(components::component_type type, 
-            naming::id_type const& gid)
-        {
-            free_component(appl_, type, gid);
-        }
-
-        static void free_component_sync(
-            applier::applier& appl, components::component_type type, 
+        static void free_component_sync(components::component_type type, 
             naming::id_type const& gid) 
         {
             typedef server::runtime_support::free_component_action action_type;
 
             // Determine whether the gid of the component to delete is local or remote
             naming::address addr;
+            applier::applier& appl = hpx::applier::get_applier();
             if (appl.address_is_local(gid, addr)) {
                 // apply locally
                 applier::detail::apply_helper2<
                     action_type, components::component_type, naming::id_type
-                >::call(appl.get_thread_manager(), appl, 
-                    appl.get_runtime_support_gid().get_lsb(), type, gid);
+                >::call(appl.get_runtime_support_gid().get_lsb(), type, gid);
             }
             else {
                 // apply remotely
-                lcos::eager_future<action_type, void>(appl, 
+                lcos::eager_future<action_type, void>(
                     naming::invalid_id, type, gid).get();
             }
         }
 
-        void free_component_sync(
-            components::component_type type, naming::id_type const& gid)
-        {
-            free_component_sync(appl_, type, gid);
-        }
-
         /// \brief Shutdown the given runtime system
         static void 
-        shutdown(applier::applier& appl, naming::id_type const& targetgid)
+        shutdown(naming::id_type const& targetgid)
         {
-            appl.apply<server::runtime_support::shutdown_action>(targetgid);
-        }
-
-        void shutdown(naming::id_type const& targetgid)
-        {
-            shutdown(appl_, targetgid);
+            hpx::applier::apply<server::runtime_support::shutdown_action>(targetgid);
         }
 
         /// \brief Shutdown the runtime systems of all localities
         static void 
-        shutdown_all(applier::applier& appl, naming::id_type const& targetgid)
+        shutdown_all(naming::id_type const& targetgid)
         {
-            appl.apply<server::runtime_support::shutdown_all_action>(targetgid);
+            hpx::applier::apply<server::runtime_support::shutdown_all_action>(targetgid);
         }
 
-        static void shutdown_all(applier::applier& appl)
+        static void shutdown_all()
         {
-            appl.apply<server::runtime_support::shutdown_all_action>(
-                appl.get_runtime_support_gid());
+            hpx::applier::apply<server::runtime_support::shutdown_all_action>(
+                hpx::applier::get_applier().get_runtime_support_gid());
         }
-
-        void shutdown_all(naming::id_type const& targetgid)
-        {
-            shutdown_all(appl_, targetgid);
-        }
-
-        void shutdown_all()
-        {
-            shutdown_all(appl_);
-        }
-
-    protected:
-        applier::applier& appl_;
     };
 
 }}}

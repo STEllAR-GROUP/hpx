@@ -53,117 +53,105 @@ namespace hpx { namespace components { namespace server
         /// \param self [in] The PX \a thread used to execute this function.
         /// \param appl [in] The applier to be used for finalization of the 
         ///             component instance. 
-        void finalize(applier::applier& appl) {}
+        void finalize() {}
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
         /// \brief Action to store an 8 bit value to a memory location
-        threads::thread_state store8(
-            applier::applier& app, boost::uint64_t addr, boost::uint8_t value)
+        threads::thread_state store8(boost::uint64_t addr, boost::uint8_t value)
         {
-            local_store8(app, addr, value);
+            local_store8(addr, value);
             return threads::terminated;
         }
 
         /// \brief Action to store a 16 bit value to a memory location
-        threads::thread_state store16(
-            applier::applier& app, boost::uint64_t addr, boost::uint16_t value)
+        threads::thread_state store16(boost::uint64_t addr, boost::uint16_t value)
         {
-            local_store16(app, addr, value);
+            local_store16(addr, value);
             return threads::terminated;
         }
 
         /// \brief Action to store a 32 value value to a memory location
-        threads::thread_state store32(
-            applier::applier& app, boost::uint64_t addr, boost::uint32_t value)
+        threads::thread_state store32(boost::uint64_t addr, boost::uint32_t value)
         {
-            local_store32(app, addr, value);
+            local_store32(addr, value);
             return threads::terminated;
         }
 
         /// \brief Action to store a 64 value value to a memory location
-        threads::thread_state store64(
-            applier::applier& app, boost::uint64_t addr, boost::uint64_t value)
+        threads::thread_state store64(boost::uint64_t addr, boost::uint64_t value)
         {
-            local_store64(app, addr, value);
+            local_store64(addr, value);
             return threads::terminated;
         }
 
         /// \brief Action to load an 8 bit value to a memory location
-        threads::thread_state load8(
-            applier::applier& app, boost::uint8_t* value, boost::uint64_t addr)
+        threads::thread_state load8(boost::uint8_t* value, boost::uint64_t addr)
         {
-            *value = local_load8(app, addr);
+            *value = local_load8(addr);
             return threads::terminated;
         }
 
         /// \brief Action to load a 16 bit value to a memory location
-        threads::thread_state load16(
-            applier::applier& app, boost::uint16_t* value, boost::uint64_t addr)
+        threads::thread_state load16(boost::uint16_t* value, boost::uint64_t addr)
         {
-            *value = local_load16(app, addr);
+            *value = local_load16(addr);
             return threads::terminated;
         }
 
         /// \brief Action to load a 32 bit value to a memory location
-        threads::thread_state load32(
-            applier::applier& app, boost::uint32_t* value, boost::uint64_t addr)
+        threads::thread_state load32(boost::uint32_t* value, boost::uint64_t addr)
         {
-            *value = local_load32(app, addr);
+            *value = local_load32(addr);
             return threads::terminated;
         }
 
         /// \brief Action to load a 64 bit value to a memory location
-        threads::thread_state load64(
-            applier::applier& app, boost::uint64_t* value, boost::uint64_t addr)
+        threads::thread_state load64(boost::uint64_t* value, boost::uint64_t addr)
         {
-            *value = local_load64(app, addr);
+            *value = local_load64(addr);
             return threads::terminated;
         }
 
         ///
-        void local_store8(applier::applier& app, boost::uint64_t addr, 
-            boost::uint8_t value)
+        void local_store8(boost::uint64_t addr, boost::uint8_t value)
         {
             *reinterpret_cast<boost::uint8_t*>(addr) = value;
         }
 
-        void local_store16(applier::applier& app, boost::uint64_t addr, 
-            boost::uint16_t value)
+        void local_store16(boost::uint64_t addr, boost::uint16_t value)
         {
             *reinterpret_cast<boost::uint16_t*>(addr) = value;
         }
 
-        void local_store32(applier::applier& app, boost::uint64_t addr, 
-            boost::uint32_t value)
+        void local_store32(boost::uint64_t addr, boost::uint32_t value)
         {
             *reinterpret_cast<boost::uint32_t*>(addr) = value;
         }
 
-        void local_store64(applier::applier& app, boost::uint64_t addr, 
-            boost::uint64_t value)
+        void local_store64(boost::uint64_t addr, boost::uint64_t value)
         {
             *reinterpret_cast<boost::uint64_t*>(addr) = value;
         }
 
         ///
-        boost::uint8_t local_load8(applier::applier& app, boost::uint64_t addr)
+        boost::uint8_t local_load8(boost::uint64_t addr)
         {
             return *reinterpret_cast<boost::uint8_t*>(addr);
         }
 
-        boost::uint16_t local_load16(applier::applier& app, boost::uint64_t addr)
+        boost::uint16_t local_load16(boost::uint64_t addr)
         {
             return *reinterpret_cast<boost::uint16_t*>(addr);
         }
 
-        boost::uint32_t local_load32(applier::applier& app, boost::uint64_t addr)
+        boost::uint32_t local_load32(boost::uint64_t addr)
         {
             return *reinterpret_cast<boost::uint32_t*>(addr);
         }
 
-        boost::uint64_t local_load64(applier::applier& app, boost::uint64_t addr)
+        boost::uint64_t local_load64(boost::uint64_t addr)
         {
             return *reinterpret_cast<boost::uint64_t*>(addr);
         }

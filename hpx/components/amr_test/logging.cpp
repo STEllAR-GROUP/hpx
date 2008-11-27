@@ -13,8 +13,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
     // Compute the result value for the current time step
-    threads::thread_state logging::logentry(applier::applier& appl, 
-        timestep_data const& val)
+    threads::thread_state logging::logentry(timestep_data const& val)
     {
         boost::mutex::scoped_lock l(mtx_);
 

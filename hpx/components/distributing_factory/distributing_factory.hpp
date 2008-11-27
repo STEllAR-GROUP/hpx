@@ -27,9 +27,8 @@ namespace hpx { namespace components
     public:
         /// Create a client side representation for any existing 
         /// \a server#runtime_support instance with the given global id \a gid.
-        distributing_factory(applier::applier& app, naming::id_type gid,
-                bool freeonexit = false) 
-          : base_type(app, gid, freeonexit)
+        distributing_factory(naming::id_type gid, bool freeonexit = false) 
+          : base_type(gid, freeonexit)
         {
         }
 

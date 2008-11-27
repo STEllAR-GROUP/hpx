@@ -23,9 +23,8 @@ namespace hpx { namespace components
     public:
         /// Create a client side representation for the existing
         /// \a server#accumulator instance with the given global id \a gid.
-        accumulator(applier::applier& appl, naming::id_type gid, 
-                bool freeonexit = true) 
-          : base_type(appl, gid, freeonexit)
+        accumulator(naming::id_type gid, bool freeonexit = true) 
+          : base_type(gid, freeonexit)
         {}
 
         ///////////////////////////////////////////////////////////////////////

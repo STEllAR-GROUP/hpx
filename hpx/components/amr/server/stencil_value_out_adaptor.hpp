@@ -30,11 +30,11 @@ namespace hpx { namespace components { namespace amr { namespace server
         > base_type;
         
     public:
-        stencil_value_out_adaptor(applier::applier& appl)
+        stencil_value_out_adaptor()
         {
             if (component_invalid == base_type::get_component_type()) {
                 // first call to get_component_type, ask AGAS for a unique id
-                base_type::set_component_type(appl.get_agas_client().
+                base_type::set_component_type(applier::get_applier().get_agas_client().
                     get_component_id("stencil_value_out_adaptor"));
             }
         }
@@ -56,8 +56,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// This is the main entry point of this component. Calling this 
         /// function (by applying the get_value) will return the value as 
         /// computed by the current time step.
-        threads::thread_state 
-        get_value (applier::applier& appl, naming::id_type* result)
+        threads::thread_state get_value (naming::id_type* result)
         {
             BOOST_ASSERT(eval_);      // must have been initialized
             eval_(result);

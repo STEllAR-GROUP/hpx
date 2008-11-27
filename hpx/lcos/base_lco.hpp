@@ -30,10 +30,10 @@ namespace hpx { namespace lcos
     class base_lco 
     {
     protected:
-        virtual threads::thread_state set_event (applier::applier& appl) = 0;
+        virtual threads::thread_state set_event () = 0;
 
-        virtual threads::thread_state set_error (
-            applier::applier& appl, hpx::error code, std::string const& msg)
+        virtual threads::thread_state set_error (hpx::error code, 
+            std::string const& msg)
         {
             // just rethrow the exception
             HPX_THROW_EXCEPTION(code, msg);
@@ -63,26 +63,18 @@ namespace hpx { namespace lcos
 
         /// \brief finalize() will be called just before the instance gets 
         ///        destructed
-        ///
-        /// \param self [in] The PX \a thread used to execute this function.
-        /// \param appl [in] The applier to be used for finalization of the 
-        ///             component instance. 
-        void finalize(applier::applier& appl) {}
+        void finalize() {}
 
         /// The \a function set_event_nonvirt is called whenever a 
         /// \a set_event_action is applied on a instance of a LCO. This function
         /// just forwards to the virtual function \a set_event, which is 
         /// overloaded by the derived concrete LCO.
         ///
-        /// \param self   [in] The PX \a thread used to execute this function.
-        /// \param appl   [in] The \a applier instance to be used to execute 
-        ///               the embedded action.
-        ///
         /// \returns      The thread state the calling thread needs to be set
         ///               to after returning from this function.
-        threads::thread_state set_event_nonvirt (applier::applier& appl)
+        threads::thread_state set_event_nonvirt()
         {
-            return set_event(appl);
+            return set_event();
         }
 
         /// The \a function set_error_nonvirt is called whenever a 
@@ -90,9 +82,6 @@ namespace hpx { namespace lcos
         /// just forwards to the virtual function \a set_error, which is 
         /// overloaded by the derived concrete LCO.
         ///
-        /// \param self   [in] The PX \a thread used to execute this function.
-        /// \param appl   [in] The \a applier instance to be used to execute 
-        ///               the embedded action.
         /// \param code   [in] The error code of the error to report to this 
         ///               LCO instance.
         /// \param msg    [in] The error message describing the error to report
@@ -100,10 +89,10 @@ namespace hpx { namespace lcos
         ///
         /// \returns      The thread state the calling thread needs to be set
         ///               to after returning from this function.
-        threads::thread_state set_error_nonvirt (
-            applier::applier& appl, hpx::error code, std::string const& msg)
+        threads::thread_state set_error_nonvirt (hpx::error code, 
+            std::string const& msg)
         {
-            return set_error(appl, code, msg);
+            return set_error(code, msg);
         }
 
         /// Each of the exposed functions needs to be encapsulated into an action
@@ -147,13 +136,12 @@ namespace hpx { namespace lcos
         /// derived objects
         virtual ~base_lco_with_value() {}
 
-        virtual threads::thread_state set_event (applier::applier& appl)
+        virtual threads::thread_state set_event()
         {
-            return set_result(appl, Result());
+            return set_result(Result());
         }
 
-        virtual threads::thread_state set_result (
-            applier::applier& appl, Result const& result) = 0;
+        virtual threads::thread_state set_result (Result const& result) = 0;
 
     public:
         // components must contain a typedef for wrapping_type defining the
@@ -174,18 +162,14 @@ namespace hpx { namespace lcos
         /// function just forwards to the virtual function \a set_result, which 
         /// is overloaded by the derived concrete LCO.
         ///
-        /// \param self   [in] The PX \a thread used to execute this function.
-        /// \param appl   [in] The \a applier instance to be used to execute 
-        ///               the embedded action.
         /// \param result [in] The result value to be transferred from the 
         ///               remote operation back to this LCO instance.
         ///
         /// \returns      The thread state the calling thread needs to be set
         ///               to after returning from this function.
-        threads::thread_state set_result_nonvirt (
-            applier::applier& appl, Result const& result) 
+        threads::thread_state set_result_nonvirt (Result const& result) 
         {
-            return set_result(appl, result);
+            return set_result(result);
         }
 
         /// Each of the exposed functions needs to be encapsulated into an action

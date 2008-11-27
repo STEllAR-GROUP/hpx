@@ -55,7 +55,7 @@ namespace hpx { namespace components
             /// \param self [in] The PX \a thread used to execute this function.
             /// \param appl [in] The applier to be used for finalization of the 
             ///             component instance. 
-            void finalize(applier::applier& appl) {}
+            void finalize() {}
         };
 
         ///////////////////////////////////////////////////////////////////////////
@@ -133,9 +133,9 @@ namespace hpx { namespace components
         ///
         /// \param appl [in] The applier to be used for finalization of the 
         ///             component instance. 
-        void finalize(applier::applier& appl) 
+        void finalize() 
         { 
-            component_->finalize(appl);
+            component_->finalize();
         }
 
         // This is the component id. Every component needs to have an embedded
@@ -230,13 +230,12 @@ namespace hpx { namespace components
 
         /// \brief  The function \a create is used for allocation and 
         //          initialization of arrays of wrappers.
-        static managed_component* 
-        create(applier::applier& appl, std::size_t count)
+        static managed_component* create(std::size_t count)
         {
             // allocate the memory
             managed_component* p = get_heap().alloc(count);
             if (1 == count)
-                return new (p) derived_type(appl);
+                return new (p) derived_type();
 
             // call constructors
             std::size_t succeeded = 0;
@@ -244,7 +243,7 @@ namespace hpx { namespace components
                 derived_type* curr = static_cast<derived_type*>(p);
                 for (std::size_t i = 0; i < count; ++i, ++curr) {
                     // call placement new, might throw
-                    new (curr) derived_type(appl);
+                    new (curr) derived_type();
                     ++succeeded;
                 }
             }
@@ -253,7 +252,7 @@ namespace hpx { namespace components
                 derived_type* curr = static_cast<derived_type*>(p);
                 for (std::size_t i = 0; i < succeeded; ++i)
                 {
-                    curr->finalize(appl);
+                    curr->finalize();
                     curr->~derived_type();
                 }
                 get_heap().free(p, count);     // free memory
@@ -264,14 +263,13 @@ namespace hpx { namespace components
 
         /// \brief  The function \a destroy is used for deletion and 
         //          de-allocation of arrays of wrappers
-        static void destroy(applier::applier& appl, derived_type* p, 
-            std::size_t count = 1)
+        static void destroy(derived_type* p, std::size_t count = 1)
         {
             if (NULL == p || 0 == count) 
                 return;     // do nothing if given a NULL pointer
 
             if (1 == count) {
-                p->finalize(appl);
+                p->finalize();
                 p->~derived_type();
             }
             else {
@@ -279,7 +277,7 @@ namespace hpx { namespace components
                 derived_type* curr = static_cast<derived_type*>(p);
                 for (std::size_t i = 0; i < count; ++i)
                 {
-                    curr->finalize(appl);
+                    curr->finalize();
                     curr->~derived_type();
                 }
             }
@@ -301,11 +299,9 @@ namespace hpx { namespace components
 
     public:
         ///
-        naming::id_type 
-        get_gid(applier::applier& appl) const
+        naming::id_type get_gid() const
         {
-            return get_heap().get_gid(appl, 
-                const_cast<managed_component*>(this));
+            return get_heap().get_gid(const_cast<managed_component*>(this));
         }
 
         ///////////////////////////////////////////////////////////////////////

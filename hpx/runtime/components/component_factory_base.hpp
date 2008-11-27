@@ -13,7 +13,6 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -71,9 +70,6 @@ namespace hpx { namespace components
 
         /// \brief Create one or more new component instances.
         ///
-        /// \param self   [in] The PX \a thread used to execute this function.
-        /// \param appl   [in] The applier instance to be used to create
-        ///               the new component instances.
         /// \param count  [in] The number of component instances to 
         ///               create. The value of this parameter should not 
         ///               be zero.
@@ -82,16 +78,13 @@ namespace hpx { namespace components
         ///         instance. If more than one component instance has been 
         ///         created (\a count > 1) the GID's of all new instances are
         ///         sequential in a row.
-        virtual naming::id_type create (applier::applier&, std::size_t) = 0;
+        virtual naming::id_type create (std::size_t) = 0;
 
         /// \brief Destroy one or more component instances
         ///
-        /// \param self   [in] The PX \a thread used to execute this function.
-        /// \param appl   [in] The applier instance to be used to destroy
-        ///               the component instances.
         /// \param gid    [in] The gid of the first component instance to 
         ///               destroy. 
-        virtual void destroy(applier::applier&, naming::id_type const&) = 0;
+        virtual void destroy(naming::id_type const&) = 0;
     };
 
 }}

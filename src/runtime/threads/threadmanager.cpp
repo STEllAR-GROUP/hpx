@@ -308,8 +308,7 @@ namespace hpx { namespace threads
     }
 
     /// Retrieve the global id of the given thread
-    naming::id_type threadmanager::get_thread_gid(thread_id_type id, 
-        applier::applier& appl) 
+    naming::id_type threadmanager::get_thread_gid(thread_id_type id) 
     {
         // lock data members while getting a thread state
         mutex_type::scoped_lock lk(mtx_);
@@ -321,7 +320,7 @@ namespace hpx { namespace threads
             map_iter = thread_map_.find(id);
 
         if (map_iter != thread_map_.end())
-            return map_iter->second->get_gid(appl);
+            return map_iter->second->get_gid();
 
         return naming::invalid_id;
     }

@@ -36,7 +36,7 @@ namespace hpx { namespace actions
     // zero argument version
     template <
         typename Component, typename Result, int Action, 
-        threads::thread_state(Component::*F)(applier::applier&, Result*)
+        threads::thread_state(Component::*F)(Result*)
     >
     class base_result_action0 
       : public action<Component, Action, boost::fusion::vector<> >
@@ -55,18 +55,18 @@ namespace hpx { namespace actions
         /// of the original thread function.
         template <typename Func>
         static threads::thread_state 
-        continuation_thread_function(applier::applier& appl, 
-            continuation_type cont, boost::tuple<Func> func)
+        continuation_thread_function(continuation_type cont, 
+            boost::tuple<Func> func)
         {
             threads::thread_state newstate = threads::unknown;
             try {
                 Result result;
                 newstate = boost::get<0>(func)(&result);
-                cont->trigger_all(appl, result);
+                cont->trigger_all(result);
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
-                cont->trigger_error(appl, e);
+                cont->trigger_error(e);
                 return threads::terminated;
             }
             return newstate;
@@ -77,24 +77,20 @@ namespace hpx { namespace actions
         /// continuation support
         template <typename Func>
         static boost::function<threads::thread_function_type>
-        construct_continuation_thread_function(Func func, 
-            applier::applier& appl, continuation_type cont) 
+        construct_continuation_thread_function(Func func, continuation_type cont) 
         {
             // we need to assign the address of the thread function to a 
             // variable to  help the compiler to deduce the function type
-            threads::thread_state (*f)(applier::applier&, continuation_type, 
-                    boost::tuple<Func>) =
+            threads::thread_state (*f)(continuation_type, boost::tuple<Func>) =
                 &base_result_action0::continuation_thread_function;
 
             // The following bind constructs the wrapped thread function
             //   f:  is the wrapping thread function
-            //  app: reference to the applier (pre-bound second argument to f)
             // cont: continuation (pre-bound third argument to f)
             // func: wrapped function object (pre-bound forth argument to f)
             //       (this is embedded into a tuple because boost::bind can't
             //       pre-bind another bound function as an argument)
-            return boost::bind(f, boost::ref(appl), cont, 
-                boost::make_tuple(func));
+            return boost::bind(f, cont, boost::make_tuple(func));
         }
 
     public:
@@ -106,11 +102,10 @@ namespace hpx { namespace actions
         /// instantiate the \a base_result_action0 type. This is used by the \a 
         /// applier in case no continuation has been supplied.
         static boost::function<threads::thread_function_type> 
-        construct_thread_function(applier::applier& appl, 
-            naming::address::address_type lva)
+        construct_thread_function(naming::address::address_type lva)
         {
             return boost::bind(F, get_lva<Component>::call(lva), 
-                boost::ref(appl), reinterpret_cast<Result*>(NULL));
+                reinterpret_cast<Result*>(NULL));
         }
 
         /// \brief This static \a construct_thread_function allows to construct 
@@ -119,31 +114,28 @@ namespace hpx { namespace actions
         /// applier in case a continuation has been supplied
         static boost::function<threads::thread_function_type> 
         construct_thread_function(continuation_type& cont, 
-            applier::applier& appl, naming::address::address_type lva)
+            naming::address::address_type lva)
         {
             return construct_continuation_thread_function(
-                boost::bind(F, get_lva<Component>::call(lva), 
-                    boost::ref(appl), _1), 
-                appl, cont);
+                boost::bind(F, get_lva<Component>::call(lva), _1), cont);
         }
 
     private:
         /// This \a get_thread_function will be invoked to retrieve the thread 
         /// function for an action which has to be invoked without continuations.
         boost::function<threads::thread_function_type>
-        get_thread_function(applier::applier& appl, 
-            naming::address::address_type lva) const
+        get_thread_function(naming::address::address_type lva) const
         {
-            return construct_thread_function(appl, lva);
+            return construct_thread_function(lva);
         }
 
         /// This \a get_thread_function will be invoked to retrieve the thread 
         /// function for an action which has to be invoked with continuations.
         boost::function<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
-            applier::applier& appl, naming::address::address_type lva) const
+            naming::address::address_type lva) const
         {
-            return construct_thread_function(cont, appl, lva);
+            return construct_thread_function(cont, lva);
         }
 
     private:
@@ -160,7 +152,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, typename Result, int Action, 
-        threads::thread_state(Component::*F)(applier::applier&, Result*)
+        threads::thread_state(Component::*F)(Result*)
     >
     class result_action0 
       : public base_result_action0<Component, Result, Action, F>
@@ -193,8 +185,8 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, typename Result, int Action, 
-        threads::thread_state(Component::*F)(applier::applier&, Result*),
-        Result (Component::*DirectF)(applier::applier&)
+        threads::thread_state(Component::*F)(Result*),
+        Result (Component::*DirectF)()
     >
     class direct_result_action0 
       : public base_result_action0<Component, Result, Action, F>
@@ -210,10 +202,9 @@ namespace hpx { namespace actions
         typedef boost::mpl::true_ direct_execution;
 
         ///
-        static Result execute_function(
-            applier::applier& appl, naming::address::address_type lva)
+        static Result execute_function(naming::address::address_type lva)
         {
-            return (get_lva<Component>::call(lva)->*DirectF)(appl);
+            return (get_lva<Component>::call(lva)->*DirectF)();
         }
 
         /// The function \a get_action_name returns the name of this action
@@ -238,7 +229,7 @@ namespace hpx { namespace actions
     //  zero parameter version, no result value
     template <
         typename Component, int Action, 
-        threads::thread_state(Component::*F)(applier::applier&)
+        threads::thread_state(Component::*F)()
     >
     class base_action0 
       : public action<Component, Action, boost::fusion::vector<> >
@@ -259,11 +250,9 @@ namespace hpx { namespace actions
         /// instantiate the base_action0 type. This is used by the \a applier in 
         /// case no continuation has been supplied.
         static boost::function<threads::thread_function_type> 
-        construct_thread_function(applier::applier& appl, 
-            naming::address::address_type lva)
+        construct_thread_function(naming::address::address_type lva)
         {
-            return boost::bind(F, get_lva<Component>::call(lva), 
-                boost::ref(appl));
+            return boost::bind(F, get_lva<Component>::call(lva));
         }
 
         /// \brief This static \a construct_thread_function allows to construct 
@@ -272,27 +261,24 @@ namespace hpx { namespace actions
         /// case a continuation has been supplied
         static boost::function<threads::thread_function_type> 
         construct_thread_function(continuation_type& cont,
-            applier::applier& appl, naming::address::address_type lva)
+            naming::address::address_type lva)
         {
             return base_type::construct_continuation_thread_function(
-                boost::bind(F, get_lva<Component>::call(lva), 
-                    boost::ref(appl)), 
-                appl, cont);
+                boost::bind(F, get_lva<Component>::call(lva)), cont);
         }
 
     private:
         boost::function<threads::thread_function_type>
-        get_thread_function(applier::applier& appl, 
-            naming::address::address_type lva) const
+        get_thread_function(naming::address::address_type lva) const
         {
-            return construct_thread_function(appl, lva);
+            return construct_thread_function(lva);
         }
 
         boost::function<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
-            applier::applier& appl, naming::address::address_type lva) const
+            naming::address::address_type lva) const
         {
-            return construct_thread_function(cont, appl, lva);
+            return construct_thread_function(cont, lva);
         }
 
     private:
@@ -309,7 +295,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, int Action, 
-        threads::thread_state(Component::*F)(applier::applier&)
+        threads::thread_state(Component::*F)()
     >
     class action0 : public base_action0<Component, Action, F>
     {
@@ -341,8 +327,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, int Action, 
-        threads::thread_state(Component::*F)(applier::applier&),
-        void (Component::*DirectF)(applier::applier&)
+        threads::thread_state(Component::*F)(), void (Component::*DirectF)()
     >
     class direct_action0 : public base_action0<Component, Action, F>
     {
@@ -357,10 +342,9 @@ namespace hpx { namespace actions
         typedef boost::mpl::true_ direct_execution;
 
         ///
-        static void execute_function(
-            applier::applier& appl, naming::address::address_type lva)
+        static void execute_function(naming::address::address_type lva)
         {
-            (get_lva<Component>::call(lva)->*DirectF)(appl);
+            (get_lva<Component>::call(lva)->*DirectF)();
         }
 
         /// The function \a get_action_name returns the name of this action
@@ -385,7 +369,7 @@ namespace hpx { namespace actions
     //  one parameter version
     template <
         typename Component, typename Result, int Action, typename T0, 
-        threads::thread_state(Component::*F)(applier::applier&, Result*, T0) 
+        threads::thread_state(Component::*F)(Result*, T0) 
     >
     class base_result_action1
       : public action<Component, Action, 
@@ -415,18 +399,18 @@ namespace hpx { namespace actions
         /// of the original thread function.
         template <typename Func>
         static threads::thread_state 
-        continuation_thread_function(applier::applier& app, 
-            continuation_type cont, boost::tuple<Func> func)
+        continuation_thread_function(continuation_type cont, 
+            boost::tuple<Func> func)
         {
             threads::thread_state newstate = threads::unknown;
             try {
                 Result result;
                 newstate = boost::get<0>(func)(&result);
-                cont->trigger_all(app, result);
+                cont->trigger_all(result);
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
-                cont->trigger_error(app, e);
+                cont->trigger_error(e);
                 return threads::terminated;
             }
             return newstate;
@@ -437,26 +421,20 @@ namespace hpx { namespace actions
         /// continuation support
         template <typename Func>
         static boost::function<threads::thread_function_type>
-        construct_continuation_thread_function(Func func, 
-            applier::applier& appl, continuation_type cont) 
+        construct_continuation_thread_function(Func func, continuation_type cont) 
         {
             // we need to assign the address of the thread function to a 
             // variable to  help the compiler to deduce the function type
-            threads::thread_state (*f)(applier::applier&, continuation_type, 
-                    boost::tuple<Func>) =
+            threads::thread_state (*f)(continuation_type, boost::tuple<Func>) =
                 &base_result_action1::continuation_thread_function;
 
             // The following bind constructs the wrapped thread function
             //   f:  is the wrapping thread function
-            //  _1:  is a placeholder which will be replaced by the reference
-            //       to thread_self
-            //  app: reference to the applier (pre-bound second argument to f)
             // cont: continuation (pre-bound third argument to f)
             // func: wrapped function object (pre-bound forth argument to f)
             //       (this is embedded into a tuple because boost::bind can't
             //       pre-bind another bound function as an argument)
-            return boost::bind(f, boost::ref(appl), cont, 
-                boost::make_tuple(func));
+            return boost::bind(f, cont, boost::make_tuple(func));
         }
 
     public:
@@ -469,11 +447,11 @@ namespace hpx { namespace actions
         /// applier in case no continuation has been supplied.
         template <typename Arg0>
         static boost::function<threads::thread_function_type> 
-        construct_thread_function(applier::applier& appl, 
-            naming::address::address_type lva, Arg0 const& arg0) 
+        construct_thread_function(naming::address::address_type lva, 
+            Arg0 const& arg0) 
         {
             return boost::bind(F, get_lva<Component>::call(lva), 
-                boost::ref(appl), reinterpret_cast<Result*>(NULL), arg0);
+                reinterpret_cast<Result*>(NULL), arg0);
         }
 
         /// \brief This static \a construct_thread_function allows to construct 
@@ -483,32 +461,28 @@ namespace hpx { namespace actions
         template <typename Arg0>
         static boost::function<threads::thread_function_type> 
         construct_thread_function(continuation_type& cont,
-            applier::applier& appl, naming::address::address_type lva, 
-            Arg0 const& arg0) 
+            naming::address::address_type lva, Arg0 const& arg0) 
         {
             return construct_continuation_thread_function(
-                boost::bind(F, get_lva<Component>::call(lva), 
-                    boost::ref(appl), _1, arg0), 
-                appl, cont);
+                boost::bind(F, get_lva<Component>::call(lva), _1, arg0), cont);
         }
 
     private:
         /// This \a get_thread_function will be invoked to retrieve the thread 
         /// function for an action which has to be invoked without continuations.
         boost::function<threads::thread_function_type>
-        get_thread_function(applier::applier& appl, 
-            naming::address::address_type lva) const
+        get_thread_function(naming::address::address_type lva) const
         {
-            return construct_thread_function(appl, lva, this->get<0>());
+            return construct_thread_function(lva, this->get<0>());
         }
 
         /// This \a get_thread_function will be invoked to retrieve the thread 
         /// function for an action which has to be invoked with continuations.
         boost::function<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
-            applier::applier& appl, naming::address::address_type lva) const
+            naming::address::address_type lva) const
         {
-            return construct_thread_function(cont, appl, lva, this->get<0>());
+            return construct_thread_function(cont, lva, this->get<0>());
         }
 
     private:
@@ -525,7 +499,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, typename Result, int Action, typename T0, 
-        threads::thread_state(Component::*F)(applier::applier&, Result*, T0)
+        threads::thread_state(Component::*F)(Result*, T0)
     >
     class result_action1 
       : public base_result_action1<Component, Result, Action, T0, F>
@@ -565,8 +539,8 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, typename Result, int Action, typename T0, 
-        threads::thread_state(Component::*F)(applier::applier&, Result*, T0),
-        Result (Component::*DirectF)(applier::applier&, T0)
+        threads::thread_state(Component::*F)(Result*, T0),
+        Result (Component::*DirectF)(T0)
     >
     class direct_result_action1 
       : public base_result_action1<Component, Result, Action, T0, F>
@@ -590,11 +564,10 @@ namespace hpx { namespace actions
 
         ///
         template <typename Arg0>
-        static Result execute_function(
-            applier::applier& appl, naming::address::address_type lva,
+        static Result execute_function(naming::address::address_type lva,
             Arg0 const& arg0)
         {
-            return (get_lva<Component>::call(lva)->*DirectF)(appl, arg0);
+            return (get_lva<Component>::call(lva)->*DirectF)(arg0);
         }
 
         /// The function \a get_action_name returns the name of this action
@@ -618,7 +591,7 @@ namespace hpx { namespace actions
     //  one parameter version, no result value
     template <
         typename Component, int Action, typename T0, 
-        threads::thread_state(Component::*F)(applier::applier&, T0)
+        threads::thread_state(Component::*F)(T0)
     >
     class base_action1 
       : public action<Component, Action, 
@@ -650,11 +623,10 @@ namespace hpx { namespace actions
         /// case no continuation has been supplied.
         template <typename Arg0>
         static boost::function<threads::thread_function_type> 
-        construct_thread_function(applier::applier& appl, 
-            naming::address::address_type lva, Arg0 const& arg0) 
+        construct_thread_function(naming::address::address_type lva, 
+            Arg0 const& arg0) 
         {
-            return boost::bind(F, get_lva<Component>::call(lva), 
-                boost::ref(appl), arg0);
+            return boost::bind(F, get_lva<Component>::call(lva), arg0);
         }
 
         /// \brief This static \a construct_thread_function allows to construct 
@@ -664,30 +636,26 @@ namespace hpx { namespace actions
         template <typename Arg0>
         static boost::function<threads::thread_function_type> 
         construct_thread_function(continuation_type& cont,
-            applier::applier& appl, naming::address::address_type lva, 
-            Arg0 const& arg0) 
+            naming::address::address_type lva, Arg0 const& arg0) 
         {
             return base_type::construct_continuation_thread_function(
-                boost::bind(F, get_lva<Component>::call(lva), 
-                    boost::ref(appl), arg0), 
-                appl, cont);
+                boost::bind(F, get_lva<Component>::call(lva), arg0), cont);
         }
 
     private:
         ///
         boost::function<threads::thread_function_type>
-        get_thread_function(applier::applier& appl, 
-            naming::address::address_type lva) const
+        get_thread_function(naming::address::address_type lva) const
         {
-            return construct_thread_function(appl, lva, this->get<0>());
+            return construct_thread_function(lva, this->get<0>());
         }
 
         ///
         boost::function<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
-            applier::applier& appl, naming::address::address_type lva) const
+            naming::address::address_type lva) const
         {
-            return construct_thread_function(cont, appl, lva, this->get<0>());
+            return construct_thread_function(cont, lva, this->get<0>());
         }
 
     private:
@@ -704,7 +672,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, int Action, typename T0, 
-        threads::thread_state(Component::*F)(applier::applier&, T0)
+        threads::thread_state(Component::*F)(T0)
     >
     class action1 : public base_action1<Component, Action, T0, F>
     {
@@ -742,8 +710,8 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, int Action, typename T0, 
-        threads::thread_state(Component::*F)(applier::applier&, T0),
-        void (Component::*DirectF)(applier::applier&, T0)
+        threads::thread_state(Component::*F)(T0), 
+        void (Component::*DirectF)(T0)
     >
     class direct_action1 : public base_action1<Component, Action, T0, F>
     {
@@ -765,11 +733,10 @@ namespace hpx { namespace actions
 
         ///
         template <typename Arg0>
-        static void execute_function(
-            applier::applier& appl, naming::address::address_type lva, 
+        static void execute_function(naming::address::address_type lva, 
             Arg0 const& arg0)
         {
-            (get_lva<Component>::call(lva)->*DirectF)(appl, arg0);
+            (get_lva<Component>::call(lva)->*DirectF)(arg0);
         }
 
         /// The function \a get_action_name returns the name of this action

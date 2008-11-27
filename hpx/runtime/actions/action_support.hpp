@@ -67,9 +67,6 @@ namespace hpx { namespace actions
         /// a \a thread, encapsulating the functionality and the arguments 
         /// of the action it is called for.
         /// 
-        /// \param appl   [in] This is a reference to the \a applier instance 
-        ///               to be passed as the second parameter to the action 
-        ///               function
         /// \param lva    [in] This is the local virtual address of the 
         ///               component the action has to be invoked on.
         ///
@@ -80,8 +77,7 @@ namespace hpx { namespace actions
         ///       thread function for an action which has to be invoked without 
         ///       continuations.
         virtual boost::function<threads::thread_function_type> 
-            get_thread_function(applier::applier& appl, 
-                naming::address::address_type lva) const = 0;
+            get_thread_function(naming::address::address_type lva) const = 0;
 
         /// The \a get_thread_function constructs a proper thread function for 
         /// a \a thread, encapsulating the functionality, the arguments, and 
@@ -89,9 +85,6 @@ namespace hpx { namespace actions
         /// 
         /// \param cont   [in] This is the list of continuations to be 
         ///               triggered after the execution of the action
-        /// \param appl   [in] This is a reference to the \a applier instance 
-        ///               to be passed as the second parameter to the action 
-        ///               function
         /// \param lva    [in] This is the local virtual address of the 
         ///               component the action has to be invoked on.
         ///
@@ -103,7 +96,7 @@ namespace hpx { namespace actions
         ///       continuations.
         virtual boost::function<threads::thread_function_type>
             get_thread_function(continuation_type& cont,
-                applier::applier& appl, naming::address::address_type lva) const = 0;
+                naming::address::address_type lva) const = 0;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -158,17 +151,17 @@ namespace hpx { namespace actions
         /// continuations without any additional argument
         template <typename Func>
         static threads::thread_state 
-        continuation_thread_function(applier::applier& app, 
-            continuation_type cont, boost::tuple<Func> func)
+        continuation_thread_function(continuation_type cont, 
+            boost::tuple<Func> func)
         {
             threads::thread_state newstate = threads::unknown;
             try {
                 newstate = boost::get<0>(func)();
-                cont->trigger_all(app);
+                cont->trigger_all();
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
-                cont->trigger_error(app, e);
+                cont->trigger_error(e);
                 return threads::terminated;
             }
             return newstate;
@@ -179,24 +172,20 @@ namespace hpx { namespace actions
         /// continuation support
         template <typename Func>
         static boost::function<threads::thread_function_type>
-        construct_continuation_thread_function(Func func, 
-            applier::applier& appl, continuation_type cont) 
+        construct_continuation_thread_function(Func func, continuation_type cont) 
         {
             // we need to assign the address of the thread function to a 
             // variable to  help the compiler to deduce the function type
-            threads::thread_state (*f)(applier::applier&, continuation_type, 
-                    boost::tuple<Func>) =
+            threads::thread_state (*f)(continuation_type, boost::tuple<Func>) =
                 &action::continuation_thread_function;
 
             // The following bind constructs the wrapped thread function
             //    f:  is the wrapping thread function
-            //  app: reference to the applier (pre-bound second argument to f)
             // cont: continuation (pre-bound third argument to f)
             // func: wrapped function object (pre-bound forth argument to f)
             //       (this is embedded into a tuple because boost::bind can't
             //       pre-bind another bound function as an argument)
-            return boost::bind(f, boost::ref(appl), cont, 
-                boost::make_tuple(func));
+            return boost::bind(f, cont, boost::make_tuple(func));
         }
 
     public:

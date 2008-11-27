@@ -125,7 +125,7 @@ namespace hpx { namespace lcos { namespace detail
 
         // trigger the future, set the result
         threads::thread_state 
-        set_result (applier::applier& appl, Result const& result)
+        set_result (Result const& result)
         {
             // set the received result, reset error status
             set_data(0, result);
@@ -135,7 +135,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         // trigger the future with the given error condition
-        threads::thread_state set_error (applier::applier& appl, hpx::error code, 
+        threads::thread_state set_error (hpx::error code, 
             std::string const& msg)
         {
             set_error(0, code, msg);
@@ -254,7 +254,7 @@ namespace hpx { namespace lcos { namespace detail
         // exposed functionality of this component
 
         // trigger the future, set the result
-        threads::thread_state set_event (applier::applier& appl)
+        threads::thread_state set_event ()
         {
             // set the received result, reset error status
             set_data(0);
@@ -264,8 +264,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         // trigger the future with the given error condition
-        threads::thread_state set_error (applier::applier& appl,
-            hpx::error code, std::string const& msg)
+        threads::thread_state set_error (hpx::error code, std::string const& msg)
         {
             set_error(0, code, msg);
 
@@ -341,9 +340,9 @@ namespace hpx { namespace lcos
         {}
 
         /// \brief Return the global id of this \a future instance
-        naming::id_type get_gid(applier::applier& appl) const
+        naming::id_type get_gid() const
         {
-            return impl_->get_gid(appl);
+            return impl_->get_gid();
         }
 
         /// Reset the future_value to allow to restart an asynchronous 

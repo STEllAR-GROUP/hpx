@@ -19,9 +19,8 @@ namespace hpx { namespace components
         typedef Stub stub_type;
 
     public:
-        client_base(applier::applier& appl, naming::id_type gid,
-                bool freeonexit = false)
-          : stub_type(appl), gid_(gid), freeonexit_(freeonexit)
+        client_base(naming::id_type gid, bool freeonexit = false)
+          : gid_(gid), freeonexit_(freeonexit)
         {
             BOOST_ASSERT(gid_);
         }
@@ -36,18 +35,16 @@ namespace hpx { namespace components
         /// Create a new instance of an distributing_factory on the locality as 
         /// given by the parameter \a targetgid
         static Derived 
-        create(applier::applier& appl, 
-            naming::id_type const& targetgid, component_type type,
+        create(naming::id_type const& targetgid, component_type type,
             bool freeonexit = false)
         {
-            return Derived(appl, stub_type::create(appl, targetgid, type), freeonexit);
+            return Derived(stub_type::create(targetgid, type), freeonexit);
         }
 
         static Derived 
-        create(applier::applier& appl, 
-            naming::id_type const& targetgid, bool freeonexit = false)
+        create(naming::id_type const& targetgid, bool freeonexit = false)
         {
-            return Derived(appl, stub_type::create(appl, targetgid), freeonexit);
+            return Derived(stub_type::create(targetgid), freeonexit);
         }
 
         void free(component_type type)

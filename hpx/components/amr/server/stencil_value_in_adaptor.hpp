@@ -7,7 +7,6 @@
 #define HPX_COMPONENTS_AMR_STENCIL_VALUE_IN_ADAPTOR_OCT_17_2008_0850PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/lcos/eager_future.hpp>
@@ -24,17 +23,17 @@ namespace hpx { namespace components { namespace amr { namespace server
         >
     {
     public:
-        stencil_value_in_adaptor(applier::applier& appl)
+        stencil_value_in_adaptor()
           : gid_(naming::invalid_id)
         {}
 
         // start the asynchronous data acquisition
-        void aquire_value(applier::applier& appl) 
+        void aquire_value() 
         {
             BOOST_ASSERT(gid_);       // must be valid at this point
 
             this->reset();            // reset the underlying future
-            this->apply(appl, gid_);  // asynchronously start the future action 
+            this->apply(gid_);        // asynchronously start the future action 
         }
 
         // connect this in-port to a data source

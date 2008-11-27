@@ -42,7 +42,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
     public:
         /// Construct a new stencil_value instance
-        stencil_value(applier::applier& appl);
+        stencil_value();
 
         /// Destruct this stencil instance
         ~stencil_value();
@@ -52,7 +52,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         ///
         /// \param appl [in] The applier to be used for finalization of the 
         ///             component instance. 
-        void finalize(applier::applier& appl);
+        void finalize();
 
         /// The function get will be called by the out-ports whenever 
         /// the current value has been requested.
@@ -70,7 +70,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         };
 
         /// Main thread function looping through all timesteps
-        threads::thread_state main(applier::applier& appl);
+        threads::thread_state main();
 
         /// This is the main entry point of this component. Calling this 
         /// function (by applying the call_action) will trigger the repeated 
@@ -80,23 +80,23 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// data referred to by the parameter \a initial. After finishing 
         /// execution it returns a reference to the result as its return value
         /// (parameter \a result)
-        threads::thread_state call (applier::applier&, naming::id_type* result, 
+        threads::thread_state call (naming::id_type* result, 
             naming::id_type const& initial);
 
         /// Return the gid's of the output ports associated with this 
         /// \a stencil_value instance.
-        threads::thread_state get_output_ports(applier::applier&, 
+        threads::thread_state get_output_ports(
             std::vector<naming::id_type> *gids);
 
         /// Connect the destinations given by the provided gid's with the 
         /// corresponding input ports associated with this \a stencil_value 
         /// instance.
-        threads::thread_state connect_input_ports(applier::applier&, 
+        threads::thread_state connect_input_ports(
             std::vector<naming::id_type> const& gids);
 
         /// Set the gid of the component implementing the actual time evolution
         /// functionality
-        threads::thread_state set_functional_component(applier::applier&, 
+        threads::thread_state set_functional_component(
             naming::id_type const& gid);
 
         // Each of the exposed functions needs to be encapsulated into an action

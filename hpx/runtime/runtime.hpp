@@ -24,11 +24,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx 
 {
-    /// This is the signature expected to be exposed by a function registered 
-    /// as HPX's 'main' function. This main function is the easiest way of 
-    /// bootstrapping an application
-    typedef threads::thread_state hpx_main_function_type(applier::applier&);
-
     /// \class runtime runtime.hpp hpx/runtime/runtime.hpp
     ///
     /// The \a runtime class encapsulates the HPX runtime system in a simple to 
@@ -104,7 +99,7 @@ namespace hpx
         ///                   stopped. If this parameter is \a true the 
         ///                   function \a runtime#start internally will call 
         ///                   \a runtime#wait.
-        void start(boost::function<hpx_main_function_type> func, 
+        void start(boost::function<threads::thread_function_type> func, 
             std::size_t num_threads = 1, bool blocking = false);
 
         /// \brief Wait for the shutdown action to be executed
@@ -142,8 +137,8 @@ namespace hpx
         ///                   is supplied, the runtime system will simply wait
         ///                   for the shutdown action without explicitly 
         ///                   executing any main thread.
-        void run(boost::function<hpx_main_function_type> func =
-            boost::function<hpx_main_function_type>(), 
+        void run(boost::function<threads::thread_function_type> func =
+                boost::function<threads::thread_function_type>(), 
             std::size_t num_threads = 1);
 
         /// \brief Run the HPX runtime system, initially use the given number 

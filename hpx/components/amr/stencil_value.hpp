@@ -25,9 +25,8 @@ namespace hpx { namespace components { namespace amr
 
     public:
         /// Construct a new stencil_value instance
-        stencil_value(applier::applier& app, naming::id_type gid,
-                bool freeonexit = false)
-          : base_type(app, gid, freeonexit)
+        stencil_value(naming::id_type gid, bool freeonexit = false)
+          : base_type(gid, freeonexit)
         {}
 
         ///////////////////////////////////////////////////////////////////////

@@ -21,10 +21,6 @@ namespace hpx { namespace components { namespace amr { namespace server
         typedef simple_component_base<logging> base_type;
 
     public:
-        logging(applier::applier& appl)
-          : base_type(appl)
-        {}
-
         enum actions
         {
             logging_logentry = 0,
@@ -32,8 +28,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         /// This is the function implementing the logging functionality
         /// It takes the values as calculated during the current time step.
-        threads::thread_state logentry(applier::applier&, 
-            timestep_data const& memblock_gid);
+        threads::thread_state logentry(timestep_data const& memblock_gid);
 
         /// Each of the exposed functions needs to be encapsulated into an action
         /// type, allowing to generate all required boilerplate code for threads,
@@ -58,27 +53,14 @@ namespace hpx { namespace components { namespace amr { namespace server
 namespace hpx { namespace components { namespace amr { namespace stubs 
 {
     ///////////////////////////////////////////////////////////////////////////
-    class logging : public components::stubs::stub_base<amr::server::logging>
+    struct logging : public components::stubs::stub_base<amr::server::logging>
     {
-    private:
-        typedef components::stubs::stub_base<amr::server::logging>  base_type;
-
-    public:
-        logging(applier::applier& appl)
-          : base_type(appl)
-        {}
-
         ///////////////////////////////////////////////////////////////////////
-        static void logentry(applier::applier& appl, 
-            naming::id_type const& gid, timestep_data const& val)
+        static void logentry(naming::id_type const& gid, 
+            timestep_data const& val)
         {
             typedef amr::server::logging::logentry_action action_type;
-            appl.apply<action_type>(gid, val);
-        }
-
-        void logentry(naming::id_type const& gid, timestep_data const& val)
-        {
-            logentry(this->appl_, gid, val);
+            applier::apply<action_type>(gid, val);
         }
     };
 
@@ -94,9 +76,8 @@ namespace hpx { namespace components { namespace amr
         typedef client_base<logging, amr::stubs::logging> base_type;
 
     public:
-        logging(applier::applier& app, naming::id_type gid,
-                bool freeonexit = false)
-          : base_type(app, gid, freeonexit)
+        logging(naming::id_type gid, bool freeonexit = false)
+          : base_type(gid, freeonexit)
         {}
 
         ///////////////////////////////////////////////////////////////////////

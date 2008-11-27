@@ -42,23 +42,20 @@
     >
     {
         static void 
-        call (threads::threadmanager& tm, applier& appl, 
-            naming::address::address_type lva,
+        call (naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            tm.register_work(Action::construct_thread_function(
-                appl, lva, BOOST_PP_ENUM_PARAMS(N, arg)),
+            hpx::applier::register_work(Action::construct_thread_function(lva, 
+                    BOOST_PP_ENUM_PARAMS(N, arg)),
                 actions::detail::get_action_name<Action>());
         }
 
         static void 
-        call (actions::continuation_type& c, 
-            threads::threadmanager& tm, applier& appl, 
-            naming::address::address_type lva,
+        call (actions::continuation_type& c, naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            tm.register_work(Action::construct_thread_function(
-                c, appl, lva, BOOST_PP_ENUM_PARAMS(N, arg)),
+            hpx::applier::register_work(Action::construct_thread_function(
+                c, lva, BOOST_PP_ENUM_PARAMS(N, arg)),
                 actions::detail::get_action_name<Action>());
         }
     };
@@ -70,25 +67,23 @@
     {
         // If local and to be directly executed, just call the function
         static void
-        call (threads::threadmanager&, applier& appl, 
-            naming::address::address_type addr,
+        call (naming::address::address_type addr,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            Action::execute_function(appl, addr, BOOST_PP_ENUM_PARAMS(N, arg));
+            Action::execute_function(addr, BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
         static typename Action::result_type  
-        call (actions::continuation_type& c, threads::threadmanager&, 
-            applier& appl, naming::address::address_type addr,
+        call (actions::continuation_type& c, naming::address::address_type addr,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             try {
-                return c->trigger_all(appl, Action::execute_function(
-                    appl, addr, BOOST_PP_ENUM_PARAMS(N, arg)));
+                return c->trigger_all(Action::execute_function(
+                    addr, BOOST_PP_ENUM_PARAMS(N, arg)));
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
-                c->trigger_error(appl, e);
+                c->trigger_error(e);
                 return typename Action::result_type();
             }
         }

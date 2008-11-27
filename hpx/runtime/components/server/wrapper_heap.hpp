@@ -125,13 +125,14 @@ namespace hpx { namespace components { namespace detail
         ///        allocated by this instance of a \a wrapper_heap
         template <typename Mutex>
         naming::id_type 
-        get_gid(applier::applier& appl, util::unique_ids<Mutex>& ids, void* p) 
+        get_gid(util::unique_ids<Mutex>& ids, void* p) 
         {
             BOOST_ASSERT(did_alloc(p));
 
             value_type* addr = static_cast<value_type*>(pool_->address());
             if (!base_gid_) {
                 // store a pointer to the AGAS client
+                hpx::applier::applier& appl = hpx::applier::get_applier();
                 get_agas_client_ = &appl.get_agas_client();
 
                 // this is the first call to get_gid() for this heap - allocate 
@@ -140,7 +141,7 @@ namespace hpx { namespace components { namespace detail
 
                 // register the global ids and the base address of this heap
                 // with the AGAS
-                if (!appl.get_agas_client().bind_range(base_gid_, step_, 
+                if (!get_agas_client_->bind_range(base_gid_, step_, 
                       naming::address(appl.here(), value_type::get_component_type(), addr),
                       sizeof(value_type))) 
                 {

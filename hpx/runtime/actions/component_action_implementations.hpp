@@ -42,8 +42,7 @@
     template <
         typename Component, typename Result, int Action, 
         BOOST_PP_ENUM_PARAMS(N, typename T),
-        threads::thread_state(Component::*F)(applier::applier&, Result*,
-            BOOST_PP_ENUM_PARAMS(N, T))
+        threads::thread_state(Component::*F)(Result*, BOOST_PP_ENUM_PARAMS(N, T))
     >
     class BOOST_PP_CAT(base_result_action, N)
       : public action<
@@ -76,18 +75,18 @@
         // of the original thread function.
         template <typename Func>
         static threads::thread_state 
-        continuation_thread_function(applier::applier& app, 
-            continuation_type cont, boost::tuple<Func> func)
+        continuation_thread_function(continuation_type cont, 
+            boost::tuple<Func> func)
         {
             threads::thread_state newstate = threads::unknown;
             try {
                 Result result;
                 newstate = boost::get<0>(func)(&result);
-                cont->trigger_all(app, result);
+                cont->trigger_all(result);
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
-                cont->trigger_error(app, e);
+                cont->trigger_error(e);
                 return threads::terminated;
             }
             return newstate;
@@ -95,24 +94,20 @@
 
         template <typename Func>
         static boost::function<threads::thread_function_type>
-        construct_continuation_thread_function(Func func, 
-            applier::applier& appl, continuation_type cont) 
+        construct_continuation_thread_function(Func func, continuation_type cont) 
         {
             // we need to assign the address of the thread function to a 
             // variable to  help the compiler to deduce the function type
-            threads::thread_state (*f)(applier::applier&, continuation_type, 
-                    boost::tuple<Func>) =
+            threads::thread_state (*f)(continuation_type, boost::tuple<Func>) =
                 &BOOST_PP_CAT(base_result_action, N)::continuation_thread_function;
 
             // The following bind constructs the wrapped thread function
             //   f:  is the wrapping thread function
-            //  app: reference to the applier (pre-bound second argument to f)
             // cont: continuation (pre-bound third argument to f)
             // func: wrapped function object (pre-bound forth argument to f)
             //       (this is embedded into a tuple because boost::bind can't
             //       pre-bind another bound function as an argument)
-            return boost::bind(f, boost::ref(appl), cont, 
-                boost::make_tuple(func));
+            return boost::bind(f, cont, boost::make_tuple(func));
         }
 
     public:
@@ -125,13 +120,11 @@
         // case no continuation has been supplied.
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static boost::function<threads::thread_function_type> 
-        construct_thread_function(applier::applier& appl, 
-            naming::address::address_type lva, 
+        construct_thread_function(naming::address::address_type lva, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
         {
             return boost::bind(F, get_lva<Component>::call(lva), 
-                boost::ref(appl), reinterpret_cast<Result*>(NULL), 
-                BOOST_PP_ENUM_PARAMS(N, arg));
+                reinterpret_cast<Result*>(NULL), BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
         // This static construct_thread_function allows to construct 
@@ -141,23 +134,21 @@
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static boost::function<threads::thread_function_type> 
         construct_thread_function(continuation_type& cont,
-            applier::applier& appl, naming::address::address_type lva, 
+            naming::address::address_type lva, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
         {
             return construct_continuation_thread_function(
-                boost::bind(F, get_lva<Component>::call(lva), 
-                    boost::ref(appl), _1, BOOST_PP_ENUM_PARAMS(N, arg)), 
-                appl, cont);
+                boost::bind(F, get_lva<Component>::call(lva), _1,
+                    BOOST_PP_ENUM_PARAMS(N, arg)), cont);
         }
 
     private:
         // This get_thread_function will be invoked to retrieve the thread 
         // function for an action which has to be invoked without continuations.
         boost::function<threads::thread_function_type>
-        get_thread_function(applier::applier& appl, 
-            naming::address::address_type lva) const
+        get_thread_function(naming::address::address_type lva) const
         {
-            return construct_thread_function(appl, lva, 
+            return construct_thread_function(lva, 
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
         }
 
@@ -165,9 +156,9 @@
         // function for an action which has to be invoked with continuations.
         boost::function<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
-            applier::applier& appl, naming::address::address_type lva) const
+            naming::address::address_type lva) const
         {
-            return construct_thread_function(cont, appl, lva, 
+            return construct_thread_function(cont, lva, 
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
         }
 
@@ -187,8 +178,7 @@
     template <
         typename Component, typename Result, int Action, 
         BOOST_PP_ENUM_PARAMS(N, typename T), 
-        threads::thread_state(Component::*F)(applier::applier&, Result*, 
-            BOOST_PP_ENUM_PARAMS(N, T))
+        threads::thread_state(Component::*F)(Result*, BOOST_PP_ENUM_PARAMS(N, T))
     >
     class BOOST_PP_CAT(result_action, N)
       : public BOOST_PP_CAT(base_result_action, N)<Component, Result, Action, 
@@ -233,10 +223,8 @@
     template <
         typename Component, typename Result, int Action, 
         BOOST_PP_ENUM_PARAMS(N, typename T), 
-        threads::thread_state(Component::*F)(applier::applier&, Result*, 
-            BOOST_PP_ENUM_PARAMS(N, T)),
-        Result (Component::*DirectF)(applier::applier&, 
-            BOOST_PP_ENUM_PARAMS(N, T))
+        threads::thread_state(Component::*F)(Result*, BOOST_PP_ENUM_PARAMS(N, T)),
+        Result (Component::*DirectF)(BOOST_PP_ENUM_PARAMS(N, T))
     >
     class BOOST_PP_CAT(direct_result_action, N)
       : public BOOST_PP_CAT(base_result_action, N)<Component, Result, Action, 
@@ -263,11 +251,10 @@
 
         ///
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static Result execute_function(
-            applier::applier& appl, naming::address::address_type lva,
+        static Result execute_function(naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            return (get_lva<Component>::call(lva)->*DirectF)(appl, 
+            return (get_lva<Component>::call(lva)->*DirectF)(
                 BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
@@ -293,8 +280,7 @@
     //  N parameter version, no result type
     template <
         typename Component, int Action, BOOST_PP_ENUM_PARAMS(N, typename T),
-        threads::thread_state(Component::*F)(applier::applier&, 
-            BOOST_PP_ENUM_PARAMS(N, T))
+        threads::thread_state(Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))
     >
     class BOOST_PP_CAT(base_action, N)
       : public action<
@@ -329,12 +315,11 @@
         // case no continuation has been supplied.
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static boost::function<threads::thread_function_type> 
-        construct_thread_function(applier::applier& appl, 
-            naming::address::address_type lva, 
+        construct_thread_function(naming::address::address_type lva, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
         {
             return boost::bind(F, get_lva<Component>::call(lva), 
-                boost::ref(appl), BOOST_PP_ENUM_PARAMS(N, arg));
+                BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
         // This static construct_thread_function allows to construct 
@@ -344,30 +329,28 @@
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static boost::function<threads::thread_function_type> 
         construct_thread_function(continuation_type& cont,
-            applier::applier& appl, naming::address::address_type lva, 
+            naming::address::address_type lva, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
         {
             return base_type::construct_continuation_thread_function(
                 boost::bind(F, get_lva<Component>::call(lva), 
-                    boost::ref(appl), BOOST_PP_ENUM_PARAMS(N, arg)), 
-                appl, cont);
+                    BOOST_PP_ENUM_PARAMS(N, arg)), cont);
         }
 
     private:
         boost::function<threads::thread_function_type>
-            get_thread_function(applier::applier& appl, 
-                naming::address::address_type lva) const
+        get_thread_function(naming::address::address_type lva) const
         {
-            return construct_thread_function(appl, lva, 
+            return construct_thread_function(lva, 
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
         }
 
         ///
         boost::function<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
-            applier::applier& appl, naming::address::address_type lva) const
+            naming::address::address_type lva) const
         {
-            return construct_thread_function(cont, appl, lva, 
+            return construct_thread_function(cont, lva, 
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
         }
 
@@ -385,8 +368,7 @@
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, int Action, BOOST_PP_ENUM_PARAMS(N, typename T),
-        threads::thread_state(Component::*F)(
-            applier::applier&, BOOST_PP_ENUM_PARAMS(N, T))
+        threads::thread_state(Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))
     >
     class BOOST_PP_CAT(action, N)
       : public BOOST_PP_CAT(base_action, N)<
@@ -430,9 +412,8 @@
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, int Action, BOOST_PP_ENUM_PARAMS(N, typename T),
-        threads::thread_state(Component::*F)(
-            applier::applier&, BOOST_PP_ENUM_PARAMS(N, T)),
-        void (Component::*DirectF)(applier::applier&, BOOST_PP_ENUM_PARAMS(N, T))
+        threads::thread_state(Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)),
+        void (Component::*DirectF)(BOOST_PP_ENUM_PARAMS(N, T))
     >
     class BOOST_PP_CAT(direct_action, N)
       : public BOOST_PP_CAT(base_action, N)<
@@ -460,12 +441,10 @@
 
         ///
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static void execute_function(
-            applier::applier& appl, naming::address::address_type lva, 
+        static void execute_function(naming::address::address_type lva, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            (get_lva<Component>::call(lva)->*DirectF)(
-                appl, BOOST_PP_ENUM_PARAMS(N, arg));
+            (get_lva<Component>::call(lva)->*DirectF)(BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
         /// The function \a get_action_name returns the name of this action

@@ -28,7 +28,7 @@ namespace hpx { namespace components { namespace amr
         typedef stencil wrapped_type;
         typedef stencil wrapping_type;
 
-        stencil(applier::applier& appl);
+        stencil();
 
         /// This is the function implementing the actual time step functionality
         /// It takes the values as calculated during the previous time step 
@@ -40,24 +40,21 @@ namespace hpx { namespace components { namespace amr
         /// of the current time step has to be stored. The parameter \a gids
         /// is a vector of gids referencing the memory blocks of the results of
         /// previous time step.
-        threads::thread_state eval(applier::applier&, 
-            bool* islast, naming::id_type const& result, 
+        threads::thread_state eval(bool* islast, naming::id_type const& result, 
             std::vector<naming::id_type> const& gids);
 
         /// The alloc function is supposed to create a new memory block instance 
         /// suitable for storing all data needed for a single time step. 
         /// Additionally it fills the memory with initial data for the data 
         /// item given by the parameter \a item (if item != -1).
-        threads::thread_state alloc_data(applier::applier&, 
-            naming::id_type* result, int item, int maxitems);
+        threads::thread_state alloc_data(naming::id_type* result, int item, 
+            int maxitems);
 
         /// The free function releases the memory allocated by init
-        threads::thread_state free_data(applier::applier&, 
-            naming::id_type const&);
+        threads::thread_state free_data(naming::id_type const&);
 
         /// The init function initializes this stencil point
-        threads::thread_state init(applier::applier&, std::size_t, 
-            naming::id_type const&);
+        threads::thread_state init(std::size_t, naming::id_type const&);
 
     private:
         std::size_t numsteps_;

@@ -5,8 +5,8 @@
 
 #ifndef BOOST_PP_IS_ITERATING
 
-#if !defined(HPX_APPLIER_APPLIER_IMPLEMENTATIONS_JUN_09_2008_0434PM)
-#define HPX_APPLIER_APPLIER_IMPLEMENTATIONS_JUN_09_2008_0434PM
+#if !defined(HPX_APPLIER_APPLY_IMPLEMENTATIONS_JUN_09_2008_0434PM)
+#define HPX_APPLIER_APPLY_IMPLEMENTATIONS_JUN_09_2008_0434PM
 
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
@@ -14,7 +14,7 @@
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
-    "hpx/runtime/applier/applier_implementations.hpp"))                       \
+    "hpx/runtime/applier/apply_implementations.hpp"))                         \
     /**/
     
 #include BOOST_PP_ITERATE()
@@ -41,7 +41,7 @@
         p.set_destination_addr(addr);   // avoid to resolve address again
 
         // Send the parcel through the parcel handler
-        parcel_handler_.put_parcel(p);
+        hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
         return false;     // destination is remote
     }
 
@@ -51,14 +51,13 @@
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (address_is_local(gid, addr))
+        if (hpx::applier::get_applier().address_is_local(gid, addr))
         {
-            BOOST_ASSERT(components::types_are_compatible(
-                addr.type_, Action::get_static_component_type()));
+            BOOST_ASSERT(components::types_are_compatible(addr.type_, 
+                components::get_component_type<typename Action::component_type>()));
             detail::BOOST_PP_CAT(apply_helper, N)<
                     Action, BOOST_PP_ENUM_PARAMS(N, Arg)
-            >::call(thread_manager_, *this, addr.address_,
-                BOOST_PP_ENUM_PARAMS(N, arg));
+            >::call(addr.address_, BOOST_PP_ENUM_PARAMS(N, arg));
             return true;     // no parcel has been sent (dest is local)
         }
 
@@ -82,7 +81,7 @@
         p.set_destination_addr(addr);   // avoid to resolve address again
 
         // Send the parcel through the parcel handler
-        parcel_handler_.put_parcel(p);
+        hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
         return false;     // destination is remote
     }
 
@@ -92,15 +91,14 @@
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (address_is_local(gid, addr))
+        if (hpx::applier::get_applier().address_is_local(gid, addr))
         {
-            BOOST_ASSERT(components::types_are_compatible(
-                addr.type_, Action::get_static_component_type()));
+            BOOST_ASSERT(components::types_are_compatible(addr.type_, 
+                components::get_component_type<typename Action::component_type>()));
             actions::continuation_type cont(c);
             detail::BOOST_PP_CAT(apply_helper, N)<
                     Action, BOOST_PP_ENUM_PARAMS(N, Arg)
-            >::call(cont, thread_manager_, *this, addr.address_,
-                BOOST_PP_ENUM_PARAMS(N, arg));
+            >::call(cont, addr.address_, BOOST_PP_ENUM_PARAMS(N, arg));
             return true;     // no parcel has been sent (dest is local)
         }
 

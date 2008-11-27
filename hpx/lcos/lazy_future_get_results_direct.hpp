@@ -31,21 +31,20 @@
 #define N BOOST_PP_ITERATION()
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    Result get(applier::applier& appl, naming::id_type const& gid, 
+    Result get(naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (appl.address_is_local(gid, addr)) {
+        if (hpx::applier::get_applier().address_is_local(gid, addr)) {
             // local, direct execution
-            BOOST_ASSERT(components::types_are_compatible(
-                addr.type_, Action::get_static_component_type()));
-            return Action::execute_function(appl, addr,
-                BOOST_PP_ENUM_PARAMS(N, arg));
+            BOOST_ASSERT(components::types_are_compatible(addr.type_, 
+                components::get_component_type<typename Action::component_type>()));
+            return Action::execute_function(addr, BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
         // initialize the remote operation
-        appl.apply_c<Action>(addr, this->get_gid(appl), gid, 
+        hpx::applier::apply_c<Action>(addr, this->get_gid(), gid, 
             BOOST_PP_ENUM_PARAMS(N, arg));
 
         // wait for the result (yield control)

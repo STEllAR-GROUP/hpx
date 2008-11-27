@@ -743,7 +743,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\hpx\runtime\applier\applier_implementations.hpp"
+						RelativePath="..\..\..\hpx\runtime\applier\apply.hpp"
 						>
 					</File>
 					<File
@@ -752,6 +752,10 @@
 					</File>
 					<File
 						RelativePath="..\..\..\hpx\runtime\applier\apply_helper_implementations.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\applier\apply_implementations.hpp"
 						>
 					</File>
 				</Filter>

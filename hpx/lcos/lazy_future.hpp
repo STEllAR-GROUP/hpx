@@ -83,8 +83,6 @@ namespace hpx { namespace lcos
         /// returned and the waiting thread has been re-scheduled by the thread
         /// manager the function \a lazy_future#get will return.
         ///
-        /// \param appl   [in] The \a applier instance to be used to execute 
-        ///               the embedded action.
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
         ///
@@ -92,10 +90,10 @@ namespace hpx { namespace lcos
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
-        Result get(applier::applier& appl, naming::id_type const& gid) const
+        Result get(naming::id_type const& gid) const
         {
             // initialize the operation
-            appl.apply_c<Action>(this->get_gid(appl), gid);
+            apply_c<Action>(this->get_gid(), gid);
 
             // wait for the result (yield control)
             return (*this->impl_)->get_data(0);
@@ -106,10 +104,6 @@ namespace hpx { namespace lcos
         /// returned and the waiting thread has been re-scheduled by the thread
         /// manager the function \a lazy_future#get will return.
         ///
-        /// \param self   [in] The \a thread which will be unconditionally
-        ///               blocked (yielded) while waiting for the result. 
-        /// \param appl   [in] The \a applier instance to be used to execute 
-        ///               the embedded action.
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the 
@@ -120,11 +114,10 @@ namespace hpx { namespace lcos
         ///               exception encapsulating the reported error code and 
         ///               error description.
         template <typename Arg0>
-        Result get(applier::applier& appl, naming::id_type const& gid,
-            Arg0 const& arg0) const
+        Result get(naming::id_type const& gid, Arg0 const& arg0) const
         {
             // initialize the operation
-            appl.apply_c<Action>(this->get_gid(appl), gid, arg0);
+            apply_c<Action>(this->get_gid(), gid, arg0);
 
             // wait for the result (yield control)
             return (*this->impl_)->get_data(0);
@@ -163,10 +156,6 @@ namespace hpx { namespace lcos
         /// returned and the waiting thread has been re-scheduled by the thread
         /// manager the function \a lazy_future#get will return.
         ///
-        /// \param self   [in] The \a thread which will be unconditionally
-        ///               blocked (yielded) while waiting for the result. 
-        /// \param appl   [in] The \a applier instance to be used to execute 
-        ///               the embedded action.
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
         ///
@@ -174,19 +163,19 @@ namespace hpx { namespace lcos
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
-        Result get(applier::applier& appl, naming::id_type const& gid) const
+        Result get(naming::id_type const& gid) const
         {
             // Determine whether the gid is local or remote
             naming::address addr;
-            if (appl.address_is_local(gid, addr)) {
+            if (hpx::applier::get_applier().address_is_local(gid, addr)) {
                 // local, direct execution
-                BOOST_ASSERT(components::types_are_compatible(
-                    addr.type_, Action::get_static_component_type()));
-                return Action::execute_function(appl, addr);
+                BOOST_ASSERT(components::types_are_compatible(addr.type_, 
+                    components::get_component_type<typename Action::component_type>()));
+                return Action::execute_function(addr);
             }
 
             // initialize the remote operation
-            appl.apply_c<Action>(addr, this->get_gid(appl), gid);
+            hpx::applier::apply_c<Action>(addr, this->get_gid(), gid);
 
             // wait for the result (yield control)
             return (*this->impl_)->get_data(0);
@@ -197,10 +186,6 @@ namespace hpx { namespace lcos
         /// returned and the waiting thread has been re-scheduled by the thread
         /// manager the function \a lazy_future#get will return.
         ///
-        /// \param self   [in] The \a thread which will be unconditionally
-        ///               blocked (yielded) while waiting for the result. 
-        /// \param appl   [in] The \a applier instance to be used to execute 
-        ///               the embedded action.
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the 
@@ -211,20 +196,19 @@ namespace hpx { namespace lcos
         ///               exception encapsulating the reported error code and 
         ///               error description.
         template <typename Arg0>
-        Result get(applier::applier& appl, naming::id_type const& gid,
-            Arg0 const& arg0) const
+        Result get(naming::id_type const& gid, Arg0 const& arg0) const
         {
             // Determine whether the gid is local or remote
             naming::address addr;
-            if (appl.address_is_local(gid, addr)) {
+            if (hpx::applier::get_applier().address_is_local(gid, addr)) {
                 // local, direct execution
-                BOOST_ASSERT(components::types_are_compatible(
-                    addr.type_, Action::get_static_component_type()));
-                return Action::execute_function(appl, addr.address_, arg0);
+                BOOST_ASSERT(components::types_are_compatible(addr.type_, 
+                    components::get_component_type<typename Action::component_type>()));
+                return Action::execute_function(addr.address_, arg0);
             }
 
             // initialize the remote operation
-            appl.apply_c<Action>(addr, this->get_gid(appl), gid, arg0);
+            hpx::applier::apply_c<Action>(addr, this->get_gid(), gid, arg0);
 
             // wait for the result (yield control)
             return (*this->impl_)->get_data(0);

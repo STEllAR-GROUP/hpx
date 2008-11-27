@@ -74,9 +74,9 @@ namespace hpx { namespace lcos
         ///               the embedded action.
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
-        void apply(applier::applier& appl, naming::id_type const& gid)
+        void apply(naming::id_type const& gid)
         {
-            appl.apply_c<Action>(this->get_gid(appl), gid);
+            hpx::applier::apply_c<Action>(this->get_gid(), gid);
         }
 
         /// Construct a new \a eager_future instance. The \a thread 
@@ -84,8 +84,6 @@ namespace hpx { namespace lcos
         /// notified as soon as the result of the operation associated with 
         /// this eager_future instance has been returned.
         /// 
-        /// \param appl   [in] The \a applier instance to be used to execute 
-        ///               the embedded action.
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
         ///
@@ -96,25 +94,22 @@ namespace hpx { namespace lcos
         ///               target for either of these actions has to be this 
         ///               eager_future instance (as it has to be sent along 
         ///               with the action as the continuation parameter).
-        eager_future(applier::applier& appl, naming::id_type const& gid)
+        eager_future(naming::id_type const& gid)
         {
-            apply(appl, gid);
+            apply(gid);
         }
 
         /// The apply function starts the asynchronous operations encapsulated
         /// by this eager future.
         ///
-        /// \param appl   [in] The \a applier instance to be used to execute 
-        ///               the embedded action.
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the 
         ///               apply operation for the embedded action.
         template <typename Arg0>
-        void apply(applier::applier& appl, naming::id_type const& gid,
-            Arg0 const arg0)
+        void apply(naming::id_type const& gid, Arg0 const arg0)
         {
-            appl.apply_c<Action>(this->get_gid(appl), gid, arg0);
+            hpx::applier::apply_c<Action>(this->get_gid(), gid, arg0);
         }
 
         /// Construct a new \a eager_future instance. The \a thread 
@@ -122,8 +117,6 @@ namespace hpx { namespace lcos
         /// notified as soon as the result of the operation associated with 
         /// this eager_future instance has been returned.
         ///
-        /// \param appl   [in] The \a applier instance to be used to execute 
-        ///               the embedded action.
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the 
@@ -137,10 +130,9 @@ namespace hpx { namespace lcos
         ///               eager_future instance (as it has to be sent along 
         ///               with the action as the continuation parameter).
         template <typename Arg0>
-        eager_future(applier::applier& appl, naming::id_type const& gid, 
-                Arg0 const& arg0)
+        eager_future(naming::id_type const& gid, Arg0 const& arg0)
         {
-            apply(appl, gid, arg0);
+            apply(gid, arg0);
         }
 
         // pull in remaining constructors
@@ -159,24 +151,22 @@ namespace hpx { namespace lcos
         /// The apply function starts the asynchronous operations encapsulated
         /// by this eager future.
         ///
-        /// \param appl   [in] The \a applier instance to be used to execute 
-        ///               the embedded action.
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
-        void apply(applier::applier& appl, naming::id_type const& gid)
+        void apply(naming::id_type const& gid)
         {
             // Determine whether the gid is local or remote
             naming::address addr;
-            if (appl.address_is_local(gid, addr)) {
+            if (hpx::applier::get_applier().address_is_local(gid, addr)) {
                 // local, direct execution
-                BOOST_ASSERT(components::types_are_compatible(
-                    addr.type_, Action::get_static_component_type()));
+                BOOST_ASSERT(components::types_are_compatible(addr.type_, 
+                    components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(0, 
-                    Action::execute_function(appl, addr.address_));
+                    Action::execute_function(addr.address_));
             }
             else {
                 // remote execution
-                appl.apply_c<Action>(addr, this->get_gid(appl), gid);
+                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid);
             }
         }
 
@@ -185,8 +175,6 @@ namespace hpx { namespace lcos
         /// notified as soon as the result of the operation associated with 
         /// this eager_future instance has been returned.
         ///
-        /// \param appl   [in] The \a applier instance to be used to execute 
-        ///               the embedded action.
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
         /// 
@@ -197,36 +185,33 @@ namespace hpx { namespace lcos
         ///               target for either of these actions has to be this 
         ///               eager_future instance (as it has to be sent along 
         ///               with the action as the continuation parameter).
-        eager_future(applier::applier& appl, naming::id_type const& gid)
+        eager_future(naming::id_type const& gid)
         {
-            apply(appl, gid);
+            apply(gid);
         }
 
         /// The apply function starts the asynchronous operations encapsulated
         /// by this eager future.
         ///
-        /// \param appl   [in] The \a applier instance to be used to execute 
-        ///               the embedded action.
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the 
         ///               apply operation for the embedded action.
         template <typename Arg0>
-        void apply(applier::applier& appl, naming::id_type const& gid,
-            Arg0 const& arg0)
+        void apply(naming::id_type const& gid, Arg0 const& arg0)
         {
             // Determine whether the gid is local or remote
             naming::address addr;
-            if (appl.address_is_local(gid, addr)) {
+            if (hpx::applier::get_applier().address_is_local(gid, addr)) {
                 // local, direct execution
-                BOOST_ASSERT(components::types_are_compatible(
-                    addr.type_, Action::get_static_component_type()));
+                BOOST_ASSERT(components::types_are_compatible(addr.type_, 
+                    components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(
-                    0, Action::execute_function(appl, addr.address_, arg0));
+                    0, Action::execute_function(addr.address_, arg0));
             }
             else {
                 // remote execution
-                appl.apply_c<Action>(addr, this->get_gid(appl), gid, arg0);
+                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid, arg0);
             }
         }
 
@@ -235,8 +220,6 @@ namespace hpx { namespace lcos
         /// notified as soon as the result of the operation associated with 
         /// this eager_future instance has been returned.
         ///
-        /// \param appl   [in] The \a applier instance to be used to execute 
-        ///               the embedded action.
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the 
@@ -250,10 +233,9 @@ namespace hpx { namespace lcos
         ///               eager_future instance (as it has to be sent along 
         ///               with the action as the continuation parameter).
         template <typename Arg0>
-        eager_future(applier::applier& appl, naming::id_type const& gid, 
-                Arg0 const& arg0)
+        eager_future(naming::id_type const& gid, Arg0 const& arg0)
         {
-            apply(appl, gid, arg0);
+            apply(gid, arg0);
         }
 
         // pull in remaining constructors

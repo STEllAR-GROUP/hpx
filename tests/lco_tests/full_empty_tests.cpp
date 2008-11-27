@@ -7,17 +7,15 @@
 #include <boost/detail/lightweight_test.hpp>
 
 #include <hpx/hpx.hpp>
-#include <hpx/components/accumulator/server/accumulator.hpp>
 
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state test1_helper(applier::applier& appl, 
-    hpx::util::full_empty<int>& data)
+threads::thread_state test1_helper(hpx::util::full_empty<int>& data)
 {
     // retrieve gid for this thread
-    naming::id_type gid = 
-        appl.get_thread_manager().get_thread_gid(threads::get_self().get_thread_id(), appl);
+    naming::id_type gid = applier::get_applier().get_thread_manager().
+            get_thread_gid(threads::get_self().get_thread_id());
     BOOST_TEST(gid);
 
     data.set(1);
@@ -26,11 +24,11 @@ threads::thread_state test1_helper(applier::applier& appl,
     return threads::terminated;
 }
 
-threads::thread_state test1(applier::applier& appl)
+threads::thread_state test1()
 {
     // retrieve gid for this thread
-    naming::id_type gid = 
-        appl.get_thread_manager().get_thread_gid(threads::get_self().get_thread_id(), appl);
+    naming::id_type gid = applier::get_applier().get_thread_manager().
+            get_thread_gid(threads::get_self().get_thread_id());
     BOOST_TEST(gid);
 
     // create a full_empty data item
@@ -38,7 +36,7 @@ threads::thread_state test1(applier::applier& appl)
     BOOST_TEST(data.is_empty());
 
     // schedule the helper thread
-    register_work(appl, boost::bind(&test1_helper, boost::ref(appl), boost::ref(data)));
+    applier::register_work(boost::bind(&test1_helper, boost::ref(data)));
 
     // wait for the other thread to set 'data' to full
     int value = 0;
@@ -57,18 +55,18 @@ threads::thread_state test1(applier::applier& appl)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(applier::applier& appl)
+threads::thread_state hpx_main()
 {
     // retrieve gid for this thread
-    naming::id_type gid = 
-        appl.get_thread_manager().get_thread_gid(threads::get_self().get_thread_id(), appl);
+    naming::id_type gid = applier::get_applier().get_thread_manager().
+            get_thread_gid(threads::get_self().get_thread_id());
     BOOST_TEST(gid);
 
     // schedule test threads: test1
-    register_work(appl, test1);
+    applier::register_work(test1);
 
     // initiate shutdown of the runtime system
-    components::stubs::runtime_support::shutdown_all(appl);
+    components::stubs::runtime_support::shutdown_all();
 
     return threads::terminated;
 }

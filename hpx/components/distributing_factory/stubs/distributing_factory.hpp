@@ -16,19 +16,8 @@ namespace hpx { namespace components { namespace stubs
     ///////////////////////////////////////////////////////////////////
     // The \a stubs#distributing_factory class is the client side 
     // representation of a \a server#distributing_factory component
-    class distributing_factory
-      : public stub_base<server::distributing_factory>
+    struct distributing_factory : stub_base<server::distributing_factory>
     {
-    private:
-        typedef stub_base<server::distributing_factory> base_type;
-
-    public:
-        /// Create a client side representation for any existing 
-        /// \a server#distributing_factory instance
-        distributing_factory(applier::applier& app) 
-          : base_type(app)
-        {}
-
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
         typedef server::distributing_factory::result_type result_type;
@@ -41,75 +30,44 @@ namespace hpx { namespace components { namespace stubs
         /// of this function to obtain the global ids of the newly created 
         /// objects.
         static lcos::future_value<result_type> create_components_async(
-            applier::applier& appl, naming::id_type const& targetgid, 
-            components::component_type type, std::size_t count) 
+            naming::id_type const& targetgid, components::component_type type, 
+            std::size_t count) 
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::distributing_factory::create_components_action action_type;
-            return lcos::eager_future<action_type, result_type>(appl, 
+            return lcos::eager_future<action_type, result_type>(
                 targetgid, type, count);
         }
 
         /// Create a number of new components of the given \a type distributed
         /// evenly over all available localities. Block for the creation to finish.
-        static result_type create_components(applier::applier& appl, 
-            naming::id_type const& targetgid, components::component_type type,
-            std::size_t count = 1) 
+        static result_type create_components(naming::id_type const& targetgid, 
+            components::component_type type, std::size_t count = 1) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future
-            return create_components_async(appl, targetgid, type, count).get();
-        }
-
-        ///
-        lcos::future_value<result_type> create_components_async(
-            naming::id_type const& targetgid, components::component_type type,
-            std::size_t count = 1) 
-        {
-            return create_components_async(appl_, targetgid, type, count);
-        }
-
-        /// 
-        result_type create_components(
-            naming::id_type const& targetgid, components::component_type type,
-            std::size_t count = 1) 
-        {
-            return create_components(appl_, targetgid, type, count);
+            return create_components_async(targetgid, type, count).get();
         }
 
         /// Free components 
-        static void free_components(applier::applier& appl, 
-            naming::id_type const& factory, result_type const& gids) 
-        {
-            typedef 
-                server::distributing_factory::free_components_action 
-            action_type;
-            appl.apply<action_type>(factory, gids, false);
-        }
-
-        ///
-        void free_components(naming::id_type const& factory, 
-            result_type const& gids) 
-        {
-            free_components(appl_, factory, gids);
-        }
-
-        static void free_components_sync(
-            applier::applier& appl, naming::id_type const& factory, 
+        static void free_components(naming::id_type const& factory, 
             result_type const& gids) 
         {
             typedef 
                 server::distributing_factory::free_components_action 
             action_type;
-            lcos::eager_future<action_type, void>(appl, factory, gids, true).get();
+            hpx::applier::apply<action_type>(factory, gids, false);
         }
 
-        ///
-        void free_components_sync(naming::id_type const& factory, result_type const& gids) 
+        static void free_components_sync(naming::id_type const& factory, 
+            result_type const& gids) 
         {
-            free_components_sync(appl_, factory, gids);
+            typedef 
+                server::distributing_factory::free_components_action 
+            action_type;
+            lcos::eager_future<action_type, void>(factory, gids, true).get();
         }
     };
 

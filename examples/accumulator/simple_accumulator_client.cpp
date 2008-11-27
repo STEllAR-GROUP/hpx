@@ -18,10 +18,11 @@ using namespace hpx;
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(applier::applier& appl)
+threads::thread_state hpx_main()
 {
     // get list of all known localities
     std::vector<naming::id_type> prefixes;
+    applier::applier& appl = applier::get_applier();
     naming::id_type prefix;
     if (appl.get_remote_prefixes(prefixes)) {
         // create accumulator on any of the remote localities
@@ -33,7 +34,7 @@ threads::thread_state hpx_main(applier::applier& appl)
     }
 
     using hpx::components::simple_accumulator;
-    simple_accumulator accu(simple_accumulator::create(appl, prefix));
+    simple_accumulator accu(simple_accumulator::create(prefix));
 
     // print some message
     std::cout << "simple accumulator client, you may enter some commands\n"
@@ -77,7 +78,7 @@ threads::thread_state hpx_main(applier::applier& appl)
     accu.free();     // this invalidates the remote reference
 
     // initiate shutdown of the runtime systems on all localities
-    components::stubs::runtime_support::shutdown_all(appl);
+    components::stubs::runtime_support::shutdown_all();
 
     return threads::terminated;
 }

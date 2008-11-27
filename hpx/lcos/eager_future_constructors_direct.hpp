@@ -31,29 +31,29 @@
 #define N BOOST_PP_ITERATION()
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    void apply(applier::applier& appl, naming::id_type const& gid, 
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+    void apply(naming::id_type const& gid, 
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         naming::address addr;
-        if (appl.address_is_local(gid, addr)) {
+        if (hpx::applier::get_applier().address_is_local(gid, addr)) {
             // local, direct execution
-            BOOST_ASSERT(components::types_are_compatible(
-                addr.type_, Action::get_static_component_type()));
+            BOOST_ASSERT(components::types_are_compatible(addr.type_, 
+                components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(0, Action::execute_function(
-                appl, addr.address_, BOOST_PP_ENUM_PARAMS(N, arg)));
+                addr.address_, BOOST_PP_ENUM_PARAMS(N, arg)));
         }
         else {
             // remote execution
-            appl.apply_c<Action>(addr, this->get_gid(appl), gid, 
+            hpx::applier::apply_c<Action>(addr, this->get_gid(), gid, 
                 BOOST_PP_ENUM_PARAMS(N, arg));
         }
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    eager_future(applier::applier& appl, naming::id_type const& gid, 
+    eager_future(naming::id_type const& gid, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        apply(appl, gid, BOOST_PP_ENUM_PARAMS(N, arg));
+        apply(gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
 #undef N

@@ -20,10 +20,11 @@ using namespace hpx;
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(applier::applier& appl)
+threads::thread_state hpx_main()
 {
     // get list of all known localities
     std::vector<naming::id_type> prefixes;
+    applier::applier& appl = applier::get_applier();
     naming::id_type prefix;
     if (appl.get_remote_prefixes(prefixes)) {
         // create accumulator on any of the remote localities
@@ -35,12 +36,12 @@ threads::thread_state hpx_main(applier::applier& appl)
     }
 
     {
-        lcos::eager_future<generate_number_action> gen(appl, prefix);
-        appl.apply<print_number_action>(prefix, gen.get());
+        lcos::eager_future<generate_number_action> gen(prefix);
+        applier::apply<print_number_action>(prefix, gen.get());
     }
 
     // initiate shutdown of the runtime systems on all localities
-    components::stubs::runtime_support::shutdown_all(appl);
+    components::stubs::runtime_support::shutdown_all();
 
     return threads::terminated;
 }

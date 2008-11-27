@@ -29,15 +29,14 @@ namespace hpx { namespace components
         typedef this_component_type wrapped_type;
 
         /// \brief Construct an empty simple_component
-        simple_component_base(applier::applier& appl) 
-          : appl_(appl)
+        simple_component_base() 
         {}
 
         /// \brief Destruct a simple_component
         ~simple_component_base()
         {
             if (gid_)
-                appl_.get_agas_client().unbind(gid_);
+                hpx::applier::get_applier().get_agas_client().unbind(gid_);
         }
 
         /// \brief finalize() will be called just before the instance gets 
@@ -46,7 +45,7 @@ namespace hpx { namespace components
         /// \param self [in] The PX \a thread used to execute this function.
         /// \param appl [in] The applier to be used for finalization of the 
         ///             component instance. 
-        void finalize(applier::applier& appl) {}
+        void finalize() {}
 
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
@@ -70,15 +69,16 @@ namespace hpx { namespace components
         /// \returns      The global id (GID)  assigned to this instance of a 
         ///               component
         naming::id_type const&
-        get_gid(applier::applier& appl) const
+        get_gid() const
         {
             if (!gid_) 
             {
+                applier::applier& appl = hpx::applier::get_applier();
                 naming::address addr(appl.here(), 
                     this_component_type::get_component_type(), 
                     boost::uint64_t(static_cast<this_component_type const*>(this)));
-                gid_ = appl_.get_parcel_handler().get_next_id();
-                if (!appl_.get_agas_client().bind(gid_, addr))
+                gid_ = appl.get_parcel_handler().get_next_id();
+                if (!appl.get_agas_client().bind(gid_, addr))
                 {
                     HPX_OSSTREAM strm;
                     strm << gid_;
@@ -106,7 +106,6 @@ namespace hpx { namespace components
 
     private:
         mutable naming::id_type gid_;
-        applier::applier& appl_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -123,28 +122,22 @@ namespace hpx { namespace components
     public:
         typedef Component type_holder;
 
-        simple_component(applier::applier& appl)
-          : Component(appl)
-        {}
-
         /// \brief  The function \a create is used for allocation and 
         ///         initialization of instances of the derived components.
-        static Component* 
-        create(applier::applier& appl, std::size_t count)
+        static Component* create(std::size_t count)
         {
             // simple components can be created individually only
             BOOST_ASSERT(1 == count);
-            return new Component(appl);
+            return new Component();
         }
 
         /// \brief  The function \a destroy is used for destruction and 
         ///         de-allocation of instances of the derived components.
-        static void destroy(applier::applier& appl, Component* p, 
-            std::size_t count = 1)
+        static void destroy(Component* p, std::size_t count = 1)
         {
             // simple components can be deleted individually only
             BOOST_ASSERT(1 == count);
-            p->finalize(appl);
+            p->finalize();
             delete p;
         }
 

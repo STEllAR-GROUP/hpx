@@ -15,10 +15,10 @@ namespace hpx { namespace actions
 {
     // Call-back function for parcelHandler to call when new parcels are received
     void action_manager::fetch_parcel(
-        parcelset::parcelhandler& parcel_handler_, naming::address const& dest)
+        parcelset::parcelhandler& parcel_handler, naming::address const& dest)
     {
         parcelset::parcel p;
-        if (parcel_handler_.get_parcel(p))  // if new parcel is found
+        if (parcel_handler.get_parcel(p))  // if new parcel is found
         {
         // write this parcel to the log
             LPT_(info) << "action_manager: fetch_parcel: " << p;
@@ -29,7 +29,7 @@ namespace hpx { namespace actions
 
             if (0 == lva) {
             // a zero address references the local runtime support component
-                lva = applier_.get_runtime_support_gid().get_lsb();
+                lva = applier::get_applier().get_runtime_support_gid().get_lsb();
             }
 
         // decode the action-type in the parcel
@@ -45,17 +45,15 @@ namespace hpx { namespace actions
             if (!cont) {
             // no continuation is to be executed, register the plain action 
             // and the local-virtual address with the TM only
-                register_work(applier_, 
-                    act->get_thread_function(applier_, lva),
+                applier::register_work(act->get_thread_function(lva),
                     act->get_action_name());
             }
             else {
             // this parcel carries a continuation, register a wrapper which
             // first executes the original thread function as required by 
             // the action and triggers the continuations afterwards
-                register_work(applier_, 
-                    act->get_thread_function(cont, applier_, lva),
-                    act->get_action_name());
+                applier::register_work(
+                    act->get_thread_function(cont, lva), act->get_action_name());
             }
         }
     }

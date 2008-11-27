@@ -31,11 +31,11 @@
 #define N BOOST_PP_ITERATION()
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    Result get(applier::applier& appl, naming::id_type const& gid, 
+    Result get(naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         // initialize the remote operation
-        appl.apply_c<Action>(this->get_gid(appl), gid, 
+        hpx::applier::apply_c<Action>(this->get_gid(), gid, 
             BOOST_PP_ENUM_PARAMS(N, arg));
 
         // wait for the result (yield control)

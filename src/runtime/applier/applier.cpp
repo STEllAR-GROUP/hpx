@@ -6,6 +6,7 @@
 
 #include <hpx/include/applier.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
+#include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/lcos/eager_future.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -13,7 +14,7 @@ namespace hpx { namespace applier
 {
     // 
     lcos::future_value<naming::id_type> 
-    create_async(applier& appl, naming::id_type const& targetgid, 
+    create_async(naming::id_type const& targetgid, 
         components::component_type type, std::size_t count)
     {
         // Create a future_value, execute the required action, 
@@ -22,40 +23,33 @@ namespace hpx { namespace applier
         typedef 
             components::server::runtime_support::create_component_action
         action_type;
-        return lcos::eager_future<action_type>(appl, targetgid, type, count);
+        return lcos::eager_future<action_type>(targetgid, type, count);
     }
 
     // 
-    naming::id_type create(applier& appl, 
-        naming::id_type const& targetgid, components::component_type type,
-        std::size_t count)
+    naming::id_type create(naming::id_type const& targetgid, 
+        components::component_type type, std::size_t count)
     {
-        return create_async(appl, targetgid, type, count).get();
+        return create_async(targetgid, type, count).get();
     }
 
     //
-    void destroy (applier& appl, components::component_type type, 
-        naming::id_type const& gid)
+    void destroy (components::component_type type, naming::id_type const& gid)
     {
         typedef 
             components::server::runtime_support::free_component_action 
         action_type;
-        appl.apply<action_type>(appl.get_runtime_support_gid(), type, gid);
+        hpx::applier::apply<action_type>(
+            hpx::applier::get_applier().get_runtime_support_gid(), type, gid);
     }
 
-    threads::thread_id_type register_work(applier& appl,
+    ///////////////////////////////////////////////////////////////////////////
+    threads::thread_id_type register_work(
         boost::function<threads::thread_function_type> func,
         char const* desc, threads::thread_state state, bool run_now)
     {
-        return appl.get_thread_manager().register_work(func, desc, state, run_now);
-    }
-
-    threads::thread_id_type register_work(applier& appl,
-        full_thread_function_type* func, char const* desc, 
-        threads::thread_state state, bool run_now)
-    {
-        return appl.get_thread_manager().register_work(
-            boost::bind(func, boost::ref(appl)), desc, state, run_now);
+        return hpx::applier::get_applier().get_thread_manager().register_work(
+            func, desc, state, run_now);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -82,21 +76,21 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     thread_state set_thread_state(thread_id_type id, thread_state new_state)
     {
-        return applier::get_applier().get_thread_manager().set_state(id, new_state);
+        return hpx::applier::get_applier().get_thread_manager().set_state(id, new_state);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     thread_id_type set_thread_state(thread_id_type id, thread_state state, 
         boost::posix_time::ptime const& at_time)
     {
-        return applier::get_applier().get_thread_manager().set_state(at_time, id, state);
+        return hpx::applier::get_applier().get_thread_manager().set_state(at_time, id, state);
     }
 
     ///////////////////////////////////////////////////////////////////////
     thread_id_type set_thread_state(thread_id_type id, thread_state state,
         boost::posix_time::time_duration const& after)
     {
-        return applier::get_applier().get_thread_manager().set_state(after, id, state);
+        return hpx::applier::get_applier().get_thread_manager().set_state(after, id, state);
     }
 
 }}

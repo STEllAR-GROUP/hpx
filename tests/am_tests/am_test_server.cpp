@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
         // Create a new applier
         hpx::applier::applier app(ph, tm, 0, 0);
         // Create a new action-manager
-        hpx::actions::action_manager am(app);
+        hpx::actions::action_manager am;
 
         // Set console control handler to allow server to be stopped.
         //console_ctrl_function = 
@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
 ///////////////////////////////////////////////////////////////////////////////
 
         // Create a new accumulator object
-        hpx::components::server::accumulator accu(app);
+        hpx::components::server::accumulator accu;
         // Statically assign a new global-id, should be dynamically done in the future
         hpx::naming::id_type id(99);
         // Put together the host-name and the port-number of the locality

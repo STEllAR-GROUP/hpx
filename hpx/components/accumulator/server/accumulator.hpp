@@ -44,7 +44,7 @@ namespace hpx { namespace components { namespace server
         };
 
         // constructor: initialize accumulator value
-        accumulator(applier::applier&)
+        accumulator()
           : arg_(0)
         {}
 
@@ -52,24 +52,21 @@ namespace hpx { namespace components { namespace server
         // exposed functionality of this component
 
         /// Initialize the accumulator
-        threads::thread_state 
-        init (applier::applier& appl) 
+        threads::thread_state init () 
         {
             arg_ = 0;
             return threads::terminated;
         }
 
         /// Add the given number to the accumulator
-        threads::thread_state 
-        add (applier::applier& appl, double arg) 
+        threads::thread_state add (double arg) 
         {
             arg_ += arg;
             return threads::terminated;
         }
 
         /// Return the current value to the caller
-        threads::thread_state 
-        query (applier::applier& appl, double* result) 
+        threads::thread_state query (double* result) 
         {
             // this will be zero if the action got invoked without continuations
             if (result)
@@ -78,8 +75,7 @@ namespace hpx { namespace components { namespace server
         }
 
         /// Print the current value of the accumulator
-        threads::thread_state 
-        print (applier::applier& appl) 
+        threads::thread_state print () 
         {
             std::cout << arg_ << std::flush << std::endl;
             return threads::terminated;

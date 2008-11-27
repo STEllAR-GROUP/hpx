@@ -44,8 +44,7 @@ namespace hpx { namespace components { namespace server
     // return, whether more than one instance of the given component can be 
     // created at the same time
     threads::thread_state runtime_support::factory_properties(
-        applier::applier& app, int* factoryprops, 
-        components::component_type type)
+        int* factoryprops, components::component_type type)
     {
     // locate the factory for the requested component type
         component_map_type::const_iterator it = components_.find(type);
@@ -67,8 +66,7 @@ namespace hpx { namespace components { namespace server
 
     // create a new instance of a component
     threads::thread_state runtime_support::create_component(
-        applier::applier& appl, naming::id_type* gid, 
-        components::component_type type, std::size_t count)
+        naming::id_type* gid, components::component_type type, std::size_t count)
     {
     // locate the factory for the requested component type
         component_map_type::const_iterator it = components_.find(type);
@@ -83,7 +81,7 @@ namespace hpx { namespace components { namespace server
         }
 
     // create new component instance
-        naming::id_type id = (*it).second->create(appl, count);
+        naming::id_type id = (*it).second->create(count);
 
     // set result if requested
         if (0 != gid)
@@ -108,8 +106,7 @@ namespace hpx { namespace components { namespace server
 
     // delete an existing instance of a component
     threads::thread_state runtime_support::free_component(
-        applier::applier& appl, components::component_type type, 
-        naming::id_type const& gid)
+        components::component_type type, naming::id_type const& gid)
     {
     // locate the factory for the requested component type
         component_map_type::const_iterator it = components_.find(type);
@@ -125,7 +122,7 @@ namespace hpx { namespace components { namespace server
         }
 
     // destroy the component instance
-        (*it).second->destroy(appl, gid);
+        (*it).second->destroy(gid);
 
         LRT_(info) << "successfully destroyed component " << gid 
             << " of type: " << components::get_component_type_name(type);
@@ -133,7 +130,7 @@ namespace hpx { namespace components { namespace server
     }
 
     // Action: shut down this runtime system instance
-    threads::thread_state runtime_support::shutdown(applier::applier& app)
+    threads::thread_state runtime_support::shutdown()
     {
         // initiate system shutdown
         stop();
@@ -141,21 +138,21 @@ namespace hpx { namespace components { namespace server
     }
 
     // initiate system shutdown for all localities
-    threads::thread_state runtime_support::shutdown_all(applier::applier& app)
+    threads::thread_state runtime_support::shutdown_all()
     {
         std::vector<naming::id_type> prefixes;
-        app.get_agas_client().get_prefixes(prefixes);
+        applier::applier& appl = hpx::applier::get_applier();
+        appl.get_agas_client().get_prefixes(prefixes);
 
         // shut down all localities except the the local one
-        components::stubs::runtime_support rts(app);
         std::vector<naming::id_type>::iterator end = prefixes.end();
         for (std::vector<naming::id_type>::iterator it = prefixes.begin(); 
              it != end; ++it)
         {
-            if (naming::get_prefix_from_id(app.get_prefix()) !=
+            if (naming::get_prefix_from_id(appl.get_prefix()) !=
                 naming::get_prefix_from_id(*it))
             {
-                rts.shutdown(*it);
+                components::stubs::runtime_support::shutdown(*it);
             }
         }
 

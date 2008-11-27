@@ -10,7 +10,7 @@ using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
 // this is a empty test thread
-threads::thread_state null_thread(applier::applier& appl)
+threads::thread_state null_thread()
 {
 //     naming::id_type gid = 
 //         appl.get_thread_manager().get_thread_gid(self.get_thread_id(), appl);
@@ -18,16 +18,13 @@ threads::thread_state null_thread(applier::applier& appl)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(
-    applier::applier& appl, util::high_resolution_timer& timer,
+threads::thread_state hpx_main(util::high_resolution_timer& timer,
     std::size_t num_threads)
 {
     // schedule a couple of threads
     timer.restart();
-    threads::threadmanager& tm = appl.get_thread_manager();
     for (std::size_t i = 0; i < num_threads; ++i) {
-        tm.register_work(boost::bind(&null_thread, boost::ref(appl)),
-            "null_thread", threads::pending, false);
+        applier::register_work(null_thread, "null_thread", threads::pending, false);
     }
 //     double elapsed = timer.elapsed();
 //     std::cerr << "Elapsed time [s] for thread initialization of " 
@@ -36,10 +33,10 @@ threads::thread_state hpx_main(
 
     // start measuring
     timer.restart();
-    tm.do_some_work();
+    applier::get_applier().get_thread_manager().do_some_work();
 
     // initiate shutdown of the runtime system
-    components::stubs::runtime_support::shutdown_all(appl);
+    components::stubs::runtime_support::shutdown_all();
     return threads::terminated;
 }
 
@@ -82,7 +79,7 @@ int main(int argc, char* argv[])
         // the main thread will wait (block) for the shutdown action and 
         // the threadmanager is serving incoming requests in the meantime
         util::high_resolution_timer timer;
-        rt.run(boost::bind(hpx_main, _1, boost::ref(timer), num_hpx_threads), 
+        rt.run(boost::bind(hpx_main, boost::ref(timer), num_hpx_threads), 
             num_threads);
         double elapsed = timer.elapsed();
         std::cout << "Elapsed time [s] for " << num_hpx_threads 
