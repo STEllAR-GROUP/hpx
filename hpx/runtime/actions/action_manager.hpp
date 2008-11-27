@@ -21,13 +21,12 @@ namespace hpx { namespace actions
     {
     public:
         // Constructor
-        action_manager()
+        action_manager(applier::applier& appl)
         {
             // Need to register the call-back function in parcelHandler so that
             // when a new parcel is received, it calls action_manager's 
             // fetchNewParcel()
-            applier::get_applier().get_parcel_handler().
-                register_event_handler(boost::bind(
+            appl.get_parcel_handler().register_event_handler(boost::bind(
                     &action_manager::fetch_parcel, this, _1, _2), conn_);
         }
 

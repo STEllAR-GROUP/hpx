@@ -57,7 +57,8 @@ namespace hpx
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_),
         applier_(parcel_handler_, thread_manager_, 
-            boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_))
+            boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
+        action_manager_(applier_)
     {}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -71,7 +72,8 @@ namespace hpx
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_),
         applier_(parcel_handler_, thread_manager_, 
-            boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_))
+            boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
+        action_manager_(applier_)
     {}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -85,7 +87,8 @@ namespace hpx
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_),
         applier_(parcel_handler_, thread_manager_, 
-            boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_))
+            boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
+        action_manager_(applier_)
     {}
 
     ///////////////////////////////////////////////////////////////////////////
