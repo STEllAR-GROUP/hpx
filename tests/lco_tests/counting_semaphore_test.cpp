@@ -104,73 +104,67 @@ struct test_environment
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-threads::thread_state sem_wait1(threads::thread_self& self, 
-    applier::applier& appl, boost::shared_ptr<test_environment> env)
+threads::thread_state sem_wait1(boost::shared_ptr<test_environment> env)
 {
     ++env->counter_;
-    env->sem_.wait(self);
+    env->sem_.wait();
 
     // all of the 3 threads need to have incremented the counter
     BOOST_TEST(3 == env->counter_);
     return threads::terminated;
 }
 
-threads::thread_state sem_signal1(threads::thread_self& self, 
-    applier::applier& appl, boost::shared_ptr<test_environment> env)
+threads::thread_state sem_signal1(boost::shared_ptr<test_environment> env)
 {
-    env->sem_.signal(self, 3);    // we need to signal all 3 threads
+    env->sem_.signal(3);    // we need to signal all 3 threads
     return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state sem_wait2(threads::thread_self& self, 
-    applier::applier& appl, boost::shared_ptr<test_environment> env)
+threads::thread_state sem_wait2(boost::shared_ptr<test_environment> env)
 {
     // we wait for three other threads to signal this semaphore
-    env->sem_.wait(self, 3);
+    env->sem_.wait(3);
 
     // all of the 3 threads need to have incremented the counter
     BOOST_TEST(3 == env->counter_);
     return threads::terminated;
 }
 
-threads::thread_state sem_signal2(threads::thread_self& self, 
-    applier::applier& appl, boost::shared_ptr<test_environment> env)
+threads::thread_state sem_signal2(boost::shared_ptr<test_environment> env)
 {
     ++env->counter_;
-    env->sem_.signal(self);    // we need to signal the semaphore here
+    env->sem_.signal();    // we need to signal the semaphore here
     return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(threads::thread_self& self, 
-    applier::applier& appl)
+threads::thread_state hpx_main()
 {
     // create a semaphore, which which we will use to make 3 threads waiting 
     // for a fourth one
     boost::shared_ptr<test_environment> env1(new test_environment);
     
     // create the  threads which will have to wait on the semaphore
-    threads::threadmanager& tm = appl.get_thread_manager();
     for (std::size_t i = 0; i < 3; ++i) 
-        register_work(appl, boost::bind(&sem_wait1, _1, boost::ref(appl), env1));
+        applier::register_work(boost::bind(&sem_wait1, env1));
 
     // now create a thread signaling the semaphore
-    register_work(appl, boost::bind(&sem_signal1, _1, boost::ref(appl), env1));
-    
+    applier::register_work(boost::bind(&sem_signal1, env1));
+
     // the 2nd test does the opposite, it creates a semaphore, which which 
     // will be used to make 1 thread waiting for three other threads
     boost::shared_ptr<test_environment> env2(new test_environment);
 
     // now create a thread waiting on the semaphore
-    register_work(appl, boost::bind(&sem_wait2, _1, boost::ref(appl), env2));
+    applier::register_work(boost::bind(&sem_wait2, env2));
 
     // create the threads which will have to signal the semaphore
     for (std::size_t i = 0; i < 3; ++i) 
-        register_work(appl, boost::bind(&sem_signal2, _1, boost::ref(appl), env2));
+        applier::register_work(boost::bind(&sem_signal2, env2));
 
     // initiate shutdown of the runtime system
-    components::stubs::runtime_support::shutdown_all(appl);
+    components::stubs::runtime_support::shutdown_all();
 
     return threads::terminated;
 }
