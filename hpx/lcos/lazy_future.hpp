@@ -93,7 +93,7 @@ namespace hpx { namespace lcos
         Result get(naming::id_type const& gid) const
         {
             // initialize the operation
-            apply_c<Action>(this->get_gid(), gid);
+            hpx::applier::apply_c<Action>(this->get_gid(), gid);
 
             // wait for the result (yield control)
             return (*this->impl_)->get_data(0);
@@ -117,7 +117,7 @@ namespace hpx { namespace lcos
         Result get(naming::id_type const& gid, Arg0 const& arg0) const
         {
             // initialize the operation
-            apply_c<Action>(this->get_gid(), gid, arg0);
+            hpx::applier::apply_c<Action>(this->get_gid(), gid, arg0);
 
             // wait for the result (yield control)
             return (*this->impl_)->get_data(0);

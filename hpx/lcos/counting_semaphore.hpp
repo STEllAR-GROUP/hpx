@@ -62,9 +62,11 @@ namespace hpx { namespace lcos
         void wait(long count = 1)
         {
             mutex_type::scoped_lock l(mtx_);
-            threads::thread_self& self = threads::get_self();
 
             while (value_ < 0) {
+                // we need to get the self anew for each round as it might
+                // get executed in a different thread from the previous one
+                threads::thread_self& self = threads::get_self();
                 queue_.enqueue(self.get_thread_id());
 
                 util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
@@ -74,6 +76,9 @@ namespace hpx { namespace lcos
             value_ -= count;
 
             while (value_ < 0) {
+                // we need to get the self anew for each round as it might
+                // get executed in a different thread from the previous one
+                threads::thread_self& self = threads::get_self();
                 queue_.enqueue(self.get_thread_id());
 
                 util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
