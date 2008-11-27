@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
         hpx::applier::applier app(ph, tm, 0, 0);
 
         // Create a new action-manager
-        hpx::actions::action_manager am;
+        hpx::actions::action_manager am(app);
 
         // Set console control handler to allow client to be stopped.
         //console_ctrl_function = 

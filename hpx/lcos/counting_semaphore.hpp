@@ -33,7 +33,7 @@ namespace hpx { namespace lcos
     /// 
     /// Counting semaphores can be used for synchronizing multiple threads as 
     /// well: one thread waiting for several other threads to touch (signal) 
-    /// semaphore, or several threads waiting for one other thread to touch 
+    /// the semaphore, or several threads waiting for one other thread to touch 
     /// this semaphore.
     class counting_semaphore
     {
@@ -53,11 +53,11 @@ namespace hpx { namespace lcos
           : value_(value)
         {}
 
-        /// \brief Wait for the semaphore to be signalled
+        /// \brief Wait for the semaphore to be signaled
         ///
         /// \param count    [in] The value by which the internal lock count will 
         ///                 be decremented. At the same time this is the minimum 
-        ///                 value of the lock count at which th ethread is not 
+        ///                 value of the lock count at which the thread is not 
         ///                 yielded.
         void wait(long count = 1)
         {
