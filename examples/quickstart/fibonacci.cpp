@@ -55,7 +55,9 @@ fib (applier::applier& appl, int* result, naming::id_type prefix, int n)
     else {
         lcos::eager_future<fibonacci_action> n1(appl, prefix, prefix, n - 1);
         lcos::eager_future<fibonacci_action> n2(appl, prefix, prefix, n - 2);
-        *result = n1.get() + n2.get();
+        int r1 = n1.get();
+        int r2 = n2.get();
+        *result = r1 + r2;
     }
     return threads::terminated;
 }
@@ -77,7 +79,7 @@ threads::thread_state hpx_main(applier::applier& appl)
 
     {
         util::high_resolution_timer t;
-        lcos::eager_future<fibonacci_action> n(appl, prefix, prefix, 15);
+        lcos::eager_future<fibonacci_action> n(appl, prefix, prefix, 10);
         int result = n.get();
         double elapsed = t.elapsed();
         std::cout << "elapsed: " << elapsed << ", result: " << result << std::endl;

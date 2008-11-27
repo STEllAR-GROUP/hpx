@@ -240,7 +240,7 @@ namespace boost { namespace coroutines { namespace detail {
         }
         ~reset_self_on_exit()
         {
-            *impl_type::self_ = self_;
+            impl_type::set_self(self_);
         }
 
         coroutine_self* self_;

@@ -290,6 +290,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\external\coroutine\boost\coroutine\detail\coroutine_impl_impl.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\external\coroutine\boost\coroutine\detail\coroutine_traits.hpp"
 					>
 				</File>

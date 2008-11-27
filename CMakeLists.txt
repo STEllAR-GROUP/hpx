@@ -131,6 +131,7 @@ endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
+    add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
 endif()
 
 # additional preprocessor definitions

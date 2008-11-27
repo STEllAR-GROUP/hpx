@@ -12,7 +12,6 @@
 #include <boost/type_traits/alignment_of.hpp>
 #include <boost/type_traits/add_pointer.hpp>
 
-#include <hpx/util/static.hpp>
 #include <hpx/util/full_empty_store.hpp>
 
 namespace hpx { namespace util
@@ -27,12 +26,7 @@ namespace hpx { namespace util
             typedef detail::full_empty_store store_type;
             struct full_empty_tag {};
 
-            static store_type& get_store()
-            {
-                // ensure thread-safe initialization
-                util::static_<store_type, full_empty_tag> store;
-                return store.get();
-            }
+            HPX_EXPORT static store_type& get_store();
         };
     }
 

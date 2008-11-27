@@ -49,7 +49,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;HPX_EXPORTS;HPX_COMPONENT_NAME=$(ProjectName)"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;HPX_EXPORTS;HPX_COMPONENT_NAME=$(ProjectName);BOOST_COROUTINE_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -194,7 +194,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;HPX_EXPORTS;BOOST_ALL_DYN_LINK;HPX_COMPONENT_NAME=$(ProjectName)"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;HPX_EXPORTS;BOOST_ALL_DYN_LINK;HPX_COMPONENT_NAME=$(ProjectName);BOOST_COROUTINE_EXPORTS"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -323,6 +323,10 @@
 				>
 				<File
 					RelativePath="..\..\..\src\util\asio_util.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\util\full_empty_memory.cpp"
 					>
 				</File>
 				<File

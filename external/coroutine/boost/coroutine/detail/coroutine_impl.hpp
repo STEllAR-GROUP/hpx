@@ -41,6 +41,25 @@
 #include <boost/coroutine/detail/context_base.hpp>
 #include <boost/coroutine/detail/self.hpp>
 
+#include <boost/config.hpp>
+
+#if defined(BOOST_WINDOWS)
+# define BOOST_COROUTINE_SYMBOL_EXPORT      __declspec(dllexport)
+# define BOOST_COROUTINE_SYMBOL_IMPORT      __declspec(dllimport)
+#elif defined(BOOST_COROUTINE_GCC_HAVE_VISIBILITY)
+# define BOOST_COROUTINE_SYMBOL_EXPORT      __attribute__((visibility("default")))
+# define BOOST_COROUTINE_SYMBOL_IMPORT      __attribute__((visibility("default")))
+#else
+# define BOOST_COROUTINE_SYMBOL_EXPORT      /* empty */
+# define BOOST_COROUTINE_SYMBOL_IMPORT      /* empty */
+#endif
+
+#if defined(BOOST_COROUTINE_EXPORTS)
+# define  BOOST_COROUTINE_EXPORT       BOOST_COROUTINE_SYMBOL_EXPORT
+#else
+# define  BOOST_COROUTINE_EXPORT       BOOST_COROUTINE_SYMBOL_IMPORT
+#endif
+
 namespace boost { namespace coroutines { namespace detail {
         
   // This class augment the contest_base class with
@@ -131,9 +150,13 @@ namespace boost { namespace coroutines { namespace detail {
         return m_thread_id;
     }
 
-  public:
+  private:
     typedef detail::coroutine_self<coroutine_type> self_type;
     static boost::thread_specific_ptr<self_type*> self_;
+
+  public:
+    BOOST_COROUTINE_EXPORT static void set_self(self_type* self);
+    BOOST_COROUTINE_EXPORT static self_type* get_self();
 
   protected:
     void rebind(thread_id_type id)
@@ -221,10 +244,7 @@ namespace boost { namespace coroutines { namespace detail {
 
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::self self_type;
       boost::optional<self_type> self (coroutine_accessor::in_place(this));
-      if (NULL == super_type::self_.get())
-          super_type::self_.reset(new self_type* (&*self));
-      else
-          *super_type::self_ = &*self;
+      super_type::set_self(&*self);
 
       detail::unpack(m_fun, *this->args(), 
          detail::trait_tag<typename coroutine_type::arg_slot_traits>());
@@ -247,10 +267,7 @@ namespace boost { namespace coroutines { namespace detail {
 
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::self self_type;
       boost::optional<self_type> self (coroutine_accessor::in_place(this));
-      if (NULL == super_type::self_.get())
-          super_type::self_.reset(new self_type* (&*self));
-      else
-          *super_type::self_ = &*self;
+      super_type::set_self(&*self);
 
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::arg_slot_traits traits;
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::result_slot_type 

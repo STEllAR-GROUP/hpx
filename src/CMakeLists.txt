@@ -169,6 +169,7 @@ set (hpxlib_SOURCES
     ${hpx_SOURCE_DIR}/src/runtime/threads/threadmanager.cpp
     # util 
     ${hpx_SOURCE_DIR}/src/util/asio_util.cpp
+    ${hpx_SOURCE_DIR}/src/util/full_empty_memory.cpp
     ${hpx_SOURCE_DIR}/src/util/ini.cpp
     ${hpx_SOURCE_DIR}/src/util/io_service_pool.cpp
     ${hpx_SOURCE_DIR}/src/util/logging.cpp
@@ -184,6 +185,7 @@ endif()
 # yes, the main shared library contains components as well
 add_definitions(-DHPX_COMPONENT_NAME=hpx)
 add_definitions(-DHPX_EXPORTS)
+add_definitions(-DBOOST_COROUTINE_EXPORTS)
 
 # separate shared module containing our portable serialization archives
 set (hpxserializationlib_HEADERS
