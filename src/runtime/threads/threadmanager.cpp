@@ -11,6 +11,7 @@
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/block_profiler.hpp>
+#include <hpx/util/time_logger.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
@@ -438,14 +439,13 @@ namespace hpx { namespace threads
                    << num_px_threads << " HPX threads";
     }
 
-    struct tfunc_tag {};
-
     std::size_t threadmanager::tfunc_impl(std::size_t num_thread)
     {
 #if HPX_DEBUG != 0
         ++thread_count_;
 #endif
         std::size_t num_px_threads = 0;
+        util::time_logger tl("tfunc", num_thread, util::ref_time_.start_);
 
         // the thread with number zero is the master
         bool is_master_thread = (0 == num_thread) ? true : false;
@@ -457,7 +457,7 @@ namespace hpx { namespace threads
             // Get the next PX thread from the queue
             boost::shared_ptr<thread> thrd;
             if (work_items_.dequeue(&thrd)) {
-                util::block_profiler<tfunc_tag> bp("threadmanager::tfunc(inner loop)");
+                tl.tick();
 
                 // Only pending PX threads will be executed.
                 // Any non-pending PX threads are leftovers from a set_state() 
@@ -505,6 +505,8 @@ namespace hpx { namespace threads
                     // separate queue
                     terminated_items_.enqueue(thrd);
                 }
+
+                tl.tock();
             }
 
             // only one dedicated OS thread is allowed to acquire the 

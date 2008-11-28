@@ -628,6 +628,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\hpx\util\time_logger.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\util\unlock_lock.hpp"
 					>
 				</File>

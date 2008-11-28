@@ -130,6 +130,7 @@ set (hpxlib_HEADERS
     ${hpx_SOURCE_DIR}/hpx/util/safe_bool.hpp
     ${hpx_SOURCE_DIR}/hpx/util/serialize_sequence.hpp
     ${hpx_SOURCE_DIR}/hpx/util/static.hpp
+    ${hpx_SOURCE_DIR}/hpx/util/time_logger.hpp
     ${hpx_SOURCE_DIR}/hpx/util/unlock_lock.hpp
     ${hpx_SOURCE_DIR}/hpx/util/util.hpp)
 
