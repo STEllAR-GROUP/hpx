@@ -127,6 +127,35 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // this is required in order to use the logging library for timings
+    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(timing_level, filter_type, 
+        boost::logging::level::disable_all) 
+    BOOST_DEFINE_LOG(timing_logger, logger_type) 
+
+    // initialize logging for performance measurements
+    void init_timing_logs(util::section const& ini) 
+    {
+        std::string loglevel, logdest, logformat;
+
+        if (ini.has_section("hpx.timing.logging")) {
+            util::section const* logini = ini.get_section("hpx.timing.logging");
+            BOOST_ASSERT(NULL != logini);
+
+            loglevel = logini->get_entry("level");
+            logdest = logini->get_entry("destination");
+            logformat = detail::unescape(logini->get_entry("format"));
+        }
+
+        if (!loglevel.empty() && 
+            boost::logging::level::disable_all != detail::get_log_level(loglevel)) 
+        {
+            timing_logger()->writer().write(logformat, logdest);
+            timing_logger()->mark_as_initialized();
+            timing_level()->set_enabled(detail::get_log_level(loglevel));
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     BOOST_DEFINE_LOG_FILTER_WITH_ARGS(hpx_level, filter_type,
         boost::logging::level::disable_all) 
     BOOST_DEFINE_LOG(hpx_logger, logger_type) 
@@ -175,6 +204,16 @@ namespace hpx { namespace util
                         "format = ${HPX_LOGFORMAT:%time%($hh:$mm.$ss) [%idx%]|\\n}",
 #endif
 
+                        "[hpx.timing.logging]",
+                        "level = ${HPX_TIMING_LOGLEVEL:0}",
+                        "destination = ${HPX_TIMING_LOGDESTINATION:file(hpx.timing.$[system.pid].log)}",
+#if defined(BOOST_WINDOWS)
+                        "format = ${HPX_TIMING_LOGFORMAT:%time%($hh:$mm.$ss.$mili) [%idx%] [TIM] |\\n}",
+#else
+                        // the Boost.Log generates bogus milliseconds on Linux systems
+                        "format = ${HPX_TIMING_LOGFORMAT:%time%($hh:$mm.$ss) [%idx%] [TIM] |\\n}",
+#endif
+
                         "[hpx.agas.logging]",
                         "level = ${HPX_AGAS_LOGLEVEL:0}",
                         "destination = ${HPX_AGAS_LOGDESTINATION:file(hpx.agas.$[system.pid].log)}",
@@ -189,6 +228,7 @@ namespace hpx { namespace util
                 // initialize logging 
                 util::runtime_configuration ini(prefill);
                 util::init_agas_logs(ini);
+                util::init_timing_logs(ini);
                 util::init_hpx_logs(ini);
             }
             catch (std::exception const&) {

@@ -66,12 +66,13 @@ namespace hpx { namespace util
               boost::uint64_t start)
           : description_(description), thread_num_(thread_num), start_(start)
         {
-            times_.reserve(HPX_INITIAL_TIMES_SIZE);
+            if (LTIM_ENABLED(fatal)) 
+                times_.reserve(HPX_INITIAL_TIMES_SIZE);
         }
 
         ~time_logger()
         {
-            if (!LHPX_ENABLED(fatal)) 
+            if (!LTIM_ENABLED(fatal)) 
                 return;     // generate output only if logging is enabled
 
             std::string name(description_);
@@ -94,12 +95,14 @@ namespace hpx { namespace util
 
         void tick()
         {
-            times_.push_back(hrtimer_ticks());
+            if (LTIM_ENABLED(fatal)) 
+                times_.push_back(hrtimer_ticks());
         }
 
         void tock()
         {
-            times_.push_back(hrtimer_ticks());
+            if (LTIM_ENABLED(fatal)) 
+                times_.push_back(hrtimer_ticks());
         }
 
         struct ref_time

@@ -47,7 +47,7 @@ namespace hpx { namespace util
 
             ~accumulator_stats()
             {
-                LAUX_(fatal) << "profiler: " << description_ << ": "
+                LTIM_(fatal) << "profiler: " << description_ << ": "
                             << boost::accumulators::sum(totals_) << " (" 
                             << boost::accumulators::count(totals_) << ", " 
                             << boost::accumulators::mean(totals_) << ", " 
@@ -86,7 +86,7 @@ namespace hpx { namespace util
 
             ~accumulator_stats()
             {
-                LAUX_(fatal) << "profiler: " << description_ << ": "
+                LTIM_(fatal) << "profiler: " << description_ << ": "
                             << extract_count(totals_) << ", " 
                             << extract_mean(totals_);
             }

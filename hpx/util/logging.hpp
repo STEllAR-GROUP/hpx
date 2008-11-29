@@ -23,10 +23,25 @@ namespace hpx { namespace util
     #define LAGAS_(lvl)                                                       \
         BOOST_LOG_USE_LOG_IF_LEVEL(hpx::util::agas_logger(),                  \
             hpx::util::agas_level(), lvl)                                     \
+        << hpx::util::levelname(::boost::logging::level::lvl)                 \
     /**/
 
     #define LAGAS_ENABLED(lvl)                                                \
         hpx::util::agas_level()->is_enabled(::boost::logging::level::lvl)     \
+    /**/
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT BOOST_DECLARE_LOG_FILTER(timing_level, filter_type)
+    HPX_EXPORT BOOST_DECLARE_LOG(timing_logger, logger_type)
+
+    #define LTIM_(lvl)                                                        \
+        BOOST_LOG_USE_LOG_IF_LEVEL(hpx::util::timing_logger(),                \
+            hpx::util::timing_level(), lvl)                                   \
+        << hpx::util::levelname(::boost::logging::level::lvl)                 \
+    /**/
+
+    #define LTIM_ENABLED(lvl)                                                 \
+        hpx::util::timing_level()->is_enabled(::boost::logging::level::lvl)   \
     /**/
 
     ///////////////////////////////////////////////////////////////////////////
@@ -54,7 +69,7 @@ namespace hpx { namespace util
     #define LERR_(lvl)  LHPX_(lvl, " [ERR] ")   /* exception */
     #define LOSH_(lvl)  LHPX_(lvl, " [OSH] ")   /* one size heap */
     #define LPT_(lvl)   LHPX_(lvl, "  [PT] ")   /* parcel transport */
-    #define LAUX_(lvl)  LHPX_(lvl, " [AUX] ")   /* auxilliary */
+    #define LAUX_(lvl)  LHPX_(lvl, " [AUX] ")   /* auxiliary */
 
 ///////////////////////////////////////////////////////////////////////////////
 }}
