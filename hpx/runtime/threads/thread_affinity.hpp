@@ -6,13 +6,8 @@
 #if !defined(HPX_RUNTIME_THREAD_AFFINITY_NOV_11_2008_0711PM)
 #define HPX_RUNTIME_THREAD_AFFINITY_NOV_11_2008_0711PM
 
-#include <boost/config.hpp>
-#if !defined(BOOST_WINDOWS) && !defined(__APPLE__)
-// make sure on linux the nptl header get's included
-#include <nptl/pthread.h>
-#endif
-
 #include <hpx/hpx_fwd.hpp>
+#include <boost/thread.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
@@ -88,6 +83,8 @@ namespace hpx { namespace threads
     }
 
 #else
+
+    #include <pthread.h>
     #include <sched.h>    // declares the scheduling interface
 
     inline bool set_affinity(boost::thread& thrd, std::size_t num_thread)
@@ -96,6 +93,7 @@ namespace hpx { namespace threads
     }
     bool set_affinity(std::size_t num_thread)
     {
+#if defined(HAVE_PTHREAD_SETAFFINITY_NP)
         std::size_t num_of_cores = boost::thread::hardware_concurrency();
         if (0 == num_of_cores)
             num_of_cores = 1;     // assume one core
@@ -109,8 +107,11 @@ namespace hpx { namespace threads
             sleep(0);   // allow the OS to pick up the change
             return true;
         }
+#endif
         return false;
     }
+
+#endif
 
 }}
 

@@ -132,6 +132,12 @@ endif()
 if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
     add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
+    include(CheckSymbolExists)
+    check_symbol_exists(pthread_setaffinity_np "pthread.h"
+        HAVE_PTHREAD_SETAFFINITY_NP)
+    if(HAVE_PTHREAD_SETAFFINITY_NP)
+        add_definition(-DHAVE_PTHREAD_SETAFFINITY_NP)
+    endif()
 endif()
 
 # additional preprocessor definitions
