@@ -99,7 +99,8 @@ namespace hpx { namespace threads
         cpu_set_t cpu;
         CPU_ZERO(&cpu);
         CPU_SET(affinity, &cpu);
-        if (sched_setaffinity (0, sizeof(cpu), &cpu) == 0) {
+        if (0 == ::pthread_setaffinity_np(::pthread_self(), sizeof(cpu), &cpu))
+        {
             sleep(0);   // allow the OS to pick up the change
             return true;
         }
