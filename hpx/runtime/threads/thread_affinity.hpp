@@ -93,16 +93,27 @@ namespace hpx { namespace threads
     }
     bool set_affinity(std::size_t num_thread)
     {
-#if defined(HAVE_PTHREAD_SETAFFINITY_NP)
         std::size_t num_of_cores = boost::thread::hardware_concurrency();
         if (0 == num_of_cores)
             num_of_cores = 1;     // assume one core
-        std::size_t affinity = num_thread % num_of_cores;
 
         cpu_set_t cpu;
         CPU_ZERO(&cpu);
+#if defined(HAVE_PTHREAD_SETAFFINITY_NP)
+        // limit this thread to one of the cores
+        std::size_t affinity = num_thread % num_of_cores;
         CPU_SET(affinity, &cpu);
         if (0 == pthread_setaffinity_np(pthread_self(), sizeof(cpu), &cpu))
+        {
+            sleep(0);   // allow the OS to pick up the change
+            return true;
+        }
+#else
+        // allow this job to run on all cores
+        for (std::size_t i = 0; i < num_of_cores; ++i)
+            CPU_SET(i, &cpu);
+
+        if (0 == sched_setaffinity(0, sizeof(cpu), &cpu))
         {
             sleep(0);   // allow the OS to pick up the change
             return true;
