@@ -100,11 +100,24 @@ namespace hpx { namespace threads
         cpu_set_t cpu;
         CPU_ZERO(&cpu);
         CPU_SET(affinity, &cpu);
+#ifdef HAVE_PTHREAD_SETAFFINITY_NP 
+#ifndef P2_PTHREAD_SETAFFINITY
         if (0 == pthread_setaffinity_np(pthread_self(), sizeof(cpu), &cpu))
+#else
+        if (0 == pthread_setaffinity_np(pthread_self(), &cpu))
+#endif
+#else
+#if HAVE_SCHED_SETAFFINITY
+#ifndef P2_SCHED_SETAFFINITY
+        if (0 == sched_setaffinity(gettid(), sizeof(cpu), &cpu))
+#else
+        if (0 == sched_setaffinity(gettid(), &cpu))
+#endif
         {
             sleep(0);   // allow the OS to pick up the change
             return true;
         }
+#endif
         return false;
     }
 #endif
