@@ -10,6 +10,8 @@
 #include <boost/version.hpp>
 #include <boost/cstdint.hpp>
 
+#include <hpx/util/logging.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(__GNUC__) 
 
@@ -69,6 +71,9 @@ namespace hpx { namespace util
 
         ~time_logger()
         {
+            if (!LHPX_ENABLED(fatal)) 
+                return;     // generate output only if logging is enabled
+
             std::string name(description_);
             name += "." + boost::lexical_cast<std::string>(getpid());
             name += "." + boost::lexical_cast<std::string>(thread_num_);
