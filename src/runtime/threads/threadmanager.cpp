@@ -514,9 +514,8 @@ namespace hpx { namespace threads
             if (is_master_thread) {
                 {
                     mutex_type::scoped_lock lk(mtx_);
-                    if (add_new())
+                    if (add_new() || cleanup_terminated())
                         cond_.notify_all();
-                    cleanup_terminated();
                 }
 
                 // make sure to handle pending set_state requests
@@ -548,15 +547,16 @@ namespace hpx { namespace threads
                 // arrived in the meantime).
                 // Ask again if queues are empty to avoid race conditions (we 
                 // need to lock anyways...), this way no notify_all() gets lost
-                if (work_items_.empty() && active_set_state_.empty())
+                while (work_items_.empty() && active_set_state_.empty())
                 {
                     LTM_(info) << "tfunc(" << num_thread 
                                << "): queues empty, entering wait";
-                    cond_.wait(lk);
+                    bool timed_out = cond_.timed_wait(lk, boost::posix_time::milliseconds(5));
                     LTM_(info) << "tfunc(" << num_thread << "): exiting wait";
 
                     // make sure all pending new threads are properly queued
-                    add_new();
+                    if (add_new() || timed_out)
+                        break;
                 }
             }
         }

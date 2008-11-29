@@ -132,6 +132,8 @@ endif()
 if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
     add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
+
+    # check for availability of pthread_setaffinity_np()
     include(CheckSymbolExists)
     check_symbol_exists(pthread_setaffinity_np "pthread.h"
         HAVE_PTHREAD_SETAFFINITY_NP)

@@ -61,7 +61,7 @@ threads::thread_state fib (int* result, naming::id_type prefix, int n)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main()
+threads::thread_state hpx_main(int argument)
 {
     // get list of all known localities
     std::vector<naming::id_type> prefixes;
@@ -78,7 +78,7 @@ threads::thread_state hpx_main()
 
     {
         util::high_resolution_timer t;
-        lcos::eager_future<fibonacci_action> n(prefix, prefix, 10);
+        lcos::eager_future<fibonacci_action> n(prefix, prefix, argument);
         int result = n.get();
         double elapsed = t.elapsed();
         std::cout << "elapsed: " << elapsed << ", result: " << result << std::endl;
@@ -107,6 +107,8 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("threads,t", po::value<int>(), 
                 "the number of operating system threads to spawn for this"
                 "HPX locality")
+            ("value,v", po::value<int>(), 
+                "the number to be used as the argument to fib (default is 10)")
         ;
 
         po::store(po::command_line_parser(argc, argv)
@@ -175,6 +177,7 @@ int main(int argc, char* argv[])
         std::string hpx_host("localhost"), agas_host;
         boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
         int num_threads = 1;
+        int argument = 10;
 
         // extract IP address/port arguments
         if (vm.count("agas")) 
@@ -186,6 +189,9 @@ int main(int argc, char* argv[])
         if (vm.count("threads"))
             num_threads = vm["threads"].as<int>();
 
+        if (vm.count("value"))
+            argument = vm["value"].as<int>();
+
         // initialize and run the AGAS service, if appropriate
         std::auto_ptr<agas_server_helper> agas_server;
         if (vm.count("run_agas_server"))  // run the AGAS server instance here
@@ -193,7 +199,7 @@ int main(int argc, char* argv[])
 
         // initialize and start the HPX runtime
         hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port);
-        rt.run(hpx_main, num_threads);
+        rt.run(boost::bind(hpx_main, argument), num_threads);
     }
     catch (std::exception& e) {
         std::cerr << "fibonacci: std::exception caught: " << e.what() << "\n";
