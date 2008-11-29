@@ -166,7 +166,9 @@ namespace hpx { namespace components { namespace server
     {
         mutex_type::scoped_lock l(mtx_);
         stopped_ = false;
+        LRT_(info) << "runtime_support: about to enter wait state";
         condition_.wait(l);
+        LRT_(info) << "runtime_support: exiting wait state";
     }
 
     void runtime_support::stop()

@@ -528,7 +528,8 @@ namespace hpx { namespace threads
                 // no obvious work has to be done, so a lock won't hurt too much
                 mutex_type::scoped_lock lk(mtx_);
 
-                LTM_(info) << "tfunc(" << num_thread << "): queues empty";
+                LTM_(info) << "tfunc(" << num_thread << "): queues empty"
+                           << ", threads left: " << thread_map_.size();
 
                 // stop running after all PX threads have been terminated
                 if (!add_new() && !running_) {
