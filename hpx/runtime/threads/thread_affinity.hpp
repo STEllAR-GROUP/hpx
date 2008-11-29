@@ -6,12 +6,18 @@
 #if !defined(HPX_RUNTIME_THREAD_AFFINITY_NOV_11_2008_0711PM)
 #define HPX_RUNTIME_THREAD_AFFINITY_NOV_11_2008_0711PM
 
+#include <boost/config.hpp>
+#if !defined(BOOST_WINDOWS) && !defined(__APPLE__)
+// make sure on linux the nptl header get's included
+#include <nptl/pthread.h>
+#endif
+
 #include <hpx/hpx_fwd.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(BOOST_WINDOWS)
 
     bool set_affinity(boost::thread& thrd, std::size_t num_thread)
     {
@@ -82,8 +88,6 @@ namespace hpx { namespace threads
     }
 
 #else
-
-    #include <pthread.h>
     #include <sched.h>    // declares the scheduling interface
 
     inline bool set_affinity(boost::thread& thrd, std::size_t num_thread)
@@ -100,27 +104,13 @@ namespace hpx { namespace threads
         cpu_set_t cpu;
         CPU_ZERO(&cpu);
         CPU_SET(affinity, &cpu);
-#ifdef HAVE_PTHREAD_SETAFFINITY_NP 
-#ifndef P2_PTHREAD_SETAFFINITY
         if (0 == pthread_setaffinity_np(pthread_self(), sizeof(cpu), &cpu))
-#else
-        if (0 == pthread_setaffinity_np(pthread_self(), &cpu))
-#endif
-#else
-#if HAVE_SCHED_SETAFFINITY
-#ifndef P2_SCHED_SETAFFINITY
-        if (0 == sched_setaffinity(gettid(), sizeof(cpu), &cpu))
-#else
-        if (0 == sched_setaffinity(gettid(), &cpu))
-#endif
         {
             sleep(0);   // allow the OS to pick up the change
             return true;
         }
-#endif
         return false;
     }
-#endif
 
 }}
 
