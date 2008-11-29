@@ -86,6 +86,8 @@ namespace hpx { namespace threads
 
     #include <pthread.h>
     #include <sched.h>    // declares the scheduling interface
+    #include <sys/syscall.h>
+    #include <sys/types.h>
 
     inline bool set_affinity(boost::thread& thrd, std::size_t num_thread)
     {
@@ -99,26 +101,19 @@ namespace hpx { namespace threads
 
         cpu_set_t cpu;
         CPU_ZERO(&cpu);
-#if defined(HAVE_PTHREAD_SETAFFINITY_NP)
+
         // limit this thread to one of the cores
         std::size_t affinity = num_thread % num_of_cores;
         CPU_SET(affinity, &cpu);
+#if defined(HAVE_PTHREAD_SETAFFINITY_NP)
         if (0 == pthread_setaffinity_np(pthread_self(), sizeof(cpu), &cpu))
-        {
-            sleep(0);   // allow the OS to pick up the change
-            return true;
-        }
 #else
-        // allow this job to run on all cores
-        for (std::size_t i = 0; i < num_of_cores; ++i)
-            CPU_SET(i, &cpu);
-
-        if (0 == sched_setaffinity(0, sizeof(cpu), &cpu))
+        if (0 == sched_setaffinity(syscall(SYS_gettid), sizeof(cpu), &cpu))
+#endif
         {
             sleep(0);   // allow the OS to pick up the change
             return true;
         }
-#endif
         return false;
     }
 
@@ -127,3 +122,4 @@ namespace hpx { namespace threads
 }}
 
 #endif
+
