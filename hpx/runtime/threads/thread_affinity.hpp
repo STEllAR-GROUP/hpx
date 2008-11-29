@@ -83,6 +83,7 @@ namespace hpx { namespace threads
 
 #else
 
+    #include <pthread.h>
     #include <sched.h>    // declares the scheduling interface
 
     inline bool set_affinity(boost::thread& thrd, std::size_t num_thread)
@@ -99,7 +100,7 @@ namespace hpx { namespace threads
         cpu_set_t cpu;
         CPU_ZERO(&cpu);
         CPU_SET(affinity, &cpu);
-        if (0 == ::pthread_setaffinity_np(::pthread_self(), sizeof(cpu), &cpu))
+        if (0 == pthread_setaffinity_np(pthread_self(), sizeof(cpu), &cpu))
         {
             sleep(0);   // allow the OS to pick up the change
             return true;
