@@ -523,7 +523,8 @@ namespace hpx { namespace threads
             }
 
             // if nothing else has to be done either wait or terminate
-            if (work_items_.empty() && active_set_state_.empty()) {
+            bool terminate = false;
+            while (work_items_.empty() && active_set_state_.empty()) {
                 // no obvious work has to be done, so a lock won't hurt too much
                 mutex_type::scoped_lock lk(mtx_);
 
@@ -536,6 +537,7 @@ namespace hpx { namespace threads
                     if (cleanup_terminated()) {
                         // we don't have any registered work items anymore
                         cond_.notify_all();   // notify possibly waiting threads
+                        terminate = true;
                         break;                // terminate scheduling loop
                     }
 
@@ -547,7 +549,7 @@ namespace hpx { namespace threads
                 // arrived in the meantime).
                 // Ask again if queues are empty to avoid race conditions (we 
                 // need to lock anyways...), this way no notify_all() gets lost
-                while (work_items_.empty() && active_set_state_.empty())
+                if (work_items_.empty() && active_set_state_.empty())
                 {
                     LTM_(info) << "tfunc(" << num_thread 
                                << "): queues empty, entering wait";
@@ -559,6 +561,8 @@ namespace hpx { namespace threads
                         break;
                 }
             }
+            if (terminate)
+                break;
         }
 
 #if HPX_DEBUG != 0
