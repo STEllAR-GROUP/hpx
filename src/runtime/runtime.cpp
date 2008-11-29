@@ -158,7 +158,9 @@ namespace hpx
         pthread_t id, boost::condition& cond)
     {
         cond.notify_all();
+        LRT_(info) << "runtime: about to enter wait_helper rts.wait()";
         rts.wait();
+        LRT_(info) << "runtime: exiting wait_helper rts.wait()";
         pthread_kill(id, SIGTERM);
     }
 #endif
@@ -190,13 +192,6 @@ namespace hpx
                 )
             );
 
-        // wait for the thread to run
-        boost::mutex mtx;
-        {
-            boost::is_mutex_type::scoped_lock lk(mtx);
-            cond.wait(lk);
-        }
-
         // Restore previous signals.
         pthread_sigmask(SIG_SETMASK, &old_mask, 0);
 
@@ -208,10 +203,18 @@ namespace hpx
         sigaddset(&wait_mask, SIGTERM);
         pthread_sigmask(SIG_BLOCK, &wait_mask, 0);
 
+        // wait for the thread to run
+        boost::mutex mtx;
+        {
+            boost::mutex::scoped_lock lk(mtx);
+            cond.wait(lk);
+        }
+
         // block main thread, this will exit as soon as Ctrl-C has been issued 
         // or any other signal has been received
         int sig = 0;
         sigwait(&wait_mask, &sig);
+        LRT_(info) << "runtime: exiting sigwait";
 
         t.join();
 #endif
