@@ -155,8 +155,9 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
 #if !defined(BOOST_WINDOWS)
     static void wait_helper(components::server::runtime_support& rts,
-        pthread_t id)
+        pthread_t id, boost::condition& cond)
     {
+        cond.notify_all();
         rts.wait();
         pthread_kill(id, SIGTERM);
     }
@@ -182,8 +183,19 @@ namespace hpx
         pthread_t id = pthread_self();
 
         // start the wait_helper in a separate thread
-        boost::thread t (
-            boost::bind(&wait_helper, boost::ref(runtime_support_), id));
+        boost::condition cond;
+        boost::thread t (boost::bind(
+                    &wait_helper, boost::ref(runtime_support_), id,
+                    boost::ref(cond)
+                )
+            );
+
+        // wait for the thread to run
+        boost::mutex mtx;
+        {
+            boost::is_mutex_type::scoped_lock lk(mtx);
+            cond.wait(lk);
+        }
 
         // Restore previous signals.
         pthread_sigmask(SIG_SETMASK, &old_mask, 0);
