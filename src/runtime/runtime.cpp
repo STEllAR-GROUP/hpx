@@ -212,10 +212,8 @@ namespace hpx
 
         // block main thread, this will exit as soon as Ctrl-C has been issued 
         // or any other signal has been received
-        int sig = 0;
-        sigwait(&wait_mask, &sig);
-        LRT_(info) << "runtime: exiting sigwait";
-
+//        int sig = 0;
+//        sigwait(&wait_mask, &sig);
         t.join();
 #endif
         LRT_(info) << "runtime: exiting wait state";
