@@ -176,8 +176,8 @@ namespace hpx { namespace components { namespace server
     {
         mutex_type::scoped_lock l(mtx_);
         if (!stopped_) {
-            condition_.notify_all();
             stopped_ = true;
+            condition_.notify_all();
         }
     }
 

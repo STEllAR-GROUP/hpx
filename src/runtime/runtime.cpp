@@ -155,13 +155,17 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
 #if !defined(BOOST_WINDOWS)
     static void wait_helper(components::server::runtime_support& rts,
-        pthread_t id, boost::condition& cond)
+        boost::mutex& mtx, boost::condition& cond, bool& running)
     {
-        cond.notify_all();
-        LRT_(info) << "runtime: about to enter wait_helper rts.wait()";
+        // signal successful initialization
+        {
+            boost::mutex::scoped_lock lk(mtx);
+            running = true;
+            cond.notify_all();
+        }
+
+        // wait for termination
         rts.wait();
-        LRT_(info) << "runtime: exiting wait_helper rts.wait()";
-        pthread_kill(id, SIGTERM);
     }
 #endif
 
@@ -177,43 +181,24 @@ namespace hpx
         // wait for the shutdown action to be executed
         runtime_support_.wait();
 #else
-        // Block all signals for background thread.
-        sigset_t new_mask;
-        sigfillset(&new_mask);
-        sigset_t old_mask;
-        pthread_sigmask(SIG_BLOCK, &new_mask, &old_mask);
-        pthread_t id = pthread_self();
-
         // start the wait_helper in a separate thread
+        boost::mutex mtx;
         boost::condition cond;
+        bool running = false;
         boost::thread t (boost::bind(
-                    &wait_helper, boost::ref(runtime_support_), id,
-                    boost::ref(cond)
+                    &wait_helper, boost::ref(runtime_support_), 
+                    boost::ref(mtx), boost::ref(cond), boost::ref(running)
                 )
             );
 
-        // Restore previous signals.
-        pthread_sigmask(SIG_SETMASK, &old_mask, 0);
-
-        // Wait for signal from waiting thread indicating time to shut down.
-        sigset_t wait_mask;
-        sigemptyset(&wait_mask);
-        sigaddset(&wait_mask, SIGINT);
-        sigaddset(&wait_mask, SIGQUIT);
-        sigaddset(&wait_mask, SIGTERM);
-        pthread_sigmask(SIG_BLOCK, &wait_mask, 0);
-
         // wait for the thread to run
-        boost::mutex mtx;
         {
             boost::mutex::scoped_lock lk(mtx);
-            cond.wait(lk);
+            if (!running)
+                cond.wait(lk);
         }
 
-        // block main thread, this will exit as soon as Ctrl-C has been issued 
-        // or any other signal has been received
-//        int sig = 0;
-//        sigwait(&wait_mask, &sig);
+        // block main thread
         t.join();
 #endif
         LRT_(info) << "runtime: exiting wait state";
