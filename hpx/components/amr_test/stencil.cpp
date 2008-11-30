@@ -26,14 +26,14 @@ namespace hpx { namespace components { namespace amr
         BOOST_ASSERT(gids.size() == 3);
 
         // start asynchronous get operations
-        components::stubs::memory_block stub;
 
         // get all input memory_block_data instances
         access_memory_block<timestep_data> val1, val2, val3, resultval;
         boost::tie(val1, val2, val3, resultval) = 
-            wait(stub.get_async(gids[0]), 
-                stub.get_async(gids[1]), stub.get_async(gids[2]),
-                stub.get_async(result));
+            wait(components::stubs::memory_block::get_async(gids[0]), 
+                 components::stubs::memory_block::get_async(gids[1]), 
+                 components::stubs::memory_block::get_async(gids[2]),
+                 components::stubs::memory_block::get_async(result));
 
         // make sure all input data items agree on the time step number
         BOOST_ASSERT(val1->timestep_ == val2->timestep_);

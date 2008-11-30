@@ -203,13 +203,24 @@ set (hpxserializationlib_SOURCES
     util/portable_binary_iarchive.cpp
     util/portable_binary_oarchive.cpp)
 
-# build instructions
+# build instructions for serialization support library
 add_library(hpx_serialization SHARED 
     ${hpxserializationlib_SOURCES} ${hpxserializationlib_HEADERS})
+set_target_properties(hpx_serialization PROPERTIES
+    VERSION ${HPX_VERSION}      # create *nix style library versions + symbolic links
+    SOVERSION ${HPX_SOVERSION}
+    CLEAN_DIRECT_OUTPUT 1       # allow creating static and shared libs without conflicts
+    OUTPUT_NAME ${component_LIBRARY_PREFIX}hpx_serialization)
 target_link_libraries(hpx_serialization ${Boost_LIBRARIES})
 
+# build instructions for main shared HPX library
 add_library(hpx SHARED 
     ${hpxlib_SOURCES} ${hpxlib_HEADERS})
+set_target_properties(hpx PROPERTIES
+    VERSION ${HPX_VERSION}      # create *nix style library versions + symbolic links
+    SOVERSION ${HPX_SOVERSION}
+    CLEAN_DIRECT_OUTPUT 1       # allow creating static and shared libs without conflicts
+    OUTPUT_NAME ${component_LIBRARY_PREFIX}hpx)
 target_link_libraries(hpx hpx_serialization ${Boost_LIBRARIES})
 
 # installation instructions
@@ -222,11 +233,3 @@ install(TARGETS hpx hpx_serialization
                 WORLD_READ WORLD_EXECUTE)
 
 
-#set_target_properties(lib_${PROJECT_NAME} PROPERTIES
-# create *nix style library versions + symbolic links
-#   VERSION ${${PROJECT_NAME}_VERSION}
-#   SOVERSION ${${PROJECT_NAME}_SOVERSION}
-# allow creating static and shared libs without conflicts
-#   CLEAN_DIRECT_OUTPUT 1
-# avoid conflicts between library and binary target names
-#   OUTPUT_NAME ${PROJECT_NAME})

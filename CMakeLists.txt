@@ -20,6 +20,7 @@ set(HPX_MAJOR_VERSION 0)
 set(HPX_MINOR_VERSION 2)
 set(HPX_PATCH_LEVEL   0)
 set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
+set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
 
 # We have a patched BoostFIND module, and other files to include, look for 
 # these in our misc directory

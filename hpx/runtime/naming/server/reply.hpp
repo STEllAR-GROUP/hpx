@@ -102,7 +102,7 @@ namespace hpx { namespace naming { namespace server
                          command == command_statistics_moment2);
             
             for (std::size_t i = 0; i < command_lastcommand; ++i)
-                statistics_.push_back(f(totals[i]));
+                statistics_.push_back(double(f(totals[i])));
         }
 
         reply (agas_server_command command, naming::address addr)

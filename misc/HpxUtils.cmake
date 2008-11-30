@@ -107,8 +107,14 @@ macro(ADD_HPX_COMPONENT name)
     add_library (${name}_component SHARED 
         ${${name}_SOURCES} 
         ${${name}_HEADERS})
+
+    # set properties of generated shared library
     set_target_properties(${name}_component PROPERTIES
+        VERSION ${HPX_VERSION}      # create *nix style library versions + symbolic links
+        SOVERSION ${HPX_SOVERSION}
+        CLEAN_DIRECT_OUTPUT 1       # allow creating static and shared libs without conflicts
         OUTPUT_NAME ${component_LIBRARY_PREFIX}${name})
+
     target_link_libraries(${name}_component 
         ${${name}_DEPENDENCIES}
         ${hpx_LIBRARIES} ${Boost_LIBRARIES})
@@ -153,7 +159,13 @@ macro(ADD_HPX_EXECUTABLE name)
 
     # avoid conflicts between source and binary target names
     set_target_properties(${name}_exe PROPERTIES
-        OUTPUT_NAME ${name}${CMAKE_DEBUG_POSTFIX})
+        DEBUG_OUTPUT_NAME ${name}${CMAKE_DEBUG_POSTFIX})
+    set_target_properties(${name}_exe PROPERTIES
+        RELEASE_OUTPUT_NAME ${name})
+    set_target_properties(${name}_exe PROPERTIES
+        RELWITHDEBINFO_OUTPUT_NAME ${name})
+    set_target_properties(${name}_exe PROPERTIES
+        MINSIZEREL_OUTPUT_NAME ${name})
 
     # linker instructions
     target_link_libraries(
