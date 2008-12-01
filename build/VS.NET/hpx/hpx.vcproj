@@ -326,10 +326,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\src\util\full_empty_memory.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\src\util\ini.cpp"
 					>
 				</File>

@@ -8,28 +8,11 @@
 
 #include <boost/noncopyable.hpp>
 #include <boost/call_traits.hpp>
-#include <boost/aligned_storage.hpp>
-#include <boost/type_traits/alignment_of.hpp>
-#include <boost/type_traits/add_pointer.hpp>
 
 #include <hpx/util/full_empty_store.hpp>
 
 namespace hpx { namespace util
 {
-    namespace detail
-    {
-        class full_empty_base : boost::noncopyable
-        {
-        protected:
-            // there is exactly one empty/full store where all memory blocks are 
-            // stored
-            typedef detail::full_empty_store store_type;
-            struct full_empty_tag {};
-
-            HPX_EXPORT static store_type& get_store();
-        };
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     /// \class full_empty full_empty_memory.hpp hpx/lcos/full_empty_memory.hpp
     ///
@@ -67,7 +50,7 @@ namespace hpx { namespace util
     ///             without having to transfer (read/write) any data you can
     ///             use the specialization lcos#full_empty<void>.
     template <typename T>
-    class full_empty : public detail::full_empty_base
+    class full_empty 
     {
     private:
         typedef T value_type;
@@ -75,25 +58,16 @@ namespace hpx { namespace util
     public:
         /// \brief Create a new full/empty storage in empty state
         full_empty() 
-        {
-            ::new (get_address()) T();      // properly initialize memory
-            set_empty();
-        }
+        {}
 
         template <typename T0>
         full_empty(T0 const& t0) 
-        {
-            ::new (get_address()) T(t0);    // properly initialize memory
-            set_empty();
-        }
+          : data_(t0)
+        {}
 
         /// \brief Destruct the full/empty data item
         ~full_empty()
-        {
-            BOOST_ASSERT(!get_store().is_used(get_address()));
-            get_store().remove(get_address());
-            get_address()->T::~T();       // properly destruct value in memory
-        }
+        {}
 
         /// \brief Atomically set the state to empty without releasing any 
         ///        waiting \a threads. This function is mainly usable for
@@ -103,7 +77,7 @@ namespace hpx { namespace util
         ///          store if it doesn't exist yet.
         void set_empty()
         {
-            get_store().set_empty(get_address());
+            data_.set_empty();
         }
 
         /// \brief Atomically set the state to full without releasing any 
@@ -114,13 +88,13 @@ namespace hpx { namespace util
         ///          the store if it doesn't exist yet.
         void set_full()
         {
-            get_store().set_full(get_address());
+            data_.set_full();
         }
 
         /// \brief Query the current state of the memory
         bool is_empty() const
         {
-            return get_store().is_empty(get_address());
+            return data_.is_empty();
         }
 
         /// \brief  Waits for the memory to become full and then reads it, 
@@ -134,7 +108,7 @@ namespace hpx { namespace util
         template <typename Target>
         void read(Target& dest)
         {
-            get_store().read(get_address(), dest);
+            data_.enqueue_full_full(dest);
         }
 
         /// \brief  Waits for memory to become full and then reads it, sets 
@@ -148,7 +122,7 @@ namespace hpx { namespace util
         template <typename Target>
         void read_and_empty(Target& dest) 
         {
-            get_store().read_and_empty(get_address(), dest);
+            data_.enqueue_full_empty(dest);
         }
 
         /// \brief  Writes memory and atomically sets its state to full without 
@@ -160,7 +134,7 @@ namespace hpx { namespace util
         template <typename Target>
         void set(Target const& data)
         {
-            get_store().set(get_address(), data);
+            data_.set_and_fill(data);
         }
 
         /// \brief  Waits for memory to become empty, and then fills it. If the 
@@ -172,120 +146,11 @@ namespace hpx { namespace util
         template <typename Target>
         void write(Target const& data)
         {
-            get_store().write(get_address(), data);
+            data_.enqueue_if_full(data);
         }
 
     private:
-        // type safe accessors to the stored data
-        typedef typename boost::add_pointer<value_type>::type pointer;
-        typedef typename boost::add_pointer<value_type const>::type const_pointer;
-
-        pointer get_address()
-        {
-            return static_cast<pointer>(data_.address());
-        }
-        const_pointer get_address() const
-        {
-            return static_cast<const_pointer>(data_.address());
-        }
-
-        // the stored data needs to be properly aligned
-        typedef boost::aligned_storage<sizeof(value_type),
-            boost::alignment_of<value_type>::value> storage_type;
-
-        storage_type data_;
-    };
-
-    /// \class full_empty full_empty_memory.hpp hpx/lcos/full_empty_memory.hpp
-    /// The full_empty<void> is a specialization of the lcos#full_empty 
-    /// template which is useful mainly as a synchronization primitive.
-    template <>
-    class full_empty<void> : public detail::full_empty_base
-    {
-    public:
-        /// \brief Create a new full/empty storage in empty state
-        full_empty() 
-        {
-            set_empty();
-        }
-
-        /// \brief Destruct the full/empty data item
-        ~full_empty()
-        {
-            BOOST_ASSERT(!get_store().is_used(get_address()));
-            get_store().remove(get_address());
-        }
-
-        /// \brief Atomically set the state to empty without releasing any 
-        ///        waiting \a threads. This function is mainly usable for
-        ///        initialization and debugging purposes.
-        /// 
-        /// \note    This function will create a new full/empty entry in the 
-        ///          store if it doesn't exist yet.
-        void set_empty()
-        {
-            get_store().set_empty(get_address());
-        }
-
-        /// \brief Atomically set the state to full without releasing any 
-        ///        waiting \a threads. This function is mainly usable for
-        ///        initialization and debugging purposes.
-        /// 
-        /// \note    This function will not create a new full/empty entry in 
-        ///          the store if it doesn't exist yet.
-        void set_full()
-        {
-            get_store().set_full(get_address());
-        }
-
-        /// \brief Query the current state of the memory
-        bool is_empty() const
-        {
-            return get_store().is_empty(get_address());
-        }
-
-        /// Wait for the memory to become full, leaves memory in full state.
-        ///
-        /// \note When memory becomes full, all \a threads waiting for it
-        ///       to become full with a read will be queued to run.
-        void read()
-        {
-            get_store().read(get_address());
-        }
-
-        /// Wait for memory to become full, sets memory to empty.
-        ///
-        /// \note When memory becomes empty, only one thread blocked like this 
-        ///       will be queued to run (one thread waiting in a \a write 
-        ///       function).
-        void read_and_empty() 
-        {
-            return get_store().read_and_empty(get_address());
-        }
-
-        /// \brief Writes memory and atomically sets its state to full without 
-        ///        waiting for it to become empty.
-        /// 
-        /// \note  Even if the function itself doesn't block, setting the 
-        ///        location to full using \a set might re-activate threads 
-        ///        waiting on this in a \a read or \a read_and_empty function.
-        void set()
-        {
-            get_store().set(get_address());
-        }
-
-        /// Wait for memory to become empty, and then fill it.
-        ///
-        /// \note When memory becomes empty only one thread blocked like this 
-        ///       will be queued to run.
-        void write()
-        {
-            get_store().write(get_address());
-        }
-
-    private:
-        void* get_address() { return this; }
-        void const* get_address() const { return this; }
+        detail::full_empty_entry<T> data_;
     };
 
 }}

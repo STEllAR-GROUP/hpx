@@ -6,8 +6,6 @@
 #if !defined(HPX_UTIL_FULLEMPTYSTORE_JUN_16_2008_0128APM)
 #define HPX_UTIL_FULLEMPTYSTORE_JUN_16_2008_0128APM
 
-#include <set>
-#include <queue>
 #include <memory>
 
 #include <hpx/hpx_fwd.hpp>
@@ -15,6 +13,9 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <boost/thread.hpp>
+#include <boost/aligned_storage.hpp>
+#include <boost/type_traits/alignment_of.hpp>
+#include <boost/type_traits/add_pointer.hpp>
 #include <boost/thread/shared_mutex.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/intrusive/slist.hpp>
@@ -30,6 +31,7 @@ namespace hpx { namespace util { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Data>
     class full_empty_entry
     {
     private:
@@ -52,7 +54,8 @@ namespace hpx { namespace util { namespace detail
         };
 
         typedef boost::intrusive::member_hook<
-            full_empty_queue_entry, full_empty_queue_entry::hook_type,
+            full_empty_queue_entry, 
+            typename full_empty_queue_entry::hook_type,
             &full_empty_queue_entry::slist_hook_
         > slist_option_type;
 
@@ -64,50 +67,54 @@ namespace hpx { namespace util { namespace detail
 
     public:
         typedef boost::mutex mutex_type;
-        typedef mutex_type::scoped_lock scoped_lock;
+        typedef typename mutex_type::scoped_lock scoped_lock;
 
-        explicit full_empty_entry(void* entry)
-          : entry_(entry), state_(full)
-        {}
+        full_empty_entry()
+          : state_(empty)
+        {
+            ::new (get_address()) Data();      // properly initialize memory
+        }
+
+        template <typename T0>
+        explicit full_empty_entry(T0 const& t0)
+          : state_(empty)
+        {
+            ::new (get_address()) Data(t0);    // properly initialize memory
+        }
 
         ~full_empty_entry()
         {
+            BOOST_ASSERT(!is_used());
+            get_address()->Data::~Data();      // properly destruct value in memory
         }
 
         // returns whether this entry is currently empty
-        template <typename Lock>
-        bool is_empty(Lock& outer_lock) const
+        bool is_empty() const
         {
             scoped_lock l(mtx_);
-            outer_lock.unlock();
             return state_ == empty;
         }
 
         // sets this entry to empty
-        template <typename Lock>
-        bool set_empty(Lock& outer_lock) 
+        bool set_empty() 
         {
             scoped_lock l(mtx_);
-            outer_lock.unlock();
             return set_empty_locked();
         }
 
         // sets this entry to full
-        template <typename Lock>
-        bool set_full(Lock& outer_lock) 
+        bool set_full() 
         {
             scoped_lock l(mtx_);
-            outer_lock.unlock();
             return set_full_locked();
         }
 
         ///////////////////////////////////////////////////////////////////////
         // enqueue a get operation if full/full queue if entry is empty
-        template <typename Lock, typename T>
-        void enqueue_full_full(Lock& outer_lock, T& dest)
+        template <typename T>
+        void enqueue_full_full(T& dest)
         {
             scoped_lock l(mtx_);
-            outer_lock.unlock();
 
             // block if this entry is empty
             if (state_ == empty) {
@@ -121,16 +128,14 @@ namespace hpx { namespace util { namespace detail
             }
 
             // copy the data to the destination
-            if (entry_ && entry_ != &dest) 
-                dest = *static_cast<T const*>(entry_);
+            if (get_address() != &dest) 
+                dest = *get_address();
         }
 
         // same as above, but for entries without associated data
-        template <typename Lock>
-        void enqueue_full_full(Lock& outer_lock)
+        void enqueue_full_full()
         {
             scoped_lock l(mtx_);
-            outer_lock.unlock();
 
             // block if this entry is empty
             if (state_ == empty) {
@@ -146,11 +151,10 @@ namespace hpx { namespace util { namespace detail
 
         ///////////////////////////////////////////////////////////////////////
         // enqueue a get operation in full/empty queue if entry is empty
-        template <typename Lock, typename T>
-        void enqueue_full_empty(Lock& outer_lock, T& dest)
+        template <typename T>
+        void enqueue_full_empty(T& dest)
         {
             scoped_lock l(mtx_);
-            outer_lock.unlock();
 
             // block if this entry is empty
             if (state_ == empty) {
@@ -166,23 +170,21 @@ namespace hpx { namespace util { namespace detail
                 }
 
                 // copy the data to the destination
-                if (entry_ && entry_ != &dest) 
-                    dest = *static_cast<T const*>(entry_);
+                if (get_address() != &dest) 
+                    dest = *get_address();
             }
             else {
                 // copy the data to the destination
-                if (entry_ && entry_ != &dest) 
-                    dest = *static_cast<T const*>(entry_);
+                if (get_address() != &dest) 
+                    dest = *get_address();
                 set_empty_locked();   // state_ = empty;
             }
         }
 
         // same as above, but for entries without associated data
-        template <typename Lock>
-        void enqueue_full_empty(Lock& outer_lock)
+        void enqueue_full_empty()
         {
             scoped_lock l(mtx_);
-            outer_lock.unlock();
 
             // block if this entry is empty
             if (state_ == empty) {
@@ -202,11 +204,10 @@ namespace hpx { namespace util { namespace detail
 
         ///////////////////////////////////////////////////////////////////////
         // enqueue if entry is full, otherwise fill it
-        template <typename Lock, typename T>
-        void enqueue_if_full(Lock& outer_lock, T const& src)
+        template <typename T>
+        void enqueue_if_full(T const& src)
         {
             scoped_lock l(mtx_);
-            outer_lock.unlock();
 
             // block if this entry is already full
             if (state_ == full) {
@@ -220,19 +221,17 @@ namespace hpx { namespace util { namespace detail
             }
 
             // set the data
-            if (entry_ && entry_ != &src) 
-                *static_cast<T*>(entry_) = src;
+            if (get_address() != &src) 
+                *get_address() = src;
 
             // make sure the entry is full
             set_full_locked();    // state_ = full
         }
 
         // same as above, but for entries without associated data
-        template <typename Lock>
-        void enqueue_if_full(Lock& outer_lock)
+        void enqueue_if_full()
         {
             scoped_lock l(mtx_);
-            outer_lock.unlock();
 
             // block if this entry is already full
             if (state_ == full) {
@@ -251,26 +250,23 @@ namespace hpx { namespace util { namespace detail
 
         ///////////////////////////////////////////////////////////////////////
         // unconditionally set the data and set the entry to full
-        template <typename Lock, typename T>
-        void set_and_fill(Lock& outer_lock, T const& src)
+        template <typename T>
+        void set_and_fill(T const& src)
         {
             scoped_lock l(mtx_);
-            outer_lock.unlock();
 
             // set the data
-            if (entry_ && entry_ != &src) 
-                *static_cast<T*>(entry_) = src;
+            if (get_address() != &src) 
+                *get_address() = src;
 
             // make sure the entry is full
             set_full_locked();    // state_ = full
         }
 
         // same as above, but for entries without associated data
-        template <typename Lock>
-        void set_and_fill(Lock& outer_lock)
+        void set_and_fill()
         {
             scoped_lock l(mtx_);
-            outer_lock.unlock();
 
             // make sure the entry is full
             set_full_locked();    // state_ = full
@@ -329,216 +325,29 @@ namespace hpx { namespace util { namespace detail
         }
 
     private:
+        typedef Data value_type;
+        typedef boost::aligned_storage<sizeof(value_type),
+            boost::alignment_of<value_type>::value> storage_type;
+
+        // type safe accessors to the stored data
+        typedef typename boost::add_pointer<value_type>::type pointer;
+        typedef typename boost::add_pointer<value_type const>::type const_pointer;
+
+        pointer get_address()
+        {
+            return static_cast<pointer>(data_.address());
+        }
+        const_pointer get_address() const
+        {
+            return static_cast<const_pointer>(data_.address());
+        }
+
         mutable mutex_type mtx_;
         queue_type write_queue_;              // threads waiting in write
         queue_type read_and_empty_queue_;     // threads waiting in read_and_empty
         queue_type read_queue_;               // threads waiting in read
-        void* entry_;                         // pointer to protected data item
+        storage_type data_;                   // protected data
         full_empty state_;                    // current full/empty state
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    class full_empty_store
-    {
-    private:
-        typedef boost::shared_mutex mutex_type;
-        typedef boost::ptr_map<void*, full_empty_entry> store_type;
-
-    protected:
-        template <typename Lock>
-        store_type::iterator create(Lock& l, void* entry)
-        {
-            boost::upgrade_to_unique_lock<mutex_type> ul(l);
-            std::pair<store_type::iterator, bool> p = 
-                store_.insert(entry, new full_empty_entry(entry));
-            if (!p.second) {
-                boost::throw_exception(std::bad_alloc());
-                return store_type::iterator();
-            }
-            return p.first;
-        }
-
-        template <typename Lock>
-        store_type::iterator find_or_create(Lock& l, void* entry)
-        {
-            // create a new entry for this unknown (full) block 
-            store_type::iterator it = store_.find(entry);
-            if (it == store_.end()) 
-                return create(l, entry);
-            return it;
-        }
-
-        template <typename Lock>
-        bool remove(Lock& l, void* entry)
-        {
-            store_type::iterator it = store_.find(entry);
-            if (it != store_.end() && !(*it).second->is_used()) {
-                boost::upgrade_to_unique_lock<mutex_type> ul(l);
-                store_.erase(it);
-                return true;
-            }
-            return false;
-        }
-
-    public:
-        full_empty_store()
-        {}
-
-        ///
-        void set_empty(void* entry)
-        {
-            boost::upgrade_lock<mutex_type> l(mtx_);
-            store_type::iterator it = store_.find(entry);
-            if (it == store_.end()) {
-                // create a new entry for this unknown (full) block 
-                it = create(l, entry);
-                (*it).second->set_empty(l);
-            }
-            else {
-                // set the entry to empty state if it's not newly created
-                if ((*it).second->set_empty(l)) 
-                    remove(entry);    // remove if no more threads are waiting
-            }
-        }
-
-        ///
-        void set_full(void* entry)
-        {
-            boost::shared_lock<mutex_type> l(mtx_);
-            store_type::iterator it = store_.find(entry);
-            if (it != store_.end() && 
-                (*it).second->set_full(l)) 
-            {
-                remove(entry);    // remove if no more threads are waiting
-            }
-        }
-
-        /// The function \a is_empty returns whether the given memory block is 
-        /// currently known to be empty.
-        ///
-        /// \param    [in]
-        ///
-        /// \returns  This returns \a true if the referenced memory block is 
-        ///           empty, otherwise it returns \a false. If nothing is known
-        ///           about the given address this function returns \a false
-        ///           as well (all memory is full by default)
-        bool is_empty(void const* entry) const
-        {
-            boost::shared_lock<mutex_type> l(mtx_);
-            store_type::const_iterator it = 
-                store_.find(const_cast<void*>(entry));
-            if (it != store_.end()) 
-                return (*it).second->is_empty(l);
-
-            return false;   // by default all memory blocks are full
-        }
-
-        ///
-        bool is_used(void* entry) const
-        {
-            boost::shared_lock<mutex_type> l(mtx_);
-            store_type::const_iterator it = 
-                store_.find(const_cast<void*>(entry));
-            if (it != store_.end()) 
-                return (*it).second->is_used();
-
-            return false;   // not existing entries are not used by any thread
-        }
-
-        /// The function \a remove erases the given entry from the store if it
-        /// is not used by any other thread anymore.
-        ///
-        /// \returns  This returns \a true if the entry has been removed from
-        ///           the store, otherwise it returns \a false, which either 
-        ///           means that the entry is unknown to the store or that the 
-        ///           entry is still in use (other threads are waiting on this
-        ///           entry).
-        bool remove(void* entry)
-        {
-            boost::upgrade_lock<mutex_type> l(mtx_);
-            return remove(l, entry);
-        }
-
-    public:
-        /// \brief  Waits for the memory to become full and then reads it, 
-        ///         leaves memory in full state.
-        template <typename T>
-        void read(void* entry, T& dest) 
-        {
-            boost::shared_lock<mutex_type> l(mtx_);
-            store_type::iterator it = store_.find(entry);
-            if (it == store_.end()) {
-            // just copy the data to the destination
-                if (entry && entry != &dest)
-                    dest = *static_cast<T const*>(entry);
-            }
-            else {
-                (*it).second->enqueue_full_full(l, dest);
-            }
-        }
-
-        void read(void* entry) 
-        {
-            boost::shared_lock<mutex_type> l(mtx_);
-            store_type::iterator it = store_.find(entry);
-            if (it != store_.end()) 
-                (*it).second->enqueue_full_full(l);
-        }
-
-        /// \brief Wait for memory to become full and then reads it, sets 
-        /// memory to empty.
-        template <typename T>
-        void read_and_empty(void* entry, T& dest)
-        {
-            boost::upgrade_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(l, entry);
-            (*it).second->enqueue_full_empty(l, dest);
-        }
-
-        void read_and_empty(void* entry)
-        {
-            boost::upgrade_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(l, entry);
-            (*it).second->enqueue_full_empty(l);
-        }
-
-        /// \brief Writes memory and atomically sets its state to full without 
-        /// waiting for it to become empty.
-        template <typename T>
-        void set(void* entry, T const& src)
-        {
-            boost::upgrade_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(l, entry);
-            (*it).second->set_and_fill(l, src);
-        }
-
-
-        void set(void* entry)
-        {
-            boost::upgrade_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(l, entry);
-            (*it).second->set_and_fill(l);
-        }
-
-        /// \brief Wait for memory to become empty, and then fill it.
-        template <typename T>
-        void write(void* entry, T const& src)
-        {
-            boost::upgrade_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(l, entry);
-            (*it).second->enqueue_if_full(l, src);
-        }
-
-        void write(void* entry)
-        {
-            boost::upgrade_lock<mutex_type> l(mtx_);
-            store_type::iterator it = find_or_create(l, entry);
-            (*it).second->enqueue_if_full(l);
-        }
-
-    private:
-        mutable mutex_type mtx_;
-        store_type store_;
     };
 
 }}}

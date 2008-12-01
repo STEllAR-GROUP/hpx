@@ -171,7 +171,6 @@ set (hpxlib_SOURCES
     ${hpx_SOURCE_DIR}/src/runtime/threads/threadmanager.cpp
     # util 
     ${hpx_SOURCE_DIR}/src/util/asio_util.cpp
-    ${hpx_SOURCE_DIR}/src/util/full_empty_memory.cpp
     ${hpx_SOURCE_DIR}/src/util/ini.cpp
     ${hpx_SOURCE_DIR}/src/util/io_service_pool.cpp
     ${hpx_SOURCE_DIR}/src/util/logging.cpp

@@ -23,7 +23,7 @@ namespace hpx { namespace util
     #define LAGAS_(lvl)                                                       \
         BOOST_LOG_USE_LOG_IF_LEVEL(hpx::util::agas_logger(),                  \
             hpx::util::agas_level(), lvl)                                     \
-        << hpx::util::levelname(::boost::logging::level::lvl)                 \
+        << hpx::util::levelname(::boost::logging::level::lvl) << " "          \
     /**/
 
     #define LAGAS_ENABLED(lvl)                                                \
@@ -37,7 +37,7 @@ namespace hpx { namespace util
     #define LTIM_(lvl)                                                        \
         BOOST_LOG_USE_LOG_IF_LEVEL(hpx::util::timing_logger(),                \
             hpx::util::timing_level(), lvl)                                   \
-        << hpx::util::levelname(::boost::logging::level::lvl)                 \
+        << hpx::util::levelname(::boost::logging::level::lvl) << " "          \
     /**/
 
     #define LTIM_ENABLED(lvl)                                                 \
