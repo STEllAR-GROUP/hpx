@@ -121,7 +121,7 @@ macro(ADD_HPX_COMPONENT name)
 
     # install binary
     install(TARGETS ${name}_component
-        RUNTIME DESTINATION bin
+        RUNTIME DESTINATION lib
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
