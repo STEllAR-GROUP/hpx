@@ -61,9 +61,11 @@ class fifo:
 
 
 public:
-    fifo(void)
+    explicit fifo(char const* description = "")
+      : enqueue_spin_count_(0), dequeue_spin_count_(0),
+        description_(description)
 #if defined(_DEBUG)
-      : count_(-1)
+      , count_(-1)
 #endif
     {
         node * n = alloc_node();
@@ -71,8 +73,10 @@ public:
         tail_.set_ptr(n);
     }
 
-    explicit fifo(std::size_t initial_nodes):
-        pool(initial_nodes)
+    fifo(std::size_t initial_nodes, char const* description = "")
+      : pool(initial_nodes)
+      , description_(description)
+      , enqueue_spin_count_(0), dequeue_spin_count_(0)
 #if defined(_DEBUG)
       , count_(-1)
 #endif
@@ -86,6 +90,10 @@ public:
     {
         assert(empty());
         dealloc_node(head_.get_ptr());
+        std::cout << "lockfree::fifo: " << description_;
+        std::cout << ", enqueue_spin_count: " << long(enqueue_spin_count_)
+                  << ", dequeue_spin_count: " << long(dequeue_spin_count_)
+                  << std::endl;
     }
 
     bool empty(void) const
@@ -97,8 +105,8 @@ public:
     {
         node * n = alloc_node(t);
 
-//         for (unsigned char i = 0; /**/; boost::lockfree::spin(++i))
-        for (;;)
+        unsigned int cnt = 0;
+        for (/**/; /**/; ++cnt)
         {
             atomic_node_ptr tail (tail_);
             memory_barrier();
@@ -109,9 +117,10 @@ public:
             {
                 if (next.get_ptr() == 0)
                 {
-                    if ( tail->next.CAS(next, n) )
+                    if (tail->next.CAS(next, n))
                     {
                         tail_.CAS(tail, n);
+                        enqueue_spin_count_ += cnt;
                         return;
                     }
                 }
@@ -123,8 +132,8 @@ public:
 
     bool dequeue (T * ret)
     {
-//         for (unsigned char i = 0; /**/; boost::lockfree::spin(++i))
-        for(;;)
+        unsigned int cnt = 0;
+        for (/**/; /**/; ++cnt)
         {
             atomic_node_ptr head(head_);
             memory_barrier();
@@ -137,9 +146,10 @@ public:
             {
                 if (head.get_ptr() == tail.get_ptr())
                 {
-                    if (next == 0)
+                    if (next == 0) {
+                        dequeue_spin_count_ += cnt;
                         return false;
-
+                    }
                     tail_.CAS(tail, next);
                 }
                 else
@@ -148,7 +158,7 @@ public:
                     if (head_.CAS(head, next))
                     {
                         dealloc_node(head.get_ptr());
-
+                        dequeue_spin_count_ += cnt;
                         return true;
                     }
                 }
@@ -197,6 +207,9 @@ private:
 #if defined(_DEBUG)
     atomic_int<long> count_;
 #endif
+    atomic_int<long> enqueue_spin_count_;
+    atomic_int<long> dequeue_spin_count_;
+    char const* description_;
 };
 
 } /* namespace detail */
@@ -211,11 +224,12 @@ class fifo:
     public detail::fifo<T, Alloc>
 {
 public:
-    fifo(void)
+    fifo(char const* description = "")
+      : detail::fifo<T, Alloc>(description)
     {}
 
-    explicit fifo(std::size_t initial_nodes):
-        detail::fifo<T, Alloc>(initial_nodes)
+    explicit fifo(std::size_t initial_nodes, char const* description = "")
+      : detail::fifo<T, Alloc>(initial_nodes)
     {}
 };
 
@@ -243,11 +257,12 @@ class fifo<T*, Alloc>:
     }
 
 public:
-    fifo(void)
+    fifo(char const* description = "")
+      : fifo_t(description)
     {}
 
-    explicit fifo(std::size_t initial_nodes):
-        fifo_t(initial_nodes)
+    explicit fifo(std::size_t initial_nodes, char const* description = "")
+      : fifo_t(initial_nodes, description)
     {}
 
     void enqueue(T * t)

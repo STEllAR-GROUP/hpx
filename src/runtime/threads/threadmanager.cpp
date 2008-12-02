@@ -44,7 +44,9 @@ namespace hpx { namespace threads
     threadmanager::threadmanager(util::io_service_pool& timer_pool,
             boost::function<void()> start_thread, boost::function<void()> stop)
       : running_(false), timer_pool_(timer_pool), 
-        start_thread_(start_thread), stop_(stop)
+        start_thread_(start_thread), stop_(stop),
+        work_items_("work_items"), terminated_items_("terminated_items"), 
+        active_set_state_("active_set_state"), new_items_("new_items")
 #if HPX_DEBUG != 0
       , thread_count_(0)
 #endif
