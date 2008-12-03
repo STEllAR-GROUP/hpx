@@ -160,6 +160,54 @@ public:
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // stack like interface to this FIFO (which actually allows to use it as a 
+    // LIFO as well)
+    void push(T const& t)
+    {
+        node * n = alloc_node(t);
+
+        for (unsigned int cnt = 0; /**/; spin((unsigned char)++cnt))
+        {
+            atomic_node_ptr head (head_);
+            memory_barrier();
+
+            atomic_node_ptr tail (tail_);
+            atomic_node_ptr first (head->next);
+            memory_barrier();
+
+            if (likely(tail == tail_))
+            {
+                n->next = first.get_ptr();
+                if (first.get_ptr() == 0) {
+                    // the queue seems to be empty
+                    atomic_node_ptr next (tail_->next);
+                    memory_barrier();
+
+                    if (tail->next.CAS(next, n))
+                    {
+                        tail_.CAS(tail, n);
+                        enqueue_spin_count_ += cnt;
+                        return;
+                    }
+                }
+                else {
+                    // insert the new item at the read end of the queue
+                    if (head_->next.CAS(first, n))
+                    {
+                        enqueue_spin_count_ += cnt;
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    bool pop (T* ret)
+    {
+        return dequeue(ret);
+    }
+
 private:
     node * alloc_node(void)
     {

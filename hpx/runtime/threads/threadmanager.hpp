@@ -210,6 +210,12 @@ namespace hpx { namespace threads
         /// (state is terminated) are properly destroyed
         bool cleanup_terminated();
 
+        /// steal a work item from one of the thread local queues
+        bool steal_work (std::size_t thread_num, boost::shared_ptr<thread>&);
+
+        /// check whether all queues are empty
+        bool queues_empty(std::size_t thread_num);
+
     private:
         /// this thread manager has exactly as much threads as requested
         boost::ptr_vector<boost::thread> threads_;
@@ -221,6 +227,9 @@ namespace hpx { namespace threads
                                             ///< set_state on an active thread
 
         work_items_type new_items_;         ///< list of threads to run
+
+        /// work item queues for each of the threads
+        work_items_type* local_work_items_;
 
         bool running_;                      ///< thread manager has bee started
         mutable mutex_type mtx_;            ///< mutex protecting the members

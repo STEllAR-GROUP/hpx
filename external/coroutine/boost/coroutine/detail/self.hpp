@@ -237,6 +237,7 @@ namespace boost { namespace coroutines { namespace detail {
         reset_self_on_exit(coroutine_self* self)
           : self_(self)
         {
+            impl_type::set_self(NULL);
         }
         ~reset_self_on_exit()
         {

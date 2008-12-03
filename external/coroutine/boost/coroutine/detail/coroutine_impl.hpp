@@ -249,11 +249,13 @@ namespace boost { namespace coroutines { namespace detail {
       detail::unpack(m_fun, *this->args(), 
          detail::trait_tag<typename coroutine_type::arg_slot_traits>());
 
-      typedef BOOST_DEDUCED_TYPENAME coroutine_type::result_slot_type 
-        result_slot_type;
+      super_type::set_self(NULL);     // reset self
 
       // In this particular case result_slot_type is guaranteed to be
       // default constructible.
+      typedef BOOST_DEDUCED_TYPENAME coroutine_type::result_slot_type 
+        result_slot_type;
+
       this->m_result_last = result_slot_type();
       this->bind_result(&*this->m_result_last);
     }
@@ -276,6 +278,8 @@ namespace boost { namespace coroutines { namespace detail {
       this->m_result_last = boost::in_place(result_slot_type(
               detail::unpack(m_fun, *this->args(), detail::trait_tag<traits>())
           ));
+
+      super_type::set_self(NULL);     // reset self
 
       this->bind_result(&*this->m_result_last);
     }
