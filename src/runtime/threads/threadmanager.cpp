@@ -55,9 +55,22 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Fifo>
+    inline void log_fifo_statistics(Fifo const& q)
+    {
+        LTIM_(fatal) << "~threadmanager: queue: "  << q.description_
+                     << ", enqueue_spin_count: " << long(q.enqueue_spin_count_)
+                     << ", dequeue_spin_count: " << long(q.dequeue_spin_count_);
+    }
+
     threadmanager::~threadmanager() 
     {
         LTM_(debug) << "~threadmanager";
+        log_fifo_statistics(work_items_);
+        log_fifo_statistics(terminated_items_);
+        log_fifo_statistics(active_set_state_);
+        log_fifo_statistics(new_items_);
+
         if (!threads_.empty()) {
             if (running_) 
                 stop();

@@ -90,10 +90,6 @@ public:
     {
         assert(empty());
         dealloc_node(head_.get_ptr());
-        std::cout << "lockfree::fifo: " << description_;
-        std::cout << ", enqueue_spin_count: " << long(enqueue_spin_count_)
-                  << ", dequeue_spin_count: " << long(dequeue_spin_count_)
-                  << std::endl;
     }
 
     bool empty(void) const
@@ -105,8 +101,7 @@ public:
     {
         node * n = alloc_node(t);
 
-        unsigned int cnt = 0;
-        for (/**/; /**/; ++cnt)
+        for (unsigned int cnt = 0; /**/; spin((unsigned char)++cnt))
         {
             atomic_node_ptr tail (tail_);
             memory_barrier();
@@ -132,8 +127,7 @@ public:
 
     bool dequeue (T * ret)
     {
-        unsigned int cnt = 0;
-        for (/**/; /**/; ++cnt)
+        for (unsigned int cnt = 0; /**/; spin((unsigned char)++cnt))
         {
             atomic_node_ptr head(head_);
             memory_barrier();
@@ -204,6 +198,7 @@ private:
     atomic_node_ptr head_;
     BOOST_LOCKFREE_CACHELINE_ALIGNMENT_PREFIX atomic_node_ptr tail_ BOOST_LOCKFREE_CACHELINE_ALIGNMENT; 
 
+public:
 #if defined(_DEBUG)
     atomic_int<long> count_;
 #endif

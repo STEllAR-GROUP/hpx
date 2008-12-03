@@ -12,11 +12,7 @@ set(generic_SOURCES
     generic_component_noresult.cpp
     generic_component_result.cpp)
 
-set(generic_INI
-    generic.ini)
-
 add_hpx_component(generic 
     SOURCES ${generic_SOURCES} 
-    HEADERS ${generic_HEADERS}
-    INI ${generic_INI})
+    HEADERS ${generic_HEADERS})
 
