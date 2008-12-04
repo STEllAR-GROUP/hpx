@@ -40,6 +40,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <boost/type_traits.hpp>
+#include <cstring>
 /**
  * Stack allocation routines and trampolines for setcontext
  */
