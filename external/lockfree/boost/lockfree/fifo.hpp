@@ -178,7 +178,7 @@ public:
 
             if (likely(tail == tail_))
             {
-                n->next = first.get_ptr();
+                n->next.set_ptr(first.get_ptr());
                 if (first.get_ptr() == 0) {
                     // the queue seems to be empty
                     atomic_node_ptr next (tail_->next);

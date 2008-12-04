@@ -46,6 +46,12 @@ namespace hpx { namespace threads
             boost::lockfree::fifo<boost::shared_ptr<thread> > 
         work_items_type;
 
+        // the queue of new items holds the thread to add and the queue where 
+        // to add the thread
+        typedef boost::lockfree::fifo<
+            std::pair<boost::shared_ptr<thread>, work_items_type*>
+        > new_items_type;
+
         // this is the type of a map holding all threads (except depleted ones)
         typedef
             std::map<thread_id_type, boost::shared_ptr<thread> >
@@ -218,6 +224,7 @@ namespace hpx { namespace threads
 
     private:
         /// this thread manager has exactly as much threads as requested
+        std::size_t num_threads_;
         boost::ptr_vector<boost::thread> threads_;
 
         thread_map_type thread_map_;        ///< mapping of thread id's to threads
@@ -226,12 +233,13 @@ namespace hpx { namespace threads
         set_state_queue_type active_set_state_;  ///< list of threads waiting for 
                                             ///< set_state on an active thread
 
-        work_items_type new_items_;         ///< list of threads to run
+        new_items_type new_items_;          ///< list of threads to run
 
         /// work item queues for each of the threads
-        work_items_type* local_work_items_;
+        work_items_type** local_work_items_;
+        static boost::thread_specific_ptr<work_items_type> local_work_item_;
 
-        bool running_;                      ///< thread manager has bee started
+        bool running_;                      ///< thread manager has been started
         mutable mutex_type mtx_;            ///< mutex protecting the members
         boost::condition cond_;             ///< used to trigger some action
 
