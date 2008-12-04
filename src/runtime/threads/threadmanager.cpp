@@ -41,17 +41,12 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::thread_specific_ptr<threadmanager::work_items_type> 
-        threadmanager::local_work_item_;
-
-    ///////////////////////////////////////////////////////////////////////////
     threadmanager::threadmanager(util::io_service_pool& timer_pool,
             boost::function<void()> start_thread, boost::function<void()> stop)
-      : num_threads_(0),
+      : running_(false), timer_pool_(timer_pool), 
+        start_thread_(start_thread), stop_(stop),
         work_items_("work_items"), terminated_items_("terminated_items"), 
-        active_set_state_("active_set_state"), new_items_("new_items"),
-        local_work_items_(NULL), running_(false), timer_pool_(timer_pool), 
-        start_thread_(start_thread), stop_(stop)
+        active_set_state_("active_set_state"), new_items_("new_items")
 #if HPX_DEBUG != 0
       , thread_count_(0)
 #endif
@@ -81,8 +76,6 @@ namespace hpx { namespace threads
                 stop();
             threads_.clear();
         }
-
-        delete local_work_items_;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -118,9 +111,9 @@ namespace hpx { namespace threads
         boost::shared_ptr<threads::thread> thrd (
             new threads::thread(threadfunc, initial_state, description));
 
-        // add the new thread to the queue of new items it will get picked 
-        // up by the master thread and added to the map later
-        new_items_.enqueue(std::make_pair(thrd, local_work_item_.get()));
+        // add the new thread to the queue of new items it will get picked up
+        // by the master thread and added to the map
+        new_items_.enqueue(thrd);
         if (run_now)
             cond_.notify_all();
 
@@ -135,19 +128,16 @@ namespace hpx { namespace threads
             return false;
 
         bool found_one = false;
-        std::pair<boost::shared_ptr<thread>, work_items_type*> toadd;
+        boost::shared_ptr<thread> toadd;
         while (new_items_.dequeue(&toadd)) {
             // add the new entry in the map of all threads
-            thread_map_.insert(map_pair(toadd.first->get_thread_id(), toadd.first));
+            thread_map_.insert(map_pair(toadd->get_thread_id(), toadd));
 
             // only insert the thread into the work-items queue if it is in 
             // pending state
-            if (toadd.first->get_state() == pending) {
-                // pushing the new thread into the proper pending queue 
-                if (NULL == toadd.second)
-                    work_items_.enqueue(toadd.first);
-                else
-                    toadd.second->push(toadd.first);
+            if (toadd->get_state() == pending) {
+                // pushing the new thread into the pending queue 
+                work_items_.enqueue(toadd);
             }
             found_one = true;
         }
@@ -418,33 +408,11 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     // main function executed by all OS threads managed by this threadmanager
-    struct reset_on_exit
-    {
-        typedef 
-            boost::lockfree::fifo<boost::shared_ptr<thread> > 
-        work_items_type;
-
-        reset_on_exit(work_items_type** queue, work_items_type* q)
-          : queue_(queue)
-        {
-            *queue = q;
-        }
-        ~reset_on_exit()
-        {
-            *queue_ = NULL;
-        }
-
-        work_items_type** queue_;
-    };
-
     void threadmanager::tfunc(std::size_t num_thread)
     {
         LTM_(info) << "tfunc(" << num_thread << "): start";
         std::size_t num_px_threads = 0;
         try {
-            local_work_item_.reset(new work_items_type);
-            reset_on_exit on_exit(&local_work_items_[num_thread], &*local_work_item_);
-
             if (start_thread_)    // notify runtime system of started thread
                 start_thread_();
 
@@ -485,41 +453,11 @@ namespace hpx { namespace threads
                    << num_px_threads << " HPX threads";
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // this looks into the local queues of all other threads and steals a
-    // thread, if available
-    inline bool threadmanager::steal_work (std::size_t thread_num, 
-        boost::shared_ptr<thread>& thrd)
-    {
-        for (std::size_t n = 0; n < num_threads_; ++n)
-        {
-            if (n != thread_num && local_work_items_[n] && 
-                local_work_items_[n]->dequeue(&thrd))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    inline bool threadmanager::queues_empty(std::size_t thread_num)
-    {
-        for (std::size_t n = 0; n < num_threads_; ++n)
-        {
-            if (local_work_items_[n] && !local_work_items_[n]->empty())
-                return false;
-        }
-        return work_items_.empty() && active_set_state_.empty();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     std::size_t threadmanager::tfunc_impl(std::size_t num_thread)
     {
 #if HPX_DEBUG != 0
         ++thread_count_;
 #endif
-        work_items_type& local_queue = *local_work_item_;
         std::size_t num_px_threads = 0;
         util::time_logger tl("tfunc", num_thread, util::ref_time_.start_);
 
@@ -532,10 +470,7 @@ namespace hpx { namespace threads
         while (true) {
             // Get the next PX thread from the queue
             boost::shared_ptr<thread> thrd;
-            if (local_queue.pop(&thrd) ||           // look into own queue first
-                work_items_.dequeue(&thrd) ||       // the look into global queue
-                steal_work(num_thread, thrd))       // and only then steal work
-            {
+            if (work_items_.dequeue(&thrd)) {
                 tl.tick();
 
                 // Only pending PX threads will be executed.
@@ -571,7 +506,7 @@ namespace hpx { namespace threads
                 // thread should be re-scheduled. If the PX thread is suspended 
                 // now we just keep it in the map of threads.
                 if (state == pending) {
-                    local_queue.enqueue(thrd);
+                    work_items_.enqueue(thrd);
                     cond_.notify_all();
                 }
 
@@ -604,7 +539,7 @@ namespace hpx { namespace threads
 
             // if nothing else has to be done either wait or terminate
             bool terminate = false;
-            while (queues_empty(num_thread)) {
+            while (work_items_.empty() && active_set_state_.empty()) {
                 // no obvious work has to be done, so a lock won't hurt too much
                 mutex_type::scoped_lock lk(mtx_);
 
@@ -630,7 +565,7 @@ namespace hpx { namespace threads
                 // arrived in the meantime).
                 // Ask again if queues are empty to avoid race conditions (we 
                 // need to lock anyways...), this way no notify_all() gets lost
-                if (queues_empty(num_thread))
+                if (work_items_.empty() && active_set_state_.empty())
                 {
                     LTM_(info) << "tfunc(" << num_thread 
                                << "): queues empty, entering wait";
@@ -670,13 +605,7 @@ namespace hpx { namespace threads
         timer_pool_.run(false);
 
         running_ = false;
-        num_threads_ = num_threads;
         try {
-            // initialize thread local queues
-            local_work_items_ = new work_items_type*[num_threads];
-            for (std::size_t i = 0; i < num_threads; ++i)
-                local_work_items_[i] = NULL;
-
             // run threads and wait for initialization to complete
             running_ = true;
             while (num_threads-- != 0) {
