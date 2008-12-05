@@ -112,7 +112,7 @@ namespace hpx { namespace util
 
 #elif defined(_POSIX_TIMERS) && _POSIX_TIMERS > 0 && defined(_POSIX_THREAD_CPUTIME)
 
-#if _POSIX_THREAD_CPUTIME > 0   // timer slways supported
+#if _POSIX_THREAD_CPUTIME > 0   // timer always supported
 
 namespace hpx { namespace util
 {
@@ -148,20 +148,20 @@ namespace hpx { namespace util
         static double now()
         {
             timespec now;
-            if (-1 == clock_gettime(CLOCK_THREAD_CPUTIME_ID, &now))
+            if (-1 == clock_gettime(CLOCK_REALTIME, &now))
                 boost::throw_exception(std::runtime_error("Couldn't get current time"));
             return double(now.tv_sec) + double(now.tv_nsec) * 1e-9;
         }
         
         void restart() 
         { 
-            if (-1 == clock_gettime(CLOCK_THREAD_CPUTIME_ID, &start_time))
+            if (-1 == clock_gettime(CLOCK_REALTIME, &start_time))
                 boost::throw_exception(std::runtime_error("Couldn't initialize start_time"));
         } 
         double elapsed() const                  // return elapsed time in seconds
         { 
             timespec now;
-            if (-1 == clock_gettime(CLOCK_THREAD_CPUTIME_ID, &now))
+            if (-1 == clock_gettime(CLOCK_REALTIME, &now))
                 boost::throw_exception(std::runtime_error("Couldn't get current time"));
 
             if (now.tv_sec == start_time.tv_sec)
@@ -179,7 +179,7 @@ namespace hpx { namespace util
         double elapsed_min() const            // return minimum value for elapsed()
         { 
             timespec resolution;
-            if (-1 == clock_getres(CLOCK_THREAD_CPUTIME_ID, &resolution))
+            if (-1 == clock_getres(CLOCK_REALTIME, &resolution))
                 boost::throw_exception(std::runtime_error("Couldn't get resolution"));
             return double(resolution.tv_sec + resolution.tv_nsec * 1e-9); 
         }
@@ -237,7 +237,7 @@ namespace hpx { namespace util
                 return double(std::clock());
 
             timespec now;
-            if (-1 == clock_gettime(CLOCK_THREAD_CPUTIME_ID, &now))
+            if (-1 == clock_gettime(CLOCK_REALTIME, &now))
                 boost::throw_exception(std::runtime_error("Couldn't get current time"));
             return double(now.tv_sec) + double(now.tv_nsec) * 1e-9;
         }
@@ -246,7 +246,7 @@ namespace hpx { namespace util
         { 
             if (use_backup)
                 start_time_backup.restart();
-            else if (-1 == clock_gettime(CLOCK_THREAD_CPUTIME_ID, &start_time))
+            else if (-1 == clock_gettime(CLOCK_REALTIME, &start_time))
                 boost::throw_exception(std::runtime_error("Couldn't initialize start_time"));
         } 
         double elapsed() const                  // return elapsed time in seconds
@@ -255,7 +255,7 @@ namespace hpx { namespace util
                 return start_time_backup.elapsed();
 
             timespec now;
-            if (-1 == clock_gettime(CLOCK_THREAD_CPUTIME_ID, &now))
+            if (-1 == clock_gettime(CLOCK_REALTIME, &now))
                 boost::throw_exception(std::runtime_error("Couldn't get current time"));
 
             if (now.tv_sec == start_time.tv_sec)
@@ -279,7 +279,7 @@ namespace hpx { namespace util
                 start_time_backup.elapsed_min();
 
             timespec resolution;
-            if (-1 == clock_getres(CLOCK_THREAD_CPUTIME_ID, &resolution))
+            if (-1 == clock_getres(CLOCK_REALTIME, &resolution))
                 boost::throw_exception(std::runtime_error("Couldn't get resolution"));
             return double(resolution.tv_sec + resolution.tv_nsec * 1e-9); 
         }
