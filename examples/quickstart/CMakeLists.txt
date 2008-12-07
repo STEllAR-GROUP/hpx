@@ -5,4 +5,5 @@
 
 # define build target
 add_hpx_executable(fibonacci SOURCES fibonacci.cpp)
+add_hpx_executable(mandelbrot SOURCES mandelbrot.cpp)
 
