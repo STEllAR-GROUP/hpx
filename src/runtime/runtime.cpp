@@ -143,7 +143,7 @@ namespace hpx
 
         // register the given main function with the thread manager
         if (!func.empty())
-            thread_manager_.register_work(func, "hpx_main");
+            thread_manager_.register_thread(func, "hpx_main");
 
         LRT_(info) << "runtime: started using "  << num_threads << " OS threads";
 

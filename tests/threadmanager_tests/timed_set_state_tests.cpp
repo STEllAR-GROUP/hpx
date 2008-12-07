@@ -27,11 +27,11 @@ threads::thread_state duration_set_state_test()
 {
     util::high_resolution_timer timer;
 
-    threads::thread_id_type id1 = applier::register_work(
+    threads::thread_id_type id1 = applier::register_thread(
         boost::bind(timed_set_state_test, timer, 1.0), 
         "duration_set_state_test1", threads::suspended);
 
-    threads::thread_id_type id2 = applier::register_work(
+    threads::thread_id_type id2 = applier::register_thread(
         boost::bind(timed_set_state_test, timer, 2.0), 
         "duration_set_state_test2", threads::suspended);
 
@@ -46,11 +46,11 @@ threads::thread_state time_set_state_test()
 {
     util::high_resolution_timer timer;
 
-    threads::thread_id_type id1 = applier::register_work(
+    threads::thread_id_type id1 = applier::register_thread(
         boost::bind(timed_set_state_test, timer, 1.0), 
         "timed_set_state_test1", threads::suspended);
 
-    threads::thread_id_type id2 = applier::register_work(
+    threads::thread_id_type id2 = applier::register_thread(
         boost::bind(timed_set_state_test, timer, 2.0), 
         "timed_set_state_test2", threads::suspended);
 

@@ -249,7 +249,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         if (functional_gid_ != naming::invalid_id && 0 == driver_thread_) {
             // run the thread which collects the input, executes the provided
             // functional element and sets the value for the next time step
-            driver_thread_ = applier::register_work(
+            driver_thread_ = applier::register_thread(
                 boost::bind(&stencil_value<N>::main, this), 
                 "stencil_value::main");
         }
@@ -273,7 +273,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         if (inputs_bound && 0 == driver_thread_) {
             // run the thread which collects the input, executes the provided
             // functional element and sets the value for the next time step
-            driver_thread_ = applier::register_work(
+            driver_thread_ = applier::register_thread(
                 boost::bind(&stencil_value<N>::main, this), 
                 "stencil_value::main");
         }

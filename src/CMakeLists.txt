@@ -34,6 +34,7 @@ set (hpxlib_HEADERS
     ${hpx_SOURCE_DIR}/hpx/lcos/eager_future.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/eager_future_constructors.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/eager_future_constructors_direct.hpp
+    ${hpx_SOURCE_DIR}/hpx/lcos/future_callback.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/future_value.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/future_wait.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/lazy_future.hpp
@@ -112,7 +113,6 @@ set (hpxlib_HEADERS
     ${hpx_SOURCE_DIR}/hpx/util/block_profiler.hpp
     ${hpx_SOURCE_DIR}/hpx/util/connection_cache.hpp
     ${hpx_SOURCE_DIR}/hpx/util/container_device.hpp
-    ${hpx_SOURCE_DIR}/hpx/util/find_msb.hpp
     ${hpx_SOURCE_DIR}/hpx/util/full_empty_memory.hpp
     ${hpx_SOURCE_DIR}/hpx/util/full_empty_store.hpp
     ${hpx_SOURCE_DIR}/hpx/util/future.hpp

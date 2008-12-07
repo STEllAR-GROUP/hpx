@@ -552,10 +552,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\hpx\util\find_msb.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\hpx\util\full_empty_memory.hpp"
 					>
 				</File>
@@ -936,6 +932,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\hpx\lcos\future_callback.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\hpx\lcos\future_value.hpp"
 					>
 				</File>
@@ -977,14 +977,6 @@
 				</File>
 				<File
 					RelativePath="..\..\..\hpx\config\warnings_suffix.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Dataflow"
-				>
-				<File
-					RelativePath="..\..\..\hpx\dataflow\dataflow.hpp"
 					>
 				</File>
 			</Filter>

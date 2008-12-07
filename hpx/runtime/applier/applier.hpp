@@ -170,7 +170,18 @@ namespace hpx { namespace applier
     ///        work to be executed
     ///
     ///
-    HPX_API_EXPORT threads::thread_id_type register_work(
+    HPX_API_EXPORT threads::thread_id_type register_thread(
+        boost::function<threads::thread_function_type> func,
+        char const* description = "", 
+        threads::thread_state initial_state = threads::pending, 
+        bool run_now = true);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Create a new \a thread using the given function as the 
+    ///        work to be executed
+    ///
+    ///
+    HPX_API_EXPORT void register_work(
         boost::function<threads::thread_function_type> func,
         char const* description = "", 
         threads::thread_state initial_state = threads::pending, 

@@ -42,11 +42,12 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     threadmanager::threadmanager(util::io_service_pool& timer_pool,
-            boost::function<void()> start_thread, boost::function<void()> stop)
-      : running_(false), timer_pool_(timer_pool), 
-        start_thread_(start_thread), stop_(stop),
+            boost::function<void()> start_thread, boost::function<void()> stop,
+            std::size_t max_count)
+      : max_count_(max_count), running_(false), 
+        timer_pool_(timer_pool), start_thread_(start_thread), stop_(stop),
         work_items_("work_items"), terminated_items_("terminated_items"), 
-        active_set_state_("active_set_state"), new_items_("new_items")
+        active_set_state_("active_set_state"), new_tasks_("new_tasks")
 #if HPX_DEBUG != 0
       , thread_count_(0)
 #endif
@@ -69,7 +70,7 @@ namespace hpx { namespace threads
         log_fifo_statistics(work_items_);
         log_fifo_statistics(terminated_items_);
         log_fifo_statistics(active_set_state_);
-        log_fifo_statistics(new_items_);
+        log_fifo_statistics(new_tasks_);
 
         if (!threads_.empty()) {
             if (running_) 
@@ -79,13 +80,13 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct register_work_tag {};
+    struct register_thread_tag {};
 
-    thread_id_type threadmanager::register_work(
-        boost::function<thread_function_type> threadfunc, 
+    thread_id_type threadmanager::register_thread(
+        boost::function<thread_function_type> const& threadfunc, 
         char const* const description, thread_state initial_state, bool run_now)
     {
-        util::block_profiler<register_work_tag> bp("threadmanager::register_work");
+        util::block_profiler<register_thread_tag> bp("threadmanager::register_thread");
 
         // verify parameters
         if (initial_state != pending && initial_state != suspended)
@@ -102,7 +103,7 @@ namespace hpx { namespace threads
             return invalid_thread_id;
         }
 
-        LTM_(info) << "register_work: initial_state(" 
+        LTM_(info) << "register_thread: initial_state(" 
                    << get_thread_state_name(initial_state) << "), "
                    << std::boolalpha << "run_now(" << run_now << "), "
                    << "description(" << description << ")";
@@ -111,37 +112,164 @@ namespace hpx { namespace threads
         boost::shared_ptr<threads::thread> thrd (
             new threads::thread(threadfunc, initial_state, description));
 
-        // add the new thread to the queue of new items it will get picked up
-        // by the master thread and added to the map
-        new_items_.enqueue(thrd);
-        if (run_now)
+        // lock data members while adding work
+        mutex_type::scoped_lock lk(mtx_);
+
+        // add a new entry in the map for this thread
+        std::pair<thread_map_type::iterator, bool> p =
+            thread_map_.insert(map_pair(thrd->get_thread_id(), thrd));
+
+        if (!p.second) {
+            HPX_THROW_EXCEPTION(hpx::no_success, 
+                "Couldn't add new thread to the map of threads");
+            return invalid_thread_id;
+        }
+
+        // only insert in the work-items queue if it is in pending state
+        if (initial_state == pending) {
+            // pushing the new thread in the pending queue thread
+            work_items_.enqueue(thrd);
+        }
+
+        if (run_now) {
+            // try to execute the new work item
             cond_.notify_all();
+        }
 
         // return the thread_id of the newly created thread
         return thrd->get_thread_id();
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline bool threadmanager::add_new()
+    struct register_work_tag {};
+
+    void threadmanager::register_work(
+        boost::function<thread_function_type> const& threadfunc, 
+        char const* const description, thread_state initial_state, bool run_now)
     {
-        if (new_items_.empty()) 
+        util::block_profiler<register_work_tag> bp("threadmanager::register_work");
+
+        // verify parameters
+        if (initial_state != pending && initial_state != suspended)
+        {
+            HPX_OSSTREAM strm;
+            strm << "invalid initial state: " 
+                 << get_thread_state_name(initial_state);
+            HPX_THROW_EXCEPTION(bad_parameter, HPX_OSSTREAM_GETSTRING(strm));
+            return;
+        }
+        if (0 == description)
+        {
+            HPX_THROW_EXCEPTION(bad_parameter, "description is NULL");
+            return;
+        }
+
+        LTM_(info) << "register_work: initial_state(" 
+                   << get_thread_state_name(initial_state) << "), "
+                   << std::boolalpha << "run_now(" << run_now << "), "
+                   << "description(" << description << ")";
+
+    // create a new task
+        new_tasks_.enqueue(
+            task_description(threadfunc, initial_state, description));
+        if (run_now) {
+            // try to execute the new work item
+            cond_.notify_all();
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // add new threads if there is some amount of work available
+    inline bool threadmanager::add_new(long add_count)
+    {
+        if (0 == add_count)
             return false;
 
-        bool found_one = false;
-        boost::shared_ptr<thread> toadd;
-        while (new_items_.dequeue(&toadd)) {
+        long added = 0;
+        task_description task;
+        while (add_count-- && new_tasks_.dequeue(&task)) 
+        {
+            // create the new thread
+            boost::shared_ptr<threads::thread> thrd (
+                new threads::thread(boost::get<0>(task), boost::get<1>(task), 
+                    boost::get<2>(task)));
+
             // add the new entry in the map of all threads
-            thread_map_.insert(map_pair(toadd->get_thread_id(), toadd));
+            std::pair<thread_map_type::iterator, bool> p =
+                thread_map_.insert(map_pair(thrd->get_thread_id(), thrd));
+
+            if (!p.second) {
+                HPX_THROW_EXCEPTION(hpx::no_success, 
+                    "Couldn't add new thread to the map of threads");
+                return false;
+            }
+
+            ++added;
 
             // only insert the thread into the work-items queue if it is in 
             // pending state
-            if (toadd->get_state() == pending) {
+            if (thrd->get_state() == pending) {
                 // pushing the new thread into the pending queue 
-                work_items_.enqueue(toadd);
+                work_items_.enqueue(thrd);
             }
-            found_one = true;
         }
-        return found_one;
+
+        if (added) {
+            LTM_(info) << "add_new: added " << added << " tasks to queues";
+        }
+        return added != 0;
+    }
+
+    inline bool threadmanager::add_new_if_possible()
+    {
+        if (new_tasks_.empty()) 
+            return false;
+
+        // create new threads from pending tasks (if appropriate)
+        long add_count = -1;                  // default is no constraint
+
+        // if the map doesn't hold max_count threads yet add some
+        if (max_count_) {
+            std::size_t count = thread_map_.size();
+            if (max_count_ >= count + min_add_new_count) {
+                add_count = max_count_ - count;
+                if (add_count < min_add_new_count)
+                    add_count = min_add_new_count;
+            }
+            else {
+                return false;
+            }
+        }
+        return add_new(add_count);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline bool threadmanager::add_new_always()
+    {
+        if (new_tasks_.empty()) 
+            return false;
+
+        // create new threads from pending tasks (if appropriate)
+        long add_count = -1;                  // default is no constraint
+
+        // if we are desperate (no work in the queues), add some even if the 
+        // map holds more than max_count
+        if (max_count_) {
+            std::size_t count = thread_map_.size();
+            if (max_count_ >= count + min_add_new_count) {
+                add_count = max_count_ - count;
+                if (add_count < min_add_new_count)
+                    add_count = min_add_new_count;
+            }
+            else if (work_items_.empty()) {
+                add_count = min_add_new_count;    // add this number of threads
+                max_count_ += min_add_new_count;  // increase max_count
+            }
+            else {
+                return false;
+            }
+        }
+        return add_new(add_count);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -168,7 +296,7 @@ namespace hpx { namespace threads
         thread_map_type::iterator map_iter = thread_map_.find(id);
 
         // the id may reference a new thread not yet stored in the map
-        if (map_iter == thread_map_.end() && add_new())
+        if (map_iter == thread_map_.end())
             map_iter = thread_map_.find(id);
 
         if (map_iter != thread_map_.end())
@@ -244,7 +372,7 @@ namespace hpx { namespace threads
         thread_map_type::iterator map_iter = thread_map_.find(id);
 
         // the id may reference a new thread not yet stored in the map
-        if (map_iter == thread_map_.end() && add_new())
+        if (map_iter == thread_map_.end())
             map_iter = thread_map_.find(id);
 
         if (map_iter != thread_map_.end())
@@ -279,7 +407,7 @@ namespace hpx { namespace threads
         // requested set_state when timer fires and will re-awaken this thread, 
         // allowing the deadline_timer to go out of scope gracefully
         thread_self& self = get_self();
-        thread_id_type wake_id = register_work(boost::bind(
+        thread_id_type wake_id = register_thread(boost::bind(
             &threadmanager::wake_timer_thread, this, id, newstate,
             self.get_thread_id()), "", suspended);
 
@@ -303,7 +431,7 @@ namespace hpx { namespace threads
                 thread_state)
             = &threadmanager::at_timer<time_type>;
 
-        return register_work(boost::bind(f, this, expire_at, id, newstate),
+        return register_thread(boost::bind(f, this, expire_at, id, newstate),
             "at_timer (expire at)");
     }
 
@@ -318,7 +446,7 @@ namespace hpx { namespace threads
                 thread_state)
             = &threadmanager::at_timer<duration_type>;
 
-        return register_work(boost::bind(f, this, from_now, id, newstate),
+        return register_thread(boost::bind(f, this, from_now, id, newstate),
             "at_timer (from now)");
     }
 
@@ -331,7 +459,7 @@ namespace hpx { namespace threads
         thread_map_type::iterator map_iter = thread_map_.find(id);
 
         // the id may reference a new thread not yet stored in the map
-        if (map_iter == thread_map_.end() && add_new())
+        if (map_iter == thread_map_.end())
             map_iter = thread_map_.find(id);
 
         if (map_iter != thread_map_.end())
@@ -400,7 +528,7 @@ namespace hpx { namespace threads
     {
         if (!terminated_items_.empty()) {
             boost::shared_ptr<thread> todelete;
-            while (terminated_items_.dequeue(&todelete))
+            while (terminated_items_.dequeue(&todelete)) 
                 thread_map_.erase(todelete->get_thread_id());
         }
         return thread_map_.empty();
@@ -529,7 +657,7 @@ namespace hpx { namespace threads
             if (is_master_thread) {
                 {
                     mutex_type::scoped_lock lk(mtx_);
-                    if (add_new() || cleanup_terminated())
+                    if (add_new_if_possible() || cleanup_terminated())
                         cond_.notify_all();
                 }
 
@@ -547,7 +675,7 @@ namespace hpx { namespace threads
                            << ", threads left: " << thread_map_.size();
 
                 // stop running after all PX threads have been terminated
-                if (!add_new() && !running_) {
+                if (!add_new_always() && !running_) {
                     // Before exiting each of the OS threads deletes the 
                     // remaining terminated PX threads 
                     if (cleanup_terminated()) {
@@ -573,7 +701,7 @@ namespace hpx { namespace threads
                     LTM_(info) << "tfunc(" << num_thread << "): exiting wait";
 
                     // make sure all pending new threads are properly queued
-                    if (add_new() || timed_out)
+                    if (add_new_always() || timed_out)
                         break;
                 }
             }

@@ -53,6 +53,15 @@ set(Boost_USE_STATIC_LIBS OFF)
 
 find_package(Boost 1.37.0 COMPONENTS ${Boost_COMPONENTS_NEEDED})
 
+if(Boost_FOUND)
+    message(STATUS "Boost version found: " 
+        ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}
+        " (${Boost_INCLUDE_DIR})")
+else()
+    message(FATAL "Boost installation not found. Please specify the Boost"
+        "installation directory using -DBOOST_ROOT=...")
+endif()
+
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIR})
 
@@ -93,6 +102,8 @@ set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}"
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" 
     CACHE PATH "Path to custom CMake Modules" 
     FORCE)
+
+message(STATUS "HPX will be installed to: " ${CMAKE_INSTALL_PREFIX})
 
 # global library configuration
 add_definitions(-DHPX_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")

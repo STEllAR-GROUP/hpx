@@ -17,6 +17,7 @@
 #include <boost/thread/condition.hpp>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
+#include <boost/tuple/tuple.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/lockfree/fifo.hpp>
 #if defined(HPX_DEBUG)
@@ -46,6 +47,13 @@ namespace hpx { namespace threads
             boost::lockfree::fifo<boost::shared_ptr<thread> > 
         work_items_type;
 
+        // this is the type of the queue of new tasks not yet converted to
+        // threads
+        typedef boost::tuple<
+            boost::function<thread_function_type>, thread_state, char const*
+        > task_description;
+        typedef boost::lockfree::fifo<task_description> task_items_type;
+
         // this is the type of a map holding all threads (except depleted ones)
         typedef
             std::map<thread_id_type, boost::shared_ptr<thread> >
@@ -63,14 +71,61 @@ namespace hpx { namespace threads
         // representation
         typedef boost::posix_time::time_duration duration_type;
 
+        // Add this number of threads to the work items queue each time the 
+        // function \a add_new() is called if the queue is empty.
+        enum { min_add_new_count = 100 };
+
+        // The maximum number of active threads this thread manager should
+        // create. This number will be a constraint only as long as the work
+        // items queue is not empty. Otherwise the number of active threads 
+        // will be incremented in steps equal to the \a min_add_new_count
+        // specified above.
+        enum { max_thread_count = 1000 };
+
     public:
         ///
         threadmanager(util::io_service_pool& timer_pool, 
             boost::function<void()> start_thread = boost::function<void()>(),
-            boost::function<void()> stop = boost::function<void()>());
+            boost::function<void()> stop = boost::function<void()>(),
+            std::size_t max_count = max_thread_count);
         ~threadmanager();
 
         typedef boost::lockfree::fifo<thread_id_type> set_state_queue_type;
+
+        /// The function \a register_work adds a new work item to the thread 
+        /// manager. It doesn't immediately create a new \a thread, it just adds 
+        /// the task parameters (function, initial state and description) to 
+        /// the internal management data structures. The thread itself will be 
+        /// created when the number of existing threads drops below the number
+        /// of threads specified by the constructors max_count parameter.
+        ///
+        /// \param func   [in] The function or function object to execute as 
+        ///               the thread's function. This must have a signature as
+        ///               defined by \a thread_function_type.
+        /// \param description [in] The value of this parameter allows to 
+        ///               specify a description of the thread to create. This 
+        ///               information is used for logging purposes mainly, but 
+        ///               might be useful for debugging as well. This parameter 
+        ///               is optional and defaults to an empty string.
+        /// \param initial_state
+        ///               [in] The value of this parameter defines the initial 
+        ///               state of the newly created \a thread. This must be
+        ///               one of the values as defined by the \a thread_state 
+        ///               enumeration (thread_state#pending, or \a
+        ///               thread_state#suspended, any other value will throw a
+        ///               hpx#bad_parameter exception).
+        /// \param run_now [in] If this parameter is \a true and the initial 
+        ///               state is given as \a thread_state#pending the thread 
+        ///               will be run immediately, otherwise it will be 
+        ///               scheduled to run later (either this function is 
+        ///               called for another thread using \a true for the
+        ///               parameter \a run_now or the function \a 
+        ///               threadmanager#do_some_work is called). This parameter
+        ///               is optional and defaults to \a true.
+        void
+        register_work(boost::function<thread_function_type> const& func,
+            char const* const description = "", 
+            thread_state initial_state = pending, bool run_now = true);
 
         /// The function \a register_work adds a new work item to the thread 
         /// manager. It creates a new \a thread, adds it to the internal
@@ -104,7 +159,7 @@ namespace hpx { namespace threads
         /// \returns      The function returns the thread id of the newly 
         ///               created thread. 
         thread_id_type 
-        register_work(boost::function<thread_function_type> func,
+        register_thread(boost::function<thread_function_type> const& threadfunc, 
             char const* const description = "", 
             thread_state initial_state = pending, bool run_now = true);
 
@@ -204,7 +259,9 @@ namespace hpx { namespace threads
 
         /// This function adds threads stored in the new_items queue to the 
         /// thread map and the work_items queue (if appropriate)
-        bool add_new();
+        bool add_new(long add_count);
+        bool add_new_if_possible();
+        bool add_new_always();
 
         /// This function makes sure all threads which are marked for deletion
         /// (state is terminated) are properly destroyed
@@ -214,13 +271,15 @@ namespace hpx { namespace threads
         /// this thread manager has exactly as much threads as requested
         boost::ptr_vector<boost::thread> threads_;
 
+        std::size_t max_count_;             ///< maximum number of existing threads
         thread_map_type thread_map_;        ///< mapping of thread id's to threads
+
         work_items_type work_items_;        ///< list of active work items
         work_items_type terminated_items_;  ///< list of terminated threads
         set_state_queue_type active_set_state_;  ///< list of threads waiting for 
                                             ///< set_state on an active thread
 
-        work_items_type new_items_;         ///< list of threads to run
+        task_items_type new_tasks_;         ///< list of new tasks to run
 
         bool running_;                      ///< thread manager has bee started
         mutable mutex_type mtx_;            ///< mutex protecting the members

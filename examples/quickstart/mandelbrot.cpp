@@ -3,10 +3,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <iostream>
-
 #include <hpx/hpx.hpp>
+
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/lcos/future_callback.hpp>
+#include <hpx/lcos/counting_semaphore.hpp>
 
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
@@ -17,73 +18,92 @@ using namespace hpx;
 namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
-// int fib(int n)
-// {
-//     if (n < 2) 
-//         return n;
-// 
-//     int n1 = fib(n - 1);
-//     int n2 = fib(n - 2);
-//     return n1 + n2;
-// }
-// 
-// int main()
-// {
-//     util::high_resolution_timer t;
-//     int result = fib(41);
-//     double elapsed = t.elapsed();
-// 
-//     std::cout << "elapsed: " << elapsed << ", result: " << result << std::endl;
-// }
-
-///////////////////////////////////////////////////////////////////////////////
-threads::thread_state fib(int* result, naming::id_type prefix, int n);
+threads::thread_state mandelbrot(int* result, double x, double y, int iterations);
 
 typedef 
-    actions::plain_result_action2<int, naming::id_type, int, fib> 
-fibonacci_action;
+    actions::plain_result_action3<int, double, double, int, mandelbrot> 
+mandelbrot_action;
 
-HPX_REGISTER_ACTION(fibonacci_action);
+HPX_REGISTER_ACTION(mandelbrot_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state fib (int* result, naming::id_type prefix, int n)
+inline long double sqr(long double x)
 {
-    if (n < 2) {
-        *result = n;
+    return x * x;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+threads::thread_state mandelbrot(int* result, double xpt, double ypt, int iterations)
+{
+    long double x = 0;
+    long double y = 0;      //converting from pixels to points
+
+    int k = 0;
+    for(/**/; k <= iterations; ++k)
+    {
+        // The Mandelbrot Function Z = Z*Z+c into x and y parts
+        long double xnew = sqr(x) - sqr(y) + xpt;
+        long double ynew = 2 * x*y - ypt;
+        if (sqr(xnew) + sqr(ynew) > 4) 
+            break;
+        x = xnew;
+        y = ynew;
     }
-    else {
-        lcos::eager_future<fibonacci_action> n1(prefix, prefix, n - 1);
-        lcos::eager_future<fibonacci_action> n2(prefix, prefix, n - 2);
-        int r1 = n1.get();
-        int r2 = n2.get();
-        *result = r1 + r2;
-    }
+
+    *result = (k >= iterations) ? 0 : k;
     return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(int argument)
+threads::thread_state mandelbrot_callback(lcos::counting_semaphore& sem,
+    int x, int y, int iterations)
+{
+//     std::cout << x << "," << y << "," << iterations << std::endl;
+    sem.signal();
+    return threads::terminated;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+threads::thread_state hpx_main(int sizex, int sizey, int iterations)
 {
     // get list of all known localities
-    std::vector<naming::id_type> prefixes;
-    naming::id_type prefix;
     applier::applier& appl = applier::get_applier();
-    if (appl.get_remote_prefixes(prefixes)) {
-        // execute the fib() function on any of the remote localities
-        prefix = prefixes[0];
-    }
-    else {
-        // execute the fib() function locally
-        prefix = appl.get_runtime_support_gid();
+
+    // get prefixes of all remote localities (if any)
+    std::vector<naming::id_type> prefixes;
+    appl.get_remote_prefixes(prefixes);
+
+    // execute the mandelbrot() function locally
+    prefixes.push_back(appl.get_runtime_support_gid());
+    std::size_t prefix_count = prefixes.size();
+
+    typedef lcos::eager_future<mandelbrot_action> future_type;
+    typedef lcos::future_callback<future_type> future_callback_type;
+
+    util::high_resolution_timer t;
+
+    // initialize the worker threads, one for each of the pixels
+    lcos::counting_semaphore sem;
+    std::vector<future_callback_type> futures;
+
+    double deltax = 1.0 / sizex;
+    double deltay = 1.0 / sizey;
+
+    for (int x = 0, i = 0; x < sizex; ++x) {
+        for (int y = 0; y < sizey; ++y, ++i) {
+            futures.push_back(future_callback_type(
+                    future_type(prefixes[i % prefix_count], x * deltax, 
+                        y * deltay, iterations), 
+                    boost::bind(mandelbrot_callback, boost::ref(sem), x, y, _1)
+                ));
+        }
     }
 
-    {
-        util::high_resolution_timer t;
-        lcos::eager_future<fibonacci_action> n(prefix, prefix, argument);
-        int result = n.get();
-        double elapsed = t.elapsed();
-        std::cout << "elapsed: " << elapsed << ", result: " << result << std::endl;
-    }
+    // wait for the calculation to finish
+    sem.wait(sizex*sizey);
+
+    double elapsed = t.elapsed();
+    std::cout << "elapsed: " << elapsed << std::endl;
 
     // initiate shutdown of the runtime systems on all localities
     components::stubs::runtime_support::shutdown_all();
@@ -95,7 +115,7 @@ threads::thread_state hpx_main(int argument)
 bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
 {
     try {
-        po::options_description desc_cmdline ("Usage: fibonacci [options]");
+        po::options_description desc_cmdline ("Usage: mandelbrot [options]");
         desc_cmdline.add_options()
             ("help,h", "print out program usage (this message)")
             ("run_agas_server,r", "run AGAS server as part of this runtime instance")
@@ -108,8 +128,13 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("threads,t", po::value<int>(), 
                 "the number of operating system threads to spawn for this"
                 "HPX locality")
-            ("value,v", po::value<int>(), 
-                "the number to be used as the argument to fib (default is 10)")
+            ("sizex,X", po::value<int>(), 
+                "the horizontal (X) size of the generated image (default is 20)")
+            ("sizey,Y", po::value<int>(), 
+                "the vertical (Y) size of the generated image (default is 20)")
+            ("iterations,i", po::value<int>(), 
+                "the nmber of iterations to use for the mandelbrot set calculations"
+                " (default is 100")
         ;
 
         po::store(po::command_line_parser(argc, argv)
@@ -123,7 +148,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
         }
     }
     catch (std::exception const& e) {
-        std::cerr << "fibonacci: exception caught: " << e.what() << std::endl;
+        std::cerr << "mandelbrot: exception caught: " << e.what() << std::endl;
         return false;
     }
     return true;
@@ -144,7 +169,7 @@ split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
         }
     }
     catch (boost::bad_lexical_cast const& /*e*/) {
-        std::cerr << "fibonacci: illegal port number given: " << v.substr(p+1) << std::endl;
+        std::cerr << "mandelbrot: illegal port number given: " << v.substr(p+1) << std::endl;
         std::cerr << "           using default value instead: " << port << std::endl;
     }
 }
@@ -178,7 +203,9 @@ int main(int argc, char* argv[])
         std::string hpx_host("localhost"), agas_host;
         boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
         int num_threads = 1;
-        int argument = 10;
+        int size_x = 20;
+        int size_y = 20;
+        int iterations = 100;
 
         // extract IP address/port arguments
         if (vm.count("agas")) 
@@ -190,8 +217,12 @@ int main(int argc, char* argv[])
         if (vm.count("threads"))
             num_threads = vm["threads"].as<int>();
 
-        if (vm.count("value"))
-            argument = vm["value"].as<int>();
+        if (vm.count("sizex"))
+            size_x = vm["sizex"].as<int>();
+        if (vm.count("sizey"))
+            size_y = vm["sizey"].as<int>();
+        if (vm.count("iterations"))
+            iterations = vm["iterations"].as<int>();
 
         // initialize and run the AGAS service, if appropriate
         std::auto_ptr<agas_server_helper> agas_server;
@@ -200,14 +231,14 @@ int main(int argc, char* argv[])
 
         // initialize and start the HPX runtime
         hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port);
-        rt.run(boost::bind(hpx_main, argument), num_threads);
+        rt.run(boost::bind(hpx_main, size_x, size_y, iterations), num_threads);
     }
     catch (std::exception& e) {
-        std::cerr << "fibonacci: std::exception caught: " << e.what() << "\n";
+        std::cerr << "mandelbrot: std::exception caught: " << e.what() << "\n";
         return -1;
     }
     catch (...) {
-        std::cerr << "fibonacci: unexpected exception caught\n";
+        std::cerr << "mandelbrot: unexpected exception caught\n";
         return -2;
     }
     return 0;

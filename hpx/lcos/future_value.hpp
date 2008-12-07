@@ -353,6 +353,8 @@ namespace hpx { namespace lcos
         }
 
     public:
+        typedef Result result_type;
+
         ~future_value()
         {}
 

@@ -20,9 +20,9 @@ int main(int argc, char* argv[])
 
     my_tm.register_work(boost::bind (my_gcd, 13, 14, 1), "gcd");                      // GCD = 1
     hpx::threads::thread_id_type t_id = 
-        my_tm.register_work(boost::bind (my_gcd, 7, 343, 7), "gcd", suspended);       // GCD = 7
+        my_tm.register_thread(boost::bind (my_gcd, 7, 343, 7), "gcd", suspended);     // GCD = 7
     hpx::threads::thread_id_type t2_id = 
-        my_tm.register_work(boost::bind (my_gcd, 120, 115, 5), "gcd", suspended);     // GCD = 5
+        my_tm.register_thread(boost::bind (my_gcd, 120, 115, 5), "gcd", suspended);   // GCD = 5
     my_tm.register_work(boost::bind (my_gcd, 9, 15, 3), "gcd", pending);              // GCD = 3
 
     BOOST_TEST(my_tm.get_state(t2_id) == suspended);
