@@ -262,6 +262,8 @@ namespace hpx { namespace threads
                 add_count = max_count_ - count;
                 if (add_count < min_add_new_count)
                     add_count = min_add_new_count;
+                if (add_count > max_add_new_count)
+                    add_count = max_add_new_count;
             }
             else if (work_items_.empty()) {
                 add_count = min_add_new_count;    // add this number of threads

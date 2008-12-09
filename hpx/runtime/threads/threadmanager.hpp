@@ -73,7 +73,10 @@ namespace hpx { namespace threads
 
         // Add this number of threads to the work items queue each time the 
         // function \a add_new() is called if the queue is empty.
-        enum { min_add_new_count = 100 };
+        enum { 
+            min_add_new_count = 100, 
+            max_add_new_count = 100
+        };
 
         // The maximum number of active threads this thread manager should
         // create. This number will be a constraint only as long as the work
