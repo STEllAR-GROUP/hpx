@@ -15,6 +15,8 @@
 #ifndef BOOST_LOCKFREE_FIFO_HPP_INCLUDED
 #define BOOST_LOCKFREE_FIFO_HPP_INCLUDED
 
+#define BOOST_LOCKFREE_FIFO_TRACK_COUNT
+
 #include <boost/lockfree/prefix.hpp>
 #include <boost/lockfree/tagged_ptr.hpp>
 #include <boost/lockfree/atomic_int.hpp>
@@ -23,6 +25,9 @@
 #include <boost/concept_check.hpp>
 #include <boost/static_assert.hpp>
 
+#if defined(BOOST_LOCKFREE_FIFO_TRACK_COUNT)
+#include <hpx/util/value_logger.hpp>
+#endif
 
 #include <memory>               /* std::auto_ptr */
 #include <boost/scoped_ptr.hpp>
@@ -64,8 +69,8 @@ public:
     explicit fifo(char const* description = "")
       : enqueue_spin_count_(0), dequeue_spin_count_(0),
         description_(description)
-#if defined(_DEBUG)
-      , count_(-1)
+#if defined(BOOST_LOCKFREE_FIFO_TRACK_COUNT)
+      , count_(-1), logger_(description)
 #endif
     {
         node * n = alloc_node();
@@ -77,8 +82,8 @@ public:
       : pool(initial_nodes)
       , description_(description)
       , enqueue_spin_count_(0), dequeue_spin_count_(0)
-#if defined(_DEBUG)
-      , count_(-1)
+#if defined(BOOST_LOCKFREE_FIFO_TRACK_COUNT)
+      , count_(-1), logger_(description)
 #endif
     {
         node * n = alloc_node();
@@ -165,8 +170,9 @@ private:
     {
         node * chunk = pool.allocate();
         new(chunk) node();
-#if defined(_DEBUG)
+#if defined(BOOST_LOCKFREE_FIFO_TRACK_COUNT)
         ++count_;
+        logger_.snapshot(count_);
 #endif
         return chunk;
     }
@@ -175,16 +181,18 @@ private:
     {
         node * chunk = pool.allocate();
         new(chunk) node(t);
-#if defined(_DEBUG)
+#if defined(BOOST_LOCKFREE_FIFO_TRACK_COUNT)
         ++count_;
+        logger_.snapshot(count_);
 #endif
         return chunk;
     }
 
     void dealloc_node(node * n)
     {
-#if defined(_DEBUG)
+#if defined(BOOST_LOCKFREE_FIFO_TRACK_COUNT)
         --count_;
+        logger_.snapshot(count_);
 #endif
         n->~node();
         pool.deallocate(n);
@@ -199,8 +207,9 @@ private:
     BOOST_LOCKFREE_CACHELINE_ALIGNMENT_PREFIX atomic_node_ptr tail_ BOOST_LOCKFREE_CACHELINE_ALIGNMENT; 
 
 public:
-#if defined(_DEBUG)
+#if defined(BOOST_LOCKFREE_FIFO_TRACK_COUNT)
     atomic_int<long> count_;
+    hpx::util::value_logger<long> logger_;
 #endif
     atomic_int<long> enqueue_spin_count_;
     atomic_int<long> dequeue_spin_count_;

@@ -185,6 +185,7 @@ namespace hpx { namespace threads
         if (0 == add_count)
             return false;
 
+        std::size_t num_threads = threads_.size();
         long added = 0;
         task_description task;
         while (add_count-- && new_tasks_.dequeue(&task)) 
@@ -204,13 +205,14 @@ namespace hpx { namespace threads
                 return false;
             }
 
-            ++added;
-
             // only insert the thread into the work-items queue if it is in 
             // pending state
             if (thrd->get_state() == pending) {
                 // pushing the new thread into the pending queue 
+                ++added;
                 work_items_.enqueue(thrd);
+                if (0 == (added % num_threads))
+                    cond_.notify_all();         // wake up sleeping threads
             }
         }
 
@@ -587,7 +589,8 @@ namespace hpx { namespace threads
         ++thread_count_;
 #endif
         std::size_t num_px_threads = 0;
-        util::time_logger tl("tfunc", num_thread, util::ref_time_.start_);
+        util::time_logger tl1("tfunc", num_thread);
+        util::time_logger tl2("tfunc1", num_thread);
 
         // the thread with number zero is the master
         bool is_master_thread = (0 == num_thread) ? true : false;
@@ -599,7 +602,7 @@ namespace hpx { namespace threads
             // Get the next PX thread from the queue
             boost::shared_ptr<thread> thrd;
             if (work_items_.dequeue(&thrd)) {
-                tl.tick();
+                tl1.tick();
 
                 // Only pending PX threads will be executed.
                 // Any non-pending PX threads are leftovers from a set_state() 
@@ -648,7 +651,7 @@ namespace hpx { namespace threads
                     terminated_items_.enqueue(thrd);
                 }
 
-                tl.tock();
+                tl1.tock();
             }
 
             // only one dedicated OS thread is allowed to acquire the 
@@ -656,8 +659,12 @@ namespace hpx { namespace threads
             // thread-map and deleting all terminated threads
             if (is_master_thread) {
                 {
+                    // first clean up terminated threads
                     mutex_type::scoped_lock lk(mtx_);
-                    if (add_new_if_possible() || cleanup_terminated())
+                    cleanup_terminated();
+
+                    // now, add new threads from the queue of task descriptions
+                    if (add_new_if_possible())
                         cond_.notify_all();
                 }
 
@@ -675,6 +682,7 @@ namespace hpx { namespace threads
                            << ", threads left: " << thread_map_.size();
 
                 // stop running after all PX threads have been terminated
+                cleanup_terminated();
                 if (!add_new_always() && !running_) {
                     // Before exiting each of the OS threads deletes the 
                     // remaining terminated PX threads 
@@ -697,7 +705,10 @@ namespace hpx { namespace threads
                 {
                     LTM_(info) << "tfunc(" << num_thread 
                                << "): queues empty, entering wait";
+                    tl2.tick();
                     bool timed_out = cond_.timed_wait(lk, boost::posix_time::milliseconds(5));
+                    tl2.tock();
+
                     LTM_(info) << "tfunc(" << num_thread << "): exiting wait";
 
                     // make sure all pending new threads are properly queued

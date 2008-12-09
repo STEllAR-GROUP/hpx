@@ -36,6 +36,12 @@ namespace boost { lockfree
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    inline boost::uint64_t hrtimer_ticks()
+    {
+        return 0;     // no timings are recorded
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <class C, class D>
     inline bool CAS (volatile C * addr, D old, D nw)
     {

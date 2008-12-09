@@ -132,7 +132,8 @@ set (hpxlib_HEADERS
     ${hpx_SOURCE_DIR}/hpx/util/static.hpp
     ${hpx_SOURCE_DIR}/hpx/util/time_logger.hpp
     ${hpx_SOURCE_DIR}/hpx/util/unlock_lock.hpp
-    ${hpx_SOURCE_DIR}/hpx/util/util.hpp)
+    ${hpx_SOURCE_DIR}/hpx/util/util.hpp
+    ${hpx_SOURCE_DIR}/hpx/util/value_logger.hpp)
 
 set (hpxlib_SOURCES
     ${hpx_SOURCE_DIR}/src/exception_list.cpp

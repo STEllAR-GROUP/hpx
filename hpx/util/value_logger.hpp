@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_TIME_LOGGER_NOV_26_0548PM)
-#define HPX_UTIL_TIME_LOGGER_NOV_26_0548PM
+#if !defined(HPX_UTIL_VALUE_LOGGER_DEC_08_0548PM)
+#define HPX_UTIL_VALUE_LOGGER_DEC_08_0548PM
 
 #include <fstream>
 #include <boost/version.hpp>
@@ -14,24 +14,21 @@
 #include <hpx/util/logging.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_INITIAL_TIMES_SIZE 64000
-
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        struct time_logger_ref_time
+        struct value_logger_ref_time
         {
-            time_logger_ref_time()
+            value_logger_ref_time()
             {
                 start_ = boost::lockfree::hrtimer_ticks();
             }
             boost::uint64_t start_;
         };
 
-        time_logger_ref_time const time_logger_ref_time_;
+        value_logger_ref_time const value_logger_ref_time_;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -39,70 +36,51 @@ namespace hpx { namespace util
     /// of code. It measures the execution time for each of the executions and
     /// collects the number of invocations, the average, and the variance of 
     /// the measured execution times.
-    class time_logger
+    template <typename T>
+    class value_logger
     {
     private:
         enum { hpx_initial_times_size = 64000 };
+        typedef std::vector<std::pair<boost::uint64_t, T> > values_type;
 
     public:
-        time_logger(char const* const description, int thread_num)
-          : description_(description), thread_num_(thread_num)
+        value_logger(char const* const description)
+          : description_(description)
         {
             if (LTIM_ENABLED(fatal)) 
-                times_.reserve(hpx_initial_times_size);
+                values_.reserve(hpx_initial_times_size);
         }
 
-        ~time_logger()
+        ~value_logger()
         {
             if (!LTIM_ENABLED(fatal)) 
                 return;     // generate output only if logging is enabled
 
             std::string name(description_);
             name += "." + boost::lexical_cast<std::string>(getpid());
-            name += "." + boost::lexical_cast<std::string>(thread_num_);
             name += ".csv";
 
             std::ofstream out(name.c_str());
 
-            int i = 0;
-            std::vector<boost::uint64_t>::iterator eit = times_.end();
-            std::vector<boost::uint64_t>::iterator bit = times_.begin();
-            for (std::vector<boost::uint64_t>::iterator it = bit; it != eit; ++it, ++i)
+            typename values_type::iterator eit = values_.end();
+            typename values_type::iterator bit = values_.begin();
+            for (typename values_type::iterator it = bit; it != eit; ++it)
             {
-                boost::uint64_t t = *it - detail::time_logger_ref_time_.start_;
-                out << t << "," << 2*thread_num_ + ((i % 2) ? 1 : 0) << std::endl;
-                out << t+1 << "," << 2*thread_num_ + ((i % 2) ? 0 : 1) << std::endl;
+                boost::uint64_t t = (*it).first - detail::value_logger_ref_time_.start_;
+                out << t << "," << (*it).second << std::endl;
             }
         }
 
-        void tick()
+        void snapshot(T const& t)
         {
             if (LTIM_ENABLED(fatal)) 
-                times_.push_back(boost::lockfree::hrtimer_ticks());
+                values_.push_back(std::make_pair(boost::lockfree::hrtimer_ticks(), t));
         }
-
-        void tock()
-        {
-            if (LTIM_ENABLED(fatal)) 
-                times_.push_back(boost::lockfree::hrtimer_ticks());
-        }
-
-        struct ref_time
-        {
-            ref_time()
-            {
-                start_ = boost::lockfree::hrtimer_ticks();
-            }
-            boost::uint64_t start_;
-        };
 
     private:
         char const* const description_;
-        int thread_num_;
-        std::vector<boost::uint64_t> times_;
+        values_type values_;
     };
-
-    time_logger::ref_time const ref_time_;
 
 }}
 

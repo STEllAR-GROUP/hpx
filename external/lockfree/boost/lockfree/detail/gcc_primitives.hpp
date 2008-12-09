@@ -54,6 +54,22 @@ namespace boost { namespace lockfree
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    inline boost::uint64_t hrtimer_ticks()
+    {
+        boost::uint32_t _lo, _hi;
+        __asm__ __volatile__ (
+              "movl %%ebx,%%esi\n"
+              "cpuid\n"
+              "rdtsc\n"
+              "movl %%esi,%%ebx\n"
+            : "=a" (_lo), "=d" (_hi)
+            :
+            : "%esi", "%ecx"
+        );
+        return ((boost::uint64_t)_hi << 32) | _lo;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <class C, class D>
     inline bool CAS(volatile C * addr, D old, D nw)
     {

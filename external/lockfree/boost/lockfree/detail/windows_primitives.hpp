@@ -67,6 +67,14 @@ namespace boost { namespace lockfree
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    inline boost::uint64_t hrtimer_ticks()
+    {
+        LARGE_INTEGER now;
+        QueryPerformanceCounter(&now);
+        return (boost::uint64_t)now.QuadPart;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <class C, class D>
     inline bool CAS (volatile C * addr, D old, D nw, boost::mpl::true_)
     {
