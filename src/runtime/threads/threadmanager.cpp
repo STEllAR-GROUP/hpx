@@ -531,8 +531,9 @@ namespace hpx { namespace threads
     inline bool threadmanager::cleanup_terminated()
     {
         if (!terminated_items_.empty()) {
+            long delete_count = max_delete_count;   // delete only this much threads
             boost::shared_ptr<thread> todelete;
-            while (terminated_items_.dequeue(&todelete)) 
+            while (--delete_count && terminated_items_.dequeue(&todelete)) 
                 thread_map_.erase(todelete->get_thread_id());
         }
         return thread_map_.empty();
@@ -583,6 +584,32 @@ namespace hpx { namespace threads
         }
         LTM_(info) << "tfunc(" << num_thread << "): end, executed " 
                    << num_px_threads << " HPX threads";
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        ///////////////////////////////////////////////////////////////////////
+        // This try_lock_wrapper is essentially equivalent to the template 
+        // boost::thread::detail::try_lock_wrapper with the one exception, that
+        // the lock() function always calls base::try_lock(). This allows us to 
+        // skip lock acquisition while exiting the condition variable.
+        template<typename Mutex>
+        class try_lock_wrapper
+          : public boost::detail::try_lock_wrapper<Mutex>
+        {
+            typedef boost::detail::try_lock_wrapper<Mutex> base;
+
+        public:
+            explicit try_lock_wrapper(Mutex& m):
+                base(m, boost::try_to_lock)
+            {}
+
+            void lock()
+            {
+                base::try_lock();       // this is different
+            }
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -681,8 +708,8 @@ namespace hpx { namespace threads
                     // first clean up terminated threads
                     mutex_type::scoped_lock lk(mtx_);
                     if (lk) {
-                        // no point in having two threads doing the maintenance
-                        // simultaneously
+                        // no point in having a thread waiting on the lock 
+                        // while another thread is doing the maintenance
                         cleanup_terminated();
 
                         // now, add new threads from the queue of task descriptions
@@ -698,12 +725,20 @@ namespace hpx { namespace threads
             // if nothing else has to be done either wait or terminate
             bool terminate = false;
             while (work_items_.empty() && active_set_state_.empty()) {
-                // no obvious work has to be done, so a lock won't hurt too much
+                // No obvious work has to be done, so a lock won't hurt too much
                 // but we lock only one of the threads, assuming this thread
                 // will do the maintenance
-                mutex_type::scoped_lock lk(mtx_, boost::try_to_lock);
+                //
+                // We prefer to exit this while loop (some kind of very short 
+                // busy waiting) to blocking on this lock. Locking fails either
+                // when a thread is currently doing thread maintenance, which
+                // means there might be new work, or the thread owning the lock 
+                // just falls through to the wait below (no work is available)
+                // in which case the current thread (which failed to acquire 
+                // the lock) will just retry to enter this loop.
+                detail::try_lock_wrapper<mutex_type> lk(mtx_);
                 if (!lk)
-                    break;            // avoid long waiting on lock
+                    break;            // avoid long wait on lock
 
                 // this thread acquired the lock, do maintenance and finally
                 // call wait() if not work is available
@@ -711,7 +746,6 @@ namespace hpx { namespace threads
                            << ", threads left: " << thread_map_.size();
 
                 // stop running after all PX threads have been terminated
-                cleanup_terminated();
                 if (!add_new_always() && !running_) {
                     // Before exiting each of the OS threads deletes the 
                     // remaining terminated PX threads 
@@ -725,11 +759,14 @@ namespace hpx { namespace threads
                     LTM_(info) << "tfunc(" << num_thread 
                                << "): threadmap not empty";
                 }
+                else {
+                    cleanup_terminated();
+                }
 
                 // Wait until somebody needs some action (if no new work 
                 // arrived in the meantime).
                 // Ask again if queues are empty to avoid race conditions (we 
-                // need to lock anyways...), this way no notify_all() gets lost
+                // needed to lock anyways...), this way no notify_all() gets lost
                 if (work_items_.empty() && active_set_state_.empty())
                 {
                     LTM_(info) << "tfunc(" << num_thread 
@@ -737,16 +774,20 @@ namespace hpx { namespace threads
 
                     bool timed_out = false;
                     {
+                        namespace bpt = boost::posix_time;
                         decrement_on_exit on_exit(wait_count_);
+
                         tl2.tick();
-                        timed_out = cond_.timed_wait(lk, boost::posix_time::milliseconds(5));
+                        timed_out = cond_.timed_wait(lk, bpt::milliseconds(5));
                         tl2.tock();
                     }
 
                     LTM_(info) << "tfunc(" << num_thread << "): exiting wait";
 
                     // make sure all pending new threads are properly queued
-                    if (add_new_always() || timed_out)
+                    // but do that only if the lock has been acquired while 
+                    // exiting the condition.wait() above
+                    if ((lk && add_new_always()) || timed_out)
                         break;
                 }
             }

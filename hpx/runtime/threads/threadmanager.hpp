@@ -75,7 +75,8 @@ namespace hpx { namespace threads
         // function \a add_new() is called if the queue is empty.
         enum { 
             min_add_new_count = 100, 
-            max_add_new_count = 100
+            max_add_new_count = 100,
+            max_delete_count = 100
         };
 
         // The maximum number of active threads this thread manager should
