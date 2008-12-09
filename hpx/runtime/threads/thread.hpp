@@ -32,9 +32,10 @@ namespace hpx { namespace threads { namespace detail
     // This is the representation of a ParalleX thread
     class thread : public lcos::base_lco, private boost::noncopyable
     {
+        typedef boost::function<thread_function_type> function_type;
+
     public:
-        thread(boost::function<thread_function_type> func, 
-                thread_id_type id, thread_state newstate,
+        thread(function_type func, thread_id_type id, thread_state newstate,
                 char const* const description)
           : coroutine_(func, id), 
             current_state_(newstate), description_(description)
@@ -46,7 +47,7 @@ namespace hpx { namespace threads { namespace detail
         /// by a factory (runtime_support) instance, we can leave this 
         /// constructor empty
         thread(applier::applier& appl)
-          : description_("")
+          : coroutine_(function_type(), 0), description_("")
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
         }

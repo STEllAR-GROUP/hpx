@@ -24,9 +24,6 @@ namespace hpx { namespace lcos
             boost::function<threads::thread_state(result_type const&)> 
         callback_type;
 
-        future_callback()
-        {}
-
         future_callback(Future const& future, callback_type cb)
         {
             hpx::applier::register_work(

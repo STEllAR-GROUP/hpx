@@ -191,11 +191,12 @@ namespace hpx { namespace threads
         while (add_count-- && new_tasks_.dequeue(&task)) 
         {
             // create the new thread
+            thread_state state = boost::get<1>(task);
             boost::shared_ptr<threads::thread> thrd (
-                new threads::thread(boost::get<0>(task), boost::get<1>(task), 
+                new threads::thread(boost::get<0>(task), state, 
                     boost::get<2>(task)));
 
-            // add the new entry in the map of all threads
+            // add the new entry to the map of all threads
             std::pair<thread_map_type::iterator, bool> p =
                 thread_map_.insert(map_pair(thrd->get_thread_id(), thrd));
 
@@ -207,7 +208,7 @@ namespace hpx { namespace threads
 
             // only insert the thread into the work-items queue if it is in 
             // pending state
-            if (thrd->get_state() == pending) {
+            if (state == pending) {
                 // pushing the new thread into the pending queue 
                 ++added;
                 work_items_.enqueue(thrd);

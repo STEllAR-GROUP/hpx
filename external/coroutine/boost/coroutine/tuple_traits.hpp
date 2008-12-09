@@ -73,7 +73,9 @@ namespace boost { namespace coroutines {
         ~)){}
         
       tuple_workaround(const tuple_workaround&) {}
+#if BOOST_COROUTINE_ARG_MAX > 0
       tuple_workaround() {}
+#endif
 #     undef BOOST_COROUTINE_arg_null_typecr
     };
   } /* detail */
@@ -126,20 +128,17 @@ namespace boost { namespace coroutines {
     boost::mpl::identity<void>,
     step_2<T> > { };
 
-  template<
-    BOOST_PP_ENUM_BINARY_PARAMS
-  (BOOST_COROUTINE_ARG_MAX,
-   typename T, 
-   = boost::tuples::null_type BOOST_PP_INTERCEPT)>
+  template<BOOST_PP_ENUM_BINARY_PARAMS(BOOST_COROUTINE_ARG_MAX,
+      typename T, = boost::tuples::null_type BOOST_PP_INTERCEPT)>
   struct tuple_traits : tuple_traits_tag {
-  public:	
+  public:
 
     // This is the straightforward boost::tuple trait
     // derived from the argument list. It is not 
     // directly used in all cases.
-    typedef boost::tuple
-    <BOOST_PP_ENUM_PARAMS
-    (BOOST_COROUTINE_ARG_MAX, T)> internal_tuple_type;
+    typedef 
+        boost::tuple<BOOST_PP_ENUM_PARAMS(BOOST_COROUTINE_ARG_MAX, T)> 
+    internal_tuple_type;
 
     // FIXME: Currently coroutine code does not use this typedef in all cases
     // and expect it to be equal to boost::tuples::null_type

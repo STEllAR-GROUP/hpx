@@ -85,6 +85,7 @@ threads::thread_state hpx_main(int sizex, int sizey, int iterations)
     // initialize the worker threads, one for each of the pixels
     lcos::counting_semaphore sem;
     std::vector<future_callback_type> futures;
+    futures.reserve(sizex*sizey);   // preallocate vector
 
     double deltax = 1.0 / sizex;
     double deltay = 1.0 / sizey;

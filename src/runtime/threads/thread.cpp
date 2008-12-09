@@ -30,17 +30,17 @@ namespace hpx { namespace threads
 {
     thread_self& get_self()
     {
-        return *thread_self::impl_type::get_self();
+        return *thread_self::impl_type::super_type::get_self();
     }
 
     thread_self* get_self_ptr()
     {
-        return thread_self::impl_type::get_self();
+        return thread_self::impl_type::super_type::get_self();
     }
 
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
 // explicit instantiation of the function thread_self::set_self
-template void hpx::threads::thread_self::impl_type::set_self(hpx::threads::thread_self*);
+template void hpx::threads::thread_self::impl_type::super_type::set_self(hpx::threads::thread_self*);
 

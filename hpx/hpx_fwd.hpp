@@ -12,6 +12,7 @@
 #endif
 
 #include <boost/shared_ptr.hpp>
+#include <boost/function.hpp>
 #include <boost/coroutine/shared_coroutine.hpp>
 #include <hpx/config.hpp>
 
@@ -124,12 +125,12 @@ namespace hpx
         HPX_API_EXPORT char const* const get_thread_state_name(thread_state state);
 
         ///////////////////////////////////////////////////////////////////////
-        typedef 
-            boost::coroutines::shared_coroutine<thread_state()>
-        coroutine_type;
+        typedef thread_state thread_function_type();
+        typedef boost::coroutines::static_coroutine<
+                thread_function_type, boost::function<thread_function_type> 
+        > coroutine_type;
         typedef coroutine_type::thread_id_type thread_id_type;
         typedef coroutine_type::self thread_self;
-        typedef thread_state thread_function_type();
 
         /// The function \a get_self returns a reference to the (OS thread 
         /// specific) self reference to the current PX thread.
