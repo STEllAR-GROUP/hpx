@@ -45,15 +45,15 @@ namespace hpx { namespace util
 
     public:
         value_logger(char const* const description)
-          : description_(description)
+          : description_(description), enabled_(LTIM_ENABLED(fatal))
         {
-            if (LTIM_ENABLED(fatal)) 
+            if (enabled_) 
                 values_.reserve(hpx_initial_times_size);
         }
 
         ~value_logger()
         {
-            if (!LTIM_ENABLED(fatal)) 
+            if (!enabled_) 
                 return;     // generate output only if logging is enabled
 
             std::string name(description_);
@@ -73,13 +73,14 @@ namespace hpx { namespace util
 
         void snapshot(T const& t)
         {
-            if (LTIM_ENABLED(fatal)) 
+            if (enabled_) 
                 values_.push_back(std::make_pair(boost::lockfree::hrtimer_ticks(), t));
         }
 
     private:
         char const* const description_;
         values_type values_;
+        bool enabled_;
     };
 
 }}

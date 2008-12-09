@@ -44,7 +44,7 @@ namespace hpx { namespace threads
     threadmanager::threadmanager(util::io_service_pool& timer_pool,
             boost::function<void()> start_thread, boost::function<void()> stop,
             std::size_t max_count)
-      : max_count_(max_count), running_(false), 
+      : max_count_(max_count), running_(false), wait_count_(0),
         timer_pool_(timer_pool), start_thread_(start_thread), stop_(stop),
         work_items_("work_items"), terminated_items_("terminated_items"), 
         active_set_state_("active_set_state"), new_tasks_("new_tasks")
@@ -211,7 +211,7 @@ namespace hpx { namespace threads
                 // pushing the new thread into the pending queue 
                 ++added;
                 work_items_.enqueue(thrd);
-                if (0 == (added % num_threads))
+                if (0 != wait_count_)
                     cond_.notify_all();         // wake up sleeping threads
             }
         }
@@ -585,6 +585,23 @@ namespace hpx { namespace threads
                    << num_px_threads << " HPX threads";
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    struct decrement_on_exit
+    {
+        decrement_on_exit(boost::lockfree::atomic_int<long>& count)
+          : count_(count)
+        {
+            ++count_;
+        }
+        ~decrement_on_exit()
+        {
+            --count_;
+        }
+
+        boost::lockfree::atomic_int<long>& count_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     std::size_t threadmanager::tfunc_impl(std::size_t num_thread)
     {
 #if HPX_DEBUG != 0
@@ -663,11 +680,15 @@ namespace hpx { namespace threads
                 {
                     // first clean up terminated threads
                     mutex_type::scoped_lock lk(mtx_);
-                    cleanup_terminated();
+                    if (lk) {
+                        // no point in having two threads doing the maintenance
+                        // simultaneously
+                        cleanup_terminated();
 
-                    // now, add new threads from the queue of task descriptions
-                    if (add_new_if_possible())
-                        cond_.notify_all();
+                        // now, add new threads from the queue of task descriptions
+                        if (add_new_if_possible())
+                            cond_.notify_all();
+                    }
                 }
 
                 // make sure to handle pending set_state requests
@@ -678,8 +699,14 @@ namespace hpx { namespace threads
             bool terminate = false;
             while (work_items_.empty() && active_set_state_.empty()) {
                 // no obvious work has to be done, so a lock won't hurt too much
-                mutex_type::scoped_lock lk(mtx_);
+                // but we lock only one of the threads, assuming this thread
+                // will do the maintenance
+                mutex_type::scoped_lock lk(mtx_, boost::try_to_lock);
+                if (!lk)
+                    break;            // avoid long waiting on lock
 
+                // this thread acquired the lock, do maintenance and finally
+                // call wait() if not work is available
                 LTM_(info) << "tfunc(" << num_thread << "): queues empty"
                            << ", threads left: " << thread_map_.size();
 
@@ -707,9 +734,14 @@ namespace hpx { namespace threads
                 {
                     LTM_(info) << "tfunc(" << num_thread 
                                << "): queues empty, entering wait";
-                    tl2.tick();
-                    bool timed_out = cond_.timed_wait(lk, boost::posix_time::milliseconds(5));
-                    tl2.tock();
+
+                    bool timed_out = false;
+                    {
+                        decrement_on_exit on_exit(wait_count_);
+                        tl2.tick();
+                        timed_out = cond_.timed_wait(lk, boost::posix_time::milliseconds(5));
+                        tl2.tock();
+                    }
 
                     LTM_(info) << "tfunc(" << num_thread << "): exiting wait";
 

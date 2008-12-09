@@ -274,8 +274,8 @@ namespace hpx { namespace threads
         /// this thread manager has exactly as much threads as requested
         boost::ptr_vector<boost::thread> threads_;
 
-        std::size_t max_count_;             ///< maximum number of existing threads
-        thread_map_type thread_map_;        ///< mapping of thread id's to threads
+        std::size_t max_count_;             ///< maximum number of existing PX-threads
+        thread_map_type thread_map_;        ///< mapping of thread id's to PX-threads
 
         work_items_type work_items_;        ///< list of active work items
         work_items_type terminated_items_;  ///< list of terminated threads
@@ -287,6 +287,7 @@ namespace hpx { namespace threads
         bool running_;                      ///< thread manager has bee started
         mutable mutex_type mtx_;            ///< mutex protecting the members
         boost::condition cond_;             ///< used to trigger some action
+        boost::lockfree::atomic_int<long> wait_count_;  ///< count waiting threads
 
         util::io_service_pool& timer_pool_; ///< used for timed set_state
 

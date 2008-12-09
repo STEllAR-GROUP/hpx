@@ -46,15 +46,16 @@ namespace hpx { namespace util
 
     public:
         time_logger(char const* const description, int thread_num)
-          : description_(description), thread_num_(thread_num)
+          : description_(description), thread_num_(thread_num), 
+            enabled_(LTIM_ENABLED(fatal))
         {
-            if (LTIM_ENABLED(fatal)) 
+            if (enabled_) 
                 times_.reserve(hpx_initial_times_size);
         }
 
         ~time_logger()
         {
-            if (!LTIM_ENABLED(fatal)) 
+            if (!enabled_) 
                 return;     // generate output only if logging is enabled
 
             std::string name(description_);
@@ -77,32 +78,22 @@ namespace hpx { namespace util
 
         void tick()
         {
-            if (LTIM_ENABLED(fatal)) 
+            if (enabled_) 
                 times_.push_back(boost::lockfree::hrtimer_ticks());
         }
 
         void tock()
         {
-            if (LTIM_ENABLED(fatal)) 
+            if (enabled_) 
                 times_.push_back(boost::lockfree::hrtimer_ticks());
         }
-
-        struct ref_time
-        {
-            ref_time()
-            {
-                start_ = boost::lockfree::hrtimer_ticks();
-            }
-            boost::uint64_t start_;
-        };
 
     private:
         char const* const description_;
         int thread_num_;
         std::vector<boost::uint64_t> times_;
+        bool enabled_;
     };
-
-    time_logger::ref_time const ref_time_;
 
 }}
 
