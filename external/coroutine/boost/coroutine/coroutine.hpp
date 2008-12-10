@@ -359,7 +359,6 @@ namespace boost { namespace coroutines {
     typedef typename impl_type::thread_id_type thread_id_type;
     typedef detail::coroutine_self<type> self;
 
-    template<typename Functor>
     static_coroutine (Functor f, thread_id_type id = 0, 
             std::ptrdiff_t stack_size = detail::default_stack_size) 
       : impl_(f, id, stack_size) 
@@ -370,11 +369,10 @@ namespace boost { namespace coroutines {
         return impl_.get_thread_id();
     }
 
-    template<typename Functor>
     void rebind(Functor f, thread_id_type id = 0)
     {
         BOOST_ASSERT(exited());
-        impl_type::rebind(m_pimpl, f, id);
+        //impl_type::rebind(m_pimpl, f, id);
     }
 
 #define BOOST_COROUTINE_generate_argument_n_type(z, n, traits_type)           \
@@ -424,7 +422,7 @@ namespace boost { namespace coroutines {
 
     typedef void(static_coroutine::*bool_type)();
     operator bool_type() const {
-        return good()? &coroutine::bool_type_f: 0;
+        return good()? &static_coroutine::bool_type_f: 0;
     }
 
     void exit() {
