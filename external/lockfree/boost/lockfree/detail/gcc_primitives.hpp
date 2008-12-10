@@ -57,6 +57,8 @@ namespace boost { namespace lockfree
     inline boost::uint64_t hrtimer_ticks()
     {
         boost::uint32_t _lo, _hi;
+#if defined(__i386__) 
+        boost::uint32_t _lo, _hi;
         __asm__ __volatile__ (
               "movl %%ebx,%%esi\n"
               "cpuid\n"
@@ -67,6 +69,20 @@ namespace boost { namespace lockfree
             : "%esi", "%ecx"
         );
         return ((boost::uint64_t)_hi << 32) | _lo;
+#elif defined(__x86_64__)
+        boost::uint32_t _lo, _hi;
+        __asm__ __volatile__ (
+              "mov %%rbx,%%rsi\n"
+              "cpuid\n"
+              "rdtsc\n"
+              "mov %%rsi,%%rbx\n"
+            : "=a" (_lo), "=d" (_hi)
+            :
+            : "%rsi", "%rcx"
+        );
+        return ((boost::uint64_t)_hi << 32) | _lo;
+#endif
+        return 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////
