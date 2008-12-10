@@ -240,7 +240,7 @@ namespace boost { namespace coroutines { namespace detail {
     typename boost::enable_if<boost::is_void<ResultType> >::type
     do_call(dummy<0> = 0) 
     {
-      BOOST_ASSERT(this->count() > 0);
+//      BOOST_ASSERT(this->count() > 0);
 
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::self self_type;
       boost::optional<self_type> self (coroutine_accessor::in_place(this));
@@ -265,7 +265,7 @@ namespace boost { namespace coroutines { namespace detail {
     typename boost::disable_if<boost::is_void<ResultType> >::type
     do_call(dummy<1> = 1) 
     {
-      BOOST_ASSERT(this->count() > 0);
+//      BOOST_ASSERT(this->count() > 0);
 
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::self self_type;
       boost::optional<self_type> self (coroutine_accessor::in_place(this));
