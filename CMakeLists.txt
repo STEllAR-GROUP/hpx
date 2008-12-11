@@ -137,7 +137,7 @@ if(MSVC)
     # suppress certain warnings
     add_definitions(-wd4251 -wd4231 -wd4275 -wd4660 -wd4094 -wd4267)
     if(CMAKE_CL_64)
-        add_definitions(-DBOOST_COROUTINES_USE_FIBERS)
+        add_definitions(-DBOOST_COROUTINE_USE_FIBERS)
     endif()
 endif()
 
@@ -156,11 +156,12 @@ endif()
 
 # additional preprocessor definitions
 add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT)
+add_definitions(-DBOOST_COROUTINE_ARG_MAX=1)
 
-# Mac systems headers have some dependency on XOPEN_SOURCE being defined
+# Mac systems headers have some dependency on _XOPEN_SOURCE being defined
 # let's better be on the safe side...
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    add_definitions(-DXOPEN_SOURCE=1)
+    add_definitions(-D_XOPEN_SOURCE=1)
 endif()
 
 # hpx_LIBRARIES lists all libraries a HPX module needs to be linked with by 

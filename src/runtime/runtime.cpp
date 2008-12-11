@@ -112,7 +112,7 @@ namespace hpx
         applier_.init_tss();
     }
 
-#if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINES_USE_FIBERS)
+#if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINE_USE_FIBERS)
 #include <io.h>
 #endif
 
@@ -120,7 +120,7 @@ namespace hpx
     void runtime::start(boost::function<threads::thread_function_type> func, 
         std::size_t num_threads, bool blocking)
     {
-#if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINES_USE_FIBERS)
+#if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINE_USE_FIBERS)
         // needs to be called to avoid problems at system startup
         // see: http://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=100319
         _isatty(0);

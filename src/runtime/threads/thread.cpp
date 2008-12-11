@@ -6,8 +6,9 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/threads/thread.hpp>
-#include <boost/coroutine/detail/coroutine_impl_impl.hpp>
 
+#include <boost/coroutine/detail/coroutine_impl_impl.hpp>
+#include <boost/pool/singleton_pool.hpp>
 #include <boost/assert.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -21,6 +22,29 @@ namespace hpx { namespace threads { namespace detail
     void thread::set_component_type(components::component_type type)
     {
         BOOST_ASSERT(false);    // shouldn't be called, ever
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct thread_tag {};
+
+    void *thread::operator new(std::size_t size)
+    {
+        BOOST_ASSERT(sizeof(thread) == size);
+        typedef boost::singleton_pool<thread_tag, sizeof(thread)> pool_type;
+            
+        void *ret = pool_type::malloc();
+        if (0 == ret)
+            boost::throw_exception(std::bad_alloc());
+        return ret;
+    }
+
+    void thread::operator delete(void *p, std::size_t size)
+    {
+        BOOST_ASSERT(sizeof(thread) == size);
+        typedef boost::singleton_pool<thread_tag, sizeof(thread)> pool_type;
+
+        if (0 != p) 
+            pool_type::free(p);
     }
 
 }}}

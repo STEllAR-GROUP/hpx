@@ -13,7 +13,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
-#include <boost/coroutine/shared_coroutine.hpp>
+#include <boost/coroutine/coroutine.hpp>
 #include <hpx/config.hpp>
 
 /// \namespace hpx

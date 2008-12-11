@@ -123,7 +123,7 @@ namespace boost { namespace coroutines { namespace detail {
 
 #elif defined(BOOST_WINDOWS)
 
-#if (defined(_M_IA64) || defined(_WIN64)) && !defined(BOOST_COROUTINES_USE_FIBERS)
+#if (defined(_M_IA64) || defined(_WIN64)) && !defined(BOOST_COROUTINE_USE_FIBERS)
 
 #include <boost/coroutine/detail/context_windows64.hpp>
 namespace boost { namespace coroutines { namespace detail {

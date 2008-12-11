@@ -13,10 +13,9 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/lockfree/atomic_int.hpp>
-#include <boost/coroutine/coroutine.hpp>
-#include <boost/coroutine/shared_coroutine.hpp>
 #include <boost/lockfree/cas.hpp>
 #include <boost/lockfree/branch_hints.hpp>
+#include <boost/coroutine/coroutine.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -91,6 +90,10 @@ namespace hpx { namespace threads { namespace detail
         {
             return description_;
         }
+
+        // threads use a specialized allocator for fast creation/destruction
+        static void *operator new(std::size_t size);
+        static void operator delete(void *p, std::size_t size);
 
     public:
         // action support
