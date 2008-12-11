@@ -362,7 +362,9 @@ namespace boost { namespace coroutines {
     static_coroutine (Functor f, thread_id_type id = 0, 
             std::ptrdiff_t stack_size = detail::default_stack_size) 
       : impl_(f, id, stack_size) 
-    {}
+    {
+        impl_.acquire();    // make sure refcount is not zero
+    }
 
     thread_id_type get_thread_id() const
     {
