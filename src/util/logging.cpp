@@ -122,7 +122,7 @@ namespace hpx { namespace util
         {
             agas_logger()->writer().write(logformat, logdest);
             agas_logger()->mark_as_initialized();
-            agas_level()->set_enabled(detail::get_log_level(loglevel));
+            agas_level()->set_enabled(boost::logging::level::fatal);
         }
     }
 
@@ -178,6 +178,12 @@ namespace hpx { namespace util
             boost::logging::level::disable_all != detail::get_log_level(loglevel)) 
         {
             hpx_logger()->writer().write(logformat, logdest);
+            hpx_logger()->mark_as_initialized();
+            hpx_level()->set_enabled(detail::get_log_level(loglevel));
+        }
+        else {
+        // if logging is disabled re-route error messages to cerr
+            hpx_logger()->writer().write(logformat, "cerr");
             hpx_logger()->mark_as_initialized();
             hpx_level()->set_enabled(detail::get_log_level(loglevel));
         }
