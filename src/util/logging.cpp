@@ -122,7 +122,7 @@ namespace hpx { namespace util
         {
             agas_logger()->writer().write(logformat, logdest);
             agas_logger()->mark_as_initialized();
-            agas_level()->set_enabled(boost::logging::level::fatal);
+            agas_level()->set_enabled(detail::get_log_level(loglevel));
         }
     }
 
@@ -151,7 +151,7 @@ namespace hpx { namespace util
         {
             timing_logger()->writer().write(logformat, logdest);
             timing_logger()->mark_as_initialized();
-            timing_level()->set_enabled(detail::get_log_level(loglevel));
+            timing_level()->set_enabled(boost::logging::level::fatal);
         }
     }
 
