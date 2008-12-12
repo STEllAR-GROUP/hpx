@@ -60,24 +60,26 @@ namespace boost { namespace lockfree
         boost::uint32_t _lo, _hi;
         __asm__ __volatile__ (
               "movl %%ebx,%%esi\n"
+              "xor eax,eax\n"
               "cpuid\n"
               "rdtsc\n"
               "movl %%esi,%%ebx\n"
             : "=a" (_lo), "=d" (_hi)
             :
-            : "%esi", "%ecx"
+            : "%esi", "%eax", "%ecx"
         );
         return ((boost::uint64_t)_hi << 32) | _lo;
 #elif defined(__x86_64__)
         boost::uint32_t _lo, _hi;
         __asm__ __volatile__ (
               "mov %%rbx,%%rsi\n"
+              "xor rax,rax\n"
               "cpuid\n"
               "rdtsc\n"
               "mov %%rsi,%%rbx\n"
             : "=a" (_lo), "=d" (_hi)
             :
-            : "%rsi", "%rcx"
+            : "%rsi", "%rax", "%rcx"
         );
         return ((boost::uint64_t)_hi << 32) | _lo;
 #endif
