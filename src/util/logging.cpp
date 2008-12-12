@@ -160,6 +160,10 @@ namespace hpx { namespace util
         boost::logging::level::disable_all) 
     BOOST_DEFINE_LOG(hpx_logger, logger_type) 
 
+    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(hpx_error_level, filter_type,
+        boost::logging::level::fatal) 
+    BOOST_DEFINE_LOG(hpx_error_logger, logger_type)
+
     // initialize logging for HPX runtime
     void init_hpx_logs(util::section const& ini) 
     {
@@ -174,18 +178,28 @@ namespace hpx { namespace util
             logformat = detail::unescape(logini->get_entry("format"));
         }
 
-        if (!loglevel.empty() && 
-            boost::logging::level::disable_all != detail::get_log_level(loglevel)) 
-        {
+        int lvl = boost::logging::level::disable_all;
+        if (!loglevel.empty())
+            lvl = detail::get_log_level(loglevel);
+
+        // errors are always logged to cerr (and if enabled, to 'normal' log as well)
+        hpx_error_logger()->writer().write(logformat, "cerr");
+
+        if (boost::logging::level::disable_all != lvl) {
             hpx_logger()->writer().write(logformat, logdest);
             hpx_logger()->mark_as_initialized();
-            hpx_level()->set_enabled(detail::get_log_level(loglevel));
+            hpx_level()->set_enabled(lvl);
+
+            // errors are logged to the given destination and to cerr
+            hpx_error_logger()->writer().write(logformat, logdest + " cerr");
+            hpx_error_logger()->mark_as_initialized();
+            hpx_error_level()->set_enabled(lvl);
         }
         else {
-        // if logging is disabled re-route error messages to cerr
-            hpx_logger()->writer().write(logformat, "cerr");
-            hpx_logger()->mark_as_initialized();
-            hpx_level()->set_enabled(boost::logging::level::fatal);
+            // errors are always logged to cerr 
+            hpx_error_logger()->writer().write(logformat, "cerr");
+            hpx_error_logger()->mark_as_initialized();
+            hpx_error_level()->set_enabled(boost::logging::level::fatal);
         }
     }
 
