@@ -227,6 +227,21 @@ namespace boost { namespace coroutines { namespace detail {
       this->do_return(status, tinfo);
     }
 
+private:
+    struct reset_self_on_exit
+    {
+        typedef BOOST_DEDUCED_TYPENAME coroutine_type::self self_type;
+
+        reset_self_on_exit(self_type* val)
+        {
+            super_type::set_self(val);
+        }
+        ~reset_self_on_exit()
+        {
+            super_type::set_self(NULL);
+        }
+    };
+
   public:
 
     //GCC workaround as per enable_if docs 
@@ -243,18 +258,18 @@ namespace boost { namespace coroutines { namespace detail {
       BOOST_ASSERT(this->count() > 0);
 
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::self self_type;
-      boost::optional<self_type> self (coroutine_accessor::in_place(this));
-      super_type::set_self(&*self);
-
-      detail::unpack(m_fun, *this->args(), 
-         detail::trait_tag<typename coroutine_type::arg_slot_traits>());
-
-      super_type::set_self(NULL);     // reset self
 
       // In this particular case result_slot_type is guaranteed to be
       // default constructible.
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::result_slot_type 
         result_slot_type;
+
+      {
+          boost::optional<self_type> self (coroutine_accessor::in_place(this));
+          reset_self_on_exit on_exit(&*self);
+          detail::unpack(m_fun, *this->args(), 
+             detail::trait_tag<typename coroutine_type::arg_slot_traits>());
+      }
 
       this->m_result_last = result_slot_type();
       this->bind_result(&*this->m_result_last);
@@ -268,18 +283,17 @@ namespace boost { namespace coroutines { namespace detail {
       BOOST_ASSERT(this->count() > 0);
 
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::self self_type;
-      boost::optional<self_type> self (coroutine_accessor::in_place(this));
-      super_type::set_self(&*self);
-
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::arg_slot_traits traits;
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::result_slot_type 
         result_slot_type;
 
-      this->m_result_last = boost::in_place(result_slot_type(
-              detail::unpack(m_fun, *this->args(), detail::trait_tag<traits>())
-          ));
-
-      super_type::set_self(NULL);     // reset self
+      {
+          boost::optional<self_type> self (coroutine_accessor::in_place(this));
+          reset_self_on_exit on_exit(&*self);
+          this->m_result_last = boost::in_place(result_slot_type(
+                  detail::unpack(m_fun, *this->args(), detail::trait_tag<traits>())
+              ));
+      }
 
       this->bind_result(&*this->m_result_last);
     }
