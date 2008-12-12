@@ -151,7 +151,7 @@ namespace hpx { namespace util
         {
             timing_logger()->writer().write(logformat, logdest);
             timing_logger()->mark_as_initialized();
-            timing_level()->set_enabled(boost::logging::level::fatal);
+            timing_level()->set_enabled(detail::get_log_level(loglevel));
         }
     }
 
@@ -185,7 +185,7 @@ namespace hpx { namespace util
         // if logging is disabled re-route error messages to cerr
             hpx_logger()->writer().write(logformat, "cerr");
             hpx_logger()->mark_as_initialized();
-            hpx_level()->set_enabled(detail::get_log_level(loglevel));
+            hpx_level()->set_enabled(boost::logging::level::fatal);
         }
     }
 
