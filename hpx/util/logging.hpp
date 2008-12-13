@@ -80,7 +80,7 @@ namespace hpx { namespace util
 
     #define LFATAL_                                                           \
         BOOST_LOG_USE_LOG_IF_LEVEL(hpx::util::hpx_error_logger(),             \
-            hpx::util::hpx_error_level(), lvl)                                \
+            hpx::util::hpx_error_level(), fatal)                              \
         << hpx::util::levelname(::boost::logging::level::fatal)               \
         << (" [ERR] ")                                                        \
     /**/
