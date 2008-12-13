@@ -553,32 +553,32 @@ namespace hpx { namespace threads
             num_px_threads = tfunc_impl(num_thread);
         }
         catch (hpx::exception const& e) {
-            LTM_(fatal) << "tfunc(" << num_thread 
-                        << "): caught hpx::exception: " 
-                        << e.what() << ", aborted execution";
+            LFATAL_ << "tfunc(" << num_thread 
+                    << "): caught hpx::exception: " 
+                    << e.what() << ", aborted execution";
             if (stop_) 
                 stop_();
             return;
         }
         catch (boost::system::system_error const& e) {
-            LTM_(fatal) << "tfunc(" << num_thread 
-                        << "): caught boost::system::system_error: " 
-                        << e.what() << ", aborted execution";
+            LFATAL_ << "tfunc(" << num_thread 
+                    << "): caught boost::system::system_error: " 
+                    << e.what() << ", aborted execution";
             if (stop_) 
                 stop_();
             return;
         }
         catch (std::exception const& e) {
-            LTM_(fatal) << "tfunc(" << num_thread 
-                        << "): caught std::exception: " 
-                        << e.what() << ", aborted execution";
+            LFATAL_ << "tfunc(" << num_thread 
+                    << "): caught std::exception: " 
+                    << e.what() << ", aborted execution";
             if (stop_) 
                 stop_();
             return;
         }
         catch (...) {
-            LTM_(fatal) << "tfunc(" << num_thread 
-                        << "): caught unexpected exception, aborted execution";
+            LFATAL_ << "tfunc(" << num_thread 
+                    << "): caught unexpected exception, aborted execution";
             if (stop_) 
                 stop_();
             return;

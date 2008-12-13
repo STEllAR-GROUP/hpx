@@ -182,9 +182,6 @@ namespace hpx { namespace util
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        // errors are always logged to cerr (and if enabled, to 'normal' log as well)
-        hpx_error_logger()->writer().write(logformat, "cerr");
-
         if (boost::logging::level::disable_all != lvl) {
             hpx_logger()->writer().write(logformat, logdest);
             hpx_logger()->mark_as_initialized();
