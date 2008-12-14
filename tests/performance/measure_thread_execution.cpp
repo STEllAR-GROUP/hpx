@@ -18,13 +18,12 @@ threads::thread_state null_thread()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(util::high_resolution_timer& timer,
-    std::size_t num_threads)
+int hpx_main(util::high_resolution_timer& timer, std::size_t num_threads)
 {
     // schedule a couple of threads
     timer.restart();
     for (std::size_t i = 0; i < num_threads; ++i) {
-        applier::register_work(null_thread, "null_thread", threads::pending, false);
+        applier::register_work_plain(null_thread, "null_thread", threads::pending, false);
     }
 //     double elapsed = timer.elapsed();
 //     std::cerr << "Elapsed time [s] for thread initialization of " 
@@ -37,7 +36,7 @@ threads::thread_state hpx_main(util::high_resolution_timer& timer,
 
     // initiate shutdown of the runtime system
     components::stubs::runtime_support::shutdown_all();
-    return threads::terminated;
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

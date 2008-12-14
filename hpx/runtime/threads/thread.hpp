@@ -104,16 +104,14 @@ namespace hpx { namespace threads { namespace detail
         enum { value = components::component_thread };
 
         /// 
-        thread_state set_event ()
+        void set_event()
         {
             // we need to reactivate the thread itself
             if (suspended == static_cast<thread_state>(current_state_)) {
                 hpx::applier::get_applier().get_thread_manager().
                     set_state(get_thread_id(), pending);
             }
-
             // FIXME: implement functionality required for depleted state
-            return terminated;
         }
 
     private:

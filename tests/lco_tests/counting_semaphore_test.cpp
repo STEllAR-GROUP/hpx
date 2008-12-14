@@ -104,47 +104,43 @@ struct test_environment
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-threads::thread_state sem_wait1(boost::shared_ptr<test_environment> env)
+void sem_wait1(boost::shared_ptr<test_environment> env)
 {
     ++env->counter_;
     env->sem_.wait();
 
     // all of the 3 threads need to have incremented the counter
     BOOST_TEST(3 == env->counter_);
-    return threads::terminated;
 }
 
-threads::thread_state sem_signal1(boost::shared_ptr<test_environment> env)
+void sem_signal1(boost::shared_ptr<test_environment> env)
 {
     env->sem_.signal(3);    // we need to signal all 3 threads
-    return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state sem_wait2(boost::shared_ptr<test_environment> env)
+void sem_wait2(boost::shared_ptr<test_environment> env)
 {
     // we wait for three other threads to signal this semaphore
     env->sem_.wait(3);
 
     // all of the 3 threads need to have incremented the counter
     BOOST_TEST(3 == env->counter_);
-    return threads::terminated;
 }
 
-threads::thread_state sem_signal2(boost::shared_ptr<test_environment> env)
+void sem_signal2(boost::shared_ptr<test_environment> env)
 {
     ++env->counter_;
     env->sem_.signal();    // we need to signal the semaphore here
-    return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main()
+int hpx_main()
 {
     // create a semaphore, which which we will use to make 3 threads waiting 
     // for a fourth one
     boost::shared_ptr<test_environment> env1(new test_environment);
-    
+
     // create the  threads which will have to wait on the semaphore
     for (std::size_t i = 0; i < 3; ++i) 
         applier::register_work(boost::bind(&sem_wait1, env1));
@@ -166,7 +162,7 @@ threads::thread_state hpx_main()
     // initiate shutdown of the runtime system
     components::stubs::runtime_support::shutdown_all();
 
-    return threads::terminated;
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

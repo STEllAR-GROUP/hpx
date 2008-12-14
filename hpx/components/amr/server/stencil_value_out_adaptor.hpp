@@ -24,7 +24,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         >
     {
     private:
-        typedef boost::function<void(naming::id_type*)> callback_function_type;
+        typedef boost::function<naming::id_type()> callback_function_type;
         typedef components::detail::managed_component_base<
             stencil_value_out_adaptor
         > base_type;
@@ -56,11 +56,10 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// This is the main entry point of this component. Calling this 
         /// function (by applying the get_value) will return the value as 
         /// computed by the current time step.
-        threads::thread_state get_value (naming::id_type* result)
+        naming::id_type get_value ()
         {
             BOOST_ASSERT(eval_);      // must have been initialized
-            eval_(result);
-            return threads::terminated;
+            return eval_();
         }
 
         // Each of the exposed functions needs to be encapsulated into an action

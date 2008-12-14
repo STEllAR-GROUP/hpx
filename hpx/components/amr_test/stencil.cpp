@@ -20,8 +20,8 @@ namespace hpx { namespace components { namespace amr
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
     // Compute the result value for the current time step
-    threads::thread_state stencil::eval(bool* is_last, 
-        naming::id_type const& result, std::vector<naming::id_type> const& gids)
+    bool stencil::eval(naming::id_type const& result, 
+        std::vector<naming::id_type> const& gids)
     {
         BOOST_ASSERT(gids.size() == 3);
 
@@ -57,21 +57,18 @@ namespace hpx { namespace components { namespace amr
         }
 
         // set return value to true if this is the last time step
-        *is_last = resultval->timestep_ >= numsteps_;
-
-        return threads::terminated;
+        return resultval->timestep_ >= numsteps_;
     }
 
-    threads::thread_state stencil::alloc_data(naming::id_type* result, 
-        int item, int maxitems)
+    naming::id_type stencil::alloc_data(int item, int maxitems)
     {
-        *result = components::stubs::memory_block::create(
+        naming::id_type result = components::stubs::memory_block::create(
             applier::get_applier().get_runtime_support_gid(), sizeof(timestep_data));
 
         if (-1 != item) {
             // provide initial data for the given data value 
             access_memory_block<timestep_data> val(
-                components::stubs::memory_block::checkout(*result));
+                components::stubs::memory_block::checkout(result));
 
             val->max_index_ = maxitems;
             val->index_ = item;
@@ -81,24 +78,19 @@ namespace hpx { namespace components { namespace amr
             else
                 val->value_ = std::pow(item - 1/3, 4.) * std::pow(item - 2/3, 4.);
         }
-        return threads::terminated;
+        return result;
     }
 
     /// The free function releases the memory allocated by init
-    threads::thread_state stencil::free_data(
-        naming::id_type const& gid)
+    void stencil::free_data(naming::id_type const& gid)
     {
         components::stubs::memory_block::free(gid);
-        return threads::terminated;
     }
 
-    /// The free function releases the memory allocated by init
-    threads::thread_state stencil::init(
-        std::size_t numsteps, naming::id_type const& logging)
+    void stencil::init(std::size_t numsteps, naming::id_type const& logging)
     {
         numsteps_ = numsteps;
         log_ = logging;
-        return threads::terminated;
     }
 
 }}}

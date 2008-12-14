@@ -13,14 +13,12 @@ namespace hpx { namespace components { namespace amr { namespace server
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
     // Compute the result value for the current time step
-    threads::thread_state logging::logentry(timestep_data const& val)
+    void logging::logentry(timestep_data const& val)
     {
         boost::mutex::scoped_lock l(mtx_);
 
         std::cout << val.max_index_ << ", " << val.index_ << ", " 
                   << val.timestep_ << ", "<< val.value_ << std::endl;
-
-        return threads::terminated;
     }
 
 }}}}

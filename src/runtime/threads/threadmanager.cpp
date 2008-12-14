@@ -172,6 +172,7 @@ namespace hpx { namespace threads
     // create a new task
         new_tasks_.enqueue(
             task_description(threadfunc, initial_state, description));
+
         if (run_now) {
             // try to execute the new work item
             cond_.notify_all();

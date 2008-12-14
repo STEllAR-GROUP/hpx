@@ -183,7 +183,7 @@ void execute(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(std::size_t numvals, std::size_t numsteps)
+int hpx_main(std::size_t numvals, std::size_t numsteps)
 {
     // get component types needed below
     components::component_type function_type = 
@@ -267,7 +267,7 @@ threads::thread_state hpx_main(std::size_t numvals, std::size_t numsteps)
     // initiate shutdown of the runtime systems on all localities
     components::stubs::runtime_support::shutdown_all();
 
-    return threads::terminated;
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -11,7 +11,7 @@
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main()
+int hpx_main()
 {
     // try to access some memory directly
     boost::uint32_t value = 0;
@@ -39,7 +39,7 @@ threads::thread_state hpx_main()
     // initiate shutdown of the runtime system
     components::stubs::runtime_support::shutdown_all();
 
-    return threads::terminated;
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

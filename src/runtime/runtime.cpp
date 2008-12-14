@@ -117,7 +117,15 @@ namespace hpx
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    void runtime::start(boost::function<threads::thread_function_type> func, 
+    static threads::thread_state 
+    run_helper(boost::function<runtime::hpx_main_function_type> func, 
+        int& result)
+    {
+        result = func();
+        return threads::terminated;
+    }
+
+    int runtime::start(boost::function<hpx_main_function_type> func, 
         std::size_t num_threads, bool blocking)
     {
 #if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINE_USE_FIBERS)
@@ -142,14 +150,19 @@ namespace hpx
                 &memory_));
 
         // register the given main function with the thread manager
-        if (!func.empty())
-            thread_manager_.register_thread(func, "hpx_main");
+        int result = 0;
+        if (!func.empty()) {
+            thread_manager_.register_thread(
+                boost::bind(run_helper, func, boost::ref(result)), "hpx_main");
+        }
 
         LRT_(info) << "runtime: started using "  << num_threads << " OS threads";
 
         // block if required
         if (blocking) 
             wait();     // wait for the shutdown_action to be executed
+
+        return result;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -228,20 +241,22 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void runtime::run(boost::function<threads::thread_function_type> func,
+    int runtime::run(boost::function<hpx_main_function_type> func,
         std::size_t num_threads)
     {
-        start(func, num_threads);
+        int result = start(func, num_threads);
         wait();
         stop();
+        return result;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void runtime::run(std::size_t num_threads)
+    int runtime::run(std::size_t num_threads)
     {
-        start(boost::function<threads::thread_function_type>(), num_threads);
+        int result = start(boost::function<hpx_main_function_type>(), num_threads);
         wait();
         stop();
+        return result;
     }
 
 }

@@ -17,15 +17,13 @@ namespace hpx { namespace components { namespace amr { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline threads::thread_state functional_timestep::initialize()
+    inline void functional_timestep::initialize()
     {
-        return threads::terminated;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline threads::thread_state functional_timestep::execute()
+    inline void functional_timestep::execute()
     {
-        return threads::terminated;
     }
 
 }}}}

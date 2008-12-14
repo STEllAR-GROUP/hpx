@@ -261,20 +261,16 @@ namespace hpx { namespace components { namespace server { namespace detail
         // exposed functionality of this component
 
         /// Get the current data for reading
-        threads::thread_state get (memory_block_data* result);
-        components::memory_block_data local_get ();
+        components::memory_block_data get();
 
         /// Get the current data for reading
-        threads::thread_state checkout (components::memory_block_data* result);
-        components::memory_block_data local_checkout();
+        components::memory_block_data checkout();
 
         /// Write back data
-        threads::thread_state checkin (components::memory_block_data const& newdata);
-        void local_checkin (components::memory_block_data const& data);
+        void checkin(components::memory_block_data const& data);
 
         /// Clone this memory_block
-        threads::thread_state clone (naming::id_type* result);
-        naming::id_type local_clone ();
+        naming::id_type clone();
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
@@ -282,23 +278,23 @@ namespace hpx { namespace components { namespace server { namespace detail
         // serialization, etc.
         typedef hpx::actions::direct_result_action0<
             memory_block, components::memory_block_data, memory_block_get, 
-            &memory_block::get, &memory_block::local_get
+            &memory_block::get
         > get_action;
 
         typedef hpx::actions::direct_result_action0<
             memory_block, components::memory_block_data, memory_block_checkout, 
-            &memory_block::checkout, &memory_block::local_checkout
+            &memory_block::checkout
         > checkout_action;
 
         typedef hpx::actions::direct_action1<
             memory_block, memory_block_checkin, 
             components::memory_block_data const&, 
-            &memory_block::checkin, &memory_block::local_checkin
+            &memory_block::checkin
         > checkin_action;
 
         typedef hpx::actions::direct_result_action0<
             memory_block, naming::id_type, memory_block_clone, 
-            &memory_block::clone, &memory_block::local_clone
+            &memory_block::clone
         > clone_action;
     };
 

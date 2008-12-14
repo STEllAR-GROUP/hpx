@@ -39,42 +39,39 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // The eval and is_last_timestep functions have to be overloaded by any
         // functional component derived from this class
-        virtual threads::thread_state eval(bool* islast, naming::id_type const&, 
+        virtual bool eval(naming::id_type const&, 
             std::vector<naming::id_type> const&)
         {
             // This shouldn't ever be called. If you're seeing this assertion 
             // you probably forgot to overload this function in your stencil 
             // class.
             BOOST_ASSERT(false);
-            return threads::terminated;
+            return true;
         }
 
-        virtual threads::thread_state alloc_data(naming::id_type*, int item,
-            int maxitems)
+        virtual naming::id_type alloc_data(int item, int maxitems)
         {
             // This shouldn't ever be called. If you're seeing this assertion 
             // you probably forgot to overload this function in your stencil 
             // class.
             BOOST_ASSERT(false);
-            return threads::terminated;
+            return naming::invalid_id;
         }
 
-        virtual threads::thread_state free_data(naming::id_type const&)
+        virtual void free_data(naming::id_type const&)
         {
             // This shouldn't ever be called. If you're seeing this assertion 
             // you probably forgot to overload this function in your stencil 
             // class.
             BOOST_ASSERT(false);
-            return threads::terminated;
         }
 
-        virtual threads::thread_state init(std::size_t, naming::id_type const&)
+        virtual void init(std::size_t, naming::id_type const&)
         {
             // This shouldn't ever be called. If you're seeing this assertion 
             // you probably forgot to overload this function in your stencil 
             // class.
             BOOST_ASSERT(false);
-            return threads::terminated;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -92,28 +89,25 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// function (by applying the eval_action) will compute the next 
         /// time step value based on the result values of the previous time 
         /// steps.
-        threads::thread_state eval_nonvirt(
-            bool* retval, naming::id_type const& result, 
+        bool eval_nonvirt(naming::id_type const& result, 
             std::vector<naming::id_type> const& gids)
         {
-            return eval(retval, result, gids);
+            return eval(result, gids);
         }
 
-        threads::thread_state alloc_data_nonvirt(
-            naming::id_type* result, int item, int maxitems)
+        naming::id_type alloc_data_nonvirt(int item, int maxitems)
         {
-            return alloc_data(result, item, maxitems);
+            return alloc_data(item, maxitems);
         }
 
-        threads::thread_state free_data_nonvirt(naming::id_type const& gid)
+        void free_data_nonvirt(naming::id_type const& gid)
         {
-            return free_data(gid);
+            free_data(gid);
         }
 
-        threads::thread_state init_nonvirt(
-            std::size_t numsteps, naming::id_type const& gid)
+        void init_nonvirt(std::size_t numsteps, naming::id_type const& gid)
         {
-            return init(numsteps, gid);
+            init(numsteps, gid);
         }
 
         ///////////////////////////////////////////////////////////////////////

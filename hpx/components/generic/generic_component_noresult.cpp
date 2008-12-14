@@ -15,10 +15,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 // This is the function to wrap into the component. It's purpose is to print
 // the floating point number it receives as its argument
-hpx::threads::thread_state print_number(double arg)
+void print_number(double arg)
 {
     std::cout << arg << std::endl;
-    return hpx::threads::terminated;
 }
 
 HPX_REGISTER_ACTION(print_number_action);

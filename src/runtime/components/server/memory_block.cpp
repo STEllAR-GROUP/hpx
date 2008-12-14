@@ -40,48 +40,24 @@ HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<memory_data_type>);
 namespace hpx { namespace components { namespace server { namespace detail
 {
     /// Get the current data for reading
-    threads::thread_state memory_block::get (
-        components::memory_block_data* result) 
-    {
-        *result = components::memory_block_data(wrapper_->component_);
-        return threads::terminated;
-    }
-
-    components::memory_block_data 
-    memory_block::local_get () 
+    components::memory_block_data memory_block::get() 
     {
         return components::memory_block_data(wrapper_->component_);
     }
 
     /// Get the current data for reading
-    threads::thread_state memory_block::checkout (
-        components::memory_block_data* result) 
-    {
-        *result = components::memory_block_data(wrapper_->component_);
-        return threads::terminated;
-    }
-
-    components::memory_block_data 
-    memory_block::local_checkout () 
+    components::memory_block_data memory_block::checkout() 
     {
         return components::memory_block_data(wrapper_->component_);
     }
 
     /// Write back data
-    threads::thread_state memory_block::checkin (
-        components::memory_block_data const& newdata) 
-    {
-        return threads::terminated;
-    }
-
-    void memory_block::local_checkin (
-        components::memory_block_data const& data) 
+    void memory_block::checkin(components::memory_block_data const& data) 
     {
     }
 
     /// Clone this memory_block
-    naming::id_type create_memory_block (
-        detail::memory_block_header const* rhs)
+    naming::id_type create_memory_block (detail::memory_block_header const* rhs)
     {
         server::memory_block* c = server::memory_block::create(rhs);
         naming::id_type gid = c->get_gid();
@@ -95,14 +71,7 @@ namespace hpx { namespace components { namespace server { namespace detail
         return naming::invalid_id;
     }
 
-    threads::thread_state memory_block::clone (naming::id_type* result) 
-    {
-        *result = create_memory_block(wrapper_->component_.get());
-        return threads::terminated;
-    }
-
-    naming::id_type 
-    memory_block::local_clone() 
+    naming::id_type memory_block::clone() 
     {
         return create_memory_block(wrapper_->component_.get());
     }

@@ -36,12 +36,12 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// This is the main entry point of this component. Calling this 
         /// function (by applying the call_action) will trigger the repeated 
         /// execution of the whole time step evolution functionality.
-        threads::thread_state initialize();
+        void initialize();
 
         /// This is called to execute a full time step based evolution based on
         /// a network of \a stencil_value components set up during a previous 
         /// call to initialize.
-        threads::thread_state execute();
+        void execute();
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action

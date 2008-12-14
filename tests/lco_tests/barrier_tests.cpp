@@ -13,19 +13,17 @@
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state barrier_test(lcos::barrier& b, boost::detail::atomic_count& c)
+void barrier_test(lcos::barrier& b, boost::detail::atomic_count& c)
 {
     ++c;
     b.wait();
 
     // all of the 4 threads need to have incremented the counter
     BOOST_TEST(4 == c);
-
-    return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(lcos::barrier& b, boost::detail::atomic_count& c)
+int hpx_main(lcos::barrier& b, boost::detail::atomic_count& c)
 {
     // create the 4 threads which will have to wait on the barrier
     for (std::size_t i = 0; i < 4; ++i) {
@@ -41,7 +39,7 @@ threads::thread_state hpx_main(lcos::barrier& b, boost::detail::atomic_count& c)
     // initiate shutdown of the runtime system
     components::stubs::runtime_support::shutdown_all();
 
-    return threads::terminated;
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

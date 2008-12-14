@@ -18,7 +18,7 @@ using namespace hpx;
 namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state mandelbrot(int* result, double x, double y, int iterations);
+int mandelbrot(double x, double y, int iterations);
 
 typedef 
     actions::plain_result_action3<int, double, double, int, mandelbrot> 
@@ -33,7 +33,7 @@ inline long double sqr(long double x)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state mandelbrot(int* result, double xpt, double ypt, int iterations)
+int mandelbrot(double xpt, double ypt, int iterations)
 {
     long double x = 0;
     long double y = 0;      //converting from pixels to points
@@ -50,21 +50,19 @@ threads::thread_state mandelbrot(int* result, double xpt, double ypt, int iterat
         y = ynew;
     }
 
-    *result = (k >= iterations) ? 0 : k;
-    return threads::terminated;
+    return (k >= iterations) ? 0 : k;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state mandelbrot_callback(lcos::counting_semaphore& sem,
+void mandelbrot_callback(lcos::counting_semaphore& sem,
     int x, int y, int iterations)
 {
 //     std::cout << x << "," << y << "," << iterations << std::endl;
     sem.signal();
-    return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(int sizex, int sizey, int iterations)
+int hpx_main(int sizex, int sizey, int iterations)
 {
     // get list of all known localities
     applier::applier& appl = applier::get_applier();
@@ -109,7 +107,7 @@ threads::thread_state hpx_main(int sizex, int sizey, int iterations)
     // initiate shutdown of the runtime systems on all localities
     components::stubs::runtime_support::shutdown_all();
 
-    return threads::terminated;
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -39,6 +39,10 @@ namespace hpx
         void init_applier();
 
     public:
+        /// The \a hpx_main_function_type is the default function type usable 
+        /// as the main HPX thread function.
+        typedef int hpx_main_function_type();
+
         /// Construct a new HPX runtime instance 
         ///
         /// \param address        [in] This is the address (IP address or 
@@ -99,7 +103,11 @@ namespace hpx
         ///                   stopped. If this parameter is \a true the 
         ///                   function \a runtime#start internally will call 
         ///                   \a runtime#wait.
-        void start(boost::function<threads::thread_function_type> func, 
+        ///
+        /// \returns          This function will return the value as returned 
+        ///                   as the result of the invocation of the function 
+        ///                   object given by the parameter \p func.
+        int start(boost::function<hpx_main_function_type> func, 
             std::size_t num_threads = 1, bool blocking = false);
 
         /// \brief Wait for the shutdown action to be executed
@@ -137,8 +145,12 @@ namespace hpx
         ///                   is supplied, the runtime system will simply wait
         ///                   for the shutdown action without explicitly 
         ///                   executing any main thread.
-        void run(boost::function<threads::thread_function_type> func =
-                boost::function<threads::thread_function_type>(), 
+        ///
+        /// \returns          This function will return the value as returned 
+        ///                   as the result of the invocation of the function 
+        ///                   object given by the parameter \p func.
+        int run(boost::function<hpx_main_function_type> func =
+                boost::function<hpx_main_function_type>(), 
             std::size_t num_threads = 1);
 
         /// \brief Run the HPX runtime system, initially use the given number 
@@ -147,7 +159,9 @@ namespace hpx
         ///
         /// \param num_threads [in] The initial number of threads to be started 
         ///                   by the threadmanager. 
-        void run(std::size_t num_threads);
+        ///
+        /// \returns          This function will always return 0 (zero).
+        int run(std::size_t num_threads);
 
         ///////////////////////////////////////////////////////////////////////
 

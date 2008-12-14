@@ -43,8 +43,7 @@ namespace hpx { namespace components { namespace server
 {
     // return, whether more than one instance of the given component can be 
     // created at the same time
-    threads::thread_state runtime_support::factory_properties(
-        int* factoryprops, components::component_type type)
+    int runtime_support::factory_properties(components::component_type type)
     {
     // locate the factory for the requested component type
         component_map_type::const_iterator it = components_.find(type);
@@ -56,17 +55,16 @@ namespace hpx { namespace components { namespace server
                  << components::get_component_type_name(type);
             HPX_THROW_EXCEPTION(hpx::bad_component_type, 
                 HPX_OSSTREAM_GETSTRING(strm));
-            return threads::terminated;
+            return factory_invalid;
         }
 
     // ask for the factory's capabilities
-        *factoryprops = (*it).second->get_factory_properties();
-        return threads::terminated;
+        return (*it).second->get_factory_properties();
     }
 
     // create a new instance of a component
-    threads::thread_state runtime_support::create_component(
-        naming::id_type* gid, components::component_type type, std::size_t count)
+    naming::id_type runtime_support::create_component(
+        components::component_type type, std::size_t count)
     {
     // locate the factory for the requested component type
         component_map_type::const_iterator it = components_.find(type);
@@ -77,35 +75,32 @@ namespace hpx { namespace components { namespace server
                  << components::get_component_type_name(type);
             HPX_THROW_EXCEPTION(hpx::bad_component_type, 
                 HPX_OSSTREAM_GETSTRING(strm));
-            return threads::terminated;
+            return naming::invalid_id;
         }
 
     // create new component instance
         naming::id_type id = (*it).second->create(count);
 
     // set result if requested
-        if (0 != gid)
-            *gid = id;
-
         if (LHPX_ENABLED(info)) {
             if ((*it).second->get_factory_properties() & factory_instance_count_is_size) 
             {
-                LRT_(info) << "successfully created component " << *gid 
+                LRT_(info) << "successfully created component " << id 
                            << " of type: " 
                            << components::get_component_type_name(type) 
                            << " (size: " << count << ")";
             }
             else {
                 LRT_(info) << "successfully created " << count 
-                           << " component(s) " << *gid << " of type: " 
+                           << " component(s) " << id << " of type: " 
                            << components::get_component_type_name(type);
             }
         }
-        return threads::terminated;
+        return id;
     }
 
     // delete an existing instance of a component
-    threads::thread_state runtime_support::free_component(
+    void runtime_support::free_component(
         components::component_type type, naming::id_type const& gid)
     {
     // locate the factory for the requested component type
@@ -118,7 +113,7 @@ namespace hpx { namespace components { namespace server
                  << components::get_component_type_name(type);
             HPX_THROW_EXCEPTION(hpx::bad_component_type, 
                 HPX_OSSTREAM_GETSTRING(strm));
-            return threads::terminated;
+            return;
         }
 
     // destroy the component instance
@@ -126,19 +121,17 @@ namespace hpx { namespace components { namespace server
 
         LRT_(info) << "successfully destroyed component " << gid 
             << " of type: " << components::get_component_type_name(type);
-        return threads::terminated;
     }
 
     // Action: shut down this runtime system instance
-    threads::thread_state runtime_support::shutdown()
+    void runtime_support::shutdown()
     {
         // initiate system shutdown
         stop();
-        return threads::terminated;
     }
 
     // initiate system shutdown for all localities
-    threads::thread_state runtime_support::shutdown_all()
+    void runtime_support::shutdown_all()
     {
         std::vector<naming::id_type> prefixes;
         applier::applier& appl = hpx::applier::get_applier();
@@ -158,7 +151,6 @@ namespace hpx { namespace components { namespace server
 
         // now make sure the local locality gets shut down as well.
         stop();
-        return threads::terminated;
     }
 
     ///////////////////////////////////////////////////////////////////////////

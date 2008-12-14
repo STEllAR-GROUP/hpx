@@ -30,14 +30,12 @@ namespace hpx { namespace lcos
     class base_lco 
     {
     protected:
-        virtual threads::thread_state set_event () = 0;
+        virtual void set_event () = 0;
 
-        virtual threads::thread_state set_error (hpx::error code, 
-            std::string const& msg)
+        virtual void set_error (hpx::error code, std::string const& msg)
         {
             // just rethrow the exception
             HPX_THROW_EXCEPTION(code, msg);
-            return threads::terminated;
         }
 
     public:
@@ -72,9 +70,9 @@ namespace hpx { namespace lcos
         ///
         /// \returns      The thread state the calling thread needs to be set
         ///               to after returning from this function.
-        threads::thread_state set_event_nonvirt()
+        void set_event_nonvirt()
         {
-            return set_event();
+            set_event();
         }
 
         /// The \a function set_error_nonvirt is called whenever a 
@@ -89,10 +87,9 @@ namespace hpx { namespace lcos
         ///
         /// \returns      The thread state the calling thread needs to be set
         ///               to after returning from this function.
-        threads::thread_state set_error_nonvirt (hpx::error code, 
-            std::string const& msg)
+        void set_error_nonvirt (hpx::error code, std::string const& msg)
         {
-            return set_error(code, msg);
+            set_error(code, msg);
         }
 
         /// Each of the exposed functions needs to be encapsulated into an action
@@ -136,12 +133,12 @@ namespace hpx { namespace lcos
         /// derived objects
         virtual ~base_lco_with_value() {}
 
-        virtual threads::thread_state set_event()
+        virtual void set_event()
         {
             return set_result(Result());
         }
 
-        virtual threads::thread_state set_result (Result const& result) = 0;
+        virtual void set_result (Result const& result) = 0;
 
     public:
         // components must contain a typedef for wrapping_type defining the
@@ -167,9 +164,9 @@ namespace hpx { namespace lcos
         ///
         /// \returns      The thread state the calling thread needs to be set
         ///               to after returning from this function.
-        threads::thread_state set_result_nonvirt (Result const& result) 
+        void set_result_nonvirt (Result const& result) 
         {
-            return set_result(result);
+            set_result(result);
         }
 
         /// Each of the exposed functions needs to be encapsulated into an action

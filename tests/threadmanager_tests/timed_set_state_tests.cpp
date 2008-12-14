@@ -13,17 +13,16 @@
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state timed_set_state_test(util::high_resolution_timer& timer, 
+void timed_set_state_test(util::high_resolution_timer& timer, 
     double wait_time)
 {
     double elapsed = timer.elapsed();
     BOOST_TEST(elapsed + 0.01 >= wait_time);    // we need some leeway here...
     std::cerr << "Elapsed: " << elapsed << std::endl;
-    return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state duration_set_state_test()
+void duration_set_state_test()
 {
     util::high_resolution_timer timer;
 
@@ -37,12 +36,10 @@ threads::thread_state duration_set_state_test()
 
     set_thread_state(id1, threads::pending, boost::posix_time::seconds(1));
     set_thread_state(id2, threads::pending, boost::posix_time::seconds(2));
-
-    return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state time_set_state_test()
+void time_set_state_test()
 {
     util::high_resolution_timer timer;
 
@@ -59,12 +56,10 @@ threads::thread_state time_set_state_test()
 
     set_thread_state(id1, threads::pending, now + boost::posix_time::seconds(1));
     set_thread_state(id2, threads::pending, now + boost::posix_time::seconds(2));
-
-    return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main()
+int hpx_main()
 {
     // test timed set_state using a time duration
     applier::register_work(duration_set_state_test, "duration_set_state_test_driver");
@@ -75,7 +70,7 @@ threads::thread_state hpx_main()
     // initiate shutdown of the runtime system
     components::stubs::runtime_support::shutdown_all();
 
-    return threads::terminated;
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

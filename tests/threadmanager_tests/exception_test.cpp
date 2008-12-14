@@ -10,10 +10,10 @@
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main()
+int hpx_main()
 {
     boost::throw_exception(hpx::exception(hpx::no_success, "Some error occurred"));
-    return threads::terminated;
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

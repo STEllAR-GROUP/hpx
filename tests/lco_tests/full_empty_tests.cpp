@@ -11,7 +11,7 @@
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state test1_helper(hpx::util::full_empty<int>& data)
+void test1_helper(hpx::util::full_empty<int>& data)
 {
     // retrieve gid for this thread
     naming::id_type gid = applier::get_applier().get_thread_manager().
@@ -20,11 +20,9 @@ threads::thread_state test1_helper(hpx::util::full_empty<int>& data)
 
     data.set(1);
     BOOST_TEST(!data.is_empty());
-
-    return threads::terminated;
 }
 
-threads::thread_state test1()
+void test1()
 {
     // retrieve gid for this thread
     naming::id_type gid = applier::get_applier().get_thread_manager().
@@ -50,12 +48,10 @@ threads::thread_state test1()
 
     BOOST_TEST(!data.is_empty());
     BOOST_TEST(value == 1);
-
-    return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main()
+int hpx_main()
 {
     // retrieve gid for this thread
     naming::id_type gid = applier::get_applier().get_thread_manager().
@@ -68,7 +64,7 @@ threads::thread_state hpx_main()
     // initiate shutdown of the runtime system
     components::stubs::runtime_support::shutdown_all();
 
-    return threads::terminated;
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

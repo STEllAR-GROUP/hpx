@@ -108,6 +108,16 @@ namespace hpx { namespace lcos { namespace detail
             data_[slot].set(data_type(result));
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        // exposed functionality of this component
+
+        // trigger the future, set the result
+        void set_result (Result const& result)
+        {
+            // set the received result, reset error status
+            set_data(0, result);
+        }
+
         // trigger the future with the given error condition
         void set_error (int slot, hpx::error code, std::string const& msg)
         {
@@ -118,30 +128,6 @@ namespace hpx { namespace lcos { namespace detail
 
             // store the error code
             data_[slot].set(data_type(error_type(make_error_code(code), msg)));
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // exposed functionality of this component
-
-        // trigger the future, set the result
-        threads::thread_state 
-        set_result (Result const& result)
-        {
-            // set the received result, reset error status
-            set_data(0, result);
-
-            // this thread has nothing more to do
-            return threads::terminated;
-        }
-
-        // trigger the future with the given error condition
-        threads::thread_state set_error (hpx::error code, 
-            std::string const& msg)
-        {
-            set_error(0, code, msg);
-
-            // this thread has nothing more to do
-            return threads::terminated;
         }
 
     private:
@@ -238,6 +224,16 @@ namespace hpx { namespace lcos { namespace detail
             data_[slot].set(data_type(result_type()));
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        // exposed functionality of this component
+
+        // trigger the future, set the result
+        void set_event()
+        {
+            // set the received result, reset error status
+            set_data(0);
+        }
+
         // trigger the future with the given error condition
         void set_error (int slot, hpx::error code, std::string const& msg)
         {
@@ -248,28 +244,6 @@ namespace hpx { namespace lcos { namespace detail
 
             // store the error code
             data_[slot].set(data_type(error_type(make_error_code(code), msg)));
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // exposed functionality of this component
-
-        // trigger the future, set the result
-        threads::thread_state set_event ()
-        {
-            // set the received result, reset error status
-            set_data(0);
-
-            // this thread has nothing more to do
-            return threads::terminated;
-        }
-
-        // trigger the future with the given error condition
-        threads::thread_state set_error (hpx::error code, std::string const& msg)
-        {
-            set_error(0, code, msg);
-
-            // this thread has nothing more to do
-            return threads::terminated;
         }
 
     private:

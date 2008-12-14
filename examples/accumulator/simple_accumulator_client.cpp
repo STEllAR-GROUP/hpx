@@ -18,7 +18,7 @@ using namespace hpx;
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main()
+int hpx_main()
 {
     // get list of all known localities
     std::vector<naming::id_type> prefixes;
@@ -80,7 +80,7 @@ threads::thread_state hpx_main()
     // initiate shutdown of the runtime systems on all localities
     components::stubs::runtime_support::shutdown_all();
 
-    return threads::terminated;
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

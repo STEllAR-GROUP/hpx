@@ -59,99 +59,49 @@ namespace hpx { namespace components { namespace server
         // exposed functionality of this component
 
         /// \brief Action to store an 8 bit value to a memory location
-        threads::thread_state store8(boost::uint64_t addr, boost::uint8_t value)
-        {
-            local_store8(addr, value);
-            return threads::terminated;
-        }
-
-        /// \brief Action to store a 16 bit value to a memory location
-        threads::thread_state store16(boost::uint64_t addr, boost::uint16_t value)
-        {
-            local_store16(addr, value);
-            return threads::terminated;
-        }
-
-        /// \brief Action to store a 32 value value to a memory location
-        threads::thread_state store32(boost::uint64_t addr, boost::uint32_t value)
-        {
-            local_store32(addr, value);
-            return threads::terminated;
-        }
-
-        /// \brief Action to store a 64 value value to a memory location
-        threads::thread_state store64(boost::uint64_t addr, boost::uint64_t value)
-        {
-            local_store64(addr, value);
-            return threads::terminated;
-        }
-
-        /// \brief Action to load an 8 bit value to a memory location
-        threads::thread_state load8(boost::uint8_t* value, boost::uint64_t addr)
-        {
-            *value = local_load8(addr);
-            return threads::terminated;
-        }
-
-        /// \brief Action to load a 16 bit value to a memory location
-        threads::thread_state load16(boost::uint16_t* value, boost::uint64_t addr)
-        {
-            *value = local_load16(addr);
-            return threads::terminated;
-        }
-
-        /// \brief Action to load a 32 bit value to a memory location
-        threads::thread_state load32(boost::uint32_t* value, boost::uint64_t addr)
-        {
-            *value = local_load32(addr);
-            return threads::terminated;
-        }
-
-        /// \brief Action to load a 64 bit value to a memory location
-        threads::thread_state load64(boost::uint64_t* value, boost::uint64_t addr)
-        {
-            *value = local_load64(addr);
-            return threads::terminated;
-        }
-
-        ///
-        void local_store8(boost::uint64_t addr, boost::uint8_t value)
+        void store8(boost::uint64_t addr, boost::uint8_t value)
         {
             *reinterpret_cast<boost::uint8_t*>(addr) = value;
         }
 
-        void local_store16(boost::uint64_t addr, boost::uint16_t value)
+        /// \brief Action to store an 16 bit value to a memory location
+        void store16(boost::uint64_t addr, boost::uint16_t value)
         {
             *reinterpret_cast<boost::uint16_t*>(addr) = value;
         }
 
-        void local_store32(boost::uint64_t addr, boost::uint32_t value)
+        /// \brief Action to store an 32 bit value to a memory location
+        void store32(boost::uint64_t addr, boost::uint32_t value)
         {
             *reinterpret_cast<boost::uint32_t*>(addr) = value;
         }
 
-        void local_store64(boost::uint64_t addr, boost::uint64_t value)
+        /// \brief Action to store an 64 bit value to a memory location
+        void store64(boost::uint64_t addr, boost::uint64_t value)
         {
             *reinterpret_cast<boost::uint64_t*>(addr) = value;
         }
 
-        ///
-        boost::uint8_t local_load8(boost::uint64_t addr)
+        /// \brief Action to load an 8 bit value to a memory location
+        boost::uint8_t load8(boost::uint64_t addr)
         {
             return *reinterpret_cast<boost::uint8_t*>(addr);
         }
 
-        boost::uint16_t local_load16(boost::uint64_t addr)
+        /// \brief Action to load an 16 bit value to a memory location
+        boost::uint16_t load16(boost::uint64_t addr)
         {
             return *reinterpret_cast<boost::uint16_t*>(addr);
         }
 
-        boost::uint32_t local_load32(boost::uint64_t addr)
+        /// \brief Action to load an 32 bit value to a memory location
+        boost::uint32_t load32(boost::uint64_t addr)
         {
             return *reinterpret_cast<boost::uint32_t*>(addr);
         }
 
-        boost::uint64_t local_load64(boost::uint64_t addr)
+        /// \brief Action to load an 64 bit value to a memory location
+        boost::uint64_t load64(boost::uint64_t addr)
         {
             return *reinterpret_cast<boost::uint64_t*>(addr);
         }
@@ -162,42 +112,42 @@ namespace hpx { namespace components { namespace server
         // serialization, etc.
         typedef hpx::actions::direct_action2<
             memory, memory_store8, boost::uint64_t, boost::uint8_t, 
-            &memory::store8, &memory::local_store8
+            &memory::store8
         > store8_action;
 
         typedef hpx::actions::direct_action2<
             memory, memory_store16, boost::uint64_t, boost::uint16_t, 
-            &memory::store16, &memory::local_store16
+            &memory::store16
         > store16_action;
 
         typedef hpx::actions::direct_action2<
             memory, memory_store32, boost::uint64_t, boost::uint32_t, 
-            &memory::store32, &memory::local_store32
+            &memory::store32
         > store32_action;
 
         typedef hpx::actions::direct_action2<
             memory, memory_store64, boost::uint64_t, boost::uint64_t, 
-            &memory::store64, &memory::local_store64
+            &memory::store64
         > store64_action;
 
         typedef hpx::actions::direct_result_action1<
             memory, boost::uint8_t, memory_load8, boost::uint64_t, 
-            &memory::load8, &memory::local_load8
+            &memory::load8
         > load8_action;
 
         typedef hpx::actions::direct_result_action1<
             memory, boost::uint16_t, memory_load16, boost::uint64_t, 
-            &memory::load16, &memory::local_load16
+            &memory::load16
         > load16_action;
 
         typedef hpx::actions::direct_result_action1<
             memory, boost::uint32_t, memory_load32, boost::uint64_t, 
-            &memory::load32, &memory::local_load32
+            &memory::load32
         > load32_action;
 
         typedef hpx::actions::direct_result_action1<
             memory, boost::uint64_t, memory_load64, boost::uint64_t, 
-            &memory::load64, &memory::local_load64
+            &memory::load64
         > load64_action;
 
     };

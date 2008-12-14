@@ -28,7 +28,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         /// This is the function implementing the logging functionality
         /// It takes the values as calculated during the current time step.
-        threads::thread_state logentry(timestep_data const& memblock_gid);
+        void logentry(timestep_data const& memblock_gid);
 
         /// Each of the exposed functions needs to be encapsulated into an action
         /// type, allowing to generate all required boilerplate code for threads,

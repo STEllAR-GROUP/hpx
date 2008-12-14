@@ -27,8 +27,8 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     // create a new instance of a component
-    threads::thread_state distributing_factory::create_components(
-        result_type* gids, components::component_type type, std::size_t count)
+    distributing_factory::result_type distributing_factory::create_components(
+        components::component_type type, std::size_t count)
     {
         // make sure we get prefixes for derived component type, if any
         components::component_type prefix_type = type;
@@ -97,20 +97,19 @@ namespace hpx { namespace components { namespace server
         }
 
         // now wait for the results
+        result_type gids;
         future_values_type::iterator vend = v.end();
         for (future_values_type::iterator vit = v.begin(); vit != vend; ++vit)
         {
-            gids->push_back(result_type::value_type(
+            gids.push_back(result_type::value_type(
                 (*vit).prefix_, (*vit).gids_.get(), (*vit).count_, type));
         }
-
-        return threads::terminated;
+        return gids;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // Action to delete existing components
-    threads::thread_state distributing_factory::free_components(
-        result_type const& gids, bool sync)
+    void distributing_factory::free_components(result_type const& gids, bool sync)
     {
         result_type::const_iterator end = gids.end();
         for (result_type::const_iterator it = gids.begin(); it != end; ++it) 
@@ -130,8 +129,6 @@ namespace hpx { namespace components { namespace server
                 }
             }
         }
-
-        return threads::terminated;
     }
 
     ///////////////////////////////////////////////////////////////////////////

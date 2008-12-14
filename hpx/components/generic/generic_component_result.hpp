@@ -14,7 +14,7 @@
 
 // This is the function to wrap into the component. Its purpose is to generate
 // a floating point number, returning it to the caller
-HPX_COMPONENT_EXPORT hpx::threads::thread_state generate_number (double*);
+HPX_COMPONENT_EXPORT double generate_number();
 
 // We use generic_component0 here because the function 
 // generate_number() takes no additional argument. The number of additional

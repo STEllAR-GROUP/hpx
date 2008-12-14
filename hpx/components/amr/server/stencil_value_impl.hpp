@@ -114,9 +114,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     // initial value and waits for the whole evolution to finish, returning the
     // result
     template <int N>
-    threads::thread_state  
-    stencil_value<N>::call(naming::id_type* result, 
-        naming::id_type const& initial)
+    naming::id_type stencil_value<N>::call(naming::id_type const& initial)
     {
         // remember that this instance is used as the first (and last) step in
         // the computation
@@ -136,10 +134,10 @@ namespace hpx { namespace components { namespace amr { namespace server
         sem_result_.wait(1);
 
         // return the final value computed to the caller
-        *result = value_gid_;
+        naming::id_type result = value_gid_;
         value_gid_ = naming::invalid_id;
 
-        return threads::terminated;
+        return result;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -149,8 +147,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     // - calculate current result
     // - set the result for the next time step
     template <int N>
-    threads::thread_state  
-    stencil_value<N>::main()
+    threads::thread_state stencil_value<N>::main()
     {
         // ask functional component to create the local data value
         backup_value_gid_ = alloc_helper(functional_gid_);
@@ -210,36 +207,34 @@ namespace hpx { namespace components { namespace amr { namespace server
     /// The function get will be called by the out-ports whenever 
     /// the current value has been requested.
     template <int N>
-    void
-    stencil_value<N>::get_value(naming::id_type* result)
+    naming::id_type stencil_value<N>::get_value()
     {
         sem_out_.wait(1);     // wait for the current value to be valid
-        *result = value_gid_; // acquire the current value
+        naming::id_type result = value_gid_; // acquire the current value
         sem_in_.signal(1);    // signal to have read the value
+
+        return result;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <int N>
-    threads::thread_state 
-    stencil_value<N>::get_output_ports(
-        std::vector<naming::id_type> *gids)
+    std::vector<naming::id_type> stencil_value<N>::get_output_ports()
     {
-        gids->clear();
+        std::vector<naming::id_type> gids;
         for (std::size_t i = 0; i < N; ++i)
-            gids->push_back(out_[i]->get_gid());
-        return threads::terminated;
+            gids.push_back(out_[i]->get_gid());
+        return gids;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <int N>
-    threads::thread_state 
-    stencil_value<N>::connect_input_ports(
+    void stencil_value<N>::connect_input_ports(
         std::vector<naming::id_type> const& gids)
     {
         if (gids.size() < N) {
             HPX_THROW_EXCEPTION(bad_parameter, 
                 "insufficient number of gid's supplied");
-            return threads::terminated;
+            return;
         }
         for (std::size_t i = 0; i < N; ++i)
             in_[i]->connect(gids[i]);
@@ -253,12 +248,11 @@ namespace hpx { namespace components { namespace amr { namespace server
                 boost::bind(&stencil_value<N>::main, this), 
                 "stencil_value::main");
         }
-        return threads::terminated;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <int N>
-    threads::thread_state 
+    void 
     stencil_value<N>::set_functional_component(naming::id_type const& gid)
     {
         // store gid of functional component
@@ -277,8 +271,6 @@ namespace hpx { namespace components { namespace amr { namespace server
                 boost::bind(&stencil_value<N>::main, this), 
                 "stencil_value::main");
         }
-
-        return threads::terminated;
     }
 
 }}}}

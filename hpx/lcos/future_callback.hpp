@@ -20,9 +20,7 @@ namespace hpx { namespace lcos
     {
     public: 
         typedef typename Future::result_type result_type;
-        typedef 
-            boost::function<threads::thread_state(result_type const&)> 
-        callback_type;
+        typedef boost::function<void(result_type const&)> callback_type;
 
         future_callback(Future const& future, callback_type cb)
         {
@@ -36,7 +34,8 @@ namespace hpx { namespace lcos
         static threads::thread_state 
             wait_for_future(Future future, callback_type cb)
         {
-            return cb(future.get());
+            cb(future.get());
+            return threads::terminated;
         }
     };
 

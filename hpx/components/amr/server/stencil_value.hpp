@@ -56,7 +56,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         /// The function get will be called by the out-ports whenever 
         /// the current value has been requested.
-        void get_value(naming::id_type*);
+        naming::id_type get_value();
 
         ///////////////////////////////////////////////////////////////////////
         // parcel action code: the action to be performed on the destination 
@@ -80,24 +80,20 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// data referred to by the parameter \a initial. After finishing 
         /// execution it returns a reference to the result as its return value
         /// (parameter \a result)
-        threads::thread_state call (naming::id_type* result, 
-            naming::id_type const& initial);
+        naming::id_type call(naming::id_type const& initial);
 
         /// Return the gid's of the output ports associated with this 
         /// \a stencil_value instance.
-        threads::thread_state get_output_ports(
-            std::vector<naming::id_type> *gids);
+        std::vector<naming::id_type> get_output_ports();
 
         /// Connect the destinations given by the provided gid's with the 
         /// corresponding input ports associated with this \a stencil_value 
         /// instance.
-        threads::thread_state connect_input_ports(
-            std::vector<naming::id_type> const& gids);
+        void connect_input_ports(std::vector<naming::id_type> const& gids);
 
         /// Set the gid of the component implementing the actual time evolution
         /// functionality
-        threads::thread_state set_functional_component(
-            naming::id_type const& gid);
+        void set_functional_component(naming::id_type const& gid);
 
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,

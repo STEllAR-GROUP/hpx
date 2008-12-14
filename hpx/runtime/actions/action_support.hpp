@@ -148,23 +148,63 @@ namespace hpx { namespace actions
         /// The \a continuation_thread_function will be registered as the thread
         /// function of a thread. It encapsulates the execution of the 
         /// original function (given by \a func), and afterwards triggers all
-        /// continuations without any additional argument
+        /// continuations using the result value obtained from the execution
+        /// of the original thread function.
         template <typename Func>
         static threads::thread_state 
-        continuation_thread_function(continuation_type cont, 
+        continuation_thread_function_void(continuation_type cont, 
             boost::tuple<Func> func)
         {
-            threads::thread_state newstate = threads::unknown;
             try {
-                newstate = boost::get<0>(func)();
+                boost::get<0>(func)();
                 cont->trigger_all();
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
                 cont->trigger_error(e);
-                return threads::terminated;
             }
-            return newstate;
+            return threads::terminated;
+        }
+
+        /// The \a construct_continuation_thread_function is a helper function
+        /// for constructing the wrapped thread function needed for 
+        /// continuation support
+        template <typename Func>
+        static boost::function<threads::thread_function_type>
+        construct_continuation_thread_function_void(Func func, continuation_type cont) 
+        {
+            // we need to assign the address of the thread function to a 
+            // variable to  help the compiler to deduce the function type
+            threads::thread_state (*f)(continuation_type, boost::tuple<Func>) =
+                &action::continuation_thread_function_void;
+
+            // The following bind constructs the wrapped thread function
+            //    f:  is the wrapping thread function
+            // cont: continuation 
+            // func: wrapped function object 
+            //       (this is embedded into a tuple because boost::bind can't
+            //       pre-bind another bound function as an argument)
+            return boost::bind(f, cont, boost::make_tuple(func));
+        }
+
+        /// The \a continuation_thread_function will be registered as the thread
+        /// function of a thread. It encapsulates the execution of the 
+        /// original function (given by \a func), and afterwards triggers all
+        /// continuations using the result value obtained from the execution
+        /// of the original thread function.
+        template <typename Func>
+        static threads::thread_state 
+        continuation_thread_function(continuation_type cont, 
+            boost::tuple<Func> func)
+        {
+            try {
+                cont->trigger_all(boost::get<0>(func)());
+            }
+            catch (hpx::exception const& e) {
+                // make sure hpx::exceptions are propagated back to the client
+                cont->trigger_error(e);
+            }
+            return threads::terminated;
         }
 
         /// The \a construct_continuation_thread_function is a helper function
@@ -181,8 +221,8 @@ namespace hpx { namespace actions
 
             // The following bind constructs the wrapped thread function
             //    f:  is the wrapping thread function
-            // cont: continuation (pre-bound third argument to f)
-            // func: wrapped function object (pre-bound forth argument to f)
+            // cont: continuation 
+            // func: wrapped function object 
             //       (this is embedded into a tuple because boost::bind can't
             //       pre-bind another bound function as an argument)
             return boost::bind(f, cont, boost::make_tuple(func));

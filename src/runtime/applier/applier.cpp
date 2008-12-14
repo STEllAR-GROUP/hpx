@@ -44,7 +44,20 @@ namespace hpx { namespace applier
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    threads::thread_id_type register_thread(
+    static threads::thread_state thread_function(boost::function<void()> func)
+    {
+        func();
+        return threads::terminated;
+    }
+
+    threads::thread_id_type register_thread(boost::function<void()> func, 
+        char const* desc, threads::thread_state state, bool run_now)
+    {
+        return hpx::applier::get_applier().get_thread_manager().register_thread(
+            boost::bind(&thread_function, func), desc, state, run_now);
+    }
+
+    threads::thread_id_type register_thread_plain(
         boost::function<threads::thread_function_type> func,
         char const* desc, threads::thread_state state, bool run_now)
     {
@@ -53,7 +66,14 @@ namespace hpx { namespace applier
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void register_work(
+    void register_work(boost::function<void()> func, char const* desc, 
+        threads::thread_state state, bool run_now)
+    {
+        hpx::applier::get_applier().get_thread_manager().register_work(
+            boost::bind(&thread_function, func), desc, state, run_now);
+    }
+
+    void register_work_plain(
         boost::function<threads::thread_function_type> func,
         char const* desc, threads::thread_state state, bool run_now)
     {
