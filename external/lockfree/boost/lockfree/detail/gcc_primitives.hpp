@@ -289,7 +289,7 @@ namespace boost { namespace lockfree
         long const value = 1 << bit;
         long old = *x;
         do {
-            long const current = interlocked_compare_exchange(x, old | value, old);
+            long const current = interlocked_compare_exchange(x, old, old | value);
             if (current == old)
             {
                 break;
@@ -304,7 +304,7 @@ namespace boost { namespace lockfree
         long const value = 1 << bit;
         long old = *x;
         do {
-            long const current = interlocked_compare_exchange(x, old & ~value, old);
+            long const current = interlocked_compare_exchange(x, old, old & ~value);
             if (current == old)
             {
                 break;
