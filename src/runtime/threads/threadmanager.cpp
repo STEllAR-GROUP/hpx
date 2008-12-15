@@ -708,7 +708,7 @@ namespace hpx { namespace threads
             if (is_master_thread) {
                 {
                     // first clean up terminated threads
-                    mutex_type::scoped_lock lk(mtx_);
+                    detail::try_lock_wrapper<mutex_type> lk(mtx_);
                     if (lk) {
                         // no point in having a thread waiting on the lock 
                         // while another thread is doing the maintenance
