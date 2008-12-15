@@ -338,7 +338,7 @@ namespace boost { namespace lockfree
     {
 #if defined(__GNUC__) && ( (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)) )
 #if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
-#warning "interlocked_decrement: using __sync_fetch_and_sub"
+#warning "interlocked_increment: using __sync_fetch_and_sub"
 #endif
         return __sync_fetch_and_add(value, 1);
 #else
@@ -375,7 +375,7 @@ namespace boost { namespace lockfree
     {
 #if defined(__GNUC__) && ( (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)) )
 #if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
-#warning "interlocked_decrement: using __sync_fetch_and_sub"
+#warning "interlocked_exchange_add: using __sync_fetch_and_add"
 #endif
         return __sync_fetch_and_add(value, add);
 #else
