@@ -7,11 +7,11 @@
 #define HPX_LCOS_COUNTING_SEMAPHORE_OCT_16_2008_1007AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/lcos/mutex.hpp>
 #include <hpx/util/unlock_lock.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/thread.hpp>
-#include <boost/lockfree/atomic_int.hpp>
 #include <boost/lockfree/fifo.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ namespace hpx { namespace lcos
     class counting_semaphore
     {
     private:
-        typedef boost::mutex mutex_type;
+        typedef hpx::lcos::mutex mutex_type;
 
     public:
         /// \brief Construct a new counting semaphore
@@ -91,9 +91,8 @@ namespace hpx { namespace lcos
         /// 
         void signal(long count = 1)
         {
-            value_ += count;
-
             mutex_type::scoped_lock l(mtx_);
+            value_ += count;
             if (value_ >= 0) {
                 threads::thread_id_type id = 0;
                 while (queue_.dequeue(&id)) 
@@ -103,7 +102,7 @@ namespace hpx { namespace lcos
 
     private:
         mutex_type mtx_;
-        boost::lockfree::atomic_int<long> value_;
+        long value_;
         boost::lockfree::fifo<threads::thread_id_type> queue_;
     };
 

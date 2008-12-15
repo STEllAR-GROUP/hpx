@@ -33,8 +33,8 @@ namespace hpx { namespace threads
     ///                   is in \a thread_state#active state this function 
     ///                   does nothing except returning 
     ///                   thread_state#unknown. 
-    HPX_API_EXPORT thread_state 
-        set_thread_state(thread_id_type id, thread_state newstate);
+    HPX_API_EXPORT thread_state set_thread_state(thread_id_type id, 
+        thread_state newstate = pending);
 
     ///////////////////////////////////////////////////////////////////////
     /// \brief  Set the thread state of the \a thread referenced by the 
@@ -42,14 +42,14 @@ namespace hpx { namespace threads
     ///
     /// \param id         [in] The thread id of the thread the state should 
     ///                   be modified for.
-    /// \param newstate   [in] The new state to be set for the thread 
-    ///                   referenced by the \a id parameter.
     /// \param at_time
+    /// \param newstate   [in] The new state to be set for the thread 
+    ///                   referenced by the \a id parameter.
     ///
     /// \returns
-    HPX_API_EXPORT thread_id_type 
-        set_thread_state(thread_id_type id, thread_state newstate, 
-            boost::posix_time::ptime const& at_time);
+    HPX_API_EXPORT thread_id_type set_thread_state(thread_id_type id, 
+        boost::posix_time::ptime const& at_time, 
+        thread_state newstate = pending);
 
     ///////////////////////////////////////////////////////////////////////
     /// \brief  Set the thread state of the \a thread referenced by the 
@@ -57,16 +57,15 @@ namespace hpx { namespace threads
     ///
     /// \param id         [in] The thread id of the thread the state should 
     ///                   be modified for.
+    /// \param after_duration
     /// \param newstate   [in] The new state to be set for the thread 
     ///                   referenced by the \a id parameter.
-    /// \param after_duration
-    ///                   
     ///
     /// \returns
     ///////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT thread_id_type 
-        set_thread_state(thread_id_type id, thread_state newstate, 
-            boost::posix_time::time_duration const& after_duration);
+    HPX_API_EXPORT thread_id_type set_thread_state(thread_id_type id, 
+        boost::posix_time::time_duration const& after_duration,
+        thread_state newstate = pending);
 
 }}
 

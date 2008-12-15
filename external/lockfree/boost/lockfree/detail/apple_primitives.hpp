@@ -13,6 +13,8 @@
 #include <libkern/OSAtomic.h>
 #include <bits/atomicity.h>
 
+#include <boost/cstdint.hpp>
+
 #define BOOST_LOCKFREE_DCAS_ALIGNMENT
 #define BOOST_LOCKFREE_CACHELINE_ALIGNMENT
 #define BOOST_LOCKFREE_CACHELINE_ALIGNMENT_PREFIX
@@ -108,6 +110,86 @@ namespace boost { namespace lockfree
         return false;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    template <class C, class D>
+    inline D interlocked_compare_exchange(volatile C * addr, D old, D nw)
+    {
+        if (OSAtomicCompareAndSwap32((int32_t)old, (int32_t)nw, (volatile int32_t*)addr))
+            return old;
+        return *addr;
+    }
+
+    inline bool interlocked_bit_test_and_set(long* x, long bit)
+    {
+        long const value = 1 << bit;
+        long old = *x;
+        do {
+            long const current = interlocked_compare_exchange(x, old | value, old);
+            if (current == old)
+            {
+                break;
+            }
+            old = current;
+        } while(true);
+        return (old & value) != 0;
+    }
+
+    inline bool interlocked_bit_test_and_reset(long* x, long bit)
+    {
+        long const value = 1 << bit;
+        long old = *x;
+        do {
+            long const current = interlocked_compare_exchange(x, old & ~value, old);
+            if (current == old)
+            {
+                break;
+            }
+            old = current;
+        } while(true);
+        return (old & value) != 0;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline boost::int32_t interlocked_decrement(boost::int32_t* value)
+    {
+        return OSAtomicDecrement32(value);
+    }
+
+    inline boost::int64_t interlocked_decrement(boost::int64_t* value)
+    {
+        return OSAtomicDecrement64(value);
+    }
+
+    inline boost::int32_t interlocked_increment(boost::int32_t* value)
+    {
+        return OSAtomicIncrement32(value);
+    }
+
+    inline boost::int64_t interlocked_increment(boost::int64_t* value)
+    {
+        return OSAtomicIncrement64(value);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline boost::int32_t interlocked_exchange_sub(boost::int32_t* value, boost::int32_t sub)
+    {
+        return OSAtomicAdd32(value, -sub);
+    }
+
+    inline boost::int64_t interlocked_exchange_sub(boost::int64_t* value, boost::int64_t sub)
+    {
+        return OSAtomicAdd32(value, -sub);
+    }
+
+    inline boost::int32_t interlocked_exchange_add(boost::int32_t* value, boost::int32_t add)
+    {
+        return OSAtomicAdd32(value, add);
+    }
+
+    inline boost::int64_t interlocked_exchange_add(boost::int64_t* value, boost::int64_t add)
+    {
+        return OSAtomicAdd64(value, add);
+    }
 
 }}
 

@@ -34,8 +34,8 @@ void duration_set_state_test()
         boost::bind(timed_set_state_test, timer, 2.0), 
         "duration_set_state_test2", threads::suspended);
 
-    set_thread_state(id1, threads::pending, boost::posix_time::seconds(1));
-    set_thread_state(id2, threads::pending, boost::posix_time::seconds(2));
+    set_thread_state(id1, boost::posix_time::seconds(1), threads::pending);
+    set_thread_state(id2, boost::posix_time::seconds(2), threads::pending);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -54,8 +54,8 @@ void time_set_state_test()
     boost::posix_time::ptime now (
         boost::posix_time::microsec_clock::universal_time());
 
-    set_thread_state(id1, threads::pending, now + boost::posix_time::seconds(1));
-    set_thread_state(id2, threads::pending, now + boost::posix_time::seconds(2));
+    set_thread_state(id1, now + boost::posix_time::seconds(1), threads::pending);
+    set_thread_state(id2, now + boost::posix_time::seconds(2), threads::pending);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -99,10 +99,9 @@ int main(int argc, char* argv[])
             hpx::naming::locality(host, agas_port));
 
         // start the HPX runtime using different numbers of threads
-        for (int i = 1; i <= 8; ++i) {
-            hpx::runtime rt(host, ps_port, host, agas_port);
+        hpx::runtime rt(host, ps_port, host, agas_port);
+        for (int i = 1; i <= 8; ++i) 
             rt.run(hpx_main, i);
-        }
     }
     catch (std::exception& e) {
         BOOST_TEST(false);

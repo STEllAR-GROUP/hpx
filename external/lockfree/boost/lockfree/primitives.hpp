@@ -17,7 +17,15 @@ namespace boost { namespace lockfree { namespace detail
     struct lw_CAS_mutex_tag {};
     inline boost::detail::lightweight_mutex& get_CAS_mutex()
     {
-        static detail::static_<boost::detail::lightweight_mutex, lw_CAS_mutex_tag> mtx;
+        detail::static_<boost::detail::lightweight_mutex, lw_CAS_mutex_tag> mtx;
+        return mtx;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct lw_ilce_mutex_tag {};
+    inline boost::detail::lightweight_mutex& get_ilce_mutex()
+    {
+        detail::static_<boost::detail::lightweight_mutex, lw_ilce_mutex_tag> mtx;
         return mtx;
     }
 
@@ -25,7 +33,7 @@ namespace boost { namespace lockfree { namespace detail
     struct lw_CAS2_mutex_tag {};
     inline boost::detail::lightweight_mutex& get_CAS2_mutex()
     {
-        static detail::static_<boost::detail::lightweight_mutex, lw_CAS2_mutex_tag> mtx;
+        detail::static_<boost::detail::lightweight_mutex, lw_CAS2_mutex_tag> mtx;
         return mtx;
     }
 
@@ -39,7 +47,7 @@ namespace boost { namespace lockfree { namespace detail
 #include <boost/lockfree/detail/apple_primitives.hpp>
 #elif defined(__GNUC__)
 #include <boost/lockfree/detail/gcc_primitives.hpp>
-#elif defined(BOOST_MSVC)
+#elif defined(BOOST_MSVC) || defined(BOOST_INTEL_WIN)
 #include <boost/lockfree/detail/windows_primitives.hpp>
 #endif
 

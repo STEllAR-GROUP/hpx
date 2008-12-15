@@ -104,6 +104,7 @@ namespace boost { namespace lockfree
             *addr = nw;
             return true;
         }
+        return false;
 #endif
     }
 
@@ -256,6 +257,134 @@ namespace boost { namespace lockfree
                                "c" (new2), "b" (new1) : "memory");
         return result != 0;
 
+#endif
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <class C, class D>
+    inline D interlocked_compare_exchange(volatile C * addr, D old, D nw)
+    {
+#if defined(__GNUC__) && ( (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)) )
+#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "interlocked_compare_exchange: using __sync_val_compare_and_swap"
+#endif
+        return __sync_val_compare_and_swap(addr, old, nw);
+#else
+#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "interlocked_compare_exchange: blocking emulation"
+#endif
+
+        boost::detail::lightweight_mutex::scoped_lock lock(detail::get_ilce_mutex());
+        D retval = *addr;
+        if (*addr == old)
+        {
+            *addr = nw;
+        }
+        return retval;
+#endif
+    }
+
+    inline bool interlocked_bit_test_and_set(long* x, long bit)
+    {
+        long const value = 1 << bit;
+        long old = *x;
+        do {
+            long const current = interlocked_compare_exchange(x, old | value, old);
+            if (current == old)
+            {
+                break;
+            }
+            old = current;
+        } while(true);
+        return (old & value) != 0;
+    }
+
+    inline bool interlocked_bit_test_and_reset(long* x, long bit)
+    {
+        long const value = 1 << bit;
+        long old = *x;
+        do {
+            long const current = interlocked_compare_exchange(x, old & ~value, old);
+            if (current == old)
+            {
+                break;
+            }
+            old = current;
+        } while(true);
+        return (old & value) != 0;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    inline T interlocked_decrement(T* value)
+    {
+#if defined(__GNUC__) && ( (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)) )
+#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "interlocked_decrement: using __sync_fetch_and_sub"
+#endif
+        return __sync_fetch_and_sub(value, 1);
+#else
+        for(;;)
+        {
+            T oldv = *value;
+            if(likely(CAS(value, oldv, oldv-1)))
+                return oldv;
+        }
+#endif
+    }
+
+    template <typename T>
+    inline T interlocked_increment(T* value)
+    {
+#if defined(__GNUC__) && ( (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)) )
+#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "interlocked_decrement: using __sync_fetch_and_sub"
+#endif
+        return __sync_fetch_and_add(value, 1);
+#else
+        for(;;)
+        {
+            T oldv = *value;
+            if(likely(CAS(value, oldv, oldv+1)))
+                return oldv;
+        }
+#endif
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    inline T interlocked_exchange_sub(T* value, T sub)
+    {
+#if defined(__GNUC__) && ( (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)) )
+#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "interlocked_exchange_sub: using __sync_fetch_and_sub"
+#endif
+        return __sync_fetch_and_add(value, sub);
+#else
+        for(;;)
+        {
+            T oldv = *value;
+            if(likely(CAS(value, oldv, oldv-sub)))
+                return oldv;
+        }
+#endif
+    }
+
+    template <typename T>
+    inline T interlocked_exchange_add(T* value, T add)
+    {
+#if defined(__GNUC__) && ( (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)) )
+#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "interlocked_decrement: using __sync_fetch_and_sub"
+#endif
+        return __sync_fetch_and_sub(value, add);
+#else
+        for(;;)
+        {
+            T oldv = *value;
+            if(likely(CAS(value, oldv, oldv+add)))
+                return oldv;
+        }
 #endif
     }
 

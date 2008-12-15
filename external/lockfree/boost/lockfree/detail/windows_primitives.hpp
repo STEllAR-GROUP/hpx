@@ -1,5 +1,11 @@
 //  Copyright (c) 2007-2008 Hartmut Kaiser
 // 
+//  Part of this code has been adopted from code published under the BSL by:
+//
+//  Copyright (C) 2007, 2008 Tim Blechmann & Thomas Grill
+//  (C) Copyright 2005-7 Anthony Williams 
+//  (C) Copyright 2007 David Deakins 
+//
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,7 +13,9 @@
 #define BOOST_LOCKFREE_DETAIL_WINDOWS_PRIMITIVES_JUL_11_2008_0407PM
 
 #include <boost/config.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/detail/interlocked.hpp>
 
 #if !defined(BOOST_MSVC)
 #error "do not include this file on non-MSVC platforms"
@@ -17,7 +25,6 @@
 
 #if BOOST_MSVC < 1400
 extern "C" void __cdecl _ReadWriteBarrier();
-extern "C" LONG __cdecl _InterlockedCompareExchange(LONG volatile*, LONG Exchange, LONG Comp);
 #if defined(_M_IA64) || defined(_WIN64)
 extern "C" LONG64 __cdecl _InterlockedCompareExchange64(LONG64 volatile*, LONG64 Exchange, LONG64 Comp);
 #endif
@@ -26,7 +33,6 @@ extern "C" LONG64 __cdecl _InterlockedCompareExchange64(LONG64 volatile*, LONG64
 #endif
 
 #pragma intrinsic(_ReadWriteBarrier)
-#pragma intrinsic(_InterlockedCompareExchange)
 #if defined(_M_IA64) || defined(_WIN64)
 #pragma intrinsic(_InterlockedCompareExchange64)
 #endif
@@ -78,7 +84,7 @@ namespace boost { namespace lockfree
     template <class C, class D>
     inline bool CAS (volatile C * addr, D old, D nw, boost::mpl::true_)
     {
-        return _InterlockedCompareExchange(addr, nw, old) == old;
+        return BOOST_INTERLOCKED_COMPARE_EXCHANGE(addr, nw, old) == old;
     }
 
 #if defined(_M_IA64) || defined(_WIN64)
@@ -148,6 +154,118 @@ namespace boost { namespace lockfree
         }
         return ok;
 #endif
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <class C, class D>
+    inline D interlocked_compare_exchange(volatile C * addr, D old, D nw)
+    {
+        return BOOST_INTERLOCKED_COMPARE_EXCHANGE(addr, nw, old);
+    }
+
+#if (_MSC_VER >= 1400) && !defined(UNDER_CE)
+
+#if _MSC_VER==1400
+    extern "C" unsigned char _interlockedbittestandset(long *a,long b);
+    extern "C" unsigned char _interlockedbittestandreset(long *a,long b);
+#else
+    extern "C" unsigned char _interlockedbittestandset(volatile long *a,long b);
+    extern "C" unsigned char _interlockedbittestandreset(volatile long *a,long b);
+#endif
+
+#pragma intrinsic(_interlockedbittestandset)
+#pragma intrinsic(_interlockedbittestandreset)
+
+    inline bool interlocked_bit_test_and_set(long* x, long bit)
+    {
+        return _interlockedbittestandset(x, bit) != 0;
+    }
+
+    inline bool interlocked_bit_test_and_reset(long* x, long bit)
+    {
+        return _interlockedbittestandreset(x, bit) != 0;
+    }
+
+#elif defined(BOOST_INTEL_WIN) && defined(_M_IX86)
+
+    inline bool interlocked_bit_test_and_set(long* x, long bit)
+    {
+        __asm {
+            mov eax, bit;
+            mov edx, x;
+            lock bts [edx], eax;
+            setc al;
+        };
+    }
+
+    inline bool interlocked_bit_test_and_reset(long* x, long bit)
+    {
+        __asm {
+            mov eax, bit;
+            mov edx, x;
+            lock btr [edx], eax;
+            setc al;
+        };
+    }
+
+#else
+
+    inline bool interlocked_bit_test_and_set(long* x, long bit)
+    {
+        long const value = 1 << bit;
+        long old = *x;
+        do {
+            long const current = interlocked_compare_exchange(x, old, old | value);
+            if (current == old)
+            {
+                break;
+            }
+            old = current;
+        } while(true);
+        return (old & value) != 0;
+    }
+
+    inline bool interlocked_bit_test_and_reset(long* x, long bit)
+    {
+        long const value = 1 << bit;
+        long old = *x;
+        do {
+            long const current = interlocked_compare_exchange(x, old, old & ~value);
+            if (current == old)
+            {
+                break;
+            }
+            old = current;
+        } while(true);
+        return (old & value) != 0;
+    }
+
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    inline T interlocked_decrement(T* value)
+    {
+        return BOOST_INTERLOCKED_DECREMENT(value);
+    }
+
+    template <typename T>
+    inline T interlocked_increment(T* value)
+    {
+        return BOOST_INTERLOCKED_INCREMENT(value);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    inline T interlocked_exchange_sub(T* value, T sub)
+    {
+        return BOOST_INTERLOCKED_EXCHANGE_ADD(value, -sub);
+    }
+
+    template <typename T>
+    inline T interlocked_exchange_add(T* value, T add)
+    {
+        return BOOST_INTERLOCKED_EXCHANGE_ADD(value, add);
     }
 
 }}

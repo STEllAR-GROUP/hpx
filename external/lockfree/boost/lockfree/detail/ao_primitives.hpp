@@ -95,6 +95,84 @@ namespace boost { lockfree
 #endif
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    template <class C, class D>
+    inline D interlocked_compare_exchange(volatile C * addr, D old, D nw)
+    {
+        if (AO_compare_and_swap_full(reinterpret_cast<volatile AO_t*>(addr),
+            reinterpret_cast<AO_t>(old), reinterpret_cast<AO_t>(nw)))
+        {
+            return old;
+        }
+        return *addr;
+    }
+
+    inline bool interlocked_bit_test_and_set(long* x, long bit)
+    {
+        long const value = 1 << bit;
+        long old = *x;
+        do {
+            long const current = interlocked_compare_exchange(x, old | value, old);
+            if (current == old)
+            {
+                break;
+            }
+            old = current;
+        } while(true);
+        return (old & value) != 0;
+    }
+
+    inline bool interlocked_bit_test_and_reset(long* x, long bit)
+    {
+        long const value = 1 << bit;
+        long old = *x;
+        do {
+            long const current = interlocked_compare_exchange(x, old & ~value, old);
+            if (current == old)
+            {
+                break;
+            }
+            old = current;
+        } while(true);
+        return (old & value) != 0;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    inline T interlocked_decrement(T* value)
+    {
+        for(;;)
+        {
+            T oldv = *value;
+            if(likely(CAS(value, oldv, oldv-1)))
+                return oldv;
+        }
+    }
+
+    template <typename T>
+    inline T interlocked_increment(T* value)
+    {
+        for(;;)
+        {
+            T oldv = *value;
+            if(likely(CAS(value, oldv, oldv+1)))
+                return oldv;
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    inline T interlocked_exchange_sub(T* value, T sub)
+    {
+        return AO_fetch_and_add_full(value, -sub);
+    }
+
+    template <typename T>
+    inline T interlocked_exchange_add(T* value, T add)
+    {
+        return AO_fetch_and_add_full(value, add);
+    }
+
 }}
 
 #endif

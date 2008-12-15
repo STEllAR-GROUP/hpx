@@ -415,7 +415,7 @@ namespace hpx { namespace threads
         thread_self& self = get_self();
         thread_id_type wake_id = register_thread(boost::bind(
             &threadmanager::wake_timer_thread, this, id, newstate,
-            self.get_thread_id()), "", suspended);
+            self.get_thread_id()), "wake_timer", suspended);
 
         // let the timer invoke the set_state on the new (suspended) thread
         t.async_wait(boost::bind(&threadmanager::set_state, this, wake_id, 

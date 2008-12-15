@@ -1,12 +1,19 @@
 //  Copyright (c) 2007-2008 Hartmut Kaiser
 // 
+//  Part of this code has been adopted from code published under the BSL by:
+//
+//  (C) Copyright 2005-7 Anthony Williams 
+//  (C) Copyright 2007 David Deakins 
+//
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_LCOS_BARRIER_JUN_23_2008_0530PM)
 #define HPX_LCOS_BARRIER_JUN_23_2008_0530PM
 
-#include <boost/detail/atomic_count.hpp>
+#include <hpx/hpx_fwd.hpp>
+
+#include <boost/noncopyable.hpp>
 #include <boost/lockfree/fifo.hpp>
 
 // Description of the mutex algorithm is explained here:
@@ -44,67 +51,167 @@
 //        else return the new semaphore 
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos 
+namespace hpx { namespace lcos { namespace detail
 {
-    /// unique_lock is a simple exclusive scoped lock usable with the mutex as
-    /// defined below
-    template <typename Mutex>
-    class unique_lock
+    // A mutex can be used to synchronize the access to an arbitrary resource
+    class mutex 
     {
+    private:
+        BOOST_STATIC_CONSTANT(unsigned char, lock_flag_bit = 31);
+        BOOST_STATIC_CONSTANT(unsigned char, event_set_flag_bit = 30);
+        BOOST_STATIC_CONSTANT(long, lock_flag_value = 1 << lock_flag_bit);
+        BOOST_STATIC_CONSTANT(long, event_set_flag_value = 1 << event_set_flag_bit);
+
     public:
-        unique_lock(Mutex& mtx)
-          : mtx_(mtx), is_locked_(false)
+        mutex()
+          : active_count_(0)
+        {}
+
+        bool try_lock()
         {
-            lock();
-        }
-        ~unique_lock()
-        {
-            if (owns_lock())
-                unlock();
+            return !boost::lockfree::interlocked_bit_test_and_set(
+                &active_count_, lock_flag_bit);
         }
 
         void lock()
         {
-            if(owns_lock())
-                HPX_THROW_EXCEPTION(lock_error);
-            mtx_.lock();
-            is_locked_ = true;
+            BOOST_VERIFY(timed_lock(::boost::detail::get_system_time_sentinel()));
         }
+
+        bool timed_lock(::boost::system_time const& wait_until)
+        {
+            if (!boost::lockfree::interlocked_bit_test_and_set(&active_count_, lock_flag_bit))
+            {
+                return true;
+            }
+
+            long old_count = active_count_;
+            for(;;) {
+                long const new_count = (old_count & lock_flag_value) ? 
+                    (old_count + 1) : (old_count | lock_flag_value);
+                long const current = boost::lockfree::interlocked_compare_exchange(
+                    &active_count_, old_count, new_count);
+                if (current == old_count)
+                {
+                    break;
+                }
+                old_count = current;
+            }
+
+            if (old_count & lock_flag_value)
+            {
+                bool lock_acquired = false;
+                do {
+                    // wait for lock to get available
+                    threads::thread_self& self = threads::get_self();
+                    threads::thread_id_type id = self.get_thread_id();
+                    queue_.enqueue(id);
+
+                    // timeout at the given time, if appropriate
+                    if (!wait_until.is_pos_infinity()) {
+                        BOOST_ASSERT(wait_until.is_pos_infinity());    // not implemented yet
+                        threads::set_thread_state(id, wait_until);
+                    }
+
+                    // FIXME: to implement a timeout we need to allow return
+                    //        values from yield
+                    self.yield(threads::suspended);
+
+//                     if (win32::WaitForSingleObject(sem, ::boost::detail::get_milliseconds_until(wait_until))!=0)
+//                     {
+//                         boost::lockfree::interlocked_decrement(&active_count_);
+//                         return false;
+//                     }
+
+                    old_count &= ~lock_flag_value;
+                    old_count |= event_set_flag_value;
+                    for(;;) {
+                        long const new_count = ((old_count & lock_flag_value) ? 
+                            old_count : ((old_count-1) | lock_flag_value)) & ~event_set_flag_value;
+                        long const current = 
+                            boost::lockfree::interlocked_compare_exchange(
+                                &active_count_, old_count, new_count);
+                        if (current == old_count)
+                        {
+                            break;
+                        }
+                        old_count = current;
+                    }
+                    lock_acquired = !(old_count & lock_flag_value);
+
+                } while (!lock_acquired);
+            }
+            return true;
+        }
+
+        template<typename Duration>
+        bool timed_lock(Duration const& timeout)
+        {
+            return timed_lock(get_system_time()+timeout);
+        }
+
+        bool timed_lock(boost::xtime const& timeout)
+        {
+            return timed_lock(boost::posix_time::ptime(timeout));
+        }
+
         void unlock()
         {
-            if(owns_lock())
-                HPX_THROW_EXCEPTION(lock_error);
-            mtx_.unlock();
-            is_locked_ = false;
+            long const offset = lock_flag_value;
+            long const old_count = boost::lockfree::interlocked_exchange_add(
+                &active_count_, lock_flag_value);
+            if (!(old_count & event_set_flag_value) && (old_count > offset))
+            {
+                if (!boost::lockfree::interlocked_bit_test_and_set(
+                        &active_count_, event_set_flag_bit))
+                {
+                    threads::thread_id_type id = 0;
+                    if (queue_.dequeue(&id)) 
+                        threads::set_thread_state(id);
+                }
+            }
         }
-        bool owns_lock() const
-        {
-            return is_locked_;
-        }
+
+        typedef boost::unique_lock<mutex> scoped_lock;
+        typedef boost::detail::try_lock_wrapper<mutex> scoped_try_lock;
 
     private:
-        Mutex& mtx_;
-        bool is_locked_;
-
-        // this class is not copyable and not copy constructible
-        explicit unique_lock(unique_lock&);
-        unique_lock& operator=(unique_lock&);
+        long active_count_;
+        boost::lockfree::fifo<threads::thread_id_type> queue_;
     };
 
-    // A mutex can be used to synchronize the access to an arbitrary resource
-    class mutex 
+}}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace lcos 
+{
+    ///////////////////////////////////////////////////////////////////////////
+    class mutex : boost::noncopyable, public detail::mutex
     {
     public:
         mutex()
         {}
+        ~mutex()
+        {}
 
-        void lock() {}
-        void unlock() {}
-        bool locked() { return false; }
+        typedef boost::unique_lock<mutex> scoped_lock;
+        typedef boost::detail::try_lock_wrapper<mutex> scoped_try_lock;
+    };
 
-        typedef unique_lock<mutex> scoped_lock;
+    typedef mutex try_mutex;
 
-    private:
+    ///////////////////////////////////////////////////////////////////////////
+    class timed_mutex : boost::noncopyable, public detail::mutex
+    {
+    public:
+        timed_mutex()
+        {}
+        ~timed_mutex()
+        {}
+
+        typedef boost::unique_lock<timed_mutex> scoped_timed_lock;
+        typedef boost::detail::try_lock_wrapper<timed_mutex> scoped_try_lock;
+        typedef scoped_timed_lock scoped_lock;
     };
 
 }}

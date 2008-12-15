@@ -109,15 +109,15 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    thread_id_type set_thread_state(thread_id_type id, thread_state state, 
-        boost::posix_time::ptime const& at_time)
+    thread_id_type set_thread_state(thread_id_type id, 
+        boost::posix_time::ptime const& at_time, thread_state state)
     {
         return hpx::applier::get_applier().get_thread_manager().set_state(at_time, id, state);
     }
 
     ///////////////////////////////////////////////////////////////////////
-    thread_id_type set_thread_state(thread_id_type id, thread_state state,
-        boost::posix_time::time_duration const& after)
+    thread_id_type set_thread_state(thread_id_type id, 
+        boost::posix_time::time_duration const& after, thread_state state)
     {
         return hpx::applier::get_applier().get_thread_manager().set_state(after, id, state);
     }

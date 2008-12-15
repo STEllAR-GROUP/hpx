@@ -28,9 +28,9 @@ bool parse_commandline(char const* name, int argc, char *argv[],
         po::options_description desc_cmdline (usage);
         desc_cmdline.add_options()
             ("help,h", "print out program usage (this message)")
-            ("run_dgas_server,r", "run DGAS server as part of this runtime instance")
-            ("dgas", po::value<std::string>(), 
-                "the IP address the DGAS server is running on (default taken "
+            ("run_agas_server,r", "run AGAS server as part of this runtime instance")
+            ("agas", po::value<std::string>(), 
+                "the IP address the AGAS server is running on (default taken "
                 "from hpx.ini), expected format: 192.168.1.1:7912")
             ("hpx", po::value<std::string>(), 
                 "the IP address the HPX parcelport is listening on (default "
@@ -98,6 +98,8 @@ struct test_environment
     test_environment()
       : sem_(0), counter_(0)
     {}
+    ~test_environment()
+    {}
 
     lcos::counting_semaphore sem_;
     boost::detail::atomic_count counter_;
@@ -135,6 +137,16 @@ void sem_signal2(boost::shared_ptr<test_environment> env)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+char const* const sem_wait1_desc[] =
+{
+    "sem_wait1_1", "sem_wait1_2", "sem_wait1_3"
+};
+
+char const* const sem_signal2_desc[] =
+{
+    "sem_signal2_1", "sem_signal2_2", "sem_signal2_3"
+};
+
 int hpx_main()
 {
     // create a semaphore, which which we will use to make 3 threads waiting 
@@ -143,21 +155,21 @@ int hpx_main()
 
     // create the  threads which will have to wait on the semaphore
     for (std::size_t i = 0; i < 3; ++i) 
-        applier::register_work(boost::bind(&sem_wait1, env1));
+        applier::register_work(boost::bind(&sem_wait1, env1), sem_wait1_desc[i]);
 
     // now create a thread signaling the semaphore
-    applier::register_work(boost::bind(&sem_signal1, env1));
+    applier::register_work(boost::bind(&sem_signal1, env1), "sem_signal1");
 
     // the 2nd test does the opposite, it creates a semaphore, which which 
     // will be used to make 1 thread waiting for three other threads
     boost::shared_ptr<test_environment> env2(new test_environment);
 
     // now create a thread waiting on the semaphore
-    applier::register_work(boost::bind(&sem_wait2, env2));
+    applier::register_work(boost::bind(&sem_wait2, env2), "sem_wait2");
 
     // create the threads which will have to signal the semaphore
     for (std::size_t i = 0; i < 3; ++i) 
-        applier::register_work(boost::bind(&sem_signal2, env2));
+        applier::register_work(boost::bind(&sem_signal2, env2), sem_signal2_desc[i]);
 
     // initiate shutdown of the runtime system
     components::stubs::runtime_support::shutdown_all();
@@ -179,24 +191,23 @@ int main(int argc, char* argv[])
         boost::uint16_t hpx_port = HPX_PORT, dgas_port = 0;
 
         // extract IP address/port arguments
-        if (vm.count("dgas")) 
-            split_ip_address(vm["dgas"].as<std::string>(), dgas_host, dgas_port);
+        if (vm.count("agas")) 
+            split_ip_address(vm["agas"].as<std::string>(), dgas_host, dgas_port);
 
         if (vm.count("hpx")) 
             split_ip_address(vm["hpx"].as<std::string>(), hpx_host, hpx_port);
 
         // initialize and run the DGAS service, if appropriate
         std::auto_ptr<dgas_server_helper> dgas_server;
-        if (vm.count("run_dgas_server")) { 
-            // run the DGAS server instance here
+        if (vm.count("run_agas_server")) { 
+            // run the AGAS server instance here
             dgas_server.reset(new dgas_server_helper(dgas_host, dgas_port));
         }
 
         // start the HPX runtime using different numbers of threads
-        for (int i = 1; i <= 8; ++i) {
-            hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port);
+        hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port);
+        for (int i = 1; i <= 8; ++i) 
             rt.run(hpx_main, i);
-        }
     }
     catch (std::exception& e) {
         BOOST_TEST(false);
