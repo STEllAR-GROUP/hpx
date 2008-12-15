@@ -410,7 +410,7 @@ namespace hpx { namespace actions
             // we need to assign the address of the thread function to a 
             // variable to  help the compiler to deduce the function type
             threads::thread_state (*f)(Arg0 const&) =
-                &plain_base_action1::template thread_function<Arg0>;
+                &plain_base_result_action1::template thread_function<Arg0>;
 
             return boost::bind(f, arg0);
         }
