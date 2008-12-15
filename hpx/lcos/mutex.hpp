@@ -57,10 +57,10 @@ namespace hpx { namespace lcos { namespace detail
     class mutex 
     {
     private:
-        BOOST_STATIC_CONSTANT(unsigned char, lock_flag_bit = 31);
-        BOOST_STATIC_CONSTANT(unsigned char, event_set_flag_bit = 30);
-        BOOST_STATIC_CONSTANT(boost::uint32_t, lock_flag_value = 1 << lock_flag_bit);
-        BOOST_STATIC_CONSTANT(boost::uint32_t, event_set_flag_value = 1 << event_set_flag_bit);
+        BOOST_STATIC_CONSTANT(boost::int32_t, lock_flag_bit = 31);
+        BOOST_STATIC_CONSTANT(boost::int32_t, event_set_flag_bit = 30);
+        BOOST_STATIC_CONSTANT(boost::int32_t, lock_flag_value = 1 << lock_flag_bit);
+        BOOST_STATIC_CONSTANT(boost::int32_t, event_set_flag_value = 1 << event_set_flag_bit);
 
     public:
         mutex()
@@ -150,7 +150,7 @@ namespace hpx { namespace lcos { namespace detail
         template<typename Duration>
         bool timed_lock(Duration const& timeout)
         {
-            return timed_lock(get_system_time()+timeout);
+            return timed_lock(boost::get_system_time()+timeout);
         }
 
         bool timed_lock(boost::xtime const& timeout)
@@ -160,7 +160,7 @@ namespace hpx { namespace lcos { namespace detail
 
         void unlock()
         {
-            boost::uint32_t const offset = lock_flag_value;
+            boost::int32_t const offset = lock_flag_value;
             boost::int32_t const old_count = 
                 boost::lockfree::interlocked_exchange_add(
                     &active_count_, lock_flag_value);
