@@ -59,8 +59,8 @@ namespace hpx { namespace lcos { namespace detail
     private:
         BOOST_STATIC_CONSTANT(unsigned char, lock_flag_bit = 31);
         BOOST_STATIC_CONSTANT(unsigned char, event_set_flag_bit = 30);
-        BOOST_STATIC_CONSTANT(long, lock_flag_value = 1 << lock_flag_bit);
-        BOOST_STATIC_CONSTANT(long, event_set_flag_value = 1 << event_set_flag_bit);
+        BOOST_STATIC_CONSTANT(boost::uint32_t, lock_flag_value = 1 << lock_flag_bit);
+        BOOST_STATIC_CONSTANT(boost::uint32_t, event_set_flag_value = 1 << event_set_flag_bit);
 
     public:
         mutex()
@@ -85,12 +85,13 @@ namespace hpx { namespace lcos { namespace detail
                 return true;
             }
 
-            long old_count = active_count_;
+            boost::int32_t old_count = active_count_;
             for(;;) {
-                long const new_count = (old_count & lock_flag_value) ? 
+                boost::int32_t const new_count = (old_count & lock_flag_value) ? 
                     (old_count + 1) : (old_count | lock_flag_value);
-                long const current = boost::lockfree::interlocked_compare_exchange(
-                    &active_count_, old_count, new_count);
+                boost::int32_t const current = 
+                    boost::lockfree::interlocked_compare_exchange(
+                        &active_count_, old_count, new_count);
                 if (current == old_count)
                 {
                     break;
@@ -126,9 +127,11 @@ namespace hpx { namespace lcos { namespace detail
                     old_count &= ~lock_flag_value;
                     old_count |= event_set_flag_value;
                     for(;;) {
-                        long const new_count = ((old_count & lock_flag_value) ? 
-                            old_count : ((old_count-1) | lock_flag_value)) & ~event_set_flag_value;
-                        long const current = 
+                        boost::int32_t const new_count = 
+                            ((old_count & lock_flag_value) ? 
+                                old_count : 
+                                ((old_count-1) | lock_flag_value)) & ~event_set_flag_value;
+                        boost::int32_t const current = 
                             boost::lockfree::interlocked_compare_exchange(
                                 &active_count_, old_count, new_count);
                         if (current == old_count)
@@ -157,9 +160,10 @@ namespace hpx { namespace lcos { namespace detail
 
         void unlock()
         {
-            long const offset = lock_flag_value;
-            long const old_count = boost::lockfree::interlocked_exchange_add(
-                &active_count_, lock_flag_value);
+            boost::uint32_t const offset = lock_flag_value;
+            boost::int32_t const old_count = 
+                boost::lockfree::interlocked_exchange_add(
+                    &active_count_, lock_flag_value);
             if (!(old_count & event_set_flag_value) && (old_count > offset))
             {
                 if (!boost::lockfree::interlocked_bit_test_and_set(
@@ -176,7 +180,7 @@ namespace hpx { namespace lcos { namespace detail
         typedef boost::detail::try_lock_wrapper<mutex> scoped_try_lock;
 
     private:
-        long active_count_;
+        boost::int32_t active_count_;
         boost::lockfree::fifo<threads::thread_id_type> queue_;
     };
 
