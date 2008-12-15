@@ -284,12 +284,13 @@ namespace boost { namespace lockfree
 #endif
     }
 
-    inline bool interlocked_bit_test_and_set(long* x, long bit)
+    template <typename T>
+    inline bool interlocked_bit_test_and_set(T* x, T bit)
     {
-        unsigned long const value = 1u << bit;
-        long old = *x;
+        unsigned T const value = 1u << bit;
+        T old = *x;
         do {
-            long const current = interlocked_compare_exchange(x, old, long(old | value));
+            T const current = interlocked_compare_exchange(x, old, T(old | value));
             if (current == old)
             {
                 break;
@@ -299,12 +300,13 @@ namespace boost { namespace lockfree
         return (old & value) != 0;
     }
 
-    inline bool interlocked_bit_test_and_reset(long* x, long bit)
+    template <typename T>
+    inline bool interlocked_bit_test_and_reset(T* x, T bit)
     {
-        unsigned long const value = 1u << bit;
-        long old = *x;
+        unsigned T const value = 1u << bit;
+        T old = *x;
         do {
-            long const current = interlocked_compare_exchange(x, old, long(old & ~value));
+            T const current = interlocked_compare_exchange(x, old, T(old & ~value));
             if (current == old)
             {
                 break;

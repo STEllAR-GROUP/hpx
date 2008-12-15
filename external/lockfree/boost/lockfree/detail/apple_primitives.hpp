@@ -119,12 +119,12 @@ namespace boost { namespace lockfree
         return *addr;
     }
 
-    inline bool interlocked_bit_test_and_set(long* x, long bit)
+    inline bool interlocked_bit_test_and_set(boost::int32_t* x, boost::int32_t bit)
     {
-        unsigned long const value = 1u << bit;
-        long old = *x;
+        boost::uint32_t const value = 1u << bit;
+        boost::int32_t old = *x;
         do {
-            long const current = interlocked_compare_exchange(x, old, long(old | value));
+            boost::int32_t const current = interlocked_compare_exchange(x, old, boost::int32_t(old | value));
             if (current == old)
             {
                 break;
@@ -134,12 +134,12 @@ namespace boost { namespace lockfree
         return (old & value) != 0;
     }
 
-    inline bool interlocked_bit_test_and_reset(long* x, long bit)
+    inline bool interlocked_bit_test_and_reset(boost::int32_t* x, boost::int32_t bit)
     {
-        unsigned long const value = 1u << bit;
-        long old = *x;
+        boost::uint32_t const value = 1u << bit;
+        boost::int32_t old = *x;
         do {
-            long const current = interlocked_compare_exchange(x, old, long(old & ~value));
+            boost::int32_t const current = interlocked_compare_exchange(x, old, boost::int32_t(old & ~value));
             if (current == old)
             {
                 break;
