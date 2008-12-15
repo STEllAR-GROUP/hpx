@@ -377,7 +377,7 @@ namespace boost { namespace lockfree
 #if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
 #warning "interlocked_decrement: using __sync_fetch_and_sub"
 #endif
-        return __sync_fetch_and_sub(value, add);
+        return __sync_fetch_and_add(value, add);
 #else
         for(;;)
         {
