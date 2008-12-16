@@ -131,6 +131,17 @@ Options:
 
 =head1 DESCRIPTION
 
-stuff
+agas_port : The port on which the AGAS server is listening
+
+parcel_port : The port for parcels
+
+host_suffix : Some machines use a host suffix to access the high speed interface. If, for
+   example, the name of a node is qb100, the infiniband network may be available on qb100h.
+   Consult your /etc/hosts file.
+
+node_file : This follows the format of the PBS_NODEFILE. The file should contain a simple
+    list of hosts delimited by newlines.
+
+help : print this message.
 
 =cut
