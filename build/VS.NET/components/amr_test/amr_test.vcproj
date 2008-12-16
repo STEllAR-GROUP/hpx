@@ -178,15 +178,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\hpx\components\amr_test\amr_test.cpp"
+				RelativePath="..\..\..\..\examples\amr\amr_test\amr_test.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\hpx\components\amr_test\logging.cpp"
+				RelativePath="..\..\..\..\examples\amr\amr_test\logging.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\hpx\components\amr_test\stencil.cpp"
+				RelativePath="..\..\..\..\examples\amr\amr_test\stencil.cpp"
 				>
 			</File>
 		</Filter>
@@ -196,24 +196,24 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\..\hpx\components\amr_test\logging.hpp"
+				RelativePath="..\..\..\..\examples\amr\amr_test\logging.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\hpx\components\amr_test\stencil.hpp"
+				RelativePath="..\..\..\..\examples\amr\amr_test\stencil.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\hpx\components\amr_test\stencil_data.hpp"
+				RelativePath="..\..\..\..\examples\amr\amr_test\stencil_data.hpp"
 				>
 			</File>
 		</Filter>
 		<File
-			RelativePath="..\..\..\..\hpx\components\amr_test\amr_test.ini"
+			RelativePath="..\..\..\..\examples\amr\amr_test\amr_test.ini"
 			>
 		</File>
 		<File
-			RelativePath="..\..\..\..\hpx\components\amr_test\CMakeLists.txt"
+			RelativePath="..\..\..\..\examples\amr\amr_test\CMakeLists.txt"
 			>
 		</File>
 	</Files>

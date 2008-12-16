@@ -178,7 +178,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\hpx\components\simple_accumulator\simple_accumulator.cpp"
+				RelativePath="..\..\..\..\examples\accumulator\simple_accumulator\simple_accumulator.cpp"
 				>
 			</File>
 		</Filter>
@@ -188,14 +188,14 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\..\hpx\components\simple_accumulator\simple_accumulator.hpp"
+				RelativePath="..\..\..\..\examples\accumulator\simple_accumulator\simple_accumulator.hpp"
 				>
 			</File>
 			<Filter
 				Name="Stubs"
 				>
 				<File
-					RelativePath="..\..\..\..\hpx\components\simple_accumulator\stubs\simple_accumulator.hpp"
+					RelativePath="..\..\..\..\examples\accumulator\simple_accumulator\stubs\simple_accumulator.hpp"
 					>
 				</File>
 			</Filter>
@@ -203,13 +203,13 @@
 				Name="Server"
 				>
 				<File
-					RelativePath="..\..\..\..\hpx\components\simple_accumulator\server\simple_accumulator.hpp"
+					RelativePath="..\..\..\..\examples\accumulator\simple_accumulator\server\simple_accumulator.hpp"
 					>
 				</File>
 			</Filter>
 		</Filter>
 		<File
-			RelativePath="..\..\..\..\hpx\components\simple_accumulator\CMakeLists.txt"
+			RelativePath="..\..\..\..\examples\accumulator\simple_accumulator\CMakeLists.txt"
 			>
 		</File>
 	</Files>

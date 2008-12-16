@@ -178,15 +178,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\hpx\components\generic\generic_component_noresult.cpp"
+				RelativePath="..\..\..\..\examples\generic\generic\generic_component_noresult.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\hpx\components\generic\generic_component_result.cpp"
+				RelativePath="..\..\..\..\examples\generic\generic\generic_component_result.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\hpx\components\generic\generic_module.cpp"
+				RelativePath="..\..\..\..\examples\generic\generic\generic_module.cpp"
 				>
 			</File>
 		</Filter>
@@ -194,16 +194,16 @@
 			Name="Header Files"
 			>
 			<File
-				RelativePath="..\..\..\..\hpx\components\generic\generic_component_noresult.hpp"
+				RelativePath="..\..\..\..\examples\generic\generic\generic_component_noresult.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\hpx\components\generic\generic_component_result.hpp"
+				RelativePath="..\..\..\..\examples\generic\generic\generic_component_result.hpp"
 				>
 			</File>
 		</Filter>
 		<File
-			RelativePath="..\..\..\..\hpx\components\generic\CMakeLists.txt"
+			RelativePath="..\..\..\..\examples\generic\generic\CMakeLists.txt"
 			>
 		</File>
 	</Files>

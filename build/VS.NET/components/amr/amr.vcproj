@@ -178,18 +178,32 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\hpx\components\amr\amr.cpp"
+				RelativePath="..\..\..\..\examples\amr\amr\amr.cpp"
 				>
 			</File>
 			<Filter
 				Name="Server"
 				>
 				<File
-					RelativePath="..\..\..\..\hpx\components\amr\server\functional_component.cpp"
+					RelativePath="..\..\..\..\examples\amr\amr\server\functional_component.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\..\..\hpx\components\amr\server\functional_timestep.cpp"
+					RelativePath="..\..\..\..\examples\amr\amr\server\functional_timestep.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -209,11 +223,11 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\..\..\hpx\components\amr\server\stencil_value.cpp"
+					RelativePath="..\..\..\..\examples\amr\amr\server\stencil_value.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\..\hpx\components\amr\server\stencil_value_out_adaptor.cpp"
+					RelativePath="..\..\..\..\examples\amr\amr\server\stencil_value_out_adaptor.cpp"
 					>
 				</File>
 			</Filter>
@@ -224,42 +238,56 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\..\hpx\components\amr\functional_component.hpp"
+				RelativePath="..\..\..\..\examples\amr\amr\functional_component.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\hpx\components\amr\stencil_value.hpp"
+				RelativePath="..\..\..\..\examples\amr\amr\stencil_value.hpp"
 				>
 			</File>
 			<Filter
 				Name="Server"
 				>
 				<File
-					RelativePath="..\..\..\..\hpx\components\amr\server\functional_component.hpp"
+					RelativePath="..\..\..\..\examples\amr\amr\server\functional_component.hpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\..\..\examples\amr\amr\server\functional_timestep.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\..\hpx\components\amr\server\functional_timestep.hpp"
+					RelativePath="..\..\..\..\examples\amr\amr\server\functional_timestep_impl.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\..\hpx\components\amr\server\functional_timestep_impl.hpp"
+					RelativePath="..\..\..\..\examples\amr\amr\server\stencil_value.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\..\hpx\components\AMR\server\stencil_value.hpp"
+					RelativePath="..\..\..\..\examples\amr\amr\server\stencil_value_impl.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\..\hpx\components\amr\server\stencil_value_impl.hpp"
+					RelativePath="..\..\..\..\examples\amr\amr\server\stencil_value_in_adaptor.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\..\hpx\components\amr\server\stencil_value_in_adaptor.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\..\hpx\components\amr\server\stencil_value_out_adaptor.hpp"
+					RelativePath="..\..\..\..\examples\amr\amr\server\stencil_value_out_adaptor.hpp"
 					>
 				</File>
 			</Filter>
@@ -267,21 +295,21 @@
 				Name="Stubs"
 				>
 				<File
-					RelativePath="..\..\..\..\hpx\components\amr\stubs\functional_component.hpp"
+					RelativePath="..\..\..\..\examples\amr\amr\stubs\functional_component.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\..\hpx\components\amr\stubs\stencil_value.hpp"
+					RelativePath="..\..\..\..\examples\amr\amr\stubs\stencil_value.hpp"
 					>
 				</File>
 			</Filter>
 		</Filter>
 		<File
-			RelativePath="..\..\..\..\hpx\components\amr\amr.ini"
+			RelativePath="..\..\..\..\examples\amr\amr\amr.ini"
 			>
 		</File>
 		<File
-			RelativePath="..\..\..\..\hpx\components\amr\CMakeLists.txt"
+			RelativePath="..\..\..\..\examples\amr\amr\CMakeLists.txt"
 			>
 		</File>
 	</Files>
