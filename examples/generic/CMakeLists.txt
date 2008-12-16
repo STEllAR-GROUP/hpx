@@ -3,7 +3,15 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# define list of target names
+# just recurse into all components subdirectories and execute the scripts there
+set(generic_SUDIRS 
+    generic)
+
+foreach(subdir ${generic_SUDIRS})
+    add_subdirectory(${subdir})
+endforeach()
+
+# define list of target names for this directory
 set(component_EXAMPLES 
     generic)              # example demonstrating generic_component
 
