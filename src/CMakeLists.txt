@@ -210,7 +210,7 @@ set_target_properties(hpx_serialization PROPERTIES
     VERSION ${HPX_VERSION}      # create *nix style library versions + symbolic links
     SOVERSION ${HPX_SOVERSION}
     CLEAN_DIRECT_OUTPUT 1       # allow creating static and shared libs without conflicts
-    OUTPUT_NAME ${component_LIBRARY_PREFIX}hpx_serialization)
+    OUTPUT_NAME hpx_serialization)
 target_link_libraries(hpx_serialization ${Boost_LIBRARIES})
 
 # build instructions for main shared HPX library
@@ -220,7 +220,7 @@ set_target_properties(hpx PROPERTIES
     VERSION ${HPX_VERSION}      # create *nix style library versions + symbolic links
     SOVERSION ${HPX_SOVERSION}
     CLEAN_DIRECT_OUTPUT 1       # allow creating static and shared libs without conflicts
-    OUTPUT_NAME ${component_LIBRARY_PREFIX}hpx)
+    OUTPUT_NAME hpx)
 target_link_libraries(hpx hpx_serialization ${Boost_LIBRARIES})
 
 # installation instructions
