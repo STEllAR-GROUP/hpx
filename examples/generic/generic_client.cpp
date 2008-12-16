@@ -8,11 +8,11 @@
 
 #include <hpx/hpx.hpp>
 
-#include <hpx/components/generic/generic_component_noresult.hpp>
-#include <hpx/components/generic/generic_component_result.hpp>
-
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
+
+#include "generic/generic_component_noresult.hpp"
+#include "generic/generic_component_result.hpp"
 
 namespace po = boost::program_options;
 
@@ -54,6 +54,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
         desc_cmdline.add_options()
             ("help,h", "print out program usage (this message)")
             ("run_agas_server,r", "run AGAS server as part of this runtime instance")
+            ("worker,w", "run this instance in worker (non-console) mode")
             ("agas,a", po::value<std::string>(), 
                 "the IP address the AGAS server is running on (default taken "
                 "from hpx.ini), expected format: 192.168.1.1:7912")
@@ -131,6 +132,7 @@ int main(int argc, char* argv[])
         std::string hpx_host("localhost"), agas_host;
         boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
         int num_threads = 1;
+        hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
 
         // extract IP address/port arguments
         if (vm.count("agas")) 
@@ -142,13 +144,16 @@ int main(int argc, char* argv[])
         if (vm.count("threads"))
             num_threads = vm["threads"].as<int>();
 
+        if (vm.count("worker"))
+            mode = hpx::runtime::worker;
+
         // initialize and run the AGAS service, if appropriate
         std::auto_ptr<agas_server_helper> agas_server;
         if (vm.count("run_agas_server"))  // run the AGAS server instance here
             agas_server.reset(new agas_server_helper(agas_host, agas_port));
 
         // initialize and start the HPX runtime
-        hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port);
+        hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, mode);
         rt.run(hpx_main, num_threads);
     }
     catch (std::exception& e) {

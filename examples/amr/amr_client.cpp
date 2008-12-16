@@ -9,15 +9,16 @@
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
-#include <hpx/components/amr/stencil_value.hpp>
-#include <hpx/components/amr/functional_component.hpp>
-#include <hpx/components/amr_test/stencil.hpp>
-#include <hpx/components/amr_test/logging.hpp>
-#include <hpx/components/amr_test/stencil_data.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 #include <boost/assign/std/vector.hpp>
+
+#include "amr/stencil_value.hpp"
+#include "amr/functional_component.hpp"
+#include "amr_test/stencil.hpp"
+#include "amr_test/logging.hpp"
+#include "amr_test/stencil_data.hpp"
 
 namespace po = boost::program_options;
 
@@ -278,6 +279,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
         desc_cmdline.add_options()
             ("help,h", "print out program usage (this message)")
             ("run_agas_server,r", "run AGAS server as part of this runtime instance")
+            ("worker,w", "run this instance in worker (non-console) mode")
             ("agas,a", po::value<std::string>(), 
                 "the IP address the AGAS server is running on (default taken "
                 "from hpx.ini), expected format: 192.168.1.1:7912")
@@ -359,6 +361,7 @@ int main(int argc, char* argv[])
         std::string hpx_host("localhost"), agas_host;
         boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
         int num_threads = 1;
+        hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
 
         // extract IP address/port arguments
         if (vm.count("agas")) 
@@ -369,6 +372,9 @@ int main(int argc, char* argv[])
 
         if (vm.count("threads"))
             num_threads = vm["threads"].as<int>();
+
+        if (vm.count("worker"))
+            mode = hpx::runtime::worker;
 
         // initialize and run the AGAS service, if appropriate
         std::auto_ptr<agas_server_helper> agas_server;
@@ -384,7 +390,7 @@ int main(int argc, char* argv[])
             numsteps = vm["numsteps"].as<std::size_t>();
 
         // initialize and start the HPX runtime
-        hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port);
+        hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, mode);
         rt.run(boost::bind (hpx_main, numvals, numsteps), num_threads);
     }
     catch (std::exception& e) {

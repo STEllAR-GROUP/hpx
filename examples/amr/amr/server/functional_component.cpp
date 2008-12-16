@@ -11,7 +11,7 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
-#include <hpx/components/amr/server/functional_component.hpp>
+#include "functional_component.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::amr::server::functional_component functional_component_type;

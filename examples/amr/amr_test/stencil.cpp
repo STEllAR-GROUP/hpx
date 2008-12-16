@@ -6,9 +6,9 @@
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/future_wait.hpp>
 
-#include <hpx/components/amr_test/stencil.hpp>
-#include <hpx/components/amr_test/logging.hpp>
-#include <hpx/components/amr_test/stencil_data.hpp>
+#include "amr_test/stencil.hpp"
+#include "amr_test/logging.hpp"
+#include "amr_test/stencil_data.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 

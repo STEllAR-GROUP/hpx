@@ -11,7 +11,7 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
-#include <hpx/components/amr/server/stencil_value_out_adaptor.hpp>
+#include "stencil_value_out_adaptor.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Define types of stencil_value_out_adaptor components exposed by this module

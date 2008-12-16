@@ -118,6 +118,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
         desc_cmdline.add_options()
             ("help,h", "print out program usage (this message)")
             ("run_agas_server,r", "run AGAS server as part of this runtime instance")
+            ("worker,w", "run this instance in worker (non-console) mode")
             ("agas,a", po::value<std::string>(), 
                 "the IP address the AGAS server is running on (default taken "
                 "from hpx.ini), expected format: 192.168.1.1:7912")
@@ -205,6 +206,7 @@ int main(int argc, char* argv[])
         int size_x = 20;
         int size_y = 20;
         int iterations = 100;
+        hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
 
         // extract IP address/port arguments
         if (vm.count("agas")) 
@@ -215,6 +217,9 @@ int main(int argc, char* argv[])
 
         if (vm.count("threads"))
             num_threads = vm["threads"].as<int>();
+
+        if (vm.count("worker"))
+            mode = hpx::runtime::worker;
 
         if (vm.count("sizex"))
             size_x = vm["sizex"].as<int>();
@@ -229,7 +234,7 @@ int main(int argc, char* argv[])
             agas_server.reset(new agas_server_helper(agas_host, agas_port));
 
         // initialize and start the HPX runtime
-        hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port);
+        hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, mode);
         rt.run(boost::bind(hpx_main, size_x, size_y, iterations), num_threads);
     }
     catch (std::exception& e) {

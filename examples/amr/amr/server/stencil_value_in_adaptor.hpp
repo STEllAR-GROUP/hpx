@@ -11,7 +11,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/lcos/eager_future.hpp>
 
-#include <hpx/components/amr/server/stencil_value_out_adaptor.hpp>
+#include "stencil_value_out_adaptor.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server 

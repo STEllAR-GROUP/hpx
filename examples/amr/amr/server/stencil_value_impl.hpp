@@ -6,12 +6,12 @@
 #if !defined(HPX_COMPONENTS_AMR_STENCIL_VALUE_IMPL_OCT_17_2008_0848AM)
 #define HPX_COMPONENTS_AMR_STENCIL_VALUE_IMPL_OCT_17_2008_0848AM
 
-#include <hpx/components/amr/server/stencil_value.hpp>
-#include <hpx/components/amr/functional_component.hpp>
-
 #include <boost/bind.hpp>
 #include <boost/assert.hpp>
 #include <boost/assign/std/vector.hpp>
+
+#include "stencil_value.hpp"
+#include "../functional_component.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server 

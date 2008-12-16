@@ -14,12 +14,12 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/lcos/counting_semaphore.hpp>
 
-#include <hpx/components/amr/server/stencil_value_in_adaptor.hpp>
-#include <hpx/components/amr/server/stencil_value_out_adaptor.hpp>
-
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/bind.hpp>
+
+#include "stencil_value_in_adaptor.hpp"
+#include "stencil_value_out_adaptor.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server 

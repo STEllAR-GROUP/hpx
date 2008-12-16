@@ -8,7 +8,8 @@
 
 #include <hpx/runtime/runtime.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/components/accumulator/stubs/accumulator.hpp>
+
+#include "stubs/accumulator.hpp"
 
 namespace hpx { namespace components 
 {

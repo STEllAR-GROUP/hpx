@@ -5,7 +5,8 @@
 
 #include <iostream>
 #include <hpx/hpx.hpp>
-#include <hpx/components/amr_test/logging.hpp>
+
+#include "amr_test/logging.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server

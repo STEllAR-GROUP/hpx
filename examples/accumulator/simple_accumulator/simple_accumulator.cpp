@@ -12,7 +12,7 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
-#include <hpx/components/simple_accumulator/server/simple_accumulator.hpp>
+#include "server/simple_accumulator.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality

@@ -11,8 +11,8 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
-#include <hpx/components/amr/server/functional_timestep.hpp>
-#include <hpx/components/amr/server/functional_timestep_impl.hpp>
+#include "server/functional_timestep.hpp"
+#include "server/functional_timestep_impl.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef 

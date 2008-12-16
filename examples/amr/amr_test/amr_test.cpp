@@ -9,11 +9,11 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
 
-#include <hpx/components/amr_test/stencil.hpp>
-#include <hpx/components/amr_test/logging.hpp>
-
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
+
+#include "amr_test/stencil.hpp"
+#include "amr_test/logging.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality

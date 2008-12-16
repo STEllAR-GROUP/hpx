@@ -9,7 +9,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/components/amr/server/stencil_value.hpp>
+
+#include "server/stencil_value.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace stubs 

@@ -8,7 +8,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/components/amr/stubs/stencil_value.hpp>
+
+#include "stubs/stencil_value.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
