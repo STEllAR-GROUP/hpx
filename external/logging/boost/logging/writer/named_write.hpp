@@ -231,6 +231,10 @@ template<class format_write_ /* = default_ */ > struct named_write {
         }
     }
 
+    template<class formatter> void add_formatter(formatter fmt) {
+        m_writer.add_formatter(fmt);
+    }
+
 private:
     struct parse_destination {
         bool has_manipulator_name() const { return !m_manipulator.empty(); }

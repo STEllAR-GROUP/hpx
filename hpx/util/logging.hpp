@@ -7,8 +7,12 @@
 #define HPX_UTIL_AGAS_LOGGING_APR_10_2008_1032AM
 
 #include <string>
-#include <hpx/config.hpp>
+#include <hpx/hpx_fwd.hpp>
+
 #include <boost/logging/format/named_write_fwd.hpp>
+#include <boost/logging/format_fwd.hpp>
+
+BOOST_LOG_FORMAT_MSG(optimize::cache_string_one_str<>)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util 
@@ -84,6 +88,22 @@ namespace hpx { namespace util
         << hpx::util::levelname(::boost::logging::level::fatal)               \
         << (" [ERR] ")                                                        \
     /**/
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        // get the data to use to pre-fill the runtime_configuration instance
+        // with logging specific data
+        std::vector<std::string> const& get_logging_data();
+
+        // the init_logging type will be used for initialization purposes only as
+        // well
+        struct init_logging
+        {
+            init_logging(runtime_configuration& ini, 
+                naming::id_type const& prefix);
+        };
+    }
 
 ///////////////////////////////////////////////////////////////////////////////
 }}

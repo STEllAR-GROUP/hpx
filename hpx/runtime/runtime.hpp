@@ -219,6 +219,7 @@ namespace hpx
         parcelset::parcelport parcel_port_;
         threads::threadmanager thread_manager_;
         parcelset::parcelhandler parcel_handler_;
+        util::detail::init_logging init_logging_;
         components::server::runtime_support runtime_support_;
         components::server::memory memory_;
         applier::applier applier_;

@@ -206,6 +206,7 @@ namespace hpx
     namespace util
     {
         class HPX_API_EXPORT section;
+        class runtime_configuration;
     }
 }
 

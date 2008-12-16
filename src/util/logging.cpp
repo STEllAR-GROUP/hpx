@@ -4,8 +4,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <cstdlib>
+
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/static.hpp>
+
 #include <boost/version.hpp>
 #include <boost/config.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -98,13 +103,36 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // custom formatter: prepend locality prefix 
+    struct locality_prefix 
+      : boost::logging::formatter::class_<
+            locality_prefix, 
+            boost::logging::formatter::implement_op_equal::no_context
+        > 
+    {
+        boost::uint32_t prefix_;
+
+        locality_prefix(naming::id_type const& prefix) 
+          : prefix_(naming::get_prefix_from_id(prefix)) 
+        {}
+
+        void operator()(param str) const 
+        {
+            std::stringstream out;
+            out << "(" << std::hex << std::setw(4) << std::setfill('0') 
+                << prefix_ << ") ";
+            str.prepend_string(out.str());
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     // this is required in order to use the logging library
     BOOST_DEFINE_LOG_FILTER_WITH_ARGS(agas_level, filter_type, 
         boost::logging::level::disable_all) 
     BOOST_DEFINE_LOG(agas_logger, logger_type) 
 
     // initialize logging for AGAS
-    void init_agas_logs(util::section const& ini) 
+    void init_agas_logs(util::section const& ini, naming::id_type const& prefix) 
     {
         std::string loglevel, logdest, logformat;
 
@@ -121,6 +149,7 @@ namespace hpx { namespace util
             boost::logging::level::disable_all != detail::get_log_level(loglevel)) 
         {
             agas_logger()->writer().write(logformat, logdest);
+            agas_logger()->writer().add_formatter(locality_prefix(prefix));
             agas_logger()->mark_as_initialized();
             agas_level()->set_enabled(detail::get_log_level(loglevel));
         }
@@ -133,7 +162,7 @@ namespace hpx { namespace util
     BOOST_DEFINE_LOG(timing_logger, logger_type) 
 
     // initialize logging for performance measurements
-    void init_timing_logs(util::section const& ini) 
+    void init_timing_logs(util::section const& ini, naming::id_type const& prefix) 
     {
         std::string loglevel, logdest, logformat;
 
@@ -150,6 +179,7 @@ namespace hpx { namespace util
             boost::logging::level::disable_all != detail::get_log_level(loglevel)) 
         {
             timing_logger()->writer().write(logformat, logdest);
+            timing_logger()->writer().add_formatter(locality_prefix(prefix));
             timing_logger()->mark_as_initialized();
             timing_level()->set_enabled(detail::get_log_level(loglevel));
         }
@@ -165,7 +195,7 @@ namespace hpx { namespace util
     BOOST_DEFINE_LOG(hpx_error_logger, logger_type)
 
     // initialize logging for HPX runtime
-    void init_hpx_logs(util::section const& ini) 
+    void init_hpx_logs(util::section const& ini, naming::id_type const& prefix) 
     {
         std::string loglevel, logdest, logformat;
 
@@ -184,6 +214,7 @@ namespace hpx { namespace util
 
         if (boost::logging::level::disable_all != lvl) {
             hpx_logger()->writer().write(logformat, logdest);
+            hpx_logger()->writer().add_formatter(locality_prefix(prefix));
             hpx_logger()->mark_as_initialized();
             hpx_level()->set_enabled(lvl);
 
@@ -195,67 +226,85 @@ namespace hpx { namespace util
         else {
             // errors are always logged to cerr 
             hpx_error_logger()->writer().write(logformat, "cerr");
+            hpx_error_logger()->writer().add_formatter(locality_prefix(prefix));
             hpx_error_logger()->mark_as_initialized();
             hpx_error_level()->set_enabled(boost::logging::level::fatal);
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    struct init_logging
-    {
-        init_logging()
-        {
-            try {
-                // add default logging configuration as defaults to the ini data
-                // this will be overwritten by related entries in the read hpx.ini
-                using namespace boost::assign;
-                std::vector<std::string> prefill; 
-                prefill +=
-                        "[hpx.logging]",
-                        "level = ${HPX_LOGLEVEL:0}",
-                        "destination = ${HPX_LOGDESTINATION:file(hpx.$[system.pid].log)}",
-#if defined(BOOST_WINDOWS)
-                        "format = ${HPX_LOGFORMAT:%time%($hh:$mm.$ss.$mili) [%idx%]|\\n}",
-#else
-                        // the Boost.Log generates bogus milliseconds on Linux systems
-                        "format = ${HPX_LOGFORMAT:%time%($hh:$mm.$ss) [%idx%]|\\n}",
-#endif
-
-                        "[hpx.timing.logging]",
-                        "level = ${HPX_TIMING_LOGLEVEL:0}",
-                        "destination = ${HPX_TIMING_LOGDESTINATION:file(hpx.timing.$[system.pid].log)}",
-#if defined(BOOST_WINDOWS)
-                        "format = ${HPX_TIMING_LOGFORMAT:%time%($hh:$mm.$ss.$mili) [%idx%] [TIM] |\\n}",
-#else
-                        // the Boost.Log generates bogus milliseconds on Linux systems
-                        "format = ${HPX_TIMING_LOGFORMAT:%time%($hh:$mm.$ss) [%idx%] [TIM] |\\n}",
-#endif
-
-                        "[hpx.agas.logging]",
-                        "level = ${HPX_AGAS_LOGLEVEL:0}",
-                        "destination = ${HPX_AGAS_LOGDESTINATION:file(hpx.agas.$[system.pid].log)}",
-#if defined(BOOST_WINDOWS)
-                        "format = ${HPX_AGAS_LOGFORMAT:%time%($hh:$mm.$ss.$mili) [%idx%][AGAS] |\\n}"
-#else
-                        // the Boost.Log generates bogus milliseconds on Linux systems
-                        "format = ${HPX_AGAS_LOGFORMAT:%time%($hh:$mm.$ss) [%idx%][AGAS] |\\n}"
-#endif
-                    ;
-
-                // initialize logging 
-                util::runtime_configuration ini(prefill);
-                util::init_agas_logs(ini);
-                util::init_timing_logs(ini);
-                util::init_hpx_logs(ini);
-            }
-            catch (std::exception const&) {
-                // just in case something goes wrong
-                std::cerr << "caught std::exception during initialization" 
-                          << std::endl;
-            }
-        }
-    };
-    init_logging const init_logging_;
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
-}}
+namespace hpx { namespace util { namespace detail
+{
+    ///////////////////////////////////////////////////////////////////////////
+    // the logging_configuration type will be instantiated exactly once 
+    struct logging_configuration
+    {
+        logging_configuration();
+        std::vector<std::string> prefill_; 
+    };
+
+    logging_configuration::logging_configuration()
+    {
+        try {
+            // add default logging configuration as defaults to the ini data
+            // this will be overwritten by related entries in the read hpx.ini
+            using namespace boost::assign;
+            prefill_ +=
+                    "[hpx.logging]",
+                    "level = ${HPX_LOGLEVEL:0}",
+                    "destination = ${HPX_LOGDESTINATION:file(hpx.$[system.pid].log)}",
+#if defined(BOOST_WINDOWS)
+                    "format = ${HPX_LOGFORMAT:%time%($hh:$mm.$ss.$mili) [%idx%]|\\n}",
+#else
+                    // the Boost.Log generates bogus milliseconds on Linux systems
+                    "format = ${HPX_LOGFORMAT:%time%($hh:$mm.$ss) [%idx%]|\\n}",
+#endif
+
+                    "[hpx.timing.logging]",
+                    "level = ${HPX_TIMING_LOGLEVEL:0}",
+                    "destination = ${HPX_TIMING_LOGDESTINATION:file(hpx.timing.$[system.pid].log)}",
+#if defined(BOOST_WINDOWS)
+                    "format = ${HPX_TIMING_LOGFORMAT:%time%($hh:$mm.$ss.$mili) [%idx%] [TIM] |\\n}",
+#else
+                    // the Boost.Log generates bogus milliseconds on Linux systems
+                    "format = ${HPX_TIMING_LOGFORMAT:%time%($hh:$mm.$ss) [%idx%] [TIM] |\\n}",
+#endif
+
+                    "[hpx.agas.logging]",
+                    "level = ${HPX_AGAS_LOGLEVEL:0}",
+                    "destination = ${HPX_AGAS_LOGDESTINATION:file(hpx.agas.$[system.pid].log)}",
+#if defined(BOOST_WINDOWS)
+                    "format = ${HPX_AGAS_LOGFORMAT:%time%($hh:$mm.$ss.$mili) [%idx%][AGAS] |\\n}"
+#else
+                    // the Boost.Log generates bogus milliseconds on Linux systems
+                    "format = ${HPX_AGAS_LOGFORMAT:%time%($hh:$mm.$ss) [%idx%][AGAS] |\\n}"
+#endif
+                ;
+        }
+        catch (std::exception const&) {
+            // just in case something goes wrong
+            std::cerr << "caught std::exception during initialization" 
+                      << std::endl;
+        }
+    }
+
+    struct init_logging_tag {};
+    std::vector<std::string> const& get_logging_data()
+    {
+        static_<logging_configuration, init_logging_tag> init;
+        return init.get().prefill_;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    init_logging::init_logging(runtime_configuration& ini, 
+        naming::id_type const& prefix)
+    {
+        init_agas_logs(ini, prefix);
+        init_timing_logs(ini, prefix);
+        init_hpx_logs(ini, prefix);
+    }
+
+///////////////////////////////////////////////////////////////////////////////
+}}}

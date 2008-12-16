@@ -12,6 +12,7 @@
 #include <boost/bind.hpp>
 
 #include <hpx/include/runtime.hpp>
+#include <hpx/util/logging.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure the system gets properly shut down while handling Ctrl-C and other
@@ -48,13 +49,15 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(std::string const& address, boost::uint16_t port,
             std::string const& agas_address, boost::uint16_t agas_port) 
-      : ini_(), agas_pool_(), parcel_pool_(), timer_pool_(),
+      : ini_(util::detail::get_logging_data()), 
+        agas_pool_(), parcel_pool_(), timer_pool_(),
         agas_client_(agas_pool_, ini_.get_agas_locality(agas_address, agas_port)),
         parcel_port_(parcel_pool_, naming::locality(address, port)),
         thread_manager_(timer_pool_, 
             boost::bind(&runtime::init_applier, This()),
             boost::bind(&runtime::stop, This(), false)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
+        init_logging_(ini_, parcel_handler_.get_prefix()),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
@@ -63,13 +66,15 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(naming::locality address, naming::locality agas_address) 
-      : ini_(), agas_pool_(), parcel_pool_(), timer_pool_(),
+      : ini_(util::detail::get_logging_data()), 
+        agas_pool_(), parcel_pool_(), timer_pool_(),
         agas_client_(agas_pool_, agas_address),
         parcel_port_(parcel_pool_, address),
         thread_manager_(timer_pool_, 
             boost::bind(&runtime::init_applier, This()),
             boost::bind(&runtime::stop, This(), false)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
+        init_logging_(ini_, parcel_handler_.get_prefix()),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
@@ -78,13 +83,15 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(naming::locality address) 
-      : ini_(), agas_pool_(), parcel_pool_(), timer_pool_(),
+      : ini_(util::detail::get_logging_data()), 
+        agas_pool_(), parcel_pool_(), timer_pool_(),
         agas_client_(agas_pool_, ini_.get_agas_locality()),
         parcel_port_(parcel_pool_, address),
         thread_manager_(timer_pool_, 
             boost::bind(&runtime::init_applier, This()),
             boost::bind(&runtime::stop, This(), false)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
+        init_logging_(ini_, parcel_handler_.get_prefix()),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
