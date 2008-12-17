@@ -36,6 +36,9 @@ bool parse_commandline(char const* name, int argc, char *argv[],
             ("hpx", po::value<std::string>(), 
                 "the IP address the HPX parcelport is listening on (default "
                 "is localhost:7910), expected format: 192.168.1.1:7913")
+            ("threads,t", po::value<int>(), 
+                "the number of operating system threads to spawn for this"
+                "HPX locality")
         ;
 
         po::store(po::command_line_parser(argc, argv)
@@ -191,6 +194,7 @@ int main(int argc, char* argv[])
         std::string hpx_host("localhost"), dgas_host;
         boost::uint16_t hpx_port = HPX_PORT, dgas_port = 0;
         hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
+        int num_threads = 0;
 
         // extract IP address/port arguments
         if (vm.count("agas")) 
@@ -202,6 +206,9 @@ int main(int argc, char* argv[])
         if (vm.count("worker"))
             mode = hpx::runtime::worker;
 
+        if (vm.count("threads"))
+            num_threads = vm["threads"].as<int>();
+
         // initialize and run the DGAS service, if appropriate
         std::auto_ptr<dgas_server_helper> dgas_server;
         if (vm.count("run_agas_server")) { 
@@ -210,9 +217,15 @@ int main(int argc, char* argv[])
         }
 
         // start the HPX runtime using different numbers of threads
-        hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
-        for (int i = 1; i <= 8; ++i) 
-            rt.run(hpx_main, i);
+        if (0 == num_threads) {
+            hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
+            for (int i = 1; i <= 8; ++i) 
+                rt.run(hpx_main, i);
+        }
+        else {
+            hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
+            rt.run(hpx_main, num_threads);
+        }
     }
     catch (std::exception& e) {
         BOOST_TEST(false);
