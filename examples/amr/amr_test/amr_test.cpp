@@ -12,8 +12,8 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
-#include "amr_test/stencil.hpp"
-#include "amr_test/logging.hpp"
+#include "stencil.hpp"
+#include "logging.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality

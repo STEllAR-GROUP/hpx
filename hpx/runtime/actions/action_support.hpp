@@ -320,7 +320,6 @@ namespace hpx { namespace actions
 
 #define HPX_REGISTER_ACTION(action)                                           \
         BOOST_CLASS_EXPORT(action)                                            \
-        HPX_REGISTER_BASE_HELPER(action)                                      \
         HPX_DEFINE_GET_ACTION_NAME(action)                                    \
     /**/
 

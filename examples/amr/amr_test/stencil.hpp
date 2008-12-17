@@ -6,7 +6,7 @@
 #if !defined(HPX_COMPONENTS_AMR_STENCIL_OCT_17_2008_0847AM)
 #define HPX_COMPONENTS_AMR_STENCIL_OCT_17_2008_0847AM
 
-#include <hpx/components/amr/server/functional_component.hpp>
+#include "../amr/server/functional_component.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 

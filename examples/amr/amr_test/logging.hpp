@@ -6,7 +6,7 @@
 #if !defined(HPX_COMPONENTS_AMR_LOGGING_NOV_10_2008_0719PM)
 #define HPX_COMPONENTS_AMR_LOGGING_NOV_10_2008_0719PM
 
-#include <hpx/components/amr_test/stencil_data.hpp>
+#include "stencil_data.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server
