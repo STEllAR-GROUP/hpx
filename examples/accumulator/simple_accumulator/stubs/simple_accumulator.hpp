@@ -12,7 +12,7 @@
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/lcos/eager_future.hpp>
 
-#include "server/simple_accumulator.hpp"
+#include <examples/accumulator/simple_accumulator/server/simple_accumulator.hpp>
 
 namespace hpx { namespace components { namespace stubs
 {
