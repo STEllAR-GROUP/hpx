@@ -19,6 +19,7 @@ use FileHandle;
 use Getopt::Long;
 use Pod::Usage;
 use Data::Dumper;
+use IO::Socket;
 
 my $agas_port = 7912;
 my $parcel_port = 7913;
@@ -34,12 +35,9 @@ my $result = GetOptions(
 
 my $prog = $ARGV[0];
 
-print Dumper($result);
-print Dumper(\@ARGV);
+pod2usage(-verbose => 1,  -exitval=>2) unless($#ARGV == 0 and -e $ARGV[0]);
 
-#pod2usage(-verbose => 1,  -exitval=>2) unless($#ARGV == 0 and -e $ARGV[0]);
-
-unless(-e $node_file) {
+unless($node_file and -e $node_file) {
     pod2usage(-verbose => 1, -exitval => 2);
 }
 
@@ -71,6 +69,15 @@ if($pid == 0) {
 };
 push @pids, $pid;
 
+my $sock;
+do {
+    $sock = IO::Socket::INET->new(PeerAddr=>$anode,
+                                 PeerPort=>$agas_port,
+                                 Proto=>"tcp");
+} while($! eq "Connection refused");
+die "could not connect to agas server" unless($sock);
+close($sock);
+
 # Start the hpx procs -- one per node, using -t $tc to pass thread count
 for(my $i=$#nodes;$i>=0;$i--) {
     my $node = $nodes[$i].$host_suffix;
@@ -86,7 +93,11 @@ for(my $i=$#nodes;$i>=0;$i--) {
         $cmd = $hpx_runtime;
     }
     if($pid == 0) {
-        run($ssh,"-o","NumberOfPasswordPrompts=0",$node,$cmd,"-a","$anode:$agas_port","-x","$node:$parcel_port","-t","$tc"); 
+        if($i > 0) {
+            run($ssh,"-o","NumberOfPasswordPrompts=0",$node,"/bin/bash -l -c '$cmd -a $anode:$agas_port -x $node:$parcel_port -t $tc'"); 
+        } else {
+            run($cmd,"-a","$anode:$agas_port","-x","$node:$parcel_port","-t","$tc"); 
+        }
     };
     push @pids, $pid;
 }
@@ -104,6 +115,7 @@ sub run {
 
 sub find {
     my $file = shift;
+    return $file if(-x $file and !-d $file);
     for my $path (split(/:/,$ENV{PATH})) {
         my $cmd = "$path/$file";
         return $cmd if(-x $cmd and !-d $cmd);
