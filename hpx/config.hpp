@@ -74,6 +74,17 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// This defines the maximum number of connect retries to the AGAS service 
+// allowing for some leeway during startup of the localities 
+#if !defined(HPX_MAX_AGAS_RETRIES)
+#define HPX_MAX_AGAS_RETRIES 10
+#endif
+
+#if !defined(HPX_AGAS_RETRIES_SLEEP)
+#define HPX_AGAS_RETRIES_SLEEP 100    // [ms]
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 //  Characters used 
 //    - to delimit several HPX ini paths
 //    - used as file extensions for shared libraries

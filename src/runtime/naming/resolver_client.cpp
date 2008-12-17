@@ -370,23 +370,31 @@ namespace hpx { namespace naming
         if (!client_connection) {
             // establish a new connection
             boost::system::error_code error = boost::asio::error::fault;
-            try {
-                client_connection.reset(new resolver_client_connection(
-                        io_service_pool_.get_io_service())); 
+            for (int i = 0; i < HPX_MAX_AGAS_RETRIES; ++i)
+            {
+                try {
+                    client_connection.reset(new resolver_client_connection(
+                            io_service_pool_.get_io_service())); 
 
-                locality::iterator_type end = there_.connect_end();
-                for (locality::iterator_type it = 
-                        there_.connect_begin(io_service_pool_.get_io_service()); 
-                     it != end; ++it)
-                {
-                    client_connection->socket().close();
-                    client_connection->socket().connect(*it, error);
-                    if (!error) 
+                    locality::iterator_type end = there_.connect_end();
+                    for (locality::iterator_type it = 
+                            there_.connect_begin(io_service_pool_.get_io_service()); 
+                         it != end; ++it)
+                    {
+                        client_connection->socket().close();
+                        client_connection->socket().connect(*it, error);
+                        if (!error) 
+                            break;
+                    }
+                    if (!error)
                         break;
+
+                    boost::this_thread::sleep(boost::get_system_time() + 
+                        boost::posix_time::milliseconds(HPX_AGAS_RETRIES_SLEEP));
                 }
-            }
-            catch (boost::system::error_code const& e) {
-                HPX_THROW_EXCEPTION(network_error, e.message());
+                catch (boost::system::error_code const& e) {
+                    HPX_THROW_EXCEPTION(network_error, e.message());
+                }
             }
 
             if (error) {

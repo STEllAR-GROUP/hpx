@@ -487,20 +487,24 @@ namespace hpx { namespace util { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    #define HPX_MAX_GETCONSOLEPREFIX_RETRIES    10
-    #define HPX_SLEEP_GETCONSOLEPREFIX_RETRIES  100   // [ms]
-
     init_logging::init_logging(runtime_configuration& ini, bool isconsole,
         naming::resolver_client& agas_client, naming::id_type const& prefix)
     {
         naming::id_type console_prefix;
-        for (int i = 0; i < HPX_MAX_GETCONSOLEPREFIX_RETRIES; ++i)
+        for (int i = 0; i < HPX_MAX_AGAS_RETRIES; ++i)
         {
             if (agas_client.get_console_prefix(console_prefix))
                 break;
 
             boost::this_thread::sleep(boost::get_system_time() + 
-                boost::posix_time::milliseconds(HPX_SLEEP_GETCONSOLEPREFIX_RETRIES));
+                boost::posix_time::milliseconds(HPX_AGAS_RETRIES_SLEEP));
+        }
+
+        if (0 == console_prefix) 
+        {
+            HPX_THROW_EXCEPTION(no_registered_console, 
+                "couldn't retrieve console locality");
+            return;
         }
 
         init_agas_log(ini, isconsole, console_prefix, prefix);
