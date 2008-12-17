@@ -40,10 +40,10 @@
 namespace hpx { namespace naming 
 {
     resolver_client::resolver_client(util::io_service_pool& io_service_pool, 
-            locality l) 
+            locality l, bool isconsole) 
       : there_(l), io_service_pool_(io_service_pool), 
         connection_cache_(HPX_MAX_AGAS_CONNECTION_CACHE_SIZE, "[AGAS] "),
-        agas_cache_(HPX_INITIAL_AGAS_CACHE_SIZE)
+        agas_cache_(HPX_INITIAL_AGAS_CACHE_SIZE), isconsole_(isconsole)
     {
         // start the io service pool
         io_service_pool.run(false);
@@ -54,12 +54,27 @@ namespace hpx { namespace naming
     bool resolver_client::get_prefix(locality const& l, id_type& prefix) 
     {
         // send request
-        server::request req (server::command_getprefix, l);
+        server::request req (server::command_getprefix, l, isconsole_);
         server::reply rep;
         execute(req, rep);
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != repeated_request)
+            HPX_THROW_EXCEPTION((error)s, rep.get_error());
+
+        prefix = rep.get_prefix();
+        return s == success;
+    }
+
+    bool resolver_client::get_console_prefix(id_type& prefix)
+    {
+        // send request
+        server::request req (server::command_getconsoleprefix);
+        server::reply rep;
+        execute(req, rep);
+
+        hpx::error s = (hpx::error) rep.get_status();
+        if (s != success && s != no_registered_console)
             HPX_THROW_EXCEPTION((error)s, rep.get_error());
 
         prefix = rep.get_prefix();

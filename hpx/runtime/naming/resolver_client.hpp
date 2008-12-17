@@ -49,10 +49,10 @@ namespace hpx { namespace naming
         ///                 outgoing requests
         /// \param l        [in] This is the locality the AGAS server is 
         ///                 running on.
-        /// \param start_asynchronously 
-        ///                 [in] This parameter allows to start 
-        ///                 the resolver client instance immediately.
-        resolver_client(util::io_service_pool& io_service_pool, locality l);
+        /// \param isconsole [in] This parameter is true if the locality 
+        ///                 represents the application console.
+        resolver_client(util::io_service_pool& io_service_pool, locality l,
+            bool isconsole = false);
 
         /// \brief Get unique prefix usable as locality id (locality prefix)
         ///
@@ -75,6 +75,16 @@ namespace hpx { namespace naming
         ///                   an earlier call. Any error results in an exception 
         ///                   thrown from this function.
         bool get_prefix(locality const& l, id_type& prefix);
+
+        /// \brief Get locality prefix of the console locality
+        ///
+        /// \param prefix     [out] The prefix value uniquely identifying the
+        ///                   console locality. This is valid only, if the 
+        ///                   return value of this function is true.
+        ///
+        /// \returns          This function returns \a true if a console prefix 
+        ///                   exists and returns \a false otherwise.
+        bool get_console_prefix(id_type& prefix);
 
         /// \brief Query for the prefixes of all known localities.
         ///
@@ -496,6 +506,7 @@ namespace hpx { namespace naming
             std::map<cache_key, entry_type>
         > cache_type;
         mutable cache_type agas_cache_;
+        bool isconsole_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

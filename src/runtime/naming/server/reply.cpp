@@ -82,6 +82,10 @@ namespace hpx { namespace naming { namespace server
                    << rep.upper_bound_ << ") ";
                 break;
 
+            case command_getconsoleprefix:
+                os << "console" << rep.lower_bound_;
+                break;
+
             case command_getprefix:
                 os << "prefix" << rep.lower_bound_;
                 break;

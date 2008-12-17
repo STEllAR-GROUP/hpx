@@ -134,10 +134,8 @@ namespace hpx { namespace applier
                 // a zero address references the local runtime support component
                 if (0 != gid.get_lsb())
                     addr.address_ = gid.get_lsb();
-                else {
-                    addr.type_ = components::component_runtime_support;
+                else 
                     addr.address_ = runtime_support_id_.get_lsb();
-                }
                 return true;
             }
 
@@ -157,6 +155,7 @@ namespace hpx { namespace applier
         // OS thread
         static boost::thread_specific_ptr<applier*> applier_;
         void init_tss();
+        void deinit_tss();
 
     private:
         parcelset::parcelhandler& parcel_handler_;

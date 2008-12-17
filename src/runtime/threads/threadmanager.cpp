@@ -545,12 +545,13 @@ namespace hpx { namespace threads
     // main function executed by all OS threads managed by this threadmanager
     void threadmanager::tfunc(std::size_t num_thread)
     {
+        // needs to be done as the first thing, otherwise logging won't work
+        if (start_thread_)    // notify runtime system of started thread
+            start_thread_();
+
         LTM_(info) << "tfunc(" << num_thread << "): start";
         std::size_t num_px_threads = 0;
         try {
-            if (start_thread_)    // notify runtime system of started thread
-                start_thread_();
-
             num_px_threads = tfunc_impl(num_thread);
         }
         catch (hpx::exception const& e) {

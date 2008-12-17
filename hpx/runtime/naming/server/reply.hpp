@@ -117,12 +117,13 @@ namespace hpx { namespace naming { namespace server
 
         reply (error s, agas_server_command command, 
                 naming::id_type prefix)
-          : command_(command_getprefix), status_(s),
+          : command_(command), status_(s),
             error_(get_error_text(s)),
             lower_bound_(prefix), upper_bound_(0)
         {
             BOOST_ASSERT(s == success || s == repeated_request);
-            BOOST_ASSERT(command == command_getprefix);
+            BOOST_ASSERT(command == command_getprefix || 
+                command == command_getconsoleprefix);
         }
 
         reply (error s, agas_server_command command, 
@@ -211,6 +212,8 @@ namespace hpx { namespace naming { namespace server
             case command_getidrange:
                 ar << upper_bound_;
                 // fall through
+
+            case command_getconsoleprefix:
             case command_getprefix:
                 ar << lower_bound_;
                 break;
@@ -265,6 +268,7 @@ namespace hpx { namespace naming { namespace server
             case command_getidrange:
                 ar >> upper_bound_;
                 // fall through
+            case command_getconsoleprefix:
             case command_getprefix:
                 ar >> lower_bound_;
                 break;

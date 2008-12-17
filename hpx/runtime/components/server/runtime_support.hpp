@@ -61,11 +61,7 @@ namespace hpx { namespace components { namespace server
 
         // constructor
         runtime_support(util::section& ini, naming::id_type const& prefix, 
-                naming::resolver_client& agas_client) 
-          : stopped_(false)
-        {
-            load_components(ini, prefix, agas_client);
-        }
+                naming::resolver_client& agas_client, applier::applier& applier);
 
         ~runtime_support()
         {

@@ -18,6 +18,7 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/remove_reference.hpp>
+#include <boost/serialization/void_cast.hpp>
 
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/util/serialize_sequence.hpp>
@@ -235,6 +236,13 @@ namespace hpx { namespace actions
             return static_cast<int>(components::get_component_type<Component>());
         }
 
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<action, base_action>();
+        }
+
     private:
         /// retrieve action code
         int get_action_code() const 
@@ -262,9 +270,6 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            using namespace boost::serialization;
-            void_cast_register<action, base_action>();
-
             util::serialize_sequence(ar, arguments_);
         }
 
@@ -282,6 +287,16 @@ namespace hpx { namespace actions
         return args.get<N>(); 
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Helper to invoke the registration code for serialization at startup
+    template <typename Action>
+    struct register_base_helper
+    {
+        register_base_helper()
+        {
+            Action::register_base();
+        }
+    };
 }}
 
 #include <hpx/config/warnings_suffix.hpp>
@@ -298,8 +313,14 @@ namespace hpx { namespace actions
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_BASE_HELPER(action)                                      \
+        hpx::actions::register_base_helper<action>                            \
+            BOOST_PP_CAT(register_base_helper_, __LINE__);                    \
+    /**/
+
 #define HPX_REGISTER_ACTION(action)                                           \
         BOOST_CLASS_EXPORT(action)                                            \
+        HPX_REGISTER_BASE_HELPER(action)                                      \
         HPX_DEFINE_GET_ACTION_NAME(action)                                    \
     /**/
 

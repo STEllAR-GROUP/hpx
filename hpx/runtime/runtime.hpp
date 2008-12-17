@@ -43,6 +43,14 @@ namespace hpx
         /// as the main HPX thread function.
         typedef int hpx_main_function_type();
 
+        /// A HPX runtime can be executed in two different modes: console mode
+        /// and worker mode.
+        enum mode
+        {
+            console = 0,    ///< The runtime instance represents the application console
+            worker = 1      ///< The runtime instance represents a worker locality
+        };
+
         /// Construct a new HPX runtime instance 
         ///
         /// \param address        [in] This is the address (IP address or 
@@ -61,9 +69,11 @@ namespace hpx
         ///                       is listening on. If this value is not 
         ///                       specified the actual port number will be 
         ///                       taken from the configuration file (hpx.ini).
+        /// \param locality_mode  [in] This is the mode the given runtime 
+        ///                       instance should be executed in.
         runtime(std::string const& address, boost::uint16_t port,
                 std::string const& agas_address = "", 
-                boost::uint16_t agas_port = 0);
+                boost::uint16_t agas_port = 0, mode  locality_mode = console);
 
         /// Construct a new HPX runtime instance 
         ///
@@ -72,7 +82,7 @@ namespace hpx
         ///                       used for receiving parcels. 
         /// \note The AGAS locality to use will be taken from the configuration 
         ///       file (hpx.ini).
-        runtime(naming::locality address);
+        runtime(naming::locality address, mode locality_mode = worker);
 
         /// Construct a new HPX runtime instance 
         ///
@@ -81,7 +91,8 @@ namespace hpx
         ///                       used for receiving parcels. 
         /// \param agas_address   [in] This is the locality the AGAS server is 
         ///                       running on. 
-        runtime(naming::locality address, naming::locality agas_address);
+        runtime(naming::locality address, naming::locality agas_address, 
+            mode locality_mode = worker);
 
         /// \brief The destructor makes sure all HPX runtime services are 
         ///        properly shut down before existing.
@@ -150,8 +161,8 @@ namespace hpx
         ///                   as the result of the invocation of the function 
         ///                   object given by the parameter \p func.
         int run(boost::function<hpx_main_function_type> func =
-                boost::function<hpx_main_function_type>(), 
-            std::size_t num_threads = 1);
+                    boost::function<hpx_main_function_type>(), 
+                std::size_t num_threads = 1);
 
         /// \brief Run the HPX runtime system, initially use the given number 
         ///        of (OS) threads in the threadmanager and block waiting for
@@ -211,6 +222,7 @@ namespace hpx
         }
 
     private:
+        mode mode_;
         util::runtime_configuration ini_;
         util::io_service_pool agas_pool_; 
         util::io_service_pool parcel_pool_; 
@@ -220,10 +232,10 @@ namespace hpx
         threads::threadmanager thread_manager_;
         parcelset::parcelhandler parcel_handler_;
         util::detail::init_logging init_logging_;
-        components::server::runtime_support runtime_support_;
         components::server::memory memory_;
         applier::applier applier_;
         actions::action_manager action_manager_;
+        components::server::runtime_support runtime_support_;
     };
 
 }   // namespace hpx

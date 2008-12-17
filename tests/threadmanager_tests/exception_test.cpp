@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
         hpx::naming::resolver_server agas(agas_pool);
 
         // start the HPX runtime
-        hpx::runtime rt("localhost", HPX_PORT);
+        hpx::runtime rt("localhost", HPX_PORT, "localhost", 0, hpx::runtime::worker);
         rt.run(hpx_main);
     }
     catch (std::exception& e) {

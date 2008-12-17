@@ -68,9 +68,8 @@ int main(int argc, char* argv[])
             hpx::naming::locality(host, agas_port));
 
         // start the HPX runtime using different numbers of threads
+        hpx::runtime rt(host, ps_port, host, agas_port);
         for (int i = 1; i <= 8; ++i) {
-            hpx::runtime rt(host, ps_port, host, agas_port);
-
             lcos::barrier b(5);       // create a barrier waiting on 5 threads
             boost::detail::atomic_count c(0);
 

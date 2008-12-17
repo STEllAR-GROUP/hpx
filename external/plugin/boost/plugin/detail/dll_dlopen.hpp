@@ -61,7 +61,7 @@ namespace boost { namespace plugin {
                 init_proc();
 #endif
         }
-        
+
         static void deinit_library(HMODULE dll_handle)
         {
 #if defined(__AIX__) && defined(__GNUC__)
@@ -94,7 +94,7 @@ namespace boost { namespace plugin {
             HMODULE h;
         };
         friend struct free_dll;
-        
+
     public:
         dll() 
         :   dll_handle (NULL) 
@@ -125,7 +125,7 @@ namespace boost { namespace plugin {
         {
             LoadLibrary();
         }
-        
+
         dll &operator=(dll const& rhs)
         {
             if (this != &rhs) {
@@ -139,12 +139,12 @@ namespace boost { namespace plugin {
             }
             return *this;
         }
-        
+
         ~dll() 
         { 
             FreeLibrary();
         }
-        
+
         std::string get_name() const { return dll_name; }
         std::string get_mapname() const { return map_name; }
 
@@ -158,7 +158,7 @@ namespace boost { namespace plugin {
             BOOST_STATIC_ASSERT(boost::is_pointer<SymbolType>::value);
             typedef typename remove_pointer<SymbolType>::type PointedType;
             dlerror();
-            
+
             // Open the library. Yes, we do it on every access to 
             // a symbol, the LoadLibrary function increases the refcnt of the dll
             // so in the end the dll class holds one refcnt and so does every 
@@ -171,7 +171,7 @@ namespace boost { namespace plugin {
 
                 throw std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str));
             }
-            
+
 #if !defined(__AIX__) 
             // AIX seems to return different handle values for the second and 
             // any following call
@@ -180,7 +180,7 @@ namespace boost { namespace plugin {
 
             dlerror();              // Clear the error state.
             init_library(handle);   // initialize library
-            
+
             // Cast the to right type.
             SymbolType address = (SymbolType)MyGetProcAddress(dll_handle, symbol_name.c_str());
             if (NULL == address) 
@@ -193,7 +193,7 @@ namespace boost { namespace plugin {
                 throw std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str));
             }
             return std::make_pair(address, free_dll(handle));
-        }        
+        }
 
     protected:
         void LoadLibrary()

@@ -21,7 +21,9 @@ namespace hpx { namespace naming { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     request_handler::request_handler()
-      : totals_(command_lastcommand), component_type_(components::component_first_dynamic)
+      : totals_(command_lastcommand), 
+        console_prefix_(0),
+        component_type_(components::component_first_dynamic)
     {
     }
 
@@ -40,6 +42,16 @@ namespace hpx { namespace naming { namespace server
                 // The real prefix has to be used as the 32 most 
                 // significant bits of global id's
 
+                // verify that this locality is either the only console of the 
+                // given application or a worker 
+                if (req.isconsole()) {
+                    if (0 != console_prefix_) {
+                        rep = reply(command_getidrange, duplicate_console);
+                        return;
+                    }
+                    console_prefix_ = (*it).second.first;
+                }
+
                 // existing entry
                 rep = reply(repeated_request, command_getprefix, 
                     get_id_from_prefix((*it).second.first)); 
@@ -48,6 +60,16 @@ namespace hpx { namespace naming { namespace server
                 // insert this prefix as being mapped to the given locality
                 boost::uint32_t prefix = (boost::uint32_t)(site_prefixes_.size() + 1);
                 naming::id_type id = get_id_from_prefix(prefix);
+
+                // verify that this locality is either the only console of the 
+                // given application or a worker 
+                if (req.isconsole()) {
+                    if (0 != console_prefix_) {
+                        rep = reply(command_getprefix, duplicate_console);
+                        return;
+                    }
+                    console_prefix_ = prefix;
+                }
 
                 // start assigning ids with the second block of 64Bit numbers only
                 naming::id_type lower_id (id.get_msb() + 1, 0);
@@ -81,6 +103,29 @@ namespace hpx { namespace naming { namespace server
         }
         catch (...) {
             rep = reply(command_getprefix, internal_server_error);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void request_handler::handle_getconsoleprefix(request const& req, reply& rep)
+    {
+        try {
+            mutex_type::scoped_lock l(registry_mtx_);
+
+            if (0 != console_prefix_) {
+                rep = reply(success, command_getconsoleprefix, 
+                    get_id_from_prefix(console_prefix_)); 
+            }
+            else {
+                rep = reply(command_getconsoleprefix, no_registered_console,
+                    "no console prefix registered for this application"); 
+            }
+        }
+        catch (std::bad_alloc) {
+            rep = reply(command_getconsoleprefix, out_of_memory);
+        }
+        catch (...) {
+            rep = reply(command_getconsoleprefix, internal_server_error);
         }
     }
 
@@ -612,9 +657,14 @@ namespace hpx { namespace naming { namespace server
     void request_handler::handle_request(request const& req, reply& rep)
     {
         LAGAS_(info) << "request: " << req;
+
         switch (req.get_command()) {
         case command_getprefix:
             handle_getprefix(req, rep);
+            break;
+
+        case command_getconsoleprefix:
+            handle_getconsoleprefix(req, rep);
             break;
 
         case command_getprefixes:

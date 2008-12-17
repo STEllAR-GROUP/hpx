@@ -475,6 +475,10 @@
 							Name="Server"
 							>
 							<File
+								RelativePath="..\..\..\src\runtime\components\server\console_logging.cpp"
+								>
+							</File>
+							<File
 								RelativePath="..\..\..\src\runtime\components\server\memory.cpp"
 								>
 							</File>
@@ -831,6 +835,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\..\hpx\runtime\components\console_logging.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\hpx\runtime\components\derived_component_factory.hpp"
 						>
 					</File>
@@ -845,6 +853,10 @@
 					<Filter
 						Name="Server"
 						>
+						<File
+							RelativePath="..\..\..\hpx\runtime\components\server\console_logging.hpp"
+							>
+						</File>
 						<File
 							RelativePath="..\..\..\hpx\runtime\components\server\manage_component.hpp"
 							>

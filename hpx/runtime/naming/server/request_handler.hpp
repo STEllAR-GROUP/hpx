@@ -58,6 +58,7 @@ namespace hpx { namespace naming { namespace server
         
     protected:
         void handle_getprefix(request const& req, reply& rep);
+        void handle_getconsoleprefix(request const& req, reply& rep);
         void handle_getprefixes(request const& req, reply& rep);
         void handle_get_component_id(request const& req, reply& rep);
         void handle_register_factory(request const& req, reply& rep);
@@ -129,6 +130,7 @@ namespace hpx { namespace naming { namespace server
         mutex_type registry_mtx_;
         registry_type registry_;              // global_id --> local_address
         site_prefix_map_type site_prefixes_;  // locality --> prefix, upper_boundary
+        boost::uint32_t console_prefix_;      // console locality
 
         mutex_type component_types_mtx_;
         int component_type_;

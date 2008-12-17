@@ -168,8 +168,8 @@ namespace hpx { namespace parcelset
                 connection_cache_.get(addr.locality_));
 
             if (!client_connection) {
-                LPT_(info) << "parcelport: creating new connection to: " 
-                           << addr.locality_;
+//                 LPT_(info) << "parcelport: creating new connection to: " 
+//                            << addr.locality_;
 
             // The parcel gets serialized inside the connection constructor, no 
             // need to keep the original parcel alive after this call returned.
@@ -205,8 +205,8 @@ namespace hpx { namespace parcelset
                 client_connection->async_write(f);
             }
             else {
-                LPT_(info) << "parcelport: reusing existing connection to: " 
-                           << addr.locality_;
+//                 LPT_(info) << "parcelport: reusing existing connection to: " 
+//                            << addr.locality_;
 
             // reuse an existing connection
                 client_connection->set_parcel(p);

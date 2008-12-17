@@ -32,19 +32,20 @@ namespace hpx { namespace naming { namespace server
         command_unknown = -1,
         command_firstcommand = 0,
         command_getprefix = 0,      ///< return a unique prefix for the requesting site
-        command_getprefixes = 1,    ///< return prefixes for all known localities in the system
-        command_get_component_id = 2,   ///< return an unique component type
-        command_register_factory = 3,   ///< register a factory for a component type
-        command_getidrange = 4,     ///< return a unique range of ids for the requesting site
-        command_bind_range = 5,     ///< bind a range of addresses to a range of global ids
-        command_unbind_range = 6,   ///< remove binding for a range of global ids
-        command_resolve = 7,        ///< resolve a global id to an address
-        command_queryid = 8,        ///< query for a global id associated with a namespace name (string)
-        command_registerid = 9,     ///< associate a namespace name with a global id
-        command_unregisterid = 10,  ///< remove association of a namespace name with a global id
-        command_statistics_count = 11,   ///< return some usage statistics: execution count 
-        command_statistics_mean = 12,    ///< return some usage statistics: average server execution time
-        command_statistics_moment2 = 13, ///< return some usage statistics: 2nd moment of server execution time
+        command_getconsoleprefix = 1, ///< return the prefix of the console locality
+        command_getprefixes = 2,    ///< return prefixes for all known localities in the system
+        command_get_component_id = 3,   ///< return an unique component type
+        command_register_factory = 4,   ///< register a factory for a component type
+        command_getidrange = 5,     ///< return a unique range of ids for the requesting site
+        command_bind_range = 6,     ///< bind a range of addresses to a range of global ids
+        command_unbind_range = 7,   ///< remove binding for a range of global ids
+        command_resolve = 8,        ///< resolve a global id to an address
+        command_queryid = 9,        ///< query for a global id associated with a namespace name (string)
+        command_registerid = 10,    ///< associate a namespace name with a global id
+        command_unregisterid = 11,  ///< remove association of a namespace name with a global id
+        command_statistics_count = 12,   ///< return some usage statistics: execution count 
+        command_statistics_mean = 13,    ///< return some usage statistics: average server execution time
+        command_statistics_moment2 = 14, ///< return some usage statistics: 2nd moment of server execution time
         command_lastcommand
     };
 
@@ -60,8 +61,8 @@ namespace hpx { namespace naming { namespace server
         {}
 
         // get_prefix
-        request(agas_server_command c, locality const& l) 
-          : command_(c), site_(l)
+        request(agas_server_command c, locality const& l, bool isconsole) 
+          : command_(c), site_(l), isconsole_(isconsole)
         {}
 
         // get_prefixes
@@ -143,6 +144,11 @@ namespace hpx { namespace naming { namespace server
             return type_;
         }
 
+        bool isconsole() const
+        {
+            return isconsole_;
+        }
+
     private:
         friend std::ostream& operator<< (std::ostream& os, request const& req);
 
@@ -195,6 +201,10 @@ namespace hpx { namespace naming { namespace server
                 break;
 
             case command_getprefix:
+                ar << isconsole_;
+                break;
+
+            case command_getconsoleprefix:
             case command_statistics_count:
             case command_statistics_mean:
             case command_statistics_moment2:
@@ -255,6 +265,10 @@ namespace hpx { namespace naming { namespace server
                 break;
 
             case command_getprefix:
+                ar >> isconsole_;
+                break;
+
+            case command_getconsoleprefix:
             case command_statistics_count:
             case command_statistics_mean:
             case command_statistics_moment2:
@@ -274,6 +288,7 @@ namespace hpx { namespace naming { namespace server
         std::ptrdiff_t offset_;     /// offset between local addresses of a range (bind_range only)
         std::string name_;          /// namespace name (get_component_id, register_factory, queryid only)
         components::component_type type_; /// component_type (optional for get_prefixes only)
+        bool isconsole_;            /// console mode of this locality (for get_prefix only)
     };
 
     /// The \a operator<< is used for logging purposes, dumping the internal 

@@ -36,6 +36,7 @@ namespace hpx
         /// The function \a get_applier returns a reference to the (thread
         /// specific) applier instance.
         HPX_API_EXPORT applier& get_applier();
+        HPX_API_EXPORT applier* get_applier_ptr();
     }
 
     /// \namespace actions

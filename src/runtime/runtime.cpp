@@ -48,54 +48,56 @@ namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(std::string const& address, boost::uint16_t port,
-            std::string const& agas_address, boost::uint16_t agas_port) 
-      : ini_(util::detail::get_logging_data()), 
+            std::string const& agas_address, boost::uint16_t agas_port, 
+            mode locality_mode) 
+      : mode_(locality_mode), ini_(util::detail::get_logging_data()), 
         agas_pool_(), parcel_pool_(), timer_pool_(),
-        agas_client_(agas_pool_, ini_.get_agas_locality(agas_address, agas_port)),
+        agas_client_(agas_pool_, ini_.get_agas_locality(agas_address, agas_port), mode_ == console),
         parcel_port_(parcel_pool_, naming::locality(address, port)),
         thread_manager_(timer_pool_, 
             boost::bind(&runtime::init_applier, This()),
             boost::bind(&runtime::stop, This(), false)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
-        init_logging_(ini_, parcel_handler_.get_prefix()),
-        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_),
+        init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
-        action_manager_(applier_)
+        action_manager_(applier_),
+        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_)
     {}
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime::runtime(naming::locality address, naming::locality agas_address) 
-      : ini_(util::detail::get_logging_data()), 
+    runtime::runtime(naming::locality address, naming::locality agas_address, 
+            mode locality_mode) 
+      : mode_(locality_mode), ini_(util::detail::get_logging_data()), 
         agas_pool_(), parcel_pool_(), timer_pool_(),
-        agas_client_(agas_pool_, agas_address),
+        agas_client_(agas_pool_, agas_address, mode_ == console),
         parcel_port_(parcel_pool_, address),
         thread_manager_(timer_pool_, 
             boost::bind(&runtime::init_applier, This()),
             boost::bind(&runtime::stop, This(), false)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
-        init_logging_(ini_, parcel_handler_.get_prefix()),
-        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_),
+        init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
-        action_manager_(applier_)
+        action_manager_(applier_),
+        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_)
     {}
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime::runtime(naming::locality address) 
-      : ini_(util::detail::get_logging_data()), 
+    runtime::runtime(naming::locality address, mode locality_mode) 
+      : mode_(locality_mode), ini_(util::detail::get_logging_data()), 
         agas_pool_(), parcel_pool_(), timer_pool_(),
-        agas_client_(agas_pool_, ini_.get_agas_locality()),
+        agas_client_(agas_pool_, ini_.get_agas_locality(), mode_ == console),
         parcel_port_(parcel_pool_, address),
         thread_manager_(timer_pool_, 
             boost::bind(&runtime::init_applier, This()),
             boost::bind(&runtime::stop, This(), false)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
-        init_logging_(ini_, parcel_handler_.get_prefix()),
-        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_),
+        init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
-        action_manager_(applier_)
+        action_manager_(applier_),
+        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_)
     {}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -111,6 +113,9 @@ namespace hpx
         runtime_support_.tidy();  // unload libraries
 
         LRT_(debug) << "~runtime(finished)";
+
+        // this disables all logging from the main thread
+        applier_.deinit_tss();    // reset thread specific pointer
     }
 
     ///////////////////////////////////////////////////////////////////////////

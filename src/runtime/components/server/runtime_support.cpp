@@ -41,6 +41,15 @@ HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::runtime_support);
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
+    runtime_support::runtime_support(util::section& ini, 
+            naming::id_type const& prefix, naming::resolver_client& agas_client, 
+            applier::applier& applier)
+      : stopped_(false)
+    {
+        applier.init_tss();     // init thread specific data for the main thread
+        load_components(ini, prefix, agas_client);
+    }
+
     // return, whether more than one instance of the given component can be 
     // created at the same time
     int runtime_support::factory_properties(components::component_type type)

@@ -118,6 +118,14 @@
                     BOOST_PP_ENUM_PARAMS(N, arg)), cont);
         }
 
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<BOOST_PP_CAT(base_result_action, N), base_type>();
+            base_type::register_base();
+        }
+
     private:
         // This get_thread_function will be invoked to retrieve the thread 
         // function for an action which has to be invoked without continuations.
@@ -183,6 +191,14 @@
             return detail::get_action_name<BOOST_PP_CAT(result_action, N)>();
         }
 
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<BOOST_PP_CAT(result_action, N), base_type>();
+            base_type::register_base();
+        }
+
     private:
         // serialization support
         friend class boost::serialization::access;
@@ -238,6 +254,14 @@
         char const* const get_action_name() const
         {
             return detail::get_action_name<BOOST_PP_CAT(direct_result_action, N)>();
+        }
+
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<BOOST_PP_CAT(direct_result_action, N), base_type>();
+            base_type::register_base();
         }
 
     private:
@@ -331,6 +355,14 @@
                     BOOST_PP_ENUM_PARAMS(N, arg)), cont);
         }
 
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<BOOST_PP_CAT(base_action, N), base_type>();
+            base_type::register_base();
+        }
+
     private:
         boost::function<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva) const
@@ -392,6 +424,14 @@
             return detail::get_action_name<BOOST_PP_CAT(action, N)>();
         }
 
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<BOOST_PP_CAT(action, N), base_type>();
+            base_type::register_base();
+        }
+
     private:
         // serialization support
         friend class boost::serialization::access;
@@ -445,6 +485,14 @@
         char const* const get_action_name() const
         {
             return detail::get_action_name<BOOST_PP_CAT(direct_action, N)>();
+        }
+
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<BOOST_PP_CAT(direct_action, N), base_type>();
+            base_type::register_base();
         }
 
     private:

@@ -113,6 +113,14 @@ namespace hpx { namespace actions
             return base_type::construct_continuation_thread_function(F, cont);
         }
 
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<plain_base_result_action0, base_type>();
+            base_type::register_base();
+        }
+
     private:
         /// This \a get_thread_function will be invoked to retrieve the thread 
         /// function for an action which has to be invoked without continuations.
@@ -161,6 +169,14 @@ namespace hpx { namespace actions
             return detail::get_action_name<plain_result_action0>();
         }
 
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<plain_result_action0, base_type>();
+            base_type::register_base();
+        }
+
     private:
         // serialization support
         friend class boost::serialization::access;
@@ -198,6 +214,14 @@ namespace hpx { namespace actions
         char const* const get_action_name() const
         {
             return detail::get_action_name<plain_direct_result_action0>();
+        }
+
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<plain_direct_result_action0, base_type>();
+            base_type::register_base();
         }
 
     private:
@@ -266,6 +290,14 @@ namespace hpx { namespace actions
             return base_type::construct_continuation_thread_function_void(F, cont);
         }
 
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<plain_base_action0, base_type>();
+            base_type::register_base();
+        }
+
     private:
         boost::function<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva) const
@@ -309,6 +341,14 @@ namespace hpx { namespace actions
             return detail::get_action_name<plain_action0>();
         }
 
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<plain_action0, base_type>();
+            base_type::register_base();
+        }
+
     private:
         // serialization support
         friend class boost::serialization::access;
@@ -345,6 +385,14 @@ namespace hpx { namespace actions
         char const* const get_action_name() const
         {
             return detail::get_action_name<plain_direct_action0>();
+        }
+
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<plain_direct_action0, base_type>();
+            base_type::register_base();
         }
 
     private:
@@ -428,6 +476,14 @@ namespace hpx { namespace actions
                 boost::bind(F, arg0), cont);
         }
 
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<plain_base_result_action1, base_type>();
+            base_type::register_base();
+        }
+
     private:
         /// This \a get_thread_function will be invoked to retrieve the thread 
         /// function for an action which has to be invoked without continuations.
@@ -481,6 +537,14 @@ namespace hpx { namespace actions
             return detail::get_action_name<plain_result_action1>();
         }
 
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<plain_result_action1, base_type>();
+            base_type::register_base();
+        }
+
     private:
         // serialization support
         friend class boost::serialization::access;
@@ -525,6 +589,14 @@ namespace hpx { namespace actions
         char const* const get_action_name() const
         {
             return detail::get_action_name<plain_direct_result_action1>();
+        }
+
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<plain_direct_result_action1, base_type>();
+            base_type::register_base();
         }
 
     private:
@@ -607,6 +679,14 @@ namespace hpx { namespace actions
                 boost::bind(F, arg0), cont);
         }
 
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<plain_base_action1, base_type>();
+            base_type::register_base();
+        }
+
     private:
         ///
         boost::function<threads::thread_function_type>
@@ -658,6 +738,14 @@ namespace hpx { namespace actions
             return detail::get_action_name<plain_action1>();
         }
 
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<plain_action1, base_type>();
+            base_type::register_base();
+        }
+
     private:
         // serialization support
         friend class boost::serialization::access;
@@ -702,6 +790,14 @@ namespace hpx { namespace actions
         char const* const get_action_name() const
         {
             return detail::get_action_name<plain_direct_action1>();
+        }
+
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<plain_direct_action1, base_type>();
+            base_type::register_base();
         }
 
     private:

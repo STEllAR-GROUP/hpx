@@ -100,7 +100,8 @@ namespace hpx { namespace util
         // well
         struct init_logging
         {
-            init_logging(runtime_configuration& ini, 
+            init_logging(runtime_configuration& ini, bool isconsole, 
+                naming::resolver_client& agas_client, 
                 naming::id_type const& prefix);
         };
     }

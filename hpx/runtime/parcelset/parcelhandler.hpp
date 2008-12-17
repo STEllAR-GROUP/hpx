@@ -214,7 +214,7 @@ namespace hpx { namespace parcelset
             }
 
             // write this parcel to the log
-            LPT_(info) << "parcelhandler: put_parcel: " << p;
+//             LPT_(info) << "parcelhandler: put_parcel: " << p;
 
             // send the parcel to its destination, return parcel id of the 
             // parcel being sent

@@ -90,10 +90,21 @@ namespace hpx { namespace applier
         applier::applier_.reset(new applier* (this));
     }
 
+    void applier::deinit_tss()
+    {
+        applier::applier_.reset();
+    }
+
     applier& get_applier()
     {
         BOOST_ASSERT(NULL != applier::applier_.get());   // should have been initialized
         return **applier::applier_;
+    }
+
+    applier* get_applier_ptr()
+    {
+        applier** appl = applier::applier_.get();
+        return appl ? *appl : NULL;
     }
 
 ///////////////////////////////////////////////////////////////////////////////

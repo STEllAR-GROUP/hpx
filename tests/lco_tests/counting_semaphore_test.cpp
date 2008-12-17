@@ -29,6 +29,7 @@ bool parse_commandline(char const* name, int argc, char *argv[],
         desc_cmdline.add_options()
             ("help,h", "print out program usage (this message)")
             ("run_agas_server,r", "run AGAS server as part of this runtime instance")
+            ("worker,w", "run this instance in worker (non-console) mode")
             ("agas", po::value<std::string>(), 
                 "the IP address the AGAS server is running on (default taken "
                 "from hpx.ini), expected format: 192.168.1.1:7912")
@@ -189,6 +190,7 @@ int main(int argc, char* argv[])
         // Check command line arguments.
         std::string hpx_host("localhost"), dgas_host;
         boost::uint16_t hpx_port = HPX_PORT, dgas_port = 0;
+        hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
 
         // extract IP address/port arguments
         if (vm.count("agas")) 
@@ -196,6 +198,9 @@ int main(int argc, char* argv[])
 
         if (vm.count("hpx")) 
             split_ip_address(vm["hpx"].as<std::string>(), hpx_host, hpx_port);
+
+        if (vm.count("worker"))
+            mode = hpx::runtime::worker;
 
         // initialize and run the DGAS service, if appropriate
         std::auto_ptr<dgas_server_helper> dgas_server;
@@ -205,7 +210,7 @@ int main(int argc, char* argv[])
         }
 
         // start the HPX runtime using different numbers of threads
-        hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port);
+        hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
         for (int i = 1; i <= 8; ++i) 
             rt.run(hpx_main, i);
     }

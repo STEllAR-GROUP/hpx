@@ -23,6 +23,7 @@ namespace hpx { namespace naming { namespace server
         const char* const command_names[] = 
         {
             "command_getprefix",
+            "command_getconsoleprefix",
             "command_getprefixes",
             "command_get_component_id",
             "command_register_factory",
@@ -86,7 +87,8 @@ namespace hpx { namespace naming { namespace server
             break;
 
         case command_getprefix:
-            os << "site(" << req.site_ << ") ";
+            os << "site(" << req.site_ << "), ";
+            os << "isconsole(" << std::boolalpha << req.isconsole_ << ") ";
             break;
 
         case command_getidrange:
@@ -98,6 +100,7 @@ namespace hpx { namespace naming { namespace server
             os << "type(" << components::get_component_type_name(req.type_) << ") ";
             break;
 
+        case command_getconsoleprefix:
         case command_statistics_count:
         case command_statistics_mean:
         case command_statistics_moment2:

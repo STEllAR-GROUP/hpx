@@ -23,6 +23,7 @@ bool parse_commandline(char const* name, int argc, char *argv[],
         desc_cmdline.add_options()
             ("help,h", "print out program usage (this message)")
             ("run_agas_server,r", "run AGAS server as part of this runtime instance")
+            ("console,c", "run this instance as the console")
             ("agas,a", po::value<std::string>(), 
                 "the IP address the AGAS server is running on (default taken "
                 "from hpx.ini), expected format: 192.168.1.1:7912")
@@ -106,6 +107,7 @@ int main(int argc, char* argv[])
         std::string hpx_host("localhost"), agas_host;
         boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
         int num_threads = 1;
+        hpx::runtime::mode mode = hpx::runtime::worker;
 
         // extract IP address/port arguments
         if (vm.count("agas")) 
@@ -116,6 +118,9 @@ int main(int argc, char* argv[])
 
         if (vm.count("threads"))
             num_threads = vm["threads"].as<int>();
+
+        if (vm.count("console"))
+            mode = hpx::runtime::console;
 
         // do we need to execute the HPX runtime
         bool no_hpx_runtime = vm.count("no_hpx_runtime") != 0;
@@ -133,7 +138,7 @@ int main(int argc, char* argv[])
         // execute HPX runtime, if appropriate
         if (!no_hpx_runtime) {
             // initialize and start the HPX runtime
-            hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port);
+            hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, mode);
 
             // the main thread will wait (block) for the shutdown action and 
             // the threadmanager is serving incoming requests in the meantime

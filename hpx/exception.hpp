@@ -45,6 +45,8 @@ namespace hpx
         bad_request = 16,
         repeated_request = 17,
         lock_error = 18,
+        duplicate_console = 19,
+        no_registered_console = 20,
         last_error
     };
 
@@ -69,6 +71,8 @@ namespace hpx
         "bad_request",
         "repeated_request",
         "lock_error",
+        "duplicate_console",
+        "no_registered_console",
         ""
     };
 
@@ -100,6 +104,8 @@ namespace hpx
                 case bad_parameter:
                 case repeated_request:
                 case lock_error:
+                case duplicate_console:
+                case no_registered_console:
                     return std::string("HPX(") + error_names[value] + ")";
 
                 default:
