@@ -249,13 +249,6 @@
                 BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
-        /// The function \a get_action_name returns the name of this action
-        /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
-        {
-            return detail::get_action_name<BOOST_PP_CAT(direct_result_action, N)>();
-        }
-
         /// serialization support
         static void register_base()
         {
@@ -265,6 +258,20 @@
         }
 
     private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name<BOOST_PP_CAT(direct_result_action, N)>();
+        }
+
+        /// The function \a get_action_type returns whether this action needs
+        /// to be executed in a new thread or directly.
+        action_type get_action_type() const 
+        {
+            return direct_action;
+        }
+
         // serialization support
         friend class boost::serialization::access;
 
@@ -480,13 +487,6 @@
             (get_lva<Component>::call(lva)->*F)(BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
-        /// The function \a get_action_name returns the name of this action
-        /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
-        {
-            return detail::get_action_name<BOOST_PP_CAT(direct_action, N)>();
-        }
-
         /// serialization support
         static void register_base()
         {
@@ -496,6 +496,20 @@
         }
 
     private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name<BOOST_PP_CAT(direct_action, N)>();
+        }
+
+        /// The function \a get_action_type returns whether this action needs
+        /// to be executed in a new thread or directly.
+        action_type get_action_type() const 
+        {
+            return direct_action;
+        }
+
         // serialization support
         friend class boost::serialization::access;
 

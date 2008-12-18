@@ -82,7 +82,7 @@ namespace hpx { namespace actions
         /// function of a thread. It encapsulates the execution of the 
         /// original function (given by \a func), while ignoring the return 
         /// value.
-        static threads::thread_state thread_function()
+        static threads::thread_state thread_function(threads::thread_state_ex)
         {
             F();      // call the function, ignoring the return value
             return threads::terminated;
@@ -209,13 +209,6 @@ namespace hpx { namespace actions
             return F();
         }
 
-        /// The function \a get_action_name returns the name of this action
-        /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
-        {
-            return detail::get_action_name<plain_direct_result_action0>();
-        }
-
         /// serialization support
         static void register_base()
         {
@@ -225,6 +218,20 @@ namespace hpx { namespace actions
         }
 
     private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name<plain_direct_result_action0>();
+        }
+
+        /// The function \a get_action_type returns whether this action needs
+        /// to be executed in a new thread or directly.
+        action_type get_action_type() const 
+        {
+            return direct_action;
+        }
+
         // serialization support
         friend class boost::serialization::access;
 
@@ -259,7 +266,7 @@ namespace hpx { namespace actions
         /// function of a thread. It encapsulates the execution of the 
         /// original function (given by \a func), while ignoring the return 
         /// value.
-        static threads::thread_state thread_function()
+        static threads::thread_state thread_function(threads::thread_state_ex)
         {
             F();      // just call the function
             return threads::terminated;
@@ -380,13 +387,6 @@ namespace hpx { namespace actions
             F();
         }
 
-        /// The function \a get_action_name returns the name of this action
-        /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
-        {
-            return detail::get_action_name<plain_direct_action0>();
-        }
-
         /// serialization support
         static void register_base()
         {
@@ -396,6 +396,20 @@ namespace hpx { namespace actions
         }
 
     private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name<plain_direct_action0>();
+        }
+
+        /// The function \a get_action_type returns whether this action needs
+        /// to be executed in a new thread or directly.
+        action_type get_action_type() const 
+        {
+            return direct_action;
+        }
+
         // serialization support
         friend class boost::serialization::access;
 
@@ -584,13 +598,6 @@ namespace hpx { namespace actions
             return F(arg0);
         }
 
-        /// The function \a get_action_name returns the name of this action
-        /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
-        {
-            return detail::get_action_name<plain_direct_result_action1>();
-        }
-
         /// serialization support
         static void register_base()
         {
@@ -600,6 +607,20 @@ namespace hpx { namespace actions
         }
 
     private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name<plain_direct_result_action1>();
+        }
+
+        /// The function \a get_action_type returns whether this action needs
+        /// to be executed in a new thread or directly.
+        action_type get_action_type() const 
+        {
+            return direct_action;
+        }
+
         // serialization support
         friend class boost::serialization::access;
 
@@ -785,13 +806,6 @@ namespace hpx { namespace actions
             F(arg0);
         }
 
-        /// The function \a get_action_name returns the name of this action
-        /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
-        {
-            return detail::get_action_name<plain_direct_action1>();
-        }
-
         /// serialization support
         static void register_base()
         {
@@ -801,6 +815,20 @@ namespace hpx { namespace actions
         }
 
     private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name<plain_direct_action1>();
+        }
+
+        /// The function \a get_action_type returns whether this action needs
+        /// to be executed in a new thread or directly.
+        action_type get_action_type() const 
+        {
+            return direct_action;
+        }
+
         // serialization support
         friend class boost::serialization::access;
 

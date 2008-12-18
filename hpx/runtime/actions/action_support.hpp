@@ -50,6 +50,15 @@ namespace hpx { namespace actions
     /// serialization of action instances through a shared_ptr.
     struct base_action
     {
+        /// The type of an action defines whether this action will be executed 
+        /// directly or by a PX-threads
+        enum action_type
+        {
+            plain_action = 0,   ///< The action will be executed by a newly created thread
+            direct_action = 1   ///< The action needs to be executed directly
+        };
+
+        /// Destructor
         virtual ~base_action() {}
 
         /// The function \a get_action_code returns the code of the action 
@@ -63,6 +72,10 @@ namespace hpx { namespace actions
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
         virtual char const* const get_action_name() const = 0;
+
+        /// The function \a get_action_type returns whether this action needs
+        /// to be executed in a new thread or directly.
+        virtual action_type get_action_type() const = 0;
 
         /// The \a get_thread_function constructs a proper thread function for 
         /// a \a thread, encapsulating the functionality and the arguments 
@@ -261,6 +274,13 @@ namespace hpx { namespace actions
         char const* const get_action_name() const
         {
             return "<Unknown action type>";
+        }
+
+        /// The function \a get_action_type returns whether this action needs
+        /// to be executed in a new thread or directly.
+        action_type get_action_type() const 
+        {
+            return plain_action;
         }
 
     private:

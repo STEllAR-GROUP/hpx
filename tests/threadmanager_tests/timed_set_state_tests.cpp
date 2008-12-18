@@ -22,7 +22,7 @@ void timed_set_state_test(util::high_resolution_timer& timer,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void duration_set_state_test()
+void duration_set_state_test(threads::thread_state_ex)
 {
     util::high_resolution_timer timer;
 
@@ -39,7 +39,7 @@ void duration_set_state_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void time_set_state_test()
+void time_set_state_test(threads::thread_state_ex)
 {
     util::high_resolution_timer timer;
 

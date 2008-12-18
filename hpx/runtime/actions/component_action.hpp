@@ -187,13 +187,6 @@ namespace hpx { namespace actions
             return (get_lva<Component>::call(lva)->*F)();
         }
 
-        /// The function \a get_action_name returns the name of this action
-        /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
-        {
-            return detail::get_action_name<direct_result_action0>();
-        }
-
         /// serialization support
         static void register_base()
         {
@@ -203,6 +196,20 @@ namespace hpx { namespace actions
         }
 
     private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name<direct_result_action0>();
+        }
+
+        /// The function \a get_action_type returns whether this action needs
+        /// to be executed in a new thread or directly.
+        action_type get_action_type() const 
+        {
+            return direct_action;
+        }
+
         // serialization support
         friend class boost::serialization::access;
 
@@ -354,13 +361,6 @@ namespace hpx { namespace actions
             (get_lva<Component>::call(lva)->*F)();
         }
 
-        /// The function \a get_action_name returns the name of this action
-        /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
-        {
-            return detail::get_action_name<direct_action0>();
-        }
-
         /// serialization support
         static void register_base()
         {
@@ -370,6 +370,20 @@ namespace hpx { namespace actions
         }
 
     private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name<direct_action0>();
+        }
+
+        /// The function \a get_action_type returns whether this action needs
+        /// to be executed in a new thread or directly.
+        action_type get_action_type() const 
+        {
+            return direct_action;
+        }
+
         // serialization support
         friend class boost::serialization::access;
 
@@ -405,14 +419,6 @@ namespace hpx { namespace actions
         base_result_action1(Arg0 const& arg0) 
           : base_type(arg0) 
         {}
-
-        /// serialization support
-        static void register_base()
-        {
-            using namespace boost::serialization;
-            void_cast_register<base_result_action1, base_type>();
-            base_type::register_base();
-        }
 
     private:
         /// The \a continuation_thread_function will be registered as the thread
@@ -458,6 +464,14 @@ namespace hpx { namespace actions
         {
             return base_type::construct_continuation_thread_function(
                 boost::bind(F, get_lva<Component>::call(lva), arg0), cont);
+        }
+
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<base_result_action1, base_type>();
+            base_type::register_base();
         }
 
     private:
@@ -559,14 +573,6 @@ namespace hpx { namespace actions
           : base_type(arg0)
         {}
 
-        /// serialization support
-        static void register_base()
-        {
-            using namespace boost::serialization;
-            void_cast_register<direct_result_action1, base_type>();
-            base_type::register_base();
-        }
-
     public:
         typedef boost::mpl::true_ direct_execution;
 
@@ -578,6 +584,15 @@ namespace hpx { namespace actions
             return (get_lva<Component>::call(lva)->*F)(arg0);
         }
 
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<direct_result_action1, base_type>();
+            base_type::register_base();
+        }
+
+    private:
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
         char const* const get_action_name() const
@@ -585,7 +600,13 @@ namespace hpx { namespace actions
             return detail::get_action_name<direct_result_action1>();
         }
 
-    private:
+        /// The function \a get_action_type returns whether this action needs
+        /// to be executed in a new thread or directly.
+        action_type get_action_type() const 
+        {
+            return direct_action;
+        }
+
         // serialization support
         friend class boost::serialization::access;
 
@@ -776,13 +797,6 @@ namespace hpx { namespace actions
             (get_lva<Component>::call(lva)->*F)(arg0);
         }
 
-        /// The function \a get_action_name returns the name of this action
-        /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
-        {
-            return detail::get_action_name<direct_action1>();
-        }
-
         /// serialization support
         static void register_base()
         {
@@ -792,6 +806,20 @@ namespace hpx { namespace actions
         }
 
     private:
+        /// The function \a get_action_name returns the name of this action
+        /// (mainly used for debugging and logging purposes).
+        char const* const get_action_name() const
+        {
+            return detail::get_action_name<direct_action1>();
+        }
+
+        /// The function \a get_action_type returns whether this action needs
+        /// to be executed in a new thread or directly.
+        action_type get_action_type() const 
+        {
+            return direct_action;
+        }
+
         // serialization support
         friend class boost::serialization::access;
 

@@ -22,7 +22,7 @@ void test1_helper(hpx::util::full_empty<int>& data)
     BOOST_TEST(!data.is_empty());
 }
 
-void test1()
+void test1(threads::thread_state_ex)
 {
     // retrieve gid for this thread
     naming::id_type gid = applier::get_applier().get_thread_manager().

@@ -195,6 +195,8 @@ namespace hpx { namespace threads
         ///                 be modified for.
         /// \param newstate [in] The new state to be set for the thread 
         ///                 referenced by the \a id parameter.
+        /// \param newstate_ex [in] The new extended state to be set for the 
+        ///                 thread referenced by the \a id parameter.
         ///
         /// \returns        This function returns the previous state of the 
         ///                 thread referenced by the \a id parameter. It will 
@@ -207,7 +209,8 @@ namespace hpx { namespace threads
         ///                 the parameter \a self if the thread referenced by 
         ///                 the parameter \a id is in \a thread_state#active 
         ///                 state.
-        thread_state set_state(thread_id_type id, thread_state newstate);
+        thread_state set_state(thread_id_type id, thread_state newstate,
+            thread_state_ex newstate_ex = wait_signaled);
 
         /// The get_state function is part of the thread related API and allows
         /// to query the state of one of the threads known to the threadmanager
@@ -229,12 +232,14 @@ namespace hpx { namespace threads
         /// Set a timer to set the state of the given \a thread to the given 
         /// new value after it expired (at the given time)
         thread_id_type set_state (time_type const& expire_at, 
-            thread_id_type id, thread_state newstate = pending);
+            thread_id_type id, thread_state newstate = pending,
+            thread_state_ex newstate_ex = wait_timeout);
 
         /// Set a timer to set the state of the given \a thread to the given
         /// new value after it expired (after the given duration)
         thread_id_type set_state (duration_type const& expire_from_now, 
-            thread_id_type id, thread_state newstate = pending);
+            thread_id_type id, thread_state newstate = pending,
+            thread_state_ex newstate_ex = wait_timeout);
 
     protected:
         // this is the thread function executing the work items in the queue
@@ -253,13 +258,14 @@ namespace hpx { namespace threads
         /// This thread function is used by the at_timer thread below to trigger
         /// the required action.
         thread_state wake_timer_thread (thread_id_type id, 
-            thread_state newstate, thread_id_type timer_id);
+            thread_state newstate, thread_state_ex newstate_ex, 
+            thread_id_type timer_id);
 
         /// This thread function initiates the required set_state action (on 
         /// behalf of one of the threadmanager#set_state functions).
         template <typename TimeType>
         thread_state at_timer (TimeType const& expire, thread_id_type id, 
-            thread_state newstate);
+            thread_state newstate, thread_state_ex newstate_ex);
 
         /// This function adds threads stored in the new_items queue to the 
         /// thread map and the work_items queue (if appropriate)

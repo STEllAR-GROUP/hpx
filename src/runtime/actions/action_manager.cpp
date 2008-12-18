@@ -27,10 +27,10 @@ namespace hpx { namespace actions
             naming::address addr = p.get_destination_addr();
             naming::address::address_type lva = addr.address_;
 
-            if (0 == lva) {
-            // a zero address references the local runtime support component
+        // by convention, a zero address references the local runtime support 
+        // component
+            if (0 == lva) 
                 lva = applier::get_applier().get_runtime_support_gid().get_lsb();
-            }
 
         // decode the action-type in the parcel
             action_type act = p.get_action();
@@ -40,20 +40,35 @@ namespace hpx { namespace actions
         // type in the destination address
             BOOST_ASSERT(dest.type_ == act->get_component_type());
 
-        // dispatch action, register work item either with or without 
-        // continuation support
-            if (!cont) {
-            // no continuation is to be executed, register the plain action 
-            // and the local-virtual address with the TM only
-                applier::register_work(act->get_thread_function(lva),
-                    act->get_action_name());
+        // either directly execute the action or create a new thread
+            if (actions::base_action::direct_action == act->get_action_type()) {
+            // direct execution of the action
+                if (!cont) {
+                // no continuation is to be executed
+                    act->get_thread_function(lva)(threads::wait_signaled);
+                }
+                else {
+                // this parcel carries a continuation, we execute a wrapper
+                // handling all related functionality
+                    act->get_thread_function(cont, lva)(threads::wait_signaled);
+                }
             }
             else {
-            // this parcel carries a continuation, register a wrapper which
-            // first executes the original thread function as required by 
-            // the action and triggers the continuations afterwards
-                applier::register_work(
-                    act->get_thread_function(cont, lva), act->get_action_name());
+            // dispatch action, register work item either with or without 
+            // continuation support
+                if (!cont) {
+                // no continuation is to be executed, register the plain action 
+                // and the local-virtual address with the TM only
+                    applier::register_work(act->get_thread_function(lva),
+                        act->get_action_name());
+                }
+                else {
+                // this parcel carries a continuation, register a wrapper which
+                // first executes the original thread function as required by 
+                // the action and triggers the continuations afterwards
+                    applier::register_work(
+                        act->get_thread_function(cont, lva), act->get_action_name());
+                }
             }
         }
     }

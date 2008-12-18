@@ -169,12 +169,13 @@ namespace hpx { namespace applier
     ///        work to be executed
     ///
     HPX_API_EXPORT threads::thread_id_type register_thread(
-        boost::function<void()> func, char const* description = "", 
+        boost::function<void(threads::thread_state_ex)> const& func, 
+        char const* description = "",  
         threads::thread_state initial_state = threads::pending, 
         bool run_now = true);
 
     HPX_API_EXPORT threads::thread_id_type register_thread_plain(
-        boost::function<threads::thread_function_type> func,
+        boost::function<threads::thread_function_type> const& func,
         char const* description = "", 
         threads::thread_state initial_state = threads::pending, 
         bool run_now = true);
@@ -184,12 +185,13 @@ namespace hpx { namespace applier
     ///        work to be executed
     ///
     HPX_API_EXPORT void register_work(
-        boost::function<void()> func, char const* description = "", 
+        boost::function<void(threads::thread_state_ex)> const& func, 
+        char const* description = "", 
         threads::thread_state initial_state = threads::pending, 
         bool run_now = true);
 
     HPX_API_EXPORT void register_work_plain(
-        boost::function<threads::thread_function_type> func,
+        boost::function<threads::thread_function_type> const& func,
         char const* description = "", 
         threads::thread_state initial_state = threads::pending, 
         bool run_now = true);

@@ -109,20 +109,15 @@ namespace hpx { namespace lcos { namespace detail
                     queue_.enqueue(id);
 
                     // timeout at the given time, if appropriate
-                    if (!wait_until.is_pos_infinity()) {
-                        BOOST_ASSERT(wait_until.is_pos_infinity());    // not implemented yet
+                    if (!wait_until.is_pos_infinity()) 
                         threads::set_thread_state(id, wait_until);
+
+                    if (threads::wait_signaled != self.yield(threads::suspended))
+                    {
+                        // if this timed out, just return false
+                        boost::lockfree::interlocked_decrement(&active_count_);
+                        return false;
                     }
-
-                    // FIXME: to implement a timeout we need to allow return
-                    //        values from yield
-                    self.yield(threads::suspended);
-
-//                     if (win32::WaitForSingleObject(sem, ::boost::detail::get_milliseconds_until(wait_until))!=0)
-//                     {
-//                         boost::lockfree::interlocked_decrement(&active_count_);
-//                         return false;
-//                     }
 
                     old_count &= ~lock_flag_value;
                     old_count |= event_set_flag_value;

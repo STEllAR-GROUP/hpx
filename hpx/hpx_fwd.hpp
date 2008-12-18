@@ -126,7 +126,17 @@ namespace hpx
         HPX_API_EXPORT char const* const get_thread_state_name(thread_state state);
 
         ///////////////////////////////////////////////////////////////////////
-        typedef thread_state thread_function_type();
+        /// \enum thread_state_ex
+        ///
+        enum thread_state_ex
+        {
+            wait_signaled = 0,  ///< The thread has been signaled
+            wait_timeout = 1,   ///< The thread has been reactivated after a timeout
+        };
+
+        typedef thread_state thread_function_type(thread_state_ex);
+
+        ///////////////////////////////////////////////////////////////////////
         typedef boost::coroutines::static_coroutine<
                 thread_function_type, boost::function<thread_function_type> 
         > coroutine_type;

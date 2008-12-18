@@ -37,7 +37,8 @@ namespace hpx { namespace threads { namespace detail
         thread(function_type func, thread_id_type id, thread_state newstate,
                 char const* const description)
           : coroutine_(func, id), 
-            current_state_(newstate), description_(description)
+            current_state_(newstate), current_state_ex_(0),
+            description_(description)
         {}
 
         /// This constructor is provided just for compatibility with the scheme
@@ -62,7 +63,9 @@ namespace hpx { namespace threads { namespace detail
 
         thread_state execute()
         {
-            return coroutine_();
+            long state_ex = current_state_ex_;
+            current_state_ex_ = wait_signaled;
+            return coroutine_(static_cast<thread_state_ex>(state_ex));
         }
 
         thread_state get_state() const 
@@ -78,6 +81,22 @@ namespace hpx { namespace threads { namespace detail
                 long prev_state = current_state_;
                 if (likely(CAS(&current_state_, prev_state, (long)newstate)))
                     return static_cast<thread_state>(prev_state);
+            }
+        }
+
+        thread_state_ex get_state_ex() const 
+        {
+            boost::lockfree::memory_barrier();
+            return static_cast<thread_state_ex>(current_state_ex_);
+        }
+
+        thread_state_ex set_state_ex(thread_state_ex newstate_ex)
+        {
+            using namespace boost::lockfree;
+            for (;;) {
+                long prev_state = current_state_ex_;
+                if (likely(CAS(&current_state_, prev_state, (long)newstate_ex)))
+                    return static_cast<thread_state_ex>(prev_state);
             }
         }
 
@@ -118,6 +137,7 @@ namespace hpx { namespace threads { namespace detail
         coroutine_type coroutine_;
         // the state is stored as a long to allow to use CAS
         long current_state_;
+        long current_state_ex_;
         char const* const description_;
     };
 
@@ -214,11 +234,10 @@ namespace hpx { namespace threads
             return get()->get_state();
         }
 
-        /// The set_state function allows to change the state this thread 
+        /// The set_state function allows to change the state of this thread 
         /// instance.
         ///
-        /// \param newstate [in] The new state to be set for the thread 
-        ///                 referenced by the \a id parameter.
+        /// \param newstate [in] The new state to be set for the thread.
         ///
         /// \note           This function will be seldom used directly. Most of 
         ///                 the time the state of a thread will have to be 
@@ -230,8 +249,37 @@ namespace hpx { namespace threads
         ///                 be used.
         thread_state set_state(thread_state new_state)
         {
-            detail::thread* t = get();
-            return t->set_state(new_state);
+            return get()->set_state(new_state);
+        }
+
+        /// The get_state_ex function allows to query the extended state of 
+        /// this thread instance.
+        ///
+        /// \returns        This function returns the current extended state of 
+        ///                 this thread. It will return one of the values as 
+        ///                 defined by the \a thread_state_ex enumeration.
+        ///
+        /// \note           This function will be seldom used directly. Most of 
+        ///                 the time the extended state of a thread will be 
+        ///                 retrieved by using the function 
+        ///                 \a threadmanager#get_state_ex.
+        thread_state_ex get_state_ex() const 
+        {
+            return get()->get_state_ex();
+        }
+
+        /// The set_state function allows to change the extended state of this 
+        /// thread instance.
+        ///
+        /// \param newstate [in] The new extended state to be set for the 
+        ///                 thread.
+        ///
+        /// \note           This function will be seldom used directly. Most of 
+        ///                 the time the state of a thread will have to be 
+        ///                 changed using the threadmanager. 
+        thread_state_ex set_state_ex(thread_state_ex new_state)
+        {
+            return get()->set_state_ex(new_state);
         }
 
         /// \brief Execute the thread function
