@@ -205,7 +205,7 @@ namespace hpx { namespace actions
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        action_type get_action_type() const 
+        base_action::action_type get_action_type() const 
         {
             return base_action::direct_action;
         }
@@ -379,7 +379,7 @@ namespace hpx { namespace actions
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        action_type get_action_type() const 
+        base_action::action_type get_action_type() const 
         {
             return base_action::direct_action;
         }
@@ -602,7 +602,7 @@ namespace hpx { namespace actions
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        action_type get_action_type() const 
+        base_action::action_type get_action_type() const 
         {
             return base_action::direct_action;
         }
@@ -815,7 +815,7 @@ namespace hpx { namespace actions
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        action_type get_action_type() const 
+        base_action::action_type get_action_type() const 
         {
             return base_action::direct_action;
         }
