@@ -269,7 +269,7 @@
         /// to be executed in a new thread or directly.
         action_type get_action_type() const 
         {
-            return direct_action;
+            return base_action::direct_action;
         }
 
         // serialization support
@@ -507,7 +507,7 @@
         /// to be executed in a new thread or directly.
         action_type get_action_type() const 
         {
-            return direct_action;
+            return base_action::direct_action;
         }
 
         // serialization support
