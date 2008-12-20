@@ -156,7 +156,7 @@ endif()
 
 # additional preprocessor definitions
 add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT)
-add_definitions(-DBOOST_COROUTINE_ARG_MAX=1)
+add_definitions(-DBOOST_COROUTINE_ARG_MAX=2)
 
 # Mac systems headers have some dependency on _XOPEN_SOURCE being defined
 # let's better be on the safe side...
