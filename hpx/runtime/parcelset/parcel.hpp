@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2008 Hartmut Kaiser
+//  Copyright (c) 2007-2009 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2007 Alexandre (aka Alex) TABBAL
 // 

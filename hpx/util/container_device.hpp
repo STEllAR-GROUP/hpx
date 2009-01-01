@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2008 Hartmut Kaiser
+//  Copyright (c) 2007-2009 Hartmut Kaiser
 //
 //  Parts of this code were taken from the Boost.IoStreams library
 //  Copyright (c) 2004 Jonathan Turkanis
