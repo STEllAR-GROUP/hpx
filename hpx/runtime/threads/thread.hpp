@@ -95,7 +95,7 @@ namespace hpx { namespace threads { namespace detail
             using namespace boost::lockfree;
             for (;;) {
                 long prev_state = current_state_ex_;
-                if (likely(CAS(&current_state_, prev_state, (long)newstate_ex)))
+                if (likely(CAS(&current_state_ex_, prev_state, (long)newstate_ex)))
                     return static_cast<thread_state_ex>(prev_state);
             }
         }
