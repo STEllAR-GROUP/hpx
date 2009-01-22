@@ -80,10 +80,12 @@ int main(int argc, char* argv[])
         rt.run(boost::bind(hpx_main, boost::ref(timer), num_hpx_threads), 
             num_threads);
         double elapsed = timer.elapsed();
-        std::cout << "Elapsed time [s] for " << num_hpx_threads 
-                  << " threads: " << elapsed << " (" 
-                  << elapsed/num_hpx_threads << " per thread)" << std::endl;
+        //std::cout << "Elapsed time [s] for " << num_hpx_threads 
+        //          << " threads: " << elapsed << " (" 
+        //          << elapsed/num_hpx_threads << " per thread)" << std::endl;
+        std::cout << elapsed/num_hpx_threads <<std::endl;
     }
+
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";
         return -1;

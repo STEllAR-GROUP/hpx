@@ -37,6 +37,7 @@ int main(int argc, char* argv[])
         using namespace hpx::naming;
 
         std::vector<double> timings;
+         double total_time = 0;
 
         // this is our locality
         locality here("localhost", HPX_PORT);
@@ -60,15 +61,15 @@ int main(int argc, char* argv[])
         {
             resolver.bind(id_type(i), address(here, 1, i));
         }
-        std::cout << " ***************************************" << std::endl << std::flush;	
-        std::cout << " Measure_bind is: "<< t.elapsed() << std::endl << std::flush;
-    
-        resolver.get_statistics_mean(timings);
-        std::cout << " Time taken by get_prefix is: " << timings[0] <<  std::endl <<std::flush;
-        std::cout << " Time taken by bind       is: " << timings[2] <<  std::endl <<std::flush;
-
+        total_time = total_time + t.elapsed();
 #if defined(MAX_ITERATIONS)
         }
+        std::cout << " Measure_bind is: "<< total_time / MAX_ITERATIONS  << std::endl << std::flush;
+
+        resolver.get_statistics_mean(timings);
+
+        std::cout << " Time taken by bind       is: " << timings[5] <<  std::endl <<std::flush;
+
 #endif
     }
     catch (std::exception& e) {
