@@ -288,6 +288,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mandelbrot", "quickstart\ma
 		{E6C6C6C4-6959-4B47-B92A-6323A906CC40} = {E6C6C6C4-6959-4B47-B92A-6323A906CC40}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mandelbrot_gui", "quickstart\mandelbrot_gui\mandelbrot_gui.vcproj", "{8B85D276-F836-4827-8AD6-57AE119ACD7C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -844,6 +846,18 @@ Global
 		{DBA88059-AC07-417E-B2E7-1CF5C702A4AC}.Release|Win32.ActiveCfg = Release|Win32
 		{DBA88059-AC07-417E-B2E7-1CF5C702A4AC}.Release|Win32.Build.0 = Release|Win32
 		{DBA88059-AC07-417E-B2E7-1CF5C702A4AC}.Release|x64.ActiveCfg = Release|Win32
+		{8B85D276-F836-4827-8AD6-57AE119ACD7C}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{8B85D276-F836-4827-8AD6-57AE119ACD7C}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{8B85D276-F836-4827-8AD6-57AE119ACD7C}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{8B85D276-F836-4827-8AD6-57AE119ACD7C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8B85D276-F836-4827-8AD6-57AE119ACD7C}.Debug|Win32.Build.0 = Debug|Win32
+		{8B85D276-F836-4827-8AD6-57AE119ACD7C}.Debug|x64.ActiveCfg = Debug|Win32
+		{8B85D276-F836-4827-8AD6-57AE119ACD7C}.Release|Any CPU.ActiveCfg = Release|Win32
+		{8B85D276-F836-4827-8AD6-57AE119ACD7C}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{8B85D276-F836-4827-8AD6-57AE119ACD7C}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{8B85D276-F836-4827-8AD6-57AE119ACD7C}.Release|Win32.ActiveCfg = Release|Win32
+		{8B85D276-F836-4827-8AD6-57AE119ACD7C}.Release|Win32.Build.0 = Release|Win32
+		{8B85D276-F836-4827-8AD6-57AE119ACD7C}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -903,6 +917,7 @@ Global
 		{86995A39-ECBE-4620-A98D-64E3FA7E0393} = {776276E2-2A7F-48B6-8824-E108D7F1EA2B}
 		{86037EB9-D590-4E13-AC7B-ED9384A0F172} = {F38DA90E-D808-4B30-BE2A-758F14002289}
 		{DBA88059-AC07-417E-B2E7-1CF5C702A4AC} = {F38DA90E-D808-4B30-BE2A-758F14002289}
+		{8B85D276-F836-4827-8AD6-57AE119ACD7C} = {F38DA90E-D808-4B30-BE2A-758F14002289}
 	EndGlobalSection
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}

@@ -94,6 +94,7 @@ namespace hpx { namespace components { namespace stubs
                 // zero address will be interpreted as a reference to the 
                 // remote runtime support object
                 addr.address_ = 0;
+                addr.type_ = components::component_runtime_support;
                 hpx::applier::apply<action_type>(addr, naming::invalid_id, type, gid);
             }
         }
@@ -114,8 +115,9 @@ namespace hpx { namespace components { namespace stubs
             }
             else {
                 // apply remotely
-                lcos::eager_future<action_type, void>(
-                    naming::invalid_id, type, gid).get();
+                naming::id_type prefix = naming::invalid_id;
+                appl.get_agas_client().get_prefix(addr.locality_, prefix);
+                lcos::eager_future<action_type, void>(prefix, type, gid).get();
             }
         }
 

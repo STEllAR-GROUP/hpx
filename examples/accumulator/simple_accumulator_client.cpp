@@ -44,7 +44,7 @@ int hpx_main()
     // execute a couple of commands on this component
     std::string cmd;
     std::cin >> cmd;
-    while (true)
+    while (std::cin.good())
     {
         if(cmd == "init") {
             accu.init();

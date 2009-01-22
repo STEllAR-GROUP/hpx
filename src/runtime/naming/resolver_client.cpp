@@ -51,7 +51,7 @@ namespace hpx { namespace naming
 
     ///////////////////////////////////////////////////////////////////////////
     // synchronous functionality
-    bool resolver_client::get_prefix(locality const& l, id_type& prefix) 
+    bool resolver_client::get_prefix(locality const& l, id_type& prefix) const
     {
         // send request
         server::request req (server::command_getprefix, l, isconsole_);
@@ -66,7 +66,7 @@ namespace hpx { namespace naming
         return s == success;
     }
 
-    bool resolver_client::get_console_prefix(id_type& prefix)
+    bool resolver_client::get_console_prefix(id_type& prefix) const
     {
         // send request
         server::request req (server::command_getconsoleprefix);

@@ -80,7 +80,8 @@ namespace hpx { namespace lcos { namespace detail
 
         bool timed_lock(::boost::system_time const& wait_until)
         {
-            if (!boost::lockfree::interlocked_bit_test_and_set(&active_count_, lock_flag_bit))
+            using namespace boost::lockfree;
+            if (!interlocked_bit_test_and_set(&active_count_, lock_flag_bit))
             {
                 return true;
             }
@@ -90,8 +91,7 @@ namespace hpx { namespace lcos { namespace detail
                 boost::int32_t const new_count = (old_count & lock_flag_value) ? 
                     (old_count + 1) : (old_count | lock_flag_value);
                 boost::int32_t const current = 
-                    boost::lockfree::interlocked_compare_exchange(
-                        &active_count_, old_count, new_count);
+                    interlocked_compare_exchange(&active_count_, old_count, new_count);
                 if (current == old_count)
                 {
                     break;
@@ -115,7 +115,7 @@ namespace hpx { namespace lcos { namespace detail
                     if (threads::wait_signaled != self.yield(threads::suspended))
                     {
                         // if this timed out, just return false
-                        boost::lockfree::interlocked_decrement(&active_count_);
+                        interlocked_decrement(&active_count_);
                         return false;
                     }
 
@@ -127,8 +127,7 @@ namespace hpx { namespace lcos { namespace detail
                                 old_count : 
                                 ((old_count-1) | lock_flag_value)) & ~event_set_flag_value;
                         boost::int32_t const current = 
-                            boost::lockfree::interlocked_compare_exchange(
-                                &active_count_, old_count, new_count);
+                            interlocked_compare_exchange(&active_count_, old_count, new_count);
                         if (current == old_count)
                         {
                             break;
@@ -155,14 +154,13 @@ namespace hpx { namespace lcos { namespace detail
 
         void unlock()
         {
+            using namespace boost::lockfree;
             boost::int32_t const offset = lock_flag_value;
             boost::int32_t const old_count = 
-                boost::lockfree::interlocked_exchange_add(
-                    &active_count_, lock_flag_value);
+                interlocked_exchange_add(&active_count_, lock_flag_value);
             if (!(old_count & event_set_flag_value) && (old_count > offset))
             {
-                if (!boost::lockfree::interlocked_bit_test_and_set(
-                        &active_count_, event_set_flag_bit))
+                if (!interlocked_bit_test_and_set(&active_count_, event_set_flag_bit))
                 {
                     threads::thread_id_type id = 0;
                     if (queue_.dequeue(&id)) 

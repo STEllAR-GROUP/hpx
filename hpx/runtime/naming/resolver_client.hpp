@@ -74,7 +74,7 @@ namespace hpx { namespace naming
         ///                   if this locality already got a prefix assigned in 
         ///                   an earlier call. Any error results in an exception 
         ///                   thrown from this function.
-        bool get_prefix(locality const& l, id_type& prefix);
+        bool get_prefix(locality const& l, id_type& prefix) const;
 
         /// \brief Get locality prefix of the console locality
         ///
@@ -84,7 +84,7 @@ namespace hpx { namespace naming
         ///
         /// \returns          This function returns \a true if a console prefix 
         ///                   exists and returns \a false otherwise.
-        bool get_console_prefix(id_type& prefix);
+        bool get_console_prefix(id_type& prefix) const;
 
         /// \brief Query for the prefixes of all known localities.
         ///

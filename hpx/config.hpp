@@ -77,7 +77,7 @@
 // This defines the maximum number of connect retries to the AGAS service 
 // allowing for some leeway during startup of the localities 
 #if !defined(HPX_MAX_AGAS_RETRIES)
-#define HPX_MAX_AGAS_RETRIES 10
+#define HPX_MAX_AGAS_RETRIES 100
 #endif
 
 #if !defined(HPX_AGAS_RETRIES_SLEEP)

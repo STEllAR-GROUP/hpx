@@ -206,7 +206,6 @@ int main(int argc, char* argv[])
         int size_x = 20;
         int size_y = 20;
         int iterations = 100;
-        hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
 
         // extract IP address/port arguments
         if (vm.count("agas")) 
@@ -217,9 +216,6 @@ int main(int argc, char* argv[])
 
         if (vm.count("threads"))
             num_threads = vm["threads"].as<int>();
-
-        if (vm.count("worker"))
-            mode = hpx::runtime::worker;
 
         if (vm.count("sizex"))
             size_x = vm["sizex"].as<int>();
@@ -234,8 +230,14 @@ int main(int argc, char* argv[])
             agas_server.reset(new agas_server_helper(agas_host, agas_port));
 
         // initialize and start the HPX runtime
-        hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, mode);
-        rt.run(boost::bind(hpx_main, size_x, size_y, iterations), num_threads);
+        if (vm.count("worker")) {
+            hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, hpx::runtime::worker);
+            rt.run(num_threads);
+        }
+        else {
+            hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, hpx::runtime::console);
+            rt.run(boost::bind(hpx_main, size_x, size_y, iterations), num_threads);
+        }
     }
     catch (std::exception& e) {
         std::cerr << "mandelbrot: std::exception caught: " << e.what() << "\n";

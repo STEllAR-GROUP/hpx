@@ -91,7 +91,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             in_[i].reset(new in_adaptor_type());
             out_[i].reset(new out_adaptor_type());
             out_[i]->get()->set_callback(
-                boost::bind(&stencil_value::get_value, this, _1));
+                boost::bind(&stencil_value::get_value, this));
         }
         // the threads driving the computation are created in 
         // set_functional_component only (see below)

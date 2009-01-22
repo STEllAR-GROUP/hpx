@@ -38,7 +38,8 @@ namespace hpx { namespace actions
 
         // make sure the component_type of the action matches the component
         // type in the destination address
-            BOOST_ASSERT(dest.type_ == act->get_component_type());
+            BOOST_ASSERT(components::types_are_compatible(
+                dest.type_, act->get_component_type()));
 
         // either directly execute the action or create a new thread
             if (actions::base_action::direct_action == act->get_action_type()) {
@@ -80,6 +81,6 @@ namespace hpx { namespace actions
     {
 
     }
-    
+
 ///////////////////////////////////////////////////////////////////////////////
 }}

@@ -97,11 +97,6 @@ namespace hpx { namespace components
         typedef Component wrapped_type;
         typedef Component type_holder;
 
-        /// \brief Construct an empty managed_component
-        managed_component() 
-          : component_(0) 
-        {}
-
         /// \brief Construct a managed_component instance holding a 
         ///        wrapped instance. This constructor takes ownership of the 
         ///        passed pointer.
@@ -114,11 +109,8 @@ namespace hpx { namespace components
 
         /// \brief Construct a managed_component instance holding a new wrapped
         ///        instance
-        ///
-        /// \param appl [in] The applier to be used for construction of the new
-        ///             wrapped instance. 
-        explicit managed_component(applier::applier& appl) 
-          : component_(new wrapped_type(appl)) 
+        managed_component() 
+          : component_(new wrapped_type()) 
         {}
 
         /// \brief The destructor releases any wrapped instances

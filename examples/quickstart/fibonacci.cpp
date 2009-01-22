@@ -48,16 +48,13 @@ HPX_REGISTER_ACTION(fibonacci_action);
 ///////////////////////////////////////////////////////////////////////////////
 int fib (naming::id_type prefix, int n)
 {
-    if (n < 2) {
+    if (n < 2) 
         return n;
-    }
-    else {
-        lcos::eager_future<fibonacci_action> n1(prefix, prefix, n - 1);
-        lcos::eager_future<fibonacci_action> n2(prefix, prefix, n - 2);
-        int r1 = n1.get();
-        int r2 = n2.get();
-        return r1 + r2;
-    }
+
+    lcos::eager_future<fibonacci_action> n1(prefix, prefix, n - 1);
+    lcos::eager_future<fibonacci_action> n2(prefix, prefix, n - 2);
+
+    return n1.get() + n2.get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -81,6 +78,7 @@ int hpx_main(int argument)
         lcos::eager_future<fibonacci_action> n(prefix, prefix, argument);
         int result = n.get();
         double elapsed = t.elapsed();
+
         std::cout << "elapsed: " << elapsed << ", result: " << result << std::endl;
     }
 

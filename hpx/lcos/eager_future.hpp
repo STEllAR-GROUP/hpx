@@ -70,8 +70,6 @@ namespace hpx { namespace lcos
         /// The apply function starts the asynchronous operations encapsulated
         /// by this eager future.
         ///
-        /// \param appl   [in] The \a applier instance to be used to execute 
-        ///               the embedded action.
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
         void apply(naming::id_type const& gid)

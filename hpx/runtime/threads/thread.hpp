@@ -37,16 +37,15 @@ namespace hpx { namespace threads { namespace detail
         thread(function_type func, thread_id_type id, thread_state newstate,
                 char const* const description)
           : coroutine_(func, id), 
-            current_state_(newstate), current_state_ex_(0),
+            current_state_(newstate), current_state_ex_(wait_signaled),
             description_(description)
         {}
 
         /// This constructor is provided just for compatibility with the scheme
-        /// of component creation, which requires to pass an applier instance 
-        /// to the component constructor. But since threads never get created 
+        /// of component creation. But since threads never get created 
         /// by a factory (runtime_support) instance, we can leave this 
         /// constructor empty
-        thread(applier::applier& appl)
+        thread()
           : coroutine_(function_type(), 0), description_("")
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
@@ -63,9 +62,7 @@ namespace hpx { namespace threads { namespace detail
 
         thread_state execute()
         {
-            long state_ex = current_state_ex_;
-            current_state_ex_ = wait_signaled;
-            return coroutine_(static_cast<thread_state_ex>(state_ex));
+            return coroutine_(set_state_ex(wait_signaled));
         }
 
         thread_state get_state() const 
