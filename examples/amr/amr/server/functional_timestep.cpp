@@ -34,7 +34,9 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(functional_timestep_type, functional_time
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
-HPX_REGISTER_ACTION(functional_timestep_type::initialize_action);
-HPX_REGISTER_ACTION(functional_timestep_type::execute_action);
+HPX_REGISTER_ACTION_EX(functional_timestep_type::initialize_action, 
+    functional_timestep_initialize_action);
+HPX_REGISTER_ACTION_EX(functional_timestep_type::execute_action, 
+    functional_timestep_execute_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(functional_timestep_type);
 

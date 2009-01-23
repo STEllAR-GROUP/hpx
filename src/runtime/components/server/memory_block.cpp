@@ -24,16 +24,26 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the memory_block actions
-HPX_REGISTER_ACTION(hpx::components::server::detail::memory_block::get_action);
-HPX_REGISTER_ACTION(hpx::components::server::detail::memory_block::checkout_action);
-HPX_REGISTER_ACTION(hpx::components::server::detail::memory_block::checkin_action);
-HPX_REGISTER_ACTION(hpx::components::server::detail::memory_block::clone_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::detail::memory_block::get_action, 
+    memory_block_get_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::detail::memory_block::checkout_action,
+    memory_block_checkout_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::detail::memory_block::checkin_action,
+    memory_block_checkin_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::detail::memory_block::clone_action,
+    memory_block_clone_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::detail::memory_block_header);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::detail::memory_block);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::memory_block);
 
 typedef hpx::components::memory_block_data memory_data_type;
-HPX_REGISTER_ACTION(hpx::lcos::base_lco_with_value<memory_data_type>::set_result_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<memory_data_type>::set_result_action,
+    set_result_action_memory_data_type);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<memory_data_type>);
 
 ///////////////////////////////////////////////////////////////////////////////

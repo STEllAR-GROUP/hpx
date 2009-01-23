@@ -88,5 +88,6 @@ namespace hpx { namespace components { namespace server
 }}}
 
 // This must be in global namespace
-HPX_REGISTER_ACTION(hpx::components::server::console_logging_action);
+HPX_REGISTER_ACTION_EX(hpx::components::server::console_logging_action,
+    console_logging_action);
 

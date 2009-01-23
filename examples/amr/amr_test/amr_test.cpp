@@ -47,7 +47,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(stencil_type);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<logging_type>, logging);
 
-HPX_REGISTER_ACTION(logging_type::logentry_action);
+HPX_REGISTER_ACTION_EX(logging_type::logentry_action, logentry_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(logging_type);
 
 

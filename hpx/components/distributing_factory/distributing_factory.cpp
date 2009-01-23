@@ -26,14 +26,20 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the distributing_factory actions
-HPX_REGISTER_ACTION(distributing_factory_type::create_components_action);
-HPX_REGISTER_ACTION(distributing_factory_type::free_components_action);
+HPX_REGISTER_ACTION_EX(
+    distributing_factory_type::create_components_action,
+    distributing_factory_create_components_action);
+HPX_REGISTER_ACTION_EX(
+    distributing_factory_type::free_components_action,
+    distributing_factory_free_components_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(distributing_factory_type);
 
 typedef hpx::lcos::base_lco_with_value<
         distributing_factory_type::result_type 
     > create_result_type;
 
-HPX_REGISTER_ACTION(create_result_type::set_result_action);
+HPX_REGISTER_ACTION_EX(
+    create_result_type::set_result_action,
+    set_result_action_distributing_factory_result);
 HPX_DEFINE_GET_COMPONENT_TYPE(create_result_type);
 

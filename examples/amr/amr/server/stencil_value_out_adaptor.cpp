@@ -23,6 +23,8 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     stencil_value_out_adaptor_type, stencil_value_out_adaptor);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION(stencil_value_out_adaptor_type::wrapped_type::get_value_action);
+HPX_REGISTER_ACTION_EX(
+    stencil_value_out_adaptor_type::wrapped_type::get_value_action,
+    stencil_value_out_get_value_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(stencil_value_out_adaptor_type::wrapped_type);
 

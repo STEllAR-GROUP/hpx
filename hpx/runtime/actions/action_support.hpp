@@ -333,15 +333,19 @@ namespace hpx { namespace actions
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BASE_HELPER(action)                                      \
+#define HPX_REGISTER_BASE_HELPER(action, actionname)                          \
         hpx::actions::register_base_helper<action>                            \
-            BOOST_PP_CAT(__hpx_action_register_base_helper_, __LINE__);       \
+            BOOST_PP_CAT(                                                     \
+                BOOST_PP_CAT(__hpx_action_register_base_helper_, __LINE__),   \
+                _##actionname);                                               \
     /**/
 
-#define HPX_REGISTER_ACTION(action)                                           \
+#define HPX_REGISTER_ACTION_EX(action, actionname)                            \
         BOOST_CLASS_EXPORT(action)                                            \
-        HPX_REGISTER_BASE_HELPER(action)                                      \
+        HPX_REGISTER_BASE_HELPER(action, actionname)                          \
         HPX_DEFINE_GET_ACTION_NAME(action)                                    \
     /**/
+
+#define HPX_REGISTER_ACTION(action) HPX_REGISTER_ACTION_EX(action, action)
 
 #endif

@@ -39,15 +39,31 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(stencil_value_double_3_type, stencil_doub
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(stencil_value_double_5_type, stencil_double_5);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION(stencil_value_double_3_type::wrapped_type::call_action);
-HPX_REGISTER_ACTION(stencil_value_double_3_type::wrapped_type::get_output_ports_action);
-HPX_REGISTER_ACTION(stencil_value_double_3_type::wrapped_type::connect_input_ports_action);
-HPX_REGISTER_ACTION(stencil_value_double_3_type::wrapped_type::set_functional_component_action);
+HPX_REGISTER_ACTION_EX(
+    stencil_value_double_3_type::wrapped_type::call_action,
+    stencil_value_double_3_call_action);
+HPX_REGISTER_ACTION_EX(
+    stencil_value_double_3_type::wrapped_type::get_output_ports_action,
+    stencil_value_double_3_get_output_ports_action);
+HPX_REGISTER_ACTION_EX(
+    stencil_value_double_3_type::wrapped_type::connect_input_ports_action,
+    stencil_value_double_3_connect_input_ports_action);
+HPX_REGISTER_ACTION_EX(
+    stencil_value_double_3_type::wrapped_type::set_functional_component_action,
+    stencil_value_double_3_set_functional_component_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(stencil_value_double_3_type::wrapped_type);
 
-HPX_REGISTER_ACTION(stencil_value_double_5_type::wrapped_type::call_action);
-HPX_REGISTER_ACTION(stencil_value_double_5_type::wrapped_type::get_output_ports_action);
-HPX_REGISTER_ACTION(stencil_value_double_5_type::wrapped_type::connect_input_ports_action);
-HPX_REGISTER_ACTION(stencil_value_double_5_type::wrapped_type::set_functional_component_action);
+HPX_REGISTER_ACTION_EX(
+    stencil_value_double_5_type::wrapped_type::call_action,
+    stencil_value_double_5_call_action);
+HPX_REGISTER_ACTION_EX(
+    stencil_value_double_5_type::wrapped_type::get_output_ports_action,
+    stencil_value_double_5_get_output_ports_action);
+HPX_REGISTER_ACTION_EX(
+    stencil_value_double_5_type::wrapped_type::connect_input_ports_action,
+    stencil_value_double_5_connect_input_ports_action);
+HPX_REGISTER_ACTION_EX(
+    stencil_value_double_5_type::wrapped_type::set_functional_component_action,
+    stencil_value_double_5_set_functional_component_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(stencil_value_double_5_type::wrapped_type);
 

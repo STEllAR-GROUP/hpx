@@ -29,11 +29,21 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the runtime_support actions
-HPX_REGISTER_ACTION(hpx::components::server::runtime_support::factory_properties_action);
-HPX_REGISTER_ACTION(hpx::components::server::runtime_support::create_component_action);
-HPX_REGISTER_ACTION(hpx::components::server::runtime_support::free_component_action);
-HPX_REGISTER_ACTION(hpx::components::server::runtime_support::shutdown_action);
-HPX_REGISTER_ACTION(hpx::components::server::runtime_support::shutdown_all_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::runtime_support::factory_properties_action,
+    factory_properties_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::runtime_support::create_component_action,
+    create_component_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::runtime_support::free_component_action,
+    free_component_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::runtime_support::shutdown_action,
+    shutdown_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::runtime_support::shutdown_all_action,
+    shutdown_all_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::runtime_support);

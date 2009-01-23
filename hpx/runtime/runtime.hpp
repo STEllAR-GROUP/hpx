@@ -71,7 +71,8 @@ namespace hpx
         ///                       taken from the configuration file (hpx.ini).
         /// \param locality_mode  [in] This is the mode the given runtime 
         ///                       instance should be executed in.
-        runtime(std::string const& address, boost::uint16_t port,
+        explicit runtime(std::string const& address = "localhost", 
+                boost::uint16_t port = HPX_PORT,
                 std::string const& agas_address = "", 
                 boost::uint16_t agas_port = 0, mode  locality_mode = console);
 
@@ -118,7 +119,8 @@ namespace hpx
         /// \returns          This function will return the value as returned 
         ///                   as the result of the invocation of the function 
         ///                   object given by the parameter \p func.
-        int start(boost::function<hpx_main_function_type> func, 
+        int start(boost::function<hpx_main_function_type> func =
+                boost::function<hpx_main_function_type>(), 
             std::size_t num_threads = 1, bool blocking = false);
 
         /// \brief Wait for the shutdown action to be executed

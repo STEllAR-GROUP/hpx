@@ -17,13 +17,19 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the future actions
-HPX_REGISTER_ACTION(hpx::lcos::base_lco::set_event_action);
-HPX_REGISTER_ACTION(hpx::lcos::base_lco::set_error_action);
+HPX_REGISTER_ACTION_EX(hpx::lcos::base_lco::set_event_action, base_set_event_action);
+HPX_REGISTER_ACTION_EX(hpx::lcos::base_lco::set_error_action, base_set_error_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION(hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_result_action);
-HPX_REGISTER_ACTION(hpx::lcos::base_lco_with_value<double>::set_result_action);
-HPX_REGISTER_ACTION(hpx::lcos::base_lco_with_value<int>::set_result_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_result_action, 
+    set_result_action_id_type);
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<double>::set_result_action,
+    set_result_action_double);
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<int>::set_result_action,
+    set_result_action_int);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco);

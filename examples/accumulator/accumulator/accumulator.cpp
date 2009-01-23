@@ -28,9 +28,17 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(accumulator_type, accumulator);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the accumulator actions
-HPX_REGISTER_ACTION(accumulator_type::wrapped_type::init_action);
-HPX_REGISTER_ACTION(accumulator_type::wrapped_type::add_action);
-HPX_REGISTER_ACTION(accumulator_type::wrapped_type::query_action);
-HPX_REGISTER_ACTION(accumulator_type::wrapped_type::print_action);
+HPX_REGISTER_ACTION_EX(
+    accumulator_type::wrapped_type::init_action,
+    accumulator_init_action);
+HPX_REGISTER_ACTION_EX(
+    accumulator_type::wrapped_type::add_action,
+    accumulator_add_action);
+HPX_REGISTER_ACTION_EX(
+    accumulator_type::wrapped_type::query_action,
+    accumulator_query_action);
+HPX_REGISTER_ACTION_EX(
+    accumulator_type::wrapped_type::print_action,
+    accumulator_print_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(accumulator_type::wrapped_type);
 
