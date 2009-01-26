@@ -153,7 +153,7 @@ namespace boost { namespace serialization
         try {
             switch (type) {
             case hpx::util::unknown_exception:
-                boost::throw_exception(std::exception(what.c_str()));
+                boost::throw_exception(std::exception());
                 break;
 
             // standard exceptions
@@ -179,19 +179,19 @@ namespace boost { namespace serialization
 
 #ifndef BOOST_NO_TYPEID
             case hpx::util::std_bad_cast:
-                boost::throw_exception(std::bad_cast(what.c_str()));
+                boost::throw_exception(std::bad_cast());
                 break;
 
             case hpx::util::std_bad_typeid:
-                boost::throw_exception(std::bad_typeid(what.c_str()));
+                boost::throw_exception(std::bad_typeid());
                 break;
 #endif
             case hpx::util::std_bad_exception:
-                boost::throw_exception(std::bad_exception(what.c_str()));
+                boost::throw_exception(std::bad_exception());
                 break;
 
             case hpx::util::std_exception:
-                boost::throw_exception(std::exception(what.c_str()));
+                boost::throw_exception(std::exception());
                 break;
 
             // boost exceptions
