@@ -503,6 +503,7 @@ namespace hpx { namespace util { namespace detail
         if (0 == console_prefix) 
         {
             HPX_THROW_EXCEPTION(no_registered_console, 
+                "init_logging::init_logging", 
                 "couldn't retrieve console locality");
             return;
         }

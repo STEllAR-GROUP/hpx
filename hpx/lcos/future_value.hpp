@@ -71,7 +71,8 @@ namespace hpx { namespace lcos { namespace detail
         Result get_data(int slot) 
         {
             if (slot < 0 || slot >= N) {
-                HPX_THROW_EXCEPTION(bad_parameter, "slot index out of range");
+                HPX_THROW_EXCEPTION(bad_parameter, 
+                    "future_value<Result, N>::get_data", "slot index out of range");
                 return Result();
             }
 
@@ -86,8 +87,9 @@ namespace hpx { namespace lcos { namespace detail
             {
                 // an error has been reported in the meantime, throw 
                 error_type e = boost::get<error_type>(d);
-                HPX_THROW_EXCEPTION_EX(
-                    boost::system::system_error, e.first, e.second);
+                HPX_RETHROW_EXCEPTION(e.first.value(), 
+                    "future_value::get_data", e.second);
+                return result_type();
             }
 
             // no error has been reported, return the result
@@ -100,7 +102,9 @@ namespace hpx { namespace lcos { namespace detail
         {
             // set the received result, reset error status
             if (slot < 0 || slot >= N) {
-                HPX_THROW_EXCEPTION(bad_parameter, "slot index out of range");
+                HPX_THROW_EXCEPTION(bad_parameter, 
+                    "future_value::set_data<Result, N>", 
+                    "slot index out of range");
                 return;
             }
 
@@ -122,7 +126,9 @@ namespace hpx { namespace lcos { namespace detail
         void set_error (int slot, hpx::error code, std::string const& msg)
         {
             if (slot < 0 || slot >= N) {
-                HPX_THROW_EXCEPTION(bad_parameter, "slot index out of range");
+                HPX_THROW_EXCEPTION(bad_parameter, 
+                    "future_value<Result, N>::set_error", 
+                    "slot index out of range");
                 return;
             }
 
@@ -188,7 +194,9 @@ namespace hpx { namespace lcos { namespace detail
         void get_data(int slot) 
         {
             if (slot < 0 || slot >= N) {
-                HPX_THROW_EXCEPTION(bad_parameter, "slot index out of range");
+                HPX_THROW_EXCEPTION(bad_parameter, 
+                    "future_value<void, N>::get_data", 
+                    "slot index out of range");
                 return;
             }
 
@@ -203,8 +211,8 @@ namespace hpx { namespace lcos { namespace detail
             {
                 // an error has been reported in the meantime, throw 
                 error_type e = boost::get<error_type>(d);
-                HPX_THROW_EXCEPTION_EX(
-                    boost::system::system_error, e.first, e.second);
+                HPX_RETHROW_EXCEPTION(e.first.value(), 
+                    "future_value::get_data", e.second);
             }
 
             // no error has been reported, just return 
@@ -216,7 +224,9 @@ namespace hpx { namespace lcos { namespace detail
         {
             // set the received result, reset error status
             if (slot < 0 || slot >= N) {
-                HPX_THROW_EXCEPTION(bad_parameter, "slot index out of range");
+                HPX_THROW_EXCEPTION(bad_parameter, 
+                    "future_value<void, N>::set_data", 
+                    "slot index out of range");
                 return;
             }
 
@@ -238,7 +248,9 @@ namespace hpx { namespace lcos { namespace detail
         void set_error (int slot, hpx::error code, std::string const& msg)
         {
             if (slot < 0 || slot >= N) {
-                HPX_THROW_EXCEPTION(bad_parameter, "slot index out of range");
+                HPX_THROW_EXCEPTION(bad_parameter, 
+                    "future_value<void, N>::set_error", 
+                    "slot index out of range");
                 return;
             }
 

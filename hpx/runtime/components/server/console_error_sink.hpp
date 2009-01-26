@@ -1,0 +1,30 @@
+//  Copyright (c) 2007-2009 Hartmut Kaiser
+// 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#if !defined(HPX_COMPONENTS_CONSOLE_ERROR_SINK_JAN_23_2009_0226PM)
+#define HPX_COMPONENTS_CONSOLE_ERROR_SINK_JAN_23_2009_0226PM
+
+#include <string>
+
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/actions/plain_action.hpp>
+
+#include <boost/exception_ptr.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace components { namespace server 
+{
+    ///////////////////////////////////////////////////////////////////////////
+    // console logging happens here
+    void console_error_sink(boost::uint32_t, boost::exception_ptr const&);
+
+    typedef actions::plain_direct_action2<
+        boost::uint32_t, boost::exception_ptr const&, console_error_sink
+    > console_error_sink_action;
+
+}}}
+
+#endif

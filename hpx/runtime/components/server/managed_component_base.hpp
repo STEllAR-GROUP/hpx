@@ -150,7 +150,9 @@ namespace hpx { namespace components
                 strm << "component is NULL (" 
                      << components::get_component_type_name(get_component_type()) 
                      << ")";
-                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+                HPX_THROW_EXCEPTION(invalid_status, 
+                    "managed_component<Component, Derived>::get", 
+                    HPX_OSSTREAM_GETSTRING(strm));
             }
             return component_;
         }
@@ -161,7 +163,9 @@ namespace hpx { namespace components
                 strm << "component is NULL (" 
                      << components::get_component_type_name(get_component_type())
                      << ")";
-                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+                HPX_THROW_EXCEPTION(invalid_status, 
+                    "managed_component<Component, Derived>::get const", 
+                    HPX_OSSTREAM_GETSTRING(strm));
             }
             return component_;
         }
@@ -305,7 +309,9 @@ namespace hpx { namespace components
                 strm << "component is NULL (" 
                      << components::get_component_type_name(get_component_type())
                      << ")";
-                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+                HPX_THROW_EXCEPTION(invalid_status, 
+                    "managed_component<Component, Derived>::operator->", 
+                    HPX_OSSTREAM_GETSTRING(strm));
             }
             return component_;
         }
@@ -317,7 +323,9 @@ namespace hpx { namespace components
                 strm << "component is NULL (" 
                      << components::get_component_type_name(get_component_type())
                      << ")";
-                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+                HPX_THROW_EXCEPTION(invalid_status, 
+                    "managed_component<Component, Derived>::operator-> const", 
+                    HPX_OSSTREAM_GETSTRING(strm));
             }
             return component_;
         }
@@ -330,7 +338,9 @@ namespace hpx { namespace components
                 strm << "component is NULL (" 
                      << components::get_component_type_name(get_component_type())
                      << ")";
-                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+                HPX_THROW_EXCEPTION(invalid_status, 
+                    "managed_component<Component, Derived>::operator*", 
+                    HPX_OSSTREAM_GETSTRING(strm));
             }
             return *component_;
         }
@@ -342,7 +352,9 @@ namespace hpx { namespace components
                 strm << "component is NULL (" 
                      << components::get_component_type_name(get_component_type())
                      << ")";
-                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+                HPX_THROW_EXCEPTION(invalid_status, 
+                    "managed_component<Component, Derived>::operator* const", 
+                    HPX_OSSTREAM_GETSTRING(strm));
             }
             return *component_;
         }

@@ -74,7 +74,28 @@ namespace hpx { namespace naming
         ///                   if this locality already got a prefix assigned in 
         ///                   an earlier call. Any error results in an exception 
         ///                   thrown from this function.
+        ///
+        /// \throws           hpx#exception
         bool get_prefix(locality const& l, id_type& prefix) const;
+
+        /// \brief Get unique prefix usable as locality id (locality prefix)
+        ///
+        /// Every locality needs to have an unique locality id, which may be 
+        /// used to issue unique global ids without having to consult the AGAS
+        /// server for every id to generate.
+        /// 
+        /// \param l          [in] The locality the locality id needs to be 
+        ///                   generated for. Repeating calls using the same 
+        ///                   locality results in identical prefix values.
+        /// \param prefix     [out] The generated prefix value uniquely 
+        ///                   identifying the given locality. This is valid 
+        ///                   only, if the return value of this function is 
+        ///                   true.
+        /// \param ec         [out] this represents the error status on exit.
+        ///
+        /// \note             This function doesn't throw but returns the 
+        ///                   result code using the parameter \a ec.
+        void get_prefix(locality const& l, id_type& prefix, error_code& ec) const;
 
         /// \brief Get locality prefix of the console locality
         ///
@@ -246,10 +267,35 @@ namespace hpx { namespace naming
         ///                   function \a bind. Do not use this function to 
         ///                   unbind any of the global ids bound using 
         ///                   \a bind_range.
+        ///
+        /// \throws           hpx#exception
         bool unbind(id_type const& id) const
         {
             address addr;   // ignore the return value
             return unbind_range(id, 1, addr);
+        }
+
+        /// \brief Unbind a global address
+        ///
+        /// Remove the association of the given global address with any local 
+        /// address, which was bound to this global address. Additionally it 
+        /// returns the local address which was bound at the time of this call.
+        /// 
+        /// \param id         [in] The global address (id) for which the 
+        ///                   association has to be removed.
+        /// \param ec         [out] this represents the error status on exit.
+        ///
+        /// \note             You can unbind only global ids bound using the 
+        ///                   function \a bind. Do not use this function to 
+        ///                   unbind any of the global ids bound using 
+        ///                   \a bind_range.
+        ///
+        /// \note             This function doesn't throw but returns the 
+        ///                   result code using the parameter \a ec.
+        void unbind(id_type const& id, error_code& ec) const
+        {
+            address addr;   // ignore the return value
+            unbind_range(id, 1, addr, ec);
         }
 
         /// \brief Unbind a global address
@@ -333,8 +379,36 @@ namespace hpx { namespace naming
         ///                   function \a bind_range. Do not use this function 
         ///                   to unbind any of the global ids bound using 
         ///                   \a bind.
+        ///
+        /// \throws           hpx#exception
         bool unbind_range(id_type const& lower_id, std::size_t count, 
             address& addr) const;
+
+        /// \brief Unbind the given range of global ids
+        ///
+        /// \param lower_id   [in] The lower bound of the assigned id range.
+        ///                   The value must the first id of the range as 
+        ///                   specified to the corresponding call to 
+        ///                   \a bind_range. 
+        /// \param count      [in] The number of consecutive global ids to unbind
+        ///                   starting at \a lower_id. This number must be 
+        ///                   identical to the number of global ids bound by 
+        ///                   the corresponding call to \a bind_range
+        /// \param addr       [out] The local address which was associated with 
+        ///                   the given global address (id).
+        ///                   This is valid only if the return value of this 
+        ///                   function is true.
+        /// \param ec         [out] this represents the error status on exit.
+        ///
+        /// \note             You can unbind only global ids bound using the 
+        ///                   function \a bind_range. Do not use this function 
+        ///                   to unbind any of the global ids bound using 
+        ///                   \a bind.
+        ///
+        /// \note             This function doesn't throw but returns the 
+        ///                   result code using the parameter \a ec.
+        void unbind_range(id_type const& lower_id, std::size_t count, 
+            address& addr, error_code& ec) const;
 
         /// \brief Resolve a given global address (id) to its associated local 
         ///        address

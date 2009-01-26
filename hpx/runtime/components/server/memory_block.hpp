@@ -127,7 +127,9 @@ namespace hpx { namespace components
                 strm << "memory_block_data data is NULL (" 
                      << components::get_component_type_name(component_memory_block) 
                      << ")";
-                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+                HPX_THROW_EXCEPTION(invalid_status, 
+                    "memory_block_data::get_ptr", 
+                    HPX_OSSTREAM_GETSTRING(strm));
             }
             return data_->get_ptr();
         }
@@ -138,7 +140,9 @@ namespace hpx { namespace components
                 strm << "memory_block_data data is NULL (" 
                      << components::get_component_type_name(component_memory_block)
                      << ")";
-                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+                HPX_THROW_EXCEPTION(invalid_status, 
+                    "memory_block_data::get_ptr const", 
+                    HPX_OSSTREAM_GETSTRING(strm));
             }
             return data_->get_ptr();
         }
@@ -150,7 +154,9 @@ namespace hpx { namespace components
                 strm << "memory_block_data data is NULL (" 
                      << components::get_component_type_name(component_memory_block)
                      << ")";
-                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+                HPX_THROW_EXCEPTION(invalid_status, 
+                    "memory_block_data::get_size", 
+                    HPX_OSSTREAM_GETSTRING(strm));
             }
             return data_->get_size();
         }
@@ -169,7 +175,9 @@ namespace hpx { namespace components
                 strm << "memory_block_data data is NULL (" 
                      << components::get_component_type_name(component_memory_block) 
                      << ")";
-                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+                HPX_THROW_EXCEPTION(invalid_status, 
+                    "memory_block_data::set", 
+                    HPX_OSSTREAM_GETSTRING(strm));
             }
             if (!data_->is_master())
             {
@@ -177,7 +185,9 @@ namespace hpx { namespace components
                 strm << "memory_block_data data is not checked out (" 
                      << components::get_component_type_name(component_memory_block)
                      << ")";
-                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+                HPX_THROW_EXCEPTION(invalid_status, 
+                    "memory_block_data::set", 
+                    HPX_OSSTREAM_GETSTRING(strm));
             }
             *reinterpret_cast<T*>(data_->get_ptr()) = val;
         }
@@ -375,7 +385,9 @@ namespace hpx { namespace components { namespace server
                 strm << "component is NULL (" 
                      << components::get_component_type_name(component_memory_block) 
                      << ")";
-                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+                HPX_THROW_EXCEPTION(invalid_status, 
+                    "memory_block::get", 
+                    HPX_OSSTREAM_GETSTRING(strm));
             }
             return static_cast<detail::memory_block*>(component_.get());
         }
@@ -386,7 +398,9 @@ namespace hpx { namespace components { namespace server
                 strm << "component is NULL (" 
                      << components::get_component_type_name(component_memory_block)
                      << ")";
-                HPX_THROW_EXCEPTION(invalid_status, HPX_OSSTREAM_GETSTRING(strm));
+                HPX_THROW_EXCEPTION(invalid_status, 
+                    "memory_block::get const", 
+                    HPX_OSSTREAM_GETSTRING(strm));
             }
             return static_cast<detail::memory_block const*>(component_.get());
         }

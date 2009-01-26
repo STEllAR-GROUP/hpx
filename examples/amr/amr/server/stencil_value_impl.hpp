@@ -232,7 +232,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::vector<naming::id_type> const& gids)
     {
         if (gids.size() < N) {
-            HPX_THROW_EXCEPTION(bad_parameter, 
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "stencil_value<N>::connect_input_ports", 
                 "insufficient number of gid's supplied");
             return;
         }

@@ -68,7 +68,8 @@ namespace hpx { namespace naming
 
         if (errors.get_error_count() == tried) {
             // all tries failed
-            HPX_THROW_EXCEPTION(network_error, errors.get_message());
+            HPX_THROW_EXCEPTION(network_error, 
+                "resolver_server::resolver_server", errors.get_message());
         }
     }
 
@@ -113,7 +114,8 @@ namespace hpx { namespace naming
 
         if (errors.get_error_count() == tried) {
             // all attempts failed
-            HPX_THROW_EXCEPTION(network_error, errors.get_message());
+            HPX_THROW_EXCEPTION(network_error, 
+                "resolver_server::resolver_server", errors.get_message());
         }
     }
 

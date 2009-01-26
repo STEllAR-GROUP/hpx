@@ -133,13 +133,19 @@ namespace hpx { namespace threads
             set_state(at_time, id, state, stateex);
     }
 
-    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     thread_id_type set_thread_state(thread_id_type id, 
         boost::posix_time::time_duration const& after, thread_state state,
         thread_state_ex stateex)
     {
         return hpx::applier::get_applier().get_thread_manager().
             set_state(after, id, state, stateex);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void report_error(boost::exception_ptr const& e)
+    {
+          hpx::applier::get_applier().get_thread_manager().report_error(e);
     }
 
 }}

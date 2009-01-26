@@ -174,7 +174,9 @@ namespace hpx { namespace naming { namespace server
         double get_statictics(std::size_t i) const
         {
             if (i >= command_lastcommand)
-                HPX_THROW_EXCEPTION(bad_parameter, "unknown AGAS command");
+                HPX_THROW_EXCEPTION(bad_parameter, 
+                    "reply::get_statictics", 
+                    "unknown AGAS command");
             return statistics_[i];
         }
 

@@ -9,11 +9,12 @@
 #include <hpx/hpx_fwd.hpp>
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/exception_ptr.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads 
 {
-    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     /// \brief  Set the thread state of the \a thread referenced by the 
     ///         thread_id \a id.
     ///
@@ -53,7 +54,7 @@ namespace hpx { namespace threads
         boost::posix_time::ptime const& at_time, 
         thread_state state = pending, thread_state_ex stateex = wait_timeout);
 
-    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     /// \brief  Set the thread state of the \a thread referenced by the 
     ///         thread_id \a id.
     ///
@@ -65,10 +66,12 @@ namespace hpx { namespace threads
     /// \param stateex
     ///
     /// \returns
-    ///////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT thread_id_type set_thread_state(thread_id_type id, 
         boost::posix_time::time_duration const& after_duration,
         thread_state state = pending, thread_state_ex stateex = wait_timeout);
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_API_EXPORT void report_error(boost::exception_ptr const& e);
 
 }}
 

@@ -21,6 +21,7 @@
 #include <boost/serialization/void_cast.hpp>
 
 #include <hpx/runtime/get_lva.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -61,13 +62,13 @@ namespace hpx { namespace actions
         /// Destructor
         virtual ~base_action() {}
 
-        /// The function \a get_action_code returns the code of the action 
-        /// instance it is called for.
-        virtual int get_action_code() const = 0;
-
         /// The function \a get_component_type returns the \a component_type 
         /// of the component this action belongs to.
         virtual int get_component_type() const = 0;
+
+        /// The function \a get_action_code returns the code of the action 
+        /// instance it is called for.
+        virtual int get_action_code() const = 0;
 
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
@@ -176,6 +177,7 @@ namespace hpx { namespace actions
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
                 cont->trigger_error(e);
+                threads::report_error(boost::current_exception());
             }
             return threads::terminated;
         }
@@ -217,6 +219,7 @@ namespace hpx { namespace actions
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
                 cont->trigger_error(e);
+                threads::report_error(boost::current_exception());
             }
             return threads::terminated;
         }

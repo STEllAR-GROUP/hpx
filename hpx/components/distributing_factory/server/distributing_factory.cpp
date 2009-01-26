@@ -42,6 +42,7 @@ namespace hpx { namespace components { namespace server
         if (prefixes.empty())
         {
             HPX_THROW_EXCEPTION(bad_component_type, 
+                "distributing_factory::create_components",
                 "attempt to create component instance of unknown type: " +
                 components::get_component_type_name(type));
         }

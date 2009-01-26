@@ -64,7 +64,8 @@ namespace hpx { namespace parcelset
 
         if (errors.get_error_count() == tried) {
             // all attempts failed
-            HPX_THROW_EXCEPTION(network_error, errors.get_message());
+            HPX_THROW_EXCEPTION(network_error, 
+                "parcelport::parcelport", errors.get_message());
         }
     }
 

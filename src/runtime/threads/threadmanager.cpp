@@ -42,10 +42,12 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     threadmanager::threadmanager(util::io_service_pool& timer_pool,
-            boost::function<void()> start_thread, boost::function<void()> stop,
+            boost::function<void()> start_thread, boost::function<void()> stop, 
+            boost::function<void(boost::exception_ptr const&)> on_error,
             std::size_t max_count)
       : max_count_(max_count), running_(false), wait_count_(0),
-        timer_pool_(timer_pool), start_thread_(start_thread), stop_(stop),
+        timer_pool_(timer_pool), 
+        start_thread_(start_thread), stop_(stop), on_error_(on_error),
         work_items_("work_items"), terminated_items_("terminated_items"), 
         active_set_state_("active_set_state"), new_tasks_("new_tasks")
 #if HPX_DEBUG != 0
@@ -94,12 +96,14 @@ namespace hpx { namespace threads
             HPX_OSSTREAM strm;
             strm << "invalid initial state: " 
                  << get_thread_state_name(initial_state);
-            HPX_THROW_EXCEPTION(bad_parameter, HPX_OSSTREAM_GETSTRING(strm));
+            HPX_THROW_EXCEPTION(bad_parameter, 
+                "threadmanager::register_thread", HPX_OSSTREAM_GETSTRING(strm));
             return invalid_thread_id;
         }
         if (0 == description)
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "description is NULL");
+            HPX_THROW_EXCEPTION(bad_parameter, 
+                "threadmanager::register_thread", "description is NULL");
             return invalid_thread_id;
         }
 
@@ -121,6 +125,7 @@ namespace hpx { namespace threads
 
         if (!p.second) {
             HPX_THROW_EXCEPTION(hpx::no_success, 
+                "threadmanager::register_thread", 
                 "Couldn't add new thread to the map of threads");
             return invalid_thread_id;
         }
@@ -155,12 +160,14 @@ namespace hpx { namespace threads
             HPX_OSSTREAM strm;
             strm << "invalid initial state: " 
                  << get_thread_state_name(initial_state);
-            HPX_THROW_EXCEPTION(bad_parameter, HPX_OSSTREAM_GETSTRING(strm));
+            HPX_THROW_EXCEPTION(bad_parameter, 
+                "threadmanager::register_work", HPX_OSSTREAM_GETSTRING(strm));
             return;
         }
         if (0 == description)
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "description is NULL");
+            HPX_THROW_EXCEPTION(bad_parameter, 
+                "threadmanager::register_work", "description is NULL");
             return;
         }
 
@@ -203,6 +210,7 @@ namespace hpx { namespace threads
 
             if (!p.second) {
                 HPX_THROW_EXCEPTION(hpx::no_success, 
+                    "threadmanager::add_new", 
                     "Couldn't add new thread to the map of threads");
                 return false;
             }
@@ -292,7 +300,8 @@ namespace hpx { namespace threads
         if (new_state == active) {
             HPX_OSSTREAM strm;
             strm << "invalid new state: " << get_thread_state_name(new_state);
-            HPX_THROW_EXCEPTION(bad_parameter, HPX_OSSTREAM_GETSTRING(strm));
+            HPX_THROW_EXCEPTION(bad_parameter, 
+                "threadmanager::set_state", HPX_OSSTREAM_GETSTRING(strm));
             return unknown;
         }
 
@@ -562,6 +571,7 @@ namespace hpx { namespace threads
             LFATAL_ << "tfunc(" << num_thread 
                     << "): caught hpx::exception: " 
                     << e.what() << ", aborted execution";
+            report_error(boost::current_exception());
             if (stop_) 
                 stop_();
             return;
@@ -570,6 +580,7 @@ namespace hpx { namespace threads
             LFATAL_ << "tfunc(" << num_thread 
                     << "): caught boost::system::system_error: " 
                     << e.what() << ", aborted execution";
+            report_error(boost::current_exception());
             if (stop_) 
                 stop_();
             return;
@@ -578,6 +589,7 @@ namespace hpx { namespace threads
             LFATAL_ << "tfunc(" << num_thread 
                     << "): caught std::exception: " 
                     << e.what() << ", aborted execution";
+            report_error(boost::current_exception());
             if (stop_) 
                 stop_();
             return;
@@ -585,6 +597,7 @@ namespace hpx { namespace threads
         catch (...) {
             LFATAL_ << "tfunc(" << num_thread 
                     << "): caught unexpected exception, aborted execution";
+            report_error(boost::current_exception());
             if (stop_) 
                 stop_();
             return;
@@ -815,7 +828,8 @@ namespace hpx { namespace threads
         LTM_(info) << "run: creating " << num_threads << " OS thread(s)";
 
         if (0 == num_threads) {
-            HPX_THROW_EXCEPTION(bad_parameter, "number of threads is zero");
+            HPX_THROW_EXCEPTION(bad_parameter, 
+                "threadmanager::run", "number of threads is zero");
         }
 
         mutex_type::scoped_lock lk(mtx_);

@@ -270,7 +270,7 @@ section* section::get_section (std::string const& sec_name)
         if (name.empty())
             name = "<root>";
 
-        HPX_THROW_EXCEPTION(bad_parameter, 
+        HPX_THROW_EXCEPTION(bad_parameter, "section::get_section", 
             "No such section (" + sec_name + ") in section: " + name);
         return NULL;
     }
@@ -279,7 +279,7 @@ section* section::get_section (std::string const& sec_name)
     if (it != sections_.end())
         return &((*it).second);
 
-    HPX_THROW_EXCEPTION(bad_parameter, 
+    HPX_THROW_EXCEPTION(bad_parameter, "section::get_section", 
         "No such section (" + sec_name + ") in section: " + get_name());
     return NULL;
 }
@@ -301,7 +301,7 @@ section const* section::get_section (std::string const& sec_name) const
         if (name.empty())
             name = "<root>";
 
-        HPX_THROW_EXCEPTION(bad_parameter, 
+        HPX_THROW_EXCEPTION(bad_parameter, "section::get_section", 
             "No such section (" + sec_name + ") in section: " + name);
         return NULL;
     }
@@ -310,7 +310,7 @@ section const* section::get_section (std::string const& sec_name) const
     if (it != sections_.end())
         return &((*it).second);
 
-    HPX_THROW_EXCEPTION(bad_parameter, 
+    HPX_THROW_EXCEPTION(bad_parameter, "section::get_section", 
         "No such section (" + sec_name + ") in section: " + get_name());
     return NULL;
 }
@@ -358,7 +358,7 @@ std::string section::get_entry (std::string const& key) const
             return (*cit).second.get_entry(sub_key);
         }
 
-        HPX_THROW_EXCEPTION(bad_parameter, 
+        HPX_THROW_EXCEPTION(bad_parameter, "section::get_entry", 
             "No such key (" + key + ") in section: " + get_name());
         return "";
     }
@@ -370,7 +370,7 @@ std::string section::get_entry (std::string const& key) const
         return (*cit).second;
     }
 
-    HPX_THROW_EXCEPTION(bad_parameter, 
+    HPX_THROW_EXCEPTION(bad_parameter, "section::get_entry", 
         "No such section (" + key + ") in section: " + get_name());
     return "";
 }
@@ -537,10 +537,10 @@ void section::line_msg(std::string const& msg, std::string const& file,
 {
     if (lnum > 0)
     {
-        HPX_THROW_EXCEPTION(no_success, 
+        HPX_THROW_EXCEPTION(no_success, "section::line_msg", 
             msg + " " + file + ":" + boost::lexical_cast<std::string>(lnum));
     }
-    HPX_THROW_EXCEPTION(no_success, msg + " " + file);
+    HPX_THROW_EXCEPTION(no_success, "section::line_msg", msg + " " + file);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

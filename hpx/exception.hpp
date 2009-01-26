@@ -115,6 +115,21 @@ namespace hpx
             }
         };
 
+        // this doesn't add any text to the exception what() message
+        class hpx_category_rethrow : public boost::system::error_category
+        {
+        public:
+            const char* name() const
+            {
+                return "";
+            }
+
+            std::string message(int value) const
+            {
+                return "";
+            }
+        };
+
     } // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -125,18 +140,68 @@ namespace hpx
         return instance;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    inline boost::system::error_code make_error_code(error e)
+    inline boost::system::error_category const& get_hpx_rethrow_category()
     {
-        return boost::system::error_code(
-            static_cast<int>(e), get_hpx_category());
+        static detail::hpx_category_rethrow instance;
+        return instance;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline boost::system::error_condition make_error_condition(error e)
+    enum throwmode 
     {
-        return boost::system::error_condition(
-            static_cast<int>(e), get_hpx_category());
+        plain = 0,
+        rethrow = 1,
+    };
+
+    inline boost::system::error_code 
+    make_error_code(error e, throwmode mode = plain)
+    {
+        return boost::system::error_code(static_cast<int>(e), 
+            mode == rethrow ? get_hpx_rethrow_category() : get_hpx_category());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline boost::system::error_condition 
+        make_error_condition(error e, throwmode mode)
+    {
+        return boost::system::error_condition(static_cast<int>(e), 
+            mode == rethrow ? get_hpx_rethrow_category() : get_hpx_category());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    class error_code : public boost::system::error_code
+    {
+    public:
+        explicit error_code(throwmode mode = plain)
+          : boost::system::error_code(make_error_code(success, mode))
+        {}
+
+        explicit error_code(error e, char const* msg = "", throwmode mode = plain)
+          : boost::system::error_code(make_error_code(e, mode))
+          , message_(msg)
+        {}
+
+        error_code(error e, std::string const& msg, throwmode mode = plain)
+          : boost::system::error_code(make_error_code(e, mode))
+          , message_(msg)
+        {}
+
+        std::string const& get_message() const { return message_; }
+
+    private:
+        std::string message_;
+    };
+
+    inline error_code 
+    make_error_code(error e, char const* msg, throwmode mode = plain)
+    {
+        return error_code(e, msg, mode);
+    }
+
+    inline error_code 
+    make_error_code(error e, std::string const& msg, throwmode mode = plain)
+    {
+        return error_code(e, msg, mode);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -144,7 +209,7 @@ namespace hpx
     {
     public:
         explicit exception(error e) 
-          : boost::system::system_error(make_error_code(e))
+          : boost::system::system_error(make_error_code(e, plain))
         {
             BOOST_ASSERT(e >= success && e < last_error);
             LERR_(error) << "created exception: " << this->what();
@@ -154,14 +219,14 @@ namespace hpx
         {
             LERR_(error) << "created exception: " << this->what();
         }
-        exception(error e, char const* msg) 
-          : boost::system::system_error(make_error_code(e), msg)
+        exception(error e, char const* msg, throwmode mode = plain) 
+          : boost::system::system_error(make_error_code(e, mode), msg)
         {
             BOOST_ASSERT(e >= success && e < last_error);
             LERR_(error) << "created exception: " << this->what();
         }
-        exception(error e, std::string msg) 
-          : boost::system::system_error(make_error_code(e), msg)
+        exception(error e, std::string const& msg, throwmode mode = plain) 
+          : boost::system::system_error(make_error_code(e, mode), msg)
         {
             BOOST_ASSERT(e >= success && e < last_error);
             LERR_(error) << "created exception: " << this->what();
@@ -176,6 +241,17 @@ namespace hpx
                 this->boost::system::system_error::code().value());
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // types needed to add additional information to the thrown exceptions
+    namespace detail
+    {
+        struct tag_throw_file {};
+        struct tag_throw_line {};
+
+        typedef boost::error_info<struct tag_throw_file, std::string> throw_file;
+        typedef boost::error_info<struct tag_throw_line, int> throw_line;
+    }
 
 ///////////////////////////////////////////////////////////////////////////////
 }
@@ -199,23 +275,31 @@ namespace boost { namespace system
 ///////////////////////////////////////////////////////////////////////////////
 // helper macro allowing to prepend file name and line number to a generated 
 // exception
-#define HPX_THROW_EXCEPTION_EX(except, errcode, msg)                          \
+#define HPX_THROW_EXCEPTION_EX(except, errcode, func, msg, mode)              \
     {                                                                         \
         std::string __s;                                                      \
+        boost::filesystem::path __p(__FILE__, boost::filesystem::native);     \
         if (LHPX_ENABLED(debug))                                              \
         {                                                                     \
-            boost::filesystem::path __p(__FILE__, boost::filesystem::native); \
             __s = hpx::util::leaf(__p);                                       \
             __s += std::string("(") + BOOST_PP_STRINGIZE(__LINE__) + "): ";   \
         }                                                                     \
         __s += msg;                                                           \
-        boost::throw_exception(except(errcode, __s));                         \
+        throw boost::enable_current_exception(boost::enable_error_info(       \
+                except((hpx::error)errcode, __s, mode)) <<                    \
+            boost::throw_function(func) <<                                    \
+            hpx::detail::throw_file(__p.string()) <<                          \
+            hpx::detail::throw_line(__LINE__));                               \
     }                                                                         \
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_THROW_EXCEPTION(errcode, msg)                                     \
-    HPX_THROW_EXCEPTION_EX(hpx::exception, errcode, msg)                      \
+#define HPX_THROW_EXCEPTION(errcode, f, msg)                                  \
+    HPX_THROW_EXCEPTION_EX(hpx::exception, errcode, f, msg, hpx::plain)       \
+    /**/
+
+#define HPX_RETHROW_EXCEPTION(errcode, f, msg)                                \
+    HPX_THROW_EXCEPTION_EX(hpx::exception, errcode, f, msg, hpx::rethrow)     \
     /**/
 
 #include <hpx/config/warnings_suffix.hpp>

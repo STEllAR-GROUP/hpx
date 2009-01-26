@@ -76,6 +76,7 @@ namespace hpx { namespace components { namespace server { namespace detail
 
         delete c;
         HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
+            "create_memory_block", 
             "global id is already bound to a different "
             "component instance");
         return naming::invalid_id;

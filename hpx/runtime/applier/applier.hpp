@@ -145,6 +145,7 @@ namespace hpx { namespace applier
                 HPX_OSSTREAM strm;
                 strm << gid;
                 HPX_THROW_EXCEPTION(unknown_component_address, 
+                    "applier::address_is_local", 
                     HPX_OSSTREAM_GETSTRING(strm));
             }
             return addr.locality_ == parcel_handler_.here();

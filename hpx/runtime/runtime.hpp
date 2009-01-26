@@ -137,6 +137,12 @@ namespace hpx
         ///                   all internal work to be completed.
         void stop(bool blocking = true);
 
+        /// \brief Report a non-recoverable error to the runtime system
+        ///
+        /// \param e          [in] This is an instance encapsulating an 
+        ///                   exception which lead to this function call.
+        void report_error(boost::exception_ptr const& e);
+
         /// \brief Run the HPX runtime system, use the given function for the 
         ///        main \a thread and block waiting for all threads to 
         ///        finish

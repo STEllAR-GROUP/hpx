@@ -35,7 +35,7 @@ namespace hpx { namespace lcos
         virtual void set_error (hpx::error code, std::string const& msg)
         {
             // just rethrow the exception
-            HPX_THROW_EXCEPTION(code, msg);
+            HPX_RETHROW_EXCEPTION(code, "base_lco::set_error", msg);
         }
 
     public:

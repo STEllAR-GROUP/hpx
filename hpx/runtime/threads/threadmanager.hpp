@@ -91,6 +91,8 @@ namespace hpx { namespace threads
         threadmanager(util::io_service_pool& timer_pool, 
             boost::function<void()> start_thread = boost::function<void()>(),
             boost::function<void()> stop = boost::function<void()>(),
+            boost::function<void(boost::exception_ptr const&)> on_error =
+                boost::function<void(boost::exception_ptr const&)>(),
             std::size_t max_count = max_thread_count);
         ~threadmanager();
 
@@ -254,6 +256,13 @@ namespace hpx { namespace threads
             cond_.notify_all();
         }
 
+        /// 
+        void report_error(boost::exception_ptr const& e)
+        {
+            if (on_error_)
+                on_error_(e);
+        }
+
     protected:
         /// This thread function is used by the at_timer thread below to trigger
         /// the required action.
@@ -299,7 +308,8 @@ namespace hpx { namespace threads
         util::io_service_pool& timer_pool_; ///< used for timed set_state
 
         boost::function<void()> start_thread_;    ///< function to call for each created thread
-        boost::function<void()> stop_;  ///< function to call in case of error
+        boost::function<void()> stop_;            ///< function to call in case of unexpected stop
+        boost::function<void(boost::exception_ptr)> on_error_;  ///< function to call in case of error
 
 #if HPX_DEBUG != 0
         boost::lockfree::atomic_int<long> thread_count_;

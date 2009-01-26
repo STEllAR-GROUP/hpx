@@ -73,6 +73,7 @@ namespace hpx { namespace components { namespace server
                     "invalid/unknown type: "
                  << components::get_component_type_name(type);
             HPX_THROW_EXCEPTION(hpx::bad_component_type, 
+                "runtime_support::factory_properties",
                 HPX_OSSTREAM_GETSTRING(strm));
             return factory_invalid;
         }
@@ -93,6 +94,7 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to create component instance of invalid/unknown type: "
                  << components::get_component_type_name(type);
             HPX_THROW_EXCEPTION(hpx::bad_component_type, 
+                "runtime_support::create_component",
                 HPX_OSSTREAM_GETSTRING(strm));
             return naming::invalid_id;
         }
@@ -131,6 +133,7 @@ namespace hpx { namespace components { namespace server
                  << " of invalid/unknown type: " 
                  << components::get_component_type_name(type);
             HPX_THROW_EXCEPTION(hpx::bad_component_type, 
+                "runtime_support::free_component",
                 HPX_OSSTREAM_GETSTRING(strm));
             return;
         }

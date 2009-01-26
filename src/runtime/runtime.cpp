@@ -13,6 +13,7 @@
 
 #include <hpx/include/runtime.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/runtime/components/console_error_sink.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure the system gets properly shut down while handling Ctrl-C and other
@@ -56,7 +57,8 @@ namespace hpx
         parcel_port_(parcel_pool_, naming::locality(address, port)),
         thread_manager_(timer_pool_, 
             boost::bind(&runtime::init_applier, This()),
-            boost::bind(&runtime::stop, This(), false)),
+            boost::bind(&runtime::stop, This(), false),
+            boost::bind(&runtime::report_error, This(), _1)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
         applier_(parcel_handler_, thread_manager_, 
@@ -74,7 +76,8 @@ namespace hpx
         parcel_port_(parcel_pool_, address),
         thread_manager_(timer_pool_, 
             boost::bind(&runtime::init_applier, This()),
-            boost::bind(&runtime::stop, This(), false)),
+            boost::bind(&runtime::stop, This(), false),
+            boost::bind(&runtime::report_error, This(), _1)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
         applier_(parcel_handler_, thread_manager_, 
@@ -91,7 +94,8 @@ namespace hpx
         parcel_port_(parcel_pool_, address),
         thread_manager_(timer_pool_, 
             boost::bind(&runtime::init_applier, This()),
-            boost::bind(&runtime::stop, This(), false)),
+            boost::bind(&runtime::stop, This(), false),
+            boost::bind(&runtime::report_error, This(), _1)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
         applier_(parcel_handler_, thread_manager_, 
@@ -234,14 +238,11 @@ namespace hpx
     {
         LRT_(info) << "runtime: about to stop services";
 
-        try {
-            // unregister the runtime_support and memory instances from the AGAS 
-            agas_client_.unbind(applier_.get_runtime_support_gid());
-            agas_client_.unbind(applier_.get_memory_gid());
-        }
-        catch(hpx::exception const&) {
-            ; // ignore errors during system shutdown (AGAS might be down already)
-        }
+        // unregister the runtime_support and memory instances from the AGAS 
+        // ignore errors, as AGAS might be down already
+        error_code ec;
+        agas_client_.unbind(applier_.get_runtime_support_gid(), ec);
+        agas_client_.unbind(applier_.get_memory_gid(), ec);
 
         // stop runtime services (threads)
         thread_manager_.stop(blocking);
@@ -250,6 +251,18 @@ namespace hpx
         runtime_support_.stop();        // re-activate main thread 
 
         LRT_(info) << "runtime: stopped all services";
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void runtime::report_error(boost::exception_ptr const& e)
+    {
+        // first report this error to the console
+        naming::id_type console_prefix;
+        if (agas_client_.get_console_prefix(console_prefix))
+        {
+            components::console_error_sink(console_prefix, 
+                parcel_handler_.get_prefix(), e);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

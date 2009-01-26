@@ -65,11 +65,13 @@ set (hpxlib_HEADERS
     ${hpx_SOURCE_DIR}/hpx/runtime/components/component_type.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/component_factory_base.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/component_factory.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/components/console_error_sink.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/console_logging.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/derived_component_factory.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/memory_block.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/runtime_support.hpp
 
+    ${hpx_SOURCE_DIR}/hpx/runtime/components/server/console_error_sink.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/server/console_logging.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/server/manage_component.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/server/managed_component_base.hpp
@@ -130,6 +132,7 @@ set (hpxlib_HEADERS
     ${hpx_SOURCE_DIR}/hpx/util/portable_binary_oarchive.hpp
     ${hpx_SOURCE_DIR}/hpx/util/runtime_configuration.hpp
     ${hpx_SOURCE_DIR}/hpx/util/safe_bool.hpp
+    ${hpx_SOURCE_DIR}/hpx/util/serialize_exception.hpp
     ${hpx_SOURCE_DIR}/hpx/util/serialize_sequence.hpp
     ${hpx_SOURCE_DIR}/hpx/util/static.hpp
     ${hpx_SOURCE_DIR}/hpx/util/time_logger.hpp
@@ -150,6 +153,7 @@ set (hpxlib_SOURCES
     ${hpx_SOURCE_DIR}/src/runtime/applier/applier.cpp
     # components
     ${hpx_SOURCE_DIR}/src/runtime/components/component_type.cpp
+    ${hpx_SOURCE_DIR}/src/runtime/components/server/console_error_sink.cpp
     ${hpx_SOURCE_DIR}/src/runtime/components/server/console_logging.cpp
     ${hpx_SOURCE_DIR}/src/runtime/components/server/memory.cpp
     ${hpx_SOURCE_DIR}/src/runtime/components/server/memory_block.cpp

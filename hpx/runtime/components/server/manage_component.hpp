@@ -21,7 +21,8 @@ namespace hpx { namespace components { namespace server
     naming::id_type create (std::size_t count)
     {
         if (0 == count) {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter, "count shouldn't be zero");
+            HPX_THROW_EXCEPTION(hpx::bad_parameter, 
+                "create<Component>", "count shouldn't be zero");
             return naming::invalid_id;
         }
 
@@ -32,6 +33,7 @@ namespace hpx { namespace components { namespace server
 
         delete c;
         HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
+            "create<Component>", 
             "global id is already bound to a different "
             "component instance");
         return naming::invalid_id;
@@ -47,6 +49,7 @@ namespace hpx { namespace components { namespace server
         if (!appl.get_agas_client().resolve(gid, addr)) 
         {
             HPX_THROW_EXCEPTION(hpx::unknown_component_address,
+                "destroy<Component>", 
                 "global id is not bound to any component instance");
         }
 
@@ -55,6 +58,7 @@ namespace hpx { namespace components { namespace server
         {
             // FIXME: should the component be re-bound ?
             HPX_THROW_EXCEPTION(hpx::unknown_component_address,
+                "destroy<Component>", 
                 "global id is not bound to any local component instance");
         }
 
@@ -68,6 +72,7 @@ namespace hpx { namespace components { namespace server
             strm << "global id is not bound to a component instance of type: "
                  << get_component_type_name(type);
             HPX_THROW_EXCEPTION(hpx::unknown_component_address,
+                "destroy<Component>", 
                 HPX_OSSTREAM_GETSTRING(strm));
         }
 

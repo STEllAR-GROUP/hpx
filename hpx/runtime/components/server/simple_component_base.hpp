@@ -86,6 +86,7 @@ namespace hpx { namespace components
                     gid_ = naming::id_type();   // invalidate GID
 
                     HPX_THROW_EXCEPTION(duplicate_component_address,
+                        "simple_component_base<Component>::get_gid", 
                         HPX_OSSTREAM_GETSTRING(strm));
                 }
             }

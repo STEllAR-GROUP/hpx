@@ -11,6 +11,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/naming.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 
 namespace hpx { namespace applier { namespace detail
 {
@@ -71,6 +72,7 @@ namespace hpx { namespace applier { namespace detail
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
                 c->trigger_error(e);
+                threads::report_error(boost::current_exception());
                 return typename Action::result_type();
             }
         }
@@ -122,6 +124,7 @@ namespace hpx { namespace applier { namespace detail
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
                 c->trigger_error(e);
+                threads::report_error(boost::current_exception());
                 return typename Action::result_type();
             }
         }

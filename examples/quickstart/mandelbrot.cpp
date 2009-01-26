@@ -5,53 +5,16 @@
 
 #include <hpx/hpx.hpp>
 
-#include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/lcos/future_callback.hpp>
 #include <hpx/lcos/counting_semaphore.hpp>
 
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/export.hpp>
+
+#include "mandelbrot_component/mandelbrot.hpp"
 
 using namespace hpx;
 namespace po = boost::program_options;
-
-///////////////////////////////////////////////////////////////////////////////
-int mandelbrot(double x, double y, int iterations);
-
-typedef 
-    actions::plain_result_action3<int, double, double, int, mandelbrot> 
-mandelbrot_action;
-
-HPX_REGISTER_ACTION(mandelbrot_action);
-
-///////////////////////////////////////////////////////////////////////////////
-inline long double sqr(long double x)
-{
-    return x * x;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-int mandelbrot(double xpt, double ypt, int iterations)
-{
-    long double x = 0;
-    long double y = 0;      //converting from pixels to points
-
-    int k = 0;
-    for(/**/; k <= iterations; ++k)
-    {
-        // The Mandelbrot Function Z = Z*Z+c into x and y parts
-        long double xnew = sqr(x) - sqr(y) + xpt;
-        long double ynew = 2 * x*y - ypt;
-        if (sqr(xnew) + sqr(ynew) > 4) 
-            break;
-        x = xnew;
-        y = ynew;
-    }
-
-    return (k >= iterations) ? 0 : k;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 void mandelbrot_callback(lcos::counting_semaphore& sem,

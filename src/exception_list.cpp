@@ -11,12 +11,12 @@ namespace hpx
 {
     exception_list::exception_list()
     {}
-    
+
     exception_list::exception_list(boost::system::system_error const& e)
     {
         add(e);
     }
-    
+
     void exception_list::add(boost::system::system_error const& e)
     {
         exceptions_.push_back(e);
@@ -28,7 +28,7 @@ namespace hpx
             return hpx::no_success;
         return exceptions_.front().code();
     }
-    
+
     std::string indent_message(char const* msg_) 
     {
         std::string result;
@@ -36,7 +36,7 @@ namespace hpx
         std::string::size_type pos = msg.find_first_of("\n");
         std::string::size_type first_non_ws = msg.find_first_not_of(" \n");
         std::string::size_type pos1 = 0;
-        
+
         while (std::string::npos != pos) {
             if (pos > first_non_ws) {   // skip leading newline
                 result += msg.substr(pos1, pos-pos1+1); 
@@ -48,7 +48,7 @@ namespace hpx
                 pos = msg.find_first_of("\n", pos1 = pos+1);
             }
         }
-        
+
         result += msg.substr(pos1); 
         return result;
     }
@@ -73,10 +73,10 @@ namespace hpx
         }
         return result;
     }
-    
+
     std::size_t exception_list::get_error_count() const
     {
         return exceptions_.size();
     }
-    
+
 }
