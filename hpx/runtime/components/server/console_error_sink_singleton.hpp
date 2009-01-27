@@ -9,28 +9,22 @@
 #include <string>
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/static.hpp>
 
 #include <boost/cstdint.hpp>
+#include <boost/noncopyable.hpp>
 #include <boost/signals.hpp>
-#include <boost/exception_ptr.hpp>
-#include <boost/thread.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
-    class console_error_dispatcher
+    class console_error_dispatcher : boost::noncopyable
     {
     private:
         typedef void dispatcher_type(boost::uint32_t, std::string const&);
-        typedef boost::mutex mutex_type;
 
     public:
         typedef boost::signals::scoped_connection scoped_connection_type;
-
-        console_error_dispatcher() {}
-        ~console_error_dispatcher() {}
 
         template <typename F, typename Connection>
         bool register_error_sink(F sink, Connection& conn)
@@ -48,13 +42,7 @@ namespace hpx { namespace components { namespace server
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    struct error_dispatcher_tag {};
-
-    inline console_error_dispatcher& get_error_dispatcher()
-    {
-        util::static_<console_error_dispatcher, error_dispatcher_tag> disp;
-        return disp.get();
-    }
+    HPX_API_EXPORT console_error_dispatcher& get_error_dispatcher();
 
 }}}
 

@@ -479,6 +479,10 @@
 								>
 							</File>
 							<File
+								RelativePath="..\..\..\src\runtime\components\server\console_error_sink_singleton.cpp"
+								>
+							</File>
+							<File
 								RelativePath="..\..\..\src\runtime\components\server\console_logging.cpp"
 								>
 							</File>

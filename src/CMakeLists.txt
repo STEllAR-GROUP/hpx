@@ -155,6 +155,7 @@ set (hpxlib_SOURCES
     # components
     ${hpx_SOURCE_DIR}/src/runtime/components/component_type.cpp
     ${hpx_SOURCE_DIR}/src/runtime/components/server/console_error_sink.cpp
+    ${hpx_SOURCE_DIR}/src/runtime/components/server/console_error_sink_singleton.cpp
     ${hpx_SOURCE_DIR}/src/runtime/components/server/console_logging.cpp
     ${hpx_SOURCE_DIR}/src/runtime/components/server/memory.cpp
     ${hpx_SOURCE_DIR}/src/runtime/components/server/memory_block.cpp
