@@ -220,7 +220,7 @@ namespace hpx
                 default_error_sink_.disconnect();
 
             return components::server::get_error_dispatcher().
-                register_error_sink(F, conn);
+                register_error_sink(sink, conn);
         }
 
         ///////////////////////////////////////////////////////////////////////
