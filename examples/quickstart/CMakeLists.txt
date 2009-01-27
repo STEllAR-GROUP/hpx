@@ -7,7 +7,7 @@
 set(mandelbrot_SUDIRS 
     mandelbrot_component)
 
-foreach(subdir ${amr_SUDIRS})
+foreach(subdir ${mandelbrot_SUDIRS})
     add_subdirectory(${subdir})
 endforeach()
 
@@ -15,5 +15,5 @@ endforeach()
 add_hpx_executable(fibonacci SOURCES fibonacci.cpp)
 add_hpx_executable(mandelbrot 
     SOURCES mandelbrot.cpp
-    DEPENDENCIES mandelbrot_component)
+    DEPENDENCIES mandelbrot_component_component)
 
