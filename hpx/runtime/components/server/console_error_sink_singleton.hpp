@@ -23,7 +23,7 @@ namespace hpx { namespace components { namespace server
     class console_error_dispatcher
     {
     private:
-        typedef void dispatcher_type(boost::uint32_t, boost::exception_ptr const&);
+        typedef void dispatcher_type(boost::uint32_t, std::string const&);
         typedef boost::mutex mutex_type;
 
     public:
@@ -38,9 +38,9 @@ namespace hpx { namespace components { namespace server
             return (conn = dispatcher_.connect(sink)).connected();
         }
 
-        void operator()(boost::uint32_t src, boost::exception_ptr const& e)
+        void operator()(boost::uint32_t src, std::string const& msg)
         {
-            dispatcher_(src, e);
+            dispatcher_(src, msg);
         }
 
     private:

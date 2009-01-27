@@ -56,15 +56,48 @@ namespace boost { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Archive>
-    void save(Archive& ar, boost::exception_ptr const& e, unsigned int)
+    void save(Archive& ar, boost::exception_ptr const& ep, unsigned int)
     {
         hpx::util::exception_type type;
         std::string what;
         int err_value;
         std::string err_message;
 
+        std::string throw_function;
+        std::string throw_file;
+        int throw_line = -1;
+
+        // retrieve information related to boost::exception
         try {
-            boost::rethrow_exception(e);
+            boost::rethrow_exception(ep);
+        }
+        catch (boost::exception const& e) {
+            boost::shared_ptr<char const* const> func = 
+                boost::get_error_info<boost::throw_function>(e);
+            if (func) {
+                throw_function = *func;
+            }
+            else {
+                boost::shared_ptr<std::string const> func = 
+                    boost::get_error_info<hpx::detail::throw_function>(e);
+                if (func)
+                    throw_function = *func;
+            }
+
+            boost::shared_ptr<std::string const> file = 
+                boost::get_error_info<hpx::detail::throw_file>(e);
+            if (file)
+                throw_file = *file;
+
+            boost::shared_ptr<int const> line =
+                boost::get_error_info<hpx::detail::throw_line>(e);
+            if (line)
+                throw_line = *line;
+        }
+
+        // figure out concrete underlying exception type
+        try {
+            boost::rethrow_exception(ep);
         }
         catch (hpx::exception const& e) {
             type = hpx::util::hpx_exception;
@@ -124,7 +157,7 @@ namespace boost { namespace serialization
             what = "unknown exception";
         }
 
-        ar & type & what;
+        ar & type & what & throw_function & throw_file & throw_line;
         if (hpx::util::hpx_exception == type) {
             ar & err_value;
         }
@@ -142,7 +175,11 @@ namespace boost { namespace serialization
         int err_value;
         std::string err_message;
 
-        ar & type & what;
+        std::string throw_function;
+        std::string throw_file;
+        int throw_line = 0;
+
+        ar & type & what & throw_function & throw_file & throw_line;
         if (hpx::util::hpx_exception == type) {
             ar & err_value;
         }
@@ -152,61 +189,72 @@ namespace boost { namespace serialization
 
         try {
             switch (type) {
+            case hpx::util::std_exception:
             case hpx::util::unknown_exception:
-                boost::throw_exception(std::exception());
+                hpx::detail::throw_exception(std::exception(),
+                    throw_function, throw_file, throw_line);
                 break;
 
             // standard exceptions
             case hpx::util::std_runtime_error:
-                boost::throw_exception(std::runtime_error(what));
+                hpx::detail::throw_exception(std::runtime_error(what),
+                    throw_function, throw_file, throw_line);
                 break;
 
             case hpx::util::std_invalid_argument:
-                boost::throw_exception(std::invalid_argument(what));
+                hpx::detail::throw_exception(std::invalid_argument(what),
+                    throw_function, throw_file, throw_line);
                 break;
 
             case hpx::util::std_out_of_range:
-                boost::throw_exception(std::out_of_range(what));
+                hpx::detail::throw_exception(std::out_of_range(what),
+                    throw_function, throw_file, throw_line);
                 break;
 
             case hpx::util::std_logic_error:
-                boost::throw_exception(std::logic_error(what));
+                hpx::detail::throw_exception(std::logic_error(what),
+                    throw_function, throw_file, throw_line);
                 break;
 
             case hpx::util::std_bad_alloc:
-                boost::throw_exception(std::bad_alloc());
+                hpx::detail::throw_exception(std::bad_alloc(),
+                    throw_function, throw_file, throw_line);
                 break;
 
 #ifndef BOOST_NO_TYPEID
             case hpx::util::std_bad_cast:
-                boost::throw_exception(std::bad_cast());
+                hpx::detail::throw_exception(std::bad_cast(),
+                    throw_function, throw_file, throw_line);
                 break;
 
             case hpx::util::std_bad_typeid:
-                boost::throw_exception(std::bad_typeid());
+                hpx::detail::throw_exception(std::bad_typeid(),
+                    throw_function, throw_file, throw_line);
                 break;
 #endif
             case hpx::util::std_bad_exception:
-                boost::throw_exception(std::bad_exception());
-                break;
-
-            case hpx::util::std_exception:
-                boost::throw_exception(std::exception());
+                hpx::detail::throw_exception(std::bad_exception(),
+                    throw_function, throw_file, throw_line);
                 break;
 
             // boost exceptions
             case hpx::util::boost_exception:
+                BOOST_ASSERT(false);    // shouldn't happen
                 break;
 
             // boost::system::system_error
             case hpx::util::boost_system_error:
-                boost::throw_exception(boost::system::system_error(err_value, 
-                    boost::system::get_system_category(), err_message));
+                hpx::detail::throw_exception(
+                    boost::system::system_error(err_value, 
+                        boost::system::get_system_category(), err_message),
+                    throw_function, throw_file, throw_line);
                 break;
 
             // hpx::exception
             case hpx::util::hpx_exception:
-                HPX_RETHROW_EXCEPTION(err_value, "load(exception_ptr)", what);
+                hpx::detail::throw_exception(
+                    hpx::exception((hpx::error)err_value, what, hpx::rethrow),
+                    throw_function, throw_file, throw_line);
                 break;
             }
         }

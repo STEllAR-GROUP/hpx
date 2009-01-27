@@ -12,7 +12,7 @@ using namespace hpx;
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    boost::throw_exception(hpx::exception(hpx::no_success, "Some error occurred"));
+    HPX_THROW_EXCEPTION(hpx::no_success, "hpx_main", "Some error occurred");
     return 0;
 }
 

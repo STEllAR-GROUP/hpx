@@ -870,6 +870,10 @@
 							>
 						</File>
 						<File
+							RelativePath="..\..\..\hpx\runtime\components\server\console_error_sink_singleton.hpp"
+							>
+						</File>
+						<File
 							RelativePath="..\..\..\hpx\runtime\components\server\console_logging.hpp"
 							>
 						</File>

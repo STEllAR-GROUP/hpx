@@ -140,7 +140,7 @@ endmacro(ADD_HPX_COMPONENT)
 macro(ADD_HPX_EXECUTABLE name)
     # retrieve arguments
     parse_arguments(${name}
-        "SOURCES;HEADERS;DEPENDENCIES"
+        "SOURCES;HEADERS;y"
         "DEBUG"
         ${ARGN})
 

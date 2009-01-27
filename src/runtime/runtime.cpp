@@ -14,7 +14,6 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
-#include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure the system gets properly shut down while handling Ctrl-C and other
@@ -51,9 +50,9 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(std::string const& address, boost::uint16_t port,
             std::string const& agas_address, boost::uint16_t agas_port, 
-            mode locality_mode, 
-            boost::function<hpx_errorsink_function_type> errorsink) 
-      : mode_(locality_mode), ini_(util::detail::get_logging_data()), 
+            mode locality_mode) 
+      : result_(0), mode_(locality_mode), 
+        ini_(util::detail::get_logging_data()), 
         agas_pool_(), parcel_pool_(), timer_pool_(),
         agas_client_(agas_pool_, ini_.get_agas_locality(agas_address, agas_port), mode_ == console),
         parcel_port_(parcel_pool_, naming::locality(address, port)),
@@ -68,21 +67,15 @@ namespace hpx
         action_manager_(applier_),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_)
     {
-        if (errorsink) {
-            components::server::get_error_dispatcher().register_error_sink(
-                errorsink, error_sink_);
-        }
-        else {
-            components::server::get_error_dispatcher().register_error_sink(
-                &runtime::default_errorsink, error_sink_);
-        }
+        components::server::get_error_dispatcher().register_error_sink(
+            &runtime::default_errorsink, default_error_sink_);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(naming::locality address, naming::locality agas_address, 
-            mode locality_mode, 
-            boost::function<hpx_errorsink_function_type> errorsink) 
-      : mode_(locality_mode), ini_(util::detail::get_logging_data()), 
+            mode locality_mode) 
+      : result_(0), mode_(locality_mode), 
+        ini_(util::detail::get_logging_data()), 
         agas_pool_(), parcel_pool_(), timer_pool_(),
         agas_client_(agas_pool_, agas_address, mode_ == console),
         parcel_port_(parcel_pool_, address),
@@ -97,20 +90,14 @@ namespace hpx
         action_manager_(applier_),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_)
     {
-        if (errorsink) {
-            components::server::get_error_dispatcher().register_error_sink(
-                errorsink, error_sink_);
-        }
-        else {
-            components::server::get_error_dispatcher().register_error_sink(
-                &runtime::default_errorsink, error_sink_);
-        }
+        components::server::get_error_dispatcher().register_error_sink(
+            &runtime::default_errorsink, default_error_sink_);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime::runtime(naming::locality address, mode locality_mode, 
-            boost::function<hpx_errorsink_function_type> errorsink) 
-      : mode_(locality_mode), ini_(util::detail::get_logging_data()), 
+    runtime::runtime(naming::locality address, mode locality_mode) 
+      : result_(0), mode_(locality_mode), 
+        ini_(util::detail::get_logging_data()), 
         agas_pool_(), parcel_pool_(), timer_pool_(),
         agas_client_(agas_pool_, ini_.get_agas_locality(), mode_ == console),
         parcel_port_(parcel_pool_, address),
@@ -125,14 +112,8 @@ namespace hpx
         action_manager_(applier_),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_)
     {
-        if (errorsink) {
-            components::server::get_error_dispatcher().register_error_sink(
-                errorsink, error_sink_);
-        }
-        else {
-            components::server::get_error_dispatcher().register_error_sink(
-                &runtime::default_errorsink, error_sink_);
-        }
+        components::server::get_error_dispatcher().register_error_sink(
+            &runtime::default_errorsink, default_error_sink_);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -197,19 +178,24 @@ namespace hpx
                 &memory_));
 
         // register the given main function with the thread manager
-        int result = 0;
         if (!func.empty()) {
             thread_manager_.register_thread(
-                boost::bind(run_helper, func, boost::ref(result)), "hpx_main");
+                boost::bind(run_helper, func, boost::ref(result_)), "hpx_main");
         }
 
         LRT_(info) << "runtime: started using "  << num_threads << " OS threads";
 
         // block if required
         if (blocking) 
-            wait();     // wait for the shutdown_action to be executed
+            return wait();     // wait for the shutdown_action to be executed
 
-        return result;
+        return 0;   // return zero as we don't know the outcome of hpx_main yet
+    }
+
+    int runtime::start(std::size_t num_threads, bool blocking)
+    {
+        boost::function<hpx_main_function_type> empty_main;
+        return start(empty_main, num_threads, blocking);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -229,7 +215,7 @@ namespace hpx
     }
 #endif
 
-    void runtime::wait()
+    int runtime::wait()
     {
         LRT_(info) << "runtime: about to enter wait state";
 
@@ -262,6 +248,7 @@ namespace hpx
         t.join();
 #endif
         LRT_(info) << "runtime: exiting wait state";
+        return result_;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -300,8 +287,8 @@ namespace hpx
     int runtime::run(boost::function<hpx_main_function_type> func,
         std::size_t num_threads)
     {
-        int result = start(func, num_threads);
-        wait();
+        start(func, num_threads);
+        int result = wait();
         stop();
         return result;
     }
@@ -309,24 +296,18 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     int runtime::run(std::size_t num_threads)
     {
-        int result = start(boost::function<hpx_main_function_type>(), num_threads);
-        wait();
+        start(boost::function<hpx_main_function_type>(), num_threads);
+        int result = wait();
         stop();
         return result;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void runtime::default_errorsink(boost::uint32_t src, 
-        boost::exception_ptr const& e)
+    void runtime::default_errorsink(boost::uint32_t src, std::string const& msg)
     {
-        try {
-            boost::rethrow_exception(e);
-        }
-        catch (boost::exception const& be) {
-            std::cerr << "locality(" << std::hex << std::setw(4) 
-                      << std::setfill('0') << src << "):" << std::endl
-                      << boost::diagnostic_information(be) << std::endl;
-        }
+        std::cerr << "locality (" << std::hex << std::setw(4) 
+                  << std::setfill('0') << src << "):" << std::endl
+                  << msg << std::endl;
     }
 
 }

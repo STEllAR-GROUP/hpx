@@ -246,11 +246,31 @@ namespace hpx
     // types needed to add additional information to the thrown exceptions
     namespace detail
     {
+        struct tag_throw_function {};
         struct tag_throw_file {};
         struct tag_throw_line {};
 
+        typedef boost::error_info<struct tag_throw_function, std::string> throw_function;
         typedef boost::error_info<struct tag_throw_file, std::string> throw_file;
         typedef boost::error_info<struct tag_throw_line, int> throw_line;
+
+        template <typename Exception>
+        void throw_exception(Exception const& e, char const* func, 
+            std::string const& file, int line)
+        {
+            throw boost::enable_current_exception(
+                boost::enable_error_info(e) << boost::throw_function(func) <<
+                    throw_file(file) << throw_line(line));
+        }
+
+        template <typename Exception>
+        void throw_exception(Exception const& e, std::string const& func, 
+            std::string const& file, int line)
+        {
+            throw boost::enable_current_exception(
+                boost::enable_error_info(e) << throw_function(func) <<
+                    throw_file(file) << throw_line(line));
+        }
     }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -285,11 +305,8 @@ namespace boost { namespace system
             __s += std::string("(") + BOOST_PP_STRINGIZE(__LINE__) + "): ";   \
         }                                                                     \
         __s += msg;                                                           \
-        throw boost::enable_current_exception(boost::enable_error_info(       \
-                except((hpx::error)errcode, __s, mode)) <<                    \
-            boost::throw_function(func) <<                                    \
-            hpx::detail::throw_file(__p.string()) <<                          \
-            hpx::detail::throw_line(__LINE__));                               \
+        hpx::detail::throw_exception(except((hpx::error)errcode, __s, mode),  \
+            func, __p.string(), __LINE__);                                    \
     }                                                                         \
     /**/
 

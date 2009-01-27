@@ -17,6 +17,7 @@
 #include <hpx/runtime/actions/action_manager.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
+#include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -39,8 +40,7 @@ namespace hpx
         void init_applier();
 
         // 
-        static void default_errorsink(boost::uint32_t, 
-            boost::exception_ptr const&);
+        static void default_errorsink(boost::uint32_t, std::string const&);
 
     public:
         /// The \a hpx_main_function_type is the default function type usable 
@@ -49,7 +49,7 @@ namespace hpx
 
         ///
         typedef void hpx_errorsink_function_type(
-            boost::uint32_t, boost::exception_ptr const&);
+            boost::uint32_t, std::string const&);
 
         /// A HPX runtime can be executed in two different modes: console mode
         /// and worker mode.
@@ -82,9 +82,7 @@ namespace hpx
         explicit runtime(std::string const& address = "localhost", 
                 boost::uint16_t port = HPX_PORT,
                 std::string const& agas_address = "", 
-                boost::uint16_t agas_port = 0, mode locality_mode = console,
-                boost::function<hpx_errorsink_function_type> errorsink =
-                    boost::function<hpx_errorsink_function_type>());
+                boost::uint16_t agas_port = 0, mode locality_mode = console);
 
         /// Construct a new HPX runtime instance 
         ///
@@ -93,9 +91,7 @@ namespace hpx
         ///                       used for receiving parcels. 
         /// \note The AGAS locality to use will be taken from the configuration 
         ///       file (hpx.ini).
-        runtime(naming::locality address, mode locality_mode = worker,
-                boost::function<hpx_errorsink_function_type> errorsink =
-                    boost::function<hpx_errorsink_function_type>());
+        explicit runtime(naming::locality address, mode locality_mode = worker);
 
         /// Construct a new HPX runtime instance 
         ///
@@ -105,9 +101,7 @@ namespace hpx
         /// \param agas_address   [in] This is the locality the AGAS server is 
         ///                       running on. 
         runtime(naming::locality address, naming::locality agas_address, 
-                mode locality_mode = worker,
-                boost::function<hpx_errorsink_function_type> errorsink =
-                    boost::function<hpx_errorsink_function_type>());
+                mode locality_mode = worker);
 
         /// \brief The destructor makes sure all HPX runtime services are 
         ///        properly shut down before existing.
@@ -127,18 +121,39 @@ namespace hpx
         /// \param blocking   [in] This allows to control whether this 
         ///                   call blocks until the runtime system has been 
         ///                   stopped. If this parameter is \a true the 
-        ///                   function \a runtime#start internally will call 
-        ///                   \a runtime#wait.
+        ///                   function \a runtime#start will call 
+        ///                   \a runtime#wait internally.
         ///
-        /// \returns          This function will return the value as returned 
-        ///                   as the result of the invocation of the function 
-        ///                   object given by the parameter \p func.
+        /// \returns          If a blocking is a true, this function will 
+        ///                   return the value as returned as the result of the 
+        ///                   invocation of the function object given by the 
+        ///                   parameter \p func. Otherwise it will return zero.
         int start(boost::function<hpx_main_function_type> func =
                 boost::function<hpx_main_function_type>(), 
             std::size_t num_threads = 1, bool blocking = false);
 
+        /// \brief Start the runtime system
+        ///
+        /// \param num_threads [in] The initial number of threads to be started 
+        ///                   by the threadmanager. 
+        /// \param blocking   [in] This allows to control whether this 
+        ///                   call blocks until the runtime system has been 
+        ///                   stopped. If this parameter is \a true the 
+        ///                   function \a runtime#start will call 
+        ///                   \a runtime#wait internally .
+        ///
+        /// \returns          If a blocking is a true, this function will 
+        ///                   return the value as returned as the result of the 
+        ///                   invocation of the function object given by the 
+        ///                   parameter \p func. Otherwise it will return zero.
+        int start(std::size_t num_threads, bool blocking = false);
+
         /// \brief Wait for the shutdown action to be executed
-        void wait();
+        ///
+        /// \returns          This function will return the value as returned 
+        ///                   as the result of the invocation of the function 
+        ///                   object given by the parameter \p func.
+        int wait();
 
         /// \brief Stop the runtime system
         ///
@@ -197,6 +212,18 @@ namespace hpx
         int run(std::size_t num_threads);
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename F, typename Connection>
+        bool register_error_sink(F sink, Connection& conn, 
+            bool unregister_default = true)
+        {
+            if (unregister_default)
+                default_error_sink_.disconnect();
+
+            return components::server::get_error_dispatcher().
+                register_error_sink(F, conn);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
 
         /// \brief Allow access to the AGAS client instance used by the HPX
         ///        runtime.
@@ -245,6 +272,7 @@ namespace hpx
 
     private:
         mode mode_;
+        int result_;
         util::runtime_configuration ini_;
         util::io_service_pool agas_pool_; 
         util::io_service_pool parcel_pool_; 
@@ -258,7 +286,7 @@ namespace hpx
         applier::applier applier_;
         actions::action_manager action_manager_;
         components::server::runtime_support runtime_support_;
-        boost::signals::scoped_connection error_sink_;
+        boost::signals::scoped_connection default_error_sink_;
     };
 
 }   // namespace hpx
