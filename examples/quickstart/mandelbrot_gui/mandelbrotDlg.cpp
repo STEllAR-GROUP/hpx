@@ -280,3 +280,10 @@ void CMandelbrotDlg::OnEnChangeY()
     created_bitmap = false;   // re-create bitmap with new size
     Invalidate();
 }
+
+void CMandelbrotDlg::error_sink(boost::uint32_t src, std::string const& msg)
+{
+    AfxMessageBox(msg.c_str());
+}
+
+

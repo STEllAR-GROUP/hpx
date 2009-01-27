@@ -43,6 +43,7 @@ public:
     CSpinButtonCtrl m_spiny;
 
     void OnDoneRendering();
+    void error_sink(boost::uint32_t, std::string const&);
 
 private:
     CBitmap m_mandelbrot;
