@@ -14,6 +14,7 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
+#include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure the system gets properly shut down while handling Ctrl-C and other
@@ -50,7 +51,8 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(std::string const& address, boost::uint16_t port,
             std::string const& agas_address, boost::uint16_t agas_port, 
-            mode locality_mode) 
+            mode locality_mode, 
+            boost::function<hpx_errorsink_function_type> errorsink) 
       : mode_(locality_mode), ini_(util::detail::get_logging_data()), 
         agas_pool_(), parcel_pool_(), timer_pool_(),
         agas_client_(agas_pool_, ini_.get_agas_locality(agas_address, agas_port), mode_ == console),
@@ -65,11 +67,21 @@ namespace hpx
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_)
-    {}
+    {
+        if (errorsink) {
+            components::server::get_error_dispatcher().register_error_sink(
+                errorsink, error_sink_);
+        }
+        else {
+            components::server::get_error_dispatcher().register_error_sink(
+                &runtime::default_errorsink, error_sink_);
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(naming::locality address, naming::locality agas_address, 
-            mode locality_mode) 
+            mode locality_mode, 
+            boost::function<hpx_errorsink_function_type> errorsink) 
       : mode_(locality_mode), ini_(util::detail::get_logging_data()), 
         agas_pool_(), parcel_pool_(), timer_pool_(),
         agas_client_(agas_pool_, agas_address, mode_ == console),
@@ -84,10 +96,20 @@ namespace hpx
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_)
-    {}
+    {
+        if (errorsink) {
+            components::server::get_error_dispatcher().register_error_sink(
+                errorsink, error_sink_);
+        }
+        else {
+            components::server::get_error_dispatcher().register_error_sink(
+                &runtime::default_errorsink, error_sink_);
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime::runtime(naming::locality address, mode locality_mode) 
+    runtime::runtime(naming::locality address, mode locality_mode, 
+            boost::function<hpx_errorsink_function_type> errorsink) 
       : mode_(locality_mode), ini_(util::detail::get_logging_data()), 
         agas_pool_(), parcel_pool_(), timer_pool_(),
         agas_client_(agas_pool_, ini_.get_agas_locality(), mode_ == console),
@@ -102,7 +124,16 @@ namespace hpx
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_)
-    {}
+    {
+        if (errorsink) {
+            components::server::get_error_dispatcher().register_error_sink(
+                errorsink, error_sink_);
+        }
+        else {
+            components::server::get_error_dispatcher().register_error_sink(
+                &runtime::default_errorsink, error_sink_);
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     runtime::~runtime()
@@ -282,6 +313,20 @@ namespace hpx
         wait();
         stop();
         return result;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void runtime::default_errorsink(boost::uint32_t src, 
+        boost::exception_ptr const& e)
+    {
+        try {
+            boost::rethrow_exception(e);
+        }
+        catch (boost::exception const& be) {
+            std::cerr << "locality(" << std::hex << std::setw(4) 
+                      << std::setfill('0') << src << "):" << std::endl
+                      << boost::diagnostic_information(be) << std::endl;
+        }
     }
 
 }

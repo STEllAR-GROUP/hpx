@@ -38,10 +38,18 @@ namespace hpx
         // init the TSS for the applier
         void init_applier();
 
+        // 
+        static void default_errorsink(boost::uint32_t, 
+            boost::exception_ptr const&);
+
     public:
         /// The \a hpx_main_function_type is the default function type usable 
         /// as the main HPX thread function.
         typedef int hpx_main_function_type();
+
+        ///
+        typedef void hpx_errorsink_function_type(
+            boost::uint32_t, boost::exception_ptr const&);
 
         /// A HPX runtime can be executed in two different modes: console mode
         /// and worker mode.
@@ -74,7 +82,9 @@ namespace hpx
         explicit runtime(std::string const& address = "localhost", 
                 boost::uint16_t port = HPX_PORT,
                 std::string const& agas_address = "", 
-                boost::uint16_t agas_port = 0, mode  locality_mode = console);
+                boost::uint16_t agas_port = 0, mode locality_mode = console,
+                boost::function<hpx_errorsink_function_type> errorsink =
+                    boost::function<hpx_errorsink_function_type>());
 
         /// Construct a new HPX runtime instance 
         ///
@@ -83,7 +93,9 @@ namespace hpx
         ///                       used for receiving parcels. 
         /// \note The AGAS locality to use will be taken from the configuration 
         ///       file (hpx.ini).
-        runtime(naming::locality address, mode locality_mode = worker);
+        runtime(naming::locality address, mode locality_mode = worker,
+                boost::function<hpx_errorsink_function_type> errorsink =
+                    boost::function<hpx_errorsink_function_type>());
 
         /// Construct a new HPX runtime instance 
         ///
@@ -93,7 +105,9 @@ namespace hpx
         /// \param agas_address   [in] This is the locality the AGAS server is 
         ///                       running on. 
         runtime(naming::locality address, naming::locality agas_address, 
-            mode locality_mode = worker);
+                mode locality_mode = worker,
+                boost::function<hpx_errorsink_function_type> errorsink =
+                    boost::function<hpx_errorsink_function_type>());
 
         /// \brief The destructor makes sure all HPX runtime services are 
         ///        properly shut down before existing.
@@ -244,6 +258,7 @@ namespace hpx
         applier::applier applier_;
         actions::action_manager action_manager_;
         components::server::runtime_support runtime_support_;
+        boost::signals::scoped_connection error_sink_;
     };
 
 }   // namespace hpx

@@ -13,5 +13,7 @@ endforeach()
 
 # define build targets for this directory
 add_hpx_executable(fibonacci SOURCES fibonacci.cpp)
-add_hpx_executable(mandelbrot SOURCES mandelbrot.cpp)
+add_hpx_executable(mandelbrot 
+    SOURCES mandelbrot.cpp
+    DEPENDENCIES mandelbrot_component)
 

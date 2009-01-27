@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
+#include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
@@ -26,12 +27,8 @@ namespace hpx { namespace components { namespace server
     // implementation of this console error sink
     void console_error_sink(boost::uint32_t src, boost::exception_ptr const& e)
     {
-        try {
-            boost::rethrow_exception(e);
-        }
-        catch (boost::exception const& be) {
-            std::cerr << boost::diagnostic_information(be) << std::endl;
-        }
+        // dispatch this error to registered functions
+        get_error_dispatcher()(src, e);
     }
 
 }}}

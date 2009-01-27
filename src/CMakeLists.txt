@@ -72,6 +72,7 @@ set (hpxlib_HEADERS
     ${hpx_SOURCE_DIR}/hpx/runtime/components/runtime_support.hpp
 
     ${hpx_SOURCE_DIR}/hpx/runtime/components/server/console_error_sink.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/components/server/console_error_sink_singleton.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/server/console_logging.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/server/manage_component.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/server/managed_component_base.hpp
