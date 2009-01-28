@@ -81,7 +81,8 @@ void received_parcel(hpx::parcelset::parcelhandler& ph, hpx::naming::address con
                 std::cout << "Average turnaround time: " 
                           << turnaround_time/accumulated_count
                           << std::flush << std::endl;
-                ph.get_parcelport().stop(false);
+                // parcelport().stop() was creating a race condition not allowing the parcelset_server to  terminate
+                //ph.get_parcelport().stop(false);
                 return;
             }
         }
