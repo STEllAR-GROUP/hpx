@@ -1,15 +1,18 @@
-// mandelbrotDlg.cpp : implementation file
-//
+//  Copyright (c) 2007-2009 Hartmut Kaiser
+// 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "stdafx.h"
 #include "mandelbrot_gui.h"
 #include "mandelbrotDlg.h"
 
 #include "../mandelbrot_component/mandelbrot.hpp"
+#include "../mandelbrot_component/mandelbrot_callback.hpp"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
+// #ifdef _DEBUG
+// #define new DEBUG_NEW
+// #endif
 
 
 // CAboutDlg dialog used for App About
@@ -184,7 +187,8 @@ void CMandelbrotDlg::OnPaint()
             -(rcframe.Width()-get_value(m_x)) / 2, 
             -(rcframe.Height()-get_value(m_y)) / 2);
 
-        CBitmap* oldbitmap = memDC.SelectObject((CBitmap*)&m_mandelbrot);
+        boost::mutex::scoped_lock l(mtx_);
+        CBitmap* oldbitmap = memDC.SelectObject(&m_mandelbrot);
         dc.BitBlt(rcframe.left, rcframe.top, 
             rcframe.left+rcframe.Width(), rcframe.top+rcframe.Height(), 
             &memDC, 0, 0, SRCCOPY);
@@ -200,9 +204,31 @@ HCURSOR CMandelbrotDlg::OnQueryDragIcon()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void mandelbrot_callback(hpx::lcos::counting_semaphore& sem,
-    int x, int y, int iterations)
+void CMandelbrotDlg::mandelbrot_callback(hpx::lcos::counting_semaphore& sem,
+    mandelbrot::result const& result)
 {
+//     std::cout << result.x_ << "," << result.y_ << "," << result.iterations_ 
+//               << std::endl;
+    CDC memDC;
+    memDC.CreateCompatibleDC(NULL);
+
+    {
+        boost::mutex::scoped_lock l(mtx_);
+        CBitmap* oldbitmap = memDC.SelectObject(&m_mandelbrot);
+        memDC.SetPixel(CPoint(result.x_, result.y_), 
+            result.iterations_ == 0 ? RGB(0, 0, 0) : RGB(255, 255, 255));
+        memDC.SelectObject(oldbitmap);
+    }
+
+    CRect rcframe;
+    m_bitmapframe.GetWindowRect(rcframe);
+
+    ScreenToClient(rcframe);
+    InflateRect(rcframe, 
+        -(rcframe.Width()-get_value(m_x)) / 2, 
+        -(rcframe.Height()-get_value(m_y)) / 2);
+
+    InvalidateRect(rcframe, FALSE);
     sem.signal();
 }
 
@@ -223,25 +249,22 @@ void calculate_mandelbrot_set(int sizex, int sizey, CMandelbrotDlg* dlg)
         prefixes.push_back(appl.get_runtime_support_gid());
 
     std::size_t prefix_count = prefixes.size();
-
-    hpx::lcos::counting_semaphore sem;
-    typedef lcos::eager_future<mandelbrot_action> future_type;
-    typedef lcos::future_callback<future_type> future_callback_type;
+    util::high_resolution_timer t;
 
     // initialize the worker threads, one for each of the pixels
-    std::vector<future_callback_type> futures;
-    futures.reserve(sizex*sizey);   // preallocate vector
+    lcos::counting_semaphore sem;
 
-    double deltax = 1.0 / sizex;
-    double deltay = 1.0 / sizey;
+    boost::scoped_ptr<mandelbrot::server::callback> cb(
+        new mandelbrot::server::callback(
+           boost::bind(&CMandelbrotDlg::mandelbrot_callback, dlg, 
+              boost::ref(sem), _1)));
+    naming::id_type callback_gid = cb->get_gid();
 
     for (int x = 0, i = 0; x < sizex; ++x) {
         for (int y = 0; y < sizey; ++y, ++i) {
-            futures.push_back(future_callback_type(
-                    future_type(prefixes[i % prefix_count], x * deltax, 
-                        y * deltay, 100), 
-                    boost::bind(mandelbrot_callback, boost::ref(sem), x, y, _1)
-                ));
+            mandelbrot::data data(x, y, sizex, sizey, 100, -1.0, 1.0, -2.0, 1.0);
+            applier::apply_c<mandelbrot_action>(callback_gid, 
+                prefixes[i % prefix_count], data);
         }
     }
 

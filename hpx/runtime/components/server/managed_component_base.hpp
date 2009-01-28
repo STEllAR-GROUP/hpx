@@ -173,7 +173,7 @@ namespace hpx { namespace components
     protected:
         // the memory for the wrappers is managed by a one_size_heap_list
         typedef detail::wrapper_heap_list<
-            detail::fixed_wrapper_heap<managed_component> > 
+            detail::fixed_wrapper_heap<derived_type> > 
         heap_type;
 
         struct wrapper_heap_tag {};
@@ -226,17 +226,17 @@ namespace hpx { namespace components
 
         /// \brief  The function \a create is used for allocation and 
         //          initialization of arrays of wrappers.
-        static managed_component* create(std::size_t count)
+        static derived_type* create(std::size_t count)
         {
             // allocate the memory
-            managed_component* p = get_heap().alloc(count);
+            derived_type* p = get_heap().alloc(count);
             if (1 == count)
                 return new (p) derived_type();
 
             // call constructors
             std::size_t succeeded = 0;
             try {
-                derived_type* curr = static_cast<derived_type*>(p);
+                derived_type* curr = p;
                 for (std::size_t i = 0; i < count; ++i, ++curr) {
                     // call placement new, might throw
                     new (curr) derived_type();
@@ -245,7 +245,7 @@ namespace hpx { namespace components
             }
             catch (...) {
                 // call destructors for successfully constructed objects
-                derived_type* curr = static_cast<derived_type*>(p);
+                derived_type* curr = p;
                 for (std::size_t i = 0; i < succeeded; ++i)
                 {
                     curr->finalize();
@@ -270,7 +270,7 @@ namespace hpx { namespace components
             }
             else {
                 // call destructors for all managed_component instances
-                derived_type* curr = static_cast<derived_type*>(p);
+                derived_type* curr = p;
                 for (std::size_t i = 0; i < count; ++i)
                 {
                     curr->finalize();

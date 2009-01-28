@@ -4,23 +4,23 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
-
-#include <hpx/lcos/future_callback.hpp>
 #include <hpx/lcos/counting_semaphore.hpp>
 
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include "mandelbrot_component/mandelbrot.hpp"
+#include "mandelbrot_component/mandelbrot_callback.hpp"
 
 using namespace hpx;
 namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
 void mandelbrot_callback(lcos::counting_semaphore& sem,
-    int x, int y, int iterations)
+    mandelbrot::result const& result)
 {
-//     std::cout << x << "," << y << "," << iterations << std::endl;
+//     std::cout << result.x_ << "," << result.y_ << "," << result.iterations_ 
+//               << std::endl;
     sem.signal();
 }
 
@@ -34,30 +34,27 @@ int hpx_main(int sizex, int sizey, int iterations)
     std::vector<naming::id_type> prefixes;
     appl.get_remote_prefixes(prefixes);
 
-    // execute the mandelbrot() function locally
-    prefixes.push_back(appl.get_runtime_support_gid());
+    // execute the mandelbrot() functions remotely only, if any, otherwise
+    // locally
+    if (prefixes.empty())
+        prefixes.push_back(appl.get_runtime_support_gid());
+
     std::size_t prefix_count = prefixes.size();
-
-    typedef lcos::eager_future<mandelbrot_action> future_type;
-    typedef lcos::future_callback<future_type> future_callback_type;
-
     util::high_resolution_timer t;
 
     // initialize the worker threads, one for each of the pixels
     lcos::counting_semaphore sem;
-    std::vector<future_callback_type> futures;
-    futures.reserve(sizex*sizey);   // preallocate vector
 
-    double deltax = 1.0 / sizex;
-    double deltay = 1.0 / sizey;
+    boost::scoped_ptr<mandelbrot::server::callback> cb(
+        new mandelbrot::server::callback(
+            boost::bind(mandelbrot_callback, boost::ref(sem), _1)));
+    naming::id_type callback_gid = cb->get_gid();
 
     for (int x = 0, i = 0; x < sizex; ++x) {
         for (int y = 0; y < sizey; ++y, ++i) {
-            futures.push_back(future_callback_type(
-                    future_type(prefixes[i % prefix_count], x * deltax, 
-                        y * deltay, iterations), 
-                    boost::bind(mandelbrot_callback, boost::ref(sem), x, y, _1)
-                ));
+            mandelbrot::data data(x, y, sizex, sizey, iterations);
+            applier::apply_c<mandelbrot_action>(callback_gid, 
+                prefixes[i % prefix_count], data);
         }
     }
 

@@ -4,10 +4,10 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(mandelbrot_HEADERS
-    mandelbrot.hpp)
+    mandelbrot.hpp mandelbrot_callback.hpp)
 
 set(mandelbrot_SOURCES
-    mandelbrot.cpp)
+    mandelbrot.cpp mandelbrot_callback.cpp)
 
 add_hpx_component(mandelbrot_component
     SOURCES ${mandelbrot_SOURCES} 

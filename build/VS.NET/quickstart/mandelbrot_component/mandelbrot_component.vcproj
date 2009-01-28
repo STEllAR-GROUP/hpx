@@ -178,7 +178,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\examples\quickstart\mandelbrot_component\mandelbrot.cpp"
+				RelativePath="..\..\..\..\examples\quickstart\mandelbrot\mandelbrot_component\mandelbrot.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\examples\quickstart\mandelbrot\mandelbrot_component\mandelbrot_callback.cpp"
 				>
 			</File>
 		</Filter>
@@ -188,12 +192,16 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\..\examples\quickstart\mandelbrot_component\mandelbrot.hpp"
+				RelativePath="..\..\..\..\examples\quickstart\mandelbrot\mandelbrot_component\mandelbrot.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\examples\quickstart\mandelbrot\mandelbrot_component\mandelbrot_callback.hpp"
 				>
 			</File>
 		</Filter>
 		<File
-			RelativePath="..\..\..\..\examples\quickstart\mandelbrot_component\CMakeLists.txt"
+			RelativePath="..\..\..\..\examples\quickstart\mandelbrot\mandelbrot_component\CMakeLists.txt"
 			>
 		</File>
 	</Files>

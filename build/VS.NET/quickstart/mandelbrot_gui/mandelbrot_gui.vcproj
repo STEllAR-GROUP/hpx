@@ -193,18 +193,26 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\examples\quickstart\mandelbrot_gui\mandelbrot_gui.cpp"
+				RelativePath="..\..\..\..\examples\quickstart\mandelbrot\mandelbrot_gui\mandelbrot_gui.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\examples\quickstart\mandelbrot_gui\mandelbrotDlg.cpp"
+				RelativePath="..\..\..\..\examples\quickstart\mandelbrot\mandelbrot_gui\mandelbrotDlg.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\examples\quickstart\mandelbrot_gui\stdafx.cpp"
+				RelativePath="..\..\..\..\examples\quickstart\mandelbrot\mandelbrot_gui\stdafx.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -219,19 +227,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\..\examples\quickstart\mandelbrot_gui\mandelbrot_gui.h"
+				RelativePath="..\..\..\..\examples\quickstart\mandelbrot\mandelbrot_gui\mandelbrot_gui.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\examples\quickstart\mandelbrot_gui\mandelbrotDlg.h"
+				RelativePath="..\..\..\..\examples\quickstart\mandelbrot\mandelbrot_gui\mandelbrotDlg.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\examples\quickstart\mandelbrot_gui\resource.h"
+				RelativePath="..\..\..\..\examples\quickstart\mandelbrot\mandelbrot_gui\resource.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\examples\quickstart\mandelbrot_gui\stdafx.h"
+				RelativePath="..\..\..\..\examples\quickstart\mandelbrot\mandelbrot_gui\stdafx.h"
 				>
 			</File>
 		</Filter>
@@ -241,15 +249,15 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath="..\..\..\..\examples\quickstart\mandelbrot_gui\res\mandelbrot_gui.ico"
+				RelativePath="..\..\..\..\examples\quickstart\mandelbrot\mandelbrot_gui\res\mandelbrot_gui.ico"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\examples\quickstart\mandelbrot_gui\mandelbrot_gui.rc"
+				RelativePath="..\..\..\..\examples\quickstart\mandelbrot\mandelbrot_gui\mandelbrot_gui.rc"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\examples\quickstart\mandelbrot_gui\res\mandelbrot_gui.rc2"
+				RelativePath="..\..\..\..\examples\quickstart\mandelbrot\mandelbrot_gui\res\mandelbrot_gui.rc2"
 				>
 			</File>
 		</Filter>

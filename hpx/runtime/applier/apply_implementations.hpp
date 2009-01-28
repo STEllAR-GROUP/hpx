@@ -107,19 +107,19 @@
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    bool apply_c (naming::address& addr, naming::id_type const& targetgid, 
+    bool apply_c (naming::address& addr, naming::id_type const& contgid, 
         naming::id_type const& gid,
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        return apply<Action>(addr, new actions::continuation(targetgid), 
+        return apply<Action>(addr, new actions::continuation(contgid), 
             gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    bool apply_c (naming::id_type const& targetgid, naming::id_type const& gid,
+    bool apply_c (naming::id_type const& contgid, naming::id_type const& gid,
          BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        return apply<Action>(new actions::continuation(targetgid), 
+        return apply<Action>(new actions::continuation(contgid), 
             gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 

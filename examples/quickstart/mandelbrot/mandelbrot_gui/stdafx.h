@@ -59,6 +59,5 @@
 #endif
 
 #include <hpx/hpx.hpp>
-#include <hpx/lcos/future_callback.hpp>
 #include <hpx/lcos/counting_semaphore.hpp>
 

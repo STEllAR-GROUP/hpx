@@ -17,13 +17,16 @@ inline long double sqr(long double x)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int mandelbrot(double xpt, double ypt, int iterations)
+mandelbrot::result mandelbrot_func(mandelbrot::data const& data)
 {
-    long double x = 0;
-    long double y = 0;      //converting from pixels to points
+    long double x = (double(data.x_) / data.sizex_) * (data.maxx_ - data.minx_) + data.minx_;
+    long double y = (double(data.y_) / data.sizey_) * (data.maxy_ - data.miny_) + data.miny_;
 
-    int k = 0;
-    for(/**/; k <= iterations; ++k)
+    long double xpt = x;
+    long double ypt = y;
+
+    boost::uint32_t k = 0;
+    for(/**/; k <= data.iterations_; ++k)
     {
         // The Mandelbrot Function Z = Z*Z+c into x and y parts
         long double xnew = sqr(x) - sqr(y) + xpt;
@@ -34,7 +37,7 @@ int mandelbrot(double xpt, double ypt, int iterations)
         y = ynew;
     }
 
-    return (k >= iterations) ? 0 : k;
+    return mandelbrot::result(data.x_, data.y_, (k >= data.iterations_) ? 0 : k);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

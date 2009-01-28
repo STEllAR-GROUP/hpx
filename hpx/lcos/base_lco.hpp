@@ -98,7 +98,7 @@ namespace hpx { namespace lcos
         ///
         /// The \a set_event_action may be used to unconditionally trigger any 
         /// LCO instances, it carries no additional parameters.
-        typedef hpx::actions::action0<
+        typedef hpx::actions::direct_action0<
             base_lco, lco_set_event, &base_lco::set_event_nonvirt
         > set_event_action;
 
@@ -110,7 +110,7 @@ namespace hpx { namespace lcos
         ///                     to report to this LCO instance.
         /// \param std::string  [in] The type of the error message describing 
         ///                     an error to report to this LCO instance.
-        typedef hpx::actions::action2<
+        typedef hpx::actions::direct_action2<
             base_lco, lco_set_error, hpx::error, std::string const&,
             &base_lco::set_error_nonvirt
         > set_error_action;
@@ -178,7 +178,7 @@ namespace hpx { namespace lcos
         ///
         /// \param Result [in] The type of the result to be transferred back to 
         ///               this LCO instance.
-        typedef hpx::actions::action1<
+        typedef hpx::actions::direct_action1<
             base_lco_with_value, lco_set_result, Result const&, 
             &base_lco_with_value::set_result_nonvirt
         > set_result_action;

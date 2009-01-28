@@ -4,16 +4,13 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # recurse into all components subdirectories and execute the scripts there
-set(mandelbrot_SUDIRS 
-    mandelbrot_component)
+set(quickstart_SUDIRS 
+    mandelbrot)
 
-foreach(subdir ${mandelbrot_SUDIRS})
+foreach(subdir ${quickstart_SUDIRS})
     add_subdirectory(${subdir})
 endforeach()
 
 # define build targets for this directory
 add_hpx_executable(fibonacci SOURCES fibonacci.cpp)
-add_hpx_executable(mandelbrot 
-    SOURCES mandelbrot.cpp
-    DEPENDENCIES mandelbrot_component_component)
 

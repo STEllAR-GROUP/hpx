@@ -1,9 +1,11 @@
-// mandelbrotDlg.h : header file
-//
+//  Copyright (c) 2007-2009 Hartmut Kaiser
+// 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 #include "afxwin.h"
-
+#include "../mandelbrot_component/mandelbrot.hpp"
 
 // CMandelbrotDlg dialog
 class CMandelbrotDlg : public CDialog
@@ -44,8 +46,11 @@ public:
 
     void OnDoneRendering();
     void error_sink(boost::uint32_t, std::string const&);
+    void mandelbrot_callback(hpx::lcos::counting_semaphore& sem,
+        mandelbrot::result const& result);
 
 private:
+    boost::mutex mtx_;
     CBitmap m_mandelbrot;
     bool created_bitmap;
     hpx::runtime& rt;

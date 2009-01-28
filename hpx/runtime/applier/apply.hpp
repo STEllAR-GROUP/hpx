@@ -92,17 +92,16 @@ namespace hpx { namespace applier
     }
 
     template <typename Action>
-    bool apply_c (naming::address& addr, naming::id_type const& targetgid, 
+    bool apply_c (naming::address& addr, naming::id_type const& contgid, 
         naming::id_type const& gid)
     {
-        return apply<Action>(addr, new actions::continuation(targetgid), gid);
+        return apply<Action>(addr, new actions::continuation(contgid), gid);
     }
 
     template <typename Action>
-    bool apply_c (naming::id_type const& targetgid, 
-        naming::id_type const& gid)
+    bool apply_c (naming::id_type const& contgid, naming::id_type const& gid)
     {
-        return apply<Action>(new actions::continuation(targetgid), gid);
+        return apply<Action>(new actions::continuation(contgid), gid);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -176,17 +175,17 @@ namespace hpx { namespace applier
     }
 
     template <typename Action, typename Arg0>
-    bool apply_c (naming::address& addr, naming::id_type const& targetgid, 
+    bool apply_c (naming::address& addr, naming::id_type const& contgid, 
         naming::id_type const& gid, Arg0 const& arg0)
     {
-        return apply<Action>(addr, new actions::continuation(targetgid), gid, arg0);
+        return apply<Action>(addr, new actions::continuation(contgid), gid, arg0);
     }
 
     template <typename Action, typename Arg0>
-    bool apply_c (naming::id_type const& targetgid, naming::id_type const& gid, 
+    bool apply_c (naming::id_type const& contgid, naming::id_type const& gid, 
         Arg0 const& arg0)
     {
-        return apply<Action>(new actions::continuation(targetgid), gid, arg0);
+        return apply<Action>(new actions::continuation(contgid), gid, arg0);
     }
 
     // bring in the rest of the apply<> overloads
