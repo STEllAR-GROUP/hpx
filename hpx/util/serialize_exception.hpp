@@ -110,10 +110,6 @@ namespace boost { namespace serialization
             err_value = e.code().value();
             err_message = e.code().message();
         }
-        catch (boost::exception const& e) {
-            type = hpx::util::boost_exception;
-            what = boost::diagnostic_information(e);
-        }
         catch (std::runtime_error const& e) {
             type = hpx::util::std_runtime_error;
             what = e.what();
@@ -151,6 +147,10 @@ namespace boost { namespace serialization
         catch (std::exception const& e) {
             type = hpx::util::std_exception;
             what = e.what();
+        }
+        catch (boost::exception const& e) {
+            type = hpx::util::boost_exception;
+            what = boost::diagnostic_information(e);
         }
         catch (...) {
             type = hpx::util::unknown_exception;

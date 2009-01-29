@@ -19,14 +19,14 @@ namespace mandelbrot
     {
         data()
           : x_(0), y_(0), sizex_(0), sizey_(0), iterations_(0),
-            minx_(0), maxx_(1.0), miny_(0), maxy_(1.0)
+            minx_(0), maxx_(1.0), miny_(0), maxy_(1.0), debug_(false)
         {}
 
         data(int x, int y, int sizex, int sizey, int iterations,
                 double minx = 0.0, double maxx = 1.0, 
                 double miny = 0.0, double maxy = 1.0)
           : x_(x), y_(y), sizex_(sizex), sizey_(sizey), iterations_(iterations),
-            minx_(minx), maxx_(maxx), miny_(miny), maxy_(maxy)
+            minx_(minx), maxx_(maxx), miny_(miny), maxy_(maxy), debug_(false)
         {}
 
         boost::uint32_t x_;
@@ -40,6 +40,8 @@ namespace mandelbrot
         double miny_;
         double maxy_;
 
+        bool debug_;
+
     private:
         // serialization support
         friend class boost::serialization::access;
@@ -49,6 +51,7 @@ namespace mandelbrot
         {
             ar & x_ & y_ & sizex_ & sizey_ & iterations_; 
             ar & minx_ & maxx_ & miny_ & maxy_; 
+            ar & debug_;
         }
     };
 

@@ -52,6 +52,7 @@ CMandelbrotDlg::CMandelbrotDlg(hpx::runtime& rt, CWnd* pParent /*=NULL*/)
     : CDialog(CMandelbrotDlg::IDD, pParent)
     , rt(rt)
     , created_bitmap(false)
+    , referesh_counter(0)
 {
     m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -83,7 +84,13 @@ inline int get_value(CEdit& edit)
 {
     CString text;
     edit.GetWindowText(text);
-    return boost::lexical_cast<int>(text);
+    try {
+        return boost::lexical_cast<int>(text);
+    }
+    catch (...) {
+        ;
+    }
+    return 1;
 }
 
 inline void set_value(CEdit& edit, int value)
@@ -212,23 +219,22 @@ void CMandelbrotDlg::mandelbrot_callback(hpx::lcos::counting_semaphore& sem,
     CDC memDC;
     memDC.CreateCompatibleDC(NULL);
 
+    int value = 255 - (std::min)(result.iterations_ * 4, (boost::uint32_t)255);
+
     {
         boost::mutex::scoped_lock l(mtx_);
         CBitmap* oldbitmap = memDC.SelectObject(&m_mandelbrot);
-        memDC.SetPixel(CPoint(result.x_, result.y_), 
-            result.iterations_ == 0 ? RGB(0, 0, 0) : RGB(255, 255, 255));
+        memDC.SetPixel(CPoint(result.x_, result.y_), RGB(value, value, value));
         memDC.SelectObject(oldbitmap);
     }
 
-    CRect rcframe;
-    m_bitmapframe.GetWindowRect(rcframe);
-
-    ScreenToClient(rcframe);
-    InflateRect(rcframe, 
-        -(rcframe.Width()-get_value(m_x)) / 2, 
-        -(rcframe.Height()-get_value(m_y)) / 2);
-
-    InvalidateRect(rcframe, FALSE);
+    if (referesh_counter == 100) {
+      InvalidateBitmap();
+      referesh_counter = 0;
+    }
+    else {
+        ++referesh_counter;
+    }
     sem.signal();
 }
 
@@ -245,8 +251,11 @@ void calculate_mandelbrot_set(int sizex, int sizey, CMandelbrotDlg* dlg)
 
     // execute the mandelbrot() functions remotely only, if any, otherwise
     // locally
-    if (prefixes.empty())
+    bool debug_remote = true;
+    if (prefixes.empty()) {
+        debug_remote = false;
         prefixes.push_back(appl.get_runtime_support_gid());
+    }
 
     std::size_t prefix_count = prefixes.size();
     util::high_resolution_timer t;
@@ -262,7 +271,8 @@ void calculate_mandelbrot_set(int sizex, int sizey, CMandelbrotDlg* dlg)
 
     for (int x = 0, i = 0; x < sizex; ++x) {
         for (int y = 0; y < sizey; ++y, ++i) {
-            mandelbrot::data data(x, y, sizex, sizey, 100, -1.0, 1.0, -2.0, 1.0);
+            mandelbrot::data data(x, y, sizex, sizey, 64, 0, 0.75, -0.75, 0); //-1.0, 0.5, -0.75, 0.75);
+//             data.debug_ = debug_remote;
             applier::apply_c<mandelbrot_action>(callback_gid, 
                 prefixes[i % prefix_count], data);
         }
@@ -282,26 +292,46 @@ void CMandelbrotDlg::OnBnClickedRender()
     hpx::applier::register_work(
         boost::bind(calculate_mandelbrot_set, sizex, sizey, this),
         "calculate_mandelbrot_set");
+
+    InvalidateBitmap(TRUE);
 }
 
 void CMandelbrotDlg::OnDoneRendering()
 {
+    InvalidateBitmap();
     m_render.EnableWindow(TRUE);
 }
 
 void CMandelbrotDlg::OnEnChangeX()
 {
-    if (IsWindow(m_x.m_hWnd))
-        set_value(m_y, get_value(m_x));
+    if (IsWindow(m_x.m_hWnd) && IsWindow(m_spinx.m_hWnd)) {
+        int minx = 0, maxx = 0;
+        m_spinx.GetRange(minx, maxx);
 
-    created_bitmap = false;   // re-create bitmap with new size
-    Invalidate();
+        int oldvalue = get_value(m_x);
+        int minvalue = (std::min)(maxx, oldvalue);
+        if (oldvalue != minvalue)
+            set_value(m_x, minvalue);
+
+        set_value(m_y, minvalue); 
+
+        InvalidateBitmap(TRUE);
+    }
 }
 
 void CMandelbrotDlg::OnEnChangeY()
 {
-    created_bitmap = false;   // re-create bitmap with new size
-    Invalidate();
+    if (IsWindow(m_y.m_hWnd) && IsWindow(m_spiny.m_hWnd)) {
+        int miny = 0, maxy = 0;
+        m_spiny.GetRange(miny, maxy);
+
+        int oldvalue = get_value(m_y);
+        int minvalue = (std::min)(maxy, oldvalue);
+        if (oldvalue != minvalue)
+            set_value(m_y, minvalue);
+
+        InvalidateBitmap(TRUE);
+    }
 }
 
 void CMandelbrotDlg::error_sink(boost::uint32_t src, std::string const& msg)
@@ -309,4 +339,14 @@ void CMandelbrotDlg::error_sink(boost::uint32_t src, std::string const& msg)
     AfxMessageBox(msg.c_str());
 }
 
+void CMandelbrotDlg::InvalidateBitmap(BOOL erase)
+{
+    CRect rcframe;
+    m_bitmapframe.GetWindowRect(rcframe);
+    ScreenToClient(rcframe);
+
+    if (erase)
+        created_bitmap = false;   // re-create bitmap with new size
+    InvalidateRect(rcframe, erase);
+}
 

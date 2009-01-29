@@ -22,6 +22,7 @@ namespace hpx { namespace actions
     public:
         // Constructor
         action_manager(applier::applier& appl)
+          : appl_(appl)
         {
             // Need to register the call-back function in parcelHandler so that
             // when a new parcel is received, it calls action_manager's 
@@ -58,6 +59,8 @@ namespace hpx { namespace actions
         // this scoped connection instance ensures the event handler to be 
         // automatically unregistered whenever it gets destroyed
         parcelset::parcelhandler::scoped_connection_type conn_;
+
+        applier::applier& appl_;
     };
 }}
 

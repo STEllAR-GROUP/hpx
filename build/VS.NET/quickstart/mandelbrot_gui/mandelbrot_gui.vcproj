@@ -265,7 +265,7 @@
 	<Globals>
 		<Global
 			Name="RESOURCE_FILE"
-			Value="\CVS\hpx\examples\quickstart\mandelbrot_gui\mandelbrot_gui.rc"
+			Value="\CVS\hpx\examples\quickstart\mandelbrot\mandelbrot_gui\mandelbrot_gui.rc"
 		/>
 	</Globals>
 </VisualStudioProject>

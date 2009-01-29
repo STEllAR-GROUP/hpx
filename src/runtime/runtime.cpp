@@ -53,7 +53,9 @@ namespace hpx
             mode locality_mode) 
       : result_(0), mode_(locality_mode), 
         ini_(util::detail::get_logging_data()), 
-        agas_pool_(), parcel_pool_(), timer_pool_(),
+        agas_pool_(boost::bind(&runtime::init_applier, This())), 
+        parcel_pool_(boost::bind(&runtime::init_applier, This())), 
+        timer_pool_(boost::bind(&runtime::init_applier, This())),
         agas_client_(agas_pool_, ini_.get_agas_locality(agas_address, agas_port), mode_ == console),
         parcel_port_(parcel_pool_, naming::locality(address, port)),
         thread_manager_(timer_pool_, 
@@ -76,7 +78,9 @@ namespace hpx
             mode locality_mode) 
       : result_(0), mode_(locality_mode), 
         ini_(util::detail::get_logging_data()), 
-        agas_pool_(), parcel_pool_(), timer_pool_(),
+        agas_pool_(boost::bind(&runtime::init_applier, This())), 
+        parcel_pool_(boost::bind(&runtime::init_applier, This())), 
+        timer_pool_(boost::bind(&runtime::init_applier, This())),
         agas_client_(agas_pool_, agas_address, mode_ == console),
         parcel_port_(parcel_pool_, address),
         thread_manager_(timer_pool_, 
@@ -98,7 +102,9 @@ namespace hpx
     runtime::runtime(naming::locality address, mode locality_mode) 
       : result_(0), mode_(locality_mode), 
         ini_(util::detail::get_logging_data()), 
-        agas_pool_(), parcel_pool_(), timer_pool_(),
+        agas_pool_(boost::bind(&runtime::init_applier, This())), 
+        parcel_pool_(boost::bind(&runtime::init_applier, This())), 
+        timer_pool_(boost::bind(&runtime::init_applier, This())),
         agas_client_(agas_pool_, ini_.get_agas_locality(), mode_ == console),
         parcel_port_(parcel_pool_, address),
         thread_manager_(timer_pool_, 

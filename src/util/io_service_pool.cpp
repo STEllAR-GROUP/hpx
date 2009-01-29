@@ -19,8 +19,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
-    io_service_pool::io_service_pool(std::size_t pool_size)
-      : next_io_service_(0), stopped_(false)
+    io_service_pool::io_service_pool(std::size_t pool_size, 
+            boost::function<void()> start_thread)
+      : next_io_service_(0), stopped_(false), start_thread_(start_thread)
     {
         if (pool_size == 0)
             throw std::runtime_error("io_service_pool size is 0");
@@ -36,6 +37,22 @@ namespace hpx { namespace util
         }
     }
 
+    io_service_pool::io_service_pool(boost::function<void()> start_thread)
+      : next_io_service_(0), stopped_(false), start_thread_(start_thread)
+    {
+        io_service_ptr io_service(new boost::asio::io_service);
+        work_ptr work(new boost::asio::io_service::work(*io_service));
+        io_services_.push_back(io_service);
+        work_.push_back(work);
+    }
+
+    void io_service_pool::thread_run(int index)
+    {
+        if (start_thread_)
+            start_thread_();
+        io_services_[index]->run();   // run io service
+    }
+
     bool io_service_pool::run(bool join_threads)
     {
         // Create a pool of threads to run all of the io_services.
@@ -45,19 +62,19 @@ namespace hpx { namespace util
                 join();
             return false;
         }
-        
+
         for (std::size_t i = 0; i < io_services_.size(); ++i)
         {
             boost::shared_ptr<boost::thread> thread(new boost::thread(
-                boost::bind(&boost::asio::io_service::run, io_services_[i])));
+                boost::bind(&io_service_pool::thread_run, this, i)));
             threads_.push_back(thread);
         }
         if (join_threads)
             join();
-            
+
         return true;
     }
-    
+
     void io_service_pool::join()
     {
         // Wait for all threads in the pool to exit.

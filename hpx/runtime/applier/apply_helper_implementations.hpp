@@ -45,7 +45,7 @@
         call (naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            hpx::applier::register_work(Action::construct_thread_function(lva, 
+            hpx::applier::register_work_plain(Action::construct_thread_function(lva, 
                     BOOST_PP_ENUM_PARAMS(N, arg)),
                 actions::detail::get_action_name<Action>());
         }
@@ -54,7 +54,7 @@
         call (actions::continuation_type& c, naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            hpx::applier::register_work(Action::construct_thread_function(
+            hpx::applier::register_work_plain(Action::construct_thread_function(
                 c, lva, BOOST_PP_ENUM_PARAMS(N, arg)),
                 actions::detail::get_action_name<Action>());
         }

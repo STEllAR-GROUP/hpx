@@ -28,21 +28,21 @@ namespace hpx { namespace applier { namespace detail
         static void 
         call (Action* act, naming::address::address_type lva)
         {
-            hpx::applier::register_work(act->get_thread_function(lva),
+            hpx::applier::register_work_plain(act->get_thread_function(lva),
                 actions::detail::get_action_name<Action>());
         }
 
         static void 
         call (naming::address::address_type lva)
         {
-            hpx::applier::register_work(Action::construct_thread_function(lva),
+            hpx::applier::register_work_plain(Action::construct_thread_function(lva),
                 actions::detail::get_action_name<Action>());
         }
 
         static void 
         call (actions::continuation_type& c, naming::address::address_type lva)
         {
-            hpx::applier::register_work(Action::construct_thread_function(c, lva),
+            hpx::applier::register_work_plain(Action::construct_thread_function(c, lva),
                 actions::detail::get_action_name<Action>());
         }
     };
@@ -91,7 +91,7 @@ namespace hpx { namespace applier { namespace detail
         static void 
         call (naming::address::address_type addr, Arg0 const& arg0)
         {
-            hpx::applier::register_work(Action::construct_thread_function(addr, arg0),
+            hpx::applier::register_work_plain(Action::construct_thread_function(addr, arg0),
                 actions::detail::get_action_name<Action>());
         }
 
@@ -99,7 +99,7 @@ namespace hpx { namespace applier { namespace detail
         call (actions::continuation_type& c, naming::address::address_type addr, 
             Arg0 const& arg0)
         {
-            hpx::applier::register_work(Action::construct_thread_function(c, addr, arg0),
+            hpx::applier::register_work_plain(Action::construct_thread_function(c, addr, arg0),
                 actions::detail::get_action_name<Action>());
         }
     };

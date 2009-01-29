@@ -82,7 +82,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,178,7,50,16,WS_GROUP
 END
 
-IDD_MANDELBROT_GUI_DIALOG DIALOGEX 0, 0, 233, 199
+IDD_MANDELBROT_GUI_DIALOG DIALOGEX 0, 0, 233, 218
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "HPX Mandelbrot"
@@ -94,7 +94,8 @@ BEGIN
     LTEXT           "&Y: ",IDC_STATIC,85,10,10,8
     EDITTEXT        IDC_Y,97,8,40,13,ES_AUTOHSCROLL
     CONTROL         "",IDC_SPINY,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,144,7,11,14
-    CONTROL         "",IDC_PICTURE,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE | NOT WS_VISIBLE,7,30,219,162,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_PICTURE,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE | NOT WS_VISIBLE,7,31,219,162,WS_EX_TRANSPARENT
+    CONTROL         "&Debug Output",IDC_DEBUG_OUTPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,197,61,10
     PUSHBUTTON      "&Render",ID_RENDER,171,7,55,16
 END
 
@@ -105,8 +106,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 1,0,0,2
+ PRODUCTVERSION 1,0,0,2
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -121,14 +122,14 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "TODO: <Company name>"
-            VALUE "FileDescription", "TODO: <File description>"
-            VALUE "FileVersion", "1.0.0.1"
+            VALUE "CompanyName", "LSU"
+            VALUE "FileDescription", "HPX Mandelbrot"
+            VALUE "FileVersion", "1.0.0.2"
             VALUE "InternalName", "mandelbrot_gui.exe"
-            VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
+            VALUE "LegalCopyright", "Copyright 2009 (c) Hartmut Kaiser."
             VALUE "OriginalFilename", "mandelbrot_gui.exe"
-            VALUE "ProductName", "TODO: <Product name>"
-            VALUE "ProductVersion", "1.0.0.1"
+            VALUE "ProductName", "HPX Mandelbrot"
+            VALUE "ProductVersion", "1.0.0.2"
         END
     END
     BLOCK "VarFileInfo"
@@ -159,7 +160,8 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 226
         TOPMARGIN, 7
-        BOTTOMMARGIN, 192
+        BOTTOMMARGIN, 211
+        HORZGUIDE, 192
     END
 END
 #endif    // APSTUDIO_INVOKED

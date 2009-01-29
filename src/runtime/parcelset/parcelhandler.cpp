@@ -98,6 +98,7 @@ namespace hpx { namespace parcelset
     void parcelhandler::parcel_sink(parcelport& pp, 
         boost::shared_ptr<std::vector<char> > const& parcel_data)
     {
+//         decode_parcel(parcel_data);
         if (NULL == tm_) {
             // this is supported for debugging purposes mainly, it results in
             // the direct execution of the parcel decoding

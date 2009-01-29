@@ -26,7 +26,7 @@ mandelbrot::result mandelbrot_func(mandelbrot::data const& data)
     long double ypt = y;
 
     boost::uint32_t k = 0;
-    for(/**/; k <= data.iterations_; ++k)
+    for(/**/; k < data.iterations_; ++k)
     {
         // The Mandelbrot Function Z = Z*Z+c into x and y parts
         long double xnew = sqr(x) - sqr(y) + xpt;
@@ -37,6 +37,12 @@ mandelbrot::result mandelbrot_func(mandelbrot::data const& data)
         y = ynew;
     }
 
+    if (data.debug_)
+    {
+        std::cerr << "X: " << data.x_ << ", Y: " << data.y_ 
+                  << ", result: " << ((k >= data.iterations_) ? 0 : k) 
+                  << std::endl;
+    }
     return mandelbrot::result(data.x_, data.y_, (k >= data.iterations_) ? 0 : k);
 }
 

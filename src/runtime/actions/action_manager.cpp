@@ -30,7 +30,7 @@ namespace hpx { namespace actions
         // by convention, a zero address references the local runtime support 
         // component
             if (0 == lva) 
-                lva = applier::get_applier().get_runtime_support_gid().get_lsb();
+                lva = appl_.get_runtime_support_gid().get_lsb();
 
         // decode the action-type in the parcel
             action_type act = p.get_action();
@@ -60,14 +60,14 @@ namespace hpx { namespace actions
                 if (!cont) {
                 // no continuation is to be executed, register the plain action 
                 // and the local-virtual address with the TM only
-                    applier::register_work(act->get_thread_function(lva),
-                        act->get_action_name());
+                    appl_.get_thread_manager().register_work(
+                        act->get_thread_function(lva), act->get_action_name());
                 }
                 else {
                 // this parcel carries a continuation, register a wrapper which
                 // first executes the original thread function as required by 
                 // the action and triggers the continuations afterwards
-                    applier::register_work(
+                    appl_.get_thread_manager().register_work(
                         act->get_thread_function(cont, lva), act->get_action_name());
                 }
             }

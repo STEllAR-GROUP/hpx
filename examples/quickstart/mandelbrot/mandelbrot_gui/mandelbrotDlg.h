@@ -49,9 +49,12 @@ public:
     void mandelbrot_callback(hpx::lcos::counting_semaphore& sem,
         mandelbrot::result const& result);
 
+    void InvalidateBitmap(BOOL erase = FALSE);
+
 private:
     boost::mutex mtx_;
     CBitmap m_mandelbrot;
     bool created_bitmap;
     hpx::runtime& rt;
+    boost::lockfree::atomic_int<long> referesh_counter;
 };
