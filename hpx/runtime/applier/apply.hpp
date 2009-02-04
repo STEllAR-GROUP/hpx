@@ -65,10 +65,10 @@ namespace hpx { namespace applier
     {
         // Determine whether the gid is local or remote
         if (hpx::applier::get_applier().address_is_local(fa)) 
-            return apply_l<Action>(fa.caddress());   // apply locally
+            return apply_l<Action>(fa.caddr());   // apply locally
 
         // apply remotely
-        return apply_r<Action>(fa.address(), fa.cgid());
+        return apply_r<Action>(fa.addr(), fa.cgid());
     }
 
     /// \note A call to applier's apply function would look like:
@@ -121,10 +121,10 @@ namespace hpx { namespace applier
     {
         // Determine whether the gid is local or remote
         if (hpx::applier::get_applier().address_is_local(fa)) 
-            return apply_l<Action>(c, fa.caddress());
+            return apply_l<Action>(c, fa.caddr());
 
         // apply remotely
-        return apply_r<Action>(fa.address(), c, fa.cgid());
+        return apply_r<Action>(fa.addr(), c, fa.cgid());
     }
 
     template <typename Action>
@@ -197,10 +197,10 @@ namespace hpx { namespace applier
     {
         // Determine whether the gid is local or remote
         if (hpx::applier::get_applier().address_is_local(fa)) 
-            return apply_l<Action>(fa.caddress(), arg0);   // apply locally
+            return apply_l<Action>(fa.caddr(), arg0);   // apply locally
 
         // apply remotely
-        return apply_r<Action>(fa.address(), fa.cgid(), arg0);
+        return apply_r<Action>(fa.addr(), fa.cgid(), arg0);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -252,10 +252,10 @@ namespace hpx { namespace applier
     {
         // Determine whether the gid is local or remote
         if (hpx::applier::get_applier().address_is_local(fa)) 
-            return apply_l<Action>(c, fa.caddress(), arg0);    // apply locally
+            return apply_l<Action>(c, fa.caddr(), arg0);    // apply locally
 
         // apply remotely
-        return apply_r<Action>(fa.address(), c, fa.cgid(), arg0);
+        return apply_r<Action>(fa.addr(), c, fa.cgid(), arg0);
     }
 
     template <typename Action, typename Arg0>

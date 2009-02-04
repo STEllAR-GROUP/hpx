@@ -41,8 +41,8 @@ namespace hpx { namespace naming
         naming::id_type& gid() { return gid_; }
         naming::id_type const& cgid() const { return gid_; }
 
-        naming::address& address() { return address_; }
-        naming::address const& caddress() const { return address_; }
+        naming::address& addr() { return address_; }
+        naming::address const& caddr() const { return address_; }
 
     private:
         naming::id_type gid_;

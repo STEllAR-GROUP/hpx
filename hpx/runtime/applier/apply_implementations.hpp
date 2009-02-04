@@ -76,10 +76,10 @@
     {
         // Determine whether the gid is local or remote
         if (hpx::applier::get_applier().address_is_local(fa))
-            return apply_l<Action>(fa.caddress(), BOOST_PP_ENUM_PARAMS(N, arg));
+            return apply_l<Action>(fa.caddr(), BOOST_PP_ENUM_PARAMS(N, arg));
 
         // apply remotely
-        return apply_r<Action>(fa.address(), fa.cgid(), BOOST_PP_ENUM_PARAMS(N, arg));
+        return apply_r<Action>(fa.addr(), fa.cgid(), BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -134,10 +134,10 @@
     {
         // Determine whether the gid is local or remote
         if (hpx::applier::get_applier().address_is_local(fa))
-            return apply_l<Action>(c, fa.caddress(), BOOST_PP_ENUM_PARAMS(N, arg));
+            return apply_l<Action>(c, fa.caddr(), BOOST_PP_ENUM_PARAMS(N, arg));
 
         // apply remotely
-        return apply_r<Action>(fa.address(), c, fa.cgid(), BOOST_PP_ENUM_PARAMS(N, arg));
+        return apply_r<Action>(fa.addr(), c, fa.cgid(), BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>

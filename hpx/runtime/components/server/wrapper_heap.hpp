@@ -164,7 +164,7 @@ namespace hpx { namespace components { namespace detail
 
             hpx::applier::applier& appl = hpx::applier::get_applier();
             value_type* addr = static_cast<value_type*>(pool_->address());
-            naming::address& localaddr = fa.address();
+            naming::address& localaddr = fa.addr();
 
             localaddr.locality_ = appl.here();
             localaddr.type_ = value_type::get_component_type();

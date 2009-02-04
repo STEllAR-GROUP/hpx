@@ -154,7 +154,7 @@ namespace hpx { namespace applier
         /// Test whether the given address (gid) is local or remote
         bool address_is_local(naming::full_address& fa) const
         {
-            naming::address& addr = fa.address();
+            naming::address& addr = fa.addr();
             if (!fa) {
                 // test if the gid is of one of the non-movable objects
                 // this is certainly an optimization relying on the fact that the 
