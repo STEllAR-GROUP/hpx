@@ -520,10 +520,10 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     inline void handle_pending_set_state(threadmanager& tm, 
-        threadmanager::set_state_queue_type& active_set_state)
+        threadmanager::thread_id_queue_type& active_set_state)
     {
         if (!active_set_state.empty()) {
-            threadmanager::set_state_queue_type still_active;
+            threadmanager::thread_id_queue_type still_active;
             thread_id_type id = 0;
 
             // try to reactivate the threads in the set_state queue
@@ -547,9 +547,9 @@ namespace hpx { namespace threads
     {
         if (!terminated_items_.empty()) {
             long delete_count = max_delete_count;   // delete only this much threads
-            boost::shared_ptr<thread> todelete;
+            thread_id_type todelete;
             while (--delete_count && terminated_items_.dequeue(&todelete)) 
-                thread_map_.erase(todelete->get_thread_id());
+                thread_map_.erase(todelete);
         }
         return thread_map_.empty();
     }
@@ -714,7 +714,9 @@ namespace hpx { namespace threads
                 if (state == depleted || state == terminated) {
                     // all OS threads put their terminated PX threads into a 
                     // separate queue
-                    terminated_items_.enqueue(thrd);
+                    thread_id_type id = thrd->get_thread_id();
+                    thrd.reset();       // avoid shared_ptr race conditions
+                    terminated_items_.enqueue(id);
                 }
 
                 tl1.tock();
