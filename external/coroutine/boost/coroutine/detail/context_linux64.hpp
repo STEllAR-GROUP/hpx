@@ -76,21 +76,15 @@ namespace boost { namespace coroutines {
        * and restores the context in @p to.
        * @note This function is found by ADL.
        */     
-      friend void 
-      swap_context(ia64_gcc_context_impl_base& from, 
-                   ia64_gcc_context_impl const& to, 
-                   default_hint);
+      friend void swap_context(ia64_gcc_context_impl_base& from, 
+          ia64_gcc_context_impl const& to, default_hint);
 
 #ifndef BOOST_COROUTINE_NO_SEPARATE_CALL_SITES
-      friend void 
-      swap_context(ia64_gcc_context_impl& from, 
-                   ia64_gcc_context_impl_base const& to,
-                   yield_hint);
+      friend void swap_context(ia64_gcc_context_impl& from, 
+          ia64_gcc_context_impl_base const& to, yield_hint);
 
-      friend void 
-      swap_context(ia64_gcc_context_impl& from, 
-                   ia64_gcc_context_impl_base const& to,
-                   yield_to_hint);
+      friend void swap_context(ia64_gcc_context_impl& from, 
+          ia64_gcc_context_impl_base const& to, yield_to_hint);
 #endif
 
     protected:
@@ -148,6 +142,17 @@ namespace boost { namespace coroutines {
         if(m_stack)
           posix::free_stack(m_stack, m_stack_size);
       }
+
+      friend void swap_context(ia64_gcc_context_impl_base& from, 
+          ia64_gcc_context_impl const& to, default_hint);
+
+#ifndef BOOST_COROUTINE_NO_SEPARATE_CALL_SITES
+      friend void swap_context(ia64_gcc_context_impl& from, 
+          ia64_gcc_context_impl_base const& to, yield_hint);
+
+      friend void swap_context(ia64_gcc_context_impl& from, 
+          ia64_gcc_context_impl_base const& to, yield_to_hint);
+#endif
 
     private:
       std::ptrdiff_t m_stack_size;
