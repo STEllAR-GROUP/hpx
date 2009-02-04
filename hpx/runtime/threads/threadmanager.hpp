@@ -43,9 +43,7 @@ namespace hpx { namespace threads
     {
     private:
         // this is the type of the queues of new or pending threads
-        typedef 
-            boost::lockfree::fifo<boost::shared_ptr<thread> > 
-        work_items_type;
+        typedef boost::lockfree::fifo<thread*> work_items_type;
 
         // this is the type of the queue of new tasks not yet converted to
         // threads

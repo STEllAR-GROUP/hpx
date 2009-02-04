@@ -133,7 +133,7 @@ namespace hpx { namespace threads
         // only insert in the work-items queue if it is in pending state
         if (initial_state == pending) {
             // pushing the new thread in the pending queue thread
-            work_items_.enqueue(thrd);
+            work_items_.enqueue(thrd.get());
         }
 
         if (run_now) {
@@ -220,7 +220,7 @@ namespace hpx { namespace threads
             if (state == pending) {
                 // pushing the new thread into the pending queue 
                 ++added;
-                work_items_.enqueue(thrd);
+                work_items_.enqueue(thrd.get());
                 if (0 != wait_count_)
                     cond_.notify_all();         // wake up sleeping threads
             }
@@ -370,7 +370,7 @@ namespace hpx { namespace threads
             thrd->set_state(new_state);
             thrd->set_state_ex(new_state_ex);
             if (new_state == pending) {
-                work_items_.enqueue(thrd);
+                work_items_.enqueue(thrd.get());
                 cond_.notify_all();
             }
             return previous_state;
@@ -491,7 +491,7 @@ namespace hpx { namespace threads
     class switch_status
     {
     public:
-        switch_status (boost::shared_ptr<thread> t, thread_state new_state)
+        switch_status (thread* t, thread_state new_state)
             : thread_(t), prev_state_(t->set_state(new_state))
         {}
 
@@ -514,7 +514,7 @@ namespace hpx { namespace threads
         }
 
     private:
-        boost::shared_ptr<thread> thread_;
+        thread* thread_;
         thread_state prev_state_;
     };
 
@@ -666,7 +666,7 @@ namespace hpx { namespace threads
         boost::coroutines::prepare_main_thread main_thread;
         while (true) {
             // Get the next PX thread from the queue
-            boost::shared_ptr<thread> thrd;
+            thread* thrd = NULL;
             if (work_items_.dequeue(&thrd)) {
                 tl1.tick();
 
@@ -715,12 +715,9 @@ namespace hpx { namespace threads
                     // all OS threads put their terminated PX threads into a 
                     // separate queue
                     thread_id_type id = thrd->get_thread_id();
-                    thrd.reset();       // avoid shared_ptr race conditions
                     terminated_items_.enqueue(id);
                 }
-                else {
-                    thrd.reset();       // just release thread
-                }
+
                 tl1.tock();
             }
 
