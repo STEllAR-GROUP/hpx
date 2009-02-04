@@ -114,7 +114,7 @@ namespace boost { namespace coroutines {
         BOOST_ASSERT(m_stack);
         m_sp = ((void**)m_stack + (m_stack_size/sizeof(void*)));
 
-        *(void**)m_stack = ~0;            // fill the last word with ones
+        *(void**)m_stack = (void*)~0;            // fill the last word with ones
 
         typedef void fun(Functor*);
         fun * funp = trampoline;
@@ -166,27 +166,27 @@ namespace boost { namespace coroutines {
      * and restores the context in @p to.
      * @note This function is found by ADL.
      */     
-    void swap_context(ia64_gcc_context_impl_base& from, 
+    inline void swap_context(ia64_gcc_context_impl_base& from, 
         ia64_gcc_context_impl const& to, default_hint) 
     {
-        BOOST_ASSERT(*(void**)to.m_stack == ~0);
+        BOOST_ASSERT(*(void**)to.m_stack == (void*)~0);
         to.prefetch();
         swapcontext_stack(&from.m_sp, to.m_sp);
     }
 
 #ifndef BOOST_COROUTINE_NO_SEPARATE_CALL_SITES
-    void swap_context(ia64_gcc_context_impl& from, 
+    inline void swap_context(ia64_gcc_context_impl& from, 
         ia64_gcc_context_impl_base const& to, yield_hint) 
     {
-        BOOST_ASSERT(*(void**)from.m_stack == ~0);
+        BOOST_ASSERT(*(void**)from.m_stack == (void*)~0);
         to.prefetch();
         swapcontext_stack2(&from.m_sp, to.m_sp);
     }
 
-    void swap_context(ia64_gcc_context_impl& from, 
+    inline void swap_context(ia64_gcc_context_impl& from, 
         ia64_gcc_context_impl_base const& to, yield_to_hint) 
     {
-        BOOST_ASSERT(*(void**)from.m_stack == ~0);
+        BOOST_ASSERT(*(void**)from.m_stack == (void*)~0);
         to.prefetch();
         swapcontext_stack3(&from.m_sp, to.m_sp);
     }

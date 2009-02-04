@@ -165,9 +165,10 @@ public:
                 }
                 else
                 {
-                    *ret = lockfree::assign_from(next->data);
+                    T t = lockfree::assign_from(next->data);
                     if (head_.CAS(head, next))
                     {
+                        *ret = t;
                         dealloc_node(head.get_ptr());
                         dequeue_spin_count_ += cnt;
                         return true;

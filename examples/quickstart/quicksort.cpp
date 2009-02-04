@@ -94,14 +94,14 @@ void quicksort<T>::call(naming::id_type prefix, naming::id_type d,
                 (std::max)(begin+1, middle_idx), end);
 
             call(prefix, d, begin, middle_idx);
-//             call(prefix, d, (std::max)(begin+1, middle_idx), end);
+//            call(prefix, d, (std::max)(begin+1, middle_idx), end);
             components::wait(n);
         }
         else {
             lcos::eager_future<quicksort_action> n(prefix, prefix, d, 
                 begin, middle_idx);
 
-//             call(prefix, d, begin, middle_idx);
+//            call(prefix, d, begin, middle_idx);
             call(prefix, d, (std::max)(begin+1, middle_idx), end);
             components::wait(n);
         }
