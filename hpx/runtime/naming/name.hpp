@@ -10,7 +10,6 @@
 #include <boost/cstdint.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/serialization.hpp>
-#include <boost/serialization/version.hpp>
 
 #include <hpx/util/safe_bool.hpp>
 
@@ -62,7 +61,7 @@ namespace hpx { namespace naming
             return t;
         }
 
-        // this get's called from the safe_bool base class 
+        // this gets called from the safe_bool base class 
         bool operator_bool() const { return 0 != id_lsb_ || 0 != id_msb_; }
 
         // we support increment and addition as operators

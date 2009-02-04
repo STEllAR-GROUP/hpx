@@ -9,13 +9,18 @@
 #include <vector>
 
 #include <boost/shared_ptr.hpp>
+#include <boost/serialization/version.hpp>
 #include <boost/serialization/serialization.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming/full_address.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+// Version of continuation
+#define HPX_CONTINUATION_VERSION 0x10
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
@@ -29,27 +34,19 @@ namespace hpx { namespace actions
         {}
 
         explicit continuation(naming::id_type const& gid)
-        {
-            gids_.push_back(gid);
-        }
-
-        explicit continuation(std::vector<naming::id_type> const& gids)
-          : gids_(gids)
+          : gid_(gid)
         {}
 
-        virtual ~continuation() {}
-
-        bool empty() const
-        {
-            return gids_.empty();
-        }
+        explicit continuation(naming::full_address const& gid)
+          : gid_(gid)
+        {}
 
         ///
-        void trigger_all();
+        void trigger();
 
         ///
         template <typename Arg0>
-        Arg0 const& trigger_all(Arg0 const& arg0);
+        Arg0 const& trigger(Arg0 const& arg0);
 
         ///
         void trigger_error(hpx::exception const& e);
@@ -61,13 +58,18 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & gids_;
+            ar & gid_;
         }
 
-        std::vector<naming::id_type> gids_;
+        naming::full_address gid_;
     };
 
 }}
+
+///////////////////////////////////////////////////////////////////////////////
+// this is the current version of the id_type serialization format
+BOOST_CLASS_VERSION(hpx::actions::continuation, HPX_CONTINUATION_VERSION)
+BOOST_CLASS_TRACKING(hpx::actions::continuation, boost::serialization::track_never)
 
 #include <hpx/config/warnings_suffix.hpp>
 

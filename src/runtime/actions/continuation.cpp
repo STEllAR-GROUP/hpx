@@ -8,45 +8,30 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/lcos/base_lco.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/export.hpp>
-#include <boost/serialization/vector.hpp>
+// #include <hpx/util/portable_binary_iarchive.hpp>
+// #include <hpx/util/portable_binary_oarchive.hpp>
+// 
+// #include <boost/serialization/version.hpp>
+// #include <boost/serialization/export.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // enable serialization of continuations through shared_ptr's
-BOOST_CLASS_EXPORT(hpx::actions::continuation);
+// BOOST_CLASS_EXPORT(hpx::actions::continuation);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
     ///////////////////////////////////////////////////////////////////////////
-    void continuation::trigger_all()
+    void continuation::trigger()
     {
-        std::vector<naming::id_type>::iterator end = gids_.end();
-        for (std::vector<naming::id_type>::iterator it = gids_.begin();
-             it != end; ++it)
-        {
-            if (!hpx::applier::apply<lcos::base_lco::set_event_action>(*it))
-                break;
-        }
+        hpx::applier::apply<lcos::base_lco::set_event_action>(gid_);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     void continuation::trigger_error(hpx::exception const& e)
     {
-        std::vector<naming::id_type>::iterator end = gids_.end();
-        for (std::vector<naming::id_type>::iterator it = gids_.begin();
-             it != end; ++it)
-        {
-            if (!hpx::applier::apply<lcos::base_lco::set_error_action>(
-                    *it, e.get_error(), std::string(e.what())))
-            {
-                break;
-            }
-        }
+        hpx::applier::apply<lcos::base_lco::set_error_action>(gid_, 
+            e.get_error(), std::string(e.what()));
     }
 
 }}

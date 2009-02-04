@@ -78,7 +78,7 @@
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             try {
-                return c->trigger_all(Action::execute_function(
+                return c->trigger(Action::execute_function(
                     addr, BOOST_PP_ENUM_PARAMS(N, arg)));
             }
             catch (hpx::exception const& e) {

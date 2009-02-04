@@ -44,7 +44,16 @@
         }
         else {
             // remote execution
-            hpx::applier::apply_c<Action>(addr, this->get_gid(), gid, 
+            naming::full_address fa;
+            if (!this->get_full_address(fa))
+            {
+                HPX_OSSTREAM strm;
+                strm << gid;
+                HPX_THROW_EXCEPTION(unknown_component_address, 
+                    "eager_future<Action, Result>::apply", 
+                    HPX_OSSTREAM_GETSTRING(strm));
+            }
+            hpx::applier::apply_c<Action>(addr, fa, gid, 
                 BOOST_PP_ENUM_PARAMS(N, arg));
         }
     }

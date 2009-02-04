@@ -26,8 +26,7 @@ namespace hpx { namespace components { namespace detail
         {}
 
         ///
-        naming::id_type 
-        get_gid(void* p)
+        naming::id_type get_gid(void* p)
         {
             typename Mutex::scoped_lock guard (this->mtx_);
 
@@ -39,6 +38,21 @@ namespace hpx { namespace components { namespace detail
                     return (*it)->get_gid(id_range_, p);
             }
             return naming::invalid_id;
+        }
+
+        ///
+        bool get_full_address(void* p, naming::full_address& fa)
+        {
+            typename Mutex::scoped_lock guard (this->mtx_);
+
+            typedef typename base_type::const_iterator iterator;
+            iterator end = this->heap_list_.end();
+            for (iterator it = this->heap_list_.begin(); it != end; ++it) 
+            {
+                if ((*it)->did_alloc(p)) 
+                    return (*it)->get_full_address(id_range_, p, fa);
+            }
+            return false;
         }
 
     private:

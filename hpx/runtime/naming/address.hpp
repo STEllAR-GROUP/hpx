@@ -66,7 +66,7 @@ namespace hpx { namespace naming
         address_type address_;  /// address (sequence number)
 
     private:
-        friend std::ostream& operator<< (std::ostream& os, address const& req);
+        friend std::ostream& operator<< (std::ostream&, address const&);
 
         // serialization support    
         friend class boost::serialization::access;

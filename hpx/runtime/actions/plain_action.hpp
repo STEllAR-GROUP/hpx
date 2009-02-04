@@ -274,7 +274,7 @@ namespace hpx { namespace actions
 
     public:
         typedef boost::mpl::false_ direct_execution;
-        typedef void result_type;
+        typedef util::unused_type result_type;
 
         /// \brief This static \a construct_thread_function allows to construct 
         /// a proper thread function for a \a thread without having to 
@@ -668,7 +668,7 @@ namespace hpx { namespace actions
 
     public:
         typedef boost::mpl::false_ direct_execution;
-        typedef void result_type;
+        typedef util::unused_type result_type;
 
         /// \brief This static \a construct_thread_function allows to construct 
         /// a proper thread function for a \a thread without having to 

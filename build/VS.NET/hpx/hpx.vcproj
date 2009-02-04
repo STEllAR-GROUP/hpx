@@ -194,7 +194,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;HPX_EXPORTS;BOOST_ALL_DYN_LINK;HPX_COMPONENT_NAME=$(ProjectName);BOOST_COROUTINE_EXPORTS;BOOST_COROUTINE_ARG_MAX=1"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;HPX_EXPORTS;BOOST_ALL_DYN_LINK;HPX_COMPONENT_NAME=$(ProjectName);BOOST_COROUTINE_EXPORTS;BOOST_COROUTINE_ARG_MAX=2"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -382,6 +382,10 @@
 					>
 					<File
 						RelativePath="..\..\..\src\runtime\naming\address.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\src\runtime\naming\full_address.cpp"
 						>
 					</File>
 					<File
@@ -707,6 +711,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\..\hpx\runtime\naming\full_address.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\hpx\runtime\naming\locality.hpp"
 						>
 					</File>
@@ -973,6 +981,14 @@
 				</File>
 				<File
 					RelativePath="..\..\..\hpx\lcos\future_value.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\lcos\future_value_full_empty_bit.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\lcos\future_value_promise.hpp"
 					>
 				</File>
 				<File

@@ -172,7 +172,7 @@ namespace hpx { namespace actions
         {
             try {
                 boost::get<0>(func)();
-                cont->trigger_all();
+                cont->trigger();
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
@@ -214,7 +214,7 @@ namespace hpx { namespace actions
             boost::tuple<Func> func)
         {
             try {
-                cont->trigger_all(boost::get<0>(func)());
+                cont->trigger(boost::get<0>(func)());
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client

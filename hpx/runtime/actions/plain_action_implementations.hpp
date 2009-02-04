@@ -324,7 +324,7 @@
 
     public:
         typedef boost::mpl::false_ direct_execution;
-        typedef void result_type;
+        typedef util::unused_type result_type;
 
         // This static construct_thread_function allows to construct 
         // a proper thread function for a thread without having to 

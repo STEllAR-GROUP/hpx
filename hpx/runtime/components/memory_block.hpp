@@ -130,6 +130,7 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         target_type* operator->() 
         {
+            BOOST_ASSERT(sizeof(target_type) <= mb_.get_size());
             return reinterpret_cast<target_type*>(mb_.get_ptr());
         }
         target_type const* operator->() const
@@ -138,8 +139,28 @@ namespace hpx { namespace components
         }
 
         ///////////////////////////////////////////////////////////////////////
+        target_type* get_ptr() 
+        {
+            BOOST_ASSERT(sizeof(target_type) <= mb_.get_size());
+            return reinterpret_cast<target_type*>(mb_.get_ptr());
+        }
+
+        target_type const* get_ptr() const
+        {
+            BOOST_ASSERT(sizeof(target_type) <= mb_.get_size());
+            return reinterpret_cast<target_type const*>(mb_.get_ptr());
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        target_type& get() 
+        {
+            BOOST_ASSERT(sizeof(target_type) <= mb_.get_size());
+            return *reinterpret_cast<target_type*>(mb_.get_ptr());
+        }
+
         target_type const& get() const
         {
+            BOOST_ASSERT(sizeof(target_type) <= mb_.get_size());
             return *reinterpret_cast<target_type const*>(mb_.get_ptr());
         }
 

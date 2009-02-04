@@ -36,15 +36,16 @@ namespace hpx { namespace components
         /// given by the parameter \a targetgid
         static Derived 
         create(naming::id_type const& targetgid, component_type type,
-            bool freeonexit = false)
+            std::size_t count = 1, bool freeonexit = false)
         {
-            return Derived(stub_type::create(targetgid, type), freeonexit);
+            return Derived(stub_type::create(targetgid, type, count), freeonexit);
         }
 
         static Derived 
-        create(naming::id_type const& targetgid, bool freeonexit = false)
+        create(naming::id_type const& targetgid, std::size_t count = 1, 
+            bool freeonexit = false)
         {
-            return Derived(stub_type::create(targetgid), freeonexit);
+            return Derived(stub_type::create(targetgid, count), freeonexit);
         }
 
         void free(component_type type)

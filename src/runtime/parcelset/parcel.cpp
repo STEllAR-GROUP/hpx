@@ -32,10 +32,10 @@ namespace hpx { namespace parcelset
         ar << destination_addr_;
         ar << source_id_;
         ar << action_;
-        bool has_continuations = continuation_ && !continuation_->empty();
+        bool has_continuations = continuation_;
         ar << has_continuations;
         if (has_continuations)
-            ar << continuation_;
+            ar << *(continuation_.get());
         ar << start_time_;
         ar << creation_time_;
     }
@@ -55,8 +55,11 @@ namespace hpx { namespace parcelset
         ar >> source_id_;
         ar >> action_;
         ar >> has_continuation;
-        if (has_continuation)
-            ar >> continuation_;
+        if (has_continuation) {
+            actions::continuation* c = new actions::continuation;
+            ar >> *c;
+            continuation_.reset(c);
+        }
         ar >> start_time_;
         ar >> creation_time_;
     }

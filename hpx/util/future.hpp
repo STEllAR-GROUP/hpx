@@ -17,6 +17,8 @@
 #include <algorithm>
 #include <memory>
 
+#include <hpx/lcos/mutex.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
@@ -92,7 +94,7 @@ namespace hpx { namespace util
         {
             boost::exception_ptr exception;
             bool done;
-            boost::mutex mutex;
+            hpx::lcos::mutex mutex;
             boost::condition_variable waiters;
 
             future_object_base():
@@ -107,7 +109,7 @@ namespace hpx { namespace util
                 waiters.notify_all();
             }
 
-            void wait_internal(boost::unique_lock<boost::mutex>& lock)
+            void wait_internal(boost::unique_lock<hpx::lcos::mutex>& lock)
             {
                 while(!done)
                 {
@@ -118,11 +120,11 @@ namespace hpx { namespace util
 
             void wait()
             {
-                boost::unique_lock<boost::mutex> lock(mutex);
+                boost::unique_lock<hpx::lcos::mutex> lock(mutex);
                 wait_internal(lock);
             }
 
-            bool timed_wait_until_internal(boost::unique_lock<boost::mutex>& lock,boost::system_time const& target_time)
+            bool timed_wait_until_internal(boost::unique_lock<hpx::lcos::mutex>& lock,boost::system_time const& target_time)
             {
                 while(!done)
                 {
@@ -137,7 +139,7 @@ namespace hpx { namespace util
             
             bool timed_wait_until(boost::system_time const& target_time)
             {
-                boost::unique_lock<boost::mutex> lock(mutex);
+                boost::unique_lock<hpx::lcos::mutex> lock(mutex);
                 return timed_wait_until_internal(lock,target_time);
             }
             
@@ -148,7 +150,7 @@ namespace hpx { namespace util
             }
             void mark_exceptional_finish()
             {
-                boost::lock_guard<boost::mutex> lock(mutex);
+                boost::lock_guard<hpx::lcos::mutex> lock(mutex);
                 mark_exceptional_finish_internal(boost::current_exception());
             }
         private:
@@ -268,18 +270,18 @@ namespace hpx { namespace util
 
             void mark_finished_with_result(source_reference_type result_)
             {
-                boost::lock_guard<boost::mutex> lock(mutex);
+                boost::lock_guard<hpx::lcos::mutex> lock(mutex);
                 mark_finished_with_result_internal(result_);
             }
             void mark_finished_with_result(move_source_type result_)
             {
-                boost::lock_guard<boost::mutex> lock(mutex);
+                boost::lock_guard<hpx::lcos::mutex> lock(mutex);
                 mark_finished_with_result_internal(result_);
             }
 
             T move()
             {
-                boost::unique_lock<boost::mutex> lock(mutex);
+                boost::unique_lock<hpx::lcos::mutex> lock(mutex);
                 wait_internal(lock);
                 if(exception)
                 {
@@ -287,7 +289,7 @@ namespace hpx { namespace util
                 }
                 if(!result)
                 {
-                    throw future_moved();
+                    boost::throw_exception(future_moved());
                 }
 
                 return future_traits<T>::move(result);
@@ -295,7 +297,7 @@ namespace hpx { namespace util
 
             bool try_move(reference dest)
             {
-                boost::lock_guard<boost::mutex> lock(mutex);
+                boost::lock_guard<hpx::lcos::mutex> lock(mutex);
                 if(!done)
                 {
                     return false;
@@ -306,7 +308,7 @@ namespace hpx { namespace util
                 }
                 if(!result)
                 {
-                    throw future_moved();
+                    boost::throw_exception(future_moved());
                 }
 
                 future_traits<T>::move(result,dest);
@@ -315,7 +317,7 @@ namespace hpx { namespace util
 
             bool timed_move_until(reference dest,boost::system_time const& target_time)
             {
-                boost::unique_lock<boost::mutex> lock(mutex);
+                boost::unique_lock<hpx::lcos::mutex> lock(mutex);
                 if(!timed_wait_until_internal(lock,target_time))
                 {
                     return false;
@@ -326,7 +328,7 @@ namespace hpx { namespace util
                 }
                 if(!result)
                 {
-                    throw future_moved();
+                    boost::throw_exception(future_moved());
                 }
                 
                 future_traits<T>::move(result,dest);
@@ -335,7 +337,7 @@ namespace hpx { namespace util
             
             reference get()
             {
-                boost::unique_lock<boost::mutex> lock(mutex);
+                boost::unique_lock<hpx::lcos::mutex> lock(mutex);
                 wait_internal(lock);
                 if(exception)
                 {
@@ -343,7 +345,7 @@ namespace hpx { namespace util
                 }
                 if(!result)
                 {
-                    throw future_moved();
+                    boost::throw_exception(future_moved());
                 }
                 
                 return *result;
@@ -351,7 +353,7 @@ namespace hpx { namespace util
 
             bool try_get(reference dest)
             {
-                boost::lock_guard<boost::mutex> lock(mutex);
+                boost::lock_guard<hpx::lcos::mutex> lock(mutex);
                 if(!done)
                 {
                     return false;
@@ -362,7 +364,7 @@ namespace hpx { namespace util
                 }
                 if(!result)
                 {
-                    throw future_moved();
+                    boost::throw_exception(future_moved());
                 }
                 
                 dest=*result;
@@ -371,7 +373,7 @@ namespace hpx { namespace util
 
             bool timed_get_until(reference dest,boost::system_time const& target_time)
             {
-                boost::unique_lock<boost::mutex> lock(mutex);
+                boost::unique_lock<hpx::lcos::mutex> lock(mutex);
 
                 if(!timed_wait_until_internal(lock,target_time))
                 {
@@ -384,7 +386,7 @@ namespace hpx { namespace util
                 }
                 if(!result)
                 {
-                    throw future_moved();
+                    boost::throw_exception(future_moved());
                 }
                 
                 dest=*result;
@@ -393,7 +395,7 @@ namespace hpx { namespace util
 
             future_state::state get_state()
             {
-                boost::lock_guard<boost::mutex> guard(mutex);
+                boost::lock_guard<hpx::lcos::mutex> guard(mutex);
                 if(!done)
                 {
                     return future_state::waiting;
@@ -427,13 +429,13 @@ namespace hpx { namespace util
 
             void mark_finished_with_result()
             {
-                boost::lock_guard<boost::mutex> lock(mutex);
+                boost::lock_guard<hpx::lcos::mutex> lock(mutex);
                 mark_finished_with_result_internal();
             }
 
             void move()
             {
-                boost::unique_lock<boost::mutex> lock(mutex);
+                boost::unique_lock<hpx::lcos::mutex> lock(mutex);
                 wait_internal(lock);
                 if(exception)
                 {
@@ -441,14 +443,14 @@ namespace hpx { namespace util
                 }
                 if(!result)
                 {
-                    throw future_moved();
+                    boost::throw_exception(future_moved());
                 }
                 result=false;
             }
 
             void get()
             {
-                boost::unique_lock<boost::mutex> lock(mutex);
+                boost::unique_lock<hpx::lcos::mutex> lock(mutex);
                 wait_internal(lock);
                 if(exception)
                 {
@@ -456,13 +458,13 @@ namespace hpx { namespace util
                 }
                 if(!result)
                 {
-                    throw future_moved();
+                    boost::throw_exception(future_moved());
                 }
             }
             
             future_state::state get_state()
             {
-                boost::lock_guard<boost::mutex> guard(mutex);
+                boost::lock_guard<hpx::lcos::mutex> guard(mutex);
                 if(!done)
                 {
                     return future_state::waiting;
@@ -539,7 +541,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_uninitialized();
+                boost::throw_exception(future_uninitialized());
             }
 
             return future->move();
@@ -549,7 +551,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_uninitialized();
+                boost::throw_exception(future_uninitialized());
             }
 
             return future->try_move(dest);
@@ -565,7 +567,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_uninitialized();
+                boost::throw_exception(future_uninitialized());
             }
 
             return future->timed_move_until(dest,abs_time);
@@ -575,7 +577,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_uninitialized();
+                boost::throw_exception(future_uninitialized());
             }
 
             return future->get();
@@ -585,7 +587,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_uninitialized();
+                boost::throw_exception(future_uninitialized());
             }
 
             return future->try_get(dest);
@@ -601,7 +603,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_uninitialized();
+                boost::throw_exception(future_uninitialized());
             }
 
             return future->timed_get_until(dest,abs_time);
@@ -630,7 +632,7 @@ namespace hpx { namespace util
             {
                 return false;
             }
-            boost::lock_guard<boost::mutex> guard(future->mutex);
+            boost::lock_guard<hpx::lcos::mutex> guard(future->mutex);
             return future->done && future->exception;
         }
         
@@ -640,7 +642,7 @@ namespace hpx { namespace util
             {
                 return false;
             }
-            boost::lock_guard<boost::mutex> guard(future->mutex);
+            boost::lock_guard<hpx::lcos::mutex> guard(future->mutex);
             return future->done && future->result;
         }
         
@@ -654,7 +656,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_uninitialized();
+                boost::throw_exception(future_uninitialized());
             }
             future->wait();
         }
@@ -669,7 +671,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_uninitialized();
+                boost::throw_exception(future_uninitialized());
             }
             return future->timed_wait_until(abs_time);
         }
@@ -730,7 +732,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_uninitialized();
+                boost::throw_exception(future_uninitialized());
             }
 
             future->move();
@@ -741,7 +743,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_uninitialized();
+                boost::throw_exception(future_uninitialized());
             }
 
             future->get();
@@ -769,7 +771,7 @@ namespace hpx { namespace util
             {
                 return false;
             }
-            boost::lock_guard<boost::mutex> guard(future->mutex);
+            boost::lock_guard<hpx::lcos::mutex> guard(future->mutex);
             return future->done && future->exception;
         }
         
@@ -779,7 +781,7 @@ namespace hpx { namespace util
             {
                 return false;
             }
-            boost::lock_guard<boost::mutex> guard(future->mutex);
+            boost::lock_guard<hpx::lcos::mutex> guard(future->mutex);
             return future->done && future->result;
         }
         
@@ -792,7 +794,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_uninitialized();
+                boost::throw_exception(future_uninitialized());
             }
             future->wait();
         }
@@ -807,7 +809,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_uninitialized();
+                boost::throw_exception(future_uninitialized());
             }
             return future->timed_wait_until(abs_time);
         }
@@ -892,7 +894,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_uninitialized();
+                boost::throw_exception(future_uninitialized());
             }
 
             return future->get();
@@ -902,7 +904,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_uninitialized();
+                boost::throw_exception(future_uninitialized());
             }
 
             return future->try_get(dest);
@@ -918,7 +920,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_uninitialized();
+                boost::throw_exception(future_uninitialized());
             }
 
             return future->timed_get_until(dest,abs_time);
@@ -930,7 +932,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                return future_state::uninitialized;
+                boost::throw_exception(future_uninitialized());
             }
             return future->get_state();
         }
@@ -947,7 +949,7 @@ namespace hpx { namespace util
             {
                 return false;
             }
-            boost::lock_guard<boost::mutex> guard(future->mutex);
+            boost::lock_guard<hpx::lcos::mutex> guard(future->mutex);
             return future->done && future->exception;
         }
         
@@ -957,7 +959,7 @@ namespace hpx { namespace util
             {
                 return false;
             }
-            boost::lock_guard<boost::mutex> guard(future->mutex);
+            boost::lock_guard<hpx::lcos::mutex> guard(future->mutex);
             return future->done && future->result;
         }
         
@@ -971,7 +973,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_uninitialized();
+                boost::throw_exception(future_uninitialized());
             }
             future->wait();
         }
@@ -986,7 +988,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_uninitialized();
+                boost::throw_exception(future_uninitialized());
             }
             return future->timed_wait_until(abs_time);
         }
@@ -1068,7 +1070,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_uninitialized();
+                boost::throw_exception(future_uninitialized());
             }
 
             future->get();
@@ -1096,7 +1098,7 @@ namespace hpx { namespace util
             {
                 return false;
             }
-            boost::lock_guard<boost::mutex> guard(future->mutex);
+            boost::lock_guard<hpx::lcos::mutex> guard(future->mutex);
             return future->done && future->exception;
         }
         
@@ -1106,7 +1108,7 @@ namespace hpx { namespace util
             {
                 return false;
             }
-            boost::lock_guard<boost::mutex> guard(future->mutex);
+            boost::lock_guard<hpx::lcos::mutex> guard(future->mutex);
             return future->done && future->result;
         }
         
@@ -1120,7 +1122,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_uninitialized();
+                boost::throw_exception(future_uninitialized());
             }
             future->wait();
         }
@@ -1135,7 +1137,7 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_uninitialized();
+                boost::throw_exception(future_uninitialized());
             }
             return future->timed_wait_until(abs_time);
         }
@@ -1170,13 +1172,13 @@ namespace hpx { namespace util
         {
             if(future)
             {
-                boost::lock_guard<boost::mutex> lock(future->mutex);
+                boost::lock_guard<hpx::lcos::mutex> lock(future->mutex);
 
                 if(!future->done)
                 {
                     try
                     {
-                        throw broken_promise();
+                        boost::throw_exception(broken_promise());
                     }
                     catch(...)
                     {
@@ -1206,11 +1208,11 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_moved();
+                boost::throw_exception(future_moved());
             }
             if(future_obtained)
             {
-                throw future_already_retrieved();
+                boost::throw_exception(future_already_retrieved());
             }
             future_obtained=true;
             return unique_future<R>(future);
@@ -1220,12 +1222,12 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_moved();
+                boost::throw_exception(future_moved());
             }
-            boost::lock_guard<boost::mutex> lock(future->mutex);
+            boost::lock_guard<hpx::lcos::mutex> lock(future->mutex);
             if(future->done)
             {
-                throw promise_already_satisfied();
+                boost::throw_exception(promise_already_satisfied());
             }
             future->mark_finished_with_result_internal(r);
         }
@@ -1235,12 +1237,12 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_moved();
+                boost::throw_exception(future_moved());
             }
-            boost::lock_guard<boost::mutex> lock(future->mutex);
+            boost::lock_guard<hpx::lcos::mutex> lock(future->mutex);
             if(future->done)
             {
-                throw promise_already_satisfied();
+                boost::throw_exception(promise_already_satisfied());
             }
             future->mark_finished_with_result_internal(r);
         }
@@ -1249,12 +1251,12 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_moved();
+                boost::throw_exception(future_moved());
             }
-            boost::lock_guard<boost::mutex> lock(future->mutex);
+            boost::lock_guard<hpx::lcos::mutex> lock(future->mutex);
             if(future->done)
             {
-                throw promise_already_satisfied();
+                boost::throw_exception(promise_already_satisfied());
             }
             future->mark_exceptional_finish_internal(p);
         }
@@ -1288,13 +1290,13 @@ namespace hpx { namespace util
         {
             if(future)
             {
-                boost::lock_guard<boost::mutex> lock(future->mutex);
+                boost::lock_guard<hpx::lcos::mutex> lock(future->mutex);
 
                 if(!future->done)
                 {
                     try
                     {
-                        throw broken_promise();
+                        boost::throw_exception(broken_promise());
                     }
                     catch(...)
                     {
@@ -1324,11 +1326,11 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_moved();
+                boost::throw_exception(future_moved());
             }
             if(future_obtained)
             {
-                throw future_already_retrieved();
+                boost::throw_exception(future_already_retrieved());
             }
             future_obtained=true;
             return unique_future<void>(future);
@@ -1338,12 +1340,12 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_moved();
+                boost::throw_exception(future_moved());
             }
-            boost::lock_guard<boost::mutex> lock(future->mutex);
+            boost::lock_guard<hpx::lcos::mutex> lock(future->mutex);
             if(future->done)
             {
-                throw promise_already_satisfied();
+                boost::throw_exception(promise_already_satisfied());
             }
             future->mark_finished_with_result_internal();
         }
@@ -1352,12 +1354,12 @@ namespace hpx { namespace util
         {
             if(!future)
             {
-                throw future_moved();
+                boost::throw_exception(future_moved());
             }
-            boost::lock_guard<boost::mutex> lock(future->mutex);
+            boost::lock_guard<hpx::lcos::mutex> lock(future->mutex);
             if(future->done)
             {
-                throw promise_already_satisfied();
+                boost::throw_exception(promise_already_satisfied());
             }
             future->mark_exceptional_finish_internal(p);
         }
@@ -1380,10 +1382,10 @@ namespace hpx { namespace util
             void run()
             {
                 {
-                    boost::lock_guard<boost::mutex> lk(this->mutex);
+                    boost::lock_guard<hpx::lcos::mutex> lk(this->mutex);
                     if(started)
                     {
-                        throw task_already_started();
+                        boost::throw_exception(task_already_started());
                     }
                     started=true;
                 }
@@ -1508,7 +1510,7 @@ namespace hpx { namespace util
         {
             if(!task)
             {
-                throw task_moved();
+                boost::throw_exception(task_moved());
             }
             else if(!future_obtained)
             {
@@ -1517,7 +1519,7 @@ namespace hpx { namespace util
             }
             else
             {
-                throw future_already_retrieved();
+                boost::throw_exception(future_already_retrieved());
             }
         }
         
@@ -1527,7 +1529,7 @@ namespace hpx { namespace util
         {
             if(!task)
             {
-                throw task_moved();
+                boost::throw_exception(task_moved());
             }
             task->run();
         }

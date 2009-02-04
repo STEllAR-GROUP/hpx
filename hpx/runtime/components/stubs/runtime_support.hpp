@@ -95,7 +95,7 @@ namespace hpx { namespace components { namespace stubs
                 // remote runtime support object
                 addr.address_ = 0;
                 addr.type_ = components::component_runtime_support;
-                hpx::applier::apply<action_type>(addr, naming::invalid_id, type, gid);
+                hpx::applier::apply_r<action_type>(addr, naming::invalid_id, type, gid);
             }
         }
 

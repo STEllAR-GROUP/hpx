@@ -15,6 +15,7 @@
 #include <boost/function.hpp>
 #include <boost/coroutine/coroutine.hpp>
 #include <hpx/config.hpp>
+#include <hpx/util/unused.hpp>
 
 /// \namespace hpx
 ///

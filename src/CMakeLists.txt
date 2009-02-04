@@ -36,6 +36,8 @@ set (hpxlib_HEADERS
     ${hpx_SOURCE_DIR}/hpx/lcos/eager_future_constructors_direct.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/future_callback.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/future_value.hpp
+    ${hpx_SOURCE_DIR}/hpx/lcos/future_value_full_empty_bit.hpp
+    ${hpx_SOURCE_DIR}/hpx/lcos/future_value_promise.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/future_wait.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/lazy_future.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/lazy_future_get_results.hpp
@@ -89,6 +91,7 @@ set (hpxlib_HEADERS
     ${hpx_SOURCE_DIR}/hpx/runtime/components/stubs/stub_base.hpp
     # naming
     ${hpx_SOURCE_DIR}/hpx/runtime/naming/address.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/naming/full_address.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/naming/locality.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/naming/name.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/naming/resolver_client.hpp
@@ -163,6 +166,7 @@ set (hpxlib_SOURCES
     ${hpx_SOURCE_DIR}/src/runtime/components/server/runtime_support.cpp
     # naming 
     ${hpx_SOURCE_DIR}/src/runtime/naming/address.cpp
+    ${hpx_SOURCE_DIR}/src/runtime/naming/full_address.cpp
     ${hpx_SOURCE_DIR}/src/runtime/naming/locality.cpp
     ${hpx_SOURCE_DIR}/src/runtime/naming/name.cpp
     ${hpx_SOURCE_DIR}/src/runtime/naming/resolver_client.cpp

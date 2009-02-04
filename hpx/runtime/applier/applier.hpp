@@ -151,6 +151,38 @@ namespace hpx { namespace applier
             return addr.locality_ == parcel_handler_.here();
         }
 
+        /// Test whether the given address (gid) is local or remote
+        bool address_is_local(naming::full_address& fa) const
+        {
+            naming::address& addr = fa.address();
+            if (!fa) {
+                // test if the gid is of one of the non-movable objects
+                // this is certainly an optimization relying on the fact that the 
+                // lsb of the local objects is equal to their address
+                naming::id_type& gid = fa.gid();
+                if (gid.get_msb() == parcel_handler_.get_prefix().get_msb())
+                {
+                    // a zero address references the local runtime support component
+                    if (0 != gid.get_lsb())
+                        addr.address_ = gid.get_lsb();
+                    else 
+                        addr.address_ = runtime_support_id_.get_lsb();
+                    return true;
+                }
+
+                // Resolve the address of the gid
+                if (!fa.resolve())
+                {
+                    HPX_OSSTREAM strm;
+                    strm << gid;
+                    HPX_THROW_EXCEPTION(unknown_component_address, 
+                        "applier::address_is_local", 
+                        HPX_OSSTREAM_GETSTRING(strm));
+                }
+            }
+            return addr.locality_ == parcel_handler_.here();
+        }
+
     public:
         // the TSS holds a pointer to the applier associated with a given 
         // OS thread

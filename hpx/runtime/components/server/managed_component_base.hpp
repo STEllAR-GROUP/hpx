@@ -300,6 +300,13 @@ namespace hpx { namespace components
             return get_heap().get_gid(const_cast<managed_component*>(this));
         }
 
+        ///
+        bool get_full_address(naming::full_address& fa) const
+        {
+            return get_heap().
+                get_full_address(const_cast<managed_component*>(this), fa);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // The managed_component behaves just like the wrapped object
         Component* operator-> ()

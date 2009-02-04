@@ -21,19 +21,13 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <typename Arg0>
     inline Arg0 const& 
-    continuation::trigger_all(Arg0 const& arg0)
+    continuation::trigger(Arg0 const& arg0)
     {
         typedef typename 
             lcos::template base_lco_with_value<Arg0>::set_result_action 
         action_type;
 
-        std::vector<naming::id_type>::iterator end = gids_.end();
-        for (std::vector<naming::id_type>::iterator it = gids_.begin();
-             it != end; ++it)
-        {
-            if (!applier::apply<action_type>(*it, arg0))
-                break;
-        }
+        applier::apply<action_type>(gid_, arg0);
         return arg0;
     }
 

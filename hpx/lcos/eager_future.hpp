@@ -74,7 +74,16 @@ namespace hpx { namespace lcos
         ///               apply the action.
         void apply(naming::id_type const& gid)
         {
-            hpx::applier::apply_c<Action>(this->get_gid(), gid);
+            naming::full_address fa;
+            if (!this->get_full_address(fa))
+            {
+                HPX_OSSTREAM strm;
+                strm << gid;
+                HPX_THROW_EXCEPTION(unknown_component_address, 
+                    "eager_future<Action, Result>::apply", 
+                    HPX_OSSTREAM_GETSTRING(strm));
+            }
+            hpx::applier::apply_c<Action>(fa, gid);
         }
 
         /// Construct a new \a eager_future instance. The \a thread 
@@ -107,7 +116,16 @@ namespace hpx { namespace lcos
         template <typename Arg0>
         void apply(naming::id_type const& gid, Arg0 const arg0)
         {
-            hpx::applier::apply_c<Action>(this->get_gid(), gid, arg0);
+            naming::full_address fa;
+            if (!this->get_full_address(fa))
+            {
+                HPX_OSSTREAM strm;
+                strm << gid;
+                HPX_THROW_EXCEPTION(unknown_component_address, 
+                    "eager_future<Action, Result>::apply", 
+                    HPX_OSSTREAM_GETSTRING(strm));
+            }
+            hpx::applier::apply_c<Action>(fa, gid, arg0);
         }
 
         /// Construct a new \a eager_future instance. The \a thread 
@@ -164,7 +182,16 @@ namespace hpx { namespace lcos
             }
             else {
                 // remote execution
-                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid);
+                naming::full_address fa;
+                if (!this->get_full_address(fa))
+                {
+                    HPX_OSSTREAM strm;
+                    strm << gid;
+                    HPX_THROW_EXCEPTION(unknown_component_address, 
+                        "eager_future<Action, Result>::apply", 
+                        HPX_OSSTREAM_GETSTRING(strm));
+                }
+                hpx::applier::apply_c<Action>(addr, fa, gid);
             }
         }
 
@@ -209,7 +236,16 @@ namespace hpx { namespace lcos
             }
             else {
                 // remote execution
-                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid, arg0);
+                naming::full_address fa;
+                if (!this->get_full_address(fa))
+                {
+                    HPX_OSSTREAM strm;
+                    strm << gid;
+                    HPX_THROW_EXCEPTION(unknown_component_address, 
+                        "eager_future<Action, Result>::apply", 
+                        HPX_OSSTREAM_GETSTRING(strm));
+                }
+                hpx::applier::apply_c<Action>(addr, fa, gid, arg0);
             }
         }
 
