@@ -38,6 +38,18 @@ namespace boost
 {
 namespace lockfree
 {
+    template <typename T>
+    T const& assign_from(T const& v)
+    { 
+        return v; 
+    }
+
+    template <typename T>
+    boost::shared_ptr<T> assign_from(boost::shared_ptr<T> const& v)
+    { 
+        return boost::atomic_load(&v); 
+    }
+
 namespace detail
 {
 
@@ -51,7 +63,7 @@ class fifo:
     struct BOOST_LOCKFREE_CACHELINE_ALIGNMENT node
     {
         node(T const & v):
-            data(v), next(NULL)
+            data(lockfree::assign_from(v)), next(NULL)
         {}
 
         node (void):
@@ -153,7 +165,7 @@ public:
                 }
                 else
                 {
-                    *ret = next->data;
+                    *ret = lockfree::assign_from(next->data);
                     if (head_.CAS(head, next))
                     {
                         dealloc_node(head.get_ptr());

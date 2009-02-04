@@ -718,7 +718,9 @@ namespace hpx { namespace threads
                     thrd.reset();       // avoid shared_ptr race conditions
                     terminated_items_.enqueue(id);
                 }
-
+                else {
+                    thrd.reset();       // just release thread
+                }
                 tl1.tock();
             }
 
