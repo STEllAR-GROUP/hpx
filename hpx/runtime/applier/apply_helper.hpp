@@ -67,7 +67,7 @@ namespace hpx { namespace applier { namespace detail
         call (actions::continuation_type& c, naming::address::address_type addr)
         {
             try {
-                return c->trigger_(Action::execute_function(addr));
+                return c->trigger(Action::execute_function(addr));
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
