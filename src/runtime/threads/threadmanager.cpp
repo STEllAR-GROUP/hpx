@@ -113,27 +113,33 @@ namespace hpx { namespace threads
                    << "description(" << description << ")";
 
         // create the new thread
-        boost::shared_ptr<threads::thread> thrd (
+        std::auto_ptr<threads::thread> thrd (
             new threads::thread(threadfunc, initial_state, description));
 
         // lock data members while adding work
-        mutex_type::scoped_lock lk(mtx_);
+        {
+            mutex_type::scoped_lock lk(mtx_);
 
-        // add a new entry in the map for this thread
-        std::pair<thread_map_type::iterator, bool> p =
-            thread_map_.insert(map_pair(thrd->get_thread_id(), thrd));
+            // add a new entry in the map for this thread
+            thread_id_type id = thrd->get_thread_id();
+            std::pair<thread_map_type::iterator, bool> p =
+                thread_map_.insert(id, thrd.get());
 
-        if (!p.second) {
-            HPX_THROW_EXCEPTION(hpx::no_success, 
-                "threadmanager::register_thread", 
-                "Couldn't add new thread to the map of threads");
-            return invalid_thread_id;
+            if (!p.second) {
+                HPX_THROW_EXCEPTION(hpx::no_success, 
+                    "threadmanager::register_thread", 
+                    "Couldn't add new thread to the map of threads");
+                return invalid_thread_id;
+            }
         }
+
+        // transfer ownership to map
+        threads::thread* t = thrd.release();
 
         // only insert in the work-items queue if it is in pending state
         if (initial_state == pending) {
             // pushing the new thread in the pending queue thread
-            work_items_.enqueue(thrd.get());
+            work_items_.enqueue(t);
         }
 
         if (run_now) {
@@ -142,7 +148,7 @@ namespace hpx { namespace threads
         }
 
         // return the thread_id of the newly created thread
-        return thrd->get_thread_id();
+        return t->get_thread_id();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -200,13 +206,14 @@ namespace hpx { namespace threads
         {
             // create the new thread
             thread_state state = boost::get<1>(task);
-            boost::shared_ptr<threads::thread> thrd (
+            std::auto_ptr<threads::thread> thrd (
                 new threads::thread(boost::get<0>(task), state, 
                     boost::get<2>(task)));
 
             // add the new entry to the map of all threads
+            thread_id_type id = thrd->get_thread_id();
             std::pair<thread_map_type::iterator, bool> p =
-                thread_map_.insert(map_pair(thrd->get_thread_id(), thrd));
+                thread_map_.insert(id, thrd.get());
 
             if (!p.second) {
                 HPX_THROW_EXCEPTION(hpx::no_success, 
@@ -215,12 +222,15 @@ namespace hpx { namespace threads
                 return false;
             }
 
+            // transfer ownership to map
+            threads::thread* t = thrd.release();
+
             // only insert the thread into the work-items queue if it is in 
             // pending state
             if (state == pending) {
                 // pushing the new thread into the pending queue 
                 ++added;
-                work_items_.enqueue(thrd.get());
+                work_items_.enqueue(t);
                 if (0 != wait_count_)
                     cond_.notify_all();         // wake up sleeping threads
             }
@@ -316,7 +326,7 @@ namespace hpx { namespace threads
 
         if (map_iter != thread_map_.end())
         {
-            boost::shared_ptr<thread> thrd = map_iter->second;
+            thread* thrd = map_iter->second;
 
             lk.unlock();
 
@@ -370,7 +380,7 @@ namespace hpx { namespace threads
             thrd->set_state(new_state);
             thrd->set_state_ex(new_state_ex);
             if (new_state == pending) {
-                work_items_.enqueue(thrd.get());
+                work_items_.enqueue(thrd);
                 cond_.notify_all();
             }
             return previous_state;

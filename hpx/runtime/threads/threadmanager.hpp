@@ -19,6 +19,7 @@
 #include <boost/bind.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/ptr_container/ptr_map.hpp>
 #include <boost/lockfree/fifo.hpp>
 #if defined(HPX_DEBUG)
 #include <boost/lockfree/atomic_int.hpp>
@@ -53,10 +54,7 @@ namespace hpx { namespace threads
         typedef boost::lockfree::fifo<task_description> task_items_type;
 
         // this is the type of a map holding all threads (except depleted ones)
-        typedef
-            std::map<thread_id_type, boost::shared_ptr<thread> >
-        thread_map_type;
-        typedef thread_map_type::value_type map_pair;
+        typedef boost::ptr_map<thread_id_type, thread> thread_map_type;
 
         // we use a simple mutex to protect the data members of the 
         // threadmanager for now
