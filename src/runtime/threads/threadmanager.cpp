@@ -314,77 +314,64 @@ namespace hpx { namespace threads
             return unknown;
         }
 
-        // lock data members while setting a thread state
-        mutex_type::scoped_lock lk(mtx_);
+        // FIXME: this is currently dangerous as we have no means of 
+        //        verification whether this thread is still alive
+        thread* thrd = reinterpret_cast<thread*>(id);
 
-        thread_map_type::iterator map_iter = thread_map_.find(id);
+        // action depends on the current state
+        thread_state previous_state = thrd->get_state();
 
-        // the id may reference a new thread not yet stored in the map
-        if (map_iter == thread_map_.end())
-            map_iter = thread_map_.find(id);
+        // nothing to do here if the state doesn't change
+        if (new_state == previous_state)
+            return new_state;
 
-        if (map_iter != thread_map_.end())
-        {
-            thread* thrd = map_iter->second;
-
-            lk.unlock();
-
-            // action depends on the current state
-            thread_state previous_state = thrd->get_state();
-
-            // nothing to do here if the state doesn't change
-            if (new_state == previous_state)
-                return new_state;
-
-            // the thread to set the state for is currently running, so we 
-            // yield control for the main thread manager loop to release this
-            // thread
-            if (previous_state == active) {
-                // if we can't suspend (because we don't know the PX thread
-                // executing this function) we need to return 'unknown'
-                if (NULL == get_self_ptr()) 
-                    return unknown;
-
-                LTM_(info) << "set_state: " << "thread(" << id << "), "
-                           << "is currently active, yielding control...";
-
-                do {
-                    thread_self& self = get_self();
-                    active_set_state_.enqueue(self.get_thread_id());
-                    self.yield(suspended);
-                } while ((previous_state = thrd->get_state()) == active);
-
-                LTM_(info) << "set_state: " << "thread(" << id << "), "
-                           << "reactivating..." << "current state(" 
-                           << get_thread_state_name(previous_state) << ")";
-            }
-
-            // If the thread has been terminated while this set_state was 
-            // waiting in the active_set_state_ queue nothing has to be done 
-            // anymore.
-            if (previous_state == terminated)
-                return terminated;
-
-            // If the previous state was pending we are supposed to remove the
-            // thread from the queue. But in order to avoid linearly looking 
-            // through the queue we defer this to the thread function, which 
-            // at some point will ignore this thread by simply skipping it 
-            // (if it's not pending anymore). 
+        // the thread to set the state for is currently running, so we 
+        // yield control for the main thread manager loop to release this
+        // thread
+        if (previous_state == active) {
+            // if we can't suspend (because we don't know the PX thread
+            // executing this function) we need to return 'unknown'
+            if (NULL == get_self_ptr()) 
+                return unknown;
 
             LTM_(info) << "set_state: " << "thread(" << id << "), "
-                       << "description(" << thrd->get_description() << "), "
-                       << "new state(" << get_thread_state_name(new_state) << ")";
+                       << "is currently active, yielding control...";
 
-            // So all what we do here is to set the new state.
-            thrd->set_state(new_state);
-            thrd->set_state_ex(new_state_ex);
-            if (new_state == pending) {
-                work_items_.enqueue(thrd);
-                cond_.notify_all();
-            }
-            return previous_state;
+            do {
+                thread_self& self = get_self();
+                active_set_state_.enqueue(self.get_thread_id());
+                self.yield(suspended);
+            } while ((previous_state = thrd->get_state()) == active);
+
+            LTM_(info) << "set_state: " << "thread(" << id << "), "
+                       << "reactivating..." << "current state(" 
+                       << get_thread_state_name(previous_state) << ")";
         }
-        return unknown;
+
+        // If the thread has been terminated while this set_state was 
+        // waiting in the active_set_state_ queue nothing has to be done 
+        // anymore.
+        if (previous_state == terminated)
+            return terminated;
+
+        // If the previous state was pending we are supposed to remove the
+        // thread from the queue. But in order to avoid linearly looking 
+        // through the queue we defer this to the thread function, which 
+        // at some point will ignore this thread by simply skipping it 
+        // (if it's not pending anymore). 
+
+        LTM_(info) << "set_state: " << "thread(" << id << "), "
+                   << "description(" << thrd->get_description() << "), "
+                   << "new state(" << get_thread_state_name(new_state) << ")";
+
+        // So all what we do here is to set the new state.
+        thrd->set_state(new_state);
+        thrd->set_state_ex(new_state_ex);
+        if (new_state == pending) {
+            work_items_.enqueue(thrd);
+            cond_.notify_all();
+        }
+        return previous_state;
     }
 
     /// The get_state function is part of the thread related API and allows
