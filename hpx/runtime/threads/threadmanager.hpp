@@ -299,7 +299,6 @@ namespace hpx { namespace threads
         bool running_;                      ///< thread manager has bee started
         mutable mutex_type mtx_;            ///< mutex protecting the members
         boost::condition cond_;             ///< used to trigger some action
-        boost::lockfree::atomic_int<long> wait_count_;  ///< count waiting threads
 
         util::io_service_pool& timer_pool_; ///< used for timed set_state
 

@@ -45,7 +45,7 @@ namespace hpx { namespace threads
             boost::function<void()> start_thread, boost::function<void()> stop, 
             boost::function<void(boost::exception_ptr const&)> on_error,
             std::size_t max_count)
-      : max_count_(max_count), running_(false), wait_count_(0),
+      : max_count_(max_count), running_(false),
         timer_pool_(timer_pool), 
         start_thread_(start_thread), stop_(stop), on_error_(on_error),
         work_items_("work_items"), terminated_items_("terminated_items"), 
@@ -69,11 +69,6 @@ namespace hpx { namespace threads
     threadmanager::~threadmanager() 
     {
         LTM_(debug) << "~threadmanager";
-        log_fifo_statistics(work_items_);
-        log_fifo_statistics(terminated_items_);
-        log_fifo_statistics(active_set_state_);
-        log_fifo_statistics(new_tasks_);
-
         if (!threads_.empty()) {
             if (running_) 
                 stop();
@@ -194,6 +189,8 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     // add new threads if there is some amount of work available
+    struct add_new_tag {};
+
     inline bool threadmanager::add_new(long add_count)
     {
         if (0 == add_count)
@@ -204,6 +201,9 @@ namespace hpx { namespace threads
         task_description task;
         while (add_count-- && new_tasks_.dequeue(&task)) 
         {
+            // measure thread creation time
+            util::block_profiler<add_new_tag> bp("threadmanager::add_new");
+
             // create the new thread
             thread_state state = boost::get<1>(task);
             std::auto_ptr<threads::thread> thrd (
@@ -231,8 +231,7 @@ namespace hpx { namespace threads
                 // pushing the new thread into the pending queue 
                 ++added;
                 work_items_.enqueue(t);
-                if (0 != wait_count_)
-                    cond_.notify_all();         // wake up sleeping threads
+                cond_.notify_all();         // wake up sleeping threads
             }
         }
 
@@ -614,6 +613,20 @@ namespace hpx { namespace threads
         }
         LTM_(info) << "tfunc(" << num_thread << "): end, executed " 
                    << num_px_threads << " HPX threads";
+
+        if (0 == num_thread) {
+            // print block profiler statistics
+            util::block_profiler<register_thread_tag>::print_stats();
+            util::block_profiler<register_work_tag>::print_stats();
+            util::block_profiler<set_state_tag>::print_stats();
+            util::block_profiler<add_new_tag>::print_stats();
+
+            // print queue statistics
+            log_fifo_statistics(work_items_);
+            log_fifo_statistics(terminated_items_);
+            log_fifo_statistics(active_set_state_);
+            log_fifo_statistics(new_tasks_);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -641,22 +654,6 @@ namespace hpx { namespace threads
             }
         };
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    struct decrement_on_exit
-    {
-        decrement_on_exit(boost::lockfree::atomic_int<long>& count)
-          : count_(count)
-        {
-            ++count_;
-        }
-        ~decrement_on_exit()
-        {
-            --count_;
-        }
-
-        boost::lockfree::atomic_int<long>& count_;
-    };
 
     ///////////////////////////////////////////////////////////////////////////
     std::size_t threadmanager::tfunc_impl(std::size_t num_thread)
@@ -806,8 +803,6 @@ namespace hpx { namespace threads
                     bool timed_out = false;
                     {
                         namespace bpt = boost::posix_time;
-                        decrement_on_exit on_exit(wait_count_);
-
                         tl2.tick();
                         timed_out = cond_.timed_wait(lk, bpt::milliseconds(5));
                         tl2.tock();

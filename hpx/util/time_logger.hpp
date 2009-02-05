@@ -47,7 +47,7 @@ namespace hpx { namespace util
     public:
         time_logger(char const* const description, int thread_num)
           : description_(description), thread_num_(thread_num), 
-            enabled_(LTIM_ENABLED(fatal))
+            enabled_(LTIM_ENABLED(warning))
         {
             if (enabled_) 
                 times_.reserve(hpx_initial_times_size);

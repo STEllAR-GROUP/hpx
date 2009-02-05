@@ -45,7 +45,7 @@ namespace hpx { namespace util
               : description_(description)
             {}
 
-            ~accumulator_stats()
+            void print_stats()
             {
                 LTIM_(fatal) << "profiler: " << description_ << ": "
                             << boost::accumulators::sum(totals_) << " (" 
@@ -84,7 +84,7 @@ namespace hpx { namespace util
                 return (0 != p.second) ? p.first / p.second : 0.0;
             }
 
-            ~accumulator_stats()
+            void print_stats()
             {
                 LTIM_(fatal) << "profiler: " << description_ << ": "
                             << extract_count(totals_) << ", " 
@@ -114,8 +114,10 @@ namespace hpx { namespace util
     {
     public:
         block_profiler(char const* const description)
-          : description_(description), measuring_(true)
-        {}
+          : description_(description), measuring_(false)
+        {
+            restart();
+        }
 
         ~block_profiler()
         {
@@ -135,8 +137,13 @@ namespace hpx { namespace util
             }
         }
 
+        static void print_stats()
+        {
+            get_stats().print_stats();
+        }
+
     private:
-        static detail::accumulator_stats& get_stats(char const* const description)
+        static detail::accumulator_stats& get_stats(char const* const description = "")
         {
             static_<detail::accumulator_stats, Tag> stats(description);
             return stats.get();
