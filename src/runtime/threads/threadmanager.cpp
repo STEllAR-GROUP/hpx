@@ -617,6 +617,7 @@ namespace hpx { namespace threads
         std::size_t num_px_threads = 0;
         util::time_logger tl1("tfunc", num_thread);
         util::time_logger tl2("tfunc1", num_thread);
+        util::time_logger tl3("tfunc2", num_thread);
 
         // the thread with number zero is the master
         bool is_master_thread = (0 == num_thread) ? true : false;
@@ -648,7 +649,9 @@ namespace hpx { namespace threads
                     if (thrd_stat == pending) {
                         // thread returns new required state
                         // store the returned state in the thread
+                        tl3.tick();
                         thrd_stat = state = (*thrd)();
+                        tl3.tock();
                         ++num_px_threads;
                     }
 
