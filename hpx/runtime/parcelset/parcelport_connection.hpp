@@ -80,9 +80,9 @@ namespace hpx { namespace parcelset
                 LPT_(error) << "parcelhandler: put parcel failed: " 
                             << e.message();
             }
-            else {
-                LPT_(info) << "parcelhandler: put parcel succeeded";
-            }
+//             else {
+//                 LPT_(info) << "parcelhandler: put parcel succeeded";
+//             }
 
             // just call initial handler
             boost::get<0>(handler)(e, bytes);

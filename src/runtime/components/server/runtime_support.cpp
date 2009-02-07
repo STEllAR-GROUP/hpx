@@ -56,7 +56,6 @@ namespace hpx { namespace components { namespace server
             applier::applier& applier)
       : stopped_(false)
     {
-        applier.init_tss();     // init thread specific data for the main thread
         load_components(ini, prefix, agas_client);
     }
 

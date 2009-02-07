@@ -53,21 +53,25 @@ namespace hpx
             mode locality_mode) 
       : result_(0), mode_(locality_mode), 
         ini_(util::detail::get_logging_data()), 
-        agas_pool_(boost::bind(&runtime::init_applier, This())), 
-        parcel_pool_(boost::bind(&runtime::init_applier, This())), 
-        timer_pool_(boost::bind(&runtime::init_applier, This())),
+        agas_pool_(boost::bind(&runtime::init_tss, This()),
+            boost::bind(&runtime::deinit_tss, This())), 
+        parcel_pool_(boost::bind(&runtime::init_tss, This()),
+            boost::bind(&runtime::deinit_tss, This())), 
+        timer_pool_(boost::bind(&runtime::init_tss, This()),
+            boost::bind(&runtime::deinit_tss, This())),
         agas_client_(agas_pool_, ini_.get_agas_locality(agas_address, agas_port), mode_ == console),
         parcel_port_(parcel_pool_, naming::locality(address, port)),
-        thread_manager_(timer_pool_, 
-            boost::bind(&runtime::init_applier, This()),
-            boost::bind(&runtime::stop, This(), false),
-            boost::bind(&runtime::report_error, This(), _1)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
+        thread_manager_(timer_pool_, 
+            boost::bind(&runtime::init_tss, This()),
+            boost::bind(&runtime::stop, This(), false),
+            boost::bind(&runtime::report_error, This(), _1)),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),
-        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_)
+        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_),
+        on_exit_functions_("on_exit_functions", false)
     {
         components::server::get_error_dispatcher().register_error_sink(
             &runtime::default_errorsink, default_error_sink_);
@@ -78,21 +82,25 @@ namespace hpx
             mode locality_mode) 
       : result_(0), mode_(locality_mode), 
         ini_(util::detail::get_logging_data()), 
-        agas_pool_(boost::bind(&runtime::init_applier, This())), 
-        parcel_pool_(boost::bind(&runtime::init_applier, This())), 
-        timer_pool_(boost::bind(&runtime::init_applier, This())),
+        agas_pool_(boost::bind(&runtime::init_tss, This()),
+            boost::bind(&runtime::deinit_tss, This())), 
+        parcel_pool_(boost::bind(&runtime::init_tss, This()),
+            boost::bind(&runtime::deinit_tss, This())), 
+        timer_pool_(boost::bind(&runtime::init_tss, This()),
+            boost::bind(&runtime::deinit_tss, This())),
         agas_client_(agas_pool_, agas_address, mode_ == console),
         parcel_port_(parcel_pool_, address),
-        thread_manager_(timer_pool_, 
-            boost::bind(&runtime::init_applier, This()),
-            boost::bind(&runtime::stop, This(), false),
-            boost::bind(&runtime::report_error, This(), _1)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
+        thread_manager_(timer_pool_, 
+            boost::bind(&runtime::init_tss, This()),
+            boost::bind(&runtime::stop, This(), false),
+            boost::bind(&runtime::report_error, This(), _1)),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),
-        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_)
+        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_),
+        on_exit_functions_("on_exit_functions", false)
     {
         components::server::get_error_dispatcher().register_error_sink(
             &runtime::default_errorsink, default_error_sink_);
@@ -102,21 +110,25 @@ namespace hpx
     runtime::runtime(naming::locality address, mode locality_mode) 
       : result_(0), mode_(locality_mode), 
         ini_(util::detail::get_logging_data()), 
-        agas_pool_(boost::bind(&runtime::init_applier, This())), 
-        parcel_pool_(boost::bind(&runtime::init_applier, This())), 
-        timer_pool_(boost::bind(&runtime::init_applier, This())),
+        agas_pool_(boost::bind(&runtime::init_tss, This()),
+            boost::bind(&runtime::deinit_tss, This())), 
+        parcel_pool_(boost::bind(&runtime::init_tss, This()),
+            boost::bind(&runtime::deinit_tss, This())), 
+        timer_pool_(boost::bind(&runtime::init_tss, This()),
+            boost::bind(&runtime::deinit_tss, This())),
         agas_client_(agas_pool_, ini_.get_agas_locality(), mode_ == console),
         parcel_port_(parcel_pool_, address),
-        thread_manager_(timer_pool_, 
-            boost::bind(&runtime::init_applier, This()),
-            boost::bind(&runtime::stop, This(), false),
-            boost::bind(&runtime::report_error, This(), _1)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
+        thread_manager_(timer_pool_, 
+            boost::bind(&runtime::init_tss, This()),
+            boost::bind(&runtime::stop, This(), false),
+            boost::bind(&runtime::report_error, This(), _1)),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),
-        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_)
+        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_),
+        on_exit_functions_("on_exit_functions", false)
     {
         components::server::get_error_dispatcher().register_error_sink(
             &runtime::default_errorsink, default_error_sink_);
@@ -131,21 +143,15 @@ namespace hpx
         parcel_port_.stop();      // stops parcel_pool_ as well
         thread_manager_.stop();   // stops timer_pool_ as well
         agas_pool_.stop();
+        agas_pool_.join();
 
-        runtime_support_.tidy();  // unload libraries
+        // unload libraries
+        runtime_support_.tidy();
 
         LRT_(debug) << "~runtime(finished)";
-
-        // this disables all logging from the main thread
-        applier_.deinit_tss();    // reset thread specific pointer
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void runtime::init_applier()
-    {
-        applier_.init_tss();
-    }
-
 #if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINE_USE_FIBERS)
 #include <io.h>
 #endif
@@ -167,6 +173,8 @@ namespace hpx
         // see: http://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=100319
         _isatty(0);
 #endif
+        // init TSS for the main thread, this enables logging, time logging, etc.
+        init_tss();
 
         // start services (service threads)
         thread_manager_.run(num_threads);   // start the thread manager, timer_pool_ as well
@@ -262,6 +270,11 @@ namespace hpx
     {
         LRT_(info) << "runtime: about to stop services";
 
+        // execute all on_exit functions whenever the first thread calls this
+        boost::function<void()> f;
+        while (on_exit_functions_.dequeue(&f))
+            f();
+
         // unregister the runtime_support and memory instances from the AGAS 
         // ignore errors, as AGAS might be down already
         error_code ec;
@@ -272,9 +285,14 @@ namespace hpx
         thread_manager_.stop(blocking);
         parcel_port_.stop(blocking);    // stops parcel_pool_ as well
         agas_pool_.stop();
+        if (blocking) 
+            agas_pool_.join();
         runtime_support_.stop();        // re-activate main thread 
 
         LRT_(info) << "runtime: stopped all services";
+
+        // this disables all logging from the main thread
+        deinit_tss();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -287,6 +305,9 @@ namespace hpx
             components::console_error_sink(console_prefix, 
                 parcel_handler_.get_prefix(), e);
         }
+
+        // stop all services
+        stop(false);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -314,6 +335,55 @@ namespace hpx
         std::cerr << "locality (" << std::hex << std::setw(4) 
                   << std::setfill('0') << src << "):" << std::endl
                   << msg << std::endl;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    boost::thread_specific_ptr<runtime*> runtime::runtime_;
+
+    void runtime::init_tss()
+    {
+        // initialize our TSS
+        BOOST_ASSERT(NULL == runtime::runtime_.get());    // shouldn't be initialized yet
+        runtime::runtime_.reset(new runtime* (this));
+
+        // initialize applier TSS
+        applier_.init_tss();
+    }
+
+    void runtime::deinit_tss()
+    {
+        // reset applier TSS
+        applier_.deinit_tss();
+
+        // reset our TSS
+        runtime::runtime_.reset();
+    }
+
+    runtime& get_runtime()
+    {
+        BOOST_ASSERT(NULL != runtime::runtime_.get());   // should have been initialized
+        return **runtime::runtime_;
+    }
+
+    runtime* get_runtime_ptr()
+    {
+        runtime** rt = runtime::runtime_.get();
+        return rt ? *rt : NULL;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void runtime::on_exit(boost::function<void()> f)
+    {
+        on_exit_functions_.enqueue(f);
+    }
+
+    bool register_on_exit(boost::function<void()> f)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL == rt)
+            return false;
+        rt->on_exit(f);
+        return true;
     }
 
 }

@@ -45,9 +45,10 @@ namespace hpx { namespace util
         enum { hpx_initial_times_size = 64000 };
 
     public:
-        time_logger(char const* const description, int thread_num)
+        time_logger(char const* const description, int thread_num, 
+                bool enabled = true)
           : description_(description), thread_num_(thread_num), 
-            enabled_(LTIM_ENABLED(warning))
+            enabled_(enabled && LTIM_ENABLED(warning))
         {
             if (enabled_) 
                 times_.reserve(hpx_initial_times_size);

@@ -34,6 +34,8 @@
     void apply(naming::id_type const& gid,
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
+        util::block_profiler_wrapper<eager_future_tag> bp(apply_logger_);
+
         naming::full_address fa;
         if (!this->get_full_address(fa))
         {
@@ -48,6 +50,7 @@
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     eager_future(naming::id_type const& gid, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+      : apply_logger_("eager_future::apply")
     {
         apply(gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }

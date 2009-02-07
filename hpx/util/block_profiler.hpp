@@ -20,13 +20,16 @@
 #include <boost/accumulators/statistics/moment.hpp>
 #endif
 
+#define HPX_DONT_USE_BLOCK_PROFILER
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
+#if !defined(HPX_DONT_USE_BLOCK_PROFILER)
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-#if BOOST_VERSION >= 103600
+#if BOOST_VERSION >= 103600 && defined(HPX_USE_ACCUMULATOR_LIBRARY)
         class accumulator_stats
         {
         private:
@@ -40,9 +43,11 @@ namespace hpx { namespace util
                 double, accumulator_stats_type
             > totals_type;
 
+            accumulator_stats* This() { return this; }
+
         public:
             accumulator_stats(char const* const description)
-              : description_(description)
+              : description_(description), registered_on_exit_(false)
             {}
 
             void print_stats()
@@ -55,14 +60,41 @@ namespace hpx { namespace util
                             << ")";
             }
 
-            void add(double val)
+            void add()
             {
-                totals_(val);
+                totals_(timer_.elapsed());
+            }
+
+            void add(double started)
+            {
+                totals_(timer_.elapsed() - started);
+            }
+
+            void restart()
+            {
+                if (!registered_on_exit_) 
+                {
+                    registered_on_exit_ = hpx::register_on_exit(
+                        boost::bind(&accumulator_stats::print_stats, This()));
+                }
+                timer_.restart();
+            }
+
+            double elapsed()
+            {
+                if (!registered_on_exit_) 
+                {
+                    registered_on_exit_ = hpx::register_on_exit(
+                        boost::bind(&accumulator_stats::print_stats, This()));
+                }
+                return timer_.elapsed();
             }
 
         private:
+            high_resolution_timer timer_;
             totals_type totals_;
-            char const* const description_;
+            std::string description_;
+            bool registered_on_exit_;
         };
 #else
         class accumulator_stats
@@ -70,9 +102,11 @@ namespace hpx { namespace util
         private:
             typedef std::pair<double, std::size_t> totals_type;
 
+            accumulator_stats* This() { return this; }
+
         public:
             accumulator_stats(char const* const description)
-              : description_(description)
+              : description_(description), registered_on_exit_(false)
             {}
 
             static inline double extract_count(totals_type const& p)
@@ -91,15 +125,43 @@ namespace hpx { namespace util
                             << extract_mean(totals_);
             }
 
-            void add(double val)
+            void add()
             {
-                totals_.first += val;
+                totals_.first += timer_.elapsed();
                 ++totals_.second;
             }
 
+            void add(double started)
+            {
+                totals_.first += timer_.elapsed() - started;
+                ++totals_.second;
+            }
+
+            void restart()
+            {
+                if (!registered_on_exit_) 
+                {
+                    registered_on_exit_ = hpx::register_on_exit(
+                        boost::bind(&accumulator_stats::print_stats, This()));
+                }
+                timer_.restart();
+            }
+
+            double elapsed()
+            {
+                if (!registered_on_exit_) 
+                {
+                    registered_on_exit_ = hpx::register_on_exit(
+                        boost::bind(&accumulator_stats::print_stats, This()));
+                }
+                return timer_.elapsed();
+            }
+
         private:
+            high_resolution_timer timer_;
             totals_type totals_;
-            char const* const description_;
+            std::string description_;
+            bool registered_on_exit_;
         };
 #endif
     }
@@ -113,8 +175,9 @@ namespace hpx { namespace util
     class block_profiler
     {
     public:
-        block_profiler(char const* const description)
-          : description_(description), measuring_(false)
+        block_profiler(char const* description, bool enable_logging = true)
+          : stats_(get_stats(description)), measuring_(false),
+            enable_logging_(enable_logging)
         {
             restart();
         }
@@ -124,36 +187,97 @@ namespace hpx { namespace util
             measure();
         }
 
+        // direct interface if used on the stack
         void restart()
         {
-            measuring_ = true;
-            timer_.restart();
+            if (enable_logging_)
+            {
+                measuring_ = true;
+                stats_.restart();
+            }
         }
         void measure()
         {
-            if (measuring_) {
-                get_stats(description_).add(timer_.elapsed());
+            if (measuring_ && enable_logging_) 
+            {
+                stats_.add();
                 measuring_ = false;
             }
         }
 
-        static void print_stats()
+        // special interface for block_profiler_wrapper below
+        void measure(double started)
         {
-            get_stats().print_stats();
+            if (enable_logging_ && LTIM_ENABLED(fatal))
+                stats_.add(started);
+        }
+
+        double elapsed()
+        {
+            return enable_logging_ && LTIM_ENABLED(fatal) ? stats_.elapsed() : 0;
         }
 
     private:
-        static detail::accumulator_stats& get_stats(char const* const description = "")
+        static detail::accumulator_stats& 
+        get_stats(char const* description)
         {
             static_<detail::accumulator_stats, Tag> stats(description);
             return stats.get();
         };
 
     private:
-        high_resolution_timer timer_;
-        char const* const description_;
+        detail::accumulator_stats& stats_;
         bool measuring_;
+        bool enable_logging_;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Tag>
+    class block_profiler_wrapper
+    {
+    public:
+        block_profiler_wrapper(block_profiler<Tag>& profile)
+          : profile_(profile), started_(profile_.elapsed())
+        {
+        }
+
+        ~block_profiler_wrapper()
+        {
+            profile_.measure(started_);
+        }
+
+    private:
+        block_profiler<Tag>& profile_;
+        double started_;
+    };
+#else
+    ///////////////////////////////////////////////////////////////////////////
+    // define dummy classes
+    template <typename Tag>
+    class block_profiler
+    {
+    public:
+        block_profiler(char const* description, bool enable_logging = true) {}
+        ~block_profiler() {}
+
+        void restart() {}
+        void measure() {}
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Tag>
+    class block_profiler_wrapper
+    {
+    public:
+        block_profiler_wrapper(block_profiler<Tag>& profile)
+        {
+        }
+
+        ~block_profiler_wrapper()
+        {
+        }
+    };
+#endif
 
 }}
 

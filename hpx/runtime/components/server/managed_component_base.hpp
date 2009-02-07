@@ -116,19 +116,14 @@ namespace hpx { namespace components
         /// \brief The destructor releases any wrapped instances
         ~managed_component()
         {
+            component_->finalize();
             delete component_;
             component_ = 0;
         }
 
         /// \brief finalize() will be called just before the instance gets 
         ///        destructed
-        ///
-        /// \param appl [in] The applier to be used for finalization of the 
-        ///             component instance. 
-        void finalize() 
-        { 
-            component_->finalize();
-        }
+        void finalize() {}  // finalize the wrapped component in our destructor
 
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation

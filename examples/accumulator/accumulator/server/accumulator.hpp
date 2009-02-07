@@ -72,7 +72,9 @@ namespace hpx { namespace components { namespace server
         /// Print the current value of the accumulator
         void print() 
         {
-            std::cout << arg_ << std::flush << std::endl;
+            applier::applier& appl = applier::get_applier();
+            std::cout << appl.get_runtime_support_gid() << "> " 
+                      << arg_ << std::flush << std::endl;
         }
 
         ///////////////////////////////////////////////////////////////////////

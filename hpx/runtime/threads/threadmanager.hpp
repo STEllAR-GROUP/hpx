@@ -35,6 +35,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
+    struct register_thread_tag {};
+    struct register_work_tag {};
+    struct add_new_tag {};
+    struct set_state_tag {};
+
     ///////////////////////////////////////////////////////////////////////////
     /// \class threadmanager threadmanager.hpp hpx/runtime/threads/threadmanager.hpp
     ///
@@ -305,6 +310,11 @@ namespace hpx { namespace threads
         boost::function<void()> start_thread_;    ///< function to call for each created thread
         boost::function<void()> stop_;            ///< function to call in case of unexpected stop
         boost::function<void(boost::exception_ptr)> on_error_;  ///< function to call in case of error
+
+        util::block_profiler<register_thread_tag> thread_logger_;
+        util::block_profiler<register_work_tag> work_logger_;
+        util::block_profiler<add_new_tag> add_new_logger_;
+        util::block_profiler<set_state_tag> set_state_logger_;
 
 #if HPX_DEBUG != 0
         boost::lockfree::atomic_int<long> thread_count_;

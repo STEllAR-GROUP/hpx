@@ -25,6 +25,14 @@ namespace hpx
 {
     class HPX_API_EXPORT runtime;
 
+    /// The function \a get_runtime returns a reference to the (thread
+    /// specific) runtime instance.
+    HPX_API_EXPORT runtime& get_runtime();
+    HPX_API_EXPORT runtime* get_runtime_ptr();
+
+    /// Register a function to be called during system shutdown
+    HPX_API_EXPORT bool register_on_exit(boost::function<void()>);
+
     /// \namespace applier
     ///
     /// The namespace \a applier contains all definitions needed for the

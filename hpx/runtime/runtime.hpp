@@ -20,6 +20,8 @@
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
+#include <boost/thread/tss.hpp>
+
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -35,9 +37,6 @@ namespace hpx
     private:
         // avoid warnings about usage of this in member initializer list
         runtime* This() { return this; }
-
-        // init the TSS for the applier
-        void init_applier();
 
         // 
         static void default_errorsink(boost::uint32_t, std::string const&);
@@ -270,6 +269,17 @@ namespace hpx
             return parcel_port_.here();
         }
 
+    public:
+        // the TSS holds a pointer to the runtime associated with a given 
+        // OS thread
+        static boost::thread_specific_ptr<runtime*> runtime_;
+        void init_tss();
+        void deinit_tss();
+
+    public:
+        /// \brief Manage list of functions to call on exit
+        void on_exit(boost::function<void()> f);
+
     private:
         mode mode_;
         int result_;
@@ -279,14 +289,18 @@ namespace hpx
         util::io_service_pool timer_pool_; 
         naming::resolver_client agas_client_;
         parcelset::parcelport parcel_port_;
-        threads::threadmanager thread_manager_;
         parcelset::parcelhandler parcel_handler_;
         util::detail::init_logging init_logging_;
+        threads::threadmanager thread_manager_;
         components::server::memory memory_;
         applier::applier applier_;
         actions::action_manager action_manager_;
         components::server::runtime_support runtime_support_;
         boost::signals::scoped_connection default_error_sink_;
+
+        // list of functions to call on exit
+        typedef boost::lockfree::fifo<boost::function<void()> > on_exit_type;
+        on_exit_type on_exit_functions_;
     };
 
 }   // namespace hpx

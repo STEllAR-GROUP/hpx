@@ -49,7 +49,11 @@ namespace hpx { namespace threads
         timer_pool_(timer_pool), 
         start_thread_(start_thread), stop_(stop), on_error_(on_error),
         work_items_("work_items"), terminated_items_("terminated_items"), 
-        active_set_state_("active_set_state"), new_tasks_("new_tasks")
+        active_set_state_("active_set_state"), new_tasks_("new_tasks"),
+        thread_logger_("threadmanager::register_thread"),
+        work_logger_("threadmanager::register_work"),
+        add_new_logger_("threadmanager::add_new"),
+        set_state_logger_("threadmanager::set_state")
 #if HPX_DEBUG != 0
       , thread_count_(0)
 #endif
@@ -77,13 +81,11 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct register_thread_tag {};
-
     thread_id_type threadmanager::register_thread(
         boost::function<thread_function_type> const& threadfunc, 
         char const* const description, thread_state initial_state, bool run_now)
     {
-        util::block_profiler<register_thread_tag> bp("threadmanager::register_thread");
+        util::block_profiler_wrapper<register_thread_tag> bp(thread_logger_);
 
         // verify parameters
         if (initial_state != pending && initial_state != suspended)
@@ -147,13 +149,11 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct register_work_tag {};
-
     void threadmanager::register_work(
         boost::function<thread_function_type> const& threadfunc, 
         char const* const description, thread_state initial_state, bool run_now)
     {
-        util::block_profiler<register_work_tag> bp("threadmanager::register_work");
+        util::block_profiler_wrapper<register_work_tag> bp(work_logger_);
 
         // verify parameters
         if (initial_state != pending && initial_state != suspended)
@@ -189,20 +189,17 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     // add new threads if there is some amount of work available
-    struct add_new_tag {};
-
     inline bool threadmanager::add_new(long add_count)
     {
         if (0 == add_count)
             return false;
 
-        std::size_t num_threads = threads_.size();
         long added = 0;
         task_description task;
         while (add_count-- && new_tasks_.dequeue(&task)) 
         {
             // measure thread creation time
-            util::block_profiler<add_new_tag> bp("threadmanager::add_new");
+            util::block_profiler_wrapper<add_new_tag> bp(add_new_logger_);
 
             // create the new thread
             thread_state state = boost::get<1>(task);
@@ -298,12 +295,10 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     /// The set_state function is part of the thread related API and allows
     /// to change the state of one of the threads managed by this threadmanager
-    struct set_state_tag {};
-
     thread_state threadmanager::set_state(thread_id_type id, 
         thread_state new_state, thread_state_ex new_state_ex)
     {
-        util::block_profiler<set_state_tag> bp("threadmanager::set_state");
+        util::block_profiler_wrapper<set_state_tag> bp(set_state_logger_);
 
         // set_state can't be used to force a thread into active state
         if (new_state == active) {
@@ -314,9 +309,10 @@ namespace hpx { namespace threads
             return unknown;
         }
 
-        // FIXME: this is currently dangerous as we have no means of 
-        //        verification whether this thread is still alive
+        // we know that the id is actually the pointer to the thread
         thread* thrd = reinterpret_cast<thread*>(id);
+        if (NULL == thrd->get())
+            return terminated;     // this thread has been already terminated 
 
         // action depends on the current state
         thread_state previous_state = thrd->get_state();
@@ -341,7 +337,8 @@ namespace hpx { namespace threads
                 thread_self& self = get_self();
                 active_set_state_.enqueue(self.get_thread_id());
                 self.yield(suspended);
-            } while ((previous_state = thrd->get_state()) == active);
+                previous_state = thrd->get() ? thrd->get_state() : terminated;
+            } while (previous_state == active);
 
             LTM_(info) << "set_state: " << "thread(" << id << "), "
                        << "reactivating..." << "current state(" 
@@ -378,19 +375,9 @@ namespace hpx { namespace threads
     /// to query the state of one of the threads known to the threadmanager
     thread_state threadmanager::get_state(thread_id_type id) 
     {
-        // lock data members while getting a thread state
-        mutex_type::scoped_lock lk(mtx_);
-
-        thread_map_type::iterator map_iter = thread_map_.find(id);
-
-        // the id may reference a new thread not yet stored in the map
-        if (map_iter == thread_map_.end())
-            map_iter = thread_map_.find(id);
-
-        if (map_iter != thread_map_.end())
-            return map_iter->second->get_state();
-
-        return unknown;
+        // we know that the id is actually the pointer to the thread
+        thread* thrd = reinterpret_cast<thread*>(id);
+        return thrd->get() ? thrd->get_state() : terminated;
     }
 
     /// This thread function is used by the at_timer thread below to trigger
@@ -428,7 +415,7 @@ namespace hpx { namespace threads
         t.async_wait(boost::bind(&threadmanager::set_state, this, wake_id, 
             pending, wait_timeout));
 
-        // this waits for the thread executed when the timer fired
+        // this waits for the thread to be executed when the timer fired
         self.yield(suspended);
         return terminated;
     }
@@ -468,19 +455,9 @@ namespace hpx { namespace threads
     /// Retrieve the global id of the given thread
     naming::id_type threadmanager::get_thread_gid(thread_id_type id) 
     {
-        // lock data members while getting a thread state
-        mutex_type::scoped_lock lk(mtx_);
-
-        thread_map_type::iterator map_iter = thread_map_.find(id);
-
-        // the id may reference a new thread not yet stored in the map
-        if (map_iter == thread_map_.end())
-            map_iter = thread_map_.find(id);
-
-        if (map_iter != thread_map_.end())
-            return map_iter->second->get_gid();
-
-        return naming::invalid_id;
+        // we know that the id is actually the pointer to the thread
+        thread* thrd = reinterpret_cast<thread*>(id);
+        return thrd->get() ? thrd->get_gid() : naming::invalid_id;
     }
 
     // helper class for switching thread state in and out during execution
@@ -568,8 +545,6 @@ namespace hpx { namespace threads
                     << "): caught hpx::exception: " 
                     << e.what() << ", aborted execution";
             report_error(boost::current_exception());
-            if (stop_) 
-                stop_();
             return;
         }
         catch (boost::system::system_error const& e) {
@@ -577,8 +552,6 @@ namespace hpx { namespace threads
                     << "): caught boost::system::system_error: " 
                     << e.what() << ", aborted execution";
             report_error(boost::current_exception());
-            if (stop_) 
-                stop_();
             return;
         }
         catch (std::exception const& e) {
@@ -586,28 +559,21 @@ namespace hpx { namespace threads
                     << "): caught std::exception: " 
                     << e.what() << ", aborted execution";
             report_error(boost::current_exception());
-            if (stop_) 
-                stop_();
             return;
         }
         catch (...) {
             LFATAL_ << "tfunc(" << num_thread 
                     << "): caught unexpected exception, aborted execution";
             report_error(boost::current_exception());
-            if (stop_) 
-                stop_();
             return;
         }
         LTM_(info) << "tfunc(" << num_thread << "): end, executed " 
                    << num_px_threads << " HPX threads";
 
-        if (0 == num_thread) {
-            // print block profiler statistics
-            util::block_profiler<register_thread_tag>::print_stats();
-            util::block_profiler<register_work_tag>::print_stats();
-            util::block_profiler<set_state_tag>::print_stats();
-            util::block_profiler<add_new_tag>::print_stats();
+        if (stop_) 
+            stop_();
 
+        if (0 == num_thread) {
             // print queue statistics
             log_fifo_statistics(work_items_);
             log_fifo_statistics(terminated_items_);
@@ -728,8 +694,7 @@ namespace hpx { namespace threads
                         cleanup_terminated();
 
                         // now, add new threads from the queue of task descriptions
-                        if (add_new_if_possible())
-                            cond_.notify_all();
+                        add_new_if_possible();    // calls notify_all
                     }
                 }
 

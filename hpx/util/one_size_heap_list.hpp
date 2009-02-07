@@ -188,42 +188,4 @@ namespace hpx { namespace util
 
 }} // namespace hpx::util
 
-///////////////////////////////////////////////////////////////////////////////
-// Macros to minimize typing:
-
-#if defined(HPX_USE_ONESIZEHEAPS)
-
-#include <boost/preprocessor/cat.hpp>
-
-///////////////////////////////////////////////////////////////////////////////
-// helper macros for the implementation of one_size_heap_lists
-#define HPX_IMPLEMENT_ONE_SIZE_PRIVATE_HEAP_LIST(allocator, dataclass)        \
-    namespace {                                                               \
-        hpx::util::one_size_heap_list<                                        \
-            hpx::util::one_size_heap<dataclass, allocator>                    \
-        > BOOST_PP_CAT(theHeap, dataclass)(#dataclass);                       \
-    };                                                                        \
-    void* dataclass::operator new (size_t size)                               \
-    {                                                                         \
-        if (size != sizeof(dataclass))                                        \
-            return ::operator new(size);                                      \
-        return BOOST_PP_CAT(theHeap, dataclass).alloc();                      \
-    }                                                                         \
-    void  dataclass::operator delete (void* p, size_t size)                   \
-    {                                                                         \
-        if (NULL == p) return; /* do nothing */                               \
-        if (size != sizeof(dataclass)) {                                      \
-            ::operator delete(p);                                             \
-            return;                                                           \
-        }                                                                     \
-        BOOST_PP_CAT(theHeap, dataclass).free(p);                             \
-    }                                                                         \
-    /**/
-
-#else
-
-#define HPX_IMPLEMENT_ONE_SIZE_PRIVATE_HEAP_LIST(allocator, dataclass)
-
-#endif
-
 #endif

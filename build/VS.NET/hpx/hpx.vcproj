@@ -651,6 +651,10 @@
 					RelativePath="..\..\..\hpx\util\util.hpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\..\hpx\util\value_logger.hpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Runtime"

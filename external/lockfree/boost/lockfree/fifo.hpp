@@ -15,7 +15,7 @@
 #ifndef BOOST_LOCKFREE_FIFO_HPP_INCLUDED
 #define BOOST_LOCKFREE_FIFO_HPP_INCLUDED
 
-#define BOOST_LOCKFREE_FIFO_TRACK_COUNT
+#define BOOST_LOCKFREE_FIFO_LOGGING
 
 #include <boost/lockfree/prefix.hpp>
 #include <boost/lockfree/tagged_ptr.hpp>
@@ -25,8 +25,9 @@
 #include <boost/concept_check.hpp>
 #include <boost/static_assert.hpp>
 
-#if defined(BOOST_LOCKFREE_FIFO_TRACK_COUNT)
+#if defined(BOOST_LOCKFREE_FIFO_LOGGING)
 #include <hpx/util/value_logger.hpp>
+#include <hpx/util/block_profiler.hpp>
 #endif
 
 #include <memory>               /* std::auto_ptr */
@@ -40,6 +41,18 @@ namespace lockfree
 {
 namespace detail
 {
+
+#if defined(BOOST_LOCKFREE_FIFO_LOGGING)
+inline std::string get_enqueue_name(char const* desc)
+{
+    return std::string(desc) + " enqueue";
+}
+
+inline std::string get_dequeue_name(char const* desc)
+{
+    return std::string(desc) + " dequeue";
+}
+#endif
 
 template <typename T, typename Alloc>
 class fifo:
@@ -66,11 +79,13 @@ class fifo:
 
 
 public:
-    explicit fifo(char const* description = "")
+    explicit fifo(char const* description = "", bool enable_logging = true)
       : enqueue_spin_count_(0), dequeue_spin_count_(0),
         description_(description)
-#if defined(BOOST_LOCKFREE_FIFO_TRACK_COUNT)
-      , count_(-1), logger_(description)
+#if defined(BOOST_LOCKFREE_FIFO_LOGGING)
+      , count_(-1), logger_(description, enable_logging)
+      , enqueue_profiler_(get_enqueue_name(description).c_str(), enable_logging)
+      , dequeue_profiler_(get_dequeue_name(description).c_str(), enable_logging)
 #endif
     {
         node * n = alloc_node();
@@ -78,12 +93,15 @@ public:
         tail_.set_ptr(n);
     }
 
-    fifo(std::size_t initial_nodes, char const* description = "")
+    fifo(std::size_t initial_nodes, char const* description = "",
+            bool enable_logging = true)
       : pool(initial_nodes)
       , description_(description)
       , enqueue_spin_count_(0), dequeue_spin_count_(0)
-#if defined(BOOST_LOCKFREE_FIFO_TRACK_COUNT)
-      , count_(-1), logger_(description)
+#if defined(BOOST_LOCKFREE_FIFO_LOGGING)
+      , count_(-1), logger_(description, enable_logging)
+      , enqueue_profiler_(get_enqueue_name(description).c_str(), enable_logging)
+      , dequeue_profiler_(get_dequeue_name(description).c_str(), enable_logging)
 #endif
     {
         node * n = alloc_node();
@@ -104,6 +122,8 @@ public:
 
     void enqueue(T const & t)
     {
+        hpx::util::block_profiler_wrapper<fifo_enqueue_tag> pw(enqueue_profiler_);
+
         node * n = alloc_node(t);
 
         for (unsigned int cnt = 0; /**/; spin((unsigned char)++cnt))
@@ -132,6 +152,8 @@ public:
 
     bool dequeue (T * ret)
     {
+        hpx::util::block_profiler_wrapper<fifo_dequeue_tag> pw(dequeue_profiler_);
+
         for (unsigned int cnt = 0; /**/; spin((unsigned char)++cnt))
         {
             atomic_node_ptr head(head_);
@@ -170,7 +192,7 @@ private:
     {
         node * chunk = pool.allocate();
         new(chunk) node();
-#if defined(BOOST_LOCKFREE_FIFO_TRACK_COUNT)
+#if defined(BOOST_LOCKFREE_FIFO_LOGGING)
         ++count_;
         logger_.snapshot(count_);
 #endif
@@ -181,7 +203,7 @@ private:
     {
         node * chunk = pool.allocate();
         new(chunk) node(t);
-#if defined(BOOST_LOCKFREE_FIFO_TRACK_COUNT)
+#if defined(BOOST_LOCKFREE_FIFO_LOGGING)
         ++count_;
         logger_.snapshot(count_);
 #endif
@@ -190,7 +212,7 @@ private:
 
     void dealloc_node(node * n)
     {
-#if defined(BOOST_LOCKFREE_FIFO_TRACK_COUNT)
+#if defined(BOOST_LOCKFREE_FIFO_LOGGING)
         --count_;
         logger_.snapshot(count_);
 #endif
@@ -207,13 +229,19 @@ private:
     BOOST_LOCKFREE_CACHELINE_ALIGNMENT_PREFIX atomic_node_ptr tail_ BOOST_LOCKFREE_CACHELINE_ALIGNMENT; 
 
 public:
-#if defined(BOOST_LOCKFREE_FIFO_TRACK_COUNT)
+#if defined(BOOST_LOCKFREE_FIFO_LOGGING)
     atomic_int<long> count_;
     hpx::util::value_logger<long> logger_;
+
+    struct fifo_enqueue_tag {};
+    hpx::util::block_profiler<fifo_enqueue_tag> enqueue_profiler_;
+
+    struct fifo_dequeue_tag {};
+    hpx::util::block_profiler<fifo_dequeue_tag> dequeue_profiler_;
 #endif
     atomic_int<long> enqueue_spin_count_;
     atomic_int<long> dequeue_spin_count_;
-    char const* description_;
+    std::string description_;
 };
 
 } /* namespace detail */
@@ -228,12 +256,13 @@ class fifo:
     public detail::fifo<T, Alloc>
 {
 public:
-    fifo(char const* description = "")
-      : detail::fifo<T, Alloc>(description)
+    fifo(char const* description = "", bool enable_logging = true)
+      : detail::fifo<T, Alloc>(description, enable_logging)
     {}
 
-    explicit fifo(std::size_t initial_nodes, char const* description = "")
-      : detail::fifo<T, Alloc>(initial_nodes)
+    explicit fifo(std::size_t initial_nodes, char const* description = "",
+            bool enable_logging = true)
+      : detail::fifo<T, Alloc>(initial_nodes, description, enable_logging)
     {}
 };
 
@@ -261,12 +290,13 @@ class fifo<T*, Alloc>:
     }
 
 public:
-    fifo(char const* description = "")
-      : fifo_t(description)
+    fifo(char const* description = "", bool enable_logging = true)
+      : fifo_t(description, enable_logging)
     {}
 
-    explicit fifo(std::size_t initial_nodes, char const* description = "")
-      : fifo_t(initial_nodes, description)
+    explicit fifo(std::size_t initial_nodes, char const* description = "",
+            bool enable_logging = true)
+      : fifo_t(initial_nodes, description, enable_logging)
     {}
 
     void enqueue(T * t)

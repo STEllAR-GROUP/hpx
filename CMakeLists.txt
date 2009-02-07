@@ -138,6 +138,7 @@ if(MSVC)
     add_definitions(-wd4251 -wd4231 -wd4275 -wd4660 -wd4094 -wd4267)
     if(CMAKE_CL_64)
         add_definitions(-DBOOST_COROUTINE_USE_FIBERS)
+        add_definitions(-wd4180)
     endif()
 endif()
 

@@ -44,8 +44,8 @@ namespace hpx { namespace util
         typedef std::vector<std::pair<boost::uint64_t, T> > values_type;
 
     public:
-        value_logger(char const* const description)
-          : description_(description), enabled_(LTIM_ENABLED(fatal))
+        value_logger(char const* const description, bool enabled = true)
+          : description_(description), enabled_(enabled && LTIM_ENABLED(fatal))
         {
             if (enabled_) 
                 values_.reserve(hpx_initial_times_size);

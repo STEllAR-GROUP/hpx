@@ -58,7 +58,7 @@ threads::thread_state hpx_main()
             accu.print();
         }
         else if (cmd == "query") {
-            std::cout << accu.query() << std::endl;
+            std::cout << prefix << "> " << accu.query() << std::endl;
         }
         else if (cmd == "help") {
             std::cout << "commands: init, add [amount], print, query, help, quit" 

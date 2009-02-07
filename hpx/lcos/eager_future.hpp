@@ -15,6 +15,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/lcos/future_value.hpp>
+#include <hpx/util/block_profiler.hpp>
 
 #include <boost/variant.hpp>
 
@@ -54,6 +55,8 @@ namespace hpx { namespace lcos
     class eager_future;
 
     ///////////////////////////////////////////////////////////////////////////
+    struct eager_future_tag {};
+
     template <typename Action, typename Result>
     class eager_future<Action, Result, boost::mpl::false_> 
         : public future_value<Result>
@@ -74,6 +77,8 @@ namespace hpx { namespace lcos
         ///               apply the action.
         void apply(naming::id_type const& gid)
         {
+            util::block_profiler_wrapper<eager_future_tag> bp(apply_logger_);
+
             naming::full_address fa;
             if (!this->get_full_address(fa))
             {
@@ -102,6 +107,7 @@ namespace hpx { namespace lcos
         ///               eager_future instance (as it has to be sent along 
         ///               with the action as the continuation parameter).
         eager_future(naming::id_type const& gid)
+          : apply_logger_("eager_future::apply")
         {
             apply(gid);
         }
@@ -116,6 +122,8 @@ namespace hpx { namespace lcos
         template <typename Arg0>
         void apply(naming::id_type const& gid, Arg0 const arg0)
         {
+            util::block_profiler_wrapper<eager_future_tag> bp(apply_logger_);
+
             naming::full_address fa;
             if (!this->get_full_address(fa))
             {
@@ -147,15 +155,20 @@ namespace hpx { namespace lcos
         ///               with the action as the continuation parameter).
         template <typename Arg0>
         eager_future(naming::id_type const& gid, Arg0 const& arg0)
+          : apply_logger_("eager_future::apply")
         {
             apply(gid, arg0);
         }
 
         // pull in remaining constructors
         #include <hpx/lcos/eager_future_constructors.hpp>
+
+        util::block_profiler<eager_future_tag> apply_logger_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    struct eager_future_direct_tag {};
+
     template <typename Action, typename Result>
     class eager_future<Action, Result, boost::mpl::true_> 
         : public future_value<Result>
@@ -171,6 +184,8 @@ namespace hpx { namespace lcos
         ///               apply the action.
         void apply(naming::id_type const& gid)
         {
+            util::block_profiler_wrapper<eager_future_direct_tag> bp(apply_logger_);
+
             // Determine whether the gid is local or remote
             naming::address addr;
             if (hpx::applier::get_applier().address_is_local(gid, addr)) {
@@ -211,6 +226,7 @@ namespace hpx { namespace lcos
         ///               eager_future instance (as it has to be sent along 
         ///               with the action as the continuation parameter).
         eager_future(naming::id_type const& gid)
+          : apply_logger_("eager_future_direct::apply")
         {
             apply(gid);
         }
@@ -225,6 +241,8 @@ namespace hpx { namespace lcos
         template <typename Arg0>
         void apply(naming::id_type const& gid, Arg0 const& arg0)
         {
+            util::block_profiler_wrapper<eager_future_direct_tag> bp(apply_logger_);
+
             // Determine whether the gid is local or remote
             naming::address addr;
             if (hpx::applier::get_applier().address_is_local(gid, addr)) {
@@ -268,12 +286,15 @@ namespace hpx { namespace lcos
         ///               with the action as the continuation parameter).
         template <typename Arg0>
         eager_future(naming::id_type const& gid, Arg0 const& arg0)
+          : apply_logger_("eager_future_direct::apply")
         {
             apply(gid, arg0);
         }
 
         // pull in remaining constructors
         #include <hpx/lcos/eager_future_constructors_direct.hpp>
+
+        util::block_profiler<eager_future_direct_tag> apply_logger_;
     };
 
 }}

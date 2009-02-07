@@ -34,6 +34,8 @@
     void apply(naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
+        util::block_profiler_wrapper<eager_future_direct_tag> bp(apply_logger_);
+
         naming::address addr;
         if (hpx::applier::get_applier().address_is_local(gid, addr)) {
             // local, direct execution
@@ -61,6 +63,7 @@
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     eager_future(naming::id_type const& gid, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+      : apply_logger_("eager_future_direct::apply")
     {
         apply(gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }

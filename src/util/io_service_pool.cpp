@@ -20,8 +20,11 @@
 namespace hpx { namespace util
 {
     io_service_pool::io_service_pool(std::size_t pool_size, 
-            boost::function<void()> start_thread)
-      : next_io_service_(0), stopped_(false), start_thread_(start_thread)
+            boost::function<void()> on_start_thread,
+            boost::function<void()> on_stop_thread)
+      : next_io_service_(0), stopped_(false), 
+        on_start_thread_(on_start_thread),
+        on_stop_thread_(on_stop_thread)
     {
         if (pool_size == 0)
             throw std::runtime_error("io_service_pool size is 0");
@@ -37,8 +40,10 @@ namespace hpx { namespace util
         }
     }
 
-    io_service_pool::io_service_pool(boost::function<void()> start_thread)
-      : next_io_service_(0), stopped_(false), start_thread_(start_thread)
+    io_service_pool::io_service_pool(boost::function<void()> on_start_thread,
+            boost::function<void()> on_stop_thread)
+      : next_io_service_(0), stopped_(false), 
+        on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread)
     {
         io_service_ptr io_service(new boost::asio::io_service);
         work_ptr work(new boost::asio::io_service::work(*io_service));
@@ -48,8 +53,8 @@ namespace hpx { namespace util
 
     void io_service_pool::thread_run(int index)
     {
-        if (start_thread_)
-            start_thread_();
+        if (on_start_thread_)
+            on_start_thread_();
         io_services_[index]->run();   // run io service
     }
 
@@ -58,7 +63,7 @@ namespace hpx { namespace util
         // Create a pool of threads to run all of the io_services.
         if (!threads_.empty())   // should be called only once
         {
-            if (join_threads)
+            if (join_threads) 
                 join();
             return false;
         }
@@ -79,7 +84,11 @@ namespace hpx { namespace util
     {
         // Wait for all threads in the pool to exit.
         for (std::size_t i = 0; !stopped_ && i < threads_.size(); ++i)
+        {
+            if (on_stop_thread_)
+                on_stop_thread_();
             threads_[i]->join();
+        }
     }
 
     void io_service_pool::stop()

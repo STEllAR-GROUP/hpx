@@ -374,7 +374,7 @@ namespace boost { namespace coroutines {
     void rebind(Functor f, thread_id_type id = 0)
     {
         BOOST_ASSERT(exited());
-        //impl_type::rebind(m_pimpl, f, id);
+        impl_type::rebind(f, id);
     }
 
 #define BOOST_COROUTINE_generate_argument_n_type(z, n, traits_type)           \
