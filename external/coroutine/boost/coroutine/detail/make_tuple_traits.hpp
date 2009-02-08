@@ -46,12 +46,12 @@ namespace boost { namespace coroutines { namespace detail {
   template<typename TypeList>
   struct make_tuple_traits;
 
-#define BOOST_COROUTINE_MAKE_TUPLE_TRAITS_GENERATOR(z, n, unused)       \
-    template<BOOST_PP_ENUM_PARAMS(n, class A)>                   \
-    struct make_tuple_traits<BOOST_PP_CAT(boost::mpl::vector, n)        \
-        <BOOST_PP_ENUM_PARAMS(n, A)> >{                          \
-        typedef tuple_traits<BOOST_PP_ENUM_PARAMS(n, A)> type;   \
-    };                                                           \
+#define BOOST_COROUTINE_MAKE_TUPLE_TRAITS_GENERATOR(z, n, unused)             \
+    template<BOOST_PP_ENUM_PARAMS(n, class A)>                                \
+    struct make_tuple_traits<BOOST_PP_CAT(boost::mpl::vector, n)              \
+        <BOOST_PP_ENUM_PARAMS(n, A)> >{                                       \
+        typedef tuple_traits<BOOST_PP_ENUM_PARAMS(n, A)> type;                \
+    };                                                                        \
 /**/
 
   /**
@@ -59,8 +59,9 @@ namespace boost { namespace coroutines { namespace detail {
    * @note This could be done more elegantly with a recursive metafunction, 
    * but this is simpler and works well anyway.
    */
-  BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX, 
-		  BOOST_COROUTINE_MAKE_TUPLE_TRAITS_GENERATOR, ~);
+BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX, 
+          BOOST_COROUTINE_MAKE_TUPLE_TRAITS_GENERATOR, ~);
+
 #undef BOOST_COROUTINE_MAKE_TUPLE_TRAITS_GENERATOR
 
 } } }

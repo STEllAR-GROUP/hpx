@@ -90,30 +90,33 @@ namespace boost { namespace coroutines {
   };
 
   template<typename T>
-  struct is_nullary :  boost::mpl::bool_<boost::tuples::length<T>::value == 0> {  };
+  struct is_nullary 
+    : boost::mpl::bool_<boost::tuples::length<T>::value == 0> 
+  {};
 
   template<typename T>
-  struct is_singular : boost::mpl::bool_<boost::tuples::length<T>::value == 1> {  };
+  struct is_singular 
+    : boost::mpl::bool_<boost::tuples::length<T>::value == 1> 
+  {};
 
   // Given a tuple_traits, makes a tuple of it
   // Simply returns the internal tuple type, unless
   // the tuple is nullary, then apply the nullary tuple workaround
   template<typename T>
-  struct make_as_tuple :
-    boost::mpl::if_<
-    is_nullary<T>,
-      detail::tuple_workaround,
-      T
-    > {};
+  struct make_as_tuple 
+    : boost::mpl::if_<is_nullary<T>, detail::tuple_workaround, T>
+  {};
 
   // Used to implement the next metafunction,
   // Splitted in two parts to satisfy the compiler.
   template<typename T>
-  struct step_2 :
-      boost::mpl::eval_if<
-      is_singular<T>,
-      boost::tuples::element<0, typename make_as_tuple<T>::type >,
-    boost::mpl::identity<typename make_as_tuple<T>::type> > { };
+  struct step_2 
+    : boost::mpl::eval_if<
+        is_singular<T>,
+        boost::tuples::element<0, typename make_as_tuple<T>::type>,
+        boost::mpl::identity<typename make_as_tuple<T>::type> 
+      > 
+  {};
 
   // Given a trait class return the internal tuple type modified 
   // as a return value.
@@ -122,15 +125,19 @@ namespace boost { namespace coroutines {
   // - If it singular returns the first type
   // - Else return the tuple itself.
   template<typename T>
-  struct make_result_type :
-    boost::mpl::eval_if<
-    is_nullary<T>,
-    boost::mpl::identity<void>,
-    step_2<T> > { };
+  struct make_result_type 
+    : boost::mpl::eval_if<
+        is_nullary<T>,
+        boost::mpl::identity<void>,
+        step_2<T> 
+      > 
+  {};
 
   template<BOOST_PP_ENUM_BINARY_PARAMS(BOOST_COROUTINE_ARG_MAX,
       typename T, = boost::tuples::null_type BOOST_PP_INTERCEPT)>
-  struct tuple_traits : tuple_traits_tag {
+  struct tuple_traits 
+    : tuple_traits_tag 
+  {
   public:
 
     // This is the straightforward boost::tuple trait
@@ -149,21 +156,23 @@ namespace boost { namespace coroutines {
     // If the index is not less than the tuple length, it returns 
     // null_type.
     template<int Index> 
-    struct at : 
-      boost::mpl::eval_if_c<
-      Index < 
-      boost::tuples::length<typename tuple_traits::internal_tuple_type>::value,
-      boost::tuples::element<Index, typename tuple_traits::internal_tuple_type>,	
-      boost::mpl::identity<typename tuple_traits::null_type> >{};
+    struct at 
+      : boost::mpl::eval_if_c<
+          Index< 
+              boost::tuples::length<typename tuple_traits::internal_tuple_type>::value,
+              boost::tuples::element<Index, typename tuple_traits::internal_tuple_type>,
+              boost::mpl::identity<typename tuple_traits::null_type> 
+          >
+      {};
 
-    typedef typename make_as_tuple<internal_tuple_type>::type
-    as_tuple;	
-
+    typedef typename make_as_tuple<internal_tuple_type>::type as_tuple;
     typedef typename make_result_type<internal_tuple_type>::type as_result;
-
   };
     
   template<typename T>
-  struct is_tuple_traits : boost::is_base_of<tuple_traits_tag, T> {};
+  struct is_tuple_traits 
+    : boost::is_base_of<tuple_traits_tag, T> 
+  {};
+
 } }
 #endif

@@ -265,8 +265,9 @@ private:
         result_slot_type;
 
       {
-          boost::optional<self_type> self (coroutine_accessor::in_place(this));
-          reset_self_on_exit on_exit(&*self);
+//           boost::optional<self_type> self (coroutine_accessor::in_place(this));
+          self_type self(this);
+          reset_self_on_exit on_exit(&self);
           detail::unpack(m_fun, *this->args(), 
              detail::trait_tag<typename coroutine_type::arg_slot_traits>());
       }
@@ -288,8 +289,9 @@ private:
         result_slot_type;
 
       {
-          boost::optional<self_type> self (coroutine_accessor::in_place(this));
-          reset_self_on_exit on_exit(&*self);
+//           boost::optional<self_type> self (coroutine_accessor::in_place(this));
+          self_type self(this);
+          reset_self_on_exit on_exit(&self);
           this->m_result_last = boost::in_place(result_slot_type(
                   detail::unpack(m_fun, *this->args(), detail::trait_tag<traits>())
               ));

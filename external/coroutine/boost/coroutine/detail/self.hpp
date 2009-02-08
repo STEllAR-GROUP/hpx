@@ -226,7 +226,11 @@ namespace boost { namespace coroutines { namespace detail {
       BOOST_ASSERT(m_pimpl);
       return m_pimpl->get_thread_id();
     }
-    
+
+    explicit coroutine_self(impl_type * pimpl) 
+      : m_pimpl(pimpl) 
+    {}
+
   private:
     coroutine_self(impl_type * pimpl, detail::init_from_impl_tag) :
       m_pimpl(pimpl) {}
