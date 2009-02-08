@@ -28,8 +28,7 @@ namespace hpx { namespace components
                                         ///< base LCO's blocking on a value
         component_future = 6,           ///< a future executing the action and 
                                         ///< allowing to wait for the result
-        component_value_adaptor = 7,    ///< a adaptor to access specific slot of an LCO
-        component_plain_function = 8,   ///< a plain remotely callable function 
+        component_value_adaptor = 7,    ///< an adaptor to access specific slot of an LCO
 
         component_last,
         component_first_dynamic = component_last
@@ -62,6 +61,7 @@ namespace hpx { namespace components
     /// \brief Verify the two given component types are matching (compatible)
     inline bool types_are_compatible(boost::int64_t lhs, boost::int64_t rhs)
     {
+        // don't compare types if one of them is unknown
         if (component_invalid == rhs || component_invalid == lhs)
             return true;    // no way of telling, so we assume the best :-P
 

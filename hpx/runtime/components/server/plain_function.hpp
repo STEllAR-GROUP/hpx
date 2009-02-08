@@ -21,7 +21,8 @@ namespace hpx { namespace components { namespace server
         // to associate this component with a given action.
         static component_type get_component_type() 
         { 
-            return component_plain_function; 
+            // plain functions are in main memory namespace
+            return component_runtime_support; 
         }
         static void set_component_type(component_type) 
         { 
