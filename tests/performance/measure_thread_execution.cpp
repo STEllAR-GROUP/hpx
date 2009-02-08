@@ -10,10 +10,11 @@ using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
 // this is a empty test thread
-void null_thread(threads::thread_state_ex)
+threads::thread_state null_thread(threads::thread_state_ex)
 {
 //     naming::id_type gid = 
 //         appl.get_thread_manager().get_thread_gid(self.get_thread_id(), appl);
+    return threads::terminated;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -22,7 +23,7 @@ int hpx_main(util::high_resolution_timer& timer, std::size_t num_threads)
     // schedule a couple of threads
     timer.restart();
     for (std::size_t i = 0; i < num_threads; ++i) {
-        applier::register_work(null_thread, "null_thread", threads::pending, false);
+        applier::register_work_plain(null_thread, "null_thread", threads::pending, false);
     }
 //     double elapsed = timer.elapsed();
 //     std::cerr << "Elapsed time [s] for thread initialization of " 

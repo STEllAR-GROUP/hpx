@@ -46,13 +46,18 @@ fibonacci_action;
 HPX_REGISTER_ACTION(fibonacci_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-int fib (naming::id_type prefix, int n)
+int fib (naming::id_type that_prefix, int n)
 {
     if (n < 2) 
         return n;
 
-    lcos::eager_future<fibonacci_action> n1(prefix, prefix, n - 1);
-    lcos::eager_future<fibonacci_action> n2(prefix, prefix, n - 2);
+    naming::id_type this_prefix = applier::get_applier().get_runtime_support_gid();
+
+    // execute the first fib() at the other locality, returning here afterwards
+    lcos::eager_future<fibonacci_action> n1(that_prefix, this_prefix, n - 1);
+
+    // execute the second fib() here, forwarding the correct prefix
+    lcos::eager_future<fibonacci_action> n2(this_prefix, that_prefix, n - 2);
 
     return n1.get() + n2.get();
 }
@@ -62,20 +67,23 @@ int hpx_main(int argument)
 {
     // get list of all known localities
     std::vector<naming::id_type> prefixes;
-    naming::id_type prefix;
     applier::applier& appl = applier::get_applier();
+
+    naming::id_type this_prefix = appl.get_runtime_support_gid();
+    naming::id_type that_prefix;
+
     if (appl.get_remote_prefixes(prefixes)) {
         // execute the fib() function on any of the remote localities
-        prefix = prefixes[0];
+        that_prefix = prefixes[0];
     }
     else {
         // execute the fib() function locally
-        prefix = appl.get_runtime_support_gid();
+        that_prefix = this_prefix;
     }
 
     {
         util::high_resolution_timer t;
-        lcos::eager_future<fibonacci_action> n(prefix, prefix, argument);
+        lcos::eager_future<fibonacci_action> n(that_prefix, this_prefix, argument);
         int result = n.get();
         double elapsed = t.elapsed();
 
@@ -202,7 +210,10 @@ int main(int argc, char* argv[])
 
         // initialize and start the HPX runtime
         hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, mode);
-        rt.run(boost::bind(hpx_main, argument), num_threads);
+        if (mode == hpx::runtime::worker)
+            rt.run(num_threads);
+        else
+            rt.run(boost::bind(hpx_main, argument), num_threads);
     }
     catch (std::exception& e) {
         std::cerr << "fibonacci: std::exception caught: " << e.what() << "\n";

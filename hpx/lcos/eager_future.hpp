@@ -65,11 +65,11 @@ namespace hpx { namespace lcos
         typedef future_value<Result> base_type;
 
     public:
-        /// Construct a (non-functional) instance of an \a eager_future. To use
-        /// this instance 
-        eager_future()
-        {}
-
+//         /// Construct a (non-functional) instance of an \a eager_future. To use
+//         /// this instance 
+//         eager_future()
+//         {}
+// 
         /// The apply function starts the asynchronous operations encapsulated
         /// by this eager future.
         ///

@@ -64,7 +64,10 @@ namespace hpx { namespace threads { namespace detail
 
         thread_state execute()
         {
-            return coroutine_(set_state_ex(wait_signaled));
+            thread_state state = 
+                coroutine_(static_cast<thread_state_ex>(current_state_ex_));
+            current_state_ex_ = wait_signaled;
+            return state;
         }
 
         thread_state get_state() const 
