@@ -65,11 +65,13 @@ namespace hpx { namespace lcos
         typedef future_value<Result> base_type;
 
     public:
-//         /// Construct a (non-functional) instance of an \a eager_future. To use
-//         /// this instance 
-//         eager_future()
-//         {}
-// 
+        /// Construct a (non-functional) instance of an \a eager_future. To use
+        /// this instance its member function \a apply needs to be directly
+        /// called.
+        eager_future()
+          : apply_logger_("eager_future::apply")
+        {}
+
         /// The apply function starts the asynchronous operations encapsulated
         /// by this eager future.
         ///
@@ -177,6 +179,13 @@ namespace hpx { namespace lcos
         typedef future_value<Result> base_type;
 
     public:
+        /// Construct a (non-functional) instance of an \a eager_future. To use
+        /// this instance its member function \a apply needs to be directly
+        /// called.
+        eager_future()
+          : apply_logger_("eager_future_direct::apply")
+        {}
+
         /// The apply function starts the asynchronous operations encapsulated
         /// by this eager future.
         ///
