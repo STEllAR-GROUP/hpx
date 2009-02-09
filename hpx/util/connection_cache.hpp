@@ -33,18 +33,18 @@ namespace hpx { namespace util
         typedef boost::shared_ptr<Connection> connection_type;
         typedef naming::locality key_type;
 
-        typedef std::pair<connection_type, key_type const*> value_type;
+        typedef std::pair<connection_type, std::pair<key_type const*, int> > value_type;
         typedef std::list<value_type> list_type;
         typedef typename list_type::iterator list_iterator;
         typedef typename list_type::size_type size_type;
 
-        typedef std::multimap<key_type, list_iterator> map_type;
+        typedef std::multimap<key_type, std::pair<list_iterator, int> > map_type;
         typedef typename map_type::iterator map_iterator;
         typedef typename map_type::size_type map_size_type;
 
         connection_cache(size_type max_cache_size, char const* const logdest)
           : max_cache_size_(max_cache_size < 2 ? 2 : max_cache_size),
-            logdest_(logdest)
+            logdest_(logdest), count_(0)
         {}
 
         connection_type get (key_type const& l)
@@ -61,8 +61,8 @@ namespace hpx { namespace util
                     << "connection_cache: reusing existing connection for: " 
                     << l;
 
-                connection_type result(mpos.first->second->first);
-                cont_.erase(mpos.first->second);
+                connection_type result(mpos.first->second.first->first);
+                cont_.erase(mpos.first->second.first);
                 index_.erase(mpos.first);
                 return result;
             }
@@ -82,9 +82,16 @@ namespace hpx { namespace util
                 << "connection_cache: returning connection to cache: " << l;
 
             // Add it to the list, and index it
-            cont_.push_back(value_type(conn, NULL));
-            index_.insert(std::make_pair(l, --(cont_.end())));
-            cont_.back().second = &(index_.find(l)->first);
+            cont_.push_back(value_type(conn, 
+                std::make_pair((key_type const*)NULL, ++count_)));
+            map_iterator it = index_.insert(
+                std::make_pair(l, std::make_pair(--(cont_.end()), count_)));
+            if (it == index_.end())
+            {
+                HPX_THROW_EXCEPTION(out_of_memory, "connection_cache::add", 
+                    "couldn't insert new item into connection cache");
+            }
+            cont_.back().second.first = &(it->first);
 
             map_size_type s = index_.size();
             if (s > max_cache_size_) {
@@ -93,6 +100,7 @@ namespace hpx { namespace util
                 LHPX_(debug, logdest_) 
                     << "connection_cache: cache full, removing least recently "
                        "used entries";
+
                 list_iterator pos = cont_.begin();
                 list_iterator last = cont_.end();
                 while (pos != last && s > max_cache_size_) {
@@ -102,9 +110,21 @@ namespace hpx { namespace util
 
                     LHPX_(debug, logdest_) 
                         << "connection_cache: removing entry for: " 
-                        << *(condemmed->second);
+                        << *(condemmed->second.first);
 
-                    index_.erase(*(condemmed->second));
+                    int generational_count = condemmed->second.second;
+                    std::pair<map_iterator, map_iterator> mpos = 
+                        index_.equal_range(*(condemmed->second.first));
+                    for(/**/; mpos.first != mpos.second; ++mpos.first)
+                    {
+                        if (mpos.first->second.second == generational_count)
+                        {
+                            index_.erase(mpos.first);
+                            break;
+                        }
+                    }
+                    BOOST_ASSERT(mpos.first != mpos.second);
+
                     cont_.erase(condemmed); 
                     --s;
                 }
@@ -117,6 +137,7 @@ namespace hpx { namespace util
         char const* const logdest_;
         list_type cont_;
         map_type index_;
+        int count_;
     };
 
 }}

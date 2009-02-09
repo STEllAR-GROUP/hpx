@@ -73,7 +73,7 @@ namespace hpx { namespace naming
           : address_(addr.to_string()), port_(port)
         {}
 
-        locality(boost::asio::ip::tcp::endpoint ep) 
+        explicit locality(boost::asio::ip::tcp::endpoint ep) 
           : address_(ep.address().to_string()), port_(ep.port()) 
         {}
 
