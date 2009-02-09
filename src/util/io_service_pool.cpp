@@ -23,8 +23,7 @@ namespace hpx { namespace util
             boost::function<void()> on_start_thread,
             boost::function<void()> on_stop_thread)
       : next_io_service_(0), stopped_(false), 
-        on_start_thread_(on_start_thread),
-        on_stop_thread_(on_stop_thread)
+        on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread)
     {
         if (pool_size == 0)
             throw std::runtime_error("io_service_pool size is 0");
@@ -55,7 +54,20 @@ namespace hpx { namespace util
     {
         if (on_start_thread_)
             on_start_thread_();
-        io_services_[index]->run();   // run io service
+
+        boost::system::error_code ec;
+        do {
+            // use this thread for the given io service
+            io_services_[index]->run(ec);   // run io service
+            if (!ec)
+                break;
+
+            // reset io service on error and restart the thread loop
+            io_services_[index]->reset();
+        } while (true);
+
+        if (on_stop_thread_)
+            on_stop_thread_();
     }
 
     bool io_service_pool::run(bool join_threads)
@@ -85,8 +97,6 @@ namespace hpx { namespace util
         // Wait for all threads in the pool to exit.
         for (std::size_t i = 0; !stopped_ && i < threads_.size(); ++i)
         {
-            if (on_stop_thread_)
-                on_stop_thread_();
             threads_[i]->join();
         }
     }
