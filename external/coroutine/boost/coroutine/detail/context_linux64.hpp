@@ -169,7 +169,7 @@ namespace boost { namespace coroutines {
     inline void swap_context(ia64_gcc_context_impl_base& from, 
         ia64_gcc_context_impl const& to, default_hint) 
     {
-        BOOST_ASSERT(*(void**)to.m_stack == (void*)~0);
+//        BOOST_ASSERT(*(void**)to.m_stack == (void*)~0);
         to.prefetch();
         swapcontext_stack(&from.m_sp, to.m_sp);
     }
@@ -178,7 +178,7 @@ namespace boost { namespace coroutines {
     inline void swap_context(ia64_gcc_context_impl& from, 
         ia64_gcc_context_impl_base const& to, yield_hint) 
     {
-        BOOST_ASSERT(*(void**)from.m_stack == (void*)~0);
+//        BOOST_ASSERT(*(void**)from.m_stack == (void*)~0);
         to.prefetch();
         swapcontext_stack2(&from.m_sp, to.m_sp);
     }
@@ -186,7 +186,7 @@ namespace boost { namespace coroutines {
     inline void swap_context(ia64_gcc_context_impl& from, 
         ia64_gcc_context_impl_base const& to, yield_to_hint) 
     {
-        BOOST_ASSERT(*(void**)from.m_stack == (void*)~0);
+//        BOOST_ASSERT(*(void**)from.m_stack == (void*)~0);
         to.prefetch();
         swapcontext_stack3(&from.m_sp, to.m_sp);
     }

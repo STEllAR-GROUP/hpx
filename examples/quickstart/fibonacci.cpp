@@ -46,8 +46,11 @@ fibonacci_action;
 HPX_REGISTER_ACTION(fibonacci_action);
 
 ///////////////////////////////////////////////////////////////////////////////
+int  count_invocations = 0;
+
 int fib (naming::id_type that_prefix, int n)
 {
+    ++count_invocations;
     if (n < 2) 
         return n;
 
@@ -214,6 +217,9 @@ int main(int argc, char* argv[])
             rt.run(num_threads);
         else
             rt.run(boost::bind(hpx_main, argument), num_threads);
+
+        std::cout << "Number of invocations of fib(): " << count_invocations 
+                  << std::endl;
     }
     catch (std::exception& e) {
         std::cerr << "fibonacci: std::exception caught: " << e.what() << "\n";
