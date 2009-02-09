@@ -55,16 +55,19 @@ namespace hpx { namespace util
         if (on_start_thread_)
             on_start_thread_();
 
-        boost::system::error_code ec;
-        do {
-            // use this thread for the given io service
-            io_services_[index]->run(ec);   // run io service
-            if (!ec)
-                break;
+//         boost::system::error_code ec;
+//         do {
+//             // use this thread for the given io service
+//             io_services_[index]->run(ec);   // run io service
+//             if (!ec)
+//                 break;
+// 
+//             // reset io service on error and restart the thread loop
+//             io_services_[index]->reset();
+//         } while (true);
 
-            // reset io service on error and restart the thread loop
-            io_services_[index]->reset();
-        } while (true);
+        // use this thread for the given io service
+        io_services_[index]->run();   // run io service
 
         if (on_stop_thread_)
             on_stop_thread_();
