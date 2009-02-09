@@ -25,6 +25,7 @@ set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
 # We have a patched BoostFIND module, and other files to include, look for 
 # these in our misc directory
 list(APPEND CMAKE_MODULE_PATH ${hpx_SOURCE_DIR}/misc)
+list(REMOVE_DUPLICATES CMAKE_MODULE_PATH)
 
 # include additional macro definitions
 include(HpxUtils)
