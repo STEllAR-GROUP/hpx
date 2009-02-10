@@ -37,36 +37,49 @@ namespace po = boost::program_options;
 // }
 
 ///////////////////////////////////////////////////////////////////////////////
-int fib(naming::id_type prefix, int n);
+int fib(naming::id_type prefix, int n, double delay_coeff);
 
 typedef 
-    actions::plain_result_action2<int, naming::id_type, int, fib> 
+    actions::plain_result_action3<int, naming::id_type, int, double, fib> 
 fibonacci_action;
 
 HPX_REGISTER_ACTION(fibonacci_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-int  count_invocations = 0;
+int count_invocations = 0;    // global invocation counter
 
-int fib (naming::id_type that_prefix, int n)
+int fib (naming::id_type that_prefix, int n, double delay_coeff)
 {
+    // count number of invocations
     ++count_invocations;
+
+    // do some busy waiting, if requested
+    if (delay_coeff) {
+        util::high_resolution_timer t;
+        double start_time = t.elapsed();
+        double current = 0;
+        do {
+            current = t.elapsed();
+        } while (current - start_time < delay_coeff * 1e-6);
+    }
+
+    // here is the actual fibonacci calculation
     if (n < 2) 
         return n;
 
-    naming::id_type this_prefix = applier::get_applier().get_runtime_support_gid();
+    typedef lcos::eager_future<fibonacci_action> fibonacci_future;
 
     // execute the first fib() at the other locality, returning here afterwards
-    lcos::eager_future<fibonacci_action> n1(that_prefix, this_prefix, n - 1);
-
     // execute the second fib() here, forwarding the correct prefix
-    lcos::eager_future<fibonacci_action> n2(this_prefix, that_prefix, n - 2);
+    naming::id_type this_prefix = applier::get_applier().get_runtime_support_gid();
+    fibonacci_future n1(that_prefix, this_prefix, n - 1, delay_coeff);
+    fibonacci_future n2(this_prefix, that_prefix, n - 2, delay_coeff);
 
     return n1.get() + n2.get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(int argument)
+int hpx_main(int argument, double delay_coeff, int& result, double& elapsed)
 {
     // get list of all known localities
     std::vector<naming::id_type> prefixes;
@@ -86,11 +99,10 @@ int hpx_main(int argument)
 
     {
         util::high_resolution_timer t;
-        lcos::eager_future<fibonacci_action> n(that_prefix, this_prefix, argument);
-        int result = n.get();
-        double elapsed = t.elapsed();
-
-        std::cout << "elapsed: " << elapsed << ", result: " << result << std::endl;
+        lcos::eager_future<fibonacci_action> n(
+            that_prefix, this_prefix, argument, delay_coeff);
+        result = n.get();
+        elapsed = t.elapsed();
     }
 
     // initiate shutdown of the runtime systems on all localities
@@ -119,6 +131,10 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "HPX locality")
             ("value,v", po::value<int>(), 
                 "the number to be used as the argument to fib (default is 10)")
+            ("csv,s", "generate statistics of the run in comma separated format")
+            ("busywait,b", po::value<double>(),
+                "add this amount of busy wait workload to each of the iterations"
+                " [in steps of 1µs], i.e. -b1000 == 1ms")
         ;
 
         po::store(po::command_line_parser(argc, argv)
@@ -189,6 +205,7 @@ int main(int argc, char* argv[])
         int num_threads = 1;
         int argument = 10;
         hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
+        double delay_coeff = 0;
 
         // extract IP address/port arguments
         if (vm.count("agas")) 
@@ -206,20 +223,39 @@ int main(int argc, char* argv[])
         if (vm.count("worker"))
             mode = hpx::runtime::worker;
 
+        if (vm.count("busywait"))
+            delay_coeff = vm["busywait"].as<double>();
+
         // initialize and run the AGAS service, if appropriate
         std::auto_ptr<agas_server_helper> agas_server;
         if (vm.count("run_agas_server"))  // run the AGAS server instance here
             agas_server.reset(new agas_server_helper(agas_host, agas_port));
 
+        int result = 0;
+        double elapsed =0;
+
         // initialize and start the HPX runtime
         hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, mode);
-        if (mode == hpx::runtime::worker)
+        if (mode == hpx::runtime::worker) {
             rt.run(num_threads);
-        else
-            rt.run(boost::bind(hpx_main, argument), num_threads);
+        }
+        else {
+            rt.run(boost::bind(hpx_main, argument, delay_coeff, 
+                boost::ref(result), boost::ref(elapsed)), num_threads);
+        }
 
-        std::cout << "Number of invocations of fib(): " << count_invocations 
-                  << std::endl;
+        if (vm.count("csv")) {
+            // write results as csv
+            std::cout << num_threads << "," << argument << "," 
+                      << elapsed << "," << result << "," << count_invocations 
+                      << std::endl;
+        }
+        else {
+            // write results the old fashioned way
+            std::cout << "elapsed: " << elapsed << ", result: " << result << std::endl;
+            std::cout << "Number of invocations of fib(): " << count_invocations 
+                      << std::endl;
+        }
     }
     catch (std::exception& e) {
         std::cerr << "fibonacci: std::exception caught: " << e.what() << "\n";

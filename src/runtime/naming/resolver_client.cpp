@@ -452,7 +452,7 @@ namespace hpx { namespace naming
         if (!client_connection) {
             // establish a new connection
             boost::system::error_code error = boost::asio::error::fault;
-            for (int i = 0; i < HPX_MAX_AGAS_RETRIES; ++i)
+            for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
             {
                 try {
                     client_connection.reset(new resolver_client_connection(
@@ -472,7 +472,7 @@ namespace hpx { namespace naming
                         break;
 
                     boost::this_thread::sleep(boost::get_system_time() + 
-                        boost::posix_time::milliseconds(HPX_AGAS_RETRIES_SLEEP));
+                        boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
                 }
                 catch (boost::system::error_code const& e) {
                     HPX_THROW_EXCEPTION(network_error, 

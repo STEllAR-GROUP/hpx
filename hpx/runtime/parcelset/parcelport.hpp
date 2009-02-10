@@ -178,20 +178,33 @@ namespace hpx { namespace parcelset
                         connection_cache_)); 
                 client_connection->set_parcel(p);
 
-            // connect to the target locality
+            // connect to the target locality, retry if needed
                 boost::system::error_code error = boost::asio::error::try_again;
-
-                naming::locality::iterator_type end = addr.locality_.connect_end();
-                for (naming::locality::iterator_type it = 
-                        addr.locality_.connect_begin(io_service_pool_.get_io_service()); 
-                     it != end; ++it)
+                for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
                 {
-                    client_connection->socket().close();
-                    client_connection->socket().connect(*it, error);
-                    if (!error) 
-                        break;
-                }
+                    try {
+                        naming::locality::iterator_type end = addr.locality_.connect_end();
+                        for (naming::locality::iterator_type it = 
+                                addr.locality_.connect_begin(io_service_pool_.get_io_service()); 
+                             it != end; ++it)
+                        {
+                            client_connection->socket().close();
+                            client_connection->socket().connect(*it, error);
+                            if (!error) 
+                                break;
+                        }
+                        if (!error) 
+                            break;
 
+                        // we wait for a really short amount of time (usually 100µs)
+                        boost::this_thread::sleep(boost::get_system_time() + 
+                            boost::posix_time::microseconds(HPX_NETWORK_RETRIES_SLEEP));
+                    }
+                    catch (boost::system::error_code const& e) {
+                        HPX_THROW_EXCEPTION(network_error, 
+                            "parcelport::send_parcel", e.message());
+                    }
+                }
                 if (error) {
                     client_connection->socket().close();
 

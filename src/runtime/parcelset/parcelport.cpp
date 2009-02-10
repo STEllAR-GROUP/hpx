@@ -87,9 +87,7 @@ namespace hpx { namespace parcelset
     {
         if (!e) {
         // handle this incoming parcel
-            conn->async_read(
-                boost::bind(&parcelport::handle_read_completion, this,
-                boost::asio::placeholders::error));
+            server::parcelport_connection_ptr c(conn);    // hold on to conn
 
         // create new connection waiting for next incoming parcel
             conn.reset(new server::parcelport_connection(
@@ -97,6 +95,12 @@ namespace hpx { namespace parcelset
             acceptor_.async_accept(conn->socket(),
                 boost::bind(&parcelport::handle_accept, this,
                     boost::asio::placeholders::error, conn));
+
+        // now accept the incoming connection by starting to read from the 
+        // socket
+            c->async_read(
+                boost::bind(&parcelport::handle_read_completion, this,
+                boost::asio::placeholders::error));
         }
     }
 

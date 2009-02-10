@@ -144,8 +144,7 @@ namespace hpx { namespace naming
     {
         if (!e) {
         // handle incoming request
-            conn->async_read(boost::bind(&resolver_server::handle_completion, 
-                this, boost::asio::placeholders::error));
+            server::connection_ptr c(conn);    // hold on to conn
 
         // create new connection waiting for next incoming request
             conn.reset(new server::connection(
@@ -153,6 +152,11 @@ namespace hpx { namespace naming
             acceptor_.async_accept(conn->socket(),
                 boost::bind(&resolver_server::handle_accept, this,
                   boost::asio::placeholders::error, conn));
+
+        // now accept the incoming connection by starting to read from the 
+        // socket
+            c->async_read(boost::bind(&resolver_server::handle_completion, 
+                this, boost::asio::placeholders::error));
         }
     }
 

@@ -567,7 +567,7 @@ namespace hpx { namespace threads
             report_error(boost::current_exception());
             return;
         }
-        LTM_(info) << "tfunc(" << num_thread << "): end, executed " 
+        LTM_(fatal) << "tfunc(" << num_thread << "): end, executed " 
                    << num_px_threads << " HPX threads";
 
         if (stop_) 
