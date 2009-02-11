@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+#  Copyright (c) 2009 Maciek Brodowicz
+# 
+#  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+#  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 """
 Perform parameter sweep runs of an application.
 """

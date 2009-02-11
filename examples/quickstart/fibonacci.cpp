@@ -37,10 +37,10 @@ namespace po = boost::program_options;
 // }
 
 ///////////////////////////////////////////////////////////////////////////////
-int fib(naming::id_type prefix, int n, double delay_coeff);
+int fib(naming::id_type prefix, int n, int delay_coeff);
 
 typedef 
-    actions::plain_result_action3<int, naming::id_type, int, double, fib> 
+    actions::plain_result_action3<int, naming::id_type, int, int, fib> 
 fibonacci_action;
 
 HPX_REGISTER_ACTION(fibonacci_action);
@@ -48,7 +48,7 @@ HPX_REGISTER_ACTION(fibonacci_action);
 ///////////////////////////////////////////////////////////////////////////////
 int count_invocations = 0;    // global invocation counter
 
-int fib (naming::id_type that_prefix, int n, double delay_coeff)
+int fib (naming::id_type that_prefix, int n, int delay_coeff)
 {
     // count number of invocations
     ++count_invocations;
@@ -79,7 +79,7 @@ int fib (naming::id_type that_prefix, int n, double delay_coeff)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(int argument, double delay_coeff, int& result, double& elapsed)
+int hpx_main(int argument, int delay_coeff, int& result, double& elapsed)
 {
     // get list of all known localities
     std::vector<naming::id_type> prefixes;
@@ -132,7 +132,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("value,v", po::value<int>(), 
                 "the number to be used as the argument to fib (default is 10)")
             ("csv,s", "generate statistics of the run in comma separated format")
-            ("busywait,b", po::value<double>(),
+            ("busywait,b", po::value<int>(),
                 "add this amount of busy wait workload to each of the iterations"
                 " [in steps of 1µs], i.e. -b1000 == 1ms")
         ;
@@ -205,7 +205,7 @@ int main(int argc, char* argv[])
         int num_threads = 1;
         int argument = 10;
         hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
-        double delay_coeff = 0;
+        int delay_coeff = 0;
 
         // extract IP address/port arguments
         if (vm.count("agas")) 
@@ -224,7 +224,7 @@ int main(int argc, char* argv[])
             mode = hpx::runtime::worker;
 
         if (vm.count("busywait"))
-            delay_coeff = vm["busywait"].as<double>();
+            delay_coeff = vm["busywait"].as<int>();
 
         // initialize and run the AGAS service, if appropriate
         std::auto_ptr<agas_server_helper> agas_server;
@@ -242,19 +242,19 @@ int main(int argc, char* argv[])
         else {
             rt.run(boost::bind(hpx_main, argument, delay_coeff, 
                 boost::ref(result), boost::ref(elapsed)), num_threads);
-        }
 
-        if (vm.count("csv")) {
-            // write results as csv
-            std::cout << num_threads << "," << argument << "," 
-                      << elapsed << "," << result << "," << count_invocations 
-                      << std::endl;
-        }
-        else {
-            // write results the old fashioned way
-            std::cout << "elapsed: " << elapsed << ", result: " << result << std::endl;
-            std::cout << "Number of invocations of fib(): " << count_invocations 
-                      << std::endl;
+            if (vm.count("csv")) {
+                // write results as csv
+                std::cout << num_threads << "," << argument << "," 
+                          << elapsed << "," << result << "," << count_invocations 
+                           << "," << elapsed/count_invocations << std::endl;
+            }
+            else {
+                // write results the old fashioned way
+                std::cout << "elapsed: " << elapsed << ", result: " << result << std::endl;
+                std::cout << "Number of invocations of fib(): " << count_invocations 
+                          << std::endl;
+            }
         }
     }
     catch (std::exception& e) {

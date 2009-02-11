@@ -36,16 +36,16 @@ namespace hpx { namespace naming
           : type_(components::component_invalid), address_(0)
         {}
 
-        address(locality l)
+        address(locality const& l)
           : locality_(l), type_(components::component_invalid), address_(0) 
         {}
 
-        address(locality l, component_type t, void* lva)
+        address(locality const& l, component_type t, void* lva)
           : locality_(l), type_(t), 
             address_(reinterpret_cast<address_type>(lva)) 
         {}
 
-        address(locality l, component_type t, address_type a)
+        address(locality const& l, component_type t, address_type a)
           : locality_(l), type_(t), address_(a) 
         {}
 
@@ -57,8 +57,8 @@ namespace hpx { namespace naming
 
         friend bool operator==(address const& lhs, address const& rhs)
         {
-            return lhs.locality_ == rhs.locality_ &&
-                   lhs.type_ == rhs.type_ && lhs.address_ == rhs.address_;
+            return lhs.type_ == rhs.type_ && lhs.address_ == rhs.address_ &&
+                   lhs.locality_ == rhs.locality_;
         }
 
         locality locality_;     /// locality: ip4 address/port number

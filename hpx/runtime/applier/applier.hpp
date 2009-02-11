@@ -33,8 +33,10 @@ namespace hpx { namespace applier
         applier(parcelset::parcelhandler &ph, threads::threadmanager& tm,
                 boost::uint64_t rts, boost::uint64_t mem)
           : parcel_handler_(ph), thread_manager_(tm),
-            runtime_support_id_(parcel_handler_.get_prefix().get_msb(), rts), 
-            memory_id_(parcel_handler_.get_prefix().get_msb(), mem)
+            runtime_support_id_(parcel_handler_.get_prefix().get_msb(), rts,
+                parcel_handler_.here(), components::component_runtime_support, rts), 
+            memory_id_(parcel_handler_.get_prefix().get_msb(), mem,
+                parcel_handler_.here(), components::component_runtime_support, mem)
         {}
 
         // destructor
@@ -112,12 +114,26 @@ namespace hpx { namespace applier
         /// of the locality the runtime_support is responsible for
         naming::id_type const& get_runtime_support_gid() const
         {
+            return runtime_support_id_.cgid();
+        }
+
+        /// By convention the runtime_support has a gid identical to the prefix 
+        /// of the locality the runtime_support is responsible for
+        naming::full_address const& get_runtime_support_address() const
+        {
             return runtime_support_id_;
         }
 
         /// By convention every memory address has gid identical to the prefix 
         /// of the locality the runtime_support is responsible for
         naming::id_type const& get_memory_gid() const
+        {
+            return memory_id_.cgid();
+        }
+
+        /// By convention every memory address has gid identical to the prefix 
+        /// of the locality the runtime_support is responsible for
+        naming::full_address const& get_memory_address() const
         {
             return memory_id_;
         }
@@ -135,7 +151,7 @@ namespace hpx { namespace applier
                 if (0 != gid.get_lsb())
                     addr.address_ = gid.get_lsb();
                 else 
-                    addr.address_ = runtime_support_id_.get_lsb();
+                    addr.address_ = runtime_support_id_.cgid().get_lsb();
                 return true;
             }
 
@@ -166,7 +182,7 @@ namespace hpx { namespace applier
                     if (0 != gid.get_lsb())
                         addr.address_ = gid.get_lsb();
                     else 
-                        addr.address_ = runtime_support_id_.get_lsb();
+                        addr.address_ = runtime_support_id_.cgid().get_lsb();
                     return true;
                 }
 
@@ -193,8 +209,8 @@ namespace hpx { namespace applier
     private:
         parcelset::parcelhandler& parcel_handler_;
         threads::threadmanager& thread_manager_;
-        naming::id_type runtime_support_id_;
-        naming::id_type memory_id_;
+        naming::full_address runtime_support_id_;
+        naming::full_address memory_id_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

@@ -32,6 +32,12 @@ namespace hpx { namespace naming
           : gid_(gid), address_(addr)
         {}
 
+        full_address(boost::uint64_t msb_id, boost::uint64_t lsb_id, 
+                locality const& l, components::component_type t, 
+                naming::address::address_type a)
+          : gid_(msb_id, lsb_id), address_(l, t, a)
+        {}
+
         /// \brief Make sure the stored gid has been resolved
         bool resolve();
 
