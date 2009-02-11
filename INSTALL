@@ -1,5 +1,5 @@
 # Copyright (c) 2007-2008 Chirag Dekate
-# Copyright (c) 2007-2008 Hartmut Kaiser
+# Copyright (c) 2007-2009 Hartmut Kaiser
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,7 +10,7 @@ HPX Installation QuickStart:
 Please make sure you have the following packages installed BEFORE 
 compiling HPX: 
     1) CMake Ver. 2.6.2 URL: http://www.cmake.org
-    2) BOOST C++ Libraries Ver. 1.35.0 URL: http://www.boost.org
+    2) Boost C++ Libraries (at least V1.35) URL: http://www.boost.org
 
 Installation Instructions:
 ==========================
@@ -25,11 +25,20 @@ directory:
 In your HPX_ROOT directory generate makefiles using "cmake":
     $ cmake .
 
+This will generate Makefile's allowing to build and install HPX. The default 
+installation directory is /usr/lib. To change the installation target directory
+invoke cmake as:
+
+    $ cmake -DCMAKE_INSTALL_PREFIX=<your directory here> .
+
 Compile the HPX sourcecode and example using "make":
     $ make
 
 The compilation messages should provide information on progress rate
 and the success of compilation & linking of HPX code. 
+
+Install the HPX binaries and header files:
+    $ make install
 
 If you have difficulty in compiling the code, please email 
 the HPX developers at:
