@@ -65,7 +65,7 @@ namespace hpx
         init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
         thread_manager_(timer_pool_, 
             boost::bind(&runtime::init_tss, This()),
-            boost::bind(&runtime::stop, This(), false),
+            boost::bind(&runtime::deinit_tss, This()),
             boost::bind(&runtime::report_error, This(), _1)),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
@@ -94,7 +94,7 @@ namespace hpx
         init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
         thread_manager_(timer_pool_, 
             boost::bind(&runtime::init_tss, This()),
-            boost::bind(&runtime::stop, This(), false),
+            boost::bind(&runtime::deinit_tss, This()),
             boost::bind(&runtime::report_error, This(), _1)),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
@@ -122,7 +122,7 @@ namespace hpx
         init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
         thread_manager_(timer_pool_, 
             boost::bind(&runtime::init_tss, This()),
-            boost::bind(&runtime::stop, This(), false),
+            boost::bind(&runtime::deinit_tss, This()),
             boost::bind(&runtime::report_error, This(), _1)),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
@@ -289,10 +289,10 @@ namespace hpx
             agas_pool_.join();
         runtime_support_.stop();        // re-activate main thread 
 
-        LRT_(info) << "runtime: stopped all services";
-
         // this disables all logging from the main thread
         deinit_tss();
+
+        LRT_(info) << "runtime: stopped all services";
     }
 
     ///////////////////////////////////////////////////////////////////////////
