@@ -38,13 +38,11 @@ namespace hpx { namespace parcelset
             std::size_t) 
         {}
 
-        threads::thread_state decode(
-            boost::shared_ptr<std::vector<char> > const&);
-
         void parcel_sink(parcelport& pp, 
             boost::shared_ptr<std::vector<char> > const& parcel_data);
 
-        void decode_parcel(boost::shared_ptr<std::vector<char> > const&);
+        threads::thread_state decode_parcel(
+            boost::shared_ptr<std::vector<char> > const& parcel_data);
 
         // avoid warnings about using \a this in member initializer list
         parcelhandler& This() { return *this; }
@@ -86,7 +84,7 @@ namespace hpx { namespace parcelset
 
             // register our callback function with the parcelport
             pp_.register_event_handler(
-                boost::bind(&parcelhandler::parcel_sink, this, _1, _2), conn_);
+                boost::bind(&parcelhandler::parcel_sink, this, _1, _2));
         }
         ~parcelhandler() 
         {
@@ -453,8 +451,6 @@ namespace hpx { namespace parcelset
 
         /// The site current range of ids to be used for id_type instances
         util::unique_ids<> id_range_;
-
-        boost::signals::scoped_connection conn_;
 
         /// This is the timer instance for this parcelhandler
         double startup_time_;

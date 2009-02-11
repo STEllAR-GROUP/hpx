@@ -7,10 +7,6 @@
 #if !defined(HPX_PARCELSET_SERVER_PARCELPORTQUEUE_MAR_26_2008_1219PM)
 #define HPX_PARCELSET_SERVER_PARCELPORTQUEUE_MAR_26_2008_1219PM
 
-#include <list>
-#include <boost/thread.hpp>
-#include <boost/signal.hpp>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 
@@ -32,22 +28,16 @@ namespace hpx { namespace parcelset { namespace server
 
         /// register event handler to be notified whenever a parcel arrives
         template <typename F>
-        bool register_event_handler(F sink)
+        void register_event_handler(F sink)
         {
-            return notify_.connect(sink).connected();
-        }
-
-        template <typename F, typename Connection>
-        bool register_event_handler(F sink, Connection& conn)
-        {
-            return (conn = notify_.connect(sink)).connected();
+            notify_ = sink;
         }
 
     private:
         hpx::parcelset::parcelport& parcel_port_;
         typedef void callback_type(parcelport&, 
             boost::shared_ptr<std::vector<char> > const&);
-        boost::signal<callback_type> notify_;
+        boost::function<callback_type> notify_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

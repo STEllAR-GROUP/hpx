@@ -30,10 +30,7 @@ namespace hpx { namespace threads { namespace detail
     // the used pool allocator doesn't need to be protected by a mutex as the
     // allocation always happens from inside the creation of the component
     // wrapper, which by itself is already protected by a mutex
-    typedef boost::singleton_pool<
-        thread_tag, sizeof(thread), boost::default_user_allocator_new_delete,
-        boost::details::pool::null_mutex
-    > pool_type;
+    typedef boost::singleton_pool<thread_tag, sizeof(thread)> pool_type;
 
     void *thread::operator new(std::size_t size)
     {

@@ -14,8 +14,8 @@ namespace hpx { namespace parcelset { namespace server
         {
             mutex_type::scoped_lock l(mtx_);
             parcel_queue_.push_back(p);
+            notify_(parcelhandler_, p.get_destination_addr());      // do some work (notify event handlers)
         }
-        notify_(parcelhandler_, p.get_destination_addr());      // do some work (notify event handlers)
     }
 
     bool parcelhandler_queue::get_parcel(parcel& p)

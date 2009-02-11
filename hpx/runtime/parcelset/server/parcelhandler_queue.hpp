@@ -57,7 +57,7 @@ namespace hpx { namespace parcelset { namespace server
 
     private:
         // list of pending parcels
-        typedef boost::mutex mutex_type;
+        typedef boost::recursive_mutex mutex_type;
         mutex_type mtx_;
 
         typedef std::list<parcel> parcel_list_type;

@@ -107,19 +107,12 @@ namespace hpx { namespace parcelset
         else {
             // create a new thread which decodes and handles the parcel
             tm_->register_thread(
-                boost::bind(&parcelhandler::decode, this, parcel_data),
+                boost::bind(&parcelhandler::decode_parcel, this, parcel_data),
                 "decode_parcel");
         }
     }
 
-    threads::thread_state parcelhandler::decode(
-        boost::shared_ptr<std::vector<char> > const& parcel_data)
-    {
-        decode_parcel(parcel_data);
-        return threads::terminated;
-    }
-
-    void parcelhandler::decode_parcel(
+    threads::thread_state parcelhandler::decode_parcel(
         boost::shared_ptr<std::vector<char> > const& parcel_data)
     {
         parcel p;
@@ -139,6 +132,7 @@ namespace hpx { namespace parcelset
 
         // add parcel to incoming parcel queue
         parcels_.add_parcel(p);
+        return threads::terminated;
     }
 
     bool parcelhandler::get_remote_prefixes(

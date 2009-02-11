@@ -133,15 +133,9 @@ namespace hpx { namespace parcelset
         ///                 function object instance is invoked by, and \a dest
         ///                 is the local destination address of the parcel.
         template <typename F>
-        bool register_event_handler(F sink)
+        void register_event_handler(F sink)
         {
-            return parcels_.register_event_handler(sink);
-        }
-
-        template <typename F, typename Connection>
-        bool register_event_handler(F sink, Connection& conn)
-        {
-            return parcels_.register_event_handler(sink, conn);
+            parcels_.register_event_handler(sink);
         }
 
         /// \brief Allow access to the locality this parcelport is associated 
