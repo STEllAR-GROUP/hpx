@@ -184,6 +184,10 @@ public:
     {
         agas_.run(false);
     }
+    ~agas_server_helper()
+    {
+        agas_.stop();
+    }
 
 private:
     hpx::util::io_service_pool agas_pool_; 

@@ -86,7 +86,7 @@ namespace hpx { namespace util
 
             for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it) {
                 value_type *p = NULL;
-                
+
                 try {
                     p = (*it)->alloc(count);
                 }

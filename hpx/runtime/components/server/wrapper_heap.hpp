@@ -35,7 +35,7 @@ namespace hpx { namespace components { namespace detail
         storage_type data;
 
         enum { 
-            heap_step = 1024,                 // default grow step
+            heap_step = 0xFFFF,               // default initial number of elements
             heap_size = sizeof(storage_type)  // size of one element in the heap
         };
 
