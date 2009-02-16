@@ -58,7 +58,7 @@ Options:
  -r number    : repeat each test "number" of times
  -o filename  : capture results to file "filename"
  -d number    : delay test start by "number" of seconds
- -t           : prefix application command line with profiling "command"
+ -t command   : prefix application command line with profiling "command"
  -x list      : exclude cases with argument tuples matching any item in the
                 "list" (python expression)
  -b command   : run preprocessing "command" before starting test sequence for
@@ -150,7 +150,7 @@ def runscript(cmdlst, options, ofhs):
 if __name__ == '__main__':
     # parse command line
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'a:b:d:hno:p:r:tT:x:')
+        opts, args = getopt.getopt(sys.argv[1:], 'a:b:d:hno:p:r:t:x:')
     except getopt.GetoptError, err:
         print 'Error:', str(err)
         usage()
