@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#  Copyright (c) 2009 Maciek Brodowicz
+#  Copyright (c) 2009 Maciej Brodowicz
 # 
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,7 +21,7 @@ try:
         _proc = None
         
         def __init__(self, cmd):
-            self._proc = subprocess.Popen(cmd, stderr = subprocess.STDOUT, stdout = subprocess.PIPE)
+            self._proc = subprocess.Popen(cmd, stderr = subprocess.STDOUT, stdout = subprocess.PIPE, shell = (False, True)[type(cmd) == StringType])
             
         def wait(self):
             return self._proc.wait()
@@ -48,31 +48,30 @@ except ImportError, err:
 
 # print usage info and exit with an error code
 def usage(rc = 2):
-    print '\nUsage:', sys.argv[0], '[options] application [const_options]'
-    print 'options:'
-    print '  -a name,range : specify range of values to be passed as option'
-    print '                  "name" to the application; "range" is a python'
-    print '                  expression producing list of values'
-    print '  -n            : don\'t stream results to stdout'
-    print '  -r number     : repeat each test "number" of times'
-    print '  -o filename   : capture results to file "filename"'
-    print '  -p number     : pad each test with "number" of seconds'
-    print '  -t            : prefix application command line with "time"'
-    print '  -T command    : as -t, but use explicit timing "command"'
-    print '  -x list       : exclude cases with argument tuples matching the'
-    print '                : items in the "list" (python expression)'
-    print '  -k number     : insert generated options starting at index'
-    print '                  "number" in the application command line'
-    print '                  (default: append at the end of line);'
-    print '                  application pathname is always at index 0'
-    print '  -h            : prints this message'
+    print '\nUsage:', sys.argv[0], '[options] application [const_options]',
+    print '''
+Options:
+ -a name,list : specify range of values, identified by "name", for a single
+                option of the application;
+                "list" is a python expression producing list of values
+ -n           : don\'t stream results to stdout
+ -r number    : repeat each test "number" of times
+ -o filename  : capture results to file "filename"
+ -d number    : delay test start by "number" of seconds
+ -t           : prefix application command line with profiling "command"
+ -x list      : exclude cases with argument tuples matching any item in the
+                "list" (python expression)
+ -b command   : run preprocessing "command" before starting test sequence for
+                each configuration, applying option substitution
+ -p command   : run postprocessing "command" after test sequence for each
+                configuration, applying option substitution
+ -h           : prints this message
+'''
     sys.exit(rc)
 
 
 # write string to each open file descriptor in the list
-def writeres(s, fdlist):
-    for fd in fdlist:
-        fd.write(s)
+def writeres(s, fdlist): map(lambda x: x.write(s), fdlist)
 
 
 # select next option set to run
@@ -85,10 +84,10 @@ def next(ixd, opts, optv):
     return None
         
 
-# run the application and capture its output and error streams
-def run(cmd, outfl):
+# run the application and optionally capture its output and error streams
+def run(cmd, outfl = None):
     proc = Process(cmd)
-    while True:
+    while outfl:
         s = proc.read()
         if s: writeres(s, outfl)
         else: break
@@ -127,28 +126,43 @@ def sepstr(sepch = '-', s = ''):
     if s: s = ' '+s.strip()+' '
     nl = (seplen-len(s))/2
     nr = seplen-len(s)-nl
-    # make sure it looks like separator
+    # make sure it still looks like separator for oversized lines
     if nl < 3: nl = 3
     if nr < 3: nr = 3
     return nl*sepch+s+nr*sepch
 
 
+# substitute all option ids in string with formatting keys
+def optidsub(optids, s):
+    for o in optids: s = s.replace(o, '%('+o+')s')
+    return s
+
+
+# run pre- or postprocessor
+def runscript(cmdlst, options, ofhs):
+    for cmd in cmdlst:
+        scr = cmd%options
+        rc = run(scr)
+        if rc:
+            writeres('Warning: command: "'+scr+'" returned '+str(rc)+'\n', ofhs)
+
+    
 if __name__ == '__main__':
     # parse command line
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'a:hk:no:p:r:tT:x:')
+        opts, args = getopt.getopt(sys.argv[1:], 'a:b:d:hno:p:r:tT:x:')
     except getopt.GetoptError, err:
         print 'Error:', str(err)
         usage()
 
     # option value lists, option names, # test repetitions, temporal pad
     options, optnames, nrep, tpad = {}, [], 1, 0
-    # external timing flag, external profiling command, option insertion index
-    timef, profcmd, genoix = False, None, None
+    # external profiling command
+    profcmd = None
     # stdout usage flag, result file name, list of output file descriptors
     stdoutf, ofile, ofhs = True, None, []
-    # exclusion list
-    excl = []
+    # exclusion list, preprocessing command list, postprocessing command list
+    excl, before, after = [], [], []
     # execution counters: app. runs, unique configs, errors, excluded configs
     runs, configs, erruns, excnt = 0, 0, 0, 0
     # separator length for pretty printing
@@ -177,18 +191,18 @@ if __name__ == '__main__':
             if len(options[wl[0]]) == 1:
                 print 'Warning: single value for option "'+wl[0]+'":', options[wl[0]]
         elif o == '-n': stdoutf = False
-        elif o == '-p': tpad = intopt(a, o)
+        elif o == '-d': tpad = intopt(a, o)
         elif o == '-r': nrep = intopt(a, o)
         elif o == '-o': ofile = a
-        elif o == '-k': genoix = intopt(a, o)
-        elif o == '-t': timef = True
-        elif o == '-t': timef, profcmd = True, a
+        elif o == '-t': profcmd = a
         elif o == '-x':
             try:
-                excl = eval(a)
+                excl = map(tuple, eval(a))
             except Exception, err:
                 print 'Error: invalid exclusion list: ', str(a)
                 usage()
+        elif o == '-b': before += [a]
+        elif o == '-p': after += [a]
         elif o == '-h': usage(0)
 
     if not args:
@@ -203,11 +217,11 @@ if __name__ == '__main__':
             sys.exit(1)
     if stdoutf: ofhs.append(sys.stdout)
 
-    # form parts of application command line
-    if genoix is None: genoix = len(args)
-    prefix, appopts = args[:genoix], args[genoix:]
-    if timef:
-        prefix = [(profcmd, '/usr/bin/time')[not profcmd]]+prefix
+    # form prototypes of application command line, pre- and postprocessor
+    cmdproto = map(lambda o: optidsub(optnames, o), args)
+    if profcmd: cmdproto = [profcmd]+cmdproto
+    if before: before = map(lambda o: optidsub(optnames, o), before)
+    if after: after = map(lambda o: optidsub(optnames, o), after)
 
     # initialize current option index dictionary
     optix = {}
@@ -219,25 +233,24 @@ if __name__ == '__main__':
     writeres('Command:'+quoteopts(sys.argv)+'\n', ofhs)
     # test loop
     while optix != None:
-        # start building command line
-        cmd = prefix[:]
         configs += 1
-        # add generated options
-        vallst = []
+        # create current instance of generated options
+        vallst, optd = [], {}
         for k in optnames:
             val = options[k][optix[k]]
-            vallst += [val]
             if type(val) is not StringType: val = str(val)
-            if k: cmd += [k, val]
-            else: cmd.append(val)
-        # check for exclusion
-        if vallst in excl:
+            optd[k] = val
+            vallst += [optd[k]]
+        # check for exclusions
+        if tuple(vallst) in excl:
             writeres(sepstr('=')+'\nSkipping:'+quoteopts(cmd)+'\n', ofhs)
             optix = next(optix, optnames, options)
             excnt += 1
             continue
-        # suffix with constant options and app arguments
-        cmd += appopts
+        # run setup program
+        if before: runscript(before, optd, ofhs)
+        # build command line
+        cmd = map(lambda x: x%optd, cmdproto)
         writeres(sepstr('=')+'\nExecuting:'+quoteopts(cmd)+'\n', ofhs)
         # run test requested number of times
         for i in range(nrep):
@@ -251,6 +264,9 @@ if __name__ == '__main__':
             outs += '\nReturn code: '+str(rc)+'\n'+sepstr()+'\n'
             writeres(outs, ofhs)
             time.sleep(tpad)
+        # run postprocessor
+        if after: runscript(after, optd, ofhs)
+
         optix = next(optix, optnames, options)
     # final banner
     writeres('='*seplen+'\n', ofhs)
@@ -260,6 +276,6 @@ if __name__ == '__main__':
     writeres('Test runs: '+str(runs)+'\n', ofhs)
     writeres('Errors: '+str(erruns)+'\n', ofhs)
     writeres('='*seplen+'\n', ofhs)
-    
+    # cleanup
     for f in ofhs:
         if f != sys.stdout: f.close()
