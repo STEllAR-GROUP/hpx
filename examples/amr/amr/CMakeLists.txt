@@ -21,8 +21,6 @@ source_group("Header Files\\Stubs"
 set(amr_server_HEADERS
     server/amr_mesh.hpp
     server/functional_component.hpp
-#    server/functional_timestep.hpp
-#    server/functional_timestep_impl.hpp
     server/stencil_value.hpp
     server/stencil_value_impl.hpp
     server/stencil_value_in_adaptor.hpp
@@ -44,7 +42,6 @@ source_group("Source Files"
 set(amr_server_SOURCES
     server/amr_mesh.cpp
     server/functional_component.cpp
-#    server/functional_timestep.cpp
     server/stencil_value.cpp
     server/stencil_value_out_adaptor.cpp)
 source_group("Source Files\\Server" 

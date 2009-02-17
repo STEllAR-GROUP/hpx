@@ -22,7 +22,7 @@ namespace po = boost::program_options;
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(std::size_t numvals, std::size_t numsteps)
+int hpx_main(std::size_t numvals, std::size_t numsteps, bool do_logging)
 {
     // get component types needed below
     components::component_type function_type = 
@@ -36,7 +36,8 @@ int hpx_main(std::size_t numvals, std::size_t numsteps)
             components::amr::amr_mesh::create(here, 1, true));
 
         std::vector<naming::id_type> result_data(
-            mesh.execute(function_type, numvals, numsteps, logging_type));
+            mesh.execute(function_type, numvals, numsteps, 
+                do_logging ? logging_type : components::component_invalid));
 
         // get some output memory_block_data instances
         std::cout << "Results: " << std::endl;
@@ -80,6 +81,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "the number of data points to use for the computation")
             ("numsteps,s", po::value<std::size_t>(), 
                 "the number of time steps to use for the computation")
+            ("verbose,v", "print calculated values after each time step")
         ;
 
         po::store(po::command_line_parser(argc, argv)
@@ -153,6 +155,7 @@ int main(int argc, char* argv[])
         boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
         int num_threads = 1;
         hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
+        bool do_logging = false;
 
         // extract IP address/port arguments
         if (vm.count("agas")) 
@@ -166,6 +169,9 @@ int main(int argc, char* argv[])
 
         if (vm.count("worker"))
             mode = hpx::runtime::worker;
+
+        if (vm.count("verbose"))
+            do_logging = true;
 
         // initialize and run the AGAS service, if appropriate
         std::auto_ptr<agas_server_helper> agas_server;
@@ -185,7 +191,7 @@ int main(int argc, char* argv[])
         if (mode == hpx::runtime::worker) 
             rt.run(num_threads);
         else 
-            rt.run(boost::bind (hpx_main, numvals, numsteps), num_threads);
+            rt.run(boost::bind (hpx_main, numvals, numsteps, do_logging), num_threads);
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";
