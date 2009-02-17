@@ -34,9 +34,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(amr_mesh_type);
 namespace hpx { namespace components { namespace amr { namespace server 
 {
     amr_mesh::amr_mesh()
-      : function_type_(components::component_invalid), 
-        numvalues_(0), 
-        logging_type_(components::component_invalid)
+      : numvalues_(0)
     {}
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -218,6 +216,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // create a couple of stencil (functional) components and the same 
         // amount of stencil_value components
+        numvalues_ = numvalues;
         result_type functions = factory.create_components(function_type, numvalues);
         result_type stencils[2] = 
         {
@@ -252,9 +251,6 @@ namespace hpx { namespace components { namespace amr { namespace server
         execute(locality_results(stencils[0]), initial_data, result_data);
 
         // free all allocated components (we can do that synchronously)
-        for (std::size_t i = 0; i < result_data.size(); ++i) 
-            components::stubs::memory_block::free(result_data[i]);
-
         if (!logging.empty())
             factory.free_components_sync(logging);
         factory.free_components_sync(stencils[1]);

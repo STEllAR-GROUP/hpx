@@ -92,9 +92,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             std::vector<naming::id_type>& result_data);
 
     private:
-        components::component_type function_type_;
         std::size_t numvalues_;
-        components::component_type logging_type_;
     };
 
 }}}}
