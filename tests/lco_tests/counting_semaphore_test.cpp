@@ -66,7 +66,7 @@ public:
     agas_server_helper(std::string host, boost::uint16_t port)
       : dgas_pool_(), dgas_(dgas_pool_, host, port)
     {}
-    ~agas_server_helper(bool blocking)
+    ~agas_server_helper()
     {
         dgas_.stop();
     }
