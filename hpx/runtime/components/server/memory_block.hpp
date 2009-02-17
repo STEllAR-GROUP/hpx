@@ -162,7 +162,13 @@ namespace hpx { namespace components
         }
 
         template <typename T>
-        T get() const
+        T& get() 
+        {
+            return *reinterpret_cast<T*>(get_ptr());
+        }
+
+        template <typename T>
+        T const& get() const
         {
             return *reinterpret_cast<T const*>(get_ptr());
         }

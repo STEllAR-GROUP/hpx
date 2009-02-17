@@ -60,12 +60,16 @@ bool parse_commandline(char const* name, int argc, char *argv[],
 
 ///////////////////////////////////////////////////////////////////////////////
 // helper class for DGAS server initialization
-class dgas_server_helper
+class agas_server_helper
 {
 public:
-    dgas_server_helper(std::string host, boost::uint16_t port)
+    agas_server_helper(std::string host, boost::uint16_t port)
       : dgas_pool_(), dgas_(dgas_pool_, host, port)
     {}
+    ~agas_server_helper(bool blocking)
+    {
+        dgas_.stop();
+    }
 
     void run (bool blocking)
     {
@@ -210,11 +214,9 @@ int main(int argc, char* argv[])
             num_threads = vm["threads"].as<int>();
 
         // initialize and run the DGAS service, if appropriate
-        std::auto_ptr<dgas_server_helper> dgas_server;
-        if (vm.count("run_agas_server")) { 
-            // run the AGAS server instance here
-            dgas_server.reset(new dgas_server_helper(dgas_host, dgas_port));
-        }
+        std::auto_ptr<agas_server_helper> dgas_server;
+        if (vm.count("run_agas_server"))  // run the AGAS server instance here
+            dgas_server.reset(new agas_server_helper(dgas_host, dgas_port));
 
         // start the HPX runtime using different numbers of threads
         if (0 == num_threads) {

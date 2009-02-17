@@ -71,7 +71,7 @@ namespace hpx { namespace util
                     << " allocated object(s)!";
             }
         }
-        
+
         // operations
         value_type* alloc(std::size_t count = 1)
         {

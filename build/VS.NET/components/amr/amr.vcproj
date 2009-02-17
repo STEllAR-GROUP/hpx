@@ -47,7 +47,7 @@
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -185,22 +185,12 @@
 				Name="Server"
 				>
 				<File
+					RelativePath="..\..\..\..\examples\amr\amr\server\amr_mesh.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\..\examples\amr\amr\server\functional_component.cpp"
 					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-						/>
-					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\..\..\examples\amr\amr\server\functional_timestep.cpp"
@@ -238,6 +228,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\..\..\examples\amr\amr\amr_mesh.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\examples\amr\amr\functional_component.hpp"
 				>
 			</File>
@@ -248,6 +242,10 @@
 			<Filter
 				Name="Server"
 				>
+				<File
+					RelativePath="..\..\..\..\examples\amr\amr\server\amr_mesh.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\..\..\examples\amr\amr\server\functional_component.hpp"
 					>
@@ -294,6 +292,10 @@
 			<Filter
 				Name="Stubs"
 				>
+				<File
+					RelativePath="..\..\..\..\examples\amr\amr\stubs\amr_mesh.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\..\..\examples\amr\amr\stubs\functional_component.hpp"
 					>

@@ -57,6 +57,18 @@ namespace hpx { namespace components { namespace stubs
         {
             free(get_component_type<ServerComponent>(), gid);
         }
+
+        static void
+        free_sync(component_type type, naming::id_type const& gid)
+        {
+            stubs::runtime_support::free_component_sync(type, gid);
+        }
+
+        static void
+        free_sync(naming::id_type const& gid)
+        {
+            free_sync(get_component_type<ServerComponent>(), gid);
+        }
     };
 
 }}}

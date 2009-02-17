@@ -64,9 +64,9 @@ namespace hpx { namespace util
             now.HighPart = ft.dwHighDateTime;
 
             // FileTime is in 100ns increments, result needs to be in [s]
-            return now.QuadPart / 1e-7;
+            return now.QuadPart * 1e-7;
         }
-        
+
         void restart() 
         { 
             if (!QueryPerformanceCounter(&start_time))
@@ -139,7 +139,7 @@ namespace hpx { namespace util
             start_time.tv_sec = time_t(t);
             start_time.tv_nsec = (t - start_time.tv_sec) * 1e9;
         }
-        
+
         high_resolution_timer(high_resolution_timer const& rhs) 
           : start_time(rhs.start_time)
         {
@@ -152,7 +152,7 @@ namespace hpx { namespace util
                 boost::throw_exception(std::runtime_error("Couldn't get current time"));
             return double(now.tv_sec) + double(now.tv_nsec) * 1e-9;
         }
-        
+
         void restart() 
         { 
             if (-1 == clock_gettime(CLOCK_REALTIME, &start_time))
@@ -166,7 +166,7 @@ namespace hpx { namespace util
 
             if (now.tv_sec == start_time.tv_sec)
                 return double(now.tv_nsec - start_time.tv_nsec) * 1e-9;
-                
+
             return double(now.tv_sec - start_time.tv_sec) + 
                 (double(now.tv_nsec - start_time.tv_nsec) * 1e-9);
         }
@@ -241,7 +241,7 @@ namespace hpx { namespace util
                 boost::throw_exception(std::runtime_error("Couldn't get current time"));
             return double(now.tv_sec) + double(now.tv_nsec) * 1e-9;
         }
-        
+
         void restart() 
         { 
             if (use_backup)

@@ -66,7 +66,7 @@ namespace hpx { namespace components { namespace server
             template<class Archive>
             void serialize(Archive& ar, const unsigned int)
             {
-                ar & prefix_ & first_gid_ & count_;
+                ar & prefix_ & first_gid_ & count_ & type_;
             }
         };
 
@@ -102,7 +102,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     /// Special segmented iterator allowing to iterate over all gids referenced
     /// by an instance of a \a distributing_factory#result_type 
-    class locality_result_iterator
+    class HPX_COMPONENT_EXPORT locality_result_iterator
       : public boost::iterator_facade<
             locality_result_iterator, naming::id_type, 
             boost::forward_traversal_tag, naming::id_type const&
@@ -111,7 +111,7 @@ namespace hpx { namespace components { namespace server
     private:
         typedef distributing_factory::result_type result_type;
 
-        struct data
+        struct HPX_COMPONENT_EXPORT data
         {
             data();
             data(result_type::const_iterator begin, result_type::const_iterator end);
