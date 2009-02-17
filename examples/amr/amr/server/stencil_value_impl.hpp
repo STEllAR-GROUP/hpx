@@ -79,8 +79,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     template <int N>
     stencil_value<N>::stencil_value()
       : driver_thread_(0), sem_result_(0), 
-        functional_gid_(naming::invalid_id), is_called_(false),
-        row_(-1), column_(-1)
+        functional_gid_(naming::invalid_id), row_(-1), column_(-1)
     {
         std::fill(&value_gids_[0], &value_gids_[2], naming::invalid_id);
 
@@ -117,10 +116,6 @@ namespace hpx { namespace components { namespace amr { namespace server
     template <int N>
     naming::id_type stencil_value<N>::call(naming::id_type const& initial)
     {
-        // remember that this instance is used as the first (and last) step in
-        // the computation
-        is_called_ = true;
-
         // sem_in_ is pre-initialized to 1, so we need to reset it
         for (int i = 0; i < N; ++i)
             sem_in_[i].wait();
@@ -180,15 +175,6 @@ namespace hpx { namespace components { namespace amr { namespace server
             // The eval action returns true for the last time step.
             is_last = eval_helper<N>::call(functional_gid_, 
                 value_gids_[0], row_, column_, in_);
-
-            // if the computation finished in an instance which has been used
-            // as the target for the initial call_action we can't exit right
-            // away, because all other instances need to be executed one more 
-            // time allowing them to free all their resources
-            if (is_last && is_called_) {
-                is_called_ = false;
-                is_last = false;
-            }
 
             // Wait for all output threads to have read the current value.
             // On the first time step the semaphore is preset to allow 

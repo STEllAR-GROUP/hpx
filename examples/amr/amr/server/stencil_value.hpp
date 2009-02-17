@@ -144,8 +144,6 @@ namespace hpx { namespace components { namespace amr { namespace server
         naming::id_type value_gids_[2];               // reference to previous values
         naming::id_type functional_gid_;              // reference to functional code
 
-        bool is_called_;      // this instance is used as target for call_action
-
         int row_;             // position of this stencil in whole graph
         int column_;
 

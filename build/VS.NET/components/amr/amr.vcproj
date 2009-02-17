@@ -193,26 +193,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\..\examples\amr\amr\server\functional_timestep.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
 					RelativePath="..\..\..\..\examples\amr\amr\server\stencil_value.cpp"
 					>
 				</File>
@@ -263,14 +243,6 @@
 							Name="VCCustomBuildTool"
 						/>
 					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\..\..\..\examples\amr\amr\server\functional_timestep.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\..\examples\amr\amr\server\functional_timestep_impl.hpp"
-					>
 				</File>
 				<File
 					RelativePath="..\..\..\..\examples\amr\amr\server\stencil_value.hpp"
