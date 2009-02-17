@@ -10,7 +10,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/stubs/stub_base.hpp>
+#include <hpx/runtime/components/client_base.hpp>
 
 #include "stubs/functional_component.hpp"
 
@@ -37,38 +37,29 @@ namespace hpx { namespace components { namespace amr
         // The eval and is_last_timestep functions have to be overloaded by any
         // functional component derived from this class
         lcos::future_value<bool> eval_async(naming::id_type const& result, 
-            std::vector<naming::id_type> const& gids)
+            std::vector<naming::id_type> const& gids, int row, int column)
         {
-            return this->base_type::eval_async(this->gid_, result, gids);
+            return this->base_type::eval_async(this->gid_, result, gids, row, column);
         }
 
         bool eval(naming::id_type const& result, 
-            std::vector<naming::id_type> const& gids)
+            std::vector<naming::id_type> const& gids, int row, int column)
         {
-            return this->base_type::eval(this->gid_, result, gids);
+            return this->base_type::eval(this->gid_, result, gids, row, column);
         }
 
         ///////////////////////////////////////////////////////////////////////
         lcos::future_value<naming::id_type> alloc_data_async(int item = -1,
-            int maxitems = -1)
+            int maxitems = -1, int row = -1)
         {
-            return this->base_type::alloc_data_async(this->gid_, item, maxitems);
+            return this->base_type::alloc_data_async(this->gid_, item, 
+                maxitems, row);
         }
 
-        naming::id_type alloc_data(int item = -1, int maxitems = -1)
+        naming::id_type alloc_data(int item = -1, int maxitems = -1,
+            int row = -1)
         {
-            return this->base_type::alloc_data(this->gid_, item, maxitems);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        void free_data(naming::id_type const& val)
-        {
-            this->base_type::free_data(this->gid_, val);
-        }
-
-        void free_data_sync(naming::id_type const& val)
-        {
-            this->base_type::free_data_sync(this->gid_, val);
+            return this->base_type::alloc_data(this->gid_, item, maxitems, row);
         }
 
         ///////////////////////////////////////////////////////////////////////

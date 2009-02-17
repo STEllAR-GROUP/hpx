@@ -5,18 +5,21 @@
 
 ###############################################################################
 set(amr_client_HEADERS
+    amr_mesh.hpp
     functional_component.hpp
     stencil_value.hpp)
 source_group("Header Files" 
     FILES ${amr_client_HEADERS})
 
 set(amr_stubs_HEADERS
+    stubs/amr_mesh.hpp
     stubs/functional_component.hpp
     stubs/stencil_value.hpp)
 source_group("Header Files\\Stubs" 
     FILES ${amr_stubs_HEADERS})
 
 set(amr_server_HEADERS
+    server/amr_mesh.hpp
     server/functional_component.hpp
 #    server/functional_timestep.hpp
 #    server/functional_timestep_impl.hpp
@@ -39,6 +42,7 @@ source_group("Source Files"
     FILES ${amr_client_SOURCES})
 
 set(amr_server_SOURCES
+    server/amr_mesh.cpp
     server/functional_component.cpp
 #    server/functional_timestep.cpp
     server/stencil_value.cpp

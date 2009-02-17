@@ -40,7 +40,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // The eval and is_last_timestep functions have to be overloaded by any
         // functional component derived from this class
         virtual bool eval(naming::id_type const&, 
-            std::vector<naming::id_type> const&)
+            std::vector<naming::id_type> const&, int, int)
         {
             // This shouldn't ever be called. If you're seeing this assertion 
             // you probably forgot to overload this function in your stencil 
@@ -49,21 +49,13 @@ namespace hpx { namespace components { namespace amr { namespace server
             return true;
         }
 
-        virtual naming::id_type alloc_data(int item, int maxitems)
+        virtual naming::id_type alloc_data(int item, int maxitems, int row)
         {
             // This shouldn't ever be called. If you're seeing this assertion 
             // you probably forgot to overload this function in your stencil 
             // class.
             BOOST_ASSERT(false);
             return naming::invalid_id;
-        }
-
-        virtual void free_data(naming::id_type const&)
-        {
-            // This shouldn't ever be called. If you're seeing this assertion 
-            // you probably forgot to overload this function in your stencil 
-            // class.
-            BOOST_ASSERT(false);
         }
 
         virtual void init(std::size_t, naming::id_type const&)
@@ -81,8 +73,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         {
             functional_component_alloc_data = 0,
             functional_component_eval = 1,
-            functional_component_free_data = 2,
-            functional_component_init = 3
+            functional_component_init = 2
         };
 
         /// This is the main entry point of this component. Calling this 
@@ -90,19 +81,14 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// time step value based on the result values of the previous time 
         /// steps.
         bool eval_nonvirt(naming::id_type const& result, 
-            std::vector<naming::id_type> const& gids)
+            std::vector<naming::id_type> const& gids, int row, int column)
         {
-            return eval(result, gids);
+            return eval(result, gids, row, column);
         }
 
-        naming::id_type alloc_data_nonvirt(int item, int maxitems)
+        naming::id_type alloc_data_nonvirt(int item, int maxitems, int row)
         {
-            return alloc_data(item, maxitems);
-        }
-
-        void free_data_nonvirt(naming::id_type const& gid)
-        {
-            free_data(gid);
+            return alloc_data(item, maxitems, row);
         }
 
         void init_nonvirt(std::size_t numsteps, naming::id_type const& gid)
@@ -114,21 +100,16 @@ namespace hpx { namespace components { namespace amr { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::result_action2<
+        typedef hpx::actions::result_action3<
             functional_component, naming::id_type, functional_component_alloc_data, 
-            int, int, &functional_component::alloc_data_nonvirt
+            int, int, int, &functional_component::alloc_data_nonvirt
         > alloc_data_action;
 
-        typedef hpx::actions::result_action2<
+        typedef hpx::actions::result_action4<
             functional_component, bool, functional_component_eval, 
             naming::id_type const&, std::vector<naming::id_type> const&, 
-            &functional_component::eval_nonvirt
+            int, int, &functional_component::eval_nonvirt
         > eval_action;
-
-        typedef hpx::actions::action1<
-            functional_component, functional_component_free_data, 
-            naming::id_type const&, &functional_component::free_data_nonvirt
-        > free_data_action;
 
         typedef hpx::actions::action2<
             functional_component, functional_component_init, 

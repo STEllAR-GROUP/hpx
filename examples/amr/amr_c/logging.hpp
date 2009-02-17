@@ -28,7 +28,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         /// This is the function implementing the logging functionality
         /// It takes the values as calculated during the current time step.
-        void logentry(timestep_data const& memblock_gid);
+        void logentry(stencil_data const& memblock_gid, int row);
 
         /// Each of the exposed functions needs to be encapsulated into an action
         /// type, allowing to generate all required boilerplate code for threads,
@@ -39,8 +39,9 @@ namespace hpx { namespace components { namespace amr { namespace server
         ///
         /// \param Result [in] The type of the result to be transferred back to 
         ///               this LCO instance.
-        typedef hpx::actions::action1<
-            logging, logging_logentry, timestep_data const&, &logging::logentry
+        typedef hpx::actions::action2<
+            logging, logging_logentry, stencil_data const&, int,
+            &logging::logentry
         > logentry_action;
 
     private:
@@ -57,10 +58,10 @@ namespace hpx { namespace components { namespace amr { namespace stubs
     {
         ///////////////////////////////////////////////////////////////////////
         static void logentry(naming::id_type const& gid, 
-            timestep_data const& val)
+            stencil_data const& val, int row)
         {
             typedef amr::server::logging::logentry_action action_type;
-            applier::apply<action_type>(gid, val);
+            applier::apply<action_type>(gid, val, row);
         }
     };
 
@@ -81,9 +82,9 @@ namespace hpx { namespace components { namespace amr
         {}
 
         ///////////////////////////////////////////////////////////////////////
-        void logentry(timestep_data const& val)
+        void logentry(stencil_data const& val, int row)
         {
-            this->base_type::logentry(this->gid_, val);
+            this->base_type::logentry(this->gid_, val, row);
         }
     };
 

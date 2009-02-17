@@ -12,11 +12,11 @@
 namespace hpx { namespace components { namespace amr 
 {
     ///////////////////////////////////////////////////////////////////////////
-    struct timestep_data
+    struct stencil_data
     {
-        std::size_t max_index_;   // overall number of data points
-        std::size_t index_;       // sequential number of this data point (0 <= index_ < max_values_)
-        std::size_t timestep_;    // current time step
+        size_t max_index_;   // overall number of data points
+        size_t index_;       // sequential number of this data point (0 <= index_ < max_values_)
+        size_t timestep_;    // current time step
         double value_;            // current value
 
     private:
@@ -29,6 +29,8 @@ namespace hpx { namespace components { namespace amr
             ar & max_index_ & index_ & timestep_ & value_; 
         }
     };
+
+    typedef struct stencil_data stencil_data;
 
 }}}
 

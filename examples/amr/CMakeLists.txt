@@ -5,7 +5,7 @@
 
 # just recurse into all components subdirectories and execute the scripts there
 set(amr_SUDIRS 
-    amr amr_test)
+    amr amr_c amr_c_test)
 
 foreach(subdir ${amr_SUDIRS})
     add_subdirectory(${subdir})
@@ -17,7 +17,8 @@ set(amr_client_SOURCES
 
 set(amr_DEPENDENCIES
     amr_component 
-    amr_test_component 
+    amr_c_component 
+    amr_c_test_component
     distributing_factory_component)
 
 add_hpx_executable(amr_client 

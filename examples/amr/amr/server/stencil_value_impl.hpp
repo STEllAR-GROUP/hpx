@@ -10,6 +10,8 @@
 #include <boost/assert.hpp>
 #include <boost/assign/std/vector.hpp>
 
+#include <algorithm>
+
 #include "stencil_value.hpp"
 #include "../functional_component.hpp"
 
@@ -26,7 +28,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         template <typename Adaptor>
         static bool
         call(naming::id_type const& gid, naming::id_type const& value_gid, 
-            Adaptor* in)
+            int row, int column, Adaptor* in)
         {
             using namespace boost::assign;
 
@@ -34,7 +36,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             input_gids += in[0]->get(), in[1]->get(), in[2]->get();
 
             return components::amr::stubs::functional_component::eval(
-               gid, value_gid, input_gids);
+               gid, value_gid, input_gids, row, column);
         }
     };
 
@@ -44,7 +46,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         template <typename Adaptor>
         static bool
         call(naming::id_type const& gid, naming::id_type const& value_gid, 
-            Adaptor* in)
+            int row, int column, Adaptor* in)
         {
             using namespace boost::assign;
 
@@ -54,45 +56,43 @@ namespace hpx { namespace components { namespace amr { namespace server
                 in[4]->get();
 
             return components::amr::stubs::functional_component::eval(
-                gid, value_gid, input_gids);
+                gid, value_gid, input_gids, row, column);
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     inline naming::id_type 
-    alloc_helper(naming::id_type const& gid)
+    alloc_helper(naming::id_type const& gid, int row)
     {
-        return components::amr::stubs::functional_component::alloc_data(gid);
+        return components::amr::stubs::functional_component::alloc_data(
+            gid, -1, -1, row);
     }
 
-    inline void free_helper(naming::id_type const& fgid, naming::id_type& gid)
+    inline void 
+    free_helper_sync(naming::id_type& gid)
     {
-        components::amr::stubs::functional_component::free_data(fgid, gid);
-        gid = naming::invalid_id;
-    }
-
-    inline void free_helper_sync(naming::id_type const& fgid, 
-        naming::id_type& gid)
-    {
-        components::amr::stubs::functional_component::free_data_sync(fgid, gid);
+        components::stubs::memory_block::free_sync(gid);
         gid = naming::invalid_id;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <int N>
     stencil_value<N>::stencil_value()
-      : driver_thread_(0), sem_in_(N), sem_out_(0), sem_result_(0), 
-        value_gid_(naming::invalid_id), backup_value_gid_(naming::invalid_id),
-        functional_gid_(naming::invalid_id), is_called_(false)
+      : driver_thread_(0), sem_result_(0), 
+        functional_gid_(naming::invalid_id), is_called_(false),
+        row_(-1), column_(-1)
     {
+        std::fill(&value_gids_[0], &value_gids_[2], naming::invalid_id);
+
         // create adaptors
         for (std::size_t i = 0; i < N; ++i)
         {
             in_[i].reset(new in_adaptor_type());
             out_[i].reset(new out_adaptor_type());
             out_[i]->get()->set_callback(
-                boost::bind(&stencil_value::get_value, this));
+                boost::bind(&stencil_value::get_value, this, i));
         }
+
         // the threads driving the computation are created in 
         // set_functional_component only (see below)
     }
@@ -105,8 +105,9 @@ namespace hpx { namespace components { namespace amr { namespace server
     template <int N>
     void stencil_value<N>::finalize() 
     {
-        if (naming::invalid_id != value_gid_) 
-            free_helper_sync(functional_gid_, value_gid_);
+        mutex_type::scoped_lock l(mtx_);
+        if (naming::invalid_id != value_gids_[1]) 
+            free_helper_sync(value_gids_[1]);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -120,22 +121,31 @@ namespace hpx { namespace components { namespace amr { namespace server
         // the computation
         is_called_ = true;
 
-        // sem_in_ is pre-initialized to N, so we need to reset it
-        sem_in_.wait(N);
+        // sem_in_ is pre-initialized to 1, so we need to reset it
+        for (int i = 0; i < N; ++i)
+            sem_in_[i].wait();
 
         // set new current value
-        BOOST_ASSERT(value_gid_ == naming::invalid_id);   // shouldn't be initialized yet
-        value_gid_ = initial;
+        {
+            mutex_type::scoped_lock l(mtx_);
+            BOOST_ASSERT(value_gids_[1] == naming::invalid_id);   // shouldn't be initialized yet
+            value_gids_[1] = initial;
+        }
 
         // signal all output threads it's safe to read value
-        sem_out_.signal(N);
+        for (int i = 0; i < N; ++i)
+            sem_out_[i].signal();
 
         // wait for final result 
-        sem_result_.wait(1);
+        sem_result_.wait();
 
         // return the final value computed to the caller
-        naming::id_type result = value_gid_;
-        value_gid_ = naming::invalid_id;
+        naming::id_type result = naming::invalid_id;
+
+        {
+            mutex_type::scoped_lock l(mtx_);
+            std::swap(value_gids_[1], result);
+        }
 
         return result;
     }
@@ -150,7 +160,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     threads::thread_state stencil_value<N>::main()
     {
         // ask functional component to create the local data value
-        backup_value_gid_ = alloc_helper(functional_gid_);
+        value_gids_[0] = alloc_helper(functional_gid_, row_);
 
         // this is the main loop of the computation, gathering the values
         // from the previous time step, computing the result of the current
@@ -164,12 +174,12 @@ namespace hpx { namespace components { namespace amr { namespace server
 
             // at this point all gid's have to be initialized
             BOOST_ASSERT(naming::invalid_id != functional_gid_);
-            BOOST_ASSERT(naming::invalid_id != backup_value_gid_);
+            BOOST_ASSERT(naming::invalid_id != value_gids_[0]);
 
-            // Compute the next value, store it in backup_value_gid_
+            // Compute the next value, store it in value_gids_[0]
             // The eval action returns true for the last time step.
             is_last = eval_helper<N>::call(functional_gid_, 
-                backup_value_gid_, in_);
+                value_gids_[0], row_, column_, in_);
 
             // if the computation finished in an instance which has been used
             // as the target for the initial call_action we can't exit right
@@ -183,23 +193,30 @@ namespace hpx { namespace components { namespace amr { namespace server
             // Wait for all output threads to have read the current value.
             // On the first time step the semaphore is preset to allow 
             // to immediately set the value.
-            sem_in_.wait(N);
+            for (int i = 0; i < N; ++i)
+                sem_in_[i].wait();
 
             // set new current value, allocate space for next current value
             // if needed (this may happen for all time steps except the first 
             // one, where the first gets it's initial value during the 
             // call_action)
-            if (naming::invalid_id == value_gid_) 
-                value_gid_ = alloc_helper(functional_gid_);
-            std::swap(value_gid_, backup_value_gid_);
+            {
+                mutex_type::scoped_lock l(mtx_);
+
+                if (naming::invalid_id == value_gids_[1]) 
+                    value_gids_[1] = alloc_helper(functional_gid_, row_);
+
+                std::swap(value_gids_[0], value_gids_[1]);
+            }
 
             // signal all output threads it's safe to read value
-            sem_out_.signal(N);
+            for (int i = 0; i < N; ++i)
+                sem_out_[i].signal();
         }
 
-        sem_result_.signal(1);        // final result has been set
+        sem_result_.signal();         // final result has been set
+        free_helper_sync(value_gids_[0]);
 
-        free_helper_sync(functional_gid_, backup_value_gid_);
         return threads::terminated;
     }
 
@@ -207,12 +224,17 @@ namespace hpx { namespace components { namespace amr { namespace server
     /// The function get will be called by the out-ports whenever 
     /// the current value has been requested.
     template <int N>
-    naming::id_type stencil_value<N>::get_value()
+    naming::id_type stencil_value<N>::get_value(int i)
     {
-        sem_out_.wait(1);     // wait for the current value to be valid
-        naming::id_type result = value_gid_; // acquire the current value
-        sem_in_.signal(1);    // signal to have read the value
+        sem_out_[i].wait();     // wait for the current value to be valid
 
+        naming::id_type result = naming::invalid_id;
+        {
+            mutex_type::scoped_lock l(mtx_);
+            result = value_gids_[1]; // acquire the current value
+        }
+
+        sem_in_[i].signal();    // signal to have read the value
         return result;
     }
 
@@ -254,10 +276,13 @@ namespace hpx { namespace components { namespace amr { namespace server
     ///////////////////////////////////////////////////////////////////////////
     template <int N>
     void 
-    stencil_value<N>::set_functional_component(naming::id_type const& gid)
+    stencil_value<N>::set_functional_component(naming::id_type const& gid,
+        int row, int column)
     {
         // store gid of functional component
         functional_gid_ = gid;
+        row_ = row;
+        column_ = column;
 
         // if all inputs have been bound already we need to start the driver 
         // thread

@@ -41,16 +41,13 @@ namespace hpx { namespace components { namespace amr
         /// is a vector of gids referencing the memory blocks of the results of
         /// previous time step.
         bool eval(naming::id_type const& result, 
-            std::vector<naming::id_type> const& gids);
+            std::vector<naming::id_type> const& gids, int row, int column);
 
         /// The alloc function is supposed to create a new memory block instance 
         /// suitable for storing all data needed for a single time step. 
         /// Additionally it fills the memory with initial data for the data 
         /// item given by the parameter \a item (if item != -1).
-        naming::id_type alloc_data(int item, int maxitems);
-
-        /// The free function releases the memory allocated by init
-        void free_data(naming::id_type const&);
+        naming::id_type alloc_data(int item, int maxitems, int row);
 
         /// The init function initializes this stencil point
         void init(std::size_t, naming::id_type const&);

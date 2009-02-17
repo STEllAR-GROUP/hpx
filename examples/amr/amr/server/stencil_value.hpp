@@ -13,6 +13,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/lcos/counting_semaphore.hpp>
+#include <hpx/lcos/mutex.hpp>
 
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -24,6 +25,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server 
 {
+    namespace detail
+    {
+        // same as counting semaphore, but initialized to 1
+        struct initialized_semaphore : lcos::counting_semaphore
+        {
+            initialized_semaphore() : lcos::counting_semaphore(1) {}
+        };
+    }
+
     /// \class stencil_value stencil_value.hpp hpx/components/amr/server/stencil_value.hpp
     template <int N>
     class HPX_COMPONENT_EXPORT stencil_value 
@@ -56,7 +66,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         /// The function get will be called by the out-ports whenever 
         /// the current value has been requested.
-        naming::id_type get_value();
+        naming::id_type get_value(int i);
 
         ///////////////////////////////////////////////////////////////////////
         // parcel action code: the action to be performed on the destination 
@@ -93,7 +103,8 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         /// Set the gid of the component implementing the actual time evolution
         /// functionality
-        void set_functional_component(naming::id_type const& gid);
+        void set_functional_component(naming::id_type const& gid, int row, 
+            int column);
 
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
@@ -114,26 +125,32 @@ namespace hpx { namespace components { namespace amr { namespace server
             &stencil_value::connect_input_ports
         > connect_input_ports_action;
 
-        typedef hpx::actions::action1<
+        typedef hpx::actions::action3<
             stencil_value, stencil_value_set_functional_component, 
-            naming::id_type const&, &stencil_value::set_functional_component
+            naming::id_type const&, int, int, 
+            &stencil_value::set_functional_component
         > set_functional_component_action;
 
     private:
         threads::thread_id_type driver_thread_;
 
-        lcos::counting_semaphore sem_in_;
-        lcos::counting_semaphore sem_out_;
+        detail::initialized_semaphore sem_in_[N];
+        lcos::counting_semaphore sem_out_[N];
         lcos::counting_semaphore sem_result_;
 
         boost::scoped_ptr<in_adaptor_type> in_[N];    // adaptors used to gather input
         boost::scoped_ptr<out_adaptor_type> out_[N];  // adaptors used to provide result
 
-        naming::id_type value_gid_;                   // reference to current value
-        naming::id_type backup_value_gid_;            // reference to previous value
+        naming::id_type value_gids_[2];               // reference to previous values
         naming::id_type functional_gid_;              // reference to functional code
 
         bool is_called_;      // this instance is used as target for call_action
+
+        int row_;             // position of this stencil in whole graph
+        int column_;
+
+        typedef lcos::mutex mutex_type;
+        mutex_type mtx_;
     };
 
 }}}}

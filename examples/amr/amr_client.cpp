@@ -7,181 +7,19 @@
 #include <iostream>
 
 #include <hpx/hpx.hpp>
-#include <hpx/lcos/future_wait.hpp>
-#include <hpx/components/distributing_factory/distributing_factory.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
-#include <boost/assign/std/vector.hpp>
 
 #include "amr/stencil_value.hpp"
 #include "amr/functional_component.hpp"
-#include "amr_test/stencil.hpp"
-#include "amr_test/logging.hpp"
-#include "amr_test/stencil_data.hpp"
+#include "amr/amr_mesh.hpp"
+#include "amr_c/stencil.hpp"
+#include "amr_c/logging.hpp"
 
 namespace po = boost::program_options;
 
 using namespace hpx;
-using namespace std;
-
-///////////////////////////////////////////////////////////////////////////////
-// Initialize functional components by setting the logging component to use
-void init(components::distributing_factory::iterator_range_type const& functions,
-    components::distributing_factory::iterator_range_type const& logging,
-    std::size_t numsteps)
-{
-    components::distributing_factory::iterator_type function = functions.first;
-    naming::id_type log = *logging.first;
-
-    for (/**/; function != functions.second; ++function)
-    {
-        components::amr::stubs::functional_component::
-            init(*function, numsteps, log);
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Create functional components, one for each data point, use those to 
-// initialize the stencil value instances
-void init_stencils(
-    components::distributing_factory::iterator_range_type const& stencils,
-    components::distributing_factory::iterator_range_type const& functions)
-{
-    components::distributing_factory::iterator_type stencil = stencils.first;
-    components::distributing_factory::iterator_type function = functions.first;
-
-    for (/**/; stencil != stencils.second; ++stencil, ++function)
-    {
-        BOOST_ASSERT(function != functions.second);
-        components::amr::stubs::stencil_value<3>::set_functional_component(
-            *stencil, *function);
-    }
-    BOOST_ASSERT(function == functions.second);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Get gids of output ports of all functions
-void get_output_ports(
-    components::distributing_factory::iterator_range_type const& stencils,
-    std::vector<std::vector<naming::id_type> >& outputs)
-{
-    typedef components::distributing_factory::result_type result_type;
-    typedef 
-        std::vector<lcos::future_value<std::vector<naming::id_type> > >
-    lazyvals_type;
-
-    // start an asynchronous operation for each of the stencil value instances
-    lazyvals_type lazyvals;
-    components::distributing_factory::iterator_type stencil = stencils.first;
-    for (/**/; stencil != stencils.second; ++stencil)
-    {
-        lazyvals.push_back(components::amr::stubs::stencil_value<3>::
-            get_output_ports_async(*stencil));
-    }
-
-    // now wait for the results
-    lazyvals_type::iterator lend = lazyvals.end();
-    for (lazyvals_type::iterator lit = lazyvals.begin(); lit != lend; ++lit) 
-    {
-        outputs.push_back((*lit).get());
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Connect the given output ports with the correct input ports, creating the 
-// required static data-flow structure.
-//
-// Currently we have exactly one stencil_value instance per data point, where 
-// the output ports of a stencil_value are connected to the input ports of the 
-// direct neighbors of itself.
-inline std::size_t mod(int idx, std::size_t maxidx)
-{
-    return (idx < 0) ? (idx + maxidx) % maxidx : idx % maxidx;
-}
-
-void connect_input_ports(
-    components::distributing_factory::result_type const* stencils,
-    std::vector<std::vector<std::vector<naming::id_type> > > const& outputs)
-{
-    typedef components::distributing_factory::result_type result_type;
-
-    int steps = (int)outputs.size();
-    for (int step = 0; step < steps; ++step) 
-    {
-        std::size_t numvals = outputs[0].size();
-        components::distributing_factory::iterator_range_type r = 
-            locality_results(stencils[step]);
-        components::distributing_factory::iterator_type stencil = r.first;
-        for (int i = 0; stencil != r.second; ++stencil, ++i)
-        {
-            using namespace boost::assign;
-            int outstep = mod(step-1, steps);
-
-            std::vector<naming::id_type> output_ports;
-            output_ports += 
-                    outputs[outstep][mod(i-1, numvals)][2],    // sw input is connected to the ne output of the sw element
-                    outputs[outstep][mod(i  , numvals)][1],    // s input is connected to the n output of the s element 
-                    outputs[outstep][mod(i+1, numvals)][0]     // se input is connected to the nw output of the se element
-                ;
-
-            components::amr::stubs::stencil_value<3>::
-                connect_input_ports(*stencil, output_ports);
-        }
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-void prepare_initial_data(
-    components::distributing_factory::iterator_range_type const& functions, 
-    std::vector<naming::id_type>& initial_data, int maxindex)
-{
-    typedef std::vector<lcos::future_value<naming::id_type> > lazyvals_type;
-
-    // create a data item value type for each of the functions
-    lazyvals_type lazyvals;
-    components::distributing_factory::iterator_type function = functions.first;
-
-    for (std::size_t i = 0; function != functions.second; ++function, ++i)
-    {
-        lazyvals.push_back(components::amr::stubs::functional_component::
-            alloc_data_async(*function, i, maxindex));
-    }
-
-    // now wait for the results
-    lazyvals_type::iterator lend = lazyvals.end();
-    for (lazyvals_type::iterator lit = lazyvals.begin(); lit != lend; ++lit) 
-    {
-        initial_data.push_back((*lit).get());
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// do actual work
-void execute(
-    components::distributing_factory::iterator_range_type const& stencils, 
-    std::vector<naming::id_type> const& initial_data, 
-    std::vector<naming::id_type>& result_data)
-{
-    // start the execution of all stencil stencils (data items)
-    typedef std::vector<lcos::future_value<naming::id_type> > lazyvals_type;
-
-    lazyvals_type lazyvals;
-    components::distributing_factory::iterator_type stencil = stencils.first;
-    for (std::size_t i = 0; stencil != stencils.second; ++stencil, ++i)
-    {
-        BOOST_ASSERT(i < initial_data.size());
-        lazyvals.push_back(components::amr::stubs::stencil_value<3>::
-            call_async(*stencil, initial_data[i]));
-    }
-
-    // now wait for the results
-    lazyvals_type::iterator lend = lazyvals.end();
-    for (lazyvals_type::iterator lit = lazyvals.begin(); lit != lend; ++lit) 
-    {
-        result_data.push_back((*lit).get());
-    }
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(std::size_t numvals, std::size_t numsteps)
@@ -191,79 +29,28 @@ int hpx_main(std::size_t numvals, std::size_t numsteps)
         components::get_component_type<components::amr::stencil>();
     components::component_type logging_type = 
         components::get_component_type<components::amr::server::logging>();
-    components::component_type stencil_type = 
-        components::get_component_type<components::amr::server::stencil_value<3> >();
 
     {
-        typedef components::distributing_factory::result_type result_type;
+        naming::id_type here = applier::get_applier().get_runtime_support_gid();
+        components::amr::amr_mesh mesh (
+            components::amr::amr_mesh::create(here, 1, true));
 
-        // create a distributing factory locally
-        components::distributing_factory factory(
-            components::distributing_factory::create(
-                applier::get_applier().get_runtime_support_gid(), true));
-
-        // create a couple of stencil (functional) components and the same 
-        // amount of stencil_value components
-        result_type functions = factory.create_components(function_type, numvals);
-        result_type stencils[2] = 
-        {
-            factory.create_components(stencil_type, numvals),
-            factory.create_components(stencil_type, numvals)
-        };
-        result_type logging = factory.create_components(logging_type);
-
-        // initialize logging functionality in functions
-        init(locality_results(functions), locality_results(logging), numsteps);
-
-        // initialize stencil_values using the stencil (functional) components
-        init_stencils(locality_results(stencils[0]), 
-            locality_results(functions));
-        init_stencils(locality_results(stencils[1]), 
-            locality_results(functions));
-
-        // ask stencil instances for their output gids
-        std::vector<std::vector<std::vector<naming::id_type> > > outputs(2);
-        get_output_ports(locality_results(stencils[0]), outputs[0]);
-        get_output_ports(locality_results(stencils[1]), outputs[1]);
-
-        // connect output gids with corresponding stencil inputs
-        connect_input_ports(stencils, outputs);
-
-        // prepare initial data
-        std::vector<naming::id_type> initial_data;
-        prepare_initial_data(locality_results(functions), initial_data, numvals);
-
-        // do actual work
-        std::vector<naming::id_type> result_data;
-        execute(locality_results(stencils[0]), initial_data, result_data);
-
-        // start asynchronous get operations
+        std::vector<naming::id_type> result_data(
+            mesh.execute(function_type, numvals, numsteps, logging_type));
 
         // get some output memory_block_data instances
-        components::access_memory_block<components::amr::timestep_data> val1, val2, val3;
-        boost::tie(val1, val2, val3) = 
-            components::wait(
-                components::stubs::memory_block::get_async(result_data[0]), 
-                components::stubs::memory_block::get_async(result_data[1]), 
-                components::stubs::memory_block::get_async(result_data[2]));
-
-        std::cout << "Result: " 
-                  << val1->value_ << ", " 
-                  << val2->value_ << ", " 
-                  << val3->value_ << std::endl;
-
-        // free all allocated components (we can do that synchronously)
-        for (std::size_t i = 0; i < functions.size(); ++i) 
+        std::cout << "Results: " << std::endl;
+        for (std::size_t i = 0; i < result_data.size(); ++i)
         {
-            components::amr::stubs::functional_component::
-                free_data_sync(functions[i].first_gid_, result_data[i]);
+            components::access_memory_block<components::amr::stencil_data> val(
+                components::stubs::memory_block::get(result_data[i]));
+            std::cout << i << ": " << val->value_ << std::endl;
         }
-        factory.free_components_sync(logging);
-        factory.free_components_sync(stencils[1]);
-        factory.free_components_sync(stencils[0]);
-        factory.free_components_sync(functions);
 
-    }   // distributing_factory needs to go out of scope before shutdown
+        for (std::size_t i = 0; i < result_data.size(); ++i)
+            components::stubs::memory_block::free(result_data[i]);
+
+    }   // amr_mesh needs to go out of scope before shutdown
 
     // initiate shutdown of the runtime systems on all localities
     components::stubs::runtime_support::shutdown_all();
@@ -395,7 +182,10 @@ int main(int argc, char* argv[])
 
         // initialize and start the HPX runtime
         hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, mode);
-        rt.run(boost::bind (hpx_main, numvals, numsteps), num_threads);
+        if (mode == hpx::runtime::worker) 
+            rt.run(num_threads);
+        else 
+            rt.run(boost::bind (hpx_main, numvals, numsteps), num_threads);
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";
