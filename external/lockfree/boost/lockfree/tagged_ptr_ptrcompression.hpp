@@ -214,7 +214,7 @@ public:
     {
         T * p = get_ptr();
         tag_t tag = get_tag();
-        ptr = pack_ptr(p, t, flag);
+        ptr = pack_ptr(p, tag, flag);
     }
     /* @} */
 
@@ -251,12 +251,22 @@ public:
     {
         return get_ptr();
     }
-
-    operator bool(void) const
-    {
-        return bool (0 != get_ptr());
-    }
     /* @} */
+
+// private:
+//     void stub(T*) {}
+//     typedef void (tagged_ptr::*bool_type)(T*);
+// 
+// public:
+//     operator bool_type() const
+//     {
+//         return (0 != get_ptr()) ? &tagged_ptr::stub : NULL;
+//     }
+
+    operator compressed_ptr_t() const
+    {
+        return ptr;
+    }
 
 protected:
     compressed_ptr_t ptr;

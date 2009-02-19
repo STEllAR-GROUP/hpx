@@ -26,7 +26,7 @@ namespace lockfree
 {
 
 template <class T>
-class BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr
+class tagged_ptr
 {
 private:
     typedef boost::uint16_t flag_t;
@@ -116,14 +116,12 @@ public:
 
     friend tagged_ptr make_unique(tagged_ptr p)
     {
-        for (;;)
-        {
-            tagged_ptr old;
-            old.set(p);
+        // if the pointer is zero, do nothing
+        if (0 == p.ptr)
+            return p;
 
-            if(likely(p.CAS(old, p.ptr)))
-                return p;
-        }
+        // otherwise increment the tag value
+        return tagged_ptr(extract_ptr(p.ptr), p.tag+1, extract_flag(p.ptr));
     }
 
     /** unsafe set operation */

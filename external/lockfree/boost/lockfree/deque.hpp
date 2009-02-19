@@ -58,24 +58,32 @@ namespace boost { namespace lockfree
             anchor(node* left, node* right, state s)
               : left_(left), right_(right)
             {
+                BOOST_ASSERT(NULL != left_.get_ptr() || NULL == right_.get_ptr());
+                BOOST_ASSERT(NULL != right_.get_ptr() || NULL == left_.get_ptr());
                 set_state(s);
             }
 
             anchor(atomic_node_ptr const& left, node* right, state s)
               : left_(make_unique(left)), right_(right)
             {
+                BOOST_ASSERT(NULL != left_.get_ptr() || NULL == right_.get_ptr());
+                BOOST_ASSERT(NULL != right_.get_ptr() || NULL == left_.get_ptr());
                 set_state(s);
             }
 
             anchor(node* left, atomic_node_ptr const& right, state s)
               : left_(left), right_(make_unique(right))
             {
+                BOOST_ASSERT(NULL != left_.get_ptr() || NULL == right_.get_ptr());
+                BOOST_ASSERT(NULL != right_.get_ptr() || NULL == left_.get_ptr());
                 set_state(s);
             }
 
             anchor(atomic_node_ptr const& left, atomic_node_ptr const& right, state s)
               : left_(make_unique(left)), right_(make_unique(right))
             {
+                BOOST_ASSERT(NULL != left_.get_ptr() || NULL == right_.get_ptr());
+                BOOST_ASSERT(NULL != right_.get_ptr() || NULL == left_.get_ptr());
                 set_state(s);
             }
 
