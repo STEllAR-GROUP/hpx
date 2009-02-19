@@ -28,11 +28,32 @@ namespace lockfree
 template <class T>
 class BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr
 {
+private:
+    typedef boost::uint16_t flag_t;
+    static const flag_t flag_mask = 1;
+
+    static T* pack_ptr(T * ptr, bool flag)
+    {
+        BOOST_ASSERT(0 == (std::size_t(ptr) & flag_mask));
+        return flag ? (T*)(std::size_t(ptr) | flag_mask) : ptr;
+    }
+
+    static T* extract_ptr(T* p)
+    {
+        return (T*)(std::size_t(p) & ~flag_mask);
+    }
+
+    static bool extract_flag(T const* i)
+    {
+        return (std::size_t(i) & flag_mask) ? true : false;
+    }
+
 public:
     typedef std::size_t tag_t;
 
     /** uninitialized constructor */
-    tagged_ptr(void)//: ptr(0), tag(0)
+    tagged_ptr(void) 
+      : ptr(0), tag(0)
     {}
 
     /** copy constructor */
@@ -41,8 +62,12 @@ public:
         set(p);
     }
 
-    explicit tagged_ptr(T * p, tag_t t = 0):
-        ptr(p), tag(t)
+    explicit tagged_ptr(T * p, tag_t t = 0)
+      : ptr(p), tag(t)
+    {}
+
+    explicit tagged_ptr(T * p, tag_t t, bool f)
+      : ptr(pack_ptr(p, f)), tag(t)
     {}
 
     /** atomic set operations */
@@ -58,6 +83,7 @@ public:
         {
             tagged_ptr old;
             old.set(*this);
+
             if(likely(CAS(old, p.ptr, p.tag)))
                 return;
         }
@@ -74,7 +100,31 @@ public:
                 return;
         }
     }
+
+    void atomic_set(T * p, tag_t t, bool f)
+    {
+        for (;;)
+        {
+            tagged_ptr old;
+            old.set(*this);
+
+            if(likely(CAS(old, pack_ptr(p, f), t)))
+                return;
+        }
+    }
     /* @} */
+
+    friend tagged_ptr make_unique(tagged_ptr p)
+    {
+        for (;;)
+        {
+            tagged_ptr old;
+            old.set(p);
+
+            if(likely(p.CAS(old, p.ptr)))
+                return p;
+        }
+    }
 
     /** unsafe set operation */
     /* @{ */
@@ -89,18 +139,31 @@ public:
         ptr = p;
         tag = t;
     }
+
+    void set(T * p, tag_t t, bool f)
+    {
+        ptr = pack_ptr(p, f);
+        tag = t;
+    }
     /* @} */
 
     /** comparing semantics */
     /* @{ */
-    bool operator== (tagged_ptr const & p) const
+    friend bool operator== (tagged_ptr const& rhs, tagged_ptr const& lhs)
     {
-        return (ptr == p.ptr) && (tag == p.tag);
+        return lhs.ptr == rhs.ptr && lhs.tag == rhs.tag;
     }
-
-    bool operator!= (tagged_ptr const & p) const
+    friend bool operator!= (tagged_ptr const& rhs, tagged_ptr const& lhs)
     {
-        return !operator==(p);
+        return !(lhs == rhs);
+    }
+    friend bool operator== (tagged_ptr volatile const& rhs, tagged_ptr const& lhs)
+    {
+        return lhs.ptr == rhs.ptr && lhs.tag == rhs.tag;
+    }
+    friend bool operator!= (tagged_ptr volatile const& rhs, tagged_ptr const& lhs)
+    {
+        return !(lhs == rhs);
     }
     /* @} */
 
@@ -108,12 +171,17 @@ public:
     /* @{ */
     T * get_ptr() const
     {
-        return ptr;
+        return extract_ptr(ptr);
     }
 
     void set_ptr(T * p)
     {
-        ptr = p;
+        ptr = pack_ptr(p, false);
+    }
+
+    void set_ptr(T * p, bool f)
+    {
+        ptr = pack_ptr(p, f);
     }
     /* @} */
 
@@ -127,6 +195,20 @@ public:
     void set_tag(tag_t t)
     {
         tag = t;
+    }
+    /* @} */
+
+    /** flag access */
+    /* @{ */
+    bool get_flag() const
+    {
+        return extract_flag(ptr);
+    }
+
+    void set_flag(bool flag = true)
+    {
+        T * p = get_ptr();
+        ptr = pack_ptr(p, flag);
     }
     /* @} */
 

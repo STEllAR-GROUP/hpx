@@ -15,6 +15,7 @@
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/utility/enable_if.hpp>
 #include <boost/detail/interlocked.hpp>
 
 #if !defined(BOOST_MSVC)
@@ -101,13 +102,14 @@ namespace boost { namespace lockfree
         return CAS (addr, old, nw, boost::mpl::bool_<sizeof(C) == sizeof(long)>());
     }
 
+#if defined(_M_IA64) || defined(_WIN64)
     ///////////////////////////////////////////////////////////////////////////
     template <class C, class D, class E>
     inline bool CAS2(volatile C * addr, D old1, E old2, D new1, E new2)
     {
-#if defined(_M_IA64) || defined(_WIN64)
 // early AMD processors do not support the cmpxchg16b instruction
 #if defined(BOOST_LOCKFREE_HAS_CMPXCHG16B)
+
 #if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
 #warning "CAS2: using CAS2_windows64, may crash on old AMD systems"
 #endif
@@ -116,6 +118,7 @@ namespace boost { namespace lockfree
             (__int64)old1, (__int64)old2, (__int64)new1, (__int64)new2);
 
 #else
+
 #if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
 #warning "CAS2: blocking cas emulation"
 #endif
@@ -127,7 +130,9 @@ namespace boost { namespace lockfree
         };
 
         volatile packed_c * packed_addr = reinterpret_cast<volatile packed_c*>(addr);
+
         boost::detail::lightweight_mutex::scoped_lock lock(detail::get_CAS2_mutex());
+//         boost::detail::spinlock_pool<12>::scoped_lock lock((void*)addr);
 
         if (packed_addr->d == old1 && packed_addr->e == old2)
         {
@@ -137,7 +142,44 @@ namespace boost { namespace lockfree
         }
         return false;
 #endif
-#else
+    }
+
+#else   // 64Bit
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <class C, class D, class E>
+    inline typename boost::enable_if_c<sizeof(C) != sizeof(boost::uint32_t), bool>::type 
+    CAS2(volatile C * addr, D old1, E old2, D new1, E new2)
+    {
+#if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
+#warning "CAS2: blocking cas emulation"
+#endif
+
+        struct packed_c
+        {
+            D d;
+            E e;
+        };
+
+        volatile packed_c * packed_addr = reinterpret_cast<volatile packed_c*>(addr);
+
+        boost::detail::lightweight_mutex::scoped_lock lock(detail::get_CAS2_mutex());
+//         boost::detail::spinlock_pool<12>::scoped_lock lock((void*)addr);
+
+        if (packed_addr->d == old1 && packed_addr->e == old2)
+        {
+            *(D*)(&packed_addr->d) = new1;
+            *(E*)(&packed_addr->e) = new2;
+            return true;
+        }
+        return false;
+    }
+
+    // specialization for 32 Bit values
+    template <class C, class D, class E>
+    inline typename boost::enable_if_c<sizeof(C) == sizeof(boost::uint32_t), bool>::type 
+    CAS2(volatile C * addr, D old1, E old2, D new1, E new2)
+    {
 #if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
 #warning "CAS2: 32Bit hand coded asm"
 #endif
@@ -153,8 +195,9 @@ namespace boost { namespace lockfree
             setz [ok]
         }
         return ok;
-#endif
     }
+
+#endif // 64 Bit
 
     ///////////////////////////////////////////////////////////////////////////
     template <class C, class D>

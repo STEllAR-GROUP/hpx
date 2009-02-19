@@ -127,6 +127,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\external\lockfree\boost\lockfree\deque.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\external\lockfree\boost\lockfree\fifo.hpp"
 				>
 			</File>

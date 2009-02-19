@@ -35,6 +35,7 @@ class BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr
 {
     typedef boost::uint64_t compressed_ptr_t;
     typedef boost::uint16_t tag_t;
+    typedef boost::uint16_t flag_t;
 
 private:
     union cast_unit
@@ -43,12 +44,19 @@ private:
         tag_t tag[4];
     };
 
+    static const int flag_index = 0;
     static const int tag_index = 3;
-    static const compressed_ptr_t ptr_mask = (1LL << 48)-1;
+    static const compressed_ptr_t ptr_mask = (1LL << 48)-2;
+    static const flag_t flag_mask = 1;
 
     static T* extract_ptr(compressed_ptr_t const & i)
     {
         return (T*)(i & ptr_mask);
+    }
+
+    static bool extract_flag(compressed_ptr_t const & i)
+    {
+        return (i & flag_mask) ? true : false;
     }
 
     static tag_t extract_tag(compressed_ptr_t const & i)
@@ -67,6 +75,17 @@ private:
         return ret.value;
     }
 
+    static compressed_ptr_t pack_ptr(T * ptr, int tag, bool flag)
+    {
+        cast_unit ret;
+        ret.value = compressed_ptr_t(ptr);
+        BOOST_ASSERT(0 == (~ptr_mask & ret.value));
+        ret.tag[tag_index] = tag;
+        if (flag)
+            ret.tag[flag_index] |= flag_mask;
+        return ret.value;
+    }
+
 public:
     /** uninitialized constructor */
     tagged_ptr(void)//: ptr(0), tag(0)
@@ -78,8 +97,12 @@ public:
         set(p);
     }
 
-    explicit tagged_ptr(T * p, tag_t t = 0):
-        ptr(pack_ptr(p, t))
+    explicit tagged_ptr(T * p, tag_t t = 0)
+      : ptr(pack_ptr(p, t))
+    {}
+
+    explicit tagged_ptr(T * p, tag_t t, bool f)
+      : ptr(pack_ptr(p, t, f))
     {}
 
     /** atomic set operations */
@@ -100,6 +123,18 @@ public:
     }
     /* @} */
 
+    friend tagged_ptr make_unique(tagged_ptr p)
+    {
+        for (;;)
+        {
+            tagged_ptr old;
+            old.set(p);
+
+            if(likely(p.CAS(old, p.ptr)))
+                return p;
+        }
+    }
+
     /** unsafe set operation */
     /* @{ */
     void set(tagged_ptr const & p)
@@ -111,18 +146,30 @@ public:
     {
         ptr = pack_ptr(p, t);
     }
+
+    void set(T * p, tag_t t, bool f)
+    {
+        ptr = pack_ptr(p, t, f);
+    }
     /* @} */
 
     /** comparing semantics */
     /* @{ */
-    bool operator== (tagged_ptr const & p) const
+    friend bool operator== (tagged_ptr const& rhs, tagged_ptr const& lhs)
     {
-        return (ptr == p.ptr);
+        return lhs.ptr == rhs.ptr;
     }
-
-    bool operator!= (tagged_ptr const & p) const
+    friend bool operator!= (tagged_ptr const& rhs, tagged_ptr const& lhs)
     {
-        return !operator==(p);
+        return !(lhs == rhs);
+    }
+    friend bool operator== (tagged_ptr volatile const& rhs, tagged_ptr const& lhs)
+    {
+        return lhs.ptr == rhs.ptr;
+    }
+    friend bool operator!= (tagged_ptr volatile const& rhs, tagged_ptr const& lhs)
+    {
+        return !(lhs == rhs);
     }
     /* @} */
 
@@ -136,7 +183,8 @@ public:
     void set_ptr(T * p)
     {
         tag_t tag = get_tag();
-        ptr = pack_ptr(p, tag);
+        bool flag = get_flag();
+        ptr = pack_ptr(p, tag, flag);
     }
     /* @} */
 
@@ -150,7 +198,23 @@ public:
     void set_tag(tag_t t)
     {
         T * p = get_ptr();
-        ptr = pack_ptr(p, t);
+        bool flag = get_flag();
+        ptr = pack_ptr(p, t, flag);
+    }
+    /* @} */
+
+    /** flag access */
+    /* @{ */
+    bool get_flag() const
+    {
+        return extract_flag(ptr);
+    }
+
+    void set_flag(bool flag = true)
+    {
+        T * p = get_ptr();
+        tag_t tag = get_tag();
+        ptr = pack_ptr(p, t, flag);
     }
     /* @} */
 
@@ -197,6 +261,7 @@ public:
 protected:
     compressed_ptr_t ptr;
 };
+
 #else
 #error unsupported platform
 #endif
