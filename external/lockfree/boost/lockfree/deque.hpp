@@ -61,19 +61,19 @@ namespace boost { namespace lockfree
                 set_state(s);
             }
 
-            anchor(atomic_node_ptr left, node* right, state s)
+            anchor(atomic_node_ptr const& left, node* right, state s)
               : left_(make_unique(left)), right_(right)
             {
                 set_state(s);
             }
 
-            anchor(node* left, atomic_node_ptr right, state s)
+            anchor(node* left, atomic_node_ptr const& right, state s)
               : left_(left), right_(make_unique(right))
             {
                 set_state(s);
             }
 
-            anchor(atomic_node_ptr left, atomic_node_ptr right, state s)
+            anchor(atomic_node_ptr const& left, atomic_node_ptr const& right, state s)
               : left_(make_unique(left)), right_(make_unique(right))
             {
                 set_state(s);
