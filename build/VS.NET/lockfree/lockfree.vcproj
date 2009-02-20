@@ -131,6 +131,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\external\lockfree\boost\lockfree\double_tagged_ptr.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\external\lockfree\boost\lockfree\double_tagged_ptr_dcas.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\external\lockfree\boost\lockfree\fifo.hpp"
 				>
 			</File>

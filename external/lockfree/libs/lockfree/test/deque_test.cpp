@@ -78,7 +78,7 @@ boost::lockfree::atomic_int<long> deque_cnt;
 
 static_hashed_set<long, (1<<16)> working_set;
 
-const unsigned int nodes_per_thread = 200000 /*0000 */;
+const unsigned int nodes_per_thread = 2000000 /* 00 */;
 
 const int reader_threads = 5;
 const int writer_threads = 5;
@@ -179,33 +179,6 @@ void get_left(void)
     }
 }
 
-BOOST_AUTO_TEST_CASE(deque_test_right)
-{
-    thread_group writer;
-    thread_group reader;
-
-    running = true;
-    received_nodes = 0;
-
-    for (int i = 0; i != reader_threads; ++i)
-        reader.create_thread(&get_right);
-
-    for (int i = 0; i != writer_threads; ++i)
-        writer.create_thread(&add_right);
-    std::cout << "deque_test_right: reader and writer threads created" << std::endl;
-
-    writer.join_all();
-    std::cout << "deque_test_right: writer threads joined. waiting for readers to finish" << std::endl;
-
-    running = false;
-    reader.join_all();
-
-    BOOST_CHECK_EQUAL(received_nodes, writer_threads * nodes_per_thread);
-    BOOST_CHECK_EQUAL(deque_cnt, 0);
-    BOOST_CHECK(sd.empty());
-    BOOST_CHECK(working_set.count_nodes() == 0);
-}
-
 BOOST_AUTO_TEST_CASE(deque_test_left)
 {
     thread_group writer;
@@ -223,6 +196,33 @@ BOOST_AUTO_TEST_CASE(deque_test_left)
 
     writer.join_all();
     std::cout << "deque_test_left: writer threads joined. waiting for readers to finish" << std::endl;
+
+    running = false;
+    reader.join_all();
+
+    BOOST_CHECK_EQUAL(received_nodes, writer_threads * nodes_per_thread);
+    BOOST_CHECK_EQUAL(deque_cnt, 0);
+    BOOST_CHECK(sd.empty());
+    BOOST_CHECK(working_set.count_nodes() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(deque_test_right)
+{
+    thread_group writer;
+    thread_group reader;
+
+    running = true;
+    received_nodes = 0;
+
+    for (int i = 0; i != reader_threads; ++i)
+        reader.create_thread(&get_right);
+
+    for (int i = 0; i != writer_threads; ++i)
+        writer.create_thread(&add_right);
+    std::cout << "deque_test_right: reader and writer threads created" << std::endl;
+
+    writer.join_all();
+    std::cout << "deque_test_right: writer threads joined. waiting for readers to finish" << std::endl;
 
     running = false;
     reader.join_all();

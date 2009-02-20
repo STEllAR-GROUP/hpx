@@ -196,7 +196,6 @@ public:
                 return detail::dummy_freelist<T, Alloc>::allocate();
 
             freelist_node * new_pool = old_pool.get_ptr()->next.get_ptr();
-
             if (pool_.CAS(old_pool, new_pool))
                 return reinterpret_cast<T*>(old_pool.get_ptr());
         }
@@ -210,9 +209,8 @@ public:
 
             freelist_node * new_pool = reinterpret_cast<freelist_node*>(n);
 
-            new_pool->next.set(old_pool.get_ptr(), 0, false);
-
-            if (pool_.CAS(old_pool,new_pool))
+            new_pool->next.set_ptr(old_pool.get_ptr());
+            if (pool_.CAS(old_pool, new_pool))
                 return;
         }
     }

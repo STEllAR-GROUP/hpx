@@ -10,7 +10,7 @@
 #define BOOST_LOCKFREE_DEQUE_HPP_INCLUDED
 
 #include <boost/lockfree/prefix.hpp>
-#include <boost/lockfree/tagged_ptr.hpp>
+#include <boost/lockfree/double_tagged_ptr.hpp>
 #include <boost/lockfree/atomic_int.hpp>
 #include <boost/lockfree/freelist.hpp>
 
@@ -30,96 +30,100 @@ namespace boost { namespace lockfree
         struct BOOST_LOCKFREE_CACHELINE_ALIGNMENT node
         {
             node(T const & v)
-              : data(v), left_(NULL), right_(NULL)
+              : data_(v)
             {}
 
-            node()
-              : left_(NULL), right_(NULL)
-            {}
-
-            tagged_ptr<node> left_;
-            tagged_ptr<node> right_;
-            T data;
+            double_tagged_ptr<node> node_;
+            T data_;
         };
-        typedef tagged_ptr<node> atomic_node_ptr;
+        typedef typename double_tagged_ptr<node>::ptr_tag atomic_node_ptr;
 
         struct BOOST_LOCKFREE_CACHELINE_ALIGNMENT anchor
         {
-            enum state { 
+            enum state 
+            { 
                 stable = 0,
                 left_push = 1,
                 right_push = 2
             };
 
             anchor()
-              : left_(NULL), right_(NULL)
             {}
 
             anchor(node* left, node* right, state s)
-              : left_(left), right_(right)
+              : node_(left, right)
             {
-                BOOST_ASSERT(NULL != left_.get_ptr() || NULL == right_.get_ptr());
-                BOOST_ASSERT(NULL != right_.get_ptr() || NULL == left_.get_ptr());
+                BOOST_ASSERT(NULL != node_.get_left_ptr() || NULL == node_.get_right_ptr());
+                BOOST_ASSERT(NULL != node_.get_right_ptr() || NULL == node_.get_left_ptr());
                 set_state(s);
             }
 
             anchor(atomic_node_ptr const& left, node* right, state s)
-              : left_(make_unique(left)), right_(right)
+              : node_(left, right)
             {
-                BOOST_ASSERT(NULL != left_.get_ptr() || NULL == right_.get_ptr());
-                BOOST_ASSERT(NULL != right_.get_ptr() || NULL == left_.get_ptr());
+                BOOST_ASSERT(NULL != node_.get_left_ptr() || NULL == node_.get_right_ptr());
+                BOOST_ASSERT(NULL != node_.get_right_ptr() || NULL == node_.get_left_ptr());
                 set_state(s);
             }
 
             anchor(node* left, atomic_node_ptr const& right, state s)
-              : left_(left), right_(make_unique(right))
+              : node_(left, right)
             {
-                BOOST_ASSERT(NULL != left_.get_ptr() || NULL == right_.get_ptr());
-                BOOST_ASSERT(NULL != right_.get_ptr() || NULL == left_.get_ptr());
+                BOOST_ASSERT(NULL != node_.get_left_ptr() || NULL == node_.get_right_ptr());
+                BOOST_ASSERT(NULL != node_.get_right_ptr() || NULL == node_.get_left_ptr());
                 set_state(s);
             }
 
             anchor(atomic_node_ptr const& left, atomic_node_ptr const& right, state s)
-              : left_(make_unique(left)), right_(make_unique(right))
+              : node_(left, right)
             {
-                BOOST_ASSERT(NULL != left_.get_ptr() || NULL == right_.get_ptr());
-                BOOST_ASSERT(NULL != right_.get_ptr() || NULL == left_.get_ptr());
+                BOOST_ASSERT(NULL != node_.get_left_ptr() || NULL == node_.get_right_ptr());
+                BOOST_ASSERT(NULL != node_.get_right_ptr() || NULL == node_.get_left_ptr());
                 set_state(s);
+            }
+
+            anchor(anchor const& rhs)
+            {
+                node_.atomic_set(rhs.node_);
+            }
+            anchor& operator=(anchor const& rhs)
+            {
+                if (this != &rhs)
+                    node_.atomic_set(rhs.node_);
+                return *this;
             }
 
             state get_state() const
             {
-                return left_.get_flag() ? left_push : 
-                          (right_.get_flag() ? right_push : stable);
+                return node_.get_left_flag() ? left_push : 
+                          (node_.get_right_flag() ? right_push : stable);
             }
 
             void set_state(state s)
             {
-                left_.set_flag(false);
-                right_.set_flag(false);
+                node_.set_left_flag(false);
+                node_.set_right_flag(false);
                 if (left_push == s)
-                    left_.set_flag();
+                    node_.set_left_flag();
                 else if (right_push == s)
-                    right_.set_flag();
+                    node_.set_right_flag();
             }
 
-            bool CAS (anchor const& oldval, anchor const& newval)
+            bool CAS (anchor const& oldval, anchor& newval)
             {
-                return boost::lockfree::CAS2(
-                    this, oldval.left_, oldval.right_, newval.left_, newval.right_);
+                return node_.CAS(oldval.node_, newval.node_);
             }
 
             friend bool operator== (anchor const& lhs, anchor const& rhs)
             {
-                return lhs.left_ == rhs.left_ && lhs.right_ == rhs.right_;
+                return lhs.node_ == rhs.node_;
             }
             friend bool operator!= (anchor const& lhs, anchor const& rhs)
             {
-                return !(lhs == rhs);
+                return lhs.node_ != rhs.node_;
             }
 
-            tagged_ptr<node> left_;
-            tagged_ptr<node> right_;
+            double_tagged_ptr<node> node_;
         };
 
     public:
@@ -138,9 +142,9 @@ namespace boost { namespace lockfree
         bool empty(void) const
         {
             // either root pointers have to be either NULL or not NULL
-            BOOST_ASSERT(NULL != root_.right_.get_ptr() || 
-                         NULL == root_.left_.get_ptr());
-            return NULL == root_.right_.get_ptr();
+            BOOST_ASSERT(NULL != root_.node_.get_right_ptr() || 
+                         NULL == root_.node_.get_left_ptr());
+            return NULL == root_.node_.get_right_ptr();
         }
 
         void push_right(T const& t)
@@ -149,9 +153,7 @@ namespace boost { namespace lockfree
             for (unsigned int cnt = 0; /**/; spin((unsigned char)++cnt))
             {
                 anchor root(root_);
-                memory_barrier();
-
-                if (NULL == root.right_.get_ptr())
+                if (NULL == root.node_.get_right_ptr())
                 {
                     anchor newroot(n, n, anchor::stable);
                     if (root_.CAS(root, newroot)) 
@@ -159,8 +161,8 @@ namespace boost { namespace lockfree
                 }
                 else if (anchor::stable == root.get_state())
                 {
-                    n->left_ = make_unique(root.right_);
-                    anchor newroot(root.left_, n, anchor::right_push);
+                    n->node_.left_ = root.node_.right_;
+                    anchor newroot(root.node_.left_, n, anchor::right_push);
                     if (root_.CAS(root, newroot))
                     {
                         stabilize_right(newroot);
@@ -180,9 +182,7 @@ namespace boost { namespace lockfree
             for (unsigned int cnt = 0; /**/; spin((unsigned char)++cnt))
             {
                 anchor root(root_);
-                memory_barrier();
-
-                if (NULL == root.left_.get_ptr())
+                if (NULL == root.node_.get_left_ptr())
                 {
                     anchor newroot(n, n, anchor::stable);
                     if (root_.CAS(root, newroot)) 
@@ -190,8 +190,8 @@ namespace boost { namespace lockfree
                 }
                 else if (anchor::stable == root.get_state())
                 {
-                    n->right_ = make_unique(root.left_);
-                    anchor newroot(n, root.right_, anchor::left_push);
+                    n->node_.right_ = root.node_.left_;
+                    anchor newroot(n, root.node_.right_, anchor::left_push);
                     if (root_.CAS(root, newroot))
                     {
                         stabilize_left(newroot);
@@ -210,28 +210,30 @@ namespace boost { namespace lockfree
             for (unsigned int cnt = 0; /**/; spin((unsigned char)++cnt))
             {
                 anchor root(root_);
-                memory_barrier();
-
-                node* right = root.right_.get_ptr();
+                node* right = root.node_.get_right_ptr();
                 if (NULL == right)
                     return false;
 
-                if (right == root.left_.get_ptr())
+                if (root.node_.get_left_ptr() == right)
                 {
                     anchor newroot(NULL, NULL, anchor::stable);
                     if (root_.CAS(root, newroot))
                     {
-                        *ret = right->data;
+                        *ret = right->data_;
                         dealloc_node(right);
                         return true;
                     }
                 }
                 else if (anchor::stable == root.get_state())
                 {
-                    anchor newroot(root.left_, right->left_, anchor::stable);
+                    atomic_node_ptr nextright(right->node_.left_);
+                    memory_barrier();
+                    if (root_ != root) continue;
+
+                    anchor newroot(root.node_.left_, nextright, anchor::stable);
                     if (root_.CAS(root, newroot))
                     {
-                        *ret = right->data;
+                        *ret = right->data_;
                         dealloc_node(right);
                         return true;
                     }
@@ -248,28 +250,30 @@ namespace boost { namespace lockfree
             for (unsigned int cnt = 0; /**/; spin((unsigned char)++cnt))
             {
                 anchor root(root_);
-                memory_barrier();
-
-                node* left = root.left_.get_ptr();
+                node* left = root.node_.get_left_ptr();
                 if (NULL == left)
                     return false;
 
-                if (root.right_.get_ptr() == left)
+                if (left == root.node_.get_right_ptr())
                 {
                     anchor newroot(NULL, NULL, anchor::stable);
                     if (root_.CAS(root, newroot))
                     {
-                        *ret = left->data;
+                        *ret = left->data_;
                         dealloc_node(left);
                         return true;
                     }
                 }
                 else if (anchor::stable == root.get_state())
                 {
-                    anchor newroot(left->right_, root.right_, anchor::stable);
+                    atomic_node_ptr nextleft(left->node_.right_);
+                    memory_barrier();
+                    if (root_ != root) continue;
+
+                    anchor newroot(nextleft, root.node_.right_, anchor::stable);
                     if (root_.CAS(root, newroot))
                     {
-                        *ret = left->data;
+                        *ret = left->data_;
                         dealloc_node(left);
                         return true;
                     }
@@ -293,54 +297,47 @@ namespace boost { namespace lockfree
 
         void stabilize_right(anchor const& root)
         {
-            atomic_node_ptr prev(root.right_.get_ptr()->left_);
+            atomic_node_ptr prev(root.node_.get_right_ptr()->node_.left_);
             memory_barrier();
             if (root_ != root) return;
 
-            atomic_node_ptr prevright(prev.get_ptr()->right_);
+            atomic_node_ptr prevright(prev.get_ptr()->node_.right_);
             memory_barrier();
-            if (prevright.get_ptr() != root.right_.get_ptr())
+            if (prevright.get_ptr() != root.node_.get_right_ptr())
             {
                 if (root_ != root) 
                     return;
-                if (!prev.get_ptr()->right_.CAS(prevright, root.right_.get_ptr()))
+                if (!prev.get_ptr()->node_.right_.CAS(prevright, root.node_.get_right_ptr()))
                     return;
             }
 
             // make the root stable
-            anchor newroot(root.left_, root.right_, anchor::stable);
+            anchor newroot(root.node_.left_, root.node_.right_, anchor::stable);
             root_.CAS(root, newroot);
         }
 
         void stabilize_left(anchor const& root)
         {
-            atomic_node_ptr prev(root.left_.get_ptr()->right_);
+            atomic_node_ptr prev(root.node_.get_left_ptr()->node_.right_);
             memory_barrier();
             if (root_ != root) return;
 
-            atomic_node_ptr prevleft(prev.get_ptr()->left_);
+            atomic_node_ptr prevleft(prev.get_ptr()->node_.left_);
             memory_barrier();
-            if (prevleft.get_ptr() != root.left_.get_ptr())
+            if (prevleft.get_ptr() != root.node_.get_left_ptr())
             {
                 if (root_ != root) 
                     return;
-                if (!prev.get_ptr()->left_.CAS(prevleft, root.left_.get_ptr()))
+                if (!prev.get_ptr()->node_.left_.CAS(prevleft, root.node_.get_left_ptr()))
                     return;
             }
 
             // make the root stable
-            anchor newroot(root.left_, root.right_, anchor::stable);
+            anchor newroot(root.node_.left_, root.node_.right_, anchor::stable);
             root_.CAS(root, newroot);
         }
 
     private:
-        node * alloc_node(void)
-        {
-            node* chunk = pool.allocate();
-            new(chunk) node();
-            return chunk;
-        }
-
         node* alloc_node(T const& t)
         {
             node* chunk = pool.allocate();

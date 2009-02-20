@@ -26,7 +26,7 @@ namespace lockfree
 {
 
 template <class T>
-class tagged_ptr
+class BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr
 {
 private:
     typedef boost::uint16_t flag_t;

@@ -138,6 +138,7 @@ namespace boost { namespace lockfree
         {
             *(D*)(&packed_addr->d) = new1;
             *(E*)(&packed_addr->e) = new2;
+            memory_barrier();
             return true;
         }
         return false;
