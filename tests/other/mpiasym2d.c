@@ -196,8 +196,8 @@ double *init(struct coords *co)
   int i, j, npos = 0;
   double *buf;
 
-  co->lx = co->x/co->px;
-  co->ly = co->y/co->py;
+  co->lx = (co->x == 1? 1: co->x/co->px);
+  co->ly = (co->y == 1? 1: co->y/co->py);
   co->lgx = co->lx+2*co->ngh;
   co->lgy = co->ly+2*co->ngh;
 
@@ -212,8 +212,8 @@ double *init(struct coords *co)
   co->carty = co->rank/co->px;
   co->xoff = co->lx*co->cartx;
   co->yoff = co->ly*co->carty;
-  co->dx = co->ngh*(co->px > 1);
-  co->dy = co->ngh*(co->py > 1);
+  co->dx = co->ngh*(co->x > 1);
+  co->dy = co->ngh*(co->y > 1);
   co->stcnt = (2*co->dx+1)*(2*co->dy+1);
 
   /* datatype for ghost cells along x direction (single zone) */
@@ -244,12 +244,7 @@ double *init(struct coords *co)
       if (randmap[i] <= 0) ++npos;
     }
   }
-  /*
-  else
-  {
-    for (i = 0; i < RNDMAPSZ; i++) randmap[i] = 1;
-  }
-  */
+
   if (npos)
     printf("Warning (node %d): %d non-positive entries in distribution table!\n", co->rank, npos);
 
@@ -346,7 +341,9 @@ int main(int argc, char **argv)
   }
   
   MPI_Comm_size(MPI_COMM_WORLD, &loc.world);
-  if (loc.px*loc.py != loc.world || loc.x%loc.px || loc.y%loc.py)
+  if (loc.px*loc.py != loc.world ||
+      (loc.x == 1 && loc.px != 1) || (loc.x != 1 && loc.x%loc.px) ||
+      (loc.y == 1 && loc.py != 1) || (loc.y != 1 && loc.y%loc.py))
   {
     printf("Invalid processor grid definition\n");
     MPI_Abort(MPI_COMM_WORLD, MPI_ERR_OTHER);
