@@ -128,8 +128,7 @@ public:
 
             freelist_node * new_pool = reinterpret_cast<freelist_node*>(n);
 
-            new_pool->next.set_ptr(old_pool.get_ptr());
-
+            new_pool->next.set(old_pool.get_ptr(), 0, false);
             if (pool_.CAS(old_pool, new_pool))
             {
                 --free_list_size;
@@ -209,7 +208,7 @@ public:
 
             freelist_node * new_pool = reinterpret_cast<freelist_node*>(n);
 
-            new_pool->next.set_ptr(old_pool.get_ptr());
+            new_pool->next.set(old_pool.get_ptr(), 0, false);
             if (pool_.CAS(old_pool, new_pool))
                 return;
         }
