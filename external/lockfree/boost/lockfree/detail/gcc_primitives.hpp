@@ -98,8 +98,7 @@ namespace boost { namespace lockfree
 #warning "CAS: blocking cas emulation"
 #endif
 
-//         boost::detail::lightweight_mutex::scoped_lock lock(detail::get_CAS_mutex());
-        boost::detail::spinlock_pool<10>::scoped_lock lock(&old);
+        boost::detail::lightweight_mutex::scoped_lock lock(detail::get_CAS_mutex());
         if (*addr == old)
         {
             *addr = nw;
@@ -172,7 +171,7 @@ namespace boost { namespace lockfree
     ( (__GNUC__ >  4) || ( (__GNUC__ == 4) && (__GNUC_MINOR__ >= 2) ) && defined(__nocona__ ) )
 
 # if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
-# warning "CAS2: 64bit using __sync_bool_compare_and_swap_16"
+# warning "CAS2: using __sync_bool_compare_and_swap_16"
 # endif
 
         struct packed_c
@@ -230,8 +229,7 @@ namespace boost { namespace lockfree
 
         volatile packed_c * packed_addr = reinterpret_cast<volatile packed_c*>(addr);
 
-//         boost::detail::lightweight_mutex::scoped_lock lock(detail::get_CAS2_mutex());
-        boost::detail::spinlock_pool<12>::scoped_lock lock(&old1);
+        boost::detail::lightweight_mutex::scoped_lock lock(detail::get_CAS2_mutex());
 
         if (packed_addr->d == old1 && packed_addr->e == old2)
         {
@@ -276,8 +274,7 @@ namespace boost { namespace lockfree
 #warning "interlocked_compare_exchange: blocking emulation"
 #endif
 
-//         boost::detail::lightweight_mutex::scoped_lock lock(detail::get_ilce_mutex());
-        boost::detail::spinlock_pool<11>::scoped_lock lock(&old);
+        boost::detail::lightweight_mutex::scoped_lock lock(detail::get_ilce_mutex());
         D retval = *addr;
         if (*addr == old)
         {

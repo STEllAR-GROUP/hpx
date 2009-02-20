@@ -99,8 +99,7 @@ namespace boost { namespace lockfree
 
         volatile packed_c * packed_addr = reinterpret_cast<volatile packed_c*>(addr);
 
-//         boost::detail::lightweight_mutex::scoped_lock lock(detail::get_CAS2_mutex());
-        boost::detail::spinlock_pool<12>::scoped_lock lock(&old1);
+        boost::detail::lightweight_mutex::scoped_lock lock(detail::get_CAS2_mutex());
 
         if (packed_addr->d == old1 && packed_addr->e == old2)
         {

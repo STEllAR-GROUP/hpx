@@ -11,8 +11,6 @@
 #include <boost/detail/lightweight_mutex.hpp>
 #include <boost/lockfree/detail/static_lw_mutex.hpp>
 
-#include <boost/detail/spinlock_pool.hpp>
-
 namespace boost { namespace lockfree { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
