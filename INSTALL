@@ -29,7 +29,7 @@ This will generate Makefile's allowing to build and install HPX. The default
 installation directory is /usr/lib. To change the installation target directory
 invoke cmake as:
 
-    $ cmake -DCMAKE_INSTALL_PREFIX=<your directory here> .
+    $ cmake -DCMAKE_PREFIX=<your directory here> .
 
 Compile the HPX sourcecode and example using "make":
     $ make
