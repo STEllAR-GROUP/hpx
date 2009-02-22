@@ -21,7 +21,3 @@ HPX_REGISTER_ACTION_EX(
     set_result_action_vector_id_type);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<std::vector<hpx::naming::id_type> >);
 
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<bool>::set_result_action,
-    set_result_action_bool);
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<bool>);

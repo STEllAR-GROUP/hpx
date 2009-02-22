@@ -67,6 +67,11 @@ namespace hpx { namespace lcos { namespace detail
           : active_count_(0)
         {}
 
+        ~mutex()
+        {
+            BOOST_ASSERT(queue_.empty());
+        }
+
         bool try_lock()
         {
             return !boost::lockfree::interlocked_bit_test_and_set(

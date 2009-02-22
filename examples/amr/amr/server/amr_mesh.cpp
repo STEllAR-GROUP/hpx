@@ -214,7 +214,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             components::distributing_factory::create(
                 applier::get_applier().get_runtime_support_gid(), true));
 
-        // create a couple of stencil (functional) components and the same 
+        // create a couple of stencil (functional) components and twice the 
         // amount of stencil_value components
         numvalues_ = numvalues;
         result_type functions = factory.create_components(function_type, numvalues);
@@ -224,11 +224,11 @@ namespace hpx { namespace components { namespace amr { namespace server
             factory.create_components(stencil_type, numvalues)
         };
 
+        // initialize logging functionality in functions
         result_type logging;
         if (logging_type != components::component_invalid)
             logging = factory.create_components(logging_type);
 
-        // initialize logging functionality in functions
         init(locality_results(functions), locality_results(logging), numsteps);
 
         // initialize stencil_values using the stencil (functional) components

@@ -606,6 +606,26 @@ namespace hpx { namespace threads
                 base::try_lock();       // this is different
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        // debug helper function, logs all suspended threads
+        void dump_suspended_threads(boost::ptr_map<thread_id_type, threads::thread>& tm)
+        {
+            typedef boost::ptr_map<thread_id_type, thread> thread_map_type;
+
+            thread_map_type::const_iterator end = tm.end();
+            for (thread_map_type::const_iterator it = tm.begin(); it != end; ++it)
+            {
+                thread const* thrd = reinterpret_cast<thread const*>((*it).second);
+                thread_state state = thrd->get_state();
+                if (suspended == state)
+                {
+                    LTM_(debug) << "suspended thread(" << (*it).first << "): "
+                                << thrd->get_description();
+                }
+            }
+        }
+
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -754,6 +774,9 @@ namespace hpx { namespace threads
                 {
                     LTM_(info) << "tfunc(" << num_thread 
                                << "): queues empty, entering wait";
+
+                    if (LHPX_ENABLED(debug) && work_items_.empty() && new_tasks_.empty())
+                        detail::dump_suspended_threads(thread_map_);
 
                     bool timed_out = false;
                     {

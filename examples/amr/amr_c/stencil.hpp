@@ -40,7 +40,7 @@ namespace hpx { namespace components { namespace amr
         /// of the current time step has to be stored. The parameter \a gids
         /// is a vector of gids referencing the memory blocks of the results of
         /// previous time step.
-        bool eval(naming::id_type const& result, 
+        int eval(naming::id_type const& result, 
             std::vector<naming::id_type> const& gids, int row, int column);
 
         /// The alloc function is supposed to create a new memory block instance 

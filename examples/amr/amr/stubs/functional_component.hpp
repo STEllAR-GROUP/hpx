@@ -26,7 +26,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
 
         // The eval and is_last_timestep functions have to be overloaded by any
         // functional component derived from this class
-        static lcos::future_value<bool> eval_async(naming::id_type const& gid, 
+        static lcos::future_value<int> eval_async(naming::id_type const& gid, 
             naming::id_type const& result, 
             std::vector<naming::id_type> const& gids, int row, int column)
         {
@@ -37,7 +37,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             return lcos::eager_future<action_type>(gid, result, gids, row, column);
         }
 
-        static bool eval(naming::id_type const& gid, 
+        static int eval(naming::id_type const& gid, 
             naming::id_type const& result, std::vector<naming::id_type> const& gids,
             int row, int column)
         {

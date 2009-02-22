@@ -21,7 +21,7 @@ namespace hpx { namespace components { namespace amr
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
     // Compute the result value for the current time step
-    bool stencil::eval(naming::id_type const& result, 
+    int stencil::eval(naming::id_type const& result, 
         std::vector<naming::id_type> const& gids, int row, int column)
     {
         BOOST_ASSERT(gids.size() == 3);
@@ -53,10 +53,12 @@ namespace hpx { namespace components { namespace amr
         else {
             // the last time step has been reached, just copy over the data
             resultval.get() = val2.get();
+            ++resultval->timestep_;
         }
 
-        // set return value to true if this is the last time step
-        return resultval->timestep_ >= numsteps_;
+        // set return value difference between actual and required number of
+        // timesteps (>0: still to go, 0: last step, <0: overdone)
+        return numsteps_ - resultval->timestep_;
     }
 
     naming::id_type stencil::alloc_data(int item, int maxitems, int row)

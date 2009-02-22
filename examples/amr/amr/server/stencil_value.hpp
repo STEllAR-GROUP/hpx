@@ -132,6 +132,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         > set_functional_component_action;
 
     private:
+        bool is_called_;                              // is one of the 'main' stencils
         threads::thread_id_type driver_thread_;
 
         detail::initialized_semaphore sem_in_[N];

@@ -39,7 +39,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // The eval and is_last_timestep functions have to be overloaded by any
         // functional component derived from this class
-        virtual bool eval(naming::id_type const&, 
+        virtual int eval(naming::id_type const&, 
             std::vector<naming::id_type> const&, int, int)
         {
             // This shouldn't ever be called. If you're seeing this assertion 
@@ -80,7 +80,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// function (by applying the eval_action) will compute the next 
         /// time step value based on the result values of the previous time 
         /// steps.
-        bool eval_nonvirt(naming::id_type const& result, 
+        int eval_nonvirt(naming::id_type const& result, 
             std::vector<naming::id_type> const& gids, int row, int column)
         {
             return eval(result, gids, row, column);
@@ -106,7 +106,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         > alloc_data_action;
 
         typedef hpx::actions::result_action4<
-            functional_component, bool, functional_component_eval, 
+            functional_component, int, functional_component_eval, 
             naming::id_type const&, std::vector<naming::id_type> const&, 
             int, int, &functional_component::eval_nonvirt
         > eval_action;

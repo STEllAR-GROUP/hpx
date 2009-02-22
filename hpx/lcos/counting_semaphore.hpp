@@ -39,6 +39,7 @@ namespace hpx { namespace lcos
     {
     private:
         typedef hpx::lcos::mutex mutex_type;
+//         typedef boost::mutex mutex_type;
 
     public:
         /// \brief Construct a new counting semaphore
@@ -52,6 +53,11 @@ namespace hpx { namespace lcos
         counting_semaphore(long value = 0)
           : value_(value)
         {}
+
+        ~counting_semaphore()
+        {
+            BOOST_ASSERT(queue_.empty());   // queue has to be empty
+        }
 
         /// \brief Wait for the semaphore to be signaled
         ///

@@ -12,6 +12,8 @@
 
 #include <algorithm>
 
+#include <hpx/util/unlock_lock.hpp>
+
 #include "stencil_value.hpp"
 #include "../functional_component.hpp"
 
@@ -26,7 +28,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     struct eval_helper<3>
     {
         template <typename Adaptor>
-        static bool
+        static int
         call(naming::id_type const& gid, naming::id_type const& value_gid, 
             int row, int column, Adaptor* in)
         {
@@ -44,7 +46,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     struct eval_helper<5>
     {
         template <typename Adaptor>
-        static bool
+        static int
         call(naming::id_type const& gid, naming::id_type const& value_gid, 
             int row, int column, Adaptor* in)
         {
@@ -61,9 +63,11 @@ namespace hpx { namespace components { namespace amr { namespace server
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Lock>
     inline naming::id_type 
-    alloc_helper(naming::id_type const& gid, int row)
+    alloc_helper(Lock& l, naming::id_type const& gid, int row)
     {
+        util::unlock_the_lock<Lock> ul(l);
         return components::amr::stubs::functional_component::alloc_data(
             gid, -1, -1, row);
     }
@@ -78,7 +82,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     ///////////////////////////////////////////////////////////////////////////
     template <int N>
     stencil_value<N>::stencil_value()
-      : driver_thread_(0), sem_result_(0), 
+      : is_called_(false), driver_thread_(0), sem_result_(0), 
         functional_gid_(naming::invalid_id), row_(-1), column_(-1)
     {
         std::fill(&value_gids_[0], &value_gids_[2], naming::invalid_id);
@@ -104,7 +108,6 @@ namespace hpx { namespace components { namespace amr { namespace server
     template <int N>
     void stencil_value<N>::finalize() 
     {
-        mutex_type::scoped_lock l(mtx_);
         if (naming::invalid_id != value_gids_[1]) 
             free_helper_sync(value_gids_[1]);
     }
@@ -116,6 +119,8 @@ namespace hpx { namespace components { namespace amr { namespace server
     template <int N>
     naming::id_type stencil_value<N>::call(naming::id_type const& initial)
     {
+        is_called_ = true;
+
         // sem_in_ is pre-initialized to 1, so we need to reset it
         for (int i = 0; i < N; ++i)
             sem_in_[i].wait();
@@ -155,14 +160,23 @@ namespace hpx { namespace components { namespace amr { namespace server
     threads::thread_state stencil_value<N>::main()
     {
         // ask functional component to create the local data value
-        value_gids_[0] = alloc_helper(functional_gid_, row_);
+        {
+            mutex_type::scoped_lock l(mtx_);
+            value_gids_[0] = alloc_helper(l, functional_gid_, row_);
+        }
+
+        // we need to store our current value gid/is_called_ on the stack, 
+        // because after is_last is true this object might have been destructed 
+        // already
+        naming::id_type value_gid_to_be_freed = value_gids_[0];
+        bool is_called = is_called_;
 
         // this is the main loop of the computation, gathering the values
         // from the previous time step, computing the result of the current
         // time step and storing the computed value in the memory_block 
         // referenced by value_gid_
-        bool is_last = false;
-        while (!is_last) {
+        int timesteps_to_go = 1;
+        while (timesteps_to_go > 0) {
             // start acquire operations on input ports
             for (std::size_t i = 0; i < N; ++i)
                 in_[i]->aquire_value();         // non-blocking!
@@ -173,8 +187,17 @@ namespace hpx { namespace components { namespace amr { namespace server
 
             // Compute the next value, store it in value_gids_[0]
             // The eval action returns true for the last time step.
-            is_last = eval_helper<N>::call(functional_gid_, 
+            timesteps_to_go = eval_helper<N>::call(functional_gid_, 
                 value_gids_[0], row_, column_, in_);
+
+            // we're done if this is exactly the last timestep and we are not 
+            // supposed to return the final value, no need to wait for further
+            // input anymore
+            if (timesteps_to_go < 0 && !is_called) {
+                // exit immediatly, 'this' might have been destructed already
+                free_helper_sync(value_gid_to_be_freed);
+                return threads::terminated;
+            }
 
             // Wait for all output threads to have read the current value.
             // On the first time step the semaphore is preset to allow 
@@ -190,9 +213,10 @@ namespace hpx { namespace components { namespace amr { namespace server
                 mutex_type::scoped_lock l(mtx_);
 
                 if (naming::invalid_id == value_gids_[1]) 
-                    value_gids_[1] = alloc_helper(functional_gid_, row_);
+                    value_gids_[1] = alloc_helper(l, functional_gid_, row_);
 
                 std::swap(value_gids_[0], value_gids_[1]);
+                value_gid_to_be_freed = value_gids_[0];
             }
 
             // signal all output threads it's safe to read value
@@ -201,7 +225,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
 
         sem_result_.signal();         // final result has been set
-        free_helper_sync(value_gids_[0]);
+        free_helper_sync(value_gid_to_be_freed);
 
         return threads::terminated;
     }
@@ -272,16 +296,18 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // if all inputs have been bound already we need to start the driver 
         // thread
-        bool inputs_bound = true;
-        for (std::size_t i = 0; i < N && inputs_bound; ++i)
-            inputs_bound = in_[i]->is_bound();
+        if (0 == driver_thread_) {
+            bool inputs_bound = true;
+            for (std::size_t i = 0; i < N && inputs_bound; ++i)
+                inputs_bound = in_[i]->is_bound();
 
-        if (inputs_bound && 0 == driver_thread_) {
-            // run the thread which collects the input, executes the provided
-            // functional element and sets the value for the next time step
-            driver_thread_ = applier::register_thread(
-                boost::bind(&stencil_value<N>::main, this), 
-                "stencil_value::main");
+            if (inputs_bound) {
+                // run the thread which collects the input, executes the provided
+                // functional element and sets the value for the next time step
+                driver_thread_ = applier::register_thread(
+                    boost::bind(&stencil_value<N>::main, this), 
+                    "stencil_value::main");
+            }
         }
     }
 
