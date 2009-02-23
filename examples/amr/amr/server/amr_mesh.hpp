@@ -35,12 +35,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         // object (the accumulator)
         enum actions
         {
-            amr_mesh_free_data = 0,
-            amr_mesh_execute = 1
+            amr_mesh_execute = 0
         };
-
-        /// initialize the amr mesh
-        void free_data(naming::id_type const& id);
 
         /// This is the main entry point of this component. 
         std::vector<naming::id_type> execute(
@@ -51,11 +47,6 @@ namespace hpx { namespace components { namespace amr { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::action1<
-            amr_mesh, amr_mesh_free_data, naming::id_type const&, 
-            &amr_mesh::free_data
-        > init_action;
-
         typedef hpx::actions::result_action4<
             amr_mesh, std::vector<naming::id_type>, amr_mesh_execute, 
             components::component_type, std::size_t, std::size_t,
