@@ -105,18 +105,16 @@ split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
 ////////////////////////////////////////////////////////////////////////////////
 struct test_environment
 {
-    test_environment(char const* desc, int max_semaphore_value)
-      : desc_(desc), sem_(0), counter1_(0), 
-        max_semaphore_value_(max_semaphore_value)
+    test_environment(char const* desc)
+      : desc_(desc), sem_(0), counter1_(0)
     {}
     ~test_environment()
     {
-        BOOST_ASSERT(counter1_ == max_semaphore_value_);
+        BOOST_TEST(counter1_ == 0);
     }
 
     std::string desc_;
     lcos::counting_semaphore sem_;
-    int max_semaphore_value_;
     boost::lockfree::atomic_int<long> counter1_;
 };
 
@@ -199,8 +197,7 @@ int hpx_main(std::size_t max_semaphore_value)
     ///////////////////////////////////////////////////////////////////////////
     // create a semaphore, which which we will use to make several threads 
     // waiting for another one
-    boost::shared_ptr<test_environment> env1(
-        new test_environment("test1", max_semaphore_value));
+    boost::shared_ptr<test_environment> env1(new test_environment("test1"));
 
     // create the  threads which will have to wait on the semaphore
     for (std::size_t i = 0; i < max_semaphore_value; ++i) 
@@ -217,8 +214,7 @@ int hpx_main(std::size_t max_semaphore_value)
     // create a semaphore, which we will use to make several threads 
     // waiting for another one, but the semaphore is signaled before being 
     // waited on
-    boost::shared_ptr<test_environment> env2(
-        new test_environment("test2", max_semaphore_value));
+    boost::shared_ptr<test_environment> env2(new test_environment("test2"));
 
     // create a thread signaling the semaphore
     applier::register_work(boost::bind(&sem_signal1, env2, max_semaphore_value), 
@@ -234,8 +230,7 @@ int hpx_main(std::size_t max_semaphore_value)
     ///////////////////////////////////////////////////////////////////////////
     // the 3rd test does the opposite, it creates a semaphore, which  
     // will be used to make one thread waiting for several other threads
-    boost::shared_ptr<test_environment> env3(
-        new test_environment("test3", max_semaphore_value));
+    boost::shared_ptr<test_environment> env3(new test_environment("test3"));
 
     // now create a thread waiting on the semaphore
     applier::register_work(boost::bind(&sem_wait2, env3, max_semaphore_value), 
@@ -249,8 +244,7 @@ int hpx_main(std::size_t max_semaphore_value)
     // the 4th test does the opposite, it creates a semaphore, which  
     // will be used to make one thread waiting for several other threads, but 
     // the semaphore is signaled before being waited on
-    boost::shared_ptr<test_environment> env4(
-        new test_environment("test4", max_semaphore_value));
+    boost::shared_ptr<test_environment> env4(new test_environment("test4"));
 
     // create the threads which will have to signal the semaphore
     for (std::size_t i = 0; i < max_semaphore_value; ++i) 
