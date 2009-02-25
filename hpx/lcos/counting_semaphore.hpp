@@ -111,6 +111,13 @@ namespace hpx { namespace lcos
             return value_;
         }
 
+#if defined(BOOST_LOCKFREE_FIFO_LOGGING)
+        long get_queue_length() const
+        {
+            return queue_.count_;
+        }
+#endif
+
     private:
         mutex_type mtx_;
         long value_;
