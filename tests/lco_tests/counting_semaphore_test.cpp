@@ -130,16 +130,20 @@ void sem_wait1(boost::shared_ptr<test_environment> env, int max_semaphore_value)
 
 void sem_signal1(boost::shared_ptr<test_environment> env, int max_semaphore_value)
 {
-    env->counter1_ -= max_semaphore_value;
-    env->sem_.signal(max_semaphore_value);    // we need to signal all threads
+    while (--max_semaphore_value >= 0) {
+        --env->counter1_;
+        env->sem_.signal();    // we need to signal all threads
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void sem_wait2(boost::shared_ptr<test_environment> env, int max_semaphore_value)
 {
     // we wait for the other threads to signal this semaphore
-    env->sem_.wait(max_semaphore_value);
-    env->counter1_ -= max_semaphore_value;
+    while (--max_semaphore_value >= 0) {
+        env->sem_.wait();
+        --env->counter1_;
+    }
 
     // all of the threads need to have incremented the counter
     BOOST_TEST(0 == env->counter1_);

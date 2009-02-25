@@ -194,7 +194,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             // supposed to return the final value, no need to wait for further
             // input anymore
             if (timesteps_to_go < 0 && !is_called) {
-                // exit immediatly, 'this' might have been destructed already
+                // exit immediately, 'this' might have been destructed already
                 free_helper_sync(value_gid_to_be_freed);
                 return threads::terminated;
             }

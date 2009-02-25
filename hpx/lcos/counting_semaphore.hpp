@@ -65,11 +65,11 @@ namespace hpx { namespace lcos
         ///                 be decremented. At the same time this is the minimum 
         ///                 value of the lock count at which the thread is not 
         ///                 yielded.
-        void wait(long count = 1)
+        void wait()
         {
             mutex_type::scoped_lock l(mtx_);
 
-            while (value_ < 0) {
+            while (0 == value_) {     // allow for higher priority threads
                 // we need to get the self anew for each round as it might
                 // get executed in a different thread from the previous one
                 threads::thread_self& self = threads::get_self();
@@ -79,31 +79,21 @@ namespace hpx { namespace lcos
                 self.yield(threads::suspended);
             }
 
-            value_ -= count;
-
-            while (value_ < 0) {
-                // we need to get the self anew for each round as it might
-                // get executed in a different thread from the previous one
-                threads::thread_self& self = threads::get_self();
-                queue_.enqueue(self.get_thread_id());
-
-                util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                self.yield(threads::suspended);
-            }
+            --value_;
         }
 
         /// \brief Signal the semaphore
         ///
         /// 
-        void signal(long count = 1)
+        void signal()
         {
             mutex_type::scoped_lock l(mtx_);
-            value_ += count;
-            if (value_ >= 0) {
-                threads::thread_id_type id = 0;
-                while (queue_.dequeue(&id)) 
-                    threads::set_thread_state(id, threads::pending);
-            }
+
+            threads::thread_id_type id = 0;
+            if (queue_.dequeue(&id)) 
+                threads::set_thread_state(id, threads::pending);
+
+            ++value_;
         }
 
     private:
