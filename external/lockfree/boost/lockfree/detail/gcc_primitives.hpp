@@ -39,18 +39,18 @@ namespace boost { namespace lockfree
     ///////////////////////////////////////////////////////////////////////////
     inline void spin(unsigned char i)
     {
-#if defined(__i386__) || defined(__x86_64__)
-        asm volatile(
-            "l%=: pause;\n\t"
-            "dec %0;\n\t"
-            "jnz l%=;\n\t"
-            : /**/
-            : "r" (i)
-            : "cc"
-        );
-#else
+//#if defined(__i386__) || defined(__x86_64__)
+//       asm volatile(
+//            "l%=: pause;\n\t"
+//            "dec %0;\n\t"
+//            "jnz l%=;\n\t"
+//            : /**/
+//            : "r" (i)
+//            : "cc"
+//        );
+//#else
         // do nothing
-#endif
+//#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////

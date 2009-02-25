@@ -308,8 +308,10 @@ int main(int argc, char* argv[])
         if (0 == num_threads) {
             hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
             for (int i = 0; i < num_tests; ++i) {
-                for (int i = 1; i <= 8; ++i) 
+                for (int i = 1; i <= 8; ++i) { 
                     rt.run(boost::bind(hpx_main, max_semaphore_value), i);
+                    std::cerr << ".";
+                }
             }
         }
         else {
