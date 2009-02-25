@@ -38,8 +38,8 @@ namespace hpx { namespace lcos
     class counting_semaphore
     {
     private:
-        typedef hpx::lcos::mutex mutex_type;
-//         typedef boost::mutex mutex_type;
+//         typedef hpx::lcos::mutex mutex_type;
+        typedef boost::mutex mutex_type;
 
     public:
         /// \brief Construct a new counting semaphore
