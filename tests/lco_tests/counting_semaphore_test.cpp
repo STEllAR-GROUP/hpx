@@ -41,7 +41,9 @@ bool parse_commandline(char const* name, int argc, char *argv[],
                 "HPX locality")
             ("value,v", po::value<int>(), 
                 "the number of threads to create for concurrent access to the "
-                "tested semaphores (default: 3, max: 20)")
+                "tested semaphores (default: 3, max: 80)")
+            ("num_tests,n", po::value<int>(), 
+                "the number of times to repeat the test (default: 1)")
         ;
 
         po::store(po::command_line_parser(argc, argv)
@@ -105,30 +107,34 @@ struct test_environment
 {
     test_environment(char const* desc, int max_semaphore_value)
       : desc_(desc),
-        sem_(0), counter_(0), max_semaphore_value_(max_semaphore_value)
+        sem_(0), counter1_(0), counter2_(0), 
+        max_semaphore_value_(max_semaphore_value)
     {}
     ~test_environment()
     {
-        BOOST_ASSERT(counter_ == max_semaphore_value_);
+        BOOST_ASSERT(counter1_ == max_semaphore_value_);
+        BOOST_ASSERT(counter2_ == max_semaphore_value_);
         BOOST_ASSERT(0 == sem_.get_value());
     }
 
     std::string desc_;
     lcos::counting_semaphore sem_;
     int max_semaphore_value_;
-    boost::detail::atomic_count counter_;
+    boost::lockfree::atomic_int<long> counter1_;
+    boost::lockfree::atomic_int<long> counter2_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 void sem_wait1(boost::shared_ptr<test_environment> env, int max_semaphore_value)
 {
-    ++env->counter_;
+    ++env->counter1_;
     env->sem_.wait();
+    ++env->counter2_;
 
     // all of the threads need to have incremented the counter, or some of the
     // threads are still sitting in the semaphore
-    BOOST_TEST(max_semaphore_value == env->counter_ ||
-               max_semaphore_value == env->counter_ + env->sem_.get_value());
+    BOOST_TEST(max_semaphore_value == env->counter1_ ||
+               max_semaphore_value == env->counter2_ + env->sem_.get_value());
 }
 
 void sem_signal1(boost::shared_ptr<test_environment> env, int max_semaphore_value)
@@ -141,14 +147,16 @@ void sem_wait2(boost::shared_ptr<test_environment> env, int max_semaphore_value)
 {
     // we wait for the other threads to signal this semaphore
     env->sem_.wait(max_semaphore_value);
+    env->counter2_ += max_semaphore_value;
 
     // all of the threads need to have incremented the counter
-    BOOST_TEST(max_semaphore_value == env->counter_);
+    BOOST_TEST(max_semaphore_value == env->counter1_);
+    BOOST_TEST(max_semaphore_value == env->counter2_);
 }
 
 void sem_signal2(boost::shared_ptr<test_environment> env)
 {
-    ++env->counter_;
+    ++env->counter1_;
     env->sem_.signal();    // we need to signal the semaphore here
 }
 
@@ -158,7 +166,19 @@ char const* const sem_wait1_desc[] =
     "sem_wait1_01", "sem_wait1_02", "sem_wait1_03", "sem_wait1_04", "sem_wait1_05",
     "sem_wait1_06", "sem_wait1_07", "sem_wait1_08", "sem_wait1_09", "sem_wait1_10",
     "sem_wait1_11", "sem_wait1_12", "sem_wait1_13", "sem_wait1_14", "sem_wait1_15",
-    "sem_wait1_16", "sem_wait1_17", "sem_wait1_18", "sem_wait1_19", "sem_wait1_20"
+    "sem_wait1_16", "sem_wait1_17", "sem_wait1_18", "sem_wait1_19", "sem_wait1_20",
+    "sem_wait1_21", "sem_wait1_22", "sem_wait1_23", "sem_wait1_24", "sem_wait1_25",
+    "sem_wait1_26", "sem_wait1_27", "sem_wait1_28", "sem_wait1_29", "sem_wait1_20",
+    "sem_wait1_31", "sem_wait1_32", "sem_wait1_33", "sem_wait1_34", "sem_wait1_35",
+    "sem_wait1_36", "sem_wait1_37", "sem_wait1_38", "sem_wait1_39", "sem_wait1_30",
+    "sem_wait1_41", "sem_wait1_42", "sem_wait1_43", "sem_wait1_44", "sem_wait1_45",
+    "sem_wait1_46", "sem_wait1_47", "sem_wait1_48", "sem_wait1_49", "sem_wait1_40",
+    "sem_wait1_51", "sem_wait1_52", "sem_wait1_53", "sem_wait1_54", "sem_wait1_55",
+    "sem_wait1_56", "sem_wait1_57", "sem_wait1_58", "sem_wait1_59", "sem_wait1_50",
+    "sem_wait1_61", "sem_wait1_62", "sem_wait1_63", "sem_wait1_64", "sem_wait1_65",
+    "sem_wait1_66", "sem_wait1_67", "sem_wait1_68", "sem_wait1_69", "sem_wait1_60",
+    "sem_wait1_71", "sem_wait1_72", "sem_wait1_73", "sem_wait1_74", "sem_wait1_75",
+    "sem_wait1_76", "sem_wait1_77", "sem_wait1_78", "sem_wait1_79", "sem_wait1_70"
 };
 
 char const* const sem_signal2_desc[] =
@@ -166,7 +186,19 @@ char const* const sem_signal2_desc[] =
     "sem_signal21_01", "sem_signal21_02", "sem_signal21_03", "sem_signal21_04", "sem_signal21_05",
     "sem_signal21_06", "sem_signal21_07", "sem_signal21_08", "sem_signal21_09", "sem_signal21_10",
     "sem_signal21_11", "sem_signal21_12", "sem_signal21_13", "sem_signal21_14", "sem_signal21_15",
-    "sem_signal21_16", "sem_signal21_17", "sem_signal21_18", "sem_signal21_19", "sem_signal21_20"
+    "sem_signal21_16", "sem_signal21_17", "sem_signal21_18", "sem_signal21_19", "sem_signal21_20",
+    "sem_signal21_21", "sem_signal21_22", "sem_signal21_23", "sem_signal21_24", "sem_signal21_25",
+    "sem_signal21_26", "sem_signal21_27", "sem_signal21_28", "sem_signal21_29", "sem_signal21_20",
+    "sem_signal21_31", "sem_signal21_32", "sem_signal21_33", "sem_signal21_34", "sem_signal21_35",
+    "sem_signal21_36", "sem_signal21_37", "sem_signal21_38", "sem_signal21_39", "sem_signal21_30",
+    "sem_signal21_41", "sem_signal21_42", "sem_signal21_43", "sem_signal21_44", "sem_signal21_45",
+    "sem_signal21_46", "sem_signal21_47", "sem_signal21_48", "sem_signal21_49", "sem_signal21_40",
+    "sem_signal21_51", "sem_signal21_52", "sem_signal21_53", "sem_signal21_54", "sem_signal21_55",
+    "sem_signal21_56", "sem_signal21_57", "sem_signal21_58", "sem_signal21_59", "sem_signal21_50",
+    "sem_signal21_61", "sem_signal21_62", "sem_signal21_63", "sem_signal21_64", "sem_signal21_65",
+    "sem_signal21_66", "sem_signal21_67", "sem_signal21_68", "sem_signal21_69", "sem_signal21_60",
+    "sem_signal21_71", "sem_signal21_72", "sem_signal21_73", "sem_signal21_74", "sem_signal21_75",
+    "sem_signal21_76", "sem_signal21_77", "sem_signal21_78", "sem_signal21_79", "sem_signal21_70"
 };
 
 int hpx_main(std::size_t max_semaphore_value)
@@ -256,6 +288,7 @@ int main(int argc, char* argv[])
         hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
         int num_threads = 0;
         std::size_t max_semaphore_value = 3;
+        int num_tests = 1;
 
         // extract IP address/port arguments
         if (vm.count("agas")) 
@@ -273,8 +306,11 @@ int main(int argc, char* argv[])
         if (vm.count("value"))
             max_semaphore_value = vm["value"].as<int>();
 
-        if (max_semaphore_value > 20)
-            max_semaphore_value = 20;
+        if (vm.count("num_tests"))
+            num_tests = vm["num_tests"].as<int>();
+
+        if (max_semaphore_value > 80)
+            max_semaphore_value = 80;
 
         // initialize and run the DGAS service, if appropriate
         std::auto_ptr<agas_server_helper> dgas_server;
@@ -284,12 +320,15 @@ int main(int argc, char* argv[])
         // start the HPX runtime using different numbers of threads
         if (0 == num_threads) {
             hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
-            for (int i = 1; i <= 8; ++i) 
-                rt.run(boost::bind(hpx_main, max_semaphore_value), i);
+            for (int i = 0; i < num_tests; ++i) {
+                for (int i = 1; i <= 8; ++i) 
+                    rt.run(boost::bind(hpx_main, max_semaphore_value), i);
+            }
         }
         else {
             hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
-            rt.run(boost::bind(hpx_main, max_semaphore_value), num_threads);
+            for (int i = 0; i < num_tests; ++i) 
+                rt.run(boost::bind(hpx_main, max_semaphore_value), num_threads);
         }
     }
     catch (std::exception& e) {
