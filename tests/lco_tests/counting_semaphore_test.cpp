@@ -106,22 +106,18 @@ split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
 struct test_environment
 {
     test_environment(char const* desc, int max_semaphore_value)
-      : desc_(desc),
-        sem_(0), counter1_(0), counter2_(0), 
+      : desc_(desc), sem_(0), counter1_(0), 
         max_semaphore_value_(max_semaphore_value)
     {}
     ~test_environment()
     {
         BOOST_ASSERT(counter1_ == max_semaphore_value_);
-        BOOST_ASSERT(counter2_ == max_semaphore_value_);
-        BOOST_ASSERT(0 == sem_.get_value());
     }
 
     std::string desc_;
     lcos::counting_semaphore sem_;
     int max_semaphore_value_;
     boost::lockfree::atomic_int<long> counter1_;
-    boost::lockfree::atomic_int<long> counter2_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -145,11 +141,10 @@ void sem_wait2(boost::shared_ptr<test_environment> env, int max_semaphore_value)
 {
     // we wait for the other threads to signal this semaphore
     env->sem_.wait(max_semaphore_value);
-    env->counter2_ += max_semaphore_value;
+    env->counter1_ -= max_semaphore_value;
 
     // all of the threads need to have incremented the counter
-    BOOST_TEST(max_semaphore_value == env->counter1_);
-    BOOST_TEST(max_semaphore_value == env->counter2_);
+    BOOST_TEST(0 == env->counter1_);
 }
 
 void sem_signal2(boost::shared_ptr<test_environment> env)
