@@ -106,6 +106,11 @@ namespace hpx { namespace lcos
             }
         }
 
+        long get_value() const 
+        {
+            return value_;
+        }
+
     private:
         mutex_type mtx_;
         long value_;

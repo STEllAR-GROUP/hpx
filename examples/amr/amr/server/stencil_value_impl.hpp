@@ -165,12 +165,6 @@ namespace hpx { namespace components { namespace amr { namespace server
             value_gids_[0] = alloc_helper(l, functional_gid_, row_);
         }
 
-        // we need to store our current value gid/is_called_ on the stack, 
-        // because after is_last is true this object might have been destructed 
-        // already
-        naming::id_type value_gid_to_be_freed = value_gids_[0];
-        bool is_called = is_called_;
-
         // this is the main loop of the computation, gathering the values
         // from the previous time step, computing the result of the current
         // time step and storing the computed value in the memory_block 
@@ -193,11 +187,8 @@ namespace hpx { namespace components { namespace amr { namespace server
             // we're done if this is exactly the last timestep and we are not 
             // supposed to return the final value, no need to wait for further
             // input anymore
-            if (timesteps_to_go < 0 && !is_called) {
-                // exit immediatly, 'this' might have been destructed already
-                free_helper_sync(value_gid_to_be_freed);
-                return threads::terminated;
-            }
+            if (timesteps_to_go < 0 && !is_called_) 
+                break;    // exit immediately
 
             // Wait for all output threads to have read the current value.
             // On the first time step the semaphore is preset to allow 
@@ -216,7 +207,6 @@ namespace hpx { namespace components { namespace amr { namespace server
                     value_gids_[1] = alloc_helper(l, functional_gid_, row_);
 
                 std::swap(value_gids_[0], value_gids_[1]);
-                value_gid_to_be_freed = value_gids_[0];
             }
 
             // signal all output threads it's safe to read value
@@ -225,7 +215,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
 
         sem_result_.signal();         // final result has been set
-        free_helper_sync(value_gid_to_be_freed);
+        free_helper_sync(value_gids_[0]);
 
         return threads::terminated;
     }
@@ -252,6 +242,8 @@ namespace hpx { namespace components { namespace amr { namespace server
     template <int N>
     std::vector<naming::id_type> stencil_value<N>::get_output_ports()
     {
+        mutex_type::scoped_lock l(mtx_);
+
         std::vector<naming::id_type> gids;
         for (std::size_t i = 0; i < N; ++i)
             gids.push_back(out_[i]->get_gid());
@@ -263,6 +255,8 @@ namespace hpx { namespace components { namespace amr { namespace server
     void stencil_value<N>::connect_input_ports(
         std::vector<naming::id_type> const& gids)
     {
+        mutex_type::scoped_lock l(mtx_);
+
         if (gids.size() < N) {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "stencil_value<N>::connect_input_ports", 
@@ -289,6 +283,8 @@ namespace hpx { namespace components { namespace amr { namespace server
     stencil_value<N>::set_functional_component(naming::id_type const& gid,
         int row, int column)
     {
+        mutex_type::scoped_lock l(mtx_);
+
         // store gid of functional component
         functional_gid_ = gid;
         row_ = row;

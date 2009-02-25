@@ -135,6 +135,7 @@ namespace hpx { namespace naming
     {
         if (io_service_pool_.is_running()) {
             io_service_pool_.stop();
+            io_service_pool_.join();
             LAGAS_(info) << "shutdown: stopped listening at: " << here_;
         }
     }
