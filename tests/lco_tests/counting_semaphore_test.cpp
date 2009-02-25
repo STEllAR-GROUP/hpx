@@ -127,19 +127,16 @@ struct test_environment
 ////////////////////////////////////////////////////////////////////////////////
 void sem_wait1(boost::shared_ptr<test_environment> env, int max_semaphore_value)
 {
-    ++env->counter1_;
     env->sem_.wait();
-    ++env->counter2_;
+    ++env->counter1_;
 
-    // all of the threads need to have incremented the counter, or some of the
-    // threads are still sitting in the semaphore
-    BOOST_TEST(max_semaphore_value == env->counter1_ ||
-               max_semaphore_value == env->counter2_ + env->sem_.get_value() - 
-                  env->sem_.get_queue_length());
+    // all of the threads need to have incremented the counter
+    BOOST_TEST(env->counter1_ <= 0);
 }
 
 void sem_signal1(boost::shared_ptr<test_environment> env, int max_semaphore_value)
 {
+    env->counter1_ -= max_semaphore_value;
     env->sem_.signal(max_semaphore_value);    // we need to signal all threads
 }
 
