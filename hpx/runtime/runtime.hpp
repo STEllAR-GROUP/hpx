@@ -273,6 +273,8 @@ namespace hpx
         // the TSS holds a pointer to the runtime associated with a given 
         // OS thread
         static boost::thread_specific_ptr<runtime*> runtime_;
+
+    private:
         void init_tss();
         void deinit_tss();
 
