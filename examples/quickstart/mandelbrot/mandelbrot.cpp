@@ -59,7 +59,9 @@ int hpx_main(int sizex, int sizey, int iterations)
     }
 
     // wait for the calculation to finish
-    sem.wait(sizex*sizey);
+    int waitfor = sizex*sizey;
+    while (--waitfor>= 0)
+        sem.wait();
 
     double elapsed = t.elapsed();
     std::cout << "elapsed: " << elapsed << std::endl;
