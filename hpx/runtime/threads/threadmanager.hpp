@@ -300,8 +300,6 @@ namespace hpx { namespace threads
 
         work_items_type work_items_;        ///< list of active work items
         thread_id_queue_type terminated_items_;  ///< list of terminated threads
-        thread_id_queue_type active_set_state_;  ///< list of threads waiting for 
-                                            ///< set_state on an active thread
 
         task_items_type new_tasks_;         ///< list of new tasks to run
 

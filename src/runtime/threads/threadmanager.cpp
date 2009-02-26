@@ -49,7 +49,7 @@ namespace hpx { namespace threads
         timer_pool_(timer_pool), 
         start_thread_(start_thread), stop_(stop), on_error_(on_error),
         work_items_("work_items"), terminated_items_("terminated_items"), 
-        active_set_state_("active_set_state"), new_tasks_("new_tasks"),
+        new_tasks_("new_tasks"),
         thread_logger_("threadmanager::register_thread"),
         work_logger_("threadmanager::register_work"),
         add_new_logger_("threadmanager::add_new"),
@@ -339,14 +339,8 @@ namespace hpx { namespace threads
             return new_state;
 
         // the thread to set the state for is currently running, so we 
-        // yield control for the main thread manager loop to release this
-        // thread
+        // schedule another thread to execute the pending set_state
         if (previous_state == active) {
-            // if we can't suspend (because we don't know the PX thread
-            // executing this function) we need to return 'unknown'
-            if (NULL == get_self_ptr()) 
-                return unknown;
-
             // schedule a new thread to set the state
             LTM_(info) << "set_state: " << "thread(" << id << "), "
                        << "is currently active, scheduling new thread...";
@@ -358,8 +352,7 @@ namespace hpx { namespace threads
         }
         else if (previous_state == terminated) {
             // If the thread has been terminated while this set_state was 
-            // waiting in the active_set_state_ queue nothing has to be done 
-            // anymore.
+            // pending nothing has to be done anymore.
             return terminated;
         }
 
@@ -504,30 +497,6 @@ namespace hpx { namespace threads
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    inline void handle_pending_set_state(threadmanager& tm, 
-        threadmanager::thread_id_queue_type& active_set_state)
-    {
-        if (!active_set_state.empty()) {
-            threadmanager::thread_id_queue_type still_active;
-            thread_id_type id = 0;
-
-            // try to reactivate the threads in the set_state queue
-            while (active_set_state.dequeue(&id)) {
-                // if the thread is still active, just re-queue the 
-                // set_state request
-                if (unknown == tm.set_state(id, pending))
-                    still_active.enqueue(id);
-            }
-
-            // copy the PX threads which are still active to the main queue
-            if (!still_active.empty()) {
-                while (still_active.dequeue(&id)) 
-                    active_set_state.enqueue(id);
-            }
-        }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     inline bool threadmanager::cleanup_terminated()
     {
         if (!terminated_items_.empty()) {
@@ -589,7 +558,6 @@ namespace hpx { namespace threads
             // print queue statistics
             log_fifo_statistics(work_items_);
             log_fifo_statistics(terminated_items_);
-            log_fifo_statistics(active_set_state_);
             log_fifo_statistics(new_tasks_);
         }
     }
@@ -732,14 +700,11 @@ namespace hpx { namespace threads
                         add_new_if_possible();    // calls notify_all
                     }
                 }
-
-                // make sure to handle pending set_state requests
-                handle_pending_set_state(*this, active_set_state_);
             }
 
             // if nothing else has to be done either wait or terminate
             bool terminate = false;
-            while (work_items_.empty() && active_set_state_.empty()) {
+            while (work_items_.empty()) {
                 // No obvious work has to be done, so a lock won't hurt too much
                 // but we lock only one of the threads, assuming this thread
                 // will do the maintenance
@@ -782,7 +747,7 @@ namespace hpx { namespace threads
                 // arrived in the meantime).
                 // Ask again if queues are empty to avoid race conditions (we 
                 // needed to lock anyways...), this way no notify_all() gets lost
-                if (work_items_.empty() && active_set_state_.empty())
+                if (work_items_.empty())
                 {
                     LTM_(info) << "tfunc(" << num_thread 
                                << "): queues empty, entering wait";
