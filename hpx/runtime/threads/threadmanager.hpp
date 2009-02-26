@@ -249,6 +249,10 @@ namespace hpx { namespace threads
         void tfunc(std::size_t num_thread);
         std::size_t tfunc_impl(std::size_t num_thread);
 
+        // thread function registered for set_state if thread is currently active
+        thread_state set_active_state(thread_id_type id, thread_state newstate,
+            thread_state_ex newstate_ex = wait_signaled);
+
     public:
         /// this notifies the thread manager that there is some more work 
         /// available 

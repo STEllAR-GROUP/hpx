@@ -293,6 +293,23 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // thread function registered for set_state if thread is currently active
+    thread_state threadmanager::set_active_state(thread_id_type id, 
+        thread_state newstate, thread_state_ex newstate_ex)
+    {
+        thread_state prevstate = set_state(id, newstate, newstate_ex);
+        if (active == prevstate) {
+            // re-schedule this task if thread is still active
+            LTM_(info) << "set_active_state: " << "thread(" << id << "), "
+                       << "is still active, scheduling new thread...";
+
+            register_work(boost::bind(&threadmanager::set_active_state, this, 
+                id, newstate, newstate_ex), "set state for active thread");
+        }
+        return terminated;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     /// The set_state function is part of the thread related API and allows
     /// to change the state of one of the threads managed by this threadmanager
     thread_state threadmanager::set_state(thread_id_type id, 
@@ -330,26 +347,21 @@ namespace hpx { namespace threads
             if (NULL == get_self_ptr()) 
                 return unknown;
 
+            // schedule a new thread to set the state
             LTM_(info) << "set_state: " << "thread(" << id << "), "
-                       << "is currently active, yielding control...";
+                       << "is currently active, scheduling new thread...";
 
-            do {
-                thread_self& self = get_self();
-                active_set_state_.enqueue(self.get_thread_id());
-                self.yield(suspended);
-                previous_state = thrd->get() ? thrd->get_state() : terminated;
-            } while (previous_state == active);
+            register_work(boost::bind(&threadmanager::set_active_state, this, 
+                id, new_state, new_state_ex), "set state for active thread");
 
-            LTM_(info) << "set_state: " << "thread(" << id << "), "
-                       << "reactivating..." << "current state(" 
-                       << get_thread_state_name(previous_state) << ")";
+            return active;     // done
         }
-
-        // If the thread has been terminated while this set_state was 
-        // waiting in the active_set_state_ queue nothing has to be done 
-        // anymore.
-        if (previous_state == terminated)
+        else if (previous_state == terminated) {
+            // If the thread has been terminated while this set_state was 
+            // waiting in the active_set_state_ queue nothing has to be done 
+            // anymore.
             return terminated;
+        }
 
         // If the previous state was pending we are supposed to remove the
         // thread from the queue. But in order to avoid linearly looking 
