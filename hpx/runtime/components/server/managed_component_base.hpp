@@ -138,30 +138,13 @@ namespace hpx { namespace components
         }
 
         /// \brief Return a pointer to the wrapped instance
+        /// \note  Caller must check validity of returned pointer
         Component* get()
         {
-            if (0 == component_) {
-                HPX_OSSTREAM strm;
-                strm << "component is NULL (" 
-                     << components::get_component_type_name(get_component_type()) 
-                     << ")";
-                HPX_THROW_EXCEPTION(invalid_status, 
-                    "managed_component<Component, Derived>::get", 
-                    HPX_OSSTREAM_GETSTRING(strm));
-            }
             return component_;
         }
         Component const* get() const
         {
-            if (0 == component_) {
-                HPX_OSSTREAM strm;
-                strm << "component is NULL (" 
-                     << components::get_component_type_name(get_component_type())
-                     << ")";
-                HPX_THROW_EXCEPTION(invalid_status, 
-                    "managed_component<Component, Derived>::get const", 
-                    HPX_OSSTREAM_GETSTRING(strm));
-            }
             return component_;
         }
 
