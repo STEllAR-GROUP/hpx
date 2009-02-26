@@ -128,7 +128,7 @@ namespace hpx { namespace components { namespace server
             &runtime_support::create_component
         > create_component_action;
 
-        typedef hpx::actions::action2<
+        typedef hpx::actions::direct_action2<
             runtime_support, runtime_support_free_component, 
             components::component_type, naming::id_type const&, 
             &runtime_support::free_component
