@@ -32,10 +32,10 @@ namespace hpx { namespace lcos
     protected:
         virtual void set_event () = 0;
 
-        virtual void set_error (hpx::error code, std::string const& msg)
+        virtual void set_error (boost::exception_ptr const& e)
         {
             // just rethrow the exception
-            HPX_RETHROW_EXCEPTION(code, "base_lco::set_error", msg);
+            boost::rethrow_exception(e);
         }
 
     public:
@@ -87,9 +87,9 @@ namespace hpx { namespace lcos
         ///
         /// \returns      The thread state the calling thread needs to be set
         ///               to after returning from this function.
-        void set_error_nonvirt (hpx::error code, std::string const& msg)
+        void set_error_nonvirt (boost::exception_ptr const& e)
         {
-            set_error(code, msg);
+            set_error(e);
         }
 
         /// Each of the exposed functions needs to be encapsulated into an action
@@ -110,8 +110,8 @@ namespace hpx { namespace lcos
         ///                     to report to this LCO instance.
         /// \param std::string  [in] The type of the error message describing 
         ///                     an error to report to this LCO instance.
-        typedef hpx::actions::direct_action2<
-            base_lco, lco_set_error, hpx::error, std::string const&,
+        typedef hpx::actions::direct_action1<
+            base_lco, lco_set_error, boost::exception_ptr const&,
             &base_lco::set_error_nonvirt
         > set_error_action;
     };

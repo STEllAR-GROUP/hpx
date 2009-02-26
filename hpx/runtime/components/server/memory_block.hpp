@@ -411,6 +411,15 @@ namespace hpx { namespace components { namespace server
             return static_cast<detail::memory_block const*>(component_.get());
         }
 
+        detail::memory_block* get_checked()
+        {
+            return get();
+        }
+        detail::memory_block const* get_checked() const
+        {
+            return get();
+        }
+
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
         // to associate this component with a given action.

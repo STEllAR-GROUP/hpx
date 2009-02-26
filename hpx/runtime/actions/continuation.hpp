@@ -49,7 +49,7 @@ namespace hpx { namespace actions
         Arg0 const& trigger(Arg0 const& arg0);
 
         ///
-        void trigger_error(hpx::exception const& e);
+        void trigger_error(boost::exception_ptr const& e);
 
     private:
         // serialization support    

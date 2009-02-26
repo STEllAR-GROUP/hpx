@@ -45,7 +45,7 @@ namespace hpx
         call(naming::address::address_type lva, boost::mpl::false_)
         {
             typedef typename Component::wrapping_type wrapping_type;
-            return reinterpret_cast<wrapping_type*>(lva)->get();
+            return reinterpret_cast<wrapping_type*>(lva)->get_checked();
         }
 
         static Component* 

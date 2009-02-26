@@ -33,7 +33,7 @@ namespace hpx { namespace lcos { namespace detail
 
     private:
         typedef Result result_type;
-        typedef std::pair<boost::system::error_code, std::string> error_type;
+        typedef boost::exception_ptr error_type;
         typedef boost::variant<result_type, error_type> data_type;
 
     public:
@@ -87,8 +87,7 @@ namespace hpx { namespace lcos { namespace detail
             {
                 // an error has been reported in the meantime, throw 
                 error_type e = boost::get<error_type>(d);
-                HPX_RETHROW_EXCEPTION(e.first.value(), 
-                    "future_value::get_data", e.second);
+                boost::rethrow_exception(e);
                 return result_type();
             }
 
@@ -112,18 +111,8 @@ namespace hpx { namespace lcos { namespace detail
             data_[slot].set(data_type(result));
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        // exposed functionality of this component
-
-        // trigger the future, set the result
-        void set_result (Result const& result)
-        {
-            // set the received result, reset error status
-            set_data(0, result);
-        }
-
         // trigger the future with the given error condition
-        void set_error (int slot, hpx::error code, std::string const& msg)
+        void set_error(int slot, boost::exception_ptr const& e)
         {
             if (slot < 0 || slot >= N) {
                 HPX_THROW_EXCEPTION(bad_parameter, 
@@ -133,7 +122,21 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             // store the error code
-            data_[slot].set(data_type(error_type(make_error_code(code), msg)));
+            data_[slot].set(data_type(e));
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // exposed functionality of this component
+
+        // trigger the future, set the result
+        void set_result (Result const& result)
+        {
+            set_data(0, result);    // set the received result, reset error status
+        }
+
+        void set_error (boost::exception_ptr const& e)
+        {
+            set_error(0, e);        // set the received error
         }
 
     private:

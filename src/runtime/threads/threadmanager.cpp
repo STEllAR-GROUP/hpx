@@ -752,7 +752,7 @@ namespace hpx { namespace threads
                     LTM_(info) << "tfunc(" << num_thread 
                                << "): queues empty, entering wait";
 
-                    if (LHPX_ENABLED(error) && !thread_map_.empty())
+                    if (LHPX_ENABLED(error) && new_tasks_.empty())
                         detail::dump_suspended_threads(thread_map_);
 
                     bool timed_out = false;

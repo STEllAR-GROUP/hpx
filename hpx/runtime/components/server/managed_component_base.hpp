@@ -148,6 +148,34 @@ namespace hpx { namespace components
             return component_;
         }
 
+        Component* get_checked()
+        {
+            if (0 == component_) {
+                HPX_OSSTREAM strm;
+                strm << "component is NULL (" 
+                     << components::get_component_type_name(get_component_type())
+                     << ")";
+                HPX_THROW_EXCEPTION(invalid_status, 
+                    "managed_component<Component, Derived>::get_checked", 
+                    HPX_OSSTREAM_GETSTRING(strm));
+            }
+            return component_;
+        }
+
+        Component const* get_checked() const
+        {
+            if (0 == component_) {
+                HPX_OSSTREAM strm;
+                strm << "component is NULL (" 
+                     << components::get_component_type_name(get_component_type())
+                     << ")";
+                HPX_THROW_EXCEPTION(invalid_status, 
+                    "managed_component<Component, Derived>::get_checked", 
+                    HPX_OSSTREAM_GETSTRING(strm));
+            }
+            return component_;
+        }
+
     protected:
         // the memory for the wrappers is managed by a one_size_heap_list
         typedef detail::wrapper_heap_list<
@@ -289,59 +317,23 @@ namespace hpx { namespace components
         // The managed_component behaves just like the wrapped object
         Component* operator-> ()
         {
-            if (0 == component_) {
-                HPX_OSSTREAM strm;
-                strm << "component is NULL (" 
-                     << components::get_component_type_name(get_component_type())
-                     << ")";
-                HPX_THROW_EXCEPTION(invalid_status, 
-                    "managed_component<Component, Derived>::operator->", 
-                    HPX_OSSTREAM_GETSTRING(strm));
-            }
-            return component_;
+            return get_checked();
         }
 
         Component const* operator-> () const
         {
-            if (0 == component_) {
-                HPX_OSSTREAM strm;
-                strm << "component is NULL (" 
-                     << components::get_component_type_name(get_component_type())
-                     << ")";
-                HPX_THROW_EXCEPTION(invalid_status, 
-                    "managed_component<Component, Derived>::operator-> const", 
-                    HPX_OSSTREAM_GETSTRING(strm));
-            }
-            return component_;
+            return get_checked();
         }
 
         ///////////////////////////////////////////////////////////////////////
         Component& operator* ()
         {
-            if (0 == component_) {
-                HPX_OSSTREAM strm;
-                strm << "component is NULL (" 
-                     << components::get_component_type_name(get_component_type())
-                     << ")";
-                HPX_THROW_EXCEPTION(invalid_status, 
-                    "managed_component<Component, Derived>::operator*", 
-                    HPX_OSSTREAM_GETSTRING(strm));
-            }
-            return *component_;
+            return *get_checked();
         }
 
         Component const& operator* () const
         {
-            if (0 == component_) {
-                HPX_OSSTREAM strm;
-                strm << "component is NULL (" 
-                     << components::get_component_type_name(get_component_type())
-                     << ")";
-                HPX_THROW_EXCEPTION(invalid_status, 
-                    "managed_component<Component, Derived>::operator* const", 
-                    HPX_OSSTREAM_GETSTRING(strm));
-            }
-            return *component_;
+            return *get_checked();
         }
 
     protected:

@@ -28,10 +28,9 @@ namespace hpx { namespace actions
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void continuation::trigger_error(hpx::exception const& e)
+    void continuation::trigger_error(boost::exception_ptr const& e)
     {
-        hpx::applier::apply<lcos::base_lco::set_error_action>(gid_, 
-            e.get_error(), std::string(e.what()));
+        hpx::applier::apply<lcos::base_lco::set_error_action>(gid_, e);
     }
 
 }}

@@ -174,10 +174,9 @@ namespace hpx { namespace actions
                 boost::get<0>(func)();
                 cont->trigger();
             }
-            catch (hpx::exception const& e) {
+            catch (hpx::exception const&) {
                 // make sure hpx::exceptions are propagated back to the client
-                cont->trigger_error(e);
-                threads::report_error(boost::current_exception());
+                cont->trigger_error(boost::current_exception());
             }
             return threads::terminated;
         }
@@ -216,10 +215,9 @@ namespace hpx { namespace actions
             try {
                 cont->trigger(boost::get<0>(func)());
             }
-            catch (hpx::exception const& e) {
+            catch (hpx::exception const&) {
                 // make sure hpx::exceptions are propagated back to the client
-                cont->trigger_error(e);
-                threads::report_error(boost::current_exception());
+                cont->trigger_error(boost::current_exception());
             }
             return threads::terminated;
         }

@@ -20,7 +20,7 @@
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="..\hpx.vsprops"
+			InheritedPropertySheets="..\hpx_application.vsprops"
 			CharacterSet="0"
 			>
 			<Tool
@@ -97,7 +97,7 @@
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="..\hpx.vsprops"
+			InheritedPropertySheets="..\hpx_application.vsprops"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
 			>
