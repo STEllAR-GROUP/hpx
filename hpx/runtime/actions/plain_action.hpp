@@ -16,6 +16,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/components/server/plain_function.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/version.hpp>
 #include <boost/shared_ptr.hpp>
@@ -382,9 +383,10 @@ namespace hpx { namespace actions
         typedef boost::mpl::true_ direct_execution;
 
         ///
-        static void execute_function(naming::address::address_type lva)
+        static util::unused_type execute_function(naming::address::address_type lva)
         {
             F();
+            return util::unused;
         }
 
         /// serialization support
@@ -800,10 +802,11 @@ namespace hpx { namespace actions
 
         ///
         template <typename Arg0>
-        static void execute_function(naming::address::address_type lva, 
+        static util::unused_type execute_function(naming::address::address_type lva, 
             Arg0 const& arg0)
         {
             F(arg0);
+            return util::unused;
         }
 
         /// serialization support

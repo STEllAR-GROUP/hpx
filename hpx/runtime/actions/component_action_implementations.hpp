@@ -481,10 +481,11 @@
 
         ///
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static void execute_function(naming::address::address_type lva, 
+        static util::unused_type execute_function(naming::address::address_type lva, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             (get_lva<Component>::call(lva)->*F)(BOOST_PP_ENUM_PARAMS(N, arg));
+            return util::unused;
         }
 
         /// serialization support
