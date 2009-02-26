@@ -83,8 +83,7 @@
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
-                c->trigger_error(e);
-                threads::report_error(boost::current_exception());
+                c->trigger_error(boost::current_exception());
                 return typename Action::result_type();
             }
         }
