@@ -143,6 +143,12 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    std::string get_thread_description(thread_id_type id)
+    {
+        return hpx::applier::get_applier().get_thread_manager().get_description(id);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     void report_error(boost::exception_ptr const& e)
     {
           hpx::applier::get_applier().get_thread_manager().report_error(e);

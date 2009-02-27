@@ -159,7 +159,7 @@ namespace hpx { namespace applier
             if (!parcel_handler_.get_resolver().resolve(gid, addr))
             {
                 HPX_OSSTREAM strm;
-                strm << gid;
+                strm << "gid" << gid;
                 HPX_THROW_EXCEPTION(unknown_component_address, 
                     "applier::address_is_local", 
                     HPX_OSSTREAM_GETSTRING(strm));
@@ -190,7 +190,7 @@ namespace hpx { namespace applier
                 if (!fa.resolve())
                 {
                     HPX_OSSTREAM strm;
-                    strm << gid;
+                    strm << "gid" << gid;
                     HPX_THROW_EXCEPTION(unknown_component_address, 
                         "applier::address_is_local", 
                         HPX_OSSTREAM_GETSTRING(strm));

@@ -244,6 +244,19 @@ namespace hpx { namespace threads
             thread_id_type id, thread_state newstate = pending,
             thread_state_ex newstate_ex = wait_timeout);
 
+        /// The get_description function is part of the thread related API and 
+        /// allows to query the description of one of the threads known to the 
+        /// threadmanager
+        ///
+        /// \param id       [in] The thread id of the thread the description 
+        ///                 should be returned for.
+        ///
+        /// \returns        This function returns the description of the 
+        ///                 thread referenced by the \a id parameter. If the 
+        ///                 thread is not known to the threadmanager the return 
+        ///                 value will be the string "<unknown>".
+        std::string get_description(thread_id_type id);
+
     protected:
         // this is the thread function executing the work items in the queue
         void tfunc(std::size_t num_thread);

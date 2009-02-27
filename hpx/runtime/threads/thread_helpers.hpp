@@ -71,6 +71,20 @@ namespace hpx { namespace threads
         thread_state state = pending, thread_state_ex stateex = wait_timeout);
 
     ///////////////////////////////////////////////////////////////////////////
+    /// The function get_thread_description is part of the thread related API 
+    /// allows to query the description of one of the threads known to the 
+    /// threadmanager.
+    ///
+    /// \param id         [in] The thread id of the thread the state should 
+    ///                   be modified for.
+    ///
+    /// \returns          This function returns the description of the 
+    ///                   thread referenced by the \a id parameter. If the 
+    ///                   thread is not known to the threadmanager the return 
+    ///                   value will be the string "<unknown>".
+    HPX_API_EXPORT std::string get_thread_description(thread_id_type id);
+
+    ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT void report_error(boost::exception_ptr const& e);
 
 }}

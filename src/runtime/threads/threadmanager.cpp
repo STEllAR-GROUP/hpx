@@ -385,6 +385,16 @@ namespace hpx { namespace threads
         return thrd->get() ? thrd->get_state() : terminated;
     }
 
+    /// The get_description function is part of the thread related API and 
+    /// allows to query the description of one of the threads known to the 
+    /// threadmanager
+    std::string threadmanager::get_description(thread_id_type id)
+    {
+        // we know that the id is actually the pointer to the thread
+        thread* thrd = reinterpret_cast<thread*>(id);
+        return thrd->get() ? thrd->get_description() : "<unknown>";
+    }
+
     /// This thread function is used by the at_timer thread below to trigger
     /// the required action.
     thread_state threadmanager::wake_timer_thread (thread_id_type id, 

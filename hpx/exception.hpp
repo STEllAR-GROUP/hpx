@@ -10,6 +10,7 @@
 #include <string>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/util.hpp>
 
@@ -247,10 +248,12 @@ namespace hpx
     namespace detail
     {
         struct tag_throw_function {};
+        struct tag_throw_thread_name {};
         struct tag_throw_file {};
         struct tag_throw_line {};
 
         typedef boost::error_info<struct tag_throw_function, std::string> throw_function;
+        typedef boost::error_info<struct tag_throw_thread_name, std::string> throw_thread_name;
         typedef boost::error_info<struct tag_throw_file, std::string> throw_file;
         typedef boost::error_info<struct tag_throw_line, int> throw_line;
 
@@ -258,18 +261,42 @@ namespace hpx
         void throw_exception(Exception const& e, char const* func, 
             std::string const& file, int line)
         {
-            throw boost::enable_current_exception(
-                boost::enable_error_info(e) << boost::throw_function(func) <<
-                    throw_file(file) << throw_line(line));
+            threads::thread_self* self = threads::get_self_ptr();
+            if (NULL != self) {
+                threads::thread_id_type id = self->get_thread_id();
+                throw boost::enable_current_exception(
+                    boost::enable_error_info(e) 
+                        << boost::throw_function(func) 
+                        << throw_thread_name(threads::get_thread_description(id))
+                        << throw_file(file) << throw_line(line));
+            }
+            else {
+                throw boost::enable_current_exception(
+                    boost::enable_error_info(e) 
+                        << boost::throw_function(func) 
+                        << throw_file(file) << throw_line(line));
+            }
         }
 
         template <typename Exception>
         void throw_exception(Exception const& e, std::string const& func, 
             std::string const& file, int line)
         {
-            throw boost::enable_current_exception(
-                boost::enable_error_info(e) << throw_function(func) <<
-                    throw_file(file) << throw_line(line));
+            threads::thread_self* self = threads::get_self_ptr();
+            if (NULL != self) {
+                threads::thread_id_type id = self->get_thread_id();
+                throw boost::enable_current_exception(
+                    boost::enable_error_info(e) 
+                        << throw_function(func) 
+                        << throw_thread_name(threads::get_thread_description(id))
+                        << throw_file(file) << throw_line(line));
+            }
+            else {
+                throw boost::enable_current_exception(
+                    boost::enable_error_info(e) 
+                        << throw_function(func) 
+                        << throw_file(file) << throw_line(line));
+            }
         }
     }
 

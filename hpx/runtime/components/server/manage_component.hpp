@@ -48,18 +48,22 @@ namespace hpx { namespace components { namespace server
         naming::address addr;
         if (!appl.get_agas_client().resolve(gid, addr)) 
         {
+            HPX_OSSTREAM strm;
+            strm << "global id " << gid << " is not bound to any "
+                    "component instance";
             HPX_THROW_EXCEPTION(hpx::unknown_component_address,
-                "destroy<Component>", 
-                "global id is not bound to any component instance");
+                "destroy<Component>", HPX_OSSTREAM_GETSTRING(strm));
         }
 
         // make sure this component is located here
         if (appl.here() != addr.locality_) 
         {
             // FIXME: should the component be re-bound ?
+            HPX_OSSTREAM strm;
+            strm << "global id " << gid << " is not bound to any local "
+                    "component instance";
             HPX_THROW_EXCEPTION(hpx::unknown_component_address,
-                "destroy<Component>", 
-                "global id is not bound to any local component instance");
+                "destroy<Component>", HPX_OSSTREAM_GETSTRING(strm));
         }
 
         // make sure it's the correct component type
@@ -69,8 +73,8 @@ namespace hpx { namespace components { namespace server
         {
             // FIXME: should the component be re-bound ?
             HPX_OSSTREAM strm;
-            strm << "global id is not bound to a component instance of type: "
-                 << get_component_type_name(type);
+            strm << "global id " << gid << " is not bound to a component "
+                    "instance of type: " << get_component_type_name(type);
             HPX_THROW_EXCEPTION(hpx::unknown_component_address,
                 "destroy<Component>", 
                 HPX_OSSTREAM_GETSTRING(strm));
