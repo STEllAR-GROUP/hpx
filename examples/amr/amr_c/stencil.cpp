@@ -6,6 +6,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/future_wait.hpp>
 
+#include <boost/foreach.hpp>
+
 #include "stencil.hpp"
 #include "logging.hpp"
 #include "stencil_data.hpp"
@@ -25,6 +27,23 @@ namespace hpx { namespace components { namespace amr
         std::vector<naming::id_type> const& gids, int row, int column)
     {
         BOOST_ASSERT(gids.size() == 3);
+
+        // make sure all the gids are looking valid
+        if (result == naming::invalid_id)
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "stencil::eval", "result gid is invalid");
+            return -1;
+        }
+        BOOST_FOREACH(naming::id_type gid, gids)
+        {
+            if (gid == naming::invalid_id)
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "stencil::eval", "input gid is invalid");
+                return -1;
+            }
+        }
 
         // start asynchronous get operations
 
