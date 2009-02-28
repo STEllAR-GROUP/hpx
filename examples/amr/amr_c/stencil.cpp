@@ -36,18 +36,11 @@ namespace hpx { namespace components { namespace amr
             return -1;
         }
 
-        int input_count = 0;
+        // this should occur only after result has been delivered already
         BOOST_FOREACH(naming::id_type gid, gids)
         {
             if (gid == naming::invalid_id)
-            {
-                HPX_OSSTREAM strm;
-                strm << "input gid at index(" << input_count << ") is invalid";
-                HPX_THROW_EXCEPTION(bad_parameter,
-                    "stencil::eval", HPX_OSSTREAM_GETSTRING(strm));
                 return -1;
-            }
-            ++input_count;
         }
 
         // start asynchronous get operations
