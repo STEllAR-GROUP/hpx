@@ -35,14 +35,19 @@ namespace hpx { namespace components { namespace amr
                 "stencil::eval", "result gid is invalid");
             return -1;
         }
+
+        int input_count = 0;
         BOOST_FOREACH(naming::id_type gid, gids)
         {
             if (gid == naming::invalid_id)
             {
+                HPX_OSSTREAM strm;
+                strm << "input gid at index(" << input_count << ") is invalid";
                 HPX_THROW_EXCEPTION(bad_parameter,
-                    "stencil::eval", "input gid is invalid");
+                    "stencil::eval", HPX_OSSTREAM_GETSTRING(strm));
                 return -1;
             }
+            ++input_count;
         }
 
         // start asynchronous get operations
