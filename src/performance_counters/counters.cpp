@@ -219,5 +219,17 @@ namespace hpx { namespace performance_counters
         return status_valid_data;
     }
 
+    /// \brief Return the counter type name from a given full instance name
+    counter_status get_counter_type_name(std::string const& name, 
+        std::string& type_name)
+    {
+        counter_type_path_elements p;
+
+        counter_status status = get_counter_path_elements(name, p);
+        if (status_valid_data != status) return status;
+
+        return get_counter_name(p, type_name);
+    }
+
 }}
 
