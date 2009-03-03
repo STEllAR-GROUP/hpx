@@ -43,6 +43,9 @@ namespace hpx { namespace performance_counters
     counter_status get_counter_name(counter_path_elements const& path, 
         std::string& result)
     {
+        if (path.objectname_.empty())
+            return status_invalid_data;
+
         result = "/";
         if (!path.objectname_.empty())
             result += path.objectname_;
@@ -71,6 +74,63 @@ namespace hpx { namespace performance_counters
 
         result += "/";
         result += path.countername_;
+
+        return status_valid_data;
+    }
+
+    /// \brief Create a full name of a counter from the contents of the given 
+    ///        \a counter_path_elements instance.
+    counter_status get_counter_name(counter_type_path_elements const& path, 
+        std::string& result)
+    {
+        if (path.objectname_.empty())
+            return status_invalid_data;
+
+        result = "/";
+        if (!path.objectname_.empty())
+            result += path.objectname_;
+
+        if (path.countername_.empty())
+            return status_invalid_data;
+
+        result += "/";
+        result += path.countername_;
+
+        return status_valid_data;
+    }
+
+    /// \brief Fill the given \a counter_type_path_elements instance from the 
+    ///        given full name of a counter
+    ///
+    ///    /objectname(parentinstancename/instancename#instanceindex)/countername
+    counter_status get_counter_path_elements(std::string const& name, 
+        counter_type_path_elements& path)
+    {
+        if (name.empty() || name[0] != '/')
+            return status_invalid_data;
+
+        std::string::size_type p = name.find_first_of("(/", 1);
+        if (p == std::string::npos)
+            return status_invalid_data;
+
+        // object name is the first part of the full name
+        path.objectname_ = name.substr(1, p-1);
+        if (path.objectname_.empty())
+            return status_invalid_data;
+
+        if (name[p] == '(') {
+            std::string::size_type p1 = name.find_first_of(")", p);
+            if (p1 == std::string::npos || p1 >= name.size()) 
+                return status_invalid_data;     // unmatched parenthesis
+            p = p1+1;
+        }
+
+        // counter name is always the last part of the full name
+        path.countername_ = name.substr(p+1);
+        if (path.countername_.empty())
+            return status_invalid_data;
+        if (path.countername_.find_first_of("/") != std::string::npos)
+            return status_invalid_data;
 
         return status_valid_data;
     }

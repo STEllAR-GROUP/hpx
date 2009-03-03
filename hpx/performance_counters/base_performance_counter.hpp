@@ -114,13 +114,49 @@ namespace hpx { namespace performance_counters
     /// i.e.
     ///    /threadmanager(localityprefix/thread#2)/queuelength
     ///
-    struct counter_path_elements
+    struct counter_type_path_elements
     {
+        counter_type_path_elements()
+        {}
+
+        template <typename S1, typename S2>
+        counter_type_path_elements(S1 const& obj, S2 const& counter)
+          : objectname_(obj), countername_(counter)
+        {}
+
         std::string objectname_;          ///< the name of the performance object 
+        std::string countername_;         ///< contains the counter name
+
+    protected:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int)
+        {
+            ar & objectname_ & countername_;
+        }
+    };
+
+    struct counter_path_elements : counter_type_path_elements
+    {
+        typedef counter_type_path_elements base_type;
+
+        counter_path_elements() 
+          : instanceindex_(0)
+        {}
+
+        template <typename S1, typename S2, typename S3, typename S4>
+        counter_path_elements(S1 const& obj, S2 const& counter, 
+                S3 const& parent, S4 const& instance, int index = 0) 
+          : base_type(obj, counter), 
+            parentinstancename_(parent), instancename_(instance),
+            instanceindex_(index)
+        {}
+
         std::string parentinstancename_;  ///< the name of the parent instance 
         std::string instancename_;        ///< the name of the object instance 
         boost::uint32_t instanceindex_;   ///< the instance index 
-        std::string countername_;         ///< contains the counter name
 
     private:
         // serialization support
@@ -129,15 +165,26 @@ namespace hpx { namespace performance_counters
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
         {
-            ar & objectname_ & parentinstancename_ & instancename_ & 
-                 instanceindex_ & countername_;
+            typedef counter_type_path_elements base_type;
+            ar & boost::serialization::base_object<base_type>(*this);
+            ar & parentinstancename_ & instancename_ & instanceindex_;
         }
     };
+
+    /// \brief Create a full name of a counter from the contents of the given 
+    ///        \a counter_type_path_elements instance.
+    HPX_API_EXPORT counter_status get_counter_name(
+        counter_type_path_elements const& path, std::string& result);
 
     /// \brief Create a full name of a counter from the contents of the given 
     ///        \a counter_path_elements instance.
     HPX_API_EXPORT counter_status get_counter_name(
         counter_path_elements const& path, std::string& result);
+
+    /// \brief Fill the given \a counter_type_path_elements instance from the 
+    ///        given full name of a counter
+    HPX_API_EXPORT counter_status get_counter_path_elements(
+        std::string const& name, counter_type_path_elements& path);
 
     /// \brief Fill the given \a counter_path_elements instance from the given 
     ///        full name of a counter
