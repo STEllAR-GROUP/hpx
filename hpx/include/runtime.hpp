@@ -12,6 +12,6 @@
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/applier.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/runtime/runtime.hpp>
+#include <hpx/runtime.hpp>
 
 #endif

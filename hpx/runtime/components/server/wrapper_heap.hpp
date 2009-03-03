@@ -17,6 +17,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming/full_address.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

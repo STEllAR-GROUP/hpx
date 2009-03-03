@@ -27,7 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx 
 {
-    /// \class runtime runtime.hpp hpx/runtime/runtime.hpp
+    /// \class runtime runtime.hpp hpx/runtime.hpp
     ///
     /// The \a runtime class encapsulates the HPX runtime system in a simple to 
     /// use way. It makes sure all required parts of the HPX runtime system are

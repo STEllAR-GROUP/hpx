@@ -8,6 +8,7 @@
 
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/naming/full_address.hpp>
 
 namespace hpx { namespace components 
 {

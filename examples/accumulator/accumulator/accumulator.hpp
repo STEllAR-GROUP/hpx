@@ -6,7 +6,7 @@
 #if !defined(HPX_COMPONENTS_ACCUMULATOR_MAY_18_2008_0822AM)
 #define HPX_COMPONENTS_ACCUMULATOR_MAY_18_2008_0822AM
 
-#include <hpx/runtime/runtime.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
 #include "stubs/accumulator.hpp"

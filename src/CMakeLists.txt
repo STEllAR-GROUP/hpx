@@ -11,7 +11,8 @@ set (hpxlib_global_HEADERS
     ${hpx_SOURCE_DIR}/hpx/exception_list.hpp
     ${hpx_SOURCE_DIR}/hpx/hpx.hpp
     ${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp
-    ${hpx_SOURCE_DIR}/hpx/version.hpp)
+    ${hpx_SOURCE_DIR}/hpx/version.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime.hpp)
 source_group("Header Files" 
     FILES ${hpxlib_global_HEADERS})
 
@@ -59,10 +60,15 @@ set (hpxlib_lcos_HEADERS
 source_group("Header Files\\lcos" 
     FILES ${hpxlib_lcos_HEADERS})
 
+# Performance counters
+set (hpxlib_performance_counters_HEADERS
+    ${hpx_SOURCE_DIR}/hpx/performance_counters/base_performance_counter.hpp)
+source_group("Header Files\\performance_counters" 
+    FILES ${hpxlib_performance_counters_HEADERS})
+
 # runtime
 set (hpxlib_runtime_HEADERS
-    ${hpx_SOURCE_DIR}/hpx/runtime/get_lva.hpp
-    ${hpx_SOURCE_DIR}/hpx/runtime/runtime.hpp)
+    ${hpx_SOURCE_DIR}/hpx/runtime/get_lva.hpp)
 source_group("Header Files\\runtime" 
     FILES ${hpxlib_runtime_HEADERS})
 
@@ -202,6 +208,7 @@ set (hpxlib_HEADERS
     ${hpxlib_config_HEADERS}
     ${hpxlib_include_HEADERS}
     ${hpxlib_lcos_HEADERS}
+    ${hpxlib_performance_counters_HEADERS}
     ${hpxlib_runtime_HEADERS}
     ${hpxlib_actions_HEADERS}
     ${hpxlib_applier_HEADERS}
@@ -216,7 +223,8 @@ set (hpxlib_HEADERS
 ###############################################################################
 # global
 set (hpxlib_global_SOURCES
-    ${hpx_SOURCE_DIR}/src/exception_list.cpp)
+    ${hpx_SOURCE_DIR}/src/exception_list.cpp
+    ${hpx_SOURCE_DIR}/src/runtime.cpp)
 source_group ("Source Files" 
     FILES ${hpxlib_global_SOURCES})
 
@@ -226,11 +234,11 @@ set (hpxlib_lcos_SOURCES
 source_group ("Source Files\\lcos" 
     FILES ${hpxlib_lcos_SOURCES})
 
-# runtime
-set (hpxlib_runtime_SOURCES
-    ${hpx_SOURCE_DIR}/src/runtime/runtime.cpp)
-source_group ("Source Files\\runtime" 
-    FILES ${hpxlib_runtime_SOURCES})
+# performance counters
+set (hpxlib_performance_counters_SOURCES
+    ${hpx_SOURCE_DIR}/src/performance_counters/base_performance_counter.cpp)
+source_group ("Source Files\\performance_counters" 
+    FILES ${hpxlib_performance_counters_SOURCES})
 
 # actions 
 set (hpxlib_actions_SOURCES
@@ -306,7 +314,7 @@ source_group ("Source Files\\util"
 set (hpxlib_SOURCES
     ${hpxlib_global_SOURCES}
     ${hpxlib_lcos_SOURCES}
-    ${hpxlib_runtime_SOURCES}
+    ${hpxlib_performance_counters_SOURCES}
     ${hpxlib_actions_SOURCES}
     ${hpxlib_applier_SOURCES}
     ${hpxlib_components_SOURCES}
