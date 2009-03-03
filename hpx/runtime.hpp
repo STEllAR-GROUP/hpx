@@ -18,6 +18,7 @@
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
+#include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/thread/tss.hpp>
@@ -259,6 +260,20 @@ namespace hpx
             return action_manager_;
         }
 
+        /// \brief Allow access to the registry counter registry instance used 
+        ///        by the HPX runtime.
+        performance_counters::registry& get_counter_registry()
+        {
+            return counters_;
+        }
+
+        /// \brief Allow access to the registry counter registry instance used 
+        ///        by the HPX runtime.
+        performance_counters::registry const& get_counter_registry() const
+        {
+            return counters_;
+        }
+
         /// \brief Allow access to the locality this runtime instance is 
         /// associated with.
         ///
@@ -299,6 +314,7 @@ namespace hpx
         actions::action_manager action_manager_;
         components::server::runtime_support runtime_support_;
         boost::signals::scoped_connection default_error_sink_;
+        performance_counters::registry counters_;
 
         // list of functions to call on exit
         typedef boost::lockfree::fifo<boost::function<void()> > on_exit_type;

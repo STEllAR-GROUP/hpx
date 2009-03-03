@@ -506,13 +506,21 @@
 				Name="Performance Counters"
 				>
 				<File
-					RelativePath="..\..\..\src\performance_counters\base_performance_counter.cpp"
+					RelativePath="..\..\..\src\performance_counters\counters.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\..\src\performance_counters\registry.cpp"
 					>
 				</File>
+				<Filter
+					Name="Stubs"
+					>
+					<File
+						RelativePath="..\..\..\src\performance_counters\stubs\performance_counter.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -1088,13 +1096,37 @@
 				Name="Performance Counters"
 				>
 				<File
-					RelativePath="..\..\..\hpx\performance_counters\base_performance_counter.hpp"
+					RelativePath="..\..\..\hpx\performance_counters\counters.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\performance_counters\performance_counter.hpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\..\hpx\performance_counters\registry.hpp"
 					>
 				</File>
+				<Filter
+					Name="Server"
+					>
+					<File
+						RelativePath="..\..\..\hpx\performance_counters\server\base_performance_counter.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\hpx\performance_counters\server\raw_counter.hpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Stubs"
+					>
+					<File
+						RelativePath="..\..\..\hpx\performance_counters\stubs\performance_counter.hpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter

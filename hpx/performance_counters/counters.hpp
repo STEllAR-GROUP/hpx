@@ -3,13 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PERFORMANCE_COUNTERS_BASE_MAR_01_2009_0134PM)
-#define HPX_PERFORMANCE_COUNTERS_BASE_MAR_01_2009_0134PM
+#if !defined(HPX_PERFORMANCE_COUNTERS_MAR_01_2009_0134PM)
+#define HPX_PERFORMANCE_COUNTERS_MAR_01_2009_0134PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/serialization/serialization.hpp>
@@ -103,16 +100,18 @@ namespace hpx { namespace performance_counters
         status_valid_data,      ///< No error occurred, data is valid
         status_new_data,        ///< Data is valid and different from last call
         status_invalid_data,    ///< Some error occurred, data is not value
+        status_already_defined, ///< The type or instance already has been defined
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// A counter_path holds the elements of a full name for a counter instance
-    /// Generally, a full name of a counter has the structure:
+    /// A counter_type_path_elements holds the elements of a full name for a 
+    /// counter type. Generally, a full name of a counter type has the 
+    /// structure:
     ///
-    ///    /objectname(parentinstancename/instancename#instanceindex)/countername
+    ///    /objectname/countername
     ///
     /// i.e.
-    ///    /threadmanager(localityprefix/thread#2)/queuelength
+    ///    /queue/length
     ///
     struct counter_type_path_elements
     {
@@ -138,6 +137,16 @@ namespace hpx { namespace performance_counters
         }
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// A counter_path_elements holds the elements of a full name for a counter 
+    /// instance. Generally, a full name of a counter instance has the 
+    /// structure:
+    ///
+    ///    /objectname(parentinstancename/instancename#instanceindex)/countername
+    ///
+    /// i.e.
+    ///    /queue(localityprefix/thread#2)/length
+    ///
     struct counter_path_elements : counter_type_path_elements
     {
         typedef counter_type_path_elements base_type;
@@ -171,8 +180,8 @@ namespace hpx { namespace performance_counters
         }
     };
 
-    /// \brief Create a full name of a counter from the contents of the given 
-    ///        \a counter_type_path_elements instance.
+    /// \brief Create a full name of a counter type from the contents of the 
+    ///        given \a counter_type_path_elements instance.
     HPX_API_EXPORT counter_status get_counter_name(
         counter_type_path_elements const& path, std::string& result);
 
@@ -182,7 +191,7 @@ namespace hpx { namespace performance_counters
         counter_path_elements const& path, std::string& result);
 
     /// \brief Fill the given \a counter_type_path_elements instance from the 
-    ///        given full name of a counter
+    ///        given full name of a counter type
     HPX_API_EXPORT counter_status get_counter_path_elements(
         std::string const& name, counter_type_path_elements& path);
 
@@ -191,9 +200,17 @@ namespace hpx { namespace performance_counters
     HPX_API_EXPORT counter_status get_counter_path_elements(
         std::string const& name, counter_path_elements& path);
 
+    /// \brief Return the counter type name from a given full instance name
+    HPX_API_EXPORT counter_status get_counter_type_name(
+        std::string const& name, std::string& type_name);
+
     ///////////////////////////////////////////////////////////////////////////
     struct counter_info
     {
+        counter_info(counter_type type = counter_raw)
+          : type_(type), version_(0x01000000), status_(status_valid_data)
+        {}
+
         counter_type type_;         ///< The type of the described counter
         boost::uint32_t version_;   ///< The version of the described counter
                                     ///< using the 0xMMmmSSSS scheme
@@ -215,6 +232,10 @@ namespace hpx { namespace performance_counters
     ///////////////////////////////////////////////////////////////////////////
     struct counter_value
     {
+        counter_value(boost::int64_t value = 0)
+          : status_(status_new_data), time_(), value_(value)
+        {}
+
         counter_status status_;     ///< The status of the counter value
         boost::int64_t time_;       ///< The local time when data was collected
         boost::int64_t value_;      ///< The current counter value
@@ -228,80 +249,6 @@ namespace hpx { namespace performance_counters
         {
             ar & status_ & time_ & value_;
         }
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    // parcel action code: the action to be performed on the destination 
-    // object 
-    enum actions
-    {
-        performance_counter_get_counter_info = 0,
-        performance_counter_get_counter_value = 1,
-    };
-
-    class base_performance_counter 
-    {
-    protected:
-        /// Destructor, needs to be virtual to allow for clean destruction of
-        /// derived objects
-        virtual ~base_performance_counter() {}
-
-        virtual void get_counter_info(counter_info& info) = 0;
-        virtual void get_counter_value(counter_value& value) = 0;
-
-    public:
-        // components must contain a typedef for wrapping_type defining the
-        // simple_component type used to encapsulate instances of this 
-        // component
-        typedef components::managed_component<base_performance_counter> wrapping_type;
-
-        /// \brief finalize() will be called just before the instance gets 
-        ///        destructed
-        void finalize() {}
-
-        // This is the component id. Every component needs to have a function
-        // \a get_component_type() which is used by the generic action 
-        // implementation to associate this component with a given action.
-        static components::component_type get_component_type() 
-        { 
-            return components::component_performance_counter; 
-        }
-        static void set_component_type(components::component_type) 
-        { 
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        counter_info get_counter_info_nonvirt()
-        {
-            counter_info info;
-            get_counter_info(info);
-            return info;
-        }
-
-        counter_value get_counter_value_nonvirt()
-        {
-            counter_value value;
-            get_counter_value(value);
-            return value;
-        }
-
-        /// Each of the exposed functions needs to be encapsulated into an action
-        /// type, allowing to generate all required boilerplate code for threads,
-        /// serialization, etc.
-
-        /// The \a get_counter_info_action may be used to ...
-        typedef hpx::actions::result_action0<
-            base_performance_counter, counter_info, 
-            performance_counter_get_counter_info, 
-            &base_performance_counter::get_counter_info_nonvirt
-        > get_counter_info_action;
-
-        /// The \a get_counter_value_action may be used to ...
-        typedef hpx::actions::result_action0<
-            base_performance_counter, counter_value, 
-            performance_counter_get_counter_value, 
-            &base_performance_counter::get_counter_value_nonvirt
-        > get_counter_value_action;
     };
 
 }}

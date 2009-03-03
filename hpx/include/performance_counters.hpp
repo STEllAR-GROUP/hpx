@@ -7,7 +7,7 @@
 #define HPX_PERFORMANCE_COUNTERS_MAR_01_2009_0212PM
 
 #include <hpx/config.hpp>
-#include <hpx/performance_counters/base_performance_counter.hpp>
+#include <hpx/performance_counters/counters.hpp>
 
 #endif
 

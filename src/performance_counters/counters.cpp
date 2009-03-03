@@ -5,7 +5,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
-#include <hpx/performance_counters/base_performance_counter.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/server/base_performance_counter.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
@@ -17,10 +18,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the performance counter  actions
 HPX_REGISTER_ACTION_EX(
-    hpx::performance_counters::base_performance_counter::get_counter_info_action, 
+    hpx::performance_counters::server::base_performance_counter::get_counter_info_action, 
     performance_counter_get_counter_info_action);
 HPX_REGISTER_ACTION_EX(
-    hpx::performance_counters::base_performance_counter::get_counter_value_action, 
+    hpx::performance_counters::server::base_performance_counter::get_counter_value_action, 
     performance_counter_get_counter_value_action);
 
 HPX_REGISTER_ACTION_EX(
@@ -31,7 +32,7 @@ HPX_REGISTER_ACTION_EX(
     set_result_action_counter_value);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::performance_counters::base_performance_counter);
+HPX_DEFINE_GET_COMPONENT_TYPE(hpx::performance_counters::server::base_performance_counter);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_info>);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_value>);
 

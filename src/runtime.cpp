@@ -71,6 +71,7 @@ namespace hpx
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_),
+        counters_(agas_client_),
         on_exit_functions_("on_exit_functions", false)
     {
         components::server::get_error_dispatcher().register_error_sink(
@@ -100,6 +101,7 @@ namespace hpx
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_),
+        counters_(agas_client_),
         on_exit_functions_("on_exit_functions", false)
     {
         components::server::get_error_dispatcher().register_error_sink(
@@ -128,6 +130,7 @@ namespace hpx
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),
         runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_),
+        counters_(agas_client_),
         on_exit_functions_("on_exit_functions", false)
     {
         components::server::get_error_dispatcher().register_error_sink(
