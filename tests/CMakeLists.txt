@@ -5,7 +5,7 @@
 
 set(test_SUBDIRS 
     am_tests applier_tests component_tests lco_tests performance 
-    threadmanager_tests)
+    performance_counters threadmanager_tests)
 
 foreach(subdir ${test_SUBDIRS})
     add_subdirectory(${subdir})
