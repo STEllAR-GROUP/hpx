@@ -72,6 +72,7 @@ link_directories(${Boost_LIBRARY_DIR})
 # We need to include several hpx directories for header files
 include_directories(${hpx_SOURCE_DIR})
 include_directories(${hpx_SOURCE_DIR}/external/cache)
+include_directories(${hpx_SOURCE_DIR}/external/chrono)
 include_directories(${hpx_SOURCE_DIR}/external/coroutine)
 include_directories(${hpx_SOURCE_DIR}/external/endian)
 if(${Boost_MINOR_VERSION} LESS 36)
