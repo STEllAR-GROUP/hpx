@@ -126,7 +126,7 @@ add_definitions(-DBOOST_SIGNALS_DYN_LINK)
 add_definitions(-DBOOST_THREAD_DYN_DLL)
 
 # Boost.Chrono gets linked in directly (at least for now)
-add_definitions(-DBOOST_CHRONO_NO_LIB))
+add_definitions(-DBOOST_CHRONO_NO_LIB)
 
 # compiler/platform specific configuration
 if(MSVC)
