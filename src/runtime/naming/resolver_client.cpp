@@ -312,7 +312,8 @@ namespace hpx { namespace naming
                 BOOST_ASSERT(id.get_msb() == realkey.id_.get_msb());
                 addr = e.get().first;
                 addr.address_ += (id.get_lsb() - realkey.id_.get_lsb()) * e.get().second;
-                ec = make_success_code();
+                if (&ec != &throws)
+                    ec = make_success_code();
                 return true;
             }
         }
@@ -584,7 +585,8 @@ namespace hpx { namespace naming
             }
         }
 
-        ec = make_success_code();
+        if (&ec != &throws)
+            ec = make_success_code();
         return client_connection;
     }
 
@@ -730,7 +732,8 @@ namespace hpx { namespace naming
             return false;
         }
 
-        ec = make_success_code();
+        if (&ec != &throws)
+            ec = make_success_code();
         return true;
     }
 

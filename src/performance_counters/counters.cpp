@@ -85,7 +85,8 @@ namespace hpx { namespace performance_counters
         result += "/";
         result += path.countername_;
 
-        ec = make_success_code();
+        if (&ec != &throws)
+            ec = make_success_code();
         return status_valid_data;
     }
 
@@ -113,7 +114,8 @@ namespace hpx { namespace performance_counters
         result += "/";
         result += path.countername_;
 
-        ec = make_success_code();
+        if (&ec != &throws)
+            ec = make_success_code();
         return status_valid_data;
     }
 
@@ -168,7 +170,8 @@ namespace hpx { namespace performance_counters
             return status_invalid_data;
         }
 
-        ec = make_success_code();
+        if (&ec != &throws)
+            ec = make_success_code();
         return status_valid_data;
     }
 
@@ -294,7 +297,8 @@ namespace hpx { namespace performance_counters
             return status_invalid_data;
         }
 
-        ec = make_success_code();
+        if (&ec != &throws)
+            ec = make_success_code();
         return status_valid_data;
     }
 

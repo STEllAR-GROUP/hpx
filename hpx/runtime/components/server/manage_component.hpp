@@ -45,7 +45,8 @@ namespace hpx { namespace components { namespace server
         Component* c = static_cast<Component*>(Component::create(count));
         naming::id_type gid = c->get_gid();
         if (gid) {
-            ec = make_success_code();
+            if (&ec != &throws)
+                ec = make_success_code();
             return gid;
         }
 
@@ -103,7 +104,8 @@ namespace hpx { namespace components { namespace server
 
         // delete the local instances
         Component::destroy(reinterpret_cast<Component*>(addr.address_));
-        ec = make_success_code();
+        if (&ec != &throws)
+            ec = make_success_code();
     }
 
 }}}
