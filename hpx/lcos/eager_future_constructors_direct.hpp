@@ -50,7 +50,7 @@
             if (!this->get_full_address(fa))
             {
                 HPX_OSSTREAM strm;
-                strm << "gid" << gid;
+                strm << "couldn't retrieve full address for gid" << gid;
                 HPX_THROW_EXCEPTION(unknown_component_address, 
                     "eager_future<Action, Result>::apply", 
                     HPX_OSSTREAM_GETSTRING(strm));

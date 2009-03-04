@@ -191,7 +191,7 @@ namespace hpx { namespace util
             agas_logger()->writer().write(logformat, logdest);
             agas_logger()->writer().add_formatter(locality_prefix(prefix));
             agas_logger()->mark_as_initialized();
-            agas_level()->set_enabled(detail::get_log_level(loglevel));
+            agas_level()->set_enabled(lvl);
         }
     }
 
@@ -232,7 +232,7 @@ namespace hpx { namespace util
             timing_logger()->writer().write(logformat, logdest);
             timing_logger()->writer().add_formatter(locality_prefix(prefix));
             timing_logger()->mark_as_initialized();
-            timing_level()->set_enabled(detail::get_log_level(loglevel));
+            timing_level()->set_enabled(lvl);
         }
     }
 
@@ -333,7 +333,7 @@ namespace hpx { namespace util
 
             agas_console_logger()->writer().write(logformat, logdest);
             agas_console_logger()->mark_as_initialized();
-            agas_console_level()->set_enabled(detail::get_log_level(loglevel));
+            agas_console_level()->set_enabled(lvl);
         }
     }
 
@@ -369,7 +369,7 @@ namespace hpx { namespace util
 
             timing_console_logger()->writer().write(logformat, logdest);
             timing_console_logger()->mark_as_initialized();
-            timing_console_level()->set_enabled(detail::get_log_level(loglevel));
+            timing_console_level()->set_enabled(lvl);
         }
     }
 
@@ -462,7 +462,8 @@ namespace hpx { namespace util { namespace detail
                 // logging related to AGAS
                     "[hpx.logging.agas]",
                     "level = ${HPX_AGAS_LOGLEVEL:0}",
-                    "destination = ${HPX_AGAS_LOGDESTINATION:console}",
+//                     "destination = ${HPX_AGAS_LOGDESTINATION:console}",
+                    "destination = ${HPX_AGAS_LOGDESTINATION:file(hpx.agas.$[system.pid].log)}",
                     "format = ${HPX_AGAS_LOGFORMAT:%time%(" HPX_TIMEFORMAT ") [%idx%][AGAS] |\\n}",
 
                 // console logging related to AGAS

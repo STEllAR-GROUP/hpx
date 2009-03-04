@@ -21,27 +21,6 @@
 #include <boost/logging/format_fwd.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
-{
-    ///////////////////////////////////////////////////////////////////////////
-    typedef boost::logging::named_logger<>::type logger_type;
-    typedef boost::logging::level::holder filter_type;
-
-    ///////////////////////////////////////////////////////////////////////////
-    BOOST_DECLARE_LOG_FILTER(agas_console_level, filter_type)
-    BOOST_DECLARE_LOG(agas_console_logger, logger_type)
-
-    ///////////////////////////////////////////////////////////////////////////
-    BOOST_DECLARE_LOG_FILTER(timing_console_level, filter_type)
-    BOOST_DECLARE_LOG(timing_console_logger, logger_type)
-
-    ///////////////////////////////////////////////////////////////////////////
-    BOOST_DECLARE_LOG_FILTER(hpx_console_level, filter_type)
-    BOOST_DECLARE_LOG(hpx_console_logger, logger_type)
-
-}}
-
-///////////////////////////////////////////////////////////////////////////////
 // definitions related to console logging
 
 #define LAGAS_CONSOLE_(lvl)                                                   \
