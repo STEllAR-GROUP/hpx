@@ -84,6 +84,7 @@ namespace hpx { namespace naming { namespace server
                     // this shouldn't happen
                     rep = reply(command_getprefix, no_success, 
                         "prefix is already bound to local address");
+                    return;
                 }
                 else {
                     // the zero as last parameter means 'all' lsb gids
@@ -256,11 +257,16 @@ namespace hpx { namespace naming { namespace server
                 // The real prefix has to be used as the 32 most 
                 // significant bits of global id's
 
+                LAGAS_(debug) << "handle_getidrange: reusing site: " 
+                    << req.get_site() << "prefix: " << (*it).second.first
+                    << "current upper: " << (*it).second.second;
+
                 // generate the new id range
                 naming::id_type lower ((*it).second.second + 1);
                 naming::id_type upper (lower + (req.get_count() - 1));
 
                 if (upper.get_msb() != lower.get_msb()) {
+                    // handle overflow
                     if ((lower.get_msb() & ~0xFFFFFFFF) == 0xFFFFFFFF)
                     {
                         rep = reply(command_getprefix, internal_server_error,
@@ -274,6 +280,9 @@ namespace hpx { namespace naming { namespace server
                 // store the new lower bound
                 (*it).second.second = upper;
 
+                LAGAS_(debug) << "handle_getidrange: new upper: " 
+                    << (*it).second.second;
+
                 // existing entry
                 rep = reply(repeated_request, command_getidrange, lower, upper); 
             }
@@ -285,10 +294,21 @@ namespace hpx { namespace naming { namespace server
                 // start assigning ids with the second block of 64Bit numbers only
                 naming::id_type lower_id (id.get_msb() + 1, 0);
 
+                LAGAS_(debug) << "handle_getidrange: new site: " 
+                    << req.get_site() << "prefix: " << id
+                    << "current upper: " << lower_id;
+
                 std::pair<site_prefix_map_type::iterator, bool> p =
                     site_prefixes_.insert(
                         site_prefix_map_type::value_type(req.get_site(), 
                             std::make_pair(prefix, lower_id)));
+
+                // make sure the entry got created
+                if (!p.second) {
+                    rep = reply(command_getprefix, no_success, 
+                        "couldn't create site prefix map entry");
+                    return;
+                }
 
                 // now, bind this prefix to the locality address allowing to 
                 // send parcels to the memory of a locality
@@ -297,6 +317,7 @@ namespace hpx { namespace naming { namespace server
                     // this shouldn't happen
                     rep = reply(command_getprefix, no_success, 
                         "prefix is already bound to local address");
+                    return;
                 }
                 else {
                     registry_.insert(registry_type::value_type(id, 
@@ -306,10 +327,13 @@ namespace hpx { namespace naming { namespace server
                 // generate the new id range
                 naming::id_type lower = lower_id + 1;
                 naming::id_type upper = lower + (req.get_count() - 1);
-                
+
                 // store the new lower bound
                 (*p.first).second.second = upper;
-                
+
+                LAGAS_(debug) << "handle_getidrange: new upper: " 
+                    << (*p.first).second.second;
+
                 // created new entry
                 rep = reply(success, command_getidrange, lower, upper);
             }
