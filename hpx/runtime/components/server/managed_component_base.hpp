@@ -12,6 +12,7 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/detail/atomic_count.hpp>
 #include <boost/type_traits/is_same.hpp>
+#include <boost/preprocessor/repeat.hpp>
 
 #include <hpx/exception.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
@@ -112,6 +113,18 @@ namespace hpx { namespace components
         managed_component() 
           : component_(new wrapped_type()) 
         {}
+
+#define MANAGED_COMPONENT_CONSTRUCT(Z, N, _)                                  \
+        template <BOOST_PP_ENUM_PARAMS(N, typename T)>                        \
+        managed_component(BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))        \
+          : component_(new wrapped_type(BOOST_PP_ENUM_PARAMS(N, t)))          \
+        {}
+    /**/
+
+        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX, 
+            MANAGED_COMPONENT_CONSTRUCT, _)
+
+#undef MANAGED_COMPONENT_CONSTRUCT
 
         /// \brief The destructor releases any wrapped instances
         ~managed_component()
@@ -262,6 +275,23 @@ namespace hpx { namespace components
             }
             return p;
         }
+
+        /// \brief  The function \a create is used for allocation and 
+        //          initialization of a single instance.
+#define MANAGED_COMPONENT_CREATE_ONE(Z, N, _)                                 \
+        template <BOOST_PP_ENUM_PARAMS(N, typename T)>                        \
+        static derived_type*                                                  \
+        create_one(BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))               \
+        {                                                                     \
+            derived_type* p = get_heap().alloc();                             \
+            return new (p) derived_type(BOOST_PP_ENUM_PARAMS(N, t));          \
+        }                                                                     \
+    /**/
+
+        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX, 
+            MANAGED_COMPONENT_CREATE_ONE, _)
+
+#undef MANAGED_COMPONENT_CREATE_ONE
 
         /// \brief  The function \a destroy is used for deletion and 
         //          de-allocation of arrays of wrappers

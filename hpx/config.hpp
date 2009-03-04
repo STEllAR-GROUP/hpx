@@ -39,6 +39,13 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This defines the maximum number of arguments a component constructor can 
+/// take
+#if !defined(HPX_COMPONENT_CREATE_ARG_MAX)
+#  define HPX_COMPONENT_CREATE_ARG_MAX 3
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 /// This defines the number of outgoing (parcel-) connections kept alive 
 #if !defined(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE)
 #  define HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE 64

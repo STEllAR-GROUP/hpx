@@ -60,7 +60,7 @@ int hpx_main(int sizex, int sizey, int iterations)
 
     // wait for the calculation to finish
     int waitfor = sizex*sizey;
-    while (--waitfor>= 0)
+    while (--waitfor >= 0)
         sem.wait();
 
     double elapsed = t.elapsed();

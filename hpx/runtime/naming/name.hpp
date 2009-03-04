@@ -187,8 +187,8 @@ namespace hpx { namespace naming
 
     inline std::ostream& operator<< (std::ostream& os, id_type const& id)
     {
-        os << "(" << std::hex << id.id_msb_ << ", " 
-                  << std::hex << id.id_lsb_ << ")";
+        os << "{" << std::hex << id.id_msb_ << ", " 
+                  << std::hex << id.id_lsb_ << "}";
         return os;
     }
 

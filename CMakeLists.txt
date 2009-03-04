@@ -125,6 +125,9 @@ add_definitions(-DBOOST_SYSTEM_DYN_LINK)
 add_definitions(-DBOOST_SIGNALS_DYN_LINK)
 add_definitions(-DBOOST_THREAD_DYN_DLL)
 
+# Boost.Chrono gets linked in directly (at least for now)
+add_definitions(-DBOOST_CHRONO_NO_LIB))
+
 # compiler/platform specific configuration
 if(MSVC)
     add_definitions(-D_WINDOWS)
@@ -206,6 +209,11 @@ install(
 # install external dependencies
 install(
     DIRECTORY external/cache/boost
+    DESTINATION include
+    FILES_MATCHING PATTERN "*.hpp"
+    REGEX ".svn" EXCLUDE)
+install(
+    DIRECTORY external/chrono/boost
     DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
     REGEX ".svn" EXCLUDE)

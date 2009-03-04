@@ -1,0 +1,35 @@
+# Boost Chrono Library test Jamfile
+
+# Copyright Beman Dawes 2003, 2006, 2008
+
+# Distributed under the Boost Software License, Version 1.0.
+# See accompanying file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt
+
+# See library home page at http://www.boost.org/libs/chrono
+
+project
+    : requirements
+#      <library>/boost/chrono//boost_chrono
+      <toolset>msvc:<asynch-exceptions>on
+    ;
+
+   test-suite "chrono"
+       :
+#         [ run ../example/time2_demo.cpp
+#           : # command line
+#           : # requirements
+#                   <link>static
+#         ]
+#         [ run ../example/time2_demo.cpp ../../system/build
+#           :  :  :  : time2_demo_dll
+#         ]
+#         [ run run_timer_test.cpp
+#           :  :  : <link>static
+#         ]
+#         [ run run_timer_test.cpp ../../system/build
+#           :  :  :  : run_timer_test_dll
+#         ]
+#         [ run ../example/run_timer_example.cpp  ../../system/build
+#         ]
+         [ compile-fail ratio_fail_test1.cpp ]
+         ;

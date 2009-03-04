@@ -279,7 +279,9 @@ void calculate_mandelbrot_set(int sizex, int sizey, CMandelbrotDlg* dlg)
     }
 
     // wait for the calculation to finish
-    sem.wait(sizex*sizey);
+    int waitfor = sizex*sizey;
+    while (--waitfor >= 0)
+        sem.wait();
 
     dlg->OnDoneRendering();
 }

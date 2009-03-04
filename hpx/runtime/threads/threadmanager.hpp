@@ -266,6 +266,9 @@ namespace hpx { namespace threads
         thread_state set_active_state(thread_id_type id, thread_state newstate,
             thread_state_ex newstate_ex = wait_signaled);
 
+        // return the length of the queues (workitems + newitems)
+        boost::int64_t get_queue_lengths() const;
+
     public:
         /// this notifies the thread manager that there is some more work 
         /// available 

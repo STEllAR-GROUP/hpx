@@ -25,17 +25,24 @@ namespace hpx { namespace performance_counters
         registry(naming::resolver_client& agas_client);
 
         /// \brief Add a new performance counter type to the (local) registry
-        counter_status add_counter_type(counter_info const& info);
+        counter_status add_counter_type(counter_info const& info, 
+            error_code& ec = throws);
 
         /// \brief Create a new performance counter instance based on given
         ///        counter value
         counter_status add_counter(counter_info const& info, 
-            boost::int64_t* countervalue, naming::id_type& id);
+            boost::int64_t* countervalue, naming::id_type& id, 
+            error_code& ec = throws);
 
         /// \brief Create a new performance counter instance based on given
         ///        function returning the counter value
         counter_status add_counter(counter_info const& info, 
-            boost::function<boost::int64_t()> f, naming::id_type& id);
+            boost::function<boost::int64_t()> f, naming::id_type& id, 
+            error_code& ec = throws);
+
+        /// 
+        counter_status remove_counter(counter_info const& info, 
+            naming::id_type const& id, error_code& ec = throws);
 
     private:
         naming::resolver_client& agas_client_;

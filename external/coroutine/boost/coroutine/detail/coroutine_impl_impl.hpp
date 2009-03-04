@@ -29,7 +29,7 @@ namespace boost { namespace coroutines { namespace detail {
     typename coroutine_impl<CoroutineType, ContextImpl>::self_type* 
     coroutine_impl<CoroutineType, ContextImpl>::get_self()
     {
-        return *self_;
+        return (NULL == self_.get()) ? NULL : *self_;
     }
 
 } } }

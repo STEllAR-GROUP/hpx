@@ -11,8 +11,9 @@ set (hpxlib_global_HEADERS
     ${hpx_SOURCE_DIR}/hpx/exception_list.hpp
     ${hpx_SOURCE_DIR}/hpx/hpx.hpp
     ${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp
-    ${hpx_SOURCE_DIR}/hpx/version.hpp
-    ${hpx_SOURCE_DIR}/hpx/runtime.hpp)
+    ${hpx_SOURCE_DIR}/hpx/performance_counters.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime.hpp
+    ${hpx_SOURCE_DIR}/hpx/version.hpp)
 source_group("Header Files" 
     FILES ${hpxlib_global_HEADERS})
 
@@ -239,6 +240,7 @@ set (hpxlib_HEADERS
 # global
 set (hpxlib_global_SOURCES
     ${hpx_SOURCE_DIR}/src/exception_list.cpp
+    ${hpx_SOURCE_DIR}/src/performance_counters.cpp
     ${hpx_SOURCE_DIR}/src/runtime.cpp)
 source_group ("Source Files" 
     FILES ${hpxlib_global_SOURCES})
@@ -260,6 +262,11 @@ set (hpxlib_performance_counters_stubs_SOURCES
     ${hpx_SOURCE_DIR}/src/performance_counters/stubs/performance_counter.cpp)
 source_group ("Source Files\\performance_counters\\stubs" 
     FILES ${hpxlib_performance_counters_stubs_SOURCES})
+
+set (hpxlib_performance_counters_server_SOURCES
+    ${hpx_SOURCE_DIR}/src/performance_counters/server/raw_counter.cpp)
+source_group ("Source Files\\performance_counters\\server" 
+    FILES ${hpxlib_performance_counters_server_SOURCES})
 
 # actions 
 set (hpxlib_actions_SOURCES
@@ -337,6 +344,7 @@ set (hpxlib_SOURCES
     ${hpxlib_lcos_SOURCES}
     ${hpxlib_performance_counters_SOURCES}
     ${hpxlib_performance_counters_stubs_SOURCES}
+    ${hpxlib_performance_counters_server_SOURCES}
     ${hpxlib_actions_SOURCES}
     ${hpxlib_applier_SOURCES}
     ${hpxlib_components_SOURCES}
@@ -352,6 +360,14 @@ if (CMAKE_COMPILER_IS_GNUCXX)
         ${hpxlib_SOURCES} 
         ${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp)
 endif()
+
+# Boost Chrono sources (as long as this library is not in Boost)
+set (hpxlib_SOURCES 
+     ${hpxlib_SOURCES}
+     ${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/chrono.cpp
+     ${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/process_clock.cpp
+     ${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/run_timer.cpp
+     ${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/run_timer_static.cpp)
 
 # yes, the main shared library contains components as well
 add_definitions(-DHPX_COMPONENT_NAME=hpx)

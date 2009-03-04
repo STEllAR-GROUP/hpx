@@ -319,6 +319,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\performance_counters.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\runtime.cpp"
 				>
 			</File>
@@ -521,6 +525,14 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="Server"
+					>
+					<File
+						RelativePath="..\..\..\src\performance_counters\server\raw_counter.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -546,6 +558,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\hpx\hpx_fwd.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\hpx\performance_counters.hpp"
 				>
 			</File>
 			<File
@@ -621,10 +637,6 @@
 				</File>
 				<File
 					RelativePath="..\..\..\hpx\util\portable_binary_oarchive.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\hpx\util\px_thread_queue.hpp"
 					>
 				</File>
 				<File
@@ -1192,6 +1204,30 @@
 					/>
 				</FileConfiguration>
 			</File>
+		</Filter>
+		<Filter
+			Name="Boost Files"
+			>
+			<Filter
+				Name="Chrono"
+				>
+				<File
+					RelativePath="..\..\..\external\chrono\libs\chrono\src\chrono.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\external\chrono\libs\chrono\src\process_clock.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\external\chrono\libs\chrono\src\run_timer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\external\chrono\libs\chrono\src\run_timer_static.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath="..\..\..\src\CMakeLists.txt"

@@ -11,6 +11,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/time_logger.hpp>
+#include <hpx/performance_counters.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
@@ -526,6 +527,13 @@ namespace hpx { namespace threads
         if (start_thread_)    // notify runtime system of started thread
             start_thread_();
 
+        if (0 == num_thread) {
+            // register counter types
+            performance_counters::counter_info info;
+            info.fullname_ = "/queue/length";
+            add_counter_type(info);           // throw on error
+        }
+
         LTM_(info) << "tfunc(" << num_thread << "): start";
         std::size_t num_px_threads = 0;
         try {
@@ -619,6 +627,37 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // This returns the current length of the queues (work items and new items)
+    boost::int64_t threadmanager::get_queue_lengths() const
+    {
+        return work_items_.count_ + new_tasks_.count_;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct manage_counter
+    {
+        ~manage_counter()
+        {
+            if (counter_) {
+                error_code ec;
+                remove_counter(info_, counter_, ec);
+            }
+        }
+
+        performance_counters::counter_status install(
+            std::string const& name, boost::function<boost::int64_t()> f, 
+            error_code& ec = throws)
+        {
+            BOOST_ASSERT(!counter_);
+            info_.fullname_ = name;
+            return add_counter(info_, f, counter_, ec);
+        }
+
+        performance_counters::counter_info info_;
+        naming::id_type counter_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     std::size_t threadmanager::tfunc_impl(std::size_t num_thread)
     {
 #if HPX_DEBUG != 0
@@ -632,6 +671,14 @@ namespace hpx { namespace threads
         // the thread with number zero is the master
         bool is_master_thread = (0 == num_thread) ? true : false;
         set_affinity(num_thread);     // set affinity on Linux systems
+
+        // register performance counters
+        manage_counter queue_length_counter; 
+        if (is_master_thread) {
+            std::string name("/queue(threadmanager)/length");
+            queue_length_counter.install(name, 
+                boost::bind(&threadmanager::get_queue_lengths, this));
+        }
 
         // run the work queue
         boost::coroutines::prepare_main_thread main_thread;

@@ -205,6 +205,14 @@ namespace hpx
         return error_code(e, msg, mode);
     }
 
+    inline error_code make_success_code(throwmode mode = plain)
+    {
+        return error_code(success, "success", mode);
+    }
+
+    //  predefined error_code object used as "throw on error" tag
+    HPX_EXCEPTION_EXPORT extern error_code throws;
+
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXCEPTION_EXPORT exception : public boost::system::system_error
     {
@@ -344,6 +352,23 @@ namespace boost { namespace system
 
 #define HPX_RETHROW_EXCEPTION(errcode, f, msg)                                \
     HPX_THROW_EXCEPTION_EX(hpx::exception, errcode, f, msg, hpx::rethrow)     \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_THROWS_IF(ec, errcode, f, msg)                                    \
+    {                                                                         \
+        if (&ec == &hpx::throws)                                              \
+            HPX_THROW_EXCEPTION(errcode, f, msg);                             \
+        ec = make_error_code((hpx::error)errcode, msg);                       \
+    }
+    /**/
+
+#define HPX_RETHROWS_IF(ec, errcode, f, msg)                                  \
+    {                                                                         \
+        if (&ec == &hpx::throws)                                              \
+            HPX_RETHROW_EXCEPTION(errcode, f, msg);                           \
+        ec = make_error_code((hpx::error)errcode, msg);                       \
+    }
     /**/
 
 #include <hpx/config/warnings_suffix.hpp>

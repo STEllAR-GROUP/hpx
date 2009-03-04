@@ -91,23 +91,27 @@ testdata_good data[] =
 
 void test_good()
 {
+    hpx::error_code ec;
     for (testdata_good* t = data; !t->fullname_.empty(); ++t)
     {
         using namespace hpx::performance_counters;
 
         std::string fullname;
-        BOOST_TEST(status_valid_data == get_counter_name(t->path_, fullname));
+        BOOST_TEST(status_valid_data == get_counter_name(t->path_, fullname, ec));
+        BOOST_TEST(ec.value() == hpx::success);
         BOOST_TEST(fullname == t->fullname_);
 
         std::string type_name;
         BOOST_TEST(status_valid_data == get_counter_name(
-            (counter_type_path_elements const&)t->path_, type_name));
+            (counter_type_path_elements const&)t->path_, type_name, ec));
+        BOOST_TEST(ec.value() == hpx::success);
         BOOST_TEST(type_name == t->typename_);
 
         counter_path_elements p;
         p.instanceindex_ = 0;
 
-        BOOST_TEST(status_valid_data == get_counter_path_elements(t->fullname_, p));
+        BOOST_TEST(status_valid_data == get_counter_path_elements(t->fullname_, p, ec));
+        BOOST_TEST(ec.value() == hpx::success);
         BOOST_TEST(p.objectname_ == t->path_.objectname_);
         BOOST_TEST(p.parentinstancename_ == t->path_.parentinstancename_);
         BOOST_TEST(p.instancename_ == t->path_.instancename_);
@@ -116,11 +120,13 @@ void test_good()
 
         counter_type_path_elements tp1, tp2;
 
-        BOOST_TEST(status_valid_data == get_counter_path_elements(t->fullname_, tp1));
+        BOOST_TEST(status_valid_data == get_counter_path_elements(t->fullname_, tp1, ec));
+        BOOST_TEST(ec.value() == hpx::success);
         BOOST_TEST(tp1.objectname_ == t->path_.objectname_);
         BOOST_TEST(tp1.countername_ == t->path_.countername_);
 
-        BOOST_TEST(status_valid_data == get_counter_path_elements(t->typename_, tp2));
+        BOOST_TEST(status_valid_data == get_counter_path_elements(t->typename_, tp2, ec));
+        BOOST_TEST(ec.value() == hpx::success);
         BOOST_TEST(tp2.objectname_ == t->path_.objectname_);
         BOOST_TEST(tp2.countername_ == t->path_.countername_);
     }
@@ -148,11 +154,27 @@ void test_bad()
 {
     using namespace hpx::performance_counters;
 
+    // test non-throwing version
+    hpx::error_code ec;
     counter_path_elements p;
     int i = 0;
     for (char const* t = testdata_bad[0]; NULL != t; t = testdata_bad[++i])
     {
-        BOOST_TEST(status_invalid_data == get_counter_path_elements(t, p));
+        BOOST_TEST(status_invalid_data == get_counter_path_elements(t, p, ec));
+        BOOST_TEST(ec.value() == hpx::bad_parameter);
+    }
+
+    // test throwing version
+    i = 0;
+    for (char const* t = testdata_bad[0]; NULL != t; t = testdata_bad[++i])
+    {
+        try {
+            get_counter_path_elements(t, p);
+            BOOST_TEST(false);
+        }
+        catch (hpx::exception const& e) {
+            BOOST_TEST(e.get_error() == hpx::bad_parameter);
+        }
     }
 }
 

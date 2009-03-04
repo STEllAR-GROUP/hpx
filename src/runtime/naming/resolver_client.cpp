@@ -50,68 +50,75 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void resolver_client::get_prefix(locality const& l, id_type& prefix, 
+    bool resolver_client::get_prefix(locality const& l, id_type& prefix, 
         error_code& ec) const
     {
         // send request
         server::request req (server::command_getprefix, l, isconsole_);
         server::reply rep;
-        execute(req, rep);
+        if (!execute(req, rep, ec))
+            return false;
 
         hpx::error s = (hpx::error) rep.get_status();
-        ec = make_error_code(s, rep.get_error(), hpx::rethrow);
         if (s != success && s != repeated_request) 
-            return;
-
-        prefix = rep.get_prefix();
-    }
-
-    bool resolver_client::get_prefix(locality const& l, id_type& prefix) const
-    {
-        error_code ec;
-        get_prefix(l, prefix, ec);
-        if (ec.value() != success && ec.value() != repeated_request)
         {
-            HPX_RETHROW_EXCEPTION(ec.value(), "resolver_client::get_prefix", 
-                ec.get_message());
+            if (&ec == &throws)
+            {
+                HPX_RETHROW_EXCEPTION(ec.value(), "resolver_client::get_prefix", 
+                    ec.get_message());
+            }
+            ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
         }
-        return ec.value() == success;
+        prefix = rep.get_prefix();
+        ec = make_error_code(s, rep.get_error());
+        return s == success;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool resolver_client::get_console_prefix(id_type& prefix) const
+    bool resolver_client::get_console_prefix(id_type& prefix, error_code& ec) const
     {
         // send request
         server::request req (server::command_getconsoleprefix);
         server::reply rep;
-        execute(req, rep);
+        if (!execute(req, rep, ec))
+            return false;
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_registered_console)
         {
-            HPX_RETHROW_EXCEPTION(s, "resolver_client::get_console_prefix", 
-                rep.get_error());
+            if (&ec == &throws)
+            {
+                HPX_RETHROW_EXCEPTION(s, "resolver_client::get_console_prefix", 
+                    rep.get_error());
+            }
+            ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
         }
         prefix = rep.get_prefix();
+        ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     bool resolver_client::get_prefixes(std::vector<id_type>& prefixes,
-        components::component_type type) const
+        components::component_type type, error_code& ec) const
     {
         // send request
         server::request req (server::command_getprefixes, type);
         server::reply rep;
-        execute(req, rep);
+        if (!execute(req, rep, ec))
+            return false;
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
         {
-            HPX_RETHROW_EXCEPTION(s, "resolver_client::get_prefixes", 
-                rep.get_error());
+            if (&ec == &throws)
+            {
+                HPX_RETHROW_EXCEPTION(s, "resolver_client::get_prefixes", 
+                    rep.get_error());
+            }
+            ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
         }
         typedef std::vector<boost::uint32_t>::const_iterator iterator;
@@ -119,82 +126,106 @@ namespace hpx { namespace naming
         for (iterator it = rep.get_prefixes().begin(); it != end; ++it)
             prefixes.push_back(get_id_from_prefix(*it));
 
+        ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     components::component_type resolver_client::get_component_id(
-        std::string const& componentname) const
+        std::string const& componentname, error_code& ec) const
     {
         // send request
         server::request req (server::command_get_component_id, componentname);
         server::reply rep;
-        execute(req, rep);
+        if (!execute(req, rep, ec))
+            return components::component_invalid;
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
         {
-            HPX_RETHROW_EXCEPTION(s, "resolver_client::get_component_id", 
-                rep.get_error());
+            if (&ec == &throws)
+            {
+                HPX_RETHROW_EXCEPTION(s, "resolver_client::get_component_id", 
+                    rep.get_error());
+            }
+            ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return components::component_invalid;
         }
+        ec = make_error_code(s, rep.get_error());
         return rep.get_component_id();
     }
 
     ///////////////////////////////////////////////////////////////////////////
     components::component_type resolver_client::register_factory(
-        id_type const& prefix, std::string const& name) const
+        id_type const& prefix, std::string const& name, error_code& ec) const
     {
         // send request
         server::request req (server::command_register_factory, name, prefix);
         server::reply rep;
-        execute(req, rep);
+        if (!execute(req, rep, ec))
+            return components::component_invalid;
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
         {
-            HPX_RETHROW_EXCEPTION(s, "resolver_client::register_factory", 
-                rep.get_error());
+            if (&ec == &throws)
+            {
+                HPX_RETHROW_EXCEPTION(s, "resolver_client::register_factory", 
+                    rep.get_error());
+            }
+            ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return components::component_invalid;
         }
+        ec = make_error_code(s, rep.get_error());
         return rep.get_component_id();
     }
 
     ///////////////////////////////////////////////////////////////////////////
     bool resolver_client::get_id_range(locality const& l, std::size_t count, 
-        id_type& lower_bound, id_type& upper_bound) const
+        id_type& lower_bound, id_type& upper_bound, error_code& ec) const
     {
         // send request
         server::request req (server::command_getidrange, l, count);
         server::reply rep;
-        execute(req, rep);
+        if (!execute(req, rep, ec))
+            return false;
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != repeated_request)
         {
-            HPX_RETHROW_EXCEPTION(s, "resolver_client::get_id_range", 
-                rep.get_error());
+            if (&ec == &throws)
+            {
+                HPX_RETHROW_EXCEPTION(s, "resolver_client::get_id_range", 
+                    rep.get_error());
+            }
+            ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
         }
         lower_bound = rep.get_lower_bound();
         upper_bound = rep.get_upper_bound();
+        ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     bool resolver_client::bind_range(id_type const& id, std::size_t count, 
-        address const& addr, std::ptrdiff_t offset) const
+        address const& addr, std::ptrdiff_t offset, error_code& ec) const
     {
         // send request
         server::request req (server::command_bind_range, id, count, addr, offset);
         server::reply rep;
-        execute(req, rep);
+        if (!execute(req, rep, ec))
+            return false;
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
         {
-            HPX_RETHROW_EXCEPTION(s, "resolver_client::bind_range", 
-                rep.get_error());
+            if (&ec == &throws)
+            {
+                HPX_RETHROW_EXCEPTION(s, "resolver_client::bind_range", 
+                    rep.get_error());
+            }
+            ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
         }
 
@@ -205,6 +236,7 @@ namespace hpx { namespace naming
         agas_cache_.insert(k, std::make_pair(addr, offset));
 #endif
 
+        ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
@@ -227,18 +259,26 @@ namespace hpx { namespace naming
         resolver_client::cache_key entry_;
     };
 
-    void resolver_client::unbind_range(id_type const& id, std::size_t count, 
+    bool resolver_client::unbind_range(id_type const& id, std::size_t count, 
         address& addr, error_code& ec) const
     {
         // send request
         server::request req (server::command_unbind_range, id, count);
         server::reply rep;
-        execute(req, rep);
+        if (!execute(req, rep, ec))
+            return false;
 
         hpx::error s = (hpx::error) rep.get_status();
-        ec = make_error_code(s, rep.get_error(), hpx::rethrow);
-        if (s != success && s != no_success)
-            return;
+        if (s != success && s != no_success) 
+        {
+            if (&ec == &throws)
+            {
+                HPX_THROW_EXCEPTION(ec.value(), 
+                    "resolver_client::unbind_range", ec.get_message());
+            }
+            ec = make_error_code(s, rep.get_error(), hpx::rethrow);
+            return false;
+        }
 
         addr = rep.get_address();
 
@@ -248,24 +288,15 @@ namespace hpx { namespace naming
         erase_policy ep(id, count);
         agas_cache_.erase(ep);
 #endif
-    }
 
-    bool resolver_client::unbind_range(id_type const& id, std::size_t count, 
-        address& addr) const
-    {
-        error_code ec;
-        unbind_range(id, count, addr, ec);
-        if (ec.value() != success && ec.value() != no_success)
-        {
-            HPX_THROW_EXCEPTION(ec.value(), 
-                "resolver_client::unbind_range", ec.get_message());
-        }
-        return ec.value() == success;
+        ec = make_error_code(s, rep.get_error());
+        return s == success;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     struct resolve_tag {};
-    bool resolver_client::resolve(id_type const& id, address& addr) const
+    bool resolver_client::resolve(id_type const& id, address& addr, 
+        error_code& ec) const
     {
         util::block_profiler<resolve_tag> bp("resolver_client::resolve");
 
@@ -281,6 +312,7 @@ namespace hpx { namespace naming
                 BOOST_ASSERT(id.get_msb() == realkey.id_.get_msb());
                 addr = e.get().first;
                 addr.address_ += (id.get_lsb() - realkey.id_.get_lsb()) * e.get().second;
+                ec = make_success_code();
                 return true;
             }
         }
@@ -289,13 +321,18 @@ namespace hpx { namespace naming
         // send request
         server::request req (server::command_resolve, id);
         server::reply rep;
-        execute(req, rep);
+        if (!execute(req, rep, ec))
+            return false;
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
         {
-            HPX_RETHROW_EXCEPTION(s, "resolver_client::resolve", 
-                rep.get_error());
+            if (&ec == &throws)
+            {
+                HPX_RETHROW_EXCEPTION(s, "resolver_client::resolve", 
+                    rep.get_error());
+            }
+            ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
         }
 
@@ -307,78 +344,108 @@ namespace hpx { namespace naming
         agas_cache_.insert(k, std::make_pair(addr, 1));
 #endif
 
+        ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     bool resolver_client::registerid(std::string const& ns_name, 
-        id_type const& id) const
+        id_type const& id, error_code& ec) const
     {
         // send request
         server::request req (server::command_registerid, ns_name, id);
         server::reply rep;
-        execute(req, rep);
+        if (!execute(req, rep, ec))
+            return false;
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
         {
-            HPX_RETHROW_EXCEPTION(s, "resolver_client::registerid", 
-                rep.get_error());
+            if (&ec == &throws)
+            {
+                HPX_RETHROW_EXCEPTION(s, "resolver_client::registerid", 
+                    rep.get_error());
+            }
+            ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
         }
+
+        ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool resolver_client::unregisterid(std::string const& ns_name) const
+    bool resolver_client::unregisterid(std::string const& ns_name,
+        error_code& ec) const
     {
         // send request
         server::request req (server::command_unregisterid, ns_name);
         server::reply rep;
-        execute(req, rep);
+        if (!execute(req, rep, ec))
+            return false;
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
         {
-            HPX_RETHROW_EXCEPTION(s, "resolver_client::unregisterid", 
-                rep.get_error());
+            if (&ec == &throws)
+            {
+                HPX_RETHROW_EXCEPTION(s, "resolver_client::unregisterid", 
+                    rep.get_error());
+            }
+            ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
         }
+
+        ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool resolver_client::queryid(std::string const& ns_name, id_type& id) const
+    bool resolver_client::queryid(std::string const& ns_name, id_type& id,
+        error_code& ec) const
     {
         // send request
         server::request req (server::command_queryid, ns_name);
         server::reply rep;
-        execute(req, rep);
+        if (!execute(req, rep, ec))
+            return false;
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
         {
-            HPX_RETHROW_EXCEPTION(s, "resolver_client::queryid", 
-                rep.get_error());
+            if (&ec == &throws)
+            {
+                HPX_RETHROW_EXCEPTION(s, "resolver_client::queryid", 
+                    rep.get_error());
+            }
+            ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
         }
         id = rep.get_id();
+
+        ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool resolver_client::get_statistics_count(std::vector<std::size_t>& counts) const
+    bool resolver_client::get_statistics_count(
+        std::vector<std::size_t>& counts, error_code& ec) const
     {
         // send request
         server::request req (server::command_statistics_count);
         server::reply rep;
-        execute(req, rep);
+        if (!execute(req, rep, ec))
+            return false;
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
         {
-            HPX_RETHROW_EXCEPTION(s, "resolver_client::get_statistics_count", 
-                rep.get_error());
+            if (&ec == &throws)
+            {
+                HPX_RETHROW_EXCEPTION(s, "resolver_client::get_statistics_count", 
+                    rep.get_error());
+            }
+            ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
         }
 
@@ -386,46 +453,61 @@ namespace hpx { namespace naming
         for (std::size_t i = 0; i < server::command_lastcommand; ++i)
             counts.push_back(std::size_t(rep.get_statictics(i)));
 
+        ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool resolver_client::get_statistics_mean(std::vector<double>& timings) const
+    bool resolver_client::get_statistics_mean(std::vector<double>& timings,
+        error_code& ec) const
     {
         // send request
         server::request req (server::command_statistics_mean);
         server::reply rep;
-        execute(req, rep);
+        if (!execute(req, rep, ec))
+            return false;
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success)
         {
-            HPX_RETHROW_EXCEPTION(s, "resolver_client::get_statistics_mean", 
-                rep.get_error());
+            if (&ec == &throws)
+            {
+                HPX_RETHROW_EXCEPTION(s, "resolver_client::get_statistics_mean", 
+                    rep.get_error());
+            }
+            ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
         }
-
         std::swap(timings, rep.get_statictics());
+
+        ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool resolver_client::get_statistics_moment2(std::vector<double>& timings) const
+    bool resolver_client::get_statistics_moment2(std::vector<double>& timings,
+        error_code& ec) const
     {
         // send request
         server::request req (server::command_statistics_moment2);
         server::reply rep;
-        execute(req, rep);
+        if (!execute(req, rep, ec))
+            return false;
 
         hpx::error s = (hpx::error) rep.get_status();
         if (s != success && s != no_success) 
         {
-            HPX_RETHROW_EXCEPTION(s, "resolver_client::get_statistics_moment2", 
-                rep.get_error());
+            if (&ec == &throws)
+            {
+                HPX_RETHROW_EXCEPTION(s, "resolver_client::get_statistics_moment2", 
+                    rep.get_error());
+            }
+            ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
         }
-
         std::swap(timings, rep.get_statictics());
+
+        ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
@@ -444,7 +526,7 @@ namespace hpx { namespace naming
 
     ///////////////////////////////////////////////////////////////////////////
     boost::shared_ptr<resolver_client_connection> 
-    resolver_client::get_client_connection() const
+    resolver_client::get_client_connection(error_code& ec) const
     {
         boost::shared_ptr<resolver_client_connection> client_connection(
             connection_cache_.get(there_));
@@ -475,8 +557,13 @@ namespace hpx { namespace naming
                         boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
                 }
                 catch (boost::system::error_code const& e) {
-                    HPX_THROW_EXCEPTION(network_error, 
-                        "resolver_client::get_client_connection", e.message());
+                    if (&ec == &throws) {
+                        HPX_THROW_EXCEPTION(network_error, 
+                            "resolver_client::get_client_connection", e.message());
+                    }
+                    ec = make_error_code(network_error, e.message());
+                    client_connection.reset();
+                    return client_connection;
                 }
             }
 
@@ -486,17 +573,24 @@ namespace hpx { namespace naming
                 HPX_OSSTREAM strm;
                 strm << error.message() << " (while trying to connect to: " 
                      << there_ << ")";
-                HPX_THROW_EXCEPTION(network_error, 
-                    "resolver_client::get_client_connection", 
-                    HPX_OSSTREAM_GETSTRING(strm));
+                if (&ec == &throws) {
+                    HPX_THROW_EXCEPTION(network_error, 
+                        "resolver_client::get_client_connection", 
+                        HPX_OSSTREAM_GETSTRING(strm));
+                }
+                ec = make_error_code(network_error, HPX_OSSTREAM_GETSTRING(strm));
+                client_connection.reset();
+                return client_connection;
             }
         }
+
+        ec = make_success_code();
         return client_connection;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void resolver_client::execute(server::request const &req, 
-        server::reply& rep) const
+    bool resolver_client::execute(server::request const &req, 
+        server::reply& rep, error_code& ec) const
     {
         typedef util::container_device<std::vector<char> > io_device_type;
 
@@ -518,7 +612,8 @@ namespace hpx { namespace naming
             boost::system::error_code err = boost::asio::error::try_again;
 
             boost::shared_ptr<resolver_client_connection> client_connection =
-                get_client_connection();
+                get_client_connection(ec);
+            if (!client_connection) return false;
 
             // send the data
             boost::integer::ulittle32_t size = (boost::integer::ulittle32_t)buffer.size();
@@ -531,12 +626,20 @@ namespace hpx { namespace naming
                     buffer.size() + sizeof(size)),
                 err);
             if (err) {
-                HPX_THROW_EXCEPTION(network_error, 
-                    "resolver_client::execute", err.message());
+                if (&ec == &throws) {
+                    HPX_THROW_EXCEPTION(network_error, 
+                        "resolver_client::execute", err.message());
+                }
+                ec = make_error_code(network_error, err.message());
+                return false;
             }
             if (buffer.size() + sizeof(size) != written_bytes) {
-                HPX_THROW_EXCEPTION(network_error, 
-                    "resolver_client::execute", "network write failed");
+                if (&ec == &throws) {
+                    HPX_THROW_EXCEPTION(network_error, 
+                        "resolver_client::execute", "network write failed");
+                }
+                ec = make_error_code(network_error, "network write failed");
+                return false;
             }
 
             // wait for response
@@ -547,12 +650,20 @@ namespace hpx { namespace naming
                 boost::bind(&resolver_client::read_completed, _1, _2, sizeof(size)),
                 err);
             if (err) {
-                HPX_THROW_EXCEPTION(network_error, 
-                    "resolver_client::execute", err.message());
+                if (&ec == &throws) {
+                    HPX_THROW_EXCEPTION(network_error, 
+                        "resolver_client::execute", err.message());
+                }
+                ec = make_error_code(network_error, err.message());
+                return false;
             }
             if (reply_length != sizeof(size)) {
-                HPX_THROW_EXCEPTION(network_error, 
-                    "resolver_client::execute", "network read failed");
+                if (&ec == &throws) {
+                    HPX_THROW_EXCEPTION(network_error, 
+                        "resolver_client::execute", "network read failed");
+                }
+                ec = make_error_code(network_error, "network read failed");
+                return false;
             }
 
             // now read the rest of the message
@@ -564,12 +675,20 @@ namespace hpx { namespace naming
                 err);
 
             if (err) {
-                HPX_THROW_EXCEPTION(network_error, 
-                    "resolver_client::execute", err.message());
+                if (&ec == &throws) {
+                    HPX_THROW_EXCEPTION(network_error, 
+                        "resolver_client::execute", err.message());
+                }
+                ec = make_error_code(network_error, err.message());
+                return false;
             }
             if (reply_length != native_size) {
-                HPX_THROW_EXCEPTION(network_error, 
-                    "resolver_client::execute", "network read failed");
+                if (&ec == &throws) {
+                    HPX_THROW_EXCEPTION(network_error, 
+                        "resolver_client::execute", "network read failed");
+                }
+                ec = make_error_code(network_error, "network read failed");
+                return false;
             }
 
             // return the connection to the cache
@@ -587,17 +706,32 @@ namespace hpx { namespace naming
             }
         }
         catch (boost::system::system_error const& e) {
-            HPX_THROW_EXCEPTION(network_error, 
-                "resolver_client::execute", e.what());
-        }        
+            if (&ec == &throws) {
+                HPX_THROW_EXCEPTION(network_error, 
+                    "resolver_client::execute", e.what());
+            }
+            ec = make_error_code(network_error, e.what());
+            return false;
+        }
         catch (std::exception const& e) {
-            HPX_THROW_EXCEPTION(network_error, 
-                "resolver_client::execute", e.what());
+            if (&ec == &throws) {
+                HPX_THROW_EXCEPTION(network_error, 
+                    "resolver_client::execute", e.what());
+            }
+            ec = make_error_code(network_error, e.what());
+            return false;
         }
-        catch(...) {
-            HPX_THROW_EXCEPTION(no_success, 
-                "resolver_client::execute", "unexpected error");
+        catch (...) {
+            if (&ec == &throws) {
+                HPX_THROW_EXCEPTION(no_success, 
+                    "resolver_client::execute", "unexpected error");
+            }
+            ec = make_error_code(network_error, "unexpected error");
+            return false;
         }
+
+        ec = make_success_code();
+        return true;
     }
 
 ///////////////////////////////////////////////////////////////////////////////

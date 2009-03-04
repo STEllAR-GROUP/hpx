@@ -7,6 +7,7 @@
 #define HPX_PERFORMANCE_COUNTERS_MAR_01_2009_0134PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/serialization/serialization.hpp>
@@ -101,6 +102,8 @@ namespace hpx { namespace performance_counters
         status_new_data,        ///< Data is valid and different from last call
         status_invalid_data,    ///< Some error occurred, data is not value
         status_already_defined, ///< The type or instance already has been defined
+        status_counter_unknown, ///< The counter instance is unknown
+        status_counter_type_unknown,  ///< The counter type is unknown
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -180,29 +183,42 @@ namespace hpx { namespace performance_counters
         }
     };
 
+    ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a full name of a counter type from the contents of the 
     ///        given \a counter_type_path_elements instance.
     HPX_API_EXPORT counter_status get_counter_name(
-        counter_type_path_elements const& path, std::string& result);
+        counter_type_path_elements const& path, std::string& result, 
+        error_code& ec = throws);
 
     /// \brief Create a full name of a counter from the contents of the given 
     ///        \a counter_path_elements instance.
     HPX_API_EXPORT counter_status get_counter_name(
-        counter_path_elements const& path, std::string& result);
+        counter_path_elements const& path, std::string& result, 
+        error_code& ec = throws);
 
     /// \brief Fill the given \a counter_type_path_elements instance from the 
     ///        given full name of a counter type
     HPX_API_EXPORT counter_status get_counter_path_elements(
-        std::string const& name, counter_type_path_elements& path);
+        std::string const& name, counter_type_path_elements& path, 
+        error_code& ec = throws);
 
     /// \brief Fill the given \a counter_path_elements instance from the given 
     ///        full name of a counter
     HPX_API_EXPORT counter_status get_counter_path_elements(
-        std::string const& name, counter_path_elements& path);
+        std::string const& name, counter_path_elements& path, 
+        error_code& ec = throws);
 
-    /// \brief Return the counter type name from a given full instance name
+    /// \brief Return the canonical counter instance name from a given full 
+    ///        instance name
+    HPX_API_EXPORT counter_status get_counter_name(
+        std::string const& name, std::string& countername, 
+        error_code& ec = throws);
+
+    /// \brief Return the canonical counter type name from a given (full) 
+    ///        instance name
     HPX_API_EXPORT counter_status get_counter_type_name(
-        std::string const& name, std::string& type_name);
+        std::string const& name, std::string& type_name, 
+        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     struct counter_info
@@ -228,6 +244,11 @@ namespace hpx { namespace performance_counters
             ar & type_ & version_ & status_ & fullname_ & helptext_;
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Complement the counter info if parent instance name is missing
+    HPX_API_EXPORT counter_status complement_counter_info(counter_info& info, 
+        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     struct counter_value
