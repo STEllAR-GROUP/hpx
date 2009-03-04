@@ -8,6 +8,7 @@
 #include <hpx/hpx_fwd.hpp>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/foreach.hpp>
 #include <boost/fusion/include/at.hpp>
 
 #include <hpx/util/logging.hpp>
@@ -258,8 +259,8 @@ namespace hpx { namespace naming { namespace server
                 // significant bits of global id's
 
                 LAGAS_(debug) << "handle_getidrange: reusing site: " 
-                    << req.get_site() << "prefix: " << (*it).second.first
-                    << "current upper: " << (*it).second.second;
+                    << req.get_site() << ", prefix: " << (*it).second.first
+                    << ", current upper: " << (*it).second.second;
 
                 // generate the new id range
                 naming::id_type lower ((*it).second.second + 1);
@@ -269,7 +270,7 @@ namespace hpx { namespace naming { namespace server
                     // handle overflow
                     if ((lower.get_msb() & ~0xFFFFFFFF) == 0xFFFFFFFF)
                     {
-                        rep = reply(command_getprefix, internal_server_error,
+                        rep = reply(command_getidrange, internal_server_error, 
                             "global ids have been exhausted");
                         return;
                     }
@@ -295,8 +296,8 @@ namespace hpx { namespace naming { namespace server
                 naming::id_type lower_id (id.get_msb() + 1, 0);
 
                 LAGAS_(debug) << "handle_getidrange: new site: " 
-                    << req.get_site() << "prefix: " << id
-                    << "current upper: " << lower_id;
+                    << req.get_site() << ", prefix: " << id
+                    << ", current upper: " << lower_id;
 
                 std::pair<site_prefix_map_type::iterator, bool> p =
                     site_prefixes_.insert(
@@ -305,7 +306,15 @@ namespace hpx { namespace naming { namespace server
 
                 // make sure the entry got created
                 if (!p.second) {
-                    rep = reply(command_getprefix, no_success, 
+                    if (LAGAS_ENABLED(debug)) {
+                        BOOST_FOREACH(site_prefix_map_type::value_type v, site_prefixes_)
+                        {
+                            LAGAS_(debug) 
+                                << "handle_getidrange: registered site: "
+                                << v.first;
+                        }
+                    }
+                    rep = reply(command_getidrange, no_success, 
                         "couldn't create site prefix map entry");
                     return;
                 }
