@@ -120,7 +120,8 @@ namespace hpx { namespace naming
 
         friend bool operator< (locality const& lhs, locality const& rhs)
         {
-            return lhs.address_ < rhs.address_ || lhs.port_ < rhs.port_;
+            return lhs.address_ < rhs.address_ || 
+                   (lhs.address_ == rhs.address_ && lhs.port_ < rhs.port_);
         }
 
         friend bool operator> (locality const& lhs, locality const& rhs)
