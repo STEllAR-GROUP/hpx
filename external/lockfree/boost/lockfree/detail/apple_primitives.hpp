@@ -178,7 +178,7 @@ namespace boost { namespace lockfree
 
     inline boost::int64_t interlocked_exchange_sub(boost::int64_t volatile* value, boost::int64_t sub)
     {
-        return OSAtomicAdd32(-sub, value);
+        return OSAtomicAdd64(-sub, value);
     }
 
     inline boost::int32_t interlocked_exchange_add(boost::int32_t volatile* value, boost::int32_t add)
