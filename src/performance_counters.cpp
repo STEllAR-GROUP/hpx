@@ -16,6 +16,12 @@ namespace hpx
         return get_runtime().get_counter_registry().add_counter_type(info, ec);
     }
 
+    performance_counters::counter_status remove_counter_type(
+        performance_counters::counter_info const& info, error_code& ec)
+    {
+        return get_runtime().get_counter_registry().remove_counter_type(info, ec);
+    }
+
     performance_counters::counter_status add_counter(
         performance_counters::counter_info const& info, 
         boost::int64_t* countervalue, naming::id_type& id, error_code& ec)

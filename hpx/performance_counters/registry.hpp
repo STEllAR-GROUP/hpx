@@ -28,6 +28,13 @@ namespace hpx { namespace performance_counters
         counter_status add_counter_type(counter_info const& info, 
             error_code& ec = throws);
 
+        /// \brief Remove an existing counter type from the (local) registry
+        ///
+        /// \note This doesn't remove existing counters of this type, it just
+        ///       inhibits defining new counters using this type.
+        counter_status remove_counter_type(counter_info const& info, 
+            error_code& ec = throws);
+
         /// \brief Create a new performance counter instance based on given
         ///        counter value
         counter_status add_counter(counter_info const& info, 

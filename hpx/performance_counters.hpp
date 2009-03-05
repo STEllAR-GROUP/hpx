@@ -20,6 +20,10 @@ namespace hpx
         performance_counters::counter_info const& info, 
         error_code& ec = throws);
 
+    HPX_API_EXPORT performance_counters::counter_status remove_counter_type(
+        performance_counters::counter_info const& info, 
+        error_code& ec = throws);
+
     HPX_API_EXPORT performance_counters::counter_status add_counter(
         performance_counters::counter_info const& info, 
         boost::int64_t* countervalue, naming::id_type& id, 

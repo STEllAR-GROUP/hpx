@@ -520,6 +520,36 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    struct manage_counter_type
+    {
+        manage_counter_type()
+          : status_(performance_counters::status_invalid_data)
+        {
+        }
+        ~manage_counter_type()
+        {
+            if (performance_counters::status_invalid_data != status_) {
+                error_code ec;
+                remove_counter_type(info_, ec);   // ignore errors
+            }
+        }
+
+        performance_counters::counter_status install(
+            std::string const& name, performance_counters::counter_type type, 
+            error_code& ec = throws)
+        {
+            BOOST_ASSERT(performance_counters::status_invalid_data == status_);
+            info_.fullname_ = name;
+            info_.type_ = type;
+            status_ = add_counter_type(info_, ec);
+            return status_;
+        }
+
+        performance_counters::counter_status status_;
+        performance_counters::counter_info info_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     // main function executed by all OS threads managed by this threadmanager
     void threadmanager::tfunc(std::size_t num_thread)
     {
@@ -527,47 +557,55 @@ namespace hpx { namespace threads
         if (start_thread_)    // notify runtime system of started thread
             start_thread_();
 
-        if (0 == num_thread) {
-            // register counter types
-            performance_counters::counter_info info;
-            info.fullname_ = "/queue/length";
-            add_counter_type(info);           // throw on error
-        }
+        {
+            manage_counter_type counter_type;
+            if (0 == num_thread) {
+                // register counter types
+                error_code ec;
+                counter_type.install("/queue/length", 
+                    performance_counters::counter_raw, ec);   // doesn't throw
+                if (ec) {
+                    LTM_(info) << "tfunc(" << num_thread << "): failed to install "
+                        "counter type '/queue/length': " << ec.get_message();
+                }
+            }
 
-        LTM_(info) << "tfunc(" << num_thread << "): start";
-        std::size_t num_px_threads = 0;
-        try {
-            num_px_threads = tfunc_impl(num_thread);
+            LTM_(info) << "tfunc(" << num_thread << "): start";
+            std::size_t num_px_threads = 0;
+            try {
+                num_px_threads = tfunc_impl(num_thread);
+            }
+            catch (hpx::exception const& e) {
+                LFATAL_ << "tfunc(" << num_thread 
+                        << "): caught hpx::exception: " 
+                        << e.what() << ", aborted thread execution";
+                report_error(boost::current_exception());
+                return;
+            }
+            catch (boost::system::system_error const& e) {
+                LFATAL_ << "tfunc(" << num_thread 
+                        << "): caught boost::system::system_error: " 
+                        << e.what() << ", aborted thread execution";
+                report_error(boost::current_exception());
+                return;
+            }
+            catch (std::exception const& e) {
+                LFATAL_ << "tfunc(" << num_thread 
+                        << "): caught std::exception: " 
+                        << e.what() << ", aborted thread execution";
+                report_error(boost::current_exception());
+                return;
+            }
+            catch (...) {
+                LFATAL_ << "tfunc(" << num_thread << "): caught unexpected "
+                    "exception, aborted thread execution";
+                report_error(boost::current_exception());
+                return;
+            }
+
+            LTM_(fatal) << "tfunc(" << num_thread << "): end, executed " 
+                       << num_px_threads << " HPX threads";
         }
-        catch (hpx::exception const& e) {
-            LFATAL_ << "tfunc(" << num_thread 
-                    << "): caught hpx::exception: " 
-                    << e.what() << ", aborted execution";
-            report_error(boost::current_exception());
-            return;
-        }
-        catch (boost::system::system_error const& e) {
-            LFATAL_ << "tfunc(" << num_thread 
-                    << "): caught boost::system::system_error: " 
-                    << e.what() << ", aborted execution";
-            report_error(boost::current_exception());
-            return;
-        }
-        catch (std::exception const& e) {
-            LFATAL_ << "tfunc(" << num_thread 
-                    << "): caught std::exception: " 
-                    << e.what() << ", aborted execution";
-            report_error(boost::current_exception());
-            return;
-        }
-        catch (...) {
-            LFATAL_ << "tfunc(" << num_thread 
-                    << "): caught unexpected exception, aborted execution";
-            report_error(boost::current_exception());
-            return;
-        }
-        LTM_(fatal) << "tfunc(" << num_thread << "): end, executed " 
-                   << num_px_threads << " HPX threads";
 
         if (stop_) 
             stop_();

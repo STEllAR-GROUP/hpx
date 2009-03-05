@@ -38,12 +38,32 @@ namespace hpx { namespace performance_counters
         return p.second ? status_valid_data : status_invalid_data;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    counter_status registry::remove_counter_type(counter_info const& info, 
+        error_code& ec)
+    {
+        // create canonical type name
+        std::string type_name;
+        counter_status status = get_counter_type_name(info.fullname_, type_name, ec);
+        if (status_valid_data != status) return status;
+
+        counter_type_map_type::iterator it = countertypes_.find(type_name);
+        if (it == countertypes_.end()) {
+            HPX_THROWS_IF(ec, bad_parameter, "registry::remove_counter_type", 
+                "counter type is not defined");
+            return status_counter_type_unknown;
+        }
+
+        countertypes_.erase(it);
+        return status_valid_data;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     boost::int64_t wrap_counter(boost::int64_t* p)
     {
         return *p;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
     counter_status registry::add_counter(counter_info const& info, 
         boost::int64_t* countervalue, naming::id_type& id, error_code& ec)
     {
