@@ -173,22 +173,22 @@ namespace boost { namespace lockfree
     ///////////////////////////////////////////////////////////////////////////
     inline boost::int32_t interlocked_exchange_sub(boost::int32_t* value, boost::int32_t sub)
     {
-        return OSAtomicAdd32(value, -sub);
+        return OSAtomicAdd32(*value, -sub);
     }
 
     inline boost::int64_t interlocked_exchange_sub(boost::int64_t* value, boost::int64_t sub)
     {
-        return OSAtomicAdd32(value, -sub);
+        return OSAtomicAdd32(*value, -sub);
     }
 
     inline boost::int32_t interlocked_exchange_add(boost::int32_t* value, boost::int32_t add)
     {
-        return OSAtomicAdd32(value, add);
+        return OSAtomicAdd32(*value, add);
     }
 
     inline boost::int64_t interlocked_exchange_add(boost::int64_t* value, boost::int64_t add)
     {
-        return OSAtomicAdd64(value, add);
+        return OSAtomicAdd64(*value, add);
     }
 
 }}
