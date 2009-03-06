@@ -11,7 +11,6 @@ set (hpxlib_global_HEADERS
     ${hpx_SOURCE_DIR}/hpx/exception_list.hpp
     ${hpx_SOURCE_DIR}/hpx/hpx.hpp
     ${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp
-    ${hpx_SOURCE_DIR}/hpx/performance_counters.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime.hpp
     ${hpx_SOURCE_DIR}/hpx/version.hpp)
 source_group("Header Files" 
@@ -202,6 +201,7 @@ set (hpxlib_util_HEADERS
     ${hpx_SOURCE_DIR}/hpx/util/io_service_pool.hpp
     ${hpx_SOURCE_DIR}/hpx/util/logging.hpp
     ${hpx_SOURCE_DIR}/hpx/util/one_size_heap_list.hpp
+    ${hpx_SOURCE_DIR}/hpx/util/performance_counters.hpp
     ${hpx_SOURCE_DIR}/hpx/util/portable_binary_archive.hpp
     ${hpx_SOURCE_DIR}/hpx/util/portable_binary_iarchive.hpp
     ${hpx_SOURCE_DIR}/hpx/util/portable_binary_oarchive.hpp
@@ -240,7 +240,6 @@ set (hpxlib_HEADERS
 # global
 set (hpxlib_global_SOURCES
     ${hpx_SOURCE_DIR}/src/exception_list.cpp
-    ${hpx_SOURCE_DIR}/src/performance_counters.cpp
     ${hpx_SOURCE_DIR}/src/runtime.cpp)
 source_group ("Source Files" 
     FILES ${hpxlib_global_SOURCES})
@@ -335,6 +334,7 @@ set (hpxlib_util_SOURCES
     ${hpx_SOURCE_DIR}/src/util/ini.cpp
     ${hpx_SOURCE_DIR}/src/util/io_service_pool.cpp
     ${hpx_SOURCE_DIR}/src/util/logging.cpp
+    ${hpx_SOURCE_DIR}/src/util/performance_counters.cpp
     ${hpx_SOURCE_DIR}/src/util/runtime_configuration.cpp)
 source_group ("Source Files\\util" 
     FILES ${hpxlib_util_SOURCES})
@@ -364,10 +364,7 @@ endif()
 # Boost Chrono sources (as long as this library is not in Boost)
 set (hpxlib_SOURCES 
      ${hpxlib_SOURCES}
-     ${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/chrono.cpp
-     ${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/process_clock.cpp
-     ${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/run_timer.cpp
-     ${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/run_timer_static.cpp)
+     ${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/chrono.cpp)
 
 # yes, the main shared library contains components as well
 add_definitions(-DHPX_COMPONENT_NAME=hpx)

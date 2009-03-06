@@ -66,12 +66,14 @@ namespace hpx { namespace naming
             {
                 HPX_RETHROW_EXCEPTION(ec.value(), "resolver_client::get_prefix", 
                     ec.get_message());
+                return false;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
         }
         prefix = rep.get_prefix();
-        ec = make_error_code(s, rep.get_error());
+        if (&ec != &throws)
+            ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
@@ -91,12 +93,14 @@ namespace hpx { namespace naming
             {
                 HPX_RETHROW_EXCEPTION(s, "resolver_client::get_console_prefix", 
                     rep.get_error());
+                return false;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
         }
         prefix = rep.get_prefix();
-        ec = make_error_code(s, rep.get_error());
+        if (&ec != &throws)
+            ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
@@ -117,6 +121,7 @@ namespace hpx { namespace naming
             {
                 HPX_RETHROW_EXCEPTION(s, "resolver_client::get_prefixes", 
                     rep.get_error());
+                return false;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
@@ -126,7 +131,8 @@ namespace hpx { namespace naming
         for (iterator it = rep.get_prefixes().begin(); it != end; ++it)
             prefixes.push_back(get_id_from_prefix(*it));
 
-        ec = make_error_code(s, rep.get_error());
+        if (&ec != &throws)
+            ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
@@ -147,11 +153,13 @@ namespace hpx { namespace naming
             {
                 HPX_RETHROW_EXCEPTION(s, "resolver_client::get_component_id", 
                     rep.get_error());
+                return components::component_invalid;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return components::component_invalid;
         }
-        ec = make_error_code(s, rep.get_error());
+        if (&ec != &throws)
+            ec = make_error_code(s, rep.get_error());
         return rep.get_component_id();
     }
 
@@ -172,11 +180,13 @@ namespace hpx { namespace naming
             {
                 HPX_RETHROW_EXCEPTION(s, "resolver_client::register_factory", 
                     rep.get_error());
+                return components::component_invalid;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return components::component_invalid;
         }
-        ec = make_error_code(s, rep.get_error());
+        if (&ec != &throws)
+            ec = make_error_code(s, rep.get_error());
         return rep.get_component_id();
     }
 
@@ -197,13 +207,15 @@ namespace hpx { namespace naming
             {
                 HPX_RETHROW_EXCEPTION(s, "resolver_client::get_id_range", 
                     rep.get_error());
+                return false;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
         }
         lower_bound = rep.get_lower_bound();
         upper_bound = rep.get_upper_bound();
-        ec = make_error_code(s, rep.get_error());
+        if (&ec != &throws)
+            ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
@@ -224,6 +236,7 @@ namespace hpx { namespace naming
             {
                 HPX_RETHROW_EXCEPTION(s, "resolver_client::bind_range", 
                     rep.get_error());
+                return false;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
@@ -236,7 +249,8 @@ namespace hpx { namespace naming
         agas_cache_.insert(k, std::make_pair(addr, offset));
 #endif
 
-        ec = make_error_code(s, rep.get_error());
+        if (&ec != &throws)
+            ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
@@ -275,6 +289,7 @@ namespace hpx { namespace naming
             {
                 HPX_THROW_EXCEPTION(ec.value(), 
                     "resolver_client::unbind_range", ec.get_message());
+                return false;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
@@ -289,7 +304,8 @@ namespace hpx { namespace naming
         agas_cache_.erase(ep);
 #endif
 
-        ec = make_error_code(s, rep.get_error());
+        if (&ec != &throws)
+            ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
@@ -332,6 +348,7 @@ namespace hpx { namespace naming
             {
                 HPX_RETHROW_EXCEPTION(s, "resolver_client::resolve", 
                     rep.get_error());
+                return false;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
@@ -345,7 +362,8 @@ namespace hpx { namespace naming
         agas_cache_.insert(k, std::make_pair(addr, 1));
 #endif
 
-        ec = make_error_code(s, rep.get_error());
+        if (&ec != &throws)
+            ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
@@ -366,12 +384,14 @@ namespace hpx { namespace naming
             {
                 HPX_RETHROW_EXCEPTION(s, "resolver_client::registerid", 
                     rep.get_error());
+                return false;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
         }
 
-        ec = make_error_code(s, rep.get_error());
+        if (&ec != &throws)
+            ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
@@ -392,12 +412,14 @@ namespace hpx { namespace naming
             {
                 HPX_RETHROW_EXCEPTION(s, "resolver_client::unregisterid", 
                     rep.get_error());
+                return false;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
         }
 
-        ec = make_error_code(s, rep.get_error());
+        if (&ec != &throws)
+            ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
@@ -418,13 +440,15 @@ namespace hpx { namespace naming
             {
                 HPX_RETHROW_EXCEPTION(s, "resolver_client::queryid", 
                     rep.get_error());
+                return false;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
         }
         id = rep.get_id();
 
-        ec = make_error_code(s, rep.get_error());
+        if (&ec != &throws)
+            ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
@@ -445,6 +469,7 @@ namespace hpx { namespace naming
             {
                 HPX_RETHROW_EXCEPTION(s, "resolver_client::get_statistics_count", 
                     rep.get_error());
+                return false;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
@@ -454,7 +479,8 @@ namespace hpx { namespace naming
         for (std::size_t i = 0; i < server::command_lastcommand; ++i)
             counts.push_back(std::size_t(rep.get_statictics(i)));
 
-        ec = make_error_code(s, rep.get_error());
+        if (&ec != &throws)
+            ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
@@ -475,13 +501,15 @@ namespace hpx { namespace naming
             {
                 HPX_RETHROW_EXCEPTION(s, "resolver_client::get_statistics_mean", 
                     rep.get_error());
+                return false;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
         }
         std::swap(timings, rep.get_statictics());
 
-        ec = make_error_code(s, rep.get_error());
+        if (&ec != &throws)
+            ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
@@ -502,13 +530,15 @@ namespace hpx { namespace naming
             {
                 HPX_RETHROW_EXCEPTION(s, "resolver_client::get_statistics_moment2", 
                     rep.get_error());
+                return false;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
             return false;
         }
         std::swap(timings, rep.get_statictics());
 
-        ec = make_error_code(s, rep.get_error());
+        if (&ec != &throws)
+            ec = make_error_code(s, rep.get_error());
         return s == success;
     }
 
@@ -561,6 +591,7 @@ namespace hpx { namespace naming
                     if (&ec == &throws) {
                         HPX_THROW_EXCEPTION(network_error, 
                             "resolver_client::get_client_connection", e.message());
+                        return boost::shared_ptr<resolver_client_connection>();
                     }
                     ec = make_error_code(network_error, e.message());
                     client_connection.reset();
@@ -578,6 +609,7 @@ namespace hpx { namespace naming
                     HPX_THROW_EXCEPTION(network_error, 
                         "resolver_client::get_client_connection", 
                         HPX_OSSTREAM_GETSTRING(strm));
+                    return boost::shared_ptr<resolver_client_connection>();
                 }
                 ec = make_error_code(network_error, HPX_OSSTREAM_GETSTRING(strm));
                 client_connection.reset();
@@ -628,19 +660,13 @@ namespace hpx { namespace naming
                     buffer.size() + sizeof(size)),
                 err);
             if (err) {
-                if (&ec == &throws) {
-                    HPX_THROW_EXCEPTION(network_error, 
-                        "resolver_client::execute", err.message());
-                }
-                ec = make_error_code(network_error, err.message());
+                HPX_THROWS_IF(ec, network_error, 
+                    "resolver_client::execute", err.message());
                 return false;
             }
             if (buffer.size() + sizeof(size) != written_bytes) {
-                if (&ec == &throws) {
-                    HPX_THROW_EXCEPTION(network_error, 
-                        "resolver_client::execute", "network write failed");
-                }
-                ec = make_error_code(network_error, "network write failed");
+                HPX_THROWS_IF(ec, network_error, 
+                    "resolver_client::execute", "network write failed");
                 return false;
             }
 
@@ -652,19 +678,13 @@ namespace hpx { namespace naming
                 boost::bind(&resolver_client::read_completed, _1, _2, sizeof(size)),
                 err);
             if (err) {
-                if (&ec == &throws) {
-                    HPX_THROW_EXCEPTION(network_error, 
-                        "resolver_client::execute", err.message());
-                }
-                ec = make_error_code(network_error, err.message());
+                HPX_THROWS_IF(ec, network_error, 
+                    "resolver_client::execute", err.message());
                 return false;
             }
             if (reply_length != sizeof(size)) {
-                if (&ec == &throws) {
-                    HPX_THROW_EXCEPTION(network_error, 
-                        "resolver_client::execute", "network read failed");
-                }
-                ec = make_error_code(network_error, "network read failed");
+                HPX_THROWS_IF(ec, network_error, 
+                    "resolver_client::execute", "network read failed");
                 return false;
             }
 
@@ -677,19 +697,13 @@ namespace hpx { namespace naming
                 err);
 
             if (err) {
-                if (&ec == &throws) {
-                    HPX_THROW_EXCEPTION(network_error, 
-                        "resolver_client::execute", err.message());
-                }
-                ec = make_error_code(network_error, err.message());
+                HPX_THROWS_IF(ec, network_error, 
+                    "resolver_client::execute", err.message());
                 return false;
             }
             if (reply_length != native_size) {
-                if (&ec == &throws) {
-                    HPX_THROW_EXCEPTION(network_error, 
-                        "resolver_client::execute", "network read failed");
-                }
-                ec = make_error_code(network_error, "network read failed");
+                HPX_THROWS_IF(ec, network_error, 
+                    "resolver_client::execute", "network read failed");
                 return false;
             }
 
@@ -708,27 +722,18 @@ namespace hpx { namespace naming
             }
         }
         catch (boost::system::system_error const& e) {
-            if (&ec == &throws) {
-                HPX_THROW_EXCEPTION(network_error, 
-                    "resolver_client::execute", e.what());
-            }
-            ec = make_error_code(network_error, e.what());
+            HPX_THROWS_IF(ec, network_error, 
+                "resolver_client::execute", e.what());
             return false;
         }
         catch (std::exception const& e) {
-            if (&ec == &throws) {
-                HPX_THROW_EXCEPTION(network_error, 
-                    "resolver_client::execute", e.what());
-            }
-            ec = make_error_code(network_error, e.what());
+            HPX_THROWS_IF(ec, network_error, 
+                "resolver_client::execute", e.what());
             return false;
         }
         catch (...) {
-            if (&ec == &throws) {
-                HPX_THROW_EXCEPTION(no_success, 
-                    "resolver_client::execute", "unexpected error");
-            }
-            ec = make_error_code(network_error, "unexpected error");
+            HPX_THROWS_IF(ec, no_success, 
+                "resolver_client::execute", "unexpected error");
             return false;
         }
 

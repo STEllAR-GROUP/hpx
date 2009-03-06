@@ -11,7 +11,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/time_logger.hpp>
-#include <hpx/performance_counters.hpp>
+#include <hpx/util/performance_counters.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
@@ -530,7 +530,7 @@ namespace hpx { namespace threads
         {
             if (performance_counters::status_invalid_data != status_) {
                 error_code ec;
-                remove_counter_type(info_, ec);   // ignore errors
+                util::remove_counter_type(info_, ec);   // ignore errors
             }
         }
 
@@ -541,7 +541,7 @@ namespace hpx { namespace threads
             BOOST_ASSERT(performance_counters::status_invalid_data == status_);
             info_.fullname_ = name;
             info_.type_ = type;
-            status_ = add_counter_type(info_, ec);
+            status_ = util::add_counter_type(info_, ec);
             return status_;
         }
 
@@ -678,7 +678,7 @@ namespace hpx { namespace threads
         {
             if (counter_) {
                 error_code ec;
-                remove_counter(info_, counter_, ec);
+                util::remove_counter(info_, counter_, ec);
             }
         }
 
@@ -688,7 +688,7 @@ namespace hpx { namespace threads
         {
             BOOST_ASSERT(!counter_);
             info_.fullname_ = name;
-            return add_counter(info_, f, counter_, ec);
+            return util::add_counter(info_, f, counter_, ec);
         }
 
         performance_counters::counter_info info_;

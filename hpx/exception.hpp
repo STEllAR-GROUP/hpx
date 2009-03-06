@@ -357,18 +357,22 @@ namespace boost { namespace system
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_THROWS_IF(ec, errcode, f, msg)                                    \
     {                                                                         \
-        if (&ec == &hpx::throws)                                              \
+        if (&ec == &hpx::throws) {                                            \
             HPX_THROW_EXCEPTION(errcode, f, msg);                             \
-        ec = make_error_code((hpx::error)errcode, msg);                       \
-    }
+        } else {                                                              \
+            ec = make_error_code((hpx::error)errcode, msg);                   \
+        }                                                                     \
+    }                                                                         \
     /**/
 
 #define HPX_RETHROWS_IF(ec, errcode, f, msg)                                  \
     {                                                                         \
-        if (&ec == &hpx::throws)                                              \
+        if (&ec == &hpx::throws) {                                            \
             HPX_RETHROW_EXCEPTION(errcode, f, msg);                           \
-        ec = make_error_code((hpx::error)errcode, msg);                       \
-    }
+        } else {                                                              \
+            ec = make_error_code((hpx::error)errcode, msg);                   \
+        }                                                                     \
+    }                                                                         \
     /**/
 
 #include <hpx/config/warnings_suffix.hpp>

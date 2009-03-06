@@ -319,10 +319,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\performance_counters.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\runtime.cpp"
 				>
 			</File>
@@ -343,6 +339,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\util\logging.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\util\performance_counters.cpp"
 					>
 				</File>
 				<File
@@ -561,10 +561,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\hpx\performance_counters.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\hpx\runtime.hpp"
 				>
 			</File>
@@ -629,6 +625,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\hpx\util\one_size_heap_list.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\hpx\util\performance_counters.hpp"
 					>
 				</File>
 				<File

@@ -7,7 +7,7 @@
 #include <hpx/include/performance_counters.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx 
+namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
     performance_counters::counter_status add_counter_type(
@@ -47,5 +47,5 @@ namespace hpx
             info, id, ec);
     }
 
-}
+}}
 
