@@ -7,8 +7,8 @@ This directory contains reimplementation of some of the hpx test codes in
 a variety of concurrent languages and environments: java, chapel, pthreads, 
 cilk, etc. This is intended for performance comparisons between "our" and 
 "their" version of functionally equivalent codes (at least as close as we 
-can get), which potentially could point out inefficiencies and bugs in 
-our system.
+can get), which could help detect inefficiencies and bugs in hpx.
+
 
 fibonacci
 ---------
@@ -33,3 +33,23 @@ pfibaff.c: as "pfib.c", but with forced thread affinity. Option "-t
 <number>" will cause the program to use only the first <number> of cores 
 available on the system. The threads are assigned to cores based on the 
 value of the thread input argument modulo <number>.
+
+non-uniform workload on regular mesh
+------------------------------------
+mpiasym2d.c: MPI implementation of 2-D grid evolution with random amount 
+of work per point. The workload pdf is described by its mean and standard 
+deviation; supported distributions are "uniform" and "normal". The work 
+is simulated by repeated accumulation of all values from square 
+neighborhood of the point including (2*n+1)^2 mesh points, where n is the 
+number of ghost cells; the final result per point is then obtained by 
+dividing the computed sum by the product of (random) number of iterations 
+and stencil size. The simulation degenerates to 1-D case (albeit 
+inefficiently) when one of grid dimensions is given as 1; "-y 1" is 
+preferred due to arrangement of arrays in memory.
+
+mpiasym1dz.c: modified version of mpiasym2d.c to provide a better match 
+for timing comparisons with amr example (also modified to include random 
+workload emulation). The changes include introduction of fixed-size 
+"zones" with localized uniform workload, pre-generation of workload data 
+to avoid RNG invocations during measurements, periodic grid, and fixed 
+1-D stencil (3 points).
