@@ -20,6 +20,15 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(raw_counter_type, raw_counter);
 
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::performance_counters::server::raw_counter);
 
+namespace hpx { namespace actions
+{
+    template hpx::performance_counters::counter_info const& 
+    continuation::trigger(hpx::performance_counters::counter_info const& arg0);
+
+    template hpx::performance_counters::counter_value const& 
+    continuation::trigger(hpx::performance_counters::counter_value const& arg0);
+}}
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
 {
