@@ -81,6 +81,7 @@ void eval(double *buf, struct coords *co, double *tmp)
   }
 }
 
+/* communicate ghost zone in non-periodic 2-D mesh */
 void comm(double *buf, struct coords *co)
 {
   MPI_Request req[4];
