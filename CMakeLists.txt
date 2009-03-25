@@ -197,6 +197,7 @@ add_subdirectory(hpx/components)
 # executables depend on libraries above
 add_subdirectory(tests)
 add_subdirectory(examples)
+add_subdirectory(applications)
 add_subdirectory(runtime)
 
 # installation instructions
