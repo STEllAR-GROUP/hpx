@@ -8,6 +8,8 @@
 #include "../amr_c/stencil_data.hpp"
 #include "../amr_c/stencil_functions.hpp"
 
+#include "rand.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
 {
@@ -18,10 +20,13 @@ namespace hpx { namespace components { namespace amr
         val->max_index_ = maxitems;
         val->index_ = item;
         val->timestep_ = 0;
+        /*
         if (item < (int)(maxitems / 3.) || item >= (int)(2. * maxitems / 3.))
             val->value_ = 0;
         else
             val->value_ = pow(item - 1./3., 4.) * pow(item - 2./3., 4.);
+	*/
+	val->value_ = drand48();
 
         return 1;
     }
@@ -31,10 +36,20 @@ namespace hpx { namespace components { namespace amr
         stencil_data const* right, stencil_data* result, int numsteps)
     {
         // the middle point is our direct predecessor
+
         result->max_index_ = middle->max_index_;
         result->index_ = middle->index_;
         result->timestep_ = middle->timestep_ + 1;
+        /*
         result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
+	*/
+        double sum = 0;
+	long t, n = work[middle->timestep_*nzones+middle->index_/zone];
+
+	//printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
+	for (t = 0; t < n; t++)
+  	    sum += left->value_+middle->value_+right->value_;
+	result->value_ = sum/(3.0*t);
 
         return 1;
     }

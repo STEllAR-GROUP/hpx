@@ -17,6 +17,8 @@
 #include "amr_c/stencil.hpp"
 #include "amr_c/logging.hpp"
 
+#include "amr_c_test/rand.hpp"
+
 namespace po = boost::program_options;
 
 using namespace hpx;
@@ -35,11 +37,14 @@ int hpx_main(std::size_t numvals, std::size_t numsteps, bool do_logging)
         components::amr::amr_mesh mesh (
             components::amr::amr_mesh::create(here, 1, true));
 
+	hpx::util::high_resolution_timer t;
         std::vector<naming::id_type> result_data(
             mesh.execute(function_type, numvals, numsteps, 
                 do_logging ? logging_type : components::component_invalid));
+	printf("Elapsed time: %f s\n", t.elapsed());
 
         // get some output memory_block_data instances
+	/*
         std::cout << "Results: " << std::endl;
         for (std::size_t i = 0; i < result_data.size(); ++i)
         {
@@ -47,6 +52,8 @@ int hpx_main(std::size_t numvals, std::size_t numsteps, bool do_logging)
                 components::stubs::memory_block::get(result_data[i]));
             std::cout << i << ": " << val->value_ << std::endl;
         }
+	*/
+	sleep(3);
 
         for (std::size_t i = 0; i < result_data.size(); ++i)
             components::stubs::memory_block::free(result_data[i]);
@@ -79,6 +86,12 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "HPX locality")
             ("numvals,n", po::value<std::size_t>(), 
                 "the number of data points to use for the computation")
+            ("dist,d", po::value<std::string>(), 
+                "random distribution type (uniform or normal)")
+            ("mean,M", po::value<double>(), 
+                "mean value of specified distribution")
+            ("stddev,S", po::value<double>(), 
+                "variance value of specified distribution")
             ("numsteps,s", po::value<std::size_t>(), 
                 "the number of time steps to use for the computation")
             ("verbose,v", "print calculated values after each time step")
@@ -170,6 +183,18 @@ int main(int argc, char* argv[])
         if (vm.count("worker"))
             mode = hpx::runtime::worker;
 
+	char pdist = 'u';
+	if (vm.count("dist"))
+            pdist = vm["dist"].as<std::string>()[0];
+
+	double mean = 1.0;
+	if (vm.count("mean"))
+            mean = vm["mean"].as<double>();
+
+	double stddev = 0.0;
+	if (vm.count("stddev"))
+            stddev = vm["stddev"].as<double>();
+
         if (vm.count("verbose"))
             do_logging = true;
 
@@ -186,6 +211,8 @@ int main(int argc, char* argv[])
         if (vm.count("numsteps"))
             numsteps = vm["numsteps"].as<std::size_t>();
 
+	initrand(42, pdist, mean, stddev, numsteps, numvals, num_threads);
+
         // initialize and start the HPX runtime
         hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, mode);
         if (mode == hpx::runtime::worker) 
@@ -201,6 +228,7 @@ int main(int argc, char* argv[])
         std::cerr << "unexpected exception caught\n";
         return -2;
     }
+
     return 0;
 }
 
