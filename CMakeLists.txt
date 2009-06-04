@@ -60,7 +60,7 @@ if(Boost_FOUND)
         " (${Boost_INCLUDE_DIR})")
 else()
     message(FATAL "Boost installation not found. Please specify the Boost"
-        "installation directory using -DBOOST_ROOT=...")
+        "installation directory using -DBOOST_ROOT=...\nReason for error:\n" ${Boost_ERROR_REASON})
 endif()
 
 include_directories(${Boost_INCLUDE_DIR})
