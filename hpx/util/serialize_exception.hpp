@@ -72,25 +72,25 @@ namespace boost { namespace serialization
             boost::rethrow_exception(ep);
         }
         catch (boost::exception const& e) {
-            boost::shared_ptr<char const* const> func = 
-                boost::get_error_info<boost::throw_function>(e);
+            boost::shared_ptr<char const* const> func(
+                boost::get_error_info<boost::throw_function>(e));
             if (func) {
                 throw_function = *func;
             }
             else {
-                boost::shared_ptr<std::string const> func = 
-                    boost::get_error_info<hpx::detail::throw_function>(e);
+                boost::shared_ptr<std::string const> func(
+                    boost::get_error_info<hpx::detail::throw_function>(e));
                 if (func)
                     throw_function = *func;
             }
 
-            boost::shared_ptr<std::string const> file = 
-                boost::get_error_info<hpx::detail::throw_file>(e);
+            boost::shared_ptr<std::string const> file(
+                boost::get_error_info<hpx::detail::throw_file>(e));
             if (file)
                 throw_file = *file;
 
-            boost::shared_ptr<int const> line =
-                boost::get_error_info<hpx::detail::throw_line>(e);
+            boost::shared_ptr<int const> line(
+                boost::get_error_info<hpx::detail::throw_line>(e));
             if (line)
                 throw_line = *line;
         }

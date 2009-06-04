@@ -21,6 +21,7 @@
 #include <boost/assert.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <boost/algorithm/string/case_conv.hpp>
 
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/version.hpp>
@@ -241,7 +242,7 @@ namespace hpx { namespace components { namespace server
 
             if (i->second.has_entry("enabled")) {
                 std::string tmp = i->second.get_entry("enabled");
-                boost::to_lower (tmp);
+                boost::algorithm::to_lower (tmp);
                 if (tmp == "no" || tmp == "false" || tmp == "0") {
                     LRT_(info) << "dynamic loading disabled: " << instance;
                     continue;     // this component has been disabled
@@ -252,7 +253,7 @@ namespace hpx { namespace components { namespace server
             bool isdefault = false;
             if (i->second.has_entry("isdefault")) {
                 std::string tmp = i->second.get_entry("isdefault");
-                boost::to_lower (tmp);
+                boost::algorithm::to_lower (tmp);
                 if (tmp == "true") 
                     isdefault = true;
             }
