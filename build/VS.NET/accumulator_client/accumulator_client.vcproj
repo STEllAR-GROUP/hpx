@@ -100,7 +100,7 @@
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="..\hpx64.vsprops"
+			InheritedPropertySheets="..\hpx64_application.vsprops"
 			CharacterSet="0"
 			>
 			<Tool
@@ -253,7 +253,7 @@
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="..\hpx64.vsprops"
+			InheritedPropertySheets="..\hpx64_application.vsprops"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
 			>
@@ -337,13 +337,6 @@
 			<File
 				RelativePath="..\..\..\examples\accumulator\accumulator_client.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 		</Filter>
 		<File
