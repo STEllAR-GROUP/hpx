@@ -104,7 +104,7 @@ namespace hpx
                 mode locality_mode = worker);
 
         /// \brief The destructor makes sure all HPX runtime services are 
-        ///        properly shut down before existing.
+        ///        properly shut down before exiting.
         ~runtime();
 
         /// \brief Start the runtime system

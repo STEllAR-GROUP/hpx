@@ -25,8 +25,8 @@ namespace hpx { namespace components { namespace amr
             val->value_ = 0;
         else
             val->value_ = pow(item - 1./3., 4.) * pow(item - 2./3., 4.);
-	*/
-	val->value_ = drand48();
+        */
+        val->value_ = random_numbers();
 
         return 1;
     }

@@ -10,6 +10,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
+#include <boost/thread.hpp>
 
 #include "amr/stencil_value.hpp"
 #include "amr/functional_component.hpp"
@@ -37,14 +38,14 @@ int hpx_main(std::size_t numvals, std::size_t numsteps, bool do_logging)
         components::amr::amr_mesh mesh (
             components::amr::amr_mesh::create(here, 1, true));
 
-	hpx::util::high_resolution_timer t;
+        hpx::util::high_resolution_timer t;
         std::vector<naming::id_type> result_data(
             mesh.execute(function_type, numvals, numsteps, 
                 do_logging ? logging_type : components::component_invalid));
-	printf("Elapsed time: %f s\n", t.elapsed());
+        printf("Elapsed time: %f s\n", t.elapsed());
 
         // get some output memory_block_data instances
-	/*
+        /*
         std::cout << "Results: " << std::endl;
         for (std::size_t i = 0; i < result_data.size(); ++i)
         {
@@ -52,8 +53,9 @@ int hpx_main(std::size_t numvals, std::size_t numsteps, bool do_logging)
                 components::stubs::memory_block::get(result_data[i]));
             std::cout << i << ": " << val->value_ << std::endl;
         }
-	*/
-	sleep(3);
+        */
+
+        boost::this_thread::sleep(boost::posix_time::seconds(3)); 
 
         for (std::size_t i = 0; i < result_data.size(); ++i)
             components::stubs::memory_block::free(result_data[i]);
@@ -183,16 +185,16 @@ int main(int argc, char* argv[])
         if (vm.count("worker"))
             mode = hpx::runtime::worker;
 
-	char pdist = 'u';
-	if (vm.count("dist"))
+        char pdist = 'u';
+        if (vm.count("dist"))
             pdist = vm["dist"].as<std::string>()[0];
 
-	double mean = 1.0;
-	if (vm.count("mean"))
+        double mean = 1.0;
+        if (vm.count("mean"))
             mean = vm["mean"].as<double>();
 
-	double stddev = 0.0;
-	if (vm.count("stddev"))
+        double stddev = 0.0;
+        if (vm.count("stddev"))
             stddev = vm["stddev"].as<double>();
 
         if (vm.count("verbose"))
@@ -211,7 +213,7 @@ int main(int argc, char* argv[])
         if (vm.count("numsteps"))
             numsteps = vm["numsteps"].as<std::size_t>();
 
-	initrand(42, pdist, mean, stddev, numsteps, numvals, num_threads);
+        initrand(42, pdist, mean, stddev, numsteps, numvals, num_threads);
 
         // initialize and start the HPX runtime
         hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, mode);

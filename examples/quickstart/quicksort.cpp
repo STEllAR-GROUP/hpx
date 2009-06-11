@@ -68,7 +68,7 @@ inline std::size_t partition(T* data, std::size_t begin, std::size_t end)
     return middle - data;
 }
 
-int count = 0;
+int sort_count = 0;
 
 template <typename T>
 void quicksort<T>::call(naming::id_type prefix, naming::id_type d, 
@@ -85,7 +85,7 @@ void quicksort<T>::call(naming::id_type prefix, naming::id_type d,
 
         std::size_t middle_idx = partition(data.get_ptr(), begin, end);
 
-        ++count;
+        ++sort_count;
 //         std::cout << "middle: " << middle_idx << std::endl;
 
         // always spawn the larger part in a new thread
@@ -148,7 +148,7 @@ int hpx_main(int argument)
 
         elapsed = t.elapsed();
         std::cout << "elapsed: " << elapsed << std::endl;
-        std::cout << "count: " << count << std::endl;
+        std::cout << "count: " << sort_count << std::endl;
 
         mb.free();
     }

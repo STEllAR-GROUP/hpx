@@ -21,9 +21,8 @@
 #include <boost/version.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/bind.hpp>
-#include <boost/ref.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/preprocessor/stringize.hpp>
+#include <boost/preprocessor/cat.hpp>
+#include <boost/preprocessor/repeat.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

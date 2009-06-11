@@ -1,8 +1,14 @@
+//  Copyright (c) 2009 Maciej Brodowicz
+// 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 #include "rand.hpp"
 
 long *work = 0;
 int zone = 0, nzones = 1;
 
+boost::rand48 random_numbers;
 
 double normicdf(double p)
 {
@@ -35,7 +41,7 @@ double normicdf(double p)
 /* P_HIGH = 1 - P_LOW */
 #define P_HIGH  0.97575
 
-    double x, q, r, u, e;
+    double x, q, r/*, u, e*/;
 
     if ((0 < p )  && (p < P_LOW))
     {
@@ -45,19 +51,19 @@ double normicdf(double p)
     else
     {
         if ((P_LOW <= p) && (p <= P_HIGH))
-	{
-	    q = p - 0.5;
-	    r = q*q;
-	    x = (((((A1*r+A2)*r+A3)*r+A4)*r+A5)*r+A6)*q/(((((B1*r+B2)*r+B3)*r+B4)*r+B5)*r+1);
-	}
-	else
         {
-	    if ((P_HIGH < p) && (p < 1))
-	    {
-	        q = sqrt(-2*log(1-p));
-		x = -(((((C1*q+C2)*q+C3)*q+C4)*q+C5)*q+C6)/((((D1*q+D2)*q+D3)*q+D4)*q+1);
-	    }
-	}
+            q = p - 0.5;
+            r = q*q;
+            x = (((((A1*r+A2)*r+A3)*r+A4)*r+A5)*r+A6)*q/(((((B1*r+B2)*r+B3)*r+B4)*r+B5)*r+1);
+        }
+        else
+        {
+            if ((P_HIGH < p) && (p < 1))
+            {
+                q = sqrt(-2*log(1-p));
+                x = -(((((C1*q+C2)*q+C3)*q+C4)*q+C5)*q+C6)/((((D1*q+D2)*q+D3)*q+D4)*q+1);
+            }
+        }
     }
 
     return x;
@@ -66,7 +72,7 @@ double normicdf(double p)
 void initrand(long seed, char dist, double mean, double stddev, int iters, int points, int nthr)
 {
     nzones = nthr; zone = points/nzones;
-    srand48(seed);
+    random_numbers.seed(seed);
 
     int i, npos = 0, allz = iters*nzones;
     work = new long[allz];
@@ -74,34 +80,34 @@ void initrand(long seed, char dist, double mean, double stddev, int iters, int p
     { /* uniform distribution */
         double h = sqrt(3.0)*stddev;
     
-	for (i = 0; i < allz; i++)
-	{
-  	    work[i] = mean-h+drand48()*(2*h);
-	    if (work[i] <= 0)
-	    {
-	        work[i] = 1; ++npos;
-	    }
-	}
+        for (i = 0; i < allz; i++)
+        {
+            work[i] = long(mean-h+random_numbers()*(2*h));
+            if (work[i] <= 0)
+            {
+                work[i] = 1; ++npos;
+            }
+        }
     }
     else if (dist == 'n')
     { /* normal distribution */
         for (i = 0; i < allz; i++)
-	{
-	    work[i] = mean+stddev*normicdf(((double)i+0.5)/RNDMAPSZ);
-	    if (work[i] <= 0)
-	    {
-	        work[i] = 1; ++npos;
-	    }
-	}
+        {
+            work[i] = long(mean+stddev*normicdf(((double)i+0.5)/RNDMAPSZ));
+            if (work[i] <= 0)
+            {
+                work[i] = 1; ++npos;
+            }
+        }
     }
     else
     {
         std::cerr << "Error: unsupported probability distribution: " << dist
-		  << std::endl;
-	exit(-4);
+                  << std::endl;
+        exit(-4);
     }
 
     if (npos)
         std::cerr << "Warning: converted " << npos
-		  <<" non-positive entries (probability distribution is skewed)!\n";
+                  <<" non-positive entries (probability distribution is skewed)!\n";
 }
