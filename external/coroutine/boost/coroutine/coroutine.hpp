@@ -226,6 +226,8 @@ namespace boost { namespace coroutines {
           (BOOST_COROUTINE_ARG_MAX, 
            arg)));
     }
+
+#   undef BOOST_COROUTINE_param_typedef
 #   undef BOOST_COROUTINE_param_with_default
 
     typedef void(coroutine::*bool_type)();

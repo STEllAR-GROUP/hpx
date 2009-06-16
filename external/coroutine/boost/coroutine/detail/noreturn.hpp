@@ -40,20 +40,27 @@
 
 #if defined(__GNUC__)
 
-#define BOOST_COROUTINE_NORETURN(function) \
-    function __attribute__((__noreturn__)) \
+#if __GNUC_MAJOR__ > 3 || (__GNUC_MAJOR__ == 3 && __GNUC_MINOR__ > 3)
+#define BOOST_COROUTINE_NORETURN(function)                                    \
+    function __attribute__((__noreturn__))                                    \
 /**/
+#else // gcc 3.3
+#define BOOST_COROUTINE_NORETURN(function)                                    \
+    function
+/**/
+#endif // gcc 3.3
   
 #elif defined (BOOST_MSVC)
 
-#define BOOST_COROUTINE_NORETURN(function) \
-    __declspec(noreturn) function          \
+#define BOOST_COROUTINE_NORETURN(function)                                    \
+    __declspec(noreturn) function                                             \
 /**/
 
 #else
+
 //just for testing, remove the following error.
 #error no default
-#define BOOST_COROUTINE_NORETURN(function) \
+#define BOOST_COROUTINE_NORETURN(function)                                    \
     function
 /**/
 

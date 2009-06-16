@@ -28,12 +28,65 @@
 
 #ifndef BOOST_COROUTINE_CONTEXT_POSIX_HPP_20060601
 #define BOOST_COROUTINE_CONTEXT_POSIX_HPP_20060601
+
+// NOTE (per http://lists.apple.com/archives/darwin-dev/2008/Jan/msg00232.html):
+// > Why the bus error? What am I doing wrong? 
+// This is a known issue where getcontext(3) is writing past the end of the
+// ucontext_t struct when _XOPEN_SOURCE is not defined (rdar://problem/5578699 ).
+// As a workaround, define _XOPEN_SOURCE before including ucontext.h.
+#if defined(__APPLE__) && ! defined(_XOPEN_SOURCE)
+#define _XOPEN_SOURCE
+// However, the above #define will only affect <ucontext.h> if it has not yet
+// been #included by something else!
+#if defined(_STRUCT_UCONTEXT)
+#error You must #include coroutine headers before anything that #includes <ucontext.h>
+#endif
+#endif
+
 #include <boost/config.hpp>
+#include <boost/assert.hpp>
 
 #if defined(_XOPEN_UNIX) && defined(_XOPEN_VERSION) && _XOPEN_VERSION >= 500
 
+// OS X 10.4 -- despite passing the test above -- doesn't support
+// swapcontext() et al. Use GNU Pth workalike functions.
+#if defined(__APPLE__) && (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ < 1050)
+
+#include "pth/pth.h"
+#include <cerrno>
+
+namespace boost { namespace coroutines { namespace detail {
+  namespace posix { namespace pth {
+
+    inline int check(int rc)
+    {
+        // The makecontext() functions return zero for success, nonzero for
+        // error. The Pth library returns TRUE for success, FALSE for error,
+        // with errno set to the nonzero error in the latter case. Map the Pth
+        // returns to ucontext style.
+        return rc? 0 : errno;
+    }
+
+}}}}}
+
+#define BOOST_CORO_POSIX_IMPL "Pth implementation"
+#define BOOST_CORO_DECLARE_CONTEXT(name) pth_uctx_t name
+#define BOOST_CORO_CREATE_CONTEXT(ctx)                                        \
+    boost::coroutines::detail::posix::pth::check(pth_uctx_create(&(ctx)))
+#define BOOST_CORO_MAKE_CONTEXT(ctx, stack, size, startfunc, startarg, exitto) \
+    /* const sigset_t* sigmask = NULL: we don't expect per-context signal masks */ \
+    boost::coroutines::detail::posix::pth::check(                             \
+        pth_uctx_make(*(ctx), static_cast<char*>(stack), (size), NULL,        \
+        (startfunc), (startarg), (exitto)))
+#define BOOST_CORO_SWAP_CONTEXT(from, to)                                     \
+    boost::coroutines::detail::posix::pth::check(pth_uctx_switch(*(from), *(to)))
+#define BOOST_CORO_DESTROY_CONTEXT(ctx)                                       \
+    boost::coroutines::detail::posix::pth::check(pth_uctx_destroy(ctx))
+
+#else // generic Posix platform (e.g. OS X >= 10.5)
+
 /*
- * makecontex based context implementation. Should be available on all
+ * makecontext based context implementation. Should be available on all
  * SuSv2 compliant UNIX systems. 
  * NOTE: this implementation is not
  * optimal as the makecontext API saves and restore the signal mask.
@@ -43,6 +96,46 @@
  * it is unlikely that they will be removed any time soon.
  */
 #include <ucontext.h>
+#include <cstddef>                  // ptrdiff_t
+
+namespace boost { namespace coroutines { namespace detail {
+  namespace posix { namespace ucontext {
+
+    inline int make_context(::ucontext_t* ctx, void* stack, std::ptrdiff_t size,
+                            void (*startfunc)(void*), void* startarg, 
+                            ::ucontext_t* exitto = NULL)
+    {
+        int error = ::getcontext(ctx);
+        if (error)
+            return error;
+
+        ctx->uc_stack.ss_sp = stack;
+        ctx->uc_stack.ss_size = size;
+        ctx->uc_link = exitto;
+
+        typedef void (*ctx_main)();
+        //makecontext can't fail.
+        ::makecontext(ctx,
+                      (ctx_main)(startfunc), 
+                      1,
+                      startarg);
+        return 0;
+    }
+
+}}}}}
+
+#define BOOST_CORO_POSIX_IMPL "ucontext implementation"
+#define BOOST_CORO_DECLARE_CONTEXT(name) ::ucontext_t name
+#define BOOST_CORO_CREATE_CONTEXT(ctx) /* nop */
+#define BOOST_CORO_MAKE_CONTEXT(ctx, stack, size, startfunc, startarg, exitto) \
+    boost::coroutines::detail::posix::ucontext::make_context(                 \
+        ctx, stack, size, startfunc, startarg, exitto)
+#define BOOST_CORO_SWAP_CONTEXT(pfrom, pto) ::swapcontext((pfrom), (pto))
+#define BOOST_CORO_DESTROY_CONTEXT(ctx) /* nop */
+
+#endif // generic Posix platform
+
+#include <signal.h>                 // SIGSTKSZ
 #include <boost/noncopyable.hpp>
 #include <boost/coroutine/exception.hpp>
 #include <boost/coroutine/detail/posix_utility.hpp>
@@ -66,68 +159,74 @@ namespace boost { namespace coroutines {
      * (at that point it will be initialized).
      *
      */
-    class ucontext_context_impl_base {
+    class ucontext_context_impl_base 
+    {
+    public:
+      ucontext_context_impl_base()
+      {
+          BOOST_CORO_CREATE_CONTEXT(m_ctx);
+      }
+      ~ucontext_context_impl_base()
+      {
+          BOOST_CORO_DESTROY_CONTEXT(m_ctx);
+      }
+
+    private:
       /*
        * Free function. Saves the current context in @p from
        * and restores the context in @p to.
        */     
-      friend 
-      void 
+      friend void 
       swap_context(ucontext_context_impl_base& from, 
-		   const ucontext_context_impl_base& to,
-		   default_hint) {
-	int  error = ::swapcontext(&from.m_ctx, &to.m_ctx); 
-	(void)error;
-	BOOST_ASSERT(error == 0);
+                   const ucontext_context_impl_base& to,
+                   default_hint) 
+      {
+          int  error = BOOST_CORO_SWAP_CONTEXT(&from.m_ctx, &to.m_ctx); 
+          (void)error;
+          BOOST_ASSERT(error == 0);
       }
 
     protected:
-      ::ucontext_t m_ctx;
+      BOOST_CORO_DECLARE_CONTEXT(m_ctx);
     };
 
-    class ucontext_context_impl :
-      public ucontext_context_impl_base,
-      private boost::noncopyable {
+    class ucontext_context_impl 
+      : public ucontext_context_impl_base,
+        private boost::noncopyable 
+    {
     public:
-      typedef ucontext_context_impl_base context_impl_base;
+        typedef ucontext_context_impl_base context_impl_base;
 
-      enum {default_stack_size = 8192};
+        enum { default_stack_size = 8192 };
 
-    
-      /**
-       * Create a context that on restore inovkes Functor on
-       *  a new stack. The stack size can be optionally specified.
-       */
-      template<typename Functor>
-      explicit
-	ucontext_context_impl(Functor& cb, std::ptrdiff_t stack_size) :
-      m_stack(alloc_stack(stack_size == -1? default_stack_size: stack_size)) {
-	stack_size = stack_size == -1? default_stack_size: stack_size;
-	int error = ::getcontext(&m_ctx);
-	BOOST_ASSERT(error == 0);
-	(void)error;
-	m_ctx.uc_stack.ss_sp = m_stack;
-	m_ctx.uc_stack.ss_size = stack_size;
-	BOOST_ASSERT(m_stack);
-	m_ctx.uc_link = 0;
-	typedef void cb_type(Functor*);
-	typedef void (*ctx_main)();
-	cb_type * cb_ptr = &trampoline<Functor>; 
+        /**
+         * Create a context that on restore invokes Functor on
+         *  a new stack. The stack size can be optionally specified.
+         */
+        template<typename Functor>
+        explicit ucontext_context_impl(Functor& cb, std::ptrdiff_t stack_size) 
+          : m_stack_size(stack_size == -1? default_stack_size: stack_size),
+            m_stack(alloc_stack(m_stack_size)) 
+        {
+            BOOST_ASSERT(m_stack);
+            typedef void cb_type(Functor*);
+            cb_type * cb_ptr = &trampoline<Functor>; 
+            int error = BOOST_CORO_MAKE_CONTEXT(&m_ctx, m_stack, m_stack_size,
+                                                (void (*)(void*))(cb_ptr), &cb, NULL);
+            (void)error;
+            BOOST_ASSERT(error == 0);
+        }
 
-	//makecontext can't fail.
-	::makecontext(&m_ctx,
-		      (ctx_main)(cb_ptr), 
-		      1,
-		      &cb);
-      }
-      
-      ~ucontext_context_impl() {
-	if(m_stack)
-	  free_stack(m_stack, m_ctx.uc_stack.ss_size);
-      }
+        ~ucontext_context_impl() 
+        {
+            if(m_stack)
+                free_stack(m_stack, m_stack_size);
+        }
 
     private:
-      void * m_stack;
+        // declare m_stack_size first so we can use it to initialize m_stack
+        std::ptrdiff_t m_stack_size;
+        void * m_stack;
     };
 
     typedef ucontext_context_impl context_impl;
@@ -136,11 +235,13 @@ namespace boost { namespace coroutines {
 #else 
 
 /**
- * This is just a temporary placeholder. Context swapping can
- * be implemented on all most posix systems lacking *context using the
- * sigaltstack+longjmp trick.
- * Eventually it will be implemented, but for now just throw an error.
- * Most posix systems are at least SuSv2 compliant anyway.
+ * This #else clause is essentially unchanged from the original Google Summer
+ * of Code version of Boost.Coroutine, which comments:
+ * "Context swapping can be implemented on most posix systems lacking *context
+ * using the sigaltstack+longjmp trick."
+ * This is in fact what the (highly portable) Pth library does, so if you
+ * encounter such a system, perhaps the best approach would be to twiddle the
+ * #if logic in this header to use the pth.h implementation above.
  */
 #error No context implementation for this POSIX system.
 

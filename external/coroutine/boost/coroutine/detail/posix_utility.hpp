@@ -46,6 +46,35 @@
  */
 namespace boost { namespace coroutines { namespace detail { namespace posix {
 
+#if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
+
+  inline 
+  void * 
+  alloc_stack(std::size_t size) {
+    void * stack = ::mmap(NULL,
+			  size,
+			  PROT_EXEC|PROT_READ|PROT_WRITE,
+#if defined(__APPLE__)
+			  MAP_PRIVATE|MAP_ANON,
+#else // ! __APPLE__
+			  MAP_PRIVATE|MAP_ANONYMOUS,
+#endif // ! __APPLE__
+			  -1,
+			  0
+			  );
+    if(stack == MAP_FAILED) {
+      std::cerr <<strerror(errno)<<"\n";
+      abort();
+    }
+    return stack;
+  }
+
+  inline
+  void free_stack(void* stack, std::size_t size) {
+    ::munmap(stack, size);
+  }
+
+#else  // non-mmap()
   
   //this should be a fine default.
   static const std::size_t stack_alignment = sizeof(void*) > 16? sizeof(void*): 16;
@@ -72,6 +101,8 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
   void free_stack(void* stack, std::size_t size) {
     delete [] static_cast<stack_aligner*>(stack);
   }
+
+#endif  // non-mmap() implementation of alloc_stack()/free_stack()
 
   /**
    * The splitter is needed for 64 bit systems. 
@@ -121,41 +152,41 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
 }
 } } }
 
-#if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
-#include <sys/mman.h>
-
-#if defined(MAP_ANONYMOUS)
-# define HPX_MAP_ANONYMOUS MAP_ANONYMOUS
-#elif defined(MAP_ANON)
-# define HPX_MAP_ANONYMOUS MAP_ANON
-#else
-# error "Anonymous mmap not available on this platform!"
-#endif
-
-namespace boost { namespace coroutines { namespace detail { namespace posix {
-  inline 
-  void * 
-  alloc_stack_mmap(std::size_t size) {
-    void * stack = ::mmap(NULL,
-                          size,
-                          PROT_EXEC|PROT_READ|PROT_WRITE,
-                          MAP_PRIVATE|HPX_MAP_ANONYMOUS,
-                          -1,
-                          0
-                          );
-    if(stack == MAP_FAILED) {
-      std::cerr <<strerror(errno)<<"\n";
-      abort();
-    }
-    return stack;
-  }
-
-  inline
-  void free_stack_mmap(void* stack, std::size_t size) {
-    ::munmap(stack, size);
-  }
-} } } }
-#endif
+//#if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
+//#include <sys/mman.h>
+//
+//#if defined(MAP_ANONYMOUS)
+//# define HPX_MAP_ANONYMOUS MAP_ANONYMOUS
+//#elif defined(MAP_ANON)
+//# define HPX_MAP_ANONYMOUS MAP_ANON
+//#else
+//# error "Anonymous mmap not available on this platform!"
+//#endif
+//
+//namespace boost { namespace coroutines { namespace detail { namespace posix {
+//  inline 
+//  void * 
+//  alloc_stack_mmap(std::size_t size) {
+//    void * stack = ::mmap(NULL,
+//                          size,
+//                          PROT_EXEC|PROT_READ|PROT_WRITE,
+//                          MAP_PRIVATE|HPX_MAP_ANONYMOUS,
+//                          -1,
+//                          0
+//                          );
+//    if(stack == MAP_FAILED) {
+//      std::cerr <<strerror(errno)<<"\n";
+//      abort();
+//    }
+//    return stack;
+//  }
+//
+//  inline
+//  void free_stack_mmap(void* stack, std::size_t size) {
+//    ::munmap(stack, size);
+//  }
+//} } } }
+//#endif
 #else
 #error This header can only be included when compiling for posix systems.
 #endif

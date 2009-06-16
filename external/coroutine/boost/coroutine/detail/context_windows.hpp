@@ -31,7 +31,7 @@
 #include <windows.h>
 #include <winnt.h>
 #include <boost/config.hpp>
-#include <boost/config.hpp>
+#include <boost/assert.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/system/system_error.hpp>

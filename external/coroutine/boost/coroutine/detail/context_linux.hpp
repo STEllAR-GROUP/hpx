@@ -34,6 +34,7 @@
 #include <cstddef>
 #include <boost/coroutine/detail/posix_utility.hpp>
 #include <boost/coroutine/detail/swap_context.hpp>
+#include <boost/assert.hpp>
 
 /*
  * Defining BOOST_COROUTINE_INLINE_ASM will enable the inlin3
