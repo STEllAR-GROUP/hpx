@@ -12,6 +12,7 @@
 #include <string>
 #include <iostream>
 #include <boost/random/linear_congruential.hpp>
+#include <hpx/config/export_definitions.hpp>
 
 #define RNDMAPSZ 10000
 
@@ -20,6 +21,6 @@ extern int zone, nzones;
 extern boost::rand48 random_numbers;
 
 double normicdf(double);
-void initrand(long, char, double, double, int, int, int);
+HPX_COMPONENT_EXPORT void initrand(long, char, double, double, int, int, int);
 
 #endif // _rand_hpp
