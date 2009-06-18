@@ -41,6 +41,7 @@
 #include <iostream>
 #include <boost/type_traits.hpp>
 #include <cstring>
+#include <sys/mman.h>
 /**
  * Stack allocation routines and trampolines for setcontext
  */
@@ -52,16 +53,16 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
   void * 
   alloc_stack(std::size_t size) {
     void * stack = ::mmap(NULL,
-			  size,
-			  PROT_EXEC|PROT_READ|PROT_WRITE,
+                          size,
+                          PROT_EXEC|PROT_READ|PROT_WRITE,
 #if defined(__APPLE__)
-			  MAP_PRIVATE|MAP_ANON,
+                          MAP_PRIVATE|MAP_ANON,
 #else // ! __APPLE__
-			  MAP_PRIVATE|MAP_ANONYMOUS,
+                          MAP_PRIVATE|MAP_ANONYMOUS,
 #endif // ! __APPLE__
-			  -1,
-			  0
-			  );
+                          -1,
+                          0
+                          );
     if(stack == MAP_FAILED) {
       std::cerr <<strerror(errno)<<"\n";
       abort();
