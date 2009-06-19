@@ -79,7 +79,7 @@ namespace hpx { namespace parcelset { namespace server
             }
             else {
                 // Determine the length of the serialized data.
-                std::size_t inbound_data_size = in_size_;
+                boost::uint64_t inbound_data_size = in_size_;
 
                 // Start an asynchronous call to receive the data.
                 in_buffer_->resize(inbound_data_size);
