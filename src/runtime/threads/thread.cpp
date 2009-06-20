@@ -69,6 +69,19 @@ namespace hpx { namespace threads
         return thread_self::impl_type::super_type::get_self();
     }
 
+    namespace detail
+    {
+        void thread::set_event()
+        {
+            // we need to reactivate the thread itself
+            if (suspended == static_cast<thread_state>(current_state_)) {
+                hpx::applier::get_applier().get_thread_manager().
+                    set_state(get_thread_id(), pending);
+            }
+            // FIXME: implement functionality required for depleted state
+        }
+    }
+
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

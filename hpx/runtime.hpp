@@ -12,6 +12,8 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/runtime/threads/policies/global_queue_scheduler.hpp>
+#include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/action_manager.hpp>
@@ -28,16 +30,17 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx 
 {
-    /// \class runtime runtime.hpp hpx/runtime.hpp
+    /// \class runtime_impl runtime.hpp hpx/runtime.hpp
     ///
     /// The \a runtime class encapsulates the HPX runtime system in a simple to 
     /// use way. It makes sure all required parts of the HPX runtime system are
     /// properly initialized. 
-    class HPX_EXPORT runtime
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    class HPX_EXPORT runtime_impl
     {
     private:
         // avoid warnings about usage of this in member initializer list
-        runtime* This() { return this; }
+        runtime_impl* This() { return this; }
 
         // 
         static void default_errorsink(boost::uint32_t, std::string const&);
@@ -50,6 +53,9 @@ namespace hpx
         ///
         typedef void hpx_errorsink_function_type(
             boost::uint32_t, std::string const&);
+
+        typedef SchedulingPolicy scheduling_policy_type;
+        typedef NotificationPolicy notification_policy_type;
 
         /// A HPX runtime can be executed in two different modes: console mode
         /// and worker mode.
@@ -79,7 +85,7 @@ namespace hpx
         ///                       taken from the configuration file (hpx.ini).
         /// \param locality_mode  [in] This is the mode the given runtime 
         ///                       instance should be executed in.
-        explicit runtime(std::string const& address = "localhost", 
+        explicit runtime_impl(std::string const& address = "localhost", 
                 boost::uint16_t port = HPX_PORT,
                 std::string const& agas_address = "", 
                 boost::uint16_t agas_port = 0, mode locality_mode = console);
@@ -91,7 +97,7 @@ namespace hpx
         ///                       used for receiving parcels. 
         /// \note The AGAS locality to use will be taken from the configuration 
         ///       file (hpx.ini).
-        explicit runtime(naming::locality address, mode locality_mode = worker);
+        explicit runtime_impl(naming::locality address, mode locality_mode = worker);
 
         /// Construct a new HPX runtime instance 
         ///
@@ -100,12 +106,12 @@ namespace hpx
         ///                       used for receiving parcels. 
         /// \param agas_address   [in] This is the locality the AGAS server is 
         ///                       running on. 
-        runtime(naming::locality address, naming::locality agas_address, 
+        runtime_impl(naming::locality address, naming::locality agas_address, 
                 mode locality_mode = worker);
 
         /// \brief The destructor makes sure all HPX runtime services are 
         ///        properly shut down before exiting.
-        ~runtime();
+        ~runtime_impl();
 
         /// \brief Start the runtime system
         ///
@@ -168,9 +174,12 @@ namespace hpx
 
         /// \brief Report a non-recoverable error to the runtime system
         ///
+        /// \param num_thread [in] The number of the operating system thread
+        ///                   the error has been detected in.
         /// \param e          [in] This is an instance encapsulating an 
         ///                   exception which lead to this function call.
-        void report_error(boost::exception_ptr const& e);
+        void report_error(std::size_t num_thread, 
+            boost::exception_ptr const& e);
 
         /// \brief Run the HPX runtime system, use the given function for the 
         ///        main \a thread and block waiting for all threads to 
@@ -287,7 +296,7 @@ namespace hpx
     public:
         // the TSS holds a pointer to the runtime associated with a given 
         // OS thread
-        static boost::thread_specific_ptr<runtime*> runtime_;
+        static boost::thread_specific_ptr<runtime_impl*> runtime_;
 
     private:
         void init_tss();
@@ -308,6 +317,8 @@ namespace hpx
         parcelset::parcelport parcel_port_;
         parcelset::parcelhandler parcel_handler_;
         util::detail::init_logging init_logging_;
+        scheduling_policy_type scheduler_;
+        notification_policy_type notifier_;
         threads::threadmanager thread_manager_;
         components::server::memory memory_;
         applier::applier applier_;

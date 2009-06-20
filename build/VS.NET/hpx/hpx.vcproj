@@ -854,6 +854,22 @@
 						RelativePath="..\..\..\hpx\runtime\threads\threadmanager.hpp"
 						>
 					</File>
+					<File
+						RelativePath="..\..\..\hpx\runtime\threads\threadmanager_impl.hpp"
+						>
+					</File>
+					<Filter
+						Name="Policies"
+						>
+						<File
+							RelativePath="..\..\..\hpx\runtime\threads\policies\callback_notifier.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\threads\policies\global_queue_scheduler.hpp"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="Components"

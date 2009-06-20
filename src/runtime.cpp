@@ -48,25 +48,28 @@ BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
 namespace hpx 
 {
     ///////////////////////////////////////////////////////////////////////////
-    runtime::runtime(std::string const& address, boost::uint16_t port,
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
+            std::string const& address, boost::uint16_t port,
             std::string const& agas_address, boost::uint16_t agas_port, 
             mode locality_mode) 
       : result_(0), mode_(locality_mode), 
         ini_(util::detail::get_logging_data()), 
-        agas_pool_(boost::bind(&runtime::init_tss, This()),
-            boost::bind(&runtime::deinit_tss, This())), 
-        parcel_pool_(boost::bind(&runtime::init_tss, This()),
-            boost::bind(&runtime::deinit_tss, This())), 
-        timer_pool_(boost::bind(&runtime::init_tss, This()),
-            boost::bind(&runtime::deinit_tss, This())),
+        agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
+            boost::bind(&runtime_impl::deinit_tss, This())), 
+        parcel_pool_(boost::bind(&runtime_impl::init_tss, This()),
+            boost::bind(&runtime_impl::deinit_tss, This())), 
+        timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
+            boost::bind(&runtime_impl::deinit_tss, This())),
         agas_client_(agas_pool_, ini_.get_agas_locality(agas_address, agas_port), mode_ == console),
         parcel_port_(parcel_pool_, naming::locality(address, port)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
-        thread_manager_(timer_pool_, 
-            boost::bind(&runtime::init_tss, This()),
-            boost::bind(&runtime::deinit_tss, This()),
-            boost::bind(&runtime::report_error, This(), _1)),
+        scheduler_(),
+        notifier_(boost::bind(&runtime_impl::init_tss, This()),
+            boost::bind(&runtime_impl::deinit_tss, This()),
+            boost::bind(&runtime_impl::report_error, This(), _1, _2)),
+        thread_manager_(timer_pool_, scheduler_, notifier_),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),
@@ -75,28 +78,31 @@ namespace hpx
         on_exit_functions_("on_exit_functions", false)
     {
         components::server::get_error_dispatcher().register_error_sink(
-            &runtime::default_errorsink, default_error_sink_);
+            &runtime_impl::default_errorsink, default_error_sink_);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime::runtime(naming::locality address, naming::locality agas_address, 
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
+            naming::locality address, naming::locality agas_address, 
             mode locality_mode) 
       : result_(0), mode_(locality_mode), 
         ini_(util::detail::get_logging_data()), 
-        agas_pool_(boost::bind(&runtime::init_tss, This()),
-            boost::bind(&runtime::deinit_tss, This())), 
-        parcel_pool_(boost::bind(&runtime::init_tss, This()),
-            boost::bind(&runtime::deinit_tss, This())), 
-        timer_pool_(boost::bind(&runtime::init_tss, This()),
-            boost::bind(&runtime::deinit_tss, This())),
+        agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
+            boost::bind(&runtime_impl::deinit_tss, This())), 
+        parcel_pool_(boost::bind(&runtime_impl::init_tss, This()),
+            boost::bind(&runtime_impl::deinit_tss, This())), 
+        timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
+            boost::bind(&runtime_impl::deinit_tss, This())),
         agas_client_(agas_pool_, agas_address, mode_ == console),
         parcel_port_(parcel_pool_, address),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
-        thread_manager_(timer_pool_, 
-            boost::bind(&runtime::init_tss, This()),
-            boost::bind(&runtime::deinit_tss, This()),
-            boost::bind(&runtime::report_error, This(), _1)),
+        scheduler_(),
+        notifier_(boost::bind(&runtime_impl::init_tss, This()),
+            boost::bind(&runtime_impl::deinit_tss, This()),
+            boost::bind(&runtime_impl::report_error, This(), _1, _2)),
+        thread_manager_(timer_pool_, scheduler_, notifier_),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),
@@ -105,27 +111,30 @@ namespace hpx
         on_exit_functions_("on_exit_functions", false)
     {
         components::server::get_error_dispatcher().register_error_sink(
-            &runtime::default_errorsink, default_error_sink_);
+            &runtime_impl::default_errorsink, default_error_sink_);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime::runtime(naming::locality address, mode locality_mode) 
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
+            naming::locality address, mode locality_mode) 
       : result_(0), mode_(locality_mode), 
         ini_(util::detail::get_logging_data()), 
-        agas_pool_(boost::bind(&runtime::init_tss, This()),
-            boost::bind(&runtime::deinit_tss, This())), 
-        parcel_pool_(boost::bind(&runtime::init_tss, This()),
-            boost::bind(&runtime::deinit_tss, This())), 
-        timer_pool_(boost::bind(&runtime::init_tss, This()),
-            boost::bind(&runtime::deinit_tss, This())),
+        agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
+            boost::bind(&runtime_impl::deinit_tss, This())), 
+        parcel_pool_(boost::bind(&runtime_impl::init_tss, This()),
+            boost::bind(&runtime_impl::deinit_tss, This())), 
+        timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
+            boost::bind(&runtime_impl::deinit_tss, This())),
         agas_client_(agas_pool_, ini_.get_agas_locality(), mode_ == console),
         parcel_port_(parcel_pool_, address),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
-        thread_manager_(timer_pool_, 
-            boost::bind(&runtime::init_tss, This()),
-            boost::bind(&runtime::deinit_tss, This()),
-            boost::bind(&runtime::report_error, This(), _1)),
+        scheduler_(),
+        notifier_(boost::bind(&runtime_impl::init_tss, This()),
+            boost::bind(&runtime_impl::deinit_tss, This()),
+            boost::bind(&runtime_impl::report_error, This(), _1, _2)),
+        thread_manager_(timer_pool_, scheduler_, notifier_),
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),
@@ -134,13 +143,14 @@ namespace hpx
         on_exit_functions_("on_exit_functions", false)
     {
         components::server::get_error_dispatcher().register_error_sink(
-            &runtime::default_errorsink, default_error_sink_);
+            &runtime_impl::default_errorsink, default_error_sink_);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime::~runtime()
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    runtime_impl<SchedulingPolicy, NotificationPolicy>::~runtime_impl()
     {
-        LRT_(debug) << "~runtime(entering)";
+        LRT_(debug) << "~runtime_impl(entering)";
 
         // stop all services
         parcel_port_.stop();      // stops parcel_pool_ as well
@@ -151,7 +161,7 @@ namespace hpx
         // unload libraries
         runtime_support_.tidy();
 
-        LRT_(debug) << "~runtime(finished)";
+        LRT_(debug) << "~runtime_impl(finished)";
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -168,7 +178,9 @@ namespace hpx
         return threads::terminated;
     }
 
-    int runtime::start(boost::function<hpx_main_function_type> func, 
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    int runtime_impl<SchedulingPolicy, NotificationPolicy>::start(
+        boost::function<hpx_main_function_type> func, 
         std::size_t num_threads, bool blocking)
     {
 #if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINE_USE_FIBERS)
@@ -200,7 +212,7 @@ namespace hpx
                 boost::bind(run_helper, func, boost::ref(result_)), "hpx_main");
         }
 
-        LRT_(info) << "runtime: started using "  << num_threads << " OS threads";
+        LRT_(info) << "runtime_impl: started using "  << num_threads << " OS threads";
 
         // block if required
         if (blocking) 
@@ -209,7 +221,9 @@ namespace hpx
         return 0;   // return zero as we don't know the outcome of hpx_main yet
     }
 
-    int runtime::start(std::size_t num_threads, bool blocking)
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    int runtime_impl<SchedulingPolicy, NotificationPolicy>::start(
+        std::size_t num_threads, bool blocking)
     {
         boost::function<hpx_main_function_type> empty_main;
         return start(empty_main, num_threads, blocking);
@@ -232,13 +246,14 @@ namespace hpx
     }
 #endif
 
-    int runtime::wait()
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    int runtime_impl<SchedulingPolicy, NotificationPolicy>::wait()
     {
-        LRT_(info) << "runtime: about to enter wait state";
+        LRT_(info) << "runtime_impl: about to enter wait state";
 
 #if defined(BOOST_WINDOWS)
         // Set console control handler to allow server to be stopped.
-        console_ctrl_function = boost::bind(&runtime::stop, this, true);
+        console_ctrl_function = boost::bind(&runtime_impl::stop, this, true);
         SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
 
         // wait for the shutdown action to be executed
@@ -264,14 +279,15 @@ namespace hpx
         // block main thread
         t.join();
 #endif
-        LRT_(info) << "runtime: exiting wait state";
+        LRT_(info) << "runtime_impl: exiting wait state";
         return result_;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void runtime::stop(bool blocking)
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::stop(bool blocking)
     {
-        LRT_(info) << "runtime: about to stop services";
+        LRT_(info) << "runtime_impl: about to stop services";
 
         // execute all on_exit functions whenever the first thread calls this
         boost::function<void()> f;
@@ -284,7 +300,7 @@ namespace hpx
         agas_client_.unbind(applier_.get_runtime_support_gid(), ec);
         agas_client_.unbind(applier_.get_memory_gid(), ec);
 
-        // stop runtime services (threads)
+        // stop runtime_impl services (threads)
         thread_manager_.stop(blocking);
         parcel_port_.stop(blocking);    // stops parcel_pool_ as well
         agas_pool_.stop();
@@ -295,11 +311,14 @@ namespace hpx
         // this disables all logging from the main thread
         deinit_tss();
 
-        LRT_(info) << "runtime: stopped all services";
+        LRT_(info) << "runtime_impl: stopped all services";
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void runtime::report_error(boost::exception_ptr const& e)
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::report_error(
+        std::size_t num_thread, 
+        boost::exception_ptr const& e)
     {
         // first report this error to the console
         naming::id_type console_prefix;
@@ -314,7 +333,9 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    int runtime::run(boost::function<hpx_main_function_type> func,
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    int runtime_impl<SchedulingPolicy, NotificationPolicy>::run(
+        boost::function<hpx_main_function_type> func,
         std::size_t num_threads)
     {
         start(func, num_threads);
@@ -324,7 +345,9 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    int runtime::run(std::size_t num_threads)
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    int runtime_impl<SchedulingPolicy, NotificationPolicy>::run(
+        std::size_t num_threads)
     {
         start(boost::function<hpx_main_function_type>(), num_threads);
         int result = wait();
@@ -333,7 +356,9 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void runtime::default_errorsink(boost::uint32_t src, std::string const& msg)
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::default_errorsink(
+        boost::uint32_t src, std::string const& msg)
     {
         std::cerr << "locality (" << std::hex << std::setw(4) 
                   << std::setfill('0') << src << "):" << std::endl
@@ -341,27 +366,41 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::thread_specific_ptr<runtime*> runtime::runtime_;
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    boost::thread_specific_ptr<
+        runtime_impl<SchedulingPolicy, NotificationPolicy> *> 
+    runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_;
 
-    void runtime::init_tss()
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_tss()
     {
         // initialize our TSS
-        BOOST_ASSERT(NULL == runtime::runtime_.get());    // shouldn't be initialized yet
-        runtime::runtime_.reset(new runtime* (this));
+        BOOST_ASSERT(NULL == runtime_impl::runtime_.get());    // shouldn't be initialized yet
+        runtime_impl::runtime_.reset(new runtime_impl* (this));
 
         // initialize applier TSS
         applier_.init_tss();
     }
 
-    void runtime::deinit_tss()
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::deinit_tss()
     {
         // reset applier TSS
         applier_.deinit_tss();
 
         // reset our TSS
-        runtime::runtime_.reset();
+        runtime_impl::runtime_.reset();
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::on_exit(
+        boost::function<void()> f)
+    {
+        on_exit_functions_.enqueue(f);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     runtime& get_runtime()
     {
         BOOST_ASSERT(NULL != runtime::runtime_.get());   // should have been initialized
@@ -372,12 +411,6 @@ namespace hpx
     {
         runtime** rt = runtime::runtime_.get();
         return rt ? *rt : NULL;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    void runtime::on_exit(boost::function<void()> f)
-    {
-        on_exit_functions_.enqueue(f);
     }
 
     bool register_on_exit(boost::function<void()> f)
@@ -391,3 +424,8 @@ namespace hpx
 
 }
 
+///////////////////////////////////////////////////////////////////////////////
+/// explicit template instantiation fo rthe thread manager of our choice
+template hpx::runtime_impl<
+    hpx::threads::policies::global_queue_scheduler, 
+    hpx::threads::policies::callback_notifier>;

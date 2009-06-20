@@ -41,7 +41,10 @@
 #include <iostream>
 #include <boost/type_traits.hpp>
 #include <cstring>
+#if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
 #include <sys/mman.h>
+#endif
+
 /**
  * Stack allocation routines and trampolines for setcontext
  */

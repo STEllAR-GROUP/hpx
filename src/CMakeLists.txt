@@ -183,6 +183,12 @@ set (hpxlib_threadmanager_HEADERS
 source_group("Header Files\\runtime\\threadmanager" 
     FILES ${hpxlib_threadmanager_HEADERS})
 
+set (hpxlib_threadmanager_policies_HEADERS
+    ${hpx_SOURCE_DIR}/hpx/runtime/threads/policies/global_queue_scheduler.hpp)
+    ${hpx_SOURCE_DIR}/hpx/runtime/threads/policies/callback_notifier.hpp)
+source_group("Header Files\\runtime\\threadmanager\\policies" 
+    FILES ${hpxlib_threadmanager_policies_HEADERS})
+
 # util
 set (hpxlib_util_HEADERS
     ${hpx_SOURCE_DIR}/hpx/util/asio_util.hpp
@@ -234,6 +240,7 @@ set (hpxlib_HEADERS
     ${hpxlib_naming_HEADERS}
     ${hpxlib_parcelset_HEADERS}
     ${hpxlib_threadmanager_HEADERS}
+    ${hpxlib_threadmanager_policies_HEADERS}
     ${hpxlib_util_HEADERS})
 
 ###############################################################################

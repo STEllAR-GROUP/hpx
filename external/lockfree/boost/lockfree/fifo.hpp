@@ -326,6 +326,18 @@ public:
     }
 };
 
+///////////////////////////////////////////////////////////////////////////
+namespace detail
+{
+    template <typename Fifo>
+    inline void log_fifo_statistics(Fifo const& q, char const* const desc)
+    {
+        LTIM_(fatal) << ": queue: "  << q.description_
+                     << ", enqueue_spin_count: " << long(q.enqueue_spin_count_)
+                     << ", dequeue_spin_count: " << long(q.dequeue_spin_count_);
+    }
+}
+
 } /* namespace lockfree */
 } /* namespace boost */
 

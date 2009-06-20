@@ -16,7 +16,9 @@ void print_state (thread_state t_s);
 int main(int argc, char* argv[])
 {
     hpx::util::io_service_pool timer_pool;
-    hpx::threads::threadmanager my_tm(timer_pool);
+    hpx::threads::policies::global_queue_scheduler scheduler;
+    hpx::threads::policies::callback_notifier notifier;
+    hpx::threads::threadmanager my_tm(timer_pool, scheduler, notifier);
 
     my_tm.register_work(boost::bind (my_gcd, 13, 14, 1), "gcd");                      // GCD = 1
     hpx::threads::thread_id_type t_id = 

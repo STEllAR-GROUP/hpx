@@ -12,14 +12,10 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
-#include <boost/tuple/tuple.hpp>
+
 #include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/ptr_container/ptr_map.hpp>
 #include <boost/lockfree/fifo.hpp>
 #if defined(HPX_DEBUG)
 #include <boost/lockfree/atomic_int.hpp>
@@ -37,7 +33,6 @@ namespace hpx { namespace threads
 {
     struct register_thread_tag {};
     struct register_work_tag {};
-    struct add_new_tag {};
     struct set_state_tag {};
 
     ///////////////////////////////////////////////////////////////////////////
@@ -45,22 +40,10 @@ namespace hpx { namespace threads
     ///
     /// The \a threadmanager class is the central instance of management for
     /// all (non-depleted) \a thread's
-    class threadmanager : private boost::noncopyable
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    class threadmanager_impl : private boost::noncopyable
     {
     private:
-        // this is the type of the queues of new or pending threads
-        typedef boost::lockfree::fifo<thread*> work_items_type;
-
-        // this is the type of the queue of new tasks not yet converted to
-        // threads
-        typedef boost::tuple<
-            boost::function<thread_function_type>, thread_state, char const*
-        > task_description;
-        typedef boost::lockfree::fifo<task_description> task_items_type;
-
-        // this is the type of a map holding all threads (except depleted ones)
-        typedef boost::ptr_map<thread_id_type, thread> thread_map_type;
-
         // we use a simple mutex to protect the data members of the 
         // threadmanager for now
         typedef boost::mutex mutex_type;
@@ -72,32 +55,15 @@ namespace hpx { namespace threads
         // representation
         typedef boost::posix_time::time_duration duration_type;
 
-        // Add this number of threads to the work items queue each time the 
-        // function \a add_new() is called if the queue is empty.
-        enum { 
-            min_add_new_count = 100, 
-            max_add_new_count = 100,
-            max_delete_count = 100
-        };
-
-        // The maximum number of active threads this thread manager should
-        // create. This number will be a constraint only as long as the work
-        // items queue is not empty. Otherwise the number of active threads 
-        // will be incremented in steps equal to the \a min_add_new_count
-        // specified above.
-        enum { max_thread_count = 1000 };
-
     public:
-        ///
-        threadmanager(util::io_service_pool& timer_pool, 
-            boost::function<void()> start_thread = boost::function<void()>(),
-            boost::function<void()> stop = boost::function<void()>(),
-            boost::function<void(boost::exception_ptr const&)> on_error =
-                boost::function<void(boost::exception_ptr const&)>(),
-            std::size_t max_count = max_thread_count);
-        ~threadmanager();
+        typedef SchedulingPolicy scheduling_policy_type;
+        typedef NotificationPolicy notification_policy_type;
 
-        typedef boost::lockfree::fifo<thread_id_type> thread_id_queue_type;
+        ///
+        threadmanager_impl(util::io_service_pool& timer_pool,
+            scheduling_policy_type& scheduler,
+            notification_policy_type& notifier);
+        ~threadmanager_impl();
 
         /// The function \a register_work adds a new work item to the thread 
         /// manager. It doesn't immediately create a new \a thread, it just adds 
@@ -121,18 +87,10 @@ namespace hpx { namespace threads
         ///               enumeration (thread_state#pending, or \a
         ///               thread_state#suspended, any other value will throw a
         ///               hpx#bad_parameter exception).
-        /// \param run_now [in] If this parameter is \a true and the initial 
-        ///               state is given as \a thread_state#pending the thread 
-        ///               will be run immediately, otherwise it will be 
-        ///               scheduled to run later (either this function is 
-        ///               called for another thread using \a true for the
-        ///               parameter \a run_now or the function \a 
-        ///               threadmanager#do_some_work is called). This parameter
-        ///               is optional and defaults to \a true.
         void
         register_work(boost::function<thread_function_type> const& func,
             char const* const description = "", 
-            thread_state initial_state = pending, bool run_now = true);
+            thread_state initial_state = pending);
 
         /// The function \a register_work adds a new work item to the thread 
         /// manager. It creates a new \a thread, adds it to the internal
@@ -266,22 +224,19 @@ namespace hpx { namespace threads
         thread_state set_active_state(thread_id_type id, thread_state newstate,
             thread_state_ex newstate_ex = wait_signaled);
 
-        // return the length of the queues (workitems + newitems)
-        boost::int64_t get_queue_lengths() const;
-
     public:
         /// this notifies the thread manager that there is some more work 
         /// available 
         void do_some_work()
         {
-            cond_.notify_all();
+            scheduler_.do_some_work();
         }
 
-        /// 
-        void report_error(boost::exception_ptr const& e)
+        /// API functions forwarding to notification policy
+        void report_error(std::size_t num_thread, boost::exception_ptr const& e)
         {
-            if (on_error_)
-                on_error_(e);
+            notifier_.on_error(num_thread, e);
+            scheduler_.on_error(num_thread, e);
         }
 
     protected:
@@ -297,46 +252,23 @@ namespace hpx { namespace threads
         thread_state at_timer (TimeType const& expire, thread_id_type id, 
             thread_state newstate, thread_state_ex newstate_ex);
 
-        /// This function adds threads stored in the new_items queue to the 
-        /// thread map and the work_items queue (if appropriate)
-        bool add_new(long add_count);
-        bool add_new_if_possible();
-        bool add_new_always();
-
-        /// This function makes sure all threads which are marked for deletion
-        /// (state is terminated) are properly destroyed
-        bool cleanup_terminated();
-
     private:
         /// this thread manager has exactly as much threads as requested
-        boost::ptr_vector<boost::thread> threads_;
-
-        std::size_t max_count_;             ///< maximum number of existing PX-threads
-        thread_map_type thread_map_;        ///< mapping of thread id's to PX-threads
-
-        work_items_type work_items_;        ///< list of active work items
-        thread_id_queue_type terminated_items_;  ///< list of terminated threads
-
-        task_items_type new_tasks_;         ///< list of new tasks to run
-
-        bool running_;                      ///< thread manager has bee started
         mutable mutex_type mtx_;            ///< mutex protecting the members
-        boost::condition cond_;             ///< used to trigger some action
-
-        util::io_service_pool& timer_pool_; ///< used for timed set_state
-
-        boost::function<void()> start_thread_;    ///< function to call for each created thread
-        boost::function<void()> stop_;            ///< function to call in case of unexpected stop
-        boost::function<void(boost::exception_ptr)> on_error_;  ///< function to call in case of error
-
-        util::block_profiler<register_thread_tag> thread_logger_;
-        util::block_profiler<register_work_tag> work_logger_;
-        util::block_profiler<add_new_tag> add_new_logger_;
-        util::block_profiler<set_state_tag> set_state_logger_;
-
+        boost::ptr_vector<boost::thread> threads_;
 #if HPX_DEBUG != 0
         boost::lockfree::atomic_int<long> thread_count_;
 #endif
+
+        bool running_;                      ///< thread manager has been started
+        util::io_service_pool& timer_pool_; ///< used for timed set_state
+
+        util::block_profiler<register_thread_tag> thread_logger_;
+        util::block_profiler<register_work_tag> work_logger_;
+        util::block_profiler<set_state_tag> set_state_logger_;
+
+        scheduling_policy_type& scheduler_;
+        notification_policy_type& notifier_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

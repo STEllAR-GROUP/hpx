@@ -78,7 +78,9 @@ int main(int argc, char* argv[])
 
         // Create a new thread-manager
         hpx::util::io_service_pool timerpool;
-        hpx::threads::threadmanager tm(timerpool);
+        hpx::threads::policies::global_queue_scheduler scheduler;
+        hpx::threads::policies::callback_notifier notifier;
+        hpx::threads::threadmanager tm(timerpool, scheduler, notifier);
         // Create a new applier
         hpx::applier::applier app(ph, tm, 0, 0);
         // Create a new action-manager

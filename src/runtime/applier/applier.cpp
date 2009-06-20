@@ -70,18 +70,18 @@ namespace hpx { namespace applier
     ///////////////////////////////////////////////////////////////////////////
     void register_work(
         boost::function<void(threads::thread_state_ex)> const& func, 
-        char const* desc, threads::thread_state state, bool run_now)
+        char const* desc, threads::thread_state state)
     {
         hpx::applier::get_applier().get_thread_manager().register_work(
-            boost::bind(&thread_function, func), desc, state, run_now);
+            boost::bind(&thread_function, func), desc, state);
     }
 
     void register_work_plain(
         boost::function<threads::thread_function_type> const& func,
-        char const* desc, threads::thread_state state, bool run_now)
+        char const* desc, threads::thread_state state)
     {
         hpx::applier::get_applier().get_thread_manager().register_work(
-            func, desc, state, run_now);
+            func, desc, state);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -149,9 +149,9 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void report_error(boost::exception_ptr const& e)
-    {
-          hpx::applier::get_applier().get_thread_manager().report_error(e);
-    }
+//     void report_error(boost::exception_ptr const& e)
+//     {
+//           hpx::applier::get_applier().get_thread_manager().report_error(e);
+//     }
 
 }}

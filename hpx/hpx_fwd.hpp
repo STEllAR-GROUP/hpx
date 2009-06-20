@@ -23,16 +23,6 @@
 /// functions and variables are defined inside this namespace.
 namespace hpx
 {
-    class HPX_API_EXPORT runtime;
-
-    /// The function \a get_runtime returns a reference to the (thread
-    /// specific) runtime instance.
-    HPX_API_EXPORT runtime& get_runtime();
-    HPX_API_EXPORT runtime* get_runtime_ptr();
-
-    /// Register a function to be called during system shutdown
-    HPX_API_EXPORT bool register_on_exit(boost::function<void()>);
-
     /// \namespace applier
     ///
     /// The namespace \a applier contains all definitions needed for the
@@ -107,8 +97,21 @@ namespace hpx
     /// hpx#threadmanager#thread's.
     namespace threads
     {
+        namespace policies
+        {
+            class HPX_API_EXPORT global_queue_scheduler;
+            class HPX_API_EXPORT callback_notifier;
+        }
+
         class HPX_API_EXPORT thread;
-        class HPX_API_EXPORT threadmanager;
+
+        template <typename SchedulingPolicy, typename NotificationPolicy> 
+        class HPX_API_EXPORT threadmanager_impl;
+
+        // this is the default threadmanager we use
+        typedef threadmanager_impl<
+            policies::global_queue_scheduler, policies::callback_notifier> 
+        threadmanager;
 
         ///////////////////////////////////////////////////////////////////////
         /// \enum thread_state
@@ -160,6 +163,24 @@ namespace hpx
         /// specific) self reference to the current PX thread.
         HPX_API_EXPORT thread_self* get_self_ptr();
     }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    class HPX_API_EXPORT runtime_impl;
+
+    // this is the default runtime type we use - needs to be instantiated with
+    // exactly the same policies as threads::threadmanager above
+    typedef runtime_impl<
+        threads::policies::global_queue_scheduler, 
+        threads::policies::callback_notifier
+    > runtime;
+
+    /// The function \a get_runtime returns a reference to the (thread
+    /// specific) runtime instance.
+    HPX_API_EXPORT runtime& get_runtime();
+    HPX_API_EXPORT runtime* get_runtime_ptr();
+
+    /// Register a function to be called during system shutdown
+    HPX_API_EXPORT bool register_on_exit(boost::function<void()>);
 
     /// \namespace components
     namespace components

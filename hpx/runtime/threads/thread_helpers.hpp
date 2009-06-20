@@ -85,7 +85,7 @@ namespace hpx { namespace threads
     HPX_API_EXPORT std::string get_thread_description(thread_id_type id);
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT void report_error(boost::exception_ptr const& e);
+//     HPX_API_EXPORT void report_error(boost::exception_ptr const& e);
 
 }}
 
