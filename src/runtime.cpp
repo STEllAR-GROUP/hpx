@@ -426,6 +426,6 @@ namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
 /// explicit template instantiation fo rthe thread manager of our choice
-template hpx::runtime_impl<
+template HPX_EXPORT class hpx::runtime_impl<
     hpx::threads::policies::global_queue_scheduler, 
     hpx::threads::policies::callback_notifier>;
