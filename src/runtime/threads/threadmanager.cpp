@@ -310,7 +310,7 @@ namespace hpx { namespace threads
         // requested actions
         thread_state (threadmanager_impl::*f)(time_type const&, thread_id_type, 
                 thread_state, thread_state_ex)
-            = &threadmanager_impl::at_timer<time_type>;
+            = &threadmanager_impl::template at_timer<time_type>;
 
         return register_thread(
             boost::bind(f, this, expire_at, id, newstate, newstate_ex),
@@ -328,7 +328,7 @@ namespace hpx { namespace threads
         // requested actions
         thread_state (threadmanager_impl::*f)(duration_type const&, thread_id_type, 
                 thread_state, thread_state_ex)
-            = &threadmanager_impl::at_timer<duration_type>;
+            = &threadmanager_impl::template at_timer<duration_type>;
 
         return register_thread(
             boost::bind(f, this, from_now, id, newstate, newstate_ex),
