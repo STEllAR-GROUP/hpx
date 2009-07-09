@@ -71,7 +71,8 @@ double normicdf(double p)
 
 void initrand(long seed, char dist, double mean, double stddev, int iters, int points, int nthr)
 {
-    nzones = nthr; zone = points/nzones;
+    nzones = nthr; 
+    zone = (std::max)(1, points/nzones);
     random_numbers.seed(boost::int32_t(seed));
 
     int i, npos = 0, allz = iters*nzones;
