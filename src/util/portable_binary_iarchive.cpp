@@ -142,13 +142,23 @@ portable_binary_iarchive::init(unsigned int flags){
 }}
 
 // explicitly instantiate for this 
+#if BOOST_VERSION < 104000
 #include <boost/archive/impl/archive_pointer_iserializer.ipp>
-#include <boost/archive/impl/basic_binary_iprimitive.ipp>
 
 namespace boost {
 namespace archive {
 
 template class detail::archive_pointer_iserializer<hpx::util::portable_binary_iarchive> ;
+
+} // namespace archive
+} // namespace boost
+#endif
+
+#include <boost/archive/impl/basic_binary_iprimitive.ipp>
+
+namespace boost {
+namespace archive {
+
 template class basic_binary_iprimitive<
     hpx::util::portable_binary_iarchive,
     std::istream::char_type, 

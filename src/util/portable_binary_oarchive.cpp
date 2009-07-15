@@ -107,14 +107,25 @@ portable_binary_oarchive::init(unsigned int flags) {
 
 }}
 
+#if BOOST_VERSION < 104000
 // explicitly instantiate for this type of stream
 #include <boost/archive/impl/archive_pointer_oserializer.ipp>
-#include <boost/archive/impl/basic_binary_oprimitive.ipp>
 
 namespace boost {
 namespace archive {
 
 template class detail::archive_pointer_oserializer<hpx::util::portable_binary_oarchive> ;
+
+} // namespace archive
+} // namespace boost
+#endif
+
+// explicitly instantiate for this type of stream
+#include <boost/archive/impl/basic_binary_oprimitive.ipp>
+
+namespace boost {
+namespace archive {
+
 template class basic_binary_oprimitive<
     hpx::util::portable_binary_oarchive,
     std::ostream::char_type, 
