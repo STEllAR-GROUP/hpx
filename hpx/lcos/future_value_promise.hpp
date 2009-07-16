@@ -87,7 +87,7 @@ namespace hpx { namespace lcos { namespace detail
 
     private:
         util::promise<result_type> promise_;
-        util::unique_future<result_type> future data_;
+        util::unique_future<result_type> data_;
     };
 
 }}}

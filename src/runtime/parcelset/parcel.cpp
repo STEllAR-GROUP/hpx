@@ -15,7 +15,6 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/shared_ptr.hpp>
-
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/vector.hpp>
