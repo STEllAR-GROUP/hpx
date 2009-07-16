@@ -46,7 +46,8 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     // console logging happens here
-    void console_logging(logging_destination dest, int level, std::string const& msg);
+    void console_logging(logging_destination dest, int level, 
+        std::string const& msg);
 
     typedef actions::plain_direct_action3<
         logging_destination, int, std::string const&, console_logging

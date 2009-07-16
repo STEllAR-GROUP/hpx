@@ -10,17 +10,65 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
+#include <hpx/util/static.hpp>
+
+#include <boost/foreach.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
+    inline void console_logging_locked(naming::id_type const& prefix, 
+        server::logging_destination dest, int level, std::string const& msg)
+    {
+        if (NULL != applier::get_applier_ptr()) 
+            applier::apply<server::console_logging_action>(prefix, dest, level, msg);
+    }
+
+    struct pending_logs
+    {
+        typedef boost::mutex mutex_type;    // use boost::mutex for now
+
+        pending_logs() : has_pending_(false) {}
+
+        void handle_pending(naming::id_type const& prefix, 
+            server::logging_destination dest, int level)
+        {
+            if (has_pending_) {
+                // log all pending messages first
+                mutex_type::scoped_lock l(mtx_);
+                BOOST_FOREACH(std::string const& s, pending_) 
+                    console_logging_locked(prefix, dest, level, s);
+                std::vector<std::string>().swap(pending_);
+                has_pending_ = false;
+            }
+        }
+
+        void add_pending(std::string const& msg)
+        {
+            mutex_type::scoped_lock l(mtx_);
+            pending_.push_back(msg);
+            has_pending_ = true;
+        }
+
+        mutex_type mtx_;
+        std::vector<std::string> pending_;
+        bool has_pending_;
+    };
+    struct pending_logs_tag {};
+
     // stub function allowing to apply the console_logging action
     void console_logging(naming::id_type const& prefix, 
         server::logging_destination dest, int level, std::string const& msg)
     {
         // do logging only if applier is still valid
-        if (NULL != applier::get_applier_ptr())
-            applier::apply<server::console_logging_action>(prefix, dest, level, msg);
+        util::static_<pending_logs, pending_logs_tag> logs;
+        if (NULL != applier::get_applier_ptr()) {
+            logs.get().handle_pending(prefix, dest, level);
+            console_logging_locked(prefix, dest, level, msg);
+        }
+        else {
+            logs.get().add_pending(msg);
+        }
     }
 
     // special initialization functions for console logging 

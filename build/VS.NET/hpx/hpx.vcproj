@@ -632,14 +632,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\hpx\util\portable_binary_iarchive.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\hpx\util\portable_binary_oarchive.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\hpx\util\runtime_configuration.hpp"
 					>
 				</File>
