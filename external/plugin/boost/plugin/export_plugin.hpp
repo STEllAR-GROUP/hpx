@@ -12,6 +12,7 @@
 #include <boost/config.hpp>
 #include <boost/any.hpp>
 #include <boost/preprocessor/cat.hpp>
+#include <boost/algorithm/string/case_conv.hpp>
 
 #include <boost/plugin/config.hpp>
 #include <boost/plugin/concrete_factory.hpp>
@@ -49,8 +50,10 @@
             {                                                                 \
                 static boost::plugin::concrete_factory<BaseType, ActualType> cf; \
                 boost::plugin::abstract_factory<BaseType>* w = &cf;           \
+                std::string actname(BOOST_PP_STRINGIZE(actualname));          \
+                boost::algorithm::to_lower(actname);                          \
                 BOOST_PLUGIN_LIST_NAME(name, classname)().insert(             \
-                    std::make_pair(BOOST_PP_STRINGIZE(actualname), w));       \
+                    std::make_pair(actname, w));                              \
             }                                                                 \
         } BOOST_PLUGIN_EXPORTER_INSTANCE_NAME(name, actualname);              \
     }                                                                         \

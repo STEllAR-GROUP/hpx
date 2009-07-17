@@ -152,6 +152,17 @@ template class detail::archive_pointer_iserializer<hpx::util::portable_binary_ia
 
 } // namespace archive
 } // namespace boost
+#else
+#include <boost/archive/detail/archive_serializer_map.hpp>
+#include <boost/archive/impl/archive_serializer_map.ipp>
+
+namespace boost {
+namespace archive {
+
+template class detail::archive_serializer_map<hpx::util::portable_binary_iarchive>;
+
+} // namespace archive
+} // namespace boost
 #endif
 
 #include <boost/archive/impl/basic_binary_iprimitive.ipp>

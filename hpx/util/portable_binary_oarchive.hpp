@@ -203,9 +203,6 @@ public:
     BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION(hpx::util::portable_binary_oarchive)
 #endif
 
-// required by export in boost <= 1.34
-#define BOOST_ARCHIVE_CUSTOM_OARCHIVE_TYPES hpx::util::portable_binary_oarchive
-
 #if defined(_MSC_VER)
 #pragma warning( pop )
 #endif

@@ -74,18 +74,17 @@ public:
 // "Portable" input binary archive.  It addresses integer size and endienness so 
 // that binary archives can be passed across systems. Note:floating point types
 // not addressed here
-class portable_binary_iarchive :
+class portable_binary_iarchive : 
     public boost::archive::basic_binary_iprimitive<
         portable_binary_iarchive,
         std::istream::char_type, 
         std::istream::traits_type
-    >,
+    >, 
     public boost::archive::detail::common_iarchive<
         portable_binary_iarchive
-    >
-      ,
+    >, 
     public boost::archive::detail::shared_ptr_helper
-      {
+{
     typedef boost::archive::basic_binary_iprimitive<
         portable_binary_iarchive,
         std::istream::char_type, 
@@ -142,7 +141,7 @@ protected:
         this->primitive_base_t::load(t);
     }
     // intermediate level to support override of operators
-    // fot templates in the absence of partial function 
+    // for templates in the absence of partial function 
     // template ordering
     typedef boost::archive::detail::common_iarchive<portable_binary_iarchive> 
         detail_common_iarchive;
@@ -200,9 +199,6 @@ public:
 #ifdef BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION
     BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION(hpx::util::portable_binary_iarchive)
 #endif
-
-// required by export in boost <= 1.34
-#define BOOST_ARCHIVE_CUSTOM_IARCHIVE_TYPES hpx::util::portable_binary_iarchive
 
 #if defined(_MSC_VER)
 #pragma warning( pop )

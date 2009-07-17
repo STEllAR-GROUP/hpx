@@ -14,6 +14,7 @@
 #include <boost/config.hpp>
 #include <boost/any.hpp>
 #include <boost/function.hpp>
+#include <boost/algorithm/string/case_conv.hpp>
 
 #include <boost/plugin/virtual_constructors.hpp>
 #include <boost/plugin/abstract_factory.hpp>
@@ -33,8 +34,10 @@ namespace boost { namespace plugin {
             typedef typename remove_pointer<get_plugins_list_type>::type PointedType;
 
             exported_plugins_type& e = f();
+            std::string clsname(class_name);
+            boost::algorithm::to_lower(clsname);
 
-            typename exported_plugins_type::iterator it = e.find(class_name);
+            typename exported_plugins_type::iterator it = e.find(clsname);
             if (it != e.end()) {
                 abstract_factory<BasePlugin>** xw = 
                     boost::unsafe_any_cast<abstract_factory<BasePlugin> *>(&(*it).second);
