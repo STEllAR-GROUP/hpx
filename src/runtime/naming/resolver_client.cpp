@@ -64,8 +64,8 @@ namespace hpx { namespace naming
         {
             if (&ec == &throws)
             {
-                HPX_RETHROW_EXCEPTION(ec.value(), "resolver_client::get_prefix", 
-                    ec.get_message());
+                HPX_RETHROW_EXCEPTION(s, "resolver_client::get_prefix", 
+                    rep.get_error());
                 return false;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
