@@ -28,6 +28,10 @@
 
 #ifndef BOOST_COROUTINE_COROUTINE_HPP_20060512
 #define BOOST_COROUTINE_COROUTINE_HPP_20060512
+
+// This needs to be first for building on Macs
+#include <boost/coroutine/detail/default_context_impl.hpp>
+
 #include <cstddef>
 #include <boost/preprocessor/repetition.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -37,7 +41,6 @@
 #include <boost/call_traits.hpp>
 #include <boost/coroutine/detail/arg_max.hpp>
 #include <boost/coroutine/detail/coroutine_impl.hpp>
-#include <boost/coroutine/detail/default_context_impl.hpp>
 #include <boost/coroutine/detail/is_callable.hpp>
 #include <boost/coroutine/detail/argument_packer.hpp>
 #include <boost/coroutine/detail/argument_unpacker.hpp>

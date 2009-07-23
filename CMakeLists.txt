@@ -36,10 +36,10 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # We need to use Boost, namely the following Boost libraries
-set(Boost_FIND_VERSION_EXACT ON)
-set(Boost_FIND_VERSION_MAJOR 1)
-set(Boost_FIND_VERSION_MINOR 37)
-set(Boost_FIND_VERSION_PATCH 0)
+set(Boost_FIND_VERSION_EXACT OFF)
+#set(Boost_FIND_VERSION_MAJOR 1)
+#set(Boost_FIND_VERSION_MINOR 39)
+#set(Boost_FIND_VERSION_PATCH 0)
 set(Boost_COMPONENTS_NEEDED
     date_time
     filesystem
@@ -51,8 +51,10 @@ set(Boost_COMPONENTS_NEEDED
     signals
     thread)
 set(Boost_USE_STATIC_LIBS OFF)
+set(Boost_ADDITIONAL_VERSIONS 
+    "1.39.0" "1.39")
 
-find_package(Boost 1.37.0 COMPONENTS ${Boost_COMPONENTS_NEEDED})
+find_package(Boost 1.33.1 COMPONENTS ${Boost_COMPONENTS_NEEDED})
 
 if(Boost_FOUND)
     message(STATUS "Boost version found: " 

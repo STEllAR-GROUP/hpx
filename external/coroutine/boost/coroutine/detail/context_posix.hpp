@@ -197,7 +197,7 @@ namespace boost { namespace coroutines {
     public:
         typedef ucontext_context_impl_base context_impl_base;
 
-        enum { default_stack_size = 8192 };
+        enum { default_stack_size = SIGSTKSZ };
 
         /**
          * Create a context that on restore invokes Functor on

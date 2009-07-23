@@ -33,6 +33,10 @@
 #ifndef BOOST_COROUTINE_WAIT_MAX
 #define BOOST_COROUTINE_WAIT_MAX 10
 #endif
+
+// This needs to be first for building on Macs
+#include <boost/coroutine/detail/default_context_impl.hpp>
+
 #include <boost/none.hpp>
 #include <boost/config.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -48,7 +52,6 @@
 #include <boost/coroutine/detail/call_impl.hpp>
 #include <boost/coroutine/detail/wait_impl.hpp>
 #include <boost/coroutine/detail/future_impl.hpp>
-#include <boost/coroutine/detail/default_context_impl.hpp>
 
 namespace boost { namespace coroutines {
 
