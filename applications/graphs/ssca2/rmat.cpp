@@ -17,9 +17,9 @@ using namespace std;
 namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main()
+threads::thread_state hpx_main(int scale)
 {
-    // Create a graph.
+    // Get list of all localities
     std::vector<naming::id_type> localities;
     naming::id_type locale;
     applier::applier& appl = applier::get_applier();
@@ -29,12 +29,20 @@ threads::thread_state hpx_main()
     else {
         locale = appl.get_runtime_support_gid();
     }
-    using hpx::components::graph;
-    graph G (graph::create(locale));
 
     // Print info message
     std::cout << "R-MAT Scalable Graph Generator\n";
+    std::cout << "Scale: " << scale << "\n";
 
+    // Create a graph.
+    using hpx::components::graph;    
+    graph G (graph::create(locale));
+    
+    int n = 1<<scale;
+    G.init(n);
+
+    // Spawn choice blocks on each locality
+    
     // Free the graph component
     G.free();
     
@@ -62,6 +70,8 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("threads,t", po::value<int>(), 
                 "the number of operating system threads to spawn for this"
                 "HPX locality")
+            ("scale,s", po::value<int>(),
+                "the scale of the graph, default is 4")
         ;
 
         po::store(po::command_line_parser(argc, argv)
@@ -75,7 +85,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
         }
     }
     catch (std::exception const& e) {
-        std::cerr << "accumulator_client: exception caught: " << e.what() << std::endl;
+        std::cerr << "rmat: exception caught: " << e.what() << std::endl;
         return false;
     }
     return true;
@@ -96,8 +106,8 @@ split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
         }
     }
     catch (boost::bad_lexical_cast const& /*e*/) {
-        std::cerr << "accumulator_client: illegal port number given: " << v.substr(p+1) << std::endl;
-        std::cerr << "                    using default value instead: " << port << std::endl;
+        std::cerr << "rmat: illegal port number given: " << v.substr(p+1) << std::endl;
+        std::cerr << "      using default value instead: " << port << std::endl;
     }
 }
 
@@ -130,6 +140,7 @@ int main(int argc, char* argv[])
         std::string hpx_host("localhost"), agas_host;
         boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
         int num_threads = 1;
+        int scale = 4;
         hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
 
         // extract IP address/port arguments
@@ -144,6 +155,9 @@ int main(int argc, char* argv[])
 
         if (vm.count("worker"))
             mode = hpx::runtime::worker;
+            
+        if (vm.count("scale"))
+            scale = vm["scale"].as<int>();
 
         // initialize and run the AGAS service, if appropriate
         std::auto_ptr<agas_server_helper> agas_server;
@@ -152,7 +166,7 @@ int main(int argc, char* argv[])
 
         // initialize and start the HPX runtime
         hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, mode);
-        rt.run(hpx_main, num_threads);
+        rt.run(boost::bind(hpx_main,scale), num_threads);
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";

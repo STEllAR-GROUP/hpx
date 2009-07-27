@@ -31,31 +31,76 @@ namespace hpx { namespace components { namespace server
         {
             graph_init = 0
         };
+        
+        // Typedefs for graph
+        typedef int count_t;
+        typedef long int vertex_t;
+        typedef long int edge_t;
 
         // constructor: initialize graph value
         graph()
-          : arg_(0)
+          : block_size_(0),
+            blocks_(0)
         {}
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
         /// Initialize the graph
-        void init() 
-        {
-            arg_ = 0;
+        void init(count_t order) 
+        {            
+            std::cout << "Initializng graph of order " << order << "\n";
+            
+            // Get list of all known localities
+            std::vector<naming::id_type> locales;
+            naming::id_type locale;
+            applier::applier& appl = applier::get_applier();
+            if (appl.get_remote_prefixes(locales))
+            {
+                locale = locales[0];
+            }
+            else
+            {
+                locale = appl.get_runtime_support_gid();
+            }
+            
+            // Calculate block distribution
+            block_size_ = ceil(order*1.0 / locales.size());
+            std::cout << "Block size is " << block_size_ << "\n";
+            
+            // Build distributed list of vertices
+            std::vector<naming::id_type> blocks(locales.size());
+            for (int i = 0; i<locales.size(); i++)
+            {
+                // Allocate remote vector of vertices
+                components::memory_block mb(
+                    components::memory_block::create(
+                        locales[i], sizeof(vertex_t)*block_size_));
+                
+                // Initialize vector list
+                //components::access_memory_block<vertex_t> data(mb.get());
+                //std::generate(data.get_ptr(), data.get_ptr()+block_size_, 0);
+
+                // Set gid for remote block
+                blocks_[i] = mb.get_gid();
+
+                std::cout << "Allocated memory at locality " << i;
+                
+                mb.free();
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::action0<
-            graph, graph_init, &graph::init
+        typedef hpx::actions::action1<
+            graph, graph_init, count_t, &graph::init
         > init_action;
 
     private:
-        double arg_;
+        count_t block_size_;
+        std::vector<naming::id_type> blocks_;
     };
 
 }}}

@@ -13,6 +13,8 @@
 
 namespace hpx { namespace components 
 {
+    typedef int count_t;
+    
     ///////////////////////////////////////////////////////////////////////////
     /// The \a graph class is the client side representation of a 
     /// specific \a server#graph component
@@ -32,10 +34,10 @@ namespace hpx { namespace components
         // exposed functionality of this component
 
         /// Initialize the graph
-        void init() 
+        void init(count_t order) 
         {
             BOOST_ASSERT(gid_);
-            this->base_type::init(gid_);
+            this->base_type::init(gid_, order);
         }
     };
     

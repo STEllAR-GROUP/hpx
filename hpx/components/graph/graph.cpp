@@ -28,7 +28,7 @@ typedef hpx::components::managed_component<
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(graph_type, graph);
 
 ///////////////////////////////////////////////////////////////////////////////
-// Serialization support for the accumulator actions
+// Serialization support for the graph actions
 HPX_REGISTER_ACTION_EX(
     graph_type::wrapped_type::init_action,
     graph_init_action);
