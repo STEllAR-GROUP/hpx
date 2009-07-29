@@ -70,7 +70,7 @@ namespace hpx { namespace components { namespace server
             
             // Build distributed list of vertices
             std::vector<naming::id_type> blocks(locales.size());
-            for (int i = 0; i<locales.size(); i++)
+            for (std::size_t i = 0; i<locales.size(); i++)
             {
                 // Allocate remote vector of vertices
                 components::memory_block mb(
