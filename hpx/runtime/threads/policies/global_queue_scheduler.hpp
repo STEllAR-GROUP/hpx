@@ -65,7 +65,7 @@ namespace hpx { namespace threads { namespace policies
                 thread_state state = thrd->get_state();
                 if (suspended == state)
                 {
-                    LTM_(error) << "suspended thread(" << (*it).first << "): "
+                    LTM_(info) << "suspended thread(" << (*it).first << "): "
                                 << thrd->get_description();
                 }
             }
