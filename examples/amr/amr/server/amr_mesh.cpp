@@ -24,6 +24,7 @@ typedef hpx::components::amr::server::amr_mesh amr_mesh_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
+HPX_REGISTER_ACTION_EX(amr_mesh_type::init_execute_action, amr_mesh_init_execute_action);
 HPX_REGISTER_ACTION_EX(amr_mesh_type::execute_action, amr_mesh_execute_action);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
@@ -198,7 +199,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     /// This is the main entry point of this component. 
-    std::vector<naming::id_type> amr_mesh::execute(
+    std::vector<naming::id_type> amr_mesh::init_execute(
         components::component_type function_type, std::size_t numvalues, 
         std::size_t numsteps, components::component_type logging_type)
     {
@@ -246,6 +247,67 @@ namespace hpx { namespace components { namespace amr { namespace server
         // prepare initial data
         std::vector<naming::id_type> initial_data;
         prepare_initial_data(locality_results(functions), initial_data);
+
+        // do actual work
+        execute(locality_results(stencils[0]), initial_data, result_data);
+
+        // free all allocated components (we can do that synchronously)
+        if (!logging.empty())
+            factory.free_components_sync(logging);
+        factory.free_components_sync(stencils[1]);
+        factory.free_components_sync(stencils[0]);
+        factory.free_components_sync(functions);
+
+        return result_data;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// This the other entry point of this component. 
+    std::vector<naming::id_type> amr_mesh::execute(
+        std::vector<naming::id_type> const& initial_data,
+        components::component_type function_type, std::size_t numvalues, 
+        std::size_t numsteps, components::component_type logging_type)
+    {
+        std::vector<naming::id_type> result_data;
+
+        components::component_type stencil_type = 
+            components::get_component_type<components::amr::server::stencil_value<3> >();
+
+        typedef components::distributing_factory::result_type result_type;
+
+        // create a distributing factory locally
+        components::distributing_factory factory(
+            components::distributing_factory::create(
+                applier::get_applier().get_runtime_support_gid(), true));
+
+        // create a couple of stencil (functional) components and twice the 
+        // amount of stencil_value components
+        numvalues_ = numvalues;
+        result_type functions = factory.create_components(function_type, numvalues);
+        result_type stencils[2] = 
+        {
+            factory.create_components(stencil_type, numvalues),
+            factory.create_components(stencil_type, numvalues)
+        };
+
+        // initialize logging functionality in functions
+        result_type logging;
+        if (logging_type != components::component_invalid)
+            logging = factory.create_components(logging_type);
+
+        init(locality_results(functions), locality_results(logging), numsteps);
+
+        // initialize stencil_values using the stencil (functional) components
+        init_stencils(locality_results(stencils[0]), locality_results(functions), 0);
+        init_stencils(locality_results(stencils[1]), locality_results(functions), 1);
+
+        // ask stencil instances for their output gids
+        std::vector<std::vector<std::vector<naming::id_type> > > outputs(2);
+        get_output_ports(locality_results(stencils[0]), outputs[0]);
+        get_output_ports(locality_results(stencils[1]), outputs[1]);
+
+        // connect output gids with corresponding stencil inputs
+        connect_input_ports(stencils, outputs);
 
         // do actual work
         execute(locality_results(stencils[0]), initial_data, result_data);

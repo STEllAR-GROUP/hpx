@@ -40,7 +40,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps, bool do_logging)
 
         hpx::util::high_resolution_timer t;
         std::vector<naming::id_type> result_data(
-            mesh.execute(function_type, numvals, numsteps, 
+            mesh.init_execute(function_type, numvals, numsteps, 
                 do_logging ? logging_type : components::component_invalid));
         printf("Elapsed time: %f s\n", t.elapsed());
 

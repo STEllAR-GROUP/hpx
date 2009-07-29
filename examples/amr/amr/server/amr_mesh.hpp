@@ -35,11 +35,17 @@ namespace hpx { namespace components { namespace amr { namespace server
         // object (the accumulator)
         enum actions
         {
-            amr_mesh_execute = 0
+            amr_mesh_init_execute = 0,
+            amr_mesh_execute = 1
         };
 
         /// This is the main entry point of this component. 
+        std::vector<naming::id_type> init_execute(
+            components::component_type function_type, std::size_t numvalues, 
+            std::size_t numsteps, components::component_type logging_type);
+
         std::vector<naming::id_type> execute(
+            std::vector<naming::id_type> const& initialdata,
             components::component_type function_type, std::size_t numvalues, 
             std::size_t numsteps, components::component_type logging_type);
 
@@ -48,7 +54,14 @@ namespace hpx { namespace components { namespace amr { namespace server
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::result_action4<
+            amr_mesh, std::vector<naming::id_type>, amr_mesh_init_execute, 
+            components::component_type, std::size_t, std::size_t,
+            components::component_type, &amr_mesh::init_execute
+        > init_execute_action;
+
+        typedef hpx::actions::result_action5<
             amr_mesh, std::vector<naming::id_type>, amr_mesh_execute, 
+            std::vector<naming::id_type> const&,
             components::component_type, std::size_t, std::size_t,
             components::component_type, &amr_mesh::execute
         > execute_action;
