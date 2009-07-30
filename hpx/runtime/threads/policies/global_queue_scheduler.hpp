@@ -392,7 +392,7 @@ namespace hpx { namespace threads { namespace policies
                     bool timed_out = false;
                     {
                         namespace bpt = boost::posix_time;
-                        timed_out = cond_.timed_wait(lk, bpt::milliseconds(5));
+                        timed_out = !cond_.timed_wait(lk, bpt::milliseconds(5));
                     }
 
                     LTM_(info) << "tfunc(" << num_thread << "): exiting wait";
