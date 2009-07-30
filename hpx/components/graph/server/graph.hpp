@@ -47,7 +47,7 @@ namespace hpx { namespace components { namespace server
         // exposed functionality of this component
 
         /// Initialize the graph
-        void init(count_t order) 
+        int init(count_t order) 
         {            
             std::cout << "Initializng graph of order " << order << "\n";
             
@@ -63,13 +63,14 @@ namespace hpx { namespace components { namespace server
             {
                 locale = appl.get_runtime_support_gid();
             }
+            locales.push_back(appl.get_runtime_support_gid());
             
             // Calculate block distribution
-            block_size_ = ceil(order*1.0 / locales.size());
+            block_size_ = order / (locales.size());
             std::cout << "Block size is " << block_size_ << "\n";
-            
+                        
             // Build distributed list of vertices
-            std::vector<naming::id_type> blocks(locales.size());
+            std::vector<naming::id_type> blocks_(locales.size());
             for (std::size_t i = 0; i<locales.size(); i++)
             {
                 // Allocate remote vector of vertices
@@ -77,25 +78,25 @@ namespace hpx { namespace components { namespace server
                     components::memory_block::create(
                         locales[i], sizeof(vertex_t)*block_size_));
                 
-                // Initialize vector list
-                //components::access_memory_block<vertex_t> data(mb.get());
-                //std::generate(data.get_ptr(), data.get_ptr()+block_size_, 0);
-
+                // TODO: Initialize vector list
+                
                 // Set gid for remote block
                 blocks_[i] = mb.get_gid();
 
-                std::cout << "Allocated memory at locality " << i;
+                std::cout << "Allocated memory at locality " << i << "\n";
                 
                 mb.free();
             }
+            
+            return 0;
         }
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::action1<
-            graph, graph_init, count_t, &graph::init
+        typedef hpx::actions::result_action1<
+            graph, int, graph_init, count_t, &graph::init
         > init_action;
 
     private:

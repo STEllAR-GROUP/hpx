@@ -37,11 +37,13 @@ threads::thread_state hpx_main(int scale)
     // Create a graph.
     using hpx::components::graph;    
     graph G (graph::create(locale));
-    
+        
+    int status = -1;
     int n = 1<<scale;
-    G.init(n);
+    status = G.init(n);
 
     // Spawn choice blocks on each locality
+    // ...
     
     // Free the graph component
     G.free();

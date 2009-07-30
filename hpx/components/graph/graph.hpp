@@ -34,10 +34,10 @@ namespace hpx { namespace components
         // exposed functionality of this component
 
         /// Initialize the graph
-        void init(count_t order) 
+        int init(count_t order) 
         {
             BOOST_ASSERT(gid_);
-            this->base_type::init(gid_, order);
+            return this->base_type::init(gid_, order);
         }
     };
     
