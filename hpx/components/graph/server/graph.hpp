@@ -70,24 +70,8 @@ namespace hpx { namespace components { namespace server
             std::cout << "Block size is " << block_size_ << "\n";
                         
             // Build distributed list of vertices
-            std::vector<naming::id_type> blocks_(locales.size());
-            for (std::size_t i = 0; i<locales.size(); i++)
-            {
-                // Allocate remote vector of vertices
-                components::memory_block mb(
-                    components::memory_block::create(
-                        locales[i], sizeof(vertex_t)*block_size_));
-                
-                // TODO: Initialize vector list
-                
-                // Set gid for remote block
-                blocks_[i] = mb.get_gid();
-
-                std::cout << "Allocated memory at locality " << i << "\n";
-                
-                mb.free();
-            }
-            
+            // ...
+                                  
             return 0;
         }
 
