@@ -18,7 +18,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming
 {
-    class full_address : public util::safe_bool<full_address>
+    class full_address 
     {
     public:
         full_address() 
@@ -38,11 +38,18 @@ namespace hpx { namespace naming
           : gid_(msb_id, lsb_id), address_(l, t, a)
         {}
 
+        // local only full_address
+        explicit full_address(address const& addr)
+          : address_(addr)
+        {}
+
         /// \brief Make sure the stored gid has been resolved
         bool resolve();
 
-        // this gets called from the safe_bool base class 
-        bool operator_bool() const { return address_; }
+        operator util::safe_bool<full_address>::result_type() const 
+        { 
+            return util::safe_bool<full_address>()(address_); 
+        }
 
         naming::id_type& gid() { return gid_; }
         naming::id_type const& cgid() const { return gid_; }

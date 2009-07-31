@@ -23,7 +23,7 @@
 namespace hpx { namespace naming
 {
     /// Global identifier for components across the PX system
-    struct HPX_EXPORT id_type : public util::safe_bool<id_type>
+    struct HPX_EXPORT id_type 
     {
         explicit id_type (boost::uint64_t lsb_id = 0) 
           : id_msb_(0), id_lsb_(lsb_id)
@@ -61,8 +61,10 @@ namespace hpx { namespace naming
             return t;
         }
 
-        // this gets called from the safe_bool base class 
-        bool operator_bool() const { return 0 != id_lsb_ || 0 != id_msb_; }
+        operator util::safe_bool<id_type>::result_type() const 
+        { 
+            return util::safe_bool<id_type>()(0 != id_lsb_ || 0 != id_msb_); 
+        }
 
         // we support increment and addition as operators
         friend id_type operator+ (id_type const& lhs, id_type const& rhs)
@@ -167,6 +169,10 @@ namespace hpx { namespace naming
         void set_lsb(boost::uint64_t lsb) 
         {
             id_lsb_ = lsb;
+        }
+        void set_lsb(void* lsb) 
+        {
+            id_lsb_ = reinterpret_cast<boost::uint64_t>(lsb);
         }
 
     private:

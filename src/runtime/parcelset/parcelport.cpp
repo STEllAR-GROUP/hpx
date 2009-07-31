@@ -77,10 +77,12 @@ namespace hpx { namespace parcelset
     void parcelport::stop(bool blocking)
     {
         io_service_pool_.stop();
-        if (blocking)
+        if (blocking) {
             io_service_pool_.join();
+            io_service_pool_.clear();
+        }
     }
-    
+
     /// accepted new incoming connection
     void parcelport::handle_accept(boost::system::error_code const& e,
         server::parcelport_connection_ptr conn)

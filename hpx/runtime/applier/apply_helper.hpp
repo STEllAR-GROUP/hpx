@@ -58,16 +58,16 @@ namespace hpx { namespace applier { namespace detail
 
         // If local and to be directly executed, just call the function
         static void
-        call (naming::address::address_type addr)
+        call (naming::address::address_type lva)
         {
-            Action::execute_function(addr);
+            Action::execute_function(lva);
         }
 
         static typename Action::result_type 
-        call (actions::continuation_type& c, naming::address::address_type addr)
+        call (actions::continuation_type& c, naming::address::address_type lva)
         {
             try {
-                return c->trigger(Action::execute_function(addr));
+                return c->trigger(Action::execute_function(lva));
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
@@ -88,17 +88,19 @@ namespace hpx { namespace applier { namespace detail
     struct apply_helper1<Action, Arg0, boost::mpl::false_>
     {
         static void 
-        call (naming::address::address_type addr, Arg0 const& arg0)
+        call (naming::address::address_type lva, Arg0 const& arg0)
         {
-            hpx::applier::register_work_plain(Action::construct_thread_function(addr, arg0),
+            hpx::applier::register_work_plain(
+                Action::construct_thread_function(lva, arg0),
                 actions::detail::get_action_name<Action>());
         }
 
         static void 
-        call (actions::continuation_type& c, naming::address::address_type addr, 
+        call (actions::continuation_type& c, naming::address::address_type lva, 
             Arg0 const& arg0)
         {
-            hpx::applier::register_work_plain(Action::construct_thread_function(c, addr, arg0),
+            hpx::applier::register_work_plain(
+                Action::construct_thread_function(c, lva, arg0),
                 actions::detail::get_action_name<Action>());
         }
     };
@@ -108,17 +110,17 @@ namespace hpx { namespace applier { namespace detail
     {
         // If local and to be directly executed, just call the function
         static void
-        call (naming::address::address_type addr, Arg0 const& arg0)
+        call (naming::address::address_type lva, Arg0 const& arg0)
         {
-            Action::execute_function(addr, arg0);
+            Action::execute_function(lva, arg0);
         }
 
         static typename Action::result_type  
-        call (actions::continuation_type& c, naming::address::address_type addr, 
+        call (actions::continuation_type& c, naming::address::address_type lva, 
             Arg0 const& arg0)
         {
             try {
-                return c->trigger(Action::execute_function(addr, arg0));
+                return c->trigger(Action::execute_function(lva, arg0));
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client

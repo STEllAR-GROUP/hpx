@@ -12,6 +12,7 @@
 #define HPX_LCOS_BARRIER_JUN_23_2008_0530PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/spinlock_pool.hpp>
 
 #include <boost/noncopyable.hpp>
 #include <boost/lockfree/fifo.hpp>
@@ -62,6 +63,10 @@ namespace hpx { namespace lcos { namespace detail
         BOOST_STATIC_CONSTANT(boost::int32_t, lock_flag_value = 1 << lock_flag_bit);
         BOOST_STATIC_CONSTANT(boost::int32_t, event_set_flag_value = 1 << event_set_flag_bit);
 
+    private:
+        struct tag {};
+        typedef hpx::util::spinlock_pool<tag> mutex_type;
+
     public:
         mutex()
           : active_count_(0)
@@ -111,14 +116,32 @@ namespace hpx { namespace lcos { namespace detail
                     // wait for lock to get available
                     threads::thread_self& self = threads::get_self();
                     threads::thread_id_type id = self.get_thread_id();
-                    queue_.enqueue(id);
+                    {
+                        // enqueue this thread
+                        mutex_type::scoped_lock l(this);
+                        queue_.enqueue(id);
 
-                    // timeout at the given time, if appropriate
-                    if (!wait_until.is_pos_infinity()) 
-                        threads::set_thread_state(id, wait_until);
-
+                        // timeout at the given time, if appropriate
+                        if (!wait_until.is_pos_infinity()) 
+                            threads::set_thread_state(id, wait_until);
+                    }
                     if (threads::wait_signaled != self.yield(threads::suspended))
                     {
+                        {
+                            // remove this thread id from queue
+                            // this is not nice, but it works. needs fixing
+                            mutex_type::scoped_lock l(this);
+
+                            boost::lockfree::fifo<threads::thread_id_type> remaining;
+                            threads::thread_id_type t;
+                            while (queue_.dequeue(&t)) {
+                                if (t != id)
+                                    remaining.enqueue(t);
+                            }
+                            while (remaining.dequeue(&t)) 
+                                queue_.enqueue(t);
+                        }
+
                         // if this timed out, just return false
                         interlocked_decrement(&active_count_);
                         return false;
@@ -167,6 +190,7 @@ namespace hpx { namespace lcos { namespace detail
             {
                 if (!interlocked_bit_test_and_set(&active_count_, event_set_flag_bit))
                 {
+                    mutex_type::scoped_lock l(this);
                     threads::thread_id_type id = 0;
                     if (queue_.dequeue(&id)) 
                         threads::set_thread_state(id);

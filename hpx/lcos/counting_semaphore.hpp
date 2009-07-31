@@ -8,10 +8,10 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/mutex.hpp>
+#include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/unlock_lock.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/thread.hpp>
 #include <boost/lockfree/fifo.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,8 +38,8 @@ namespace hpx { namespace lcos
     class counting_semaphore
     {
     private:
-//        typedef hpx::lcos::mutex mutex_type;
-        typedef boost::mutex mutex_type;
+        struct tag {};
+        typedef hpx::util::spinlock_pool<tag> mutex_type;
 
     public:
         /// \brief Construct a new counting semaphore
@@ -67,7 +67,7 @@ namespace hpx { namespace lcos
         ///                 yielded.
         void wait()
         {
-            mutex_type::scoped_lock l(mtx_);
+            mutex_type::scoped_lock l(this);
 
             while (0 == value_) {     // allow for higher priority threads
                 // we need to get the self anew for each round as it might
@@ -87,7 +87,7 @@ namespace hpx { namespace lcos
         /// 
         void signal()
         {
-            mutex_type::scoped_lock l(mtx_);
+            mutex_type::scoped_lock l(this);
 
             threads::thread_id_type id = 0;
             if (queue_.dequeue(&id)) 
@@ -97,7 +97,6 @@ namespace hpx { namespace lcos
         }
 
     private:
-        mutex_type mtx_;
         long value_;
         boost::lockfree::fifo<threads::thread_id_type> queue_;
     };

@@ -44,11 +44,27 @@ namespace hpx { namespace applier
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    static threads::thread_state thread_function(
+    static inline threads::thread_state thread_function(
         boost::function<void(threads::thread_state_ex)> const& func)
     {
         func(threads::wait_signaled);
         return threads::terminated;
+    }
+
+    static inline threads::thread_state thread_function_nullary(
+        boost::function<void()> const& func)
+    {
+        func();
+        return threads::terminated;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    threads::thread_id_type register_thread_nullary(
+        boost::function<void()> const& func, char const* desc, 
+        threads::thread_state state, bool run_now)
+    {
+        return hpx::applier::get_applier().get_thread_manager().register_thread(
+            boost::bind(&thread_function_nullary, func), desc, state, run_now);
     }
 
     threads::thread_id_type register_thread(
@@ -68,6 +84,14 @@ namespace hpx { namespace applier
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    void register_work_nullary(
+        boost::function<void()> const& func, char const* desc, 
+        threads::thread_state state)
+    {
+        hpx::applier::get_applier().get_thread_manager().register_work(
+            boost::bind(&thread_function_nullary, func), desc, state);
+    }
+
     void register_work(
         boost::function<void(threads::thread_state_ex)> const& func, 
         char const* desc, threads::thread_state state)

@@ -26,7 +26,7 @@ namespace hpx { namespace naming
     /// \class address address.hpp hpx/runtime/naming/address.hpp
     ///
     /// 
-    struct HPX_EXPORT address : public util::safe_bool<address>
+    struct HPX_EXPORT address 
     {
         typedef boost::int64_t component_type;
         typedef boost::uint64_t address_type;
@@ -49,10 +49,21 @@ namespace hpx { namespace naming
           : locality_(l), type_(t), address_(a) 
         {}
 
-        // this gets called from the safe_bool base class 
-        bool operator_bool() const 
+        // local only addresses
+        address(void* lva)
+          : type_(components::component_invalid), 
+            address_(reinterpret_cast<address_type>(lva)) 
+        {}
+
+        address(address_type a)
+          : type_(components::component_invalid), address_(a) 
+        {}
+
+        // safe operator bool()
+        operator util::safe_bool<address>::result_type() const 
         { 
-            return components::component_invalid != type_ || 0 != address_; 
+            return util::safe_bool<address>()(
+                components::component_invalid != type_ || 0 != address_); 
         }
 
         friend bool operator==(address const& lhs, address const& rhs)

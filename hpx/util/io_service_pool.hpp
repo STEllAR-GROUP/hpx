@@ -52,6 +52,9 @@ namespace hpx { namespace util
         /// \brief Join all io_service threads in the pool.
         void join();
 
+        /// \brief Clear all internal data structures
+        void clear();
+
         /// \brief 
         bool is_running() const { return !threads_.empty(); }
 

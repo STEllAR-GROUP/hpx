@@ -45,7 +45,8 @@
         call (naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            hpx::applier::register_work_plain(Action::construct_thread_function(lva, 
+            hpx::applier::register_work_plain(
+                Action::construct_thread_function(lva, 
                     BOOST_PP_ENUM_PARAMS(N, arg)),
                 actions::detail::get_action_name<Action>());
         }
@@ -54,8 +55,9 @@
         call (actions::continuation_type& c, naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            hpx::applier::register_work_plain(Action::construct_thread_function(
-                c, lva, BOOST_PP_ENUM_PARAMS(N, arg)),
+            hpx::applier::register_work_plain(
+                Action::construct_thread_function(
+                    c, lva, BOOST_PP_ENUM_PARAMS(N, arg)),
                 actions::detail::get_action_name<Action>());
         }
     };
@@ -67,19 +69,19 @@
     {
         // If local and to be directly executed, just call the function
         static void
-        call (naming::address::address_type addr,
+        call (naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            Action::execute_function(addr, BOOST_PP_ENUM_PARAMS(N, arg));
+            Action::execute_function(lva, BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
         static typename Action::result_type  
-        call (actions::continuation_type& c, naming::address::address_type addr,
+        call (actions::continuation_type& c, naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             try {
                 return c->trigger(Action::execute_function(
-                    addr, BOOST_PP_ENUM_PARAMS(N, arg)));
+                    lva, BOOST_PP_ENUM_PARAMS(N, arg)));
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client

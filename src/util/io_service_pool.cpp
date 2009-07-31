@@ -112,7 +112,17 @@ namespace hpx { namespace util
             // Explicitly stop all io_services.
             for (std::size_t i = 0; !stopped_ && i < io_services_.size(); ++i)
                 io_services_[i]->stop();
+
             stopped_ = true;
+        }
+    }
+
+    void io_service_pool::clear()
+    {
+        if (stopped_) {
+            threads_.clear();
+            io_services_.clear();
+            work_.clear();
         }
     }
 

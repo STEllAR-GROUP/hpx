@@ -102,14 +102,16 @@ namespace hpx { namespace threads
             return invalid_thread_id;
         }
 
-        LTM_(info) << "register_thread: initial_state(" 
+        // create the new thread
+        thread_id_type newid = scheduler_.create_thread(
+            threadfunc, description, initial_state, run_now);
+
+        LTM_(info) << "register_thread(" << newid << "): initial_state(" 
                    << get_thread_state_name(initial_state) << "), "
                    << std::boolalpha << "run_now(" << run_now << "), "
                    << "description(" << description << ")";
 
-        // create the new thread
-        return scheduler_.create_thread(
-            threadfunc, description, initial_state, run_now);
+        return newid;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -236,7 +238,8 @@ namespace hpx { namespace threads
     /// The get_state function is part of the thread related API and allows
     /// to query the state of one of the threads known to the threadmanager_impl
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    thread_state threadmanager_impl<SchedulingPolicy, NotificationPolicy>::get_state(thread_id_type id) 
+    thread_state threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_state(thread_id_type id) 
     {
         // we know that the id is actually the pointer to the thread
         thread* thrd = reinterpret_cast<thread*>(id);
@@ -267,7 +270,7 @@ namespace hpx { namespace threads
         set_state(id, newstate, newstate_ex);
 
         // then re-activate the thread holding the deadline_timer
-        set_state(timer_id, pending);
+        set_state(timer_id, pending, wait_timeout);
         return terminated;
     }
 
@@ -279,22 +282,22 @@ namespace hpx { namespace threads
         at_timer (TimeType const& expire, thread_id_type id, 
             thread_state newstate, thread_state_ex newstate_ex)
     {
-        // create timer firing in correspondence with given time
-        boost::asio::deadline_timer t (timer_pool_.get_io_service(), expire);
-
         // create a new thread in suspended state, which will execute the 
         // requested set_state when timer fires and will re-awaken this thread, 
         // allowing the deadline_timer to go out of scope gracefully
         thread_self& self = get_self();
         thread_id_type wake_id = register_thread(boost::bind(
-            &threadmanager_impl::wake_timer_thread, this, id, newstate, newstate_ex,
-            self.get_thread_id()), "wake_timer", suspended);
+            &threadmanager_impl::wake_timer_thread, this, id, newstate, 
+            newstate_ex, self.get_thread_id()), "wake_timer", suspended);
+
+        // create timer firing in correspondence with given time
+        boost::asio::deadline_timer t (timer_pool_.get_io_service(), expire);
 
         // let the timer invoke the set_state on the new (suspended) thread
         t.async_wait(boost::bind(&threadmanager_impl::set_state, this, wake_id, 
             pending, wait_timeout));
 
-        // this waits for the thread to be executed when the timer fired
+        // this waits for the thread to be reactivated when the timer fired
         self.yield(suspended);
         return terminated;
     }
@@ -550,19 +553,26 @@ namespace hpx { namespace threads
                         ++num_px_threads;
                     }
 
+                    LTM_(debug) << "tfunc(" << num_thread << "): "
+                               << "thread(" << thrd->get_thread_id() << "), "
+                               << "description(" << thrd->get_description() << "), "
+                               << "new state(" << get_thread_state_name(state) << ")";
+
+                    // Re-add this work item to our list of work items if the PX
+                    // thread should be re-scheduled. If the PX thread is suspended 
+                    // now we just keep it in the map of threads.
+                    if (state == pending) {
+                        scheduler_.schedule_thread(thrd);
+                        do_some_work();
+                    }
+
                 }   // this stores the new state in the PX thread
-
-                LTM_(debug) << "tfunc(" << num_thread << "): "
-                           << "thread(" << thrd->get_thread_id() << "), "
-                           << "description(" << thrd->get_description() << "), "
-                           << "new state(" << get_thread_state_name(state) << ")";
-
-                // Re-add this work item to our list of work items if the PX
-                // thread should be re-scheduled. If the PX thread is suspended 
-                // now we just keep it in the map of threads.
-                if (state == pending) {
+                else if (active == state) {
+                    // re-schedule thread, if it is still marked as active
+                    // this might happen, if some thread has been added to the
+                    // scheduler queue already but the state has not been reset 
+                    // yet
                     scheduler_.schedule_thread(thrd);
-                    do_some_work();
                 }
 
                 // Remove the mapping from thread_map_ if PX thread is depleted 
@@ -667,8 +677,10 @@ namespace hpx { namespace threads
 
             LTM_(info) << "stop: stopping timer pool"; 
             timer_pool_.stop();             // stop timer pool as well
-            if (blocking) 
+            if (blocking) {
                 timer_pool_.join();
+                timer_pool_.clear();
+            }
         }
     }
 }}

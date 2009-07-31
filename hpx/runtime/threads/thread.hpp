@@ -215,7 +215,7 @@ namespace hpx { namespace threads
         ///                 by using the function \a threadmanager#get_state.
         thread_state get_state() const 
         {
-            return get()->get_state();
+            return get() ? get()->get_state() : terminated;
         }
 
         /// The set_state function allows to change the state of this thread 
@@ -233,7 +233,7 @@ namespace hpx { namespace threads
         ///                 be used.
         thread_state set_state(thread_state new_state)
         {
-            return get()->set_state(new_state);
+            return get() ? get()->set_state(new_state) : terminated;
         }
 
         /// The get_state_ex function allows to query the extended state of 
@@ -249,7 +249,7 @@ namespace hpx { namespace threads
         ///                 \a threadmanager#get_state_ex.
         thread_state_ex get_state_ex() const 
         {
-            return get()->get_state_ex();
+            return get() ? get()->get_state_ex() : wait_unknown;
         }
 
         /// The set_state function allows to change the extended state of this 
@@ -263,7 +263,7 @@ namespace hpx { namespace threads
         ///                 changed using the threadmanager. 
         thread_state_ex set_state_ex(thread_state_ex new_state)
         {
-            return get()->set_state_ex(new_state);
+            return get() ? get()->set_state_ex(new_state) : wait_unknown;
         }
 
         /// \brief Execute the thread function
@@ -274,13 +274,13 @@ namespace hpx { namespace threads
         ///                 thread's scheduling status.
         thread_state operator()()
         {
-            return get()->execute();
+            return get() ? get()->execute() : terminated;
         }
 
         /// \brief Get the (optional) description of this thread
         char const* const get_description() const
         {
-            return get()->get_description();
+            return get() ? get()->get_description() : "<terminated>";
         }
     };
 

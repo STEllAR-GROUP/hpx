@@ -142,6 +142,7 @@ namespace hpx
         ///
         enum thread_state_ex
         {
+            wait_unknown = -1,
             wait_signaled = 0,  ///< The thread has been signaled
             wait_timeout = 1,   ///< The thread has been reactivated after a timeout
         };
