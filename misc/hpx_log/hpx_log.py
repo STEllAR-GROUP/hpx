@@ -38,8 +38,7 @@ class HpxLog:
 
   def __clean_counts(self):
     """Adds zero-padding to the front of event counts."""
-    count_lens = [len(e['count']) for e in self.__events]
-    width = max(count_lens)
+    width = max([len(e['count']) for e in self.__events])
 
     for event in self.__events:
       event['count'] = "%%0%dd" % width % int(event['count']) 
