@@ -7,6 +7,7 @@
 set(component_SUDIRS 
     distributing_factory
     graph
+    vertex
     vertex_list)
 
 foreach(subdir ${component_SUDIRS})

@@ -14,10 +14,12 @@
 #include <boost/serialization/export.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
+#include <hpx/components/vertex/vertex.hpp>
+
 #include "vertex_list.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::vertex_list::server::vertex_list vertex_list_type;
+typedef hpx::components::server::vertex_list vertex_list_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the vertex_list actions
@@ -28,16 +30,18 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
 HPX_DEFINE_GET_COMPONENT_TYPE(vertex_list_type);
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace vertex_list {namespace server
+namespace hpx { namespace components { namespace server
 {
     vertex_list::vertex_list()
       : num_items_(0),
         blocks_(0)
     {}
     
-    int vertex_list::init(components::component_type item_type, std::size_t num_items) 
+    int vertex_list::init(components::component_type item_type, std::size_t num_items)
     {                    
         std::size_t block_size_;
+
+        std::cout << "Initializng vertex_list of length " << num_items << "\n";
 
         // Get vertex_list of all known localities
         std::vector<naming::id_type> locales;
@@ -53,59 +57,44 @@ namespace hpx { namespace components { namespace vertex_list {namespace server
         }
         locales.push_back(appl.get_runtime_support_gid());
     
+        // Calculate block distribution
+        block_size_ = num_items / (locales.size());
+        std::cout << "Block size is " << block_size_ << "\n";
+
+        typedef components::distributing_factory::result_type result_type;
+
+        std::vector<result_type> sub_lists;
+
+        // Create factories on each locality
         for (std::size_t i = 0; i < locales.size(); i++)
         {
+            std::cout << "Creating factory on locality " << i << "\n";
+
             // Create distributing factories across the system
             components::distributing_factory factory(
                 components::distributing_factory::create(
                     locales[i], true));
-        }
-        
-        
-        // Calculate block distribution
-        block_size_ = num_items / (locales.size());
-        std::cout << "Block size is " << block_size_ << "\n";
-        
-        std::cout << "Initializng vertex_list of length " << num_items << "\n";
-        
-        
-        
-        // Build distributed vertex_list of vertices
-        
-        // Create factories on each locality
-        //std::vector<components::distributing_factory> factories_(locales.size());
-        /*
-        for (std::size_t i = 0; i < locales.size(); i++)
-        {
-          components::distributing_factory factory(
-              components::distributing_factory::create(
-                  locales[i], true));
-          //factories_.push_back(factory);
-        }
-        */
-        
-        // Create vertices on each locality through corr. factory
-        
-        /*
-        std::vector<naming::id_type> blocks_(locales.size());
-        for (std::size_t i = 0; i<locales.size(); i++)
-        {
-            // Allocate remote vector of vertices
-            components::memory_block mb(
-                components::memory_block::create(
-                    locales[i], sizeof(vertex_t)*block_size_));
-            
-            // TODO: Initialize vector vertex_list
-            
-            // Set gid for remote block
-            blocks_[i] = mb.get_gid();
 
-            std::cout << "Allocated memory at locality " << i << "\n";
-            
-            mb.free();
+            sub_lists.push_back(factory.create_components(item_type, block_size_));
         }
-        */
+
+        // Test: run through and initialize each vertex in order
+        components::distributing_factory::iterator_range_type range;
+        components::distributing_factory::iterator_type iter;
+
+        for (int i=0; i < sub_lists.size(); ++i)
+        {
+            range = locality_results(sub_lists[i]);
+            iter = range.first;
+            for(int label = 0; iter != range.second; ++iter, ++label)
+            {
+                using components::vertex;
+                vertex v(*iter);
+                v.init(label);
+            }
+        }
+
         return 0;
     }
     
-}}}}
+}}}

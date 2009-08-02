@@ -12,6 +12,10 @@ set (graph_HEADERS
 
 set (graph_SOURCES
     graph.cpp)
+    
+set (graph_DEPENDENCIES
+    vertex_component
+    vertex_list_component)
 
 ###############################################################################
 
@@ -24,4 +28,6 @@ source_group(""
 
 add_hpx_component(graph 
     SOURCES ${graph_SOURCES} 
-    HEADERS ${graph_HEADERS})
+    HEADERS ${graph_HEADERS}
+    DEPENDENCIES ${graph_DEPENDENCIES}
+    INI ${graph_INI})

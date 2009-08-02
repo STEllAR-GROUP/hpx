@@ -15,13 +15,13 @@
 
 #include "../server/vertex_list.hpp"
 
-namespace hpx { namespace components { namespace vertex_list { namespace stubs
+namespace hpx { namespace components { namespace stubs
 {    
     ///////////////////////////////////////////////////////////////////////////
     /// The \a stubs#vertex_list class is the client side representation of all
     /// \a server#vertex_list components
     struct vertex_list 
-      : components::stubs::stub_base<vertex_list::server::vertex_list>
+      : components::stubs::stub_base<server::vertex_list>
     {
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
@@ -31,7 +31,7 @@ namespace hpx { namespace components { namespace vertex_list { namespace stubs
         static int init(naming::id_type gid, components::component_type item_type,
             std::size_t order) 
         {
-            typedef vertex_list::server::vertex_list::init_action action_type;
+            typedef server::vertex_list::init_action action_type;
             return lcos::eager_future<action_type>(gid, item_type, order).get();
         }
     };

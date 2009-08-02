@@ -16,7 +16,7 @@
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace vertex_list { namespace server 
+namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     /// The vertex_list is an HPX component. 
@@ -31,7 +31,7 @@ namespace hpx { namespace components { namespace vertex_list { namespace server
         vertex_list();
         
         //typedef vertex_list::server::vertex_list wrapping_type;
-        typedef hpx::components::vertex_list::server::vertex_list wrapping_type;
+        typedef hpx::components::server::vertex_list wrapping_type;
         
         // parcel action code: the action to be performed on the destination 
         // object (the vertex_list)
@@ -65,6 +65,6 @@ namespace hpx { namespace components { namespace vertex_list { namespace server
         std::vector<naming::id_type> blocks_;
     };
 
-}}}}
+}}}
 
 #endif

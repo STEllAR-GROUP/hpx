@@ -15,7 +15,8 @@ set (vertex_list_SOURCES
     server/vertex_list.cpp)
 
 set(vertex_list_DEPENDENCIES
-    distributing_factory_component)
+    distributing_factory_component
+    vertex_component)
     
 ###############################################################################
 

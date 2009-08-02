@@ -15,6 +15,9 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
+#include <hpx/components/vertex/vertex.hpp>
+#include <hpx/components/vertex_list/vertex_list.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server 
 {
@@ -41,7 +44,12 @@ namespace hpx { namespace components { namespace server
         graph()
           : block_size_(0),
             blocks_(0)
-        {}
+        {
+            applier::applier& appl = applier::get_applier();
+
+            using hpx::components::vertex_list;
+            vertex_list vertices_(vertex_list::create(appl.get_runtime_support_gid()));
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
@@ -65,13 +73,10 @@ namespace hpx { namespace components { namespace server
             }
             locales.push_back(appl.get_runtime_support_gid());
             
-            // Calculate block distribution
-            block_size_ = order / (locales.size());
-            std::cout << "Block size is " << block_size_ << "\n";
-                        
-            // Build distributed list of vertices
-            // ...
-                                  
+            // Create a vertex_list and initialize
+            components::component_type vertex_type = components::get_component_type<vertex>();
+            vertices_.init(vertex_type, order);
+
             return 0;
         }
 
@@ -86,6 +91,8 @@ namespace hpx { namespace components { namespace server
     private:
         count_t block_size_;
         std::vector<naming::id_type> blocks_;
+
+        vertex_list vertices_;
     };
 
 }}}

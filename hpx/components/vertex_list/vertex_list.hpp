@@ -12,7 +12,7 @@
 
 #include "stubs/vertex_list.hpp"
 
-namespace hpx { namespace components { namespace vertex_list
+namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a vertex_list class is the client side representation of a 
@@ -21,7 +21,7 @@ namespace hpx { namespace components { namespace vertex_list
       : public client_base<vertex_list, stubs::vertex_list>
     {
     private:
-        typedef client_base<vertex_list, vertex_list::stubs::vertex_list> base_type;
+        typedef client_base<vertex_list, stubs::vertex_list> base_type;
 
     public:
         /// Create a client side representation for the existing
@@ -34,10 +34,10 @@ namespace hpx { namespace components { namespace vertex_list
         // exposed functionality of this component
 
         /// Initialize the vertex_list
-        int init(components::component_type item_type, std::size_t order) 
+        int init(components::component_type item_type, std::size_t order)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::init(gid_, order);
+            return this->base_type::init(gid_, item_type, order);
         }
     };
     
