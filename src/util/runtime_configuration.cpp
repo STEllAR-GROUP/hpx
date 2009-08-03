@@ -26,7 +26,7 @@ namespace hpx { namespace util
 
             // create default installation location and logging settings
             "[hpx]",
-            "location = $[system.prefix]",
+            "location = ${HPX_LOCATION:$[system.prefix]}",
             "ini_path = $[hpx.location]/share/hpx/ini",
 
             "[hpx.agas]",
