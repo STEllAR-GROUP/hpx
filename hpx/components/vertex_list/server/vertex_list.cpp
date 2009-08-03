@@ -82,7 +82,7 @@ namespace hpx { namespace components { namespace server
         components::distributing_factory::iterator_range_type range;
         components::distributing_factory::iterator_type iter;
 
-        for (int i=0; i < sub_lists.size(); ++i)
+        for (std::size_t i=0; i < sub_lists.size(); ++i)
         {
             range = locality_results(sub_lists[i]);
             iter = range.first;

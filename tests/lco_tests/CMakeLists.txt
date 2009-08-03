@@ -7,7 +7,8 @@
 set(TESTS 
     barrier_tests 
     full_empty_tests 
-    counting_semaphore_test)
+    counting_semaphore_test
+    mutex_tests)
 
 # build and install each of the tests
 foreach(test ${TESTS})

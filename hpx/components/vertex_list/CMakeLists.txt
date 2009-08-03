@@ -17,7 +17,7 @@ set (vertex_list_SOURCES
 set(vertex_list_DEPENDENCIES
     distributing_factory_component
     vertex_component)
-    
+
 ###############################################################################
 
 set(vertex_list_INI

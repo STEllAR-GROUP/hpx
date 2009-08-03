@@ -15,7 +15,8 @@ set (graph_SOURCES
     
 set (graph_DEPENDENCIES
     vertex_component
-    vertex_list_component)
+    vertex_list_component
+    distributing_factory_component)
 
 ###############################################################################
 

@@ -179,7 +179,8 @@ set (hpxlib_threadmanager_HEADERS
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread_affinity.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread_helpers.hpp
-    ${hpx_SOURCE_DIR}/hpx/runtime/threads/threadmanager.hpp)
+    ${hpx_SOURCE_DIR}/hpx/runtime/threads/threadmanager.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/threads/threadmanager_impl.hpp)
 source_group("Header Files\\runtime\\threadmanager" 
     FILES ${hpxlib_threadmanager_HEADERS})
 
@@ -215,6 +216,7 @@ set (hpxlib_util_HEADERS
     ${hpx_SOURCE_DIR}/hpx/util/safe_bool.hpp
     ${hpx_SOURCE_DIR}/hpx/util/serialize_exception.hpp
     ${hpx_SOURCE_DIR}/hpx/util/serialize_sequence.hpp
+    ${hpx_SOURCE_DIR}/hpx/util/spinlock_pool.hpp
     ${hpx_SOURCE_DIR}/hpx/util/static.hpp
     ${hpx_SOURCE_DIR}/hpx/util/time_logger.hpp
     ${hpx_SOURCE_DIR}/hpx/util/unlock_lock.hpp
