@@ -144,6 +144,9 @@ namespace hpx { namespace components { namespace server
             &runtime_support::shutdown_all
         > shutdown_all_action;
 
+        /// \brief Start the runtime_support component
+        void run();
+
         /// \brief Wait for the runtime_support component to notify the calling
         ///        thread.
         ///

@@ -155,10 +155,7 @@ namespace hpx
         // stop all services
         parcel_port_.stop();      // stops parcel_pool_ as well
         thread_manager_.stop();   // stops timer_pool_ as well
-
         agas_pool_.stop();
-        agas_pool_.join();
-        agas_pool_.clear();
 
         // unload libraries
         runtime_support_.tidy();
@@ -194,6 +191,7 @@ namespace hpx
         init_tss();
 
         // start services (service threads)
+        runtime_support_.run();
         thread_manager_.run(num_threads);   // start the thread manager, timer_pool_ as well
         parcel_port_.run(false);            // starts parcel_pool_ as well
 
@@ -305,11 +303,6 @@ namespace hpx
         // stop runtime_impl services (threads)
         thread_manager_.stop(blocking);
         parcel_port_.stop(blocking);    // stops parcel_pool_ as well
-        agas_pool_.stop();
-        if (blocking) {
-            agas_pool_.join();
-            agas_pool_.clear();
-        }
         runtime_support_.stop();        // re-activate main thread 
 
         // this disables all logging from the main thread

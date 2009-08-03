@@ -26,19 +26,31 @@ namespace hpx { namespace parcelset
     parcelport::parcelport(util::io_service_pool& io_service_pool, 
             naming::locality here)
       : io_service_pool_(io_service_pool),
-        acceptor_(io_service_pool_.get_io_service()),
+        acceptor_(NULL),
         parcels_(This()),
         connection_cache_(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE, "  [PT] "), 
         here_(here)
+    {}
+
+    parcelport::~parcelport()
     {
-        // initialize network
+        delete acceptor_;
+    }
+
+    bool parcelport::run(bool blocking)
+    {
+        io_service_pool_.run(false);    // start pool
+
         using boost::asio::ip::tcp;
-        
+        if (NULL == acceptor_)
+            acceptor_ = new boost::asio::ip::tcp::acceptor(io_service_pool_.get_io_service());
+
+        // initialize network
         int tried = 0;
         exception_list errors;
-        naming::locality::iterator_type end = here.accept_end();
+        naming::locality::iterator_type end = here_.accept_end();
         for (naming::locality::iterator_type it = 
-                here.accept_begin(io_service_pool_.get_io_service()); 
+                here_.accept_begin(io_service_pool_.get_io_service()); 
              it != end; ++it, ++tried)
         {
             try {
@@ -48,11 +60,11 @@ namespace hpx { namespace parcelset
                 );
 
                 tcp::endpoint ep = *it;
-                acceptor_.open(ep.protocol());
-                acceptor_.set_option(tcp::acceptor::reuse_address(true));
-                acceptor_.bind(ep);
-                acceptor_.listen();
-                acceptor_.async_accept(conn->socket(),
+                acceptor_->open(ep.protocol());
+                acceptor_->set_option(tcp::acceptor::reuse_address(true));
+                acceptor_->bind(ep);
+                acceptor_->listen();
+                acceptor_->async_accept(conn->socket(),
                     boost::bind(&parcelport::handle_accept, this,
                         boost::asio::placeholders::error, conn));
             }
@@ -67,15 +79,15 @@ namespace hpx { namespace parcelset
             HPX_THROW_EXCEPTION(network_error, 
                 "parcelport::parcelport", errors.get_message());
         }
-    }
 
-    bool parcelport::run(bool blocking)
-    {
         return io_service_pool_.run(blocking);
     }
 
     void parcelport::stop(bool blocking)
     {
+        delete acceptor_;
+        acceptor_ = NULL;
+
         io_service_pool_.stop();
         if (blocking) {
             io_service_pool_.join();
@@ -94,7 +106,7 @@ namespace hpx { namespace parcelset
         // create new connection waiting for next incoming parcel
             conn.reset(new server::parcelport_connection(
                 io_service_pool_.get_io_service(), parcels_));
-            acceptor_.async_accept(conn->socket(),
+            acceptor_->async_accept(conn->socket(),
                 boost::bind(&parcelport::handle_accept, this,
                     boost::asio::placeholders::error, conn));
 

@@ -52,6 +52,8 @@ namespace hpx { namespace parcelset
         parcelport(util::io_service_pool& io_service_pool, 
             naming::locality here);
 
+        ~parcelport();
+
         /// Start the parcelport threads, enabling the parcel receiver
         ///
         /// \param blocking [in] If blocking is set to \a true the routine will 
@@ -228,7 +230,7 @@ namespace hpx { namespace parcelset
         util::io_service_pool& io_service_pool_;
 
         /// Acceptor used to listen for incoming connections.
-        boost::asio::ip::tcp::acceptor acceptor_;
+        boost::asio::ip::tcp::acceptor* acceptor_;
 
         /// The handler for all incoming requests.
         server::parcelport_queue parcels_;

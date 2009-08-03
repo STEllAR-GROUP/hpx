@@ -176,6 +176,12 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    void runtime_support::run()
+    {
+        mutex_type::scoped_lock l(mtx_);
+        stopped_ = false;
+    }
+
     void runtime_support::wait()
     {
         mutex_type::scoped_lock l(mtx_);

@@ -22,7 +22,7 @@ namespace hpx { namespace util
     io_service_pool::io_service_pool(std::size_t pool_size, 
             boost::function<void()> on_start_thread,
             boost::function<void()> on_stop_thread)
-      : next_io_service_(0), stopped_(false), 
+      : next_io_service_(0), stopped_(false), pool_size_(pool_size),
         on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread)
     {
         if (pool_size == 0)
@@ -41,7 +41,7 @@ namespace hpx { namespace util
 
     io_service_pool::io_service_pool(boost::function<void()> on_start_thread,
             boost::function<void()> on_stop_thread)
-      : next_io_service_(0), stopped_(false), 
+      : next_io_service_(0), stopped_(false), pool_size_(1),
         on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread)
     {
         io_service_ptr io_service(new boost::asio::io_service);
@@ -83,12 +83,27 @@ namespace hpx { namespace util
             return false;
         }
 
+        // Give all the io_services work to do so that their run() functions 
+        // will not exit until they are explicitly stopped.
+        if (!io_services_.empty())
+            clear();
+
+        for (std::size_t i = 0; i < pool_size_; ++i)
+        {
+            io_service_ptr io_service(new boost::asio::io_service);
+            work_ptr work(new boost::asio::io_service::work(*io_service));
+            io_services_.push_back(io_service);
+            work_.push_back(work);
+        }
+
         for (std::size_t i = 0; i < io_services_.size(); ++i)
         {
             boost::shared_ptr<boost::thread> thread(new boost::thread(
                 boost::bind(&io_service_pool::thread_run, this, i)));
             threads_.push_back(thread);
         }
+
+        stopped_ = false;
         if (join_threads)
             join();
 
@@ -120,6 +135,7 @@ namespace hpx { namespace util
     void io_service_pool::clear()
     {
         if (stopped_) {
+            next_io_service_ = 0;
             threads_.clear();
             io_services_.clear();
             work_.clear();

@@ -82,6 +82,9 @@ namespace hpx { namespace util
         /// set to true if stopped
         bool stopped_;
 
+        /// initial number of OS threads to execute in this pool
+        std::size_t pool_size_;
+
         /// call this for each thread start/stop
         boost::function<void()> on_start_thread_;
         boost::function<void()> on_stop_thread_;
