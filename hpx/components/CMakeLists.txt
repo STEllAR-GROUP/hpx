@@ -5,10 +5,7 @@
 
 # just recurse into all components subdirectories and execute the scripts there
 set(component_SUDIRS 
-    distributing_factory
-    graph
-    vertex
-    vertex_list)
+    distributing_factory)
 
 foreach(subdir ${component_SUDIRS})
     add_subdirectory(${subdir})

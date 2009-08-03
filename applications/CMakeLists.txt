@@ -4,7 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(application_SUBDIRS 
-    graphs)
+    )
 
 foreach(subdir ${application_SUBDIRS})
     add_subdirectory(${subdir})
