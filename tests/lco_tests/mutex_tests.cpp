@@ -156,7 +156,7 @@ struct test_lock_times_out_if_other_thread_has_lock
             {
                 // create timeout thread
 //                 threads::thread_id_type timer_id = 
-                threads::set_thread_state(id, boost::posix_time::seconds(2));
+                threads::set_thread_state(id, boost::posix_time::seconds(1));
 
                 // suspend this thread waiting for test to happen
                 self.yield(threads::suspended);

@@ -13,9 +13,10 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/spinlock_pool.hpp>
+#include <hpx/util/unlock_lock.hpp>
 
 #include <boost/noncopyable.hpp>
-#include <boost/lockfree/fifo.hpp>
+#include <boost/intrusive/list.hpp>
 
 // Description of the mutex algorithm is explained here:
 // http://lists.boost.org/Archives/boost/2006/09/110367.php
@@ -67,6 +68,32 @@ namespace hpx { namespace lcos { namespace detail
         struct tag {};
         typedef hpx::util::spinlock_pool<tag> mutex_type;
 
+        // define data structures needed for intrusive slist container used for
+        // the queues
+        struct mutex_queue_entry
+        {
+            typedef boost::intrusive::list_member_hook<
+                boost::intrusive::link_mode<boost::intrusive::auto_unlink>
+            > hook_type;
+
+            mutex_queue_entry(threads::thread_id_type id)
+              : id_(id)
+            {}
+
+            threads::thread_id_type id_;
+            hook_type list_hook_;
+        };
+
+        typedef boost::intrusive::member_hook<
+            mutex_queue_entry, mutex_queue_entry::hook_type,
+            &mutex_queue_entry::list_hook_
+        > list_option_type;
+
+        typedef boost::intrusive::list<
+            mutex_queue_entry, list_option_type, 
+            boost::intrusive::constant_time_size<false>
+        > queue_type;
+
     public:
         mutex()
           : active_count_(0)
@@ -116,36 +143,26 @@ namespace hpx { namespace lcos { namespace detail
                     // wait for lock to get available
                     threads::thread_self& self = threads::get_self();
                     threads::thread_id_type id = self.get_thread_id();
+
                     {
+                        mutex_queue_entry e(self.get_thread_id());
+
                         // enqueue this thread
                         mutex_type::scoped_lock l(this);
-                        queue_.enqueue(id);
+                        queue_.push_back(e);
+                        util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
 
                         // timeout at the given time, if appropriate
                         if (!wait_until.is_pos_infinity()) 
                             threads::set_thread_state(id, wait_until);
-                    }
-                    if (threads::wait_signaled != self.yield(threads::suspended))
-                    {
+
+                        if (threads::wait_signaled != self.yield(threads::suspended))
                         {
-                            // remove this thread id from queue
-                            // this is not nice, but it works. needs fixing
-                            mutex_type::scoped_lock l(this);
-
-                            boost::lockfree::fifo<threads::thread_id_type> remaining;
-                            threads::thread_id_type t;
-                            while (queue_.dequeue(&t)) {
-                                if (t != id)
-                                    remaining.enqueue(t);
-                            }
-                            while (remaining.dequeue(&t)) 
-                                queue_.enqueue(t);
+                            // if this timed out, just return false
+                            interlocked_decrement(&active_count_);
+                            return false;
                         }
-
-                        // if this timed out, just return false
-                        interlocked_decrement(&active_count_);
-                        return false;
-                    }
+                    }   // mutex_queue_entry goes out of scope (removes itself from the list)
 
                     old_count &= ~lock_flag_value;
                     old_count |= event_set_flag_value;
@@ -191,9 +208,13 @@ namespace hpx { namespace lcos { namespace detail
                 if (!interlocked_bit_test_and_set(&active_count_, event_set_flag_bit))
                 {
                     mutex_type::scoped_lock l(this);
-                    threads::thread_id_type id = 0;
-                    if (queue_.dequeue(&id)) 
-                        threads::set_thread_state(id);
+                    if (!queue_.empty()) {
+                        threads::thread_id_type id = queue_.front().id_;
+                        queue_.pop_front();
+
+                        l.unlock();
+                        set_thread_state(id, threads::pending);
+                    }
                 }
             }
         }
@@ -203,7 +224,7 @@ namespace hpx { namespace lcos { namespace detail
 
     private:
         boost::int32_t active_count_;
-        boost::lockfree::fifo<threads::thread_id_type> queue_;
+        queue_type queue_;
     };
 
 }}}

@@ -7,7 +7,8 @@
 #define HPX_LCOS_BARRIER_JUN_23_2008_0530PM
 
 #include <boost/intrusive/slist.hpp>
-#include <boost/thread.hpp>
+#include <hpx/util/spinlock_pool.hpp>
+#include <hpx/util/unlock_lock.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos 
@@ -25,7 +26,8 @@ namespace hpx { namespace lcos
     class barrier 
     {
     private:
-        typedef boost::mutex mutex_type;
+        struct tag {};
+        typedef hpx::util::spinlock_pool<tag> mutex_type;
 
         // define data structures needed for intrusive slist container used for
         // the queues
@@ -65,13 +67,14 @@ namespace hpx { namespace lcos
         /// entered this function.
         void wait()
         {
-            mutex_type::scoped_lock l(mtx_);
             threads::thread_self& self = threads::get_self();
+
+            mutex_type::scoped_lock l(this);
             if (queue_.size() < number_of_threads_-1) {
                 barrier_queue_entry e(self.get_thread_id());
                 queue_.push_back(e);
 
-                l.unlock();
+                util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                 self.yield(threads::suspended);
             }
             else {
