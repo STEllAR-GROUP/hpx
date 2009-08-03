@@ -1,0 +1,46 @@
+//  Copyright (c) 2007-2009 Dylan Stark
+// 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#if !defined(HPX_COMPONENTS_VERTEX_MAY_18_2008_0822AM)
+#define HPX_COMPONENTS_VERTEX_MAY_18_2008_0822AM
+
+#include <hpx/runtime.hpp>
+#include <hpx/runtime/components/client_base.hpp>
+
+#include <hpx/components/vertex/stubs/vertex.hpp>
+
+namespace hpx { namespace components 
+{
+    typedef int count_t;
+    
+    ///////////////////////////////////////////////////////////////////////////
+    /// The \a vertex class is the client side representation of a
+    /// specific \a server#vertex component
+    class vertex
+      : public client_base<vertex, stubs::vertex>
+    {
+        typedef client_base<vertex, stubs::vertex> base_type;
+
+    public:
+        /// Create a client side representation for the existing
+        /// \a server#vertex instance with the given global id \a gid.
+        vertex(naming::id_type gid, bool freeonexit = true)
+          : base_type(gid, freeonexit)
+        {}
+
+        ///////////////////////////////////////////////////////////////////////
+        // exposed functionality of this component
+
+        /// Initialize the vertex
+        int init(count_t order) 
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::init(gid_, order);
+        }
+    };
+    
+}}
+
+#endif
