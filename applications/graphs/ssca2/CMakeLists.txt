@@ -14,10 +14,13 @@
 set(ssca_KERNELS
    rmat)
 
+set(ssca_DEPENDENCIES
+   graph_component vertex_list_component vertex_component)
+
 foreach(kernel ${ssca_KERNELS})
     set(${kernel}_SOURCES
         ${kernel}.cpp)
     add_hpx_executable(${kernel}
         SOURCES ${${kernel}_SOURCES}
-        DEPENDENCIES graph_component)
+        DEPENDENCIES ${ssca_DEPENDENCIES})
 endforeach()
