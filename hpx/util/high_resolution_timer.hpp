@@ -137,7 +137,7 @@ namespace hpx { namespace util
         high_resolution_timer(double t) 
         {
             start_time.tv_sec = time_t(t);
-            start_time.tv_nsec = (t - start_time.tv_sec) * 1e9;
+            start_time.tv_nsec = long(double(t - start_time.tv_sec) * 1e9);
         }
 
         high_resolution_timer(high_resolution_timer const& rhs) 
@@ -221,7 +221,7 @@ namespace hpx { namespace util
         {
             if (!use_backup) {
                 start_time.tv_sec = time_t(t);
-                start_time.tv_nsec = (t - start_time.tv_sec) * 1e9;
+                start_time.tv_nsec = long(double(t - start_time.tv_sec) * 1e9);
             }
         }
         

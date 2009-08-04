@@ -278,21 +278,22 @@ namespace boost { namespace lockfree
         return *reinterpret_cast<T*>(&t);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     inline long interlocked_read_acquire(long volatile* x)
     {
-        return BOOST_INTERLOCKED_COMPARE_EXCHANGE(x, 0, 0);
+        return interlocked_compare_exchange(x, 0, 0);
     }
     inline void* interlocked_read_acquire(void* volatile* x)
     {
-        return BOOST_INTERLOCKED_COMPARE_EXCHANGE_POINTER(x, 0, 0);
+        return interlocked_compare_exchange((long volatile*)x, 0, 0);
     }
     inline void interlocked_write_release(long volatile* x,long value)
     {
-        BOOST_INTERLOCKED_EXCHANGE(x, value);
+        interlocked_exchange(x, value);
     }
     inline void interlocked_write_release(void* volatile* x,void* value)
     {
-        BOOST_INTERLOCKED_EXCHANGE_POINTER(x, value);
+        interlocked_exchange((long volatile*)x, (long)value);
     }
 
 }}
