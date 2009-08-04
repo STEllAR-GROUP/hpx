@@ -200,7 +200,7 @@ namespace boost { namespace lockfree
     template <typename T>
     inline T interlocked_exchange(T volatile *orig, T val)
     {
-        return interlocked_compare_exchange(orig, *(T*)orig, val)
+        return interlocked_compare_exchange(orig, *(T*)orig, val);
     }
 
 }}
