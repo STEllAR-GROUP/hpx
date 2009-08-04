@@ -80,7 +80,7 @@ namespace hpx { namespace lcos { namespace detail
     private:
         bool try_recursive_lock(threads::thread_id_type current_thread_id)
         {
-            if(boost::detail::interlocked_read_acquire(&locking_thread_id) ==
+            if(boost::lockfree::interlocked_read_acquire(&locking_thread_id) ==
                 current_thread_id)
             {
                 ++recursion_count;
