@@ -31,6 +31,7 @@ namespace hpx { namespace threads
             "active",
             "pending",
             "suspended",
+            "marked_for_suspension",
             "depleted",
             "terminated"
         };
@@ -148,25 +149,6 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // thread function registered for set_state if thread is currently active
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    thread_state threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        set_active_state(thread_id_type id, 
-            thread_state newstate, thread_state_ex newstate_ex)
-    {
-        thread_state prevstate = set_state(id, newstate, newstate_ex);
-        if (active == prevstate) {
-            // re-schedule this task if thread is still active
-            LTM_(info) << "set_active_state: " << "thread(" << id << "), "
-                       << "is still active, scheduling new thread...";
-
-            register_work(boost::bind(&threadmanager_impl::set_active_state, this, 
-                id, newstate, newstate_ex), "set state for active thread");
-        }
-        return terminated;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     /// The set_state function is part of the thread related API and allows
     /// to change the state of one of the threads managed by this threadmanager_impl
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -199,15 +181,16 @@ namespace hpx { namespace threads
 
         // the thread to set the state for is currently running, so we 
         // schedule another thread to execute the pending set_state
-        if (previous_state == active) {
+        if (previous_state == active || previous_state == marked_for_suspension) 
+        {
             // schedule a new thread to set the state
             LTM_(info) << "set_state: " << "thread(" << id << "), "
-                       << "is currently active, scheduling new thread...";
+                       << "is currently/still active, scheduling new thread...";
 
-            register_work(boost::bind(&threadmanager_impl::set_active_state, this, 
+            register_work(boost::bind(&threadmanager_impl::set_state, this, 
                 id, new_state, new_state_ex), "set state for active thread");
 
-            return active;     // done
+            return previous_state;     // done
         }
         else if (previous_state == terminated) {
             // If the thread has been terminated while this set_state was 
@@ -353,12 +336,14 @@ namespace hpx { namespace threads
     {
     public:
         switch_status (thread* t, thread_state new_state)
-            : thread_(t), prev_state_(t->set_state(new_state))
+            : thread_(t), 
+              prev_state_(t->set_state(new_state)),
+              orig_state_(new_state)
         {}
 
         ~switch_status ()
         {
-            thread_->set_state(prev_state_);
+            thread_->set_state(prev_state_, orig_state_);
         }
 
         // allow to change the state the thread will be switched to after 
@@ -377,6 +362,7 @@ namespace hpx { namespace threads
     private:
         thread* thread_;
         thread_state prev_state_;
+        thread_state orig_state_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -543,15 +529,20 @@ namespace hpx { namespace threads
                     // switch the state of the thread to active and back to 
                     // what the thread reports as its return value
 
-                    switch_status thrd_stat (thrd, active);
-                    if (thrd_stat == pending) {
-                        // thread returns new required state
-                        // store the returned state in the thread
-                        tl2.tick();
-                        thrd_stat = state = (*thrd)();
-                        tl2.tock();
-                        ++num_px_threads;
-                    }
+                    {
+                        switch_status thrd_stat (thrd, active);
+                        if (thrd_stat == pending) {
+                            // thread returns new required state
+                            // store the returned state in the thread
+                            tl2.tick();
+                            thrd_stat = (*thrd)();
+                            tl2.tock();
+                            ++num_px_threads;
+                        }
+                    }   // this stores the new state in the PX thread
+
+                    // retrieve the new state
+                    state = thrd->get_state();
 
                     LTM_(debug) << "tfunc(" << num_thread << "): "
                                << "thread(" << thrd->get_thread_id() << "), "
@@ -565,8 +556,7 @@ namespace hpx { namespace threads
                         scheduler_.schedule_thread(thrd);
                         do_some_work();
                     }
-
-                }   // this stores the new state in the PX thread
+                }
                 else if (active == state) {
                     // re-schedule thread, if it is still marked as active
                     // this might happen, if some thread has been added to the
@@ -574,6 +564,7 @@ namespace hpx { namespace threads
                     // yet
                     scheduler_.schedule_thread(thrd);
                 }
+                // have to do nothing for 'marked_for_suspension' threads
 
                 // Remove the mapping from thread_map_ if PX thread is depleted 
                 // or terminated, this will delete the PX thread as all 

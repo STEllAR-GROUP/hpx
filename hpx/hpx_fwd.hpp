@@ -129,11 +129,15 @@ namespace hpx
             suspended = 3,  ///< thread has been suspended (waiting for 
                             ///< synchronization event, but still known 
                             ///< and under control of the threadmanager)
-            depleted = 4,   ///< thread has been depleted (deeply 
+            marked_for_suspension = 4,  ///< synchronization support: allows
+                            ///< to mark a thread as being suspended while it's
+                            ///< still active
+            depleted = 5,   ///< thread has been depleted (deeply 
                             ///< suspended, it is not known to the thread 
                             ///< manager)
-            terminated = 5  ///< thread has been stopped an may be garbage 
+            terminated = 6  ///< thread has been stopped an may be garbage 
                             ///< collected
+
         };
         HPX_API_EXPORT char const* const get_thread_state_name(thread_state state);
 

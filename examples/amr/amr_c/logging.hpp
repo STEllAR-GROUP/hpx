@@ -6,6 +6,7 @@
 #if !defined(HPX_COMPONENTS_AMR_LOGGING_NOV_10_2008_0719PM)
 #define HPX_COMPONENTS_AMR_LOGGING_NOV_10_2008_0719PM
 
+#include <hpx/lcos/mutex.hpp>
 #include "stencil_data.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -45,7 +46,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         > logentry_action;
 
     private:
-        boost::mutex mtx_;
+        typedef lcos::mutex mutex_type;
+        mutex_type mtx_;
     };
 
 }}}}

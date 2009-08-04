@@ -73,7 +73,12 @@ namespace hpx { namespace lcos
                 // we need to get the self anew for each round as it might
                 // get executed in a different thread from the previous one
                 threads::thread_self& self = threads::get_self();
-                queue_.enqueue(self.get_thread_id());
+
+                // mark the thread as suspended before adding to the queue
+                threads::thread_id_type id = self.get_thread_id();
+                reinterpret_cast<threads::thread*>(id)->
+                    set_state(threads::marked_for_suspension);
+                queue_.enqueue(id);
 
                 util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                 self.yield(threads::suspended);

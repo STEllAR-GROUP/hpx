@@ -86,6 +86,21 @@ namespace hpx { namespace threads { namespace detail
             }
         }
 
+        thread_state set_state(thread_state newstate, thread_state old_state)
+        {
+            using namespace boost::lockfree;
+            if (likely(CAS(&current_state_, (long)old_state, (long)newstate)))
+                return old_state;
+
+            long current_state = interlocked_read_acquire(&current_state_);
+            if (current_state == marked_for_suspension ||
+                newstate == terminated)
+            {
+                return set_state(newstate);
+            }
+            return static_cast<thread_state>(current_state);
+        }
+
         thread_state_ex get_state_ex() const 
         {
             boost::lockfree::memory_barrier();
@@ -215,7 +230,8 @@ namespace hpx { namespace threads
         ///                 by using the function \a threadmanager#get_state.
         thread_state get_state() const 
         {
-            return get() ? get()->get_state() : terminated;
+            detail::thread const* t = get();
+            return t ? t->get_state() : terminated;
         }
 
         /// The set_state function allows to change the state of this thread 
@@ -233,7 +249,32 @@ namespace hpx { namespace threads
         ///                 be used.
         thread_state set_state(thread_state new_state)
         {
-            return get() ? get()->set_state(new_state) : terminated;
+            detail::thread* t = get();
+            return t ? t->set_state(new_state) : terminated;
+        }
+
+        /// The set_state function allows to change the state of this thread 
+        /// instance depending on its current state. It will change the state
+        /// atomically only if the current state is still the same as passed
+        /// as the second parameter. Otherwise it won't touch the thread state
+        /// of this instance.
+        ///
+        /// \param newstate [in] The new state to be set for the thread.
+        /// \param oldstate [in] The old state of the thread which still has to
+        ///                 be teh current state.
+        ///
+        /// \note           This function will be seldom used directly. Most of 
+        ///                 the time the state of a thread will have to be 
+        ///                 changed using the threadmanager. Moreover,
+        ///                 changing the thread state using this function does
+        ///                 not change its scheduling status. It only sets the
+        ///                 thread's status word. To change the thread's 
+        ///                 scheduling status \a threadmanager#set_state should
+        ///                 be used.
+        thread_state set_state(thread_state new_state, thread_state old_state)
+        {
+            detail::thread* t = get();
+            return t ? t->set_state(new_state, old_state) : terminated;
         }
 
         /// The get_state_ex function allows to query the extended state of 
@@ -249,7 +290,8 @@ namespace hpx { namespace threads
         ///                 \a threadmanager#get_state_ex.
         thread_state_ex get_state_ex() const 
         {
-            return get() ? get()->get_state_ex() : wait_unknown;
+            detail::thread const* t = get();
+            return t ? t->get_state_ex() : wait_unknown;
         }
 
         /// The set_state function allows to change the extended state of this 
@@ -263,7 +305,8 @@ namespace hpx { namespace threads
         ///                 changed using the threadmanager. 
         thread_state_ex set_state_ex(thread_state_ex new_state)
         {
-            return get() ? get()->set_state_ex(new_state) : wait_unknown;
+            detail::thread* t = get();
+            return t ? t->set_state_ex(new_state) : wait_unknown;
         }
 
         /// \brief Execute the thread function
@@ -274,13 +317,15 @@ namespace hpx { namespace threads
         ///                 thread's scheduling status.
         thread_state operator()()
         {
-            return get() ? get()->execute() : terminated;
+            detail::thread* t = get();
+            return t ? t->execute() : terminated;
         }
 
         /// \brief Get the (optional) description of this thread
         char const* const get_description() const
         {
-            return get() ? get()->get_description() : "<terminated>";
+            detail::thread const* t = get();
+            return t ? t->get_description() : "<terminated>";
         }
     };
 

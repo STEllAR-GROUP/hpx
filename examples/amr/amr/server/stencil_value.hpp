@@ -148,8 +148,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         int row_;             // position of this stencil in whole graph
         int column_;
 
-//         typedef lcos::mutex mutex_type;
-        typedef boost::mutex mutex_type;
+        typedef lcos::mutex mutex_type;
         mutex_type mtx_;
     };
 

@@ -317,6 +317,7 @@ int main(int argc, char* argv[])
                     std::cerr << ".";
                 }
             }
+            std::cerr << "\n";
         }
         else {
             hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);

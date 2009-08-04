@@ -147,10 +147,13 @@ namespace hpx { namespace lcos { namespace detail
                     threads::thread_id_type id = self.get_thread_id();
 
                     {
-                        mutex_queue_entry e(self.get_thread_id());
-
                         // enqueue this thread
                         mutex_type::scoped_lock l(this);
+                        mutex_queue_entry e(id);
+
+                        // mark the thread as suspended before adding to the queue
+                        reinterpret_cast<threads::thread*>(id)->
+                            set_state(threads::marked_for_suspension);
                         queue_.push_back(e);
                         util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
 
@@ -164,7 +167,9 @@ namespace hpx { namespace lcos { namespace detail
                             interlocked_decrement(&active_count_);
                             return false;
                         }
-                    }   // mutex_queue_entry goes out of scope (removes itself from the list)
+                    }   // mutex_queue_entry goes out of scope (removes itself 
+                        // from the list, acquiring the unlocked mutex before 
+                        // doing so)
 
                     old_count &= ~lock_flag_value;
                     old_count |= event_set_flag_value;
