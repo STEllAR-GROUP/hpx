@@ -1047,6 +1047,10 @@
 					RelativePath="..\..\..\hpx\lcos\mutex.hpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\..\hpx\lcos\recursive_mutex.hpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Config"

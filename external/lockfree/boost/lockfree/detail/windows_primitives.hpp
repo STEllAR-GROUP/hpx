@@ -272,7 +272,10 @@ namespace boost { namespace lockfree
     template <typename T>
     inline T interlocked_exchange(T volatile *orig, T val)
     {
-        return BOOST_INTERLOCKED_EXCHANGE((long volatile*)orig, val);
+        long t = BOOST_INTERLOCKED_EXCHANGE(
+            reinterpret_cast<long volatile*>(orig), 
+            *reinterpret_cast<long*>(&val));
+        return *reinterpret_cast<T*>(&t);
     }
 
 }}

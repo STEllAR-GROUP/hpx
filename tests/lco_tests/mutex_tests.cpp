@@ -6,6 +6,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/mutex.hpp>
+#include <hpx/lcos/recursive_mutex.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
@@ -155,15 +156,10 @@ struct test_lock_times_out_if_other_thread_has_lock
         {
             {
                 // create timeout thread
-//                 threads::thread_id_type timer_id = 
                 threads::set_thread_state(id, boost::posix_time::seconds(1));
 
                 // suspend this thread waiting for test to happen
                 self.yield(threads::suspended);
-//                 if (threads::wait_signaled == self.yield(threads::suspended)) {
-//                     // trigger the timer thread if not timed out
-//                     threads::set_thread_state(timer_id);
-//                 }
 
                 BOOST_TEST(done);
                 BOOST_TEST(!locked);
@@ -208,6 +204,14 @@ HPX_REGISTER_ACTION_EX(
     test_lock_times_out_if_other_thread_has_lock<lcos::timed_mutex>::locking_thread_through_constructor_action,
     test_lock_times_out_if_other_thread_has_lock_time_mutex_locking_thread_through_constructor_action);
 
+HPX_DEFINE_GET_COMPONENT_TYPE(test_lock_times_out_if_other_thread_has_lock<lcos::recursive_timed_mutex>);
+HPX_REGISTER_ACTION_EX(
+    test_lock_times_out_if_other_thread_has_lock<lcos::recursive_timed_mutex>::locking_thread_action,
+    test_lock_times_out_if_other_thread_has_lock_recursive_time_mutex_locking_thread_action);
+HPX_REGISTER_ACTION_EX(
+    test_lock_times_out_if_other_thread_has_lock<lcos::recursive_timed_mutex>::locking_thread_through_constructor_action,
+    test_lock_times_out_if_other_thread_has_lock_recursive_time_mutex_locking_thread_through_constructor_action);
+
 template <typename M>
 struct test_timedlock
 {
@@ -228,7 +232,8 @@ struct test_timedlock
         // Test the lock's constructors.
         {
             // Construct and initialize an xtime for a fast time out.
-            boost::system_time xt = boost::get_system_time()+boost::posix_time::milliseconds(100);
+            boost::system_time xt = boost::get_system_time() + 
+                boost::posix_time::milliseconds(100);
 
             timed_lock_type lock(mutex, xt);
             BOOST_TEST(lock ? true : false);
@@ -277,116 +282,115 @@ struct test_timedlock
     }
 };
 
-// template <typename M>
-// struct test_recursive_lock
-// {
-//     typedef M mutex_type;
-//     typedef typename M::scoped_lock lock_type;
-// 
-//     void operator()()
-//     {
-//         mutex_type mx;
-//         lock_type lock1(mx);
-//         lock_type lock2(mx);
-//     }
-// };
-// 
-// 
-// 
-// void test_try_mutex()
-// {
-//     timed_test(&do_test_try_mutex, 3);
-// }
-// 
-// void do_test_timed_mutex()
-// {
-//     test_lock<boost::timed_mutex>()();
-//     test_trylock<boost::timed_mutex>()();
-//     test_timedlock<boost::timed_mutex>()();
-// }
-// 
-// void test_timed_mutex()
-// {
-//     timed_test(&do_test_timed_mutex, 3);
-// }
-// 
-// void do_test_recursive_mutex()
-// {
-//     test_lock<boost::recursive_mutex>()();
-//     test_recursive_lock<boost::recursive_mutex>()();
-// }
-// 
-// void test_recursive_mutex()
-// {
-//     timed_test(&do_test_recursive_mutex, 3);
-// }
-// 
-// void do_test_recursive_try_mutex()
-// {
-//     test_lock<boost::recursive_try_mutex>()();
-//     test_trylock<boost::recursive_try_mutex>()();
-//     test_recursive_lock<boost::recursive_try_mutex>()();
-// }
-// 
-// void test_recursive_try_mutex()
-// {
-//     timed_test(&do_test_recursive_try_mutex, 3);
-// }
-// 
-// void do_test_recursive_timed_mutex()
-// {
-//     test_lock<boost::recursive_timed_mutex>()();
-//     test_trylock<boost::recursive_timed_mutex>()();
-//     test_timedlock<boost::recursive_timed_mutex>()();
-//     test_recursive_lock<boost::recursive_timed_mutex>()();
-// }
-// 
-// void test_recursive_timed_mutex()
-// {
-//     timed_test(&do_test_recursive_timed_mutex, 3);
-// }
-
-// boost::unit_test_framework::test_suite* init_unit_test_suite(int, char*[])
-// {
-//     boost::unit_test_framework::test_suite* test =
-//         BOOST_TEST_SUITE("Boost.Threads: mutex test suite");
-// 
-//     test->add(BOOST_TEST_CASE(&test_mutex));
-//     test->add(BOOST_TEST_CASE(&test_try_mutex));
-//     test->add(BOOST_TEST_CASE(&test_timed_mutex));
-//     test->add(BOOST_TEST_CASE(&test_recursive_mutex));
-//     test->add(BOOST_TEST_CASE(&test_recursive_try_mutex));
-//     test->add(BOOST_TEST_CASE(&test_recursive_timed_mutex));
-// 
-//     return test;
-// }
-
-void do_test_mutex()
+template <typename M>
+struct test_recursive_lock
 {
-    test_lock<hpx::lcos::mutex>()();
+    typedef M mutex_type;
+    typedef typename M::scoped_lock lock_type;
+
+    void operator()()
+    {
+        mutex_type mx;
+        lock_type lock1(mx);
+        lock_type lock2(mx);
+    }
+};
+
+void do_test_mutex(int num_tests)
+{
+    test_lock<hpx::lcos::mutex> t;
+    for (int i = 0; i < num_tests; ++i)
+    {
+        applier::register_work_nullary(t, "do_test_mutex_t");
+    }
 }
 
-void do_test_try_mutex()
+void do_test_try_mutex(int num_tests)
 {
-    test_lock<hpx::lcos::try_mutex>()();
-    test_trylock<hpx::lcos::try_mutex>()();
+    test_lock<hpx::lcos::try_mutex> t1;
+    test_trylock<hpx::lcos::try_mutex> t2;
+    for (int i = 0; i < num_tests; ++i)
+    {
+        applier::register_work_nullary(t1, "do_test_try_mutex_t1");
+        applier::register_work_nullary(t2, "do_test_try_mutex_t2");
+    }
 }
 
-void do_test_timed_mutex()
+void do_test_timed_mutex(int num_tests)
 {
-    test_lock<hpx::lcos::timed_mutex>()();
-    test_trylock<hpx::lcos::timed_mutex>()();
-    test_timedlock<hpx::lcos::timed_mutex>()();
+    test_lock<hpx::lcos::timed_mutex> t1;
+    test_trylock<hpx::lcos::timed_mutex> t2;
+    test_timedlock<hpx::lcos::timed_mutex> t3;
+    for (int i = 0; i < num_tests; ++i)
+    {
+        applier::register_work_nullary(t1, "do_test_timed_mutex_t1");
+        applier::register_work_nullary(t2, "do_test_timed_mutex_t2");
+        applier::register_work_nullary(t3, "do_test_timed_mutex_t3");
+    }
+}
+
+void do_test_recursive_mutex(int num_tests)
+{
+    test_lock<hpx::lcos::recursive_mutex> t1;
+    test_recursive_lock<hpx::lcos::recursive_mutex> t2;
+    for (int i = 0; i < num_tests; ++i)
+    {
+        applier::register_work_nullary(t1, "do_test_recursive_mutex_t1");
+        applier::register_work_nullary(t2, "do_test_recursive_mutex_t2");
+    }
+}
+
+void do_test_recursive_try_mutex(int num_tests)
+{
+    test_lock<hpx::lcos::recursive_try_mutex> t1;
+    test_trylock<hpx::lcos::recursive_try_mutex> t2;
+    test_recursive_lock<hpx::lcos::recursive_try_mutex> t3;
+    for (int i = 0; i < num_tests; ++i)
+    {
+        applier::register_work_nullary(t1, "do_test_recursive_try_mutex_t1");
+        applier::register_work_nullary(t2, "do_test_recursive_try_mutex_t2");
+        applier::register_work_nullary(t3, "do_test_recursive_try_mutex_t3");
+    }
+}
+
+void do_test_recursive_timed_mutex(int num_tests)
+{
+    test_lock<hpx::lcos::recursive_timed_mutex> t1;
+    test_trylock<hpx::lcos::recursive_timed_mutex> t2;
+    test_timedlock<hpx::lcos::recursive_timed_mutex> t3;
+    test_recursive_lock<hpx::lcos::recursive_timed_mutex> t4;
+    for (int i = 0; i < num_tests; ++i)
+    {
+        applier::register_work_nullary(t1, "do_test_recursive_timed_mutex_t1");
+        applier::register_work_nullary(t2, "do_test_recursive_timed_mutex_t2");
+        applier::register_work_nullary(t3, "do_test_recursive_timed_mutex_t3");
+        applier::register_work_nullary(t4, "do_test_recursive_timed_mutex_t4");
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(int num_threads)
+int hpx_main(int num_threads, int num_tests)
 {
-    // run the tests
-    applier::register_work_nullary(do_test_mutex, "do_test_mutex");
-    applier::register_work_nullary(do_test_try_mutex, "do_test_try_mutex");
-    if (num_threads > 1)
-        applier::register_work_nullary(do_test_timed_mutex, "do_test_timed_mutex");
+    applier::register_work_nullary(
+        boost::bind(&do_test_mutex, num_tests), "do_test_mutex");
+    applier::register_work_nullary(
+        boost::bind(&do_test_try_mutex, num_tests), "do_test_try_mutex");
+    if (num_threads > 1) {
+        applier::register_work_nullary(
+            boost::bind(&do_test_timed_mutex, num_tests), "do_test_timed_mutex");
+    }
+
+    applier::register_work_nullary(
+        boost::bind(&do_test_recursive_mutex, num_tests), 
+            "do_test_recursive_mutex");
+    applier::register_work_nullary(
+        boost::bind(&do_test_recursive_try_mutex, num_tests), 
+            "do_test_recursive_try_mutex");
+    if (num_threads > 1) {
+        applier::register_work_nullary(
+            boost::bind(&do_test_recursive_timed_mutex, num_tests), 
+                "do_test_recursive_timed_mutex");
+    }
 
     // initiate shutdown of the runtime system
     components::stubs::runtime_support::shutdown_all();
@@ -518,7 +522,7 @@ int main(int argc, char* argv[])
             hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
             for (int t = 0; t < num_tests; ++t) {
                 for (int i = 1; i <= 8; ++i) { 
-                    rt.run(boost::bind(&hpx_main, i), i);
+                    rt.run(boost::bind(&hpx_main, i, num_tests), i);
                     std::cerr << ".";
                 }
             }
@@ -527,7 +531,7 @@ int main(int argc, char* argv[])
         else {
             hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
             for (int t = 0; t < num_tests; ++t) {
-                rt.run(boost::bind(&hpx_main, num_threads), num_threads);
+                rt.run(boost::bind(&hpx_main, num_threads, num_tests), num_threads);
                 std::cerr << ".";
             }
             std::cerr << "\n";

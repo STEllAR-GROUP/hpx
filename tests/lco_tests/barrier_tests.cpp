@@ -170,7 +170,7 @@ int main(int argc, char* argv[])
             for (int t = 0; t < num_tests; ++t) {
                 for (int i = 1; i <= 8; ++i) { 
                     std::size_t count = 2 * i;
-                    lcos::barrier b(count+1);       // create a barrier waiting on 5 threads
+                    lcos::barrier b(count+1);       // create a barrier waiting on 'count' threads
                     boost::detail::atomic_count c(0);
 
                     rt.run(boost::bind(hpx_main, boost::ref(b), boost::ref(c), count), i);
@@ -183,7 +183,7 @@ int main(int argc, char* argv[])
             hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
             for (int t = 0; t < num_tests; ++t) {
                 std::size_t count = 2 * num_threads;
-                lcos::barrier b(count + 1);       // create a barrier waiting on 5 threads
+                lcos::barrier b(count + 1);       // create a barrier waiting on 'count' threads
                 boost::detail::atomic_count c(0);
 
                 rt.run(boost::bind(hpx_main, boost::ref(b), boost::ref(c), count), num_threads);
