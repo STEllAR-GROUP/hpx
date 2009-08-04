@@ -97,7 +97,7 @@ namespace boost { lockfree
 
     ///////////////////////////////////////////////////////////////////////////
     template <class C, class D>
-    inline D interlocked_compare_exchange(volatile C * addr, D old, D nw)
+    inline D interlocked_compare_exchange(C volatile* addr, D old, D nw)
     {
         if (AO_compare_and_swap_full(reinterpret_cast<volatile AO_t*>(addr),
             reinterpret_cast<AO_t>(old), reinterpret_cast<AO_t>(nw)))
@@ -108,7 +108,7 @@ namespace boost { lockfree
     }
 
     template <typename T>
-    inline bool interlocked_bit_test_and_set(T* x, T bit)
+    inline bool interlocked_bit_test_and_set(T volatile* x, T bit)
     {
         T const value = 1u << bit;
         T old = *x;
@@ -124,7 +124,7 @@ namespace boost { lockfree
     }
 
     template <typename T>
-    inline bool interlocked_bit_test_and_reset(T* x, T bit)
+    inline bool interlocked_bit_test_and_reset(T volatile* x, T bit)
     {
         T const value = 1u << bit;
         T old = *x;
@@ -141,7 +141,7 @@ namespace boost { lockfree
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    inline T interlocked_decrement(T* value)
+    inline T interlocked_decrement(T volatile* value)
     {
         for(;;)
         {
@@ -152,7 +152,7 @@ namespace boost { lockfree
     }
 
     template <typename T>
-    inline T interlocked_increment(T* value)
+    inline T interlocked_increment(T volatile* value)
     {
         for(;;)
         {
@@ -164,15 +164,22 @@ namespace boost { lockfree
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    inline T interlocked_exchange_sub(T* value, T sub)
+    inline T interlocked_exchange_sub(T volatile* value, T sub)
     {
         return AO_fetch_and_add_full(value, -sub);
     }
 
     template <typename T>
-    inline T interlocked_exchange_add(T* value, T add)
+    inline T interlocked_exchange_add(T volatile* value, T add)
     {
         return AO_fetch_and_add_full(value, add);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    inline T interlocked_exchange(T volatile *orig, T val)
+    {
+        return interlocked_compare_exchange(orig, *(T*)orig, val)
     }
 
 }}

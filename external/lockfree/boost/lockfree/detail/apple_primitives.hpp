@@ -117,7 +117,7 @@ namespace boost { namespace lockfree
 
     ///////////////////////////////////////////////////////////////////////////
     template <class C, class D>
-    inline D interlocked_compare_exchange(volatile C * addr, D old, D nw)
+    inline D interlocked_compare_exchange(C volatile* addr, D old, D nw)
     {
         if (OSAtomicCompareAndSwap32((int32_t)old, (int32_t)nw, (volatile int32_t*)addr))
             return old;
@@ -194,6 +194,13 @@ namespace boost { namespace lockfree
     inline boost::int64_t interlocked_exchange_add(boost::int64_t volatile* value, boost::int64_t add)
     {
         return OSAtomicAdd64(add, value);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    inline T interlocked_exchange(T volatile *orig, T val)
+    {
+        return interlocked_compare_exchange(orig, *(T*)orig, val)
     }
 
 }}

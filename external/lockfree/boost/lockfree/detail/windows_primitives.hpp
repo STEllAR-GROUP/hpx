@@ -244,28 +244,35 @@ namespace boost { namespace lockfree
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    inline T interlocked_decrement(T* value)
+    inline T interlocked_decrement(T volatile* value)
     {
         return BOOST_INTERLOCKED_DECREMENT(value);
     }
 
     template <typename T>
-    inline T interlocked_increment(T* value)
+    inline T interlocked_increment(T volatile* value)
     {
         return BOOST_INTERLOCKED_INCREMENT(value);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    inline T interlocked_exchange_sub(T* value, T sub)
+    inline T interlocked_exchange_sub(T volatile* value, T sub)
     {
         return BOOST_INTERLOCKED_EXCHANGE_ADD(value, -sub);
     }
 
     template <typename T>
-    inline T interlocked_exchange_add(T* value, T add)
+    inline T interlocked_exchange_add(T volatile* value, T add)
     {
         return BOOST_INTERLOCKED_EXCHANGE_ADD(value, add);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    inline T interlocked_exchange(T volatile *orig, T val)
+    {
+        return BOOST_INTERLOCKED_EXCHANGE((long volatile*)orig, val);
     }
 
 }}

@@ -262,7 +262,7 @@ namespace boost { namespace lockfree
 
     ///////////////////////////////////////////////////////////////////////////
     template <class C, class D>
-    inline D interlocked_compare_exchange(volatile C * addr, D old, D nw)
+    inline D interlocked_compare_exchange(C volatile* addr, D old, D nw)
     {
 #if defined(__GNUC__) && ( (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)) )
 #if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
@@ -285,7 +285,7 @@ namespace boost { namespace lockfree
     }
 
     template <typename T>
-    inline bool interlocked_bit_test_and_set(T* x, T bit)
+    inline bool interlocked_bit_test_and_set(T volatile* x, T bit)
     {
         T const value = 1u << bit;
         T old = *x;
@@ -301,7 +301,7 @@ namespace boost { namespace lockfree
     }
 
     template <typename T>
-    inline bool interlocked_bit_test_and_reset(T* x, T bit)
+    inline bool interlocked_bit_test_and_reset(T volatile* x, T bit)
     {
         T const value = 1u << bit;
         T old = *x;
@@ -318,7 +318,7 @@ namespace boost { namespace lockfree
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    inline T interlocked_decrement(T* value)
+    inline T interlocked_decrement(T volatile* value)
     {
 #if defined(__GNUC__) && ( (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)) )
 #if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
@@ -336,7 +336,7 @@ namespace boost { namespace lockfree
     }
 
     template <typename T>
-    inline T interlocked_increment(T* value)
+    inline T interlocked_increment(T volatile* value)
     {
 #if defined(__GNUC__) && ( (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)) )
 #if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
@@ -355,7 +355,7 @@ namespace boost { namespace lockfree
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    inline T interlocked_exchange_sub(T* value, T sub)
+    inline T interlocked_exchange_sub(T volatile* value, T sub)
     {
 #if defined(__GNUC__) && ( (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)) )
 #if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
@@ -373,7 +373,7 @@ namespace boost { namespace lockfree
     }
 
     template <typename T>
-    inline T interlocked_exchange_add(T* value, T add)
+    inline T interlocked_exchange_add(T volatile* value, T add)
     {
 #if defined(__GNUC__) && ( (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)) )
 #if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
@@ -388,6 +388,13 @@ namespace boost { namespace lockfree
                 return oldv;
         }
 #endif
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    inline T interlocked_exchange(T volatile *orig, T val)
+    {
+        return interlocked_compare_exchange(orig, *(T*)orig, val)
     }
 
 }}
