@@ -31,6 +31,12 @@ namespace hpx { namespace components { namespace stubs
             typedef server::vertex::init_action action_type;
             return lcos::eager_future<action_type>(gid, label).get();
         }
+
+        static int label(naming::id_type gid)
+        {
+        	typedef server::vertex::label_action action_type;
+        	return lcos::eager_future<action_type>(gid).get();
+        }
     };
 
 }}}

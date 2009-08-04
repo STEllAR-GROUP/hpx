@@ -39,6 +39,18 @@ namespace hpx { namespace components
             BOOST_ASSERT(gid_);
             return this->base_type::init(gid_, item_type, order);
         }
+
+        int size(void)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::size(gid_);
+        }
+
+        naming::id_type at_index(const int index)
+        {
+        	BOOST_ASSERT(gid_);
+        	return this->base_type::at_index(gid_, index);
+        }
     };
     
 }}

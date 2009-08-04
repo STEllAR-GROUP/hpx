@@ -39,6 +39,34 @@ namespace hpx { namespace components
             BOOST_ASSERT(gid_);
             return this->base_type::init(gid_, order);
         }
+
+        int order(void)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::order(gid_);
+        }
+
+        int size(void)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::size(gid_);
+        }
+
+        /// Add an edge to the graph
+        lcos::future_value<int>
+        add_edge(naming::id_type u, naming::id_type v, int w)
+        {
+        	BOOST_ASSERT(gid_);
+        	return this->base_type::add_edge(gid_, u, v, w);
+        }
+
+        /// Get the vertex name
+        naming::id_type
+        vertex_name(int id)
+        {
+        	BOOST_ASSERT(gid_);
+        	return this->base_type::vertex_name(gid_, id);
+        }
     };
     
 }}

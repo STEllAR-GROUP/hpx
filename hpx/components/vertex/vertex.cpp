@@ -32,5 +32,8 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(vertex_type, vertex);
 HPX_REGISTER_ACTION_EX(
     vertex_type::wrapped_type::init_action,
     vertex_init_action);
+HPX_REGISTER_ACTION_EX(
+	vertex_type::wrapped_type::label_action,
+	vertex_init_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(vertex_type::wrapped_type);
 

@@ -32,7 +32,11 @@ namespace hpx { namespace components { namespace server
         // object (the graph)
         enum actions
         {
-            graph_init = 0
+            graph_init = 0,
+            graph_order = 1,
+            graph_size = 2,
+            graph_add_edge = 3,
+            graph_vertex_name = 4
         };
         
         // Typedefs for graph
@@ -43,7 +47,8 @@ namespace hpx { namespace components { namespace server
         // constructor: initialize graph value
         graph()
           : block_size_(0),
-            blocks_(0)
+            blocks_(0),
+            size_(0)
         {
             applier::applier& appl = applier::get_applier();
 
@@ -57,7 +62,7 @@ namespace hpx { namespace components { namespace server
         /// Initialize the graph
         int init(count_t order) 
         {            
-            std::cout << "Initializng graph of order " << order << "\n";
+            std::cout << "Initializing graph of order " << order << std::endl;
             
             // Get list of all known localities
             std::vector<naming::id_type> locales;
@@ -80,6 +85,35 @@ namespace hpx { namespace components { namespace server
             return 0;
         }
 
+        int order(void)
+        {
+            return vertices_.size();
+        }
+
+        int size(void)
+        {
+            return size_;
+        }
+
+        int add_edge(naming::id_type u_g, naming::id_type v_g, int label)
+        {
+            std::cout << "Adding edge ("
+                      << hpx::components::stubs::vertex::label(u_g) << ", "
+                      << hpx::components::stubs::vertex::label(v_g) << ", "
+                      << label << ")" << std::endl;
+
+            // Extend vertex components for adding edges
+
+        	++size_;
+
+        	return 0;
+        }
+
+        naming::id_type vertex_name(int id)
+        {
+        	return vertices_.at_index(id);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
@@ -88,9 +122,27 @@ namespace hpx { namespace components { namespace server
             graph, int, graph_init, count_t, &graph::init
         > init_action;
 
+        typedef hpx::actions::result_action0<
+            graph, int, graph_order, &graph::order
+        > order_action;
+
+        typedef hpx::actions::result_action0<
+            graph, int, graph_size, &graph::size
+        > size_action;
+
+        typedef hpx::actions::result_action3<
+			graph, int, graph_add_edge, naming::id_type, naming::id_type, int, &graph::add_edge
+		> add_edge_action;
+
+        typedef hpx::actions::result_action1<
+			graph, naming::id_type, graph_vertex_name, int, &graph::vertex_name
+		> vertex_name_action;
+
     private:
         count_t block_size_;
         std::vector<naming::id_type> blocks_;
+
+        int size_;
 
         vertex_list vertices_;
     };

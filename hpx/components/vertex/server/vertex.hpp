@@ -29,7 +29,8 @@ namespace hpx { namespace components { namespace server
         // object (the vertex)
         enum actions
         {
-            vertex_init = 0
+            vertex_init = 0,
+            vertex_label = 1
         };
         
         // constructor: initialize vertex value
@@ -37,28 +38,29 @@ namespace hpx { namespace components { namespace server
           : label_(-1)
         {}
 
+        ~vertex()
+        {
+            std::cout << "Dying " << label_ << "\n";
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
         /// Initialize the vertex
         int init(int label)
-        {            
-            if (label_ == -1)
-            {
-                std::cout << "Setting label '" << label << "' "
-                          << "on locality '" << applier::get_applier().get_runtime_support_gid() << "'"
-                          << "\n";
-                label_ = label;
-            }
-            else
-            {
-                std::cout << "Resetting label from '" << label_ << "' to '" << label << "' "
-                           << "on locality '" << applier::get_applier().get_runtime_support_gid() << "'"
-                           << "\n";
-                label_ = label;
-            }
+        {
+            std::cout << "Initializing vertex with label "
+                      << label << " on locality"
+                      << applier::get_applier().get_runtime_support_gid() << std::endl;
+
+            label_ = label;
 
             return 0;
+        }
+
+        int label(void)
+        {
+        	return label_;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -68,6 +70,10 @@ namespace hpx { namespace components { namespace server
         typedef hpx::actions::result_action1<
             vertex, int, vertex_init, int, &vertex::init
         > init_action;
+
+        typedef hpx::actions::result_action0<
+			vertex, int, vertex_label, &vertex::label
+		> label_action;
 
     private:
         int label_;

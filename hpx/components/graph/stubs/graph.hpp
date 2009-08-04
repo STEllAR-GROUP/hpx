@@ -33,6 +33,32 @@ namespace hpx { namespace components { namespace stubs
             typedef server::graph::init_action action_type;
             return lcos::eager_future<action_type>(gid, order).get();
         }
+
+        static int order(naming::id_type gid)
+        {
+            typedef server::graph::order_action action_type;
+            return lcos::eager_future<action_type>(gid).get();
+        }
+
+        static int size(naming::id_type gid)
+        {
+            typedef server::graph::size_action action_type;
+            return lcos::eager_future<action_type>(gid).get();
+        }
+
+        static lcos::future_value<int>
+        add_edge(naming::id_type gid, naming::id_type u, naming::id_type v, int w)
+        {
+        	typedef server::graph::add_edge_action action_type;
+        	return lcos::eager_future<action_type>(gid, u, v, w);
+        }
+
+        static naming::id_type
+        vertex_name(naming::id_type gid, int id)
+        {
+        	typedef server::graph::vertex_name_action action_type;
+        	return lcos::eager_future<action_type>(gid, id).get();
+        }
     };
 
 }}}

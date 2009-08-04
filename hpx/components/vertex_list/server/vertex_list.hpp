@@ -37,7 +37,9 @@ namespace hpx { namespace components { namespace server
         // object (the vertex_list)
         enum actions
         {
-            vertex_list_init = 0
+            vertex_list_init = 0,
+            vertex_list_size = 1,
+            vertex_list_at_index = 2
         };
         
         ///////////////////////////////////////////////////////////////////////
@@ -45,6 +47,10 @@ namespace hpx { namespace components { namespace server
 
         /// Initialize the vertex_list
         int init(components::component_type item_type, std::size_t num_items); 
+
+        int size(void);
+
+        naming::id_type at_index(const int index);
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
@@ -54,15 +60,27 @@ namespace hpx { namespace components { namespace server
             vertex_list, int, vertex_list_init, components::component_type, std::size_t, &vertex_list::init
         > init_action;
         
+        typedef hpx::actions::result_action0<
+            vertex_list, int, vertex_list_size, &vertex_list::size
+        > size_action;
+
+        typedef hpx::actions::result_action1<
+			vertex_list, naming::id_type, vertex_list_at_index, const int, &vertex_list::at_index
+		> at_index_action;
+
     protected:
         typedef components::distributing_factory::iterator_range_type
             distributed_iterator_range_type;
             
     private:
         //typedef components::distributing_factory::result_type result_type;
-//        std::vector<result_type> blocks_;
         std::size_t num_items_;
         std::vector<naming::id_type> blocks_;
+
+        std::size_t block_size_;
+
+        typedef components::distributing_factory::result_type result_type;
+        std::vector<result_type> sub_lists_;
     };
 
 }}}

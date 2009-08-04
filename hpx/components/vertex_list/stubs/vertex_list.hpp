@@ -34,6 +34,18 @@ namespace hpx { namespace components { namespace stubs
             typedef server::vertex_list::init_action action_type;
             return lcos::eager_future<action_type>(gid, item_type, order).get();
         }
+
+        static int size(naming::id_type gid)
+        {
+            typedef server::vertex_list::size_action action_type;
+            return lcos::eager_future<action_type>(gid).get();
+        }
+
+        static naming::id_type at_index(naming::id_type gid, const int index)
+        {
+        	typedef server::vertex_list::at_index_action action_type;
+        	return lcos::eager_future<action_type>(gid, index).get();
+        }
     };
 
 }}}

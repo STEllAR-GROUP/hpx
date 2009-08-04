@@ -6,45 +6,124 @@
 
 #include <iostream>
 
+#include <stdlib.h>
+#include <time.h>
+
 #include <hpx/hpx.hpp>
 #include <hpx/components/graph/graph.hpp>
+#include <hpx/components/vertex/vertex.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
+#include <boost/unordered_map.hpp>
 
 using namespace hpx;
 using namespace std;
 namespace po = boost::program_options;
 
+int nrand(int);
+
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(int scale)
+threads::thread_state hpx_main(int scale, int edge_factor,
+                               double a, double b, double c, double d)
 {
-    // Get list of all localities
-    std::vector<naming::id_type> localities;
-    naming::id_type locale;
-    applier::applier& appl = applier::get_applier();
-    if (appl.get_remote_prefixes(localities)) {
-        locale = localities[0];
-    }
-    else {
-        locale = appl.get_runtime_support_gid();
-    }
+    std::size_t num_edges_per_phase;
+    std::size_t num_edges_added;
+    double a_, b_, c_, d_;
+    std::size_t order, size;
+    boost::unordered_map<int64_t, int64_t> known_edges;
+    int type_max = 32;
+    int status = -1;
 
     // Print info message
     std::cout << "R-MAT Scalable Graph Generator\n";
     std::cout << "Scale: " << scale << "\n";
+    std::cout << "(A,B,C,D) = " << setprecision(2)
+              << "(" << a << ", " << b << ", " << c << ", " << d << ")"
+              << std::endl;
+
+    // Setup
+    order = 1 << scale;
+    size = edge_factor * order;
+
+    a_ = a;
+    b_ = b;
+    c_ = c;
+    d_ = d;
+
+    srand(time(0));
 
     // Create a graph.
-    using hpx::components::graph;    
-    graph G (graph::create(locale));
-        
-    int status = -1;
-    int n = 1<<scale;
-    status = G.init(n);
+    naming::id_type this_locale = 
+        applier::get_applier().get_runtime_support_gid();
 
-    // Spawn choice blocks on each locality
-    // ...
-    
+    using hpx::components::graph;    
+    graph G (graph::create(this_locale));
+       
+    // Initialize the graph.
+    // Assumes we are initializing size-many vertices
+    // with labels ranging from [0,size).
+    status = G.init(order);
+
+    // Setup for processing each phase
+    num_edges_per_phase = size < 1<<16 ? size : 1<<16;
+
+    // Start adding edges in phases
+    num_edges_added = 0;
+
+    int x, y;
+    double p;
+    std::size_t step; 
+    while (num_edges_added < size)
+    {
+        // Choose edge
+        x = 1;
+        y = 1;
+        step = order/2;
+        for (int i=0; i<scale; ++i)
+        {
+            p = rand()*1.0 / RAND_MAX;
+
+            // Pick the partition
+            if (p < a)           
+            {   
+            // Do nothing
+            }   
+            else if ((p >= a) && (p < a+b))
+            {
+                y += step;
+            } 
+            else if ((p >= a+b) && (p < a+b+c))
+            {
+                x += step;
+            }
+            else if ((p >= a+b+c) && (p < a+b+c+d))
+            {
+                x += step;
+                y += step;
+            }
+            step = step/2;
+        }
+
+        // Use hash table to catch duplicate edges
+        int64_t key = (x-1)*order + (y-1);
+        if (known_edges.find(key) == known_edges.end())
+        {
+           known_edges[key] = key;
+           status = G.add_edge(G.vertex_name(x-1),
+                               G.vertex_name(y-1),
+                               nrand(type_max)).get();
+           num_edges_added += 1;
+        }
+    }
+   
+    // Test that the graph was actually populated.
+    // Also serves to keep from freeing too early.
+    int actual_order = G.order();
+    int actual_size = G.size();
+    std::cout << "Actual order is " << actual_order << std::endl;
+    std::cout << "Actual size is " << actual_size << std::endl;
+
     // Free the graph component
     G.free();
     
@@ -129,6 +208,21 @@ private:
     hpx::naming::resolver_server agas_;
 };
 
+// From Accelerated C++, p 135
+int nrand(int n)
+{
+    if (n <= 0 || n > RAND_MAX)
+        throw domain_error("Argument to nrand is out of range");
+
+    const int bucket_size = RAND_MAX / n;
+    int r;
+
+    do r = rand() / bucket_size;
+    while (r >= n);
+
+    return r;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
@@ -161,6 +255,14 @@ int main(int argc, char* argv[])
         if (vm.count("scale"))
             scale = vm["scale"].as<int>();
 
+        double a, b, c, d;
+        a = 0.57;
+        b = 0.19;
+        c = 0.19; 
+        d = 0.05;
+
+        int edge_factor = 3;
+
         // initialize and run the AGAS service, if appropriate
         std::auto_ptr<agas_server_helper> agas_server;
         if (vm.count("run_agas_server"))  // run the AGAS server instance here
@@ -168,7 +270,7 @@ int main(int argc, char* argv[])
 
         // initialize and start the HPX runtime
         hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, mode);
-        rt.run(boost::bind(hpx_main,scale), num_threads);
+        rt.run(boost::bind(hpx_main,scale,edge_factor,a,b,c,d), num_threads);
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";

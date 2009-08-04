@@ -32,5 +32,16 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(graph_type, graph);
 HPX_REGISTER_ACTION_EX(
     graph_type::wrapped_type::init_action,
     graph_init_action);
+HPX_REGISTER_ACTION_EX(
+    graph_type::wrapped_type::order_action,
+    graph_order_action);
+HPX_REGISTER_ACTION_EX(
+    graph_type::wrapped_type::size_action,
+    graph_size_action);
+HPX_REGISTER_ACTION_EX(
+	graph_type::wrapped_type::add_edge_action,
+	graph_add_edge_action);
+HPX_REGISTER_ACTION_EX(
+	graph_type::wrapped_type::vertex_name_action,
+	graph_vertex_name_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(graph_type::wrapped_type);
-
