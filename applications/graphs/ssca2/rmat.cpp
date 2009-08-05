@@ -36,6 +36,11 @@ threads::thread_state hpx_main(int scale, int edge_factor,
     int type_max = 32;
     int status = -1;
 
+    typedef hpx::components::server::graph::init_action     graph_init_action;
+    typedef hpx::components::server::graph::order_action    graph_order_action;
+    typedef hpx::components::server::graph::size_action     graph_size_action;
+    typedef hpx::components::server::graph::add_edge_action graph_add_edge_action;
+
     // Print info message
     std::cout << "R-MAT Scalable Graph Generator\n";
     std::cout << "Scale: " << scale << "\n";
@@ -66,7 +71,7 @@ threads::thread_state hpx_main(int scale, int edge_factor,
     // with labels ranging from [0,size).
     //stat = lcos::eager_future<graph::init>(G.get_gid(), order);
     //stat.get();
-    lcos::future_value<int> result = G.init(order);
+    lcos::future_value<int> result = lcos::eager_future<graph_init_action>(G.get_gid(), order);
     result.get();
 
     // Start adding edges in phases
@@ -112,9 +117,14 @@ threads::thread_state hpx_main(int scale, int edge_factor,
         if (known_edges.find(key) == known_edges.end())
         {
            known_edges[key] = key;
+           results.push_back(
+               lcos::eager_future<graph_add_edge_action>(
+                   G.get_gid(), G.vertex_name(x-1), G.vertex_name(y-1), nrand(type_max)));
+           /*
            results.push_back(G.add_edge(G.vertex_name(x-1),
                                         G.vertex_name(y-1),
                                         nrand(type_max)));
+           */
            num_edges_added += 1;
         }
     }
@@ -127,10 +137,10 @@ threads::thread_state hpx_main(int scale, int edge_factor,
     }
    
     // Test that the graph was actually populated.
-    int actual_order = G.order();
-    int actual_size = G.size();
-    std::cout << "Actual order is " << actual_order << std::endl;
-    std::cout << "Actual size is " << actual_size << std::endl;
+    lcos::future_value<int> order_f = lcos::eager_future<graph_order_action>(G.get_gid());
+    lcos::future_value<int> size_f = lcos::eager_future<graph_size_action>(G.get_gid());
+    std::cout << "Actual order is " << order_f.get() << std::endl;
+    std::cout << "Actual size is " << size_f.get() << std::endl;
 
     // Free the graph component
     G.free();

@@ -28,11 +28,10 @@ namespace hpx { namespace components { namespace stubs
 
         /// Initialize the server#graph instance 
         /// with the given \a gid
-        static lcos::future_value<int>
-        init(naming::id_type gid, count_t order)
+        static int init(naming::id_type gid, count_t order)
         {
             typedef server::graph::init_action action_type;
-            return lcos::eager_future<action_type>(gid, order);
+            return lcos::eager_future<action_type>(gid, order).get();
         }
 
         static int order(naming::id_type gid)
@@ -47,15 +46,13 @@ namespace hpx { namespace components { namespace stubs
             return lcos::eager_future<action_type>(gid).get();
         }
 
-        static lcos::future_value<int>
-        add_edge(naming::id_type gid, naming::id_type u, naming::id_type v, int w)
+        static int add_edge(naming::id_type gid, naming::id_type u, naming::id_type v, int w)
         {
         	typedef server::graph::add_edge_action action_type;
-        	return lcos::eager_future<action_type>(gid, u, v, w);
+        	return lcos::eager_future<action_type>(gid, u, v, w).get();
         }
 
-        static naming::id_type
-        vertex_name(naming::id_type gid, int id)
+        static naming::id_type vertex_name(naming::id_type gid, int id)
         {
         	typedef server::graph::vertex_name_action action_type;
         	return lcos::eager_future<action_type>(gid, id).get();
