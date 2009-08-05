@@ -13,6 +13,8 @@
 #include <hpx/components/graph/graph.hpp>
 #include <hpx/components/vertex/vertex.hpp>
 
+#include <hpx/lcos/eager_future.hpp>
+
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 #include <boost/unordered_map.hpp>
@@ -27,7 +29,6 @@ int nrand(int);
 threads::thread_state hpx_main(int scale, int edge_factor,
                                double a, double b, double c, double d)
 {
-    std::size_t num_edges_per_phase;
     std::size_t num_edges_added;
     double a_, b_, c_, d_;
     std::size_t order, size;
@@ -51,29 +52,29 @@ threads::thread_state hpx_main(int scale, int edge_factor,
     c_ = c;
     d_ = d;
 
+    naming::id_type this_locale =
+        applier::get_applier().get_runtime_support_gid();
+
     srand(time(0));
 
     // Create a graph.
-    naming::id_type this_locale = 
-        applier::get_applier().get_runtime_support_gid();
-
     using hpx::components::graph;    
     graph G (graph::create(this_locale));
        
     // Initialize the graph.
     // Assumes we are initializing size-many vertices
     // with labels ranging from [0,size).
+    //stat = lcos::eager_future<graph::init>(G.get_gid(), order);
+    //stat.get();
     status = G.init(order);
-
-    // Setup for processing each phase
-    num_edges_per_phase = size < 1<<16 ? size : 1<<16;
 
     // Start adding edges in phases
     num_edges_added = 0;
 
     int x, y;
     double p;
-    std::size_t step; 
+    std::size_t step;
+    std::vector<lcos::future_value<int> > stats;
     while (num_edges_added < size)
     {
         // Choose edge
@@ -110,15 +111,20 @@ threads::thread_state hpx_main(int scale, int edge_factor,
         if (known_edges.find(key) == known_edges.end())
         {
            known_edges[key] = key;
-           status = G.add_edge(G.vertex_name(x-1),
-                               G.vertex_name(y-1),
-                               nrand(type_max)).get();
+           stats.push_back(G.add_edge(G.vertex_name(x-1),
+                                      G.vertex_name(y-1),
+                                      nrand(type_max)));
            num_edges_added += 1;
         }
     }
+    // Check that all in flight actions have completed
+    while (stats.size() > 0)
+    {
+        stats.back().get();
+        stats.pop_back();
+    }
    
     // Test that the graph was actually populated.
-    // Also serves to keep from freeing too early.
     int actual_order = G.order();
     int actual_size = G.size();
     std::cout << "Actual order is " << actual_order << std::endl;

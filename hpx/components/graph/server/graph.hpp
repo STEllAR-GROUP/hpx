@@ -60,7 +60,7 @@ namespace hpx { namespace components { namespace server
         // exposed functionality of this component
 
         /// Initialize the graph
-        int init(count_t order) 
+        int init(count_t order)
         {            
             std::cout << "Initializing graph of order " << order << std::endl;
             
@@ -97,12 +97,7 @@ namespace hpx { namespace components { namespace server
 
         int add_edge(naming::id_type u_g, naming::id_type v_g, int label)
         {
-            std::cout << "Adding edge ("
-                      << hpx::components::stubs::vertex::label(u_g) << ", "
-                      << hpx::components::stubs::vertex::label(v_g) << ", "
-                      << label << ")" << std::endl;
-
-            // Extend vertex components for adding edges
+            hpx::components::stubs::vertex::add_edge(u_g, v_g, label);
 
         	++size_;
 

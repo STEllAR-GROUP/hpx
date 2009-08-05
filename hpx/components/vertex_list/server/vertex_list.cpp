@@ -98,9 +98,22 @@ namespace hpx { namespace components { namespace server
 
     naming::id_type vertex_list::at_index(const int index)
     {
-    	int block = index / block_size_;
-    	int item = index % block_size_;
+        int block = index / block_size_;
+        int item = index % block_size_;
 
+        // Run through and initialize each vertex in order
+        components::distributing_factory::iterator_range_type range;
+        components::distributing_factory::iterator_type iter;
+
+        range = locality_results(sub_lists_[block]);
+        iter = range.first;
+        for(int j = 0; iter != range.second; ++iter, ++j)
+        {
+            if (j == item)
+                return *iter;
+        }
+
+        // This is what I want to do, but it only ever returns the first item
     	return (locality_results(sub_lists_[block]).first[item]);
     }
 

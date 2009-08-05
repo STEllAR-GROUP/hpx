@@ -35,5 +35,8 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
 	vertex_type::wrapped_type::label_action,
 	vertex_init_action);
+HPX_REGISTER_ACTION_EX(
+    vertex_type::wrapped_type::add_edge_action,
+    vertex_add_edge_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(vertex_type::wrapped_type);
 

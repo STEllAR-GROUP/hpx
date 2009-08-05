@@ -30,12 +30,14 @@ namespace hpx { namespace components { namespace server
         enum actions
         {
             vertex_init = 0,
-            vertex_label = 1
+            vertex_label = 1,
+            vertex_add_edge = 2
         };
         
         // constructor: initialize vertex value
         vertex()
-          : label_(-1)
+          : label_(-1),
+            out_edges_(0)
         {}
 
         ~vertex()
@@ -63,6 +65,17 @@ namespace hpx { namespace components { namespace server
         	return label_;
         }
 
+        int add_edge(naming::id_type v_g, int label)
+        {
+            std::cout << "Adding edge from "
+                      << label_ << " with type "
+                      << label << std::endl;
+
+            out_edges_.push_back(std::pair<naming::id_type,int>(v_g,label));
+
+            return 0;
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
@@ -75,8 +88,13 @@ namespace hpx { namespace components { namespace server
 			vertex, int, vertex_label, &vertex::label
 		> label_action;
 
+        typedef hpx::actions::result_action2<
+            vertex, int, vertex_add_edge, naming::id_type, int, &vertex::add_edge
+        > add_edge_action;
+
     private:
         int label_;
+        std::vector<std::pair<naming::id_type, int> > out_edges_;
     };
 
 }}}
