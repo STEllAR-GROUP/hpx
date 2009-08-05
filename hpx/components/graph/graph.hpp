@@ -34,7 +34,8 @@ namespace hpx { namespace components
         // exposed functionality of this component
 
         /// Initialize the graph
-        int init(count_t order)
+        lcos::future_value<int>
+        init(count_t order)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::init(gid_, order);

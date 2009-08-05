@@ -28,10 +28,11 @@ namespace hpx { namespace components { namespace stubs
 
         /// Initialize the server#graph instance 
         /// with the given \a gid
-        static int init(naming::id_type gid, count_t order)
+        static lcos::future_value<int>
+        init(naming::id_type gid, count_t order)
         {
             typedef server::graph::init_action action_type;
-            return lcos::eager_future<action_type>(gid, order).get();
+            return lcos::eager_future<action_type>(gid, order);
         }
 
         static int order(naming::id_type gid)

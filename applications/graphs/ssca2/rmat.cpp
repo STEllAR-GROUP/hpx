@@ -66,7 +66,8 @@ threads::thread_state hpx_main(int scale, int edge_factor,
     // with labels ranging from [0,size).
     //stat = lcos::eager_future<graph::init>(G.get_gid(), order);
     //stat.get();
-    status = G.init(order);
+    lcos::future_value<int> result = G.init(order);
+    result.get();
 
     // Start adding edges in phases
     num_edges_added = 0;
@@ -74,7 +75,7 @@ threads::thread_state hpx_main(int scale, int edge_factor,
     int x, y;
     double p;
     std::size_t step;
-    std::vector<lcos::future_value<int> > stats;
+    std::vector<lcos::future_value<int> > results;
     while (num_edges_added < size)
     {
         // Choose edge
@@ -111,17 +112,18 @@ threads::thread_state hpx_main(int scale, int edge_factor,
         if (known_edges.find(key) == known_edges.end())
         {
            known_edges[key] = key;
-           stats.push_back(G.add_edge(G.vertex_name(x-1),
-                                      G.vertex_name(y-1),
-                                      nrand(type_max)));
+           results.push_back(G.add_edge(G.vertex_name(x-1),
+                                        G.vertex_name(y-1),
+                                        nrand(type_max)));
            num_edges_added += 1;
         }
     }
+
     // Check that all in flight actions have completed
-    while (stats.size() > 0)
+    while (results.size() > 0)
     {
-        stats.back().get();
-        stats.pop_back();
+        results.back().get();
+        results.pop_back();
     }
    
     // Test that the graph was actually populated.
