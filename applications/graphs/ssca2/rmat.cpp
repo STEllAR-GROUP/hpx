@@ -69,8 +69,6 @@ threads::thread_state hpx_main(int scale, int edge_factor,
     // Initialize the graph.
     // Assumes we are initializing size-many vertices
     // with labels ranging from [0,size).
-    //stat = lcos::eager_future<graph::init>(G.get_gid(), order);
-    //stat.get();
     lcos::future_value<int> result = lcos::eager_future<graph_init_action>(G.get_gid(), order);
     result.get();
 
@@ -120,11 +118,7 @@ threads::thread_state hpx_main(int scale, int edge_factor,
            results.push_back(
                lcos::eager_future<graph_add_edge_action>(
                    G.get_gid(), G.vertex_name(x-1), G.vertex_name(y-1), nrand(type_max)));
-           /*
-           results.push_back(G.add_edge(G.vertex_name(x-1),
-                                        G.vertex_name(y-1),
-                                        nrand(type_max)));
-           */
+
            num_edges_added += 1;
         }
     }
