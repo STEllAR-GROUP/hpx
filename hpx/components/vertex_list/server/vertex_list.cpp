@@ -35,57 +35,31 @@ HPX_DEFINE_GET_COMPONENT_TYPE(vertex_list_type);
 namespace hpx { namespace components { namespace server
 {
     vertex_list::vertex_list()
-      : num_items_(0),
-        blocks_(0)
+      : num_items_(0)
     {}
     
     int vertex_list::init(components::component_type item_type, std::size_t num_items)
     {                    
         num_items_ = num_items;
 
-        std::cout << "Initializng vertex_list of length " << num_items << std::endl;
+        std::cout << "Initializing vertex_list of length " << num_items << std::endl;
 
-        // Get vertex_list of all known localities
-        std::vector<naming::id_type> locales;
-        naming::id_type locale;
-        applier::applier& appl = applier::get_applier();
-        if (appl.get_remote_prefixes(locales))
-        {
-            locale = locales[0];
-        }
-        else
-        {
-            locale = appl.get_runtime_support_gid();
-        }
-        locales.push_back(appl.get_runtime_support_gid());
-    
-        // Calculate block distribution
-        block_size_ = num_items / (locales.size());
-        std::cout << "Using block size of " << block_size_ << std::endl;
+        naming::id_type here = applier::get_applier().get_runtime_support_gid();
 
-        // Create factories on each locality
-        for (std::size_t i = 0; i < locales.size(); i++)
-        {
-            // Create distributing factories across the system
-            components::distributing_factory factory(
-                components::distributing_factory::create(
-                    locales[i], true));
+        using components::distributing_factory;
+        distributing_factory factory(distributing_factory::create(here, true));
 
-            sub_lists_.push_back(factory.create_components(item_type, block_size_));
-        }
+        list_ = factory.create_components(item_type, num_items);
 
         // Run through and initialize each vertex in order
         components::distributing_factory::iterator_range_type range;
         components::distributing_factory::iterator_type iter;
 
-        for (int i=0; i < sub_lists_.size(); ++i)
+        range = locality_results(list_);
+        iter = range.first;
+        for (int label = 0; iter != range.second; ++iter, ++label)
         {
-            range = locality_results(sub_lists_[i]);
-            iter = range.first;
-            for(int label = 0; iter != range.second; ++iter, ++label)
-            {
-                components::stubs::vertex::init(*iter, label);
-            }
+            components::stubs::vertex::init(*iter, label);
         }
 
         return 0;
@@ -98,23 +72,20 @@ namespace hpx { namespace components { namespace server
 
     naming::id_type vertex_list::at_index(const int index)
     {
-        int block = index / block_size_;
-        int item = index % block_size_;
-
         // Run through and initialize each vertex in order
         components::distributing_factory::iterator_range_type range;
         components::distributing_factory::iterator_type iter;
 
-        range = locality_results(sub_lists_[block]);
+        range = locality_results(list_);
         iter = range.first;
         for(int j = 0; iter != range.second; ++iter, ++j)
         {
-            if (j == item)
+            if (j == index)
                 return *iter;
         }
 
         // This is what I want to do, but it only ever returns the first item
-    	return (locality_results(sub_lists_[block]).first[item]);
+    	return (locality_results(list_).first[index]);
     }
 
 }}}

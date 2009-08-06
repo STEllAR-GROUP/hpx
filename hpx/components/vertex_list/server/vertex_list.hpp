@@ -73,14 +73,10 @@ namespace hpx { namespace components { namespace server
             distributed_iterator_range_type;
             
     private:
-        //typedef components::distributing_factory::result_type result_type;
-        std::size_t num_items_;
-        std::vector<naming::id_type> blocks_;
-
-        std::size_t block_size_;
-
         typedef components::distributing_factory::result_type result_type;
-        std::vector<result_type> sub_lists_;
+        result_type list_;
+
+        std::size_t num_items_;
     };
 
 }}}
