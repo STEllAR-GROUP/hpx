@@ -166,10 +166,11 @@ namespace hpx { namespace threads
         ///                 thread is not known to the threadmanager the return 
         ///                 value will be \a thread_state#unknown.
         ///
-        /// \note           This function yields the \a thread specified by
-        ///                 the parameter \a self if the thread referenced by 
-        ///                 the parameter \a id is in \a thread_state#active 
-        ///                 state.
+        /// \note           If the thread referenced by the parameter \a id 
+        ///                 is in \a thread_state#active state this function 
+        ///                 schedules a new thread which will set the state of 
+        ///                 the thread as soon as its not active anymore. The
+        ///                 function returns \a thread_state#active in this case. 
         thread_state set_state(thread_id_type id, thread_state newstate,
             thread_state_ex newstate_ex = wait_signaled);
 
@@ -187,17 +188,55 @@ namespace hpx { namespace threads
         ///                 value will be \a thread_state#unknown.
         thread_state get_state(thread_id_type id);
 
+        /// The function get_thread_gid is part of the thread related API 
+        /// allows to query the GID of one of the threads known to the 
+        /// threadmanager.
         ///
+        /// \param id         [in] The thread id of the thread the state should 
+        ///                   be modified for.
+        ///
+        /// \returns          This function returns the GID of the 
+        ///                   thread referenced by the \a id parameter. If the 
+        ///                   thread is not known to the threadmanager the 
+        ///                   return value will be \a naming::invalid_id.
         naming::id_type get_thread_gid(thread_id_type id);
 
         /// Set a timer to set the state of the given \a thread to the given 
         /// new value after it expired (at the given time)
+        /// \brief  Set the thread state of the \a thread referenced by the 
+        ///         thread_id \a id.
+        ///
+        /// Set a timer to set the state of the given \a thread to the given 
+        /// new value after it expired (at the given time)
+        ///
+        /// \param id         [in] The thread id of the thread the state should 
+        ///                   be modified for.
+        /// \param at_time
+        /// \param state      [in] The new state to be set for the thread 
+        ///                   referenced by the \a id parameter.
+        /// \param newstate_ex [in] The new extended state to be set for the 
+        ///                   thread referenced by the \a id parameter.
+        ///
+        /// \returns
         thread_id_type set_state (time_type const& expire_at, 
             thread_id_type id, thread_state newstate = pending,
             thread_state_ex newstate_ex = wait_timeout);
 
+        /// \brief  Set the thread state of the \a thread referenced by the 
+        ///         thread_id \a id.
+        ///
         /// Set a timer to set the state of the given \a thread to the given
         /// new value after it expired (after the given duration)
+        /// 
+        /// \param id         [in] The thread id of the thread the state should 
+        ///                   be modified for.
+        /// \param after_duration
+        /// \param state      [in] The new state to be set for the thread 
+        ///                   referenced by the \a id parameter.
+        /// \param newstate_ex [in] The new extended state to be set for the 
+        ///                   thread referenced by the \a id parameter.
+        ///
+        /// \returns
         thread_id_type set_state (duration_type const& expire_from_now, 
             thread_id_type id, thread_state newstate = pending,
             thread_state_ex newstate_ex = wait_timeout);
@@ -219,6 +258,11 @@ namespace hpx { namespace threads
         // this is the thread function executing the work items in the queue
         void tfunc(std::size_t num_thread);
         std::size_t tfunc_impl(std::size_t num_thread);
+
+        // thread function registered for set_state if thread is currently 
+        // active
+        thread_state set_active_state(thread_id_type id, 
+                thread_state newstate, thread_state_ex newstate_ex);
 
     public:
         /// this notifies the thread manager that there is some more work 

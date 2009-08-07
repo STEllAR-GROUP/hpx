@@ -149,12 +149,24 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // thread function registered for set_state if thread is currently active
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    thread_state threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        set_active_state(thread_id_type id, 
+            thread_state newstate, thread_state_ex newstate_ex)
+    {
+        // just retry, set_state will create new thread if target is still active
+        set_state(id, newstate, newstate_ex);
+        return terminated;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     /// The set_state function is part of the thread related API and allows
     /// to change the state of one of the threads managed by this threadmanager_impl
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_state threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        set_state(thread_id_type id, 
-            thread_state new_state, thread_state_ex new_state_ex)
+        set_state(thread_id_type id, thread_state new_state, 
+            thread_state_ex new_state_ex)
     {
         util::block_profiler_wrapper<set_state_tag> bp(set_state_logger_);
 
@@ -185,9 +197,9 @@ namespace hpx { namespace threads
         {
             // schedule a new thread to set the state
             LTM_(info) << "set_state: " << "thread(" << id << "), "
-                       << "is currently/still active, scheduling new thread...";
+                       << "is currently active, scheduling new thread...";
 
-            register_work(boost::bind(&threadmanager_impl::set_state, this, 
+            register_work(boost::bind(&threadmanager_impl::set_active_state, this, 
                 id, new_state, new_state_ex), "set state for active thread");
 
             return previous_state;     // done
@@ -269,9 +281,14 @@ namespace hpx { namespace threads
         // requested set_state when timer fires and will re-awaken this thread, 
         // allowing the deadline_timer to go out of scope gracefully
         thread_self& self = get_self();
+        thread_id_type self_id = self.get_thread_id();
+
+        // mark the thread as suspended before wake thread gets created
+        reinterpret_cast<thread*>(self_id)->set_state(marked_for_suspension);
+
         thread_id_type wake_id = register_thread(boost::bind(
             &threadmanager_impl::wake_timer_thread, this, id, newstate, 
-            newstate_ex, self.get_thread_id()), "wake_timer", suspended);
+            newstate_ex, self_id), "wake_timer", suspended);
 
         // create timer firing in correspondence with given time
         boost::asio::deadline_timer t (timer_pool_.get_io_service(), expire);
@@ -294,8 +311,8 @@ namespace hpx { namespace threads
     {
         // this creates a new thread which creates the timer and handles the
         // requested actions
-        thread_state (threadmanager_impl::*f)(time_type const&, thread_id_type, 
-                thread_state, thread_state_ex)
+        thread_state (threadmanager_impl::*f)(time_type const&, 
+                thread_id_type, thread_state, thread_state_ex)
             = &threadmanager_impl::template at_timer<time_type>;
 
         return register_thread(
@@ -312,8 +329,8 @@ namespace hpx { namespace threads
     {
         // this creates a new thread which creates the timer and handles the
         // requested actions
-        thread_state (threadmanager_impl::*f)(duration_type const&, thread_id_type, 
-                thread_state, thread_state_ex)
+        thread_state (threadmanager_impl::*f)(duration_type const&, 
+                thread_id_type, thread_state, thread_state_ex)
             = &threadmanager_impl::template at_timer<duration_type>;
 
         return register_thread(

@@ -37,7 +37,7 @@ bool parse_commandline(char const* name, int argc, char *argv[],
                 "the IP address the HPX parcelport is listening on (default "
                 "is localhost:7910), expected format: 192.168.1.1:7913")
             ("threads,t", po::value<int>(), 
-                "the number of operating system threads to spawn for this"
+                "the number of operating system threads to spawn for this "
                 "HPX locality")
             ("value,v", po::value<int>(), 
                 "the number of threads to create for concurrent access to the "
@@ -136,6 +136,12 @@ void sem_signal1(boost::shared_ptr<test_environment> env, int max_semaphore_valu
     }
 }
 
+void sem_signal1_all(boost::shared_ptr<test_environment> env, int max_semaphore_value)
+{
+    env->counter1_ -= max_semaphore_value;
+    env->sem_.signal(max_semaphore_value);    // we need to signal all threads
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 void sem_wait2(boost::shared_ptr<test_environment> env, int max_semaphore_value)
 {
@@ -144,6 +150,16 @@ void sem_wait2(boost::shared_ptr<test_environment> env, int max_semaphore_value)
         env->sem_.wait();
         --env->counter1_;
     }
+
+    // all of the threads need to have incremented the counter
+    BOOST_TEST(0 == env->counter1_);
+}
+
+void sem_wait2_all(boost::shared_ptr<test_environment> env, int max_semaphore_value)
+{
+    // we wait for the other threads to signal this semaphore
+    env->sem_.wait(max_semaphore_value);
+    env->counter1_ -= max_semaphore_value;
 
     // all of the threads need to have incremented the counter
     BOOST_TEST(0 == env->counter1_);
@@ -178,22 +194,22 @@ char const* const sem_wait1_desc[] =
 
 char const* const sem_signal2_desc[] =
 {
-    "sem_signal21_01", "sem_signal21_02", "sem_signal21_03", "sem_signal21_04", "sem_signal21_05",
-    "sem_signal21_06", "sem_signal21_07", "sem_signal21_08", "sem_signal21_09", "sem_signal21_10",
-    "sem_signal21_11", "sem_signal21_12", "sem_signal21_13", "sem_signal21_14", "sem_signal21_15",
-    "sem_signal21_16", "sem_signal21_17", "sem_signal21_18", "sem_signal21_19", "sem_signal21_20",
-    "sem_signal21_21", "sem_signal21_22", "sem_signal21_23", "sem_signal21_24", "sem_signal21_25",
-    "sem_signal21_26", "sem_signal21_27", "sem_signal21_28", "sem_signal21_29", "sem_signal21_30",
-    "sem_signal21_31", "sem_signal21_32", "sem_signal21_33", "sem_signal21_34", "sem_signal21_35",
-    "sem_signal21_36", "sem_signal21_37", "sem_signal21_38", "sem_signal21_39", "sem_signal21_40",
-    "sem_signal21_41", "sem_signal21_42", "sem_signal21_43", "sem_signal21_44", "sem_signal21_45",
-    "sem_signal21_46", "sem_signal21_47", "sem_signal21_48", "sem_signal21_49", "sem_signal21_50",
-    "sem_signal21_51", "sem_signal21_52", "sem_signal21_53", "sem_signal21_54", "sem_signal21_55",
-    "sem_signal21_56", "sem_signal21_57", "sem_signal21_58", "sem_signal21_59", "sem_signal21_60",
-    "sem_signal21_61", "sem_signal21_62", "sem_signal21_63", "sem_signal21_64", "sem_signal21_65",
-    "sem_signal21_66", "sem_signal21_67", "sem_signal21_68", "sem_signal21_69", "sem_signal21_70",
-    "sem_signal21_71", "sem_signal21_72", "sem_signal21_73", "sem_signal21_74", "sem_signal21_75",
-    "sem_signal21_76", "sem_signal21_77", "sem_signal21_78", "sem_signal21_79", "sem_signal21_80"
+    "sem_signal2_01", "sem_signal2_02", "sem_signal2_03", "sem_signal2_04", "sem_signal2_05",
+    "sem_signal2_06", "sem_signal2_07", "sem_signal2_08", "sem_signal2_09", "sem_signal2_10",
+    "sem_signal2_11", "sem_signal2_12", "sem_signal2_13", "sem_signal2_14", "sem_signal2_15",
+    "sem_signal2_16", "sem_signal2_17", "sem_signal2_18", "sem_signal2_19", "sem_signal2_20",
+    "sem_signal2_21", "sem_signal2_22", "sem_signal2_23", "sem_signal2_24", "sem_signal2_25",
+    "sem_signal2_26", "sem_signal2_27", "sem_signal2_28", "sem_signal2_29", "sem_signal2_30",
+    "sem_signal2_31", "sem_signal2_32", "sem_signal2_33", "sem_signal2_34", "sem_signal2_35",
+    "sem_signal2_36", "sem_signal2_37", "sem_signal2_38", "sem_signal2_39", "sem_signal2_40",
+    "sem_signal2_41", "sem_signal2_42", "sem_signal2_43", "sem_signal2_44", "sem_signal2_45",
+    "sem_signal2_46", "sem_signal2_47", "sem_signal2_48", "sem_signal2_49", "sem_signal2_50",
+    "sem_signal2_51", "sem_signal2_52", "sem_signal2_53", "sem_signal2_54", "sem_signal2_55",
+    "sem_signal2_56", "sem_signal2_57", "sem_signal2_58", "sem_signal2_59", "sem_signal2_60",
+    "sem_signal2_61", "sem_signal2_62", "sem_signal2_63", "sem_signal2_64", "sem_signal2_65",
+    "sem_signal2_66", "sem_signal2_67", "sem_signal2_68", "sem_signal2_69", "sem_signal2_70",
+    "sem_signal2_71", "sem_signal2_72", "sem_signal2_73", "sem_signal2_74", "sem_signal2_75",
+    "sem_signal2_76", "sem_signal2_77", "sem_signal2_78", "sem_signal2_79", "sem_signal2_80"
 };
 
 int hpx_main(std::size_t max_semaphore_value)
@@ -215,6 +231,22 @@ int hpx_main(std::size_t max_semaphore_value)
         "sem_signal1");
 
     ///////////////////////////////////////////////////////////////////////////
+    // create a semaphore, which which we will use to make several threads 
+    // waiting for another one, use signal_all
+    boost::shared_ptr<test_environment> env1_all(new test_environment("test1_all"));
+
+    // create the  threads which will have to wait on the semaphore
+    for (std::size_t i = 0; i < max_semaphore_value; ++i) 
+    {
+        applier::register_work(boost::bind(&sem_wait1, env1_all, max_semaphore_value), 
+            sem_wait1_desc[i]);
+    }
+
+    // now create a thread signaling the semaphore
+    applier::register_work(boost::bind(&sem_signal1_all, env1_all, max_semaphore_value), 
+        "sem_signal1_all");
+
+    ///////////////////////////////////////////////////////////////////////////
     // create a semaphore, which we will use to make several threads 
     // waiting for another one, but the semaphore is signaled before being 
     // waited on
@@ -232,6 +264,23 @@ int hpx_main(std::size_t max_semaphore_value)
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // create a semaphore, which we will use to make several threads 
+    // waiting for another one, but the semaphore is signaled before being 
+    // waited on, use signal_all
+    boost::shared_ptr<test_environment> env2_all(new test_environment("test2_all"));
+
+    // create a thread signaling the semaphore
+    applier::register_work(boost::bind(&sem_signal1_all, env2_all, max_semaphore_value), 
+        "sem_signal1_all");
+
+    // create the  threads which will have to wait on the semaphore
+    for (std::size_t i = 0; i < max_semaphore_value; ++i) 
+    {
+        applier::register_work(boost::bind(&sem_wait1, env2_all, max_semaphore_value), 
+            sem_wait1_desc[i]);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // the 3rd test does the opposite, it creates a semaphore, which  
     // will be used to make one thread waiting for several other threads
     boost::shared_ptr<test_environment> env3(new test_environment("test3"));
@@ -243,6 +292,20 @@ int hpx_main(std::size_t max_semaphore_value)
     // create the threads which will have to signal the semaphore
     for (std::size_t i = 0; i < max_semaphore_value; ++i) 
         applier::register_work(boost::bind(&sem_signal2, env3), sem_signal2_desc[i]);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // the 3rd test does the opposite, it creates a semaphore, which  
+    // will be used to make one thread waiting for several other threads,
+    // use wait_all
+    boost::shared_ptr<test_environment> env3_all(new test_environment("test3_all"));
+
+    // now create a thread waiting on the semaphore
+    applier::register_work(boost::bind(&sem_wait2_all, env3_all, max_semaphore_value), 
+        "sem_wait2_all");
+
+    // create the threads which will have to signal the semaphore
+    for (std::size_t i = 0; i < max_semaphore_value; ++i) 
+        applier::register_work(boost::bind(&sem_signal2, env3_all), sem_signal2_desc[i]);
 
     ///////////////////////////////////////////////////////////////////////////
     // the 4th test does the opposite, it creates a semaphore, which  
@@ -257,6 +320,20 @@ int hpx_main(std::size_t max_semaphore_value)
     // now create a thread waiting on the semaphore
     applier::register_work(boost::bind(&sem_wait2, env4, max_semaphore_value), 
         "sem_wait2");
+
+    ///////////////////////////////////////////////////////////////////////////
+    // the 4th test does the opposite, it creates a semaphore, which  
+    // will be used to make one thread waiting for several other threads, but 
+    // the semaphore is signaled before being waited on, use wait_all
+    boost::shared_ptr<test_environment> env4_all(new test_environment("test4_all"));
+
+    // create the threads which will have to signal the semaphore
+    for (std::size_t i = 0; i < max_semaphore_value; ++i) 
+        applier::register_work(boost::bind(&sem_signal2, env4_all), sem_signal2_desc[i]);
+
+    // now create a thread waiting on the semaphore
+    applier::register_work(boost::bind(&sem_wait2_all, env4_all, max_semaphore_value), 
+        "sem_wait2_all");
 
     // initiate shutdown of the runtime system
     components::stubs::runtime_support::shutdown_all();
@@ -321,8 +398,10 @@ int main(int argc, char* argv[])
         }
         else {
             hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
-            for (int i = 0; i < num_tests; ++i) 
+            for (int i = 0; i < num_tests; ++i) {
                 rt.run(boost::bind(hpx_main, max_semaphore_value), num_threads);
+                std::cerr << ".";
+            }
         }
     }
     catch (std::exception& e) {

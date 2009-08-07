@@ -167,9 +167,21 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    thread_state get_thread_state(thread_id_type id)
+    {
+        return hpx::applier::get_applier().get_thread_manager().get_state(id);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     std::string get_thread_description(thread_id_type id)
     {
         return hpx::applier::get_applier().get_thread_manager().get_description(id);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    naming::id_type get_thread_gid(thread_id_type id)
+    {
+        return hpx::applier::get_applier().get_thread_manager().get_thread_gid(id);
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -186,11 +186,12 @@ namespace hpx { namespace components { namespace amr { namespace server
             BOOST_ASSERT(naming::invalid_id != value_gids_[0]);
 
             // Compute the next value, store it in value_gids_[0]
-            // The eval action returns true for the last time step.
+            // The eval action returns an integer allowing to finish 
+            // computation (>0: still to go, 0: last step, <0: overdone)
             timesteps_to_go = eval_helper<N>::call(functional_gid_, 
                 value_gids_[0], row_, column_, in_);
 
-            // we're done if this is exactly the last timestep and we are not 
+            // we're done if this is exactly the last time-step and we are not 
             // supposed to return the final value, no need to wait for further
             // input anymore
             if (timesteps_to_go < 0 && !is_called) {
