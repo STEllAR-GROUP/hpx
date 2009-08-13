@@ -906,10 +906,6 @@
 						Name="Server"
 						>
 						<File
-							RelativePath="..\..\..\hpx\runtime\components\server\addref_release_proxy.hpp"
-							>
-						</File>
-						<File
 							RelativePath="..\..\..\hpx\runtime\components\server\console_error_sink.hpp"
 							>
 						</File>

@@ -387,9 +387,10 @@ int main(int argc, char* argv[])
 
         // start the HPX runtime using different numbers of threads
         if (0 == num_threads) {
+            int num_of_cores = boost::thread::hardware_concurrency();
             hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
             for (int i = 0; i < num_tests; ++i) {
-                for (int i = 1; i <= 8; ++i) { 
+                for (int i = 1; i <= 2*num_of_cores; ++i) { 
                     rt.run(boost::bind(hpx_main, max_semaphore_value), i);
                     std::cerr << ".";
                 }

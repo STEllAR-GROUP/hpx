@@ -9,15 +9,13 @@
 #include <memory>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
-#include <boost/thread.hpp>
 #include <boost/aligned_storage.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 #include <boost/type_traits/add_pointer.hpp>
-#include <boost/thread/shared_mutex.hpp>
-#include <boost/ptr_container/ptr_map.hpp>
 #include <boost/intrusive/slist.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -65,8 +63,10 @@ namespace hpx { namespace util { namespace detail
             boost::intrusive::constant_time_size<false>
         > queue_type;
 
+        struct tag {};
+
     public:
-        typedef boost::mutex mutex_type;
+        typedef hpx::util::spinlock_pool<tag> mutex_type;
         typedef typename mutex_type::scoped_lock scoped_lock;
 
         full_empty_entry()
@@ -91,21 +91,21 @@ namespace hpx { namespace util { namespace detail
         // returns whether this entry is currently empty
         bool is_empty() const
         {
-            scoped_lock l(mtx_);
+            scoped_lock l(this);
             return state_ == empty;
         }
 
         // sets this entry to empty
         bool set_empty() 
         {
-            scoped_lock l(mtx_);
+            scoped_lock l(this);
             return set_empty_locked();
         }
 
         // sets this entry to full
         bool set_full() 
         {
-            scoped_lock l(mtx_);
+            scoped_lock l(this);
             return set_full_locked();
         }
 
@@ -114,13 +114,19 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         void enqueue_full_full(T& dest)
         {
-            scoped_lock l(mtx_);
+            threads::thread_self& self = threads::get_self();
+            threads::thread_id_type id = self.get_thread_id();
+
+            scoped_lock l(this);
 
             // block if this entry is empty
             if (state_ == empty) {
+                // mark the thread as suspended before adding to the queue
+                reinterpret_cast<threads::thread*>(id)->
+                    set_state(threads::marked_for_suspension);
+
                 // enqueue the request and block this thread
-                threads::thread_self& self = threads::get_self();
-                full_empty_queue_entry f(self.get_thread_id());
+                full_empty_queue_entry f(id);
                 read_queue_.push_back(f);
 
                 util::unlock_the_lock<scoped_lock> ul(l);
@@ -135,13 +141,19 @@ namespace hpx { namespace util { namespace detail
         // same as above, but for entries without associated data
         void enqueue_full_full()
         {
-            scoped_lock l(mtx_);
+            threads::thread_self& self = threads::get_self();
+            threads::thread_id_type id = self.get_thread_id();
+
+            scoped_lock l(this);
 
             // block if this entry is empty
             if (state_ == empty) {
+                // mark the thread as suspended before adding to the queue
+                reinterpret_cast<threads::thread*>(id)->
+                    set_state(threads::marked_for_suspension);
+
                 // enqueue the request and block this thread
-                threads::thread_self& self = threads::get_self();
-                full_empty_queue_entry f(self.get_thread_id());
+                full_empty_queue_entry f(id);
                 read_queue_.push_back(f);
 
                 util::unlock_the_lock<scoped_lock> ul(l);
@@ -154,13 +166,19 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         void enqueue_full_empty(T& dest)
         {
-            scoped_lock l(mtx_);
+            threads::thread_self& self = threads::get_self();
+            threads::thread_id_type id = self.get_thread_id();
+
+            scoped_lock l(this);
 
             // block if this entry is empty
             if (state_ == empty) {
+                // mark the thread as suspended before adding to the queue
+                reinterpret_cast<threads::thread*>(id)->
+                    set_state(threads::marked_for_suspension);
+
                 // enqueue the request and block this thread
-                threads::thread_self& self = threads::get_self();
-                full_empty_queue_entry f(self.get_thread_id());
+                full_empty_queue_entry f(id);
                 read_and_empty_queue_.push_back(f);
 
                 // yield this thread
@@ -184,13 +202,19 @@ namespace hpx { namespace util { namespace detail
         // same as above, but for entries without associated data
         void enqueue_full_empty()
         {
-            scoped_lock l(mtx_);
+            threads::thread_self& self = threads::get_self();
+            threads::thread_id_type id = self.get_thread_id();
+
+            scoped_lock l(this);
 
             // block if this entry is empty
             if (state_ == empty) {
+                // mark the thread as suspended before adding to the queue
+                reinterpret_cast<threads::thread*>(id)->
+                    set_state(threads::marked_for_suspension);
+
                 // enqueue the request and block this thread
-                threads::thread_self& self = threads::get_self();
-                full_empty_queue_entry f(self.get_thread_id());
+                full_empty_queue_entry f(id);
                 read_and_empty_queue_.push_back(f);
 
                 // yield this thread
@@ -207,13 +231,19 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         void enqueue_if_full(T const& src)
         {
-            scoped_lock l(mtx_);
+            threads::thread_self& self = threads::get_self();
+            threads::thread_id_type id = self.get_thread_id();
+
+            scoped_lock l(this);
 
             // block if this entry is already full
             if (state_ == full) {
+                // mark the thread as suspended before adding to the queue
+                reinterpret_cast<threads::thread*>(id)->
+                    set_state(threads::marked_for_suspension);
+
                 // enqueue the request and block this thread
-                threads::thread_self& self = threads::get_self();
-                full_empty_queue_entry f(self.get_thread_id());
+                full_empty_queue_entry f(id);
                 write_queue_.push_back(f);
 
                 util::unlock_the_lock<scoped_lock> ul(l);
@@ -231,13 +261,19 @@ namespace hpx { namespace util { namespace detail
         // same as above, but for entries without associated data
         void enqueue_if_full()
         {
-            scoped_lock l(mtx_);
+            threads::thread_self& self = threads::get_self();
+            threads::thread_id_type id = self.get_thread_id();
+
+            scoped_lock l(this);
 
             // block if this entry is already full
             if (state_ == full) {
+                // mark the thread as suspended before adding to the queue
+                reinterpret_cast<threads::thread*>(id)->
+                    set_state(threads::marked_for_suspension);
+
                 // enqueue the request and block this thread
-                threads::thread_self& self = threads::get_self();
-                full_empty_queue_entry f(self.get_thread_id());
+                full_empty_queue_entry f(id);
                 write_queue_.push_back(f);
 
                 util::unlock_the_lock<scoped_lock> ul(l);
@@ -253,7 +289,7 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         void set_and_fill(T const& src)
         {
-            scoped_lock l(mtx_);
+            scoped_lock l(this);
 
             // set the data
             if (get_address() != &src) 
@@ -266,7 +302,7 @@ namespace hpx { namespace util { namespace detail
         // same as above, but for entries without associated data
         void set_and_fill()
         {
-            scoped_lock l(mtx_);
+            scoped_lock l(this);
 
             // make sure the entry is full
             set_full_locked();    // state_ = full
@@ -275,7 +311,7 @@ namespace hpx { namespace util { namespace detail
         // returns whether this entry is still in use
         bool is_used() const
         {
-            scoped_lock l(mtx_);
+            scoped_lock l(this);
             return is_used_locked();
         }
 
