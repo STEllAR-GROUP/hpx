@@ -39,11 +39,14 @@ namespace hpx { namespace components { namespace server
         {
             vertex_list_init = 0,
             vertex_list_size = 1,
-            vertex_list_at_index = 2
+            vertex_list_at_index = 2,
+            vertex_list_list = 3
         };
         
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
+
+        typedef components::distributing_factory::result_type result_type;
 
         /// Initialize the vertex_list
         int init(components::component_type item_type, std::size_t num_items); 
@@ -51,6 +54,8 @@ namespace hpx { namespace components { namespace server
         int size(void);
 
         naming::id_type at_index(const int index);
+
+        result_type list(void);
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
@@ -68,12 +73,15 @@ namespace hpx { namespace components { namespace server
 			vertex_list, naming::id_type, vertex_list_at_index, const int, &vertex_list::at_index
 		> at_index_action;
 
+        typedef hpx::actions::result_action0<
+            vertex_list, result_type, vertex_list_list, &vertex_list::list
+        > list_action;
+
     protected:
         typedef components::distributing_factory::iterator_range_type
             distributed_iterator_range_type;
             
     private:
-        typedef components::distributing_factory::result_type result_type;
         result_type list_;
 
         std::size_t num_items_;

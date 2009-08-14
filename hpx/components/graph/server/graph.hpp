@@ -36,13 +36,16 @@ namespace hpx { namespace components { namespace server
             graph_order = 1,
             graph_size = 2,
             graph_add_edge = 3,
-            graph_vertex_name = 4
+            graph_vertex_name = 4,
+            graph_vertices = 5
         };
         
         // Typedefs for graph
         typedef int count_t;
         typedef long int vertex_t;
         typedef long int edge_t;
+
+        typedef vertex_list::result_type result_type;
 
         // constructor: initialize graph value
         graph()
@@ -109,6 +112,11 @@ namespace hpx { namespace components { namespace server
         	return vertices_.at_index(id);
         }
 
+        result_type vertices(void)
+        {
+            return vertices_.list();
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
@@ -132,6 +140,10 @@ namespace hpx { namespace components { namespace server
         typedef hpx::actions::result_action1<
 			graph, naming::id_type, graph_vertex_name, int, &graph::vertex_name
 		> vertex_name_action;
+
+        typedef hpx::actions::result_action0<
+            graph, result_type, graph_vertices, &graph::vertices
+        > vertices_action;
 
     private:
         count_t block_size_;

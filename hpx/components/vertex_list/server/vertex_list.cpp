@@ -27,6 +27,7 @@ typedef hpx::components::server::vertex_list vertex_list_type;
 HPX_REGISTER_ACTION_EX(vertex_list_type::init_action, vertex_list_init_action);
 HPX_REGISTER_ACTION_EX(vertex_list_type::size_action, vertex_list_size_action);
 HPX_REGISTER_ACTION_EX(vertex_list_type::at_index_action, vertex_list_at_index_action);
+HPX_REGISTER_ACTION_EX(vertex_list_type::list_action, vertex_list_list);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<vertex_list_type>, vertex_list);
 HPX_DEFINE_GET_COMPONENT_TYPE(vertex_list_type);
@@ -50,6 +51,8 @@ namespace hpx { namespace components { namespace server
         distributing_factory factory(distributing_factory::create(here, true));
 
         list_ = factory.create_components(item_type, num_items);
+
+        std::cout << "Number of sub lists: " << list_.size() << std::endl;
 
         // Run through and initialize each vertex in order
         components::distributing_factory::iterator_range_type range;
@@ -86,6 +89,12 @@ namespace hpx { namespace components { namespace server
 
         // This is what I want to do, but it only ever returns the first item
     	return (locality_results(list_).first[index]);
+    }
+
+    typedef hpx::components::distributing_factory::result_type result_type;
+    result_type vertex_list::list(void)
+    {
+        return list_;
     }
 
 }}}

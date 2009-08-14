@@ -44,4 +44,7 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
 	graph_type::wrapped_type::vertex_name_action,
 	graph_vertex_name_action);
+HPX_REGISTER_ACTION_EX(
+    graph_type::wrapped_type::vertices_action,
+    graph_vertices_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(graph_type::wrapped_type);

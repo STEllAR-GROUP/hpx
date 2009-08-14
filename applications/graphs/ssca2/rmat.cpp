@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2009 Dylan Stark
+//  Copyright (c) 2008-2010 Dylan Stark
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,6 +12,9 @@
 #include <hpx/hpx.hpp>
 #include <hpx/components/graph/graph.hpp>
 #include <hpx/components/vertex/vertex.hpp>
+#include <hpx/components/distributed_list/distributed_list.hpp>
+
+#include "kernel2/kernel2.hpp"
 
 #include <hpx/lcos/eager_future.hpp>
 
@@ -57,14 +60,13 @@ threads::thread_state hpx_main(int scale, int edge_factor,
     c_ = c;
     d_ = d;
 
-    naming::id_type this_locale =
-        applier::get_applier().get_runtime_support_gid();
+    naming::id_type here = applier::get_applier().get_runtime_support_gid();
 
     srand(time(0));
 
     // Create a graph.
     using hpx::components::graph;    
-    graph G (graph::create(this_locale));
+    graph G (graph::create(here));
        
     // Initialize the graph.
     // Assumes we are initializing size-many vertices
@@ -130,11 +132,23 @@ threads::thread_state hpx_main(int scale, int edge_factor,
         results.pop_back();
     }
    
-    // Test that the graph was actually populated.
-    lcos::future_value<int> order_f = lcos::eager_future<graph_order_action>(G.get_gid());
-    lcos::future_value<int> size_f = lcos::eager_future<graph_size_action>(G.get_gid());
-    std::cout << "Actual order is " << order_f.get() << std::endl;
-    std::cout << "Actual size is " << size_f.get() << std::endl;
+    // Kernel 1: graph construction (see above)
+
+    // Kernel 2: classify large sets
+    using hpx::components::kernel2;
+    using hpx::components::distributed_list;
+
+    kernel2 K2 (kernel2::create(here));
+
+    typedef hpx::components::server::kernel2::edge_list_type edge_list_type;
+    typedef distributed_list<edge_list_type> dist_edge_list_type;
+    dist_edge_list_type edge_list (dist_edge_list_type::create(here));
+
+    K2.large_set(G.get_gid(), edge_list.get_gid());
+
+    // Kernel 3: ???
+
+    // Kernel 4: ???
 
     // Free the graph component
     G.free();

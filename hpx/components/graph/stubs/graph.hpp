@@ -25,6 +25,7 @@ namespace hpx { namespace components { namespace stubs
     {
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
+        typedef vertex_list::result_type result_type;
 
         /// Initialize the server#graph instance 
         /// with the given \a gid
@@ -56,6 +57,12 @@ namespace hpx { namespace components { namespace stubs
         {
         	typedef server::graph::vertex_name_action action_type;
         	return lcos::eager_future<action_type>(gid, id).get();
+        }
+
+        static result_type vertices(naming::id_type gid)
+        {
+            typedef server::graph::vertices_action action_type;
+            return lcos::eager_future<action_type>(gid).get();
         }
     };
 

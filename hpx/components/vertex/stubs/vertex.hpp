@@ -14,6 +14,9 @@
 
 #include <hpx/components/vertex/server/vertex.hpp>
 
+//typedef std::vector<std::pair<hpx::naming::id_type, int> > partial_edge_list_type;
+typedef hpx::components::server::vertex::partial_edge_list_type partial_edge_list_type;
+
 namespace hpx { namespace components { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -42,6 +45,13 @@ namespace hpx { namespace components { namespace stubs
         {
             typedef server::vertex::add_edge_action action_type;
             return lcos::eager_future<action_type>(gid, v_g, label).get();
+        }
+
+        static partial_edge_list_type
+        out_edges(naming::id_type gid)
+        {
+            typedef server::vertex::out_edges_action action_type;
+            return lcos::eager_future<action_type>(gid).get();
         }
     };
 

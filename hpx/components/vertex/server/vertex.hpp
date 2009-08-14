@@ -31,7 +31,8 @@ namespace hpx { namespace components { namespace server
         {
             vertex_init = 0,
             vertex_label = 1,
-            vertex_add_edge = 2
+            vertex_add_edge = 2,
+            vertex_out_edges = 3
         };
         
         // constructor: initialize vertex value
@@ -47,6 +48,31 @@ namespace hpx { namespace components { namespace server
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
+
+        struct partial_edge
+        {
+            partial_edge()
+            {}
+
+            partial_edge(naming::id_type const& target, int label)
+              : target_(target), label_(label)
+            {}
+
+            naming::id_type target_;
+            int label_;
+
+        private:
+            // serialization support
+            friend class boost::serialization::access;
+
+            template<class Archive>
+            void serialize(Archive& ar, const unsigned int)
+            {
+                ar & target_ & label_;
+            }
+        };
+        typedef std::vector<partial_edge> partial_edge_list_type;
+
 
         /// Initialize the vertex
         int init(int label)
@@ -71,9 +97,15 @@ namespace hpx { namespace components { namespace server
                       << label_ << " with type "
                       << label << std::endl;
 
-            out_edges_.push_back(std::pair<naming::id_type,int>(v_g,label));
+            out_edges_.push_back(partial_edge(v_g,label));
 
             return 0;
+        }
+
+        partial_edge_list_type out_edges(void)
+        {
+
+            return out_edges_;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -92,9 +124,13 @@ namespace hpx { namespace components { namespace server
             vertex, int, vertex_add_edge, naming::id_type, int, &vertex::add_edge
         > add_edge_action;
 
+        typedef hpx::actions::result_action0<
+            vertex, partial_edge_list_type, vertex_out_edges, &vertex::out_edges
+        > out_edges_action;
+
     private:
         int label_;
-        std::vector<std::pair<naming::id_type, int> > out_edges_;
+        partial_edge_list_type out_edges_;
     };
 
 }}}

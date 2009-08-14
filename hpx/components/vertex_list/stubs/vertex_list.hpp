@@ -25,6 +25,7 @@ namespace hpx { namespace components { namespace stubs
     {
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
+        typedef hpx::components::distributing_factory::result_type result_type;
 
         /// Initialize the server#vertex_list instance 
         /// with the given \a gid
@@ -45,6 +46,12 @@ namespace hpx { namespace components { namespace stubs
         {
         	typedef server::vertex_list::at_index_action action_type;
         	return lcos::eager_future<action_type>(gid, index).get();
+        }
+
+        static result_type list(naming::id_type gid)
+        {
+            typedef server::vertex_list::list_action action_type;
+            return lcos::eager_future<action_type>(gid).get();
         }
     };
 

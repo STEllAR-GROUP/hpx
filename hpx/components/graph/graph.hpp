@@ -65,6 +65,12 @@ namespace hpx { namespace components
         	BOOST_ASSERT(gid_);
         	return this->base_type::vertex_name(gid_, id);
         }
+
+        result_type vertices(void)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::vertices(gid_);
+        }
     };
     
 }}

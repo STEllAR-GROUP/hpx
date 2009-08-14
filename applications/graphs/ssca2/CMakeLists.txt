@@ -11,11 +11,19 @@
 #INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 #LINK_DIRECTORIES(${Boost_LIBRARY_DIR})
 
+set(ssca_SUDIRS 
+    kernel2)
+    
+foreach(subdir ${ssca_SUDIRS})
+    add_subdirectory(${subdir})
+endforeach()
+    
 set(ssca_KERNELS
    rmat)
 
 set(ssca_DEPENDENCIES
-   graph_component vertex_list_component vertex_component)
+   graph_component vertex_list_component vertex_component
+   distributed_list_component kernel2_component)
 
 foreach(kernel ${ssca_KERNELS})
     set(${kernel}_SOURCES
