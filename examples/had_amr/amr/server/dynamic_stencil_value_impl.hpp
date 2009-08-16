@@ -1,10 +1,11 @@
 //  Copyright (c) 2007-2009 Hartmut Kaiser
+//  Copyright (c) 2009 Matt Anderson
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_AMR_STENCIL_VALUE_IMPL_OCT_17_2008_0848AM)
-#define HPX_COMPONENTS_AMR_STENCIL_VALUE_IMPL_OCT_17_2008_0848AM
+#if !defined(HPX_COMPONENTS_AMR_DYNAMIC_STENCIL_VALUE_IMPL)
+#define HPX_COMPONENTS_AMR_DYNAMIC_STENCIL_VALUE_IMPL
 
 #include <boost/bind.hpp>
 #include <boost/assert.hpp>
@@ -31,12 +32,12 @@ namespace hpx { namespace components { namespace amr { namespace server
             using namespace boost::assign;
 
             std::vector<naming::id_type> input_gids;
-            for (int i=0;i<in.size();i++) {
-              input_gids += in[i]->get();
+            for (std::size_t i = 0; i < in.size(); ++i) {
+                input_gids += in[i]->get();
             }
 
             return components::amr::stubs::functional_component::eval(
-               gid, value_gid, input_gids, row, column);
+                gid, value_gid, input_gids, row, column);
         }
     };
 
@@ -64,15 +65,6 @@ namespace hpx { namespace components { namespace amr { namespace server
     {
         std::fill(&value_gids_[0], &value_gids_[2], naming::invalid_id);
 
-        // create adaptors
-       // for (std::size_t i = 0; i < N; ++i)
-       // {
-       //     in_[i].reset(new in_adaptor_type());
-       //     out_[i].reset(new out_adaptor_type());
-       //     out_[i]->get()->set_callback(
-       //         boost::bind(&dynamic_stencil_value::get_value, this, i));
-       // }
-
         // the threads driving the computation are created in 
         // set_functional_component only (see below)
     }
@@ -83,7 +75,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
     inline void dynamic_stencil_value::finalize() 
     {
-        if (naming::invalid_id != value_gids_[1]) 
+       if (naming::invalid_id != value_gids_[1]) 
             free_helper_sync(value_gids_[1]);
     }
 
@@ -95,9 +87,17 @@ namespace hpx { namespace components { namespace amr { namespace server
     {
         is_called_ = true;
 
+        // this needs to have been initialized
+        if (-1 == stencilsize_) {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "dynamic_stencil_value::connect_input_ports", 
+                "this instance has not been initialized yet");
+            return naming::invalid_id;
+        }
+
         // sem_in_ is pre-initialized to 1, so we need to reset it
-        for (int i = 0; i < stencilsize_; ++i)
-            sem_in_[i].wait();
+        for (std::size_t i = 0; i < stencilsize_; ++i)
+            sem_in_[i]->wait();
 
         // set new current value
         {
@@ -107,8 +107,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
 
         // signal all output threads it's safe to read value
-        for (int i = 0; i < stencilsize_; ++i)
-            sem_out_[i].signal();
+        for (std::size_t i = 0; i < stencilsize_; ++i)
+            sem_out_[i]->signal();
 
         // wait for final result 
         sem_result_.wait();
@@ -176,8 +176,8 @@ namespace hpx { namespace components { namespace amr { namespace server
             // Wait for all output threads to have read the current value.
             // On the first time step the semaphore is preset to allow 
             // to immediately set the value.
-            for (int i = 0; i < stencilsize_; ++i)
-                sem_in_[i].wait();
+            for (std::size_t i = 0; i < stencilsize_; ++i)
+                sem_in_[i]->wait();
 
             // set new current value, allocate space for next current value
             // if needed (this may happen for all time steps except the first 
@@ -194,8 +194,8 @@ namespace hpx { namespace components { namespace amr { namespace server
             }
 
             // signal all output threads it's safe to read value
-            for (int i = 0; i < stencilsize_; ++i)
-                sem_out_[i].signal();
+            for (std::size_t i = 0; i < stencilsize_; ++i)
+                sem_out_[i]->signal();
         }
 
         sem_result_.signal();         // final result has been set
@@ -209,7 +209,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     /// the current value has been requested.
     inline naming::id_type dynamic_stencil_value::get_value(int i)
     {
-        sem_out_[i].wait();     // wait for the current value to be valid
+        sem_out_[i]->wait();     // wait for the current value to be valid
 
         naming::id_type result = naming::invalid_id;
         {
@@ -217,14 +217,24 @@ namespace hpx { namespace components { namespace amr { namespace server
             result = value_gids_[1]; // acquire the current value
         }
 
-        sem_in_[i].signal();    // signal to have read the value
+        sem_in_[i]->signal();    // signal to have read the value
         return result;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     inline std::vector<naming::id_type> dynamic_stencil_value::get_output_ports()
     {
+        mutex_type::scoped_lock l(mtx_);
         std::vector<naming::id_type> gids;
+
+        // this needs to have been initialized
+        if (-1 == stencilsize_) {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "dynamic_stencil_value::connect_input_ports", 
+                "this instance has not been initialized yet");
+            return gids;
+        }
+
         for (std::size_t i = 0; i < stencilsize_; ++i)
             gids.push_back(out_[i]->get_gid());
         return gids;
@@ -234,30 +244,29 @@ namespace hpx { namespace components { namespace amr { namespace server
     inline void dynamic_stencil_value::connect_input_ports(
         std::vector<naming::id_type> const& gids)
     {
+        // this needs to have been initialized
+        if (-1 == stencilsize_) {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "dynamic_stencil_value::connect_input_ports", 
+                "this instance has not been initialized yet");
+            return;
+        }
+
         if (gids.size() < stencilsize_) {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "dynamic_stencil_value<N>::connect_input_ports", 
+                "dynamic_stencil_value::connect_input_ports", 
                 "insufficient number of gid's supplied");
             return;
         }
+
         for (std::size_t i = 0; i < stencilsize_; ++i)
             in_[i]->connect(gids[i]);
-
-        // if the functional component already has been set we need to start 
-        // the driver thread
-        if (functional_gid_ != naming::invalid_id && 0 == driver_thread_) {
-            // run the thread which collects the input, executes the provided
-            // functional element and sets the value for the next time step
-            driver_thread_ = applier::register_thread(
-                boost::bind(&dynamic_stencil_value::main, this), 
-                "dynamic_stencil_value::main");
-        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
     inline void 
     dynamic_stencil_value::set_functional_component(naming::id_type const& gid,
-        int row, int column,int stencilsize)
+        int row, int column, int stencilsize)
     {
         // store gid of functional component
         functional_gid_ = gid;
@@ -273,10 +282,11 @@ namespace hpx { namespace components { namespace amr { namespace server
         // create adaptors
         for (std::size_t i = 0; i < stencilsize_; ++i)
         {
+            sem_in_[i].reset(new lcos::counting_semaphore(1));
+            sem_out_[i].reset(new lcos::counting_semaphore());
             in_[i].reset(new in_adaptor_type());
-            out_[i].reset(new out_adaptor_type());
-            out_[i]->get()->set_callback(
-                boost::bind(&dynamic_stencil_value::get_value, this, i));
+            out_[i].reset(new out_adaptor_type(
+                boost::bind(&dynamic_stencil_value::get_value, this, i)));
         }
 
         // if all inputs have been bound already we need to start the driver 

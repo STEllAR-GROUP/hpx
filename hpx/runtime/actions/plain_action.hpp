@@ -44,12 +44,12 @@ namespace hpx { namespace actions
         /// plain (free) remotely callable function identifiers
         function_action_base = 100,
         function_action_arg0 = function_action_base + 0, 
-        BOOST_PP_REPEAT(HPX_PLAIN_ACTION_ARGUMENT_LIMIT, HPX_FUNCTION_ARG_ENUM, _)
+        BOOST_PP_REPEAT(HPX_ACTION_ARGUMENT_LIMIT, HPX_FUNCTION_ARG_ENUM, _)
 
         /// plain (free) remotely callable function identifiers with result
         function_result_action_base = 200,
         function_result_action_arg0 = function_result_action_base + 0, 
-        BOOST_PP_REPEAT(HPX_PLAIN_ACTION_ARGUMENT_LIMIT, HPX_FUNCTION_RETARG_ENUM, _)
+        BOOST_PP_REPEAT(HPX_ACTION_ARGUMENT_LIMIT, HPX_FUNCTION_RETARG_ENUM, _)
     };
 
 #undef HPX_FUNCTION_RETARG_ENUM

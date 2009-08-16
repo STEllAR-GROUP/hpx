@@ -30,19 +30,14 @@ namespace hpx { namespace components { namespace amr { namespace server
         > base_type;
         
     public:
-        stencil_value_out_adaptor()
+        stencil_value_out_adaptor(callback_function_type eval = callback_function_type())
+          : eval_(eval)
         {
             if (component_invalid == base_type::get_component_type()) {
                 // first call to get_component_type, ask AGAS for a unique id
                 base_type::set_component_type(applier::get_applier().get_agas_client().
                     get_component_id("stencil_value_out_adaptor"));
             }
-        }
-
-        /// set function to call whenever the result is requested
-        void set_callback(callback_function_type eval)
-        {
-            eval_ = eval;
         }
 
         ///////////////////////////////////////////////////////////////////////

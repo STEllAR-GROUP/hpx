@@ -72,13 +72,13 @@ namespace hpx { namespace lcos { namespace detail
 
         // define data structures needed for intrusive slist container used for
         // the queues
-        struct mutex_queue_entry
+        struct queue_entry
         {
             typedef boost::intrusive::list_member_hook<
                 boost::intrusive::link_mode<boost::intrusive::auto_unlink>
             > hook_type;
 
-            mutex_queue_entry(threads::thread_id_type id)
+            queue_entry(threads::thread_id_type id)
               : id_(id)
             {}
 
@@ -87,12 +87,12 @@ namespace hpx { namespace lcos { namespace detail
         };
 
         typedef boost::intrusive::member_hook<
-            mutex_queue_entry, mutex_queue_entry::hook_type,
-            &mutex_queue_entry::list_hook_
+            queue_entry, queue_entry::hook_type,
+            &queue_entry::list_hook_
         > list_option_type;
 
         typedef boost::intrusive::list<
-            mutex_queue_entry, list_option_type, 
+            queue_entry, list_option_type, 
             boost::intrusive::constant_time_size<false>
         > queue_type;
 
@@ -149,7 +149,7 @@ namespace hpx { namespace lcos { namespace detail
                     {
                         // enqueue this thread
                         mutex_type::scoped_lock l(this);
-                        mutex_queue_entry e(id);
+                        queue_entry e(id);
 
                         // mark the thread as suspended before adding to the queue
                         reinterpret_cast<threads::thread*>(id)->
@@ -167,7 +167,7 @@ namespace hpx { namespace lcos { namespace detail
                             interlocked_decrement(&active_count_);
                             return false;
                         }
-                    }   // mutex_queue_entry goes out of scope (removes itself 
+                    }   // queue_entry goes out of scope (removes itself 
                         // from the list, acquiring the unlocked mutex before 
                         // doing so)
 

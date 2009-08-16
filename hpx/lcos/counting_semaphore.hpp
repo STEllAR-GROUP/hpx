@@ -12,7 +12,7 @@
 #include <hpx/util/unlock_lock.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/lockfree/fifo.hpp>
+#include <boost/intrusive/slist.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos 
@@ -40,6 +40,34 @@ namespace hpx { namespace lcos
     private:
         struct tag {};
         typedef hpx::util::spinlock_pool<tag> mutex_type;
+
+        // define data structures needed for intrusive slist container used for
+        // the queues
+        struct queue_entry
+        {
+            typedef boost::intrusive::slist_member_hook<
+                boost::intrusive::link_mode<boost::intrusive::normal_link>
+            > hook_type;
+
+            queue_entry(threads::thread_id_type id)
+              : id_(id)
+            {}
+
+            threads::thread_id_type id_;
+            hook_type slist_hook_;
+        };
+
+        typedef boost::intrusive::member_hook<
+            queue_entry, 
+            typename queue_entry::hook_type,
+            &queue_entry::slist_hook_
+        > slist_option_type;
+
+        typedef boost::intrusive::slist<
+            queue_entry, slist_option_type, 
+            boost::intrusive::cache_last<true>, 
+            boost::intrusive::constant_time_size<false>
+        > queue_type;
 
     public:
         /// \brief Construct a new counting semaphore
@@ -73,12 +101,14 @@ namespace hpx { namespace lcos
                 // we need to get the self anew for each round as it might
                 // get executed in a different thread from the previous one
                 threads::thread_self& self = threads::get_self();
+                threads::thread_id_type id = self.get_thread_id();
 
                 // mark the thread as suspended before adding to the queue
-                threads::thread_id_type id = self.get_thread_id();
                 reinterpret_cast<threads::thread*>(id)->
                     set_state(threads::marked_for_suspension);
-                queue_.enqueue(id);
+
+                queue_entry f(id);
+                queue_.push_back(f);
 
                 util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                 self.yield(threads::suspended);
@@ -96,15 +126,19 @@ namespace hpx { namespace lcos
 
             value_ += count;
             if (value_ >= 0) {
-                threads::thread_id_type id = 0;
-                while (queue_.dequeue(&id)) 
-                    threads::set_thread_state(id, threads::pending);
+                // release all threads, they will figure out between themselves
+                // which one gets released from wait above
+                while (!queue_.empty()) {
+                    queue_entry& e (queue_.front());
+                    queue_.pop_front();
+                    threads::set_thread_state(e.id_, threads::pending);
+                }
             }
         }
 
     private:
         long value_;
-        boost::lockfree::fifo<threads::thread_id_type> queue_;
+        queue_type queue_;
     };
 
 }}

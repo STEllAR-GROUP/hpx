@@ -91,9 +91,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         for (std::size_t i = 0; i < N; ++i)
         {
             in_[i].reset(new in_adaptor_type());
-            out_[i].reset(new out_adaptor_type());
-            out_[i]->get()->set_callback(
-                boost::bind(&stencil_value::get_value, this, i));
+            out_[i].reset(new out_adaptor_type(
+                boost::bind(&stencil_value<N>::get_value, this, i)));
         }
 
         // the threads driving the computation are created in 

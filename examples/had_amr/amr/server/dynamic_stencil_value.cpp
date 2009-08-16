@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2009 Hartmut Kaiser
+//  Copyright (c) 2009 Matt Anderson
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -24,11 +25,11 @@ typedef hpx::components::managed_component<
 /// The following construct registers a minimal factory needed for the creation
 /// of new stencil instances. The name used as the second macro parameter
 /// must match the component name used in the ini configuration file used
-/// for this component. For instance the configuration file amr.ini may look 
+/// for this component. For instance the configuration file had_amr.ini may look 
 /// like:
 /// 
-/// [hpx.components.stencil_double_3]      # this must match the string below
-/// name = amr                    # this must match the name of the shared library
+/// [hpx.components.dynamic_stencil_double]      # this must match the string below
+/// name = had_amr                               # this must match the name of the shared library
 /// path = $[hpx.location]/lib    # this is the default location where to find the shared library
 ///
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(dynamic_stencil_value_double_type, dynamic_stencil_double);

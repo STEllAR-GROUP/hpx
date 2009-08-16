@@ -37,13 +37,13 @@ namespace hpx { namespace util { namespace detail
 
         // define data structures needed for intrusive slist container used for
         // the queues
-        struct full_empty_queue_entry
+        struct queue_entry
         {
             typedef boost::intrusive::slist_member_hook<
                 boost::intrusive::link_mode<boost::intrusive::normal_link>
             > hook_type;
 
-            full_empty_queue_entry(thread_id_type id)
+            queue_entry(thread_id_type id)
               : id_(id)
             {}
 
@@ -52,13 +52,13 @@ namespace hpx { namespace util { namespace detail
         };
 
         typedef boost::intrusive::member_hook<
-            full_empty_queue_entry, 
-            typename full_empty_queue_entry::hook_type,
-            &full_empty_queue_entry::slist_hook_
+            queue_entry, 
+            typename queue_entry::hook_type,
+            &queue_entry::slist_hook_
         > slist_option_type;
 
         typedef boost::intrusive::slist<
-            full_empty_queue_entry, slist_option_type, 
+            queue_entry, slist_option_type, 
             boost::intrusive::cache_last<true>, 
             boost::intrusive::constant_time_size<false>
         > queue_type;
@@ -126,7 +126,7 @@ namespace hpx { namespace util { namespace detail
                     set_state(threads::marked_for_suspension);
 
                 // enqueue the request and block this thread
-                full_empty_queue_entry f(id);
+                queue_entry f(id);
                 read_queue_.push_back(f);
 
                 util::unlock_the_lock<scoped_lock> ul(l);
@@ -153,7 +153,7 @@ namespace hpx { namespace util { namespace detail
                     set_state(threads::marked_for_suspension);
 
                 // enqueue the request and block this thread
-                full_empty_queue_entry f(id);
+                queue_entry f(id);
                 read_queue_.push_back(f);
 
                 util::unlock_the_lock<scoped_lock> ul(l);
@@ -178,7 +178,7 @@ namespace hpx { namespace util { namespace detail
                     set_state(threads::marked_for_suspension);
 
                 // enqueue the request and block this thread
-                full_empty_queue_entry f(id);
+                queue_entry f(id);
                 read_and_empty_queue_.push_back(f);
 
                 // yield this thread
@@ -214,7 +214,7 @@ namespace hpx { namespace util { namespace detail
                     set_state(threads::marked_for_suspension);
 
                 // enqueue the request and block this thread
-                full_empty_queue_entry f(id);
+                queue_entry f(id);
                 read_and_empty_queue_.push_back(f);
 
                 // yield this thread
@@ -243,7 +243,7 @@ namespace hpx { namespace util { namespace detail
                     set_state(threads::marked_for_suspension);
 
                 // enqueue the request and block this thread
-                full_empty_queue_entry f(id);
+                queue_entry f(id);
                 write_queue_.push_back(f);
 
                 util::unlock_the_lock<scoped_lock> ul(l);
@@ -273,7 +273,7 @@ namespace hpx { namespace util { namespace detail
                     set_state(threads::marked_for_suspension);
 
                 // enqueue the request and block this thread
-                full_empty_queue_entry f(id);
+                queue_entry f(id);
                 write_queue_.push_back(f);
 
                 util::unlock_the_lock<scoped_lock> ul(l);
@@ -321,7 +321,7 @@ namespace hpx { namespace util { namespace detail
             state_ = empty;
 
             if (!write_queue_.empty()) {
-                full_empty_queue_entry& e (write_queue_.front());
+                queue_entry& e (write_queue_.front());
                 write_queue_.pop_front();
                 threads::set_thread_state(e.id_, threads::pending);
                 set_full_locked();    // state_ = full
@@ -337,7 +337,7 @@ namespace hpx { namespace util { namespace detail
 
             // handle all threads waiting for the block to become full
             while (!read_queue_.empty()) {
-                full_empty_queue_entry& e(read_queue_.front());
+                queue_entry& e(read_queue_.front());
                 read_queue_.pop_front();
                 threads::set_thread_state(e.id_, threads::pending);
             }
@@ -345,7 +345,7 @@ namespace hpx { namespace util { namespace detail
             // since we got full now we need to re-activate one thread waiting
             // for the block to become full
             if (!read_and_empty_queue_.empty()) {
-                full_empty_queue_entry& e(read_and_empty_queue_.front());
+                queue_entry& e(read_and_empty_queue_.front());
                 read_and_empty_queue_.pop_front();
                 threads::set_thread_state(e.id_, threads::pending);
                 set_empty_locked();   // state_ = empty

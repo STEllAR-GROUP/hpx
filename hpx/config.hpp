@@ -29,13 +29,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the maximum number of arguments a component action can take
 #if !defined(HPX_ACTION_ARGUMENT_LIMIT)
-#  define HPX_ACTION_ARGUMENT_LIMIT 5
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-/// This defines the maximum number of arguments a plain action can take
-#if !defined(HPX_PLAIN_ACTION_ARGUMENT_LIMIT)
-#  define HPX_PLAIN_ACTION_ARGUMENT_LIMIT 5
+#  define HPX_ACTION_ARGUMENT_LIMIT 6
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -1,10 +1,11 @@
 //  Copyright (c) 2007-2009 Hartmut Kaiser
+//  Copyright (c) 2009 Matt Anderson
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_AMR_SERVER_STENCIL_VALUE_OCT_17_2008_0848AM)
-#define HPX_COMPONENTS_AMR_SERVER_STENCIL_VALUE_OCT_17_2008_0848AM
+#if !defined(HPX_COMPONENTS_AMR_SERVER_DZNAMIC_STENCIL_VALUE)
+#define HPX_COMPONENTS_AMR_SERVER_DZNAMIC_STENCIL_VALUE
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -16,7 +17,7 @@
 #include <hpx/lcos/mutex.hpp>
 
 #include <boost/noncopyable.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/bind.hpp>
 
 #include "stencil_value_in_adaptor.hpp"
@@ -25,15 +26,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server 
 {
-    namespace detail
-    {
-        // same as counting semaphore, but initialized to 1
-        struct initialized_semaphore : lcos::counting_semaphore
-        {
-            initialized_semaphore() : lcos::counting_semaphore(1) {}
-        };
-    }
-
     /// \class dynamic_stencil_value dynamic_stencil_value.hpp hpx/components/amr/server/dynamic_stencil_value.hpp
     class HPX_COMPONENT_EXPORT dynamic_stencil_value 
       : public components::detail::managed_component_base<dynamic_stencil_value >
@@ -134,19 +126,19 @@ namespace hpx { namespace components { namespace amr { namespace server
         bool is_called_;                              // is one of the 'main' stencils
         threads::thread_id_type driver_thread_;
 
-        std::vector< detail::initialized_semaphore> sem_in_;
-        std::vector<lcos::counting_semaphore> sem_out_;
+        std::vector<boost::shared_ptr<lcos::counting_semaphore> > sem_in_;
+        std::vector<boost::shared_ptr<lcos::counting_semaphore> > sem_out_;
         lcos::counting_semaphore sem_result_;
 
-        std::vector<boost::scoped_ptr<in_adaptor_type> > in_;    // adaptors used to gather input
-        std::vector<boost::scoped_ptr<out_adaptor_type> > out_;  // adaptors used to provide result
+        std::vector<boost::shared_ptr<in_adaptor_type> > in_;    // adaptors used to gather input
+        std::vector<boost::shared_ptr<out_adaptor_type> > out_;  // adaptors used to provide result
 
         naming::id_type value_gids_[2];               // reference to previous values
         naming::id_type functional_gid_;              // reference to functional code
 
         int row_;             // position of this stencil in whole graph
         int column_;
-        int stencilsize_;
+        std::size_t stencilsize_;
 
         typedef lcos::mutex mutex_type;
         mutex_type mtx_;

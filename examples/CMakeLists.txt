@@ -9,7 +9,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         accumulator generic naming parcelset quickstart)
 else()
     set(example_SUBDIRS 
-        accumulator amr generic naming parcelset quickstart)
+        accumulator amr generic had_amr naming parcelset quickstart)
 endif()
 
 foreach(subdir ${example_SUBDIRS})
