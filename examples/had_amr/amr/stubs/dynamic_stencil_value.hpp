@@ -85,12 +85,12 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         /// Set the gid of the component implementing the actual time evolution
         /// functionality
         static void set_functional_component(naming::id_type const& gid, 
-            naming::id_type const& functiongid, int row, int column)
+            naming::id_type const& functiongid, int row, int column,int stencilsize)
         {
-            typedef 
+            typedef
                 amr::server::dynamic_stencil_value::set_functional_component_action 
             action_type;
-            applier::apply<action_type>(gid, functiongid, row, column);
+            applier::apply<action_type>(gid, functiongid, row, column, stencilsize);
         }
     };
 

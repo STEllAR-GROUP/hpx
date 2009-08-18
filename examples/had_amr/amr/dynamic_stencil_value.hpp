@@ -15,13 +15,12 @@
 namespace hpx { namespace components { namespace amr 
 {
     /// \class dynamic_stencil_value dynamic_stencil_value.hpp hpx/components/amr/dynamic_stencil_value.hpp
-    template <int N>
     class dynamic_stencil_value 
-      : public client_base<dynamic_stencil_value<N>, amr::stubs::dynamic_stencil_value<N> >
+      : public client_base<dynamic_stencil_value, amr::stubs::dynamic_stencil_value >
     {
     private:
         typedef 
-            client_base<dynamic_stencil_value<N>, amr::stubs::dynamic_stencil_value<N> > 
+            client_base<dynamic_stencil_value, amr::stubs::dynamic_stencil_value > 
         base_type;
 
     public:
@@ -77,10 +76,10 @@ namespace hpx { namespace components { namespace amr
         /// Set the gid of the component implementing the actual time evolution
         /// functionality
         void set_functional_component(naming::id_type const& functiongid,
-            int row, int column)
+            int row, int column, int stencilsize)
         {
             this->base_type::set_functional_component(this->gid_, functiongid, 
-                row, column);
+                row, column, stencilsize);
         }
     };
 

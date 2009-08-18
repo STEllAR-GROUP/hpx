@@ -14,7 +14,7 @@
 #include <boost/serialization/export.hpp>
 #include <boost/assign/std/vector.hpp>
 
-#include "../stencil_value.hpp"
+#include "../dynamic_stencil_value.hpp"
 #include "../functional_component.hpp"
 
 #include "amr_mesh.hpp"
@@ -70,8 +70,8 @@ namespace hpx { namespace components { namespace amr { namespace server
             BOOST_ASSERT(function != functions.second);
           //  components::amr::stubs::dynamic_stencil_value::set_functional_component(
           //      *stencil, *function, static_step, column,stencilsize);
-            components::amr::stubs::stencil_value<3>::set_functional_component(
-                *stencil, *function, static_step, column);
+            components::amr::stubs::dynamic_stencil_value::set_functional_component(
+                *stencil, *function, static_step, column,stencilsize);
         }
         BOOST_ASSERT(function == functions.second);
     }
@@ -92,7 +92,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         components::distributing_factory::iterator_type stencil = stencils.first;
         for (/**/; stencil != stencils.second; ++stencil)
         {
-            lazyvals.push_back(components::amr::stubs::stencil_value<3>::
+            lazyvals.push_back(components::amr::stubs::dynamic_stencil_value::
                 get_output_ports_async(*stencil));
         }
 
@@ -141,10 +141,10 @@ namespace hpx { namespace components { namespace amr { namespace server
                         outputs[outstep][mod(i+1, numvals)][0]     // se input is connected to the nw output of the se element
                     ;
 
-             //   components::amr::stubs::dynamic_stencil_value::
-             //       connect_input_ports(*stencil, output_ports);
-                  components::amr::stubs::stencil_value<3>::
-                      connect_input_ports(*stencil, output_ports);
+                components::amr::stubs::dynamic_stencil_value::
+                    connect_input_ports(*stencil, output_ports);
+             //     components::amr::stubs::stencil_value<3>::
+             //         connect_input_ports(*stencil, output_ports);
             }
         }
     }
@@ -189,10 +189,10 @@ namespace hpx { namespace components { namespace amr { namespace server
         for (std::size_t i = 0; stencil != stencils.second; ++stencil, ++i)
         {
             BOOST_ASSERT(i < initial_data.size());
-          //  lazyvals.push_back(components::amr::stubs::dynamic_stencil_value::
-          //      call_async(*stencil, initial_data[i]));
-            lazyvals.push_back(components::amr::stubs::stencil_value<3>::
+            lazyvals.push_back(components::amr::stubs::dynamic_stencil_value::
                 call_async(*stencil, initial_data[i]));
+          //  lazyvals.push_back(components::amr::stubs::stencil_value<3>::
+          //      call_async(*stencil, initial_data[i]));
         }
 
         // now wait for the results
@@ -213,10 +213,10 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::cout << " init_execute Stencilsize : " << stencilsize << std::endl;
         std::vector<naming::id_type> result_data;
 
-        components::component_type stencil_type = 
-            components::get_component_type<components::amr::server::stencil_value<3> >();
       //  components::component_type stencil_type = 
-      //      components::get_component_type<components::amr::server::dynamic_stencil_value >();
+      //      components::get_component_type<components::amr::server::stencil_value<3> >();
+        components::component_type stencil_type = 
+            components::get_component_type<components::amr::server::dynamic_stencil_value >();
 
         typedef components::distributing_factory::result_type result_type;
 
@@ -282,10 +282,10 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::cout << " execute Stencilsize : " << stencilsize << std::endl;
         std::vector<naming::id_type> result_data;
 
-        components::component_type stencil_type = 
-            components::get_component_type<components::amr::server::stencil_value<3> >();
         //components::component_type stencil_type = 
-        //    components::get_component_type<components::amr::server::dynamic_stencil_value >();
+        //    components::get_component_type<components::amr::server::stencil_value<3> >();
+        components::component_type stencil_type = 
+            components::get_component_type<components::amr::server::dynamic_stencil_value >();
 
         typedef components::distributing_factory::result_type result_type;
 
