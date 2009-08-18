@@ -20,16 +20,16 @@
 #include "amr_mesh.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::amr::server::amr_mesh amr_mesh_type;
+typedef hpx::components::amr::server::amr_mesh had_amr_mesh_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
-HPX_REGISTER_ACTION_EX(amr_mesh_type::init_execute_action, amr_mesh_init_execute_action);
-HPX_REGISTER_ACTION_EX(amr_mesh_type::execute_action, amr_mesh_execute_action);
+HPX_REGISTER_ACTION_EX(had_amr_mesh_type::init_execute_action, amr_mesh_init_execute_action);
+HPX_REGISTER_ACTION_EX(had_amr_mesh_type::execute_action, amr_mesh_execute_action);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<amr_mesh_type>, amr_mesh);
-HPX_DEFINE_GET_COMPONENT_TYPE(amr_mesh_type);
+    hpx::components::simple_component<had_amr_mesh_type>, had_amr_mesh);
+HPX_DEFINE_GET_COMPONENT_TYPE(had_amr_mesh_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server 
@@ -213,8 +213,6 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::cout << " init_execute Stencilsize : " << stencilsize << std::endl;
         std::vector<naming::id_type> result_data;
 
-      //  components::component_type stencil_type = 
-      //      components::get_component_type<components::amr::server::stencil_value<3> >();
         components::component_type stencil_type = 
             components::get_component_type<components::amr::server::dynamic_stencil_value >();
 
@@ -282,8 +280,6 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::cout << " execute Stencilsize : " << stencilsize << std::endl;
         std::vector<naming::id_type> result_data;
 
-        //components::component_type stencil_type = 
-        //    components::get_component_type<components::amr::server::stencil_value<3> >();
         components::component_type stencil_type = 
             components::get_component_type<components::amr::server::dynamic_stencil_value >();
 

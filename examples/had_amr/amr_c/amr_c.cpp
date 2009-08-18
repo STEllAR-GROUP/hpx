@@ -20,8 +20,8 @@
 HPX_REGISTER_COMPONENT_MODULE();
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::amr::stencil stencil_type;
-typedef hpx::components::amr::server::logging logging_type;
+typedef hpx::components::amr::stencil had_stencil_type;
+typedef hpx::components::amr::server::logging had_logging_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// The following construct registers a minimal factory needed for the creation
@@ -30,24 +30,24 @@ typedef hpx::components::amr::server::logging logging_type;
 /// for this component. For instance the configuration file amr.ini may look 
 /// like:
 /// 
-/// [hpx.components.stencil]      # this must match the string below
-/// name = amr_test               # this must match the name of the shared library
+/// [hpx.components.had_stencil]  # this must match the string below
+/// name = had_amr_test           # this must match the name of the shared library
 /// path = $[hpx.location]/lib    # this is the default location where to find the shared library
 ///
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
-    hpx::components::simple_component<stencil_type>, 
-    stencil, "functional_component_type");
+    hpx::components::simple_component<had_stencil_type>, 
+    had_stencil, "functional_component_type");
 
-HPX_DEFINE_GET_COMPONENT_TYPE(stencil_type);
+HPX_DEFINE_GET_COMPONENT_TYPE(had_stencil_type);
 
-/// [hpx.components.logging]      # this must match the string below
-/// name = amr_test               # this must match the name of the shared library
+/// [hpx.components.had_logging]  # this must match the string below
+/// name = had_amr_test           # this must match the name of the shared library
 /// path = $[hpx.location]/lib    # this is the default location where to find the shared library
 ///
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<logging_type>, logging);
+    hpx::components::simple_component<had_logging_type>, had_logging);
 
-HPX_REGISTER_ACTION_EX(logging_type::logentry_action, logentry_action);
-HPX_DEFINE_GET_COMPONENT_TYPE(logging_type);
+HPX_REGISTER_ACTION_EX(had_logging_type::logentry_action, logentry_action);
+HPX_DEFINE_GET_COMPONENT_TYPE(had_logging_type);
 
 

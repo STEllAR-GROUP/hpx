@@ -52,8 +52,8 @@ set(had_amr_SOURCES
     ${had_amr_server_SOURCES})
 
 ###############################################################################
-set(amr_INI
-    amr.ini)
+set(had_amr_INI
+    had_amr.ini)
 source_group("" 
     FILES ${had_amr_INI})
 

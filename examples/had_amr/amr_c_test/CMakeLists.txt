@@ -4,7 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(had_amr_c_test_SOURCES
-    amr_c_test.cpp rand.cpp)
+    had_amr_c_test.cpp rand.cpp)
 
 add_hpx_component(had_amr_c_test
     SOURCES ${had_amr_c_test_SOURCES}) 

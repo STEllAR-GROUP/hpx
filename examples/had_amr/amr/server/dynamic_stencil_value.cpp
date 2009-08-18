@@ -32,7 +32,8 @@ typedef hpx::components::managed_component<
 /// name = had_amr                               # this must match the name of the shared library
 /// path = $[hpx.location]/lib    # this is the default location where to find the shared library
 ///
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(dynamic_stencil_value_double_type, dynamic_stencil_double);
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(dynamic_stencil_value_double_type, 
+    dynamic_stencil_double);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION_EX(
