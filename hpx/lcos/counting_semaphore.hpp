@@ -58,8 +58,7 @@ namespace hpx { namespace lcos
         };
 
         typedef boost::intrusive::member_hook<
-            queue_entry, 
-            typename queue_entry::hook_type,
+            queue_entry, queue_entry::hook_type,
             &queue_entry::slist_hook_
         > slist_option_type;
 
