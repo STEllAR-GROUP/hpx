@@ -7,7 +7,6 @@
 set(had_amr_client_HEADERS
     amr_mesh.hpp
     functional_component.hpp
-    stencil_value.hpp
     dynamic_stencil_value.hpp)
 source_group("Header Files" 
     FILES ${had_amr_client_HEADERS})
@@ -15,7 +14,6 @@ source_group("Header Files"
 set(had_amr_stubs_HEADERS
     stubs/amr_mesh.hpp
     stubs/functional_component.hpp
-    stubs/stencil_value.hpp
     stubs/dynamic_stencil_value.hpp)
 source_group("Header Files\\Stubs" 
     FILES ${had_amr_stubs_HEADERS})
@@ -23,8 +21,6 @@ source_group("Header Files\\Stubs"
 set(had_amr_server_HEADERS
     server/amr_mesh.hpp
     server/functional_component.hpp
-    server/stencil_value.hpp
-    server/stencil_value_impl.hpp
     server/stencil_value_in_adaptor.hpp
     server/stencil_value_out_adaptor.hpp
     server/dynamic_stencil_value.hpp
@@ -46,7 +42,6 @@ source_group("Source Files"
 set(had_amr_server_SOURCES
     server/amr_mesh.cpp
     server/functional_component.cpp
-    server/stencil_value.cpp
     server/stencil_value_out_adaptor.cpp
     server/dynamic_stencil_value.cpp)
 source_group("Source Files\\Server" 

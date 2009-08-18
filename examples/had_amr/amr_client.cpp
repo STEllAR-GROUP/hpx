@@ -12,7 +12,8 @@
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 
-#include "amr/stencil_value.hpp"
+//#include "amr/stencil_value.hpp"
+#include "amr/dynamic_stencil_value.hpp"
 #include "amr/functional_component.hpp"
 #include "amr/amr_mesh.hpp"
 #include "amr_c/stencil.hpp"

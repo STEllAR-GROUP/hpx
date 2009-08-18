@@ -33,7 +33,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
-            typedef typename amr::server::dynamic_stencil_value::call_action action_type;
+            typedef amr::server::dynamic_stencil_value::call_action action_type;
             return lcos::eager_future<action_type>(targetgid, initial);
         }
 
@@ -54,8 +54,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
-            typedef 
-                typename amr::server::dynamic_stencil_value::get_output_ports_action 
+            typedef amr::server::dynamic_stencil_value::get_output_ports_action 
             action_type;
             typedef std::vector<naming::id_type> return_type;
             return lcos::eager_future<action_type, return_type>(gid);
@@ -77,7 +76,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             std::vector<naming::id_type> const& gids)
         {
             typedef 
-                typename amr::server::dynamic_stencil_value::connect_input_ports_action 
+                amr::server::dynamic_stencil_value::connect_input_ports_action 
             action_type;
             applier::apply<action_type>(gid, gids);
         }
@@ -89,7 +88,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             naming::id_type const& functiongid, int row, int column)
         {
             typedef 
-                typename amr::server::dynamic_stencil_value::set_functional_component_action 
+                amr::server::dynamic_stencil_value::set_functional_component_action 
             action_type;
             applier::apply<action_type>(gid, functiongid, row, column);
         }
