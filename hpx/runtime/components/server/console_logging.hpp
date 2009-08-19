@@ -31,6 +31,10 @@ namespace hpx { namespace util
     BOOST_DECLARE_LOG_FILTER(hpx_console_level, filter_type)
     BOOST_DECLARE_LOG(hpx_console_logger, logger_type)
 
+    ///////////////////////////////////////////////////////////////////////////
+    BOOST_DECLARE_LOG_FILTER(app_console_level, filter_type)
+    BOOST_DECLARE_LOG(app_console_logger, logger_type)
+
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -42,6 +46,7 @@ namespace hpx { namespace components { namespace server
         destination_hpx = 0,
         destination_timing = 1,
         destination_agas = 2,
+        destination_app = 3,
     };
 
     ///////////////////////////////////////////////////////////////////////////

@@ -68,6 +68,20 @@ namespace hpx { namespace util
     /**/
 
     ///////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT BOOST_DECLARE_LOG_FILTER(app_level, filter_type)
+    HPX_EXPORT BOOST_DECLARE_LOG(app_logger, logger_type)
+
+    #define LAPP_(lvl)                                                        \
+        BOOST_LOG_USE_LOG_IF_LEVEL(hpx::util::app_logger(),                   \
+            hpx::util::app_level(), lvl)                                      \
+        << hpx::util::levelname(::boost::logging::level::lvl) << " "          \
+    /**/
+
+    #define LAPP_ENABLED(lvl)                                                 \
+        hpx::util::app_level()->is_enabled(::boost::logging::level::lvl)      \
+    /**/
+
+    ///////////////////////////////////////////////////////////////////////////
     // specific logging
     #define LTM_(lvl)   LHPX_(lvl, "  [TM] ")   /* thread manager */
     #define LRT_(lvl)   LHPX_(lvl, "  [RT] ")   /* runtime support */

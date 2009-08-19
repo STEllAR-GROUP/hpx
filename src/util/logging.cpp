@@ -302,6 +302,49 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(app_level, filter_type,
+        boost::logging::level::disable_all) 
+    BOOST_DEFINE_LOG(app_logger, logger_type) 
+
+    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(app_error_level, filter_type,
+        boost::logging::level::fatal) 
+    BOOST_DEFINE_LOG(app_error_logger, logger_type)
+
+    // initialize logging for application
+    void init_app_logs(util::section const& ini, bool isconsole, 
+        naming::id_type const& console_prefix, naming::id_type const& prefix) 
+    {
+        std::string loglevel, logdest, logformat;
+
+        if (ini.has_section("hpx.logging.application")) {
+            util::section const* logini = ini.get_section("hpx.logging.application");
+            BOOST_ASSERT(NULL != logini);
+
+            loglevel = logini->get_entry("level", "");
+            logdest = logini->get_entry("destination", "");
+            logformat = detail::unescape(logini->get_entry("format", ""));
+        }
+
+        int lvl = boost::logging::level::disable_all;
+        if (!loglevel.empty()) 
+            lvl = detail::get_log_level(loglevel);
+
+        if (boost::logging::level::disable_all != lvl) {
+            if (logdest.empty())      // ensure minimal defaults
+                logdest = isconsole ? "cerr" : "console";
+            if (logformat.empty())
+                logformat = "|\\n";
+
+            app_logger()->writer().add_destination("console",
+                console(console_prefix, lvl, components::server::destination_app));
+            app_logger()->writer().write(logformat, logdest);
+            app_logger()->writer().add_formatter(locality_prefix(prefix));
+            app_logger()->mark_as_initialized();
+            app_level()->set_enabled(lvl);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     BOOST_DEFINE_LOG_FILTER_WITH_ARGS(agas_console_level, filter_type, 
         boost::logging::level::disable_all) 
     BOOST_DEFINE_LOG(agas_console_logger, logger_type) 
@@ -408,6 +451,42 @@ namespace hpx { namespace util
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(app_console_level, filter_type, 
+        boost::logging::level::disable_all) 
+    BOOST_DEFINE_LOG(app_console_logger, logger_type) 
+
+    // initialize logging for applications
+    void init_app_console_log(util::section const& ini) 
+    {
+        std::string loglevel, logdest, logformat;
+
+        if (ini.has_section("hpx.logging.console.application")) {
+            util::section const* logini = ini.get_section("hpx.logging.console.application");
+            BOOST_ASSERT(NULL != logini);
+
+            loglevel = logini->get_entry("level", "");
+            logdest = logini->get_entry("destination", "");
+            logformat = detail::unescape(logini->get_entry("format", ""));
+        }
+
+        int lvl = boost::logging::level::disable_all;
+        if (!loglevel.empty()) 
+            lvl = detail::get_log_level(loglevel);
+
+        if (boost::logging::level::disable_all != lvl) 
+        {
+            if (logdest.empty())      // ensure minimal defaults
+                logdest = "cerr";
+            if (logformat.empty())
+                logformat = "|\\n";
+
+            app_console_logger()->writer().write(logformat, logdest);
+            app_console_logger()->mark_as_initialized();
+            app_console_level()->set_enabled(lvl);
+        }
+    }
+
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -470,7 +549,19 @@ namespace hpx { namespace util { namespace detail
                     "[hpx.logging.console.agas]",
                     "level = ${HPX_AGAS_LOGLEVEL:$[hpx.logging.agas.level]}",
                     "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:file(hpx.agas.$[system.pid].log)}",
-                    "format = ${HPX_CONSOLE_AGAS_LOGFORMAT:|}"
+                    "format = ${HPX_CONSOLE_AGAS_LOGFORMAT:|}",
+
+                // logging related to applications
+                    "[hpx.logging.application]",
+                    "level = ${HPX_APP_LOGLEVEL:0}",
+                    "destination = ${HPX_APP_LOGDESTINATION:console}",
+                    "format = ${HPX_APP_LOGFORMAT:%time%(" HPX_TIMEFORMAT ") [%idx%] [APP] |\\n}",
+
+                // console logging related to applications
+                    "[hpx.logging.console.application]",
+                    "level = ${HPX_APP_LOGLEVEL:$[hpx.logging.application.level]}",
+                    "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:file(hpx.application.$[system.pid].log)}",
+                    "format = ${HPX_CONSOLE_APP_LOGFORMAT:|}"
                 ;
         }
         catch (std::exception const&) {
@@ -512,12 +603,14 @@ namespace hpx { namespace util { namespace detail
         init_agas_log(ini, isconsole, console_prefix, prefix);
         init_timing_log(ini, isconsole, console_prefix, prefix);
         init_hpx_logs(ini, isconsole, console_prefix, prefix);
+        init_app_logs(ini, isconsole, console_prefix, prefix);
 
         // initialize console logs (if appropriate)
         if (isconsole) {
             init_agas_console_log(ini);
             init_timing_console_log(ini);
             init_hpx_console_log(ini);
+            init_app_console_log(ini);
         }
     }
 

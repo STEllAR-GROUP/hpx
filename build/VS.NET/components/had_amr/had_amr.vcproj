@@ -197,10 +197,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\..\examples\had_amr\amr\server\stencil_value.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\..\examples\had_amr\amr\server\stencil_value_out_adaptor.cpp"
 					>
 				</File>
@@ -244,22 +240,6 @@
 				</File>
 				<File
 					RelativePath="..\..\..\..\examples\had_amr\amr\server\functional_component.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\..\examples\had_amr\amr\server\stencil_value.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\..\examples\had_amr\amr\server\stencil_value_impl.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\..\examples\had_amr\amr\server\stencil_value_in_adaptor.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\..\examples\had_amr\amr\server\stencil_value_out_adaptor.hpp"
 					>
 				</File>
 			</Filter>
