@@ -38,6 +38,11 @@
         util::hpx_console_level()->is_enabled(lvl))                           \
 /**/
 
+#define LAPP_CONSOLE_(lvl)                                                    \
+    BOOST_LOG_USE_LOG(util::app_console_logger(), read_msg().gather().out(),  \
+        util::app_console_level()->is_enabled(lvl))                           \
+/**/
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
@@ -57,6 +62,10 @@ namespace hpx { namespace components { namespace server
 
         case destination_agas:
             LAGAS_CONSOLE_(level) << msg;
+            break;
+
+        case destination_app:
+            LAPP_CONSOLE_(level) << msg;
             break;
 
         default:
