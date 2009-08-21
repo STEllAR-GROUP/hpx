@@ -17,12 +17,16 @@
 #include "../stubs/local_list.hpp"
 
 // Needs this to define edge_list_type
-#include "../../../../applications/graphs/ssca2/kernel2/kernel2.hpp"
+#include "../../../../applications/graphs/ssca2/ssca2/ssca2.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::server::local_list<
-    hpx::components::server::kernel2::edge_list_type
+    hpx::components::server::ssca2::edge_list_type
 > local_edge_list_type;
+
+typedef hpx::components::server::local_list<
+    hpx::components::server::ssca2::graph_list_type
+> local_graph_list_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the local_list actions
@@ -33,6 +37,13 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<local_edge_list_type>, local_list);
 HPX_DEFINE_GET_COMPONENT_TYPE(local_edge_list_type);
+
+HPX_REGISTER_ACTION_EX(
+    local_graph_list_type::append_action,
+    locallist_append_action);
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+    hpx::components::simple_component<local_graph_list_type>, local_graph_list);
+HPX_DEFINE_GET_COMPONENT_TYPE(local_graph_list_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server

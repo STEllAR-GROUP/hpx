@@ -54,6 +54,7 @@ namespace hpx { namespace components { namespace server
         > get_local_action;
 
     private:
+        // Map from locale to its local_list
         std::map<naming::id_type,naming::id_type> map_;
     };
 

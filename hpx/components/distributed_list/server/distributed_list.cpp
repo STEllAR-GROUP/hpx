@@ -21,24 +21,35 @@
 #include "../stubs/local_list.hpp"
 
 // Needs this to define edge_list_type
-#include "../../../../applications/graphs/ssca2/kernel2/kernel2.hpp"
+#include "../../../../applications/graphs/ssca2/ssca2/ssca2.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::server::distributed_list<
-    hpx::components::server::kernel2::edge_list_type
+    hpx::components::server::ssca2::edge_list_type
 > distributed_edge_list_type;
+
+typedef hpx::components::server::distributed_list<
+    hpx::components::server::ssca2::graph_list_type
+> distributed_graph_list_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the distributed_list actions
 
 HPX_REGISTER_ACTION_EX(
     distributed_edge_list_type::get_local_action,
-    distributed_list_get_local_action);
+    distributed_edge_list_get_local_action);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<distributed_edge_list_type>,
-    distributed_list);
+    distributed_edge_list);
 HPX_DEFINE_GET_COMPONENT_TYPE(distributed_edge_list_type);
 
+HPX_REGISTER_ACTION_EX(
+    distributed_graph_list_type::get_local_action,
+    distributed_graph_list_get_local_action);
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+    hpx::components::simple_component<distributed_graph_list_type>,
+    distributed_graph_list);
+HPX_DEFINE_GET_COMPONENT_TYPE(distributed_graph_list_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
@@ -58,7 +69,7 @@ namespace hpx { namespace components { namespace server
             std::cout << "Need to make new sublist" << std::endl;
 
             // Create a new sub list there
-            typedef kernel2::edge_list_type edge_list_type;
+            typedef ssca2::edge_list_type edge_list_type;
             typedef hpx::components::local_list<edge_list_type> local_list_type;
 
             local_list_type edge_list(local_list_type::create(locale));
