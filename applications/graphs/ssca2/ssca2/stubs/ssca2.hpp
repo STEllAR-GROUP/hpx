@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_STUBS_KERNEL2_AUG_13_2009_1040AM)
-#define HPX_COMPONENTS_STUBS_KERNEL2_AUG_13_2009_1040AM
+#if !defined(HPX_COMPONENTS_STUBS_SSCA2_AUG_13_2009_1040AM)
+#define HPX_COMPONENTS_STUBS_SSCA2_AUG_13_2009_1040AM
 
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -13,17 +13,18 @@
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/lcos/eager_future.hpp>
 
-#include "../server/kernel2.hpp"
+#include "../server/ssca2.hpp"
 
-typedef hpx::components::server::kernel2::edge_list_type edge_list_type;
+typedef hpx::components::server::ssca2::edge edge;
+typedef hpx::components::server::ssca2::edge_list_type edge_list_type;
 
 namespace hpx { namespace components { namespace stubs
 {    
     ///////////////////////////////////////////////////////////////////////////
-    /// The \a stubs#kernel2 class is the client side representation of all
-    /// \a server#kernel2 components
-    struct kernel2
-      : components::stubs::stub_base<server::kernel2>
+    /// The \a stubs#ssca2 class is the client side representation of all
+    /// \a server#ssca2 components
+    struct ssca2
+      : components::stubs::stub_base<server::ssca2>
     {
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
@@ -35,7 +36,7 @@ namespace hpx { namespace components { namespace stubs
                   naming::id_type G,
                   naming::id_type edge_list)
         {
-            typedef server::kernel2::large_set_action action_type;
+            typedef server::ssca2::large_set_action action_type;
             return lcos::eager_future<action_type>(gid, G, edge_list).get();
         }
 
@@ -46,10 +47,30 @@ namespace hpx { namespace components { namespace stubs
                         naming::id_type local_max_lco,
                         naming::id_type global_max_lco)
         {
-            typedef server::kernel2::large_set_local_action action_type;
+            typedef server::ssca2::large_set_local_action action_type;
             return lcos::eager_future<action_type>(
                        gid, local_list, edge_list, local_max_lco, global_max_lco
                    ).get();
+        }
+
+        static int
+        extract(naming::id_type gid,
+                naming::id_type edge_list,
+                naming::id_type subgraphs)
+        {
+            typedef server::ssca2::extract_action action_type;
+            return lcos::eager_future<action_type>(gid, edge_list, subgraphs).get();
+        }
+
+        static int
+        extract_subgraph(naming::id_type gid,
+                         naming::id_type H,
+                         naming::id_type source,
+                         naming::id_type target,
+                         int d)
+        {
+            typedef server::ssca2::extract_subgraph_action action_type;
+            return lcos::eager_future<action_type>(gid, H, source, target, d).get();
         }
     };
 

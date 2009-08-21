@@ -14,7 +14,7 @@
 #include <hpx/components/vertex/vertex.hpp>
 #include <hpx/components/distributed_list/distributed_list.hpp>
 
-#include "kernel2/kernel2.hpp"
+#include "ssca2/ssca2.hpp"
 
 #include <hpx/lcos/eager_future.hpp>
 
@@ -132,21 +132,51 @@ threads::thread_state hpx_main(int scale, int edge_factor,
         results.pop_back();
     }
    
-    // Kernel 1: graph construction (see above)
+    // SSCA#2 Graph Analysis Benchmark
 
-    // Kernel 2: classify large sets
-    using hpx::components::kernel2;
+    using hpx::components::ssca2;
     using hpx::components::distributed_list;
 
-    kernel2 K2 (kernel2::create(here));
+    ssca2 SSCA2 (ssca2::create(here));
 
-    typedef hpx::components::server::kernel2::edge_list_type edge_list_type;
+    // Kernel 1: graph construction (see above)
+    // Input:
+    //    infile - the file containing the graph data
+    // Output:
+    //    G = the graph containing the graph data
+
+    // G = graph()
+    // for_each(infile.lines(), add_edge_from_line)
+
+    // Kernel 2: classify large sets
+    // Input:
+    //    G - the graph read in from Kernel 1
+    // Output:
+    //    edge_list - the list of maximal edges
+
+    // edges = filter(G.edges(), max_edge)
+
+    typedef hpx::components::server::ssca2::edge_list_type edge_list_type;
     typedef distributed_list<edge_list_type> dist_edge_list_type;
     dist_edge_list_type edge_list (dist_edge_list_type::create(here));
 
-    K2.large_set(G.get_gid(), edge_list.get_gid());
+    SSCA2.large_set(G.get_gid(), edge_list.get_gid());
 
-    // Kernel 3: ???
+    // Kernel 3: graph extraction
+    // Input:
+    //     G - the graph read in from Kernel 1
+    //     edge_list - the list of maximal edges
+    //     d - the SubGraphPathLength
+    // Output:
+    //     subgraphs - the list of subgraphs extracted from G
+
+    // subgraphs = map(edges, extract_subgraph)
+
+    typedef hpx::components::server::ssca2::graph_list_type graph_list_type;
+    typedef distributed_list<graph_list_type> dist_graph_list_type;
+    dist_graph_list_type subgraphs(dist_graph_list_type::create(here));
+
+    SSCA2.extract(edge_list.get_gid(), subgraphs.get_gid());
 
     // Kernel 4: ???
 

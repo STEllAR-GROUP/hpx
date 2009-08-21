@@ -24,39 +24,43 @@
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/lcos/reduce_max.hpp>
 
-#include "kernel2.hpp"
-#include "../stubs/kernel2.hpp"
+#include "ssca2.hpp"
+#include "../stubs/ssca2.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::server::kernel2 kernel2_type;
-typedef hpx::components::server::kernel2::edge_list_type edge_list_type;
+typedef hpx::components::server::ssca2 ssca2_type;
+typedef hpx::components::server::ssca2::edge_list_type edge_list_type;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Serialization support for the kernel2 actions
-HPX_REGISTER_ACTION_EX(kernel2_type::large_set_action,
-                       kernel2_large_set_action);
-HPX_REGISTER_ACTION_EX(kernel2_type::large_set_local_action,
-                       kernel2_large_set_local_action);
+// Serialization support for the ssca2 actions
+HPX_REGISTER_ACTION_EX(ssca2_type::large_set_action,
+                       ssca2_large_set_action);
+HPX_REGISTER_ACTION_EX(ssca2_type::large_set_local_action,
+                       ssca2_large_set_local_action);
+HPX_REGISTER_ACTION_EX(ssca2_type::extract_action,
+                       ssca2_extract_action);
+HPX_REGISTER_ACTION_EX(ssca2_type::extract_subgraph_action,
+                       ssca2_extract_subgraph_action);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<kernel2_type>, kernel2);
-HPX_DEFINE_GET_COMPONENT_TYPE(kernel2_type);
+    hpx::components::simple_component<ssca2_type>, ssca2);
+HPX_DEFINE_GET_COMPONENT_TYPE(ssca2_type);
 
 typedef hpx::lcos::base_lco_with_value<
-        kernel2_type::edge_list_type
+        ssca2_type::edge_list_type
     > create_edge_list_type;
 
 HPX_REGISTER_ACTION_EX(
     create_edge_list_type::set_result_action,
-    set_result_action_kernel2_result);
+    set_result_action_ssca2_result);
 HPX_DEFINE_GET_COMPONENT_TYPE(create_edge_list_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
-    kernel2::kernel2() {}
+    ssca2::ssca2() {}
     
     int
-    kernel2::large_set(naming::id_type G, naming::id_type dist_edge_list)
+    ssca2::large_set(naming::id_type G, naming::id_type dist_edge_list)
     {
         std::cout << "Starting Kernel 2" << std::endl;
 
@@ -106,7 +110,7 @@ namespace hpx { namespace components { namespace server
     }
     
     int
-    kernel2::large_set_local(locality_result local_vertex_list,
+    ssca2::large_set_local(locality_result local_vertex_list,
                              naming::id_type edge_list,
                              naming::id_type local_max_lco,
                              naming::id_type global_max_lco)
@@ -115,7 +119,7 @@ namespace hpx { namespace components { namespace server
 
         int max = -1;
         int num_added = 0;
-        kernel2::edge_list_type edge_list_local;
+        ssca2::edge_list_type edge_list_local;
 
         // Iterate over local edges
         naming::id_type gid = local_vertex_list.first_gid_;
@@ -169,9 +173,9 @@ namespace hpx { namespace components { namespace server
             std::cout << "Adding local edge set at "
                       << local_vertex_list.prefix_ << std::endl;
 
-            typedef distributed_list<kernel2::edge_list_type>
+            typedef distributed_list<ssca2::edge_list_type>
                 distributed_edge_list_type;
-            typedef local_list<kernel2::edge_list_type> local_edge_list_type;
+            typedef local_list<ssca2::edge_list_type> local_edge_list_type;
 
             naming::id_type local_list =
                 lcos::eager_future<
@@ -190,6 +194,47 @@ namespace hpx { namespace components { namespace server
         }
 
         return num_added;
+    }
+
+    int
+    ssca2::extract(naming::id_type edge_list, naming::id_type subgraphs)
+    {
+        std::cout << "Extracting subgraphs" << std::endl;
+
+    }
+
+    int
+    ssca2::extract_subgraph(naming::id_type H, naming::id_type source, naming::id_type target, int d)
+    {
+        // Needs to allow only one (H,_,v,d) to proceed
+        int label = lcos::eager_future<server::vertex::label_action>(source).get();
+
+        std::cout << "Extracting subgraph starting with (" << source << target << ")" << std::endl;
+
+        /*
+        int status = lcos::eager_future<server::graph::add_vertex_action>(H, label).get();
+        if (status == 1 && d > 0) // Success
+        {
+            typedef std::vector<naming::id_type> gids_type;
+            gids_type neighbors =
+                lcos::eager_future<server::vertex::neighbors_action>(target).get();
+
+            // This needs to be encapsulated into a separate construct
+            std::vector<future_value<int> > results;
+            gids_type::iterator end = neighbors.end();
+            for (gids_type::iterator it = neighbors.begin(); it != end; ++it)
+            {
+                results.push_back(lcos::eager_future<extract_subgraph_action>(H, edge(), d-1));
+            }
+            while (results.size() > 0)
+            {
+                results.back().get();
+                results.pop_back();
+            }
+        }
+        */
+
+        return 0;
     }
 
 }}}

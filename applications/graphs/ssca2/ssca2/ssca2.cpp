@@ -8,7 +8,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
-#include <applications/graphs/ssca2/kernel2/server/kernel2.hpp>
+#include <applications/graphs/ssca2/ssca2/server/ssca2.hpp>
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>

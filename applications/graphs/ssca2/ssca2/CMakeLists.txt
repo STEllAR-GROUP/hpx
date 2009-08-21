@@ -5,31 +5,31 @@
 
 ###############################################################################
 
-set (kernel2_HEADERS
-    kernel2.hpp
-    server/kernel2.hpp
-    stubs/kernel2.hpp)
+set (ssca2_HEADERS
+    ssca2.hpp
+    server/ssca2.hpp
+    stubs/ssca2.hpp)
 
-set (kernel2_SOURCES
-    kernel2.cpp
-    server/kernel2.cpp
+set (ssca2_SOURCES
+    ssca2.cpp
+    server/ssca2.cpp
     reduce_max.cpp)
 
-set(kernel2_DEPENDENCIES
+set(ssca2_DEPENDENCIES
     graph_component
     distributed_list_component
     distributing_factory_component
     vertex_component)
 
-set(kernel2_INI
-    kernel2.ini)
+set(ssca2_INI
+    ssca2.ini)
 source_group("" 
-    FILES ${kernel2_INI})
+    FILES ${ssca2_INI})
 
 ###############################################################################
 
-add_hpx_component(kernel2 
-    SOURCES ${kernel2_SOURCES} 
-    HEADERS ${kernel2_HEADERS}
-    DEPENDENCIES ${kernel2_DEPENDENCIES}
-    INI ${kernel2_INI})
+add_hpx_component(ssca2 
+    SOURCES ${ssca2_SOURCES} 
+    HEADERS ${ssca2_HEADERS}
+    DEPENDENCIES ${ssca2_DEPENDENCIES}
+    INI ${ssca2_INI})
