@@ -5,33 +5,33 @@
 
 ###############################################################################
 
-set (distributed_list_HEADERS
-    distributed_list.hpp
-    server/distributed_list.hpp
-    stubs/distributed_list.hpp
-    local_list.hpp
-    server/local_list.hpp
-    stubs/local_list.hpp)
+set (distributed_set_HEADERS
+    distributed_set.hpp
+    server/distributed_set.hpp
+    stubs/distributed_set.hpp
+    local_set.hpp
+    server/local_set.hpp
+    stubs/local_set.hpp)
 
-set (distributed_list_SOURCES
-    distributed_list.cpp
-    server/distributed_list.cpp
-    server/local_list.cpp)
+set (distributed_set_SOURCES
+    distributed_set.cpp
+    server/distributed_set.cpp
+    server/local_set.cpp)
 
-set(distributed_list_DEPENDENCIES
+set(distributed_set_DEPENDENCIES
     )
 
 ###############################################################################
 
-set(distributed_list_INI
-    distributed_list.ini)
+set(distributed_set_INI
+    distributed_set.ini)
 source_group(""
-    FILES ${distributed_list_INI})
+    FILES ${distributed_set_INI})
 
 ###############################################################################
 
-add_hpx_component(distributed_list 
-    SOURCES ${distributed_list_SOURCES} 
-    HEADERS ${distributed_list_HEADERS}
-    DEPENDENCIES ${distributed_list_DEPENDENCIES}
-    INI ${distributed_list_INI})
+add_hpx_component(distributed_set 
+    SOURCES ${distributed_set_SOURCES} 
+    HEADERS ${distributed_set_HEADERS}
+    DEPENDENCIES ${distributed_set_DEPENDENCIES}
+    INI ${distributed_set_INI})
