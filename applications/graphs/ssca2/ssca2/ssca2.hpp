@@ -32,28 +32,28 @@ namespace hpx { namespace components
         // exposed functionality of this component
 
         int
-        large_set(naming::id_type G, naming::id_type edge_list)
+        large_set(naming::id_type G, naming::id_type edge_set)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::large_set(gid_, G, edge_list);
+            return this->base_type::large_set(gid_, G, edge_set);
         }
 
         int
-        large_set_local(locality_result local_list,
-                        naming::id_type edge_list,
+        large_set_local(locality_result local_set,
+                        naming::id_type edge_set,
                         naming::id_type local_max_lco,
                         naming::id_type global_max_lco)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::large_set_local(
-                gid_, local_list, edge_list, local_max_lco, global_max_lco);
+                gid_, local_set, edge_set, local_max_lco, global_max_lco);
         }
 
         int
-        extract(naming::id_type edge_list, naming::id_type subgraphs)
+        extract(naming::id_type edge_set, naming::id_type subgraphs)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::extract(gid_, edge_list, subgraphs);
+            return this->base_type::extract(gid_, edge_set, subgraphs);
         }
 
         int

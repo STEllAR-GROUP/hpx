@@ -11,7 +11,7 @@
 
 #include <hpx/components/vertex/stubs/vertex.hpp>
 
-//typedef std::vector<std::pair<naming::id_type, int> > partial_edge_list_type;
+//typedef std::vector<std::pair<naming::id_type, int> > partial_edge_set_type;
 
 namespace hpx { namespace components 
 {
@@ -54,7 +54,7 @@ namespace hpx { namespace components
             return this->base_type::add_edge(gid_, v_g, label);
         }
 
-        partial_edge_list_type
+        partial_edge_set_type
         out_edges(void)
         {
             BOOST_ASSERT(gid_);

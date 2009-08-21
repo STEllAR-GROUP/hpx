@@ -13,5 +13,5 @@
 
 #include "../../applications/graphs/ssca2/ssca2/ssca2.hpp"
 
-#include <hpx/components/distributed_list/server/local_list.hpp>
-#include "local_list.hpp"
+#include <hpx/components/distributed_set/server/local_set.hpp>
+#include "local_set.hpp"

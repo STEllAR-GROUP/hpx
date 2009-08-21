@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_SERVER_DISTRIBUTED_LIST_AUG_14_2009_1129AM)
-#define HPX_COMPONENTS_SERVER_DISTRIBUTED_LIST_AUG_14_2009_1129AM
+#if !defined(HPX_COMPONENTS_SERVER_DISTRIBUTED_SET_AUG_14_2009_1129AM)
+#define HPX_COMPONENTS_SERVER_DISTRIBUTED_SET_AUG_14_2009_1129AM
 
 #include <iostream>
 
@@ -18,23 +18,23 @@
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// The distributed_list is an HPX component.
+    /// The distributed_set is an HPX component.
     ///
     template <typename List>
-    class HPX_COMPONENT_EXPORT distributed_list
-      : public simple_component_base<distributed_list<List> >
+    class HPX_COMPONENT_EXPORT distributed_set
+      : public simple_component_base<distributed_set<List> >
     {
     private:
-        typedef simple_component_base<distributed_list> base_type;
+        typedef simple_component_base<distributed_set> base_type;
         
     public:
-        distributed_list();
+        distributed_set();
         
-        typedef hpx::components::server::distributed_list<List> wrapping_type;
+        typedef hpx::components::server::distributed_set<List> wrapping_type;
         
         enum actions
         {
-            distributed_list_get_local = 0
+            distributed_set_get_local = 0
         };
         
         ///////////////////////////////////////////////////////////////////////
@@ -48,13 +48,13 @@ namespace hpx { namespace components { namespace server
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::result_action1<
-            distributed_list, naming::id_type, distributed_list_get_local,
+            distributed_set, naming::id_type, distributed_set_get_local,
             naming::id_type,
-            &distributed_list::get_local
+            &distributed_set::get_local
         > get_local_action;
 
     private:
-        // Map from locale to its local_list
+        // Map from locale to its local_set
         std::map<naming::id_type,naming::id_type> map_;
     };
 

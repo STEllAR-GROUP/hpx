@@ -8,7 +8,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
-#include <hpx/components/distributed_list/server/distributed_list.hpp>
+#include <hpx/components/distributed_set/server/distributed_set.hpp>
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>

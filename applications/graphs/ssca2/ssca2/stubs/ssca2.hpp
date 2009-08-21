@@ -16,7 +16,7 @@
 #include "../server/ssca2.hpp"
 
 typedef hpx::components::server::ssca2::edge edge;
-typedef hpx::components::server::ssca2::edge_list_type edge_list_type;
+typedef hpx::components::server::ssca2::edge_set_type edge_set_type;
 
 namespace hpx { namespace components { namespace stubs
 {    
@@ -34,32 +34,32 @@ namespace hpx { namespace components { namespace stubs
         static int
         large_set(naming::id_type gid,
                   naming::id_type G,
-                  naming::id_type edge_list)
+                  naming::id_type edge_set)
         {
             typedef server::ssca2::large_set_action action_type;
-            return lcos::eager_future<action_type>(gid, G, edge_list).get();
+            return lcos::eager_future<action_type>(gid, G, edge_set).get();
         }
 
         static int
         large_set_local(naming::id_type gid,
-                        locality_result local_list,
-                        naming::id_type edge_list,
+                        locality_result local_set,
+                        naming::id_type edge_set,
                         naming::id_type local_max_lco,
                         naming::id_type global_max_lco)
         {
             typedef server::ssca2::large_set_local_action action_type;
             return lcos::eager_future<action_type>(
-                       gid, local_list, edge_list, local_max_lco, global_max_lco
+                       gid, local_set, edge_set, local_max_lco, global_max_lco
                    ).get();
         }
 
         static int
         extract(naming::id_type gid,
-                naming::id_type edge_list,
+                naming::id_type edge_set,
                 naming::id_type subgraphs)
         {
             typedef server::ssca2::extract_action action_type;
-            return lcos::eager_future<action_type>(gid, edge_list, subgraphs).get();
+            return lcos::eager_future<action_type>(gid, edge_set, subgraphs).get();
         }
 
         static int

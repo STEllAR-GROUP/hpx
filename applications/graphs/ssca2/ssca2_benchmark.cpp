@@ -12,7 +12,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/components/graph/graph.hpp>
 #include <hpx/components/vertex/vertex.hpp>
-#include <hpx/components/distributed_list/distributed_list.hpp>
+#include <hpx/components/distributed_set/distributed_set.hpp>
 
 #include "ssca2/ssca2.hpp"
 
@@ -135,7 +135,7 @@ threads::thread_state hpx_main(int scale, int edge_factor,
     // SSCA#2 Graph Analysis Benchmark
 
     using hpx::components::ssca2;
-    using hpx::components::distributed_list;
+    using hpx::components::distributed_set;
 
     ssca2 SSCA2 (ssca2::create(here));
 
@@ -152,31 +152,35 @@ threads::thread_state hpx_main(int scale, int edge_factor,
     // Input:
     //    G - the graph read in from Kernel 1
     // Output:
-    //    edge_list - the list of maximal edges
+    //    edge_set - the list of maximal edges
 
     // edges = filter(G.edges(), max_edge)
 
-    typedef hpx::components::server::ssca2::edge_list_type edge_list_type;
-    typedef distributed_list<edge_list_type> dist_edge_list_type;
-    dist_edge_list_type edge_list (dist_edge_list_type::create(here));
+    /*
+    typedef hpx::components::server::ssca2::edge_set_type edge_set_type;
+    typedef distributed_set<edge_set_type> dist_edge_set_type;
+    dist_edge_set_type edge_set (dist_edge_set_type::create(here));
 
-    SSCA2.large_set(G.get_gid(), edge_list.get_gid());
+    SSCA2.large_set(G.get_gid(), edge_set.get_gid());
+    */
 
     // Kernel 3: graph extraction
     // Input:
     //     G - the graph read in from Kernel 1
-    //     edge_list - the list of maximal edges
+    //     edge_set - the list of maximal edges
     //     d - the SubGraphPathLength
     // Output:
     //     subgraphs - the list of subgraphs extracted from G
 
     // subgraphs = map(edges, extract_subgraph)
 
-    typedef hpx::components::server::ssca2::graph_list_type graph_list_type;
-    typedef distributed_list<graph_list_type> dist_graph_list_type;
-    dist_graph_list_type subgraphs(dist_graph_list_type::create(here));
+    /*
+    typedef hpx::components::server::ssca2::graph_set_type graph_set_type;
+    typedef distributed_set<graph_set_type> dist_graph_set_type;
+    dist_graph_set_type subgraphs(dist_graph_set_type::create(here));
 
-    SSCA2.extract(edge_list.get_gid(), subgraphs.get_gid());
+    SSCA2.extract(edge_set.get_gid(), subgraphs.get_gid());
+    */
 
     // Kernel 4: ???
 

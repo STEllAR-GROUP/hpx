@@ -71,7 +71,7 @@ namespace hpx { namespace components { namespace server
                 ar & target_ & label_;
             }
         };
-        typedef std::vector<partial_edge> partial_edge_list_type;
+        typedef std::vector<partial_edge> partial_edge_set_type;
 
 
         /// Initialize the vertex
@@ -102,7 +102,7 @@ namespace hpx { namespace components { namespace server
             return 0;
         }
 
-        partial_edge_list_type out_edges(void)
+        partial_edge_set_type out_edges(void)
         {
 
             return out_edges_;
@@ -125,12 +125,12 @@ namespace hpx { namespace components { namespace server
         > add_edge_action;
 
         typedef hpx::actions::result_action0<
-            vertex, partial_edge_list_type, vertex_out_edges, &vertex::out_edges
+            vertex, partial_edge_set_type, vertex_out_edges, &vertex::out_edges
         > out_edges_action;
 
     private:
         int label_;
-        partial_edge_list_type out_edges_;
+        partial_edge_set_type out_edges_;
     };
 
 }}}

@@ -13,48 +13,48 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
-#include "local_list.hpp"
-#include "../stubs/local_list.hpp"
+#include "local_set.hpp"
+#include "../stubs/local_set.hpp"
 
-// Needs this to define edge_list_type
+// Needs this to define edge_set_type
 #include "../../../../applications/graphs/ssca2/ssca2/ssca2.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::server::local_list<
-    hpx::components::server::ssca2::edge_list_type
-> local_edge_list_type;
+typedef hpx::components::server::local_set<
+    hpx::components::server::ssca2::edge_set_type
+> local_edge_set_type;
 
-typedef hpx::components::server::local_list<
-    hpx::components::server::ssca2::graph_list_type
-> local_graph_list_type;
+typedef hpx::components::server::local_set<
+    hpx::components::server::ssca2::graph_set_type
+> local_graph_set_type;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Serialization support for the local_list actions
+// Serialization support for the local_set actions
 
 HPX_REGISTER_ACTION_EX(
-    local_edge_list_type::append_action,
-    local_list_append_action);
+    local_edge_set_type::append_action,
+    local_set_append_action);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<local_edge_list_type>, local_list);
-HPX_DEFINE_GET_COMPONENT_TYPE(local_edge_list_type);
+    hpx::components::simple_component<local_edge_set_type>, local_set);
+HPX_DEFINE_GET_COMPONENT_TYPE(local_edge_set_type);
 
 HPX_REGISTER_ACTION_EX(
-    local_graph_list_type::append_action,
+    local_graph_set_type::append_action,
     locallist_append_action);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<local_graph_list_type>, local_graph_list);
-HPX_DEFINE_GET_COMPONENT_TYPE(local_graph_list_type);
+    hpx::components::simple_component<local_graph_set_type>, local_graph_set);
+HPX_DEFINE_GET_COMPONENT_TYPE(local_graph_set_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
     template <typename List>
-    local_list<List>::local_list()
-      : local_list_(0)
+    local_set<List>::local_set()
+      : local_set_(0)
     {}
     
     template <typename List>
-    int local_list<List>::append(List list)
+    int local_set<List>::append(List list)
     {
         std::cout << "Appending to local list at locale " << std::endl;
 
@@ -64,10 +64,10 @@ namespace hpx { namespace components { namespace server
         list_iter end = list.end();
         for (list_iter it = list.begin(); it != end; ++it)
         {
-            local_list_.push_back(*it);
+            local_set_.push_back(*it);
         }
 
-        return local_list_.size();
+        return local_set_.size();
     }
 
 }}}

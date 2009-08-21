@@ -15,8 +15,8 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
-//typedef hpx::components::server::vertex::partial_edge_list_type partial_edge_list_type;
-typedef hpx::components::server::vertex::partial_edge_list_type partial_edge_list_type;
+//typedef hpx::components::server::vertex::partial_edge_set_type partial_edge_set_type;
+typedef hpx::components::server::vertex::partial_edge_set_type partial_edge_set_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
@@ -45,13 +45,13 @@ HPX_REGISTER_ACTION_EX(
     vertex_out_edges_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(vertex_type::wrapped_type);
 
-//typedef std::vector<std::pair<hpx::naming::id_type, int> > partial_edge_list_type;
+//typedef std::vector<std::pair<hpx::naming::id_type, int> > partial_edge_set_type;
 
 typedef hpx::lcos::base_lco_with_value<
-        hpx::components::server::vertex::partial_edge_list_type
-    > create_partial_edge_list_type;
+        hpx::components::server::vertex::partial_edge_set_type
+    > create_partial_edge_set_type;
 
 HPX_REGISTER_ACTION_EX(
-    create_partial_edge_list_type::set_result_action,
+    create_partial_edge_set_type::set_result_action,
     set_result_action_vertex_result);
-HPX_DEFINE_GET_COMPONENT_TYPE(create_partial_edge_list_type);
+HPX_DEFINE_GET_COMPONENT_TYPE(create_partial_edge_set_type);

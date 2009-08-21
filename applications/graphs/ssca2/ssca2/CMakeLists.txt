@@ -17,7 +17,7 @@ set (ssca2_SOURCES
 
 set(ssca2_DEPENDENCIES
     graph_component
-    distributed_list_component
+    distributed_set_component
     distributing_factory_component
     vertex_component)
 

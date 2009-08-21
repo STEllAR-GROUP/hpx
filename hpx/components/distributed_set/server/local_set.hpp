@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_SERVER_LOCAL_LIST_AUG_13_2009_1054PM)
-#define HPX_COMPONENTS_SERVER_LOCAL_LIST_AUG_13_2009_1054PM
+#if !defined(HPX_COMPONENTS_SERVER_LOCAL_SET_AUG_13_2009_1054PM)
+#define HPX_COMPONENTS_SERVER_LOCAL_SET_AUG_13_2009_1054PM
 
 #include <iostream>
 
@@ -18,24 +18,24 @@
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// The local_list is an HPX component.
+    /// The local_set is an HPX component.
     ///
     template <typename List>
-    class HPX_COMPONENT_EXPORT local_list
-      : public simple_component_base<local_list<List> >
+    class HPX_COMPONENT_EXPORT local_set
+      : public simple_component_base<local_set<List> >
     {
     private:
-        typedef simple_component_base<local_list> base_type;
+        typedef simple_component_base<local_set> base_type;
         
     public:
-        local_list();
+        local_set();
         
-        //typedef local_list::server::local_list wrapping_type;
-        typedef hpx::components::server::local_list<List> wrapping_type;
+        //typedef local_set::server::local_set wrapping_type;
+        typedef hpx::components::server::local_set<List> wrapping_type;
         
         enum actions
         {
-            local_list_append = 0
+            local_set_append = 0
         };
         
         ///////////////////////////////////////////////////////////////////////
@@ -50,11 +50,11 @@ namespace hpx { namespace components { namespace server
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::result_action1<
-            local_list, int, local_list_append, List, &local_list::append
+            local_set, int, local_set_append, List, &local_set::append
         > append_action;
 
     private:
-        List local_list_;
+        List local_set_;
     };
 
 }}}

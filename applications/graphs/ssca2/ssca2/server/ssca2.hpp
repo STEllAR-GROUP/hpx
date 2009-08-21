@@ -16,7 +16,7 @@
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
 #include <hpx/components/graph/graph.hpp>
-#include <hpx/components/distributed_list/distributed_list.hpp>
+#include <hpx/components/distributed_set/distributed_set.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
@@ -95,26 +95,26 @@ namespace hpx { namespace components { namespace server
             }
         };
 
-        typedef std::vector<edge> edge_list_type;
+        typedef std::vector<edge> edge_set_type;
         typedef distributing_factory::locality_result locality_result;
 
-        typedef distributed_list<edge_list_type> dist_edge_list_type;
+        typedef distributed_set<edge_set_type> dist_edge_set_type;
 
-        typedef std::vector<graph_foo> graph_list_type;
-        typedef distributed_list<graph_list_type> dist_graph_list_type;
+        typedef std::vector<graph_foo> graph_set_type;
+        typedef distributed_set<graph_set_type> dist_graph_set_type;
 
         int
         large_set(naming::id_type G,
-                  naming::id_type dist_edge_list);
+                  naming::id_type dist_edge_set);
 
         int
-        large_set_local(locality_result local_list,
-                        naming::id_type edge_list,
+        large_set_local(locality_result local_set,
+                        naming::id_type edge_set,
                         naming::id_type local_max_lco,
                         naming::id_type global_max_lco);
 
         int
-        extract(naming::id_type edge_list,
+        extract(naming::id_type edge_set,
                 naming::id_type subgraphs);
 
         int

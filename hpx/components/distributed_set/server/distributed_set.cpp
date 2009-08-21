@@ -13,52 +13,52 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
-#include "distributed_list.hpp"
-#include "../stubs/distributed_list.hpp"
+#include "distributed_set.hpp"
+#include "../stubs/distributed_set.hpp"
 
-#include "../local_list.hpp"
-#include "../server/local_list.hpp"
-#include "../stubs/local_list.hpp"
+#include "../local_set.hpp"
+#include "../server/local_set.hpp"
+#include "../stubs/local_set.hpp"
 
-// Needs this to define edge_list_type
+// Needs this to define edge_set_type
 #include "../../../../applications/graphs/ssca2/ssca2/ssca2.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::server::distributed_list<
-    hpx::components::server::ssca2::edge_list_type
-> distributed_edge_list_type;
+typedef hpx::components::server::distributed_set<
+    hpx::components::server::ssca2::edge_set_type
+> distributed_edge_set_type;
 
-typedef hpx::components::server::distributed_list<
-    hpx::components::server::ssca2::graph_list_type
-> distributed_graph_list_type;
+typedef hpx::components::server::distributed_set<
+    hpx::components::server::ssca2::graph_set_type
+> distributed_graph_set_type;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Serialization support for the distributed_list actions
+// Serialization support for the distributed_set actions
 
 HPX_REGISTER_ACTION_EX(
-    distributed_edge_list_type::get_local_action,
-    distributed_edge_list_get_local_action);
+    distributed_edge_set_type::get_local_action,
+    distributed_edge_set_get_local_action);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<distributed_edge_list_type>,
-    distributed_edge_list);
-HPX_DEFINE_GET_COMPONENT_TYPE(distributed_edge_list_type);
+    hpx::components::simple_component<distributed_edge_set_type>,
+    distributed_edge_set);
+HPX_DEFINE_GET_COMPONENT_TYPE(distributed_edge_set_type);
 
 HPX_REGISTER_ACTION_EX(
-    distributed_graph_list_type::get_local_action,
-    distributed_graph_list_get_local_action);
+    distributed_graph_set_type::get_local_action,
+    distributed_graph_set_get_local_action);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<distributed_graph_list_type>,
-    distributed_graph_list);
-HPX_DEFINE_GET_COMPONENT_TYPE(distributed_graph_list_type);
+    hpx::components::simple_component<distributed_graph_set_type>,
+    distributed_graph_set);
+HPX_DEFINE_GET_COMPONENT_TYPE(distributed_graph_set_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
     template <typename List>
-    distributed_list<List>::distributed_list() {}
+    distributed_set<List>::distributed_set() {}
     
     template <typename List>
-    naming::id_type distributed_list<List>::get_local(naming::id_type locale)
+    naming::id_type distributed_set<List>::get_local(naming::id_type locale)
     {
         std::cout << "Getting local sublist at " << locale <<  std::endl;
 
@@ -69,14 +69,14 @@ namespace hpx { namespace components { namespace server
             std::cout << "Need to make new sublist" << std::endl;
 
             // Create a new sub list there
-            typedef ssca2::edge_list_type edge_list_type;
-            typedef hpx::components::local_list<edge_list_type> local_list_type;
+            typedef ssca2::edge_set_type edge_set_type;
+            typedef hpx::components::local_set<edge_set_type> local_set_type;
 
-            local_list_type edge_list(local_list_type::create(locale));
+            local_set_type edge_set(local_set_type::create(locale));
 
             std::cout << "Created local sublist" << std::endl;
 
-            map_[locale] = edge_list.get_gid();
+            map_[locale] = edge_set.get_gid();
 
             std::cout << "Sending local sublist gid" << std::endl;
 
