@@ -16,8 +16,10 @@ set (ssca2_SOURCES
     reduce_max.cpp)
 
 set(ssca2_DEPENDENCIES
+	props_component
     graph_component
     distributed_set_component
+    distributed_map_component
     distributing_factory_component
     vertex_component)
 

@@ -12,7 +12,8 @@
 #LINK_DIRECTORIES(${Boost_LIBRARY_DIR})
 
 set(ssca_SUDIRS 
-    ssca2)
+    ssca2
+    props)
     
 foreach(subdir ${ssca_SUDIRS})
     add_subdirectory(${subdir})

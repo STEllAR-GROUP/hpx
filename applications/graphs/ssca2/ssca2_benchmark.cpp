@@ -10,9 +10,12 @@
 #include <time.h>
 
 #include <hpx/hpx.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/components/graph/graph.hpp>
 #include <hpx/components/vertex/vertex.hpp>
 #include <hpx/components/distributed_set/distributed_set.hpp>
+
+#include <hpx/components/distributed_map/distributed_map.hpp>
 
 #include "ssca2/ssca2.hpp"
 
@@ -21,6 +24,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 #include <boost/unordered_map.hpp>
+
+#define LSSCA_(lvl) LAPP_(lvl) << " [SSCA] "
 
 using namespace hpx;
 using namespace std;
@@ -36,7 +41,7 @@ threads::thread_state hpx_main(int scale, int edge_factor,
     double a_, b_, c_, d_;
     std::size_t order, size;
     boost::unordered_map<int64_t, int64_t> known_edges;
-    int type_max = 32;
+    int type_max = 16;
     int status = -1;
 
     typedef hpx::components::server::graph::init_action     graph_init_action;
@@ -45,11 +50,10 @@ threads::thread_state hpx_main(int scale, int edge_factor,
     typedef hpx::components::server::graph::add_edge_action graph_add_edge_action;
 
     // Print info message
-    std::cout << "R-MAT Scalable Graph Generator\n";
-    std::cout << "Scale: " << scale << "\n";
-    std::cout << "(A,B,C,D) = " << setprecision(2)
-              << "(" << a << ", " << b << ", " << c << ", " << d << ")"
-              << std::endl;
+    LSSCA_(info) << "R-MAT Scalable Graph Generator";
+    LSSCA_(info) << "Scale: " << scale;
+    LSSCA_(info) << "(A,B,C,D) = " << setprecision(2)
+              << "(" << a << ", " << b << ", " << c << ", " << d << ")";
 
     // Setup
     order = 1 << scale;
@@ -144,7 +148,7 @@ threads::thread_state hpx_main(int scale, int edge_factor,
     //    infile - the file containing the graph data
     // Output:
     //    G = the graph containing the graph data
-
+    //
     // G = graph()
     // for_each(infile.lines(), add_edge_from_line)
 
@@ -153,16 +157,14 @@ threads::thread_state hpx_main(int scale, int edge_factor,
     //    G - the graph read in from Kernel 1
     // Output:
     //    edge_set - the list of maximal edges
-
+    //
     // edges = filter(G.edges(), max_edge)
 
-    /*
     typedef hpx::components::server::ssca2::edge_set_type edge_set_type;
     typedef distributed_set<edge_set_type> dist_edge_set_type;
     dist_edge_set_type edge_set (dist_edge_set_type::create(here));
 
     SSCA2.large_set(G.get_gid(), edge_set.get_gid());
-    */
 
     // Kernel 3: graph extraction
     // Input:
@@ -171,18 +173,16 @@ threads::thread_state hpx_main(int scale, int edge_factor,
     //     d - the SubGraphPathLength
     // Output:
     //     subgraphs - the list of subgraphs extracted from G
-
+    //
     // subgraphs = map(edges, extract_subgraph)
 
-    /*
     typedef hpx::components::server::ssca2::graph_set_type graph_set_type;
     typedef distributed_set<graph_set_type> dist_graph_set_type;
     dist_graph_set_type subgraphs(dist_graph_set_type::create(here));
 
     SSCA2.extract(edge_set.get_gid(), subgraphs.get_gid());
-    */
 
-    // Kernel 4: ???
+    // Kernel 4: ...
 
     // Free the graph component
     G.free();

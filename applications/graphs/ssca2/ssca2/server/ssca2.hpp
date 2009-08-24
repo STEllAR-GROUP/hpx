@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -17,6 +18,14 @@
 
 #include <hpx/components/graph/graph.hpp>
 #include <hpx/components/distributed_set/distributed_set.hpp>
+
+#include <hpx/components/distributed_map/distributed_map.hpp>
+#include <hpx/components/distributed_map/local_map.hpp>
+
+#include "boost/serialization/map.hpp"
+
+#include <hpx/lcos/mutex.hpp>
+#include <hpx/util/spinlock_pool.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
@@ -40,7 +49,10 @@ namespace hpx { namespace components { namespace server
             ssca2_large_set = 0,
             ssca2_large_set_local = 1,
             ssca2_extract = 2,
-            ssca2_extract_subgraph = 3
+            ssca2_extract_local = 3,
+            ssca2_extract_subgraph = 4,
+            ssca2_init_props_map = 5,
+            ssca2_init_props_map_local = 6
         };
         
         ///////////////////////////////////////////////////////////////////////
@@ -55,6 +67,11 @@ namespace hpx { namespace components { namespace server
             graph_foo(naming::id_type const& G)
               : G_(G)
               {}
+
+            bool operator<(const graph_foo& that)
+            {
+                return this->G_ < that.G_;
+            }
 
             naming::id_type G_;
 
@@ -80,6 +97,13 @@ namespace hpx { namespace components { namespace server
               : source_(source), target_(target), label_(label)
             {}
 
+            bool operator<(const edge& that)
+            {
+                return (this->source_ < that.source_)
+                       && (this->target_ < that.target_)
+                       && (this->label_ < that.label_);
+            }
+
             naming::id_type source_;
             naming::id_type target_;
             int label_;
@@ -95,6 +119,45 @@ namespace hpx { namespace components { namespace server
             }
         };
 
+        struct props
+        {
+        private:
+            struct tag {};
+            typedef hpx::util::spinlock_pool<tag> mutex_type;
+
+        public:
+            props()
+              : color_(0)
+            {}
+
+            int color_black()
+            {
+                mutex_type::scoped_lock l(this);
+
+                if (color_ == 0)
+                {
+                    color_ = 1;
+                    return 1;
+                }
+
+                return 0;
+            }
+
+        private:
+            int color_;
+
+        private:
+            // serialization support
+            friend class boost::serialization::access;
+
+            template<class Archive>
+            void serialize(Archive& ar, const unsigned int)
+            {
+                ar & color_;
+            }
+
+        };
+
         typedef std::vector<edge> edge_set_type;
         typedef distributing_factory::locality_result locality_result;
 
@@ -102,6 +165,10 @@ namespace hpx { namespace components { namespace server
 
         typedef std::vector<graph_foo> graph_set_type;
         typedef distributed_set<graph_set_type> dist_graph_set_type;
+
+        typedef std::map<naming::id_type,naming::id_type> gids_map_type;
+        typedef distributed_map<gids_map_type> dist_gids_map_type;
+        typedef local_map<gids_map_type> local_gids_map_type;
 
         int
         large_set(naming::id_type G,
@@ -118,10 +185,23 @@ namespace hpx { namespace components { namespace server
                 naming::id_type subgraphs);
 
         int
+        extract_local(naming::id_type local_edge_set,
+                      naming::id_type subgraphs);
+
+        int
         extract_subgraph(naming::id_type H,
+                         naming::id_type pmap,
                          naming::id_type source,
                          naming::id_type vertex,
                          int d);
+
+        int
+        init_props_map(naming::id_type P,
+                       naming::id_type G);
+
+        int
+        init_props_map_local(naming::id_type local_props,
+                             locality_result local_vertices);
 
         typedef hpx::actions::result_action2<
             ssca2, int, ssca2_large_set,
@@ -141,12 +221,29 @@ namespace hpx { namespace components { namespace server
             &ssca2::extract
         > extract_action;
 
-        typedef hpx::actions::result_action4<
+        typedef hpx::actions::result_action2<
+            ssca2, int, ssca2_extract_local,
+            naming::id_type, naming::id_type,
+            &ssca2::extract_local
+        > extract_local_action;
+
+        typedef hpx::actions::result_action5<
             ssca2, int, ssca2_extract_subgraph,
-            naming::id_type, naming::id_type, naming::id_type, int,
+            naming::id_type, naming::id_type, naming::id_type, naming::id_type, int,
             &ssca2::extract_subgraph
         > extract_subgraph_action;
 
+        typedef hpx::actions::result_action2<
+            ssca2, int, ssca2_init_props_map,
+            naming::id_type, naming::id_type,
+            &ssca2::init_props_map
+        > init_props_map_action;
+
+        typedef hpx::actions::result_action2<
+            ssca2, int, ssca2_init_props_map_local,
+            naming::id_type, locality_result,
+            &ssca2::init_props_map_local
+        > init_props_map_local_action;
     };
 
 }}}
