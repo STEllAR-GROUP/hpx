@@ -37,6 +37,11 @@ namespace hpx { namespace components
         {
             return this->base_type::append(this->gid_, list);
         }
+
+        List get(void)
+        {
+            return this->base_type::get(this->gid_);
+        }
     };
     
 }}

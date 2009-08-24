@@ -38,6 +38,9 @@ typedef hpx::components::server::distributed_set<
 HPX_REGISTER_ACTION_EX(
     distributed_edge_set_type::get_local_action,
     distributed_edge_set_get_local_action);
+HPX_REGISTER_ACTION_EX(
+    distributed_edge_set_type::locals_action,
+    distributed_edge_set_locals_action);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<distributed_edge_set_type>,
     distributed_edge_set);
@@ -46,6 +49,9 @@ HPX_DEFINE_GET_COMPONENT_TYPE(distributed_edge_set_type);
 HPX_REGISTER_ACTION_EX(
     distributed_graph_set_type::get_local_action,
     distributed_graph_set_get_local_action);
+HPX_REGISTER_ACTION_EX(
+    distributed_graph_set_type::locals_action,
+    distributed_graph_set_locals_action);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<distributed_graph_set_type>,
     distributed_graph_set);
@@ -77,6 +83,7 @@ namespace hpx { namespace components { namespace server
             std::cout << "Created local sublist" << std::endl;
 
             map_[locale] = edge_set.get_gid();
+            locals_.push_back(map_[locale]);
 
             std::cout << "Sending local sublist gid" << std::endl;
 
@@ -86,6 +93,14 @@ namespace hpx { namespace components { namespace server
         {
             return map_[locale];
         }
+    }
+
+    template <typename List>
+    std::vector<naming::id_type> distributed_set<List>::locals(void)
+    {
+        std::cout << "Getting coverage of distributed set" << std::endl;
+
+        return locals_;
     }
 
 }}}

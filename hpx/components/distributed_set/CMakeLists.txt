@@ -15,6 +15,7 @@ set (distributed_set_HEADERS
 
 set (distributed_set_SOURCES
     distributed_set.cpp
+    local_set.cpp
     server/distributed_set.cpp
     server/local_set.cpp)
 

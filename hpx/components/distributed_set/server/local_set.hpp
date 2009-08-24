@@ -35,7 +35,8 @@ namespace hpx { namespace components { namespace server
         
         enum actions
         {
-            local_set_append = 0
+            local_set_append = 0,
+            local_set_get = 1
         };
         
         ///////////////////////////////////////////////////////////////////////
@@ -45,6 +46,8 @@ namespace hpx { namespace components { namespace server
 
         int append(List);
 
+        List get(void);
+
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
@@ -52,6 +55,10 @@ namespace hpx { namespace components { namespace server
         typedef hpx::actions::result_action1<
             local_set, int, local_set_append, List, &local_set::append
         > append_action;
+
+        typedef hpx::actions::result_action0<
+            local_set, List, local_set_get, &local_set::get
+        > get_action;
 
     private:
         List local_set_;

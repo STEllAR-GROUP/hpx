@@ -35,6 +35,13 @@ namespace hpx { namespace components { namespace stubs
                 action_type;
             return lcos::eager_future<action_type>(gid, locale).get();
         }
+
+        static std::vector<naming::id_type>
+        locals(naming::id_type gid)
+        {
+            typedef typename server::distributed_set<List>::locals_action action_type;
+            return lcos::eager_future<action_type>(gid).get();
+        }
     };
 
 }}}

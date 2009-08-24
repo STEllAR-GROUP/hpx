@@ -45,6 +45,11 @@ namespace hpx { namespace components
         {
             return this->base_type::get_local(this->gid_, locale);
         }
+
+        std::vector<naming::id_type> locals(void)
+        {
+            return this->base_type::locals(this->gid_);
+        }
     };
     
 }}

@@ -34,14 +34,18 @@ namespace hpx { namespace components { namespace server
         
         enum actions
         {
-            distributed_set_get_local = 0
+            distributed_set_get_local = 0,
+            distributed_set_locals = 1
         };
         
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
+
         typedef List list_type;
 
         naming::id_type get_local(naming::id_type);
+
+        std::vector<naming::id_type> locals(void);
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
@@ -53,9 +57,15 @@ namespace hpx { namespace components { namespace server
             &distributed_set::get_local
         > get_local_action;
 
+        typedef hpx::actions::result_action0<
+            distributed_set, std::vector<naming::id_type>, distributed_set_locals,
+            &distributed_set::locals
+        > locals_action;
+
     private:
         // Map from locale to its local_set
         std::map<naming::id_type,naming::id_type> map_;
+        std::vector<naming::id_type> locals_;
     };
 
 }}}
