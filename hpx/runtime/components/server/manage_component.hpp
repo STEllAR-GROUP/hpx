@@ -95,10 +95,11 @@ namespace hpx { namespace components { namespace server
             // FIXME: should the component be re-bound ?
             HPX_OSSTREAM strm;
             strm << "global id " << gid << " is not bound to a component "
-                    "instance of type: " << get_component_type_name(type);
+                    "instance of type: " << get_component_type_name(type)
+                 << " (it is bound to a " << get_component_type_name(addr.type_) 
+                 << ")";
             HPX_THROWS_IF(ec, hpx::unknown_component_address,
-                "destroy<Component>", 
-                HPX_OSSTREAM_GETSTRING(strm));
+                "destroy<Component>", HPX_OSSTREAM_GETSTRING(strm));
             return;
         }
 
