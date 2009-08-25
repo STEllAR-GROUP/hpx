@@ -48,4 +48,7 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     dynamic_stencil_value_double_type::wrapped_type::set_functional_component_action,
     dynamic_stencil_value_double_set_functional_component_action);
+HPX_REGISTER_ACTION_EX(
+    dynamic_stencil_value_double_type::wrapped_type::start_action,
+    dynamic_stencil_value_double_start_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(dynamic_stencil_value_double_type::wrapped_type);

@@ -68,6 +68,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             dynamic_stencil_value_get_output_ports = 1,
             dynamic_stencil_value_connect_input_ports = 2,
             dynamic_stencil_value_set_functional_component = 3,
+            dynamic_stencil_value_start = 4,
         };
 
         /// Main thread function looping through all timesteps
@@ -97,6 +98,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         void set_functional_component(naming::id_type const& gid, int row, 
             int column, int stencilsize);
 
+        void start();
+
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
@@ -121,6 +124,11 @@ namespace hpx { namespace components { namespace amr { namespace server
             naming::id_type const&, int, int, int,
             &dynamic_stencil_value::set_functional_component
         > set_functional_component_action;
+
+        typedef hpx::actions::action0<
+            dynamic_stencil_value, dynamic_stencil_value_start, 
+            &dynamic_stencil_value::start
+        > start_action;
 
     private:
         bool is_called_;                              // is one of the 'main' stencils

@@ -85,6 +85,8 @@ namespace hpx { namespace components { namespace amr { namespace server
     // result
     inline naming::id_type dynamic_stencil_value::call(naming::id_type const& initial)
     {
+        start();
+
         is_called_ = true;
 
         // this needs to have been initialized
@@ -288,7 +290,12 @@ namespace hpx { namespace components { namespace amr { namespace server
             out_[i].reset(new out_adaptor_type(
                 boost::bind(&dynamic_stencil_value::get_value, this, i)));
         }
-
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////
+    inline void 
+    dynamic_stencil_value::start()
+    {
         // if all inputs have been bound already we need to start the driver 
         // thread
         if (0 == driver_thread_) {

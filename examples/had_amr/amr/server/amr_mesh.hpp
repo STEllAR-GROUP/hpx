@@ -97,6 +97,8 @@ namespace hpx { namespace components { namespace amr { namespace server
             std::vector<naming::id_type> const& initial_data, 
             std::vector<naming::id_type>& result_data);
 
+        static void start_row(distributed_iterator_range_type const& stencils);
+
     private:
         std::size_t numvalues_;
     };

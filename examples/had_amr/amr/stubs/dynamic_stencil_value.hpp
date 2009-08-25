@@ -92,6 +92,17 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             action_type;
             applier::apply<action_type>(gid, functiongid, row, column, stencilsize);
         }
+        
+        ///////////////////////////////////////////////////////////////////////
+        /// Subset of set_functional_component
+        /// functionality
+        static lcos::future_value<void> start_async(naming::id_type const& gid)
+        {
+            typedef
+                amr::server::dynamic_stencil_value::start_action 
+            action_type;
+            return lcos::eager_future<action_type, void>(gid);
+        }
     };
 
 }}}}

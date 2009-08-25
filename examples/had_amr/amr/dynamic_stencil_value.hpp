@@ -81,6 +81,14 @@ namespace hpx { namespace components { namespace amr
             this->base_type::set_functional_component(this->gid_, functiongid, 
                 row, column, stencilsize);
         }
+        
+        ///////////////////////////////////////////////////////////////////////
+        /// Subset of set_functional_component
+        /// functionality
+        void start()
+        {
+            this->base_type::start_async(this->gid_);
+        }
     };
 
 }}}

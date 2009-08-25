@@ -202,6 +202,30 @@ namespace hpx { namespace components { namespace amr { namespace server
             result_data.push_back((*lit).get());
         }
     }
+    
+    ///////////////////////////////////////////////////////////////////////////////
+    // 
+    void amr_mesh::start_row(
+        components::distributing_factory::iterator_range_type const& stencils)
+    {
+        // start the execution of all stencil stencils (data items)
+        typedef std::vector<lcos::future_value< void > > lazyvals_type;
+
+        lazyvals_type lazyvals;
+        components::distributing_factory::iterator_type stencil = stencils.first;
+        for (std::size_t i = 0; stencil != stencils.second; ++stencil, ++i)
+        {
+            lazyvals.push_back(components::amr::stubs::dynamic_stencil_value::
+                start_async(*stencil));
+        }
+
+        // now wait for the results
+        lazyvals_type::iterator lend = lazyvals.end();
+        for (lazyvals_type::iterator lit = lazyvals.begin(); lit != lend; ++lit) 
+        {
+            (*lit).get();
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /// This is the main entry point of this component. 
@@ -251,6 +275,9 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // connect output gids with corresponding stencil inputs
         connect_input_ports(stencils, outputs);
+
+        // for loop over second row ; call start for each
+        start_row(locality_results(stencils[1]));
 
         // prepare initial data
         std::vector<naming::id_type> initial_data;
