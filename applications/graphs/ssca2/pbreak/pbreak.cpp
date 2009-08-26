@@ -13,18 +13,17 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
-#include <hpx/lcos/reduce_max.hpp>
+#include <applications/graphs/ssca2/pbreak/pbreak.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::lcos::detail::reduce_max reduce_max_type;
+typedef hpx::lcos::detail::pbreak pbreak_type;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Serialization support for the reduce_max LCO actions
+// Serialization support for the parallel break LCO actions
 
-// These could go somewhere else ... but where?
-HPX_DEFINE_GET_ACTION_NAME(reduce_max_type);
-HPX_REGISTER_ACTION_EX(reduce_max_type::signal_action,
-                       reduce_max_signal_action);
-HPX_REGISTER_ACTION_EX(reduce_max_type::wait_action,
-                       reduce_max_wait_action);
-HPX_DEFINE_GET_COMPONENT_TYPE(reduce_max_type);
+HPX_DEFINE_GET_ACTION_NAME(pbreak_type);
+HPX_REGISTER_ACTION_EX(pbreak_type::signal_action,
+                       pbreak_signal_action);
+HPX_REGISTER_ACTION_EX(pbreak_type::wait_action,
+                       pbreak_wait_action);
+HPX_DEFINE_GET_COMPONENT_TYPE(pbreak_type);

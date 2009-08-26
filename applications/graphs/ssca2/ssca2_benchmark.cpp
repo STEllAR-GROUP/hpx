@@ -118,7 +118,7 @@ threads::thread_state hpx_main(int scale, int edge_factor,
 
         // Use hash table to catch duplicate edges
         int64_t key = (x-1)*order + (y-1);
-        if (known_edges.find(key) == known_edges.end())
+        if (x-1 != y-1 && known_edges.find(key) == known_edges.end())
         {
            known_edges[key] = key;
            results.push_back(
@@ -181,6 +181,8 @@ threads::thread_state hpx_main(int scale, int edge_factor,
     dist_graph_set_type subgraphs(dist_graph_set_type::create(here));
 
     SSCA2.extract(edge_set.get_gid(), subgraphs.get_gid());
+
+    LSSCA_(info) << "Completed Kernel 3";
 
     // Kernel 4: ...
 

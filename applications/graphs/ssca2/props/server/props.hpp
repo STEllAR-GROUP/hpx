@@ -15,6 +15,10 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
+#include <hpx/lcos/mutex.hpp>
+#include <hpx/util/spinlock_pool.hpp>
+#include <hpx/util/unlock_lock.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server 
 {
@@ -24,6 +28,10 @@ namespace hpx { namespace components { namespace server
     class props
       : public components::detail::managed_component_base<props>
     {
+    private:
+        struct tag {};
+        typedef hpx::util::spinlock_pool<tag> mutex_type;
+
     public:
         // parcel action code: the action to be performed on the destination 
         // object (the props)
@@ -48,10 +56,14 @@ namespace hpx { namespace components { namespace server
 
         int color(int d)
         {
+            mutex_type::scoped_lock l(this);
+
             if (d > color_)
             {
-                color_ = d-1;
+                color_ = d;
             }
+
+            util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
 
             return color_;
         }

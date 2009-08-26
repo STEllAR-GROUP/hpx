@@ -12,11 +12,12 @@ set (ssca2_HEADERS
 
 set (ssca2_SOURCES
     ssca2.cpp
-    server/ssca2.cpp
-    reduce_max.cpp)
+    server/ssca2.cpp)
 
 set(ssca2_DEPENDENCIES
-	props_component
+    reduce_max_component
+	  pbreak_component
+	  props_component
     graph_component
     distributed_set_component
     distributed_map_component

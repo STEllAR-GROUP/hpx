@@ -24,6 +24,8 @@
 
 #include "boost/serialization/map.hpp"
 
+#include "../../pbreak/pbreak.hpp"
+
 #include <hpx/lcos/mutex.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 
@@ -158,6 +160,50 @@ namespace hpx { namespace components { namespace server
 
         };
 
+        struct pbreak_closure
+        {
+        public:
+            pbreak_closure()
+              : gid_(naming::invalid_id), partial_(0)
+            {}
+
+            pbreak_closure(naming::id_type gid, int partial)
+              : gid_(gid), partial_(partial)
+            {}
+
+            void update(int partial)
+            {
+                partial_ += partial;
+            }
+
+            void signal(void)
+            {
+                // Asynchronous on signal
+                applier::apply<lcos::detail::pbreak::signal_action>(gid_,partial_);
+            }
+
+            int wait(void)
+            {
+                // Synchronous on the wait
+                //applier::apply<lcos::detail::pbreak::wait_action>(gid_);
+                return lcos::eager_future<lcos::detail::pbreak::wait_action>(gid_).get();
+            }
+
+        private:
+            naming::id_type gid_;
+            int partial_;
+
+        private:
+            // serialization support
+            friend class boost::serialization::access;
+
+            template<class Archive>
+            void serialize(Archive& ar, const unsigned int)
+            {
+                ar & gid_ & partial_;
+            }
+        };
+
         typedef std::vector<edge> edge_set_type;
         typedef distributing_factory::locality_result locality_result;
 
@@ -193,7 +239,8 @@ namespace hpx { namespace components { namespace server
                          naming::id_type pmap,
                          naming::id_type source,
                          naming::id_type vertex,
-                         int d);
+                         int d,
+                         pbreak_closure s);
 
         int
         init_props_map(naming::id_type P,
@@ -227,9 +274,9 @@ namespace hpx { namespace components { namespace server
             &ssca2::extract_local
         > extract_local_action;
 
-        typedef hpx::actions::result_action5<
+        typedef hpx::actions::result_action6<
             ssca2, int, ssca2_extract_subgraph,
-            naming::id_type, naming::id_type, naming::id_type, naming::id_type, int,
+            naming::id_type, naming::id_type, naming::id_type, naming::id_type, int, pbreak_closure,
             &ssca2::extract_subgraph
         > extract_subgraph_action;
 
