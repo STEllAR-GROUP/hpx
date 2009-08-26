@@ -14,6 +14,10 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 
+#include <hpx/lcos/mutex.hpp>
+#include <hpx/util/spinlock_pool.hpp>
+#include <hpx/util/unlock_lock.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
@@ -64,6 +68,7 @@ namespace hpx { namespace components { namespace server
 
     private:
         // Map from locale to its local_map
+        hpx::lcos::mutex mtx_;
         std::map<naming::id_type,naming::id_type> map_;
         std::vector<naming::id_type> locals_;
     };

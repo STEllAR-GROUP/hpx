@@ -28,9 +28,11 @@ namespace hpx { namespace components { namespace server
     class HPX_COMPONENT_EXPORT local_map
       : public simple_component_base<local_map<List> >
     {
+          /*
     private:
         struct tag {};
         typedef hpx::util::spinlock_pool<tag> mutex_type;
+        */
     private:
         typedef simple_component_base<local_map> base_type;
         
@@ -75,6 +77,8 @@ namespace hpx { namespace components { namespace server
         > value_action;
 
     private:
+        hpx::lcos::mutex mtx_;
+        naming::id_type dist_map_;
         List local_map_;
     };
 
