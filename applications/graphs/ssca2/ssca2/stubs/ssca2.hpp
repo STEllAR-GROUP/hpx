@@ -77,11 +77,10 @@ namespace hpx { namespace components { namespace stubs
                          naming::id_type pmap,
                          naming::id_type source,
                          naming::id_type target,
-                         int d,
-                         server::ssca2::pbreak_closure s)
+                         int d)
         {
             typedef server::ssca2::extract_subgraph_action action_type;
-            return lcos::eager_future<action_type>(gid, H, pmap, source, target, d, s).get();
+            return lcos::eager_future<action_type>(gid, H, pmap, source, target, d).get();
         }
 
         static int

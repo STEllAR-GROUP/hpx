@@ -187,6 +187,7 @@ threads::thread_state hpx_main(int scale, int edge_factor,
     // Kernel 4: ...
 
     // Free the graph component
+    subgraphs.free();
     G.free();
     
     // Shut down runtime services

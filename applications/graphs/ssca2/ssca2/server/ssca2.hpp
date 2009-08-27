@@ -239,8 +239,7 @@ namespace hpx { namespace components { namespace server
                          naming::id_type pmap,
                          naming::id_type source,
                          naming::id_type vertex,
-                         int d,
-                         pbreak_closure s);
+                         int d);
 
         int
         init_props_map(naming::id_type P,
@@ -274,9 +273,9 @@ namespace hpx { namespace components { namespace server
             &ssca2::extract_local
         > extract_local_action;
 
-        typedef hpx::actions::result_action6<
+        typedef hpx::actions::result_action5<
             ssca2, int, ssca2_extract_subgraph,
-            naming::id_type, naming::id_type, naming::id_type, naming::id_type, int, pbreak_closure,
+            naming::id_type, naming::id_type, naming::id_type, naming::id_type, int,
             &ssca2::extract_subgraph
         > extract_subgraph_action;
 
@@ -291,6 +290,7 @@ namespace hpx { namespace components { namespace server
             naming::id_type, locality_result,
             &ssca2::init_props_map_local
         > init_props_map_local_action;
+
     };
 
 }}}

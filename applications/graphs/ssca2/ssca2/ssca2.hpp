@@ -64,10 +64,10 @@ namespace hpx { namespace components
         }
 
         int
-        extract_subgraph(naming::id_type H, naming::id_type pmap, naming::id_type source, naming::id_type target, int d, server::ssca2::pbreak_closure s)
+        extract_subgraph(naming::id_type H, naming::id_type pmap, naming::id_type source, naming::id_type target, int d)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::extract_subgraph(gid_, H, pmap, source, target, d, s);
+            return this->base_type::extract_subgraph(gid_, H, pmap, source, target, d);
         }
 
         int

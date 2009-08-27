@@ -70,7 +70,6 @@ HPX_REGISTER_ACTION_EX(
 HPX_DEFINE_GET_COMPONENT_TYPE(create_edge_set_type);
 
 #define LSSCA_(lvl) LAPP_(lvl) << " [SSCA] "
-//#define LSSCA_(lvl) std::cout
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
@@ -80,7 +79,7 @@ namespace hpx { namespace components { namespace server
     int
     ssca2::large_set(naming::id_type G, naming::id_type dist_edge_set)
     {
-        LSSCA_(info) << "Starting Kernel 2";
+        LSSCA_(info) << "large_set(" << G << ", " << dist_edge_set << ")";
 
         typedef components::distributing_factory::result_type result_type;
 
@@ -133,7 +132,8 @@ namespace hpx { namespace components { namespace server
                              naming::id_type local_max_lco,
                              naming::id_type global_max_lco)
     {
-        LSSCA_(info) << "Processing local set";
+        LSSCA_(info) << "large_set_local(local_vertex_set, " << edge_set
+                     << ", " << local_max_lco << ", " << global_max_lco << ")";
 
         int max = -1;
         int num_added = 0;
@@ -216,20 +216,21 @@ namespace hpx { namespace components { namespace server
     int
     ssca2::extract(naming::id_type edge_set, naming::id_type subgraphs)
     {
-        LSSCA_(info) << "Extracting subgraphs";
+        LSSCA_(info) << "extract(" << edge_set
+                     << ", " << subgraphs << ")";
 
         typedef distributed_set<ssca2::graph_set_type>
             distributed_graph_set_type;
         typedef distributed_set<ssca2::edge_set_type>
             distributed_edge_set_type;
 
+        std::vector<lcos::future_value<int> > results;
+
         // Get vector of local sublists of the edge set
         std::vector<naming::id_type> locals =
             lcos::eager_future<
                 distributed_edge_set_type::locals_action
             >(edge_set).get();
-
-        std::vector<lcos::future_value<int> > results;
 
         // Spawn extract_local local to each sublist of the edge set
         std::vector<naming::id_type>::const_iterator end = locals.end();
@@ -238,7 +239,6 @@ namespace hpx { namespace components { namespace server
         {
             // This uses hack to get prefix
             naming::id_type locale(boost::uint64_t((*it).get_msb()) << 32, 0);
-            //naming::id_type locale(naming::get_prefix_from_id(*it));
 
             // Get colocated portion of subgraphs set
             naming::id_type local_subgraphs =
@@ -246,19 +246,19 @@ namespace hpx { namespace components { namespace server
                     distributed_graph_set_type::get_local_action
                 >(subgraphs, locale).get();
 
+            // Spawn actions local to data
             results.push_back(lcos::eager_future<
                 extract_local_action
             >(locale, *it, local_subgraphs));
         }
 
+        // Collect notifications that local actions have finished
         std::vector<lcos::future_value<int> >::iterator rend = results.end();
         for (std::vector<lcos::future_value<int> >::iterator rit = results.begin();
              rit != rend; ++rit)
         {
             (*rit).get();
         }
-
-        LSSCA_(info) << "There are " << locals.size() << " local lists";
 
         return 0;
     }
@@ -267,7 +267,8 @@ namespace hpx { namespace components { namespace server
     ssca2::extract_local(naming::id_type local_edge_set,
                          naming::id_type local_subgraphs)
     {
-        LSSCA_(info) << "Extracting subgraphs local to " << local_edge_set;
+        LSSCA_(info) << "extract_local(" << local_edge_set
+                     << ", " << local_subgraphs;
 
         typedef local_set<ssca2::edge_set_type> local_edge_set_type;
         typedef local_set<ssca2::graph_set_type> local_graph_set_type;
@@ -304,15 +305,6 @@ namespace hpx { namespace components { namespace server
         >(local_subgraphs, graph_set_local).get();
 
         // Extract subgraphs for each edge
-
-        // Note: given the semantics of pbreak, we could actually have one
-        // pbreak across all distributed searches, but that would
-        // significantly raise the contention for the single pbreak
-        typedef std::vector<lcos::pbreak> pbreaks;
-        pbreaks p;
-        typedef std::vector<pbreak_closure> syncs;
-        syncs s;
-
         std::vector<lcos::future_value<int> > results;
 
         int i = 0;
@@ -321,42 +313,14 @@ namespace hpx { namespace components { namespace server
              it != end; ++it, ++i)
         {
             naming::id_type H = graphs + i;
-
-            /*
-            // This uses hack to get prefix
-            naming::id_type locale(boost::uint64_t(pmaps[i].get_msb()) << 32,0);
-
-            naming::id_type local_pmap =
-                dist_gids_map_type::get_local(pmaps[i], locale);
-            */
-
             int d = 3; // This should be an argument
 
-            p.push_back(lcos::pbreak());
-            s.push_back(pbreak_closure(p[i].get_gid(),edges.size()-1));
-
-            // Have to push these into a vector, otherwise it tries to return
-            // the result of the action to a future_value that has already
-            // gone out of scope and been destroyed
             results.push_back(lcos::eager_future<
                 extract_subgraph_action
-            >(here, H, pmaps[i], (*it).source_, (*it).target_, d, s[i]));
-
-            LSSCA_(info) << "Sent " << i;
-
+            >(here, H, pmaps[i], (*it).source_, (*it).target_, d));
         }
 
-        LSSCA_(info) << "Done sending ...";
-
-        /*
-        syncs::iterator send = s.end();
-        for (syncs::iterator sit = s.begin(); sit != send; ++sit)
-        {
-            LSSCA_(info) << "Wait ";
-            (*sit).wait();
-        }
-        */
-
+        // Collect notifications that subgraph extractions have finished
         std::vector<lcos::future_value<int> >::iterator rend = results.end();
         for (std::vector<lcos::future_value<int> >::iterator rit = results.begin();
              rit != rend; ++rit)
@@ -364,32 +328,33 @@ namespace hpx { namespace components { namespace server
             (*rit).get();
         }
 
-        LSSCA_(info) << "Done waiting ...";
-
         return 0;
     }
 
     int
     ssca2::extract_subgraph(naming::id_type H, naming::id_type pmap,
                             naming::id_type source, naming::id_type target,
-                            int d, pbreak_closure s)
+                            int d)
     {
         typedef std::map<naming::id_type,naming::id_type> gids_map_type;
         typedef components::stubs::local_map<gids_map_type> local_gids_map_type;
         typedef stubs::distributed_map<gids_map_type> dist_gids_map_type;
 
-        LSSCA_(info) << "Extracting (" << source
-                    << ", " << target << ") " << "to depth of " << d;
+        LSSCA_(info) << "extract_subgraph(" << H << ", " << pmap
+                     << ", " << source << ", " << target << ", " << d << ")";
 
         // Note: execution is local to source
 
         // Get pmap local to source
         // This is a consequence of not really being able to continue
         // the action local to the data
+
         // This uses hack to get prefix
         naming::id_type locale(boost::uint64_t(source.get_msb()) << 32,0);
         naming::id_type local_pmap =
             dist_gids_map_type::get_local(pmap, locale);
+
+        LSSCA_(info) << "Got local pmap " << local_pmap;
 
         // Get source from local_pmap
         components::component_type props_type =
@@ -397,53 +362,42 @@ namespace hpx { namespace components { namespace server
         naming::id_type source_props =
             local_gids_map_type::value(local_pmap, source, props_type);
 
-        LSSCA_(info) << "Source props is " << source_props;
+        LSSCA_(info) << "Got source_props " << source_props;
 
+        // Get the color of the source vertex
         int color =
             lcos::eager_future<
                 server::props::color_action
             >(source_props, d).get();
 
-        LSSCA_(info) << "Color of " << source_props << " is " << color;
-
-        std::vector<lcos::future_value<int> > results;
-
         if (color >= d && d > 1)
         {
             // Continue with the search
-
             std::vector<lcos::future_value<int> > results;
 
             partial_edge_set_type neighbors =
                 lcos::eager_future<vertex::out_edges_action>(target).get();
 
-            LSSCA_(info) << "Visiting " << neighbors.size() << " neighbors";
+            LSSCA_(info) << "Visiting " << neighbors.size()
+                         << " neighbors of target " << target;
 
             partial_edge_set_type::iterator end = neighbors.end();
             for (partial_edge_set_type::iterator it = neighbors.begin();
                  it != end; ++it)
             {
-                s.update(neighbors.size() - 1);
-
                 // Spawn subsequent search
                 results.push_back(lcos::eager_future<
                     ssca2::extract_subgraph_action
-                >(locale, H, pmap, target, (*it).target_, d-1, s));
+                >(locale, H, pmap, target, (*it).target_, d-1));
             }
 
+            // Collect notifications of when subsequent searches are finished
             std::vector<lcos::future_value<int> >::iterator rend = results.end();
             for (std::vector<lcos::future_value<int> >::iterator rit = results.begin();
                  rit != rend; ++rit)
             {
                 (*rit).get();
             }
-        }
-        else
-        {
-            // Notify of end-of-search
-
-            LSSCA_(info) << "Signaling ";
-            //s.signal();
         }
 
         return 0;
