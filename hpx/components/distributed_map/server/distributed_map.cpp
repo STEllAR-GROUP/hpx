@@ -21,7 +21,7 @@
 #include "../server/local_map.hpp"
 #include "../stubs/local_map.hpp"
 
-#define LDIST_MAP_(lvl) LAPP_(lvl) << " [DIST_MAP] "
+#define LDIST_MAP_(lvl) LAPP_(lvl) << " [DIST_MAP] " << gid_ << " "
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -47,62 +47,46 @@ HPX_DEFINE_GET_COMPONENT_TYPE(distributed_gids_map_type);
 namespace hpx { namespace components { namespace server
 {
     template <typename List>
-    distributed_map<List>::distributed_map() {}
+    distributed_map<List>::distributed_map()
+      : gid_(this->base_type::get_gid())
+    {}
     
     template <typename List>
     naming::id_type distributed_map<List>::get_local(naming::id_type locale)
     {
-        naming::id_type value;
+        LDIST_MAP_(info) << "distributed_map<>::get_local(" << locale << ")";
 
-        LDIST_MAP_(info) << "Getting local sublist at " << locale;
-
+        if (map_.count(locale) == 0)
         {
-            lcos::mutex::scoped_lock l(mtx_);
-
-            typename List::iterator it = map_.find(locale);
-            if (it == map_.end())
-            {
-                value = naming::invalid_id;
-                map_[locale] = value;
-            }
-            else
-            {
-                value = it->second;
-            }
-        }
-
-
-        naming::id_type retval = naming::invalid_id;
-
-        // If a list already exists on this locality, return a reference to it
-        // Otherwise, create a new one and return a reference to it
-        if (value == naming::invalid_id)
-        {
-            LDIST_MAP_(info) << "Need to make new sublist";
-
             // Create a new sub list there
             typedef List map_type;
             typedef hpx::components::local_map<map_type> local_map_type;
-
             local_map_type props_map(local_map_type::create(locale));
 
-            LDIST_MAP_(info) << "Created local sublist " << props_map.get_gid();
+            lcos::mutex::scoped_lock l(mtx_);
 
-            map_[locale] = props_map.get_gid();
-            locals_.push_back(map_[locale]);
+            if (map_.count(locale) == 0)
+            {
+                LDIST_MAP_(info) << "Needs to make new sublist";
 
-            LDIST_MAP_(info) << "Sending local sublist gid";
+                //LDIST_MAP_(info) << "Created local sublist " << props_map.get_gid();
 
-            retval = map_[locale];
+                map_[locale] = props_map.get_gid();
+                locals_.push_back(map_[locale]);
+
+                LDIST_MAP_(info) << "Sending local sublist gid";
+            }
+
+            //mtx_.unlock();
+            //return map_[locale];
         }
         else
         {
             LDIST_MAP_(info) << "Returning existing sublist " << map_[locale];
-            retval = map_[locale];
         }
 
-        return retval;
-    }
+        return map_[locale];
+   }
 
     template <typename List>
     std::vector<naming::id_type> distributed_map<List>::locals(void)

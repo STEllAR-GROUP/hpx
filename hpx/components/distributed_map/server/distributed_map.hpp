@@ -67,7 +67,8 @@ namespace hpx { namespace components { namespace server
         > locals_action;
 
     private:
-        // Map from locale to its local_map
+        naming::id_type gid_;
+
         hpx::lcos::mutex mtx_;
         std::map<naming::id_type,naming::id_type> map_;
         std::vector<naming::id_type> locals_;

@@ -20,7 +20,7 @@
 // Needs this to define edge_map_type
 #include "../../../../applications/graphs/ssca2/ssca2/ssca2.hpp"
 
-#define LLOCAL_MAP_(lvl) LAPP_(lvl) << " [LOCAL_MAP] "
+#define LLOCAL_MAP_(lvl) LAPP_(lvl) << " [LOCAL_MAP] " << gid_ << " "
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -46,7 +46,8 @@ namespace hpx { namespace components { namespace server
 {
     template <typename List>
     local_map<List>::local_map()
-      : dist_map_(naming::invalid_id),
+      : gid_(this->base_type::get_gid()),
+        dist_map_(naming::invalid_id),
         local_map_()
     {}
 
@@ -55,7 +56,7 @@ namespace hpx { namespace components { namespace server
     {
         LLOCAL_MAP_(info) << "Appending to local list at locale ";
 
-        // Probably should do some locking ... somewhere ... maybe here
+        lcos::mutex::scoped_lock l(mtx_);
 
         typedef typename List::iterator list_iter;
         list_iter end = list.end();
@@ -80,51 +81,41 @@ namespace hpx { namespace components { namespace server
     template <typename List>
     naming::id_type local_map<List>::value(naming::id_type key, components::component_type value_type)
     {
-        naming::id_type value;
 
-        // Lock access to the pmap for potential update
-
-        LLOCAL_MAP_(info) << "Locking value for key " << key;
-        {
-            lcos::mutex::scoped_lock l(mtx_);
-
-            typename List::iterator it = local_map_.find(key);
-            if (it == local_map_.end())
-            {
-                value = naming::invalid_id;
-                local_map_[key] = value;
-            }
-            else
-            {
-                value = it->second;
-            }
-        }
-
-        if (value == naming::invalid_id)
+        if (local_map_.count(key) == 0)
         {
             // The key was not in the map
             // Note: this is a very static solution, we are not searching the
             // entire distributed map for the key
 
             // Create a new instance of value type
+            naming::id_type value;
             naming::id_type here = hpx::applier::get_applier().get_prefix();
             value = components::stubs::runtime_support::create_component(here, value_type, 1);
 
-            local_map_[key] = value;
+            lcos::mutex::scoped_lock l(mtx_);
 
-            LLOCAL_MAP_(info) << "Key added to map: (" << key << ", " << value << ")";
+            if (local_map_.count(key) == 0)
+            {
+                LLOCAL_MAP_(info) << "Adding key to map: (" << key << ")";
+
+                local_map_[key] = value;
+
+                LLOCAL_MAP_(info) << "Key added to map: (" << key << ", " << value << ")";
+            }
+
         }
         else
         {
             // The key was already in the map
-            LLOCAL_MAP_(info) << "Key already in map: (" << key << ", " << value << ")";
+            LLOCAL_MAP_(info) << "Key already in map: (" << key << ", " << local_map_[key] << ")";
         }
 
         /*
         util::unlock_the_lock<scoped_lock> ul(l);
         */
 
-        return value;
+        return local_map_[key];
     }
 
 }}}
