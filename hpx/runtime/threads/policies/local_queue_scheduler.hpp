@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREADMANAGER_SCHEDULING_GLOBAL_QUEUE_JUN_18_2009_1116AM)
-#define HPX_THREADMANAGER_SCHEDULING_GLOBAL_QUEUE_JUN_18_2009_1116AM
+#if !defined(HPX_THREADMANAGER_SCHEDULING_LOCAL_QUEUE_AUG_25_2009_0137PM)
+#define HPX_THREADMANAGER_SCHEDULING_LOCAL_QUEUE_AUG_25_2009_0137PM
 
 #include <map>
 #include <memory>
@@ -26,9 +26,9 @@
 namespace hpx { namespace threads { namespace policies
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// The global_queue_scheduler maintains exactly one global queue of work 
-    /// items (threads), where all OS threads pull their next work item from.
-    class global_queue_scheduler
+    /// The local_queue_scheduler maintains exactly one queue of work items 
+    /// (threads) per os thread, where this OS thread pulls its next work from.
+    class local_queue_scheduler
     {
     private:
         // The maximum number of active threads this thread manager should
@@ -39,7 +39,7 @@ namespace hpx { namespace threads { namespace policies
         enum { max_thread_count = 1000 };
 
     public:
-        global_queue_scheduler(std::size_t max_count = max_thread_count)
+        local_queue_scheduler(std::size_t max_count = max_thread_count)
           : queue_(max_count)
         {}
 
@@ -120,7 +120,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
     private:
-        thread_queue queue_;                ///< this manages all the threads
+        thread_queue queue_;                ///< this manages all the PX threads
     };
 
 }}}

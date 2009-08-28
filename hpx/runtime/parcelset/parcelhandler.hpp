@@ -75,7 +75,7 @@ namespace hpx { namespace parcelset
         ///                 instance will be used for any parcel related 
         ///                 transport operations the parcelhandler carries out.
         parcelhandler(naming::resolver_client& resolver, parcelport& pp,
-                threads::threadmanager* tm = NULL) 
+                threads::threadmanager_base* tm = NULL) 
           : resolver_(resolver), pp_(pp), tm_(tm), parcels_(This()),
             startup_time_(util::high_resolution_timer::now()), timer_()
         {
@@ -444,7 +444,7 @@ namespace hpx { namespace parcelset
         parcelport& pp_;
 
         /// the threadmanager to use (optional)
-        threads::threadmanager* tm_;
+        threads::threadmanager_base* tm_;
 
         /// 
         server::parcelhandler_queue parcels_;

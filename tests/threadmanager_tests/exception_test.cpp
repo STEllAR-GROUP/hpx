@@ -54,6 +54,10 @@ void errorsink(boost::uint32_t src, std::string const& msg)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// this is the runtime type we use in this application
+typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
+
+///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     try {
@@ -62,7 +66,7 @@ int main(int argc, char* argv[])
         hpx::naming::resolver_server agas(agas_pool);
 
         // start the HPX runtime
-        hpx::runtime rt("localhost", HPX_PORT, "localhost", 0, hpx::runtime::console);
+        runtime_type rt("localhost", HPX_PORT, "localhost", 0, hpx::runtime::console);
 
         boost::signals::scoped_connection errorsink_connection;
         rt.register_error_sink(errorsink, errorsink_connection);

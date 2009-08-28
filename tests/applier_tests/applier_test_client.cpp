@@ -32,6 +32,8 @@
 //  This gets called whenever a parcel was received, it just sends back any 
 //  received parcel
 
+typedef hpx::threads::threadmanager_impl<hpx::threads::policies::global_queue_scheduler> threadmanager_type;
+
 int main(int argc, char* argv[])
 {
     try {
@@ -78,7 +80,7 @@ int main(int argc, char* argv[])
         hpx::util::io_service_pool timerpool;
         hpx::threads::policies::global_queue_scheduler scheduler;
         hpx::threads::policies::callback_notifier notifier;
-        hpx::threads::threadmanager tm(timerpool, scheduler, notifier);
+        threadmanager_type tm(timerpool, scheduler, notifier);
         // Create a new applier
         hpx::applier::applier app(ph, tm, 0, 0);
 

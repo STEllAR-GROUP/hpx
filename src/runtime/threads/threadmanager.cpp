@@ -105,7 +105,7 @@ namespace hpx { namespace threads
 
         // create the new thread
         thread_id_type newid = scheduler_.create_thread(
-            threadfunc, description, initial_state, run_now);
+            threadfunc, description, initial_state, run_now, get_thread_num());
 
         LTM_(info) << "register_thread(" << newid << "): initial_state(" 
                    << get_thread_state_name(initial_state) << "), "
@@ -145,7 +145,8 @@ namespace hpx { namespace threads
                    << "description(" << description << ")";
 
         // create the new thread
-        scheduler_.create_thread(threadfunc, description, initial_state, false);
+        scheduler_.create_thread(threadfunc, description, initial_state, false, 
+            get_thread_num());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -414,10 +415,32 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     // main function executed by all OS threads managed by this threadmanager_impl
+    template <typename SP, typename NP>
+    struct init_tss_helper
+    {
+        typedef threadmanager_impl<SP, NP> threadmanager_type;
+
+        init_tss_helper(threadmanager_type& tm, std::size_t thread_num)
+          : tm_(tm)
+        {
+            tm_.init_tss(thread_num);
+        }
+        ~init_tss_helper()
+        {
+            tm_.deinit_tss();
+        }
+
+        threadmanager_type& tm_;
+    };
+
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         tfunc(std::size_t num_thread)
     {
+        // manage the number of this thread in its TSS
+        init_tss_helper<SchedulingPolicy, NotificationPolicy> 
+            tss_helper(*this, num_thread);
+
         // needs to be done as the first thing, otherwise logging won't work
         notifier_.on_start_thread(num_thread);       // notify runtime system of started thread
         scheduler_.on_start_thread(num_thread);
@@ -521,7 +544,8 @@ namespace hpx { namespace threads
         if (is_master_thread) {
             std::string name("/queue(threadmanager_impl)/length");
             queue_length_counter.install(name, 
-                boost::bind(&scheduling_policy_type::get_queue_lengths, &scheduler_));
+                boost::bind(&scheduling_policy_type::get_queue_lengths, 
+                    &scheduler_, num_thread));
         }
 
         // run the work queue
@@ -529,7 +553,7 @@ namespace hpx { namespace threads
         while (true) {
             // Get the next PX thread from the queue
             thread* thrd = NULL;
-            if (scheduler_.get_next_thread(&thrd)) {
+            if (scheduler_.get_next_thread(num_thread, &thrd)) {
                 tl1.tick();
 
                 // Only pending PX threads will be executed.
@@ -570,8 +594,8 @@ namespace hpx { namespace threads
                     // thread should be re-scheduled. If the PX thread is suspended 
                     // now we just keep it in the map of threads.
                     if (state == pending) {
-                        scheduler_.schedule_thread(thrd);
-                        do_some_work();
+                        scheduler_.schedule_thread(thrd, num_thread);
+                        do_some_work(num_thread);
                     }
                 }
                 else if (active == state) {
@@ -579,7 +603,7 @@ namespace hpx { namespace threads
                     // this might happen, if some thread has been added to the
                     // scheduler queue already but the state has not been reset 
                     // yet
-                    scheduler_.schedule_thread(thrd);
+                    scheduler_.schedule_thread(thrd, num_thread);
                 }
                 // have to do nothing for 'marked_for_suspension' threads
 
@@ -600,7 +624,7 @@ namespace hpx { namespace threads
 
 #if HPX_DEBUG != 0
         // the last OS thread is allowed to exit only if no more PX threads exist
-        BOOST_ASSERT(0 != --thread_count_ || !scheduler_.get_thread_count());
+        BOOST_ASSERT(0 != --thread_count_ || !scheduler_.get_thread_count(num_thread));
 #endif
         return num_px_threads;
     }
@@ -691,13 +715,49 @@ namespace hpx { namespace threads
             }
         }
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    boost::thread_specific_ptr<std::size_t> 
+    threadmanager_impl<SchedulingPolicy, NotificationPolicy>::thread_num_;
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        init_tss(std::size_t thread_num)
+    {
+        BOOST_ASSERT(NULL == threadmanager_impl::thread_num_.get());    // shouldn't be initialized yet
+        threadmanager_impl::thread_num_.reset(new std::size_t(thread_num));
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::deinit_tss()
+    {
+        threadmanager_impl::thread_num_.reset();
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    std::size_t 
+    threadmanager_impl<SchedulingPolicy, NotificationPolicy>::get_thread_num()
+    {
+        if (NULL != threadmanager_impl::thread_num_.get())
+            return *threadmanager_impl::thread_num_;
+
+        // some OS threads are not managed by the threadmanager
+        return std::size_t(-1);
+    }
+
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-/// explicit template instantiation fo rthe thread manager of our choice
+/// explicit template instantiation for the thread manager of our choice
 #include <hpx/runtime/threads/policies/global_queue_scheduler.hpp>
+#include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 
 template HPX_EXPORT class hpx::threads::threadmanager_impl<
     hpx::threads::policies::global_queue_scheduler, 
+    hpx::threads::policies::callback_notifier>;
+
+template HPX_EXPORT class hpx::threads::threadmanager_impl<
+    hpx::threads::policies::local_queue_scheduler, 
     hpx::threads::policies::callback_notifier>;

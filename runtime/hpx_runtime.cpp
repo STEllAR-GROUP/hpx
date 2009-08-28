@@ -95,6 +95,10 @@ split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// this is the runtime type we use in this application
+typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
+
+///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     try {
@@ -138,7 +142,7 @@ int main(int argc, char* argv[])
         // execute HPX runtime, if appropriate
         if (!no_hpx_runtime) {
             // initialize and start the HPX runtime
-            hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, mode);
+            runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
 
             // the main thread will wait (block) for the shutdown action and 
             // the threadmanager is serving incoming requests in the meantime

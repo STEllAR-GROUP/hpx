@@ -53,7 +53,8 @@ namespace hpx
             std::string const& address, boost::uint16_t port,
             std::string const& agas_address, boost::uint16_t agas_port, 
             mode locality_mode) 
-      : result_(0), mode_(locality_mode), 
+      : runtime(agas_client_),
+        result_(0), mode_(locality_mode), 
         ini_(util::detail::get_logging_data()), 
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This())), 
@@ -73,9 +74,7 @@ namespace hpx
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),
-        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_),
-        counters_(agas_client_),
-        on_exit_functions_("on_exit_functions", false)
+        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_)
     {
         components::server::get_error_dispatcher().register_error_sink(
             &runtime_impl::default_errorsink, default_error_sink_);
@@ -86,7 +85,8 @@ namespace hpx
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
             naming::locality address, naming::locality agas_address, 
             mode locality_mode) 
-      : result_(0), mode_(locality_mode), 
+      : runtime(agas_client_),
+        result_(0), mode_(locality_mode), 
         ini_(util::detail::get_logging_data()), 
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This())), 
@@ -106,9 +106,7 @@ namespace hpx
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),
-        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_),
-        counters_(agas_client_),
-        on_exit_functions_("on_exit_functions", false)
+        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_)
     {
         components::server::get_error_dispatcher().register_error_sink(
             &runtime_impl::default_errorsink, default_error_sink_);
@@ -118,7 +116,8 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
             naming::locality address, mode locality_mode) 
-      : result_(0), mode_(locality_mode), 
+      : runtime(agas_client_),
+        result_(0), mode_(locality_mode), 
         ini_(util::detail::get_logging_data()), 
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This())), 
@@ -138,9 +137,7 @@ namespace hpx
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),
-        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_),
-        counters_(agas_client_),
-        on_exit_functions_("on_exit_functions", false)
+        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_)
     {
         components::server::get_error_dispatcher().register_error_sink(
             &runtime_impl::default_errorsink, default_error_sink_);
@@ -290,9 +287,7 @@ namespace hpx
         LRT_(info) << "runtime_impl: about to stop services";
 
         // execute all on_exit functions whenever the first thread calls this
-        boost::function<void()> f;
-        while (on_exit_functions_.dequeue(&f))
-            f();
+        this->runtime::stop();
 
         // unregister the runtime_support and memory instances from the AGAS 
         // ignore errors, as AGAS might be down already
@@ -364,16 +359,10 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy> 
-    boost::thread_specific_ptr<
-        runtime_impl<SchedulingPolicy, NotificationPolicy> *> 
-    runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_;
-
-    template <typename SchedulingPolicy, typename NotificationPolicy> 
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_tss()
     {
         // initialize our TSS
-        BOOST_ASSERT(NULL == runtime_impl::runtime_.get());    // shouldn't be initialized yet
-        runtime_impl::runtime_.reset(new runtime_impl* (this));
+        this->runtime::init_tss();
 
         // initialize applier TSS
         applier_.init_tss();
@@ -386,18 +375,25 @@ namespace hpx
         applier_.deinit_tss();
 
         // reset our TSS
-        runtime_impl::runtime_.reset();
+        this->runtime::deinit_tss();
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy, typename NotificationPolicy> 
-    void runtime_impl<SchedulingPolicy, NotificationPolicy>::on_exit(
-        boost::function<void()> f)
+    boost::thread_specific_ptr<runtime *> runtime::runtime_;
+
+    void runtime::init_tss()
     {
-        on_exit_functions_.enqueue(f);
+        // initialize our TSS
+        BOOST_ASSERT(NULL == runtime::runtime_.get());    // shouldn't be initialized yet
+        runtime::runtime_.reset(new runtime* (this));
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+    void runtime::deinit_tss()
+    {
+        // reset our TSS
+        runtime::runtime_.reset();
+    }
+
     runtime& get_runtime()
     {
         BOOST_ASSERT(NULL != runtime::runtime_.get());   // should have been initialized
@@ -422,7 +418,11 @@ namespace hpx
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-/// explicit template instantiation fo rthe thread manager of our choice
+/// explicit template instantiation for the thread manager of our choice
 template HPX_EXPORT class hpx::runtime_impl<
     hpx::threads::policies::global_queue_scheduler, 
+    hpx::threads::policies::callback_notifier>;
+
+template HPX_EXPORT class hpx::runtime_impl<
+    hpx::threads::policies::local_queue_scheduler, 
     hpx::threads::policies::callback_notifier>;

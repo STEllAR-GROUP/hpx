@@ -100,18 +100,20 @@ namespace hpx
         namespace policies
         {
             class HPX_API_EXPORT global_queue_scheduler;
+            class HPX_API_EXPORT local_queue_scheduler;
             class HPX_API_EXPORT callback_notifier;
+
+            // define the default scheduler to use
+            typedef local_queue_scheduler queue_scheduler;
         }
 
+        struct HPX_API_EXPORT threadmanager_base;
         class HPX_API_EXPORT thread;
 
-        template <typename SchedulingPolicy, typename NotificationPolicy> 
+        template <
+            typename SchedulingPolicy, 
+            typename NotificationPolicy = threads::policies::callback_notifier> 
         class HPX_API_EXPORT threadmanager_impl;
-
-        // this is the default threadmanager we use
-        typedef threadmanager_impl<
-            policies::global_queue_scheduler, policies::callback_notifier> 
-        threadmanager;
 
         ///////////////////////////////////////////////////////////////////////
         /// \enum thread_state
@@ -169,15 +171,12 @@ namespace hpx
         HPX_API_EXPORT thread_self* get_self_ptr();
     }
 
-    template <typename SchedulingPolicy, typename NotificationPolicy> 
-    class HPX_API_EXPORT runtime_impl;
+    class HPX_API_EXPORT runtime;
 
-    // this is the default runtime type we use - needs to be instantiated with
-    // exactly the same policies as threads::threadmanager above
-    typedef runtime_impl<
-        threads::policies::global_queue_scheduler, 
-        threads::policies::callback_notifier
-    > runtime;
+    template <
+        typename SchedulingPolicy, 
+        typename NotificationPolicy = threads::policies::callback_notifier> 
+    class HPX_API_EXPORT runtime_impl;
 
     /// The function \a get_runtime returns a reference to the (thread
     /// specific) runtime instance.

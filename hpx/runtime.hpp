@@ -13,6 +13,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/policies/global_queue_scheduler.hpp>
+#include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -30,22 +31,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx 
 {
-    /// \class runtime_impl runtime.hpp hpx/runtime.hpp
-    ///
-    /// The \a runtime class encapsulates the HPX runtime system in a simple to 
-    /// use way. It makes sure all required parts of the HPX runtime system are
-    /// properly initialized. 
-    template <typename SchedulingPolicy, typename NotificationPolicy> 
-    class HPX_EXPORT runtime_impl
+    /// \class runtime runtime.hpp hpx/runtime.hpp
+    class HPX_EXPORT runtime
     {
-    private:
-        // avoid warnings about usage of this in member initializer list
-        runtime_impl* This() { return this; }
-
-        // 
-        static void default_errorsink(boost::uint32_t, std::string const&);
-
     public:
+        /// A HPX runtime can be executed in two different modes: console mode
+        /// and worker mode.
+        enum mode
+        {
+            console = 0,    ///< The runtime instance represents the application console
+            worker = 1      ///< The runtime instance represents a worker locality
+        };
+
         /// The \a hpx_main_function_type is the default function type usable 
         /// as the main HPX thread function.
         typedef int hpx_main_function_type();
@@ -54,16 +51,77 @@ namespace hpx
         typedef void hpx_errorsink_function_type(
             boost::uint32_t, std::string const&);
 
+        /// construct a new instance of a runtime
+        runtime(naming::resolver_client& agas_client) 
+          : counters_(agas_client),
+            on_exit_functions_("on_exit_functions", false)
+        {}
+
+        /// \brief Manage list of functions to call on exit
+        void on_exit(boost::function<void()> f)
+        {
+            on_exit_functions_.enqueue(f);
+        }
+
+        /// \brief Allow access to the registry counter registry instance used 
+        ///        by the HPX runtime.
+        performance_counters::registry& get_counter_registry()
+        {
+            return counters_;
+        }
+
+        /// \brief Allow access to the registry counter registry instance used 
+        ///        by the HPX runtime.
+        performance_counters::registry const& get_counter_registry() const
+        {
+            return counters_;
+        }
+
+        /// \brief Call all registered on_exit functions
+        void stop()
+        {
+            boost::function<void()> f;
+            while (on_exit_functions_.dequeue(&f))
+                f();
+        }
+
+        // the TSS holds a pointer to the runtime associated with a given 
+        // OS thread
+        static boost::thread_specific_ptr<runtime*> runtime_;
+
+    protected:
+        void init_tss();
+        void deinit_tss();
+
+    protected:
+        performance_counters::registry counters_;
+
+        // list of functions to call on exit
+        typedef boost::lockfree::fifo<boost::function<void()> > on_exit_type;
+        on_exit_type on_exit_functions_;
+    };
+
+    /// \class runtime_impl runtime.hpp hpx/runtime.hpp
+    ///
+    /// The \a runtime class encapsulates the HPX runtime system in a simple to 
+    /// use way. It makes sure all required parts of the HPX runtime system are
+    /// properly initialized. 
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    class HPX_EXPORT runtime_impl : public runtime
+    {
+    private:
+        typedef threads::threadmanager_impl<SchedulingPolicy, NotificationPolicy>
+            threadmanager_type;
+
+        // avoid warnings about usage of this in member initializer list
+        runtime_impl* This() { return this; }
+
+        // 
+        static void default_errorsink(boost::uint32_t, std::string const&);
+
+    public:
         typedef SchedulingPolicy scheduling_policy_type;
         typedef NotificationPolicy notification_policy_type;
-
-        /// A HPX runtime can be executed in two different modes: console mode
-        /// and worker mode.
-        enum mode
-        {
-            console = 0,    ///< The runtime instance represents the application console
-            worker = 1      ///< The runtime instance represents a worker locality
-        };
 
         /// Construct a new HPX runtime instance 
         ///
@@ -250,7 +308,7 @@ namespace hpx
 
         /// \brief Allow access to the thread manager instance used by the HPX
         ///        runtime.
-        threads::threadmanager& get_thread_manager()
+        threadmanager_type& get_thread_manager()
         {
             return thread_manager_;
         }
@@ -269,20 +327,6 @@ namespace hpx
             return action_manager_;
         }
 
-        /// \brief Allow access to the registry counter registry instance used 
-        ///        by the HPX runtime.
-        performance_counters::registry& get_counter_registry()
-        {
-            return counters_;
-        }
-
-        /// \brief Allow access to the registry counter registry instance used 
-        ///        by the HPX runtime.
-        performance_counters::registry const& get_counter_registry() const
-        {
-            return counters_;
-        }
-
         /// \brief Allow access to the locality this runtime instance is 
         /// associated with.
         ///
@@ -293,18 +337,9 @@ namespace hpx
             return parcel_port_.here();
         }
 
-    public:
-        // the TSS holds a pointer to the runtime associated with a given 
-        // OS thread
-        static boost::thread_specific_ptr<runtime_impl*> runtime_;
-
     private:
         void init_tss();
         void deinit_tss();
-
-    public:
-        /// \brief Manage list of functions to call on exit
-        void on_exit(boost::function<void()> f);
 
     private:
         mode mode_;
@@ -319,17 +354,12 @@ namespace hpx
         util::detail::init_logging init_logging_;
         scheduling_policy_type scheduler_;
         notification_policy_type notifier_;
-        threads::threadmanager thread_manager_;
+        threadmanager_type thread_manager_;
         components::server::memory memory_;
         applier::applier applier_;
         actions::action_manager action_manager_;
         components::server::runtime_support runtime_support_;
         boost::signals::scoped_connection default_error_sink_;
-        performance_counters::registry counters_;
-
-        // list of functions to call on exit
-        typedef boost::lockfree::fifo<boost::function<void()> > on_exit_type;
-        on_exit_type on_exit_functions_;
     };
 
 }   // namespace hpx

@@ -40,6 +40,10 @@ int hpx_main(util::high_resolution_timer& timer, std::size_t num_threads)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// this is the runtime type we use in this application
+typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
+
+///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     try {
@@ -73,7 +77,7 @@ int main(int argc, char* argv[])
             hpx::naming::locality(agas_host, agas_port));
 
         // initialize and start the HPX runtime
-        hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port);
+        runtime_type rt(hpx_host, hpx_port, agas_host, agas_port);
 
         // the main thread will wait (block) for the shutdown action and 
         // the threadmanager is serving incoming requests in the meantime

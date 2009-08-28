@@ -153,6 +153,10 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+// this is the runtime type we use in this application
+typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
+
+///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     try {
@@ -193,11 +197,11 @@ int main(int argc, char* argv[])
 
         // initialize and start the HPX runtime
         if (vm.count("worker")) {
-            hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, hpx::runtime::worker);
+            runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, hpx::runtime::worker);
             rt.run(num_threads);
         }
         else {
-            hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, hpx::runtime::console);
+            runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, hpx::runtime::console);
             rt.run(boost::bind(hpx_main, size_x, size_y, iterations), num_threads);
         }
     }

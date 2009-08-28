@@ -74,6 +74,10 @@ int hpx_main()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// this is the runtime type we use in this application
+typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
+
+///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     try {
@@ -99,7 +103,7 @@ int main(int argc, char* argv[])
             hpx::naming::locality(host, agas_port));
 
         // start the HPX runtime using different numbers of threads
-        hpx::runtime rt(host, ps_port, host, agas_port);
+        runtime_type rt(host, ps_port, host, agas_port);
         for (int i = 1; i <= 8; ++i) 
             rt.run(hpx_main, i);
     }

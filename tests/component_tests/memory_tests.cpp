@@ -123,6 +123,10 @@ split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// this is the runtime type we use in this application
+typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
+
+///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     try {
@@ -154,7 +158,7 @@ int main(int argc, char* argv[])
             dgas_server.reset(new agas_server_helper(dgas_host, dgas_port));
 
         // initialize and start the HPX runtime
-        hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
+        runtime_type rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
         rt.run(hpx_main, 2);
     }
     catch (std::exception& e) {

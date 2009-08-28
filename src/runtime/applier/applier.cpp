@@ -184,10 +184,4 @@ namespace hpx { namespace threads
         return hpx::applier::get_applier().get_thread_manager().get_thread_gid(id);
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-//     void report_error(boost::exception_ptr const& e)
-//     {
-//           hpx::applier::get_applier().get_thread_manager().report_error(e);
-//     }
-
 }}

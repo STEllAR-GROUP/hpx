@@ -861,6 +861,14 @@
 							RelativePath="..\..\..\hpx\runtime\threads\policies\global_queue_scheduler.hpp"
 							>
 						</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\threads\policies\local_queue_scheduler.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\hpx\runtime\threads\policies\thread_queue.hpp"
+							>
+						</File>
 					</Filter>
 				</Filter>
 				<Filter

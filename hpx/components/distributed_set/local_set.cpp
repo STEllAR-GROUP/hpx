@@ -11,7 +11,7 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
-#include "../../applications/graphs/ssca2/ssca2/ssca2.hpp"
+// #include "../../applications/graphs/ssca2/ssca2/ssca2.hpp"
 
 #include <hpx/components/distributed_set/server/local_set.hpp>
 #include "local_set.hpp"

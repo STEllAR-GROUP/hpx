@@ -116,6 +116,10 @@ CMandelbrotApp theApp;
 
 // CMandelbrotApp initialization
 
+///////////////////////////////////////////////////////////////////////////////
+// this is the runtime type we use in this application
+typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
+
 BOOL CMandelbrotApp::InitInstance()
 {
     // InitCommonControlsEx() is required on Windows XP if an application
@@ -174,7 +178,7 @@ BOOL CMandelbrotApp::InitInstance()
         agas_server.reset(new agas_server_helper(agas_host, agas_port));
 
     // initialize and start the HPX runtime
-    hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, hpx::runtime::console);
+    runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, hpx::runtime::console);
 
     // show dialog
     CMandelbrotDlg dlg (rt);

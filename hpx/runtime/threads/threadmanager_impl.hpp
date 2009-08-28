@@ -17,7 +17,7 @@ namespace hpx { namespace threads
 {
     // 
     typedef threadmanager_impl<
-        policies::global_queue_scheduler, policies::callback_notifier> 
+        policies::local_queue_scheduler, policies::callback_notifier> 
     threadmanager;
 
 ///////////////////////////////////////////////////////////////////////////////

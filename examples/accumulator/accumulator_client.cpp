@@ -158,6 +158,10 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+// this is the runtime type we use in this application
+typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
+
+///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     try {
@@ -191,7 +195,7 @@ int main(int argc, char* argv[])
             agas_server.reset(new agas_server_helper(agas_host, agas_port));
 
         // initialize and start the HPX runtime
-        hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, mode);
+        runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
         rt.run(hpx_main, num_threads);
     }
     catch (std::exception& e) {

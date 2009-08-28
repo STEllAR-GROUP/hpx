@@ -128,6 +128,10 @@ split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// this is the runtime type we use in this application
+typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
+
+///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     try {
@@ -167,7 +171,7 @@ int main(int argc, char* argv[])
         // start the HPX runtime using different numbers of threads
         if (0 == num_threads) {
             int num_of_cores = boost::thread::hardware_concurrency();
-            hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
+            runtime_type rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
             for (int t = 0; t < num_tests; ++t) {
                 for (int i = 1; i <= 2*num_of_cores; ++i) { 
                     std::size_t count = 2 * i;
@@ -181,7 +185,7 @@ int main(int argc, char* argv[])
             std::cerr << "\n";
         }
         else {
-            hpx::runtime rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
+            runtime_type rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
             for (int t = 0; t < num_tests; ++t) {
                 std::size_t count = 2 * num_threads;
                 lcos::barrier b(count + 1);       // create a barrier waiting on 'count' threads
