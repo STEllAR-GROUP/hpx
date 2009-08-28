@@ -11,6 +11,9 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/util/logging.hpp>
+
+#include <hpx/runtime/actions/plain_action.hpp>
+
 #include <hpx/components/graph/graph.hpp>
 #include <hpx/components/vertex/vertex.hpp>
 #include <hpx/components/distributed_set/distributed_set.hpp>
@@ -20,9 +23,13 @@
 #include "ssca2/ssca2.hpp"
 
 #include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/future_wait.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/export.hpp>
+
 #include <boost/unordered_map.hpp>
 
 #define LSSCA_(lvl) LAPP_(lvl) << " [SSCA] "
@@ -34,8 +41,16 @@ namespace po = boost::program_options;
 int nrand(int);
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main(int scale, int edge_factor,
-                               double a, double b, double c, double d)
+
+int rmat(naming::id_type, int, int, int);
+
+typedef
+    actions::plain_result_action4<int, naming::id_type, int, int, int, rmat>
+rmat_action;
+
+HPX_REGISTER_ACTION(rmat_action);
+
+int rmat(naming::id_type G, int scale, int edge_factor, int type)
 {
     std::size_t num_edges_added;
     double a_, b_, c_, d_;
@@ -48,34 +63,42 @@ threads::thread_state hpx_main(int scale, int edge_factor,
     typedef hpx::components::server::graph::order_action    graph_order_action;
     typedef hpx::components::server::graph::size_action     graph_size_action;
     typedef hpx::components::server::graph::add_edge_action graph_add_edge_action;
-
-    // Print info message
-    LSSCA_(info) << "R-MAT Scalable Graph Generator";
-    LSSCA_(info) << "Scale: " << scale;
-    LSSCA_(info) << "(A,B,C,D) = " << setprecision(2)
-              << "(" << a << ", " << b << ", " << c << ", " << d << ")";
+    typedef hpx::components::server::graph::vertex_name_action graph_vertex_name_action;
 
     // Setup
     order = 1 << scale;
     size = edge_factor * order;
 
-    a_ = a;
-    b_ = b;
-    c_ = c;
-    d_ = d;
+    if (type == 0)
+    {   // nice
+        a_ = 0.57;
+        b_ = 0.19;
+        c_ = 0.19;
+        d_ = 0.05;
+    }
+    else
+    {   // Erdos-Renyi
+        a_ = 0.25;
+        b_ = 0.25;
+        c_ = 0.25;
+        d_ = 0.25;
+    }
+
+    // Print info message
+    LSSCA_(info) << "R-MAT Scalable Graph Generator";
+    LSSCA_(info) << "Scale: " << scale;
+    LSSCA_(info) << "Edge-factor:" << edge_factor;
+    LSSCA_(info) << "(A,B,C,D) = " << setprecision(2)
+              << "(" << a_ << ", " << b_ << ", " << c_ << ", " << d_ << ")";
 
     naming::id_type here = applier::get_applier().get_runtime_support_gid();
 
     srand(time(0));
-
-    // Create a graph.
-    using hpx::components::graph;    
-    graph G (graph::create(here));
        
     // Initialize the graph.
     // Assumes we are initializing size-many vertices
     // with labels ranging from [0,size).
-    lcos::future_value<int> result = lcos::eager_future<graph_init_action>(G.get_gid(), order);
+    lcos::future_value<int> result = lcos::eager_future<graph_init_action>(G, order);
     result.get();
 
     // Start adding edges in phases
@@ -96,19 +119,19 @@ threads::thread_state hpx_main(int scale, int edge_factor,
             p = rand()*1.0 / RAND_MAX;
 
             // Pick the partition
-            if (p < a)           
+            if (p < a_)
             {   
             // Do nothing
             }   
-            else if ((p >= a) && (p < a+b))
+            else if ((p >= a_) && (p < a_+b_))
             {
                 y += step;
             } 
-            else if ((p >= a+b) && (p < a+b+c))
+            else if ((p >= a_+b_) && (p < a_+b_+c_))
             {
                 x += step;
             }
-            else if ((p >= a+b+c) && (p < a+b+c+d))
+            else if ((p >= a_+b_+c_) && (p < a_+b_+c_+d_))
             {
                 x += step;
                 y += step;
@@ -121,9 +144,14 @@ threads::thread_state hpx_main(int scale, int edge_factor,
         if (x-1 != y-1 && known_edges.find(key) == known_edges.end())
         {
            known_edges[key] = key;
+
+           lcos::future_value<naming::id_type> u = lcos::eager_future<graph_vertex_name_action>(G, x-1);
+           lcos::future_value<naming::id_type> v = lcos::eager_future<graph_vertex_name_action>(G, y-1);
+
            results.push_back(
-               lcos::eager_future<graph_add_edge_action>(
-                   G.get_gid(), G.vertex_name(x-1), G.vertex_name(y-1), nrand(type_max)));
+               lcos::eager_future<
+                   graph_add_edge_action
+               >(G, u.get(), v.get(), nrand(type_max)));
 
            num_edges_added += 1;
         }
@@ -135,7 +163,24 @@ threads::thread_state hpx_main(int scale, int edge_factor,
         results.back().get();
         results.pop_back();
     }
-   
+
+    return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+int hpx_main(int depth, int scale, int edge_factor, int type)
+{
+    naming::id_type here = applier::get_applier().get_runtime_support_gid();
+
+    // Create an R-MAT graph.
+    using hpx::components::graph;
+    graph G (graph::create(here));
+
+    lcos::eager_future<rmat_action> r(
+        here, G.get_gid(), scale, edge_factor, type);
+    r.get();
+
     // SSCA#2 Graph Analysis Benchmark
 
     using hpx::components::ssca2;
@@ -193,7 +238,7 @@ threads::thread_state hpx_main(int scale, int edge_factor,
     // Shut down runtime services
     components::stubs::runtime_support::shutdown_all();
     
-    return threads::terminated;
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -216,6 +261,12 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "HPX locality")
             ("scale,s", po::value<int>(),
                 "the scale of the graph, default is 4")
+            ("depth,d", po::value<int>(),
+                "the subgraph path length for Kernel 3")
+            ("edge_factor,f", po::value<int>(),
+                "the edge factor of the R-MAT graph")
+            ("type,y", po::value<int>(),
+                "the type of R-MAT, controls the (a,b,c,d) parameters")
         ;
 
         po::store(po::command_line_parser(argc, argv)
@@ -300,6 +351,10 @@ int main(int argc, char* argv[])
         boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
         int num_threads = 1;
         int scale = 4;
+        int depth = 3;
+        int edge_factor = 8;
+        int type = 0;
+
         hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
 
         // extract IP address/port arguments
@@ -318,13 +373,14 @@ int main(int argc, char* argv[])
         if (vm.count("scale"))
             scale = vm["scale"].as<int>();
 
-        double a, b, c, d;
-        a = 0.57;
-        b = 0.19;
-        c = 0.19; 
-        d = 0.05;
+        if (vm.count("depth"))
+            depth = vm["depth"].as<int>();
 
-        int edge_factor = 3;
+        if (vm.count("edge_factor"))
+            edge_factor = vm["edge_factor"].as<int>();
+
+        if (vm.count("type"))
+            type = vm["type"].as<int>();
 
         // initialize and run the AGAS service, if appropriate
         std::auto_ptr<agas_server_helper> agas_server;
@@ -333,7 +389,7 @@ int main(int argc, char* argv[])
 
         // initialize and start the HPX runtime
         hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, mode);
-        rt.run(boost::bind(hpx_main,scale,edge_factor,a,b,c,d), num_threads);
+        rt.run(boost::bind(hpx_main, depth, scale, edge_factor, type), num_threads);
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";

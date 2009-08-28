@@ -273,7 +273,7 @@ namespace hpx { namespace components { namespace server
         typedef local_set<ssca2::edge_set_type> local_edge_set_type;
         typedef local_set<ssca2::graph_set_type> local_graph_set_type;
 
-        // Get local vector of edges
+        // Get local vector of edges, for iterating over
         ssca2::edge_set_type edges(
             lcos::eager_future<
                 local_edge_set_type::get_action
@@ -315,9 +315,41 @@ namespace hpx { namespace components { namespace server
             naming::id_type H = graphs + i;
             int d = 3; // This should be an argument
 
-            results.push_back(lcos::eager_future<
-                extract_subgraph_action
-            >(here, H, pmaps[i], (*it).source_, (*it).target_, d));
+            // We are local to source
+
+            // Get pmap local to source
+            // This is a consequence of not really being able to continue
+            // the action local to the data
+
+            // This uses hack to get prefix
+            naming::id_type locale(boost::uint64_t((*it).source_.get_msb()) << 32,0);
+            naming::id_type local_pmap =
+                dist_gids_map_type::get_local(pmaps[i], locale);
+
+            LSSCA_(info) << "Got local pmap " << local_pmap;
+
+            // Get source from local_pmap
+            components::component_type props_type =
+                components::get_component_type<components::server::props>();
+            naming::id_type source_props =
+                components::stubs::local_map<gids_map_type>::value(local_pmap, (*it).source_, props_type);
+
+            LSSCA_(info) << "Got source_props " << source_props;
+
+            // Get the color of the source vertex
+            int color =
+                lcos::eager_future<
+                    server::props::color_action
+                >(source_props, d).get();
+
+            if (color >= d && d > 1)
+            {
+                // Spawn subgraph extraction local to target
+                naming::id_type there(boost::uint64_t((*it).target_.get_msb()) << 32,0);
+                results.push_back(lcos::eager_future<
+                    extract_subgraph_action
+                >(there, H, pmaps[i], (*it).source_, (*it).target_, d));
+            }
         }
 
         // Collect notifications that subgraph extractions have finished
@@ -343,32 +375,30 @@ namespace hpx { namespace components { namespace server
         LSSCA_(info) << "extract_subgraph(" << H << ", " << pmap
                      << ", " << source << ", " << target << ", " << d << ")";
 
-        // Note: execution is local to source
+        // Note: execution is local to target
 
-        // Get pmap local to source
-        // This is a consequence of not really being able to continue
-        // the action local to the data
+        // Get pmap local to target
 
         // This uses hack to get prefix
-        naming::id_type locale(boost::uint64_t(source.get_msb()) << 32,0);
+        naming::id_type locale(boost::uint64_t(target.get_msb()) << 32,0);
         naming::id_type local_pmap =
             dist_gids_map_type::get_local(pmap, locale);
 
         LSSCA_(info) << "Got local pmap " << local_pmap;
 
-        // Get source from local_pmap
+        // Get target from local_pmap
         components::component_type props_type =
             components::get_component_type<components::server::props>();
-        naming::id_type source_props =
-            local_gids_map_type::value(local_pmap, source, props_type);
+        naming::id_type target_props =
+            local_gids_map_type::value(local_pmap, target, props_type);
 
-        LSSCA_(info) << "Got source_props " << source_props;
+        LSSCA_(info) << "Got target_props " << target_props;
 
         // Get the color of the source vertex
         int color =
             lcos::eager_future<
                 server::props::color_action
-            >(source_props, d).get();
+            >(target_props, d).get();
 
         if (color >= d && d > 1)
         {
