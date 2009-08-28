@@ -186,10 +186,10 @@ source_group("Header Files\\runtime\\threadmanager"
     FILES ${hpxlib_threadmanager_HEADERS})
 
 set (hpxlib_threadmanager_policies_HEADERS
-    ${hpx_SOURCE_DIR}/hpx/runtime/threads/policies/callback_notifier.hpp)
+    ${hpx_SOURCE_DIR}/hpx/runtime/threads/policies/callback_notifier.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/policies/global_queue_scheduler.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/policies/local_queue_scheduler.hpp
-    ${hpx_SOURCE_DIR}/hpx/runtime/threads/policies/thread_queue.hpp.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/threads/policies/thread_queue.hpp)
 source_group("Header Files\\runtime\\threadmanager\\policies" 
     FILES ${hpxlib_threadmanager_policies_HEADERS})
 
