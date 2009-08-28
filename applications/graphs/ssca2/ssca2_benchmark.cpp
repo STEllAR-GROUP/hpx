@@ -388,7 +388,9 @@ int main(int argc, char* argv[])
             agas_server.reset(new agas_server_helper(agas_host, agas_port));
 
         // initialize and start the HPX runtime
-        hpx::runtime rt(hpx_host, hpx_port, agas_host, agas_port, mode);
+        typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
+        runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
+
         rt.run(boost::bind(hpx_main, depth, scale, edge_factor, type), num_threads);
     }
     catch (std::exception& e) {
