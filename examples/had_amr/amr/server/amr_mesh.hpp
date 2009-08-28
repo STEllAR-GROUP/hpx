@@ -83,7 +83,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         static void init_stencils(
             distributed_iterator_range_type const& stencils,
-            distributed_iterator_range_type const& functions, int static_step, int stencilsize);
+            distributed_iterator_range_type const& functions, int static_step, int stencilsize,int numvalues);
 
         static void get_output_ports(
             distributed_iterator_range_type const& stencils,

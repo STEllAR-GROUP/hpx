@@ -26,7 +26,7 @@ namespace hpx { namespace components { namespace amr
     int stencil::eval(naming::id_type const& result, 
         std::vector<naming::id_type> const& gids, int row, int column)
     {
-        BOOST_ASSERT(gids.size() == 3);
+        //BOOST_ASSERT(gids.size() == 3);
 
         // make sure all the gids are looking valid
         if (result == naming::invalid_id)
@@ -47,11 +47,20 @@ namespace hpx { namespace components { namespace amr
 
         // get all input memory_block_data instances
         access_memory_block<stencil_data> val1, val2, val3, resultval;
-        boost::tie(val1, val2, val3, resultval) = 
+        if (gids.size() == 3) { 
+          boost::tie(val1, val2, val3, resultval) = 
             wait(components::stubs::memory_block::get_async(gids[0]), 
                  components::stubs::memory_block::get_async(gids[1]), 
                  components::stubs::memory_block::get_async(gids[2]),
                  components::stubs::memory_block::get_async(result));
+        } else if ( gids.size() == 2) {
+          boost::tie(val1, val2, resultval) = 
+            wait(components::stubs::memory_block::get_async(gids[0]), 
+                 components::stubs::memory_block::get_async(gids[1]), 
+                 components::stubs::memory_block::get_async(result));
+        } else {
+          BOOST_ASSERT(0 == 1);
+        }
 
         // make sure all input data items agree on the time step number
         BOOST_ASSERT(val1->timestep_ == val2->timestep_);
@@ -60,9 +69,20 @@ namespace hpx { namespace components { namespace amr
         // the middle point is our direct predecessor
         if (val2->timestep_ < numsteps_) {
 
-            // this is the actual calculation, call provided (external) function
-            evaluate_timestep(val1.get_ptr(), val2.get_ptr(), val3.get_ptr(), 
-                resultval.get_ptr(), numsteps_);
+            if ( gids.size() == 3 ) {
+              // this is the actual calculation, call provided (external) function
+              evaluate_timestep(val1.get_ptr(), val2.get_ptr(), val3.get_ptr(), 
+                  resultval.get_ptr(), numsteps_);
+            } else if ( gids.size() == 2 ) {
+              // bdry computation
+              if ( column == 0 ) {
+                evaluate_left_bdry_timestep(val1.get_ptr(), val2.get_ptr(),
+                  resultval.get_ptr(), numsteps_);
+              } else {
+                evaluate_right_bdry_timestep(val1.get_ptr(), val2.get_ptr(),
+                  resultval.get_ptr(), numsteps_);
+              }
+            }
 
             if (log_)     // send result to logging instance
                 stubs::logging::logentry(log_, resultval.get(), row);

@@ -48,8 +48,54 @@ namespace hpx { namespace components { namespace amr
 
         //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
         for (t = 0; t < n; t++)
-            sum += left->value_+middle->value_+right->value_;
-        result->value_ = sum/(3.0*t);
+            sum += left->value_+middle->value_;
+        result->value_ = sum/(2.0*t);
+
+        return 1;
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////
+    int evaluate_left_bdry_timestep(stencil_data const* middle, stencil_data const* right, 
+                               stencil_data* result, int numsteps)
+    {
+        // the middle point is our direct predecessor
+
+        result->max_index_ = middle->max_index_;
+        result->index_ = middle->index_;
+        result->timestep_ = middle->timestep_ + 1;
+        /*
+        result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
+        */
+        double sum = 0;
+        long t, n = work[middle->timestep_*nzones+middle->index_/zone];
+
+        //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
+        for (t = 0; t < n; t++)
+            sum += middle->value_+right->value_;
+        result->value_ = sum/(2.0*t);
+
+        return 1;
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////
+    int evaluate_right_bdry_timestep(stencil_data const* left, stencil_data const* middle, 
+                               stencil_data* result, int numsteps)
+    {
+        // the middle point is our direct predecessor
+
+        result->max_index_ = middle->max_index_;
+        result->index_ = middle->index_;
+        result->timestep_ = middle->timestep_ + 1;
+        /*
+        result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
+        */
+        double sum = 0;
+        long t, n = work[middle->timestep_*nzones+middle->index_/zone];
+
+        //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
+        for (t = 0; t < n; t++)
+            sum += left->value_+middle->value_;
+        result->value_ = sum/(2.0*t);
 
         return 1;
     }

@@ -60,7 +60,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     // Create functional components, one for each data point, use those to 
     // initialize the stencil value instances
     void amr_mesh::init_stencils(distributed_iterator_range_type const& stencils,
-        distributed_iterator_range_type const& functions, int static_step,int stencilsize)
+        distributed_iterator_range_type const& functions, int static_step,int stencilsize,int numvalues)
     {
         components::distributing_factory::iterator_type stencil = stencils.first;
         components::distributing_factory::iterator_type function = functions.first;
@@ -70,8 +70,16 @@ namespace hpx { namespace components { namespace amr { namespace server
             BOOST_ASSERT(function != functions.second);
           //  components::amr::stubs::dynamic_stencil_value::set_functional_component(
           //      *stencil, *function, static_step, column,stencilsize);
-            components::amr::stubs::dynamic_stencil_value::set_functional_component(
+            if ( column == 0 || column == numvalues-1 ) {
+            // TEST
+              components::amr::stubs::dynamic_stencil_value::set_functional_component(
+                  *stencil, *function, static_step, column,2);
+            //  components::amr::stubs::dynamic_stencil_value::set_functional_component(
+            //      *stencil, *function, static_step, column,stencilsize);
+            } else {
+              components::amr::stubs::dynamic_stencil_value::set_functional_component(
                 *stencil, *function, static_step, column,stencilsize);
+            }
         }
         BOOST_ASSERT(function == functions.second);
     }
@@ -135,11 +143,31 @@ namespace hpx { namespace components { namespace amr { namespace server
                 int outstep = mod(step-1, steps);
 
                 std::vector<naming::id_type> output_ports;
-                output_ports += 
-                        outputs[outstep][mod(i-1, numvals)][2],    // sw input is connected to the ne output of the sw element
-                        outputs[outstep][mod(i  , numvals)][1],    // s input is connected to the n output of the s element 
-                        outputs[outstep][mod(i+1, numvals)][0]     // se input is connected to the nw output of the se element
+                if ( i==0 ) {
+                  output_ports += 
+                        outputs[outstep][0][0],  
+                        outputs[outstep][1][0];
+             // std::cout << " TEST A outputs " << outputs[outstep][0][0] << std::endl;
+             // std::cout << " TEST B outputs " << outputs[outstep][1][0] << std::endl;
+                } else if ( i==numvals-1 ) {
+                  output_ports += 
+                        outputs[outstep][numvals-2][2],  
+                        outputs[outstep][numvals-1][1];
+                } else if ( i==1 ) {
+                  output_ports += 
+                        outputs[outstep][i-1][1], // there are only two inputs at i=0 
+                        outputs[outstep][i][1],  
+                        outputs[outstep][i+1][0];
+                } else {
+                  output_ports += 
+                     //   outputs[outstep][mod(i-1, numvals)][2],    // sw input is connected to the ne output of the sw element
+                     //   outputs[outstep][mod(i  , numvals)][1],    // s input is connected to the n output of the s element 
+                     //   outputs[outstep][mod(i+1, numvals)][0]     // se input is connected to the nw output of the se element
+                        outputs[outstep][i-1][2],    // sw input is connected to the ne output of the sw element
+                        outputs[outstep][i][1],    // s input is connected to the n output of the s element 
+                        outputs[outstep][i+1][0]    // se input is connected to the nw output of the se element
                     ;
+                }
 
                 components::amr::stubs::dynamic_stencil_value::
                     connect_input_ports(*stencil, output_ports);
@@ -265,8 +293,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         init(locality_results(functions), locality_results(logging), numsteps);
 
         // initialize stencil_values using the stencil (functional) components
-        init_stencils(locality_results(stencils[0]), locality_results(functions), 0, stencilsize);
-        init_stencils(locality_results(stencils[1]), locality_results(functions), 1, stencilsize);
+        init_stencils(locality_results(stencils[0]), locality_results(functions), 0, stencilsize,numvalues);
+        init_stencils(locality_results(stencils[1]), locality_results(functions), 1, stencilsize,numvalues);
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(2);
@@ -276,15 +304,19 @@ namespace hpx { namespace components { namespace amr { namespace server
         // connect output gids with corresponding stencil inputs
         connect_input_ports(stencils, outputs);
 
+        printf(" TEST a\n");
         // for loop over second row ; call start for each
         start_row(locality_results(stencils[1]));
+        printf(" TEST b\n");
 
         // prepare initial data
         std::vector<naming::id_type> initial_data;
         prepare_initial_data(locality_results(functions), initial_data);
+        printf(" TEST c\n");
 
         // do actual work
         execute(locality_results(stencils[0]), initial_data, result_data);
+        printf(" TEST d\n");
 
         // free all allocated components (we can do that synchronously)
         if (!logging.empty())
@@ -335,8 +367,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         init(locality_results(functions), locality_results(logging), numsteps);
 
         // initialize stencil_values using the stencil (functional) components
-        init_stencils(locality_results(stencils[0]), locality_results(functions), 0, stencilsize);
-        init_stencils(locality_results(stencils[1]), locality_results(functions), 1, stencilsize);
+        init_stencils(locality_results(stencils[0]), locality_results(functions), 0, stencilsize,numvalues);
+        init_stencils(locality_results(stencils[1]), locality_results(functions), 1, stencilsize,numvalues);
        // init_stencils(locality_results(stencils[0]), locality_results(functions), 0);
        // init_stencils(locality_results(stencils[1]), locality_results(functions), 1);
 
