@@ -22,6 +22,14 @@ namespace hpx { namespace components { namespace amr
         stencil_data const* middle, stencil_data const* right, 
         stencil_data* result, int numsteps);
 
+    HPX_COMPONENT_EXPORT int evaluate_left_bdry_timestep(
+        stencil_data const* middle, stencil_data const* right, 
+        stencil_data* result, int numsteps);
+
+    HPX_COMPONENT_EXPORT int evaluate_right_bdry_timestep(stencil_data const* left, 
+        stencil_data const* middle,
+        stencil_data* result, int numsteps);
+
 }}}
 
 #endif
