@@ -7,16 +7,21 @@
 
 set (graph_HEADERS
     graph.hpp
+    edge.hpp
     server/graph.hpp
-    stubs/graph.hpp)
+    server/edge.hpp
+    stubs/graph.hpp
+    stubs/edge.hpp)
 
 set (graph_SOURCES
-    graph.cpp)
+    graph.cpp
+    edge.cpp)
     
 set (graph_DEPENDENCIES
     vertex_component
     vertex_list_component
-    distributing_factory_component)
+    distributing_factory_component
+    distributed_set_component)
 
 ###############################################################################
 

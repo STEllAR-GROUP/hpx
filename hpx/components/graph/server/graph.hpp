@@ -17,6 +17,7 @@
 
 #include <hpx/components/vertex/vertex.hpp>
 #include <hpx/components/vertex_list/vertex_list.hpp>
+#include <hpx/components/distributed_set/distributed_set.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server 
@@ -49,20 +50,22 @@ namespace hpx { namespace components { namespace server
 
         // constructor: initialize graph value
         graph()
-          : block_size_(0),
-            blocks_(0),
-            size_(0)
+          : size_(0)
         {
-            applier::applier& appl = applier::get_applier();
+            naming::id_type here = applier::get_applier().get_runtime_support_gid();
 
+            // This is going to be phased out
             using hpx::components::vertex_list;
-            vertex_list vertices_(vertex_list::create(appl.get_runtime_support_gid()));
+            vertex_list vertices_(vertex_list::create(here));
+
+            vertex_set_ = vertex_set_stub::create(here);
         }
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
         /// Initialize the graph
+        // This is an opt. for when we know the order a priori
         int init(count_t order)
         {            
             std::cout << "Initializing graph of order " << order << std::endl;
@@ -146,12 +149,18 @@ namespace hpx { namespace components { namespace server
         > vertices_action;
 
     private:
+        typedef hpx::components::stubs::distributed_set<
+            hpx::components::vertex
+        > vertex_set_stub;
+
         count_t block_size_;
         std::vector<naming::id_type> blocks_;
 
         int size_;
 
         vertex_list vertices_;
+
+        naming::id_type vertex_set_;
     };
 
 }}}
