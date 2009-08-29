@@ -6,6 +6,7 @@
 #if !defined(HPX_CONFIG_MAR_24_2008_0943AM)
 #define HPX_CONFIG_MAR_24_2008_0943AM
 
+#include <boost/config.hpp>
 #include <string>
 #include <hpx/config/export_definitions.hpp>
 

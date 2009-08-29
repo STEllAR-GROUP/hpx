@@ -4,9 +4,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
+
 #include <boost/lexical_cast.hpp>
+#include <boost/program_options.hpp>
 
 using namespace hpx;
+namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
 // this is a empty test thread
@@ -21,7 +24,7 @@ threads::thread_state null_thread(threads::thread_state_ex)
 int hpx_main(util::high_resolution_timer& timer, std::size_t num_threads)
 {
     // schedule a couple of threads
-    timer.restart();
+//     timer.restart();
     for (std::size_t i = 0; i < num_threads; ++i) {
         applier::register_work_plain(null_thread, "null_thread", threads::pending);
     }
@@ -40,54 +43,157 @@ int hpx_main(util::high_resolution_timer& timer, std::size_t num_threads)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// this is the runtime type we use in this application
-typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
+bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
+{
+    try {
+        po::options_description desc_cmdline ("Usage: fibonacci [options]");
+        desc_cmdline.add_options()
+            ("help,h", "print out program usage (this message)")
+            ("run_agas_server,r", "run AGAS server as part of this runtime instance")
+            ("worker,w", "run this instance in worker (non-console) mode")
+            ("agas,a", po::value<std::string>(), 
+                "the IP address the AGAS server is running on (default taken "
+                "from hpx.ini), expected format: 192.168.1.1:7912")
+            ("hpx,x", po::value<std::string>(), 
+                "the IP address the HPX parcelport is listening on (default "
+                "is localhost:7910), expected format: 192.168.1.1:7913")
+            ("threads,t", po::value<int>(), 
+                "the number of operating system threads to spawn for this"
+                "HPX locality")
+            ("value,v", po::value<int>(), 
+                "the number of px-threads to create")
+            ("local,l", po::value<int>(), 
+                "use local thread scheduler with this number of queues"
+                " (default is to use global thread scheduler)")
+        ;
+
+        po::store(po::command_line_parser(argc, argv)
+            .options(desc_cmdline).run(), vm);
+        po::notify(vm);
+
+        // print help screen
+        if (vm.count("help")) {
+            std::cout << desc_cmdline;
+            return false;
+        }
+    }
+    catch (std::exception const& e) {
+        std::cerr << "measure_thread_execution: exception caught: " 
+                  << e.what() << std::endl;
+        return false;
+    }
+    return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+inline void 
+split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
+{
+    std::string::size_type p = v.find_first_of(":");
+    try {
+        if (p != std::string::npos) {
+            addr = v.substr(0, p);
+            port = boost::lexical_cast<boost::uint16_t>(v.substr(p+1));
+        }
+        else {
+            addr = v;
+        }
+    }
+    catch (boost::bad_lexical_cast const& /*e*/) {
+        std::cerr << "measure_thread_execution: illegal port number given: " 
+                  << v.substr(p+1) << std::endl;
+        std::cerr << "                          using default value instead: " 
+                  << port << std::endl;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// helper class for AGAS server initialization
+class agas_server_helper
+{
+public:
+    agas_server_helper(std::string host, boost::uint16_t port)
+      : agas_pool_(), agas_(agas_pool_, host, port)
+    {
+        agas_.run(false);
+    }
+    ~agas_server_helper()
+    {
+        agas_.stop();
+    }
+
+private:
+    hpx::util::io_service_pool agas_pool_; 
+    hpx::naming::resolver_server agas_;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> 
+    global_runtime_type;
+typedef hpx::runtime_impl<hpx::threads::policies::local_queue_scheduler> 
+    local_runtime_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     try {
-        // Check command line arguments.
-        std::string hpx_host, agas_host;
-        boost::uint16_t hpx_port, agas_port;
-        std::size_t num_threads = 1;
-        std::size_t num_hpx_threads = 1;
+        // analyze the command line
+        po::variables_map vm;
+        if (!parse_commandline(argc, argv, vm))
+            return -1;
 
         // Check command line arguments.
-        if (argc != 7) {
-            std::cerr << "Usage: hpx_runtime hpx_addr hpx_port agas_addr "
-                         "agas_port number_of_threads number_of_threads" 
-                      << std::endl;
-            std::cerr << "Try: hpx_runtime <your_ip_addr> 7911 "
-                         "<your_ip_addr> 7912 1 1000" << std::endl;
-            return -3;
+        std::string hpx_host("localhost"), agas_host;
+        boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
+        int num_threads = 1;
+        int num_hpx_threads = 1;
+        hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
+
+        // extract IP address/port arguments
+        if (vm.count("agas")) 
+            split_ip_address(vm["agas"].as<std::string>(), agas_host, agas_port);
+
+        if (vm.count("hpx")) 
+            split_ip_address(vm["hpx"].as<std::string>(), hpx_host, hpx_port);
+
+        if (vm.count("threads"))
+            num_threads = vm["threads"].as<int>();
+
+        if (vm.count("value"))
+            num_hpx_threads = vm["value"].as<int>();
+
+        if (vm.count("worker"))
+            mode = hpx::runtime::worker;
+
+        // initialize and run the AGAS service, if appropriate
+        std::auto_ptr<agas_server_helper> agas_server;
+        if (vm.count("run_agas_server"))  // run the AGAS server instance here
+            agas_server.reset(new agas_server_helper(agas_host, agas_port));
+
+        util::high_resolution_timer timer;
+        double elapsed = 0;
+        if (!vm.count("local")) {
+            // initialize and start the HPX runtime
+            global_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
+
+            // the main thread will wait (block) for the shutdown action and 
+            // the threadmanager is serving incoming requests in the meantime
+            rt.run(boost::bind(hpx_main, boost::ref(timer), num_hpx_threads), 
+                num_threads);
+            elapsed = timer.elapsed();
         }
         else {
-            hpx_host = argv[1];
-            hpx_port = boost::lexical_cast<boost::uint16_t>(argv[2]);
-            agas_host = argv[3];
-            agas_port  = boost::lexical_cast<boost::uint16_t>(argv[4]);
-            num_threads = boost::lexical_cast<int>(argv[5]);
-            num_hpx_threads = boost::lexical_cast<int>(argv[6]);
+            // initialize and start the HPX runtime
+            std::pair<std::size_t, std::size_t> init(/*vm["local"].as<int>()*/num_threads, 0);
+            local_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, 
+                mode, init);
+
+            // the main thread will wait (block) for the shutdown action and 
+            // the threadmanager is serving incoming requests in the meantime
+            rt.run(boost::bind(hpx_main, boost::ref(timer), num_hpx_threads), 
+                num_threads);
+            elapsed = timer.elapsed();
         }
-
-        // run the AGAS server instance here
-        hpx::util::io_service_pool agas_pool; 
-        hpx::naming::resolver_server agas(agas_pool, 
-            hpx::naming::locality(agas_host, agas_port));
-
-        // initialize and start the HPX runtime
-        runtime_type rt(hpx_host, hpx_port, agas_host, agas_port);
-
-        // the main thread will wait (block) for the shutdown action and 
-        // the threadmanager is serving incoming requests in the meantime
-        util::high_resolution_timer timer;
-        rt.run(boost::bind(hpx_main, boost::ref(timer), num_hpx_threads), 
-            num_threads);
-        double elapsed = timer.elapsed();
-        //std::cout << "Elapsed time [s] for " << num_hpx_threads 
-        //          << " threads: " << elapsed << " (" 
-        //          << elapsed/num_hpx_threads << " per thread)" << std::endl;
         std::cout << elapsed/num_hpx_threads <<std::endl;
     }
 

@@ -21,6 +21,7 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/lockfree/fifo.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
+#include <boost/noncopyable.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
@@ -28,7 +29,7 @@ namespace hpx { namespace threads { namespace policies
     ///////////////////////////////////////////////////////////////////////////
     /// The local_queue_scheduler maintains exactly one queue of work items 
     /// (threads) per os thread, where this OS thread pulls its next work from.
-    class local_queue_scheduler
+    class local_queue_scheduler : boost::noncopyable
     {
     private:
         // The maximum number of active threads this thread manager should
@@ -39,15 +40,37 @@ namespace hpx { namespace threads { namespace policies
         enum { max_thread_count = 1000 };
 
     public:
-        local_queue_scheduler(std::size_t max_count = max_thread_count)
-          : queue_(max_count)
-        {}
+        typedef std::pair<std::size_t, std::size_t> init_parameter_type;
+
+        local_queue_scheduler(init_parameter_type const& init)
+          : queues_(init.first), 
+            curr_queue_(0)
+        {
+            for (std::size_t i = 0; i < init.first; ++i) 
+                queues_[i] = new thread_queue(init.second);
+        }
+
+        ~local_queue_scheduler()
+        {
+            for (std::size_t i = 0; i < queues_.size(); ++i) 
+                delete queues_[i];
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // This returns the current length of the queues (work items and new items)
         boost::int64_t get_queue_lengths(std::size_t num_thread = std::size_t(-1)) const
         {
-            return queue_.get_queue_lengths();
+            // either return queue length of one specific queue
+            if (std::size_t(-1) != num_thread) {
+                BOOST_ASSERT(num_thread < queues_.size());
+                return queues_[num_thread]->get_queue_lengths();
+            }
+
+            // or cumulative queue lengths of all queues
+            boost::int64_t result = 0;
+            for (std::size_t i = 0; i < queues_.size(); ++i)
+                result += queues_[i]->get_queue_lengths();
+            return result;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -58,34 +81,57 @@ namespace hpx { namespace threads { namespace policies
             char const* const description, thread_state initial_state,
             bool run_now, std::size_t num_thread = std::size_t(-1))
         {
-            return queue_.create_thread(threadfunc, description, 
-                initial_state, run_now);
+            if (std::size_t(-1) != num_thread) {
+                BOOST_ASSERT(num_thread < queues_.size());
+                return queues_[num_thread]->create_thread(threadfunc, 
+                    description, initial_state, run_now);
+            }
+
+            return queues_[++curr_queue_ % queues_.size()]->create_thread(
+                threadfunc, description, initial_state, run_now);
         }
 
         /// Return the next thread to be executed, return false if non is 
         /// available
         bool get_next_thread(std::size_t num_thread, threads::thread** thrd)
         {
-            return queue_.get_next_thread(thrd);
+            BOOST_ASSERT(num_thread < queues_.size());
+            if (queues_[num_thread]->get_next_thread(thrd))
+                return true;
+
+            for (std::size_t i = 1; i < queues_.size(); ++i) {
+                std::size_t idx = (i + num_thread) % queues_.size();
+                if (queues_[idx]->get_next_thread(thrd))
+                    return true;
+            }
+            return false;
         }
 
         /// Schedule the passed thread
         void schedule_thread(threads::thread* thrd, 
             std::size_t num_thread = std::size_t(-1))
         {
-            queue_.schedule_thread(thrd);
+            if (std::size_t(-1) != num_thread) {
+                BOOST_ASSERT(num_thread < queues_.size());
+                queues_[num_thread]->schedule_thread(thrd);
+            }
+            else {
+                queues_[++curr_queue_ % queues_.size()]->schedule_thread(thrd);
+            }
         }
 
         /// Destroy the passed thread as it has been terminated
         void destroy_thread(threads::thread* thrd)
         {
-            queue_.destroy_thread(thrd);
+            for (std::size_t i = 0; i < queues_.size(); ++i)
+                queues_[i]->destroy_thread(thrd);
         }
 
         /// Return the number of existing threads, regardless of their state
         std::size_t get_thread_count(std::size_t num_thread) const
         {
-            return queue_.get_thread_count();
+            BOOST_ASSERT(num_thread < queues_.size());
+            return queues_[num_thread]->get_thread_count();
         }
 
         /// This is a function which gets called periodically by the thread 
@@ -94,7 +140,8 @@ namespace hpx { namespace threads { namespace policies
         /// has to be terminated (i.e. no more work has to be done).
         bool wait_or_add_new(std::size_t num_thread, bool running)
         {
-            return queue_.wait_or_add_new(num_thread, running);
+            BOOST_ASSERT(num_thread < queues_.size());
+            return queues_[num_thread]->wait_or_add_new(num_thread, running);
         }
 
         /// This function gets called by the threadmanager whenever new work
@@ -102,25 +149,33 @@ namespace hpx { namespace threads { namespace policies
         /// possibly idling OS threads
         void do_some_work(std::size_t num_thread)
         {
-            queue_.do_some_work();
+            if (std::size_t(-1) != num_thread) {
+                BOOST_ASSERT(num_thread < queues_.size());
+                queues_[num_thread]->do_some_work();
+            }
+            else {
+                for (std::size_t i = 0; i < queues_.size(); ++i)
+                    queues_[i]->do_some_work();
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread) 
         {
-            queue_.on_start_thread(num_thread);
+            queues_[num_thread]->on_start_thread(num_thread);
         } 
         void on_stop_thread(std::size_t num_thread)
         {
-            queue_.on_stop_thread(num_thread);
+            queues_[num_thread]->on_stop_thread(num_thread);
         }
         void on_error(std::size_t num_thread, boost::exception_ptr const& e) 
         {
-            queue_.on_error(num_thread, e);
+            queues_[num_thread]->on_error(num_thread, e);
         }
 
     private:
-        thread_queue queue_;                ///< this manages all the PX threads
+        std::vector<thread_queue*> queues_;   ///< this manages all the PX threads
+        std::size_t curr_queue_;
     };
 
 }}}

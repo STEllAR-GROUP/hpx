@@ -48,14 +48,15 @@ namespace hpx { namespace util
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // exception to be thrown if integer read from archive doesn't fit
 // variable being loaded
-class portable_binary_iarchive_exception : 
+class BOOST_ARCHIVE_DECL(BOOST_PP_EMPTY()) portable_binary_iarchive_exception : 
     public virtual boost::archive::archive_exception
 {
 public:
-    typedef enum {
+    enum exception_code {
         incompatible_integer_size 
-    } exception_code;
+    };
     portable_binary_iarchive_exception(exception_code c = incompatible_integer_size )
+      : boost::archive::archive_exception((boost::archive::archive_exception::exception_code)c)
     {}
     virtual const char *what( ) const throw( )
     {
@@ -71,7 +72,7 @@ public:
 };
 
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
-// "Portable" input binary archive.  It addresses integer size and endienness so 
+// "Portable" input binary archive.  It addresses integer size and endianness so 
 // that binary archives can be passed across systems. Note:floating point types
 // not addressed here
 class portable_binary_iarchive : 

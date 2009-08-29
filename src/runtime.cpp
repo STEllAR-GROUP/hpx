@@ -52,7 +52,7 @@ namespace hpx
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
             std::string const& address, boost::uint16_t port,
             std::string const& agas_address, boost::uint16_t agas_port, 
-            mode locality_mode) 
+            mode locality_mode, init_scheduler_type const& init) 
       : runtime(agas_client_),
         result_(0), mode_(locality_mode), 
         ini_(util::detail::get_logging_data()), 
@@ -66,7 +66,7 @@ namespace hpx
         parcel_port_(parcel_pool_, naming::locality(address, port)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
-        scheduler_(),
+        scheduler_(init),
         notifier_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()),
             boost::bind(&runtime_impl::report_error, This(), _1, _2)),
@@ -84,7 +84,7 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
             naming::locality address, naming::locality agas_address, 
-            mode locality_mode) 
+            mode locality_mode, init_scheduler_type const& init) 
       : runtime(agas_client_),
         result_(0), mode_(locality_mode), 
         ini_(util::detail::get_logging_data()), 
@@ -98,7 +98,7 @@ namespace hpx
         parcel_port_(parcel_pool_, address),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
-        scheduler_(),
+        scheduler_(init),
         notifier_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()),
             boost::bind(&runtime_impl::report_error, This(), _1, _2)),
@@ -115,7 +115,8 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
-            naming::locality address, mode locality_mode) 
+            naming::locality address, mode locality_mode, 
+            init_scheduler_type const& init) 
       : runtime(agas_client_),
         result_(0), mode_(locality_mode), 
         ini_(util::detail::get_logging_data()), 
@@ -129,7 +130,7 @@ namespace hpx
         parcel_port_(parcel_pool_, address),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
-        scheduler_(),
+        scheduler_(init),
         notifier_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()),
             boost::bind(&runtime_impl::report_error, This(), _1, _2)),

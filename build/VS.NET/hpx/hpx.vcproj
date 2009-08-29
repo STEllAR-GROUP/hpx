@@ -68,6 +68,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="boost_serialization-vc80-mt-gd-1_40.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"

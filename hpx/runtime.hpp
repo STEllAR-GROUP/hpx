@@ -123,6 +123,9 @@ namespace hpx
         typedef SchedulingPolicy scheduling_policy_type;
         typedef NotificationPolicy notification_policy_type;
 
+        typedef typename scheduling_policy_type::init_parameter_type 
+            init_scheduler_type;
+
         /// Construct a new HPX runtime instance 
         ///
         /// \param address        [in] This is the address (IP address or 
@@ -144,9 +147,10 @@ namespace hpx
         /// \param locality_mode  [in] This is the mode the given runtime 
         ///                       instance should be executed in.
         explicit runtime_impl(std::string const& address = "localhost", 
-                boost::uint16_t port = HPX_PORT,
-                std::string const& agas_address = "", 
-                boost::uint16_t agas_port = 0, mode locality_mode = console);
+            boost::uint16_t port = HPX_PORT,
+            std::string const& agas_address = "", 
+            boost::uint16_t agas_port = 0, mode locality_mode = console,
+            init_scheduler_type const& init = init_scheduler_type());
 
         /// Construct a new HPX runtime instance 
         ///
@@ -155,7 +159,9 @@ namespace hpx
         ///                       used for receiving parcels. 
         /// \note The AGAS locality to use will be taken from the configuration 
         ///       file (hpx.ini).
-        explicit runtime_impl(naming::locality address, mode locality_mode = worker);
+        explicit runtime_impl(naming::locality address, 
+            mode locality_mode = worker,
+            init_scheduler_type const& init = init_scheduler_type());
 
         /// Construct a new HPX runtime instance 
         ///
@@ -165,7 +171,8 @@ namespace hpx
         /// \param agas_address   [in] This is the locality the AGAS server is 
         ///                       running on. 
         runtime_impl(naming::locality address, naming::locality agas_address, 
-                mode locality_mode = worker);
+            mode locality_mode = worker,
+            init_scheduler_type const& init = init_scheduler_type());
 
         /// \brief The destructor makes sure all HPX runtime services are 
         ///        properly shut down before exiting.

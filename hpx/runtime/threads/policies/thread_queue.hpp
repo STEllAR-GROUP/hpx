@@ -222,19 +222,34 @@ namespace hpx { namespace threads { namespace policies
             if (!terminated_items_.empty()) {
                 long delete_count = max_delete_count;   // delete only this much threads
                 thread_id_type todelete;
-                while (--delete_count && terminated_items_.dequeue(&todelete)) 
-                    thread_map_.erase(todelete);
+                while (delete_count && terminated_items_.dequeue(&todelete)) 
+                {
+                    if (thread_map_.erase(todelete))
+                        --delete_count;
+                }
             }
             return thread_map_.empty();
         }
 
     public:
-        thread_queue(std::size_t max_count)
+        // The maximum number of active threads this thread manager should
+        // create. This number will be a constraint only as long as the work
+        // items queue is not empty. Otherwise the number of active threads 
+        // will be incremented in steps equal to the \a min_add_new_count
+        // specified above.
+        enum { max_thread_count = 1000 };
+
+        thread_queue(std::size_t max_count = max_thread_count)
           : work_items_("work_items"), 
             terminated_items_("terminated_items"), 
-            max_count_(max_count),
+            max_count_((0 == max_count) ? max_thread_count : max_count),
             add_new_logger_("thread_queue::add_new")
         {}
+
+        void set_max_count(std::size_t max_count = max_thread_count)
+        {
+            max_count_ = (0 == max_count) ? max_thread_count : max_count;
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // This returns the current length of the queues (work items and new items)

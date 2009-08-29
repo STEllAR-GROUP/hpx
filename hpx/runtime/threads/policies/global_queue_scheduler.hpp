@@ -39,8 +39,10 @@ namespace hpx { namespace threads { namespace policies
         enum { max_thread_count = 1000 };
 
     public:
-        global_queue_scheduler(std::size_t max_count = max_thread_count)
-          : queue_(max_count)
+        typedef std::size_t init_parameter_type;
+
+        global_queue_scheduler(init_parameter_type max_count = 0)
+          : queue_((0 == max_count) ? max_thread_count : max_count)
         {}
 
         ///////////////////////////////////////////////////////////////////////
