@@ -17,6 +17,7 @@
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
 #include <hpx/components/graph/graph.hpp>
+#include <hpx/components/graph/edge.hpp>
 #include <hpx/components/vertex/vertex.hpp>
 
 #include <hpx/components/distributed_set/distributed_set.hpp>
@@ -37,8 +38,16 @@
 #include "../../props/props.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+
 typedef hpx::components::server::ssca2 ssca2_type;
-typedef hpx::components::server::ssca2::edge_set_type edge_set_type;
+
+typedef hpx::components::edge edge_type;
+typedef hpx::components::server::distributed_set<edge_type> dist_edge_set_type;
+typedef hpx::components::server::local_set<edge_type> local_edge_set_type;
+
+typedef hpx::components::graph graph_type;
+typedef hpx::components::server::distributed_set<graph_type> dist_graph_set_type;
+typedef hpx::components::server::local_set<graph_type> local_graph_set_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the ssca2 actions
@@ -60,6 +69,7 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<ssca2_type>, ssca2);
 HPX_DEFINE_GET_COMPONENT_TYPE(ssca2_type);
 
+/*
 typedef hpx::lcos::base_lco_with_value<
         ssca2_type::edge_set_type
     > create_edge_set_type;
@@ -68,6 +78,7 @@ HPX_REGISTER_ACTION_EX(
     create_edge_set_type::set_result_action,
     set_result_action_ssca2_result);
 HPX_DEFINE_GET_COMPONENT_TYPE(create_edge_set_type);
+*/
 
 #define LSSCA_(lvl) LAPP_(lvl) << " [SSCA] "
 
@@ -84,7 +95,6 @@ namespace hpx { namespace components { namespace server
         typedef components::distributing_factory::result_type result_type;
 
         int total_added = 0;
-        edge_set_type edge_set;
         std::vector<lcos::future_value<int> > local_searches;
 
         // Get vertex set of G
@@ -137,7 +147,8 @@ namespace hpx { namespace components { namespace server
 
         int max = -1;
         int num_added = 0;
-        ssca2::edge_set_type edge_set_local;
+
+        std::vector<edge_type::edge_snapshot_type> edge_set_local;
 
         // Iterate over local edges
         naming::id_type gid = local_vertex_set.first_gid_;
@@ -155,14 +166,18 @@ namespace hpx { namespace components { namespace server
                 if ((*it).label_ > max)
                 {
                     edge_set_local.clear();
-                    edge_set_local.push_back(
-                        edge(gid, (*it).target_, (*it).label_));
+
+                    edge_type::edge_snapshot_type e(gid, (*it).target_, (*it).label_);
+
+                    edge_set_local.push_back(e);
+                    //edge_set_local.push_back(
+                    //    edge(gid, (*it).target_, (*it).label_));
                     max = (*it).label_;
                 }
                 else if ((*it).label_ == max)
                 {
                     edge_set_local.push_back(
-                        edge(gid, (*it).target_, (*it).label_));
+                        edge::edge_snapshot_type(gid, (*it).target_, (*it).label_));
                 }
             }
         }
@@ -190,19 +205,37 @@ namespace hpx { namespace components { namespace server
             LSSCA_(info) << "Adding local edge set at "
                         << local_vertex_set.prefix_;
 
-            typedef distributed_set<ssca2::edge_set_type>
+            /*
+            typedef distributed_set<ssca2::edge_type>
                 distributed_edge_set_type;
             typedef local_set<ssca2::edge_set_type> local_edge_set_type;
+            */
 
             naming::id_type local_set =
                 lcos::eager_future<
-                    distributed_edge_set_type::get_local_action
+                    dist_edge_set_type::get_local_action
                 >(edge_set, local_vertex_set.prefix_).get();
+
+            // Convert edge snapshots into real edges
+
+            naming::id_type edge_base(stubs::edge::create(local_vertex_set.prefix_, edge_set_local.size()));
+            std::vector<naming::id_type> edges(edge_set_local.size());
+
+            int i=0;
+            std::vector<edge_type::edge_snapshot_type>::const_iterator eend = edge_set_local.end();
+            for (std::vector<edge_type::edge_snapshot_type>::const_iterator eit = edge_set_local.begin();
+                 eit != eend; ++eit, ++i)
+            {
+                lcos::eager_future<
+                               server::edge::init_action
+                           >(edge_base+i, (*eit).source_, (*eit).target_, (*eit).label_).get();
+                edges[i] = edge_base+i;
+            }
 
             num_added =
                 lcos::eager_future<
                     local_edge_set_type::append_action
-                >(local_set, edge_set_local).get();
+                >(local_set, edges).get();
         }
         else
         {
@@ -219,17 +252,19 @@ namespace hpx { namespace components { namespace server
         LSSCA_(info) << "extract(" << edge_set
                      << ", " << subgraphs << ")";
 
-        typedef distributed_set<ssca2::graph_set_type>
-            distributed_graph_set_type;
-        typedef distributed_set<ssca2::edge_set_type>
-            distributed_edge_set_type;
+        /*
+        typedef components::edge edge;
+        typedef components::graph graph;
+
+        typedef components::server::distributed_set distributed_set;
+        */
 
         std::vector<lcos::future_value<int> > results;
 
         // Get vector of local sublists of the edge set
         std::vector<naming::id_type> locals =
             lcos::eager_future<
-                distributed_edge_set_type::locals_action
+                dist_edge_set_type::locals_action
             >(edge_set).get();
 
         // Spawn extract_local local to each sublist of the edge set
@@ -243,7 +278,7 @@ namespace hpx { namespace components { namespace server
             // Get colocated portion of subgraphs set
             naming::id_type local_subgraphs =
                 lcos::eager_future<
-                    distributed_graph_set_type::get_local_action
+                    dist_graph_set_type::get_local_action
                 >(subgraphs, locale).get();
 
             // Spawn actions local to data
@@ -270,23 +305,25 @@ namespace hpx { namespace components { namespace server
         LSSCA_(info) << "extract_local(" << local_edge_set
                      << ", " << local_subgraphs;
 
-        typedef local_set<ssca2::edge_set_type> local_edge_set_type;
-        typedef local_set<ssca2::graph_set_type> local_graph_set_type;
+        /*
+        typedef components::edge edge;
+        typedef components::graph graph;
+        typedef components::server::local_set local_set;
+        */
 
         // Get local vector of edges, for iterating over
-        ssca2::edge_set_type edges(
+        std::vector<naming::id_type> edges(
             lcos::eager_future<
                 local_edge_set_type::get_action
             >(local_edge_set).get());
 
         // Allocate vector of empty subgraphs
         // (mirroring the local portion of the edge list)
-        ssca2::graph_set_type graph_set_local(edges.size());
+        std::vector<naming::id_type> graph_set_local(edges.size());
 
         // This uses hack to get prefix
         naming::id_type here(boost::uint64_t(local_edge_set.get_msb()) << 32,0);
-        naming::id_type graphs =
-            hpx::components::stubs::graph::create(here, edges.size());
+        naming::id_type graphs = components::stubs::graph::create(here, edges.size());
 
         // Allocate vector of property maps for each subgraph
         typedef std::map<naming::id_type,naming::id_type> gids_map_type;
@@ -300,6 +337,7 @@ namespace hpx { namespace components { namespace server
         }
 
         // Append local vector of graphs
+        // Think about "grow" action to expand with N new items
         lcos::eager_future<
             local_graph_set_type::append_action
         >(local_subgraphs, graph_set_local).get();
@@ -308,12 +346,17 @@ namespace hpx { namespace components { namespace server
         std::vector<lcos::future_value<int> > results;
 
         int i = 0;
-        ssca2::edge_set_type::const_iterator end = edges.end();
-        for (ssca2::edge_set_type::const_iterator it = edges.begin();
+        std::vector<naming::id_type>::const_iterator end = edges.end();
+        for (std::vector<naming::id_type>::const_iterator it = edges.begin();
              it != end; ++it, ++i)
         {
             naming::id_type H = graphs + i;
             int d = 3; // This should be an argument
+
+            edge_type::edge_snapshot_type e(
+                lcos::eager_future<
+                    components::server::edge::get_snapshot_action
+                >(*it).get());
 
             // We are local to source
 
@@ -322,7 +365,7 @@ namespace hpx { namespace components { namespace server
             // the action local to the data
 
             // This uses hack to get prefix
-            naming::id_type locale(boost::uint64_t((*it).source_.get_msb()) << 32,0);
+            naming::id_type locale(boost::uint64_t(e.source_.get_msb()) << 32,0);
             naming::id_type local_pmap =
                 dist_gids_map_type::get_local(pmaps[i], locale);
 
@@ -332,7 +375,7 @@ namespace hpx { namespace components { namespace server
             components::component_type props_type =
                 components::get_component_type<components::server::props>();
             naming::id_type source_props =
-                components::stubs::local_map<gids_map_type>::value(local_pmap, (*it).source_, props_type);
+                components::stubs::local_map<gids_map_type>::value(local_pmap, e.source_, props_type);
 
             LSSCA_(info) << "Got source_props " << source_props;
 
@@ -342,13 +385,14 @@ namespace hpx { namespace components { namespace server
                     server::props::color_action
                 >(source_props, d).get();
 
+
             if (color >= d && d > 1)
             {
                 // Spawn subgraph extraction local to target
-                naming::id_type there(boost::uint64_t((*it).target_.get_msb()) << 32,0);
+                naming::id_type there(boost::uint64_t(e.target_.get_msb()) << 32,0);
                 results.push_back(lcos::eager_future<
                     extract_subgraph_action
-                >(there, H, pmaps[i], (*it).source_, (*it).target_, d));
+                >(there, H, pmaps[i], e.source_, e.target_, d));
             }
         }
 

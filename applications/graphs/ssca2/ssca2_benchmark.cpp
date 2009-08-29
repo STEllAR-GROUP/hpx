@@ -15,6 +15,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 
 #include <hpx/components/graph/graph.hpp>
+#include <hpx/components/graph/edge.hpp>
 #include <hpx/components/vertex/vertex.hpp>
 #include <hpx/components/distributed_set/distributed_set.hpp>
 
@@ -185,6 +186,7 @@ int hpx_main(int depth, int scale, int edge_factor, int type)
 
     using hpx::components::ssca2;
     using hpx::components::distributed_set;
+    using hpx::components::edge;
 
     ssca2 SSCA2 (ssca2::create(here));
 
@@ -205,10 +207,10 @@ int hpx_main(int depth, int scale, int edge_factor, int type)
     //
     // edges = filter(G.edges(), max_edge)
 
-    typedef hpx::components::server::ssca2::edge_set_type edge_set_type;
-    typedef distributed_set<edge_set_type> dist_edge_set_type;
-    dist_edge_set_type edge_set (dist_edge_set_type::create(here));
+    //typedef hpx::components::server::ssca2::edge_set_type edge_set_type;
+    //typedef distributed_set<edge_set_type> dist_edge_set_type;
 
+    distributed_set<edge> edge_set(distributed_set<edge>::create(here));
     SSCA2.large_set(G.get_gid(), edge_set.get_gid());
 
     // Kernel 3: graph extraction
@@ -221,11 +223,16 @@ int hpx_main(int depth, int scale, int edge_factor, int type)
     //
     // subgraphs = map(edges, extract_subgraph)
 
+
+    distributed_set<graph> subgraphs(distributed_set<graph>::create(here));
+    /*
     typedef hpx::components::server::ssca2::graph_set_type graph_set_type;
     typedef distributed_set<graph_set_type> dist_graph_set_type;
     dist_graph_set_type subgraphs(dist_graph_set_type::create(here));
+    */
 
     SSCA2.extract(edge_set.get_gid(), subgraphs.get_gid());
+
 
     LSSCA_(info) << "Completed Kernel 3";
 

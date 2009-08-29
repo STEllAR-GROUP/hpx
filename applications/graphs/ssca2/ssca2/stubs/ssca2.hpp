@@ -15,9 +15,6 @@
 
 #include "../server/ssca2.hpp"
 
-typedef hpx::components::server::ssca2::edge edge;
-typedef hpx::components::server::ssca2::edge_set_type edge_set_type;
-
 namespace hpx { namespace components { namespace stubs
 {    
     ///////////////////////////////////////////////////////////////////////////

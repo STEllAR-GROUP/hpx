@@ -60,6 +60,7 @@ namespace hpx { namespace components { namespace server
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
+        /*
         // This should go somewhere else ... but where?
         struct graph_foo
         {
@@ -87,7 +88,8 @@ namespace hpx { namespace components { namespace server
                 ar & G_;
             }
         };
-
+        */
+        /*
         struct edge
         {
             edge()
@@ -120,6 +122,7 @@ namespace hpx { namespace components { namespace server
                 ar & source_ & target_ & label_;
             }
         };
+        */
 
         struct props
         {
@@ -204,13 +207,20 @@ namespace hpx { namespace components { namespace server
             }
         };
 
-        typedef std::vector<edge> edge_set_type;
+        /*
+        typedef edge edge_type;
+        typedef std::vector<edge_type> edge_set_type;
+
+        typedef distributed_set<edge_type> dist_edge_set_type;
+        */
+
         typedef distributing_factory::locality_result locality_result;
 
-        typedef distributed_set<edge_set_type> dist_edge_set_type;
-
-        typedef std::vector<graph_foo> graph_set_type;
-        typedef distributed_set<graph_set_type> dist_graph_set_type;
+        /*
+        typedef graph_foo graph_foo_type;
+        typedef std::vector<graph_foo_type> graph_set_type;
+        typedef distributed_set<graph_foo_type> dist_graph_set_type;
+        */
 
         typedef std::map<naming::id_type,naming::id_type> gids_map_type;
         typedef distributed_map<gids_map_type> dist_gids_map_type;
