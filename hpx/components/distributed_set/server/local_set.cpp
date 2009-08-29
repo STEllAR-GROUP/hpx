@@ -38,7 +38,7 @@ typedef hpx::components::server::local_set<
 
 HPX_REGISTER_ACTION_EX(
     local_vertex_set_type::append_action,
-    local_append_action);
+    local_set_append_action);
 HPX_REGISTER_ACTION_EX(
     local_vertex_set_type::get_action,
     local_set_get_action);
