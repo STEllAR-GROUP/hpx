@@ -13,6 +13,10 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
+#include <hpx/components/vertex/vertex.hpp>
+#include <hpx/components/graph/edge.hpp>
+#include <hpx/components/graph/graph.hpp>
+
 #include "distributed_set.hpp"
 #include "../stubs/distributed_set.hpp"
 
@@ -21,19 +25,34 @@
 #include "../stubs/local_set.hpp"
 
 // Needs this to define edge_set_type
-#include "../../../../applications/graphs/ssca2/ssca2/ssca2.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+
 typedef hpx::components::server::distributed_set<
-    hpx::components::server::ssca2::edge_set_type
+    hpx::components::vertex
+> distributed_vertex_set_type;
+
+typedef hpx::components::server::distributed_set<
+    hpx::components::edge
 > distributed_edge_set_type;
 
 typedef hpx::components::server::distributed_set<
-    hpx::components::server::ssca2::graph_set_type
+    hpx::components::graph
 > distributed_graph_set_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the distributed_set actions
+
+HPX_REGISTER_ACTION_EX(
+    distributed_vertex_set_type::get_local_action,
+    distributed_vertex_set_get_local_action);
+HPX_REGISTER_ACTION_EX(
+    distributed_vertex_set_type::locals_action,
+    distributed_vertex_set_locals_action);
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+    hpx::components::simple_component<distributed_vertex_set_type>,
+    distributed_vertex_set);
+HPX_DEFINE_GET_COMPONENT_TYPE(distributed_vertex_set_type);
 
 HPX_REGISTER_ACTION_EX(
     distributed_edge_set_type::get_local_action,
@@ -60,11 +79,13 @@ HPX_DEFINE_GET_COMPONENT_TYPE(distributed_graph_set_type);
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
-    template <typename List>
-    distributed_set<List>::distributed_set() {}
+    template <typename Item>
+    distributed_set<Item>::distributed_set()
+      : next_locale_(0)
+    {}
     
-    template <typename List>
-    naming::id_type distributed_set<List>::get_local(naming::id_type locale)
+    template <typename Item>
+    naming::id_type distributed_set<Item>::get_local(naming::id_type locale)
     {
         std::cout << "Getting local sublist at " << locale <<  std::endl;
 
@@ -75,9 +96,7 @@ namespace hpx { namespace components { namespace server
             std::cout << "Need to make new sublist" << std::endl;
 
             // Create a new sub list there
-            typedef ssca2::edge_set_type edge_set_type;
-            typedef hpx::components::local_set<edge_set_type> local_set_type;
-
+            typedef hpx::components::local_set<Item> local_set_type;
             local_set_type edge_set(local_set_type::create(locale));
 
             std::cout << "Created local sublist" << std::endl;
@@ -95,8 +114,8 @@ namespace hpx { namespace components { namespace server
         }
     }
 
-    template <typename List>
-    std::vector<naming::id_type> distributed_set<List>::locals(void)
+    template <typename Item>
+    std::vector<naming::id_type> distributed_set<Item>::locals(void)
     {
         std::cout << "Getting coverage of distributed set" << std::endl;
 

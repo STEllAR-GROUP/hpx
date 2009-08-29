@@ -20,9 +20,9 @@ namespace hpx { namespace components { namespace stubs
     ///////////////////////////////////////////////////////////////////////////
     /// The \a stubs#distributed_set class is the client side representation of
     /// all \a server#distributed_set components
-    template <typename List>
+    template <typename Item>
     struct distributed_set
-      : components::stubs::stub_base<server::distributed_set<List> >
+      : components::stubs::stub_base<server::distributed_set<Item> >
     {
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
@@ -31,7 +31,7 @@ namespace hpx { namespace components { namespace stubs
         /// with the given \a gid
         static naming::id_type get_local(naming::id_type gid, naming::id_type locale)
         {
-            typedef typename server::distributed_set<List>::get_local_action
+            typedef typename server::distributed_set<Item>::get_local_action
                 action_type;
             return lcos::eager_future<action_type>(gid, locale).get();
         }
@@ -39,7 +39,7 @@ namespace hpx { namespace components { namespace stubs
         static std::vector<naming::id_type>
         locals(naming::id_type gid)
         {
-            typedef typename server::distributed_set<List>::locals_action action_type;
+            typedef typename server::distributed_set<Item>::locals_action action_type;
             return lcos::eager_future<action_type>(gid).get();
         }
     };

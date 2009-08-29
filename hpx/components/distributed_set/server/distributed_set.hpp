@@ -20,9 +20,9 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     /// The distributed_set is an HPX component.
     ///
-    template <typename List>
+    template <typename Item>
     class HPX_COMPONENT_EXPORT distributed_set
-      : public simple_component_base<distributed_set<List> >
+      : public simple_component_base<distributed_set<Item> >
     {
     private:
         typedef simple_component_base<distributed_set> base_type;
@@ -30,7 +30,7 @@ namespace hpx { namespace components { namespace server
     public:
         distributed_set();
         
-        typedef hpx::components::server::distributed_set<List> wrapping_type;
+        typedef hpx::components::server::distributed_set<Item> wrapping_type;
         
         enum actions
         {
@@ -41,7 +41,7 @@ namespace hpx { namespace components { namespace server
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        typedef List list_type;
+        typedef std::vector<naming::id_type> set_type;
 
         naming::id_type get_local(naming::id_type);
 
@@ -66,6 +66,8 @@ namespace hpx { namespace components { namespace server
         // Map from locale to its local_set
         std::map<naming::id_type,naming::id_type> map_;
         std::vector<naming::id_type> locals_;
+
+        int next_locale_;
     };
 
 }}}

@@ -13,23 +13,38 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
+#include <hpx/components/vertex/vertex.hpp>
+#include <hpx/components/graph/graph.hpp>
+#include <hpx/components/graph/edge.hpp>
+
 #include "local_set.hpp"
 #include "../stubs/local_set.hpp"
 
-// Needs this to define edge_set_type
-#include "../../../../applications/graphs/ssca2/ssca2/ssca2.hpp"
-
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::server::local_set<
-    hpx::components::server::ssca2::edge_set_type
+    hpx::components::vertex
+> local_vertex_set_type;
+
+typedef hpx::components::server::local_set<
+    hpx::components::edge
 > local_edge_set_type;
 
 typedef hpx::components::server::local_set<
-    hpx::components::server::ssca2::graph_set_type
+    hpx::components::graph
 > local_graph_set_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the local_set actions
+
+HPX_REGISTER_ACTION_EX(
+    local_vertex_set_type::append_action,
+    local_append_action);
+HPX_REGISTER_ACTION_EX(
+    local_vertex_set_type::get_action,
+    local_set_get_action);
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+    hpx::components::simple_component<local_vertex_set_type>, local_vertex_set);
+HPX_DEFINE_GET_COMPONENT_TYPE(local_vertex_set_type);
 
 HPX_REGISTER_ACTION_EX(
     local_edge_set_type::append_action,
@@ -38,7 +53,7 @@ HPX_REGISTER_ACTION_EX(
     local_edge_set_type::get_action,
     local_set_get_action);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<local_edge_set_type>, local_set);
+    hpx::components::simple_component<local_edge_set_type>, local_edge_set);
 HPX_DEFINE_GET_COMPONENT_TYPE(local_edge_set_type);
 
 HPX_REGISTER_ACTION_EX(
@@ -51,19 +66,19 @@ HPX_DEFINE_GET_COMPONENT_TYPE(local_graph_set_type);
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
-    template <typename List>
-    local_set<List>::local_set()
+    template <typename Item>
+    local_set<Item>::local_set()
       : local_set_(0)
     {}
 
-    template <typename List>
-    int local_set<List>::append(List list)
+    template <typename Item>
+    int local_set<Item>::append(set_type list)
     {
         std::cout << "Appending to local list at locale " << std::endl;
 
         // Probably should do some locking ... somewhere ... maybe here
 
-        typedef typename List::iterator list_iter;
+        typedef typename set_type::iterator list_iter;
         list_iter end = list.end();
         for (list_iter it = list.begin(); it != end; ++it)
         {
@@ -73,8 +88,8 @@ namespace hpx { namespace components { namespace server
         return local_set_.size();
     }
 
-    template <typename List>
-    List local_set<List>::get(void)
+    template <typename Item>
+    std::vector<naming::id_type> local_set<Item>::get(void)
     {
         std::cout << "Getting local set" << std::endl;
 

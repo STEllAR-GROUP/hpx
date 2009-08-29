@@ -20,22 +20,24 @@ namespace hpx { namespace components { namespace stubs
     ///////////////////////////////////////////////////////////////////////////
     /// The \a stubs#local_set class is the client side representation of all
     /// \a server#local_set components
-    template <typename List>
+    template <typename Item>
     struct local_set
-      : components::stubs::stub_base<server::local_set<List> >
+      : components::stubs::stub_base<server::local_set<Item> >
     {
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        static int append(naming::id_type gid, List list)
+        typedef std::vector<naming::id_type> set_type;
+
+        static int append(naming::id_type gid, set_type list)
         {
-            typedef typename server::local_set<List>::append_action action_type;
+            typedef typename server::local_set<Item>::append_action action_type;
             return lcos::eager_future<action_type>(gid, list).get();
         }
 
-        static List get(naming::id_type gid)
+        static set_type get(naming::id_type gid)
         {
-            typedef typename server::local_set<List>::get_action action_type;
+            typedef typename server::local_set<Item>::get_action action_type;
             return lcos::eager_future<action_type>(gid).get();
         }
     };

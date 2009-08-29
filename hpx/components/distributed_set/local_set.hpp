@@ -14,13 +14,13 @@
 
 namespace hpx { namespace components
 {
-    template <typename List>
+    template <typename Item>
     class local_set
-      : public client_base<local_set<List>, stubs::local_set<List> >
+      : public client_base<local_set<Item>, stubs::local_set<Item> >
     {
     private:
         typedef client_base<
-                    local_set<List>, stubs::local_set<List>
+                    local_set<Item>, stubs::local_set<Item>
                 > base_type;
 
     public:
@@ -33,12 +33,14 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        int append(List list)
+        typedef std::vector<naming::id_type> set_type;
+
+        int append(set_type list)
         {
             return this->base_type::append(this->gid_, list);
         }
 
-        List get(void)
+        set_type get(void)
         {
             return this->base_type::get(this->gid_);
         }

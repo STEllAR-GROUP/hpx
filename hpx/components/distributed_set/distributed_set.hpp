@@ -21,17 +21,17 @@ namespace hpx { namespace components
     /// The purpose of the distributed list component is simply to wrap local
     /// non-component list types, to give them GIDs
     ///
-    /// Remember that List must be serializable
+    /// Remember that Item must be serializable
 
-    template <typename List>
+    template <typename Item>
     class distributed_set
       : public client_base<
-                   distributed_set<List>, stubs::distributed_set<List>
+                   distributed_set<Item>, stubs::distributed_set<Item>
                >
     {
     private:
         typedef client_base<
-                    distributed_set<List>, stubs::distributed_set<List>
+                    distributed_set<Item>, stubs::distributed_set<Item>
                 > base_type;
 
     public:

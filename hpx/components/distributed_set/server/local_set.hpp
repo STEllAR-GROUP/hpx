@@ -20,9 +20,9 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     /// The local_set is an HPX component.
     ///
-    template <typename List>
+    template <typename Item>
     class HPX_COMPONENT_EXPORT local_set
-      : public simple_component_base<local_set<List> >
+      : public simple_component_base<local_set<Item> >
     {
     private:
         typedef simple_component_base<local_set> base_type;
@@ -31,7 +31,7 @@ namespace hpx { namespace components { namespace server
         local_set();
         
         //typedef local_set::server::local_set wrapping_type;
-        typedef hpx::components::server::local_set<List> wrapping_type;
+        typedef hpx::components::server::local_set<Item> wrapping_type;
         
         enum actions
         {
@@ -42,26 +42,26 @@ namespace hpx { namespace components { namespace server
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        typedef List list_type;
+        typedef std::vector<naming::id_type> set_type;
 
-        int append(List);
+        int append(set_type);
 
-        List get(void);
+        set_type get(void);
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::result_action1<
-            local_set, int, local_set_append, List, &local_set::append
+            local_set, int, local_set_append, set_type, &local_set::append
         > append_action;
 
         typedef hpx::actions::result_action0<
-            local_set, List, local_set_get, &local_set::get
+            local_set, set_type, local_set_get, &local_set::get
         > get_action;
 
     private:
-        List local_set_;
+        set_type local_set_;
     };
 
 }}}
