@@ -25,7 +25,6 @@ namespace hpx { namespace components { namespace stubs
     {
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
-        typedef vertex_list::result_type result_type;
 
         /// Initialize the server#graph instance 
         /// with the given \a gid

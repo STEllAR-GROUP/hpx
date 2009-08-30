@@ -17,7 +17,6 @@
 #include <hpx/runtime/actions/component_action.hpp>
 
 #include <hpx/components/vertex/vertex.hpp>
-#include <hpx/components/vertex_list/vertex_list.hpp>
 #include <hpx/components/distributed_set/distributed_set.hpp>
 
 #define LGRAPH_(lvl) LAPP_(lvl) << " [GRAPH] "

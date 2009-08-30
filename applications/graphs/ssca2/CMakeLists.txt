@@ -14,7 +14,7 @@ foreach(subdir ${ssca_SUDIRS})
 endforeach()
 
 set(ssca_DEPENDENCIES
-   graph_component vertex_list_component vertex_component
+   graph_component vertex_component
    distributed_set_component ssca2_component)
 
 set(ssca2_benchmark_SOURCES
