@@ -16,12 +16,11 @@ set (ssca2_SOURCES
 
 set(ssca2_DEPENDENCIES
     reduce_max_component
-	  pbreak_component
-	  props_component
+	pbreak_component
+	props_component
     graph_component
     distributed_set_component
     distributed_map_component
-    distributing_factory_component
     vertex_component)
 
 set(ssca2_INI

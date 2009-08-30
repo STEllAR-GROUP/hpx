@@ -124,6 +124,7 @@ namespace hpx { namespace components { namespace server
         };
         */
 
+        /*
         struct props
         {
         private:
@@ -206,6 +207,7 @@ namespace hpx { namespace components { namespace server
                 ar & gid_ & partial_;
             }
         };
+        */
 
         /*
         typedef edge edge_type;
@@ -231,7 +233,7 @@ namespace hpx { namespace components { namespace server
                   naming::id_type dist_edge_set);
 
         int
-        large_set_local(locality_result local_set,
+        large_set_local(naming::id_type local_set,
                         naming::id_type edge_set,
                         naming::id_type local_max_lco,
                         naming::id_type global_max_lco);
@@ -267,7 +269,7 @@ namespace hpx { namespace components { namespace server
 
         typedef hpx::actions::result_action4<
             ssca2, int, ssca2_large_set_local,
-            locality_result, naming::id_type, naming::id_type, naming::id_type,
+            naming::id_type, naming::id_type, naming::id_type, naming::id_type,
             &ssca2::large_set_local
         > large_set_local_action;
 

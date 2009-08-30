@@ -18,6 +18,7 @@
 #include <hpx/components/graph/edge.hpp>
 #include <hpx/components/vertex/vertex.hpp>
 #include <hpx/components/distributed_set/distributed_set.hpp>
+#include <hpx/components/distributed_set/local_set.hpp>
 
 #include <hpx/components/distributed_map/distributed_map.hpp>
 
@@ -97,10 +98,51 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
     srand(time(0));
        
     // Initialize the graph.
-    // Assumes we are initializing size-many vertices
-    // with labels ranging from [0,size).
     lcos::future_value<int> result = lcos::eager_future<graph_init_action>(G, order);
     result.get();
+
+    // Initialize size-many vertices
+    // with labels ranging from [0,size).
+    typedef hpx::components::server::vertex vertex_type;
+    typedef hpx::components::server::distributed_set<vertex_type> dist_vertex_set_type;
+    typedef std::vector<naming::id_type> gids_type;
+
+    naming::id_type vertex_set =
+        lcos::eager_future<hpx::components::server::graph::vertices_action>(G).get();
+    gids_type locals =
+        lcos::eager_future<dist_vertex_set_type::locals_action>(vertex_set).get();
+
+    LSSCA_(info) << "Number of local lists: " << locals.size();
+
+    std::vector<naming::id_type> label_pmap(order);
+
+    int i = 0;
+    gids_type::const_iterator gend = locals.end();
+    for (gids_type::const_iterator git = locals.begin();
+         git != gend; ++git)
+    {
+        LSSCA_(info) << "Local list" << *git;
+
+        gids_type vertices =
+            lcos::eager_future<
+                hpx::components::server::local_set<
+                    hpx::components::server::vertex
+                >::get_action
+            >(*git).get();
+
+        gids_type::const_iterator vend = vertices.end();
+        for (gids_type::const_iterator vit = vertices.begin();
+             vit != vend; ++vit)
+        {
+            LSSCA_(info) << "Vertex" << *vit;
+
+            lcos::eager_future<hpx::components::server::vertex::init_action>(*vit, i).get();
+            label_pmap[i] = *vit;
+
+            ++i;
+        }
+
+    }
 
     // Start adding edges in phases
     num_edges_added = 0;
@@ -146,13 +188,10 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
         {
            known_edges[key] = key;
 
-           lcos::future_value<naming::id_type> u = lcos::eager_future<graph_vertex_name_action>(G, x-1);
-           lcos::future_value<naming::id_type> v = lcos::eager_future<graph_vertex_name_action>(G, y-1);
-
            results.push_back(
                lcos::eager_future<
                    graph_add_edge_action
-               >(G, u.get(), v.get(), nrand(type_max)));
+               >(G, label_pmap[x-1], label_pmap[y-1], nrand(type_max)));
 
            num_edges_added += 1;
         }
@@ -186,7 +225,7 @@ int hpx_main(int depth, int scale, int edge_factor, int type)
 
     using hpx::components::ssca2;
     using hpx::components::distributed_set;
-    using hpx::components::edge;
+    using hpx::components::server::edge;
 
     ssca2 SSCA2 (ssca2::create(here));
 
@@ -207,8 +246,7 @@ int hpx_main(int depth, int scale, int edge_factor, int type)
     //
     // edges = filter(G.edges(), max_edge)
 
-    //typedef hpx::components::server::ssca2::edge_set_type edge_set_type;
-    //typedef distributed_set<edge_set_type> dist_edge_set_type;
+    LSSCA_(info) << "Starting Kernel 2";
 
     distributed_set<edge> edge_set(distributed_set<edge>::create(here));
     SSCA2.large_set(G.get_gid(), edge_set.get_gid());
@@ -224,12 +262,8 @@ int hpx_main(int depth, int scale, int edge_factor, int type)
     // subgraphs = map(edges, extract_subgraph)
 
 
-    distributed_set<graph> subgraphs(distributed_set<graph>::create(here));
-    /*
-    typedef hpx::components::server::ssca2::graph_set_type graph_set_type;
-    typedef distributed_set<graph_set_type> dist_graph_set_type;
-    dist_graph_set_type subgraphs(dist_graph_set_type::create(here));
-    */
+    typedef components::server::graph graph_type;
+    distributed_set<graph_type> subgraphs(distributed_set<graph_type>::create(here));
 
     SSCA2.extract(edge_set.get_gid(), subgraphs.get_gid());
 

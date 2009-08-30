@@ -41,11 +41,15 @@
 
 typedef hpx::components::server::ssca2 ssca2_type;
 
-typedef hpx::components::edge edge_type;
+typedef hpx::components::server::vertex vertex_type;
+typedef hpx::components::server::distributed_set<vertex_type> dist_vertex_set_type;
+typedef hpx::components::server::local_set<vertex_type> local_vertex_set_type;
+
+typedef hpx::components::server::edge edge_type;
 typedef hpx::components::server::distributed_set<edge_type> dist_edge_set_type;
 typedef hpx::components::server::local_set<edge_type> local_edge_set_type;
 
-typedef hpx::components::graph graph_type;
+typedef hpx::components::server::graph graph_type;
 typedef hpx::components::server::distributed_set<graph_type> dist_graph_set_type;
 typedef hpx::components::server::local_set<graph_type> local_graph_set_type;
 
@@ -93,26 +97,34 @@ namespace hpx { namespace components { namespace server
         LSSCA_(info) << "large_set(" << G << ", " << dist_edge_set << ")";
 
         typedef components::distributing_factory::result_type result_type;
+        typedef std::vector<naming::id_type> gids_type;
 
         int total_added = 0;
         std::vector<lcos::future_value<int> > local_searches;
 
         // Get vertex set of G
-        result_type vertices =
+        naming::id_type vertices =
             lcos::eager_future<graph::vertices_action>(G).get();
 
+        typedef std::vector<naming::id_type> gids_type;
+        gids_type vertex_sets =
+            lcos::eager_future<dist_vertex_set_type::locals_action>(vertices).get();
+
         // Create lcos to reduce max value
-        lcos::reduce_max local_max(vertices.size(), 1);
-        lcos::reduce_max global_max(1, vertices.size());
+        lcos::reduce_max local_max(vertex_sets.size(), 1);
+        lcos::reduce_max global_max(1, vertex_sets.size());
 
         // Spawn searches on local sub lists
-        result_type::const_iterator end = vertices.end();
-        for (result_type::const_iterator it = vertices.begin();
-             it != end; ++it)
+        gids_type::const_iterator vend = vertex_sets.end();
+        for (gids_type::const_iterator vit = vertex_sets.begin();
+             vit != vend; ++vit)
         {
+            naming::id_type there(boost::uint64_t((*vit).get_msb()) << 32, 0);
+
             local_searches.push_back(
-                lcos::eager_future<large_set_local_action>((*it).prefix_,
-                    *it,
+                lcos::eager_future<large_set_local_action>(
+                    there,
+                    (*vit),
                     dist_edge_set,
                     local_max.get_gid(),
                     global_max.get_gid()));
@@ -137,52 +149,59 @@ namespace hpx { namespace components { namespace server
     }
     
     int
-    ssca2::large_set_local(locality_result local_vertex_set,
+    ssca2::large_set_local(naming::id_type local_vertex_set,
                              naming::id_type edge_set,
                              naming::id_type local_max_lco,
                              naming::id_type global_max_lco)
     {
-        LSSCA_(info) << "large_set_local(local_vertex_set, " << edge_set
+        LSSCA_(info) << "large_set_local(" << local_vertex_set << ", " << edge_set
                      << ", " << local_max_lco << ", " << global_max_lco << ")";
+
+        typedef std::vector<naming::id_type> gids_type;
 
         int max = -1;
         int num_added = 0;
 
+        naming::id_type here = applier::get_applier().get_runtime_support_gid();
+
         std::vector<edge_type::edge_snapshot_type> edge_set_local;
 
-        // Iterate over local edges
-        naming::id_type gid = local_vertex_set.first_gid_;
-        for (std::size_t cnt = 0; cnt < local_vertex_set.count_; ++cnt, ++gid)
+        // Iterate over local vertices
+        gids_type vertices =
+            lcos::eager_future<local_vertex_set_type::get_action>(local_vertex_set).get();
+
+        gids_type::const_iterator vend = vertices.end();
+        for (gids_type::const_iterator vit = vertices.begin();
+             vit != vend; ++vit)
         {
             // Get incident edges from this vertex
             typedef vertex::partial_edge_set_type partial_type;
             partial_type partials =
-                lcos::eager_future<vertex::out_edges_action>(gid).get();
+                lcos::eager_future<vertex::out_edges_action>(*vit).get();
 
             // Iterate over incident edges
-            partial_type::iterator end = partials.end();
-            for (partial_type::iterator it = partials.begin(); it != end; ++it)
+            partial_type::iterator pend = partials.end();
+            for (partial_type::iterator pit = partials.begin(); pit != pend; ++pit)
             {
-                if ((*it).label_ > max)
+                if ((*pit).label_ > max)
                 {
                     edge_set_local.clear();
 
-                    edge_type::edge_snapshot_type e(gid, (*it).target_, (*it).label_);
+                    edge_type::edge_snapshot_type e(*vit, (*pit).target_, (*pit).label_);
 
                     edge_set_local.push_back(e);
-                    //edge_set_local.push_back(
-                    //    edge(gid, (*it).target_, (*it).label_));
-                    max = (*it).label_;
+
+                    max = (*pit).label_;
                 }
-                else if ((*it).label_ == max)
+                else if ((*pit).label_ == max)
                 {
                     edge_set_local.push_back(
-                        edge::edge_snapshot_type(gid, (*it).target_, (*it).label_));
+                        edge::edge_snapshot_type(*vit, (*pit).target_, (*pit).label_));
                 }
             }
         }
 
-        LSSCA_(info) << "Max on locality " << local_vertex_set.prefix_ << " "
+        LSSCA_(info) << "Max on locality " << here << " "
                     << "is " << max << ", total of " << edge_set_local.size();
 
         // Signal local maximum
@@ -191,7 +210,7 @@ namespace hpx { namespace components { namespace server
         >(local_max_lco, max);
 
         LSSCA_(info) << "Waiting to see max is on locality "
-                    << local_vertex_set.prefix_;
+                    << here;
 
         // Wait for global maximum
         int global_max =
@@ -203,22 +222,14 @@ namespace hpx { namespace components { namespace server
         if (max == global_max)
         {
             LSSCA_(info) << "Adding local edge set at "
-                        << local_vertex_set.prefix_;
-
-            /*
-            typedef distributed_set<ssca2::edge_type>
-                distributed_edge_set_type;
-            typedef local_set<ssca2::edge_set_type> local_edge_set_type;
-            */
+                        << here;
 
             naming::id_type local_set =
                 lcos::eager_future<
                     dist_edge_set_type::get_local_action
-                >(edge_set, local_vertex_set.prefix_).get();
+                >(edge_set, here).get();
 
-            // Convert edge snapshots into real edges
-
-            naming::id_type edge_base(stubs::edge::create(local_vertex_set.prefix_, edge_set_local.size()));
+            naming::id_type edge_base(stubs::edge::create(here, edge_set_local.size()));
             std::vector<naming::id_type> edges(edge_set_local.size());
 
             int i=0;
@@ -240,7 +251,7 @@ namespace hpx { namespace components { namespace server
         else
         {
             LSSCA_(info) << "Not adding local edge set at "
-                        << local_vertex_set.prefix_;
+                        << here;
         }
 
         return num_added;
@@ -251,13 +262,6 @@ namespace hpx { namespace components { namespace server
     {
         LSSCA_(info) << "extract(" << edge_set
                      << ", " << subgraphs << ")";
-
-        /*
-        typedef components::edge edge;
-        typedef components::graph graph;
-
-        typedef components::server::distributed_set distributed_set;
-        */
 
         std::vector<lcos::future_value<int> > results;
 
@@ -304,12 +308,6 @@ namespace hpx { namespace components { namespace server
     {
         LSSCA_(info) << "extract_local(" << local_edge_set
                      << ", " << local_subgraphs;
-
-        /*
-        typedef components::edge edge;
-        typedef components::graph graph;
-        typedef components::server::local_set local_set;
-        */
 
         // Get local vector of edges, for iterating over
         std::vector<naming::id_type> edges(
@@ -361,9 +359,6 @@ namespace hpx { namespace components { namespace server
             // We are local to source
 
             // Get pmap local to source
-            // This is a consequence of not really being able to continue
-            // the action local to the data
-
             // This uses hack to get prefix
             naming::id_type locale(boost::uint64_t(e.source_.get_msb()) << 32,0);
             naming::id_type local_pmap =
@@ -422,7 +417,6 @@ namespace hpx { namespace components { namespace server
         // Note: execution is local to target
 
         // Get pmap local to target
-
         // This uses hack to get prefix
         naming::id_type locale(boost::uint64_t(target.get_msb()) << 32,0);
         naming::id_type local_pmap =
@@ -482,24 +476,7 @@ namespace hpx { namespace components { namespace server
     {
         LSSCA_(info) << "Initializing property map";
 
-        // Get vertex set of G
-        typedef components::distributing_factory::result_type result_type;
-        result_type vertices =
-            lcos::eager_future<graph::vertices_action>(G).get();
-
-        // Spawn inits on local sub lists
-        result_type::const_iterator end = vertices.end();
-        for (result_type::const_iterator it = vertices.begin();
-             it != end; ++it)
-        {
-            naming::id_type local_props =
-                lcos::eager_future<
-                    dist_gids_map_type::get_local_action
-                >(P, (*it).prefix_).get();
-            lcos::eager_future<
-                init_props_map_local_action
-            >((*it).prefix_, local_props, *it).get();
-        }
+        // Action intentionally left blank
 
         return 0;
     }

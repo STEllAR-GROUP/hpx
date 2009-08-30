@@ -39,7 +39,7 @@ namespace hpx { namespace components
         }
 
         int
-        large_set_local(locality_result local_set,
+        large_set_local(naming::id_type local_set,
                         naming::id_type edge_set,
                         naming::id_type local_max_lco,
                         naming::id_type global_max_lco)
