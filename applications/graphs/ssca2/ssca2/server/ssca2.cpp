@@ -307,7 +307,7 @@ namespace hpx { namespace components { namespace server
                          naming::id_type local_subgraphs)
     {
         LSSCA_(info) << "extract_local(" << local_edge_set
-                     << ", " << local_subgraphs;
+                     << ", " << local_subgraphs << ")";
 
         // Get local vector of edges, for iterating over
         std::vector<naming::id_type> edges(
@@ -318,11 +318,16 @@ namespace hpx { namespace components { namespace server
         // Allocate vector of empty subgraphs
         // This is creating the actual individual subgraphs
         // (mirroring the local portion of the edge list)
-        std::vector<naming::id_type> graph_set_local(edges.size());
-
+        //std::vector<naming::id_type> graph_set_local(edges.size());
         // This uses hack to get prefix
         naming::id_type here(boost::uint64_t(local_edge_set.get_msb()) << 32,0);
-        naming::id_type graphs = components::stubs::graph::create(here, edges.size());
+        std::vector<naming::id_type> graphs;
+        for (int i=0; i < edges.size(); ++i)
+        {
+            graphs.push_back(lcos::eager_future<
+                local_graph_set_type::add_item_action
+            >(local_subgraphs, naming::invalid_id).get());
+        }
 
         // Allocate vector of property maps for each subgraph
         // This is creating the actual individual property maps
@@ -332,16 +337,17 @@ namespace hpx { namespace components { namespace server
 
         for (int i = 0; i < edges.size(); ++i)
         {
-            graph_set_local.push_back(graphs + i);
             pmaps.push_back(dist_gids_map_type::create(here));
         }
 
         // Append local vector of graphs
         // Think about "grow" action to expand with N new items
         // (Could replace this with local_set<>::add_item()'s)
+        /*
         lcos::eager_future<
             local_graph_set_type::append_action
         >(local_subgraphs, graph_set_local).get();
+        */
 
         // Extract subgraphs for each edge
         std::vector<lcos::future_value<int> > results;
@@ -353,7 +359,7 @@ namespace hpx { namespace components { namespace server
         {
             // This is per edge/subgraph/pmap
 
-            naming::id_type H = graphs + i;
+            naming::id_type H = graphs[i];
             int d = 3; // This should be an argument
 
             edge_type::edge_snapshot_type e(

@@ -149,13 +149,13 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
         {
             known_vertices[x-1] = lcos::eager_future<
                 graph_add_vertex_action
-            >(G).get();
+            >(G, naming::invalid_id).get();
         }
         if (known_vertices.find(y-1) == known_vertices.end())
         {
             known_vertices[y-1] = lcos::eager_future<
                 graph_add_vertex_action
-            >(G).get();
+            >(G, naming::invalid_id).get();
         }
 
         // Use hash table to catch duplicate edges
@@ -187,6 +187,8 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
 
 int hpx_main(int depth, int scale, int edge_factor, int type)
 {
+    typedef std::vector<naming::id_type> gids_type;
+
     naming::id_type here = applier::get_applier().get_runtime_support_gid();
 
     // Create an R-MAT graph.
@@ -201,7 +203,11 @@ int hpx_main(int depth, int scale, int edge_factor, int type)
 
     using hpx::components::ssca2;
     using hpx::components::distributed_set;
+    using hpx::components::local_set;
     using hpx::components::server::edge;
+
+    util::high_resolution_timer t;
+    double start_time, total_time;
 
     ssca2 SSCA2 (ssca2::create(here));
 
@@ -224,8 +230,39 @@ int hpx_main(int depth, int scale, int edge_factor, int type)
 
     LSSCA_(info) << "Starting Kernel 2";
 
+    /* Begin: timed execution of Kernel 2 */
+    start_time = t.now();
     distributed_set<edge> edge_set(distributed_set<edge>::create(here));
     SSCA2.large_set(G.get_gid(), edge_set.get_gid());
+    total_time = t.now() - start_time;
+    /* End: timed execution of Kernel 2 */
+    LSSCA_(info) << "Completed Kernel 2 in " << total_time << " ms";
+    std::cout << "Completed Kernel 2 in " << total_time << " ms" << std::endl;
+
+    LSSCA_(info) << "Large set:";
+
+    int num_edges = 0;
+
+    gids_type locals = edge_set.locals();
+
+    gids_type::const_iterator lend = locals.end();
+    for (gids_type::const_iterator lit = locals.begin();
+         lit != lend; ++lit)
+    {
+        gids_type edges = components::stubs::local_set<edge>::get(*lit);
+
+        gids_type::const_iterator eend = edges.end();
+        for (gids_type::const_iterator eit = edges.begin();
+             eit != eend; ++eit, ++num_edges)
+        {
+            edge::edge_snapshot e = components::stubs::edge::get_snapshot(*eit);
+
+            LSSCA_(info) << num_edges << ": (" << e.source_ << ", " << e.target_
+                         << ", " << e.label_ << ")";
+        }
+    }
+
+    LSSCA_(info) << "Found total of " << num_edges << " edges";
 
     // Kernel 3: graph extraction
     // Input:
@@ -237,14 +274,43 @@ int hpx_main(int depth, int scale, int edge_factor, int type)
     //
     // subgraphs = map(edges, extract_subgraph)
 
+    LSSCA_(info) << "Starting Kernel 3";
 
     typedef components::server::graph graph_type;
+
+    /* Begin: timed execution of Kernel 2 */
+    start_time = t.now();
     distributed_set<graph_type> subgraphs(distributed_set<graph_type>::create(here));
-
     SSCA2.extract(edge_set.get_gid(), subgraphs.get_gid());
+    total_time = t.now() - start_time;
+    /* End: timed execution of Kernel 2 */
 
+    LSSCA_(info) << "Completed Kernel 3 in " << total_time << " ms";
+    std::cout << "Completed Kernel 3 in " << total_time << " ms" << std::endl;
 
-    LSSCA_(info) << "Completed Kernel 3";
+    LSSCA_(info) << "Subgraphs:";
+
+    int num_graphs = 0;
+
+    gids_type slocals = subgraphs.locals();
+
+    gids_type::const_iterator slend = slocals.end();
+    for (gids_type::const_iterator slit = slocals.begin();
+         slit != slend; ++slit)
+    {
+        gids_type subgraphs = components::stubs::local_set<graph_type>::get(*slit);
+
+        gids_type::const_iterator gend = subgraphs.end();
+        for (gids_type::const_iterator git = subgraphs.begin();
+             git != gend; ++git, ++num_graphs)
+        {
+            int order = components::stubs::graph::order(*git);
+            int size = components::stubs::graph::size(*git);
+
+            LSSCA_(info) << num_graphs << ": order" << order << ", size=" << size;
+
+        }
+    }
 
     // Kernel 4: ...
 

@@ -53,7 +53,8 @@ namespace hpx { namespace components { namespace server
 
         // constructor: initialize graph value
         graph()
-          : size_(0)
+          : order_(0),
+            size_(0)
         {
             naming::id_type here = applier::get_applier().get_runtime_support_gid();
 
@@ -100,11 +101,18 @@ namespace hpx { namespace components { namespace server
         {
             LGRAPH_(info) << "Adding vertex";
 
-            return lcos::eager_future<
+            u = lcos::eager_future<
                        components::server::distributed_set<
                            components::server::vertex
                        >::add_item_action
                    >(vertex_set_, u).get();
+
+            if (u != naming::invalid_id)
+            {
+                ++order_;
+            }
+
+            return u;
         }
 
         int add_edge(naming::id_type u_g, naming::id_type v_g, int label)
