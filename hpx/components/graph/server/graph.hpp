@@ -96,7 +96,7 @@ namespace hpx { namespace components { namespace server
             return size_;
         }
 
-        naming::id_type add_vertex(void)
+        naming::id_type add_vertex(naming::id_type u=naming::invalid_id)
         {
             LGRAPH_(info) << "Adding vertex";
 
@@ -104,7 +104,7 @@ namespace hpx { namespace components { namespace server
                        components::server::distributed_set<
                            components::server::vertex
                        >::add_item_action
-                   >(vertex_set_).get();
+                   >(vertex_set_, u).get();
         }
 
         int add_edge(naming::id_type u_g, naming::id_type v_g, int label)
@@ -144,8 +144,8 @@ namespace hpx { namespace components { namespace server
             graph, int, graph_size, &graph::size
         > size_action;
 
-        typedef hpx::actions::result_action0<
-            graph, naming::id_type, graph_add_vertex, &graph::add_vertex
+        typedef hpx::actions::result_action1<
+            graph, naming::id_type, graph_add_vertex, naming::id_type, &graph::add_vertex
         > add_vertex_action;
 
         typedef hpx::actions::result_action3<

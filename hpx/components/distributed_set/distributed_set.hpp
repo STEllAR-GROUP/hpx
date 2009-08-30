@@ -47,9 +47,9 @@ namespace hpx { namespace components
             return this->base_type::init(this->gid_, num_items);
         }
 
-        naming::id_type add_item(void)
+        naming::id_type add_item(naming::id_type item=naming::invalid_id)
         {
-            return this->base_type::add_item(this->gid_);
+            return this->base_type::add_item(this->gid_, item);
         }
 
         naming::id_type get_local(naming::id_type locale)

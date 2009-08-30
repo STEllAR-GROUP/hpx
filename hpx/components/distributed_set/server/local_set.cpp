@@ -88,26 +88,32 @@ namespace hpx { namespace components { namespace server
     {}
 
     template <typename Item>
-    naming::id_type local_set<Item>::add_item(void)
+    naming::id_type local_set<Item>::add_item(naming::id_type item=naming::invalid_id)
     {
-        LLSET_(info) << "Adding new item";
+        if (item == naming::invalid_id)
+        {
+            LLSET_(info) << "Adding new item";
 
-        naming::id_type here = applier::get_applier().get_runtime_support_gid();
+            naming::id_type here = applier::get_applier().get_runtime_support_gid();
 
-        components::component_type type = Item::get_component_type();
+            components::component_type type = Item::get_component_type();
 
-        naming::id_type new_item =
-            components::stubs::runtime_support::create_component(here, type, 1);
+            item = components::stubs::runtime_support::create_component(here, type, 1);
+        }
+        else
+        {
+            LLSET_(info) << "Adding existing item";
+        }
 
-        if (new_item != naming::invalid_id)
+        if (item != naming::invalid_id)
         {
             // Just guard against concurrent updates
             lcos::mutex::scoped_lock l(local_set_mtx_);
 
-            local_set_.push_back(new_item);
+            local_set_.push_back(item);
         }
 
-        return new_item;
+        return item;
     }
 
     template <typename Item>

@@ -316,6 +316,7 @@ namespace hpx { namespace components { namespace server
             >(local_edge_set).get());
 
         // Allocate vector of empty subgraphs
+        // This is creating the actual individual subgraphs
         // (mirroring the local portion of the edge list)
         std::vector<naming::id_type> graph_set_local(edges.size());
 
@@ -324,6 +325,7 @@ namespace hpx { namespace components { namespace server
         naming::id_type graphs = components::stubs::graph::create(here, edges.size());
 
         // Allocate vector of property maps for each subgraph
+        // This is creating the actual individual property maps
         typedef std::map<naming::id_type,naming::id_type> gids_map_type;
         typedef stubs::distributed_map<gids_map_type> dist_gids_map_type;
         std::vector<naming::id_type> pmaps;
@@ -336,6 +338,7 @@ namespace hpx { namespace components { namespace server
 
         // Append local vector of graphs
         // Think about "grow" action to expand with N new items
+        // (Could replace this with local_set<>::add_item()'s)
         lcos::eager_future<
             local_graph_set_type::append_action
         >(local_subgraphs, graph_set_local).get();
@@ -348,6 +351,8 @@ namespace hpx { namespace components { namespace server
         for (std::vector<naming::id_type>::const_iterator it = edges.begin();
              it != end; ++it, ++i)
         {
+            // This is per edge/subgraph/pmap
+
             naming::id_type H = graphs + i;
             int d = 3; // This should be an argument
 
@@ -383,11 +388,25 @@ namespace hpx { namespace components { namespace server
 
             if (color >= d && d > 1)
             {
+                // Add source to H
+                lcos::eager_future<
+                    server::graph::add_vertex_action
+                >(H, e.source_).get();
+
                 // Spawn subgraph extraction local to target
+                // Probably should rework this to use continuations :-)
                 naming::id_type there(boost::uint64_t(e.target_.get_msb()) << 32,0);
-                results.push_back(lcos::eager_future<
-                    extract_subgraph_action
-                >(there, H, pmaps[i], e.source_, e.target_, d));
+                results.push_back(
+                    lcos::eager_future<
+                        extract_subgraph_action
+                    >(there, H, pmaps[i], e.source_, e.target_, d)
+                );
+                // Can do this because we know the vertices were already added
+                results.push_back(
+                    lcos::eager_future<
+                        server::graph::add_edge_action
+                    >(H, e.source_, e.target_, e.label_)
+                );
             }
         }
 
@@ -440,6 +459,11 @@ namespace hpx { namespace components { namespace server
 
         if (color >= d && d > 1)
         {
+            // Add (new) source (i.e., the old target) to H
+            lcos::eager_future<
+                server::graph::add_vertex_action
+            >(H, target).get();
+
             // Continue with the search
             std::vector<lcos::future_value<int> > results;
 
@@ -454,9 +478,18 @@ namespace hpx { namespace components { namespace server
                  it != end; ++it)
             {
                 // Spawn subsequent search
-                results.push_back(lcos::eager_future<
-                    ssca2::extract_subgraph_action
-                >(locale, H, pmap, target, (*it).target_, d-1));
+                results.push_back(
+                    lcos::eager_future<
+                        ssca2::extract_subgraph_action
+                    >(locale, H, pmap, target, (*it).target_, d-1)
+                );
+                // Can do this because we know the vertices were already added
+                results.push_back(
+                    lcos::eager_future<
+                        server::graph::add_edge_action
+                    >(H, target, (*it).target_, (*it).label_)
+                );
+
             }
 
             // Collect notifications of when subsequent searches are finished

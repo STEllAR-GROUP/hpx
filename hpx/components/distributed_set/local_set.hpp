@@ -35,9 +35,9 @@ namespace hpx { namespace components
 
         typedef std::vector<naming::id_type> set_type;
 
-        naming::id_type add_item(void)
+        naming::id_type add_item(naming::id_type item=naming::invalid_id)
         {
-            return this->base_type::add_item(this->gid_);
+            return this->base_type::add_item(this->gid_, item);
         }
 
         int append(set_type list)

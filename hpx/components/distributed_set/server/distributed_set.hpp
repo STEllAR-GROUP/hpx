@@ -51,7 +51,7 @@ namespace hpx { namespace components { namespace server
 
         int init(int);
 
-        naming::id_type add_item(void);
+        naming::id_type add_item(naming::id_type);
 
         naming::id_type get_local(naming::id_type);
 
@@ -67,8 +67,9 @@ namespace hpx { namespace components { namespace server
             &distributed_set::init
         > init_action;
 
-        typedef hpx::actions::result_action0<
+        typedef hpx::actions::result_action1<
             distributed_set, naming::id_type, distributed_set_add_item,
+            naming::id_type,
             &distributed_set::add_item
         > add_item_action;
 

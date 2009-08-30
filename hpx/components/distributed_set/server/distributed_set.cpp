@@ -162,44 +162,55 @@ namespace hpx { namespace components { namespace server
     }
 
     template <typename Item>
-    naming::id_type distributed_set<Item>::add_item(void)
+    naming::id_type distributed_set<Item>::add_item(naming::id_type item=naming::invalid_id)
     {
-        LDSET_(info) << "add_item()";
+        naming::id_type locale;
 
-        // Decide which locality to add it to
-        // This should really use some DistributingPolicy interface
-
-        // Part of this brought over from distributing_factor
-        // make sure we get prefixes for derived component type, if any
-        components::component_type type = Item::get_component_type();
-        components::component_type prefix_type = type;
-        if (type != components::get_base_type(type))
-            prefix_type = components::get_derived_type(type);
-
-        LDSET_(info) << "Got component type";
-
-        // get list of locality prefixes
-        std::vector<naming::id_type> prefixes;
-        hpx::applier::get_applier().get_agas_client().get_prefixes(prefixes, prefix_type);
-
-        if (prefixes.empty())
+        if (item == naming::invalid_id)
         {
-            HPX_THROW_EXCEPTION(bad_component_type,
-                "distributing_factory::create_components",
-                "attempt to create component instance of unknown type: " +
-                components::get_component_type_name(type));
+            LDSET_(info) << "Adding new item";
+
+            // Decide which locality to add it to
+            // This should really use some DistributingPolicy interface
+
+            // Part of this brought over from distributing_factor
+            // make sure we get prefixes for derived component type, if any
+            components::component_type type = Item::get_component_type();
+            components::component_type prefix_type = type;
+            if (type != components::get_base_type(type))
+                prefix_type = components::get_derived_type(type);
+
+            LDSET_(info) << "Got component type";
+
+            // get list of locality prefixes
+            std::vector<naming::id_type> prefixes;
+            hpx::applier::get_applier().get_agas_client().get_prefixes(prefixes, prefix_type);
+
+            if (prefixes.empty())
+            {
+                HPX_THROW_EXCEPTION(bad_component_type,
+                    "distributing_factory::create_components",
+                    "attempt to create component instance of unknown type: " +
+                    components::get_component_type_name(type));
+            }
+
+            LDSET_(info) << "Looking for locals_[" << num_items_+1 << "%" << prefixes.size() << " ="
+                        << (num_items_+1)%prefixes.size() << "]";
+
+            locale = get_local(prefixes[(num_items_+1)%prefixes.size()]);
+        }
+        else
+        {
+            LDSET_(info) << "Adding existing item";
+
+            locale = get_local(naming::id_type(boost::uint64_t(item.get_msb()) << 32, 0));
         }
 
-        LDSET_(info) << "Looking for locals_[" << num_items_+1 << "%" << prefixes.size() << " ="
-                    << (num_items_+1)%prefixes.size() << "]";
-
-        naming::id_type locale = get_local(prefixes[(num_items_+1)%prefixes.size()]);
-        LDSET_(info) << "Adding new item to " << locale;
-
         // Add it there
+        LDSET_(info) << "Adding new item to " << locale;
         naming::id_type new_item =  lcos::eager_future<
                    typename components::server::local_set<Item>::add_item_action
-               >(locale).get();
+               >(locale, item).get();
 
         if (new_item != naming::invalid_id)
         {

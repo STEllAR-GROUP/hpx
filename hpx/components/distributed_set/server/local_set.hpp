@@ -49,7 +49,7 @@ namespace hpx { namespace components { namespace server
 
         typedef std::vector<naming::id_type> set_type;
 
-        naming::id_type add_item(void);
+        naming::id_type add_item(naming::id_type);
 
         int append(set_type);
 
@@ -60,8 +60,8 @@ namespace hpx { namespace components { namespace server
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
 
-        typedef hpx::actions::result_action0<
-            local_set, naming::id_type, local_set_add_item, &local_set::add_item
+        typedef hpx::actions::result_action1<
+            local_set, naming::id_type, local_set_add_item, naming::id_type, &local_set::add_item
         > add_item_action;
 
         typedef hpx::actions::result_action1<

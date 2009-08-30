@@ -37,11 +37,11 @@ namespace hpx { namespace components { namespace stubs
             return lcos::eager_future<action_type>(gid, num_items).get();
         }
 
-        static naming::id_type add_item(naming::id_type gid)
+        static naming::id_type add_item(naming::id_type gid, naming::id_type item=naming::invalid_id)
         {
             typedef typename server::distributed_set<Item>::add_item
                 action_type;
-            return lcos::eager_future<action_type>(gid).get();
+            return lcos::eager_future<action_type>(gid, item).get();
         }
 
         static naming::id_type get_local(naming::id_type gid, naming::id_type locale)
