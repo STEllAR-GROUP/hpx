@@ -47,6 +47,12 @@ namespace hpx { namespace components { namespace stubs
             return lcos::eager_future<action_type>(gid).get();
         }
 
+        static naming::id_type add_vertex(naming::id_type gid)
+        {
+            typedef server::graph::add_vertex_action action_type;
+            return lcos::eager_future<action_type>(gid).get();
+        }
+
         static int add_edge(naming::id_type gid, naming::id_type u, naming::id_type v, int w)
         {
         	typedef server::graph::add_edge_action action_type;
@@ -59,7 +65,7 @@ namespace hpx { namespace components { namespace stubs
         	return lcos::eager_future<action_type>(gid, id).get();
         }
 
-        static result_type vertices(naming::id_type gid)
+        static naming::id_type vertices(naming::id_type gid)
         {
             typedef server::graph::vertices_action action_type;
             return lcos::eager_future<action_type>(gid).get();

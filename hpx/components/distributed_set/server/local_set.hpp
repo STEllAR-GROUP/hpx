@@ -14,6 +14,10 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 
+#include <hpx/lcos/mutex.hpp>
+#include <hpx/util/spinlock_pool.hpp>
+#include <hpx/util/unlock_lock.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
@@ -35,14 +39,17 @@ namespace hpx { namespace components { namespace server
         
         enum actions
         {
-            local_set_append = 0,
-            local_set_get = 1
+            local_set_add_item = 0,
+            local_set_append = 1,
+            local_set_get = 2
         };
         
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
         typedef std::vector<naming::id_type> set_type;
+
+        naming::id_type add_item(void);
 
         int append(set_type);
 
@@ -52,6 +59,11 @@ namespace hpx { namespace components { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
+
+        typedef hpx::actions::result_action0<
+            local_set, naming::id_type, local_set_add_item, &local_set::add_item
+        > add_item_action;
+
         typedef hpx::actions::result_action1<
             local_set, int, local_set_append, set_type, &local_set::append
         > append_action;
@@ -61,6 +73,9 @@ namespace hpx { namespace components { namespace server
         > get_action;
 
     private:
+        naming::id_type gid_;
+
+        lcos::mutex local_set_mtx_;
         set_type local_set_;
     };
 

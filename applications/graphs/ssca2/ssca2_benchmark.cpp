@@ -57,10 +57,12 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
     std::size_t num_edges_added;
     double a_, b_, c_, d_;
     std::size_t order, size;
+    boost::unordered_map<int64_t, naming::id_type> known_vertices;
     boost::unordered_map<int64_t, int64_t> known_edges;
     int type_max = 16;
     int status = -1;
 
+    typedef hpx::components::server::graph::add_vertex_action graph_add_vertex_action;
     typedef hpx::components::server::graph::init_action     graph_init_action;
     typedef hpx::components::server::graph::order_action    graph_order_action;
     typedef hpx::components::server::graph::size_action     graph_size_action;
@@ -97,52 +99,9 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
 
     srand(time(0));
        
-    // Initialize the graph.
-    lcos::future_value<int> result = lcos::eager_future<graph_init_action>(G, order);
-    result.get();
-
-    // Initialize size-many vertices
-    // with labels ranging from [0,size).
     typedef hpx::components::server::vertex vertex_type;
     typedef hpx::components::server::distributed_set<vertex_type> dist_vertex_set_type;
     typedef std::vector<naming::id_type> gids_type;
-
-    naming::id_type vertex_set =
-        lcos::eager_future<hpx::components::server::graph::vertices_action>(G).get();
-    gids_type locals =
-        lcos::eager_future<dist_vertex_set_type::locals_action>(vertex_set).get();
-
-    LSSCA_(info) << "Number of local lists: " << locals.size();
-
-    std::vector<naming::id_type> label_pmap(order);
-
-    int i = 0;
-    gids_type::const_iterator gend = locals.end();
-    for (gids_type::const_iterator git = locals.begin();
-         git != gend; ++git)
-    {
-        LSSCA_(info) << "Local list" << *git;
-
-        gids_type vertices =
-            lcos::eager_future<
-                hpx::components::server::local_set<
-                    hpx::components::server::vertex
-                >::get_action
-            >(*git).get();
-
-        gids_type::const_iterator vend = vertices.end();
-        for (gids_type::const_iterator vit = vertices.begin();
-             vit != vend; ++vit)
-        {
-            LSSCA_(info) << "Vertex" << *vit;
-
-            lcos::eager_future<hpx::components::server::vertex::init_action>(*vit, i).get();
-            label_pmap[i] = *vit;
-
-            ++i;
-        }
-
-    }
 
     // Start adding edges in phases
     num_edges_added = 0;
@@ -182,6 +141,23 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
             step = step/2;
         }
 
+        LSSCA_(info) << "Adding edge (" << x-1 << ", " << y-1 << ")";
+
+        // Use hash to catch duplicate vertices
+        // Note: Update this to do the two actions in parallel
+        if (known_vertices.find(x-1) == known_vertices.end())
+        {
+            known_vertices[x-1] = lcos::eager_future<
+                graph_add_vertex_action
+            >(G).get();
+        }
+        if (known_vertices.find(y-1) == known_vertices.end())
+        {
+            known_vertices[y-1] = lcos::eager_future<
+                graph_add_vertex_action
+            >(G).get();
+        }
+
         // Use hash table to catch duplicate edges
         int64_t key = (x-1)*order + (y-1);
         if (x-1 != y-1 && known_edges.find(key) == known_edges.end())
@@ -191,7 +167,7 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
            results.push_back(
                lcos::eager_future<
                    graph_add_edge_action
-               >(G, label_pmap[x-1], label_pmap[y-1], nrand(type_max)));
+               >(G, known_vertices[x-1], known_vertices[y-1], nrand(type_max)));
 
            num_edges_added += 1;
         }

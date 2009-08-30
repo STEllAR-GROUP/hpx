@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 
@@ -20,22 +21,27 @@
 #include "local_set.hpp"
 #include "../stubs/local_set.hpp"
 
+#define LLSET_(lvl) LAPP_(lvl) << " [LOCAL_SET] " << gid_ << " "
+
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::server::local_set<
-    hpx::components::vertex
+    hpx::components::server::vertex
 > local_vertex_set_type;
 
 typedef hpx::components::server::local_set<
-    hpx::components::edge
+    hpx::components::server::edge
 > local_edge_set_type;
 
 typedef hpx::components::server::local_set<
-    hpx::components::graph
+    hpx::components::server::graph
 > local_graph_set_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the local_set actions
 
+HPX_REGISTER_ACTION_EX(
+    local_vertex_set_type::add_item_action,
+    local_set_add_item_action);
 HPX_REGISTER_ACTION_EX(
     local_vertex_set_type::append_action,
     local_set_append_action);
@@ -47,6 +53,9 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
 HPX_DEFINE_GET_COMPONENT_TYPE(local_vertex_set_type);
 
 HPX_REGISTER_ACTION_EX(
+    local_edge_set_type::add_item_action,
+    local_set_add_item_action);
+HPX_REGISTER_ACTION_EX(
     local_edge_set_type::append_action,
     local_set_append_action);
 HPX_REGISTER_ACTION_EX(
@@ -57,8 +66,14 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
 HPX_DEFINE_GET_COMPONENT_TYPE(local_edge_set_type);
 
 HPX_REGISTER_ACTION_EX(
+    local_graph_set_type::add_item_action,
+    local_set_add_item_action);
+HPX_REGISTER_ACTION_EX(
     local_graph_set_type::append_action,
     local_set_append_action);
+HPX_REGISTER_ACTION_EX(
+    local_graph_set_type::get_action,
+    local_set_get_action);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<local_graph_set_type>, local_graph_set);
 HPX_DEFINE_GET_COMPONENT_TYPE(local_graph_set_type);
@@ -68,13 +83,38 @@ namespace hpx { namespace components { namespace server
 {
     template <typename Item>
     local_set<Item>::local_set()
-      : local_set_(0)
+      : gid_(this->base_type::get_gid()),
+        local_set_(0)
     {}
+
+    template <typename Item>
+    naming::id_type local_set<Item>::add_item(void)
+    {
+        LLSET_(info) << "Adding new item";
+
+        naming::id_type here = applier::get_applier().get_runtime_support_gid();
+
+        components::component_type type = Item::get_component_type();
+
+        naming::id_type new_item =
+            components::stubs::runtime_support::create_component(here, type, 1);
+
+        if (new_item != naming::invalid_id)
+        {
+            // Just guard against concurrent updates
+            lcos::mutex::scoped_lock l(local_set_mtx_);
+
+            local_set_.push_back(new_item);
+        }
+
+        return new_item;
+    }
 
     template <typename Item>
     int local_set<Item>::append(set_type list)
     {
-        std::cout << "Appending to local list at locale " << std::endl;
+        LLSET_(info) << "THIS IS DEPRICATED => DON'T USE";
+        LLSET_(info) << "Appending to local list at locale ";
 
         // Probably should do some locking ... somewhere ... maybe here
 
@@ -91,7 +131,7 @@ namespace hpx { namespace components { namespace server
     template <typename Item>
     std::vector<naming::id_type> local_set<Item>::get(void)
     {
-        std::cout << "Getting local set" << std::endl;
+        LLSET_(info)  << "Getting local set";
 
         return local_set_;
     }

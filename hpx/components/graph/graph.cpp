@@ -39,8 +39,11 @@ HPX_REGISTER_ACTION_EX(
     graph_type::wrapped_type::size_action,
     graph_size_action);
 HPX_REGISTER_ACTION_EX(
-	graph_type::wrapped_type::add_edge_action,
-	graph_add_edge_action);
+    graph_type::wrapped_type::add_vertex_action,
+    graph_add_vertex_action);
+HPX_REGISTER_ACTION_EX(
+    graph_type::wrapped_type::add_edge_action,
+    graph_add_edge_action);
 HPX_REGISTER_ACTION_EX(
 	graph_type::wrapped_type::vertex_name_action,
 	graph_vertex_name_action);

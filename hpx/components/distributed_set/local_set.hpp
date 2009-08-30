@@ -27,13 +27,18 @@ namespace hpx { namespace components
         local_set(naming::id_type gid, bool freeonexit = true)
           : base_type(gid, freeonexit)
         {
-            std::cout << "Constructing local list" << std::endl;
+            LAPP_(info) << " [LOCAL_SET] " << "Constructing local list" << std::endl;
         }
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
         typedef std::vector<naming::id_type> set_type;
+
+        naming::id_type add_item(void)
+        {
+            return this->base_type::add_item(this->gid_);
+        }
 
         int append(set_type list)
         {

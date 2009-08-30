@@ -29,6 +29,21 @@ namespace hpx { namespace components { namespace stubs
 
         /// Initialize the server#distributed_set instance
         /// with the given \a gid
+
+        static int init(naming::id_type gid, int num_items)
+        {
+            typedef typename server::distributed_set<Item>::init_action
+                action_type;
+            return lcos::eager_future<action_type>(gid, num_items).get();
+        }
+
+        static naming::id_type add_item(naming::id_type gid)
+        {
+            typedef typename server::distributed_set<Item>::add_item
+                action_type;
+            return lcos::eager_future<action_type>(gid).get();
+        }
+
         static naming::id_type get_local(naming::id_type gid, naming::id_type locale)
         {
             typedef typename server::distributed_set<Item>::get_local_action

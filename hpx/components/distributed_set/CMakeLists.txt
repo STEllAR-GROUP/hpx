@@ -20,6 +20,7 @@ set (distributed_set_SOURCES
     server/local_set.cpp)
 
 set(distributed_set_DEPENDENCIES
+    distributing_factory_component
     )
 
 ###############################################################################

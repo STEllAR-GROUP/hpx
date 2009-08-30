@@ -14,6 +14,10 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 
+#include <hpx/lcos/mutex.hpp>
+#include <hpx/util/spinlock_pool.hpp>
+#include <hpx/util/unlock_lock.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
@@ -34,14 +38,20 @@ namespace hpx { namespace components { namespace server
         
         enum actions
         {
-            distributed_set_get_local = 0,
-            distributed_set_locals = 1
+            distributed_set_init = 0,
+            distributed_set_add_item = 1,
+            distributed_set_get_local = 2,
+            distributed_set_locals = 3
         };
         
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
         typedef std::vector<naming::id_type> set_type;
+
+        int init(int);
+
+        naming::id_type add_item(void);
 
         naming::id_type get_local(naming::id_type);
 
@@ -51,6 +61,17 @@ namespace hpx { namespace components { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
+        typedef hpx::actions::result_action1<
+            distributed_set, int, distributed_set_init,
+            int,
+            &distributed_set::init
+        > init_action;
+
+        typedef hpx::actions::result_action0<
+            distributed_set, naming::id_type, distributed_set_add_item,
+            &distributed_set::add_item
+        > add_item_action;
+
         typedef hpx::actions::result_action1<
             distributed_set, naming::id_type, distributed_set_get_local,
             naming::id_type,
@@ -63,9 +84,15 @@ namespace hpx { namespace components { namespace server
         > locals_action;
 
     private:
+        naming::id_type gid_;
+
+        lcos::mutex mtx_;
+
         // Map from locale to its local_set
         std::map<naming::id_type,naming::id_type> map_;
         std::vector<naming::id_type> locals_;
+
+        int num_items_;
 
         int next_locale_;
     };

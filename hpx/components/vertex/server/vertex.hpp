@@ -9,11 +9,14 @@
 #include <iostream>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
+
+#define LVERTEX_(lvl) LAPP_(lvl) << " [VERTEX] "
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server 
@@ -42,9 +45,7 @@ namespace hpx { namespace components { namespace server
         {}
 
         ~vertex()
-        {
-            std::cout << "Dying " << label_ << "\n";
-        }
+        {}
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
@@ -77,9 +78,9 @@ namespace hpx { namespace components { namespace server
         /// Initialize the vertex
         int init(int label)
         {
-            std::cout << "Initializing vertex with label "
+            LVERTEX_(info) << "Initializing vertex with label "
                       << label << " on locality"
-                      << applier::get_applier().get_runtime_support_gid() << std::endl;
+                      << applier::get_applier().get_runtime_support_gid();
 
             label_ = label;
 
@@ -93,9 +94,7 @@ namespace hpx { namespace components { namespace server
 
         int add_edge(naming::id_type v_g, int label)
         {
-            std::cout << "Adding edge from "
-                      << label_ << " with type "
-                      << label << std::endl;
+            LVERTEX_(info) << "Adding edge to " << v_g;
 
             out_edges_.push_back(partial_edge(v_g,label));
 

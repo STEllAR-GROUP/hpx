@@ -52,6 +52,12 @@ namespace hpx { namespace components
             return this->base_type::size(gid_);
         }
 
+        naming::id_type add_vertex(void)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::add_vertex(gid_);
+        }
+
         /// Add an edge to the graph
         int add_edge(naming::id_type u, naming::id_type v, int w)
         {
@@ -66,7 +72,7 @@ namespace hpx { namespace components
         	return this->base_type::vertex_name(gid_, id);
         }
 
-        result_type vertices(void)
+        naming::id_type vertices(void)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::vertices(gid_);

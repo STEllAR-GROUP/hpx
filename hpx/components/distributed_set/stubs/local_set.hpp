@@ -29,6 +29,12 @@ namespace hpx { namespace components { namespace stubs
 
         typedef std::vector<naming::id_type> set_type;
 
+        static naming::id_type add_item(naming::id_type gid)
+        {
+            typedef typename server::local_set<Item>::add_item_action action_type;
+            return lcos::eager_future<action_type>(gid).get();
+        }
+
         static int append(naming::id_type gid, set_type list)
         {
             typedef typename server::local_set<Item>::append_action action_type;

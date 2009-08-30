@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -18,6 +19,8 @@
 #include <hpx/components/vertex/vertex.hpp>
 #include <hpx/components/vertex_list/vertex_list.hpp>
 #include <hpx/components/distributed_set/distributed_set.hpp>
+
+#define LGRAPH_(lvl) LAPP_(lvl) << " [GRAPH] "
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server 
@@ -36,9 +39,10 @@ namespace hpx { namespace components { namespace server
             graph_init = 0,
             graph_order = 1,
             graph_size = 2,
-            graph_add_edge = 3,
-            graph_vertex_name = 4,
-            graph_vertices = 5
+            graph_add_vertex = 3,
+            graph_add_edge = 4,
+            graph_vertex_name = 5,
+            graph_vertices = 6
         };
         
         // Typedefs for graph
@@ -46,7 +50,7 @@ namespace hpx { namespace components { namespace server
         typedef long int vertex_t;
         typedef long int edge_t;
 
-        typedef vertex_list::result_type result_type;
+        //typedef vertex_list::result_type result_type;
 
         // constructor: initialize graph value
         graph()
@@ -55,8 +59,8 @@ namespace hpx { namespace components { namespace server
             naming::id_type here = applier::get_applier().get_runtime_support_gid();
 
             // This is going to be phased out
-            using hpx::components::vertex_list;
-            vertex_list vertices_(vertex_list::create(here));
+            //using hpx::components::vertex_list;
+            //vertex_list vertices_(vertex_list::create(here));
 
             vertex_set_ = vertex_set_stub::create(here);
         }
@@ -68,37 +72,40 @@ namespace hpx { namespace components { namespace server
         // This is an opt. for when we know the order a priori
         int init(count_t order)
         {            
-            std::cout << "Initializing graph of order " << order << std::endl;
-            
-            // Get list of all known localities
-            std::vector<naming::id_type> locales;
-            naming::id_type locale;
-            applier::applier& appl = applier::get_applier();
-            if (appl.get_remote_prefixes(locales))
-            {
-                locale = locales[0];
-            }
-            else
-            {
-                locale = appl.get_runtime_support_gid();
-            }
-            locales.push_back(appl.get_runtime_support_gid());
-            
+            LGRAPH_(info) << "Initializing graph of order " << order;
+
             // Create a vertex_list and initialize
-            components::component_type vertex_type = components::get_component_type<vertex>();
-            vertices_.init(vertex_type, order);
+            
+            vertex_set_stub::init(vertex_set_, order);
+
+            //components::component_type vertex_type = components::get_component_type<vertex>();
+            //vertices_.init(vertex_type, order);
+
+            order_ = order;
 
             return 0;
         }
 
         int order(void)
         {
-            return vertices_.size();
+            //return vertices_.size();
+            return order_;
         }
 
         int size(void)
         {
             return size_;
+        }
+
+        naming::id_type add_vertex(void)
+        {
+            LGRAPH_(info) << "Adding vertex";
+
+            return lcos::eager_future<
+                       components::server::distributed_set<
+                           components::server::vertex
+                       >::add_item_action
+                   >(vertex_set_).get();
         }
 
         int add_edge(naming::id_type u_g, naming::id_type v_g, int label)
@@ -112,12 +119,14 @@ namespace hpx { namespace components { namespace server
 
         naming::id_type vertex_name(int id)
         {
-        	return vertices_.at_index(id);
+        	//return vertices_.at_index(id);
+            return naming::invalid_id;
         }
 
-        result_type vertices(void)
+        naming::id_type vertices(void)
         {
-            return vertices_.list();
+            //return vertices_.list();
+            return vertex_set_;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -136,6 +145,10 @@ namespace hpx { namespace components { namespace server
             graph, int, graph_size, &graph::size
         > size_action;
 
+        typedef hpx::actions::result_action0<
+            graph, naming::id_type, graph_add_vertex, &graph::add_vertex
+        > add_vertex_action;
+
         typedef hpx::actions::result_action3<
 			graph, int, graph_add_edge, naming::id_type, naming::id_type, int, &graph::add_edge
 		> add_edge_action;
@@ -145,20 +158,21 @@ namespace hpx { namespace components { namespace server
 		> vertex_name_action;
 
         typedef hpx::actions::result_action0<
-            graph, result_type, graph_vertices, &graph::vertices
+            graph, naming::id_type, graph_vertices, &graph::vertices
         > vertices_action;
 
     private:
         typedef hpx::components::stubs::distributed_set<
-            hpx::components::vertex
+            hpx::components::server::vertex
         > vertex_set_stub;
 
         count_t block_size_;
         std::vector<naming::id_type> blocks_;
 
+        int order_;
         int size_;
 
-        vertex_list vertices_;
+        //vertex_list vertices_;
 
         naming::id_type vertex_set_;
     };

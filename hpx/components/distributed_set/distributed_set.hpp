@@ -41,6 +41,17 @@ namespace hpx { namespace components
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
+
+        int init(int num_items)
+        {
+            return this->base_type::init(this->gid_, num_items);
+        }
+
+        naming::id_type add_item(void)
+        {
+            return this->base_type::add_item(this->gid_);
+        }
+
         naming::id_type get_local(naming::id_type locale)
         {
             return this->base_type::get_local(this->gid_, locale);
