@@ -37,8 +37,8 @@ namespace hpx { namespace components { namespace stubs
 
         static int label(naming::id_type gid)
         {
-        	typedef server::vertex::label_action action_type;
-        	return lcos::eager_future<action_type>(gid).get();
+            typedef server::vertex::label_action action_type;
+            return lcos::eager_future<action_type>(gid).get();
         }
 
         static int add_edge(naming::id_type gid, naming::id_type v_g, int label)

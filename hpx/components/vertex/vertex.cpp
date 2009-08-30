@@ -35,8 +35,8 @@ HPX_REGISTER_ACTION_EX(
     vertex_type::wrapped_type::init_action,
     vertex_init_action);
 HPX_REGISTER_ACTION_EX(
-	vertex_type::wrapped_type::label_action,
-	vertex_init_action);
+    vertex_type::wrapped_type::label_action,
+    vertex_init_action);
 HPX_REGISTER_ACTION_EX(
     vertex_type::wrapped_type::add_edge_action,
     vertex_add_edge_action);

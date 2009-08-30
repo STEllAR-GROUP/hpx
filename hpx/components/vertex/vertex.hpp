@@ -44,8 +44,8 @@ namespace hpx { namespace components
 
         int label(void)
         {
-        	BOOST_ASSERT(gid_);
-        	return this->base_type::label(gid_);
+            BOOST_ASSERT(gid_);
+            return this->base_type::label(gid_);
         }
 
         int add_edge(naming::id_type v_g, int label)

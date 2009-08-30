@@ -116,8 +116,8 @@ namespace hpx { namespace components { namespace server
         > init_action;
 
         typedef hpx::actions::result_action0<
-			vertex, int, vertex_label, &vertex::label
-		> label_action;
+            vertex, int, vertex_label, &vertex::label
+        > label_action;
 
         typedef hpx::actions::result_action2<
             vertex, int, vertex_add_edge, naming::id_type, int, &vertex::add_edge
