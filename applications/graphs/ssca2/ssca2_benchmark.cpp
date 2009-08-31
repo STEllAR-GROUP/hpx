@@ -185,19 +185,11 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int hpx_main(int depth, int scale, int edge_factor, int type)
+int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int type)
 {
     typedef std::vector<naming::id_type> gids_type;
 
     naming::id_type here = applier::get_applier().get_runtime_support_gid();
-
-    // Create an R-MAT graph.
-    using hpx::components::graph;
-    graph G (graph::create(here));
-
-    lcos::eager_future<rmat_action> r(
-        here, G.get_gid(), scale, edge_factor, type);
-    r.get();
 
     // SSCA#2 Graph Analysis Benchmark
 
@@ -219,6 +211,31 @@ int hpx_main(int depth, int scale, int edge_factor, int type)
     //
     // G = graph()
     // for_each(infile.lines(), add_edge_from_line)
+
+    using hpx::components::graph;
+    graph G (graph::create(here));
+
+    // Generate the R-MAT graph if no file is given
+    if (input_file.length() == 0)
+    {
+        LSSCA_(info) << "Skipping Kernel 1";
+
+        lcos::eager_future<rmat_action> r(
+            here, G.get_gid(), scale, edge_factor, type);
+        r.get();
+    }
+    else
+    {
+        LSSCA_(info) << "Starting Kernel 1";
+
+        /* Begin: timed execution of Kernel 1 */
+        start_time = t.now();
+        SSCA2.read_graph(G.get_gid(), input_file);
+        total_time = t.now() - start_time;
+        /* End: timed execution of Kernel 1 */
+        LSSCA_(info) << "Completed Kernel 1 in " << total_time << " ms";
+        std::cout << "Completed Kernel 1 in " << total_time << " ms" << std::endl;
+    }
 
     // Kernel 2: classify large sets
     // Input:
@@ -342,11 +359,13 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("threads,t", po::value<int>(), 
                 "the number of operating system threads to spawn for this"
                 "HPX locality")
+            ("file,f", po::value<std::string>(),
+                "the file containing the graph data")
             ("scale,s", po::value<int>(),
                 "the scale of the graph, default is 4")
             ("depth,d", po::value<int>(),
                 "the subgraph path length for Kernel 3")
-            ("edge_factor,f", po::value<int>(),
+            ("edge_factor,e", po::value<int>(),
                 "the edge factor of the R-MAT graph")
             ("type,y", po::value<int>(),
                 "the type of R-MAT, controls the (a,b,c,d) parameters")
@@ -433,6 +452,7 @@ int main(int argc, char* argv[])
         std::string hpx_host("localhost"), agas_host;
         boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
         int num_threads = 1;
+        std::string filename;
         int scale = 4;
         int depth = 3;
         int edge_factor = 8;
@@ -453,6 +473,9 @@ int main(int argc, char* argv[])
         if (vm.count("worker"))
             mode = hpx::runtime::worker;
             
+        if (vm.count("file"))
+            filename = vm["file"].as<std::string>();
+
         if (vm.count("scale"))
             scale = vm["scale"].as<int>();
 
@@ -474,7 +497,7 @@ int main(int argc, char* argv[])
         typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
         runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
 
-        rt.run(boost::bind(hpx_main, depth, scale, edge_factor, type), num_threads);
+        rt.run(boost::bind(hpx_main, depth, filename, scale, edge_factor, type), num_threads);
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";

@@ -3,6 +3,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <fstream>
+#include <algorithm>
+
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
@@ -37,6 +40,8 @@
 
 #include "../../props/props.hpp"
 
+#include <boost/unordered_map.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 
 typedef hpx::components::server::ssca2 ssca2_type;
@@ -55,6 +60,8 @@ typedef hpx::components::server::local_set<graph_type> local_graph_set_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the ssca2 actions
+HPX_REGISTER_ACTION_EX(ssca2_type::read_graph_action,
+                       ssca2_large_set_action);
 HPX_REGISTER_ACTION_EX(ssca2_type::large_set_action,
                        ssca2_large_set_action);
 HPX_REGISTER_ACTION_EX(ssca2_type::large_set_local_action,
@@ -73,17 +80,6 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<ssca2_type>, ssca2);
 HPX_DEFINE_GET_COMPONENT_TYPE(ssca2_type);
 
-/*
-typedef hpx::lcos::base_lco_with_value<
-        ssca2_type::edge_set_type
-    > create_edge_set_type;
-
-HPX_REGISTER_ACTION_EX(
-    create_edge_set_type::set_result_action,
-    set_result_action_ssca2_result);
-HPX_DEFINE_GET_COMPONENT_TYPE(create_edge_set_type);
-*/
-
 #define LSSCA_(lvl) LAPP_(lvl) << " [SSCA] "
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -91,6 +87,73 @@ namespace hpx { namespace components { namespace server
 {
     ssca2::ssca2() {}
     
+    int
+    ssca2::read_graph(naming::id_type G, std::string filename)
+    {
+        int64_t x, y, w;
+        boost::unordered_map<int64_t, naming::id_type> known_vertices;
+        //boost::unordered_map<int64_t, std::vector<int64_t> > known_edges;
+        std::vector<lcos::future_value<int> > results;
+
+        LSSCA_(info) << "read_graph(" << G << ", " << filename << ")";
+
+        std::ifstream fin(filename.c_str());
+        if (!fin)
+        {
+            std::cerr << "Error: could not open " << filename << std::endl;
+            exit(1);
+        }
+
+        fin >> x;
+        fin >> y;
+        fin >> w;
+
+        int num_edges_added = 0;
+        while (!fin.eof())
+        {
+            LSSCA_(info) << num_edges_added << ": " << "Adding edge ("
+                         << x << ", " << y << ", " << w
+                         << ")";
+
+            // Use hash to catch duplicate vertices
+            // Note: Update this to do the two actions in parallel
+            if (known_vertices.find(x) == known_vertices.end())
+            {
+                known_vertices[x] = lcos::eager_future<
+                    server::graph::add_vertex_action
+                >(G, naming::invalid_id).get();
+
+                LSSCA_(info) << "Adding vertex (" << x << ", " << known_vertices[x] << ")";
+            }
+            if (known_vertices.find(y) == known_vertices.end())
+            {
+                known_vertices[y] = lcos::eager_future<
+                    server::graph::add_vertex_action
+                >(G, naming::invalid_id).get();
+
+                LSSCA_(info) << "Adding vertex (" << y << ", " << known_vertices[y] << ")";
+            }
+
+            results.push_back(
+                lcos::eager_future<
+                    server::graph::add_edge_action
+                >(G, known_vertices[x], known_vertices[y], w));
+
+            num_edges_added += 1;
+
+            fin >> x;
+            fin >> y;
+            fin >> w;
+        }
+
+        // Check that all in flight actions have completed
+        while (results.size() > 0)
+        {
+            results.back().get();
+            results.pop_back();
+        }
+    }
+
     int
     ssca2::large_set(naming::id_type G, naming::id_type dist_edge_set)
     {

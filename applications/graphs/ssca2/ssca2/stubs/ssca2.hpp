@@ -29,6 +29,15 @@ namespace hpx { namespace components { namespace stubs
             locality_result;
 
         static int
+        read_graph(naming::id_type gid,
+                   naming::id_type G,
+                   std::string filename)
+        {
+            typedef server::ssca2::read_graph_action action_type;
+            return lcos::eager_future<action_type>(gid, G, filename).get();
+        }
+
+        static int
         large_set(naming::id_type gid,
                   naming::id_type G,
                   naming::id_type edge_set)

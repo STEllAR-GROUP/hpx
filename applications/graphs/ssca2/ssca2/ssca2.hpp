@@ -32,6 +32,13 @@ namespace hpx { namespace components
         // exposed functionality of this component
 
         int
+        read_graph(naming::id_type G, std::string filename)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::read_graph(gid_, G, filename);
+        }
+
+        int
         large_set(naming::id_type G, naming::id_type edge_set)
         {
             BOOST_ASSERT(gid_);

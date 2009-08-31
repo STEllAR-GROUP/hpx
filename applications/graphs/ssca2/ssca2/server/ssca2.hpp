@@ -48,13 +48,14 @@ namespace hpx { namespace components { namespace server
         
         enum actions
         {
-            ssca2_large_set = 0,
-            ssca2_large_set_local = 1,
-            ssca2_extract = 2,
-            ssca2_extract_local = 3,
-            ssca2_extract_subgraph = 4,
-            ssca2_init_props_map = 5,
-            ssca2_init_props_map_local = 6
+            ssca2_read_graph = 0,
+            ssca2_large_set = 1,
+            ssca2_large_set_local = 2,
+            ssca2_extract = 3,
+            ssca2_extract_local = 4,
+            ssca2_extract_subgraph = 5,
+            ssca2_init_props_map = 6,
+            ssca2_init_props_map_local = 7
         };
         
         ///////////////////////////////////////////////////////////////////////
@@ -65,6 +66,10 @@ namespace hpx { namespace components { namespace server
         typedef std::map<naming::id_type,naming::id_type> gids_map_type;
         typedef distributed_map<gids_map_type> dist_gids_map_type;
         typedef local_map<gids_map_type> local_gids_map_type;
+
+        int
+        read_graph(naming::id_type G,
+                   std::string filename);
 
         int
         large_set(naming::id_type G,
@@ -98,6 +103,12 @@ namespace hpx { namespace components { namespace server
         int
         init_props_map_local(naming::id_type local_props,
                              locality_result local_vertices);
+
+        typedef hpx::actions::result_action2<
+            ssca2, int, ssca2_read_graph,
+            naming::id_type, std::string,
+            &ssca2::read_graph
+        > read_graph_action;
 
         typedef hpx::actions::result_action2<
             ssca2, int, ssca2_large_set,
