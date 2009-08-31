@@ -413,7 +413,9 @@ namespace hpx { namespace components { namespace server
         */
 
         // Extract subgraphs for each edge
-        std::vector<lcos::future_value<int> > results;
+        std::vector<naming::id_type> Hs;
+        std::vector<naming::id_type> srcs;
+        std::vector<lcos::future_value<naming::id_type> > results;
 
         int i = 0;
         std::vector<naming::id_type>::const_iterator end = edges.end();
@@ -422,7 +424,7 @@ namespace hpx { namespace components { namespace server
         {
             // This is per edge/subgraph/pmap
 
-            naming::id_type H = graphs[i];
+            Hs.push_back(graphs[i]);
             int d = 3; // This should be an argument
 
             edge_type::edge_snapshot_type e(
@@ -448,6 +450,11 @@ namespace hpx { namespace components { namespace server
 
             LSSCA_(info) << "Got source_props " << source_props;
 
+            // Add source to H
+            srcs.push_back(lcos::eager_future<
+                server::graph::add_vertex_action
+            >(Hs.back(), naming::invalid_id).get());
+
             // Get the color of the source vertex
             int color =
                 lcos::eager_future<
@@ -457,40 +464,56 @@ namespace hpx { namespace components { namespace server
 
             if (color >= d && d > 1)
             {
-                // Add source to H
-                lcos::eager_future<
-                    server::graph::add_vertex_action
-                >(H, e.source_).get();
-
                 // Spawn subgraph extraction local to target
                 // Probably should rework this to use continuations :-)
                 naming::id_type there(boost::uint64_t(e.target_.get_msb()) << 32,0);
                 results.push_back(
                     lcos::eager_future<
                         extract_subgraph_action
-                    >(there, H, pmaps[i], e.source_, e.target_, d)
-                );
-                // Can do this because we know the vertices were already added
-                results.push_back(
-                    lcos::eager_future<
-                        server::graph::add_edge_action
-                    >(H, e.source_, e.target_, e.label_)
+                    >(there, Hs.back(), pmaps[i], e.source_, e.target_, d)
                 );
             }
         }
 
+        std::vector<lcos::future_value<int> > more_results;
+
         // Collect notifications that subgraph extractions have finished
-        std::vector<lcos::future_value<int> >::iterator rend = results.end();
-        for (std::vector<lcos::future_value<int> >::iterator rit = results.begin();
+        while (Hs.size() > 0)
+        {
+            more_results.push_back(lcos::eager_future<
+                server::graph::add_edge_action
+            >(Hs.back(), srcs.back(), results.back().get(), -1)); // We lost the label
+
+            Hs.pop_back();
+            srcs.pop_back();
+            results.pop_back();
+        }
+
+        // Can't let the add_edge go out of scope before the result makes
+        // it to the future_value
+        while (more_results.size() > 0)
+        {
+            more_results.back().get();
+            more_results.pop_back();
+        }
+
+             /*
+        std::vector<lcos::future_value<naming::id_type> >::iterator rend = results.end();
+        for (std::vector<lcos::future_value<naming::id_type> >::iterator rit = results.begin();
              rit != rend; ++rit)
         {
-            (*rit).get();
+            naming::id_type new_target = (*rit).get();
+
+            // Can do this because we know the vertices were already added
+
+
         }
+        */
 
         return 0;
     }
 
-    int
+    naming::id_type
     ssca2::extract_subgraph(naming::id_type H, naming::id_type pmap,
                             naming::id_type source, naming::id_type target,
                             int d)
@@ -520,6 +543,11 @@ namespace hpx { namespace components { namespace server
 
         LSSCA_(info) << "Got target_props " << target_props;
 
+        // Add (new) source (i.e., the old target) to H
+        naming::id_type new_source = lcos::eager_future<
+            server::graph::add_vertex_action
+        >(H, naming::invalid_id).get();
+
         // Get the color of the source vertex
         int color =
             lcos::eager_future<
@@ -528,13 +556,8 @@ namespace hpx { namespace components { namespace server
 
         if (color >= d && d > 1)
         {
-            // Add (new) source (i.e., the old target) to H
-            lcos::eager_future<
-                server::graph::add_vertex_action
-            >(H, target).get();
-
             // Continue with the search
-            std::vector<lcos::future_value<int> > results;
+            std::vector<lcos::future_value<naming::id_type> > results;
 
             partial_edge_set_type neighbors =
                 lcos::eager_future<vertex::out_edges_action>(target).get();
@@ -552,25 +575,30 @@ namespace hpx { namespace components { namespace server
                         ssca2::extract_subgraph_action
                     >(locale, H, pmap, target, (*it).target_, d-1)
                 );
-                // Can do this because we know the vertices were already added
-                results.push_back(
-                    lcos::eager_future<
-                        server::graph::add_edge_action
-                    >(H, target, (*it).target_, (*it).label_)
-                );
-
             }
 
+            std::vector<lcos::future_value<int> > add_edge_fs;
+
             // Collect notifications of when subsequent searches are finished
-            std::vector<lcos::future_value<int> >::iterator rend = results.end();
-            for (std::vector<lcos::future_value<int> >::iterator rit = results.begin();
+            std::vector<lcos::future_value<naming::id_type> >::iterator rend = results.end();
+            for (std::vector<lcos::future_value<naming::id_type> >::iterator rit = results.begin();
                  rit != rend; ++rit)
             {
-                (*rit).get();
+                naming::id_type new_target = (*rit).get();
+
+                // Can do this because we know the vertices were already added
+                add_edge_fs.push_back(lcos::eager_future<
+                        server::graph::add_edge_action
+                    >(H, new_source, new_target, -1)); // We lost the label
+            }
+            while (add_edge_fs.size() > 0)
+            {
+                add_edge_fs.back().get();
+                add_edge_fs.pop_back();
             }
         }
 
-        return 0;
+        return new_source;
     }
 
     int

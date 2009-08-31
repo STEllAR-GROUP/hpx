@@ -70,7 +70,7 @@ namespace hpx { namespace components
             return this->base_type::extract_local(gid_, local_edge_set, subgraphs);
         }
 
-        int
+        naming::id_type
         extract_subgraph(naming::id_type H, naming::id_type pmap, naming::id_type source, naming::id_type target, int d)
         {
             BOOST_ASSERT(gid_);

@@ -77,7 +77,7 @@ namespace hpx { namespace components { namespace stubs
             return lcos::eager_future<action_type>(gid, local_edge_set, subgraphs).get();
         }
 
-        static int
+        static naming::id_type
         extract_subgraph(naming::id_type gid,
                          naming::id_type H,
                          naming::id_type pmap,

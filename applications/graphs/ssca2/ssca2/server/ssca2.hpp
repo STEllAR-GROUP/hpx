@@ -89,7 +89,7 @@ namespace hpx { namespace components { namespace server
         extract_local(naming::id_type local_edge_set,
                       naming::id_type subgraphs);
 
-        int
+        naming::id_type
         extract_subgraph(naming::id_type H,
                          naming::id_type pmap,
                          naming::id_type source,
@@ -135,7 +135,7 @@ namespace hpx { namespace components { namespace server
         > extract_local_action;
 
         typedef hpx::actions::result_action5<
-            ssca2, int, ssca2_extract_subgraph,
+            ssca2, naming::id_type, ssca2_extract_subgraph,
             naming::id_type, naming::id_type, naming::id_type, naming::id_type, int,
             &ssca2::extract_subgraph
         > extract_subgraph_action;
