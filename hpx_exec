@@ -64,7 +64,7 @@ my @pids = ();
 my $anode = $nodes[0].$host_suffix;
 my $pid = fork();
 if($pid == 0) {
-    run($hpx_runtime,"-r","-a","$anode:$agas_port");
+    run($hpx_runtime,"-r","-a","$anode:$agas_port","-c");
     exit(0);
 };
 #push @pids, $pid;
@@ -97,7 +97,7 @@ for(my $i=$#nodes;$i>=0;$i--) {
         if($i > 0) {
             run($ssh,"-o","NumberOfPasswordPrompts=0",$node,"/bin/bash -l -c '$cmd -a $anode:$agas_port -x $node:$parcel_port -t $tc'"); 
         } else {
-            run($cmd,"-c","-a","$anode:$agas_port","-x","$node:$parcel_port","-t","$tc"); 
+            run($cmd,"-w","-a","$anode:$agas_port","-x","$node:$parcel_port","-t","$tc"); 
         }
     };
     push @pids, $pid;
