@@ -64,7 +64,9 @@ namespace hpx { namespace components { namespace amr
 
         // make sure all input data items agree on the time step number
         BOOST_ASSERT(val1->timestep_ == val2->timestep_);
-        BOOST_ASSERT(val1->timestep_ == val3->timestep_);
+        if ( gids.size() == 3 ) {
+          BOOST_ASSERT(val1->timestep_ == val3->timestep_);
+        }
 
         // the middle point is our direct predecessor
         if (val2->timestep_ < numsteps_) {
@@ -92,10 +94,10 @@ namespace hpx { namespace components { namespace amr
             resultval.get() = val2.get();
             ++resultval->timestep_;
         }
-
         // set return value difference between actual and required number of
         // timesteps (>0: still to go, 0: last step, <0: overdone)
-        return numsteps_ - resultval->timestep_;
+     //   return numsteps_ - resultval->timestep_;
+        return 0;
     }
 
     naming::id_type stencil::alloc_data(int item, int maxitems, int row)

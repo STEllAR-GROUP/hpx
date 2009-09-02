@@ -71,7 +71,6 @@ namespace hpx { namespace components { namespace amr { namespace server
           //  components::amr::stubs::dynamic_stencil_value::set_functional_component(
           //      *stencil, *function, static_step, column,stencilsize);
             if ( column == 0 || column == numvalues-1 ) {
-            // TEST
               components::amr::stubs::dynamic_stencil_value::set_functional_component(
                   *stencil, *function, static_step, column,2);
             //  components::amr::stubs::dynamic_stencil_value::set_functional_component(
@@ -304,19 +303,15 @@ namespace hpx { namespace components { namespace amr { namespace server
         // connect output gids with corresponding stencil inputs
         connect_input_ports(stencils, outputs);
 
-        printf(" TEST a\n");
         // for loop over second row ; call start for each
         start_row(locality_results(stencils[1]));
-        printf(" TEST b\n");
 
         // prepare initial data
         std::vector<naming::id_type> initial_data;
         prepare_initial_data(locality_results(functions), initial_data);
-        printf(" TEST c\n");
 
         // do actual work
         execute(locality_results(stencils[0]), initial_data, result_data);
-        printf(" TEST d\n");
 
         // free all allocated components (we can do that synchronously)
         if (!logging.empty())
