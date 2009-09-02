@@ -96,8 +96,7 @@ namespace hpx { namespace components { namespace amr
         }
         // set return value difference between actual and required number of
         // timesteps (>0: still to go, 0: last step, <0: overdone)
-     //   return numsteps_ - resultval->timestep_;
-        return 0;
+        return numsteps_ - resultval->timestep_;
     }
 
     naming::id_type stencil::alloc_data(int item, int maxitems, int row)
