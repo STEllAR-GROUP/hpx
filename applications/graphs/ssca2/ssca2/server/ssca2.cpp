@@ -238,11 +238,13 @@ namespace hpx { namespace components { namespace server
              vit != vend; ++vit)
         {
             // Get incident edges from this vertex
+            // Need to update this to be a guaranteed local action
             typedef vertex::partial_edge_set_type partial_type;
             partial_type partials =
                 lcos::eager_future<vertex::out_edges_action>(*vit).get();
 
             // Iterate over incident edges
+            // Could break this out into a separate thread to run concurrently
             partial_type::iterator pend = partials.end();
             for (partial_type::iterator pit = partials.begin(); pit != pend; ++pit)
             {
@@ -383,6 +385,9 @@ namespace hpx { namespace components { namespace server
         // (mirroring the local portion of the edge list)
         //std::vector<naming::id_type> graph_set_local(edges.size());
         // This uses hack to get prefix
+
+        // Should be not be syncing until as late as possible,
+        // after the pmaps returns
         naming::id_type here(boost::uint64_t(local_edge_set.get_msb()) << 32,0);
         std::vector<naming::id_type> graphs;
         for (int i=0; i < edges.size(); ++i)

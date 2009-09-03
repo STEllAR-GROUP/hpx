@@ -56,10 +56,9 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
 {
     std::size_t num_edges_added;
     double a_, b_, c_, d_;
-    std::size_t order, size;
+    std::size_t order, size, type_max;
     boost::unordered_map<int64_t, naming::id_type> known_vertices;
     boost::unordered_map<int64_t, int64_t> known_edges;
-    int type_max = 16;
     int status = -1;
 
     typedef hpx::components::server::graph::add_vertex_action graph_add_vertex_action;
@@ -72,6 +71,7 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
     // Setup
     order = 1 << scale;
     size = edge_factor * order;
+    type_max = 1 << scale;
 
     if (type == 0)
     {   // nice
@@ -189,6 +189,7 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
 {
     typedef std::vector<naming::id_type> gids_type;
 
+    // Find out where here is
     naming::id_type here = applier::get_applier().get_runtime_support_gid();
 
     // SSCA#2 Graph Analysis Benchmark
@@ -201,21 +202,17 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
     util::high_resolution_timer t;
     double start_time, total_time;
 
+    // Instantiate the SSCA2 component which implements the kernels
+    // This is not strictly necessary, and the component actions
+    // could have been implemented directly in this file
     ssca2 SSCA2 (ssca2::create(here));
 
-    // Kernel 1: graph construction (see above)
-    // Input:
-    //    infile - the file containing the graph data
-    // Output:
-    //    G = the graph containing the graph data
-    //
-    // G = graph()
-    // for_each(infile.lines(), add_edge_from_line)
-
+    // Create the graph used for with all kernels
     using hpx::components::graph;
-    graph G (graph::create(here));
+    graph G(graph::create(here));
 
-    // Generate the R-MAT graph if no file is given
+    // Generate the R-MAT graph if no file is given,
+    // otherwise, execute Kernel 1 to read in graph data
     if (input_file.length() == 0)
     {
         LSSCA_(info) << "Skipping Kernel 1";
@@ -226,6 +223,14 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
     }
     else
     {
+        // Kernel 1: graph construction (see above)
+        // Input:
+        //    infile - the file containing the graph data
+        // Output:
+        //    G = the graph containing the graph data
+        //
+        // for_each(infile.lines(), add_edge_from_line)
+
         LSSCA_(info) << "Starting Kernel 1";
 
         /* Begin: timed execution of Kernel 1 */
