@@ -15,11 +15,3 @@
 
 #include <hpx/components/distributed_set/server/local_set.hpp>
 #include "local_set.hpp"
-
-///////////////////////////////////////////////////////////////////////////////
-// additional action definitions required for returning List
-
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<hpx::components::server::edge::edge_snapshot_type>::set_result_action,
-    set_result_action_vector_edge_type);
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<hpx::components::server::edge::edge_snapshot_type>);
