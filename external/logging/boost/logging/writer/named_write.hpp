@@ -222,13 +222,13 @@ template<class format_write_ /* = default_ */ > struct named_write {
     template<class formatter> void replace_formatter(const string_type & name, formatter d) {
         if ( m_format_before_str.find(name) != string_type::npos) {
             m_format_before.del(name);
-            m_format_before.add(name, d);
         }
+        m_format_before.add(name, d);
 
         if ( m_format_after_str.find(name) != string_type::npos) {
             m_format_after.del(name);
-            m_format_after.add(name, d);
         }
+        m_format_after.add(name, d);
     }
 
     template<class formatter> void add_formatter(formatter fmt) {

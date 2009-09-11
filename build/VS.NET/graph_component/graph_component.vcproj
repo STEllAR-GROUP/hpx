@@ -178,6 +178,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\..\hpx\components\graph\edge.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\hpx\components\graph\graph.cpp"
 				>
 			</File>
@@ -188,12 +192,20 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\..\hpx\components\graph\edge.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\hpx\components\graph\graph.hpp"
 				>
 			</File>
 			<Filter
 				Name="Server"
 				>
+				<File
+					RelativePath="..\..\..\hpx\components\graph\server\edge.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\..\hpx\components\graph\server\graph.hpp"
 					>
@@ -202,6 +214,10 @@
 			<Filter
 				Name="Stubs"
 				>
+				<File
+					RelativePath="..\..\..\hpx\components\graph\stubs\edge.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\..\hpx\components\graph\stubs\graph.hpp"
 					>

@@ -106,7 +106,7 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // custom formatter: prepend locality prefix 
+    // custom formatter: locality prefix 
     struct locality_prefix 
       : boost::logging::formatter::class_<
             locality_prefix, 
@@ -122,9 +122,33 @@ namespace hpx { namespace util
         void operator()(param str) const 
         {
             std::stringstream out;
-            out << "(" << std::hex << std::setw(4) << std::setfill('0') 
-                << prefix_ << ") ";
+            out << std::hex << std::setw(4) << std::setfill('0') << prefix_;
             str.prepend_string(out.str());
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // custom formatter: PX thread id
+    struct thread_id 
+      : boost::logging::formatter::class_<
+            thread_id, 
+            boost::logging::formatter::implement_op_equal::no_context
+        > 
+    {
+        void operator()(param str) const 
+        {
+            threads::thread_self* self = threads::get_self_ptr();
+            if (0 != self) {
+                // called from inside a PX thread 
+                std::stringstream out;
+                out << std::hex << std::setw(8) << std::setfill('0') 
+                    << self->get_thread_id();
+                str.prepend_string(out.str());
+            }
+            else {
+                // called from outside a PX thread 
+                str.prepend_string("--------");
+            }
         }
     };
 
@@ -189,7 +213,8 @@ namespace hpx { namespace util
             agas_logger()->writer().add_destination("console",
                 console(console_prefix, lvl, components::server::destination_agas));
             agas_logger()->writer().write(logformat, logdest);
-            agas_logger()->writer().add_formatter(locality_prefix(prefix));
+            agas_logger()->writer().replace_formatter("locality", locality_prefix(prefix));
+            agas_logger()->writer().replace_formatter("pxthread", thread_id());
             agas_logger()->mark_as_initialized();
             agas_level()->set_enabled(lvl);
         }
@@ -230,7 +255,8 @@ namespace hpx { namespace util
             timing_logger()->writer().add_destination("console",
                 console(console_prefix, lvl, components::server::destination_timing));
             timing_logger()->writer().write(logformat, logdest);
-            timing_logger()->writer().add_formatter(locality_prefix(prefix));
+            timing_logger()->writer().replace_formatter("locality", locality_prefix(prefix));
+            timing_logger()->writer().replace_formatter("pxthread", thread_id());
             timing_logger()->mark_as_initialized();
             timing_level()->set_enabled(lvl);
         }
@@ -273,7 +299,8 @@ namespace hpx { namespace util
             hpx_logger()->writer().add_destination("console",
                 console(console_prefix, lvl, components::server::destination_hpx));
             hpx_logger()->writer().write(logformat, logdest);
-            hpx_logger()->writer().add_formatter(locality_prefix(prefix));
+            hpx_logger()->writer().replace_formatter("locality", locality_prefix(prefix));
+            hpx_logger()->writer().replace_formatter("pxthread", thread_id());
             hpx_logger()->mark_as_initialized();
             hpx_level()->set_enabled(lvl);
 
@@ -281,7 +308,8 @@ namespace hpx { namespace util
             hpx_error_logger()->writer().add_destination("console",
                 console(console_prefix, lvl, components::server::destination_hpx));
             hpx_error_logger()->writer().write(logformat, logdest + " cerr");
-            hpx_error_logger()->writer().add_formatter(locality_prefix(prefix));
+            hpx_error_logger()->writer().replace_formatter("locality", locality_prefix(prefix));
+            hpx_error_logger()->writer().replace_formatter("pxthread", thread_id());
             hpx_error_logger()->mark_as_initialized();
             hpx_error_level()->set_enabled(lvl);
         }
@@ -295,7 +323,8 @@ namespace hpx { namespace util
             else {
                 hpx_error_logger()->writer().write(logformat, "cerr");
             }
-            hpx_error_logger()->writer().add_formatter(locality_prefix(prefix));
+            hpx_error_logger()->writer().replace_formatter("locality", locality_prefix(prefix));
+            hpx_error_logger()->writer().replace_formatter("pxthread", thread_id());
             hpx_error_logger()->mark_as_initialized();
             hpx_error_level()->set_enabled(boost::logging::level::fatal);
         }
@@ -338,7 +367,8 @@ namespace hpx { namespace util
             app_logger()->writer().add_destination("console",
                 console(console_prefix, lvl, components::server::destination_app));
             app_logger()->writer().write(logformat, logdest);
-            app_logger()->writer().add_formatter(locality_prefix(prefix));
+            app_logger()->writer().replace_formatter("locality", locality_prefix(prefix));
+            app_logger()->writer().replace_formatter("pxthread", thread_id());
             app_logger()->mark_as_initialized();
             app_level()->set_enabled(lvl);
         }
@@ -518,7 +548,7 @@ namespace hpx { namespace util { namespace detail
                     "[hpx.logging]",
                     "level = ${HPX_LOGLEVEL:0}",
                     "destination = ${HPX_LOGDESTINATION:console}",
-                    "format = ${HPX_LOGFORMAT:%time%(" HPX_TIMEFORMAT ") [%idx%]|\\n}",
+                    "format = ${HPX_LOGFORMAT:(%locality%) T%pxthread% %time%(" HPX_TIMEFORMAT ") [%idx%]|\\n}",
 
                 // general console logging
                     "[hpx.logging.console]",
@@ -530,7 +560,7 @@ namespace hpx { namespace util { namespace detail
                     "[hpx.logging.timing]",
                     "level = ${HPX_TIMING_LOGLEVEL:0}",
                     "destination = ${HPX_TIMING_LOGDESTINATION:console}",
-                    "format = ${HPX_TIMING_LOGFORMAT:%time%(" HPX_TIMEFORMAT ") [%idx%] [TIM] |\\n}",
+                    "format = ${HPX_TIMING_LOGFORMAT:(%locality%) T%pxthread% %time%(" HPX_TIMEFORMAT ") [%idx%] [TIM] |\\n}",
 
                 // console logging related to timing
                     "[hpx.logging.console.timing]",
@@ -543,7 +573,7 @@ namespace hpx { namespace util { namespace detail
                     "level = ${HPX_AGAS_LOGLEVEL:0}",
 //                     "destination = ${HPX_AGAS_LOGDESTINATION:console}",
                     "destination = ${HPX_AGAS_LOGDESTINATION:file(hpx.agas.$[system.pid].log)}",
-                    "format = ${HPX_AGAS_LOGFORMAT:%time%(" HPX_TIMEFORMAT ") [%idx%][AGAS] |\\n}",
+                    "format = ${HPX_AGAS_LOGFORMAT:(%locality%) T%pxthread% %time%(" HPX_TIMEFORMAT ") [%idx%][AGAS] |\\n}",
 
                 // console logging related to AGAS
                     "[hpx.logging.console.agas]",
@@ -555,7 +585,7 @@ namespace hpx { namespace util { namespace detail
                     "[hpx.logging.application]",
                     "level = ${HPX_APP_LOGLEVEL:0}",
                     "destination = ${HPX_APP_LOGDESTINATION:console}",
-                    "format = ${HPX_APP_LOGFORMAT:%time%(" HPX_TIMEFORMAT ") [%idx%] [APP] |\\n}",
+                    "format = ${HPX_APP_LOGFORMAT:(%locality%) T%pxthread% %time%(" HPX_TIMEFORMAT ") [%idx%] [APP] |\\n}",
 
                 // console logging related to applications
                     "[hpx.logging.console.application]",
