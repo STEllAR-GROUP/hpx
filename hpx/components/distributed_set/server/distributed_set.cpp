@@ -102,7 +102,7 @@ namespace hpx { namespace components { namespace server
 {
     template <typename Item>
     distributed_set<Item>::distributed_set()
-      : gid_(this->base_type::get_gid()),
+      : gid_(This()->base_type::get_gid()),
         num_items_(0),
         next_locale_(0)
     {}
@@ -134,7 +134,7 @@ namespace hpx { namespace components { namespace server
         {
             // Create a vector of GIDs from locality result
             std::vector<naming::id_type> gids;
-            for (int i=0; i < (*rit).count_; ++i)
+            for (std::size_t i=0; i < (*rit).count_; ++i)
             {
                 gids.push_back((*rit).first_gid_ + i);
             }

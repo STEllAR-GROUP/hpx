@@ -83,7 +83,7 @@ namespace hpx { namespace components { namespace server
 {
     template <typename Item>
     local_set<Item>::local_set()
-      : gid_(this->base_type::get_gid()),
+      : gid_(This()->base_type::get_gid()),
         local_set_(0)
     {}
 

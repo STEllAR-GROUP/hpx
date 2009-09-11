@@ -30,7 +30,10 @@ namespace hpx { namespace components { namespace server
     {
     private:
         typedef simple_component_base<local_set> base_type;
-        
+
+        // avoid warnings about using this in constructor initializer list
+        local_set* This() { return this; }
+
     public:
         local_set();
         
