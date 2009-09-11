@@ -69,6 +69,19 @@ namespace hpx { namespace threads
         return thread_self::impl_type::super_type::get_self();
     }
 
+    thread_id_type get_self_id()
+    {
+        thread_self* self = get_self_ptr();
+        return (0 != self) ? self->get_thread_id() : 0;
+    }
+
+    thread_id_type get_parent_id()
+    {
+        thread_self* self = get_self_ptr();
+        return (0 != self) ? 
+            reinterpret_cast<thread*>(self->get_thread_id())->get_parent_thread_id() : 0;
+    }
+
     namespace detail
     {
         void thread::set_event()

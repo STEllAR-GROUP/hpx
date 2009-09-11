@@ -170,6 +170,15 @@ namespace hpx
         /// The function \a get_self returns a pointer to the (OS thread 
         /// specific) self reference to the current PX thread.
         HPX_API_EXPORT thread_self* get_self_ptr();
+
+        /// The function \a get_self_id returns the PX thread id of the current
+        /// thread (or zero if the current thread is not a PX thread).
+        HPX_API_EXPORT thread_id_type get_self_id();
+
+        /// The function \a get_parent_id returns the PX thread id of the 
+        /// currents thread parent (or zero if the current thread is not a 
+        /// PX thread).
+        HPX_API_EXPORT thread_id_type get_parent_id();
     }
 
     class HPX_API_EXPORT runtime;

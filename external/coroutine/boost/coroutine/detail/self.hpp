@@ -221,7 +221,7 @@ namespace boost { namespace coroutines { namespace detail {
       BOOST_ASSERT(m_pimpl);
       return m_pimpl->pending();
     }
-    
+
     thread_id_type get_thread_id() const {
       BOOST_ASSERT(m_pimpl);
       return m_pimpl->get_thread_id();

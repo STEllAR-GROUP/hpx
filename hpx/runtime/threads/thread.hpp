@@ -37,18 +37,28 @@ namespace hpx { namespace threads { namespace detail
 
     public:
         thread(function_type func, thread_id_type id, thread_state newstate,
-                char const* const description)
+                char const* const description, thread_id_type parent_id)
           : coroutine_(func, id), 
             current_state_(newstate), current_state_ex_(wait_signaled),
-            description_(description)
-        {}
+            description_(description), 
+            parent_thread_id_(parent_id)
+        {
+            // store the thread id of the parent thread, mainly for debugging 
+            // purposes
+            if (0 == parent_thread_id_) {
+                thread_self* self = get_self_ptr();
+                if (self)
+                    parent_thread_id_ = self->get_thread_id();
+            }
+        }
 
         /// This constructor is provided just for compatibility with the scheme
         /// of component creation. But since threads never get created 
         /// by a factory (runtime_support) instance, we can leave this 
         /// constructor empty
         thread()
-          : coroutine_(function_type(), 0), description_("")
+          : coroutine_(function_type(), 0), description_(""), 
+            parent_thread_id_(0)
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
         }
@@ -127,6 +137,11 @@ namespace hpx { namespace threads { namespace detail
             return description_;
         }
 
+        thread_id_type get_parent_thread_id() const
+        {
+            return parent_thread_id_;
+        }
+
         // threads use a specialized allocator for fast creation/destruction
         static void *operator new(std::size_t size);
         static void operator delete(void *p, std::size_t size);
@@ -148,6 +163,7 @@ namespace hpx { namespace threads { namespace detail
         long current_state_;
         long current_state_ex_;
         char const* const description_;
+        thread_id_type parent_thread_id_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -200,8 +216,9 @@ namespace hpx { namespace threads
         /// \param newstate [in] The initial thread state this instance will
         ///                 be initialized with.
         thread(boost::function<thread_function_type> threadfunc, 
-               thread_state new_state = init, char const* const desc = "")
-          : base_type(new detail::thread(threadfunc, This(), new_state, desc))
+               thread_state new_state = init, char const* const desc = "",
+               thread_id_type parent_id = 0)
+          : base_type(new detail::thread(threadfunc, This(), new_state, desc, parent_id))
         {
             LTM_(debug) << "thread::thread(" << this << "), description(" 
                         << desc << ")";
@@ -216,6 +233,12 @@ namespace hpx { namespace threads
         thread_id_type get_thread_id() const
         {
             return const_cast<thread*>(this);
+        }
+
+        thread_id_type get_parent_thread_id() const
+        {
+            detail::thread const* t = get();
+            return t ? t->get_parent_thread_id() : 0;
         }
 
         /// The get_state function allows to query the state of this thread

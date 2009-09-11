@@ -102,7 +102,8 @@ namespace hpx { namespace threads { namespace policies
         // this is the type of the queue of new tasks not yet converted to
         // threads
         typedef boost::tuple<
-            boost::function<thread_function_type>, thread_state, char const*
+            boost::function<thread_function_type>, thread_state, char const*,
+            thread_id_type
         > task_description;
         typedef boost::lockfree::fifo<task_description> task_items_type;
 
@@ -127,7 +128,7 @@ namespace hpx { namespace threads { namespace policies
                 thread_state state = boost::get<1>(task);
                 std::auto_ptr<threads::thread> thrd (
                     new threads::thread(boost::get<0>(task), state, 
-                        boost::get<2>(task)));
+                        boost::get<2>(task), boost::get<3>(task)));
 
                 // add the new entry to the map of all threads
                 thread_id_type id = thrd->get_thread_id();
@@ -297,8 +298,12 @@ namespace hpx { namespace threads { namespace policies
 
             // do not execute the work, but register a task description for 
             // later thread creation
+            thread_id_type parent_id = 0;
+            threads::thread_self* self = get_self_ptr();
+            if (self)
+                parent_id = self->get_thread_id();
             new_tasks_.enqueue(
-                task_description(threadfunc, initial_state, description));
+                task_description(threadfunc, initial_state, description, parent_id));
 
             return invalid_thread_id;     // thread has not been created yet
         }

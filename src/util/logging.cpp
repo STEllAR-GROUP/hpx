@@ -153,6 +153,31 @@ namespace hpx { namespace util
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    // custom formatter: PX parent thread id
+    struct parent_thread_id 
+      : boost::logging::formatter::class_<
+            thread_id, 
+            boost::logging::formatter::implement_op_equal::no_context
+        > 
+    {
+        void operator()(param str) const 
+        {
+            threads::thread_self* self = threads::get_self_ptr();
+            if (0 != self) {
+                // called from inside a PX thread 
+                std::stringstream out;
+                out << std::hex << std::setw(8) << std::setfill('0') 
+                    << threads::get_parent_id();
+                str.prepend_string(out.str());
+            }
+            else {
+                // called from outside a PX thread 
+                str.prepend_string("--------");
+            }
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     // custom log destination: send generated strings to console
     struct console : boost::logging::destination::is_generic 
     {
@@ -215,6 +240,7 @@ namespace hpx { namespace util
             agas_logger()->writer().write(logformat, logdest);
             agas_logger()->writer().replace_formatter("locality", locality_prefix(prefix));
             agas_logger()->writer().replace_formatter("pxthread", thread_id());
+            agas_logger()->writer().replace_formatter("pxparent", parent_thread_id());
             agas_logger()->mark_as_initialized();
             agas_level()->set_enabled(lvl);
         }
@@ -257,6 +283,7 @@ namespace hpx { namespace util
             timing_logger()->writer().write(logformat, logdest);
             timing_logger()->writer().replace_formatter("locality", locality_prefix(prefix));
             timing_logger()->writer().replace_formatter("pxthread", thread_id());
+            timing_logger()->writer().replace_formatter("pxparent", parent_thread_id());
             timing_logger()->mark_as_initialized();
             timing_level()->set_enabled(lvl);
         }
@@ -301,6 +328,7 @@ namespace hpx { namespace util
             hpx_logger()->writer().write(logformat, logdest);
             hpx_logger()->writer().replace_formatter("locality", locality_prefix(prefix));
             hpx_logger()->writer().replace_formatter("pxthread", thread_id());
+            hpx_logger()->writer().replace_formatter("pxparent", parent_thread_id());
             hpx_logger()->mark_as_initialized();
             hpx_level()->set_enabled(lvl);
 
@@ -310,6 +338,7 @@ namespace hpx { namespace util
             hpx_error_logger()->writer().write(logformat, logdest + " cerr");
             hpx_error_logger()->writer().replace_formatter("locality", locality_prefix(prefix));
             hpx_error_logger()->writer().replace_formatter("pxthread", thread_id());
+            hpx_error_logger()->writer().replace_formatter("pxparent", parent_thread_id());
             hpx_error_logger()->mark_as_initialized();
             hpx_error_level()->set_enabled(lvl);
         }
@@ -325,6 +354,7 @@ namespace hpx { namespace util
             }
             hpx_error_logger()->writer().replace_formatter("locality", locality_prefix(prefix));
             hpx_error_logger()->writer().replace_formatter("pxthread", thread_id());
+            hpx_error_logger()->writer().replace_formatter("pxparent", parent_thread_id());
             hpx_error_logger()->mark_as_initialized();
             hpx_error_level()->set_enabled(boost::logging::level::fatal);
         }
@@ -369,6 +399,7 @@ namespace hpx { namespace util
             app_logger()->writer().write(logformat, logdest);
             app_logger()->writer().replace_formatter("locality", locality_prefix(prefix));
             app_logger()->writer().replace_formatter("pxthread", thread_id());
+            app_logger()->writer().replace_formatter("pxparent", parent_thread_id());
             app_logger()->mark_as_initialized();
             app_level()->set_enabled(lvl);
         }
