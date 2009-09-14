@@ -22,7 +22,7 @@ class HpxLog:
     for line in log_file.readlines():
       self.__events.append(HpxLogEvent(line))
 
-    self.__clean_counts()
+    #self.__clean_counts()
 
   def get_events(self):
     return deepcopy(self.__events)
@@ -49,19 +49,24 @@ class HpxLogEvent:
     log_line = log_line[:-1]
     self.__log_line = copy(log_line)
 
-    self.__keys = ['locality', 'time', 'count', 'type', 'module', 'msg']
-    log_items = self.__log_line.split(None, 5)
+    self.__keys = ['locality', 'tid', 'time', 'count', 'module', 'level', 'msg']
+    log_items = self.__log_line.split(None, 6)
 
     values = [self.__clean_item(k,v) for (k,v) in zip(self.__keys,log_items)]
     self.__event = dict([[k,v] for (k,v) in zip(self.__keys, values)])
 
   def __clean_item(self, key, item):
     if 'locality' in key:
-      return item[1:-1]
+      return item[:-1]    # Remove trailing parenthesis
     elif 'count' in key:
-      return item[1:-1]
+      return item[1:-1]   # Remove enclosing brackets
+    elif 'tid' in key:
+      return item[1:]     # Remove leading 'T'
     else:
       return item
+
+  def has_key(self, key):
+    return key in self.__event
 
   def __getitem__(self, key):
     return self.__event[key]

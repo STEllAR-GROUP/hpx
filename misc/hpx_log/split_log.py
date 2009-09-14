@@ -37,4 +37,4 @@ if __name__=="__main__":
     log_file = sys.argv[1]
     run(log_file)
   else:
-    print __doc__;
+    print __doc__
