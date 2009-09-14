@@ -93,6 +93,16 @@ namespace hpx { namespace applier
             return parcel_handler_.get_prefix();
         }
 
+        /// \brief Allow access to the id of the locality this applier 
+        ///        instance is associated with.
+        ///
+        /// This function returns a reference to the id of the locality this 
+        /// applier instance is associated with.
+        boost::uint32_t get_prefix_id() const
+        {
+            return naming::get_prefix_from_id(parcel_handler_.get_prefix());
+        }
+
         /// \brief Allow access to the prefixes of all remote localities 
         ///        registered with the AGAS service.
         ///

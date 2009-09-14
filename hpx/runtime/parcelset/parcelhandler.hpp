@@ -436,7 +436,7 @@ namespace hpx { namespace parcelset
     private:
         /// The AGAS client
         naming::resolver_client& resolver_;
-        
+
         /// The site prefix of the locality 
         naming::id_type prefix_;
 

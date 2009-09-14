@@ -178,12 +178,16 @@ namespace hpx { namespace threads
         ///               enumeration (thread_state#pending, or \a
         ///               thread_state#suspended, any other value will throw a
         ///               hpx#bad_parameter exception).
+        /// \param parent_prefix
+        /// \param parent thread id
         virtual void
         register_work(boost::function<thread_function_type> const& func,
             char const* const description = "", 
-            thread_state initial_state = pending) = 0;
+            thread_state initial_state = pending, 
+            boost::uint32_t parent_prefix = 0, 
+            thread_id_type parent_id = 0) = 0;
 
-        /// The function \a register_work adds a new work item to the thread 
+        /// The function \a register_thread adds a new work item to the thread 
         /// manager. It creates a new \a thread, adds it to the internal
         /// management data structures, and schedules the new thread, if 
         /// appropriate.
@@ -279,9 +283,10 @@ namespace hpx { namespace threads
         void
         register_work(boost::function<thread_function_type> const& func,
             char const* const description = "", 
-            thread_state initial_state = pending);
+            thread_state initial_state = pending, 
+            boost::uint32_t parent_prefix = 0, thread_id_type parent_id = 0);
 
-        /// The function \a register_work adds a new work item to the thread 
+        /// The function \a register_thread adds a new work item to the thread 
         /// manager. It creates a new \a thread, adds it to the internal
         /// management data structures, and schedules the new thread, if 
         /// appropriate.

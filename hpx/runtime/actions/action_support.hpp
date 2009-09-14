@@ -112,6 +112,12 @@ namespace hpx { namespace actions
         virtual boost::function<threads::thread_function_type>
             get_thread_function(continuation_type& cont,
                 naming::address::address_type lva) const = 0;
+
+        /// return the id of the locality of the parent thread
+        virtual boost::uint32_t get_parent_locality_prefix() const = 0;
+
+        /// Return the thread id of the parent thread
+        virtual threads::thread_id_type get_parent_thread_id() const = 0;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -129,12 +135,14 @@ namespace hpx { namespace actions
 
         // construct an action from its arguments
         action() 
-          : arguments_() 
+          : arguments_(), parent_id_(0), parent_locality_(0)
         {}
 
         template <typename Arg0>
         action(Arg0 const& arg0) 
-          : arguments_(arg0) 
+          : arguments_(arg0), 
+            parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())), 
+            parent_locality_(applier::get_applier().get_prefix_id())
         {}
 
         // bring in the rest of the constructors
@@ -284,6 +292,18 @@ namespace hpx { namespace actions
             return base_action::plain_action;
         }
 
+        /// Return the locality of the parent thread
+        boost::uint32_t get_parent_locality_prefix() const
+        {
+            return parent_locality_;
+        }
+
+        /// Return the thread id of the parent thread
+        threads::thread_id_type get_parent_thread_id() const
+        {
+            return reinterpret_cast<threads::thread_id_type>(parent_id_);
+        }
+
     private:
         // serialization support
         friend class boost::serialization::access;
@@ -292,10 +312,14 @@ namespace hpx { namespace actions
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
             util::serialize_sequence(ar, arguments_);
+            ar & parent_locality_;
+            ar & parent_id_;
         }
 
     private:
         arguments_type arguments_;
+        boost::uint32_t parent_locality_;
+        std::size_t parent_id_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

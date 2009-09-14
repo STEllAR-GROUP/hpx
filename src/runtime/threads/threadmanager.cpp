@@ -119,7 +119,8 @@ namespace hpx { namespace threads
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::register_work(
         boost::function<thread_function_type> const& threadfunc, 
-        char const* const description, thread_state initial_state)
+        char const* const description, thread_state initial_state, 
+        boost::uint32_t parent_prefix, thread_id_type parent_id)
     {
         util::block_profiler_wrapper<register_work_tag> bp(work_logger_);
 
@@ -145,8 +146,8 @@ namespace hpx { namespace threads
                    << "description(" << description << ")";
 
         // create the new thread
-        scheduler_.create_thread(threadfunc, description, initial_state, false, 
-            get_thread_num());
+        scheduler_.create_thread(threadfunc, description, initial_state, 
+            false, get_thread_num(), parent_prefix, parent_id);
     }
 
     ///////////////////////////////////////////////////////////////////////////

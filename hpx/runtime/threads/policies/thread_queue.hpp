@@ -103,7 +103,7 @@ namespace hpx { namespace threads { namespace policies
         // threads
         typedef boost::tuple<
             boost::function<thread_function_type>, thread_state, char const*,
-            thread_id_type
+            thread_id_type, boost::uint32_t
         > task_description;
         typedef boost::lockfree::fifo<task_description> task_items_type;
 
@@ -128,7 +128,8 @@ namespace hpx { namespace threads { namespace policies
                 thread_state state = boost::get<1>(task);
                 std::auto_ptr<threads::thread> thrd (
                     new threads::thread(boost::get<0>(task), state, 
-                        boost::get<2>(task), boost::get<3>(task)));
+                        boost::get<2>(task), boost::get<3>(task),
+                        boost::get<4>(task)));
 
                 // add the new entry to the map of all threads
                 thread_id_type id = thrd->get_thread_id();
@@ -265,11 +266,13 @@ namespace hpx { namespace threads { namespace policies
         thread_id_type create_thread(
             boost::function<thread_function_type> const& threadfunc, 
             char const* const description, thread_state initial_state,
-            bool run_now)
+            bool run_now, boost::uint32_t parent_prefix, 
+            thread_id_type parent_id)
         {
             if (run_now) {
                 std::auto_ptr<threads::thread> thrd (
-                    new threads::thread(threadfunc, initial_state, description));
+                    new threads::thread(threadfunc, initial_state, description,
+                        parent_id, parent_prefix));
 
                 mutex_type::scoped_lock lk(mtx_);
 
@@ -298,12 +301,16 @@ namespace hpx { namespace threads { namespace policies
 
             // do not execute the work, but register a task description for 
             // later thread creation
-            thread_id_type parent_id = 0;
-            threads::thread_self* self = get_self_ptr();
-            if (self)
-                parent_id = self->get_thread_id();
+            if (0 == parent_id) {
+                threads::thread_self* self = get_self_ptr();
+                if (self)
+                    parent_id = self->get_thread_id();
+            }
+            if (0 == parent_prefix) 
+                parent_prefix = applier::get_applier().get_prefix_id();
             new_tasks_.enqueue(
-                task_description(threadfunc, initial_state, description, parent_id));
+                task_description(threadfunc, initial_state, description, 
+                    parent_id, parent_prefix));
 
             return invalid_thread_id;     // thread has not been created yet
         }

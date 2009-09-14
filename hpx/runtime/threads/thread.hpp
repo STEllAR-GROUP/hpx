@@ -37,11 +37,13 @@ namespace hpx { namespace threads { namespace detail
 
     public:
         thread(function_type func, thread_id_type id, thread_state newstate,
-                char const* const description, thread_id_type parent_id)
+                char const* const description, thread_id_type parent_id,
+                boost::uint32_t parent_prefix)
           : coroutine_(func, id), 
             current_state_(newstate), current_state_ex_(wait_signaled),
             description_(description), 
-            parent_thread_id_(parent_id)
+            parent_thread_id_(parent_id),
+            parent_locality_prefix_(parent_prefix)
         {
             // store the thread id of the parent thread, mainly for debugging 
             // purposes
@@ -50,6 +52,8 @@ namespace hpx { namespace threads { namespace detail
                 if (self)
                     parent_thread_id_ = self->get_thread_id();
             }
+            if (0 == parent_locality_prefix_) 
+                parent_locality_prefix_ = applier::get_applier().get_prefix_id();
         }
 
         /// This constructor is provided just for compatibility with the scheme
@@ -58,7 +62,7 @@ namespace hpx { namespace threads { namespace detail
         /// constructor empty
         thread()
           : coroutine_(function_type(), 0), description_(""), 
-            parent_thread_id_(0)
+            parent_locality_prefix_(0), parent_thread_id_(0)
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
         }
@@ -137,6 +141,10 @@ namespace hpx { namespace threads { namespace detail
             return description_;
         }
 
+        boost::uint32_t get_parent_locality_prefix() const
+        {
+            return parent_locality_prefix_;
+        }
         thread_id_type get_parent_thread_id() const
         {
             return parent_thread_id_;
@@ -163,6 +171,7 @@ namespace hpx { namespace threads { namespace detail
         long current_state_;
         long current_state_ex_;
         char const* const description_;
+        boost::uint32_t parent_locality_prefix_;
         thread_id_type parent_thread_id_;
     };
 
@@ -216,9 +225,10 @@ namespace hpx { namespace threads
         /// \param newstate [in] The initial thread state this instance will
         ///                 be initialized with.
         thread(boost::function<thread_function_type> threadfunc, 
-               thread_state new_state = init, char const* const desc = "",
-               thread_id_type parent_id = 0)
-          : base_type(new detail::thread(threadfunc, This(), new_state, desc, parent_id))
+              thread_state new_state = init, char const* const desc = "",
+              thread_id_type parent_id = 0, boost::uint32_t parent_prefix = 0)
+          : base_type(new detail::thread(threadfunc, This(), new_state, desc, 
+                parent_id, parent_prefix))
         {
             LTM_(debug) << "thread::thread(" << this << "), description(" 
                         << desc << ")";
@@ -235,6 +245,14 @@ namespace hpx { namespace threads
             return const_cast<thread*>(this);
         }
 
+        /// Return the locality of the parent thread
+        boost::uint32_t get_parent_locality_prefix() const
+        {
+            detail::thread const* t = get();
+            return t ? t->get_parent_locality_prefix() : 0;
+        }
+
+        /// Return the thread id of the parent thread
         thread_id_type get_parent_thread_id() const
         {
             detail::thread const* t = get();
