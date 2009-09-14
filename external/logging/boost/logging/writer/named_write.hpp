@@ -318,6 +318,10 @@ private:
                     parsing_params = true;
                     params.clear();
                 }
+                else {
+                    stripped_str += *b;
+                    parser.add( *b);
+                }
             }
             else if ( (*b == ')') && parsing_params) {
                 BOOST_ASSERT ( parser.has_manipulator_name() );
