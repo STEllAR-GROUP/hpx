@@ -17,14 +17,14 @@
 /// Define types of stencil_value_out_adaptor components exposed by this module
 typedef hpx::components::managed_component<
     hpx::components::amr::server::stencil_value_out_adaptor
-> stencil_value_out_adaptor_type;
+> had_stencil_value_out_adaptor_type;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    stencil_value_out_adaptor_type, had_stencil_value_out_adaptor);
+    had_stencil_value_out_adaptor_type, had_stencil_value_out_adaptor);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION_EX(
-    stencil_value_out_adaptor_type::wrapped_type::get_value_action,
-    stencil_value_out_get_value_action);
-HPX_DEFINE_GET_COMPONENT_TYPE(stencil_value_out_adaptor_type::wrapped_type);
+    had_stencil_value_out_adaptor_type::wrapped_type::get_value_action,
+    had_stencil_value_out_get_value_action);
+HPX_DEFINE_GET_COMPONENT_TYPE(had_stencil_value_out_adaptor_type::wrapped_type);
 

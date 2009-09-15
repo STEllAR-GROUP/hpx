@@ -24,8 +24,8 @@ typedef hpx::components::amr::server::amr_mesh had_amr_mesh_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
-HPX_REGISTER_ACTION_EX(had_amr_mesh_type::init_execute_action, amr_mesh_init_execute_action);
-HPX_REGISTER_ACTION_EX(had_amr_mesh_type::execute_action, amr_mesh_execute_action);
+HPX_REGISTER_ACTION_EX(had_amr_mesh_type::init_execute_action, had_amr_mesh_init_execute_action);
+HPX_REGISTER_ACTION_EX(had_amr_mesh_type::execute_action, had_amr_mesh_execute_action);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<had_amr_mesh_type>, had_amr_mesh);

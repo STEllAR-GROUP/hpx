@@ -19,10 +19,10 @@ typedef hpx::components::amr::server::functional_component functional_component_
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
 HPX_REGISTER_ACTION_EX(functional_component_type::alloc_data_action, 
-    functional_component_alloc_data_action);
+    had_functional_component_alloc_data_action);
 HPX_REGISTER_ACTION_EX(functional_component_type::eval_action, 
-    functional_component_eval_action);
+    had_functional_component_eval_action);
 HPX_REGISTER_ACTION_EX(functional_component_type::init_action, 
-    functional_component_init_action);
+    had_functional_component_init_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(functional_component_type);
 
