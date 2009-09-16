@@ -14,6 +14,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/coroutine/coroutine.hpp>
 #include <hpx/config.hpp>
 #include <hpx/util/unused.hpp>
@@ -37,6 +38,9 @@ namespace hpx
         /// specific) applier instance.
         HPX_API_EXPORT applier& get_applier();
         HPX_API_EXPORT applier* get_applier_ptr();
+
+        /// The function \a get_prefix_id returns the id of this locality
+        HPX_API_EXPORT boost::uint32_t get_prefix_id();
     }
 
     /// \namespace actions
@@ -181,7 +185,7 @@ namespace hpx
         HPX_API_EXPORT thread_id_type get_parent_id();
 
         /// The function \a get_parent_prefix returns the id of the locality of
-        /// the currents thread parent (or zero if the current thread is not a 
+        /// the current's thread parent (or zero if the current thread is not a 
         /// PX thread).
         HPX_API_EXPORT boost::uint32_t get_parent_prefix();
     }

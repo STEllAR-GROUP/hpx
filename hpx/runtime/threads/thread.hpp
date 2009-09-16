@@ -53,7 +53,7 @@ namespace hpx { namespace threads { namespace detail
                     parent_thread_id_ = self->get_thread_id();
             }
             if (0 == parent_locality_prefix_) 
-                parent_locality_prefix_ = applier::get_applier().get_prefix_id();
+                parent_locality_prefix_ = applier::get_prefix_id();
         }
 
         /// This constructor is provided just for compatibility with the scheme

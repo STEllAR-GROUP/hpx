@@ -134,6 +134,13 @@ namespace hpx { namespace applier
         return appl ? *appl : NULL;
     }
 
+    // The function \a get_prefix_id returns the id of this locality
+    boost::uint32_t get_prefix_id()
+    {
+        applier** appl = applier::applier_.get();
+        return appl ? (*appl)->get_prefix_id() : 0;
+    }
+
 ///////////////////////////////////////////////////////////////////////////////
 }}
 

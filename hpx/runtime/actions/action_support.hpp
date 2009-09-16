@@ -142,7 +142,7 @@ namespace hpx { namespace actions
         action(Arg0 const& arg0) 
           : arguments_(arg0), 
             parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())), 
-            parent_locality_(applier::get_applier().get_prefix_id())
+            parent_locality_(applier::get_prefix_id())
         {}
 
         // bring in the rest of the constructors

@@ -307,7 +307,7 @@ namespace hpx { namespace threads { namespace policies
                     parent_id = self->get_thread_id();
             }
             if (0 == parent_prefix) 
-                parent_prefix = applier::get_applier().get_prefix_id();
+                parent_prefix = applier::get_prefix_id();
             new_tasks_.enqueue(
                 task_description(threadfunc, initial_state, description, 
                     parent_id, parent_prefix));

@@ -40,6 +40,9 @@ namespace hpx { namespace threads { namespace policies
         enum { max_thread_count = 1000 };
 
     public:
+        // the scheduler type takes two initialization parameters: 
+        //    the number of queues
+        //    the maxcount per queue
         typedef std::pair<std::size_t, std::size_t> init_parameter_type;
 
         local_queue_scheduler(init_parameter_type const& init)
