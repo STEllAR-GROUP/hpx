@@ -30,6 +30,9 @@ namespace hpx { namespace components { namespace amr
         stencil_data const* middle,
         stencil_data* result, int numsteps);
 
+    HPX_COMPONENT_EXPORT int evaluate_refinement(stencil_data const* result, 
+        int numsteps);
+
 }}}
 
 #endif

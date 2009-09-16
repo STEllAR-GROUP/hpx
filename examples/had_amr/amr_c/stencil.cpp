@@ -26,7 +26,7 @@ namespace hpx { namespace components { namespace amr
     int stencil::eval(naming::id_type const& result, 
         std::vector<naming::id_type> const& gids, int row, int column)
     {
-        //BOOST_ASSERT(gids.size() == 3);
+        BOOST_ASSERT(gids.size() <= 3);
 
         // make sure all the gids are looking valid
         if (result == naming::invalid_id)
@@ -68,8 +68,12 @@ namespace hpx { namespace components { namespace amr
           BOOST_ASSERT(val1->timestep_ == val3->timestep_);
         }
 
-        // the middle point is our direct predecessor
-        if (val2->timestep_ < numsteps_) {
+        // the predecessor
+        int middle_timestep;
+        if ( gids.size() == 3 ) middle_timestep = val2->timestep_;
+        else if ( gids.size() == 2 && column == 0 ) middle_timestep = val2->timestep_;
+        else middle_timestep = val1->timestep_;
+        if (middle_timestep < numsteps_) {
 
             if ( gids.size() == 3 ) {
               // this is the actual calculation, call provided (external) function
@@ -85,6 +89,9 @@ namespace hpx { namespace components { namespace amr
                   resultval.get_ptr(), numsteps_);
               }
             }
+
+            // check for refinement
+            evaluate_refinement(resultval.get_ptr(), numsteps_);
 
             if (log_)     // send result to logging instance
                 stubs::logging::logentry(log_, resultval.get(), row);
