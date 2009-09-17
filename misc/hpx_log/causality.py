@@ -56,7 +56,11 @@ def run(filename, exp):
   #  dot.write("  %s [shape=point];\n" % (i))
 
   for (u,v) in edges:
-    dot.write("  %s -> %s [label=%s];\n" % (u, v, edges.index((u,v))))
+    u_name = 'T' + vertices[u].replace('/','_')
+    u_name = u_name.replace('-','_')
+    v_name = 'T' + vertices[v].replace('/','_')
+    v_name = v_name.replace('-','_')
+    dot.write("  %s -> %s;\n" % (u_name, v_name))
 
   dot.write("}\n")
 
