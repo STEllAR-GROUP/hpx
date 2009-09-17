@@ -8,6 +8,8 @@
 
 #include <boost/foreach.hpp>
 
+#include "../amr/amr_mesh.hpp"
+
 #include "stencil.hpp"
 #include "logging.hpp"
 #include "stencil_data.hpp"
@@ -91,7 +93,25 @@ namespace hpx { namespace components { namespace amr
             }
 
             // check for refinement
-            evaluate_refinement(resultval.get_ptr(), numsteps_);
+            bool refine = evaluate_refinement(resultval.get_ptr(), numsteps_);
+
+            // this will be a parameter someday
+            int allowedl = 1;
+            if ( refine && val1->level_ <= allowedl ) {
+              resultval->level_ = val1->level_ + 1;
+
+              // the initial data for the child mesh comes from the parent mesh
+              naming::id_type here = applier::get_applier().get_runtime_support_gid();
+              components::component_type logging_type =
+                        components::get_component_type<components::amr::server::logging>();
+              components::component_type function_type =
+                       components::get_component_type<components::amr::stencil>();
+              components::amr::amr_mesh child_mesh (
+                    components::amr::amr_mesh::create(here, 1, true));
+              std::vector<naming::id_type> result_data(
+                          child_mesh.init_execute(function_type, 3, 2, 3,
+                          logging_type));
+            }
 
             if (log_)     // send result to logging instance
                 stubs::logging::logentry(log_, resultval.get(), row);

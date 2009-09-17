@@ -20,6 +20,7 @@ namespace hpx { namespace components { namespace amr
         val->max_index_ = maxitems;
         val->index_ = item;
         val->timestep_ = 0;
+        val->level_= 0;
         /*
         if (item < (int)(maxitems / 3.) || item >= (int)(2. * maxitems / 3.))
             val->value_ = 0;
@@ -100,10 +101,10 @@ namespace hpx { namespace components { namespace amr
         return 1;
     }
 
-    int evaluate_refinement(stencil_data const* result,
+    bool evaluate_refinement(stencil_data const* result,
                             int numsteps)
     {
-        return 1;
+        return false;
     }
 
 }}}
