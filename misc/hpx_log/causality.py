@@ -13,74 +13,62 @@ import sys
 
 from hpx_log import HpxLog
 
+import pxdm
+
 def get_parent_tid(event):
   msg = event['msg']
   tid = msg[msg.index('(')+1:msg.index(')')]
 
   return tid
 
-def run(filename, exp):
-  log = HpxLog(filename)
+def build_graph(thread, action):
+  # Kludge 1
+  action['--------'] = {'name':'not-a-thread'}
 
-  vertices = []
+  tasks = [(t['name'],t['parent']) for t in thread.values()]
+
   edges = []
+  vertices = []
 
-  for event in log.get_events():
-    if event.has_key('msg') and exp in event['msg']:
-      source = '/'.join(event['parent'])
-      target = '/'.join(event['thread'])
-      src = 0
-      tgt = 0
+  for (u,v) in tasks:
+    cid = 'T'+u[1]
+    cid = cid.replace('-','_')
+    pid = 'T'+v[1]
+    pid = pid.replace('-','_')
 
-      if not source in vertices:
-        vertices.append(source)
-        src = len(vertices)-1
-      else:
-        src = vertices.index(source)
-      if not target in vertices:
-        vertices.append(target)
-        tgt = len(vertices)-1
-      else:
-        tgt = vertices.index(target)
 
-      if (src,tgt) not in edges:
-        edges.append((src,tgt))
+    if not pid in vertices:
+      label = action[v[1]]['name'][1] 
+      vertices.append((pid,label))
+    if not cid in vertices:
+      label = action[u[1]]['name'][1] 
+      vertices.append((cid,label))
+    edges.append((pid, cid))
 
-  # Write DOT to to file
-  dot_filename = filename + '.dot'
-  dot = open(dot_filename, 'w')
+  return (edges, vertices)
 
-  dot.write("digraph {\n")
- 
-  #for i in range(len(vertices)):
-  #  dot.write("  %s [shape=point];\n" % (i))
+def run(log_filename, node_style, arc_style):
+  (component, object, action, thread) = pxdm.run(log_filename)
 
+  (edges, vertices) = build_graph(thread, action)
+
+  print "digraph {"
+  for (u,w) in vertices:
+    print "  %%s %s;" % (node_style) % (u,w)
   for (u,v) in edges:
-    u_name = 'T' + vertices[u].replace('/','_')
-    u_name = u_name.replace('-','_')
-    v_name = 'T' + vertices[v].replace('/','_')
-    v_name = v_name.replace('-','_')
-    dot.write("  %s -> %s;\n" % (u_name, v_name))
-
-  dot.write("}\n")
-
-  # Write out some additional information
-  print "Nodes:"
-  for v in vertices:
-    print "  %d\t%s" % (vertices.index(v), v)
-
-  print "Arcs:"
-  for (u,v) in edges:
-    print "  %d\t(%s, %s)" % (edges.index((u,v)), vertices[u], vertices[v])
+    print "  %s -> %s;" % (u,v)
+  print "}"
 
 if __name__=="__main__":
-  if (len(sys.argv) == 3):
-    exp = sys.argv[2]
-  else:
-    exp = ''
+  node_style = '[label=%s]'
+  arc_style = ''
 
   if (len(sys.argv) >= 2):
     log_file = sys.argv[1]
-    run(log_file, exp)
+
+    if "--point" in sys.argv:
+      node_style = '[shape=point,label=%s]'
+
+    run(log_file, node_style, arc_style)
   else:
     print __doc__
