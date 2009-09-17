@@ -36,12 +36,14 @@ def build_graph(thread, action):
     pid = 'T'+v[1]
     pid = pid.replace('-','_')
 
-
+    label = 'x'
     if not pid in vertices:
-      label = action[v[1]]['name'][1] 
+      if action.has_key(v[1]):
+        label = action[v[1]]['name'][1] 
       vertices.append((pid,label))
     if not cid in vertices:
-      label = action[u[1]]['name'][1] 
+      if action.has_key(v[1]):
+        label = action[v[1]]['name'][1] 
       vertices.append((cid,label))
     edges.append((pid, cid))
 
