@@ -97,8 +97,9 @@ namespace hpx { namespace components { namespace amr
 
             // this will be a parameter someday
             int allowedl = 1;
-            if ( refine && val1->level_ <= allowedl ) {
+            if ( refine && val1->level_ <= allowedl && gids.size() == 3 ) {
               resultval->level_ = val1->level_ + 1;
+              printf(" TEST result level %d\n",resultval->level_);
 
               // the initial data for the child mesh comes from the parent mesh
               naming::id_type here = applier::get_applier().get_runtime_support_gid();
@@ -108,8 +109,13 @@ namespace hpx { namespace components { namespace amr
                        components::get_component_type<components::amr::stencil>();
               components::amr::amr_mesh child_mesh (
                     components::amr::amr_mesh::create(here, 1, true));
+              std::vector<naming::id_type> initial_data;
+              initial_data.push_back(result);
+              initial_data.push_back(result);
+              initial_data.push_back(result);
+
               std::vector<naming::id_type> result_data(
-                          child_mesh.init_execute(function_type, 3, 2, 3,
+                          child_mesh.execute(initial_data,function_type, 3, 2,3,
                           logging_type));
             }
 

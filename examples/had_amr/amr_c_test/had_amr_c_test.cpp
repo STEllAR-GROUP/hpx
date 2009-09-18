@@ -104,7 +104,7 @@ namespace hpx { namespace components { namespace amr
     bool evaluate_refinement(stencil_data const* result,
                             int numsteps)
     {
-        return false;
+        return true;
     }
 
 }}}
