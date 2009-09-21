@@ -65,10 +65,10 @@ namespace hpx { namespace components { namespace amr
         }
 
         // make sure all input data items agree on the time step number
-        BOOST_ASSERT(val1->timestep_ == val2->timestep_);
-        if ( gids.size() == 3 ) {
-          BOOST_ASSERT(val1->timestep_ == val3->timestep_);
-        }
+       // BOOST_ASSERT(val1->timestep_ == val2->timestep_);
+       // if ( gids.size() == 3 ) {
+       //   BOOST_ASSERT(val1->timestep_ == val3->timestep_);
+       // }
 
         // the predecessor
         std::size_t middle_timestep;
@@ -97,9 +97,53 @@ namespace hpx { namespace components { namespace amr
 
             // this will be a parameter someday
             std::size_t allowedl = 1;
-            if ( refine && val1->level_ <= allowedl && gids.size() == 3 ) {
-              resultval->level_ = val1->level_ + 1;
-              printf(" TEST result level %d\n",resultval->level_);
+            if ( refine && resultval->level_ <= allowedl && gids.size() == 3 ) {
+              naming::id_type gval1, gval2, gval3;
+              boost::tie(gval1, gval2, gval3) = 
+                wait(components::stubs::memory_block::clone_async(gids[0]), 
+                      components::stubs::memory_block::clone_async(gids[1]), 
+                      components::stubs::memory_block::clone_async(gids[2]));
+
+              access_memory_block<stencil_data> mval1, mval2, mval3;
+              boost::tie(mval1, mval2, mval3) = 
+                  wait(components::stubs::memory_block::get_async(gval1), 
+                       components::stubs::memory_block::get_async(gval2), 
+                       components::stubs::memory_block::get_async(gval3));
+
+              // call user defined interpolation
+              std::vector<access_memory_block<stencil_data> > source_interp;
+              std::vector<access_memory_block<stencil_data> > destination_interp;
+
+              source_interp.push_back(val1);
+              source_interp.push_back(val2);
+              source_interp.push_back(val3);
+
+              interpolation(source_interp,destination_interp);
+
+              mval1->max_index_ = resultval->max_index_; 
+              mval2->max_index_ = resultval->max_index_; 
+              mval3->max_index_ = resultval->max_index_; 
+
+              mval1->index_ = resultval->index_; 
+              mval2->index_ = resultval->index_; 
+              mval3->index_ = resultval->index_; 
+
+             // mval1->value_ = resultval->value_; 
+             // mval2->value_ = resultval->value_; 
+             // mval3->value_ = resultval->value_; 
+
+              // end user defined
+
+              //printf(" TEST A result level %d resultval level %d : %g %g %g\n",mval1->level_,resultval->level_,mval1->value_,mval2->value_,mval3->value_);
+              mval1->level_ = resultval->level_ + 1;
+              mval2->level_ = resultval->level_ + 1;
+              mval3->level_ = resultval->level_ + 1;
+              //printf(" TEST B result level %d resultval level %d\n",mval1->level_,resultval->level_);
+
+              // initialize timestep 
+              mval1->timestep_ = 0;
+              mval2->timestep_ = 0;
+              mval3->timestep_ = 0;
 
               // the initial data for the child mesh comes from the parent mesh
               naming::id_type here = applier::get_applier().get_runtime_support_gid();
@@ -110,13 +154,17 @@ namespace hpx { namespace components { namespace amr
               components::amr::amr_mesh child_mesh (
                     components::amr::amr_mesh::create(here, 1, true));
               std::vector<naming::id_type> initial_data;
-              initial_data.push_back(result);
-              initial_data.push_back(result);
-              initial_data.push_back(result);
+              initial_data.push_back(gval1);
+              initial_data.push_back(gval2);
+              initial_data.push_back(gval3);
 
               std::vector<naming::id_type> result_data(
                           child_mesh.execute(initial_data,function_type, 3, 2,3,
                           logging_type));
+
+              // evaluate result data
+              // release initial data
+              // release result data
             }
 
             if (log_)     // send result to logging instance

@@ -4,7 +4,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <math.h>
+#include <hpx/hpx.hpp>
+#include <hpx/lcos/future_wait.hpp>
 
+#include "../amr/amr_mesh.hpp"
+
+#include "../amr_c/stencil.hpp"
 #include "../amr_c/stencil_data.hpp"
 #include "../amr_c/stencil_functions.hpp"
 
@@ -108,6 +113,17 @@ namespace hpx { namespace components { namespace amr
                             int numsteps)
     {
         return true;
+    }
+
+    int interpolation(std::vector<access_memory_block<stencil_data> > source_interp,
+                      std::vector<access_memory_block<stencil_data> > destination_interp)
+    {
+      std::vector<access_memory_block<stencil_data> >::iterator itsource;
+      for (itsource=source_interp.begin(); itsource !=source_interp.end();itsource++) {
+        destination_interp.push_back( *(itsource) );
+      }
+
+      return 1;
     }
 
 }}}
