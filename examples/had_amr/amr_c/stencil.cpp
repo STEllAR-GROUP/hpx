@@ -71,7 +71,7 @@ namespace hpx { namespace components { namespace amr
         }
 
         // the predecessor
-        int middle_timestep;
+        std::size_t middle_timestep;
         if ( gids.size() == 3 ) middle_timestep = val2->timestep_;
         else if ( gids.size() == 2 && column == 0 ) middle_timestep = val2->timestep_;
         else middle_timestep = val1->timestep_;
@@ -96,7 +96,7 @@ namespace hpx { namespace components { namespace amr
             bool refine = evaluate_refinement(resultval.get_ptr(), numsteps_);
 
             // this will be a parameter someday
-            int allowedl = 1;
+            std::size_t allowedl = 1;
             if ( refine && val1->level_ <= allowedl && gids.size() == 3 ) {
               resultval->level_ = val1->level_ + 1;
               printf(" TEST result level %d\n",resultval->level_);

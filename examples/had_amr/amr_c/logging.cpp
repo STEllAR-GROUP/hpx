@@ -18,7 +18,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     {
         mutex_type::scoped_lock l(mtx_);
 
-        std::cout << row << ", " << val.index_ << ": " 
+        std::cout << row << ", " << val.index_ << ", " << val.level_ << ": " 
                   << val.max_index_ << ", " << val.timestep_ << ", " 
                   << val.value_ << std::endl;
     }

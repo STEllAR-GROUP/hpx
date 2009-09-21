@@ -292,8 +292,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         init(locality_results(functions), locality_results(logging), numsteps);
 
         // initialize stencil_values using the stencil (functional) components
-        init_stencils(locality_results(stencils[0]), locality_results(functions), 0, stencilsize,numvalues);
-        init_stencils(locality_results(stencils[1]), locality_results(functions), 1, stencilsize,numvalues);
+        init_stencils(locality_results(stencils[0]), locality_results(functions), 0, stencilsize, numvalues);
+        init_stencils(locality_results(stencils[1]), locality_results(functions), 1, stencilsize, numvalues);
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(2);
@@ -363,10 +363,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         init(locality_results(functions), locality_results(logging), numsteps);
 
         // initialize stencil_values using the stencil (functional) components
-        init_stencils(locality_results(stencils[0]), locality_results(functions), 0, stencilsize,numvalues);
-        init_stencils(locality_results(stencils[1]), locality_results(functions), 1, stencilsize,numvalues);
-       // init_stencils(locality_results(stencils[0]), locality_results(functions), 0);
-       // init_stencils(locality_results(stencils[1]), locality_results(functions), 1);
+        init_stencils(locality_results(stencils[0]), locality_results(functions), 0, stencilsize, numvalues);
+        init_stencils(locality_results(stencils[1]), locality_results(functions), 1, stencilsize, numvalues);
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(2);
@@ -375,6 +373,9 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // connect output gids with corresponding stencil inputs
         connect_input_ports(stencils, outputs);
+
+        // for loop over second row ; call start for each
+        start_row(locality_results(stencils[1]));
 
         // do actual work
         execute(locality_results(stencils[0]), initial_data, result_data);

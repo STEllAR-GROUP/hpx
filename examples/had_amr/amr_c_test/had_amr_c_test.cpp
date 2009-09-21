@@ -41,6 +41,7 @@ namespace hpx { namespace components { namespace amr
         result->max_index_ = middle->max_index_;
         result->index_ = middle->index_;
         result->timestep_ = middle->timestep_ + 1;
+        result->level_ = middle->level_;
         /*
         result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
         */
@@ -64,6 +65,7 @@ namespace hpx { namespace components { namespace amr
         result->max_index_ = middle->max_index_;
         result->index_ = middle->index_;
         result->timestep_ = middle->timestep_ + 1;
+        result->level_ = middle->level_;
         /*
         result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
         */
@@ -87,6 +89,7 @@ namespace hpx { namespace components { namespace amr
         result->max_index_ = middle->max_index_;
         result->index_ = middle->index_;
         result->timestep_ = middle->timestep_ + 1;
+        result->level_ = middle->level_;
         /*
         result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
         */
