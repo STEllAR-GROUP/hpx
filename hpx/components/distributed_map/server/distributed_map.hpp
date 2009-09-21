@@ -30,12 +30,15 @@ namespace hpx { namespace components { namespace server
     {
     private:
         typedef simple_component_base<distributed_map> base_type;
-        
+
+        // avoid warnings about using this in member initializer list
+        distributed_map* This() { return this; }
+
     public:
         distributed_map();
-        
+
         typedef hpx::components::server::distributed_map<List> wrapping_type;
-        
+
         enum actions
         {
             distributed_map_get_local = 0,

@@ -30,7 +30,10 @@ namespace hpx { namespace components { namespace server
     {
     private:
         typedef simple_component_base<local_map> base_type;
-        
+
+        // avoid warnings about using this in member initializer list
+        local_map* This() { return this; }
+
     public:
         local_map();
         

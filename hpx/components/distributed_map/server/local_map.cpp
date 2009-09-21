@@ -46,7 +46,7 @@ namespace hpx { namespace components { namespace server
 {
     template <typename List>
     local_map<List>::local_map()
-      : gid_(this->base_type::get_gid()),
+      : gid_(This()->base_type::get_gid()),
         dist_map_(naming::invalid_id),
         local_map_()
     {}
