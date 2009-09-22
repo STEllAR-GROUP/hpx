@@ -31,10 +31,10 @@ namespace hpx { namespace components { namespace amr
         stencil_data* result, int numsteps);
 
     HPX_COMPONENT_EXPORT bool evaluate_refinement(stencil_data const* result, 
-        int numsteps);
+        std::size_t level,
+        std::size_t numsteps);
 
-    HPX_COMPONENT_EXPORT int interpolation(std::vector<access_memory_block<stencil_data> > source_interp,
-                              std::vector<access_memory_block<stencil_data> > destination_interp);
+    HPX_COMPONENT_EXPORT int interpolation();
 
 }}}
 

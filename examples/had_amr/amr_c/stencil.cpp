@@ -93,7 +93,7 @@ namespace hpx { namespace components { namespace amr
             }
 
             // check for refinement
-            bool refine = evaluate_refinement(resultval.get_ptr(), numsteps_);
+            bool refine = evaluate_refinement(resultval.get_ptr(), resultval->level_ ,numsteps_);
 
             // this will be a parameter someday
             std::size_t allowedl = 1;
@@ -111,14 +111,7 @@ namespace hpx { namespace components { namespace amr
                        components::stubs::memory_block::get_async(gval3));
 
               // call user defined interpolation
-              std::vector<access_memory_block<stencil_data> > source_interp;
-              std::vector<access_memory_block<stencil_data> > destination_interp;
-
-              source_interp.push_back(val1);
-              source_interp.push_back(val2);
-              source_interp.push_back(val3);
-
-              interpolation(source_interp,destination_interp);
+              interpolation();
 
               mval1->max_index_ = resultval->max_index_; 
               mval2->max_index_ = resultval->max_index_; 
@@ -128,9 +121,9 @@ namespace hpx { namespace components { namespace amr
               mval2->index_ = resultval->index_; 
               mval3->index_ = resultval->index_; 
 
-             // mval1->value_ = resultval->value_; 
-             // mval2->value_ = resultval->value_; 
-             // mval3->value_ = resultval->value_; 
+              mval1->value_ = resultval->value_; 
+              mval2->value_ = resultval->value_; 
+              mval3->value_ = resultval->value_; 
 
               // end user defined
 
@@ -166,7 +159,6 @@ namespace hpx { namespace components { namespace amr
               // release initial data
               // release result data
             }
-
             if (log_)     // send result to logging instance
                 stubs::logging::logentry(log_, resultval.get(), row);
         }
