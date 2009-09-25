@@ -28,10 +28,6 @@ HPX_COMPONENT_EXPORT int evaluate_right_bdry_timestep(stencil_data const* left,
     stencil_data const* middle,
     stencil_data* result, int numsteps);
 
-HPX_COMPONENT_EXPORT bool evaluate_refinement(stencil_data const* result, 
-    std::size_t level,
-    std::size_t numsteps);
-
 HPX_COMPONENT_EXPORT int interpolation();
 
 #endif

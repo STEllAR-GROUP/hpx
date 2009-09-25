@@ -81,6 +81,7 @@ namespace hpx { namespace components { namespace amr
               // this is the actual calculation, call provided (external) function
               evaluate_timestep(val1.get_ptr(), val2.get_ptr(), val3.get_ptr(), 
                   resultval.get_ptr(), numsteps_);
+              printf(" TEST left %d mid %d right %d\n",val1->refine_,val2->refine_,val3->refine_);
             } else if ( gids.size() == 2 ) {
               // bdry computation
               if ( column == 0 ) {
@@ -91,13 +92,10 @@ namespace hpx { namespace components { namespace amr
                   resultval.get_ptr(), numsteps_);
               }
             }
-
-            // check for refinement
-            bool refine = evaluate_refinement(resultval.get_ptr(), resultval->level_ ,numsteps_);
-
+#if 0
             // this will be a parameter someday
             std::size_t allowedl = 1;
-            if ( refine && resultval->level_ <= allowedl && gids.size() == 3 ) {
+            if ( val2->refine_ && val2->level_ <= allowedl && gids.size() == 3 ) {
               naming::id_type gval1, gval2, gval3;
               boost::tie(gval1, gval2, gval3) = 
                 wait(components::stubs::memory_block::clone_async(gids[0]), 
@@ -127,11 +125,9 @@ namespace hpx { namespace components { namespace amr
 
               // end user defined
 
-              //printf(" TEST A result level %d resultval level %d : %g %g %g\n",mval1->level_,resultval->level_,mval1->value_,mval2->value_,mval3->value_);
               mval1->level_ = resultval->level_ + 1;
               mval2->level_ = resultval->level_ + 1;
               mval3->level_ = resultval->level_ + 1;
-              //printf(" TEST B result level %d resultval level %d\n",mval1->level_,resultval->level_);
 
               // initialize timestep 
               mval1->timestep_ = 0;
@@ -152,13 +148,15 @@ namespace hpx { namespace components { namespace amr
               initial_data.push_back(gval3);
 
               std::vector<naming::id_type> result_data(
-                          child_mesh.execute(initial_data,function_type, 3, 2,3,
+                          child_mesh.execute(initial_data,function_type,3,2,3,
                           logging_type));
 
               // evaluate result data
               // release initial data
               // release result data
             }
+#endif
+
             if (log_)     // send result to logging instance
                 stubs::logging::logentry(log_, resultval.get(), row);
         }

@@ -20,6 +20,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         std::cout << row << ", " << val.index_ << ", " << val.level_ << ": " 
                   << val.max_index_ << ", " << val.timestep_ << ", " 
+                  << val.refine_ << ", " 
                   << val.value_ << std::endl;
     }
 

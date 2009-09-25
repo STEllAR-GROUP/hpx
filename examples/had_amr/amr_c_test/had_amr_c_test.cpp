@@ -19,6 +19,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row)
     val->index_ = item;
     val->timestep_ = 0;
     val->level_= 0;
+    val->refine_= false;
     /*
     if (item < (int)(maxitems / 3.) || item >= (int)(2. * maxitems / 3.))
         val->value_ = 0;
@@ -40,6 +41,7 @@ int evaluate_timestep(stencil_data const* left, stencil_data const* middle,
     result->index_ = middle->index_;
     result->timestep_ = middle->timestep_ + 1;
     result->level_ = middle->level_;
+    result->refine_ = true;
     /*
     result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
     */
@@ -64,6 +66,7 @@ int evaluate_left_bdry_timestep(stencil_data const* middle, stencil_data const* 
     result->index_ = middle->index_;
     result->timestep_ = middle->timestep_ + 1;
     result->level_ = middle->level_;
+    result->refine_ = false;
     /*
     result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
     */
@@ -88,6 +91,7 @@ int evaluate_right_bdry_timestep(stencil_data const* left, stencil_data const* m
     result->index_ = middle->index_;
     result->timestep_ = middle->timestep_ + 1;
     result->level_ = middle->level_;
+    result->refine_ = false;
     /*
     result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
     */
@@ -100,17 +104,6 @@ int evaluate_right_bdry_timestep(stencil_data const* left, stencil_data const* m
     result->value_ = sum/(2.0*t);
 
     return 1;
-}
-
-bool evaluate_refinement(stencil_data const* result,
-                         size_t level,
-                         size_t numsteps)
-{
-  if ( level > 0 ) {
-    return false;
-  } else {
-    return true;
-  }
 }
 
 int interpolation()

@@ -18,6 +18,7 @@ struct stencil_data
     size_t timestep_;    // current time step
     size_t level_;    // refinement level
     double value_;            // current value
+        bool refine_;     // whether to refine
 
 #if defined(__cplusplus)
 private:
