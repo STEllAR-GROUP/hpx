@@ -6,7 +6,8 @@
 #if !defined(HPX_EXPORT_DEFINITIONS_SEPTEMBER_25_2008_0214PM)
 #define HPX_EXPORT_DEFINITIONS_SEPTEMBER_25_2008_0214PM
 
-// For symbol import/export macros
+// For symbol import/export macros, we bother for C++ only
+#if defined(__cplusplus)
 #include <boost/config.hpp>
 
 #if defined(BOOST_WINDOWS)
@@ -21,11 +22,23 @@
 # define HPX_SYMBOL_INTERNAL    __attribute__((visibility("hidden")))
 # define HPX_APISYMBOL_EXPORT   /* empty */
 # define HPX_APISYMBOL_IMPORT   /* empty */
-#else
+#endif
+#endif
+
+// make sure we have reasonable defaults
+#if !defined(HPX_SYMBOL_EXPORT)
 # define HPX_SYMBOL_EXPORT      /* empty */
+#endif
+#if !defined(HPX_SYMBOL_IMPORT)
 # define HPX_SYMBOL_IMPORT      /* empty */
+#endif
+#if !defined(HPX_SYMBOL_INTERNAL)
 # define HPX_SYMBOL_INTERNAL    /* empty */
+#endif
+#if !defined(HPX_APISYMBOL_EXPORT)
 # define HPX_APISYMBOL_EXPORT   /* empty */
+#endif
+#if !defined(HPX_APISYMBOL_IMPORT)
 # define HPX_APISYMBOL_IMPORT   /* empty */
 #endif
 

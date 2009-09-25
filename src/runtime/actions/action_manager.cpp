@@ -60,20 +60,18 @@ namespace hpx { namespace actions
                 if (!cont) {
                 // no continuation is to be executed, register the plain action 
                 // and the local-virtual address with the TM only
+                    threads::thread_init_data data;
                     appl_.get_thread_manager().register_work(
-                        act->get_thread_function(lva), act->get_action_name(),
-                        threads::pending, act->get_parent_locality_prefix(),
-                        act->get_parent_thread_id());
+                        act->get_thread_init_data(lva, data), threads::pending);
                 }
                 else {
                 // this parcel carries a continuation, register a wrapper which
                 // first executes the original thread function as required by 
                 // the action and triggers the continuations afterwards
+                    threads::thread_init_data data;
                     appl_.get_thread_manager().register_work(
-                        act->get_thread_function(cont, lva), 
-                        act->get_action_name(), threads::pending, 
-                        act->get_parent_locality_prefix(),
-                        act->get_parent_thread_id());
+                        act->get_thread_init_data(cont, lva, data),
+                        threads::pending);
                 }
             }
         }

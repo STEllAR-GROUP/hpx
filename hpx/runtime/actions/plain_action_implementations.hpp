@@ -15,7 +15,7 @@
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
+    (3, (1, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/runtime/actions/plain_action_implementations.hpp"))                  \
     /**/
 
@@ -206,6 +206,34 @@
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
+
+    private:
+        threads::thread_init_data const& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+            data.description = detail::get_action_name<BOOST_PP_CAT(plain_result_action, N)>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            return data;
+        }
+
+        threads::thread_init_data const& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, 
+            threads::thread_init_data& data)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+            data.description = detail::get_action_name<BOOST_PP_CAT(plain_result_action, N)>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            return data;
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -255,6 +283,16 @@
         }
 
     private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
+
+    private:
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
         char const* const get_action_name() const
@@ -269,13 +307,32 @@
             return base_action::direct_action;
         }
 
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
+    private:
+        threads::thread_init_data const& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+            data.description = detail::get_action_name<BOOST_PP_CAT(plain_direct_result_action, N)>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            return data;
+        }
+
+        threads::thread_init_data const& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, 
+            threads::thread_init_data& data)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+            data.description = detail::get_action_name<BOOST_PP_CAT(plain_direct_result_action, N)>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            return data;
         }
     };
 
@@ -444,6 +501,34 @@
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
+
+    private:
+        threads::thread_init_data const& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+            data.description = detail::get_action_name<BOOST_PP_CAT(plain_action, N)>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            return data;
+        }
+
+        threads::thread_init_data const& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, 
+            threads::thread_init_data& data)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+            data.description = detail::get_action_name<BOOST_PP_CAT(plain_action, N)>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            return data;
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -493,6 +578,16 @@
         }
 
     private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
+
+    private:
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
         char const* const get_action_name() const
@@ -507,13 +602,31 @@
             return base_action::direct_action;
         }
 
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
+        threads::thread_init_data const& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+            data.description = detail::get_action_name<BOOST_PP_CAT(plain_direct_action, N)>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            return data;
+        }
+
+        threads::thread_init_data const& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, 
+            threads::thread_init_data& data)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+            data.description = detail::get_action_name<BOOST_PP_CAT(plain_direct_action, N)>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            return data;
         }
     };
 

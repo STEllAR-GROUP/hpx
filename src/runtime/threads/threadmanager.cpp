@@ -77,12 +77,49 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
+//     template <typename SchedulingPolicy, typename NotificationPolicy>
+//     thread_id_type threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+//         register_thread(
+//             boost::function<thread_function_type> const& threadfunc, 
+//             char const* const description, thread_state initial_state, 
+//             bool run_now)
+//     {
+//         util::block_profiler_wrapper<register_thread_tag> bp(thread_logger_);
+// 
+//         // verify parameters
+//         if (initial_state != pending && initial_state != suspended)
+//         {
+//             HPX_OSSTREAM strm;
+//             strm << "invalid initial state: " 
+//                  << get_thread_state_name(initial_state);
+//             HPX_THROW_EXCEPTION(bad_parameter, 
+//                 "threadmanager_impl::register_thread", HPX_OSSTREAM_GETSTRING(strm));
+//             return invalid_thread_id;
+//         }
+//         if (0 == description)
+//         {
+//             HPX_THROW_EXCEPTION(bad_parameter, 
+//                 "threadmanager_impl::register_thread", "description is NULL");
+//             return invalid_thread_id;
+//         }
+// 
+//         // create the new thread
+//         thread_id_type newid = scheduler_.create_thread(
+//             threadfunc, description, initial_state, run_now, get_thread_num());
+// 
+//         LTM_(info) << "register_thread(" << newid << "): initial_state(" 
+//                    << get_thread_state_name(initial_state) << "), "
+//                    << std::boolalpha << "run_now(" << run_now << "), "
+//                    << "description(" << description << ")";
+// 
+//         return newid;
+//     }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_id_type threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        register_thread(
-            boost::function<thread_function_type> const& threadfunc, 
-            char const* const description, thread_state initial_state, 
-            bool run_now)
+        register_thread(thread_init_data const& data, 
+            thread_state initial_state, bool run_now)
     {
         util::block_profiler_wrapper<register_thread_tag> bp(thread_logger_);
 
@@ -96,7 +133,7 @@ namespace hpx { namespace threads
                 "threadmanager_impl::register_thread", HPX_OSSTREAM_GETSTRING(strm));
             return invalid_thread_id;
         }
-        if (0 == description)
+        if (0 == data.description)
         {
             HPX_THROW_EXCEPTION(bad_parameter, 
                 "threadmanager_impl::register_thread", "description is NULL");
@@ -105,22 +142,55 @@ namespace hpx { namespace threads
 
         // create the new thread
         thread_id_type newid = scheduler_.create_thread(
-            threadfunc, description, initial_state, run_now, get_thread_num());
+            data, initial_state, run_now, get_thread_num());
 
         LTM_(info) << "register_thread(" << newid << "): initial_state(" 
                    << get_thread_state_name(initial_state) << "), "
                    << std::boolalpha << "run_now(" << run_now << "), "
-                   << "description(" << description << ")";
+                   << "description(" << data.description << ")";
 
         return newid;
     }
 
     ///////////////////////////////////////////////////////////////////////////
+//     template <typename SchedulingPolicy, typename NotificationPolicy>
+//     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::register_work(
+//         boost::function<thread_function_type> const& threadfunc, 
+//         char const* const description, thread_state initial_state, 
+//         boost::uint32_t parent_prefix, thread_id_type parent_id)
+//     {
+//         util::block_profiler_wrapper<register_work_tag> bp(work_logger_);
+// 
+//         // verify parameters
+//         if (initial_state != pending && initial_state != suspended)
+//         {
+//             HPX_OSSTREAM strm;
+//             strm << "invalid initial state: " 
+//                  << get_thread_state_name(initial_state);
+//             HPX_THROW_EXCEPTION(bad_parameter, 
+//                 "threadmanager_impl::register_work", HPX_OSSTREAM_GETSTRING(strm));
+//             return;
+//         }
+//         if (0 == description)
+//         {
+//             HPX_THROW_EXCEPTION(bad_parameter, 
+//                 "threadmanager_impl::register_work", "description is NULL");
+//             return;
+//         }
+// 
+//         LTM_(info) << "register_work: initial_state(" 
+//                    << get_thread_state_name(initial_state) << "), "
+//                    << "description(" << description << ")";
+// 
+//         // create the new thread
+//         scheduler_.create_thread(threadfunc, description, initial_state, 
+//             false, get_thread_num(), parent_prefix, parent_id);
+//     }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::register_work(
-        boost::function<thread_function_type> const& threadfunc, 
-        char const* const description, thread_state initial_state, 
-        boost::uint32_t parent_prefix, thread_id_type parent_id)
+        thread_init_data const& data, thread_state initial_state)
     {
         util::block_profiler_wrapper<register_work_tag> bp(work_logger_);
 
@@ -134,7 +204,7 @@ namespace hpx { namespace threads
                 "threadmanager_impl::register_work", HPX_OSSTREAM_GETSTRING(strm));
             return;
         }
-        if (0 == description)
+        if (0 == data.description)
         {
             HPX_THROW_EXCEPTION(bad_parameter, 
                 "threadmanager_impl::register_work", "description is NULL");
@@ -143,11 +213,10 @@ namespace hpx { namespace threads
 
         LTM_(info) << "register_work: initial_state(" 
                    << get_thread_state_name(initial_state) << "), "
-                   << "description(" << description << ")";
+                   << "description(" << data.description << ")";
 
         // create the new thread
-        scheduler_.create_thread(threadfunc, description, initial_state, 
-            false, get_thread_num(), parent_prefix, parent_id);
+        scheduler_.create_thread(data, initial_state, false, get_thread_num());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -201,8 +270,11 @@ namespace hpx { namespace threads
             LTM_(info) << "set_state: " << "thread(" << id << "), "
                        << "is currently active, scheduling new thread...";
 
-            register_work(boost::bind(&threadmanager_impl::set_active_state, this, 
-                id, new_state, new_state_ex), "set state for active thread");
+            thread_init_data data(
+                boost::bind(&threadmanager_impl::set_active_state, this, 
+                    id, new_state, new_state_ex), 
+                "set state for active thread");
+            register_work(data);
 
             return previous_state;     // done
         }
@@ -288,9 +360,11 @@ namespace hpx { namespace threads
         // mark the thread as suspended before wake thread gets created
         reinterpret_cast<thread*>(self_id)->set_state(marked_for_suspension);
 
-        thread_id_type wake_id = register_thread(boost::bind(
-            &threadmanager_impl::wake_timer_thread, this, id, newstate, 
-            newstate_ex, self_id), "wake_timer", suspended);
+        thread_init_data data(
+            boost::bind(&threadmanager_impl::wake_timer_thread, this, id, 
+                newstate, newstate_ex, self_id), 
+            "wake_timer");
+        thread_id_type wake_id = register_thread(data, suspended);
 
         // create timer firing in correspondence with given time
         boost::asio::deadline_timer t (timer_pool_.get_io_service(), expire);
@@ -317,9 +391,10 @@ namespace hpx { namespace threads
                 thread_id_type, thread_state, thread_state_ex)
             = &threadmanager_impl::template at_timer<time_type>;
 
-        return register_thread(
+        thread_init_data data(
             boost::bind(f, this, expire_at, id, newstate, newstate_ex),
             "at_timer (expire at)");
+        return register_thread(data);
     }
 
     /// Set a timer to set the state of the given \a thread to the given
@@ -335,9 +410,10 @@ namespace hpx { namespace threads
                 thread_id_type, thread_state, thread_state_ex)
             = &threadmanager_impl::template at_timer<duration_type>;
 
-        return register_thread(
+        thread_init_data data(
             boost::bind(f, this, from_now, id, newstate, newstate_ex),
             "at_timer (from now)");
+        return register_thread(data);
     }
 
     /// Retrieve the global id of the given thread

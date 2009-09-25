@@ -79,22 +79,18 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         // create a new thread and schedule it if the initial state is equal to 
         // pending
-        thread_id_type create_thread(
-            boost::function<thread_function_type> const& threadfunc, 
-            char const* const description, thread_state initial_state,
-            bool run_now, std::size_t num_thread = std::size_t(-1), 
-            boost::uint32_t parent_prefix = 0, thread_id_type parent_id = 0)
+        thread_id_type create_thread(thread_init_data const& data, 
+            thread_state initial_state, bool run_now, 
+            std::size_t num_thread = std::size_t(-1))
         {
             if (std::size_t(-1) != num_thread) {
                 BOOST_ASSERT(num_thread < queues_.size());
-                return queues_[num_thread]->create_thread(threadfunc, 
-                    description, initial_state, run_now, parent_prefix, 
-                    parent_id);
+                return queues_[num_thread]->create_thread(data, initial_state, 
+                    run_now);
             }
 
             return queues_[++curr_queue_ % queues_.size()]->create_thread(
-                threadfunc, description, initial_state, run_now, parent_prefix, 
-                parent_id);
+                data, initial_state, run_now);
         }
 
         /// Return the next thread to be executed, return false if non is 

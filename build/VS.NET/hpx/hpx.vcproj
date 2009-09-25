@@ -843,6 +843,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\..\hpx\runtime\threads\thread_init_data.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\hpx\runtime\threads\threadmanager.hpp"
 						>
 					</File>

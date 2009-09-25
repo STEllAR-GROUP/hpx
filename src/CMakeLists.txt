@@ -180,6 +180,7 @@ set (hpxlib_threadmanager_HEADERS
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread_affinity.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread_helpers.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread_init_data.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/threadmanager.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/threadmanager_impl.hpp)
 source_group("Header Files\\runtime\\threadmanager" 

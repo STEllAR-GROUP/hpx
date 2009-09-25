@@ -13,6 +13,7 @@
 #include <hpx/include/naming.hpp>
 #include <hpx/include/parcelset.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/thread_init_data.hpp>
 
 #include <boost/thread/tss.hpp>
 
@@ -244,6 +245,11 @@ namespace hpx { namespace applier
         threads::thread_state initial_state = threads::pending, 
         bool run_now = true);
 
+    HPX_API_EXPORT threads::thread_id_type register_thread_plain(
+        threads::thread_init_data const& data,
+        threads::thread_state initial_state = threads::pending, 
+        bool run_now = true);
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new \a thread using the given function as the 
     ///        work to be executed
@@ -260,6 +266,10 @@ namespace hpx { namespace applier
     HPX_API_EXPORT void register_work_plain(
         boost::function<threads::thread_function_type> const& func,
         char const* description = "", 
+        threads::thread_state initial_state = threads::pending);
+
+    HPX_API_EXPORT void register_work_plain(
+        threads::thread_init_data const& data,
         threads::thread_state initial_state = threads::pending);
 
     /// The \a create_async function initiates the creation of a new 

@@ -162,6 +162,32 @@ namespace hpx { namespace actions
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
+
+    private:
+        threads::thread_init_data const& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva);
+            data.description = detail::get_action_name<result_action0>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            return data;
+        }
+
+        threads::thread_init_data const& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, 
+            threads::thread_init_data& data)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva);
+            data.description = detail::get_action_name<result_action0>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            return data;
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -197,6 +223,16 @@ namespace hpx { namespace actions
         }
 
     private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
+
+    private:
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
         char const* const get_action_name() const
@@ -211,13 +247,29 @@ namespace hpx { namespace actions
             return base_action::direct_action;
         }
 
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
+        threads::thread_init_data const& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva);
+            data.description = detail::get_action_name<direct_result_action0>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            return data;
+        }
+
+        threads::thread_init_data const& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, 
+            threads::thread_init_data& data)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva);
+            data.description = detail::get_action_name<direct_result_action0>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            return data;
         }
     };
 
@@ -340,6 +392,32 @@ namespace hpx { namespace actions
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
+
+    private:
+        threads::thread_init_data const& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva);
+            data.description = detail::get_action_name<action0>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            return data;
+        }
+
+        threads::thread_init_data const& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, 
+            threads::thread_init_data& data)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva);
+            data.description = detail::get_action_name<action0>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            return data;
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -372,6 +450,16 @@ namespace hpx { namespace actions
         }
 
     private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
+
+    private:
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
         char const* const get_action_name() const
@@ -386,453 +474,33 @@ namespace hpx { namespace actions
             return base_action::direct_action;
         }
 
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
+        threads::thread_init_data const& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva);
+            data.description = detail::get_action_name<direct_action0>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            return data;
+        }
+
+        threads::thread_init_data const& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, 
+            threads::thread_init_data& data)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva);
+            data.description = detail::get_action_name<direct_action0>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            return data;
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    //  one parameter version
-    template <
-        typename Component, typename Result, int Action, typename T0, 
-        Result (Component::*F)(T0) 
-    >
-    class base_result_action1
-      : public action<Component, Action, 
-            boost::fusion::vector<typename detail::remove_qualifiers<T0>::type> >
-    {
-    private:
-        typedef 
-            action<Component, Action, 
-                boost::fusion::vector<typename detail::remove_qualifiers<T0>::type> >
-        base_type;
-
-    public:
-        base_result_action1() 
-        {}
-
-        // construct an action from its arguments
-        template <typename Arg0>
-        base_result_action1(Arg0 const& arg0) 
-          : base_type(arg0) 
-        {}
-
-    private:
-        /// The \a continuation_thread_function will be registered as the thread
-        /// function of a thread. It encapsulates the execution of the 
-        /// original function (given by \a func).
-        template <typename Arg0>
-        static threads::thread_state thread_function(
-            naming::address::address_type lva, Arg0 const& arg0)
-        {
-            (get_lva<Component>::call(lva)->*F)(arg0);
-            return threads::terminated;
-        }
-
-    public:
-        typedef boost::mpl::false_ direct_execution;
-        typedef Result result_type;
-
-        /// \brief This static \a construct_thread_function allows to construct 
-        /// a proper thread function for a \a thread without having to 
-        /// instantiate the \a base_result_action1 type. This is used by the \a 
-        /// applier in case no continuation has been supplied.
-        template <typename Arg0>
-        static boost::function<threads::thread_function_type> 
-        construct_thread_function(naming::address::address_type lva, 
-            Arg0 const& arg0) 
-        {
-            // we need to assign the address of the thread function to a 
-            // variable to  help the compiler to deduce the function type
-            threads::thread_state (*f)(naming::address::address_type, Arg0 const&) =
-                &base_result_action1::template thread_function<Arg0>;
-
-            return boost::bind(f, lva, arg0);
-        }
-
-        /// \brief This static \a construct_thread_function allows to construct 
-        /// a proper thread function for a \a thread without having to 
-        /// instantiate the \a base_result_action1 type. This is used by the \a 
-        /// applier in case a continuation has been supplied
-        template <typename Arg0>
-        static boost::function<threads::thread_function_type> 
-        construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, Arg0 const& arg0) 
-        {
-            return base_type::construct_continuation_thread_function(
-                boost::bind(F, get_lva<Component>::call(lva), arg0), cont);
-        }
-
-        /// serialization support
-        static void register_base()
-        {
-            using namespace boost::serialization;
-            void_cast_register<base_result_action1, base_type>();
-            base_type::register_base();
-        }
-
-    private:
-        /// This \a get_thread_function will be invoked to retrieve the thread 
-        /// function for an action which has to be invoked without continuations.
-        boost::function<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva) const
-        {
-            return construct_thread_function(lva, this->get<0>());
-        }
-
-        /// This \a get_thread_function will be invoked to retrieve the thread 
-        /// function for an action which has to be invoked with continuations.
-        boost::function<threads::thread_function_type>
-        get_thread_function(continuation_type& cont,
-            naming::address::address_type lva) const
-        {
-            return construct_thread_function(cont, lva, this->get<0>());
-        }
-
-    private:
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
-        {
-            ar & boost::serialization::base_object<base_type>(*this);
-        }
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Component, typename Result, int Action, typename T0, 
-        Result (Component::*F)(T0)
-    >
-    class result_action1 
-      : public base_result_action1<Component, Result, Action, T0, F>
-    {
-    private:
-        typedef 
-            base_result_action1<Component, Result, Action, T0, F> 
-        base_type;
-
-    public:
-        result_action1()
-        {}
-
-        template <typename Arg0>
-        result_action1(Arg0 const& arg0)
-          : base_type(arg0)
-        {}
-
-        /// The function \a get_action_name returns the name of this action
-        /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
-        {
-            return detail::get_action_name<result_action1>();
-        }
-
-        /// serialization support
-        static void register_base()
-        {
-            using namespace boost::serialization;
-            void_cast_register<result_action1, base_type>();
-            base_type::register_base();
-        }
-
-    private:
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
-        {
-            ar & boost::serialization::base_object<base_type>(*this);
-        }
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Component, typename Result, int Action, typename T0, 
-        Result (Component::*F)(T0)
-    >
-    class direct_result_action1 
-      : public base_result_action1<Component, Result, Action, T0, F>
-    {
-    private:
-        typedef 
-            base_result_action1<Component, Result, Action, T0, F> 
-        base_type;
-
-    public:
-        direct_result_action1()
-        {}
-
-        template <typename Arg0>
-        direct_result_action1(Arg0 const& arg0)
-          : base_type(arg0)
-        {}
-
-    public:
-        typedef boost::mpl::true_ direct_execution;
-
-        ///
-        template <typename Arg0>
-        static Result execute_function(naming::address::address_type lva,
-            Arg0 const& arg0)
-        {
-            return (get_lva<Component>::call(lva)->*F)(arg0);
-        }
-
-        /// serialization support
-        static void register_base()
-        {
-            using namespace boost::serialization;
-            void_cast_register<direct_result_action1, base_type>();
-            base_type::register_base();
-        }
-
-    private:
-        /// The function \a get_action_name returns the name of this action
-        /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
-        {
-            return detail::get_action_name<direct_result_action1>();
-        }
-
-        /// The function \a get_action_type returns whether this action needs
-        /// to be executed in a new thread or directly.
-        base_action::action_type get_action_type() const 
-        {
-            return base_action::direct_action;
-        }
-
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
-        {
-            ar & boost::serialization::base_object<base_type>(*this);
-        }
-    };
-
-    //  one parameter version, no result value
-    template <
-        typename Component, int Action, typename T0, void (Component::*F)(T0)
-    >
-    class base_action1 
-      : public action<Component, Action, 
-            boost::fusion::vector<typename detail::remove_qualifiers<T0>::type> >
-    {
-    private:
-        typedef 
-            action<Component, Action, 
-                boost::fusion::vector<typename detail::remove_qualifiers<T0>::type> >
-        base_type;
-
-    public:
-        base_action1() 
-        {}
-
-        // construct an action from its arguments
-        template <typename Arg0>
-        base_action1(Arg0 const& arg0) 
-          : base_type(arg0) 
-        {}
-
-    private:
-        /// The \a continuation_thread_function will be registered as the thread
-        /// function of a thread. It encapsulates the execution of the 
-        /// original function (given by \a func).
-        template <typename Arg0>
-        static threads::thread_state thread_function(
-            naming::address::address_type lva, Arg0 const& arg0)
-        {
-            (get_lva<Component>::call(lva)->*F)(arg0);
-            return threads::terminated;
-        }
-
-    public:
-        typedef boost::mpl::false_ direct_execution;
-        typedef util::unused_type result_type;
-
-        /// \brief This static \a construct_thread_function allows to construct 
-        /// a proper thread function for a \a thread without having to 
-        /// instantiate the \a base_action1 type. This is used by the \a applier in 
-        /// case no continuation has been supplied.
-        template <typename Arg0>
-        static boost::function<threads::thread_function_type> 
-        construct_thread_function(naming::address::address_type lva, 
-            Arg0 const& arg0) 
-        {
-            // we need to assign the address of the thread function to a 
-            // variable to  help the compiler to deduce the function type
-            threads::thread_state (*f)(naming::address::address_type, Arg0 const&) =
-                &base_action1::template thread_function<Arg0>;
-
-            return boost::bind(f, lva, arg0);
-        }
-
-        /// \brief This static \a construct_thread_function allows to construct 
-        /// a proper thread function for a \a thread without having to 
-        /// instantiate the \a base_action1 type. This is used by the \a applier in 
-        /// case a continuation has been supplied
-        template <typename Arg0>
-        static boost::function<threads::thread_function_type> 
-        construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, Arg0 const& arg0) 
-        {
-            return base_type::construct_continuation_thread_function_void(
-                boost::bind(F, get_lva<Component>::call(lva), arg0), cont);
-        }
-
-        /// serialization support
-        static void register_base()
-        {
-            using namespace boost::serialization;
-            void_cast_register<base_action1, base_type>();
-            base_type::register_base();
-        }
-
-    private:
-        ///
-        boost::function<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva) const
-        {
-            return construct_thread_function(lva, this->get<0>());
-        }
-
-        ///
-        boost::function<threads::thread_function_type>
-        get_thread_function(continuation_type& cont,
-            naming::address::address_type lva) const
-        {
-            return construct_thread_function(cont, lva, this->get<0>());
-        }
-
-    private:
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
-        {
-            ar & boost::serialization::base_object<base_type>(*this);
-        }
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Component, int Action, typename T0, void (Component::*F)(T0)
-    >
-    class action1 : public base_action1<Component, Action, T0, F>
-    {
-    private:
-        typedef base_action1<Component, Action, T0, F> base_type;
-
-    public:
-        action1()
-        {}
-
-        // construct an action from its arguments
-        template <typename Arg0>
-        action1(Arg0 const& arg0) 
-          : base_type(arg0) 
-        {}
-
-        /// The function \a get_action_name returns the name of this action
-        /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
-        {
-            return detail::get_action_name<action1>();
-        }
-
-        /// serialization support
-        static void register_base()
-        {
-            using namespace boost::serialization;
-            void_cast_register<action1, base_type>();
-            base_type::register_base();
-        }
-
-    private:
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
-        {
-            ar & boost::serialization::base_object<base_type>(*this);
-        }
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Component, int Action, typename T0, void (Component::*F)(T0)
-    >
-    class direct_action1 : public base_action1<Component, Action, T0, F>
-    {
-    private:
-        typedef base_action1<Component, Action, T0, F> base_type;
-
-    public:
-        direct_action1()
-        {}
-
-        // construct an action from its arguments
-        template <typename Arg0>
-        direct_action1(Arg0 const& arg0) 
-          : base_type(arg0) 
-        {}
-
-    public:
-        typedef boost::mpl::true_ direct_execution;
-
-        ///
-        template <typename Arg0>
-        static util::unused_type execute_function(naming::address::address_type lva, 
-            Arg0 const& arg0)
-        {
-            (get_lva<Component>::call(lva)->*F)(arg0);
-            return util::unused;
-        }
-
-        /// serialization support
-        static void register_base()
-        {
-            using namespace boost::serialization;
-            void_cast_register<direct_action1, base_type>();
-            base_type::register_base();
-        }
-
-    private:
-        /// The function \a get_action_name returns the name of this action
-        /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
-        {
-            return detail::get_action_name<direct_action1>();
-        }
-
-        /// The function \a get_action_type returns whether this action needs
-        /// to be executed in a new thread or directly.
-        base_action::action_type get_action_type() const 
-        {
-            return base_action::direct_action;
-        }
-
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
-        {
-            ar & boost::serialization::base_object<base_type>(*this);
-        }
-    };
-
     // bring in the rest of the implementations
     #include <hpx/runtime/actions/component_action_implementations.hpp>
 

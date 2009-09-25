@@ -11,115 +11,110 @@
 
 #include "rand.hpp"
 
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr 
+///////////////////////////////////////////////////////////////////////////
+int generate_initial_data(stencil_data* val, int item, int maxitems, int row)
 {
-    ///////////////////////////////////////////////////////////////////////////
-    int generate_initial_data(stencil_data* val, int item, int maxitems, int row)
-    {
-        // provide initial data for the given data value 
-        val->max_index_ = maxitems;
-        val->index_ = item;
-        val->timestep_ = 0;
-        val->level_= 0;
-        /*
-        if (item < (int)(maxitems / 3.) || item >= (int)(2. * maxitems / 3.))
-            val->value_ = 0;
-        else
-            val->value_ = pow(item - 1./3., 4.) * pow(item - 2./3., 4.);
-        */
-        val->value_ = random_numbers();
+    // provide initial data for the given data value 
+    val->max_index_ = maxitems;
+    val->index_ = item;
+    val->timestep_ = 0;
+    val->level_= 0;
+    /*
+    if (item < (int)(maxitems / 3.) || item >= (int)(2. * maxitems / 3.))
+        val->value_ = 0;
+    else
+        val->value_ = pow(item - 1./3., 4.) * pow(item - 2./3., 4.);
+    */
+    val->value_ = random_numbers();
 
-        return 1;
-    }
+    return 1;
+}
 
-    ///////////////////////////////////////////////////////////////////////////
-    int evaluate_timestep(stencil_data const* left, stencil_data const* middle, 
-        stencil_data const* right, stencil_data* result, int numsteps)
-    {
-        // the middle point is our direct predecessor
+///////////////////////////////////////////////////////////////////////////
+int evaluate_timestep(stencil_data const* left, stencil_data const* middle, 
+    stencil_data const* right, stencil_data* result, int numsteps)
+{
+    // the middle point is our direct predecessor
 
-        result->max_index_ = middle->max_index_;
-        result->index_ = middle->index_;
-        result->timestep_ = middle->timestep_ + 1;
-        result->level_ = middle->level_;
-        /*
-        result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
-        */
-        double sum = 0;
-        long t, n = work[middle->timestep_*nzones+middle->index_/zone];
+    result->max_index_ = middle->max_index_;
+    result->index_ = middle->index_;
+    result->timestep_ = middle->timestep_ + 1;
+    result->level_ = middle->level_;
+    /*
+    result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
+    */
+    double sum = 0;
+    long t, n = work[middle->timestep_*nzones+middle->index_/zone];
 
-        //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
-        for (t = 0; t < n; t++)
-            sum += left->value_+middle->value_;
-        result->value_ = sum/(2.0*t);
+    //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
+    for (t = 0; t < n; t++)
+        sum += left->value_+middle->value_;
+    result->value_ = sum/(2.0*t);
 
-        return 1;
-    }
-    
-    ///////////////////////////////////////////////////////////////////////////
-    int evaluate_left_bdry_timestep(stencil_data const* middle, stencil_data const* right, 
-                               stencil_data* result, int numsteps)
-    {
-        // the middle point is our direct predecessor
+    return 1;
+}
 
-        result->max_index_ = middle->max_index_;
-        result->index_ = middle->index_;
-        result->timestep_ = middle->timestep_ + 1;
-        result->level_ = middle->level_;
-        /*
-        result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
-        */
-        double sum = 0;
-        long t, n = work[middle->timestep_*nzones+middle->index_/zone];
+///////////////////////////////////////////////////////////////////////////
+int evaluate_left_bdry_timestep(stencil_data const* middle, stencil_data const* right, 
+                           stencil_data* result, int numsteps)
+{
+    // the middle point is our direct predecessor
 
-        //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
-        for (t = 0; t < n; t++)
-            sum += middle->value_+right->value_;
-        result->value_ = sum/(2.0*t);
+    result->max_index_ = middle->max_index_;
+    result->index_ = middle->index_;
+    result->timestep_ = middle->timestep_ + 1;
+    result->level_ = middle->level_;
+    /*
+    result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
+    */
+    double sum = 0;
+    long t, n = work[middle->timestep_*nzones+middle->index_/zone];
 
-        return 1;
-    }
-    
-    ///////////////////////////////////////////////////////////////////////////
-    int evaluate_right_bdry_timestep(stencil_data const* left, stencil_data const* middle, 
-                               stencil_data* result, int numsteps)
-    {
-        // the middle point is our direct predecessor
+    //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
+    for (t = 0; t < n; t++)
+        sum += middle->value_+right->value_;
+    result->value_ = sum/(2.0*t);
 
-        result->max_index_ = middle->max_index_;
-        result->index_ = middle->index_;
-        result->timestep_ = middle->timestep_ + 1;
-        result->level_ = middle->level_;
-        /*
-        result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
-        */
-        double sum = 0;
-        long t, n = work[middle->timestep_*nzones+middle->index_/zone];
+    return 1;
+}
 
-        //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
-        for (t = 0; t < n; t++)
-            sum += left->value_+middle->value_;
-        result->value_ = sum/(2.0*t);
+///////////////////////////////////////////////////////////////////////////
+int evaluate_right_bdry_timestep(stencil_data const* left, stencil_data const* middle, 
+                           stencil_data* result, int numsteps)
+{
+    // the middle point is our direct predecessor
 
-        return 1;
-    }
+    result->max_index_ = middle->max_index_;
+    result->index_ = middle->index_;
+    result->timestep_ = middle->timestep_ + 1;
+    result->level_ = middle->level_;
+    /*
+    result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
+    */
+    double sum = 0;
+    long t, n = work[middle->timestep_*nzones+middle->index_/zone];
 
-    bool evaluate_refinement(stencil_data const* result,
-                             size_t level,
-                             size_t numsteps)
-    {
-      if ( level > 0 ) {
-        return false;
-      } else {
-        return true;
-      }
-    }
+    //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
+    for (t = 0; t < n; t++)
+        sum += left->value_+middle->value_;
+    result->value_ = sum/(2.0*t);
 
-    int interpolation()
-    {
-      return 1;
-    }
+    return 1;
+}
 
- }}}
+bool evaluate_refinement(stencil_data const* result,
+                         size_t level,
+                         size_t numsteps)
+{
+  if ( level > 0 ) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+int interpolation()
+{
+  return 1;
+}
 

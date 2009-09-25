@@ -63,24 +63,37 @@ namespace hpx { namespace applier
         boost::function<void()> const& func, char const* desc, 
         threads::thread_state state, bool run_now)
     {
+        threads::thread_init_data data(
+            boost::bind(&thread_function_nullary, func), desc);
         return hpx::applier::get_applier().get_thread_manager().register_thread(
-            boost::bind(&thread_function_nullary, func), desc, state, run_now);
+            data, state, run_now);
     }
 
     threads::thread_id_type register_thread(
         boost::function<void(threads::thread_state_ex)> const& func, 
         char const* desc, threads::thread_state state, bool run_now)
     {
+        threads::thread_init_data data(
+            boost::bind(&thread_function, func), desc);
         return hpx::applier::get_applier().get_thread_manager().register_thread(
-            boost::bind(&thread_function, func), desc, state, run_now);
+            data, state, run_now);
     }
 
     threads::thread_id_type register_thread_plain(
         boost::function<threads::thread_function_type> const& func,
         char const* desc, threads::thread_state state, bool run_now)
     {
+        threads::thread_init_data data(func, desc);
         return hpx::applier::get_applier().get_thread_manager().register_thread(
-            func, desc, state, run_now);
+            data, state, run_now);
+    }
+
+    threads::thread_id_type register_thread_plain(
+        threads::thread_init_data const& data, threads::thread_state state, 
+        bool run_now)
+    {
+        return hpx::applier::get_applier().get_thread_manager().register_thread(
+            data, state, run_now);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -88,24 +101,33 @@ namespace hpx { namespace applier
         boost::function<void()> const& func, char const* desc, 
         threads::thread_state state)
     {
-        hpx::applier::get_applier().get_thread_manager().register_work(
-            boost::bind(&thread_function_nullary, func), desc, state);
+        threads::thread_init_data data(
+            boost::bind(&thread_function_nullary, func), desc);
+        hpx::applier::get_applier().get_thread_manager().register_work(data, state);
     }
 
     void register_work(
         boost::function<void(threads::thread_state_ex)> const& func, 
         char const* desc, threads::thread_state state)
     {
-        hpx::applier::get_applier().get_thread_manager().register_work(
-            boost::bind(&thread_function, func), desc, state);
+        threads::thread_init_data data(
+            boost::bind(&thread_function, func), desc);
+        hpx::applier::get_applier().get_thread_manager().register_work(data, state);
     }
 
     void register_work_plain(
         boost::function<threads::thread_function_type> const& func,
         char const* desc, threads::thread_state state)
     {
+        threads::thread_init_data data(func, desc);
+        hpx::applier::get_applier().get_thread_manager().register_work(data, state);
+    }
+
+    void register_work_plain(
+        threads::thread_init_data const& data, threads::thread_state state)
+    {
         hpx::applier::get_applier().get_thread_manager().register_work(
-            func, desc, state);
+            data, state);
     }
 
     ///////////////////////////////////////////////////////////////////////////

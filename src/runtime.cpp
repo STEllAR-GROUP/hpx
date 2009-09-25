@@ -206,8 +206,9 @@ namespace hpx
 
         // register the given main function with the thread manager
         if (!func.empty()) {
-            thread_manager_.register_thread(
+            threads::thread_init_data data(
                 boost::bind(run_helper, func, boost::ref(result_)), "hpx_main");
+            thread_manager_.register_thread(data);
         }
 
         LRT_(info) << "runtime_impl: started using "  << num_threads << " OS threads";

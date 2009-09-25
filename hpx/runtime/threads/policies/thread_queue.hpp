@@ -101,10 +101,7 @@ namespace hpx { namespace threads { namespace policies
 
         // this is the type of the queue of new tasks not yet converted to
         // threads
-        typedef boost::tuple<
-            boost::function<thread_function_type>, thread_state, char const*,
-            thread_id_type, boost::uint32_t
-        > task_description;
+        typedef boost::tuple<thread_init_data, thread_state> task_description;
         typedef boost::lockfree::fifo<task_description> task_items_type;
 
         typedef boost::lockfree::fifo<thread_id_type> thread_id_queue_type;
@@ -127,9 +124,7 @@ namespace hpx { namespace threads { namespace policies
                 // create the new thread
                 thread_state state = boost::get<1>(task);
                 std::auto_ptr<threads::thread> thrd (
-                    new threads::thread(boost::get<0>(task), state, 
-                        boost::get<2>(task), boost::get<3>(task),
-                        boost::get<4>(task)));
+                    new threads::thread(boost::get<0>(task), state));
 
                 // add the new entry to the map of all threads
                 thread_id_type id = thrd->get_thread_id();
@@ -263,16 +258,12 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         // create a new thread and schedule it if the initial state is equal to 
         // pending
-        thread_id_type create_thread(
-            boost::function<thread_function_type> const& threadfunc, 
-            char const* const description, thread_state initial_state,
-            bool run_now, boost::uint32_t parent_prefix, 
-            thread_id_type parent_id)
+        thread_id_type create_thread(thread_init_data const& data, 
+            thread_state initial_state, bool run_now)
         {
             if (run_now) {
                 std::auto_ptr<threads::thread> thrd (
-                    new threads::thread(threadfunc, initial_state, description,
-                        parent_id, parent_prefix));
+                    new threads::thread(data, initial_state));
 
                 mutex_type::scoped_lock lk(mtx_);
 
@@ -301,17 +292,7 @@ namespace hpx { namespace threads { namespace policies
 
             // do not execute the work, but register a task description for 
             // later thread creation
-            if (0 == parent_id) {
-                threads::thread_self* self = get_self_ptr();
-                if (self)
-                    parent_id = self->get_thread_id();
-            }
-            if (0 == parent_prefix) 
-                parent_prefix = applier::get_prefix_id();
-            new_tasks_.enqueue(
-                task_description(threadfunc, initial_state, description, 
-                    parent_id, parent_prefix));
-
+            new_tasks_.enqueue(task_description(data, initial_state));
             return invalid_thread_id;     // thread has not been created yet
         }
 

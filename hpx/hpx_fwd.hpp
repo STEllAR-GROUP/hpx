@@ -185,9 +185,14 @@ namespace hpx
         HPX_API_EXPORT thread_id_type get_parent_id();
 
         /// The function \a get_parent_prefix returns the id of the locality of
-        /// the current's thread parent (or zero if the current thread is not a 
+        /// the currents thread parent (or zero if the current thread is not a 
         /// PX thread).
         HPX_API_EXPORT boost::uint32_t get_parent_prefix();
+
+        /// The function \a get_self_component_id returns the lva of the 
+        /// component the current thread is acting on
+        HPX_API_EXPORT boost::uint64_t get_self_component_id();
+
     }
 
     class HPX_API_EXPORT runtime;

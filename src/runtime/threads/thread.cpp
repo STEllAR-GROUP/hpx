@@ -89,6 +89,13 @@ namespace hpx { namespace threads
             reinterpret_cast<thread*>(self->get_thread_id())->get_parent_locality_prefix() : 0;
     }
 
+    naming::address::address_type get_self_component_id()
+    {
+        thread_self* self = get_self_ptr();
+        return (0 != self) ? 
+            reinterpret_cast<thread*>(self->get_thread_id())->get_component_id() : 0;
+    }
+
     namespace detail
     {
         void thread::set_event()

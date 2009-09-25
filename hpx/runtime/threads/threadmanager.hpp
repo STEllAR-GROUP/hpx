@@ -24,6 +24,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -180,12 +181,16 @@ namespace hpx { namespace threads
         ///               hpx#bad_parameter exception).
         /// \param parent_prefix
         /// \param parent thread id
+//         virtual void
+//         register_work(boost::function<thread_function_type> const& func,
+//             char const* const description = "", 
+//             thread_state initial_state = pending, 
+//             boost::uint32_t parent_prefix = 0, 
+//             thread_id_type parent_id = 0) = 0;
+
         virtual void
-        register_work(boost::function<thread_function_type> const& func,
-            char const* const description = "", 
-            thread_state initial_state = pending, 
-            boost::uint32_t parent_prefix = 0, 
-            thread_id_type parent_id = 0) = 0;
+        register_work(thread_init_data const& data, 
+            thread_state initial_state = pending) = 0;
 
         /// The function \a register_thread adds a new work item to the thread 
         /// manager. It creates a new \a thread, adds it to the internal
@@ -218,9 +223,13 @@ namespace hpx { namespace threads
         ///
         /// \returns      The function returns the thread id of the newly 
         ///               created thread. 
+//         virtual thread_id_type 
+//         register_thread(boost::function<thread_function_type> const& threadfunc, 
+//             char const* const description = "", 
+//             thread_state initial_state = pending, bool run_now = true) = 0;
+
         virtual thread_id_type 
-        register_thread(boost::function<thread_function_type> const& threadfunc, 
-            char const* const description = "", 
+        register_thread(thread_init_data const& data, 
             thread_state initial_state = pending, bool run_now = true) = 0;
 
         /// this notifies the thread manager that there is some more work 
@@ -280,11 +289,13 @@ namespace hpx { namespace threads
         ///               enumeration (thread_state#pending, or \a
         ///               thread_state#suspended, any other value will throw a
         ///               hpx#bad_parameter exception).
-        void
-        register_work(boost::function<thread_function_type> const& func,
-            char const* const description = "", 
-            thread_state initial_state = pending, 
-            boost::uint32_t parent_prefix = 0, thread_id_type parent_id = 0);
+//         void register_work(boost::function<thread_function_type> const& func,
+//             char const* const description = "", 
+//             thread_state initial_state = pending, 
+//             boost::uint32_t parent_prefix = 0, thread_id_type parent_id = 0);
+
+        void register_work(thread_init_data const& data, 
+            thread_state initial_state = pending);
 
         /// The function \a register_thread adds a new work item to the thread 
         /// manager. It creates a new \a thread, adds it to the internal
@@ -317,9 +328,12 @@ namespace hpx { namespace threads
         ///
         /// \returns      The function returns the thread id of the newly 
         ///               created thread. 
-        thread_id_type 
-        register_thread(boost::function<thread_function_type> const& threadfunc, 
-            char const* const description = "", 
+//         thread_id_type 
+//         register_thread(boost::function<thread_function_type> const& threadfunc, 
+//             char const* const description = "", 
+//             thread_state initial_state = pending, bool run_now = true);
+
+        thread_id_type register_thread(thread_init_data const& data, 
             thread_state initial_state = pending, bool run_now = true);
 
         /// \brief  Run the thread manager's work queue. This function 

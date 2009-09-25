@@ -22,6 +22,7 @@
 
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -118,6 +119,16 @@ namespace hpx { namespace actions
 
         /// Return the thread id of the parent thread
         virtual threads::thread_id_type get_parent_thread_id() const = 0;
+
+        /// Return all data needed for thread initialization
+        virtual threads::thread_init_data const& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data) = 0;
+
+        virtual threads::thread_init_data const& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva,
+            threads::thread_init_data& data) = 0;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -316,7 +327,7 @@ namespace hpx { namespace actions
             ar & parent_id_;
         }
 
-    private:
+    protected:
         arguments_type arguments_;
         boost::uint32_t parent_locality_;
         std::size_t parent_id_;

@@ -386,6 +386,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "had_amr_c", "components\had
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "had_amr_c_test", "components\had_amr_c\had_amr_c_test\had_amr_c_test.vcproj", "{7D35509B-D814-4C60-B934-4C8C03C076EC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{163E7F8F-1A47-488F-AB83-21183A70B0BD} = {163E7F8F-1A47-488F-AB83-21183A70B0BD}
+		{46E027F2-3AFC-4F13-B8C8-35A8E8559CD5} = {46E027F2-3AFC-4F13-B8C8-35A8E8559CD5}
+		{E6C6C6C4-6959-4B47-B92A-6323A906CC40} = {E6C6C6C4-6959-4B47-B92A-6323A906CC40}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "had_amr_client", "had_amr_client\had_amr_client.vcproj", "{46E4CB02-186F-4EC7-93A6-CF4DA8670212}"
 	ProjectSection(ProjectDependencies) = postProject

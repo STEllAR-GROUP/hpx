@@ -22,12 +22,19 @@ int main(int argc, char* argv[])
     hpx::threads::policies::callback_notifier notifier;
     threadmanager_type my_tm(timer_pool, scheduler, notifier);
 
-    my_tm.register_work(boost::bind (my_gcd, 13, 14, 1), "gcd");                      // GCD = 1
+    threads::thread_init_data data1(boost::bind (my_gcd, 13, 14, 1), "gcd");
+    my_tm.register_work(data1);                      // GCD = 1
+
+    threads::thread_init_data data2(boost::bind (my_gcd, 7, 343, 7), "gcd");
     hpx::threads::thread_id_type t_id = 
-        my_tm.register_thread(boost::bind (my_gcd, 7, 343, 7), "gcd", suspended);     // GCD = 7
+        my_tm.register_thread(data2, suspended);     // GCD = 7
+
+    threads::thread_init_data data3(boost::bind (my_gcd, 120, 115, 5), "gcd");
     hpx::threads::thread_id_type t2_id = 
-        my_tm.register_thread(boost::bind (my_gcd, 120, 115, 5), "gcd", suspended);   // GCD = 5
-    my_tm.register_work(boost::bind (my_gcd, 9, 15, 3), "gcd", pending);              // GCD = 3
+        my_tm.register_thread(data3, suspended);   // GCD = 5
+
+    threads::thread_init_data data4(boost::bind (my_gcd, 9, 15, 3), "gcd");
+    my_tm.register_work(data4, pending);              // GCD = 3
 
     BOOST_TEST(my_tm.get_state(t2_id) == suspended);
     my_tm.set_state(t2_id, pending);
