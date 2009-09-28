@@ -84,6 +84,7 @@ namespace hpx { namespace components { namespace server
 
     private:
         naming::id_type gid_;
+        int num_items_;
 
         lcos::mutex local_set_mtx_;
         set_type local_set_;

@@ -61,6 +61,11 @@ namespace hpx { namespace components
         {
             return this->base_type::locals(this->gid_);
         }
+
+        int size(void)
+        {
+            return this->base_type::size(this->gid_);
+        }
     };
     
 }}

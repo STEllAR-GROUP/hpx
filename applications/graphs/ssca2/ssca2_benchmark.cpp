@@ -21,8 +21,11 @@
 #include <hpx/components/distributed_set/local_set.hpp>
 
 #include <hpx/components/distributed_map/distributed_map.hpp>
+#include <hpx/components/distributed_map/local_map.hpp>
 
 #include "ssca2/ssca2.hpp"
+
+#include "props/props.hpp"
 
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/lcos/future_wait.hpp>
@@ -34,11 +37,15 @@
 
 #include <boost/unordered_map.hpp>
 
+#include "ssca2_benchmark.hpp"
+
 #define LSSCA_(lvl) LAPP_(lvl) << " [SSCA] "
 
 using namespace hpx;
 using namespace std;
 namespace po = boost::program_options;
+
+typedef std::vector<naming::id_type> gids_type;
 
 int nrand(int);
 
@@ -50,10 +57,15 @@ typedef
     actions::plain_result_action4<int, naming::id_type, int, int, int, rmat>
 rmat_action;
 
+///////////////////////////////////////////////////////////////////////////////
+
 HPX_REGISTER_ACTION(rmat_action);
 
 int rmat(naming::id_type G, int scale, int edge_factor, int type)
 {
+    LSSCA_(info) << "event: action(ssca2_benchmark::rmat) status(begin)";
+    LSSCA_(info) << "parent(" << threads::get_parent_id() << ")";
+
     std::size_t num_edges_added;
     double a_, b_, c_, d_;
     std::size_t order, size, type_max;
@@ -68,6 +80,8 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
     typedef hpx::components::server::graph::add_edge_action graph_add_edge_action;
     typedef hpx::components::server::graph::vertex_name_action graph_vertex_name_action;
 
+    typedef naming::id_type gid_type;
+
     // Setup
     order = 1 << scale;
     size = edge_factor * order;
@@ -79,6 +93,14 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
         b_ = 0.19;
         c_ = 0.19;
         d_ = 0.05;
+    }
+    else if (type == 1)
+    {
+        // SSCA2 v2.2
+        a_ = 0.55;
+        b_ = 0.1;
+        c_ = 0.1;
+        d_ = 0.25;
     }
     else
     {   // Erdos-Renyi
@@ -141,8 +163,6 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
             step = step/2;
         }
 
-        LSSCA_(info) << "Adding edge (" << x-1 << ", " << y-1 << ")";
-
         // Use hash to catch duplicate vertices
         // Note: Update this to do the two actions in parallel
         if (known_vertices.find(x-1) == known_vertices.end())
@@ -169,6 +189,10 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
                    graph_add_edge_action
                >(G, known_vertices[x-1], known_vertices[y-1], nrand(type_max)));
 
+           LSSCA_(info) << "Adding edge ("
+                        << known_vertices[x-1] << ", "
+                        << known_vertices[y-1] << ")";
+
            num_edges_added += 1;
         }
     }
@@ -187,6 +211,10 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
 
 int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int type)
 {
+    LSSCA_(info) << "event: action(ssca2_benchmark::hpx_main) status(begin)";
+    LSSCA_(info) << "parent(" << threads::get_parent_id() << ")";
+    std::cout.setf(std::ios::dec);
+
     typedef std::vector<naming::id_type> gids_type;
 
     // Find out where here is
@@ -197,10 +225,12 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
     using hpx::components::ssca2;
     using hpx::components::distributed_set;
     using hpx::components::local_set;
+    using hpx::components::distributed_map;
     using hpx::components::server::edge;
 
-    util::high_resolution_timer t;
-    double start_time, total_time;
+    typedef naming::id_type gid_type;
+
+    double total_time;
 
     // Instantiate the SSCA2 component which implements the kernels
     // This is not strictly necessary, and the component actions
@@ -234,9 +264,9 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
         LSSCA_(info) << "Starting Kernel 1";
 
         /* Begin: timed execution of Kernel 1 */
-        start_time = t.now();
+        hpx::util::high_resolution_timer k1_t;
         SSCA2.read_graph(G.get_gid(), input_file);
-        total_time = t.now() - start_time;
+        total_time = k1_t.elapsed();
         /* End: timed execution of Kernel 1 */
         LSSCA_(info) << "Completed Kernel 1 in " << total_time << " ms";
         std::cout << "Completed Kernel 1 in " << total_time << " ms" << std::endl;
@@ -253,10 +283,10 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
     LSSCA_(info) << "Starting Kernel 2";
 
     /* Begin: timed execution of Kernel 2 */
-    start_time = t.now();
+    hpx::util::high_resolution_timer k2_t;
     distributed_set<edge> edge_set(distributed_set<edge>::create(here));
     SSCA2.large_set(G.get_gid(), edge_set.get_gid());
-    total_time = t.now() - start_time;
+    total_time = k2_t.elapsed();
     /* End: timed execution of Kernel 2 */
     LSSCA_(info) << "Completed Kernel 2 in " << total_time << " ms";
     std::cout << "Completed Kernel 2 in " << total_time << " ms" << std::endl;
@@ -300,12 +330,12 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
 
     typedef components::server::graph graph_type;
 
-    /* Begin: timed execution of Kernel 2 */
-    start_time = t.now();
+    /* Begin: timed execution of Kernel 3 */
+    hpx::util::high_resolution_timer k3_t;
     distributed_set<graph_type> subgraphs(distributed_set<graph_type>::create(here));
     SSCA2.extract(edge_set.get_gid(), subgraphs.get_gid());
-    total_time = t.now() - start_time;
-    /* End: timed execution of Kernel 2 */
+    total_time = k3_t.elapsed();
+    /* End: timed execution of Kernel 3 */
 
     LSSCA_(info) << "Completed Kernel 3 in " << total_time << " ms";
     std::cout << "Completed Kernel 3 in " << total_time << " ms" << std::endl;
@@ -334,7 +364,73 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
         }
     }
 
-    // Kernel 4: ...
+    // Kernel 4: graph analysis algorithm
+    // Input:
+    //     G - the graph read in from Kernel 1
+    //     scale - the scale for this run of the benchmark
+    //     k4_approx - the log of the number of vertices to consider
+    // Output:
+    //     bc_scores - the collection of betweenness centrality scores
+
+    LSSCA_(info) << "Starting Kernel 4";
+
+    typedef std::map<naming::id_type,naming::id_type> gids_map_type;
+    typedef components::server::vertex vertex_type;
+
+    int k4_approx = scale;
+
+    LSSCA_(info) << "K4 approx. is " << k4_approx;
+
+    gid_type V = G.vertices();
+
+    gid_type VS;
+    if (k4_approx < scale && k4_approx > 0)
+    {
+         gid_type here = applier::get_applier().get_prefix();
+
+         // Create new VS, a subset of V(G)
+         LSSCA_(info) << "Creating new VS";
+         VS = hpx::components::distributed_set<
+                 hpx::components::server::vertex
+              >::create(here).get_gid();
+
+         // Select random items
+         gids_type v_locals =
+             lcos::eager_future<
+                 components::server::distributed_set<vertex_type>::locals_action
+             >(V).get();
+         select_random_vertices(v_locals, k4_approx, VS);
+     }
+     else if (k4_approx == scale)
+     {
+         LSSCA_(info) << "Using V as VS";
+         VS = V;
+     }
+     else
+     {
+         LSSCA_(info) << "Error: k4_approx not in (0,scale]; using V as VS";
+         VS = V;
+     }
+
+    /* Begin: timed execution of Kernel 4 */
+    hpx::util::high_resolution_timer k4_t;
+    distributed_map<gids_map_type>
+        bc_scores(distributed_map<gids_map_type>::create(here));
+    lcos::eager_future<kernel4_action>
+        k4(here, V, VS, k4_approx, bc_scores.get_gid());
+    k4.get();
+    total_time = k4_t.elapsed();
+    /* End: timed execution of Kernel 4 */
+
+    LSSCA_(info) << "Completed Kernel 4 in " << total_time << " ms";
+    std::cout << "Completed Kernel 4 in " << total_time << " ms" << std::endl;
+
+    double teps;
+    if (k4_approx == scale)
+        teps = calculate_teps(V, G.order(), total_time, true);
+    else
+        teps = calculate_teps(V, 1<<k4_approx, total_time, false);
+    std::cout << "TEPS = " << teps << std::endl;
 
     // Free the graph component
     subgraphs.free();
@@ -429,11 +525,13 @@ private:
     hpx::naming::resolver_server agas_;
 };
 
+///////////////////////////////////////////////////////////////////////////////
 // From Accelerated C++, p 135
+
 int nrand(int n)
 {
     if (n <= 0 || n > RAND_MAX)
-        throw domain_error("Argument to nrand is out of range");
+        std::cerr << "Argument to nrand is out of range" << std::endl;
 
     const int bucket_size = RAND_MAX / n;
     int r;

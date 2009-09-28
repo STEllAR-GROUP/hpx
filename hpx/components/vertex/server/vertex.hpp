@@ -35,7 +35,8 @@ namespace hpx { namespace components { namespace server
             vertex_init = 0,
             vertex_label = 1,
             vertex_add_edge = 2,
-            vertex_out_edges = 3
+            vertex_out_edges = 3,
+            vertex_out_degree = 4
         };
         
         // constructor: initialize vertex value
@@ -107,6 +108,11 @@ namespace hpx { namespace components { namespace server
             return out_edges_;
         }
 
+        int out_degree(void)
+        {
+            return out_edges_.size();
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
@@ -126,6 +132,10 @@ namespace hpx { namespace components { namespace server
         typedef hpx::actions::result_action0<
             vertex, partial_edge_set_type, vertex_out_edges, &vertex::out_edges
         > out_edges_action;
+
+        typedef hpx::actions::result_action0<
+            vertex, int, vertex_out_degree, &vertex::out_degree
+        > out_degree_action;
 
     private:
         int label_;

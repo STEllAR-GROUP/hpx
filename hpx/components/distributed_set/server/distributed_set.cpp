@@ -58,6 +58,9 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     distributed_vertex_set_type::locals_action,
     distributed_vertex_set_locals_action);
+HPX_REGISTER_ACTION_EX(
+    distributed_vertex_set_type::size_action,
+    distributed_vertex_set_size_action);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<distributed_vertex_set_type>,
     distributed_vertex_set);
@@ -75,6 +78,9 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     distributed_edge_set_type::locals_action,
     distributed_edge_set_locals_action);
+HPX_REGISTER_ACTION_EX(
+    distributed_edge_set_type::size_action,
+    distributed_edge_set_size_action);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<distributed_edge_set_type>,
     distributed_edge_set);
@@ -92,6 +98,9 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     distributed_graph_set_type::locals_action,
     distributed_graph_set_locals_action);
+HPX_REGISTER_ACTION_EX(
+    distributed_graph_set_type::size_action,
+    distributed_graph_set_size_action);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<distributed_graph_set_type>,
     distributed_graph_set);
@@ -258,6 +267,26 @@ namespace hpx { namespace components { namespace server
         LDSET_(info) << "Getting coverage of distributed set";
 
         return locals_;
+    }
+
+    template <typename Item>
+    int distributed_set<Item>::size(void)
+    {
+        int count = 0;
+
+        // This is an expensive call, should have local set push updates
+        std::vector<naming::id_type>::const_iterator lit = locals_.begin();
+        for (std::vector<naming::id_type>::const_iterator lend = locals_.end();
+             lit != lend; ++lit)
+        {
+            count += lcos::eager_future<typename components::server::local_set<Item>::size_action>(*lit).get();
+        }
+
+        lcos::mutex::scoped_lock l(mtx_);
+
+        num_items_ = count;
+
+        return num_items_;
     }
 
 }}}

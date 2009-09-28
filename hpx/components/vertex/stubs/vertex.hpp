@@ -53,6 +53,13 @@ namespace hpx { namespace components { namespace stubs
             typedef server::vertex::out_edges_action action_type;
             return lcos::eager_future<action_type>(gid).get();
         }
+
+        static int
+        out_degree(naming::id_type gid)
+        {
+            typedef server::vertex::out_degree_action action_type;
+            return lcos::eager_future<action_type>(gid).get();
+        }
     };
 
 }}}

@@ -43,6 +43,12 @@ namespace hpx { namespace components
             BOOST_ASSERT(gid_);
             return this->base_type::color(gid_, d);
         }
+
+        double incr(double d)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::incr(gid_, d);
+        }
     };
     
 }}

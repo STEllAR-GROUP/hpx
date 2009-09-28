@@ -93,7 +93,8 @@ namespace hpx { namespace components { namespace server
     template <typename Item>
     local_set<Item>::local_set()
       : gid_(This()->base_type::get_gid()),
-        local_set_(0)
+        local_set_(0),
+        num_items_(0)
     {}
 
     template <typename Item>
@@ -120,6 +121,7 @@ namespace hpx { namespace components { namespace server
             lcos::mutex::scoped_lock l(local_set_mtx_);
 
             local_set_.push_back(item);
+            ++num_items_;
         }
 
         return item;

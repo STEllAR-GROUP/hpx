@@ -37,6 +37,10 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     local_gids_map_type::value_action,
     local_gids_map_value_action);
+// Must add gids_map_type serialization first
+//HPX_REGISTER_ACTION_EX(
+//    local_gids_map_type::get_action,
+//    local_gids_map_value_action);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<local_gids_map_type>, local_gids_map);
 HPX_DEFINE_GET_COMPONENT_TYPE(local_gids_map_type);

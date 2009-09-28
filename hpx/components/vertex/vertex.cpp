@@ -43,6 +43,9 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     vertex_type::wrapped_type::out_edges_action,
     vertex_out_edges_action);
+HPX_REGISTER_ACTION_EX(
+    vertex_type::wrapped_type::out_degree_action,
+    vertex_out_degree_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(vertex_type::wrapped_type);
 
 //typedef std::vector<std::pair<hpx::naming::id_type, int> > partial_edge_set_type;

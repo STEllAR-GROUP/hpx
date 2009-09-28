@@ -7,6 +7,7 @@
 #define HPX_LCOS_REDUCE_MAX_AUG_12_2009_0552PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread.hpp>
@@ -26,6 +27,8 @@
 
 #include <boost/assert.hpp>
 #include <boost/lockfree/fifo.hpp>
+
+#define LREDUCE_(lvl) LAPP_(lvl) << " [REDUCE_MAX] "
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
@@ -47,27 +50,36 @@ namespace hpx { namespace lcos { namespace detail
 
         reduce_max()
           : in_(1), out_(1), value_(0)
-          {}
+          {
+              LREDUCE_(info) << "event: action(reduce_max::reduce_max) status(begin)";
+          }
 
         reduce_max(int in, int out=1, int value=0)
           : in_(in),
             out_(out),
             value_(value)
-        {}
+        {
+            LREDUCE_(info) << "event: action(reduce_max::reduce_max) status(begin)";
+        }
 
         ~reduce_max()
         {
+            LREDUCE_(info) << "event: action(reduce_max::~reduce_max) status(begin)";
+
             BOOST_ASSERT(queue_.empty());   // queue has to be empty
         }
 
         void set_event (void)
         {
+            LREDUCE_(info) << "event: action(reduce_max::set_event) status(begin)";
             wait();
         }
 
         int wait(void)
         {
             mutex_type::scoped_lock l(this);
+
+            LREDUCE_(info) << "event: action(reduce_max::wait) status(begin)";
 
             std::cout << "Wait(): in_ = " << in_ << " out_ = " << out_ << std::endl;
 
@@ -106,6 +118,8 @@ namespace hpx { namespace lcos { namespace detail
         void signal(int value)
         {
             mutex_type::scoped_lock l(this);
+
+            LREDUCE_(info) << "event: action(reduce_max::signal) status(begin)";
 
             std::cout << "signal(" << value << "): in_ = " << in_
                       << " out_ = " << out_ << std::endl;

@@ -60,6 +60,13 @@ namespace hpx { namespace components
             BOOST_ASSERT(gid_);
             return this->base_type::out_edges(gid_);
         }
+
+        int
+        out_degree(void)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::out_degree(gid_);
+        }
     };
     
 }}

@@ -38,6 +38,12 @@ namespace hpx { namespace components { namespace stubs
             return lcos::eager_future<action_type>(gid, d).get();
         }
 
+        static double incr(naming::id_type gid, double d)
+        {
+            typedef server::props::incr_action action_type;
+            return lcos::eager_future<action_type>(gid, d).get();
+        }
+
     };
 
 }}}

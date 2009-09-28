@@ -44,7 +44,8 @@ namespace hpx { namespace components { namespace server
             distributed_set_init = 0,
             distributed_set_add_item = 1,
             distributed_set_get_local = 2,
-            distributed_set_locals = 3
+            distributed_set_locals = 3,
+            distributed_set_size = 4
         };
         
         ///////////////////////////////////////////////////////////////////////
@@ -59,6 +60,8 @@ namespace hpx { namespace components { namespace server
         naming::id_type get_local(naming::id_type);
 
         std::vector<naming::id_type> locals(void);
+
+        int size(void);
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
@@ -86,6 +89,11 @@ namespace hpx { namespace components { namespace server
             distributed_set, std::vector<naming::id_type>, distributed_set_locals,
             &distributed_set::locals
         > locals_action;
+
+        typedef hpx::actions::result_action0<
+            distributed_set, int, distributed_set_size,
+            &distributed_set::size
+        > size_action;
 
     private:
         naming::id_type gid_;

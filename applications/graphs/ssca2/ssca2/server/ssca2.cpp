@@ -85,11 +85,17 @@ HPX_DEFINE_GET_COMPONENT_TYPE(ssca2_type);
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
-    ssca2::ssca2() {}
+    ssca2::ssca2() {
+        LSSCA_(info) << "event: action(ssca2::ssca2) status(begin)";
+        LSSCA_(info) << "parent(" << threads::get_parent_id() << ")";
+    }
     
     int
     ssca2::read_graph(naming::id_type G, std::string filename)
     {
+        LSSCA_(info) << "event: action(ssca2::read_graph) status(begin)";
+        LSSCA_(info) << "parent(" << threads::get_parent_id() << ")";
+
         int64_t x, y, w;
         boost::unordered_map<int64_t, naming::id_type> known_vertices;
         //boost::unordered_map<int64_t, std::vector<int64_t> > known_edges;
@@ -157,6 +163,9 @@ namespace hpx { namespace components { namespace server
     int
     ssca2::large_set(naming::id_type G, naming::id_type dist_edge_set)
     {
+        LSSCA_(info) << "event: action(ssca2::large_set) status(begin)";
+        LSSCA_(info) << "parent(" << threads::get_parent_id() << ")";
+
         LSSCA_(info) << "large_set(" << G << ", " << dist_edge_set << ")";
 
         typedef components::distributing_factory::result_type result_type;
@@ -217,6 +226,9 @@ namespace hpx { namespace components { namespace server
                              naming::id_type local_max_lco,
                              naming::id_type global_max_lco)
     {
+        LSSCA_(info) << "event: action(ssca2::large_set_local) status(begin)";
+        LSSCA_(info) << "parent(" << threads::get_parent_id() << ")";
+
         LSSCA_(info) << "large_set_local(" << local_vertex_set << ", " << edge_set
                      << ", " << local_max_lco << ", " << global_max_lco << ")";
 
@@ -325,6 +337,9 @@ namespace hpx { namespace components { namespace server
     int
     ssca2::extract(naming::id_type edge_set, naming::id_type subgraphs)
     {
+        LSSCA_(info) << "event: action(ssca2::extract) status(begin)";
+        LSSCA_(info) << "parent(" << threads::get_parent_id() << ")";
+
         LSSCA_(info) << "extract(" << edge_set
                      << ", " << subgraphs << ")";
 
@@ -371,6 +386,9 @@ namespace hpx { namespace components { namespace server
     ssca2::extract_local(naming::id_type local_edge_set,
                          naming::id_type local_subgraphs)
     {
+        LSSCA_(info) << "event: action(ssca2::extract_local) status(begin)";
+        LSSCA_(info) << "parent(" << threads::get_parent_id() << ")";
+
         LSSCA_(info) << "extract_local(" << local_edge_set
                      << ", " << local_subgraphs << ")";
 
@@ -523,6 +541,9 @@ namespace hpx { namespace components { namespace server
                             naming::id_type source, naming::id_type target,
                             int d)
     {
+        LSSCA_(info) << "event: action(ssca2::extract_subgraph ) status(begin)";
+        LSSCA_(info) << "parent(" << threads::get_parent_id() << ")";
+
         typedef std::map<naming::id_type,naming::id_type> gids_map_type;
         typedef components::stubs::local_map<gids_map_type> local_gids_map_type;
         typedef stubs::distributed_map<gids_map_type> dist_gids_map_type;

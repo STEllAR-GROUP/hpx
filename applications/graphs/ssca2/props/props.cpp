@@ -34,5 +34,8 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     props_type::wrapped_type::color_action,
     props_color_action);
+HPX_REGISTER_ACTION_EX(
+    props_type::wrapped_type::incr_action,
+    props_incr_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(props_type::wrapped_type);
 
