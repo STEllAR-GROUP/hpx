@@ -74,7 +74,7 @@ namespace hpx { namespace components { namespace server
                 map_[locale] = props_map.get_gid();
                 locals_.push_back(map_[locale]);
 
-                LDIST_MAP_(info) << "Sending local sublist gid";
+                LDIST_MAP_(info) << "Sending local sublist gid (" << map_[locale] << ")";
             }
 
             //mtx_.unlock();

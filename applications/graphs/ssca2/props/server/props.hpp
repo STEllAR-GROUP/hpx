@@ -48,7 +48,8 @@ namespace hpx { namespace components { namespace server
         
         // constructor: initialize props value
         props()
-          : color_(0)
+          : color_(0),
+            count_(0.0)
         {
             LPROPS_(info) << "event: action(props::props) status(begin)";
         }
@@ -59,6 +60,9 @@ namespace hpx { namespace components { namespace server
         int init(int val)
         {
             LPROPS_(info) << "event: action(props::init) status(begin)";
+            color_ = val;
+            count_ = val;
+
             return val;
         }
 

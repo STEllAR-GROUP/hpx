@@ -81,8 +81,6 @@ namespace hpx { namespace lcos { namespace detail
 
             LREDUCE_(info) << "event: action(reduce_max::wait) status(begin)";
 
-            std::cout << "Wait(): in_ = " << in_ << " out_ = " << out_ << std::endl;
-
             // Note: out_ is a lower bound, if more show up before the last
             // in_, then they all get signaled, if it shows up after the
             // last in_, it waits on the next round.
@@ -120,9 +118,6 @@ namespace hpx { namespace lcos { namespace detail
             mutex_type::scoped_lock l(this);
 
             LREDUCE_(info) << "event: action(reduce_max::signal) status(begin)";
-
-            std::cout << "signal(" << value << "): in_ = " << in_
-                      << " out_ = " << out_ << std::endl;
 
             if (in_ > 0)
             {

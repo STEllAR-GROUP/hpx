@@ -65,11 +65,15 @@ HPX_REGISTER_ACTION(kernel4_action);
 
 int kernel4(naming::id_type V, naming::id_type VS, int k4_approx, naming::id_type bc_scores)
 {
+    future_ints_type results;
+
     // Build out BC pmap
     gids_type locals =
         lcos::eager_future<dist_vertex_set_type::locals_action>(V).get();
 
-    future_ints_type results;
+    // This uses hack to get prefix
+    naming::id_type there(boost::uint64_t((locals[0]).get_msb()) << 32, 0);
+
     gids_type::const_iterator lit = locals.begin();
     for (gids_type::const_iterator lend = locals.end();
          lit != lend; ++lit)
@@ -79,6 +83,7 @@ int kernel4(naming::id_type V, naming::id_type VS, int k4_approx, naming::id_typ
 
         gid_type bc_local =
             lcos::eager_future<dist_gids_map_type::get_local_action>(bc_scores, there).get();
+
         results.push_back(lcos::eager_future<init_local_bc_action>(there, bc_local, *lit));
     }
     while (results.size() > 0)
@@ -227,21 +232,15 @@ int init_local_bc(naming::id_type bc_local, naming::id_type v_local)
 {
     LSSCA_(info) << "Initializing local_bc (" << bc_local << ") with v_local (" << v_local << ")";
 
-    gids_map_type locals;
-
-    naming::id_type here = applier::get_applier().get_prefix();
-
     gids_type vertices = lcos::eager_future<local_vertex_set_type::get_action>(v_local).get();
+
     gids_type::const_iterator vit = vertices.begin();
     for (gids_type::const_iterator vend = vertices.end();
          vit != vend; ++vit)
     {
-        client_props_type prop(client_props_type::create(here));
-        prop.init(0);
-        locals[*vit] = prop.get_gid();
+        components::component_type props_comp_type = components::get_component_type<props_type>();
+        lcos::eager_future<local_gids_map_type::value_action>(bc_local, *vit, props_comp_type).get();
     }
-
-    lcos::eager_future<local_gids_map_type::append_action>(bc_local, locals).get();
 
     return 0;
 }
@@ -252,9 +251,9 @@ HPX_REGISTER_ACTION(add_local_item_action);
 
 int add_local_item(int index, naming::id_type v_locals, naming::id_type vs_locals)
 {
-    int retval = 0;
-
     gids_type vertices = lcos::eager_future<local_vertex_set_type::get_action>(v_locals).get();
+
+    int retval = 0;
 
     int degree = lcos::eager_future<vertex_type::out_degree_action>(vertices[index]).get();
     if (degree > 0)

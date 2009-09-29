@@ -17,12 +17,18 @@ set(ssca_DEPENDENCIES
    graph_component vertex_component
    distributed_set_component 
    distributed_map_component
-   ssca2_component)
+   ssca2_component
+   )
 
+set (ssca2_HEADERS
+     ssca2_benchmark.hpp
+    )
+    
 set(ssca2_benchmark_SOURCES
     ssca2_benchmark.cpp
     kernel4.cpp)
     
 add_hpx_executable(ssca2_benchmark
     SOURCES ${ssca2_benchmark_SOURCES}
+    HEADERS ${ssca2_benchmark_HEADERS}
     DEPENDENCIES ${ssca_DEPENDENCIES})

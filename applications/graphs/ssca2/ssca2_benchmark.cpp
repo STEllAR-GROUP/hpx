@@ -268,8 +268,8 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
         SSCA2.read_graph(G.get_gid(), input_file);
         total_time = k1_t.elapsed();
         /* End: timed execution of Kernel 1 */
-        LSSCA_(info) << "Completed Kernel 1 in " << total_time << " ms";
-        std::cout << "Completed Kernel 1 in " << total_time << " ms" << std::endl;
+        LSSCA_(info) << "Completed Kernel 1 in " << total_time << " sec";
+        std::cout << "Completed Kernel 1 in " << total_time << " sec" << std::endl;
     }
 
     // Kernel 2: classify large sets
@@ -288,8 +288,8 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
     SSCA2.large_set(G.get_gid(), edge_set.get_gid());
     total_time = k2_t.elapsed();
     /* End: timed execution of Kernel 2 */
-    LSSCA_(info) << "Completed Kernel 2 in " << total_time << " ms";
-    std::cout << "Completed Kernel 2 in " << total_time << " ms" << std::endl;
+    LSSCA_(info) << "Completed Kernel 2 in " << total_time << " sec";
+    std::cout << "Completed Kernel 2 in " << total_time << " sec" << std::endl;
 
     LSSCA_(info) << "Large set:";
 
@@ -337,8 +337,8 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
     total_time = k3_t.elapsed();
     /* End: timed execution of Kernel 3 */
 
-    LSSCA_(info) << "Completed Kernel 3 in " << total_time << " ms";
-    std::cout << "Completed Kernel 3 in " << total_time << " ms" << std::endl;
+    LSSCA_(info) << "Completed Kernel 3 in " << total_time << " sec";
+    std::cout << "Completed Kernel 3 in " << total_time << " sec" << std::endl;
 
     LSSCA_(info) << "Subgraphs:";
 
@@ -363,6 +363,11 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
 
         }
     }
+
+    // Free components
+    subgraphs.free();
+    edge_set.free();
+
 
     // Kernel 4: graph analysis algorithm
     // Input:
@@ -422,8 +427,8 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
     total_time = k4_t.elapsed();
     /* End: timed execution of Kernel 4 */
 
-    LSSCA_(info) << "Completed Kernel 4 in " << total_time << " ms";
-    std::cout << "Completed Kernel 4 in " << total_time << " ms" << std::endl;
+    LSSCA_(info) << "Completed Kernel 4 in " << total_time << " sec";
+    std::cout << "Completed Kernel 4 in " << total_time << " sec" << std::endl;
 
     double teps;
     if (k4_approx == scale)
@@ -432,14 +437,26 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
         teps = calculate_teps(V, 1<<k4_approx, total_time, false);
     std::cout << "TEPS = " << teps << std::endl;
 
-    // Free the graph component
-    subgraphs.free();
+    // Free components
+    if (k4_approx < scale && k4_approx > 0)
+    {
+        hpx::components::stubs::distributed_set<
+            hpx::components::server::vertex
+        >::free(VS);
+    }
+    bc_scores.free();
+
+    // Shutdown ...
+
+    // Free components
     G.free();
-    
+    SSCA2.free();
+
     // Shut down runtime services
     components::stubs::runtime_support::shutdown_all();
-    
+
     return 0;
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -599,8 +616,13 @@ int main(int argc, char* argv[])
         // initialize and start the HPX runtime
         typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
         runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
-
-        rt.run(boost::bind(hpx_main, depth, filename, scale, edge_factor, type), num_threads);
+        if (mode == hpx::runtime::worker) {
+            rt.run(num_threads);
+        }
+        else
+        {
+            rt.run(boost::bind(hpx_main, depth, filename, scale, edge_factor, type), num_threads);
+        }
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";

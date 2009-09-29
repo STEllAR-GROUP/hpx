@@ -47,4 +47,15 @@ typedef
     actions::plain_result_action3<int, naming::id_type, naming::id_type, double, incr_bc>
 incr_bc_action;
 
+/*
+struct k4
+{
+    static int init_local_bc(naming::id_type bc_local, naming::id_type v_local);
+
+    typedef actions::plain_result_action2<
+        int, naming::id_type, naming::id_type, k4::init_local_bc
+    > init_local_bc_action;
+};
+
+ */
 #endif
