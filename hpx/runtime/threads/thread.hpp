@@ -294,7 +294,7 @@ namespace hpx { namespace threads
             return t ? t->get_parent_thread_id() : 0;
         }
 
-        /// Return the thread id of the parent thread
+        /// Return the id of the component this thread is running in
         naming::address::address_type get_component_id() const
         {
             detail::thread const* t = get();

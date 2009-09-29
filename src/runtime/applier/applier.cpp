@@ -117,9 +117,10 @@ namespace hpx { namespace applier
 
     void register_work_plain(
         boost::function<threads::thread_function_type> const& func,
-        char const* desc, threads::thread_state state)
+        char const* desc, naming::address::address_type lva,
+        threads::thread_state state)
     {
-        threads::thread_init_data data(func, desc);
+        threads::thread_init_data data(func, desc, lva);
         hpx::applier::get_applier().get_thread_manager().register_work(data, state);
     }
 

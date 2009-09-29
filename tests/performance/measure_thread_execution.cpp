@@ -26,7 +26,8 @@ int hpx_main(util::high_resolution_timer& timer, std::size_t num_threads)
     // schedule a couple of threads
 //     timer.restart();
     for (std::size_t i = 0; i < num_threads; ++i) {
-        applier::register_work_plain(null_thread, "null_thread", threads::pending);
+        applier::register_work_plain(null_thread, "null_thread", 
+            (naming::address::address_type)null_thread, threads::pending);
     }
 //     double elapsed = timer.elapsed();
 //     std::cerr << "Elapsed time [s] for thread initialization of " 

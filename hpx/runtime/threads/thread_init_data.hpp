@@ -19,9 +19,10 @@ namespace hpx { namespace threads
         thread_init_data() {}
 
         template <typename F>
-        thread_init_data(F f, char const* desc = 0) 
+        thread_init_data(F f, char const* desc = 0, 
+                naming::address::address_type lva = 0) 
           : func(f), description(desc), 
-            lva(0), parent_prefix(0), parent_id(0)
+            lva(lva), parent_prefix(0), parent_id(0)
         {}
 
         boost::function<threads::thread_function_type> func;

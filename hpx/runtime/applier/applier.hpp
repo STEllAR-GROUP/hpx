@@ -265,7 +265,7 @@ namespace hpx { namespace applier
 
     HPX_API_EXPORT void register_work_plain(
         boost::function<threads::thread_function_type> const& func,
-        char const* description = "", 
+        char const* description = "", naming::address::address_type lva = 0,
         threads::thread_state initial_state = threads::pending);
 
     HPX_API_EXPORT void register_work_plain(

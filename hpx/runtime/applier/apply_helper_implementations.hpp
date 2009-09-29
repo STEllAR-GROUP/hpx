@@ -48,7 +48,7 @@
             hpx::applier::register_work_plain(
                 Action::construct_thread_function(lva, 
                     BOOST_PP_ENUM_PARAMS(N, arg)),
-                actions::detail::get_action_name<Action>());
+                actions::detail::get_action_name<Action>(), lva);
         }
 
         static void 
@@ -58,7 +58,7 @@
             hpx::applier::register_work_plain(
                 Action::construct_thread_function(
                     c, lva, BOOST_PP_ENUM_PARAMS(N, arg)),
-                actions::detail::get_action_name<Action>());
+                actions::detail::get_action_name<Action>(), lva);
         }
     };
 
