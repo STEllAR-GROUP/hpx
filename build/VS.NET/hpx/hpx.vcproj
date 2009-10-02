@@ -1160,6 +1160,14 @@
 					</File>
 				</Filter>
 			</Filter>
+			<Filter
+				Name="HpxC"
+				>
+				<File
+					RelativePath="..\..\..\hpx\c\types.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Auxiliary Files"

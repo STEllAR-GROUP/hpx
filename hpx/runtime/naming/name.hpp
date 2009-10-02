@@ -11,6 +11,7 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/serialization.hpp>
 
+#include <hpx/c/types.h>
 #include <hpx/util/safe_bool.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -23,15 +24,19 @@
 namespace hpx { namespace naming
 {
     /// Global identifier for components across the PX system
-    struct HPX_EXPORT id_type 
+    struct HPX_EXPORT id_type : protected ::gid
     {
         explicit id_type (boost::uint64_t lsb_id = 0) 
-          : id_msb_(0), id_lsb_(lsb_id)
-        {}
+        {
+            id_msb_ = 0;
+            id_lsb_ = lsb_id;
+        }
 
         explicit id_type (boost::uint64_t msb_id, boost::uint64_t lsb_id) 
-          : id_msb_(msb_id), id_lsb_(lsb_id)
-        {}
+        {
+            id_msb_ = msb_id;
+            id_lsb_ = lsb_id;
+        }
 
         id_type& operator=(boost::uint64_t lsb_id)
         {
@@ -174,10 +179,6 @@ namespace hpx { namespace naming
         {
             id_lsb_ = reinterpret_cast<boost::uint64_t>(lsb);
         }
-
-    private:
-        boost::uint64_t id_msb_;    // Type that we use for global IDs
-        boost::uint64_t id_lsb_;
 
     private:
         friend std::ostream& operator<< (std::ostream& os, id_type const& id);
