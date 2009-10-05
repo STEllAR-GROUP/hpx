@@ -38,10 +38,10 @@ namespace hpx { namespace naming
             id_lsb_ = lsb_id;
         }
 
-        id_type (::gid const& gid) 
+        id_type (::gid const& rhs) 
         {
-            id_msb_ = gid.id_msb_;
-            id_lsb_ = gid.lsb_id_;
+            id_msb_ = rhs.id_msb_;
+            id_lsb_ = rhs.id_lsb_;
         }
 
         id_type& operator=(boost::uint64_t lsb_id)
