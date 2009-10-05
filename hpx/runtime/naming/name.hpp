@@ -24,7 +24,7 @@
 namespace hpx { namespace naming
 {
     /// Global identifier for components across the PX system
-    struct HPX_EXPORT id_type : protected ::gid
+    struct HPX_EXPORT id_type : ::gid
     {
         explicit id_type (boost::uint64_t lsb_id = 0) 
         {
@@ -38,6 +38,12 @@ namespace hpx { namespace naming
             id_lsb_ = lsb_id;
         }
 
+        id_type (::gid const& gid) 
+        {
+            id_msb_ = gid.id_msb_;
+            id_lsb_ = gid.lsb_id_;
+        }
+
         id_type& operator=(boost::uint64_t lsb_id)
         {
             id_msb_ = 0;
@@ -46,6 +52,13 @@ namespace hpx { namespace naming
         }
 
         id_type& operator=(id_type const& rhs)
+        {
+            id_msb_ = rhs.id_msb_;
+            id_lsb_ = rhs.id_lsb_;
+            return *this;
+        }
+
+        id_type& operator=(::gid const& rhs)
         {
             id_msb_ = rhs.id_msb_;
             id_lsb_ = rhs.id_lsb_;
