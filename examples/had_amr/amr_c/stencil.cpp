@@ -81,7 +81,7 @@ namespace hpx { namespace components { namespace amr
               // this is the actual calculation, call provided (external) function
               evaluate_timestep(val1.get_ptr(), val2.get_ptr(), val3.get_ptr(), 
                   resultval.get_ptr(), numsteps_);
-              printf(" TEST left %d mid %d right %d\n",val1->refine_,val2->refine_,val3->refine_);
+              //printf(" TEST left %d mid %d right %d\n",val1->refine_,val2->refine_,val3->refine_);
             } else if ( gids.size() == 2 ) {
               // bdry computation
               if ( column == 0 ) {
@@ -93,81 +93,38 @@ namespace hpx { namespace components { namespace amr
               }
             }
 
-            // Interpolation 
-
-            // Instatiate new mesh
-            // Check if a finer gid has been created
-            if ( gids.size() == 3 ) {
-              if ( val1->right_neighbor_.id_lsb_ > 5000 && 
-                   val2->right_neighbor_.id_lsb_ > 5000 ) {
-                // the initial data for the child mesh comes from the parent mesh
-                naming::id_type here = applier::get_applier().get_runtime_support_gid();
-                components::component_type logging_type =
-                          components::get_component_type<components::amr::server::logging>();
-                components::component_type function_type =
-                          components::get_component_type<components::amr::stencil>();
-                components::amr::amr_mesh child_mesh (
-                          components::amr::amr_mesh::create(here, 1, true));
-                std::vector<naming::id_type> initial_data;
-                initial_data.push_back(val1->right_neighbor_);
-                initial_data.push_back(gids[1]);
-                initial_data.push_back(val2->right_neighbor_);
-  
-                std::vector<naming::id_type> result_data(
-                            child_mesh.execute(initial_data,function_type,3,2,3,
-                            logging_type));
-
-                // evaluate result data
-                // release initial data
-                // release result data
-              }
-            }
-
-            // clone the gids and communicate
-            if ( gids.size() == 3 ) {
-              memset(&resultval->right_neighbor_,0,sizeof(gid));
-              memset(&resultval->left_neighbor_,0,sizeof(gid));
-              if ( val1->refine_  && val2->refine_  && val3->refine_) {
-                // center refinement -- clone a right neighbor
-                resultval->right_neighbor_ = 
-                  components::stubs::memory_block::clone(gids[1]);
-              } else if ( val1->refine_ && val2->refine_ && !val3->refine_ ) {
-                // 1 point away from right boundary -- clone a right neighbor
-                resultval->right_neighbor_ = 
-                  components::stubs::memory_block::clone(gids[1]);
-              } else if ( val1->refine_ && !val2->refine_ && val3->refine_ ) {
-                // point inbetween refinement boundaries -- clone a right neighbor
-                resultval->right_neighbor_ = 
-                  components::stubs::memory_block::clone(gids[1]);
-              } else if ( val1->refine_ && !val2->refine_ && !val3->refine_ ) {
-                // right boundary -- clone a right neighbor
-                resultval->right_neighbor_ = 
-                  components::stubs::memory_block::clone(gids[1]);
-              } else if ( !val1->refine_ && val2->refine_ && val3->refine_ ) {
-                // 1 point away from left boundary -- clone a right neigbhor
-                resultval->right_neighbor_ = 
-                  components::stubs::memory_block::clone(gids[1]);
-              } else if ( !val1->refine_ && val2->refine_ && !val3->refine_ ) {
-                // unique refinement node -- no cloning
-              } else if ( !val1->refine_ && !val2->refine_ && val3->refine_ ) {
-                // left boundary -- clone left and right neighbor
-                boost::tie(resultval->right_neighbor_,resultval->left_neighbor_) = 
-                  components::wait(components::stubs::memory_block::clone_async(gids[1]),
-                                   components::stubs::memory_block::clone_async(gids[1]));
-              } else if ( !val1->refine_ && !val2->refine_ && !val3->refine_ ) {
-                // no refinement -- no cloning
-              }
-
-            }
-
-#if 0
             // this will be a parameter someday
             std::size_t allowedl = 1;
             if ( val2->refine_ && val2->level_ <= allowedl && gids.size() == 3 ) {
-              boost::tie(val2->left_neighbor_, val2->middle_neighbor_,val2->right_neighbor_) = 
-                components::wait(components::stubs::memory_block::clone_async(gids[0]), 
-                      components::stubs::memory_block::clone_async(gids[1]),
-                      components::stubs::memory_block::clone_async(gids[2]));
+              naming::id_type gval1, gval2, gval3, gval4, gval5;
+              boost::tie(gval1, gval2, gval3, gval4, gval5) = 
+                                components::wait(components::stubs::memory_block::clone_async(gids[0]), 
+                                     components::stubs::memory_block::clone_async(gids[0]),
+                                     components::stubs::memory_block::clone_async(gids[1]),
+                                     components::stubs::memory_block::clone_async(gids[2]),
+                                     components::stubs::memory_block::clone_async(gids[2]));
+
+              access_memory_block<stencil_data> mval1, mval2,mval3,mval4,mval5;
+              boost::tie(mval1,mval2,mval3,mval4,mval5) = 
+                              components::wait(components::stubs::memory_block::get_async(gval1), 
+                                   components::stubs::memory_block::get_async(gval2),
+                                   components::stubs::memory_block::get_async(gval3),
+                                   components::stubs::memory_block::get_async(gval4),
+                                   components::stubs::memory_block::get_async(gval5));
+
+              // increase the level by one
+              mval1->level_ = 1;
+              mval2->level_ = 1;
+              mval3->level_ = 1;
+              mval4->level_ = 1;
+              mval5->level_ = 1;
+
+              // initialize timestep for the fine mesh
+              mval1->timestep_ = 0;
+              mval2->timestep_ = 0;
+              mval3->timestep_ = 0;
+              mval4->timestep_ = 0;
+              mval5->timestep_ = 0;
 
               // the initial data for the child mesh comes from the parent mesh
               naming::id_type here = applier::get_applier().get_runtime_support_gid();
@@ -178,16 +135,23 @@ namespace hpx { namespace components { namespace amr
               components::amr::amr_mesh child_mesh (
                         components::amr::amr_mesh::create(here, 1, true));
               std::vector<naming::id_type> initial_data;
+              initial_data.push_back(gval1);
+              initial_data.push_back(gval2);
+              initial_data.push_back(gval3);
+              initial_data.push_back(gval4);
+              initial_data.push_back(gval5);
 
+              std::size_t numvalues = 5;
+              std::size_t numsteps = 2;
+              std::size_t stencilsize = 3;
               std::vector<naming::id_type> result_data(
-                          child_mesh.execute(initial_data,function_type,3,2,3,
+                          child_mesh.execute(initial_data,function_type,numvalues,numsteps,stencilsize,
                           logging_type));
 
               // evaluate result data
               // release initial data
               // release result data
             }
-#endif
 
 
             if (log_)     // send result to logging instance

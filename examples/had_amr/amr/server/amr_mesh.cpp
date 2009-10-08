@@ -261,7 +261,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::size_t numsteps, std::size_t stencilsize, 
         components::component_type logging_type)
     {
-        std::cout << " init_execute Stencilsize : " << stencilsize << std::endl;
+      //  std::cout << " init_execute Stencilsize : " << stencilsize << std::endl;
         std::vector<naming::id_type> result_data;
 
         components::component_type stencil_type = 
@@ -332,7 +332,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::size_t stencilsize,
         components::component_type logging_type)
     {
-        std::cout << " execute Stencilsize : " << stencilsize << std::endl;
+    //    std::cout << " execute Stencilsize : " << stencilsize << std::endl;
         std::vector<naming::id_type> result_data;
 
         components::component_type stencil_type = 
