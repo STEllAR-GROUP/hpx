@@ -362,11 +362,12 @@ namespace hpx { namespace components { namespace server
           : component_(0) 
         {
             std::size_t size = rhs->get_size();
-            boost::uint8_t* p = new boost::uint8_t[size + sizeof(detail::memory_block_header)];
-            new ((detail::memory_block*)p) detail::memory_block(this, size);
+            detail::memory_block* p = (detail::memory_block*)new boost::uint8_t[
+                size + sizeof(detail::memory_block_header)];
+            new (p) detail::memory_block(this, size);
 
             using namespace std;    // some systems have memcpy in std
-            memcpy(p, rhs, size + sizeof(detail::memory_block_header));
+            memcpy(p->get_ptr(), rhs->get_ptr(), size);
             component_.reset((detail::memory_block_header*)p);
         }
 
