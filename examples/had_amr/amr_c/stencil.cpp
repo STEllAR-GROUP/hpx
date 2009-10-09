@@ -95,14 +95,14 @@ namespace hpx { namespace components { namespace amr
 
             // this will be a parameter someday
             std::size_t allowedl = 1;
-            if ( val2->refine_ && val2->level_ <= allowedl && gids.size() == 3 ) {
+            if ( val2->refine_ && val2->level_ < allowedl && gids.size() == 3 ) {
               naming::id_type gval1, gval2, gval3, gval4, gval5;
               boost::tie(gval1, gval2, gval3, gval4, gval5) = 
-                                components::wait(components::stubs::memory_block::clone_async(gids[0]), 
-                                     components::stubs::memory_block::clone_async(gids[0]),
+                                components::wait(components::stubs::memory_block::clone_async(gids[1]), 
                                      components::stubs::memory_block::clone_async(gids[1]),
-                                     components::stubs::memory_block::clone_async(gids[2]),
-                                     components::stubs::memory_block::clone_async(gids[2]));
+                                     components::stubs::memory_block::clone_async(gids[1]),
+                                     components::stubs::memory_block::clone_async(gids[1]),
+                                     components::stubs::memory_block::clone_async(gids[1]));
 
               access_memory_block<stencil_data> mval1, mval2,mval3,mval4,mval5;
               boost::tie(mval1,mval2,mval3,mval4,mval5) = 
@@ -113,11 +113,11 @@ namespace hpx { namespace components { namespace amr
                                    components::stubs::memory_block::get_async(gval5));
 
               // increase the level by one
-              mval1->level_ = 1;
-              mval2->level_ = 1;
-              mval3->level_ = 1;
-              mval4->level_ = 1;
-              mval5->level_ = 1;
+              ++mval1->level_;
+              ++mval2->level_;
+              ++mval3->level_;
+              ++mval4->level_;
+              ++mval5->level_;
 
               // initialize timestep for the fine mesh
               mval1->timestep_ = 0;
@@ -147,10 +147,13 @@ namespace hpx { namespace components { namespace amr
               std::vector<naming::id_type> result_data(
                           child_mesh.execute(initial_data,function_type,numvalues,numsteps,stencilsize,
                           logging_type));
-
+      
               // evaluate result data
+              
               // release initial data
+              
               // release result data
+
             }
 
 

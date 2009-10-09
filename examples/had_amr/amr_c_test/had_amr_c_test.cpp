@@ -50,9 +50,9 @@ int evaluate_timestep(stencil_data const* left, stencil_data const* middle,
     long t, n = work[middle->timestep_*nzones+middle->index_/zone];
 
     //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
-    for (t = 0; t < n; t++)
-        sum += left->value_+middle->value_;
-    result->value_ = sum/(2.0*t);
+    //for (t = 0; t < n; t++)
+    //    sum += left->value_+middle->value_ ;
+    result->value_ = left->value_ + middle->value_ + right->value_;
 
     return 1;
 }
@@ -75,9 +75,9 @@ int evaluate_left_bdry_timestep(stencil_data const* middle, stencil_data const* 
     long t, n = work[middle->timestep_*nzones+middle->index_/zone];
 
     //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
-    for (t = 0; t < n; t++)
-        sum += middle->value_+right->value_;
-    result->value_ = sum/(2.0*t);
+    //for (t = 0; t < n; t++)
+    //    sum += middle->value_+right->value_;
+    result->value_ = middle->value_+right->value_;
 
     return 1;
 }
@@ -100,9 +100,9 @@ int evaluate_right_bdry_timestep(stencil_data const* left, stencil_data const* m
     long t, n = work[middle->timestep_*nzones+middle->index_/zone];
 
     //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
-    for (t = 0; t < n; t++)
-        sum += left->value_+middle->value_;
-    result->value_ = sum/(2.0*t);
+    //for (t = 0; t < n; t++)
+    //    sum += left->value_+middle->value_;
+    result->value_ = left->value_+middle->value_;
 
     return 1;
 }
