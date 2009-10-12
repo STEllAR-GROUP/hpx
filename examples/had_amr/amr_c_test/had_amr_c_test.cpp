@@ -20,6 +20,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row)
     val->timestep_ = 0;
     val->level_= 0;
     val->refine_= false;
+    val->right_alloc_ = 0;
     /*
     if (item < (int)(maxitems / 3.) || item >= (int)(2. * maxitems / 3.))
         val->value_ = 0;
@@ -52,7 +53,7 @@ int evaluate_timestep(stencil_data const* left, stencil_data const* middle,
     //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
     //for (t = 0; t < n; t++)
     //    sum += left->value_+middle->value_ ;
-    result->value_ = left->value_ + middle->value_ + right->value_;
+    result->value_ = 1.0/3.0*(left->value_ + middle->value_ + right->value_);
 
     return 1;
 }
@@ -77,7 +78,7 @@ int evaluate_left_bdry_timestep(stencil_data const* middle, stencil_data const* 
     //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
     //for (t = 0; t < n; t++)
     //    sum += middle->value_+right->value_;
-    result->value_ = middle->value_+right->value_;
+    result->value_ = 0.5*(middle->value_+right->value_);
 
     return 1;
 }
@@ -102,7 +103,7 @@ int evaluate_right_bdry_timestep(stencil_data const* left, stencil_data const* m
     //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
     //for (t = 0; t < n; t++)
     //    sum += left->value_+middle->value_;
-    result->value_ = left->value_+middle->value_;
+    result->value_ = 0.5*(left->value_+middle->value_);
 
     return 1;
 }

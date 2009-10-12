@@ -126,6 +126,13 @@ namespace hpx { namespace components { namespace amr
               mval4->timestep_ = 0;
               mval5->timestep_ = 0;
 
+              // initialize the index
+              mval1->index_ = 0;
+              mval2->index_ = 1;
+              mval3->index_ = 2;
+              mval4->index_ = 3;
+              mval5->index_ = 4;
+
               // the initial data for the child mesh comes from the parent mesh
               naming::id_type here = applier::get_applier().get_runtime_support_gid();
               components::component_type logging_type =
@@ -147,12 +154,22 @@ namespace hpx { namespace components { namespace amr
               std::vector<naming::id_type> result_data(
                           child_mesh.execute(initial_data,function_type,numvalues,numsteps,stencilsize,
                           logging_type));
+
+              access_memory_block<stencil_data> r_val1, r_val2;
+              boost::tie(r_val1, r_val2) = 
+               wait(components::stubs::memory_block::get_async(result_data[2]), 
+                    components::stubs::memory_block::get_async(result_data[3]));
+
+              // overwrite the coarse point computation
+              resultval->value_ = r_val1->value_;
       
               // evaluate result data
-              
-              // release initial data
-              
+              resultval->right_alloc_ = 1;
+              resultval->right_value_ = r_val2->value_;
+
               // release result data
+              for (std::size_t i = 0; i < result_data.size(); ++i) 
+                components::stubs::memory_block::free(result_data[i]);
 
             }
 
