@@ -21,7 +21,7 @@ struct stencil_data
     size_t level_;    // refinement level
     double value_;            // current value
     bool refine_;     // whether to refine
-    double right_value_;
+    gid right_neighbor_;
     size_t right_alloc_;
 
 #if defined(__cplusplus)
