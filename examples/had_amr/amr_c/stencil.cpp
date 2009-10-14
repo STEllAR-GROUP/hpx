@@ -95,203 +95,9 @@ namespace hpx { namespace components { namespace amr
             // this will be a parameter someday
             std::size_t allowedl = 2;
 
-            // -------- Check for derefinement --------
-            if ( val2->refine_ == 0 ) {
-              // Derefine {{{
-              if ( val2->right_alloc_ == 1 ) {
-                val2->right_alloc_ = 0;
-              }
-              // }}}
-            } else if ( gids.size() == 3 && val2->level_ < allowedl ) {
-              //------- proceed with refinement ------- {{{
-              
-              // Check if we already have a refined grid to evolve: 
-              if ( val2->right_alloc_ == 1 ) {
-                // the refined grid is already up and running {{{
-
-                std::vector<naming::id_type> initial_data;
-
-                naming::id_type gval1, gval2, gval3, gval4, gval5;
-                boost::tie(gval1, gval2, gval3, gval4, gval5) = 
-                                  components::wait(components::stubs::memory_block::clone_async(gids[0]), 
-                                       components::stubs::memory_block::clone_async(gids[1]),
-                                       components::stubs::memory_block::clone_async(gids[1]),
-                                       components::stubs::memory_block::clone_async(gids[1]),
-                                       components::stubs::memory_block::clone_async(gids[2]));
-          
-                // reset timestep and column (index)
-                access_memory_block<stencil_data> mval1, mval2,mval3,mval4,mval5;
-                boost::tie(mval1,mval2,mval3,mval4,mval5) = 
-                                components::wait(components::stubs::memory_block::get_async(gval1), 
-                                     components::stubs::memory_block::get_async(gval2),
-                                     components::stubs::memory_block::get_async(gval3),
-                                     components::stubs::memory_block::get_async(gval4),
-                                     components::stubs::memory_block::get_async(gval5));
-
-                if ( val1->right_alloc_ == 1 ) {
-                  // no interpolation required
-                  // assign the finer mesh values
-                  mval2->level_ = val1->right_neighbor_level_;
-                  mval4->level_ = val2->right_neighbor_level_;
-
-                  mval2->value_ = val1->right_neighbor_;
-                  mval4->value_ = val2->right_neighbor_;
-                } else {
-                  mval2->level_ = val2->right_neighbor_level_;
-                  mval4->level_ = val2->right_neighbor_level_;
-
-                  // interpolation
-                  mval2->value_ = 0.5*(mval1->value_ + mval3->value_);
-                }
-
-                // no change in number of levels
-                BOOST_ASSERT(mval2->level_ == mval4->level_);
-                mval1->level_ = mval2->level_;
-                mval3->level_ = mval2->level_;
-                mval5->level_ = mval2->level_;
-  
-                // initialize timestep for the fine mesh
-                mval1->timestep_ = 0;
-                mval2->timestep_ = 0;
-                mval3->timestep_ = 0;
-                mval4->timestep_ = 0;
-                mval5->timestep_ = 0;
-
-                // initialize the index
-                mval1->index_ = 0;
-                mval2->index_ = 1;
-                mval3->index_ = 2;
-                mval4->index_ = 3;
-                mval5->index_ = 4;
-                 
-                initial_data.push_back(gval1);
-                initial_data.push_back(gval2);
-                initial_data.push_back(gval3);
-                initial_data.push_back(gval4);
-                initial_data.push_back(gval5);
-
-                naming::id_type here = applier::get_applier().get_runtime_support_gid();
-                components::component_type logging_type =
-                          components::get_component_type<components::amr::server::logging>();
-                components::component_type function_type =
-                          components::get_component_type<components::amr::stencil>();
-                components::amr::amr_mesh child_mesh (
-                          components::amr::amr_mesh::create(here, 1, true));
-
-                std::size_t numvalues = 5;
-                std::size_t numsteps = 2;
-                std::size_t stencilsize = 3;
-                std::vector<naming::id_type> result_data(
-                            child_mesh.execute(initial_data,function_type,numvalues,numsteps,stencilsize,
-                            logging_type));
-
-                access_memory_block<stencil_data> r_val1,r_val2;
-                boost::tie(r_val1,r_val2) = 
-                                components::wait(components::stubs::memory_block::get_async(result_data[2]), 
-                                     components::stubs::memory_block::get_async(result_data[3]));
-
-                // overwrite the coarse point computation
-                resultval->value_ = r_val1->value_;
-        
-                // remember right neighbor value
-                resultval->right_alloc_ = 1;
-                resultval->right_neighbor_ = r_val2->value_;
-                resultval->right_neighbor_level_ = r_val2->level_;
-
-                // release result data
-                for (std::size_t i = 0; i < result_data.size(); ++i) 
-                  components::stubs::memory_block::free(result_data[i]);
-
-                for (std::size_t i = 0; i < initial_data.size(); ++i) 
-                  components::stubs::memory_block::free(initial_data[i]);
-
-                // }}}
-              } else {
-                // interpolation required to get the refined grid up and running {{{
-                naming::id_type gval1, gval2, gval3, gval4, gval5;
-                boost::tie(gval1, gval2, gval3, gval4, gval5) = 
-                                  components::wait(components::stubs::memory_block::clone_async(gids[0]), 
-                                       components::stubs::memory_block::clone_async(gids[0]),
-                                       components::stubs::memory_block::clone_async(gids[1]),
-                                       components::stubs::memory_block::clone_async(gids[2]),
-                                       components::stubs::memory_block::clone_async(gids[2]));
-
-                access_memory_block<stencil_data> mval1, mval2,mval3,mval4,mval5;
-                boost::tie(mval1,mval2,mval3,mval4,mval5) = 
-                                components::wait(components::stubs::memory_block::get_async(gval1), 
-                                     components::stubs::memory_block::get_async(gval2),
-                                     components::stubs::memory_block::get_async(gval3),
-                                     components::stubs::memory_block::get_async(gval4),
-                                     components::stubs::memory_block::get_async(gval5));
-
-                // increase the level by one
-                ++mval1->level_;
-                ++mval2->level_;
-                ++mval3->level_;
-                ++mval4->level_;
-                ++mval5->level_;
-
-                // initialize timestep for the fine mesh
-                mval1->timestep_ = 0;
-                mval2->timestep_ = 0;
-                mval3->timestep_ = 0;
-                mval4->timestep_ = 0;
-                mval5->timestep_ = 0;
-
-                // initialize the index
-                mval1->index_ = 0;
-                mval2->index_ = 1;
-                mval3->index_ = 2;
-                mval4->index_ = 3;
-                mval5->index_ = 4;
-
-                // the initial data for the child mesh comes from the parent mesh
-                naming::id_type here = applier::get_applier().get_runtime_support_gid();
-                components::component_type logging_type =
-                          components::get_component_type<components::amr::server::logging>();
-                components::component_type function_type =
-                          components::get_component_type<components::amr::stencil>();
-                components::amr::amr_mesh child_mesh (
-                          components::amr::amr_mesh::create(here, 1, true));
-                std::vector<naming::id_type> initial_data;
-                initial_data.push_back(gval1);
-                initial_data.push_back(gval2);
-                initial_data.push_back(gval3);
-                initial_data.push_back(gval4);
-                initial_data.push_back(gval5);
-
-                std::size_t numvalues = 5;
-                std::size_t numsteps = 2;
-                std::size_t stencilsize = 3;
-                std::vector<naming::id_type> result_data(
-                            child_mesh.execute(initial_data,function_type,numvalues,numsteps,stencilsize,
-                            logging_type));
-
-                access_memory_block<stencil_data> r_val1,r_val2;
-                boost::tie(r_val1,r_val2) = 
-                                components::wait(components::stubs::memory_block::get_async(result_data[2]), 
-                                     components::stubs::memory_block::get_async(result_data[3]));
-
-                // overwrite the coarse point computation
-                resultval->value_ = r_val1->value_;
-        
-                // remember right neighbor value
-                resultval->right_alloc_ = 1;
-                resultval->right_neighbor_ = r_val2->value_;
-                resultval->right_neighbor_level_ = r_val2->level_;
-
-                // release result data
-                for (std::size_t i = 0; i < result_data.size(); ++i) 
-                  components::stubs::memory_block::free(result_data[i]);
-
-                for (std::size_t i = 0; i < initial_data.size(); ++i) 
-                  components::stubs::memory_block::free(initial_data[i]);
-
-                // }}}
-              }
-            // }}}
+            if ( val2->refine_ && gids.size() == 3 && val2->level_ < allowedl ) {
+              finer_mesh(result,gids);
             }
-        
 
             if (log_)     // send result to logging instance
                 stubs::logging::logentry(log_, resultval.get(), row);
@@ -304,6 +110,99 @@ namespace hpx { namespace components { namespace amr
         // set return value difference between actual and required number of
         // timesteps (>0: still to go, 0: last step, <0: overdone)
         return numsteps_ - resultval->timestep_;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Implement a finer mesh via interpolation of inter-mesh points
+    // Compute the result value for the current time step
+    int stencil::finer_mesh(naming::id_type const& result, 
+        std::vector<naming::id_type> const& gids) {
+
+      naming::id_type gval1, gval2, gval3, gval4, gval5;
+      boost::tie(gval1, gval2, gval3, gval4, gval5) = 
+                        components::wait(components::stubs::memory_block::clone_async(gids[0]), 
+                             components::stubs::memory_block::clone_async(gids[0]),
+                             components::stubs::memory_block::clone_async(gids[1]),
+                             components::stubs::memory_block::clone_async(gids[2]),
+                             components::stubs::memory_block::clone_async(gids[2]));
+
+      access_memory_block<stencil_data> mval1, mval2,mval3,mval4,mval5;
+      boost::tie(mval1,mval2,mval3,mval4,mval5) = 
+                      components::wait(components::stubs::memory_block::get_async(gval1), 
+                           components::stubs::memory_block::get_async(gval2),
+                           components::stubs::memory_block::get_async(gval3),
+                           components::stubs::memory_block::get_async(gval4),
+                           components::stubs::memory_block::get_async(gval5));
+
+      // increase the level by one
+      ++mval1->level_;
+      ++mval2->level_;
+      ++mval3->level_;
+      ++mval4->level_;
+      ++mval5->level_;
+
+      // initialize timestep for the fine mesh
+      mval1->timestep_ = 0;
+      mval2->timestep_ = 0;
+      mval3->timestep_ = 0;
+      mval4->timestep_ = 0;
+      mval5->timestep_ = 0;
+
+      // initialize the index
+      mval1->index_ = 0;
+      mval2->index_ = 1;
+      mval3->index_ = 2;
+      mval4->index_ = 3;
+      mval5->index_ = 4;
+
+      // call to user defined interpolation
+      interpolation();
+
+      // the initial data for the child mesh comes from the parent mesh
+      naming::id_type here = applier::get_applier().get_runtime_support_gid();
+      components::component_type logging_type =
+                components::get_component_type<components::amr::server::logging>();
+      components::component_type function_type =
+                components::get_component_type<components::amr::stencil>();
+      components::amr::amr_mesh child_mesh (
+                components::amr::amr_mesh::create(here, 1, true));
+      std::vector<naming::id_type> initial_data;
+      initial_data.push_back(gval1);
+      initial_data.push_back(gval2);
+      initial_data.push_back(gval3);
+      initial_data.push_back(gval4);
+      initial_data.push_back(gval5);
+
+      std::size_t numvalues = 5;
+      std::size_t numsteps = 2;
+      std::size_t stencilsize = 3;
+      bool do_logging = false;
+      std::vector<naming::id_type> result_data(
+                  child_mesh.execute(initial_data,function_type,numvalues,numsteps,stencilsize,
+                  do_logging ? logging_type : components::component_invalid));
+
+      access_memory_block<stencil_data> r_val1,r_val2,resultval;
+      boost::tie(r_val1,r_val2,resultval) = 
+                      components::wait(components::stubs::memory_block::get_async(result_data[2]), 
+                           components::stubs::memory_block::get_async(result_data[3]),
+                           components::stubs::memory_block::get_async(result));
+
+      // overwrite the coarse point computation
+      resultval->value_ = r_val1->value_;
+         
+      // remember right neighbor value
+      resultval->right_alloc_ = 1;
+      resultval->right_neighbor_ = r_val2->value_;
+      resultval->right_neighbor_level_ = r_val2->level_;
+
+      // release result data
+      for (std::size_t i = 0; i < result_data.size(); ++i) 
+        components::stubs::memory_block::free(result_data[i]);
+
+      for (std::size_t i = 0; i < initial_data.size(); ++i) 
+        components::stubs::memory_block::free(initial_data[i]);
+
+      return 0;
     }
 
     naming::id_type stencil::alloc_data(int item, int maxitems, int row)
