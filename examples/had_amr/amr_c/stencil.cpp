@@ -94,7 +94,6 @@ namespace hpx { namespace components { namespace amr
             
             // this will be a parameter someday
             std::size_t allowedl = 2;
-
             if ( val2->refine_ && gids.size() == 3 && val2->level_ < allowedl ) {
               finer_mesh(result,gids);
             }
@@ -155,6 +154,10 @@ namespace hpx { namespace components { namespace amr
       mval4->index_ = 3;
       mval5->index_ = 4;
 
+      // if the refined point already exists, no need to interpolate
+      if ( mval1->right_alloc_ ) mval2->value_ = mval1->right_value_; 
+      if ( mval3->right_alloc_ ) mval4->value_ = mval3->right_value_; 
+      
       // call to user defined interpolation
       interpolation();
 
@@ -176,7 +179,7 @@ namespace hpx { namespace components { namespace amr
       std::size_t numvalues = 5;
       std::size_t numsteps = 2;
       std::size_t stencilsize = 3;
-      bool do_logging = false;
+      bool do_logging = true;
       std::vector<naming::id_type> result_data(
                   child_mesh.execute(initial_data,function_type,numvalues,numsteps,stencilsize,
                   do_logging ? logging_type : components::component_invalid));
@@ -192,8 +195,8 @@ namespace hpx { namespace components { namespace amr
          
       // remember right neighbor value
       resultval->right_alloc_ = 1;
-      resultval->right_neighbor_ = r_val2->value_;
-      resultval->right_neighbor_level_ = r_val2->level_;
+      resultval->right_value_ = r_val2->value_;
+      resultval->right_value_level_ = r_val2->level_;
 
       // release result data
       for (std::size_t i = 0; i < result_data.size(); ++i) 
