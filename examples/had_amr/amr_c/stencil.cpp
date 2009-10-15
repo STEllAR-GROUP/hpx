@@ -18,6 +18,49 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
 {
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        // helper functions to get several memory pointers asynchronously
+        inline boost::tuple<
+            access_memory_block<stencil_data>, access_memory_block<stencil_data>
+          , access_memory_block<stencil_data> >
+        get_async(naming::id_type const& g1, naming::id_type const& g2
+          , naming::id_type const& g3)
+        {
+            return wait(components::stubs::memory_block::get_async(g1)
+              , components::stubs::memory_block::get_async(g2)
+              , components::stubs::memory_block::get_async(g3));
+        }
+
+        inline boost::tuple<
+            access_memory_block<stencil_data>, access_memory_block<stencil_data>
+          , access_memory_block<stencil_data>, access_memory_block<stencil_data> >
+        get_async(naming::id_type const& g1, naming::id_type const& g2
+          , naming::id_type const& g3, naming::id_type const& g4)
+        {
+            return wait(components::stubs::memory_block::get_async(g1)
+              , components::stubs::memory_block::get_async(g2)
+              , components::stubs::memory_block::get_async(g3)
+              , components::stubs::memory_block::get_async(g4));
+        }
+
+        inline boost::tuple<
+            access_memory_block<stencil_data>, access_memory_block<stencil_data>
+          , access_memory_block<stencil_data>, access_memory_block<stencil_data>
+          , access_memory_block<stencil_data> >
+        get_async(naming::id_type const& g1, naming::id_type const& g2
+          , naming::id_type const& g3, naming::id_type const& g4
+          , naming::id_type const& g5)
+        {
+            return wait(components::stubs::memory_block::get_async(g1)
+              , components::stubs::memory_block::get_async(g2)
+              , components::stubs::memory_block::get_async(g3)
+              , components::stubs::memory_block::get_async(g4)
+              , components::stubs::memory_block::get_async(g5));
+        }
+    }
+
     stencil::stencil()
       : numsteps_(0)
     {}
@@ -50,18 +93,15 @@ namespace hpx { namespace components { namespace amr
         // get all input memory_block_data instances
         access_memory_block<stencil_data> val1, val2, val3, resultval;
         if (gids.size() == 3) { 
-          boost::tie(val1, val2, val3, resultval) = 
-            wait(components::stubs::memory_block::get_async(gids[0]), 
-                 components::stubs::memory_block::get_async(gids[1]), 
-                 components::stubs::memory_block::get_async(gids[2]),
-                 components::stubs::memory_block::get_async(result));
-        } else if ( gids.size() == 2) {
-          boost::tie(val1, val2, resultval) = 
-            wait(components::stubs::memory_block::get_async(gids[0]), 
-                 components::stubs::memory_block::get_async(gids[1]), 
-                 components::stubs::memory_block::get_async(result));
-        } else {
-          BOOST_ASSERT(0 == 1);
+            boost::tie(val1, val2, val3, resultval) = 
+                detail::get_async(gids[0], gids[1], gids[2], result);
+        } 
+        else if (gids.size() == 2) {
+            boost::tie(val1, val2, resultval) = 
+                detail::get_async(gids[0], gids[1], result);
+        } 
+        else {
+            BOOST_ASSERT(false);    // should not happen
         }
 
         // make sure all input data items agree on the time step number
@@ -72,16 +112,23 @@ namespace hpx { namespace components { namespace amr
 
         // the predecessor
         std::size_t middle_timestep;
-        if ( gids.size() == 3 ) middle_timestep = val2->timestep_;
-        else if ( gids.size() == 2 && column == 0 ) middle_timestep = val2->timestep_;
-        else middle_timestep = val1->timestep_;
+        if (gids.size() == 3) 
+            middle_timestep = val2->timestep_;
+        else if (gids.size() == 2 && column == 0) 
+            middle_timestep = val2->timestep_;      // left boundary point
+        else {
+            BOOST_ASSERT(gids.size() == 2);
+            middle_timestep = val1->timestep_;      // right boundary point
+        }
+
         if (middle_timestep < numsteps_) {
 
-            if ( gids.size() == 3 ) {
+            if (gids.size() == 3) {
               // this is the actual calculation, call provided (external) function
               evaluate_timestep(val1.get_ptr(), val2.get_ptr(), val3.get_ptr(), 
                   resultval.get_ptr(), numsteps_);
-            } else if ( gids.size() == 2 ) {
+            } 
+            else if (gids.size() == 2) {
               // bdry computation
               if ( column == 0 ) {
                 evaluate_left_bdry_timestep(val1.get_ptr(), val2.get_ptr(),
@@ -91,11 +138,11 @@ namespace hpx { namespace components { namespace amr
                   resultval.get_ptr(), numsteps_);
               }
             }
-            
+
             // this will be a parameter someday
             std::size_t allowedl = 2;
             if ( val2->refine_ && gids.size() == 3 && val2->level_ < allowedl ) {
-              finer_mesh(result,gids);
+              finer_mesh(result, gids);
             }
 
             if (log_)     // send result to logging instance
@@ -115,7 +162,8 @@ namespace hpx { namespace components { namespace amr
     // Implement a finer mesh via interpolation of inter-mesh points
     // Compute the result value for the current time step
     int stencil::finer_mesh(naming::id_type const& result, 
-        std::vector<naming::id_type> const& gids) {
+        std::vector<naming::id_type> const& gids) 
+    {
 
       naming::id_type gval1, gval2, gval3, gval4, gval5;
       boost::tie(gval1, gval2, gval3, gval4, gval5) = 
@@ -125,13 +173,9 @@ namespace hpx { namespace components { namespace amr
                              components::stubs::memory_block::clone_async(gids[1]),
                              components::stubs::memory_block::clone_async(gids[2]));
 
-      access_memory_block<stencil_data> mval1, mval2,mval3,mval4,mval5;
-      boost::tie(mval1,mval2,mval3,mval4,mval5) = 
-                      components::wait(components::stubs::memory_block::get_async(gval1), 
-                           components::stubs::memory_block::get_async(gval2),
-                           components::stubs::memory_block::get_async(gval3),
-                           components::stubs::memory_block::get_async(gval4),
-                           components::stubs::memory_block::get_async(gval5));
+      access_memory_block<stencil_data> mval1, mval2, mval3, mval4, mval5;
+      boost::tie(mval1, mval2, mval3, mval4, mval5) = 
+          detail::get_async(gval1, gval2, gval3, gval4, gval5);
 
       // increase the level by one
       ++mval1->level_;
@@ -155,9 +199,11 @@ namespace hpx { namespace components { namespace amr
       mval5->index_ = 4;
 
       // if the refined point already exists, no need to interpolate
-      if ( mval1->right_alloc_ == 1 && mval1->right_level_ == mval1->level_) mval2->value_ = mval1->right_value_; 
-      if ( mval3->right_alloc_ == 1 && mval3->right_level_ == mval3->level_ ) mval4->value_ = mval3->right_value_; 
-      
+      if (mval1->right_alloc_ == 1 && mval1->right_level_ == mval1->level_) 
+          mval2->value_ = mval1->right_value_; 
+      if (mval3->right_alloc_ == 1 && mval3->right_level_ == mval3->level_) 
+          mval4->value_ = mval3->right_value_; 
+
       // call to user defined interpolation
       interpolation();
 
@@ -169,6 +215,7 @@ namespace hpx { namespace components { namespace amr
                 components::get_component_type<components::amr::stencil>();
       components::amr::amr_mesh child_mesh (
                 components::amr::amr_mesh::create(here, 1, true));
+
       std::vector<naming::id_type> initial_data;
       initial_data.push_back(gval1);
       initial_data.push_back(gval2);
@@ -179,20 +226,19 @@ namespace hpx { namespace components { namespace amr
       std::size_t numvalues = 5;
       std::size_t numsteps = 2;
       std::size_t stencilsize = 3;
+
       bool do_logging = true;
       std::vector<naming::id_type> result_data(
-                  child_mesh.execute(initial_data,function_type,numvalues,numsteps,stencilsize,
-                  do_logging ? logging_type : components::component_invalid));
+          child_mesh.execute(initial_data, function_type, numvalues, numsteps
+            , stencilsize, do_logging ? logging_type : components::component_invalid));
 
-      access_memory_block<stencil_data> r_val1,r_val2,resultval;
-      boost::tie(r_val1,r_val2,resultval) = 
-                      components::wait(components::stubs::memory_block::get_async(result_data[2]), 
-                           components::stubs::memory_block::get_async(result_data[3]),
-                           components::stubs::memory_block::get_async(result));
+      access_memory_block<stencil_data> r_val1, r_val2, resultval;
+      boost::tie(r_val1, r_val2, resultval) = 
+          detail::get_async(result_data[2], result_data[3], result);
 
       // overwrite the coarse point computation
       resultval->value_ = r_val1->value_;
-         
+
       // remember right neighbor value
       resultval->right_alloc_ = 1;
       resultval->right_value_ = r_val2->value_;
@@ -200,14 +246,15 @@ namespace hpx { namespace components { namespace amr
 
       // release result data
       for (std::size_t i = 0; i < result_data.size(); ++i) 
-        components::stubs::memory_block::free(result_data[i]);
+          components::stubs::memory_block::free(result_data[i]);
 
       for (std::size_t i = 0; i < initial_data.size(); ++i) 
-        components::stubs::memory_block::free(initial_data[i]);
+          components::stubs::memory_block::free(initial_data[i]);
 
       return 0;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     naming::id_type stencil::alloc_data(int item, int maxitems, int row)
     {
         naming::id_type result = components::stubs::memory_block::create(
