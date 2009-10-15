@@ -22,7 +22,7 @@ struct stencil_data
     double value_;            // current value
     bool refine_;     // whether to refine
     double right_value_;
-    size_t right_value_level_;
+    size_t right_level_;
     size_t right_alloc_;
 
 #if defined(__cplusplus)

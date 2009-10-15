@@ -120,9 +120,9 @@ namespace hpx { namespace components { namespace amr
       naming::id_type gval1, gval2, gval3, gval4, gval5;
       boost::tie(gval1, gval2, gval3, gval4, gval5) = 
                         components::wait(components::stubs::memory_block::clone_async(gids[0]), 
-                             components::stubs::memory_block::clone_async(gids[0]),
                              components::stubs::memory_block::clone_async(gids[1]),
-                             components::stubs::memory_block::clone_async(gids[2]),
+                             components::stubs::memory_block::clone_async(gids[1]),
+                             components::stubs::memory_block::clone_async(gids[1]),
                              components::stubs::memory_block::clone_async(gids[2]));
 
       access_memory_block<stencil_data> mval1, mval2,mval3,mval4,mval5;
@@ -155,8 +155,8 @@ namespace hpx { namespace components { namespace amr
       mval5->index_ = 4;
 
       // if the refined point already exists, no need to interpolate
-      if ( mval1->right_alloc_ ) mval2->value_ = mval1->right_value_; 
-      if ( mval3->right_alloc_ ) mval4->value_ = mval3->right_value_; 
+      if ( mval1->right_alloc_ == 1 && mval1->right_level_ == mval1->level_) mval2->value_ = mval1->right_value_; 
+      if ( mval3->right_alloc_ == 1 && mval3->right_level_ == mval3->level_ ) mval4->value_ = mval3->right_value_; 
       
       // call to user defined interpolation
       interpolation();
@@ -196,7 +196,7 @@ namespace hpx { namespace components { namespace amr
       // remember right neighbor value
       resultval->right_alloc_ = 1;
       resultval->right_value_ = r_val2->value_;
-      resultval->right_value_level_ = r_val2->level_;
+      resultval->right_level_ = r_val2->level_;
 
       // release result data
       for (std::size_t i = 0; i < result_data.size(); ++i) 
