@@ -20,6 +20,7 @@ struct stencil_data
     size_t timestep_;    // current time step
     size_t level_;    // refinement level
     double value_;            // current value
+    double x_;      // x coordinate value
     bool refine_;     // whether to refine
     double right_value_;
     size_t right_level_;

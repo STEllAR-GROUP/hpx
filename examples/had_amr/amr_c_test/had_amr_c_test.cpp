@@ -11,6 +11,11 @@
 
 #include "rand.hpp"
 
+double xmin = -10.0;
+double xmax =  10.0;
+double dx;
+double dt;
+
 ///////////////////////////////////////////////////////////////////////////
 int generate_initial_data(stencil_data* val, int item, int maxitems, int row)
 {
@@ -28,7 +33,12 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row)
         val->value_ = pow(item - 1./3., 4.) * pow(item - 2./3., 4.);
     */
     //val->value_ = random_numbers();
-    val->value_ = item*item;
+    dx = (xmax-xmin)/(maxitems-1);
+    dt = 0.5*dx;
+
+    double xcoord = xmin + item*dx;
+    val->x_ = xcoord;
+    val->value_ = exp(-xcoord*xcoord);
 
     return 1;
 }
@@ -53,7 +63,7 @@ int evaluate_timestep(stencil_data const* left, stencil_data const* middle,
     //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
     //for (t = 0; t < n; t++)
     //    sum += left->value_+middle->value_ ;
-    result->value_ = 1.0/3.0*(left->value_ + middle->value_ + right->value_);
+    result->value_ = middle->value_ - dt/dx*(middle->value_ - left->value_);
 
     return 1;
 }
@@ -78,7 +88,9 @@ int evaluate_left_bdry_timestep(stencil_data const* middle, stencil_data const* 
     //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
     //for (t = 0; t < n; t++)
     //    sum += middle->value_+right->value_;
-    result->value_ = 0.5*(middle->value_+right->value_);
+    //result->value_ = 0.5*(middle->value_+right->value_);
+    // boundary condition
+    result->value_ = middle->value_;
 
     return 1;
 }
@@ -103,7 +115,8 @@ int evaluate_right_bdry_timestep(stencil_data const* left, stencil_data const* m
     //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
     //for (t = 0; t < n; t++)
     //    sum += left->value_+middle->value_;
-    result->value_ = 0.5*(left->value_+middle->value_);
+    //result->value_ = 0.5*(left->value_+middle->value_);
+    result->value_ = middle->value_ - dt/dx*(middle->value_ - left->value_);
 
     return 1;
 }
