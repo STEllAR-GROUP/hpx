@@ -100,6 +100,8 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "the number of time steps to use for the computation")
             ("stencilsize,z", po::value<std::size_t>(), 
                 "the total (left and right) stencil size for a node")
+            ("parfile,p", po::value<std::string>(), 
+                "the parameter file")
             ("verbose,v", "print calculated values after each time step")
         ;
 
@@ -224,6 +226,25 @@ int main(int argc, char* argv[])
         std::size_t stencilsize = 3;
         if (vm.count("stencilsize"))
             stencilsize = vm["stencilsize"].as<std::size_t>();
+
+        std::string parfile;
+        if (vm.count("parfile")) {
+            parfile = vm["parfile"].as<std::string>();
+            hpx::util::section pars(parfile);
+
+            if ( pars.has_section("had_amr") ) {
+              hpx::util::section *sec = pars.get_section("had_amr");
+              if ( sec->has_entry("lambda") ) {
+                std::string tmp = sec->get_entry("lambda");
+                double lambda = atof(tmp.c_str());
+              }
+              if ( sec->has_entry("lambda") ) {
+                std::string tmp = sec->get_entry("allowedl");
+                std::size_t allowedl = atoi(tmp.c_str());
+              }
+            }
+
+        }
 
         initrand(42, pdist, mean, stddev, numsteps, numvals, num_threads);
 
