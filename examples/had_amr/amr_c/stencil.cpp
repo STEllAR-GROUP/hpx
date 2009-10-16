@@ -115,10 +115,10 @@ namespace hpx { namespace components { namespace amr
         if (gids.size() == 3) 
             middle_timestep = val2->timestep_;
         else if (gids.size() == 2 && column == 0) 
-            middle_timestep = val2->timestep_;      // left boundary point
+            middle_timestep = val1->timestep_;      // left boundary point
         else {
             BOOST_ASSERT(gids.size() == 2);
-            middle_timestep = val1->timestep_;      // right boundary point
+            middle_timestep = val2->timestep_;      // right boundary point
         }
 
         if (middle_timestep < numsteps_) {
@@ -127,17 +127,28 @@ namespace hpx { namespace components { namespace amr
               // this is the actual calculation, call provided (external) function
               evaluate_timestep(val1.get_ptr(), val2.get_ptr(), val3.get_ptr(), 
                   resultval.get_ptr(), numsteps_);
+
+              // copy over the coordinate value to the result
+              resultval->x_ = val2->x_;
             } 
             else if (gids.size() == 2) {
               // bdry computation
               if ( column == 0 ) {
                 evaluate_left_bdry_timestep(val1.get_ptr(), val2.get_ptr(),
                   resultval.get_ptr(), numsteps_);
+
+                // copy over the coordinate value to the result
+                resultval->x_ = val1->x_;
               } else {
                 evaluate_right_bdry_timestep(val1.get_ptr(), val2.get_ptr(),
                   resultval.get_ptr(), numsteps_);
+
+                // copy over the coordinate value to the result
+                resultval->x_ = val2->x_;
               }
             }
+
+            // copy over the coordinate value to the result
 
             // this will be a parameter someday
             std::size_t allowedl = 2;
@@ -203,6 +214,10 @@ namespace hpx { namespace components { namespace amr
           mval2->value_ = mval1->right_value_; 
       if (mval3->right_alloc_ == 1 && mval3->right_level_ == mval3->level_) 
           mval4->value_ = mval3->right_value_; 
+
+      // this updates the coordinate position
+      mval2->x_ = 0.5*(mval1->x_ + mval3->x_);
+      mval4->x_ = 0.5*(mval3->x_ + mval5->x_);
 
       // call to user defined interpolation
       interpolation();
