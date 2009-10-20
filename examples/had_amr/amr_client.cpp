@@ -26,9 +26,9 @@ namespace po = boost::program_options;
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(std::size_t numvals, std::size_t numsteps, std::size_t stencilsize, bool do_logging)
+int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
+             components::amr::server::Parameter const& par)
 {
-    std::cout << " main Stencilsize : " << stencilsize << std::endl;
     // get component types needed below
     components::component_type function_type = 
         components::get_component_type<components::amr::stencil>();
@@ -42,8 +42,8 @@ int hpx_main(std::size_t numvals, std::size_t numsteps, std::size_t stencilsize,
 
         hpx::util::high_resolution_timer t;
         std::vector<naming::id_type> result_data(
-            mesh.init_execute(function_type, numvals, numsteps, stencilsize,
-                do_logging ? logging_type : components::component_invalid));
+            mesh.init_execute(function_type, numvals, numsteps,
+                do_logging ? logging_type : components::component_invalid,par));
         printf("Elapsed time: %f s\n", t.elapsed());
 
         // get some output memory_block_data instances
@@ -98,8 +98,6 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "variance value of specified distribution")
             ("numsteps,s", po::value<std::size_t>(), 
                 "the number of time steps to use for the computation")
-            ("stencilsize,z", po::value<std::size_t>(), 
-                "the total (left and right) stencil size for a node")
             ("parfile,p", po::value<std::string>(), 
                 "the parameter file")
             ("verbose,v", "print calculated values after each time step")
@@ -222,10 +220,13 @@ int main(int argc, char* argv[])
         std::size_t numsteps = 3;
         if (vm.count("numsteps"))
             numsteps = vm["numsteps"].as<std::size_t>();
-        
-        std::size_t stencilsize = 3;
-        if (vm.count("stencilsize"))
-            stencilsize = vm["stencilsize"].as<std::size_t>();
+
+        components::amr::server::Parameter par;
+        // default pars
+        par.stencilsize = 3;
+        par.allowedl    = 0;
+        par.loglevel    = 0;
+        par.lambda      = 0.15;
 
         std::string parfile;
         if (vm.count("parfile")) {
@@ -236,14 +237,21 @@ int main(int argc, char* argv[])
               hpx::util::section *sec = pars.get_section("had_amr");
               if ( sec->has_entry("lambda") ) {
                 std::string tmp = sec->get_entry("lambda");
-                double lambda = atof(tmp.c_str());
+                par.lambda = atof(tmp.c_str());
               }
-              if ( sec->has_entry("lambda") ) {
+              if ( sec->has_entry("allowedl") ) {
                 std::string tmp = sec->get_entry("allowedl");
-                std::size_t allowedl = atoi(tmp.c_str());
+                par.allowedl = atoi(tmp.c_str());
+              }
+              if ( sec->has_entry("loglevel") ) {
+                std::string tmp = sec->get_entry("loglevel");
+                par.loglevel = atoi(tmp.c_str());
+              }
+              if ( sec->has_entry("stencilsize") ) {
+                std::string tmp = sec->get_entry("stencilsize");
+                par.stencilsize = atoi(tmp.c_str());
               }
             }
-
         }
 
         initrand(42, pdist, mean, stddev, numsteps, numvals, num_threads);
@@ -253,7 +261,7 @@ int main(int argc, char* argv[])
         if (mode == hpx::runtime::worker) 
             rt.run(num_threads);
         else 
-            rt.run(boost::bind (hpx_main, numvals, numsteps, stencilsize, do_logging), num_threads);
+            rt.run(boost::bind (hpx_main, numvals, numsteps, do_logging,par), num_threads);
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";

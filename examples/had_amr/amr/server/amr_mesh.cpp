@@ -258,9 +258,12 @@ namespace hpx { namespace components { namespace amr { namespace server
     /// This is the main entry point of this component. 
     std::vector<naming::id_type> amr_mesh::init_execute(
         components::component_type function_type, std::size_t numvalues, 
-        std::size_t numsteps, std::size_t stencilsize, 
-        components::component_type logging_type)
+        std::size_t numsteps,
+        components::component_type logging_type,Parameter const& par)
     {
+      // TEST
+      std::size_t stencilsize = 3;
+
       //  std::cout << " init_execute Stencilsize : " << stencilsize << std::endl;
         std::vector<naming::id_type> result_data;
 
@@ -329,9 +332,11 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::vector<naming::id_type> const& initial_data,
         components::component_type function_type, std::size_t numvalues, 
         std::size_t numsteps,
-        std::size_t stencilsize,
-        components::component_type logging_type)
+        components::component_type logging_type,Parameter const& par)
     {
+      // TEST
+        std::size_t stencilsize = 3;
+
     //    std::cout << " execute Stencilsize : " << stencilsize << std::endl;
         std::vector<naming::id_type> result_data;
 

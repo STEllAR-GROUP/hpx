@@ -240,12 +240,13 @@ namespace hpx { namespace components { namespace amr
 
       std::size_t numvalues = 5;
       std::size_t numsteps = 2;
-      std::size_t stencilsize = 3;
 
       bool do_logging = true;
+      // TEMPORARY FIX TEST
+      server::Parameter par;
       std::vector<naming::id_type> result_data(
-          child_mesh.execute(initial_data, function_type, numvalues, numsteps
-            , stencilsize, do_logging ? logging_type : components::component_invalid));
+          child_mesh.execute(initial_data, function_type, numvalues, numsteps, 
+            do_logging ? logging_type : components::component_invalid,par));
 
       access_memory_block<stencil_data> r_val1, r_val2, resultval;
       boost::tie(r_val1, r_val2, resultval) = 
