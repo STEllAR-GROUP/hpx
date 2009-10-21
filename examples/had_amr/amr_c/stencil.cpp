@@ -69,7 +69,8 @@ namespace hpx { namespace components { namespace amr
     // Implement actual functionality of this stencil
     // Compute the result value for the current time step
     int stencil::eval(naming::id_type const& result, 
-        std::vector<naming::id_type> const& gids, int row, int column)
+        std::vector<naming::id_type> const& gids, int row, int column,
+        server::Parameter const& par)
     {
         BOOST_ASSERT(gids.size() <= 3);
 
@@ -150,10 +151,9 @@ namespace hpx { namespace components { namespace amr
 
             // copy over the coordinate value to the result
 
-            // this will be a parameter someday
-            std::size_t allowedl = 2;
+            std::size_t allowedl = par.allowedl;
             if ( val2->refine_ && gids.size() == 3 && val2->level_ < allowedl ) {
-              finer_mesh(result, gids);
+              finer_mesh(result, gids,par);
             }
 
             if (log_)     // send result to logging instance
@@ -173,7 +173,8 @@ namespace hpx { namespace components { namespace amr
     // Implement a finer mesh via interpolation of inter-mesh points
     // Compute the result value for the current time step
     int stencil::finer_mesh(naming::id_type const& result, 
-        std::vector<naming::id_type> const& gids) 
+        std::vector<naming::id_type> const& gids,
+        server::Parameter const& par) 
     {
 
       naming::id_type gval1, gval2, gval3, gval4, gval5;
@@ -242,8 +243,6 @@ namespace hpx { namespace components { namespace amr
       std::size_t numsteps = 2;
 
       bool do_logging = true;
-      // TEMPORARY FIX TEST
-      server::Parameter par;
       std::vector<naming::id_type> result_data(
           child_mesh.execute(initial_data, function_type, numvalues, numsteps, 
             do_logging ? logging_type : components::component_invalid,par));

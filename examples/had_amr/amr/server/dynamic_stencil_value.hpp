@@ -23,6 +23,8 @@
 #include "stencil_value_in_adaptor.hpp"
 #include "stencil_value_out_adaptor.hpp"
 
+#include "../../amr_client.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server 
 {
@@ -96,7 +98,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// Set the gid of the component implementing the actual time evolution
         /// functionality
         void set_functional_component(naming::id_type const& gid, int row, 
-            int column, int stencilsize);
+            int column, int stencilsize,Parameter const& par);
 
         void start();
 
@@ -119,9 +121,9 @@ namespace hpx { namespace components { namespace amr { namespace server
             &dynamic_stencil_value::connect_input_ports
         > connect_input_ports_action;
 
-        typedef hpx::actions::action4<
+        typedef hpx::actions::action5<
             dynamic_stencil_value, dynamic_stencil_value_set_functional_component, 
-            naming::id_type const&, int, int, int,
+            naming::id_type const&, int, int, int,Parameter const&,
             &dynamic_stencil_value::set_functional_component
         > set_functional_component_action;
 
@@ -147,6 +149,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         int row_;             // position of this stencil in whole graph
         int column_;
         std::size_t stencilsize_;
+        Parameter par_;
 
         typedef lcos::mutex mutex_type;
         mutex_type mtx_;

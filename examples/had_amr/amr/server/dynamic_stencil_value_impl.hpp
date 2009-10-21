@@ -18,6 +18,8 @@
 #include "dynamic_stencil_value.hpp"
 #include "../functional_component.hpp"
 
+#include "../../amr_client.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server 
 {
@@ -27,7 +29,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         template <typename Adaptor>
         static int
         call(naming::id_type const& gid, naming::id_type const& value_gid, 
-            int row, int column, Adaptor &in)
+            int row, int column, Adaptor &in,Parameter const& par)
         {
             using namespace boost::assign;
 
@@ -37,7 +39,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             }
 
             return components::amr::stubs::functional_component::eval(
-                gid, value_gid, input_gids, row, column);
+                gid, value_gid, input_gids, row, column,par);
         }
     };
 
@@ -164,7 +166,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             // The eval action returns an integer allowing to finish 
             // computation (>0: still to go, 0: last step, <0: overdone)
             timesteps_to_go = eval_helper::call(functional_gid_, 
-                value_gids_[0], row_, column_, in_);
+                value_gids_[0], row_, column_, in_, par_);
 
             // we're done if this is exactly the last time-step and we are not 
             // supposed to return the final value, no need to wait for further
@@ -268,13 +270,14 @@ namespace hpx { namespace components { namespace amr { namespace server
     ///////////////////////////////////////////////////////////////////////////
     inline void 
     dynamic_stencil_value::set_functional_component(naming::id_type const& gid,
-        int row, int column, int stencilsize)
+        int row, int column, int stencilsize,Parameter const& par)
     {
         // store gid of functional component
         functional_gid_ = gid;
         row_ = row;
         column_ = column;
         stencilsize_ = stencilsize;
+        par_ = par;
 
         sem_in_.resize(stencilsize);
         sem_out_.resize(stencilsize);

@@ -60,7 +60,8 @@ namespace hpx { namespace components { namespace amr { namespace server
     // Create functional components, one for each data point, use those to 
     // initialize the stencil value instances
     void amr_mesh::init_stencils(distributed_iterator_range_type const& stencils,
-        distributed_iterator_range_type const& functions, int static_step,int stencilsize,int numvalues)
+        distributed_iterator_range_type const& functions, int static_step,int stencilsize,
+        int numvalues,Parameter const& par)
     {
         components::distributing_factory::iterator_type stencil = stencils.first;
         components::distributing_factory::iterator_type function = functions.first;
@@ -68,16 +69,12 @@ namespace hpx { namespace components { namespace amr { namespace server
         for (int column = 0; stencil != stencils.second; ++stencil, ++function, ++column)
         {
             BOOST_ASSERT(function != functions.second);
-          //  components::amr::stubs::dynamic_stencil_value::set_functional_component(
-          //      *stencil, *function, static_step, column,stencilsize);
             if ( column == 0 || column == numvalues-1 ) {
               components::amr::stubs::dynamic_stencil_value::set_functional_component(
-                  *stencil, *function, static_step, column,2);
-            //  components::amr::stubs::dynamic_stencil_value::set_functional_component(
-            //      *stencil, *function, static_step, column,stencilsize);
+                  *stencil, *function, static_step, column,2,par);
             } else {
               components::amr::stubs::dynamic_stencil_value::set_functional_component(
-                *stencil, *function, static_step, column,stencilsize);
+                *stencil, *function, static_step, column,stencilsize,par);
             }
         }
         BOOST_ASSERT(function == functions.second);
@@ -261,10 +258,9 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::size_t numsteps,
         components::component_type logging_type,Parameter const& par)
     {
-      // TEST
-      std::size_t stencilsize = 3;
+        std::size_t stencilsize = par.stencilsize;
 
-      //  std::cout << " init_execute Stencilsize : " << stencilsize << std::endl;
+        //  std::cout << " init_execute Stencilsize : " << stencilsize << std::endl;
         std::vector<naming::id_type> result_data;
 
         components::component_type stencil_type = 
@@ -295,8 +291,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         init(locality_results(functions), locality_results(logging), numsteps);
 
         // initialize stencil_values using the stencil (functional) components
-        init_stencils(locality_results(stencils[0]), locality_results(functions), 0, stencilsize, numvalues);
-        init_stencils(locality_results(stencils[1]), locality_results(functions), 1, stencilsize, numvalues);
+        init_stencils(locality_results(stencils[0]), locality_results(functions), 0, stencilsize, numvalues,par);
+        init_stencils(locality_results(stencils[1]), locality_results(functions), 1, stencilsize, numvalues,par);
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(2);
@@ -368,8 +364,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         init(locality_results(functions), locality_results(logging), numsteps);
 
         // initialize stencil_values using the stencil (functional) components
-        init_stencils(locality_results(stencils[0]), locality_results(functions), 0, stencilsize, numvalues);
-        init_stencils(locality_results(stencils[1]), locality_results(functions), 1, stencilsize, numvalues);
+        init_stencils(locality_results(stencils[0]), locality_results(functions), 0, stencilsize, numvalues,par);
+        init_stencils(locality_results(stencils[1]), locality_results(functions), 1, stencilsize, numvalues,par);
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(2);

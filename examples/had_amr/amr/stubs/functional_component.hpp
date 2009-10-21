@@ -14,6 +14,8 @@
 
 #include "../server/functional_component.hpp"
 
+#include "../../amr_client.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace stubs 
 {
@@ -28,22 +30,23 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         // functional component derived from this class
         static lcos::future_value<int> eval_async(naming::id_type const& gid, 
             naming::id_type const& result, 
-            std::vector<naming::id_type> const& gids, int row, int column)
+            std::vector<naming::id_type> const& gids, int row, int column,
+            server::Parameter const& par)
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::functional_component::eval_action action_type;
-            return lcos::eager_future<action_type>(gid, result, gids, row, column);
+            return lcos::eager_future<action_type>(gid, result, gids, row, column,par);
         }
 
         static int eval(naming::id_type const& gid, 
             naming::id_type const& result, std::vector<naming::id_type> const& gids,
-            int row, int column)
+            int row, int column,server::Parameter const& par)
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future
-            return eval_async(gid, result, gids, row, column).get();
+            return eval_async(gid, result, gids, row, column,par).get();
         }
 
         ///////////////////////////////////////////////////////////////////////

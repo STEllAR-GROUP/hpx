@@ -12,6 +12,8 @@
 
 #include "../server/dynamic_stencil_value.hpp"
 
+#include "../../amr_client.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace stubs 
 {
@@ -85,12 +87,13 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         /// Set the gid of the component implementing the actual time evolution
         /// functionality
         static void set_functional_component(naming::id_type const& gid, 
-            naming::id_type const& functiongid, int row, int column,int stencilsize)
+            naming::id_type const& functiongid, int row, int column,int stencilsize,
+            server::Parameter const& par)
         {
             typedef
                 amr::server::dynamic_stencil_value::set_functional_component_action 
             action_type;
-            applier::apply<action_type>(gid, functiongid, row, column, stencilsize);
+            applier::apply<action_type>(gid, functiongid, row, column, stencilsize,par);
         }
         
         ///////////////////////////////////////////////////////////////////////

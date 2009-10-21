@@ -41,12 +41,14 @@ namespace hpx { namespace components { namespace amr
         /// is a vector of gids referencing the memory blocks of the results of
         /// previous time step.
         int eval(naming::id_type const& result, 
-            std::vector<naming::id_type> const& gids, int row, int column);
+            std::vector<naming::id_type> const& gids, int row, int column,
+            server::Parameter const& par);
 
         // this function creates a finer mesh from 3 input gids and evolves that
         // finer mesh for two steps.
         int finer_mesh(naming::id_type const& result, 
-            std::vector<naming::id_type> const& gids);
+            std::vector<naming::id_type> const& gids,
+            server::Parameter const& par);
 
         /// The alloc function is supposed to create a new memory block instance 
         /// suitable for storing all data needed for a single time step. 
