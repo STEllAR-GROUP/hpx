@@ -330,8 +330,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::size_t numsteps,
         components::component_type logging_type,Parameter const& par)
     {
-      // TEST
-        std::size_t stencilsize = 3;
+        std::size_t stencilsize = par.stencilsize;
 
     //    std::cout << " execute Stencilsize : " << stencilsize << std::endl;
         std::vector<naming::id_type> result_data;

@@ -40,6 +40,11 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         components::amr::amr_mesh mesh (
             components::amr::amr_mesh::create(here, 1, true));
 
+        if ( par.loglevel > 0 ) {
+          // over-ride a false command line argument
+          do_logging = true;
+        }
+
         hpx::util::high_resolution_timer t;
         std::vector<naming::id_type> result_data(
             mesh.init_execute(function_type, numvals, numsteps,
@@ -227,6 +232,8 @@ int main(int argc, char* argv[])
         par.allowedl    = 0;
         par.loglevel    = 0;
         par.lambda      = 0.15;
+        par.nx0         = numvals;
+        par.nt0         = numsteps;
 
         std::string parfile;
         if (vm.count("parfile")) {
@@ -250,6 +257,18 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("stencilsize") ) {
                 std::string tmp = sec->get_entry("stencilsize");
                 par.stencilsize = atoi(tmp.c_str());
+              }
+              if ( sec->has_entry("nx0") ) {
+                std::string tmp = sec->get_entry("nx0");
+                par.nx0 = atoi(tmp.c_str());
+                // over-ride command line argument if present
+                numvals = par.nx0;
+              }
+              if ( sec->has_entry("nt0") ) {
+                std::string tmp = sec->get_entry("nt0");
+                par.nt0 = atoi(tmp.c_str());
+                // over-ride command line argument if present
+                numsteps = par.nt0;
               }
             }
         }

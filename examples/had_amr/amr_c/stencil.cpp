@@ -242,7 +242,10 @@ namespace hpx { namespace components { namespace amr
       std::size_t numvalues = 5;
       std::size_t numsteps = 2;
 
-      bool do_logging = true;
+      bool do_logging = false;
+      if ( par.loglevel > 0 ) {
+        do_logging = true;
+      }
       std::vector<naming::id_type> result_data(
           child_mesh.execute(initial_data, function_type, numvalues, numsteps, 
             do_logging ? logging_type : components::component_invalid,par));
