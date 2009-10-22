@@ -87,6 +87,12 @@ namespace hpx { namespace components
             this->base_type::shutdown_all(gid_);
         }
 
+        /// \brief Retrieve configuration information
+        void get_config(util::section& ini)
+        {
+            this->base_type::get_config(gid_, ini);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         naming::id_type const& get_gid() const
         {

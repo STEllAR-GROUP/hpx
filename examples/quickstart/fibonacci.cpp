@@ -75,12 +75,19 @@ int fib (naming::id_type that_prefix, int n, int delay_coeff)
     fibonacci_future n1(that_prefix, this_prefix, n - 1, delay_coeff);
     fibonacci_future n2(this_prefix, that_prefix, n - 2, delay_coeff);
 
+//     std::cout << "*";
+
     return n1.get() + n2.get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argument, int delay_coeff, int& result, double& elapsed)
 {
+    // try to get arguments from application configuration
+    runtime& rt = get_runtime();
+    argument = boost::lexical_cast<int>(
+        rt.get_config().get_entry("application.fibonacci.argument", argument));
+
     // get list of all known localities
     std::vector<naming::id_type> prefixes;
     applier::applier& appl = applier::get_applier();
@@ -120,6 +127,8 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("help,h", "print out program usage (this message)")
             ("run_agas_server,r", "run AGAS server as part of this runtime instance")
             ("worker,w", "run this instance in worker (non-console) mode")
+            ("config", po::value<std::string>(), 
+                "load the specified file as an application configuration file")
             ("agas,a", po::value<std::string>(), 
                 "the IP address the AGAS server is running on (default taken "
                 "from hpx.ini), expected format: 192.168.1.1:7912")
@@ -228,8 +237,13 @@ int main(int argc, char* argv[])
         if (vm.count("value"))
             argument = vm["value"].as<int>();
 
-        if (vm.count("worker"))
+        if (vm.count("worker")) {
             mode = hpx::runtime::worker;
+            if (vm.count("config")) {
+                std::cerr << "fibonacci: --config option ignored, used for console "
+                             "instance only\n";
+            }
+        }
 
         if (vm.count("busywait"))
             delay_coeff = vm["busywait"].as<int>();
@@ -248,6 +262,14 @@ int main(int argc, char* argv[])
             rt.run(num_threads);
         }
         else {
+            // if we've got a configuration file (as console) we read it in,
+            // otherwise this information will be automatically pulled from 
+            // the console
+            if (vm.count("config")) {
+                std::string config(vm["config"].as<std::string>());
+                rt.get_config().load_application_configuration(config.c_str());
+            }
+
             rt.run(boost::bind(hpx_main, argument, delay_coeff, 
                 boost::ref(result), boost::ref(elapsed)), num_threads);
 

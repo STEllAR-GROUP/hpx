@@ -19,6 +19,8 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/ini.hpp>
+#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/portable_binary_oarchive.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -98,7 +100,7 @@ section::section (std::string const& filename, section* root)
 }
 
 section::section (const section & in)
-  : root_(this_()), name_(in.get_name())
+  : root_(this_()), name_(in.get_name()), section_env_(in.section_env_)
 {
     regex_init();
 
@@ -111,6 +113,25 @@ section::section (const section & in)
     section_map::iterator send = s.end();
     for (section_map::iterator si = s.begin(); si != send; ++si)
         add_section (si->first, si->second, get_root());
+}
+
+section& section::operator=(section const& rhs)
+{
+    if (this != &rhs) {
+        name_ = rhs.get_name();
+        section_env_ = rhs.section_env_;
+
+        entry_map const& e = rhs.get_entries();
+        entry_map::const_iterator end = e.end();
+        for (entry_map::const_iterator i = e.begin (); i != end; ++i)
+            add_entry(i->first, i->second);
+
+        section_map s = rhs.get_sections();
+        section_map::iterator send = s.end();
+        for (section_map::iterator si = s.begin(); si != send; ++si)
+            add_section (si->first, si->second, get_root());
+    }
+    return *this;
 }
 
 void section::read (std::string const& filename)
@@ -586,7 +607,7 @@ void section::expand_bracket(std::string& value, std::string::size_type begin) c
         std::string to_expand = value.substr(begin+2, end-begin-2);
         std::string::size_type colon = find_next(":", to_expand);
         if (colon == std::string::npos) {
-            value.replace(begin, end-begin+1, root_->get_entry(to_expand, ""));
+            value.replace(begin, end-begin+1, root_->get_entry(to_expand, std::string("")));
         }
         else {
             value.replace(begin, end-begin+1, 
@@ -623,6 +644,46 @@ std::string section::expand_entry (std::string value) const
     expand_entry(value, (std::string::size_type)-1);
     return value;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename Archive>
+void section::save(Archive& ar, const unsigned int version) const
+{
+    using namespace boost::serialization;
+
+    ar << make_nvp("name", name_);
+    ar << make_nvp("entries", entries_);
+    ar << make_nvp("section_env", section_env_);
+    ar << make_nvp("sections", sections_);
+}
+template <typename Archive>
+void section::load(Archive& ar, const unsigned int version)
+{
+    using namespace boost::serialization;
+
+    ar >> make_nvp("name", name_);
+    ar >> make_nvp("entries", entries_);
+    ar >> make_nvp("section_env", section_env_);
+    ar >> make_nvp("sections", sections_);
+
+    set_root(this, true);     // make this the current root
+}
+
+    ///////////////////////////////////////////////////////////////////////////
+    // explicit instantiation for the correct archive types
+#if HPX_USE_PORTABLE_ARCHIVES != 0
+template HPX_EXPORT void 
+section::save(util::portable_binary_oarchive&, const unsigned int version) const;
+
+template HPX_EXPORT void 
+section::load(util::portable_binary_iarchive&, const unsigned int version);
+#else
+template HPX_EXPORT void 
+section::save(boost::archive::binary_oarchive&, const unsigned int version) const;
+
+template HPX_EXPORT void 
+section::load(boost::archive::binary_iarchive&, const unsigned int version);
+#endif
 
 }}  // namespace hpx::util
 

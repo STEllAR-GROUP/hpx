@@ -11,6 +11,7 @@
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/lcos/eager_future.hpp>
+#include <hpx/util/ini.hpp>
 
 namespace hpx { namespace components { namespace stubs
 {
@@ -139,6 +140,24 @@ namespace hpx { namespace components { namespace stubs
         {
             hpx::applier::apply<server::runtime_support::shutdown_all_action>(
                 hpx::applier::get_applier().get_runtime_support_gid());
+        }
+
+        /// \brief Retrieve configuration information
+        static lcos::future_value<util::section> get_config_async(
+            naming::id_type const& targetgid) 
+        {
+            // Create an eager_future, execute the required action,
+            // we simply return the initialized future_value, the caller needs
+            // to call get() on the return value to obtain the result
+            typedef server::runtime_support::get_config_action action_type;
+            return lcos::eager_future<action_type>(targetgid);
+        }
+
+        static void get_config(naming::id_type const& targetgid, util::section& ini)
+        {
+            // The following get yields control while the action above 
+            // is executed and the result is returned to the eager_future
+            ini = get_config_async(targetgid).get();
         }
     };
 

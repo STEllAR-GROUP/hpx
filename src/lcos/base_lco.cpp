@@ -6,6 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/lcos/base_lco.hpp>
+#include <hpx/util/ini.hpp>
 #include <hpx/util/serialize_exception.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -34,6 +35,9 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<int>::set_result_action,
     set_result_action_int);
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<hpx::util::section>::set_result_action,
+    set_result_action_int);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco);
@@ -41,4 +45,5 @@ HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<hpx::naming::id_typ
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<std::vector<hpx::naming::id_type> >);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<double>);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<int>);
+HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<hpx::util::section>);
 

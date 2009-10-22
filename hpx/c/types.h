@@ -18,7 +18,7 @@
 # endif
 #else
 # if !defined(_MSC_VER)
-//typedef unsigned long long uint64_t;
+#  include <stdint.h>
 # else
 typedef unsigned __int64 uint64_t;
 # endif

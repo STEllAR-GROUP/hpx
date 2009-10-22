@@ -19,6 +19,9 @@ namespace hpx { namespace util
         using namespace boost::assign;
         std::vector<std::string> lines; 
         lines +=
+            // create an empty application section
+            "[application]",
+
             // create system and application instance specific entries
             "[system]",
             "pid = " + boost::lexical_cast<std::string>(getpid()),
@@ -127,6 +130,26 @@ namespace hpx { namespace util
             }
         }
         return naming::locality(HPX_NAME_RESOLVER_ADDRESS, HPX_NAME_RESOLVER_PORT);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    bool runtime_configuration::load_application_configuration(
+        char const* filename, error_code& ec)
+    {
+        try {
+            section appcfg(filename);
+            section applroot;
+            applroot.add_section("application", appcfg);
+            this->section::merge(applroot);
+        }
+        catch (hpx::exception const& e) {
+            // file doesn't exist or is ill-formed
+            if (&ec == &throws)
+                throw;
+            ec = make_error_code(e.get_error(), e.what(), hpx::rethrow);
+            return false;
+        }
+        return true;
     }
 
 }}

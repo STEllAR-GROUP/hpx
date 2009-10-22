@@ -45,6 +45,9 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::shutdown_all_action,
     shutdown_all_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::runtime_support::get_config_action,
+    get_config_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::runtime_support);
@@ -55,7 +58,7 @@ namespace hpx { namespace components { namespace server
     runtime_support::runtime_support(util::section& ini, 
             naming::id_type const& prefix, naming::resolver_client& agas_client, 
             applier::applier& applier)
-      : stopped_(false)
+      : stopped_(false), ini_(ini)
     {
         load_components(ini, prefix, agas_client);
     }
@@ -173,6 +176,12 @@ namespace hpx { namespace components { namespace server
 
         // now make sure the local locality gets shut down as well.
         stop();
+    }
+
+    // Retrieve configuration information
+    util::section runtime_support::get_config()
+    {
+        return *ini_.get_section("application");
     }
 
     ///////////////////////////////////////////////////////////////////////////

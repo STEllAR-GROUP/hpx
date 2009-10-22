@@ -54,7 +54,8 @@ namespace hpx
         /// construct a new instance of a runtime
         runtime(naming::resolver_client& agas_client) 
           : counters_(agas_client),
-            on_exit_functions_("on_exit_functions", false)
+            on_exit_functions_("on_exit_functions", false),
+            ini_(util::detail::get_logging_data())
         {}
 
         /// \brief Manage list of functions to call on exit
@@ -89,6 +90,16 @@ namespace hpx
         // OS thread
         static boost::thread_specific_ptr<runtime*> runtime_;
 
+        /// \brief access configuration information
+        util::runtime_configuration& get_config()
+        {
+            return ini_;
+        }
+        util::runtime_configuration const& get_config() const
+        {
+            return ini_;
+        }
+
     protected:
         void init_tss();
         void deinit_tss();
@@ -99,6 +110,8 @@ namespace hpx
         // list of functions to call on exit
         typedef boost::lockfree::fifo<boost::function<void()> > on_exit_type;
         on_exit_type on_exit_functions_;
+
+        util::runtime_configuration ini_;
     };
 
     /// \class runtime_impl runtime.hpp hpx/runtime.hpp
@@ -351,7 +364,6 @@ namespace hpx
     private:
         mode mode_;
         int result_;
-        util::runtime_configuration ini_;
         util::io_service_pool agas_pool_; 
         util::io_service_pool parcel_pool_; 
         util::io_service_pool timer_pool_; 

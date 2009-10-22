@@ -46,6 +46,8 @@ namespace hpx { namespace components { namespace server
             runtime_support_free_component = 2,     ///< delete existing components
             runtime_support_shutdown = 3,           ///< shut down this runtime instance
             runtime_support_shutdown_all = 4,       ///< shut down the runtime instances of all localities
+
+            runtime_support_get_config = 5,         ///< get configuration information 
         };
 
         // This is the component id. Every component needs to have an embedded
@@ -112,6 +114,9 @@ namespace hpx { namespace components { namespace server
         /// \brief Action shut down runtime system instances on all localities
         void shutdown_all();
 
+        /// \brief Retrieve configuration information
+        util::section get_config();
+
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
@@ -143,6 +148,11 @@ namespace hpx { namespace components { namespace server
             runtime_support, runtime_support_shutdown_all, 
             &runtime_support::shutdown_all
         > shutdown_all_action;
+
+        typedef hpx::actions::result_action0<
+            runtime_support, util::section, runtime_support_get_config, 
+            &runtime_support::get_config
+        > get_config_action;
 
         /// \brief Start the runtime_support component
         void run();
@@ -178,6 +188,8 @@ namespace hpx { namespace components { namespace server
 
         component_map_type components_;
         module_list_type modules_;
+
+        util::section& ini_;
     };
 
 }}}

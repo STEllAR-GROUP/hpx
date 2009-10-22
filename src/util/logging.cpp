@@ -269,9 +269,10 @@ namespace hpx { namespace util
             util::section const* logini = ini.get_section("hpx.logging.agas");
             BOOST_ASSERT(NULL != logini);
 
-            loglevel = logini->get_entry("level", "");
-            logdest = logini->get_entry("destination", "");
-            logformat = detail::unescape(logini->get_entry("format", ""));
+            std::string empty;
+            loglevel = logini->get_entry("level", empty);
+            logdest = logini->get_entry("destination", empty);
+            logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
         int lvl = boost::logging::level::disable_all;
@@ -314,9 +315,10 @@ namespace hpx { namespace util
             util::section const* logini = ini.get_section("hpx.logging.timing");
             BOOST_ASSERT(NULL != logini);
 
-            loglevel = logini->get_entry("level", "");
-            logdest = logini->get_entry("destination", "");
-            logformat = detail::unescape(logini->get_entry("format", ""));
+            std::string empty;
+            loglevel = logini->get_entry("level", empty);
+            logdest = logini->get_entry("destination", empty);
+            logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
         int lvl = boost::logging::level::disable_all;
@@ -362,9 +364,10 @@ namespace hpx { namespace util
             util::section const* logini = ini.get_section("hpx.logging");
             BOOST_ASSERT(NULL != logini);
 
-            loglevel = logini->get_entry("level", "");
-            logdest = logini->get_entry("destination", "");
-            logformat = detail::unescape(logini->get_entry("format", ""));
+            std::string empty;
+            loglevel = logini->get_entry("level", empty);
+            logdest = logini->get_entry("destination", empty);
+            logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
         int lvl = boost::logging::level::disable_all;
@@ -439,9 +442,10 @@ namespace hpx { namespace util
             util::section const* logini = ini.get_section("hpx.logging.application");
             BOOST_ASSERT(NULL != logini);
 
-            loglevel = logini->get_entry("level", "");
-            logdest = logini->get_entry("destination", "");
-            logformat = detail::unescape(logini->get_entry("format", ""));
+            std::string empty;
+            loglevel = logini->get_entry("level", empty);
+            logdest = logini->get_entry("destination", empty);
+            logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
         int lvl = boost::logging::level::disable_all;
@@ -481,9 +485,10 @@ namespace hpx { namespace util
             util::section const* logini = ini.get_section("hpx.logging.console.agas");
             BOOST_ASSERT(NULL != logini);
 
-            loglevel = logini->get_entry("level", "");
-            logdest = logini->get_entry("destination", "");
-            logformat = detail::unescape(logini->get_entry("format", ""));
+            std::string empty;
+            loglevel = logini->get_entry("level", empty);
+            logdest = logini->get_entry("destination", empty);
+            logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
         int lvl = boost::logging::level::disable_all;
@@ -517,9 +522,10 @@ namespace hpx { namespace util
             util::section const* logini = ini.get_section("hpx.logging.console.timing");
             BOOST_ASSERT(NULL != logini);
 
-            loglevel = logini->get_entry("level", "");
-            logdest = logini->get_entry("destination", "");
-            logformat = detail::unescape(logini->get_entry("format", ""));
+            std::string empty;
+            loglevel = logini->get_entry("level", empty);
+            logdest = logini->get_entry("destination", empty);
+            logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
         int lvl = boost::logging::level::disable_all;
@@ -553,9 +559,10 @@ namespace hpx { namespace util
             util::section const* logini = ini.get_section("hpx.logging.console");
             BOOST_ASSERT(NULL != logini);
 
-            loglevel = logini->get_entry("level", "");
-            logdest = logini->get_entry("destination", "");
-            logformat = detail::unescape(logini->get_entry("format", ""));
+            std::string empty;
+            loglevel = logini->get_entry("level", empty);
+            logdest = logini->get_entry("destination", empty);
+            logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
         int lvl = boost::logging::level::disable_all;
@@ -588,9 +595,10 @@ namespace hpx { namespace util
             util::section const* logini = ini.get_section("hpx.logging.console.application");
             BOOST_ASSERT(NULL != logini);
 
-            loglevel = logini->get_entry("level", "");
-            logdest = logini->get_entry("destination", "");
-            logformat = detail::unescape(logini->get_entry("format", ""));
+            std::string empty;
+            loglevel = logini->get_entry("level", empty);
+            logdest = logini->get_entry("destination", empty);
+            logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
         int lvl = boost::logging::level::disable_all;

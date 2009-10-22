@@ -16,7 +16,7 @@ namespace hpx { namespace util
     // The runtime_configuration class is a wrapper for the runtime 
     // configuration data allowing to extract configuration information in a 
     // more convenient way
-    class runtime_configuration : public section
+    class HPX_API_EXPORT runtime_configuration : public section
     {
     public:
         // initialize and load configuration information
@@ -31,6 +31,11 @@ namespace hpx { namespace util
         // configuration info can be found).
         naming::locality get_agas_locality(
             std::string default_address, boost::uint16_t default_port);
+
+        // Load application specific configuration and merge it with the
+        // default configuration loaded from hpx.ini
+        bool load_application_configuration(char const* filename, 
+            error_code& ec = throws);
     };
 
 }}

@@ -24,6 +24,8 @@ bool parse_commandline(char const* name, int argc, char *argv[],
             ("help,h", "print out program usage (this message)")
             ("run_agas_server,r", "run AGAS server as part of this runtime instance")
             ("console,c", "run this instance as the console")
+            ("config", po::value<std::string>(), 
+                "load the specified file as an application configuration file")
             ("agas,a", po::value<std::string>(), 
                 "the IP address the AGAS server is running on (default taken "
                 "from hpx.ini), expected format: 192.168.1.1:7912")
@@ -125,6 +127,10 @@ int main(int argc, char* argv[])
 
         if (vm.count("console"))
             mode = hpx::runtime::console;
+        else if (vm.count("config")) {
+            std::cerr << "hpx_runtime: config option ignored, used for console "
+                         "instance only\n";
+        }
 
         // do we need to execute the HPX runtime
         bool no_hpx_runtime = vm.count("no_hpx_runtime") != 0;
@@ -144,21 +150,29 @@ int main(int argc, char* argv[])
             // initialize and start the HPX runtime
             runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
 
+            // if we've got a configuration file (as console) we read it in,
+            // otherwise this information will be automatically pulled from 
+            // the console
+            if (mode == hpx::runtime::console && vm.count("config")) {
+                std::string config(vm["config"].as<std::string>());
+                rt.get_config().load_application_configuration(config.c_str());
+            }
+
             // the main thread will wait (block) for the shutdown action and 
             // the threadmanager is serving incoming requests in the meantime
             rt.run(num_threads);
         }
     }
     catch (hpx::exception const& e) {
-        std::cerr << "hpx::exception caught: " << e.what() << "\n";
+        std::cerr << "hpx_runtime: hpx::exception caught: " << e.what() << "\n";
         return -1;
     }
     catch (std::exception const& e) {
-        std::cerr << "std::exception caught: " << e.what() << "\n";
+        std::cerr << "hpx_runtime: std::exception caught: " << e.what() << "\n";
         return -1;
     }
     catch (...) {
-        std::cerr << "unexpected exception caught\n";
+        std::cerr << "hpx_runtime: unexpected exception caught\n";
         return -2;
     }
     return 0;

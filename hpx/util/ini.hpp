@@ -9,13 +9,21 @@
 
 #include <map>
 #include <iosfwd>
+
 #include <boost/lexical_cast.hpp>
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/string.hpp>
 
 // suppress warnings about dependent classes not being exported from the dll
 #if defined(BOOST_MSVC)
 #pragma warning(push)
 #pragma warning(disable: 4091 4251 4231 4275 4660)
 #endif
+
+///////////////////////////////////////////////////////////////////////////////
+//  section serialization format version
+#define HPX_SECTION_VERSION 0x10
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -36,6 +44,17 @@ namespace hpx { namespace util
         section_map sections_;
         std::string name_;
 
+    private:
+        friend class boost::serialization::access;
+
+        template <typename Archive>
+        void save(Archive& ar, const unsigned int version) const;
+
+        template <typename Archive>
+        void load(Archive& ar, const unsigned int version);
+
+        BOOST_SERIALIZATION_SPLIT_MEMBER()
+
     protected:
         bool regex_init();
         void line_msg(std::string const& msg, std::string const& file, 
@@ -46,6 +65,8 @@ namespace hpx { namespace util
         explicit section(std::string const& filename, section* root = NULL);
         section(section const& in);
         ~section() {}
+
+        section& operator=(section const& rhs);
 
         void parse(std::string const& sourcename, 
             std::vector<std::string> const& lines);
@@ -83,14 +104,28 @@ namespace hpx { namespace util
         void expand_bracket(std::string&, std::string::size_type) const;
         void expand_brace(std::string&, std::string::size_type) const;
 
-        void set_root(section* r) { root_ = r; }
+        void set_root(section* r, bool recursive = false) 
+        { 
+            root_ = r; 
+            if (recursive) {
+                section_map::iterator send = sections_.end();
+                for (section_map::iterator si = sections_.begin(); si != send; ++si)
+                    si->second.set_root(r, true);
+            }
+        }
         section* get_root() const { return root_; }
         std::string get_name() const { return name_; }
+        void set_name(std::string const& name) { name_ = name; }
 
         section clone(section* root = NULL) const;
     };
 
 }} // namespace hpx::util
+
+///////////////////////////////////////////////////////////////////////////////
+// this is the current version of the parcel serialization format
+// this definition needs to be in the global namespace
+BOOST_CLASS_VERSION(hpx::util::section, HPX_SECTION_VERSION)
 
 #endif
 

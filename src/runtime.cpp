@@ -14,6 +14,7 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
+#include <hpx/runtime/components/runtime_support.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure the system gets properly shut down while handling Ctrl-C and other
@@ -55,7 +56,6 @@ namespace hpx
             mode locality_mode, init_scheduler_type const& init) 
       : runtime(agas_client_),
         result_(0), mode_(locality_mode), 
-        ini_(util::detail::get_logging_data()), 
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This())), 
         parcel_pool_(boost::bind(&runtime_impl::init_tss, This()),
@@ -87,7 +87,6 @@ namespace hpx
             mode locality_mode, init_scheduler_type const& init) 
       : runtime(agas_client_),
         result_(0), mode_(locality_mode), 
-        ini_(util::detail::get_logging_data()), 
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This())), 
         parcel_pool_(boost::bind(&runtime_impl::init_tss, This()),
@@ -119,7 +118,6 @@ namespace hpx
             init_scheduler_type const& init) 
       : runtime(agas_client_),
         result_(0), mode_(locality_mode), 
-        ini_(util::detail::get_logging_data()), 
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This())), 
         parcel_pool_(boost::bind(&runtime_impl::init_tss, This()),
@@ -332,7 +330,23 @@ namespace hpx
         boost::function<hpx_main_function_type> func,
         std::size_t num_threads)
     {
+        // start the main thread function
         start(func, num_threads);
+
+        // if we're not the console, we'll pull the console's configuration 
+        // information and merge it with ours
+        if (mode_ == worker) {
+            error_code ec;
+            naming::id_type console_prefix;
+            if (agas_client_.get_console_prefix(console_prefix, ec))
+            {
+                util::section ini;
+                components::stubs::runtime_support::get_config(console_prefix, ini);
+                ini_.add_section("application", ini);
+            }
+        }
+
+        // now wait for everything to finish
         int result = wait();
         stop();
         return result;
@@ -343,7 +357,23 @@ namespace hpx
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::run(
         std::size_t num_threads)
     {
+        // start the main thread function
         start(boost::function<hpx_main_function_type>(), num_threads);
+
+        // if we're not the console, we'll pull the console's configuration 
+        // information and merge it with ours
+        if (mode_ == worker) {
+            error_code ec;
+            naming::id_type console_prefix;
+            if (agas_client_.get_console_prefix(console_prefix, ec))
+            {
+                util::section ini;
+                components::stubs::runtime_support::get_config(console_prefix, ini);
+                ini_.merge(ini);
+            }
+        }
+
+        // now wait for everything to finish
         int result = wait();
         stop();
         return result;
