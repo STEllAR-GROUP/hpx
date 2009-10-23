@@ -51,17 +51,17 @@ namespace hpx { namespace components { namespace amr
         }
 
         ///////////////////////////////////////////////////////////////////////
-        lcos::future_value<naming::id_type> alloc_data_async(int item = -1,
-            int maxitems = -1, int row = -1)
+        lcos::future_value<naming::id_type> alloc_data_async(int item,
+            int maxitems, int row,server::Parameter const& par)
         {
             return this->base_type::alloc_data_async(this->gid_, item, 
-                maxitems, row);
+                maxitems, row,par);
         }
 
-        naming::id_type alloc_data(int item = -1, int maxitems = -1,
-            int row = -1)
+        naming::id_type alloc_data(int item, int maxitems,
+            int row,server::Parameter const& par)
         {
-            return this->base_type::alloc_data(this->gid_, item, maxitems, row);
+            return this->base_type::alloc_data(this->gid_, item, maxitems, row,par);
         }
 
         ///////////////////////////////////////////////////////////////////////

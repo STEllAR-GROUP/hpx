@@ -46,11 +46,11 @@ namespace hpx { namespace components { namespace amr { namespace server
     ///////////////////////////////////////////////////////////////////////////
     template <typename Lock>
     inline naming::id_type 
-    alloc_helper(Lock& l, naming::id_type const& gid, int row)
+    alloc_helper(Lock& l, naming::id_type const& gid, int row,Parameter const& par)
     {
         util::unlock_the_lock<Lock> ul(l);
         return components::amr::stubs::functional_component::alloc_data(
-            gid, -1, -1, row);
+            gid, -1, -1, row,par);
     }
 
     inline void 
@@ -139,7 +139,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // ask functional component to create the local data value
         {
             mutex_type::scoped_lock l(mtx_);
-            value_gids_[0] = alloc_helper(l, functional_gid_, row_);
+            value_gids_[0] = alloc_helper(l, functional_gid_, row_,par_);
         }
 
         // we need to store our current value gid/is_called_ on the stack, 
@@ -191,7 +191,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                 mutex_type::scoped_lock l(mtx_);
 
                 if (naming::invalid_id == value_gids_[1]) 
-                    value_gids_[1] = alloc_helper(l, functional_gid_, row_);
+                    value_gids_[1] = alloc_helper(l, functional_gid_, row_,par_);
 
                 std::swap(value_gids_[0], value_gids_[1]);
                 value_gid_to_be_freed = value_gids_[0];

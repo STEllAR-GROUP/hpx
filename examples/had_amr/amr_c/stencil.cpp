@@ -149,8 +149,6 @@ namespace hpx { namespace components { namespace amr
               }
             }
 
-            // copy over the coordinate value to the result
-
             std::size_t allowedl = par.allowedl;
             if ( val2->refine_ && gids.size() == 3 && val2->level_ < allowedl ) {
               finer_mesh(result, gids,par);
@@ -273,7 +271,7 @@ namespace hpx { namespace components { namespace amr
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    naming::id_type stencil::alloc_data(int item, int maxitems, int row)
+    naming::id_type stencil::alloc_data(int item, int maxitems, int row,server::Parameter const& par)
     {
         naming::id_type result = components::stubs::memory_block::create(
             applier::get_applier().get_runtime_support_gid(), sizeof(stencil_data));
@@ -284,7 +282,7 @@ namespace hpx { namespace components { namespace amr
                 components::stubs::memory_block::checkout(result));
 
             // call provided (external) function
-            generate_initial_data(val.get_ptr(), item, maxitems, row);
+            generate_initial_data(val.get_ptr(), item, maxitems, row,par);
 
             if (log_)         // send initial value to logging instance
                 stubs::logging::logentry(log_, val.get(), row);

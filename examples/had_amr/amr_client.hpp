@@ -33,6 +33,12 @@ namespace hpx { namespace components { namespace amr { namespace server
             ar & allowedl;
             ar & loglevel;
             ar & stencilsize;
+            ar & nt0;
+            ar & nx0;
+            ar & minx0;
+            ar & maxx0;
+            ar & dx0;
+            ar & dt0;
         }
     };
 

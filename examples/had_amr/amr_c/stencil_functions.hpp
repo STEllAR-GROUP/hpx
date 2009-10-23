@@ -7,12 +7,13 @@
 #define AMR_C_FUNCTIONS_FEB_16_2009_0141PM
 
 #include <hpx/config/export_definitions.hpp>
+#include "../amr_client.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 /// The function \a generate_initial_data will be called to initialize the 
 /// given instance of 'stencil_data' 
 HPX_COMPONENT_EXPORT int generate_initial_data(
-    stencil_data* data, int item, int maxitems, int row);
+    stencil_data* data, int item, int maxitems, int row,Par const& par);
 
 /// The function \a evaluate_timestep will be called to compute the result data
 /// for the given timestep

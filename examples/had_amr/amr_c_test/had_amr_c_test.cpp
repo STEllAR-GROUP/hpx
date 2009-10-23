@@ -17,7 +17,7 @@ double dx;
 double dt;
 
 ///////////////////////////////////////////////////////////////////////////
-int generate_initial_data(stencil_data* val, int item, int maxitems, int row)
+int generate_initial_data(stencil_data* val, int item, int maxitems, int row,Par const& par)
 {
     // provide initial data for the given data value 
     val->max_index_ = maxitems;
@@ -33,10 +33,9 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row)
         val->value_ = pow(item - 1./3., 4.) * pow(item - 2./3., 4.);
     */
     //val->value_ = random_numbers();
-    dx = (xmax-xmin)/(maxitems-1);
-    dt = 0.5*dx;
+    double dx0 = par.dx0;
 
-    double xcoord = xmin + item*dx;
+    double xcoord = par.minx0 + item*dx0;
     val->x_ = xcoord;
     val->value_ = exp(-xcoord*xcoord);
 

@@ -54,7 +54,7 @@ namespace hpx { namespace components { namespace amr
         /// suitable for storing all data needed for a single time step. 
         /// Additionally it fills the memory with initial data for the data 
         /// item given by the parameter \a item (if item != -1).
-        naming::id_type alloc_data(int item, int maxitems, int row);
+        naming::id_type alloc_data(int item, int maxitems, int row,server::Parameter const& par);
 
         /// The init function initializes this stencil point
         void init(std::size_t, naming::id_type const&);

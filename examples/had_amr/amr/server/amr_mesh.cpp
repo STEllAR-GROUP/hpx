@@ -176,7 +176,8 @@ namespace hpx { namespace components { namespace amr { namespace server
     ///////////////////////////////////////////////////////////////////////////////
     void amr_mesh::prepare_initial_data(
         distributed_iterator_range_type const& functions, 
-        std::vector<naming::id_type>& initial_data)
+        std::vector<naming::id_type>& initial_data,
+        Parameter const& par)
     {
         typedef std::vector<lcos::future_value<naming::id_type> > lazyvals_type;
 
@@ -187,7 +188,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         for (std::size_t i = 0; function != functions.second; ++function, ++i)
         {
             lazyvals.push_back(components::amr::stubs::functional_component::
-                alloc_data_async(*function, i, numvalues_, 0));
+                alloc_data_async(*function, i, numvalues_, 0,par));
         }
 
         // now wait for the results
@@ -307,7 +308,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // prepare initial data
         std::vector<naming::id_type> initial_data;
-        prepare_initial_data(locality_results(functions), initial_data);
+        prepare_initial_data(locality_results(functions), initial_data,par);
 
         // do actual work
         execute(locality_results(stencils[0]), initial_data, result_data);

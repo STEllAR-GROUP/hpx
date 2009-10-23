@@ -81,7 +81,8 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         void prepare_initial_data(
             distributed_iterator_range_type const& functions, 
-            std::vector<naming::id_type>& initial_data);
+            std::vector<naming::id_type>& initial_data,
+            Parameter const& par);
 
         static void init_stencils(
             distributed_iterator_range_type const& stencils,

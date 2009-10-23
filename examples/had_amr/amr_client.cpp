@@ -234,6 +234,8 @@ int main(int argc, char* argv[])
         par.lambda      = 0.15;
         par.nx0         = numvals;
         par.nt0         = numsteps;
+        par.minx0       = -10.0;
+        par.maxx0       =  10.0;
 
         std::string parfile;
         if (vm.count("parfile")) {
@@ -270,8 +272,20 @@ int main(int argc, char* argv[])
                 // over-ride command line argument if present
                 numsteps = par.nt0;
               }
+              if ( sec->has_entry("maxx0") ) {
+                std::string tmp = sec->get_entry("maxx0");
+                par.maxx0 = atof(tmp.c_str());
+              }
+              if ( sec->has_entry("minx0") ) {
+                std::string tmp = sec->get_entry("minx0");
+                par.minx0 = atof(tmp.c_str());
+              }
             }
         }
+
+        // derived parameters
+        par.dx0 = (par.maxx0 - par.minx0)/(par.nx0-1);
+        par.dt0 = par.lambda*par.dx0;
 
         initrand(42, pdist, mean, stddev, numsteps, numvals, num_threads);
 
