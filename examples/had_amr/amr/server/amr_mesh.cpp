@@ -16,6 +16,7 @@
 
 #include "../dynamic_stencil_value.hpp"
 #include "../functional_component.hpp"
+#include "../../parameter.hpp"
 
 #include "amr_mesh.hpp"
 
@@ -60,21 +61,25 @@ namespace hpx { namespace components { namespace amr { namespace server
     // Create functional components, one for each data point, use those to 
     // initialize the stencil value instances
     void amr_mesh::init_stencils(distributed_iterator_range_type const& stencils,
-        distributed_iterator_range_type const& functions, int static_step,int stencilsize,
-        int numvalues,Parameter const& par)
+        distributed_iterator_range_type const& functions, int static_step, 
+        int stencilsize, int numvalues, Parameter const& par)
     {
         components::distributing_factory::iterator_type stencil = stencils.first;
         components::distributing_factory::iterator_type function = functions.first;
 
         for (int column = 0; stencil != stencils.second; ++stencil, ++function, ++column)
         {
+            namespace stubs = components::amr::stubs;
             BOOST_ASSERT(function != functions.second);
-            if ( column == 0 || column == numvalues-1 ) {
-              components::amr::stubs::dynamic_stencil_value::set_functional_component(
-                  *stencil, *function, static_step, column,2,par);
-            } else {
-              components::amr::stubs::dynamic_stencil_value::set_functional_component(
-                *stencil, *function, static_step, column,stencilsize,par);
+            if (column == 0 || column == numvalues-1) {
+                // boundary value
+                stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                    *function, static_step, column, stencilsize-1, stencilsize-1, par);
+            } 
+            else {
+                // 'normal' value
+                stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                    *function, static_step, column, stencilsize, stencilsize, par);
             }
         }
         BOOST_ASSERT(function == functions.second);
@@ -188,7 +193,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         for (std::size_t i = 0; function != functions.second; ++function, ++i)
         {
             lazyvals.push_back(components::amr::stubs::functional_component::
-                alloc_data_async(*function, i, numvalues_, 0,par));
+                alloc_data_async(*function, i, numvalues_, 0, par));
         }
 
         // now wait for the results
@@ -257,7 +262,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     std::vector<naming::id_type> amr_mesh::init_execute(
         components::component_type function_type, std::size_t numvalues, 
         std::size_t numsteps,
-        components::component_type logging_type,Parameter const& par)
+        components::component_type logging_type, Parameter const& par)
     {
         std::size_t stencilsize = par.stencilsize;
 
@@ -292,8 +297,10 @@ namespace hpx { namespace components { namespace amr { namespace server
         init(locality_results(functions), locality_results(logging), numsteps);
 
         // initialize stencil_values using the stencil (functional) components
-        init_stencils(locality_results(stencils[0]), locality_results(functions), 0, stencilsize, numvalues,par);
-        init_stencils(locality_results(stencils[1]), locality_results(functions), 1, stencilsize, numvalues,par);
+        init_stencils(locality_results(stencils[0]), locality_results(functions), 
+            0, stencilsize, numvalues, par);
+        init_stencils(locality_results(stencils[1]), locality_results(functions), 
+            1, stencilsize, numvalues, par);
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(2);
@@ -308,7 +315,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // prepare initial data
         std::vector<naming::id_type> initial_data;
-        prepare_initial_data(locality_results(functions), initial_data,par);
+        prepare_initial_data(locality_results(functions), initial_data, par);
 
         // do actual work
         execute(locality_results(stencils[0]), initial_data, result_data);
@@ -329,7 +336,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::vector<naming::id_type> const& initial_data,
         components::component_type function_type, std::size_t numvalues, 
         std::size_t numsteps,
-        components::component_type logging_type,Parameter const& par)
+        components::component_type logging_type, Parameter const& par)
     {
         std::size_t stencilsize = par.stencilsize;
 
@@ -364,8 +371,10 @@ namespace hpx { namespace components { namespace amr { namespace server
         init(locality_results(functions), locality_results(logging), numsteps);
 
         // initialize stencil_values using the stencil (functional) components
-        init_stencils(locality_results(stencils[0]), locality_results(functions), 0, stencilsize, numvalues,par);
-        init_stencils(locality_results(stencils[1]), locality_results(functions), 1, stencilsize, numvalues,par);
+        init_stencils(locality_results(stencils[0]), locality_results(functions), 
+            0, stencilsize, numvalues, par);
+        init_stencils(locality_results(stencils[1]), locality_results(functions), 
+            1, stencilsize, numvalues, par);
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(2);

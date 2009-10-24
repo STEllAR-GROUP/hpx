@@ -17,7 +17,8 @@ double dx;
 double dt;
 
 ///////////////////////////////////////////////////////////////////////////
-int generate_initial_data(stencil_data* val, int item, int maxitems, int row,Par const& par)
+int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
+    Par const& par)
 {
     // provide initial data for the given data value 
     val->max_index_ = maxitems;
@@ -57,7 +58,7 @@ int evaluate_timestep(stencil_data const* left, stencil_data const* middle,
     result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
     */
     double sum = 0;
-    long t, n = work[middle->timestep_*nzones+middle->index_/zone];
+    long n = work[middle->timestep_*nzones+middle->index_/zone];
 
     //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
     //for (t = 0; t < n; t++)
@@ -82,7 +83,7 @@ int evaluate_left_bdry_timestep(stencil_data const* middle, stencil_data const* 
     result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
     */
     double sum = 0;
-    long t, n = work[middle->timestep_*nzones+middle->index_/zone];
+    long n = work[middle->timestep_*nzones+middle->index_/zone];
 
     //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
     //for (t = 0; t < n; t++)
@@ -109,7 +110,7 @@ int evaluate_right_bdry_timestep(stencil_data const* left, stencil_data const* m
     result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
     */
     double sum = 0;
-    long t, n = work[middle->timestep_*nzones+middle->index_/zone];
+    long n = work[middle->timestep_*nzones+middle->index_/zone];
 
     //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
     //for (t = 0; t < n; t++)

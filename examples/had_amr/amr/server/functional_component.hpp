@@ -12,7 +12,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 
-#include "../../amr_client.hpp"
+#include "../../parameter.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server 
@@ -51,7 +51,8 @@ namespace hpx { namespace components { namespace amr { namespace server
             return true;
         }
 
-        virtual naming::id_type alloc_data(int item, int maxitems, int row,Parameter const& par)
+        virtual naming::id_type alloc_data(int item, int maxitems, int row,
+            Parameter const& par)
         {
             // This shouldn't ever be called. If you're seeing this assertion 
             // you probably forgot to overload this function in your stencil 
@@ -88,9 +89,10 @@ namespace hpx { namespace components { namespace amr { namespace server
             return eval(result, gids, row, column,par);
         }
 
-        naming::id_type alloc_data_nonvirt(int item, int maxitems, int row,Parameter const& par)
+        naming::id_type alloc_data_nonvirt(int item, int maxitems, int row,
+            Parameter const& par)
         {
-            return alloc_data(item, maxitems, row,par);
+            return alloc_data(item, maxitems, row, par);
         }
 
         void init_nonvirt(std::size_t numsteps, naming::id_type const& gid)
@@ -104,7 +106,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         // serialization, etc.
         typedef hpx::actions::result_action4<
             functional_component, naming::id_type, functional_component_alloc_data, 
-            int, int, int,Parameter const&, &functional_component::alloc_data_nonvirt
+            int, int, int, Parameter const&, 
+            &functional_component::alloc_data_nonvirt
         > alloc_data_action;
 
         typedef hpx::actions::result_action5<

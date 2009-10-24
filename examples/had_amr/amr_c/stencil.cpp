@@ -70,7 +70,7 @@ namespace hpx { namespace components { namespace amr
     // Compute the result value for the current time step
     int stencil::eval(naming::id_type const& result, 
         std::vector<naming::id_type> const& gids, int row, int column,
-        server::Parameter const& par)
+        Parameter const& par)
     {
         BOOST_ASSERT(gids.size() <= 3);
 
@@ -171,8 +171,7 @@ namespace hpx { namespace components { namespace amr
     // Implement a finer mesh via interpolation of inter-mesh points
     // Compute the result value for the current time step
     int stencil::finer_mesh(naming::id_type const& result, 
-        std::vector<naming::id_type> const& gids,
-        server::Parameter const& par) 
+        std::vector<naming::id_type> const& gids, Parameter const& par) 
     {
 
       naming::id_type gval1, gval2, gval3, gval4, gval5;
@@ -271,7 +270,8 @@ namespace hpx { namespace components { namespace amr
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    naming::id_type stencil::alloc_data(int item, int maxitems, int row,server::Parameter const& par)
+    naming::id_type stencil::alloc_data(int item, int maxitems, int row,
+        Parameter const& par)
     {
         naming::id_type result = components::stubs::memory_block::create(
             applier::get_applier().get_runtime_support_gid(), sizeof(stencil_data));
@@ -282,7 +282,7 @@ namespace hpx { namespace components { namespace amr
                 components::stubs::memory_block::checkout(result));
 
             // call provided (external) function
-            generate_initial_data(val.get_ptr(), item, maxitems, row,par);
+            generate_initial_data(val.get_ptr(), item, maxitems, row, par);
 
             if (log_)         // send initial value to logging instance
                 stubs::logging::logentry(log_, val.get(), row);

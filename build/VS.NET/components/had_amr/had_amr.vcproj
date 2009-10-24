@@ -200,6 +200,18 @@
 					RelativePath="..\..\..\..\examples\had_amr\amr\server\stencil_value_out_adaptor.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\..\..\examples\had_amr\amr\server\tapered_amr_mesh.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -240,6 +252,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\..\examples\had_amr\amr\server\functional_component.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\..\examples\had_amr\amr\server\tapered_amr_mesh.hpp"
 					>
 				</File>
 			</Filter>

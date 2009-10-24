@@ -18,8 +18,6 @@
 #include "dynamic_stencil_value.hpp"
 #include "../functional_component.hpp"
 
-#include "../../amr_client.hpp"
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server 
 {
@@ -46,11 +44,12 @@ namespace hpx { namespace components { namespace amr { namespace server
     ///////////////////////////////////////////////////////////////////////////
     template <typename Lock>
     inline naming::id_type 
-    alloc_helper(Lock& l, naming::id_type const& gid, int row,Parameter const& par)
+    alloc_helper(Lock& l, naming::id_type const& gid, int row,
+        Parameter const& par)
     {
         util::unlock_the_lock<Lock> ul(l);
         return components::amr::stubs::functional_component::alloc_data(
-            gid, -1, -1, row,par);
+            gid, -1, -1, row, par);
     }
 
     inline void 
@@ -63,7 +62,8 @@ namespace hpx { namespace components { namespace amr { namespace server
     ///////////////////////////////////////////////////////////////////////////
     inline dynamic_stencil_value::dynamic_stencil_value()
       : is_called_(false), driver_thread_(0), sem_result_(0), 
-        functional_gid_(naming::invalid_id), row_(-1), column_(-1), stencilsize_(-1)
+        functional_gid_(naming::invalid_id), row_(-1), column_(-1), 
+        instencilsize_(-1), outstencilsize_(-1)
     {
         std::fill(&value_gids_[0], &value_gids_[2], naming::invalid_id);
 
@@ -92,15 +92,15 @@ namespace hpx { namespace components { namespace amr { namespace server
         is_called_ = true;
 
         // this needs to have been initialized
-        if (-1 == stencilsize_) {
+        if (-1 == instencilsize_ || -1 == outstencilsize_) {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "dynamic_stencil_value::connect_input_ports", 
+                "dynamic_stencil_value::connect_input_ports ", 
                 "this instance has not been initialized yet");
             return naming::invalid_id;
         }
 
         // sem_in_ is pre-initialized to 1, so we need to reset it
-        for (std::size_t i = 0; i < stencilsize_; ++i)
+        for (std::size_t i = 0; i < outstencilsize_; ++i)
             sem_in_[i]->wait();
 
         // set new current value
@@ -111,7 +111,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
 
         // signal all output threads it's safe to read value
-        for (std::size_t i = 0; i < stencilsize_; ++i)
+        for (std::size_t i = 0; i < outstencilsize_; ++i)
             sem_out_[i]->signal();
 
         // wait for final result 
@@ -139,7 +139,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // ask functional component to create the local data value
         {
             mutex_type::scoped_lock l(mtx_);
-            value_gids_[0] = alloc_helper(l, functional_gid_, row_,par_);
+            value_gids_[0] = alloc_helper(l, functional_gid_, row_, par_);
         }
 
         // we need to store our current value gid/is_called_ on the stack, 
@@ -155,7 +155,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         int timesteps_to_go = 1;
         while (timesteps_to_go > 0) {
             // start acquire operations on input ports
-            for (std::size_t i = 0; i < stencilsize_; ++i)
+            for (std::size_t i = 0; i < instencilsize_; ++i)
                 in_[i]->aquire_value();         // non-blocking!
 
             // at this point all gid's have to be initialized
@@ -180,7 +180,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             // Wait for all output threads to have read the current value.
             // On the first time step the semaphore is preset to allow 
             // to immediately set the value.
-            for (std::size_t i = 0; i < stencilsize_; ++i)
+            for (std::size_t i = 0; i < outstencilsize_; ++i)
                 sem_in_[i]->wait();
 
             // set new current value, allocate space for next current value
@@ -191,14 +191,14 @@ namespace hpx { namespace components { namespace amr { namespace server
                 mutex_type::scoped_lock l(mtx_);
 
                 if (naming::invalid_id == value_gids_[1]) 
-                    value_gids_[1] = alloc_helper(l, functional_gid_, row_,par_);
+                    value_gids_[1] = alloc_helper(l, functional_gid_, row_, par_);
 
                 std::swap(value_gids_[0], value_gids_[1]);
                 value_gid_to_be_freed = value_gids_[0];
             }
 
             // signal all output threads it's safe to read value
-            for (std::size_t i = 0; i < stencilsize_; ++i)
+            for (std::size_t i = 0; i < outstencilsize_; ++i)
                 sem_out_[i]->signal();
         }
 
@@ -218,10 +218,10 @@ namespace hpx { namespace components { namespace amr { namespace server
         naming::id_type result = naming::invalid_id;
         {
             mutex_type::scoped_lock l(mtx_);
-            result = value_gids_[1]; // acquire the current value
+            result = value_gids_[1];  // acquire the current value
         }
 
-        sem_in_[i]->signal();    // signal to have read the value
+        sem_in_[i]->signal();         // signal to have read the value
         return result;
     }
 
@@ -232,14 +232,14 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::vector<naming::id_type> gids;
 
         // this needs to have been initialized
-        if (-1 == stencilsize_) {
+        if (-1 == instencilsize_ || -1 == outstencilsize_) {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "dynamic_stencil_value::connect_input_ports", 
+                "dynamic_stencil_value::connect_input_ports ", 
                 "this instance has not been initialized yet");
             return gids;
         }
 
-        for (std::size_t i = 0; i < stencilsize_; ++i)
+        for (std::size_t i = 0; i < outstencilsize_; ++i)
             gids.push_back(out_[i]->get_gid());
         return gids;
     }
@@ -249,52 +249,57 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::vector<naming::id_type> const& gids)
     {
         // this needs to have been initialized
-        if (-1 == stencilsize_) {
+        if (-1 == instencilsize_ || -1 == outstencilsize_) {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "dynamic_stencil_value::connect_input_ports", 
+                "dynamic_stencil_value::connect_input_ports ", 
                 "this instance has not been initialized yet");
             return;
         }
 
-        if (gids.size() < stencilsize_) {
+        if (gids.size() < instencilsize_) {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "dynamic_stencil_value::connect_input_ports", 
+                "dynamic_stencil_value::connect_input_ports ", 
                 "insufficient number of gid's supplied");
             return;
         }
 
-        for (std::size_t i = 0; i < stencilsize_; ++i)
+        for (std::size_t i = 0; i < instencilsize_; ++i)
             in_[i]->connect(gids[i]);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     inline void 
     dynamic_stencil_value::set_functional_component(naming::id_type const& gid,
-        int row, int column, int stencilsize,Parameter const& par)
+        int row, int column, int instencilsize, int outstencilsize,
+        Parameter const& par)
     {
         // store gid of functional component
         functional_gid_ = gid;
         row_ = row;
         column_ = column;
-        stencilsize_ = stencilsize;
+        instencilsize_ = instencilsize;
+        outstencilsize_ = outstencilsize;
         par_ = par;
 
-        sem_in_.resize(stencilsize);
-        sem_out_.resize(stencilsize);
-        in_.resize(stencilsize);
-        out_.resize(stencilsize);
+        sem_in_.resize(outstencilsize);
+        sem_out_.resize(outstencilsize);
+        in_.resize(instencilsize);
+        out_.resize(outstencilsize);
 
         // create adaptors
-        for (std::size_t i = 0; i < stencilsize_; ++i)
+        for (std::size_t i = 0; i < outstencilsize_; ++i)
+        {
+            in_[i].reset(new in_adaptor_type());
+        }
+        for (std::size_t i = 0; i < outstencilsize_; ++i)
         {
             sem_in_[i].reset(new lcos::counting_semaphore(1));
             sem_out_[i].reset(new lcos::counting_semaphore());
-            in_[i].reset(new in_adaptor_type());
             out_[i].reset(new out_adaptor_type(
                 boost::bind(&dynamic_stencil_value::get_value, this, i)));
         }
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
     inline void 
     dynamic_stencil_value::start()
@@ -303,7 +308,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // thread
         if (0 == driver_thread_) {
             bool inputs_bound = true;
-            for (std::size_t i = 0; i < stencilsize_ && inputs_bound; ++i)
+            for (std::size_t i = 0; i < instencilsize_ && inputs_bound; ++i)
                 inputs_bound = in_[i]->is_bound();
 
             if (inputs_bound) {

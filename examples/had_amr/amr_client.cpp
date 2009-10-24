@@ -27,7 +27,7 @@ using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
-             components::amr::server::Parameter const& par)
+             components::amr::Parameter const& par)
 {
     // get component types needed below
     components::component_type function_type = 
@@ -48,7 +48,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         hpx::util::high_resolution_timer t;
         std::vector<naming::id_type> result_data(
             mesh.init_execute(function_type, numvals, numsteps,
-                do_logging ? logging_type : components::component_invalid,par));
+                do_logging ? logging_type : components::component_invalid, par));
         printf("Elapsed time: %f s\n", t.elapsed());
 
         // get some output memory_block_data instances
@@ -226,7 +226,8 @@ int main(int argc, char* argv[])
         if (vm.count("numsteps"))
             numsteps = vm["numsteps"].as<std::size_t>();
 
-        components::amr::server::Parameter par;
+        components::amr::Parameter par;
+
         // default pars
         par.stencilsize = 3;
         par.allowedl    = 0;
@@ -294,7 +295,7 @@ int main(int argc, char* argv[])
         if (mode == hpx::runtime::worker) 
             rt.run(num_threads);
         else 
-            rt.run(boost::bind (hpx_main, numvals, numsteps, do_logging,par), num_threads);
+            rt.run(boost::bind(hpx_main, numvals, numsteps, do_logging, par), num_threads);
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";

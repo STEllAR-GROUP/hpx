@@ -40,8 +40,7 @@ namespace hpx { namespace components { namespace amr
         init_execute_async(components::component_type function_type, 
             std::size_t numvalues, std::size_t numsteps,
            // components::component_type logging_type = components::component_invalid,
-            components::component_type logging_type,
-            server::Parameter const& par)
+            components::component_type logging_type, Parameter const& par)
         {
             return this->base_type::init_execute_async(this->gid_, function_type,
                 numvalues, numsteps, logging_type,par);
@@ -50,8 +49,7 @@ namespace hpx { namespace components { namespace amr
         std::vector<naming::id_type> 
         init_execute(components::component_type function_type, 
             std::size_t numvalues, std::size_t numsteps,
-            components::component_type logging_type,
-            server::Parameter const& par)
+            components::component_type logging_type, Parameter const& par)
         {
             return this->base_type::init_execute(this->gid_, function_type,
                 numvalues, numsteps,logging_type,par);
@@ -63,8 +61,7 @@ namespace hpx { namespace components { namespace amr
         execute_async(std::vector<naming::id_type> const& initial_data,
             components::component_type function_type, 
             std::size_t numvalues, std::size_t numsteps,
-            components::component_type logging_type,
-            server::Parameter const& par)
+            components::component_type logging_type, Parameter const& par)
         {
             return this->base_type::execute_async(this->gid_, initial_data, 
                 function_type, numvalues, numsteps, logging_type,par);
@@ -74,8 +71,7 @@ namespace hpx { namespace components { namespace amr
         execute(std::vector<naming::id_type> const& initial_data,
             components::component_type function_type, 
             std::size_t numvalues, std::size_t numsteps,
-            components::component_type logging_type,
-            server::Parameter const& par)
+            components::component_type logging_type, Parameter const& par)
         {
             return this->base_type::execute(this->gid_, initial_data, 
                 function_type, numvalues, numsteps, logging_type,par);

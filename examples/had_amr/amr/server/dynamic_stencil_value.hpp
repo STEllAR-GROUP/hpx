@@ -22,8 +22,7 @@
 
 #include "stencil_value_in_adaptor.hpp"
 #include "stencil_value_out_adaptor.hpp"
-
-#include "../../amr_client.hpp"
+#include "../../parameter.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server 
@@ -98,7 +97,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// Set the gid of the component implementing the actual time evolution
         /// functionality
         void set_functional_component(naming::id_type const& gid, int row, 
-            int column, int stencilsize,Parameter const& par);
+            int column, int instencilsize, int outstencilsize, 
+            Parameter const& par);
 
         void start();
 
@@ -112,7 +112,8 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         typedef hpx::actions::result_action0<
             dynamic_stencil_value, std::vector<naming::id_type>, 
-            dynamic_stencil_value_get_output_ports, &dynamic_stencil_value::get_output_ports
+            dynamic_stencil_value_get_output_ports, 
+            &dynamic_stencil_value::get_output_ports
         > get_output_ports_action;
 
         typedef hpx::actions::action1<
@@ -121,9 +122,9 @@ namespace hpx { namespace components { namespace amr { namespace server
             &dynamic_stencil_value::connect_input_ports
         > connect_input_ports_action;
 
-        typedef hpx::actions::action5<
+        typedef hpx::actions::action6<
             dynamic_stencil_value, dynamic_stencil_value_set_functional_component, 
-            naming::id_type const&, int, int, int,Parameter const&,
+            naming::id_type const&, int, int, int, int, Parameter const&,
             &dynamic_stencil_value::set_functional_component
         > set_functional_component_action;
 
@@ -148,7 +149,8 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         int row_;             // position of this stencil in whole graph
         int column_;
-        std::size_t stencilsize_;
+        std::size_t instencilsize_;
+        std::size_t outstencilsize_;
         Parameter par_;
 
         typedef lcos::mutex mutex_type;

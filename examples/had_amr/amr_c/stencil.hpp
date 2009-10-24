@@ -42,19 +42,20 @@ namespace hpx { namespace components { namespace amr
         /// previous time step.
         int eval(naming::id_type const& result, 
             std::vector<naming::id_type> const& gids, int row, int column,
-            server::Parameter const& par);
+            Parameter const& par);
 
         // this function creates a finer mesh from 3 input gids and evolves that
         // finer mesh for two steps.
         int finer_mesh(naming::id_type const& result, 
             std::vector<naming::id_type> const& gids,
-            server::Parameter const& par);
+            Parameter const& par);
 
         /// The alloc function is supposed to create a new memory block instance 
         /// suitable for storing all data needed for a single time step. 
         /// Additionally it fills the memory with initial data for the data 
         /// item given by the parameter \a item (if item != -1).
-        naming::id_type alloc_data(int item, int maxitems, int row,server::Parameter const& par);
+        naming::id_type alloc_data(int item, int maxitems, int row,
+            Parameter const& par);
 
         /// The init function initializes this stencil point
         void init(std::size_t, naming::id_type const&);

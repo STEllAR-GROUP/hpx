@@ -28,7 +28,8 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         static lcos::future_value<std::vector<naming::id_type> > 
         init_execute_async(naming::id_type const& gid, 
             components::component_type function_type, std::size_t numvalues, 
-            std::size_t numsteps, components::component_type logging_type,server::Parameter const& par)
+            std::size_t numsteps, components::component_type logging_type,
+            Parameter const& par)
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
@@ -40,7 +41,8 @@ namespace hpx { namespace components { namespace amr { namespace stubs
 
         static std::vector<naming::id_type> init_execute(naming::id_type const& gid, 
             components::component_type function_type, std::size_t numvalues, 
-            std::size_t numsteps, components::component_type logging_type,server::Parameter const& par)
+            std::size_t numsteps, components::component_type logging_type,
+            Parameter const& par)
         {
             return init_execute_async(gid, function_type, numvalues, numsteps,
                 logging_type,par).get();
@@ -51,7 +53,8 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         execute_async(naming::id_type const& gid, 
             std::vector<naming::id_type> const& initial_data,
             components::component_type function_type, std::size_t numvalues, 
-            std::size_t numsteps, components::component_type logging_type,server::Parameter const& par)
+            std::size_t numsteps, components::component_type logging_type,
+            Parameter const& par)
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
@@ -64,7 +67,8 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         static std::vector<naming::id_type> execute(naming::id_type const& gid, 
             std::vector<naming::id_type> const& initial_data,
             components::component_type function_type, std::size_t numvalues, 
-            std::size_t numsteps, components::component_type logging_type,server::Parameter const& par)
+            std::size_t numsteps, components::component_type logging_type,
+            Parameter const& par)
         {
             return execute_async(gid, initial_data, function_type, numvalues, 
                 numsteps, logging_type,par).get();

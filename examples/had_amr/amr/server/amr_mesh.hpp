@@ -13,7 +13,7 @@
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
-#include "../../amr_client.hpp"
+#include "../../parameter.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server 
@@ -45,13 +45,13 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::vector<naming::id_type> init_execute(
             components::component_type function_type, std::size_t numvalues, 
             std::size_t numsteps,
-            components::component_type logging_type,Parameter const& par);
+            components::component_type logging_type, Parameter const& par);
 
         std::vector<naming::id_type> execute(
             std::vector<naming::id_type> const& initialdata,
             components::component_type function_type, std::size_t numvalues, 
             std::size_t numsteps,
-            components::component_type logging_type,Parameter const& par);
+            components::component_type logging_type, Parameter const& par);
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
@@ -60,7 +60,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         typedef hpx::actions::result_action5<
             amr_mesh, std::vector<naming::id_type>, amr_mesh_init_execute, 
             components::component_type, std::size_t, std::size_t,
-            components::component_type,Parameter const&, &amr_mesh::init_execute
+            components::component_type, Parameter const&, &amr_mesh::init_execute
         > init_execute_action;
 
         typedef hpx::actions::result_action6<

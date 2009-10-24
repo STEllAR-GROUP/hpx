@@ -38,30 +38,31 @@ namespace hpx { namespace components { namespace amr
         // functional component derived from this class
         lcos::future_value<int> eval_async(naming::id_type const& result, 
             std::vector<naming::id_type> const& gids, int row, int column,
-            server::Parameter const& par)
+            Parameter const& par)
         {
             return this->base_type::eval_async(this->gid_, result, gids, row, column,par);
         }
 
         int eval(naming::id_type const& result, 
             std::vector<naming::id_type> const& gids, int row, int column,
-            server::Parameter const& par)
+            Parameter const& par)
         {
             return this->base_type::eval(this->gid_, result, gids, row, column,par);
         }
 
         ///////////////////////////////////////////////////////////////////////
         lcos::future_value<naming::id_type> alloc_data_async(int item,
-            int maxitems, int row,server::Parameter const& par)
+            int maxitems, int row, Parameter const& par)
         {
             return this->base_type::alloc_data_async(this->gid_, item, 
-                maxitems, row,par);
+                maxitems, row, par);
         }
 
         naming::id_type alloc_data(int item, int maxitems,
-            int row,server::Parameter const& par)
+            int row, Parameter const& par)
         {
-            return this->base_type::alloc_data(this->gid_, item, maxitems, row,par);
+            return this->base_type::alloc_data(this->gid_, item, maxitems, 
+                row, par);
         }
 
         ///////////////////////////////////////////////////////////////////////

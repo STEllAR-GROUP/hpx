@@ -13,8 +13,7 @@
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 
 #include "../server/functional_component.hpp"
-
-#include "../../amr_client.hpp"
+#include "../../parameter.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace stubs 
@@ -31,7 +30,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         static lcos::future_value<int> eval_async(naming::id_type const& gid, 
             naming::id_type const& result, 
             std::vector<naming::id_type> const& gids, int row, int column,
-            server::Parameter const& par)
+            Parameter const& par)
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
@@ -42,7 +41,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
 
         static int eval(naming::id_type const& gid, 
             naming::id_type const& result, std::vector<naming::id_type> const& gids,
-            int row, int column,server::Parameter const& par)
+            int row, int column, Parameter const& par)
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future
@@ -52,19 +51,19 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         static lcos::future_value<naming::id_type> alloc_data_async(
             naming::id_type const& gid, int item, int maxitems,
-            int row,server::Parameter const& par)
+            int row, Parameter const& par)
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::functional_component::alloc_data_action action_type;
-            return lcos::eager_future<action_type>(gid, item, maxitems, row,par);
+            return lcos::eager_future<action_type>(gid, item, maxitems, row, par);
         }
 
         static naming::id_type alloc_data(naming::id_type const& gid, 
-            int item, int maxitems, int row,server::Parameter const& par)
+            int item, int maxitems, int row, Parameter const& par)
         {
-            return alloc_data_async(gid, item, maxitems, row,par).get();
+            return alloc_data_async(gid, item, maxitems, row, par).get();
         }
 
         ///////////////////////////////////////////////////////////////////////

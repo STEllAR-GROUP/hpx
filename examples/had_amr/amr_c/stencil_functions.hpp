@@ -7,7 +7,7 @@
 #define AMR_C_FUNCTIONS_FEB_16_2009_0141PM
 
 #include <hpx/config/export_definitions.hpp>
-#include "../amr_client.hpp"
+#include "../parameter.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 /// The function \a generate_initial_data will be called to initialize the 
