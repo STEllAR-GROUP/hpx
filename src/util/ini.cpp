@@ -118,6 +118,7 @@ section::section (const section & in)
 section& section::operator=(section const& rhs)
 {
     if (this != &rhs) {
+        root_ = rhs.get_root();
         name_ = rhs.get_name();
         section_env_ = rhs.section_env_;
 
