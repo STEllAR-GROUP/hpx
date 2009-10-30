@@ -9,6 +9,7 @@
 #include <boost/foreach.hpp>
 
 #include "../amr/amr_mesh.hpp"
+#include "../amr/amr_mesh_tapered.hpp"
 
 #include "stencil.hpp"
 #include "logging.hpp"
@@ -59,6 +60,21 @@ namespace hpx { namespace components { namespace amr
               , components::stubs::memory_block::get_async(g4)
               , components::stubs::memory_block::get_async(g5));
         }
+        inline boost::tuple<
+            access_memory_block<stencil_data>, access_memory_block<stencil_data>
+          , access_memory_block<stencil_data>, access_memory_block<stencil_data>
+          , access_memory_block<stencil_data>, access_memory_block<stencil_data> >
+        get_async(naming::id_type const& g1, naming::id_type const& g2
+          , naming::id_type const& g3, naming::id_type const& g4
+          , naming::id_type const& g5, naming::id_type const& g6)
+        {
+            return wait(components::stubs::memory_block::get_async(g1)
+              , components::stubs::memory_block::get_async(g2)
+              , components::stubs::memory_block::get_async(g3)
+              , components::stubs::memory_block::get_async(g4)
+              , components::stubs::memory_block::get_async(g5)
+              , components::stubs::memory_block::get_async(g6));
+        }
     }
 
     stencil::stencil()
@@ -72,7 +88,7 @@ namespace hpx { namespace components { namespace amr
         std::vector<naming::id_type> const& gids, int row, int column,
         Parameter const& par)
     {
-        BOOST_ASSERT(gids.size() <= 3);
+        BOOST_ASSERT(gids.size() <= 5);
 
         // make sure all the gids are looking valid
         if (result == naming::invalid_id)
@@ -92,7 +108,7 @@ namespace hpx { namespace components { namespace amr
         // start asynchronous get operations
 
         // get all input memory_block_data instances
-        access_memory_block<stencil_data> val1, val2, val3, resultval;
+        access_memory_block<stencil_data> val1, val2, val3, val4, val5, resultval;
         if (gids.size() == 3) { 
             boost::tie(val1, val2, val3, resultval) = 
                 detail::get_async(gids[0], gids[1], gids[2], result);
@@ -100,6 +116,10 @@ namespace hpx { namespace components { namespace amr
         else if (gids.size() == 2) {
             boost::tie(val1, val2, resultval) = 
                 detail::get_async(gids[0], gids[1], result);
+        } 
+        else if (gids.size() == 5) {
+            boost::tie(val1, val2, val3, val4, val5, resultval) = 
+                detail::get_async(gids[0], gids[1], gids[2], gids[3], gids[4], result);
         } 
         else {
             BOOST_ASSERT(false);    // should not happen
@@ -114,12 +134,15 @@ namespace hpx { namespace components { namespace amr
         // the predecessor
         std::size_t middle_timestep;
         if (gids.size() == 3) 
-            middle_timestep = val2->timestep_;
+          middle_timestep = val2->timestep_;
         else if (gids.size() == 2 && column == 0) 
-            middle_timestep = val1->timestep_;      // left boundary point
-        else {
-            BOOST_ASSERT(gids.size() == 2);
-            middle_timestep = val2->timestep_;      // right boundary point
+          middle_timestep = val1->timestep_;      // left boundary point
+        else if (gids.size() == 2 && column != 0) {
+          middle_timestep = val2->timestep_;      // right boundary point
+        } else if ( gids.size() == 3 ) {
+          middle_timestep = val2->timestep_;
+        } else if ( gids.size() == 5 ) {
+          middle_timestep = val3->timestep_;
         }
 
         if (middle_timestep < numsteps_) {
@@ -127,26 +150,32 @@ namespace hpx { namespace components { namespace amr
             if (gids.size() == 3) {
               // this is the actual calculation, call provided (external) function
               evaluate_timestep(val1.get_ptr(), val2.get_ptr(), val3.get_ptr(), 
-                  resultval.get_ptr(), numsteps_);
+                  resultval.get_ptr(), numsteps_,par);
 
               // copy over the coordinate value to the result
               resultval->x_ = val2->x_;
-            } 
-            else if (gids.size() == 2) {
+            } else if (gids.size() == 2) {
               // bdry computation
               if ( column == 0 ) {
                 evaluate_left_bdry_timestep(val1.get_ptr(), val2.get_ptr(),
-                  resultval.get_ptr(), numsteps_);
+                  resultval.get_ptr(), numsteps_,par);
 
                 // copy over the coordinate value to the result
                 resultval->x_ = val1->x_;
               } else {
                 evaluate_right_bdry_timestep(val1.get_ptr(), val2.get_ptr(),
-                  resultval.get_ptr(), numsteps_);
+                  resultval.get_ptr(), numsteps_,par);
 
                 // copy over the coordinate value to the result
                 resultval->x_ = val2->x_;
               }
+            } else if (gids.size() == 5) {
+              // this is the actual calculation, call provided (external) function
+              evaluate_timestep(val2.get_ptr(), val3.get_ptr(), val4.get_ptr(), 
+                  resultval.get_ptr(), numsteps_,par);
+
+              // copy over the coordinate value to the result
+              resultval->x_ = val3->x_;
             }
 
             std::size_t allowedl = par.allowedl;
@@ -159,9 +188,21 @@ namespace hpx { namespace components { namespace amr
         }
         else {
             // the last time step has been reached, just copy over the data
-            resultval.get() = val2.get();
+            if (gids.size() == 3) {
+              resultval.get() = val2.get();
+            } else if (gids.size() == 2) {
+              // bdry computation
+              if ( column == 0 ) {
+                resultval.get() = val1.get();
+              } else {
+                resultval.get() = val2.get();
+              }
+            } else if (gids.size() == 5) {
+              resultval.get() = val3.get();
+            }
             ++resultval->timestep_;
         }
+ 
         // set return value difference between actual and required number of
         // timesteps (>0: still to go, 0: last step, <0: overdone)
         return numsteps_ - resultval->timestep_;
@@ -226,8 +267,8 @@ namespace hpx { namespace components { namespace amr
                 components::get_component_type<components::amr::server::logging>();
       components::component_type function_type =
                 components::get_component_type<components::amr::stencil>();
-      components::amr::amr_mesh child_mesh (
-                components::amr::amr_mesh::create(here, 1, true));
+      components::amr::amr_mesh_tapered child_mesh (
+                components::amr::amr_mesh_tapered::create(here, 1, true));
 
       std::vector<naming::id_type> initial_data;
       initial_data.push_back(gval1);

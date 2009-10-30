@@ -62,24 +62,58 @@ namespace hpx { namespace components { namespace amr { namespace server
     // initialize the stencil value instances
     void amr_mesh::init_stencils(distributed_iterator_range_type const& stencils,
         distributed_iterator_range_type const& functions, int static_step, 
-        int stencilsize, int numvalues, Parameter const& par)
+        int numvalues, Parameter const& par)
     {
         components::distributing_factory::iterator_type stencil = stencils.first;
         components::distributing_factory::iterator_type function = functions.first;
+
+        if ( par.coarsestencilsize == 5 ) BOOST_ASSERT(numvalues > 9);
 
         for (int column = 0; stencil != stencils.second; ++stencil, ++function, ++column)
         {
             namespace stubs = components::amr::stubs;
             BOOST_ASSERT(function != functions.second);
-            if (column == 0 || column == numvalues-1) {
-                // boundary value
-                stubs::dynamic_stencil_value::set_functional_component(*stencil, 
-                    *function, static_step, column, stencilsize-1, stencilsize-1, par);
-            } 
-            else {
-                // 'normal' value
-                stubs::dynamic_stencil_value::set_functional_component(*stencil, 
-                    *function, static_step, column, stencilsize, stencilsize, par);
+            if ( par.coarsestencilsize == 3 ) {
+              if (column == 0 || column == numvalues-1) {
+                  // boundary value
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column, 
+                      par.coarsestencilsize-1, par.coarsestencilsize-1, par);
+              } 
+              else {
+                  // 'normal' value
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column, 
+                      par.coarsestencilsize, par.coarsestencilsize, par);
+              }
+            } else if ( par.coarsestencilsize == 5 ) {
+              // bias the stencil to the right
+              if (column == 0 ) {
+                  // boundary value
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column, 2,3, par);
+              } else if ( column == 1) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column,3,4, par);
+              } else if ( column == 2 || column == 3) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column,5,4, par);
+              } else if ( column == numvalues-4 || column == numvalues-3) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column,5,4,par);
+              } else if ( column == numvalues-2) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column,3,4,par);
+              } else if ( column == numvalues-1) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column, 2,3, par);
+              } else {
+                  // 'normal' value
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column, 5,5, par);
+              }
+            } else {
+               BOOST_ASSERT (false);
             }
         }
         BOOST_ASSERT(function == functions.second);
@@ -127,7 +161,8 @@ namespace hpx { namespace components { namespace amr { namespace server
 
     void amr_mesh::connect_input_ports(
         components::distributing_factory::result_type const* stencils,
-        std::vector<std::vector<std::vector<naming::id_type> > > const& outputs)
+        std::vector<std::vector<std::vector<naming::id_type> > > const& outputs,
+        Parameter const& par)
     {
         typedef components::distributing_factory::result_type result_type;
 
@@ -144,30 +179,84 @@ namespace hpx { namespace components { namespace amr { namespace server
                 int outstep = mod(step-1, steps);
 
                 std::vector<naming::id_type> output_ports;
-                if ( i==0 ) {
-                  output_ports += 
-                        outputs[outstep][0][0],  
-                        outputs[outstep][1][0];
-             // std::cout << " TEST A outputs " << outputs[outstep][0][0] << std::endl;
-             // std::cout << " TEST B outputs " << outputs[outstep][1][0] << std::endl;
-                } else if ( i==numvals-1 ) {
-                  output_ports += 
-                        outputs[outstep][numvals-2][2],  
-                        outputs[outstep][numvals-1][1];
-                } else if ( i==1 ) {
-                  output_ports += 
-                        outputs[outstep][i-1][1], // there are only two inputs at i=0 
-                        outputs[outstep][i][1],  
-                        outputs[outstep][i+1][0];
+                if ( par.coarsestencilsize == 3 ) {
+                  if ( i==0 ) {
+                    output_ports += 
+                          outputs[outstep][0][0],  
+                          outputs[outstep][1][0];
+                  } else if ( i==numvals-1 ) {
+                    output_ports += 
+                          outputs[outstep][numvals-2][2],  
+                          outputs[outstep][numvals-1][1];
+                  } else if ( i==1 ) {
+                    output_ports += 
+                          outputs[outstep][i-1][1], // there are only two inputs at i=0 
+                          outputs[outstep][i][1],  
+                          outputs[outstep][i+1][0];
+                  } else {
+                    output_ports += 
+                          outputs[outstep][i-1][2],    // sw input is connected to the ne output of the sw element
+                          outputs[outstep][i][1],    // s input is connected to the n output of the s element 
+                          outputs[outstep][i+1][0]    // se input is connected to the nw output of the se element
+                      ;
+                  }
+                } else if ( par.coarsestencilsize == 5 ) {
+                  if ( i==0 ) {
+                    output_ports += 
+                          outputs[outstep][0][1],  
+                          outputs[outstep][1][3];
+                  } else if ( i==1 ) {
+                    output_ports += 
+                          outputs[outstep][i-1][2], 
+                          outputs[outstep][i][2],  
+                          outputs[outstep][i+1][3];
+                  } else if ( i==numvals-6 ) {
+                    output_ports += 
+                          outputs[outstep][i-2][0], 
+                          outputs[outstep][i-1][1], 
+                          outputs[outstep][i][2],  
+                          outputs[outstep][i+1][3],
+                          outputs[outstep][i+2][0];
+                  } else if ( i==numvals-5 ) {
+                    output_ports += 
+                          outputs[outstep][i-2][0], 
+                          outputs[outstep][i-1][1], 
+                          outputs[outstep][i][2],  
+                          outputs[outstep][i+1][3],
+                          outputs[outstep][i+2][3];
+                  } else if ( i==numvals-4 ) {
+                    output_ports += 
+                          outputs[outstep][i-2][0], 
+                          outputs[outstep][i-1][1], 
+                          outputs[outstep][i][2],  
+                          outputs[outstep][i+1][2],
+                          outputs[outstep][i+2][3];
+                  } else if ( i==numvals-3 ) {
+                    output_ports += 
+                          outputs[outstep][i-2][0], 
+                          outputs[outstep][i-1][1], 
+                          outputs[outstep][i][1],  
+                          outputs[outstep][i+1][2],
+                          outputs[outstep][i+2][2];
+                  } else if ( i==numvals-2 ) {
+                    output_ports += 
+                          outputs[outstep][i-1][0],
+                          outputs[outstep][i][0],  
+                          outputs[outstep][i+1][0];
+                  } else if ( i==numvals-1 ) {
+                    output_ports += 
+                          outputs[outstep][i-1][1],
+                          outputs[outstep][i][1];  
+                  } else {
+                    output_ports += 
+                          outputs[outstep][i-2][0],
+                          outputs[outstep][i-1][1],  
+                          outputs[outstep][i][2],
+                          outputs[outstep][i+1][3],
+                          outputs[outstep][i+2][4];
+                  }
                 } else {
-                  output_ports += 
-                     //   outputs[outstep][mod(i-1, numvals)][2],    // sw input is connected to the ne output of the sw element
-                     //   outputs[outstep][mod(i  , numvals)][1],    // s input is connected to the n output of the s element 
-                     //   outputs[outstep][mod(i+1, numvals)][0]     // se input is connected to the nw output of the se element
-                        outputs[outstep][i-1][2],    // sw input is connected to the ne output of the sw element
-                        outputs[outstep][i][1],    // s input is connected to the n output of the s element 
-                        outputs[outstep][i+1][0]    // se input is connected to the nw output of the se element
-                    ;
+                  BOOST_ASSERT(false);
                 }
 
                 components::amr::stubs::dynamic_stencil_value::
@@ -264,9 +353,6 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::size_t numsteps,
         components::component_type logging_type, Parameter const& par)
     {
-        std::size_t stencilsize = par.stencilsize;
-
-        //  std::cout << " init_execute Stencilsize : " << stencilsize << std::endl;
         std::vector<naming::id_type> result_data;
 
         components::component_type stencil_type = 
@@ -298,9 +384,9 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // initialize stencil_values using the stencil (functional) components
         init_stencils(locality_results(stencils[0]), locality_results(functions), 
-            0, stencilsize, numvalues, par);
+            0, numvalues, par);
         init_stencils(locality_results(stencils[1]), locality_results(functions), 
-            1, stencilsize, numvalues, par);
+            1, numvalues, par);
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(2);
@@ -308,7 +394,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         get_output_ports(locality_results(stencils[1]), outputs[1]);
 
         // connect output gids with corresponding stencil inputs
-        connect_input_ports(stencils, outputs);
+        connect_input_ports(stencils, outputs,par);
 
         // for loop over second row ; call start for each
         start_row(locality_results(stencils[1]));
@@ -338,9 +424,6 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::size_t numsteps,
         components::component_type logging_type, Parameter const& par)
     {
-        std::size_t stencilsize = par.stencilsize;
-
-    //    std::cout << " execute Stencilsize : " << stencilsize << std::endl;
         std::vector<naming::id_type> result_data;
 
         components::component_type stencil_type = 
@@ -372,9 +455,9 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // initialize stencil_values using the stencil (functional) components
         init_stencils(locality_results(stencils[0]), locality_results(functions), 
-            0, stencilsize, numvalues, par);
+            0, numvalues, par);
         init_stencils(locality_results(stencils[1]), locality_results(functions), 
-            1, stencilsize, numvalues, par);
+            1, numvalues, par);
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(2);
@@ -382,7 +465,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         get_output_ports(locality_results(stencils[1]), outputs[1]);
 
         // connect output gids with corresponding stencil inputs
-        connect_input_ports(stencils, outputs);
+        connect_input_ports(stencils, outputs,par);
 
         // for loop over second row ; call start for each
         start_row(locality_results(stencils[1]));

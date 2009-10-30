@@ -287,7 +287,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         out_.resize(outstencilsize);
 
         // create adaptors
-        for (std::size_t i = 0; i < outstencilsize_; ++i)
+        for (std::size_t i = 0; i < instencilsize_; ++i)
         {
             in_[i].reset(new in_adaptor_type());
         }

@@ -238,6 +238,8 @@ int main(int argc, char* argv[])
         par.minx0       = -10.0;
         par.maxx0       =  10.0;
 
+        par.linearbounds = 1;
+
         std::string parfile;
         if (vm.count("parfile")) {
             parfile = vm["parfile"].as<std::string>();
@@ -260,6 +262,10 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("stencilsize") ) {
                 std::string tmp = sec->get_entry("stencilsize");
                 par.stencilsize = atoi(tmp.c_str());
+              }
+              if ( sec->has_entry("linearbounds") ) {
+                std::string tmp = sec->get_entry("linearbounds");
+                par.linearbounds = atoi(tmp.c_str());
               }
               if ( sec->has_entry("nx0") ) {
                 std::string tmp = sec->get_entry("nx0");
@@ -287,6 +293,16 @@ int main(int argc, char* argv[])
         // derived parameters
         par.dx0 = (par.maxx0 - par.minx0)/(par.nx0-1);
         par.dt0 = par.lambda*par.dx0;
+        if ( par.allowedl > 0 ) {
+          if ( par.linearbounds == 1 ) {
+            par.coarsestencilsize = par.stencilsize + 2;
+          } else {
+            // Not implemented yet
+            BOOST_ASSERT(false);
+          }
+        } else {
+          par.coarsestencilsize = par.stencilsize;
+        }
 
         initrand(42, pdist, mean, stddev, numsteps, numvals, num_threads);
 

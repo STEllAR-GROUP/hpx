@@ -29,6 +29,8 @@ namespace hpx { namespace components { namespace amr
             ar & allowedl;
             ar & loglevel;
             ar & stencilsize;
+            ar & linearbounds;
+            ar & coarsestencilsize;
             ar & nt0;
             ar & nx0;
             ar & minx0;

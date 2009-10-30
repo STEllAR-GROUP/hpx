@@ -11,11 +11,6 @@
 
 #include "rand.hpp"
 
-double xmin = -10.0;
-double xmax =  10.0;
-double dx;
-double dt;
-
 ///////////////////////////////////////////////////////////////////////////
 int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     Par const& par)
@@ -45,7 +40,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
 
 ///////////////////////////////////////////////////////////////////////////
 int evaluate_timestep(stencil_data const* left, stencil_data const* middle, 
-    stencil_data const* right, stencil_data* result, int numsteps)
+    stencil_data const* right, stencil_data* result, int numsteps,Par const& par)
 {
     // the middle point is our direct predecessor
 
@@ -59,6 +54,8 @@ int evaluate_timestep(stencil_data const* left, stencil_data const* middle,
     */
     double sum = 0;
     long n = work[middle->timestep_*nzones+middle->index_/zone];
+    double dt = par.dt0;
+    double dx = par.dx0;
 
     //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
     //for (t = 0; t < n; t++)
@@ -70,7 +67,7 @@ int evaluate_timestep(stencil_data const* left, stencil_data const* middle,
 
 ///////////////////////////////////////////////////////////////////////////
 int evaluate_left_bdry_timestep(stencil_data const* middle, stencil_data const* right, 
-                           stencil_data* result, int numsteps)
+                           stencil_data* result, int numsteps,Par const& par)
 {
     // the middle point is our direct predecessor
 
@@ -84,6 +81,8 @@ int evaluate_left_bdry_timestep(stencil_data const* middle, stencil_data const* 
     */
     double sum = 0;
     long n = work[middle->timestep_*nzones+middle->index_/zone];
+    double dt = par.dt0;
+    double dx = par.dx0;
 
     //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
     //for (t = 0; t < n; t++)
@@ -97,7 +96,7 @@ int evaluate_left_bdry_timestep(stencil_data const* middle, stencil_data const* 
 
 ///////////////////////////////////////////////////////////////////////////
 int evaluate_right_bdry_timestep(stencil_data const* left, stencil_data const* middle, 
-                           stencil_data* result, int numsteps)
+                           stencil_data* result, int numsteps,Par const& par)
 {
     // the middle point is our direct predecessor
 
@@ -111,6 +110,8 @@ int evaluate_right_bdry_timestep(stencil_data const* left, stencil_data const* m
     */
     double sum = 0;
     long n = work[middle->timestep_*nzones+middle->index_/zone];
+    double dt = par.dt0;
+    double dx = par.dx0;
 
     //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
     //for (t = 0; t < n; t++)

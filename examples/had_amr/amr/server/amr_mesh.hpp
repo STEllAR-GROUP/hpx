@@ -86,7 +86,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         static void init_stencils(
             distributed_iterator_range_type const& stencils,
-            distributed_iterator_range_type const& functions, int static_step, int stencilsize,int numvalues,Parameter const& par);
+            distributed_iterator_range_type const& functions, int static_step, int numvalues,Parameter const& par);
 
         static void get_output_ports(
             distributed_iterator_range_type const& stencils,
@@ -94,7 +94,8 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         static void connect_input_ports(
             components::distributing_factory::result_type const* stencils,
-            std::vector<std::vector<std::vector<naming::id_type> > > const& outputs);
+            std::vector<std::vector<std::vector<naming::id_type> > > const& outputs,
+            Parameter const& par);
 
         static void execute(distributed_iterator_range_type const& stencils, 
             std::vector<naming::id_type> const& initial_data, 

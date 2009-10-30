@@ -15,6 +15,8 @@ struct Par {
       int allowedl;
       int loglevel;
       int stencilsize;
+      int linearbounds;
+      int coarsestencilsize;
       int nx0;
       int nt0;
       double minx0;
