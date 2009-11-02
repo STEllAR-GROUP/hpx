@@ -179,7 +179,7 @@ namespace hpx { namespace components { namespace amr
             }
 
             std::size_t allowedl = par.allowedl;
-            if ( val2->refine_ && gids.size() == 3 && val2->level_ < allowedl ) {
+            if ( val2->refine_ && gids.size() == 5 && val2->level_ < allowedl ) {
               finer_mesh(result, gids,par);
             }
 
@@ -215,17 +215,18 @@ namespace hpx { namespace components { namespace amr
         std::vector<naming::id_type> const& gids, Parameter const& par) 
     {
 
-      naming::id_type gval1, gval2, gval3, gval4, gval5;
-      boost::tie(gval1, gval2, gval3, gval4, gval5) = 
+      naming::id_type gval1, gval2, gval3, gval4, gval5, gval6;
+      boost::tie(gval1, gval2, gval3, gval4, gval5, gval6) = 
                         components::wait(components::stubs::memory_block::clone_async(gids[0]), 
                              components::stubs::memory_block::clone_async(gids[1]),
-                             components::stubs::memory_block::clone_async(gids[1]),
-                             components::stubs::memory_block::clone_async(gids[1]),
-                             components::stubs::memory_block::clone_async(gids[2]));
+                             components::stubs::memory_block::clone_async(gids[2]),
+                             components::stubs::memory_block::clone_async(gids[3]),
+                             components::stubs::memory_block::clone_async(gids[4]),
+                             components::stubs::memory_block::clone_async(gids[4]));
 
-      access_memory_block<stencil_data> mval1, mval2, mval3, mval4, mval5;
-      boost::tie(mval1, mval2, mval3, mval4, mval5) = 
-          detail::get_async(gval1, gval2, gval3, gval4, gval5);
+      access_memory_block<stencil_data> mval1, mval2, mval3, mval4, mval5, mval6;
+      boost::tie(mval1, mval2, mval3, mval4, mval5, mval6) = 
+          detail::get_async(gval1, gval2, gval3, gval4, gval5, gval6);
 
       // increase the level by one
       ++mval1->level_;
@@ -233,6 +234,7 @@ namespace hpx { namespace components { namespace amr
       ++mval3->level_;
       ++mval4->level_;
       ++mval5->level_;
+      ++mval6->level_;
 
       // initialize timestep for the fine mesh
       mval1->timestep_ = 0;
@@ -240,6 +242,7 @@ namespace hpx { namespace components { namespace amr
       mval3->timestep_ = 0;
       mval4->timestep_ = 0;
       mval5->timestep_ = 0;
+      mval6->timestep_ = 0;
 
       // initialize the index
       mval1->index_ = 0;
@@ -247,19 +250,68 @@ namespace hpx { namespace components { namespace amr
       mval3->index_ = 2;
       mval4->index_ = 3;
       mval5->index_ = 4;
+      mval6->index_ = 5;
 
-      // if the refined point already exists, no need to interpolate
-      if (mval1->right_alloc_ == 1 && mval1->right_level_ == mval1->level_) 
-          mval2->value_ = mval1->right_value_; 
-      if (mval3->right_alloc_ == 1 && mval3->right_level_ == mval3->level_) 
-          mval4->value_ = mval3->right_value_; 
+      // temporarily store the values before overwriting them
+      double t1,t2,t3,t4,t5;
+      double x1,x2,x3,x4,x5;
+      t1 = mval1->value_;
+      t2 = mval2->value_;
+      t3 = mval3->value_;
+      t4 = mval4->value_;
+      t5 = mval5->value_;
+
+      x1 = mval1->x_;
+      x2 = mval2->x_;
+      x3 = mval3->x_;
+      x4 = mval4->x_;
+      x5 = mval5->x_;
 
       // this updates the coordinate position
-      mval2->x_ = 0.5*(mval1->x_ + mval3->x_);
-      mval4->x_ = 0.5*(mval3->x_ + mval5->x_);
+      mval1->x_ = x2;
+      mval2->x_ = 0.5*(x2+x3);
+      mval3->x_ = x3;
+      mval4->x_ = 0.5*(x3+x4);
+      mval5->x_ = x4;
+      mval6->x_ = 0.5*(x4+x5);
+      
+      // ------------------------------
+      // bias the stencil to the right
+      mval1->value_ = t2;
+      
+      if ( par.linearbounds == 1 ) {
+        // linear interpolation
+        mval2->value_ = 0.5*(t2 + t3);
+      } else {
+        // other user defined options not implemented yet
+        interpolation();
+        BOOST_ASSERT(false);
+      }
 
-      // call to user defined interpolation
-      interpolation();
+      mval3->value_ = t3;
+
+      if ( par.linearbounds == 1 ) {
+        // linear interpolation
+        mval4->value_ = 0.5*(t3 + t4);
+      } else {
+        // other user defined options not implemented yet
+        interpolation();
+        BOOST_ASSERT(false);
+      }
+
+      mval5->value_ = t4;
+
+      if ( par.linearbounds == 1 ) {
+        // linear interpolation
+        mval6->value_ = 0.5*(t4 + t5);
+      } else {
+        // other user defined options not implemented yet
+        interpolation();
+        BOOST_ASSERT(false);
+      }
+      
+      // end bias the stencil to the right
+      // ------------------------------
 
       // the initial data for the child mesh comes from the parent mesh
       naming::id_type here = applier::get_applier().get_runtime_support_gid();
@@ -276,8 +328,9 @@ namespace hpx { namespace components { namespace amr
       initial_data.push_back(gval3);
       initial_data.push_back(gval4);
       initial_data.push_back(gval5);
+      initial_data.push_back(gval6);
 
-      std::size_t numvalues = 5;
+      std::size_t numvalues = 6;
       std::size_t numsteps = 2;
 
       bool do_logging = false;

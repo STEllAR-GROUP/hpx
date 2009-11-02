@@ -67,21 +67,47 @@ namespace hpx { namespace components { namespace amr { namespace server
         components::distributing_factory::iterator_type stencil = stencils.first;
         components::distributing_factory::iterator_type function = functions.first;
 
+        if ( par.coarsestencilsize == 5 ) BOOST_ASSERT(numvalues == 6);
+
         for (int column = 0; stencil != stencils.second; ++stencil, ++function, ++column)
         {
             namespace stubs = components::amr::stubs;
             BOOST_ASSERT(function != functions.second);
-            if (column == 0 || column == numvalues-1) {
+            if ( par.coarsestencilsize == 3 ) {
+              if (column == 0 || column == numvalues-1) {
                 // boundary value
                 stubs::dynamic_stencil_value::set_functional_component(*stencil, 
                     *function, static_step, column, 
                     par.stencilsize-1, par.stencilsize-1, par);
-            } 
-            else {
+              } else {
                 // 'normal' value
                 stubs::dynamic_stencil_value::set_functional_component(*stencil, 
                     *function, static_step, column, 
                     par.stencilsize, par.stencilsize, par);
+              }
+            } else if ( par.coarsestencilsize == 5 ) {
+              // bias the stencil to the right
+              if (column == 0 ) {
+                stubs::dynamic_stencil_value::set_functional_component(*stencil,
+                                                *function, static_step, column, 2,3, par);
+              } else if ( column == 1) {
+                stubs::dynamic_stencil_value::set_functional_component(*stencil,
+                                                *function, static_step, column, 3,4, par);
+              } else if ( column == 2) {
+                stubs::dynamic_stencil_value::set_functional_component(*stencil,
+                                                *function, static_step, column, 5,3, par);
+              } else if ( column == 3) {
+                stubs::dynamic_stencil_value::set_functional_component(*stencil,
+                                                *function, static_step, column, 5,3, par);
+              } else if ( column == 4) {
+                stubs::dynamic_stencil_value::set_functional_component(*stencil,
+                                                *function, static_step, column, 3,4, par);
+              } else if ( column == 5) {
+                stubs::dynamic_stencil_value::set_functional_component(*stencil,
+                                                *function, static_step, column, 2,3, par);
+              }
+            } else {
+              BOOST_ASSERT (false);
             }
         }
         BOOST_ASSERT(function == functions.second);
@@ -129,7 +155,8 @@ namespace hpx { namespace components { namespace amr { namespace server
 
     void amr_mesh_tapered::connect_input_ports(
         components::distributing_factory::result_type const* stencils,
-        std::vector<std::vector<std::vector<naming::id_type> > > const& outputs)
+        std::vector<std::vector<std::vector<naming::id_type> > > const& outputs,
+        Parameter const& par)
     {
         typedef components::distributing_factory::result_type result_type;
 
@@ -146,24 +173,60 @@ namespace hpx { namespace components { namespace amr { namespace server
                 int outstep = mod(step-1, steps);
 
                 std::vector<naming::id_type> output_ports;
-                if ( i==0 ) {
-                  output_ports += 
-                        outputs[outstep][0][0],  
-                        outputs[outstep][1][0];
-                } else if ( i==numvals-1 ) {
-                  output_ports += 
-                        outputs[outstep][numvals-2][2],  
-                        outputs[outstep][numvals-1][1];
-                } else if ( i==1 ) {
-                  output_ports += 
-                        outputs[outstep][i-1][1], // there are only two inputs at i=0 
-                        outputs[outstep][i][1],  
-                        outputs[outstep][i+1][0];
-                } else {
-                  output_ports += 
-                        outputs[outstep][i-1][2],
-                        outputs[outstep][i][1], 
-                        outputs[outstep][i+1][0];
+                if ( par.coarsestencilsize == 3 ) {
+                  if ( i==0 ) {
+                    output_ports += 
+                          outputs[outstep][0][0],  
+                          outputs[outstep][1][0];
+                  } else if ( i==numvals-1 ) {
+                    output_ports += 
+                          outputs[outstep][numvals-2][2],  
+                          outputs[outstep][numvals-1][1];
+                  } else if ( i==1 ) {
+                    output_ports += 
+                          outputs[outstep][i-1][1], // there are only two inputs at i=0 
+                          outputs[outstep][i][1],  
+                          outputs[outstep][i+1][0];
+                  } else {
+                    output_ports += 
+                          outputs[outstep][i-1][2],
+                          outputs[outstep][i][1], 
+                          outputs[outstep][i+1][0];
+                  }
+                } else if ( par.coarsestencilsize == 5 ) {
+                  if ( i==0 ) {
+                    output_ports += 
+                          outputs[outstep][i][0],  
+                          outputs[outstep][i+1][3];
+                  } else if ( i==1 ) {
+                    output_ports += 
+                          outputs[outstep][i-1][2],  
+                          outputs[outstep][i][2],  
+                          outputs[outstep][i+1][0];
+                  } else if ( i==2 ) {
+                    output_ports += 
+                          outputs[outstep][i-2][1],  
+                          outputs[outstep][i-1][0],  
+                          outputs[outstep][i][1],  
+                          outputs[outstep][i+1][0],
+                          outputs[outstep][i+2][1];
+                  } else if ( i==3 ) {
+                    output_ports += 
+                          outputs[outstep][i-2][1],  
+                          outputs[outstep][i-1][2],  
+                          outputs[outstep][i][1],  
+                          outputs[outstep][i+1][2],
+                          outputs[outstep][i+2][1];
+                  } else if ( i==4 ) {
+                    output_ports += 
+                          outputs[outstep][i-1][2],  
+                          outputs[outstep][i][0],  
+                          outputs[outstep][i+1][0];
+                  } else if ( i==5 ) {
+                    output_ports += 
+                          outputs[outstep][i-1][3],  
+                          outputs[outstep][i][2];  
+                  }
                 }
 
                 components::amr::stubs::dynamic_stencil_value::
@@ -299,7 +362,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         get_output_ports(locality_results(stencils[1]), outputs[1]);
 
         // connect output gids with corresponding stencil inputs
-        connect_input_ports(stencils, outputs);
+        connect_input_ports(stencils, outputs,par);
 
         // for loop over second row ; call start for each
         start_row(locality_results(stencils[1]));
@@ -370,7 +433,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         get_output_ports(locality_results(stencils[1]), outputs[1]);
 
         // connect output gids with corresponding stencil inputs
-        connect_input_ports(stencils, outputs);
+        connect_input_ports(stencils, outputs,par);
 
         // for loop over second row ; call start for each
         start_row(locality_results(stencils[1]));
