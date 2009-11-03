@@ -12,6 +12,17 @@
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
+// Helper routines
+
+inline hpx::naming::id_type find_here(void)
+{
+    return hpx::applier::get_applier().get_runtime_support_gid();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Definitions for Kernel 3
+
+///////////////////////////////////////////////////////////////////////////////
 // Definitions for Kernel 4
 
 int kernel4(naming::id_type G, naming::id_type VS, int k4_approx, naming::id_type bc_scores);
@@ -47,15 +58,4 @@ typedef
     actions::plain_result_action3<int, naming::id_type, naming::id_type, double, incr_bc>
 incr_bc_action;
 
-/*
-struct k4
-{
-    static int init_local_bc(naming::id_type bc_local, naming::id_type v_local);
-
-    typedef actions::plain_result_action2<
-        int, naming::id_type, naming::id_type, k4::init_local_bc
-    > init_local_bc_action;
-};
-
- */
 #endif

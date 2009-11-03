@@ -26,9 +26,7 @@ namespace hpx { namespace components
     public:
         local_map(naming::id_type gid, bool freeonexit = true)
           : base_type(gid, freeonexit)
-        {
-            std::cout << "Constructing local list" << std::endl;
-        }
+        { }
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component

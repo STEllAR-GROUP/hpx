@@ -45,7 +45,6 @@ namespace hpx { namespace components { namespace server
         };
         
         // Typedefs for graph
-        typedef int count_t;
         typedef long int vertex_t;
         typedef long int edge_t;
 
@@ -70,7 +69,7 @@ namespace hpx { namespace components { namespace server
 
         /// Initialize the graph
         // This is an opt. for when we know the order a priori
-        int init(count_t order)
+        int init(std::size_t order)
         {            
             LGRAPH_(info) << "Initializing graph of order " << order;
 
@@ -141,7 +140,7 @@ namespace hpx { namespace components { namespace server
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::result_action1<
-            graph, int, graph_init, count_t, &graph::init
+            graph, int, graph_init, std::size_t, &graph::init
         > init_action;
 
         typedef hpx::actions::result_action0<
@@ -173,7 +172,7 @@ namespace hpx { namespace components { namespace server
             hpx::components::server::vertex
         > vertex_set_stub;
 
-        count_t block_size_;
+        std::size_t block_size_;
         std::vector<naming::id_type> blocks_;
 
         int order_;

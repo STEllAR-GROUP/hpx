@@ -404,6 +404,10 @@ namespace hpx { namespace components { namespace server
         //std::vector<naming::id_type> graph_set_local(edges.size());
         // This uses hack to get prefix
 
+        // Why are we using a dist-set for subgraphs?
+        // Why not a pmap?
+        // That would give a mapping from e->S_e.
+
         // Should be not be syncing until as late as possible,
         // after the pmaps returns
         naming::id_type here(boost::uint64_t(local_edge_set.get_msb()) << 32,0);

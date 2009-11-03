@@ -16,8 +16,6 @@
 
 namespace hpx { namespace components { namespace stubs
 {
-    typedef int count_t;
-    
     ///////////////////////////////////////////////////////////////////////////
     /// The \a stubs#graph class is the client side representation of all
     /// \a server#graph components
@@ -28,7 +26,7 @@ namespace hpx { namespace components { namespace stubs
 
         /// Initialize the server#graph instance 
         /// with the given \a gid
-        static int init(naming::id_type gid, count_t order)
+        static int init(naming::id_type gid, std::size_t order)
         {
             typedef server::graph::init_action action_type;
             return lcos::eager_future<action_type>(gid, order).get();

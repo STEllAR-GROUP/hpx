@@ -217,8 +217,7 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
 
     typedef std::vector<naming::id_type> gids_type;
 
-    // Find out where here is
-    naming::id_type here = applier::get_applier().get_runtime_support_gid();
+    naming::id_type here = find_here();
 
     // SSCA#2 Graph Analysis Benchmark
 
