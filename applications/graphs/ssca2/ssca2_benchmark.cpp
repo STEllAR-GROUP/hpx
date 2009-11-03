@@ -199,17 +199,15 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int type)
+int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int type, int k4_approx)
 {
-    LSSCA_(info) << "event: action(ssca2_benchmark::hpx_main) status(begin)";
-    LSSCA_(info) << "parent(" << threads::get_parent_id() << ")";
+    // SSCA#2 Graph Analysis Benchmark
+    LSSCA_(info) << "Starting SSCA2 Graph Analysis Benchmark";
+
     std::cout.setf(std::ios::dec);
 
-    naming::id_type here = find_here();
-
-    // SSCA#2 Graph Analysis Benchmark
-
     double total_time;
+    gid_type here = find_here();
 
     // Create the graph used for with all kernels
     client_graph_type G(client_graph_type::create(here));
@@ -347,7 +345,6 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
     subgraphs.free();
     edge_set.free();
 
-
     // Kernel 4: graph analysis algorithm
     // Input:
     //     G - the graph read in from Kernel 1
@@ -357,8 +354,6 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
     //     bc_scores - the collection of betweenness centrality scores
 
     LSSCA_(info) << "Starting Kernel 4";
-
-    int k4_approx = scale;
 
     LSSCA_(info) << "K4 approx. is " << k4_approx;
 
@@ -418,8 +413,6 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
     }
     bc_scores.free();
 
-    // Shutdown ...
-
     // Free components
     G.free();
 
@@ -458,6 +451,8 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "the edge factor of the R-MAT graph")
             ("type,y", po::value<int>(),
                 "the type of R-MAT, controls the (a,b,c,d) parameters")
+            ("k4_approx,k", po::value<int>(),
+                "the approximate scale for Kernel 4")
         ;
 
         po::store(po::command_line_parser(argc, argv)
@@ -548,6 +543,7 @@ int main(int argc, char* argv[])
         int depth = 3;
         int edge_factor = 8;
         int type = 0;
+        int k4_approx = scale;
 
         hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
 
@@ -579,6 +575,11 @@ int main(int argc, char* argv[])
         if (vm.count("type"))
             type = vm["type"].as<int>();
 
+        if (vm.count("k4_approx"))
+            k4_approx = vm["k4_approx"].as<int>();
+        else
+            k4_approx = scale;
+
         // initialize and run the AGAS service, if appropriate
         std::auto_ptr<agas_server_helper> agas_server;
         if (vm.count("run_agas_server"))  // run the AGAS server instance here
@@ -592,7 +593,7 @@ int main(int argc, char* argv[])
         }
         else
         {
-            rt.run(boost::bind(hpx_main, depth, filename, scale, edge_factor, type), num_threads);
+            rt.run(boost::bind(hpx_main, depth, filename, scale, edge_factor, type, k4_approx), num_threads);
         }
     }
     catch (std::exception& e) {
