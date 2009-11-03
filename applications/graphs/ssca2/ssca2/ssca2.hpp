@@ -57,27 +57,6 @@ namespace hpx { namespace components
         }
 
         int
-        extract(naming::id_type edge_set, naming::id_type subgraphs)
-        {
-            BOOST_ASSERT(gid_);
-            return this->base_type::extract(gid_, edge_set, subgraphs);
-        }
-
-        int
-        extract_local(naming::id_type local_edge_set, naming::id_type subgraphs)
-        {
-            BOOST_ASSERT(gid_);
-            return this->base_type::extract_local(gid_, local_edge_set, subgraphs);
-        }
-
-        naming::id_type
-        extract_subgraph(naming::id_type H, naming::id_type pmap, naming::id_type source, naming::id_type target, int d)
-        {
-            BOOST_ASSERT(gid_);
-            return this->base_type::extract_subgraph(gid_, H, pmap, source, target, d);
-        }
-
-        int
         init_props_map(naming::id_type P, naming::id_type G)
         {
             BOOST_ASSERT(gid_);

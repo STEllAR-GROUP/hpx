@@ -332,7 +332,9 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
     /* Begin: timed execution of Kernel 3 */
     hpx::util::high_resolution_timer k3_t;
     distributed_set<graph_type> subgraphs(distributed_set<graph_type>::create(here));
-    SSCA2.extract(edge_set.get_gid(), subgraphs.get_gid());
+    lcos::eager_future<kernel3_action>
+        k3(here, edge_set.get_gid(), subgraphs.get_gid());
+    k3.get();
     total_time = k3_t.elapsed();
     /* End: timed execution of Kernel 3 */
 

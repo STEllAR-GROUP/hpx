@@ -26,6 +26,7 @@ set (ssca2_HEADERS
     
 set(ssca2_benchmark_SOURCES
     ssca2_benchmark.cpp
+    kernel3.cpp
     kernel4.cpp)
     
 add_hpx_executable(ssca2_benchmark

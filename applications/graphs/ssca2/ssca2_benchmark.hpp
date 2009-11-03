@@ -22,6 +22,27 @@ inline hpx::naming::id_type find_here(void)
 ///////////////////////////////////////////////////////////////////////////////
 // Definitions for Kernel 3
 
+int kernel3(naming::id_type edge_set, naming::id_type subgraphs);
+int extract_local(naming::id_type local_edge_set, naming::id_type local_subgraphs);
+naming::id_type extract_subgraph(naming::id_type H, naming::id_type pmap,
+                        naming::id_type source, naming::id_type target,
+                        int d);
+
+typedef
+    actions::plain_result_action2<int, naming::id_type, naming::id_type, kernel3>
+kernel3_action;
+
+typedef
+    actions::plain_result_action2<int, naming::id_type, naming::id_type, extract_local>
+extract_local_action;
+
+typedef
+    actions::plain_result_action5<naming::id_type,
+                                  naming::id_type, naming::id_type, naming::id_type,
+                                  naming::id_type, int,
+                                  extract_subgraph>
+extract_subgraph_action;
+
 ///////////////////////////////////////////////////////////////////////////////
 // Definitions for Kernel 4
 

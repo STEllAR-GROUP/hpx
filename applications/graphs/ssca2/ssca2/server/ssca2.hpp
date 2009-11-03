@@ -51,9 +51,6 @@ namespace hpx { namespace components { namespace server
             ssca2_read_graph = 0,
             ssca2_large_set = 1,
             ssca2_large_set_local = 2,
-            ssca2_extract = 3,
-            ssca2_extract_local = 4,
-            ssca2_extract_subgraph = 5,
             ssca2_init_props_map = 6,
             ssca2_init_props_map_local = 7
         };
@@ -82,21 +79,6 @@ namespace hpx { namespace components { namespace server
                         naming::id_type global_max_lco);
 
         int
-        extract(naming::id_type edge_set,
-                naming::id_type subgraphs);
-
-        int
-        extract_local(naming::id_type local_edge_set,
-                      naming::id_type subgraphs);
-
-        naming::id_type
-        extract_subgraph(naming::id_type H,
-                         naming::id_type pmap,
-                         naming::id_type source,
-                         naming::id_type vertex,
-                         int d);
-
-        int
         init_props_map(naming::id_type P,
                        naming::id_type G);
 
@@ -121,24 +103,6 @@ namespace hpx { namespace components { namespace server
             naming::id_type, naming::id_type, naming::id_type, naming::id_type,
             &ssca2::large_set_local
         > large_set_local_action;
-
-        typedef hpx::actions::result_action2<
-            ssca2, int, ssca2_extract,
-            naming::id_type, naming::id_type,
-            &ssca2::extract
-        > extract_action;
-
-        typedef hpx::actions::result_action2<
-            ssca2, int, ssca2_extract_local,
-            naming::id_type, naming::id_type,
-            &ssca2::extract_local
-        > extract_local_action;
-
-        typedef hpx::actions::result_action5<
-            ssca2, naming::id_type, ssca2_extract_subgraph,
-            naming::id_type, naming::id_type, naming::id_type, naming::id_type, int,
-            &ssca2::extract_subgraph
-        > extract_subgraph_action;
 
         typedef hpx::actions::result_action2<
             ssca2, int, ssca2_init_props_map,

@@ -60,36 +60,6 @@ namespace hpx { namespace components { namespace stubs
         }
 
         static int
-        extract(naming::id_type gid,
-                naming::id_type edge_set,
-                naming::id_type subgraphs)
-        {
-            typedef server::ssca2::extract_action action_type;
-            return lcos::eager_future<action_type>(gid, edge_set, subgraphs).get();
-        }
-
-        static int
-        extract_local(naming::id_type gid,
-                      naming::id_type local_edge_set,
-                      naming::id_type subgraphs)
-        {
-            typedef server::ssca2::extract_local_action action_type;
-            return lcos::eager_future<action_type>(gid, local_edge_set, subgraphs).get();
-        }
-
-        static naming::id_type
-        extract_subgraph(naming::id_type gid,
-                         naming::id_type H,
-                         naming::id_type pmap,
-                         naming::id_type source,
-                         naming::id_type target,
-                         int d)
-        {
-            typedef server::ssca2::extract_subgraph_action action_type;
-            return lcos::eager_future<action_type>(gid, H, pmap, source, target, d).get();
-        }
-
-        static int
         init_props_map(naming::id_type gid,
                        naming::id_type P,
                        naming::id_type G)
