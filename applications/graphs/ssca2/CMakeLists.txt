@@ -5,7 +5,6 @@
 
 set(ssca_SUDIRS 
     props
-    pbreak
     reduce_max)
     
 foreach(subdir ${ssca_SUDIRS})
