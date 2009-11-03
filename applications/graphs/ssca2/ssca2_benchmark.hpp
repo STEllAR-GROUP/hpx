@@ -20,6 +20,25 @@ inline hpx::naming::id_type find_here(void)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Definitions for Kernel 2
+
+int kernel2(naming::id_type G, naming::id_type dist_edge_set);
+int large_set_local(naming::id_type local_vertex_set,
+                             naming::id_type edge_set,
+                             naming::id_type local_max_lco,
+                             naming::id_type global_max_lco);
+
+typedef
+    actions::plain_result_action2<int, naming::id_type, naming::id_type, kernel2>
+kernel2_action;
+
+typedef
+    actions::plain_result_action4<int, naming::id_type, naming::id_type,
+                                  naming::id_type, naming::id_type,
+                                  large_set_local>
+large_set_local_action;
+
+///////////////////////////////////////////////////////////////////////////////
 // Definitions for Kernel 3
 
 int kernel3(naming::id_type edge_set, naming::id_type subgraphs);

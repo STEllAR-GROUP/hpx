@@ -39,24 +39,6 @@ namespace hpx { namespace components
         }
 
         int
-        large_set(naming::id_type G, naming::id_type edge_set)
-        {
-            BOOST_ASSERT(gid_);
-            return this->base_type::large_set(gid_, G, edge_set);
-        }
-
-        int
-        large_set_local(naming::id_type local_set,
-                        naming::id_type edge_set,
-                        naming::id_type local_max_lco,
-                        naming::id_type global_max_lco)
-        {
-            BOOST_ASSERT(gid_);
-            return this->base_type::large_set_local(
-                gid_, local_set, edge_set, local_max_lco, global_max_lco);
-        }
-
-        int
         init_props_map(naming::id_type P, naming::id_type G)
         {
             BOOST_ASSERT(gid_);

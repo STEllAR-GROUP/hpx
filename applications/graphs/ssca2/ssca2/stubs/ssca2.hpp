@@ -38,28 +38,6 @@ namespace hpx { namespace components { namespace stubs
         }
 
         static int
-        large_set(naming::id_type gid,
-                  naming::id_type G,
-                  naming::id_type edge_set)
-        {
-            typedef server::ssca2::large_set_action action_type;
-            return lcos::eager_future<action_type>(gid, G, edge_set).get();
-        }
-
-        static int
-        large_set_local(naming::id_type gid,
-                naming::id_type local_set,
-                        naming::id_type edge_set,
-                        naming::id_type local_max_lco,
-                        naming::id_type global_max_lco)
-        {
-            typedef server::ssca2::large_set_local_action action_type;
-            return lcos::eager_future<action_type>(
-                       gid, local_set, edge_set, local_max_lco, global_max_lco
-                   ).get();
-        }
-
-        static int
         init_props_map(naming::id_type gid,
                        naming::id_type P,
                        naming::id_type G)

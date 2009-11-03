@@ -284,7 +284,9 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
     /* Begin: timed execution of Kernel 2 */
     hpx::util::high_resolution_timer k2_t;
     distributed_set<edge> edge_set(distributed_set<edge>::create(here));
-    SSCA2.large_set(G.get_gid(), edge_set.get_gid());
+    lcos::eager_future<kernel2_action>
+        k2(here, G.get_gid(), edge_set.get_gid());
+    k2.get();
     total_time = k2_t.elapsed();
     /* End: timed execution of Kernel 2 */
     LSSCA_(info) << "Completed Kernel 2 in " << total_time << " sec";

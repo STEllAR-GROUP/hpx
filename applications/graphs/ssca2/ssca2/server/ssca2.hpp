@@ -49,8 +49,6 @@ namespace hpx { namespace components { namespace server
         enum actions
         {
             ssca2_read_graph = 0,
-            ssca2_large_set = 1,
-            ssca2_large_set_local = 2,
             ssca2_init_props_map = 6,
             ssca2_init_props_map_local = 7
         };
@@ -69,16 +67,6 @@ namespace hpx { namespace components { namespace server
                    std::string filename);
 
         int
-        large_set(naming::id_type G,
-                  naming::id_type dist_edge_set);
-
-        int
-        large_set_local(naming::id_type local_set,
-                        naming::id_type edge_set,
-                        naming::id_type local_max_lco,
-                        naming::id_type global_max_lco);
-
-        int
         init_props_map(naming::id_type P,
                        naming::id_type G);
 
@@ -91,18 +79,6 @@ namespace hpx { namespace components { namespace server
             naming::id_type, std::string,
             &ssca2::read_graph
         > read_graph_action;
-
-        typedef hpx::actions::result_action2<
-            ssca2, int, ssca2_large_set,
-            naming::id_type, naming::id_type,
-            &ssca2::large_set
-        > large_set_action;
-
-        typedef hpx::actions::result_action4<
-            ssca2, int, ssca2_large_set_local,
-            naming::id_type, naming::id_type, naming::id_type, naming::id_type,
-            &ssca2::large_set_local
-        > large_set_local_action;
 
         typedef hpx::actions::result_action2<
             ssca2, int, ssca2_init_props_map,
