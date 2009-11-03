@@ -4,7 +4,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(ssca_SUDIRS 
-    ssca2
     props
     pbreak
     reduce_max)
@@ -17,7 +16,8 @@ set(ssca_DEPENDENCIES
    graph_component vertex_component
    distributed_set_component 
    distributed_map_component
-   ssca2_component
+   props_component
+   reduce_max_component
    )
 
 set (ssca2_HEADERS
@@ -26,6 +26,7 @@ set (ssca2_HEADERS
     
 set(ssca2_benchmark_SOURCES
     ssca2_benchmark.cpp
+    kernel1.cpp
     kernel2.cpp
     kernel3.cpp
     kernel4.cpp)

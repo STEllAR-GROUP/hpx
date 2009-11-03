@@ -23,8 +23,6 @@
 #include <hpx/components/distributed_map/distributed_map.hpp>
 #include <hpx/components/distributed_map/local_map.hpp>
 
-#include "ssca2/ssca2.hpp"
-
 #include "props/props.hpp"
 
 #include <hpx/lcos/eager_future.hpp>
@@ -221,7 +219,6 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
 
     // SSCA#2 Graph Analysis Benchmark
 
-    using hpx::components::ssca2;
     using hpx::components::distributed_set;
     using hpx::components::local_set;
     using hpx::components::distributed_map;
@@ -230,11 +227,6 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
     typedef naming::id_type gid_type;
 
     double total_time;
-
-    // Instantiate the SSCA2 component which implements the kernels
-    // This is not strictly necessary, and the component actions
-    // could have been implemented directly in this file
-    ssca2 SSCA2 (ssca2::create(here));
 
     // Create the graph used for with all kernels
     using hpx::components::graph;
@@ -264,7 +256,9 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
 
         /* Begin: timed execution of Kernel 1 */
         hpx::util::high_resolution_timer k1_t;
-        SSCA2.read_graph(G.get_gid(), input_file);
+        lcos::eager_future<kernel1_action>
+            k1(here, G.get_gid(), input_file);
+        k1.get();
         total_time = k1_t.elapsed();
         /* End: timed execution of Kernel 1 */
         LSSCA_(info) << "Completed Kernel 1 in " << total_time << " sec";
@@ -453,7 +447,6 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
 
     // Free components
     G.free();
-    SSCA2.free();
 
     // Shut down runtime services
     components::stubs::runtime_support::shutdown_all();

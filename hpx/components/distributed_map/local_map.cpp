@@ -11,7 +11,5 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
-#include "../../applications/graphs/ssca2/ssca2/ssca2.hpp"
-
 #include <hpx/components/distributed_map/server/local_map.hpp>
 #include "local_map.hpp"

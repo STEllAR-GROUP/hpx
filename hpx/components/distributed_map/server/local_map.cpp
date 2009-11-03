@@ -17,9 +17,6 @@
 #include "local_map.hpp"
 #include "../stubs/local_map.hpp"
 
-// Needs this to define edge_map_type
-#include "../../../../applications/graphs/ssca2/ssca2/ssca2.hpp"
-
 #define LLOCAL_MAP_(lvl) LAPP_(lvl) << " [LOCAL_MAP] " << gid_ << " "
 
 ///////////////////////////////////////////////////////////////////////////////

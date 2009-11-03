@@ -20,6 +20,16 @@ inline hpx::naming::id_type find_here(void)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Definitions for Kernel 1
+
+int kernel1(naming::id_type G, std::string filename);
+
+typedef actions::plain_result_action2<int,
+                                      naming::id_type, std::string,
+                                      kernel1>
+kernel1_action;
+
+///////////////////////////////////////////////////////////////////////////////
 // Definitions for Kernel 2
 
 int kernel2(naming::id_type G, naming::id_type dist_edge_set);
