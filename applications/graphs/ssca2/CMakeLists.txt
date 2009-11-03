@@ -22,6 +22,7 @@ set(ssca_DEPENDENCIES
 
 set (ssca2_HEADERS
      ssca2_benchmark.hpp
+     ssca2_types.hpp
     )
     
 set(ssca2_benchmark_SOURCES

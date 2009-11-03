@@ -9,6 +9,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 
+#include "ssca2_types.hpp"
+
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////

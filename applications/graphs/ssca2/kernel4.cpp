@@ -40,25 +40,6 @@ using namespace hpx;
 
 #define LSSCA_(lvl) LAPP_(lvl) << " [SSCA] "
 
-typedef naming::id_type gid_type;
-typedef std::vector<naming::id_type> gids_type;
-
-typedef std::vector<lcos::future_value<int> > future_ints_type;
-
-typedef hpx::components::server::graph graph_type;
-
-typedef hpx::components::server::vertex vertex_type;
-typedef hpx::components::server::distributed_set<vertex_type> dist_vertex_set_type;
-typedef hpx::components::server::local_set<vertex_type> local_vertex_set_type;
-typedef hpx::components::distributed_set<vertex_type> client_dist_vertex_type;
-
-typedef std::map<gid_type,gid_type> gids_map_type;
-typedef hpx::components::server::distributed_map<gids_map_type> dist_gids_map_type;
-typedef hpx::components::server::local_map<gids_map_type> local_gids_map_type;
-
-typedef hpx::components::props client_props_type;
-typedef hpx::components::server::props props_type;
-
 ///////////////////////////////////////////////////////////////////////////////
 
 HPX_REGISTER_ACTION(kernel4_action);

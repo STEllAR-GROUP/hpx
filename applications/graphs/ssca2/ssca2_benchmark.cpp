@@ -43,8 +43,6 @@ using namespace hpx;
 using namespace std;
 namespace po = boost::program_options;
 
-typedef std::vector<naming::id_type> gids_type;
-
 int nrand(int);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -71,14 +69,12 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
     boost::unordered_map<int64_t, int64_t> known_edges;
     int status = -1;
 
-    typedef hpx::components::server::graph::add_vertex_action graph_add_vertex_action;
-    typedef hpx::components::server::graph::init_action     graph_init_action;
-    typedef hpx::components::server::graph::order_action    graph_order_action;
-    typedef hpx::components::server::graph::size_action     graph_size_action;
-    typedef hpx::components::server::graph::add_edge_action graph_add_edge_action;
-    typedef hpx::components::server::graph::vertex_name_action graph_vertex_name_action;
-
-    typedef naming::id_type gid_type;
+    typedef graph_type::add_vertex_action graph_add_vertex_action;
+    typedef graph_type::init_action     graph_init_action;
+    typedef graph_type::order_action    graph_order_action;
+    typedef graph_type::size_action     graph_size_action;
+    typedef graph_type::add_edge_action graph_add_edge_action;
+    typedef graph_type::vertex_name_action graph_vertex_name_action;
 
     // Setup
     order = 1 << scale;
@@ -115,21 +111,17 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
     LSSCA_(info) << "(A,B,C,D) = " << setprecision(2)
               << "(" << a_ << ", " << b_ << ", " << c_ << ", " << d_ << ")";
 
-    naming::id_type here = applier::get_applier().get_runtime_support_gid();
+    naming::id_type here = find_here();
 
     srand(time(0));
        
-    typedef hpx::components::server::vertex vertex_type;
-    typedef hpx::components::server::distributed_set<vertex_type> dist_vertex_set_type;
-    typedef std::vector<naming::id_type> gids_type;
-
     // Start adding edges in phases
     num_edges_added = 0;
 
     int x, y;
     double p;
     std::size_t step;
-    std::vector<lcos::future_value<int> > results;
+    future_ints_type results;
     while (num_edges_added < size)
     {
         // Choose edge
@@ -213,24 +205,14 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
     LSSCA_(info) << "parent(" << threads::get_parent_id() << ")";
     std::cout.setf(std::ios::dec);
 
-    typedef std::vector<naming::id_type> gids_type;
-
     naming::id_type here = find_here();
 
     // SSCA#2 Graph Analysis Benchmark
 
-    using hpx::components::distributed_set;
-    using hpx::components::local_set;
-    using hpx::components::distributed_map;
-    using hpx::components::server::edge;
-
-    typedef naming::id_type gid_type;
-
     double total_time;
 
     // Create the graph used for with all kernels
-    using hpx::components::graph;
-    graph G(graph::create(here));
+    client_graph_type G(client_graph_type::create(here));
 
     // Generate the R-MAT graph if no file is given,
     // otherwise, execute Kernel 1 to read in graph data
@@ -277,7 +259,7 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
 
     /* Begin: timed execution of Kernel 2 */
     hpx::util::high_resolution_timer k2_t;
-    distributed_set<edge> edge_set(distributed_set<edge>::create(here));
+    client_dist_edge_set_type edge_set(client_dist_edge_set_type::create(here));
     lcos::eager_future<kernel2_action>
         k2(here, G.get_gid(), edge_set.get_gid());
     k2.get();
@@ -296,13 +278,13 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
     for (gids_type::const_iterator lit = locals.begin();
          lit != lend; ++lit)
     {
-        gids_type edges = components::stubs::local_set<edge>::get(*lit);
+        gids_type edges = stub_local_edge_set_type::get(*lit);
 
         gids_type::const_iterator eend = edges.end();
         for (gids_type::const_iterator eit = edges.begin();
              eit != eend; ++eit, ++num_edges)
         {
-            edge::edge_snapshot e = components::stubs::edge::get_snapshot(*eit);
+            edge_type::edge_snapshot e = stub_edge_type::get_snapshot(*eit);
 
             LSSCA_(info) << num_edges << ": (" << e.source_ << ", " << e.target_
                          << ", " << e.label_ << ")";
@@ -327,7 +309,7 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
 
     /* Begin: timed execution of Kernel 3 */
     hpx::util::high_resolution_timer k3_t;
-    distributed_set<graph_type> subgraphs(distributed_set<graph_type>::create(here));
+    client_dist_graph_set_type subgraphs(client_dist_graph_set_type::create(here));
     lcos::eager_future<kernel3_action>
         k3(here, edge_set.get_gid(), subgraphs.get_gid());
     k3.get();
@@ -347,14 +329,14 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
     for (gids_type::const_iterator slit = slocals.begin();
          slit != slend; ++slit)
     {
-        gids_type subgraphs = components::stubs::local_set<graph_type>::get(*slit);
+        gids_type subgraphs = stub_local_graph_set_type::get(*slit);
 
         gids_type::const_iterator gend = subgraphs.end();
         for (gids_type::const_iterator git = subgraphs.begin();
              git != gend; ++git, ++num_graphs)
         {
-            int order = components::stubs::graph::order(*git);
-            int size = components::stubs::graph::size(*git);
+            int order = stub_graph_type::order(*git);
+            int size = stub_graph_type::size(*git);
 
             LSSCA_(info) << num_graphs << ": order" << order << ", size=" << size;
 
@@ -376,9 +358,6 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
 
     LSSCA_(info) << "Starting Kernel 4";
 
-    typedef std::map<naming::id_type,naming::id_type> gids_map_type;
-    typedef components::server::vertex vertex_type;
-
     int k4_approx = scale;
 
     LSSCA_(info) << "K4 approx. is " << k4_approx;
@@ -388,18 +367,16 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
     gid_type VS;
     if (k4_approx < scale && k4_approx > 0)
     {
-         gid_type here = applier::get_applier().get_prefix();
+         gid_type here = find_here();
 
          // Create new VS, a subset of V(G)
          LSSCA_(info) << "Creating new VS";
-         VS = hpx::components::distributed_set<
-                 hpx::components::server::vertex
-              >::create(here).get_gid();
+         VS = client_dist_vertex_set_type::create(here).get_gid();
 
          // Select random items
          gids_type v_locals =
              lcos::eager_future<
-                 components::server::distributed_set<vertex_type>::locals_action
+                 dist_vertex_set_type::locals_action
              >(V).get();
          select_random_vertices(v_locals, k4_approx, VS);
      }
@@ -416,8 +393,8 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
 
     /* Begin: timed execution of Kernel 4 */
     hpx::util::high_resolution_timer k4_t;
-    distributed_map<gids_map_type>
-        bc_scores(distributed_map<gids_map_type>::create(here));
+    client_dist_gids_map_type
+        bc_scores(client_dist_gids_map_type::create(here));
     lcos::eager_future<kernel4_action>
         k4(here, V, VS, k4_approx, bc_scores.get_gid());
     k4.get();
@@ -437,9 +414,7 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
     // Free components
     if (k4_approx < scale && k4_approx > 0)
     {
-        hpx::components::stubs::distributed_set<
-            hpx::components::server::vertex
-        >::free(VS);
+        stub_dist_vertex_set_type::free(VS);
     }
     bc_scores.free();
 
