@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/serialize_exception.hpp>
@@ -47,3 +48,10 @@ HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<double>);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<int>);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<hpx::util::section>);
 
+////////////////////////////////////////////////////////////////////////////
+//
+namespace hpx { namespace actions
+{
+   template hpx::util::section const&
+   continuation::trigger(hpx::util::section const&);
+}}
