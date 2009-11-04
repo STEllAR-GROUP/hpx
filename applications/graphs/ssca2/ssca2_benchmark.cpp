@@ -43,168 +43,16 @@ using namespace hpx;
 using namespace std;
 namespace po = boost::program_options;
 
-int nrand(int);
-
 ///////////////////////////////////////////////////////////////////////////////
 
-int rmat(naming::id_type, int, int, int);
-
-typedef
-    actions::plain_result_action4<int, naming::id_type, int, int, int, rmat>
-rmat_action;
-
-///////////////////////////////////////////////////////////////////////////////
-
-HPX_REGISTER_ACTION(rmat_action);
-
-int rmat(naming::id_type G, int scale, int edge_factor, int type)
-{
-    LSSCA_(info) << "event: action(ssca2_benchmark::rmat) status(begin)";
-    LSSCA_(info) << "parent(" << threads::get_parent_id() << ")";
-
-    std::size_t num_edges_added;
-    double a_, b_, c_, d_;
-    std::size_t order, size, type_max;
-    boost::unordered_map<int64_t, naming::id_type> known_vertices;
-    boost::unordered_map<int64_t, int64_t> known_edges;
-    int status = -1;
-
-    typedef graph_type::add_vertex_action graph_add_vertex_action;
-    typedef graph_type::init_action     graph_init_action;
-    typedef graph_type::order_action    graph_order_action;
-    typedef graph_type::size_action     graph_size_action;
-    typedef graph_type::add_edge_action graph_add_edge_action;
-    typedef graph_type::vertex_name_action graph_vertex_name_action;
-
-    // Setup
-    order = 1 << scale;
-    size = edge_factor * order;
-    type_max = 1 << scale;
-
-    if (type == 0)
-    {   // nice
-        a_ = 0.57;
-        b_ = 0.19;
-        c_ = 0.19;
-        d_ = 0.05;
-    }
-    else if (type == 1)
-    {
-        // SSCA2 v2.2
-        a_ = 0.55;
-        b_ = 0.1;
-        c_ = 0.1;
-        d_ = 0.25;
-    }
-    else
-    {   // Erdos-Renyi
-        a_ = 0.25;
-        b_ = 0.25;
-        c_ = 0.25;
-        d_ = 0.25;
-    }
-
-    // Print info message
-    LSSCA_(info) << "R-MAT Scalable Graph Generator";
-    LSSCA_(info) << "Scale: " << scale;
-    LSSCA_(info) << "Edge-factor:" << edge_factor;
-    LSSCA_(info) << "(A,B,C,D) = " << setprecision(2)
-              << "(" << a_ << ", " << b_ << ", " << c_ << ", " << d_ << ")";
-
-    naming::id_type here = find_here();
-
-    srand(time(0));
-       
-    // Start adding edges in phases
-    num_edges_added = 0;
-
-    int x, y;
-    double p;
-    std::size_t step;
-    future_ints_type results;
-    while (num_edges_added < size)
-    {
-        // Choose edge
-        x = 1;
-        y = 1;
-        step = order/2;
-        for (int i=0; i<scale; ++i)
-        {
-            p = rand()*1.0 / RAND_MAX;
-
-            // Pick the partition
-            if (p < a_)
-            {   
-            // Do nothing
-            }   
-            else if ((p >= a_) && (p < a_+b_))
-            {
-                y += step;
-            } 
-            else if ((p >= a_+b_) && (p < a_+b_+c_))
-            {
-                x += step;
-            }
-            else if ((p >= a_+b_+c_) && (p < a_+b_+c_+d_))
-            {
-                x += step;
-                y += step;
-            }
-            step = step/2;
-        }
-
-        // Use hash to catch duplicate vertices
-        // Note: Update this to do the two actions in parallel
-        if (known_vertices.find(x-1) == known_vertices.end())
-        {
-            known_vertices[x-1] = lcos::eager_future<
-                graph_add_vertex_action
-            >(G, naming::invalid_id).get();
-        }
-        if (known_vertices.find(y-1) == known_vertices.end())
-        {
-            known_vertices[y-1] = lcos::eager_future<
-                graph_add_vertex_action
-            >(G, naming::invalid_id).get();
-        }
-
-        // Use hash table to catch duplicate edges
-        int64_t key = (x-1)*order + (y-1);
-        if (x-1 != y-1 && known_edges.find(key) == known_edges.end())
-        {
-           known_edges[key] = key;
-
-           results.push_back(
-               lcos::eager_future<
-                   graph_add_edge_action
-               >(G, known_vertices[x-1], known_vertices[y-1], nrand(type_max)));
-
-           LSSCA_(info) << "Adding edge ("
-                        << known_vertices[x-1] << ", "
-                        << known_vertices[y-1] << ")";
-
-           num_edges_added += 1;
-        }
-    }
-
-    // Check that all in flight actions have completed
-    while (results.size() > 0)
-    {
-        results.back().get();
-        results.pop_back();
-    }
-
-    return 0;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int type, int k4_approx)
+int hpx_main(int depth, std::string input_file, int k4_approx)
 {
     // SSCA#2 Graph Analysis Benchmark
     LSSCA_(info) << "Starting SSCA2 Graph Analysis Benchmark";
 
     std::cout.setf(std::ios::dec);
+
+    int scale;
 
     double total_time;
     gid_type here = find_here();
@@ -212,38 +60,29 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
     // Create the graph used for with all kernels
     client_graph_type G(client_graph_type::create(here));
 
-    // Generate the R-MAT graph if no file is given,
-    // otherwise, execute Kernel 1 to read in graph data
-    if (input_file.length() == 0)
-    {
-        LSSCA_(info) << "Skipping Kernel 1";
+    // Kernel 1: graph construction (see above)
+    // Input:
+    //    infile - the file containing the graph data
+    // Output:
+    //    G = the graph containing the graph data
+    //
+    // for_each(infile.lines(), add_edge_from_line)
 
-        lcos::eager_future<rmat_action> r(
-            here, G.get_gid(), scale, edge_factor, type);
-        r.get();
-    }
-    else
-    {
-        // Kernel 1: graph construction (see above)
-        // Input:
-        //    infile - the file containing the graph data
-        // Output:
-        //    G = the graph containing the graph data
-        //
-        // for_each(infile.lines(), add_edge_from_line)
+    LSSCA_(info) << "Starting Kernel 1";
 
-        LSSCA_(info) << "Starting Kernel 1";
+    /* Begin: timed execution of Kernel 1 */
+    hpx::util::high_resolution_timer k1_t;
+    lcos::eager_future<kernel1_action>
+        k1(here, G.get_gid(), input_file);
+    k1.get();
+    total_time = k1_t.elapsed();
+    /* End: timed execution of Kernel 1 */
+    LSSCA_(info) << "Completed Kernel 1 in " << total_time << " sec";
+    std::cout << "Completed Kernel 1 in " << total_time << " sec" << std::endl;
 
-        /* Begin: timed execution of Kernel 1 */
-        hpx::util::high_resolution_timer k1_t;
-        lcos::eager_future<kernel1_action>
-            k1(here, G.get_gid(), input_file);
-        k1.get();
-        total_time = k1_t.elapsed();
-        /* End: timed execution of Kernel 1 */
-        LSSCA_(info) << "Completed Kernel 1 in " << total_time << " sec";
-        std::cout << "Completed Kernel 1 in " << total_time << " sec" << std::endl;
-    }
+    // Derive scale from order of the input graph
+    scale = log2(G.order());
+    LSSCA_(info) << "Input file scale: " << scale;
 
     // Kernel 2: classify large sets
     // Input:
@@ -359,6 +198,9 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
 
     gid_type V = G.vertices();
 
+    if (k4_approx == 0)
+        k4_approx = scale;
+
     gid_type VS;
     if (k4_approx < scale && k4_approx > 0)
     {
@@ -383,6 +225,7 @@ int hpx_main(int depth, std::string input_file, int scale, int edge_factor, int 
      else
      {
          LSSCA_(info) << "Error: k4_approx not in (0,scale]; using V as VS";
+         k4_approx = scale;
          VS = V;
      }
 
@@ -443,14 +286,8 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "HPX locality")
             ("file,f", po::value<std::string>(),
                 "the file containing the graph data")
-            ("scale,s", po::value<int>(),
-                "the scale of the graph, default is 4")
             ("depth,d", po::value<int>(),
                 "the subgraph path length for Kernel 3")
-            ("edge_factor,e", po::value<int>(),
-                "the edge factor of the R-MAT graph")
-            ("type,y", po::value<int>(),
-                "the type of R-MAT, controls the (a,b,c,d) parameters")
             ("k4_approx,k", po::value<int>(),
                 "the approximate scale for Kernel 4")
         ;
@@ -509,23 +346,6 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-// From Accelerated C++, p 135
-
-int nrand(int n)
-{
-    if (n <= 0 || n > RAND_MAX)
-        std::cerr << "Argument to nrand is out of range" << std::endl;
-
-    const int bucket_size = RAND_MAX / n;
-    int r;
-
-    do r = rand() / bucket_size;
-    while (r >= n);
-
-    return r;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     try {
@@ -539,11 +359,8 @@ int main(int argc, char* argv[])
         boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
         int num_threads = 1;
         std::string filename;
-        int scale = 4;
         int depth = 3;
-        int edge_factor = 8;
-        int type = 0;
-        int k4_approx = scale;
+        int k4_approx = 0;
 
         hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
 
@@ -563,22 +380,11 @@ int main(int argc, char* argv[])
         if (vm.count("file"))
             filename = vm["file"].as<std::string>();
 
-        if (vm.count("scale"))
-            scale = vm["scale"].as<int>();
-
         if (vm.count("depth"))
             depth = vm["depth"].as<int>();
 
-        if (vm.count("edge_factor"))
-            edge_factor = vm["edge_factor"].as<int>();
-
-        if (vm.count("type"))
-            type = vm["type"].as<int>();
-
         if (vm.count("k4_approx"))
             k4_approx = vm["k4_approx"].as<int>();
-        else
-            k4_approx = scale;
 
         // initialize and run the AGAS service, if appropriate
         std::auto_ptr<agas_server_helper> agas_server;
@@ -593,7 +399,7 @@ int main(int argc, char* argv[])
         }
         else
         {
-            rt.run(boost::bind(hpx_main, depth, filename, scale, edge_factor, type, k4_approx), num_threads);
+            rt.run(boost::bind(hpx_main, depth, filename, k4_approx), num_threads);
         }
     }
     catch (std::exception& e) {

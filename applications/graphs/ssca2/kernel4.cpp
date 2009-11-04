@@ -166,18 +166,18 @@ double calculate_teps(gid_type V, int order, double total_time, bool exact)
     // Count number of zero-degree vertices
     int n_0 = 0;
 
-    gids_type v_locals = components::stubs::distributed_set<vertex_type>::locals(V);
+    gids_type v_locals = stub_dist_vertex_set_type::locals(V);
     gids_type::const_iterator vit = v_locals.begin();
     for (gids_type::const_iterator vend = v_locals.end();
          vit != vend; ++vit)
     {
-        gids_type vertices = components::stubs::local_set<vertex_type>::get(*vit);
+        gids_type vertices = stub_local_vertex_set_type::get(*vit);
         gids_type::const_iterator it = vertices.begin();
         for (gids_type::const_iterator end = vertices.end();
              it != end; ++it)
         {
             gid_type v = *it;
-            int deg_v = components::stubs::vertex::out_degree(v);
+            int deg_v = stub_vertex_type::out_degree(v);
 
             if (deg_v == 0)
             {

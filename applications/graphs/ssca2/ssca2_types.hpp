@@ -58,10 +58,12 @@ typedef hpx::components::local_set<graph_type>         client_local_graph_set_ty
 // Vertex-related types
 
 typedef hpx::components::server::vertex vertex_type;
+typedef hpx::components::stubs::vertex stub_vertex_type;
 typedef hpx::components::server::distributed_set<vertex_type> dist_vertex_set_type;
 typedef hpx::components::stubs::distributed_set<vertex_type> stub_dist_vertex_set_type;
 typedef hpx::components::distributed_set<vertex_type> client_dist_vertex_set_type;
 typedef hpx::components::server::local_set<vertex_type> local_vertex_set_type;
+typedef hpx::components::stubs::local_set<vertex_type> stub_local_vertex_set_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Edge-related types
