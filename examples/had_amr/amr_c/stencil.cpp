@@ -120,9 +120,11 @@ namespace hpx { namespace components { namespace amr
         else if (gids.size() == 5) {
             boost::tie(val1, val2, val3, val4, val5, resultval) = 
                 detail::get_async(gids[0], gids[1], gids[2], gids[3], gids[4], result);
-        } 
-        else {
-            BOOST_ASSERT(false);    // should not happen
+        } else if (gids.size() == 1) {
+          return 0;
+        //  val1 = components::stubs::memory_block::get(gids[0]); 
+        } else {
+          BOOST_ASSERT(false);    // should not happen
         }
 
         // make sure all input data items agree on the time step number
@@ -143,6 +145,8 @@ namespace hpx { namespace components { namespace amr
           middle_timestep = val2->timestep_;
         } else if ( gids.size() == 5 ) {
           middle_timestep = val3->timestep_;
+        } else if ( gids.size() == 1 ) {
+          middle_timestep = val1->timestep_;
         }
 
         if (middle_timestep < numsteps_) {
@@ -176,10 +180,13 @@ namespace hpx { namespace components { namespace amr
 
               // copy over the coordinate value to the result
               resultval->x_ = val3->x_;
+            } else if (gids.size() == 1) {
+              resultval->x_ = val1->x_;
             }
 
             std::size_t allowedl = par.allowedl;
-            if ( val2->refine_ && gids.size() == 5 && val2->level_ < allowedl ) {
+            if ( column == 5 && val2->refine_ && gids.size() == 5 && val2->level_ < allowedl ) {
+              printf(" TEST middle_timestep %d\n",middle_timestep);
               finer_mesh(result, gids,par);
             }
 
@@ -199,6 +206,8 @@ namespace hpx { namespace components { namespace amr
               }
             } else if (gids.size() == 5) {
               resultval.get() = val3.get();
+            } else if (gids.size() == 1) {
+              resultval.get() = val1.get();
             }
             ++resultval->timestep_;
         }
@@ -331,15 +340,18 @@ namespace hpx { namespace components { namespace amr
       initial_data.push_back(gval6);
 
       std::size_t numvalues = 6;
-      std::size_t numsteps = 2;
+      // the tapered mesh takes two steps each cycle
+      std::size_t numcycles = 1;
 
       bool do_logging = false;
       if ( par.loglevel > 0 ) {
         do_logging = true;
       }
+      printf(" HELLO WORLD TEST\n");
       std::vector<naming::id_type> result_data(
-          child_mesh.execute(initial_data, function_type, numvalues, numsteps, 
+          child_mesh.execute(initial_data, function_type, numvalues, numcycles, 
             do_logging ? logging_type : components::component_invalid,par));
+      printf(" HELLO WORLD TEST B\n");
 
       access_memory_block<stencil_data> r_val1, r_val2, resultval;
       boost::tie(r_val1, r_val2, resultval) = 
