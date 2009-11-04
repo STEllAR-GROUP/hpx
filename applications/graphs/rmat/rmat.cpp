@@ -72,6 +72,7 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
     boost::unordered_map<int64_t, naming::id_type> known_vertices;
     boost::unordered_map<int64_t, int64_t> known_edges;
     int status = -1;
+    std::string type_name;
 
     typedef graph_type::add_vertex_action graph_add_vertex_action;
     typedef graph_type::init_action     graph_init_action;
@@ -91,6 +92,8 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
         b_ = 0.19;
         c_ = 0.19;
         d_ = 0.05;
+
+        type_name = "nice";
     }
     else if (type == 1)
     {
@@ -99,6 +102,8 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
         b_ = 0.1;
         c_ = 0.1;
         d_ = 0.25;
+
+        type_name = "nasty";
     }
     else
     {   // Erdos-Renyi
@@ -106,7 +111,19 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
         b_ = 0.25;
         c_ = 0.25;
         d_ = 0.25;
+
+        type_name = "erdos";
     }
+
+    std::string out_filename = "rmat_" + boost::lexical_cast<std::string>(scale)
+                                       + "_"
+                                       + boost::lexical_cast<std::string>(edge_factor)
+                                       + "_"
+                                       + type_name
+                                       + ".tuples";
+    ofstream out_file;
+    out_file.open (out_filename.c_str());
+
 
     // Print info message
     LRMAT_(info) << "R-MAT Scalable Graph Generator";
@@ -189,9 +206,9 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
                         << known_vertices[x-1] << ", "
                         << known_vertices[y-1] << ")";
 
-           std::cout << known_vertices[x-1].get_lsb() << " "
-                     << known_vertices[y-1].get_lsb() << " "
-                     << type_val << std::endl;
+           out_file << known_vertices[x-1].get_lsb() << " "
+                    << known_vertices[y-1].get_lsb() << " "
+                    << type_val << std::endl;
 
            num_edges_added += 1;
         }
@@ -203,6 +220,8 @@ int rmat(naming::id_type G, int scale, int edge_factor, int type)
         results.back().get();
         results.pop_back();
     }
+
+    out_file.close();
 
     return 0;
 }
