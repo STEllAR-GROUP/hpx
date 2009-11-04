@@ -70,15 +70,43 @@ int hpx_main(int depth, std::string input_file, int k4_approx)
 
     LSSCA_(info) << "Starting Kernel 1";
 
-    /* Begin: timed execution of Kernel 1 */
-    hpx::util::high_resolution_timer k1_t;
-    lcos::eager_future<kernel1_action>
-        k1(here, G.get_gid(), input_file);
-    k1.get();
-    total_time = k1_t.elapsed();
-    /* End: timed execution of Kernel 1 */
-    LSSCA_(info) << "Completed Kernel 1 in " << total_time << " sec";
-    std::cout << "Completed Kernel 1 in " << total_time << " sec" << std::endl;
+    /* Begin: timed execution of Kernel 1 v1 */
+    hpx::util::high_resolution_timer k1_v1_t;
+    lcos::eager_future<kernel1_v1_action>
+        k1_v1(here, G.get_gid(), input_file);
+    k1_v1.get();
+    total_time = k1_v1_t.elapsed();
+    /* End: timed execution of Kernel 1  v1*/
+    LSSCA_(info) << "Completed Kernel 1 v1 in " << total_time << " sec";
+    std::cout << "Completed Kernel 1 v1 in " << total_time << " sec" << std::endl;
+
+    {
+        /* Begin: timed execution of Kernel 1 v1 */
+        client_graph_type G_K2(client_graph_type::create(here));
+        hpx::util::high_resolution_timer k1_v2_t;
+        lcos::eager_future<kernel1_v2_action>
+            k1_v2(here, G_K2.get_gid(), input_file);
+        k1_v2.get();
+        total_time = k1_v2_t.elapsed();
+        /* End: timed execution of Kernel 1  v2*/
+        LSSCA_(info) << "Completed Kernel 1 v2 in " << total_time << " sec";
+        std::cout << "Completed Kernel 1 v2 in " << total_time << " sec" << std::endl;
+        G_K2.free();
+    }
+
+    {
+        /* Begin: timed execution of Kernel 1 v1 */
+        client_graph_type G_K3(client_graph_type::create(here));
+        hpx::util::high_resolution_timer k1_v3_t;
+        lcos::eager_future<kernel1_v2_action>
+            k1_v3(here, G_K3.get_gid(), input_file);
+        k1_v3.get();
+        total_time = k1_v3_t.elapsed();
+        /* End: timed execution of Kernel 1  v2*/
+        LSSCA_(info) << "Completed Kernel 1 v3 in " << total_time << " sec";
+        std::cout << "Completed Kernel 1 v3 in " << total_time << " sec" << std::endl;
+        G_K3.free();
+    }
 
     // Derive scale from order of the input graph
     scale = log2(G.order());

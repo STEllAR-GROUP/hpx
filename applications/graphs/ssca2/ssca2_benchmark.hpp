@@ -24,12 +24,26 @@ inline hpx::naming::id_type find_here(void)
 ///////////////////////////////////////////////////////////////////////////////
 // Definitions for Kernel 1
 
-int kernel1(naming::id_type G, std::string filename);
+int kernel1_v1(naming::id_type G, std::string filename);
 
 typedef actions::plain_result_action2<int,
                                       naming::id_type, std::string,
-                                      kernel1>
-kernel1_action;
+                                      kernel1_v1>
+kernel1_v1_action;
+
+int kernel1_v2(naming::id_type G, std::string filename);
+
+typedef actions::plain_result_action2<int,
+                                      naming::id_type, std::string,
+                                      kernel1_v2>
+kernel1_v2_action;
+
+int kernel1_v3(naming::id_type G, std::string filename);
+
+typedef actions::plain_result_action2<int,
+                                      naming::id_type, std::string,
+                                      kernel1_v3>
+kernel1_v3_action;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Definitions for Kernel 2

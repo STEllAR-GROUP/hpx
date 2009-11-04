@@ -35,6 +35,9 @@ typedef std::map<gid_type,gid_type> gids_map_type;
 typedef hpx::lcos::future_value<int> future_int_type;
 typedef std::vector<future_int_type> future_ints_type;
 
+typedef hpx::lcos::future_value<gid_type> future_gid_type;
+typedef std::vector<future_gid_type> future_gids_type;
+
 ///////////////////////////////////////////////////////////////////////////////
 // Misc. component types
 
