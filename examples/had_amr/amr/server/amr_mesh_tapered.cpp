@@ -67,50 +67,61 @@ namespace hpx { namespace components { namespace amr { namespace server
         components::distributing_factory::iterator_type stencil = stencils.first;
         components::distributing_factory::iterator_type function = functions.first;
 
-        if ( par.coarsestencilsize == 5 ) BOOST_ASSERT(numvalues == 6);
-
         for (int column = 0; stencil != stencils.second; ++stencil, ++function, ++column)
         {
             namespace stubs = components::amr::stubs;
             BOOST_ASSERT(function != functions.second);
-            if ( par.coarsestencilsize == 3 ) {
-              if (column == 0 || column == numvalues-1) {
-                // boundary value
-                stubs::dynamic_stencil_value::set_functional_component(*stencil, 
-                    *function, static_step, column, 
-                    par.stencilsize-1, par.stencilsize-1, par);
+            if ( par.stencilsize == 3 ) {
+              stubs::dynamic_stencil_value::set_functional_component(*stencil,
+                                      *function, static_step, column, 1,1, par);
+#if 0
+              if ( numvalues == 2 ) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil,
+                                          *function, static_step, column, 3,3, par);
               } else {
-                // 'normal' value
-                stubs::dynamic_stencil_value::set_functional_component(*stencil, 
-                    *function, static_step, column, 
-                    par.stencilsize, par.stencilsize, par);
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil,
+                                          *function, static_step, column, 1,1, par);
               }
-            } else if ( par.coarsestencilsize == 5 ) {
-              // bias the stencil to the right
-              if (column == 0 ) {
+#endif
+
+#if 0
+              if ( numvalues == 6 ) {
+                if (column == 0 || column == 5 ) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil,
+                                          *function, static_step, column, 1,1, par);
+                } else if (column == 1 || column == 4) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil,
+                                          *function, static_step, column, 1,2, par);
+                } else if ( column == 2 || column == 3 ) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil,
+                                          *function, static_step, column, 1,3, par);
+                } else {
+                  BOOST_ASSERT(false);
+                }
+              } else if ( numvalues == 4 ) {
+                if (column == 0 || column == 3) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil,
+                                          *function, static_step, column, 3,1, par);
+                } else if (column == 1 || column == 2 ) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil,
+                                          *function, static_step, column, 3,2, par);
+                } else {
+                  BOOST_ASSERT(false);
+                }
+              } else if ( numvalues == 2 ) {
                 stubs::dynamic_stencil_value::set_functional_component(*stencil,
-                                                *function, static_step, column, 2,3, par);
-              } else if ( column == 1) {
-                stubs::dynamic_stencil_value::set_functional_component(*stencil,
-                                                *function, static_step, column, 3,4, par);
-              } else if ( column == 2) {
-                stubs::dynamic_stencil_value::set_functional_component(*stencil,
-                                                *function, static_step, column, 5,3, par);
-              } else if ( column == 3) {
-                stubs::dynamic_stencil_value::set_functional_component(*stencil,
-                                                *function, static_step, column, 5,3, par);
-              } else if ( column == 4) {
-                stubs::dynamic_stencil_value::set_functional_component(*stencil,
-                                                *function, static_step, column, 3,4, par);
-              } else if ( column == 5) {
-                stubs::dynamic_stencil_value::set_functional_component(*stencil,
-                                                *function, static_step, column, 2,3, par);
+                                        *function, static_step, column, 3,3, par);
+              } else {
+                // should not happen
+                BOOST_ASSERT(false);
               }
+#endif
             } else {
-              BOOST_ASSERT (false);
+              // unimplemented at this point
+              BOOST_ASSERT(false);
             }
         }
-        BOOST_ASSERT(function == functions.second);
+       // BOOST_ASSERT(function == functions.second);
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -163,70 +174,142 @@ namespace hpx { namespace components { namespace amr { namespace server
         int steps = (int)outputs.size();
         for (int step = 0; step < steps; ++step) 
         {
-            std::size_t numvals = outputs[0].size();
             components::distributing_factory::iterator_range_type r = 
                 locality_results(stencils[step]);
             components::distributing_factory::iterator_type stencil = r.first;
             for (int i = 0; stencil != r.second; ++stencil, ++i)
             {
                 using namespace boost::assign;
-                int outstep = mod(step-1, steps);
 
                 std::vector<naming::id_type> output_ports;
-                if ( par.coarsestencilsize == 3 ) {
-                  if ( i==0 ) {
-                    output_ports += 
-                          outputs[outstep][0][0],  
-                          outputs[outstep][1][0];
-                  } else if ( i==numvals-1 ) {
-                    output_ports += 
-                          outputs[outstep][numvals-2][2],  
-                          outputs[outstep][numvals-1][1];
-                  } else if ( i==1 ) {
-                    output_ports += 
-                          outputs[outstep][i-1][1], // there are only two inputs at i=0 
-                          outputs[outstep][i][1],  
-                          outputs[outstep][i+1][0];
+                if ( par.stencilsize == 3 ) {
+                  if ( step == 0 ) {
+                    output_ports += outputs[2][i][0];
+                  } else if ( step == 1 ) {
+                    output_ports += outputs[0][i][0];
+                  } else if ( step == 2 ) {
+                    output_ports += outputs[1][i][0];
                   } else {
-                    output_ports += 
-                          outputs[outstep][i-1][2],
-                          outputs[outstep][i][1], 
-                          outputs[outstep][i+1][0];
+                    BOOST_ASSERT(false);
                   }
-                } else if ( par.coarsestencilsize == 5 ) {
-                  if ( i==0 ) {
-                    output_ports += 
-                          outputs[outstep][i][0],  
-                          outputs[outstep][i+1][3];
-                  } else if ( i==1 ) {
-                    output_ports += 
-                          outputs[outstep][i-1][2],  
-                          outputs[outstep][i][2],  
-                          outputs[outstep][i+1][0];
-                  } else if ( i==2 ) {
-                    output_ports += 
-                          outputs[outstep][i-2][1],  
-                          outputs[outstep][i-1][0],  
-                          outputs[outstep][i][1],  
-                          outputs[outstep][i+1][0],
-                          outputs[outstep][i+2][1];
-                  } else if ( i==3 ) {
-                    output_ports += 
-                          outputs[outstep][i-2][1],  
-                          outputs[outstep][i-1][2],  
-                          outputs[outstep][i][1],  
-                          outputs[outstep][i+1][2],
-                          outputs[outstep][i+2][1];
-                  } else if ( i==4 ) {
-                    output_ports += 
-                          outputs[outstep][i-1][2],  
-                          outputs[outstep][i][0],  
-                          outputs[outstep][i+1][0];
-                  } else if ( i==5 ) {
-                    output_ports += 
-                          outputs[outstep][i-1][3],  
-                          outputs[outstep][i][2];  
+#if 0
+                  if ( step == 0 ) {
+                    if ( i == 0 ) {
+                      output_ports +=
+                                   outputs[step+2][0][0];
+                    } else if ( i == 1 ) {
+                      output_ports +=
+                                   outputs[step+2][0][1];
+                    } else if ( i == 2 ) {
+                      output_ports +=
+                                   outputs[step+2][0][2];
+                    } else if ( i == 3 ) {
+                      output_ports +=
+                                   outputs[step+2][1][0];
+                    } else if ( i == 4 ) {
+                      output_ports +=
+                                   outputs[step+2][1][1];
+                    } else if ( i == 5 ) {
+                      output_ports +=
+                                   outputs[step+2][1][2];
+                    } else {
+                      BOOST_ASSERT(false);
+                    }
+                  } else if ( step == 1 ) {
+                    if ( i == 0 ) {
+                      output_ports += outputs[step-1][1][0];
+                    } else if ( i == 1 ) {
+                      output_ports += outputs[step-1][2][0];
+                    } else if ( i == 2 ) {
+                      output_ports += outputs[step-1][3][0];
+                    } else if ( i == 3 ) {
+                      output_ports += outputs[step-1][4][0];
+                    } else {
+                      BOOST_ASSERT(false);
+                    }
+                  } else if ( step == 2 ) {
+                    if ( i == 0 ) {
+                      output_ports +=
+                                   outputs[step-2][0][0],
+                                   outputs[step-1][0][0],
+                                   outputs[step-1][1][0];
+                    } else if ( i == 1 ) {
+                      output_ports +=
+                                   outputs[step-1][2][0],
+                                   outputs[step-1][3][0],
+                                   outputs[step-2][5][0];
+                    } else {
+                      BOOST_ASSERT(false);
+                    }
                   }
+#endif
+#if 0
+                  if ( step == 0 ) {
+                    if ( i == 0 ) {
+                      output_ports +=
+                                   outputs[step+2][0][1];
+                    } else if ( i == 1 ) {
+                      output_ports +=
+                                   outputs[step+2][0][2];
+                    } else if ( i == 2 ) {
+                      output_ports +=
+                                   outputs[step+2][0][0];
+                    } else if ( i == 3 ) {
+                      output_ports +=
+                                   outputs[step+2][1][0];
+                    } else if ( i == 4 ) {
+                      output_ports +=
+                                   outputs[step+2][1][2];
+                    } else if ( i == 5 ) {
+                      output_ports +=
+                                   outputs[step+2][1][1];
+                    } else {
+                      BOOST_ASSERT(false);
+                    }
+                  } else if ( step == 1 ) {
+                    if ( i == 0 ) {
+                      output_ports +=
+                                   outputs[step-1][0][0],
+                                   outputs[step-1][1][0],
+                                   outputs[step-1][2][2];
+                    } else if ( i == 1 ) {
+                      output_ports +=
+                                   outputs[step-1][1][1],
+                                   outputs[step-1][2][1],
+                                   outputs[step-1][3][1];
+                    } else if ( i == 2 ) {
+                      output_ports +=
+                                   outputs[step-1][2][0],
+                                   outputs[step-1][3][0],
+                                   outputs[step-1][4][1];
+                    } else if ( i == 3 ) {
+                      output_ports +=
+                                   outputs[step-1][3][2],
+                                   outputs[step-1][4][0],
+                                   outputs[step-1][5][0];
+                    } else {
+                      BOOST_ASSERT(false);
+                    }
+                  } else if ( step == 2 ) {
+                    if ( i == 0 ) {
+                      output_ports +=
+                                   outputs[step-1][0][0],
+                                   outputs[step-1][1][0],
+                                   outputs[step-1][2][0];
+                    } else if ( i == 1 ) {
+                      output_ports +=
+                                   outputs[step-1][1][1],
+                                   outputs[step-1][2][1],
+                                   outputs[step-1][3][0];
+                    } else {
+                      BOOST_ASSERT(false);
+                    }
+                  } else {
+                    BOOST_ASSERT(false);
+                  }
+#endif
+                } else {
+                  BOOST_ASSERT(false);
                 }
 
                 components::amr::stubs::dynamic_stencil_value::
@@ -323,6 +406,8 @@ namespace hpx { namespace components { namespace amr { namespace server
     {
         std::vector<naming::id_type> result_data;
 
+        BOOST_ASSERT(numvalues==6);
+
         components::component_type stencil_type = 
             components::get_component_type<components::amr::server::dynamic_stencil_value >();
 
@@ -337,10 +422,15 @@ namespace hpx { namespace components { namespace amr { namespace server
         // amount of stencil_value components
         numvalues_ = numvalues;
         result_type functions = factory.create_components(function_type, numvalues);
-        result_type stencils[2] = 
+        result_type stencils[3] = 
         {
-            factory.create_components(stencil_type, numvalues),
-            factory.create_components(stencil_type, numvalues)
+            factory.create_components(stencil_type, 6),
+            factory.create_components(stencil_type, 6),
+            factory.create_components(stencil_type, 6)
+#if 0
+            factory.create_components(stencil_type, 4),
+            factory.create_components(stencil_type, 2)
+#endif
         };
 
         // initialize logging functionality in functions
@@ -352,20 +442,30 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // initialize stencil_values using the stencil (functional) components
         init_stencils(locality_results(stencils[0]), locality_results(functions), 
-            0, numvalues, par);
+            0, 6, par);
         init_stencils(locality_results(stencils[1]), locality_results(functions), 
-            1, numvalues, par);
+            1, 6, par);
+        init_stencils(locality_results(stencils[2]), locality_results(functions), 
+            2, 6, par);
+#if 0
+        init_stencils(locality_results(stencils[1]), locality_results(functions), 
+            1, 4, par);
+        init_stencils(locality_results(stencils[2]), locality_results(functions), 
+            1, 2, par);
+#endif
 
         // ask stencil instances for their output gids
-        std::vector<std::vector<std::vector<naming::id_type> > > outputs(2);
+        std::vector<std::vector<std::vector<naming::id_type> > > outputs(3);
         get_output_ports(locality_results(stencils[0]), outputs[0]);
         get_output_ports(locality_results(stencils[1]), outputs[1]);
+        get_output_ports(locality_results(stencils[2]), outputs[2]);
 
         // connect output gids with corresponding stencil inputs
         connect_input_ports(stencils, outputs,par);
 
         // for loop over second row ; call start for each
         start_row(locality_results(stencils[1]));
+        start_row(locality_results(stencils[2]));
 
         // prepare initial data
         std::vector<naming::id_type> initial_data;
@@ -377,6 +477,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // free all allocated components (we can do that synchronously)
         if (!logging.empty())
             factory.free_components_sync(logging);
+        factory.free_components_sync(stencils[2]);
         factory.free_components_sync(stencils[1]);
         factory.free_components_sync(stencils[0]);
         factory.free_components_sync(functions);
@@ -394,6 +495,8 @@ namespace hpx { namespace components { namespace amr { namespace server
     {
         std::vector<naming::id_type> result_data;
 
+        BOOST_ASSERT(numvalues==6);
+
         components::component_type stencil_type = 
             components::get_component_type<components::amr::server::dynamic_stencil_value >();
 
@@ -408,10 +511,15 @@ namespace hpx { namespace components { namespace amr { namespace server
         // amount of stencil_value components
         numvalues_ = numvalues;
         result_type functions = factory.create_components(function_type, numvalues);
-        result_type stencils[2] = 
+        result_type stencils[3] = 
         {
-            factory.create_components(stencil_type, numvalues),
-            factory.create_components(stencil_type, numvalues)
+            factory.create_components(stencil_type, 6),
+            factory.create_components(stencil_type, 6),
+            factory.create_components(stencil_type, 6)
+#if 0
+            factory.create_components(stencil_type, 4),
+            factory.create_components(stencil_type, 2)
+#endif
         };
 
         // initialize logging functionality in functions
@@ -423,20 +531,30 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // initialize stencil_values using the stencil (functional) components
         init_stencils(locality_results(stencils[0]), locality_results(functions), 
-            0, numvalues, par);
+            0, 6, par);
         init_stencils(locality_results(stencils[1]), locality_results(functions), 
-            1, numvalues, par);
+            1, 6, par);
+        init_stencils(locality_results(stencils[2]), locality_results(functions), 
+            2, 6, par);
+#if 0
+        init_stencils(locality_results(stencils[1]), locality_results(functions), 
+            1, 4, par);
+        init_stencils(locality_results(stencils[2]), locality_results(functions), 
+            1, 2, par);
+#endif
 
         // ask stencil instances for their output gids
-        std::vector<std::vector<std::vector<naming::id_type> > > outputs(2);
+        std::vector<std::vector<std::vector<naming::id_type> > > outputs(3);
         get_output_ports(locality_results(stencils[0]), outputs[0]);
         get_output_ports(locality_results(stencils[1]), outputs[1]);
+        get_output_ports(locality_results(stencils[2]), outputs[2]);
 
         // connect output gids with corresponding stencil inputs
         connect_input_ports(stencils, outputs,par);
 
         // for loop over second row ; call start for each
         start_row(locality_results(stencils[1]));
+        start_row(locality_results(stencils[2]));
 
         // do actual work
         execute(locality_results(stencils[0]), initial_data, result_data);
@@ -444,6 +562,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // free all allocated components (we can do that synchronously)
         if (!logging.empty())
             factory.free_components_sync(logging);
+        factory.free_components_sync(stencils[2]);
         factory.free_components_sync(stencils[1]);
         factory.free_components_sync(stencils[0]);
         factory.free_components_sync(functions);
