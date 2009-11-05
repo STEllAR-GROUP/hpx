@@ -120,11 +120,10 @@ namespace hpx { namespace components { namespace amr
         else if (gids.size() == 5) {
             boost::tie(val1, val2, val3, val4, val5, resultval) = 
                 detail::get_async(gids[0], gids[1], gids[2], gids[3], gids[4], result);
-        } else if (gids.size() == 1) {
-          return 0;
-        //  val1 = components::stubs::memory_block::get(gids[0]); 
-        } else {
-          BOOST_ASSERT(false);    // should not happen
+        } 
+        else {
+         // printf(" TEST gids.size %d %d %d timestep %d\n",gids.size(),row,column,val1->timestep_);
+            BOOST_ASSERT(false);    // should not happen
         }
 
         // make sure all input data items agree on the time step number
@@ -145,8 +144,6 @@ namespace hpx { namespace components { namespace amr
           middle_timestep = val2->timestep_;
         } else if ( gids.size() == 5 ) {
           middle_timestep = val3->timestep_;
-        } else if ( gids.size() == 1 ) {
-          middle_timestep = val1->timestep_;
         }
 
         if (middle_timestep < numsteps_) {
@@ -180,13 +177,10 @@ namespace hpx { namespace components { namespace amr
 
               // copy over the coordinate value to the result
               resultval->x_ = val3->x_;
-            } else if (gids.size() == 1) {
-              resultval->x_ = val1->x_;
             }
 
             std::size_t allowedl = par.allowedl;
-            if ( column == 5 && val2->refine_ && gids.size() == 5 && val2->level_ < allowedl ) {
-              printf(" TEST middle_timestep %d\n",middle_timestep);
+            if ( val2->refine_ && gids.size() == 5 && val2->level_ < allowedl ) {
               finer_mesh(result, gids,par);
             }
 
@@ -206,8 +200,6 @@ namespace hpx { namespace components { namespace amr
               }
             } else if (gids.size() == 5) {
               resultval.get() = val3.get();
-            } else if (gids.size() == 1) {
-              resultval.get() = val1.get();
             }
             ++resultval->timestep_;
         }
@@ -224,103 +216,75 @@ namespace hpx { namespace components { namespace amr
         std::vector<naming::id_type> const& gids, Parameter const& par) 
     {
 
-      naming::id_type gval1, gval2, gval3, gval4, gval5, gval6;
-      boost::tie(gval1, gval2, gval3, gval4, gval5, gval6) = 
+      naming::id_type gval[8];
+      boost::tie(gval[0], gval[1], gval[2], gval[3], gval[4]) = 
                         components::wait(components::stubs::memory_block::clone_async(gids[0]), 
                              components::stubs::memory_block::clone_async(gids[1]),
                              components::stubs::memory_block::clone_async(gids[2]),
                              components::stubs::memory_block::clone_async(gids[3]),
-                             components::stubs::memory_block::clone_async(gids[4]),
                              components::stubs::memory_block::clone_async(gids[4]));
 
-      access_memory_block<stencil_data> mval1, mval2, mval3, mval4, mval5, mval6;
-      boost::tie(mval1, mval2, mval3, mval4, mval5, mval6) = 
-          detail::get_async(gval1, gval2, gval3, gval4, gval5, gval6);
+      boost::tie(gval[5], gval[6], gval[7]) = 
+                        components::wait(components::stubs::memory_block::clone_async(gids[2]), 
+                             components::stubs::memory_block::clone_async(gids[2]),
+                             components::stubs::memory_block::clone_async(gids[2]));
+
+      access_memory_block<stencil_data> mval[8];
+      boost::tie(mval[0], mval[1], mval[2], mval[3], mval[4]) = 
+          detail::get_async(gval[0], gval[1], gval[2], gval[3], gval[4]);
+
+      boost::tie(mval[5], mval[6], mval[7]) = detail::get_async(gval[5], gval[6], gval[7]);
 
       // increase the level by one
-      ++mval1->level_;
-      ++mval2->level_;
-      ++mval3->level_;
-      ++mval4->level_;
-      ++mval5->level_;
-      ++mval6->level_;
-
-      // initialize timestep for the fine mesh
-      mval1->timestep_ = 0;
-      mval2->timestep_ = 0;
-      mval3->timestep_ = 0;
-      mval4->timestep_ = 0;
-      mval5->timestep_ = 0;
-      mval6->timestep_ = 0;
-
-      // initialize the index
-      mval1->index_ = 0;
-      mval2->index_ = 1;
-      mval3->index_ = 2;
-      mval4->index_ = 3;
-      mval5->index_ = 4;
-      mval6->index_ = 5;
+      int i;
+      for (i=0;i<8;i++) {
+        ++mval[i]->level_;
+        mval[i]->timestep_ = 0;
+        mval[i]->index_ = i;
+      }
 
       // temporarily store the values before overwriting them
       double t1,t2,t3,t4,t5;
       double x1,x2,x3,x4,x5;
-      t1 = mval1->value_;
-      t2 = mval2->value_;
-      t3 = mval3->value_;
-      t4 = mval4->value_;
-      t5 = mval5->value_;
+      t1 = mval[0]->value_;
+      t2 = mval[1]->value_;
+      t3 = mval[2]->value_;
+      t4 = mval[3]->value_;
+      t5 = mval[4]->value_;
 
-      x1 = mval1->x_;
-      x2 = mval2->x_;
-      x3 = mval3->x_;
-      x4 = mval4->x_;
-      x5 = mval5->x_;
+      x1 = mval[0]->x_;
+      x2 = mval[1]->x_;
+      x3 = mval[2]->x_;
+      x4 = mval[3]->x_;
+      x5 = mval[4]->x_;
 
       // this updates the coordinate position
-      mval1->x_ = x2;
-      mval2->x_ = 0.5*(x2+x3);
-      mval3->x_ = x3;
-      mval4->x_ = 0.5*(x3+x4);
-      mval5->x_ = x4;
-      mval6->x_ = 0.5*(x4+x5);
+      mval[0]->x_ = 0.5*(x1+x2);
+      mval[1]->x_ = x2;
+      mval[2]->x_ = 0.5*(x2+x3);
+      mval[3]->x_ = x3;
+      mval[4]->x_ = 0.5*(x3+x4);
+      mval[5]->x_ = x4;
+      mval[6]->x_ = 0.5*(x4+x5);
+      mval[7]->x_ = x5;
       
-      // ------------------------------
-      // bias the stencil to the right
-      mval1->value_ = t2;
-      
+      // coarse node duplicates
+      mval[1]->value_ = t2;
+      mval[3]->value_ = t3;
+      mval[5]->value_ = t4;
+      mval[7]->value_ = t5;
+
       if ( par.linearbounds == 1 ) {
         // linear interpolation
-        mval2->value_ = 0.5*(t2 + t3);
+        mval[0]->value_ = 0.5*(t1 + t2);
+        mval[2]->value_ = 0.5*(t2 + t3);
+        mval[4]->value_ = 0.5*(t3 + t4);
+        mval[6]->value_ = 0.5*(t4 + t5);
       } else {
         // other user defined options not implemented yet
         interpolation();
         BOOST_ASSERT(false);
       }
-
-      mval3->value_ = t3;
-
-      if ( par.linearbounds == 1 ) {
-        // linear interpolation
-        mval4->value_ = 0.5*(t3 + t4);
-      } else {
-        // other user defined options not implemented yet
-        interpolation();
-        BOOST_ASSERT(false);
-      }
-
-      mval5->value_ = t4;
-
-      if ( par.linearbounds == 1 ) {
-        // linear interpolation
-        mval6->value_ = 0.5*(t4 + t5);
-      } else {
-        // other user defined options not implemented yet
-        interpolation();
-        BOOST_ASSERT(false);
-      }
-      
-      // end bias the stencil to the right
-      // ------------------------------
 
       // the initial data for the child mesh comes from the parent mesh
       naming::id_type here = applier::get_applier().get_runtime_support_gid();
@@ -332,26 +296,20 @@ namespace hpx { namespace components { namespace amr
                 components::amr::amr_mesh_tapered::create(here, 1, true));
 
       std::vector<naming::id_type> initial_data;
-      initial_data.push_back(gval1);
-      initial_data.push_back(gval2);
-      initial_data.push_back(gval3);
-      initial_data.push_back(gval4);
-      initial_data.push_back(gval5);
-      initial_data.push_back(gval6);
+      for (i=0;i<8;i++) {
+        initial_data.push_back(gval[i]);
+      }
 
-      std::size_t numvalues = 6;
-      // the tapered mesh takes two steps each cycle
-      std::size_t numcycles = 1;
+      std::size_t numvalues = 8;
+      std::size_t numsteps = 2;
 
       bool do_logging = false;
       if ( par.loglevel > 0 ) {
         do_logging = true;
       }
-      printf(" HELLO WORLD TEST\n");
       std::vector<naming::id_type> result_data(
-          child_mesh.execute(initial_data, function_type, numvalues, numcycles, 
+          child_mesh.execute(initial_data, function_type, numvalues, numsteps, 
             do_logging ? logging_type : components::component_invalid,par));
-      printf(" HELLO WORLD TEST B\n");
 
       access_memory_block<stencil_data> r_val1, r_val2, resultval;
       boost::tie(r_val1, r_val2, resultval) = 
