@@ -49,21 +49,17 @@ HPX_REGISTER_ACTION(kernel2_action);
 
 int kernel2(naming::id_type G, naming::id_type dist_edge_set)
 {
-    LSSCA_(info) << "event: action(ssca2::large_set) status(begin)";
-    LSSCA_(info) << "parent(" << threads::get_parent_id() << ")";
-
     LSSCA_(info) << "large_set(" << G << ", " << dist_edge_set << ")";
 
     typedef distributing_factory_type::result_type result_type;
 
     int total_added = 0;
-    std::vector<lcos::future_value<int> > local_searches;
+    future_ints_type local_searches;
 
     // Get vertex set of G
-    naming::id_type vertices =
+    gid_type vertices =
         lcos::eager_future<graph_type::vertices_action>(G).get();
 
-    typedef std::vector<naming::id_type> gids_type;
     gids_type vertex_sets =
         lcos::eager_future<dist_vertex_set_type::locals_action>(vertices).get();
 
@@ -76,7 +72,7 @@ int kernel2(naming::id_type G, naming::id_type dist_edge_set)
     for (gids_type::const_iterator vit = vertex_sets.begin();
          vit != vend; ++vit)
     {
-        naming::id_type there(boost::uint64_t((*vit).get_msb()) << 32, 0);
+        gid_type there(boost::uint64_t((*vit).get_msb()) << 32, 0);
 
         local_searches.push_back(
             lcos::eager_future<large_set_local_action>(
@@ -112,18 +108,13 @@ int large_set_local(naming::id_type local_vertex_set,
                          naming::id_type local_max_lco,
                          naming::id_type global_max_lco)
 {
-    LSSCA_(info) << "event: action(ssca2::large_set_local) status(begin)";
-    LSSCA_(info) << "parent(" << threads::get_parent_id() << ")";
-
     LSSCA_(info) << "large_set_local(" << local_vertex_set << ", " << edge_set
                  << ", " << local_max_lco << ", " << global_max_lco << ")";
-
-    typedef std::vector<naming::id_type> gids_type;
 
     int max = -1;
     int num_added = 0;
 
-    naming::id_type here = applier::get_applier().get_runtime_support_gid();
+    naming::id_type here = find_here();
 
     std::vector<edge_type::edge_snapshot_type> edge_set_local;
 
@@ -187,13 +178,13 @@ int large_set_local(naming::id_type local_vertex_set,
         LSSCA_(info) << "Adding local edge set at "
                     << here;
 
-        naming::id_type local_set =
+        gid_type local_set =
             lcos::eager_future<
                 dist_edge_set_type::get_local_action
             >(edge_set, here).get();
 
-        naming::id_type edge_base(stub_edge_type::create(here, edge_set_local.size()));
-        std::vector<naming::id_type> edges(edge_set_local.size());
+        gid_type edge_base(stub_edge_type::create(here, edge_set_local.size()));
+        gids_type edges(edge_set_local.size());
 
         int i=0;
         std::vector<edge_type::edge_snapshot_type>::const_iterator eend = edge_set_local.end();
