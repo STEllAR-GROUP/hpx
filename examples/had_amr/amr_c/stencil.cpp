@@ -110,19 +110,25 @@ namespace hpx { namespace components { namespace amr
         // get all input memory_block_data instances
         access_memory_block<stencil_data> val1, val2, val3, val4, val5, resultval;
         if (gids.size() == 3) { 
+          printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
             boost::tie(val1, val2, val3, resultval) = 
                 detail::get_async(gids[0], gids[1], gids[2], result);
         } 
         else if (gids.size() == 2) {
+          printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
             boost::tie(val1, val2, resultval) = 
                 detail::get_async(gids[0], gids[1], result);
         } 
         else if (gids.size() == 5) {
+          printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
             boost::tie(val1, val2, val3, val4, val5, resultval) = 
                 detail::get_async(gids[0], gids[1], gids[2], gids[3], gids[4], result);
         } 
         else {
-         // printf(" TEST gids.size %d %d %d timestep %d\n",gids.size(),row,column,val1->timestep_);
+
+          printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
+        //  printf(" TEST2 gids.size %d %d %d timestep %d\n",gids.size(),row,column,val1->timestep_);
+        //  return 0;
             BOOST_ASSERT(false);    // should not happen
         }
 
@@ -180,7 +186,8 @@ namespace hpx { namespace components { namespace amr
             }
 
             std::size_t allowedl = par.allowedl;
-            if ( val2->refine_ && gids.size() == 5 && val2->level_ < allowedl ) {
+          //  if ( val2->refine_ && gids.size() == 5 && val2->level_ < allowedl ) {
+            if ( column == 5 && gids.size() == 5 && val2->level_ < allowedl ) {
               finer_mesh(result, gids,par);
             }
 
