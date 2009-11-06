@@ -25,6 +25,15 @@ namespace hpx { namespace components { namespace amr
         // helper functions to get several memory pointers asynchronously
         inline boost::tuple<
             access_memory_block<stencil_data>, access_memory_block<stencil_data>
+        >
+        get_async(naming::id_type const& g1, naming::id_type const& g2)
+        {
+            return wait(components::stubs::memory_block::get_async(g1)
+              , components::stubs::memory_block::get_async(g2));
+        }
+
+        inline boost::tuple<
+            access_memory_block<stencil_data>, access_memory_block<stencil_data>
           , access_memory_block<stencil_data> >
         get_async(naming::id_type const& g1, naming::id_type const& g2
           , naming::id_type const& g3)
@@ -125,9 +134,10 @@ namespace hpx { namespace components { namespace amr
                 detail::get_async(gids[0], gids[1], gids[2], gids[3], gids[4], result);
         } 
         else {
+            boost::tie(val1, resultval) = detail::get_async(gids[0], result);
 
-          printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
-        //  printf(" TEST2 gids.size %d %d %d timestep %d\n",gids.size(),row,column,val1->timestep_);
+        //  printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
+          printf(" TEST2 gids.size %d %d %d timestep %d\n",gids.size(),row,column,val1->timestep_);
         //  return 0;
             BOOST_ASSERT(false);    // should not happen
         }
@@ -213,7 +223,8 @@ namespace hpx { namespace components { namespace amr
  
         // set return value difference between actual and required number of
         // timesteps (>0: still to go, 0: last step, <0: overdone)
-        return numsteps_ - resultval->timestep_;
+        int r = numsteps_ - resultval->timestep_;
+        return r;
     }
 
     ///////////////////////////////////////////////////////////////////////////
