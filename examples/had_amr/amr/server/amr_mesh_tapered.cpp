@@ -458,11 +458,11 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // initialize stencil_values using the stencil (functional) components
         init_stencils(locality_results(stencils[0]), locality_results(functions), 
-            0, numvalues, par);
+            0, 8, par);
         init_stencils(locality_results(stencils[1]), locality_results(functions), 
-            1, numvalues, par);
+            1, 6, par);
         init_stencils(locality_results(stencils[2]), locality_results(functions), 
-            2, numvalues, par);
+            2, 2, par);
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(3);
