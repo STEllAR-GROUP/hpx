@@ -248,9 +248,6 @@ naming::id_type extract_subgraph(naming::id_type H, naming::id_type pmap,
                         naming::id_type source, naming::id_type target,
                         int d)
 {
-    LSSCA_(info) << "event: action(ssca2::extract_subgraph ) status(begin)";
-    LSSCA_(info) << "parent(" << threads::get_parent_id() << ")";
-
     LSSCA_(info) << "extract_subgraph(" << H << ", " << pmap
                  << ", " << source << ", " << target << ", " << d << ")";
 
@@ -258,8 +255,8 @@ naming::id_type extract_subgraph(naming::id_type H, naming::id_type pmap,
 
     // Get pmap local to target
     // This uses hack to get prefix
-    naming::id_type locale(boost::uint64_t(target.get_msb()) << 32,0);
-    naming::id_type local_pmap =
+    gid_type locale(boost::uint64_t(target.get_msb()) << 32,0);
+    gid_type local_pmap =
         stub_dist_gids_map_type::get_local(pmap, locale);
 
     LSSCA_(info) << "Got local pmap " << local_pmap;
@@ -267,13 +264,13 @@ naming::id_type extract_subgraph(naming::id_type H, naming::id_type pmap,
     // Get target from local_pmap
     components::component_type props_comp_type =
         components::get_component_type<props_type>();
-    naming::id_type target_props =
+    gid_type target_props =
         stub_local_gids_map_type::value(local_pmap, target, props_comp_type);
 
     LSSCA_(info) << "Got target_props " << target_props;
 
     // Add (new) source (i.e., the old target) to H
-    naming::id_type new_source = lcos::eager_future<
+    gid_type new_source = lcos::eager_future<
         graph_type::add_vertex_action
     >(H, naming::invalid_id).get();
 
@@ -286,7 +283,7 @@ naming::id_type extract_subgraph(naming::id_type H, naming::id_type pmap,
     if (color >= d && d > 1)
     {
         // Continue with the search
-        std::vector<lcos::future_value<naming::id_type> > results;
+        future_gids_type results;
 
         partial_edge_set_type neighbors =
             lcos::eager_future<vertex_type::out_edges_action>(target).get();
@@ -306,14 +303,14 @@ naming::id_type extract_subgraph(naming::id_type H, naming::id_type pmap,
             );
         }
 
-        std::vector<lcos::future_value<int> > add_edge_fs;
+        future_ints_type add_edge_fs;
 
         // Collect notifications of when subsequent searches are finished
-        std::vector<lcos::future_value<naming::id_type> >::iterator rend = results.end();
-        for (std::vector<lcos::future_value<naming::id_type> >::iterator rit = results.begin();
+        future_gids_type::iterator rend = results.end();
+        for (future_gids_type::iterator rit = results.begin();
              rit != rend; ++rit)
         {
-            naming::id_type new_target = (*rit).get();
+            gid_type new_target = (*rit).get();
 
             // Can do this because we know the vertices were already added
             add_edge_fs.push_back(lcos::eager_future<
