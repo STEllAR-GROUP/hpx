@@ -44,7 +44,7 @@ using namespace hpx;
 
 HPX_REGISTER_ACTION(kernel3_action);
 
-int kernel3(naming::id_type edge_set, naming::id_type subgraphs)
+int kernel3(naming::id_type edge_set, naming::id_type subgraphs, int depth)
 {
     LSSCA_(info) << "extract(" << edge_set
                  << ", " << subgraphs << ")";
@@ -74,7 +74,7 @@ int kernel3(naming::id_type edge_set, naming::id_type subgraphs)
         // Spawn actions local to data
         results.push_back(lcos::eager_future<
             extract_local_action
-        >(locale, *it, local_subgraphs));
+        >(locale, *it, local_subgraphs, depth));
     }
 
     // Collect notifications that local actions have finished
@@ -91,7 +91,8 @@ int kernel3(naming::id_type edge_set, naming::id_type subgraphs)
 HPX_REGISTER_ACTION(extract_local_action);
 
 int extract_local(naming::id_type local_edge_set,
-                     naming::id_type local_subgraphs)
+                     naming::id_type local_subgraphs,
+                     int depth)
 {
     LSSCA_(info) << "extract_local(" << local_edge_set
                  << ", " << local_subgraphs << ")";
@@ -154,7 +155,6 @@ int extract_local(naming::id_type local_edge_set,
         // This is per edge/subgraph/pmap
 
         Hs.push_back(graphs[i]);
-        int d = 3; // This should be an argument
 
         edge_type::edge_snapshot_type e(
             lcos::eager_future<
@@ -188,10 +188,10 @@ int extract_local(naming::id_type local_edge_set,
         int color =
             lcos::eager_future<
                 props_type::color_action
-            >(source_props, d).get();
+            >(source_props, depth).get();
 
 
-        if (color >= d && d > 1)
+        if (color >= depth && depth > 1)
         {
             // Spawn subgraph extraction local to target
             // Probably should rework this to use continuations :-)
@@ -199,7 +199,7 @@ int extract_local(naming::id_type local_edge_set,
             results.push_back(
                 lcos::eager_future<
                     extract_subgraph_action
-                >(there, Hs.back(), pmaps[i], e.source_, e.target_, d)
+                >(there, Hs.back(), pmaps[i], e.source_, e.target_, depth)
             );
         }
     }

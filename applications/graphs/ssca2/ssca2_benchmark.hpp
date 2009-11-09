@@ -67,18 +67,18 @@ large_set_local_action;
 ///////////////////////////////////////////////////////////////////////////////
 // Definitions for Kernel 3
 
-int kernel3(naming::id_type edge_set, naming::id_type subgraphs);
-int extract_local(naming::id_type local_edge_set, naming::id_type local_subgraphs);
+int kernel3(naming::id_type edge_set, naming::id_type subgraphs, int depth);
+int extract_local(naming::id_type local_edge_set, naming::id_type local_subgraphs, int depth);
 naming::id_type extract_subgraph(naming::id_type H, naming::id_type pmap,
                         naming::id_type source, naming::id_type target,
                         int d);
 
 typedef
-    actions::plain_result_action2<int, naming::id_type, naming::id_type, kernel3>
+    actions::plain_result_action3<int, naming::id_type, naming::id_type, int, kernel3>
 kernel3_action;
 
 typedef
-    actions::plain_result_action2<int, naming::id_type, naming::id_type, extract_local>
+    actions::plain_result_action3<int, naming::id_type, naming::id_type, int, extract_local>
 extract_local_action;
 
 typedef

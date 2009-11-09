@@ -176,7 +176,7 @@ int hpx_main(int depth, std::string input_file, int k4_approx)
     hpx::util::high_resolution_timer k3_t;
     client_dist_graph_set_type subgraphs(client_dist_graph_set_type::create(here));
     lcos::eager_future<kernel3_action>
-        k3(here, edge_set.get_gid(), subgraphs.get_gid());
+        k3(here, edge_set.get_gid(), subgraphs.get_gid(), depth);
     k3.get();
     total_time = k3_t.elapsed();
     /* End: timed execution of Kernel 3 */
@@ -315,7 +315,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("file,f", po::value<std::string>(),
                 "the file containing the graph data")
             ("depth,d", po::value<int>(),
-                "the subgraph path length for Kernel 3")
+                "the subgraph path length for Kernel 3 (default is 3)")
             ("k4_approx,k", po::value<int>(),
                 "the approximate scale for Kernel 4")
         ;
