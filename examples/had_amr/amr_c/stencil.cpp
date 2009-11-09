@@ -134,12 +134,13 @@ namespace hpx { namespace components { namespace amr
                 detail::get_async(gids[0], gids[1], gids[2], gids[3], gids[4], result);
         } 
         else {
+          printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
             boost::tie(val1, resultval) = detail::get_async(gids[0], result);
 
         //  printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
-          printf(" TEST2 gids.size %d %d %d timestep %d\n",gids.size(),row,column,val1->timestep_);
-        //  return 0;
-            BOOST_ASSERT(false);    // should not happen
+        //  printf(" TEST2 gids.size %d %d %d timestep %d\n",gids.size(),row,column,val1->timestep_);
+          return 0;
+        //    BOOST_ASSERT(false);    // should not happen
         }
 
         // make sure all input data items agree on the time step number
