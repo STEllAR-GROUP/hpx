@@ -170,7 +170,7 @@ namespace hpx { namespace components { namespace amr
 
               // copy over the coordinate value to the result
               resultval->x_ = val2->x_;
-              resultval->x_ = val2->level_;
+              resultval->level_ = val2->level_;
             } else if (gids.size() == 2) {
               // bdry computation
               if ( column == 0 ) {
@@ -179,14 +179,14 @@ namespace hpx { namespace components { namespace amr
 
                 // copy over the coordinate value to the result
                 resultval->x_ = val1->x_;
-                resultval->x_ = val1->level_;
+                resultval->level_ = val1->level_;
               } else {
                 evaluate_right_bdry_timestep(val1.get_ptr(), val2.get_ptr(),
                   resultval.get_ptr(), numsteps_,par);
 
                 // copy over the coordinate value to the result
                 resultval->x_ = val2->x_;
-                resultval->x_ = val2->level_;
+                resultval->level_ = val2->level_;
               }
             } else if (gids.size() == 5) {
               // this is the actual calculation, call provided (external) function
@@ -195,12 +195,11 @@ namespace hpx { namespace components { namespace amr
 
               // copy over the coordinate value to the result
               resultval->x_ = val3->x_;
-              resultval->x_ = val3->level_;
+              resultval->level_ = val3->level_;
             }
 
             std::size_t allowedl = par.allowedl;
             if ( val2->refine_ && gids.size() == 5 && val2->level_ < allowedl ) {
-          //  if ( column == 5 && gids.size() == 5 && val2->level_ < allowedl ) {
               finer_mesh(result, gids,par);
             }
 
@@ -228,7 +227,6 @@ namespace hpx { namespace components { namespace amr
  
         // set return value difference between actual and required number of
         // timesteps (>0: still to go, 0: last step, <0: overdone)
-       // printf(" val1->level_ %d\n",val1->level_);
         int r = numsteps_ - resultval->timestep_;
         if ( val1->level_ > 0 ) {
           if ( row == 1 || row == 2 ) return 0;
