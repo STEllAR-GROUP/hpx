@@ -119,28 +119,26 @@ namespace hpx { namespace components { namespace amr
         // get all input memory_block_data instances
         access_memory_block<stencil_data> val1, val2, val3, val4, val5, resultval;
         if (gids.size() == 3) { 
-          printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
+      //    printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
             boost::tie(val1, val2, val3, resultval) = 
                 detail::get_async(gids[0], gids[1], gids[2], result);
         } 
         else if (gids.size() == 2) {
-          printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
+      //    printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
             boost::tie(val1, val2, resultval) = 
                 detail::get_async(gids[0], gids[1], result);
         } 
         else if (gids.size() == 5) {
-          printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
+      //    printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
             boost::tie(val1, val2, val3, val4, val5, resultval) = 
                 detail::get_async(gids[0], gids[1], gids[2], gids[3], gids[4], result);
         } 
         else {
-          printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
-            boost::tie(val1, resultval) = detail::get_async(gids[0], result);
-
+      //    printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
+        //    boost::tie(val1, resultval) = detail::get_async(gids[0], result);
         //  printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
         //  printf(" TEST2 gids.size %d %d %d timestep %d\n",gids.size(),row,column,val1->timestep_);
-          return 0;
-        //    BOOST_ASSERT(false);    // should not happen
+          return -1;
         }
 
         // make sure all input data items agree on the time step number
@@ -172,6 +170,7 @@ namespace hpx { namespace components { namespace amr
 
               // copy over the coordinate value to the result
               resultval->x_ = val2->x_;
+              resultval->x_ = val2->level_;
             } else if (gids.size() == 2) {
               // bdry computation
               if ( column == 0 ) {
@@ -180,12 +179,14 @@ namespace hpx { namespace components { namespace amr
 
                 // copy over the coordinate value to the result
                 resultval->x_ = val1->x_;
+                resultval->x_ = val1->level_;
               } else {
                 evaluate_right_bdry_timestep(val1.get_ptr(), val2.get_ptr(),
                   resultval.get_ptr(), numsteps_,par);
 
                 // copy over the coordinate value to the result
                 resultval->x_ = val2->x_;
+                resultval->x_ = val2->level_;
               }
             } else if (gids.size() == 5) {
               // this is the actual calculation, call provided (external) function
@@ -194,11 +195,12 @@ namespace hpx { namespace components { namespace amr
 
               // copy over the coordinate value to the result
               resultval->x_ = val3->x_;
+              resultval->x_ = val3->level_;
             }
 
             std::size_t allowedl = par.allowedl;
-          //  if ( val2->refine_ && gids.size() == 5 && val2->level_ < allowedl ) {
-            if ( column == 5 && gids.size() == 5 && val2->level_ < allowedl ) {
+            if ( val2->refine_ && gids.size() == 5 && val2->level_ < allowedl ) {
+          //  if ( column == 5 && gids.size() == 5 && val2->level_ < allowedl ) {
               finer_mesh(result, gids,par);
             }
 
@@ -218,14 +220,24 @@ namespace hpx { namespace components { namespace amr
               }
             } else if (gids.size() == 5) {
               resultval.get() = val3.get();
+            } else {
+              BOOST_ASSERT(false);
             }
             ++resultval->timestep_;
         }
  
         // set return value difference between actual and required number of
         // timesteps (>0: still to go, 0: last step, <0: overdone)
+       // printf(" val1->level_ %d\n",val1->level_);
         int r = numsteps_ - resultval->timestep_;
-        return r;
+        if ( val1->level_ > 0 ) {
+          if ( row == 1 || row == 2 ) return 0;
+          else {
+            return r;
+          }
+        } else {
+          return r;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
