@@ -12,7 +12,7 @@
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/lcos/eager_future.hpp>
 
-#include <hpx/components/vertex/server/vertex.hpp>
+#include <hpx/components/graph/server/vertex.hpp>
 
 //typedef std::vector<std::pair<hpx::naming::id_type, int> > partial_edge_set_type;
 typedef hpx::components::server::vertex::partial_edge_set_type partial_edge_set_type;

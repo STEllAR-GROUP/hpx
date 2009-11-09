@@ -16,7 +16,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
-#include <hpx/components/vertex/vertex.hpp>
+#include <hpx/components/graph/vertex.hpp>
 #include <hpx/components/distributed_set/distributed_set.hpp>
 
 #define LGRAPH_(lvl) LAPP_(lvl) << " [GRAPH] "

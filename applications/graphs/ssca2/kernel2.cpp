@@ -22,7 +22,7 @@
 
 #include <hpx/components/graph/graph.hpp>
 #include <hpx/components/graph/edge.hpp>
-#include <hpx/components/vertex/vertex.hpp>
+#include <hpx/components/graph/vertex.hpp>
 
 #include <hpx/components/distributed_set/distributed_set.hpp>
 #include <hpx/components/distributed_set/local_set.hpp>

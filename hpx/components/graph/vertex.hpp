@@ -9,7 +9,7 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
-#include <hpx/components/vertex/stubs/vertex.hpp>
+#include <hpx/components/graph/stubs/vertex.hpp>
 
 //typedef std::vector<std::pair<naming::id_type, int> > partial_edge_set_type;
 

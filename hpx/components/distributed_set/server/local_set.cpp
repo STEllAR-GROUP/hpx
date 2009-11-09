@@ -14,7 +14,7 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
-#include <hpx/components/vertex/vertex.hpp>
+#include <hpx/components/graph/vertex.hpp>
 #include <hpx/components/graph/graph.hpp>
 #include <hpx/components/graph/edge.hpp>
 

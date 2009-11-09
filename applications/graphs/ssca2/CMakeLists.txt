@@ -12,7 +12,7 @@ foreach(subdir ${ssca_SUDIRS})
 endforeach()
 
 set(ssca_DEPENDENCIES
-   graph_component vertex_component
+   graph_component
    distributed_set_component 
    distributed_map_component
    props_component

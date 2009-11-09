@@ -16,7 +16,7 @@
 
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
-#include <hpx/components/vertex/vertex.hpp>
+#include <hpx/components/graph/vertex.hpp>
 #include <hpx/components/graph/edge.hpp>
 #include <hpx/components/graph/graph.hpp>
 
