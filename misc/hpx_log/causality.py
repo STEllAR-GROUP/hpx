@@ -50,7 +50,7 @@ def build_graph(thread, action):
   return (edges, vertices)
 
 def run(log_filename, node_style, arc_style):
-  (component, object, action, thread) = pxdm.run(log_filename)
+  (component, object, action, thread, locality) = pxdm.run(log_filename)
 
   (edges, vertices) = build_graph(thread, action)
 

@@ -49,7 +49,7 @@ class HpxLogEvent:
     log_line = log_line[:-1]
     self.__log_line = copy(log_line)
 
-    self.__keys = ['thread', 'parent', 'time', 'count', 'module', 'level', 'msg']
+    self.__keys = ['thread', 'parent', 'time', 'count', 'level', 'module', 'msg']
     log_items = self.__log_line.split(None, 6)
 
     values = [self.__clean_item(k,v) for (k,v) in zip(self.__keys,log_items)]

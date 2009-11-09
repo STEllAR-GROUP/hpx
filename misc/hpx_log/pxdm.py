@@ -14,13 +14,101 @@ from hpx_log import HpxLog
 
 ###
 
-re_thread_id = re.compile('\([TP]([^/]+)/([^\)]+)\)')
+rdf = []
+
+###
+
+re_thread_id = re.compile('\(T([^/]+)/([^\)]+)/([^\)]+)\)')
+re_parent_id = re.compile('P([^/]+)/([^\)]+)')
   
 re_thread = re.compile('thread\(([^\)]+)\)')
 re_desc = re.compile('description\(([^\)]*)\)')
 re_desc_full = re.compile('description\(([^\)]*)::([^\)]*)\)')
 re_state_old = re.compile('old state\(([^\)]*)\)')
 re_state_new = re.compile('new state\(([^\)]*)\)')
+
+###
+
+def urlize(type, str):
+  """Takes literal representation."""
+  url = ''
+
+  if type == 'action':
+    url = str + 'Action'
+  elif type == 'component':
+    url = str + 'Component'
+  elif type == 'fco':
+    url = str + 'Fco'
+  elif type == 'gid':
+    url = str + 'Gid'
+  elif type == 'locality':
+    url = str + 'Locality'
+  elif type == 'thread':
+    url = str + 'Thread'
+  else:
+    print "ERROR: don't know how to urlize '%s'" % (type)
+    exit()
+
+  return url
+
+def literalize(type, str):
+  """Takes canonical representation."""
+
+  literal = ''
+
+  if 'action' in type:
+    literal = ''.join([s.capitalize() for s in str.split('::')])
+  elif type == 'component':
+    literal = ''.join([s.capitalize() for s in str.split('::')])
+  elif type == 'fco':
+    literal = str
+  elif type == 'gid':
+    (msb, lsb) = str.split(':')
+    literal = 'M'+msb+'L'+lsb
+  elif type == 'locality':
+    literal = str
+  elif type == 'thread':
+    literal = str
+  else:
+    print "ERROR: don't know how to literalize '%s'" % (type)
+    exit()
+
+  return literal
+
+def canonicalize(type, str):
+  """Takes raw representation."""
+
+  if 'action' in type:
+    res = str[:str.rfind('_action')]
+  elif 'component' in type:
+    parts = str.split('::')
+
+    if 'server' in parts:
+      parts.remove('server')
+    if 'stubs' in parts:
+      parts.remove('stubs')
+
+    res = '::'.join(parts)
+  elif 'fco' in type:
+    if str == '--------':
+      str = 'Null'
+    res = str
+  elif 'gid' in type:
+    res = ':'.join(str)
+  elif 'locality' in type:
+    if str == '----':
+      str = 'Null'
+    res = 'L' + str
+  elif 'thread' in type:
+    (locale, thread) = str[:2]
+    locale = canonicalize('locality', locale)
+    if thread == '--------':
+      thread = 'Null'
+    res = locale + 'T' + thread
+  else:
+    print "ERROR: don't know how to canonicalize '%s'" % (type)
+
+  return res
 
 ###
 
@@ -32,6 +120,11 @@ def parse_component(event, component):
 
   if not component.has_key(type):
     component[type] = {'name':name, 'type':type}
+
+    # RDF
+    name = canonicalize('component', name)
+    url = urlize('component', literalize('component', name))
+    rdf.append(':%s a px:Component; px:componentName "%s"; px:componentId "%s" .' % (url, name, type))
   else:
     print "Error: duplicate components!"
     exit(1)
@@ -45,8 +138,16 @@ def parse_object(event, object):
 
   msg = event['msg']
 
+  thread = event['thread']
+  locale = thread[0]
+
   gid_str = msg[msg.index('{')+1:msg.index('}')]
   gid = tuple(gid_str.split(', '))
+
+  # RDF
+  o_name = urlize('gid', literalize('gid', canonicalize('gid', gid)))
+  o_gid = canonicalize('gid', gid)
+  rdf.append(':%s a px:Fco; px:gid "%s" .' % (o_name, o_gid))
 
   type = 0
   count = 0
@@ -67,7 +168,14 @@ def parse_object(event, object):
     object[gid] = {}
     object[gid]['gid'] = gid
     object[gid]['type'] = type
-    object[gid]['count'] = count
+    object[gid]['count'] = 1 #count
+    object[gid]['thread'] = thread
+    object[gid]['locale'] = locale
+    
+    # RDF
+    locale = urlize('locality', literalize('locality', canonicalize('locality', locale)))
+    rdf.append(':%s px:componentType [ px:componentId "%s" ] .' % (o_name, type))
+    rdf.append(':%s px:locality :%s.' % (o_name, locale))
   else:
     print "Error: duplicate objects"
     exit(1)
@@ -92,6 +200,8 @@ def parse_thread_dtor(event, action):
 
 def parse_tfunc(event, action):
   msg = event['msg']
+
+  locale = event['thread'][0]
 
   if 'tfunc(0): start' in msg:
     return
@@ -118,8 +228,40 @@ def parse_tfunc(event, action):
   if not action.has_key(local_tid):
     action[local_tid] = {}
     action[local_tid]['thread'] = local_tid
+    action[local_tid]['locale'] = locale
     action[local_tid]['name'] = name
     action[local_tid]['state'] = state
+
+def parse_register_work(event):
+  msg = event['msg']
+
+  # Action
+  # - name
+  # - component
+
+  m_desc_full = re_desc_full.search(msg)
+  component = canonicalize('component', m_desc_full.group(1))
+  action = canonicalize('action', m_desc_full.group(2))
+
+  action_name = '::'.join((component, action))
+  component_url = urlize('component', literalize('component', component))
+
+  action_url = urlize('action', literalize('action', action_name))
+
+  rdf.append(':%s a px:Action; px:actionName "%s"; px:component :%s .' % (action_url, action_name, component_url))
+
+  # ActionEvent 
+  # - action
+  # - type
+  # - parent thread
+  # - source fco
+  # [ a px:ActionEvent; px:action :XxxAction; px:actionType "yyy"; px:parent :ZzzThread ] .
+
+  action_type = 'spawned'
+  parent = urlize('thread', literalize('thread', canonicalize('thread', event['thread'])))
+  source = urlize('fco', literalize('fco', canonicalize('fco', event['thread'][2])))
+  rdf.append('[] a px:ActionEvent; px:action :%s; px:eventType "%s"; px:sourceThread :%s; px:sourceDatum [ px:localAddress "%s" ] .' % (action_url, action_type, parent, source))
+  rdf.append(':%s a px:Thread; px:targetDatum [ px:localAddress "%s" ] .' % (parent, source))
 
 def run(log_filename):
   log = HpxLog(log_filename)
@@ -128,13 +270,36 @@ def run(log_filename):
   object = {}
   action = {}
   thread = {}
+  locality = []
 
+  rdf.append("@prefix px:  <http://px.cct.lsu.edu/pxo/0.1/> .")
+  
   for event in log.get_events():
     child = event['thread']
     parent = event['parent']
+
+    # RDF
+    c_name = urlize('thread', literalize('thread', canonicalize('thread', child[:2])))
+    p_name = urlize('thread', literalize('thread', canonicalize('thread', parent)))
+    rdf.append(':%s a px:Thread; px:parent :%s .' % (c_name, p_name))
+    rdf.append(':%s a px:Thread; px:child :%s .' % (p_name, c_name))
+
+    # RDF
+    (t_loc, t_gid, t_obj) = child
+    t_gid = canonicalize('thread', (t_loc, t_gid))
+    t_loc_id = canonicalize('locality', t_loc)
+    t_loc = urlize('locality', literalize('locality', t_loc_id))
+    t_obj = urlize('fco', literalize('fco', canonicalize('fco', t_obj)))
+    rdf.append(':%s px:locality :%s; px:gid "%s"; px:source :%s .' % (c_name, t_loc, t_gid, t_obj))
+    rdf.append(':%s a px:Locality; px:localityId "%s" .' % (t_loc, t_loc_id))
+
+    # RDF
+    (p_loc, p_gid) = parent
+    rdf.append(':%s px:locality "%s"; px:gid "%s" .' % (p_name, p_loc, p_gid))
+
     if not thread.has_key(child):
       thread[child] = {}
-      thread[child]['name'] = child
+      thread[child]['name'] = child[:2]
       thread[child]['parent'] = parent
 
     if 'dynamic loading succeeded' in event['msg']:
@@ -143,7 +308,13 @@ def run(log_filename):
       parse_object(event, object)
     elif '~thread' in event['msg']:
       parse_thread_dtor(event, action)
-    elif 'TM' in event['level'] and 'stop' in event['msg']:
+    elif 'TM' in event['module'] and 'register_work:' in event['msg']:
+      parse_register_work(event)
+    elif 'TM' in event['module'] and 'stop' in event['msg']:
+      pass
+    elif 'TM' in event['module'] and 'run:' in event['msg']:
+      pass
+    elif 'TM' in event['module'] and 'add_new:' in event['msg']:
       pass
     elif 'about to stop services' in event['msg']:
       pass
@@ -151,7 +322,7 @@ def run(log_filename):
       pass
     elif 'queues empty' in event['msg']:
       pass
-    elif 'connection_cache' in event['level']:
+    elif 'connection_cache' in event['msg']:
       pass
     elif 'HPX threads' in event['msg']:
       pass
@@ -162,7 +333,16 @@ def run(log_filename):
     else:
       pass #print event
 
-  return (component, object, action, thread)
+  for thr in thread.values():
+    locale = thr['name'][0]
+    if not locale in locality:
+      locality.append(locale)
+
+  # Write out RDF
+  rdf_out = open(log_filename+'.n3', 'w')
+  rdf_out.writelines([line+'\n' for line in rdf])
+
+  return (component, object, action, thread, locality)
 
 if __name__=="__main__":
   if len(sys.argv) == 2:
