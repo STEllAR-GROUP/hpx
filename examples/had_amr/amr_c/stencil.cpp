@@ -215,7 +215,7 @@ namespace hpx { namespace components { namespace amr
             return 1;
           }
         } else {
-          int t = (int) nearbyint(resultval->timestep_);
+          int t = (int) (resultval->timestep_ + 0.5);
           int r = numsteps_ - t;
           return r;
         }

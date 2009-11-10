@@ -46,7 +46,7 @@ int evaluate_timestep(stencil_data const* left, stencil_data const* middle,
 
     result->max_index_ = middle->max_index_;
     result->index_ = middle->index_;
-    result->timestep_ = middle->timestep_ + 1.0/pow(2,middle->level_);
+    result->timestep_ = middle->timestep_ + 1.0/pow(2.0,(int) middle->level_);
     result->level_ = middle->level_;
     result->refine_ = true;
     /*
@@ -69,7 +69,7 @@ int evaluate_left_bdry_timestep(stencil_data const* middle, stencil_data const* 
 
     result->max_index_ = middle->max_index_;
     result->index_ = middle->index_;
-    result->timestep_ = middle->timestep_ + 1.0/pow(2,middle->level_);
+    result->timestep_ = middle->timestep_ + 1.0/pow(2.0,(int) middle->level_);
     result->level_ = middle->level_;
     result->refine_ = false;
     /*
@@ -93,7 +93,7 @@ int evaluate_right_bdry_timestep(stencil_data const* left, stencil_data const* m
 
     result->max_index_ = middle->max_index_;
     result->index_ = middle->index_;
-    result->timestep_ = middle->timestep_ + 1.0/pow(2,middle->level_);
+    result->timestep_ = middle->timestep_ + 1.0/pow(2.0,(int) middle->level_);
     result->level_ = middle->level_;
     result->refine_ = false;
     /*
