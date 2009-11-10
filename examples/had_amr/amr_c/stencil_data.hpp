@@ -17,7 +17,7 @@ struct stencil_data
 {
     size_t max_index_;   // overall number of data points
     size_t index_;       // sequential number of this data point (0 <= index_ < max_values_)
-    size_t timestep_;    // current time step
+    double timestep_;    // current time step
     size_t level_;    // refinement level
     double value_;            // current value
     double x_;      // x coordinate value

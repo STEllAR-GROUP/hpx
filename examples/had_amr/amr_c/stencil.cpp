@@ -119,36 +119,23 @@ namespace hpx { namespace components { namespace amr
         // get all input memory_block_data instances
         access_memory_block<stencil_data> val1, val2, val3, val4, val5, resultval;
         if (gids.size() == 3) { 
-      //    printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
             boost::tie(val1, val2, val3, resultval) = 
                 detail::get_async(gids[0], gids[1], gids[2], result);
         } 
         else if (gids.size() == 2) {
-      //    printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
             boost::tie(val1, val2, resultval) = 
                 detail::get_async(gids[0], gids[1], result);
         } 
         else if (gids.size() == 5) {
-      //    printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
             boost::tie(val1, val2, val3, val4, val5, resultval) = 
                 detail::get_async(gids[0], gids[1], gids[2], gids[3], gids[4], result);
         } 
         else {
-      //    printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
-        //    boost::tie(val1, resultval) = detail::get_async(gids[0], result);
-        //  printf(" TEST gids.size %d %d %d \n",gids.size(),row,column);
-        //  printf(" TEST2 gids.size %d %d %d timestep %d\n",gids.size(),row,column,val1->timestep_);
           return -1;
         }
 
-        // make sure all input data items agree on the time step number
-       // BOOST_ASSERT(val1->timestep_ == val2->timestep_);
-       // if ( gids.size() == 3 ) {
-       //   BOOST_ASSERT(val1->timestep_ == val3->timestep_);
-       // }
-
         // the predecessor
-        std::size_t middle_timestep;
+        double middle_timestep;
         if (gids.size() == 3) 
           middle_timestep = val2->timestep_;
         else if (gids.size() == 2 && column == 0) 
@@ -161,7 +148,7 @@ namespace hpx { namespace components { namespace amr
           middle_timestep = val3->timestep_;
         }
 
-        if (middle_timestep < numsteps_) {
+        if (val1->level_ == 0 && middle_timestep < numsteps_ || val1->level_ > 0) {
 
             if (gids.size() == 3) {
               // this is the actual calculation, call provided (external) function
@@ -179,14 +166,12 @@ namespace hpx { namespace components { namespace amr
 
                 // copy over the coordinate value to the result
                 resultval->x_ = val1->x_;
-                resultval->level_ = val1->level_;
               } else {
                 evaluate_right_bdry_timestep(val1.get_ptr(), val2.get_ptr(),
                   resultval.get_ptr(), numsteps_,par);
 
                 // copy over the coordinate value to the result
                 resultval->x_ = val2->x_;
-                resultval->level_ = val2->level_;
               }
             } else if (gids.size() == 5) {
               // this is the actual calculation, call provided (external) function
@@ -195,7 +180,6 @@ namespace hpx { namespace components { namespace amr
 
               // copy over the coordinate value to the result
               resultval->x_ = val3->x_;
-              resultval->level_ = val3->level_;
             }
 
             std::size_t allowedl = par.allowedl;
@@ -203,8 +187,7 @@ namespace hpx { namespace components { namespace amr
               finer_mesh(result, gids,par);
             }
 
-            if (log_)     // send result to logging instance
-                stubs::logging::logentry(log_, resultval.get(), row);
+            if (log_)  stubs::logging::logentry(log_, resultval.get(), row);
         }
         else {
             // the last time step has been reached, just copy over the data
@@ -222,18 +205,18 @@ namespace hpx { namespace components { namespace amr
             } else {
               BOOST_ASSERT(false);
             }
-            ++resultval->timestep_;
         }
  
         // set return value difference between actual and required number of
         // timesteps (>0: still to go, 0: last step, <0: overdone)
-        int r = numsteps_ - resultval->timestep_;
         if ( val1->level_ > 0 ) {
           if ( row == 1 || row == 2 ) return 0;
           else {
-            return r;
+            return 1;
           }
         } else {
+          int t = (int) nearbyint(resultval->timestep_);
+          int r = numsteps_ - t;
           return r;
         }
     }
@@ -268,7 +251,6 @@ namespace hpx { namespace components { namespace amr
       int i;
       for (i=0;i<8;i++) {
         ++mval[i]->level_;
-        mval[i]->timestep_ = 0;
         mval[i]->index_ = i;
       }
 

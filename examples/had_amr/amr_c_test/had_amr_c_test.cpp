@@ -46,20 +46,16 @@ int evaluate_timestep(stencil_data const* left, stencil_data const* middle,
 
     result->max_index_ = middle->max_index_;
     result->index_ = middle->index_;
-    result->timestep_ = middle->timestep_ + 1;
+    result->timestep_ = middle->timestep_ + 1.0/pow(2,middle->level_);
     result->level_ = middle->level_;
     result->refine_ = true;
     /*
     result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
     */
     double sum = 0;
-    long n = work[middle->timestep_*nzones+middle->index_/zone];
     double dt = par.dt0;
     double dx = par.dx0;
 
-    //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
-    //for (t = 0; t < n; t++)
-    //    sum += left->value_+middle->value_ ;
     result->value_ = middle->value_ - dt/dx*(middle->value_ - left->value_);
 
     return 1;
@@ -73,21 +69,16 @@ int evaluate_left_bdry_timestep(stencil_data const* middle, stencil_data const* 
 
     result->max_index_ = middle->max_index_;
     result->index_ = middle->index_;
-    result->timestep_ = middle->timestep_ + 1;
+    result->timestep_ = middle->timestep_ + 1.0/pow(2,middle->level_);
     result->level_ = middle->level_;
     result->refine_ = false;
     /*
     result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
     */
     double sum = 0;
-    long n = work[middle->timestep_*nzones+middle->index_/zone];
     double dt = par.dt0;
     double dx = par.dx0;
 
-    //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
-    //for (t = 0; t < n; t++)
-    //    sum += middle->value_+right->value_;
-    //result->value_ = 0.5*(middle->value_+right->value_);
     // boundary condition
     result->value_ = middle->value_;
 
@@ -102,20 +93,16 @@ int evaluate_right_bdry_timestep(stencil_data const* left, stencil_data const* m
 
     result->max_index_ = middle->max_index_;
     result->index_ = middle->index_;
-    result->timestep_ = middle->timestep_ + 1;
+    result->timestep_ = middle->timestep_ + 1.0/pow(2,middle->level_);
     result->level_ = middle->level_;
     result->refine_ = false;
     /*
     result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
     */
     double sum = 0;
-    long n = work[middle->timestep_*nzones+middle->index_/zone];
     double dt = par.dt0;
     double dx = par.dx0;
 
-    //printf("Point %d, iter %d: work=%ld\n", middle->index_, middle->timestep_, n);
-    //for (t = 0; t < n; t++)
-    //    sum += left->value_+middle->value_;
     //result->value_ = 0.5*(left->value_+middle->value_);
     result->value_ = middle->value_ - dt/dx*(middle->value_ - left->value_);
 
