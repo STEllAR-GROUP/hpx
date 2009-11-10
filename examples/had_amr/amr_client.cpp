@@ -232,6 +232,8 @@ int main(int argc, char* argv[])
         par.stencilsize = 3;
         par.allowedl    = 0;
         par.loglevel    = 0;
+        par.output      = 1.0;
+        par.output_stdout = 1;
         par.lambda      = 0.15;
         par.nx0         = numvals;
         par.nt0         = numsteps;
@@ -258,6 +260,14 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("loglevel") ) {
                 std::string tmp = sec->get_entry("loglevel");
                 par.loglevel = atoi(tmp.c_str());
+              }
+              if ( sec->has_entry("output") ) {
+                std::string tmp = sec->get_entry("output");
+                par.output = atof(tmp.c_str());
+              }
+              if ( sec->has_entry("output_stdout") ) {
+                std::string tmp = sec->get_entry("output_stdout");
+                par.output_stdout = atoi(tmp.c_str());
               }
               if ( sec->has_entry("stencilsize") ) {
                 std::string tmp = sec->get_entry("stencilsize");

@@ -8,6 +8,7 @@
 
 #include <hpx/lcos/mutex.hpp>
 #include "stencil_data.hpp"
+#include "../parameter.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server
@@ -29,7 +30,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         /// This is the function implementing the logging functionality
         /// It takes the values as calculated during the current time step.
-        void logentry(stencil_data const& memblock_gid, int row);
+        void logentry(stencil_data const& memblock_gid, int row, Parameter const& par );
 
         /// Each of the exposed functions needs to be encapsulated into an action
         /// type, allowing to generate all required boilerplate code for threads,
@@ -40,8 +41,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         ///
         /// \param Result [in] The type of the result to be transferred back to 
         ///               this LCO instance.
-        typedef hpx::actions::action2<
-            logging, logging_logentry, stencil_data const&, int,
+        typedef hpx::actions::action3<
+            logging, logging_logentry, stencil_data const&, int,Parameter const&,
             &logging::logentry
         > logentry_action;
 
@@ -60,10 +61,10 @@ namespace hpx { namespace components { namespace amr { namespace stubs
     {
         ///////////////////////////////////////////////////////////////////////
         static void logentry(naming::id_type const& gid, 
-            stencil_data const& val, int row)
+            stencil_data const& val, int row, Parameter const& par)
         {
             typedef amr::server::logging::logentry_action action_type;
-            applier::apply<action_type>(gid, val, row);
+            applier::apply<action_type>(gid, val, row, par);
         }
     };
 
@@ -84,9 +85,9 @@ namespace hpx { namespace components { namespace amr
         {}
 
         ///////////////////////////////////////////////////////////////////////
-        void logentry(stencil_data const& val, int row)
+        void logentry(stencil_data const& val, int row, Parameter const& par)
         {
-            this->base_type::logentry(this->gid_, val, row);
+            this->base_type::logentry(this->gid_, val, row, par);
         }
     };
 

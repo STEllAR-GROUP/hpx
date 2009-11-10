@@ -14,15 +14,19 @@ namespace hpx { namespace components { namespace amr { namespace server
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
     // Compute the result value for the current time step
-    void logging::logentry(stencil_data const& val, int row)
+    void logging::logentry(stencil_data const& val, int row, Parameter const& par)
     {
         mutex_type::scoped_lock l(mtx_);
 
-        std::cout << " AMR Level: " << val.level_ << "   Timestep: " <<  val.timestep_ << "   refine?: " << val.refine_ << "   row: " << row << "   index: " << val.index_ << "    Value: " << val.value_ << "  x-coordinate : " << val.x_ << std::endl;   
-      //  std::cout << row << ", " << val.index_ << ", " << val.level_ << ": " 
-      //            << val.max_index_ << ", " << val.timestep_ << ", " 
-      //            << val.refine_ << ", " 
-      //            << val.value_ << std::endl;
+        if ( par.output_stdout == 1 ) {
+          std::cout << " AMR Level: " << val.level_ << "   Timestep: " <<  val.timestep_ << "   refine?: " << val.refine_ << "   row: " << row << "   index: " << val.index_ << "    Value: " << val.value_ << "  x-coordinate : " << val.x_ << std::endl;   
+        }
+
+        // output to file "output.dat"
+        FILE *fdata;
+        fdata = fopen("output.dat","a");
+        fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_,val.x_,val.value_);
+        fclose(fdata);
     }
 
 }}}}

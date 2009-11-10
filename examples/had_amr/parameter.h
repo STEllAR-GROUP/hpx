@@ -14,6 +14,8 @@ struct Par {
       double lambda;
       int allowedl;
       int loglevel;
+      double output;
+      int output_stdout;
       int stencilsize;
       int linearbounds;
       int coarsestencilsize;

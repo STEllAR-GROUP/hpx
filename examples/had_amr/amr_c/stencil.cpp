@@ -8,6 +8,8 @@
 
 #include <boost/foreach.hpp>
 
+#include <math.h>
+
 #include "../amr/amr_mesh.hpp"
 #include "../amr/amr_mesh_tapered.hpp"
 
@@ -187,7 +189,8 @@ namespace hpx { namespace components { namespace amr
               finer_mesh(result, gids,par);
             }
 
-            if (log_)  stubs::logging::logentry(log_, resultval.get(), row);
+            if (log_ && fmod(resultval->timestep_,par.output) < 1.e-6)  
+                stubs::logging::logentry(log_, resultval.get(), row, par);
         }
         else {
             // the last time step has been reached, just copy over the data
@@ -360,7 +363,7 @@ namespace hpx { namespace components { namespace amr
             generate_initial_data(val.get_ptr(), item, maxitems, row, par);
 
             if (log_)         // send initial value to logging instance
-                stubs::logging::logentry(log_, val.get(), row);
+                stubs::logging::logentry(log_, val.get(), row, par);
         }
         return result;
     }
