@@ -13,25 +13,31 @@
 
 ///////////////////////////////////////////////////////////////////////////
 int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
-    Par const& par)
+    int level, double x, Par const& par)
 {
     // provide initial data for the given data value 
     val->max_index_ = maxitems;
     val->index_ = item;
     val->timestep_ = 0;
-    val->level_= 0;
+    val->level_= level;
     val->refine_= false;
     val->right_alloc_ = 0;
-    /*
-    if (item < (int)(maxitems / 3.) || item >= (int)(2. * maxitems / 3.))
-        val->value_ = 0;
-    else
-        val->value_ = pow(item - 1./3., 4.) * pow(item - 2./3., 4.);
-    */
-    //val->value_ = random_numbers();
-    double dx0 = par.dx0;
 
-    double xcoord = par.minx0 + item*dx0;
+    double dx;
+    double xcoord;
+
+    dx = par.dx0/pow(2.0,level);
+    if ( level == 0 ) {
+      xcoord = par.minx0 + item*dx;
+    } else {
+      // for tapered mesh
+      if (maxitems != 8) {
+        printf("Problem Level %d !\n",level);
+        exit(0);
+      }
+      xcoord = x + (item-3)*dx;
+    }
+
     val->x_ = xcoord;
     val->value_ = exp(-xcoord*xcoord);
 
@@ -40,7 +46,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
 
 ///////////////////////////////////////////////////////////////////////////
 int evaluate_timestep(stencil_data const* left, stencil_data const* middle, 
-    stencil_data const* right, stencil_data* result, int numsteps,Par const& par)
+    stencil_data const* right, stencil_data* result, int numsteps, Par const& par)
 {
     // the middle point is our direct predecessor
 

@@ -159,7 +159,6 @@ namespace hpx { namespace components { namespace amr
 
               // copy over the coordinate value to the result
               resultval->x_ = val2->x_;
-              resultval->level_ = val2->level_;
             } else if (gids.size() == 2) {
               // bdry computation
               if ( column == 0 ) {
@@ -187,6 +186,12 @@ namespace hpx { namespace components { namespace amr
             std::size_t allowedl = par.allowedl;
             if ( val2->refine_ && gids.size() == 5 && val2->level_ < allowedl ) {
               finer_mesh(result, gids,par);
+            }
+
+            // One special case: refining at time = 0
+            if ( resultval->refine_ && gids.size() == 5 && 
+                 val1->timestep_ < 1.e-6 && resultval->level_ < allowedl ) {
+              finer_mesh_initial(result, gids, resultval->level_+1, resultval->x_, par);
             }
 
             if (log_ && fmod(resultval->timestep_,par.output) < 1.e-6)  
@@ -314,15 +319,12 @@ namespace hpx { namespace components { namespace amr
         initial_data.push_back(gval[i]);
       }
 
-      std::size_t numvalues = 8;
-      std::size_t numsteps = 2;
-
       bool do_logging = false;
       if ( par.loglevel > 0 ) {
         do_logging = true;
       }
       std::vector<naming::id_type> result_data(
-          child_mesh.execute(initial_data, function_type, numvalues, numsteps, 
+          child_mesh.execute(initial_data, function_type,
             do_logging ? logging_type : components::component_invalid,par));
 
       access_memory_block<stencil_data> r_val1, r_val2, resultval;
@@ -346,10 +348,54 @@ namespace hpx { namespace components { namespace amr
 
       return 0;
     }
+    
+    ///////////////////////////////////////////////////////////////////////////
+    // Implement a finer mesh via interpolation of inter-mesh points
+    // Compute the result value for the current time step
+    int stencil::finer_mesh_initial(naming::id_type const& result, 
+        std::vector<naming::id_type> const& gids, std::size_t level, double x, Parameter const& par) 
+    {
+
+      // the initial data for the child mesh comes from the parent mesh
+      naming::id_type here = applier::get_applier().get_runtime_support_gid();
+      components::component_type logging_type =
+                components::get_component_type<components::amr::server::logging>();
+      components::component_type function_type =
+                components::get_component_type<components::amr::stencil>();
+      components::amr::amr_mesh_tapered child_mesh (
+                components::amr::amr_mesh_tapered::create(here, 1, true));
+
+      bool do_logging = false;
+      if ( par.loglevel > 0 ) {
+        do_logging = true;
+      }
+      std::vector<naming::id_type> result_data(
+          child_mesh.init_execute(function_type,
+            do_logging ? logging_type : components::component_invalid,
+            level, x, par));
+
+      access_memory_block<stencil_data> r_val1, r_val2, resultval;
+      boost::tie(r_val1, r_val2, resultval) = 
+          detail::get_async(result_data[2], result_data[3], result);
+
+      // overwrite the coarse point computation
+      resultval->value_ = r_val1->value_;
+
+      // remember right neighbor value
+      resultval->right_alloc_ = 1;
+      resultval->right_value_ = r_val2->value_;
+      resultval->right_level_ = r_val2->level_;
+
+      // release result data
+      for (std::size_t i = 0; i < result_data.size(); ++i) 
+          components::stubs::memory_block::free(result_data[i]);
+
+      return 0;
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     naming::id_type stencil::alloc_data(int item, int maxitems, int row,
-        Parameter const& par)
+        std::size_t level, double x, Parameter const& par)
     {
         naming::id_type result = components::stubs::memory_block::create(
             applier::get_applier().get_runtime_support_gid(), sizeof(stencil_data));
@@ -360,9 +406,9 @@ namespace hpx { namespace components { namespace amr
                 components::stubs::memory_block::checkout(result));
 
             // call provided (external) function
-            generate_initial_data(val.get_ptr(), item, maxitems, row, par);
+            generate_initial_data(val.get_ptr(), item, maxitems, row, level, x, par);
 
-            if (log_)         // send initial value to logging instance
+            if (par.loglevel > 1)         // send initial value to logging instance
                 stubs::logging::logentry(log_, val.get(), row, par);
         }
         return result;

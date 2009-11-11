@@ -43,14 +43,13 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         /// This is the main entry point of this component. 
         std::vector<naming::id_type> init_execute(
-            components::component_type function_type, std::size_t numvalues, 
-            std::size_t numsteps,
-            components::component_type logging_type, Parameter const& par);
+            components::component_type function_type,
+            components::component_type logging_type, 
+            std::size_t level, double x, Parameter const& par);
 
         std::vector<naming::id_type> execute(
             std::vector<naming::id_type> const& initialdata,
-            components::component_type function_type, std::size_t numvalues, 
-            std::size_t numsteps,
+            components::component_type function_type,
             components::component_type logging_type, Parameter const& par);
 
         ///////////////////////////////////////////////////////////////////////
@@ -59,14 +58,15 @@ namespace hpx { namespace components { namespace amr { namespace server
         // serialization, etc.
         typedef hpx::actions::result_action5<
             amr_mesh_tapered, std::vector<naming::id_type>, amr_mesh_tapered_init_execute, 
-            components::component_type, std::size_t, std::size_t,
-            components::component_type, Parameter const&, &amr_mesh_tapered::init_execute
+            components::component_type, 
+            components::component_type, std::size_t, double,
+            Parameter const&, &amr_mesh_tapered::init_execute
         > init_execute_action;
 
-        typedef hpx::actions::result_action6<
+        typedef hpx::actions::result_action4<
             amr_mesh_tapered, std::vector<naming::id_type>, amr_mesh_tapered_execute, 
             std::vector<naming::id_type> const&,
-            components::component_type, std::size_t, std::size_t,
+            components::component_type, 
             components::component_type, Parameter const&, &amr_mesh_tapered::execute
         > execute_action;
 
@@ -82,6 +82,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         void prepare_initial_data(
             distributed_iterator_range_type const& functions, 
             std::vector<naming::id_type>& initial_data,
+            std::size_t level, double x,
             Parameter const& par);
 
         static void init_stencils(

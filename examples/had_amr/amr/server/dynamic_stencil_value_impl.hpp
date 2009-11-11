@@ -49,7 +49,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     {
         util::unlock_the_lock<Lock> ul(l);
         return components::amr::stubs::functional_component::alloc_data(
-            gid, -1, -1, row, par);
+            gid, -1, -1, row, -1, 0.0, par);
     }
 
     inline void 

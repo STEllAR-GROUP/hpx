@@ -261,6 +261,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     void amr_mesh_tapered::prepare_initial_data(
         distributed_iterator_range_type const& functions, 
         std::vector<naming::id_type>& initial_data,
+        std::size_t level, double x, 
         Parameter const& par)
     {
         typedef std::vector<lcos::future_value<naming::id_type> > lazyvals_type;
@@ -272,7 +273,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         for (std::size_t i = 0; function != functions.second; ++function, ++i)
         {
             lazyvals.push_back(components::amr::stubs::functional_component::
-                alloc_data_async(*function, i, numvalues_, 0, par));
+                alloc_data_async(*function, i, numvalues_, 0, level, x, par));
         }
 
         // now wait for the results
@@ -339,12 +340,12 @@ namespace hpx { namespace components { namespace amr { namespace server
     ///////////////////////////////////////////////////////////////////////////
     /// This is the main entry point of this component. 
     std::vector<naming::id_type> amr_mesh_tapered::init_execute(
-        components::component_type function_type, std::size_t numvalues, 
-        std::size_t numsteps,
-        components::component_type logging_type, Parameter const& par)
+        components::component_type function_type,
+        components::component_type logging_type, 
+        std::size_t level, double x, Parameter const& par)
     {
-        BOOST_ASSERT(numvalues == 8);
-        BOOST_ASSERT(numsteps == 2);
+        std::size_t numvalues = 8;
+        std::size_t numsteps = 2;
 
         std::vector<naming::id_type> result_data;
 
@@ -399,7 +400,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // prepare initial data
         std::vector<naming::id_type> initial_data;
-        prepare_initial_data(locality_results(functions), initial_data, par);
+        prepare_initial_data(locality_results(functions), initial_data, level, x, par);
 
         // do actual work
         execute(locality_results(stencils[0]), initial_data, result_data);
@@ -419,12 +420,11 @@ namespace hpx { namespace components { namespace amr { namespace server
     /// This the other entry point of this component. 
     std::vector<naming::id_type> amr_mesh_tapered::execute(
         std::vector<naming::id_type> const& initial_data,
-        components::component_type function_type, std::size_t numvalues, 
-        std::size_t numsteps,
+        components::component_type function_type,
         components::component_type logging_type, Parameter const& par)
     {
-        BOOST_ASSERT(numvalues == 8);
-        BOOST_ASSERT(numsteps == 2);
+        std::size_t numvalues = 8;
+        std::size_t numsteps = 2;
 
         std::vector<naming::id_type> result_data;
 

@@ -282,7 +282,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         for (std::size_t i = 0; function != functions.second; ++function, ++i)
         {
             lazyvals.push_back(components::amr::stubs::functional_component::
-                alloc_data_async(*function, i, numvalues_, 0, par));
+                alloc_data_async(*function, i, numvalues_, 0, 0, 0.0, par));
         }
 
         // now wait for the results

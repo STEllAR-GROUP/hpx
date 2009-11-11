@@ -52,6 +52,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
 
         virtual naming::id_type alloc_data(int item, int maxitems, int row,
+            std::size_t level, double x, 
             Parameter const& par)
         {
             // This shouldn't ever be called. If you're seeing this assertion 
@@ -90,9 +91,9 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
 
         naming::id_type alloc_data_nonvirt(int item, int maxitems, int row,
-            Parameter const& par)
+            std::size_t level, double x, Parameter const& par)
         {
-            return alloc_data(item, maxitems, row, par);
+            return alloc_data(item, maxitems, row, level, x, par);
         }
 
         void init_nonvirt(std::size_t numsteps, naming::id_type const& gid)
@@ -104,9 +105,9 @@ namespace hpx { namespace components { namespace amr { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::result_action4<
+        typedef hpx::actions::result_action6<
             functional_component, naming::id_type, functional_component_alloc_data, 
-            int, int, int, Parameter const&, 
+            int, int, int, std::size_t, double, Parameter const&, 
             &functional_component::alloc_data_nonvirt
         > alloc_data_action;
 
