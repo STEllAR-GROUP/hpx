@@ -142,10 +142,9 @@ if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
     add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
     # suppress certain warnings
-    add_definitions(-wd4251 -wd4231 -wd4275 -wd4660 -wd4094 -wd4267)
+    add_definitions(-wd4251 -wd4231 -wd4275 -wd4660 -wd4094 -wd4267 -wd4180)
     if(CMAKE_CL_64)
         add_definitions(-DBOOST_COROUTINE_USE_FIBERS)
-        add_definitions(-wd4180)
     endif()
 endif()
 
@@ -206,7 +205,7 @@ add_subdirectory(runtime)
 install(
     DIRECTORY hpx/                    # install all hpx header files
     DESTINATION include/hpx 
-    FILES_MATCHING PATTERN "*.hpp"
+    FILES_MATCHING PATTERN "*.h*"
     REGEX ".svn" EXCLUDE
     REGEX "CMakeFiles" EXCLUDE)
 
