@@ -133,6 +133,8 @@ namespace hpx { namespace components { namespace amr
                 detail::get_async(gids[0], gids[1], gids[2], gids[3], gids[4], result);
         } 
         else {
+          boost::tie(val1, resultval) = detail::get_async(gids[0], result);
+          resultval.get() = val1.get();
           return -1;
         }
 
@@ -329,7 +331,7 @@ namespace hpx { namespace components { namespace amr
 
       access_memory_block<stencil_data> r_val1, r_val2, resultval;
       boost::tie(r_val1, r_val2, resultval) = 
-          detail::get_async(result_data[2], result_data[3], result);
+          detail::get_async(result_data[3], result_data[4], result);
 
       // overwrite the coarse point computation
       resultval->value_ = r_val1->value_;
@@ -376,9 +378,8 @@ namespace hpx { namespace components { namespace amr
 
       access_memory_block<stencil_data> r_val1, r_val2, resultval;
       boost::tie(r_val1, r_val2, resultval) = 
-          detail::get_async(result_data[2], result_data[3], result);
-
-      // overwrite the coarse point computation
+          detail::get_async(result_data[3], result_data[4], result);
+      
       resultval->value_ = r_val1->value_;
 
       // remember right neighbor value

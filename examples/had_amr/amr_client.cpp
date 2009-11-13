@@ -314,6 +314,13 @@ int main(int argc, char* argv[])
           par.coarsestencilsize = par.stencilsize;
         }
 
+        // create output file to append to
+        FILE *fdata;
+        fdata = fopen("output.dat","w");
+        fprintf(fdata,"\n");
+        fclose(fdata);
+
+
         initrand(42, pdist, mean, stddev, numsteps, numvals, num_threads);
 
         // initialize and start the HPX runtime
