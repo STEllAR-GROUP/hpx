@@ -297,10 +297,26 @@ namespace hpx { namespace components { namespace amr
 
       if ( par.linearbounds == 1 ) {
         // linear interpolation
-        mval[0]->value_ = 0.5*(t1 + t2);
-        mval[2]->value_ = 0.5*(t2 + t3);
-        mval[4]->value_ = 0.5*(t3 + t4);
-        mval[6]->value_ = 0.5*(t4 + t5);
+        if ( mval[0]->right_alloc_ == 1 && mval[0]->right_level_ == mval[0]->level_ ) {
+          mval[0]->value_ = mval[0]->right_value_;
+        } else {
+          mval[0]->value_ = 0.5*(t1 + t2);
+        }
+        if ( mval[1]->right_alloc_ == 1 && mval[1]->right_level_ == mval[2]->level_ ) {
+          mval[2]->value_ = mval[1]->right_value_;
+        } else {
+          mval[2]->value_ = 0.5*(t2 + t3);
+        }
+        if ( mval[2]->right_alloc_ == 1 && mval[2]->right_level_ == mval[4]->level_ ) {
+          mval[4]->value_ = mval[2]->right_value_;
+        } else {
+          mval[4]->value_ = 0.5*(t3 + t4);
+        }
+        if ( mval[3]->right_alloc_ == 1 && mval[3]->right_level_ == mval[6]->level_ ) {
+          mval[6]->value_ = mval[3]->right_value_;
+        } else {
+          mval[6]->value_ = 0.5*(t4 + t5);
+        }
       } else {
         // other user defined options not implemented yet
         interpolation();
