@@ -1,13 +1,15 @@
 [had_amr]
 nx0         = 10
-nt0         = 4
+nt0         = 50
 
 minx0       = -10.0;
 maxx0       =  10.0;
 
 lambda      = 0.15
 
-allowedl     = 1
+allowedl     = 2
 stencilsize  = 3
 linearbounds = 1
-loglevel     = 1
+loglevel     = 2
+output       = 1.0
+output_stdout = 1
