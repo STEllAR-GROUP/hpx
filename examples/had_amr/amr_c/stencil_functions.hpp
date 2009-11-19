@@ -7,27 +7,28 @@
 #define AMR_C_FUNCTIONS_FEB_16_2009_0141PM
 
 #include <hpx/config/export_definitions.hpp>
-#include "../parameter.hpp"
+#include "../parameter.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 /// The function \a generate_initial_data will be called to initialize the 
 /// given instance of 'stencil_data' 
 HPX_COMPONENT_EXPORT int generate_initial_data(
-    stencil_data* data, int item, int maxitems, int row, int level, double x, Par const& par);
+    stencil_data* data, int item, int maxitems, int row, int level, double x, 
+    Par const& par);
 
 /// The function \a evaluate_timestep will be called to compute the result data
 /// for the given timestep
 HPX_COMPONENT_EXPORT int evaluate_timestep(stencil_data const* left, 
     stencil_data const* middle, stencil_data const* right, 
-    stencil_data* result, int numsteps,Par const& par);
+    stencil_data* result, int numsteps, Par const& par);
 
 HPX_COMPONENT_EXPORT int evaluate_left_bdry_timestep(
     stencil_data const* middle, stencil_data const* right, 
-    stencil_data* result, int numsteps,Par const& par);
+    stencil_data* result, int numsteps, Par const& par);
 
 HPX_COMPONENT_EXPORT int evaluate_right_bdry_timestep(stencil_data const* left, 
     stencil_data const* middle,
-    stencil_data* result, int numsteps,Par const& par);
+    stencil_data* result, int numsteps, Par const& par);
 
 HPX_COMPONENT_EXPORT int interpolation();
 

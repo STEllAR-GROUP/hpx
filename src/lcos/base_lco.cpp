@@ -38,7 +38,7 @@ HPX_REGISTER_ACTION_EX(
     set_result_action_int);
 HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<hpx::util::section>::set_result_action,
-    set_result_action_int);
+    set_result_action_section);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco);
@@ -48,10 +48,10 @@ HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<double>);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<int>);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<hpx::util::section>);
 
-////////////////////////////////////////////////////////////////////////////
-//
+//////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
-   template hpx::util::section const&
-   continuation::trigger(hpx::util::section const&);
+    template hpx::util::section const& 
+    continuation::trigger(hpx::util::section const&);
 }}
+

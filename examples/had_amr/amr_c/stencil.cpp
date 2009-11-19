@@ -361,8 +361,8 @@ namespace hpx { namespace components { namespace amr
       for (std::size_t i = 0; i < result_data.size(); ++i) 
           components::stubs::memory_block::free(result_data[i]);
 
-      for (std::size_t i = 0; i < initial_data.size(); ++i) 
-          components::stubs::memory_block::free(initial_data[i]);
+//       for (std::size_t i = 0; i < initial_data.size(); ++i) 
+//           components::stubs::memory_block::free(initial_data[i]);
 
       return 0;
     }

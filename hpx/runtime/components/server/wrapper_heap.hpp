@@ -23,6 +23,34 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace detail 
 {
+#if defined(HPX_DEBUG_WRAPPER_HEAP)
+    namespace debug
+    {
+        ///////////////////////////////////////////////////////////////////////
+        // Test memory area for being filled as expected
+        inline 
+        bool test_fill_bytes (void *p, unsigned char c, std::size_t cnt)
+        {
+            unsigned char* uc = (unsigned char*)p;
+            for (std::size_t i = 0; i < cnt; ++i) {
+                if (*uc++ != c)
+                    return false;
+            }
+            return true;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // Fill memory area
+        inline 
+        void fill_bytes (void *p, unsigned char c, int cnt)
+        {
+            using namespace std;    // some systems have memset in namespace std
+            memset (p, c, cnt);
+        }
+
+    } // namespace debug
+#endif
+
     ///////////////////////////////////////////////////////////////////////////////
     template<typename T, typename Allocator>
     class wrapper_heap : private boost::noncopyable
@@ -31,9 +59,16 @@ namespace hpx { namespace components { namespace detail
         typedef T value_type;
         typedef Allocator allocator_type;
 
+#if defined(HPX_DEBUG_WRAPPER_HEAP)
+        enum guard_value {
+            initial_value = 0xcc,           // memory has been initialized
+            freed_value = 0xdd,             // memory has been freed
+        };
+#endif
+
         typedef boost::aligned_storage<sizeof(value_type),
             boost::alignment_of<value_type>::value> storage_type;
-        storage_type data;
+//         storage_type data;
 
         enum { 
             heap_step = 0xFFFF,               // default initial number of elements
@@ -89,6 +124,10 @@ namespace hpx { namespace components { namespace detail
             first_free_ += count;
             free_size_ -= (int)count;
 
+#if defined(HPX_DEBUG_WRAPPER_HEAP)
+            // init memory blocks
+            debug::fill_bytes(p, initial_value, count*sizeof(storage_type));
+#endif
             BOOST_ASSERT(free_size_ >= 0);
             return p;
         }
@@ -104,9 +143,15 @@ namespace hpx { namespace components { namespace detail
             BOOST_ASSERT(NULL != pool_ && p1 >= pool_);
             BOOST_ASSERT(NULL != pool_ && p1 + count <= pool_ + size_);
             BOOST_ASSERT(first_free_ == NULL || p1 != first_free_);
+            BOOST_ASSERT((std::size_t)free_size_ + count <= size_);
+#if defined(HPX_DEBUG_WRAPPER_HEAP)
+            // make sure this has not been freed yet
+            BOOST_ASSERT(!debug::test_fill_bytes(p1->address(), freed_value, 
+                count*sizeof(storage_type)));
 
-            using namespace std;
-            memset(p1->address(), 0, sizeof(storage_type));
+            // give memory back to pool
+            debug::fill_bytes(p1->address(), freed_value, sizeof(storage_type));
+#endif
             free_size_ += (int)count;
 
             // release the pool if this one was the last allocated item

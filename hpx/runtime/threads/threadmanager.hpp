@@ -26,6 +26,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/util/io_service_pool.hpp>
+#include <hpx/util/block_profiler.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

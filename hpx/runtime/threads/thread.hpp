@@ -13,8 +13,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/lockfree/atomic_int.hpp>
-#include <boost/lockfree/cas.hpp>
-#include <boost/lockfree/branch_hints.hpp>
 #include <boost/coroutine/coroutine.hpp>
 
 #include <hpx/hpx_fwd.hpp>

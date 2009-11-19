@@ -15,6 +15,7 @@
 #include <boost/fusion/include/size.hpp>
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
+#include <boost/function.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/remove_reference.hpp>
