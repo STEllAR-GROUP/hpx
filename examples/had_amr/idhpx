@@ -1,6 +1,6 @@
 [had_amr]
-nx0         = 10
-nt0         = 50
+nx0         = 50
+nt0         = 10
 
 minx0       = -10.0;
 maxx0       =  10.0;
