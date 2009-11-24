@@ -167,7 +167,8 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 // this is the runtime type we use in this application
-typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
+typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> global_runtime_type;
+typedef hpx::runtime_impl<hpx::threads::policies::local_queue_scheduler> local_runtime_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
@@ -241,6 +242,7 @@ int main(int argc, char* argv[])
         par.maxx0       =  10.0;
 
         par.linearbounds = 1;
+        int scheduler = 0;  // default: global scheduler
 
         std::string parfile;
         if (vm.count("parfile")) {
@@ -289,6 +291,11 @@ int main(int argc, char* argv[])
                 // over-ride command line argument if present
                 numsteps = par.nt0;
               }
+              if ( sec->has_entry("thread_scheduler") ) {
+                std::string tmp = sec->get_entry("thread_scheduler");
+                scheduler = atoi(tmp.c_str());
+                BOOST_ASSERT( scheduler == 0 || scheduler == 1 );
+              }
               if ( sec->has_entry("maxx0") ) {
                 std::string tmp = sec->get_entry("maxx0");
                 par.maxx0 = atof(tmp.c_str());
@@ -324,11 +331,22 @@ int main(int argc, char* argv[])
         initrand(42, pdist, mean, stddev, numsteps, numvals, num_threads);
 
         // initialize and start the HPX runtime
-        runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
-        if (mode == hpx::runtime::worker) 
-            rt.run(num_threads);
-        else 
-            rt.run(boost::bind(hpx_main, numvals, numsteps, do_logging, par), num_threads);
+        if (scheduler == 0) {
+          global_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
+          if (mode == hpx::runtime::worker) 
+              rt.run(num_threads);
+          else 
+              rt.run(boost::bind(hpx_main, numvals, numsteps, do_logging, par), num_threads);
+        } else if ( scheduler == 1) {
+          std::pair<std::size_t, std::size_t> init(/*vm["local"].as<int>()*/num_threads, 0);
+          local_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
+          if (mode == hpx::runtime::worker) 
+              rt.run(num_threads);
+          else 
+              rt.run(boost::bind(hpx_main, numvals, numsteps, do_logging, par), num_threads);
+        } else {
+          BOOST_ASSERT(false);
+        }
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";
