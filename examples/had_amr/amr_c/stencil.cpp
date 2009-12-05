@@ -12,6 +12,7 @@
 
 #include "../amr/amr_mesh.hpp"
 #include "../amr/amr_mesh_tapered.hpp"
+#include "../amr/amr_mesh_left.hpp"
 
 #include "stencil.hpp"
 #include "logging.hpp"
@@ -157,7 +158,7 @@ namespace hpx { namespace components { namespace amr
             if (gids.size() == 3) {
               // this is the actual calculation, call provided (external) function
               evaluate_timestep(val1.get_ptr(), val2.get_ptr(), val3.get_ptr(), 
-                  resultval.get_ptr(), numsteps_,par);
+                  resultval.get_ptr(), numsteps_,par,gids.size());
 
               // copy over the coordinate value to the result
               resultval->x_ = val2->x_;
@@ -179,7 +180,7 @@ namespace hpx { namespace components { namespace amr
             } else if (gids.size() == 5) {
               // this is the actual calculation, call provided (external) function
               evaluate_timestep(val2.get_ptr(), val3.get_ptr(), val4.get_ptr(), 
-                  resultval.get_ptr(), numsteps_,par);
+                  resultval.get_ptr(), numsteps_,par,gids.size());
 
               // copy over the coordinate value to the result
               resultval->x_ = val3->x_;
@@ -238,7 +239,8 @@ namespace hpx { namespace components { namespace amr
         std::vector<naming::id_type> const& gids, Parameter const& par) 
     {
 
-      naming::id_type gval[8];
+      int i;
+      naming::id_type gval[9];
       boost::tie(gval[0], gval[1], gval[2], gval[3], gval[4]) = 
                         components::wait(components::stubs::memory_block::clone_async(gids[0]), 
                              components::stubs::memory_block::clone_async(gids[1]),
@@ -246,25 +248,11 @@ namespace hpx { namespace components { namespace amr
                              components::stubs::memory_block::clone_async(gids[3]),
                              components::stubs::memory_block::clone_async(gids[4]));
 
-      boost::tie(gval[5], gval[6], gval[7]) = 
-                        components::wait(components::stubs::memory_block::clone_async(gids[2]), 
-                             components::stubs::memory_block::clone_async(gids[2]),
-                             components::stubs::memory_block::clone_async(gids[2]));
-
-      access_memory_block<stencil_data> mval[8];
+      access_memory_block<stencil_data> mval[9];
       boost::tie(mval[0], mval[1], mval[2], mval[3], mval[4]) = 
           detail::get_async(gval[0], gval[1], gval[2], gval[3], gval[4]);
 
-      boost::tie(mval[5], mval[6], mval[7]) = detail::get_async(gval[5], gval[6], gval[7]);
-
-      // increase the level by one
-      int i;
-      for (i=0;i<8;i++) {
-        ++mval[i]->level_;
-        mval[i]->index_ = i;
-      }
-
-      // temporarily store the values before overwriting them
+      // temporarily store the anchor values before overwriting them
       double t1,t2,t3,t4,t5;
       double x1,x2,x3,x4,x5;
       t1 = mval[0]->value_;
@@ -279,90 +267,234 @@ namespace hpx { namespace components { namespace amr
       x4 = mval[3]->x_;
       x5 = mval[4]->x_;
 
-      // this updates the coordinate position
-      mval[0]->x_ = 0.5*(x1+x2);
-      mval[1]->x_ = x2;
-      mval[2]->x_ = 0.5*(x2+x3);
-      mval[3]->x_ = x3;
-      mval[4]->x_ = 0.5*(x3+x4);
-      mval[5]->x_ = x4;
-      mval[6]->x_ = 0.5*(x4+x5);
-      mval[7]->x_ = x5;
+      if ( !mval[1]->refine_ || !mval[0]->refine_) {
+        // the edge of the AMR mesh has been reached.  
+        // Use the left mesh class instead of standard tapered
+        boost::tie(gval[5], gval[6], gval[7],gval[8]) = 
+                      components::wait(components::stubs::memory_block::clone_async(gids[2]), 
+                      components::stubs::memory_block::clone_async(gids[2]),
+                      components::stubs::memory_block::clone_async(gids[2]),
+                      components::stubs::memory_block::clone_async(gids[2]));
+        boost::tie(mval[5], mval[6], mval[7],mval[8]) = detail::get_async(gval[5], gval[6], gval[7],gval[8]);
+
+        // increase the level by one
+        for (i=0;i<9;i++) {
+          ++mval[i]->level_;
+          mval[i]->index_ = i;
+        }
+
+        // this updates the coordinate position
+        mval[0]->x_ = x1;
+        mval[1]->x_ = 0.5*(x1+x2);
+        mval[2]->x_ = x2;
+        mval[3]->x_ = 0.5*(x2+x3);
+        mval[4]->x_ = x3;
+        mval[5]->x_ = 0.5*(x3+x4);
+        mval[6]->x_ = x4;
+        mval[7]->x_ = 0.5*(x4+x5);
+        mval[8]->x_ = x5;
       
-      // coarse node duplicates
-      mval[1]->value_ = t2;
-      mval[3]->value_ = t3;
-      mval[5]->value_ = t4;
-      mval[7]->value_ = t5;
+        // coarse node duplicates
+        mval[0]->value_ = t1;
+        mval[2]->value_ = t2;
+        mval[4]->value_ = t3;
+        mval[6]->value_ = t4;
+        mval[8]->value_ = t5;
 
-      if ( par.linearbounds == 1 ) {
-        // linear interpolation
-        if ( mval[0]->right_alloc_ == 1 && mval[0]->right_level_ == mval[0]->level_ ) {
-          mval[0]->value_ = mval[0]->right_value_;
+        if ( par.linearbounds == 1 ) {
+          // linear interpolation
+          if ( mval[0]->right_alloc_ == 1 && mval[0]->right_level_ == mval[1]->level_ ) {
+            mval[1]->value_ = mval[0]->right_value_;
+          } else if ( mval[1]->left_alloc_ == 1 && mval[1]->left_level_ == mval[1]->level_ ) {
+            mval[1]->value_ = mval[1]->left_value_;
+          } else {
+            mval[1]->value_ = 0.5*(t1 + t2);
+           // std::cout << "interpolating " << " x value : " << mval[1]->x_ << std::endl;
+          }
+          if ( mval[1]->right_alloc_ == 1 && mval[1]->right_level_ == mval[3]->level_ ) {
+            mval[3]->value_ = mval[1]->right_value_;
+          } else if ( mval[2]->left_alloc_ == 1 && mval[2]->left_level_ == mval[3]->level_ ) {
+            mval[3]->value_ = mval[2]->left_value_;
+          } else {
+            mval[3]->value_ = 0.5*(t2 + t3);
+           // std::cout << "interpolating " << " x value : " << mval[3]->x_ << std::endl;
+          }
+          if ( mval[2]->right_alloc_ == 1 && mval[2]->right_level_ == mval[5]->level_ ) {
+            mval[5]->value_ = mval[2]->right_value_;
+          } else if ( mval[3]->left_alloc_ == 1 && mval[3]->left_level_ == mval[5]->level_ ) {
+            mval[5]->value_ = mval[3]->left_value_;
+          } else {
+            mval[5]->value_ = 0.5*(t3 + t4);
+           // std::cout << "interpolating " << " x value : " << mval[5]->x_ << std::endl;
+          }
+          if ( mval[3]->right_alloc_ == 1 && mval[3]->right_level_ == mval[7]->level_ ) {
+            mval[7]->value_ = mval[3]->right_value_;
+          } else if ( mval[4]->left_alloc_ == 1 && mval[4]->left_level_ == mval[7]->level_ ) {
+            mval[7]->value_ = mval[4]->left_value_;
+          } else {
+            mval[7]->value_ = 0.5*(t4 + t5);
+           // std::cout << "interpolating " << " x value : " << mval[7]->x_ << std::endl;
+          }
         } else {
-          mval[0]->value_ = 0.5*(t1 + t2);
+          // other user defined options not implemented yet
+          interpolation();
+          BOOST_ASSERT(false);
         }
-        if ( mval[1]->right_alloc_ == 1 && mval[1]->right_level_ == mval[2]->level_ ) {
-          mval[2]->value_ = mval[1]->right_value_;
-        } else {
-          mval[2]->value_ = 0.5*(t2 + t3);
+
+        // the initial data for the child mesh comes from the parent mesh
+        naming::id_type here = applier::get_applier().get_runtime_support_gid();
+        components::component_type logging_type =
+                  components::get_component_type<components::amr::server::logging>();
+        components::component_type function_type =
+                  components::get_component_type<components::amr::stencil>();
+        components::amr::amr_mesh_left child_mesh (
+                  components::amr::amr_mesh_left::create(here, 1, true));
+
+        std::vector<naming::id_type> initial_data;
+        for (i=0;i<9;i++) {
+          initial_data.push_back(gval[i]);
         }
-        if ( mval[2]->right_alloc_ == 1 && mval[2]->right_level_ == mval[4]->level_ ) {
-          mval[4]->value_ = mval[2]->right_value_;
-        } else {
-          mval[4]->value_ = 0.5*(t3 + t4);
+
+        bool do_logging = false;
+        if ( par.loglevel > 0 ) {
+          do_logging = true;
         }
-        if ( mval[3]->right_alloc_ == 1 && mval[3]->right_level_ == mval[6]->level_ ) {
-          mval[6]->value_ = mval[3]->right_value_;
-        } else {
-          mval[6]->value_ = 0.5*(t4 + t5);
-        }
+        std::vector<naming::id_type> result_data(
+            child_mesh.execute(initial_data, function_type,
+              do_logging ? logging_type : components::component_invalid,par));
+  
+        access_memory_block<stencil_data> r_val1, r_val2, r_val3, resultval;
+        boost::tie(r_val1, r_val2, r_val3, resultval) = 
+            detail::get_async(result_data[2], result_data[4], result_data[6], result);
+
+        // overwrite the coarse point computation
+        resultval->value_ = r_val2->value_;
+  
+        // remember neighbor value
+        resultval->right_alloc_ = 1;
+        resultval->right_value_ = r_val3->value_;
+        resultval->right_level_ = r_val3->level_;
+
+        resultval->left_alloc_ = 1;
+        resultval->left_value_ = r_val1->value_;
+        resultval->left_level_ = r_val1->level_;
+
+        // release result data
+        for (std::size_t i = 0; i < result_data.size(); ++i) 
+            components::stubs::memory_block::free(result_data[i]);
+
       } else {
-        // other user defined options not implemented yet
-        interpolation();
-        BOOST_ASSERT(false);
+        boost::tie(gval[5], gval[6], gval[7]) = 
+                      components::wait(components::stubs::memory_block::clone_async(gids[2]), 
+                      components::stubs::memory_block::clone_async(gids[2]),
+                      components::stubs::memory_block::clone_async(gids[2]));
+        boost::tie(mval[5], mval[6], mval[7]) = detail::get_async(gval[5], gval[6], gval[7]);
+
+        // increase the level by one
+        for (i=0;i<8;i++) {
+          ++mval[i]->level_;
+          mval[i]->index_ = i;
+        }
+
+        // this updates the coordinate position
+        mval[0]->x_ = 0.5*(x1+x2);
+        mval[1]->x_ = x2;
+        mval[2]->x_ = 0.5*(x2+x3);
+        mval[3]->x_ = x3;
+        mval[4]->x_ = 0.5*(x3+x4);
+        mval[5]->x_ = x4;
+        mval[6]->x_ = 0.5*(x4+x5);
+        mval[7]->x_ = x5;
+      
+        // coarse node duplicates
+        mval[1]->value_ = t2;
+        mval[3]->value_ = t3;
+        mval[5]->value_ = t4;
+        mval[7]->value_ = t5;
+
+        if ( par.linearbounds == 1 ) {
+          // linear interpolation
+          if ( mval[0]->right_alloc_ == 1 && mval[0]->right_level_ == mval[0]->level_ ) {
+          //  std::cout << "A: Using right value : " << mval[0]->right_level_ << " x value : " << mval[0]->x_ << " right value : " << mval[0]->right_value_ << std::endl;
+            mval[0]->value_ = mval[0]->right_value_;
+          } else if ( mval[1]->left_alloc_ == 1 && mval[1]->left_level_ == mval[0]->level_ ) {
+            mval[0]->value_ = mval[1]->left_value_;
+          } else {
+            mval[0]->value_ = 0.5*(t1 + t2);
+          //  std::cout << "A: interpolating " << " x value : " << mval[0]->x_ << " right level : " << mval[0]->right_level_ << " right alloc: " << mval[0]->right_alloc_ << " level: " << mval[0]->level_ << std::endl;
+          }
+          if ( mval[1]->right_alloc_ == 1 && mval[1]->right_level_ == mval[2]->level_ ) {
+         //   std::cout << "B: Using right value : " << mval[1]->right_level_ << " x value : " << mval[2]->x_ << " right value : " << mval[1]->right_value_ << std::endl;
+            mval[2]->value_ = mval[1]->right_value_;
+          } else if ( mval[2]->left_alloc_ == 1 && mval[2]->left_level_ == mval[2]->level_ ) {
+            mval[2]->value_ = mval[1]->left_value_;
+          } else {
+            mval[2]->value_ = 0.5*(t2 + t3);
+          //  std::cout << "B: interpolating " << " x value : " << mval[2]->x_ << " right level : " << mval[0]->right_level_ << " right alloc: " << mval[0]->right_alloc_ << " level: " << mval[0]->level_  << std::endl;
+          }
+          if ( mval[2]->right_alloc_ == 1 && mval[2]->right_level_ == mval[4]->level_ ) {
+        //    std::cout << "C: Using right value : " << mval[2]->right_level_ << " x value : " << mval[4]->x_ << " right value : " << mval[2]->right_value_ << std::endl;
+            mval[4]->value_ = mval[2]->right_value_;
+          } else if ( mval[3]->left_alloc_ == 1 && mval[3]->left_level_ == mval[4]->level_ ) {
+            mval[4]->value_ = mval[3]->left_value_;
+          } else {
+            mval[4]->value_ = 0.5*(t3 + t4);
+          //  std::cout << "C: interpolating " <<  " x value : " << mval[4]->x_ << " right level : " << mval[0]->right_level_ << " right alloc: " << mval[0]->right_alloc_ << " level: " << mval[0]->level_  << std::endl;
+          }
+          if ( mval[3]->right_alloc_ == 1 && mval[3]->right_level_ == mval[6]->level_ ) {
+         //   std::cout << "D: Using right value : " << mval[3]->right_level_ << " x value : " << mval[6]->x_ << " right value : " << mval[3]->right_value_ <<  std::endl;
+            mval[6]->value_ = mval[3]->right_value_;
+          } else if ( mval[4]->left_alloc_ == 1 && mval[4]->left_level_ == mval[6]->level_ ) {
+            mval[6]->value_ = mval[4]->left_value_;
+          } else {
+            mval[6]->value_ = 0.5*(t4 + t5);
+          //  std::cout << "D: interpolating " << " x value : " << mval[6]->x_ << " right level : " << mval[0]->right_level_ << " right alloc: " << mval[0]->right_alloc_ << " level: " << mval[0]->level_  << std::endl;
+          }
+        } else {
+          // other user defined options not implemented yet
+          interpolation();
+          BOOST_ASSERT(false);
+        }
+
+        // the initial data for the child mesh comes from the parent mesh
+        naming::id_type here = applier::get_applier().get_runtime_support_gid();
+        components::component_type logging_type =
+                  components::get_component_type<components::amr::server::logging>();
+        components::component_type function_type =
+                  components::get_component_type<components::amr::stencil>();
+        components::amr::amr_mesh_tapered child_mesh (
+                  components::amr::amr_mesh_tapered::create(here, 1, true));
+
+        std::vector<naming::id_type> initial_data;
+        for (i=0;i<8;i++) {
+          initial_data.push_back(gval[i]);
+        }
+
+        bool do_logging = false;
+        if ( par.loglevel > 0 ) {
+          do_logging = true;
+        }
+        std::vector<naming::id_type> result_data(
+            child_mesh.execute(initial_data, function_type,
+              do_logging ? logging_type : components::component_invalid,par));
+  
+        access_memory_block<stencil_data> r_val1, r_val2, resultval;
+        boost::tie(r_val1, r_val2, resultval) = 
+            detail::get_async(result_data[3], result_data[4], result);
+
+        // overwrite the coarse point computation
+        resultval->value_ = r_val1->value_;
+  
+        // remember right neighbor value
+        resultval->right_alloc_ = 1;
+        resultval->right_value_ = r_val2->value_;
+        resultval->right_level_ = r_val2->level_;
+      //  std::cout << "result x value : " << resultval->x_ << " result right level : " << resultval->right_level_ << " result right alloc: " << resultval->right_alloc_ << " result level: " << resultval->level_ << " result right value : " << resultval->right_value_ << " result value " << resultval->value_ << std::endl;
+        
+        // release result data
+        for (std::size_t i = 0; i < result_data.size(); ++i) 
+            components::stubs::memory_block::free(result_data[i]);
       }
-
-      // the initial data for the child mesh comes from the parent mesh
-      naming::id_type here = applier::get_applier().get_runtime_support_gid();
-      components::component_type logging_type =
-                components::get_component_type<components::amr::server::logging>();
-      components::component_type function_type =
-                components::get_component_type<components::amr::stencil>();
-      components::amr::amr_mesh_tapered child_mesh (
-                components::amr::amr_mesh_tapered::create(here, 1, true));
-
-      std::vector<naming::id_type> initial_data;
-      for (i=0;i<8;i++) {
-        initial_data.push_back(gval[i]);
-      }
-
-      bool do_logging = false;
-      if ( par.loglevel > 0 ) {
-        do_logging = true;
-      }
-      std::vector<naming::id_type> result_data(
-          child_mesh.execute(initial_data, function_type,
-            do_logging ? logging_type : components::component_invalid,par));
-
-      access_memory_block<stencil_data> r_val1, r_val2, resultval;
-      boost::tie(r_val1, r_val2, resultval) = 
-          detail::get_async(result_data[3], result_data[4], result);
-
-      // overwrite the coarse point computation
-      resultval->value_ = r_val1->value_;
-
-      // remember right neighbor value
-      resultval->right_alloc_ = 1;
-      resultval->right_value_ = r_val2->value_;
-      resultval->right_level_ = r_val2->level_;
-
-      // release result data
-      for (std::size_t i = 0; i < result_data.size(); ++i) 
-          components::stubs::memory_block::free(result_data[i]);
-
-//       for (std::size_t i = 0; i < initial_data.size(); ++i) 
-//           components::stubs::memory_block::free(initial_data[i]);
 
       return 0;
     }
@@ -380,8 +512,8 @@ namespace hpx { namespace components { namespace amr
                 components::get_component_type<components::amr::server::logging>();
       components::component_type function_type =
                 components::get_component_type<components::amr::stencil>();
-      components::amr::amr_mesh_tapered child_mesh (
-                components::amr::amr_mesh_tapered::create(here, 1, true));
+      components::amr::amr_mesh_left child_mesh (
+                components::amr::amr_mesh_left::create(here, 1, true));
 
       bool do_logging = false;
       if ( par.loglevel > 0 ) {
@@ -392,17 +524,39 @@ namespace hpx { namespace components { namespace amr
             do_logging ? logging_type : components::component_invalid,
             level, x, par));
 
-      access_memory_block<stencil_data> r_val1, r_val2, resultval;
-      boost::tie(r_val1, r_val2, resultval) = 
-          detail::get_async(result_data[3], result_data[4], result);
-      
-      resultval->value_ = r_val1->value_;
+     //  if using mesh_left
+//#if 0
+      access_memory_block<stencil_data> r_val1, r_val2, r_val3, resultval;
+      boost::tie(r_val1, r_val2, r_val3, resultval) = 
+          detail::get_async(result_data[2], result_data[4], result_data[6], result);
+      //overwrite the coarse point computation
+      resultval->value_ = r_val2->value_;
+  
+      // remember neighbor value
+      resultval->right_alloc_ = 1;
+      resultval->right_value_ = r_val3->value_;
+      resultval->right_level_ = r_val3->level_;
 
-      // remember right neighbor value
+      resultval->left_alloc_ = 1;
+      resultval->left_value_ = r_val1->value_;
+      resultval->left_level_ = r_val1->level_;
+//#endif
+
+     // if using mesh_tapered
+#if 0
+     access_memory_block<stencil_data> r_val1, r_val2, resultval;
+     boost::tie(r_val1, r_val2, resultval) = 
+     detail::get_async(result_data[3], result_data[4], result);
+
+      // overwrite the coarse point computation
+      resultval->value_ = r_val1->value_;
+  
+      // remember neighbor value
       resultval->right_alloc_ = 1;
       resultval->right_value_ = r_val2->value_;
       resultval->right_level_ = r_val2->level_;
-
+#endif
+      
       // release result data
       for (std::size_t i = 0; i < result_data.size(); ++i) 
           components::stubs::memory_block::free(result_data[i]);

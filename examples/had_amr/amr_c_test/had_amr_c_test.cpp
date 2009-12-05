@@ -31,11 +31,11 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
       xcoord = par.minx0 + item*dx;
     } else {
       // for tapered mesh
-      if (maxitems != 8) {
-        printf("Problem Level %d !\n",level);
+      if (maxitems != 9) {
+        printf("had_amr_test.cpp line 35: Problem Level %d !\n",level);
         exit(0);
       }
-      xcoord = x + (item-3)*dx;
+      xcoord = x + (item-4)*dx;
     }
 
     val->x_ = xcoord;
@@ -46,7 +46,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
 
 ///////////////////////////////////////////////////////////////////////////
 int evaluate_timestep(stencil_data const* left, stencil_data const* middle, 
-    stencil_data const* right, stencil_data* result, int numsteps, Par const& par)
+    stencil_data const* right, stencil_data* result, int numsteps, Par const& par,int gidsize)
 {
     // the middle point is our direct predecessor
 
@@ -55,6 +55,7 @@ int evaluate_timestep(stencil_data const* left, stencil_data const* middle,
     result->timestep_ = middle->timestep_ + 1.0/pow(2.0,(int) middle->level_);
     result->level_ = middle->level_;
     result->refine_ = true;
+    if (gidsize < 5) result->refine_ = false;
     /*
     result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
     */
@@ -63,6 +64,9 @@ int evaluate_timestep(stencil_data const* left, stencil_data const* middle,
     double dx = par.dx0;
 
     result->value_ = middle->value_ - dt/dx*(middle->value_ - left->value_);
+
+    //if ( result->value_ > 0.2 ) result->refine_ = true;
+    //else result->refine_ = false;
 
     return 1;
 }

@@ -25,6 +25,9 @@ struct stencil_data
     double right_value_;
     size_t right_level_;
     size_t right_alloc_;
+    double left_value_;
+    size_t left_level_;
+    size_t left_alloc_;
 
 #if defined(__cplusplus)
 private:

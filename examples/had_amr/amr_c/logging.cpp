@@ -19,7 +19,10 @@ namespace hpx { namespace components { namespace amr { namespace server
         mutex_type::scoped_lock l(mtx_);
 
         if ( par.output_stdout == 1 ) {
-          std::cout << " AMR Level: " << val.level_ << "   Timestep: " <<  val.timestep_ << "   refine?: " << val.refine_ << "   row: " << row << "   index: " << val.index_ << "    Value: " << val.value_ << "  x-coordinate : " << val.x_ << std::endl;   
+          std::cout << " AMR Level: " << val.level_ << "   Timestep: " <<  val.timestep_ << "   refine?: " << val.refine_ << "   row: " << row << "   index: " << val.index_ << "    Value: " << val.value_ << "  x-coordinate : " << val.x_ << std::endl;
+         // if (val.right_alloc_ == 1) {
+         //   std::cout << " right value : " << val.right_value_ << " right level : " << val.right_level_ << " right alloc : " << val.right_alloc_ << std::endl;   
+         // } 
         }
 
         // output to file "output.dat"
