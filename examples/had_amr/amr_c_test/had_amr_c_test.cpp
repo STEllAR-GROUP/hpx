@@ -22,6 +22,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->level_= level;
     val->refine_= false;
     val->right_alloc_ = 0;
+    val->left_alloc_ = 0;
 
     double dx;
     double xcoord;
