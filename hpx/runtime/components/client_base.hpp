@@ -70,6 +70,13 @@ namespace hpx { namespace components
             return gid_;
         }
 
+        naming::id_type detach() const
+        {
+            naming::id_type g = gid_;
+            gid_ = naming::invalid_id;
+            return g;
+        }
+
     protected:
         naming::id_type gid_;
         bool freeonexit_;
