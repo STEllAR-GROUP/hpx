@@ -36,7 +36,7 @@ namespace hpx { namespace components
     }
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (3, HPX_ACTION_ARGUMENT_LIMIT,                                        \
+    (3, (3, HPX_WAIT_ARGUMENT_LIMIT,                                          \
     "hpx/lcos/future_wait.hpp"))                                              \
     /**/
 

@@ -210,7 +210,7 @@
         }
 
     private:
-        threads::thread_init_data const& 
+        threads::thread_init_data& 
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data)
         {
@@ -223,7 +223,7 @@
             return data;
         }
 
-        threads::thread_init_data const& 
+        threads::thread_init_data& 
         get_thread_init_data(continuation_type& cont,
             naming::address::address_type lva, 
             threads::thread_init_data& data)
@@ -296,7 +296,7 @@
         }
 
     private:
-        threads::thread_init_data const& 
+        threads::thread_init_data& 
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data)
         {
@@ -309,7 +309,7 @@
             return data;
         }
 
-        threads::thread_init_data const& 
+        threads::thread_init_data& 
         get_thread_init_data(continuation_type& cont,
             naming::address::address_type lva, 
             threads::thread_init_data& data)
@@ -506,7 +506,7 @@
         }
 
     private:
-        threads::thread_init_data const& 
+        threads::thread_init_data& 
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data)
         {
@@ -519,7 +519,7 @@
             return data;
         }
 
-        threads::thread_init_data const& 
+        threads::thread_init_data& 
         get_thread_init_data(continuation_type& cont,
             naming::address::address_type lva, 
             threads::thread_init_data& data)
@@ -605,7 +605,7 @@
             return base_action::direct_action;
         }
 
-        threads::thread_init_data const& 
+        threads::thread_init_data& 
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data)
         {
@@ -618,7 +618,7 @@
             return data;
         }
 
-        threads::thread_init_data const& 
+        threads::thread_init_data& 
         get_thread_init_data(continuation_type& cont,
             naming::address::address_type lva, 
             threads::thread_init_data& data)

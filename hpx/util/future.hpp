@@ -98,7 +98,7 @@ namespace hpx { namespace util
             boost::condition_variable waiters;
 
             future_object_base():
-                done(false)
+                done(false), mutex("future_object_base")
             {}
             virtual ~future_object_base()
             {}

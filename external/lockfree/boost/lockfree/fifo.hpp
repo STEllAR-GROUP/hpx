@@ -63,15 +63,19 @@ class fifo:
 
     struct BOOST_LOCKFREE_CACHELINE_ALIGNMENT node
     {
+        typedef tagged_ptr<node> tagged_ptr_t;
+
         node(T const & v):
-            data(v), next(NULL)
-        {}
+            data(v)
+        {
+            next.set(NULL, next.get_tag() + 1); /* increment tag to avoid ABA problem */
+        }
 
         node (void):
             next(NULL)
         {}
 
-        tagged_ptr<node> next;
+        tagged_ptr_t next;
         T data;
     };
 
@@ -80,7 +84,8 @@ class fifo:
 
 public:
     explicit fifo(char const* description = "", bool enable_logging = true)
-      : enqueue_spin_count_(0), dequeue_spin_count_(0),
+      : pool(128),
+        enqueue_spin_count_(0), dequeue_spin_count_(0),
         description_(description)
 #if defined(BOOST_LOCKFREE_FIFO_LOGGING)
       , count_(-1), logger_(description, enable_logging)
@@ -120,11 +125,14 @@ public:
         return head_.get_ptr() == tail_.get_ptr();
     }
 
-    void enqueue(T const & t)
+    bool enqueue(T const & t)
     {
         hpx::util::block_profiler_wrapper<fifo_enqueue_tag> pw(enqueue_profiler_);
 
         node * n = alloc_node(t);
+
+        if (n == NULL)
+            return false;
 
         for (unsigned int cnt = 0; /**/; spin((unsigned char)++cnt))
         {
@@ -141,7 +149,7 @@ public:
                     {
                         tail_.CAS(tail, n);
                         enqueue_spin_count_ += cnt;
-                        return;
+                        return true;
                     }
                 }
                 else
@@ -176,6 +184,7 @@ public:
                 else
                 {
                     *ret = next->data;
+                    memory_barrier();
                     if (head_.CAS(head, next))
                     {
                         dealloc_node(head.get_ptr());
@@ -225,8 +234,12 @@ private:
     boost::lockfree::caching_freelist<node, node_allocator> pool;
 
     /* force head_ and tail_ to different cache lines! */
-    atomic_node_ptr head_;
-    BOOST_LOCKFREE_CACHELINE_ALIGNMENT_PREFIX atomic_node_ptr tail_ BOOST_LOCKFREE_CACHELINE_ALIGNMENT; 
+    volatile atomic_node_ptr head_;
+    static const int padding_size = 64 - sizeof(atomic_node_ptr); /* cache lines on current cpus seem to
+                                                                   * be 64 byte */
+    char padding1[padding_size];
+    volatile atomic_node_ptr tail_;
+    char padding2[padding_size];
 
 public:
 #if defined(BOOST_LOCKFREE_FIFO_LOGGING)

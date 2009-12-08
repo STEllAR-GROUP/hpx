@@ -69,7 +69,7 @@ if __name__=="__main__":
     log_file = sys.argv[1]
 
     if "--point" in sys.argv:
-      node_style = '[shape=point,label=%s]'
+      node_style = '[label=%s]' # shape=point,
 
     run(log_file, node_style, arc_style)
   else:

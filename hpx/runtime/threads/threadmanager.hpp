@@ -190,7 +190,7 @@ namespace hpx { namespace threads
 //             thread_id_type parent_id = 0) = 0;
 
         virtual void
-        register_work(thread_init_data const& data, 
+        register_work(thread_init_data& data, 
             thread_state initial_state = pending) = 0;
 
         /// The function \a register_thread adds a new work item to the thread 
@@ -230,7 +230,7 @@ namespace hpx { namespace threads
 //             thread_state initial_state = pending, bool run_now = true) = 0;
 
         virtual thread_id_type 
-        register_thread(thread_init_data const& data, 
+        register_thread(thread_init_data& data, 
             thread_state initial_state = pending, bool run_now = true) = 0;
 
         /// this notifies the thread manager that there is some more work 
@@ -295,7 +295,7 @@ namespace hpx { namespace threads
 //             thread_state initial_state = pending, 
 //             boost::uint32_t parent_prefix = 0, thread_id_type parent_id = 0);
 
-        void register_work(thread_init_data const& data, 
+        void register_work(thread_init_data& data, 
             thread_state initial_state = pending);
 
         /// The function \a register_thread adds a new work item to the thread 
@@ -334,7 +334,7 @@ namespace hpx { namespace threads
 //             char const* const description = "", 
 //             thread_state initial_state = pending, bool run_now = true);
 
-        thread_id_type register_thread(thread_init_data const& data, 
+        thread_id_type register_thread(thread_init_data& data, 
             thread_state initial_state = pending, bool run_now = true);
 
         /// \brief  Run the thread manager's work queue. This function 

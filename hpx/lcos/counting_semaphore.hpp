@@ -83,6 +83,21 @@ namespace hpx { namespace lcos
 
         ~counting_semaphore()
         {
+            if (!queue_.empty() && LHPX_ENABLED(fatal)) {
+                LERR_(fatal) << "~counting_semaphore: queue is not empty";
+
+                mutex_type::scoped_lock l(this);
+                while (!queue_.empty()) {
+                    threads::thread_id_type id = queue_.front().id_;
+                    queue_.pop_front();
+
+                    // we know that the id is actually the pointer to the thread
+                    threads::thread* thrd = reinterpret_cast<threads::thread*>(id);
+                    LERR_(fatal) << "~counting_semaphore: pending thread: " 
+                            << get_thread_state_name(thrd->get_state()) 
+                            << "(" << id << "): " << thrd->get_description();
+                }
+            }
             BOOST_ASSERT(queue_.empty());   // queue has to be empty
         }
 

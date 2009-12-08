@@ -79,7 +79,7 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         // create a new thread and schedule it if the initial state is equal to 
         // pending
-        thread_id_type create_thread(thread_init_data const& data, 
+        thread_id_type create_thread(thread_init_data& data, 
             thread_state initial_state, bool run_now, 
             std::size_t num_thread = std::size_t(-1))
         {

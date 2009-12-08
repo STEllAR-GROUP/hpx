@@ -10,6 +10,10 @@
 #error "do not include this file on non-gcc platforms"
 #endif
 
+#if defined(__INTEL_COMPILER)
+#include <ia64intrin.h>
+#endif
+
 #define BOOST_LOCKFREE_CACHELINE_ALIGNMENT __attribute__((aligned(64)))
 #define BOOST_LOCKFREE_CACHELINE_ALIGNMENT_PREFIX 
 

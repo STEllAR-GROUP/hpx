@@ -89,7 +89,7 @@ namespace hpx { namespace applier
     }
 
     threads::thread_id_type register_thread_plain(
-        threads::thread_init_data const& data, threads::thread_state state, 
+        threads::thread_init_data& data, threads::thread_state state, 
         bool run_now)
     {
         return hpx::applier::get_applier().get_thread_manager().register_thread(
@@ -125,7 +125,7 @@ namespace hpx { namespace applier
     }
 
     void register_work_plain(
-        threads::thread_init_data const& data, threads::thread_state state)
+        threads::thread_init_data& data, threads::thread_state state)
     {
         hpx::applier::get_applier().get_thread_manager().register_work(
             data, state);

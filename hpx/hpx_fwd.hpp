@@ -9,7 +9,7 @@
 #include <boost/config.hpp>
 #if defined(BOOST_WINDOWS)
 #include <winsock2.h>
-#include <excpt.h>
+#include <windows.h>
 #endif
 
 #include <boost/shared_ptr.hpp>

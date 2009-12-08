@@ -65,6 +65,22 @@ namespace hpx { namespace util { namespace detail
 
         struct tag {};
 
+        void log_non_empty_queue(char const* const desc, queue_type& queue)
+        {
+            mutex_type::scoped_lock l(this);
+            while (!queue.empty()) {
+                threads::thread_id_type id = queue.front().id_;
+                queue.pop_front();
+
+                // we know that the id is actually the pointer to the thread
+                threads::thread* thrd = reinterpret_cast<threads::thread*>(id);
+                LERR_(fatal) << "~full_empty_entry: pending thread in " 
+                        << desc << ": " 
+                        << get_thread_state_name(thrd->get_state()) 
+                        << "(" << id << "): " << thrd->get_description();
+            }
+        }
+
     public:
         typedef hpx::util::spinlock_pool<tag> mutex_type;
         typedef typename mutex_type::scoped_lock scoped_lock;
@@ -84,6 +100,12 @@ namespace hpx { namespace util { namespace detail
 
         ~full_empty_entry()
         {
+            if (is_used() && LHPX_ENABLED(fatal)) {
+                LERR_(fatal) << "~full_empty_entry: one of the queues is not empty";
+                log_non_empty_queue("write_queue", write_queue_);
+                log_non_empty_queue("read_and_empty_queue", read_and_empty_queue_);
+                log_non_empty_queue("read_queue", read_queue_);
+            }
             BOOST_ASSERT(!is_used());
             get_address()->Data::~Data();      // properly destruct value in memory
         }

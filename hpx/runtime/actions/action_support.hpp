@@ -122,11 +122,11 @@ namespace hpx { namespace actions
         virtual threads::thread_id_type get_parent_thread_id() const = 0;
 
         /// Return all data needed for thread initialization
-        virtual threads::thread_init_data const& 
+        virtual threads::thread_init_data& 
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data) = 0;
 
-        virtual threads::thread_init_data const& 
+        virtual threads::thread_init_data& 
         get_thread_init_data(continuation_type& cont,
             naming::address::address_type lva,
             threads::thread_init_data& data) = 0;

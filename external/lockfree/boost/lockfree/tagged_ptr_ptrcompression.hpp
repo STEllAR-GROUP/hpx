@@ -46,12 +46,12 @@ private:
     static const int tag_index = 3;
     static const compressed_ptr_t ptr_mask = (1LL << 48)-1;
 
-    static T* extract_ptr(compressed_ptr_t const & i)
+    static T* extract_ptr(volatile compressed_ptr_t const & i)
     {
         return (T*)(i & ptr_mask);
     }
 
-    static tag_t extract_tag(compressed_ptr_t const & i)
+    static tag_t extract_tag(volatile compressed_ptr_t const & i)
     {
         cast_unit cu;
         cu.value = i;
@@ -73,7 +73,7 @@ public:
     {}
 
     /** copy constructor */
-    tagged_ptr(tagged_ptr const & p)//: ptr(0), tag(0)
+    tagged_ptr(volatile tagged_ptr const & p)//: ptr(0), tag(0)
     {
         set(p);
     }
@@ -102,7 +102,7 @@ public:
 
     /** unsafe set operation */
     /* @{ */
-    void set(tagged_ptr const & p)
+    void set(volatile tagged_ptr const & p)
     {
         ptr = p.ptr;
     }
@@ -115,12 +115,12 @@ public:
 
     /** comparing semantics */
     /* @{ */
-    bool operator== (tagged_ptr const & p) const
+    bool operator== (volatile tagged_ptr const & p) const
     {
         return (ptr == p.ptr);
     }
 
-    bool operator!= (tagged_ptr const & p) const
+    bool operator!= (volatile tagged_ptr const & p) const
     {
         return !operator==(p);
     }
@@ -128,12 +128,12 @@ public:
 
     /** pointer access */
     /* @{ */
-    T * get_ptr() const
+    T * get_ptr() const volatile
     {
         return extract_ptr(ptr);
     }
 
-    void set_ptr(T * p)
+    void set_ptr(T * p) volatile
     {
         tag_t tag = get_tag();
         ptr = pack_ptr(p, tag);
@@ -142,12 +142,12 @@ public:
 
     /** tag access */
     /* @{ */
-    tag_t get_tag() const
+    tag_t get_tag() const volatile
     {
         return extract_tag(ptr);
     }
 
-    void set_tag(tag_t t)
+    void set_tag(tag_t t) volatile
     {
         T * p = get_ptr();
         ptr = pack_ptr(p, t);
@@ -157,19 +157,19 @@ public:
     /** compare and swap  */
     /* @{ */
 private:
-    bool CAS(compressed_ptr_t const & oldval, compressed_ptr_t const & newval)
+    bool CAS(compressed_ptr_t const & oldval, compressed_ptr_t const & newval) volatile 
     {
         return boost::lockfree::CAS(&(this->ptr), oldval, newval);
     }
 
 public:
-    bool CAS(tagged_ptr const & oldval, T * newptr)
+    bool CAS(tagged_ptr const & oldval, T * newptr) volatile 
     {
         compressed_ptr_t new_compressed_ptr = pack_ptr(newptr, extract_tag(oldval.ptr)+1);
         return CAS(oldval.ptr, new_compressed_ptr);
     }
 
-    bool CAS(tagged_ptr const & oldval, T * newptr, tag_t t)
+    bool CAS(tagged_ptr const & oldval, T * newptr, tag_t t) volatile 
     {
         compressed_ptr_t new_compressed_ptr = pack_ptr(newptr, t);
         return boost::lockfree::CAS(&(this->ptr), oldval.ptr, new_compressed_ptr);

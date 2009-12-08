@@ -61,10 +61,10 @@ namespace hpx { namespace lcos { namespace detail
     class mutex 
     {
     private:
-        BOOST_STATIC_CONSTANT(boost::int32_t, lock_flag_bit = 31);
-        BOOST_STATIC_CONSTANT(boost::int32_t, event_set_flag_bit = 30);
-        BOOST_STATIC_CONSTANT(boost::int32_t, lock_flag_value = 1 << lock_flag_bit);
-        BOOST_STATIC_CONSTANT(boost::int32_t, event_set_flag_value = 1 << event_set_flag_bit);
+        BOOST_STATIC_CONSTANT(char, lock_flag_bit = 31);
+        BOOST_STATIC_CONSTANT(char, event_set_flag_bit = 30);
+        BOOST_STATIC_CONSTANT(long, lock_flag_value = 1 << lock_flag_bit);
+        BOOST_STATIC_CONSTANT(long, event_set_flag_value = 1 << event_set_flag_bit);
 
     private:
         struct tag {};
@@ -97,12 +97,29 @@ namespace hpx { namespace lcos { namespace detail
         > queue_type;
 
     public:
-        mutex()
-          : active_count_(0)
+        mutex(char const* const description)
+          : active_count_(0), description_(description)
         {}
 
         ~mutex()
         {
+            if (!queue_.empty() && LHPX_ENABLED(fatal)) {
+                LERR_(fatal) << "~mutex: " << description_ 
+                             << ": queue is not empty";
+
+                mutex_type::scoped_lock l(this);
+                while (!queue_.empty()) {
+                    threads::thread_id_type id = queue_.front().id_;
+                    queue_.pop_front();
+
+                    // we know that the id is actually the pointer to the thread
+                    threads::thread* thrd = reinterpret_cast<threads::thread*>(id);
+                    LERR_(fatal) << "~mutex: " << description_
+                            << ": pending thread: " 
+                            << get_thread_state_name(thrd->get_state()) 
+                            << "(" << id << "): " << thrd->get_description();
+                }
+            }
             BOOST_ASSERT(queue_.empty());
         }
 
@@ -112,24 +129,15 @@ namespace hpx { namespace lcos { namespace detail
                 &active_count_, lock_flag_bit);
         }
 
-        void lock()
-        {
-            BOOST_VERIFY(timed_lock(::boost::detail::get_system_time_sentinel()));
-        }
-
-        bool timed_lock(::boost::system_time const& wait_until)
+        void mark_waiting_and_try_lock(long& old_count)
         {
             using namespace boost::lockfree;
-            if (!interlocked_bit_test_and_set(&active_count_, lock_flag_bit))
-            {
-                return true;
-            }
 
-            boost::int32_t old_count = active_count_;
-            for(;;) {
-                boost::int32_t const new_count = (old_count & lock_flag_value) ? 
+            for(;;) 
+            {
+                long const new_count = (old_count & lock_flag_value) ? 
                     (old_count + 1) : (old_count | lock_flag_value);
-                boost::int32_t const current = 
+                long const current = 
                     interlocked_compare_exchange(&active_count_, old_count, new_count);
                 if (current == old_count)
                 {
@@ -137,57 +145,111 @@ namespace hpx { namespace lcos { namespace detail
                 }
                 old_count = current;
             }
+        }
+
+        void clear_waiting_and_try_lock(boost::int32_t& old_count)
+        {
+            using namespace boost::lockfree;
+
+            old_count &= ~lock_flag_value;
+            old_count |= event_set_flag_value;
+            for(;;) {
+                long const new_count = 
+                    ((old_count & lock_flag_value) ? 
+                        old_count : ((old_count-1) | lock_flag_value)) & 
+                    ~event_set_flag_value;
+                long const current = 
+                    interlocked_compare_exchange(&active_count_, old_count, new_count);
+                if (current == old_count)
+                {
+                    break;
+                }
+                old_count = current;
+            }
+        }
+
+        bool wait_for_single_object(
+            ::boost::system_time const& wait_until = ::boost::system_time())
+        {
+            threads::thread_self& self = threads::get_self();
+            threads::thread_id_type id = self.get_thread_id();
+
+            // enqueue this thread
+            mutex_type::scoped_lock l(this);
+            queue_entry e(id);
+
+            // mark the thread as suspended before adding to the queue
+            reinterpret_cast<threads::thread*>(id)->
+                set_state(threads::marked_for_suspension);
+            queue_.push_back(e);
+            util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+
+            // timeout at the given time, if appropriate
+            if (!wait_until.is_not_a_date_time()) 
+                threads::set_thread_state(id, wait_until);
+
+            // if this timed out, return true
+            return threads::wait_timeout == self.yield(threads::suspended);
+            // queue_entry goes out of scope (removes itself 
+            // from the list, acquiring the unlocked mutex before 
+            // doing so)
+        }
+
+        void set_event()
+        {
+            mutex_type::scoped_lock l(this);
+            if (!queue_.empty()) {
+                threads::thread_id_type id = queue_.front().id_;
+                queue_.pop_front();
+
+                l.unlock();
+                set_thread_state(id, threads::pending);
+            }
+        }
+
+        void lock()
+        {
+            using namespace boost::lockfree;
+            if (try_lock())
+                return;
+
+            long old_count = active_count_;
+            mark_waiting_and_try_lock(old_count);
 
             if (old_count & lock_flag_value)
             {
+                // wait for lock to get available
                 bool lock_acquired = false;
                 do {
-                    // wait for lock to get available
-                    threads::thread_self& self = threads::get_self();
-                    threads::thread_id_type id = self.get_thread_id();
-
-                    {
-                        // enqueue this thread
-                        mutex_type::scoped_lock l(this);
-                        queue_entry e(id);
-
-                        // mark the thread as suspended before adding to the queue
-                        reinterpret_cast<threads::thread*>(id)->
-                            set_state(threads::marked_for_suspension);
-                        queue_.push_back(e);
-                        util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-
-                        // timeout at the given time, if appropriate
-                        if (!wait_until.is_pos_infinity()) 
-                            threads::set_thread_state(id, wait_until);
-
-                        if (threads::wait_signaled != self.yield(threads::suspended))
-                        {
-                            // if this timed out, just return false
-                            interlocked_decrement(&active_count_);
-                            return false;
-                        }
-                    }   // queue_entry goes out of scope (removes itself 
-                        // from the list, acquiring the unlocked mutex before 
-                        // doing so)
-
-                    old_count &= ~lock_flag_value;
-                    old_count |= event_set_flag_value;
-                    for(;;) {
-                        boost::int32_t const new_count = 
-                            ((old_count & lock_flag_value) ? 
-                                old_count : 
-                                ((old_count-1) | lock_flag_value)) & ~event_set_flag_value;
-                        boost::int32_t const current = 
-                            interlocked_compare_exchange(&active_count_, old_count, new_count);
-                        if (current == old_count)
-                        {
-                            break;
-                        }
-                        old_count = current;
-                    }
+                    BOOST_VERIFY(!wait_for_single_object());
+                    clear_waiting_and_try_lock(old_count);
                     lock_acquired = !(old_count & lock_flag_value);
+                } while (!lock_acquired);
+            }
+        }
 
+        bool timed_lock(::boost::system_time const& wait_until)
+        {
+            using namespace boost::lockfree;
+            if (try_lock())
+                return true;
+
+            long old_count = active_count_;
+            mark_waiting_and_try_lock(old_count);
+
+            if (old_count & lock_flag_value)
+            {
+                // wait for lock to get available
+                bool lock_acquired = false;
+                do {
+                    if (wait_for_single_object()) 
+                    {
+                        // if this timed out, just return false
+                        interlocked_decrement(&active_count_);
+                        return false;
+                    }
+                    clear_waiting_and_try_lock(old_count);
+                    lock_acquired = !(old_count & lock_flag_value);
                 } while (!lock_acquired);
             }
             return true;
@@ -207,21 +269,14 @@ namespace hpx { namespace lcos { namespace detail
         void unlock()
         {
             using namespace boost::lockfree;
-            boost::int32_t const offset = lock_flag_value;
-            boost::int32_t const old_count = 
+            long const offset = lock_flag_value;
+            long const old_count = 
                 interlocked_exchange_add(&active_count_, lock_flag_value);
             if (!(old_count & event_set_flag_value) && (old_count > offset))
             {
                 if (!interlocked_bit_test_and_set(&active_count_, event_set_flag_bit))
                 {
-                    mutex_type::scoped_lock l(this);
-                    if (!queue_.empty()) {
-                        threads::thread_id_type id = queue_.front().id_;
-                        queue_.pop_front();
-
-                        l.unlock();
-                        set_thread_state(id, threads::pending);
-                    }
+                    set_event();
                 }
             }
         }
@@ -230,8 +285,9 @@ namespace hpx { namespace lcos { namespace detail
         typedef boost::detail::try_lock_wrapper<mutex> scoped_try_lock;
 
     private:
-        boost::int32_t active_count_;
+        long active_count_;
         queue_type queue_;
+        char const* const description_;
     };
 
 }}}
@@ -243,7 +299,8 @@ namespace hpx { namespace lcos
     class mutex : boost::noncopyable, public detail::mutex
     {
     public:
-        mutex()
+        mutex(char const* const description = "")
+          : detail::mutex(description)
         {}
         ~mutex()
         {}
@@ -258,7 +315,8 @@ namespace hpx { namespace lcos
     class timed_mutex : boost::noncopyable, public detail::mutex
     {
     public:
-        timed_mutex()
+        timed_mutex(char const* const description = "")
+          : detail::mutex(description)
         {}
         ~timed_mutex()
         {}

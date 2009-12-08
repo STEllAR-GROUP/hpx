@@ -70,10 +70,10 @@ class freelist:
 {
     struct freelist_node
     {
-        lockfree::tagged_ptr<struct freelist_node> next;
+        lockfree::tagged_ptr<freelist_node> next;
     };
 
-    typedef lockfree::tagged_ptr<struct freelist_node> tagged_ptr_;
+    typedef lockfree::tagged_ptr<freelist_node> tagged_ptr_;
 
 public:
     freelist(void):
@@ -83,7 +83,7 @@ public:
     explicit freelist(std::size_t initial_nodes):
         pool_(NULL)
     {
-        for (int i = 0; i != std::min(initial_nodes, max_size); ++i)
+        for (int i = 0; i != (std::min)(initial_nodes, max_size); ++i)
         {
             T * node = detail::dummy_freelist<T, Alloc>::allocate();
             deallocate(node);
@@ -101,9 +101,10 @@ public:
         {
             tagged_ptr_ old_pool(pool_);
 
-            if (not old_pool)
+            if (!old_pool)
                 return detail::dummy_freelist<T, Alloc>::allocate();
 
+            memory_barrier();
             freelist_node * new_pool = old_pool->next.get_ptr();
 
             if (pool_.CAS(old_pool, new_pool))
@@ -152,7 +153,7 @@ private:
     }
 
     tagged_ptr_ pool_;
-    atomic_int<long> free_list_size;
+    atomic_int<unsigned long> free_list_size;
 };
 
 template <typename T, typename Alloc = std::allocator<T> >
@@ -195,6 +196,7 @@ public:
             if (!old_pool)
                 return detail::dummy_freelist<T, Alloc>::allocate();
 
+            memory_barrier();
             freelist_node * new_pool = old_pool->next.get_ptr();
 
             if (pool_.CAS(old_pool, new_pool))
@@ -230,7 +232,7 @@ private:
         }
     }
 
-    tagged_ptr_ pool_;
+    volatile tagged_ptr_ pool_;
 };
 
 } /* namespace lockfree */

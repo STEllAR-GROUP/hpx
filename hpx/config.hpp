@@ -34,6 +34,12 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This defines the maximum number of arguments a component action can take
+#if !defined(HPX_WAIT_ARGUMENT_LIMIT)
+#  define HPX_WAIT_ARGUMENT_LIMIT 10
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 /// This defines the maximum number of arguments a component constructor can 
 /// take
 #if !defined(HPX_COMPONENT_CREATE_ARG_MAX)

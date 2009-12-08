@@ -84,7 +84,6 @@ namespace hpx { namespace components { namespace stubs
             return clone_async(targetgid).get();
         }
     };
-
 }}}
 
 #endif

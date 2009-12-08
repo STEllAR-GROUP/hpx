@@ -62,18 +62,9 @@ namespace hpx { namespace threads { namespace policies
             for (thread_map_type::const_iterator it = tm.begin(); it != end; ++it)
             {
                 threads::thread const* thrd = (*it).second;
-                thread_state state = thrd->get_state();
-                if (suspended == state)
-                {
-                    LTM_(info) << "suspended thread(" << (*it).first << "): "
-                               << thrd->get_description();
-                }
-                else if (marked_for_suspension == state)
-                {
-                    LTM_(info) << "marked_for_suspension thread(" 
-                               << (*it).first << "): "
-                               << thrd->get_description();
-                }
+                LTM_(error) << get_thread_state_name(thrd->get_state()) 
+                            << "(" << (*it).first << "): "
+                            << thrd->get_description();
             }
         }
     }
@@ -258,7 +249,7 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         // create a new thread and schedule it if the initial state is equal to 
         // pending
-        thread_id_type create_thread(thread_init_data const& data, 
+        thread_id_type create_thread(thread_init_data& data, 
             thread_state initial_state, bool run_now)
         {
             if (run_now) {

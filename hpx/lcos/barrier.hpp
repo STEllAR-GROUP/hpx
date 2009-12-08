@@ -61,6 +61,11 @@ namespace hpx { namespace lcos
           : number_of_threads_(number_of_threads)
         {}
 
+        ~barrier()
+        {
+            BOOST_ASSERT(queue_.empty());
+        }
+
         /// The function \a wait will block the number of entering \a threads
         /// (as given by the constructor parameter \a number_of_threads), 
         /// releasing all waiting threads as soon as the last \a thread

@@ -36,7 +36,7 @@ public:
     {}
 
     /** copy constructor */
-    tagged_ptr(tagged_ptr const & p)//: ptr(0), tag(0)
+    tagged_ptr(volatile tagged_ptr const & p)//: ptr(0), tag(0)
     {
         set(p);
     }
@@ -78,7 +78,7 @@ public:
 
     /** unsafe set operation */
     /* @{ */
-    void set(tagged_ptr const & p)
+    void set(volatile tagged_ptr const & p)
     {
         ptr = p.ptr;
         tag = p.tag;
@@ -93,12 +93,12 @@ public:
 
     /** comparing semantics */
     /* @{ */
-    bool operator== (tagged_ptr const & p) const
+    bool operator== (volatile tagged_ptr const & p) const
     {
         return (ptr == p.ptr) && (tag == p.tag);
     }
 
-    bool operator!= (tagged_ptr const & p) const
+    bool operator!= (volatile tagged_ptr const & p) const
     {
         return !operator==(p);
     }
@@ -106,12 +106,12 @@ public:
 
     /** pointer access */
     /* @{ */
-    T * get_ptr() const
+    T * get_ptr() const volatile 
     {
         return ptr;
     }
 
-    void set_ptr(T * p)
+    void set_ptr(T * p) volatile 
     {
         ptr = p;
     }
@@ -119,12 +119,12 @@ public:
 
     /** tag access */
     /* @{ */
-    tag_t get_tag() const
+    tag_t get_tag() const volatile 
     {
         return tag;
     }
 
-    void set_tag(tag_t t)
+    void set_tag(tag_t t) volatile 
     {
         tag = t;
     }
@@ -132,12 +132,12 @@ public:
 
     /** compare and swap  */
     /* @{ */
-    bool CAS(tagged_ptr const & oldval, T * newptr)
+    bool CAS(tagged_ptr const & oldval, T * newptr) volatile 
     {
         return boost::lockfree::CAS2(this, oldval.ptr, oldval.tag, newptr, oldval.tag + 1);
     }
 
-    bool CAS(tagged_ptr const & oldval, T * newptr, tag_t t)
+    bool CAS(tagged_ptr const & oldval, T * newptr, tag_t t) volatile 
     {
         return boost::lockfree::CAS2(this, oldval.ptr, oldval.tag, newptr, t);
     }

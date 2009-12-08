@@ -33,7 +33,7 @@ namespace hpx { namespace threads { namespace detail
         typedef boost::function<thread_function_type> function_type;
 
     public:
-        thread(thread_init_data const& init_data, thread_id_type id, 
+        thread(thread_init_data& init_data, thread_id_type id, 
                thread_state newstate)
           : coroutine_(init_data.func, id), 
             current_state_(newstate), 
@@ -98,16 +98,16 @@ namespace hpx { namespace threads { namespace detail
 
         thread_state execute()
         {
-            thread_state state = 
-                coroutine_(static_cast<thread_state_ex>(current_state_ex_));
+            thread_state_ex current_state_ex = get_state_ex();
             current_state_ex_ = wait_signaled;
-            return state;
+            return coroutine_(current_state_ex);
         }
 
         thread_state get_state() const 
         {
-            boost::lockfree::memory_barrier();
-            return static_cast<thread_state>(current_state_);
+            using namespace boost::lockfree;
+            return static_cast<thread_state>(
+                interlocked_read_acquire(const_cast<long*>(&current_state_)));
         }
 
         thread_state set_state(thread_state newstate)
@@ -127,18 +127,20 @@ namespace hpx { namespace threads { namespace detail
                 return old_state;
 
             long current_state = interlocked_read_acquire(&current_state_);
-            if (current_state == marked_for_suspension ||
-                newstate == terminated)
+            if (current_state != marked_for_suspension &&
+                newstate != terminated)
             {
-                return set_state(newstate);
+                BOOST_ASSERT(false);    // this shouldn't happen!
+                return static_cast<thread_state>(current_state);
             }
-            return static_cast<thread_state>(current_state);
+            return set_state(newstate);
         }
 
         thread_state_ex get_state_ex() const 
         {
-            boost::lockfree::memory_barrier();
-            return static_cast<thread_state_ex>(current_state_ex_);
+            using namespace boost::lockfree;
+            return static_cast<thread_state_ex>(
+                interlocked_read_acquire(const_cast<long*>(&current_state_ex_)));
         }
 
         thread_state_ex set_state_ex(thread_state_ex newstate_ex)
@@ -194,6 +196,8 @@ namespace hpx { namespace threads { namespace detail
         // the state is stored as a long to allow to use CAS
         long current_state_;
         long current_state_ex_;
+
+        // all of the following is debug/logging support information
         char const* const description_;
         boost::uint32_t parent_locality_prefix_;
         thread_id_type parent_thread_id_;
@@ -249,8 +253,7 @@ namespace hpx { namespace threads
         ///                 \a thread will be associated with.
         /// \param newstate [in] The initial thread state this instance will
         ///                 be initialized with.
-        thread(thread_init_data const& init_data, 
-               thread_state new_state = init)
+        thread(thread_init_data& init_data, thread_state new_state = init)
           : base_type(new detail::thread(init_data, This(), new_state))
         {
             LTM_(debug) << "thread::thread(" << this << "), description(" 

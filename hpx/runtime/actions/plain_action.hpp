@@ -188,7 +188,7 @@ namespace hpx { namespace actions
         }
 
     private:
-        threads::thread_init_data const& 
+        threads::thread_init_data& 
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data)
         {
@@ -200,7 +200,7 @@ namespace hpx { namespace actions
             return data;
         }
 
-        threads::thread_init_data const& 
+        threads::thread_init_data& 
         get_thread_init_data(continuation_type& cont,
             naming::address::address_type lva, 
             threads::thread_init_data& data)
@@ -268,7 +268,7 @@ namespace hpx { namespace actions
             return base_action::direct_action;
         }
 
-        threads::thread_init_data const& 
+        threads::thread_init_data& 
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data)
         {
@@ -280,7 +280,7 @@ namespace hpx { namespace actions
             return data;
         }
 
-        threads::thread_init_data const& 
+        threads::thread_init_data& 
         get_thread_init_data(continuation_type& cont,
             naming::address::address_type lva, 
             threads::thread_init_data& data)
@@ -419,7 +419,7 @@ namespace hpx { namespace actions
         }
 
     private:
-        threads::thread_init_data const& 
+        threads::thread_init_data& 
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data)
         {
@@ -431,7 +431,7 @@ namespace hpx { namespace actions
             return data;
         }
 
-        threads::thread_init_data const& 
+        threads::thread_init_data& 
         get_thread_init_data(continuation_type& cont,
             naming::address::address_type lva, 
             threads::thread_init_data& data)
@@ -499,7 +499,7 @@ namespace hpx { namespace actions
             return base_action::direct_action;
         }
 
-        threads::thread_init_data const& 
+        threads::thread_init_data& 
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data)
         {
@@ -511,7 +511,7 @@ namespace hpx { namespace actions
             return data;
         }
 
-        threads::thread_init_data const& 
+        threads::thread_init_data& 
         get_thread_init_data(continuation_type& cont,
             naming::address::address_type lva, 
             threads::thread_init_data& data)

@@ -23,6 +23,10 @@ namespace hpx { namespace components { namespace amr { namespace server
         typedef simple_component_base<logging> base_type;
 
     public:
+        logging()
+          : mtx_("logging")
+        {}
+
         enum actions
         {
             logging_logentry = 0,

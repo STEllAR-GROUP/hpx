@@ -246,7 +246,7 @@ namespace hpx { namespace applier
         bool run_now = true);
 
     HPX_API_EXPORT threads::thread_id_type register_thread_plain(
-        threads::thread_init_data const& data,
+        threads::thread_init_data& data,
         threads::thread_state initial_state = threads::pending, 
         bool run_now = true);
 
@@ -269,7 +269,7 @@ namespace hpx { namespace applier
         threads::thread_state initial_state = threads::pending);
 
     HPX_API_EXPORT void register_work_plain(
-        threads::thread_init_data const& data,
+        threads::thread_init_data& data,
         threads::thread_state initial_state = threads::pending);
 
     /// The \a create_async function initiates the creation of a new 
