@@ -32,6 +32,8 @@ namespace hpx { namespace util { namespace detail
     template <typename Data>
     class full_empty_entry
     {
+        struct tag {};
+
     public:
         typedef hpx::util::spinlock_pool<tag> mutex_type;
         typedef typename mutex_type::scoped_lock scoped_lock;
@@ -66,8 +68,6 @@ namespace hpx { namespace util { namespace detail
             boost::intrusive::cache_last<true>, 
             boost::intrusive::constant_time_size<false>
         > queue_type;
-
-        struct tag {};
 
         void log_non_empty_queue(char const* const desc, queue_type& queue)
         {
