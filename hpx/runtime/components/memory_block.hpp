@@ -11,6 +11,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/stubs/memory_block.hpp>
 #include <hpx/runtime/components/client_base.hpp>
+#include <hpx/lcos/future_wait.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
