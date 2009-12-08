@@ -21,9 +21,7 @@ namespace hpx { namespace components
     public:
         client_base(naming::id_type gid, bool freeonexit = false)
           : gid_(gid), freeonexit_(freeonexit)
-        {
-            BOOST_ASSERT(gid_);
-        }
+        {}
 
         ~client_base() 
         {
