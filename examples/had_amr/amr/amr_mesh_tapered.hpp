@@ -27,6 +27,9 @@ namespace hpx { namespace components { namespace amr
         base_type;
 
     public:
+        amr_mesh_tapered()
+          : base_type(naming::invalid_id, false)
+        {}
         amr_mesh_tapered(naming::id_type gid, bool freeonexit = false)
           : base_type(gid, freeonexit)
         {}
