@@ -23,72 +23,6 @@
 namespace hpx { namespace components { namespace amr 
 {
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        // helper functions to get several memory pointers asynchronously
-        inline boost::tuple<
-            access_memory_block<stencil_data>, access_memory_block<stencil_data>
-        >
-        get_async(naming::id_type const& g1, naming::id_type const& g2)
-        {
-            return wait(components::stubs::memory_block::get_async(g1)
-              , components::stubs::memory_block::get_async(g2));
-        }
-
-        inline boost::tuple<
-            access_memory_block<stencil_data>, access_memory_block<stencil_data>
-          , access_memory_block<stencil_data> >
-        get_async(naming::id_type const& g1, naming::id_type const& g2
-          , naming::id_type const& g3)
-        {
-            return wait(components::stubs::memory_block::get_async(g1)
-              , components::stubs::memory_block::get_async(g2)
-              , components::stubs::memory_block::get_async(g3));
-        }
-
-        inline boost::tuple<
-            access_memory_block<stencil_data>, access_memory_block<stencil_data>
-          , access_memory_block<stencil_data>, access_memory_block<stencil_data> >
-        get_async(naming::id_type const& g1, naming::id_type const& g2
-          , naming::id_type const& g3, naming::id_type const& g4)
-        {
-            return wait(components::stubs::memory_block::get_async(g1)
-              , components::stubs::memory_block::get_async(g2)
-              , components::stubs::memory_block::get_async(g3)
-              , components::stubs::memory_block::get_async(g4));
-        }
-
-        inline boost::tuple<
-            access_memory_block<stencil_data>, access_memory_block<stencil_data>
-          , access_memory_block<stencil_data>, access_memory_block<stencil_data>
-          , access_memory_block<stencil_data> >
-        get_async(naming::id_type const& g1, naming::id_type const& g2
-          , naming::id_type const& g3, naming::id_type const& g4
-          , naming::id_type const& g5)
-        {
-            return wait(components::stubs::memory_block::get_async(g1)
-              , components::stubs::memory_block::get_async(g2)
-              , components::stubs::memory_block::get_async(g3)
-              , components::stubs::memory_block::get_async(g4)
-              , components::stubs::memory_block::get_async(g5));
-        }
-        inline boost::tuple<
-            access_memory_block<stencil_data>, access_memory_block<stencil_data>
-          , access_memory_block<stencil_data>, access_memory_block<stencil_data>
-          , access_memory_block<stencil_data>, access_memory_block<stencil_data> >
-        get_async(naming::id_type const& g1, naming::id_type const& g2
-          , naming::id_type const& g3, naming::id_type const& g4
-          , naming::id_type const& g5, naming::id_type const& g6)
-        {
-            return wait(components::stubs::memory_block::get_async(g1)
-              , components::stubs::memory_block::get_async(g2)
-              , components::stubs::memory_block::get_async(g3)
-              , components::stubs::memory_block::get_async(g4)
-              , components::stubs::memory_block::get_async(g5)
-              , components::stubs::memory_block::get_async(g6));
-        }
-    }
-
     stencil::stencil()
       : numsteps_(0)
     {}
@@ -123,18 +57,19 @@ namespace hpx { namespace components { namespace amr
         access_memory_block<stencil_data> val1, val2, val3, val4, val5, resultval;
         if (gids.size() == 3) { 
             boost::tie(val1, val2, val3, resultval) = 
-                detail::get_async(gids[0], gids[1], gids[2], result);
+                get_memory_block_async<stencil_data>(gids[0], gids[1], gids[2], result);
         } 
         else if (gids.size() == 2) {
             boost::tie(val1, val2, resultval) = 
-                detail::get_async(gids[0], gids[1], result);
+                get_memory_block_async<stencil_data>(gids[0], gids[1], result);
         } 
         else if (gids.size() == 5) {
             boost::tie(val1, val2, val3, val4, val5, resultval) = 
-                detail::get_async(gids[0], gids[1], gids[2], gids[3], gids[4], result);
+                get_memory_block_async<stencil_data>(gids[0], gids[1], gids[2], gids[3], gids[4], result);
         } 
         else {
-          boost::tie(val1, resultval) = detail::get_async(gids[0], result);
+          boost::tie(val1, resultval) = 
+                get_memory_block_async<stencil_data>(gids[0], result);
           resultval.get() = val1.get();
           return -1;
         }
@@ -250,7 +185,7 @@ namespace hpx { namespace components { namespace amr
 
       access_memory_block<stencil_data> mval[9];
       boost::tie(mval[0], mval[1], mval[2], mval[3], mval[4]) = 
-          detail::get_async(gval[0], gval[1], gval[2], gval[3], gval[4]);
+          get_memory_block_async<stencil_data>(gval[0], gval[1], gval[2], gval[3], gval[4]);
 
       // temporarily store the anchor values before overwriting them
       double t1,t2,t3,t4,t5;
@@ -275,7 +210,8 @@ namespace hpx { namespace components { namespace amr
                       components::stubs::memory_block::clone_async(gids[2]),
                       components::stubs::memory_block::clone_async(gids[2]),
                       components::stubs::memory_block::clone_async(gids[2]));
-        boost::tie(mval[5], mval[6], mval[7],mval[8]) = detail::get_async(gval[5], gval[6], gval[7],gval[8]);
+        boost::tie(mval[5], mval[6], mval[7],mval[8]) = 
+            get_memory_block_async<stencil_data>(gval[5], gval[6], gval[7],gval[8]);
 
         // increase the level by one
         for (i=0;i<9;i++) {
@@ -365,7 +301,7 @@ namespace hpx { namespace components { namespace amr
   
         access_memory_block<stencil_data> r_val1, r_val2, r_val3, resultval;
         boost::tie(r_val1, r_val2, r_val3, resultval) = 
-            detail::get_async(result_data[2], result_data[4], result_data[6], result);
+            get_memory_block_async<stencil_data>(result_data[2], result_data[4], result_data[6], result);
 
         // overwrite the coarse point computation
         resultval->value_ = r_val2->value_;
@@ -388,7 +324,8 @@ namespace hpx { namespace components { namespace amr
                       components::wait(components::stubs::memory_block::clone_async(gids[2]), 
                       components::stubs::memory_block::clone_async(gids[2]),
                       components::stubs::memory_block::clone_async(gids[2]));
-        boost::tie(mval[5], mval[6], mval[7]) = detail::get_async(gval[5], gval[6], gval[7]);
+        boost::tie(mval[5], mval[6], mval[7]) = 
+            get_memory_block_async<stencil_data>(gval[5], gval[6], gval[7]);
 
         // increase the level by one
         for (i=0;i<8;i++) {
@@ -480,7 +417,7 @@ namespace hpx { namespace components { namespace amr
   
         access_memory_block<stencil_data> r_val1, r_val2, resultval;
         boost::tie(r_val1, r_val2, resultval) = 
-            detail::get_async(result_data[3], result_data[4], result);
+            get_memory_block_async<stencil_data>(result_data[3], result_data[4], result);
 
         // overwrite the coarse point computation
         resultval->value_ = r_val1->value_;
@@ -528,7 +465,7 @@ namespace hpx { namespace components { namespace amr
 //#if 0
       access_memory_block<stencil_data> r_val1, r_val2, r_val3, resultval;
       boost::tie(r_val1, r_val2, r_val3, resultval) = 
-          detail::get_async(result_data[2], result_data[4], result_data[6], result);
+          get_memory_block_async<stencil_data>(result_data[2], result_data[4], result_data[6], result);
       //overwrite the coarse point computation
       resultval->value_ = r_val2->value_;
   
@@ -546,7 +483,7 @@ namespace hpx { namespace components { namespace amr
 #if 0
      access_memory_block<stencil_data> r_val1, r_val2, resultval;
      boost::tie(r_val1, r_val2, resultval) = 
-     detail::get_async(result_data[3], result_data[4], result);
+     get_memory_block_async<stencil_data>(result_data[3], result_data[4], result);
 
       // overwrite the coarse point computation
       resultval->value_ = r_val1->value_;

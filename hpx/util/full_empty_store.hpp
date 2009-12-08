@@ -32,6 +32,10 @@ namespace hpx { namespace util { namespace detail
     template <typename Data>
     class full_empty_entry
     {
+    public:
+        typedef hpx::util::spinlock_pool<tag> mutex_type;
+        typedef typename mutex_type::scoped_lock scoped_lock;
+
     private:
         typedef threads::thread_id_type thread_id_type;
 
@@ -82,9 +86,6 @@ namespace hpx { namespace util { namespace detail
         }
 
     public:
-        typedef hpx::util::spinlock_pool<tag> mutex_type;
-        typedef typename mutex_type::scoped_lock scoped_lock;
-
         full_empty_entry()
           : state_(empty)
         {
