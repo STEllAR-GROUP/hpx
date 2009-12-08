@@ -272,13 +272,9 @@ namespace hpx { namespace lcos { namespace detail
             long const offset = lock_flag_value;
             long const old_count = 
                 interlocked_exchange_add(&active_count_, lock_flag_value);
-            if (!(old_count & event_set_flag_value) && (old_count > offset))
-            {
-                if (!interlocked_bit_test_and_set(&active_count_, event_set_flag_bit))
-                {
-                    set_event();
-                }
-            }
+            BOOST_VERIFY(!(old_count & event_set_flag_value) && (old_count > offset));
+            BOOST_VERIFY(!interlocked_bit_test_and_set(&active_count_, event_set_flag_bit));
+            set_event();
         }
 
         typedef boost::unique_lock<mutex> scoped_lock;
