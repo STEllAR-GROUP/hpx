@@ -126,7 +126,7 @@ namespace hpx { namespace lcos { namespace detail
         bool try_lock()
         {
             return !boost::lockfree::interlocked_bit_test_and_set(
-                &active_count_, lock_flag_bit);
+                &active_count_,(long) lock_flag_bit);
         }
 
         void mark_waiting_and_try_lock(long& old_count)
@@ -147,7 +147,7 @@ namespace hpx { namespace lcos { namespace detail
             }
         }
 
-        void clear_waiting_and_try_lock(boost::int32_t& old_count)
+        void clear_waiting_and_try_lock(long& old_count)
         {
             using namespace boost::lockfree;
 
@@ -273,7 +273,7 @@ namespace hpx { namespace lcos { namespace detail
             long const old_count = 
                 interlocked_exchange_add(&active_count_, lock_flag_value);
             BOOST_VERIFY(!(old_count & event_set_flag_value) && (old_count > offset));
-            BOOST_VERIFY(!interlocked_bit_test_and_set(&active_count_, event_set_flag_bit));
+            BOOST_VERIFY(!interlocked_bit_test_and_set(&active_count_,(long) event_set_flag_bit));
             set_event();
         }
 

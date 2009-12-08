@@ -27,8 +27,8 @@ namespace hpx { namespace lcos { namespace detail
         threads::thread_id_type locking_thread_id;
         UnderlyingMutex mutex;
 
-        recursive_mutex_impl()
-          : recursion_count(0), locking_thread_id(0)
+        recursive_mutex_impl(char const * const p)
+          : recursion_count(0), locking_thread_id(0), mutex(p)
         {}
 
         bool try_lock()
@@ -128,8 +128,10 @@ namespace hpx { namespace lcos
       : boost::noncopyable, public detail::recursive_mutex
     {
     public:
-        recursive_mutex()
-        {}
+        recursive_mutex(char const * const p = "")
+          : detail::recursive_mutex(p)
+        {
+        }
         ~recursive_mutex()
         {}
 
@@ -143,7 +145,8 @@ namespace hpx { namespace lcos
       : boost::noncopyable, public detail::recursive_timed_mutex
     {
     public:
-        recursive_timed_mutex()
+        recursive_timed_mutex(char const * const p = "")
+          : detail::recursive_timed_mutex(p)
         {}
         ~recursive_timed_mutex()
         {}
