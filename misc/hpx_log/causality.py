@@ -23,7 +23,7 @@ def get_parent_tid(event):
 
 def build_graph(thread, action):
   # Kludge 1
-  action['--------'] = {'name':'not-a-thread'}
+  action['--------'] = {'name':(0,'"not-a-thread"')}
 
   tasks = [(t['name'],t['parent']) for t in thread.values()]
 
@@ -36,7 +36,7 @@ def build_graph(thread, action):
     pid = 'T'+v[1]
     pid = pid.replace('-','_')
 
-    label = 'x'
+    label = '""'
     if not pid in vertices:
       if action.has_key(v[1]):
         label = action[v[1]]['name'][1] 
