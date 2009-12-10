@@ -123,12 +123,12 @@ namespace boost { namespace lockfree
         return *addr;
     }
 
-    inline D interlocked_compare_exchange(int64_t volatile* addr, int64_t old, int64_t nw)
-    {
-        if (OSAtomicCompareAndSwap64(old, nw, addr))
-            return old;
-        return *addr;
-    }
+//     inline int64_t interlocked_compare_exchange(int64_t volatile* addr, int64_t old, int64_t nw)
+//     {
+//         if (OSAtomicCompareAndSwap64(old, nw, addr))
+//             return old;
+//         return *addr;
+//     }
 
     inline bool interlocked_bit_test_and_set(boost::int32_t volatile* x, boost::int32_t bit)
     {
@@ -210,23 +210,23 @@ namespace boost { namespace lockfree
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline long interlocked_read_acquire(long volatile* x)
+    inline int32_t interlocked_read_acquire(int32_t volatile* x)
     {
         return interlocked_compare_exchange(x, 0, 0);
     }
     inline void* interlocked_read_acquire(void* volatile* x)
     {
-        long t = interlocked_compare_exchange((long volatile*)x, 0, 0);
+        int32_t t = interlocked_compare_exchange((int32_t volatile*)x, 0, 0);
         return *reinterpret_cast<void**>(&t);
     }
-    inline void interlocked_write_release(long volatile* x, long value)
+    inline void interlocked_write_release(int32_t volatile* x, int32_t value)
     {
         interlocked_exchange(x, value);
     }
     inline void interlocked_write_release(void* volatile* x, void* value)
     {
-        interlocked_exchange(reinterpret_cast<long volatile*>(x), 
-            *reinterpret_cast<long*>(&value));
+        interlocked_exchange(reinterpret_cast<int32_t volatile*>(x), 
+            *reinterpret_cast<int32_t*>(&value));
     }
 
 }}
