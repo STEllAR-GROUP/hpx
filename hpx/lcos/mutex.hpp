@@ -61,10 +61,8 @@ namespace hpx { namespace lcos { namespace detail
     class mutex 
     {
     private:
-        BOOST_STATIC_CONSTANT(char, lock_flag_bit = 31);
-        BOOST_STATIC_CONSTANT(char, event_set_flag_bit = 30);
+        BOOST_STATIC_CONSTANT(long, lock_flag_bit = 31);
         BOOST_STATIC_CONSTANT(long, lock_flag_value = 1 << lock_flag_bit);
-        BOOST_STATIC_CONSTANT(long, event_set_flag_value = 1 << event_set_flag_bit);
 
     private:
         struct tag {};
@@ -126,7 +124,7 @@ namespace hpx { namespace lcos { namespace detail
         bool try_lock()
         {
             return !boost::lockfree::interlocked_bit_test_and_set(
-                &active_count_,(long) lock_flag_bit);
+                &active_count_, lock_flag_bit);
         }
 
         void mark_waiting_and_try_lock(long& old_count)
@@ -152,12 +150,11 @@ namespace hpx { namespace lcos { namespace detail
             using namespace boost::lockfree;
 
             old_count &= ~lock_flag_value;
-            old_count |= event_set_flag_value;
             for(;;) {
-                long const new_count = 
-                    ((old_count & lock_flag_value) ? 
-                        old_count : ((old_count-1) | lock_flag_value)) & 
-                    ~event_set_flag_value;
+                long const new_count = (
+                    (old_count & lock_flag_value) ? 
+                        old_count : ((old_count-1) | lock_flag_value)
+                ); 
                 long const current = 
                     interlocked_compare_exchange(&active_count_, old_count, new_count);
                 if (current == old_count)
@@ -269,11 +266,10 @@ namespace hpx { namespace lcos { namespace detail
         void unlock()
         {
             using namespace boost::lockfree;
-            long const offset = lock_flag_value;
-            long const old_count = 
-                interlocked_exchange_add(&active_count_, lock_flag_value);
-            BOOST_VERIFY(!(old_count & event_set_flag_value) && (old_count > offset));
-            BOOST_VERIFY(!interlocked_bit_test_and_set(&active_count_,(long) event_set_flag_bit));
+            BOOST_VERIFY(
+                interlocked_exchange_add(&active_count_, lock_flag_value) & 
+                    lock_flag_value
+            );
             set_event();
         }
 

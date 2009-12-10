@@ -45,9 +45,14 @@
 #endif
 #include <cstddef>
 #include <algorithm> //for swap
+#include <boost/version.hpp>
 #include <boost/coroutine/detail/swap_context.hpp> //for swap hints
 #include <boost/intrusive_ptr.hpp>
+#if BOOST_VERSION < 104200
 #include <boost/exception.hpp>
+#else
+#include <boost/exception/all.hpp>
+#endif
 #include <boost/coroutine/exception.hpp>
 #include <boost/coroutine/detail/noreturn.hpp>
 namespace boost { namespace coroutines { namespace detail {
