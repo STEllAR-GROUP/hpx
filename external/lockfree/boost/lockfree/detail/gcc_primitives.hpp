@@ -289,7 +289,7 @@ namespace boost { namespace lockfree
     }
 
     template <typename T>
-    inline bool interlocked_bit_test_and_set(T volatile* x, T bit)
+    inline bool interlocked_bit_test_and_set(T volatile* x, long bit)
     {
         T const value = 1u << bit;
         T old = *x;
@@ -305,7 +305,7 @@ namespace boost { namespace lockfree
     }
 
     template <typename T>
-    inline bool interlocked_bit_test_and_reset(T volatile* x, T bit)
+    inline bool interlocked_bit_test_and_reset(T volatile* x, long bit)
     {
         T const value = 1u << bit;
         T old = *x;
