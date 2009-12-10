@@ -234,19 +234,9 @@ namespace boost { namespace lockfree
     {
         return interlocked_compare_exchange(x, 0, 0);
     }
-    inline void* interlocked_read_acquire(void* volatile* x)
-    {
-        long t = interlocked_compare_exchange((long volatile*)x, 0, 0);
-        return *reinterpret_cast<void**>(&t);
-    }
     inline void interlocked_write_release(long volatile* x, long value)
     {
         interlocked_exchange(x, value);
-    }
-    inline void interlocked_write_release(void* volatile* x, void* value)
-    {
-        interlocked_exchange(reinterpret_cast<long volatile*>(x), 
-            *reinterpret_cast<long*>(&value));
     }
 
 }}
