@@ -65,6 +65,9 @@ namespace hpx { namespace components { namespace amr
         /// The init function initializes this stencil point
         void init(std::size_t, naming::id_type const&);
 
+        /// floating point comparison (for coordinates)
+        int floatcmp(double x1,double x2);
+
     private:
         std::size_t numsteps_;
         naming::id_type log_;

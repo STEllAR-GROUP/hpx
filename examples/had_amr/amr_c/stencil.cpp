@@ -27,6 +27,17 @@ namespace hpx { namespace components { namespace amr
       : numsteps_(0)
     {}
 
+    int stencil::floatcmp(double x1,double x2) {
+      // compare to floating point numbers
+      double epsilon = 1.e-8;
+      if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
+        // the numbers are close enough for coordinate comparison
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+        
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
     // Compute the result value for the current time step
@@ -237,40 +248,83 @@ namespace hpx { namespace components { namespace amr
         mval[6]->value_ = t4;
         mval[8]->value_ = t5;
 
+        // avoid interpolation if possible
+        int s1,s3,s5,s7;
+        s1 = 0; s3 = 0; s5 = 0; s7 = 0;
+        // ------------------------------------------------------------------------------------------------
+        if ( mval[0]->right_alloc_ == 1 ) {
+          access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[0]->right_);
+          if ( floatcmp(amb->x_,mval[1]->x_) ) {
+            mval[1]->value_ = amb->value_;
+            s1 = 1;
+          } 
+        }
+
+        if (mval[1]->left_alloc_ == 1 && s1 == 0) {
+          access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[1]->left_);
+          if ( floatcmp(amb->x_,mval[1]->x_) ) {
+            mval[1]->value_ = amb->value_;
+            s1 = 1;
+          }
+        }
+
+        // ------------------------------------------------------------------------------------------------
+        if ( mval[1]->right_alloc_ == 1 ) {
+          access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[1]->right_);
+          if ( floatcmp(amb->x_,mval[3]->x_) ) {
+            mval[3]->value_ = amb->value_;
+            s3 = 1;
+          }
+        } 
+        if (mval[2]->left_alloc_ == 1 && s3 == 0) {
+          access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[2]->left_);
+          if ( floatcmp(amb->x_,mval[3]->x_) ) {
+            mval[3]->value_ = amb->value_;
+            s3 = 1;
+          }
+        }
+        // ------------------------------------------------------------------------------------------------
+        if ( mval[2]->right_alloc_ == 1 ) {
+          access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[2]->right_);
+          if ( floatcmp(amb->x_,mval[5]->x_) ) {
+            mval[5]->value_ = amb->value_;
+            s5 = 1;
+          }
+        } 
+        if (mval[3]->left_alloc_ == 1 && s5 == 0) {
+          access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[3]->left_);
+          if ( floatcmp(amb->x_,mval[5]->x_) ) {
+            mval[5]->value_ = amb->value_;
+            s5 = 1;
+          }
+        }
+        // ------------------------------------------------------------------------------------------------
+        if ( mval[3]->right_alloc_ == 1 ) {
+          access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[3]->right_);
+          if ( floatcmp(amb->x_,mval[7]->x_) ) {
+            mval[7]->value_ = amb->value_;
+            s7 = 1;
+          }
+        } 
+        if (mval[4]->left_alloc_ == 1 && s7 == 0) {
+          access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[4]->left_);
+          if ( floatcmp(amb->x_,mval[7]->x_) ) {
+            mval[7]->value_ = amb->value_;
+            s7 = 1;
+          }
+        }
+        // ------------------------------------------------------------------------------------------------
+
+
         if ( par.linearbounds == 1 ) {
           // linear interpolation
-          if ( mval[0]->right_alloc_ == 1 && mval[0]->right_level_ == mval[1]->level_ ) {
-            mval[1]->value_ = mval[0]->right_value_;
-          } else if ( mval[1]->left_alloc_ == 1 && mval[1]->left_level_ == mval[1]->level_ ) {
-            mval[1]->value_ = mval[1]->left_value_;
-          } else {
-            mval[1]->value_ = 0.5*(t1 + t2);
-           // std::cout << "interpolating " << " x value : " << mval[1]->x_ << std::endl;
-          }
-          if ( mval[1]->right_alloc_ == 1 && mval[1]->right_level_ == mval[3]->level_ ) {
-            mval[3]->value_ = mval[1]->right_value_;
-          } else if ( mval[2]->left_alloc_ == 1 && mval[2]->left_level_ == mval[3]->level_ ) {
-            mval[3]->value_ = mval[2]->left_value_;
-          } else {
-            mval[3]->value_ = 0.5*(t2 + t3);
-           // std::cout << "interpolating " << " x value : " << mval[3]->x_ << std::endl;
-          }
-          if ( mval[2]->right_alloc_ == 1 && mval[2]->right_level_ == mval[5]->level_ ) {
-            mval[5]->value_ = mval[2]->right_value_;
-          } else if ( mval[3]->left_alloc_ == 1 && mval[3]->left_level_ == mval[5]->level_ ) {
-            mval[5]->value_ = mval[3]->left_value_;
-          } else {
-            mval[5]->value_ = 0.5*(t3 + t4);
-           // std::cout << "interpolating " << " x value : " << mval[5]->x_ << std::endl;
-          }
-          if ( mval[3]->right_alloc_ == 1 && mval[3]->right_level_ == mval[7]->level_ ) {
-            mval[7]->value_ = mval[3]->right_value_;
-          } else if ( mval[4]->left_alloc_ == 1 && mval[4]->left_level_ == mval[7]->level_ ) {
-            mval[7]->value_ = mval[4]->left_value_;
-          } else {
-            mval[7]->value_ = 0.5*(t4 + t5);
-           // std::cout << "interpolating " << " x value : " << mval[7]->x_ << std::endl;
-          }
+          if ( s1 == 0 ) mval[1]->value_ = 0.5*(t1 + t2);
+          if ( s3 == 0 ) mval[3]->value_ = 0.5*(t2 + t3);
+          if ( s5 == 0 ) mval[5]->value_ = 0.5*(t3 + t4);
+          if ( s7 == 0 ) mval[7]->value_ = 0.5*(t4 + t5);
+          // TEST
+          if ( !s1 || !s3 || !s5 || !s7 ) printf("Interpolation B: %d %d %d %d : %g %g %g %g\n",
+                                       s1,s3,s5,s7,mval[1]->x_,mval[3]->x_,mval[5]->x_,mval[7]->x_);
         } else {
           // other user defined options not implemented yet
           interpolation();
@@ -299,25 +353,32 @@ namespace hpx { namespace components { namespace amr
             child_mesh.execute(initial_data, function_type,
               do_logging ? logging_type : components::component_invalid,par));
   
-        access_memory_block<stencil_data> r_val1, r_val2, r_val3, resultval;
-        boost::tie(r_val1, r_val2, r_val3, resultval) = 
-            get_memory_block_async<stencil_data>(result_data[2], result_data[4], result_data[6], result);
+        access_memory_block<stencil_data> r_val, resultval;
+        boost::tie(r_val, resultval) = 
+            get_memory_block_async<stencil_data>(result_data[4], result);
 
         // overwrite the coarse point computation
-        resultval->value_ = r_val2->value_;
+        resultval->value_ = r_val->value_;
+
+        resultval->overwrite_alloc_ = 1;
+        resultval->overwrite_ = result_data[4];
   
         // remember neighbor value
         resultval->right_alloc_ = 1;
-        resultval->right_value_ = r_val3->value_;
-        resultval->right_level_ = r_val3->level_;
+        resultval->right_ = result_data[6];
 
         resultval->left_alloc_ = 1;
-        resultval->left_value_ = r_val1->value_;
-        resultval->left_level_ = r_val1->level_;
+        resultval->left_ = result_data[2];
 
+        components::stubs::memory_block::free(result_data[0]);
+        components::stubs::memory_block::free(result_data[1]);
+        components::stubs::memory_block::free(result_data[3]);
+        components::stubs::memory_block::free(result_data[5]);
+        components::stubs::memory_block::free(result_data[7]);
+        components::stubs::memory_block::free(result_data[8]);
         // release result data
-        for (std::size_t i = 0; i < result_data.size(); ++i) 
-            components::stubs::memory_block::free(result_data[i]);
+        //for (std::size_t i = 0; i < result_data.size(); ++i) 
+        //    components::stubs::memory_block::free(result_data[i]);
 
       } else {
         boost::tie(gval[5], gval[6], gval[7]) = 
@@ -349,44 +410,196 @@ namespace hpx { namespace components { namespace amr
         mval[5]->value_ = t4;
         mval[7]->value_ = t5;
 
+        // avoid interpolation if possible
+        int s0,s2,s4,s6;
+        s0 = 0; s2 = 0; s4 = 0; s6 = 0;
+        // ------------------------------------------------------------------------------------------------
+        // look right
+        access_memory_block<stencil_data> amb0;
+        amb0 = mval[0];
+        while (s0 == 0 && amb0->right_alloc_ == 1) {
+          access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->right_);
+          if ( floatcmp(amb1->x_,mval[0]->x_) ) {
+            mval[0]->value_ = amb1->value_;
+            s0 = 1;
+          } else if ( amb1->x_ > mval[0]->x_ ) {
+            // look to the right again
+            naming::id_type tmp = amb0->right_;
+            amb0 = hpx::components::stubs::memory_block::get(tmp);
+          } else if ( amb1->x_ < mval[0]->x_ ) {
+            // you overshot it -- check the overwrite gid
+            if (amb0->overwrite_alloc_ == 1) {
+              naming::id_type tmp = amb0->overwrite_;
+              amb0 = hpx::components::stubs::memory_block::get(tmp);
+            } else {
+              break;
+            }
+          }
+        }
+
+        // look left
+        amb0 = mval[1];
+        while (s0 == 0 && amb0->left_alloc_ == 1) {
+          access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->left_);
+          if ( floatcmp(amb1->x_,mval[0]->x_) ) {
+            mval[0]->value_ = amb1->value_;
+            s0 = 1;
+          } else if ( amb1->x_ < mval[0]->x_  ) {
+            // you overshot it -- check the overwrite gid
+            if (amb0->overwrite_alloc_ == 1) {
+              naming::id_type tmp = amb0->overwrite_;
+              amb0 = hpx::components::stubs::memory_block::get(tmp);
+            } else {
+              break;
+            }
+          } else if ( amb1->x_ > mval[0]->x_ ) {
+            // look left again
+            naming::id_type tmp = amb0->left_;
+            amb0 = hpx::components::stubs::memory_block::get(tmp);
+          }
+        }
+        // ------------------------------------------------------------------------------------------------
+        // look right
+        amb0 = mval[1];
+        while (s2 == 0 && amb0->right_alloc_ == 1) {
+          access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->right_);
+          if ( floatcmp(amb1->x_,mval[2]->x_) ) {
+            mval[2]->value_ = amb1->value_;
+            s2 = 1;
+          } else if ( amb1->x_ > mval[2]->x_ ) {
+            // look to the right again
+            naming::id_type tmp = amb0->right_;
+            amb0 = hpx::components::stubs::memory_block::get(tmp);
+          } else if ( amb1->x_ < mval[2]->x_ ) {
+            // you overshot it -- check the overwrite gid
+            if (amb0->overwrite_alloc_ == 1) {
+              naming::id_type tmp = amb0->overwrite_;
+              amb0 = hpx::components::stubs::memory_block::get(tmp);
+            } else {
+              break;
+            }
+          }
+        }
+
+        // look left
+        amb0 = mval[2];
+        while (s2 == 0 && amb0->left_alloc_ == 1) {
+          access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->left_);
+          if ( floatcmp(amb1->x_,mval[2]->x_) ) {
+            mval[2]->value_ = amb1->value_;
+            s2 = 1;
+          } else if ( amb1->x_ < mval[2]->x_  ) {
+            // you overshot it -- check the overwrite gid
+            if (amb0->overwrite_alloc_ == 1) {
+              naming::id_type tmp = amb0->overwrite_;
+              amb0 = hpx::components::stubs::memory_block::get(tmp);
+            } else {
+              break;
+            }
+          } else if ( amb1->x_ > mval[2]->x_ ) {
+            // look left again
+            naming::id_type tmp = amb0->left_;
+            amb0 = hpx::components::stubs::memory_block::get(tmp);
+          }
+        }
+        // ------------------------------------------------------------------------------------------------
+        // look right
+        amb0 = mval[2];
+        while (s4 == 0 && amb0->right_alloc_ == 1) {
+          access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->right_);
+          if ( floatcmp(amb1->x_,mval[4]->x_) ) {
+            mval[4]->value_ = amb1->value_;
+            s4 = 1;
+          } else if ( amb1->x_ > mval[4]->x_ ) {
+            // look to the right again
+            naming::id_type tmp = amb0->right_;
+            amb0 = hpx::components::stubs::memory_block::get(tmp);
+          } else if ( amb1->x_ < mval[4]->x_ ) {
+            // you overshot it -- check the overwrite gid
+            if (amb0->overwrite_alloc_ == 1) {
+              naming::id_type tmp = amb0->overwrite_;
+              amb0 = hpx::components::stubs::memory_block::get(tmp);
+            } else {
+              break;
+            }
+          }
+        }
+
+        // look left
+        amb0 = mval[3];
+        while (s4 == 0 && amb0->left_alloc_ == 1) {
+          access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->left_);
+          if ( floatcmp(amb1->x_,mval[4]->x_) ) {
+            mval[4]->value_ = amb1->value_;
+            s4 = 1;
+          } else if ( amb1->x_ < mval[4]->x_  ) {
+            // you overshot it -- check the overwrite gid
+            if (amb0->overwrite_alloc_ == 1) {
+              naming::id_type tmp = amb0->overwrite_;
+              amb0 = hpx::components::stubs::memory_block::get(tmp);
+            } else {
+              break;
+            }
+          } else if ( amb1->x_ > mval[4]->x_ ) {
+            // look left again
+            naming::id_type tmp = amb0->left_;
+            amb0 = hpx::components::stubs::memory_block::get(tmp);
+          }
+        }
+        // ------------------------------------------------------------------------------------------------
+        // look right
+        amb0 = mval[3];
+        while (s6 == 0 && amb0->right_alloc_ == 1) {
+          access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->right_);
+          if ( floatcmp(amb1->x_,mval[6]->x_) ) {
+            mval[6]->value_ = amb1->value_;
+            s6 = 1;
+          } else if ( amb1->x_ > mval[6]->x_ ) {
+            // look to the right again
+            naming::id_type tmp = amb0->right_;
+            amb0 = hpx::components::stubs::memory_block::get(tmp);
+          } else if ( amb1->x_ < mval[6]->x_ ) {
+            // you overshot it -- check the overwrite gid
+            if (amb0->overwrite_alloc_ == 1) {
+              naming::id_type tmp = amb0->overwrite_;
+              amb0 = hpx::components::stubs::memory_block::get(tmp);
+            } else {
+              break;
+            }
+          }
+        }
+
+        // look left
+        amb0 = mval[4];
+        while (s6 == 0 && amb0->left_alloc_ == 1) {
+          access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->left_);
+          if ( floatcmp(amb1->x_,mval[6]->x_) ) {
+            mval[6]->value_ = amb1->value_;
+            s6 = 1;
+          } else if ( amb1->x_ < mval[6]->x_  ) {
+            // you overshot it -- check the overwrite gid
+            if (amb0->overwrite_alloc_ == 1) {
+              naming::id_type tmp = amb0->overwrite_;
+              amb0 = hpx::components::stubs::memory_block::get(tmp);
+            } else {
+              break;
+            }
+          } else if ( amb1->x_ > mval[6]->x_ ) {
+            // look left again
+            naming::id_type tmp = amb0->left_;
+            amb0 = hpx::components::stubs::memory_block::get(tmp);
+          }
+        }
+        // ------------------------------------------------------------------------------------------------
+
         if ( par.linearbounds == 1 ) {
-          // linear interpolation
-          if ( mval[0]->right_alloc_ == 1 && mval[0]->right_level_ == mval[0]->level_ ) {
-          //  std::cout << "A: Using right value : " << mval[0]->right_level_ << " x value : " << mval[0]->x_ << " right value : " << mval[0]->right_value_ << std::endl;
-            mval[0]->value_ = mval[0]->right_value_;
-          } else if ( mval[1]->left_alloc_ == 1 && mval[1]->left_level_ == mval[0]->level_ ) {
-            mval[0]->value_ = mval[1]->left_value_;
-          } else {
-            mval[0]->value_ = 0.5*(t1 + t2);
-          //  std::cout << "A: interpolating " << " x value : " << mval[0]->x_ << " right level : " << mval[0]->right_level_ << " right alloc: " << mval[0]->right_alloc_ << " level: " << mval[0]->level_ << std::endl;
-          }
-          if ( mval[1]->right_alloc_ == 1 && mval[1]->right_level_ == mval[2]->level_ ) {
-         //   std::cout << "B: Using right value : " << mval[1]->right_level_ << " x value : " << mval[2]->x_ << " right value : " << mval[1]->right_value_ << std::endl;
-            mval[2]->value_ = mval[1]->right_value_;
-          } else if ( mval[2]->left_alloc_ == 1 && mval[2]->left_level_ == mval[2]->level_ ) {
-            mval[2]->value_ = mval[1]->left_value_;
-          } else {
-            mval[2]->value_ = 0.5*(t2 + t3);
-          //  std::cout << "B: interpolating " << " x value : " << mval[2]->x_ << " right level : " << mval[0]->right_level_ << " right alloc: " << mval[0]->right_alloc_ << " level: " << mval[0]->level_  << std::endl;
-          }
-          if ( mval[2]->right_alloc_ == 1 && mval[2]->right_level_ == mval[4]->level_ ) {
-        //    std::cout << "C: Using right value : " << mval[2]->right_level_ << " x value : " << mval[4]->x_ << " right value : " << mval[2]->right_value_ << std::endl;
-            mval[4]->value_ = mval[2]->right_value_;
-          } else if ( mval[3]->left_alloc_ == 1 && mval[3]->left_level_ == mval[4]->level_ ) {
-            mval[4]->value_ = mval[3]->left_value_;
-          } else {
-            mval[4]->value_ = 0.5*(t3 + t4);
-          //  std::cout << "C: interpolating " <<  " x value : " << mval[4]->x_ << " right level : " << mval[0]->right_level_ << " right alloc: " << mval[0]->right_alloc_ << " level: " << mval[0]->level_  << std::endl;
-          }
-          if ( mval[3]->right_alloc_ == 1 && mval[3]->right_level_ == mval[6]->level_ ) {
-         //   std::cout << "D: Using right value : " << mval[3]->right_level_ << " x value : " << mval[6]->x_ << " right value : " << mval[3]->right_value_ <<  std::endl;
-            mval[6]->value_ = mval[3]->right_value_;
-          } else if ( mval[4]->left_alloc_ == 1 && mval[4]->left_level_ == mval[6]->level_ ) {
-            mval[6]->value_ = mval[4]->left_value_;
-          } else {
-            mval[6]->value_ = 0.5*(t4 + t5);
-          //  std::cout << "D: interpolating " << " x value : " << mval[6]->x_ << " right level : " << mval[0]->right_level_ << " right alloc: " << mval[0]->right_alloc_ << " level: " << mval[0]->level_  << std::endl;
-          }
+          mval[0]->value_ = 0.5*(t1 + t2);
+          mval[2]->value_ = 0.5*(t2 + t3);
+          mval[4]->value_ = 0.5*(t3 + t4);
+          mval[6]->value_ = 0.5*(t4 + t5);
+          // TEST
+          if ( !s0 || !s2 || !s4 || !s6 ) printf("Interpolation A: %d %d %d %d : %g %g %g %g\n",
+                                        s0,s2,s4,s6,mval[0]->x_,mval[2]->x_,mval[4]->x_,mval[6]->x_);
         } else {
           // other user defined options not implemented yet
           interpolation();
@@ -401,6 +614,13 @@ namespace hpx { namespace components { namespace amr
                   components::get_component_type<components::amr::stencil>();
         components::amr::amr_mesh_tapered child_mesh (
                   components::amr::amr_mesh_tapered::create(here, 1, true));
+        //components::amr::amr_mesh_tapered child_mesh;
+        //if ( gid ) {
+        //child_mesh = components::amr::amr_mesh_tapered(gid,true);
+        //} else {
+        //child_mesh = components::amr::amr_mesh_tapered::create(here, 1, true);
+        // do this later: gid = child_mesh.detach();
+        //}
 
         std::vector<naming::id_type> initial_data;
         for (i=0;i<8;i++) {
@@ -415,22 +635,31 @@ namespace hpx { namespace components { namespace amr
             child_mesh.execute(initial_data, function_type,
               do_logging ? logging_type : components::component_invalid,par));
   
-        access_memory_block<stencil_data> r_val1, r_val2, resultval;
-        boost::tie(r_val1, r_val2, resultval) = 
-            get_memory_block_async<stencil_data>(result_data[3], result_data[4], result);
+        access_memory_block<stencil_data> r_val,resultval;
+        boost::tie(r_val, resultval) = 
+            get_memory_block_async<stencil_data>(result_data[3], result);
 
         // overwrite the coarse point computation
-        resultval->value_ = r_val1->value_;
+        resultval->value_ = r_val->value_;
+
+        resultval->overwrite_alloc_ = 1;
+        resultval->overwrite_ = result_data[3];
   
         // remember right neighbor value
         resultval->right_alloc_ = 1;
-        resultval->right_value_ = r_val2->value_;
-        resultval->right_level_ = r_val2->level_;
-      //  std::cout << "result x value : " << resultval->x_ << " result right level : " << resultval->right_level_ << " result right alloc: " << resultval->right_alloc_ << " result level: " << resultval->level_ << " result right value : " << resultval->right_value_ << " result value " << resultval->value_ << std::endl;
-        
+        resultval->right_ = result_data[4];
+
+        resultval->left_alloc_ = 0;
+
+        components::stubs::memory_block::free(result_data[0]);
+        components::stubs::memory_block::free(result_data[1]);
+        components::stubs::memory_block::free(result_data[2]);
+        components::stubs::memory_block::free(result_data[5]);
+        components::stubs::memory_block::free(result_data[6]);
+        components::stubs::memory_block::free(result_data[7]);
         // release result data
-        for (std::size_t i = 0; i < result_data.size(); ++i) 
-            components::stubs::memory_block::free(result_data[i]);
+        //for (std::size_t i = 0; i < result_data.size(); ++i) 
+        //    components::stubs::memory_block::free(result_data[i]);
       }
 
       return 0;
@@ -461,42 +690,34 @@ namespace hpx { namespace components { namespace amr
             do_logging ? logging_type : components::component_invalid,
             level, x, par));
 
-     //  if using mesh_left
-//#if 0
-      access_memory_block<stencil_data> r_val1, r_val2, r_val3, resultval;
-      boost::tie(r_val1, r_val2, r_val3, resultval) = 
-          get_memory_block_async<stencil_data>(result_data[2], result_data[4], result_data[6], result);
-      //overwrite the coarse point computation
-      resultval->value_ = r_val2->value_;
-  
-      // remember neighbor value
-      resultval->right_alloc_ = 1;
-      resultval->right_value_ = r_val3->value_;
-      resultval->right_level_ = r_val3->level_;
-
-      resultval->left_alloc_ = 1;
-      resultval->left_value_ = r_val1->value_;
-      resultval->left_level_ = r_val1->level_;
-//#endif
-
-     // if using mesh_tapered
-#if 0
-     access_memory_block<stencil_data> r_val1, r_val2, resultval;
-     boost::tie(r_val1, r_val2, resultval) = 
-     get_memory_block_async<stencil_data>(result_data[3], result_data[4], result);
-
+      //  using mesh_left
+      access_memory_block<stencil_data> r_val, resultval;
+      boost::tie(r_val, resultval) = 
+          get_memory_block_async<stencil_data>(result_data[4], result);
+ 
       // overwrite the coarse point computation
-      resultval->value_ = r_val1->value_;
-  
+      resultval->value_ = r_val->value_;
+ 
+      resultval->overwrite_alloc_ = 1;
+      resultval->overwrite_ = result_data[4];
+   
       // remember neighbor value
       resultval->right_alloc_ = 1;
-      resultval->right_value_ = r_val2->value_;
-      resultval->right_level_ = r_val2->level_;
-#endif
-      
+      resultval->right_ = result_data[6];
+ 
+      resultval->left_alloc_ = 1;
+      resultval->left_ = result_data[2];
+ 
+      components::stubs::memory_block::free(result_data[0]);
+      components::stubs::memory_block::free(result_data[1]);
+      components::stubs::memory_block::free(result_data[3]);
+      components::stubs::memory_block::free(result_data[5]);
+      components::stubs::memory_block::free(result_data[7]);
+      components::stubs::memory_block::free(result_data[8]);
+ 
       // release result data
-      for (std::size_t i = 0; i < result_data.size(); ++i) 
-          components::stubs::memory_block::free(result_data[i]);
+      //for (std::size_t i = 0; i < result_data.size(); ++i) 
+      //    components::stubs::memory_block::free(result_data[i]);
 
       return 0;
     }

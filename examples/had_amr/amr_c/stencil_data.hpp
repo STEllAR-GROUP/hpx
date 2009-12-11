@@ -22,12 +22,12 @@ struct stencil_data
     double value_;            // current value
     double x_;      // x coordinate value
     bool refine_;     // whether to refine
-    double right_value_;
-    size_t right_level_;
+    gid overwrite_; // gid of overwrite stencil point
+    gid right_;     // gid of right stencil point
+    gid left_;      // gid of left stencil point
     size_t right_alloc_;
-    double left_value_;
-    size_t left_level_;
     size_t left_alloc_;
+    size_t overwrite_alloc_;
 
 #if defined(__cplusplus)
 private:
