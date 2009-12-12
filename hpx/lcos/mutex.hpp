@@ -127,7 +127,7 @@ namespace hpx { namespace lcos { namespace detail
                 &active_count_, lock_flag_bit);
         }
 
-        void mark_waiting_and_try_lock(long& old_count)
+        void mark_waiting_and_try_lock(boost::int32_t& old_count)
         {
             using namespace boost::lockfree;
 
@@ -145,7 +145,7 @@ namespace hpx { namespace lcos { namespace detail
             }
         }
 
-        void clear_waiting_and_try_lock(long& old_count)
+        void clear_waiting_and_try_lock(boost::int32_t& old_count)
         {
             using namespace boost::lockfree;
 
