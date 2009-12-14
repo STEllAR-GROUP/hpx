@@ -57,7 +57,7 @@ int evaluate_timestep(stencil_data const* left, stencil_data const* middle,
     result->timestep_ = middle->timestep_ + 1.0/pow(2.0,(int) middle->level_);
     result->level_ = middle->level_;
     result->refine_ = true;
-    //if (gidsize < 5) result->refine_ = false;
+    if (gidsize < 5) result->refine_ = false;
     /*
     result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
     */

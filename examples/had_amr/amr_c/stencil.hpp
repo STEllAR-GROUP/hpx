@@ -7,6 +7,7 @@
 #define HPX_COMPONENTS_AMR_STENCIL_OCT_17_2008_0847AM
 
 #include "../amr/server/functional_component.hpp"
+#include "stencil_data.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
@@ -64,6 +65,10 @@ namespace hpx { namespace components { namespace amr
 
         /// The init function initializes this stencil point
         void init(std::size_t, naming::id_type const&);
+
+        int findpoint(access_memory_block<stencil_data> const& lookright,
+                      access_memory_block<stencil_data> const& lookleft,
+                      access_memory_block<stencil_data> & resultval);
 
         /// floating point comparison (for coordinates)
         int floatcmp(double x1,double x2);

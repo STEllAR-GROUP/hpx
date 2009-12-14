@@ -29,7 +29,7 @@ namespace hpx { namespace components { namespace amr
 
     int stencil::floatcmp(double x1,double x2) {
       // compare to floating point numbers
-      double epsilon = 1.e-8;
+      double epsilon = 1.e-5;
       if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
         // the numbers are close enough for coordinate comparison
         return 1;
@@ -251,70 +251,11 @@ namespace hpx { namespace components { namespace amr
         // avoid interpolation if possible
         int s1,s3,s5,s7;
         s1 = 0; s3 = 0; s5 = 0; s7 = 0;
-        // ------------------------------------------------------------------------------------------------
-        if ( mval[0]->right_alloc_ == 1 ) {
-          access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[0]->right_);
-          if ( floatcmp(amb->x_,mval[1]->x_) ) {
-            mval[1]->value_ = amb->value_;
-            s1 = 1;
-          } 
-        }
 
-        if (mval[1]->left_alloc_ == 1 && s1 == 0) {
-          access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[1]->left_);
-          if ( floatcmp(amb->x_,mval[1]->x_) ) {
-            mval[1]->value_ = amb->value_;
-            s1 = 1;
-          }
-        }
-
-        // ------------------------------------------------------------------------------------------------
-        if ( mval[1]->right_alloc_ == 1 ) {
-          access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[1]->right_);
-          if ( floatcmp(amb->x_,mval[3]->x_) ) {
-            mval[3]->value_ = amb->value_;
-            s3 = 1;
-          }
-        } 
-        if (mval[2]->left_alloc_ == 1 && s3 == 0) {
-          access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[2]->left_);
-          if ( floatcmp(amb->x_,mval[3]->x_) ) {
-            mval[3]->value_ = amb->value_;
-            s3 = 1;
-          }
-        }
-        // ------------------------------------------------------------------------------------------------
-        if ( mval[2]->right_alloc_ == 1 ) {
-          access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[2]->right_);
-          if ( floatcmp(amb->x_,mval[5]->x_) ) {
-            mval[5]->value_ = amb->value_;
-            s5 = 1;
-          }
-        } 
-        if (mval[3]->left_alloc_ == 1 && s5 == 0) {
-          access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[3]->left_);
-          if ( floatcmp(amb->x_,mval[5]->x_) ) {
-            mval[5]->value_ = amb->value_;
-            s5 = 1;
-          }
-        }
-        // ------------------------------------------------------------------------------------------------
-        if ( mval[3]->right_alloc_ == 1 ) {
-          access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[3]->right_);
-          if ( floatcmp(amb->x_,mval[7]->x_) ) {
-            mval[7]->value_ = amb->value_;
-            s7 = 1;
-          }
-        } 
-        if (mval[4]->left_alloc_ == 1 && s7 == 0) {
-          access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[4]->left_);
-          if ( floatcmp(amb->x_,mval[7]->x_) ) {
-            mval[7]->value_ = amb->value_;
-            s7 = 1;
-          }
-        }
-        // ------------------------------------------------------------------------------------------------
-
+        s1 = findpoint(mval[0],mval[1],mval[1]);
+        s3 = findpoint(mval[1],mval[2],mval[3]);
+        s5 = findpoint(mval[2],mval[3],mval[5]);
+        s7 = findpoint(mval[3],mval[4],mval[7]);
 
         if ( par.linearbounds == 1 ) {
           // linear interpolation
@@ -413,184 +354,11 @@ namespace hpx { namespace components { namespace amr
         // avoid interpolation if possible
         int s0,s2,s4,s6;
         s0 = 0; s2 = 0; s4 = 0; s6 = 0;
-        // ------------------------------------------------------------------------------------------------
-        // look right
-        access_memory_block<stencil_data> amb0;
-        amb0 = mval[0];
-        while (s0 == 0 && amb0->right_alloc_ == 1) {
-          access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->right_);
-          if ( floatcmp(amb1->x_,mval[0]->x_) ) {
-            mval[0]->value_ = amb1->value_;
-            s0 = 1;
-          } else if ( amb1->x_ > mval[0]->x_ ) {
-            // look to the right again
-            naming::id_type tmp = amb0->right_;
-            amb0 = hpx::components::stubs::memory_block::get(tmp);
-          } else if ( amb1->x_ < mval[0]->x_ ) {
-            // you overshot it -- check the overwrite gid
-            if (amb0->overwrite_alloc_ == 1) {
-              naming::id_type tmp = amb0->overwrite_;
-              amb0 = hpx::components::stubs::memory_block::get(tmp);
-            } else {
-              break;
-            }
-          }
-        }
 
-        // look left
-        amb0 = mval[1];
-        while (s0 == 0 && amb0->left_alloc_ == 1) {
-          access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->left_);
-          if ( floatcmp(amb1->x_,mval[0]->x_) ) {
-            mval[0]->value_ = amb1->value_;
-            s0 = 1;
-          } else if ( amb1->x_ < mval[0]->x_  ) {
-            // you overshot it -- check the overwrite gid
-            if (amb0->overwrite_alloc_ == 1) {
-              naming::id_type tmp = amb0->overwrite_;
-              amb0 = hpx::components::stubs::memory_block::get(tmp);
-            } else {
-              break;
-            }
-          } else if ( amb1->x_ > mval[0]->x_ ) {
-            // look left again
-            naming::id_type tmp = amb0->left_;
-            amb0 = hpx::components::stubs::memory_block::get(tmp);
-          }
-        }
-        // ------------------------------------------------------------------------------------------------
-        // look right
-        amb0 = mval[1];
-        while (s2 == 0 && amb0->right_alloc_ == 1) {
-          access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->right_);
-          if ( floatcmp(amb1->x_,mval[2]->x_) ) {
-            mval[2]->value_ = amb1->value_;
-            s2 = 1;
-          } else if ( amb1->x_ > mval[2]->x_ ) {
-            // look to the right again
-            naming::id_type tmp = amb0->right_;
-            amb0 = hpx::components::stubs::memory_block::get(tmp);
-          } else if ( amb1->x_ < mval[2]->x_ ) {
-            // you overshot it -- check the overwrite gid
-            if (amb0->overwrite_alloc_ == 1) {
-              naming::id_type tmp = amb0->overwrite_;
-              amb0 = hpx::components::stubs::memory_block::get(tmp);
-            } else {
-              break;
-            }
-          }
-        }
-
-        // look left
-        amb0 = mval[2];
-        while (s2 == 0 && amb0->left_alloc_ == 1) {
-          access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->left_);
-          if ( floatcmp(amb1->x_,mval[2]->x_) ) {
-            mval[2]->value_ = amb1->value_;
-            s2 = 1;
-          } else if ( amb1->x_ < mval[2]->x_  ) {
-            // you overshot it -- check the overwrite gid
-            if (amb0->overwrite_alloc_ == 1) {
-              naming::id_type tmp = amb0->overwrite_;
-              amb0 = hpx::components::stubs::memory_block::get(tmp);
-            } else {
-              break;
-            }
-          } else if ( amb1->x_ > mval[2]->x_ ) {
-            // look left again
-            naming::id_type tmp = amb0->left_;
-            amb0 = hpx::components::stubs::memory_block::get(tmp);
-          }
-        }
-        // ------------------------------------------------------------------------------------------------
-        // look right
-        amb0 = mval[2];
-        while (s4 == 0 && amb0->right_alloc_ == 1) {
-          access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->right_);
-          if ( floatcmp(amb1->x_,mval[4]->x_) ) {
-            mval[4]->value_ = amb1->value_;
-            s4 = 1;
-          } else if ( amb1->x_ > mval[4]->x_ ) {
-            // look to the right again
-            naming::id_type tmp = amb0->right_;
-            amb0 = hpx::components::stubs::memory_block::get(tmp);
-          } else if ( amb1->x_ < mval[4]->x_ ) {
-            // you overshot it -- check the overwrite gid
-            if (amb0->overwrite_alloc_ == 1) {
-              naming::id_type tmp = amb0->overwrite_;
-              amb0 = hpx::components::stubs::memory_block::get(tmp);
-            } else {
-              break;
-            }
-          }
-        }
-
-        // look left
-        amb0 = mval[3];
-        while (s4 == 0 && amb0->left_alloc_ == 1) {
-          access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->left_);
-          if ( floatcmp(amb1->x_,mval[4]->x_) ) {
-            mval[4]->value_ = amb1->value_;
-            s4 = 1;
-          } else if ( amb1->x_ < mval[4]->x_  ) {
-            // you overshot it -- check the overwrite gid
-            if (amb0->overwrite_alloc_ == 1) {
-              naming::id_type tmp = amb0->overwrite_;
-              amb0 = hpx::components::stubs::memory_block::get(tmp);
-            } else {
-              break;
-            }
-          } else if ( amb1->x_ > mval[4]->x_ ) {
-            // look left again
-            naming::id_type tmp = amb0->left_;
-            amb0 = hpx::components::stubs::memory_block::get(tmp);
-          }
-        }
-        // ------------------------------------------------------------------------------------------------
-        // look right
-        amb0 = mval[3];
-        while (s6 == 0 && amb0->right_alloc_ == 1) {
-          access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->right_);
-          if ( floatcmp(amb1->x_,mval[6]->x_) ) {
-            mval[6]->value_ = amb1->value_;
-            s6 = 1;
-          } else if ( amb1->x_ > mval[6]->x_ ) {
-            // look to the right again
-            naming::id_type tmp = amb0->right_;
-            amb0 = hpx::components::stubs::memory_block::get(tmp);
-          } else if ( amb1->x_ < mval[6]->x_ ) {
-            // you overshot it -- check the overwrite gid
-            if (amb0->overwrite_alloc_ == 1) {
-              naming::id_type tmp = amb0->overwrite_;
-              amb0 = hpx::components::stubs::memory_block::get(tmp);
-            } else {
-              break;
-            }
-          }
-        }
-
-        // look left
-        amb0 = mval[4];
-        while (s6 == 0 && amb0->left_alloc_ == 1) {
-          access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->left_);
-          if ( floatcmp(amb1->x_,mval[6]->x_) ) {
-            mval[6]->value_ = amb1->value_;
-            s6 = 1;
-          } else if ( amb1->x_ < mval[6]->x_  ) {
-            // you overshot it -- check the overwrite gid
-            if (amb0->overwrite_alloc_ == 1) {
-              naming::id_type tmp = amb0->overwrite_;
-              amb0 = hpx::components::stubs::memory_block::get(tmp);
-            } else {
-              break;
-            }
-          } else if ( amb1->x_ > mval[6]->x_ ) {
-            // look left again
-            naming::id_type tmp = amb0->left_;
-            amb0 = hpx::components::stubs::memory_block::get(tmp);
-          }
-        }
-        // ------------------------------------------------------------------------------------------------
+        s0 = findpoint(mval[0],mval[1],mval[0]);
+        s2 = findpoint(mval[1],mval[2],mval[2]);
+        s4 = findpoint(mval[2],mval[3],mval[4]);
+        s6 = findpoint(mval[3],mval[4],mval[6]);
 
         if ( par.linearbounds == 1 ) {
           mval[0]->value_ = 0.5*(t1 + t2);
@@ -741,6 +509,59 @@ namespace hpx { namespace components { namespace amr
                 stubs::logging::logentry(log_, val.get(), row, par);
         }
         return result;
+    }
+
+    int stencil::findpoint(access_memory_block<stencil_data> const& lookright,
+                           access_memory_block<stencil_data> const& lookleft, 
+                           access_memory_block<stencil_data> & resultval) 
+    {
+      int s = 0;
+      access_memory_block<stencil_data> amb0;
+      amb0 = lookright;
+      // look right
+      while (s == 0 && amb0->right_alloc_ == 1) {
+        access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->right_);
+        if ( floatcmp(amb1->x_,resultval->x_) ) {
+          resultval->value_ = amb1->value_;
+          s = 1;
+        } else if ( amb1->x_ < resultval->x_ ) {
+          // look to the right again
+          naming::id_type tmp = amb0->right_;
+          amb0 = hpx::components::stubs::memory_block::get(tmp);
+        } else if ( amb1->x_ > resultval->x_ ) {
+          // you overshot it -- check the overwrite gid
+          if (amb0->overwrite_alloc_ == 1) {
+            naming::id_type tmp = amb0->overwrite_;
+            amb0 = hpx::components::stubs::memory_block::get(tmp);
+          } else {
+            break;
+          }
+        }
+      }
+
+      // look left
+      amb0 = lookleft;
+      while (s == 0 && amb0->left_alloc_ == 1) {
+        access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->left_);
+        if ( floatcmp(amb1->x_,resultval->x_) ) {
+          resultval->value_ = amb1->value_;
+          s = 1;
+        } else if ( amb1->x_ < resultval->x_  ) {
+          // you overshot it -- check the overwrite gid
+          if (amb0->overwrite_alloc_ == 1) {
+            naming::id_type tmp = amb0->overwrite_;
+            amb0 = hpx::components::stubs::memory_block::get(tmp);
+          } else {
+            break;
+          }
+        } else if ( amb1->x_ > resultval->x_ ) {
+          // look left again
+          naming::id_type tmp = amb0->left_;
+          amb0 = hpx::components::stubs::memory_block::get(tmp);
+        }
+      }
+
+      return s;
     }
 
     void stencil::init(std::size_t numsteps, naming::id_type const& logging)
