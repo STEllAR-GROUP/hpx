@@ -123,6 +123,14 @@ namespace boost { namespace lockfree
         return *addr;
     }
 
+    // same implementation, but for long
+    inline long interlocked_compare_exchange(long volatile* addr, long old, long nw)
+    {
+        if (OSAtomicCompareAndSwapLong(old, nw, addr))
+            return old;
+        return *addr;
+    }
+
 //     inline int64_t interlocked_compare_exchange(int64_t volatile* addr, int64_t old, int64_t nw)
 //     {
 //         if (OSAtomicCompareAndSwap64(old, nw, addr))
