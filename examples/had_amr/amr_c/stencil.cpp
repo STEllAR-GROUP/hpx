@@ -29,7 +29,7 @@ namespace hpx { namespace components { namespace amr
 
     int stencil::floatcmp(double x1,double x2) {
       // compare to floating point numbers
-      double epsilon = 1.e-5;
+      double epsilon = 1.e-8;
       if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
         // the numbers are close enough for coordinate comparison
         return 1;
