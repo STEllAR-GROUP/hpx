@@ -561,7 +561,7 @@ namespace hpx { namespace threads
         // register performance counters
         manage_counter queue_length_counter; 
         if (is_master_thread) {
-            std::string name("/queue(threadmanager_impl)/length");
+            std::string name("/queue(threadmanager)/length");
             queue_length_counter.install(name, 
                 boost::bind(&scheduling_policy_type::get_queue_lengths, 
                     &scheduler_, num_thread));
