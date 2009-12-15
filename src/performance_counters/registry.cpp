@@ -111,7 +111,7 @@ namespace hpx { namespace performance_counters
         }
 
         // register the conical name with AGAS
-        agas_client_.registerid(complemented_info.fullname_, id, ec);
+        agas_client_.registerid(complemented_info.fullname_, newid, ec);
         if (ec) return status_invalid_data;
 
         id = newid;
