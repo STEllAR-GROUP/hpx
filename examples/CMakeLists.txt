@@ -6,10 +6,12 @@
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     # Removes AMR example when building on for Mac OS X
     set(example_SUBDIRS 
-        accumulator generic naming parcelset quickstart)
+        quickstart
+        heart_beat)
 else()
     set(example_SUBDIRS 
-        accumulator had_amr generic naming parcelset quickstart)
+        quickstart
+        heart_beat)
 endif()
 
 foreach(subdir ${example_SUBDIRS})
