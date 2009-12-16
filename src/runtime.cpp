@@ -328,23 +328,46 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::run(
         boost::function<hpx_main_function_type> func,
-        std::size_t num_threads)
+        std::size_t num_threads, std::size_t num_localities)
     {
         // start the main thread function
         start(func, num_threads);
 
-        // if we're not the console, we'll pull the console's configuration 
-        // information and merge it with ours
-        if (mode_ == worker) {
-            error_code ec;
-            naming::id_type console_prefix;
-            if (agas_client_.get_console_prefix(console_prefix, ec))
-            {
-                util::section ini;
-                components::stubs::runtime_support::get_config(console_prefix, ini);
-                ini_.add_section("application", ini);
+        // if there are more than one localities involved, wait for all
+        // to get registered
+        if (num_localities > 1) {
+            bool foundall = false;
+            for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i) {
+                std::vector<naming::id_type> prefixes;
+                error_code ec;
+                if (agas_client_.get_prefixes(prefixes, ec) &&
+                    num_localities == prefixes.size()+1) 
+                {
+                    foundall = true;
+                    break;
+                }
+
+                boost::this_thread::sleep(boost::get_system_time() + 
+                    boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+            } 
+            if (!foundall) {
+                HPX_THROW_EXCEPTION(startup_timed_out, "runtime::run", 
+                    "timed out while waiting for other localities");
             }
         }
+
+        // if we're not the console, we'll pull the console configuration 
+        // information and merge it with ours
+//         if (mode_ == worker) {
+//             error_code ec;
+//             naming::id_type console_prefix;
+//             if (agas_client_.get_console_prefix(console_prefix, ec))
+//             {
+//                 util::section ini;
+//                 components::stubs::runtime_support::get_config(console_prefix, ini);
+//                 ini_.add_section("application", ini);
+//             }
+//         }
 
         // now wait for everything to finish
         int result = wait();
@@ -355,23 +378,46 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::run(
-        std::size_t num_threads)
+        std::size_t num_threads, std::size_t num_localities)
     {
         // start the main thread function
         start(boost::function<hpx_main_function_type>(), num_threads);
 
-        // if we're not the console, we'll pull the console's configuration 
-        // information and merge it with ours
-        if (mode_ == worker) {
-            error_code ec;
-            naming::id_type console_prefix;
-            if (agas_client_.get_console_prefix(console_prefix, ec))
-            {
-                util::section ini;
-                components::stubs::runtime_support::get_config(console_prefix, ini);
-                ini_.merge(ini);
+        // if there are more than one localities involved, wait for all
+        // to get registered
+        if (num_localities > 1) {
+            bool foundall = false;
+            for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i) {
+                std::vector<naming::id_type> prefixes;
+                error_code ec;
+                if (agas_client_.get_prefixes(prefixes, ec) &&
+                    num_localities == prefixes.size()+1) 
+                {
+                    foundall = true;
+                    break;
+                }
+
+                boost::this_thread::sleep(boost::get_system_time() + 
+                    boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+            } 
+            if (!foundall) {
+                HPX_THROW_EXCEPTION(startup_timed_out, "runtime::run", 
+                    "timed out while waiting for other localities");
             }
         }
+
+        // if we're not the console, we'll pull the console configuration 
+        // information and merge it with ours
+//         if (mode_ == worker) {
+//             error_code ec;
+//             naming::id_type console_prefix;
+//             if (agas_client_.get_console_prefix(console_prefix, ec))
+//             {
+//                 util::section ini;
+//                 components::stubs::runtime_support::get_config(console_prefix, ini);
+//                 ini_.merge(ini);
+//             }
+//         }
 
         // now wait for everything to finish
         int result = wait();
