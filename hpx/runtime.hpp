@@ -286,7 +286,7 @@ namespace hpx
         ///                   object given by the parameter \p func.
         int run(boost::function<hpx_main_function_type> func =
                     boost::function<hpx_main_function_type>(), 
-                std::size_t num_threads = 1);
+                std::size_t num_threads = 1, std::size_t num_localities = 1);
 
         /// \brief Run the HPX runtime system, initially use the given number 
         ///        of (OS) threads in the threadmanager and block waiting for
@@ -296,7 +296,7 @@ namespace hpx
         ///                   by the threadmanager. 
         ///
         /// \returns          This function will always return 0 (zero).
-        int run(std::size_t num_threads);
+        int run(std::size_t num_threads, std::size_t num_localities = 1);
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Connection>
