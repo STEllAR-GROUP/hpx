@@ -131,8 +131,12 @@ namespace hpx { namespace naming
         ///                   parameter \a ec. Otherwise it throws and instance
         ///                   of hpx#exception.
         bool get_prefixes(std::vector<id_type>& prefixes,
-            components::component_type type = components::component_invalid,
-            error_code& ec = throws) const;
+            components::component_type type, error_code& ec = throws) const;
+        bool get_prefixes(std::vector<id_type>& prefixes, 
+            error_code& ec = throws) const
+        {
+            return get_prefixes(prefixes, components::component_invalid, ec);
+        }
 
         /// \brief Return a unique id usable as a component type.
         /// 

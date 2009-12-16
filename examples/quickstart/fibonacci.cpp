@@ -135,6 +135,9 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("hpx,x", po::value<std::string>(), 
                 "the IP address the HPX parcelport is listening on (default "
                 "is localhost:7910), expected format: 192.168.1.1:7913")
+            ("localities,l", po::value<int>(), 
+                "the number of localities to wait for at application startup"
+                "(default is 1)")
             ("threads,t", po::value<int>(), 
                 "the number of operating system threads to spawn for this"
                 "HPX locality")
@@ -220,6 +223,7 @@ int main(int argc, char* argv[])
         std::string hpx_host("localhost"), agas_host;
         boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
         int num_threads = 1;
+        int num_localities = 1;
         int argument = 10;
         hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
         int delay_coeff = 0;
@@ -230,6 +234,9 @@ int main(int argc, char* argv[])
 
         if (vm.count("hpx")) 
             split_ip_address(vm["hpx"].as<std::string>(), hpx_host, hpx_port);
+
+        if (vm.count("localities"))
+            num_localities = vm["localities"].as<int>();
 
         if (vm.count("threads"))
             num_threads = vm["threads"].as<int>();
@@ -259,7 +266,7 @@ int main(int argc, char* argv[])
         // initialize and start the HPX runtime
         runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
         if (mode == hpx::runtime::worker) {
-            rt.run(num_threads);
+            rt.run(num_threads, num_localities);
         }
         else {
             // if we've got a configuration file (as console) we read it in,
@@ -271,7 +278,8 @@ int main(int argc, char* argv[])
             }
 
             rt.run(boost::bind(hpx_main, argument, delay_coeff, 
-                boost::ref(result), boost::ref(elapsed)), num_threads);
+                boost::ref(result), boost::ref(elapsed)), num_threads, 
+                num_localities);
 
             if (vm.count("csv")) {
                 // write results as csv

@@ -54,28 +54,6 @@ namespace hpx { namespace threads { namespace detail
                 parent_locality_prefix_ = applier::get_prefix_id();
         }
 
-//         thread(function_type func, thread_id_type id, thread_state newstate,
-//                 char const* const description, thread_id_type parent_id,
-//                 boost::uint32_t parent_prefix, naming::address::address_type lva)
-//           : coroutine_(func, id), 
-//             current_state_(newstate), 
-//             current_state_ex_(wait_signaled),
-//             description_(description), 
-//             parent_thread_id_(parent_id),
-//             parent_locality_prefix_(parent_prefix)
-//             component_id_(lva)
-//         {
-//             // store the thread id of the parent thread, mainly for debugging 
-//             // purposes
-//             if (0 == parent_thread_id_) {
-//                 thread_self* self = get_self_ptr();
-//                 if (self)
-//                     parent_thread_id_ = self->get_thread_id();
-//             }
-//             if (0 == parent_locality_prefix_) 
-//                 parent_locality_prefix_ = applier::get_prefix_id();
-//         }
-
         /// This constructor is provided just for compatibility with the scheme
         /// of component creation. But since threads never get created 
         /// by a factory (runtime_support) instance, we can leave this 
@@ -107,15 +85,15 @@ namespace hpx { namespace threads { namespace detail
         {
             using namespace boost::lockfree;
             return static_cast<thread_state>(
-                interlocked_read_acquire(const_cast<long*>(&current_state_)));
+                interlocked_read_acquire(&current_state_));
         }
 
         thread_state set_state(thread_state newstate)
         {
             using namespace boost::lockfree;
             for (;;) {
-                long prev_state = current_state_;
-                if (likely(CAS(&current_state_, prev_state, (long)newstate)))
+                boost::int32_t prev_state = current_state_;
+                if (likely(CAS(&current_state_, prev_state, (boost::int32_t)newstate)))
                     return static_cast<thread_state>(prev_state);
             }
         }
@@ -123,10 +101,13 @@ namespace hpx { namespace threads { namespace detail
         thread_state set_state(thread_state newstate, thread_state old_state)
         {
             using namespace boost::lockfree;
-            if (likely(CAS(&current_state_, (long)old_state, (long)newstate)))
+            if (likely(CAS(&current_state_, (boost::int32_t)old_state, 
+                    (boost::int32_t)newstate)))
+            {
                 return old_state;
+            }
 
-            long current_state = interlocked_read_acquire(&current_state_);
+            boost::int32_t current_state = interlocked_read_acquire(&current_state_);
             if (current_state != marked_for_suspension &&
                 newstate != terminated)
             {
@@ -140,15 +121,15 @@ namespace hpx { namespace threads { namespace detail
         {
             using namespace boost::lockfree;
             return static_cast<thread_state_ex>(
-                interlocked_read_acquire(const_cast<long*>(&current_state_ex_)));
+                interlocked_read_acquire(&current_state_ex_));
         }
 
         thread_state_ex set_state_ex(thread_state_ex newstate_ex)
         {
             using namespace boost::lockfree;
             for (;;) {
-                long prev_state = current_state_ex_;
-                if (likely(CAS(&current_state_ex_, prev_state, (long)newstate_ex)))
+                boost::int32_t prev_state = current_state_ex_;
+                if (likely(CAS(&current_state_ex_, prev_state, (boost::int32_t)newstate_ex)))
                     return static_cast<thread_state_ex>(prev_state);
             }
         }
@@ -193,9 +174,9 @@ namespace hpx { namespace threads { namespace detail
 
     private:
         coroutine_type coroutine_;
-        // the state is stored as a long to allow to use CAS
-        long current_state_;
-        long current_state_ex_;
+        // the state is stored as a boost::int32_t to allow to use CAS
+        mutable boost::int32_t current_state_;
+        mutable boost::int32_t current_state_ex_;
 
         // all of the following is debug/logging support information
         char const* const description_;

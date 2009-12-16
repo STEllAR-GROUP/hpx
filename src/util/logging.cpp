@@ -714,6 +714,8 @@ namespace hpx { namespace util { namespace detail
         }
     }
 
+#undef HPX_TIMEFORMAT
+
     struct init_logging_tag {};
     std::vector<std::string> const& get_logging_data()
     {

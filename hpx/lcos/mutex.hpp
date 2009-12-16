@@ -265,11 +265,10 @@ namespace hpx { namespace lcos { namespace detail
 
         void unlock()
         {
+            BOOST_ASSERT(active_count_ & lock_flag_value);
+
             using namespace boost::lockfree;
-            BOOST_VERIFY(
-                interlocked_exchange_add(&active_count_, lock_flag_value) & 
-                    lock_flag_value
-            );
+            interlocked_exchange_add(&active_count_, lock_flag_value);
             set_event();
         }
 
