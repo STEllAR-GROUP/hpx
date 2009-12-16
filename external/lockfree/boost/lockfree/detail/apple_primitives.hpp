@@ -131,12 +131,19 @@ namespace boost { namespace lockfree
         return *addr;
     }
 
-//     inline int64_t interlocked_compare_exchange(int64_t volatile* addr, int64_t old, int64_t nw)
-//     {
-//         if (OSAtomicCompareAndSwap64(old, nw, addr))
-//             return old;
-//         return *addr;
-//     }
+    inline int64_t interlocked_compare_exchange(int64_t volatile* addr, int64_t old, int64_t nw)
+    {
+        if (OSAtomicCompareAndSwap64(old, nw, addr))
+            return old;
+        return *addr;
+    }
+    
+    inline void* interlocked_compare_exchange(void *volatile *addr, void *old, void *nw)
+    {
+        if (OSAtomicCompareAndSwapPtr(old, nw, addr))
+            return old;
+        return *(void**)addr;
+    }
 
     inline bool interlocked_bit_test_and_set(boost::int32_t volatile* x, boost::int32_t bit)
     {
@@ -214,7 +221,7 @@ namespace boost { namespace lockfree
     template <typename T>
     inline T interlocked_exchange(T volatile *orig, T val)
     {
-        return interlocked_compare_exchange(orig, *(T*)orig, val);
+        return interlocked_compare_exchange(orig, *orig, val);
     }
 
     ///////////////////////////////////////////////////////////////////////////
