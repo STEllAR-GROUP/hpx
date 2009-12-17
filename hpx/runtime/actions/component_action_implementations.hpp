@@ -229,7 +229,7 @@
             threads::thread_init_data& data)
         {
             data.lva = lva;
-            data.func = this->construct_thread_function(lva,
+            data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
             data.description = detail::get_action_name<BOOST_PP_CAT(result_action, N)>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
@@ -315,7 +315,7 @@
             threads::thread_init_data& data)
         {
             data.lva = lva;
-            data.func = this->construct_thread_function(lva,
+            data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
             data.description = detail::get_action_name<BOOST_PP_CAT(direct_result_action, N)>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
@@ -525,7 +525,7 @@
             threads::thread_init_data& data)
         {
             data.lva = lva;
-            data.func = this->construct_thread_function(lva,
+            data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
             data.description = detail::get_action_name<BOOST_PP_CAT(action, N)>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
@@ -624,7 +624,7 @@
             threads::thread_init_data& data)
         {
             data.lva = lva;
-            data.func = this->construct_thread_function(lva,
+            data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
             data.description = detail::get_action_name<BOOST_PP_CAT(direct_action, N)>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);

@@ -206,7 +206,7 @@ namespace hpx { namespace actions
             threads::thread_init_data& data)
         {
             data.lva = lva;
-            data.func = this->construct_thread_function(lva);
+            data.func = this->construct_thread_function(cont, lva);
             data.description = detail::get_action_name<plain_result_action0>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
@@ -286,7 +286,7 @@ namespace hpx { namespace actions
             threads::thread_init_data& data)
         {
             data.lva = lva;
-            data.func = this->construct_thread_function(lva);
+            data.func = this->construct_thread_function(cont, lva);
             data.description = detail::get_action_name<plain_direct_result_action0>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
@@ -437,7 +437,7 @@ namespace hpx { namespace actions
             threads::thread_init_data& data)
         {
             data.lva = lva;
-            data.func = this->construct_thread_function(lva);
+            data.func = this->construct_thread_function(cont, lva);
             data.description = detail::get_action_name<plain_action0>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
@@ -517,7 +517,7 @@ namespace hpx { namespace actions
             threads::thread_init_data& data)
         {
             data.lva = lva;
-            data.func = this->construct_thread_function(lva);
+            data.func = this->construct_thread_function(cont, lva);
             data.description = detail::get_action_name<plain_direct_action0>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;

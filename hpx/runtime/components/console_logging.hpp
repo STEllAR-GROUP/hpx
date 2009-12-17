@@ -26,35 +26,56 @@ namespace hpx { namespace components
 
     struct pending_logs
     {
-        typedef boost::mutex mutex_type;    // use boost::mutex for now
+        typedef boost::recursive_mutex mutex_type;    // use boost::mutex for now
 
-        pending_logs() : has_pending_(false) {}
+        pending_logs() : has_pending_(false), sending_logs_(false) {}
 
         void handle_pending(naming::id_type const& prefix, 
             server::logging_destination dest, int level)
         {
             if (has_pending_) {
                 // log all pending messages first
-                mutex_type::scoped_lock l(mtx_);
-                BOOST_FOREACH(std::string const& s, pending_) 
-                    console_logging_locked(prefix, dest, level, s);
-                std::vector<std::string>().swap(pending_);
-                has_pending_ = false;
+                mutex_type::scoped_lock l(mtx_, boost::defer_lock);
+                if (l.try_lock()) {
+                    BOOST_FOREACH(std::string const& s, pending_) 
+                        console_logging_locked(prefix, dest, level, s);
+                    std::vector<std::string>().swap(pending_);
+                    has_pending_ = false;
+                }
             }
         }
 
         void add_pending(std::string const& msg)
         {
-            mutex_type::scoped_lock l(mtx_);
-            pending_.push_back(msg);
-            has_pending_ = true;
+            mutex_type::scoped_lock l(mtx_, boost::defer_lock);
+            if (l.try_lock()) {
+                pending_.push_back(msg);
+                has_pending_ = true;
+            }
         }
 
         mutex_type mtx_;
         std::vector<std::string> pending_;
         bool has_pending_;
+        bool sending_logs_;
     };
     struct pending_logs_tag {};
+
+    struct reset_on_exit
+    {
+        reset_on_exit(bool& flag, bool new_value)
+          : flag_(flag), oldval_(flag)
+        {
+            flag_ = new_value;
+        }
+        ~reset_on_exit()
+        {
+            flag_ = oldval_;
+        }
+
+        bool& flag_;
+        bool oldval_;
+    };
 
     // stub function allowing to apply the console_logging action
     void console_logging(naming::id_type const& prefix, 
@@ -63,8 +84,14 @@ namespace hpx { namespace components
         // do logging only if applier is still valid
         util::static_<pending_logs, pending_logs_tag> logs;
         if (NULL != applier::get_applier_ptr()) {
-            logs.get().handle_pending(prefix, dest, level);
-            console_logging_locked(prefix, dest, level, msg);
+            if (logs.get().sending_logs_) {
+                logs.get().add_pending(msg);
+            }
+            else {
+                reset_on_exit exit(logs.get().sending_logs_, true);
+                logs.get().handle_pending(prefix, dest, level);
+                console_logging_locked(prefix, dest, level, msg);
+            }
         }
         else {
             logs.get().add_pending(msg);

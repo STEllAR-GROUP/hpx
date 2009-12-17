@@ -132,6 +132,10 @@ namespace hpx
         // 
         static void default_errorsink(boost::uint32_t, std::string const&);
 
+        //
+        threads::thread_state run_helper(
+            boost::function<runtime::hpx_main_function_type> func, int& result);
+
     public:
         typedef SchedulingPolicy scheduling_policy_type;
         typedef NotificationPolicy notification_policy_type;
@@ -214,7 +218,8 @@ namespace hpx
         ///                   parameter \p func. Otherwise it will return zero.
         int start(boost::function<hpx_main_function_type> func =
                 boost::function<hpx_main_function_type>(), 
-            std::size_t num_threads = 1, bool blocking = false);
+            std::size_t num_threads = 1, std::size_t num_localities = 1, 
+            bool blocking = false);
 
         /// \brief Start the runtime system
         ///
@@ -230,7 +235,8 @@ namespace hpx
         ///                   return the value as returned as the result of the 
         ///                   invocation of the function object given by the 
         ///                   parameter \p func. Otherwise it will return zero.
-        int start(std::size_t num_threads, bool blocking = false);
+        int start(std::size_t num_threads, std::size_t num_localities = 1, 
+            bool blocking = false);
 
         /// \brief Wait for the shutdown action to be executed
         ///

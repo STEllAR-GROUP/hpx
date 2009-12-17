@@ -165,18 +165,34 @@ namespace hpx
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    static threads::thread_state 
-    run_helper(boost::function<runtime::hpx_main_function_type> func, 
-        int& result)
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    threads::thread_state 
+    runtime_impl<SchedulingPolicy, NotificationPolicy>::run_helper(
+        boost::function<runtime::hpx_main_function_type> func, int& result)
     {
-        result = func();
+        // if we're not the console, we'll pull the console configuration 
+        // information and merge it with ours
+//         if (mode_ == worker) {
+//             error_code ec;
+//             naming::id_type console_prefix;
+//             if (agas_client_.get_console_prefix(console_prefix, ec))
+//             {
+//                 util::section ini;
+//                 components::stubs::runtime_support::get_config(console_prefix, ini);
+//                 ini_.add_section("application", ini);
+//             }
+//         }
+
+        // now, execute the user supplied thread function
+        if (!func.empty()) 
+            result = func();
         return threads::terminated;
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::start(
         boost::function<hpx_main_function_type> func, 
-        std::size_t num_threads, bool blocking)
+        std::size_t num_threads, std::size_t num_localities, bool blocking)
     {
 #if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINE_USE_FIBERS)
         // needs to be called to avoid problems at system startup
@@ -188,8 +204,8 @@ namespace hpx
 
         // start services (service threads)
         runtime_support_.run();
-        thread_manager_.run(num_threads);   // start the thread manager, timer_pool_ as well
         parcel_port_.run(false);            // starts parcel_pool_ as well
+        thread_manager_.run(num_threads);   // start the thread manager, timer_pool_ as well
 
         // register the runtime_support and memory instances with the AGAS 
         agas_client_.bind(applier_.get_runtime_support_gid(), 
@@ -202,12 +218,34 @@ namespace hpx
                 components::get_component_type<components::server::memory>(), 
                 &memory_));
 
-        // register the given main function with the thread manager
-        if (!func.empty()) {
-            threads::thread_init_data data(
-                boost::bind(run_helper, func, boost::ref(result_)), "hpx_main");
-            thread_manager_.register_thread(data);
+        // if there are more than one localities involved, wait for all
+        // to get registered
+        if (num_localities > 1) {
+            bool foundall = false;
+            for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i) {
+                std::vector<naming::id_type> prefixes;
+                error_code ec;
+                if (agas_client_.get_prefixes(prefixes, ec) &&
+                    num_localities == prefixes.size()) 
+                {
+                    foundall = true;
+                    break;
+                }
+
+                boost::this_thread::sleep(boost::get_system_time() + 
+                    boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+            } 
+            if (!foundall) {
+                HPX_THROW_EXCEPTION(startup_timed_out, "runtime::run", 
+                    "timed out while waiting for other localities");
+            }
         }
+
+        // register the given main function with the thread manager
+        threads::thread_init_data data(
+            boost::bind(&runtime_impl::run_helper, this, func, boost::ref(result_)), 
+            "hpx_main");
+        thread_manager_.register_thread(data);
 
         LRT_(info) << "runtime_impl: started using "  << num_threads << " OS threads";
 
@@ -220,10 +258,10 @@ namespace hpx
 
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::start(
-        std::size_t num_threads, bool blocking)
+        std::size_t num_threads, std::size_t num_localities, bool blocking)
     {
         boost::function<hpx_main_function_type> empty_main;
-        return start(empty_main, num_threads, blocking);
+        return start(empty_main, num_threads, num_localities, blocking);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -331,43 +369,7 @@ namespace hpx
         std::size_t num_threads, std::size_t num_localities)
     {
         // start the main thread function
-        start(func, num_threads);
-
-        // if there are more than one localities involved, wait for all
-        // to get registered
-        if (num_localities > 1) {
-            bool foundall = false;
-            for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i) {
-                std::vector<naming::id_type> prefixes;
-                error_code ec;
-                if (agas_client_.get_prefixes(prefixes, ec) &&
-                    num_localities == prefixes.size()+1) 
-                {
-                    foundall = true;
-                    break;
-                }
-
-                boost::this_thread::sleep(boost::get_system_time() + 
-                    boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
-            } 
-            if (!foundall) {
-                HPX_THROW_EXCEPTION(startup_timed_out, "runtime::run", 
-                    "timed out while waiting for other localities");
-            }
-        }
-
-        // if we're not the console, we'll pull the console configuration 
-        // information and merge it with ours
-//         if (mode_ == worker) {
-//             error_code ec;
-//             naming::id_type console_prefix;
-//             if (agas_client_.get_console_prefix(console_prefix, ec))
-//             {
-//                 util::section ini;
-//                 components::stubs::runtime_support::get_config(console_prefix, ini);
-//                 ini_.add_section("application", ini);
-//             }
-//         }
+        start(func, num_threads, num_localities);
 
         // now wait for everything to finish
         int result = wait();
@@ -381,43 +383,7 @@ namespace hpx
         std::size_t num_threads, std::size_t num_localities)
     {
         // start the main thread function
-        start(boost::function<hpx_main_function_type>(), num_threads);
-
-        // if there are more than one localities involved, wait for all
-        // to get registered
-        if (num_localities > 1) {
-            bool foundall = false;
-            for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i) {
-                std::vector<naming::id_type> prefixes;
-                error_code ec;
-                if (agas_client_.get_prefixes(prefixes, ec) &&
-                    num_localities == prefixes.size()+1) 
-                {
-                    foundall = true;
-                    break;
-                }
-
-                boost::this_thread::sleep(boost::get_system_time() + 
-                    boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
-            } 
-            if (!foundall) {
-                HPX_THROW_EXCEPTION(startup_timed_out, "runtime::run", 
-                    "timed out while waiting for other localities");
-            }
-        }
-
-        // if we're not the console, we'll pull the console configuration 
-        // information and merge it with ours
-//         if (mode_ == worker) {
-//             error_code ec;
-//             naming::id_type console_prefix;
-//             if (agas_client_.get_console_prefix(console_prefix, ec))
-//             {
-//                 util::section ini;
-//                 components::stubs::runtime_support::get_config(console_prefix, ini);
-//                 ini_.merge(ini);
-//             }
-//         }
+        start(num_threads, num_localities);
 
         // now wait for everything to finish
         int result = wait();

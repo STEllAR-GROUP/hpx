@@ -30,6 +30,7 @@ namespace hpx { namespace util
     class connection_cache
     {
     public:
+        typedef boost::recursive_mutex mutex_type;
         typedef boost::shared_ptr<Connection> connection_type;
         typedef naming::locality key_type;
 
@@ -49,7 +50,7 @@ namespace hpx { namespace util
 
         connection_type get (key_type const& l)
         {
-            boost::mutex::scoped_lock lock(mtx_);
+            mutex_type::scoped_lock lock(mtx_);
 
             LHPX_(debug, logdest_) << "connection_cache: requesting: " << l;
 
@@ -76,7 +77,7 @@ namespace hpx { namespace util
 
         void add (key_type const& l, connection_type conn)
         {
-            boost::mutex::scoped_lock lock(mtx_);
+            mutex_type::scoped_lock lock(mtx_);
 
             LHPX_(debug, logdest_) 
                 << "connection_cache: returning connection to cache: " << l;
@@ -132,7 +133,7 @@ namespace hpx { namespace util
         }
 
     private:
-        boost::mutex mtx_;
+        mutex_type mtx_;
         size_type max_cache_size_;
         char const* const logdest_;
         list_type cont_;

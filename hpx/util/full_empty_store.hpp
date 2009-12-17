@@ -71,7 +71,7 @@ namespace hpx { namespace util { namespace detail
 
         void log_non_empty_queue(char const* const desc, queue_type& queue)
         {
-          typename mutex_type::scoped_lock l(this);
+            scoped_lock l(this);
             while (!queue.empty()) {
                 threads::thread_id_type id = queue.front().id_;
                 queue.pop_front();
