@@ -41,7 +41,8 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     }
 
     val->x_ = xcoord;
-    val->value_ = exp(-xcoord*xcoord);
+    //val->value_ = exp(-xcoord*xcoord);
+    val->value_ = xcoord;
 
     return 1;
 }
@@ -57,15 +58,14 @@ int evaluate_timestep(stencil_data const* left, stencil_data const* middle,
     result->timestep_ = middle->timestep_ + 1.0/pow(2.0,(int) middle->level_);
     result->level_ = middle->level_;
     result->refine_ = true;
-    if (gidsize < 5) result->refine_ = false;
-    /*
-    result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
-    */
+    //if (gidsize < 5) result->refine_ = false;
+
     double sum = 0;
     double dt = par.dt0;
     double dx = par.dx0;
 
-    result->value_ = middle->value_ - dt/dx*(middle->value_ - left->value_);
+   // result->value_ = middle->value_ - dt/dx*(middle->value_ - left->value_);
+    result->value_ = middle->value_;
 
     //if ( result->value_ > 0.2 ) result->refine_ = true;
     //else result->refine_ = false;
@@ -115,8 +115,8 @@ int evaluate_right_bdry_timestep(stencil_data const* left, stencil_data const* m
     double dt = par.dt0;
     double dx = par.dx0;
 
-    //result->value_ = 0.5*(left->value_+middle->value_);
-    result->value_ = middle->value_ - dt/dx*(middle->value_ - left->value_);
+    //result->value_ = middle->value_ - dt/dx*(middle->value_ - left->value_);
+    result->value_ = middle->value_;
 
     return 1;
 }

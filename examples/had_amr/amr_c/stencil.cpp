@@ -187,42 +187,39 @@ namespace hpx { namespace components { namespace amr
 
       int i;
       naming::id_type gval[9];
-      boost::tie(gval[0], gval[1], gval[2], gval[3], gval[4]) = 
+      access_memory_block<stencil_data> mval[9];
+      access_memory_block<stencil_data> edge1,edge2;
+
+      boost::tie(edge1,edge2) = 
+          get_memory_block_async<stencil_data>(gids[0],gids[1]);
+
+      if ( !edge1->refine_ || !edge2->refine_) {
+        boost::tie(gval[0], gval[2], gval[4], gval[6], gval[8]) = 
                         components::wait(components::stubs::memory_block::clone_async(gids[0]), 
                              components::stubs::memory_block::clone_async(gids[1]),
                              components::stubs::memory_block::clone_async(gids[2]),
                              components::stubs::memory_block::clone_async(gids[3]),
                              components::stubs::memory_block::clone_async(gids[4]));
+        boost::tie(gval[1], gval[3], gval[5],gval[7]) = 
+                    components::wait(components::stubs::memory_block::clone_async(gids[2]), 
+                    components::stubs::memory_block::clone_async(gids[2]),
+                    components::stubs::memory_block::clone_async(gids[2]),
+                    components::stubs::memory_block::clone_async(gids[2]));
+        boost::tie(mval[0], mval[2], mval[4], mval[6], mval[8]) = 
+          get_memory_block_async<stencil_data>(gval[0], gval[2], gval[4], gval[6], gval[8]);
 
-      access_memory_block<stencil_data> mval[9];
-      boost::tie(mval[0], mval[1], mval[2], mval[3], mval[4]) = 
-          get_memory_block_async<stencil_data>(gval[0], gval[1], gval[2], gval[3], gval[4]);
+        // temporarily store the anchor values before overwriting them
+        double t0,t2,t4,t6,t8;
+        t0 = mval[0]->value_;
+        t2 = mval[2]->value_;
+        t4 = mval[4]->value_;
+        t6 = mval[6]->value_;
+        t8 = mval[8]->value_;
 
-      // temporarily store the anchor values before overwriting them
-      double t1,t2,t3,t4,t5;
-      double x1,x2,x3,x4,x5;
-      t1 = mval[0]->value_;
-      t2 = mval[1]->value_;
-      t3 = mval[2]->value_;
-      t4 = mval[3]->value_;
-      t5 = mval[4]->value_;
-
-      x1 = mval[0]->x_;
-      x2 = mval[1]->x_;
-      x3 = mval[2]->x_;
-      x4 = mval[3]->x_;
-      x5 = mval[4]->x_;
-
-      if ( !mval[1]->refine_ || !mval[0]->refine_) {
         // the edge of the AMR mesh has been reached.  
         // Use the left mesh class instead of standard tapered
-        boost::tie(gval[5], gval[6], gval[7],gval[8]) = 
-                      components::wait(components::stubs::memory_block::clone_async(gids[2]), 
-                      components::stubs::memory_block::clone_async(gids[2]),
-                      components::stubs::memory_block::clone_async(gids[2]),
-                      components::stubs::memory_block::clone_async(gids[2]));
-        boost::tie(mval[5], mval[6], mval[7],mval[8]) = 
-            get_memory_block_async<stencil_data>(gval[5], gval[6], gval[7],gval[8]);
+        boost::tie(mval[1], mval[3], mval[5],mval[7]) = 
+            get_memory_block_async<stencil_data>(gval[1], gval[3], gval[5],gval[7]);
 
         // increase the level by one
         for (i=0;i<9;i++) {
@@ -231,41 +228,38 @@ namespace hpx { namespace components { namespace amr
         }
 
         // this updates the coordinate position
-        mval[0]->x_ = x1;
-        mval[1]->x_ = 0.5*(x1+x2);
-        mval[2]->x_ = x2;
-        mval[3]->x_ = 0.5*(x2+x3);
-        mval[4]->x_ = x3;
-        mval[5]->x_ = 0.5*(x3+x4);
-        mval[6]->x_ = x4;
-        mval[7]->x_ = 0.5*(x4+x5);
-        mval[8]->x_ = x5;
-      
-        // coarse node duplicates
-        mval[0]->value_ = t1;
-        mval[2]->value_ = t2;
-        mval[4]->value_ = t3;
-        mval[6]->value_ = t4;
-        mval[8]->value_ = t5;
+        mval[1]->x_ = 0.5*(mval[0]->x_+mval[2]->x_);
+        mval[3]->x_ = 0.5*(mval[2]->x_+mval[4]->x_);
+        mval[5]->x_ = 0.5*(mval[4]->x_+mval[6]->x_);
+        mval[7]->x_ = 0.5*(mval[6]->x_+mval[8]->x_);
 
+        // unset alloc on these gids
+        for (i=1;i<9;i=i+2) {
+          mval[i]->left_alloc_ = 0;
+          mval[i]->right_alloc_ = 0;
+          mval[i]->overwrite_alloc_ = 0;
+        }
+      
         // avoid interpolation if possible
         int s1,s3,s5,s7;
         s1 = 0; s3 = 0; s5 = 0; s7 = 0;
 
-        s1 = findpoint(mval[0],mval[1],mval[1]);
-        s3 = findpoint(mval[1],mval[2],mval[3]);
-        s5 = findpoint(mval[2],mval[3],mval[5]);
-        s7 = findpoint(mval[3],mval[4],mval[7]);
+        s1 = findpoint(mval[0],mval[2],mval[1]);
+        s3 = findpoint(mval[2],mval[4],mval[3]);
+        s5 = findpoint(mval[4],mval[6],mval[5]);
+        s7 = findpoint(mval[6],mval[8],mval[7]);
 
         if ( par.linearbounds == 1 ) {
           // linear interpolation
-          if ( s1 == 0 ) mval[1]->value_ = 0.5*(t1 + t2);
-          if ( s3 == 0 ) mval[3]->value_ = 0.5*(t2 + t3);
-          if ( s5 == 0 ) mval[5]->value_ = 0.5*(t3 + t4);
-          if ( s7 == 0 ) mval[7]->value_ = 0.5*(t4 + t5);
+          if ( s1 == 0 ) mval[1]->value_ = 0.5*(t0 + t2);
+          if ( s3 == 0 ) mval[3]->value_ = 0.5*(t2 + t4);
+          if ( s5 == 0 ) mval[5]->value_ = 0.5*(t4 + t6);
+          if ( s7 == 0 ) mval[7]->value_ = 0.5*(t6 + t8);
           // TEST
-          if ( !s1 || !s3 || !s5 || !s7 ) printf("Interpolation B: %d %d %d %d : %g %g %g %g\n",
+          if ( !s1 || !s3 || !s5 || !s7 ) {
+            printf("Interpolation B: %d %d %d %d : %g %g %g %g\n",
                                        s1,s3,s5,s7,mval[1]->x_,mval[3]->x_,mval[5]->x_,mval[7]->x_);
+          }
         } else {
           // other user defined options not implemented yet
           interpolation();
@@ -294,22 +288,25 @@ namespace hpx { namespace components { namespace amr
             child_mesh.execute(initial_data, function_type,
               do_logging ? logging_type : components::component_invalid,par));
   
-        access_memory_block<stencil_data> r_val, resultval;
-        boost::tie(r_val, resultval) = 
+        access_memory_block<stencil_data> overwrite, resultval;
+        boost::tie(overwrite, resultval) = 
             get_memory_block_async<stencil_data>(result_data[4], result);
 
         // overwrite the coarse point computation
-        resultval->value_ = r_val->value_;
+        resultval->value_ = overwrite->value_;
 
         resultval->overwrite_alloc_ = 1;
         resultval->overwrite_ = result_data[4];
-  
-        // remember neighbor value
-        resultval->right_alloc_ = 1;
-        resultval->right_ = result_data[6];
 
-        resultval->left_alloc_ = 1;
-        resultval->left_ = result_data[2];
+        // remember neighbor value
+        overwrite->right_alloc_ = 1;
+        overwrite->right_ = result_data[6];
+
+        overwrite->left_alloc_ = 1;
+        overwrite->left_ = result_data[2];
+
+        resultval->right_alloc_ = 0;
+        resultval->left_alloc_ = 0;
 
         components::stubs::memory_block::free(result_data[0]);
         components::stubs::memory_block::free(result_data[1]);
@@ -320,14 +317,33 @@ namespace hpx { namespace components { namespace amr
         // release result data
         //for (std::size_t i = 0; i < result_data.size(); ++i) 
         //    components::stubs::memory_block::free(result_data[i]);
-
       } else {
-        boost::tie(gval[5], gval[6], gval[7]) = 
-                      components::wait(components::stubs::memory_block::clone_async(gids[2]), 
-                      components::stubs::memory_block::clone_async(gids[2]),
-                      components::stubs::memory_block::clone_async(gids[2]));
-        boost::tie(mval[5], mval[6], mval[7]) = 
-            get_memory_block_async<stencil_data>(gval[5], gval[6], gval[7]);
+        boost::tie(gval[8], gval[1], gval[3], gval[5], gval[7]) = 
+                        components::wait(components::stubs::memory_block::clone_async(gids[0]), 
+                             components::stubs::memory_block::clone_async(gids[1]),
+                             components::stubs::memory_block::clone_async(gids[2]),
+                             components::stubs::memory_block::clone_async(gids[3]),
+                             components::stubs::memory_block::clone_async(gids[4]));
+        boost::tie(gval[0], gval[2], gval[4],gval[6]) = 
+                    components::wait(components::stubs::memory_block::clone_async(gids[2]), 
+                    components::stubs::memory_block::clone_async(gids[2]),
+                    components::stubs::memory_block::clone_async(gids[2]),
+                    components::stubs::memory_block::clone_async(gids[2]));
+        boost::tie(mval[8], mval[1], mval[3], mval[5], mval[7]) = 
+          get_memory_block_async<stencil_data>(gval[8], gval[1], gval[3], gval[5], gval[7]);
+
+        // temporarily store the anchor values before overwriting them
+        double tm1,t1,t3,t5,t7;
+        tm1 = mval[8]->value_;
+        t1 = mval[1]->value_;
+        t3 = mval[3]->value_;
+        t5 = mval[5]->value_;
+        t7 = mval[7]->value_;
+
+        // the edge of the AMR mesh has been reached.  
+        // standard tapered
+        boost::tie(mval[0], mval[2], mval[4],mval[6]) = 
+            get_memory_block_async<stencil_data>(gval[0], gval[2], gval[4],gval[6]);
 
         // increase the level by one
         for (i=0;i<8;i++) {
@@ -336,38 +352,60 @@ namespace hpx { namespace components { namespace amr
         }
 
         // this updates the coordinate position
-        mval[0]->x_ = 0.5*(x1+x2);
-        mval[1]->x_ = x2;
-        mval[2]->x_ = 0.5*(x2+x3);
-        mval[3]->x_ = x3;
-        mval[4]->x_ = 0.5*(x3+x4);
-        mval[5]->x_ = x4;
-        mval[6]->x_ = 0.5*(x4+x5);
-        mval[7]->x_ = x5;
-      
-        // coarse node duplicates
-        mval[1]->value_ = t2;
-        mval[3]->value_ = t3;
-        mval[5]->value_ = t4;
-        mval[7]->value_ = t5;
+        mval[0]->x_ = 0.5*(mval[8]->x_+mval[1]->x_);
+        mval[2]->x_ = 0.5*(mval[1]->x_+mval[3]->x_);
+        mval[4]->x_ = 0.5*(mval[3]->x_+mval[5]->x_);
+        mval[6]->x_ = 0.5*(mval[5]->x_+mval[7]->x_);
+
+        // unset alloc on these gids
+        for (i=0;i<8;i=i+2) {
+          mval[i]->left_alloc_ = 0;
+          mval[i]->right_alloc_ = 0;
+          mval[i]->overwrite_alloc_ = 0;
+        }
 
         // avoid interpolation if possible
         int s0,s2,s4,s6;
         s0 = 0; s2 = 0; s4 = 0; s6 = 0;
 
-        s0 = findpoint(mval[0],mval[1],mval[0]);
-        s2 = findpoint(mval[1],mval[2],mval[2]);
-        s4 = findpoint(mval[2],mval[3],mval[4]);
-        s6 = findpoint(mval[3],mval[4],mval[6]);
+        s0 = findpoint(mval[8],mval[1],mval[0]);
+        s2 = findpoint(mval[1],mval[3],mval[2]);
+        s4 = findpoint(mval[3],mval[5],mval[4]);
+        s6 = findpoint(mval[5],mval[7],mval[6]);
 
         if ( par.linearbounds == 1 ) {
-          mval[0]->value_ = 0.5*(t1 + t2);
-          mval[2]->value_ = 0.5*(t2 + t3);
-          mval[4]->value_ = 0.5*(t3 + t4);
-          mval[6]->value_ = 0.5*(t4 + t5);
+          mval[0]->value_ = 0.5*(tm1 + t1);
+          mval[2]->value_ = 0.5*(t1 + t3);
+          mval[4]->value_ = 0.5*(t3 + t5);
+          mval[6]->value_ = 0.5*(t5 + t7);
           // TEST
-          if ( !s0 || !s2 || !s4 || !s6 ) printf("Interpolation A: %d %d %d %d : %g %g %g %g\n",
+          if ( !s0 || !s2 || !s4 || !s6 ) { printf("Interpolation A: %d %d %d %d : %g %g %g %g\n",
                                         s0,s2,s4,s6,mval[0]->x_,mval[2]->x_,mval[4]->x_,mval[6]->x_);
+#if 0
+            printf(" TEST s0 overwrite alloc: %d\n",mval[0]->overwrite_alloc_);
+            if ( mval[0]->overwrite_alloc_ ) {
+              access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[0]->overwrite_);
+              printf(" TEST s0 further: x1: %g overwrite x: %g- right: %d left: %d overwrite2: %d\n",x1,amb->x_,amb->right_alloc_,
+                  amb->left_alloc_,amb->overwrite_alloc_);
+              if ( amb->right_alloc_ == 1 ) {
+                access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb->right_);
+                printf(" TEST s0 even further: overwrite-right: %g %g\n",amb1->x_, amb1->value_);
+              }
+              if ( amb->left_alloc_ == 1 ) {
+                access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb->left_);
+                printf(" TEST s0 even further: overwrite-left: %g %g\n",amb1->x_, amb1->value_);
+              }
+              if ( amb->overwrite_alloc_ == 1 ) {
+                access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb->overwrite_);
+                printf(" TEST s0 even further: overwrite-overwrite: %g %g left %d right %d overwrite %d\n",amb1->x_, amb1->value_,amb1->left_alloc_,amb1->right_alloc_,amb1->overwrite_alloc_);
+                if ( amb1->right_alloc_ == 1 ) {
+                  access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->right_);
+                  printf(" TEST s0 even further: overwrite-overwrite-right: %g %g\n",amb2->x_, amb2->value_);
+                }
+              }
+            }
+#endif
+          }
         } else {
           // other user defined options not implemented yet
           interpolation();
@@ -395,6 +433,9 @@ namespace hpx { namespace components { namespace amr
           initial_data.push_back(gval[i]);
         }
 
+        // this cloned gid is not needed anymore
+        components::stubs::memory_block::free(gval[8]);
+
         bool do_logging = false;
         if ( par.loglevel > 0 ) {
           do_logging = true;
@@ -403,20 +444,23 @@ namespace hpx { namespace components { namespace amr
             child_mesh.execute(initial_data, function_type,
               do_logging ? logging_type : components::component_invalid,par));
   
-        access_memory_block<stencil_data> r_val,resultval;
-        boost::tie(r_val, resultval) = 
+        access_memory_block<stencil_data> overwrite,resultval;
+        boost::tie(overwrite, resultval) = 
             get_memory_block_async<stencil_data>(result_data[3], result);
 
         // overwrite the coarse point computation
-        resultval->value_ = r_val->value_;
+        resultval->value_ = overwrite->value_;
 
+        // remember the overwrite point and the neighbor
         resultval->overwrite_alloc_ = 1;
         resultval->overwrite_ = result_data[3];
-  
-        // remember right neighbor value
-        resultval->right_alloc_ = 1;
-        resultval->right_ = result_data[4];
 
+        overwrite->right_alloc_ = 1;
+        overwrite->right_ = result_data[4];
+
+        overwrite->left_alloc_ = 0;
+  
+        resultval->right_alloc_ = 0;
         resultval->left_alloc_ = 0;
 
         components::stubs::memory_block::free(result_data[0]);
@@ -459,23 +503,26 @@ namespace hpx { namespace components { namespace amr
             level, x, par));
 
       //  using mesh_left
-      access_memory_block<stencil_data> r_val, resultval;
-      boost::tie(r_val, resultval) = 
+      access_memory_block<stencil_data> overwrite, resultval;
+      boost::tie(overwrite, resultval) = 
           get_memory_block_async<stencil_data>(result_data[4], result);
  
       // overwrite the coarse point computation
-      resultval->value_ = r_val->value_;
+      resultval->value_ = overwrite->value_;
  
       resultval->overwrite_alloc_ = 1;
       resultval->overwrite_ = result_data[4];
    
       // remember neighbor value
-      resultval->right_alloc_ = 1;
-      resultval->right_ = result_data[6];
- 
-      resultval->left_alloc_ = 1;
-      resultval->left_ = result_data[2];
- 
+      overwrite->right_alloc_ = 1;
+      overwrite->right_ = result_data[6];
+
+      overwrite->left_alloc_ = 1;
+      overwrite->left_ = result_data[2];
+
+      resultval->right_alloc_ = 0;
+      resultval->left_alloc_ = 0;
+
       components::stubs::memory_block::free(result_data[0]);
       components::stubs::memory_block::free(result_data[1]);
       components::stubs::memory_block::free(result_data[3]);
@@ -511,53 +558,53 @@ namespace hpx { namespace components { namespace amr
         return result;
     }
 
-    int stencil::findpoint(access_memory_block<stencil_data> const& lookright,
-                           access_memory_block<stencil_data> const& lookleft, 
+    int stencil::findpoint(access_memory_block<stencil_data> const& anchor_to_the_right,
+                           access_memory_block<stencil_data> const& anchor_to_the_left, 
                            access_memory_block<stencil_data> & resultval) 
     {
       int s = 0;
       access_memory_block<stencil_data> amb0;
-      amb0 = lookright;
-      // look right
-      while (s == 0 && amb0->right_alloc_ == 1) {
-        access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->right_);
-        if ( floatcmp(amb1->x_,resultval->x_) ) {
-          resultval->value_ = amb1->value_;
-          s = 1;
-        } else if ( amb1->x_ < resultval->x_ ) {
-          // look to the right again
-          naming::id_type tmp = amb0->right_;
-          amb0 = hpx::components::stubs::memory_block::get(tmp);
-        } else if ( amb1->x_ > resultval->x_ ) {
-          // you overshot it -- check the overwrite gid
-          if (amb0->overwrite_alloc_ == 1) {
-            naming::id_type tmp = amb0->overwrite_;
-            amb0 = hpx::components::stubs::memory_block::get(tmp);
-          } else {
-            break;
+      amb0 = anchor_to_the_right;
+      while (s == 0 && amb0->overwrite_alloc_ == 1) {
+        access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->overwrite_);
+
+        // look around
+        if ( amb1->right_alloc_ == 1 ) {
+          access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->right_);
+          if ( floatcmp(amb2->x_,resultval->x_) ) {
+            resultval->value_ = amb2->value_;
+            s = 1;
+          } else if ( amb2->x_ < resultval->x_ ) {
+            // go to a higher AMR level based on right anchor
+            amb0 = amb2;
+          } else if ( amb2->x_ > resultval->x_ ) {
+            // go to a higher AMR level based on original anchor 
+            amb0 = amb1;
           }
+        } else {
+          amb0 = amb1;
         }
       }
 
-      // look left
-      amb0 = lookleft;
-      while (s == 0 && amb0->left_alloc_ == 1) {
-        access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->left_);
-        if ( floatcmp(amb1->x_,resultval->x_) ) {
-          resultval->value_ = amb1->value_;
-          s = 1;
-        } else if ( amb1->x_ < resultval->x_  ) {
-          // you overshot it -- check the overwrite gid
-          if (amb0->overwrite_alloc_ == 1) {
-            naming::id_type tmp = amb0->overwrite_;
-            amb0 = hpx::components::stubs::memory_block::get(tmp);
-          } else {
-            break;
+      amb0 = anchor_to_the_left;
+      while (s == 0 && amb0->overwrite_alloc_ == 1) {
+        access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->overwrite_);
+
+        // look around
+        if ( amb1->left_alloc_ == 1 ) {
+          access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->left_);
+          if ( floatcmp(amb2->x_,resultval->x_) ) {
+            resultval->value_ = amb2->value_;
+            s = 1;
+          } else if ( amb2->x_ < resultval->x_ ) {
+            // go to a higher AMR level based on original anchor
+            amb0 = amb1;
+          } else if ( amb2->x_ > resultval->x_ ) {
+            // go to a higher AMR level based on left anchor 
+            amb0 = amb2;
           }
-        } else if ( amb1->x_ > resultval->x_ ) {
-          // look left again
-          naming::id_type tmp = amb0->left_;
-          amb0 = hpx::components::stubs::memory_block::get(tmp);
+        } else {
+          amb0 = amb1;
         }
       }
 
