@@ -382,27 +382,21 @@ namespace hpx { namespace components { namespace amr
           if ( !s0 || !s2 || !s4 || !s6 ) { printf("Interpolation A: %d %d %d %d : %g %g %g %g\n",
                                         s0,s2,s4,s6,mval[0]->x_,mval[2]->x_,mval[4]->x_,mval[6]->x_);
 #if 0
-            printf(" TEST s0 overwrite alloc: %d\n",mval[0]->overwrite_alloc_);
-            if ( mval[0]->overwrite_alloc_ ) {
-              access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[0]->overwrite_);
-              printf(" TEST s0 further: x1: %g overwrite x: %g- right: %d left: %d overwrite2: %d\n",x1,amb->x_,amb->right_alloc_,
-                  amb->left_alloc_,amb->overwrite_alloc_);
+            printf(" TEST s6 overwrite alloc: %d %d\n",mval[5]->overwrite_alloc_,mval[7]->overwrite_alloc_);
+            if ( mval[5]->overwrite_alloc_ == 1 ) {
+              access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[5]->overwrite_);
+              printf(" TEST s6 left anchor overwrite alloc %d %d %d : verify x %g %g\n",
+                               amb->left_alloc_,amb->overwrite_alloc_,amb->right_alloc_,mval[5]->x_,amb->x_);
               if ( amb->right_alloc_ == 1 ) {
                 access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb->right_);
-                printf(" TEST s0 even further: overwrite-right: %g %g\n",amb1->x_, amb1->value_);
+                printf(" TEST left anchor overwrite-right alloc %d %d %d : x %g\n",
+                               amb1->left_alloc_,amb1->overwrite_alloc_,amb1->right_alloc_,amb1->x_);
               }
-              if ( amb->left_alloc_ == 1 ) {
-                access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb->left_);
-                printf(" TEST s0 even further: overwrite-left: %g %g\n",amb1->x_, amb1->value_);
-              }
-              if ( amb->overwrite_alloc_ == 1 ) {
-                access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb->overwrite_);
-                printf(" TEST s0 even further: overwrite-overwrite: %g %g left %d right %d overwrite %d\n",amb1->x_, amb1->value_,amb1->left_alloc_,amb1->right_alloc_,amb1->overwrite_alloc_);
-                if ( amb1->right_alloc_ == 1 ) {
-                  access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->right_);
-                  printf(" TEST s0 even further: overwrite-overwrite-right: %g %g\n",amb2->x_, amb2->value_);
-                }
-              }
+            }
+            if ( mval[7]->overwrite_alloc_ == 1 ) {
+              access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[7]->overwrite_);
+              printf(" TEST s6 left anchor overwrite alloc %d %d %d : verify x %g %g\n",
+                               amb->left_alloc_,amb->overwrite_alloc_,amb->right_alloc_,mval[7]->x_,amb->x_);
             }
 #endif
           }
@@ -558,14 +552,15 @@ namespace hpx { namespace components { namespace amr
         return result;
     }
 
-    int stencil::findpoint(access_memory_block<stencil_data> const& anchor_to_the_right,
-                           access_memory_block<stencil_data> const& anchor_to_the_left, 
+    int stencil::findpoint(access_memory_block<stencil_data> const& anchor_to_the_left,
+                           access_memory_block<stencil_data> const& anchor_to_the_right, 
                            access_memory_block<stencil_data> & resultval) 
     {
+      // the pinball machine
       int s = 0;
       access_memory_block<stencil_data> amb0;
-      amb0 = anchor_to_the_right;
-      while (s == 0 && amb0->overwrite_alloc_ == 1) {
+      amb0 = anchor_to_the_left;
+      if (s == 0 && amb0->overwrite_alloc_ == 1) {
         access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->overwrite_);
 
         // look around
@@ -574,37 +569,67 @@ namespace hpx { namespace components { namespace amr
           if ( floatcmp(amb2->x_,resultval->x_) ) {
             resultval->value_ = amb2->value_;
             s = 1;
-          } else if ( amb2->x_ < resultval->x_ ) {
-            // go to a higher AMR level based on right anchor
-            amb0 = amb2;
-          } else if ( amb2->x_ > resultval->x_ ) {
-            // go to a higher AMR level based on original anchor 
-            amb0 = amb1;
+            return s;
+          } else {
+            if ( amb2->x_ > resultval->x_ ) {
+              s = findpoint(amb1,amb2,resultval);
+            } else {
+              s = findpoint(amb2,amb1,resultval);
+            }
           }
-        } else {
-          amb0 = amb1;
         }
-      }
 
-      amb0 = anchor_to_the_left;
-      while (s == 0 && amb0->overwrite_alloc_ == 1) {
-        access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->overwrite_);
-
-        // look around
-        if ( amb1->left_alloc_ == 1 ) {
+        if ( s == 0 && amb1->left_alloc_ == 1 ) {
           access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->left_);
           if ( floatcmp(amb2->x_,resultval->x_) ) {
             resultval->value_ = amb2->value_;
             s = 1;
-          } else if ( amb2->x_ < resultval->x_ ) {
-            // go to a higher AMR level based on original anchor
-            amb0 = amb1;
-          } else if ( amb2->x_ > resultval->x_ ) {
-            // go to a higher AMR level based on left anchor 
-            amb0 = amb2;
+            return s;
+          } else {
+            if ( amb2->x_ > resultval->x_ ) {
+              s = findpoint(amb1,amb2,resultval);
+            } else {
+              s = findpoint(amb2,amb1,resultval);
+            }
           }
-        } else {
-          amb0 = amb1;
+        }
+
+      }
+
+
+      amb0 = anchor_to_the_right;
+      if (s == 0 && amb0->overwrite_alloc_ == 1) {
+        access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->overwrite_);
+
+        // look around
+        if ( amb1->right_alloc_ == 1 ) {
+          access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->right_);
+          if ( floatcmp(amb2->x_,resultval->x_) ) {
+            resultval->value_ = amb2->value_;
+            s = 1;
+            return s;
+          } else {
+            if ( amb2->x_ > resultval->x_ ) {
+              s = findpoint(amb1,amb2,resultval);
+            } else {
+              s = findpoint(amb2,amb1,resultval);
+            }
+          }
+        }
+
+        if (s == 0 && amb1->left_alloc_ == 1 ) {
+          access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->left_);
+          if ( floatcmp(amb2->x_,resultval->x_) ) {
+            resultval->value_ = amb2->value_;
+            s = 1;
+            return s;
+          } else {
+            if ( amb2->x_ > resultval->x_ ) {
+              s = findpoint(amb1,amb2,resultval);
+            } else {
+              s = findpoint(amb2,amb1,resultval);
+            }
+          }
         }
       }
 
