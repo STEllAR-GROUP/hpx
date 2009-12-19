@@ -58,17 +58,19 @@ int evaluate_timestep(stencil_data const* left, stencil_data const* middle,
     result->timestep_ = middle->timestep_ + 1.0/pow(2.0,(int) middle->level_);
     result->level_ = middle->level_;
     result->refine_ = true;
-    //if (gidsize < 5) result->refine_ = false;
+    if (gidsize < 5) result->refine_ = false;
 
     double sum = 0;
     double dt = par.dt0;
     double dx = par.dx0;
 
-   // result->value_ = middle->value_ - dt/dx*(middle->value_ - left->value_);
-    result->value_ = middle->value_;
+    result->value_ = middle->value_ - dt/dx*(middle->value_ - left->value_);
+   // result->value_ = middle->value_;
 
     //if ( result->value_ > 0.2 ) result->refine_ = true;
     //else result->refine_ = false;
+
+    if (gidsize < 5) result->refine_ = false;
 
     return 1;
 }
@@ -84,10 +86,7 @@ int evaluate_left_bdry_timestep(stencil_data const* middle, stencil_data const* 
     result->timestep_ = middle->timestep_ + 1.0/pow(2.0,(int) middle->level_);
     result->level_ = middle->level_;
     result->refine_ = false;
-    /*
-    result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
-    */
-    double sum = 0;
+
     double dt = par.dt0;
     double dx = par.dx0;
 
@@ -108,15 +107,12 @@ int evaluate_right_bdry_timestep(stencil_data const* left, stencil_data const* m
     result->timestep_ = middle->timestep_ + 1.0/pow(2.0,(int) middle->level_);
     result->level_ = middle->level_;
     result->refine_ = false;
-    /*
-    result->value_ = 0.25 * left->value_ + 0.75 * right->value_;
-    */
-    double sum = 0;
+
     double dt = par.dt0;
     double dx = par.dx0;
 
-    //result->value_ = middle->value_ - dt/dx*(middle->value_ - left->value_);
-    result->value_ = middle->value_;
+    result->value_ = middle->value_ - dt/dx*(middle->value_ - left->value_);
+    //result->value_ = middle->value_;
 
     return 1;
 }

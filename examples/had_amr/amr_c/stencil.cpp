@@ -193,7 +193,7 @@ namespace hpx { namespace components { namespace amr
       boost::tie(edge1,edge2) = 
           get_memory_block_async<stencil_data>(gids[0],gids[1]);
 
-      if ( !edge1->refine_ || !edge2->refine_) {
+  //    if ( !edge1->refine_ || !edge2->refine_) {
         boost::tie(gval[0], gval[2], gval[4], gval[6], gval[8]) = 
                         components::wait(components::stubs::memory_block::clone_async(gids[0]), 
                              components::stubs::memory_block::clone_async(gids[1]),
@@ -317,6 +317,7 @@ namespace hpx { namespace components { namespace amr
         // release result data
         //for (std::size_t i = 0; i < result_data.size(); ++i) 
         //    components::stubs::memory_block::free(result_data[i]);
+#if 0
       } else {
         boost::tie(gval[8], gval[1], gval[3], gval[5], gval[7]) = 
                         components::wait(components::stubs::memory_block::clone_async(gids[0]), 
@@ -382,22 +383,11 @@ namespace hpx { namespace components { namespace amr
           if ( !s0 || !s2 || !s4 || !s6 ) { printf("Interpolation A: %d %d %d %d : %g %g %g %g\n",
                                         s0,s2,s4,s6,mval[0]->x_,mval[2]->x_,mval[4]->x_,mval[6]->x_);
 #if 0
-            printf(" TEST s6 overwrite alloc: %d %d\n",mval[5]->overwrite_alloc_,mval[7]->overwrite_alloc_);
-            if ( mval[5]->overwrite_alloc_ == 1 ) {
-              access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[5]->overwrite_);
-              printf(" TEST s6 left anchor overwrite alloc %d %d %d : verify x %g %g\n",
-                               amb->left_alloc_,amb->overwrite_alloc_,amb->right_alloc_,mval[5]->x_,amb->x_);
-              if ( amb->right_alloc_ == 1 ) {
-                access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb->right_);
-                printf(" TEST left anchor overwrite-right alloc %d %d %d : x %g\n",
-                               amb1->left_alloc_,amb1->overwrite_alloc_,amb1->right_alloc_,amb1->x_);
-              }
-            }
-            if ( mval[7]->overwrite_alloc_ == 1 ) {
-              access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[7]->overwrite_);
-              printf(" TEST s6 left anchor overwrite alloc %d %d %d : verify x %g %g\n",
-                               amb->left_alloc_,amb->overwrite_alloc_,amb->right_alloc_,mval[7]->x_,amb->x_);
-            }
+          if ( mval[1]->overwrite_alloc_ == 1 ) {
+              access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[1]->overwrite_);
+              printf(" TEST s0 left anchor overwrite alloc %d %d %d : verify x %g %g\n",
+                               amb->left_alloc_,amb->overwrite_alloc_,amb->right_alloc_,mval[1]->x_,amb->x_);
+          }
 #endif
           }
         } else {
@@ -467,6 +457,7 @@ namespace hpx { namespace components { namespace amr
         //for (std::size_t i = 0; i < result_data.size(); ++i) 
         //    components::stubs::memory_block::free(result_data[i]);
       }
+#endif
 
       return 0;
     }
