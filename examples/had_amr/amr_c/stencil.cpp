@@ -193,7 +193,7 @@ namespace hpx { namespace components { namespace amr
       boost::tie(edge1,edge2) = 
           get_memory_block_async<stencil_data>(gids[0],gids[1]);
 
-  //    if ( !edge1->refine_ || !edge2->refine_) {
+      if ( !edge1->refine_ || !edge2->refine_) {
         boost::tie(gval[0], gval[2], gval[4], gval[6], gval[8]) = 
                         components::wait(components::stubs::memory_block::clone_async(gids[0]), 
                              components::stubs::memory_block::clone_async(gids[1]),
@@ -317,7 +317,6 @@ namespace hpx { namespace components { namespace amr
         // release result data
         //for (std::size_t i = 0; i < result_data.size(); ++i) 
         //    components::stubs::memory_block::free(result_data[i]);
-#if 0
       } else {
         boost::tie(gval[8], gval[1], gval[3], gval[5], gval[7]) = 
                         components::wait(components::stubs::memory_block::clone_async(gids[0]), 
@@ -457,7 +456,6 @@ namespace hpx { namespace components { namespace amr
         //for (std::size_t i = 0; i < result_data.size(); ++i) 
         //    components::stubs::memory_block::free(result_data[i]);
       }
-#endif
 
       return 0;
     }

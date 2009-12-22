@@ -41,8 +41,8 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     }
 
     val->x_ = xcoord;
-    //val->value_ = exp(-xcoord*xcoord);
-    val->value_ = xcoord;
+    val->value_ = exp(-xcoord*xcoord);
+    //val->value_ = xcoord;
 
     return 1;
 }
