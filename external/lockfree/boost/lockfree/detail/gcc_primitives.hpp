@@ -402,6 +402,10 @@ namespace boost { namespace lockfree
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    inline long interlocked_read_acquire(int32_t volatile* x)
+    {
+        return interlocked_compare_exchange(x, 0, 0);
+    }
     inline long interlocked_read_acquire(long volatile* x)
     {
         return interlocked_compare_exchange(x, 0, 0);
