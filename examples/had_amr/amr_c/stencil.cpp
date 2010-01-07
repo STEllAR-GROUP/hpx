@@ -134,7 +134,7 @@ namespace hpx { namespace components { namespace amr
 
             std::size_t allowedl = par.allowedl;
             if ( val2->refine_ && gids.size() == 5 && val2->level_ < allowedl ) {
-              finer_mesh(result, gids,par);
+              finer_mesh(result, gids, row, par);
             }
 
             // One special case: refining at time = 0
@@ -182,7 +182,7 @@ namespace hpx { namespace components { namespace amr
     // Implement a finer mesh via interpolation of inter-mesh points
     // Compute the result value for the current time step
     int stencil::finer_mesh(naming::id_type const& result, 
-        std::vector<naming::id_type> const& gids, Parameter const& par) 
+        std::vector<naming::id_type> const& gids, int row, Parameter const& par) 
     {
 
       int i;
@@ -274,9 +274,9 @@ namespace hpx { namespace components { namespace amr
                   components::get_component_type<components::amr::stencil>();
         //components::amr::amr_mesh_left child_left_mesh (
         //          components::amr::amr_mesh_left::create(here, 1, true));
-        //if ( !child_left_mesh.get_gid() ) {
-          child_left_mesh = components::amr::amr_mesh_left::create(here, 1, true);
-        //}
+        if ( !child_left_mesh[row].get_gid() ) {
+          child_left_mesh[row] = components::amr::amr_mesh_left::create(here, 1, true);
+        }
 
         std::vector<naming::id_type> initial_data;
         for (i=0;i<9;i++) {
@@ -288,7 +288,7 @@ namespace hpx { namespace components { namespace amr
           do_logging = true;
         }
         std::vector<naming::id_type> result_data(
-            child_left_mesh.execute(initial_data, function_type,
+            child_left_mesh[row].execute(initial_data, function_type,
               do_logging ? logging_type : components::component_invalid,par));
   
         access_memory_block<stencil_data> overwrite, resultval;
@@ -323,8 +323,6 @@ namespace hpx { namespace components { namespace amr
         // release result data
         //for (std::size_t i = 0; i < result_data.size(); ++i) 
         //    components::stubs::memory_block::free(result_data[i]);
-
-        child_left_mesh.free();
       } else {
         boost::tie(gval[8], gval[1], gval[3], gval[5], gval[7]) = 
                         components::wait(components::stubs::memory_block::clone_async(gids[0]), 
@@ -404,9 +402,9 @@ namespace hpx { namespace components { namespace amr
                   components::get_component_type<components::amr::stencil>();
         //components::amr::amr_mesh_tapered child_mesh (
         //          components::amr::amr_mesh_tapered::create(here, 1, true));
-        //if ( !child_mesh.get_gid() ) {
-          child_mesh = components::amr::amr_mesh_tapered::create(here, 1, true);
-        //}
+        if ( !child_mesh[row].get_gid() ) {
+          child_mesh[row] = components::amr::amr_mesh_tapered::create(here,1, true);
+        }
 
         std::vector<naming::id_type> initial_data;
         for (i=0;i<8;i++) {
@@ -421,7 +419,7 @@ namespace hpx { namespace components { namespace amr
           do_logging = true;
         }
         std::vector<naming::id_type> result_data(
-            child_mesh.execute(initial_data, function_type,
+            child_mesh[row].execute(initial_data, function_type,
               do_logging ? logging_type : components::component_invalid,par));
   
         access_memory_block<stencil_data> overwrite,resultval;
@@ -446,6 +444,11 @@ namespace hpx { namespace components { namespace amr
         resultval->right_alloc_ = 0;
         resultval->left_alloc_ = 0;
 
+        // TEST
+        //if ( floatcmp(overwrite->x_,-3.3333333333333333333333333) == 1 ) {
+        //  traverse_grid(result);
+        //}
+
         components::stubs::memory_block::free(result_data[0]);
         components::stubs::memory_block::free(result_data[1]);
         components::stubs::memory_block::free(result_data[2]);
@@ -455,7 +458,6 @@ namespace hpx { namespace components { namespace amr
         // release result data
         //for (std::size_t i = 0; i < result_data.size(); ++i) 
         //    components::stubs::memory_block::free(result_data[i]);
-        child_mesh.free();
       }
 
       return 0;
@@ -631,6 +633,29 @@ namespace hpx { namespace components { namespace amr
         numsteps_ = numsteps;
         log_ = logging;
     }
+
+    // This routine is for debugging -- pass in any gid
+    // and it traverses the entire grid available at that moment
+    void stencil::traverse_grid(naming::id_type const& start)
+    {
+      access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(start);
+      printf("stencil::traverse_grid x: %g lsb: %d\n",amb->x_,start.id_lsb_);
+      if ( amb->overwrite_alloc_ == 1 ) {
+        printf("stencil::traverse_grid overwrite\n");
+        traverse_grid(amb->overwrite_);
+      }
+
+      if ( amb->right_alloc_ == 1 ) {
+        printf("stencil::traverse_grid right\n");
+        traverse_grid(amb->right_);
+      }
+
+      if ( amb->left_alloc_ == 1 ) {
+        printf("stencil::traverse_grid left\n");
+        traverse_grid(amb->left_);
+      }
+    }
+
 
 }}}
 
