@@ -518,7 +518,6 @@ namespace hpx { namespace components { namespace amr
       //for (std::size_t i = 0; i < result_data.size(); ++i) 
       //    components::stubs::memory_block::free(result_data[i]);
 
-      child_left_mesh.free();
       return 0;
     }
 
