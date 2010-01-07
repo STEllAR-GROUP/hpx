@@ -28,8 +28,8 @@ namespace hpx { namespace components { namespace amr
     private:
         typedef amr::server::functional_component base_type;
 
-        components::amr::amr_mesh_tapered child_mesh[3];
-        components::amr::amr_mesh_left child_left_mesh[3];
+       // components::amr::amr_mesh_tapered child_mesh[3][9];
+       // components::amr::amr_mesh_left child_left_mesh[3][9];
 
     public:
         typedef stencil wrapped_type;
@@ -55,7 +55,7 @@ namespace hpx { namespace components { namespace amr
         // finer mesh for two steps.
         int finer_mesh(naming::id_type const& result, 
             std::vector<naming::id_type> const& gids,
-            int row,
+            int row, int column,
             Parameter const& par);
         
         // this function creates a finer mesh from the initial data
