@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2009 Hartmut Kaiser
+//  Copyright (c) 2007-2010 Hartmut Kaiser
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -60,6 +60,17 @@ namespace hpx { namespace components
                 this->stub_type::free(gid_);
                 gid_ = naming::invalid_id;
             }
+        }
+
+        client_base& operator= (client_base const& rhs)
+        {
+            if (this != &rhs) {
+                if (freeonexit_)
+                    free();
+                gid_ = rhs.gid_;
+                freeonexit_ = rhs.freeonexit_;
+            }
+            return *this;
         }
 
         ///////////////////////////////////////////////////////////////////////
