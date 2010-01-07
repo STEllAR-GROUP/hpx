@@ -272,8 +272,11 @@ namespace hpx { namespace components { namespace amr
                   components::get_component_type<components::amr::server::logging>();
         components::component_type function_type =
                   components::get_component_type<components::amr::stencil>();
-        components::amr::amr_mesh_left child_mesh (
-                  components::amr::amr_mesh_left::create(here, 1, true));
+        //components::amr::amr_mesh_left child_left_mesh (
+        //          components::amr::amr_mesh_left::create(here, 1, true));
+        //if ( !child_left_mesh.get_gid() ) {
+          child_left_mesh = components::amr::amr_mesh_left::create(here, 1, true);
+        //}
 
         std::vector<naming::id_type> initial_data;
         for (i=0;i<9;i++) {
@@ -285,7 +288,7 @@ namespace hpx { namespace components { namespace amr
           do_logging = true;
         }
         std::vector<naming::id_type> result_data(
-            child_mesh.execute(initial_data, function_type,
+            child_left_mesh.execute(initial_data, function_type,
               do_logging ? logging_type : components::component_invalid,par));
   
         access_memory_block<stencil_data> overwrite, resultval;
@@ -305,6 +308,9 @@ namespace hpx { namespace components { namespace amr
         overwrite->left_alloc_ = 1;
         overwrite->left_ = result_data[2];
 
+        overwrite->reference_alloc_ = 1;
+        overwrite->reference_ = result;
+
         resultval->right_alloc_ = 0;
         resultval->left_alloc_ = 0;
 
@@ -317,6 +323,8 @@ namespace hpx { namespace components { namespace amr
         // release result data
         //for (std::size_t i = 0; i < result_data.size(); ++i) 
         //    components::stubs::memory_block::free(result_data[i]);
+
+        child_left_mesh.free();
       } else {
         boost::tie(gval[8], gval[1], gval[3], gval[5], gval[7]) = 
                         components::wait(components::stubs::memory_block::clone_async(gids[0]), 
@@ -381,13 +389,6 @@ namespace hpx { namespace components { namespace amr
           // TEST
           if ( !s0 || !s2 || !s4 || !s6 ) { printf("Interpolation A: %d %d %d %d : %g %g %g %g\n",
                                         s0,s2,s4,s6,mval[0]->x_,mval[2]->x_,mval[4]->x_,mval[6]->x_);
-#if 0
-          if ( mval[1]->overwrite_alloc_ == 1 ) {
-              access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(mval[1]->overwrite_);
-              printf(" TEST s0 left anchor overwrite alloc %d %d %d : verify x %g %g\n",
-                               amb->left_alloc_,amb->overwrite_alloc_,amb->right_alloc_,mval[1]->x_,amb->x_);
-          }
-#endif
           }
         } else {
           // other user defined options not implemented yet
@@ -401,14 +402,10 @@ namespace hpx { namespace components { namespace amr
                   components::get_component_type<components::amr::server::logging>();
         components::component_type function_type =
                   components::get_component_type<components::amr::stencil>();
-        components::amr::amr_mesh_tapered child_mesh (
-                  components::amr::amr_mesh_tapered::create(here, 1, true));
-        //components::amr::amr_mesh_tapered child_mesh;
-        //if ( gid ) {
-        //child_mesh = components::amr::amr_mesh_tapered(gid,true);
-        //} else {
-        //child_mesh = components::amr::amr_mesh_tapered::create(here, 1, true);
-        // do this later: gid = child_mesh.detach();
+        //components::amr::amr_mesh_tapered child_mesh (
+        //          components::amr::amr_mesh_tapered::create(here, 1, true));
+        //if ( !child_mesh.get_gid() ) {
+          child_mesh = components::amr::amr_mesh_tapered::create(here, 1, true);
         //}
 
         std::vector<naming::id_type> initial_data;
@@ -442,6 +439,9 @@ namespace hpx { namespace components { namespace amr
         overwrite->right_ = result_data[4];
 
         overwrite->left_alloc_ = 0;
+
+        overwrite->reference_alloc_ = 1;
+        overwrite->reference_ = result;
   
         resultval->right_alloc_ = 0;
         resultval->left_alloc_ = 0;
@@ -455,6 +455,7 @@ namespace hpx { namespace components { namespace amr
         // release result data
         //for (std::size_t i = 0; i < result_data.size(); ++i) 
         //    components::stubs::memory_block::free(result_data[i]);
+        child_mesh.free();
       }
 
       return 0;
@@ -473,7 +474,7 @@ namespace hpx { namespace components { namespace amr
                 components::get_component_type<components::amr::server::logging>();
       components::component_type function_type =
                 components::get_component_type<components::amr::stencil>();
-      components::amr::amr_mesh_left child_mesh (
+      components::amr::amr_mesh_left child_left_mesh (
                 components::amr::amr_mesh_left::create(here, 1, true));
 
       bool do_logging = false;
@@ -481,7 +482,7 @@ namespace hpx { namespace components { namespace amr
         do_logging = true;
       }
       std::vector<naming::id_type> result_data(
-          child_mesh.init_execute(function_type,
+          child_left_mesh.init_execute(function_type,
             do_logging ? logging_type : components::component_invalid,
             level, x, par));
 
@@ -517,6 +518,7 @@ namespace hpx { namespace components { namespace amr
       //for (std::size_t i = 0; i < result_data.size(); ++i) 
       //    components::stubs::memory_block::free(result_data[i]);
 
+      child_left_mesh.free();
       return 0;
     }
 
