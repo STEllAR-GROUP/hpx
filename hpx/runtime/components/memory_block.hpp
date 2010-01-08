@@ -31,6 +31,10 @@ namespace hpx { namespace components
         typedef client_base<memory_block, stubs::memory_block> base_type;
 
     public:
+        memory_block() 
+          : base_type(naming::invalid_id, false)
+        {}
+
         /// Create a client side representation for the existing
         /// \a server#memory_block instance with the given global id \a gid.
         memory_block(naming::id_type gid, bool freeonexit = false) 

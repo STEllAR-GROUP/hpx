@@ -22,6 +22,10 @@ namespace hpx { namespace components
         typedef client_base<accumulator, stubs::accumulator> base_type;
 
     public:
+        accumulator() 
+          : base_type(naming::invalid_id, false)
+        {}
+
         /// Create a client side representation for the existing
         /// \a server#accumulator instance with the given global id \a gid.
         accumulator(naming::id_type gid, bool freeonexit = true) 

@@ -35,8 +35,8 @@ int hpx_main(std::size_t numvals, std::size_t numsteps, bool do_logging)
 
     {
         naming::id_type here = applier::get_applier().get_runtime_support_gid();
-        components::amr::amr_mesh mesh (
-            components::amr::amr_mesh::create(here, 1, true));
+        components::amr::amr_mesh mesh; 
+        mesh.create(here, 1, true);
 
         hpx::util::high_resolution_timer t;
         std::vector<naming::id_type> result_data(

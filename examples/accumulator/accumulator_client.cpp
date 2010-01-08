@@ -35,7 +35,8 @@ threads::thread_state hpx_main()
 
     // create an accumulator locally
     using hpx::components::accumulator;
-    accumulator accu (accumulator::create(prefix));
+    accumulator accu;
+    accumulator.create(prefix);
 
     // print some message
     std::cout << "accumulator client, you may enter some commands "

@@ -35,7 +35,8 @@ int hpx_main()
     }
 
     using hpx::components::simple_accumulator;
-    simple_accumulator accu(simple_accumulator::create(prefix));
+    simple_accumulator accu;
+    simple_accumulator.create(prefix);
 
     // print some message
     std::cout << "simple accumulator client, you may enter some commands\n"
