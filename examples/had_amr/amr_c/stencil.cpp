@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2009 Hartmut Kaiser
+//  Copyright (c) 2007-2010 Hartmut Kaiser
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -140,7 +140,7 @@ namespace hpx { namespace components { namespace amr
             // One special case: refining at time = 0
             if ( resultval->refine_ && gids.size() == 5 && 
                  val1->timestep_ < 1.e-6 && resultval->level_ < allowedl ) {
-              finer_mesh_initial(result, gids, resultval->level_+1, resultval->x_, par);
+              finer_mesh_initial(result, gids, resultval->level_+1, resultval->x_, row, column, par);
             }
 
             if (log_ && fmod(resultval->timestep_,par.output) < 1.e-6)  
@@ -274,11 +274,11 @@ namespace hpx { namespace components { namespace amr
                   components::get_component_type<components::amr::stencil>();
         //components::amr::amr_mesh_left child_left_mesh (
         //          components::amr::amr_mesh_left::create(here, 1, true));
-        //if ( !child_left_mesh[row][column].get_gid() ) {
-        //  printf(" TEST left row %d %d\n",row,column);
-        components::amr::amr_mesh_left child_left_mesh;
-        child_left_mesh = components::amr::amr_mesh_left::create(here, 1, true);
-        //}
+        if ( !child_left_mesh[row].get_gid() ) {
+            printf(" TEST left row %d %d\n",row,column);
+//         components::amr::amr_mesh_left child_left_mesh;
+            child_left_mesh[row].create(here, 1, true);
+        }
 
         std::vector<naming::id_type> initial_data;
         for (i=0;i<9;i++) {
@@ -290,7 +290,7 @@ namespace hpx { namespace components { namespace amr
           do_logging = true;
         }
         std::vector<naming::id_type> result_data(
-            child_left_mesh.execute(initial_data, function_type,
+            child_left_mesh[row].execute(initial_data, function_type,
               do_logging ? logging_type : components::component_invalid,par));
   
         access_memory_block<stencil_data> overwrite, resultval;
@@ -404,13 +404,13 @@ namespace hpx { namespace components { namespace amr
                   components::get_component_type<components::amr::stencil>();
         //components::amr::amr_mesh_tapered child_mesh (
         //          components::amr::amr_mesh_tapered::create(here, 1, true));
-        //if ( !child_mesh[row][column].get_gid() ) {
-          printf(" TEST row %d %d\n",row,column);
-        components::amr::amr_mesh_tapered child_mesh;
-        child_mesh = components::amr::amr_mesh_tapered::create(here,1, true);
-        //} else {
-        //  printf(" TEST working...\n");
-        //}
+        if ( !child_mesh[row].get_gid() ) {
+            printf(" TEST row %d %d\n",row,column);
+//         components::amr::amr_mesh_tapered child_mesh;
+            child_mesh[row].create(here,1, true);
+        } else {
+            printf(" TEST working...\n");
+        }
 
         std::vector<naming::id_type> initial_data;
         for (i=0;i<8;i++) {
@@ -425,7 +425,7 @@ namespace hpx { namespace components { namespace amr
           do_logging = true;
         }
         std::vector<naming::id_type> result_data(
-            child_mesh.execute(initial_data, function_type,
+            child_mesh[row].execute(initial_data, function_type,
               do_logging ? logging_type : components::component_invalid,par));
   
         access_memory_block<stencil_data> overwrite,resultval;
@@ -473,7 +473,8 @@ namespace hpx { namespace components { namespace amr
     // Implement a finer mesh via interpolation of inter-mesh points
     // Compute the result value for the current time step
     int stencil::finer_mesh_initial(naming::id_type const& result, 
-        std::vector<naming::id_type> const& gids, std::size_t level, double x, Parameter const& par) 
+        std::vector<naming::id_type> const& gids, std::size_t level, double x, 
+        int row, int column, Parameter const& par) 
     {
 
       // the initial data for the child mesh comes from the parent mesh
@@ -482,15 +483,18 @@ namespace hpx { namespace components { namespace amr
                 components::get_component_type<components::amr::server::logging>();
       components::component_type function_type =
                 components::get_component_type<components::amr::stencil>();
-      components::amr::amr_mesh_left child_left_mesh (
-                components::amr::amr_mesh_left::create(here, 1, true));
+//       components::amr::amr_mesh_left child_left_mesh (
+//                 components::amr::amr_mesh_left::create(here, 1, true));
+
+      if (!child_left_mesh[row].get_gid())
+          child_left_mesh[row].create(here, 1, true);
 
       bool do_logging = false;
       if ( par.loglevel > 0 ) {
         do_logging = true;
       }
       std::vector<naming::id_type> result_data(
-          child_left_mesh.init_execute(function_type,
+          child_left_mesh[row].init_execute(function_type,
             do_logging ? logging_type : components::component_invalid,
             level, x, par));
 

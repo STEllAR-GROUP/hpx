@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2009 Hartmut Kaiser
+//  Copyright (c) 2007-2010 Hartmut Kaiser
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -62,7 +62,8 @@ namespace hpx
             boost::bind(&runtime_impl::deinit_tss, This())), 
         timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This())),
-        agas_client_(agas_pool_, ini_.get_agas_locality(agas_address, agas_port), mode_ == console),
+        agas_client_(agas_pool_, ini_.get_agas_locality(agas_address, agas_port), 
+            mode_ == console, ini_.get_agas_cache_size()),
         parcel_port_(parcel_pool_, naming::locality(address, port)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
@@ -93,7 +94,8 @@ namespace hpx
             boost::bind(&runtime_impl::deinit_tss, This())), 
         timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This())),
-        agas_client_(agas_pool_, agas_address, mode_ == console),
+        agas_client_(agas_pool_, agas_address, mode_ == console,
+            ini_.get_agas_cache_size()),
         parcel_port_(parcel_pool_, address),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
@@ -124,7 +126,8 @@ namespace hpx
             boost::bind(&runtime_impl::deinit_tss, This())), 
         timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This())),
-        agas_client_(agas_pool_, ini_.get_agas_locality(), mode_ == console),
+        agas_client_(agas_pool_, ini_.get_agas_locality(), 
+            mode_ == console, ini_.get_agas_cache_size()),
         parcel_port_(parcel_pool_, address),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),

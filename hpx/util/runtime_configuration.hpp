@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2009 Hartmut Kaiser
+//  Copyright (c) 2007-2010 Hartmut Kaiser
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -24,13 +24,16 @@ namespace hpx { namespace util
         runtime_configuration(std::vector<std::string> const& prefill);
 
         // Get the AGAS locality to use 
-        naming::locality get_agas_locality();
+        naming::locality get_agas_locality() const;
 
         // Get the AGAS locality to use (default_address/default_port are 
         // the default values describing the locality to use if no 
         // configuration info can be found).
         naming::locality get_agas_locality(
-            std::string default_address, boost::uint16_t default_port);
+            std::string default_address, boost::uint16_t default_port) const;
+
+        // Get AGAS client side cache size
+        std::size_t get_agas_cache_size() const;
 
         // Load application specific configuration and merge it with the
         // default configuration loaded from hpx.ini

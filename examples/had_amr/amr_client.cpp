@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2009 Hartmut Kaiser
+//  Copyright (c) 2007-2010 Hartmut Kaiser
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -37,8 +37,9 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 
     {
         naming::id_type here = applier::get_applier().get_runtime_support_gid();
-        components::amr::amr_mesh mesh (
-            components::amr::amr_mesh::create(here, 1, true));
+
+        components::amr::amr_mesh mesh;
+        mesh.create(here, 1, true);
 
         if ( par.loglevel > 0 ) {
           // over-ride a false command line argument

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2009 Hartmut Kaiser
+//  Copyright (c) 2007-2010 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -52,7 +52,8 @@ namespace hpx { namespace naming
         /// \param isconsole [in] This parameter is true if the locality 
         ///                 represents the application console.
         resolver_client(util::io_service_pool& io_service_pool, locality l,
-            bool isconsole = false);
+            bool isconsole = false, 
+            std::size_t cachesize = HPX_INITIAL_AGAS_CACHE_SIZE);
 
         /// \brief Get unique prefix usable as locality id (locality prefix)
         ///

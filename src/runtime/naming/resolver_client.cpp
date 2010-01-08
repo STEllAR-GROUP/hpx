@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2009 Hartmut Kaiser
+//  Copyright (c) 2007-2010 Hartmut Kaiser
 //
 //  Parts of this code were taken from the Boost.Asio library
 //  Copyright (c) 2003-2007 Christopher M. Kohlhoff (chris at kohlhoff dot com)
@@ -40,10 +40,10 @@
 namespace hpx { namespace naming 
 {
     resolver_client::resolver_client(util::io_service_pool& io_service_pool, 
-            locality l, bool isconsole) 
+            locality l, bool isconsole, std::size_t cachesize) 
       : there_(l), io_service_pool_(io_service_pool), 
         connection_cache_(HPX_MAX_AGAS_CONNECTION_CACHE_SIZE, "[AGAS] "),
-        agas_cache_(HPX_INITIAL_AGAS_CACHE_SIZE), isconsole_(isconsole)
+        agas_cache_(cachesize), isconsole_(isconsole)
     {
         // start the io service pool
         io_service_pool.run(false);
@@ -640,6 +640,7 @@ namespace hpx { namespace naming
                 boost::archive::binary_oarchive archive(io);
 #endif
                 archive << req;
+                io.strict_sync();
             }
 
             // get existing connection to AGAS server or establish a new one

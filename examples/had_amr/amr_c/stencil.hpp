@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2009 Hartmut Kaiser
+//  Copyright (c) 2007-2010 Hartmut Kaiser
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -28,14 +28,15 @@ namespace hpx { namespace components { namespace amr
     private:
         typedef amr::server::functional_component base_type;
 
-       // components::amr::amr_mesh_tapered child_mesh[3][9];
-       // components::amr::amr_mesh_left child_left_mesh[3][9];
+        components::amr::amr_mesh_tapered child_mesh[3];
+        components::amr::amr_mesh_left child_left_mesh[3];
 
     public:
         typedef stencil wrapped_type;
         typedef stencil wrapping_type;
 
         stencil();
+        ~stencil() {}
 
         /// This is the function implementing the actual time step functionality
         /// It takes the values as calculated during the previous time step 
@@ -61,7 +62,7 @@ namespace hpx { namespace components { namespace amr
         // this function creates a finer mesh from the initial data
         int finer_mesh_initial(naming::id_type const& result, 
             std::vector<naming::id_type> const& gids, std::size_t level, double x,
-            Parameter const& par);
+            int row, int column, Parameter const& par);
 
         /// The alloc function is supposed to create a new memory block instance 
         /// suitable for storing all data needed for a single time step. 

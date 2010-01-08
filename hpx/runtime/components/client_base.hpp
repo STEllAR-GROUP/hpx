@@ -32,18 +32,22 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         /// Create a new instance of an distributing_factory on the locality as 
         /// given by the parameter \a targetgid
-        static Derived 
-        create(naming::id_type const& targetgid, component_type type,
+        Derived& create(naming::id_type const& targetgid, component_type type,
             std::size_t count = 1, bool freeonexit = false)
         {
-            return Derived(stub_type::create(targetgid, type, count), freeonexit);
+            free();
+            gid_ = stub_type::create(targetgid, type, count);
+            freeonexit_ = freeonexit;
+            return static_cast<Derived&>(*this);
         }
 
-        static Derived 
-        create(naming::id_type const& targetgid, std::size_t count = 1, 
+        Derived& create(naming::id_type const& targetgid, std::size_t count = 1, 
             bool freeonexit = false)
         {
-            return Derived(stub_type::create(targetgid, count), freeonexit);
+            free();
+            gid_ = stub_type::create(targetgid, count);
+            freeonexit_ = freeonexit;
+            return static_cast<Derived&>(*this);
         }
 
         void free(component_type type)
@@ -62,17 +66,6 @@ namespace hpx { namespace components
             }
         }
 
-        client_base& operator= (client_base const& rhs)
-        {
-            if (this != &rhs) {
-                if (freeonexit_)
-                    free();
-                gid_ = rhs.gid_;
-                freeonexit_ = rhs.freeonexit_;
-            }
-            return *this;
-        }
-
         ///////////////////////////////////////////////////////////////////////
         naming::id_type const& get_gid() const
         {
@@ -81,14 +74,18 @@ namespace hpx { namespace components
 
         naming::id_type detach() 
         {
-            naming::id_type g = gid_;
-            gid_ = naming::invalid_id;
+            naming::id_type g;
+            std::swap(gid_, g);
             return g;
         }
 
     protected:
         naming::id_type gid_;
         bool freeonexit_;
+
+    private:
+        // we should not copy instances of this class
+        client_base& operator= (client_base const& rhs);
     };
 
 }}

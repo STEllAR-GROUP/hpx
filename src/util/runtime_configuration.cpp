@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2009 Hartmut Kaiser
+//  Copyright (c) 2005-2010 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -37,6 +37,8 @@ namespace hpx { namespace util
                 HPX_NAME_RESOLVER_ADDRESS "}",
             "port = ${HPX_AGAS_SERVER_PORT:" 
                 BOOST_PP_STRINGIZE(HPX_NAME_RESOLVER_PORT) "}",
+            "cachesize = ${HPX_AGAS_CACHE_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_CACHE_SIZE) "}",
 
             // create default ini entries for memory_block component hosted in 
             // the main hpx shared library
@@ -93,11 +95,11 @@ namespace hpx { namespace util
     //    address=<ip address>   # this defaults to HPX_NAME_RESOLVER_ADDRESS
     //    port=<ip port>         # this defaults to HPX_NAME_RESOLVER_PORT
     //
-    naming::locality runtime_configuration::get_agas_locality()
+    naming::locality runtime_configuration::get_agas_locality() const
     {
         // load all components as described in the configuration information
         if (has_section("hpx.agas")) {
-            util::section* sec = get_section("hpx.agas");
+            util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 std::string cfg_port(
                     sec->get_entry("port", HPX_NAME_RESOLVER_PORT));
@@ -111,11 +113,11 @@ namespace hpx { namespace util
     }
 
     naming::locality runtime_configuration::get_agas_locality(
-        std::string default_address, boost::uint16_t default_port)
+        std::string default_address, boost::uint16_t default_port) const
     {
         // load all components as described in the configuration information
         if (has_section("hpx.agas")) {
-            util::section* sec = get_section("hpx.agas");
+            util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 // read fall back values from configuration file, if needed
                 if (default_address.empty()) {
@@ -130,6 +132,18 @@ namespace hpx { namespace util
             }
         }
         return naming::locality(HPX_NAME_RESOLVER_ADDRESS, HPX_NAME_RESOLVER_PORT);
+    }
+
+    std::size_t runtime_configuration::get_agas_cache_size() const
+    {
+        if (has_section("hpx.agas")) {
+            util::section const* sec = get_section("hpx.agas");
+            if (NULL != sec) {
+                return boost::lexical_cast<std::size_t>(
+                    sec->get_entry("cachesize", HPX_INITIAL_AGAS_CACHE_SIZE));
+            }
+        }
+        return HPX_INITIAL_AGAS_CACHE_SIZE;
     }
 
     ///////////////////////////////////////////////////////////////////////////
