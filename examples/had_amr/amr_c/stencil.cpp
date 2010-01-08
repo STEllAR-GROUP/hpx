@@ -25,7 +25,9 @@ namespace hpx { namespace components { namespace amr
     ///////////////////////////////////////////////////////////////////////////
     stencil::stencil()
       : numsteps_(0)
-    {}
+    {
+      lsb_count = 0;
+    }
 
     int stencil::floatcmp(double x1,double x2) {
       // compare to floating point numbers
@@ -452,7 +454,7 @@ namespace hpx { namespace components { namespace amr
 
         // TEST
         //if ( floatcmp(overwrite->x_,-3.3333333333333333333333333) == 1 ) {
-        //  traverse_grid(result);
+        //  traverse_grid(result,1);
         //}
 
         components::stubs::memory_block::free(result_data[0]);
@@ -646,23 +648,81 @@ namespace hpx { namespace components { namespace amr
 
     // This routine is for debugging -- pass in any gid
     // and it traverses the entire grid available at that moment
-    void stencil::traverse_grid(naming::id_type const& start)
+    void stencil::traverse_grid(naming::id_type const& start,int firstcall)
     {
+      int i;
+      int found;
+
+      if (firstcall == 1) lsb_count = 0;
+
       access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(start);
       printf("stencil::traverse_grid x: %g lsb: %d\n",amb->x_,start.id_lsb_);
       if ( amb->overwrite_alloc_ == 1 ) {
-        printf("stencil::traverse_grid overwrite\n");
-        traverse_grid(amb->overwrite_);
+        // check if the lsb has already been recorded
+        found = 0;
+        for (i=0;i<lsb_count;i++) {
+          if (amb->overwrite_.id_lsb_ == unique_lsb[i]) {
+            found = 1;
+            break;
+          }
+        }
+        if ( found == 0 ) {
+          unique_lsb[lsb_count] = amb->overwrite_.id_lsb_;
+          lsb_count++;
+          printf("stencil::traverse_grid overwrite\n");
+          traverse_grid(amb->overwrite_,0);
+        }
+      }
+
+      if ( amb->reference_alloc_ == 1 ) {
+        // check if the lsb has already been recorded
+        found = 0;
+        for (i=0;i<lsb_count;i++) {
+          if (amb->reference_.id_lsb_ == unique_lsb[i]) {
+            found = 1;
+            break;
+          }
+        }
+        if ( found == 0 ) {
+          unique_lsb[lsb_count] = amb->reference_.id_lsb_;
+          lsb_count++;
+          printf("stencil::traverse_grid reference\n");
+          traverse_grid(amb->reference_,0);
+        }
       }
 
       if ( amb->right_alloc_ == 1 ) {
-        printf("stencil::traverse_grid right\n");
-        traverse_grid(amb->right_);
+        // check if the lsb has already been recorded
+        found = 0;
+        for (i=0;i<lsb_count;i++) {
+          if (amb->right_.id_lsb_ == unique_lsb[i]) {
+            found = 1;
+            break;
+          }
+        }
+        if ( found == 0 ) {
+          unique_lsb[lsb_count] = amb->right_.id_lsb_;
+          lsb_count++;
+          printf("stencil::traverse_grid right\n");
+          traverse_grid(amb->right_,0);
+        }
       }
 
       if ( amb->left_alloc_ == 1 ) {
-        printf("stencil::traverse_grid left\n");
-        traverse_grid(amb->left_);
+        // check if the lsb has already been recorded
+        found = 0;
+        for (i=0;i<lsb_count;i++) {
+          if (amb->left_.id_lsb_ == unique_lsb[i]) {
+            found = 1;
+            break;
+          }
+        }
+        if ( found == 0 ) {
+          unique_lsb[lsb_count] = amb->left_.id_lsb_;
+          lsb_count++;
+          printf("stencil::traverse_grid left\n");
+          traverse_grid(amb->left_,0);
+        }
       }
     }
 

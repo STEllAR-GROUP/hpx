@@ -28,6 +28,9 @@ namespace hpx { namespace components { namespace amr
     private:
         typedef amr::server::functional_component base_type;
 
+        int lsb_count;
+        int unique_lsb[1000];
+
         components::amr::amr_mesh_tapered child_mesh[3];
         components::amr::amr_mesh_left child_left_mesh[3];
 
@@ -82,7 +85,7 @@ namespace hpx { namespace components { namespace amr
         int floatcmp(double x1,double x2);
 
         // debugging routine -- traverses the entire mesh available
-        void traverse_grid(naming::id_type const& start);
+        void traverse_grid(naming::id_type const& start,int firstcall);
 
     private:
         std::size_t numsteps_;

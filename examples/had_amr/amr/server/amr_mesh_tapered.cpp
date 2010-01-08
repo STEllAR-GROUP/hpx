@@ -355,8 +355,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         typedef components::distributing_factory::result_type result_type;
 
         // create a distributing factory locally
-        components::distributing_factory factory;
-        factory.create(applier::get_applier().get_runtime_support_gid(), true);
+        components::distributing_factory factory(applier::get_applier().get_runtime_support_gid(), true);
 
         // create a couple of stencil (functional) components and twice the 
         // amount of stencil_value components
@@ -433,8 +432,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         typedef components::distributing_factory::result_type result_type;
 
         // create a distributing factory locally
-        components::distributing_factory factory;
-        factory.create(applier::get_applier().get_runtime_support_gid(), true);
+        components::distributing_factory factory(applier::get_applier().get_runtime_support_gid(), true);
 
         // create a couple of stencil (functional) components and twice the 
         // amount of stencil_value components
