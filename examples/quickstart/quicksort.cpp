@@ -127,7 +127,7 @@ int hpx_main(int argument)
     {
         // create (remote) memory block
         components::memory_block mb;
-        mp.create(prefix, sizeof(int)*argument);
+        mb.create(prefix, sizeof(int)*argument);
         components::access_memory_block<int> data(mb.get());
 
         // randomly fill the vector
