@@ -9,6 +9,7 @@
 #include "../amr/amr_mesh.hpp"
 #include "../amr/amr_mesh_tapered.hpp"
 #include "../amr/amr_mesh_left.hpp"
+#include "../amr/tapered_autonomous.hpp"
 #include "../amr/server/functional_component.hpp"
 #include "stencil_data.hpp"
 
@@ -31,6 +32,7 @@ namespace hpx { namespace components { namespace amr
         int lsb_count;
         int unique_lsb[1000];
 
+        components::amr::tapered_autonomous child[3];
         components::amr::amr_mesh_tapered child_mesh[3];
         components::amr::amr_mesh_left child_left_mesh[3];
 
@@ -58,6 +60,11 @@ namespace hpx { namespace components { namespace amr
         // this function creates a finer mesh from 3 input gids and evolves that
         // finer mesh for two steps.
         int finer_mesh(naming::id_type const& result, 
+            std::vector<naming::id_type> const& gids,
+            int row, int column,
+            Parameter const& par);
+
+        int finer_mesh_tapered(naming::id_type const& result, 
             std::vector<naming::id_type> const& gids,
             int row, int column,
             Parameter const& par);
