@@ -93,7 +93,7 @@ namespace boost { namespace plugin {
 
             HMODULE h;
         };
-        friend template <typename T> free_dll;
+        template <typename T> friend struct free_dll;
 
     public:
         dll() 
