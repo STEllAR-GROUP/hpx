@@ -74,11 +74,11 @@ namespace boost { namespace plugin {
         }
 
         ///////////////////////////////////////////////////////////////////////
+        template<typename T>
         struct free_dll 
         {
             free_dll(HMODULE h) : h(h) {}
 
-            template<typename T>
             void operator()(T)
             {
                 if (NULL != h)
@@ -93,7 +93,7 @@ namespace boost { namespace plugin {
 
             HMODULE h;
         };
-        friend struct free_dll;
+        friend template <typename T> free_dll;
 
     public:
         dll() 
@@ -192,7 +192,7 @@ namespace boost { namespace plugin {
                     
                 throw std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str));
             }
-            return std::make_pair(address, free_dll(handle));
+            return std::make_pair(address, free_dll<SymbolType>(handle));
         }
 
     protected:
