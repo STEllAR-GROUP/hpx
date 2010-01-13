@@ -128,7 +128,8 @@ namespace hpx { namespace components { namespace server
         using components::distributing_factory;
 
         naming::id_type here = applier::get_applier().get_runtime_support_gid();
-        distributing_factory factory(distributing_factory::create(here, true));
+        distributing_factory factory;
+        factory.create(here, true);
 
         typedef distributing_factory::result_type result_type;
         result_type list = factory.create_components(Item::get_component_type(), num_items);
@@ -244,7 +245,8 @@ namespace hpx { namespace components { namespace server
 
             // Create a new sub list there
             typedef hpx::components::local_set<Item> local_set_type;
-            local_set_type edge_set(local_set_type::create(locale));
+            local_set_type edge_set;
+            edge_set.create(locale);
 
             LDSET_(info) << "Created local sublist";
 

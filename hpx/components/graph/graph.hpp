@@ -22,6 +22,10 @@ namespace hpx { namespace components
         typedef client_base<graph, stubs::graph> base_type;
 
     public:
+        graph()
+          : base_type(naming::invalid_id, true)
+        {}
+
         /// Create a client side representation for the existing
         /// \a server#graph instance with the given global id \a gid.
         graph(naming::id_type gid, bool freeonexit = true) 

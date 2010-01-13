@@ -22,6 +22,10 @@ namespace hpx { namespace components
         typedef client_base<edge, stubs::edge> base_type;
 
     public:
+        edge()
+          : base_type(naming::invalid_id, true)
+        {}
+
         /// Create a client side representation for the existing
         /// \a server#edge instance with the given global id \a gid.
         edge(naming::id_type gid, bool freeonexit = true)

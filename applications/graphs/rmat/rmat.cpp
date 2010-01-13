@@ -238,7 +238,8 @@ int hpx_main(int scale, int edge_factor, int type)
     gid_type here = hpx::applier::get_applier().get_runtime_support_gid();;
 
     // Create the graph used for with all kernels
-    client_graph_type G(client_graph_type::create(here));
+    client_graph_type G;
+    G.create(here);
 
     // Generate the R-MAT graph if no file is given,
     // otherwise, execute Kernel 1 to read in graph data

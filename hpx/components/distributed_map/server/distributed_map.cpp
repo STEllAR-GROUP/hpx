@@ -61,7 +61,9 @@ namespace hpx { namespace components { namespace server
             // Create a new sub list there
             typedef List map_type;
             typedef hpx::components::local_map<map_type> local_map_type;
-            local_map_type props_map(local_map_type::create(locale));
+
+            local_map_type props_map;
+            props_map.create(locale);
 
             lcos::mutex::scoped_lock l(mtx_);
 

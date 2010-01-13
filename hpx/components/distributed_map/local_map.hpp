@@ -24,6 +24,10 @@ namespace hpx { namespace components
                 > base_type;
 
     public:
+        local_map()
+          : base_type(naming::invalid_id, true)
+        {}
+
         local_map(naming::id_type gid, bool freeonexit = true)
           : base_type(gid, freeonexit)
         { }

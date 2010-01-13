@@ -58,7 +58,8 @@ int hpx_main(int depth, std::string input_file, int k4_approx)
     gid_type here = find_here();
 
     // Create the graph used for with all kernels
-    client_graph_type G(client_graph_type::create(here));
+    client_graph_type G;
+    G.create(here);
 
     // Kernel 1: graph construction (see above)
     // Input:
@@ -82,7 +83,8 @@ int hpx_main(int depth, std::string input_file, int k4_approx)
 
     {
         /* Begin: timed execution of Kernel 1 v1 */
-        client_graph_type G_K2(client_graph_type::create(here));
+        client_graph_type G_K2;
+        G_K2.create(here);
         hpx::util::high_resolution_timer k1_v2_t;
         lcos::eager_future<kernel1_v2_action>
             k1_v2(here, G_K2.get_gid(), input_file);
@@ -96,7 +98,8 @@ int hpx_main(int depth, std::string input_file, int k4_approx)
 
     {
         /* Begin: timed execution of Kernel 1 v1 */
-        client_graph_type G_K3(client_graph_type::create(here));
+        client_graph_type G_K3;
+        G_K3.create(here);
         hpx::util::high_resolution_timer k1_v3_t;
         lcos::eager_future<kernel1_v2_action>
             k1_v3(here, G_K3.get_gid(), input_file);
@@ -124,7 +127,8 @@ int hpx_main(int depth, std::string input_file, int k4_approx)
 
     /* Begin: timed execution of Kernel 2 */
     hpx::util::high_resolution_timer k2_t;
-    client_dist_edge_set_type edge_set(client_dist_edge_set_type::create(here));
+    client_dist_edge_set_type edge_set;
+    edge_set.create(here);
     lcos::eager_future<kernel2_action>
         k2(here, G.get_gid(), edge_set.get_gid());
     k2.get();
@@ -174,7 +178,8 @@ int hpx_main(int depth, std::string input_file, int k4_approx)
 
     /* Begin: timed execution of Kernel 3 */
     hpx::util::high_resolution_timer k3_t;
-    client_dist_graph_set_type subgraphs(client_dist_graph_set_type::create(here));
+    client_dist_graph_set_type subgraphs;
+    subgraphs.create(here);
     lcos::eager_future<kernel3_action>
         k3(here, edge_set.get_gid(), subgraphs.get_gid(), depth);
     k3.get();
@@ -236,7 +241,9 @@ int hpx_main(int depth, std::string input_file, int k4_approx)
 
          // Create new VS, a subset of V(G)
          LSSCA_(info) << "Creating new VS";
-         VS = client_dist_vertex_set_type::create(here).get_gid();
+         client_dist_vertex_set_type vs;
+         vs.create(here);
+         VS = vs.get_gid();
 
          // Select random items
          gids_type v_locals =
@@ -259,8 +266,8 @@ int hpx_main(int depth, std::string input_file, int k4_approx)
 
     /* Begin: timed execution of Kernel 4 */
     hpx::util::high_resolution_timer k4_t;
-    client_dist_gids_map_type
-        bc_scores(client_dist_gids_map_type::create(here));
+    client_dist_gids_map_type bc_scores;
+    bc_scores.create(here);
     lcos::eager_future<kernel4_action>
         k4(here, V, VS, k4_approx, bc_scores.get_gid());
     k4.get();
