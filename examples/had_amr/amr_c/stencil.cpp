@@ -136,7 +136,7 @@ namespace hpx { namespace components { namespace amr
             }
 
             std::size_t allowedl = par.allowedl;
-            if ( resultval->refine_ && gids.size() == 5 && val2->level_ < allowedl ) {
+            if ( resultval->refine_ && gids.size() == 5 && resultval->level_ < allowedl ) {
               finer_mesh_tapered(result, gids, row, column, par);
             } 
 
