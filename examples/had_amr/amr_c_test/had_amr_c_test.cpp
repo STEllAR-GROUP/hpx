@@ -67,8 +67,8 @@ int evaluate_timestep(stencil_data const* left, stencil_data const* middle,
     result->value_ = middle->value_ - dt/dx*(middle->value_ - left->value_);
    // result->value_ = middle->value_;
 
-    //if ( result->value_ > 0.2 ) result->refine_ = true;
-    //else result->refine_ = false;
+    if ( result->value_ > 0.05 ) result->refine_ = true;
+    else result->refine_ = false;
 
     if (gidsize < 5) result->refine_ = false;
 

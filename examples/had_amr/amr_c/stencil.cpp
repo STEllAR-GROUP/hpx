@@ -136,9 +136,9 @@ namespace hpx { namespace components { namespace amr
             }
 
             std::size_t allowedl = par.allowedl;
-            if ( val2->refine_ && gids.size() == 5 && val2->level_ < allowedl ) {
-              finer_mesh(result, gids, row, column, par);
-            }
+            if ( resultval->refine_ && gids.size() == 5 && val2->level_ < allowedl ) {
+              finer_mesh_tapered(result, gids, row, column, par);
+            } 
 
             // One special case: refining at time = 0
             if ( resultval->refine_ && gids.size() == 5 && 
@@ -181,91 +181,6 @@ namespace hpx { namespace components { namespace amr
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Implement a finer mesh via interpolation of inter-mesh points
-    // Compute the result value for the current time step
-    int stencil::finer_mesh(naming::id_type const& result, 
-        std::vector<naming::id_type> const& gids, int row,int column, Parameter const& par) 
-    {
-      int i;
-      access_memory_block<stencil_data> mval[5];
-      access_memory_block<stencil_data> tval;
-
-      boost::tie(mval[0], mval[1], mval[2], mval[3], mval[4]) = 
-        get_memory_block_async<stencil_data>(gids[0], gids[1], gids[2], gids[3], gids[4]);
-
-      // store the anchor values and coordinates
-      double tm1,t1,t3,t5,t7;
-      double t0,t2,t4,t6;
-      double xm1,x1,x3,x5,x7;
-
-      tm1 = mval[0]->value_;
-      t1 = mval[1]->value_;
-      t3 = mval[2]->value_;
-      t5 = mval[3]->value_;
-      t7 = mval[4]->value_;
-
-      xm1 = mval[0]->x_;
-      x1 = mval[1]->x_;
-      x3 = mval[2]->x_;
-      x5 = mval[3]->x_;
-      x7 = mval[4]->x_;
-
-      // increase the level by one 
-      int level = mval[0]->level_;
-      level++;
-
-      // avoid interpolation if possible
-      int s0,s2,s4,s6;
-      s0 = 0; s2 = 0; s4 = 0; s6 = 0;
-
-      s0 = findpoint(mval[0],mval[1],tval);
-      if ( s0 == 1 ) t0 = tval->value_;
-      else t0 = 0.5*(tm1 + t1);
-
-      s2 = findpoint(mval[1],mval[2],tval);
-      if ( s2 == 1 ) t2 = tval->value_;
-      else t2 = 0.5*(t1 + t3);
-
-      s4 = findpoint(mval[2],mval[3],tval);
-      if ( s4 == 1 ) t4 = tval->value_;
-      else t4 = 0.5*(t3 + t5);
-
-      s6 = findpoint(mval[3],mval[4],tval);
-      if ( s6 == 1 ) t6 = tval->value_;
-      else t6 = 0.5*(t5 + t7);
-
-      // the initial data for the child mesh comes from the parent mesh
-      naming::id_type here = applier::get_applier().get_runtime_support_gid();
-      components::component_type logging_type =
-                components::get_component_type<components::amr::server::logging>();
-      components::component_type function_type =
-                components::get_component_type<components::amr::stencil>();
-      if ( !child[row].get_gid() ) {
-          child[row].create(here,1, true);
-      }
-
-      bool do_logging = false;
-      if ( par.loglevel > 0 ) {
-        do_logging = true;
-      }
-
-      std::vector<double> initial_data;
-      initial_data.push_back(t0);
-      initial_data.push_back(t1);
-      initial_data.push_back(t2);
-      initial_data.push_back(t3);
-      initial_data.push_back(t4);
-      initial_data.push_back(t5);
-      initial_data.push_back(t6);
-      initial_data.push_back(t7);
-
-      std::vector<naming::id_type> result_data(
-          child[row].execute(initial_data, function_type,
-            do_logging ? logging_type : components::component_invalid,par));
-  
-      return 0;
-    }
     ///////////////////////////////////////////////////////////////////////////
     // Implement a finer mesh via interpolation of inter-mesh points
     // Compute the result value for the current time step
@@ -332,10 +247,11 @@ namespace hpx { namespace components { namespace amr
         int s1,s3,s5,s7;
         s1 = 0; s3 = 0; s5 = 0; s7 = 0;
 
-        s1 = findpoint(mval[0],mval[2],mval[1]);
-        s3 = findpoint(mval[2],mval[4],mval[3]);
-        s5 = findpoint(mval[4],mval[6],mval[5]);
-        s7 = findpoint(mval[6],mval[8],mval[7]);
+        // TEST
+      //  s1 = findpoint(mval[0],mval[2],mval[1]);
+      //  s3 = findpoint(mval[2],mval[4],mval[3]);
+      //  s5 = findpoint(mval[4],mval[6],mval[5]);
+      //  s7 = findpoint(mval[6],mval[8],mval[7]);
 
         if ( par.linearbounds == 1 ) {
           // linear interpolation
@@ -344,10 +260,10 @@ namespace hpx { namespace components { namespace amr
           if ( s5 == 0 ) mval[5]->value_ = 0.5*(t4 + t6);
           if ( s7 == 0 ) mval[7]->value_ = 0.5*(t6 + t8);
           // TEST
-          if ( !s1 || !s3 || !s5 || !s7 ) {
-            printf("Interpolation B: %d %d %d %d : %g %g %g %g\n",
-                                       s1,s3,s5,s7,mval[1]->x_,mval[3]->x_,mval[5]->x_,mval[7]->x_);
-          }
+        //  if ( !s1 || !s3 || !s5 || !s7 ) {
+        //    printf("Interpolation B: %d %d %d %d : %g %g %g %g\n",
+        //                               s1,s3,s5,s7,mval[1]->x_,mval[3]->x_,mval[5]->x_,mval[7]->x_);
+        //  }
         } else {
           // other user defined options not implemented yet
           interpolation();
@@ -360,11 +276,7 @@ namespace hpx { namespace components { namespace amr
                   components::get_component_type<components::amr::server::logging>();
         components::component_type function_type =
                   components::get_component_type<components::amr::stencil>();
-        //components::amr::amr_mesh_left child_left_mesh (
-        //          components::amr::amr_mesh_left::create(here, 1, true));
         if ( !child_left_mesh[row].get_gid() ) {
-            printf(" TEST left row %d %d\n",row,column);
-//         components::amr::amr_mesh_left child_left_mesh;
             child_left_mesh[row].create(here, 1, true);
         }
 
@@ -464,20 +376,21 @@ namespace hpx { namespace components { namespace amr
         int s0,s2,s4,s6;
         s0 = 0; s2 = 0; s4 = 0; s6 = 0;
 
-        s0 = findpoint(mval[8],mval[1],mval[0]);
-        s2 = findpoint(mval[1],mval[3],mval[2]);
-        s4 = findpoint(mval[3],mval[5],mval[4]);
-        s6 = findpoint(mval[5],mval[7],mval[6]);
+     //   s0 = findpoint(mval[8],mval[1],mval[0]);
+     //   s2 = findpoint(mval[1],mval[3],mval[2]);
+     //   s4 = findpoint(mval[3],mval[5],mval[4]);
+     //   s6 = findpoint(mval[5],mval[7],mval[6]);
 
         if ( par.linearbounds == 1 ) {
-          mval[0]->value_ = 0.5*(tm1 + t1);
-          mval[2]->value_ = 0.5*(t1 + t3);
-          mval[4]->value_ = 0.5*(t3 + t5);
-          mval[6]->value_ = 0.5*(t5 + t7);
+          if (s0 == 0) mval[0]->value_ = 0.5*(tm1 + t1);
+          if (s2 == 0) mval[2]->value_ = 0.5*(t1 + t3);
+          if (s4 == 0) mval[4]->value_ = 0.5*(t3 + t5);
+          if (s6 == 0) mval[6]->value_ = 0.5*(t5 + t7);
           // TEST
-          if ( !s0 || !s2 || !s4 || !s6 ) { printf("Interpolation A: %d %d %d %d : %g %g %g %g\n",
-                                        s0,s2,s4,s6,mval[0]->x_,mval[2]->x_,mval[4]->x_,mval[6]->x_);
-          }
+     //     if ( !s0 || !s2 || !s4 || !s6 ) {
+     //        printf("Interpolation A: %d %d %d %d : %g %g %g %g\n",
+     //                         s0,s2,s4,s6,mval[0]->x_,mval[2]->x_,mval[4]->x_,mval[6]->x_);
+     //     }
         } else {
           // other user defined options not implemented yet
           interpolation();
@@ -491,11 +404,7 @@ namespace hpx { namespace components { namespace amr
         components::component_type function_type =
                   components::get_component_type<components::amr::stencil>();
         if ( !child_mesh[row].get_gid() ) {
-            printf(" TEST row %d %d\n",row,column);
-//         components::amr::amr_mesh_tapered child_mesh;
             child_mesh[row].create(here,1, true);
-        } else {
-            printf(" TEST working...\n");
         }
 
         std::vector<naming::id_type> initial_data;
@@ -569,8 +478,6 @@ namespace hpx { namespace components { namespace amr
                 components::get_component_type<components::amr::server::logging>();
       components::component_type function_type =
                 components::get_component_type<components::amr::stencil>();
-//       components::amr::amr_mesh_left child_left_mesh (
-//                 components::amr::amr_mesh_left::create(here, 1, true));
 
       if (!child_left_mesh[row].get_gid())
           child_left_mesh[row].create(here, 1, true);
