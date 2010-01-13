@@ -138,6 +138,8 @@ namespace hpx { namespace components { namespace amr
             std::size_t allowedl = par.allowedl;
             if ( resultval->refine_ && gids.size() == 5 && resultval->level_ < allowedl ) {
               finer_mesh_tapered(result, gids, row, column, par);
+            } else {
+              resultval->overwrite_alloc_ = 0;
             } 
 
             // One special case: refining at time = 0
@@ -248,10 +250,10 @@ namespace hpx { namespace components { namespace amr
         s1 = 0; s3 = 0; s5 = 0; s7 = 0;
 
         // TEST
-      //  s1 = findpoint(mval[0],mval[2],mval[1]);
-      //  s3 = findpoint(mval[2],mval[4],mval[3]);
-      //  s5 = findpoint(mval[4],mval[6],mval[5]);
-      //  s7 = findpoint(mval[6],mval[8],mval[7]);
+        s1 = findpoint(mval[0],mval[2],mval[1]);
+        s3 = findpoint(mval[2],mval[4],mval[3]);
+        s5 = findpoint(mval[4],mval[6],mval[5]);
+        s7 = findpoint(mval[6],mval[8],mval[7]);
 
         if ( par.linearbounds == 1 ) {
           // linear interpolation
@@ -376,10 +378,10 @@ namespace hpx { namespace components { namespace amr
         int s0,s2,s4,s6;
         s0 = 0; s2 = 0; s4 = 0; s6 = 0;
 
-     //   s0 = findpoint(mval[8],mval[1],mval[0]);
-     //   s2 = findpoint(mval[1],mval[3],mval[2]);
-     //   s4 = findpoint(mval[3],mval[5],mval[4]);
-     //   s6 = findpoint(mval[5],mval[7],mval[6]);
+        s0 = findpoint(mval[8],mval[1],mval[0]);
+        s2 = findpoint(mval[1],mval[3],mval[2]);
+        s4 = findpoint(mval[3],mval[5],mval[4]);
+        s6 = findpoint(mval[5],mval[7],mval[6]);
 
         if ( par.linearbounds == 1 ) {
           if (s0 == 0) mval[0]->value_ = 0.5*(tm1 + t1);
