@@ -33,7 +33,7 @@ namespace hpx { namespace util
     //      T::T() MUST not throw!
     //          this is a requirement of boost::call_once.
     //
-    template <typename T, typename Tag>
+    template <typename T, typename Tag=T>
     struct static_ : boost::noncopyable
     {
     private:
