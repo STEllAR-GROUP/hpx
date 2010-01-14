@@ -136,7 +136,8 @@ namespace hpx { namespace components { namespace amr
             }
 
             std::size_t allowedl = par.allowedl;
-            if ( resultval->refine_ && gids.size() == 5 && resultval->level_ < allowedl ) {
+            if ( resultval->refine_ && gids.size() == 5 && resultval->level_ < allowedl 
+                 && val1->timestep_ >= 1.e-6  ) {
               finer_mesh_tapered(result, gids, row, column, par);
             } else {
               resultval->overwrite_alloc_ = 0;
@@ -199,6 +200,7 @@ namespace hpx { namespace components { namespace amr
           get_memory_block_async<stencil_data>(gids[0],gids[1]);
 
       if ( !edge1->refine_ || !edge2->refine_) {
+    //  if ( 1 ) {
         boost::tie(gval[0], gval[2], gval[4], gval[6], gval[8]) = 
                         components::wait(components::stubs::memory_block::clone_async(gids[0]), 
                              components::stubs::memory_block::clone_async(gids[1]),
@@ -249,7 +251,6 @@ namespace hpx { namespace components { namespace amr
         int s1,s3,s5,s7;
         s1 = 0; s3 = 0; s5 = 0; s7 = 0;
 
-        // TEST
         s1 = findpoint(mval[0],mval[2],mval[1]);
         s3 = findpoint(mval[2],mval[4],mval[3]);
         s5 = findpoint(mval[4],mval[6],mval[5]);
@@ -262,10 +263,10 @@ namespace hpx { namespace components { namespace amr
           if ( s5 == 0 ) mval[5]->value_ = 0.5*(t4 + t6);
           if ( s7 == 0 ) mval[7]->value_ = 0.5*(t6 + t8);
           // TEST
-        //  if ( !s1 || !s3 || !s5 || !s7 ) {
-        //    printf("Interpolation B: %d %d %d %d : %g %g %g %g\n",
-        //                               s1,s3,s5,s7,mval[1]->x_,mval[3]->x_,mval[5]->x_,mval[7]->x_);
-        //  }
+          if ( !s1 || !s3 || !s5 || !s7 ) {
+            printf("Interpolation B: %d %d %d %d : %g %g %g %g\n",
+                                       s1,s3,s5,s7,mval[1]->x_,mval[3]->x_,mval[5]->x_,mval[7]->x_);
+          }
         } else {
           // other user defined options not implemented yet
           interpolation();
@@ -389,10 +390,10 @@ namespace hpx { namespace components { namespace amr
           if (s4 == 0) mval[4]->value_ = 0.5*(t3 + t5);
           if (s6 == 0) mval[6]->value_ = 0.5*(t5 + t7);
           // TEST
-     //     if ( !s0 || !s2 || !s4 || !s6 ) {
-     //        printf("Interpolation A: %d %d %d %d : %g %g %g %g\n",
-     //                         s0,s2,s4,s6,mval[0]->x_,mval[2]->x_,mval[4]->x_,mval[6]->x_);
-     //     }
+          if ( !s0 || !s2 || !s4 || !s6 ) {
+             printf("Interpolation A: %d %d %d %d : %g %g %g %g\n",
+                              s0,s2,s4,s6,mval[0]->x_,mval[2]->x_,mval[4]->x_,mval[6]->x_);
+          }
         } else {
           // other user defined options not implemented yet
           interpolation();
