@@ -327,6 +327,12 @@ int main(int argc, char* argv[])
         fdata = fopen("output.dat","w");
         fprintf(fdata,"\n");
         fclose(fdata);
+        fdata = fopen("logcode1.dat","w");
+        fprintf(fdata,"\n");
+        fclose(fdata);
+        fdata = fopen("logcode2.dat","w");
+        fprintf(fdata,"\n");
+        fclose(fdata);
 
 
         initrand(42, pdist, mean, stddev, numsteps, numvals, num_threads);

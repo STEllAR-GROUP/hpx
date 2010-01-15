@@ -150,7 +150,7 @@ namespace hpx { namespace components { namespace amr
             }
 
             if (log_ && fmod(resultval->timestep_,par.output) < 1.e-6)  
-                stubs::logging::logentry(log_, resultval.get(), row, par);
+                stubs::logging::logentry(log_, resultval.get(), row,0, par);
         }
         else {
             // the last time step has been reached, just copy over the data
@@ -262,11 +262,19 @@ namespace hpx { namespace components { namespace amr
           if ( s3 == 0 ) mval[3]->value_ = 0.5*(t2 + t4);
           if ( s5 == 0 ) mval[5]->value_ = 0.5*(t4 + t6);
           if ( s7 == 0 ) mval[7]->value_ = 0.5*(t6 + t8);
+
+          // DEBUG
+          if ( s1 == 0 ) stubs::logging::logentry(log_, mval[1].get(), row,2, par);
+          if ( s3 == 0 ) stubs::logging::logentry(log_, mval[3].get(), row,2, par);
+          if ( s5 == 0 ) stubs::logging::logentry(log_, mval[5].get(), row,2, par);
+          if ( s7 == 0 ) stubs::logging::logentry(log_, mval[7].get(), row,2, par);
+
           // TEST
-          if ( !s1 || !s3 || !s5 || !s7 ) {
-            printf("Interpolation B: %d %d %d %d : %g %g %g %g\n",
-                                       s1,s3,s5,s7,mval[1]->x_,mval[3]->x_,mval[5]->x_,mval[7]->x_);
-          }
+          //if ( !s1 || !s3 || !s5 || !s7 ) {
+          //  printf("Interpolation B: %d %d %d %d : %g %g %g %g\n",
+          //                             s1,s3,s5,s7,mval[1]->x_,mval[3]->x_,mval[5]->x_,mval[7]->x_);
+          //}
+          
         } else {
           // other user defined options not implemented yet
           interpolation();
@@ -318,6 +326,14 @@ namespace hpx { namespace components { namespace amr
 
         resultval->right_alloc_ = 0;
         resultval->left_alloc_ = 0;
+
+        // DEBUG -- log the right/left points computed
+        access_memory_block<stencil_data> amb1 = 
+                         hpx::components::stubs::memory_block::get(result_data[2]);
+        access_memory_block<stencil_data> amb2 = 
+                         hpx::components::stubs::memory_block::get(result_data[6]);
+        stubs::logging::logentry(log_, amb1.get(), row,1, par);
+        stubs::logging::logentry(log_, amb2.get(), row,1, par);
 
         components::stubs::memory_block::free(result_data[0]);
         components::stubs::memory_block::free(result_data[1]);
@@ -389,11 +405,19 @@ namespace hpx { namespace components { namespace amr
           if (s2 == 0) mval[2]->value_ = 0.5*(t1 + t3);
           if (s4 == 0) mval[4]->value_ = 0.5*(t3 + t5);
           if (s6 == 0) mval[6]->value_ = 0.5*(t5 + t7);
+
+          // DEBUG
+          if ( s0 == 0 ) stubs::logging::logentry(log_, mval[0].get(), row,2, par);
+          if ( s2 == 0 ) stubs::logging::logentry(log_, mval[2].get(), row,2, par);
+          if ( s4 == 0 ) stubs::logging::logentry(log_, mval[4].get(), row,2, par);
+          if ( s6 == 0 ) stubs::logging::logentry(log_, mval[6].get(), row,2, par);
+
           // TEST
-          if ( !s0 || !s2 || !s4 || !s6 ) {
-             printf("Interpolation A: %d %d %d %d : %g %g %g %g\n",
-                              s0,s2,s4,s6,mval[0]->x_,mval[2]->x_,mval[4]->x_,mval[6]->x_);
-          }
+          //if ( !s0 || !s2 || !s4 || !s6 ) {
+          //   printf("Interpolation A: %d %d %d %d : %g %g %g %g\n",
+          //                    s0,s2,s4,s6,mval[0]->x_,mval[2]->x_,mval[4]->x_,mval[6]->x_);
+          //}
+          
         } else {
           // other user defined options not implemented yet
           interpolation();
@@ -448,10 +472,10 @@ namespace hpx { namespace components { namespace amr
         resultval->right_alloc_ = 0;
         resultval->left_alloc_ = 0;
 
-        // TEST
-        //if ( floatcmp(overwrite->x_,-3.3333333333333333333333333) == 1 ) {
-        //  traverse_grid(result,1);
-        //}
+        // DEBUG -- log the right points computed
+        access_memory_block<stencil_data> amb = 
+                           hpx::components::stubs::memory_block::get(result_data[4]);
+        stubs::logging::logentry(log_, amb.get(), row,1, par);
 
         components::stubs::memory_block::free(result_data[0]);
         components::stubs::memory_block::free(result_data[1]);
@@ -515,6 +539,14 @@ namespace hpx { namespace components { namespace amr
       resultval->right_alloc_ = 0;
       resultval->left_alloc_ = 0;
 
+      // DEBUG -- log the right/left points computed
+      access_memory_block<stencil_data> amb1 = 
+                         hpx::components::stubs::memory_block::get(result_data[2]);
+      access_memory_block<stencil_data> amb2 = 
+                         hpx::components::stubs::memory_block::get(result_data[6]);
+      stubs::logging::logentry(log_, amb1.get(), row,1, par);
+      stubs::logging::logentry(log_, amb2.get(), row,1, par);
+
       components::stubs::memory_block::free(result_data[0]);
       components::stubs::memory_block::free(result_data[1]);
       components::stubs::memory_block::free(result_data[3]);
@@ -545,7 +577,7 @@ namespace hpx { namespace components { namespace amr
             generate_initial_data(val.get_ptr(), item, maxitems, row, level, x, par);
 
             if (par.loglevel > 1)         // send initial value to logging instance
-                stubs::logging::logentry(log_, val.get(), row, par);
+                stubs::logging::logentry(log_, val.get(), row,0, par);
         }
         return result;
     }

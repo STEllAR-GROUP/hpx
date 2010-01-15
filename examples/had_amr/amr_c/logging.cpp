@@ -14,7 +14,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
     // Compute the result value for the current time step
-    void logging::logentry(stencil_data const& val, int row, Parameter const& par)
+    void logging::logentry(stencil_data const& val, int row, int logcode, Parameter const& par)
     {
         mutex_type::scoped_lock l(mtx_);
 
@@ -27,9 +27,26 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // output to file "output.dat"
         FILE *fdata;
-        fdata = fopen("output.dat","a");
-        fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_,val.x_,val.value_);
-        fclose(fdata);
+        if ( logcode == 0 ) {
+          fdata = fopen("output.dat","a");
+          fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_,val.x_,val.value_);
+          fclose(fdata);
+        }
+
+        // Debugging measures
+        // output file to "logcode1.dat"
+        if ( logcode == 1 ) {
+          fdata = fopen("logcode1.dat","a");
+          fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_,val.x_,val.value_);
+          fclose(fdata);
+        }
+        //
+        // output file to "logcode2.dat"
+        if ( logcode == 2 ) {
+          fdata = fopen("logcode2.dat","a");
+          fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_,val.x_,val.value_);
+          fclose(fdata);
+        }
     }
 
 }}}}
