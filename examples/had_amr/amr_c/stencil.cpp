@@ -13,7 +13,6 @@
 #include "../amr/amr_mesh.hpp"
 #include "../amr/amr_mesh_tapered.hpp"
 #include "../amr/amr_mesh_left.hpp"
-#include "../amr/tapered_autonomous.hpp"
 
 #include "stencil.hpp"
 #include "logging.hpp"

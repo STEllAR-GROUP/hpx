@@ -9,7 +9,6 @@
 #include "../amr/amr_mesh.hpp"
 #include "../amr/amr_mesh_tapered.hpp"
 #include "../amr/amr_mesh_left.hpp"
-#include "../amr/tapered_autonomous.hpp"
 #include "../amr/server/functional_component.hpp"
 #include "stencil_data.hpp"
 
