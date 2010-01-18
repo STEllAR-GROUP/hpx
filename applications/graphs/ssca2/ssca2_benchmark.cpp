@@ -298,7 +298,6 @@ int hpx_main(int depth, std::string input_file, int k4_approx)
     components::stubs::runtime_support::shutdown_all();
 
     return 0;
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -429,13 +428,8 @@ int main(int argc, char* argv[])
         // initialize and start the HPX runtime
         typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
         runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
-        if (mode == hpx::runtime::worker) {
-            rt.run(num_threads);
-        }
-        else
-        {
-            rt.run(boost::bind(hpx_main, depth, filename, k4_approx), num_threads);
-        }
+        rt.run(boost::bind(hpx_main, depth, filename, k4_approx), num_threads);
+
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";
