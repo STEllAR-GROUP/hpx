@@ -119,9 +119,9 @@ int main(int argc, char *argv[]) {
       tmpx2 = x2[l];
       if ( floatcmp(tmpx,tmpx2) == 1 ) {
         // compare the timestep
-        if ( timesteps[k] == timesteps[l] ) {
+        if ( floatcmp(timesteps[k],timesteps2[l]) == 1 ) {
           // found a coincident
-          printf(" x: %g timestep: %g x2: %g timestep: %g\n",x[k],timesteps[k],x2[l],timesteps[l]);
+          printf(" x: %g timestep: %g x2: %g timestep: %g\n",x[k],timesteps[k],x2[l],timesteps2[l]);
           count++;
         }
       }

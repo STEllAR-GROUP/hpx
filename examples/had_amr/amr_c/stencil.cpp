@@ -110,6 +110,17 @@ namespace hpx { namespace components { namespace amr
 
               // copy over the coordinate value to the result
               resultval->x_ = val2->x_;
+
+              // copy over subsidiary data from stencil_data
+              resultval->overwrite_ = val2->overwrite_;
+              resultval->right_ = val2->right_;
+              resultval->left_ = val2->left_;
+              resultval->reference_ = val2->reference_;
+
+              resultval->overwrite_alloc_ = val2->overwrite_alloc_;
+              resultval->right_alloc_ = val2->right_alloc_;
+              resultval->left_alloc_ = val2->left_alloc_;
+              resultval->reference_alloc_ = val2->reference_alloc_;
             } else if (gids.size() == 2) {
               // bdry computation
               if ( column == 0 ) {
@@ -118,12 +129,34 @@ namespace hpx { namespace components { namespace amr
 
                 // copy over the coordinate value to the result
                 resultval->x_ = val1->x_;
+
+                // copy over subsidiary data from stencil_data
+                resultval->overwrite_ = val1->overwrite_;
+                resultval->right_ = val1->right_;
+                resultval->left_ = val1->left_;
+                resultval->reference_ = val1->reference_;
+
+                resultval->overwrite_alloc_ = val1->overwrite_alloc_;
+                resultval->right_alloc_ = val1->right_alloc_;
+                resultval->left_alloc_ = val1->left_alloc_;
+                resultval->reference_alloc_ = val1->reference_alloc_;
               } else {
                 evaluate_right_bdry_timestep(val1.get_ptr(), val2.get_ptr(),
                   resultval.get_ptr(), numsteps_,par);
 
                 // copy over the coordinate value to the result
                 resultval->x_ = val2->x_;
+
+                // copy over subsidiary data from stencil_data
+                resultval->overwrite_ = val2->overwrite_;
+                resultval->right_ = val2->right_;
+                resultval->left_ = val2->left_;
+                resultval->reference_ = val2->reference_;
+
+                resultval->overwrite_alloc_ = val2->overwrite_alloc_;
+                resultval->right_alloc_ = val2->right_alloc_;
+                resultval->left_alloc_ = val2->left_alloc_;
+                resultval->reference_alloc_ = val2->reference_alloc_;
               }
             } else if (gids.size() == 5) {
               // this is the actual calculation, call provided (external) function
@@ -132,6 +165,17 @@ namespace hpx { namespace components { namespace amr
 
               // copy over the coordinate value to the result
               resultval->x_ = val3->x_;
+
+              // copy over subsidiary data from stencil_data
+              resultval->overwrite_ = val3->overwrite_;
+              resultval->right_ = val3->right_;
+              resultval->left_ = val3->left_;
+              resultval->reference_ = val3->reference_;
+
+              resultval->overwrite_alloc_ = val3->overwrite_alloc_;
+              resultval->right_alloc_ = val3->right_alloc_;
+              resultval->left_alloc_ = val3->left_alloc_;
+              resultval->reference_alloc_ = val3->reference_alloc_;
             }
 
             std::size_t allowedl = par.allowedl;
@@ -198,8 +242,8 @@ namespace hpx { namespace components { namespace amr
       boost::tie(edge1,edge2) = 
           get_memory_block_async<stencil_data>(gids[0],gids[1]);
 
-      if ( !edge1->refine_ || !edge2->refine_) {
-    //  if ( 1 ) {
+      if ( !edge1->refine_ || !edge2->refine_ ) {
+     // if ( 1 ) {
         boost::tie(gval[0], gval[2], gval[4], gval[6], gval[8]) = 
                         components::wait(components::stubs::memory_block::clone_async(gids[0]), 
                              components::stubs::memory_block::clone_async(gids[1]),
@@ -245,7 +289,7 @@ namespace hpx { namespace components { namespace amr
           mval[i]->right_alloc_ = 0;
           mval[i]->overwrite_alloc_ = 0;
         }
-      
+
         // avoid interpolation if possible
         int s1,s3,s5,s7;
         s1 = 0; s3 = 0; s5 = 0; s7 = 0;
@@ -269,10 +313,10 @@ namespace hpx { namespace components { namespace amr
           if ( s7 == 0 ) stubs::logging::logentry(log_, mval[7].get(), row,2, par);
 
           // TEST
-          //if ( !s1 || !s3 || !s5 || !s7 ) {
-          //  printf("Interpolation B: %d %d %d %d : %g %g %g %g\n",
-          //                             s1,s3,s5,s7,mval[1]->x_,mval[3]->x_,mval[5]->x_,mval[7]->x_);
-          //}
+          if ( !s1 || !s3 || !s5 || !s7 ) {
+            printf("Interpolation B: %d %d %d %d : %g %g %g %g\n",
+                                       s1,s3,s5,s7,mval[1]->x_,mval[3]->x_,mval[5]->x_,mval[7]->x_);
+          }
           
         } else {
           // other user defined options not implemented yet
@@ -323,15 +367,13 @@ namespace hpx { namespace components { namespace amr
         overwrite->reference_alloc_ = 1;
         overwrite->reference_ = result;
 
-        resultval->right_alloc_ = 0;
-        resultval->left_alloc_ = 0;
-
         // DEBUG -- log the right/left points computed
         access_memory_block<stencil_data> amb1 = 
-                         hpx::components::stubs::memory_block::get(result_data[2]);
-        access_memory_block<stencil_data> amb2 = 
-                         hpx::components::stubs::memory_block::get(result_data[6]);
+                       hpx::components::stubs::memory_block::get(result_data[2]);
         stubs::logging::logentry(log_, amb1.get(), row,1, par);
+
+        access_memory_block<stencil_data> amb2 = 
+                       hpx::components::stubs::memory_block::get(result_data[6]);
         stubs::logging::logentry(log_, amb2.get(), row,1, par);
 
         components::stubs::memory_block::free(result_data[0]);
@@ -383,7 +425,7 @@ namespace hpx { namespace components { namespace amr
         mval[4]->x_ = 0.5*(mval[3]->x_+mval[5]->x_);
         mval[6]->x_ = 0.5*(mval[5]->x_+mval[7]->x_);
 
-        // unset alloc on these gids
+        // resset alloc on these gids
         for (i=0;i<8;i=i+2) {
           mval[i]->left_alloc_ = 0;
           mval[i]->right_alloc_ = 0;
@@ -412,10 +454,10 @@ namespace hpx { namespace components { namespace amr
           if ( s6 == 0 ) stubs::logging::logentry(log_, mval[6].get(), row,2, par);
 
           // TEST
-          //if ( !s0 || !s2 || !s4 || !s6 ) {
-          //   printf("Interpolation A: %d %d %d %d : %g %g %g %g\n",
-          //                    s0,s2,s4,s6,mval[0]->x_,mval[2]->x_,mval[4]->x_,mval[6]->x_);
-          //}
+          if ( !s0 || !s2 || !s4 || !s6 ) {
+            printf("Interpolation A: %d %d %d %d : %g %g %g %g\n",
+                              s0,s2,s4,s6,mval[0]->x_,mval[2]->x_,mval[4]->x_,mval[6]->x_);
+          }
           
         } else {
           // other user defined options not implemented yet
@@ -467,13 +509,10 @@ namespace hpx { namespace components { namespace amr
 
         overwrite->reference_alloc_ = 1;
         overwrite->reference_ = result;
-  
-        resultval->right_alloc_ = 0;
-        resultval->left_alloc_ = 0;
 
-        // DEBUG -- log the right points computed
+        // DEBUG -- log the right points computed if no interp was involved
         access_memory_block<stencil_data> amb = 
-                           hpx::components::stubs::memory_block::get(result_data[4]);
+                         hpx::components::stubs::memory_block::get(result_data[4]);
         stubs::logging::logentry(log_, amb.get(), row,1, par);
 
         components::stubs::memory_block::free(result_data[0]);
@@ -521,6 +560,7 @@ namespace hpx { namespace components { namespace amr
       access_memory_block<stencil_data> overwrite, resultval;
       boost::tie(overwrite, resultval) = 
           get_memory_block_async<stencil_data>(result_data[4], result);
+
  
       // overwrite the coarse point computation
       resultval->value_ = overwrite->value_;
@@ -534,6 +574,9 @@ namespace hpx { namespace components { namespace amr
 
       overwrite->left_alloc_ = 1;
       overwrite->left_ = result_data[2];
+
+      overwrite->reference_alloc_ = 1;
+      overwrite->reference_ = result;
 
       resultval->right_alloc_ = 0;
       resultval->left_alloc_ = 0;
