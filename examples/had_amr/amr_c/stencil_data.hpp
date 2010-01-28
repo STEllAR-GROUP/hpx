@@ -25,11 +25,9 @@ struct stencil_data
     gid overwrite_; // gid of overwrite stencil point
     gid right_;     // gid of right stencil point
     gid left_;      // gid of left stencil point
-    gid reference_;  // coarser gid reference
     size_t right_alloc_;
     size_t left_alloc_;
     size_t overwrite_alloc_;
-    size_t reference_alloc_;
 
 #if defined(__cplusplus)
 private:
@@ -39,7 +37,7 @@ private:
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
-        ar & max_index_ & index_ & timestep_ & value_; 
+        ar & max_index_ & index_ & timestep_ & value_ & level_ & value_ & x_ & refine_ & right_alloc_ & left_alloc_ & overwrite_alloc_ & reference_alloc_; 
     }
 #endif
 };

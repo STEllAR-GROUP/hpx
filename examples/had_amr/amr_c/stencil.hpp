@@ -28,9 +28,6 @@ namespace hpx { namespace components { namespace amr
     private:
         typedef amr::server::functional_component base_type;
 
-        int lsb_count;
-        int unique_lsb[1000];
-
         components::amr::amr_mesh_tapered child_mesh[3];
         components::amr::amr_mesh_left child_left_mesh[3];
 

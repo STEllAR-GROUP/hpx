@@ -112,15 +112,9 @@ namespace hpx { namespace components { namespace amr
               resultval->x_ = val2->x_;
 
               // copy over subsidiary data from stencil_data
-              resultval->overwrite_ = val2->overwrite_;
-              resultval->right_ = val2->right_;
-              resultval->left_ = val2->left_;
-              resultval->reference_ = val2->reference_;
-
-              resultval->overwrite_alloc_ = val2->overwrite_alloc_;
-              resultval->right_alloc_ = val2->right_alloc_;
-              resultval->left_alloc_ = val2->left_alloc_;
-              resultval->reference_alloc_ = val2->reference_alloc_;
+              resultval->overwrite_alloc_ = 0;
+              resultval->right_alloc_ = 0;
+              resultval->left_alloc_ = 0;
             } else if (gids.size() == 2) {
               // bdry computation
               if ( column == 0 ) {
@@ -131,15 +125,9 @@ namespace hpx { namespace components { namespace amr
                 resultval->x_ = val1->x_;
 
                 // copy over subsidiary data from stencil_data
-                resultval->overwrite_ = val1->overwrite_;
-                resultval->right_ = val1->right_;
-                resultval->left_ = val1->left_;
-                resultval->reference_ = val1->reference_;
-
-                resultval->overwrite_alloc_ = val1->overwrite_alloc_;
-                resultval->right_alloc_ = val1->right_alloc_;
-                resultval->left_alloc_ = val1->left_alloc_;
-                resultval->reference_alloc_ = val1->reference_alloc_;
+                resultval->overwrite_alloc_ = 0;
+                resultval->right_alloc_ = 0;
+                resultval->left_alloc_ = 0;
               } else {
                 evaluate_right_bdry_timestep(val1.get_ptr(), val2.get_ptr(),
                   resultval.get_ptr(), numsteps_,par);
@@ -148,15 +136,9 @@ namespace hpx { namespace components { namespace amr
                 resultval->x_ = val2->x_;
 
                 // copy over subsidiary data from stencil_data
-                resultval->overwrite_ = val2->overwrite_;
-                resultval->right_ = val2->right_;
-                resultval->left_ = val2->left_;
-                resultval->reference_ = val2->reference_;
-
-                resultval->overwrite_alloc_ = val2->overwrite_alloc_;
-                resultval->right_alloc_ = val2->right_alloc_;
-                resultval->left_alloc_ = val2->left_alloc_;
-                resultval->reference_alloc_ = val2->reference_alloc_;
+                resultval->overwrite_alloc_ = 0;
+                resultval->right_alloc_ = 0;
+                resultval->left_alloc_ = 0;
               }
             } else if (gids.size() == 5) {
               // this is the actual calculation, call provided (external) function
@@ -167,15 +149,9 @@ namespace hpx { namespace components { namespace amr
               resultval->x_ = val3->x_;
 
               // copy over subsidiary data from stencil_data
-              resultval->overwrite_ = val3->overwrite_;
-              resultval->right_ = val3->right_;
-              resultval->left_ = val3->left_;
-              resultval->reference_ = val3->reference_;
-
-              resultval->overwrite_alloc_ = val3->overwrite_alloc_;
-              resultval->right_alloc_ = val3->right_alloc_;
-              resultval->left_alloc_ = val3->left_alloc_;
-              resultval->reference_alloc_ = val3->reference_alloc_;
+              resultval->overwrite_alloc_ = 0;
+              resultval->right_alloc_ = 0;
+              resultval->left_alloc_ = 0;
             }
 
             std::size_t allowedl = par.allowedl;
@@ -243,7 +219,6 @@ namespace hpx { namespace components { namespace amr
           get_memory_block_async<stencil_data>(gids[0],gids[1]);
 
       if ( !edge1->refine_ || !edge2->refine_ ) {
-     // if ( 1 ) {
         boost::tie(gval[0], gval[2], gval[4], gval[6], gval[8]) = 
                         components::wait(components::stubs::memory_block::clone_async(gids[0]), 
                              components::stubs::memory_block::clone_async(gids[1]),
@@ -313,10 +288,10 @@ namespace hpx { namespace components { namespace amr
           if ( s7 == 0 ) stubs::logging::logentry(log_, mval[7].get(), row,2, par);
 
           // TEST
-          if ( !s1 || !s3 || !s5 || !s7 ) {
-            printf("Interpolation B: %d %d %d %d : %g %g %g %g\n",
-                                       s1,s3,s5,s7,mval[1]->x_,mval[3]->x_,mval[5]->x_,mval[7]->x_);
-          }
+          //if ( !s1 || !s3 || !s5 || !s7 ) {
+          //  printf("Interpolation B: %d %d %d %d : %g %g %g %g\n",
+          //                             s1,s3,s5,s7,mval[1]->x_,mval[3]->x_,mval[5]->x_,mval[7]->x_);
+          //}
           
         } else {
           // other user defined options not implemented yet
@@ -364,9 +339,6 @@ namespace hpx { namespace components { namespace amr
         overwrite->left_alloc_ = 1;
         overwrite->left_ = result_data[2];
 
-        overwrite->reference_alloc_ = 1;
-        overwrite->reference_ = result;
-
         // DEBUG -- log the right/left points computed
         access_memory_block<stencil_data> amb1 = 
                        hpx::components::stubs::memory_block::get(result_data[2]);
@@ -400,6 +372,10 @@ namespace hpx { namespace components { namespace amr
         boost::tie(mval[8], mval[1], mval[3], mval[5], mval[7]) = 
           get_memory_block_async<stencil_data>(gval[8], gval[1], gval[3], gval[5], gval[7]);
 
+        boost::tie(mval[0], mval[2], mval[4],mval[6]) = 
+            get_memory_block_async<stencil_data>(gval[0], gval[2], gval[4],gval[6]);
+
+
         // temporarily store the anchor values before overwriting them
         double tm1,t1,t3,t5,t7;
         tm1 = mval[8]->value_;
@@ -408,13 +384,8 @@ namespace hpx { namespace components { namespace amr
         t5 = mval[5]->value_;
         t7 = mval[7]->value_;
 
-        // the edge of the AMR mesh has been reached.  
-        // standard tapered
-        boost::tie(mval[0], mval[2], mval[4],mval[6]) = 
-            get_memory_block_async<stencil_data>(gval[0], gval[2], gval[4],gval[6]);
-
         // increase the level by one
-        for (i=0;i<8;i++) {
+        for (i=0;i<9;i++) {
           ++mval[i]->level_;
           mval[i]->index_ = i;
         }
@@ -425,7 +396,7 @@ namespace hpx { namespace components { namespace amr
         mval[4]->x_ = 0.5*(mval[3]->x_+mval[5]->x_);
         mval[6]->x_ = 0.5*(mval[5]->x_+mval[7]->x_);
 
-        // resset alloc on these gids
+        // reset alloc on these gids
         for (i=0;i<8;i=i+2) {
           mval[i]->left_alloc_ = 0;
           mval[i]->right_alloc_ = 0;
@@ -454,10 +425,10 @@ namespace hpx { namespace components { namespace amr
           if ( s6 == 0 ) stubs::logging::logentry(log_, mval[6].get(), row,2, par);
 
           // TEST
-          if ( !s0 || !s2 || !s4 || !s6 ) {
-            printf("Interpolation A: %d %d %d %d : %g %g %g %g\n",
-                              s0,s2,s4,s6,mval[0]->x_,mval[2]->x_,mval[4]->x_,mval[6]->x_);
-          }
+          //if ( !s0 || !s2 || !s4 || !s6 ) {
+          //  printf("Interpolation A: %d %d %d %d : %g %g %g %g\n",
+          //                    s0,s2,s4,s6,mval[0]->x_,mval[2]->x_,mval[4]->x_,mval[6]->x_);
+          //}
           
         } else {
           // other user defined options not implemented yet
@@ -506,9 +477,6 @@ namespace hpx { namespace components { namespace amr
         overwrite->right_ = result_data[4];
 
         overwrite->left_alloc_ = 0;
-
-        overwrite->reference_alloc_ = 1;
-        overwrite->reference_ = result;
 
         // DEBUG -- log the right points computed if no interp was involved
         access_memory_block<stencil_data> amb = 
@@ -575,9 +543,6 @@ namespace hpx { namespace components { namespace amr
       overwrite->left_alloc_ = 1;
       overwrite->left_ = result_data[2];
 
-      overwrite->reference_alloc_ = 1;
-      overwrite->reference_ = result;
-
       resultval->right_alloc_ = 0;
       resultval->left_alloc_ = 0;
 
@@ -640,6 +605,12 @@ namespace hpx { namespace components { namespace amr
           access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->right_);
           if ( floatcmp(amb2->x_,resultval->x_) ) {
             resultval->value_ = amb2->value_;
+            // transfer overwrite information as well
+            if ( amb2->overwrite_alloc_ == 1 ) {
+              resultval->overwrite_alloc_ = 1;
+              resultval->overwrite_ = amb2->overwrite_;
+            }
+
             s = 1;
             return s;
           } else {
@@ -655,6 +626,11 @@ namespace hpx { namespace components { namespace amr
           access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->left_);
           if ( floatcmp(amb2->x_,resultval->x_) ) {
             resultval->value_ = amb2->value_;
+            // transfer overwrite information as well
+            if ( amb2->overwrite_alloc_ == 1 ) {
+              resultval->overwrite_alloc_ = 1;
+              resultval->overwrite_ = amb2->overwrite_;
+            }
             s = 1;
             return s;
           } else {
@@ -678,6 +654,11 @@ namespace hpx { namespace components { namespace amr
           access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->right_);
           if ( floatcmp(amb2->x_,resultval->x_) ) {
             resultval->value_ = amb2->value_;
+            // transfer overwrite information as well
+            if ( amb2->overwrite_alloc_ == 1 ) {
+              resultval->overwrite_alloc_ = 1;
+              resultval->overwrite_ = amb2->overwrite_;
+            }
             s = 1;
             return s;
           } else {
@@ -693,6 +674,11 @@ namespace hpx { namespace components { namespace amr
           access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->left_);
           if ( floatcmp(amb2->x_,resultval->x_) ) {
             resultval->value_ = amb2->value_;
+            // transfer overwrite information as well
+            if ( amb2->overwrite_alloc_ == 1 ) {
+              resultval->overwrite_alloc_ = 1;
+              resultval->overwrite_ = amb2->overwrite_;
+            }
             s = 1;
             return s;
           } else {
@@ -739,23 +725,6 @@ namespace hpx { namespace components { namespace amr
           lsb_count++;
           printf("stencil::traverse_grid overwrite\n");
           traverse_grid(amb->overwrite_,0);
-        }
-      }
-
-      if ( amb->reference_alloc_ == 1 ) {
-        // check if the lsb has already been recorded
-        found = 0;
-        for (i=0;i<lsb_count;i++) {
-          if (amb->reference_.id_lsb_ == unique_lsb[i]) {
-            found = 1;
-            break;
-          }
-        }
-        if ( found == 0 ) {
-          unique_lsb[lsb_count] = amb->reference_.id_lsb_;
-          lsb_count++;
-          printf("stencil::traverse_grid reference\n");
-          traverse_grid(amb->reference_,0);
         }
       }
 
