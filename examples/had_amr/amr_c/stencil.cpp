@@ -26,7 +26,6 @@ namespace hpx { namespace components { namespace amr
     stencil::stencil()
       : numsteps_(0)
     {
-      lsb_count = 0;
     }
 
     int stencil::floatcmp(double x1,double x2) {
@@ -154,6 +153,23 @@ namespace hpx { namespace components { namespace amr
               resultval->left_alloc_ = 0;
             }
 
+            // TEST
+            if ( gids.size() == 5 ) {
+              testpoint(val1,gids[0]);
+              testpoint(val2,gids[1]);
+              testpoint(val3,gids[2]);
+              testpoint(val4,gids[3]);
+              testpoint(val5,gids[4]);
+            } else if ( gids.size() == 3 ) {
+              testpoint(val1,gids[0]);
+              testpoint(val2,gids[1]);
+              testpoint(val3,gids[2]);
+            } else if ( gids.size() == 2 ) {
+              testpoint(val1,gids[0]);
+              testpoint(val2,gids[1]);
+            }
+            // END TEST
+            
             std::size_t allowedl = par.allowedl;
             if ( resultval->refine_ && gids.size() == 5 && resultval->level_ < allowedl 
                  && val1->timestep_ >= 1.e-6  ) {
@@ -700,13 +716,22 @@ namespace hpx { namespace components { namespace amr
         log_ = logging;
     }
 
+    // This routine is for debugging
+    void stencil::testpoint(access_memory_block<stencil_data> const& val,
+                            naming::id_type const& gid)
+    {
+       if ( floatcmp(val->x_,1.1111111111111111111) == 1 ) {
+           printf(" TEST overwrite %d timestep: %g value %g index %d id %d level %d\n",val->overwrite_alloc_,val->timestep_,val->value_,val->index_,gid.id_lsb_,val->level_);
+       }
+    }
+
     // This routine is for debugging -- pass in any gid
     // and it traverses the entire grid available at that moment
     void stencil::traverse_grid(naming::id_type const& start,int firstcall)
     {
       int i;
       int found;
-
+#if 0
       if (firstcall == 1) lsb_count = 0;
 
       access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(start);
@@ -761,6 +786,7 @@ namespace hpx { namespace components { namespace amr
           traverse_grid(amb->left_,0);
         }
       }
+#endif
     }
 
 

@@ -24,7 +24,6 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->right_alloc_ = 0;
     val->left_alloc_ = 0;
     val->overwrite_alloc_ = 0;
-    val->reference_alloc_ = 0;
 
     double dx;
     double xcoord;

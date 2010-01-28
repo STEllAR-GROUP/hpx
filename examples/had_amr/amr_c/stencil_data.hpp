@@ -37,7 +37,7 @@ private:
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
-        ar & max_index_ & index_ & timestep_ & value_ & level_ & value_ & x_ & refine_ & right_alloc_ & left_alloc_ & overwrite_alloc_ & reference_alloc_; 
+        ar & max_index_ & index_ & timestep_ & value_ & level_ & value_ & x_ & refine_ & right_alloc_ & left_alloc_ & overwrite_alloc_ ; 
     }
 #endif
 };
