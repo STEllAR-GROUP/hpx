@@ -82,9 +82,12 @@ namespace hpx { namespace components { namespace amr
         int floatcmp(double x1,double x2);
 
         // debug routine
-        void testpoint(access_memory_block<stencil_data> const& val,
+        int testpoint(access_memory_block<stencil_data> const& val,
                                 naming::id_type const& gid);
 
+
+        // debug routine
+        void checkpoint(std::vector<naming::id_type> const& gids);
 
         // debugging routine -- traverses the entire mesh available
         void traverse_grid(naming::id_type const& start,int firstcall);

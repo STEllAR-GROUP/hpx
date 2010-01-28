@@ -153,23 +153,25 @@ namespace hpx { namespace components { namespace amr
               resultval->left_alloc_ = 0;
             }
 
-            // TEST
+#if 0
+            // DEBUGGING
+            int st;
             if ( gids.size() == 5 ) {
-              testpoint(val1,gids[0]);
-              testpoint(val2,gids[1]);
-              testpoint(val3,gids[2]);
-              testpoint(val4,gids[3]);
-              testpoint(val5,gids[4]);
+              st = testpoint(val1,gids[0]); if (st) checkpoint(gids);
+              st = testpoint(val2,gids[1]); if (st) checkpoint(gids);
+              st = testpoint(val3,gids[2]); if (st) checkpoint(gids);
+              st = testpoint(val4,gids[3]); if (st) checkpoint(gids);
+              st = testpoint(val5,gids[4]); if (st) checkpoint(gids);
             } else if ( gids.size() == 3 ) {
-              testpoint(val1,gids[0]);
-              testpoint(val2,gids[1]);
-              testpoint(val3,gids[2]);
+              st = testpoint(val1,gids[0]); if (st) checkpoint(gids);
+              st = testpoint(val2,gids[1]); if (st) checkpoint(gids);
+              st = testpoint(val3,gids[2]); if (st) checkpoint(gids);
             } else if ( gids.size() == 2 ) {
-              testpoint(val1,gids[0]);
-              testpoint(val2,gids[1]);
+              st = testpoint(val1,gids[0]); if (st) checkpoint(gids);
+              st = testpoint(val2,gids[1]); if (st) checkpoint(gids);
             }
-            // END TEST
-            
+#endif
+
             std::size_t allowedl = par.allowedl;
             if ( resultval->refine_ && gids.size() == 5 && resultval->level_ < allowedl 
                  && val1->timestep_ >= 1.e-6  ) {
@@ -234,7 +236,7 @@ namespace hpx { namespace components { namespace amr
       boost::tie(edge1,edge2) = 
           get_memory_block_async<stencil_data>(gids[0],gids[1]);
 
-      if ( !edge1->refine_ || !edge2->refine_ ) {
+      if ( !edge1->refine_ || !edge2->refine_ || (row == 1 && column == 1) ) {
         boost::tie(gval[0], gval[2], gval[4], gval[6], gval[8]) = 
                         components::wait(components::stubs::memory_block::clone_async(gids[0]), 
                              components::stubs::memory_block::clone_async(gids[1]),
@@ -303,12 +305,6 @@ namespace hpx { namespace components { namespace amr
           if ( s5 == 0 ) stubs::logging::logentry(log_, mval[5].get(), row,2, par);
           if ( s7 == 0 ) stubs::logging::logentry(log_, mval[7].get(), row,2, par);
 
-          // TEST
-          //if ( !s1 || !s3 || !s5 || !s7 ) {
-          //  printf("Interpolation B: %d %d %d %d : %g %g %g %g\n",
-          //                             s1,s3,s5,s7,mval[1]->x_,mval[3]->x_,mval[5]->x_,mval[7]->x_);
-          //}
-          
         } else {
           // other user defined options not implemented yet
           interpolation();
@@ -391,7 +387,6 @@ namespace hpx { namespace components { namespace amr
         boost::tie(mval[0], mval[2], mval[4],mval[6]) = 
             get_memory_block_async<stencil_data>(gval[0], gval[2], gval[4],gval[6]);
 
-
         // temporarily store the anchor values before overwriting them
         double tm1,t1,t3,t5,t7;
         tm1 = mval[8]->value_;
@@ -440,12 +435,6 @@ namespace hpx { namespace components { namespace amr
           if ( s4 == 0 ) stubs::logging::logentry(log_, mval[4].get(), row,2, par);
           if ( s6 == 0 ) stubs::logging::logentry(log_, mval[6].get(), row,2, par);
 
-          // TEST
-          //if ( !s0 || !s2 || !s4 || !s6 ) {
-          //  printf("Interpolation A: %d %d %d %d : %g %g %g %g\n",
-          //                    s0,s2,s4,s6,mval[0]->x_,mval[2]->x_,mval[4]->x_,mval[6]->x_);
-          //}
-          
         } else {
           // other user defined options not implemented yet
           interpolation();
@@ -717,12 +706,46 @@ namespace hpx { namespace components { namespace amr
     }
 
     // This routine is for debugging
-    void stencil::testpoint(access_memory_block<stencil_data> const& val,
+    int stencil::testpoint(access_memory_block<stencil_data> const& val,
                             naming::id_type const& gid)
     {
-       if ( floatcmp(val->x_,1.1111111111111111111) == 1 ) {
-           printf(" TEST overwrite %d timestep: %g value %g index %d id %d level %d\n",val->overwrite_alloc_,val->timestep_,val->value_,val->index_,gid.id_lsb_,val->level_);
+       if ( floatcmp(val->x_,1.1111111111111111) == 1 ) {
+           printf(" TEST overwrite %d timestep: %g value %g index %d id %d level %d x %g right_alloc %d left_alloc %d\n",
+               val->overwrite_alloc_,val->timestep_,
+               val->value_,val->index_,gid.id_lsb_,val->level_,
+               val->x_,val->right_alloc_,val->left_alloc_);
+           if ( gid.id_lsb_ == 542346 ) {
+             return 1;
+           }
        }
+       return 0;
+    }
+
+    // This routine is for debugging
+    void stencil::checkpoint(std::vector<naming::id_type> const& gids)
+    {
+      int i;
+      for (i=0;i<gids.size();i++) {
+        access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(gids[i]);
+        printf(" gid: %d location: %g overwrite: %d\n",gids[i].id_lsb_,amb->x_,amb->overwrite_alloc_);
+        if ( amb->overwrite_alloc_ == 1 ) {
+          access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb->overwrite_);
+          printf(" overwrite      location: %g overwrite: %d : %d %d : level %d\n",amb2->x_,amb2->overwrite_alloc_,amb2->left_alloc_,amb2->right_alloc_,amb2->level_);
+          if ( amb2->overwrite_alloc_ == 1 ) {
+            access_memory_block<stencil_data> amb3 = hpx::components::stubs::memory_block::get(amb2->overwrite_);
+          printf("  overwrite overwrite    location: %g overwrite: %d : %d %d : level %d\n",amb3->x_,amb3->overwrite_alloc_,amb3->left_alloc_,amb3->right_alloc_,amb3->level_);
+          }
+          if ( amb2->right_alloc_ == 1 ) {
+            access_memory_block<stencil_data> amb3 = hpx::components::stubs::memory_block::get(amb2->right_);
+          printf(" overwrite right       location: %g overwrite: %d : %d %d : level %d\n",amb3->x_,amb3->overwrite_alloc_,amb3->left_alloc_,amb3->right_alloc_,amb3->level_);
+          }
+          if ( amb2->left_alloc_ == 1 ) {
+            access_memory_block<stencil_data> amb3 = hpx::components::stubs::memory_block::get(amb2->right_);
+          printf(" overwrite left       location: %g overwrite: %d : %d %d : level %d\n",amb3->x_,amb3->overwrite_alloc_,amb3->left_alloc_,amb3->right_alloc_,amb3->level_);
+          }
+        }
+      }
+
     }
 
     // This routine is for debugging -- pass in any gid
