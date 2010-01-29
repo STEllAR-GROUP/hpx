@@ -52,6 +52,12 @@ namespace hpx { namespace components { namespace stubs
             typedef typename server::local_set<Item>::size_action action_type;
             return lcos::eager_future<action_type>(gid).get();
         }
+
+        static naming::id_type get_locale(naming::id_type gid)
+        {
+            typedef typename server::local_set<Item>::get_locale_action action_type;
+            return lcos::eager_future<action_type>(gid).get();
+        }
     };
 
 }}}

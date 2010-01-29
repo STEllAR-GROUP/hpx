@@ -45,7 +45,8 @@ namespace hpx { namespace components { namespace server
             local_set_add_item = 0,
             local_set_append = 1,
             local_set_get = 2,
-            local_set_size = 3
+            local_set_size = 3,
+            local_set_get_locale = 4
         };
         
         ///////////////////////////////////////////////////////////////////////
@@ -60,6 +61,8 @@ namespace hpx { namespace components { namespace server
         set_type get(void);
 
         int size(void);
+
+        naming::id_type get_locale(void);
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
@@ -82,8 +85,14 @@ namespace hpx { namespace components { namespace server
             local_set, int, local_set_size, &local_set::size
         > size_action;
 
+        typedef hpx::actions::result_action0<
+            local_set, naming::id_type, local_set_get_locale, &local_set::get_locale
+        > get_locale_action;
+
     private:
         naming::id_type gid_;
+        naming::id_type locale_;
+
         int num_items_;
 
         lcos::mutex local_set_mtx_;

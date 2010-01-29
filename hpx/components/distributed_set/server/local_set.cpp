@@ -51,6 +51,9 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     local_vertex_set_type::size_action,
     local_vertex_set_size_action);
+HPX_REGISTER_ACTION_EX(
+    local_vertex_set_type::get_locale_action,
+    local_vertex_set_get_locale_action);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<local_vertex_set_type>, local_vertex_set);
 HPX_DEFINE_GET_COMPONENT_TYPE(local_vertex_set_type);
@@ -67,6 +70,9 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     local_edge_set_type::size_action,
     local_edge_set_size_action);
+HPX_REGISTER_ACTION_EX(
+    local_edge_set_type::get_locale_action,
+    local_edge_set_get_locale_action);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<local_edge_set_type>, local_edge_set);
 HPX_DEFINE_GET_COMPONENT_TYPE(local_edge_set_type);
@@ -83,6 +89,9 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     local_graph_set_type::size_action,
     local_graph_set_size_action);
+HPX_REGISTER_ACTION_EX(
+    local_graph_set_type::get_locale_action,
+    local_graph_set_get_locale_action);
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<local_graph_set_type>, local_graph_set);
 HPX_DEFINE_GET_COMPONENT_TYPE(local_graph_set_type);
@@ -93,6 +102,7 @@ namespace hpx { namespace components { namespace server
     template <typename Item>
     local_set<Item>::local_set()
       : gid_(This()->base_type::get_gid()),
+        locale_(applier::get_applier().get_runtime_support_gid()),
         local_set_(0),
         num_items_(0)
     {}
@@ -157,5 +167,11 @@ namespace hpx { namespace components { namespace server
     int local_set<Item>::size(void)
     {
         return local_set_.size();
+    }
+
+    template <typename Item>
+    naming::id_type local_set<Item>::get_locale(void)
+    {
+        return locale_;
     }
 }}}
