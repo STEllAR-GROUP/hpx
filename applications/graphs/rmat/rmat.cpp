@@ -235,7 +235,12 @@ int hpx_main(int scale, int edge_factor, int type)
 
     std::cout.setf(std::ios::dec);
 
-    gid_type here = hpx::applier::get_applier().get_runtime_support_gid();;
+    gid_type here = hpx::applier::get_applier().get_runtime_support_gid();
+    gids_type prefixes;
+    if (hpx::applier::get_applier().get_remote_prefixes(prefixes))
+    {
+        here = prefixes[0];
+    }
 
     // Create the graph used for with all kernels
     client_graph_type G;
@@ -401,13 +406,8 @@ int main(int argc, char* argv[])
         // initialize and start the HPX runtime
         typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
         runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
-        if (mode == hpx::runtime::worker) {
-            rt.run(num_threads);
-        }
-        else
-        {
-            rt.run(boost::bind(hpx_main, scale, edge_factor, type), num_threads);
-        }
+        rt.run(boost::bind(hpx_main, scale, edge_factor, type), num_threads);
+
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";
