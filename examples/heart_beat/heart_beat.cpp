@@ -15,92 +15,107 @@
 
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
 
+#include "heart_beat.hpp"
+
 using namespace hpx;
 namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-int monitor(int delay);
-
-typedef 
-    actions::plain_result_action1<int, int, monitor>
-monitor_action;
+// This is one long-running thread.
+//
+// Currently only monitors "this" locality, and never stops :-).
 
 HPX_REGISTER_ACTION(monitor_action);
 
-///////////////////////////////////////////////////////////////////////////////
-
-int monitor(int delay)
+int monitor(double frequency, double duration, double rate)
 {
-  typedef std::vector<naming::id_type> gids_type;
+  typedef hpx::naming::id_type gid_type;
+  typedef std::vector<gid_type> gids_type;
+  typedef util::high_resolution_timer timer_type;
 
   hpx::naming::resolver_client const& agas =
       hpx::applier::get_applier().get_agas_client();
 
+  gid_type here = applier::get_applier().get_runtime_support_gid();
 
-  gids_type prefixes;
-  applier::get_applier().get_remote_prefixes(prefixes);
-  prefixes.push_back(applier::get_applier().get_runtime_support_gid());
-  int n_prefixes = prefixes.size();
-  
-  std::vector<hpx::performance_counters::counter_value> values(n_prefixes);
+  // Build full performance counter name
+  std::string queue("/queue(");
+  queue += boost::lexical_cast<std::string>(here);
+  queue += "/threadmanager)/length";
 
-  for (int i = 0; i < n_prefixes; ++i)
+  // Get GID of performance counter
+  gid_type gid;
+  agas.queryid(queue, gid);
+
+  std::cout << "Begin timing block" << std::endl;
+
+  // Start segment
+  timer_type t;
+  double current_time;
+
+  while(true)
   {
-      // Build full performance counter name
-      std::string queue("/queue(");
-      queue += boost::lexical_cast<std::string>(prefixes[i]);
-      queue += "/threadmanager)/length";
-    
-      // Get GID of perforamnce counter
-      hpx::naming::id_type gid;
-      agas.queryid(queue, gid);
-    
-      // Access value of peformance counter
-      values[i] = 
-          hpx::performance_counters::stubs::
-            performance_counter::get_value(gid);
+      std::cout << "\tBegin segment" << std::endl;
+
+      double segment_start = t.elapsed();
+      do {
+          std::cout << "\t\tBegin monitoring block" << std::endl;
+
+          // Start monitoring phase
+          double monitor_start = t.elapsed();
+          do{
+              current_time = t.elapsed();
+
+              // Access value of performance counter
+              hpx::performance_counters::counter_value value;
+              value =
+                  hpx::performance_counters::stubs::
+                    performance_counter::get_value(gid);
+
+              if (hpx::performance_counters::status_valid_data == value.status_)
+              {
+                  std::cout << current_time << ": " << value.value_ << std::endl;
+              }
+
+              // Adjust rate of pinging values
+              double delay_start = t.elapsed();
+              do {
+                  current_time = t.elapsed();
+              } while(current_time - delay_start < rate);
+          } while (current_time - monitor_start < duration);
+      } while (current_time - segment_start < frequency);
+
+      // Adjust rate of monitoring phases
+      double pause_start = t.elapsed();
+      do {
+          current_time = t.elapsed();
+      } while(current_time - pause_start < (frequency-duration));
   }
-
-  while (n_prefixes > 0)
-  {
-    for (int i=0; i<n_prefixes; ++i)
-    {
-      if (hpx::performance_counters::status_valid_data == values[i].status_
-          && values[i].value_ > 0)
-        std::cout << "Locale " << prefixes[i] << ": " 
-                  << values[i].value_ << std::endl;
-    }
-
-    // Busy wait 
-    util::high_resolution_timer t;
-    double start_time = t.elapsed();
-    double current = 0;
-    do {
-        current = t.elapsed();
-    } while (current - start_time < delay*1e-6);
-  }
-
 
   return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(int delay)
+int hpx_main(double delay, double frequency, double duration, double rate)
 {
-    // try to get arguments from application configuration
-    runtime& rt = get_runtime();
+    // Delay
+    util::high_resolution_timer t;
+    double start_time = t.elapsed();
+    double current = 0;
+    do {
+        current = t.elapsed();
+    } while (current - start_time < delay);
 
-    // get list of all known localities
-    std::vector<naming::id_type> prefixes;
-    applier::applier& appl = applier::get_applier();
-
-    naming::id_type this_prefix = appl.get_runtime_support_gid();
+    naming::id_type here = applier::get_applier().get_runtime_support_gid();
 
     std::cout << "Heart beat monitor, yo!" << std::endl;
 
-    lcos::eager_future<monitor_action> n(this_prefix, delay);
+    lcos::eager_future<monitor_action> n(here,
+                                         duration,
+                                         frequency,
+                                         rate);
     n.get();
       
     // initiate shutdown of the runtime systems on all localities
@@ -129,8 +144,15 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("threads,t", po::value<int>(), 
                 "the number of operating system threads to spawn for this"
                 "HPX locality")
-            ("delay,d", po::value<int>(),
-                "the delay at which to ping the system")
+            ("frequency,f", po::value<int>(),
+                "how often to start monitoring (ms)")
+            ("duration,d", po::value<int>(),
+                "how long to monitor (ms)")
+            ("rate", po::value<int>(),
+                "how often to poll (ms)")
+            ("delay,p", po::value<int>(),
+                "the amount of time to delay before monitoring starts (s) "
+                "(gives time to start other application)")
         ;
 
         po::store(po::command_line_parser(argc, argv)
@@ -204,7 +226,12 @@ int main(int argc, char* argv[])
             return -1;
 
         // Check command line arguments.
-        int delay = 1e6;
+        int frequency = 1000000;
+        int duration  =  500000;
+        int rate      =    1000;
+
+        int delay = 1;
+
         std::string hpx_host("localhost"), agas_host;
         boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
         int num_threads = 1;
@@ -228,6 +255,16 @@ int main(int argc, char* argv[])
             }
         }
 
+        if (vm.count("frequency")) {
+            frequency = vm["frequency"].as<int>();
+        }
+        if (vm.count("duration")) {
+            duration = vm["duration"].as<int>();
+        }
+        if (vm.count("rate")) {
+            rate = vm["rate"].as<int>();
+        }
+
         if (vm.count("delay")) {
             delay = vm["delay"].as<int>();
         }
@@ -236,9 +273,6 @@ int main(int argc, char* argv[])
         std::auto_ptr<agas_server_helper> agas_server;
         if (vm.count("run_agas_server"))  // run the AGAS server instance here
             agas_server.reset(new agas_server_helper(agas_host, agas_port));
-
-        int result = 0;
-        double elapsed =0;
 
         // initialize and start the HPX runtime
         runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
@@ -254,7 +288,11 @@ int main(int argc, char* argv[])
                 rt.get_config().load_application_configuration(config.c_str());
             }
 
-            rt.run(boost::bind(hpx_main, delay), num_threads);
+            rt.run(boost::bind(hpx_main, delay*1.0e-6,
+                               frequency*1.0e-6,
+                               duration*1.0e-6,
+                               rate*1.0e-6),
+                   num_threads);
 
         }
     }

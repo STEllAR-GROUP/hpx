@@ -4,5 +4,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # define build targets for this directory
-add_hpx_executable(heart_beat SOURCES heart_beat.cpp)
+add_hpx_executable(heart_beat SOURCES heart_beat.cpp
+                              HEADERS heart_beat.hpp)
 
