@@ -32,4 +32,6 @@ HPX_COMPONENT_EXPORT int evaluate_right_bdry_timestep(stencil_data const* left,
 
 HPX_COMPONENT_EXPORT int interpolation();
 
+HPX_COMPONENT_EXPORT bool refinement(double,int);
+
 #endif

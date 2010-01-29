@@ -57,19 +57,15 @@ int evaluate_timestep(stencil_data const* left, stencil_data const* middle,
     result->index_ = middle->index_;
     result->timestep_ = middle->timestep_ + 1.0/pow(2.0,(int) middle->level_);
     result->level_ = middle->level_;
-    result->refine_ = true;
+    result->refine_ = false;
 
     double sum = 0;
     double dt = par.dt0;
     double dx = par.dx0;
 
     result->value_ = middle->value_ - dt/dx*(middle->value_ - left->value_);
-   // result->value_ = middle->value_;
 
-    if ( result->level_ == 0 && result->value_ > 0.05 ) result->refine_ = true;
-    else if ( result->level_ == 1 && result->value_ > 0.25 ) result->refine_ = true;
-    else if ( result->level_ == 2 && result->value_ > 0.35 ) result->refine_ = true;
-    else result->refine_ = false;
+    result->refine_ = refinement(result->value_,result->level_);
 
     if (gidsize < 5) result->refine_ = false;
 
@@ -113,7 +109,6 @@ int evaluate_right_bdry_timestep(stencil_data const* left, stencil_data const* m
     double dx = par.dx0;
 
     result->value_ = middle->value_ - dt/dx*(middle->value_ - left->value_);
-    //result->value_ = middle->value_;
 
     return 1;
 }
@@ -122,4 +117,17 @@ int interpolation()
 {
   return 1;
 }
+
+bool refinement(double value,int level)
+{
+  double threshold;
+  if ( level == 0 ) threshold = 0.05;
+  if ( level == 1 ) threshold = 0.25;
+  if ( level == 2 ) threshold = 0.35;
+  if ( level == 3 ) threshold = 0.45;
+
+  if ( value > threshold ) return true;
+  else return false;
+}
+
 

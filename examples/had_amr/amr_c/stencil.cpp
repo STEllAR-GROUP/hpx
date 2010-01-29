@@ -30,7 +30,7 @@ namespace hpx { namespace components { namespace amr
 
     int stencil::floatcmp(double x1,double x2) {
       // compare to floating point numbers
-      double epsilon = 1.e-8;
+      double epsilon = 1.e-4;
       if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
         // the numbers are close enough for coordinate comparison
         return 1;
@@ -170,6 +170,7 @@ namespace hpx { namespace components { namespace amr
               st = testpoint(val1,gids[0]); if (st) checkpoint(gids);
               st = testpoint(val2,gids[1]); if (st) checkpoint(gids);
             }
+            st = testpoint(resultval,result);
 #endif
 
             std::size_t allowedl = par.allowedl;
@@ -304,12 +305,17 @@ namespace hpx { namespace components { namespace amr
           if ( s3 == 0 ) stubs::logging::logentry(log_, mval[3].get(), row,2, par);
           if ( s5 == 0 ) stubs::logging::logentry(log_, mval[5].get(), row,2, par);
           if ( s7 == 0 ) stubs::logging::logentry(log_, mval[7].get(), row,2, par);
-
         } else {
           // other user defined options not implemented yet
           interpolation();
           BOOST_ASSERT(false);
         }
+
+        // apply refinement criteria test to interpolated/found values
+        mval[1]->refine_ = refinement(mval[1]->value_,mval[1]->level_);
+        mval[3]->refine_ = refinement(mval[3]->value_,mval[1]->level_);
+        mval[5]->refine_ = refinement(mval[5]->value_,mval[1]->level_);
+        mval[7]->refine_ = refinement(mval[7]->value_,mval[1]->level_);
 
         // the initial data for the child mesh comes from the parent mesh
         naming::id_type here = applier::get_applier().get_runtime_support_gid();
@@ -440,6 +446,12 @@ namespace hpx { namespace components { namespace amr
           interpolation();
           BOOST_ASSERT(false);
         }
+
+        // apply refinement criteria test to interpolated/found values
+        mval[0]->refine_ = refinement(mval[0]->value_,mval[0]->level_);
+        mval[2]->refine_ = refinement(mval[2]->value_,mval[2]->level_);
+        mval[4]->refine_ = refinement(mval[4]->value_,mval[4]->level_);
+        mval[6]->refine_ = refinement(mval[6]->value_,mval[6]->level_);
 
         // the initial data for the child mesh comes from the parent mesh
         naming::id_type here = applier::get_applier().get_runtime_support_gid();
@@ -709,14 +721,14 @@ namespace hpx { namespace components { namespace amr
     int stencil::testpoint(access_memory_block<stencil_data> const& val,
                             naming::id_type const& gid)
     {
-       if ( floatcmp(val->x_,1.1111111111111111) == 1 ) {
-           printf(" TEST overwrite %d timestep: %g value %g index %d id %d level %d x %g right_alloc %d left_alloc %d\n",
+       if ( floatcmp(val->x_,3.3333333333333333) == 1 ) {
+           printf(" TEST overwrite %d timestep: %g value %g index %d id %d level %d x %g right_alloc %d left_alloc %d refine %d\n",
                val->overwrite_alloc_,val->timestep_,
                val->value_,val->index_,gid.id_lsb_,val->level_,
-               val->x_,val->right_alloc_,val->left_alloc_);
-           if ( gid.id_lsb_ == 542346 ) {
-             return 1;
-           }
+               val->x_,val->right_alloc_,val->left_alloc_,val->refine_);
+           //if ( gid.id_lsb_ == 549233 ) {
+           //  return 1;
+           //}
        }
        return 0;
     }
@@ -740,7 +752,7 @@ namespace hpx { namespace components { namespace amr
           printf(" overwrite right       location: %g overwrite: %d : %d %d : level %d\n",amb3->x_,amb3->overwrite_alloc_,amb3->left_alloc_,amb3->right_alloc_,amb3->level_);
           }
           if ( amb2->left_alloc_ == 1 ) {
-            access_memory_block<stencil_data> amb3 = hpx::components::stubs::memory_block::get(amb2->right_);
+            access_memory_block<stencil_data> amb3 = hpx::components::stubs::memory_block::get(amb2->left_);
           printf(" overwrite left       location: %g overwrite: %d : %d %d : level %d\n",amb3->x_,amb3->overwrite_alloc_,amb3->left_alloc_,amb3->right_alloc_,amb3->level_);
           }
         }
