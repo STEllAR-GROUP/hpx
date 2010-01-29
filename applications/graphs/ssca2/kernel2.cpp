@@ -72,7 +72,8 @@ int kernel2(naming::id_type G, naming::id_type dist_edge_set)
     for (gids_type::const_iterator vit = vertex_sets.begin();
          vit != vend; ++vit)
     {
-        gid_type there(boost::uint64_t((*vit).get_msb()) << 32, 0);
+        gid_type there =
+            lcos::eager_future<local_vertex_set_type::get_locale_action>(*vit).get();
 
         local_searches.push_back(
             lcos::eager_future<large_set_local_action>(
