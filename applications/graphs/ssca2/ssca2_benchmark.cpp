@@ -45,7 +45,7 @@ namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int hpx_main(int depth, std::string input_file, int k4_approx)
+int hpx_main(int depth, std::string input_file, int k4_approx, bool monitor)
 {
     // SSCA#2 Graph Analysis Benchmark
     LSSCA_(info) << "Starting SSCA2 Graph Analysis Benchmark";
@@ -56,6 +56,23 @@ int hpx_main(int depth, std::string input_file, int k4_approx)
 
     double total_time;
     gid_type here = find_here();
+
+    // Start heart beat monitor
+    hpx::lcos::eager_future<monitor_action> heart_beat(here,
+                                              10000000,
+                                              1000000,
+                                              0);
+    if (!monitor)
+        heart_beat.get();
+
+    /*
+    util::high_resolution_timer t;
+    double current_time;
+    double pause_start = t.elapsed();
+    do {
+        current_time = t.elapsed();
+    } while(current_time - pause_start < 1000000e-06);
+    */
 
     // Create the graph used for with all kernels
     client_graph_type G;
@@ -81,6 +98,7 @@ int hpx_main(int depth, std::string input_file, int k4_approx)
     LSSCA_(info) << "Completed Kernel 1 v1 in " << total_time << " sec";
     std::cout << "Completed Kernel 1 v1 in " << total_time << " sec" << std::endl;
 
+    if (1)
     {
         /* Begin: timed execution of Kernel 1 v1 */
         client_graph_type G_K2;
@@ -96,6 +114,7 @@ int hpx_main(int depth, std::string input_file, int k4_approx)
         G_K2.free();
     }
 
+    if (1)
     {
         /* Begin: timed execution of Kernel 1 v1 */
         client_graph_type G_K3;
@@ -114,6 +133,18 @@ int hpx_main(int depth, std::string input_file, int k4_approx)
     // Derive scale from order of the input graph
     scale = log2(G.order());
     LSSCA_(info) << "Input file scale: " << scale;
+
+    // Get vertex set of G
+    gid_type vertices = G.vertices();
+    gids_type vertex_sets =
+        lcos::eager_future<dist_vertex_set_type::locals_action>(vertices).get();
+    for (int i=0; i < vertex_sets.size(); ++i)
+    {
+        gid_type there =
+            lcos::eager_future<local_vertex_set_type::get_locale_action>(vertex_sets[i]).get();
+
+        LSSCA_(info) << "vertex_sets[" << i << "] is on " << there;
+    }
 
     // Kernel 2: classify large sets
     // Input:
@@ -291,6 +322,9 @@ int hpx_main(int depth, std::string input_file, int k4_approx)
     }
     bc_scores.free();
 
+    if (monitor)
+        heart_beat.get();
+
     // Free components
     G.free();
 
@@ -324,6 +358,8 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "the subgraph path length for Kernel 3 (default is 3)")
             ("k4_approx,k", po::value<int>(),
                 "the approximate scale for Kernel 4")
+            ("monitor,m",
+                "toggle monitoring")
         ;
 
         po::store(po::command_line_parser(argc, argv)
@@ -395,6 +431,7 @@ int main(int argc, char* argv[])
         std::string filename;
         int depth = 3;
         int k4_approx = 0;
+        bool monitor = false;
 
         hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
 
@@ -420,6 +457,9 @@ int main(int argc, char* argv[])
         if (vm.count("k4_approx"))
             k4_approx = vm["k4_approx"].as<int>();
 
+        if (vm.count("monitor"))
+            monitor = true;
+
         // initialize and run the AGAS service, if appropriate
         std::auto_ptr<agas_server_helper> agas_server;
         if (vm.count("run_agas_server"))  // run the AGAS server instance here
@@ -428,7 +468,7 @@ int main(int argc, char* argv[])
         // initialize and start the HPX runtime
         typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
         runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
-        rt.run(boost::bind(hpx_main, depth, filename, k4_approx), num_threads);
+        rt.run(boost::bind(hpx_main, depth, filename, k4_approx, monitor), num_threads);
 
     }
     catch (std::exception& e) {

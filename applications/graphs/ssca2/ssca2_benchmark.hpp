@@ -22,6 +22,15 @@ inline hpx::naming::id_type find_here(void)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Definitions for heart beat monitior
+
+int monitor(double frequency, double duration, double rate);
+
+typedef
+    actions::plain_result_action3<int, double, double, double, monitor>
+monitor_action;
+
+///////////////////////////////////////////////////////////////////////////////
 // Definitions for Kernel 1
 
 int kernel1_v1(naming::id_type G, std::string filename);

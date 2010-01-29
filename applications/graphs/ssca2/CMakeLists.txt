@@ -26,6 +26,7 @@ set (ssca2_HEADERS
     
 set(ssca2_benchmark_SOURCES
     ssca2_benchmark.cpp
+    heart_beat.cpp
     kernel1.cpp
     kernel2.cpp
     kernel3.cpp
