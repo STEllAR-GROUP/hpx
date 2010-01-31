@@ -113,13 +113,13 @@ location of outer boundaries.  The computational demands
 required to resolve these different physical scales are best met
 using adaptive mesh refinement.
 
-In the past this challenge has been met using the publicly available computational infrastructure
+In the past this challenge has been met using the publicly available MPI based computational infrastructure
 \had\ to provide parallel distributed
 AMR for our codes~\cite{had_webpage,Liebling}.  As an example, 
 Figure~\ref{fig:amr_mesh} illustrates the resulting mesh structure at a 
 pre-merger stage of a binary neutron star system in our simulations.
 
-Strong scaling results of the \had\ toolkit are illustrated for a particular sample problem
+Strong scaling results of the MPI based \had\ toolkit are illustrated for a particular sample problem
 in Figure~\ref{fig:sphshock-strongscaling}.  We define speed-up as  
 \begin{eqnarray*}
 {\rm speedup}(n) = \frac{{\rm Run~time~on~one~processor}}{{\rm Run~time~on~{\it n}~processors}}.
@@ -128,7 +128,7 @@ The results presented are
 strong scaling results; the global problem size was kept constant while the
 number of processors varied.  Strong scaling tests are problem dependent and vary
 according to the size of the global problem selected for investigation.  For most problems
-we investigate, strong scaling using the \had\ toolkit is sufficient only up to about 256 processors.
+we investigate, strong scaling using the MPI based \had\ toolkit is sufficient only up to about 256 processors.
 
 The HPX implementation of ParalleX provides a way to eliminate the global barriers which 
 impair the scaling of the \had\ toolkit.   A 1-D implementation of the \had\ AMR toolkit has
@@ -144,7 +144,7 @@ for both 1-D and 3-D implementations.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{HPX based HAD}
 
-The \had\ toolkit in it's original form contains a global barrier every timestep: no
+The MPI based \had\ toolkit in its original form contains a global barrier every timestep: no
 computation can proceed once the global barrier has been reached until every point has reached
 the same timestep in the simulation.  This type of global barrier is not unique to \had\ : other
 major finite difference and finite element based AMR toolkits also contain this global barrier.
@@ -159,7 +159,7 @@ Three types of mesh objects are introduced to remove all global barriers.  The f
 data structure is a node point.  Each node point is autonomous and is communicated.  
 This is in contrast to what is normally done with finite difference
 AMR codes where the large blocks of node points are treated autonomously and the boundaries of these
-blocks of nodes points are communicated.  See Figure~\ref{fig:granularity}.
+blocks of node points are communicated.  See Figure~\ref{fig:granularity}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -183,9 +183,10 @@ S. Liebling and L. Lehner for
 \epsfig{file=figures/grid0.0.ps,height=4.0cm}
 \epsfig{file=figures/grid84.8.ps,height=4.0cm}
 \epsfig{file=figures/grid500.8.ps,height=4.0cm}
-\caption{The AMR mesh structure at times 0, 84, and 500 for the
+\caption{The AMR mesh structure at three different for the
     pre-merge stage of the simulation with
-      a highest resolution of 32 points across each star.
+      a highest resolution of 32 points across each star. This simulation
+      was performed using the MPI based HAD toolkit.
     The simulation had seven different resolution levels depending on the relative
 error measured locally in the computational domain.  Five of those resolution levels are visible
 here.  Simulations were performed on 128 processors.} \label{fig:amr_mesh}
