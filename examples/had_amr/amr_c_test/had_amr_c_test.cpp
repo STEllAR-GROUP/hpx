@@ -122,9 +122,10 @@ bool refinement(double value,int level)
 {
   double threshold;
   if ( level == 0 ) threshold = 0.05;
-  if ( level == 1 ) threshold = 0.25;
-  if ( level == 2 ) threshold = 0.35;
-  if ( level == 3 ) threshold = 0.45;
+  if ( level == 1 ) threshold = 0.15;
+  if ( level == 2 ) threshold = 0.25;
+  if ( level == 3 ) threshold = 0.3;
+  if ( level == 4 ) threshold = 0.35;
 
   if ( value > threshold ) return true;
   else return false;

@@ -86,92 +86,44 @@ namespace hpx { namespace components { namespace amr
           return -1;
         }
 
-        // the predecessor
-        double middle_timestep;
-        if (gids.size() == 3) 
-          middle_timestep = val2->timestep_;
-        else if (gids.size() == 2 && column == 0) 
-          middle_timestep = val1->timestep_;      // left boundary point
-        else if (gids.size() == 2 && column != 0) {
-          middle_timestep = val2->timestep_;      // right boundary point
-        } else if ( gids.size() == 3 ) {
-          middle_timestep = val2->timestep_;
+        // all input values should have the same timestep
+        if (gids.size() == 3) {
+          BOOST_ASSERT(val1->timestep_== val2->timestep_ &&
+                       val2->timestep_== val3->timestep_);
+        } else if (gids.size() == 2) {
+          BOOST_ASSERT(val1->timestep_== val2->timestep_);
         } else if ( gids.size() == 5 ) {
-          middle_timestep = val3->timestep_;
+          BOOST_ASSERT(val1->timestep_== val2->timestep_ && 
+                       val2->timestep_== val3->timestep_ && 
+                       val3->timestep_== val4->timestep_ && 
+                       val4->timestep_== val5->timestep_);
         }
 
-        if (val1->level_ == 0 && middle_timestep < numsteps_ || val1->level_ > 0) {
 
+        if (val1->level_ == 0 && val1->timestep_ < numsteps_ || val1->level_ > 0) {
+            resultval->overwrite_alloc_ = 0;
+            resultval->right_alloc_ = 0;
+            resultval->left_alloc_ = 0;
             if (gids.size() == 3) {
-              // this is the actual calculation, call provided (external) function
+              resultval->x_ = val2->x_;
               evaluate_timestep(val1.get_ptr(), val2.get_ptr(), val3.get_ptr(), 
                   resultval.get_ptr(), numsteps_,par,gids.size());
-
-              // copy over the coordinate value to the result
-              resultval->x_ = val2->x_;
-
-              // copy over subsidiary data from stencil_data
-              resultval->overwrite_alloc_ = 0;
-              resultval->right_alloc_ = 0;
-              resultval->left_alloc_ = 0;
             } else if (gids.size() == 2) {
               // bdry computation
               if ( column == 0 ) {
+                resultval->x_ = val1->x_;
                 evaluate_left_bdry_timestep(val1.get_ptr(), val2.get_ptr(),
                   resultval.get_ptr(), numsteps_,par);
-
-                // copy over the coordinate value to the result
-                resultval->x_ = val1->x_;
-
-                // copy over subsidiary data from stencil_data
-                resultval->overwrite_alloc_ = 0;
-                resultval->right_alloc_ = 0;
-                resultval->left_alloc_ = 0;
               } else {
+                resultval->x_ = val2->x_;
                 evaluate_right_bdry_timestep(val1.get_ptr(), val2.get_ptr(),
                   resultval.get_ptr(), numsteps_,par);
-
-                // copy over the coordinate value to the result
-                resultval->x_ = val2->x_;
-
-                // copy over subsidiary data from stencil_data
-                resultval->overwrite_alloc_ = 0;
-                resultval->right_alloc_ = 0;
-                resultval->left_alloc_ = 0;
               }
             } else if (gids.size() == 5) {
-              // this is the actual calculation, call provided (external) function
+              resultval->x_ = val3->x_;
               evaluate_timestep(val2.get_ptr(), val3.get_ptr(), val4.get_ptr(), 
                   resultval.get_ptr(), numsteps_,par,gids.size());
-
-              // copy over the coordinate value to the result
-              resultval->x_ = val3->x_;
-
-              // copy over subsidiary data from stencil_data
-              resultval->overwrite_alloc_ = 0;
-              resultval->right_alloc_ = 0;
-              resultval->left_alloc_ = 0;
             }
-
-#if 0
-            // DEBUGGING
-            int st;
-            if ( gids.size() == 5 ) {
-              st = testpoint(val1,gids[0]); if (st) checkpoint(gids);
-              st = testpoint(val2,gids[1]); if (st) checkpoint(gids);
-              st = testpoint(val3,gids[2]); if (st) checkpoint(gids);
-              st = testpoint(val4,gids[3]); if (st) checkpoint(gids);
-              st = testpoint(val5,gids[4]); if (st) checkpoint(gids);
-            } else if ( gids.size() == 3 ) {
-              st = testpoint(val1,gids[0]); if (st) checkpoint(gids);
-              st = testpoint(val2,gids[1]); if (st) checkpoint(gids);
-              st = testpoint(val3,gids[2]); if (st) checkpoint(gids);
-            } else if ( gids.size() == 2 ) {
-              st = testpoint(val1,gids[0]); if (st) checkpoint(gids);
-              st = testpoint(val2,gids[1]); if (st) checkpoint(gids);
-            }
-            st = testpoint(resultval,result);
-#endif
 
             std::size_t allowedl = par.allowedl;
             if ( resultval->refine_ && gids.size() == 5 && resultval->level_ < allowedl 

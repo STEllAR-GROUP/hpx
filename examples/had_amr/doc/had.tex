@@ -156,11 +156,13 @@ HPX based \had\ toolkit has been redesigned in order that all points can proceed
 timestep in the simulation without waiting until the neighbor point is ready to do the same. 
 
 Three types of mesh objects are introduced to remove all global barriers.  The fundamental
-data structure is a node point.  Each node point is autonomous and is communicated.  
-This is in contrast to what is normally done with finite difference
-AMR codes where the large blocks of node points are treated autonomously and the boundaries of these
-blocks of node points are communicated.  See Figure~\ref{fig:granularity}.
-
+data structure is a node point.  Each node point is autonomous and may be communicated
+depending on the granularity desired for a particular problem.  
+Finite difference AMR codes normally passed the large blocks of node points to the user defined
+code where only the boundaries of those blocks are communicated.  See Figure~\ref{fig:granularity}.
+HPX based \had\ currently implements the smallest granularity possible.  Eventually 
+a runtime parameter will be introduced so that the user can adjust the optimal granularity for a
+particular problem on a particular number of processors.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %   A C K N O W L E D G M E N T S
@@ -183,7 +185,7 @@ S. Liebling and L. Lehner for
 \epsfig{file=figures/grid0.0.ps,height=4.0cm}
 \epsfig{file=figures/grid84.8.ps,height=4.0cm}
 \epsfig{file=figures/grid500.8.ps,height=4.0cm}
-\caption{The AMR mesh structure at three different for the
+\caption{The AMR mesh structure at three different times for the
     pre-merge stage of the simulation with
       a highest resolution of 32 points across each star. This simulation
       was performed using the MPI based HAD toolkit.
@@ -225,12 +227,14 @@ based AMR code.  Large blocks of memory are passed to the user for computation w
 the boundaries of the blocks are communicated among processors.  In this figure, the yellow regions
 (frequently referred to as ghostzones) are communicated regions originating from blue zones on 
 a distributed memory block as indicated by the arrows.
-Contrast this with the
-approach used for HPX based \had\ seen in (b).  Here each point is communicated giving the simulation
+The current HPX based \had\  approach is seen in (b).  
+Here each point is communicated giving the simulation
 the smallest granularity possible.  While the amount of communication required in paradigm (b) is 
 substantially more than in (a), those communication costs are reduced by the locality
 management inherent in HPX.  Paradigm (b) is advantageous for eliminating global
-computation barriers.
+computation barriers.  HPX based \had\ will eventually be capable of both paradigm (a) and (b)
+controlled as a runtime parameter so the user can adjust the optimal granularity for a 
+particular problem on a particular number of processors.
 } \label{fig:granularity}
 \end{figure}
 
