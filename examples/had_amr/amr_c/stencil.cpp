@@ -67,17 +67,38 @@ namespace hpx { namespace components { namespace amr
 
         // get all input memory_block_data instances
         access_memory_block<stencil_data> val1, val2, val3, val4, val5, resultval;
+        std::vector< stencil_data * > vecval;
         if (gids.size() == 3) { 
             boost::tie(val1, val2, val3, resultval) = 
                 get_memory_block_async<stencil_data>(gids[0], gids[1], gids[2], result);
+            vecval.push_back(val1.get_ptr()); 
+            vecval.push_back(val2.get_ptr()); 
+            vecval.push_back(val3.get_ptr()); 
+
+            // update x position
+            resultval->x_ = val2->x_;
         } 
         else if (gids.size() == 2) {
             boost::tie(val1, val2, resultval) = 
                 get_memory_block_async<stencil_data>(gids[0], gids[1], result);
+            vecval.push_back(val1.get_ptr()); 
+            vecval.push_back(val2.get_ptr()); 
+
+            // update x position
+            if ( column == 0 ) resultval->x_ = val1->x_;
+            else resultval->x_ = val2->x_; 
         } 
         else if (gids.size() == 5) {
             boost::tie(val1, val2, val3, val4, val5, resultval) = 
                 get_memory_block_async<stencil_data>(gids[0], gids[1], gids[2], gids[3], gids[4], result);
+            vecval.push_back(val1.get_ptr()); 
+            vecval.push_back(val2.get_ptr()); 
+            vecval.push_back(val3.get_ptr()); 
+            vecval.push_back(val4.get_ptr()); 
+            vecval.push_back(val5.get_ptr()); 
+
+            // update x position
+            resultval->x_ = val3->x_;
         } 
         else {
           boost::tie(val1, resultval) = 
@@ -85,6 +106,10 @@ namespace hpx { namespace components { namespace amr
           resultval.get() = val1.get();
           return -1;
         }
+        // initialize result 
+        resultval->overwrite_alloc_ = 0;
+        resultval->right_alloc_ = 0;
+        resultval->left_alloc_ = 0;
 
         // all input values should have the same timestep
         if (gids.size() == 3) {
@@ -101,29 +126,10 @@ namespace hpx { namespace components { namespace amr
 
 
         if (val1->level_ == 0 && val1->timestep_ < numsteps_ || val1->level_ > 0) {
-            resultval->overwrite_alloc_ = 0;
-            resultval->right_alloc_ = 0;
-            resultval->left_alloc_ = 0;
-            if (gids.size() == 3) {
-              resultval->x_ = val2->x_;
-              evaluate_timestep(val1.get_ptr(), val2.get_ptr(), val3.get_ptr(), 
-                  resultval.get_ptr(), numsteps_,par,gids.size());
-            } else if (gids.size() == 2) {
-              // bdry computation
-              if ( column == 0 ) {
-                resultval->x_ = val1->x_;
-                evaluate_left_bdry_timestep(val1.get_ptr(), val2.get_ptr(),
-                  resultval.get_ptr(), numsteps_,par);
-              } else {
-                resultval->x_ = val2->x_;
-                evaluate_right_bdry_timestep(val1.get_ptr(), val2.get_ptr(),
-                  resultval.get_ptr(), numsteps_,par);
-              }
-            } else if (gids.size() == 5) {
-              resultval->x_ = val3->x_;
-              evaluate_timestep(val2.get_ptr(), val3.get_ptr(), val4.get_ptr(), 
-                  resultval.get_ptr(), numsteps_,par,gids.size());
-            }
+
+            // call rk update 
+            rkupdate(&*vecval.begin(),resultval.get_ptr(),vecval.size(),
+                     numsteps_,par,gids.size(),column);
 
             std::size_t allowedl = par.allowedl;
             if ( resultval->refine_ && gids.size() == 5 && resultval->level_ < allowedl 

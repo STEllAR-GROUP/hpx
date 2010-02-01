@@ -47,70 +47,41 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     return 1;
 }
 
-///////////////////////////////////////////////////////////////////////////
-int evaluate_timestep(stencil_data const* left, stencil_data const* middle, 
-    stencil_data const* right, stencil_data* result, int numsteps, Par const& par,int gidsize)
+int rkupdate(stencil_data ** vecval,stencil_data* result,int size,
+             int numsteps,Par const& par,int gidsize,int column)
 {
-    // the middle point is our direct predecessor
+  result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
+  result->level_ = vecval[0]->level_;
+  result->refine_ = false;
 
-    result->max_index_ = middle->max_index_;
-    result->index_ = middle->index_;
-    result->timestep_ = middle->timestep_ + 1.0/pow(2.0,(int) middle->level_);
-    result->level_ = middle->level_;
-    result->refine_ = false;
+  double dt = par.dt0;
+  double dx = par.dx0;
 
-    double sum = 0;
-    double dt = par.dt0;
-    double dx = par.dx0;
+  if ( size == 3 ) {
+    result->value_ = vecval[1]->value_ - dt/dx*(vecval[1]->value_ - vecval[0]->value_);
+    result->max_index_ = vecval[1]->max_index_;
+    result->index_ = vecval[1]->index_;
+  } else if ( size == 5 ) {
+    result->value_ = vecval[2]->value_ - dt/dx*(vecval[2]->value_ - vecval[1]->value_);
+    result->max_index_ = vecval[2]->max_index_;
+    result->index_ = vecval[2]->index_;
+  } else if ( size == 2 ) {
+    if ( column == 0 ) {
+      result->value_ = vecval[0]->value_;
+      result->max_index_ = vecval[0]->max_index_;
+      result->index_ = vecval[0]->index_;
+    } else {
+      result->value_ = vecval[1]->value_ - dt/dx*(vecval[1]->value_ - vecval[0]->value_);
+      result->max_index_ = vecval[1]->max_index_;
+      result->index_ = vecval[1]->index_;
+    }
+  }
 
-    result->value_ = middle->value_ - dt/dx*(middle->value_ - left->value_);
+  result->refine_ = refinement(result->value_,result->level_);
 
-    result->refine_ = refinement(result->value_,result->level_);
+  if (gidsize < 5) result->refine_ = false;
 
-    if (gidsize < 5) result->refine_ = false;
-
-    return 1;
-}
-
-///////////////////////////////////////////////////////////////////////////
-int evaluate_left_bdry_timestep(stencil_data const* middle, stencil_data const* right, 
-                           stencil_data* result, int numsteps,Par const& par)
-{
-    // the middle point is our direct predecessor
-
-    result->max_index_ = middle->max_index_;
-    result->index_ = middle->index_;
-    result->timestep_ = middle->timestep_ + 1.0/pow(2.0,(int) middle->level_);
-    result->level_ = middle->level_;
-    result->refine_ = false;
-
-    double dt = par.dt0;
-    double dx = par.dx0;
-
-    // boundary condition
-    result->value_ = middle->value_;
-
-    return 1;
-}
-
-///////////////////////////////////////////////////////////////////////////
-int evaluate_right_bdry_timestep(stencil_data const* left, stencil_data const* middle, 
-                           stencil_data* result, int numsteps,Par const& par)
-{
-    // the middle point is our direct predecessor
-
-    result->max_index_ = middle->max_index_;
-    result->index_ = middle->index_;
-    result->timestep_ = middle->timestep_ + 1.0/pow(2.0,(int) middle->level_);
-    result->level_ = middle->level_;
-    result->refine_ = false;
-
-    double dt = par.dt0;
-    double dx = par.dx0;
-
-    result->value_ = middle->value_ - dt/dx*(middle->value_ - left->value_);
-
-    return 1;
+  return 1;
 }
 
 int interpolation()

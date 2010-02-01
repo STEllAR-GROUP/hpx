@@ -18,20 +18,12 @@ HPX_COMPONENT_EXPORT int generate_initial_data(
 
 /// The function \a evaluate_timestep will be called to compute the result data
 /// for the given timestep
-HPX_COMPONENT_EXPORT int evaluate_timestep(stencil_data const* left, 
-    stencil_data const* middle, stencil_data const* right, 
-    stencil_data* result, int numsteps, Par const& par,int gidsize);
-
-HPX_COMPONENT_EXPORT int evaluate_left_bdry_timestep(
-    stencil_data const* middle, stencil_data const* right, 
-    stencil_data* result, int numsteps, Par const& par);
-
-HPX_COMPONENT_EXPORT int evaluate_right_bdry_timestep(stencil_data const* left, 
-    stencil_data const* middle,
-    stencil_data* result, int numsteps, Par const& par);
-
 HPX_COMPONENT_EXPORT int interpolation();
 
 HPX_COMPONENT_EXPORT bool refinement(double,int);
+
+HPX_COMPONENT_EXPORT int rkupdate(stencil_data ** val, stencil_data* result,int size,
+                                  int numsteps,Par const& par,int gidsize,int column);
+
 
 #endif
