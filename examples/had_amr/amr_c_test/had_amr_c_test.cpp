@@ -52,7 +52,6 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,
 {
   result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
   result->level_ = vecval[0]->level_;
-  result->refine_ = false;
 
   double dt = par.dt0;
   double dx = par.dx0;
@@ -77,8 +76,6 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,
     }
   }
 
-  result->refine_ = refinement(result->value_,result->level_);
-
   if (gidsize < 5) result->refine_ = false;
 
   return 1;
@@ -89,8 +86,10 @@ int interpolation()
   return 1;
 }
 
-bool refinement(double value,int level)
+bool refinement(double value,int level,int gidsize)
 {
+  if (gidsize < 5) return false;
+
   double threshold;
   if ( level == 0 ) threshold = 0.05;
   if ( level == 1 ) threshold = 0.15;

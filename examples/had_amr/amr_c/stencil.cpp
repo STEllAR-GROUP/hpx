@@ -130,6 +130,7 @@ namespace hpx { namespace components { namespace amr
             // call rk update 
             rkupdate(&*vecval.begin(),resultval.get_ptr(),vecval.size(),
                      numsteps_,par,gids.size(),column);
+            resultval->refine_ = refinement(resultval->value_,resultval->level_,gids.size());
 
             std::size_t allowedl = par.allowedl;
             if ( resultval->refine_ && gids.size() == 5 && resultval->level_ < allowedl 
@@ -270,10 +271,10 @@ namespace hpx { namespace components { namespace amr
         }
 
         // apply refinement criteria test to interpolated/found values
-        mval[1]->refine_ = refinement(mval[1]->value_,mval[1]->level_);
-        mval[3]->refine_ = refinement(mval[3]->value_,mval[1]->level_);
-        mval[5]->refine_ = refinement(mval[5]->value_,mval[1]->level_);
-        mval[7]->refine_ = refinement(mval[7]->value_,mval[1]->level_);
+        mval[1]->refine_ = refinement(mval[1]->value_,mval[1]->level_,5);
+        mval[3]->refine_ = refinement(mval[3]->value_,mval[1]->level_,5);
+        mval[5]->refine_ = refinement(mval[5]->value_,mval[1]->level_,5);
+        mval[7]->refine_ = refinement(mval[7]->value_,mval[1]->level_,5);
 
         // the initial data for the child mesh comes from the parent mesh
         naming::id_type here = applier::get_applier().get_runtime_support_gid();
@@ -406,10 +407,10 @@ namespace hpx { namespace components { namespace amr
         }
 
         // apply refinement criteria test to interpolated/found values
-        mval[0]->refine_ = refinement(mval[0]->value_,mval[0]->level_);
-        mval[2]->refine_ = refinement(mval[2]->value_,mval[2]->level_);
-        mval[4]->refine_ = refinement(mval[4]->value_,mval[4]->level_);
-        mval[6]->refine_ = refinement(mval[6]->value_,mval[6]->level_);
+        mval[0]->refine_ = refinement(mval[0]->value_,mval[0]->level_,5);
+        mval[2]->refine_ = refinement(mval[2]->value_,mval[2]->level_,5);
+        mval[4]->refine_ = refinement(mval[4]->value_,mval[4]->level_,5);
+        mval[6]->refine_ = refinement(mval[6]->value_,mval[6]->level_,5);
 
         // the initial data for the child mesh comes from the parent mesh
         naming::id_type here = applier::get_applier().get_runtime_support_gid();

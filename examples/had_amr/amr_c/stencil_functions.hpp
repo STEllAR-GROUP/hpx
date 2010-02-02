@@ -20,7 +20,7 @@ HPX_COMPONENT_EXPORT int generate_initial_data(
 /// for the given timestep
 HPX_COMPONENT_EXPORT int interpolation();
 
-HPX_COMPONENT_EXPORT bool refinement(double,int);
+HPX_COMPONENT_EXPORT bool refinement(double,int,int);
 
 HPX_COMPONENT_EXPORT int rkupdate(stencil_data ** val, stencil_data* result,int size,
                                   int numsteps,Par const& par,int gidsize,int column);
