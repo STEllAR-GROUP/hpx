@@ -136,13 +136,14 @@ just been completed; a 3-D implementation is coming shortly.  In the next sectio
 outline the key concepts and data structures inside the new HPX based \had\ 
 for both 1-D and 3-D implementations.
 
-
+\vspace{0.4cm}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %   Section
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{HPX based HAD}
+\label{sec:hpx_had}
 
 The MPI based \had\ toolkit in its original form contains a global barrier every timestep: no
 computation can proceed once the global barrier has been reached until every point has reached
@@ -152,8 +153,10 @@ This global barrier causes major problems when running on large numbers of proce
 most processors end up waiting for others to reach the global barrier.  Improved load balancing
 can help reduce this problem but will not solve it.  ParalleX enables us to remove all 
 global barriers from the simulation pipeline, including the ubiquitous timestep barrier.  The
-HPX based \had\ toolkit has been redesigned in order that all points can proceed computing the next
-timestep in the simulation without waiting until the neighbor point is ready to do the same. 
+HPX based \had\ toolkit has been redesigned in order that a node point which is ready to proceed 
+computing the next
+timestep in the simulation can do so without waiting until the neighboring node point is ready to do the same. 
+The essential concept is illustrated in Figure~\ref{fig:unigrid}.
 
 Three types of mesh objects are introduced to remove all global barriers.  The fundamental
 data structure is a node point.  Each node point is autonomous and may be communicated
@@ -162,7 +165,14 @@ Finite difference AMR codes normally passed the large blocks of node points to t
 code where only the boundaries of those blocks are communicated.  See Figure~\ref{fig:granularity}.
 HPX based \had\ currently implements the smallest granularity possible.  Eventually 
 a runtime parameter will be introduced so that the user can adjust the optimal granularity for a
-particular problem on a particular number of processors.
+particular problem on a particular number of processors.  
+
+The first type of mesh object in the HPX based \had\ toolkit is the unigrid mesh.  This is illustrated
+ in Figure~\ref{fig:unigrid} for a 1-D space and time simulation where each node point requires information
+from adjacent neighbors in order to compute a result for the next stage in the simulation.
+The number of neighbors needed in order to compute a result is adjustable as a runtime parameter 
+in the HPX based \had\ implementation.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %   A C K N O W L E D G M E N T S
@@ -236,6 +246,17 @@ computation barriers.  HPX based \had\ will eventually be capable of both paradi
 controlled as a runtime parameter so the user can adjust the optimal granularity for a 
 particular problem on a particular number of processors.
 } \label{fig:granularity}
+\end{figure}
+
+\begin{figure}
+\epsfig{file=figures/unigrid.ps,height=5.0cm}
+\caption{The unigrid mesh structure  
+for a 1-D space and time simulation where each node point requires information
+from both adjacent neighbors in order to compute a result for the next stage in the simulation.
+When the input data (indicated by "{\bf In}") required for operation $F_{0,i}$ to compute a result 
+for Stage 0 is available, the computation proceeds.  The $F_{0,i}$ operation can proceed without
+waiting for the adjacent operations $F_{0,i-1}$ and $F_{0,i+1}$ to be ready.}
+\label{fig:unigrid}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
