@@ -74,7 +74,7 @@
 
 \title{HPX Application: HAD Adaptive Mesh Refinement}
 
-\author{The usual suspects} 
+\author{Matthew Anderson$^{1,2}$} 
 
 \affiliation{
 ${}^1$Department of Physics and Astronomy, Louisiana State University, Baton Rouge, LA 70803-4001 \\
@@ -147,7 +147,7 @@ for both 1-D and 3-D implementations.
 
 The MPI based \had\ toolkit in its original form contains a global barrier every timestep: no
 computation can proceed once the global barrier has been reached until every point has reached
-the same timestep in the simulation.  This type of global barrier is not unique to \had\ : other
+the same timestep in the simulation.  This type of global barrier is not unique to \had: other
 major finite difference and finite element based AMR toolkits also contain this global barrier.
 This global barrier causes major problems when running on large numbers of processors because
 most processors end up waiting for others to reach the global barrier.  Improved load balancing
@@ -172,6 +172,14 @@ The first type of mesh object in the HPX based \had\ toolkit is the unigrid mesh
 from adjacent neighbors in order to compute a result for the next stage in the simulation.
 The number of neighbors needed in order to compute a result is adjustable as a runtime parameter 
 in the HPX based \had\ implementation.
+
+The second and third type of mesh objects in the HPX based \had\ toolkit are tapered meshes.
+The standard Berger-Oliger AMR~\cite{Berger} calls for interpolation in time at the boundaries
+of finer meshes, as illustrated in Figure XXX.  The tapered-grid boundary method~\cite{Lehner:2005vc}   
+offers an improvement by eliminating the need for interpolation in time while significantly
+reducing spurious reflections at interface boundaries.  See Figure XXX.  The tapered meshes in \had\
+incorporate the tapered grid boundary method; an illustration of the two tapered meshes
+needed for second order spatial differencing with AMR is found in Figure~\ref{fig:tapered}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -257,6 +265,12 @@ When the input data (indicated by "{\bf In}") required for operation $F_{0,i}$ t
 for Stage 0 is available, the computation proceeds.  The $F_{0,i}$ operation can proceed without
 waiting for the adjacent operations $F_{0,i-1}$ and $F_{0,i+1}$ to be ready.}
 \label{fig:unigrid}
+\end{figure}
+
+\begin{figure}
+\epsfig{file=figures/tapered.ps,height=5.0cm}
+\caption{The left tapered mesh structure.}
+\label{fig:tapered}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
