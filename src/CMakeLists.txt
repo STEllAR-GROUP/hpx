@@ -403,6 +403,7 @@ set (hpxserializationlib_SOURCES
 add_library(hpx_serialization SHARED 
     ${hpxserializationlib_SOURCES} ${hpxserializationlib_HEADERS})
 set_target_properties(hpx_serialization PROPERTIES
+    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
     VERSION ${HPX_VERSION}      # create *nix style library versions + symbolic links
     SOVERSION ${HPX_SOVERSION}
     CLEAN_DIRECT_OUTPUT 1       # allow creating static and shared libs without conflicts
@@ -413,6 +414,7 @@ target_link_libraries(hpx_serialization ${Boost_LIBRARIES})
 add_library(hpx SHARED 
     ${hpxlib_SOURCES} ${hpxlib_HEADERS})
 set_target_properties(hpx PROPERTIES
+    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
     VERSION ${HPX_VERSION}      # create *nix style library versions + symbolic links
     SOVERSION ${HPX_SOVERSION}
     CLEAN_DIRECT_OUTPUT 1       # allow creating static and shared libs without conflicts
