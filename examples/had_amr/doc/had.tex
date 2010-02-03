@@ -175,11 +175,20 @@ in the HPX based \had\ implementation.
 
 The second and third type of mesh objects in the HPX based \had\ toolkit are tapered meshes.
 The standard Berger-Oliger AMR~\cite{Berger} calls for interpolation in time at the boundaries
-of finer meshes, as illustrated in Figure XXX.  The tapered-grid boundary method~\cite{Lehner:2005vc}   
+of finer meshes.  The tapered-grid boundary method~\cite{Lehner:2005vc}   
 offers an improvement by eliminating the need for interpolation in time while significantly
-reducing spurious reflections at interface boundaries.  See Figure XXX.  The tapered meshes in \had\
+reducing spurious reflections at interface boundaries.  In the tapered-grid boundary method, the boundary points
+of an AMR region are discarded each update cycle resulting in a tapered spacetime mesh that respects the domain of
+dependence for the problem.  The tapered meshes in \had
 incorporate the tapered grid boundary method; an illustration of the two tapered meshes
-needed for second order spatial differencing with AMR is found in Figure~\ref{fig:tapered}.
+needed for second order spatial differencing with AMR is found in Figures~\ref{fig:tapered} and ~\ref{fig:right_tapered}.
+
+Using the meshes illustrated in Figures~\ref{fig:unigrid},~\ref{fig:tapered},~\ref{fig:right_tapered} we have created
+a parallel 1-D AMR application code evolving the advection equation without any global barriers with arbitrary 
+levels of refinement.  The data flow of the HPX based \had\ AMR code is illustrated in Figure~\ref{fig:amr_dataflow} 
+for a two level 1-D AMR simulation.   Snapshots of the data are various instances in time are shown in 
+Figure~\ref{fig:advect}.  Figure~\ref{fig:no_barriers} follows the evolution of the simulation in {\it physical} time
+to better illustrate the impact of removing global barriers from a simulation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -271,6 +280,24 @@ waiting for the adjacent operations $F_{0,i-1}$ and $F_{0,i+1}$ to be ready.}
 \epsfig{file=figures/tapered.ps,height=5.0cm}
 \caption{The left tapered mesh structure.}
 \label{fig:tapered}
+\end{figure}
+
+\begin{figure}
+\epsfig{file=figures/rt.ps,height=5.0cm}
+\caption{The right tapered mesh structure.}
+\label{fig:right_tapered}
+\end{figure}
+
+\begin{figure}
+\epsfig{file=figures/barrier.ps,height=10.0cm,angle=270}
+\caption{Results from evolving the 1-D advection equation using two levels of refinement for a simulation time of $t=20$.
+This figure compares the simulation time versus physical time (i.e. real time) for six different x coordinate 
+positions.  Notice that some points in the simulation long before others do (i.e. the slope is much higher for some points
+than for others).  This is 
+a consequence of removing global barriers from the computation.  If a global barrier were introduced, then all
+x coordinate points would like on the same line and the code performance could be no better 
+than the lowest slope line in this figure.}
+\label{fig:no_barriers}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
