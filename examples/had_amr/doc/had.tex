@@ -186,7 +186,7 @@ needed for second order spatial differencing with AMR is found in Figures~\ref{f
 Using the meshes illustrated in Figures~\ref{fig:unigrid},~\ref{fig:tapered},~\ref{fig:right_tapered} we have created
 a parallel 1-D AMR application code evolving the advection equation without any global barriers with arbitrary 
 levels of refinement.  The data flow of the HPX based \had\ AMR code is illustrated in Figure~\ref{fig:amr_dataflow} 
-for a two level 1-D AMR simulation.   Snapshots of the data are various instances in time are shown in 
+for a one level 1-D AMR simulation.   Snapshots of the data are various instances in time are shown in 
 Figure~\ref{fig:advect}.  Figure~\ref{fig:no_barriers} follows the evolution of the simulation in {\it physical} time
 to better illustrate the impact of removing global barriers from a simulation.
 
@@ -208,6 +208,8 @@ S. Liebling and L. Lehner for
 \bibliography{./had}
 \bibliographystyle{apsrev}
 
+\begin{widetext}
+
 \begin{figure}
 \epsfig{file=figures/grid0.0.ps,height=4.0cm}
 \epsfig{file=figures/grid84.8.ps,height=4.0cm}
@@ -223,7 +225,7 @@ here.  Simulations were performed on 128 processors.} \label{fig:amr_mesh}
 
 \begin{figure}
 \begin{tabular}{cc}
-\epsfig{file=figures/strongscale,height=5.5cm} & \epsfig{file=figures/amrscale,height=5.5cm} \\
+\epsfig{file=figures/strongscale,height=7.5cm} & \epsfig{file=figures/amrscale,height=7.5cm} \\
 {\bf (a)} & {\bf (b)}
 \end{tabular}
 \caption{This figure shows strong scaling results for single grid and
@@ -245,7 +247,7 @@ All tests were performed on an Intel Pentium IV 3.0 GHz cluster with Myrinet.}
 
 \begin{figure}
 \begin{tabular}{cc}
-\epsfig{file=figures/communication.ps,height=4.5cm} & \epsfig{file=figures/granularity.ps,height=3.0cm} \\
+\epsfig{file=figures/communication.ps,height=7.5cm} & \epsfig{file=figures/granularity.ps,height=5.0cm} \\
 {\bf (a)} & {\bf (b)}
 \end{tabular}
 \caption{Two different approaches to structured mesh based communication: 
@@ -266,7 +268,7 @@ particular problem on a particular number of processors.
 \end{figure}
 
 \begin{figure}
-\epsfig{file=figures/unigrid.ps,height=5.0cm}
+\epsfig{file=figures/unigrid.ps,height=6.0cm}
 \caption{The unigrid mesh structure  
 for a 1-D space and time simulation where each node point requires information
 from both adjacent neighbors in order to compute a result for the next stage in the simulation.
@@ -277,15 +279,22 @@ waiting for the adjacent operations $F_{0,i-1}$ and $F_{0,i+1}$ to be ready.}
 \end{figure}
 
 \begin{figure}
-\epsfig{file=figures/tapered.ps,height=5.0cm}
+\epsfig{file=figures/tapered.ps,height=6.0cm}
 \caption{The left tapered mesh structure.}
 \label{fig:tapered}
 \end{figure}
 
 \begin{figure}
-\epsfig{file=figures/rt.ps,height=5.0cm}
+\epsfig{file=figures/rt.ps,height=6.0cm}
 \caption{The right tapered mesh structure.}
 \label{fig:right_tapered}
+\end{figure}
+
+\begin{figure}
+\epsfig{file=figures/level0.ps,height=6.0cm}
+\epsfig{file=figures/level1.ps,height=6.5cm} \\
+\caption{AMR data flow example for a simulation with 1 level of refinement and stencilsize 3.
+} \label{fig:amr_dataflow}
 \end{figure}
 
 \begin{figure}
@@ -299,6 +308,8 @@ x coordinate points would like on the same line and the code performance could b
 than the lowest slope line in this figure.}
 \label{fig:no_barriers}
 \end{figure}
+
+\end{widetext}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
