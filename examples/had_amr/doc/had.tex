@@ -161,8 +161,8 @@ The essential concept is illustrated in Figure~\ref{fig:unigrid}.
 Three types of mesh objects are introduced to remove all global barriers.  The fundamental
 data structure is a node point.  Each node point is autonomous and may be communicated
 depending on the granularity desired for a particular problem.  
-Finite difference AMR codes normally passed the large blocks of node points to the user defined
-code where only the boundaries of those blocks are communicated.  See Figure~\ref{fig:granularity}.
+Finite difference AMR codes normally pass large blocks of node points to the user defined
+code; only the boundaries of these blocks are communicated, as illustrated in Figure~\ref{fig:granularity}.
 HPX based \had\ currently implements the smallest granularity possible.  Eventually 
 a runtime parameter will be introduced so that the user can adjust the optimal granularity for a
 particular problem on a particular number of processors.  
@@ -170,8 +170,7 @@ particular problem on a particular number of processors.
 The first type of mesh object in the HPX based \had\ toolkit is the unigrid mesh.  This is illustrated
  in Figure~\ref{fig:unigrid} for a 1-D space and time simulation where each node point requires information
 from adjacent neighbors in order to compute a result for the next stage in the simulation.
-The number of neighbors needed in order to compute a result is adjustable as a runtime parameter 
-in the HPX based \had\ implementation.
+The number of neighbors is adjustable as a runtime parameter in the HPX based \had\ implementation.
 
 The second and third type of mesh objects in the HPX based \had\ toolkit are tapered meshes.
 The standard Berger-Oliger AMR~\cite{Berger} calls for interpolation in time at the boundaries
@@ -179,14 +178,14 @@ of finer meshes.  The tapered-grid boundary method~\cite{Lehner:2005vc}
 offers an improvement by eliminating the need for interpolation in time while significantly
 reducing spurious reflections at interface boundaries.  In the tapered-grid boundary method, the boundary points
 of an AMR region are discarded each update cycle resulting in a tapered spacetime mesh that respects the domain of
-dependence for the problem.  The tapered meshes in \had
+dependence for the problem.  The tapered meshes in \had\
 incorporate the tapered grid boundary method; an illustration of the two tapered meshes
 needed for second order spatial differencing with AMR is found in Figures~\ref{fig:tapered} and ~\ref{fig:right_tapered}.
 
 Using the meshes illustrated in Figures~\ref{fig:unigrid},~\ref{fig:tapered},~\ref{fig:right_tapered} we have created
 a parallel 1-D AMR application code evolving the advection equation without any global barriers with arbitrary 
 levels of refinement.  The data flow of the HPX based \had\ AMR code is illustrated in Figure~\ref{fig:amr_dataflow} 
-for a one level 1-D AMR simulation.   Snapshots of the data are various instances in time are shown in 
+for a single level 1-D AMR simulation.   Snapshots of the data are various instances in time are shown in 
 Figure~\ref{fig:advect}.  Figure~\ref{fig:no_barriers} follows the evolution of the simulation in {\it physical} time
 to better illustrate the impact of removing global barriers from a simulation.
 
@@ -295,6 +294,15 @@ waiting for the adjacent operations $F_{0,i-1}$ and $F_{0,i+1}$ to be ready.}
 \epsfig{file=figures/level1.ps,height=6.5cm} \\
 \caption{AMR data flow example for a simulation with 1 level of refinement and stencilsize 3.
 } \label{fig:amr_dataflow}
+\end{figure}
+
+\begin{figure}
+\begin{tabular}{cc}
+\epsfig{file=figures/advect1.ps,height=7.5cm} & \epsfig{file=figures/advect2.ps,height=7.5cm} \\
+{\bf (a)} & {\bf (b)}
+\end{tabular}
+\caption{AMR
+} \label{fig:advect}
 \end{figure}
 
 \begin{figure}
