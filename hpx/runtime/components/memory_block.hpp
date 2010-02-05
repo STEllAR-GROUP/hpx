@@ -186,7 +186,7 @@ namespace hpx { namespace components
     get_memory_block_async(std::vector<access_memory_block<T> >& results,
         std::vector<naming::id_type> const& gids)
     {
-        typedef std::vector<lcos::future_value<naming::gid_type> > 
+        typedef std::vector<lcos::future_value<memory_block_data> > 
             lazy_results_type;
         lazy_results_type lazy_results;
 
@@ -195,14 +195,14 @@ namespace hpx { namespace components
             const_iterator_type;
 
         const_iterator_type end = gids.end();
-        for (const_iterator_type it = gids.begin(); it != end ++it)
+        for (const_iterator_type it = gids.begin(); it != end; ++it)
             lazy_results.push_back(stubs::memory_block::get_async(*it));
 
         // then wait for all results to get back to us
         typedef typename lazy_results_type::iterator iterator_type;
         iterator_type lend = lazy_results.end();
         for (iterator_type lit = lazy_results.begin(); lit != lend; ++lit)
-            results.push_back((*it).get());
+            results.push_back((*lit).get());
     }
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
