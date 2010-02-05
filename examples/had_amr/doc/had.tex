@@ -185,9 +185,9 @@ needed for second order spatial differencing with AMR is found in Figures~\ref{f
 Using the meshes illustrated in Figures~\ref{fig:unigrid},~\ref{fig:tapered},~\ref{fig:right_tapered} we have created
 a parallel 1-D AMR application code evolving the advection equation without any global barriers with arbitrary 
 levels of refinement.  The data flow of the HPX based \had\ AMR code is illustrated in Figure~\ref{fig:amr_dataflow} 
-for a single level 1-D AMR simulation.   Snapshots of the data are various instances in time are shown in 
-Figure~\ref{fig:advect}.  Figure~\ref{fig:no_barriers} follows the evolution of the simulation in {\it physical} time
-to better illustrate the impact of removing global barriers from a simulation.
+for a single level 1-D AMR simulation.   Snapshots of a multiple refinement level simulation at two instances in time are shown in 
+Figure~\ref{fig:advect}.  Figure~\ref{fig:no_barriers} follows the evolution of a multiple refinement level simulation 
+in {\it physical} time to better illustrate the impact of removing global barriers from a simulation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -279,20 +279,32 @@ waiting for the adjacent operations $F_{0,i-1}$ and $F_{0,i+1}$ to be ready.}
 
 \begin{figure}
 \epsfig{file=figures/tapered.ps,height=6.0cm}
-\caption{The left tapered mesh structure.}
+\caption{The left tapered mesh structure.  One of two meshes used for computing finer meshes.  See also
+Figures~\ref{fig:right_tapered} and ~\ref{fig:amr_dataflow}.  }
 \label{fig:tapered}
 \end{figure}
 
 \begin{figure}
 \epsfig{file=figures/rt.ps,height=6.0cm}
-\caption{The right tapered mesh structure.}
+\caption{The right tapered mesh structure.  One of two meshes used for computing finer meshes.  See also
+Figures~\ref{fig:tapered} and ~\ref{fig:amr_dataflow}.}
 \label{fig:right_tapered}
 \end{figure}
 
 \begin{figure}
 \epsfig{file=figures/level0.ps,height=6.0cm}
-\epsfig{file=figures/level1.ps,height=6.5cm} \\
-\caption{AMR data flow example for a simulation with 1 level of refinement and stencilsize 3.
+\epsfig{file=figures/level1.ps,height=18.5cm,angle=90} \\
+\caption{AMR data flow example for a simulation with 1 level of refinement and a stencilsize of three so that the adjacent
+neighbors of each point are required for a computation.  The numbers in each frame indicate the timestep and the coordinate location
+of the node.  The simulation begins at timestep 0 on the coarse mesh (level 0) where data points $I_{0,0 \rightarrow 6}$ are 
+provided as initial data.  The initial data is communicated as indicated.  Data points at timestep 1, $I_{1,0 \rightarrow 6}$, are
+then computed as the data becomes available and the refinement criteria is applied to the result.  In this example, the two points
+labelled $I_{1,2}$ and $I_{1,3}$ are flagged for refinement as indicated by the $^*$.  At this point, the computation of $I_{1,2}$ and
+$I_{1,3}$ is repeated, but this time using the finer meshes illustrated.  Data points $I_{0,\frac{1}{2}}$, $I_{0,\frac{3}{2}}$, $I_{0,\frac{5}{2}}$, $I_{0,\frac{7}{2}}$, and $I_{0,\frac{9}{2}}$ are then found from the initial data (or from a previous finer mesh cycle if available;
+interpolation from neighbors if not), and the computation of $I_{1,2}$ and $I_{1,3}$ is repeated at twice the resolution.  Neighboring
+points $I_{1,\frac{3}{2}}$, $I_{1,\frac{5}{2}}$, and $I_{1,\frac{7}{2}}$ are also computed for use in future AMR cycles.  This process is
+entirely non-blocking and allows for each point to refine autonomously without knowing if its neighbor is refining or not.   The cost of
+this, however, is that some computations are duplicated.  Duplicate computations are indicated by dashed frame boxes. 
 } \label{fig:amr_dataflow}
 \end{figure}
 
@@ -301,7 +313,12 @@ waiting for the adjacent operations $F_{0,i-1}$ and $F_{0,i+1}$ to be ready.}
 \epsfig{file=figures/advect1.ps,height=7.5cm} & \epsfig{file=figures/advect2.ps,height=7.5cm} \\
 {\bf (a)} & {\bf (b)}
 \end{tabular}
-\caption{AMR
+\caption{The plots in (a) and (b) show the AMR mesh structure of a wave with 3 levels of refinement traveling to the right at two
+instances in time: $t=0$ and $t=80$.
+The refinement criteria was set to be the amplitude of the wave in this case for
+demonstration purposes.  The coarsest mesh is colored orange; the finer meshes (each finer than the
+last by factor of two) are colored blue, purple, and light blue-red.  The refined regions track the 
+wave as it moves to the right.  This example was run on two operating system threads.   
 } \label{fig:advect}
 \end{figure}
 
