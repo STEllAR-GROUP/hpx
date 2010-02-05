@@ -68,7 +68,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         components::distributing_factory::iterator_type function = functions.first;
 
         if ( par.coarsestencilsize == 5 ) BOOST_ASSERT(numvalues > 9);
-        if ( par.coarsestencilsize == 9 ) BOOST_ASSERT(numvalues > 9);
+        if ( par.coarsestencilsize == 9 ) BOOST_ASSERT(numvalues > 16);
 
         for (int column = 0; stencil != stencils.second; ++stencil, ++function, ++column)
         {
@@ -210,10 +210,10 @@ namespace hpx { namespace components { namespace amr { namespace server
         typedef components::distributing_factory::result_type result_type;
 
         int j;
-        int *dst_ports;
-        int *dst_src;
-        int *dst_size;
         std::size_t numvals = outputs[0].size();
+        std::vector<int> dst_ports(numvals*9);
+        std::vector<int> dst_src(numvals*9);
+        std::vector<int> dst_size(numvals);
         if ( par.coarsestencilsize == 9 ) {
           prep_ports_nine(dst_ports,dst_src,dst_size,numvals); 
         }
@@ -321,11 +321,6 @@ namespace hpx { namespace components { namespace amr { namespace server
              //     components::amr::stubs::stencil_value<3>::
              //         connect_input_ports(*stencil, output_ports);
             }
-        }
-        if ( par.coarsestencilsize == 9 ) {
-          delete [] dst_ports;
-          delete [] dst_src;
-          delete [] dst_size;
         }
     }
 
@@ -543,22 +538,17 @@ namespace hpx { namespace components { namespace amr { namespace server
         return result_data;
     }
 
-    void amr_mesh::prep_ports_nine(int *dst_ports,int *dst_src,int *dst_size,std::size_t numvals ) { 
+    void amr_mesh::prep_ports_nine(std::vector<int> &dst_ports,std::vector<int> &dst_src,std::vector<int> &dst_size,std::size_t numvals ) { 
       int j,k;
-      dst_ports = new int[numvals*9];
-      dst_src = new int[numvals*9];
-      dst_size = new int[numvals];
       // initialize size to zero
       for (j=0;j<numvals;j++) {
         dst_size[j] = 0;
       }
-
       for (j=0;j<numvals;j++) {
         if ( j == 0 ) {
           dst_ports[j + numvals*dst_size[j]] = 0;
             dst_src[j + numvals*dst_size[j]] = j;
            dst_size[j]++;
-
           dst_ports[j+1 + numvals*dst_size[j+1]] = 1;
             dst_src[j+1 + numvals*dst_size[j+1]] = j;
            dst_size[j+1]++;
@@ -824,7 +814,6 @@ namespace hpx { namespace components { namespace amr { namespace server
            dst_size[j+4]++;
         }
       }
-
       int t1;
       for (j=0;j<numvals;j++) {
         // Now sort the src ports in ascending order for each destination port
@@ -839,7 +828,6 @@ namespace hpx { namespace components { namespace amr { namespace server
             t1 = dst_ports[j+numvals*k];
             dst_ports[j+numvals*k] = dst_ports[j+numvals*(k+1)];
             dst_ports[j+numvals*(k+1)] = t1;
-
           }
         }
       }
