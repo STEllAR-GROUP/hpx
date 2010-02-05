@@ -181,6 +181,30 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     // helper functions to get several memory pointers asynchronously
 
+    template <typename T>
+    inline void
+    get_memory_block_async(std::vector<access_memory_block<T> >& results,
+        std::vector<naming::id_type> const& gids)
+    {
+        typedef std::vector<lcos::future_value<naming::gid_type> > 
+            lazy_results_type;
+        lazy_results_type lazy_results;
+
+        // first invoke all remote operations
+        typedef typename std::vector<naming::id_type>::const_iterator
+            const_iterator_type;
+
+        const_iterator_type end = gids.end();
+        for (const_iterator_type it = gids.begin(); it != end ++it)
+            lazy_results.push_back(stubs::memory_block::get_async(*it));
+
+        // then wait for all results to get back to us
+        typedef typename lazy_results_type::iterator iterator_type;
+        iterator_type lend = lazy_results.end();
+        for (iterator_type lit = lazy_results.begin(); lit != lend; ++lit)
+            results.push_back((*it).get());
+    }
+
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (2, HPX_WAIT_ARGUMENT_LIMIT,                                          \
     "hpx/runtime/components/memory_block.hpp"))                               \
