@@ -232,6 +232,7 @@ int main(int argc, char* argv[])
 
         // default pars
         par.stencilsize = 3;
+        par.integrator  = 0;
         par.allowedl    = 0;
         par.loglevel    = 0;
         par.output      = 1.0;
@@ -276,6 +277,11 @@ int main(int argc, char* argv[])
                 std::string tmp = sec->get_entry("stencilsize");
                 par.stencilsize = atoi(tmp.c_str());
               }
+              if ( sec->has_entry("integrator") ) {
+                std::string tmp = sec->get_entry("integrator");
+                par.integrator = atoi(tmp.c_str());
+                if ( par.integrator < 0 || par.integrator > 1 ) BOOST_ASSERT(false); 
+              }
               if ( sec->has_entry("linearbounds") ) {
                 std::string tmp = sec->get_entry("linearbounds");
                 par.linearbounds = atoi(tmp.c_str());
@@ -313,7 +319,16 @@ int main(int argc, char* argv[])
         par.dt0 = par.lambda*par.dx0;
         if ( par.allowedl > 0 ) {
           if ( par.linearbounds == 1 ) {
-            par.coarsestencilsize = par.stencilsize + 2;
+            if ( par.integrator == 0 ) {
+              // Euler step
+              par.coarsestencilsize = par.stencilsize + 2;
+            } else if ( par.integrator == 1 ) {
+              // rk3 step
+              par.coarsestencilsize = par.stencilsize + 4;
+            } else {
+              // Not implemented yet
+              BOOST_ASSERT(false);
+            }
           } else {
             // Not implemented yet
             BOOST_ASSERT(false);

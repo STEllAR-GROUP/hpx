@@ -53,6 +53,14 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,
   result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
   result->level_ = vecval[0]->level_;
 
+  calcrhs(vecval,result,size,numsteps,par,gidsize,column);
+
+  return 1;
+}
+
+int calcrhs(stencil_data ** vecval,stencil_data* result,int size,
+             int numsteps,Par const& par,int gidsize,int column)
+{
   double dt = par.dt0;
   double dx = par.dx0;
 
@@ -64,6 +72,10 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,
     result->value_ = vecval[2]->value_ - dt/dx*(vecval[2]->value_ - vecval[1]->value_);
     result->max_index_ = vecval[2]->max_index_;
     result->index_ = vecval[2]->index_;
+  } else if ( size == 9 ) {
+    result->value_ = vecval[4]->value_ - dt/dx*(vecval[4]->value_ - vecval[3]->value_);
+    result->max_index_ = vecval[4]->max_index_;
+    result->index_ = vecval[4]->index_;
   } else if ( size == 2 ) {
     if ( column == 0 ) {
       result->value_ = vecval[0]->value_;
@@ -75,10 +87,6 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,
       result->index_ = vecval[1]->index_;
     }
   }
-
-  if (gidsize < 5) result->refine_ = false;
-
-  return 1;
 }
 
 int interpolation()

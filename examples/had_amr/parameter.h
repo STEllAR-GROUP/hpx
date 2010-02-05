@@ -19,6 +19,7 @@ struct Par {
       int stencilsize;
       int linearbounds;
       int coarsestencilsize;
+      int integrator;
       int nx0;
       int nt0;
       double minx0;

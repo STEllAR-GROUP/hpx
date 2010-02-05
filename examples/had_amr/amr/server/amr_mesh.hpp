@@ -103,6 +103,8 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         static void start_row(distributed_iterator_range_type const& stencils);
 
+        static void prep_ports_nine(int *dst_ports,int *dst_src,int *dst_size,std::size_t numvals );
+
     private:
         std::size_t numvalues_;
     };

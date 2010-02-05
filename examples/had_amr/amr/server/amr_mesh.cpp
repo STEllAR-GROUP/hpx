@@ -68,6 +68,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         components::distributing_factory::iterator_type function = functions.first;
 
         if ( par.coarsestencilsize == 5 ) BOOST_ASSERT(numvalues > 9);
+        if ( par.coarsestencilsize == 9 ) BOOST_ASSERT(numvalues > 9);
 
         for (int column = 0; stencil != stencils.second; ++stencil, ++function, ++column)
         {
@@ -87,7 +88,6 @@ namespace hpx { namespace components { namespace amr { namespace server
                       par.coarsestencilsize, par.coarsestencilsize, par);
               }
             } else if ( par.coarsestencilsize == 5 ) {
-              // bias the stencil to the right
               if (column == 0 ) {
                   // boundary value
                   stubs::dynamic_stencil_value::set_functional_component(*stencil, 
@@ -111,6 +111,49 @@ namespace hpx { namespace components { namespace amr { namespace server
                   // 'normal' value
                   stubs::dynamic_stencil_value::set_functional_component(*stencil, 
                       *function, static_step, column, 5,5, par);
+              }
+            } else if ( par.coarsestencilsize == 9 ) {
+              if (column == 0 ) {
+                  // boundary value
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column, 2,3, par);
+              } else if ( column == 1) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column,3,5, par);
+              } else if ( column == 2 || column == 3) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column,3,6, par);
+              } else if ( column == 4 || column == 5) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column,9,6, par);
+              } else if ( column == 6 ) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column,9,7, par);
+              } else if ( column == 7 ) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column,9,8, par);
+              } else if ( column == numvalues-8 ) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column,9,8,par);
+              } else if ( column == numvalues-7 ) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column,9,7,par);
+              } else if ( column == numvalues-6 || column == numvalues-5) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column,9,6,par);
+              } else if ( column == numvalues-4 || column == numvalues-3) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column,3,6,par);
+              } else if ( column == numvalues-2) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column,3,5,par);
+              } else if ( column == numvalues-1) {
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column, 2,3, par);
+              } else {
+                  // 'normal' value
+                  stubs::dynamic_stencil_value::set_functional_component(*stencil, 
+                      *function, static_step, column, 9,9, par);
               }
             } else {
                BOOST_ASSERT (false);
@@ -166,10 +209,19 @@ namespace hpx { namespace components { namespace amr { namespace server
     {
         typedef components::distributing_factory::result_type result_type;
 
+        int j;
+        int *dst_ports;
+        int *dst_src;
+        int *dst_size;
+        std::size_t numvals = outputs[0].size();
+        if ( par.coarsestencilsize == 9 ) {
+          prep_ports_nine(dst_ports,dst_src,dst_size,numvals); 
+        }
+
         int steps = (int)outputs.size();
         for (int step = 0; step < steps; ++step) 
         {
-            std::size_t numvals = outputs[0].size();
+          //  std::size_t numvals = outputs[0].size();
             components::distributing_factory::iterator_range_type r = 
                 locality_results(stencils[step]);
             components::distributing_factory::iterator_type stencil = r.first;
@@ -255,6 +307,11 @@ namespace hpx { namespace components { namespace amr { namespace server
                           outputs[outstep][i+1][3],
                           outputs[outstep][i+2][4];
                   }
+                } else if ( par.coarsestencilsize == 9 ) {
+                  // get src ports in ascending order
+                  for (j=0;j<dst_size[i];j++) {
+                    output_ports.push_back(outputs[outstep][dst_src[i+numvals*j]][dst_ports[i+numvals*j]]);
+                  }
                 } else {
                   BOOST_ASSERT(false);
                 }
@@ -264,6 +321,11 @@ namespace hpx { namespace components { namespace amr { namespace server
              //     components::amr::stubs::stencil_value<3>::
              //         connect_input_ports(*stencil, output_ports);
             }
+        }
+        if ( par.coarsestencilsize == 9 ) {
+          delete [] dst_ports;
+          delete [] dst_src;
+          delete [] dst_size;
         }
     }
 
@@ -479,6 +541,309 @@ namespace hpx { namespace components { namespace amr { namespace server
         factory.free_components_sync(functions);
 
         return result_data;
+    }
+
+    void amr_mesh::prep_ports_nine(int *dst_ports,int *dst_src,int *dst_size,std::size_t numvals ) { 
+      int j,k;
+      dst_ports = new int[numvals*9];
+      dst_src = new int[numvals*9];
+      dst_size = new int[numvals];
+      // initialize size to zero
+      for (j=0;j<numvals;j++) {
+        dst_size[j] = 0;
+      }
+
+      for (j=0;j<numvals;j++) {
+        if ( j == 0 ) {
+          dst_ports[j + numvals*dst_size[j]] = 0;
+            dst_src[j + numvals*dst_size[j]] = j;
+           dst_size[j]++;
+
+          dst_ports[j+1 + numvals*dst_size[j+1]] = 1;
+            dst_src[j+1 + numvals*dst_size[j+1]] = j;
+           dst_size[j+1]++;
+
+          dst_ports[j+4 + numvals*dst_size[j+4]] = 2;
+            dst_src[j+4 + numvals*dst_size[j+4]] = j;
+           dst_size[j+4]++;
+        } else if ( j == 1 ) {
+          dst_ports[j-1 + numvals*dst_size[j-1]] = 0;
+            dst_src[j-1 + numvals*dst_size[j-1]] = j;
+           dst_size[j-1]++;
+
+          dst_ports[j + numvals*dst_size[j]] = 1;
+            dst_src[j + numvals*dst_size[j]] = j;
+           dst_size[j]++;
+
+          dst_ports[j+1 + numvals*dst_size[j+1]] = 2;
+            dst_src[j+1 + numvals*dst_size[j+1]] = j;
+           dst_size[j+1]++;
+          
+          dst_ports[j+3 + numvals*dst_size[j+3]] = 3;
+            dst_src[j+3 + numvals*dst_size[j+3]] = j;
+           dst_size[j+3]++;
+
+          dst_ports[j+4 + numvals*dst_size[j+4]] = 4;
+            dst_src[j+4 + numvals*dst_size[j+4]] = j;
+           dst_size[j+4]++;
+        } else if ( j == 2 || j == 3 || j == 4 || j == 5) {
+          dst_ports[j-1 + numvals*dst_size[j-1]] = 0;
+            dst_src[j-1 + numvals*dst_size[j-1]] = j;
+           dst_size[j-1]++;
+
+          dst_ports[j + numvals*dst_size[j]] = 1;
+            dst_src[j + numvals*dst_size[j]] = j;
+           dst_size[j]++;
+
+          dst_ports[j+1 + numvals*dst_size[j+1]] = 2;
+            dst_src[j+1 + numvals*dst_size[j+1]] = j;
+           dst_size[j+1]++;
+
+          dst_ports[j+2 + numvals*dst_size[j+2]] = 3;
+            dst_src[j+2 + numvals*dst_size[j+2]] = j;
+           dst_size[j+2]++;
+
+          dst_ports[j+3 + numvals*dst_size[j+3]] = 4;
+            dst_src[j+3 + numvals*dst_size[j+3]] = j;
+           dst_size[j+3]++;
+
+          dst_ports[j+4 + numvals*dst_size[j+4]] = 5;
+            dst_src[j+4 + numvals*dst_size[j+4]] = j;
+           dst_size[j+4]++;
+        } else if ( j == 6 ) {
+          dst_ports[j-2 + numvals*dst_size[j-2]] = 0;
+            dst_src[j-2 + numvals*dst_size[j-2]] = j;
+           dst_size[j-2]++;
+
+          dst_ports[j-1 + numvals*dst_size[j-1]] = 1;
+            dst_src[j-1 + numvals*dst_size[j-1]] = j;
+           dst_size[j-1]++;
+
+          dst_ports[j + numvals*dst_size[j]] = 2;
+            dst_src[j + numvals*dst_size[j]] = j;
+           dst_size[j]++;
+
+          dst_ports[j+1 + numvals*dst_size[j+1]] = 3;
+            dst_src[j+1 + numvals*dst_size[j+1]] = j;
+           dst_size[j+1]++;
+
+          dst_ports[j+2 + numvals*dst_size[j+2]] = 4;
+            dst_src[j+2 + numvals*dst_size[j+2]] = j;
+           dst_size[j+2]++;
+
+          dst_ports[j+3 + numvals*dst_size[j+3]] = 5;
+            dst_src[j+3 + numvals*dst_size[j+3]] = j;
+           dst_size[j+3]++;
+
+          dst_ports[j+4 + numvals*dst_size[j+4]] = 6;
+            dst_src[j+4 + numvals*dst_size[j+4]] = j;
+           dst_size[j+4]++;
+        } else if ( j == 7 ) {
+          dst_ports[j-3 + numvals*dst_size[j-3]] = 0;
+            dst_src[j-3 + numvals*dst_size[j-3]] = j;
+           dst_size[j-3]++;
+
+          dst_ports[j-2 + numvals*dst_size[j-2]] = 1;
+            dst_src[j-2 + numvals*dst_size[j-2]] = j;
+           dst_size[j-2]++;
+
+          dst_ports[j-1 + numvals*dst_size[j-1]] = 2;
+            dst_src[j-1 + numvals*dst_size[j-1]] = j;
+           dst_size[j-1]++;
+
+          dst_ports[j + numvals*dst_size[j]] = 3;
+            dst_src[j + numvals*dst_size[j]] = j;
+           dst_size[j]++;
+
+          dst_ports[j+1 + numvals*dst_size[j+1]] = 4;
+            dst_src[j+1 + numvals*dst_size[j+1]] = j;
+           dst_size[j+1]++;
+
+          dst_ports[j+2 + numvals*dst_size[j+2]] = 5;
+            dst_src[j+2 + numvals*dst_size[j+2]] = j;
+           dst_size[j+2]++;
+
+          dst_ports[j+3 + numvals*dst_size[j+3]] = 6;
+            dst_src[j+3 + numvals*dst_size[j+3]] = j;
+           dst_size[j+3]++;
+
+          dst_ports[j+4 + numvals*dst_size[j+4]] = 7;
+            dst_src[j+4 + numvals*dst_size[j+4]] = j;
+           dst_size[j+4]++;
+        } else if ( j == numvals-8 ) {
+          dst_ports[j-4 + numvals*dst_size[j-4]] = 0;
+            dst_src[j-4 + numvals*dst_size[j-4]] = j;
+           dst_size[j-4]++;
+
+          dst_ports[j-3 + numvals*dst_size[j-3]] = 1;
+            dst_src[j-3 + numvals*dst_size[j-3]] = j;
+           dst_size[j-3]++;
+
+          dst_ports[j-2 + numvals*dst_size[j-2]] = 2;
+            dst_src[j-2 + numvals*dst_size[j-2]] = j;
+           dst_size[j-2]++;
+
+          dst_ports[j-1 + numvals*dst_size[j-1]] = 3;
+            dst_src[j-1 + numvals*dst_size[j-1]] = j;
+           dst_size[j-1]++;
+
+          dst_ports[j + numvals*dst_size[j]] = 4;
+            dst_src[j + numvals*dst_size[j]] = j;
+           dst_size[j]++;
+
+          dst_ports[j+1 + numvals*dst_size[j+1]] = 5;
+            dst_src[j+1 + numvals*dst_size[j+1]] = j;
+           dst_size[j+1]++;
+
+          dst_ports[j+2 + numvals*dst_size[j+2]] = 6;
+            dst_src[j+2 + numvals*dst_size[j+2]] = j;
+           dst_size[j+2]++;
+
+          dst_ports[j+3 + numvals*dst_size[j+3]] = 7;
+            dst_src[j+3 + numvals*dst_size[j+3]] = j;
+           dst_size[j+3]++;
+        } else if ( j == numvals-7 ) {
+          dst_ports[j-4 + numvals*dst_size[j-4]] = 0;
+            dst_src[j-4 + numvals*dst_size[j-4]] = j;
+           dst_size[j-4]++;
+
+          dst_ports[j-3 + numvals*dst_size[j-3]] = 1;
+            dst_src[j-3 + numvals*dst_size[j-3]] = j;
+           dst_size[j-3]++;
+
+          dst_ports[j-2 + numvals*dst_size[j-2]] = 2;
+            dst_src[j-2 + numvals*dst_size[j-2]] = j;
+           dst_size[j-2]++;
+
+          dst_ports[j-1 + numvals*dst_size[j-1]] = 3;
+            dst_src[j-1 + numvals*dst_size[j-1]] = j;
+           dst_size[j-1]++;
+
+          dst_ports[j + numvals*dst_size[j]] = 4;
+            dst_src[j + numvals*dst_size[j]] = j;
+           dst_size[j]++;
+
+          dst_ports[j+1 + numvals*dst_size[j+1]] = 5;
+            dst_src[j+1 + numvals*dst_size[j+1]] = j;
+           dst_size[j+1]++;
+
+          dst_ports[j+2 + numvals*dst_size[j+2]] = 6;
+            dst_src[j+2 + numvals*dst_size[j+2]] = j;
+           dst_size[j+2]++;
+        } else if ( j == numvals-6 || j == numvals-5 || j == numvals-4 || j == numvals-3 ) {
+          dst_ports[j-4 + numvals*dst_size[j-4]] = 0;
+            dst_src[j-4 + numvals*dst_size[j-4]] = j;
+           dst_size[j-4]++;
+
+          dst_ports[j-3 + numvals*dst_size[j-3]] = 1;
+            dst_src[j-3 + numvals*dst_size[j-3]] = j;
+           dst_size[j-3]++;
+
+          dst_ports[j-2 + numvals*dst_size[j-2]] = 2;
+            dst_src[j-2 + numvals*dst_size[j-2]] = j;
+           dst_size[j-2]++;
+
+          dst_ports[j-1 + numvals*dst_size[j-1]] = 3;
+            dst_src[j-1 + numvals*dst_size[j-1]] = j;
+           dst_size[j-1]++;
+
+          dst_ports[j + numvals*dst_size[j]] = 4;
+            dst_src[j + numvals*dst_size[j]] = j;
+           dst_size[j]++;
+
+          dst_ports[j+1 + numvals*dst_size[j+1]] = 5;
+            dst_src[j+1 + numvals*dst_size[j+1]] = j;
+           dst_size[j+1]++;
+        } else if ( j == numvals-2 ) {
+          dst_ports[j-4 + numvals*dst_size[j-4]] = 0;
+            dst_src[j-4 + numvals*dst_size[j-4]] = j;
+           dst_size[j-4]++;
+
+          dst_ports[j-3 + numvals*dst_size[j-3]] = 1;
+            dst_src[j-3 + numvals*dst_size[j-3]] = j;
+           dst_size[j-3]++;
+
+          dst_ports[j-1 + numvals*dst_size[j-1]] = 2;
+            dst_src[j-1 + numvals*dst_size[j-1]] = j;
+           dst_size[j-1]++;
+
+          dst_ports[j + numvals*dst_size[j]] = 3;
+            dst_src[j + numvals*dst_size[j]] = j;
+           dst_size[j]++;
+
+          dst_ports[j+1 + numvals*dst_size[j+1]] = 4;
+            dst_src[j+1 + numvals*dst_size[j+1]] = j;
+           dst_size[j+1]++;
+        } else if ( j == numvals-1 ) {
+          dst_ports[j-4 + numvals*dst_size[j-4]] = 0;
+            dst_src[j-4 + numvals*dst_size[j-4]] = j;
+           dst_size[j-4]++;
+
+          dst_ports[j-1 + numvals*dst_size[j-1]] = 1;
+            dst_src[j-1 + numvals*dst_size[j-1]] = j;
+           dst_size[j-1]++;
+
+          dst_ports[j + numvals*dst_size[j]] = 2;
+            dst_src[j + numvals*dst_size[j]] = j;
+           dst_size[j]++;
+        } else {
+          dst_ports[j-4 + numvals*dst_size[j-4]] = 0;
+            dst_src[j-4 + numvals*dst_size[j-4]] = j;
+           dst_size[j-4]++;
+
+          dst_ports[j-3 + numvals*dst_size[j-3]] = 1;
+            dst_src[j-3 + numvals*dst_size[j-3]] = j;
+           dst_size[j-3]++;
+
+          dst_ports[j-2 + numvals*dst_size[j-2]] = 2;
+            dst_src[j-2 + numvals*dst_size[j-2]] = j;
+           dst_size[j-2]++;
+
+          dst_ports[j-1 + numvals*dst_size[j-1]] = 3;
+            dst_src[j-1 + numvals*dst_size[j-1]] = j;
+           dst_size[j-1]++;
+
+          dst_ports[j + numvals*dst_size[j]] = 4;
+            dst_src[j + numvals*dst_size[j]] = j;
+           dst_size[j]++;
+
+          dst_ports[j+1 + numvals*dst_size[j+1]] = 5;
+            dst_src[j+1 + numvals*dst_size[j+1]] = j;
+           dst_size[j+1]++;
+
+          dst_ports[j+2 + numvals*dst_size[j+2]] = 6;
+            dst_src[j+2 + numvals*dst_size[j+2]] = j;
+           dst_size[j+2]++;
+
+          dst_ports[j+3 + numvals*dst_size[j+3]] = 7;
+            dst_src[j+3 + numvals*dst_size[j+3]] = j;
+           dst_size[j+3]++;
+
+          dst_ports[j+4 + numvals*dst_size[j+4]] = 8;
+            dst_src[j+4 + numvals*dst_size[j+4]] = j;
+           dst_size[j+4]++;
+        }
+      }
+
+      int t1;
+      for (j=0;j<numvals;j++) {
+        // Now sort the src ports in ascending order for each destination port
+        for (k=0;k<dst_size[j]-1;k++) {
+          if (dst_src[j+numvals*k] > dst_src[j+numvals*(k+1)]) {
+            // swap
+            t1 = dst_src[j+numvals*k];
+            dst_src[j+numvals*k] = dst_src[j+numvals*(k+1)];
+            dst_src[j+numvals*(k+1)] = t1;
+
+            // swap the port too
+            t1 = dst_ports[j+numvals*k];
+            dst_ports[j+numvals*k] = dst_ports[j+numvals*(k+1)];
+            dst_ports[j+numvals*(k+1)] = t1;
+
+          }
+        }
+      }
+
     }
 
 }}}}
