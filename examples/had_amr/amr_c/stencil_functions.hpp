@@ -8,6 +8,7 @@
 
 #include <hpx/config/export_definitions.hpp>
 #include "../parameter.h"
+#include "../had_config.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 /// The function \a generate_initial_data will be called to initialize the 
@@ -20,7 +21,7 @@ HPX_COMPONENT_EXPORT int generate_initial_data(
 /// for the given timestep
 HPX_COMPONENT_EXPORT int interpolation();
 
-HPX_COMPONENT_EXPORT bool refinement(double,int,int);
+HPX_COMPONENT_EXPORT bool refinement(had_double_type,int,int);
 
 HPX_COMPONENT_EXPORT int rkupdate(stencil_data ** val, stencil_data* result,int size,
                                   int numsteps,Par const& par,int gidsize,int column);

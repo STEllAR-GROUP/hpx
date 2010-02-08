@@ -12,6 +12,26 @@
 
 #include <hpx/c/types.h>
 
+#include "../had_config.hpp"
+
+struct nodedata
+{
+  double phi0;
+  double phi1;
+ 
+#if defined(__cplusplus)
+private:
+    // serialization support
+    friend class boost::serialization::access;
+
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar & phi0 & phi1;
+    }
+#endif
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 struct stencil_data
 {
@@ -19,8 +39,9 @@ struct stencil_data
     size_t index_;       // sequential number of this data point (0 <= index_ < max_values_)
     double timestep_;    // current time step
     size_t level_;    // refinement level
-    double value_;            // current value
+    had_double_type value_;            // current value
     double x_;      // x coordinate value
+    int iter_;      // rk subcycle indicator
     bool refine_;     // whether to refine
     gid overwrite_; // gid of overwrite stencil point
     gid right_;     // gid of right stencil point
@@ -37,7 +58,7 @@ private:
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
-        ar & max_index_ & index_ & timestep_ & value_ & level_ & value_ & x_ & refine_ & right_alloc_ & left_alloc_ & overwrite_alloc_ ; 
+        ar & max_index_ & index_ & timestep_ & value_ & level_ & value_ & x_ & iter_ & refine_ & right_alloc_ & left_alloc_ & overwrite_alloc_ ; 
     }
 #endif
 };
