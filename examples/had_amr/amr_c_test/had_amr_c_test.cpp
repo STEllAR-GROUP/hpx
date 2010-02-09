@@ -8,8 +8,24 @@
 //#include "../amr_c/stencil.hpp"
 #include "../amr_c/stencil_data.hpp"
 #include "../amr_c/stencil_functions.hpp"
+#include "../had_config.hpp"
 
-#include "rand.hpp"
+// local functions
+int floatcmp(double x1,double x2) {
+  // compare to floating point numbers
+  double epsilon = 1.e-8;
+  if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
+    // the numbers are close enough for coordinate comparison
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+int calcrhs(struct nodedata * rhs,
+                had_double_type *phi,
+                had_double_type *x, double dx, int size,
+                Par const& par, int gidsize, int column);
 
 ///////////////////////////////////////////////////////////////////////////
 int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
@@ -20,6 +36,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->index_ = item;
     val->timestep_ = 0;
     val->level_= level;
+    val->iter_ = 0;
     val->refine_= false;
     val->right_alloc_ = 0;
     val->left_alloc_ = 0;
@@ -41,7 +58,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     }
 
     val->x_ = xcoord;
-    val->value_ = exp(-xcoord*xcoord);
+    val->value_.phi0 = exp(-xcoord*xcoord);
     //val->value_ = xcoord;
 
     return 1;
@@ -50,51 +67,132 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
 int rkupdate(stencil_data ** vecval,stencil_data* result,int size,
              int numsteps,Par const& par,int gidsize,int column)
 {
-  result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
+  // copy over the level info
   result->level_ = vecval[0]->level_;
 
-  calcrhs(vecval,result,size,numsteps,par,gidsize,column);
+  // allocate some temporary arrays for calculating the rhs
+  had_double_type *phi;
+  had_double_type *x;
+  had_double_type *phi_np1;
+  nodedata rhs;
+  int i;
+
+  phi = (double *) malloc(sizeof(had_double_type*)*size);
+  phi_np1 = (double *) malloc(sizeof(had_double_type*)*size);
+  x = (double *) malloc(sizeof(had_double_type*)*size);
+  double dt = par.dt0/pow(2.0,(int) vecval[0]->level_);
+  double dx = par.dx0/pow(2.0,(int) vecval[0]->level_);
+
+  // assign temporary arrays
+  for (i=0;i<size;i++) {
+    phi[i] = vecval[i]->value_.phi0;
+    phi_np1[i] = vecval[i]->value_.phi1;
+    x[i] = vecval[i]->x_;
+  }
+
+  // Sanity check
+  if ( floatcmp(x[1] - x[0],dx) == 0 ) {
+    printf(" PROBLEM with dx: %g %g\n",x[1]-x[0],dx);
+    return 0;
+  }
+
+  if ( par.integrator == 0 ) {  // Euler
+    result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
+    calcrhs(&rhs,phi,x,dx,size,par,gidsize,column);
+
+    if ( size%2 == 1 ) {
+      // the middle point
+      result->max_index_ = vecval[(size-1)/2]->max_index_;
+      result->index_ = vecval[(size-1)/2]->index_;
+      result->value_.phi0 = phi[(size-1)/2] + rhs.phi0*dt;
+    } else {
+    // boundary
+      if ( column == 0 ) {
+        result->max_index_ = vecval[0]->max_index_;
+        result->index_ = vecval[0]->index_;
+        result->value_.phi0 = phi[0] + rhs.phi0*dt;
+      } else {
+        result->max_index_ = vecval[1]->max_index_;
+        result->index_ = vecval[1]->index_;
+        result->value_.phi0 = phi[1] + rhs.phi0*dt;
+      }
+    }
+  } else if ( par.integrator == 1 ) { // rk3
+    printf(" PROBLEM -- not finished yet\n");
+    return 0;
+#if 0
+    if ( vecval[0]->iter_ == 0 ) {
+      // no timestep update-- this is just a part of an rk subcycle
+      result->timestep_ = vecval[0]->timestep_;
+      result->iter_ = vecval[0]->iter_ + 1;
+
+      calcrhs(&rhs,phi,x,size,par,gidsize,column);
+
+      result->value_.phi0 = phi0  
+      result->value_.phi1 = phi0 + dt*rhs.phi0;  
+    } else if ( vecval[0]->iter_ == 1 ) {
+      // no timestep update-- this is just a part of an rk subcycle
+      result->timestep_ = vecval[0]->timestep_;
+      result->iter_ = vecval[0]->iter_ + 1;
+
+      calcrhs(&rhs,phi_np1,x,size,par,gidsize,column);
+
+      result->value_.phi0 = phi0  
+      result->value_.phi1 = 0.75*phi0 + 0.25*phi1 + dt*rhs.phi0;  
+    } else if ( vecval[0]->iter_ == 2 ) {
+      calcrhs(&rhs,phi_np1,x,size,par,gidsize,column);
+      result->iter_ = 0;
+
+      result->value_.phi0 = 1./3.*phi0 + 2./3.*(phi1 + dt*rhs.phi0);  
+
+      // Now comes the timestep update
+      result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
+    } else {
+      printf(" PROBLEM : invalid iter flag %d\n",vecval[0]->iter_);
+      return 0;
+    }
+#endif
+  } else { 
+    printf(" PROBLEM : invalid integrator %d\n",par.integrator);
+    return 0;
+  }
+
+  free(phi);
+  free(x);
+  free(phi_np1);
 
   return 1;
 }
 
-int calcrhs(stencil_data ** vecval,stencil_data* result,int size,
-             int numsteps,Par const& par,int gidsize,int column)
+// This is a pointwise calculation: compute the rhs for point result given input values in array phi
+int calcrhs(struct nodedata * rhs,
+                had_double_type *phi,
+                had_double_type *x, double dx, int size,
+                Par const& par, int gidsize, int column)
 {
-  double dt = par.dt0;
-  double dx = par.dx0;
-
-  if ( size == 3 ) {
-    result->value_ = vecval[1]->value_ - dt/dx*(vecval[1]->value_ - vecval[0]->value_);
-    result->max_index_ = vecval[1]->max_index_;
-    result->index_ = vecval[1]->index_;
-  } else if ( size == 5 ) {
-    result->value_ = vecval[2]->value_ - dt/dx*(vecval[2]->value_ - vecval[1]->value_);
-    result->max_index_ = vecval[2]->max_index_;
-    result->index_ = vecval[2]->index_;
-  } else if ( size == 9 ) {
-    result->value_ = vecval[4]->value_ - dt/dx*(vecval[4]->value_ - vecval[3]->value_);
-    result->max_index_ = vecval[4]->max_index_;
-    result->index_ = vecval[4]->index_;
-  } else if ( size == 2 ) {
+  if ( size%2 == 1 ) {
+    int midpoint = (size-1)/2;
+    rhs->phi0 = -(phi[midpoint] - phi[midpoint-1])/dx;
+  } else {
+    // boundary
     if ( column == 0 ) {
-      result->value_ = vecval[0]->value_;
-      result->max_index_ = vecval[0]->max_index_;
-      result->index_ = vecval[0]->index_;
+      rhs->phi0 = 0;
     } else {
-      result->value_ = vecval[1]->value_ - dt/dx*(vecval[1]->value_ - vecval[0]->value_);
-      result->max_index_ = vecval[1]->max_index_;
-      result->index_ = vecval[1]->index_;
+      rhs->phi0 = -(phi[1] - phi[0])/dx;
     }
   }
 }
 
-int interpolation()
+int interpolation(struct nodedata *dst,struct nodedata *src1,struct nodedata *src2)
 {
+  // linear interpolation at boundaries
+  dst->phi0 = 0.5*(src1->phi0 + src2->phi0);
+  dst->phi1 = 0.5*(src1->phi1 + src2->phi1);
+
   return 1;
 }
 
-bool refinement(double value,int level,int gidsize)
+bool refinement(struct nodedata *dst,int level,int gidsize)
 {
   if (gidsize < 5) return false;
 
@@ -105,7 +203,7 @@ bool refinement(double value,int level,int gidsize)
   if ( level == 3 ) threshold = 0.3;
   if ( level == 4 ) threshold = 0.35;
 
-  if ( value > threshold ) return true;
+  if ( dst->phi0 > threshold ) return true;
   else return false;
 }
 

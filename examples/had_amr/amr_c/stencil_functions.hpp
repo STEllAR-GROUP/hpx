@@ -19,15 +19,11 @@ HPX_COMPONENT_EXPORT int generate_initial_data(
 
 /// The function \a evaluate_timestep will be called to compute the result data
 /// for the given timestep
-HPX_COMPONENT_EXPORT int interpolation();
+HPX_COMPONENT_EXPORT int interpolation(struct nodedata *dst,struct nodedata *src1,struct nodedata *src2);
 
-HPX_COMPONENT_EXPORT bool refinement(had_double_type,int,int);
+HPX_COMPONENT_EXPORT bool refinement(struct nodedata *data,int,int);
 
 HPX_COMPONENT_EXPORT int rkupdate(stencil_data ** val, stencil_data* result,int size,
                                   int numsteps,Par const& par,int gidsize,int column);
-
-HPX_COMPONENT_EXPORT int calcrhs(stencil_data ** val, stencil_data* result,int size,
-                                  int numsteps,Par const& par,int gidsize,int column);
-
 
 #endif

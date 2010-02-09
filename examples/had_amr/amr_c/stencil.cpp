@@ -67,6 +67,8 @@ namespace hpx { namespace components { namespace amr
 
         // get all input memory_block_data instances
         access_memory_block<stencil_data> val[9], resultval;
+        //std::vector<access_memory_block<stencil_data> > vecval_test;
+
         int i;
         std::vector< stencil_data * > vecval;
         if (gids.size() == 3) { 
@@ -98,6 +100,8 @@ namespace hpx { namespace components { namespace amr
             resultval->x_ = val[2]->x_;
 
         } else if (gids.size() == 9) {
+            //get_memory_block_async<stencil_data>(vecval_test,gids,result);
+
             boost::tie(val[0], val[1], val[2], val[3], val[4], resultval) = 
                 get_memory_block_async<stencil_data>(gids[0], gids[1], gids[2], gids[3], gids[4], result);
             boost::tie(val[5], val[6], val[7], val[8]) = 
@@ -144,7 +148,7 @@ namespace hpx { namespace components { namespace amr
             int gft = rkupdate(&*vecval.begin(),resultval.get_ptr(),vecval.size(),
                      numsteps_,par,gids.size(),column);
             BOOST_ASSERT(gft);
-            resultval->refine_ = refinement(resultval->value_,resultval->level_,gids.size());
+            resultval->refine_ = refinement(&resultval->value_,resultval->level_,gids.size());
 
             std::size_t allowedl = par.allowedl;
             if ( resultval->refine_ && gids.size() == 5 && resultval->level_ < allowedl 
@@ -228,7 +232,7 @@ namespace hpx { namespace components { namespace amr
           get_memory_block_async<stencil_data>(gval[0], gval[2], gval[4], gval[6], gval[8]);
 
         // temporarily store the anchor values before overwriting them
-        double t0,t2,t4,t6,t8;
+        nodedata t0,t2,t4,t6,t8;
         t0 = mval[0]->value_;
         t2 = mval[2]->value_;
         t4 = mval[4]->value_;
@@ -268,29 +272,22 @@ namespace hpx { namespace components { namespace amr
         s5 = findpoint(mval[4],mval[6],mval[5]);
         s7 = findpoint(mval[6],mval[8],mval[7]);
 
-        if ( par.linearbounds == 1 ) {
-          // linear interpolation
-          if ( s1 == 0 ) mval[1]->value_ = 0.5*(t0 + t2);
-          if ( s3 == 0 ) mval[3]->value_ = 0.5*(t2 + t4);
-          if ( s5 == 0 ) mval[5]->value_ = 0.5*(t4 + t6);
-          if ( s7 == 0 ) mval[7]->value_ = 0.5*(t6 + t8);
+        if ( s1 == 0 ) interpolation(&(mval[1]->value_),&t0,&t2);
+        if ( s3 == 0 ) interpolation(&(mval[3]->value_),&t2,&t4);
+        if ( s5 == 0 ) interpolation(&(mval[5]->value_),&t4,&t6);
+        if ( s7 == 0 ) interpolation(&(mval[7]->value_),&t6,&t8);
 
-          // DEBUG
-          if ( s1 == 0 ) stubs::logging::logentry(log_, mval[1].get(), row,2, par);
-          if ( s3 == 0 ) stubs::logging::logentry(log_, mval[3].get(), row,2, par);
-          if ( s5 == 0 ) stubs::logging::logentry(log_, mval[5].get(), row,2, par);
-          if ( s7 == 0 ) stubs::logging::logentry(log_, mval[7].get(), row,2, par);
-        } else {
-          // other user defined options not implemented yet
-          interpolation();
-          BOOST_ASSERT(false);
-        }
+        // DEBUG
+        if ( s1 == 0 ) stubs::logging::logentry(log_, mval[1].get(), row,2, par);
+        if ( s3 == 0 ) stubs::logging::logentry(log_, mval[3].get(), row,2, par);
+        if ( s5 == 0 ) stubs::logging::logentry(log_, mval[5].get(), row,2, par);
+        if ( s7 == 0 ) stubs::logging::logentry(log_, mval[7].get(), row,2, par);
 
         // apply refinement criteria test to interpolated/found values
-        mval[1]->refine_ = refinement(mval[1]->value_,mval[1]->level_,5);
-        mval[3]->refine_ = refinement(mval[3]->value_,mval[1]->level_,5);
-        mval[5]->refine_ = refinement(mval[5]->value_,mval[1]->level_,5);
-        mval[7]->refine_ = refinement(mval[7]->value_,mval[1]->level_,5);
+        mval[1]->refine_ = refinement(&(mval[1]->value_),mval[1]->level_,5);
+        mval[3]->refine_ = refinement(&(mval[3]->value_),mval[1]->level_,5);
+        mval[5]->refine_ = refinement(&(mval[5]->value_),mval[1]->level_,5);
+        mval[7]->refine_ = refinement(&(mval[7]->value_),mval[1]->level_,5);
 
         // the initial data for the child mesh comes from the parent mesh
         naming::id_type here = applier::get_applier().get_runtime_support_gid();
@@ -369,7 +366,7 @@ namespace hpx { namespace components { namespace amr
             get_memory_block_async<stencil_data>(gval[0], gval[2], gval[4],gval[6]);
 
         // temporarily store the anchor values before overwriting them
-        double tm1,t1,t3,t5,t7;
+        nodedata tm1,t1,t3,t5,t7;
         tm1 = mval[8]->value_;
         t1 = mval[1]->value_;
         t3 = mval[3]->value_;
@@ -404,29 +401,22 @@ namespace hpx { namespace components { namespace amr
         s4 = findpoint(mval[3],mval[5],mval[4]);
         s6 = findpoint(mval[5],mval[7],mval[6]);
 
-        if ( par.linearbounds == 1 ) {
-          if (s0 == 0) mval[0]->value_ = 0.5*(tm1 + t1);
-          if (s2 == 0) mval[2]->value_ = 0.5*(t1 + t3);
-          if (s4 == 0) mval[4]->value_ = 0.5*(t3 + t5);
-          if (s6 == 0) mval[6]->value_ = 0.5*(t5 + t7);
+        if (s0 == 0) interpolation(&(mval[0]->value_),&tm1,&t1);
+        if (s2 == 0) interpolation(&(mval[2]->value_),&t1,&t3);
+        if (s4 == 0) interpolation(&(mval[4]->value_),&t3,&t5);
+        if (s6 == 0) interpolation(&(mval[6]->value_),&t5,&t7);
 
-          // DEBUG
-          if ( s0 == 0 ) stubs::logging::logentry(log_, mval[0].get(), row,2, par);
-          if ( s2 == 0 ) stubs::logging::logentry(log_, mval[2].get(), row,2, par);
-          if ( s4 == 0 ) stubs::logging::logentry(log_, mval[4].get(), row,2, par);
-          if ( s6 == 0 ) stubs::logging::logentry(log_, mval[6].get(), row,2, par);
-
-        } else {
-          // other user defined options not implemented yet
-          interpolation();
-          BOOST_ASSERT(false);
-        }
+        // DEBUG
+        if ( s0 == 0 ) stubs::logging::logentry(log_, mval[0].get(), row,2, par);
+        if ( s2 == 0 ) stubs::logging::logentry(log_, mval[2].get(), row,2, par);
+        if ( s4 == 0 ) stubs::logging::logentry(log_, mval[4].get(), row,2, par);
+        if ( s6 == 0 ) stubs::logging::logentry(log_, mval[6].get(), row,2, par);
 
         // apply refinement criteria test to interpolated/found values
-        mval[0]->refine_ = refinement(mval[0]->value_,mval[0]->level_,5);
-        mval[2]->refine_ = refinement(mval[2]->value_,mval[2]->level_,5);
-        mval[4]->refine_ = refinement(mval[4]->value_,mval[4]->level_,5);
-        mval[6]->refine_ = refinement(mval[6]->value_,mval[6]->level_,5);
+        mval[0]->refine_ = refinement(&(mval[0]->value_),mval[0]->level_,5);
+        mval[2]->refine_ = refinement(&(mval[2]->value_),mval[2]->level_,5);
+        mval[4]->refine_ = refinement(&(mval[4]->value_),mval[4]->level_,5);
+        mval[6]->refine_ = refinement(&(mval[6]->value_),mval[6]->level_,5);
 
         // the initial data for the child mesh comes from the parent mesh
         naming::id_type here = applier::get_applier().get_runtime_support_gid();
@@ -697,9 +687,9 @@ namespace hpx { namespace components { namespace amr
                             naming::id_type const& gid)
     {
        if ( floatcmp(val->x_,3.3333333333333333) == 1 ) {
-           printf(" TEST overwrite %d timestep: %g value %g index %d id %d level %d x %g right_alloc %d left_alloc %d refine %d\n",
+           printf(" TEST overwrite %d timestep: %g index %d id %d level %d x %g right_alloc %d left_alloc %d refine %d\n",
                val->overwrite_alloc_,val->timestep_,
-               val->value_,val->index_,gid.id_lsb_,val->level_,
+               val->index_,gid.id_lsb_,val->level_,
                val->x_,val->right_alloc_,val->left_alloc_,val->refine_);
            //if ( gid.id_lsb_ == 549233 ) {
            //  return 1;

@@ -16,8 +16,8 @@
 
 struct nodedata
 {
-  double phi0;
-  double phi1;
+  had_double_type phi0;
+  had_double_type phi1;
  
 #if defined(__cplusplus)
 private:
@@ -39,7 +39,7 @@ struct stencil_data
     size_t index_;       // sequential number of this data point (0 <= index_ < max_values_)
     double timestep_;    // current time step
     size_t level_;    // refinement level
-    had_double_type value_;            // current value
+    nodedata value_;            // current value
     double x_;      // x coordinate value
     int iter_;      // rk subcycle indicator
     bool refine_;     // whether to refine

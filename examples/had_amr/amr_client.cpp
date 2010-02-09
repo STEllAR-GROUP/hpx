@@ -350,7 +350,7 @@ int main(int argc, char* argv[])
         fclose(fdata);
 
 
-        initrand(42, pdist, mean, stddev, numsteps, numvals, num_threads);
+      //  initrand(42, pdist, mean, stddev, numsteps, numvals, num_threads);
 
         // initialize and start the HPX runtime
         if (scheduler == 0) {
