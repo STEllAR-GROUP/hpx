@@ -123,10 +123,6 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,
       // no timestep update-- this is just a part of an rk subcycle
       result->timestep_ = vecval[0]->timestep_;
 
-      // TEST
-      //printf(" TEST iter 0\n");
-      //result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
-
       result->iter_ = vecval[0]->iter_ + 1;
 
       calcrhs(&rhs,phi,x,dx,size,par,gidsize,column);
@@ -155,10 +151,6 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,
     } else if ( vecval[0]->iter_ == 1 ) {
       // no timestep update-- this is just a part of an rk subcycle
       result->timestep_ = vecval[0]->timestep_;
-
-      // TEST
-      //printf(" TEST iter 1\n");
-      //result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
 
       result->iter_ = vecval[0]->iter_ + 1;
 
