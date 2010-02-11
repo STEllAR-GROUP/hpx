@@ -118,32 +118,94 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,
       }
     }
   } else if ( par.integrator == 1 ) { // rk3
-    printf(" PROBLEM -- not finished yet\n");
-    return 0;
-#if 0
+
     if ( vecval[0]->iter_ == 0 ) {
       // no timestep update-- this is just a part of an rk subcycle
       result->timestep_ = vecval[0]->timestep_;
+
+      // TEST
+      //printf(" TEST iter 0\n");
+      //result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
+
       result->iter_ = vecval[0]->iter_ + 1;
 
-      calcrhs(&rhs,phi,x,size,par,gidsize,column);
+      calcrhs(&rhs,phi,x,dx,size,par,gidsize,column);
 
-      result->value_.phi0 = phi0  
-      result->value_.phi1 = phi0 + dt*rhs.phi0;  
+      if ( size%2 == 1 ) {
+        // the middle point
+        result->max_index_ = vecval[(size-1)/2]->max_index_;
+        result->index_ = vecval[(size-1)/2]->index_;
+        result->value_.phi0 = phi[(size-1)/2];
+        result->value_.phi1 = phi[(size-1)/2] + rhs.phi0*dt;
+      } else {
+      // boundary
+        if ( column == 0 ) {
+          result->max_index_ = vecval[0]->max_index_;
+          result->index_ = vecval[0]->index_;
+          result->value_.phi0 = phi[0];
+          result->value_.phi1 = phi[0] + rhs.phi0*dt;
+        } else {
+          result->max_index_ = vecval[1]->max_index_;
+          result->index_ = vecval[1]->index_;
+          result->value_.phi0 = phi[1];
+          result->value_.phi1 = phi[1] + rhs.phi0*dt;
+        }
+      }
+
     } else if ( vecval[0]->iter_ == 1 ) {
       // no timestep update-- this is just a part of an rk subcycle
       result->timestep_ = vecval[0]->timestep_;
+
+      // TEST
+      //printf(" TEST iter 1\n");
+      //result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
+
       result->iter_ = vecval[0]->iter_ + 1;
 
-      calcrhs(&rhs,phi_np1,x,size,par,gidsize,column);
+      calcrhs(&rhs,phi_np1,x,dx,size,par,gidsize,column);
 
-      result->value_.phi0 = phi0  
-      result->value_.phi1 = 0.75*phi0 + 0.25*phi1 + dt*rhs.phi0;  
+      if ( size%2 == 1 ) {
+        // the middle point
+        result->max_index_ = vecval[(size-1)/2]->max_index_;
+        result->index_ = vecval[(size-1)/2]->index_;
+        result->value_.phi0 = phi[(size-1)/2];
+        result->value_.phi1 = 0.75*phi[(size-1)/2]+0.25*phi_np1[(size-1)/2] + rhs.phi0*dt;
+      } else {
+      // boundary
+        if ( column == 0 ) {
+          result->max_index_ = vecval[0]->max_index_;
+          result->index_ = vecval[0]->index_;
+          result->value_.phi0 = phi[0];
+          result->value_.phi1 = 0.75*phi[0]+0.25*phi_np1[0] + rhs.phi0*dt;
+        } else {
+          result->max_index_ = vecval[1]->max_index_;
+          result->index_ = vecval[1]->index_;
+          result->value_.phi0 = phi[1];
+          result->value_.phi1 = 0.75*phi[1]+0.25*phi_np1[1] + rhs.phi0*dt;
+        }
+      }
+
     } else if ( vecval[0]->iter_ == 2 ) {
-      calcrhs(&rhs,phi_np1,x,size,par,gidsize,column);
+      calcrhs(&rhs,phi_np1,x,dx,size,par,gidsize,column);
       result->iter_ = 0;
 
-      result->value_.phi0 = 1./3.*phi0 + 2./3.*(phi1 + dt*rhs.phi0);  
+      if ( size%2 == 1 ) {
+        // the middle point
+        result->max_index_ = vecval[(size-1)/2]->max_index_;
+        result->index_ = vecval[(size-1)/2]->index_;
+        result->value_.phi0 = 1./3*phi[(size-1)/2]+2./3*(phi_np1[(size-1)/2] + rhs.phi0*dt);
+      } else {
+      // boundary
+        if ( column == 0 ) {
+          result->max_index_ = vecval[0]->max_index_;
+          result->index_ = vecval[0]->index_;
+          result->value_.phi0 = 1./3*phi[0]+2./3*(phi_np1[0] + rhs.phi0*dt);
+        } else {
+          result->max_index_ = vecval[1]->max_index_;
+          result->index_ = vecval[1]->index_;
+          result->value_.phi0 = 1./3*phi[1]+2./3*(phi_np1[1] + rhs.phi0*dt);
+        }
+      }
 
       // Now comes the timestep update
       result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
@@ -151,7 +213,6 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,
       printf(" PROBLEM : invalid iter flag %d\n",vecval[0]->iter_);
       return 0;
     }
-#endif
   } else { 
     printf(" PROBLEM : invalid integrator %d\n",par.integrator);
     return 0;
