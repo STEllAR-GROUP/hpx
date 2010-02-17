@@ -337,6 +337,10 @@ int main(int argc, char* argv[])
           par.coarsestencilsize = par.stencilsize;
         }
 
+        if ( par.integrator == 1 ) {
+          numsteps *= 3;  // three subcycles each step
+        }
+
         // create output file to append to
         FILE *fdata;
         fdata = fopen("output.dat","w");

@@ -35,6 +35,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->max_index_ = maxitems;
     val->index_ = item;
     val->timestep_ = 0;
+    val->cycle_ = 0;
     val->level_= level;
     val->iter_ = 0;
     val->refine_= false;
@@ -69,6 +70,9 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,
 {
   // copy over the level info
   result->level_ = vecval[0]->level_;
+
+  // count the subcycle
+  result->cycle_ = vecval[0]->cycle_ + 1;
 
   // allocate some temporary arrays for calculating the rhs
   had_double_type *phi;

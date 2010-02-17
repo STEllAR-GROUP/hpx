@@ -38,6 +38,7 @@ struct stencil_data
     size_t max_index_;   // overall number of data points
     size_t index_;       // sequential number of this data point (0 <= index_ < max_values_)
     double timestep_;    // current time step
+    int cycle_; // counts the number of subcycles
     size_t level_;    // refinement level
     nodedata value_;            // current value
     double x_;      // x coordinate value
@@ -58,7 +59,7 @@ private:
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
-        ar & max_index_ & index_ & timestep_ & value_ & level_ & value_ & x_ & iter_ & refine_ & right_alloc_ & left_alloc_ & overwrite_alloc_ ; 
+        ar & max_index_ & index_ & cycle_ & timestep_ & value_ & level_ & value_ & x_ & iter_ & refine_ & right_alloc_ & left_alloc_ & overwrite_alloc_ ; 
     }
 #endif
 };

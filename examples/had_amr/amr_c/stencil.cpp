@@ -195,7 +195,8 @@ namespace hpx { namespace components { namespace amr
             return 1;
           }
         } else {
-          int t = (int) (resultval->timestep_ + 0.5);
+          //int t = (int) (resultval->timestep_ + 0.5);
+          int t = resultval->cycle_;
           int r = numsteps_ - t;
           return r;
         }
