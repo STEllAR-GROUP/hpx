@@ -151,7 +151,12 @@ namespace hpx { namespace components { namespace amr
             resultval->refine_ = refinement(&resultval->value_,resultval->level_,gids.size());
 
             std::size_t allowedl = par.allowedl;
-            if ( resultval->refine_ && gids.size() == 5 && resultval->level_ < allowedl 
+            bool refinable = false;
+
+            if ( gids.size() == 5 && par.stencilsize == 3 && par.integrator == 0 ) refinable = true;
+            if ( gids.size() == 9 && par.stencilsize == 3 && par.integrator == 1 ) refinable = true;
+
+            if ( resultval->refine_ && refinable && resultval->level_ < allowedl 
                  && val[0]->timestep_ >= 1.e-6  ) {
               finer_mesh_tapered(result, gids, row, column, par);
             } else {
@@ -159,7 +164,7 @@ namespace hpx { namespace components { namespace amr
             } 
 
             // One special case: refining at time = 0
-            if ( resultval->refine_ && gids.size() == 5 && 
+            if ( resultval->refine_ && refinable && 
                  val[0]->timestep_ < 1.e-6 && resultval->level_ < allowedl ) {
               finer_mesh_initial(result, gids, resultval->level_+1, resultval->x_, row, column, par);
             }
@@ -169,8 +174,8 @@ namespace hpx { namespace components { namespace amr
         }
         else {
             // the last time step has been reached, just copy over the data
-            if (gids.size() == 3) {
-              resultval.get() = val[1].get();
+            if ((gids.size())%2 == 1) {
+              resultval.get() = val[(gids.size()-1)/2].get();
             } else if (gids.size() == 2) {
               // bdry computation
               if ( column == 0 ) {
@@ -178,10 +183,6 @@ namespace hpx { namespace components { namespace amr
               } else {
                 resultval.get() = val[1].get();
               }
-            } else if (gids.size() == 5) {
-              resultval.get() = val[2].get();
-            } else if (gids.size() == 9) {
-              resultval.get() = val[4].get();
             } else {
               BOOST_ASSERT(false);
             }
@@ -314,40 +315,41 @@ namespace hpx { namespace components { namespace amr
               do_logging ? logging_type : components::component_invalid,par));
   
         access_memory_block<stencil_data> overwrite, resultval;
+        int mid; 
+        if ( (result_data.size())%2 == 1 ) {
+          mid = (result_data.size()-1)/2;
+        } else {
+          BOOST_ASSERT(false);
+        }
         boost::tie(overwrite, resultval) = 
-            get_memory_block_async<stencil_data>(result_data[4], result);
+            get_memory_block_async<stencil_data>(result_data[mid], result);
 
         // overwrite the coarse point computation
         resultval->value_ = overwrite->value_;
 
         resultval->overwrite_alloc_ = 1;
-        resultval->overwrite_ = result_data[4];
+        resultval->overwrite_ = result_data[mid];
 
         // remember neighbor value
         overwrite->right_alloc_ = 1;
-        overwrite->right_ = result_data[6];
+        overwrite->right_ = result_data[result_data.size()-1];
 
         overwrite->left_alloc_ = 1;
-        overwrite->left_ = result_data[2];
+        overwrite->left_ = result_data[0];
 
         // DEBUG -- log the right/left points computed
         access_memory_block<stencil_data> amb1 = 
-                       hpx::components::stubs::memory_block::get(result_data[2]);
+                       hpx::components::stubs::memory_block::get(result_data[0]);
         stubs::logging::logentry(log_, amb1.get(), row,1, par);
 
         access_memory_block<stencil_data> amb2 = 
-                       hpx::components::stubs::memory_block::get(result_data[6]);
+                       hpx::components::stubs::memory_block::get(result_data[result_data.size()-1]);
         stubs::logging::logentry(log_, amb2.get(), row,1, par);
 
-        components::stubs::memory_block::free(result_data[0]);
-        components::stubs::memory_block::free(result_data[1]);
-        components::stubs::memory_block::free(result_data[3]);
-        components::stubs::memory_block::free(result_data[5]);
-        components::stubs::memory_block::free(result_data[7]);
-        components::stubs::memory_block::free(result_data[8]);
         // release result data
-        //for (std::size_t i = 0; i < result_data.size(); ++i) 
-        //    components::stubs::memory_block::free(result_data[i]);
+        for (std::size_t i = 1; i < result_data.size()-1; ++i) { 
+          if ( i != mid ) components::stubs::memory_block::free(result_data[i]);
+        }
       } else {
         boost::tie(gval[8], gval[1], gval[3], gval[5], gval[7]) = 
                         components::wait(components::stubs::memory_block::clone_async(gids[0]), 
@@ -447,34 +449,28 @@ namespace hpx { namespace components { namespace amr
   
         access_memory_block<stencil_data> overwrite,resultval;
         boost::tie(overwrite, resultval) = 
-            get_memory_block_async<stencil_data>(result_data[3], result);
+            get_memory_block_async<stencil_data>(result_data[0], result);
 
         // overwrite the coarse point computation
         resultval->value_ = overwrite->value_;
 
         // remember the overwrite point and the neighbor
         resultval->overwrite_alloc_ = 1;
-        resultval->overwrite_ = result_data[3];
+        resultval->overwrite_ = result_data[0];
 
         overwrite->right_alloc_ = 1;
-        overwrite->right_ = result_data[4];
+        overwrite->right_ = result_data[result_data.size()-1];
 
         overwrite->left_alloc_ = 0;
 
         // DEBUG -- log the right points computed if no interp was involved
         access_memory_block<stencil_data> amb = 
-                         hpx::components::stubs::memory_block::get(result_data[4]);
+                         hpx::components::stubs::memory_block::get(result_data[result_data.size()-1]);
         stubs::logging::logentry(log_, amb.get(), row,1, par);
 
-        components::stubs::memory_block::free(result_data[0]);
-        components::stubs::memory_block::free(result_data[1]);
-        components::stubs::memory_block::free(result_data[2]);
-        components::stubs::memory_block::free(result_data[5]);
-        components::stubs::memory_block::free(result_data[6]);
-        components::stubs::memory_block::free(result_data[7]);
         // release result data
-        //for (std::size_t i = 0; i < result_data.size(); ++i) 
-        //    components::stubs::memory_block::free(result_data[i]);
+        for (std::size_t i = 1; i < result_data.size()-1; ++i) 
+            components::stubs::memory_block::free(result_data[i]);
       }
 
       return 0;
@@ -509,41 +505,46 @@ namespace hpx { namespace components { namespace amr
 
       //  using mesh_left
       access_memory_block<stencil_data> overwrite, resultval;
+      int mid; 
+      if ( (result_data.size())%2 == 1 ) {
+        mid = (result_data.size()-1)/2;
+      } else {
+        BOOST_ASSERT(false);
+      }
+
       boost::tie(overwrite, resultval) = 
-          get_memory_block_async<stencil_data>(result_data[4], result);
+          get_memory_block_async<stencil_data>(result_data[mid], result);
 
  
       // overwrite the coarse point computation
       resultval->value_ = overwrite->value_;
  
       resultval->overwrite_alloc_ = 1;
-      resultval->overwrite_ = result_data[4];
+      resultval->overwrite_ = result_data[mid];
    
       // remember neighbor value
       overwrite->right_alloc_ = 1;
-      overwrite->right_ = result_data[6];
+      overwrite->right_ = result_data[0];
 
       overwrite->left_alloc_ = 1;
-      overwrite->left_ = result_data[2];
+      overwrite->left_ = result_data[result_data.size()-1];
 
       resultval->right_alloc_ = 0;
       resultval->left_alloc_ = 0;
 
       // DEBUG -- log the right/left points computed
       access_memory_block<stencil_data> amb1 = 
-                         hpx::components::stubs::memory_block::get(result_data[2]);
+                         hpx::components::stubs::memory_block::get(result_data[0]);
       access_memory_block<stencil_data> amb2 = 
-                         hpx::components::stubs::memory_block::get(result_data[6]);
+                         hpx::components::stubs::memory_block::get(result_data[result_data.size()-1]);
       stubs::logging::logentry(log_, amb1.get(), row,1, par);
       stubs::logging::logentry(log_, amb2.get(), row,1, par);
 
-      components::stubs::memory_block::free(result_data[0]);
-      components::stubs::memory_block::free(result_data[1]);
-      components::stubs::memory_block::free(result_data[3]);
-      components::stubs::memory_block::free(result_data[5]);
-      components::stubs::memory_block::free(result_data[7]);
-      components::stubs::memory_block::free(result_data[8]);
- 
+      for (std::size_t i = 1; i < result_data.size()-1; ++i) {
+        // free all but the overwrite and end value
+        if ( i != mid )  components::stubs::memory_block::free(result_data[i]);
+      }
+
       // release result data
       //for (std::size_t i = 0; i < result_data.size(); ++i) 
       //    components::stubs::memory_block::free(result_data[i]);
