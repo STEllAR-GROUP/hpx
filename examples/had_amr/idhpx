@@ -1,15 +1,18 @@
 [had_amr]
-nx0         = 50
-nt0         = 10
+nx0         = 20
+nt0         = 20
 
 minx0       = -10.0;
 maxx0       =  10.0;
 
 lambda      = 0.15
 
-allowedl     = 2
+allowedl     = 0
 stencilsize  = 3
+integrator   = 0
 linearbounds = 1
 loglevel     = 2
 output       = 1.0
 output_stdout = 1
+
+scheduler = 0
