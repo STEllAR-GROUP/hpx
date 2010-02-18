@@ -324,7 +324,7 @@ int main(int argc, char* argv[])
               par.coarsestencilsize = par.stencilsize + 2;
             } else if ( par.integrator == 1 ) {
               // rk3 step
-              par.coarsestencilsize = par.stencilsize + 4;
+              par.coarsestencilsize = par.stencilsize + 6;
             } else {
               // Not implemented yet
               BOOST_ASSERT(false);

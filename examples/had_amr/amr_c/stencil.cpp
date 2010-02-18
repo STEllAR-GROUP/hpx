@@ -148,7 +148,9 @@ namespace hpx { namespace components { namespace amr
             int gft = rkupdate(&*vecval.begin(),resultval.get_ptr(),vecval.size(),
                      numsteps_,par,gids.size(),column);
             BOOST_ASSERT(gft);
-            resultval->refine_ = refinement(&resultval->value_,resultval->level_,gids.size());
+            // refine only after rk subcycles are finished (we don't refine in the midst of rk subcycles)
+            if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&resultval->value_,resultval->level_,gids.size());
+            else resultval->refine_ = false;
 
             std::size_t allowedl = par.allowedl;
             bool refinable = false;
@@ -169,7 +171,7 @@ namespace hpx { namespace components { namespace amr
               finer_mesh_initial(result, gids, resultval->level_+1, resultval->x_, row, column, par);
             }
 
-            if (log_ && fmod(resultval->timestep_,par.output) < 1.e-6)  
+            if (log_ && fmod(resultval->timestep_,par.output) < 1.e-6) 
                 stubs::logging::logentry(log_, resultval.get(), row,0, par);
         }
         else {

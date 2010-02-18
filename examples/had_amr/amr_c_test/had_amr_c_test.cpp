@@ -104,6 +104,9 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,
     result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
     calcrhs(&rhs,phi,x,dx,size,par,gidsize,column);
 
+    // iter is kept to be zero for Euler
+    result->iter_ = 0;
+
     if ( size%2 == 1 ) {
       // the middle point
       result->max_index_ = vecval[(size-1)/2]->max_index_;
