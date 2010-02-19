@@ -248,6 +248,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         typedef components::distributing_factory::result_type result_type;
 
+        int j;
         std::size_t numvals = outputs[0].size();
         Array3D dst_port(7,numvals,12);
         Array3D dst_src(7,numvals,12);
@@ -269,6 +270,11 @@ namespace hpx { namespace components { namespace amr { namespace server
                 using namespace boost::assign;
 
                 std::vector<naming::id_type> output_ports;
+
+                for (j=0;j<dst_size(step,i,0);j++) {
+                  output_ports.push_back(outputs[dst_step(step,i,j)][dst_src(step,i,j)][dst_port( step,i,j)]);
+                }
+
                 components::amr::stubs::dynamic_stencil_value::
                     connect_input_ports(*stencil, output_ports);
             }
@@ -652,6 +658,48 @@ namespace hpx { namespace components { namespace amr { namespace server
         dst_step( step,column,dst_size(step,column,0) ) = src_step;
         dst_size(step,column,0) += 1;
       }
+
+      // sort the src step (or row) in descending order
+      int t1,k,kk;
+      int step,column;
+      for (j=0;j<vsrc_step.size();j++) {
+        step = vstep[j];
+        column = vcolumn[j];
+        for (kk=dst_size(step,column,0);kk>=0;kk--) {
+          for (k=0;k<kk-1;k++) {
+            if (dst_step( step,column,k) < dst_step( step,column,k+1) ) {
+              // swap
+              t1 = dst_step( step,column,k);
+              dst_step( step,column,k) = dst_step( step,column,k+1);
+              dst_step( step,column,k+1) = t1;
+  
+              // swap the src, port info too
+              t1 = dst_src( step,column,k);
+              dst_src( step,column,k) = dst_src( step,column,k+1);
+              dst_src( step,column,k+1) = t1;
+  
+              t1 = dst_port( step,column,k);
+              dst_port( step,column,k) = dst_port( step,column,k+1);
+              dst_port( step,column,k+1) = t1;
+            } else if ( dst_step( step,column,k) == dst_step( step,column,k+1) ) {
+              //sort the port in ascending order if the step is the same
+              if (dst_port( step,column,k) > dst_port( step,column,k+1) ) {
+                t1 = dst_port( step,column,k);
+                dst_port( step,column,k) = dst_port( step,column,k+1);
+                dst_port( step,column,k+1) = t1;
+
+                // swap the src, port info too
+                t1 = dst_src( step,column,k);
+                dst_src( step,column,k) = dst_src( step,column,k+1);
+                dst_src( step,column,k+1) = t1;
+              }
+
+            }
+          }
+        }
+      }
+
+
     }
 
 

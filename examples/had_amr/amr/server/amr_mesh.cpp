@@ -814,20 +814,22 @@ namespace hpx { namespace components { namespace amr { namespace server
            dst_size[j+4]++;
         }
       }
-      int t1;
+      int t1,kk;
       for (j=0;j<numvals;j++) {
         // Now sort the src ports in ascending order for each destination port
-        for (k=0;k<dst_size[j]-1;k++) {
-          if (dst_src[j+numvals*k] > dst_src[j+numvals*(k+1)]) {
-            // swap
-            t1 = dst_src[j+numvals*k];
-            dst_src[j+numvals*k] = dst_src[j+numvals*(k+1)];
-            dst_src[j+numvals*(k+1)] = t1;
-
-            // swap the port too
-            t1 = dst_ports[j+numvals*k];
-            dst_ports[j+numvals*k] = dst_ports[j+numvals*(k+1)];
-            dst_ports[j+numvals*(k+1)] = t1;
+        for (kk=dst_size[j];kk>=0;kk--) {
+          for (k=0;k<kk-1;k++) {
+            if (dst_src[j+numvals*k] > dst_src[j+numvals*(k+1)]) {
+              // swap
+              t1 = dst_src[j+numvals*k];
+              dst_src[j+numvals*k] = dst_src[j+numvals*(k+1)];
+              dst_src[j+numvals*(k+1)] = t1;
+  
+              // swap the port too
+              t1 = dst_ports[j+numvals*k];
+              dst_ports[j+numvals*k] = dst_ports[j+numvals*(k+1)];
+              dst_ports[j+numvals*(k+1)] = t1;
+            }
           }
         }
       }
