@@ -80,28 +80,28 @@ namespace hpx { namespace components { namespace amr { namespace server
                                                 *function, static_step, column, 1,2, par);
               } else if (column == 1 || column == 15) {
                 stubs::dynamic_stencil_value::set_functional_component(*stencil,
-                                                *function, static_step, column, 1,3, par);
+                                                *function, static_step, column, 1,4, par);
               } else if (column == 2 || column == 14) {
                 stubs::dynamic_stencil_value::set_functional_component(*stencil,
-                                                *function, static_step, column, 1,4, par);
+                                                *function, static_step, column, 1,6, par);
               } else if (column == 3 || column == 13) {
                 stubs::dynamic_stencil_value::set_functional_component(*stencil,
-                                                *function, static_step, column, 1,5, par);
+                                                *function, static_step, column, 1,7, par);
               } else if (column == 4 || column == 12) {
                 stubs::dynamic_stencil_value::set_functional_component(*stencil,
-                                                *function, static_step, column, 1,6, par);
+                                                *function, static_step, column, 1,8, par);
               } else if (column == 5 || column == 11) {
                 stubs::dynamic_stencil_value::set_functional_component(*stencil,
-                                                *function, static_step, column, 1,7, par);
+                                                *function, static_step, column, 1,9, par);
               } else if (column == 6 || column == 10) {
                 stubs::dynamic_stencil_value::set_functional_component(*stencil,
-                                                *function, static_step, column, 1,8, par);
+                                                *function, static_step, column, 1,10, par);
               } else if (column == 7 || column == 9) {
                 stubs::dynamic_stencil_value::set_functional_component(*stencil,
-                                                *function, static_step, column, 1,9, par);
+                                                *function, static_step, column, 1,11, par);
               } else if (column == 8 ) {
                 stubs::dynamic_stencil_value::set_functional_component(*stencil,
-                                                *function, static_step, column, 1,10, par);
+                                                *function, static_step, column, 1,12, par);
               } else {
                 // this shouldn't happen
                 BOOST_ASSERT(false);
@@ -364,6 +364,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     {
         std::size_t numvalues = 17;
         std::size_t numsteps = 6;
+        int i;
 
         std::vector<naming::id_type> result_data;
 
@@ -399,41 +400,23 @@ namespace hpx { namespace components { namespace amr { namespace server
         init(locality_results(functions), locality_results(logging), numsteps);
 
         // initialize stencil_values using the stencil (functional) components
-        init_stencils(locality_results(stencils[0]), locality_results(functions), 
-            0, 17, par);
-        init_stencils(locality_results(stencils[1]), locality_results(functions), 
-            1, 15, par);
-        init_stencils(locality_results(stencils[2]), locality_results(functions), 
-            2, 13, par);
-        init_stencils(locality_results(stencils[3]), locality_results(functions), 
-            2, 11, par);
-        init_stencils(locality_results(stencils[4]), locality_results(functions), 
-            2, 7, par);
-        init_stencils(locality_results(stencils[5]), locality_results(functions), 
-            2, 5, par);
-        init_stencils(locality_results(stencils[6]), locality_results(functions), 
-            2, 3, par);
+        init_stencils(locality_results(stencils[0]), locality_results(functions), 0, 17, par);
+        init_stencils(locality_results(stencils[1]), locality_results(functions), 1, 15, par);
+        init_stencils(locality_results(stencils[2]), locality_results(functions), 2, 13, par);
+        init_stencils(locality_results(stencils[3]), locality_results(functions), 3, 11, par);
+        init_stencils(locality_results(stencils[4]), locality_results(functions), 4, 7, par);
+        init_stencils(locality_results(stencils[5]), locality_results(functions), 5, 5, par);
+        init_stencils(locality_results(stencils[6]), locality_results(functions), 6, 3, par);
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(7);
-        get_output_ports(locality_results(stencils[0]), outputs[0]);
-        get_output_ports(locality_results(stencils[1]), outputs[1]);
-        get_output_ports(locality_results(stencils[2]), outputs[2]);
-        get_output_ports(locality_results(stencils[3]), outputs[3]);
-        get_output_ports(locality_results(stencils[4]), outputs[4]);
-        get_output_ports(locality_results(stencils[5]), outputs[5]);
-        get_output_ports(locality_results(stencils[6]), outputs[6]);
+        for (i=0;i<=6;i++) get_output_ports(locality_results(stencils[i]), outputs[i]);
 
         // connect output gids with corresponding stencil inputs
         connect_input_ports(stencils, outputs,par);
 
         // for loop over second row ; call start for each
-        start_row(locality_results(stencils[1]));
-        start_row(locality_results(stencils[2]));
-        start_row(locality_results(stencils[3]));
-        start_row(locality_results(stencils[4]));
-        start_row(locality_results(stencils[5]));
-        start_row(locality_results(stencils[6]));
+        for (i=1;i<=6;i++) start_row(locality_results(stencils[i]));
 
         // prepare initial data
         std::vector<naming::id_type> initial_data;
@@ -445,13 +428,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // free all allocated components (we can do that synchronously)
         if (!logging.empty())
             factory.free_components_sync(logging);
-        factory.free_components_sync(stencils[6]);
-        factory.free_components_sync(stencils[5]);
-        factory.free_components_sync(stencils[4]);
-        factory.free_components_sync(stencils[3]);
-        factory.free_components_sync(stencils[2]);
-        factory.free_components_sync(stencils[1]);
-        factory.free_components_sync(stencils[0]);
+        for (i=6;i>=0;i--) factory.free_components_sync(stencils[i]);
         factory.free_components_sync(functions);
 
         return result_data;
@@ -466,6 +443,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     {
         std::size_t numvalues = 17;
         std::size_t numsteps = 6;
+        int i;
 
         std::vector<naming::id_type> result_data;
 
@@ -501,41 +479,23 @@ namespace hpx { namespace components { namespace amr { namespace server
         init(locality_results(functions), locality_results(logging), numsteps);
 
         // initialize stencil_values using the stencil (functional) components
-        init_stencils(locality_results(stencils[0]), locality_results(functions), 
-            0, 17, par);
-        init_stencils(locality_results(stencils[1]), locality_results(functions), 
-            1, 15, par);
-        init_stencils(locality_results(stencils[2]), locality_results(functions), 
-            2, 13, par);
-        init_stencils(locality_results(stencils[3]), locality_results(functions), 
-            2, 11, par);
-        init_stencils(locality_results(stencils[4]), locality_results(functions), 
-            2, 7, par);
-        init_stencils(locality_results(stencils[5]), locality_results(functions), 
-            2, 5, par);
-        init_stencils(locality_results(stencils[6]), locality_results(functions), 
-            2, 3, par);
+        init_stencils(locality_results(stencils[0]), locality_results(functions), 0, 17, par);
+        init_stencils(locality_results(stencils[1]), locality_results(functions), 1, 15, par);
+        init_stencils(locality_results(stencils[2]), locality_results(functions), 2, 13, par);
+        init_stencils(locality_results(stencils[3]), locality_results(functions), 3, 11, par);
+        init_stencils(locality_results(stencils[4]), locality_results(functions), 4, 7, par);
+        init_stencils(locality_results(stencils[5]), locality_results(functions), 5, 5, par);
+        init_stencils(locality_results(stencils[6]), locality_results(functions), 6, 3, par);
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(7);
-        get_output_ports(locality_results(stencils[0]), outputs[0]);
-        get_output_ports(locality_results(stencils[1]), outputs[1]);
-        get_output_ports(locality_results(stencils[2]), outputs[2]);
-        get_output_ports(locality_results(stencils[3]), outputs[3]);
-        get_output_ports(locality_results(stencils[4]), outputs[4]);
-        get_output_ports(locality_results(stencils[5]), outputs[5]);
-        get_output_ports(locality_results(stencils[6]), outputs[6]);
+        for (i=0;i<=6;i++) get_output_ports(locality_results(stencils[i]), outputs[i]);
 
         // connect output gids with corresponding stencil inputs
         connect_input_ports(stencils, outputs,par);
 
         // for loop over second row ; call start for each
-        start_row(locality_results(stencils[1]));
-        start_row(locality_results(stencils[2]));
-        start_row(locality_results(stencils[3]));
-        start_row(locality_results(stencils[4]));
-        start_row(locality_results(stencils[5]));
-        start_row(locality_results(stencils[6]));
+        for (i=1;i<=6;i++) start_row(locality_results(stencils[i]));
 
         // do actual work
         execute(locality_results(stencils[0]), initial_data, result_data);
@@ -543,13 +503,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // free all allocated components (we can do that synchronously)
         if (!logging.empty())
             factory.free_components_sync(logging);
-        factory.free_components_sync(stencils[6]);
-        factory.free_components_sync(stencils[5]);
-        factory.free_components_sync(stencils[4]);
-        factory.free_components_sync(stencils[3]);
-        factory.free_components_sync(stencils[2]);
-        factory.free_components_sync(stencils[1]);
-        factory.free_components_sync(stencils[0]);
+        for (i=6;i>=0;i--) factory.free_components_sync(stencils[i]);
         factory.free_components_sync(functions);
 
         return result_data;
@@ -558,7 +512,146 @@ namespace hpx { namespace components { namespace amr { namespace server
     void rk_left::prep_ports(Array3D &dst_port,Array3D &dst_src,
                              Array3D &dst_step,Array3D &dst_size)
     {
+      int i,j;
 
+      // vcolumn is the destination column number
+      // vstep is the destination step (or row) number
+      // vsrc_column is the source column number
+      // vsrc_step is the source step number
+      // vport is the output port number; increases consecutively
+      std::vector<int> vcolumn,vstep,vsrc_column,vsrc_step,vport;
+
+      // connect outputs for the zeroth row (the zeroth row outputs to the first row *and* the third row)
+      vsrc_step.push_back(0);vsrc_column.push_back(0);vstep.push_back(1);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(0);vsrc_column.push_back(0);vstep.push_back(3);vcolumn.push_back(1);vport.push_back(1);
+
+      vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(1);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(1);vcolumn.push_back(1);vport.push_back(1);
+      vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(3);vcolumn.push_back(1);vport.push_back(2);
+      vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(3);vcolumn.push_back(2);vport.push_back(3);
+
+      for (i=2;i<15;i++) {
+        vsrc_step.push_back(0);vsrc_column.push_back(i);vstep.push_back(1);vcolumn.push_back(i-2);vport.push_back(0);
+        vsrc_step.push_back(0);vsrc_column.push_back(i);vstep.push_back(1);vcolumn.push_back(i-1);vport.push_back(1);
+        vsrc_step.push_back(0);vsrc_column.push_back(i);vstep.push_back(1);vcolumn.push_back(i  );vport.push_back(2);
+      }
+
+      int counter;
+      for (i=2;i<15;i++) {
+        counter = 3;  // counter starts at 3 because this the first three output ports were already used in the lines above
+        for (j=i-6;j<i+2;j++) {
+          if ( j > 0 && j < 10 ) {
+            vsrc_step.push_back(0);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(j);vport.push_back(counter);
+            counter++;
+          }
+        }
+      }
+
+      vsrc_step.push_back(0);vsrc_column.push_back(15);vstep.push_back(1);vcolumn.push_back(13);vport.push_back(0);
+      vsrc_step.push_back(0);vsrc_column.push_back(15);vstep.push_back(1);vcolumn.push_back(14);vport.push_back(1);
+      vsrc_step.push_back(0);vsrc_column.push_back(15);vstep.push_back(3);vcolumn.push_back(8);vport.push_back(2);
+      vsrc_step.push_back(0);vsrc_column.push_back(15);vstep.push_back(3);vcolumn.push_back(9);vport.push_back(3);
+
+      vsrc_step.push_back(0);vsrc_column.push_back(16);vstep.push_back(1);vcolumn.push_back(14);vport.push_back(0);
+      vsrc_step.push_back(0);vsrc_column.push_back(16);vstep.push_back(3);vcolumn.push_back(9);vport.push_back(1);
+
+      // connect outputs for the first row (the first row only outputs to the second row)
+      for (i=0;i<15;i++) {
+        counter = 0;  
+        for (j=i-2;j<i+1;j++) {
+          if ( j >= 0 && j <= 12 ) {
+            vsrc_step.push_back(1);vsrc_column.push_back(i);vstep.push_back(2);vcolumn.push_back(j);vport.push_back(counter);
+            counter++;
+          }
+        }
+      }
+
+      // connect outputs for the second row (the second row only outputs to the third row)
+      for (i=0;i<13;i++) {
+        counter = 0;  
+        for (j=i-2;j<i+1;j++) {
+          if ( j >= 0 && j <= 10 ) {
+            vsrc_step.push_back(2);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(j);vport.push_back(counter);
+            counter++;
+          }
+        }
+      }
+
+      // connect outputs for the third row (the third row outputs to the fourth row *and* the sixth row)
+      vsrc_step.push_back(3);vsrc_column.push_back(0);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(0);
+
+      vsrc_step.push_back(3);vsrc_column.push_back(1);vstep.push_back(4);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(1);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(1);
+      vsrc_step.push_back(3);vsrc_column.push_back(1);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(2);
+
+      vsrc_step.push_back(3);vsrc_column.push_back(2);vstep.push_back(4);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(2);vstep.push_back(4);vcolumn.push_back(1);vport.push_back(1);
+      vsrc_step.push_back(3);vsrc_column.push_back(2);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(2);
+      vsrc_step.push_back(3);vsrc_column.push_back(2);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(3);
+      vsrc_step.push_back(3);vsrc_column.push_back(2);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(4);
+
+      for (i=3;i<8;i++) {
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-3);vport.push_back(0);
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-2);vport.push_back(1);
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-1);vport.push_back(2);
+
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(3);
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(4);
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(5);
+      }
+
+      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(4);vcolumn.push_back(5);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(4);vcolumn.push_back(6);vport.push_back(1);
+      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(2);
+      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(3);
+      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(4);
+
+      vsrc_step.push_back(3);vsrc_column.push_back(9);vstep.push_back(4);vcolumn.push_back(6);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(9);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(1);
+      vsrc_step.push_back(3);vsrc_column.push_back(9);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(2);
+
+      vsrc_step.push_back(3);vsrc_column.push_back(0);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(0);
+
+      // connect outputs for the fourth row (the fourth row only outputs to the fifth row)
+      for (i=0;i<6;i++) {
+        counter = 0;  
+        for (j=i-2;j<i+1;j++) {
+          if ( j >= 0 && j <= 4 ) {
+            vsrc_step.push_back(4);vsrc_column.push_back(i);vstep.push_back(5);vcolumn.push_back(j);vport.push_back(counter);
+            counter++;
+          }
+        }
+      }
+
+      // connect outputs for the fifth row (the fifth row only outputs to the sixth row)
+      for (i=0;i<5;i++) {
+        counter = 0;  
+        for (j=i-2;j<i+1;j++) {
+          if ( j >= 0 && j <= 2 ) {
+            vsrc_step.push_back(5);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(j);vport.push_back(counter);
+            counter++;
+          }
+        }
+      }
+
+      // connect outputs for the sixth row (the sixth row only outputs to the first row)
+      for (i=0;i<6;i++) {
+                     vsrc_step.push_back(6);vsrc_column.push_back(0);vstep.push_back(1);vcolumn.push_back(i);vport.push_back(i);
+        if ( i < 5 ) vsrc_step.push_back(6);vsrc_column.push_back(1);vstep.push_back(1);vcolumn.push_back(i+6);vport.push_back(i);
+                     vsrc_step.push_back(6);vsrc_column.push_back(2);vstep.push_back(1);vcolumn.push_back(i+11);vport.push_back(i);
+      }
+
+      // Create a ragged 3D array
+      for (j=0;j<vsrc_step.size();j++) {
+        int column,step,src_column,src_step,port;
+        src_column = vsrc_column[j]; src_step = vsrc_step[j];
+        column = vcolumn[j]; step = vstep[j];
+        port = vport[j];
+        dst_port( step,column,dst_size(step,column,0) ) = port;
+        dst_src(  step,column,dst_size(step,column,0) ) = src_column;
+        dst_step( step,column,dst_size(step,column,0) ) = src_step;
+        dst_size(step,column,0) += 1;
+      }
     }
 
 
