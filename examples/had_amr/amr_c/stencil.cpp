@@ -215,12 +215,154 @@ namespace hpx { namespace components { namespace amr
       int i;
       naming::id_type gval[9];
       access_memory_block<stencil_data> mval[9];
-      access_memory_block<stencil_data> edge1,edge2;
 
-      boost::tie(edge1,edge2) = 
-          get_memory_block_async<stencil_data>(gids[0],gids[1]);
+      bool left = left_tapered_mesh(gids,row,column,par);
 
-      if ( !edge1->refine_ || !edge2->refine_ || (row == 1 && column == 1) ) {
+      if ( left ) {
+        // -------------------- Left (unbiased) Tapered Mesh --------------------------
+        std::vector<naming::id_type> initial_data;
+        left_tapered_prep_initial_data(initial_data,gids,row,column,par);
+
+        // mesh object setup
+        naming::id_type here = applier::get_applier().get_runtime_support_gid();
+        components::component_type logging_type =
+                  components::get_component_type<components::amr::server::logging>();
+        components::component_type function_type =
+                  components::get_component_type<components::amr::stencil>();
+        // create the mesh only if you need to, otherwise reuse (reduce overhead)
+        if ( !child_left_mesh[row].get_gid() ) {
+            child_left_mesh[row].create(here, 1, true);
+        }
+
+        bool do_logging = false;
+        if ( par.loglevel > 0 ) {
+          do_logging = true;
+        }
+        std::vector<naming::id_type> result_data(
+            child_left_mesh[row].execute(initial_data, function_type,
+              do_logging ? logging_type : components::component_invalid,par));
+  
+        // -------------------------------------------------------------------
+        // You get 3 values out: left, center, and right -- that's it.  overwrite the coarse grid point and
+        // tell the neighbors to remember the left and right values.
+        access_memory_block<stencil_data> overwrite, resultval;
+        int mid; 
+        if ( (result_data.size())%2 == 1 ) {
+          mid = (result_data.size()-1)/2;
+        } else {
+          BOOST_ASSERT(false);
+        }
+        boost::tie(overwrite, resultval) = 
+            get_memory_block_async<stencil_data>(result_data[mid], result);
+
+        // overwrite the coarse point computation
+        resultval->value_ = overwrite->value_;
+
+        resultval->overwrite_alloc_ = 1;
+        resultval->overwrite_ = result_data[mid];
+
+        // remember neighbor value
+        overwrite->right_alloc_ = 1;
+        overwrite->right_ = result_data[result_data.size()-1];
+
+        overwrite->left_alloc_ = 1;
+        overwrite->left_ = result_data[0];
+
+        // DEBUG -- log the right/left points computed
+        access_memory_block<stencil_data> amb1 = 
+                       hpx::components::stubs::memory_block::get(result_data[0]);
+        stubs::logging::logentry(log_, amb1.get(), row,1, par);
+
+        access_memory_block<stencil_data> amb2 = 
+                       hpx::components::stubs::memory_block::get(result_data[result_data.size()-1]);
+        stubs::logging::logentry(log_, amb2.get(), row,1, par);
+
+        // release result data
+        for (std::size_t i = 1; i < result_data.size()-1; ++i) { 
+          if ( i != mid ) components::stubs::memory_block::free(result_data[i]);
+        }
+      } else {
+        // -------------------- Right (biased) Tapered Mesh --------------------------
+        std::vector<naming::id_type> initial_data;
+        right_tapered_prep_initial_data(initial_data,gids,row,column,par);
+
+        // mesh object setup
+        naming::id_type here = applier::get_applier().get_runtime_support_gid();
+        components::component_type logging_type =
+                  components::get_component_type<components::amr::server::logging>();
+        components::component_type function_type =
+                  components::get_component_type<components::amr::stencil>();
+        // create the mesh only if you need to, otherwise reuse (reduce overhead)
+        if ( !child_mesh[row].get_gid() ) {
+            child_mesh[row].create(here,1, true);
+        }
+
+        bool do_logging = false;
+        if ( par.loglevel > 0 ) {
+          do_logging = true;
+        }
+        std::vector<naming::id_type> result_data(
+            child_mesh[row].execute(initial_data, function_type,
+              do_logging ? logging_type : components::component_invalid,par));
+  
+        // -------------------------------------------------------------------
+        // You get 2 values out: center, and right -- that's it.  overwrite the coarse grid point and
+        // tell the neighbor to remember the right value.
+        access_memory_block<stencil_data> overwrite,resultval;
+        boost::tie(overwrite, resultval) = 
+            get_memory_block_async<stencil_data>(result_data[0], result);
+
+        // overwrite the coarse point computation
+        resultval->value_ = overwrite->value_;
+
+        // remember the overwrite point and the neighbor
+        resultval->overwrite_alloc_ = 1;
+        resultval->overwrite_ = result_data[0];
+
+        overwrite->right_alloc_ = 1;
+        overwrite->right_ = result_data[result_data.size()-1];
+
+        overwrite->left_alloc_ = 0;
+
+        // DEBUG -- log the right points computed if no interp was involved
+        access_memory_block<stencil_data> amb = 
+                         hpx::components::stubs::memory_block::get(result_data[result_data.size()-1]);
+        stubs::logging::logentry(log_, amb.get(), row,1, par);
+
+        // release result data
+        for (std::size_t i = 1; i < result_data.size()-1; ++i) 
+            components::stubs::memory_block::free(result_data[i]);
+      }
+
+      return 0;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Decide whether to use a left or right biased tapered mesh
+    bool stencil::left_tapered_mesh(std::vector<naming::id_type> const& gids, int row,int column, Parameter const& par) 
+    {
+      if ( par.integrator == 0 ) {
+        access_memory_block<stencil_data> edge1,edge2;
+        boost::tie(edge1,edge2) = get_memory_block_async<stencil_data>(gids[0],gids[1]);
+        if ( !edge1->refine_ || !edge2->refine_ || (row == 1 && column == 1) ) return true;
+        else return false;
+      } else if (par.integrator == 1) {
+        // not implemented yet
+        BOOST_ASSERT(false);
+      }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Prep initial data for left (unbiased) tapered mesh
+    int stencil::left_tapered_prep_initial_data(std::vector<naming::id_type> & initial_data, 
+        std::vector<naming::id_type> const& gids, int row,int column, Parameter const& par) 
+    {
+      int i;
+      if ( par.integrator == 0 ) {
+        // Euler {{{
+        naming::id_type gval[9];
+        access_memory_block<stencil_data> mval[9];
+
         boost::tie(gval[0], gval[2], gval[4], gval[6], gval[8]) = 
                         components::wait(components::stubs::memory_block::clone_async(gids[0]), 
                              components::stubs::memory_block::clone_async(gids[1]),
@@ -293,66 +435,29 @@ namespace hpx { namespace components { namespace amr
         mval[5]->refine_ = refinement(&(mval[5]->value_),mval[1]->level_,5);
         mval[7]->refine_ = refinement(&(mval[7]->value_),mval[1]->level_,5);
 
-        // the initial data for the child mesh comes from the parent mesh
-        naming::id_type here = applier::get_applier().get_runtime_support_gid();
-        components::component_type logging_type =
-                  components::get_component_type<components::amr::server::logging>();
-        components::component_type function_type =
-                  components::get_component_type<components::amr::stencil>();
-        if ( !child_left_mesh[row].get_gid() ) {
-            child_left_mesh[row].create(here, 1, true);
-        }
-
-        std::vector<naming::id_type> initial_data;
         for (i=0;i<9;i++) {
           initial_data.push_back(gval[i]);
         }
+        // }}}
+      } else if (par.integrator == 1) {
+        // not implemented yet
+        BOOST_ASSERT(false);
+      }
 
-        bool do_logging = false;
-        if ( par.loglevel > 0 ) {
-          do_logging = true;
-        }
-        std::vector<naming::id_type> result_data(
-            child_left_mesh[row].execute(initial_data, function_type,
-              do_logging ? logging_type : components::component_invalid,par));
-  
-        access_memory_block<stencil_data> overwrite, resultval;
-        int mid; 
-        if ( (result_data.size())%2 == 1 ) {
-          mid = (result_data.size()-1)/2;
-        } else {
-          BOOST_ASSERT(false);
-        }
-        boost::tie(overwrite, resultval) = 
-            get_memory_block_async<stencil_data>(result_data[mid], result);
+      return 0;
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////
+    // Prep initial data for right biased tapered mesh
+    int stencil::right_tapered_prep_initial_data(std::vector<naming::id_type> & initial_data, 
+        std::vector<naming::id_type> const& gids, int row,int column, Parameter const& par) 
+    {
+      int i;
+      if ( par.integrator == 0 ) {
+        // Euler {{{
+        naming::id_type gval[9];
+        access_memory_block<stencil_data> mval[9];
 
-        // overwrite the coarse point computation
-        resultval->value_ = overwrite->value_;
-
-        resultval->overwrite_alloc_ = 1;
-        resultval->overwrite_ = result_data[mid];
-
-        // remember neighbor value
-        overwrite->right_alloc_ = 1;
-        overwrite->right_ = result_data[result_data.size()-1];
-
-        overwrite->left_alloc_ = 1;
-        overwrite->left_ = result_data[0];
-
-        // DEBUG -- log the right/left points computed
-        access_memory_block<stencil_data> amb1 = 
-                       hpx::components::stubs::memory_block::get(result_data[0]);
-        stubs::logging::logentry(log_, amb1.get(), row,1, par);
-
-        access_memory_block<stencil_data> amb2 = 
-                       hpx::components::stubs::memory_block::get(result_data[result_data.size()-1]);
-        stubs::logging::logentry(log_, amb2.get(), row,1, par);
-
-        // release result data
-        for (std::size_t i = 1; i < result_data.size()-1; ++i) { 
-          if ( i != mid ) components::stubs::memory_block::free(result_data[i]);
-        }
-      } else {
         boost::tie(gval[8], gval[1], gval[3], gval[5], gval[7]) = 
                         components::wait(components::stubs::memory_block::clone_async(gids[0]), 
                              components::stubs::memory_block::clone_async(gids[1]),
@@ -423,61 +528,21 @@ namespace hpx { namespace components { namespace amr
         mval[4]->refine_ = refinement(&(mval[4]->value_),mval[4]->level_,5);
         mval[6]->refine_ = refinement(&(mval[6]->value_),mval[6]->level_,5);
 
-        // the initial data for the child mesh comes from the parent mesh
-        naming::id_type here = applier::get_applier().get_runtime_support_gid();
-        components::component_type logging_type =
-                  components::get_component_type<components::amr::server::logging>();
-        components::component_type function_type =
-                  components::get_component_type<components::amr::stencil>();
-        if ( !child_mesh[row].get_gid() ) {
-            child_mesh[row].create(here,1, true);
-        }
-
-        std::vector<naming::id_type> initial_data;
         for (i=0;i<8;i++) {
           initial_data.push_back(gval[i]);
         }
 
         // this cloned gid is not needed anymore
         components::stubs::memory_block::free(gval[8]);
-
-        bool do_logging = false;
-        if ( par.loglevel > 0 ) {
-          do_logging = true;
-        }
-        std::vector<naming::id_type> result_data(
-            child_mesh[row].execute(initial_data, function_type,
-              do_logging ? logging_type : components::component_invalid,par));
-  
-        access_memory_block<stencil_data> overwrite,resultval;
-        boost::tie(overwrite, resultval) = 
-            get_memory_block_async<stencil_data>(result_data[0], result);
-
-        // overwrite the coarse point computation
-        resultval->value_ = overwrite->value_;
-
-        // remember the overwrite point and the neighbor
-        resultval->overwrite_alloc_ = 1;
-        resultval->overwrite_ = result_data[0];
-
-        overwrite->right_alloc_ = 1;
-        overwrite->right_ = result_data[result_data.size()-1];
-
-        overwrite->left_alloc_ = 0;
-
-        // DEBUG -- log the right points computed if no interp was involved
-        access_memory_block<stencil_data> amb = 
-                         hpx::components::stubs::memory_block::get(result_data[result_data.size()-1]);
-        stubs::logging::logentry(log_, amb.get(), row,1, par);
-
-        // release result data
-        for (std::size_t i = 1; i < result_data.size()-1; ++i) 
-            components::stubs::memory_block::free(result_data[i]);
+        // }}}
+      } else if (par.integrator == 1) {
+        // not implemented yet
+        BOOST_ASSERT(false);
       }
 
       return 0;
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
     // Implement a finer mesh via interpolation of inter-mesh points
     // Compute the result value for the current time step
