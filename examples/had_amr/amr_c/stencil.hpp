@@ -9,6 +9,7 @@
 #include "../amr/amr_mesh.hpp"
 #include "../amr/amr_mesh_tapered.hpp"
 #include "../amr/amr_mesh_left.hpp"
+#include "../amr/rk_left.hpp"
 #include "../amr/server/functional_component.hpp"
 #include "stencil_data.hpp"
 
@@ -30,6 +31,8 @@ namespace hpx { namespace components { namespace amr
 
         components::amr::amr_mesh_tapered child_mesh[3];
         components::amr::amr_mesh_left child_left_mesh[3];
+
+        components::amr::rk_left rk_left_mesh[7];
 
     public:
         typedef stencil wrapped_type;

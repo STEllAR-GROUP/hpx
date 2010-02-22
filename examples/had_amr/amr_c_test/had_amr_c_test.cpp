@@ -252,10 +252,8 @@ int interpolation(struct nodedata *dst,struct nodedata *src1,struct nodedata *sr
   return 1;
 }
 
-bool refinement(struct nodedata *dst,int level,int gidsize)
+bool refinement(struct nodedata *dst,int level)
 {
-  if (gidsize < 5) return false;
-
   double threshold;
   if ( level == 0 ) threshold = 0.05;
   if ( level == 1 ) threshold = 0.15;

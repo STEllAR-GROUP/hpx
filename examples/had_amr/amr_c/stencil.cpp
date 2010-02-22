@@ -13,6 +13,7 @@
 #include "../amr/amr_mesh.hpp"
 #include "../amr/amr_mesh_tapered.hpp"
 #include "../amr/amr_mesh_left.hpp"
+#include "../amr/rk_left.hpp"
 
 #include "stencil.hpp"
 #include "logging.hpp"
@@ -149,16 +150,16 @@ namespace hpx { namespace components { namespace amr
                      numsteps_,par,gids.size(),column);
             BOOST_ASSERT(gft);
             // refine only after rk subcycles are finished (we don't refine in the midst of rk subcycles)
-            if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&resultval->value_,resultval->level_,gids.size());
+            if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&resultval->value_,resultval->level_);
             else resultval->refine_ = false;
 
             std::size_t allowedl = par.allowedl;
-            bool refinable = false;
 
-            if ( gids.size() == 5 && par.stencilsize == 3 && par.integrator == 0 ) refinable = true;
-            if ( gids.size() == 9 && par.stencilsize == 3 && par.integrator == 1 ) refinable = true;
+            // eliminate unrefinable cases
+            if ( gids.size() != 5 && par.stencilsize == 3 && par.integrator == 0 ) resultval->refine_ = false;
+            if ( gids.size() != 9 && par.stencilsize == 3 && par.integrator == 1 ) resultval->refine_ = false;
 
-            if ( resultval->refine_ && refinable && resultval->level_ < allowedl 
+            if ( resultval->refine_ && resultval->level_ < allowedl 
                  && val[0]->timestep_ >= 1.e-6  ) {
               finer_mesh_tapered(result, gids, row, column, par);
             } else {
@@ -166,7 +167,7 @@ namespace hpx { namespace components { namespace amr
             } 
 
             // One special case: refining at time = 0
-            if ( resultval->refine_ && refinable && 
+            if ( resultval->refine_ && 
                  val[0]->timestep_ < 1.e-6 && resultval->level_ < allowedl ) {
               finer_mesh_initial(result, gids, resultval->level_+1, resultval->x_, row, column, par);
             }
@@ -230,17 +231,33 @@ namespace hpx { namespace components { namespace amr
         components::component_type function_type =
                   components::get_component_type<components::amr::stencil>();
         // create the mesh only if you need to, otherwise reuse (reduce overhead)
-        if ( !child_left_mesh[row].get_gid() ) {
-            child_left_mesh[row].create(here, 1, true);
+        if ( par.integrator == 0 ) {
+          if ( !child_left_mesh[row].get_gid() ) {
+              child_left_mesh[row].create(here, 1, true);
+          }
+        } else if ( par.integrator == 1 ) {
+          if ( !rk_left_mesh[row].get_gid() ) {
+              rk_left_mesh[row].create(here, 1, true);
+          }
+        } else {
+          BOOST_ASSERT(false);
         }
 
         bool do_logging = false;
         if ( par.loglevel > 0 ) {
           do_logging = true;
         }
-        std::vector<naming::id_type> result_data(
-            child_left_mesh[row].execute(initial_data, function_type,
-              do_logging ? logging_type : components::component_invalid,par));
+
+        std::vector<naming::id_type> result_data;
+        if ( par.integrator == 0 ) {
+          result_data = child_left_mesh[row].execute(initial_data, function_type,
+                do_logging ? logging_type : components::component_invalid,par);
+        } else if ( par.integrator == 1 ) {
+          result_data =  rk_left_mesh[row].execute(initial_data, function_type,
+                do_logging ? logging_type : components::component_invalid,par);
+        } else {
+          BOOST_ASSERT(false);
+        }
   
         // -------------------------------------------------------------------
         // You get 3 values out: left, center, and right -- that's it.  overwrite the coarse grid point and
@@ -348,7 +365,8 @@ namespace hpx { namespace components { namespace amr
         else return false;
       } else if (par.integrator == 1) {
         // not implemented yet
-        BOOST_ASSERT(false);
+        //BOOST_ASSERT(false);
+        return true;
       }
     }
 
@@ -360,6 +378,7 @@ namespace hpx { namespace components { namespace amr
       int i;
       if ( par.integrator == 0 ) {
         // Euler {{{
+        BOOST_ASSERT(gids.size() == 5);
         naming::id_type gval[9];
         access_memory_block<stencil_data> mval[9];
 
@@ -377,14 +396,6 @@ namespace hpx { namespace components { namespace amr
         boost::tie(mval[0], mval[2], mval[4], mval[6], mval[8]) = 
           get_memory_block_async<stencil_data>(gval[0], gval[2], gval[4], gval[6], gval[8]);
 
-        // temporarily store the anchor values before overwriting them
-        nodedata t0,t2,t4,t6,t8;
-        t0 = mval[0]->value_;
-        t2 = mval[2]->value_;
-        t4 = mval[4]->value_;
-        t6 = mval[6]->value_;
-        t8 = mval[8]->value_;
-
         // the edge of the AMR mesh has been reached.  
         // Use the left mesh class instead of standard tapered
         boost::tie(mval[1], mval[3], mval[5],mval[7]) = 
@@ -397,10 +408,9 @@ namespace hpx { namespace components { namespace amr
         }
 
         // this updates the coordinate position
-        mval[1]->x_ = 0.5*(mval[0]->x_+mval[2]->x_);
-        mval[3]->x_ = 0.5*(mval[2]->x_+mval[4]->x_);
-        mval[5]->x_ = 0.5*(mval[4]->x_+mval[6]->x_);
-        mval[7]->x_ = 0.5*(mval[6]->x_+mval[8]->x_);
+        for (i=1;i<9;i=i+2) {
+          mval[i]->x_ = 0.5*(mval[i-1]->x_+mval[i+1]->x_);
+        }
 
         // unset alloc on these gids
         for (i=1;i<9;i=i+2) {
@@ -410,38 +420,100 @@ namespace hpx { namespace components { namespace amr
         }
 
         // avoid interpolation if possible
-        int s1,s3,s5,s7;
-        s1 = 0; s3 = 0; s5 = 0; s7 = 0;
+        int s;
+        s = 0;
+        for (i=1;i<9;i=i+2) {
+          s = findpoint(mval[i-1],mval[i+1],mval[i]);
+          if ( s == 0 ) { 
+            interpolation(&(mval[i]->value_),&(mval[i-1]->value_),&(mval[i+1]->value_));
+            // DEBUG
+            stubs::logging::logentry(log_, mval[i].get(), row,2, par);
+          }
+          mval[i]->refine_ = refinement(&(mval[i]->value_),mval[i]->level_);
 
-        s1 = findpoint(mval[0],mval[2],mval[1]);
-        s3 = findpoint(mval[2],mval[4],mval[3]);
-        s5 = findpoint(mval[4],mval[6],mval[5]);
-        s7 = findpoint(mval[6],mval[8],mval[7]);
-
-        if ( s1 == 0 ) interpolation(&(mval[1]->value_),&t0,&t2);
-        if ( s3 == 0 ) interpolation(&(mval[3]->value_),&t2,&t4);
-        if ( s5 == 0 ) interpolation(&(mval[5]->value_),&t4,&t6);
-        if ( s7 == 0 ) interpolation(&(mval[7]->value_),&t6,&t8);
-
-        // DEBUG
-        if ( s1 == 0 ) stubs::logging::logentry(log_, mval[1].get(), row,2, par);
-        if ( s3 == 0 ) stubs::logging::logentry(log_, mval[3].get(), row,2, par);
-        if ( s5 == 0 ) stubs::logging::logentry(log_, mval[5].get(), row,2, par);
-        if ( s7 == 0 ) stubs::logging::logentry(log_, mval[7].get(), row,2, par);
-
-        // apply refinement criteria test to interpolated/found values
-        mval[1]->refine_ = refinement(&(mval[1]->value_),mval[1]->level_,5);
-        mval[3]->refine_ = refinement(&(mval[3]->value_),mval[1]->level_,5);
-        mval[5]->refine_ = refinement(&(mval[5]->value_),mval[1]->level_,5);
-        mval[7]->refine_ = refinement(&(mval[7]->value_),mval[1]->level_,5);
+          // eliminate unrefinable cases
+          if ( gids.size() != 5 && par.stencilsize == 3 && par.integrator == 0 ) mval[i]->refine_ = false;
+          if ( gids.size() != 9 && par.stencilsize == 3 && par.integrator == 1 ) mval[i]->refine_ = false;
+        }
 
         for (i=0;i<9;i++) {
           initial_data.push_back(gval[i]);
         }
         // }}}
       } else if (par.integrator == 1) {
-        // not implemented yet
-        BOOST_ASSERT(false);
+        // rk3 {{{
+        BOOST_ASSERT(gids.size() == 9);
+        naming::id_type gval[17];
+        access_memory_block<stencil_data> mval[17];
+
+        boost::tie(gval[0], gval[2], gval[4], gval[6], gval[8]) = 
+                        components::wait(components::stubs::memory_block::clone_async(gids[0]), 
+                             components::stubs::memory_block::clone_async(gids[1]),
+                             components::stubs::memory_block::clone_async(gids[2]),
+                             components::stubs::memory_block::clone_async(gids[3]),
+                             components::stubs::memory_block::clone_async(gids[4]));
+        boost::tie(gval[10], gval[12], gval[14], gval[16]) = 
+                        components::wait(components::stubs::memory_block::clone_async(gids[5]), 
+                             components::stubs::memory_block::clone_async(gids[6]),
+                             components::stubs::memory_block::clone_async(gids[7]),
+                             components::stubs::memory_block::clone_async(gids[8]));
+        boost::tie(gval[1], gval[3], gval[5],gval[7]) = 
+                    components::wait(components::stubs::memory_block::clone_async(gids[4]), 
+                    components::stubs::memory_block::clone_async(gids[4]),
+                    components::stubs::memory_block::clone_async(gids[4]),
+                    components::stubs::memory_block::clone_async(gids[4]));
+        boost::tie(gval[9], gval[11], gval[13],gval[15]) = 
+                    components::wait(components::stubs::memory_block::clone_async(gids[4]), 
+                    components::stubs::memory_block::clone_async(gids[4]),
+                    components::stubs::memory_block::clone_async(gids[4]),
+                    components::stubs::memory_block::clone_async(gids[4]));
+        boost::tie(mval[0], mval[2], mval[4], mval[6], mval[8]) = 
+          get_memory_block_async<stencil_data>(gval[0], gval[2], gval[4], gval[6], gval[8]);
+        boost::tie(mval[10], mval[12], mval[14], mval[16]) = 
+          get_memory_block_async<stencil_data>(gval[10], gval[12], gval[14], gval[16]);
+
+        // the edge of the AMR mesh has been reached.  
+        // Use the left mesh class instead of standard tapered
+        boost::tie(mval[1], mval[3], mval[5],mval[7]) = 
+            get_memory_block_async<stencil_data>(gval[1], gval[3], gval[5],gval[7]);
+        boost::tie(mval[9], mval[11], mval[13],mval[15]) = 
+            get_memory_block_async<stencil_data>(gval[9], gval[11], gval[13],gval[15]);
+
+        // increase the level by one
+        for (i=0;i<17;i++) {
+          ++mval[i]->level_;
+          mval[i]->index_ = i;
+        }
+
+        // this updates the coordinate position
+        for (i=1;i<17;i=i+2) {
+          mval[i]->x_ = 0.5*(mval[i-1]->x_+mval[i+1]->x_);
+        }
+
+        // unset alloc on these gids
+        for (i=1;i<17;i=i+2) {
+          mval[i]->left_alloc_ = 0;
+          mval[i]->right_alloc_ = 0;
+          mval[i]->overwrite_alloc_ = 0;
+        }
+
+        // avoid interpolation if possible
+        int s;
+        s = 0;
+        for (i=1;i<17;i=i+2) {
+          s = findpoint(mval[i-1],mval[i+1],mval[i]);
+          if ( s == 0 ) { 
+            interpolation(&(mval[i]->value_),&(mval[i-1]->value_),&(mval[i+1]->value_));
+            // DEBUG
+            stubs::logging::logentry(log_, mval[i].get(), row,2, par);
+          }
+          mval[i]->refine_ = refinement(&(mval[i]->value_),mval[i]->level_);
+        }
+
+        for (i=0;i<17;i++) {
+          initial_data.push_back(gval[i]);
+        }
+        // }}}
       }
 
       return 0;
@@ -523,10 +595,10 @@ namespace hpx { namespace components { namespace amr
         if ( s6 == 0 ) stubs::logging::logentry(log_, mval[6].get(), row,2, par);
 
         // apply refinement criteria test to interpolated/found values
-        mval[0]->refine_ = refinement(&(mval[0]->value_),mval[0]->level_,5);
-        mval[2]->refine_ = refinement(&(mval[2]->value_),mval[2]->level_,5);
-        mval[4]->refine_ = refinement(&(mval[4]->value_),mval[4]->level_,5);
-        mval[6]->refine_ = refinement(&(mval[6]->value_),mval[6]->level_,5);
+        mval[0]->refine_ = refinement(&(mval[0]->value_),mval[0]->level_);
+        mval[2]->refine_ = refinement(&(mval[2]->value_),mval[2]->level_);
+        mval[4]->refine_ = refinement(&(mval[4]->value_),mval[4]->level_);
+        mval[6]->refine_ = refinement(&(mval[6]->value_),mval[6]->level_);
 
         for (i=0;i<8;i++) {
           initial_data.push_back(gval[i]);
@@ -558,17 +630,36 @@ namespace hpx { namespace components { namespace amr
       components::component_type function_type =
                 components::get_component_type<components::amr::stencil>();
 
-      if (!child_left_mesh[row].get_gid())
-          child_left_mesh[row].create(here, 1, true);
+      if ( par.integrator == 0 ) {
+        if ( !child_left_mesh[row].get_gid() ) {
+            child_left_mesh[row].create(here, 1, true);
+        }
+      } else if ( par.integrator == 1 ) {
+        if ( !rk_left_mesh[row].get_gid() ) {
+            rk_left_mesh[row].create(here, 1, true);
+        }
+      } else {
+        BOOST_ASSERT(false);
+      }
 
       bool do_logging = false;
       if ( par.loglevel > 0 ) {
         do_logging = true;
       }
-      std::vector<naming::id_type> result_data(
-          child_left_mesh[row].init_execute(function_type,
-            do_logging ? logging_type : components::component_invalid,
-            level, x, par));
+
+      std::vector<naming::id_type> result_data;
+      if ( par.integrator == 0 ) {
+        result_data = child_left_mesh[row].init_execute(function_type,
+              do_logging ? logging_type : components::component_invalid,
+              level, x, par);
+      } else if ( par.integrator == 1 ) {
+        result_data = rk_left_mesh[row].init_execute(function_type,
+              do_logging ? logging_type : components::component_invalid,
+              level, x, par);
+      } else {
+        BOOST_ASSERT(false);
+      }
+
 
       //  using mesh_left
       access_memory_block<stencil_data> overwrite, resultval;
