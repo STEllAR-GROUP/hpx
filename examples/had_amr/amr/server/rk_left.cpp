@@ -70,10 +70,31 @@ namespace hpx { namespace components { namespace amr { namespace server
         BOOST_ASSERT(par.stencilsize == 3);
         BOOST_ASSERT(par.coarsestencilsize == 9);
 
+        Array3D dst_port(7,17,15);
+        Array3D dst_src(7,17,15);
+        Array3D dst_step(7,17,15);
+        Array3D dst_size(7,17,1);
+        Array3D src_size(7,17,1);
+        prep_ports(dst_port,dst_src,dst_step,dst_size,src_size);
+
+        int row;
         for (int column = 0; stencil != stencils.second; ++stencil, ++function, ++column)
         {
             namespace stubs = components::amr::stubs;
             BOOST_ASSERT(function != functions.second);
+            if ( numvalues == 17 ) row = 0;
+            else if ( numvalues == 15 ) row = 1;
+            else if ( numvalues == 13 ) row = 2;
+            else if ( numvalues == 11 ) row = 3;
+            else if ( numvalues == 7 ) row = 4;
+            else if ( numvalues == 5 ) row = 5;
+            else if ( numvalues == 3 ) row = 6;
+            else BOOST_ASSERT(false);
+
+            stubs::dynamic_stencil_value::set_functional_component(*stencil,
+                                          *function, static_step, column, dst_size(row,column,0),src_size(row,column,0), par);
+
+#if 0
             if ( numvalues == 17 ) {
               if (column == 0 || column == 16) {
                 stubs::dynamic_stencil_value::set_functional_component(*stencil,
@@ -194,6 +215,7 @@ namespace hpx { namespace components { namespace amr { namespace server
               // this shouldn't happen
               BOOST_ASSERT(false);
             }
+#endif
         }
        // BOOST_ASSERT(function == functions.second);
     }
@@ -250,18 +272,19 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         int j;
         std::size_t numvals = outputs[0].size();
-        Array3D dst_port(7,numvals,12);
-        Array3D dst_src(7,numvals,12);
-        Array3D dst_step(7,numvals,12);
+        Array3D dst_port(7,numvals,15);
+        Array3D dst_src(7,numvals,15);
+        Array3D dst_step(7,numvals,15);
         Array3D dst_size(7,numvals,1);
-        prep_ports(dst_port,dst_src,dst_step,dst_size);
+        Array3D src_size(7,numvals,1);
+        prep_ports(dst_port,dst_src,dst_step,dst_size,src_size);
 
         int steps = (int)outputs.size();
         BOOST_ASSERT(steps == 7);
 
         for (int step = 0; step < steps; ++step) 
         {
-            std::size_t numvals = outputs[0].size();
+           // std::size_t numvals = outputs[0].size();
             components::distributing_factory::iterator_range_type r = 
                 locality_results(stencils[step]);
             components::distributing_factory::iterator_type stencil = r.first;
@@ -516,7 +539,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     }
 
     void rk_left::prep_ports(Array3D &dst_port,Array3D &dst_src,
-                             Array3D &dst_step,Array3D &dst_size)
+                             Array3D &dst_step,Array3D &dst_size,Array3D &src_size)
     {
       int i,j;
 
@@ -545,7 +568,7 @@ namespace hpx { namespace components { namespace amr { namespace server
       int counter;
       for (i=2;i<15;i++) {
         counter = 3;  // counter starts at 3 because this the first three output ports were already used in the lines above
-        for (j=i-6;j<i+2;j++) {
+        for (j=i-7;j<i+2;j++) {
           if ( j > 0 && j < 10 ) {
             vsrc_step.push_back(0);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(j);vport.push_back(counter);
             counter++;
@@ -613,13 +636,13 @@ namespace hpx { namespace components { namespace amr { namespace server
       vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(4);
 
       vsrc_step.push_back(3);vsrc_column.push_back(9);vstep.push_back(4);vcolumn.push_back(6);vport.push_back(0);
-      vsrc_step.push_back(3);vsrc_column.push_back(9);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(1);
-      vsrc_step.push_back(3);vsrc_column.push_back(9);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(2);
+      vsrc_step.push_back(3);vsrc_column.push_back(9);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(1);
+      vsrc_step.push_back(3);vsrc_column.push_back(9);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(2);
 
-      vsrc_step.push_back(3);vsrc_column.push_back(0);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(10);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(0);
 
       // connect outputs for the fourth row (the fourth row only outputs to the fifth row)
-      for (i=0;i<6;i++) {
+      for (i=0;i<7;i++) {
         counter = 0;  
         for (j=i-2;j<i+1;j++) {
           if ( j >= 0 && j <= 4 ) {
@@ -640,11 +663,13 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
       }
 
-      // connect outputs for the sixth row (the sixth row only outputs to the first row)
+      // connect outputs for the sixth row (the sixth row only outputs to the zeroth row)
       for (i=0;i<6;i++) {
-                     vsrc_step.push_back(6);vsrc_column.push_back(0);vstep.push_back(1);vcolumn.push_back(i);vport.push_back(i);
-        if ( i < 5 ) vsrc_step.push_back(6);vsrc_column.push_back(1);vstep.push_back(1);vcolumn.push_back(i+6);vport.push_back(i);
-                     vsrc_step.push_back(6);vsrc_column.push_back(2);vstep.push_back(1);vcolumn.push_back(i+11);vport.push_back(i);
+        vsrc_step.push_back(6);vsrc_column.push_back(0);vstep.push_back(0);vcolumn.push_back(i);vport.push_back(i);
+        if ( i < 5 ) { 
+          vsrc_step.push_back(6);vsrc_column.push_back(1);vstep.push_back(0);vcolumn.push_back(i+6);vport.push_back(i);
+        }
+        vsrc_step.push_back(6);vsrc_column.push_back(2);vstep.push_back(0);vcolumn.push_back(i+11);vport.push_back(i);
       }
 
       // Create a ragged 3D array
@@ -657,8 +682,9 @@ namespace hpx { namespace components { namespace amr { namespace server
         dst_src(  step,column,dst_size(step,column,0) ) = src_column;
         dst_step( step,column,dst_size(step,column,0) ) = src_step;
         dst_size(step,column,0) += 1;
+        src_size(src_step,src_column,0) += 1;
       }
-
+       
       // sort the src step (or row) in descending order
       int t1,k,kk;
       int step,column;

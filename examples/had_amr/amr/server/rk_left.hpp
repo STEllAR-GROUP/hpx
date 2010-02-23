@@ -105,7 +105,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         static void start_row(distributed_iterator_range_type const& stencils);
 
-        static void prep_ports(Array3D &dst_port,Array3D &dst_src,Array3D &dst_step,Array3D &dst_size);
+        static void prep_ports(Array3D &dst_port,Array3D &dst_src,Array3D &dst_step,Array3D &dst_size,Array3D &src_size);
 
     private:
         std::size_t numvalues_;
