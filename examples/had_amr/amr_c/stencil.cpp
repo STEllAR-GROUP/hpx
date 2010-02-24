@@ -67,81 +67,36 @@ namespace hpx { namespace components { namespace amr
         // start asynchronous get operations
 
         // get all input memory_block_data instances
-        access_memory_block<stencil_data> val[9], resultval;
-        //std::vector<access_memory_block<stencil_data> > vecval_test;
+        access_memory_block<stencil_data> resultval;
+        std::vector<access_memory_block<stencil_data> > val;
 
         int i;
         std::vector< stencil_data * > vecval;
-        if (gids.size() == 3) { 
-            boost::tie(val[0], val[1], val[2], resultval) = 
-                get_memory_block_async<stencil_data>(gids[0], gids[1], gids[2], result);
-            vecval.push_back(val[0].get_ptr()); 
-            vecval.push_back(val[1].get_ptr()); 
-            vecval.push_back(val[2].get_ptr()); 
+        resultval = get_memory_block_async(val,gids,result);
+        for (i=0;i<val.size();i++) vecval.push_back(val[i].get_ptr());
 
-            // update x position
-            resultval->x_ = val[1]->x_;
-
-        } else if (gids.size() == 2) {
-            boost::tie(val[0], val[1], resultval) = 
-                get_memory_block_async<stencil_data>(gids[0], gids[1], result);
-            vecval.push_back(val[0].get_ptr()); 
-            vecval.push_back(val[1].get_ptr()); 
-
-            // update x position
+        if ( val.size()%2 == 0 ) {
+          if ( val.size() == 2 ) {
             if ( column == 0 ) resultval->x_ = val[0]->x_;
             else resultval->x_ = val[1]->x_; 
+          }
+        } else {
+          if ( gids.size() == 1 ) { 
+            resultval.get() = val[0].get();
+            return -1;
+          }
 
-        } else if (gids.size() == 5) {
-            boost::tie(val[0], val[1], val[2], val[3], val[4], resultval) = 
-                get_memory_block_async<stencil_data>(gids[0], gids[1], gids[2], gids[3], gids[4], result);
-            for (i=0;i<5;i++) vecval.push_back(val[i].get_ptr()); 
-
-            // update x position
-            resultval->x_ = val[2]->x_;
-
-        } else if (gids.size() == 9) {
-            //get_memory_block_async<stencil_data>(vecval_test,gids,result);
-
-            boost::tie(val[0], val[1], val[2], val[3], val[4], resultval) = 
-                get_memory_block_async<stencil_data>(gids[0], gids[1], gids[2], gids[3], gids[4], result);
-            boost::tie(val[5], val[6], val[7], val[8]) = 
-                get_memory_block_async<stencil_data>(gids[5], gids[6], gids[7], gids[8]);
-            for (i=0;i<9;i++) vecval.push_back(val[i].get_ptr()); 
-
-            // update x position
-            resultval->x_ = val[4]->x_;
-
-        } 
-        else {
-          boost::tie(val[0], resultval) = 
-                get_memory_block_async<stencil_data>(gids[0], result);
-          resultval.get() = val[0].get();
-          return -1;
+          // update x position
+          resultval->x_ = val[(val.size()-1)/2]->x_;
         }
+
         // initialize result 
         resultval->overwrite_alloc_ = 0;
         resultval->right_alloc_ = 0;
         resultval->left_alloc_ = 0;
 
-        // all input values should have the same timestep
-        if (gids.size() == 3) {
-          BOOST_ASSERT(val[0]->timestep_== val[1]->timestep_ &&
-                       val[1]->timestep_== val[2]->timestep_);
-        } else if (gids.size() == 2) {
-          BOOST_ASSERT(val[0]->timestep_== val[1]->timestep_);
-        } else if ( gids.size() == 5 ) {
-          BOOST_ASSERT(val[0]->timestep_== val[1]->timestep_ && 
-                       val[1]->timestep_== val[2]->timestep_ && 
-                       val[2]->timestep_== val[3]->timestep_ && 
-                       val[3]->timestep_== val[4]->timestep_);
-        } else if ( gids.size() == 9 ) {
-          BOOST_ASSERT(val[0]->timestep_== val[1]->timestep_ && val[1]->timestep_== val[2]->timestep_ && 
-                       val[2]->timestep_== val[3]->timestep_ && val[3]->timestep_== val[4]->timestep_ &&
-                       val[4]->timestep_== val[5]->timestep_ && val[5]->timestep_== val[6]->timestep_ &&
-                       val[6]->timestep_== val[7]->timestep_ && val[7]->timestep_== val[8]->timestep_ );
-        }
-
+        // the first two input values should have the same timestep
+        BOOST_ASSERT(val[0]->timestep_== val[1]->timestep_);
 
         if (val[0]->level_ == 0 && val[0]->timestep_ < numsteps_ || val[0]->level_ > 0) {
 

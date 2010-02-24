@@ -51,11 +51,12 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
       xcoord = par.minx0 + item*dx;
     } else {
       // for tapered mesh
-      if (maxitems != 9) {
-        printf("had_amr_test.cpp line 35: Problem Level %d !\n",level);
+      if (maxitems%2 == 0) {
+        printf("had_amr_test.cpp : generate initial data: Problem Level %d !\n",level);
         exit(0);
+      } else {
+        xcoord = x + (item-((maxitems-1)/2))*dx;
       }
-      xcoord = x + (item-4)*dx;
     }
 
     val->x_ = xcoord;
