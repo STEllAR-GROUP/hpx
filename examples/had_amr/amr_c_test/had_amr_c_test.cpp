@@ -25,7 +25,7 @@ int floatcmp(double x1,double x2) {
 int calcrhs(struct nodedata * rhs,
                 had_double_type *phi,
                 had_double_type *x, double dx, int size,
-                Par const& par, int gidsize, int column);
+                int column, Par const& par);
 
 ///////////////////////////////////////////////////////////////////////////
 int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
@@ -66,8 +66,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     return 1;
 }
 
-int rkupdate(stencil_data ** vecval,stencil_data* result,int size,
-             int numsteps,Par const& par,int gidsize,int column)
+int rkupdate(stencil_data ** vecval,stencil_data* result,int size,int column, Par const& par)
 {
   // copy over the level info
   result->level_ = vecval[0]->level_;
@@ -103,7 +102,7 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,
 
   if ( par.integrator == 0 ) {  // Euler
     result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
-    calcrhs(&rhs,phi,x,dx,size,par,gidsize,column);
+    calcrhs(&rhs,phi,x,dx,size,column,par);
 
     // iter is kept to be zero for Euler
     result->iter_ = 0;
@@ -133,7 +132,7 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,
 
       result->iter_ = vecval[0]->iter_ + 1;
 
-      calcrhs(&rhs,phi,x,dx,size,par,gidsize,column);
+      calcrhs(&rhs,phi,x,dx,size,column,par);
 
       if ( size%2 == 1 ) {
         // the middle point
@@ -162,7 +161,7 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,
 
       result->iter_ = vecval[0]->iter_ + 1;
 
-      calcrhs(&rhs,phi_np1,x,dx,size,par,gidsize,column);
+      calcrhs(&rhs,phi_np1,x,dx,size,column,par);
 
       if ( size%2 == 1 ) {
         // the middle point
@@ -186,7 +185,7 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,
       }
 
     } else if ( vecval[0]->iter_ == 2 ) {
-      calcrhs(&rhs,phi_np1,x,dx,size,par,gidsize,column);
+      calcrhs(&rhs,phi_np1,x,dx,size,column,par);
       result->iter_ = 0;
 
       if ( size%2 == 1 ) {
@@ -229,7 +228,7 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,
 int calcrhs(struct nodedata * rhs,
                 had_double_type *phi,
                 had_double_type *x, double dx, int size,
-                Par const& par, int gidsize, int column)
+                int column, Par const& par)
 {
   if ( size%2 == 1 ) {
     int midpoint = (size-1)/2;

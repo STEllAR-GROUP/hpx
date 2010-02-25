@@ -337,6 +337,9 @@ int main(int argc, char* argv[])
           par.coarsestencilsize = par.stencilsize;
         }
 
+        // The stencilsize needs to be odd
+        BOOST_ASSERT(par.stencilsize%2 != 0 );
+
         if ( par.integrator == 1 ) {
           numsteps *= 3;  // three subcycles each step
         }

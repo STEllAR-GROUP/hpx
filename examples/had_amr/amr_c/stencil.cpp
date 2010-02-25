@@ -47,8 +47,6 @@ namespace hpx { namespace components { namespace amr
         std::vector<naming::id_type> const& gids, int row, int column,
         Parameter const& par)
     {
-        //BOOST_ASSERT(gids.size() <= 5);
-
         // make sure all the gids are looking valid
         if (result == naming::invalid_id)
         {
@@ -73,13 +71,20 @@ namespace hpx { namespace components { namespace amr
         int i;
         std::vector< stencil_data * > vecval;
         resultval = get_memory_block_async(val,gids,result);
-        for (i=0;i<val.size();i++) vecval.push_back(val[i].get_ptr());
 
-        if ( val.size()%2 == 0 ) {
-          if ( val.size() == 2 ) {
-            if ( column == 0 ) resultval->x_ = val[0]->x_;
-            else resultval->x_ = val[1]->x_; 
+        // the gids may originate from different timesteps (due to rk tapering)
+        if ( val[0]->timestep_ != val[val.size()-1]->timestep_ ) {
+          for (i=0;i<val.size();i++) {
+            if ( val[0]->timestep_ == val[i]->timestep_ ) vecval.push_back(val[i].get_ptr());
           }
+        } else {
+          for (i=0;i<val.size();i++) vecval.push_back(val[i].get_ptr());
+        }
+
+        // Here we give the coordinate value to the result (prior to sending it to the user)
+        if ( val.size() == 2 ) {
+          if ( column == 0 ) resultval->x_ = val[0]->x_;
+          else resultval->x_ = val[1]->x_; 
         } else {
           if ( gids.size() == 1 ) { 
             resultval.get() = val[0].get();
@@ -87,7 +92,8 @@ namespace hpx { namespace components { namespace amr
           }
 
           // update x position
-          resultval->x_ = val[(val.size()-1)/2]->x_;
+          BOOST_ASSERT( (vecval.size())%2 == 1 );
+          resultval->x_ = val[(vecval.size()-1)/2]->x_;
         }
 
         // initialize result 
@@ -101,8 +107,7 @@ namespace hpx { namespace components { namespace amr
         if (val[0]->level_ == 0 && val[0]->timestep_ < numsteps_ || val[0]->level_ > 0) {
 
             // call rk update 
-            int gft = rkupdate(&*vecval.begin(),resultval.get_ptr(),vecval.size(),
-                     numsteps_,par,gids.size(),column);
+            int gft = rkupdate(&*vecval.begin(),resultval.get_ptr(),vecval.size(),column,par);
             BOOST_ASSERT(gft);
             // refine only after rk subcycles are finished (we don't refine in the midst of rk subcycles)
             if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&resultval->value_,resultval->level_);
@@ -154,7 +159,6 @@ namespace hpx { namespace components { namespace amr
             return 1;
           }
         } else {
-          //int t = (int) (resultval->timestep_ + 0.5);
           int t = resultval->cycle_;
           int r = numsteps_ - t;
           return r;

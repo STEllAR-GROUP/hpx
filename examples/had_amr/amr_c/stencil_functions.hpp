@@ -23,7 +23,6 @@ HPX_COMPONENT_EXPORT int interpolation(struct nodedata *dst,struct nodedata *src
 
 HPX_COMPONENT_EXPORT bool refinement(struct nodedata *data,int);
 
-HPX_COMPONENT_EXPORT int rkupdate(stencil_data ** val, stencil_data* result,int size,
-                                  int numsteps,Par const& par,int gidsize,int column);
+HPX_COMPONENT_EXPORT int rkupdate(stencil_data ** val, stencil_data* result,int size,int column,Par const& par);
 
 #endif
