@@ -708,16 +708,16 @@ namespace hpx { namespace components { namespace amr { namespace server
               dst_port( step,column,k) = dst_port( step,column,k+1);
               dst_port( step,column,k+1) = t1;
             } else if ( dst_step( step,column,k) == dst_step( step,column,k+1) ) {
-              //sort the port in ascending order if the step is the same
-              if (dst_port( step,column,k) > dst_port( step,column,k+1) ) {
-                t1 = dst_port( step,column,k);
-                dst_port( step,column,k) = dst_port( step,column,k+1);
-                dst_port( step,column,k+1) = t1;
-
-                // swap the src, port info too
+              //sort the src column in ascending order if the step is the same
+              if (dst_src( step,column,k) > dst_src( step,column,k+1) ) {
                 t1 = dst_src( step,column,k);
                 dst_src( step,column,k) = dst_src( step,column,k+1);
                 dst_src( step,column,k+1) = t1;
+
+                // swap the src, port info too
+                t1 = dst_port( step,column,k);
+                dst_port( step,column,k) = dst_port( step,column,k+1);
+                dst_port( step,column,k+1) = t1;
               }
 
             }

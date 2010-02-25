@@ -816,7 +816,7 @@ namespace hpx { namespace components { namespace amr { namespace server
       }
       int t1,kk;
       for (j=0;j<numvals;j++) {
-        // Now sort the src ports in ascending order for each destination port
+        // Now sort the src column in ascending order for each destination column
         for (kk=dst_size[j];kk>=0;kk--) {
           for (k=0;k<kk-1;k++) {
             if (dst_src[j+numvals*k] > dst_src[j+numvals*(k+1)]) {

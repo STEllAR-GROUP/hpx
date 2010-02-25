@@ -73,9 +73,9 @@ namespace hpx { namespace components { namespace amr
         resultval = get_memory_block_async(val,gids,result);
 
         // the gids may originate from different timesteps (due to rk tapering)
-        if ( val[0]->timestep_ != val[val.size()-1]->timestep_ ) {
+        if ( val[0]->iter_ != val[val.size()-1]->iter_ ) {
           for (i=0;i<val.size();i++) {
-            if ( val[0]->timestep_ == val[i]->timestep_ ) vecval.push_back(val[i].get_ptr());
+            if ( val[0]->iter_ == val[i]->iter_ ) vecval.push_back(val[i].get_ptr());
           }
         } else {
           for (i=0;i<val.size();i++) vecval.push_back(val[i].get_ptr());
