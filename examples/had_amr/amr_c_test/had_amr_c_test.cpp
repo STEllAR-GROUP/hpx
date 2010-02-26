@@ -9,6 +9,7 @@
 #include "../amr_c/stencil_data.hpp"
 #include "../amr_c/stencil_functions.hpp"
 #include "../had_config.hpp"
+#include <stdio.h>
 
 // local functions
 int floatcmp(double x1,double x2) {
