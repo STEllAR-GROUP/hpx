@@ -16,6 +16,7 @@
 #include "amr/dynamic_stencil_value.hpp"
 #include "amr/functional_component.hpp"
 #include "amr/amr_mesh.hpp"
+#include "amr/rk_mesh.hpp"
 #include "amr_c/stencil.hpp"
 #include "amr_c/logging.hpp"
 
@@ -39,7 +40,11 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         naming::id_type here = applier::get_applier().get_runtime_support_gid();
 
         components::amr::amr_mesh mesh;
-        mesh.create(here, 1, true);
+        components::amr::rk_mesh rk_mesh;
+        // TEST
+       // if ( par.integrator == 0 || par.allowedl == 0 ) mesh.create(here, 1, true);
+        if ( par.integrator == 0 ) mesh.create(here, 1, true);
+        else if ( par.integrator == 1 ) rk_mesh.create(here,1,true);
 
         if ( par.loglevel > 0 ) {
           // over-ride a false command line argument
@@ -47,9 +52,17 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         }
 
         hpx::util::high_resolution_timer t;
-        std::vector<naming::id_type> result_data(
-            mesh.init_execute(function_type, numvals, numsteps,
-                do_logging ? logging_type : components::component_invalid, par));
+        std::vector<naming::id_type> result_data;
+        
+        // TEST
+       // if ( par.integrator == 0 || par.allowedl == 0 ) {
+        if ( par.integrator == 0 ) {
+            result_data = mesh.init_execute(function_type, numvals, numsteps,
+                do_logging ? logging_type : components::component_invalid, par);
+        } else if ( par.integrator == 1 ) {
+            result_data = rk_mesh.init_execute(function_type, numvals, numsteps,
+                do_logging ? logging_type : components::component_invalid, par);
+        }
         printf("Elapsed time: %f s\n", t.elapsed());
 
         // get some output memory_block_data instances
