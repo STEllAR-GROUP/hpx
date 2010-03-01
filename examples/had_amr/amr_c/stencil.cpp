@@ -154,7 +154,7 @@ namespace hpx { namespace components { namespace amr
         // set return value difference between actual and required number of
         // timesteps (>0: still to go, 0: last step, <0: overdone)
         if ( val[0]->level_ > 0 ) {
-          if ( row == 1 || row == 2 ) return 0;
+          if ( row > 0 ) return 0;
           else {
             return 1;
           }

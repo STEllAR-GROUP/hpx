@@ -137,8 +137,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         int j;
         BOOST_ASSERT(par.coarsestencilsize == 9 );
-        // TEST
-        //BOOST_ASSERT(par.stencilsize == 3 );
+        BOOST_ASSERT(par.stencilsize == 3 );
         std::size_t numvals = outputs[0].size();
         Array3D dst_port(4,numvals,9);
         Array3D dst_src(4,numvals,9);
@@ -395,8 +394,9 @@ namespace hpx { namespace components { namespace amr { namespace server
       int counter;
       int step,dst;
 
-      for (step=0;step<3;step++) {
+      for (step=0;step<4;step++) {
         dst = step+1;
+        if ( dst == 4 ) dst = 0;
 
         for (i=0;i<5;i++) {
           counter = 0;
@@ -408,7 +408,6 @@ namespace hpx { namespace components { namespace amr { namespace server
           }
           for (j=i-4;j<i+5;j++) {
             if ( j >=4 && j < numvalues-4 ) {
-              dst = step+1;
               vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
               counter++;
             }
@@ -425,7 +424,6 @@ namespace hpx { namespace components { namespace amr { namespace server
           }
           for (j=i-4;j<i+5;j++) {
             if ( j >=4 && j < numvalues-4 ) {
-              dst = step+1;
               vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
               counter++;
             }
@@ -433,22 +431,18 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
       }
 
-      for (step=0;step<3;step++) {
+      for (step=0;step<4;step++) {
         for (i=5;i<numvalues-5;i++) {
           counter = 0;
           for (j=i-4;j<i+5;j++) {
             if ( j >=4 && j < numvalues-4 ) {
               dst = step+1;
+              if ( dst == 4 ) dst = 0;
               vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
               counter++;
             }
           }
         }
-      }
-
-      step = 3; dst = 0;
-      for (i=0;i<numvalues;i++) {
-        vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(0);
       }
 
       // Create a ragged 3D array

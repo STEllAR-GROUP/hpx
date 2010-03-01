@@ -41,9 +41,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 
         components::amr::amr_mesh mesh;
         components::amr::rk_mesh rk_mesh;
-        // TEST
-       // if ( par.integrator == 0 || par.allowedl == 0 ) mesh.create(here, 1, true);
-        if ( par.integrator == 0 ) mesh.create(here, 1, true);
+        if ( par.integrator == 0 || par.allowedl == 0 ) mesh.create(here, 1, true);
         else if ( par.integrator == 1 ) rk_mesh.create(here,1,true);
 
         if ( par.loglevel > 0 ) {
@@ -54,9 +52,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         hpx::util::high_resolution_timer t;
         std::vector<naming::id_type> result_data;
         
-        // TEST
-       // if ( par.integrator == 0 || par.allowedl == 0 ) {
-        if ( par.integrator == 0 ) {
+        if ( par.integrator == 0 || par.allowedl == 0 ) {
             result_data = mesh.init_execute(function_type, numvals, numsteps,
                 do_logging ? logging_type : components::component_invalid, par);
         } else if ( par.integrator == 1 ) {
