@@ -110,9 +110,8 @@ namespace hpx { namespace components { namespace amr
             int gft = rkupdate(&*vecval.begin(),resultval.get_ptr(),vecval.size(),column,par);
             BOOST_ASSERT(gft);
             // refine only after rk subcycles are finished (we don't refine in the midst of rk subcycles)
-            //if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&resultval->value_,resultval->level_);
-            //else resultval->refine_ = false;
-            resultval->refine_ = refinement(&resultval->value_,resultval->level_);
+            if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&resultval->value_,resultval->level_);
+            else resultval->refine_ = false;
 
             std::size_t allowedl = par.allowedl;
 
@@ -450,10 +449,12 @@ namespace hpx { namespace components { namespace amr
         boost::tie(mval[9], mval[11], mval[13],mval[15]) = 
             get_memory_block_async<stencil_data>(gval[9], gval[11], gval[13],gval[15]);
 
-        // increase the level by one
         for (i=0;i<17;i++) {
+          // increase the level by one
           ++mval[i]->level_;
           mval[i]->index_ = i;
+
+          mval[i]->iter_ = 0;
         }
 
         // this updates the coordinate position
