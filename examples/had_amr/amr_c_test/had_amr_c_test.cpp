@@ -26,7 +26,7 @@ int floatcmp(double x1,double x2) {
 int calcrhs(struct nodedata * rhs,
                 had_double_type *phi,
                 had_double_type *x, double dx, int size,
-                int column, Par const& par);
+                bool boundary, int *bbox,int compute_index, Par const& par);
 
 ///////////////////////////////////////////////////////////////////////////
 int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
@@ -67,13 +67,17 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     return 1;
 }
 
-int rkupdate(stencil_data ** vecval,stencil_data* result,int size,int column, Par const& par)
+int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,int *bbox,int compute_index, Par const& par)
 {
   // copy over the level info
   result->level_ = vecval[0]->level_;
 
   // count the subcycle
   result->cycle_ = vecval[0]->cycle_ + 1;
+
+  // copy over index information
+  result->max_index_ = vecval[compute_index]->max_index_;
+  result->index_ = vecval[compute_index]->index_;
 
   // allocate some temporary arrays for calculating the rhs
   had_double_type *phi;
@@ -102,110 +106,44 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,int column, Pa
   }
 
   if ( par.integrator == 0 ) {  // Euler
-    result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
-    calcrhs(&rhs,phi,x,dx,size,column,par);
+    calcrhs(&rhs,phi,x,dx,size,boundary,bbox,compute_index,par);
 
     // iter is kept to be zero for Euler
     result->iter_ = 0;
 
-    if ( size%2 == 1 ) {
-      // the middle point
-      result->max_index_ = vecval[(size-1)/2]->max_index_;
-      result->index_ = vecval[(size-1)/2]->index_;
-      result->value_.phi0 = phi[(size-1)/2] + rhs.phi0*dt;
-    } else {
-    // boundary
-      if ( column == 0 ) {
-        result->max_index_ = vecval[0]->max_index_;
-        result->index_ = vecval[0]->index_;
-        result->value_.phi0 = phi[0] + rhs.phi0*dt;
-      } else {
-        result->max_index_ = vecval[1]->max_index_;
-        result->index_ = vecval[1]->index_;
-        result->value_.phi0 = phi[1] + rhs.phi0*dt;
-      }
-    }
+    result->value_.phi0 = phi[compute_index] + rhs.phi0*dt;
+    result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
   } else if ( par.integrator == 1 ) { // rk3
 
     if ( vecval[0]->iter_ == 0 ) {
-      // no timestep update-- this is just a part of an rk subcycle
-      result->timestep_ = vecval[0]->timestep_;
-
+      // increment rk subcycle counter
       result->iter_ = vecval[0]->iter_ + 1;
 
-      calcrhs(&rhs,phi,x,dx,size,column,par);
+      calcrhs(&rhs,phi,x,dx,size,boundary,bbox,compute_index,par);
 
-      if ( size%2 == 1 ) {
-        // the middle point
-        result->max_index_ = vecval[(size-1)/2]->max_index_;
-        result->index_ = vecval[(size-1)/2]->index_;
-        result->value_.phi0 = phi[(size-1)/2];
-        result->value_.phi1 = phi[(size-1)/2] + rhs.phi0*dt;
-      } else {
-      // boundary
-        if ( column == 0 ) {
-          result->max_index_ = vecval[0]->max_index_;
-          result->index_ = vecval[0]->index_;
-          result->value_.phi0 = phi[0];
-          result->value_.phi1 = phi[0] + rhs.phi0*dt;
-        } else {
-          result->max_index_ = vecval[1]->max_index_;
-          result->index_ = vecval[1]->index_;
-          result->value_.phi0 = phi[1];
-          result->value_.phi1 = phi[1] + rhs.phi0*dt;
-        }
-      }
+      result->value_.phi0 = phi[compute_index];
+      result->value_.phi1 = phi[compute_index] + rhs.phi0*dt;
 
+      // no timestep update-- this is just a part of an rk subcycle
+      result->timestep_ = vecval[0]->timestep_;
     } else if ( vecval[0]->iter_ == 1 ) {
-      // no timestep update-- this is just a part of an rk subcycle
-      result->timestep_ = vecval[0]->timestep_;
-
+      // increment rk subcycle counter
       result->iter_ = vecval[0]->iter_ + 1;
 
-      calcrhs(&rhs,phi_np1,x,dx,size,column,par);
+      calcrhs(&rhs,phi_np1,x,dx,size,boundary,bbox,compute_index,par);
 
-      if ( size%2 == 1 ) {
-        // the middle point
-        result->max_index_ = vecval[(size-1)/2]->max_index_;
-        result->index_ = vecval[(size-1)/2]->index_;
-        result->value_.phi0 = phi[(size-1)/2];
-        result->value_.phi1 = 0.75*phi[(size-1)/2]+0.25*phi_np1[(size-1)/2] + rhs.phi0*dt;
-      } else {
-      // boundary
-        if ( column == 0 ) {
-          result->max_index_ = vecval[0]->max_index_;
-          result->index_ = vecval[0]->index_;
-          result->value_.phi0 = phi[0];
-          result->value_.phi1 = 0.75*phi[0]+0.25*phi_np1[0] + rhs.phi0*dt;
-        } else {
-          result->max_index_ = vecval[1]->max_index_;
-          result->index_ = vecval[1]->index_;
-          result->value_.phi0 = phi[1];
-          result->value_.phi1 = 0.75*phi[1]+0.25*phi_np1[1] + rhs.phi0*dt;
-        }
-      }
+      result->value_.phi0 = phi[compute_index];
+      result->value_.phi1 = 0.75*phi[compute_index]+0.25*phi_np1[compute_index] + rhs.phi0*dt;
 
+      // no timestep update-- this is just a part of an rk subcycle
+      result->timestep_ = vecval[0]->timestep_;
     } else if ( vecval[0]->iter_ == 2 ) {
-      calcrhs(&rhs,phi_np1,x,dx,size,column,par);
+      calcrhs(&rhs,phi_np1,x,dx,size,boundary,bbox,compute_index,par);
+
+      // reset rk subcycle counter
       result->iter_ = 0;
 
-      if ( size%2 == 1 ) {
-        // the middle point
-        result->max_index_ = vecval[(size-1)/2]->max_index_;
-        result->index_ = vecval[(size-1)/2]->index_;
-        result->value_.phi0 = 1./3*phi[(size-1)/2]+2./3*(phi_np1[(size-1)/2] + rhs.phi0*dt);
-      } else {
-      // boundary
-        if ( column == 0 ) {
-          result->max_index_ = vecval[0]->max_index_;
-          result->index_ = vecval[0]->index_;
-          result->value_.phi0 = 1./3*phi[0]+2./3*(phi_np1[0] + rhs.phi0*dt);
-        } else {
-          result->max_index_ = vecval[1]->max_index_;
-          result->index_ = vecval[1]->index_;
-          result->value_.phi0 = 1./3*phi[1]+2./3*(phi_np1[1] + rhs.phi0*dt);
-        }
-      }
+      result->value_.phi0 = 1./3*phi[compute_index]+2./3*(phi_np1[compute_index] + rhs.phi0*dt);
 
       // Now comes the timestep update
       result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
@@ -229,17 +167,20 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,int column, Pa
 int calcrhs(struct nodedata * rhs,
                 had_double_type *phi,
                 had_double_type *x, double dx, int size,
-                int column, Par const& par)
+                bool boundary,int *bbox,int compute_index, Par const& par)
 {
-  if ( size%2 == 1 ) {
-    int midpoint = (size-1)/2;
-    rhs->phi0 = -(phi[midpoint] - phi[midpoint-1])/dx;
+  if ( !boundary ) {
+    // the compute_index is not physical boundary; all points in stencilsize
+    // are available for computing the rhs.
+    rhs->phi0 = -(phi[compute_index] - phi[compute_index-1])/dx;
   } else {
-    // boundary
-    if ( column == 0 ) {
+    // boundary -- look at the bounding box (bbox) to decide which boundary it is
+    if ( bbox[0] == 1 ) {
+      // we are at the left boundary
       rhs->phi0 = 0;
-    } else {
-      rhs->phi0 = -(phi[1] - phi[0])/dx;
+    } else if (bbox[1] == 1) {
+      // we are at the right boundary
+      rhs->phi0 = -(phi[compute_index] - phi[compute_index-1])/dx;
     }
   }
 }

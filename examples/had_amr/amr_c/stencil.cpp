@@ -82,9 +82,27 @@ namespace hpx { namespace components { namespace amr
         }
 
         // Here we give the coordinate value to the result (prior to sending it to the user)
+        int compute_index;
+        bool boundary = false;
+        int bbox[2];
         if ( val.size() == 2 ) {
-          if ( column == 0 ) resultval->x_ = val[0]->x_;
-          else resultval->x_ = val[1]->x_; 
+          if ( column == 0 ) {
+            resultval->x_ = val[0]->x_;
+            compute_index = 0;
+
+            // indicate a physical boundary
+            boundary = true;
+            bbox[0] = 1;
+            bbox[1] = 0;
+          } else {
+            resultval->x_ = val[1]->x_; 
+            compute_index = 1;
+
+            // indicate a physical boundary
+            boundary = true;
+            bbox[0] = 0;
+            bbox[1] = 1;
+          }
         } else {
           if ( gids.size() == 1 ) { 
             resultval.get() = val[0].get();
@@ -94,6 +112,7 @@ namespace hpx { namespace components { namespace amr
           // update x position
           BOOST_ASSERT( (vecval.size())%2 == 1 );
           resultval->x_ = val[(vecval.size()-1)/2]->x_;
+          compute_index = (vecval.size()-1)/2;
         }
 
         // initialize result 
@@ -107,7 +126,7 @@ namespace hpx { namespace components { namespace amr
         if (val[0]->level_ == 0 && val[0]->timestep_ < numsteps_ || val[0]->level_ > 0) {
 
             // call rk update 
-            int gft = rkupdate(&*vecval.begin(),resultval.get_ptr(),vecval.size(),column,par);
+            int gft = rkupdate(&*vecval.begin(),resultval.get_ptr(),vecval.size(),boundary,bbox,compute_index,par);
             BOOST_ASSERT(gft);
             // refine only after rk subcycles are finished (we don't refine in the midst of rk subcycles)
             if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&resultval->value_,resultval->level_);
@@ -140,18 +159,7 @@ namespace hpx { namespace components { namespace amr
         }
         else {
             // the last time step has been reached, just copy over the data
-            if ((gids.size())%2 == 1) {
-              resultval.get() = val[(gids.size()-1)/2].get();
-            } else if (gids.size() == 2) {
-              // bdry computation
-              if ( column == 0 ) {
-                resultval.get() = val[0].get();
-              } else {
-                resultval.get() = val[1].get();
-              }
-            } else {
-              BOOST_ASSERT(false);
-            }
+            resultval.get() = val[compute_index].get();
         }
  
         // set return value difference between actual and required number of
