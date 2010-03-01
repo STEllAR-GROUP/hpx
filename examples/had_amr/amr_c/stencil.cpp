@@ -110,18 +110,22 @@ namespace hpx { namespace components { namespace amr
             int gft = rkupdate(&*vecval.begin(),resultval.get_ptr(),vecval.size(),column,par);
             BOOST_ASSERT(gft);
             // refine only after rk subcycles are finished (we don't refine in the midst of rk subcycles)
-            if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&resultval->value_,resultval->level_);
-            else resultval->refine_ = false;
+            //if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&resultval->value_,resultval->level_);
+            //else resultval->refine_ = false;
+            resultval->refine_ = refinement(&resultval->value_,resultval->level_);
 
             std::size_t allowedl = par.allowedl;
 
             // eliminate unrefinable cases
             if ( gids.size() != 5 && par.stencilsize == 3 && par.integrator == 0 ) resultval->refine_ = false;
-            if ( gids.size() != 9 && par.stencilsize == 3 && par.integrator == 1 ) resultval->refine_ = false;
+            if ( par.stencilsize == 3 && par.integrator == 1 ) {
+              if ( gids.size() == vecval.size() && gids.size() != 9 ) resultval->refine_ = false; 
+              if ( gids.size() != vecval.size() && gids.size() - vecval.size() != 9 ) resultval->refine_ = false; 
+            }
 
             if ( resultval->refine_ && resultval->level_ < allowedl 
                  && val[0]->timestep_ >= 1.e-6  ) {
-              finer_mesh_tapered(result, gids, row, column, par);
+              finer_mesh_tapered(result, gids,vecval.size(), row, column, par);
             } else {
               resultval->overwrite_alloc_ = 0;
             } 
@@ -169,7 +173,7 @@ namespace hpx { namespace components { namespace amr
     // Implement a finer mesh via interpolation of inter-mesh points
     // Compute the result value for the current time step
     int stencil::finer_mesh_tapered(naming::id_type const& result, 
-        std::vector<naming::id_type> const& gids, int row,int column, Parameter const& par) 
+        std::vector<naming::id_type> const& gids,int vecvalsize, int row,int column, Parameter const& par) 
     {
 
       int i;
@@ -181,7 +185,7 @@ namespace hpx { namespace components { namespace amr
       if ( left ) {
         // -------------------- Left (unbiased) Tapered Mesh --------------------------
         std::vector<naming::id_type> initial_data;
-        left_tapered_prep_initial_data(initial_data,gids,row,column,par);
+        left_tapered_prep_initial_data(initial_data,gids,vecvalsize,row,column,par);
 
         // mesh object setup
         naming::id_type here = applier::get_applier().get_runtime_support_gid();
@@ -260,7 +264,7 @@ namespace hpx { namespace components { namespace amr
       } else {
         // -------------------- Right (biased) Tapered Mesh --------------------------
         std::vector<naming::id_type> initial_data;
-        right_tapered_prep_initial_data(initial_data,gids,row,column,par);
+        right_tapered_prep_initial_data(initial_data,gids,vecvalsize,row,column,par);
 
         // mesh object setup
         naming::id_type here = applier::get_applier().get_runtime_support_gid();
@@ -332,7 +336,7 @@ namespace hpx { namespace components { namespace amr
     ///////////////////////////////////////////////////////////////////////////
     // Prep initial data for left (unbiased) tapered mesh
     int stencil::left_tapered_prep_initial_data(std::vector<naming::id_type> & initial_data, 
-        std::vector<naming::id_type> const& gids, int row,int column, Parameter const& par) 
+        std::vector<naming::id_type> const& gids,int vecvalsize, int row,int column, Parameter const& par) 
     {
       int i;
       if ( par.integrator == 0 ) {
@@ -401,21 +405,29 @@ namespace hpx { namespace components { namespace amr
         // }}}
       } else if (par.integrator == 1) {
         // rk3 {{{
-        BOOST_ASSERT(gids.size() == 9);
+        BOOST_ASSERT(gids.size()-vecvalsize == 9 || gids.size() == 9);
         naming::id_type gval[17];
         access_memory_block<stencil_data> mval[17];
 
+        // inputs may include different timestamps; separate these out
+        int std_index;
+        if ( gids.size() != vecvalsize ) {
+          std_index = vecvalsize;
+        } else {
+          std_index = 0;
+        }
+
         boost::tie(gval[0], gval[2], gval[4], gval[6], gval[8]) = 
-                        components::wait(components::stubs::memory_block::clone_async(gids[0]), 
-                             components::stubs::memory_block::clone_async(gids[1]),
-                             components::stubs::memory_block::clone_async(gids[2]),
-                             components::stubs::memory_block::clone_async(gids[3]),
-                             components::stubs::memory_block::clone_async(gids[4]));
+                        components::wait(components::stubs::memory_block::clone_async(gids[std_index]), 
+                             components::stubs::memory_block::clone_async(gids[std_index+1]),
+                             components::stubs::memory_block::clone_async(gids[std_index+2]),
+                             components::stubs::memory_block::clone_async(gids[std_index+3]),
+                             components::stubs::memory_block::clone_async(gids[std_index+4]));
         boost::tie(gval[10], gval[12], gval[14], gval[16]) = 
-                        components::wait(components::stubs::memory_block::clone_async(gids[5]), 
-                             components::stubs::memory_block::clone_async(gids[6]),
-                             components::stubs::memory_block::clone_async(gids[7]),
-                             components::stubs::memory_block::clone_async(gids[8]));
+                        components::wait(components::stubs::memory_block::clone_async(gids[std_index+5]), 
+                             components::stubs::memory_block::clone_async(gids[std_index+6]),
+                             components::stubs::memory_block::clone_async(gids[std_index+7]),
+                             components::stubs::memory_block::clone_async(gids[std_index+8]));
         boost::tie(gval[1], gval[3], gval[5],gval[7]) = 
                     components::wait(components::stubs::memory_block::clone_async(gids[4]), 
                     components::stubs::memory_block::clone_async(gids[4]),
@@ -481,7 +493,7 @@ namespace hpx { namespace components { namespace amr
     ///////////////////////////////////////////////////////////////////////////
     // Prep initial data for right biased tapered mesh
     int stencil::right_tapered_prep_initial_data(std::vector<naming::id_type> & initial_data, 
-        std::vector<naming::id_type> const& gids, int row,int column, Parameter const& par) 
+        std::vector<naming::id_type> const& gids,int vecvalsize, int row,int column, Parameter const& par) 
     {
       int i;
       if ( par.integrator == 0 ) {

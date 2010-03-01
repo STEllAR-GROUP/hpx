@@ -58,7 +58,7 @@ namespace hpx { namespace components { namespace amr
         // this function creates a finer mesh from 3 input gids and evolves that
         // finer mesh for two steps.
         int finer_mesh_tapered(naming::id_type const& result, 
-            std::vector<naming::id_type> const& gids,
+            std::vector<naming::id_type> const& gids,int vecvalsize,
             int row, int column,
             Parameter const& par);
         
@@ -98,10 +98,10 @@ namespace hpx { namespace components { namespace amr
         bool left_tapered_mesh(std::vector<naming::id_type> const& gids, int row,int column, Parameter const& par);
 
         int left_tapered_prep_initial_data(std::vector<naming::id_type> & initial_data,
-                    std::vector<naming::id_type> const& gids, int row,int column, Parameter const& par);
+                    std::vector<naming::id_type> const& gids,int vecvalsize, int row,int column, Parameter const& par);
 
         int right_tapered_prep_initial_data(std::vector<naming::id_type> & initial_data,
-                    std::vector<naming::id_type> const& gids, int row,int column, Parameter const& par);
+                    std::vector<naming::id_type> const& gids,int vecvalsize, int row,int column, Parameter const& par);
 
 
     private:
