@@ -133,7 +133,7 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
       calcrhs(&rhs,phi_np1,x,dx,size,boundary,bbox,compute_index,par);
 
       result->value_.phi0 = phi[compute_index];
-      result->value_.phi1 = 0.75*phi[compute_index]+0.25*phi_np1[compute_index] + rhs.phi0*dt;
+      result->value_.phi1 = 0.75*phi[compute_index]+0.25*phi_np1[compute_index] + 0.25*rhs.phi0*dt;
 
       // no timestep update-- this is just a part of an rk subcycle
       result->timestep_ = vecval[0]->timestep_;
