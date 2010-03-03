@@ -24,6 +24,7 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/integer/endian.hpp>
+#include <boost/foreach.hpp>
 
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -33,6 +34,8 @@
 #include <hpx/runtime/naming/server/reply.hpp>
 #include <hpx/runtime/naming/server/request.hpp>
 #include <hpx/runtime/naming/server/request_handler.hpp>
+
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming { namespace server 
@@ -51,14 +54,21 @@ namespace hpx { namespace naming { namespace server
         }
         ~connection()
         {
-            socket_.close();
+            boost::system::error_code ec;
+            socket_.shutdown(boost::asio::socket_base::shutdown_both, ec);
+            socket_.close(ec);
         }
 
         /// Get the socket associated with the connection.
         boost::asio::ip::tcp::socket& socket() { return socket_; }
 
         /// Stop all asynchronous operations associated with the connection.
-        void stop() { socket_.close(); }
+        void stop() 
+        {
+            boost::system::error_code ec;
+            socket_.shutdown(boost::asio::socket_base::shutdown_both, ec);
+            socket_.close(ec);
+        }
 
         /// Asynchronously read a data structure from the socket.
         template <typename Handler>
@@ -114,7 +124,8 @@ namespace hpx { namespace naming { namespace server
                 boost::get<0>(handler)(e);
 
             // send the error reply back to the requesting site
-                reply rep (no_success, e.message().c_str());
+                std::vector<reply> rep;
+                rep.push_back(reply(no_success, e.message().c_str()));
                 async_write(rep, handler);
             }
             else {
@@ -123,9 +134,9 @@ namespace hpx { namespace naming { namespace server
                 boost::uint8_t command = command_unknown;
 
             // Extract the data structure from the data just received.
+                std::vector<request> reqs;
                 try {
                 // De-serialize the data
-                    request req;
                     {
                     // create a special io stream on top of buffer_
                         boost::iostreams::stream<io_device_type> io(buffer_);
@@ -134,17 +145,22 @@ namespace hpx { namespace naming { namespace server
 #else
                         boost::archive::binary_iarchive archive(io);
 #endif
-                        archive >> req;
+                        std::size_t count;
+                        archive >> count;
+                        for (/**/; count > 0; --count)
+                        {
+                            request req;
+                            archive >> req;
+                            reqs.push_back(req);
+                        }
                     }
 
-                    command = req.get_command();
-
                 // act on request and generate reply
-                    reply rep;
-                    request_handler_.handle_request(req, rep);
+                    std::vector<reply> reps;
+                    request_handler_.handle_requests(reqs, reps);
 
                 // send the reply back to the requesting site
-                    async_write(rep, handler);
+                    async_write(reps, handler);
                 }
                 catch (std::exception const& e) {
                     // Unable to decode data.
@@ -153,18 +169,23 @@ namespace hpx { namespace naming { namespace server
                     boost::get<0>(handler)(error);
 
                 // send the error reply back to the requesting site
-                    reply rep (no_success, e.what());
+                    std::vector<reply> rep;
+                    rep.push_back(reply(no_success, e.what()));
                     async_write(rep, handler);
                 }
 
                 // gather timings
-                request_handler_.add_timing(command, t.elapsed());
+                BOOST_FOREACH(request const& req, reqs)
+                {
+                    request_handler_.add_timing(req.get_command(), t.elapsed());
+                }
             }
         }
 
         /// Asynchronously write a data structure to the socket.
         template <typename Handler>
-        void async_write(reply const& rep, boost::tuple<Handler> handler)
+        void async_write(std::vector<reply> const& reps, 
+            boost::tuple<Handler> handler)
         {
             typedef util::container_device<std::vector<char> > io_device_type;
 
@@ -179,7 +200,10 @@ namespace hpx { namespace naming { namespace server
 #else
                 boost::archive::binary_oarchive archive(io);
 #endif
-                archive << rep;
+                std::size_t count = reps.size();
+                archive << count;
+                for (std::size_t i = 0; i < count; ++i)
+                    archive << reps[i];
             }
 
             size_ = (boost::uint32_t)buffer_.size();

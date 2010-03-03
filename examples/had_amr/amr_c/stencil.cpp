@@ -116,9 +116,9 @@ namespace hpx { namespace components { namespace amr
         }
 
         // initialize result 
-        resultval->overwrite_alloc_ = 0;
-        resultval->right_alloc_ = 0;
-        resultval->left_alloc_ = 0;
+        resultval->overwrite_alloc_ = false;
+        resultval->right_alloc_ = false;
+        resultval->left_alloc_ = false;
 
         // the first two input values should have the same timestep
         BOOST_ASSERT(val[0]->timestep_== val[1]->timestep_);
@@ -182,8 +182,6 @@ namespace hpx { namespace components { namespace amr
     int stencil::finer_mesh_tapered(naming::id_type const& result, 
         std::vector<naming::id_type> const& gids,int vecvalsize, int row,int column, Parameter const& par) 
     {
-
-      int i;
       naming::id_type gval[9];
       access_memory_block<stencil_data> mval[9];
 
@@ -195,7 +193,6 @@ namespace hpx { namespace components { namespace amr
         left_tapered_prep_initial_data(initial_data,gids,vecvalsize,row,column,par);
 
         // mesh object setup
-        naming::id_type here = applier::get_applier().get_runtime_support_gid();
         components::component_type logging_type =
                   components::get_component_type<components::amr::server::logging>();
         components::component_type function_type =
@@ -203,11 +200,11 @@ namespace hpx { namespace components { namespace amr
         // create the mesh only if you need to, otherwise reuse (reduce overhead)
         if ( par.integrator == 0 ) {
           if ( !child_left_mesh[row].get_gid() ) {
-              child_left_mesh[row].create(here, 1, true);
+              child_left_mesh[row].create(applier::get_applier().get_runtime_support_gid());
           }
         } else if ( par.integrator == 1 ) {
           if ( !rk_left_mesh[row].get_gid() ) {
-              rk_left_mesh[row].create(here, 1, true);
+              rk_left_mesh[row].create(applier::get_applier().get_runtime_support_gid());
           }
         } else {
           BOOST_ASSERT(false);
@@ -245,14 +242,14 @@ namespace hpx { namespace components { namespace amr
         // overwrite the coarse point computation
         resultval->value_ = overwrite->value_;
 
-        resultval->overwrite_alloc_ = 1;
+        resultval->overwrite_alloc_ = true;
         resultval->overwrite_ = result_data[mid];
 
         // remember neighbor value
-        overwrite->right_alloc_ = 1;
+        overwrite->right_alloc_ = true;
         overwrite->right_ = result_data[result_data.size()-1];
 
-        overwrite->left_alloc_ = 1;
+        overwrite->left_alloc_ = true;
         overwrite->left_ = result_data[0];
 
         // DEBUG -- log the right/left points computed
@@ -281,7 +278,7 @@ namespace hpx { namespace components { namespace amr
                   components::get_component_type<components::amr::stencil>();
         // create the mesh only if you need to, otherwise reuse (reduce overhead)
         if ( !child_mesh[row].get_gid() ) {
-            child_mesh[row].create(here,1, true);
+            child_mesh[row].create(here);
         }
 
         bool do_logging = false;
@@ -303,13 +300,13 @@ namespace hpx { namespace components { namespace amr
         resultval->value_ = overwrite->value_;
 
         // remember the overwrite point and the neighbor
-        resultval->overwrite_alloc_ = 1;
+        resultval->overwrite_alloc_ = true;
         resultval->overwrite_ = result_data[0];
 
-        overwrite->right_alloc_ = 1;
+        overwrite->right_alloc_ = true;
         overwrite->right_ = result_data[result_data.size()-1];
 
-        overwrite->left_alloc_ = 0;
+        overwrite->left_alloc_ = false;
 
         // DEBUG -- log the right points computed if no interp was involved
         access_memory_block<stencil_data> amb = 
@@ -331,13 +328,16 @@ namespace hpx { namespace components { namespace amr
       if ( par.integrator == 0 ) {
         access_memory_block<stencil_data> edge1,edge2;
         boost::tie(edge1,edge2) = get_memory_block_async<stencil_data>(gids[0],gids[1]);
-        if ( !edge1->refine_ || !edge2->refine_ || (row == 1 && column == 1) ) return true;
-        else return false;
+        if ( !edge1->refine_ || !edge2->refine_ || (row == 1 && column == 1) ) 
+            return true;
+        return false;
       } else if (par.integrator == 1) {
         // not implemented yet
         //BOOST_ASSERT(false);
         return true;
       }
+      BOOST_ASSERT(false);
+      return false;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -358,7 +358,7 @@ namespace hpx { namespace components { namespace amr
                              components::stubs::memory_block::clone_async(gids[2]),
                              components::stubs::memory_block::clone_async(gids[3]),
                              components::stubs::memory_block::clone_async(gids[4]));
-        boost::tie(gval[1], gval[3], gval[5],gval[7]) = 
+        boost::tie(gval[1], gval[3], gval[5], gval[7]) = 
                     components::wait(components::stubs::memory_block::clone_async(gids[2]), 
                     components::stubs::memory_block::clone_async(gids[2]),
                     components::stubs::memory_block::clone_async(gids[2]),
@@ -384,9 +384,9 @@ namespace hpx { namespace components { namespace amr
 
         // unset alloc on these gids
         for (i=1;i<9;i=i+2) {
-          mval[i]->left_alloc_ = 0;
-          mval[i]->right_alloc_ = 0;
-          mval[i]->overwrite_alloc_ = 0;
+          mval[i]->left_alloc_ = false;
+          mval[i]->right_alloc_ = false;
+          mval[i]->overwrite_alloc_ = false;
         }
 
         // avoid interpolation if possible
@@ -472,9 +472,9 @@ namespace hpx { namespace components { namespace amr
 
         // unset alloc on these gids
         for (i=1;i<17;i=i+2) {
-          mval[i]->left_alloc_ = 0;
-          mval[i]->right_alloc_ = 0;
-          mval[i]->overwrite_alloc_ = 0;
+          mval[i]->left_alloc_ = false;
+          mval[i]->right_alloc_ = false;
+          mval[i]->overwrite_alloc_ = false;
         }
 
         // avoid interpolation if possible
@@ -549,9 +549,9 @@ namespace hpx { namespace components { namespace amr
 
         // reset alloc on these gids
         for (i=0;i<8;i=i+2) {
-          mval[i]->left_alloc_ = 0;
-          mval[i]->right_alloc_ = 0;
-          mval[i]->overwrite_alloc_ = 0;
+          mval[i]->left_alloc_ = false;
+          mval[i]->right_alloc_ = false;
+          mval[i]->overwrite_alloc_ = false;
         }
 
         // avoid interpolation if possible
@@ -602,7 +602,6 @@ namespace hpx { namespace components { namespace amr
         std::vector<naming::id_type> const& gids, std::size_t level, double x, 
         int row, int column, Parameter const& par) 
     {
-
       // the initial data for the child mesh comes from the parent mesh
       naming::id_type here = applier::get_applier().get_runtime_support_gid();
       components::component_type logging_type =
@@ -612,11 +611,11 @@ namespace hpx { namespace components { namespace amr
 
       if ( par.integrator == 0 ) {
         if ( !child_left_mesh[row].get_gid() ) {
-            child_left_mesh[row].create(here, 1, true);
+            child_left_mesh[row].create(here);
         }
       } else if ( par.integrator == 1 ) {
         if ( !rk_left_mesh[row].get_gid() ) {
-            rk_left_mesh[row].create(here, 1, true);
+            rk_left_mesh[row].create(here);
         }
       } else {
         BOOST_ASSERT(false);
@@ -657,18 +656,18 @@ namespace hpx { namespace components { namespace amr
       // overwrite the coarse point computation
       resultval->value_ = overwrite->value_;
  
-      resultval->overwrite_alloc_ = 1;
+      resultval->overwrite_alloc_ = true;
       resultval->overwrite_ = result_data[mid];
    
       // remember neighbor value
-      overwrite->right_alloc_ = 1;
+      overwrite->right_alloc_ = true;
       overwrite->right_ = result_data[0];
 
-      overwrite->left_alloc_ = 1;
+      overwrite->left_alloc_ = true;
       overwrite->left_ = result_data[result_data.size()-1];
 
-      resultval->right_alloc_ = 0;
-      resultval->left_alloc_ = 0;
+      resultval->right_alloc_ = false;
+      resultval->left_alloc_ = false;
 
       // DEBUG -- log the right/left points computed
       access_memory_block<stencil_data> amb1 = 
@@ -680,22 +679,22 @@ namespace hpx { namespace components { namespace amr
 
       for (std::size_t i = 1; i < result_data.size()-1; ++i) {
         // free all but the overwrite and end value
-        if ( i != mid )  components::stubs::memory_block::free(result_data[i]);
+        if ( i != mid ) components::stubs::memory_block::free(result_data[i]);
       }
-
-      // release result data
-      //for (std::size_t i = 0; i < result_data.size(); ++i) 
-      //    components::stubs::memory_block::free(result_data[i]);
 
       return 0;
     }
+
+    hpx::actions::manage_object_action<stencil_data> const manage_stencil_data =
+        hpx::actions::manage_object_action<stencil_data>();
 
     ///////////////////////////////////////////////////////////////////////////
     naming::id_type stencil::alloc_data(int item, int maxitems, int row,
         std::size_t level, double x, Parameter const& par)
     {
+        naming::id_type here = applier::get_applier().get_runtime_support_gid();
         naming::id_type result = components::stubs::memory_block::create(
-            applier::get_applier().get_runtime_support_gid(), sizeof(stencil_data));
+            here, sizeof(stencil_data), manage_stencil_data);
 
         if (-1 != item) {
             // provide initial data for the given data value 
@@ -744,13 +743,13 @@ namespace hpx { namespace components { namespace amr
           }
         }
 
-        if ( s == 0 && amb1->left_alloc_ == 1 ) {
+        if ( s == 0 && amb1->left_alloc_) {
           access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->left_);
           if ( floatcmp(amb2->x_,resultval->x_) ) {
             resultval->value_ = amb2->value_;
             // transfer overwrite information as well
-            if ( amb2->overwrite_alloc_ == 1 ) {
-              resultval->overwrite_alloc_ = 1;
+            if ( amb2->overwrite_alloc_) {
+              resultval->overwrite_alloc_ = true;
               resultval->overwrite_ = amb2->overwrite_;
             }
             s = 1;
@@ -792,13 +791,13 @@ namespace hpx { namespace components { namespace amr
           }
         }
 
-        if (s == 0 && amb1->left_alloc_ == 1 ) {
+        if (s == 0 && amb1->left_alloc_) {
           access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->left_);
           if ( floatcmp(amb2->x_,resultval->x_) ) {
             resultval->value_ = amb2->value_;
             // transfer overwrite information as well
-            if ( amb2->overwrite_alloc_ == 1 ) {
-              resultval->overwrite_alloc_ = 1;
+            if ( amb2->overwrite_alloc_) {
+              resultval->overwrite_alloc_ = true;
               resultval->overwrite_ = amb2->overwrite_;
             }
             s = 1;
@@ -829,7 +828,7 @@ namespace hpx { namespace components { namespace amr
        if ( floatcmp(val->x_,3.3333333333333333) == 1 ) {
            printf(" TEST overwrite %d timestep: %g index %d id %d level %d x %g right_alloc %d left_alloc %d refine %d\n",
                val->overwrite_alloc_,val->timestep_,
-               val->index_,gid.id_lsb_,val->level_,
+               val->index_, gid.get_gid().get_lsb(),val->level_,
                val->x_,val->right_alloc_,val->left_alloc_,val->refine_);
            //if ( gid.id_lsb_ == 549233 ) {
            //  return 1;
@@ -844,7 +843,7 @@ namespace hpx { namespace components { namespace amr
       int i;
       for (i=0;i<gids.size();i++) {
         access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(gids[i]);
-        printf(" gid: %d location: %g overwrite: %d\n",gids[i].id_lsb_,amb->x_,amb->overwrite_alloc_);
+        printf(" gid: %d location: %g overwrite: %d\n", gids[i].get_gid().get_lsb(), amb->x_, amb->overwrite_alloc_);
         if ( amb->overwrite_alloc_ == 1 ) {
           access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb->overwrite_);
           printf(" overwrite      location: %g overwrite: %d : %d %d : level %d\n",amb2->x_,amb2->overwrite_alloc_,amb2->left_alloc_,amb2->right_alloc_,amb2->level_);
@@ -869,9 +868,9 @@ namespace hpx { namespace components { namespace amr
     // and it traverses the entire grid available at that moment
     void stencil::traverse_grid(naming::id_type const& start,int firstcall)
     {
+#if 0
       int i;
       int found;
-#if 0
       if (firstcall == 1) lsb_count = 0;
 
       access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(start);
@@ -910,7 +909,7 @@ namespace hpx { namespace components { namespace amr
         }
       }
 
-      if ( amb->left_alloc_ == 1 ) {
+      if ( amb->left_alloc_ ) {
         // check if the lsb has already been recorded
         found = 0;
         for (i=0;i<lsb_count;i++) {

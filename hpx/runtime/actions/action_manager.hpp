@@ -38,7 +38,7 @@ namespace hpx { namespace actions
         // Invoked by the Thread Manager when it is running out of work-items 
         // and needs something to execute on a specific starving resources 
         // specified as the argument
-        void fetch_parcel (naming::id_type resourceID);
+        void fetch_parcel (naming::id_type const& resourceID);
 
         // Invoked by the Applier when it has a local action to be executed
 //        void fetchNewAction ();

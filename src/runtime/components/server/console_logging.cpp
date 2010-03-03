@@ -72,7 +72,6 @@ namespace hpx { namespace components { namespace server
             break;
         }
     }
-
 }}}
 
 // This must be in global namespace

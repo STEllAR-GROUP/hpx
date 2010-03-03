@@ -18,20 +18,40 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/variant.hpp>
 #include <boost/static_assert.hpp>
-
+#include <boost/mpl/identity.hpp>
+  
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail 
 {
+    template <typename Result, typename RemoteResult>
+    struct get_result
+    {
+        template <typename RemoteResult>
+        static Result call(RemoteResult const& rhs)
+        {
+            return Result(rhs);
+        }
+    };
+
+    template <typename Result>
+    struct get_result<Result, Result>
+    {
+        static Result const& call(Result const& rhs)
+        {
+            return rhs;
+        }
+    };
+
     /// A future_value can be used by a single thread to invoke a (remote) 
     /// action and wait for the result. 
-    template <typename Result, int N>
-    class future_value : public lcos::base_lco_with_value<Result>
+    template <typename Result, typename RemoteResult, int N>
+    class future_value : public lcos::base_lco_with_value<RemoteResult>
     {
     private:
         // make sure N is in a reasonable range
         BOOST_STATIC_ASSERT(N > 0);   // N must be greater than zero
 
-    private:
+    protected:
         typedef Result result_type;
         typedef boost::exception_ptr error_type;
         typedef boost::variant<result_type, error_type> data_type;
@@ -42,9 +62,7 @@ namespace hpx { namespace lcos { namespace detail
         // to associate this component with a given action.
         enum { value = components::component_future };
 
-        future_value()
-        {
-        }
+        future_value() {}
 
         /// Reset the future_value to allow to restart an asynchronous 
         /// operation. Allows any subsequent set_data operation to succeed.
@@ -73,7 +91,7 @@ namespace hpx { namespace lcos { namespace detail
             if (slot < 0 || slot >= N) {
                 HPX_THROW_EXCEPTION(bad_parameter, 
                     "future_value<Result, N>::get_data", "slot index out of range");
-                return Result();
+                // never reached
             }
 
             // yields control if needed
@@ -88,7 +106,7 @@ namespace hpx { namespace lcos { namespace detail
                 // an error has been reported in the meantime, throw 
                 error_type e = boost::get<error_type>(d);
                 boost::rethrow_exception(e);
-                return result_type();
+                // never reached
             }
 
             // no error has been reported, return the result
@@ -97,7 +115,7 @@ namespace hpx { namespace lcos { namespace detail
 
         // helper functions for setting data (if successful) or the error (if
         // non-successful)
-        void set_data(int slot, Result const& result)
+        void set_data(int slot, RemoteResult const& result)
         {
             // set the received result, reset error status
             if (slot < 0 || slot >= N) {
@@ -108,7 +126,8 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             // store the value
-            data_[slot].set(data_type(result));
+            data_[slot].set(
+                data_type(get_result<Result, RemoteResult>::call(result)));
         }
 
         // trigger the future with the given error condition
@@ -129,7 +148,7 @@ namespace hpx { namespace lcos { namespace detail
         // exposed functionality of this component
 
         // trigger the future, set the result
-        void set_result (Result const& result)
+        void set_result (RemoteResult const& result)
         {
             set_data(0, result);    // set the received result, reset error status
         }
@@ -139,10 +158,167 @@ namespace hpx { namespace lcos { namespace detail
             set_error(0, e);        // set the received error
         }
 
+        template <typename ManagedType>
+        naming::id_type const& get_gid(ManagedType* p) const
+        {
+            if (!id_) {
+                naming::gid_type gid = p->get_base_gid(); 
+                naming::strip_credit_from_gid(gid);
+                id_ = naming::id_type(gid, naming::id_type::unmanaged);
+            }
+            return id_;
+        }
+
     private:
         util::full_empty<data_type> data_[N];
+        mutable naming::id_type id_;
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// A future_value can be used by a single thread to invoke a (remote) 
+    /// action and wait for the result. This specialization wraps the result
+    /// value (a gid_type) into a managed id_type.
+    template <int N>
+    class future_value<naming::id_type, naming::gid_type, N>
+      : public lcos::base_lco_with_value<naming::gid_type>
+    {
+    private:
+        // make sure N is in a reasonable range
+        BOOST_STATIC_ASSERT(N > 0);   // N must be greater than zero
+
+    protected:
+        typedef naming::id_type result_type;
+        typedef boost::exception_ptr error_type;
+        typedef boost::variant<result_type, error_type> data_type;
+
+    public:
+        future_value() {}
+
+        /// Reset the future_value to allow to restart an asynchronous 
+        /// operation. Allows any subsequent set_data operation to succeed.
+        void reset()
+        {
+            data_->set_empty();
+        }
+
+        /// Get the result of the requested action. This call blocks (yields 
+        /// control) if the result is not ready. As soon as the result has been 
+        /// returned and the waiting thread has been re-scheduled by the thread
+        /// manager the function \a lazy_future#get will return.
+        ///
+        /// \param slot   [in] The number of the slot the value has to be 
+        ///               returned for. This number must be positive, but 
+        ///               smaller than the template parameter \a N.
+        /// \param self   [in] The \a thread which will be unconditionally
+        ///               blocked (yielded) while waiting for the result. 
+        ///
+        /// \note         If there has been an error reported (using the action
+        ///               \a base_lco#set_error), this function will throw an
+        ///               exception encapsulating the reported error code and 
+        ///               error description.
+        result_type get_data(int slot) 
+        {
+            if (slot < 0 || slot >= N) {
+                HPX_THROW_EXCEPTION(bad_parameter, 
+                    "future_value<Result, N>::get_data", "slot index out of range");
+                return naming::invalid_id;
+            }
+
+            // yields control if needed
+            data_type d;
+            data_[slot].read(d);
+
+            // the thread has been re-activated by one of the actions 
+            // supported by this future_value (see \a future_value::set_event
+            // and future_value::set_error).
+            if (1 == d.which())
+            {
+                // an error has been reported in the meantime, throw 
+                error_type e = boost::get<error_type>(d);
+                boost::rethrow_exception(e);
+                return naming::invalid_id;
+            }
+
+            // no error has been reported, return the result
+            return boost::get<naming::id_type>(d);
+        };
+
+        // helper functions for setting data (if successful) or the error (if
+        // non-successful)
+        void set_data(int slot, naming::gid_type const& result)
+        {
+            // set the received result, reset error status
+            if (slot < 0 || slot >= N) {
+                HPX_THROW_EXCEPTION(bad_parameter, 
+                    "future_value::set_data<Result, N>", 
+                    "slot index out of range");
+                return;
+            }
+
+            // store the value as a managed id
+            data_[slot].set(
+                data_type(naming::id_type(result, naming::id_type::managed)));
+        }
+
+        // trigger the future with the given error condition
+        void set_error(int slot, boost::exception_ptr const& e)
+        {
+            if (slot < 0 || slot >= N) {
+                HPX_THROW_EXCEPTION(bad_parameter, 
+                    "future_value<Result, N>::set_error", 
+                    "slot index out of range");
+                return;
+            }
+
+            // store the error code
+            data_[slot].set(data_type(e));
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // exposed functionality of this component
+
+        // trigger the future, set the result
+        void set_result (naming::gid_type const& result)
+        {
+            set_data(0, result);    // set the received result, reset error status
+        }
+
+        void set_error (boost::exception_ptr const& e)
+        {
+            set_error(0, e);        // set the received error
+        }
+
+        template <typename ManagedType>
+        naming::id_type const& get_gid(ManagedType* p) const
+        {
+            if (!id_) {
+                naming::gid_type gid = p->get_base_gid(); 
+                naming::strip_credit_from_gid(gid);
+                id_ = naming::id_type(gid, naming::id_type::unmanaged);
+            }
+            return id_;
+        }
+
+    private:
+        util::full_empty<data_type> data_[N];
+        mutable naming::id_type id_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    struct log_on_exit
+    {
+        log_on_exit(boost::shared_ptr<T> const& impl)
+          : impl_(impl)
+        {
+            LAPP_(info) << "future_value::get(" << impl_->get_gid() << ")";
+        }
+        ~log_on_exit()
+        {
+            LAPP_(info) << "future_value::got(" << impl_->get_gid() << ")";
+        }
+        boost::shared_ptr<T> const& impl_;
+    };
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -183,11 +359,16 @@ namespace hpx { namespace lcos
     ///                  continuation must return a value of a type convertible 
     ///                  to the type as specified by the template parameter 
     ///                  \a Result
-    template <typename Result, int N>
+    template <typename Result>
+    struct future_value_remote_result
+      : boost::mpl::identity<Result>
+    {};
+
+    template <typename Result, typename RemoteResult, int N>
     class future_value 
     {
     protected:
-        typedef detail::future_value<Result, N> wrapped_type;
+        typedef detail::future_value<Result, RemoteResult, N> wrapped_type;
         typedef components::managed_component<wrapped_type> wrapping_type;
 
         /// Construct a new \a future instance. The supplied 
@@ -204,19 +385,21 @@ namespace hpx { namespace lcos
         ///               with the action as the continuation parameter).
         future_value()
           : impl_(new wrapping_type(new wrapped_type()))
-        {}
+        {
+            LAPP_(info) << "future_value::future_value(" << impl_->get_gid() << ")";
+        }
 
         /// \brief Return the global id of this \a future instance
-        naming::id_type get_gid() const
+        naming::id_type const& get_gid() const
         {
-            return impl_->get_gid();
+            return (*impl_)->get_gid(impl_.get());
         }
 
         /// \brief Return the full address of this \a future instance
-        bool get_full_address(naming::full_address& fa) const
-        {
-            return impl_->get_full_address(fa);
-        }
+//         bool get_full_address(naming::full_address& fa) const
+//         {
+//             return impl_->get_full_address(fa);
+//         }
 
         /// Reset the future_value to allow to restart an asynchronous 
         /// operation. Allows any subsequent set_data operation to succeed.
@@ -231,6 +414,7 @@ namespace hpx { namespace lcos
         ~future_value()
         {}
 
+    public:
         /// Get the result of the requested action. This call blocks (yields 
         /// control) if the result is not ready. As soon as the result has been 
         /// returned and the waiting thread has been re-scheduled by the thread
@@ -245,6 +429,7 @@ namespace hpx { namespace lcos
         ///               error description.
         Result get(int slot = 0) const
         {
+            detail::log_on_exit<wrapping_type> on_exit(impl_);
             return (*impl_)->get_data(slot);
         }
 
@@ -252,11 +437,18 @@ namespace hpx { namespace lcos
         boost::shared_ptr<wrapping_type> impl_;
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    template <>
+    struct future_value_remote_result<void>
+      : boost::mpl::identity<util::unused_type>
+    {};
+
     template <int N>
-    class future_value<void, N>
+    class future_value<void, util::unused_type, N>
     {
     protected:
-        typedef detail::future_value<util::unused_type, N> wrapped_type;
+        typedef detail::future_value<util::unused_type, util::unused_type, N> 
+            wrapped_type;
         typedef components::managed_component<wrapped_type> wrapping_type;
 
         /// Construct a new \a future instance. The supplied 
@@ -273,19 +465,21 @@ namespace hpx { namespace lcos
         ///               with the action as the continuation parameter).
         future_value()
           : impl_(new wrapping_type(new wrapped_type()))
-        {}
+        {
+            LAPP_(info) << "future_value<void>::future_value(" << impl_->get_gid() << ")";
+        }
 
         /// \brief Return the global id of this \a future instance
-        naming::id_type get_gid() const
+        naming::id_type const& get_gid() const
         {
-            return impl_->get_gid();
+            return (*impl_)->get_gid(impl_.get());
         }
 
         /// \brief Return the full address of this \a future instance
-        bool get_full_address(naming::full_address& fa) const
-        {
-            return impl_->get_full_address(fa);
-        }
+//         bool get_full_address(naming::full_address& fa) const
+//         {
+//             return impl_->get_full_address(fa);
+//         }
 
         /// Reset the future_value to allow to restart an asynchronous 
         /// operation. Allows any subsequent set_data operation to succeed.
@@ -314,13 +508,13 @@ namespace hpx { namespace lcos
         ///               error description.
         util::unused_type get(int slot = 0) const
         {
+            detail::log_on_exit<wrapping_type> on_exit(impl_);
             return (*impl_)->get_data(slot);
         }
 
     protected:
         boost::shared_ptr<wrapping_type> impl_;
     };
-
 }}
 
 #endif

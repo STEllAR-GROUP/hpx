@@ -76,10 +76,12 @@ namespace hpx { namespace parcelset
         void handle_write(boost::system::error_code const& e, std::size_t bytes,
             boost::tuple<Handler> handler)
         {
-            if (e) {
-                LPT_(error) << "parcelhandler: put parcel failed: " 
-                            << e.message();
-            }
+            // if there is an error sending a parcel it's likely logging will not 
+            // work anyways, so don't log the error
+//             if (e) {
+//                 LPT_(error) << "parcelhandler: put parcel failed: " 
+//                             << e.message();
+//             }
 //             else {
 //                 LPT_(info) << "parcelhandler: put parcel succeeded";
 //             }

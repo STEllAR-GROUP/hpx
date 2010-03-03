@@ -14,6 +14,7 @@
 #include <hpx/util/ini.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
+#include <boost/detail/atomic_count.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -61,6 +62,7 @@ namespace hpx { namespace components
         ///       save the configuration setting for later use.
         derived_component_factory(util::section const* global, 
             util::section const* local)
+          : refcnt_(0)
         {
             // store the configuration settings
             if (NULL != global)
@@ -83,7 +85,7 @@ namespace hpx { namespace components
         /// \return Returns the unique identifier of the component type this 
         ///         factory instance is responsible for. This function throws
         ///         on any error.
-        component_type get_component_type(naming::id_type const& prefix, 
+        component_type get_component_type(naming::gid_type const& prefix, 
             naming::resolver_client& agas_client)
         {
             typedef typename Component::type_holder type_holder;
@@ -132,25 +134,42 @@ namespace hpx { namespace components
         ///         instance. If more than one component instance has been 
         ///         created (\a count > 1) the GID's of all new instances are
         ///         sequential in a row.
-        naming::id_type create (std::size_t count)
+        naming::gid_type create (std::size_t count)
         {
-            return server::create<Component>(count);
+            naming::gid_type id = server::create<Component>(count);
+            if (id) 
+                ++refcnt_;
+            return id;
         }
 
         /// \brief Destroy one or more component instances
         ///
         /// \param gid    [in] The gid of the first component instance to 
         ///               destroy. 
-        void destroy(naming::id_type const& gid)
+        void destroy(naming::gid_type const& gid)
         {
             server::destroy<Component>(gid);
+            --refcnt_;
+        }
+
+        /// \brief Ask whether this factory can be unloaded
+        ///
+        /// \return Returns whether it is safe to unload this factory and
+        ///         the shared library implementing this factory. This 
+        ///         function will return 'true' whenever no more outstanding
+        ///         instances of the managed object type are alive.
+        bool may_unload() const
+        {
+            return refcnt_ == 0;
         }
 
     protected:
         util::section global_settings_;
         util::section local_settings_;
-    };
 
+        // count outstanding instances to avoid premature unloading
+        boost::detail::atomic_count refcnt_;
+    };
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

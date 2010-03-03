@@ -6,6 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 
 #include <hpx/runtime/actions/action_manager.hpp>
+#include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
@@ -13,6 +14,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
+    ///////////////////////////////////////////////////////////////////////////
+    // This does not really belong here, but we put it into this spot for the 
+    // lack of a better one :-P
+    inline manage_object_action_base const& 
+    manage_object_action_base::get_instance() const
+    {
+        static manage_object_action<boost::uint8_t> const instance =
+                manage_object_action<boost::uint8_t>();
+        return instance;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // Call-back function for parcelHandler to call when new parcels are received
     void action_manager::fetch_parcel(
         parcelset::parcelhandler& parcel_handler, naming::address const& dest)
@@ -21,7 +34,7 @@ namespace hpx { namespace actions
         if (parcel_handler.get_parcel(p))  // if new parcel is found
         {
         // write this parcel to the log
-            LPT_(info) << "action_manager: fetch_parcel: " << p;
+            LPT_(debug) << "action_manager: fetch_parcel: " << p;
 
         // decode the local virtual address of the parcel
             naming::address addr = p.get_destination_addr();
@@ -30,7 +43,7 @@ namespace hpx { namespace actions
         // by convention, a zero address references the local runtime support 
         // component
             if (0 == lva) 
-                lva = appl_.get_runtime_support_gid().get_lsb();
+                lva = appl_.get_runtime_support_raw_gid().get_lsb();
 
         // decode the action-type in the parcel
             action_type act = p.get_action();
@@ -42,7 +55,9 @@ namespace hpx { namespace actions
                 dest.type_, act->get_component_type()));
 
         // either directly execute the action or create a new thread
-            if (actions::base_action::direct_action == act->get_action_type()) {
+            if (actions::base_action::direct_action == act->get_action_type() ||
+                !appl_.get_thread_manager().is_running()) 
+            {
             // direct execution of the action
                 if (!cont) {
                 // no continuation is to be executed
@@ -80,7 +95,7 @@ namespace hpx { namespace actions
     // Invoked by the Thread Manager when it is running out of work-items 
     // and needs something to execute on a specific starving resources 
     // specified as the argument
-    void action_manager::fetch_parcel (naming::id_type resourceID)
+    void action_manager::fetch_parcel (naming::id_type const& resourceID)
     {
 
     }

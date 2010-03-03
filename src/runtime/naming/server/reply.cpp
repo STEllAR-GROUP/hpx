@@ -41,6 +41,10 @@ namespace hpx { namespace naming { namespace server
             "hpx: agas: internal server error (out of memory)";
         char const* const unknown_version = 
             "hpx: agas: ill formatted request (unknown version)";
+        char const* const bad_component_type = 
+            "hpx: agas: unknown component type";
+        char const* const duplicate_console = 
+            "hpx: agas: more than one console localities";
     }
 
     char const* const get_error_text(error status)
@@ -56,6 +60,8 @@ namespace hpx { namespace naming { namespace server
         case hpx::version_unknown:       return status_strings::unknown_version;
         case hpx::repeated_request:      return status_strings::repeated_request;
         case hpx::internal_server_error: return status_strings::internal_server_error;
+        case hpx::bad_component_type:    return status_strings::bad_component_type;
+        case hpx::duplicate_console:     return status_strings::duplicate_console;
         default:
             break;
         }
@@ -87,6 +93,7 @@ namespace hpx { namespace naming { namespace server
                 break;
 
             case command_getprefix:
+            case command_getprefix_for_site:
                 os << "prefix" << rep.lower_bound_;
                 break;
 
@@ -111,12 +118,23 @@ namespace hpx { namespace naming { namespace server
                     iterator end = rep.get_prefixes().end(); 
                     for (iterator it = rep.get_prefixes().begin(); it != end; )
                     {
-                        os << std::hex << get_id_from_prefix(*it);
+                        os << std::hex << get_gid_from_prefix(*it);
                         if (++it != end)
                             os << ", ";
                     }
                     os << ")";
                 }
+                break;
+
+            case command_incref:
+                os << "refcnt(" << rep.refcnt_ << ") ";
+                break;
+
+            case command_decref:
+                os << "refcnt(" << rep.refcnt_ << ")";
+                if (0 == rep.refcnt_)
+                    os << ", type(" << (int)rep.type_ << ")";
+                os << " ";
                 break;
 
             case command_bind_range:

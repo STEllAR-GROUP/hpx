@@ -227,6 +227,11 @@ namespace boost { namespace coroutines { namespace detail {
       return m_pimpl->get_thread_id();
     }
 
+    std::size_t get_thread_phase() const {
+        BOOST_ASSERT(m_pimpl);
+        return m_pimpl->get_thread_phase();
+    }
+
     explicit coroutine_self(impl_type * pimpl) 
       : m_pimpl(pimpl) 
     {}

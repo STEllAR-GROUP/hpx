@@ -140,7 +140,7 @@ void section::read (std::string const& filename)
 #if defined(__AIX__) && defined(__GNUC__)
     // NEVER ask why... seems to be some weird stdlib initialization problem
     // If you don't call getline() here the while(getline...) loop below will
-    // crash with a bad_cast excetion. Stupid AIX...
+    // crash with a bad_cast exception. Stupid AIX...
     std::string l1;
     std::ifstream i1;
     i1.open(filename.c_str(), std::ios::in);

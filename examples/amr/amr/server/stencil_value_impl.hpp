@@ -75,7 +75,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     inline void 
     free_helper_sync(naming::id_type& gid)
     {
-        components::stubs::memory_block::free_sync(gid);
+//         components::stubs::memory_block::free_sync(gid);
         gid = naming::invalid_id;
     }
 

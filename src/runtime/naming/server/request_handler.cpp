@@ -25,15 +25,14 @@ namespace hpx { namespace naming { namespace server
       : totals_(command_lastcommand), 
         console_prefix_(0),
         component_type_(components::component_first_dynamic)
-    {
-    }
+    {}
 
     request_handler::~request_handler()
-    {
-    }
+    {}
 
     ///////////////////////////////////////////////////////////////////////////
-    void request_handler::handle_getprefix(request const& req, reply& rep)
+    void request_handler::handle_getprefix(request const& req, reply& rep, 
+        bool self)
     {
         try {
             mutex_type::scoped_lock l(registry_mtx_);
@@ -45,35 +44,38 @@ namespace hpx { namespace naming { namespace server
 
                 // verify that this locality is either the only console of the 
                 // given application or a worker 
-                if (req.isconsole()) {
-                    if (0 != console_prefix_) {
-                        rep = reply(command_getidrange, duplicate_console);
+                if (self && req.isconsole()) {
+                    if (0 != console_prefix_ && console_prefix_ != (*it).second.first) {
+                        rep = reply(self ? command_getprefix : command_getprefix_for_site, 
+                            duplicate_console);
                         return;
                     }
                     console_prefix_ = (*it).second.first;
                 }
 
                 // existing entry
-                rep = reply(repeated_request, command_getprefix, 
-                    get_id_from_prefix((*it).second.first)); 
+                rep = reply(repeated_request, 
+                    self ? command_getprefix : command_getprefix_for_site,
+                    get_gid_from_prefix((*it).second.first)); 
             }
             else {
                 // insert this prefix as being mapped to the given locality
                 boost::uint32_t prefix = (boost::uint32_t)(site_prefixes_.size() + 1);
-                naming::id_type id = get_id_from_prefix(prefix);
+                naming::gid_type id = get_gid_from_prefix(prefix);
 
                 // verify that this locality is either the only console of the 
                 // given application or a worker 
-                if (req.isconsole()) {
+                if (self && req.isconsole()) {
                     if (0 != console_prefix_) {
-                        rep = reply(command_getprefix, duplicate_console);
+                        rep = reply(self ? command_getprefix : command_getprefix_for_site, 
+                            duplicate_console);
                         return;
                     }
                     console_prefix_ = prefix;
                 }
 
                 // start assigning ids with the second block of 64Bit numbers only
-                naming::id_type lower_id (id.get_msb() + 1, 0);
+                naming::gid_type lower_id (id.get_msb() + 1, 0);
                 site_prefixes_.insert(
                     site_prefix_map_type::value_type(req.get_site(), 
                         std::make_pair(prefix, lower_id)));
@@ -83,8 +85,8 @@ namespace hpx { namespace naming { namespace server
                 registry_type::iterator it = registry_.find(id);
                 if (it != registry_.end()) {
                     // this shouldn't happen
-                    rep = reply(command_getprefix, no_success, 
-                        "prefix is already bound to local address");
+                    rep = reply(self ? command_getprefix : command_getprefix_for_site, 
+                        no_success, "prefix is already bound to local address");
                     return;
                 }
                 else {
@@ -97,14 +99,17 @@ namespace hpx { namespace naming { namespace server
                 // significant bits of global id's
 
                 // created new entry
-                rep = reply(success, command_getprefix, id);
+                rep = reply(success, 
+                    self ? command_getprefix : command_getprefix_for_site, id);
             }
         }
         catch (std::bad_alloc) {
-            rep = reply(command_getprefix, out_of_memory);
+            rep = reply(self ? command_getprefix : command_getprefix_for_site, 
+                out_of_memory);
         }
         catch (...) {
-            rep = reply(command_getprefix, internal_server_error);
+            rep = reply(self ? command_getprefix : command_getprefix_for_site, 
+                internal_server_error);
         }
     }
 
@@ -116,7 +121,7 @@ namespace hpx { namespace naming { namespace server
 
             if (0 != console_prefix_) {
                 rep = reply(success, command_getconsoleprefix, 
-                    get_id_from_prefix(console_prefix_)); 
+                    get_gid_from_prefix(console_prefix_)); 
             }
             else {
                 rep = reply(command_getconsoleprefix, no_registered_console,
@@ -225,7 +230,7 @@ namespace hpx { namespace naming { namespace server
             }
 
             // store prefix in factory map
-            boost::uint32_t prefix = get_prefix_from_id(req.get_id());
+            boost::uint32_t prefix = get_prefix_from_gid(req.get_id());
             factory_map::iterator itf = factories_.insert(
                 factory_map::value_type((*it).second, prefix));
 
@@ -263,8 +268,8 @@ namespace hpx { namespace naming { namespace server
                     << ", current upper: " << (*it).second.second;
 
                 // generate the new id range
-                naming::id_type lower ((*it).second.second + 1);
-                naming::id_type upper (lower + (req.get_count() - 1));
+                naming::gid_type lower ((*it).second.second + 1);
+                naming::gid_type upper (lower + (req.get_count() - 1));
 
                 if (upper.get_msb() != lower.get_msb()) {
                     // handle overflow
@@ -274,7 +279,7 @@ namespace hpx { namespace naming { namespace server
                             "global ids have been exhausted");
                         return;
                     }
-                    lower = naming::id_type(upper.get_msb(), 0);
+                    lower = naming::gid_type(upper.get_msb(), 0);
                     upper = lower + (req.get_count() - 1);
                 }
 
@@ -284,16 +289,20 @@ namespace hpx { namespace naming { namespace server
                 LAGAS_(debug) << "handle_getidrange: new upper: " 
                     << (*it).second.second;
 
+                // set initial credits
+                naming::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
+                naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT);
+
                 // existing entry
                 rep = reply(repeated_request, command_getidrange, lower, upper); 
             }
             else {
                 // insert this prefix as being mapped to the given locality
                 boost::uint32_t prefix = (boost::uint32_t)site_prefixes_.size() + 1;
-                naming::id_type id = get_id_from_prefix(prefix);
+                naming::gid_type id = get_gid_from_prefix(prefix);
 
                 // start assigning ids with the second block of 64Bit numbers only
-                naming::id_type lower_id (id.get_msb() + 1, 0);
+                naming::gid_type lower_id (id.get_msb() + 1, 0);
 
                 LAGAS_(debug) << "handle_getidrange: new site: " 
                     << req.get_site() << ", prefix: " << id
@@ -324,7 +333,7 @@ namespace hpx { namespace naming { namespace server
                 registry_type::iterator it = registry_.find(id);
                 if (it != registry_.end()) {
                     // this shouldn't happen
-                    rep = reply(command_getprefix, no_success, 
+                    rep = reply(command_getidrange, no_success, 
                         "prefix is already bound to local address");
                     return;
                 }
@@ -334,8 +343,8 @@ namespace hpx { namespace naming { namespace server
                 }
 
                 // generate the new id range
-                naming::id_type lower = lower_id + 1;
-                naming::id_type upper = lower + (req.get_count() - 1);
+                naming::gid_type lower = lower_id + 1;
+                naming::gid_type upper = lower + (req.get_count() - 1);
 
                 // store the new lower bound
                 (*p.first).second.second = upper;
@@ -343,15 +352,19 @@ namespace hpx { namespace naming { namespace server
                 LAGAS_(debug) << "handle_getidrange: new upper: " 
                     << (*p.first).second.second;
 
+                // set initial credits
+                naming::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
+                naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT);
+
                 // created new entry
                 rep = reply(success, command_getidrange, lower, upper);
             }
         }
         catch (std::bad_alloc) {
-            rep = reply(command_getprefix, out_of_memory);
+            rep = reply(command_getidrange, out_of_memory);
         }
         catch (...) {
-            rep = reply(command_getprefix, internal_server_error);
+            rep = reply(command_getidrange, internal_server_error);
         }
     }
 
@@ -365,10 +378,13 @@ namespace hpx { namespace naming { namespace server
                 using boost::fusion::at_c;
 
                 mutex_type::scoped_lock l(registry_mtx_);
-                registry_type::iterator it = registry_.lower_bound(req.get_id());
+                naming::gid_type id = req.get_id();
+                naming::strip_credit_from_gid(id);
+
+                registry_type::iterator it = registry_.lower_bound(id);
 
                 if (it != registry_.end()) {
-                    if ((*it).first == req.get_id()) {
+                    if ((*it).first == id) {
                         // update existing bindings
                         if (at_c<1>((*it).second) != req.get_count()) 
                         {
@@ -385,38 +401,38 @@ namespace hpx { namespace naming { namespace server
                     }
                     else if (it != registry_.begin()) {
                         --it;
-                        if ((*it).first + at_c<1>((*it).second) > req.get_id()) {
+                        if ((*it).first + at_c<1>((*it).second) > id) {
                             // the previous range covers the new id
                             s = bad_parameter;
                             str = "the new global id is contained in an existing range";
                         }
                         else {
                             // create new bindings
-                            create_new_binding(req, s, str);
+                            create_new_binding(req, id, s, str);
                         }
                     }
                     else {
                         // create new bindings, the existing ranges are larger 
                         // than the new global id
-                        create_new_binding(req, s, str);
+                        create_new_binding(req, id, s, str);
                     }
                 }
                 else {
                     if (!registry_.empty()) {
                         --it;
-                        if ((*it).first + at_c<1>((*it).second) > req.get_id()) {
+                        if ((*it).first + at_c<1>((*it).second) > id) {
                             // the previous range covers the new id
                             s = bad_parameter;
                             str = "the new global id is contained in an existing range";
                         }
                         else {
                             // create new bindings
-                            create_new_binding(req, s, str);
+                            create_new_binding(req, id, s, str);
                         }
                     }
                     else {
                         // create new bindings
-                        create_new_binding(req, s, str);
+                        create_new_binding(req, id, s, str);
                     }
                 }
             }
@@ -431,6 +447,155 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    void request_handler::handle_incref(request const& req, reply& rep)
+    {
+        try {
+            mutex_type::scoped_lock l(registry_mtx_);
+
+            naming::gid_type id = req.get_id();
+            naming::strip_credit_from_gid(id);
+
+            refcnt_store_type::iterator it = refcnts_.find(id);
+            if (it == refcnts_.end()) 
+            {
+                // we insert a new reference count entry with an initial 
+                // count of HPX_INITIAL_GLOBALCREDIT because we assume bind() 
+                // has already created the first reference (plus credits).
+                std::pair<refcnt_store_type::iterator, bool> p = 
+                    refcnts_.insert(refcnt_store_type::value_type(id, 
+                                        HPX_INITIAL_GLOBALCREDIT));
+                if (!p.second)
+                {
+                    rep = reply(command_incref, out_of_memory);
+                    return;
+                }
+                it = p.first;
+            }
+
+            rep = reply(command_incref, (*it).second += req.get_count());
+        }
+        catch (std::bad_alloc) {
+            rep = reply(command_incref, out_of_memory);
+        }
+        catch (...) {
+            rep = reply(command_incref, internal_server_error);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    components::component_type
+    request_handler::get_component_type(naming::gid_type const& gid)
+    {
+        using boost::fusion::at_c;
+
+        mutex_type::scoped_lock l(registry_mtx_);
+        registry_type::iterator it = registry_.lower_bound(gid);
+        if (it != registry_.end()) {
+            if ((*it).first == gid) {
+                // found the exact match in the registry
+                components::component_type t = (components::component_type)at_c<0>((*it).second).type_;
+                return (components::component_type)at_c<0>((*it).second).type_;
+            }
+            else if (it != registry_.begin()) {
+                --it;
+                if ((*it).first + at_c<1>((*it).second) > gid) {
+                    // the previous range covers the given global id
+
+                    // the only limitation while binding blocks of global 
+                    // ids is that these have to have identical msb's
+                    if (gid.get_msb() == (*it).first.get_msb()) {
+                        components::component_type t = (components::component_type)at_c<0>((*it).second).type_;
+                        return (components::component_type)at_c<0>((*it).second).type_;
+                    }
+                }
+            }
+        }
+        else if (!registry_.empty()) {
+            --it;
+            if ((*it).first + at_c<1>((*it).second) >= gid) {
+                // the previous range covers the id to resolve
+                components::component_type t = (components::component_type)at_c<0>((*it).second).type_;
+                return (components::component_type)at_c<0>((*it).second).type_;
+            }
+        }
+        return components::component_invalid;
+    }
+
+    void request_handler::handle_decref(request const& req, reply& rep)
+    {
+        try {
+            naming::gid_type id = req.get_id();
+            naming::strip_credit_from_gid(id);
+
+            BOOST_ASSERT(req.get_count() <= HPX_INITIAL_GLOBALCREDIT);
+
+            boost::uint64_t cnt = 0;
+
+            mutex_type::scoped_lock l(registry_mtx_);
+            refcnt_store_type::iterator it = refcnts_.find(id);
+            if (it != refcnts_.end()) 
+            {
+                if ((*it).second < req.get_count()) {
+                    rep = reply(command_decref, bad_parameter,
+                        "Bogus credit while decrementing global reference count.");
+                    return;
+                }
+
+                (*it).second -= req.get_count();
+                cnt = (*it).second;
+
+                if (0 == cnt)
+                    refcnts_.erase(it);   // last reference removes entry
+            }
+            else if (req.get_count() < HPX_INITIAL_GLOBALCREDIT) 
+            {
+                // we insert a new reference count entry with an initial 
+                // count of HPX_INITIAL_GLOBALCREDIT because we assume bind() 
+                // has already created the first reference (plus credits).
+                std::pair<refcnt_store_type::iterator, bool> p = refcnts_.insert(
+                        refcnt_store_type::value_type(id, HPX_INITIAL_GLOBALCREDIT));
+                if (!p.second)
+                {
+                    rep = reply(command_decref, out_of_memory);
+                    return;
+                }
+                it = p.first;
+
+                if ((*it).second < req.get_count()) {
+                    rep = reply(command_decref, bad_parameter,
+                        "Bogus credit while decrementing global reference count.");
+                    return;
+                }
+
+                (*it).second -= req.get_count();
+                cnt = (*it).second;
+
+                if (0 == cnt)
+                    refcnts_.erase(it);   // last reference removes entry
+            }
+            l.unlock();
+
+            components::component_type t = components::component_invalid;
+            if (0 == cnt) 
+            {
+                t = get_component_type(id);
+                if (t == components::component_invalid) {
+                    rep = reply(command_decref, bad_component_type,
+                        "Unknown component type while decrementing global reference count.");
+                    return;
+                }
+            }
+            rep = reply(command_decref, cnt, t);
+        }
+        catch (std::bad_alloc) {
+            rep = reply(command_decref, out_of_memory);
+        }
+        catch (...) {
+            rep = reply(command_decref, internal_server_error);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     void request_handler::handle_unbind_range(request const& req, reply& rep)
     {
         try {
@@ -440,7 +605,11 @@ namespace hpx { namespace naming { namespace server
                 using boost::fusion::at_c;
 
                 mutex_type::scoped_lock l(registry_mtx_);
-                registry_type::iterator it = registry_.find(req.get_id());
+
+                naming::gid_type id = req.get_id();
+                naming::strip_credit_from_gid(id);
+
+                registry_type::iterator it = registry_.find(id);
                 if (it != registry_.end()) {
                     if (at_c<1>((*it).second) != req.get_count()) {
                         // this is an error since we can't use a different 
@@ -473,20 +642,24 @@ namespace hpx { namespace naming { namespace server
             using boost::fusion::at_c;
 
             mutex_type::scoped_lock l(registry_mtx_);
-            registry_type::iterator it = registry_.lower_bound(req.get_id());
+
+            naming::gid_type id = req.get_id();
+            naming::strip_credit_from_gid(id);
+
+            registry_type::iterator it = registry_.lower_bound(id);
             if (it != registry_.end()) {
-                if ((*it).first == req.get_id()) {
+                if ((*it).first == id) {
                     // found the exact match in the registry
                     rep = reply(command_resolve, at_c<0>((*it).second));
                 }
                 else if (it != registry_.begin()) {
                     --it;
-                    if ((*it).first + at_c<1>((*it).second) > req.get_id()) {
+                    if ((*it).first + at_c<1>((*it).second) > id) {
                         // the previous range covers the given global id
 
                         // the only limitation while binding blocks of global 
                         // ids is that these have to have identical msb's
-                        if (req.get_id().get_msb() != (*it).first.get_msb()) {
+                        if (id.get_msb() != (*it).first.get_msb()) {
                             // no existing range covers the given global id
                             rep = reply(command_resolve, internal_server_error,
                                 "msb's of global ids should match");
@@ -496,7 +669,7 @@ namespace hpx { namespace naming { namespace server
                             // given global id
                             naming::address addr (at_c<0>((*it).second));
                             boost::uint64_t gid_offset = 
-                                req.get_id().get_lsb() - (*it).first.get_lsb();
+                                id.get_lsb() - (*it).first.get_lsb();
                             addr.address_ += gid_offset * at_c<2>((*it).second);
                             rep = reply(command_resolve, addr);
                         }
@@ -513,11 +686,11 @@ namespace hpx { namespace naming { namespace server
             }
             else if (!registry_.empty()) {
                 --it;
-                if ((*it).first + at_c<1>((*it).second) >= req.get_id()) {
+                if ((*it).first + at_c<1>((*it).second) >= id) {
                     // the previous range covers the id to resolve
                     naming::address addr (at_c<0>((*it).second));
                     boost::uint64_t gid_offset = 
-                        req.get_id().get_lsb() - (*it).first.get_lsb();
+                        id.get_lsb() - (*it).first.get_lsb();
                     addr.address_ += gid_offset * at_c<2>((*it).second);
                     rep = reply(command_resolve, addr);
                 }
@@ -563,12 +736,16 @@ namespace hpx { namespace naming { namespace server
             error s = no_success;
             {
                 mutex_type::scoped_lock l(ns_registry_mtx_);
+
+                naming::gid_type id = req.get_id();
+                naming::strip_credit_from_gid(id);
+
                 ns_registry_type::iterator it = ns_registry_.find(req.get_name());
                 if (it != ns_registry_.end())
-                    (*it).second = req.get_id();
+                    (*it).second = id;
                 else {
                     ns_registry_.insert(ns_registry_type::value_type(
-                        req.get_name(), req.get_id()));
+                        req.get_name(), id));
                     s = success;    // created new entry
                 }
             }
@@ -687,13 +864,28 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    void request_handler::handle_requests(std::vector<request> const& reqs, 
+        std::vector<reply>& reps)
+    {
+        BOOST_FOREACH(request const& req, reqs)
+        {
+            reply rep;
+            handle_request(req, rep);
+            reps.push_back(rep);
+        }
+    }
+
     void request_handler::handle_request(request const& req, reply& rep)
     {
         LAGAS_(info) << "request: " << req;
 
         switch (req.get_command()) {
         case command_getprefix:
-            handle_getprefix(req, rep);
+            handle_getprefix(req, rep, true);
+            break;
+
+        case command_getprefix_for_site:
+            handle_getprefix(req, rep, false);
             break;
 
         case command_getconsoleprefix:
@@ -718,6 +910,14 @@ namespace hpx { namespace naming { namespace server
 
         case command_bind_range:
             handle_bind_range(req, rep);
+            break;
+
+        case command_incref:
+            handle_incref(req, rep);
+            break;
+
+        case command_decref:
+            handle_decref(req, rep);
             break;
 
         case command_unbind_range:

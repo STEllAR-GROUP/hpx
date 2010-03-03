@@ -105,7 +105,7 @@ namespace hpx { namespace threads
     ///                   thread referenced by the \a id parameter. If the 
     ///                   thread is not known to the threadmanager the return 
     ///                   value will be \a naming::invalid_id.
-    HPX_API_EXPORT naming::id_type get_thread_gid(thread_id_type id);
+    HPX_API_EXPORT naming::id_type const& get_thread_gid(thread_id_type id);
 
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_thread_state is part of the thread related API 

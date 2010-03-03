@@ -28,7 +28,7 @@ namespace hpx { namespace applier
     {
         // If remote, create a new parcel to be sent to the destination
         // Create a new parcel with the gid, action, and arguments
-        parcelset::parcel p (gid, new Action());
+        parcelset::parcel p (gid.get_gid(), new Action());
         if (components::component_invalid == addr.type_)
             addr.type_ = components::get_component_type<typename Action::component_type>();
         p.set_destination_addr(addr);   // avoid to resolve address again
@@ -53,23 +53,23 @@ namespace hpx { namespace applier
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid, addr)) 
+        if (hpx::applier::get_applier().address_is_local(gid.get_gid(), addr)) 
             return apply_l<Action>(addr);   // apply locally
 
         // apply remotely
         return apply_r<Action>(addr, gid);
     }
 
-    template <typename Action>
-    bool apply (naming::full_address& fa)
-    {
-        // Determine whether the gid is local or remote
-        if (hpx::applier::get_applier().address_is_local(fa)) 
-            return apply_l<Action>(fa.caddr());   // apply locally
-
-        // apply remotely
-        return apply_r<Action>(fa.addr(), fa.cgid());
-    }
+//     template <typename Action>
+//     bool apply (naming::full_address& fa)
+//     {
+//         // Determine whether the gid is local or remote
+//         if (hpx::applier::get_applier().address_is_local(fa)) 
+//             return apply_l<Action>(fa.caddr());   // apply locally
+// 
+//         // apply remotely
+//         return apply_r<Action>(fa.addr(), fa.cgid());
+//     }
 
     /// \note A call to applier's apply function would look like:
     /// \code
@@ -83,7 +83,7 @@ namespace hpx { namespace applier
 
         // If remote, create a new parcel to be sent to the destination
         // Create a new parcel with the gid, action, and arguments
-        parcelset::parcel p (gid, new Action(), cont);
+        parcelset::parcel p (gid.get_gid(), new Action(), cont);
         if (components::component_invalid == addr.type_)
             addr.type_ = components::get_component_type<typename Action::component_type>();
         p.set_destination_addr(addr);   // avoid to resolve address again
@@ -109,23 +109,23 @@ namespace hpx { namespace applier
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid, addr)) 
+        if (hpx::applier::get_applier().address_is_local(gid.get_gid(), addr)) 
             return apply_l<Action>(c, addr);
 
         // apply remotely
         return apply_r<Action>(addr, c, gid);
     }
 
-    template <typename Action>
-    bool apply (actions::continuation* c, naming::full_address& fa)
-    {
-        // Determine whether the gid is local or remote
-        if (hpx::applier::get_applier().address_is_local(fa)) 
-            return apply_l<Action>(c, fa.caddr());
-
-        // apply remotely
-        return apply_r<Action>(fa.addr(), c, fa.cgid());
-    }
+//     template <typename Action>
+//     bool apply (actions::continuation* c, naming::full_address& fa)
+//     {
+//         // Determine whether the gid is local or remote
+//         if (hpx::applier::get_applier().address_is_local(fa)) 
+//             return apply_l<Action>(c, fa.caddr());
+// 
+//         // apply remotely
+//         return apply_r<Action>(fa.addr(), c, fa.cgid());
+//     }
 
     template <typename Action>
     bool apply_c (naming::address& addr, naming::id_type const& contgid, 
@@ -134,12 +134,12 @@ namespace hpx { namespace applier
         return apply_r<Action>(addr, new actions::continuation(contgid), gid);
     }
 
-    template <typename Action>
-    bool apply_c (naming::address& addr, naming::full_address const& contaddr, 
-        naming::id_type const& gid)
-    {
-        return apply_r<Action>(addr, new actions::continuation(contaddr), gid);
-    }
+//     template <typename Action>
+//     bool apply_c (naming::address& addr, naming::full_address const& contaddr, 
+//         naming::id_type const& gid)
+//     {
+//         return apply_r<Action>(addr, new actions::continuation(contaddr), gid);
+//     }
 
     template <typename Action>
     bool apply_c (naming::id_type const& contgid, naming::id_type const& gid)
@@ -147,11 +147,11 @@ namespace hpx { namespace applier
         return apply<Action>(new actions::continuation(contgid), gid);
     }
 
-    template <typename Action>
-    bool apply_c (naming::full_address const& contaddr, naming::id_type const& gid)
-    {
-        return apply<Action>(new actions::continuation(contaddr), gid);
-    }
+//     template <typename Action>
+//     bool apply_c (naming::full_address const& contaddr, naming::id_type const& gid)
+//     {
+//         return apply<Action>(new actions::continuation(contaddr), gid);
+//     }
 
     ///////////////////////////////////////////////////////////////////////////
     // one parameter version
@@ -161,13 +161,29 @@ namespace hpx { namespace applier
     {
         // If remote, create a new parcel to be sent to the destination
         // Create a new parcel with the gid, action, and arguments
-        parcelset::parcel p (gid, new Action(arg0));
+        parcelset::parcel p (gid.get_gid(), new Action(arg0));
         if (components::component_invalid == addr.type_)
             addr.type_ = components::get_component_type<typename Action::component_type>();
         p.set_destination_addr(addr);   // avoid to resolve address again
 
         // Send the parcel through the parcel handler
         hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
+        return false;     // destination is remote
+    }
+
+    template <typename Action, typename Arg0>
+    bool apply_r_sync (naming::address& addr, naming::id_type const& gid, 
+        Arg0 const& arg0)
+    {
+        // If remote, create a new parcel to be sent to the destination
+        // Create a new parcel with the gid, action, and arguments
+        parcelset::parcel p (gid.get_gid(), new Action(arg0));
+        if (components::component_invalid == addr.type_)
+            addr.type_ = components::get_component_type<typename Action::component_type>();
+        p.set_destination_addr(addr);   // avoid to resolve address again
+
+        // Send the parcel through the parcel handler
+        hpx::applier::get_applier().get_parcel_handler().sync_put_parcel(p);
         return false;     // destination is remote
     }
 
@@ -185,23 +201,23 @@ namespace hpx { namespace applier
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid, addr)) 
+        if (hpx::applier::get_applier().address_is_local(gid.get_gid(), addr)) 
             return apply_l<Action>(addr, arg0);   // apply locally
 
         // apply remotely
         return apply_r<Action>(addr, gid, arg0);
     }
 
-    template <typename Action, typename Arg0>
-    bool apply (naming::full_address& fa, Arg0 const& arg0)
-    {
-        // Determine whether the gid is local or remote
-        if (hpx::applier::get_applier().address_is_local(fa)) 
-            return apply_l<Action>(fa.caddr(), arg0);   // apply locally
-
-        // apply remotely
-        return apply_r<Action>(fa.addr(), fa.cgid(), arg0);
-    }
+//     template <typename Action, typename Arg0>
+//     bool apply (naming::full_address& fa, Arg0 const& arg0)
+//     {
+//         // Determine whether the gid is local or remote
+//         if (hpx::applier::get_applier().address_is_local(fa)) 
+//             return apply_l<Action>(fa.caddr(), arg0);   // apply locally
+// 
+//         // apply remotely
+//         return apply_r<Action>(fa.addr(), fa.cgid(), arg0);
+//     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Arg0>
@@ -212,7 +228,7 @@ namespace hpx { namespace applier
 
         // If remote, create a new parcel to be sent to the destination
         // Create a new parcel with the gid, action, and arguments
-        parcelset::parcel p (gid, new Action(arg0), cont);
+        parcelset::parcel p (gid.get_gid(), new Action(arg0), cont);
         if (components::component_invalid == addr.type_)
             addr.type_ = components::get_component_type<typename Action::component_type>();
         p.set_destination_addr(addr);   // avoid to resolve address again
@@ -239,24 +255,24 @@ namespace hpx { namespace applier
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid, addr)) 
+        if (hpx::applier::get_applier().address_is_local(gid.get_gid(), addr)) 
             return apply_l<Action>(c, addr, arg0);    // apply locally
 
         // apply remotely
         return apply_r<Action>(addr, c, gid, arg0);
     }
 
-    template <typename Action, typename Arg0>
-    bool apply (actions::continuation* c, naming::full_address& fa, 
-        Arg0 const& arg0)
-    {
-        // Determine whether the gid is local or remote
-        if (hpx::applier::get_applier().address_is_local(fa)) 
-            return apply_l<Action>(c, fa.caddr(), arg0);    // apply locally
-
-        // apply remotely
-        return apply_r<Action>(fa.addr(), c, fa.cgid(), arg0);
-    }
+//     template <typename Action, typename Arg0>
+//     bool apply (actions::continuation* c, naming::full_address& fa, 
+//         Arg0 const& arg0)
+//     {
+//         // Determine whether the gid is local or remote
+//         if (hpx::applier::get_applier().address_is_local(fa)) 
+//             return apply_l<Action>(c, fa.caddr(), arg0);    // apply locally
+// 
+//         // apply remotely
+//         return apply_r<Action>(fa.addr(), c, fa.cgid(), arg0);
+//     }
 
     template <typename Action, typename Arg0>
     bool apply_c (naming::address& addr, naming::id_type const& contgid, 
@@ -265,12 +281,12 @@ namespace hpx { namespace applier
         return apply_r<Action>(addr, new actions::continuation(contgid), gid, arg0);
     }
 
-    template <typename Action, typename Arg0>
-    bool apply_c (naming::address& addr, naming::full_address const& contaddr, 
-        naming::id_type const& gid, Arg0 const& arg0)
-    {
-        return apply_r<Action>(addr, new actions::continuation(contaddr), gid, arg0);
-    }
+//     template <typename Action, typename Arg0>
+//     bool apply_c (naming::address& addr, naming::full_address const& contaddr, 
+//         naming::id_type const& gid, Arg0 const& arg0)
+//     {
+//         return apply_r<Action>(addr, new actions::continuation(contaddr), gid, arg0);
+//     }
 
     template <typename Action, typename Arg0>
     bool apply_c (naming::id_type const& contgid, naming::id_type const& gid, 
@@ -279,12 +295,12 @@ namespace hpx { namespace applier
         return apply<Action>(new actions::continuation(contgid), gid, arg0);
     }
 
-    template <typename Action, typename Arg0>
-    bool apply_c (naming::full_address const& contaddr, naming::id_type const& gid, 
-        Arg0 const& arg0)
-    {
-        return apply<Action>(new actions::continuation(contaddr), gid, arg0);
-    }
+//     template <typename Action, typename Arg0>
+//     bool apply_c (naming::full_address const& contaddr, naming::id_type const& gid, 
+//         Arg0 const& arg0)
+//     {
+//         return apply<Action>(new actions::continuation(contaddr), gid, arg0);
+//     }
 
     // bring in the rest of the apply<> overloads
     #include <hpx/runtime/applier/apply_implementations.hpp>

@@ -28,10 +28,10 @@ namespace hpx { namespace components { namespace amr
 
     public:
         rk_left()
-          : base_type(naming::invalid_id, false)
+          : base_type(naming::invalid_id)
         {}
-        rk_left(naming::id_type gid, bool freeonexit = false)
-          : base_type(gid, freeonexit)
+        rk_left(naming::id_type gid)
+          : base_type(gid)
         {}
 
         ///////////////////////////////////////////////////////////////////////

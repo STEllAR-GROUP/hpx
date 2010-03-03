@@ -28,11 +28,10 @@ namespace hpx { namespace components { namespace amr
 
     public:
         rk_mesh()
-          : base_type(naming::invalid_id, false)
         {}
 
-        rk_mesh(naming::id_type gid, bool freeonexit = false)
-          : base_type(gid, freeonexit)
+        rk_mesh(naming::id_type gid)
+          : base_type(gid)
         {}
 
         ///////////////////////////////////////////////////////////////////////

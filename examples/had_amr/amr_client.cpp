@@ -39,11 +39,6 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
     {
         naming::id_type here = applier::get_applier().get_runtime_support_gid();
 
-        components::amr::amr_mesh mesh;
-        components::amr::rk_mesh rk_mesh;
-        if ( par.integrator == 0 || par.allowedl == 0 ) mesh.create(here, 1, true);
-        else if ( par.integrator == 1 ) rk_mesh.create(here,1,true);
-
         if ( par.loglevel > 0 ) {
           // over-ride a false command line argument
           do_logging = true;
@@ -53,9 +48,13 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         std::vector<naming::id_type> result_data;
         
         if ( par.integrator == 0 || par.allowedl == 0 ) {
-            result_data = mesh.init_execute(function_type, numvals, numsteps,
+           components::amr::amr_mesh mesh;
+           mesh.create(here);
+           result_data = mesh.init_execute(function_type, numvals, numsteps,
                 do_logging ? logging_type : components::component_invalid, par);
         } else if ( par.integrator == 1 ) {
+            components::amr::rk_mesh rk_mesh;
+            rk_mesh.create(here);
             result_data = rk_mesh.init_execute(function_type, numvals, numsteps,
                 do_logging ? logging_type : components::component_invalid, par);
         }
@@ -76,7 +75,6 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 
         for (std::size_t i = 0; i < result_data.size(); ++i)
             components::stubs::memory_block::free(result_data[i]);
-
     }   // amr_mesh needs to go out of scope before shutdown
 
     // initiate shutdown of the runtime systems on all localities
@@ -179,6 +177,8 @@ private:
 // this is the runtime type we use in this application
 typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> global_runtime_type;
 typedef hpx::runtime_impl<hpx::threads::policies::local_queue_scheduler> local_runtime_type;
+
+#include <crtdbg.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])

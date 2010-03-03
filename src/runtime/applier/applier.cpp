@@ -13,7 +13,7 @@
 namespace hpx { namespace applier
 {
     // 
-    lcos::future_value<naming::id_type> 
+    lcos::future_value<naming::id_type, naming::gid_type> 
     create_async(naming::id_type const& targetgid, 
         components::component_type type, std::size_t count)
     {
@@ -23,7 +23,7 @@ namespace hpx { namespace applier
         typedef 
             components::server::runtime_support::create_component_action
         action_type;
-        return lcos::eager_future<action_type>(targetgid, type, count);
+        return lcos::eager_future<action_type, naming::id_type>(targetgid, type, count);
     }
 
     // 
@@ -34,14 +34,14 @@ namespace hpx { namespace applier
     }
 
     //
-    void destroy (components::component_type type, naming::id_type const& gid)
-    {
-        typedef 
-            components::server::runtime_support::free_component_action 
-        action_type;
-        hpx::applier::apply<action_type>(
-            hpx::applier::get_applier().get_runtime_support_gid(), type, gid);
-    }
+//     void destroy (components::component_type type, naming::id_type const& gid)
+//     {
+//         typedef 
+//             components::server::runtime_support::free_component_action 
+//         action_type;
+//         hpx::applier::apply<action_type>(
+//             hpx::applier::get_applier().get_runtime_support_raw_gid(), type, gid);
+//     }
 
     ///////////////////////////////////////////////////////////////////////////
     static inline threads::thread_state thread_function(
@@ -99,36 +99,40 @@ namespace hpx { namespace applier
     ///////////////////////////////////////////////////////////////////////////
     void register_work_nullary(
         boost::function<void()> const& func, char const* desc, 
-        threads::thread_state state)
+        threads::thread_state state, error_code& ec)
     {
         threads::thread_init_data data(
             boost::bind(&thread_function_nullary, func), desc);
-        hpx::applier::get_applier().get_thread_manager().register_work(data, state);
+        hpx::applier::get_applier().get_thread_manager().
+            register_work(data, state, ec);
     }
 
     void register_work(
         boost::function<void(threads::thread_state_ex)> const& func, 
-        char const* desc, threads::thread_state state)
+        char const* desc, threads::thread_state state, error_code& ec)
     {
         threads::thread_init_data data(
             boost::bind(&thread_function, func), desc);
-        hpx::applier::get_applier().get_thread_manager().register_work(data, state);
+        hpx::applier::get_applier().get_thread_manager().
+            register_work(data, state, ec);
     }
 
     void register_work_plain(
         boost::function<threads::thread_function_type> const& func,
         char const* desc, naming::address::address_type lva,
-        threads::thread_state state)
+        threads::thread_state state, error_code& ec)
     {
         threads::thread_init_data data(func, desc, lva);
-        hpx::applier::get_applier().get_thread_manager().register_work(data, state);
+        hpx::applier::get_applier().get_thread_manager().
+            register_work(data, state, ec);
     }
 
     void register_work_plain(
-        threads::thread_init_data& data, threads::thread_state state)
+        threads::thread_init_data& data, threads::thread_state state,
+        error_code& ec)
     {
-        hpx::applier::get_applier().get_thread_manager().register_work(
-            data, state);
+        hpx::applier::get_applier().get_thread_manager().
+            register_work(data, state, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -209,7 +213,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    naming::id_type get_thread_gid(thread_id_type id)
+    naming::id_type const& get_thread_gid(thread_id_type id)
     {
         return hpx::applier::get_applier().get_thread_manager().get_thread_gid(id);
     }

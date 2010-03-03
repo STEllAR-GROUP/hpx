@@ -132,6 +132,13 @@ namespace hpx { namespace util
             }
         }
 
+        void clear()
+        {
+            mutex_type::scoped_lock lock(mtx_);
+            index_.clear();
+            cont_.clear();
+        }
+
     private:
         mutex_type mtx_;
         size_type max_cache_size_;

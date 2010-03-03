@@ -19,5 +19,4 @@ namespace hpx { namespace components
     set_component_type<server::plain_function>(component_type t)
     { 
     }
-
 }}

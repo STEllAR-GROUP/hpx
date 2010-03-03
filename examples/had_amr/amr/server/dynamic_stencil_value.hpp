@@ -141,8 +141,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::vector<boost::shared_ptr<lcos::counting_semaphore> > sem_out_;
         lcos::counting_semaphore sem_result_;
 
-        std::vector<boost::shared_ptr<in_adaptor_type> > in_;    // adaptors used to gather input
-        std::vector<boost::shared_ptr<out_adaptor_type> > out_;  // adaptors used to provide result
+        std::vector<boost::shared_ptr<in_adaptor_type> > in_;   // adaptors used to gather input
+        std::vector<naming::id_type> out_;                      // adaptors used to provide result
 
         naming::id_type value_gids_[2];               // reference to previous values
         naming::id_type functional_gid_;              // reference to functional code

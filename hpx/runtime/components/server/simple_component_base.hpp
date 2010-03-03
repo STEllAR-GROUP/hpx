@@ -8,7 +8,6 @@
 
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/naming/full_address.hpp>
 
 namespace hpx { namespace components 
 {
@@ -69,8 +68,8 @@ namespace hpx { namespace components
         ///
         /// \returns      The global id (GID)  assigned to this instance of a 
         ///               component
-        naming::id_type const&
-        get_gid() const
+        naming::gid_type const&
+        get_base_gid() const
         {
             if (!gid_) 
             {
@@ -84,7 +83,7 @@ namespace hpx { namespace components
                     HPX_OSSTREAM strm;
                     strm << gid_;
 
-                    gid_ = naming::id_type();   // invalidate GID
+                    gid_ = naming::gid_type();   // invalidate GID
 
                     HPX_THROW_EXCEPTION(duplicate_component_address,
                         "simple_component_base<Component>::get_gid", 
@@ -102,17 +101,17 @@ namespace hpx { namespace components
         ///               instance (global id (GID), local virtual address)
         ///
         /// \returns      This returns \a true if the para,eter \a fa is valid.
-        bool get_full_address(naming::full_address& fa) const
-        {
-            fa.gid() = get_gid();
-            applier::applier& appl = hpx::applier::get_applier();
-            naming::address& addr = fa.addr();
-            addr.locality_ = appl.here();
-            addr.type_ = this_component_type::get_component_type();
-            addr.address_ = 
-                boost::uint64_t(static_cast<this_component_type const*>(this));
-            return true;
-        }
+//         bool get_full_address(naming::full_address& fa) const
+//         {
+//             fa.gid() = get_gid();
+//             applier::applier& appl = hpx::applier::get_applier();
+//             naming::address& addr = fa.addr();
+//             addr.locality_ = appl.here();
+//             addr.type_ = this_component_type::get_component_type();
+//             addr.address_ = 
+//                 boost::uint64_t(static_cast<this_component_type const*>(this));
+//             return true;
+//         }
 
         /// \brief  The function \a get_factory_properties is used to 
         ///         determine, whether instances of the derived component can 
@@ -127,7 +126,7 @@ namespace hpx { namespace components
         }
 
     private:
-        mutable naming::id_type gid_;
+        mutable naming::gid_type gid_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -162,7 +161,6 @@ namespace hpx { namespace components
             p->finalize();
             delete p;
         }
-
     };
 
 }}

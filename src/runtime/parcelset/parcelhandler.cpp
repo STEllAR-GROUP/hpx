@@ -11,6 +11,7 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/container_device.hpp>
+#include <hpx/runtime/naming/detail/resolver_do_undo.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 
@@ -99,7 +100,7 @@ namespace hpx { namespace parcelset
         boost::shared_ptr<std::vector<char> > const& parcel_data)
     {
 //         decode_parcel(parcel_data);
-        if (NULL == tm_) {
+        if (NULL == tm_ || !tm_->is_running()) {
             // this is supported for debugging purposes mainly, it results in
             // the direct execution of the parcel decoding
             decode_parcel(parcel_data);
@@ -137,9 +138,9 @@ namespace hpx { namespace parcelset
     }
 
     bool parcelhandler::get_remote_prefixes(
-        std::vector<naming::id_type>& prefixes) const
+        std::vector<naming::gid_type>& prefixes) const
     {
-        std::vector<naming::id_type> allprefixes;
+        std::vector<naming::gid_type> allprefixes;
         bool result = resolver_.get_prefixes(allprefixes);
         if (!result) return false;
 
@@ -147,6 +148,112 @@ namespace hpx { namespace parcelset
         std::remove_copy_if(allprefixes.begin(), allprefixes.end(), 
             std::back_inserter(prefixes), _1 == prefix_);
         return !prefixes.empty();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // this handler is called whenever the parcel has been sent
+    void release_do_undo(boost::system::error_code const& e, 
+            std::size_t size, parcelhandler::handler_type f,
+            boost::shared_ptr<naming::detail::bulk_resolver_helper> do_undo)
+    {
+        if (e)
+            do_undo->undo();
+        f(e, size);   // call supplied handler in any case
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // prepare the given gid, note: this function modifies the passed id
+    void prepare_gid(
+        boost::shared_ptr<naming::detail::bulk_resolver_helper> do_undo, 
+        naming::id_type const& id)
+    {
+        // request new credits from AGAS if needed (i.e. gid is credit managed
+        // and the new gid has no credits after splitting)
+        boost::uint16_t oldcredits = id.get_credit();
+        if (0 != oldcredits) 
+        {
+            naming::id_type newid(id.split_credits());
+            if (0 == newid.get_credit())
+            {
+                BOOST_ASSERT(1 == id.get_credit());
+                do_undo->incref(id, HPX_INITIAL_GLOBALCREDIT, id, oldcredits);
+                do_undo->incref(newid, HPX_INITIAL_GLOBALCREDIT, id, oldcredits);
+            }
+            const_cast<naming::id_type&>(id) = newid;
+        }
+    }
+
+    // prepare all GIDs stored in an action
+    void prepare_action(
+        boost::shared_ptr<naming::detail::bulk_resolver_helper> do_undo, 
+        actions::action_type action)
+    {
+        action->enumerate_argument_gids(boost::bind(prepare_gid, do_undo, _1));
+    }
+
+    // prepare all GIDs stored in a continuation
+    void prepare_continuation(
+        boost::shared_ptr<naming::detail::bulk_resolver_helper> do_undo, 
+        actions::continuation_type cont)
+    {
+        if (cont)
+            cont->enumerate_argument_gids(boost::bind(prepare_gid, do_undo, _1));
+    }
+
+    // walk through all data in this parcel and register all required AGAS 
+    // operations with the given resolver_helper
+    void prepare_parcel(
+        boost::shared_ptr<naming::detail::bulk_resolver_helper> do_undo, 
+        parcel& p, error_code& ec)
+    {
+        prepare_gid(do_undo, p.get_source());                // we need to register the source gid
+        prepare_action(do_undo, p.get_action());             // all gids stored in the action
+        prepare_continuation(do_undo, p.get_continuation()); // all gids in the continuation
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
+
+    parcel_id parcelhandler::put_parcel(parcel& p, handler_type f)
+    {
+        // properly initialize parcel
+        init_parcel(p);
+
+        // asynchronously resolve destination address, if needed
+        boost::shared_ptr<naming::detail::bulk_resolver_helper> do_undo(
+            new naming::detail::bulk_resolver_helper(resolver_));
+
+        if (!p.get_destination_addr())
+        { 
+            naming::address addr;
+            if (!resolver_.resolve_cached(p.get_destination(), addr)) {
+                // resolve the remote address
+                do_undo->resolve(p.get_destination(), p);
+            }
+            else {
+                p.set_destination_addr(addr);
+            }
+        }
+
+        // prepare all additional AGAS related operations for this parcel
+        error_code ec;
+        prepare_parcel(do_undo, p, ec);
+        if (ec) {
+            // parcel preparation failed
+            HPX_THROW_EXCEPTION(no_success, 
+                "parcelhandler::put_parcel", ec.get_message());
+        }
+
+        // execute all necessary AGAS operations (if any)
+        do_undo->execute(ec);
+        if (ec) {
+            // one or more AGAS operations failed
+            HPX_THROW_EXCEPTION(no_success, 
+                "parcelhandler::put_parcel", ec.get_message());
+        }
+
+        // send the parcel to its destination, return parcel id of the 
+        // parcel being sent
+        return pp_.put_parcel(p, boost::bind(&release_do_undo, _1, _2, f, do_undo));
     }
 
 ///////////////////////////////////////////////////////////////////////////////

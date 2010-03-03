@@ -95,6 +95,7 @@ set (hpxlib_actions_HEADERS
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/component_action_implementations.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/continuation.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/continuation_impl.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/actions/manage_object_action.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action_implementations.hpp)
 source_group("Header Files\\runtime\\actions" 
@@ -150,12 +151,13 @@ source_group("Header Files\\runtime\\components\\stubs"
 # naming
 set (hpxlib_naming_HEADERS
     ${hpx_SOURCE_DIR}/hpx/runtime/naming/address.hpp
-    ${hpx_SOURCE_DIR}/hpx/runtime/naming/full_address.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/naming/bulk_resolver_client.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/naming/locality.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/naming/name.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/naming/resolver_client.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/naming/resolver_client_connection.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/naming/resolver_server.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/naming/detail/resolver_do_undo.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/naming/server/connection.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/naming/server/reply.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/naming/server/request.hpp
@@ -313,11 +315,12 @@ source_group ("Source Files\\runtime\\components\\server"
 # naming 
 set (hpxlib_naming_SOURCES
     ${hpx_SOURCE_DIR}/src/runtime/naming/address.cpp
-    ${hpx_SOURCE_DIR}/src/runtime/naming/full_address.cpp
+    ${hpx_SOURCE_DIR}/src/runtime/naming/bulk_resolver_client.cpp
     ${hpx_SOURCE_DIR}/src/runtime/naming/locality.cpp
     ${hpx_SOURCE_DIR}/src/runtime/naming/name.cpp
     ${hpx_SOURCE_DIR}/src/runtime/naming/resolver_client.cpp
     ${hpx_SOURCE_DIR}/src/runtime/naming/resolver_server.cpp
+    ${hpx_SOURCE_DIR}/src/runtime/naming/detail/resolver_do_undo.cpp
     ${hpx_SOURCE_DIR}/src/runtime/naming/server/reply.cpp
     ${hpx_SOURCE_DIR}/src/runtime/naming/server/request.cpp
     ${hpx_SOURCE_DIR}/src/runtime/naming/server/request_handler.cpp)

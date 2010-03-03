@@ -56,7 +56,6 @@ namespace hpx { namespace components { namespace amr { namespace server
     free_helper_sync(naming::id_type& gid)
     {
         components::stubs::memory_block::free_sync(gid);
-        gid = naming::invalid_id;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -241,7 +240,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
 
         for (std::size_t i = 0; i < outstencilsize_; ++i)
-            gids.push_back(out_[i]->get_gid());
+            gids.push_back(out_[i]);
         return gids;
     }
 
@@ -296,8 +295,10 @@ namespace hpx { namespace components { namespace amr { namespace server
         {
             sem_in_[i].reset(new lcos::counting_semaphore(1));
             sem_out_[i].reset(new lcos::counting_semaphore());
-            out_[i].reset(new out_adaptor_type(
-                boost::bind(&dynamic_stencil_value::get_value, this, i)));
+            out_[i] = naming::id_type(
+                components::server::create_one<out_adaptor_type>(
+                    boost::bind(&dynamic_stencil_value::get_value, this, i)),
+                    naming::id_type::managed);
         }
     }
 

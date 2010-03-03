@@ -158,16 +158,16 @@ namespace hpx { namespace lcos
         {}
 
         /// \brief Return the global id of this \a future instance
-        naming::id_type get_gid() const
+        naming::gid_type get_gid() const
         {
             return impl_->get_gid();
         }
 
-        /// \brief Return the full address of this \a future instance
-        bool get_full_address(naming::full_address& fa) const
-        {
-            return impl_->get_full_address(fa);
-        }
+//         /// \brief Return the full address of this \a future instance
+//         bool get_full_address(naming::full_address& fa) const
+//         {
+//             return impl_->get_full_address(fa);
+//         }
 
         /// Reset the future_value to allow to restart an asynchronous 
         /// operation. Allows any subsequent set_data operation to succeed.

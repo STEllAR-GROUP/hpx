@@ -13,6 +13,7 @@
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/util/static.hpp>
 #include <hpx/util/util.hpp>
 
@@ -26,7 +27,6 @@
 namespace hpx { namespace components { namespace server 
 {
     class memory_block;     // forward declaration only
-
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -40,15 +40,39 @@ namespace hpx { namespace components { namespace server { namespace detail
     public:
         /// This constructor is called on the locality where there memory_block
         /// is hosted
-        memory_block_header(server::memory_block* wrapper, std::size_t size)
-          : count_(0), size_(size), wrapper_(wrapper)
-        {}
+        memory_block_header(server::memory_block* wrapper, std::size_t size,
+                hpx::actions::manage_object_action_base const& act)
+          : count_(0), size_(size), wrapper_(wrapper), 
+            managing_object_(act.get_instance())
+        {
+            if (act.construct())
+                act.construct()(this->get_ptr(), size);
+        }
+
+        memory_block_header(server::memory_block* wrapper, 
+                memory_block_header const* rhs, std::size_t size,
+                hpx::actions::manage_object_action_base const& act)
+          : count_(0), size_(size), wrapper_(wrapper), 
+            managing_object_(act.get_instance())
+        {
+            if (act.clone())
+                act.clone()(this->get_ptr(), rhs->get_ptr(), size);
+        }
 
         /// This constructor is called whenever a memory_block gets 
         /// de-serialized
-        explicit memory_block_header(std::size_t size)
-          : count_(0), size_(size), wrapper_(NULL)
+        explicit memory_block_header(std::size_t size,
+                hpx::actions::manage_object_action_base const& act)
+          : count_(0), size_(size), wrapper_(NULL), 
+            managing_object_(act.get_instance())
         {}
+
+        ~memory_block_header()
+        {
+            // invoke destructor, if needed
+            if (this->managing_object_.destruct())
+                this->managing_object_.destruct()(this->get_ptr());
+        }
 
         /// \brief get_ptr returns the address of the first byte allocated for 
         ///        this memory_block. 
@@ -63,6 +87,12 @@ namespace hpx { namespace components { namespace server { namespace detail
 
         /// return the size of the memory block contained in this instance
         std::size_t get_size() const { return size_; }
+
+        /// return the reference to the managing object
+        actions::manage_object_action_base const& get_managing_object() const
+        {
+            return managing_object_;
+        }
 
         /// Return whether this instance is the master instance of this
         /// memory block
@@ -80,6 +110,14 @@ namespace hpx { namespace components { namespace server { namespace detail
             BOOST_ASSERT(false);    // this shouldn't be ever called
         }
 
+        template <typename ManagedType>
+        naming::id_type const& get_gid(ManagedType* p) const
+        {
+            if (!id_) 
+                id_ = naming::id_type(p->get_base_gid(), naming::id_type::managed);
+            return id_;
+        }
+
     protected:
         friend void intrusive_ptr_add_ref(memory_block_header* p);
         friend void intrusive_ptr_release(memory_block_header* p);
@@ -87,6 +125,8 @@ namespace hpx { namespace components { namespace server { namespace detail
         boost::detail::atomic_count count_;
         std::size_t size_;
         server::memory_block* wrapper_;
+        mutable naming::id_type id_;
+        actions::manage_object_action_base const& managing_object_;
     };
 
     /// support functions for boost::intrusive_ptr
@@ -97,10 +137,11 @@ namespace hpx { namespace components { namespace server { namespace detail
 
     inline void intrusive_ptr_release(memory_block_header* p)
     {
-        if (0 == --p->count_)
-            delete (boost::uint8_t*)p;    // memory was allocated as array of uint8_t's
+        if (0 == --p->count_) {
+            p->~memory_block_header();
+            delete [] (boost::uint8_t*)p;
+        }
     }
-
 }}}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -211,7 +252,12 @@ namespace hpx { namespace components
         void save(Archive & ar, const unsigned int version) const
         {
             std::size_t size = data_->get_size();
+            actions::manage_object_action_base* act = 
+                const_cast<actions::manage_object_action_base*>(
+                    &data_->get_managing_object().get_instance());
+
             ar << size;
+            ar << act;
             ar << boost::serialization::make_array(data_->get_ptr(), data_->get_size());
         }
 
@@ -219,14 +265,17 @@ namespace hpx { namespace components
         void load(Archive & ar, const unsigned int version)
         {
             std::size_t size = 0;
+            actions::manage_object_action_base* act = NULL;
+
             ar >> size;
+            ar >> act;
 
-            boost::uint8_t* p = new boost::uint8_t[
-                size + sizeof(server::detail::memory_block_header)];
-            new ((server::detail::memory_block_header*)p) 
-                server::detail::memory_block_header(size);
-
-            data_.reset((server::detail::memory_block_header*)p);
+            server::detail::memory_block_header* p = 
+                (server::detail::memory_block_header*)new boost::uint8_t[
+                    size + sizeof(server::detail::memory_block_header)];
+            data_.reset(new (p) server::detail::memory_block_header(
+                size, act->get_instance()));
+            delete act;
 
             ar >> boost::serialization::make_array(data_->get_ptr(), size);
         }
@@ -235,7 +284,6 @@ namespace hpx { namespace components
     private:
         boost::intrusive_ptr<server::detail::memory_block_header> data_;
     };
-
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -249,6 +297,9 @@ namespace hpx { namespace components { namespace server { namespace detail
     /// memory_block_header directly followed by the actual raw memory.
     class HPX_EXPORT memory_block : public memory_block_header
     {
+        typedef actions::manage_object_action_base::destruct_function 
+            destruct_function;
+
     public:
         // parcel action code: the action to be performed on the destination 
         // object (the accumulator)
@@ -260,10 +311,17 @@ namespace hpx { namespace components { namespace server { namespace detail
             memory_block_clone = 3
         };
 
-        memory_block(server::memory_block* wrapper, std::size_t size)
-          : memory_block_header(wrapper, size)
+        // construct a new memory block
+        memory_block(server::memory_block* wrapper, std::size_t size,
+                hpx::actions::manage_object_action_base const& act)
+          : memory_block_header(wrapper, size, act)
         {}
-        ~memory_block()
+
+        // clone memory from rhs
+        memory_block(server::memory_block* wrapper, std::size_t size,
+                detail::memory_block_header const* rhs, 
+                hpx::actions::manage_object_action_base const& act)
+          : memory_block_header(wrapper, rhs, size, act)
         {}
 
         ///////////////////////////////////////////////////////////////////////
@@ -286,7 +344,7 @@ namespace hpx { namespace components { namespace server { namespace detail
         void checkin(components::memory_block_data const& data);
 
         /// Clone this memory_block
-        naming::id_type clone();
+        naming::gid_type clone();
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
@@ -309,7 +367,7 @@ namespace hpx { namespace components { namespace server { namespace detail
         > checkin_action;
 
         typedef hpx::actions::direct_result_action0<
-            memory_block, naming::id_type, memory_block_clone, 
+            memory_block, naming::gid_type, memory_block_clone, 
             &memory_block::clone
         > clone_action;
     };
@@ -348,27 +406,27 @@ namespace hpx { namespace components { namespace server
         ///
         /// \param appl [in] The applier to be used for construction of the new
         ///             wrapped instance. 
-        memory_block(std::size_t size) 
+        memory_block(std::size_t size, 
+                actions::manage_object_action_base const& act) 
           : component_(0) 
         {
-            boost::uint8_t* p = new boost::uint8_t[size + sizeof(detail::memory_block_header)];
-            new ((detail::memory_block*)p) detail::memory_block(this, size);
-            component_.reset((detail::memory_block_header*)p);
+            detail::memory_block* p = (detail::memory_block*)new boost::uint8_t[
+                sizeof(detail::memory_block_header) + size];
+            new (p) detail::memory_block(this, size, act);
+            component_.reset(p);
         }
 
         /// \brief Construct a memory_block instance as a plain copy of the 
         ///        parameter
-        memory_block(detail::memory_block_header const* rhs) 
+        memory_block(detail::memory_block_header const* rhs,
+                actions::manage_object_action_base const& act) 
           : component_(0) 
         {
             std::size_t size = rhs->get_size();
             detail::memory_block* p = (detail::memory_block*)new boost::uint8_t[
-                size + sizeof(detail::memory_block_header)];
-            new (p) detail::memory_block(this, size);
-
-            using namespace std;    // some systems have memcpy in std
-            memcpy(p->get_ptr(), rhs->get_ptr(), size);
-            component_.reset((detail::memory_block_header*)p);
+                sizeof(detail::memory_block_header) + size];
+            new (p) detail::memory_block(this, size, rhs, act);
+            component_.reset(p);
         }
 
         /// \brief finalize() will be called just before the instance gets 
@@ -444,8 +502,9 @@ namespace hpx { namespace components { namespace server
         static heap_type& get_heap()
         {
             // ensure thread-safe initialization
-            util::static_<heap_type, wrapper_heap_tag> heap(get_component_type());
-            return heap.get();
+            util::static_<heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT> 
+                heap(get_component_type());
+            return heap.get(get_runtime_instance_number());
         }
 
     public:
@@ -492,19 +551,20 @@ namespace hpx { namespace components { namespace server
         ///         parameter normally used to specify the number of objects to 
         ///         be created. It is interpreted as the number of bytes to 
         ///         allocate for the new memory_block.
-        static memory_block* create(std::size_t count)
+        static memory_block* create(std::size_t count,
+            actions::manage_object_action_base const& act)
         {
             // allocate the memory
             memory_block* p = get_heap().alloc();
-            return new (p) memory_block(count);
+            return new (p) memory_block(count, act);
         }
 
-        static memory_block* 
-        create(detail::memory_block_header const* rhs)
+        static memory_block* create(detail::memory_block_header const* rhs,
+            actions::manage_object_action_base const& act)
         {
             // allocate the memory
             memory_block* p = get_heap().alloc();
-            return new (p) memory_block(rhs);
+            return new (p) memory_block(rhs, act);
         }
 
         /// \brief  The function \a destroy is used for deletion and 
@@ -537,8 +597,12 @@ namespace hpx { namespace components { namespace server
 
     public:
         ///
-        naming::id_type 
-        get_gid() const
+        naming::id_type const& get_gid() const
+        {
+            return get_checked()->get_gid(this);
+        }
+
+        naming::gid_type get_base_gid() const
         {
             return get_heap().get_gid(const_cast<memory_block*>(this));
         }
@@ -551,7 +615,6 @@ namespace hpx { namespace components { namespace server
         ///        a single pointer
         boost::intrusive_ptr<detail::memory_block_header> component_;
     };
-
 }}}
 
 #endif

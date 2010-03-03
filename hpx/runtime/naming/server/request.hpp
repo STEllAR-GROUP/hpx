@@ -34,18 +34,21 @@ namespace hpx { namespace naming { namespace server
         command_getprefix = 0,      ///< return a unique prefix for the requesting site
         command_getconsoleprefix = 1, ///< return the prefix of the console locality
         command_getprefixes = 2,    ///< return prefixes for all known localities in the system
-        command_get_component_id = 3,   ///< return an unique component type
-        command_register_factory = 4,   ///< register a factory for a component type
-        command_getidrange = 5,     ///< return a unique range of ids for the requesting site
-        command_bind_range = 6,     ///< bind a range of addresses to a range of global ids
-        command_unbind_range = 7,   ///< remove binding for a range of global ids
-        command_resolve = 8,        ///< resolve a global id to an address
-        command_queryid = 9,        ///< query for a global id associated with a namespace name (string)
-        command_registerid = 10,    ///< associate a namespace name with a global id
-        command_unregisterid = 11,  ///< remove association of a namespace name with a global id
-        command_statistics_count = 12,   ///< return some usage statistics: execution count 
-        command_statistics_mean = 13,    ///< return some usage statistics: average server execution time
-        command_statistics_moment2 = 14, ///< return some usage statistics: 2nd moment of server execution time
+        command_getprefix_for_site = 3, ///< return prefix for the given site
+        command_get_component_id = 4,   ///< return an unique component type
+        command_register_factory = 5,   ///< register a factory for a component type
+        command_getidrange = 6,     ///< return a unique range of ids for the requesting site
+        command_bind_range = 7,     ///< bind a range of addresses to a range of global ids
+        command_incref = 8,         ///< increment global reference count for the given id
+        command_decref = 9,         ///< decrement global reference count for the given id
+        command_unbind_range = 10,  ///< remove binding for a range of global ids
+        command_resolve = 11,       ///< resolve a global id to an address
+        command_queryid = 12,       ///< query for a global id associated with a namespace name (string)
+        command_registerid = 13,    ///< associate a namespace name with a global id
+        command_unregisterid = 14,  ///< remove association of a namespace name with a global id
+        command_statistics_count = 15,   ///< return some usage statistics: execution count 
+        command_statistics_mean = 16,    ///< return some usage statistics: average server execution time
+        command_statistics_moment2 = 17, ///< return some usage statistics: 2nd moment of server execution time
         command_lastcommand
     };
 
@@ -71,18 +74,18 @@ namespace hpx { namespace naming { namespace server
         {}
 
         // get_id_range
-        request(agas_server_command c, locality const& l, std::size_t count) 
+        request(agas_server_command c, locality const& l, boost::uint32_t count) 
           : command_(c), count_(count), site_(l)
         {}
 
         // resolve
-        request(agas_server_command c, naming::id_type const& id) 
+        request(agas_server_command c, naming::gid_type const& id) 
           : command_(c), id_(id)
         {}
 
         // registerid, register_factory
         request(agas_server_command c, std::string const& ns_name, 
-                naming::id_type const& id) 
+                naming::gid_type const& id) 
           : command_(c), id_(id), name_(ns_name)
         {}
 
@@ -93,14 +96,15 @@ namespace hpx { namespace naming { namespace server
         {}
 
         // bind_range
-        request(agas_server_command c, naming::id_type id, std::size_t count, 
-                address const& addr, std::ptrdiff_t offset) 
+        request(agas_server_command c, naming::gid_type id, 
+                std::size_t count, address const& addr, std::ptrdiff_t offset) 
           : command_(c), id_(id), count_(count), 
             addr_(addr), offset_(offset)
         {}
 
-        // unbind_range
-        request(agas_server_command c, naming::id_type id, std::size_t count) 
+        // unbind_range, incref, decref
+        request(agas_server_command c, naming::gid_type const& id, 
+              boost::uint32_t count) 
           : command_(c), id_(id), count_(count)
         {}
 
@@ -109,12 +113,12 @@ namespace hpx { namespace naming { namespace server
             return command_;
         }
 
-        naming::id_type const& get_id() const
+        naming::gid_type const& get_id() const
         {
             return id_;
         }
 
-        std::size_t const& get_count() const
+        boost::uint32_t const& get_count() const
         {
             return count_;
         }
@@ -175,6 +179,8 @@ namespace hpx { namespace naming { namespace server
                 ar << offset_;
                 break;
 
+            case command_incref:
+            case command_decref:
             case command_unbind_range:
                 ar << id_;
                 ar << count_;
@@ -204,6 +210,7 @@ namespace hpx { namespace naming { namespace server
                 ar << isconsole_;
                 break;
 
+            case command_getprefix_for_site:
             case command_getconsoleprefix:
             case command_statistics_count:
             case command_statistics_mean:
@@ -239,6 +246,8 @@ namespace hpx { namespace naming { namespace server
                 ar >> offset_;
                 break;
 
+            case command_incref:
+            case command_decref:
             case command_unbind_range:
                 ar >> id_;
                 ar >> count_;
@@ -268,6 +277,7 @@ namespace hpx { namespace naming { namespace server
                 ar >> isconsole_;
                 break;
 
+            case command_getprefix_for_site:
             case command_getconsoleprefix:
             case command_statistics_count:
             case command_statistics_mean:
@@ -280,15 +290,15 @@ namespace hpx { namespace naming { namespace server
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     private:
-        boost::uint8_t command_;    /// one of the agas_server_command's above
-        naming::id_type id_;        /// global id (resolve, register_factory, bind and unbind only)
-        std::size_t count_;         /// number of global ids (bind_range, unbind_range only)
-        naming::locality site_;     /// our address 
-        naming::address addr_;      /// address to associate with this id (bind only)
-        std::ptrdiff_t offset_;     /// offset between local addresses of a range (bind_range only)
-        std::string name_;          /// namespace name (get_component_id, register_factory, queryid only)
-        components::component_type type_; /// component_type (optional for get_prefixes only)
-        bool isconsole_;            /// console mode of this locality (for get_prefix only)
+        boost::uint8_t command_;      ///< one of the agas_server_command's above
+        naming::gid_type id_;  ///< global id (resolve, register_factory, bind and unbind only)
+        boost::uint32_t count_;       ///< number of global ids (bind_range, unbind_range only)
+        naming::locality site_;       ///< our address 
+        naming::address addr_;        ///< address to associate with this id (bind only)
+        std::ptrdiff_t offset_;       ///< offset between local addresses of a range (bind_range only)
+        std::string name_;            ///< namespace name (get_component_id, register_factory, queryid only)
+        components::component_type type_; ///< component_type (optional for get_prefixes only)
+        bool isconsole_;              ///< console mode of this locality (for get_prefix only)
     };
 
     /// The \a operator<< is used for logging purposes, dumping the internal 

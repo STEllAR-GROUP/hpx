@@ -17,6 +17,5 @@ namespace hpx { namespace components { namespace server
         util::static_<console_error_dispatcher, error_dispatcher_tag> disp;
         return disp.get();
     }
-
 }}}
 

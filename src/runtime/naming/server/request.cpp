@@ -25,10 +25,13 @@ namespace hpx { namespace naming { namespace server
             "command_getprefix",
             "command_getconsoleprefix",
             "command_getprefixes",
+            "command_getprefix_for_site",
             "command_get_component_id",
             "command_register_factory",
             "command_getidrange",
             "command_bind_range",
+            "command_incref",
+            "command_decref",
             "command_unbind_range",
             "command_resolve",
             "command_queryid",
@@ -62,16 +65,18 @@ namespace hpx { namespace naming { namespace server
         case command_bind_range:
             os << "id" << req.id_ << " ";
             if (req.count_ != 1)
-                os << "count:" << std::dec << req.count_ << " ";
+                os << "count(" << std::dec << req.count_ << ") ";
             os << "addr(" << req.addr_ << ") ";
             if (req.offset_ != 0)
-                os << "offset:" << std::dec << req.offset_ << " ";
+                os << "offset(" << std::dec << req.offset_ << ") ";
             break;
 
+        case command_incref:
+        case command_decref:
         case command_unbind_range:
             os << "id" << req.id_ << " ";
             if (req.count_ != 1)
-                os << "count:" << std::dec << req.count_ << " ";
+                os << "count(" << std::dec << req.count_ << ") ";
             break;
 
         case command_get_component_id:
@@ -91,9 +96,13 @@ namespace hpx { namespace naming { namespace server
             os << "isconsole(" << std::boolalpha << req.isconsole_ << ") ";
             break;
 
+        case command_getprefix_for_site:
+            os << "site(" << req.site_ << "), ";
+            break;
+
         case command_getidrange:
             os << "site(" << req.site_ << ") ";
-            os << "count:" << std::dec << req.count_ << " ";
+            os << "count(" << std::dec << req.count_ << ") ";
             break;
 
         case command_getprefixes:

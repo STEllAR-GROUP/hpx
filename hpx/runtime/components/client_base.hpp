@@ -19,51 +19,40 @@ namespace hpx { namespace components
         typedef Stub stub_type;
 
     public:
-        client_base(naming::id_type gid, bool freeonexit = false)
-          : gid_(gid), freeonexit_(freeonexit)
+        client_base()
+          : gid_(naming::invalid_id)
         {}
 
-        ~client_base() 
-        {
-            if (freeonexit_ && gid_)
-                this->stub_type::free(gid_);
-        }
+        client_base(naming::id_type gid)
+          : gid_(gid)
+        {}
 
         ///////////////////////////////////////////////////////////////////////
         /// Create a new instance of an distributing_factory on the locality as 
         /// given by the parameter \a targetgid
         Derived& create(naming::id_type const& targetgid, component_type type,
-            std::size_t count = 1, bool freeonexit = false)
+            std::size_t count = 1)
         {
             free();
             gid_ = stub_type::create(targetgid, type, count);
-            freeonexit_ = freeonexit;
             return static_cast<Derived&>(*this);
         }
 
-        Derived& create(naming::id_type const& targetgid, std::size_t count = 1, 
-            bool freeonexit = false)
+        Derived& create(naming::id_type const& targetgid, std::size_t count = 1)
         {
             free();
             gid_ = stub_type::create(targetgid, count);
-            freeonexit_ = freeonexit;
             return static_cast<Derived&>(*this);
         }
 
         void free(component_type type)
         {
-            if (gid_) {
-                this->stub_type::free(type, gid_);
-                gid_ = naming::invalid_id;
-            }
+            gid_ = naming::invalid_id;
         }
 
         void free()
         {
-            if (gid_) {
-                this->stub_type::free(gid_);
-                gid_ = naming::invalid_id;
-            }
+            gid_ = naming::invalid_id;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -81,11 +70,6 @@ namespace hpx { namespace components
 
     protected:
         naming::id_type gid_;
-        bool freeonexit_;
-
-    private:
-        // we should not copy instances of this class
-        client_base& operator= (client_base const& rhs);
     };
 
 }}

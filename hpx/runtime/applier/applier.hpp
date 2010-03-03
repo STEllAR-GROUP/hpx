@@ -35,9 +35,11 @@ namespace hpx { namespace applier
                 boost::uint64_t rts, boost::uint64_t mem)
           : parcel_handler_(ph), thread_manager_(tm),
             runtime_support_id_(parcel_handler_.get_prefix().get_msb(), rts,
-                parcel_handler_.here(), components::component_runtime_support, rts), 
+                parcel_handler_.here(), components::component_runtime_support, 
+                rts, naming::id_type::unmanaged), 
             memory_id_(parcel_handler_.get_prefix().get_msb(), mem,
-                parcel_handler_.here(), components::component_runtime_support, mem)
+                parcel_handler_.here(), components::component_runtime_support, 
+                mem, naming::id_type::unmanaged)
         {}
 
         // destructor
@@ -89,7 +91,7 @@ namespace hpx { namespace applier
         ///
         /// This function returns a reference to the locality this applier
         /// instance is associated with.
-        naming::id_type const& get_prefix() const
+        naming::gid_type const& get_prefix() const
         {
             return parcel_handler_.get_prefix();
         }
@@ -101,7 +103,7 @@ namespace hpx { namespace applier
         /// applier instance is associated with.
         boost::uint32_t get_prefix_id() const
         {
-            return naming::get_prefix_from_id(parcel_handler_.get_prefix());
+            return naming::get_prefix_from_gid(parcel_handler_.get_prefix());
         }
 
         /// \brief Allow access to the prefixes of all remote localities 
@@ -116,53 +118,54 @@ namespace hpx { namespace applier
         /// \returns The function returns \a true if there is at least one 
         ///          remote locality known to the AGASservice 
         ///          (!prefixes.empty()).
-        bool get_remote_prefixes(std::vector<naming::id_type>& prefixes) const
+        bool get_remote_prefixes(std::vector<naming::gid_type>& prefixes) const
         {
             return parcel_handler_.get_remote_prefixes(prefixes);
         }
 
         /// By convention the runtime_support has a gid identical to the prefix 
         /// of the locality the runtime_support is responsible for
-        naming::id_type const& get_runtime_support_gid() const
+        naming::gid_type const& get_runtime_support_raw_gid() const
         {
-            return runtime_support_id_.cgid();
+            return runtime_support_id_.get_gid();
         }
 
         /// By convention the runtime_support has a gid identical to the prefix 
         /// of the locality the runtime_support is responsible for
-        naming::full_address const& get_runtime_support_address() const
+        naming::id_type const& get_runtime_support_gid() const
         {
             return runtime_support_id_;
         }
 
         /// By convention every memory address has gid identical to the prefix 
         /// of the locality the runtime_support is responsible for
-        naming::id_type const& get_memory_gid() const
+        naming::gid_type const& get_memory_gid() const
         {
-            return memory_id_.cgid();
+            return memory_id_.get_gid();
         }
 
         /// By convention every memory address has gid identical to the prefix 
         /// of the locality the runtime_support is responsible for
-        naming::full_address const& get_memory_address() const
+        naming::id_type const& get_memory_address() const
         {
             return memory_id_;
         }
 
         /// Test whether the given address (gid) is local or remote
-        bool address_is_local(naming::id_type const& gid, 
+        bool address_is_local(naming::gid_type const& gid, 
             naming::address& addr) const
         {
             // test if the gid is of one of the non-movable objects
             // this is certainly an optimization relying on the fact that the 
             // lsb of the local objects is equal to their address
-            if (gid.get_msb() == parcel_handler_.get_prefix().get_msb())
+            if (naming::strip_credit_from_gid(gid.get_msb()) == 
+                    parcel_handler_.get_prefix().get_msb())
             {
                 // a zero address references the local runtime support component
                 if (0 != gid.get_lsb())
                     addr.address_ = gid.get_lsb();
                 else 
-                    addr.address_ = runtime_support_id_.cgid().get_lsb();
+                    addr.address_ = runtime_support_id_.get_lsb();
                 return true;
             }
 
@@ -178,38 +181,6 @@ namespace hpx { namespace applier
             return addr.locality_ == parcel_handler_.here();
         }
 
-        /// Test whether the given address (gid) is local or remote
-        bool address_is_local(naming::full_address& fa) const
-        {
-            naming::address& addr = fa.addr();
-            if (!fa) {
-                // test if the gid is of one of the non-movable objects
-                // this is certainly an optimization relying on the fact that the 
-                // lsb of the local objects is equal to their address
-                naming::id_type& gid = fa.gid();
-                if (gid.get_msb() == parcel_handler_.get_prefix().get_msb())
-                {
-                    // a zero address references the local runtime support component
-                    if (0 != gid.get_lsb())
-                        addr.address_ = gid.get_lsb();
-                    else 
-                        addr.address_ = runtime_support_id_.cgid().get_lsb();
-                    return true;
-                }
-
-                // Resolve the address of the gid
-                if (!fa.resolve())
-                {
-                    HPX_OSSTREAM strm;
-                    strm << "gid" << gid;
-                    HPX_THROW_EXCEPTION(unknown_component_address, 
-                        "applier::address_is_local", 
-                        HPX_OSSTREAM_GETSTRING(strm));
-                }
-            }
-            return addr.locality_ == parcel_handler_.here();
-        }
-
     public:
         // the TSS holds a pointer to the applier associated with a given 
         // OS thread
@@ -220,8 +191,8 @@ namespace hpx { namespace applier
     private:
         parcelset::parcelhandler& parcel_handler_;
         threads::threadmanager_base& thread_manager_;
-        naming::full_address runtime_support_id_;
-        naming::full_address memory_id_;
+        naming::id_type runtime_support_id_;
+        naming::id_type memory_id_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -256,21 +227,25 @@ namespace hpx { namespace applier
     ///
     HPX_API_EXPORT void register_work_nullary(
         boost::function<void()> const& func, char const* description = "", 
-        threads::thread_state initial_state = threads::pending);
+        threads::thread_state initial_state = threads::pending,
+        error_code& ec = throws);
 
     HPX_API_EXPORT void register_work(
         boost::function<void(threads::thread_state_ex)> const& func, 
         char const* description = "", 
-        threads::thread_state initial_state = threads::pending);
+        threads::thread_state initial_state = threads::pending,
+        error_code& ec = throws);
 
     HPX_API_EXPORT void register_work_plain(
         boost::function<threads::thread_function_type> const& func,
         char const* description = "", naming::address::address_type lva = 0,
-        threads::thread_state initial_state = threads::pending);
+        threads::thread_state initial_state = threads::pending,
+        error_code& ec = throws);
 
     HPX_API_EXPORT void register_work_plain(
         threads::thread_init_data& data,
-        threads::thread_state initial_state = threads::pending);
+        threads::thread_state initial_state = threads::pending,
+        error_code& ec = throws);
 
     /// The \a create_async function initiates the creation of a new 
     /// component using the runtime_support as given by targetgid. This 
@@ -288,7 +263,7 @@ namespace hpx { namespace applier
     ///
     /// \note       For synchronous operation use the function 
     ///             \a applier#create_async.
-    HPX_API_EXPORT lcos::future_value<naming::id_type> 
+    HPX_API_EXPORT lcos::future_value<naming::id_type, naming::gid_type> 
         create_async(naming::id_type const& targetgid, 
             components::component_type type, std::size_t count = 1);
 
@@ -315,8 +290,8 @@ namespace hpx { namespace applier
     /// \param type
     /// \param count
     /// \param gid
-    HPX_API_EXPORT void destroy (components::component_type type, 
-        naming::id_type const& gid, std::size_t count = 1);
+//     HPX_API_EXPORT void destroy (components::component_type type, 
+//         naming::id_type const& gid, std::size_t count = 1);
 
 }}
 

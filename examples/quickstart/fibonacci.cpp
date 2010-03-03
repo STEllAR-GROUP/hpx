@@ -37,10 +37,10 @@ namespace po = boost::program_options;
 // }
 
 ///////////////////////////////////////////////////////////////////////////////
-int fib(naming::id_type prefix, int n, int delay_coeff);
+int fib(naming::gid_type prefix, int n, int delay_coeff);
 
 typedef 
-    actions::plain_result_action3<int, naming::id_type, int, int, fib> 
+    actions::plain_result_action3<int, naming::gid_type, int, int, fib> 
 fibonacci_action;
 
 HPX_REGISTER_ACTION(fibonacci_action);
@@ -48,7 +48,7 @@ HPX_REGISTER_ACTION(fibonacci_action);
 ///////////////////////////////////////////////////////////////////////////////
 int count_invocations = 0;    // global invocation counter
 
-int fib (naming::id_type that_prefix, int n, int delay_coeff)
+int fib (naming::gid_type that_prefix, int n, int delay_coeff)
 {
     // count number of invocations
     ++count_invocations;
@@ -71,7 +71,7 @@ int fib (naming::id_type that_prefix, int n, int delay_coeff)
 
     // execute the first fib() at the other locality, returning here afterwards
     // execute the second fib() here, forwarding the correct prefix
-    naming::id_type this_prefix = applier::get_applier().get_runtime_support_gid();
+    naming::gid_type this_prefix = applier::get_applier().get_runtime_support_raw_gid();
     fibonacci_future n1(that_prefix, this_prefix, n - 1, delay_coeff);
     fibonacci_future n2(this_prefix, that_prefix, n - 2, delay_coeff);
 
@@ -89,11 +89,11 @@ int hpx_main(int argument, int delay_coeff, int& result, double& elapsed)
         rt.get_config().get_entry("application.fibonacci.argument", argument));
 
     // get list of all known localities
-    std::vector<naming::id_type> prefixes;
+    std::vector<naming::gid_type> prefixes;
     applier::applier& appl = applier::get_applier();
 
-    naming::id_type this_prefix = appl.get_runtime_support_gid();
-    naming::id_type that_prefix;
+    naming::gid_type this_prefix = appl.get_runtime_support_raw_gid();
+    naming::gid_type that_prefix;
 
     if (appl.get_remote_prefixes(prefixes)) {
         // execute the fib() function on any of the remote localities

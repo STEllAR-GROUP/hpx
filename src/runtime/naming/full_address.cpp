@@ -21,5 +21,4 @@ namespace hpx { namespace naming
             return true;
         return hpx::applier::get_applier().get_agas_client().resolve(gid_, address_);
     }
-
 }}

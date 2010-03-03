@@ -25,6 +25,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/thread/tss.hpp>
+#include <boost/detail/atomic_count.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -55,7 +56,8 @@ namespace hpx
         runtime(naming::resolver_client& agas_client) 
           : counters_(agas_client),
             on_exit_functions_("on_exit_functions", false),
-            ini_(util::detail::get_logging_data())
+            ini_(util::detail::get_logging_data()),
+            instance_number_(++instance_number_counter_)
         {}
 
         /// \brief Manage list of functions to call on exit
@@ -100,6 +102,11 @@ namespace hpx
             return ini_;
         }
 
+        std::size_t get_instance_number() const 
+        { 
+            return (std::size_t)instance_number_;
+        }
+
     protected:
         void init_tss();
         void deinit_tss();
@@ -112,6 +119,9 @@ namespace hpx
         on_exit_type on_exit_functions_;
 
         util::runtime_configuration ini_;
+
+        long instance_number_;
+        static boost::detail::atomic_count instance_number_counter_;
     };
 
     /// \class runtime_impl runtime.hpp hpx/runtime.hpp
@@ -245,7 +255,7 @@ namespace hpx
         ///                   object given by the parameter \p func.
         int wait();
 
-        /// \brief Stop the runtime system
+        /// \brief Initiate termination of the runtime system
         ///
         /// \param blocking   [in] This allows to control whether this 
         ///                   call blocks until the runtime system has been 
@@ -255,6 +265,17 @@ namespace hpx
         ///                   with this parameter set to \a true to wait for 
         ///                   all internal work to be completed.
         void stop(bool blocking = true);
+
+        /// \brief Stop the runtime system, wait for termination
+        ///
+        /// \param blocking   [in] This allows to control whether this 
+        ///                   call blocks until the runtime system has been 
+        ///                   fully stopped. If this parameter is \a false then 
+        ///                   this call will initiate the stop action but will
+        ///                   return immediately. Use a second call to stop 
+        ///                   with this parameter set to \a true to wait for 
+        ///                   all internal work to be completed.
+        void stopped(bool blocking, boost::condition& cond);
 
         /// \brief Report a non-recoverable error to the runtime system
         ///

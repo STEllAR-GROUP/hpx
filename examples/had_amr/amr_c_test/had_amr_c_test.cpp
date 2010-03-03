@@ -3,7 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <math.h>
+#include <hpx/hpx.hpp>
+#include <cmath>
 
 //#include "../amr_c/stencil.hpp"
 #include "../amr_c/stencil_data.hpp"
@@ -23,7 +24,7 @@ int floatcmp(double x1,double x2) {
   }
 }
 
-int calcrhs(struct nodedata * rhs,
+void calcrhs(struct nodedata * rhs,
                 had_double_type *phi,
                 had_double_type *x, double dx, int size,
                 bool boundary, int *bbox,int compute_index, Par const& par);
@@ -164,7 +165,7 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
 }
 
 // This is a pointwise calculation: compute the rhs for point result given input values in array phi
-int calcrhs(struct nodedata * rhs,
+void calcrhs(struct nodedata * rhs,
                 had_double_type *phi,
                 had_double_type *x, double dx, int size,
                 bool boundary,int *bbox,int compute_index, Par const& par)

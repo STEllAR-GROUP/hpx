@@ -40,7 +40,6 @@ namespace hpx { namespace components { namespace server
             get_error_dispatcher()(src, HPX_OSSTREAM_GETSTRING(strm));
         }
     }
-
 }}}
 
 // This must be in global namespace

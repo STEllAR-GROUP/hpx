@@ -20,29 +20,30 @@ namespace hpx { namespace components
       : public client_base<distributing_factory, stubs::distributing_factory>
     {
     private:
-        typedef 
-            client_base<distributing_factory, stubs::distributing_factory>
-        base_type;
+        typedef client_base<distributing_factory, stubs::distributing_factory>
+            base_type;
 
     public:
         distributing_factory()
-          : base_type(naming::invalid_id, false)
+          : base_type(naming::invalid_id)
         {}
 
         /// Create a client side representation for any existing 
         /// \a server#runtime_support instance with the given global id \a gid.
-        distributing_factory(naming::id_type gid, bool freeonexit = false) 
-          : base_type(gid, freeonexit)
+        distributing_factory(naming::id_type gid) 
+          : base_type(gid)
         {}
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
         typedef base_type::result_type result_type;
+        typedef base_type::remote_result_type remote_result_type;
         typedef base_type::iterator_type iterator_type;
         typedef base_type::iterator_range_type iterator_range_type;
 
         ///
-        lcos::future_value<result_type> create_components_async(
+        lcos::future_value<result_type, remote_result_type> 
+        create_components_async(
             components::component_type type, std::size_t count = 1) 
         {
             return this->base_type::create_components_async(gid_, type, count);
@@ -58,12 +59,12 @@ namespace hpx { namespace components
         ///
         void free_components(result_type const& gids) 
         {
-            this->base_type::free_components(gid_, gids);
+//             this->base_type::free_components(gid_, gids);
         }
 
         void free_components_sync(result_type const& gids)
         {
-            this->base_type::free_components_sync(gid_, gids);
+//             this->base_type::free_components_sync(gid_, gids);
         }
     };
 

@@ -6,6 +6,8 @@
 #if !defined(HPX_NAMING_CLIENT_RESOLVER_MAR_24_2008_0952AM)
 #define HPX_NAMING_CLIENT_RESOLVER_MAR_24_2008_0952AM
 
+#define HPX_USE_AGAS_CACHE 1
+
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -68,6 +70,10 @@ namespace hpx { namespace naming
         ///                   identifying the given locality. This is valid 
         ///                   only, if the return value of this function is 
         ///                   true.
+        /// \param self       This parameter is \a true if the request is issued
+        ///                   to assign a prefix to this site, and it is \a false
+        ///                   if the command should return the prefix
+        ///                   for the given location.
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
@@ -84,7 +90,7 @@ namespace hpx { namespace naming
         ///                   throw but returns the result code using the 
         ///                   parameter \a ec. Otherwise it throws and instance
         ///                   of hpx#exception.
-        bool get_prefix(locality const& l, id_type& prefix,
+        bool get_prefix(locality const& l, gid_type& prefix, bool self = true,
             error_code& ec = throws) const;
 
         /// \brief Get locality prefix of the console locality
@@ -104,7 +110,8 @@ namespace hpx { namespace naming
         ///                   throw but returns the result code using the 
         ///                   parameter \a ec. Otherwise it throws and instance
         ///                   of hpx#exception.
-        bool get_console_prefix(id_type& prefix, error_code& ec = throws) const;
+        bool get_console_prefix(gid_type& prefix, 
+            error_code& ec = throws) const;
 
         /// \brief Query for the prefixes of all known localities.
         ///
@@ -131,9 +138,9 @@ namespace hpx { namespace naming
         ///                   throw but returns the result code using the 
         ///                   parameter \a ec. Otherwise it throws and instance
         ///                   of hpx#exception.
-        bool get_prefixes(std::vector<id_type>& prefixes,
+        bool get_prefixes(std::vector<gid_type>& prefixes,
             components::component_type type, error_code& ec = throws) const;
-        bool get_prefixes(std::vector<id_type>& prefixes, 
+        bool get_prefixes(std::vector<gid_type>& prefixes, 
             error_code& ec = throws) const
         {
             return get_prefixes(prefixes, components::component_invalid, ec);
@@ -189,8 +196,9 @@ namespace hpx { namespace naming
         ///                   throw but returns the result code using the 
         ///                   parameter \a ec. Otherwise it throws and instance
         ///                   of hpx#exception.
-        components::component_type register_factory(id_type const& prefix, 
-            std::string const& name, error_code& ec = throws) const;
+        components::component_type register_factory(
+            gid_type const& prefix, std::string const& name, 
+            error_code& ec = throws) const;
 
         /// \brief Get unique range of freely assignable global ids 
         ///
@@ -235,8 +243,8 @@ namespace hpx { namespace naming
         ///                   throw but returns the result code using the 
         ///                   parameter \a ec. Otherwise it throws and instance
         ///                   of hpx#exception.
-        bool get_id_range(locality const& l, std::size_t count, 
-            id_type& lower_bound, id_type& upper_bound, 
+        bool get_id_range(locality const& l, boost::uint32_t count, 
+            gid_type& lower_bound, gid_type& upper_bound, 
             error_code& ec = throws) const;
 
         /// \brief Bind a global address to a local address.
@@ -268,7 +276,10 @@ namespace hpx { namespace naming
         ///                   throw but returns the result code using the 
         ///                   parameter \a ec. Otherwise it throws and instance
         ///                   of hpx#exception.
-        bool bind(id_type const& id, address const& addr,
+        /// 
+        /// \note             Binding a gid to a local address sets its global
+        ///                   reference count to one.
+        bool bind(gid_type const& id, address const& addr,
             error_code& ec = throws) const
         {
             return bind_range(id, 1, addr, 0, ec);
@@ -306,8 +317,45 @@ namespace hpx { namespace naming
         ///                   throw but returns the result code using the 
         ///                   parameter \a ec. Otherwise it throws and instance
         ///                   of hpx#exception.
-        bool bind_range(id_type const& lower_id, std::size_t count, 
+        /// 
+        /// \note             Binding a gid to a local address sets its global
+        ///                   reference count to one.
+        bool bind_range(gid_type const& lower_id, boost::uint32_t count, 
             address const& baseaddr, std::ptrdiff_t offset, 
+            error_code& ec = throws) const;
+
+        /// \brief Increment the global reference count for the given id
+        ///
+        /// \param id         [in] The global address (id) for which the 
+        ///                   global reference count has to be incremented.
+        /// \param credits    [in] The number of reference counts to add for
+        ///                   the given id.
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        /// 
+        /// \returns          The global reference count after the increment. 
+        boost::uint32_t incref(gid_type const& id, boost::uint32_t credits = 1, 
+            error_code& ec = throws) const;
+
+        /// \brief Decrement the global reference count for the given id
+        ///
+        /// \param id         [in] The global address (id) for which the 
+        ///                   global reference count has to be decremented.
+        /// \param t          [out] If this was the last outstanding global 
+        ///                   reference for the given gid (the return value of 
+        ///                   this function is zero), t will be set to the
+        ///                   component type of the corresponding element.
+        ///                   Otherwise t will not be modified.
+        /// \param credits    [in] The number of reference counts to add for
+        ///                   the given id.
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        /// 
+        /// \returns          The global reference count after the decrement. 
+        boost::uint32_t decref(gid_type const& id, 
+            components::component_type& t, boost::uint32_t credits = 1,
             error_code& ec = throws) const;
 
         /// \brief Unbind a global address
@@ -337,7 +385,10 @@ namespace hpx { namespace naming
         ///                   throw but returns the result code using the 
         ///                   parameter \a ec. Otherwise it throws and instance
         ///                   of hpx#exception.
-        bool unbind(id_type const& id, error_code& ec = throws) const
+        /// 
+        /// \note             This function will raise an error if the global 
+        ///                   reference count of the given gid is not zero!
+        bool unbind(gid_type const& id, error_code& ec = throws) const
         {
             address addr;   // ignore the return value
             return unbind_range(id, 1, addr, ec);
@@ -374,7 +425,11 @@ namespace hpx { namespace naming
         ///                   throw but returns the result code using the 
         ///                   parameter \a ec. Otherwise it throws and instance
         ///                   of hpx#exception.
-        bool unbind(id_type const& id, address& addr, error_code& ec = throws) const
+        /// 
+        /// \note             This function will raise an error if the global 
+        ///                   reference count of the given gid is not zero!
+        bool unbind(gid_type const& id, address& addr, 
+            error_code& ec = throws) const
         {
             return unbind_range(id, 1, addr, ec);
         }
@@ -410,7 +465,10 @@ namespace hpx { namespace naming
         ///                   throw but returns the result code using the 
         ///                   parameter \a ec. Otherwise it throws and instance
         ///                   of hpx#exception.
-        bool unbind_range(id_type const& lower_id, std::size_t count, 
+        /// 
+        /// \note             This function will raise an error if the global 
+        ///                   reference count of the given gid is not zero!
+        bool unbind_range(gid_type const& lower_id, boost::uint32_t count, 
             error_code& ec = throws) const
         {
             address addr;   // ignore the return value
@@ -451,7 +509,10 @@ namespace hpx { namespace naming
         ///                   throw but returns the result code using the 
         ///                   parameter \a ec. Otherwise it throws and instance
         ///                   of hpx#exception.
-        bool unbind_range(id_type const& lower_id, std::size_t count, 
+        /// 
+        /// \note             This function will raise an error if the global 
+        ///                   reference count of the given gid is not zero!
+        bool unbind_range(gid_type const& lower_id, boost::uint32_t count, 
             address& addr, error_code& ec = throws) const;
 
         /// \brief Resolve a given global address (id) to its associated local 
@@ -483,7 +544,16 @@ namespace hpx { namespace naming
         ///                   throw but returns the result code using the 
         ///                   parameter \a ec. Otherwise it throws and instance
         ///                   of hpx#exception.
-        bool resolve(id_type const& id, address& addr, 
+        bool resolve(gid_type const& id, address& addr, bool try_cache = true,
+            error_code& ec = throws) const;
+
+        bool resolve(id_type const& id, address& addr, bool try_cache = true,
+            error_code& ec = throws) const
+        {
+            return resolve(id.get_gid(), addr, try_cache, ec);
+        }
+
+        bool resolve_cached(gid_type const& id, address& addr, 
             error_code& ec = throws) const;
 
         /// \brief Register a global name with a global address (id)
@@ -513,7 +583,7 @@ namespace hpx { namespace naming
         ///                   throw but returns the result code using the 
         ///                   parameter \a ec. Otherwise it throws and instance
         ///                   of hpx#exception.
-        bool registerid(std::string const& name, id_type const& id,
+        bool registerid(std::string const& name, gid_type const& id,
             error_code& ec = throws) const;
 
         /// \brief Unregister a global name (release any existing association)
@@ -566,7 +636,7 @@ namespace hpx { namespace naming
         ///                   throw but returns the result code using the 
         ///                   parameter \a ec. Otherwise it throws and instance
         ///                   of hpx#exception.
-        bool queryid(std::string const& ns_name, id_type& id,
+        bool queryid(std::string const& ns_name, gid_type& id,
             error_code& ec = throws) const;
 
         /// \brief Query for the gathered statistics of this AGAS instance 
@@ -638,7 +708,13 @@ namespace hpx { namespace naming
         ///        client instance is using to serve requests
         locality const& there() const { return there_; }
 
+        /// \brief Returns whether this resolver_client represents the console 
+        ///        locality
+        bool is_console() const { return isconsole_; }
+
     protected:
+        friend class bulk_resolver_client;
+
         static bool read_completed(boost::system::error_code const& err, 
             std::size_t bytes_transferred, boost::uint32_t size);
         static bool write_completed(boost::system::error_code const& err, 
@@ -646,6 +722,8 @@ namespace hpx { namespace naming
 
         bool execute(server::request const& req, server::reply& rep,
             error_code& ec) const;
+        bool execute(std::vector<server::request> const &req, 
+            std::vector<server::reply>& rep, error_code& ec) const;
 
         boost::shared_ptr<resolver_client_connection> 
         get_client_connection(error_code& ec) const;
@@ -656,20 +734,23 @@ namespace hpx { namespace naming
 
         /// The connection cache for sending connections
         mutable util::connection_cache<resolver_client_connection> connection_cache_;
+        bool isconsole_;
 
+#if defined(HPX_USE_AGAS_CACHE)
     public:
         /// The cache of recently looked up entries
         struct cache_key
         {
             cache_key()
-              : id_(naming::invalid_id), count_(0)
+              : id_(), count_(0)
             {}
 
-            explicit cache_key(naming::id_type const& id, std::size_t count = 1)
+            explicit cache_key(naming::gid_type const& id, 
+                    std::size_t count = 1)
               : id_(id), count_(count)
             {}
 
-            naming::id_type id_;
+            naming::gid_type id_;
             std::size_t count_;
 
             friend bool operator<(cache_key const& lhs, cache_key const& rhs)
@@ -687,7 +768,8 @@ namespace hpx { namespace naming
 
     private:
         // protect the cache from race conditions
-        mutable boost::mutex mtx_;
+        typedef boost::mutex mutex_type;
+        mutable mutex_type mtx_;
 
         typedef boost::cache::local_cache<
             cache_key, entry_type, 
@@ -695,7 +777,7 @@ namespace hpx { namespace naming
             std::map<cache_key, entry_type>
         > cache_type;
         mutable cache_type agas_cache_;
-        bool isconsole_;
+#endif
     };
 
 ///////////////////////////////////////////////////////////////////////////////

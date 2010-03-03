@@ -53,11 +53,18 @@ namespace hpx { namespace components
 
             /// \brief finalize() will be called just before the instance gets 
             ///        destructed
-            ///
-            /// \param self [in] The PX \a thread used to execute this function.
-            /// \param appl [in] The applier to be used for finalization of the 
-            ///             component instance. 
             void finalize() {}
+
+            template <typename ManagedType>
+            naming::id_type const& get_gid(ManagedType* p) const
+            {
+                if (!id_) 
+                    id_ = naming::id_type(p->get_base_gid(), naming::id_type::managed);
+                return id_;
+            }
+
+        private:
+            mutable naming::id_type id_;
         };
 
         ///////////////////////////////////////////////////////////////////////////
@@ -201,8 +208,9 @@ namespace hpx { namespace components
         static heap_type& get_heap()
         {
             // ensure thread-safe initialization
-            util::static_<heap_type, wrapper_heap_tag> heap(get_component_type());
-            return heap.get();
+            util::static_<heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT> 
+                heap(get_component_type());
+            return heap.get(get_runtime_instance_number());
         }
 
     public:
@@ -327,22 +335,23 @@ namespace hpx { namespace components
         static factory_property get_factory_properties()
         {
             // components derived from this template can be allocated in blocks
-            return factory_is_multi_instance;
+            return factory_none; // factory_is_multi_instance;
         }
 
     public:
         ///
-        naming::id_type get_gid() const
+        /// \brief Return the global id of this \a future instance
+        naming::id_type const& get_gid() const
         {
-            return get_heap().get_gid(const_cast<managed_component*>(this));
+            return get_checked()->get_gid(this);
         }
 
         ///
-        bool get_full_address(naming::full_address& fa) const
-        {
-            return get_heap().
-                get_full_address(const_cast<managed_component*>(this), fa);
-        }
+//         bool get_full_address(naming::full_address& fa) const
+//         {
+//             return get_heap().
+//                 get_full_address(const_cast<managed_component*>(this), fa);
+//         }
 
         ///////////////////////////////////////////////////////////////////////
         // The managed_component behaves just like the wrapped object
@@ -365,6 +374,12 @@ namespace hpx { namespace components
         Component const& operator* () const
         {
             return *get_checked();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        naming::gid_type get_base_gid() const
+        {
+            return get_heap().get_gid(const_cast<managed_component*>(this));
         }
 
     protected:

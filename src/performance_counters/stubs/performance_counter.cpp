@@ -38,5 +38,4 @@ namespace hpx { namespace performance_counters { namespace stubs
     {
         return get_value_async(targetgid).get();
     }
-
 }}}

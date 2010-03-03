@@ -319,7 +319,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         components::distributing_factory::iterator_range_type const& stencils)
     {
         // start the execution of all stencil stencils (data items)
-        typedef std::vector<lcos::future_value< void > > lazyvals_type;
+        typedef std::vector<lcos::future_value<void> > lazyvals_type;
 
         lazyvals_type lazyvals;
         components::distributing_factory::iterator_type stencil = stencils.first;
@@ -356,7 +356,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // create a distributing factory locally
         components::distributing_factory factory;
-        factory.create(applier::get_applier().get_runtime_support_gid(), true);
+        factory.create(applier::get_applier().get_runtime_support_gid());
 
         // create a couple of stencil (functional) components and twice the 
         // amount of stencil_value components
@@ -434,7 +434,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // create a distributing factory locally
         components::distributing_factory factory;
-        factory.create(applier::get_applier().get_runtime_support_gid(), true);
+        factory.create(applier::get_applier().get_runtime_support_gid());
 
         // create a couple of stencil (functional) components and twice the 
         // amount of stencil_value components

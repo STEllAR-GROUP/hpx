@@ -17,7 +17,6 @@
 #include <hpx/config.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/naming/full_address.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -79,7 +78,7 @@ namespace hpx { namespace components { namespace detail
         explicit wrapper_heap(char const* class_name, bool, bool, 
                 int count, std::size_t step = (std::size_t)-1)
           : pool_(NULL), first_free_(NULL), step_(step), size_(0), free_size_(0),
-            base_gid_(naming::invalid_id), get_agas_client_(NULL),
+            base_gid_(naming::invalid_gid), get_agas_client_(NULL),
             class_name_(class_name), alloc_count_(0), free_count_(0),
             heap_count_(count)
         {
@@ -95,7 +94,7 @@ namespace hpx { namespace components { namespace detail
         wrapper_heap()
           : pool_(NULL), first_free_(NULL), 
             step_(heap_step), size_(0), free_size_(0),
-            base_gid_(naming::invalid_id), get_agas_client_(NULL),
+            base_gid_(naming::invalid_gid), get_agas_client_(NULL),
             alloc_count_(0), free_count_(0), heap_count_(0)
         {
             BOOST_ASSERT(sizeof(storage_type) == heap_size);
@@ -169,7 +168,7 @@ namespace hpx { namespace components { namespace detail
         /// \note  The pointer given by the parameter \a p must have been 
         ///        allocated by this instance of a \a wrapper_heap
         template <typename Mutex>
-        naming::id_type 
+        naming::gid_type 
         get_gid(util::unique_ids<Mutex>& ids, void* p) 
         {
             BOOST_ASSERT(did_alloc(p));
@@ -190,7 +189,7 @@ namespace hpx { namespace components { namespace detail
                       naming::address(appl.here(), value_type::get_component_type(), addr),
                       sizeof(value_type))) 
                 {
-                    return naming::invalid_id;
+                    return naming::invalid_gid;
                 }
             }
             return base_gid_ + (static_cast<value_type*>(p) - addr);
@@ -202,42 +201,42 @@ namespace hpx { namespace components { namespace detail
         ///
         /// \note  The pointer given by the parameter \a p must have been 
         ///        allocated by this instance of a \a wrapper_heap
-        template <typename Mutex>
-        bool get_full_address(util::unique_ids<Mutex>& ids, void* p, 
-            naming::full_address& fa) 
-        {
-            BOOST_ASSERT(did_alloc(p));
-
-            hpx::applier::applier& appl = hpx::applier::get_applier();
-            value_type* addr = static_cast<value_type*>(pool_->address());
-            naming::address& localaddr = fa.addr();
-
-            localaddr.locality_ = appl.here();
-            localaddr.type_ = value_type::get_component_type();
-            localaddr.address_ = 
-                reinterpret_cast<naming::address::address_type>(addr);
-
-            if (!base_gid_) {
-                // store a pointer to the AGAS client
-                get_agas_client_ = &appl.get_agas_client();
-
-                // this is the first call to get_gid() for this heap - allocate 
-                // a sufficiently large range of global ids
-                base_gid_ = ids.get_id(appl.here(), *get_agas_client_, step_);
-
-                // register the global ids and the base address of this heap
-                // with the AGAS
-                if (!get_agas_client_->bind_range(
-                        base_gid_, step_, localaddr, sizeof(value_type))) 
-                {
-                    return false;
-                }
-            }
-
-            localaddr.address_ = reinterpret_cast<naming::address::address_type>(p);
-            fa.gid() = base_gid_ + (static_cast<value_type*>(p) - addr);
-            return true;
-        }
+//         template <typename Mutex>
+//         bool get_full_address(util::unique_ids<Mutex>& ids, void* p, 
+//             naming::full_address& fa) 
+//         {
+//             BOOST_ASSERT(did_alloc(p));
+// 
+//             hpx::applier::applier& appl = hpx::applier::get_applier();
+//             value_type* addr = static_cast<value_type*>(pool_->address());
+//             naming::address& localaddr = fa.addr();
+// 
+//             localaddr.locality_ = appl.here();
+//             localaddr.type_ = value_type::get_component_type();
+//             localaddr.address_ = 
+//                 reinterpret_cast<naming::address::address_type>(addr);
+// 
+//             if (!base_gid_) {
+//                 // store a pointer to the AGAS client
+//                 get_agas_client_ = &appl.get_agas_client();
+// 
+//                 // this is the first call to get_gid() for this heap - allocate 
+//                 // a sufficiently large range of global ids
+//                 base_gid_ = ids.get_id(appl.here(), *get_agas_client_, step_);
+// 
+//                 // register the global ids and the base address of this heap
+//                 // with the AGAS
+//                 if (!get_agas_client_->bind_range(
+//                         base_gid_, step_, localaddr, sizeof(value_type))) 
+//                 {
+//                     return false;
+//                 }
+//             }
+// 
+//             localaddr.address_ = reinterpret_cast<naming::address::address_type>(p);
+//             fa.gid() = base_gid_ + (static_cast<value_type*>(p) - addr);
+//             return true;
+//         }
 
     protected:
         bool test_release()
@@ -250,7 +249,7 @@ namespace hpx { namespace components { namespace detail
             if (base_gid_) {
                 BOOST_ASSERT(NULL != get_agas_client_);
                 get_agas_client_->unbind_range(base_gid_, step_);
-                base_gid_ = naming::invalid_id;
+                base_gid_ = naming::invalid_gid;
             }
 
             tidy();
@@ -320,7 +319,7 @@ namespace hpx { namespace components { namespace detail
 
         // these values are used for AGAS registration of all elements of this
         // managed_component heap
-        naming::id_type base_gid_;
+        naming::gid_type base_gid_;
         naming::resolver_client const* get_agas_client_;
 
     public:

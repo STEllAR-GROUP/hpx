@@ -61,7 +61,7 @@ namespace hpx { namespace naming { namespace server
                 error_ += std::string(": ") + what;
         }
 
-        reply (agas_server_command command, naming::id_type const& id, 
+        reply (agas_server_command command, naming::gid_type const& id, 
                error s = success)
           : command_(command), status_(s),
             error_(get_error_text(s)),
@@ -115,19 +115,31 @@ namespace hpx { namespace naming { namespace server
                          command == command_unbind_range);
         }
 
+        reply (agas_server_command command, boost::uint64_t refcnt,
+                components::component_type t = components::component_invalid)
+          : command_(command), status_(success), 
+            error_(get_error_text(success)),
+            type_(t), refcnt_(boost::uint32_t(refcnt))
+        {
+            BOOST_ASSERT(command == command_incref ||
+                         command == command_decref);
+        }
+
         reply (error s, agas_server_command command, 
-                naming::id_type prefix)
+                naming::gid_type prefix)
           : command_(command), status_(s),
             error_(get_error_text(s)),
             lower_bound_(prefix), upper_bound_(0)
         {
             BOOST_ASSERT(s == success || s == repeated_request);
             BOOST_ASSERT(command == command_getprefix || 
-                command == command_getconsoleprefix);
+                command == command_getconsoleprefix ||
+                command == command_getprefix_for_site);
         }
 
         reply (error s, agas_server_command command, 
-                naming::id_type lower_bound, naming::id_type upper_bound)
+                naming::gid_type lower_bound, 
+                naming::gid_type upper_bound)
           : command_(command_getidrange), status_(s),
             error_(get_error_text(s)),
             lower_bound_(lower_bound), upper_bound_(upper_bound)
@@ -137,6 +149,11 @@ namespace hpx { namespace naming { namespace server
         }
 
         ///////////////////////////////////////////////////////////////////////
+        agas_server_command get_command() const
+        {
+            return (agas_server_command)command_;
+        }
+
         error get_status() const
         {
             return (error)status_;
@@ -149,19 +166,19 @@ namespace hpx { namespace naming { namespace server
         {
             return address_;
         }
-        naming::id_type const& get_prefix() const
+        naming::gid_type const& get_prefix() const
         {
             return lower_bound_;
         }
-        naming::id_type const& get_lower_bound() const
+        naming::gid_type const& get_lower_bound() const
         {
             return lower_bound_;
         }
-        naming::id_type const& get_upper_bound() const
+        naming::gid_type const& get_upper_bound() const
         {
             return upper_bound_;
         }
-        naming::id_type get_id() const
+        naming::gid_type get_id() const
         {
             return id_;
         }
@@ -169,6 +186,11 @@ namespace hpx { namespace naming { namespace server
         components::component_type get_component_id() const
         {
             return type_;
+        }
+
+        boost::uint32_t get_refcnt() const
+        {
+            return refcnt_;
         }
 
         double get_statictics(std::size_t i) const
@@ -217,6 +239,7 @@ namespace hpx { namespace naming { namespace server
 
             case command_getconsoleprefix:
             case command_getprefix:
+            case command_getprefix_for_site:
                 ar << lower_bound_;
                 break;
 
@@ -237,6 +260,14 @@ namespace hpx { namespace naming { namespace server
             case command_statistics_mean:
             case command_statistics_moment2:
                 ar << statistics_;
+                break;
+
+            case command_incref:
+                ar << refcnt_;
+                break;
+
+            case command_decref:
+                ar << refcnt_ << type_;
                 break;
 
             case command_bind_range:
@@ -272,6 +303,7 @@ namespace hpx { namespace naming { namespace server
                 // fall through
             case command_getconsoleprefix:
             case command_getprefix:
+            case command_getprefix_for_site:
                 ar >> lower_bound_;
                 break;
 
@@ -294,6 +326,14 @@ namespace hpx { namespace naming { namespace server
                 ar >> statistics_;
                 break;
 
+            case command_incref:
+                ar >> refcnt_;
+                break;
+
+            case command_decref:
+                ar >> refcnt_ >> type_;
+                break;
+
             case command_bind_range:
             case command_registerid: 
             case command_unregisterid: 
@@ -308,13 +348,14 @@ namespace hpx { namespace naming { namespace server
         boost::uint8_t status_;         ///< status of requested operation
         std::string error_;             ///< descriptive error message
         naming::address address_;       ///< address (for resolve only)
-        naming::id_type lower_bound_;   ///< lower bound of id range (for get_idrange only) 
+        naming::gid_type lower_bound_;  ///< lower bound of id range (for get_idrange only) 
                                         ///< or the prefix for the given locality (get_prefix only)
-        naming::id_type upper_bound_;   ///< upper bound of id range (for get_idrange only)
-        naming::id_type id_;            ///< global id (for queryid only)
+        naming::gid_type upper_bound_;  ///< upper bound of id range (for get_idrange only)
+        naming::gid_type id_;           ///< global id (for queryid only)
         std::vector<double> statistics_;        ///< gathered statistics
         std::vector<boost::uint32_t> prefixes_; ///< all site prefixes known to this server
         components::component_type type_;       ///< the component type (command_get_component_id, command_register_factory only)
+        boost::uint32_t refcnt_;        ///< global reference count (for incref and decref)
     };
 
     /// The \a operator<< is used for logging purposes, dumping the internal 

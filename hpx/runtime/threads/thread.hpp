@@ -139,6 +139,11 @@ namespace hpx { namespace threads { namespace detail
             return coroutine_.get_thread_id();
         }
 
+        std::size_t get_thread_phase() const
+        {
+            return coroutine_.get_thread_phase();
+        }
+ 
         char const* const get_description() const
         {
             return description_;
@@ -172,6 +177,17 @@ namespace hpx { namespace threads { namespace detail
         /// 
         void set_event();
 
+        template <typename ManagedType>
+        naming::id_type const& get_gid(ManagedType* p) const
+        {
+            if (!id_) {
+                naming::gid_type gid = p->get_base_gid(); 
+                naming::strip_credit_from_gid(gid);
+                id_ = naming::id_type(gid, naming::id_type::unmanaged);
+            }
+            return id_;
+        }
+
     private:
         coroutine_type coroutine_;
         // the state is stored as a boost::int32_t to allow to use CAS
@@ -183,6 +199,8 @@ namespace hpx { namespace threads { namespace detail
         boost::uint32_t parent_locality_prefix_;
         thread_id_type parent_thread_id_;
         naming::address::address_type const component_id_;
+
+        mutable naming::id_type id_;    // that's our gid
     };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -260,6 +278,12 @@ namespace hpx { namespace threads
         thread_id_type get_thread_id() const
         {
             return const_cast<thread*>(this);
+        }
+
+        std::size_t get_thread_phase() const
+        {
+            detail::thread const* t = get();
+            return t ? t->get_thread_phase() : 0;
         }
 
         /// Return the locality of the parent thread

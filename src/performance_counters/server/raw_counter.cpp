@@ -50,6 +50,5 @@ namespace hpx { namespace performance_counters { namespace server
         value.time_ = boost::chrono::high_resolution_clock::now().
             time_since_epoch().count();
     }
-
 }}}
 

@@ -65,6 +65,7 @@ namespace hpx
     /// (Distributed Global Address Space) service.
     namespace naming
     {
+        struct HPX_API_EXPORT gid_type;
         struct HPX_API_EXPORT id_type;
         struct HPX_API_EXPORT address;
         class HPX_API_EXPORT locality;
@@ -207,6 +208,10 @@ namespace hpx
     HPX_API_EXPORT runtime& get_runtime();
     HPX_API_EXPORT runtime* get_runtime_ptr();
 
+    /// The function \a get_runtime_instance_number returns a unique number
+    /// associated with the runtime instance the current thread is running in.
+    HPX_API_EXPORT std::size_t get_runtime_instance_number();
+
     /// Register a function to be called during system shutdown
     HPX_API_EXPORT bool register_on_exit(boost::function<void()>);
 
@@ -257,7 +262,13 @@ namespace hpx
         template <typename Result> 
         class base_lco_with_value;
 
-        template <typename Result, int N = 1> 
+        template <typename Result>
+        struct future_value_remote_result;
+
+        template <typename Result, 
+            typename RemoteResult = 
+                typename future_value_remote_result<Result>::type, 
+            int N = 1> 
         class future_value;
 
         template <typename Action, 

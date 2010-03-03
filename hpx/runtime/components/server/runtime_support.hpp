@@ -18,6 +18,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/actions/manage_object_action.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -28,8 +29,9 @@ namespace hpx { namespace components { namespace server
     {
     private:
         typedef boost::mutex mutex_type;
-        typedef std::list<boost::plugin::dll> module_list_type;
-        typedef boost::shared_ptr<component_factory_base> component_factory_type;
+        typedef std::pair<
+            boost::shared_ptr<component_factory_base>, boost::plugin::dll
+        > component_factory_type;
         typedef std::map<component_type, component_factory_type> component_map_type;
 
     public:
@@ -48,6 +50,7 @@ namespace hpx { namespace components { namespace server
             runtime_support_shutdown_all = 4,       ///< shut down the runtime instances of all localities
 
             runtime_support_get_config = 5,         ///< get configuration information 
+            runtime_support_create_memory_block = 6,   ///< create new memory block
         };
 
         // This is the component id. Every component needs to have an embedded
@@ -62,7 +65,7 @@ namespace hpx { namespace components { namespace server
         }
 
         // constructor
-        runtime_support(util::section& ini, naming::id_type const& prefix, 
+        runtime_support(util::section& ini, naming::gid_type const& prefix, 
                 naming::resolver_client& agas_client, applier::applier& applier);
 
         ~runtime_support()
@@ -78,20 +81,7 @@ namespace hpx { namespace components { namespace server
         ///             component instance. 
         void finalize() {}
 
-        void tidy()
-        {
-            components_.clear();    // make sure components get released first
-
-            // Only after releasing the components we are allowed to release 
-            // the modules. This is done in reverse order of loading.
-            module_list_type::iterator end = modules_.end();
-            for (module_list_type::iterator it = modules_.begin(); it != end; /**/)
-            {
-                module_list_type::iterator curr = it;
-                ++it;
-                modules_.erase(curr);
-            }
-        }
+        void tidy();
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
@@ -101,15 +91,19 @@ namespace hpx { namespace components { namespace server
         int factory_properties(components::component_type type); 
 
         /// \brief Action to create new components
-        naming::id_type create_component(components::component_type type, 
+        naming::gid_type create_component(components::component_type type, 
             std::size_t count); 
+
+        /// \brief Action to create new memory block
+        naming::gid_type create_memory_block(std::size_t count, 
+            hpx::actions::manage_object_action_base const& act); 
 
         /// \brief Action to delete existing components
         void free_component(components::component_type type, 
-            naming::id_type const& gid); 
+            naming::gid_type const& gid); 
 
         /// \brief Action shut down this runtime system instance
-        void shutdown();
+        int shutdown();
 
         /// \brief Action shut down runtime system instances on all localities
         void shutdown_all();
@@ -128,19 +122,25 @@ namespace hpx { namespace components { namespace server
         > factory_properties_action;
 
         typedef hpx::actions::result_action2<
-            runtime_support, naming::id_type, runtime_support_create_component, 
+            runtime_support, naming::gid_type, runtime_support_create_component, 
             components::component_type, std::size_t, 
             &runtime_support::create_component
         > create_component_action;
 
+        typedef hpx::actions::result_action2<
+            runtime_support, naming::gid_type, runtime_support_create_memory_block, 
+            std::size_t, hpx::actions::manage_object_action_base const&,
+            &runtime_support::create_memory_block
+        > create_memory_block_action;
+
         typedef hpx::actions::direct_action2<
             runtime_support, runtime_support_free_component, 
-            components::component_type, naming::id_type const&, 
+            components::component_type, naming::gid_type const&, 
             &runtime_support::free_component
         > free_component_action;
 
-        typedef hpx::actions::action0<
-            runtime_support, runtime_support_shutdown, 
+        typedef hpx::actions::result_action0<
+            runtime_support, int, runtime_support_shutdown, 
             &runtime_support::shutdown
         > shutdown_action;
 
@@ -149,7 +149,11 @@ namespace hpx { namespace components { namespace server
             &runtime_support::shutdown_all
         > shutdown_all_action;
 
-        typedef hpx::actions::result_action0<
+        // even if this is not a short/minimal action, we still execute it 
+        // directly to avoid a deadlock condition inside the thread manager
+        // waiting for this thread to finish, which waits for the thread 
+        // manager to exit
+        typedef hpx::actions::direct_result_action0<
             runtime_support, util::section, runtime_support_get_config, 
             &runtime_support::get_config
         > get_config_action;
@@ -172,23 +176,26 @@ namespace hpx { namespace components { namespace server
         /// \note      This function can be called from any thread.
         void stop();
 
+        /// called locally only
+        void stopped();
+
     protected:
         // Load all components from the ini files found in the configuration
-        void load_components(util::section& ini, naming::id_type const& prefix, 
+        void load_components(util::section& ini, naming::gid_type const& prefix, 
             naming::resolver_client& agas_client);
         bool load_component(util::section& ini, std::string const& instance, 
             std::string const& component, boost::filesystem::path lib,
-            naming::id_type const& prefix, naming::resolver_client& agas_client, 
+            naming::gid_type const& prefix, naming::resolver_client& agas_client, 
             bool isdefault);
 
     private:
         mutex_type mtx_;
-        boost::condition condition_;
+        boost::condition wait_condition_;
+        boost::condition stop_condition_;
         bool stopped_;
+        bool terminated_;
 
         component_map_type components_;
-        module_list_type modules_;
-
         util::section& ini_;
     };
 

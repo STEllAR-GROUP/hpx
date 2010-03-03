@@ -52,7 +52,8 @@ namespace hpx { namespace components { namespace stubs
         /// given \a targetgid. This is a non-blocking call. The caller needs 
         /// to call \a future_value#get on the result of this function 
         /// to obtain the global id of the newly created object.
-        static lcos::future_value<naming::id_type> create_component_async(
+        static lcos::future_value<naming::id_type, naming::gid_type> 
+        create_component_async(
             naming::id_type const& targetgid, components::component_type type, 
             std::size_t count = 1) 
         {
@@ -60,7 +61,7 @@ namespace hpx { namespace components { namespace stubs
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::runtime_support::create_component_action action_type;
-            return lcos::eager_future<action_type>(targetgid, type, count);
+            return lcos::eager_future<action_type, naming::id_type>(targetgid, type, count);
         }
 
         /// Create a new component \a type using the runtime_support with the 
@@ -74,9 +75,38 @@ namespace hpx { namespace components { namespace stubs
             return create_component_async(targetgid, type, count).get();
         }
 
+        /// Create a new memory block using the runtime_support with the 
+        /// given \a targetgid. This is a non-blocking call. The caller needs 
+        /// to call \a future_value#get on the result of this function 
+        /// to obtain the global id of the newly created object.
+        template <typename T>
+        static lcos::future_value<naming::id_type, naming::gid_type> 
+        create_memory_block_async(
+            naming::id_type const& targetgid, std::size_t count,
+            hpx::actions::manage_object_action<T> const& act) 
+        {
+            // Create an eager_future, execute the required action,
+            // we simply return the initialized future_value, the caller needs
+            // to call get() on the return value to obtain the result
+            typedef server::runtime_support::create_memory_block_action action_type;
+            return lcos::eager_future<action_type, naming::id_type>(targetgid, count, act);
+        }
+
+        /// Create a new memory block using the runtime_support with the 
+        /// given \a targetgid. Block for the creation to finish.
+        template <typename T>
+        static naming::id_type create_memory_block(
+            naming::id_type const& targetgid, std::size_t count,
+            hpx::actions::manage_object_action<T> const& act) 
+        {
+            // The following get yields control while the action above 
+            // is executed and the result is returned to the eager_future
+            return create_memory_block_async(targetgid, count, act).get();
+        }
+
         /// Destroy an existing component
         static void free_component(components::component_type type, 
-            naming::id_type const& gid) 
+            naming::gid_type const& gid) 
         {
             typedef server::runtime_support::free_component_action action_type;
 
@@ -87,8 +117,8 @@ namespace hpx { namespace components { namespace stubs
             if (appl.address_is_local(gid, addr)) {
                 // apply locally
                 applier::detail::apply_helper2<
-                    action_type, components::component_type, naming::id_type
-                >::call(appl.get_runtime_support_gid().get_lsb(), type, gid);
+                    action_type, components::component_type, naming::gid_type
+                >::call(appl.get_runtime_support_raw_gid().get_lsb(), type, gid);
             }
             else {
                 // apply remotely
@@ -101,7 +131,7 @@ namespace hpx { namespace components { namespace stubs
         }
 
         static void free_component_sync(components::component_type type, 
-            naming::id_type const& gid) 
+            naming::gid_type const& gid) 
         {
             typedef server::runtime_support::free_component_action action_type;
 
@@ -111,22 +141,33 @@ namespace hpx { namespace components { namespace stubs
             if (appl.address_is_local(gid, addr)) {
                 // apply locally
                 applier::detail::apply_helper2<
-                    action_type, components::component_type, naming::id_type
-                >::call(appl.get_runtime_support_gid().get_lsb(), type, gid);
+                    action_type, components::component_type, naming::gid_type
+                >::call(appl.get_runtime_support_raw_gid().get_lsb(), type, gid);
             }
             else {
                 // apply remotely
-                naming::id_type prefix = naming::invalid_id;
-                appl.get_agas_client().get_prefix(addr.locality_, prefix);
+                naming::gid_type prefix;
+                appl.get_agas_client().get_prefix(addr.locality_, prefix, false);
                 lcos::eager_future<action_type, void>(prefix, type, gid).get();
             }
         }
 
         /// \brief Shutdown the given runtime system
-        static void 
-        shutdown(naming::id_type const& targetgid)
+        static lcos::future_value<int>  
+        shutdown_async(naming::id_type const& targetgid)
         {
-            hpx::applier::apply<server::runtime_support::shutdown_action>(targetgid);
+            // Create an eager_future, execute the required action,
+            // we simply return the initialized future_value, the caller needs
+            // to call get() on the return value to obtain the result
+            typedef server::runtime_support::shutdown_action action_type;
+            return lcos::eager_future<action_type>(targetgid);
+        }
+
+        static int shutdown(naming::id_type const& targetgid)
+        {
+            // The following get yields control while the action above 
+            // is executed and the result is returned to the eager_future
+            return shutdown_async(targetgid).get();
         }
 
         /// \brief Shutdown the runtime systems of all localities
@@ -139,7 +180,9 @@ namespace hpx { namespace components { namespace stubs
         static void shutdown_all()
         {
             hpx::applier::apply<server::runtime_support::shutdown_all_action>(
-                hpx::applier::get_applier().get_runtime_support_gid());
+                hpx::naming::id_type(
+                    hpx::applier::get_applier().get_runtime_support_raw_gid(),
+                    hpx::naming::id_type::unmanaged));
         }
 
         /// \brief Retrieve configuration information

@@ -98,7 +98,7 @@ namespace hpx { namespace performance_counters
         if (ec) return status_invalid_data;
 
         // create the counter as requested
-        naming::id_type newid = naming::invalid_id;
+        naming::gid_type newid = naming::invalid_gid;
         try {
             typedef components::managed_component<server::raw_counter> counter_type;
             newid = components::server::create_one<counter_type>(complemented_info, f);
@@ -114,7 +114,7 @@ namespace hpx { namespace performance_counters
         agas_client_.registerid(complemented_info.fullname_, newid, ec);
         if (ec) return status_invalid_data;
 
-        id = newid;
+        id = naming::id_type(newid, naming::id_type::managed);
         return status_valid_data;
     }
 
@@ -140,13 +140,13 @@ namespace hpx { namespace performance_counters
         // delete the counter
         switch (info.type_) {
         case counter_raw:
-            {
-                typedef 
-                    components::managed_component<server::raw_counter> 
-                counter_type;
-                components::server::destroy<counter_type>(id, ec);
-                if (ec) return status_invalid_data;
-            }
+//             {
+//                 typedef 
+//                     components::managed_component<server::raw_counter> 
+//                 counter_type;
+//                 components::server::destroy<counter_type>(id.get_gid(), ec);
+//                 if (ec) return status_invalid_data;
+//             }
             break;
 
         default:

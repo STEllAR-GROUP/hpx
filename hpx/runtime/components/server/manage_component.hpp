@@ -34,16 +34,16 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     /// Create arrays of components using their default constructor
     template <typename Component>
-    naming::id_type create (std::size_t count, error_code& ec = throws)
+    naming::gid_type create (std::size_t count, error_code& ec = throws)
     {
         if (0 == count) {
             HPX_THROWS_IF(ec, hpx::bad_parameter, 
                 "create<Component>", "count shouldn't be zero");
-            return naming::invalid_id;
+            return naming::invalid_gid;
         }
 
         Component* c = static_cast<Component*>(Component::create(count));
-        naming::id_type gid = c->get_gid();
+        naming::gid_type gid = c->get_base_gid();
         if (gid) {
             if (&ec != &throws)
                 ec = make_success_code();
@@ -55,12 +55,12 @@ namespace hpx { namespace components { namespace server
             "create<Component>", 
             "global id is already bound to a different "
             "component instance");
-        return naming::invalid_id;
+        return naming::invalid_gid;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    void destroy(naming::id_type const& gid, error_code& ec = throws)
+    void destroy(naming::gid_type const& gid, error_code& ec = throws)
     {
         // retrieve the local address bound to the given global id
         applier::applier& appl = hpx::applier::get_applier();
@@ -127,11 +127,11 @@ namespace hpx { namespace components { namespace server
     /// Create single instances of a component using additional constructor 
     /// parameters
     template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename T)>
-    naming::id_type create_one(BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))
+    naming::gid_type create_one(BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))
     {
         Component* c = static_cast<Component*>(
             Component::create_one(BOOST_PP_ENUM_PARAMS(N, t)));
-        naming::id_type gid = c->get_gid();
+        naming::gid_type gid = c->get_base_gid();
         if (gid) 
             return gid;
 
@@ -140,7 +140,7 @@ namespace hpx { namespace components { namespace server
             "create<Component>", 
             "global id is already bound to a different "
             "component instance");
-        return naming::invalid_id;
+        return naming::invalid_gid;
     }
 
 #undef N

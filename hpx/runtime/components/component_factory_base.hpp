@@ -51,7 +51,7 @@ namespace hpx { namespace components
         ///         factory instance is responsible for. This function throws
         ///         on any error.
         virtual component_type get_component_type(
-            naming::id_type const& prefix, naming::resolver_client& agas_client) = 0;
+            naming::gid_type const& prefix, naming::resolver_client& agas_client) = 0;
 
         /// \brief Return the name of the component type this factory is 
         ///        responsible for
@@ -78,13 +78,21 @@ namespace hpx { namespace components
         ///         instance. If more than one component instance has been 
         ///         created (\a count > 1) the GID's of all new instances are
         ///         sequential in a row.
-        virtual naming::id_type create (std::size_t) = 0;
+        virtual naming::gid_type create (std::size_t) = 0;
 
         /// \brief Destroy one or more component instances
         ///
         /// \param gid    [in] The gid of the first component instance to 
         ///               destroy. 
-        virtual void destroy(naming::id_type const&) = 0;
+        virtual void destroy(naming::gid_type const&) = 0;
+
+        /// \brief Ask whether this factory can be unloaded
+        ///
+        /// \return Returns whether it is safe to unload this factory and
+        ///         the shared library implementing this factory. This 
+        ///         function will return 'true' whenever no more outstanding
+        ///         instances of the managed object type are alive.
+        virtual bool may_unload() const = 0;
     };
 
 }}
@@ -113,10 +121,9 @@ namespace boost { namespace plugin
     struct virtual_constructors<hpx::components::component_factory_base>
     {
         typedef mpl::list<
-            mpl::list<hpx::util::section const*, hpx::util::section const*>
+            mpl::list<hpx::util::section const*, hpx::util::section const*> 
         > type;
     };
-
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

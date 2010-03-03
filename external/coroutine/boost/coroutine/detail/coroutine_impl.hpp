@@ -150,6 +150,11 @@ namespace boost { namespace coroutines { namespace detail {
         return m_thread_id;
     }
 
+    std::size_t get_thread_phase() const
+    {
+        return this->phase();
+    }
+
   private:
     typedef detail::coroutine_self<coroutine_type> self_type;
     static boost::thread_specific_ptr<self_type*> self_;

@@ -28,6 +28,13 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This defines the maximum number of possible runtime instances in one 
+/// executable
+#if !defined(HPX_RUNTIME_INSTANCE_LIMIT)
+#  define HPX_RUNTIME_INSTANCE_LIMIT 2
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 /// This defines the maximum number of arguments a component action can take
 #if !defined(HPX_ACTION_ARGUMENT_LIMIT)
 #  define HPX_ACTION_ARGUMENT_LIMIT 6
@@ -73,6 +80,13 @@
 /// serialization
 #if !defined(HPX_USE_PORTABLE_ARCHIVES)
 #  define HPX_USE_PORTABLE_ARCHIVES 1
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// This defines the initial global reference count associated with any created 
+/// object.
+#if !defined(HPX_INITIAL_GLOBALCREDIT)
+#  define HPX_INITIAL_GLOBALCREDIT 255
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

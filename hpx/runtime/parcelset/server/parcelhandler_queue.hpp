@@ -37,10 +37,10 @@ namespace hpx { namespace parcelset { namespace server
         bool get_parcel (parcel_id tag, parcel& p);
 
         /// return parcel of from the given source locality 
-        bool get_parcel_from (naming::id_type src, parcel& p);
+        bool get_parcel_from (naming::id_type const& src, parcel& p);
 
         /// return parcel for destination 'dest' 
-        bool get_parcel_for (naming::id_type dest, parcel& p);
+        bool get_parcel_for (naming::gid_type const& dest, parcel& p);
 
         /// register event handler to be notified whenever a parcel arrives
         template <typename F>

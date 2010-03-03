@@ -23,9 +23,12 @@ namespace hpx { namespace components
     public:
         /// Create a client side representation for the existing
         /// \a server#runtime_support instance with the given global id \a gid.
-        runtime_support(naming::id_type gid = naming::invalid_id) 
+        runtime_support(naming::id_type const& gid = naming::invalid_id) 
           : gid_(naming::invalid_id == gid ? 
-                applier::get_applier().get_runtime_support_gid() : gid)
+                naming::id_type(
+                    applier::get_applier().get_runtime_support_raw_gid(),
+                    naming::id_type::unmanaged
+                ) : gid)
         {}
 
         ///////////////////////////////////////////////////////////////////////
@@ -55,30 +58,52 @@ namespace hpx { namespace components
         }
 
         /// Asynchronously create a new component using the runtime_support 
-        lcos::future_value<naming::id_type> 
+        lcos::future_value<naming::id_type, naming::gid_type> 
         create_component_async(components::component_type type, 
             std::size_t count = 1) 
         {
             return this->base_type::create_component_async(gid_, type, count);
         }
 
-        /// Destroy an existing component
-        void free_component (components::component_type type, 
-            naming::id_type const& gid)
+        /// Create a new memory block using the runtime_support 
+        template <typename T>
+        naming::id_type create_memory_block(std::size_t count, 
+            hpx::actions::manage_object_action<T> const& act) 
         {
-            this->base_type::free_component(type, gid);
+            return this->base_type::create_memory_block(gid_, count, act);
         }
 
-        void free_component_sync(
-            components::component_type type, naming::id_type const& gid)
+        /// Asynchronously create a new memory block using the runtime_support 
+        template <typename T>
+        lcos::future_value<naming::id_type, naming::gid_type> 
+        create_memory_block_async(std::size_t count,
+            hpx::actions::manage_object_action<T> const& act) 
         {
-            this->base_type::free_component_sync(type, gid);
+            return this->base_type::create_memory_block_async(gid_, count, act);
         }
+
+        /// Destroy an existing component
+//         void free_component (components::component_type type, 
+//             naming::id_type const& gid)
+//         {
+//             this->base_type::free_component(type, gid);
+//         }
+
+//         void free_component_sync(
+//             components::component_type type, naming::id_type const& gid)
+//         {
+//             this->base_type::free_component_sync(type, gid);
+//         }
 
         /// \brief Shutdown the given runtime system
-        void shutdown()
+        lcos::future_value<int> shutdown_async()
         {
-            this->base_type::shutdown(gid_);
+            return this->base_type::shutdown_async(gid_);
+        }
+
+        int shutdown()
+        {
+            return this->base_type::shutdown(gid_);
         }
 
         /// \brief Shutdown the runtime systems of all localities

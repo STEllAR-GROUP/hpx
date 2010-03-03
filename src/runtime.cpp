@@ -49,6 +49,9 @@ BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
 namespace hpx 
 {
     ///////////////////////////////////////////////////////////////////////////
+    boost::detail::atomic_count runtime::instance_number_counter_(-1);
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
             std::string const& address, boost::uint16_t port,
@@ -66,7 +69,7 @@ namespace hpx
             mode_ == console, ini_.get_agas_cache_size()),
         parcel_port_(parcel_pool_, naming::locality(address, port)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
-        init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
+        init_logging_(ini_, mode_ == console, agas_client_),
         scheduler_(init),
         notifier_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()),
@@ -98,7 +101,7 @@ namespace hpx
             ini_.get_agas_cache_size()),
         parcel_port_(parcel_pool_, address),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
-        init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
+        init_logging_(ini_, mode_ == console, agas_client_),
         scheduler_(init),
         notifier_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()),
@@ -130,7 +133,7 @@ namespace hpx
             mode_ == console, ini_.get_agas_cache_size()),
         parcel_port_(parcel_pool_, address),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
-        init_logging_(ini_, mode_ == console, agas_client_, parcel_handler_.get_prefix()),
+        init_logging_(ini_, mode_ == console, agas_client_),
         scheduler_(init),
         notifier_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()),
@@ -211,7 +214,7 @@ namespace hpx
         thread_manager_.run(num_threads);   // start the thread manager, timer_pool_ as well
 
         // register the runtime_support and memory instances with the AGAS 
-        agas_client_.bind(applier_.get_runtime_support_gid(), 
+        agas_client_.bind(applier_.get_runtime_support_raw_gid(), 
             naming::address(parcel_port_.here(), 
                 components::get_component_type<components::server::runtime_support>(), 
                 &runtime_support_));
@@ -226,7 +229,7 @@ namespace hpx
         if (num_localities > 1) {
             bool foundall = false;
             for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i) {
-                std::vector<naming::id_type> prefixes;
+                std::vector<naming::gid_type> prefixes;
                 error_code ec;
                 if (agas_client_.get_prefixes(prefixes, ec) &&
                     num_localities == prefixes.size()) 
@@ -322,6 +325,8 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // First half of termination process: stop thread manager,
+    // schedule a task managed by timer_pool to initiate second part
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::stop(bool blocking)
     {
@@ -330,21 +335,50 @@ namespace hpx
         // execute all on_exit functions whenever the first thread calls this
         this->runtime::stop();
 
+        // stop runtime_impl services (threads)
+        thread_manager_.stop(false);    // just initiate shutdown
+
+        // schedule task in timer_pool to execute stopped() below
+        // this is necessary as this function (stop()) might have been called
+        // from a PX thread, so it would deadlock by waiting for the thread 
+        // manager
+        boost::mutex mtx;
+        boost::condition cond;
+        boost::mutex::scoped_lock l(mtx);
+        parcel_port_.get_io_service_pool().get_io_service().post(
+            boost::bind(&runtime_impl::stopped, this, blocking, boost::ref(cond)));
+        cond.wait(l);
+
+        // stop the rest of the system
+        parcel_port_.stop(blocking);        // stops parcel_pool_ as well
+
+        deinit_tss();
+    }
+
+    // Second step in termination: shut down all services.
+    // This gets executed as a task in the timer_pool io_service and not as 
+    // a PX thread!
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::stopped(
+        bool blocking, boost::condition& cond)
+    {
         // unregister the runtime_support and memory instances from the AGAS 
         // ignore errors, as AGAS might be down already
         error_code ec;
-        agas_client_.unbind(applier_.get_runtime_support_gid(), ec);
+        agas_client_.unbind(applier_.get_runtime_support_raw_gid(), ec);
         agas_client_.unbind(applier_.get_memory_gid(), ec);
 
-        // stop runtime_impl services (threads)
-        thread_manager_.stop(blocking);
-        parcel_port_.stop(blocking);    // stops parcel_pool_ as well
-        runtime_support_.stop();        // re-activate main thread 
+        // wait for thread manager to exit
+        runtime_support_.stopped();         // re-activate main thread 
+        thread_manager_.stop(blocking);     // wait for thread manager
 
         // this disables all logging from the main thread
         deinit_tss();
 
         LRT_(info) << "runtime_impl: stopped all services";
+
+        // we're done now
+        cond.notify_all();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -354,10 +388,11 @@ namespace hpx
         boost::exception_ptr const& e)
     {
         // first report this error to the console
-        naming::id_type console_prefix;
+        naming::gid_type console_prefix;
         if (agas_client_.get_console_prefix(console_prefix))
         {
-            components::console_error_sink(console_prefix, 
+            components::console_error_sink(
+                naming::id_type(console_prefix, naming::id_type::unmanaged), 
                 parcel_handler_.get_prefix(), e);
         }
 
@@ -462,6 +497,12 @@ namespace hpx
         return true;
     }
 
+    std::size_t get_runtime_instance_number()
+    {
+//         runtime* rt = get_runtime_ptr();
+//         return (NULL == rt) ? 0 : rt->get_instance_number();
+        return get_runtime().get_instance_number();
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

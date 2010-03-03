@@ -28,10 +28,10 @@
 namespace hpx { namespace parcelset
 {
     ///////////////////////////////////////////////////////////////////////////
-    typedef naming::id_type parcel_id;
+    typedef naming::gid_type parcel_id;
 
     parcel_id const no_parcel_id = parcel_id();
-    parcel_id const invalid_parcel_id = naming::invalid_id;
+    parcel_id const invalid_parcel_id = naming::invalid_gid;
     
     ///////////////////////////////////////////////////////////////////////////
     /// \class parcel parcel.hpp hpx/runtime/parcelset/parcel.hpp
@@ -41,40 +41,36 @@ namespace hpx { namespace parcelset
     {
     public:
         parcel() 
-          : tag_(0), destination_id_(0), source_id_(), action_(), 
+          : tag_(0), destination_id_(), source_id_(), action_(), 
             continuation_(), start_time_(0), creation_time_(0)
         {
         }
 
-        parcel(naming::id_type apply_to)
-          : tag_(0), destination_id_(apply_to), source_id_(0), action_(), 
+        parcel(naming::gid_type apply_to)
+          : tag_(0), destination_id_(apply_to), source_id_(), action_(), 
             continuation_(), start_time_(0), creation_time_(0)
         {
         }
 
-        parcel(naming::id_type apply_to, actions::base_action* act)
-          : tag_(0), destination_id_(apply_to), source_id_(0), action_(act), 
+        parcel(naming::gid_type apply_to, actions::base_action* act)
+          : tag_(0), destination_id_(apply_to), source_id_(), action_(act), 
             continuation_(), start_time_(0), creation_time_(0)
-        {
-        }
+        {}
 
-        parcel(naming::id_type apply_to, actions::base_action* act, 
+        parcel(naming::gid_type apply_to, actions::base_action* act, 
                actions::continuation* do_after) 
-          : tag_(0), destination_id_(apply_to), source_id_(0), action_(act), 
+          : tag_(0), destination_id_(apply_to), source_id_(), action_(act), 
             continuation_(do_after), start_time_(0), creation_time_(0)
-        {
-        }
+        {}
 
-        parcel(naming::id_type apply_to, actions::base_action* act, 
+        parcel(naming::gid_type apply_to, actions::base_action* act, 
                actions::continuation_type do_after) 
-          : tag_(0), destination_id_(apply_to), source_id_(0), action_(act), 
+          : tag_(0), destination_id_(apply_to), source_id_(), action_(act), 
             continuation_(do_after), start_time_(0), creation_time_(0)
-        {
-        }
+        {}
 
         ~parcel()
-        {
-        }
+        {}
 
         // default copy constructor is ok    
         // default assignment operator is ok
@@ -100,23 +96,21 @@ namespace hpx { namespace parcelset
         }
 
         /// get and set the source locality/component id
-        naming::id_type get_source() const
-        {
-            return source_id_;
-        }
-        void set_source(naming::id_type source_id)
+        naming::id_type& get_source() { return source_id_; }
+        naming::id_type const& get_source() const { return source_id_; }
+
+        void set_source(naming::id_type const& source_id)
         {
             source_id_ = source_id;
         }
 
         /// get and set the destination id
-        void set_destination(naming::id_type dest)
+        naming::gid_type& get_destination() { return destination_id_; }
+        naming::gid_type const& get_destination() const { return destination_id_; }
+
+        void set_destination(naming::gid_type const& dest)
         {
             destination_id_ = dest;
-        }
-        naming::id_type get_destination() const
-        {
-            return destination_id_;
         }
 
         /// get and set the destination address
@@ -160,7 +154,7 @@ namespace hpx { namespace parcelset
 
     private:
         parcel_id tag_;   
-        naming::id_type destination_id_;
+        naming::gid_type destination_id_;
         naming::address destination_addr_;
         naming::id_type source_id_;
         actions::action_type action_;

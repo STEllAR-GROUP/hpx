@@ -31,15 +31,26 @@ namespace hpx { namespace components
         typedef client_base<memory_block, stubs::memory_block> base_type;
 
     public:
-        memory_block() 
-          : base_type(naming::invalid_id, false)
-        {}
+        memory_block() {}
 
         /// Create a client side representation for the existing
         /// \a server#memory_block instance with the given global id \a gid.
-        memory_block(naming::id_type gid, bool freeonexit = false) 
-          : base_type(gid, freeonexit)
+        memory_block(naming::id_type const& gid) 
+          : base_type(gid)
         {}
+
+        ///////////////////////////////////////////////////////////////////////
+        /// Create a new instance of an distributing_factory on the locality as 
+        /// given by the parameter \a targetgid
+        template <typename T>
+        memory_block& 
+        create(naming::id_type const& targetgid, std::size_t count, 
+            hpx::actions::manage_object_action<T> const& act)
+        {
+            this->base_type::free();
+            gid_ = stub_type::create(targetgid, count, act);
+            return *this;
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
@@ -66,7 +77,7 @@ namespace hpx { namespace components
 
         /// Asynchronously clone the \a memory_block_data maintained by this 
         /// memory_block
-        lcos::future_value<naming::id_type> clone_async() 
+        lcos::future_value<naming::id_type, naming::gid_type> clone_async() 
         {
             return this->base_type::clone_async(gid_);
         }
@@ -195,14 +206,14 @@ namespace hpx { namespace components
             const_iterator_type;
 
         const_iterator_type end = gids.end();
-        for (const_iterator_type it = gids.begin(); it != end; ++it)
+        for (const_iterator_type it = gids.begin(); it != end ++it)
             lazy_results.push_back(stubs::memory_block::get_async(*it));
 
         // then wait for all results to get back to us
         typedef typename lazy_results_type::iterator iterator_type;
         iterator_type lend = lazy_results.end();
         for (iterator_type lit = lazy_results.begin(); lit != lend; ++lit)
-            results.push_back((*lit).get());
+            results.push_back((*it).get());
     }
 
     template <typename T>
@@ -258,7 +269,7 @@ namespace hpx { namespace components
         access_memory_block<T>                                                \
     /**/
 #define HPX_GET_ASYNC_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n)               \
-        naming::id_type const& BOOST_PP_CAT(g, n)                             \
+        naming::id_type const& BOOST_PP_CAT(g, n)                            \
     /**/
 #define HPX_WAIT_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n)                    \
         stubs::memory_block::get_async(BOOST_PP_CAT(g, n))                    \

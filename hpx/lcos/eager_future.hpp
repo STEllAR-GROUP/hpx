@@ -59,10 +59,10 @@ namespace hpx { namespace lcos
 
     template <typename Action, typename Result>
     class eager_future<Action, Result, boost::mpl::false_> 
-        : public future_value<Result>
+        : public future_value<Result, typename Action::result_type>
     {
     private:
-        typedef future_value<Result> base_type;
+        typedef future_value<Result, typename Action::result_type> base_type;
 
     public:
         /// Construct a (non-functional) instance of an \a eager_future. To use
@@ -80,17 +80,7 @@ namespace hpx { namespace lcos
         void apply(naming::id_type const& gid)
         {
             util::block_profiler_wrapper<eager_future_tag> bp(apply_logger_);
-
-            naming::full_address fa;
-            if (!this->get_full_address(fa))
-            {
-                HPX_OSSTREAM strm;
-                strm << "couldn't retrieve full address for gid" << gid;
-                HPX_THROW_EXCEPTION(unknown_component_address, 
-                    "eager_future<Action, Result>::apply", 
-                    HPX_OSSTREAM_GETSTRING(strm));
-            }
-            hpx::applier::apply_c<Action>(fa, gid);
+            hpx::applier::apply_c<Action>(this->get_gid(), gid);
         }
 
         /// Construct a new \a eager_future instance. The \a thread 
@@ -108,6 +98,11 @@ namespace hpx { namespace lcos
         ///               target for either of these actions has to be this 
         ///               eager_future instance (as it has to be sent along 
         ///               with the action as the continuation parameter).
+        eager_future(naming::gid_type const& gid)
+          : apply_logger_("eager_future::apply")
+        {
+            apply(naming::id_type(gid, naming::id_type::unmanaged));
+        }
         eager_future(naming::id_type const& gid)
           : apply_logger_("eager_future::apply")
         {
@@ -125,17 +120,7 @@ namespace hpx { namespace lcos
         void apply(naming::id_type const& gid, Arg0 const arg0)
         {
             util::block_profiler_wrapper<eager_future_tag> bp(apply_logger_);
-
-            naming::full_address fa;
-            if (!this->get_full_address(fa))
-            {
-                HPX_OSSTREAM strm;
-                strm << "couldn't retrieve full address for gid" << gid;
-                HPX_THROW_EXCEPTION(unknown_component_address, 
-                    "eager_future<Action, Result>::apply", 
-                    HPX_OSSTREAM_GETSTRING(strm));
-            }
-            hpx::applier::apply_c<Action>(fa, gid, arg0);
+            hpx::applier::apply_c<Action>(this->get_gid(), gid, arg0);
         }
 
         /// Construct a new \a eager_future instance. The \a thread 
@@ -155,6 +140,12 @@ namespace hpx { namespace lcos
         ///               target for either of these actions has to be this 
         ///               eager_future instance (as it has to be sent along 
         ///               with the action as the continuation parameter).
+        template <typename Arg0>
+        eager_future(naming::gid_type const& gid, Arg0 const& arg0)
+          : apply_logger_("eager_future::apply")
+        {
+            apply(naming::id_type(gid, naming::id_type::unmanaged), arg0);
+        }
         template <typename Arg0>
         eager_future(naming::id_type const& gid, Arg0 const& arg0)
           : apply_logger_("eager_future::apply")
@@ -173,10 +164,10 @@ namespace hpx { namespace lcos
 
     template <typename Action, typename Result>
     class eager_future<Action, Result, boost::mpl::true_> 
-        : public future_value<Result>
+        : public future_value<Result, typename Action::result_type>
     {
     private:
-        typedef future_value<Result> base_type;
+        typedef future_value<Result, typename Action::result_type> base_type;
 
     public:
         /// Construct a (non-functional) instance of an \a eager_future. To use
@@ -197,7 +188,7 @@ namespace hpx { namespace lcos
 
             // Determine whether the gid is local or remote
             naming::address addr;
-            if (hpx::applier::get_applier().address_is_local(gid, addr)) {
+            if (hpx::applier::get_applier().address_is_local(gid.get_gid(), addr)) {
                 // local, direct execution
                 BOOST_ASSERT(components::types_are_compatible(addr.type_, 
                     components::get_component_type<typename Action::component_type>()));
@@ -206,16 +197,7 @@ namespace hpx { namespace lcos
             }
             else {
                 // remote execution
-                naming::full_address fa;
-                if (!this->get_full_address(fa))
-                {
-                    HPX_OSSTREAM strm;
-                    strm << "couldn't retrieve full address for gid" << gid;
-                    HPX_THROW_EXCEPTION(unknown_component_address, 
-                        "eager_future<Action, Result>::apply", 
-                        HPX_OSSTREAM_GETSTRING(strm));
-                }
-                hpx::applier::apply_c<Action>(addr, fa, gid);
+                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid);
             }
         }
 
@@ -234,6 +216,11 @@ namespace hpx { namespace lcos
         ///               target for either of these actions has to be this 
         ///               eager_future instance (as it has to be sent along 
         ///               with the action as the continuation parameter).
+        eager_future(naming::gid_type const& gid)
+          : apply_logger_("eager_future_direct::apply")
+        {
+            apply(naming::id_type(gid, naming::id_type::unmanaged));
+        }
         eager_future(naming::id_type const& gid)
           : apply_logger_("eager_future_direct::apply")
         {
@@ -254,7 +241,7 @@ namespace hpx { namespace lcos
 
             // Determine whether the gid is local or remote
             naming::address addr;
-            if (hpx::applier::get_applier().address_is_local(gid, addr)) {
+            if (hpx::applier::get_applier().address_is_local(gid.get_gid(), addr)) {
                 // local, direct execution
                 BOOST_ASSERT(components::types_are_compatible(addr.type_, 
                     components::get_component_type<typename Action::component_type>()));
@@ -263,16 +250,7 @@ namespace hpx { namespace lcos
             }
             else {
                 // remote execution
-                naming::full_address fa;
-                if (!this->get_full_address(fa))
-                {
-                    HPX_OSSTREAM strm;
-                    strm << "couldn't retrieve full address for gid" << gid;
-                    HPX_THROW_EXCEPTION(unknown_component_address, 
-                        "eager_future<Action, Result>::apply", 
-                        HPX_OSSTREAM_GETSTRING(strm));
-                }
-                hpx::applier::apply_c<Action>(addr, fa, gid, arg0);
+                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid, arg0);
             }
         }
 
@@ -293,6 +271,12 @@ namespace hpx { namespace lcos
         ///               target for either of these actions has to be this 
         ///               eager_future instance (as it has to be sent along 
         ///               with the action as the continuation parameter).
+        template <typename Arg0>
+        eager_future(naming::gid_type const& gid, Arg0 const& arg0)
+          : apply_logger_("eager_future_direct::apply")
+        {
+            apply(naming::id_type(gid, naming::id_type::unmanaged), arg0);
+        }
         template <typename Arg0>
         eager_future(naming::id_type const& gid, Arg0 const& arg0)
           : apply_logger_("eager_future_direct::apply")

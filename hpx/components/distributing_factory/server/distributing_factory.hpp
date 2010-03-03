@@ -16,12 +16,79 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/iterator_adaptors.hpp>
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/foreach.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT locality_result_iterator;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // exposed functionality of this component
+    struct remote_locality_result
+    {
+        typedef std::vector<naming::gid_type>::iterator iterator;
+        typedef std::vector<naming::gid_type>::const_iterator const_iterator;
+        typedef std::vector<naming::gid_type>::value_type value_type;
+
+        remote_locality_result()
+        {}
+
+        remote_locality_result(naming::gid_type const& prefix, 
+                components::component_type type)
+          : prefix_(prefix), type_(type)
+        {}
+
+        naming::gid_type prefix_;             ///< prefix of the locality 
+        std::vector<naming::gid_type> gids_;  ///< gids of the created components
+        components::component_type type_;     ///< type of created components
+
+        iterator begin() { return gids_.begin(); }
+        const_iterator begin() const { return gids_.begin(); }
+        iterator end() { return gids_.end(); }
+        const_iterator end() const { return gids_.end(); }
+
+    private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int)
+        {
+            ar & prefix_ & gids_ & type_;
+        }
+    };
+
+    // same as remote_locality_result, except it stores id_type's
+    struct locality_result
+    {
+        typedef std::vector<naming::id_type>::iterator iterator;
+        typedef std::vector<naming::id_type>::const_iterator const_iterator;
+        typedef std::vector<naming::id_type>::value_type value_type;
+
+        locality_result()
+        {}
+
+        locality_result(remote_locality_result const& results)
+          : prefix_(results.prefix_), type_(results.type_)
+        {
+            BOOST_FOREACH(naming::gid_type const& gid, results.gids_)
+            {
+                gids_.push_back(naming::id_type(gid, naming::id_type::managed));
+            }
+        }
+
+        iterator begin() { return gids_.begin(); }
+        const_iterator begin() const { return gids_.begin(); }
+        iterator end() { return gids_.end(); }
+        const_iterator end() const { return gids_.end(); }
+
+        naming::gid_type prefix_;             ///< prefix of the locality 
+        std::vector<naming::id_type> gids_;   ///< gids of the created components
+        components::component_type type_;     ///< type of created components
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT distributing_factory
@@ -40,63 +107,35 @@ namespace hpx { namespace components { namespace server
         distributing_factory()
         {}
 
-        ///////////////////////////////////////////////////////////////////////
-        // exposed functionality of this component
-        struct locality_result
-        {
-            locality_result()
-            {}
-
-            locality_result(naming::id_type const& prefix, 
-                    naming::id_type const& first_gid, std::size_t count,
-                    components::component_type type)
-              : prefix_(prefix), first_gid_(first_gid), count_(count), 
-                type_(type)
-            {}
-
-            naming::id_type prefix_;    ///< prefix of the locality 
-            naming::id_type first_gid_; ///< gid of the first created component
-            std::size_t count_;         ///< number of created components
-            components::component_type type_; ///< type of created components
-
-        private:
-            // serialization support
-            friend class boost::serialization::access;
-
-            template<class Archive>
-            void serialize(Archive& ar, const unsigned int)
-            {
-                ar & prefix_ & first_gid_ & count_ & type_;
-            }
-        };
-
+        typedef std::vector<remote_locality_result> remote_result_type;
         typedef std::vector<locality_result> result_type;
+
         typedef locality_result_iterator iterator_type;
         typedef 
             std::pair<locality_result_iterator, locality_result_iterator>
         iterator_range_type;
 
         /// \brief Action to create new components
-        result_type create_components(components::component_type type, 
+        remote_result_type create_components(components::component_type type, 
             std::size_t count); 
 
         /// \brief Action to delete existing components
-        void free_components(result_type const& gids, bool sync); 
+//         void free_components(result_type const& gids, bool sync); 
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::result_action2<
-            distributing_factory, result_type, factory_create_components, 
+            distributing_factory, remote_result_type, factory_create_components, 
             components::component_type, std::size_t, 
             &distributing_factory::create_components
         > create_components_action;
 
-        typedef hpx::actions::action2<
-            distributing_factory, factory_free_components, 
-            result_type const&, bool, &distributing_factory::free_components
-        > free_components_action;
+//         typedef hpx::actions::action2<
+//             distributing_factory, factory_free_components, 
+//             result_type const&, bool, &distributing_factory::free_components
+//         > free_components_action;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -110,6 +149,7 @@ namespace hpx { namespace components { namespace server
     {
     private:
         typedef distributing_factory::result_type result_type;
+        typedef result_type::value_type locality_result_type;
 
         struct HPX_COMPONENT_EXPORT data
         {
@@ -122,8 +162,8 @@ namespace hpx { namespace components { namespace server
 
             result_type::const_iterator current_;
             result_type::const_iterator end_;
-            std::size_t count_;
-            naming::id_type value_;
+            locality_result_type::const_iterator current_gid_;
+
             bool is_at_end_;
         };
 
@@ -168,6 +208,34 @@ namespace hpx { namespace components { namespace server
     std::pair<locality_result_iterator, locality_result_iterator>
         locality_results(distributing_factory::result_type const& v);
 
+}}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace lcos { namespace detail 
+{
+    // we need to specialize this template to allow for automatic conversion of
+    // the vector<remote_locality_result> to a vector<locality_result>
+    template <typename Result, typename RemoteResult>
+    struct get_result;
+
+    template <>
+    struct get_result<
+        std::vector<components::server::locality_result>, 
+        std::vector<components::server::remote_locality_result> >
+    {
+        typedef std::vector<components::server::locality_result> result_type;
+        typedef std::vector<components::server::remote_locality_result> remote_result_type;
+
+        static result_type call(remote_result_type const& rhs)
+        {
+            result_type result;
+            BOOST_FOREACH(remote_result_type::value_type const& r, rhs)
+            {
+                result.push_back(result_type::value_type(r));
+            }
+            return result;
+        }
+    };
 }}}
 
 #endif

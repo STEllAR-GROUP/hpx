@@ -35,18 +35,18 @@
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         util::block_profiler_wrapper<eager_future_tag> bp(apply_logger_);
-
-        naming::full_address fa;
-        if (!this->get_full_address(fa))
-        {
-            HPX_OSSTREAM strm;
-            strm << "couldn't retrieve full address for gid" << gid;
-            HPX_THROW_EXCEPTION(unknown_component_address, 
-                "eager_future<Action, Result>::apply", HPX_OSSTREAM_GETSTRING(strm));
-        }
-        hpx::applier::apply_c<Action>(fa, gid, BOOST_PP_ENUM_PARAMS(N, arg));
+        hpx::applier::apply_c<Action>(
+            this->get_gid(), gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
+    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    eager_future(naming::gid_type const& gid, 
+            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+      : apply_logger_("eager_future::apply")
+    {
+        apply(naming::id_type(gid, naming::id_type::unmanaged), 
+            BOOST_PP_ENUM_PARAMS(N, arg));
+    }
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     eager_future(naming::id_type const& gid, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))

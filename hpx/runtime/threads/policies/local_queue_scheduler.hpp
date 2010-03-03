@@ -80,17 +80,17 @@ namespace hpx { namespace threads { namespace policies
         // create a new thread and schedule it if the initial state is equal to 
         // pending
         thread_id_type create_thread(thread_init_data& data, 
-            thread_state initial_state, bool run_now, 
+            thread_state initial_state, bool run_now, error_code& ec,
             std::size_t num_thread = std::size_t(-1))
         {
             if (std::size_t(-1) != num_thread) {
                 BOOST_ASSERT(num_thread < queues_.size());
                 return queues_[num_thread]->create_thread(data, initial_state, 
-                    run_now);
+                    run_now, ec);
             }
 
             return queues_[++curr_queue_ % queues_.size()]->create_thread(
-                data, initial_state, run_now);
+                data, initial_state, run_now, ec);
         }
 
         /// Return the next thread to be executed, return false if non is 

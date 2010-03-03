@@ -8,6 +8,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 #include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
@@ -40,6 +41,8 @@ namespace hpx { namespace naming { namespace server
         ~request_handler();
 
         /// Handle a request and produce a reply.
+        void handle_requests(std::vector<request> const& req, 
+            std::vector<reply>& rep);
         void handle_request(request const& req, reply& rep);
 
         // collect statistics
@@ -57,13 +60,15 @@ namespace hpx { namespace naming { namespace server
         }
         
     protected:
-        void handle_getprefix(request const& req, reply& rep);
+        void handle_getprefix(request const& req, reply& rep, bool self);
         void handle_getconsoleprefix(request const& req, reply& rep);
         void handle_getprefixes(request const& req, reply& rep);
         void handle_get_component_id(request const& req, reply& rep);
         void handle_register_factory(request const& req, reply& rep);
         void handle_getidrange(request const& req, reply& rep);
         void handle_bind_range(request const& req, reply& rep);
+        void handle_incref(request const& req, reply& rep);
+        void handle_decref(request const& req, reply& rep);
         void handle_unbind_range(request const& req, reply& rep);
         void handle_resolve(request const& req, reply& rep);
         void handle_queryid(request const& req, reply& rep);
@@ -82,17 +87,18 @@ namespace hpx { namespace naming { namespace server
         registry_data_type;
 
     protected:
-        void create_new_binding(request const &req, error& s, std::string& str)
+        void create_new_binding(request const &req, gid_type const& id, 
+            error& s, std::string& str)
         {
-            naming::id_type upper_bound;
-            upper_bound = req.get_id() + (req.get_count() - 1);
-            if (req.get_id().get_msb() != upper_bound.get_msb()) {
+            naming::gid_type upper_bound;
+            upper_bound = id + (req.get_count() - 1);
+            if (id.get_msb() != upper_bound.get_msb()) {
                 s = internal_server_error;
                 str = "msb's of global ids of lower and upper range bound should match";
             }
             else {
                 registry_.insert(
-                    registry_type::value_type(req.get_id(), 
+                    registry_type::value_type(id, 
                         registry_data_type(req.get_address(), 
                             req.get_count(), req.get_offset()
                         )));
@@ -100,16 +106,19 @@ namespace hpx { namespace naming { namespace server
             }
         }
 
+        components::component_type get_component_type(naming::gid_type const&);
+
     private:
         // The ns_registry_type is used to store the mappings from the 
         // global names (strings) to global ids.
-        typedef std::map<std::string, naming::id_type> ns_registry_type;
-        typedef std::map<naming::id_type, registry_data_type> registry_type;
+        typedef std::map<std::string, naming::gid_type> ns_registry_type;
+        typedef std::map<naming::gid_type, registry_data_type> registry_type;
+        typedef std::map<naming::gid_type, boost::uint64_t> refcnt_store_type;
 
         // The site_prefix_map_type is used to store the assigned prefix and 
         // the current upper boundary to be used for global id assignment for
         // a particular locality.
-        typedef std::pair<boost::uint32_t, naming::id_type> site_prefix_type;
+        typedef std::pair<boost::uint32_t, naming::gid_type> site_prefix_type;
         typedef std::map<hpx::naming::locality, site_prefix_type> 
             site_prefix_map_type;
         typedef site_prefix_map_type::value_type site_prefix_value_type;
@@ -131,6 +140,7 @@ namespace hpx { namespace naming { namespace server
         registry_type registry_;              // global_id --> local_address
         site_prefix_map_type site_prefixes_;  // locality --> prefix, upper_boundary
         boost::uint32_t console_prefix_;      // console locality
+        refcnt_store_type refcnts_;           // store reference counts
 
         mutex_type component_types_mtx_;
         int component_type_;

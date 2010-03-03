@@ -87,7 +87,8 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         static void init_stencils(
             distributed_iterator_range_type const& stencils,
-            distributed_iterator_range_type const& functions, int static_step, int numvalues,Parameter const& par);
+            distributed_iterator_range_type const& functions, int static_step, 
+            int numvalues,Parameter const& par);
 
         static void get_output_ports(
             distributed_iterator_range_type const& stencils,
@@ -105,7 +106,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         static void start_row(distributed_iterator_range_type const& stencils);
 
         static void prep_ports_nine(Array3D &dst_port,Array3D &dst_src,
-                                    Array3D &dst_step,Array3D &dst_size,Array3D &src_size,int numvalues);
+                                    Array3D &dst_step,Array3D &dst_size,
+                                    Array3D &src_size,int numvalues);
 
     private:
         std::size_t numvalues_;

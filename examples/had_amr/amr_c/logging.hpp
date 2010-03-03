@@ -84,8 +84,10 @@ namespace hpx { namespace components { namespace amr
         typedef client_base<logging, amr::stubs::logging> base_type;
 
     public:
-        logging(naming::id_type gid, bool freeonexit = false)
-          : base_type(gid, freeonexit)
+        logging() {}
+
+        logging(naming::id_type const& gid)
+          : base_type(gid)
         {}
 
         ///////////////////////////////////////////////////////////////////////

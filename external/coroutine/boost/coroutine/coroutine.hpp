@@ -171,6 +171,11 @@ namespace boost { namespace coroutines {
         return m_pimpl->get_thread_id();
     }
 
+    std::size_t get_thread_phase() const
+    {
+        return m_pimpl->get_thread_phase();
+    }
+
     template<typename Functor>
     void rebind(Functor f, thread_id_type id = 0)
     {
@@ -374,6 +379,11 @@ namespace boost { namespace coroutines {
     thread_id_type get_thread_id() const
     {
         return impl_.get_thread_id();
+    }
+
+    std::size_t get_thread_phase() const
+    {
+        return impl_.get_thread_phase();
     }
 
     void rebind(Functor f, thread_id_type id = 0)

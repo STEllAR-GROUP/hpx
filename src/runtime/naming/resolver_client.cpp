@@ -34,8 +34,6 @@
 #include <hpx/util/util.hpp>
 #include <hpx/util/block_profiler.hpp>
 
-#define HPX_USE_AGAS_CACHE 1
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming 
 {
@@ -50,11 +48,12 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool resolver_client::get_prefix(locality const& l, id_type& prefix, 
-        error_code& ec) const
+    bool resolver_client::get_prefix(locality const& l, gid_type& prefix, 
+        bool self, error_code& ec) const
     {
         // send request
-        server::request req (server::command_getprefix, l, isconsole_);
+        server::request req (self ? server::command_getprefix : 
+            server::command_getprefix_for_site, l, isconsole_);
         server::reply rep;
         if (!execute(req, rep, ec))
             return false;
@@ -78,7 +77,7 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool resolver_client::get_console_prefix(id_type& prefix, error_code& ec) const
+    bool resolver_client::get_console_prefix(gid_type& prefix, error_code& ec) const
     {
         // send request
         server::request req (server::command_getconsoleprefix);
@@ -105,7 +104,7 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool resolver_client::get_prefixes(std::vector<id_type>& prefixes,
+    bool resolver_client::get_prefixes(std::vector<gid_type>& prefixes,
         components::component_type type, error_code& ec) const
     {
         // send request
@@ -129,7 +128,7 @@ namespace hpx { namespace naming
         typedef std::vector<boost::uint32_t>::const_iterator iterator;
         iterator end = rep.get_prefixes().end();
         for (iterator it = rep.get_prefixes().begin(); it != end; ++it)
-            prefixes.push_back(get_id_from_prefix(*it));
+            prefixes.push_back(get_gid_from_prefix(*it));
 
         if (&ec != &throws)
             ec = make_error_code(s, rep.get_error());
@@ -165,7 +164,7 @@ namespace hpx { namespace naming
 
     ///////////////////////////////////////////////////////////////////////////
     components::component_type resolver_client::register_factory(
-        id_type const& prefix, std::string const& name, error_code& ec) const
+        gid_type const& prefix, std::string const& name, error_code& ec) const
     {
         // send request
         server::request req (server::command_register_factory, name, prefix);
@@ -191,8 +190,8 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool resolver_client::get_id_range(locality const& l, std::size_t count, 
-        id_type& lower_bound, id_type& upper_bound, error_code& ec) const
+    bool resolver_client::get_id_range(locality const& l, boost::uint32_t count, 
+        gid_type& lower_bound, gid_type& upper_bound, error_code& ec) const
     {
         // send request
         server::request req (server::command_getidrange, l, count);
@@ -220,11 +219,12 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool resolver_client::bind_range(id_type const& id, std::size_t count, 
+    bool resolver_client::bind_range(gid_type const& id, boost::uint32_t count, 
         address const& addr, std::ptrdiff_t offset, error_code& ec) const
     {
         // send request
-        server::request req (server::command_bind_range, id, count, addr, offset);
+        server::request req (server::command_bind_range, id, count, 
+            addr, offset);
         server::reply rep;
         if (!execute(req, rep, ec))
             return false;
@@ -244,7 +244,7 @@ namespace hpx { namespace naming
 
 #if defined(HPX_USE_AGAS_CACHE)
         // add the new range to the local cache
-        boost::mutex::scoped_lock lock(mtx_);
+        mutex_type::scoped_lock lock(mtx_);
         cache_key k(id, count);
         agas_cache_.insert(k, std::make_pair(addr, offset));
 #endif
@@ -255,9 +255,69 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    boost::uint32_t resolver_client::incref(gid_type const& id, 
+        boost::uint32_t credits, error_code& ec) const
+    {
+        // send request
+        server::request req (server::command_incref, id, credits);
+        server::reply rep;
+        if (!execute(req, rep, ec))
+            return -1;
+
+        hpx::error s = (hpx::error) rep.get_status();
+        if (s != success) 
+        {
+            if (&ec == &throws)
+            {
+                HPX_THROW_EXCEPTION(ec.value(), 
+                    "resolver_client::incref", ec.get_message());
+                return -1;
+            }
+            ec = make_error_code(s, rep.get_error(), hpx::rethrow);
+            return -1;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+        return rep.get_refcnt();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    boost::uint32_t resolver_client::decref(gid_type const& id, 
+        components::component_type& t, boost::uint32_t credits, error_code& ec) const
+    {
+        // send request
+        server::request req (server::command_decref, id, credits);
+        server::reply rep;
+        if (!execute(req, rep, ec))
+            return -1;
+
+        hpx::error s = (hpx::error) rep.get_status();
+        if (s != success) 
+        {
+            if (&ec == &throws)
+            {
+                HPX_THROW_EXCEPTION(ec.value(), 
+                    "resolver_client::decref", ec.get_message());
+                return -1;
+            }
+            ec = make_error_code(s, rep.get_error(), hpx::rethrow);
+            return -1;
+        }
+
+        boost::uint32_t refcnt = rep.get_refcnt();
+        if (0 == refcnt)
+            t = rep.get_component_id();
+
+        if (&ec != &throws)
+            ec = make_success_code();
+        return refcnt;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     struct erase_policy
     {
-        erase_policy(id_type const& id, std::size_t count)
+        erase_policy(gid_type const& id, std::size_t count)
           : entry_(id, count)
         {}
 
@@ -273,8 +333,8 @@ namespace hpx { namespace naming
         resolver_client::cache_key entry_;
     };
 
-    bool resolver_client::unbind_range(id_type const& id, std::size_t count, 
-        address& addr, error_code& ec) const
+    bool resolver_client::unbind_range(gid_type const& id, 
+        boost::uint32_t count, address& addr, error_code& ec) const
     {
         // send request
         server::request req (server::command_unbind_range, id, count);
@@ -299,7 +359,7 @@ namespace hpx { namespace naming
 
 #if defined(HPX_USE_AGAS_CACHE)
         // remove this entry from the cache
-        boost::mutex::scoped_lock lock(mtx_);
+        mutex_type::scoped_lock lock(mtx_);
         erase_policy ep(id, count);
         agas_cache_.erase(ep);
 #endif
@@ -311,16 +371,15 @@ namespace hpx { namespace naming
 
     ///////////////////////////////////////////////////////////////////////////
     struct resolve_tag {};
-    bool resolver_client::resolve(id_type const& id, address& addr, 
+
+    bool resolver_client::resolve_cached(gid_type const& id, address& addr, 
         error_code& ec) const
     {
-        util::block_profiler<resolve_tag> bp("resolver_client::resolve");
-
 #if defined(HPX_USE_AGAS_CACHE)
         // first look up the requested item in the cache
         cache_key k(id);
         {
-            boost::mutex::scoped_lock lock(mtx_);
+            mutex_type::scoped_lock lock(mtx_);
             cache_key realkey;
             cache_type::entry_type e;
             if (agas_cache_.get_entry(k, realkey, e)) {
@@ -334,6 +393,16 @@ namespace hpx { namespace naming
             }
         }
 #endif
+        return false;
+    }
+
+    bool resolver_client::resolve(gid_type const& id, address& addr, 
+        bool try_cache, error_code& ec) const
+    {
+        util::block_profiler<resolve_tag> bp("resolver_client::resolve");
+
+        if (try_cache && resolve_cached(id, addr, ec))
+            return true;
 
         // send request
         server::request req (server::command_resolve, id);
@@ -358,7 +427,8 @@ namespace hpx { namespace naming
 
 #if defined(HPX_USE_AGAS_CACHE)
         // add the requested item to the cache
-        boost::mutex::scoped_lock lock(mtx_);
+        mutex_type::scoped_lock lock(mtx_);
+        cache_key k(id);
         agas_cache_.insert(k, std::make_pair(addr, 1));
 #endif
 
@@ -369,7 +439,7 @@ namespace hpx { namespace naming
 
     ///////////////////////////////////////////////////////////////////////////
     bool resolver_client::registerid(std::string const& ns_name, 
-        id_type const& id, error_code& ec) const
+        gid_type const& id, error_code& ec) const
     {
         // send request
         server::request req (server::command_registerid, ns_name, id);
@@ -424,7 +494,7 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool resolver_client::queryid(std::string const& ns_name, id_type& id,
+    bool resolver_client::queryid(std::string const& ns_name, gid_type& id,
         error_code& ec) const
     {
         // send request
@@ -576,6 +646,8 @@ namespace hpx { namespace naming
                             there_.connect_begin(io_service_pool_.get_io_service()); 
                          it != end; ++it)
                     {
+//                         boost::system::error_code ec;
+//                         client_connection->socket().shutdown(boost::asio::socket_base::shutdown_both, ec);
                         client_connection->socket().close();
                         client_connection->socket().connect(*it, error);
                         if (!error) 
@@ -600,6 +672,9 @@ namespace hpx { namespace naming
             }
 
             if (error) {
+//                 boost::system::error_code ec;
+//                 client_connection->socket().shutdown(
+//                     boost::asio::socket_base::shutdown_both, ec);
                 client_connection->socket().close();
 
                 HPX_OSSTREAM strm;
@@ -639,6 +714,8 @@ namespace hpx { namespace naming
 #else
                 boost::archive::binary_oarchive archive(io);
 #endif
+                std::size_t count = 1;
+                archive << count;
                 archive << req;
                 io.strict_sync();
             }
@@ -719,6 +796,134 @@ namespace hpx { namespace naming
 #else
                 boost::archive::binary_iarchive archive(io);
 #endif
+                std::size_t count;
+                archive >> count;
+                BOOST_ASSERT(count == 1);
+                archive >> rep;
+            }
+        }
+        catch (boost::system::system_error const& e) {
+            HPX_THROWS_IF(ec, network_error, 
+                "resolver_client::execute", e.what());
+            return false;
+        }
+        catch (std::exception const& e) {
+            HPX_THROWS_IF(ec, network_error, 
+                "resolver_client::execute", e.what());
+            return false;
+        }
+        catch (...) {
+            HPX_THROWS_IF(ec, no_success, 
+                "resolver_client::execute", "unexpected error");
+            return false;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+        return true;
+    }
+
+    bool resolver_client::execute(std::vector<server::request> const &req, 
+        std::vector<server::reply>& rep, error_code& ec) const
+    {
+        typedef util::container_device<std::vector<char> > io_device_type;
+
+        try {
+            // connect socket
+            std::vector<char> buffer;
+            {
+                // serialize the request
+                boost::iostreams::stream<io_device_type> io(buffer);
+#if HPX_USE_PORTABLE_ARCHIVES != 0
+                util::portable_binary_oarchive archive(io);
+#else
+                boost::archive::binary_oarchive archive(io);
+#endif
+                std::size_t count = req.size();
+                archive << count;
+                archive << req;
+                io.strict_sync();
+            }
+
+            // get existing connection to AGAS server or establish a new one
+            boost::system::error_code err = boost::asio::error::try_again;
+
+            boost::shared_ptr<resolver_client_connection> client_connection =
+                get_client_connection(ec);
+            if (!client_connection) return false;
+
+            // send the data
+            boost::integer::ulittle32_t size = (boost::integer::ulittle32_t)buffer.size();
+            std::vector<boost::asio::const_buffer> buffers;
+            buffers.push_back(boost::asio::buffer(&size, sizeof(size)));
+            buffers.push_back(boost::asio::buffer(buffer));
+            std::size_t written_bytes = boost::asio::write(
+                client_connection->socket(), buffers,
+                boost::bind(&resolver_client::write_completed, _1, _2, 
+                    buffer.size() + sizeof(size)),
+                err);
+            if (err) {
+                HPX_THROWS_IF(ec, network_error, 
+                    "resolver_client::execute", err.message());
+                return false;
+            }
+            if (buffer.size() + sizeof(size) != written_bytes) {
+                HPX_THROWS_IF(ec, network_error, 
+                    "resolver_client::execute", "network write failed");
+                return false;
+            }
+
+            // wait for response
+            // first read the size of the message 
+            std::size_t reply_length = boost::asio::read(
+                client_connection->socket(),
+                boost::asio::buffer(&size, sizeof(size)),
+                boost::bind(&resolver_client::read_completed, _1, _2, sizeof(size)),
+                err);
+            if (err) {
+                HPX_THROWS_IF(ec, network_error, 
+                    "resolver_client::execute", err.message());
+                return false;
+            }
+            if (reply_length != sizeof(size)) {
+                HPX_THROWS_IF(ec, network_error, 
+                    "resolver_client::execute", "network read failed");
+                return false;
+            }
+
+            // now read the rest of the message
+            boost::uint32_t native_size = size;
+            buffer.resize(native_size);
+            reply_length = boost::asio::read(client_connection->socket(), 
+                boost::asio::buffer(buffer), 
+                boost::bind(&resolver_client::read_completed, _1, _2, native_size), 
+                err);
+
+            if (err) {
+                HPX_THROWS_IF(ec, network_error, 
+                    "resolver_client::execute", err.message());
+                return false;
+            }
+            if (reply_length != native_size) {
+                HPX_THROWS_IF(ec, network_error, 
+                    "resolver_client::execute", "network read failed");
+                return false;
+            }
+
+            // return the connection to the cache
+            connection_cache_.add(there_, client_connection);
+
+            // De-serialize the data
+            {
+                boost::iostreams::stream<io_device_type> io(buffer);
+#if HPX_USE_PORTABLE_ARCHIVES != 0
+                util::portable_binary_iarchive archive(io);
+#else
+                boost::archive::binary_iarchive archive(io);
+#endif
+                std::size_t count;
+                archive >> count;
+                BOOST_ASSERT(count == req.size());
                 archive >> rep;
             }
         }

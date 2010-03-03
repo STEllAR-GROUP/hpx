@@ -25,9 +25,11 @@ namespace hpx { namespace components { namespace amr
         base_type;
 
     public:
+        stencil_value() {}
+
         /// Construct a new stencil_value instance
-        stencil_value(naming::id_type gid, bool freeonexit = false)
-          : base_type(gid, freeonexit)
+        stencil_value(naming::id_type const& gid)
+          : base_type(gid)
         {}
 
         ///////////////////////////////////////////////////////////////////////

@@ -42,7 +42,15 @@ namespace hpx { namespace util
 
             // create default ini entries for memory_block component hosted in 
             // the main hpx shared library
-            "[hpx.components.memory_block]",
+//             "[hpx.components.memory_block]",
+//             "name = hpx",
+//             "path = $[hpx.location]/lib/" 
+//                 BOOST_PP_STRINGIZE(HPX_MANGLE_NAME(HPX_COMPONENT_NAME))
+//                 HPX_SHARED_LIB_EXTENSION,
+
+            // create default ini entries for raw_counter component hosted in 
+            // the main hpx shared library
+            "[hpx.components.raw_counter]",
             "name = hpx",
             "path = $[hpx.location]/lib/" 
                 BOOST_PP_STRINGIZE(HPX_MANGLE_NAME(HPX_COMPONENT_NAME))

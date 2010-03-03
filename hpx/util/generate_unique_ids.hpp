@@ -32,7 +32,7 @@ namespace hpx { namespace util
         {}
 
         /// Generate next unique component id
-        naming::id_type get_id(naming::locality const& here,
+        naming::gid_type get_id(naming::locality const& here,
             naming::resolver_client const& resolver, std::size_t count = 1)
         {
             // create a new id
@@ -45,7 +45,7 @@ namespace hpx { namespace util
                     (std::max)(std::size_t(range_delta), count), lower_, upper_);
             }
 
-            naming::id_type result = lower_;
+            naming::gid_type result = lower_;
             lower_ += count;
             return result;
         }
@@ -54,8 +54,8 @@ namespace hpx { namespace util
         mutex_type mtx_;
 
         /// The range of available ids for components
-        naming::id_type lower_;
-        naming::id_type upper_;
+        naming::gid_type lower_;
+        naming::gid_type upper_;
     };
     
 }}

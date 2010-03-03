@@ -80,9 +80,19 @@ namespace hpx { namespace threads
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_id_type threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         register_thread(thread_init_data& data, thread_state initial_state, 
-            bool run_now)
+            bool run_now, error_code& ec)
     {
         util::block_profiler_wrapper<register_thread_tag> bp(thread_logger_);
+
+        // verify state
+        if (!running_) 
+        {
+            // threadmanager is not currently running
+            HPX_THROWS_IF(ec, invalid_status,
+                "threadmanager_impl::register_thread",
+                "invalid state: thread manager is not running");
+            return invalid_thread_id;
+        }
 
         // verify parameters
         if (initial_state != pending && initial_state != suspended)
@@ -90,13 +100,14 @@ namespace hpx { namespace threads
             HPX_OSSTREAM strm;
             strm << "invalid initial state: " 
                  << get_thread_state_name(initial_state);
-            HPX_THROW_EXCEPTION(bad_parameter, 
-                "threadmanager_impl::register_thread", HPX_OSSTREAM_GETSTRING(strm));
+            HPX_THROWS_IF(ec, bad_parameter,
+                "threadmanager_impl::register_thread",
+                HPX_OSSTREAM_GETSTRING(strm));
             return invalid_thread_id;
         }
         if (0 == data.description)
         {
-            HPX_THROW_EXCEPTION(bad_parameter, 
+            HPX_THROWS_IF(ec, bad_parameter,
                 "threadmanager_impl::register_thread", "description is NULL");
             return invalid_thread_id;
         }
@@ -111,7 +122,7 @@ namespace hpx { namespace threads
 
         // create the new thread
         thread_id_type newid = scheduler_.create_thread(
-            data, initial_state, run_now, get_thread_num());
+            data, initial_state, run_now, ec, get_thread_num());
 
         LTM_(info) << "register_thread(" << newid << "): initial_state(" 
                    << get_thread_state_name(initial_state) << "), "
@@ -124,9 +135,19 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::register_work(
-        thread_init_data& data, thread_state initial_state)
+        thread_init_data& data, thread_state initial_state, error_code& ec)
     {
         util::block_profiler_wrapper<register_work_tag> bp(work_logger_);
+
+        // verify state
+        if (!running_) 
+        {
+            // threadmanager is not currently running
+            HPX_THROWS_IF(ec, invalid_status,
+                "threadmanager_impl::register_work",
+                "invalid state: thread manager is not running");
+            return;
+        }
 
         // verify parameters
         if (initial_state != pending && initial_state != suspended)
@@ -134,13 +155,14 @@ namespace hpx { namespace threads
             HPX_OSSTREAM strm;
             strm << "invalid initial state: " 
                  << get_thread_state_name(initial_state);
-            HPX_THROW_EXCEPTION(bad_parameter, 
-                "threadmanager_impl::register_work", HPX_OSSTREAM_GETSTRING(strm));
+            HPX_THROWS_IF(ec, bad_parameter,
+                "threadmanager_impl::register_work",
+                HPX_OSSTREAM_GETSTRING(strm));
             return;
         }
         if (0 == data.description)
         {
-            HPX_THROW_EXCEPTION(bad_parameter, 
+            HPX_THROWS_IF(ec, bad_parameter,
                 "threadmanager_impl::register_work", "description is NULL");
             return;
         }
@@ -158,7 +180,7 @@ namespace hpx { namespace threads
             data.parent_prefix = applier::get_prefix_id();
 
         // create the new thread
-        scheduler_.create_thread(data, initial_state, false, get_thread_num());
+        scheduler_.create_thread(data, initial_state, false, ec, get_thread_num());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -360,7 +382,8 @@ namespace hpx { namespace threads
 
     /// Retrieve the global id of the given thread
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    naming::id_type threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    naming::id_type const& 
+    threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         get_thread_gid(thread_id_type id) 
     {
         // we know that the id is actually the pointer to the thread
@@ -523,10 +546,7 @@ namespace hpx { namespace threads
     {
         ~manage_counter()
         {
-            if (counter_) {
-                error_code ec;
-                util::remove_counter(info_, counter_, ec);
-            }
+            uninstall();
         }
 
         performance_counters::counter_status install(
@@ -536,6 +556,15 @@ namespace hpx { namespace threads
             BOOST_ASSERT(!counter_);
             info_.fullname_ = name;
             return util::add_counter(info_, f, counter_, ec);
+        }
+
+        void uninstall()
+        {
+            if (counter_) {
+                error_code ec;
+                util::remove_counter(info_, counter_, ec);
+                counter_ = naming::invalid_id;
+            }
         }
 
         performance_counters::counter_info info_;
@@ -635,6 +664,10 @@ namespace hpx { namespace threads
 
                 tl1.tock();
             }
+
+            // if we need to terminate, unregister the counter first
+            if (!running_)
+                queue_length_counter.uninstall();
 
             // if nothing else has to be done either wait or terminate
             if (scheduler_.wait_or_add_new(num_thread, running_))

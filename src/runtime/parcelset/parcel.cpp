@@ -27,7 +27,7 @@ namespace hpx { namespace parcelset
     void parcel::save(Archive & ar, const unsigned int version) const
     {
         ar << tag_;
-        ar << destination_id_;
+        ar << destination_id_;    // don't increment global refcnt
         ar << destination_addr_;
         ar << source_id_;
         ar << action_;
@@ -49,6 +49,7 @@ namespace hpx { namespace parcelset
 
         bool has_continuation = false;
         ar >> tag_;
+
         ar >> destination_id_;
         ar >> destination_addr_;
         ar >> source_id_;

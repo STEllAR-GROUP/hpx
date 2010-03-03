@@ -57,10 +57,10 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
     class lazy_future<Action, Result, boost::mpl::false_> 
-      : public future_value<Result, 1>
+      : public future_value<Result, typename Action::result_type>
     {
     private:
-        typedef future_value<Result, 1> base_type;
+        typedef future_value<Result, typename Action::result_type> base_type;
 
     public:
         /// Construct a new \a lazy_future instance. The \a thread 
@@ -90,10 +90,15 @@ namespace hpx { namespace lcos
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
+        Result get(naming::gid_type const& gid) const
+        {
+            return get(naming::id_type(gid, naming::id_type::unmanaged));
+        }
         Result get(naming::id_type const& gid) const
         {
             // initialize the operation
-            hpx::applier::apply_c<Action>(this->get_gid(), gid);
+            hpx::applier::apply_c<Action>(
+                this->get_gid(naming::id_type::unmanaged), gid);
 
             // wait for the result (yield control)
             return (*this->impl_)->get_data(0);
@@ -114,26 +119,32 @@ namespace hpx { namespace lcos
         ///               exception encapsulating the reported error code and 
         ///               error description.
         template <typename Arg0>
+        Result get(naming::gid_type const& gid, Arg0 const& arg0) const
+        {
+            return get(naming::id_type(gid, naming::id_type::unmanaged), arg0);
+        }
+        template <typename Arg0>
         Result get(naming::id_type const& gid, Arg0 const& arg0) const
         {
             // initialize the operation
-            hpx::applier::apply_c<Action>(this->get_gid(), gid, arg0);
+            hpx::applier::apply_c<Action>(
+                this->get_gid(naming::id_type::unmanaged), gid, arg0);
 
             // wait for the result (yield control)
             return (*this->impl_)->get_data(0);
         }
 
-        // pull in remaining get's
+        // pull in remaining gets
         #include <hpx/lcos/lazy_future_get_results.hpp>
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
     class lazy_future<Action, Result, boost::mpl::true_> 
-      : public future_value<Result, 1>
+      : public future_value<Result, typename Action::result_type>
     {
     private:
-        typedef future_value<Result, 1> base_type;
+        typedef future_value<Result, typename Action::result_type> base_type;
 
     public:
         /// Construct a new \a lazy_future instance. The \a thread 
@@ -163,6 +174,10 @@ namespace hpx { namespace lcos
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
+        Result get(naming::gid_type const& gid) const
+        {
+            return get(naming::id_type(gid, naming::id_type::unmanaged));
+        }
         Result get(naming::id_type const& gid) const
         {
             // Determine whether the gid is local or remote
@@ -175,7 +190,8 @@ namespace hpx { namespace lcos
             }
 
             // initialize the remote operation
-            hpx::applier::apply_c<Action>(addr, this->get_gid(), gid);
+            hpx::applier::apply_c<Action>(
+                addr, this->get_gid(naming::id_type::unmanaged), gid);
 
             // wait for the result (yield control)
             return (*this->impl_)->get_data(0);
@@ -195,6 +211,11 @@ namespace hpx { namespace lcos
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
+        template <typename Arg0>
+        Result get(naming::gid_type const& gid, Arg0 const& arg0) const
+        {
+            return get(naming::id_type(gid, naming::id_type::unmanaged), arg0);
+        }
         template <typename Arg0>
         Result get(naming::id_type const& gid, Arg0 const& arg0) const
         {
@@ -208,13 +229,14 @@ namespace hpx { namespace lcos
             }
 
             // initialize the remote operation
-            hpx::applier::apply_c<Action>(addr, this->get_gid(), gid, arg0);
+            hpx::applier::apply_c<Action>(
+                addr, this->get_gid(naming::id_type::unmanaged), gid, arg0);
 
             // wait for the result (yield control)
             return (*this->impl_)->get_data(0);
         }
 
-        // pull in remaining get's
+        // pull in remaining gets
         #include <hpx/lcos/lazy_future_get_results_direct.hpp>
     };
 

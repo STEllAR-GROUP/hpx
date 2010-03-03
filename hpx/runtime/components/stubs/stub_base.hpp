@@ -18,28 +18,28 @@ namespace hpx { namespace components { namespace stubs
     {
         ///////////////////////////////////////////////////////////////////////
         /// Asynchronously create a new instance of a distributing_factory
-        static lcos::future_value<naming::id_type>
+        static lcos::future_value<naming::id_type, naming::gid_type>
         create_async(naming::id_type const& gid, 
             component_type type, std::size_t count = 1)
         {
             return stubs::runtime_support::create_component_async(gid, type, count);
         }
 
-        static lcos::future_value<naming::id_type>
+        static lcos::future_value<naming::id_type, naming::gid_type>
         create_async(naming::id_type const& gid, std::size_t count = 1)
         {
             return create_async(gid, get_component_type<ServerComponent>(), count);
         }
 
         /// Create a new instance of an simple_accumulator
-        static naming::id_type 
+        static naming::id_type
         create(naming::id_type const& gid, component_type type, 
             std::size_t count = 1)
         {
             return stubs::runtime_support::create_component(gid, type, count);
         }
 
-        static naming::id_type 
+        static naming::id_type
         create(naming::id_type const& gid, std::size_t count = 1)
         {
             return create(gid, get_component_type<ServerComponent>(), count);
@@ -47,27 +47,31 @@ namespace hpx { namespace components { namespace stubs
 
         /// Delete an existing component
         static void
-        free(component_type type, naming::id_type const& gid)
+        free(component_type type, naming::id_type& gid)
         {
-            stubs::runtime_support::free_component(type, gid);
+//             stubs::runtime_support::free_component(type, gid.get_gid());
+            gid = naming::invalid_id;
         }
 
         static void
-        free(naming::id_type const& gid)
+        free(naming::id_type& gid)
         {
-            free(get_component_type<ServerComponent>(), gid);
+//             free(get_component_type<ServerComponent>(), gid);
+            gid = naming::invalid_id;
         }
 
         static void
-        free_sync(component_type type, naming::id_type const& gid)
+        free_sync(component_type type, naming::id_type& gid)
         {
-            stubs::runtime_support::free_component_sync(type, gid);
+//             stubs::runtime_support::free_component_sync(type, gid.get_gid());
+            gid = naming::invalid_id;
         }
 
         static void
-        free_sync(naming::id_type const& gid)
+        free_sync(naming::id_type& gid)
         {
-            free_sync(get_component_type<ServerComponent>(), gid);
+//             free_sync(get_component_type<ServerComponent>(), gid);
+            gid = naming::invalid_id;
         }
     };
 

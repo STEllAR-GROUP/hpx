@@ -250,7 +250,7 @@ namespace hpx { namespace threads { namespace policies
         // create a new thread and schedule it if the initial state is equal to 
         // pending
         thread_id_type create_thread(thread_init_data& data, 
-            thread_state initial_state, bool run_now)
+            thread_state initial_state, bool run_now, error_code& ec)
         {
             if (run_now) {
                 std::auto_ptr<threads::thread> thrd (
@@ -264,7 +264,7 @@ namespace hpx { namespace threads { namespace policies
                     thread_map_.insert(id, thrd.get());
 
                 if (!p.second) {
-                    HPX_THROW_EXCEPTION(hpx::no_success, 
+                    HPX_THROWS_IF(ec, hpx::no_success, 
                         "threadmanager::register_thread", 
                         "Couldn't add new thread to the map of threads");
                     return invalid_thread_id;

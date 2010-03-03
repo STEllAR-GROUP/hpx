@@ -34,7 +34,10 @@ namespace hpx { namespace parcelset
 
     parcelport::~parcelport()
     {
-        delete acceptor_;
+        // make sure all existing connections get destroyed first
+        connection_cache_.clear();
+        if (NULL != acceptor_)
+            delete acceptor_;
     }
 
     bool parcelport::run(bool blocking)
@@ -85,12 +88,17 @@ namespace hpx { namespace parcelset
 
     void parcelport::stop(bool blocking)
     {
-        delete acceptor_;
-        acceptor_ = NULL;
-
+        // make sure no more work is pending, wait for service pool to get empty
         io_service_pool_.stop();
         if (blocking) {
             io_service_pool_.join();
+
+            // now it's safe to take everything down
+            connection_cache_.clear();
+
+            delete acceptor_;
+            acceptor_ = NULL;
+
             io_service_pool_.clear();
         }
     }
@@ -125,6 +133,81 @@ namespace hpx { namespace parcelset
         {
             LPT_(error) << "handle read operation completion: error: " 
                         << e.message();
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void parcelport::send_parcel(parcel const& p, naming::address const& addr, 
+        handler_type f)
+    {
+        parcelport_connection_ptr client_connection(
+            connection_cache_.get(addr.locality_));
+
+        if (!client_connection) {
+//                 LPT_(info) << "parcelport: creating new connection to: " 
+//                            << addr.locality_;
+
+        // The parcel gets serialized inside the connection constructor, no 
+        // need to keep the original parcel alive after this call returned.
+            client_connection.reset(new parcelport_connection(
+                    io_service_pool_.get_io_service(), addr.locality_, 
+                    connection_cache_)); 
+            client_connection->set_parcel(p);
+
+        // connect to the target locality, retry if needed
+            boost::system::error_code error = boost::asio::error::try_again;
+            for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
+            {
+                try {
+                    naming::locality::iterator_type end = addr.locality_.connect_end();
+                    for (naming::locality::iterator_type it = 
+                            addr.locality_.connect_begin(io_service_pool_.get_io_service()); 
+                         it != end; ++it)
+                    {
+//                         boost::system::error_code ec;
+//                         client_connection->socket().shutdown(
+//                             boost::asio::socket_base::shutdown_both, ec);
+                        client_connection->socket().close();
+                        client_connection->socket().connect(*it, error);
+                        if (!error) 
+                            break;
+                    }
+                    if (!error) 
+                        break;
+
+                    // we wait for a really short amount of time (usually 100µs)
+                    boost::this_thread::sleep(boost::get_system_time() + 
+                        boost::posix_time::microseconds(HPX_NETWORK_RETRIES_SLEEP));
+                }
+                catch (boost::system::error_code const& e) {
+                    HPX_THROW_EXCEPTION(network_error, 
+                        "parcelport::send_parcel", e.message());
+                }
+            }
+            if (error) {
+//                 boost::system::error_code ec;
+//                 client_connection->socket().shutdown(
+//                     boost::asio::socket_base::shutdown_both, ec);
+                client_connection->socket().close();
+
+                HPX_OSSTREAM strm;
+                strm << error.message() << " (while trying to connect to: " 
+                     << addr.locality_ << ")";
+                HPX_THROW_EXCEPTION(network_error, 
+                    "parcelport::send_parcel", 
+                    HPX_OSSTREAM_GETSTRING(strm));
+            }
+
+        // Start an asynchronous write operation.
+            client_connection->async_write(f);
+        }
+        else {
+//                 LPT_(info) << "parcelport: reusing existing connection to: " 
+//                            << addr.locality_;
+
+        // reuse an existing connection
+            client_connection->set_parcel(p);
+            client_connection->async_write(f);
         }
     }
 

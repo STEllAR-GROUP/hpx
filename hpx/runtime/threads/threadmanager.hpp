@@ -52,6 +52,9 @@ namespace hpx { namespace threads
     public:
         virtual ~threadmanager_base() {}
 
+        /// \brief Return whether the thread manager is still running
+        virtual bool is_running() const = 0;
+
         /// The get_state function is part of the thread related API and allows
         /// to query the state of one of the threads known to the threadmanager
         ///
@@ -143,7 +146,7 @@ namespace hpx { namespace threads
         ///                   thread referenced by the \a id parameter. If the 
         ///                   thread is not known to the threadmanager the 
         ///                   return value will be \a naming::invalid_id.
-        virtual naming::id_type get_thread_gid(thread_id_type id) = 0;
+        virtual naming::id_type const& get_thread_gid(thread_id_type id) = 0;
 
         /// The get_description function is part of the thread related API and 
         /// allows to query the description of one of the threads known to the 
@@ -191,7 +194,8 @@ namespace hpx { namespace threads
 
         virtual void
         register_work(thread_init_data& data, 
-            thread_state initial_state = pending) = 0;
+            thread_state initial_state = pending,
+            error_code& ec = throws) = 0;
 
         /// The function \a register_thread adds a new work item to the thread 
         /// manager. It creates a new \a thread, adds it to the internal
@@ -231,7 +235,8 @@ namespace hpx { namespace threads
 
         virtual thread_id_type 
         register_thread(thread_init_data& data, 
-            thread_state initial_state = pending, bool run_now = true) = 0;
+            thread_state initial_state = pending, bool run_now = true,
+            error_code& ec = throws) = 0;
 
         /// this notifies the thread manager that there is some more work 
         /// available 
@@ -296,7 +301,7 @@ namespace hpx { namespace threads
 //             boost::uint32_t parent_prefix = 0, thread_id_type parent_id = 0);
 
         void register_work(thread_init_data& data, 
-            thread_state initial_state = pending);
+            thread_state initial_state = pending, error_code& ec = throws);
 
         /// The function \a register_thread adds a new work item to the thread 
         /// manager. It creates a new \a thread, adds it to the internal
@@ -335,7 +340,8 @@ namespace hpx { namespace threads
 //             thread_state initial_state = pending, bool run_now = true);
 
         thread_id_type register_thread(thread_init_data& data, 
-            thread_state initial_state = pending, bool run_now = true);
+            thread_state initial_state = pending, bool run_now = true,
+            error_code& ec = throws);
 
         /// \brief  Run the thread manager's work queue. This function 
         ///         instantiates the specified number of OS threads. All OS
@@ -356,6 +362,9 @@ namespace hpx { namespace threads
         /// \param blocking
         ///
         void stop (bool blocking = true);
+
+        /// \brief Return whether the thread manager is still running
+        bool is_running() const { return running_; }
 
         /// The set_state function is part of the thread related API and allows
         /// to change the state of one of the threads managed by this 
@@ -408,7 +417,7 @@ namespace hpx { namespace threads
         ///                   thread referenced by the \a id parameter. If the 
         ///                   thread is not known to the threadmanager the 
         ///                   return value will be \a naming::invalid_id.
-        naming::id_type get_thread_gid(thread_id_type id);
+        naming::id_type const& get_thread_gid(thread_id_type id);
 
         /// Set a timer to set the state of the given \a thread to the given 
         /// new value after it expired (at the given time)

@@ -137,6 +137,11 @@ namespace boost { namespace plugin {
             return std::make_pair(address, detail::free_dll<SymbolType>(handle));
         }
 
+        void keep_alive()
+        {
+            LoadLibrary();
+        }
+
     protected:
         void LoadLibrary()
         {

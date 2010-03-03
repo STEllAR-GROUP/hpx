@@ -70,7 +70,7 @@ namespace hpx { namespace parcelset { namespace server
         return false;
     }
 
-    bool parcelhandler_queue::get_parcel_from(naming::id_type src, parcel& p)
+    bool parcelhandler_queue::get_parcel_from(naming::id_type const& src, parcel& p)
     {
         mutex_type::scoped_lock l(mtx_);
 
@@ -90,7 +90,7 @@ namespace hpx { namespace parcelset { namespace server
         return false;
     }
 
-    bool parcelhandler_queue::get_parcel_for(naming::id_type dest, parcel& p)
+    bool parcelhandler_queue::get_parcel_for(naming::gid_type const& dest, parcel& p)
     {
         mutex_type::scoped_lock l(mtx_);
 

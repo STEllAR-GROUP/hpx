@@ -14,7 +14,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime/naming/full_address.hpp>
+#include <hpx/runtime/naming/name.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -37,10 +37,6 @@ namespace hpx { namespace actions
           : gid_(gid)
         {}
 
-        explicit continuation(naming::full_address const& gid)
-          : gid_(gid)
-        {}
-
         ///
         void trigger();
 
@@ -50,6 +46,9 @@ namespace hpx { namespace actions
 
         ///
         void trigger_error(boost::exception_ptr const& e);
+
+        typedef boost::function<void(naming::id_type&)> enum_gid_handler_type;
+        void enumerate_argument_gids(enum_gid_handler_type);
 
     private:
         // serialization support    
@@ -61,9 +60,8 @@ namespace hpx { namespace actions
             ar & gid_;
         }
 
-        naming::full_address gid_;
+        naming::id_type gid_;
     };
-
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

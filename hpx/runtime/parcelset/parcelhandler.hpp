@@ -35,8 +35,7 @@ namespace hpx { namespace parcelset
     {
     private:
         static void default_write_handler(boost::system::error_code const& e, 
-            std::size_t) 
-        {}
+            std::size_t size) {}
 
         void parcel_sink(parcelport& pp, 
             boost::shared_ptr<std::vector<char> > const& parcel_data);
@@ -56,13 +55,15 @@ namespace hpx { namespace parcelset
 
             // ensure the source locality id is set (if no component id is given)
             if (!p.get_source())
-                p.set_source(prefix_);
+                p.set_source(naming::id_type(prefix_, naming::id_type::unmanaged));
 
             // set the current local time for this locality
             p.set_start_time(get_current_time());
         }
         
     public:
+        typedef parcelport::handler_type handler_type;
+
         /// Construct a new \a parcelhandler initializing it from a AGAS client
         /// instance (parameter \a resolver) and the parcelport to be used for
         /// parcel send and receive (parameter \a pp).
@@ -125,7 +126,7 @@ namespace hpx { namespace parcelset
         /// 
         /// but doesn't require the full AGAS round trip as the prefix value 
         /// is cached inside the parcelhandler.
-        naming::id_type const& get_prefix() const 
+        naming::gid_type const& get_prefix() const 
         { 
             return prefix_; 
         }
@@ -138,7 +139,7 @@ namespace hpx { namespace parcelset
         /// \returns The function returns \a true if there is at least one 
         ///          remote locality known to the AGASservice 
         ///          (!prefixes.empty()).
-        bool get_remote_prefixes(std::vector<naming::id_type>& prefixes) const;
+        bool get_remote_prefixes(std::vector<naming::gid_type>& prefixes) const;
 
         /// A parcel is submitted for transport at the source locality site to 
         /// the parcel set of the locality with the put-parcel command
@@ -176,48 +177,7 @@ namespace hpx { namespace parcelset
         ///                 where \a err is the status code of the operation and
         ///                       \a size is the number of successfully 
         ///                              transferred bytes.
-        template <typename Handler>
-        parcel_id put_parcel(parcel& p, Handler f)
-        {
-            // asynchronously resolve destination address, if needed
-            if (!p.get_destination_addr()) {
-//                 util::unique_future<std::pair<bool, naming::address> > fut = 
-//                     resolver_.resolve_async(p.get_destination());
-// 
-//                 // properly initialize parcel
-//                 init_parcel(p);
-// 
-//                 // wait for the address translation to complete
-//                 std::pair<bool, naming::address> result = fut.get();
-//                 if (!result.first) {
-//                     throw exception(unknown_component_address, 
-//                         "Unknown destination address");
-//                 }
-//                 p.set_destination_addr(result.second);
-
-                // properly initialize parcel
-                init_parcel(p);
-
-                // resolve the remote address
-                naming::address addr;
-                if (!resolver_.resolve(p.get_destination(), addr)) {
-                    throw exception(unknown_component_address, 
-                        "Unknown destination address");
-                }
-                p.set_destination_addr(addr);
-            }
-            else {
-                // properly initialize parcel
-                init_parcel(p);
-            }
-
-            // write this parcel to the log
-//             LPT_(info) << "parcelhandler: put_parcel: " << p;
-
-            // send the parcel to its destination, return parcel id of the 
-            // parcel being sent
-            return pp_.put_parcel(p, f);
-        }
+        parcel_id put_parcel(parcel& p, handler_type f);
 
         /// This put_parcel() function overload is asynchronous, but no 
         /// callback functor is provided by the user. 
@@ -326,7 +286,7 @@ namespace hpx { namespace parcelset
         /// The returned parcel will be no longer available from the 
         /// parcelhandler as it is removed from the internal queue of received 
         /// parcels.
-        bool get_parcel_from(naming::id_type source, parcel& p)
+        bool get_parcel_from(naming::id_type const& source, parcel& p)
         {
             return parcels_.get_parcel_from(source, p);
         }
@@ -350,7 +310,7 @@ namespace hpx { namespace parcelset
         /// The returned parcel will be no longer available from the 
         /// parcelhandler as it is removed from the internal queue of received 
         /// parcels.
-        bool get_parcel_for(naming::id_type dest, parcel& p)
+        bool get_parcel_for(naming::gid_type const& dest, parcel& p)
         {
             return parcels_.get_parcel_for(dest, p);
         }
@@ -438,7 +398,7 @@ namespace hpx { namespace parcelset
         naming::resolver_client& resolver_;
 
         /// The site prefix of the locality 
-        naming::id_type prefix_;
+        naming::gid_type prefix_;
 
         /// the parcelport this handler is associated with
         parcelport& pp_;

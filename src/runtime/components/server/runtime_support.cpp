@@ -12,6 +12,7 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/manage_component.hpp>
+#include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 
@@ -37,6 +38,9 @@ HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::create_component_action,
     create_component_action);
 HPX_REGISTER_ACTION_EX(
+    hpx::components::server::runtime_support::create_memory_block_action,
+    create_memory_block_action);
+HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::free_component_action,
     free_component_action);
 HPX_REGISTER_ACTION_EX(
@@ -55,21 +59,23 @@ HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::runtime_support);
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
+    ///////////////////////////////////////////////////////////////////////////
     runtime_support::runtime_support(util::section& ini, 
-            naming::id_type const& prefix, naming::resolver_client& agas_client, 
+            naming::gid_type const& prefix, naming::resolver_client& agas_client, 
             applier::applier& applier)
-      : stopped_(false), ini_(ini)
+      : stopped_(false), terminated_(false), ini_(ini)
     {
         load_components(ini, prefix, agas_client);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     // return, whether more than one instance of the given component can be 
     // created at the same time
     int runtime_support::factory_properties(components::component_type type)
     {
     // locate the factory for the requested component type
         component_map_type::const_iterator it = components_.find(type);
-        if (it == components_.end()) {
+        if (it == components_.end() || !(*it).second.first) {
             // we don't know anything about this component
             HPX_OSSTREAM strm;
             strm << "attempt to query factory properties for components "
@@ -82,16 +88,17 @@ namespace hpx { namespace components { namespace server
         }
 
     // ask for the factory's capabilities
-        return (*it).second->get_factory_properties();
+        return (*it).second.first->get_factory_properties();
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     // create a new instance of a component
-    naming::id_type runtime_support::create_component(
+    naming::gid_type runtime_support::create_component(
         components::component_type type, std::size_t count)
     {
     // locate the factory for the requested component type
         component_map_type::const_iterator it = components_.find(type);
-        if (it == components_.end()) {
+        if (it == components_.end() || !(*it).second.first) {
             // we don't know anything about this component
             HPX_OSSTREAM strm;
             strm << "attempt to create component instance of invalid/unknown type: "
@@ -99,15 +106,15 @@ namespace hpx { namespace components { namespace server
             HPX_THROW_EXCEPTION(hpx::bad_component_type, 
                 "runtime_support::create_component",
                 HPX_OSSTREAM_GETSTRING(strm));
-            return naming::invalid_id;
+            return naming::invalid_gid;
         }
 
     // create new component instance
-        naming::id_type id = (*it).second->create(count);
+        naming::gid_type id = (*it).second.first->create(count);
 
     // set result if requested
         if (LHPX_ENABLED(info)) {
-            if ((*it).second->get_factory_properties() & factory_instance_count_is_size) 
+            if ((*it).second.first->get_factory_properties() & factory_instance_count_is_size) 
             {
                 LRT_(info) << "successfully created component " << id 
                            << " of type: " 
@@ -123,11 +130,67 @@ namespace hpx { namespace components { namespace server
         return id;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // create a new instance of a memory block
+    naming::gid_type runtime_support::create_memory_block(
+        std::size_t count, hpx::actions::manage_object_action_base const& act)
+    {
+        server::memory_block* c = server::memory_block::create(count, act);
+        naming::gid_type gid = c->get_base_gid();
+        if (gid) {
+            LRT_(info) << "successfully created memory block of size " << count 
+                       << ": " << gid;
+            return gid;
+        }
+
+        delete c;
+        HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
+            "runtime_support::create_memory_block", 
+            "global id is already bound to a different "
+            "component instance");
+        return naming::invalid_gid;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // delete an existing instance of a component
     void runtime_support::free_component(
-        components::component_type type, naming::id_type const& gid)
+        components::component_type type, naming::gid_type const& gid)
     {
     // locate the factory for the requested component type
+        if (type == components::component_memory_block) {
+            // retrieve the local address bound to the given global id
+            applier::applier& appl = hpx::applier::get_applier();
+            naming::address addr;
+            if (!appl.get_agas_client().resolve(gid, addr)) 
+            {
+                HPX_OSSTREAM strm;
+                strm << "global id " << gid << " is not bound to any "
+                        "component instance";
+                HPX_THROW_EXCEPTION(hpx::unknown_component_address,
+                    "destroy<Component>", HPX_OSSTREAM_GETSTRING(strm));
+                return;
+            }
+
+            // make sure this component is located here
+            if (appl.here() != addr.locality_) 
+            {
+                // FIXME: should the component be re-bound ?
+                HPX_OSSTREAM strm;
+                strm << "global id " << gid << " is not bound to any local "
+                        "component instance";
+                HPX_THROW_EXCEPTION(hpx::unknown_component_address,
+                    "destroy<Component>", HPX_OSSTREAM_GETSTRING(strm));
+                return;
+            }
+
+            // free the memory block
+            components::server::memory_block::destroy(
+                reinterpret_cast<components::server::memory_block*>(addr.address_));
+
+            LRT_(info) << "successfully destroyed memory block " << gid;
+            return;
+        }
+
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
             // we don't know anything about this component
@@ -142,36 +205,50 @@ namespace hpx { namespace components { namespace server
         }
 
     // destroy the component instance
-        (*it).second->destroy(gid);
+        (*it).second.first->destroy(gid);
 
         LRT_(info) << "successfully destroyed component " << gid 
             << " of type: " << components::get_component_type_name(type);
     }
 
+    // function to be called during shutdown
     // Action: shut down this runtime system instance
-    void runtime_support::shutdown()
+    int runtime_support::shutdown()
     {
         // initiate system shutdown
         stop();
+        return 0;   // dummy value
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     // initiate system shutdown for all localities
     void runtime_support::shutdown_all()
     {
-        std::vector<naming::id_type> prefixes;
+        std::vector<naming::gid_type> prefixes;
         applier::applier& appl = hpx::applier::get_applier();
         appl.get_agas_client().get_prefixes(prefixes);
 
         // shut down all localities except the the local one
-        std::vector<naming::id_type>::iterator end = prefixes.end();
-        for (std::vector<naming::id_type>::iterator it = prefixes.begin(); 
+        std::vector<lcos::future_value<int> > lazy_actions;
+        std::vector<naming::gid_type>::iterator end = prefixes.end();
+        for (std::vector<naming::gid_type>::iterator it = prefixes.begin(); 
              it != end; ++it)
         {
-            if (naming::get_prefix_from_id(appl.get_prefix()) !=
-                naming::get_prefix_from_id(*it))
+            if (naming::get_prefix_from_gid(appl.get_prefix()) !=
+                naming::get_prefix_from_gid(*it))
             {
-                components::stubs::runtime_support::shutdown(*it);
+                naming::id_type id(*it, naming::id_type::unmanaged);
+                lazy_actions.push_back(
+                    components::stubs::runtime_support::shutdown_async(id));
             }
+        }
+
+        // wait for all localities to be stopped
+        std::vector<lcos::future_value<int> >::iterator lend = lazy_actions.end();
+        for (std::vector<lcos::future_value<int> >::iterator lit = lazy_actions.begin();
+             lit != lend; ++lit)
+        {
+            (*lit).get();
         }
 
         // now make sure the local locality gets shut down as well.
@@ -184,11 +261,37 @@ namespace hpx { namespace components { namespace server
         return *ini_.get_section("application");
     }
 
+    void runtime_support::tidy()
+    {
+        // Only after releasing the components we are allowed to release 
+        // the modules. This is done in reverse order of loading.
+        component_map_type::iterator end = components_.end();
+        for (component_map_type::iterator it = components_.begin(); it != end; /**/)
+        {
+            component_map_type::iterator curr = it;
+            ++it;
+            if ((*curr).second.first)
+            {
+                // this is a workaround for sloppy memory management...
+                // keep module in memory until application terminated
+                if (!(*curr).second.first->may_unload())
+                    (*curr).second.second.keep_alive();
+
+                // delete factory in any case
+                (*curr).second.first.reset();
+            }
+
+            // now delete the entry
+            components_.erase(curr);
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     void runtime_support::run()
     {
         mutex_type::scoped_lock l(mtx_);
         stopped_ = false;
+        terminated_ = false;
     }
 
     void runtime_support::wait()
@@ -196,7 +299,7 @@ namespace hpx { namespace components { namespace server
         mutex_type::scoped_lock l(mtx_);
         if (!stopped_) {
             LRT_(info) << "runtime_support: about to enter wait state";
-            condition_.wait(l);
+            wait_condition_.wait(l);
             LRT_(info) << "runtime_support: exiting wait state";
         }
     }
@@ -205,15 +308,27 @@ namespace hpx { namespace components { namespace server
     {
         mutex_type::scoped_lock l(mtx_);
         if (!stopped_) {
+            BOOST_ASSERT(!terminated_);
             stopped_ = true;
-            condition_.notify_all();
+            wait_condition_.notify_all();
+            stop_condition_.wait(l);        // wait for termination
+        }
+    }
+
+    // this will be called after the thread manager has exited
+    void runtime_support::stopped()
+    {
+        mutex_type::scoped_lock l(mtx_);
+        if (!terminated_) {
+            stop_condition_.notify_all();   // finished cleanup/termination
+            terminated_ = true;
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // Load all components from the ini files found in the configuration
     void runtime_support::load_components(util::section& ini, 
-        naming::id_type const& prefix, naming::resolver_client& agas_client)
+        naming::gid_type const& prefix, naming::resolver_client& agas_client)
     {
         // load all components as described in the configuration information
         if (!ini.has_section("hpx.components")) {
@@ -296,7 +411,7 @@ namespace hpx { namespace components { namespace server
 
     bool runtime_support::load_component(util::section& ini, 
         std::string const& instance, std::string const& component, 
-        boost::filesystem::path lib, naming::id_type const& prefix, 
+        boost::filesystem::path lib, naming::gid_type const& prefix, 
         naming::resolver_client& agas_client, bool isdefault)
     {
         namespace fs = boost::filesystem;
@@ -323,7 +438,7 @@ namespace hpx { namespace components { namespace server
                 component_ini = ini.get_section(component_section);
 
             // create the component factory object
-            component_factory_type factory (
+            boost::shared_ptr<component_factory_base> factory (
                 pf.create(instance, glob_ini, component_ini)); 
 
             component_type t = factory->get_component_type(prefix, agas_client);
@@ -332,20 +447,15 @@ namespace hpx { namespace components { namespace server
                 return false;   // module refused to load
             }
 
-            // store component factory for later use
-            std::pair<component_map_type::iterator, bool> p = 
-                components_.insert(component_map_type::value_type(t, factory));
+            // store component factory and module for later use
+            std::pair<component_map_type::iterator, bool> p = components_.insert(
+                    component_map_type::value_type(t, std::make_pair(factory, d)));
 
             if (!p.second) {
                 LRT_(error) << "duplicate component id: " << instance
                            << ": " << components::get_component_type_name(t);
                 return false;   // duplicate component id?
             }
-
-            // Store the reference to the shared library if everything is fine.
-            // We store the library at front of the list so we can unload the 
-            // modules in reverse order.
-            modules_.push_front(d); 
 
             LRT_(info) << "dynamic loading succeeded: " << lib.string() 
                        << ": " << instance << ": " 
@@ -360,6 +470,5 @@ namespace hpx { namespace components { namespace server
         }
         return true;    // component got loaded
     }
-
 }}}
 

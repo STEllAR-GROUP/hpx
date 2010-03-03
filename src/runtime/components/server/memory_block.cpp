@@ -20,8 +20,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_COMPONENT_MODULE();
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::server::memory_block, memory_block);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the memory_block actions
@@ -68,24 +66,23 @@ namespace hpx { namespace components { namespace server { namespace detail
     }
 
     /// Clone this memory_block
-    naming::id_type create_memory_block (detail::memory_block_header const* rhs)
+    naming::gid_type create_memory_block (detail::memory_block_header const* rhs,
+        actions::manage_object_action_base const& act)
     {
-        server::memory_block* c = server::memory_block::create(rhs);
-        naming::id_type gid = c->get_gid();
-        if (gid) 
-            return gid;
+        server::memory_block* c = server::memory_block::create(rhs, act);
+        naming::gid_type gid = c->get_base_gid();
+        if (gid) return gid;
 
         delete c;
         HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
-            "create_memory_block", 
+            "server::detail::create_memory_block", 
             "global id is already bound to a different "
             "component instance");
-        return naming::invalid_id;
+        return naming::invalid_gid;
     }
 
-    naming::id_type memory_block::clone() 
+    naming::gid_type memory_block::clone() 
     {
-        return create_memory_block(wrapper_->component_.get());
+        return create_memory_block(wrapper_->component_.get(), this->managing_object_);
     }
-
 }}}}

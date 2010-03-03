@@ -23,6 +23,30 @@ namespace hpx { namespace components { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
+        template <typename T>
+        static lcos::future_value<naming::id_type, naming::gid_type> 
+        create_async(naming::id_type const& targetgid, std::size_t count,
+            hpx::actions::manage_object_action<T> const& act) 
+        {
+            // Create an eager_future, execute the required action,
+            // we simply return the initialized future_value, the caller needs
+            // to call get() on the return value to obtain the result
+            typedef server::runtime_support::create_memory_block_action action_type;
+            return lcos::eager_future<action_type, naming::id_type>(targetgid, count, act);
+        }
+
+        /// Create a new component \a type using the runtime_support with the 
+        /// given \a targetgid. Block for the creation to finish.
+        template <typename T>
+        static naming::id_type 
+        create(naming::id_type const& targetgid, std::size_t count, 
+            hpx::actions::manage_object_action<T> const& act) 
+        {
+            // The following get yields control while the action above 
+            // is executed and the result is returned to the eager_future
+            return create_async(targetgid, count, act).get();
+        }
+
         /// Exposed functionality: get returns either the local memory pointers
         /// or a copy of the remote data.
 
@@ -66,15 +90,15 @@ namespace hpx { namespace components { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::future_value<naming::id_type> clone_async(
-            naming::id_type const& targetgid) 
+        static lcos::future_value<naming::id_type, naming::gid_type> 
+        clone_async(naming::id_type const& targetgid) 
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::detail::memory_block::clone_action action_type;
-            typedef naming::id_type data_type;
-            return lcos::eager_future<action_type, data_type>(targetgid);
+            typedef naming::gid_type data_type;
+            return lcos::eager_future<action_type, naming::id_type>(targetgid);
         }
 
         static naming::id_type clone(naming::id_type const& targetgid) 

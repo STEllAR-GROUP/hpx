@@ -16,13 +16,13 @@ namespace hpx { namespace components
 {
     // stub function allowing to apply the console_console_error_sink action
     void console_error_sink(naming::id_type const& dst, 
-        naming::id_type const& src, boost::exception_ptr const& e)
+        naming::gid_type const& src, boost::exception_ptr const& e)
     {
         // do logging only if applier is still valid
         if (NULL != applier::get_applier_ptr())
         {
             applier::apply<server::console_error_sink_action>(
-                dst, naming::get_prefix_from_id(src), e);
+                dst, naming::get_prefix_from_gid(src), e);
         }
     }
 

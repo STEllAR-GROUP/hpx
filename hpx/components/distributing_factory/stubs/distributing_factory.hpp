@@ -21,6 +21,7 @@ namespace hpx { namespace components { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
         typedef server::distributing_factory::result_type result_type;
+        typedef server::distributing_factory::remote_result_type remote_result_type;
         typedef server::distributing_factory::iterator_type iterator_type;
         typedef server::distributing_factory::iterator_range_type iterator_range_type;
 
@@ -29,14 +30,16 @@ namespace hpx { namespace components { namespace stubs
         /// The caller needs to call \a future_value#get on the result 
         /// of this function to obtain the global ids of the newly created 
         /// objects.
-        static lcos::future_value<result_type> create_components_async(
+        static lcos::future_value<result_type, remote_result_type> 
+        create_components_async(
             naming::id_type const& targetgid, components::component_type type, 
             std::size_t count) 
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
-            typedef server::distributing_factory::create_components_action action_type;
+            typedef server::distributing_factory::create_components_action 
+                action_type;
             return lcos::eager_future<action_type, result_type>(
                 targetgid, type, count);
         }
@@ -55,19 +58,17 @@ namespace hpx { namespace components { namespace stubs
         static void free_components(naming::id_type const& factory, 
             result_type const& gids) 
         {
-            typedef 
-                server::distributing_factory::free_components_action 
-            action_type;
-            hpx::applier::apply<action_type>(factory, gids, false);
+//             typedef server::distributing_factory::free_components_action 
+//                 action_type;
+//             hpx::applier::apply<action_type>(factory, gids, false);
         }
 
         static void free_components_sync(naming::id_type const& factory, 
             result_type const& gids) 
         {
-            typedef 
-                server::distributing_factory::free_components_action 
-            action_type;
-            lcos::eager_future<action_type, void>(factory, gids, true).get();
+//             typedef server::distributing_factory::free_components_action 
+//                 action_type;
+//             lcos::eager_future<action_type, void>(factory, gids, true).get();
         }
     };
 

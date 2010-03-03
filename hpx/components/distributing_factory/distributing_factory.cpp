@@ -29,13 +29,13 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
 HPX_REGISTER_ACTION_EX(
     distributing_factory_type::create_components_action,
     distributing_factory_create_components_action);
-HPX_REGISTER_ACTION_EX(
-    distributing_factory_type::free_components_action,
-    distributing_factory_free_components_action);
+// HPX_REGISTER_ACTION_EX(
+//     distributing_factory_type::free_components_action,
+//     distributing_factory_free_components_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(distributing_factory_type);
 
 typedef hpx::lcos::base_lco_with_value<
-        distributing_factory_type::result_type 
+        distributing_factory_type::remote_result_type 
     > create_result_type;
 
 HPX_REGISTER_ACTION_EX(

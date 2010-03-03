@@ -13,6 +13,7 @@
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/at.hpp>
 #include <boost/fusion/include/size.hpp>
+#include <boost/fusion/include/any.hpp>
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
 #include <boost/function.hpp>
@@ -48,8 +49,8 @@ namespace hpx { namespace actions
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// The \a base_action class is a abstract class used as the base class for 
-    /// all action types. It's main purpose is to allow polymorphic 
+    /// The \a base_action class is an abstract class used as the base class  
+    /// for all action types. It's main purpose is to allow polymorphic 
     /// serialization of action instances through a shared_ptr.
     struct base_action
     {
@@ -130,16 +131,40 @@ namespace hpx { namespace actions
         get_thread_init_data(continuation_type& cont,
             naming::address::address_type lva,
             threads::thread_init_data& data) = 0;
+
+        /// Enumerate all GIDs which stored as arguments
+        typedef boost::function<void(naming::id_type const&)> enum_gid_handler_type;
+        virtual void enumerate_argument_gids(enum_gid_handler_type) = 0;
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    struct enum_gid_handler
+    {
+        enum_gid_handler(base_action::enum_gid_handler_type f)
+          : f_(f)
+        {}
+
+        template <typename T>
+        bool operator()(T&) const
+        {
+            return true;
+        }
+        bool operator()(naming::id_type const& id) const
+        {
+            f_(boost::ref(id));
+            return true;
+        }
+
+        base_action::enum_gid_handler_type f_;
+    };
+
     template <typename Component, int Action, typename Arguments>
     class action : public base_action
     {
     public:
         typedef Component component_type;
         typedef Arguments arguments_type;
-        typedef void result_type;
+        typedef util::unused_type result_type;
 
         // This is the action code (id) of this action. It is exposed to allow 
         // generic handling of actions.
@@ -314,6 +339,11 @@ namespace hpx { namespace actions
         threads::thread_id_type get_parent_thread_id() const
         {
             return reinterpret_cast<threads::thread_id_type>(parent_id_);
+        }
+
+        void enumerate_argument_gids(enum_gid_handler_type f)
+        {
+            boost::fusion::any(arguments_, enum_gid_handler(f));
         }
 
     private:

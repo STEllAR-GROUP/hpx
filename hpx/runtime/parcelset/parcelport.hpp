@@ -89,8 +89,12 @@ namespace hpx { namespace parcelset
         ///                 where \a err is the status code of the operation and
         ///                       \a size is the number of successfully 
         ///                              transferred bytes.
-        template <typename Handler>
-        parcel_id put_parcel(parcel& p, Handler f)
+
+        typedef boost::function<
+              void(boost::system::error_code const&, std::size_t)
+        > handler_type;
+    
+        parcel_id put_parcel(parcel& p, handler_type f)
         {
             // send the parcel to its destination
             send_parcel(p, p.get_destination_addr(), f);
@@ -150,6 +154,11 @@ namespace hpx { namespace parcelset
             return here_;
         }
 
+        util::io_service_pool& get_io_service_pool()
+        {
+            return io_service_pool_;
+        }
+
     protected:
         // helper functions for receiving parcels
         void handle_accept(boost::system::error_code const& e,
@@ -157,73 +166,8 @@ namespace hpx { namespace parcelset
         void handle_read_completion(boost::system::error_code const& e);
 
         /// send the parcel to the specified address
-        template <typename Handler>
-        void send_parcel(parcel const& p, naming::address const& addr, Handler f)
-        {
-            parcelport_connection_ptr client_connection(
-                connection_cache_.get(addr.locality_));
-
-            if (!client_connection) {
-//                 LPT_(info) << "parcelport: creating new connection to: " 
-//                            << addr.locality_;
-
-            // The parcel gets serialized inside the connection constructor, no 
-            // need to keep the original parcel alive after this call returned.
-                client_connection.reset(new parcelport_connection(
-                        io_service_pool_.get_io_service(), addr.locality_, 
-                        connection_cache_)); 
-                client_connection->set_parcel(p);
-
-            // connect to the target locality, retry if needed
-                boost::system::error_code error = boost::asio::error::try_again;
-                for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
-                {
-                    try {
-                        naming::locality::iterator_type end = addr.locality_.connect_end();
-                        for (naming::locality::iterator_type it = 
-                                addr.locality_.connect_begin(io_service_pool_.get_io_service()); 
-                             it != end; ++it)
-                        {
-                            client_connection->socket().close();
-                            client_connection->socket().connect(*it, error);
-                            if (!error) 
-                                break;
-                        }
-                        if (!error) 
-                            break;
-
-                        // we wait for a really short amount of time (usually 100µs)
-                        boost::this_thread::sleep(boost::get_system_time() + 
-                            boost::posix_time::microseconds(HPX_NETWORK_RETRIES_SLEEP));
-                    }
-                    catch (boost::system::error_code const& e) {
-                        HPX_THROW_EXCEPTION(network_error, 
-                            "parcelport::send_parcel", e.message());
-                    }
-                }
-                if (error) {
-                    client_connection->socket().close();
-
-                    HPX_OSSTREAM strm;
-                    strm << error.message() << " (while trying to connect to: " 
-                         << addr.locality_ << ")";
-                    HPX_THROW_EXCEPTION(network_error, 
-                        "parcelport::send_parcel", 
-                        HPX_OSSTREAM_GETSTRING(strm));
-                }
-
-            // Start an asynchronous write operation.
-                client_connection->async_write(f);
-            }
-            else {
-//                 LPT_(info) << "parcelport: reusing existing connection to: " 
-//                            << addr.locality_;
-
-            // reuse an existing connection
-                client_connection->set_parcel(p);
-                client_connection->async_write(f);
-            }
-        }
+        void send_parcel(parcel const& p, naming::address const& addr, 
+            handler_type f);
 
     private:
         /// The pool of io_service objects used to perform asynchronous operations.

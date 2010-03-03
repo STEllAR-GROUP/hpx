@@ -35,7 +35,8 @@
     {
         // If remote, create a new parcel to be sent to the destination
         // Create a new parcel with the gid, action, and arguments
-        parcelset::parcel p (gid, new Action(BOOST_PP_ENUM_PARAMS(N, arg)));
+        parcelset::parcel p (gid.get_gid(), 
+            new Action(BOOST_PP_ENUM_PARAMS(N, arg)));
         if (components::component_invalid == addr.type_)
             addr.type_ = components::get_component_type<typename Action::component_type>();
         p.set_destination_addr(addr);   // avoid to resolve address again
@@ -63,24 +64,24 @@
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid, addr))
+        if (hpx::applier::get_applier().address_is_local(gid.get_gid(), addr))
             return apply_l<Action>(addr, BOOST_PP_ENUM_PARAMS(N, arg));
 
         // apply remotely
         return apply_r<Action>(addr, gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
-    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    bool apply (naming::full_address& fa, 
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-    {
-        // Determine whether the gid is local or remote
-        if (hpx::applier::get_applier().address_is_local(fa))
-            return apply_l<Action>(fa.caddr(), BOOST_PP_ENUM_PARAMS(N, arg));
-
-        // apply remotely
-        return apply_r<Action>(fa.addr(), fa.cgid(), BOOST_PP_ENUM_PARAMS(N, arg));
-    }
+//     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+//     bool apply (naming::full_address& fa, 
+//         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+//     {
+//         // Determine whether the gid is local or remote
+//         if (hpx::applier::get_applier().address_is_local(fa))
+//             return apply_l<Action>(fa.caddr(), BOOST_PP_ENUM_PARAMS(N, arg));
+// 
+//         // apply remotely
+//         return apply_r<Action>(fa.addr(), fa.cgid(), BOOST_PP_ENUM_PARAMS(N, arg));
+//     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
@@ -92,7 +93,8 @@
 
         // If remote, create a new parcel to be sent to the destination
         // Create a new parcel with the gid, action, and arguments
-        parcelset::parcel p (gid, new Action(BOOST_PP_ENUM_PARAMS(N, arg)), cont);
+        parcelset::parcel p (gid.get_gid(), 
+            new Action(BOOST_PP_ENUM_PARAMS(N, arg)), cont);
         if (components::component_invalid == addr.type_)
             addr.type_ = components::get_component_type<typename Action::component_type>();
         p.set_destination_addr(addr);   // avoid to resolve address again
@@ -121,24 +123,24 @@
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid, addr))
+        if (hpx::applier::get_applier().address_is_local(gid.get_gid(), addr))
             return apply_l<Action>(c, addr, BOOST_PP_ENUM_PARAMS(N, arg));
 
         // apply remotely
         return apply_r<Action>(addr, c, gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
-    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    bool apply (actions::continuation* c, naming::full_address& fa, 
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-    {
-        // Determine whether the gid is local or remote
-        if (hpx::applier::get_applier().address_is_local(fa))
-            return apply_l<Action>(c, fa.caddr(), BOOST_PP_ENUM_PARAMS(N, arg));
-
-        // apply remotely
-        return apply_r<Action>(fa.addr(), c, fa.cgid(), BOOST_PP_ENUM_PARAMS(N, arg));
-    }
+//     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+//     bool apply (actions::continuation* c, naming::full_address& fa, 
+//         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+//     {
+//         // Determine whether the gid is local or remote
+//         if (hpx::applier::get_applier().address_is_local(fa))
+//             return apply_l<Action>(c, fa.caddr(), BOOST_PP_ENUM_PARAMS(N, arg));
+// 
+//         // apply remotely
+//         return apply_r<Action>(fa.addr(), c, fa.cgid(), BOOST_PP_ENUM_PARAMS(N, arg));
+//     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     bool apply_c (naming::address& addr, naming::id_type const& contgid, 
@@ -149,14 +151,14 @@
             gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
-    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    bool apply_c (naming::address& addr, naming::full_address const& contaddr, 
-        naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-    {
-        return apply_r<Action>(addr, new actions::continuation(contaddr), 
-            gid, BOOST_PP_ENUM_PARAMS(N, arg));
-    }
+//     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+//     bool apply_c (naming::address& addr, naming::full_address const& contaddr, 
+//         naming::id_type const& gid,
+//         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+//     {
+//         return apply_r<Action>(addr, new actions::continuation(contaddr), 
+//             gid, BOOST_PP_ENUM_PARAMS(N, arg));
+//     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     bool apply_c (naming::id_type const& contgid, naming::id_type const& gid,
@@ -166,13 +168,13 @@
             gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
-    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    bool apply_c (naming::full_address const& contaddr, naming::id_type const& gid,
-         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-    {
-        return apply<Action>(new actions::continuation(contaddr), 
-            gid, BOOST_PP_ENUM_PARAMS(N, arg));
-    }
+//     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+//     bool apply_c (naming::full_address const& contaddr, naming::id_type const& gid,
+//          BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+//     {
+//         return apply<Action>(new actions::continuation(contaddr), 
+//             gid, BOOST_PP_ENUM_PARAMS(N, arg));
+//     }
 
 #undef N
 

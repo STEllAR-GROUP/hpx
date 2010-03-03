@@ -22,10 +22,12 @@ namespace hpx { namespace components
         typedef client_base<props, stubs::props> base_type;
 
     public:
+        props() {}
+
         /// Create a client side representation for the existing
         /// \a server#props instance with the given global id \a gid.
-        props(naming::id_type gid, bool freeonexit = true)
-          : base_type(gid, freeonexit)
+        props(naming::id_type gid)
+          : base_type(gid)
         {}
 
         ///////////////////////////////////////////////////////////////////////

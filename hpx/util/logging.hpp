@@ -115,8 +115,7 @@ namespace hpx { namespace util
         struct init_logging
         {
             init_logging(runtime_configuration& ini, bool isconsole, 
-                naming::resolver_client& agas_client, 
-                naming::id_type const& prefix);
+                naming::resolver_client& agas_client);
         };
     }
 

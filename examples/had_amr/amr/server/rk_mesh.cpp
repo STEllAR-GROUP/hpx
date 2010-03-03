@@ -77,7 +77,6 @@ namespace hpx { namespace components { namespace amr { namespace server
         Array3D src_size(4,numvalues,1);
         prep_ports_nine(dst_port,dst_src,dst_step,dst_size,src_size,numvalues);
 
-        int row;
         for (int column = 0; stencil != stencils.second; ++stencil, ++function, ++column)
         {
             namespace stubs = components::amr::stubs;
@@ -264,7 +263,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // create a distributing factory locally
         components::distributing_factory factory;
-        factory.create(applier::get_applier().get_runtime_support_gid(), true);
+        factory.create(applier::get_applier().get_runtime_support_gid());
 
         // create a couple of stencil (functional) components and twice the 
         // amount of stencil_value components
@@ -332,7 +331,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // create a distributing factory locally
         components::distributing_factory factory;
-        factory.create(applier::get_applier().get_runtime_support_gid(), true);
+        factory.create(applier::get_applier().get_runtime_support_gid());
 
         // create a couple of stencil (functional) components and twice the 
         // amount of stencil_value components

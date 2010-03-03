@@ -47,6 +47,5 @@ namespace hpx { namespace components
         }
         return result;
     }
-
 }}
 
