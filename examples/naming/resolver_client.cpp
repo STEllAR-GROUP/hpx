@@ -50,29 +50,29 @@ int main(int argc, char* argv[])
         resolver_client resolver(io_service_pool, 
             hpx::naming::locality(host, port));
         
-        id_type last_lowerid;
+        gid_type last_lowerid;
         
 #if defined(MAX_ITERATIONS)
         for (int i = 0; i < MAX_ITERATIONS; ++i)
         {
 #endif
         // retrieve the id prefix of this site
-        id_type prefix1;
+        gid_type prefix1;
         if (resolver.get_prefix(here, prefix1))
             last_lowerid = prefix1;
         BOOST_TEST(prefix1 != 0);
 
-        std::vector<hpx::naming::id_type> prefixes;
+        std::vector<hpx::naming::gid_type> prefixes;
         resolver.get_prefixes(prefixes);
         BOOST_TEST(((0 == i) ? 1 : 2) == prefixes.size());
         BOOST_TEST(prefixes.back() == prefix1);
 
-        id_type prefix2;
+        gid_type prefix2;
         BOOST_TEST(!resolver.get_prefix(here, prefix2));
         BOOST_TEST(prefix2 == prefix1);   // same site should get same prefix
 
         // different sites should get different prefix
-        id_type prefix3;
+        gid_type prefix3;
         resolver.get_prefix(locality("1.1.1.1", 1), prefix3);
         BOOST_TEST(prefix3 != prefix2);   
 
@@ -80,87 +80,87 @@ int main(int argc, char* argv[])
         BOOST_TEST(2 == prefixes.size());
         BOOST_TEST(prefixes.front() == prefix3);
 
-        id_type prefix4;
+        gid_type prefix4;
         BOOST_TEST(!resolver.get_prefix(locality("1.1.1.1", 1), prefix4));
         BOOST_TEST(prefix3 == prefix4);   
 
         // test get_id_range
-        id_type lower1, upper1;
+        gid_type lower1, upper1;
         BOOST_TEST(!resolver.get_id_range(here, 1024, lower1, upper1));
         BOOST_TEST(0 == i || last_lowerid+1 == lower1);   
         
-        id_type lower2, upper2;
+        gid_type lower2, upper2;
         BOOST_TEST(!resolver.get_id_range(here, 1024, lower2, upper2));
         BOOST_TEST(upper1+1 == lower2);   
         last_lowerid = upper2;
         
         // bind an arbitrary address
-        BOOST_TEST(resolver.bind(id_type(1), address(here, 1, 2)));
+        BOOST_TEST(resolver.bind(gid_type(1), address(here, 1, 2)));
         
         // associate this id with a namespace name
-        BOOST_TEST(resolver.registerid("/test/foo/1", id_type(1)));
+        BOOST_TEST(resolver.registerid("/test/foo/1", gid_type(1)));
         
         // resolve this address
         address addr;
-        BOOST_TEST(resolver.resolve(id_type(1), addr));
+        BOOST_TEST(resolver.resolve(gid_type(1), addr));
         BOOST_TEST(addr == address(here, 1, 2));
 
         // try to resolve a non-existing address
-        BOOST_TEST(!resolver.resolve(id_type(2), addr));
+        BOOST_TEST(!resolver.resolve(gid_type(2), addr));
 
         // check association of the namespace name
-        id_type id;
+        gid_type id;
         BOOST_TEST(resolver.queryid("/test/foo/1", id));
-        BOOST_TEST(id == id_type(1));
+        BOOST_TEST(id == gid_type(1));
         
         // rebind the id above to a new address
-        BOOST_TEST(!resolver.bind(id_type(1), address(here, 1, 3)));
+        BOOST_TEST(!resolver.bind(gid_type(1), address(here, 1, 3)));
 
         // re-associate this id with a namespace name
-        BOOST_TEST(!resolver.registerid("/test/foo/1", id_type(2)));
+        BOOST_TEST(!resolver.registerid("/test/foo/1", gid_type(2)));
 
         // resolve it again
-        BOOST_TEST(resolver.resolve(id_type(1), addr));
+        BOOST_TEST(resolver.resolve(gid_type(1), addr));
         BOOST_TEST(addr == address(here, 1, 3));
 
         // re-check association of the namespace name
         BOOST_TEST(resolver.queryid("/test/foo/1", id));
-        BOOST_TEST(id == id_type(2));
+        BOOST_TEST(id == gid_type(2));
 
         // unbind the address
-        BOOST_TEST(resolver.unbind(id_type(1), addr));
+        BOOST_TEST(resolver.unbind(gid_type(1), addr));
         BOOST_TEST(addr == address(here, 1, 3));
 
         // remove association
         BOOST_TEST(resolver.unregisterid("/test/foo/1"));
         
         // resolve should fail now
-        BOOST_TEST(!resolver.resolve(id_type(1), addr));
+        BOOST_TEST(!resolver.resolve(gid_type(1), addr));
 
         // association of the namespace name should fail now
         BOOST_TEST(!resolver.queryid("/test/foo/1", id));
 
         // repeated unbind should fail
-        BOOST_TEST(!resolver.unbind(id_type(1)));
+        BOOST_TEST(!resolver.unbind(gid_type(1)));
 
         // repeated remove association should fail
         BOOST_TEST(!resolver.unregisterid("/test/foo/1"));
         
         // test bind_range/unbind_range API
-        BOOST_TEST(resolver.bind_range(id_type(3), 20, address(here, 1, 2), 10));
+        BOOST_TEST(resolver.bind_range(gid_type(3), 20, address(here, 1, 2), 10));
 
-        BOOST_TEST(resolver.resolve(id_type(3), addr));
+        BOOST_TEST(resolver.resolve(gid_type(3), addr));
         BOOST_TEST(addr == address(here, 1, 2));
         
-        BOOST_TEST(resolver.resolve(id_type(6), addr));
+        BOOST_TEST(resolver.resolve(gid_type(6), addr));
         BOOST_TEST(addr == address(here, 1, 32));
 
-        BOOST_TEST(resolver.resolve(id_type(22), addr));
+        BOOST_TEST(resolver.resolve(gid_type(22), addr));
         BOOST_TEST(addr == address(here, 1, 192));
         
-        BOOST_TEST(!resolver.resolve(id_type(23), addr));
+        BOOST_TEST(!resolver.resolve(gid_type(23), addr));
 
-        BOOST_TEST(resolver.unbind_range(id_type(3), 20, addr));
+        BOOST_TEST(resolver.unbind_range(gid_type(3), 20, addr));
         BOOST_TEST(addr == address(here, 1, 2));
 
         // get statistics

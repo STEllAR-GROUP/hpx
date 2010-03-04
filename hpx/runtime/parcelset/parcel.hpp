@@ -99,6 +99,9 @@ namespace hpx { namespace parcelset
         naming::id_type& get_source() { return source_id_; }
         naming::id_type const& get_source() const { return source_id_; }
 
+        naming::gid_type& get_source_gid() { return source_id_.get_gid(); }
+        naming::gid_type const& get_source_gid() const { return source_id_.get_gid(); }
+
         void set_source(naming::id_type const& source_id)
         {
             source_id_ = source_id;

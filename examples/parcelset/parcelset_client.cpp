@@ -63,9 +63,9 @@ void received_parcel(hpx::parcelset::parcelhandler& ph, hpx::naming::address con
             //std::cout << "Received parcel: " << std::hex << p.get_parcel_id() 
             //          << std::flush << std::endl;
 
-            p.set_destination(p.get_source());
-            p.set_source(hpx::naming::id_type());
-            p.set_parcel_id(hpx::naming::id_type());
+            p.set_destination(p.get_source_gid());
+            p.set_source(hpx::naming::invalid_id);
+            p.set_parcel_id(hpx::naming::invalid_gid);
             start_time = ph.get_current_time();
 
             ph.put_parcel(p);
@@ -149,7 +149,7 @@ int main(int argc, char* argv[])
         boost::thread::sleep(xt);
                             
         // retrieve prefix for remote locality
-        hpx::naming::id_type remote_prefix;
+        hpx::naming::gid_type remote_prefix;
         hpx::naming::locality remote_l(remote_ps_host, remote_ps_port);
         agas_c.get_prefix(remote_l, remote_prefix);
         

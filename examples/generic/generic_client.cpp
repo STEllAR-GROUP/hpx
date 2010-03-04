@@ -36,8 +36,9 @@ int hpx_main()
     }
 
     {
-        lcos::eager_future<generate_number_action> gen(naming::id_type(prefix,naming::id_type::unmanaged));
-        applier::apply<print_number_action>(prefix, gen.get());
+        naming::id_type prefix_id(prefix,naming::id_type::unmanaged);
+        lcos::eager_future<generate_number_action> gen(prefix_id);
+        applier::apply<print_number_action>(prefix_id, gen.get());
     }
 
     // initiate shutdown of the runtime systems on all localities

@@ -76,9 +76,9 @@ void received_parcel(hpx::parcelset::parcelhandler &ph, hpx::naming::address con
                 return;
             }
 
-            p.set_destination(p.get_source());
-            p.set_source(hpx::naming::id_type());
-            p.set_parcel_id(hpx::naming::id_type());
+            p.set_destination(p.get_source_gid());
+            p.set_source(hpx::naming::invalid_id);
+            p.set_parcel_id(hpx::naming::invalid_gid);
             start_time = ph.get_current_time();
             ph.put_parcel(p);
             ++count;
