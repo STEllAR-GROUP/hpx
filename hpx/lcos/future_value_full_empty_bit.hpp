@@ -26,7 +26,6 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Result, typename RemoteResult>
     struct get_result
     {
-        template <typename RemoteResult>
         static Result call(RemoteResult const& rhs)
         {
             return Result(rhs);
