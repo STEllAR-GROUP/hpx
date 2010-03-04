@@ -23,20 +23,20 @@ using namespace std;
 int hpx_main()
 {
     // get list of all known localities
-    std::vector<naming::id_type> prefixes;
+    std::vector<naming::gid_type> prefixes;
     applier::applier& appl = applier::get_applier();
-    naming::id_type prefix;
+    naming::gid_type prefix;
     if (appl.get_remote_prefixes(prefixes)) {
         // create accumulator on any of the remote localities
         prefix = prefixes[0];
     }
     else {
         // create an accumulator locally
-        prefix = appl.get_runtime_support_gid();
+        prefix = appl.get_runtime_support_raw_gid();
     }
 
     {
-        lcos::eager_future<generate_number_action> gen(prefix);
+        lcos::eager_future<generate_number_action> gen(naming::id_type(prefix,naming::id_type::unmanaged));
         applier::apply<print_number_action>(prefix, gen.get());
     }
 

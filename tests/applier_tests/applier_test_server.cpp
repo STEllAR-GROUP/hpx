@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
         // Create a new accumulator object
         hpx::components::server::accumulator accu;
         // Statically assign a new global-id, should be dynamically done in the future
-        hpx::naming::id_type id(11);
+        hpx::naming::gid_type id(11);
         // Put together the host-name and the port-number of the locality
         hpx::naming::locality l(ps_host, ps_port);
         // Get the local virtual address of the accumulator object

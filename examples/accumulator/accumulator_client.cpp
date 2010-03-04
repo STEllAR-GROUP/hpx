@@ -21,8 +21,8 @@ namespace po = boost::program_options;
 threads::thread_state hpx_main()
 {
     // get list of all known localities
-    std::vector<naming::id_type> prefixes;
-    naming::id_type prefix;
+    std::vector<naming::gid_type> prefixes;
+    naming::gid_type prefix;
     applier::applier& appl = applier::get_applier();
     if (appl.get_remote_prefixes(prefixes)) {
         // create accumulator on any of the remote localities
@@ -30,13 +30,13 @@ threads::thread_state hpx_main()
     }
     else {
         // create an accumulator locally
-        prefix = appl.get_runtime_support_gid();
+        prefix = appl.get_runtime_support_raw_gid();
     }
 
     // create an accumulator locally
     using hpx::components::accumulator;
     accumulator accu;
-    accu.create(prefix);
+    accu.create(naming::id_type(prefix,naming::id_type::unmanaged));
 
     // print some message
     std::cout << "accumulator client, you may enter some commands "

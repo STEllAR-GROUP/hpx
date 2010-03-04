@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
         boost::thread::sleep(xt);
 
         // retrieve prefix for remote locality
-        hpx::naming::id_type remote_prefix;
+        hpx::naming::gid_type remote_prefix;
         hpx::naming::locality remote_l(remote_ps_host, remote_ps_port);
         agas_c.get_prefix(remote_l, remote_prefix);
 
@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
         // 5. TM executes the function
 
         // statically defined component id is 99
-        hpx::naming::id_type id(99);
+        hpx::naming::gid_type id(99);
         
         // create an initial accumulator parcel to send to remote locality
         hpx::parcelset::parcel p_init(id, new hpx::components::server::accumulator::init_action());

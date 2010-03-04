@@ -390,6 +390,8 @@ namespace hpx { namespace components { namespace amr { namespace server
       // vport is the output port number; increases consecutively
       std::vector<int> vcolumn,vstep,vsrc_column,vsrc_step,vport;
 
+      //using namespace boost::assign;
+
       int counter;
       int step,dst;
 

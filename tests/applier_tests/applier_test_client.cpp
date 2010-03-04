@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
         boost::thread::sleep(xt);
 
         // retrieve prefix for remote locality
-        hpx::naming::id_type remote_prefix;
+        hpx::naming::gid_type remote_prefix;
         hpx::naming::locality remote_l(remote_ps_host, remote_ps_port);
         agas_c.get_prefix(remote_l, remote_prefix);
 
@@ -127,7 +127,7 @@ int main(int argc, char* argv[])
 
         // Create a accumulator with static gid of 44 on the client side
         hpx::components::server::accumulator accu;
-        hpx::naming::id_type local_id(44);
+        hpx::naming::gid_type local_id(44);
         hpx::naming::locality l(ps_host, ps_port);
         agas_c.bind(local_id, hpx::naming::address(l, 
             hpx::components::server::accumulator::get_component_type(), &accu));
@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
         bool p_l3 = hpx::applier::apply<hpx::components::server::accumulator::print_action>(local_id);
 
         // Create a static gid for remote accumulator on server
-        hpx::naming::id_type remote_id(11);
+        hpx::naming::gid_type remote_id(11);
 
         // Test code to verify that the applier can successfully apply to remote components
         bool p_r1 = hpx::applier::apply<hpx::components::server::accumulator::init_action>(remote_id);
@@ -146,7 +146,7 @@ int main(int argc, char* argv[])
         bool p_r3 = hpx::applier::apply<hpx::components::server::accumulator::print_action>(remote_id);
 
         //// Send a parcel from client to server, destined at the accumulator (gid = 11)
-        //hpx::naming::id_type remote_id(11);
+        //hpx::naming::gid_type remote_id(11);
         //// Need to update this to the parcel-return action
         //hpx::parcelset::parcel p_init(remote_id, new hpx::components::server::accumulator::init_action());
         //hpx::parcelset::parcel_id p_id = ph.sync_put_parcel(p_init);

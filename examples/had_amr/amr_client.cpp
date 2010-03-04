@@ -178,8 +178,6 @@ private:
 typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> global_runtime_type;
 typedef hpx::runtime_impl<hpx::threads::policies::local_queue_scheduler> local_runtime_type;
 
-#include <crtdbg.h>
-
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
