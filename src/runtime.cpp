@@ -219,7 +219,7 @@ namespace hpx
                 components::get_component_type<components::server::runtime_support>(), 
                 &runtime_support_));
 
-        agas_client_.bind(applier_.get_memory_gid(), 
+        agas_client_.bind(applier_.get_memory_raw_gid(), 
             naming::address(parcel_port_.here(), 
                 components::get_component_type<components::server::memory>(), 
                 &memory_));
@@ -366,7 +366,7 @@ namespace hpx
         // ignore errors, as AGAS might be down already
         error_code ec;
         agas_client_.unbind(applier_.get_runtime_support_raw_gid(), ec);
-        agas_client_.unbind(applier_.get_memory_gid(), ec);
+        agas_client_.unbind(applier_.get_memory_raw_gid(), ec);
 
         // wait for thread manager to exit
         runtime_support_.stopped();         // re-activate main thread 

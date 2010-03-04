@@ -139,14 +139,14 @@ namespace hpx { namespace applier
 
         /// By convention every memory address has gid identical to the prefix 
         /// of the locality the runtime_support is responsible for
-        naming::gid_type const& get_memory_gid() const
+        naming::gid_type const& get_memory_raw_gid() const
         {
             return memory_id_.get_gid();
         }
 
         /// By convention every memory address has gid identical to the prefix 
         /// of the locality the runtime_support is responsible for
-        naming::id_type const& get_memory_address() const
+        naming::id_type const& get_memory_gid() const
         {
             return memory_id_;
         }
