@@ -213,7 +213,7 @@ namespace hpx { namespace components
         typedef typename lazy_results_type::iterator iterator_type;
         iterator_type lend = lazy_results.end();
         for (iterator_type lit = lazy_results.begin(); lit != lend; ++lit)
-            results.push_back((*it).get());
+            results.push_back((*lit).get());
     }
 
     template <typename T>

@@ -43,7 +43,7 @@
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid, addr)) {
+        if (hpx::applier::get_applier().address_is_local(gid.get_gid(), addr)) {
             // local, direct execution
             BOOST_ASSERT(components::types_are_compatible(addr.type_, 
                 components::get_component_type<typename Action::component_type>()));
@@ -51,8 +51,7 @@
         }
 
         // initialize the remote operation
-        hpx::applier::apply_c<Action>(
-            addr, this->get_gid(naming::id_type::unmanaged), gid, 
+        hpx::applier::apply_c<Action>(addr, this->get_gid(), gid, 
             BOOST_PP_ENUM_PARAMS(N, arg));
 
         // wait for the result (yield control)

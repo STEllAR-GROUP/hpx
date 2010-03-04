@@ -182,7 +182,7 @@ namespace hpx { namespace lcos
         {
             // Determine whether the gid is local or remote
             naming::address addr;
-            if (hpx::applier::get_applier().address_is_local(gid, addr)) {
+            if (hpx::applier::get_applier().address_is_local(gid.get_gid(), addr)) {
                 // local, direct execution
                 BOOST_ASSERT(components::types_are_compatible(addr.type_, 
                     components::get_component_type<typename Action::component_type>()));
@@ -221,7 +221,7 @@ namespace hpx { namespace lcos
         {
             // Determine whether the gid is local or remote
             naming::address addr;
-            if (hpx::applier::get_applier().address_is_local(gid, addr)) {
+            if (hpx::applier::get_applier().address_is_local(gid.get_gid(), addr)) {
                 // local, direct execution
                 BOOST_ASSERT(components::types_are_compatible(addr.type_, 
                     components::get_component_type<typename Action::component_type>()));
@@ -229,8 +229,7 @@ namespace hpx { namespace lcos
             }
 
             // initialize the remote operation
-            hpx::applier::apply_c<Action>(
-                addr, this->get_gid(naming::id_type::unmanaged), gid, arg0);
+            hpx::applier::apply_c<Action>(addr, this->get_gid(), gid, arg0);
 
             // wait for the result (yield control)
             return (*this->impl_)->get_data(0);
