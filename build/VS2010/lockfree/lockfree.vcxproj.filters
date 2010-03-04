@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Detail">
+      <UniqueIdentifier>{44d3f45d-5215-4703-92b6-c3ed01f2a2dc}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\atomic_int.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\branch_hints.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\cas.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\ao_primitives.hpp">
+      <Filter>Header Files\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\apple_primitives.hpp">
+      <Filter>Header Files\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\gcc_primitives.hpp">
+      <Filter>Header Files\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\static_lw_mutex.hpp">
+      <Filter>Header Files\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\windows_primitives.hpp">
+      <Filter>Header Files\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\fifo.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\freelist.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\prefix.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\primitives.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\stack.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\tagged_ptr.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\tagged_ptr_dcas.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\tagged_ptr_ptrcompression.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
