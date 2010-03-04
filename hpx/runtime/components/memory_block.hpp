@@ -206,7 +206,7 @@ namespace hpx { namespace components
             const_iterator_type;
 
         const_iterator_type end = gids.end();
-        for (const_iterator_type it = gids.begin(); it != end ++it)
+        for (const_iterator_type it = gids.begin(); it != end; ++it)
             lazy_results.push_back(stubs::memory_block::get_async(*it));
 
         // then wait for all results to get back to us
