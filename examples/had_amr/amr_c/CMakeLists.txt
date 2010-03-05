@@ -20,6 +20,6 @@ set(had_amr_c_INI
 add_hpx_component(had_amr_c
     SOURCES ${had_amr_c_SOURCES} 
     HEADERS ${had_amr_c_HEADERS}
-    INI ${amr_c_INI}
+    INI ${had_amr_c_INI}
     DEPENDENCIES had_amr_c_test_component)
 

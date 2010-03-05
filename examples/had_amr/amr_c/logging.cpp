@@ -18,9 +18,10 @@ namespace hpx { namespace components { namespace amr { namespace server
     {
         mutex_type::scoped_lock l(mtx_);
 
+        int i;
         if ( par.output_stdout == 1 && val.iter_ == 0 ) {
           if (fmod(val.timestep_,par.output) < 1.e-6) {
-          std::cout << " AMR Level: " << val.level_ << "   Timestep: " <<  val.timestep_ << "   refine?: " << val.refine_ << "   row: " << row << "   index: " << val.index_ << "    Value: " << val.value_.phi0 << "  x-coordinate : " << val.x_ << std::endl;
+          std::cout << " AMR Level: " << val.level_ << "   Timestep: " <<  val.timestep_ << "   refine?: " << val.refine_ << "   row: " << row << "   index: " << val.index_ << "    Value: " << val.value_.phi[0][0] << "  x-coordinate : " << val.x_ << std::endl;
           }
         }
 
@@ -29,7 +30,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         if ( logcode == 0 && val.iter_ == 0 ) {
           if (fmod(val.timestep_,par.output) < 1.e-6) {
             fdata = fopen("output.dat","a");
-            fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_,val.x_,val.value_.phi0);
+            fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_,val.x_,val.value_.phi[0][0]);
             fclose(fdata);
           }
         }
@@ -38,14 +39,14 @@ namespace hpx { namespace components { namespace amr { namespace server
         // output file to "logcode1.dat"
         if ( logcode == 1 ) {
           fdata = fopen("logcode1.dat","a");
-          fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_,val.x_,val.value_.phi0);
+          fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_,val.x_,val.value_.phi[0][0]);
           fclose(fdata);
         }
         //
         // output file to "logcode2.dat"
         if ( logcode == 2 ) {
           fdata = fopen("logcode2.dat","a");
-          fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_,val.x_,val.value_.phi0);
+          fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_,val.x_,val.value_.phi[0][0]);
           fclose(fdata);
         }
     }

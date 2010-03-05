@@ -13,9 +13,9 @@
 #include <stdio.h>
 
 // local functions
-int floatcmp(double x1,double x2) {
+int floatcmp(had_double_type x1,had_double_type x2) {
   // compare to floating point numbers
-  double epsilon = 1.e-8;
+  had_double_type epsilon = 1.e-8;
   if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
     // the numbers are close enough for coordinate comparison
     return 1;
@@ -25,9 +25,9 @@ int floatcmp(double x1,double x2) {
 }
 
 void calcrhs(struct nodedata * rhs,
-                had_double_type *phi,
-                had_double_type *x, double dx, int size,
-                bool boundary, int *bbox,int compute_index, Par const& par);
+                stencil_data ** vecval,
+                int flag, double dx, int size,
+                bool boundary,int *bbox,int compute_index, Par const& par);
 
 ///////////////////////////////////////////////////////////////////////////
 int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
@@ -45,8 +45,8 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->left_alloc_ = 0;
     val->overwrite_alloc_ = 0;
 
-    double dx;
-    double xcoord;
+    had_double_type dx;
+    had_double_type xcoord;
 
     dx = par.dx0/pow(2.0,level);
     if ( level == 0 ) {
@@ -62,7 +62,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     }
 
     val->x_ = xcoord;
-    val->value_.phi0 = exp(-xcoord*xcoord);
+    val->value_.phi[0][0] = exp(-xcoord*xcoord);
     //val->value_ = xcoord;
 
     return 1;
@@ -81,38 +81,27 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
   result->index_ = vecval[compute_index]->index_;
 
   // allocate some temporary arrays for calculating the rhs
-  had_double_type *phi;
-  had_double_type *x;
-  had_double_type *phi_np1;
   nodedata rhs;
   int i;
 
-  phi = (double *) malloc(sizeof(had_double_type*)*size);
-  phi_np1 = (double *) malloc(sizeof(had_double_type*)*size);
-  x = (double *) malloc(sizeof(had_double_type*)*size);
   double dt = par.dt0/pow(2.0,(int) vecval[0]->level_);
   double dx = par.dx0/pow(2.0,(int) vecval[0]->level_);
 
-  // assign temporary arrays
-  for (i=0;i<size;i++) {
-    phi[i] = vecval[i]->value_.phi0;
-    phi_np1[i] = vecval[i]->value_.phi1;
-    x[i] = vecval[i]->x_;
-  }
-
   // Sanity check
-  if ( floatcmp(x[1] - x[0],dx) == 0 ) {
-    printf(" PROBLEM with dx: %g %g\n",x[1]-x[0],dx);
+  if ( floatcmp(vecval[1]->x_ - vecval[0]->x_,dx) == 0 ) {
+    printf(" PROBLEM with dx: %g %g\n",vecval[1]->x_ - vecval[0]->x_,dx);
     return 0;
   }
 
   if ( par.integrator == 0 ) {  // Euler
-    calcrhs(&rhs,phi,x,dx,size,boundary,bbox,compute_index,par);
+    calcrhs(&rhs,vecval,0,dx,size,boundary,bbox,compute_index,par);
 
     // iter is kept to be zero for Euler
     result->iter_ = 0;
 
-    result->value_.phi0 = phi[compute_index] + rhs.phi0*dt;
+    for (i=0;i<num_eqns;i++) {
+      result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i] + rhs.phi[0][i]*dt;
+    }
     result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
   } else if ( par.integrator == 1 ) { // rk3
 
@@ -120,10 +109,12 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
       // increment rk subcycle counter
       result->iter_ = vecval[0]->iter_ + 1;
 
-      calcrhs(&rhs,phi,x,dx,size,boundary,bbox,compute_index,par);
+      calcrhs(&rhs,vecval,0,dx,size,boundary,bbox,compute_index,par);
 
-      result->value_.phi0 = phi[compute_index];
-      result->value_.phi1 = phi[compute_index] + rhs.phi0*dt;
+      for (i=0;i<num_eqns;i++) {
+        result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
+        result->value_.phi[1][i] = vecval[compute_index]->value_.phi[0][i] + rhs.phi[0][i]*dt;
+      }
 
       // no timestep update-- this is just a part of an rk subcycle
       result->timestep_ = vecval[0]->timestep_;
@@ -131,20 +122,26 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
       // increment rk subcycle counter
       result->iter_ = vecval[0]->iter_ + 1;
 
-      calcrhs(&rhs,phi_np1,x,dx,size,boundary,bbox,compute_index,par);
+      calcrhs(&rhs,vecval,1,dx,size,boundary,bbox,compute_index,par);
 
-      result->value_.phi0 = phi[compute_index];
-      result->value_.phi1 = 0.75*phi[compute_index]+0.25*phi_np1[compute_index] + 0.25*rhs.phi0*dt;
+      for (i=0;i<num_eqns;i++) {
+        result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
+        result->value_.phi[1][i] = 0.75*vecval[compute_index]->value_.phi[0][i]
+                                  +0.25*vecval[compute_index]->value_.phi[1][i] + 0.25*rhs.phi[0][i]*dt;
+      }
 
       // no timestep update-- this is just a part of an rk subcycle
       result->timestep_ = vecval[0]->timestep_;
     } else if ( vecval[0]->iter_ == 2 ) {
-      calcrhs(&rhs,phi_np1,x,dx,size,boundary,bbox,compute_index,par);
+      calcrhs(&rhs,vecval,1,dx,size,boundary,bbox,compute_index,par);
 
       // reset rk subcycle counter
       result->iter_ = 0;
 
-      result->value_.phi0 = 1./3*phi[compute_index]+2./3*(phi_np1[compute_index] + rhs.phi0*dt);
+      for (i=0;i<num_eqns;i++) {
+        result->value_.phi[0][i] = 1./3*vecval[compute_index]->value_.phi[0][i]
+                                 +2./3*(vecval[compute_index]->value_.phi[1][i] + rhs.phi[0][i]*dt);
+      }
 
       // Now comes the timestep update
       result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
@@ -157,54 +154,53 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
     return 0;
   }
 
-  free(phi);
-  free(x);
-  free(phi_np1);
-
   return 1;
 }
 
 // This is a pointwise calculation: compute the rhs for point result given input values in array phi
 void calcrhs(struct nodedata * rhs,
-                had_double_type *phi,
-                had_double_type *x, double dx, int size,
+                stencil_data ** vecval,
+                int flag, double dx, int size,
                 bool boundary,int *bbox,int compute_index, Par const& par)
 {
   if ( !boundary ) {
     // the compute_index is not physical boundary; all points in stencilsize
     // are available for computing the rhs.
-    rhs->phi0 = -(phi[compute_index] - phi[compute_index-1])/dx;
+    rhs->phi[0][0] = -(vecval[compute_index]->value_.phi[flag][0] - vecval[compute_index-1]->value_.phi[flag][0])/dx;
   } else {
     // boundary -- look at the bounding box (bbox) to decide which boundary it is
     if ( bbox[0] == 1 ) {
       // we are at the left boundary
-      rhs->phi0 = 0;
+      rhs->phi[0][0] = 0;
     } else if (bbox[1] == 1) {
       // we are at the right boundary
-      rhs->phi0 = -(phi[compute_index] - phi[compute_index-1])/dx;
+      rhs->phi[0][0] = -(vecval[compute_index]->value_.phi[flag][0] - vecval[compute_index-1]->value_.phi[flag][0])/dx;
     }
   }
 }
 
 int interpolation(struct nodedata *dst,struct nodedata *src1,struct nodedata *src2)
 {
+  int i;
   // linear interpolation at boundaries
-  dst->phi0 = 0.5*(src1->phi0 + src2->phi0);
-  dst->phi1 = 0.5*(src1->phi1 + src2->phi1);
+  for (i=0;i<num_eqns;i++) {
+    dst->phi[0][i] = 0.5*(src1->phi[0][i] + src2->phi[0][i]);
+    dst->phi[1][i] = 0.5*(src1->phi[1][i] + src2->phi[1][i]);
+  }
 
   return 1;
 }
 
 bool refinement(struct nodedata *dst,int level)
 {
-  double threshold;
+  had_double_type threshold;
   if ( level == 0 ) threshold = 0.05;
   if ( level == 1 ) threshold = 0.15;
   if ( level == 2 ) threshold = 0.25;
   if ( level == 3 ) threshold = 0.3;
   if ( level == 4 ) threshold = 0.35;
 
-  if ( dst->phi0 > threshold ) return true;
+  if ( dst->phi[0][0] > threshold ) return true;
   else return false;
 }
 

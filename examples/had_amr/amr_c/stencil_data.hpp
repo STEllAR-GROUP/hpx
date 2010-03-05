@@ -15,8 +15,7 @@
 
 struct nodedata
 {
-  had_double_type phi0;
-  had_double_type phi1;
+  had_double_type phi[2][num_eqns];
  
 #if defined(__cplusplus)
 private:
@@ -26,7 +25,7 @@ private:
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
-        ar & phi0 & phi1;
+        ar & phi;
     }
 #endif
 };
@@ -38,11 +37,11 @@ struct stencil_data
 
     size_t max_index_;   // overall number of data points
     size_t index_;       // sequential number of this data point (0 <= index_ < max_values_)
-    double timestep_;    // current time step
+    had_double_type timestep_;    // current time step
     int cycle_; // counts the number of subcycles
     size_t level_;    // refinement level
     nodedata value_;            // current value
-    double x_;      // x coordinate value
+    had_double_type x_;      // x coordinate value
     int iter_;      // rk subcycle indicator
     gid overwrite_; // gid of overwrite stencil point
     gid right_;     // gid of right stencil point
