@@ -42,19 +42,19 @@ int main(int argc, char* argv[])
         hpx::util::io_service_pool agas_pool; 
         resolver_client resolver(agas_pool, hpx::naming::locality(host, port));
         
-        id_type last_lowerid;
+        gid_type last_lowerid;
         
 #if defined(MAX_ITERATIONS)
         for (int i = 0; i < MAX_ITERATIONS; ++i)
         {
 #endif
         // retrieve the id prefix of this site
-        id_type prefix1;
+        gid_type prefix1;
         if (resolver.get_prefix(here, prefix1))
             last_lowerid = prefix1;
 
         // test get_id_range
-        id_type lower1, upper1;
+        gid_type lower1, upper1;
         hpx::util::high_resolution_timer t;
         for(int i = 1;i<1000;i++)
         {

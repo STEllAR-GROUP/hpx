@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
         hpx::util::io_service_pool agas_pool; 
         resolver_client resolver(agas_pool, hpx::naming::locality(host, port));
         
-        id_type last_lowerid;
+        gid_type last_lowerid;
         
 #if defined(MAX_ITERATIONS)
         for (int i = 0; i < MAX_ITERATIONS; ++i)
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 #endif
         
         // retrieve the id prefix of this site
-        id_type prefix1;
+        gid_type prefix1;
         if (resolver.get_prefix(here, prefix1))
             last_lowerid = prefix1;
                 
@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
         // bind an arbitrary address
         for (int i=1; i <3;i++)
         {
-            resolver.bind(id_type(i), address(here, 1, 2));
+            resolver.bind(gid_type(i), address(here, 1, 2));
         }
         
         // registerid() associates this id with a namespace name
@@ -70,10 +70,10 @@ int main(int argc, char* argv[])
             s="/test/foo/";
             s+= boost::lexical_cast<std::string>(a);//type conversion
             const char* b = s.c_str();
-            resolver.registerid(b, id_type(a));
+            resolver.registerid(b, gid_type(a));
         }
         
-        id_type id;
+        gid_type id;
         hpx::util::high_resolution_timer t;
         for(int i = 1;i<1000;i++)
         {

@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
         hpx::util::io_service_pool agas_pool; 
         resolver_client resolver(agas_pool, hpx::naming::locality(host, port));
         
-        id_type last_lowerid;
+        gid_type last_lowerid;
         
 #if defined(MAX_ITERATIONS)
         for (int i = 0; i < MAX_ITERATIONS; ++i)
@@ -51,11 +51,11 @@ int main(int argc, char* argv[])
 #endif
         
         // retrieve the id prefix of this site
-        id_type prefix1;
+        gid_type prefix1;
         hpx::util::high_resolution_timer t;
         for(int i=0; i<1000;i++)
         {
-            prefix1 = id_type(i);
+            prefix1 = gid_type(i);
             resolver.get_prefix(here, prefix1);
         }
         total_time = total_time + t.elapsed();
