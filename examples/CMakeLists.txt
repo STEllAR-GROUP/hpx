@@ -8,7 +8,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(example_SUBDIRS 
         accumulator naming parcelset generic
         quickstart
-        heart_beat)
+        #heart_beat
+       )
 else()
     set(example_SUBDIRS 
         accumulator generic had_amr naming parcelset

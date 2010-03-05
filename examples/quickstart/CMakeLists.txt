@@ -5,7 +5,8 @@
 
 # recurse into all components subdirectories and execute the scripts there
 set(quickstart_SUDIRS 
-    mandelbrot)
+    #mandelbrot
+   )
 
 foreach(subdir ${quickstart_SUDIRS})
     add_subdirectory(${subdir})
