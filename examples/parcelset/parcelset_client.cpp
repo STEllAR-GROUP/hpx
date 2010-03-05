@@ -192,7 +192,7 @@ int main(int argc, char* argv[])
         boost::thread::sleep(xt);
                             
         // retrieve prefix for remote locality
-        hpx::naming::id_type remote_prefix;
+        hpx::naming::gid_type remote_prefix;
         hpx::naming::locality remote_l(remote_ps_host, remote_ps_port);
         agas_c.get_prefix(remote_l, remote_prefix);
         
