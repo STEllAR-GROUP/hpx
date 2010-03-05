@@ -1,15 +1,15 @@
 [had_amr]
-nx0         = 20
-nt0         = 20
+nx0         = 30
+nt0         = 80
 
-minx0       = -10.0;
+minx0       =  1.0;
 maxx0       =  10.0;
 
 lambda      = 0.15
 
 allowedl     = 0
 stencilsize  = 3
-integrator   = 0
+integrator   = 1
 linearbounds = 1
 loglevel     = 2
 output       = 1.0

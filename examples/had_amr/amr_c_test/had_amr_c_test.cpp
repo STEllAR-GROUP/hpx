@@ -26,7 +26,7 @@ int floatcmp(had_double_type x1,had_double_type x2) {
 
 void calcrhs(struct nodedata * rhs,
                 stencil_data ** vecval,
-                int flag, double dx, int size,
+                int flag, had_double_type dx, int size,
                 bool boundary,int *bbox,int compute_index, Par const& par);
 
 ///////////////////////////////////////////////////////////////////////////
@@ -62,8 +62,8 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     }
 
     val->x_ = xcoord;
-    val->value_.phi[0][0] = exp(-xcoord*xcoord);
-    //val->value_ = xcoord;
+    val->value_.phi[0][0] = 0.1*exp(-(xcoord-8.0)*(xcoord-8.0));   // u
+    val->value_.phi[0][1] = 0.0;                               // psi
 
     return 1;
 }
@@ -84,8 +84,8 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
   nodedata rhs;
   int i;
 
-  double dt = par.dt0/pow(2.0,(int) vecval[0]->level_);
-  double dx = par.dx0/pow(2.0,(int) vecval[0]->level_);
+  had_double_type dt = par.dt0/pow(2.0,(int) vecval[0]->level_);
+  had_double_type dx = par.dx0/pow(2.0,(int) vecval[0]->level_);
 
   // Sanity check
   if ( floatcmp(vecval[1]->x_ - vecval[0]->x_,dx) == 0 ) {
@@ -160,21 +160,38 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
 // This is a pointwise calculation: compute the rhs for point result given input values in array phi
 void calcrhs(struct nodedata * rhs,
                 stencil_data ** vecval,
-                int flag, double dx, int size,
+                int flag, had_double_type dx, int size,
                 bool boundary,int *bbox,int compute_index, Par const& par)
 {
+
+  // variable: 0  -- u
+  // variable: 1  -- psi
+
+  had_double_type x = vecval[compute_index]->x_;
+
   if ( !boundary ) {
     // the compute_index is not physical boundary; all points in stencilsize
     // are available for computing the rhs.
-    rhs->phi[0][0] = -(vecval[compute_index]->value_.phi[flag][0] - vecval[compute_index-1]->value_.phi[flag][0])/dx;
+    rhs->phi[0][0] = vecval[compute_index]->value_.phi[flag][1];
+
+    rhs->phi[0][1] = (      vecval[compute_index+1]->value_.phi[flag][0] 
+                       - 2.*vecval[compute_index]->value_.phi[flag][0] 
+                          + vecval[compute_index-1]->value_.phi[flag][0] )/(dx*dx)
+                 + 2./x * ( vecval[compute_index+1]->value_.phi[flag][0] - vecval[compute_index-1]->value_.phi[flag][0] )/dx
+                      + pow(vecval[compute_index]->value_.phi[flag][0],7.0);
   } else {
     // boundary -- look at the bounding box (bbox) to decide which boundary it is
     if ( bbox[0] == 1 ) {
-      // we are at the left boundary
-      rhs->phi[0][0] = 0;
+      // we are at the left boundary 
+      rhs->phi[0][0] = vecval[compute_index]->value_.phi[flag][1];
+
+      // the first derivative term dominates ( goes as 1/x )
+      rhs->phi[0][1] = 2./x * ( vecval[compute_index+1]->value_.phi[flag][0] - vecval[compute_index]->value_.phi[flag][0] )/dx
+                      + pow(vecval[compute_index]->value_.phi[flag][0],7.0);
     } else if (bbox[1] == 1) {
-      // we are at the right boundary
+      // we are at the right boundary -- outflow
       rhs->phi[0][0] = -(vecval[compute_index]->value_.phi[flag][0] - vecval[compute_index-1]->value_.phi[flag][0])/dx;
+      rhs->phi[0][1] = -(vecval[compute_index]->value_.phi[flag][1] - vecval[compute_index-1]->value_.phi[flag][1])/dx;
     }
   }
 }
