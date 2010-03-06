@@ -45,7 +45,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::vector<naming::id_type> init_execute(
             components::component_type function_type,
             components::component_type logging_type, 
-            std::size_t level, double x, Parameter const& par);
+            std::size_t level, had_double_type x, Parameter const& par);
 
         std::vector<naming::id_type> execute(
             std::vector<naming::id_type> const& initialdata,
@@ -59,7 +59,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         typedef hpx::actions::result_action5<
             rk_left, std::vector<naming::id_type>, rk_left_init_execute, 
             components::component_type, 
-            components::component_type, std::size_t, double,
+            components::component_type, std::size_t, had_double_type,
             Parameter const&, &rk_left::init_execute
         > init_execute_action;
 
@@ -82,7 +82,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         void prepare_initial_data(
             distributed_iterator_range_type const& functions, 
             std::vector<naming::id_type>& initial_data,
-            std::size_t level, double x,
+            std::size_t level, had_double_type x,
             Parameter const& par);
 
         static void init_stencils(

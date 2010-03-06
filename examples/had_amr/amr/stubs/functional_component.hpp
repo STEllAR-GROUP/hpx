@@ -51,7 +51,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         static lcos::future_value<naming::id_type> alloc_data_async(
             naming::id_type const& gid, int item, int maxitems,
-            int row, std::size_t level, double x, Parameter const& par)
+            int row, std::size_t level, had_double_type x, Parameter const& par)
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
@@ -61,7 +61,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         }
 
         static naming::id_type alloc_data(naming::id_type const& gid, 
-            int item, int maxitems, int row, std::size_t level, double x, Parameter const& par)
+            int item, int maxitems, int row, std::size_t level, had_double_type x, Parameter const& par)
         {
             return alloc_data_async(gid, item, maxitems, row, level, x, par).get();
         }

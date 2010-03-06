@@ -29,7 +29,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         init_execute_async(naming::id_type const& gid, 
             components::component_type function_type, 
             components::component_type logging_type,
-            std::size_t level,double x,Parameter const& par)
+            std::size_t level,had_double_type x,Parameter const& par)
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
@@ -42,7 +42,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         static std::vector<naming::id_type> init_execute(naming::id_type const& gid, 
             components::component_type function_type,
             components::component_type logging_type,
-            std::size_t level, double x,Parameter const& par)
+            std::size_t level, had_double_type x,Parameter const& par)
         {
             return init_execute_async(gid, function_type, logging_type,level,x,par).get();
         }

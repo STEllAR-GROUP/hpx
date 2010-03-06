@@ -29,9 +29,9 @@ namespace hpx { namespace components { namespace amr
     {
     }
 
-    int stencil::floatcmp(double x1,double x2) {
+    int stencil::floatcmp(had_double_type x1,had_double_type x2) {
       // compare to floating point numbers
-      double epsilon = 1.e-8;
+      had_double_type epsilon = 1.e-8;
       if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
         // the numbers are close enough for coordinate comparison
         return 1;
@@ -599,7 +599,7 @@ namespace hpx { namespace components { namespace amr
     // Implement a finer mesh via interpolation of inter-mesh points
     // Compute the result value for the current time step
     int stencil::finer_mesh_initial(naming::id_type const& result, 
-        std::vector<naming::id_type> const& gids, std::size_t level, double x, 
+        std::vector<naming::id_type> const& gids, std::size_t level, had_double_type x, 
         int row, int column, Parameter const& par) 
     {
       // the initial data for the child mesh comes from the parent mesh
@@ -690,7 +690,7 @@ namespace hpx { namespace components { namespace amr
 
     ///////////////////////////////////////////////////////////////////////////
     naming::id_type stencil::alloc_data(int item, int maxitems, int row,
-        std::size_t level, double x, Parameter const& par)
+        std::size_t level, had_double_type x, Parameter const& par)
     {
         naming::id_type here = applier::get_applier().get_runtime_support_gid();
         naming::id_type result = components::stubs::memory_block::create(

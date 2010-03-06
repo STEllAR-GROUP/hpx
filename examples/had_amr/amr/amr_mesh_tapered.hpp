@@ -40,7 +40,7 @@ namespace hpx { namespace components { namespace amr
         // functional component derived from this class
         lcos::future_value<std::vector<naming::id_type> > 
         init_execute_async(components::component_type function_type, 
-            components::component_type logging_type, std::size_t level, double x, Parameter const& par)
+            components::component_type logging_type, std::size_t level, had_double_type x, Parameter const& par)
         {
             return this->base_type::init_execute_async(this->gid_, function_type,
                 logging_type,level, x, par);
@@ -48,7 +48,7 @@ namespace hpx { namespace components { namespace amr
 
         std::vector<naming::id_type> 
         init_execute(components::component_type function_type, 
-            components::component_type logging_type, std::size_t level, double x, Parameter const& par)
+            components::component_type logging_type, std::size_t level, had_double_type x, Parameter const& par)
         {
             return this->base_type::init_execute(this->gid_, function_type,
                 logging_type,level,x,par);

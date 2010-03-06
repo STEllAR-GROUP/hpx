@@ -281,7 +281,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     void amr_mesh_left::prepare_initial_data(
         distributed_iterator_range_type const& functions, 
         std::vector<naming::id_type>& initial_data,
-        std::size_t level, double x, 
+        std::size_t level, had_double_type x, 
         Parameter const& par)
     {
         typedef std::vector<lcos::future_value<naming::id_type> > lazyvals_type;
@@ -362,7 +362,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     std::vector<naming::id_type> amr_mesh_left::init_execute(
         components::component_type function_type,
         components::component_type logging_type, 
-        std::size_t level, double x, Parameter const& par)
+        std::size_t level, had_double_type x, Parameter const& par)
     {
         std::size_t numvalues = 9;
         std::size_t numsteps = 2;

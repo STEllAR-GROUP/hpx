@@ -64,7 +64,7 @@ namespace hpx { namespace components { namespace amr
         
         // this function creates a finer mesh from the initial data
         int finer_mesh_initial(naming::id_type const& result, 
-            std::vector<naming::id_type> const& gids, std::size_t level, double x,
+            std::vector<naming::id_type> const& gids, std::size_t level, had_double_type x,
             int row, int column, Parameter const& par);
 
         /// The alloc function is supposed to create a new memory block instance 
@@ -72,7 +72,7 @@ namespace hpx { namespace components { namespace amr
         /// Additionally it fills the memory with initial data for the data 
         /// item given by the parameter \a item (if item != -1).
         naming::id_type alloc_data(int item, int maxitems, int row,
-            std::size_t level, double x, Parameter const& par);
+            std::size_t level, had_double_type x, Parameter const& par);
 
         /// The init function initializes this stencil point
         void init(std::size_t, naming::id_type const&);
@@ -82,7 +82,7 @@ namespace hpx { namespace components { namespace amr
                       access_memory_block<stencil_data> & resultval);
 
         /// floating point comparison (for coordinates)
-        int floatcmp(double x1,double x2);
+        int floatcmp(had_double_type x1,had_double_type x2);
 
         // debug routine
         int testpoint(access_memory_block<stencil_data> const& val,
