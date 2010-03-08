@@ -31,7 +31,7 @@ void calcrhs(struct nodedata * rhs,
 
 ///////////////////////////////////////////////////////////////////////////
 int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
-    int level, double x, Par const& par)
+    int level, had_double_type x, Par const& par)
 {
     // provide initial data for the given data value 
     val->max_index_ = maxitems;
@@ -62,7 +62,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     }
 
     val->x_ = xcoord;
-    val->value_.phi[0][0] = 0.1*exp(-(xcoord-8.0)*(xcoord-8.0));   // u
+    val->value_.phi[0][0] = par.energy*exp(-(xcoord-8.0)*(xcoord-8.0));   // u
     val->value_.phi[0][1] = 0.0;                               // psi
 
     return 1;
@@ -211,13 +211,13 @@ int interpolation(struct nodedata *dst,struct nodedata *src1,struct nodedata *sr
 bool refinement(struct nodedata *dst,int level)
 {
   had_double_type threshold;
-  if ( level == 0 ) threshold = 0.05;
-  if ( level == 1 ) threshold = 0.15;
-  if ( level == 2 ) threshold = 0.25;
-  if ( level == 3 ) threshold = 0.3;
-  if ( level == 4 ) threshold = 0.35;
+  if ( level == 0 ) return true;
+  if ( level == 1 ) threshold = 0.015;
+  if ( level == 2 ) threshold = 0.025;
+  if ( level == 3 ) threshold = 0.03;
+  if ( level == 4 ) threshold = 0.035;
 
-  if ( dst->phi[0][0] > threshold ) return true;
+  if ( dst->phi[0][1] > threshold || dst->phi[0][0] > threshold ) return true;
   else return false;
 }
 

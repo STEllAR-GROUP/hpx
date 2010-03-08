@@ -249,6 +249,7 @@ int main(int argc, char* argv[])
         par.nt0         = numsteps;
         par.minx0       = -10.0;
         par.maxx0       =  10.0;
+        par.energy      =  1.0;
 
         par.linearbounds = 1;
         int scheduler = 0;  // default: global scheduler
@@ -317,6 +318,10 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("minx0") ) {
                 std::string tmp = sec->get_entry("minx0");
                 par.minx0 = atof(tmp.c_str());
+              }
+              if ( sec->has_entry("energy") ) {
+                std::string tmp = sec->get_entry("energy");
+                par.energy = atof(tmp.c_str());
               }
             }
         }
