@@ -129,7 +129,7 @@ namespace hpx { namespace components { namespace amr
             int gft = rkupdate(&*vecval.begin(),resultval.get_ptr(),vecval.size(),boundary,bbox,compute_index,par);
             BOOST_ASSERT(gft);
             // refine only after rk subcycles are finished (we don't refine in the midst of rk subcycles)
-            if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&resultval->value_,resultval->level_);
+            if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&*vecval.begin(),vecval.size(),&resultval->value_,resultval->level_,par);
             else resultval->refine_ = false;
 
             std::size_t allowedl = par.allowedl;
@@ -396,10 +396,15 @@ namespace hpx { namespace components { namespace amr
           s = findpoint(mval[i-1],mval[i+1],mval[i]);
           if ( s == 0 ) { 
             interpolation(&(mval[i]->value_),&(mval[i-1]->value_),&(mval[i+1]->value_));
+            std::vector< stencil_data * > vecval;
+            vecval.push_back(mval[i-1].get_ptr());
+            vecval.push_back(mval[i].get_ptr());
+            vecval.push_back(mval[i+1].get_ptr());
+            mval[i]->refine_ = refinement(&*vecval.begin(),vecval.size(),&(mval[i]->value_),mval[i]->level_,par);
+
             // DEBUG
             stubs::logging::logentry(log_, mval[i].get(), row,2, par);
           }
-          mval[i]->refine_ = refinement(&(mval[i]->value_),mval[i]->level_);
 
           // eliminate unrefinable cases
           if ( gids.size() != 5 && par.stencilsize == 3 && par.integrator == 0 ) mval[i]->refine_ = false;
@@ -484,10 +489,15 @@ namespace hpx { namespace components { namespace amr
           s = findpoint(mval[i-1],mval[i+1],mval[i]);
           if ( s == 0 ) { 
             interpolation(&(mval[i]->value_),&(mval[i-1]->value_),&(mval[i+1]->value_));
+            std::vector< stencil_data * > vecval;
+            vecval.push_back(mval[i-1].get_ptr());
+            vecval.push_back(mval[i].get_ptr());
+            vecval.push_back(mval[i+1].get_ptr());
+            mval[i]->refine_ = refinement(&*vecval.begin(),vecval.size(),&(mval[i]->value_),mval[i]->level_,par);
+
             // DEBUG
             stubs::logging::logentry(log_, mval[i].get(), row,2, par);
           }
-          mval[i]->refine_ = refinement(&(mval[i]->value_),mval[i]->level_);
         }
 
         for (i=0;i<17;i++) {
@@ -563,22 +573,44 @@ namespace hpx { namespace components { namespace amr
         s4 = findpoint(mval[3],mval[5],mval[4]);
         s6 = findpoint(mval[5],mval[7],mval[6]);
 
-        if (s0 == 0) interpolation(&(mval[0]->value_),&tm1,&t1);
-        if (s2 == 0) interpolation(&(mval[2]->value_),&t1,&t3);
-        if (s4 == 0) interpolation(&(mval[4]->value_),&t3,&t5);
-        if (s6 == 0) interpolation(&(mval[6]->value_),&t5,&t7);
+        if (s0 == 0) {
+          interpolation(&(mval[0]->value_),&tm1,&t1);
+          std::vector< stencil_data * > vecval;
+          vecval.push_back(mval[8].get_ptr());
+          vecval.push_back(mval[0].get_ptr());
+          vecval.push_back(mval[1].get_ptr());
+          mval[0]->refine_ = refinement(&*vecval.begin(),vecval.size(),&(mval[0]->value_),mval[0]->level_,par);
+        }
+        if (s2 == 0) {
+          interpolation(&(mval[2]->value_),&t1,&t3);
+          std::vector< stencil_data * > vecval;
+          vecval.push_back(mval[1].get_ptr());
+          vecval.push_back(mval[2].get_ptr());
+          vecval.push_back(mval[3].get_ptr());
+          mval[2]->refine_ = refinement(&*vecval.begin(),vecval.size(),&(mval[2]->value_),mval[2]->level_,par);
+        }
+        if (s4 == 0) {
+          interpolation(&(mval[4]->value_),&t3,&t5);
+          std::vector< stencil_data * > vecval;
+          vecval.push_back(mval[3].get_ptr());
+          vecval.push_back(mval[4].get_ptr());
+          vecval.push_back(mval[5].get_ptr());
+          mval[4]->refine_ = refinement(&*vecval.begin(),vecval.size(),&(mval[4]->value_),mval[4]->level_,par);
+        }
+        if (s6 == 0) {
+          interpolation(&(mval[6]->value_),&t5,&t7);
+          std::vector< stencil_data * > vecval;
+          vecval.push_back(mval[5].get_ptr());
+          vecval.push_back(mval[6].get_ptr());
+          vecval.push_back(mval[7].get_ptr());
+          mval[6]->refine_ = refinement(&*vecval.begin(),vecval.size(),&(mval[6]->value_),mval[6]->level_,par);
+        }
 
         // DEBUG
         if ( s0 == 0 ) stubs::logging::logentry(log_, mval[0].get(), row,2, par);
         if ( s2 == 0 ) stubs::logging::logentry(log_, mval[2].get(), row,2, par);
         if ( s4 == 0 ) stubs::logging::logentry(log_, mval[4].get(), row,2, par);
         if ( s6 == 0 ) stubs::logging::logentry(log_, mval[6].get(), row,2, par);
-
-        // apply refinement criteria test to interpolated/found values
-        mval[0]->refine_ = refinement(&(mval[0]->value_),mval[0]->level_);
-        mval[2]->refine_ = refinement(&(mval[2]->value_),mval[2]->level_);
-        mval[4]->refine_ = refinement(&(mval[4]->value_),mval[4]->level_);
-        mval[6]->refine_ = refinement(&(mval[6]->value_),mval[6]->level_);
 
         for (i=0;i<8;i++) {
           initial_data.push_back(gval[i]);
@@ -726,6 +758,7 @@ namespace hpx { namespace components { namespace amr
           access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->right_);
           if ( floatcmp(amb2->x_,resultval->x_) ) {
             resultval->value_ = amb2->value_;
+            resultval->refine_ = amb2->refine_;
             // transfer overwrite information as well
             if ( amb2->overwrite_alloc_ == 1 ) {
               resultval->overwrite_alloc_ = 1;
@@ -747,6 +780,7 @@ namespace hpx { namespace components { namespace amr
           access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->left_);
           if ( floatcmp(amb2->x_,resultval->x_) ) {
             resultval->value_ = amb2->value_;
+            resultval->refine_ = amb2->refine_;
             // transfer overwrite information as well
             if ( amb2->overwrite_alloc_) {
               resultval->overwrite_alloc_ = true;
@@ -775,6 +809,7 @@ namespace hpx { namespace components { namespace amr
           access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->right_);
           if ( floatcmp(amb2->x_,resultval->x_) ) {
             resultval->value_ = amb2->value_;
+            resultval->refine_ = amb2->refine_;
             // transfer overwrite information as well
             if ( amb2->overwrite_alloc_ == 1 ) {
               resultval->overwrite_alloc_ = 1;
@@ -795,6 +830,7 @@ namespace hpx { namespace components { namespace amr
           access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->left_);
           if ( floatcmp(amb2->x_,resultval->x_) ) {
             resultval->value_ = amb2->value_;
+            resultval->refine_ = amb2->refine_;
             // transfer overwrite information as well
             if ( amb2->overwrite_alloc_) {
               resultval->overwrite_alloc_ = true;

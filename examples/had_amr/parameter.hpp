@@ -53,6 +53,7 @@ namespace hpx { namespace components { namespace amr
             ar & dx0;
             ar & dt0;
             ar & energy;
+            ar & ethreshold;
         }
     };
 

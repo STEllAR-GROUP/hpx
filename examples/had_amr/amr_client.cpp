@@ -250,6 +250,7 @@ int main(int argc, char* argv[])
         par.minx0       = -10.0;
         par.maxx0       =  10.0;
         par.energy      =  1.0;
+        par.ethreshold  =  0.1;
 
         par.linearbounds = 1;
         int scheduler = 0;  // default: global scheduler
@@ -322,6 +323,10 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("energy") ) {
                 std::string tmp = sec->get_entry("energy");
                 par.energy = atof(tmp.c_str());
+              }
+              if ( sec->has_entry("ethreshold") ) {
+                std::string tmp = sec->get_entry("ethreshold");
+                par.ethreshold = atof(tmp.c_str());
               }
             }
         }

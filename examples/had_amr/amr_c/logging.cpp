@@ -20,9 +20,8 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         int i;
         if ( par.output_stdout == 1 && val.iter_ == 0 ) {
-          had_double_type dx = par.dx0/pow(2.0,(int) val.level_);
           if (fmod(val.timestep_,par.output) < 1.e-6) {
-          std::cout << " AMR Level: " << val.level_ << "   Timestep: " <<  val.timestep_ << " Time : " << val.timestep_*dx*par.lambda   << "   refine?: " << val.refine_ << "   row: " << row << "   index: " << val.index_ << "    Value: " << val.value_.phi[0][0] << "  x-coordinate : " << val.x_ << std::endl;
+          std::cout << " AMR Level: " << val.level_ << "   Timestep: " <<  val.timestep_ << " Time : " << val.timestep_*par.dx0*par.lambda  << "   refine?: " << val.refine_ << "   row: " << row << "   index: " << val.index_ << "    Value: " << val.value_.phi[0][0] << "  x-coordinate : " << val.x_ << std::endl;
           }
         }
 
@@ -31,7 +30,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         if ( logcode == 0 && val.iter_ == 0 ) {
           if (fmod(val.timestep_,par.output) < 1.e-6) {
             fdata = fopen("output.dat","a");
-            fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_,val.x_,val.value_.phi[0][0]);
+            fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_*par.dx0*par.lambda,val.x_,val.value_.phi[0][0]);
             fclose(fdata);
           }
         }

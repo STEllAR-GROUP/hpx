@@ -208,8 +208,27 @@ int interpolation(struct nodedata *dst,struct nodedata *src1,struct nodedata *sr
   return 1;
 }
 
-bool refinement(struct nodedata *dst,int level)
+bool refinement(stencil_data ** vecval, int size, struct nodedata *dst,int level,Par const& par)
 {
+//#if 0
+  had_double_type grad1,grad2;
+  int index;
+  had_double_type dx = par.dx0/pow(2.0,(int) vecval[0]->level_);
+
+  // gradient detector
+  if ( size%2 == 1 ) {
+    index = (size-1)/2;
+    grad1 = (vecval[index+1]->value_.phi[0][0] - vecval[index-1]->value_.phi[0][0])/(2.*dx);
+    grad2 = (vecval[index+1]->value_.phi[0][1] - vecval[index-1]->value_.phi[0][1])/(2.*dx);
+    if ( sqrt( grad1*grad1 + grad2*grad2 ) > par.ethreshold ) return true;
+    else return false;
+  } else {
+    return false;
+  }
+//#endif 
+
+#if 0
+  // simple amplitude refinement
   had_double_type threshold;
   if ( level == 0 ) return true;
   if ( level == 1 ) threshold = 0.015;
@@ -219,6 +238,7 @@ bool refinement(struct nodedata *dst,int level)
 
   if ( dst->phi[0][1] > threshold || dst->phi[0][0] > threshold ) return true;
   else return false;
+#endif
 }
 
 
