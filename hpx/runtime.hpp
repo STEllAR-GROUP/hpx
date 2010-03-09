@@ -24,6 +24,7 @@
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
+#include <boost/foreach.hpp>
 #include <boost/thread/tss.hpp>
 #include <boost/detail/atomic_count.hpp>
 
@@ -55,7 +56,6 @@ namespace hpx
         /// construct a new instance of a runtime
         runtime(naming::resolver_client& agas_client) 
           : counters_(agas_client),
-            on_exit_functions_("on_exit_functions", false),
             ini_(util::detail::get_logging_data()),
             instance_number_(++instance_number_counter_)
         {}
@@ -63,7 +63,8 @@ namespace hpx
         /// \brief Manage list of functions to call on exit
         void on_exit(boost::function<void()> f)
         {
-            on_exit_functions_.enqueue(f);
+            boost::mutex::scoped_lock l(on_exit_functions_mtx_);
+            on_exit_functions_.push_back(f);
         }
 
         /// \brief Allow access to the registry counter registry instance used 
@@ -83,8 +84,10 @@ namespace hpx
         /// \brief Call all registered on_exit functions
         void stop()
         {
-            boost::function<void()> f;
-            while (on_exit_functions_.dequeue(&f))
+            typedef boost::function<void()> value_type;
+
+            boost::mutex::scoped_lock l(on_exit_functions_mtx_);
+            BOOST_FOREACH(value_type f, on_exit_functions_)
                 f();
         }
 
@@ -115,8 +118,9 @@ namespace hpx
         performance_counters::registry counters_;
 
         // list of functions to call on exit
-        typedef boost::lockfree::fifo<boost::function<void()> > on_exit_type;
+        typedef std::vector<boost::function<void()> > on_exit_type;
         on_exit_type on_exit_functions_;
+        boost::mutex on_exit_functions_mtx_;
 
         util::runtime_configuration ini_;
 

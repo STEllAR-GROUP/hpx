@@ -15,7 +15,7 @@
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/unlock_lock.hpp>
 
-#include <boost/lockfree/primitives.hpp>
+#include <boost/atomic.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/intrusive/list.hpp>
 #include <boost/thread/locks.hpp>
@@ -57,6 +57,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
 {
+    template <typename T>
+    inline bool interlocked_bit_test_and_set(boost::atomic<T>& x, long bit)
+    {
+        T const value = 1u << bit;
+        long old = x.load(boost::memory_order_acquire);
+        do {
+            if (x.compare_exchange_strong(old, T(old | value)))
+                break;
+        } while(true);
+        return (old & value) != 0;
+    }
+
     // A mutex can be used to synchronize the access to an arbitrary resource
     class mutex 
     {
@@ -123,45 +135,31 @@ namespace hpx { namespace lcos { namespace detail
 
         bool try_lock()
         {
-            return !boost::lockfree::interlocked_bit_test_and_set(
-                &active_count_, lock_flag_bit);
+            return !interlocked_bit_test_and_set(active_count_, lock_flag_bit);
         }
 
-        void mark_waiting_and_try_lock(boost::int32_t& old_count)
+        void mark_waiting_and_try_lock(long& old_count)
         {
-            using namespace boost::lockfree;
-
             for(;;) 
             {
-                boost::int32_t const new_count = (old_count & lock_flag_value) ? 
+                long const new_count = (old_count & lock_flag_value) ? 
                     (old_count + 1) : (old_count | lock_flag_value);
-                boost::int32_t const current = 
-                    interlocked_compare_exchange(&active_count_, old_count, new_count);
-                if (current == old_count)
-                {
+
+                if (active_count_.compare_exchange_strong(old_count, new_count))
                     break;
-                }
-                old_count = current;
             }
         }
 
-        void clear_waiting_and_try_lock(boost::int32_t& old_count)
+        void clear_waiting_and_try_lock(long& old_count)
         {
-            using namespace boost::lockfree;
-
             old_count &= ~lock_flag_value;
-            for(;;) {
-                boost::int32_t const new_count = (
-                    (old_count & lock_flag_value) ? 
-                        old_count : ((old_count-1) | lock_flag_value)
-                ); 
-                boost::int32_t const current = 
-                    interlocked_compare_exchange(&active_count_, old_count, new_count);
-                if (current == old_count)
-                {
+            for(;;) 
+            {
+                long const new_count = (old_count & lock_flag_value) ? 
+                    old_count : ((old_count-1) | lock_flag_value); 
+
+                if (active_count_.compare_exchange_strong(old_count, new_count))
                     break;
-                }
-                old_count = current;
             }
         }
 
@@ -210,7 +208,7 @@ namespace hpx { namespace lcos { namespace detail
             if (try_lock())
                 return;
 
-            boost::int32_t old_count = active_count_;
+            long old_count = active_count_;
             mark_waiting_and_try_lock(old_count);
 
             if (old_count & lock_flag_value)
@@ -231,7 +229,7 @@ namespace hpx { namespace lcos { namespace detail
             if (try_lock())
                 return true;
 
-            boost::int32_t old_count = active_count_;
+            long old_count = active_count_;
             mark_waiting_and_try_lock(old_count);
 
             if (old_count & lock_flag_value)
@@ -242,7 +240,7 @@ namespace hpx { namespace lcos { namespace detail
                     if (wait_for_single_object()) 
                     {
                         // if this timed out, just return false
-                        interlocked_decrement(&active_count_);
+                        --active_count_;
                         return false;
                     }
                     clear_waiting_and_try_lock(old_count);
@@ -266,9 +264,7 @@ namespace hpx { namespace lcos { namespace detail
         void unlock()
         {
             BOOST_ASSERT(active_count_ & lock_flag_value);
-
-            using namespace boost::lockfree;
-            interlocked_exchange_add(&active_count_, lock_flag_value);
+            active_count_ += lock_flag_value;
             set_event();
         }
 
@@ -276,7 +272,7 @@ namespace hpx { namespace lcos { namespace detail
         typedef boost::detail::try_lock_wrapper<mutex> scoped_try_lock;
 
     private:
-        boost::int32_t active_count_;
+        boost::atomic_int32_t active_count_;
         queue_type queue_;
         char const* const description_;
     };

@@ -18,6 +18,17 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\branch_hints.hpp" />
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\freelist.hpp" />
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\prefix.hpp" />
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\tagged_ptr.hpp" />
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\tagged_ptr_dcas.hpp" />
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\tagged_ptr_ptrcompression.hpp" />
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\fifo.hpp" />
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\ringbuffer.hpp" />
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\stack.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7D649D08-4F76-4F4E-AA15-40BE749A41F8}</ProjectGuid>
     <RootNamespace>lockfree</RootNamespace>
@@ -108,24 +119,6 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\atomic_int.hpp" />
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\branch_hints.hpp" />
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\cas.hpp" />
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\fifo.hpp" />
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\freelist.hpp" />
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\prefix.hpp" />
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\primitives.hpp" />
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\stack.hpp" />
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\tagged_ptr.hpp" />
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\tagged_ptr_dcas.hpp" />
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\tagged_ptr_ptrcompression.hpp" />
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\ao_primitives.hpp" />
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\apple_primitives.hpp" />
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\gcc_primitives.hpp" />
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\static_lw_mutex.hpp" />
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\windows_primitives.hpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

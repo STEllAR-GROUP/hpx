@@ -9,7 +9,6 @@
 #include <fstream>
 #include <boost/version.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/lockfree/primitives.hpp>
 
 #include <hpx/util/logging.hpp>
 
@@ -19,6 +18,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
+    inline boost::uint64_t hrtimer_ticks()
+    {
+        return 0;   // FIXME!
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
@@ -26,7 +30,7 @@ namespace hpx { namespace util
         {
             time_logger_ref_time()
             {
-                start_ = boost::lockfree::hrtimer_ticks();
+                start_ = hrtimer_ticks();
             }
             boost::uint64_t start_;
         };
@@ -80,13 +84,13 @@ namespace hpx { namespace util
         void tick()
         {
             if (enabled_) 
-                times_.push_back(boost::lockfree::hrtimer_ticks());
+                times_.push_back(hrtimer_ticks());
         }
 
         void tock()
         {
             if (enabled_) 
-                times_.push_back(boost::lockfree::hrtimer_ticks());
+                times_.push_back(hrtimer_ticks());
         }
 
     private:

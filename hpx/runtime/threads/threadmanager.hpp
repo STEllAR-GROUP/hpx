@@ -17,8 +17,8 @@
 
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/lockfree/fifo.hpp>
-#if defined(HPX_DEBUG)
-#include <boost/lockfree/atomic_int.hpp>
+#if HPX_DEBUG != 0
+#include <boost/atomic.hpp>
 #endif
 
 #include <hpx/hpx_fwd.hpp>
@@ -525,7 +525,7 @@ namespace hpx { namespace threads
         mutable mutex_type mtx_;            ///< mutex protecting the members
         boost::ptr_vector<boost::thread> threads_;
 #if HPX_DEBUG != 0
-        boost::lockfree::atomic_int<long> thread_count_;
+        boost::atomic<long> thread_count_;
 #endif
 
         bool running_;                      ///< thread manager has been started

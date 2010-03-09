@@ -12,7 +12,6 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/lockfree/atomic_int.hpp>
 #include <boost/coroutine/coroutine.hpp>
 
 #include <hpx/hpx_fwd.hpp>
@@ -33,7 +32,7 @@ namespace hpx { namespace threads { namespace detail
         typedef boost::function<thread_function_type> function_type;
 
     public:
-        thread(thread_init_data& init_data, thread_id_type id, 
+        thread(thread_init_data const& init_data, thread_id_type id, 
                thread_state newstate)
           : coroutine_(init_data.func, id), 
             current_state_(newstate), 
@@ -77,7 +76,7 @@ namespace hpx { namespace threads { namespace detail
         thread_state execute()
         {
             thread_state_ex current_state_ex = get_state_ex();
-            current_state_ex_ = wait_signaled;
+            current_state_ex_.store(wait_signaled, boost::memory_order_release);
             return coroutine_(current_state_ex);
         }
 
@@ -85,29 +84,34 @@ namespace hpx { namespace threads { namespace detail
         {
             using namespace boost::lockfree;
             return static_cast<thread_state>(
-                interlocked_read_acquire(&current_state_));
+                current_state_.load(boost::memory_order_acquire));
         }
 
         thread_state set_state(thread_state newstate)
         {
             using namespace boost::lockfree;
             for (;;) {
-                boost::int32_t prev_state = current_state_;
-                if (likely(CAS(&current_state_, prev_state, (boost::int32_t)newstate)))
+                unsigned long prev_state = current_state_;
+                if (likely(current_state_.compare_exchange_strong(
+                        prev_state, newstate)))
+                {
                     return static_cast<thread_state>(prev_state);
+                }
             }
         }
 
         thread_state set_state(thread_state newstate, thread_state old_state)
         {
             using namespace boost::lockfree;
-            if (likely(CAS(&current_state_, (boost::int32_t)old_state, 
-                    (boost::int32_t)newstate)))
+            unsigned long old_state_long = old_state;
+            if (likely(current_state_.compare_exchange_strong(
+                    old_state_long, newstate)))
             {
                 return old_state;
             }
 
-            boost::int32_t current_state = interlocked_read_acquire(&current_state_);
+            boost::int32_t current_state = 
+                current_state_.load(boost::memory_order_acquire);
             if (current_state != marked_for_suspension &&
                 newstate != terminated)
             {
@@ -121,16 +125,19 @@ namespace hpx { namespace threads { namespace detail
         {
             using namespace boost::lockfree;
             return static_cast<thread_state_ex>(
-                interlocked_read_acquire(&current_state_ex_));
+                current_state_ex_.load(boost::memory_order_acquire));
         }
 
         thread_state_ex set_state_ex(thread_state_ex newstate_ex)
         {
             using namespace boost::lockfree;
             for (;;) {
-                boost::int32_t prev_state = current_state_ex_;
-                if (likely(CAS(&current_state_ex_, prev_state, (boost::int32_t)newstate_ex)))
+                unsigned long prev_state = current_state_ex_;
+                if (likely(current_state_ex_.compare_exchange_strong(
+                        prev_state, newstate_ex)))
+                {
                     return static_cast<thread_state_ex>(prev_state);
+                }
             }
         }
 
@@ -191,8 +198,8 @@ namespace hpx { namespace threads { namespace detail
     private:
         coroutine_type coroutine_;
         // the state is stored as a boost::int32_t to allow to use CAS
-        mutable boost::int32_t current_state_;
-        mutable boost::int32_t current_state_ex_;
+        mutable boost::atomic_uint32_t current_state_;
+        mutable boost::atomic_uint32_t current_state_ex_;
 
         // all of the following is debug/logging support information
         char const* const description_;
@@ -252,7 +259,7 @@ namespace hpx { namespace threads
         ///                 \a thread will be associated with.
         /// \param newstate [in] The initial thread state this instance will
         ///                 be initialized with.
-        thread(thread_init_data& init_data, thread_state new_state = init)
+        thread(thread_init_data const& init_data, thread_state new_state = init)
           : base_type(new detail::thread(init_data, This(), new_state))
         {
             LTM_(debug) << "thread::thread(" << this << "), description(" 

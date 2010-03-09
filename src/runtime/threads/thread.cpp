@@ -101,7 +101,9 @@ namespace hpx { namespace threads
         void thread::set_event()
         {
             // we need to reactivate the thread itself
-            if (suspended == static_cast<thread_state>(current_state_)) {
+            if (suspended == static_cast<thread_state>(
+                    current_state_.load(boost::memory_order_acquire))) 
+            {
                 hpx::applier::get_applier().get_thread_manager().
                     set_state(get_thread_id(), pending);
             }

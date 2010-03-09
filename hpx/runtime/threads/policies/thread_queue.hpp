@@ -17,6 +17,7 @@
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/bind.hpp>
+#include <boost/atomic.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/lockfree/fifo.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
@@ -25,6 +26,13 @@
 namespace hpx { namespace threads { namespace policies
 {
     struct add_new_tag {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Fifo>
+    inline void log_fifo_statistics(Fifo const& q, char const* const desc)
+    {
+        // FIXME
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -93,7 +101,7 @@ namespace hpx { namespace threads { namespace policies
         // this is the type of the queue of new tasks not yet converted to
         // threads
         typedef boost::tuple<thread_init_data, thread_state> task_description;
-        typedef boost::lockfree::fifo<task_description> task_items_type;
+        typedef boost::lockfree::fifo<task_description const*> task_items_type;
 
         typedef boost::lockfree::fifo<thread_id_type> thread_id_queue_type;
 
@@ -106,16 +114,20 @@ namespace hpx { namespace threads { namespace policies
                 return false;
 
             long added = 0;
-            task_description task;
+            task_description const* task = 0;
             while (add_count-- && new_tasks_.dequeue(&task)) 
             {
+                --new_tasks_count_;
+
                 // measure thread creation time
                 util::block_profiler_wrapper<add_new_tag> bp(add_new_logger_);
 
                 // create the new thread
-                thread_state state = boost::get<1>(task);
+                thread_state state = boost::get<1>(*task);
                 std::auto_ptr<threads::thread> thrd (
-                    new threads::thread(boost::get<0>(task), state));
+                    new threads::thread(boost::get<0>(*task), state));
+
+                delete task;
 
                 // add the new entry to the map of all threads
                 thread_id_type id = thrd->get_thread_id();
@@ -138,6 +150,7 @@ namespace hpx { namespace threads { namespace policies
                     // pushing the new thread into the pending queue 
                     ++added;
                     work_items_.enqueue(t);
+                    ++work_items_count_;
                     cond_.notify_all();         // wake up sleeping threads
                 }
             }
@@ -228,8 +241,8 @@ namespace hpx { namespace threads { namespace policies
         enum { max_thread_count = 1000 };
 
         thread_queue(std::size_t max_count = max_thread_count)
-          : work_items_("work_items"), 
-            terminated_items_("terminated_items"), 
+          : work_items_(/*"work_items"*/), work_items_count_(0),
+            terminated_items_(/*"terminated_items"*/), 
             max_count_((0 == max_count) ? max_thread_count : max_count),
             add_new_logger_("thread_queue::add_new")
         {}
@@ -243,7 +256,7 @@ namespace hpx { namespace threads { namespace policies
         // This returns the current length of the queues (work items and new items)
         boost::int64_t get_queue_lengths() const
         {
-            return work_items_.count_ + new_tasks_.count_;
+            return work_items_count_ + new_tasks_count_;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -283,7 +296,8 @@ namespace hpx { namespace threads { namespace policies
 
             // do not execute the work, but register a task description for 
             // later thread creation
-            new_tasks_.enqueue(task_description(data, initial_state));
+            new_tasks_.enqueue(new task_description(data, initial_state));
+            ++new_tasks_count_;
             return invalid_thread_id;     // thread has not been created yet
         }
 
@@ -291,13 +305,18 @@ namespace hpx { namespace threads { namespace policies
         /// available
         bool get_next_thread(threads::thread** thrd)
         {
-            return work_items_.dequeue(thrd);
+            if (work_items_.dequeue(thrd)) {
+                --work_items_count_;
+                return true;
+            }
+            return false;
         }
 
         /// Schedule the passed thread
         void schedule_thread(threads::thread* thrd)
         {
             work_items_.enqueue(thrd);
+            ++work_items_count_;
         }
 
         /// Destroy the passed thread as it has been terminated
@@ -419,7 +438,6 @@ namespace hpx { namespace threads { namespace policies
         {
             if (0 == num_thread) {
                 // print queue statistics
-                using boost::lockfree::detail::log_fifo_statistics;
                 log_fifo_statistics(work_items_, "thread_queue");
                 log_fifo_statistics(terminated_items_, "thread_queue");
                 log_fifo_statistics(new_tasks_, "thread_queue");
@@ -433,10 +451,12 @@ namespace hpx { namespace threads { namespace policies
 
         thread_map_type thread_map_;        ///< mapping of thread id's to PX-threads
         work_items_type work_items_;        ///< list of active work items
-        thread_id_queue_type terminated_items_;  ///< list of terminated threads
+        boost::atomic<long> work_items_count_;    ///< count of active work items
+        thread_id_queue_type terminated_items_;   ///< list of terminated threads
 
         std::size_t max_count_;             ///< maximum number of existing PX-threads
         task_items_type new_tasks_;         ///< list of new tasks to run
+        boost::atomic<long> new_tasks_count_;     ///< count of new tasks to run
 
         util::block_profiler<add_new_tag> add_new_logger_;
     };

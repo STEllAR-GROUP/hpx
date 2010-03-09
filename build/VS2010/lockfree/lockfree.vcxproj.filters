@@ -10,53 +10,32 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\atomic_int.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\branch_hints.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\cas.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\ao_primitives.hpp">
-      <Filter>Header Files\Detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\apple_primitives.hpp">
-      <Filter>Header Files\Detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\gcc_primitives.hpp">
-      <Filter>Header Files\Detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\static_lw_mutex.hpp">
-      <Filter>Header Files\Detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\windows_primitives.hpp">
-      <Filter>Header Files\Detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\fifo.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\freelist.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\prefix.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\primitives.hpp">
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\ringbuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\stack.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\tagged_ptr.hpp">
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\fifo.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\tagged_ptr_dcas.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\tagged_ptr.hpp">
+      <Filter>Header Files\Detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\tagged_ptr_ptrcompression.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\tagged_ptr_dcas.hpp">
+      <Filter>Header Files\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\tagged_ptr_ptrcompression.hpp">
+      <Filter>Header Files\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\branch_hints.hpp">
+      <Filter>Header Files\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\freelist.hpp">
+      <Filter>Header Files\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\prefix.hpp">
+      <Filter>Header Files\Detail</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
