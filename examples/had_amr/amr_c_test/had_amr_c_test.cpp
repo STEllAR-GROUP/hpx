@@ -83,13 +83,14 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
   // allocate some temporary arrays for calculating the rhs
   nodedata rhs;
   int i;
+  had_double_type r1,r2,y1,y2,A,B,C;
 
   had_double_type dt = par.dt0/pow(2.0,(int) vecval[0]->level_);
   had_double_type dx = par.dx0/pow(2.0,(int) vecval[0]->level_);
 
   // Sanity check
   if ( floatcmp(vecval[1]->x_ - vecval[0]->x_,dx) == 0 ) {
-    printf(" PROBLEM with dx: %g %g\n",vecval[1]->x_ - vecval[0]->x_,dx);
+    printf(" PROBLEM with dx: %g %g : x1 %g x2 %g\n",vecval[1]->x_ - vecval[0]->x_,dx,vecval[1]->x_,vecval[0]->x_);
     return 0;
   }
 
@@ -102,6 +103,24 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
     for (i=0;i<num_eqns;i++) {
       result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i] + rhs.phi[0][i]*dt;
     }
+
+    // set left boundary by quadratic
+    if ( boundary && bbox[0] == 1 ) {
+      for (i=0;i<num_eqns;i++) {
+        y1 = vecval[compute_index+1]->value_.phi[0][i];
+        y2 = vecval[compute_index+2]->value_.phi[0][i];
+        r1 = vecval[compute_index+1]->x_;
+        r2 = vecval[compute_index+2]->x_;
+
+        // y = A*r^2 + B*r + C
+        B = 0; // functions are even; at r=0 dphi/dr = 0
+        A = (y2-y1)/(r2*r2 - r1*r1);
+        C = -A*r1*r1 + y1;
+        // at r=0
+        result->value_.phi[0][i] = C;
+      }
+    }
+
     result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
   } else if ( par.integrator == 1 ) { // rk3
 
@@ -111,9 +130,29 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
 
       calcrhs(&rhs,vecval,0,dx,size,boundary,bbox,compute_index,par);
 
-      for (i=0;i<num_eqns;i++) {
-        result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
-        result->value_.phi[1][i] = vecval[compute_index]->value_.phi[0][i] + rhs.phi[0][i]*dt;
+      // set left boundary by quadratic
+      if ( boundary && bbox[0] == 1 ) {
+        for (i=0;i<num_eqns;i++) {
+          y1 = vecval[compute_index+1]->value_.phi[0][i];
+          y2 = vecval[compute_index+2]->value_.phi[0][i];
+          r1 = vecval[compute_index+1]->x_;
+          r2 = vecval[compute_index+2]->x_;
+  
+          // y = A*r^2 + B*r + C
+          B = 0; // functions are even; at r=0 dphi/dr = 0
+          A = (y2-y1)/(r2*r2 - r1*r1);
+          C = -A*r1*r1 + y1;
+          // at r=0
+          result->value_.phi[1][i] = C;
+
+          // this is not used in evolution, but put it here anyways for clarity
+          result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
+        }
+      } else {
+        for (i=0;i<num_eqns;i++) {
+          result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
+          result->value_.phi[1][i] = vecval[compute_index]->value_.phi[0][i] + rhs.phi[0][i]*dt;
+        }
       }
 
       // no timestep update-- this is just a part of an rk subcycle
@@ -124,10 +163,29 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
 
       calcrhs(&rhs,vecval,1,dx,size,boundary,bbox,compute_index,par);
 
-      for (i=0;i<num_eqns;i++) {
-        result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
-        result->value_.phi[1][i] = 0.75*vecval[compute_index]->value_.phi[0][i]
-                                  +0.25*vecval[compute_index]->value_.phi[1][i] + 0.25*rhs.phi[0][i]*dt;
+      if ( boundary && bbox[0] == 1 ) {
+        for (i=0;i<num_eqns;i++) {
+          y1 = vecval[compute_index+1]->value_.phi[0][i];
+          y2 = vecval[compute_index+2]->value_.phi[0][i];
+          r1 = vecval[compute_index+1]->x_;
+          r2 = vecval[compute_index+2]->x_;
+  
+          // y = A*r^2 + B*r + C
+          B = 0; // functions are even; at r=0 dphi/dr = 0
+          A = (y2-y1)/(r2*r2 - r1*r1);
+          C = -A*r1*r1 + y1;
+          // at r=0
+          result->value_.phi[1][i] = C;
+
+          // this is not used in evolution, but put it here anyways for clarity
+          result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
+        }
+      } else {
+        for (i=0;i<num_eqns;i++) {
+          result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
+          result->value_.phi[1][i] = 0.75*vecval[compute_index]->value_.phi[0][i]
+                                    +0.25*vecval[compute_index]->value_.phi[1][i] + 0.25*rhs.phi[0][i]*dt;
+        }
       }
 
       // no timestep update-- this is just a part of an rk subcycle
@@ -138,9 +196,25 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
       // reset rk subcycle counter
       result->iter_ = 0;
 
-      for (i=0;i<num_eqns;i++) {
-        result->value_.phi[0][i] = 1./3*vecval[compute_index]->value_.phi[0][i]
-                                 +2./3*(vecval[compute_index]->value_.phi[1][i] + rhs.phi[0][i]*dt);
+      if ( boundary && bbox[0] == 1 ) {
+        for (i=0;i<num_eqns;i++) {
+          y1 = vecval[compute_index+1]->value_.phi[0][i];
+          y2 = vecval[compute_index+2]->value_.phi[0][i];
+          r1 = vecval[compute_index+1]->x_;
+          r2 = vecval[compute_index+2]->x_;
+  
+          // y = A*r^2 + B*r + C
+          B = 0; // functions are even; at r=0 dphi/dr = 0
+          A = (y2-y1)/(r2*r2 - r1*r1);
+          C = -A*r1*r1 + y1;
+          // at r=0
+          result->value_.phi[0][i] = C;
+        }
+      } else {
+        for (i=0;i<num_eqns;i++) {
+          result->value_.phi[0][i] = 1./3*vecval[compute_index]->value_.phi[0][i]
+                                   +2./3*(vecval[compute_index]->value_.phi[1][i] + rhs.phi[0][i]*dt);
+        }
       }
 
       // Now comes the timestep update
@@ -182,12 +256,11 @@ void calcrhs(struct nodedata * rhs,
   } else {
     // boundary -- look at the bounding box (bbox) to decide which boundary it is
     if ( bbox[0] == 1 ) {
-      // we are at the left boundary 
-      rhs->phi[0][0] = vecval[compute_index]->value_.phi[flag][1];
+      // we are at the left boundary  -- values are determined by quadratic fit, not evolution
+      if ( size != 4 ) fprintf(stderr,"Problem: not enough points for boundary condition\n");
+      rhs->phi[0][0] = 0.0;
+      rhs->phi[0][1] = 0.0;
 
-      // the first derivative term dominates ( goes as 1/x )
-      rhs->phi[0][1] = 2./x * ( vecval[compute_index+1]->value_.phi[flag][0] - vecval[compute_index]->value_.phi[flag][0] )/dx
-                      + pow(vecval[compute_index]->value_.phi[flag][0],7.0);
     } else if (bbox[1] == 1) {
       // we are at the right boundary -- outflow
       rhs->phi[0][0] = -(vecval[compute_index]->value_.phi[flag][0] - vecval[compute_index-1]->value_.phi[flag][0])/dx;

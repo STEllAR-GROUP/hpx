@@ -47,7 +47,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         hpx::util::high_resolution_timer t;
         std::vector<naming::id_type> result_data;
         
-        if ( par.integrator == 0 || par.allowedl == 0 ) {
+        if ( par.integrator == 0 ) {
            components::amr::amr_mesh mesh;
            mesh.create(here);
            result_data = mesh.init_execute(function_type, numvals, numsteps,
@@ -359,6 +359,9 @@ int main(int argc, char* argv[])
 
         if ( par.integrator == 1 ) {
           numsteps *= 3;  // three subcycles each step
+
+          // TEST -- FIX LATER
+          par.coarsestencilsize = par.stencilsize + 6;
         }
 
         // create output file to append to

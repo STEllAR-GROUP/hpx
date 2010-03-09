@@ -85,35 +85,28 @@ namespace hpx { namespace components { namespace amr
         int compute_index;
         bool boundary = false;
         int bbox[2];
-        if ( val.size() == 2 ) {
+        if ( vecval.size()%2 == 0 ) {
           if ( column == 0 ) {
-            resultval->x_ = val[0]->x_;
             compute_index = 0;
-
-            // indicate a physical boundary
-            boundary = true;
             bbox[0] = 1;
             bbox[1] = 0;
           } else {
-            resultval->x_ = val[1]->x_; 
-            compute_index = 1;
-
-            // indicate a physical boundary
-            boundary = true;
+            compute_index = vecval.size()-1;
             bbox[0] = 0;
             bbox[1] = 1;
           }
+          // indicate a physical boundary
+          boundary = true;
         } else {
           if ( gids.size() == 1 ) { 
             resultval.get() = val[0].get();
             return -1;
           }
-
-          // update x position
           BOOST_ASSERT( (vecval.size())%2 == 1 );
-          resultval->x_ = val[(vecval.size()-1)/2]->x_;
           compute_index = (vecval.size()-1)/2;
         }
+        // update x position
+        resultval->x_ = val[compute_index]->x_;
 
         // initialize result 
         resultval->overwrite_alloc_ = false;

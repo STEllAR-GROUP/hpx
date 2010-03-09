@@ -401,6 +401,13 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         for (i=0;i<5;i++) {
           counter = 0;
+
+          // extra points for left boundary
+          if (i==2 || i == 3) {
+            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(0);vport.push_back(counter);
+            counter++;
+          }
+
           for (j=i-1;j<i+2;j++) {
             if ( j >=0 && j < 4 ) {
               vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
