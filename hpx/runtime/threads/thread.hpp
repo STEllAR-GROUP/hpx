@@ -92,7 +92,7 @@ namespace hpx { namespace threads { namespace detail
         {
             using namespace boost::lockfree;
             for (;;) {
-                long prev_state = current_state_;
+                boost::uint32_t prev_state = current_state_;
                 if (likely(current_state_.compare_exchange_strong(
                         prev_state, newstate)))
                 {
@@ -104,7 +104,7 @@ namespace hpx { namespace threads { namespace detail
         thread_state set_state(thread_state newstate, thread_state old_state)
         {
             using namespace boost::lockfree;
-            long old_state_long = old_state;
+            boost::uint32_t old_state_long = old_state;
             if (likely(current_state_.compare_exchange_strong(
                     old_state_long, newstate)))
             {
@@ -133,7 +133,7 @@ namespace hpx { namespace threads { namespace detail
         {
             using namespace boost::lockfree;
             for (;;) {
-                long prev_state = current_state_ex_;
+                boost::uint32_t prev_state = current_state_ex_;
                 if (likely(current_state_ex_.compare_exchange_strong(
                         prev_state, newstate_ex)))
                 {
