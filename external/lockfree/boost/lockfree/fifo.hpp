@@ -15,20 +15,12 @@
 #ifndef BOOST_LOCKFREE_FIFO_HPP_INCLUDED
 #define BOOST_LOCKFREE_FIFO_HPP_INCLUDED
 
-#define BOOST_LOCKFREE_FIFO_LOGGING
+#include <boost/atomic.hpp>
+#include <boost/lockfree/detail/tagged_ptr.hpp>
+#include <boost/lockfree/detail/freelist.hpp>
 
-#include <boost/lockfree/prefix.hpp>
-#include <boost/lockfree/tagged_ptr.hpp>
-#include <boost/lockfree/atomic_int.hpp>
-#include <boost/lockfree/freelist.hpp>
-
-#include <boost/concept_check.hpp>
 #include <boost/static_assert.hpp>
-
-#if defined(BOOST_LOCKFREE_FIFO_LOGGING)
-#include <hpx/util/value_logger.hpp>
-#include <hpx/util/block_profiler.hpp>
-#endif
+#include <boost/type_traits/is_pod.hpp>
 
 #include <memory>               /* std::auto_ptr */
 #include <boost/scoped_ptr.hpp>
@@ -39,27 +31,15 @@ namespace boost
 {
 namespace lockfree
 {
+
 namespace detail
 {
 
-#if defined(BOOST_LOCKFREE_FIFO_LOGGING)
-inline std::string get_enqueue_name(char const* desc)
-{
-    return std::string(desc) + " enqueue";
-}
-
-inline std::string get_dequeue_name(char const* desc)
-{
-    return std::string(desc) + " dequeue";
-}
-#endif
-
-template <typename T, typename Alloc>
+template <typename T, typename freelist_t, typename Alloc>
 class fifo:
     boost::noncopyable
 {
-    BOOST_CLASS_REQUIRE(T, boost, CopyConstructibleConcept);
-    BOOST_CLASS_REQUIRE(T, boost, DefaultConstructibleConcept);
+    BOOST_STATIC_ASSERT(boost::is_pod<T>::value);
 
     struct BOOST_LOCKFREE_CACHELINE_ALIGNMENT node
     {
@@ -68,127 +48,129 @@ class fifo:
         node(T const & v):
             data(v)
         {
-            next.set(NULL, next.get_tag() + 1); /* increment tag to avoid ABA problem */
+            /* increment tag to avoid ABA problem */
+            tagged_ptr_t old_next = next.load(memory_order_relaxed);
+            tagged_ptr_t new_next (NULL, old_next.get_tag()+1);
+            next.store(new_next, memory_order_release);
         }
 
         node (void):
-            next(NULL)
+            next(tagged_ptr_t(NULL, 0))
         {}
 
-        tagged_ptr_t next;
+        atomic<tagged_ptr_t> next;
         T data;
     };
 
-    typedef tagged_ptr<node> atomic_node_ptr;
+    typedef tagged_ptr<node> tagged_ptr_t;
 
+    typedef typename Alloc::template rebind<node>::other node_allocator;
+/*     typedef typename select_freelist<node, node_allocator, freelist_t>::type pool_t; */
 
-public:
-    explicit fifo(char const* description = "", bool enable_logging = true)
-      : pool(128),
-        enqueue_spin_count_(0), dequeue_spin_count_(0),
-        description_(description)
-#if defined(BOOST_LOCKFREE_FIFO_LOGGING)
-      , count_(-1), logger_(description, enable_logging)
-      , enqueue_profiler_(get_enqueue_name(description).c_str(), enable_logging)
-      , dequeue_profiler_(get_dequeue_name(description).c_str(), enable_logging)
-#endif
+    typedef typename boost::mpl::if_<boost::is_same<freelist_t, caching_freelist_t>,
+                                     caching_freelist<node, node_allocator>,
+                                     static_freelist<node, node_allocator>
+                                     >::type pool_t;
+
+    void initialize(void)
     {
         node * n = alloc_node();
-        head_.set_ptr(n);
-        tail_.set_ptr(n);
+        tagged_ptr_t dummy_node(n, 0);
+        head_.store(dummy_node, memory_order_relaxed);
+        tail_.store(dummy_node, memory_order_release);
     }
 
-    fifo(std::size_t initial_nodes, char const* description = "",
-            bool enable_logging = true)
-      : pool(initial_nodes)
-      , description_(description)
-      , enqueue_spin_count_(0), dequeue_spin_count_(0)
-#if defined(BOOST_LOCKFREE_FIFO_LOGGING)
-      , count_(-1), logger_(description, enable_logging)
-      , enqueue_profiler_(get_enqueue_name(description).c_str(), enable_logging)
-      , dequeue_profiler_(get_dequeue_name(description).c_str(), enable_logging)
-#endif
+public:
+    const bool is_lock_free (void) const
     {
-        node * n = alloc_node();
-        head_.set_ptr(n);
-        tail_.set_ptr(n);
+        return head_.is_lock_free();
+    }
+
+    fifo(void):
+        pool(128)
+    {
+        initialize();
+    }
+
+    explicit fifo(std::size_t initial_nodes):
+        pool(initial_nodes)
+    {
+        initialize();
     }
 
     ~fifo(void)
     {
-        assert(empty());
-        dealloc_node(head_.get_ptr());
+        if (!empty())
+        {
+            T dummy;
+            for(;;)
+            {
+                if (!dequeue(&dummy))
+                    break;
+            }
+        }
+        dealloc_node(head_.load(memory_order_relaxed).get_ptr());
     }
 
-    bool empty(void) const
+    bool empty(void)
     {
-        return head_.get_ptr() == tail_.get_ptr();
+        return head_.load().get_ptr() == tail_.load().get_ptr();
     }
 
     bool enqueue(T const & t)
     {
-        hpx::util::block_profiler_wrapper<fifo_enqueue_tag> pw(enqueue_profiler_);
-
         node * n = alloc_node(t);
 
         if (n == NULL)
             return false;
 
-        for (unsigned int cnt = 0; /**/; spin((unsigned char)++cnt))
+        for (;;)
         {
-            atomic_node_ptr tail (tail_);
-            memory_barrier();
-            atomic_node_ptr next (tail->next);
-            memory_barrier();
+            tagged_ptr_t tail = tail_.load(memory_order_acquire);
+            tagged_ptr_t next = tail->next.load(memory_order_acquire);
+            node * next_ptr = next.get_ptr();
 
-            if (likely(tail == tail_))
+            if (likely(tail == tail_.load(memory_order_acquire)))
             {
-                if (next.get_ptr() == 0)
+                if (next_ptr == 0)
                 {
-                    if (tail->next.CAS(next, n))
+                    if ( tail->next.compare_exchange_strong(next, tagged_ptr_t(n, next.get_tag() + 1)) )
                     {
-                        tail_.CAS(tail, n);
-                        enqueue_spin_count_ += cnt;
+                        tail_.compare_exchange_strong(tail, tagged_ptr_t(n, tail.get_tag() + 1));
                         return true;
                     }
                 }
                 else
-                    tail_.CAS(tail, next.get_ptr());
+                    tail_.compare_exchange_strong(tail, tagged_ptr_t(next_ptr, tail.get_tag() + 1));
             }
         }
     }
 
     bool dequeue (T * ret)
     {
-        hpx::util::block_profiler_wrapper<fifo_dequeue_tag> pw(dequeue_profiler_);
-
-        for (unsigned int cnt = 0; /**/; spin((unsigned char)++cnt))
+        for (;;)
         {
-            atomic_node_ptr head(head_);
-            memory_barrier();
+            tagged_ptr_t head = head_.load(memory_order_acquire);
+            tagged_ptr_t tail = tail_.load(memory_order_acquire);
+            tagged_ptr_t next = head->next.load(memory_order_acquire);
+            node * next_ptr = next.get_ptr();
 
-            atomic_node_ptr tail(tail_);
-            node * next = head->next.get_ptr();
-            memory_barrier();
-
-            if (likely(head == head_))
+            if (likely(head == head_.load(memory_order_acquire)))
             {
                 if (head.get_ptr() == tail.get_ptr())
                 {
-                    if (next == 0) {
-                        dequeue_spin_count_ += cnt;
+                    if (next_ptr == 0)
                         return false;
-                    }
-                    tail_.CAS(tail, next);
+                    tail_.compare_exchange_strong(tail, tagged_ptr_t(next_ptr, tail.get_tag() + 1));
                 }
                 else
                 {
-                    *ret = next->data;
-                    memory_barrier();
-                    if (head_.CAS(head, next))
+                    if (next_ptr == 0) /* this check shouldn't be needed, but it crashes without :/ */
+                        continue;
+                    *ret = next_ptr->data;
+                    if (head_.compare_exchange_strong(head, tagged_ptr_t(next_ptr, head.get_tag() + 1)))
                     {
                         dealloc_node(head.get_ptr());
-                        dequeue_spin_count_ += cnt;
                         return true;
                     }
                 }
@@ -201,10 +183,6 @@ private:
     {
         node * chunk = pool.allocate();
         new(chunk) node();
-#if defined(BOOST_LOCKFREE_FIFO_LOGGING)
-        ++count_;
-        logger_.snapshot(count_);
-#endif
         return chunk;
     }
 
@@ -212,49 +190,22 @@ private:
     {
         node * chunk = pool.allocate();
         new(chunk) node(t);
-#if defined(BOOST_LOCKFREE_FIFO_LOGGING)
-        ++count_;
-        logger_.snapshot(count_);
-#endif
         return chunk;
     }
 
     void dealloc_node(node * n)
     {
-#if defined(BOOST_LOCKFREE_FIFO_LOGGING)
-        --count_;
-        logger_.snapshot(count_);
-#endif
         n->~node();
         pool.deallocate(n);
     }
 
-    typedef typename Alloc::template rebind<node>::other node_allocator;
-
-    boost::lockfree::caching_freelist<node, node_allocator> pool;
-
-    /* force head_ and tail_ to different cache lines! */
-    volatile atomic_node_ptr head_;
-    static const int padding_size = 64 - sizeof(atomic_node_ptr); /* cache lines on current cpus seem to
-                                                                   * be 64 byte */
+    atomic<tagged_ptr_t> head_;
+    static const int padding_size = BOOST_LOCKFREE_CACHELINE_BYTES - sizeof(tagged_ptr_t);
     char padding1[padding_size];
-    volatile atomic_node_ptr tail_;
+    atomic<tagged_ptr_t> tail_;
     char padding2[padding_size];
 
-public:
-#if defined(BOOST_LOCKFREE_FIFO_LOGGING)
-    atomic_int<long> count_;
-    hpx::util::value_logger<long> logger_;
-
-    struct fifo_enqueue_tag {};
-    hpx::util::block_profiler<fifo_enqueue_tag> enqueue_profiler_;
-
-    struct fifo_dequeue_tag {};
-    hpx::util::block_profiler<fifo_dequeue_tag> dequeue_profiler_;
-#endif
-    atomic_int<long> enqueue_spin_count_;
-    atomic_int<long> dequeue_spin_count_;
-    std::string description_;
+    pool_t pool;
 };
 
 } /* namespace detail */
@@ -264,18 +215,18 @@ public:
  *  - wrapper for detail::fifo
  * */
 template <typename T,
-          typename Alloc = std::allocator<T> >
+          typename freelist_t = caching_freelist_t,
+          typename Alloc = std::allocator<T>
+          >
 class fifo:
-    public detail::fifo<T, Alloc>
+    public detail::fifo<T, freelist_t, Alloc>
 {
 public:
-    fifo(char const* description = "", bool enable_logging = true)
-      : detail::fifo<T, Alloc>(description, enable_logging)
+    fifo(void)
     {}
 
-    explicit fifo(std::size_t initial_nodes, char const* description = "",
-            bool enable_logging = true)
-      : detail::fifo<T, Alloc>(initial_nodes, description, enable_logging)
+    explicit fifo(std::size_t initial_nodes):
+        detail::fifo<T, freelist_t, Alloc>(initial_nodes)
     {}
 };
 
@@ -285,11 +236,11 @@ public:
  *  - wrapper for detail::fifo
  *  - overload dequeue to support smart pointers
  * */
-template <typename T, typename Alloc>
-class fifo<T*, Alloc>:
-    public detail::fifo<T*, Alloc>
+template <typename T, typename freelist_t, typename Alloc>
+class fifo<T*, freelist_t, Alloc>:
+    public detail::fifo<T*, freelist_t, Alloc>
 {
-    typedef detail::fifo<T*, Alloc> fifo_t;
+    typedef detail::fifo<T*, freelist_t, Alloc> fifo_t;
 
     template <typename smart_ptr>
     bool dequeue_smart_ptr(smart_ptr & ptr)
@@ -303,18 +254,16 @@ class fifo<T*, Alloc>:
     }
 
 public:
-    fifo(char const* description = "", bool enable_logging = true)
-      : fifo_t(description, enable_logging)
+    fifo(void)
     {}
 
-    explicit fifo(std::size_t initial_nodes, char const* description = "",
-            bool enable_logging = true)
-      : fifo_t(initial_nodes, description, enable_logging)
+    explicit fifo(std::size_t initial_nodes):
+        fifo_t(initial_nodes)
     {}
 
-    void enqueue(T * t)
+    bool enqueue(T * t)
     {
-        fifo_t::enqueue(t);
+        return fifo_t::enqueue(t);
     }
 
     bool dequeue (T ** ret)
@@ -330,7 +279,7 @@ public:
     bool dequeue (boost::scoped_ptr<T> & ret)
     {
         BOOST_STATIC_ASSERT(sizeof(boost::scoped_ptr<T>) == sizeof(T*));
-        return dequeue(reinterpret_cast<T**>(&ret));
+        return dequeue(reinterpret_cast<T**>((void*)&ret));
     }
 
     bool dequeue (boost::shared_ptr<T> & ret)
@@ -338,18 +287,6 @@ public:
         return dequeue_smart_ptr(ret);
     }
 };
-
-///////////////////////////////////////////////////////////////////////////
-namespace detail
-{
-    template <typename Fifo>
-    inline void log_fifo_statistics(Fifo const& q, char const* const desc)
-    {
-        LTIM_(fatal) << ": queue: "  << q.description_
-                     << ", enqueue_spin_count: " << long(q.enqueue_spin_count_)
-                     << ", dequeue_spin_count: " << long(q.dequeue_spin_count_);
-    }
-}
 
 } /* namespace lockfree */
 } /* namespace boost */

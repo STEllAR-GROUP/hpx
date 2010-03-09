@@ -11,14 +11,9 @@
 #ifndef BOOST_LOCKFREE_TAGGED_PTR_DCAS_HPP_INCLUDED
 #define BOOST_LOCKFREE_TAGGED_PTR_DCAS_HPP_INCLUDED
 
-#include <boost/lockfree/cas.hpp>
-#include <boost/lockfree/branch_hints.hpp>
+#include <boost/lockfree/detail/branch_hints.hpp>
 
 #include <cstddef>              /* for std::size_t */
-
-# if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
-#warning "using tagged_ptr_dcas"
-#endif
 
 namespace boost
 {
@@ -35,53 +30,19 @@ public:
     tagged_ptr(void)//: ptr(0), tag(0)
     {}
 
-    /** copy constructor */
-    tagged_ptr(volatile tagged_ptr const & p)//: ptr(0), tag(0)
-    {
-        set(p);
-    }
+    tagged_ptr(tagged_ptr const & p):
+        ptr(p.ptr), tag(p.tag)
+    {}
 
     explicit tagged_ptr(T * p, tag_t t = 0):
         ptr(p), tag(t)
     {}
 
-    /** atomic set operations */
+    /** unsafe set operation */
     /* @{ */
     void operator= (tagged_ptr const & p)
     {
-        atomic_set(p);
-    }
-
-    void atomic_set(tagged_ptr const & p)
-    {
-        for (;;)
-        {
-            tagged_ptr old;
-            old.set(*this);
-            if(likely(CAS(old, p.ptr, p.tag)))
-                return;
-        }
-    }
-
-    void atomic_set(T * p, tag_t t)
-    {
-        for (;;)
-        {
-            tagged_ptr old;
-            old.set(*this);
-
-            if(likely(CAS(old, p, t)))
-                return;
-        }
-    }
-    /* @} */
-
-    /** unsafe set operation */
-    /* @{ */
-    void set(volatile tagged_ptr const & p)
-    {
-        ptr = p.ptr;
-        tag = p.tag;
+        set(p.ptr, p.tag);
     }
 
     void set(T * p, tag_t t)
@@ -106,12 +67,12 @@ public:
 
     /** pointer access */
     /* @{ */
-    T * get_ptr() const volatile 
+    T * get_ptr(void) const volatile
     {
         return ptr;
     }
 
-    void set_ptr(T * p) volatile 
+    void set_ptr(T * p) volatile
     {
         ptr = p;
     }
@@ -119,27 +80,14 @@ public:
 
     /** tag access */
     /* @{ */
-    tag_t get_tag() const volatile 
+    tag_t get_tag() const volatile
     {
         return tag;
     }
 
-    void set_tag(tag_t t) volatile 
+    void set_tag(tag_t t) volatile
     {
         tag = t;
-    }
-    /* @} */
-
-    /** compare and swap  */
-    /* @{ */
-    bool CAS(tagged_ptr const & oldval, T * newptr) volatile 
-    {
-        return boost::lockfree::CAS2(this, oldval.ptr, oldval.tag, newptr, oldval.tag + 1);
-    }
-
-    bool CAS(tagged_ptr const & oldval, T * newptr, tag_t t) volatile 
-    {
-        return boost::lockfree::CAS2(this, oldval.ptr, oldval.tag, newptr, t);
     }
     /* @} */
 
@@ -157,7 +105,7 @@ public:
 
     operator bool(void) const
     {
-        return bool(NULL != ptr);
+        return ptr != 0;
     }
     /* @} */
 

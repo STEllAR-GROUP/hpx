@@ -1,6 +1,6 @@
 //  tagged pointer, for aba prevention
 //
-//  Copyright (C) 2008 Tim Blechmann, based on code by Cory Nelson
+//  Copyright (C) 2008, 2009 Tim Blechmann, based on code by Cory Nelson
 //
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE_1_0.txt or copy at
@@ -11,27 +11,21 @@
 #ifndef BOOST_LOCKFREE_TAGGED_PTR_PTRCOMPRESSION_HPP_INCLUDED
 #define BOOST_LOCKFREE_TAGGED_PTR_PTRCOMPRESSION_HPP_INCLUDED
 
-#include <boost/lockfree/cas.hpp>
-#include <boost/lockfree/branch_hints.hpp>
+#include <boost/lockfree/detail/branch_hints.hpp>
 
 #include <cstddef>              /* for std::size_t */
 
 #include <boost/cstdint.hpp>
-#include <boost/assert.hpp>
-
-# if defined(BOOST_LOCKFREE_IDENTIFY_CAS_METHOD)
-#warning "using tagged_ptr_ptrcompression"
-#endif
 
 namespace boost
 {
 namespace lockfree
 {
 
-#if defined(__x86_64__) || defined(_M_IA64) || defined(_WIN64)
+#if defined (__x86_64__) || defined (_M_X64) || defined(__alpha__)
 
 template <class T>
-class BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr
+class tagged_ptr
 {
     typedef boost::uint64_t compressed_ptr_t;
     typedef boost::uint16_t tag_t;
@@ -44,7 +38,7 @@ private:
     };
 
     static const int tag_index = 3;
-    static const compressed_ptr_t ptr_mask = (1LL << 48)-1;
+    static const compressed_ptr_t ptr_mask = 0xffffffffffff; //(1L<<48L)-1;
 
     static T* extract_ptr(volatile compressed_ptr_t const & i)
     {
@@ -62,7 +56,6 @@ private:
     {
         cast_unit ret;
         ret.value = compressed_ptr_t(ptr);
-        BOOST_ASSERT(0 == (~ptr_mask & ret.value));
         ret.tag[tag_index] = tag;
         return ret.value;
     }
@@ -73,36 +66,17 @@ public:
     {}
 
     /** copy constructor */
-    tagged_ptr(volatile tagged_ptr const & p)//: ptr(0), tag(0)
-    {
-        set(p);
-    }
+    tagged_ptr(tagged_ptr const & p):
+        ptr(p.ptr)
+    {}
 
     explicit tagged_ptr(T * p, tag_t t = 0):
         ptr(pack_ptr(p, t))
     {}
 
-    /** atomic set operations */
-    /* @{ */
-    void operator= (tagged_ptr const & p)
-    {
-        atomic_set(p);
-    }
-
-    void atomic_set(tagged_ptr const & p)
-    {
-        set(p);
-    }
-
-    void atomic_set(T * p, tag_t t)
-    {
-        ptr = pack_ptr(p, t);
-    }
-    /* @} */
-
     /** unsafe set operation */
     /* @{ */
-    void set(volatile tagged_ptr const & p)
+    void operator= (tagged_ptr const & p)
     {
         ptr = p.ptr;
     }
@@ -154,28 +128,6 @@ public:
     }
     /* @} */
 
-    /** compare and swap  */
-    /* @{ */
-private:
-    bool CAS(compressed_ptr_t const & oldval, compressed_ptr_t const & newval) volatile 
-    {
-        return boost::lockfree::CAS(&(this->ptr), oldval, newval);
-    }
-
-public:
-    bool CAS(tagged_ptr const & oldval, T * newptr) volatile 
-    {
-        compressed_ptr_t new_compressed_ptr = pack_ptr(newptr, extract_tag(oldval.ptr)+1);
-        return CAS(oldval.ptr, new_compressed_ptr);
-    }
-
-    bool CAS(tagged_ptr const & oldval, T * newptr, tag_t t) volatile 
-    {
-        compressed_ptr_t new_compressed_ptr = pack_ptr(newptr, t);
-        return boost::lockfree::CAS(&(this->ptr), oldval.ptr, new_compressed_ptr);
-    }
-    /* @} */
-
     /** smart pointer support  */
     /* @{ */
     T & operator*() const
@@ -190,7 +142,7 @@ public:
 
     operator bool(void) const
     {
-        return bool (0 != get_ptr());
+        return get_ptr() != 0;
     }
     /* @} */
 
