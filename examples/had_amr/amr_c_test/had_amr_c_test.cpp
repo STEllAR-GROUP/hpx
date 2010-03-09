@@ -133,14 +133,14 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
       }
 
       if ( boundary && bbox[0] == 1 ) {
-        // interpolate chi
-        result->value_.phi[1][0] = vecval[compute_index]->value_.phi[0][0]
-                             -4./3*vecval[compute_index+1]->value_.phi[0][0]
-                             +1./3*vecval[compute_index+2]->value_.phi[0][0];
-        // interpolate Pi
-        result->value_.phi[1][2] = vecval[compute_index]->value_.phi[0][2]
-                             -4./3*vecval[compute_index+1]->value_.phi[0][2]
-                             +1./3*vecval[compute_index+2]->value_.phi[0][2];
+        // quadratic fit chi
+        result->value_.phi[1][0] =
+                              4./3*vecval[compute_index+1]->value_.phi[0][0]
+                             -1./3*vecval[compute_index+2]->value_.phi[0][0];
+        // quadratic fit Pi
+        result->value_.phi[1][2] =
+                              4./3*vecval[compute_index+1]->value_.phi[0][2]
+                             -1./3*vecval[compute_index+2]->value_.phi[0][2];
       }
 
       // no timestep update-- this is just a part of an rk subcycle
@@ -158,14 +158,14 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
       }
 
       if ( boundary && bbox[0] == 1 ) {
-        // interpolate chi
-        result->value_.phi[1][0] = vecval[compute_index]->value_.phi[0][0]
-                             -4./3*vecval[compute_index+1]->value_.phi[0][0]
-                             +1./3*vecval[compute_index+2]->value_.phi[0][0];
-        // interpolate Pi
-        result->value_.phi[1][2] = vecval[compute_index]->value_.phi[0][2]
-                             -4./3*vecval[compute_index+1]->value_.phi[0][2]
-                             +1./3*vecval[compute_index+2]->value_.phi[0][2];
+        // quadratic fit chi
+        result->value_.phi[1][0] = 
+                             4./3*vecval[compute_index+1]->value_.phi[1][0]
+                             -1./3*vecval[compute_index+2]->value_.phi[1][0];
+        // quadratic fit Pi
+        result->value_.phi[1][2] =
+                              4./3*vecval[compute_index+1]->value_.phi[1][2]
+                             -1./3*vecval[compute_index+2]->value_.phi[1][2];
       }
 
       // no timestep update-- this is just a part of an rk subcycle
@@ -182,14 +182,14 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
       }
 
       if ( boundary && bbox[0] == 1 ) {
-        // interpolate chi
-        result->value_.phi[0][0] = vecval[compute_index]->value_.phi[0][0]
-                             -4./3*vecval[compute_index+1]->value_.phi[0][0]
-                             +1./3*vecval[compute_index+2]->value_.phi[0][0];
-        // interpolate Pi
-        result->value_.phi[0][2] = vecval[compute_index]->value_.phi[0][2]
-                             -4./3*vecval[compute_index+1]->value_.phi[0][2]
-                             +1./3*vecval[compute_index+2]->value_.phi[0][2];
+        // quadratic fit chi
+        result->value_.phi[0][0] = 
+                              4./3*vecval[compute_index+1]->value_.phi[1][0]
+                             -1./3*vecval[compute_index+2]->value_.phi[1][0];
+        // quadratic fit Pi
+        result->value_.phi[0][2] = 
+                              4./3*vecval[compute_index+1]->value_.phi[1][2]
+                             -1./3*vecval[compute_index+2]->value_.phi[1][2];
       }
 
       // Energy
