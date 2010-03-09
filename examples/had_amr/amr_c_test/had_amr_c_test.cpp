@@ -117,7 +117,7 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
   }
 
   if ( par.integrator == 0 ) {  // Euler
-    printf(" PROBLEM : not implemented at present\n");
+    printf(" PROBLEM: not implemented\n");
     return 0;
   } else if ( par.integrator == 1 ) { // rk3
 
@@ -292,7 +292,7 @@ int interpolation(struct nodedata *dst,struct nodedata *src1,struct nodedata *sr
 bool refinement(stencil_data ** vecval, int size, struct nodedata *dst,int level,Par const& par)
 {
 //#if 0
-  had_double_type grad1,grad2;
+  had_double_type grad1,grad2,grad3,grad4;
   int index;
   had_double_type dx = par.dx0/pow(2.0,(int) vecval[0]->level_);
 
@@ -301,7 +301,9 @@ bool refinement(stencil_data ** vecval, int size, struct nodedata *dst,int level
     index = (size-1)/2;
     grad1 = (vecval[index+1]->value_.phi[0][0] - vecval[index-1]->value_.phi[0][0])/(2.*dx);
     grad2 = (vecval[index+1]->value_.phi[0][1] - vecval[index-1]->value_.phi[0][1])/(2.*dx);
-    if ( sqrt( grad1*grad1 + grad2*grad2 ) > par.ethreshold ) return true;
+    grad3 = (vecval[index+1]->value_.phi[0][2] - vecval[index-1]->value_.phi[0][2])/(2.*dx);
+    grad4 = (vecval[index+1]->value_.phi[0][3] - vecval[index-1]->value_.phi[0][3])/(2.*dx);
+    if ( sqrt( grad1*grad1 + grad2*grad2 + grad3*grad3 + grad4*grad4 ) > par.ethreshold ) return true;
     else return false;
   } else {
     return false;
@@ -312,12 +314,15 @@ bool refinement(stencil_data ** vecval, int size, struct nodedata *dst,int level
   // simple amplitude refinement
   had_double_type threshold;
   if ( level == 0 ) return true;
-  if ( level == 1 ) threshold = 0.015;
-  if ( level == 2 ) threshold = 0.025;
+  if ( level == 1 ) threshold = 0.005;
+  if ( level == 2 ) threshold = 0.01;
   if ( level == 3 ) threshold = 0.03;
   if ( level == 4 ) threshold = 0.035;
 
-  if ( dst->phi[0][1] > threshold || dst->phi[0][0] > threshold ) return true;
+  if ( dst->phi[0][0] > threshold || 
+       dst->phi[0][1] > threshold || 
+       dst->phi[0][2] > threshold || 
+       dst->phi[0][3] > threshold ) return true;
   else return false;
 #endif
 }
