@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 
+#include <boost/atomic.hpp>
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
@@ -91,7 +92,7 @@ namespace hpx { namespace threads { namespace detail
         {
             using namespace boost::lockfree;
             for (;;) {
-                unsigned long prev_state = current_state_;
+                long prev_state = current_state_;
                 if (likely(current_state_.compare_exchange_strong(
                         prev_state, newstate)))
                 {
@@ -103,7 +104,7 @@ namespace hpx { namespace threads { namespace detail
         thread_state set_state(thread_state newstate, thread_state old_state)
         {
             using namespace boost::lockfree;
-            unsigned long old_state_long = old_state;
+            long old_state_long = old_state;
             if (likely(current_state_.compare_exchange_strong(
                     old_state_long, newstate)))
             {
@@ -132,7 +133,7 @@ namespace hpx { namespace threads { namespace detail
         {
             using namespace boost::lockfree;
             for (;;) {
-                unsigned long prev_state = current_state_ex_;
+                long prev_state = current_state_ex_;
                 if (likely(current_state_ex_.compare_exchange_strong(
                         prev_state, newstate_ex)))
                 {
