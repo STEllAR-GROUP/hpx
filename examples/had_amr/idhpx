@@ -1,11 +1,18 @@
 [had_amr]
-nx0         = 30
-nt0         = 80
+nx0         = 60
+nt0         = 200
 
-minx0       =  1.0;
+minx0       =  0.0;
 maxx0       =  10.0;
 
 lambda      = 0.15
+
+amp    = 0.01
+delta  = 1.0
+R0     = 8.0
+PP     = 7
+
+ethreshold  = 0.1
 
 allowedl     = 0
 stencilsize  = 3
