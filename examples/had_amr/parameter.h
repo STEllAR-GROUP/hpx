@@ -28,8 +28,11 @@ struct Par {
       had_double_type maxx0;
       had_double_type dx0;
       had_double_type dt0;
-      had_double_type energy;
       had_double_type ethreshold;
+      had_double_type R0;
+      had_double_type delta;
+      had_double_type amp;
+      int PP;
 };
 
 #if defined(__cplusplus)

@@ -29,6 +29,19 @@ void calcrhs(struct nodedata * rhs,
                 int flag, had_double_type dx, int size,
                 bool boundary,int *bbox,int compute_index, Par const& par);
 
+had_double_type initial_chi(had_double_type r,Par const& par) {
+  had_double_type chi = par.amp*exp( -(r-par.R0)*(r-par.R0)/(par.delta*par.delta) );   
+  return chi;
+}
+
+had_double_type initial_Phi(had_double_type r,Par const& par) {
+
+  // Phi is the r derivative of chi
+  had_double_type Phi = par.amp*exp( -(r-par.R0)*(r-par.R0)/(par.delta*par.delta) ) * ( -2.*(r-par.R0)/(par.delta*par.delta) );
+
+  return Phi;
+}
+
 ///////////////////////////////////////////////////////////////////////////
 int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     int level, had_double_type x, Par const& par)
@@ -61,9 +74,19 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
       }
     }
 
-    val->x_ = xcoord;
-    val->value_.phi[0][0] = par.energy*exp(-(xcoord-8.0)*(xcoord-8.0));   // u
-    val->value_.phi[0][1] = 0.0;                               // psi
+    had_double_type chi,Phi,Pi,Energy,r;
+
+    r = xcoord;
+    chi = initial_chi(r,par);
+    Phi = initial_Phi(r,par);
+    Pi  = 0.0;
+    Energy = 0.5*r*r*(Pi*Pi + Phi*Phi) - r*r*pow(chi,par.PP+1)/(par.PP+1);
+
+    val->x_ = r;
+    val->value_.phi[0][0] = chi;
+    val->value_.phi[0][1] = Phi;
+    val->value_.phi[0][2] = Pi;
+    val->value_.phi[0][3] = Energy;
 
     return 1;
 }
@@ -83,7 +106,6 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
   // allocate some temporary arrays for calculating the rhs
   nodedata rhs;
   int i;
-  had_double_type r1,r2,y1,y2,A,B,C;
 
   had_double_type dt = par.dt0/pow(2.0,(int) vecval[0]->level_);
   had_double_type dx = par.dx0/pow(2.0,(int) vecval[0]->level_);
@@ -95,33 +117,8 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
   }
 
   if ( par.integrator == 0 ) {  // Euler
-    calcrhs(&rhs,vecval,0,dx,size,boundary,bbox,compute_index,par);
-
-    // iter is kept to be zero for Euler
-    result->iter_ = 0;
-
-    for (i=0;i<num_eqns;i++) {
-      result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i] + rhs.phi[0][i]*dt;
-    }
-
-    // set left boundary by quadratic
-    if ( boundary && bbox[0] == 1 ) {
-      for (i=0;i<num_eqns;i++) {
-        y1 = vecval[compute_index+1]->value_.phi[0][i];
-        y2 = vecval[compute_index+2]->value_.phi[0][i];
-        r1 = vecval[compute_index+1]->x_;
-        r2 = vecval[compute_index+2]->x_;
-
-        // y = A*r^2 + B*r + C
-        B = 0; // functions are even; at r=0 dphi/dr = 0
-        A = (y2-y1)/(r2*r2 - r1*r1);
-        C = -A*r1*r1 + y1;
-        // at r=0
-        result->value_.phi[0][i] = C;
-      }
-    }
-
-    result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
+    printf(" PROBLEM : not implemented at present\n");
+    return 0;
   } else if ( par.integrator == 1 ) { // rk3
 
     if ( vecval[0]->iter_ == 0 ) {
@@ -130,29 +127,20 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
 
       calcrhs(&rhs,vecval,0,dx,size,boundary,bbox,compute_index,par);
 
-      // set left boundary by quadratic
-      if ( boundary && bbox[0] == 1 ) {
-        for (i=0;i<num_eqns;i++) {
-          y1 = vecval[compute_index+1]->value_.phi[0][i];
-          y2 = vecval[compute_index+2]->value_.phi[0][i];
-          r1 = vecval[compute_index+1]->x_;
-          r2 = vecval[compute_index+2]->x_;
-  
-          // y = A*r^2 + B*r + C
-          B = 0; // functions are even; at r=0 dphi/dr = 0
-          A = (y2-y1)/(r2*r2 - r1*r1);
-          C = -A*r1*r1 + y1;
-          // at r=0
-          result->value_.phi[1][i] = C;
+      for (i=0;i<num_eqns;i++) {
+        result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
+        result->value_.phi[1][i] = vecval[compute_index]->value_.phi[0][i] + rhs.phi[0][i]*dt;
+      }
 
-          // this is not used in evolution, but put it here anyways for clarity
-          result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
-        }
-      } else {
-        for (i=0;i<num_eqns;i++) {
-          result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
-          result->value_.phi[1][i] = vecval[compute_index]->value_.phi[0][i] + rhs.phi[0][i]*dt;
-        }
+      if ( boundary && bbox[0] == 1 ) {
+        // interpolate chi
+        result->value_.phi[1][0] = vecval[compute_index]->value_.phi[0][0]
+                             -4./3*vecval[compute_index+1]->value_.phi[0][0]
+                             +1./3*vecval[compute_index+2]->value_.phi[0][0];
+        // interpolate Pi
+        result->value_.phi[1][2] = vecval[compute_index]->value_.phi[0][2]
+                             -4./3*vecval[compute_index+1]->value_.phi[0][2]
+                             +1./3*vecval[compute_index+2]->value_.phi[0][2];
       }
 
       // no timestep update-- this is just a part of an rk subcycle
@@ -163,29 +151,21 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
 
       calcrhs(&rhs,vecval,1,dx,size,boundary,bbox,compute_index,par);
 
-      if ( boundary && bbox[0] == 1 ) {
-        for (i=0;i<num_eqns;i++) {
-          y1 = vecval[compute_index+1]->value_.phi[0][i];
-          y2 = vecval[compute_index+2]->value_.phi[0][i];
-          r1 = vecval[compute_index+1]->x_;
-          r2 = vecval[compute_index+2]->x_;
-  
-          // y = A*r^2 + B*r + C
-          B = 0; // functions are even; at r=0 dphi/dr = 0
-          A = (y2-y1)/(r2*r2 - r1*r1);
-          C = -A*r1*r1 + y1;
-          // at r=0
-          result->value_.phi[1][i] = C;
+      for (i=0;i<num_eqns;i++) {
+        result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
+        result->value_.phi[1][i] = 0.75*vecval[compute_index]->value_.phi[0][i]
+                                  +0.25*vecval[compute_index]->value_.phi[1][i] + 0.25*rhs.phi[0][i]*dt;
+      }
 
-          // this is not used in evolution, but put it here anyways for clarity
-          result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
-        }
-      } else {
-        for (i=0;i<num_eqns;i++) {
-          result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
-          result->value_.phi[1][i] = 0.75*vecval[compute_index]->value_.phi[0][i]
-                                    +0.25*vecval[compute_index]->value_.phi[1][i] + 0.25*rhs.phi[0][i]*dt;
-        }
+      if ( boundary && bbox[0] == 1 ) {
+        // interpolate chi
+        result->value_.phi[1][0] = vecval[compute_index]->value_.phi[0][0]
+                             -4./3*vecval[compute_index+1]->value_.phi[0][0]
+                             +1./3*vecval[compute_index+2]->value_.phi[0][0];
+        // interpolate Pi
+        result->value_.phi[1][2] = vecval[compute_index]->value_.phi[0][2]
+                             -4./3*vecval[compute_index+1]->value_.phi[0][2]
+                             +1./3*vecval[compute_index+2]->value_.phi[0][2];
       }
 
       // no timestep update-- this is just a part of an rk subcycle
@@ -196,26 +176,28 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
       // reset rk subcycle counter
       result->iter_ = 0;
 
-      if ( boundary && bbox[0] == 1 ) {
-        for (i=0;i<num_eqns;i++) {
-          y1 = vecval[compute_index+1]->value_.phi[0][i];
-          y2 = vecval[compute_index+2]->value_.phi[0][i];
-          r1 = vecval[compute_index+1]->x_;
-          r2 = vecval[compute_index+2]->x_;
-  
-          // y = A*r^2 + B*r + C
-          B = 0; // functions are even; at r=0 dphi/dr = 0
-          A = (y2-y1)/(r2*r2 - r1*r1);
-          C = -A*r1*r1 + y1;
-          // at r=0
-          result->value_.phi[0][i] = C;
-        }
-      } else {
-        for (i=0;i<num_eqns;i++) {
-          result->value_.phi[0][i] = 1./3*vecval[compute_index]->value_.phi[0][i]
-                                   +2./3*(vecval[compute_index]->value_.phi[1][i] + rhs.phi[0][i]*dt);
-        }
+      for (i=0;i<num_eqns;i++) {
+        result->value_.phi[0][i] = 1./3*vecval[compute_index]->value_.phi[0][i]
+                                 +2./3*(vecval[compute_index]->value_.phi[1][i] + rhs.phi[0][i]*dt);
       }
+
+      if ( boundary && bbox[0] == 1 ) {
+        // interpolate chi
+        result->value_.phi[0][0] = vecval[compute_index]->value_.phi[0][0]
+                             -4./3*vecval[compute_index+1]->value_.phi[0][0]
+                             +1./3*vecval[compute_index+2]->value_.phi[0][0];
+        // interpolate Pi
+        result->value_.phi[0][2] = vecval[compute_index]->value_.phi[0][2]
+                             -4./3*vecval[compute_index+1]->value_.phi[0][2]
+                             +1./3*vecval[compute_index+2]->value_.phi[0][2];
+      }
+
+      // Energy
+      had_double_type chi = result->value_.phi[0][0];
+      had_double_type Phi = result->value_.phi[0][1];
+      had_double_type Pi  = result->value_.phi[0][2];
+      had_double_type r   = result->x_;
+      result->value_.phi[0][3] = 0.5*r*r*(Pi*Pi + Phi*Phi) - r*r*pow(chi,par.PP+1.0)/(par.PP+1.0);
 
       // Now comes the timestep update
       result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
@@ -238,33 +220,59 @@ void calcrhs(struct nodedata * rhs,
                 bool boundary,int *bbox,int compute_index, Par const& par)
 {
 
-  // variable: 0  -- u
-  // variable: 1  -- psi
-
-  had_double_type x = vecval[compute_index]->x_;
+  had_double_type dr = dx;
+  had_double_type r = vecval[compute_index]->x_;
+  had_double_type chi = vecval[compute_index]->value_.phi[flag][0];
+  had_double_type Phi = vecval[compute_index]->value_.phi[flag][1];
+  had_double_type Pi =  vecval[compute_index]->value_.phi[flag][2];
 
   if ( !boundary ) {
     // the compute_index is not physical boundary; all points in stencilsize
     // are available for computing the rhs.
-    rhs->phi[0][0] = vecval[compute_index]->value_.phi[flag][1];
 
-    rhs->phi[0][1] = (      vecval[compute_index+1]->value_.phi[flag][0] 
-                       - 2.*vecval[compute_index]->value_.phi[flag][0] 
-                          + vecval[compute_index-1]->value_.phi[flag][0] )/(dx*dx)
-                 + 2./x * ( vecval[compute_index+1]->value_.phi[flag][0] - vecval[compute_index-1]->value_.phi[flag][0] )/dx
-                      + pow(vecval[compute_index]->value_.phi[flag][0],7.0);
+    rhs->phi[0][0] = Pi; // chi rhs
+
+    had_double_type Pi_np1 = vecval[compute_index+1]->value_.phi[flag][2];
+    had_double_type Pi_nm1 = vecval[compute_index-1]->value_.phi[flag][2];
+
+    rhs->phi[0][1] = (Pi_np1 - Pi_nm1)/(2.*dr); // Phi rhs
+
+    had_double_type Phi_np1 = vecval[compute_index+1]->value_.phi[flag][1];
+    had_double_type Phi_nm1 = vecval[compute_index-1]->value_.phi[flag][1];
+
+    had_double_type r2_Phi_np1 = (r+dr)*(r+dr)*Phi_np1;
+    had_double_type r2_Phi_nm1 = (r-dr)*(r-dr)*Phi_nm1;
+
+    rhs->phi[0][2] = 3.*( r2_Phi_np1 - r2_Phi_nm1 )/( pow(r+dr,3) - pow(r-dr,3) ) + pow(chi,par.PP); // Pi rhs
+
+    rhs->phi[0][3] = 0.; // Energy rhs
   } else {
     // boundary -- look at the bounding box (bbox) to decide which boundary it is
     if ( bbox[0] == 1 ) {
+      had_double_type Phi_nm1 = vecval[compute_index-1]->value_.phi[flag][1];
+      had_double_type Phi_nm2 = vecval[compute_index-2]->value_.phi[flag][1];
       // we are at the left boundary  -- values are determined by quadratic fit, not evolution
       if ( size != 4 ) fprintf(stderr,"Problem: not enough points for boundary condition\n");
-      rhs->phi[0][0] = 0.0;
-      rhs->phi[0][1] = 0.0;
+
+      rhs->phi[0][0] = 0.0; // chi rhs -- chi is set by quadratic fit
+      rhs->phi[0][1] = 0.0; // Phi rhs -- Phi-dot is always zero at r=0
+      rhs->phi[0][2] = 0.0; // Pi rhs -- chi is set by quadratic fit
+      rhs->phi[0][3] = 0.0; // Energy rhs -- analysis variable
 
     } else if (bbox[1] == 1) {
-      // we are at the right boundary -- outflow
-      rhs->phi[0][0] = -(vecval[compute_index]->value_.phi[flag][0] - vecval[compute_index-1]->value_.phi[flag][0])/dx;
-      rhs->phi[0][1] = -(vecval[compute_index]->value_.phi[flag][1] - vecval[compute_index-1]->value_.phi[flag][1])/dx;
+      if ( size != 4 ) fprintf(stderr,"Problem: not enough points for boundary condition\n");
+
+      had_double_type Phi_nm1 = vecval[compute_index-1]->value_.phi[flag][1];
+      had_double_type Phi_nm2 = vecval[compute_index-2]->value_.phi[flag][1];
+
+      had_double_type Pi_nm1 = vecval[compute_index-1]->value_.phi[flag][2];
+      had_double_type Pi_nm2 = vecval[compute_index-2]->value_.phi[flag][2];
+
+      // we are at the right boundary 
+      rhs->phi[0][0] = Pi;  // chi rhs
+      rhs->phi[0][1] = -(3.*Phi - 4.*Phi_nm1 + Phi_nm2)/(2.*dr) - Phi/r;    // Phi rhs
+      rhs->phi[0][2] = -Pi/r - (3.*Pi - 4.*Pi_nm1 + Pi_nm2)/(2.*dr);      // Pi rhs
+      rhs->phi[0][3] = 0.0; // Energy rhs -- analysis variable
     }
   }
 }

@@ -29,8 +29,20 @@ namespace hpx { namespace components { namespace amr { namespace server
         FILE *fdata;
         if ( logcode == 0 && val.iter_ == 0 ) {
           if (fmod(val.timestep_,par.output) < 1.e-6) {
-            fdata = fopen("output.dat","a");
+            fdata = fopen("chi.dat","a");
             fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_*par.dx0*par.lambda,val.x_,val.value_.phi[0][0]);
+            fclose(fdata);
+
+            fdata = fopen("Phi.dat","a");
+            fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_*par.dx0*par.lambda,val.x_,val.value_.phi[0][1]);
+            fclose(fdata);
+
+            fdata = fopen("Pi.dat","a");
+            fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_*par.dx0*par.lambda,val.x_,val.value_.phi[0][2]);
+            fclose(fdata);
+
+            fdata = fopen("energy.dat","a");
+            fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_*par.dx0*par.lambda,val.x_,val.value_.phi[0][3]);
             fclose(fdata);
           }
         }

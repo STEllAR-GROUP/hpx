@@ -424,12 +424,20 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         for (i=numvalues-5;i<numvalues;i++) {
           counter = 0;
+
           for (j=i-1;j<i+2;j++) {
             if ( j >=numvalues-4 && j < numvalues ) {
               vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
               counter++;
             }
           }
+
+          // extra points for left boundary
+          if (i==numvalues-3 || i == numvalues-4) {
+            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(numvalues-1);vport.push_back(counter);
+            counter++;
+          }
+
           for (j=i-4;j<i+5;j++) {
             if ( j >=4 && j < numvalues-4 ) {
               vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);

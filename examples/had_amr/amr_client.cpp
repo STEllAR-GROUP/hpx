@@ -249,8 +249,11 @@ int main(int argc, char* argv[])
         par.nt0         = numsteps;
         par.minx0       = -10.0;
         par.maxx0       =  10.0;
-        par.energy      =  1.0;
         par.ethreshold  =  0.1;
+        par.R0          =  8.0;
+        par.amp         =  0.1;
+        par.delta       =  1.0;
+        par.PP          =  7;
 
         par.linearbounds = 1;
         int scheduler = 0;  // default: global scheduler
@@ -320,13 +323,25 @@ int main(int argc, char* argv[])
                 std::string tmp = sec->get_entry("minx0");
                 par.minx0 = atof(tmp.c_str());
               }
-              if ( sec->has_entry("energy") ) {
-                std::string tmp = sec->get_entry("energy");
-                par.energy = atof(tmp.c_str());
-              }
               if ( sec->has_entry("ethreshold") ) {
                 std::string tmp = sec->get_entry("ethreshold");
                 par.ethreshold = atof(tmp.c_str());
+              }
+              if ( sec->has_entry("R0") ) {
+                std::string tmp = sec->get_entry("R0");
+                par.R0 = atof(tmp.c_str());
+              }
+              if ( sec->has_entry("delta") ) {
+                std::string tmp = sec->get_entry("delta");
+                par.delta = atof(tmp.c_str());
+              }
+              if ( sec->has_entry("amp") ) {
+                std::string tmp = sec->get_entry("amp");
+                par.amp = atof(tmp.c_str());
+              }
+              if ( sec->has_entry("PP") ) {
+                std::string tmp = sec->get_entry("PP");
+                par.PP = atoi(tmp.c_str());
               }
             }
         }
@@ -366,18 +381,29 @@ int main(int argc, char* argv[])
 
         // create output file to append to
         FILE *fdata;
-        fdata = fopen("output.dat","w");
+        fdata = fopen("chi.dat","w");
         fprintf(fdata,"\n");
         fclose(fdata);
+
+        fdata = fopen("Phi.dat","w");
+        fprintf(fdata,"\n");
+        fclose(fdata);
+
+        fdata = fopen("Pi.dat","w");
+        fprintf(fdata,"\n");
+        fclose(fdata);
+
+        fdata = fopen("energy.dat","w");
+        fprintf(fdata,"\n");
+        fclose(fdata);
+
         fdata = fopen("logcode1.dat","w");
         fprintf(fdata,"\n");
         fclose(fdata);
+
         fdata = fopen("logcode2.dat","w");
         fprintf(fdata,"\n");
         fclose(fdata);
-
-
-      //  initrand(42, pdist, mean, stddev, numsteps, numvals, num_threads);
 
         // initialize and start the HPX runtime
         if (scheduler == 0) {

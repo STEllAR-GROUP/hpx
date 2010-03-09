@@ -20,26 +20,29 @@ int main(int argc, char *argv[]) {
   int size;
   int shape[3];
   if ( argc < 2 ) {
-    printf(" Usage: hpx2sdf <data file>\n");
+    printf(" Usage: hpx2sdf <basename>\n");
     exit(0);
   }
   char basename[80];
+  char data_basename[80];
   char cnames[80];
   sprintf(cnames,"x");
   sprintf(basename,argv[1]);
+
+  sprintf(data_basename,"%s.dat",basename);
 
   FILE *fdata;
   char j1[64], j2[64], j3[64], j4[64];
 
   /* Ensure that the file exists */
-  fdata = fopen(basename,"r");
+  fdata = fopen(data_basename,"r");
   size = 0;
   if ( fdata ) {
     while(fscanf(fdata,"%s %s %s %s",&j1,&j2,&j3,&j4) > 0 ) {
       size++;
     }
   } else {
-    printf(" data file %s doesn't exist.  Try again\n",basename);
+    printf(" data file %s.dat doesn't exist.  Try again\n",basename);
     exit(0);
   }
 
@@ -51,7 +54,7 @@ int main(int argc, char *argv[]) {
   x = (double *) malloc(sizeof(double)*size);
   value = (double *) malloc(sizeof(double)*size);
 
-  fdata = fopen(basename,"r");
+  fdata = fopen(data_basename,"r");
   i = 0;
   int maxlevel = -1;
   if ( fdata ) {
@@ -216,7 +219,7 @@ int main(int argc, char *argv[]) {
       }
 
       shape[0] = tmp_size;
-      gft_out_full("output",num_timesteps[k],shape,cnames,1,x_nod,data_nod);
+      gft_out_full(basename,num_timesteps[k],shape,cnames,1,x_nod,data_nod);
 
     }
   }

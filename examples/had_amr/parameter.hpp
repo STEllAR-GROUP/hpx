@@ -52,8 +52,12 @@ namespace hpx { namespace components { namespace amr
             ar & maxx0;
             ar & dx0;
             ar & dt0;
-            ar & energy;
             ar & ethreshold;
+            ar & R0;
+            ar & delta;
+            ar & amp;
+            ar & PP;
+
         }
     };
 

@@ -7,6 +7,6 @@
 #define HPX_COMPONENTS_HAD_CONFIG_FEB_08_2010_0226PM
 
 typedef double had_double_type;
-const int num_eqns = 2;
+const int num_eqns = 4;
 
 #endif
