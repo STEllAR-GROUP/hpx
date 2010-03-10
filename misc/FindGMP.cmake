@@ -31,10 +31,12 @@ if(NOT GMP_ROOT)
     find_path(GMP_INCLUDE_DIR gmp.h)
 endif(NOT GMP_ROOT)
 
-get_filename_component(GMP_ROOT ${GMP_INCLUDE_DIR} PATH)
-set(GMP_ROOT ${GMP_ROOT} CACHE PATH "GMP root directory.")
-
-INCLUDE(FindPackageHandleStandardArgs)
+include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(GMP DEFAULT_MSG GMP_LIBRARY GMP_INCLUDE_DIR)
+
+if (GMP_FOUND)
+    get_filename_component(GMP_ROOT ${GMP_INCLUDE_DIR} PATH)
+    set(GMP_ROOT ${GMP_ROOT} CACHE PATH "GMP root directory.")
+endif(GMP_FOUND)
 
 mark_as_advanced(GMP_INCLUDE_DIR GMP_LIBRARY)
