@@ -53,7 +53,7 @@ class mutex_posix {
 public:
     typedef scoped_lock_posix scoped_lock;
 
-    mutex_posix() : m_mutex() {
+    mutex_posix() : m_mutex(), m_count(0) {
         pthread_mutexattr_t attr;
         int res = pthread_mutexattr_init(&attr);
         BOOST_ASSERT(res == 0);
