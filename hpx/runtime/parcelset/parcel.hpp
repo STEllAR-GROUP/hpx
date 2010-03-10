@@ -172,7 +172,7 @@ namespace hpx { namespace parcelset
 ///////////////////////////////////////////////////////////////////////////////
 // this is the current version of the parcel serialization format
 // this definition needs to be in the global namespace
-BOOST_CLASS_VERSION(hpx::parcelset::parcel, HPX_PARCEL_VERSION)
+//BOOST_CLASS_VERSION(hpx::parcelset::parcel, HPX_PARCEL_VERSION)
 BOOST_CLASS_TRACKING(hpx::parcelset::parcel, boost::serialization::track_never)
 
 #include <hpx/config/warnings_suffix.hpp>
