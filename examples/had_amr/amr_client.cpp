@@ -105,10 +105,6 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "the number of data points to use for the computation")
             ("dist,d", po::value<std::string>(), 
                 "random distribution type (uniform or normal)")
-            ("mean,M", po::value<double>(), 
-                "mean value of specified distribution")
-            ("stddev,S", po::value<double>(), 
-                "variance value of specified distribution")
             ("numsteps,s", po::value<std::size_t>(), 
                 "the number of time steps to use for the computation")
             ("parfile,p", po::value<std::string>(), 
@@ -210,18 +206,6 @@ int main(int argc, char* argv[])
 
         if (vm.count("worker"))
             mode = hpx::runtime::worker;
-
-        char pdist = 'u';
-        if (vm.count("dist"))
-            pdist = vm["dist"].as<std::string>()[0];
-
-        double mean = 1.0;
-        if (vm.count("mean"))
-            mean = vm["mean"].as<double>();
-
-        double stddev = 0.0;
-        if (vm.count("stddev"))
-            stddev = vm["stddev"].as<double>();
 
         if (vm.count("verbose"))
             do_logging = true;
