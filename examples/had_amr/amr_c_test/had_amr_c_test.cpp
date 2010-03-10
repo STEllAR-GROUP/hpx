@@ -249,8 +249,6 @@ void calcrhs(struct nodedata * rhs,
   } else {
     // boundary -- look at the bounding box (bbox) to decide which boundary it is
     if ( bbox[0] == 1 ) {
-      had_double_type Phi_nm1 = vecval[compute_index-1]->value_.phi[flag][1];
-      had_double_type Phi_nm2 = vecval[compute_index-2]->value_.phi[flag][1];
       // we are at the left boundary  -- values are determined by quadratic fit, not evolution
       if ( size != 4 ) fprintf(stderr,"Problem: not enough points for boundary condition\n");
 
