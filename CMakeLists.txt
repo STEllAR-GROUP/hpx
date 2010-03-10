@@ -227,6 +227,11 @@ install(
     FILES_MATCHING PATTERN "*.hpp"
     REGEX ".svn" EXCLUDE)
 install(
+    DIRECTORY external/atomic/boost
+    DESTINATION include
+    FILES_MATCHING PATTERN "*.hpp"
+    REGEX ".svn" EXCLUDE)
+install(
     DIRECTORY external/endian/boost
     DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
