@@ -6,7 +6,14 @@
 #if !defined(HPX_COMPONENTS_HAD_CONFIG_FEB_08_2010_0226PM)
 #define HPX_COMPONENTS_HAD_CONFIG_FEB_08_2010_0226PM
 
+#if defined(MPFR_FOUND)
+#include "mpreal.h"
+#include "serialize_mpreal.hpp"
+
+typedef mpfr::mpreal had_double_type;
+#else
 typedef double had_double_type;
+#endif
 const int num_eqns = 4;
 
 #endif

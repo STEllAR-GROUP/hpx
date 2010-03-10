@@ -9,6 +9,10 @@
 #  MPFR_ROOT         MPFR main path.
 
 # Check if MPFR_ROOT is defined and use that path first.
+if (NOT MPFR_ROOT AND NOT $ENV{MPFR_ROOT} STREQUAL "")
+  set(MPFR_ROOT $ENV{MPFR_ROOT})
+endif(NOT MPFR_ROOT AND NOT $ENV{MPFR_ROOT} STREQUAL "")
+
 if(MPFR_ROOT)
 	find_path(MPFR_INCLUDE_DIR mpfr.h PATHS ${MPFR_ROOT}/include NO_DEFAULT_PATH)
 	find_library(MPFR_LIBRARY mpfr PATHS ${MPFR_ROOT}/lib NO_DEFAULT_PATH)

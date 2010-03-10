@@ -29,24 +29,31 @@ namespace hpx { namespace components { namespace amr { namespace server
         FILE *fdata;
         if ( logcode == 0 && val.iter_ == 0 ) {
           if (fmod(val.timestep_,par.output) < 1.e-6) {
+            std::string x_str = boost::lexical_cast<std::string>(val.x_);
+            std::string chi_str = boost::lexical_cast<std::string>(val.value_.phi[0][0]);
+            std::string Phi_str = boost::lexical_cast<std::string>(val.value_.phi[0][1]);
+            std::string Pi_str = boost::lexical_cast<std::string>(val.value_.phi[0][2]);
+            std::string energy_str = boost::lexical_cast<std::string>(val.value_.phi[0][3]);
+            std::string time_str = boost::lexical_cast<std::string>(val.timestep_*par.dx0*par.lambda);
+
             fdata = fopen("chi.dat","a");
-            fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_*par.dx0*par.lambda,val.x_,val.value_.phi[0][0]);
+            fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),chi_str.c_str());
             fclose(fdata);
 
             fdata = fopen("Phi.dat","a");
-            fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_*par.dx0*par.lambda,val.x_,val.value_.phi[0][1]);
+            fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),Phi_str.c_str());
             fclose(fdata);
 
             fdata = fopen("Pi.dat","a");
-            fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_*par.dx0*par.lambda,val.x_,val.value_.phi[0][2]);
+            fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),Pi_str.c_str());
             fclose(fdata);
 
             fdata = fopen("energy.dat","a");
-            fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_*par.dx0*par.lambda,val.x_,val.value_.phi[0][3]);
+            fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),energy_str.c_str());
             fclose(fdata);
           }
         }
-
+#if 0
         // Debugging measures
         // output file to "logcode1.dat"
         if ( logcode == 1 ) {
@@ -61,6 +68,7 @@ namespace hpx { namespace components { namespace amr { namespace server
           fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_,val.x_,val.value_.phi[0][0]);
           fclose(fdata);
         }
+#endif
     }
 
 }}}}

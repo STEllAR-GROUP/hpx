@@ -11,6 +11,10 @@
 # GMP_ROOT          The GMP main path
 
 # Check if GMP_ROOT is defined and use that path first.
+if (NOT GMP_ROOT AND NOT $ENV{GMP_ROOT} STREQUAL "")
+  set(GMP_ROOT $ENV{GMP_ROOT})
+endif(NOT GMP_ROOT AND NOT $ENV{GMP_ROOT} STREQUAL "")
+
 if(GMP_ROOT)
     find_path(GMP_INCLUDE_DIR gmp.h PATHS ${GMP_ROOT}/include NO_DEFAULT_PATH)
     find_library(GMP_LIBRARY gmp PATHS ${GMP_ROOT}/lib NO_DEFAULT_PATH)

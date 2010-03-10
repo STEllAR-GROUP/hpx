@@ -181,6 +181,10 @@ typedef hpx::runtime_impl<hpx::threads::policies::local_queue_scheduler> local_r
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
+#if defined(MPFR_FOUND)
+    mpfr::mpreal::set_default_prec(128);
+#endif
+
     try {
         // analyze the command line
         po::variables_map vm;

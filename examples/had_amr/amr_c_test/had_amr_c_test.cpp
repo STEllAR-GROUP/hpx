@@ -112,7 +112,7 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
 
   // Sanity check
   if ( floatcmp(vecval[1]->x_ - vecval[0]->x_,dx) == 0 ) {
-    printf(" PROBLEM with dx: %g %g : x1 %g x2 %g\n",vecval[1]->x_ - vecval[0]->x_,dx,vecval[1]->x_,vecval[0]->x_);
+    std::cout <<" PROBLEM with dx: "<<  dx << std::endl;
     return 0;
   }
 

@@ -855,10 +855,10 @@ namespace hpx { namespace components { namespace amr
                             naming::id_type const& gid)
     {
        if ( floatcmp(val->x_,3.3333333333333333) == 1 ) {
-           printf(" TEST overwrite %d timestep: %g index %d id %d level %d x %g right_alloc %d left_alloc %d refine %d\n",
-               val->overwrite_alloc_,val->timestep_,
-               val->index_, gid.get_gid().get_lsb(),val->level_,
-               val->x_,val->right_alloc_,val->left_alloc_,val->refine_);
+          // printf(" TEST overwrite %d timestep: %g index %d id %d level %d x %g right_alloc %d left_alloc %d refine %d\n",
+          //     val->overwrite_alloc_,val->timestep_,
+          //     val->index_, gid.get_gid().get_lsb(),val->level_,
+          //     val->x_,val->right_alloc_,val->left_alloc_,val->refine_);
            //if ( gid.id_lsb_ == 549233 ) {
            //  return 1;
            //}
@@ -872,21 +872,21 @@ namespace hpx { namespace components { namespace amr
       int i;
       for (i=0;i<gids.size();i++) {
         access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(gids[i]);
-        printf(" gid: %d location: %g overwrite: %d\n", gids[i].get_gid().get_lsb(), amb->x_, amb->overwrite_alloc_);
+     //   printf(" gid: %d location: %g overwrite: %d\n", gids[i].get_gid().get_lsb(), amb->x_, amb->overwrite_alloc_);
         if ( amb->overwrite_alloc_ == 1 ) {
           access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb->overwrite_);
-          printf(" overwrite      location: %g overwrite: %d : %d %d : level %d\n",amb2->x_,amb2->overwrite_alloc_,amb2->left_alloc_,amb2->right_alloc_,amb2->level_);
+     //     printf(" overwrite      location: %g overwrite: %d : %d %d : level %d\n",amb2->x_,amb2->overwrite_alloc_,amb2->left_alloc_,amb2->right_alloc_,amb2->level_);
           if ( amb2->overwrite_alloc_ == 1 ) {
             access_memory_block<stencil_data> amb3 = hpx::components::stubs::memory_block::get(amb2->overwrite_);
-          printf("  overwrite overwrite    location: %g overwrite: %d : %d %d : level %d\n",amb3->x_,amb3->overwrite_alloc_,amb3->left_alloc_,amb3->right_alloc_,amb3->level_);
+     //     printf("  overwrite overwrite    location: %g overwrite: %d : %d %d : level %d\n",amb3->x_,amb3->overwrite_alloc_,amb3->left_alloc_,amb3->right_alloc_,amb3->level_);
           }
           if ( amb2->right_alloc_ == 1 ) {
             access_memory_block<stencil_data> amb3 = hpx::components::stubs::memory_block::get(amb2->right_);
-          printf(" overwrite right       location: %g overwrite: %d : %d %d : level %d\n",amb3->x_,amb3->overwrite_alloc_,amb3->left_alloc_,amb3->right_alloc_,amb3->level_);
+     //     printf(" overwrite right       location: %g overwrite: %d : %d %d : level %d\n",amb3->x_,amb3->overwrite_alloc_,amb3->left_alloc_,amb3->right_alloc_,amb3->level_);
           }
           if ( amb2->left_alloc_ == 1 ) {
             access_memory_block<stencil_data> amb3 = hpx::components::stubs::memory_block::get(amb2->left_);
-          printf(" overwrite left       location: %g overwrite: %d : %d %d : level %d\n",amb3->x_,amb3->overwrite_alloc_,amb3->left_alloc_,amb3->right_alloc_,amb3->level_);
+     //     printf(" overwrite left       location: %g overwrite: %d : %d %d : level %d\n",amb3->x_,amb3->overwrite_alloc_,amb3->left_alloc_,amb3->right_alloc_,amb3->level_);
           }
         }
       }
