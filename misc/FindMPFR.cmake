@@ -1,0 +1,31 @@
+# Copyright (c) 2007-2009 Hartmut Kaiser
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#  MPFR_FOUND        True if MPFR was found
+#  MPFR_INCLUDE_DIR  The path to the MPFR include directory
+#  MPFR_LIBRARY      The name(s) of the MPFR library 
+#  MPFR_ROOT         MPFR main path.
+
+# Check if MPFR_ROOT is defined and use that path first.
+if(MPFR_ROOT)
+	find_path(MPFR_INCLUDE_DIR mpfr.h PATHS ${MPFR_ROOT}/include NO_DEFAULT_PATH)
+	find_library(MPFR_LIBRARY mpfr PATHS ${MPFR_ROOT}/lib NO_DEFAULT_PATH)
+
+	if(NOT MPFR_LIBRARY)
+		message(STATUS "Warning: MPFR not found in the path specified in MPFR_ROOT")
+		unset(MPFR_ROOT)
+	endif(NOT MPFR_LIBRARY)
+endif(MPFR_ROOT)
+
+find_path(MPFR_INCLUDE_DIR mpfr.h)
+find_library(MPFR_LIBRARY NAMES mpfr)
+
+get_filename_component(MPFR_ROOT ${MPFR_INCLUDE_DIR} PATH)
+set(MPFR_ROOT ${MPFR_ROOT} CACHE PATH "MPFR root directory.")
+
+INCLUDE(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(MPFR DEFAULT_MSG MPFR_LIBRARY MPFR_INCLUDE_DIR)
+
+mark_as_advanced(MPFR_INCLUDE_DIR MPFR_LIBRARY)
