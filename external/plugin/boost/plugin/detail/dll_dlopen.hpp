@@ -28,7 +28,11 @@
 #error "This file shouldn't be included directly, use the file boost/plugin/dll.hpp only."
 #endif
 
+#if !defined(_WIN32)
 typedef void* HMODULE;
+#else
+typedef struct HINSTANCE__* HMODULE;
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(RTLD_LOCAL)
@@ -40,7 +44,7 @@ typedef void* HMODULE;
 
 ///////////////////////////////////////////////////////////////////////////////
 #define MyFreeLibrary(x)      dlclose (x)
-#define MyLoadLibrary(x)      dlopen  (x, RTLD_GLOBAL | RTLD_LAZY)
+#define MyLoadLibrary(x)      (HMODULE)(dlopen(x, RTLD_GLOBAL | RTLD_LAZY))
 #define MyGetProcAddress(x,y) dlsym   (x, y)
 
 ///////////////////////////////////////////////////////////////////////////////

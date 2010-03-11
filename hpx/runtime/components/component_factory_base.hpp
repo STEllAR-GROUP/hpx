@@ -14,18 +14,8 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-
-///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_COMPONENT_NAME)
-# define HPX_COMPONENT_NAME hpx
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_COMPONENT_LIB_NAME)
-#define HPX_COMPONENT_LIB_NAME                                                \
-        HPX_MANGLE_COMPONENT_NAME(HPX_COMPONENT_NAME)                         \
-    /**/
-#endif
+#include <hpx/runtime/components/constructor_argument.hpp>
+#include <hpx/runtime/components/component_registry_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -79,6 +69,19 @@ namespace hpx { namespace components
         ///         created (\a count > 1) the GID's of all new instances are
         ///         sequential in a row.
         virtual naming::gid_type create (std::size_t) = 0;
+
+        /// \brief Create one new component instance using the given constructor 
+        ///        argument.
+        ///
+        /// \param Arg0  [in] The type specific constructor argument
+        ///
+        /// \return Returns the GID of the first newly created component 
+        ///         instance. If more than one component instance has been 
+        ///         created (\a count > 1) the GID's of all new instances are
+        ///         sequential in a row.
+        virtual naming::gid_type create_one (
+            components::constructor_argument const&) 
+        { return naming::invalid_gid; }
 
         /// \brief Destroy one or more component instances
         ///
@@ -142,6 +145,7 @@ namespace boost { namespace plugin
 #define HPX_REGISTER_COMPONENT_MODULE()                                       \
         BOOST_PLUGIN_EXPORT_LIST(HPX_COMPONENT_LIB_NAME,                      \
             HPX_MANGLE_COMPONENT_NAME(factory));                              \
+        HPX_REGISTER_REGISTRY_MODULE()                                        \
     /**/
 
 #endif

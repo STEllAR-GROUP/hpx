@@ -45,7 +45,24 @@ namespace hpx { namespace components
             return static_cast<Derived&>(*this);
         }
 
-        void free(component_type type)
+        template <typename Arg0>
+        Derived& create_one(naming::id_type const& targetgid, component_type type,
+            Arg0 const& arg0)
+        {
+            free();
+            gid_ = stub_type::create_one(targetgid, type, arg0);
+            return static_cast<Derived&>(*this);
+        }
+
+        template <typename Arg0>
+        Derived& create_one(naming::id_type const& targetgid, Arg0 const& arg0)
+        {
+            free();
+            gid_ = stub_type::create_one(targetgid, arg0);
+            return static_cast<Derived&>(*this);
+        }
+
+        void free(component_type)
         {
             gid_ = naming::invalid_id;
         }

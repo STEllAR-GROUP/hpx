@@ -13,7 +13,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/mutex.hpp>
 
-#include <boost/lockfree/primitives.hpp>
+#include <boost/atomic.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/thread/locks.hpp>
 
@@ -24,7 +24,7 @@ namespace hpx { namespace lcos { namespace detail
     struct recursive_mutex_impl
     {
         long recursion_count;
-        threads::thread_id_type locking_thread_id;
+        boost::atomic<threads::thread_id_type> locking_thread_id;
         UnderlyingMutex mutex;
 
         recursive_mutex_impl(char const * const p)
@@ -48,8 +48,7 @@ namespace hpx { namespace lcos { namespace detail
             if (!try_recursive_lock(current_thread_id))
             {
                 mutex.lock();
-                boost::lockfree::interlocked_exchange(&locking_thread_id, 
-                    current_thread_id);
+                locking_thread_id.exchange(current_thread_id);
                 recursion_count = 1;
             }
         }
@@ -71,8 +70,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             if (!--recursion_count)
             {
-                boost::lockfree::interlocked_exchange(&locking_thread_id, 
-                    (threads::thread_id_type)0);
+                locking_thread_id.exchange((threads::thread_id_type)0);
                 mutex.unlock();
             }
         }
@@ -80,7 +78,7 @@ namespace hpx { namespace lcos { namespace detail
     private:
         bool try_recursive_lock(threads::thread_id_type current_thread_id)
         {
-            if(boost::lockfree::interlocked_read_acquire(&locking_thread_id) ==
+            if(locking_thread_id.load(boost::memory_order_acquire) == 
                 current_thread_id)
             {
                 ++recursion_count;
@@ -93,8 +91,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             if (mutex.try_lock())
             {
-                boost::lockfree::interlocked_exchange(&locking_thread_id,
-                    current_thread_id);
+                locking_thread_id.exchange(current_thread_id);
                 recursion_count = 1;
                 return true;
             }
@@ -106,8 +103,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             if (mutex.timed_lock(target))
             {
-                boost::lockfree::interlocked_exchange(&locking_thread_id,
-                    current_thread_id);
+                locking_thread_id.exchange(current_thread_id);
                 recursion_count = 1;
                 return true;
             }

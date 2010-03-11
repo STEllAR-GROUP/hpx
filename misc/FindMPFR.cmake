@@ -10,7 +10,7 @@
 
 # Check if MPFR_ROOT is defined and use that path first.
 if (NOT MPFR_ROOT AND NOT $ENV{MPFR_ROOT} STREQUAL "")
-  set(MPFR_ROOT $ENV{MPFR_ROOT})
+    set(MPFR_ROOT $ENV{MPFR_ROOT})
 endif(NOT MPFR_ROOT AND NOT $ENV{MPFR_ROOT} STREQUAL "")
 
 if(MPFR_ROOT)

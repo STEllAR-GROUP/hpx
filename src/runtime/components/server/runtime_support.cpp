@@ -131,6 +131,35 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // create a new instance of a component
+    naming::gid_type runtime_support::create_one_component(
+        components::component_type type, constructor_argument const& arg0)
+    {
+    // locate the factory for the requested component type
+        component_map_type::const_iterator it = components_.find(type);
+        if (it == components_.end() || !(*it).second.first) {
+            // we don't know anything about this component
+            HPX_OSSTREAM strm;
+            strm << "attempt to create component instance of invalid/unknown type: "
+                 << components::get_component_type_name(type);
+            HPX_THROW_EXCEPTION(hpx::bad_component_type, 
+                "runtime_support::create_component",
+                HPX_OSSTREAM_GETSTRING(strm));
+            return naming::invalid_gid;
+        }
+
+    // create new component instance
+        naming::gid_type id = (*it).second.first->create_one(arg0);
+
+    // set result if requested
+        LRT_(info) << "successfully created component " << id 
+                   << " of type: " 
+                   << components::get_component_type_name(type);
+
+        return id;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // create a new instance of a memory block
     naming::gid_type runtime_support::create_memory_block(
         std::size_t count, hpx::actions::manage_object_action_base const& act)

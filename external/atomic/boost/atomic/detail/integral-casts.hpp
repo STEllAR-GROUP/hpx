@@ -8,14 +8,15 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <string.h>
+#include <boost/cstdint.hpp>
 
 namespace boost { namespace detail { namespace atomic {
 
 template<typename T>
-class platform_atomic<T, 1> : private platform_atomic_integral<uint8_t> {
+class platform_atomic<T, 1> : private platform_atomic_integral<boost::uint8_t> {
 public:
-	typedef platform_atomic_integral<uint8_t> super;
-// 	typedef union { T e; uint8_t i;} conv;
+	typedef platform_atomic_integral<boost::uint8_t> super;
+// 	typedef union { T e; boost::uint8_t i;} conv;
 	
 	platform_atomic() {}
 	explicit platform_atomic(T t) : super(to_integral(t))
@@ -36,7 +37,7 @@ public:
 		memory_order success_order,
 		memory_order failure_order) volatile
 	{
-		uint8_t _expected, _desired;
+		boost::uint8_t _expected, _desired;
 		_expected=to_integral(expected);
 		_desired=to_integral(desired);
 		bool success=super::compare_exchange_strong(_expected, _desired, success_order, failure_order);
@@ -49,7 +50,7 @@ public:
 		memory_order success_order,
 		memory_order failure_order) volatile
 	{
-		uint8_t _expected, _desired;
+		boost::uint8_t _expected, _desired;
 		_expected=to_integral(expected);
 		_desired=to_integral(desired);
 		bool success=super::compare_exchange_weak(_expected, _desired, success_order, failure_order);
@@ -67,13 +68,13 @@ public:
 	
 	using super::is_lock_free;
 protected:
-	static inline uint8_t to_integral(T &t)
+	static inline boost::uint8_t to_integral(T &t)
 	{
-		uint8_t tmp;
+		boost::uint8_t tmp;
 		memcpy(&tmp, &t, sizeof(t));
 		return tmp;
 	}
-	static inline T from_integral(uint8_t t)
+	static inline T from_integral(boost::uint8_t t)
 	{
 		T tmp;
 		memcpy(&tmp, &t, sizeof(t));
@@ -82,10 +83,10 @@ protected:
 };
 
 template<typename T>
-class platform_atomic<T, 2> : private platform_atomic_integral<uint16_t> {
+class platform_atomic<T, 2> : private platform_atomic_integral<boost::uint16_t> {
 public:
-	typedef platform_atomic_integral<uint16_t> super;
-// 	typedef union { T e; uint16_t i;} conv;
+	typedef platform_atomic_integral<boost::uint16_t> super;
+// 	typedef union { T e; boost::uint16_t i;} conv;
 	
 	platform_atomic() {}
 	explicit platform_atomic(T t) : super(to_integral(t))
@@ -106,7 +107,7 @@ public:
 		memory_order success_order,
 		memory_order failure_order) volatile
 	{
-		uint16_t _expected, _desired;
+		boost::uint16_t _expected, _desired;
 		_expected=to_integral(expected);
 		_desired=to_integral(desired);
 		bool success=super::compare_exchange_strong(_expected, _desired, success_order, failure_order);
@@ -119,7 +120,7 @@ public:
 		memory_order success_order,
 		memory_order failure_order) volatile
 	{
-		uint16_t _expected, _desired;
+		boost::uint16_t _expected, _desired;
 		_expected=to_integral(expected);
 		_desired=to_integral(desired);
 		bool success=super::compare_exchange_weak(_expected, _desired, success_order, failure_order);
@@ -137,13 +138,13 @@ public:
 	
 	using super::is_lock_free;
 protected:
-	static inline uint16_t to_integral(T &t)
+	static inline boost::uint16_t to_integral(T &t)
 	{
-		uint16_t tmp;
+		boost::uint16_t tmp;
 		memcpy(&tmp, &t, sizeof(t));
 		return tmp;
 	}
-	static inline T from_integral(uint16_t t)
+	static inline T from_integral(boost::uint16_t t)
 	{
 		T tmp;
 		memcpy(&tmp, &t, sizeof(t));
@@ -152,10 +153,10 @@ protected:
 };
 
 template<typename T>
-class platform_atomic<T, 4> : private platform_atomic_integral<uint32_t> {
+class platform_atomic<T, 4> : private platform_atomic_integral<boost::uint32_t> {
 public:
-	typedef platform_atomic_integral<uint32_t> super;
-// 	typedef union { T e; uint32_t i;} conv;
+	typedef platform_atomic_integral<boost::uint32_t> super;
+// 	typedef union { T e; boost::uint32_t i;} conv;
 	
 	platform_atomic() {}
 	explicit platform_atomic(T t) : super(to_integral(t))
@@ -176,7 +177,7 @@ public:
 		memory_order success_order,
 		memory_order failure_order) volatile
 	{
-		uint32_t _expected, _desired;
+		boost::uint32_t _expected, _desired;
 		_expected=to_integral(expected);
 		_desired=to_integral(desired);
 		bool success=super::compare_exchange_strong(_expected, _desired, success_order, failure_order);
@@ -189,7 +190,7 @@ public:
 		memory_order success_order,
 		memory_order failure_order) volatile
 	{
-		uint32_t _expected, _desired;
+		boost::uint32_t _expected, _desired;
 		_expected=to_integral(expected);
 		_desired=to_integral(desired);
 		bool success=super::compare_exchange_weak(_expected, _desired, success_order, failure_order);
@@ -207,13 +208,13 @@ public:
 	
 	using super::is_lock_free;
 protected:
-	static inline uint32_t to_integral(T &t)
+	static inline boost::uint32_t to_integral(T &t)
 	{
-		uint32_t tmp;
+		boost::uint32_t tmp;
 		memcpy(&tmp, &t, sizeof(t));
 		return tmp;
 	}
-	static inline T from_integral(uint32_t t)
+	static inline T from_integral(boost::uint32_t t)
 	{
 		T tmp;
 		memcpy(&tmp, &t, sizeof(t));
@@ -222,10 +223,10 @@ protected:
 };
 
 template<typename T>
-class platform_atomic<T, 8> : private platform_atomic_integral<uint64_t> {
+class platform_atomic<T, 8> : private platform_atomic_integral<boost::uint64_t> {
 public:
-	typedef platform_atomic_integral<uint64_t> super;
-// 	typedef union { T e; uint64_t i;} conv;
+	typedef platform_atomic_integral<boost::uint64_t> super;
+// 	typedef union { T e; boost::uint64_t i;} conv;
 	
 	platform_atomic() {}
 	explicit platform_atomic(T t) : super(to_integral(t))
@@ -246,7 +247,7 @@ public:
 		memory_order success_order,
 		memory_order failure_order) volatile
 	{
-		uint64_t _expected, _desired;
+		boost::uint64_t _expected, _desired;
 		_expected=to_integral(expected);
 		_desired=to_integral(desired);
 		bool success=super::compare_exchange_strong(_expected, _desired, success_order, failure_order);
@@ -259,7 +260,7 @@ public:
 		memory_order success_order,
 		memory_order failure_order) volatile
 	{
-		uint64_t _expected, _desired;
+		boost::uint64_t _expected, _desired;
 		_expected=to_integral(expected);
 		_desired=to_integral(desired);
 		bool success=super::compare_exchange_weak(_expected, _desired, success_order, failure_order);
@@ -277,13 +278,13 @@ public:
 	
 	using super::is_lock_free;
 protected:
-	static inline uint64_t to_integral(T &t)
+	static inline boost::uint64_t to_integral(T &t)
 	{
-		uint64_t tmp;
+		boost::uint64_t tmp;
 		memcpy(&tmp, &t, sizeof(t));
 		return tmp;
 	}
-	static inline T from_integral(uint64_t t)
+	static inline T from_integral(boost::uint64_t t)
 	{
 		T tmp;
 		memcpy(&tmp, &t, sizeof(t));

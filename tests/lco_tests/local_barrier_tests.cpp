@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
-#include <hpx/lcos/barrier.hpp>
+#include <hpx/lcos/local_barrier.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/detail/lightweight_test.hpp>
@@ -15,25 +15,25 @@ using namespace hpx;
 namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
-void barrier_test(naming::id_type const& id, boost::detail::atomic_count& c, std::size_t count)
+void barrier_test(lcos::local_barrier& b, boost::detail::atomic_count& c, std::size_t count)
 {
     ++c;
-    lcos::stubs::barrier::wait(id);     // wait for all threads to enter the barrier
+    b.wait();
 
     // all of the 'count' threads need to have incremented the counter
     BOOST_TEST(count == c);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(naming::id_type const& id, boost::detail::atomic_count& c, std::size_t count)
+int hpx_main(lcos::local_barrier& b, boost::detail::atomic_count& c, std::size_t count)
 {
     // create the 4 threads which will have to wait on the barrier
     for (std::size_t i = 0; i < count; ++i) {
         applier::register_work(
-            boost::bind(&barrier_test, id, boost::ref(c), count));
+            boost::bind(&barrier_test, boost::ref(b), boost::ref(c), count));
     }
 
-    lcos::stubs::barrier::wait(id);     // wait for all threads to enter the barrier
+    b.wait();     // wait for all threads to enter the barrier
 
     // all of the 'count' threads need to have incremented the counter
     BOOST_TEST(count == c);
@@ -172,16 +172,13 @@ int main(int argc, char* argv[])
         if (0 == num_threads) {
             int num_of_cores = boost::thread::hardware_concurrency();
             runtime_type rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
-            naming::id_type prefix = rt.get_applier().get_runtime_support_gid();
-
             for (int t = 0; t < num_tests; ++t) {
                 for (int i = 1; i <= 2*num_of_cores; ++i) { 
                     std::size_t count = 2 * i;
-                    lcos::barrier b;
-                    b.create_one (prefix, count+1);       // create a barrier waiting on 'count' threads
+                    lcos::local_barrier b(count+1);       // create a barrier waiting on 'count' threads
                     boost::detail::atomic_count c(0);
 
-                    rt.run(boost::bind(hpx_main, b.get_gid(), boost::ref(c), count), i);
+                    rt.run(boost::bind(hpx_main, boost::ref(b), boost::ref(c), count), i);
                     std::cerr << ".";
                 }
             }
@@ -189,15 +186,12 @@ int main(int argc, char* argv[])
         }
         else {
             runtime_type rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
-            naming::id_type prefix = rt.get_applier().get_runtime_support_gid();
-
             for (int t = 0; t < num_tests; ++t) {
                 std::size_t count = 2 * num_threads;
-                lcos::barrier b;
-                b.create_one (prefix, count+1);       // create a barrier waiting on 'count' threads
+                lcos::local_barrier b(count + 1);       // create a barrier waiting on 'count' threads
                 boost::detail::atomic_count c(0);
 
-                rt.run(boost::bind(hpx_main, b.get_gid(), boost::ref(c), count), num_threads);
+                rt.run(boost::bind(hpx_main, boost::ref(b), boost::ref(c), count), num_threads);
                 std::cerr << ".";
             }
             std::cerr << "\n";

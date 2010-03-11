@@ -8,6 +8,7 @@
 
 #include <exception>
 #include <string>
+#include <iosfwd>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>

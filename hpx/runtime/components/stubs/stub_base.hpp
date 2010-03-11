@@ -17,7 +17,7 @@ namespace hpx { namespace components { namespace stubs
     struct stub_base 
     {
         ///////////////////////////////////////////////////////////////////////
-        /// Asynchronously create a new instance of a distributing_factory
+        /// Asynchronously create a new instance of a component
         static lcos::future_value<naming::id_type, naming::gid_type>
         create_async(naming::id_type const& gid, 
             component_type type, std::size_t count = 1)
@@ -45,32 +45,61 @@ namespace hpx { namespace components { namespace stubs
             return create(gid, get_component_type<ServerComponent>(), count);
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        /// Asynchronously create a new instance of a component while passing 
+        /// one argument to it's constructor
+        template <typename Arg0>
+        static lcos::future_value<naming::id_type, naming::gid_type>
+        create_one_async(naming::id_type const& gid, component_type type, 
+            Arg0 const& arg0)
+        {
+            return stubs::runtime_support::create_one_component_async(gid, type, arg0);
+        }
+
+        template <typename Arg0>
+        static lcos::future_value<naming::id_type, naming::gid_type>
+        create_one_async(naming::id_type const& gid, Arg0 const& arg0)
+        {
+            return create_one_async(gid, get_component_type<ServerComponent>(), arg0);
+        }
+
+        /// Create a new instance of an simple_accumulator
+        template <typename Arg0>
+        static naming::id_type
+        create_one(naming::id_type const& gid, component_type type, Arg0 const& arg0)
+        {
+            return stubs::runtime_support::create_one_component(gid, type, arg0);
+        }
+
+        template <typename Arg0>
+        static naming::id_type
+        create_one(naming::id_type const& gid, Arg0 const& arg0)
+        {
+            return create_one(gid, get_component_type<ServerComponent>(), arg0);
+        }
+
         /// Delete an existing component
         static void
         free(component_type type, naming::id_type& gid)
         {
-//             stubs::runtime_support::free_component(type, gid.get_gid());
             gid = naming::invalid_id;
         }
 
         static void
         free(naming::id_type& gid)
         {
-//             free(get_component_type<ServerComponent>(), gid);
             gid = naming::invalid_id;
         }
 
         static void
         free_sync(component_type type, naming::id_type& gid)
         {
-//             stubs::runtime_support::free_component_sync(type, gid.get_gid());
             gid = naming::invalid_id;
         }
 
         static void
         free_sync(naming::id_type& gid)
         {
-//             free_sync(get_component_type<ServerComponent>(), gid);
             gid = naming::invalid_id;
         }
     };

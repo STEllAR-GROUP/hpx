@@ -27,13 +27,12 @@ namespace hpx { namespace components
 
     public:
         vertex()
-          : base_type(naming::invalid_id, true)
         {}
 
         /// Create a client side representation for the existing
         /// \a server#vertex instance with the given global id \a gid.
-        vertex(naming::id_type gid, bool freeonexit = true)
-          : base_type(gid, freeonexit)
+        vertex(naming::id_type gid)
+          : base_type(gid)
         {}
 
         ///////////////////////////////////////////////////////////////////////

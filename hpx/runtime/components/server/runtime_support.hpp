@@ -17,6 +17,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
+#include <hpx/runtime/components/constructor_argument.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
 
@@ -45,12 +46,13 @@ namespace hpx { namespace components { namespace server
                                                     ///< one instance of a component 
                                                     ///< can be created at once
             runtime_support_create_component = 1,   ///< create new components
-            runtime_support_free_component = 2,     ///< delete existing components
-            runtime_support_shutdown = 3,           ///< shut down this runtime instance
-            runtime_support_shutdown_all = 4,       ///< shut down the runtime instances of all localities
+            runtime_support_create_one_component = 2,   ///< create new component with one constructor argument
+            runtime_support_free_component = 3,     ///< delete existing components
+            runtime_support_shutdown = 4,           ///< shut down this runtime instance
+            runtime_support_shutdown_all = 5,       ///< shut down the runtime instances of all localities
 
-            runtime_support_get_config = 5,         ///< get configuration information 
-            runtime_support_create_memory_block = 6,   ///< create new memory block
+            runtime_support_get_config = 6,         ///< get configuration information 
+            runtime_support_create_memory_block = 7,   ///< create new memory block
         };
 
         // This is the component id. Every component needs to have an embedded
@@ -94,6 +96,11 @@ namespace hpx { namespace components { namespace server
         naming::gid_type create_component(components::component_type type, 
             std::size_t count); 
 
+        /// \brief Action to create new component while passing one constructor 
+        ///        parameter
+        naming::gid_type create_one_component(components::component_type type, 
+            constructor_argument const& arg0); 
+
         /// \brief Action to create new memory block
         naming::gid_type create_memory_block(std::size_t count, 
             hpx::actions::manage_object_action_base const& act); 
@@ -126,6 +133,13 @@ namespace hpx { namespace components { namespace server
             components::component_type, std::size_t, 
             &runtime_support::create_component
         > create_component_action;
+
+        typedef hpx::actions::result_action2<
+            runtime_support, naming::gid_type, 
+            runtime_support_create_one_component, 
+            components::component_type, constructor_argument const&, 
+            &runtime_support::create_one_component
+        > create_one_component_action;
 
         typedef hpx::actions::result_action2<
             runtime_support, naming::gid_type, runtime_support_create_memory_block, 

@@ -158,6 +158,7 @@
     <ClCompile Include="..\..\..\src\runtime\naming\detail\resolver_do_undo.cpp" />
     <ClCompile Include="..\..\..\src\util\asio_util.cpp" />
     <ClCompile Include="..\..\..\src\util\ini.cpp" />
+    <ClCompile Include="..\..\..\src\util\init_ini_data.cpp" />
     <ClCompile Include="..\..\..\src\util\io_service_pool.cpp" />
     <ClCompile Include="..\..\..\src\util\logging.cpp" />
     <ClCompile Include="..\..\..\src\util\performance_counters.cpp" />
@@ -204,9 +205,16 @@
     <ClInclude Include="..\..\..\hpx\exception_list.hpp" />
     <ClInclude Include="..\..\..\hpx\hpx.hpp" />
     <ClInclude Include="..\..\..\hpx\hpx_fwd.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\local_barrier.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\server\barrier.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\stubs\barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\actions\action_registry.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\actions\manage_object_action.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\component_factory_one.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\component_registry.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\component_registry_base.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\constructor_argument.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\naming\bulk_resolver_client.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\naming\detail\resolver_do_undo.hpp" />
     <ClInclude Include="..\..\..\hpx\version.hpp" />
@@ -343,6 +351,8 @@
     <None Include="..\..\..\CMakeLists.txt" />
     <None Include="..\..\..\misc\FindBoost.cmake" />
     <None Include="..\..\..\docs\hpx.doxy" />
+    <None Include="..\..\..\misc\FindGMP.cmake" />
+    <None Include="..\..\..\misc\FindMPFR.cmake" />
     <None Include="..\..\..\misc\HpxUtils.cmake" />
     <None Include="..\..\..\src\CMakeLists.txt" />
   </ItemGroup>

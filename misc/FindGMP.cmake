@@ -12,7 +12,7 @@
 
 # Check if GMP_ROOT is defined and use that path first.
 if (NOT GMP_ROOT AND NOT $ENV{GMP_ROOT} STREQUAL "")
-  set(GMP_ROOT $ENV{GMP_ROOT})
+    set(GMP_ROOT $ENV{GMP_ROOT})
 endif(NOT GMP_ROOT AND NOT $ENV{GMP_ROOT} STREQUAL "")
 
 if(GMP_ROOT)

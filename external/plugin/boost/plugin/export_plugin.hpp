@@ -18,25 +18,35 @@
 #include <boost/plugin/concrete_factory.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-#define BOOST_PLUGIN_NAME(name, base)                                         \
-    BOOST_PP_CAT(name, BOOST_PP_CAT(_, base))                                 \
+#define BOOST_PLUGIN_NAME_2(name1, name2)                                     \
+    BOOST_PP_CAT(name1, BOOST_PP_CAT(_, name2))                               \
     /**/
 
+#define BOOST_PLUGIN_NAME_3(name, base, cname)                                \
+    BOOST_PP_CAT(cname, BOOST_PP_CAT(_,                                       \
+        BOOST_PP_CAT(name, BOOST_PP_CAT(_, base))))                           \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
 #define BOOST_PLUGIN_LIST_NAME(name, base)                                    \
-    BOOST_PP_CAT(boost_exported_plugins_list_, BOOST_PLUGIN_NAME(name, base)) \
+    BOOST_PP_CAT(boost_exported_plugins_list_,                                \
+        BOOST_PLUGIN_NAME_2(name, base))                                      \
     /**/
 
-#define BOOST_PLUGIN_EXPORTER_NAME(name, base)                                \
-    BOOST_PP_CAT(boost_plugin_exporter_, BOOST_PLUGIN_NAME(name, base))       \
+#define BOOST_PLUGIN_EXPORTER_NAME(name, base, cname)                         \
+    BOOST_PP_CAT(boost_plugin_exporter_,                                      \
+        BOOST_PLUGIN_NAME_3(name, base, cname))                               \
     /**/
 
-#define BOOST_PLUGIN_EXPORTER_INSTANCE_NAME(name, base)                       \
-    BOOST_PP_CAT(boost_plugin_exporter_instance_, BOOST_PLUGIN_NAME(name, base)) \
+#define BOOST_PLUGIN_EXPORTER_INSTANCE_NAME(name, base, cname)                \
+    BOOST_PP_CAT(boost_plugin_exporter_instance_,                             \
+        BOOST_PLUGIN_NAME_3(name, base, cname))                               \
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
 #define BOOST_PLUGIN_FORCE_LOAD_NAME(name, base)                              \
-    BOOST_PP_CAT(boost_exported_plugins_force_load_, BOOST_PLUGIN_NAME(name, base)) \
+    BOOST_PP_CAT(boost_exported_plugins_force_load_,                          \
+        BOOST_PLUGIN_NAME_2(name, base))                                      \
     /**/
     
 ///////////////////////////////////////////////////////////////////////////////
@@ -45,8 +55,8 @@
                BOOST_PLUGIN_API BOOST_PLUGIN_LIST_NAME(name, classname)();    \
                                                                               \
     namespace {                                                               \
-        struct BOOST_PLUGIN_EXPORTER_NAME(name, actualname) {                 \
-            BOOST_PLUGIN_EXPORTER_NAME(name, actualname)()                    \
+        struct BOOST_PLUGIN_EXPORTER_NAME(name, actualname, classname) {      \
+            BOOST_PLUGIN_EXPORTER_NAME(name, actualname, classname)()         \
             {                                                                 \
                 static boost::plugin::concrete_factory<BaseType, ActualType> cf; \
                 boost::plugin::abstract_factory<BaseType>* w = &cf;           \
@@ -55,7 +65,7 @@
                 BOOST_PLUGIN_LIST_NAME(name, classname)().insert(             \
                     std::make_pair(actname, w));                              \
             }                                                                 \
-        } BOOST_PLUGIN_EXPORTER_INSTANCE_NAME(name, actualname);              \
+        } BOOST_PLUGIN_EXPORTER_INSTANCE_NAME(name, actualname, classname);   \
     }                                                                         \
     /**/
 

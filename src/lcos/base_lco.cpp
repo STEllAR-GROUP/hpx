@@ -5,8 +5,10 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/components/component_factory_one.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/lcos/base_lco.hpp>
+#include <hpx/lcos/server/barrier.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/serialize_exception.hpp>
 
@@ -19,7 +21,7 @@
 #include <boost/serialization/export.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Serialization support for the future actions
+// Serialization support for the base LCO actions
 HPX_REGISTER_ACTION_EX(hpx::lcos::base_lco::set_event_action, base_set_event_action);
 HPX_REGISTER_ACTION_EX(hpx::lcos::base_lco::set_error_action, base_set_error_action);
 
@@ -56,7 +58,14 @@ HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<double>);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<int>);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<hpx::util::section>);
 
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// Barrier
+typedef hpx::components::managed_component<hpx::lcos::server::barrier> barrier_type;
+
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE(barrier_type, barrier);
+HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::server::barrier);
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
     template hpx::util::section const& 

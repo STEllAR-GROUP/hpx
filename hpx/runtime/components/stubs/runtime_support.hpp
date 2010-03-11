@@ -48,6 +48,7 @@ namespace hpx { namespace components { namespace stubs
             return get_factory_properties_async(targetgid, type).get();
         }
 
+        ///////////////////////////////////////////////////////////////////////
         /// Create a new component \a type using the runtime_support with the 
         /// given \a targetgid. This is a non-blocking call. The caller needs 
         /// to call \a future_value#get on the result of this function 
@@ -75,6 +76,41 @@ namespace hpx { namespace components { namespace stubs
             return create_component_async(targetgid, type, count).get();
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        /// Create a new component \a type using the runtime_support with the 
+        /// given \a targetgid. This is a non-blocking call. The caller needs 
+        /// to call \a future_value#get on the result of this function 
+        /// to obtain the global id of the newly created object. Pass one
+        /// generic argument to the constructor.
+        template <typename Arg0>
+        static lcos::future_value<naming::id_type, naming::gid_type> 
+        create_one_component_async(
+            naming::id_type const& targetgid, components::component_type type, 
+            Arg0 const& arg0) 
+        {
+            // Create an eager_future, execute the required action,
+            // we simply return the initialized future_value, the caller needs
+            // to call get() on the return value to obtain the result
+            typedef server::runtime_support::create_one_component_action 
+                action_type;
+            return lcos::eager_future<action_type, naming::id_type>(
+                targetgid, type, components::constructor_argument(arg0));
+        }
+
+        /// Create a new component \a type using the runtime_support with the 
+        /// given \a targetgid. Block for the creation to finish. Pass one
+        /// generic argument to the constructor.
+        template <typename Arg0>
+        static naming::id_type create_one_component(
+            naming::id_type const& targetgid, components::component_type type, 
+            Arg0 const& arg0) 
+        {
+            // The following get yields control while the action above 
+            // is executed and the result is returned to the eager_future
+            return create_one_component_async(targetgid, type, arg0).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         /// Create a new memory block using the runtime_support with the 
         /// given \a targetgid. This is a non-blocking call. The caller needs 
         /// to call \a future_value#get on the result of this function 

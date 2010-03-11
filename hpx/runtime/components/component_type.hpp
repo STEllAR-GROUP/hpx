@@ -29,8 +29,9 @@ namespace hpx { namespace components
         component_future = 6,           ///< a future executing the action and 
                                         ///< allowing to wait for the result
         component_value_adaptor = 7,    ///< an adaptor to access specific slot of an LCO
+        component_barrier = 8,          ///< a LCO implementing a barrier
 
-        component_performance_counter = 8,  ///< the base of all performance counters
+        component_performance_counter = 9,  ///< the base of all performance counters
 
         component_last,
         component_first_dynamic = component_last

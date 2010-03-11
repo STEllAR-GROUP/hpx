@@ -78,11 +78,38 @@ namespace boost { namespace plugin {
             return get_abstract_factory_static<BasePlugin>(f.first, f.second, 
                 class_name, d.get_name());
         }
+
+        inline void
+        get_abstract_factory_names(dll const& d, std::string const &base_name,
+            std::vector<std::string>& names)
+        {
+            typedef boost::function<void (get_plugins_list_type)> DeleterType;
+
+            std::string plugin_entry("boost_exported_plugins_list_");
+            plugin_entry += d.get_mapname();
+            plugin_entry += "_" + base_name;
+
+            std::pair<get_plugins_list_type, DeleterType> f = 
+                d.get<get_plugins_list_type, DeleterType>(plugin_entry.c_str());
+
+            exported_plugins_type& e = (f.first)();
+
+            exported_plugins_type::iterator end = e.end();
+            for (exported_plugins_type::iterator it = e.begin(); it != end; ++it)
+            {
+                names.push_back((*it).first);
+            }
+        }
         
         ///////////////////////////////////////////////////////////////////////
         struct plugin_factory_item_base
         {
-            void create(int******);
+            void create(int******) const;
+
+            void get_names(std::vector<std::string>& names) const
+            {
+                get_abstract_factory_names(this->m_dll, this->m_basename, names);
+            }
 
         protected:
             dll m_dll;
@@ -97,7 +124,7 @@ namespace boost { namespace plugin {
         struct plugin_factory_item<BasePlugin, Base, boost::mpl::list<> > 
         :   public Base 
         { 
-            BasePlugin* create(std::string const& name)
+            BasePlugin* create(std::string const& name) const
             {
                 std::pair<abstract_factory<BasePlugin> *, dll_handle> r = 
                     get_abstract_factory<BasePlugin>(this->m_dll, name, this->m_basename);
@@ -110,10 +137,10 @@ namespace boost { namespace plugin {
         :   public Base 
         {
             using Base::create;
-            BasePlugin* create(std::string const& name, A1 a1)
+            BasePlugin* create(std::string const& name, A1 a1) const
             {
                 std::pair<abstract_factory<BasePlugin> *, dll_handle> r = 
-                    get_abstract_factory<BasePlugin>(this->m_dll, name);
+                    get_abstract_factory<BasePlugin>(this->m_dll, name, this->m_basename);
                 return r.first->create(r.second, a1);
             }
         };
@@ -123,7 +150,7 @@ namespace boost { namespace plugin {
         :   public Base 
         {
             using Base::create;
-            BasePlugin* create(std::string const& name, A1 a1, A2 a2)
+            BasePlugin* create(std::string const& name, A1 a1, A2 a2) const
             {
                 std::pair<abstract_factory<BasePlugin> *, dll_handle> r = 
                     get_abstract_factory<BasePlugin>(this->m_dll, name, this->m_basename);
@@ -139,7 +166,7 @@ namespace boost { namespace plugin {
         ///////////////////////////////////////////////////////////////////////
         struct static_plugin_factory_item_base
         {
-            void create(int******);
+            void create(int******) const;
 
         protected:
             get_plugins_list_type f;
@@ -153,7 +180,7 @@ namespace boost { namespace plugin {
         struct static_plugin_factory_item<BasePlugin, Base, boost::mpl::list<> > 
         :   public Base 
         { 
-            BasePlugin* create(std::string const& name)
+            BasePlugin* create(std::string const& name) const
             {
                 std::pair<abstract_factory<BasePlugin> *, dll_handle> r = 
                     get_abstract_factory_static<BasePlugin>(
@@ -167,7 +194,7 @@ namespace boost { namespace plugin {
         :   public Base 
         {                
             using Base::create;
-            BasePlugin* create(std::string const& name, A1 a1)
+            BasePlugin* create(std::string const& name, A1 a1) const
             {
                 std::pair<abstract_factory<BasePlugin> *, dll_handle> r = 
                     get_abstract_factory_static<BasePlugin>(
@@ -181,7 +208,7 @@ namespace boost { namespace plugin {
         :   public Base 
         {
             using Base::create;
-            BasePlugin* create(std::string const& name, A1 a1, A2 a2)
+            BasePlugin* create(std::string const& name, A1 a1, A2 a2) const
             {
                 std::pair<abstract_factory<BasePlugin> *, dll_handle> r = 
                     get_abstract_factory_static<BasePlugin>(

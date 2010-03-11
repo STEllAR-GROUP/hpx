@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Hartmut Kaiser
+# Copyright (c) 2007-2010 Hartmut Kaiser
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -42,6 +42,8 @@ source_group("Header Files\\include"
 # LCO's
 set (hpxlib_lcos_HEADERS
     ${hpx_SOURCE_DIR}/hpx/lcos/barrier.hpp
+    ${hpx_SOURCE_DIR}/hpx/lcos/stubs/barrier.hpp
+    ${hpx_SOURCE_DIR}/hpx/lcos/server/barrier.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/base_lco.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/condition.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/counting_semaphore.hpp
@@ -56,6 +58,7 @@ set (hpxlib_lcos_HEADERS
     ${hpx_SOURCE_DIR}/hpx/lcos/lazy_future.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/lazy_future_get_results.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/lazy_future_get_results_direct.hpp
+    ${hpx_SOURCE_DIR}/hpx/lcos/local_barrier.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/mutex.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/recursive_mutex.hpp)
 source_group("Header Files\\lcos" 
@@ -117,6 +120,10 @@ set (hpxlib_components_HEADERS
     ${hpx_SOURCE_DIR}/hpx/runtime/components/component_type.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/component_factory_base.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/component_factory.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/components/component_factory_one.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/components/component_registry_base.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/components/component_registry.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/components/constructor_argument.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/console_error_sink.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/console_logging.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/derived_component_factory.hpp
@@ -348,6 +355,7 @@ source_group ("Source Files\\runtime\\threadmanager"
 set (hpxlib_util_SOURCES
     ${hpx_SOURCE_DIR}/src/util/asio_util.cpp
     ${hpx_SOURCE_DIR}/src/util/ini.cpp
+    ${hpx_SOURCE_DIR}/src/util/init_ini_data.cpp
     ${hpx_SOURCE_DIR}/src/util/io_service_pool.cpp
     ${hpx_SOURCE_DIR}/src/util/logging.cpp
     ${hpx_SOURCE_DIR}/src/util/performance_counters.cpp

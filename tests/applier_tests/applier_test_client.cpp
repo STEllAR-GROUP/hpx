@@ -127,9 +127,10 @@ int main(int argc, char* argv[])
 
         // Create a accumulator with static gid of 44 on the client side
         hpx::components::server::accumulator accu;
-        hpx::naming::gid_type local_id(44);
+        hpx::naming::gid_type local_gid(44);
+        hpx::naming::id_type local_id(local_gid, hpx::naming::id_type::unmanaged);
         hpx::naming::locality l(ps_host, ps_port);
-        agas_c.bind(local_id, hpx::naming::address(l, 
+        agas_c.bind(local_gid, hpx::naming::address(l, 
             hpx::components::server::accumulator::get_component_type(), &accu));
 
         // Test code to verify that the applier can successfully apply to local components
@@ -138,7 +139,8 @@ int main(int argc, char* argv[])
         bool p_l3 = hpx::applier::apply<hpx::components::server::accumulator::print_action>(local_id);
 
         // Create a static gid for remote accumulator on server
-        hpx::naming::gid_type remote_id(11);
+        hpx::naming::gid_type remote_gid(11);
+        hpx::naming::id_type remote_id(remote_gid, hpx::naming::id_type::unmanaged);
 
         // Test code to verify that the applier can successfully apply to remote components
         bool p_r1 = hpx::applier::apply<hpx::components::server::accumulator::init_action>(remote_id);

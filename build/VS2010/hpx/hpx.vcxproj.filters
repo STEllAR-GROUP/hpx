@@ -132,6 +132,12 @@
     <Filter Include="Source Files\Util">
       <UniqueIdentifier>{d64417e9-daa7-4385-b1cc-d42ab22789b0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\LCOs\Server">
+      <UniqueIdentifier>{219b401f-f977-46f9-bc59-dfe6dbfef93c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\LCOs\Stubs">
+      <UniqueIdentifier>{2c3a4904-4cd2-451b-afd6-333031b29bad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\boost\libs\signals\src\named_slot_map.cpp">
@@ -270,6 +276,9 @@
       <Filter>Source Files\Util</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\util\runtime_configuration.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\init_ini_data.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
   </ItemGroup>
@@ -691,6 +700,27 @@
     <ClInclude Include="..\..\..\hpx\runtime\actions\manage_object_action.hpp">
       <Filter>Header Files\Runtime\Actions</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\local_barrier.hpp">
+      <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\server\barrier.hpp">
+      <Filter>Header Files\LCOs\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\stubs\barrier.hpp">
+      <Filter>Header Files\LCOs\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\components\constructor_argument.hpp">
+      <Filter>Header Files\Runtime\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\components\component_factory_one.hpp">
+      <Filter>Header Files\Runtime\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\components\component_registry_base.hpp">
+      <Filter>Header Files\Runtime\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\components\component_registry.hpp">
+      <Filter>Header Files\Runtime\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\CMakeLists.txt">
@@ -706,6 +736,12 @@
       <Filter>Auxiliary Files</Filter>
     </None>
     <None Include="..\..\..\src\CMakeLists.txt" />
+    <None Include="..\..\..\misc\FindGMP.cmake">
+      <Filter>Auxiliary Files</Filter>
+    </None>
+    <None Include="..\..\..\misc\FindMPFR.cmake">
+      <Filter>Auxiliary Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <MASM Include="..\..\..\external\coroutine\libs\coroutine\src\swapcontext_windows.asm">

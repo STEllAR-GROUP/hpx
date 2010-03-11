@@ -138,7 +138,14 @@ public:
 		integral_type c,
 		memory_order order=memory_order_seq_cst) volatile
 	{
+#if defined(BOOST_MSVC)
+#pragma warning(push)
+#pragma warning(disable: 4146)    // unary minus operator applied to unsigned type, result still unsigned
+#endif
 		return fetch_add(-c, order);
+#if defined(BOOST_MSVC)
+#pragma warning(pop)
+#endif
 	}
 	
 	build_arithmeticops() {}

@@ -67,9 +67,6 @@ namespace hpx { namespace lcos
         /// \a set_event_action is applied on a instance of a LCO. This function
         /// just forwards to the virtual function \a set_event, which is 
         /// overloaded by the derived concrete LCO.
-        ///
-        /// \returns      The thread state the calling thread needs to be set
-        ///               to after returning from this function.
         void set_event_nonvirt()
         {
             set_event();
@@ -80,13 +77,8 @@ namespace hpx { namespace lcos
         /// just forwards to the virtual function \a set_error, which is 
         /// overloaded by the derived concrete LCO.
         ///
-        /// \param code   [in] The error code of the error to report to this 
-        ///               LCO instance.
-        /// \param msg    [in] The error message describing the error to report
+        /// \param e      [in] The exception encapsulating the error to report 
         ///               to this LCO instance.
-        ///
-        /// \returns      The thread state the calling thread needs to be set
-        ///               to after returning from this function.
         void set_error_nonvirt (boost::exception_ptr const& e)
         {
             set_error(e);
@@ -106,10 +98,9 @@ namespace hpx { namespace lcos
         /// information from the remote site to the LCO instance specified as
         /// a continuation. This action carries 2 parameters:
         ///
-        /// \param hpx::error   [in] The type of the error code of an error 
-        ///                     to report to this LCO instance.
-        /// \param std::string  [in] The type of the error message describing 
-        ///                     an error to report to this LCO instance.
+        /// \param boost::exception_ptr
+        ///               [in] The exception encapsulating the error to report 
+        ///               to this LCO instance.
         typedef hpx::actions::direct_action1<
             base_lco, lco_set_error, boost::exception_ptr const&,
             &base_lco::set_error_nonvirt

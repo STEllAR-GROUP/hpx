@@ -65,6 +65,25 @@ namespace hpx { namespace components
             return this->base_type::create_component_async(gid_, type, count);
         }
 
+        /// Create a new component type using the runtime_support. Pass one
+        /// generic argument to the constructor.
+        template <typename Arg0>
+        naming::id_type create_one_component(
+            components::component_type type, Arg0 const& arg0) 
+        {
+            return this->base_type::create_one_component(gid_, type, arg0);
+        }
+
+        /// Asynchronously create a new component using the runtime_support. 
+        /// Pass one generic argument to the constructor. 
+        template <typename Arg0>
+        lcos::future_value<naming::id_type, naming::gid_type> 
+        create_component_async(components::component_type type, 
+            Arg0 const& arg0) 
+        {
+            return this->base_type::create_one_component_async(gid_, type, arg0);
+        }
+
         /// Create a new memory block using the runtime_support 
         template <typename T>
         naming::id_type create_memory_block(std::size_t count, 

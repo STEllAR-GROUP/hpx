@@ -31,13 +31,13 @@ int hpx_main(int sizex, int sizey, int iterations)
     applier::applier& appl = applier::get_applier();
 
     // get prefixes of all remote localities (if any)
-    std::vector<naming::id_type> prefixes;
+    std::vector<naming::gid_type> prefixes;
     appl.get_remote_prefixes(prefixes);
 
     // execute the mandelbrot() functions remotely only, if any, otherwise
     // locally
     if (prefixes.empty())
-        prefixes.push_back(appl.get_runtime_support_gid());
+        prefixes.push_back(appl.get_runtime_support_raw_gid());
 
     std::size_t prefix_count = prefixes.size();
     util::high_resolution_timer t;
@@ -53,8 +53,8 @@ int hpx_main(int sizex, int sizey, int iterations)
     for (int x = 0, i = 0; x < sizex; ++x) {
         for (int y = 0; y < sizey; ++y, ++i) {
             mandelbrot::data data(x, y, sizex, sizey, iterations);
-            applier::apply_c<mandelbrot_action>(callback_gid, 
-                prefixes[i % prefix_count], data);
+            naming::id_type id(prefixes[i % prefix_count], naming::id_type::unmanaged);
+            applier::apply_c<mandelbrot_action>(callback_gid, id, data);
         }
     }
 

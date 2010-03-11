@@ -10,6 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 
 #include <hpx/runtime/components/component_factory_base.hpp>
+#include <hpx/runtime/components/component_registry.hpp>
 #include <hpx/runtime/components/server/manage_component.hpp>
 #include <hpx/util/ini.hpp>
 
@@ -192,6 +193,7 @@ namespace hpx { namespace components
         template<> char const* const                                          \
             hpx::components::derived_component_factory<ComponentType>::       \
                 unique_base_component_name = basecomponentname;               \
+        HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY(ComponentType, componentname) \
     /**/
 
 #endif

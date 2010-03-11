@@ -4,13 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/export.hpp>
+#include <hpx/runtime/components/component_factory_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
-HPX_REGISTER_COMPONENT_MODULE();
-
+HPX_REGISTER_COMPONENT_MODULE();    // create entry point for component factory

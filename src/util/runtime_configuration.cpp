@@ -50,11 +50,17 @@ namespace hpx { namespace util
 
             // create default ini entries for raw_counter component hosted in 
             // the main hpx shared library
-            "[hpx.components.raw_counter]",
-            "name = hpx",
-            "path = $[hpx.location]/lib/" 
-                BOOST_PP_STRINGIZE(HPX_MANGLE_NAME(HPX_COMPONENT_NAME))
-                HPX_SHARED_LIB_EXTENSION
+//             "[hpx.components.raw_counter]",
+//             "name = hpx",
+//             "path = $[hpx.location]/lib/" 
+//                 BOOST_PP_STRINGIZE(HPX_MANGLE_NAME(HPX_COMPONENT_NAME))
+//                 HPX_SHARED_LIB_EXTENSION,
+// 
+//             "[hpx.components.barrier]",
+//             "name = hpx",
+//             "path = $[hpx.location]/lib/" 
+//                 BOOST_PP_STRINGIZE(HPX_MANGLE_NAME(HPX_COMPONENT_NAME))
+//                 HPX_SHARED_LIB_EXTENSION
         ;
         ini.parse("static defaults", lines);
     }

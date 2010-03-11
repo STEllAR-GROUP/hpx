@@ -171,6 +171,14 @@
     <ClCompile Include="..\..\..\tests\applier_tests\applier_test_client.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\components\accumulator\accumulator.vcxproj">
+      <Project>{973c51d3-f306-4c6f-b9b6-a8420a20a6f1}</Project>
+      <Private>true</Private>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
     <ProjectReference Include="..\hpx\hpx.vcxproj">
       <Project>{e6c6c6c4-6959-4b47-b92a-6323a906cc40}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

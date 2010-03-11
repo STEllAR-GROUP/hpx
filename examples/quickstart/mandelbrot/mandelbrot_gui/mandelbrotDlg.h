@@ -56,5 +56,5 @@ private:
     CBitmap m_mandelbrot;
     bool created_bitmap;
     hpx::runtime& rt;
-    boost::lockfree::atomic_int<long> referesh_counter;
+    boost::atomic<long> referesh_counter;
 };

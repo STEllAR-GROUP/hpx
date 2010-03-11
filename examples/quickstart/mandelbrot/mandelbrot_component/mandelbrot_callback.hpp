@@ -30,8 +30,20 @@ namespace mandelbrot { namespace server { namespace detail
         // exposed functionality of this component
         void set_result (mandelbrot::result const& result);
 
+        template <typename ManagedType>
+        hpx::naming::id_type const& get_gid(ManagedType* p) const
+        {
+            if (!id_) {
+                hpx::naming::gid_type gid = p->get_base_gid(); 
+                hpx::naming::strip_credit_from_gid(gid);
+                id_ = hpx::naming::id_type(gid, hpx::naming::id_type::unmanaged);
+            }
+            return id_;
+        }
+
     private:
         boost::function<set_result_func_type> f_;
+        mutable hpx::naming::id_type id_;
     };
 
 }}}

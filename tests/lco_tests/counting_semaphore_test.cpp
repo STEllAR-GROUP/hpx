@@ -6,6 +6,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/counting_semaphore.hpp>
 
+#include <boost/atomic.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/detail/lightweight_test.hpp>
@@ -115,7 +116,7 @@ struct test_environment
 
     std::string desc_;
     lcos::counting_semaphore sem_;
-    boost::lockfree::atomic_int<long> counter1_;
+    boost::atomic<long> counter1_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

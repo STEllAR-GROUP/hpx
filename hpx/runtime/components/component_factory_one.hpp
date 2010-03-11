@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENT_FACTORY_SEP_26_2008_0647PM)
-#define HPX_COMPONENT_FACTORY_SEP_26_2008_0647PM
+#if !defined(HPX_COMPONENT_FACTORY_ONE_MAR_10_2010_0228PM)
+#define HPX_COMPONENT_FACTORY_ONE_MAR_10_2010_0228PM
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
@@ -21,17 +21,18 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class component_factory component_factory.hpp hpx/runtime/components/component_factory.hpp
+    /// \class component_factory_one component_factory_one.hpp hpx/runtime/components/component_factory_one.hpp
     ///
-    /// The \a component_factory provides a minimal implementation of a 
+    /// The \a component_factory_one provides a minimal implementation of a 
     /// component's factory. If no additional functionality is required this
     /// type can be used to implement the full set of minimally required 
-    /// functions to be exposed by a component's factory instance.
+    /// functions to be exposed by a component's factory instance. It supports 
+    /// creating objects requiring one constructor parameter.
     ///
     /// \tparam Component   The component type this factory should be 
     ///                     responsible for.
     template <typename Component>
-    struct component_factory : public component_factory_base
+    struct component_factory_one : public component_factory_base
     {
         /// 
         static char const* const unique_component_name;
@@ -52,7 +53,7 @@ namespace hpx { namespace components
         ///
         /// \note The contents of both sections has to be cloned in order to 
         ///       save the configuration setting for later use.
-        component_factory(util::section const* global, util::section const* local)
+        component_factory_one(util::section const* global, util::section const* local)
           : refcnt_(0)
         {
             // store the configuration settings
@@ -63,7 +64,7 @@ namespace hpx { namespace components
         }
 
         ///
-        ~component_factory() {}
+        ~component_factory_one() {}
 
         /// \brief Return the unique identifier of the component type this 
         ///        factory is responsible for
@@ -128,6 +129,23 @@ namespace hpx { namespace components
             return id;
         }
 
+        /// \brief Create one new component instance using the given constructor 
+        ///        argument.
+        ///
+        /// \param Arg0  [in] The type specific constructor argument
+        ///
+        /// \return Returns the GID of the first newly created component 
+        ///         instance. If more than one component instance has been 
+        ///         created (\a count > 1) the GID's of all new instances are
+        ///         sequential in a row.
+        naming::gid_type create_one (components::constructor_argument const& arg0)
+        {
+            naming::gid_type id = server::create_one<Component>(arg0);
+            if (id) 
+                ++refcnt_;
+            return id;
+        }
+
         /// \brief Destroy one or more component instances
         ///
         /// \param gid    [in] The gid of the first component instance to 
@@ -160,14 +178,18 @@ namespace hpx { namespace components
 
 ///////////////////////////////////////////////////////////////////////////////
 /// The macro \a HPX_REGISTER_MINIMAL_COMPONENT_FACTORY is used create and to 
-/// register a minimal component factory with Boost.Plugin. 
-#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(ComponentType, componentname)  \
+/// register a minimal component factory with Boost.Plugin. This macro may be 
+/// used if the registered component factory is the only factory to be exposed 
+/// from a particular module. If more than one factories need to be exposed
+/// the \a HPX_REGISTER_COMPONENT_FACTORY and \a HPX_REGISTER_COMPONENT_MODULE
+/// macros should be used instead.
+#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE(ComponentType, componentname) \
         HPX_REGISTER_COMPONENT_FACTORY(                                       \
-            hpx::components::component_factory<ComponentType>,                \
+            hpx::components::component_factory_one<ComponentType>,            \
             componentname);                                                   \
-        template struct hpx::components::component_factory<ComponentType>;    \
+        template struct hpx::components::component_factory_one<ComponentType>;\
         template<> char const* const                                          \
-            hpx::components::component_factory<ComponentType>::               \
+            hpx::components::component_factory_one<ComponentType>::           \
                 unique_component_name = BOOST_PP_STRINGIZE(componentname);    \
         HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY(ComponentType, componentname) \
     /**/
