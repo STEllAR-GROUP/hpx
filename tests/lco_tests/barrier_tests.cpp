@@ -19,24 +19,30 @@ void barrier_test(naming::id_type const& id, boost::detail::atomic_count& c, std
 {
     ++c;
     lcos::stubs::barrier::wait(id);     // wait for all threads to enter the barrier
-
-    // all of the 'count' threads need to have incremented the counter
-    BOOST_TEST(count == c);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(naming::id_type const& id, boost::detail::atomic_count& c, std::size_t count)
+int hpx_main(int num_tests, int num_cores)
 {
-    // create the 4 threads which will have to wait on the barrier
-    for (std::size_t i = 0; i < count; ++i) {
-        applier::register_work(
-            boost::bind(&barrier_test, id, boost::ref(c), count));
+    naming::id_type prefix = applier::get_applier().get_runtime_support_gid();
+
+    for (int t = 0; t < num_tests; ++t) {
+        std::size_t count = 2 * num_cores;
+
+        // create a barrier waiting on 'count' threads
+        lcos::barrier b;
+        b.create_one (prefix, count+1);
+
+        boost::detail::atomic_count c(0);
+        for (std::size_t j = 0; j < count; ++j) {
+            applier::register_work(
+                boost::bind(&barrier_test, b.get_gid(), boost::ref(c), count));
+        }
+
+        b.wait();             // wait for all threads to enter the barrier
+        BOOST_TEST(count == c);
+        std::cerr << ".";
     }
-
-    lcos::stubs::barrier::wait(id);     // wait for all threads to enter the barrier
-
-    // all of the 'count' threads need to have incremented the counter
-    BOOST_TEST(count == c);
 
     // initiate shutdown of the runtime system
     components::stubs::runtime_support::shutdown_all();
@@ -144,7 +150,7 @@ int main(int argc, char* argv[])
         std::string hpx_host("localhost"), dgas_host;
         boost::uint16_t hpx_port = HPX_PORT, dgas_port = 0;
         hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
-        int num_threads = 0;
+        int num_threads = 1;
         int num_tests = 1;
 
         // extract IP address/port arguments
@@ -169,39 +175,26 @@ int main(int argc, char* argv[])
             dgas_server.reset(new agas_server_helper(dgas_host, dgas_port));
 
         // start the HPX runtime using different numbers of threads
-        if (0 == num_threads) {
-            int num_of_cores = boost::thread::hardware_concurrency();
+//         if (0 == num_threads) {
             runtime_type rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
-            naming::id_type prefix = rt.get_applier().get_runtime_support_gid();
-
-            for (int t = 0; t < num_tests; ++t) {
-                for (int i = 1; i <= 2*num_of_cores; ++i) { 
-                    std::size_t count = 2 * i;
-                    lcos::barrier b;
-                    b.create_one (prefix, count+1);       // create a barrier waiting on 'count' threads
-                    boost::detail::atomic_count c(0);
-
-                    rt.run(boost::bind(hpx_main, b.get_gid(), boost::ref(c), count), i);
-                    std::cerr << ".";
-                }
-            }
+            rt.run(boost::bind(hpx_main, num_tests, num_threads), num_threads);
             std::cerr << "\n";
-        }
-        else {
-            runtime_type rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
-            naming::id_type prefix = rt.get_applier().get_runtime_support_gid();
-
-            for (int t = 0; t < num_tests; ++t) {
-                std::size_t count = 2 * num_threads;
-                lcos::barrier b;
-                b.create_one (prefix, count+1);       // create a barrier waiting on 'count' threads
-                boost::detail::atomic_count c(0);
-
-                rt.run(boost::bind(hpx_main, b.get_gid(), boost::ref(c), count), num_threads);
-                std::cerr << ".";
-            }
-            std::cerr << "\n";
-        }
+//         }
+//         else {
+//             runtime_type rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
+//             naming::id_type prefix = rt.get_applier().get_runtime_support_gid();
+// 
+//             for (int t = 0; t < num_tests; ++t) {
+//                 std::size_t count = 2 * num_threads;
+//                 lcos::barrier b;
+//                 b.create_one (prefix, count+1);       // create a barrier waiting on 'count' threads
+//                 boost::detail::atomic_count c(0);
+// 
+//                 rt.run(boost::bind(hpx_main, b.get_gid(), boost::ref(c), count), num_threads);
+//                 std::cerr << ".";
+//             }
+//             std::cerr << "\n";
+//         }
     }
     catch (std::exception& e) {
         BOOST_TEST(false);
