@@ -38,7 +38,7 @@ namespace hpx { namespace util
             "port = ${HPX_AGAS_SERVER_PORT:" 
                 BOOST_PP_STRINGIZE(HPX_NAME_RESOLVER_PORT) "}",
             "cachesize = ${HPX_AGAS_CACHE_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_CACHE_SIZE) "}",
+                BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_CACHE_SIZE) "}"
 
             // create default ini entries for memory_block component hosted in 
             // the main hpx shared library
