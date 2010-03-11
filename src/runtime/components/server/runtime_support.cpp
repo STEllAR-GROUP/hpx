@@ -38,6 +38,9 @@ HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::create_component_action,
     create_component_action);
 HPX_REGISTER_ACTION_EX(
+    hpx::components::server::runtime_support::create_one_component_action,
+    create_one_component_action);
+HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::create_memory_block_action,
     create_memory_block_action);
 HPX_REGISTER_ACTION_EX(
