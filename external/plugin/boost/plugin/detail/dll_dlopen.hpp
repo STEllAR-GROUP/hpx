@@ -194,6 +194,7 @@ namespace boost { namespace plugin {
                     << symbol_name << "' in the shared library '" 
                     << dll_name << "' (" << dlerror () << ")";
                     
+                MyFreeLibrary(handle);
                 throw std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str));
             }
             return std::make_pair(address, free_dll<SymbolType>(handle));

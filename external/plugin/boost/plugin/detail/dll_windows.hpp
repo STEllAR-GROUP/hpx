@@ -131,7 +131,8 @@ namespace boost { namespace plugin {
                 str << "Boost.Plugin: Unable to locate the exported symbol name '" 
                     << symbol_name << "' in the shared library '" 
                     << dll_name << "'";
-                    
+
+                ::FreeLibrary(handle);
                 throw std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str));
             }
             return std::make_pair(address, detail::free_dll<SymbolType>(handle));
