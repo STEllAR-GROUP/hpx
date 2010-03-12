@@ -63,8 +63,10 @@ namespace hpx { namespace lcos { namespace detail
         T const value = 1u << bit;
         boost::uint32_t old = x.load(boost::memory_order_acquire);
         do {
-            if (x.compare_exchange_strong(old, T(old | value)))
+            boost::uint32_t tmp = old;
+            if (x.compare_exchange_strong(tmp, T(old | value)))
                 break;
+            old = tmp;
         } while(true);
         return (old & value) != 0;
     }
@@ -73,8 +75,8 @@ namespace hpx { namespace lcos { namespace detail
     class mutex 
     {
     private:
-        BOOST_STATIC_CONSTANT(boost::int32_t, lock_flag_bit = 31);
-        BOOST_STATIC_CONSTANT(boost::int32_t, lock_flag_value = 1 << lock_flag_bit);
+        BOOST_STATIC_CONSTANT(boost::uint32_t, lock_flag_bit = 31);
+        BOOST_STATIC_CONSTANT(boost::uint32_t, lock_flag_value = 1u << lock_flag_bit);
 
     private:
         struct tag {};
@@ -145,8 +147,10 @@ namespace hpx { namespace lcos { namespace detail
                 boost::uint32_t new_count = (old_count & lock_flag_value) ? 
                     (old_count + 1) : (old_count | lock_flag_value);
 
-                if (active_count_.compare_exchange_strong(old_count, new_count))
+                boost::uint32_t tmp = old_count;
+                if (active_count_.compare_exchange_strong(tmp, new_count))
                     break;
+                old_count = tmp;
             }
         }
 
@@ -158,8 +162,10 @@ namespace hpx { namespace lcos { namespace detail
                 boost::uint32_t new_count = (old_count & lock_flag_value) ? 
                     old_count : ((old_count-1) | lock_flag_value); 
 
-                if (active_count_.compare_exchange_strong(old_count, new_count))
+                boost::uint32_t tmp = old_count;
+                if (active_count_.compare_exchange_strong(tmp, new_count))
                     break;
+                old_count = tmp;
             }
         }
 
@@ -208,7 +214,8 @@ namespace hpx { namespace lcos { namespace detail
             if (try_lock())
                 return;
 
-            boost::uint32_t old_count = active_count_;
+            boost::uint32_t old_count = 
+                active_count_.load(boost::memory_order_acquire);
             mark_waiting_and_try_lock(old_count);
 
             if (old_count & lock_flag_value)
@@ -229,7 +236,8 @@ namespace hpx { namespace lcos { namespace detail
             if (try_lock())
                 return true;
 
-            boost::uint32_t old_count = active_count_;
+            boost::uint32_t old_count = 
+                active_count_.load(boost::memory_order_acquire);
             mark_waiting_and_try_lock(old_count);
 
             if (old_count & lock_flag_value)
