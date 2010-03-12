@@ -16,14 +16,20 @@ namespace hpx { namespace components { namespace amr { namespace server
     // Compute the result value for the current time step
     void logging::logentry(stencil_data const& val, int row, int logcode, Parameter const& par)
     {
-//         b.wait();
-
         mutex_type::scoped_lock l(mtx_);
 
         int i;
         if ( par.output_stdout == 1 && val.iter_ == 0 ) {
           if (fmod(val.timestep_,par.output) < 1.e-6) {
-          std::cout << " AMR Level: " << val.level_ << "   Timestep: " <<  val.timestep_ << " Time : " << val.timestep_*par.dx0*par.lambda  << "   refine?: " << val.refine_ << "   row: " << row << "   index: " << val.index_ << "    Value: " << val.value_.phi[0][0] << "  x-coordinate : " << val.x_ << std::endl;
+            std::cout << " AMR Level: " << val.level_ 
+                      << " Timestep: " <<  val.timestep_ 
+                      << " Time: " << val.timestep_*par.dx0*par.lambda  
+                      << " refine?: " << val.refine_ 
+                      << " row: " << row 
+                      << " index: " << val.index_ 
+                      << " Value: " << val.value_.phi[0][0] 
+                      << " x-coordinate: " << val.x_ 
+                      << std::endl << std::flush ;
           }
         }
 
