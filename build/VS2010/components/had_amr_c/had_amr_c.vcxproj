@@ -186,7 +186,11 @@
     </ProjectReference>
     <ProjectReference Include="..\had_amr\had_amr.vcxproj">
       <Project>{86d94786-3beb-4c94-8d7b-f4b6ef867a74}</Project>
+      <Private>true</Private>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
     <ProjectReference Include="had_amr_c_test\had_amr_c_test.vcxproj">
       <Project>{7d35509b-d814-4c60-b934-4c8c03c076ec}</Project>
