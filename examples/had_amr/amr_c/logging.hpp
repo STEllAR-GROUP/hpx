@@ -9,6 +9,7 @@
 #include <hpx/lcos/mutex.hpp>
 #include "stencil_data.hpp"
 #include "../parameter.hpp"
+#include <hpx/lcos/barrier.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server
@@ -25,12 +26,17 @@ namespace hpx { namespace components { namespace amr { namespace server
     public:
         logging()
           : mtx_("logging")
-        {}
+        {
+//             naming::id_type prefix = applier::get_applier().get_runtime_support_gid();
+//             b.create_one(prefix, 60);
+        }
 
         enum actions
         {
             logging_logentry = 0,
         };
+
+//         lcos::barrier b;
 
         /// This is the function implementing the logging functionality
         /// It takes the values as calculated during the current time step.

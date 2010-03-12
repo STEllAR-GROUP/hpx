@@ -16,6 +16,8 @@ namespace hpx { namespace components { namespace amr { namespace server
     // Compute the result value for the current time step
     void logging::logentry(stencil_data const& val, int row, int logcode, Parameter const& par)
     {
+//         b.wait();
+
         mutex_type::scoped_lock l(mtx_);
 
         int i;
