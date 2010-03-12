@@ -52,7 +52,7 @@ set(Boost_COMPONENTS_NEEDED
     thread)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_ADDITIONAL_VERSIONS 
-    "1.42.0", "1.42", "1.41.0", "1.41", "1.40.0", "1.40", "1.39.0" "1.39")
+    "1.43.0", "1.43", "1.42.0", "1.42", "1.41.0", "1.41", "1.40.0", "1.40", "1.39.0" "1.39")
 
 find_package(Boost 1.33.1 COMPONENTS ${Boost_COMPONENTS_NEEDED})
 
@@ -223,6 +223,11 @@ install(
     REGEX ".svn" EXCLUDE)
 install(
     DIRECTORY external/coroutine/boost
+    DESTINATION include
+    FILES_MATCHING PATTERN "*.hpp"
+    REGEX ".svn" EXCLUDE)
+install(
+    DIRECTORY external/atomic/boost
     DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
     REGEX ".svn" EXCLUDE)
