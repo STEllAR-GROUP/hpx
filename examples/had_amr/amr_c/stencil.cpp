@@ -108,6 +108,14 @@ namespace hpx { namespace components { namespace amr
         // update x position
         resultval->x_ = val[compute_index]->x_;
 
+        //boundary for r = 0
+        if ( floatcmp(resultval->x_,0.0) ) {
+          // indicate a physical boundary
+          boundary = true;
+          bbox[0] = 1;
+          bbox[1] = 0;
+        }
+
         // initialize result 
         resultval->overwrite_alloc_ = false;
         resultval->right_alloc_ = false;

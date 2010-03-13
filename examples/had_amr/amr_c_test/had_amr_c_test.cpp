@@ -77,10 +77,17 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     had_double_type chi,Phi,Pi,Energy,r;
 
     r = xcoord;
-    chi = initial_chi(r,par);
-    Phi = initial_Phi(r,par);
-    Pi  = 0.0;
-    Energy = 0.5*r*r*(Pi*Pi + Phi*Phi) - r*r*pow(chi,par.PP+1)/(par.PP+1);
+    if ( r < 0.0 ) {
+      chi = -9999.0;
+      Phi = -9999.0;
+      Pi  = -9999.0;
+      Energy = -9999.0;
+    } else {
+      chi = initial_chi(r,par);
+      Phi = initial_Phi(r,par);
+      Pi  = 0.0;
+      Energy = 0.5*r*r*(Pi*Pi + Phi*Phi) - r*r*pow(chi,par.PP+1)/(par.PP+1);
+    }
 
     val->x_ = r;
     val->value_.phi[0][0] = chi;
@@ -226,6 +233,15 @@ void calcrhs(struct nodedata * rhs,
   had_double_type Phi = vecval[compute_index]->value_.phi[flag][1];
   had_double_type Pi =  vecval[compute_index]->value_.phi[flag][2];
 
+  if ( r < 0.0 ) {
+    // ignore these points 
+    rhs->phi[0][0] = 0.0;
+    rhs->phi[0][1] = 0.0;
+    rhs->phi[0][2] = 0.0;
+    rhs->phi[0][3] = 0.0;
+    return;
+  }
+
   if ( !boundary ) {
     // the compute_index is not physical boundary; all points in stencilsize
     // are available for computing the rhs.
@@ -250,7 +266,6 @@ void calcrhs(struct nodedata * rhs,
     // boundary -- look at the bounding box (bbox) to decide which boundary it is
     if ( bbox[0] == 1 ) {
       // we are at the left boundary  -- values are determined by quadratic fit, not evolution
-      if ( size != 4 ) fprintf(stderr,"Problem: not enough points for boundary condition\n");
 
       rhs->phi[0][0] = 0.0; // chi rhs -- chi is set by quadratic fit
       rhs->phi[0][1] = 0.0; // Phi rhs -- Phi-dot is always zero at r=0
@@ -293,6 +308,10 @@ bool refinement(stencil_data ** vecval, int size, struct nodedata *dst,int level
   had_double_type grad1,grad2,grad3,grad4;
   int index;
   had_double_type dx = par.dx0/pow(2.0,(int) vecval[0]->level_);
+
+  if ( vecval[0]->x_ < 5.0 ) {
+    return true;
+  }
 
   // gradient detector
   if ( size%2 == 1 ) {
