@@ -11,7 +11,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server
 {
-    logging::mutex_type logging::mtx_ = logging::mutex_type("logging");
+    logging::mutex_type logging::mtx_("logging");
 
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
