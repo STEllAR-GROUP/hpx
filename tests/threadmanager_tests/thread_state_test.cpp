@@ -10,8 +10,8 @@
 using namespace hpx;
 using namespace hpx::threads;
 
-thread_state my_gcd (int m, int n, int gcd);
-void print_state (thread_state t_s);
+thread_state_enum my_gcd (int m, int n, int gcd);
+void print_state (thread_state_enum t_s);
 
 typedef hpx::threads::threadmanager_impl<hpx::threads::policies::global_queue_scheduler> threadmanager_type;
 
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
     return boost::report_errors();
 }
 
-thread_state my_gcd (int m, int n, int gcd)
+thread_state_enum my_gcd (int m, int n, int gcd)
 {
     int r;
     while(n != 0){
@@ -80,7 +80,7 @@ thread_state my_gcd (int m, int n, int gcd)
     return terminated;
 }
 
-void print_state (thread_state t_s)
+void print_state (thread_state_enum t_s)
 {
     switch (t_s) {
     case unknown:    std::cout << "Unknown" << std::endl << std::flush;    break;

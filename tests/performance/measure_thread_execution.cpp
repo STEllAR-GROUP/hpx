@@ -13,7 +13,7 @@ namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
 // this is a empty test thread
-threads::thread_state null_thread(threads::thread_state_ex)
+threads::thread_state_enum null_thread(threads::thread_state_ex_enum)
 {
 //     naming::id_type gid = 
 //         appl.get_thread_manager().get_thread_gid(self.get_thread_id(), appl);
