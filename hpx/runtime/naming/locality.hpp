@@ -10,6 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/util/safe_bool.hpp>
 
 #include <boost/config.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -63,6 +64,7 @@ namespace hpx { namespace naming
     {
     public:
         locality() 
+          : port_(boost::uint16_t(-1))
         {}
 
         locality(std::string const& addr, boost::uint16_t port)
@@ -127,6 +129,12 @@ namespace hpx { namespace naming
         friend bool operator> (locality const& lhs, locality const& rhs)
         {
             return !(lhs < rhs) && !(lhs == rhs);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        operator util::safe_bool<locality>::result_type() const 
+        { 
+            return util::safe_bool<locality>()(port_ != boost::uint16_t(-1)); 
         }
 
     private:

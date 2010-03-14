@@ -72,7 +72,7 @@
         /// function of a thread. It encapsulates the execution of the 
         /// original function (given by \a func).
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static threads::thread_state thread_function(
+        static threads::thread_state_enum thread_function(
             naming::address::address_type lva, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
@@ -95,7 +95,7 @@
         {
             // we need to assign the address of the thread function to a 
             // variable to  help the compiler to deduce the function type
-            threads::thread_state (*f)(naming::address::address_type,
+            threads::thread_state_enum (*f)(naming::address::address_type,
                     BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) =
                 &BOOST_PP_CAT(base_result_action, N)::
                     template thread_function<BOOST_PP_ENUM_PARAMS(N, Arg)>;
@@ -372,7 +372,7 @@
         /// function of a thread. It encapsulates the execution of the 
         /// original function (given by \a func).
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static threads::thread_state thread_function(
+        static threads::thread_state_enum thread_function(
             naming::address::address_type lva, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
@@ -395,7 +395,7 @@
         {
             // we need to assign the address of the thread function to a 
             // variable to  help the compiler to deduce the function type
-            threads::thread_state (*f)(naming::address::address_type,
+            threads::thread_state_enum (*f)(naming::address::address_type,
                     BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) =
                 &BOOST_PP_CAT(base_action, N)::
                     template thread_function<BOOST_PP_ENUM_PARAMS(N, Arg)>;

@@ -291,8 +291,21 @@ namespace hpx { namespace naming
               : gid_type(msb_id, lsb_id), address_(l, type, a)
             {}
 
+            bool is_local_cached() const;
+            bool is_local();
+            bool resolve(naming::address& addr);
+            bool is_resolved() const { return address_; }
+            void get_local_address(naming::address& addr) const
+            {
+                BOOST_ASSERT(is_local_cached());
+                addr = address_;
+            }
+
             // cached resolved address
             naming::address address_;
+
+        protected:
+            bool resolve();
         };
 
         // custom deleter for id_type_impl above
@@ -448,6 +461,29 @@ namespace hpx { namespace naming
         {
             gid_type::mutex_type::scoped_lock l(gid_.get());
             return id_type(split_credits_for_gid(*gid_, fraction), unmanaged);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        bool is_local_cached() const
+        {
+            return gid_->is_local_cached();
+        }
+        bool is_local() const
+        {
+            return gid_->is_local();
+        }
+        void get_local_address(naming::address& addr) const
+        {
+            return gid_->get_local_address(addr);
+        }
+
+        bool resolve(address& addr)
+        {
+            return gid_->resolve(addr);
+        }
+        bool is_resolved() const
+        {
+            return gid_->is_resolved();
         }
 
     private:

@@ -37,7 +37,7 @@
         util::block_profiler_wrapper<eager_future_direct_tag> bp(apply_logger_);
 
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid.get_gid(), addr)) {
+        if (hpx::applier::get_applier().address_is_local(gid, addr)) {
             // local, direct execution
             BOOST_ASSERT(components::types_are_compatible(addr.type_, 
                 components::get_component_type<typename Action::component_type>()));

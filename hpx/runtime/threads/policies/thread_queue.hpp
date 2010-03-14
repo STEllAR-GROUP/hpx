@@ -66,6 +66,7 @@ namespace hpx { namespace threads { namespace policies
         {
             typedef boost::ptr_map<thread_id_type, threads::thread> thread_map_type;
 
+            LTM_(error) << "Listing suspended threads while queues are empty:";
             thread_map_type::const_iterator end = tm.end();
             for (thread_map_type::const_iterator it = tm.begin(); it != end; ++it)
             {
@@ -100,7 +101,7 @@ namespace hpx { namespace threads { namespace policies
 
         // this is the type of the queue of new tasks not yet converted to
         // threads
-        typedef boost::tuple<thread_init_data, thread_state> task_description;
+        typedef boost::tuple<thread_init_data, thread_state_enum> task_description;
         typedef boost::lockfree::fifo<task_description const*> task_items_type;
 
         typedef boost::lockfree::fifo<thread_id_type> thread_id_queue_type;
@@ -123,7 +124,7 @@ namespace hpx { namespace threads { namespace policies
                 util::block_profiler_wrapper<add_new_tag> bp(add_new_logger_);
 
                 // create the new thread
-                thread_state state = boost::get<1>(*task);
+                thread_state_enum state = boost::get<1>(*task);
                 std::auto_ptr<threads::thread> thrd (
                     new threads::thread(boost::get<0>(*task), state));
 
@@ -263,7 +264,7 @@ namespace hpx { namespace threads { namespace policies
         // create a new thread and schedule it if the initial state is equal to 
         // pending
         thread_id_type create_thread(thread_init_data& data, 
-            thread_state initial_state, bool run_now, error_code& ec)
+            thread_state_enum initial_state, bool run_now, error_code& ec)
         {
             if (run_now) {
                 std::auto_ptr<threads::thread> thrd (
@@ -336,7 +337,8 @@ namespace hpx { namespace threads { namespace policies
         /// manager to allow for maintenance tasks to be executed in the 
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
-        bool wait_or_add_new(std::size_t num_thread, bool running)
+        bool wait_or_add_new(std::size_t num_thread, bool running, 
+            std::size_t& idle_loop_count)
         {
             // only one dedicated OS thread is allowed to acquire the 
             // lock for the purpose of inserting the new threads into the 
@@ -403,8 +405,18 @@ namespace hpx { namespace threads { namespace policies
                     LTM_(info) << "tfunc(" << num_thread 
                                << "): queues empty, entering wait";
 
-                    if (LHPX_ENABLED(error) && new_tasks_.empty())
-                        detail::dump_suspended_threads(thread_map_);
+                    if (idle_loop_count > 200) {
+                        // reset idle loop count
+                        idle_loop_count = 0;
+
+                        // dump list of suspended threads once a second
+                        if (LHPX_ENABLED(error) && new_tasks_.empty())
+                            detail::dump_suspended_threads(thread_map_);
+
+                        // in any case we reactivate all pending threads
+                        if (reactivate_pending_threads())
+                            break;    // we got work, exit loop
+                    }
 
                     bool timed_out = false;
                     {
@@ -422,6 +434,30 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
             return terminate;
+        }
+
+        /// Look through thread map and put all active threads into the queue 
+        /// of work items
+        bool reactivate_pending_threads()
+        {
+            typedef boost::ptr_map<thread_id_type, threads::thread> thread_map_type;
+
+            bool added_one = false;
+            thread_map_type::const_iterator end = thread_map_.end();
+            for (thread_map_type::const_iterator it = thread_map_.begin(); 
+                 it != end; ++it)
+            {
+                threads::thread const* thrd = (*it).second;
+                if (threads::pending == thrd->get_state()) {
+                    LTM_(error) << "reactivating pending thread: " 
+                                << get_thread_state_name(thrd->get_state()) 
+                                << "(" << (*it).first << "): "
+                                << thrd->get_description();
+                    work_items_.enqueue(const_cast<threads::thread*>(thrd));
+                    added_one = true;
+                }
+            }
+            return added_one;
         }
 
         /// This function gets called by the threadmanager whenever new work

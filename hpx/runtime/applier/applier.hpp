@@ -152,6 +152,23 @@ namespace hpx { namespace applier
         }
 
         /// Test whether the given address (gid) is local or remote
+        bool address_is_local(naming::id_type const& id, 
+            naming::address& addr) const
+        {
+            if (id.is_local()) {    // address gets resolved if not already
+                id.get_local_address(addr);
+                return true;
+            }
+
+            if (!id.is_resolved()) {
+                HPX_OSSTREAM strm;
+                strm << "gid" << id.get_gid();
+                HPX_THROW_EXCEPTION(unknown_component_address, 
+                    "applier::address_is_local", HPX_OSSTREAM_GETSTRING(strm));
+            }
+            return false;   // non-local
+        }
+
         bool address_is_local(naming::gid_type const& gid, 
             naming::address& addr) const
         {
@@ -175,8 +192,7 @@ namespace hpx { namespace applier
                 HPX_OSSTREAM strm;
                 strm << "gid" << gid;
                 HPX_THROW_EXCEPTION(unknown_component_address, 
-                    "applier::address_is_local", 
-                    HPX_OSSTREAM_GETSTRING(strm));
+                    "applier::address_is_local", HPX_OSSTREAM_GETSTRING(strm));
             }
             return addr.locality_ == parcel_handler_.here();
         }
@@ -201,24 +217,24 @@ namespace hpx { namespace applier
     ///
     HPX_API_EXPORT threads::thread_id_type register_thread_nullary(
         boost::function<void()> const& func, char const* description = "",  
-        threads::thread_state initial_state = threads::pending, 
+        threads::thread_state_enum initial_state = threads::pending, 
         bool run_now = true);
 
     HPX_API_EXPORT threads::thread_id_type register_thread(
         boost::function<void(threads::thread_state_ex)> const& func, 
         char const* description = "",  
-        threads::thread_state initial_state = threads::pending, 
+        threads::thread_state_enum initial_state = threads::pending, 
         bool run_now = true);
 
     HPX_API_EXPORT threads::thread_id_type register_thread_plain(
         boost::function<threads::thread_function_type> const& func,
         char const* description = "", 
-        threads::thread_state initial_state = threads::pending, 
+        threads::thread_state_enum initial_state = threads::pending, 
         bool run_now = true);
 
     HPX_API_EXPORT threads::thread_id_type register_thread_plain(
         threads::thread_init_data& data,
-        threads::thread_state initial_state = threads::pending, 
+        threads::thread_state_enum initial_state = threads::pending, 
         bool run_now = true);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -227,24 +243,24 @@ namespace hpx { namespace applier
     ///
     HPX_API_EXPORT void register_work_nullary(
         boost::function<void()> const& func, char const* description = "", 
-        threads::thread_state initial_state = threads::pending,
+        threads::thread_state_enum initial_state = threads::pending, 
         error_code& ec = throws);
 
     HPX_API_EXPORT void register_work(
         boost::function<void(threads::thread_state_ex)> const& func, 
         char const* description = "", 
-        threads::thread_state initial_state = threads::pending,
+        threads::thread_state_enum initial_state = threads::pending, 
         error_code& ec = throws);
 
     HPX_API_EXPORT void register_work_plain(
         boost::function<threads::thread_function_type> const& func,
         char const* description = "", naming::address::address_type lva = 0,
-        threads::thread_state initial_state = threads::pending,
+        threads::thread_state_enum initial_state = threads::pending, 
         error_code& ec = throws);
 
     HPX_API_EXPORT void register_work_plain(
         threads::thread_init_data& data,
-        threads::thread_state initial_state = threads::pending,
+        threads::thread_state_enum initial_state = threads::pending, 
         error_code& ec = throws);
 
     /// The \a create_async function initiates the creation of a new 

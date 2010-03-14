@@ -92,8 +92,9 @@ namespace hpx { namespace threads
         ///                 schedules a new thread which will set the state of 
         ///                 the thread as soon as its not active anymore. The
         ///                 function returns \a thread_state#active in this case. 
-        virtual thread_state set_state(thread_id_type id, thread_state newstate,
-            thread_state_ex newstate_ex = wait_signaled) = 0;
+        virtual thread_state set_state(thread_id_type id, 
+            thread_state_enum newstate,
+            thread_state_ex_enum newstate_ex = wait_signaled) = 0;
 
         /// Set a timer to set the state of the given \a thread to the given 
         /// new value after it expired (at the given time)
@@ -113,8 +114,8 @@ namespace hpx { namespace threads
         ///
         /// \returns
         virtual thread_id_type set_state (time_type const& expire_at, 
-            thread_id_type id, thread_state newstate = pending,
-            thread_state_ex newstate_ex = wait_timeout) = 0;
+            thread_id_type id, thread_state_enum newstate = pending,
+            thread_state_ex_enum newstate_ex = wait_timeout) = 0;
 
         /// \brief  Set the thread state of the \a thread referenced by the 
         ///         thread_id \a id.
@@ -132,8 +133,8 @@ namespace hpx { namespace threads
         ///
         /// \returns
         virtual thread_id_type set_state (duration_type const& expire_from_now, 
-            thread_id_type id, thread_state newstate = pending,
-            thread_state_ex newstate_ex = wait_timeout) = 0;
+            thread_id_type id, thread_state_enum newstate = pending,
+            thread_state_ex_enum newstate_ex = wait_timeout) = 0;
 
         /// The function get_thread_gid is part of the thread related API 
         /// allows to query the GID of one of the threads known to the 
@@ -194,7 +195,7 @@ namespace hpx { namespace threads
 
         virtual void
         register_work(thread_init_data& data, 
-            thread_state initial_state = pending,
+            thread_state_enum initial_state = pending,
             error_code& ec = throws) = 0;
 
         /// The function \a register_thread adds a new work item to the thread 
@@ -235,8 +236,8 @@ namespace hpx { namespace threads
 
         virtual thread_id_type 
         register_thread(thread_init_data& data, 
-            thread_state initial_state = pending, bool run_now = true,
-            error_code& ec = throws) = 0;
+            thread_state_enum initial_state = pending, 
+            bool run_now = true, error_code& ec = throws) = 0;
 
         /// this notifies the thread manager that there is some more work 
         /// available 
@@ -301,7 +302,8 @@ namespace hpx { namespace threads
 //             boost::uint32_t parent_prefix = 0, thread_id_type parent_id = 0);
 
         void register_work(thread_init_data& data, 
-            thread_state initial_state = pending, error_code& ec = throws);
+            thread_state_enum initial_state = pending, 
+            error_code& ec = throws);
 
         /// The function \a register_thread adds a new work item to the thread 
         /// manager. It creates a new \a thread, adds it to the internal
@@ -340,8 +342,8 @@ namespace hpx { namespace threads
 //             thread_state initial_state = pending, bool run_now = true);
 
         thread_id_type register_thread(thread_init_data& data, 
-            thread_state initial_state = pending, bool run_now = true,
-            error_code& ec = throws);
+            thread_state_enum initial_state = pending, 
+            bool run_now = true, error_code& ec = throws);
 
         /// \brief  Run the thread manager's work queue. This function 
         ///         instantiates the specified number of OS threads. All OS
@@ -389,8 +391,8 @@ namespace hpx { namespace threads
         ///                 schedules a new thread which will set the state of 
         ///                 the thread as soon as its not active anymore. The
         ///                 function returns \a thread_state#active in this case. 
-        thread_state set_state(thread_id_type id, thread_state newstate,
-            thread_state_ex newstate_ex = wait_signaled);
+        thread_state set_state(thread_id_type id, thread_state_enum newstate,
+            thread_state_ex_enum newstate_ex = wait_signaled);
 
         /// The get_state function is part of the thread related API and allows
         /// to query the state of one of the threads known to the threadmanager
@@ -437,8 +439,8 @@ namespace hpx { namespace threads
         ///
         /// \returns
         thread_id_type set_state (time_type const& expire_at, 
-            thread_id_type id, thread_state newstate = pending,
-            thread_state_ex newstate_ex = wait_timeout);
+            thread_id_type id, thread_state_enum newstate = pending,
+            thread_state_ex_enum newstate_ex = wait_timeout);
 
         /// \brief  Set the thread state of the \a thread referenced by the 
         ///         thread_id \a id.
@@ -456,8 +458,8 @@ namespace hpx { namespace threads
         ///
         /// \returns
         thread_id_type set_state (duration_type const& expire_from_now, 
-            thread_id_type id, thread_state newstate = pending,
-            thread_state_ex newstate_ex = wait_timeout);
+            thread_id_type id, thread_state_enum newstate = pending,
+            thread_state_ex_enum newstate_ex = wait_timeout);
 
         /// The get_description function is part of the thread related API and 
         /// allows to query the description of one of the threads known to the 
@@ -480,7 +482,7 @@ namespace hpx { namespace threads
         // thread function registered for set_state if thread is currently 
         // active
         thread_state set_active_state(thread_id_type id, 
-                thread_state newstate, thread_state_ex newstate_ex);
+                thread_state_enum newstate, thread_state_ex_enum newstate_ex);
 
     public:
         /// this notifies the thread manager that there is some more work 
@@ -500,15 +502,15 @@ namespace hpx { namespace threads
     protected:
         /// This thread function is used by the at_timer thread below to trigger
         /// the required action.
-        thread_state wake_timer_thread (thread_id_type id, 
-            thread_state newstate, thread_state_ex newstate_ex, 
+        thread_state_enum wake_timer_thread (thread_id_type id, 
+            thread_state_enum newstate, thread_state_ex_enum newstate_ex, 
             thread_id_type timer_id);
 
         /// This thread function initiates the required set_state action (on 
         /// behalf of one of the threadmanager#set_state functions).
         template <typename TimeType>
-        thread_state at_timer (TimeType const& expire, thread_id_type id, 
-            thread_state newstate, thread_state_ex newstate_ex);
+        thread_state_enum at_timer (TimeType const& expire, thread_id_type id, 
+            thread_state_enum newstate, thread_state_ex_enum newstate_ex);
 
     public:
         static std::size_t get_thread_num();

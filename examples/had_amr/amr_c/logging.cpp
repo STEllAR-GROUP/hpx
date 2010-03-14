@@ -11,6 +11,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server
 {
+    logging::mutex_type logging::mtx_ = logging::mutex_type("logging");
+
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
     // Compute the result value for the current time step
@@ -18,7 +20,6 @@ namespace hpx { namespace components { namespace amr { namespace server
     {
         mutex_type::scoped_lock l(mtx_);
 
-        int i;
         if ( par.output_stdout == 1 && val.iter_ == 0 ) {
           if (fmod(val.timestep_,par.output) < 1.e-6) {
             std::cout << " AMR Level: " << val.level_ 

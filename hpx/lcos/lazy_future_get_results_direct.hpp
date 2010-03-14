@@ -43,7 +43,7 @@
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid.get_gid(), addr)) {
+        if (hpx::applier::get_applier().address_is_local(gid, addr)) {
             // local, direct execution
             BOOST_ASSERT(components::types_are_compatible(addr.type_, 
                 components::get_component_type<typename Action::component_type>()));

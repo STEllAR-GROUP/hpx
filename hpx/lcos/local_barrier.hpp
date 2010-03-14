@@ -80,8 +80,8 @@ namespace hpx { namespace lcos
                 local_barrier_queue_entry e(id);
 
                 // mark the thread as suspended before adding to the queue
-                reinterpret_cast<threads::thread*>(id)->
-                    set_state(threads::marked_for_suspension);
+//                 reinterpret_cast<threads::thread*>(id)->
+//                     set_state(threads::marked_for_suspension);
                 queue_.push_back(e);
 
                 util::unlock_the_lock<mutex_type::scoped_lock> ul(l);

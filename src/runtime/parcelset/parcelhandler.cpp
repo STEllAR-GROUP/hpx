@@ -134,7 +134,7 @@ namespace hpx { namespace parcelset
 
         // add parcel to incoming parcel queue
         parcels_.add_parcel(p);
-        return threads::terminated;
+        return threads::thread_state(threads::terminated);
     }
 
     bool parcelhandler::get_remote_prefixes(

@@ -37,7 +37,8 @@ namespace hpx { namespace threads
     ///                   the thread as soon as its not active anymore. The
     ///                   function returns \a thread_state#active in this case. 
     HPX_API_EXPORT thread_state set_thread_state(thread_id_type id, 
-        thread_state state = pending, thread_state_ex stateex = wait_signaled);
+        thread_state_enum state = pending, 
+        thread_state_ex_enum stateex = wait_signaled);
 
     ///////////////////////////////////////////////////////////////////////
     /// \brief  Set the thread state of the \a thread referenced by the 
@@ -57,7 +58,8 @@ namespace hpx { namespace threads
     /// \returns
     HPX_API_EXPORT thread_id_type set_thread_state(thread_id_type id, 
         boost::posix_time::ptime const& at_time, 
-        thread_state state = pending, thread_state_ex stateex = wait_timeout);
+        thread_state_enum state = pending, 
+        thread_state_ex_enum stateex = wait_timeout);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief  Set the thread state of the \a thread referenced by the 
@@ -77,7 +79,8 @@ namespace hpx { namespace threads
     /// \returns
     HPX_API_EXPORT thread_id_type set_thread_state(thread_id_type id, 
         boost::posix_time::time_duration const& after_duration,
-        thread_state state = pending, thread_state_ex stateex = wait_timeout);
+        thread_state_enum state = pending, 
+        thread_state_ex_enum stateex = wait_timeout);
 
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_thread_description is part of the thread related API 

@@ -18,6 +18,7 @@
 #include <boost/coroutine/coroutine.hpp>
 #include <hpx/config.hpp>
 #include <hpx/util/unused.hpp>
+#include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 
 /// \namespace hpx
 ///
@@ -122,11 +123,11 @@ namespace hpx
         class HPX_API_EXPORT threadmanager_impl;
 
         ///////////////////////////////////////////////////////////////////////
-        /// \enum thread_state
+        /// \enum thread_state_enum
         ///
-        /// The thread_state enumerator encodes the current state of a \a 
-        /// thread instance
-        enum thread_state
+        /// The \a thread_state_enum enumerator encodes the current state of a 
+        /// \a thread instance
+        enum thread_state_enum
         {
             unknown = -1,
             init = 0,       ///< thread is initializing
@@ -145,21 +146,25 @@ namespace hpx
                             ///< manager)
             terminated = 6  ///< thread has been stopped an may be garbage 
                             ///< collected
-
         };
-        HPX_API_EXPORT char const* const get_thread_state_name(thread_state state);
+
+        typedef threads::detail::tagged_thread_state<thread_state_enum> thread_state;
+
+        HPX_API_EXPORT char const* const get_thread_state_name(thread_state_enum state);
 
         ///////////////////////////////////////////////////////////////////////
-        /// \enum thread_state_ex
+        /// \enum thread_state_ex_enum
         ///
-        enum thread_state_ex
+        enum thread_state_ex_enum
         {
             wait_unknown = -1,
             wait_signaled = 0,  ///< The thread has been signaled
             wait_timeout = 1,   ///< The thread has been reactivated after a timeout
         };
 
-        typedef thread_state thread_function_type(thread_state_ex);
+        typedef threads::detail::tagged_thread_state<thread_state_ex_enum> thread_state_ex;
+
+        typedef thread_state_enum thread_function_type(thread_state_ex_enum);
 
         ///////////////////////////////////////////////////////////////////////
         typedef boost::coroutines::static_coroutine<

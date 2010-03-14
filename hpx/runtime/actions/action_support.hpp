@@ -211,7 +211,7 @@ namespace hpx { namespace actions
         /// continuations using the result value obtained from the execution
         /// of the original thread function.
         template <typename Func>
-        static threads::thread_state 
+        static threads::thread_state_enum 
         continuation_thread_function_void(continuation_type cont, 
             boost::tuple<Func> func)
         {
@@ -235,7 +235,7 @@ namespace hpx { namespace actions
         {
             // we need to assign the address of the thread function to a 
             // variable to  help the compiler to deduce the function type
-            threads::thread_state (*f)(continuation_type, boost::tuple<Func>) =
+            threads::thread_state_enum (*f)(continuation_type, boost::tuple<Func>) =
                 &action::continuation_thread_function_void;
 
             // The following bind constructs the wrapped thread function
@@ -253,7 +253,7 @@ namespace hpx { namespace actions
         /// continuations using the result value obtained from the execution
         /// of the original thread function.
         template <typename Func>
-        static threads::thread_state 
+        static threads::thread_state_enum 
         continuation_thread_function(continuation_type cont, 
             boost::tuple<Func> func)
         {
@@ -276,7 +276,7 @@ namespace hpx { namespace actions
         {
             // we need to assign the address of the thread function to a 
             // variable to  help the compiler to deduce the function type
-            threads::thread_state (*f)(continuation_type, boost::tuple<Func>) =
+            threads::thread_state_enum (*f)(continuation_type, boost::tuple<Func>) =
                 &action::continuation_thread_function;
 
             // The following bind constructs the wrapped thread function

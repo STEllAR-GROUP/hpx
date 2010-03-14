@@ -192,7 +192,7 @@ namespace hpx
         // now, execute the user supplied thread function
         if (!func.empty()) 
             result = func();
-        return threads::terminated;
+        return threads::thread_state(threads::terminated);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy> 

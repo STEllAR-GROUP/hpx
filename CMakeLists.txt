@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Hartmut Kaiser
+# Copyright (c) 2007-2010 Hartmut Kaiser
 # Copyright (c) 2007-2008 Chirag Dekate
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
@@ -52,7 +52,8 @@ set(Boost_COMPONENTS_NEEDED
     thread)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_ADDITIONAL_VERSIONS 
-    "1.43.0", "1.43", "1.42.0", "1.42", "1.41.0", "1.41", "1.40.0", "1.40", "1.39.0" "1.39")
+    "1.43.0" "1.43" "1.42.0" "1.42" "1.41.0" "1.41" "1.40.0" "1.40" 
+    "1.39.0" "1.39")
 
 find_package(Boost 1.33.1 COMPONENTS ${Boost_COMPONENTS_NEEDED})
 

@@ -53,7 +53,7 @@ namespace hpx { namespace applier
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid.get_gid(), addr)) 
+        if (hpx::applier::get_applier().address_is_local(gid, addr)) 
             return apply_l<Action>(addr);   // apply locally
 
         // apply remotely
@@ -109,7 +109,7 @@ namespace hpx { namespace applier
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid.get_gid(), addr)) 
+        if (hpx::applier::get_applier().address_is_local(gid, addr)) 
             return apply_l<Action>(c, addr);
 
         // apply remotely
@@ -201,7 +201,7 @@ namespace hpx { namespace applier
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid.get_gid(), addr)) 
+        if (hpx::applier::get_applier().address_is_local(gid, addr)) 
             return apply_l<Action>(addr, arg0);   // apply locally
 
         // apply remotely
@@ -255,7 +255,7 @@ namespace hpx { namespace applier
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid.get_gid(), addr)) 
+        if (hpx::applier::get_applier().address_is_local(gid, addr)) 
             return apply_l<Action>(c, addr, arg0);    // apply locally
 
         // apply remotely

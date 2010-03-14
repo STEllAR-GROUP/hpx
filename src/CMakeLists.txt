@@ -191,8 +191,9 @@ set (hpxlib_threadmanager_HEADERS
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread_helpers.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread_init_data.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/threadmanager.hpp
-    ${hpx_SOURCE_DIR}/hpx/runtime/threads/threadmanager_impl.hpp)
-source_group("Header Files\\runtime\\threadmanager" 
+    ${hpx_SOURCE_DIR}/hpx/runtime/threads/threadmanager_impl.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/threads/detail/tagged_thread_state.hpp)
+source_group("Header Files\\runtime\\threads" 
     FILES ${hpxlib_threadmanager_HEADERS})
 
 set (hpxlib_threadmanager_policies_HEADERS
@@ -200,7 +201,7 @@ set (hpxlib_threadmanager_policies_HEADERS
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/policies/global_queue_scheduler.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/policies/local_queue_scheduler.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/threads/policies/thread_queue.hpp)
-source_group("Header Files\\runtime\\threadmanager\\policies" 
+source_group("Header Files\\runtime\\threads\\policies" 
     FILES ${hpxlib_threadmanager_policies_HEADERS})
 
 # util
@@ -348,7 +349,7 @@ source_group ("Source Files\\runtime\\parcelset"
 set (hpxlib_threadmanager_SOURCES
     ${hpx_SOURCE_DIR}/src/runtime/threads/thread.cpp
     ${hpx_SOURCE_DIR}/src/runtime/threads/threadmanager.cpp)
-source_group ("Source Files\\runtime\\threadmanager" 
+source_group ("Source Files\\runtime\\threads" 
     FILES ${hpxlib_threadmanager_SOURCES})
 
 # util 

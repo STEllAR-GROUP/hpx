@@ -180,8 +180,8 @@ namespace hpx { namespace lcos { namespace detail
             queue_entry e(id);
 
             // mark the thread as suspended before adding to the queue
-            reinterpret_cast<threads::thread*>(id)->
-                set_state(threads::marked_for_suspension);
+//             reinterpret_cast<threads::thread*>(id)->
+//                 set_state(threads::marked_for_suspension);
             queue_.push_back(e);
             util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
 
@@ -192,7 +192,7 @@ namespace hpx { namespace lcos { namespace detail
             // if this timed out, return true
             return threads::wait_timeout == self.yield(threads::suspended);
             // queue_entry goes out of scope (removes itself 
-            // from the list, acquiring the unlocked mutex before 
+            // from the list, re-acquiring the unlocked mutex before 
             // doing so)
         }
 

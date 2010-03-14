@@ -20,6 +20,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 #include <hpx/lcos/base_lco.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -34,10 +35,10 @@ namespace hpx { namespace threads { namespace detail
 
     public:
         thread(thread_init_data const& init_data, thread_id_type id, 
-               thread_state newstate)
+               thread_state_enum newstate)
           : coroutine_(init_data.func, id), 
-            current_state_(newstate), 
-            current_state_ex_(wait_signaled),
+            current_state_(thread_state(newstate)), 
+            current_state_ex_(thread_state_ex(wait_signaled)),
             description_(init_data.description), 
             parent_thread_id_(init_data.parent_id),
             parent_locality_prefix_(init_data.parent_prefix),
@@ -74,71 +75,78 @@ namespace hpx { namespace threads { namespace detail
         static components::component_type get_component_type();
         static void set_component_type(components::component_type);
 
-        thread_state execute()
+        thread_state_enum execute()
         {
-            thread_state_ex current_state_ex = get_state_ex();
-            current_state_ex_.store(wait_signaled, boost::memory_order_release);
+            thread_state_ex_enum current_state_ex = get_state_ex();
+            set_state_ex(wait_signaled);
             return coroutine_(current_state_ex);
         }
 
         thread_state get_state() const 
         {
-            using namespace boost::lockfree;
-            return static_cast<thread_state>(
-                current_state_.load(boost::memory_order_acquire));
+            return current_state_.load(boost::memory_order_acquire);
         }
 
-        thread_state set_state(thread_state newstate)
+        thread_state set_state(thread_state_enum newstate)
         {
-            using namespace boost::lockfree;
+            thread_state prev_state = current_state_.load(boost::memory_order_acquire);
             for (;;) {
-                boost::uint32_t prev_state = current_state_;
+                thread_state tmp = prev_state;
+
+                using boost::lockfree::likely;
                 if (likely(current_state_.compare_exchange_strong(
-                        prev_state, newstate)))
+                        tmp, thread_state(newstate, tmp.get_tag() + 1))))
                 {
-                    return static_cast<thread_state>(prev_state);
+                    return prev_state;
                 }
+                prev_state = tmp;
             }
         }
 
-        thread_state set_state(thread_state newstate, thread_state old_state)
+        thread_state set_state_tagged(thread_state_enum newstate, 
+            thread_state& new_tagged_state)
         {
-            using namespace boost::lockfree;
-            boost::uint32_t old_state_long = old_state;
-            if (likely(current_state_.compare_exchange_strong(
-                    old_state_long, newstate)))
-            {
-                return old_state;
-            }
+            thread_state prev_state = current_state_.load(boost::memory_order_acquire);
+            for (;;) {
+                thread_state tmp = prev_state;
+                new_tagged_state = thread_state(newstate, tmp.get_tag() + 1);
 
-            boost::int32_t current_state = 
-                current_state_.load(boost::memory_order_acquire);
-            if (current_state != marked_for_suspension &&
-                newstate != terminated)
-            {
-                BOOST_ASSERT(false);    // this shouldn't happen!
-                return static_cast<thread_state>(current_state);
+                using boost::lockfree::likely;
+                if (likely(current_state_.compare_exchange_strong(tmp, new_tagged_state)))
+                {
+                    return prev_state;
+                }
+
+                prev_state = tmp;
             }
-            return set_state(newstate);
+        }
+
+        bool restore_state(thread_state_enum new_state, thread_state old_state)
+        {
+            return current_state_.compare_exchange_strong(
+                old_state, thread_state(new_state, old_state.get_tag() + 1));
         }
 
         thread_state_ex get_state_ex() const 
         {
-            using namespace boost::lockfree;
-            return static_cast<thread_state_ex>(
-                current_state_ex_.load(boost::memory_order_acquire));
+            return current_state_ex_.load(boost::memory_order_acquire);
         }
 
-        thread_state_ex set_state_ex(thread_state_ex newstate_ex)
+        thread_state_ex set_state_ex(thread_state_ex_enum new_state)
         {
-            using namespace boost::lockfree;
+            thread_state_ex prev_state = 
+                current_state_ex_.load(boost::memory_order_acquire);
+
             for (;;) {
-                boost::uint32_t prev_state = current_state_ex_;
+                thread_state_ex tmp = prev_state;
+
+                using boost::lockfree::likely;
                 if (likely(current_state_ex_.compare_exchange_strong(
-                        prev_state, newstate_ex)))
+                        tmp, thread_state_ex(new_state, tmp.get_tag() + 1))))
                 {
-                    return static_cast<thread_state_ex>(prev_state);
+                    return prev_state;
                 }
+                prev_state = tmp;
             }
         }
 
@@ -199,8 +207,8 @@ namespace hpx { namespace threads { namespace detail
     private:
         coroutine_type coroutine_;
         // the state is stored as a boost::int32_t to allow to use CAS
-        mutable boost::atomic_uint32_t current_state_;
-        mutable boost::atomic_uint32_t current_state_ex_;
+        mutable boost::atomic<thread_state> current_state_;
+        mutable boost::atomic<thread_state_ex> current_state_ex_;
 
         // all of the following is debug/logging support information
         char const* const description_;
@@ -260,7 +268,8 @@ namespace hpx { namespace threads
         ///                 \a thread will be associated with.
         /// \param newstate [in] The initial thread state this instance will
         ///                 be initialized with.
-        thread(thread_init_data const& init_data, thread_state new_state = init)
+        thread(thread_init_data const& init_data, 
+                thread_state_enum new_state = init)
           : base_type(new detail::thread(init_data, This(), new_state))
         {
             LTM_(debug) << "thread::thread(" << this << "), description(" 
@@ -328,7 +337,7 @@ namespace hpx { namespace threads
         thread_state get_state() const 
         {
             detail::thread const* t = get();
-            return t ? t->get_state() : terminated;
+            return t ? t->get_state() : thread_state(terminated);
         }
 
         /// The set_state function allows to change the state of this thread 
@@ -336,7 +345,7 @@ namespace hpx { namespace threads
         ///
         /// \param newstate [in] The new state to be set for the thread.
         ///
-        /// \note           This function will be seldom used directly. Most of 
+        /// \note           This function will be seldomly used directly. Most of 
         ///                 the time the state of a thread will have to be 
         ///                 changed using the threadmanager. Moreover,
         ///                 changing the thread state using this function does
@@ -344,13 +353,27 @@ namespace hpx { namespace threads
         ///                 thread's status word. To change the thread's 
         ///                 scheduling status \a threadmanager#set_state should
         ///                 be used.
-        thread_state set_state(thread_state new_state)
+        thread_state set_state(thread_state_enum new_state)
         {
             detail::thread* t = get();
-            return t ? t->set_state(new_state) : terminated;
+            return t ? t->set_state(new_state) : thread_state(terminated);
         }
 
         /// The set_state function allows to change the state of this thread 
+        /// instance.
+        ///
+        /// \param newstate [in] The new state to be set for the thread.
+        /// \param new_tagged_state [out] will hold the new fully tagged state
+        thread_state set_state_tagged(thread_state_enum new_state, 
+            thread_state& new_tagged_state)
+        {
+            detail::thread* t = get();
+            return t ? 
+                t->set_state_tagged(new_state, new_tagged_state) : 
+                thread_state(terminated);
+        }
+
+        /// The restore_state function allows to change the state of this thread 
         /// instance depending on its current state. It will change the state
         /// atomically only if the current state is still the same as passed
         /// as the second parameter. Otherwise it won't touch the thread state
@@ -358,9 +381,9 @@ namespace hpx { namespace threads
         ///
         /// \param newstate [in] The new state to be set for the thread.
         /// \param oldstate [in] The old state of the thread which still has to
-        ///                 be teh current state.
+        ///                 be the current state.
         ///
-        /// \note           This function will be seldom used directly. Most of 
+        /// \note           This function will be seldomly used directly. Most of 
         ///                 the time the state of a thread will have to be 
         ///                 changed using the threadmanager. Moreover,
         ///                 changing the thread state using this function does
@@ -368,10 +391,13 @@ namespace hpx { namespace threads
         ///                 thread's status word. To change the thread's 
         ///                 scheduling status \a threadmanager#set_state should
         ///                 be used.
-        thread_state set_state(thread_state new_state, thread_state old_state)
+        ///
+        /// \returns This function returns \a true if the state has been 
+        ///          changed successfully
+        bool restore_state(thread_state_enum newstate, thread_state oldstate)
         {
             detail::thread* t = get();
-            return t ? t->set_state(new_state, old_state) : terminated;
+            return t ? t->restore_state(newstate, oldstate) : false;
         }
 
         /// The get_state_ex function allows to query the extended state of 
@@ -388,7 +414,7 @@ namespace hpx { namespace threads
         thread_state_ex get_state_ex() const 
         {
             detail::thread const* t = get();
-            return t ? t->get_state_ex() : wait_unknown;
+            return t ? t->get_state_ex() : thread_state_ex(wait_unknown);
         }
 
         /// The set_state function allows to change the extended state of this 
@@ -400,10 +426,10 @@ namespace hpx { namespace threads
         /// \note           This function will be seldom used directly. Most of 
         ///                 the time the state of a thread will have to be 
         ///                 changed using the threadmanager. 
-        thread_state_ex set_state_ex(thread_state_ex new_state)
+        thread_state_ex set_state_ex(thread_state_ex_enum new_state)
         {
             detail::thread* t = get();
-            return t ? t->set_state_ex(new_state) : wait_unknown;
+            return t ? t->set_state_ex(new_state) : thread_state_ex(wait_unknown);
         }
 
         /// \brief Execute the thread function
@@ -412,10 +438,10 @@ namespace hpx { namespace threads
         ///                 should be scheduled from this point on. The thread
         ///                 manager will use the returned value to set the 
         ///                 thread's scheduling status.
-        thread_state operator()()
+        thread_state_enum operator()()
         {
             detail::thread* t = get();
-            return t ? t->execute() : terminated;
+            return t ? t->execute() : thread_state(terminated);
         }
 
         /// \brief Get the (optional) description of this thread

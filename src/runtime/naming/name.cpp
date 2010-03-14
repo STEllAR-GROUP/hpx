@@ -58,7 +58,8 @@ namespace hpx { namespace naming
                 // once it is executed.
                 error_code ec;
                 applier::register_work(boost::bind(decrement_refcnt, p), 
-                    "decrement global gid reference count", threads::pending, ec);
+                    "decrement global gid reference count", 
+                    threads::thread_state(threads::pending), ec);
                 if (ec) 
                 {
                     // if we are not able to spawn a new thread, we need to execute 
@@ -77,7 +78,74 @@ namespace hpx { namespace naming
         {
             delete p;   // delete local gid representation only
         }
-    }
+
+        bool id_type_impl::is_local_cached() const
+        {
+            applier::applier& appl = applier::get_applier();
+            gid_type::mutex_type::scoped_lock l(this);
+            return address_ ? address_.locality_ == appl.here() : false;
+        }
+
+        bool id_type_impl::is_local()
+        {
+            bool valid = false;
+            {
+                gid_type::mutex_type::scoped_lock l(this);
+                valid = address_ ? true : false;
+            }
+
+            if (!valid && !resolve()) 
+                return false;
+
+            applier::applier& appl = applier::get_applier();
+            return address_.locality_ == appl.here();
+        }
+
+        bool id_type_impl::resolve(naming::address& addr)
+        {
+            bool valid = false;
+            {
+                gid_type::mutex_type::scoped_lock l(this);
+                valid = address_ ? true : false;
+            }
+
+            // if it already has been resolved, just return the address
+            if (valid || resolve()) {
+                addr = address_;
+                return true;
+            }
+            return false;
+        }
+
+        bool id_type_impl::resolve()
+        {
+            // call only if not already resolved
+
+            applier::applier& appl = applier::get_applier();
+            if (strip_credit_from_gid(this->get_msb()) == appl.get_prefix().get_msb())
+            {
+                // a zero address references the local runtime support component
+                gid_type::mutex_type::scoped_lock l(this);
+                if (0 != this->get_lsb())
+                    address_ = this->get_lsb();
+                else 
+                    address_ = appl.get_runtime_support_gid().get_lsb();
+
+                address_.locality_ = appl.here();
+                return true;
+            }
+
+            error_code ec;
+            address addr;
+            if (appl.get_agas_client().resolve(*this, addr, true, ec) && !ec)
+            {
+                gid_type::mutex_type::scoped_lock l(this);
+                address_ = addr;
+                return true;
+            }
+            return false;
+        }
+    }   // detail
 
     template <class Archive>
     void id_type::save(Archive & ar, const unsigned int version) const

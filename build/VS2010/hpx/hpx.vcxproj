@@ -217,6 +217,7 @@
     <ClInclude Include="..\..\..\hpx\runtime\components\constructor_argument.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\naming\bulk_resolver_client.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\naming\detail\resolver_do_undo.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\detail\tagged_thread_state.hpp" />
     <ClInclude Include="..\..\..\hpx\version.hpp" />
     <ClInclude Include="..\..\..\hpx\util\asio_util.hpp" />
     <ClInclude Include="..\..\..\hpx\util\block_profiler.hpp" />

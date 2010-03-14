@@ -57,7 +57,7 @@ namespace hpx { namespace threads { namespace policies
         // create a new thread and schedule it if the initial state is equal to 
         // pending
         thread_id_type create_thread(thread_init_data& data, 
-            thread_state initial_state, bool run_now, error_code& ec,
+            thread_state_enum initial_state, bool run_now, error_code& ec,
             std::size_t num_thread = std::size_t(-1))
         {
             return queue_.create_thread(data, initial_state, run_now, ec);
@@ -93,9 +93,10 @@ namespace hpx { namespace threads { namespace policies
         /// manager to allow for maintenance tasks to be executed in the 
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
-        bool wait_or_add_new(std::size_t num_thread, bool running)
+        bool wait_or_add_new(std::size_t num_thread, bool running,
+            std::size_t& idle_loop_count)
         {
-            return queue_.wait_or_add_new(num_thread, running);
+            return queue_.wait_or_add_new(num_thread, running, idle_loop_count);
         }
 
         /// This function gets called by the threadmanager whenever new work

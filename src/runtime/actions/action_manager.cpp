@@ -61,12 +61,14 @@ namespace hpx { namespace actions
             // direct execution of the action
                 if (!cont) {
                 // no continuation is to be executed
-                    act->get_thread_function(lva)(threads::wait_signaled);
+                    act->get_thread_function(lva)(
+                        threads::thread_state_ex(threads::wait_signaled));
                 }
                 else {
                 // this parcel carries a continuation, we execute a wrapper
                 // handling all related functionality
-                    act->get_thread_function(cont, lva)(threads::wait_signaled);
+                    act->get_thread_function(cont, lva)(
+                        threads::thread_state_ex(threads::wait_signaled));
                 }
             }
             else {
@@ -77,7 +79,8 @@ namespace hpx { namespace actions
                 // and the local-virtual address with the TM only
                     threads::thread_init_data data;
                     appl_.get_thread_manager().register_work(
-                        act->get_thread_init_data(lva, data), threads::pending);
+                        act->get_thread_init_data(lva, data), 
+                        threads::thread_state(threads::pending));
                 }
                 else {
                 // this parcel carries a continuation, register a wrapper which
@@ -86,7 +89,7 @@ namespace hpx { namespace actions
                     threads::thread_init_data data;
                     appl_.get_thread_manager().register_work(
                         act->get_thread_init_data(cont, lva, data),
-                        threads::pending);
+                        threads::thread_state(threads::pending));
                 }
             }
         }

@@ -173,7 +173,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             if (timesteps_to_go < 0 && !is_called) {
                 // exit immediately, 'this' might have been destructed already
                 free_helper_sync(value_gid_to_be_freed);
-                return threads::terminated;
+                return threads::thread_state(threads::terminated);
             }
 
             // Wait for all output threads to have read the current value.
@@ -205,7 +205,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             sem_result_.signal();         // final result has been set
         free_helper_sync(value_gid_to_be_freed);
 
-        return threads::terminated;
+        return threads::thread_state(threads::terminated);
     }
 
     ///////////////////////////////////////////////////////////////////////////

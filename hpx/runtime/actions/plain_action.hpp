@@ -82,7 +82,8 @@ namespace hpx { namespace actions
         /// function of a thread. It encapsulates the execution of the 
         /// original function (given by \a func), while ignoring the return 
         /// value.
-        static threads::thread_state thread_function(threads::thread_state_ex)
+        static threads::thread_state_enum 
+        thread_function(threads::thread_state_ex_enum)
         {
             F();      // call the function, ignoring the return value
             return threads::terminated;
@@ -318,7 +319,8 @@ namespace hpx { namespace actions
         /// function of a thread. It encapsulates the execution of the 
         /// original function (given by \a func), while ignoring the return 
         /// value.
-        static threads::thread_state thread_function(threads::thread_state_ex)
+        static threads::thread_state_enum 
+        thread_function(threads::thread_state_ex_enum)
         {
             F();      // just call the function
             return threads::terminated;

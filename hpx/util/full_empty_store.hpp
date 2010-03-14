@@ -145,8 +145,8 @@ namespace hpx { namespace util { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // mark the thread as suspended before adding to the queue
-                reinterpret_cast<threads::thread*>(id)->
-                    set_state(threads::marked_for_suspension);
+//                 reinterpret_cast<threads::thread*>(id)->
+//                     set_state(threads::marked_for_suspension);
 
                 // enqueue the request and block this thread
                 queue_entry f(id);
@@ -172,8 +172,8 @@ namespace hpx { namespace util { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // mark the thread as suspended before adding to the queue
-                reinterpret_cast<threads::thread*>(id)->
-                    set_state(threads::marked_for_suspension);
+//                 reinterpret_cast<threads::thread*>(id)->
+//                     set_state(threads::marked_for_suspension);
 
                 // enqueue the request and block this thread
                 queue_entry f(id);
@@ -197,8 +197,8 @@ namespace hpx { namespace util { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // mark the thread as suspended before adding to the queue
-                reinterpret_cast<threads::thread*>(id)->
-                    set_state(threads::marked_for_suspension);
+//                 reinterpret_cast<threads::thread*>(id)->
+//                     set_state(threads::marked_for_suspension);
 
                 // enqueue the request and block this thread
                 queue_entry f(id);
@@ -233,8 +233,8 @@ namespace hpx { namespace util { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // mark the thread as suspended before adding to the queue
-                reinterpret_cast<threads::thread*>(id)->
-                    set_state(threads::marked_for_suspension);
+//                 reinterpret_cast<threads::thread*>(id)->
+//                     set_state(threads::marked_for_suspension);
 
                 // enqueue the request and block this thread
                 queue_entry f(id);
@@ -262,8 +262,8 @@ namespace hpx { namespace util { namespace detail
             // block if this entry is already full
             if (state_ == full) {
                 // mark the thread as suspended before adding to the queue
-                reinterpret_cast<threads::thread*>(id)->
-                    set_state(threads::marked_for_suspension);
+//                 reinterpret_cast<threads::thread*>(id)->
+//                     set_state(threads::marked_for_suspension);
 
                 // enqueue the request and block this thread
                 queue_entry f(id);
@@ -292,8 +292,8 @@ namespace hpx { namespace util { namespace detail
             // block if this entry is already full
             if (state_ == full) {
                 // mark the thread as suspended before adding to the queue
-                reinterpret_cast<threads::thread*>(id)->
-                    set_state(threads::marked_for_suspension);
+//                 reinterpret_cast<threads::thread*>(id)->
+//                     set_state(threads::marked_for_suspension);
 
                 // enqueue the request and block this thread
                 queue_entry f(id);

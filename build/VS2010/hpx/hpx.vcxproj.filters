@@ -138,6 +138,9 @@
     <Filter Include="Header Files\LCOs\Stubs">
       <UniqueIdentifier>{2c3a4904-4cd2-451b-afd6-333031b29bad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Runtime\Threads\Detail">
+      <UniqueIdentifier>{5ad0b7af-2e50-473a-8e1f-4314cc4a2a87}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\boost\libs\signals\src\named_slot_map.cpp">
@@ -720,6 +723,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\components\component_registry.hpp">
       <Filter>Header Files\Runtime\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\threads\detail\tagged_thread_state.hpp">
+      <Filter>Header Files\Runtime\Threads\Detail</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

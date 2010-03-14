@@ -37,7 +37,7 @@ namespace hpx { namespace threads
         };
     }
 
-    char const* const get_thread_state_name(thread_state state)
+    char const* const get_thread_state_name(thread_state_enum state)
     {
         if (state < init || state > terminated)
             return "unknown";
@@ -79,7 +79,7 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_id_type threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        register_thread(thread_init_data& data, thread_state initial_state, 
+        register_thread(thread_init_data& data, thread_state_enum initial_state, 
             bool run_now, error_code& ec)
     {
         util::block_profiler_wrapper<register_thread_tag> bp(thread_logger_);
@@ -135,7 +135,7 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::register_work(
-        thread_init_data& data, thread_state initial_state, error_code& ec)
+        thread_init_data& data, thread_state_enum initial_state, error_code& ec)
     {
         util::block_profiler_wrapper<register_work_tag> bp(work_logger_);
 
@@ -188,11 +188,11 @@ namespace hpx { namespace threads
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_state threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_active_state(thread_id_type id, 
-            thread_state newstate, thread_state_ex newstate_ex)
+            thread_state_enum newstate, thread_state_ex_enum newstate_ex)
     {
         // just retry, set_state will create new thread if target is still active
         set_state(id, newstate, newstate_ex);
-        return terminated;
+        return thread_state(terminated);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -200,8 +200,8 @@ namespace hpx { namespace threads
     /// to change the state of one of the threads managed by this threadmanager_impl
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_state threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        set_state(thread_id_type id, thread_state new_state, 
-            thread_state_ex new_state_ex)
+        set_state(thread_id_type id, thread_state_enum new_state, 
+            thread_state_ex_enum new_state_ex)
     {
         util::block_profiler_wrapper<set_state_tag> bp(set_state_logger_);
 
@@ -211,20 +211,20 @@ namespace hpx { namespace threads
             strm << "invalid new state: " << get_thread_state_name(new_state);
             HPX_THROW_EXCEPTION(bad_parameter, 
                 "threadmanager_impl::set_state", HPX_OSSTREAM_GETSTRING(strm));
-            return unknown;
+            return thread_state(unknown);
         }
 
         // we know that the id is actually the pointer to the thread
         thread* thrd = reinterpret_cast<thread*>(id);
         if (NULL == thrd->get())
-            return terminated;     // this thread has been already terminated 
+            return thread_state(terminated);     // this thread has already been terminated 
 
         // action depends on the current state
         thread_state previous_state = thrd->get_state();
 
         // nothing to do here if the state doesn't change
         if (new_state == previous_state)
-            return new_state;
+            return thread_state(new_state);
 
         // the thread to set the state for is currently running, so we 
         // schedule another thread to execute the pending set_state
@@ -245,7 +245,7 @@ namespace hpx { namespace threads
         else if (previous_state == terminated) {
             // If the thread has been terminated while this set_state was 
             // pending nothing has to be done anymore.
-            return terminated;
+            return previous_state;
         }
 
         // If the previous state was pending we are supposed to remove the
@@ -261,10 +261,12 @@ namespace hpx { namespace threads
         // So all what we do here is to set the new state.
         thrd->set_state(new_state);
         thrd->set_state_ex(new_state_ex);
+
         if (new_state == pending) {
             scheduler_.schedule_thread(thrd);
             do_some_work();
         }
+
         return previous_state;
     }
 
@@ -276,7 +278,7 @@ namespace hpx { namespace threads
     {
         // we know that the id is actually the pointer to the thread
         thread* thrd = reinterpret_cast<thread*>(id);
-        return thrd->get() ? thrd->get_state() : terminated;
+        return thrd->get() ? thrd->get_state() : thread_state(terminated);
     }
 
     /// The get_description function is part of the thread related API and 
@@ -294,9 +296,9 @@ namespace hpx { namespace threads
     /// This thread function is used by the at_timer thread below to trigger
     /// the required action.
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    thread_state threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    thread_state_enum threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         wake_timer_thread (thread_id_type id, 
-            thread_state newstate, thread_state_ex newstate_ex, 
+            thread_state_enum newstate, thread_state_ex_enum newstate_ex, 
             thread_id_type timer_id) 
     {
         // first trigger the requested set_state 
@@ -311,9 +313,9 @@ namespace hpx { namespace threads
     /// behalf of one of the threadmanager_impl#set_state functions).
     template <typename SchedulingPolicy, typename NotificationPolicy>
     template <typename TimeType>
-    thread_state threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    thread_state_enum threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         at_timer (TimeType const& expire, thread_id_type id, 
-            thread_state newstate, thread_state_ex newstate_ex)
+            thread_state_enum newstate, thread_state_ex_enum newstate_ex)
     {
         // create a new thread in suspended state, which will execute the 
         // requested set_state when timer fires and will re-awaken this thread, 
@@ -322,7 +324,7 @@ namespace hpx { namespace threads
         thread_id_type self_id = self.get_thread_id();
 
         // mark the thread as suspended before wake thread gets created
-        reinterpret_cast<thread*>(self_id)->set_state(marked_for_suspension);
+//         reinterpret_cast<thread*>(self_id)->set_state(marked_for_suspension);
 
         thread_init_data data(
             boost::bind(&threadmanager_impl::wake_timer_thread, this, id, 
@@ -335,7 +337,7 @@ namespace hpx { namespace threads
 
         // let the timer invoke the set_state on the new (suspended) thread
         t.async_wait(boost::bind(&threadmanager_impl::set_state, this, wake_id, 
-            pending, wait_timeout));
+            thread_state(pending), thread_state_ex(wait_timeout)));
 
         // this waits for the thread to be reactivated when the timer fired
         self.yield(suspended);
@@ -347,12 +349,12 @@ namespace hpx { namespace threads
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_id_type threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_state (time_type const& expire_at, thread_id_type id, 
-            thread_state newstate, thread_state_ex newstate_ex)
+            thread_state_enum newstate, thread_state_ex_enum newstate_ex)
     {
         // this creates a new thread which creates the timer and handles the
         // requested actions
-        thread_state (threadmanager_impl::*f)(time_type const&, 
-                thread_id_type, thread_state, thread_state_ex)
+        thread_state_enum (threadmanager_impl::*f)(time_type const&, 
+                thread_id_type, thread_state_enum, thread_state_ex_enum)
             = &threadmanager_impl::template at_timer<time_type>;
 
         thread_init_data data(
@@ -366,12 +368,12 @@ namespace hpx { namespace threads
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_id_type threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_state (duration_type const& from_now, thread_id_type id, 
-            thread_state newstate, thread_state_ex newstate_ex)
+            thread_state_enum newstate, thread_state_ex_enum newstate_ex)
     {
         // this creates a new thread which creates the timer and handles the
         // requested actions
-        thread_state (threadmanager_impl::*f)(duration_type const&, 
-                thread_id_type, thread_state, thread_state_ex)
+        thread_state_enum (threadmanager_impl::*f)(duration_type const&, 
+                thread_id_type, thread_state_enum, thread_state_ex_enum)
             = &threadmanager_impl::template at_timer<duration_type>;
 
         thread_init_data data(
@@ -395,34 +397,55 @@ namespace hpx { namespace threads
     class switch_status
     {
     public:
-        switch_status (thread* t, thread_state new_state)
+        switch_status (thread* t, thread_state_enum new_state)
             : thread_(t), 
-              prev_state_(t->set_state(new_state)),
-              orig_state_(new_state)
+              prev_state_(t->set_state_tagged(new_state, orig_state_)),
+              stored_state_(false)
         {}
 
         ~switch_status ()
         {
-            thread_->set_state(prev_state_, orig_state_);
+            if (!stored_state_)
+                store_state(prev_state_);
         }
 
         // allow to change the state the thread will be switched to after 
         // execution
-        thread_state operator=(thread_state new_state)
+        thread_state operator=(thread_state_enum new_state)
         {
-            return prev_state_ = new_state;
+            return prev_state_ = thread_state(new_state);
         }
 
-        // allow to compare against the previous state of the thread
-        bool operator== (thread_state rhs)
+        // Get the state this thread was in before execution (usually pending),
+        // this helps making sure no other OS-thread is started to execute this
+        // PX-thread in the meantime.
+        thread_state get_previous() const
         {
-            return prev_state_ == rhs;
+            return prev_state_;
         }
+
+        // This restores the previous state, while making sure that the 
+        // original state has not been changed since we started executing this
+        // thread. The function returns true if the state has been set, false
+        // otherwise.
+        bool store_state(thread_state& newstate)
+        {
+            disable_restore();
+            if (thread_->restore_state(prev_state_, orig_state_)) {
+                newstate = prev_state_;
+                return true;
+            }
+            return false;
+        }
+
+        // disable default handling in destructor
+        void disable_restore() { stored_state_ = true; }
 
     private:
         thread* thread_;
         thread_state prev_state_;
         thread_state orig_state_;
+        bool stored_state_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -572,6 +595,26 @@ namespace hpx { namespace threads
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    inline void write_old_state_log(std::size_t num_thread, thread* thrd, 
+        thread_state state)
+    {
+        LTM_(debug) << "tfunc(" << num_thread << "): "
+                   << "thread(" << thrd->get_thread_id() << "), " 
+                   << "description(" << thrd->get_description() << "), "
+                   << "old state(" << get_thread_state_name(state) << ")";
+    }
+
+    inline void write_new_state_log(std::size_t num_thread, thread* thrd, 
+        thread_state state, char const* info)
+    {
+        LTM_(debug) << "tfunc(" << num_thread << "): "
+                   << "thread(" << thrd->get_thread_id() << "), "
+                   << "description(" << thrd->get_description() << "), "
+                   << "new state(" << get_thread_state_name(state) << "), "
+                   << info;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     std::size_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         tfunc_impl(std::size_t num_thread)
@@ -596,12 +639,15 @@ namespace hpx { namespace threads
                     &scheduler_, num_thread));
         }
 
+        std::size_t idle_loop_count = 0;
+        
         // run the work queue
         boost::coroutines::prepare_main_thread main_thread;
         while (true) {
             // Get the next PX thread from the queue
             thread* thrd = NULL;
             if (scheduler_.get_next_thread(num_thread, &thrd)) {
+                idle_loop_count = 0;
                 tl1.tick();
 
                 // Only pending PX threads will be executed.
@@ -609,10 +655,7 @@ namespace hpx { namespace threads
                 // call for a previously pending PX thread (see comments above).
                 thread_state state = thrd->get_state();
 
-                LTM_(debug) << "tfunc(" << num_thread << "): "
-                           << "thread(" << thrd->get_thread_id() << "), " 
-                           << "description(" << thrd->get_description() << "), "
-                           << "old state(" << get_thread_state_name(state) << ")";
+                write_old_state_log(num_thread, thrd, state);
 
                 if (pending == state) {
                     // switch the state of the thread to active and back to 
@@ -620,7 +663,7 @@ namespace hpx { namespace threads
 
                     {
                         switch_status thrd_stat (thrd, active);
-                        if (thrd_stat == pending) {
+                        if (state == thrd_stat.get_previous()) {
                             // thread returns new required state
                             // store the returned state in the thread
                             tl2.tick();
@@ -628,15 +671,31 @@ namespace hpx { namespace threads
                             tl2.tock();
                             ++num_px_threads;
                         }
-                    }   // this stores the new state in the PX thread
+                        else {
+                            // some other OS-thread got in between and started 
+                            // executing this PX-thread, we just continue with 
+                            // the next one
+                            thrd_stat.disable_restore();
+                            write_new_state_log(num_thread, thrd, state, "no execution");
+                            tl1.tock();
+                            continue;
+                        }
 
-                    // retrieve the new state
-                    state = thrd->get_state();
+                        // store and retrieve the new state in the thread 
+                        if (!thrd_stat.store_state(state)) {
+                            // some other OS-thread got in between and changed 
+                            // the state of this thread, we just continue with 
+                            // the next one
+                            write_new_state_log(num_thread, thrd, state, "no state change");
+                            tl1.tock();
+                            continue;
+                        }
 
-                    LTM_(debug) << "tfunc(" << num_thread << "): "
-                               << "thread(" << thrd->get_thread_id() << "), "
-                               << "description(" << thrd->get_description() << "), "
-                               << "new state(" << get_thread_state_name(state) << ")";
+                        // any exception thrown from the thread will reset its 
+                        // state at this point
+                    }
+
+                    write_new_state_log(num_thread, thrd, state, "normal");
 
                     // Re-add this work item to our list of work items if the PX
                     // thread should be re-scheduled. If the PX thread is suspended 
@@ -664,13 +723,16 @@ namespace hpx { namespace threads
 
                 tl1.tock();
             }
+            else {
+                ++idle_loop_count;
+            }
 
             // if we need to terminate, unregister the counter first
             if (!running_)
                 queue_length_counter.uninstall();
 
             // if nothing else has to be done either wait or terminate
-            if (scheduler_.wait_or_add_new(num_thread, running_))
+            if (scheduler_.wait_or_add_new(num_thread, running_, idle_loop_count))
                 break;
         }
 
