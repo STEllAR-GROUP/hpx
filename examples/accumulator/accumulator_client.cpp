@@ -18,7 +18,7 @@ using namespace std;
 namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
-threads::thread_state hpx_main()
+threads::thread_state_enum hpx_main()
 {
     // get list of all known localities
     std::vector<naming::gid_type> prefixes;
