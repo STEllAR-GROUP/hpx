@@ -82,7 +82,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     Pi  = 0.0;
     Energy = 0.5*r*r*(Pi*Pi + Phi*Phi) - r*r*pow(chi,par.PP+1)/(par.PP+1);
 
-    if ( r < 0.0 ) {
+    if ( floatcmp(r,0.0) == 0 && r < 0.0 ) {
       chi = -99999999.0;
       Phi = -99999999.0;
       Pi  = -99999999.0;
