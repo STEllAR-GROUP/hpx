@@ -269,8 +269,8 @@ namespace hpx { namespace naming
         {
             if (&ec == &throws)
             {
-                HPX_THROW_EXCEPTION(ec.value(), 
-                    "resolver_client::incref", ec.get_message());
+                HPX_RETHROW_EXCEPTION(s, 
+                    "resolver_client::incref", rep.get_error());
                 return -1;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
@@ -297,8 +297,8 @@ namespace hpx { namespace naming
         {
             if (&ec == &throws)
             {
-                HPX_THROW_EXCEPTION(ec.value(), 
-                    "resolver_client::decref", ec.get_message());
+                HPX_RETHROW_EXCEPTION(s, 
+                    "resolver_client::decref", rep.get_error());
                 return -1;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
@@ -347,8 +347,8 @@ namespace hpx { namespace naming
         {
             if (&ec == &throws)
             {
-                HPX_THROW_EXCEPTION(ec.value(), 
-                    "resolver_client::unbind_range", ec.get_message());
+                HPX_RETHROW_EXCEPTION(s, 
+                    "resolver_client::unbind_range", rep.get_error());
                 return false;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
