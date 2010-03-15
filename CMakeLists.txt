@@ -210,6 +210,14 @@ install(
     FILES_MATCHING PATTERN "*.h*"
     REGEX ".svn" EXCLUDE
     REGEX "CMakeFiles" EXCLUDE)
+install(
+    DIRECTORY misc/               # install all hpx build utility files
+    DESTINATION share/cmake 
+    FILES_MATCHING PATTERN "*.cmake"
+    REGEX "hpx_log" EXCLUDE
+    REGEX "pxdm" EXCLUDE
+    REGEX ".svn" EXCLUDE
+    REGEX "CMakeFiles" EXCLUDE)
 
 # install external dependencies
 install(
