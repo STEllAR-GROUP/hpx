@@ -542,6 +542,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                              Array3D &dst_step,Array3D &dst_size,Array3D &src_size)
     {
       int i,j;
+      int counter;
 
       // vcolumn is the destination column number
       // vstep is the destination step (or row) number
@@ -552,22 +553,45 @@ namespace hpx { namespace components { namespace amr { namespace server
 
       // connect outputs for the zeroth row (the zeroth row outputs to the first row *and* the third row)
       vsrc_step.push_back(0);vsrc_column.push_back(0);vstep.push_back(1);vcolumn.push_back(0);vport.push_back(0);
-      vsrc_step.push_back(0);vsrc_column.push_back(0);vstep.push_back(3);vcolumn.push_back(1);vport.push_back(1);
+      vsrc_step.push_back(0);vsrc_column.push_back(0);vstep.push_back(1);vcolumn.push_back(0);vport.push_back(1);
+      vsrc_step.push_back(0);vsrc_column.push_back(0);vstep.push_back(1);vcolumn.push_back(1);vport.push_back(2);
+      vsrc_step.push_back(0);vsrc_column.push_back(0);vstep.push_back(3);vcolumn.push_back(1);vport.push_back(3);
 
       vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(1);vcolumn.push_back(0);vport.push_back(0);
       vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(1);vcolumn.push_back(1);vport.push_back(1);
-      vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(3);vcolumn.push_back(1);vport.push_back(2);
-      vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(3);vcolumn.push_back(2);vport.push_back(3);
+      vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(1);vcolumn.push_back(2);vport.push_back(2);
+      vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(3);vcolumn.push_back(1);vport.push_back(3);
+      vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(3);vcolumn.push_back(2);vport.push_back(4);
 
-      for (i=2;i<15;i++) {
-        vsrc_step.push_back(0);vsrc_column.push_back(i);vstep.push_back(1);vcolumn.push_back(i-2);vport.push_back(0);
-        vsrc_step.push_back(0);vsrc_column.push_back(i);vstep.push_back(1);vcolumn.push_back(i-1);vport.push_back(1);
-        vsrc_step.push_back(0);vsrc_column.push_back(i);vstep.push_back(1);vcolumn.push_back(i  );vport.push_back(2);
+      i = 2;
+      counter = 0;
+      for (j=i-3;j<i+2;j++) {
+        if ( j >= 0 && j <= 14 ) {
+          vsrc_step.push_back(0);vsrc_column.push_back(i);vstep.push_back(1);vcolumn.push_back(j);vport.push_back(counter);
+          counter++;
+        }
+      }
+      i = 2;
+      counter = 4;
+      for (j=i-7;j<i+2;j++) {
+        if ( j > 0 && j < 10 ) {
+          vsrc_step.push_back(0);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(j);vport.push_back(counter);
+          counter++;
+        }
       }
 
-      int counter;
-      for (i=2;i<15;i++) {
-        counter = 3;  // counter starts at 3 because this the first three output ports were already used in the lines above
+      for (i=3;i<14;i++) {
+        counter = 0;
+        for (j=i-3;j<i+2;j++) {
+          if ( j >= 0 && j <= 14 ) {
+            vsrc_step.push_back(0);vsrc_column.push_back(i);vstep.push_back(1);vcolumn.push_back(j);vport.push_back(counter);
+            counter++;
+          }
+        }
+      }
+
+      for (i=3;i<14;i++) {
+        counter = 5;  // counter starts at 5 because this the first three output ports were already used in the lines above
         for (j=i-7;j<i+2;j++) {
           if ( j > 0 && j < 10 ) {
             vsrc_step.push_back(0);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(j);vport.push_back(counter);
@@ -576,18 +600,43 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
       }
 
-      vsrc_step.push_back(0);vsrc_column.push_back(15);vstep.push_back(1);vcolumn.push_back(13);vport.push_back(0);
-      vsrc_step.push_back(0);vsrc_column.push_back(15);vstep.push_back(1);vcolumn.push_back(14);vport.push_back(1);
-      vsrc_step.push_back(0);vsrc_column.push_back(15);vstep.push_back(3);vcolumn.push_back(8);vport.push_back(2);
-      vsrc_step.push_back(0);vsrc_column.push_back(15);vstep.push_back(3);vcolumn.push_back(9);vport.push_back(3);
+      i = 14;
+      counter = 0;
+      for (j=i-3;j<i+2;j++) {
+        if ( j >= 0 && j <= 14 ) {
+          vsrc_step.push_back(0);vsrc_column.push_back(i);vstep.push_back(1);vcolumn.push_back(j);vport.push_back(counter);
+          counter++;
+        }
+      }
+      i = 14;
+      counter = 4;
+      for (j=i-7;j<i+2;j++) {
+        if ( j > 0 && j < 10 ) {
+          vsrc_step.push_back(0);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(j);vport.push_back(counter);
+          counter++;
+        }
+      }
 
-      vsrc_step.push_back(0);vsrc_column.push_back(16);vstep.push_back(1);vcolumn.push_back(14);vport.push_back(0);
-      vsrc_step.push_back(0);vsrc_column.push_back(16);vstep.push_back(3);vcolumn.push_back(9);vport.push_back(1);
+      vsrc_step.push_back(0);vsrc_column.push_back(15);vstep.push_back(1);vcolumn.push_back(12);vport.push_back(0);
+      vsrc_step.push_back(0);vsrc_column.push_back(15);vstep.push_back(1);vcolumn.push_back(13);vport.push_back(1);
+      vsrc_step.push_back(0);vsrc_column.push_back(15);vstep.push_back(1);vcolumn.push_back(14);vport.push_back(2);
+      vsrc_step.push_back(0);vsrc_column.push_back(15);vstep.push_back(3);vcolumn.push_back(8);vport.push_back(3);
+      vsrc_step.push_back(0);vsrc_column.push_back(15);vstep.push_back(3);vcolumn.push_back(9);vport.push_back(4);
+
+      vsrc_step.push_back(0);vsrc_column.push_back(16);vstep.push_back(1);vcolumn.push_back(13);vport.push_back(0);
+      vsrc_step.push_back(0);vsrc_column.push_back(16);vstep.push_back(1);vcolumn.push_back(14);vport.push_back(1);
+      vsrc_step.push_back(0);vsrc_column.push_back(16);vstep.push_back(1);vcolumn.push_back(14);vport.push_back(2);
+      vsrc_step.push_back(0);vsrc_column.push_back(16);vstep.push_back(3);vcolumn.push_back(9);vport.push_back(3);
 
       // connect outputs for the first row (the first row only outputs to the second row)
-      for (i=0;i<15;i++) {
+      i = 0;
+      vsrc_step.push_back(1);vsrc_column.push_back(i);vstep.push_back(2);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(1);vsrc_column.push_back(i);vstep.push_back(2);vcolumn.push_back(0);vport.push_back(1);
+      vsrc_step.push_back(1);vsrc_column.push_back(i);vstep.push_back(2);vcolumn.push_back(1);vport.push_back(2);
+
+      for (i=1;i<14;i++) {
         counter = 0;  
-        for (j=i-2;j<i+1;j++) {
+        for (j=i-3;j<i+2;j++) {
           if ( j >= 0 && j <= 12 ) {
             vsrc_step.push_back(1);vsrc_column.push_back(i);vstep.push_back(2);vcolumn.push_back(j);vport.push_back(counter);
             counter++;
@@ -595,10 +644,20 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
       }
 
+      i = 14;
+      vsrc_step.push_back(1);vsrc_column.push_back(i);vstep.push_back(2);vcolumn.push_back(11);vport.push_back(0);
+      vsrc_step.push_back(1);vsrc_column.push_back(i);vstep.push_back(2);vcolumn.push_back(12);vport.push_back(1);
+      vsrc_step.push_back(1);vsrc_column.push_back(i);vstep.push_back(2);vcolumn.push_back(12);vport.push_back(2);
+
       // connect outputs for the second row (the second row only outputs to the third row)
-      for (i=0;i<13;i++) {
+      i = 0;
+      vsrc_step.push_back(2);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(2);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(0);vport.push_back(1);
+      vsrc_step.push_back(2);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(1);vport.push_back(2);
+    
+      for (i=1;i<12;i++) {
         counter = 0;  
-        for (j=i-2;j<i+1;j++) {
+        for (j=i-3;j<i+2;j++) {
           if ( j >= 0 && j <= 10 ) {
             vsrc_step.push_back(2);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(j);vport.push_back(counter);
             counter++;
@@ -606,45 +665,83 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
       }
 
+      i = 12;
+      vsrc_step.push_back(2);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(9);vport.push_back(0);
+      vsrc_step.push_back(2);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(10);vport.push_back(1);
+      vsrc_step.push_back(2);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(10);vport.push_back(2);
+
       // connect outputs for the third row (the third row outputs to the fourth row *and* the sixth row)
-      vsrc_step.push_back(3);vsrc_column.push_back(0);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(0);vstep.push_back(4);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(0);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(1);
 
       vsrc_step.push_back(3);vsrc_column.push_back(1);vstep.push_back(4);vcolumn.push_back(0);vport.push_back(0);
-      vsrc_step.push_back(3);vsrc_column.push_back(1);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(1);
-      vsrc_step.push_back(3);vsrc_column.push_back(1);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(2);
+      vsrc_step.push_back(3);vsrc_column.push_back(1);vstep.push_back(4);vcolumn.push_back(1);vport.push_back(1);
+      vsrc_step.push_back(3);vsrc_column.push_back(1);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(2);
+      vsrc_step.push_back(3);vsrc_column.push_back(1);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(3);
 
       vsrc_step.push_back(3);vsrc_column.push_back(2);vstep.push_back(4);vcolumn.push_back(0);vport.push_back(0);
       vsrc_step.push_back(3);vsrc_column.push_back(2);vstep.push_back(4);vcolumn.push_back(1);vport.push_back(1);
-      vsrc_step.push_back(3);vsrc_column.push_back(2);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(2);
-      vsrc_step.push_back(3);vsrc_column.push_back(2);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(3);
-      vsrc_step.push_back(3);vsrc_column.push_back(2);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(4);
+      vsrc_step.push_back(3);vsrc_column.push_back(2);vstep.push_back(4);vcolumn.push_back(2);vport.push_back(2);
+      vsrc_step.push_back(3);vsrc_column.push_back(2);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(3);
+      vsrc_step.push_back(3);vsrc_column.push_back(2);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(4);
+      vsrc_step.push_back(3);vsrc_column.push_back(2);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(5);
 
-      for (i=3;i<8;i++) {
-        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-3);vport.push_back(0);
-        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-2);vport.push_back(1);
-        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-1);vport.push_back(2);
+      i = 3;
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(1);vport.push_back(1);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(2);vport.push_back(2);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(3);vport.push_back(3);
 
-        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(3);
-        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(4);
-        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(5);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(4);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(5);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(6);
+
+      for (i=4;i<7;i++) {
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-4);vport.push_back(0);
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-3);vport.push_back(1);
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-2);vport.push_back(2);
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-1);vport.push_back(3);
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i);vport.push_back(4);
+
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(5);
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(6);
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(7);
       }
 
-      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(4);vcolumn.push_back(5);vport.push_back(0);
-      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(4);vcolumn.push_back(6);vport.push_back(1);
-      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(2);
-      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(3);
-      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(4);
+      i = 7;
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-4);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-3);vport.push_back(1);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-2);vport.push_back(2);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-1);vport.push_back(3);
 
-      vsrc_step.push_back(3);vsrc_column.push_back(9);vstep.push_back(4);vcolumn.push_back(6);vport.push_back(0);
-      vsrc_step.push_back(3);vsrc_column.push_back(9);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(1);
-      vsrc_step.push_back(3);vsrc_column.push_back(9);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(2);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(4);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(5);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(6);
 
-      vsrc_step.push_back(3);vsrc_column.push_back(10);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(4);vcolumn.push_back(4);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(4);vcolumn.push_back(5);vport.push_back(1);
+      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(4);vcolumn.push_back(6);vport.push_back(2);
+      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(3);
+      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(4);
+      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(5);
+
+      vsrc_step.push_back(3);vsrc_column.push_back(9);vstep.push_back(4);vcolumn.push_back(5);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(9);vstep.push_back(4);vcolumn.push_back(6);vport.push_back(1);
+      vsrc_step.push_back(3);vsrc_column.push_back(9);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(2);
+      vsrc_step.push_back(3);vsrc_column.push_back(9);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(3);
+
+      vsrc_step.push_back(3);vsrc_column.push_back(10);vstep.push_back(4);vcolumn.push_back(6);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(10);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(1);
 
       // connect outputs for the fourth row (the fourth row only outputs to the fifth row)
-      for (i=0;i<7;i++) {
+      i = 0;
+      vsrc_step.push_back(4);vsrc_column.push_back(i);vstep.push_back(5);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(4);vsrc_column.push_back(i);vstep.push_back(5);vcolumn.push_back(0);vport.push_back(1);
+      vsrc_step.push_back(4);vsrc_column.push_back(i);vstep.push_back(5);vcolumn.push_back(1);vport.push_back(2);
+
+      for (i=1;i<6;i++) {
         counter = 0;  
-        for (j=i-2;j<i+1;j++) {
+        for (j=i-3;j<i+2;j++) {
           if ( j >= 0 && j <= 4 ) {
             vsrc_step.push_back(4);vsrc_column.push_back(i);vstep.push_back(5);vcolumn.push_back(j);vport.push_back(counter);
             counter++;
@@ -652,16 +749,30 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
       }
 
+      i = 6;
+      vsrc_step.push_back(4);vsrc_column.push_back(i);vstep.push_back(5);vcolumn.push_back(3);vport.push_back(0);
+      vsrc_step.push_back(4);vsrc_column.push_back(i);vstep.push_back(5);vcolumn.push_back(4);vport.push_back(1);
+      vsrc_step.push_back(4);vsrc_column.push_back(i);vstep.push_back(5);vcolumn.push_back(4);vport.push_back(2);
+
       // connect outputs for the fifth row (the fifth row only outputs to the sixth row)
-      for (i=0;i<5;i++) {
+      i = 0;
+      vsrc_step.push_back(5);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(5);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(1);
+      vsrc_step.push_back(5);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(2);
+
+      for (i=1;i<4;i++) {
         counter = 0;  
-        for (j=i-2;j<i+1;j++) {
+        for (j=i-3;j<i+2;j++) {
           if ( j >= 0 && j <= 2 ) {
             vsrc_step.push_back(5);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(j);vport.push_back(counter);
             counter++;
           }
         }
       }
+      i = 4;
+      vsrc_step.push_back(5);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(0);
+      vsrc_step.push_back(5);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(1);
+      vsrc_step.push_back(5);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(2);
 
       // connect outputs for the sixth row (the sixth row only outputs to the zeroth row)
       for (i=0;i<6;i++) {

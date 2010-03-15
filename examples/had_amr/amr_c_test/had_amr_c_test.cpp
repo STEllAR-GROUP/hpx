@@ -111,9 +111,16 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
   had_double_type dx = par.dx0/pow(2.0,(int) vecval[0]->level_);
 
   // Sanity check
-  if ( floatcmp(vecval[1]->x_ - vecval[0]->x_,dx) == 0 ) {
-    std::cout <<" PROBLEM with dx: "<<  dx << std::endl;
-    return 0;
+  if ( size > 2 ) {
+    if ( floatcmp(vecval[2]->x_ - vecval[1]->x_,dx) == 0 ) {
+      std::cout <<" PROBLEM with dx: "<<  dx << " x[2] " << vecval[2]->x_ << " x[1] " << vecval[1]->x_ << std::endl;
+      return 0;
+    }
+  } else {
+    if ( floatcmp(vecval[1]->x_ - vecval[0]->x_,dx) == 0 ) {
+      std::cout <<" PROBLEM with dx: "<<  dx << " x[1] " << vecval[1]->x_ << " x[0] " << vecval[0]->x_ << std::endl;
+      return 0;
+    }
   }
 
   if ( par.integrator == 0 ) {  // Euler
