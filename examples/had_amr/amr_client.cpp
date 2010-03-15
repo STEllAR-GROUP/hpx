@@ -235,7 +235,7 @@ int main(int argc, char* argv[])
         par.lambda      = 0.15;
         par.nx0         = numvals;
         par.nt0         = numsteps;
-        par.minx0       =  0.0;
+        par.minx0       = -10.0;
         par.maxx0       =  10.0;
         par.ethreshold  =  0.1;
         par.R0          =  8.0;
@@ -307,6 +307,10 @@ int main(int argc, char* argv[])
                 std::string tmp = sec->get_entry("maxx0");
                 par.maxx0 = atof(tmp.c_str());
               }
+              if ( sec->has_entry("minx0") ) {
+                std::string tmp = sec->get_entry("minx0");
+                par.minx0 = atof(tmp.c_str());
+              }
               if ( sec->has_entry("ethreshold") ) {
                 std::string tmp = sec->get_entry("ethreshold");
                 par.ethreshold = atof(tmp.c_str());
@@ -333,12 +337,6 @@ int main(int argc, char* argv[])
         // derived parameters
         par.dx0 = (par.maxx0 - par.minx0)/(par.nx0-1);
         par.dt0 = par.lambda*par.dx0;
-
-        // adjust domain so that there are 4 ghost zones to the left of minx0, which is always r=0 
-        // so you can refine at r=0
-        par.minx0 = par.minx0 - 4.*par.dx0;
-        par.maxx0 = par.maxx0 - 4.*par.dx0;
-
         if ( par.allowedl > 0 ) {
           if ( par.linearbounds == 1 ) {
             if ( par.integrator == 0 ) {
@@ -365,8 +363,7 @@ int main(int argc, char* argv[])
         if ( par.integrator == 1 ) {
           numsteps *= 3;  // three subcycles each step
 
-          // the ensures was always use rk_mesh instead of amr_mesh.
-          // rk_mesh has the special BC implemented in it which we need for this problem.
+          // TEST -- FIX LATER
           par.coarsestencilsize = par.stencilsize + 6;
         }
 

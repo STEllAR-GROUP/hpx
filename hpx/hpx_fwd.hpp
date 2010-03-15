@@ -129,18 +129,15 @@ namespace hpx
         /// \a thread instance
         enum thread_state_enum
         {
-            unknown = -1,
-            init = 0,       ///< thread is initializing
-            active = 1,     ///< thread is currently active (running,
+            unknown = 0,
+            init = 1,       ///< thread is initializing
+            active = 2,     ///< thread is currently active (running,
                             ///< has resources)
-            pending = 2,    ///< thread is pending (ready to run, but 
+            pending = 3,    ///< thread is pending (ready to run, but 
                             ///< no hardware resource available)
-            suspended = 3,  ///< thread has been suspended (waiting for 
+            suspended = 4,  ///< thread has been suspended (waiting for 
                             ///< synchronization event, but still known 
                             ///< and under control of the threadmanager)
-            marked_for_suspension = 4,  ///< synchronization support: allows
-                            ///< to mark a thread as being suspended while it's
-                            ///< still active
             depleted = 5,   ///< thread has been depleted (deeply 
                             ///< suspended, it is not known to the thread 
                             ///< manager)

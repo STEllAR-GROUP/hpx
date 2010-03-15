@@ -51,11 +51,11 @@ namespace hpx { namespace threads { namespace detail
 
     public:
         ///////////////////////////////////////////////////////////////////////
-        tagged_thread_state() {}
+        tagged_thread_state() : state_(0) {}
 
-        tagged_thread_state(tagged_thread_state const& p)
-          : state_(p.state_)
-        {}
+//         tagged_thread_state(tagged_thread_state const& p)
+//           : state_(p.state_)
+//         {}
 
         explicit tagged_thread_state(T state, int t = 0)
           : state_(pack_state(state, t))
@@ -63,11 +63,11 @@ namespace hpx { namespace threads { namespace detail
 
         ///////////////////////////////////////////////////////////////////////
         /// unsafe set operation
-        tagged_thread_state& operator= (tagged_thread_state const& p)
-        {
-            state_ = p.state_;
-            return *this;
-        }
+//         tagged_thread_state& operator= (tagged_thread_state const& p)
+//         {
+//             state_ = p.state_;
+//             return *this;
+//         }
 
         void set (T state, int t)
         {
@@ -98,7 +98,7 @@ namespace hpx { namespace threads { namespace detail
             state_ = pack_state(state, t);
         }
 
-        operator T() const
+        operator T() const volatile
         {
             return get_state();
         }

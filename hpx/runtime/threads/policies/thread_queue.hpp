@@ -66,14 +66,32 @@ namespace hpx { namespace threads { namespace policies
         {
             typedef boost::ptr_map<thread_id_type, threads::thread> thread_map_type;
 
-            LTM_(error) << "Listing suspended threads while queues are empty:";
+            bool logged_headline = false;
             thread_map_type::const_iterator end = tm.end();
             for (thread_map_type::const_iterator it = tm.begin(); it != end; ++it)
             {
                 threads::thread const* thrd = (*it).second;
-                LTM_(error) << get_thread_state_name(thrd->get_state()) 
-                            << "(" << (*it).first << "): "
-                            << thrd->get_description();
+                threads::thread_state state = thrd->get_state();
+
+                if (state != thrd->get_marked_state()) {
+                    // log each thread only once
+                    if (!logged_headline) {
+                        LTM_(error) << "Listing suspended threads while queues are empty:";
+                        logged_headline = true;
+                    }
+
+                    LTM_(error) << get_thread_state_name(state) 
+                                << "(" << std::hex << std::setw(8) 
+                                    << std::setfill('0') << (*it).first 
+                                << "." << std::hex << std::setw(2) 
+                                    << std::setfill('0') << thrd->get_thread_phase() 
+                                << "/" << std::hex << std::setw(8) 
+                                    << std::setfill('0') << thrd->get_component_id()
+                                << ") P" << std::hex << std::setw(8) 
+                                    << std::setfill('0') << thrd->get_parent_thread_id() 
+                                << ": " << thrd->get_description();
+                    thrd->set_marked_state(state);
+                }
             }
         }
     }
@@ -318,6 +336,7 @@ namespace hpx { namespace threads { namespace policies
         {
             work_items_.enqueue(thrd);
             ++work_items_count_;
+            cond_.notify_all();         // wake up sleeping threads
         }
 
         /// Destroy the passed thread as it has been terminated
@@ -422,6 +441,7 @@ namespace hpx { namespace threads { namespace policies
                     {
                         namespace bpt = boost::posix_time;
                         timed_out = !cond_.timed_wait(lk, bpt::milliseconds(5));
+                        ++idle_loop_count;
                     }
 
                     LTM_(info) << "tfunc(" << num_thread << "): exiting wait";
@@ -449,11 +469,15 @@ namespace hpx { namespace threads { namespace policies
             {
                 threads::thread const* thrd = (*it).second;
                 if (threads::pending == thrd->get_state()) {
-                    LTM_(error) << "reactivating pending thread: " 
+                    LTM_(fatal) << "reactivating pending thread: " 
                                 << get_thread_state_name(thrd->get_state()) 
                                 << "(" << (*it).first << "): "
                                 << thrd->get_description();
+
                     work_items_.enqueue(const_cast<threads::thread*>(thrd));
+                    ++work_items_count_;
+                    cond_.notify_all();         // wake up sleeping threads
+
                     added_one = true;
                 }
             }

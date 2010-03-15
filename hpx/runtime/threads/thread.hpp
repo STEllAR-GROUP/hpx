@@ -42,7 +42,8 @@ namespace hpx { namespace threads { namespace detail
             description_(init_data.description), 
             parent_thread_id_(init_data.parent_id),
             parent_locality_prefix_(init_data.parent_prefix),
-            component_id_(init_data.lva)
+            component_id_(init_data.lva),
+            marked_state_(unknown)
         {
             // store the thread id of the parent thread, mainly for debugging 
             // purposes
@@ -103,22 +104,17 @@ namespace hpx { namespace threads { namespace detail
             }
         }
 
-        thread_state set_state_tagged(thread_state_enum newstate, 
-            thread_state& new_tagged_state)
+        bool set_state_tagged(thread_state_enum newstate, 
+            thread_state& prev_state, thread_state& new_tagged_state)
         {
-            thread_state prev_state = current_state_.load(boost::memory_order_acquire);
-            for (;;) {
-                thread_state tmp = prev_state;
-                new_tagged_state = thread_state(newstate, tmp.get_tag() + 1);
-
-                using boost::lockfree::likely;
-                if (likely(current_state_.compare_exchange_strong(tmp, new_tagged_state)))
-                {
-                    return prev_state;
-                }
-
+            thread_state tmp = prev_state;
+            new_tagged_state = thread_state(newstate, prev_state.get_tag() + 1);
+            if (current_state_.compare_exchange_strong(tmp, new_tagged_state))
+            {
                 prev_state = tmp;
+                return true;
             }
+            return false;
         }
 
         bool restore_state(thread_state_enum new_state, thread_state old_state)
@@ -178,6 +174,15 @@ namespace hpx { namespace threads { namespace detail
             return component_id_;
         }
 
+        void set_marked_state(thread_state mark) const
+        {
+            marked_state_ = mark;
+        }
+        thread_state get_marked_state() const
+        {
+            return marked_state_;
+        }
+
         // threads use a specialized allocator for fast creation/destruction
         static void *operator new(std::size_t size);
         static void operator delete(void *p, std::size_t size);
@@ -206,7 +211,7 @@ namespace hpx { namespace threads { namespace detail
 
     private:
         coroutine_type coroutine_;
-        // the state is stored as a boost::int32_t to allow to use CAS
+
         mutable boost::atomic<thread_state> current_state_;
         mutable boost::atomic<thread_state_ex> current_state_ex_;
 
@@ -215,6 +220,7 @@ namespace hpx { namespace threads { namespace detail
         boost::uint32_t parent_locality_prefix_;
         thread_id_type parent_thread_id_;
         naming::address::address_type const component_id_;
+        mutable thread_state marked_state_;
 
         mutable naming::id_type id_;    // that's our gid
     };
@@ -364,13 +370,13 @@ namespace hpx { namespace threads
         ///
         /// \param newstate [in] The new state to be set for the thread.
         /// \param new_tagged_state [out] will hold the new fully tagged state
-        thread_state set_state_tagged(thread_state_enum new_state, 
-            thread_state& new_tagged_state)
+        bool set_state_tagged(thread_state_enum new_state, 
+            thread_state& prev_state, thread_state& new_tagged_state)
         {
             detail::thread* t = get();
             return t ? 
-                t->set_state_tagged(new_state, new_tagged_state) : 
-                thread_state(terminated);
+                t->set_state_tagged(new_state, prev_state, new_tagged_state) : 
+                false;
         }
 
         /// The restore_state function allows to change the state of this thread 
@@ -449,6 +455,19 @@ namespace hpx { namespace threads
         {
             detail::thread const* t = get();
             return t ? t->get_description() : "<terminated>";
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        void set_marked_state(thread_state mark) const
+        {
+            detail::thread const* t = get();
+            if (t) 
+                t->set_marked_state(mark);
+        }
+        thread_state get_marked_state() const
+        {
+            detail::thread const* t = get();
+            return t ? t->get_marked_state() : thread_state(unknown);
         }
     };
 

@@ -177,12 +177,10 @@ namespace hpx { namespace lcos { namespace detail
 
             // enqueue this thread
             mutex_type::scoped_lock l(this);
-            queue_entry e(id);
 
-            // mark the thread as suspended before adding to the queue
-//             reinterpret_cast<threads::thread*>(id)->
-//                 set_state(threads::marked_for_suspension);
+            queue_entry e(id);
             queue_.push_back(e);
+
             util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
 
             // timeout at the given time, if appropriate

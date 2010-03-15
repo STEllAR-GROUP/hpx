@@ -27,11 +27,11 @@ namespace hpx { namespace threads
     {
         char const* const thread_state_names[] = 
         {
+            "unknown",
             "init",
             "active",
             "pending",
             "suspended",
-            "marked_for_suspension",
             "depleted",
             "terminated"
         };
@@ -221,14 +221,15 @@ namespace hpx { namespace threads
 
         // action depends on the current state
         thread_state previous_state = thrd->get_state();
+        thread_state_enum previous_state_val = previous_state;
 
         // nothing to do here if the state doesn't change
-        if (new_state == previous_state)
+        if (new_state == previous_state_val)
             return thread_state(new_state);
 
         // the thread to set the state for is currently running, so we 
         // schedule another thread to execute the pending set_state
-        if (previous_state == active || previous_state == marked_for_suspension) 
+        if (previous_state_val == active) 
         {
             // schedule a new thread to set the state
             LTM_(warning) << "set_state: " << "thread(" << id << "), "
@@ -242,7 +243,7 @@ namespace hpx { namespace threads
 
             return previous_state;     // done
         }
-        else if (previous_state == terminated) {
+        else if (previous_state_val == terminated) {
             // If the thread has been terminated while this set_state was 
             // pending nothing has to be done anymore.
             return previous_state;
@@ -323,9 +324,6 @@ namespace hpx { namespace threads
         thread_self& self = get_self();
         thread_id_type self_id = self.get_thread_id();
 
-        // mark the thread as suspended before wake thread gets created
-//         reinterpret_cast<thread*>(self_id)->set_state(marked_for_suspension);
-
         thread_init_data data(
             boost::bind(&threadmanager_impl::wake_timer_thread, this, id, 
                 newstate, newstate_ex, self_id), 
@@ -397,17 +395,18 @@ namespace hpx { namespace threads
     class switch_status
     {
     public:
-        switch_status (thread* t, thread_state_enum new_state)
-            : thread_(t), 
-              prev_state_(t->set_state_tagged(new_state, orig_state_)),
-              stored_state_(false)
+        switch_status (thread* t, thread_state prev_state)
+          : thread_(t), prev_state_(prev_state),
+            need_restore_state_(t->set_state_tagged(active, prev_state_, orig_state_))
         {}
 
         ~switch_status ()
         {
-            if (!stored_state_)
+            if (need_restore_state_)
                 store_state(prev_state_);
         }
+
+        bool is_valid() const { return need_restore_state_; }
 
         // allow to change the state the thread will be switched to after 
         // execution
@@ -439,13 +438,13 @@ namespace hpx { namespace threads
         }
 
         // disable default handling in destructor
-        void disable_restore() { stored_state_ = true; }
+        void disable_restore() { need_restore_state_ = false; }
 
     private:
         thread* thread_;
         thread_state prev_state_;
         thread_state orig_state_;
-        bool stored_state_;
+        bool need_restore_state_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -596,7 +595,7 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     inline void write_old_state_log(std::size_t num_thread, thread* thrd, 
-        thread_state state)
+        thread_state_enum state)
     {
         LTM_(debug) << "tfunc(" << num_thread << "): "
                    << "thread(" << thrd->get_thread_id() << "), " 
@@ -604,8 +603,17 @@ namespace hpx { namespace threads
                    << "old state(" << get_thread_state_name(state) << ")";
     }
 
-    inline void write_new_state_log(std::size_t num_thread, thread* thrd, 
-        thread_state state, char const* info)
+    inline void write_new_state_log_debug(std::size_t num_thread, thread* thrd, 
+        thread_state_enum state, char const* info)
+    {
+        LTM_(debug) << "tfunc(" << num_thread << "): "
+                   << "thread(" << thrd->get_thread_id() << "), "
+                   << "description(" << thrd->get_description() << "), "
+                   << "new state(" << get_thread_state_name(state) << "), "
+                   << info;
+    }
+    inline void write_new_state_log_warning(std::size_t num_thread, thread* thrd, 
+        thread_state_enum state, char const* info)
     {
         LTM_(debug) << "tfunc(" << num_thread << "): "
                    << "thread(" << thrd->get_thread_id() << "), "
@@ -654,16 +662,19 @@ namespace hpx { namespace threads
                 // Any non-pending PX threads are leftovers from a set_state() 
                 // call for a previously pending PX thread (see comments above).
                 thread_state state = thrd->get_state();
+                thread_state_enum state_val = state;
 
-                write_old_state_log(num_thread, thrd, state);
+                write_old_state_log(num_thread, thrd, state_val);
 
-                if (pending == state) {
+                if (pending == state_val) {
                     // switch the state of the thread to active and back to 
                     // what the thread reports as its return value
 
                     {
-                        switch_status thrd_stat (thrd, active);
-                        if (state == thrd_stat.get_previous()) {
+                        // tries to set state to active (only if state is still 
+                        // the same as 'state')
+                        switch_status thrd_stat (thrd, state);
+                        if (thrd_stat.is_valid() && thrd_stat.get_previous() == pending) {
                             // thread returns new required state
                             // store the returned state in the thread
                             tl2.tick();
@@ -676,7 +687,8 @@ namespace hpx { namespace threads
                             // executing this PX-thread, we just continue with 
                             // the next one
                             thrd_stat.disable_restore();
-                            write_new_state_log(num_thread, thrd, state, "no execution");
+                            write_new_state_log_warning(
+                                num_thread, thrd, state_val, "no execution");
                             tl1.tock();
                             continue;
                         }
@@ -686,45 +698,43 @@ namespace hpx { namespace threads
                             // some other OS-thread got in between and changed 
                             // the state of this thread, we just continue with 
                             // the next one
-                            write_new_state_log(num_thread, thrd, state, "no state change");
+                            write_new_state_log_warning(
+                                num_thread, thrd, state_val, "no state change");
                             tl1.tock();
                             continue;
                         }
+                        state_val = state;
 
                         // any exception thrown from the thread will reset its 
                         // state at this point
                     }
 
-                    write_new_state_log(num_thread, thrd, state, "normal");
+                    write_new_state_log_debug(num_thread, thrd, state_val, "normal");
 
                     // Re-add this work item to our list of work items if the PX
                     // thread should be re-scheduled. If the PX thread is suspended 
                     // now we just keep it in the map of threads.
-                    if (state == pending) {
+                    if (state_val == pending) {
                         scheduler_.schedule_thread(thrd, num_thread);
                         do_some_work(num_thread);
                     }
                 }
-                else if (active == state) {
+                else if (active == state_val) {
                     // re-schedule thread, if it is still marked as active
                     // this might happen, if some thread has been added to the
                     // scheduler queue already but the state has not been reset 
                     // yet
                     scheduler_.schedule_thread(thrd, num_thread);
                 }
-                // have to do nothing for 'marked_for_suspension' threads
 
                 // Remove the mapping from thread_map_ if PX thread is depleted 
                 // or terminated, this will delete the PX thread as all 
                 // references go out of scope.
                 // FIXME: what has to be done with depleted PX threads?
-                if (state == depleted || state == terminated) 
+                if (state_val == depleted || state_val == terminated) 
                     scheduler_.destroy_thread(thrd);
 
                 tl1.tock();
-            }
-            else {
-                ++idle_loop_count;
             }
 
             // if we need to terminate, unregister the counter first
