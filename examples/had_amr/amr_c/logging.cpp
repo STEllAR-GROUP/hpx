@@ -37,7 +37,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // output to file "output.dat"
         FILE *fdata;
         if ( logcode == 0 && val.iter_ == 0 ) {
-          if (fmod(val.timestep_,par.output) < 1.e-6) {
+          if (fmod(val.timestep_,par.output) < 1.e-6 && val.x_ >= 0.0) {
             std::string x_str = boost::lexical_cast<std::string>(val.x_);
             std::string chi_str = boost::lexical_cast<std::string>(val.value_.phi[0][0]);
             std::string Phi_str = boost::lexical_cast<std::string>(val.value_.phi[0][1]);
