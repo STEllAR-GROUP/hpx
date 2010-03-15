@@ -101,6 +101,9 @@ macro(ADD_HPX_COMPONENT name)
         message(STATUS ${name}_INI ": " ${${name}_INI})
     endif()
 
+    if(UNIX)
+        set(component_LIBRARY_PREFIX "hpx_component_")
+    endif()
     add_definitions(-DHPX_COMPONENT_NAME=${name})
     add_definitions(-DHPX_COMPONENT_EXPORTS)
 

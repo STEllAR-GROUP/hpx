@@ -20,6 +20,9 @@ set(Boost_ADDITIONAL_VERSIONS
     "1.43", "1.43.0", "1.42" "1.40.0" "1.40" "1.39.0" "1.39")
 find_package(Boost 1.33.1 COMPONENTS ${Boost_COMPONENTS_NEEDED})
 
+include_directories(${Boost_INCLUDE_DIR})
+link_directories(${Boost_LIBRARY_DIR})
+
 if(NOT DEFINED HPX_ROOT)
     set(HPX_ROOT $ENV{HPX_ROOT})
 endif()
