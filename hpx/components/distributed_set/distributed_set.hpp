@@ -36,11 +36,11 @@ namespace hpx { namespace components
 
     public:
         distributed_set()
-          : base_type(naming::invalid_id, true)
+          : base_type(naming::invalid_id)
         {}
 
-        distributed_set(naming::id_type gid, bool freeonexit = true)
-          : base_type(gid, freeonexit)
+        distributed_set(naming::id_type gid)
+          : base_type(gid)
         {}
 
         ///////////////////////////////////////////////////////////////////////

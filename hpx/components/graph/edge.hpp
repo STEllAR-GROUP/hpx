@@ -23,13 +23,13 @@ namespace hpx { namespace components
 
     public:
         edge()
-          : base_type(naming::invalid_id, true)
+          : base_type(naming::invalid_id)
         {}
 
         /// Create a client side representation for the existing
         /// \a server#edge instance with the given global id \a gid.
-        edge(naming::id_type gid, bool freeonexit = true)
-          : base_type(gid, freeonexit)
+        edge(naming::id_type gid)
+          : base_type(gid)
         {}
 
         ///////////////////////////////////////////////////////////////////////

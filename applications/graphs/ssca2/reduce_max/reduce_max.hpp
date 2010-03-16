@@ -163,9 +163,9 @@ namespace hpx { namespace lcos
           : impl_(new wrapping_type(new wrapped_type(in,out,value)))
           {}
 
-        naming::id_type get_gid()
+        naming::gid_type get_base_gid()
         {
-            return impl_->get_gid();
+            return impl_->get_base_gid();
         }
 
         int wait()

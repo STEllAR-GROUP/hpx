@@ -4,7 +4,9 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(graph_SUBDIRS 
-    ssca2)
+    rmat
+    ssca2
+   )
 
 foreach(subdir ${graph_SUBDIRS})
     add_subdirectory(${subdir})

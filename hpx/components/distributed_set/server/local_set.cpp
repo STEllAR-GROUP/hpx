@@ -101,7 +101,7 @@ namespace hpx { namespace components { namespace server
 {
     template <typename Item>
     local_set<Item>::local_set()
-      : gid_(This()->base_type::get_gid()),
+      : gid_(This()->base_type::get_base_gid()),
         locale_(applier::get_applier().get_runtime_support_gid()),
         local_set_(0),
         num_items_(0)

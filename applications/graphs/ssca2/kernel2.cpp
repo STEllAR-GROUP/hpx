@@ -80,15 +80,15 @@ int kernel2(naming::id_type G, naming::id_type dist_edge_set)
                 there,
                 (*vit),
                 dist_edge_set,
-                local_max.get_gid(),
-                global_max.get_gid()));
+                naming::id_type(local_max.get_base_gid(), naming::id_type::unmanaged),
+                naming::id_type(global_max.get_base_gid(), naming::id_type::unmanaged)));
     }
 
     // Get the (reduced) global maximum, and signal it back to
     // local searches
     typedef hpx::lcos::detail::reduce_max::wait_action wait_action;
     global_max.signal(
-        lcos::eager_future<wait_action>(local_max.get_gid()).get());
+        lcos::eager_future<wait_action>(local_max.get_base_gid()).get());
 
     // Run through local search results to tally total edges added
     while (local_searches.size() > 0)
@@ -194,8 +194,9 @@ int large_set_local(naming::id_type local_vertex_set,
         {
             lcos::eager_future<
                            edge_type::init_action
-                       >(edge_base+i, (*eit).source_, (*eit).target_, (*eit).label_).get();
-            edges[i] = edge_base+i;
+                       >(edge_base, (*eit).source_, (*eit).target_, (*eit).label_).get();
+            edges[i] = edge_base;
+            ++edge_base;
         }
 
         num_added =

@@ -62,8 +62,7 @@ int kernel3(naming::id_type edge_set, naming::id_type subgraphs, int depth)
     for (gids_type::const_iterator it = locals.begin();
          it != end; ++it)
     {
-        // This uses hack to get prefix
-        gid_type locale(boost::uint64_t((*it).get_msb()) << 32, 0);
+        gid_type locale(find_there(*it));
 
         // Get colocated portion of subgraphs set
         gid_type local_subgraphs =
@@ -115,7 +114,8 @@ int extract_local(naming::id_type local_edge_set,
 
     // Should be not be syncing until as late as possible,
     // after the pmaps returns
-    gid_type here(boost::uint64_t(local_edge_set.get_msb()) << 32,0);
+    gid_type here(find_there(local_edge_set));
+
     gids_type graphs;
     for (int i=0; i < edges.size(); ++i)
     {
@@ -164,8 +164,8 @@ int extract_local(naming::id_type local_edge_set,
         // We are local to source
 
         // Get pmap local to source
-        // This uses hack to get prefix
-        gid_type locale(boost::uint64_t(e.source_.get_msb()) << 32,0);
+        gid_type locale(find_there(e.source_));
+
         gid_type local_pmap =
             stub_dist_gids_map_type::get_local(pmaps[i], locale);
 
@@ -195,7 +195,8 @@ int extract_local(naming::id_type local_edge_set,
         {
             // Spawn subgraph extraction local to target
             // Probably should rework this to use continuations :-)
-            gid_type there(boost::uint64_t(e.target_.get_msb()) << 32,0);
+            gid_type there(find_there(*it));
+
             results.push_back(
                 lcos::eager_future<
                     extract_subgraph_action
@@ -255,7 +256,7 @@ naming::id_type extract_subgraph(naming::id_type H, naming::id_type pmap,
 
     // Get pmap local to target
     // This uses hack to get prefix
-    gid_type locale(boost::uint64_t(target.get_msb()) << 32,0);
+    gid_type locale(find_there(target));
     gid_type local_pmap =
         stub_dist_gids_map_type::get_local(pmap, locale);
 

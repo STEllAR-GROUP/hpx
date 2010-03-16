@@ -111,7 +111,7 @@ namespace hpx { namespace components { namespace server
 {
     template <typename Item>
     distributed_set<Item>::distributed_set()
-      : gid_(This()->base_type::get_gid()),
+      : gid_(This()->base_type::get_base_gid()),
         num_items_(0),
         next_locale_(0)
     {}
@@ -142,20 +142,14 @@ namespace hpx { namespace components { namespace server
         for (result_type::const_iterator rit = list.begin();
              rit != rend; ++rit)
         {
-            // Create a vector of GIDs from locality result
-            std::vector<naming::id_type> gids;
-            for (std::size_t i=0; i < (*rit).count_; ++i)
-            {
-                gids.push_back((*rit).first_gid_ + i);
-            }
-
             // Append to appropriate local set
-            naming::id_type there = get_local((*rit).prefix_); // Can I do this?
+            naming::id_type there = get_local(naming::id_type((*rit).prefix_,
+                                              naming::id_type::unmanaged)); // Can I do this?
 
             results.push_back(
                 lcos::eager_future<
                     typename local_set<Item>::append_action
-                >(there, gids));
+                >(there, (*rit).gids_));
 
             LDSET_(info) << "Adding local set to locals_";
         }
@@ -193,7 +187,7 @@ namespace hpx { namespace components { namespace server
             LDSET_(info) << "Got component type";
 
             // get list of locality prefixes
-            std::vector<naming::id_type> prefixes;
+            std::vector<naming::gid_type> prefixes;
             hpx::applier::get_applier().get_agas_client().get_prefixes(prefixes, prefix_type);
 
             if (prefixes.empty())
@@ -207,13 +201,17 @@ namespace hpx { namespace components { namespace server
             LDSET_(info) << "Looking for locals_[" << num_items_+1 << "%" << prefixes.size() << " ="
                         << (num_items_+1)%prefixes.size() << "]";
 
-            locale = get_local(prefixes[(num_items_+1)%prefixes.size()]);
+            locale = get_local(
+                    naming::id_type(prefixes[(num_items_+1)%prefixes.size()],
+                            naming::id_type::unmanaged));
         }
         else
         {
             LDSET_(info) << "Adding existing item";
 
-            locale = get_local(naming::id_type(boost::uint64_t(item.get_msb()) << 32, 0));
+            // TODO: find a better way to do this
+            locale = get_local(naming::get_id_from_prefix(
+                         naming::get_prefix_from_id(item)));
         }
 
         // Add it there

@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include <iostream>
+#include <fstream>
 
 #include <stdlib.h>
 
@@ -236,10 +236,10 @@ int hpx_main(int scale, int edge_factor, int type)
     std::cout.setf(std::ios::dec);
 
     gid_type here = hpx::applier::get_applier().get_runtime_support_gid();
-    gids_type prefixes;
+    std::vector<naming::gid_type> prefixes;
     if (hpx::applier::get_applier().get_remote_prefixes(prefixes))
     {
-        here = prefixes[0];
+        here = naming::id_type(prefixes[0], naming::id_type::unmanaged);
     }
 
     // Create the graph used for with all kernels

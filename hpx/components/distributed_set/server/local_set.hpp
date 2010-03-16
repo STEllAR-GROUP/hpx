@@ -90,7 +90,7 @@ namespace hpx { namespace components { namespace server
         > get_locale_action;
 
     private:
-        naming::id_type gid_;
+        naming::gid_type gid_;
         naming::id_type locale_;
 
         int num_items_;

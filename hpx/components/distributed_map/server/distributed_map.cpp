@@ -48,7 +48,7 @@ namespace hpx { namespace components { namespace server
 {
     template <typename List>
     distributed_map<List>::distributed_map()
-      : gid_(This()->base_type::get_gid())
+      : gid_(This()->base_type::get_base_gid())
     {}
     
     template <typename List>

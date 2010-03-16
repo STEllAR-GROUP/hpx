@@ -25,11 +25,11 @@ namespace hpx { namespace components
 
     public:
         local_set()
-          : base_type(naming::invalid_id, true)
+          : base_type(naming::invalid_id)
         {}
 
-        local_set(naming::id_type gid, bool freeonexit = true)
-          : base_type(gid, freeonexit)
+        local_set(naming::id_type gid)
+          : base_type(gid)
         {
             LAPP_(info) << " [LOCAL_SET] " << "Constructing local list" << std::endl;
         }

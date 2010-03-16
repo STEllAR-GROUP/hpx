@@ -55,7 +55,7 @@ int monitor(double frequency, double duration, double rate)
   queue += "/threadmanager)/length";
 
   // Get GID of performance counter
-  gid_type gid;
+  naming::gid_type gid;
   agas.queryid(queue, gid);
 
   std::cout << "Begin timing block" << std::endl;
@@ -81,7 +81,7 @@ int monitor(double frequency, double duration, double rate)
               hpx::performance_counters::counter_value value;
               value =
                   hpx::performance_counters::stubs::
-                    performance_counter::get_value(gid);
+                    performance_counter::get_value(naming::id_type(gid, naming::id_type::unmanaged));
 
               if (hpx::performance_counters::status_valid_data == value.status_)
               {

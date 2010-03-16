@@ -53,14 +53,14 @@ int kernel4(naming::id_type V, naming::id_type VS, int k4_approx, naming::id_typ
         lcos::eager_future<dist_vertex_set_type::locals_action>(V).get();
 
     // This uses hack to get prefix
-    naming::id_type there(boost::uint64_t((locals[0]).get_msb()) << 32, 0);
+    naming::id_type there(find_there(locals[0]));
 
     gids_type::const_iterator lit = locals.begin();
     for (gids_type::const_iterator lend = locals.end();
          lit != lend; ++lit)
     {
         // This uses hack to get prefix
-        naming::id_type there(boost::uint64_t((*lit).get_msb()) << 32, 0);
+        naming::id_type there(find_there(*lit));
 
         gid_type bc_local =
             lcos::eager_future<dist_gids_map_type::get_local_action>(bc_scores, there).get();
@@ -80,7 +80,7 @@ int kernel4(naming::id_type V, naming::id_type VS, int k4_approx, naming::id_typ
          vsit != vsend; ++vsit)
     {
         // This uses hack to get prefix
-        naming::id_type there(boost::uint64_t((*vsit).get_msb()) << 32, 0);
+        naming::id_type there(find_there(*vsit));
 
         results.push_back(lcos::eager_future<bfs_sssp_local_action>(there, V, *vsit, bc_scores));
     }
@@ -110,7 +110,7 @@ void select_random_vertices(gids_type v_locals, int k4_approx, naming::id_type V
         total += sizes[i];
 
         // This uses hack to get prefix
-        naming::id_type there(boost::uint64_t((v_locals[i]).get_msb()) << 32, 0);
+        naming::id_type there(find_there(v_locals[i]));
         vs_locals[i] = lcos::eager_future<dist_vertex_set_type::get_local_action>(VS, there).get();
 
         LSSCA_(info) << "size[" << i << "] = " << sizes[i];
@@ -143,7 +143,7 @@ void select_random_vertices(gids_type v_locals, int k4_approx, naming::id_type V
                 int local_index = index - (sum - sizes[i]);
 
                // This uses hack to get prefix
-               naming::id_type there(boost::uint64_t((v_locals[i]).get_msb()) << 32, 0);
+               naming::id_type there(find_there(v_locals[i]));
 
                // Need to parallelize this part ...
                int added = lcos::eager_future<add_local_item_action>(there, local_index, v_locals[i], vs_locals[i]).get();
@@ -256,7 +256,7 @@ int bfs_sssp_local(naming::id_type V, naming::id_type vs_locals, naming::id_type
 
     future_ints_type results;
 
-    gid_type here = applier::get_applier().get_prefix();
+    gid_type here = naming::id_type(applier::get_applier().get_prefix(), naming::id_type::unmanaged);
 
     gids_type vertices = lcos::eager_future<local_vertex_set_type::get_action>(vs_locals).get();
     gids_type::const_iterator vit = vertices.begin();
@@ -382,8 +382,7 @@ int bfs_sssp(naming::id_type start, naming::id_type V, naming::id_type bc_scores
     {
         gid_type w = ait->first;
 
-        // This uses hack to get prefix
-        naming::id_type there(boost::uint64_t((w).get_msb()) << 32, 0);
+        naming::id_type there(find_there(w));
 
         // Should this be divided by 2?
         results.push_back(lcos::eager_future<incr_bc_action>(there, bc_scores, w, delta[w]/2.0));
@@ -407,7 +406,7 @@ HPX_REGISTER_ACTION(incr_bc_action);
 
 int incr_bc(naming::id_type bc_scores, naming::id_type w, double delta_w)
 {
-    gid_type here = applier::get_applier().get_prefix();
+    gid_type here = naming::id_type(applier::get_applier().get_prefix(), naming::id_type::unmanaged);
 
     gid_type bc_local = lcos::eager_future<dist_gids_map_type::get_local_action>(bc_scores, here).get();
 

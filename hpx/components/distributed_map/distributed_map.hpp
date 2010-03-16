@@ -36,11 +36,11 @@ namespace hpx { namespace components
 
     public:
         distributed_map()
-          : base_type(naming::invalid_id, true)
+          : base_type(naming::invalid_id)
         {}
 
-        distributed_map(naming::id_type gid, bool freeonexit = true)
-          : base_type(gid, freeonexit)
+        distributed_map(naming::id_type gid)
+          : base_type(gid)
         {}
 
         ///////////////////////////////////////////////////////////////////////

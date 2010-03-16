@@ -16,6 +16,16 @@ using namespace hpx;
 ///////////////////////////////////////////////////////////////////////////////
 // Helper routines
 
+inline naming::id_type find_there(naming::id_type fco)
+{
+    naming::address addr;
+    applier::get_applier().get_agas_client().resolve(fco.get_gid(), addr, false);
+    naming::gid_type there;
+    applier::get_applier().get_agas_client().get_prefix(addr.locality_, there, false);
+
+    return naming::id_type(there, naming::id_type::unmanaged);
+}
+
 inline hpx::naming::id_type find_here(void)
 {
     return hpx::applier::get_applier().get_runtime_support_gid();

@@ -75,7 +75,7 @@ namespace hpx { namespace components { namespace server
         > value_action;
 
     private:
-        naming::id_type gid_;
+        naming::gid_type gid_;
 
         hpx::lcos::mutex mtx_;
         naming::id_type dist_map_;

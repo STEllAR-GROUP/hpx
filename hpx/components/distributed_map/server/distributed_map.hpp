@@ -70,7 +70,7 @@ namespace hpx { namespace components { namespace server
         > locals_action;
 
     private:
-        naming::id_type gid_;
+        naming::gid_type gid_;
 
         hpx::lcos::mutex mtx_;
         std::map<naming::id_type,naming::id_type> map_;

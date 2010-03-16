@@ -96,7 +96,7 @@ namespace hpx { namespace components { namespace server
         > size_action;
 
     private:
-        naming::id_type gid_;
+        naming::gid_type gid_;
 
         lcos::mutex mtx_;
 

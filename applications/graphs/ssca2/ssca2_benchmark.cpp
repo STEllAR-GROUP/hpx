@@ -58,12 +58,14 @@ int hpx_main(int depth, std::string input_file, int k4_approx, bool monitor)
     gid_type here = find_here();
 
     // Start heart beat monitor
+#ifdef WANT_MONITOR
     hpx::lcos::eager_future<monitor_action> heart_beat(here,
                                               10000000,
                                               1000000,
                                               0);
     if (!monitor)
         heart_beat.get();
+#endif
 
     /*
     util::high_resolution_timer t;
@@ -98,9 +100,9 @@ int hpx_main(int depth, std::string input_file, int k4_approx, bool monitor)
     LSSCA_(info) << "Completed Kernel 1 v1 in " << total_time << " sec";
     std::cout << "Completed Kernel 1 v1 in " << total_time << " sec" << std::endl;
 
-    if (1)
+    if (0)
     {
-        /* Begin: timed execution of Kernel 1 v1 */
+        /* Begin: timed execution of Kernel 1 v2 */
         client_graph_type G_K2;
         G_K2.create(here);
         hpx::util::high_resolution_timer k1_v2_t;
@@ -114,9 +116,9 @@ int hpx_main(int depth, std::string input_file, int k4_approx, bool monitor)
         G_K2.free();
     }
 
-    if (1)
+    if (0)
     {
-        /* Begin: timed execution of Kernel 1 v1 */
+        /* Begin: timed execution of Kernel 1 v3 */
         client_graph_type G_K3;
         G_K3.create(here);
         hpx::util::high_resolution_timer k1_v3_t;
@@ -153,6 +155,14 @@ int hpx_main(int depth, std::string input_file, int k4_approx, bool monitor)
     //    edge_set - the list of maximal edges
     //
     // edges = filter(G.edges(), max_edge)
+
+    // Free components
+    G.free();
+
+    // Shut down runtime services
+    components::stubs::runtime_support::shutdown_all();
+
+    return 0;
 
     LSSCA_(info) << "Starting Kernel 2";
 
@@ -322,8 +332,10 @@ int hpx_main(int depth, std::string input_file, int k4_approx, bool monitor)
     }
     bc_scores.free();
 
+#ifdef WANT_MONITOR
     if (monitor)
         heart_beat.get();
+#endif
 
     // Free components
     G.free();

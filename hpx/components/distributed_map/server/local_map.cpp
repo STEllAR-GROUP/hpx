@@ -47,7 +47,7 @@ namespace hpx { namespace components { namespace server
 {
     template <typename List>
     local_map<List>::local_map()
-      : gid_(This()->base_type::get_gid()),
+      : gid_(This()->base_type::get_base_gid()),
         dist_map_(naming::invalid_id),
         local_map_()
     {}
@@ -91,7 +91,8 @@ namespace hpx { namespace components { namespace server
 
             // Create a new instance of value type
             naming::id_type value;
-            naming::id_type here = hpx::applier::get_applier().get_prefix();
+            naming::id_type here = naming::id_type(hpx::applier::get_applier().get_prefix(),
+                                                   naming::id_type::unmanaged);
             value = components::stubs::runtime_support::create_component(here, value_type, 1);
 
             lcos::mutex::scoped_lock l(mtx_);

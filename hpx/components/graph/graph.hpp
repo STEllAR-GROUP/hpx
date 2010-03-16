@@ -23,13 +23,13 @@ namespace hpx { namespace components
 
     public:
         graph()
-          : base_type(naming::invalid_id, true)
+          : base_type(naming::invalid_id)
         {}
 
         /// Create a client side representation for the existing
         /// \a server#graph instance with the given global id \a gid.
-        graph(naming::id_type gid, bool freeonexit = true) 
-          : base_type(gid, freeonexit)
+        graph(naming::id_type gid)
+          : base_type(gid)
         {}
 
         ///////////////////////////////////////////////////////////////////////
