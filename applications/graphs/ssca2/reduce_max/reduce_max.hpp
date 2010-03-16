@@ -91,8 +91,8 @@ namespace hpx { namespace lcos { namespace detail
 
             // mark the thread as suspended before adding to the queue
             threads::thread_id_type id = self.get_thread_id();
-            reinterpret_cast<threads::thread*>(id)->
-                set_state(threads::marked_for_suspension);
+//            reinterpret_cast<threads::thread*>(id)->
+//                set_state(threads::marked_for_suspension);
             queue_.enqueue(id);
 
             --out_;
