@@ -32,6 +32,6 @@ find_package_handle_standard_args(MPFR DEFAULT_MSG MPFR_LIBRARY MPFR_INCLUDE_DIR
 if(MPFR_FOUND)
     get_filename_component(MPFR_ROOT ${MPFR_INCLUDE_DIR} PATH)
     set(MPFR_ROOT ${MPFR_ROOT} CACHE PATH "MPFR root directory.")
+    mark_as_advanced(MPFR_INCLUDE_DIR MPFR_LIBRARY)
 endif()
 
-mark_as_advanced(MPFR_INCLUDE_DIR MPFR_LIBRARY)
