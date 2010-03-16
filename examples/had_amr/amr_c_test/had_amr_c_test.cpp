@@ -77,10 +77,17 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     had_double_type chi,Phi,Pi,Energy,r;
 
     r = xcoord;
-    chi = initial_chi(r,par);
-    Phi = initial_Phi(r,par);
-    Pi  = 0.0;
-    Energy = 0.5*r*r*(Pi*Pi + Phi*Phi) - r*r*pow(chi,par.PP+1)/(par.PP+1);
+    if ( r < 0.0 ) {
+      chi = -9999.0;
+      Phi = -9999.0;
+      Pi  = -9999.0;
+      Energy = -9999.0;
+    } else {
+      chi = initial_chi(r,par);
+      Phi = initial_Phi(r,par);
+      Pi  = 0.0;
+      Energy = 0.5*r*r*(Pi*Pi + Phi*Phi) - r*r*pow(chi,par.PP+1)/(par.PP+1);
+    }
 
     if ( floatcmp(r,0.0) == 0 && r < 0.0 ) {
       chi = -99999999.0;
@@ -319,6 +326,10 @@ bool refinement(stencil_data ** vecval, int size, struct nodedata *dst,int level
   had_double_type grad1,grad2,grad3,grad4;
   int index;
   had_double_type dx = par.dx0/pow(2.0,(int) vecval[0]->level_);
+
+  if ( vecval[0]->x_ < 5.0 ) {
+    return true;
+  }
 
   // gradient detector
   if ( size%2 == 1 ) {

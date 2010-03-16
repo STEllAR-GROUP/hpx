@@ -110,7 +110,7 @@ namespace hpx { namespace lcos { namespace detail
 
     public:
         mutex(char const* const description)
-          : active_count_(0), description_(description)
+          : active_count_(0), pending_events_(0), description_(description)
         {}
 
         ~mutex()
@@ -177,6 +177,10 @@ namespace hpx { namespace lcos { namespace detail
 
             // enqueue this thread
             mutex_type::scoped_lock l(this);
+            if (pending_events_) {
+                --pending_events_;
+                return false;
+            }
 
             queue_entry e(id);
             queue_.push_back(e);
@@ -203,6 +207,9 @@ namespace hpx { namespace lcos { namespace detail
 
                 l.unlock();
                 set_thread_state(id, threads::pending);
+            }
+            else if (active_count_.load(boost::memory_order_acquire) & ~lock_flag_value) {
+                ++pending_events_;
             }
         }
 
@@ -280,6 +287,7 @@ namespace hpx { namespace lcos { namespace detail
     private:
         boost::atomic_uint32_t active_count_;
         queue_type queue_;
+        boost::uint32_t pending_events_;
         char const* const description_;
     };
 

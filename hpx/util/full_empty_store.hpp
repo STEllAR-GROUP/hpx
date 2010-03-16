@@ -320,9 +320,9 @@ namespace hpx { namespace util { namespace detail
             state_ = empty;
 
             if (!write_queue_.empty()) {
-                queue_entry& e (write_queue_.front());
+                threads::thread_id_type id = write_queue_.front().id_;
                 write_queue_.pop_front();
-                threads::set_thread_state(e.id_, threads::pending);
+                threads::set_thread_state(id, threads::pending);
                 set_full_locked();    // state_ = full
             }
 
@@ -336,17 +336,17 @@ namespace hpx { namespace util { namespace detail
 
             // handle all threads waiting for the block to become full
             while (!read_queue_.empty()) {
-                queue_entry& e(read_queue_.front());
+                threads::thread_id_type id = read_queue_.front().id_;
                 read_queue_.pop_front();
-                threads::set_thread_state(e.id_, threads::pending);
+                threads::set_thread_state(id, threads::pending);
             }
 
             // since we got full now we need to re-activate one thread waiting
             // for the block to become full
             if (!read_and_empty_queue_.empty()) {
-                queue_entry& e(read_and_empty_queue_.front());
+                threads::thread_id_type id = read_and_empty_queue_.front().id_;
                 read_and_empty_queue_.pop_front();
-                threads::set_thread_state(e.id_, threads::pending);
+                threads::set_thread_state(id, threads::pending);
                 set_empty_locked();   // state_ = empty
             }
 

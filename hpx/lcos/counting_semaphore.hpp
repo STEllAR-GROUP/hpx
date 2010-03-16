@@ -138,11 +138,26 @@ namespace hpx { namespace lcos
             if (value_ >= 0) {
                 // release all threads, they will figure out between themselves
                 // which one gets released from wait above
+#if BOOST_VERSION < 103600
+                // slist::swap has a bug in Boost 1.35.0
                 while (!queue_.empty()) {
-                    queue_entry& e (queue_.front());
+                    threads::thread_id_type id = queue_.front().id_;
                     queue_.pop_front();
-                    threads::set_thread_state(e.id_, threads::pending);
+                    threads::set_thread_state(id, threads::pending);
                 }
+#else
+                // swap the list
+                queue_type queue;
+                queue.swap(queue_);
+                l.unlock();
+
+                // release the threads
+                while (!queue.empty()) {
+                    threads::thread_id_type id = queue.front().id_;
+                    queue.pop_front();
+                    threads::set_thread_state(id, threads::pending);
+                }
+#endif
             }
         }
 
