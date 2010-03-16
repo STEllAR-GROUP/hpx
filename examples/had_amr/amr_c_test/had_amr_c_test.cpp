@@ -323,10 +323,19 @@ bool refinement(stencil_data ** vecval, int size, struct nodedata *dst,int level
   // gradient detector
   if ( size%2 == 1 ) {
     index = (size-1)/2;
-    grad1 = (vecval[index+1]->value_.phi[0][0] - vecval[index-1]->value_.phi[0][0])/(2.*dx);
-    grad2 = (vecval[index+1]->value_.phi[0][1] - vecval[index-1]->value_.phi[0][1])/(2.*dx);
-    grad3 = (vecval[index+1]->value_.phi[0][2] - vecval[index-1]->value_.phi[0][2])/(2.*dx);
-    grad4 = (vecval[index+1]->value_.phi[0][3] - vecval[index-1]->value_.phi[0][3])/(2.*dx);
+
+    // different criteria for near r=0
+    if ( vecval[index]->x_ < 0.25 ) {
+      grad1 = (vecval[index+1]->value_.phi[0][0] - vecval[index]->value_.phi[0][0])/(2.*dx);
+      grad2 = (vecval[index+1]->value_.phi[0][1] - vecval[index]->value_.phi[0][1])/(2.*dx);
+      grad3 = (vecval[index+1]->value_.phi[0][2] - vecval[index]->value_.phi[0][2])/(2.*dx);
+      grad4 = (vecval[index+1]->value_.phi[0][3] - vecval[index]->value_.phi[0][3])/(2.*dx);
+    } else {
+      grad1 = (vecval[index+1]->value_.phi[0][0] - vecval[index-1]->value_.phi[0][0])/(2.*dx);
+      grad2 = (vecval[index+1]->value_.phi[0][1] - vecval[index-1]->value_.phi[0][1])/(2.*dx);
+      grad3 = (vecval[index+1]->value_.phi[0][2] - vecval[index-1]->value_.phi[0][2])/(2.*dx);
+      grad4 = (vecval[index+1]->value_.phi[0][3] - vecval[index-1]->value_.phi[0][3])/(2.*dx);
+    }
     if ( sqrt( grad1*grad1 + grad2*grad2 + grad3*grad3 + grad4*grad4 ) > par.ethreshold ) return true;
     else return false;
   } else {
