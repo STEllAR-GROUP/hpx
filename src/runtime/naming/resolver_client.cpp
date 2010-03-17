@@ -865,8 +865,9 @@ namespace hpx { namespace naming
         server::reply& rep, error_code& ec) const
     {
         BOOST_ASSERT(local_only_ && request_handler_);
-        request_handler_->handle_request(req,rep);
-        ec = make_success_code();   // success;
+        request_handler_->handle_request(req, rep);
+        if (&ec != &throws)
+            ec = make_success_code();   // success;
         return true;
     }
 
@@ -1011,7 +1012,8 @@ namespace hpx { namespace naming
     {
         BOOST_ASSERT(local_only_ && request_handler_);
         request_handler_->handle_requests(req,rep);
-        ec = make_success_code();   // success;
+        if (&ec != &throws)
+            ec = make_success_code();   // success;
         return true;
     }
 
