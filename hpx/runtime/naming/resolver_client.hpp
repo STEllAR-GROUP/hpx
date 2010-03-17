@@ -57,7 +57,8 @@ namespace hpx { namespace naming
         /// \param isconsole [in] This parameter is true if the locality 
         ///                 represents the application console.
         resolver_client(util::io_service_pool& io_service_pool, 
-            util::runtime_configuration const& ini_, bool isconsole = false);
+            util::runtime_configuration const& ini_ = util::runtime_configuration(), 
+            bool isconsole = false);
 
         /// Construct the resolver client to work with the server given by
         /// a locality
@@ -72,7 +73,8 @@ namespace hpx { namespace naming
         /// \param isconsole [in] This parameter is true if the locality 
         ///                 represents the application console.
         resolver_client(util::io_service_pool& io_service_pool, 
-            locality const& l, util::runtime_configuration const& ini_, 
+            locality const& l, 
+            util::runtime_configuration const& ini_ = util::runtime_configuration(), 
             bool isconsole = false);
 
         ~resolver_client();
