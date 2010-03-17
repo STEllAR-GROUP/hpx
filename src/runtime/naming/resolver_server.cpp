@@ -32,7 +32,8 @@ namespace hpx { namespace naming
             locality l)
       : io_service_pool_(io_service_pool),
         acceptor_(io_service_pool_.get_io_service()),
-        request_handler_(), here_(l)
+        request_handler_(), 
+        here_(util::runtime_configuration().get_agas_locality(l))
    {
         // start the io_service
         run(false);
@@ -78,7 +79,7 @@ namespace hpx { namespace naming
       : io_service_pool_(io_service_pool),
         acceptor_(io_service_pool_.get_io_service()),
         request_handler_(), 
-        here_(util::runtime_configuration().get_agas_locality(address, port))
+        here_(util::runtime_configuration().get_agas_locality(locality(address, port)))
     {
         // start the io_service
         run(false);

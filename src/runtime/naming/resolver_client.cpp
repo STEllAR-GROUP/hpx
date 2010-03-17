@@ -38,15 +38,41 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming 
 {
+    ///////////////////////////////////////////////////////////////////////////
     resolver_client::resolver_client(util::io_service_pool& io_service_pool, 
-            locality l, bool local_only, bool isconsole, std::size_t cachesize) 
-      : there_(l), io_service_pool_(io_service_pool), 
-        connection_cache_(HPX_MAX_AGAS_CONNECTION_CACHE_SIZE, "[AGAS] "),
-        agas_cache_(cachesize), isconsole_(isconsole),
-        local_only_(local_only), request_handler_()
+            util::runtime_configuration const& ini, bool isconsole) 
+      : there_(ini.get_agas_locality()), io_service_pool_(io_service_pool), 
+        connection_cache_(ini.get_agas_connection_cache_size(), "[AGAS] "),
+        agas_cache_(ini.get_agas_cache_size()), isconsole_(isconsole),
+        local_only_(ini.get_agas_smp_mode()), request_handler_(0)
     {
         // start the io service pool
         io_service_pool.run(false);
+
+        // initialize the request handler if in SMP mode
+        if (local_only_)
+            request_handler_ = new naming::server::request_handler;
+    }
+
+    resolver_client::resolver_client(util::io_service_pool& io_service_pool, 
+            locality const& l, util::runtime_configuration const& ini, 
+            bool isconsole) 
+      : there_(ini.get_agas_locality(l)), io_service_pool_(io_service_pool), 
+        connection_cache_(ini.get_agas_connection_cache_size(), "[AGAS] "),
+        agas_cache_(ini.get_agas_cache_size()), isconsole_(isconsole),
+        local_only_(ini.get_agas_smp_mode()), request_handler_(0)
+    {
+        // start the io service pool
+        io_service_pool.run(false);
+
+        // initialize the request handler if in SMP mode
+        if (local_only_)
+            request_handler_ = new naming::server::request_handler;
+    }
+
+    resolver_client::~resolver_client()
+    {
+        delete request_handler_;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -705,10 +731,9 @@ namespace hpx { namespace naming
     bool resolver_client::execute(server::request const &req, 
         server::reply& rep, error_code& ec) const
     {
-        if(local_only_)
-            return execute_local(req,rep,ec);
-        else
-            return execute_remote(req,rep,ec);
+        if (local_only_)
+            return execute_local(req, rep, ec);
+        return execute_remote(req, rep, ec);
     }
 
     bool resolver_client::execute_remote(server::request const &req, 
@@ -835,15 +860,27 @@ namespace hpx { namespace naming
             ec = make_success_code();
         return true;
     }
+
     bool resolver_client::execute_local(server::request const &req, 
         server::reply& rep, error_code& ec) const
     {
-        request_handler_.handle_request(req,rep);
-        ec = make_success_code();//success;
+        BOOST_ASSERT(local_only_ && request_handler_);
+        request_handler_->handle_request(req,rep);
+        ec = make_success_code();   // success;
         return true;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     bool resolver_client::execute(std::vector<server::request> const &req, 
+        std::vector<server::reply>& rep, error_code& ec) const
+    {
+        if (local_only_)
+            return execute_local(req, rep, ec);
+        return execute_remote(req, rep, ec);
+    }
+
+    bool resolver_client::execute_remote(
+        std::vector<server::request> const &req, 
         std::vector<server::reply>& rep, error_code& ec) const
     {
         typedef util::container_device<std::vector<char> > io_device_type;
@@ -965,6 +1002,16 @@ namespace hpx { namespace naming
 
         if (&ec != &throws)
             ec = make_success_code();
+        return true;
+    }
+
+    bool resolver_client::execute_local(
+        std::vector<server::request> const &req, 
+        std::vector<server::reply>& rep, error_code& ec) const
+    {
+        BOOST_ASSERT(local_only_ && request_handler_);
+        request_handler_->handle_requests(req,rep);
+        ec = make_success_code();   // success;
         return true;
     }
 

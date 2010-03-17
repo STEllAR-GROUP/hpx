@@ -137,6 +137,9 @@ namespace hpx { namespace naming
             return util::safe_bool<locality>()(port_ != boost::uint16_t(-1)); 
         }
 
+        std::string const& get_address() const { return address_; }
+        boost::uint16_t get_port() const { return port_; }
+
     private:
         friend std::ostream& operator<< (std::ostream& os, locality const& l);
 

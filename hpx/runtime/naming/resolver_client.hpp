@@ -16,6 +16,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/buffer.hpp>
@@ -51,14 +52,30 @@ namespace hpx { namespace naming
         /// \param io_service_pool
         ///                 [in] The pool of networking threads to use to serve 
         ///                 outgoing requests
-        /// \param l        [in] This is the locality the AGAS server is 
-        ///                 running on.
+        /// \param ini      [in] This is the referen ce to the global 
+        ///                 configuration data to use for this resolver client
         /// \param isconsole [in] This parameter is true if the locality 
         ///                 represents the application console.
-        resolver_client(util::io_service_pool& io_service_pool, locality l,
-            bool local_only = false,
-            bool isconsole = false, 
-            std::size_t cachesize = HPX_INITIAL_AGAS_CACHE_SIZE);
+        resolver_client(util::io_service_pool& io_service_pool, 
+            util::runtime_configuration const& ini_, bool isconsole = false);
+
+        /// Construct the resolver client to work with the server given by
+        /// a locality
+        ///
+        /// \param io_service_pool
+        ///                 [in] The pool of networking threads to use to serve 
+        ///                 outgoing requests
+        /// \param l        [in] This is the locality the AGAS server is 
+        ///                 running on.
+        /// \param ini      [in] This is the referen ce to the global 
+        ///                 configuration data to use for this resolver client
+        /// \param isconsole [in] This parameter is true if the locality 
+        ///                 represents the application console.
+        resolver_client(util::io_service_pool& io_service_pool, 
+            locality const& l, util::runtime_configuration const& ini_, 
+            bool isconsole = false);
+
+        ~resolver_client();
 
         /// \brief Get unique prefix usable as locality id (locality prefix)
         ///
@@ -736,12 +753,21 @@ namespace hpx { namespace naming
             error_code& ec) const;
         bool execute_remote(server::request const& req, server::reply& rep,
             error_code& ec) const;
+
+        bool execute_local(std::vector<server::request> const &req, 
+            std::vector<server::reply>& rep, error_code& ec) const;
+        bool execute_remote(std::vector<server::request> const &req, 
+            std::vector<server::reply>& rep, error_code& ec) const;
+
+    private:
         locality there_;
         util::io_service_pool& io_service_pool_;
 
         /// The connection cache for sending connections
         mutable util::connection_cache<resolver_client_connection> connection_cache_;
         bool isconsole_;
+        bool local_only_;
+        naming::server::request_handler* request_handler_;
 
 #if defined(HPX_USE_AGAS_CACHE)
     public:
@@ -785,9 +811,6 @@ namespace hpx { namespace naming
         > cache_type;
         mutable cache_type agas_cache_;
 #endif
-
-        bool local_only_;
-        mutable hpx::naming::server::request_handler request_handler_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

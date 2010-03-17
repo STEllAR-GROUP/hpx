@@ -38,7 +38,10 @@ namespace hpx { namespace util
             "port = ${HPX_AGAS_SERVER_PORT:" 
                 BOOST_PP_STRINGIZE(HPX_NAME_RESOLVER_PORT) "}",
             "cachesize = ${HPX_AGAS_CACHE_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_CACHE_SIZE) "}"
+                BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_CACHE_SIZE) "}",
+            "connectioncachesize = ${HPX_AGAS_CONNECTION_CACHE_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_MAX_AGAS_CONNECTION_CACHE_SIZE) "}",
+            "smp_mode = ${HPX_AGAS_SMP_MODE:0}"
 
             // create default ini entries for memory_block component hosted in 
             // the main hpx shared library
@@ -127,13 +130,16 @@ namespace hpx { namespace util
     }
 
     naming::locality runtime_configuration::get_agas_locality(
-        std::string default_address, boost::uint16_t default_port) const
+        naming::locality const& l) const
     {
         // load all components as described in the configuration information
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 // read fall back values from configuration file, if needed
+                std::string default_address (l.get_address());
+                boost::uint16_t default_port = l.get_port();
+
                 if (default_address.empty()) {
                     default_address = 
                         sec->get_entry("address", HPX_NAME_RESOLVER_ADDRESS);
@@ -160,13 +166,26 @@ namespace hpx { namespace util
         return HPX_INITIAL_AGAS_CACHE_SIZE;
     }
 
+    std::size_t runtime_configuration::get_agas_connection_cache_size() const
+    {
+        if (has_section("hpx.agas")) {
+            util::section const* sec = get_section("hpx.agas");
+            if (NULL != sec) {
+                return boost::lexical_cast<std::size_t>(
+                    sec->get_entry("connectioncachesize", 
+                        HPX_MAX_AGAS_CONNECTION_CACHE_SIZE));
+            }
+        }
+        return HPX_MAX_AGAS_CONNECTION_CACHE_SIZE;
+    }
+
     bool runtime_configuration::get_agas_smp_mode() const
     {
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 return boost::lexical_cast<int>(
-                    sec->get_entry("smp_mode", "0"));
+                    sec->get_entry("smp_mode", "0")) ? true : false;
             }
         }
         return false;
