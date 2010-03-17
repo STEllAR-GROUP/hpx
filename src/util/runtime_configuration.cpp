@@ -160,6 +160,18 @@ namespace hpx { namespace util
         return HPX_INITIAL_AGAS_CACHE_SIZE;
     }
 
+    bool runtime_configuration::get_agas_smp_mode() const
+    {
+        if (has_section("hpx.agas")) {
+            util::section const* sec = get_section("hpx.agas");
+            if (NULL != sec) {
+                return boost::lexical_cast<int>(
+                    sec->get_entry("smp_mode", "0"));
+            }
+        }
+        return false;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     bool runtime_configuration::load_application_configuration(
         char const* filename, error_code& ec)

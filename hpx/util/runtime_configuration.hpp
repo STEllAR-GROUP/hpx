@@ -39,6 +39,9 @@ namespace hpx { namespace util
         // default configuration loaded from hpx.ini
         bool load_application_configuration(char const* filename, 
             error_code& ec = throws);
+
+        // Can be set to true if we are only going to run HPX in one locality.
+        bool get_agas_smp_mode() const;
     };
 
 }}

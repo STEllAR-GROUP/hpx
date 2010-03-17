@@ -27,6 +27,8 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
+#include <hpx/runtime/naming/server/request_handler.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming 
 {
@@ -54,6 +56,7 @@ namespace hpx { namespace naming
         /// \param isconsole [in] This parameter is true if the locality 
         ///                 represents the application console.
         resolver_client(util::io_service_pool& io_service_pool, locality l,
+            bool local_only = false,
             bool isconsole = false, 
             std::size_t cachesize = HPX_INITIAL_AGAS_CACHE_SIZE);
 
@@ -729,6 +732,10 @@ namespace hpx { namespace naming
         get_client_connection(error_code& ec) const;
 
     private:
+        bool execute_local(server::request const& req, server::reply& rep,
+            error_code& ec) const;
+        bool execute_remote(server::request const& req, server::reply& rep,
+            error_code& ec) const;
         locality there_;
         util::io_service_pool& io_service_pool_;
 
@@ -778,6 +785,9 @@ namespace hpx { namespace naming
         > cache_type;
         mutable cache_type agas_cache_;
 #endif
+
+        bool local_only_;
+        mutable hpx::naming::server::request_handler request_handler_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

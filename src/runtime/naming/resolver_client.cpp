@@ -34,14 +34,16 @@
 #include <hpx/util/util.hpp>
 #include <hpx/util/block_profiler.hpp>
 
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming 
 {
     resolver_client::resolver_client(util::io_service_pool& io_service_pool, 
-            locality l, bool isconsole, std::size_t cachesize) 
+            locality l, bool local_only, bool isconsole, std::size_t cachesize) 
       : there_(l), io_service_pool_(io_service_pool), 
         connection_cache_(HPX_MAX_AGAS_CONNECTION_CACHE_SIZE, "[AGAS] "),
-        agas_cache_(cachesize), isconsole_(isconsole)
+        agas_cache_(cachesize), isconsole_(isconsole),
+        local_only_(local_only), request_handler_()
     {
         // start the io service pool
         io_service_pool.run(false);
@@ -297,8 +299,10 @@ namespace hpx { namespace naming
         {
             if (&ec == &throws)
             {
+                /*
                 HPX_RETHROW_EXCEPTION(s, 
                     "resolver_client::decref", rep.get_error());
+                    */
                 return -1;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
@@ -701,6 +705,15 @@ namespace hpx { namespace naming
     bool resolver_client::execute(server::request const &req, 
         server::reply& rep, error_code& ec) const
     {
+        if(local_only_)
+            return execute_local(req,rep,ec);
+        else
+            return execute_remote(req,rep,ec);
+    }
+
+    bool resolver_client::execute_remote(server::request const &req, 
+        server::reply& rep, error_code& ec) const
+    {
         typedef util::container_device<std::vector<char> > io_device_type;
 
         try {
@@ -820,6 +833,13 @@ namespace hpx { namespace naming
 
         if (&ec != &throws)
             ec = make_success_code();
+        return true;
+    }
+    bool resolver_client::execute_local(server::request const &req, 
+        server::reply& rep, error_code& ec) const
+    {
+        request_handler_.handle_request(req,rep);
+        ec = make_success_code();//success;
         return true;
     }
 
