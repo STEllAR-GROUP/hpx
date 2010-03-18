@@ -14,6 +14,10 @@ import sys
 
 from hpx_log import HpxLog
 
+from px_dag import PxExecution
+from px_dag import PxPhase
+from px_dag import PxThread
+
 import pxdm
 
 g_action = '(future_value|got|set)'
@@ -76,6 +80,9 @@ def add_edge(edges, A, B):
 
 def thread(t):
   return t.split('p')[0]
+
+def node_name(phase):
+  return "T%sp%s" % (phase.get_thread(), phase.get_id())
 
 def parse_action_name(event, label, future, cadd):
   action = None
