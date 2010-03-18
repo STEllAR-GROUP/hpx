@@ -15,8 +15,3 @@ An HpxLog contains a number of HpxLogEvent's, corresponding to the lines in the
 logfile. An HpxLogEvent contains a number of fields, corresponding to the 
 columns in the logfile.
 
-split_log.py:
-
-This script takes a logfile and splits it into multiple logfile, one for each 
-locality. It also orders the events in each by its "count".
-
