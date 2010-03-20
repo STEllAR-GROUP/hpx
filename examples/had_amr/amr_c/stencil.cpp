@@ -93,7 +93,7 @@ namespace hpx { namespace components { namespace amr
             bbox[0] = 1;
             bbox[1] = 0;
             boundary = true;
-          } else if ( column == 49 ) {
+          } else if ( column == par.nx0-1 ) {
             bbox[0] = 0;
             bbox[1] = 1;
             boundary = true;
