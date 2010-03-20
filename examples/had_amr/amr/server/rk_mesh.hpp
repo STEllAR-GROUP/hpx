@@ -107,7 +107,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         static void prep_ports_nine(Array3D &dst_port,Array3D &dst_src,
                                     Array3D &dst_step,Array3D &dst_size,
-                                    Array3D &src_size,int numvalues);
+                                    Array3D &src_size,int numvalues,Parameter const& par);
 
     private:
         std::size_t numvalues_;

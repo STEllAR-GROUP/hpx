@@ -242,6 +242,7 @@ int main(int argc, char* argv[])
         par.amp         =  0.1;
         par.delta       =  1.0;
         par.PP          =  7;
+        par.global_barrier  =  0;
 
         par.linearbounds = 1;
         int scheduler = 0;  // default: global scheduler
@@ -326,6 +327,10 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("PP") ) {
                 std::string tmp = sec->get_entry("PP");
                 par.PP = atoi(tmp.c_str());
+              }
+              if ( sec->has_entry("global_barrier") ) {
+                std::string tmp = sec->get_entry("global_barrier");
+                par.global_barrier = atoi(tmp.c_str());
               }
             }
         }
