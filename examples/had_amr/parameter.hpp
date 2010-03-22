@@ -57,6 +57,7 @@ namespace hpx { namespace components { namespace amr
             ar & delta;
             ar & amp;
             ar & PP;
+            ar & global_barrier;
 
         }
     };
