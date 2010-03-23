@@ -154,7 +154,7 @@ namespace hpx { namespace components { namespace stubs
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future
-            return create_one_component_async(gid.get_gid(), type, arg0).get();
+            return create_one_component_async(gid, type, arg0).get();
         }
 
         ///////////////////////////////////////////////////////////////////////

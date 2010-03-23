@@ -53,7 +53,7 @@ namespace hpx { namespace naming { namespace server
         bool self)
     {
         try {
-            mutex_type::scoped_lock l(registry_mtx_);
+            typename mutex_type::scoped_lock l(registry_mtx_);
             site_prefix_map_type::iterator it = 
                 site_prefixes_.find(req.get_site());
             if (it != site_prefixes_.end()) {
@@ -136,7 +136,7 @@ namespace hpx { namespace naming { namespace server
     void request_handler<Mutex>::handle_getconsoleprefix(request const& req, reply& rep)
     {
         try {
-            mutex_type::scoped_lock l(registry_mtx_);
+            typename mutex_type::scoped_lock l(registry_mtx_);
 
             if (0 != console_prefix_) {
                 rep = reply(success, command_getconsoleprefix, 
@@ -157,21 +157,21 @@ namespace hpx { namespace naming { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Mutex>
-    inline void lock(Mutex&, typename Mutex::scoped_lock& l)
+    inline void lock_helper(Mutex&, typename Mutex::scoped_lock& l)
     {
         l.lock();
     }
-    inline void lock(boost::detail::spinlock& m, boost::detail::spinlock::scoped_lock&)
+    inline void lock_helper(boost::detail::spinlock& m, boost::detail::spinlock::scoped_lock&)
     {
         m.lock();
     }
 
     template <typename Mutex>
-    inline void unlock(Mutex&, typename Mutex::scoped_lock& l)
+    inline void unlock_helper(Mutex&, typename Mutex::scoped_lock& l)
     {
         l.unlock();
     }
-    inline void unlock(boost::detail::spinlock& m, boost::detail::spinlock::scoped_lock&)
+    inline void unlock_helper(boost::detail::spinlock& m, boost::detail::spinlock::scoped_lock&)
     {
         m.unlock();
     }
@@ -180,7 +180,7 @@ namespace hpx { namespace naming { namespace server
     void request_handler<Mutex>::handle_getprefixes(request const& req, reply& rep)
     {
         try {
-            mutex_type::scoped_lock l(registry_mtx_);
+            typename mutex_type::scoped_lock l(registry_mtx_);
 
             std::vector<boost::uint32_t> prefixes;
             prefixes.reserve(site_prefixes_.size());
@@ -188,18 +188,18 @@ namespace hpx { namespace naming { namespace server
             components::component_type t = req.get_type();
             if (components::component_invalid == t) {
                 // return all prefixes
-                site_prefix_map_type::iterator end = site_prefixes_.end();
-                for (site_prefix_map_type::iterator it = site_prefixes_.begin();
+                typename site_prefix_map_type::iterator end = site_prefixes_.end();
+                for (typename site_prefix_map_type::iterator it = site_prefixes_.begin();
                      it != end; ++it)
                 {
                     prefixes.push_back((*it).second.first);
                 }
             }
             else {
-                unlock(registry_mtx_, l);
+                unlock_helper(registry_mtx_, l);
 
                 // return prefixes which have a factory for the given type
-                mutex_type::scoped_lock fl(component_types_mtx_);
+                typename mutex_type::scoped_lock fl(component_types_mtx_);
                 std::pair<factory_map::iterator, factory_map::iterator> p = 
                     factories_.equal_range(t);
                 for (/**/; p.first != p.second; ++p.first) 
@@ -207,7 +207,7 @@ namespace hpx { namespace naming { namespace server
                     prefixes.push_back((*p.first).second);
                 }
 
-                lock(registry_mtx_, l);
+                lock_helper(registry_mtx_, l);
             }
 
             rep = reply(prefixes, prefixes.empty() ? no_success : success); 
@@ -225,12 +225,12 @@ namespace hpx { namespace naming { namespace server
     void request_handler<Mutex>::handle_get_component_id(request const& req, reply& rep)
     {
         try {
-            mutex_type::scoped_lock l(component_types_mtx_);
+            typename mutex_type::scoped_lock l(component_types_mtx_);
 
             component_type_map::iterator it = component_types_.find(req.get_name());
             if (it == component_types_.end()) {
                 // first request: create a new component type and store it
-                std::pair<component_type_map::iterator, bool> p = 
+                std::pair<typename component_type_map::iterator, bool> p = 
                     component_types_.insert(component_type_map::value_type(
                         req.get_name(), component_type_++));
                 if (!p.second) {
@@ -257,13 +257,13 @@ namespace hpx { namespace naming { namespace server
     void request_handler<Mutex>::handle_register_factory(request const& req, reply& rep)
     {
         try {
-            mutex_type::scoped_lock l(component_types_mtx_);
+            typename mutex_type::scoped_lock l(component_types_mtx_);
 
             // ensure component type
             component_type_map::iterator it = component_types_.find(req.get_name());
             if (it == component_types_.end()) {
                 // first request: create a new component type and store it
-                std::pair<component_type_map::iterator, bool> p = 
+                std::pair<typename component_type_map::iterator, bool> p = 
                     component_types_.insert(component_type_map::value_type(
                         req.get_name(), component_type_++));
                 if (!p.second) {
@@ -275,8 +275,8 @@ namespace hpx { namespace naming { namespace server
 
             // store prefix in factory map
             boost::uint32_t prefix = get_prefix_from_gid(req.get_id());
-            factory_map::iterator itf = factories_.insert(
-                factory_map::value_type((*it).second, prefix));
+            typename factory_map::iterator itf = factories_.insert(
+                typename factory_map::value_type((*it).second, prefix));
 
             if (itf == factories_.end()) 
             {
@@ -301,8 +301,8 @@ namespace hpx { namespace naming { namespace server
     void request_handler<Mutex>::handle_getidrange(request const& req, reply& rep)
     {
         try {
-            mutex_type::scoped_lock l(registry_mtx_);
-            site_prefix_map_type::iterator it = 
+            typename mutex_type::scoped_lock l(registry_mtx_);
+            typename site_prefix_map_type::iterator it = 
                 site_prefixes_.find(req.get_site());
             if (it != site_prefixes_.end()) {
                 // The real prefix has to be used as the 32 most 
@@ -353,15 +353,15 @@ namespace hpx { namespace naming { namespace server
                     << req.get_site() << ", prefix: " << id
                     << ", current upper: " << lower_id;
 
-                std::pair<site_prefix_map_type::iterator, bool> p =
+                std::pair<typename site_prefix_map_type::iterator, bool> p =
                     site_prefixes_.insert(
-                        site_prefix_map_type::value_type(req.get_site(), 
+                        typename site_prefix_map_type::value_type(req.get_site(), 
                             std::make_pair(prefix, lower_id)));
 
                 // make sure the entry got created
                 if (!p.second) {
                     if (LAGAS_ENABLED(debug)) {
-                        BOOST_FOREACH(site_prefix_map_type::value_type v, site_prefixes_)
+                        BOOST_FOREACH(typename site_prefix_map_type::value_type v, site_prefixes_)
                         {
                             LAGAS_(debug) 
                                 << "handle_getidrange: registered site: "
@@ -375,7 +375,7 @@ namespace hpx { namespace naming { namespace server
 
                 // now, bind this prefix to the locality address allowing to 
                 // send parcels to the memory of a locality
-                registry_type::iterator it = registry_.find(id);
+                typename registry_type::iterator it = registry_.find(id);
                 if (it != registry_.end()) {
                     // this shouldn't happen
                     rep = reply(command_getidrange, no_success, 
@@ -383,7 +383,7 @@ namespace hpx { namespace naming { namespace server
                     return;
                 }
                 else {
-                    registry_.insert(registry_type::value_type(id, 
+                    registry_.insert(typename registry_type::value_type(id, 
                         registry_data_type(address(req.get_site()), 1, 0)));
                 }
 
@@ -423,11 +423,11 @@ namespace hpx { namespace naming { namespace server
             {
                 using boost::fusion::at_c;
 
-                mutex_type::scoped_lock l(registry_mtx_);
+                typename mutex_type::scoped_lock l(registry_mtx_);
                 naming::gid_type id = req.get_id();
                 naming::strip_credit_from_gid(id);
 
-                registry_type::iterator it = registry_.lower_bound(id);
+                typename registry_type::iterator it = registry_.lower_bound(id);
 
                 if (it != registry_.end()) {
                     if ((*it).first == id) {
@@ -497,19 +497,19 @@ namespace hpx { namespace naming { namespace server
     void request_handler<Mutex>::handle_incref(request const& req, reply& rep)
     {
         try {
-            mutex_type::scoped_lock l(registry_mtx_);
+            typename mutex_type::scoped_lock l(registry_mtx_);
 
             naming::gid_type id = req.get_id();
             naming::strip_credit_from_gid(id);
 
-            refcnt_store_type::iterator it = refcnts_.find(id);
+            typename refcnt_store_type::iterator it = refcnts_.find(id);
             if (it == refcnts_.end()) 
             {
                 // we insert a new reference count entry with an initial 
                 // count of HPX_INITIAL_GLOBALCREDIT because we assume bind() 
                 // has already created the first reference (plus credits).
-                std::pair<refcnt_store_type::iterator, bool> p = 
-                    refcnts_.insert(refcnt_store_type::value_type(id, 
+                std::pair<typename refcnt_store_type::iterator, bool> p = 
+                    refcnts_.insert(typename refcnt_store_type::value_type(id, 
                                         HPX_INITIAL_GLOBALCREDIT));
                 if (!p.second)
                 {
@@ -536,8 +536,8 @@ namespace hpx { namespace naming { namespace server
     {
         using boost::fusion::at_c;
 
-        mutex_type::scoped_lock l(registry_mtx_);
-        registry_type::iterator it = registry_.lower_bound(gid);
+        typename mutex_type::scoped_lock l(registry_mtx_);
+        typename registry_type::iterator it = registry_.lower_bound(gid);
         if (it != registry_.end()) {
             if ((*it).first == gid) {
                 // found the exact match in the registry
@@ -581,8 +581,8 @@ namespace hpx { namespace naming { namespace server
             boost::uint64_t cnt = 0;
 
             {
-                mutex_type::scoped_lock l(registry_mtx_);
-                refcnt_store_type::iterator it = refcnts_.find(id);
+                typename mutex_type::scoped_lock l(registry_mtx_);
+                typename refcnt_store_type::iterator it = refcnts_.find(id);
                 if (it != refcnts_.end()) 
                 {
                     if ((*it).second < req.get_count()) {
@@ -602,8 +602,9 @@ namespace hpx { namespace naming { namespace server
                     // we insert a new reference count entry with an initial 
                     // count of HPX_INITIAL_GLOBALCREDIT because we assume bind() 
                     // has already created the first reference (plus credits).
-                    std::pair<refcnt_store_type::iterator, bool> p = refcnts_.insert(
-                            refcnt_store_type::value_type(id, HPX_INITIAL_GLOBALCREDIT));
+                    std::pair<typename refcnt_store_type::iterator, bool> p = 
+                        refcnts_.insert(
+                            typename refcnt_store_type::value_type(id, HPX_INITIAL_GLOBALCREDIT));
                     if (!p.second)
                     {
                         rep = reply(command_decref, out_of_memory);
@@ -655,12 +656,12 @@ namespace hpx { namespace naming { namespace server
             {
                 using boost::fusion::at_c;
 
-                mutex_type::scoped_lock l(registry_mtx_);
+                typename mutex_type::scoped_lock l(registry_mtx_);
 
                 naming::gid_type id = req.get_id();
                 naming::strip_credit_from_gid(id);
 
-                registry_type::iterator it = registry_.find(id);
+                typename registry_type::iterator it = registry_.find(id);
                 if (it != registry_.end()) {
                     if (at_c<1>((*it).second) != req.get_count()) {
                         // this is an error since we can't use a different 
@@ -693,12 +694,12 @@ namespace hpx { namespace naming { namespace server
         try {
             using boost::fusion::at_c;
 
-            mutex_type::scoped_lock l(registry_mtx_);
+            typename mutex_type::scoped_lock l(registry_mtx_);
 
             naming::gid_type id = req.get_id();
             naming::strip_credit_from_gid(id);
 
-            registry_type::iterator it = registry_.lower_bound(id);
+            typename registry_type::iterator it = registry_.lower_bound(id);
             if (it != registry_.end()) {
                 if ((*it).first == id) {
                     // found the exact match in the registry
@@ -767,8 +768,8 @@ namespace hpx { namespace naming { namespace server
     void request_handler<Mutex>::handle_queryid(request const& req, reply& rep)
     {
         try {
-            mutex_type::scoped_lock l(ns_registry_mtx_);
-            ns_registry_type::iterator it = ns_registry_.find(req.get_name());
+            typename mutex_type::scoped_lock l(ns_registry_mtx_);
+            typename ns_registry_type::iterator it = ns_registry_.find(req.get_name());
             if (it != ns_registry_.end()) 
                 rep = reply(command_queryid, (*it).second);
             else
@@ -789,16 +790,16 @@ namespace hpx { namespace naming { namespace server
         try {
             error s = no_success;
             {
-                mutex_type::scoped_lock l(ns_registry_mtx_);
+                typename mutex_type::scoped_lock l(ns_registry_mtx_);
 
                 naming::gid_type id = req.get_id();
                 naming::strip_credit_from_gid(id);
 
-                ns_registry_type::iterator it = ns_registry_.find(req.get_name());
+                typename ns_registry_type::iterator it = ns_registry_.find(req.get_name());
                 if (it != ns_registry_.end())
                     (*it).second = id;
                 else {
-                    ns_registry_.insert(ns_registry_type::value_type(
+                    ns_registry_.insert(typename ns_registry_type::value_type(
                         req.get_name(), id));
                     s = success;    // created new entry
                 }
@@ -820,8 +821,8 @@ namespace hpx { namespace naming { namespace server
         try {
             error s = no_success;
             {
-                mutex_type::scoped_lock l(ns_registry_mtx_);
-                ns_registry_type::iterator it = ns_registry_.find(req.get_name());
+                typename mutex_type::scoped_lock l(ns_registry_mtx_);
+                typename ns_registry_type::iterator it = ns_registry_.find(req.get_name());
                 if (it != ns_registry_.end()) {
                     ns_registry_.erase(it);
                     s = success;
@@ -1029,6 +1030,6 @@ namespace hpx { namespace naming { namespace server
 }}}  // namespace hpx::naming::server
 
 ///////////////////////////////////////////////////////////////////////////////
-template hpx::naming::server::request_handler<boost::mutex>;
+template class hpx::naming::server::request_handler<boost::mutex>;
 // template hpx::naming::server::request_handler<hpx::lcos::mutex>;
-template hpx::naming::server::request_handler<boost::detail::spinlock>;
+template class hpx::naming::server::request_handler<boost::detail::spinlock>;

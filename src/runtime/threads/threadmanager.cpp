@@ -309,7 +309,8 @@ namespace hpx { namespace threads
     {
         // we know that the id is actually the pointer to the thread
         thread* thrd = reinterpret_cast<thread*>(id);
-        return thrd->get() ? thrd->set_lco_description(desc) : "<unknown>";
+        if (thrd->get()) 
+            thrd->set_lco_description(desc);
     }
 
     /// This thread function is used by the at_timer thread below to trigger

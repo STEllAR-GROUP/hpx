@@ -13,7 +13,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 else()
     set(example_SUBDIRS 
         accumulator generic had_amr naming parcelset
-        #quickstart
+        quickstart
         #heart_beat
        )
 endif()
