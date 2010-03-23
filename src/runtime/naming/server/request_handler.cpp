@@ -16,22 +16,40 @@
 #include <hpx/runtime/naming/server/request.hpp>
 #include <hpx/runtime/naming/server/request_handler.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/lcos/mutex.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming { namespace server 
 {
+    template <typename Mutex>
+    inline void init_mutex(Mutex& m)
+    {
+    }
+    inline void init_mutex(boost::detail::spinlock& m)
+    {
+        boost::detail::spinlock l = BOOST_DETAIL_SPINLOCK_INIT;
+        m = l;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
-    request_handler::request_handler()
+    template <typename Mutex>
+    request_handler<Mutex>::request_handler()
       : totals_(command_lastcommand), 
         console_prefix_(0),
         component_type_(components::component_first_dynamic)
-    {}
+    {
+        init_mutex(ns_registry_mtx_);
+        init_mutex(registry_mtx_);
+        init_mutex(component_types_mtx_);
+    }
 
-    request_handler::~request_handler()
+    template <typename Mutex>
+    request_handler<Mutex>::~request_handler()
     {}
 
     ///////////////////////////////////////////////////////////////////////////
-    void request_handler::handle_getprefix(request const& req, reply& rep, 
+    template <typename Mutex>
+    void request_handler<Mutex>::handle_getprefix(request const& req, reply& rep, 
         bool self)
     {
         try {
@@ -114,7 +132,8 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void request_handler::handle_getconsoleprefix(request const& req, reply& rep)
+    template <typename Mutex>
+    void request_handler<Mutex>::handle_getconsoleprefix(request const& req, reply& rep)
     {
         try {
             mutex_type::scoped_lock l(registry_mtx_);
@@ -137,7 +156,28 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void request_handler::handle_getprefixes(request const& req, reply& rep)
+    template <typename Mutex>
+    inline void lock(Mutex&, typename Mutex::scoped_lock& l)
+    {
+        l.lock();
+    }
+    inline void lock(boost::detail::spinlock& m, boost::detail::spinlock::scoped_lock&)
+    {
+        m.lock();
+    }
+
+    template <typename Mutex>
+    inline void unlock(Mutex&, typename Mutex::scoped_lock& l)
+    {
+        l.unlock();
+    }
+    inline void unlock(boost::detail::spinlock& m, boost::detail::spinlock::scoped_lock&)
+    {
+        m.unlock();
+    }
+
+    template <typename Mutex>
+    void request_handler<Mutex>::handle_getprefixes(request const& req, reply& rep)
     {
         try {
             mutex_type::scoped_lock l(registry_mtx_);
@@ -156,7 +196,7 @@ namespace hpx { namespace naming { namespace server
                 }
             }
             else {
-                l.unlock();
+                unlock(registry_mtx_, l);
 
                 // return prefixes which have a factory for the given type
                 mutex_type::scoped_lock fl(component_types_mtx_);
@@ -166,6 +206,8 @@ namespace hpx { namespace naming { namespace server
                 {
                     prefixes.push_back((*p.first).second);
                 }
+
+                lock(registry_mtx_, l);
             }
 
             rep = reply(prefixes, prefixes.empty() ? no_success : success); 
@@ -179,7 +221,8 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void request_handler::handle_get_component_id(request const& req, reply& rep)
+    template <typename Mutex>
+    void request_handler<Mutex>::handle_get_component_id(request const& req, reply& rep)
     {
         try {
             mutex_type::scoped_lock l(component_types_mtx_);
@@ -210,7 +253,8 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void request_handler::handle_register_factory(request const& req, reply& rep)
+    template <typename Mutex>
+    void request_handler<Mutex>::handle_register_factory(request const& req, reply& rep)
     {
         try {
             mutex_type::scoped_lock l(component_types_mtx_);
@@ -253,7 +297,8 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void request_handler::handle_getidrange(request const& req, reply& rep)
+    template <typename Mutex>
+    void request_handler<Mutex>::handle_getidrange(request const& req, reply& rep)
     {
         try {
             mutex_type::scoped_lock l(registry_mtx_);
@@ -369,7 +414,8 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void request_handler::handle_bind_range(request const& req, reply& rep)
+    template <typename Mutex>
+    void request_handler<Mutex>::handle_bind_range(request const& req, reply& rep)
     {
         try {
             error s = no_success;
@@ -447,7 +493,8 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void request_handler::handle_incref(request const& req, reply& rep)
+    template <typename Mutex>
+    void request_handler<Mutex>::handle_incref(request const& req, reply& rep)
     {
         try {
             mutex_type::scoped_lock l(registry_mtx_);
@@ -483,8 +530,9 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Mutex>
     components::component_type
-    request_handler::get_component_type(naming::gid_type const& gid)
+    request_handler<Mutex>::get_component_type(naming::gid_type const& gid)
     {
         using boost::fusion::at_c;
 
@@ -521,7 +569,8 @@ namespace hpx { namespace naming { namespace server
         return components::component_invalid;
     }
 
-    void request_handler::handle_decref(request const& req, reply& rep)
+    template <typename Mutex>
+    void request_handler<Mutex>::handle_decref(request const& req, reply& rep)
     {
         try {
             naming::gid_type id = req.get_id();
@@ -531,49 +580,50 @@ namespace hpx { namespace naming { namespace server
 
             boost::uint64_t cnt = 0;
 
-            mutex_type::scoped_lock l(registry_mtx_);
-            refcnt_store_type::iterator it = refcnts_.find(id);
-            if (it != refcnts_.end()) 
             {
-                if ((*it).second < req.get_count()) {
-                    rep = reply(command_decref, bad_parameter,
-                        "Bogus credit while decrementing global reference count.");
-                    return;
-                }
-
-                (*it).second -= req.get_count();
-                cnt = (*it).second;
-
-                if (0 == cnt)
-                    refcnts_.erase(it);   // last reference removes entry
-            }
-            else if (req.get_count() < HPX_INITIAL_GLOBALCREDIT) 
-            {
-                // we insert a new reference count entry with an initial 
-                // count of HPX_INITIAL_GLOBALCREDIT because we assume bind() 
-                // has already created the first reference (plus credits).
-                std::pair<refcnt_store_type::iterator, bool> p = refcnts_.insert(
-                        refcnt_store_type::value_type(id, HPX_INITIAL_GLOBALCREDIT));
-                if (!p.second)
+                mutex_type::scoped_lock l(registry_mtx_);
+                refcnt_store_type::iterator it = refcnts_.find(id);
+                if (it != refcnts_.end()) 
                 {
-                    rep = reply(command_decref, out_of_memory);
-                    return;
+                    if ((*it).second < req.get_count()) {
+                        rep = reply(command_decref, bad_parameter,
+                            "Bogus credit while decrementing global reference count.");
+                        return;
+                    }
+
+                    (*it).second -= req.get_count();
+                    cnt = (*it).second;
+
+                    if (0 == cnt)
+                        refcnts_.erase(it);   // last reference removes entry
                 }
-                it = p.first;
+                else if (req.get_count() < HPX_INITIAL_GLOBALCREDIT) 
+                {
+                    // we insert a new reference count entry with an initial 
+                    // count of HPX_INITIAL_GLOBALCREDIT because we assume bind() 
+                    // has already created the first reference (plus credits).
+                    std::pair<refcnt_store_type::iterator, bool> p = refcnts_.insert(
+                            refcnt_store_type::value_type(id, HPX_INITIAL_GLOBALCREDIT));
+                    if (!p.second)
+                    {
+                        rep = reply(command_decref, out_of_memory);
+                        return;
+                    }
+                    it = p.first;
 
-                if ((*it).second < req.get_count()) {
-                    rep = reply(command_decref, bad_parameter,
-                        "Bogus credit while decrementing global reference count.");
-                    return;
+                    if ((*it).second < req.get_count()) {
+                        rep = reply(command_decref, bad_parameter,
+                            "Bogus credit while decrementing global reference count.");
+                        return;
+                    }
+
+                    (*it).second -= req.get_count();
+                    cnt = (*it).second;
+
+                    if (0 == cnt)
+                        refcnts_.erase(it);   // last reference removes entry
                 }
-
-                (*it).second -= req.get_count();
-                cnt = (*it).second;
-
-                if (0 == cnt)
-                    refcnts_.erase(it);   // last reference removes entry
             }
-            l.unlock();
 
             components::component_type t = components::component_invalid;
             if (0 == cnt) 
@@ -596,7 +646,8 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void request_handler::handle_unbind_range(request const& req, reply& rep)
+    template <typename Mutex>
+    void request_handler<Mutex>::handle_unbind_range(request const& req, reply& rep)
     {
         try {
             error s = no_success;
@@ -636,7 +687,8 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void request_handler::handle_resolve(request const& req, reply& rep)
+    template <typename Mutex>
+    void request_handler<Mutex>::handle_resolve(request const& req, reply& rep)
     {
         try {
             using boost::fusion::at_c;
@@ -711,7 +763,8 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void request_handler::handle_queryid(request const& req, reply& rep)
+    template <typename Mutex>
+    void request_handler<Mutex>::handle_queryid(request const& req, reply& rep)
     {
         try {
             mutex_type::scoped_lock l(ns_registry_mtx_);
@@ -730,7 +783,8 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void request_handler::handle_registerid(request const& req, reply& rep)
+    template <typename Mutex>
+    void request_handler<Mutex>::handle_registerid(request const& req, reply& rep)
     {
         try {
             error s = no_success;
@@ -760,7 +814,8 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void request_handler::handle_unregisterid(request const& req, reply& rep)
+    template <typename Mutex>
+    void request_handler<Mutex>::handle_unregisterid(request const& req, reply& rep)
     {
         try {
             error s = no_success;
@@ -790,7 +845,8 @@ namespace hpx { namespace naming { namespace server
     }
 #endif
     
-    void request_handler::handle_statistics_count(request const& req, reply& rep)
+    template <typename Mutex>
+    void request_handler<Mutex>::handle_statistics_count(request const& req, reply& rep)
     {
         try {
 #if BOOST_VERSION >= 103600
@@ -815,7 +871,8 @@ namespace hpx { namespace naming { namespace server
     }
 #endif
     
-    void request_handler::handle_statistics_mean(request const& req, reply& rep)
+    template <typename Mutex>
+    void request_handler<Mutex>::handle_statistics_mean(request const& req, reply& rep)
     {
         try {
 #if BOOST_VERSION >= 103600
@@ -834,7 +891,8 @@ namespace hpx { namespace naming { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
 #if BOOST_VERSION >= 103600
-    double request_handler::extract_moment2(accumulator_set_type const& p)
+    template <typename Mutex>
+    double request_handler<Mutex>::extract_moment2(accumulator_set_type const& p)
     {
         return boost::accumulators::extract::moment<2>(p);
     }
@@ -845,12 +903,13 @@ namespace hpx { namespace naming { namespace server
     }
 #endif
 
-    void request_handler::handle_statistics_moment2(request const& req, reply& rep)
+    template <typename Mutex>
+    void request_handler<Mutex>::handle_statistics_moment2(request const& req, reply& rep)
     {
         try {
 #if BOOST_VERSION >= 103600
             rep = reply(command_statistics_moment2, totals_, 
-                &request_handler::extract_moment2);
+                &request_handler<Mutex>::extract_moment2);
 #else
             rep = reply(command_statistics_moment2, totals_, extract_moment2);
 #endif
@@ -864,7 +923,8 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void request_handler::handle_requests(std::vector<request> const& reqs, 
+    template <typename Mutex>
+    void request_handler<Mutex>::handle_requests(std::vector<request> const& reqs, 
         std::vector<reply>& reps)
     {
         BOOST_FOREACH(request const& req, reqs)
@@ -875,7 +935,8 @@ namespace hpx { namespace naming { namespace server
         }
     }
 
-    void request_handler::handle_request(request const& req, reply& rep)
+    template <typename Mutex>
+    void request_handler<Mutex>::handle_request(request const& req, reply& rep)
     {
         LAGAS_(info) << "request: " << req;
 
@@ -967,3 +1028,7 @@ namespace hpx { namespace naming { namespace server
 
 }}}  // namespace hpx::naming::server
 
+///////////////////////////////////////////////////////////////////////////////
+template hpx::naming::server::request_handler<boost::mutex>;
+// template hpx::naming::server::request_handler<hpx::lcos::mutex>;
+template hpx::naming::server::request_handler<boost::detail::spinlock>;

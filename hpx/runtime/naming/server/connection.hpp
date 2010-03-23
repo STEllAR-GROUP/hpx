@@ -48,7 +48,7 @@ namespace hpx { namespace naming { namespace server
     public:
         /// Construct a receiving connection with the given io_service.
         connection(boost::asio::io_service& io_service,
-            request_handler& handler)
+            request_handler<boost::mutex>& handler)
           : socket_(io_service), request_handler_(handler)
         {
         }
@@ -245,7 +245,7 @@ namespace hpx { namespace naming { namespace server
         boost::asio::ip::tcp::socket socket_;
 
         /// The handler used to process the incoming request.
-        request_handler& request_handler_;
+        request_handler<boost::mutex>& request_handler_;
 
         /// buffer for incoming and outgoing data
         boost::integer::ulittle32_t size_;

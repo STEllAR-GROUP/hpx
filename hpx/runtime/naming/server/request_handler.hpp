@@ -26,6 +26,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/locality.hpp>
+#include <hpx/util/spinlock_pool.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming { namespace server 
@@ -33,7 +34,8 @@ namespace hpx { namespace naming { namespace server
     class request;
     class reply;
 
-    /// The common handler for all incoming requests.
+    /// The common handler for all incoming requests
+    template <typename Mutex>
     class request_handler : private boost::noncopyable
     {
     public:
@@ -131,7 +133,7 @@ namespace hpx { namespace naming { namespace server
         typedef std::map<std::string, int> component_type_map;
         typedef std::multimap<int, boost::uint32_t> factory_map;
 
-        typedef boost::mutex mutex_type;
+        typedef Mutex mutex_type;
 
         mutex_type ns_registry_mtx_;
         ns_registry_type ns_registry_;        // "name" --> global_id
@@ -170,8 +172,9 @@ namespace hpx { namespace naming { namespace server
     };
 
     // compare two entries in the site_prefix_map_type above
-    inline bool operator< (request_handler::site_prefix_value_type const& lhs,
-        request_handler::site_prefix_value_type const& rhs)
+    inline bool 
+    operator< (std::pair<hpx::naming::locality, std::pair<boost::uint32_t, naming::gid_type> > const& lhs,
+        std::pair<hpx::naming::locality, std::pair<boost::uint32_t, naming::gid_type> > const& rhs)
     {
         if (lhs.first < rhs.first)
             return true;

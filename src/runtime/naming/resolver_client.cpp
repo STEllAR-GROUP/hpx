@@ -34,7 +34,6 @@
 #include <hpx/util/util.hpp>
 #include <hpx/util/block_profiler.hpp>
 
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming 
 {
@@ -46,12 +45,14 @@ namespace hpx { namespace naming
         agas_cache_(ini.get_agas_cache_size()), isconsole_(isconsole),
         local_only_(ini.get_agas_smp_mode()), request_handler_(0)
     {
-        // start the io service pool
-        io_service_pool.run(false);
-
         // initialize the request handler if in SMP mode
-        if (local_only_)
-            request_handler_ = new naming::server::request_handler;
+        if (local_only_) {
+            request_handler_ = new naming::server::request_handler<request_mutex_type>;
+        }
+        else {
+            // start the io service pool
+            io_service_pool_.run(false);
+        }
     }
 
     resolver_client::resolver_client(util::io_service_pool& io_service_pool, 
@@ -62,12 +63,14 @@ namespace hpx { namespace naming
         agas_cache_(ini.get_agas_cache_size()), isconsole_(isconsole),
         local_only_(ini.get_agas_smp_mode()), request_handler_(0)
     {
-        // start the io service pool
-        io_service_pool.run(false);
-
         // initialize the request handler if in SMP mode
-        if (local_only_)
-            request_handler_ = new naming::server::request_handler;
+        if (local_only_) {
+            request_handler_ = new naming::server::request_handler<request_mutex_type>;
+        }
+        else {
+            // start the io service pool
+            io_service_pool_.run(false);
+        }
     }
 
     resolver_client::~resolver_client()
@@ -271,10 +274,12 @@ namespace hpx { namespace naming
         }
 
 #if defined(HPX_USE_AGAS_CACHE)
-        // add the new range to the local cache
-        mutex_type::scoped_lock lock(mtx_);
-        cache_key k(id, count);
-        agas_cache_.insert(k, std::make_pair(addr, offset));
+        if (!local_only_) {
+            // add the new range to the local cache
+            mutex_type::scoped_lock lock(mtx_);
+            cache_key k(id, count);
+            agas_cache_.insert(k, std::make_pair(addr, offset));
+        }
 #endif
 
         if (&ec != &throws)
@@ -325,10 +330,8 @@ namespace hpx { namespace naming
         {
             if (&ec == &throws)
             {
-                /*
                 HPX_RETHROW_EXCEPTION(s, 
                     "resolver_client::decref", rep.get_error());
-                    */
                 return -1;
             }
             ec = make_error_code(s, rep.get_error(), hpx::rethrow);
@@ -388,10 +391,12 @@ namespace hpx { namespace naming
         addr = rep.get_address();
 
 #if defined(HPX_USE_AGAS_CACHE)
-        // remove this entry from the cache
-        mutex_type::scoped_lock lock(mtx_);
-        erase_policy ep(id, count);
-        agas_cache_.erase(ep);
+        if (!local_only_) {
+            // remove this entry from the cache
+            mutex_type::scoped_lock lock(mtx_);
+            erase_policy ep(id, count);
+            agas_cache_.erase(ep);
+        }
 #endif
 
         if (&ec != &throws)
@@ -431,7 +436,7 @@ namespace hpx { namespace naming
     {
         util::block_profiler<resolve_tag> bp("resolver_client::resolve");
 
-        if (try_cache && resolve_cached(id, addr, ec))
+        if (try_cache && !local_only_ && resolve_cached(id, addr, ec))
             return true;
 
         // send request
@@ -456,10 +461,12 @@ namespace hpx { namespace naming
         addr = rep.get_address();
 
 #if defined(HPX_USE_AGAS_CACHE)
-        // add the requested item to the cache
-        mutex_type::scoped_lock lock(mtx_);
-        cache_key k(id);
-        agas_cache_.insert(k, std::make_pair(addr, 1));
+        if (!local_only_) {
+            // add the requested item to the cache
+            mutex_type::scoped_lock lock(mtx_);
+            cache_key k(id);
+            agas_cache_.insert(k, std::make_pair(addr, 1));
+        }
 #endif
 
         if (&ec != &throws)
@@ -668,24 +675,26 @@ namespace hpx { namespace naming
             for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
             {
                 try {
-                    client_connection.reset(new resolver_client_connection(
-                            io_service_pool_.get_io_service())); 
-
-                    locality::iterator_type end = there_.connect_end();
-                    for (locality::iterator_type it = 
-                            there_.connect_begin(io_service_pool_.get_io_service()); 
-                         it != end; ++it)
                     {
-//                         boost::system::error_code ec;
-//                         client_connection->socket().shutdown(boost::asio::socket_base::shutdown_both, ec);
-                        client_connection->socket().close();
-                        client_connection->socket().connect(*it, error);
-                        if (!error) 
+                        mutex_type::scoped_lock l(connection_mtx_);
+                        client_connection.reset(new resolver_client_connection(
+                                io_service_pool_.get_io_service())); 
+
+                        locality::iterator_type end = there_.connect_end();
+                        for (locality::iterator_type it = 
+                                there_.connect_begin(io_service_pool_.get_io_service()); 
+                             it != end; ++it)
+                        {
+    //                         boost::system::error_code ec;
+    //                         client_connection->socket().shutdown(boost::asio::socket_base::shutdown_both, ec);
+                            client_connection->socket().close();
+                            client_connection->socket().connect(*it, error);
+                            if (!error) 
+                                break;
+                        }
+                        if (!error)
                             break;
                     }
-                    if (!error)
-                        break;
-
                     boost::this_thread::sleep(boost::get_system_time() + 
                         boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
                 }
@@ -1011,7 +1020,7 @@ namespace hpx { namespace naming
         std::vector<server::reply>& rep, error_code& ec) const
     {
         BOOST_ASSERT(local_only_ && request_handler_);
-        request_handler_->handle_requests(req,rep);
+        request_handler_->handle_requests(req, rep);
         if (&ec != &throws)
             ec = make_success_code();   // success;
         return true;

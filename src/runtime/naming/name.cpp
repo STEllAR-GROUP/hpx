@@ -33,7 +33,9 @@ namespace hpx { namespace naming
             boost::uint32_t credits = get_credit_from_gid(*p);
 
             BOOST_ASSERT(0 != credits);
-            if (0 == applier::get_applier().get_agas_client().decref(*p, t, credits))
+            
+            error_code ec;
+            if (0 == applier::get_applier().get_agas_client().decref(*p, t, credits, ec))
             {
                 components::stubs::runtime_support::free_component_sync(t, *p);
             }

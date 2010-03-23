@@ -90,7 +90,7 @@ namespace hpx { namespace naming
         boost::asio::ip::tcp::acceptor acceptor_;
 
         /// The handler for all incoming requests.
-        server::request_handler request_handler_;
+        server::request_handler<boost::mutex> request_handler_;
 
         /// this represents the locality this server is running on
         naming::locality here_;

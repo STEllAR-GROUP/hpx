@@ -54,18 +54,17 @@ namespace hpx { namespace util { namespace detail
             {}
 
             thread_id_type id_;
-            hook_type slist_hook_;
+            hook_type list_hook_;
         };
 
         typedef boost::intrusive::member_hook<
-            queue_entry, 
-            typename queue_entry::hook_type,
-            &queue_entry::slist_hook_
-        > slist_option_type;
+            queue_entry, typename queue_entry::hook_type,
+            &queue_entry::list_hook_
+        > list_option_type;
 
         typedef boost::intrusive::slist<
-            queue_entry, slist_option_type, 
-            boost::intrusive::cache_last<true>, 
+            queue_entry, list_option_type, 
+            boost::intrusive::cache_last<true>,
             boost::intrusive::constant_time_size<false>
         > queue_type;
 
@@ -145,6 +144,8 @@ namespace hpx { namespace util { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
+                threads::set_thread_lco_description(id, "enqueue_full_full");
+                
                 queue_entry f(id);
                 read_queue_.push_back(f);
 
@@ -168,6 +169,8 @@ namespace hpx { namespace util { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
+                threads::set_thread_lco_description(id, "enqueue_full_full");
+
                 queue_entry f(id);
                 read_queue_.push_back(f);
 
@@ -189,6 +192,8 @@ namespace hpx { namespace util { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
+                threads::set_thread_lco_description(id, "enqueue_full_empty");
+
                 queue_entry f(id);
                 read_and_empty_queue_.push_back(f);
 
@@ -221,6 +226,8 @@ namespace hpx { namespace util { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
+                threads::set_thread_lco_description(id, "enqueue_full_empty");
+
                 queue_entry f(id);
                 read_and_empty_queue_.push_back(f);
 
@@ -246,6 +253,8 @@ namespace hpx { namespace util { namespace detail
             // block if this entry is already full
             if (state_ == full) {
                 // enqueue the request and block this thread
+                threads::set_thread_lco_description(id, "enqueue_if_full");
+
                 queue_entry f(id);
                 write_queue_.push_back(f);
 
@@ -272,6 +281,8 @@ namespace hpx { namespace util { namespace detail
             // block if this entry is already full
             if (state_ == full) {
                 // enqueue the request and block this thread
+                threads::set_thread_lco_description(id, "enqueue_if_full");
+
                 queue_entry f(id);
                 write_queue_.push_back(f);
 
@@ -323,6 +334,7 @@ namespace hpx { namespace util { namespace detail
                 threads::thread_id_type id = write_queue_.front().id_;
                 write_queue_.pop_front();
                 threads::set_thread_state(id, threads::pending);
+                threads::set_thread_lco_description(id);
                 set_full_locked();    // state_ = full
             }
 
@@ -339,6 +351,7 @@ namespace hpx { namespace util { namespace detail
                 threads::thread_id_type id = read_queue_.front().id_;
                 read_queue_.pop_front();
                 threads::set_thread_state(id, threads::pending);
+                threads::set_thread_lco_description(id);
             }
 
             // since we got full now we need to re-activate one thread waiting
@@ -347,6 +360,7 @@ namespace hpx { namespace util { namespace detail
                 threads::thread_id_type id = read_and_empty_queue_.front().id_;
                 read_and_empty_queue_.pop_front();
                 threads::set_thread_state(id, threads::pending);
+                threads::set_thread_lco_description(id);
                 set_empty_locked();   // state_ = empty
             }
 

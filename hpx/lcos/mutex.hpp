@@ -17,7 +17,7 @@
 
 #include <boost/atomic.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/intrusive/list.hpp>
+#include <boost/intrusive/slist.hpp>
 #include <boost/thread/locks.hpp>
 
 // Description of the mutex algorithm is explained here:
@@ -86,8 +86,8 @@ namespace hpx { namespace lcos { namespace detail
         // the queues
         struct queue_entry
         {
-            typedef boost::intrusive::list_member_hook<
-                boost::intrusive::link_mode<boost::intrusive::auto_unlink>
+            typedef boost::intrusive::slist_member_hook<
+                boost::intrusive::link_mode<boost::intrusive::normal_link>
             > hook_type;
 
             queue_entry(threads::thread_id_type id)
@@ -103,8 +103,9 @@ namespace hpx { namespace lcos { namespace detail
             &queue_entry::list_hook_
         > list_option_type;
 
-        typedef boost::intrusive::list<
+        typedef boost::intrusive::slist<
             queue_entry, list_option_type, 
+            boost::intrusive::cache_last<true>,
             boost::intrusive::constant_time_size<false>
         > queue_type;
 
@@ -125,11 +126,10 @@ namespace hpx { namespace lcos { namespace detail
                     queue_.pop_front();
 
                     // we know that the id is actually the pointer to the thread
-                    threads::thread* thrd = reinterpret_cast<threads::thread*>(id);
                     LERR_(fatal) << "~mutex: " << description_
                             << ": pending thread: " 
-                            << get_thread_state_name(thrd->get_state()) 
-                            << "(" << id << "): " << thrd->get_description();
+                            << threads::get_thread_state_name(threads::get_thread_state(id)) 
+                            << "(" << id << "): " << threads::get_thread_description(id);
                 }
             }
             BOOST_ASSERT(queue_.empty());
@@ -182,6 +182,8 @@ namespace hpx { namespace lcos { namespace detail
                 return false;
             }
 
+            threads::set_thread_lco_description(id, description_);
+
             queue_entry e(id);
             queue_.push_back(e);
 
@@ -206,7 +208,8 @@ namespace hpx { namespace lcos { namespace detail
                 queue_.pop_front();
 
                 l.unlock();
-                set_thread_state(id, threads::pending);
+                threads::set_thread_state(id, threads::pending);
+                threads::set_thread_lco_description(id);
             }
             else if (active_count_.load(boost::memory_order_acquire) & ~lock_flag_value) {
                 ++pending_events_;
@@ -215,7 +218,6 @@ namespace hpx { namespace lcos { namespace detail
 
         void lock()
         {
-            using namespace boost::lockfree;
             if (try_lock())
                 return;
 
@@ -237,7 +239,6 @@ namespace hpx { namespace lcos { namespace detail
 
         bool timed_lock(::boost::system_time const& wait_until)
         {
-            using namespace boost::lockfree;
             if (try_lock())
                 return true;
 
@@ -300,7 +301,7 @@ namespace hpx { namespace lcos
     class mutex : boost::noncopyable, public detail::mutex
     {
     public:
-        mutex(char const* const description = "")
+        mutex(char const* const description = "mutex")
           : detail::mutex(description)
         {}
         ~mutex()
@@ -316,7 +317,7 @@ namespace hpx { namespace lcos
     class timed_mutex : boost::noncopyable, public detail::mutex
     {
     public:
-        timed_mutex(char const* const description = "")
+        timed_mutex(char const* const description = "timed_mutex")
           : detail::mutex(description)
         {}
         ~timed_mutex()

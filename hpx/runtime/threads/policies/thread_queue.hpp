@@ -89,7 +89,8 @@ namespace hpx { namespace threads { namespace policies
                                     << std::setfill('0') << thrd->get_component_id()
                                 << ") P" << std::hex << std::setw(8) 
                                     << std::setfill('0') << thrd->get_parent_thread_id() 
-                                << ": " << thrd->get_description();
+                                << ": " << thrd->get_description()
+                                << ": " << thrd->get_lco_description();
                     thrd->set_marked_state(state);
                 }
             }
@@ -263,7 +264,8 @@ namespace hpx { namespace threads { namespace policies
           : work_items_(/*"work_items"*/), work_items_count_(0),
             terminated_items_(/*"terminated_items"*/), 
             max_count_((0 == max_count) ? max_thread_count : max_count),
-            add_new_logger_("thread_queue::add_new")
+            add_new_logger_("thread_queue::add_new"),
+            new_tasks_count_(0)
         {}
 
         void set_max_count(std::size_t max_count = max_thread_count)

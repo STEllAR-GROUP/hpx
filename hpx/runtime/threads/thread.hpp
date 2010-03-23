@@ -40,6 +40,7 @@ namespace hpx { namespace threads { namespace detail
             current_state_(thread_state(newstate)), 
             current_state_ex_(thread_state_ex(wait_signaled)),
             description_(init_data.description), 
+            lco_description_(""),
             parent_thread_id_(init_data.parent_id),
             parent_locality_prefix_(init_data.parent_prefix),
             component_id_(init_data.lva),
@@ -61,7 +62,7 @@ namespace hpx { namespace threads { namespace detail
         /// by a factory (runtime_support) instance, we can leave this 
         /// constructor empty
         thread()
-          : coroutine_(function_type(), 0), description_(""), 
+          : coroutine_(function_type(), 0), description_(""), lco_description_(0),
             parent_locality_prefix_(0), parent_thread_id_(0), component_id_(0)
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
@@ -161,6 +162,15 @@ namespace hpx { namespace threads { namespace detail
             return description_;
         }
 
+        char const* get_lco_description() const
+        {
+            return lco_description_;
+        }
+        void set_lco_description(char const* lco_description)
+        {
+            lco_description_ = lco_description;
+        }
+
         boost::uint32_t get_parent_locality_prefix() const
         {
             return parent_locality_prefix_;
@@ -217,6 +227,8 @@ namespace hpx { namespace threads { namespace detail
 
         // all of the following is debug/logging support information
         char const* const description_;
+        char const* lco_description_;
+
         boost::uint32_t parent_locality_prefix_;
         thread_id_type parent_thread_id_;
         naming::address::address_type const component_id_;
@@ -455,6 +467,18 @@ namespace hpx { namespace threads
         {
             detail::thread const* t = get();
             return t ? t->get_description() : "<terminated>";
+        }
+
+        char const* get_lco_description() const
+        {
+            detail::thread const* t = get();
+            return t ? t->get_lco_description() : "<terminated>";
+        }
+        void set_lco_description(char const* lco_description = "")
+        {
+            detail::thread* t = get();
+            if (t) 
+                t->set_lco_description(lco_description);
         }
 
         ///////////////////////////////////////////////////////////////////////

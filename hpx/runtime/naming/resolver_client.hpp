@@ -17,6 +17,7 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/lcos/mutex.hpp>
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/buffer.hpp>
@@ -762,14 +763,19 @@ namespace hpx { namespace naming
             std::vector<server::reply>& rep, error_code& ec) const;
 
     private:
+        typedef boost::mutex mutex_type;
+
         locality there_;
         util::io_service_pool& io_service_pool_;
 
         /// The connection cache for sending connections
+        mutable mutex_type connection_mtx_;
         mutable util::connection_cache<resolver_client_connection> connection_cache_;
         bool isconsole_;
         bool local_only_;
-        naming::server::request_handler* request_handler_;
+
+        typedef boost::detail::spinlock request_mutex_type;
+        naming::server::request_handler<request_mutex_type>* request_handler_;
 
 #if defined(HPX_USE_AGAS_CACHE)
     public:
@@ -803,7 +809,6 @@ namespace hpx { namespace naming
 
     private:
         // protect the cache from race conditions
-        typedef boost::mutex mutex_type;
         mutable mutex_type mtx_;
 
         typedef boost::cache::local_cache<

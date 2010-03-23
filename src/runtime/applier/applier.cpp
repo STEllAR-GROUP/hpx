@@ -212,6 +212,15 @@ namespace hpx { namespace threads
         return hpx::applier::get_applier().get_thread_manager().get_description(id);
     }
 
+    std::string get_thread_lco_description(thread_id_type id)
+    {
+        return hpx::applier::get_applier().get_thread_manager().get_lco_description(id);
+    }
+    void set_thread_lco_description(thread_id_type id, char const* desc)
+    {
+        return hpx::applier::get_applier().get_thread_manager().set_lco_description(id, desc);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     naming::id_type const& get_thread_gid(thread_id_type id)
     {

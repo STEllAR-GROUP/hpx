@@ -727,6 +727,12 @@
     <ClInclude Include="..\..\..\hpx\runtime\threads\detail\tagged_thread_state.hpp">
       <Filter>Header Files\Runtime\Threads\Detail</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\naming\server\request_handler_registry.hpp">
+      <Filter>Header Files\Runtime\Naming\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\spinlock_pool.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\CMakeLists.txt">

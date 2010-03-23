@@ -54,17 +54,17 @@ namespace hpx { namespace lcos
             {}
 
             threads::thread_id_type id_;
-            hook_type slist_hook_;
+            hook_type list_hook_;
         };
 
         typedef boost::intrusive::member_hook<
             queue_entry, queue_entry::hook_type,
-            &queue_entry::slist_hook_
-        > slist_option_type;
+            &queue_entry::list_hook_
+        > list_option_type;
 
         typedef boost::intrusive::slist<
-            queue_entry, slist_option_type, 
-            boost::intrusive::cache_last<true>, 
+            queue_entry, list_option_type, 
+            boost::intrusive::cache_last<true>,
             boost::intrusive::constant_time_size<false>
         > queue_type;
 
@@ -117,6 +117,8 @@ namespace hpx { namespace lcos
                 threads::thread_self& self = threads::get_self();
                 threads::thread_id_type id = self.get_thread_id();
 
+                threads::set_thread_lco_description(id, "counting::semaphore");
+
                 queue_entry f(id);
                 queue_.push_back(f);
 
@@ -156,6 +158,7 @@ namespace hpx { namespace lcos
                     threads::thread_id_type id = queue.front().id_;
                     queue.pop_front();
                     threads::set_thread_state(id, threads::pending);
+                    threads::set_thread_lco_description(id);
                 }
 #endif
             }

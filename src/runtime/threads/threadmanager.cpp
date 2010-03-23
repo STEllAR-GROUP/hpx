@@ -294,6 +294,24 @@ namespace hpx { namespace threads
         return thrd->get() ? thrd->get_description() : "<unknown>";
     }
 
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    std::string threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_lco_description(thread_id_type id)
+    {
+        // we know that the id is actually the pointer to the thread
+        thread* thrd = reinterpret_cast<thread*>(id);
+        return thrd->get() ? thrd->get_lco_description() : "<unknown>";
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        set_lco_description(thread_id_type id, char const* desc)
+    {
+        // we know that the id is actually the pointer to the thread
+        thread* thrd = reinterpret_cast<thread*>(id);
+        return thrd->get() ? thrd->set_lco_description(desc) : "<unknown>";
+    }
+
     /// This thread function is used by the at_timer thread below to trigger
     /// the required action.
     template <typename SchedulingPolicy, typename NotificationPolicy>
