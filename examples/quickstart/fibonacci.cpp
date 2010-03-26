@@ -141,6 +141,9 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("threads,t", po::value<int>(), 
                 "the number of operating system threads to spawn for this"
                 "HPX locality")
+            ("queueing,q", po::value<std::string>(),
+                "the queue scheduling policy to use, options are 'global' "
+                " and 'local' (default is 'global')")
             ("value,v", po::value<int>(), 
                 "the number to be used as the argument to fib (default is 10)")
             ("csv,s", "generate statistics of the run in comma separated format")
@@ -208,7 +211,8 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 // this is the runtime type we use in this application
-typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
+typedef hpx::threads::policies::global_queue_scheduler global_queue_policy;
+typedef hpx::threads::policies::local_queue_scheduler local_queue_policy;
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
@@ -223,6 +227,7 @@ int main(int argc, char* argv[])
         std::string hpx_host("localhost"), agas_host;
         boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
         int num_threads = 1;
+        std::string queueing = "global";
         int num_localities = 1;
         int argument = 10;
         hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
@@ -240,6 +245,9 @@ int main(int argc, char* argv[])
 
         if (vm.count("threads"))
             num_threads = vm["threads"].as<int>();
+
+        if (vm.count("queueing"))
+            queueing = vm["queueing"].as<std::string>();
 
         if (vm.count("value"))
             argument = vm["value"].as<int>();
@@ -264,36 +272,79 @@ int main(int argc, char* argv[])
         double elapsed =0;
 
         // initialize and start the HPX runtime
-        runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
-        if (mode == hpx::runtime::worker) {
-            rt.run(num_threads, num_localities);
-        }
-        else {
-            // if we've got a configuration file (as console) we read it in,
-            // otherwise this information will be automatically pulled from 
-            // the console
-            if (vm.count("config")) {
-                std::string config(vm["config"].as<std::string>());
-                rt.get_config().load_application_configuration(config.c_str());
-            }
+        if (queueing == "global")
+        {
+            typedef hpx::runtime_impl<global_queue_policy> runtime_type;
 
-            rt.run(boost::bind(hpx_main, argument, delay_coeff, 
-                boost::ref(result), boost::ref(elapsed)), num_threads, 
-                num_localities);
-
-            if (vm.count("csv")) {
-                // write results as csv
-                std::cout << num_threads << "," << argument << "," 
-                          << elapsed << "," << result << "," << count_invocations 
-                           << "," << elapsed/count_invocations << std::endl;
+            runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
+            if (mode == hpx::runtime::worker) {
+                rt.run(num_threads, num_localities);
             }
             else {
-                // write results the old fashioned way
-                std::cout << "elapsed: " << elapsed << ", result: " << result << std::endl;
-                std::cout << "Number of invocations of fib(): " << count_invocations 
-                          << std::endl;
+                // if we've got a configuration file (as console) we read it in,
+                // otherwise this information will be automatically pulled from 
+                // the console
+                if (vm.count("config")) {
+                    std::string config(vm["config"].as<std::string>());
+                    rt.get_config().load_application_configuration(config.c_str());
+                }
+    
+                rt.run(boost::bind(hpx_main, argument, delay_coeff, 
+                    boost::ref(result), boost::ref(elapsed)), num_threads, 
+                    num_localities);
+    
+                if (vm.count("csv")) {
+                    // write results as csv
+                    std::cout << num_threads << "," << argument << "," 
+                              << elapsed << "," << result << "," << count_invocations 
+                               << "," << elapsed/count_invocations << std::endl;
+                }
+                else {
+                    // write results the old fashioned way
+                    std::cout << "elapsed: " << elapsed << ", result: " << result << std::endl;
+                    std::cout << "Number of invocations of fib(): " << count_invocations 
+                              << std::endl;
+                }
             }
         }
+        else if (queueing == "local")
+        {
+            typedef hpx::runtime_impl<local_queue_policy> runtime_type;
+            local_queue_policy::init_parameter_type init(num_threads, 1000);
+
+            runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
+            if (mode == hpx::runtime::worker) {
+                rt.run(num_threads, num_localities);
+            }
+            else {
+                // if we've got a configuration file (as console) we read it in,
+                // otherwise this information will be automatically pulled from 
+                // the console
+                if (vm.count("config")) {
+                    std::string config(vm["config"].as<std::string>());
+                    rt.get_config().load_application_configuration(config.c_str());
+                }
+    
+                rt.run(boost::bind(hpx_main, argument, delay_coeff, 
+                    boost::ref(result), boost::ref(elapsed)), num_threads, 
+                    num_localities);
+    
+                if (vm.count("csv")) {
+                    // write results as csv
+                    std::cout << num_threads << "," << argument << "," 
+                              << elapsed << "," << result << "," << count_invocations 
+                               << "," << elapsed/count_invocations << std::endl;
+                }
+                else {
+                    // write results the old fashioned way
+                    std::cout << "elapsed: " << elapsed << ", result: " << result << std::endl;
+                    std::cout << "Number of invocations of fib(): " << count_invocations 
+                              << std::endl;
+                }
+            }
+        }
+        else
+            BOOST_ASSERT(false);
     }
     catch (std::exception& e) {
         std::cerr << "fibonacci: std::exception caught: " << e.what() << "\n";
