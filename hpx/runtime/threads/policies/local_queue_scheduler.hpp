@@ -49,6 +49,7 @@ namespace hpx { namespace threads { namespace policies
           : queues_(init.first), 
             curr_queue_(0)
         {
+            BOOST_ASSERT(init.first != 0);
             for (std::size_t i = 0; i < init.first; ++i) 
                 queues_[i] = new thread_queue(init.second);
         }
