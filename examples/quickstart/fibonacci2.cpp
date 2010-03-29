@@ -81,10 +81,18 @@ int fib (naming::gid_type that_prefix, int n, int delay_coeff)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(int argument, int delay_coeff, int num_threads, bool write_to_csv)
+int hpx_main(po::variables_map &vm)
 {
+    int argument = 10;
+    int delay_coeff = 0;
     int result = 0;
     double elapsed = 0.0;
+
+    // Process application-specific command-line options
+    if (vm.count("value"))
+        argument = vm["value"].as<int>();
+    if (vm.count("busywait"))
+        delay_coeff = vm["busywait"].as<int>();
 
     // try to get arguments from application configuration
     runtime& rt = get_runtime();
@@ -115,10 +123,10 @@ int hpx_main(int argument, int delay_coeff, int num_threads, bool write_to_csv)
         elapsed = t.elapsed();
     }
 
-    if (write_to_csv)
+    if (vm.count("csv"))
     {
       // write results as csv
-      std::cout << num_threads << "," << argument << "," 
+      std::cout << argument << "," 
         << elapsed << "," << result << "," << count_invocations 
         << "," << elapsed/count_invocations << std::endl;
     }
@@ -246,9 +254,7 @@ int main(int argc, char* argv[])
         int num_threads = 1;
         std::string queueing = "global";
         int num_localities = 1;
-        int argument = 10;
         hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
-        int delay_coeff = 0;
 
         // extract IP address/port arguments
         if (vm.count("agas")) 
@@ -266,9 +272,6 @@ int main(int argc, char* argv[])
         if (vm.count("queueing"))
             queueing = vm["queueing"].as<std::string>();
 
-        if (vm.count("value"))
-            argument = vm["value"].as<int>();
-
         if (vm.count("worker")) {
             mode = hpx::runtime::worker;
             if (vm.count("config")) {
@@ -277,16 +280,10 @@ int main(int argc, char* argv[])
             }
         }
 
-        if (vm.count("busywait"))
-            delay_coeff = vm["busywait"].as<int>();
-
         // initialize and run the AGAS service, if appropriate
         std::auto_ptr<agas_server_helper> agas_server;
         if (vm.count("run_agas_server"))  // run the AGAS server instance here
             agas_server.reset(new agas_server_helper(agas_host, agas_port));
-
-        int result = 0;
-        double elapsed =0;
 
         // initialize and start the HPX runtime
         if (queueing == "global")
@@ -303,8 +300,7 @@ int main(int argc, char* argv[])
                
             // Run this runtime instance
             if (mode != hpx::runtime::worker) {
-                rt.run(boost::bind(hpx_main, argument, delay_coeff, num_threads,
-                    (vm.count("csv")>0)), num_threads, num_localities);
+                rt.run(boost::bind(hpx_main, vm), num_threads, num_localities);
             }
             else
             {
@@ -326,8 +322,7 @@ int main(int argc, char* argv[])
                
             // Run this runtime instance
             if (mode != hpx::runtime::worker) {
-                rt.run(boost::bind(hpx_main, argument, delay_coeff, num_threads,
-                    (vm.count("csv")>0)), num_threads, num_localities);
+                rt.run(boost::bind(hpx_main, vm), num_threads, num_localities);
             }
             else
             {
