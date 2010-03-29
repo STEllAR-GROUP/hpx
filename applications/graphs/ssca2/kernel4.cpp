@@ -127,7 +127,7 @@ void select_random_vertices(gids_type v_locals, int k4_approx, naming::id_type V
         //for (int i=0; i<num_to_add; ++i)
         while (num_to_add > 0)
         {
-            int index = rand()*(1.0*total)/(RAND_MAX);
+            int index = (int)(rand()*(1.0*total)/(RAND_MAX));
 
             if (seen_vertices.find(index) == seen_vertices.end())
             {
@@ -412,7 +412,7 @@ int incr_bc(naming::id_type bc_scores, naming::id_type w, double delta_w)
 
     components::component_type props_comp_type = components::get_component_type<props_type>();
     gid_type bc_w_prop = lcos::eager_future<local_gids_map_type::value_action>(bc_local, w, props_comp_type).get();
-    int bc_w = lcos::eager_future<props_type::incr_action>(bc_w_prop, delta_w).get();
+    int bc_w = (int)lcos::eager_future<props_type::incr_action>(bc_w_prop, delta_w).get();
 
     LSSCA_(info) <<  "BC, " << w <<", " << delta_w;
 

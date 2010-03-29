@@ -133,7 +133,7 @@ int hpx_main(int depth, std::string input_file, int k4_approx, bool monitor)
     }
 
     // Derive scale from order of the input graph
-    scale = log2(G.order());
+    scale = (int)log2(G.order());
     LSSCA_(info) << "Input file scale: " << scale;
 
     // Get vertex set of G
