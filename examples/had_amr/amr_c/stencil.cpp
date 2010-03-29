@@ -272,10 +272,10 @@ namespace hpx { namespace components { namespace amr
         overwrite->left_ = result_data[0];
 
         // DEBUG -- log the right/left points computed
-        //access_memory_block<stencil_data> amb1 = 
-        //               hpx::components::stubs::memory_block::get(result_data[0]);
-        //if (log_)
-        //    stubs::logging::logentry(log_, amb1.get(), row,1, par);
+        access_memory_block<stencil_data> amb1 = 
+                       hpx::components::stubs::memory_block::get(result_data[0]);
+        if (log_)
+            stubs::logging::logentry(log_, amb1.get(), row,1, par);
 
         access_memory_block<stencil_data> amb2 = 
                        hpx::components::stubs::memory_block::get(result_data[result_data.size()-1]);
@@ -330,10 +330,10 @@ namespace hpx { namespace components { namespace amr
         overwrite->left_alloc_ = false;
 
         // DEBUG -- log the right points computed if no interp was involved
-        //access_memory_block<stencil_data> amb = 
-        //                 hpx::components::stubs::memory_block::get(result_data[result_data.size()-1]);
-        //if (log_)
-        //    stubs::logging::logentry(log_, amb.get(), row,1, par);
+        access_memory_block<stencil_data> amb = 
+                         hpx::components::stubs::memory_block::get(result_data[result_data.size()-1]);
+        if (log_)
+            stubs::logging::logentry(log_, amb.get(), row,1, par);
 
         // release result data
         for (std::size_t i = 1; i < result_data.size()-1; ++i) 
@@ -425,8 +425,8 @@ namespace hpx { namespace components { namespace amr
             mval[i]->refine_ = refinement(&*vecval.begin(),vecval.size(),&(mval[i]->value_),mval[i]->level_,par);
 
             // DEBUG
-            //if (log_)
-            //    stubs::logging::logentry(log_, mval[i].get(), row,2, par);
+            if (log_)
+                stubs::logging::logentry(log_, mval[i].get(), row,2, par);
           }
 
           // eliminate unrefinable cases
@@ -519,8 +519,8 @@ namespace hpx { namespace components { namespace amr
             mval[i]->refine_ = refinement(&*vecval.begin(),vecval.size(),&(mval[i]->value_),mval[i]->level_,par);
 
             // DEBUG
-            //if (log_)
-            //    stubs::logging::logentry(log_, mval[i].get(), row,2, par);
+            if (log_)
+                stubs::logging::logentry(log_, mval[i].get(), row,2, par);
           }
         }
 
@@ -631,12 +631,12 @@ namespace hpx { namespace components { namespace amr
         }
 
         // DEBUG
-        //if (log_) {
-        //    if ( s0 == 0 ) stubs::logging::logentry(log_, mval[0].get(), row,2, par);
-        //    if ( s2 == 0 ) stubs::logging::logentry(log_, mval[2].get(), row,2, par);
-        //    if ( s4 == 0 ) stubs::logging::logentry(log_, mval[4].get(), row,2, par);
-        //    if ( s6 == 0 ) stubs::logging::logentry(log_, mval[6].get(), row,2, par);
-        //}
+        if (log_) {
+            if ( s0 == 0 ) stubs::logging::logentry(log_, mval[0].get(), row,2, par);
+            if ( s2 == 0 ) stubs::logging::logentry(log_, mval[2].get(), row,2, par);
+            if ( s4 == 0 ) stubs::logging::logentry(log_, mval[4].get(), row,2, par);
+            if ( s6 == 0 ) stubs::logging::logentry(log_, mval[6].get(), row,2, par);
+        }
 
         for (i=0;i<8;i++) {
           initial_data.push_back(gval[i]);
@@ -728,14 +728,14 @@ namespace hpx { namespace components { namespace amr
       resultval->left_alloc_ = false;
 
       // DEBUG -- log the right/left points computed
-      //access_memory_block<stencil_data> amb1 = 
-      //                   hpx::components::stubs::memory_block::get(result_data[0]);
-      //access_memory_block<stencil_data> amb2 = 
-      //                   hpx::components::stubs::memory_block::get(result_data[result_data.size()-1]);
-      //if (log_) {
-      //    stubs::logging::logentry(log_, amb1.get(), row,1, par);
-      //    stubs::logging::logentry(log_, amb2.get(), row,1, par);
-      //}
+      access_memory_block<stencil_data> amb1 = 
+                         hpx::components::stubs::memory_block::get(result_data[0]);
+      access_memory_block<stencil_data> amb2 = 
+                         hpx::components::stubs::memory_block::get(result_data[result_data.size()-1]);
+      if (log_) {
+          stubs::logging::logentry(log_, amb1.get(), row,1, par);
+          stubs::logging::logentry(log_, amb2.get(), row,1, par);
+      }
 
       for (std::size_t i = 1; i < result_data.size()-1; ++i) {
         // free all but the overwrite and end value

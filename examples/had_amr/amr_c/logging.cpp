@@ -62,22 +62,29 @@ namespace hpx { namespace components { namespace amr { namespace server
             fclose(fdata);
           }
         }
-#if 0
+
         // Debugging measures
         // output file to "logcode1.dat"
         if ( logcode == 1 ) {
+          std::string x_str = boost::lexical_cast<std::string>(val.x_);
+          std::string chi_str = boost::lexical_cast<std::string>(val.value_.phi[0][0]);
+          std::string time_str = boost::lexical_cast<std::string>(val.timestep_*par.dx0*par.lambda);
+
           fdata = fopen("logcode1.dat","a");
-          fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_,val.x_,val.value_.phi[0][0]);
+          fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),chi_str.c_str());
           fclose(fdata);
         }
         //
         // output file to "logcode2.dat"
         if ( logcode == 2 ) {
+          std::string x_str = boost::lexical_cast<std::string>(val.x_);
+          std::string chi_str = boost::lexical_cast<std::string>(val.value_.phi[0][0]);
+          std::string time_str = boost::lexical_cast<std::string>(val.timestep_*par.dx0*par.lambda);
+
           fdata = fopen("logcode2.dat","a");
-          fprintf(fdata,"%d %g %g %g\n",val.level_,val.timestep_,val.x_,val.value_.phi[0][0]);
+          fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),chi_str.c_str());
           fclose(fdata);
         }
-#endif
     }
 
 }}}}
