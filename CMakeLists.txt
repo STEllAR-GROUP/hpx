@@ -43,7 +43,6 @@ set(Boost_FIND_VERSION_EXACT OFF)
 set(Boost_COMPONENTS_NEEDED
     date_time
     filesystem
-    graph
     program_options
     regex
     serialization
