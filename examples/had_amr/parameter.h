@@ -33,7 +33,6 @@ struct Par {
       had_double_type delta;
       had_double_type amp;
       int PP;
-      int global_barrier;
 };
 
 #if defined(__cplusplus)

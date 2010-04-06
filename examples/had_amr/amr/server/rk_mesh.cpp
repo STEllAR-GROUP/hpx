@@ -67,20 +67,15 @@ namespace hpx { namespace components { namespace amr { namespace server
         components::distributing_factory::iterator_type stencil = stencils.first;
         components::distributing_factory::iterator_type function = functions.first;
 
-        BOOST_ASSERT(par.coarsestencilsize == 9);
         BOOST_ASSERT(numvalues > 16);
 
         int memsize;
-        if ( par.global_barrier == 1 ) {
-          memsize = 6*par.nx0 + 9;
-        } else {
-          memsize = 9;
-        }
-        Array3D dst_port(4,numvalues,memsize);
-        Array3D dst_src(4,numvalues,memsize);
-        Array3D dst_step(4,numvalues,memsize);
-        Array3D dst_size(4,numvalues,1);
-        Array3D src_size(4,numvalues,1);
+        memsize = 13;
+        Array3D dst_port(6,numvalues,memsize);
+        Array3D dst_src(6,numvalues,memsize);
+        Array3D dst_step(6,numvalues,memsize);
+        Array3D dst_size(6,numvalues,1);
+        Array3D src_size(6,numvalues,1);
         prep_ports_nine(dst_port,dst_src,dst_step,dst_size,src_size,numvalues,par);
 
         for (int column = 0; stencil != stencils.second; ++stencil, ++function, ++column)
@@ -142,22 +137,17 @@ namespace hpx { namespace components { namespace amr { namespace server
         typedef components::distributing_factory::result_type result_type;
 
         int j;
-        BOOST_ASSERT(par.coarsestencilsize == 9 );
         BOOST_ASSERT(par.stencilsize == 3 );
         std::size_t numvals = outputs[0].size();
 
         int memsize;
-        if ( par.global_barrier == 1 ) {
-          memsize = 6*par.nx0 + 9;
-        } else {
-          memsize = 9;
-        }
+        memsize = 13;
 
-        Array3D dst_port(4,numvals,memsize);
-        Array3D dst_src(4,numvals,memsize);
-        Array3D dst_step(4,numvals,memsize);
-        Array3D dst_size(4,numvals,1);
-        Array3D src_size(4,numvals,1);
+        Array3D dst_port(6,numvals,memsize);
+        Array3D dst_src(6,numvals,memsize);
+        Array3D dst_step(6,numvals,memsize);
+        Array3D dst_size(6,numvals,1);
+        Array3D src_size(6,numvals,1);
         prep_ports_nine(dst_port,dst_src,dst_step,dst_size,src_size,numvals,par);
 
 
@@ -284,8 +274,11 @@ namespace hpx { namespace components { namespace amr { namespace server
         // amount of stencil_value components
         numvalues_ = numvalues;
         result_type functions = factory.create_components(function_type, numvalues);
-        result_type stencils[3] = 
+        result_type stencils[6] = 
         {
+            factory.create_components(stencil_type, numvalues),
+            factory.create_components(stencil_type, numvalues),
+            factory.create_components(stencil_type, numvalues),
             factory.create_components(stencil_type, numvalues),
             factory.create_components(stencil_type, numvalues),
             factory.create_components(stencil_type, numvalues)
@@ -300,17 +293,17 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         int i;
         // initialize stencil_values using the stencil (functional) components
-        for (i=0;i<3;i++) init_stencils(locality_results(stencils[i]), locality_results(functions), i, numvalues, par);
+        for (i=0;i<6;i++) init_stencils(locality_results(stencils[i]), locality_results(functions), i, numvalues, par);
 
         // ask stencil instances for their output gids
-        std::vector<std::vector<std::vector<naming::id_type> > > outputs(3);
-        for (i=0;i<3;i++) get_output_ports(locality_results(stencils[i]), outputs[i]);
+        std::vector<std::vector<std::vector<naming::id_type> > > outputs(6);
+        for (i=0;i<6;i++) get_output_ports(locality_results(stencils[i]), outputs[i]);
 
         // connect output gids with corresponding stencil inputs
         connect_input_ports(stencils, outputs,par);
 
         // for loop over second row ; call start for each
-        for (i=1;i<3;i++) start_row(locality_results(stencils[i]));
+        for (i=1;i<6;i++) start_row(locality_results(stencils[i]));
 
         // prepare initial data
         std::vector<naming::id_type> initial_data;
@@ -322,7 +315,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // free all allocated components (we can do that synchronously)
         if (!logging.empty())
             factory.free_components_sync(logging);
-        for (i=2;i>=0;i--) factory.free_components_sync(stencils[i]);
+        for (i=5;i>=0;i--) factory.free_components_sync(stencils[i]);
         factory.free_components_sync(functions);
 
         return result_data;
@@ -351,8 +344,11 @@ namespace hpx { namespace components { namespace amr { namespace server
         // amount of stencil_value components
         numvalues_ = numvalues;
         result_type functions = factory.create_components(function_type, numvalues);
-        result_type stencils[3] = 
+        result_type stencils[6] = 
         {
+            factory.create_components(stencil_type, numvalues),
+            factory.create_components(stencil_type, numvalues),
+            factory.create_components(stencil_type, numvalues),
             factory.create_components(stencil_type, numvalues),
             factory.create_components(stencil_type, numvalues),
             factory.create_components(stencil_type, numvalues)
@@ -367,17 +363,17 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         int i;
         // initialize stencil_values using the stencil (functional) components
-        for (i=0;i<3;i++) init_stencils(locality_results(stencils[i]), locality_results(functions), i, numvalues, par);
+        for (i=0;i<6;i++) init_stencils(locality_results(stencils[i]), locality_results(functions), i, numvalues, par);
 
         // ask stencil instances for their output gids
-        std::vector<std::vector<std::vector<naming::id_type> > > outputs(3);
-        for (i=0;i<3;i++) get_output_ports(locality_results(stencils[i]), outputs[i]);
+        std::vector<std::vector<std::vector<naming::id_type> > > outputs(6);
+        for (i=0;i<6;i++) get_output_ports(locality_results(stencils[i]), outputs[i]);
 
         // connect output gids with corresponding stencil inputs
         connect_input_ports(stencils, outputs,par);
 
         // for loop over second row ; call start for each
-        for (i=1;i<3;i++) start_row(locality_results(stencils[i]));
+        for (i=1;i<6;i++) start_row(locality_results(stencils[i]));
 
         // do actual work
         execute(locality_results(stencils[0]), initial_data, result_data);
@@ -385,7 +381,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // free all allocated components (we can do that synchronously)
         if (!logging.empty())
             factory.free_components_sync(logging);
-        for (i=2;i>=0;i--) factory.free_components_sync(stencils[i]);
+        for (i=5;i>=0;i--) factory.free_components_sync(stencils[i]);
         factory.free_components_sync(functions);
 
         return result_data;
@@ -408,88 +404,33 @@ namespace hpx { namespace components { namespace amr { namespace server
       int counter;
       int step,dst;
 
-      int lower;
-      if ( par.global_barrier == 1 ) {
-        lower = 1;
-      } else {
-        lower = 0;
-      }
-
-      for (step=lower;step<3;step++) {
+      for (step=0;step<6;step++) {
         dst = step+1;
-        if ( dst == 3 ) dst = 0;
+        if ( dst == 6 ) dst = 0;
 
-        for (i=0;i<5;i++) {
+        for (i=0;i<numvalues;i++) {
           counter = 0;
 
-          // extra points for left boundary
-          if (i==2 || i == 3) {
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(0);vport.push_back(counter);
+          // three inputs for everybody
+          for (j=i-1;j<i+2;j++) {
+            if ( j >=0 && j < numvalues ) {
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+              counter++;
+            }
+          }
+
+          // extra output to i=4 (the left boundary)
+          if (i == 6) {
+            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(4);vport.push_back(counter);
             counter++;
           }
 
-          for (j=i-1;j<i+2;j++) {
-            if ( j >=0 && j < 4 ) {
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-            }
-          }
-          for (j=i-4;j<i+5;j++) {
-            if ( j >=4 && j < numvalues-4 ) {
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-            }
-          }
-        }
-
-        for (i=numvalues-5;i<numvalues;i++) {
-          counter = 0;
-
-          for (j=i-1;j<i+2;j++) {
-            if ( j >=numvalues-4 && j < numvalues ) {
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-            }
-          }
-
-          // extra points for left boundary
-          if (i==numvalues-3 || i == numvalues-4) {
+          // extra output to i=numvales-1 (the right boundary)
+          if (i == numvalues-3) {
             vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(numvalues-1);vport.push_back(counter);
             counter++;
           }
 
-          for (j=i-4;j<i+5;j++) {
-            if ( j >=4 && j < numvalues-4 ) {
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-            }
-          }
-        }
-      }
-
-      for (step=lower;step<3;step++) {
-        for (i=5;i<numvalues-5;i++) {
-          counter = 0;
-          for (j=i-4;j<i+5;j++) {
-            if ( j >=4 && j < numvalues-4 ) {
-              dst = step+1;
-              if ( dst == 3 ) dst = 0;
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-            }
-          }
-        }
-      }
-
-      if ( par.global_barrier == 1 ) {
-        // step 0 -- all to all to force global barrier
-        step = 0; dst = 1;
-        for (i=0;i<numvalues;i++) {
-          counter = 0;
-          for (j=0;j<numvalues;j++) {
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-            counter++;
-          }
         }
       }
 

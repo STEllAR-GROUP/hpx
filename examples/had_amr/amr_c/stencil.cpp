@@ -86,43 +86,36 @@ namespace hpx { namespace components { namespace amr
         bool boundary = false;
         int bbox[2];
 
-        if ( vecval.size() == par.nx0 && par.global_barrier == 1 ) {
-          compute_index = column;
-
-          if ( column == 0 ) {
-            bbox[0] = 1;
-            bbox[1] = 0;
-            boundary = true;
-          } else if ( column == par.nx0-1 ) {
-            bbox[0] = 0;
-            bbox[1] = 1;
-            boundary = true;
-          }
-
-        } else {
-
-          if ( vecval.size()%2 == 0 ) {
-            if ( column == 0 ) {
-              compute_index = 0;
-              bbox[0] = 1;
-              bbox[1] = 0;
-            } else {
-              compute_index = vecval.size()-1;
-              bbox[0] = 0;
-              bbox[1] = 1;
-            }
+        if ( val[0]->level_ == 0 ) {
+          if ( column == 4 ) {
             // indicate a physical boundary
             boundary = true;
-          } else {
-            if ( gids.size() == 1 ) { 
-              resultval.get() = val[0].get();
-              return -1;
-            }
-            BOOST_ASSERT( (vecval.size())%2 == 1 );
-            compute_index = (vecval.size()-1)/2;
+            compute_index = 1;
+            bbox[0] = 1;
+            bbox[1] = 0;
+          } else if ( column == par.nx0 - 1) {
+            // indicate a physical boundary
+            boundary = true;
+            compute_index = vecval.size()-1;
+            bbox[0] = 0;
+            bbox[1] = 1;
+          } else if ( column == 0 ) {
+            compute_index = 0;
           }
+        } 
 
+        if (vecval.size()%2 != 0 ) {
+          if ( gids.size() == 1 ) { 
+            resultval.get() = val[0].get();
+            return -1;
+          }
+          BOOST_ASSERT( (vecval.size())%2 == 1 );
+          if ( !boundary ) compute_index = (vecval.size()-1)/2;
+        } else {
+          // This should only happen at a physical boundary or the left edge of the mesh
+          BOOST_ASSERT( (column == 0 || boundary) );
         }
+
         // update x position
         resultval->x_ = val[compute_index]->x_;
 
