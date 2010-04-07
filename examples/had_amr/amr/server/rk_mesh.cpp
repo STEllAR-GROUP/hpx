@@ -402,7 +402,7 @@ namespace hpx { namespace components { namespace amr { namespace server
       //using namespace boost::assign;
 
       int counter;
-      int step,dst;
+      int step,dst,dst2;
 
       for (step=0;step<6;step++) {
         dst = step+1;
@@ -429,6 +429,18 @@ namespace hpx { namespace components { namespace amr { namespace server
           if (i == numvalues-3) {
             vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(numvalues-1);vport.push_back(counter);
             counter++;
+          }
+
+          if ( step == 0 || step == 3 ) {
+            // extra output from these rows
+            if ( step == 0 ) dst2 = 3;
+            if ( step == 3 ) dst2 = 0;
+            for (j=i-4;j<i+5;j++) {
+              if ( j >=4 && j < numvalues-4 ) {
+                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst2);vcolumn.push_back(j);vport.push_back(counter);
+                counter++;
+              }
+            }
           }
 
         }

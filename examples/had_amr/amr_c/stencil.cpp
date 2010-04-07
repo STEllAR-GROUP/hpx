@@ -444,7 +444,6 @@ namespace hpx { namespace components { namespace amr
         } else {
           std_index = 0;
         }
-
         boost::tie(gval[0], gval[2], gval[4], gval[6], gval[8]) = 
                         components::wait(components::stubs::memory_block::clone_async(gids[std_index]), 
                              components::stubs::memory_block::clone_async(gids[std_index+1]),
