@@ -107,6 +107,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\external\atomic\boost\atomic.hpp" />
     <ClInclude Include="..\..\..\external\atomic\boost\atomic\detail\base.hpp" />
     <ClInclude Include="..\..\..\external\atomic\boost\atomic\detail\builder.hpp" />
     <ClInclude Include="..\..\..\external\atomic\boost\atomic\detail\fallback.hpp" />
