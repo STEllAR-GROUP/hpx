@@ -313,31 +313,21 @@ int interpolation(struct nodedata *dst,struct nodedata *src1,struct nodedata *sr
   return 1;
 }
 
-bool refinement(stencil_data ** vecval, int size, struct nodedata *dst,int level,Par const& par)
+bool refinement(stencil_data ** vecval, int size, struct nodedata *dst,int level,int compute_index,Par const& par)
 {
 //#if 0
   had_double_type grad1,grad2,grad3,grad4;
-  int index;
   had_double_type dx = par.dx0/pow(2.0,(int) vecval[0]->level_);
 
+  if ( compute_index > 0 && compute_index < size-1 ) {
   // gradient detector
-  if ( size%2 == 1 ) {
-    index = (size-1)/2;
+  grad1 = (vecval[compute_index+1]->value_.phi[0][0] - vecval[compute_index-1]->value_.phi[0][0])/(2.*dx);
+  grad2 = (vecval[compute_index+1]->value_.phi[0][1] - vecval[compute_index-1]->value_.phi[0][1])/(2.*dx);
+  grad3 = (vecval[compute_index+1]->value_.phi[0][2] - vecval[compute_index-1]->value_.phi[0][2])/(2.*dx);
+  grad4 = (vecval[compute_index+1]->value_.phi[0][3] - vecval[compute_index-1]->value_.phi[0][3])/(2.*dx);
 
-    // different criteria for near r=0
-    if ( vecval[index]->x_ < 0.25 ) {
-      grad1 = (vecval[index+1]->value_.phi[0][0] - vecval[index]->value_.phi[0][0])/(2.*dx);
-      grad2 = (vecval[index+1]->value_.phi[0][1] - vecval[index]->value_.phi[0][1])/(2.*dx);
-      grad3 = (vecval[index+1]->value_.phi[0][2] - vecval[index]->value_.phi[0][2])/(2.*dx);
-      grad4 = (vecval[index+1]->value_.phi[0][3] - vecval[index]->value_.phi[0][3])/(2.*dx);
-    } else {
-      grad1 = (vecval[index+1]->value_.phi[0][0] - vecval[index-1]->value_.phi[0][0])/(2.*dx);
-      grad2 = (vecval[index+1]->value_.phi[0][1] - vecval[index-1]->value_.phi[0][1])/(2.*dx);
-      grad3 = (vecval[index+1]->value_.phi[0][2] - vecval[index-1]->value_.phi[0][2])/(2.*dx);
-      grad4 = (vecval[index+1]->value_.phi[0][3] - vecval[index-1]->value_.phi[0][3])/(2.*dx);
-    }
-    if ( sqrt( grad1*grad1 + grad2*grad2 + grad3*grad3 + grad4*grad4 ) > par.ethreshold ) return true;
-    else return false;
+  if ( sqrt( grad1*grad1 + grad2*grad2 + grad3*grad3 + grad4*grad4 ) > par.ethreshold ) return true;
+  else return false;
   } else {
     return false;
   }
@@ -346,11 +336,11 @@ bool refinement(stencil_data ** vecval, int size, struct nodedata *dst,int level
 #if 0
   // simple amplitude refinement
   had_double_type threshold;
-  if ( level == 0 ) return true;
-  if ( level == 1 ) threshold = 0.005;
-  if ( level == 2 ) threshold = 0.01;
-  if ( level == 3 ) threshold = 0.03;
-  if ( level == 4 ) threshold = 0.035;
+  if ( level == 0 ) threshold = 0.15;
+  if ( level == 1 ) threshold = 0.25;
+  if ( level == 2 ) threshold = 0.21;
+  if ( level == 3 ) threshold = 0.33;
+  if ( level == 4 ) threshold = 0.45;
 
   if ( dst->phi[0][0] > threshold || 
        dst->phi[0][1] > threshold || 
