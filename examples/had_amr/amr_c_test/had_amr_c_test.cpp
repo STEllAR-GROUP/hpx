@@ -313,21 +313,30 @@ int interpolation(struct nodedata *dst,struct nodedata *src1,struct nodedata *sr
   return 1;
 }
 
-bool refinement(stencil_data ** vecval, int size, struct nodedata *dst,int level,int compute_index,Par const& par)
+bool refinement(stencil_data ** vecval, int size, struct nodedata *dst,int level,int compute_index,bool boundary, int *bbox,Par const& par)
 {
 //#if 0
   had_double_type grad1,grad2,grad3,grad4;
   had_double_type dx = par.dx0/pow(2.0,(int) vecval[0]->level_);
 
-  if ( compute_index > 0 && compute_index < size-1 ) {
-  // gradient detector
-  grad1 = (vecval[compute_index+1]->value_.phi[0][0] - vecval[compute_index-1]->value_.phi[0][0])/(2.*dx);
-  grad2 = (vecval[compute_index+1]->value_.phi[0][1] - vecval[compute_index-1]->value_.phi[0][1])/(2.*dx);
-  grad3 = (vecval[compute_index+1]->value_.phi[0][2] - vecval[compute_index-1]->value_.phi[0][2])/(2.*dx);
-  grad4 = (vecval[compute_index+1]->value_.phi[0][3] - vecval[compute_index-1]->value_.phi[0][3])/(2.*dx);
+  if ( compute_index > 0 && compute_index < size-1 && !boundary ) {
+    // gradient detector
+    grad1 = (vecval[compute_index+1]->value_.phi[0][0] - vecval[compute_index-1]->value_.phi[0][0])/(2.*dx);
+    grad2 = (vecval[compute_index+1]->value_.phi[0][1] - vecval[compute_index-1]->value_.phi[0][1])/(2.*dx);
+    grad3 = (vecval[compute_index+1]->value_.phi[0][2] - vecval[compute_index-1]->value_.phi[0][2])/(2.*dx);
+    grad4 = (vecval[compute_index+1]->value_.phi[0][3] - vecval[compute_index-1]->value_.phi[0][3])/(2.*dx);
 
-  if ( sqrt( grad1*grad1 + grad2*grad2 + grad3*grad3 + grad4*grad4 ) > par.ethreshold ) return true;
-  else return false;
+    if ( sqrt( grad1*grad1 + grad2*grad2 + grad3*grad3 + grad4*grad4 ) > par.ethreshold ) return true;
+    else return false;
+  } if ( boundary && bbox[0] == 1 ) {
+    // gradient detector
+    grad1 = (vecval[compute_index+1]->value_.phi[0][0] - vecval[compute_index]->value_.phi[0][0])/(dx);
+    grad2 = (vecval[compute_index+1]->value_.phi[0][1] - vecval[compute_index]->value_.phi[0][1])/(dx);
+    grad3 = (vecval[compute_index+1]->value_.phi[0][2] - vecval[compute_index]->value_.phi[0][2])/(dx);
+    grad4 = (vecval[compute_index+1]->value_.phi[0][3] - vecval[compute_index]->value_.phi[0][3])/(dx);
+
+    if ( sqrt( grad1*grad1 + grad2*grad2 + grad3*grad3 + grad4*grad4 ) > par.ethreshold ) return true;
+    return false;
   } else {
     return false;
   }
