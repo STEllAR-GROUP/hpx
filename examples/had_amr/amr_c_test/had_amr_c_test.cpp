@@ -244,6 +244,8 @@ void calcrhs(struct nodedata * rhs,
   had_double_type chi = vecval[compute_index]->value_.phi[flag][0];
   had_double_type Phi = vecval[compute_index]->value_.phi[flag][1];
   had_double_type Pi =  vecval[compute_index]->value_.phi[flag][2];
+  had_double_type tmp2d;
+  had_double_type scale;
 
   if ( r < 0.0 ) {
     // ignore these points 
@@ -258,20 +260,28 @@ void calcrhs(struct nodedata * rhs,
     // the compute_index is not physical boundary; all points in stencilsize
     // are available for computing the rhs.
 
-    rhs->phi[0][0] = Pi; // chi rhs
+    had_double_type chi_np1 = vecval[compute_index+1]->value_.phi[flag][0];
+    had_double_type chi_nm1 = vecval[compute_index-1]->value_.phi[flag][0];
+    tmp2d = (chi_np1 - 2.*chi +  chi_nm1)/(dr*dr); 
+    scale = 1.0-tanh(0.25*r*r)*tanh(0.25*r*r);
+
+    rhs->phi[0][0] = Pi + par.eps*scale*tmp2d; // chi rhs
 
     had_double_type Pi_np1 = vecval[compute_index+1]->value_.phi[flag][2];
     had_double_type Pi_nm1 = vecval[compute_index-1]->value_.phi[flag][2];
 
-    rhs->phi[0][1] = (Pi_np1 - Pi_nm1)/(2.*dr); // Phi rhs
-
     had_double_type Phi_np1 = vecval[compute_index+1]->value_.phi[flag][1];
     had_double_type Phi_nm1 = vecval[compute_index-1]->value_.phi[flag][1];
+    tmp2d = (Phi_np1 - 2.*Phi + Phi_nm1)/(dr*dr);
+
+    rhs->phi[0][1] = (Pi_np1 - Pi_nm1)/(2.*dr) + par.eps*scale*tmp2d; // Phi rhs
 
     had_double_type r2_Phi_np1 = (r+dr)*(r+dr)*Phi_np1;
     had_double_type r2_Phi_nm1 = (r-dr)*(r-dr)*Phi_nm1;
 
-    rhs->phi[0][2] = 3.*( r2_Phi_np1 - r2_Phi_nm1 )/( pow(r+dr,3) - pow(r-dr,3) ) + pow(chi,par.PP); // Pi rhs
+    tmp2d = (Pi_np1 - 2.*Pi + Pi_nm1)/(dr*dr);
+
+    rhs->phi[0][2] = 3.*( r2_Phi_np1 - r2_Phi_nm1 )/( pow(r+dr,3) - pow(r-dr,3) ) + pow(chi,par.PP) + par.eps*scale*tmp2d; // Pi rhs
 
     rhs->phi[0][3] = 0.; // Energy rhs
   } else {
@@ -313,11 +323,13 @@ int interpolation(struct nodedata *dst,struct nodedata *src1,struct nodedata *sr
   return 1;
 }
 
-bool refinement(stencil_data ** vecval, int size, struct nodedata *dst,int level,int compute_index,bool boundary, int *bbox,Par const& par)
+bool refinement(stencil_data ** vecval, int size, struct nodedata *dst,int level,had_double_type r,int compute_index,bool boundary, int *bbox,Par const& par)
 {
 //#if 0
   had_double_type grad1,grad2,grad3,grad4;
   had_double_type dx = par.dx0/pow(2.0,(int) vecval[0]->level_);
+
+  if ( r < par.fmr_radius ) return true;
 
   if ( compute_index > 0 && compute_index < size-1 && !boundary ) {
     // gradient detector

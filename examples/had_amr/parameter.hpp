@@ -56,6 +56,8 @@ namespace hpx { namespace components { namespace amr
             ar & R0;
             ar & delta;
             ar & amp;
+            ar & eps;
+            ar & fmr_radius;
             ar & PP;
 
         }

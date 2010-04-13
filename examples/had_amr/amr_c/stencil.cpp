@@ -141,7 +141,7 @@ namespace hpx { namespace components { namespace amr
             int gft = rkupdate(&*vecval.begin(),resultval.get_ptr(),vecval.size(),boundary,bbox,compute_index,par);
             BOOST_ASSERT(gft);
             // refine only after rk subcycles are finished (we don't refine in the midst of rk subcycles)
-            if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&*vecval.begin(),vecval.size(),&resultval->value_,resultval->level_,compute_index,boundary,bbox,par);
+            if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&*vecval.begin(),vecval.size(),&resultval->value_,resultval->level_,resultval->x_,compute_index,boundary,bbox,par);
             else resultval->refine_ = false;
 
             std::size_t allowedl = par.allowedl;
@@ -394,7 +394,7 @@ namespace hpx { namespace components { namespace amr
             vecval.push_back(mval[i-1].get_ptr());
             vecval.push_back(mval[i].get_ptr());
             vecval.push_back(mval[i+1].get_ptr());
-            mval[i]->refine_ = refinement(&*vecval.begin(),vecval.size(),&(mval[i]->value_),mval[i]->level_,1,boundary,bbox,par);
+            mval[i]->refine_ = refinement(&*vecval.begin(),vecval.size(),&(mval[i]->value_),mval[i]->level_,mval[i]->x_,1,boundary,bbox,par);
 
             // DEBUG
             if (log_)

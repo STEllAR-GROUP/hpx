@@ -242,6 +242,8 @@ int main(int argc, char* argv[])
         par.amp         =  0.1;
         par.delta       =  1.0;
         par.PP          =  7;
+        par.eps         =  0.0;
+        par.fmr_radius  =  -999.0;
 
         par.linearbounds = 1;
         int scheduler = 0;  // default: global scheduler
@@ -326,6 +328,14 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("PP") ) {
                 std::string tmp = sec->get_entry("PP");
                 par.PP = atoi(tmp.c_str());
+              }
+              if ( sec->has_entry("eps") ) {
+                std::string tmp = sec->get_entry("eps");
+                par.eps = atof(tmp.c_str());
+              }
+              if ( sec->has_entry("fmr_radius") ) {
+                std::string tmp = sec->get_entry("fmr_radius");
+                par.fmr_radius = atof(tmp.c_str());
               }
             }
         }

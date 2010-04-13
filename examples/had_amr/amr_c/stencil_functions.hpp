@@ -21,7 +21,7 @@ HPX_COMPONENT_EXPORT int generate_initial_data(
 /// for the given timestep
 HPX_COMPONENT_EXPORT int interpolation(struct nodedata *dst,struct nodedata *src1,struct nodedata *src2);
 
-HPX_COMPONENT_EXPORT bool refinement(stencil_data ** val,int size,struct nodedata *data,int,int,bool boundary, int *bbox,Par const& par);
+HPX_COMPONENT_EXPORT bool refinement(stencil_data ** val,int size,struct nodedata *data,int,had_double_type,int,bool boundary, int *bbox,Par const& par);
 
 HPX_COMPONENT_EXPORT int rkupdate(stencil_data ** val, stencil_data* result,int size,bool boundary,int *bbox,int compute_index,Par const& par);
 
