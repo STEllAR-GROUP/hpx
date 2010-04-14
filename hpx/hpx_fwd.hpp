@@ -6,7 +6,7 @@
 #if !defined(HPX_HPX_FWD_MAR_24_2008_1119AM)
 #define HPX_HPX_FWD_MAR_24_2008_1119AM
 
-#include <cstdint>
+#include <cstdlib>
 
 #include <boost/config.hpp>
 #if defined(BOOST_WINDOWS)
