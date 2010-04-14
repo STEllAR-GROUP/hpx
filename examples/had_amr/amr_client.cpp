@@ -244,6 +244,7 @@ int main(int argc, char* argv[])
         par.PP          =  7;
         par.eps         =  0.0;
         par.fmr_radius  =  -999.0;
+        par.output_level =  0;
 
         par.linearbounds = 1;
         int scheduler = 0;  // default: global scheduler
@@ -274,6 +275,10 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("output_stdout") ) {
                 std::string tmp = sec->get_entry("output_stdout");
                 par.output_stdout = atoi(tmp.c_str());
+              }
+              if ( sec->has_entry("output_level") ) {
+                std::string tmp = sec->get_entry("output_level");
+                par.output_level = atoi(tmp.c_str());
               }
               if ( sec->has_entry("stencilsize") ) {
                 std::string tmp = sec->get_entry("stencilsize");

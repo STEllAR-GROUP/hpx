@@ -34,6 +34,7 @@ struct Par {
       had_double_type amp;
       had_double_type eps;
       had_double_type fmr_radius;
+      int output_level;
       int PP;
 };
 
