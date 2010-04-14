@@ -24,7 +24,7 @@ namespace boost { namespace serialization
     template<class Archive>
     void save(Archive& ar, mpfr::mpreal const& d, unsigned int version)
     {
-        std::string s(d);
+        std::string s(d.to_string());
         ar & s;
     }
 
