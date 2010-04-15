@@ -283,7 +283,8 @@ def write_dot(app_run):
     print "    label = \"%s (%s)\";" % (thread.action_name(), thread.id())
     phases = thread.phases()
     phases.sort()
-    print "    %s;" % (' -> '.join([p.id() for p in phases]))
+    if len(phases) > 0:
+      print "    %s;" % (' -> '.join([p.id() for p in phases]))
     print "  }"
     for phase in thread.phases():
       for transition in phase.transitions():
