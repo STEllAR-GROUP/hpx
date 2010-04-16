@@ -272,6 +272,9 @@ def condense(edges, label):
 
   return new_names
 
+def phase_number(phase):
+  return phase.id()[phase.id().rfind('p')+1:]
+
 def write_dot(app_run):
   cluster_number = 0
 
@@ -283,6 +286,8 @@ def write_dot(app_run):
     print "    label = \"%s (%s)\";" % (thread.action_name(), thread.id())
     phases = thread.phases()
     phases.sort()
+    for p in phases:
+      print "    %s [label=\"%s\"];" % (p.id(), phase_number(p))
     if len(phases) > 0:
       print "    %s;" % (' -> '.join([p.id() for p in phases]))
     print "  }"
