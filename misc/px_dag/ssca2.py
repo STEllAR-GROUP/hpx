@@ -119,7 +119,7 @@ def build_model(app_run, log_filename):
     (parent_loc, parent_addr) = event['parent']
 
     ### Clean thread information
-    if child_addr == '--------':
+    if child_addr == '--------.--':
       child_addr = '0x0000000p0'
     if parent_addr == '--------':
       parent_addr = '0x0000000'
@@ -286,8 +286,8 @@ def write_dot(app_run):
     print "    label = \"%s (%s)\";" % (thread.action_name(), thread.id())
     phases = thread.phases()
     phases.sort()
-    for p in phases:
-      print "    %s [label=\"%s\"];" % (p.id(), phase_number(p))
+    #for p in phases:
+    #  print "    %s [label=\"%s\"];" % (p.id(), phase_number(p))
     if len(phases) > 0:
       print "    %s;" % (' -> '.join([p.id() for p in phases]))
     print "  }"
