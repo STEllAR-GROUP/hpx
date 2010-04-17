@@ -311,13 +311,83 @@ void calcrhs(struct nodedata * rhs,
   }
 }
 
-int interpolation(struct nodedata *dst,struct nodedata *src1,struct nodedata *src2)
+had_double_type interp_quad(had_double_type y1,had_double_type y2,had_double_type y3,had_double_type y4,had_double_type y5,
+                            had_double_type x, 
+                            had_double_type x1,had_double_type x2,had_double_type x3,had_double_type x4,had_double_type x5) {
+  had_double_type xx1 = x - x1;
+  had_double_type xx2 = x - x2;
+  had_double_type xx3 = x - x3;
+  had_double_type xx4 = x - x4;
+  had_double_type xx5 = x - x5;
+  had_double_type result = xx2*xx3*xx4*xx5*y1/( (x1-x2)*(x1-x3)*(x1-x4)*(x1-x5) )
+                + xx1*xx3*xx4*xx5*y2/( (x2-x1)*(x2-x3)*(x2-x4)*(x2-x5) )
+                + xx1*xx2*xx4*xx5*y3/( (x3-x1)*(x3-x2)*(x3-x4)*(x3-x5) )
+                + xx1*xx2*xx3*xx5*y4/( (x4-x1)*(x4-x2)*(x4-x3)*(x4-x5) )
+                + xx1*xx2*xx3*xx4*y5/( (x5-x1)*(x5-x2)*(x5-x3)*(x5-x4) );
+
+  return result;
+}                 
+
+int interpolation(had_double_type dst_x,struct nodedata *dst,
+                  had_double_type * x_val, int xsize,
+                  nodedata * n_val, int nsize)
 {
-  int i;
+  int i,start_index;
+
+  // sanity check
+  if ( x_val[0] > dst_x || x_val[xsize-1] < dst_x ) return 0;
+
+  // specific to spherical symmetry
+  if ( dst_x < 0.0 ) {
+    for (i=0;i<num_eqns;i++) {
+      dst->phi[0][i] = 1.e8;
+      dst->phi[1][i] = 1.e8;
+    }
+    return 1;
+  }
+
+  // quad interp at AMR boundaries
+  // find the point nearest dst_x
+  for (i=0;i<xsize;i++) {
+    if ( x_val[i] > dst_x ) break;
+  }
+
+  if ( i > 1 && i < xsize-2 ) {
+    start_index = i-2;
+  } else if ( i <= 1 ) {
+    start_index = 0;
+  } else if ( i >= xsize-2 ) {
+    start_index = xsize-5;
+  } else {
+    // this shouldn't happen
+    return 0;
+  }
+
   // linear interpolation at boundaries
   for (i=0;i<num_eqns;i++) {
-    dst->phi[0][i] = 0.5*(src1->phi[0][i] + src2->phi[0][i]);
-    dst->phi[1][i] = 0.5*(src1->phi[1][i] + src2->phi[1][i]);
+    dst->phi[0][i] = interp_quad(n_val[start_index].phi[0][i],
+                                 n_val[start_index+1].phi[0][i],
+                                 n_val[start_index+2].phi[0][i],
+                                 n_val[start_index+3].phi[0][i],
+                                 n_val[start_index+4].phi[0][i],
+                                 dst_x,
+                                 x_val[start_index],
+                                 x_val[start_index+1],
+                                 x_val[start_index+2],
+                                 x_val[start_index+3],
+                                 x_val[start_index+4]);
+
+    dst->phi[1][i] = interp_quad(n_val[start_index].phi[1][i],
+                                 n_val[start_index+1].phi[1][i],
+                                 n_val[start_index+2].phi[1][i],
+                                 n_val[start_index+3].phi[1][i],
+                                 n_val[start_index+4].phi[1][i],
+                                 dst_x,
+                                 x_val[start_index],
+                                 x_val[start_index+1],
+                                 x_val[start_index+2],
+                                 x_val[start_index+3],
+                                 x_val[start_index+4]);
   }
 
   return 1;

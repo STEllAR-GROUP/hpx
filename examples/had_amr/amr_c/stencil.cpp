@@ -389,7 +389,23 @@ namespace hpx { namespace components { namespace amr
         for (i=1;i<17;i=i+2) {
           s = findpoint(mval[i-1],mval[i+1],mval[i]);
           if ( s == 0 ) { 
-            interpolation(&(mval[i]->value_),&(mval[i-1]->value_),&(mval[i+1]->value_));
+            std::vector< had_double_type > x_val;
+            std::vector< nodedata > n_val;
+            x_val.push_back(mval[0]->x_); n_val.push_back(mval[0]->value_);
+            x_val.push_back(mval[2]->x_); n_val.push_back(mval[2]->value_);
+            x_val.push_back(mval[4]->x_); n_val.push_back(mval[4]->value_);
+            x_val.push_back(mval[6]->x_); n_val.push_back(mval[6]->value_);
+            x_val.push_back(mval[8]->x_); n_val.push_back(mval[8]->value_);
+            x_val.push_back(mval[10]->x_); n_val.push_back(mval[10]->value_);
+            x_val.push_back(mval[12]->x_); n_val.push_back(mval[12]->value_);
+            x_val.push_back(mval[14]->x_); n_val.push_back(mval[14]->value_);
+            x_val.push_back(mval[16]->x_); n_val.push_back(mval[16]->value_);
+            // pass in everything -- let the user decide how to interpolate using all the available anchors
+            int gft = interpolation(mval[i]->x_,&(mval[i]->value_),
+                          &*x_val.begin(),x_val.size(),
+                          &*n_val.begin(),n_val.size());
+            BOOST_ASSERT(gft);
+
             std::vector< stencil_data * > vecval;
             vecval.push_back(mval[i-1].get_ptr());
             vecval.push_back(mval[i].get_ptr());
