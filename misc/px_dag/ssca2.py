@@ -286,8 +286,8 @@ def write_dot(app_run):
     print "    label = \"%s (%s)\";" % (thread.action_name(), thread.id())
     phases = thread.phases()
     phases.sort()
-    #for p in phases:
-    #  print "    %s [label=\"%s\"];" % (p.id(), phase_number(p))
+    for p in phases:
+      print "    %s [label=\"%s\"];" % (p.id(), phase_number(p))
     if len(phases) > 0:
       print "    %s;" % (' -> '.join([p.id() for p in phases]))
     print "  }"
