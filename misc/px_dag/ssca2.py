@@ -62,7 +62,7 @@ def get_parent_tid(event):
 
 def first_phase(phase):
   (thread, count) = phase.split('p')
-  return 'p'.join([thread, '1'])
+  return 'p'.join([thread, '01'])
 
 def next_phase(phase):
   (thread, count) = phase.split('p')
