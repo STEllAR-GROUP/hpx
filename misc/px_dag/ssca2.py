@@ -171,7 +171,15 @@ def build_model(app_run, log_filename):
     if f.has_key('future_value'):
       C = phases['T'+f['future_value']]
     if f.has_key('set'):
-      D = phases['T'+first_phase(f['set'])]
+      key = 'T'+first_phase(f['set'])
+      if not phases.has_key(key):
+        phases[key] = PxPhase(key)
+        key_id = key[:key.find('p')]
+        if not threads.has_key(key_id):
+          threads[key_id] = PxThread(key_id)
+        else:
+          threads[key_id].add_phase(phases[key])
+      D = phases[key]
       E = phases['T'+f['set']]
 
     if A and B:
