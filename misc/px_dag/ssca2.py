@@ -25,6 +25,7 @@ g_gid = '{([^,]+), (.*)}.*'
 re_future = re.compile('future_value::'+g_action+'\('+g_gid+'\)')
 
 re_action = re.compile('\[(.*)\][^:]*(::\S*)')
+re_thread_desc = re.compile('tfunc\([^\)]*\): thread\(([^\)]*)\), description\(([^\)]*)\)')
 
 def get_parent_tid(event):
   msg = event['msg']
@@ -102,6 +103,13 @@ def parse_action_name(event, label, future, cadd):
       if not 'eager_future' in action:
         if not label.has_key(thread(cadd)):
           label[thread(cadd)] = action
+    else:
+      m_thread_desc = re_thread_desc.search(event['msg'])
+      if m_thread_desc:
+        thread = 'T'+m_thread_desc.group(1)
+        action_name = m_thread_desc.group(2)
+        if not label.has_key(thread):
+          label[thread] = action_name
 
   return action
 
@@ -148,6 +156,11 @@ def build_model(app_run, log_filename):
 
     # Add phase to thread
     threads[child_thread_id].add_phase(phases[child_phase_id])
+
+  # Use labels to annotate with action name information
+  for (thread, action_name) in label.items():
+    if threads.has_key(thread):
+      threads[thread].set_action_name(action_name)
 
   # Use futures information to set transitions and dependencies
   for f in future.values():
@@ -279,6 +292,7 @@ def write_dot(app_run):
   cluster_number = 0
 
   print "digraph {"
+  print "  size=\"8.5,11\";"
   print "  rankdir=LR;"
   for thread in app_run.threads():
     cluster_number += 1
