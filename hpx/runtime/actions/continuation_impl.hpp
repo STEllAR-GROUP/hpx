@@ -27,6 +27,8 @@ namespace hpx { namespace actions
             lcos::template base_lco_with_value<Arg0>::set_result_action 
         action_type;
 
+        LAPP_(info) << "future_value::set(" << gid_ << ")";
+
         applier::apply<action_type>(gid_, arg0);
         return arg0;
     }
