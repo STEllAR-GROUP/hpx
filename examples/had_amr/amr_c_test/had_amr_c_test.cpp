@@ -332,7 +332,7 @@ int interpolation(had_double_type dst_x,struct nodedata *dst,
                   had_double_type * x_val, int xsize,
                   nodedata * n_val, int nsize)
 {
-  int i,start_index;
+  int i,j,start_index;
 
   // sanity check
   if ( x_val[0] > dst_x || x_val[xsize-1] < dst_x ) return 0;
@@ -362,9 +362,12 @@ int interpolation(had_double_type dst_x,struct nodedata *dst,
     // this shouldn't happen
     return 0;
   }
+  j = i;
 
   // linear interpolation at boundaries
   for (i=0;i<num_eqns;i++) {
+    dst->phi[0][i] = 0.5*(n_val[j-1].phi[0][i] + n_val[j].phi[0][i]);
+#if 0
     dst->phi[0][i] = interp_quad(n_val[start_index].phi[0][i],
                                  n_val[start_index+1].phi[0][i],
                                  n_val[start_index+2].phi[0][i],
@@ -376,18 +379,7 @@ int interpolation(had_double_type dst_x,struct nodedata *dst,
                                  x_val[start_index+2],
                                  x_val[start_index+3],
                                  x_val[start_index+4]);
-
-    dst->phi[1][i] = interp_quad(n_val[start_index].phi[1][i],
-                                 n_val[start_index+1].phi[1][i],
-                                 n_val[start_index+2].phi[1][i],
-                                 n_val[start_index+3].phi[1][i],
-                                 n_val[start_index+4].phi[1][i],
-                                 dst_x,
-                                 x_val[start_index],
-                                 x_val[start_index+1],
-                                 x_val[start_index+2],
-                                 x_val[start_index+3],
-                                 x_val[start_index+4]);
+#endif
   }
 
   return 1;

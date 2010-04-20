@@ -9,6 +9,8 @@
 #include <boost/cstdint.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/serialization.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 
 #include "parameter.h"
 
@@ -30,7 +32,7 @@ class Array3D {
 namespace hpx { namespace components { namespace amr 
 {
     /// Parameter structure
-    struct HPX_EXPORT Parameter : ::Par
+    struct HPX_EXPORT Parameter_impl : ::Par
     {
     private:
         friend class boost::serialization::access;
@@ -61,6 +63,28 @@ namespace hpx { namespace components { namespace amr
             ar & output_level;
             ar & PP;
 
+        }
+    };
+
+    struct HPX_EXPORT Parameter  {
+      boost::shared_ptr< Parameter_impl > p;
+      Parameter() : p(new Parameter_impl) {
+      }
+      public:
+        Parameter_impl * operator -> () {
+          return p.get();
+        }
+
+        Parameter_impl const * operator -> () const {
+          return p.get();
+        }
+
+      private:
+        friend class boost::serialization::access;
+        template<class Archive>
+        void serialize(Archive &ar, const unsigned int version) 
+        {
+          ar & p;
         }
     };
 

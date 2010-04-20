@@ -33,11 +33,11 @@ namespace hpx { namespace components { namespace amr { namespace server
     {
         mutex_type::scoped_lock l(mtx_);
 
-        if ( par.output_stdout == 1 && val.iter_ == 0 ) {
-          if (fmod(val.timestep_,par.output) < 1.e-6) {
+        if ( par->output_stdout == 1 && val.iter_ == 0 ) {
+          if (fmod(val.timestep_,par->output) < 1.e-6) {
             std::cout << " AMR Level: " << val.level_ 
                       << " Timestep: " <<  val.timestep_ 
-                      << " Time: " << val.timestep_*par.dx0*par.lambda  
+                      << " Time: " << val.timestep_*par->dx0*par->lambda  
                       << " refine?: " << val.refine_ 
                       << " row: " << row 
                       << " index: " << val.index_ 
@@ -50,13 +50,13 @@ namespace hpx { namespace components { namespace amr { namespace server
         // output to file "output.dat"
         FILE *fdata;
         if ( logcode == 0 && val.iter_ == 0 ) {
-          if (fmod(val.timestep_,par.output) < 1.e-6 && val.x_ >= 0.0 && val.level_ >= par.output_level) {
+          if (fmod(val.timestep_,par->output) < 1.e-6 && val.x_ >= 0.0 && val.level_ >= par->output_level) {
             std::string x_str = convert(val.x_);
             std::string chi_str = convert(val.value_.phi[0][0]);
             std::string Phi_str = convert(val.value_.phi[0][1]);
             std::string Pi_str = convert(val.value_.phi[0][2]);
             std::string energy_str = convert(val.value_.phi[0][3]);
-            std::string time_str = convert(val.timestep_*par.dx0*par.lambda);
+            std::string time_str = convert(val.timestep_*par->dx0*par->lambda);
 
             fdata = fopen("chi.dat","a");
             fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),chi_str.c_str());
@@ -81,7 +81,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         if ( logcode == 1 ) {
           std::string x_str = convert(val.x_);
           std::string chi_str = convert(val.value_.phi[0][0]);
-          std::string time_str = convert(val.timestep_*par.dx0*par.lambda);
+          std::string time_str = convert(val.timestep_*par->dx0*par->lambda);
 
           fdata = fopen("logcode1.dat","a");
           fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),chi_str.c_str());
@@ -92,7 +92,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         if ( logcode == 2 ) {
           std::string x_str = convert(val.x_);
           std::string chi_str = convert(val.value_.phi[0][0]);
-          std::string time_str = convert(val.timestep_*par.dx0*par.lambda);
+          std::string time_str = convert(val.timestep_*par->dx0*par->lambda);
 
           fdata = fopen("logcode2.dat","a");
           fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),chi_str.c_str());

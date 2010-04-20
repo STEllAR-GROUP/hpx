@@ -39,7 +39,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
     {
         naming::id_type here = applier::get_applier().get_runtime_support_gid();
 
-        if ( par.loglevel > 0 ) {
+        if ( par->loglevel > 0 ) {
           // over-ride a false command line argument
           do_logging = true;
         }
@@ -47,12 +47,12 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         hpx::util::high_resolution_timer t;
         std::vector<naming::id_type> result_data;
         
-        if ( par.integrator == 0 ) {
+        if ( par->integrator == 0 ) {
            components::amr::amr_mesh mesh;
            mesh.create(here);
            result_data = mesh.init_execute(function_type, numvals, numsteps,
                 do_logging ? logging_type : components::component_invalid, par);
-        } else if ( par.integrator == 1 ) {
+        } else if ( par->integrator == 1 ) {
             components::amr::rk_mesh rk_mesh;
             rk_mesh.create(here);
             result_data = rk_mesh.init_execute(function_type, numvals, numsteps,
@@ -226,27 +226,27 @@ int main(int argc, char* argv[])
         components::amr::Parameter par;
 
         // default pars
-        par.stencilsize = 3;
-        par.integrator  = 0;
-        par.allowedl    = 0;
-        par.loglevel    = 0;
-        par.output      = 1.0;
-        par.output_stdout = 1;
-        par.lambda      = 0.15;
-        par.nx0         = numvals;
-        par.nt0         = numsteps;
-        par.minx0       =   0.0;
-        par.maxx0       =  10.0;
-        par.ethreshold  =  0.1;
-        par.R0          =  8.0;
-        par.amp         =  0.1;
-        par.delta       =  1.0;
-        par.PP          =  7;
-        par.eps         =  0.0;
-        par.fmr_radius  =  -999.0;
-        par.output_level =  0;
+        par->stencilsize = 3;
+        par->integrator  = 0;
+        par->allowedl    = 0;
+        par->loglevel    = 0;
+        par->output      = 1.0;
+        par->output_stdout = 1;
+        par->lambda      = 0.15;
+        par->nx0         = numvals;
+        par->nt0         = numsteps;
+        par->minx0       =   0.0;
+        par->maxx0       =  10.0;
+        par->ethreshold  =  0.1;
+        par->R0          =  8.0;
+        par->amp         =  0.1;
+        par->delta       =  1.0;
+        par->PP          =  7;
+        par->eps         =  0.0;
+        par->fmr_radius  =  -999.0;
+        par->output_level =  0;
 
-        par.linearbounds = 1;
+        par->linearbounds = 1;
         int scheduler = 0;  // default: global scheduler
 
         std::string parfile;
@@ -258,52 +258,52 @@ int main(int argc, char* argv[])
               hpx::util::section *sec = pars.get_section("had_amr");
               if ( sec->has_entry("lambda") ) {
                 std::string tmp = sec->get_entry("lambda");
-                par.lambda = atof(tmp.c_str());
+                par->lambda = atof(tmp.c_str());
               }
               if ( sec->has_entry("allowedl") ) {
                 std::string tmp = sec->get_entry("allowedl");
-                par.allowedl = atoi(tmp.c_str());
+                par->allowedl = atoi(tmp.c_str());
               }
               if ( sec->has_entry("loglevel") ) {
                 std::string tmp = sec->get_entry("loglevel");
-                par.loglevel = atoi(tmp.c_str());
+                par->loglevel = atoi(tmp.c_str());
               }
               if ( sec->has_entry("output") ) {
                 std::string tmp = sec->get_entry("output");
-                par.output = atof(tmp.c_str());
+                par->output = atof(tmp.c_str());
               }
               if ( sec->has_entry("output_stdout") ) {
                 std::string tmp = sec->get_entry("output_stdout");
-                par.output_stdout = atoi(tmp.c_str());
+                par->output_stdout = atoi(tmp.c_str());
               }
               if ( sec->has_entry("output_level") ) {
                 std::string tmp = sec->get_entry("output_level");
-                par.output_level = atoi(tmp.c_str());
+                par->output_level = atoi(tmp.c_str());
               }
               if ( sec->has_entry("stencilsize") ) {
                 std::string tmp = sec->get_entry("stencilsize");
-                par.stencilsize = atoi(tmp.c_str());
+                par->stencilsize = atoi(tmp.c_str());
               }
               if ( sec->has_entry("integrator") ) {
                 std::string tmp = sec->get_entry("integrator");
-                par.integrator = atoi(tmp.c_str());
-                if ( par.integrator < 0 || par.integrator > 1 ) BOOST_ASSERT(false); 
+                par->integrator = atoi(tmp.c_str());
+                if ( par->integrator < 0 || par->integrator > 1 ) BOOST_ASSERT(false); 
               }
               if ( sec->has_entry("linearbounds") ) {
                 std::string tmp = sec->get_entry("linearbounds");
-                par.linearbounds = atoi(tmp.c_str());
+                par->linearbounds = atoi(tmp.c_str());
               }
               if ( sec->has_entry("nx0") ) {
                 std::string tmp = sec->get_entry("nx0");
-                par.nx0 = atoi(tmp.c_str());
+                par->nx0 = atoi(tmp.c_str());
                 // over-ride command line argument if present
-                numvals = par.nx0;
+                numvals = par->nx0;
               }
               if ( sec->has_entry("nt0") ) {
                 std::string tmp = sec->get_entry("nt0");
-                par.nt0 = atoi(tmp.c_str());
+                par->nt0 = atoi(tmp.c_str());
                 // over-ride command line argument if present
-                numsteps = par.nt0;
+                numsteps = par->nt0;
               }
               if ( sec->has_entry("thread_scheduler") ) {
                 std::string tmp = sec->get_entry("thread_scheduler");
@@ -312,56 +312,56 @@ int main(int argc, char* argv[])
               }
               if ( sec->has_entry("maxx0") ) {
                 std::string tmp = sec->get_entry("maxx0");
-                par.maxx0 = atof(tmp.c_str());
+                par->maxx0 = atof(tmp.c_str());
               }
               if ( sec->has_entry("ethreshold") ) {
                 std::string tmp = sec->get_entry("ethreshold");
-                par.ethreshold = atof(tmp.c_str());
+                par->ethreshold = atof(tmp.c_str());
               }
               if ( sec->has_entry("R0") ) {
                 std::string tmp = sec->get_entry("R0");
-                par.R0 = atof(tmp.c_str());
+                par->R0 = atof(tmp.c_str());
               }
               if ( sec->has_entry("delta") ) {
                 std::string tmp = sec->get_entry("delta");
-                par.delta = atof(tmp.c_str());
+                par->delta = atof(tmp.c_str());
               }
               if ( sec->has_entry("amp") ) {
                 std::string tmp = sec->get_entry("amp");
-                par.amp = atof(tmp.c_str());
+                par->amp = atof(tmp.c_str());
               }
               if ( sec->has_entry("PP") ) {
                 std::string tmp = sec->get_entry("PP");
-                par.PP = atoi(tmp.c_str());
+                par->PP = atoi(tmp.c_str());
               }
               if ( sec->has_entry("eps") ) {
                 std::string tmp = sec->get_entry("eps");
-                par.eps = atof(tmp.c_str());
+                par->eps = atof(tmp.c_str());
               }
               if ( sec->has_entry("fmr_radius") ) {
                 std::string tmp = sec->get_entry("fmr_radius");
-                par.fmr_radius = atof(tmp.c_str());
+                par->fmr_radius = atof(tmp.c_str());
               }
             }
         }
 
         // derived parameters
-        par.dx0 = (par.maxx0 - par.minx0)/(par.nx0-1);
-        par.dt0 = par.lambda*par.dx0;
+        par->dx0 = (par->maxx0 - par->minx0)/(par->nx0-1);
+        par->dt0 = par->lambda*par->dx0;
 
         // adjust domain so that there are 4 ghost zones to the left of minx0, which is always r=0
         // so you can refine at r=0
-        par.minx0 = par.minx0 - 4.*par.dx0;
-        par.maxx0 = par.maxx0 - 4.*par.dx0;
+        par->minx0 = par->minx0 - 4.*par->dx0;
+        par->maxx0 = par->maxx0 - 4.*par->dx0;
 
-        if ( par.allowedl > 0 ) {
-          if ( par.linearbounds == 1 ) {
-            if ( par.integrator == 0 ) {
+        if ( par->allowedl > 0 ) {
+          if ( par->linearbounds == 1 ) {
+            if ( par->integrator == 0 ) {
               // Euler step
-              par.coarsestencilsize = par.stencilsize + 2;
-            } else if ( par.integrator == 1 ) {
+              par->coarsestencilsize = par->stencilsize + 2;
+            } else if ( par->integrator == 1 ) {
               // rk3 step
-              par.coarsestencilsize = par.stencilsize + 6;
+              par->coarsestencilsize = par->stencilsize + 6;
             } else {
               // Not implemented yet
               BOOST_ASSERT(false);
@@ -371,18 +371,18 @@ int main(int argc, char* argv[])
             BOOST_ASSERT(false);
           }
         } else {
-          par.coarsestencilsize = par.stencilsize;
+          par->coarsestencilsize = par->stencilsize;
         }
 
         // The stencilsize needs to be odd
-        BOOST_ASSERT(par.stencilsize%2 != 0 );
+        BOOST_ASSERT(par->stencilsize%2 != 0 );
 
-        if ( par.integrator == 1 ) {
+        if ( par->integrator == 1 ) {
           numsteps *= 3;  // three subcycles each step
 
           // this ensures we always use rk_mesh instead of amr_mesh.
           // rk_mesh has the special BC implemented in it which we need for this problem.
-          par.coarsestencilsize = par.stencilsize + 6;
+          par->coarsestencilsize = par->stencilsize + 6;
         }
 
         // create output file to append to

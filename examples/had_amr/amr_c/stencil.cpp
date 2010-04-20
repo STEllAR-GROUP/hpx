@@ -93,7 +93,7 @@ namespace hpx { namespace components { namespace amr
             compute_index = 1;
             bbox[0] = 1;
             bbox[1] = 0;
-          } else if ( column == par.nx0 - 1) {
+          } else if ( column == par->nx0 - 1) {
             // indicate a physical boundary
             boundary = true;
             compute_index = vecval.size()-1;
@@ -138,17 +138,17 @@ namespace hpx { namespace components { namespace amr
         if (val[0]->level_ == 0 && val[0]->timestep_ < numsteps_ || val[0]->level_ > 0) {
 
             // call rk update 
-            int gft = rkupdate(&*vecval.begin(),resultval.get_ptr(),vecval.size(),boundary,bbox,compute_index,par);
+            int gft = rkupdate(&*vecval.begin(),resultval.get_ptr(),vecval.size(),boundary,bbox,compute_index,*par.p);
             BOOST_ASSERT(gft);
             // refine only after rk subcycles are finished (we don't refine in the midst of rk subcycles)
-            if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&*vecval.begin(),vecval.size(),&resultval->value_,resultval->level_,resultval->x_,compute_index,boundary,bbox,par);
+            if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&*vecval.begin(),vecval.size(),&resultval->value_,resultval->level_,resultval->x_,compute_index,boundary,bbox,*par.p);
             else resultval->refine_ = false;
 
-            std::size_t allowedl = par.allowedl;
+            std::size_t allowedl = par->allowedl;
 
             // eliminate unrefinable cases
-            if ( gids.size() != 5 && par.stencilsize == 3 && par.integrator == 0 ) resultval->refine_ = false;
-            if ( par.stencilsize == 3 && par.integrator == 1 ) {
+            if ( gids.size() != 5 && par->stencilsize == 3 && par->integrator == 0 ) resultval->refine_ = false;
+            if ( par->stencilsize == 3 && par->integrator == 1 ) {
               if ( gids.size() == vecval.size() && gids.size() != 9 ) resultval->refine_ = false; 
               if ( gids.size() != vecval.size() && gids.size() - vecval.size() != 9 ) resultval->refine_ = false; 
             }
@@ -166,7 +166,7 @@ namespace hpx { namespace components { namespace amr
               finer_mesh_initial(result, gids, resultval->level_+1, resultval->x_, row, column, par);
             }
 
-            if (log_ && fmod(resultval->timestep_,par.output) < 1.e-6) 
+            if (log_ && fmod(resultval->timestep_,par->output) < 1.e-6) 
                 stubs::logging::logentry(log_, resultval.get(), row,0, par);
         }
         else {
@@ -210,11 +210,11 @@ namespace hpx { namespace components { namespace amr
         components::component_type function_type =
                   components::get_component_type<components::amr::stencil>();
         // create the mesh only if you need to, otherwise reuse (reduce overhead)
-        if ( par.integrator == 0 ) {
+        if ( par->integrator == 0 ) {
           if ( !child_left_mesh[row].get_gid() ) {
               child_left_mesh[row].create(applier::get_applier().get_runtime_support_gid());
           }
-        } else if ( par.integrator == 1 ) {
+        } else if ( par->integrator == 1 ) {
           if ( !rk_left_mesh[row].get_gid() ) {
               rk_left_mesh[row].create(applier::get_applier().get_runtime_support_gid());
           }
@@ -223,15 +223,15 @@ namespace hpx { namespace components { namespace amr
         }
 
         bool do_logging = false;
-        if ( par.loglevel > 0 ) {
+        if ( par->loglevel > 0 ) {
           do_logging = true;
         }
 
         std::vector<naming::id_type> result_data;
-        if ( par.integrator == 0 ) {
+        if ( par->integrator == 0 ) {
           result_data = child_left_mesh[row].execute(initial_data, function_type,
                 do_logging ? logging_type : components::component_invalid,par);
-        } else if ( par.integrator == 1 ) {
+        } else if ( par->integrator == 1 ) {
           result_data =  rk_left_mesh[row].execute(initial_data, function_type,
                 do_logging ? logging_type : components::component_invalid,par);
         } else {
@@ -292,14 +292,14 @@ namespace hpx { namespace components { namespace amr
     // Decide whether to use a left or right biased tapered mesh
     bool stencil::left_tapered_mesh(std::vector<naming::id_type> const& gids, int row,int column, Parameter const& par) 
     {
-      if ( par.integrator == 0 ) {
+      if ( par->integrator == 0 ) {
         BOOST_ASSERT(false);
         //access_memory_block<stencil_data> edge1,edge2;
         //boost::tie(edge1,edge2) = get_memory_block_async<stencil_data>(gids[0],gids[1]);
         //if ( !edge1->refine_ || !edge2->refine_ || (row == 1 && column == 1) ) 
         //    return true;
         //return false;
-      } else if (par.integrator == 1) {
+      } else if (par->integrator == 1) {
         return true;
       }
       BOOST_ASSERT(false);
@@ -312,10 +312,10 @@ namespace hpx { namespace components { namespace amr
         std::vector<naming::id_type> const& gids,int vecvalsize, int row,int column, Parameter const& par) 
     {
       int i;
-      if ( par.integrator == 0 ) {
+      if ( par->integrator == 0 ) {
         // not implemented
         BOOST_ASSERT(false);
-      } else if (par.integrator == 1) {
+      } else if (par->integrator == 1) {
         // rk3 {{{
         BOOST_ASSERT(gids.size()-vecvalsize == 9 || gids.size() == 9);
         naming::id_type gval[17];
@@ -410,7 +410,7 @@ namespace hpx { namespace components { namespace amr
             vecval.push_back(mval[i-1].get_ptr());
             vecval.push_back(mval[i].get_ptr());
             vecval.push_back(mval[i+1].get_ptr());
-            mval[i]->refine_ = refinement(&*vecval.begin(),vecval.size(),&(mval[i]->value_),mval[i]->level_,mval[i]->x_,1,boundary,bbox,par);
+            mval[i]->refine_ = refinement(&*vecval.begin(),vecval.size(),&(mval[i]->value_),mval[i]->level_,mval[i]->x_,1,boundary,bbox,*par.p);
 
             // DEBUG
             if (log_)
@@ -433,10 +433,10 @@ namespace hpx { namespace components { namespace amr
         std::vector<naming::id_type> const& gids,int vecvalsize, int row,int column, Parameter const& par) 
     {
       int i;
-      if ( par.integrator == 0 ) {
+      if ( par->integrator == 0 ) {
         // not implemented yet
         BOOST_ASSERT(false);
-      } else if (par.integrator == 1) {
+      } else if (par->integrator == 1) {
         // not implemented yet
         BOOST_ASSERT(false);
       }
@@ -458,11 +458,11 @@ namespace hpx { namespace components { namespace amr
       components::component_type function_type =
                 components::get_component_type<components::amr::stencil>();
 
-      if ( par.integrator == 0 ) {
+      if ( par->integrator == 0 ) {
         if ( !child_left_mesh[row].get_gid() ) {
             child_left_mesh[row].create(here);
         }
-      } else if ( par.integrator == 1 ) {
+      } else if ( par->integrator == 1 ) {
         if ( !rk_left_mesh[row].get_gid() ) {
             rk_left_mesh[row].create(here);
         }
@@ -471,16 +471,16 @@ namespace hpx { namespace components { namespace amr
       }
 
       bool do_logging = false;
-      if ( par.loglevel > 0 ) {
+      if ( par->loglevel > 0 ) {
         do_logging = true;
       }
 
       std::vector<naming::id_type> result_data;
-      if ( par.integrator == 0 ) {
+      if ( par->integrator == 0 ) {
         result_data = child_left_mesh[row].init_execute(function_type,
               do_logging ? logging_type : components::component_invalid,
               level, x, par);
-      } else if ( par.integrator == 1 ) {
+      } else if ( par->integrator == 1 ) {
         result_data = rk_left_mesh[row].init_execute(function_type,
               do_logging ? logging_type : components::component_invalid,
               level, x, par);
@@ -553,9 +553,9 @@ namespace hpx { namespace components { namespace amr
                 components::stubs::memory_block::checkout(result));
 
             // call provided (external) function
-            generate_initial_data(val.get_ptr(), item, maxitems, row, level, x, par);
+            generate_initial_data(val.get_ptr(), item, maxitems, row, level, x, *par.p);
 
-            if (log_ && par.loglevel > 1)         // send initial value to logging instance
+            if (log_ && par->loglevel > 1)         // send initial value to logging instance
                 stubs::logging::logentry(log_, val.get(), row,0, par);
         }
         return result;

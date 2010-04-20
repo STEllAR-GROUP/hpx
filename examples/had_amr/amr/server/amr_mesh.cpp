@@ -67,27 +67,27 @@ namespace hpx { namespace components { namespace amr { namespace server
         components::distributing_factory::iterator_type stencil = stencils.first;
         components::distributing_factory::iterator_type function = functions.first;
 
-        if ( par.coarsestencilsize == 5 ) BOOST_ASSERT(numvalues > 9);
-        if ( par.coarsestencilsize == 9 ) BOOST_ASSERT(numvalues > 16);
+        if ( par->coarsestencilsize == 5 ) BOOST_ASSERT(numvalues > 9);
+        if ( par->coarsestencilsize == 9 ) BOOST_ASSERT(numvalues > 16);
 
         for (int column = 0; stencil != stencils.second; ++stencil, ++function, ++column)
         {
             namespace stubs = components::amr::stubs;
             BOOST_ASSERT(function != functions.second);
-            if ( par.coarsestencilsize == 3 ) {
+            if ( par->coarsestencilsize == 3 ) {
               if (column == 0 || column == numvalues-1) {
                   // boundary value
                   stubs::dynamic_stencil_value::set_functional_component(*stencil, 
                       *function, static_step, column, 
-                      par.coarsestencilsize-1, par.coarsestencilsize-1, par);
+                      par->coarsestencilsize-1, par->coarsestencilsize-1, par);
               } 
               else {
                   // 'normal' value
                   stubs::dynamic_stencil_value::set_functional_component(*stencil, 
                       *function, static_step, column, 
-                      par.coarsestencilsize, par.coarsestencilsize, par);
+                      par->coarsestencilsize, par->coarsestencilsize, par);
               }
-            } else if ( par.coarsestencilsize == 5 ) {
+            } else if ( par->coarsestencilsize == 5 ) {
               if (column == 0 ) {
                   // boundary value
                   stubs::dynamic_stencil_value::set_functional_component(*stencil, 
@@ -112,7 +112,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                   stubs::dynamic_stencil_value::set_functional_component(*stencil, 
                       *function, static_step, column, 5,5, par);
               }
-            } else if ( par.coarsestencilsize == 9 ) {
+            } else if ( par->coarsestencilsize == 9 ) {
               if (column == 0 ) {
                   // boundary value
                   stubs::dynamic_stencil_value::set_functional_component(*stencil, 
@@ -214,7 +214,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::vector<int> dst_ports(numvals*9);
         std::vector<int> dst_src(numvals*9);
         std::vector<int> dst_size(numvals);
-        if ( par.coarsestencilsize == 9 ) {
+        if ( par->coarsestencilsize == 9 ) {
           prep_ports_nine(dst_ports,dst_src,dst_size,numvals); 
         }
 
@@ -231,7 +231,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                 int outstep = mod(step-1, steps);
 
                 std::vector<naming::id_type> output_ports;
-                if ( par.coarsestencilsize == 3 ) {
+                if ( par->coarsestencilsize == 3 ) {
                   if ( i==0 ) {
                     output_ports += 
                           outputs[outstep][0][0],  
@@ -252,7 +252,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                           outputs[outstep][i+1][0]    // se input is connected to the nw output of the se element
                       ;
                   }
-                } else if ( par.coarsestencilsize == 5 ) {
+                } else if ( par->coarsestencilsize == 5 ) {
                   if ( i==0 ) {
                     output_ports += 
                           outputs[outstep][0][1],  
@@ -307,7 +307,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                           outputs[outstep][i+1][3],
                           outputs[outstep][i+2][4];
                   }
-                } else if ( par.coarsestencilsize == 9 ) {
+                } else if ( par->coarsestencilsize == 9 ) {
                   // get src ports in ascending order
                   for (j=0;j<dst_size[i];j++) {
                     output_ports.push_back(outputs[outstep][dst_src[i+numvals*j]][dst_ports[i+numvals*j]]);

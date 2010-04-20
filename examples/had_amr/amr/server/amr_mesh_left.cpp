@@ -67,7 +67,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         components::distributing_factory::iterator_type stencil = stencils.first;
         components::distributing_factory::iterator_type function = functions.first;
 
-        BOOST_ASSERT(par.coarsestencilsize == 5);
+        BOOST_ASSERT(par->coarsestencilsize == 5);
 
         for (int column = 0; stencil != stencils.second; ++stencil, ++function, ++column)
         {
@@ -165,7 +165,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::vector<std::vector<std::vector<naming::id_type> > > const& outputs,
         Parameter const& par)
     {
-        BOOST_ASSERT(par.coarsestencilsize == 5);
+        BOOST_ASSERT(par->coarsestencilsize == 5);
 
         typedef components::distributing_factory::result_type result_type;
 
