@@ -14,6 +14,8 @@ import sys
 
 from hpx_log import HpxLog
 
+import messages
+
 from px_dag import PxExecution
 from px_dag import PxPhase
 from px_dag import PxThread
@@ -26,8 +28,6 @@ re_future = re.compile('future_value::'+g_action+'\('+g_gid+'\)')
 
 re_action = re.compile('\[(.*)\][^:]*(::\S*)')
 re_thread_desc = re.compile('tfunc\([^\)]*\): thread\(([^\)]*)\), description\(([^\)]*)\)')
-
-re_suspended = re.compile('suspended\(([^\.]*)\.([^\/]*)\/([^\)]*)\) P([^:]*)')
 
 def get_parent_tid(event):
   msg = event['msg']
@@ -88,29 +88,25 @@ def node_name(phase):
   return "T%sp%s" % (phase.get_thread(), phase.get_id())
 
 def process_message(event, threads, phases):
-  m_suspended = re_suspended.search(event['msg'])
+  m_suspended = messages.re_suspended.search(event['msg'])
   if m_suspended:
-    thread = 'T'+m_suspended.group(1)
-    phase = thread+'p'+m_suspended.group(2)
-    thread_gid = m_suspended.group(3)
-    parent = 'T'+m_suspended.group(4)
-    parent_phase = parent+'p'+'99' # this is just a guess
+    suspended = messages.SuspendedThread(m_suspended)
 
-    if not threads.has_key(thread):
-      threads[thread] = PxThread(thread)
-    if not phases.has_key(phase):
-      phases[phase] = PxPhase(phase)
-    threads[thread].add_phase(phases[phase])
+    if not threads.has_key(suspended.thread):
+      threads[suspended.thread] = PxThread(suspended.thread)
+    if not phases.has_key(suspended.phase):
+      phases[suspended.phase] = PxPhase(suspended.phase)
+    threads[suspended.thread].add_phase(phases[suspended.phase])
 
-    if not threads.has_key(parent):
-      threads[parent] = PxThread(parent)
-    if not phases.has_key(parent_phase):
-      phases[parent_phase] = PxPhase(parent_phase)
-    threads[parent].add_phase(phases[parent_phase])
+    if not threads.has_key(suspended.parent):
+      threads[suspended.parent] = PxThread(suspended.parent)
+    if not phases.has_key(suspended.parent_phase):
+      phases[suspended.parent_phase] = PxPhase(suspended.parent_phase)
+    threads[suspended.parent].add_phase(phases[suspended.parent_phase])
 
-    phases[phase].add_dependency_on(phases[parent_phase])
-    phases[parent_phase].add_transition_to(phases[phase])
-    
+    phases[suspended.phase].add_dependency_on(phases[suspended.parent_phase])
+    phases[suspended.parent_phase].add_transition_to(phases[suspended.phase])
+
     return
 
 def parse_action_name(event, label, future, cadd):
