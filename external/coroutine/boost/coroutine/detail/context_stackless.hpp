@@ -35,64 +35,79 @@ namespace boost { namespace coroutines {
 
     template<typename T>
     inline void
-    trampoline(T* fun) 
-    { 
+    trampoline(void* p) 
+    {
+      T* fun = static_cast<T*>(p);
+      BOOST_ASSERT(fun);
       (*fun)();
-      std::abort();
     }
 
-    class context_impl;
+    class stackless_context_impl;
 
-    class context_impl_base 
+    class stackless_context_impl_base 
     {
+    protected:
+      typedef void (*trampoline_type)(void*);
+      trampoline_type function;
+      void* data;
+
     public:
-      context_impl_base() {}
+      stackless_context_impl_base() 
+        : function(0), data(0)
+      {}
+
+      template<typename Functor>
+      stackless_context_impl_base(Functor& cb) 
+        : function(static_cast<trampoline_type>(&trampoline<Functor>)), 
+          data(&cb)
+      {}
 
       /**
        * Free function. Saves the current context in @p from
        * and restores the context in @p to.
        * @note This function is found by ADL.
        */     
-      friend void swap_context(context_impl_base& from, 
-          context_impl const& to, default_hint);
+      friend void swap_context(stackless_context_impl_base& from, 
+          stackless_context_impl_base const& to, default_hint);
     };
 
-    class context_impl : public context_impl_base
+    class stackless_context_impl : public stackless_context_impl_base
     {
     public:
 
-      typedef context_impl_base context_impl_base;
+      typedef stackless_context_impl_base context_impl_base;
 
-      context_impl() 
-      {}
+      stackless_context_impl() {}
 
       /**
        * Create a context that on restore invokes Functor on
        *  a new stack. The stack size can be optionally specified.
        */
       template<typename Functor>
-      context_impl(Functor& cb, std::ptrdiff_t stack_size = -1) 
+      stackless_context_impl(Functor& cb, std::ptrdiff_t stack_size = -1) 
+        : stackless_context_impl_base(cb)
       {
       }
       
-      ~context_impl() 
+      ~stackless_context_impl() 
       {
       }
 
-      friend void swap_context(context_impl_base& from, 
-          context_impl const& to, default_hint);
+      friend void swap_context(stackless_context_impl_base& from, 
+          stackless_context_impl_base const& to, default_hint);
     };
     
-    typedef context_impl context_impl;
+    typedef stackless_context_impl context_impl;
 
     /**
      * Free function. Saves the current context in @p from
      * and restores the context in @p to.
      * @note This function is found by ADL.
      */     
-    inline void swap_context(context_impl_base& from, 
-        context_impl const& to, default_hint) 
+    inline void swap_context(stackless_context_impl_base& from, 
+        stackless_context_impl_base const& to, default_hint) 
     {
+        (*to.function)(to.data);
     }
 
   }
