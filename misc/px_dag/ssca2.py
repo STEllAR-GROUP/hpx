@@ -27,6 +27,8 @@ re_future = re.compile('future_value::'+g_action+'\('+g_gid+'\)')
 re_action = re.compile('\[(.*)\][^:]*(::\S*)')
 re_thread_desc = re.compile('tfunc\([^\)]*\): thread\(([^\)]*)\), description\(([^\)]*)\)')
 
+re_suspended = re.compile('suspended\(([^\.]*)\.([^\/]*)\/([^\)]*)\) P([^:]*)')
+
 def get_parent_tid(event):
   msg = event['msg']
   tid = msg[msg.index('(')+1:msg.index(')')]
@@ -85,8 +87,35 @@ def thread(t):
 def node_name(phase):
   return "T%sp%s" % (phase.get_thread(), phase.get_id())
 
+def process_message(event, threads, phases):
+  m_suspended = re_suspended.search(event['msg'])
+  if m_suspended:
+    thread = 'T'+m_suspended.group(1)
+    phase = thread+'p'+m_suspended.group(2)
+    thread_gid = m_suspended.group(3)
+    parent = 'T'+m_suspended.group(4)
+    parent_phase = parent+'p'+'99' # this is just a guess
+
+    if not threads.has_key(thread):
+      threads[thread] = PxThread(thread)
+    if not phases.has_key(phase):
+      phases[phase] = PxPhase(phase)
+    threads[thread].add_phase(phases[phase])
+
+    if not threads.has_key(parent):
+      threads[parent] = PxThread(parent)
+    if not phases.has_key(parent_phase):
+      phases[parent_phase] = PxPhase(parent_phase)
+    threads[parent].add_phase(phases[parent_phase])
+
+    phases[phase].add_dependency_on(phases[parent_phase])
+    phases[parent_phase].add_transition_to(phases[phase])
+    
+    return
+
 def parse_action_name(event, label, future, cadd):
   action = None
+
   m_future = re_future.search(event['msg'])
   if m_future:
     action = m_future.group(1)
@@ -96,22 +125,23 @@ def parse_action_name(event, label, future, cadd):
       future[gid] = {action: cadd}
     else:
       future[gid][action] = cadd
-  else:
-    m_action = re_action.search(event['msg'])
-    if m_action:
-      action = m_action.group(1).lower() + m_action.group(2)
-      if not 'eager_future' in action:
-        if not label.has_key(thread(cadd)):
-          label[thread(cadd)] = action
-    else:
-      m_thread_desc = re_thread_desc.search(event['msg'])
-      if m_thread_desc:
-        thread = 'T'+m_thread_desc.group(1)
-        action_name = m_thread_desc.group(2)
-        if not label.has_key(thread):
-          label[thread] = action_name
+    return action
 
-  return action
+  m_action = re_action.search(event['msg'])
+  if m_action:
+    action = m_action.group(1).lower() + m_action.group(2)
+    if not 'eager_future' in action:
+      if not label.has_key(thread(cadd)):
+        label[thread(cadd)] = action
+    return action
+
+  m_thread_desc = re_thread_desc.search(event['msg'])
+  if m_thread_desc:
+    thread = 'T'+m_thread_desc.group(1)
+    action_name = m_thread_desc.group(2)
+    if not label.has_key(thread):
+      label[thread] = action_name
+    return action
 
 def build_model(app_run, log_filename):
   log = HpxLog(log_filename)
@@ -137,6 +167,8 @@ def build_model(app_run, log_filename):
 
     action_name = parse_action_name(event, label, future, child_addr)
 
+    process_message(event, threads, phases)
+
     # Create phase
     child_phase_id = 'T'+child_addr
     if not phases.has_key(child_phase_id):
@@ -156,7 +188,7 @@ def build_model(app_run, log_filename):
 
     # Add phase to thread
     threads[child_thread_id].add_phase(phases[child_phase_id])
-
+     
   # Use labels to annotate with action name information
   for (thread, action_name) in label.items():
     if threads.has_key(thread):
