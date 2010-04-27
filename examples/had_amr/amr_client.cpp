@@ -227,7 +227,7 @@ int main(int argc, char* argv[])
 
         // default pars
         par->stencilsize = 3;
-        par->integrator  = 0;
+        par->integrator  = 1;
         par->allowedl    = 0;
         par->loglevel    = 0;
         par->output      = 1.0;
@@ -298,6 +298,10 @@ int main(int argc, char* argv[])
                 par->nx0 = atoi(tmp.c_str());
                 // over-ride command line argument if present
                 numvals = par->nx0;
+                if ( par->nx0 < 16 ) {
+                  std::cout << " Problem: you need to increase nx0 to at least 16 !" << std::endl;
+                  BOOST_ASSERT(false);
+                }
               }
               if ( sec->has_entry("nt0") ) {
                 std::string tmp = sec->get_entry("nt0");

@@ -211,9 +211,8 @@ namespace hpx { namespace components { namespace amr
                   components::get_component_type<components::amr::stencil>();
         // create the mesh only if you need to, otherwise reuse (reduce overhead)
         if ( par->integrator == 0 ) {
-          if ( !child_left_mesh[row].get_gid() ) {
-              child_left_mesh[row].create(applier::get_applier().get_runtime_support_gid());
-          }
+          // Euler not supported anymore
+          BOOST_ASSERT(false);
         } else if ( par->integrator == 1 ) {
           if ( !rk_left_mesh[row].get_gid() ) {
               rk_left_mesh[row].create(applier::get_applier().get_runtime_support_gid());
@@ -229,8 +228,7 @@ namespace hpx { namespace components { namespace amr
 
         std::vector<naming::id_type> result_data;
         if ( par->integrator == 0 ) {
-          result_data = child_left_mesh[row].execute(initial_data, function_type,
-                do_logging ? logging_type : components::component_invalid,par);
+          // Euler not supported anymore
         } else if ( par->integrator == 1 ) {
           result_data =  rk_left_mesh[row].execute(initial_data, function_type,
                 do_logging ? logging_type : components::component_invalid,par);
@@ -459,9 +457,7 @@ namespace hpx { namespace components { namespace amr
                 components::get_component_type<components::amr::stencil>();
 
       if ( par->integrator == 0 ) {
-        if ( !child_left_mesh[row].get_gid() ) {
-            child_left_mesh[row].create(here);
-        }
+        BOOST_ASSERT(false);
       } else if ( par->integrator == 1 ) {
         if ( !rk_left_mesh[row].get_gid() ) {
             rk_left_mesh[row].create(here);
@@ -477,9 +473,7 @@ namespace hpx { namespace components { namespace amr
 
       std::vector<naming::id_type> result_data;
       if ( par->integrator == 0 ) {
-        result_data = child_left_mesh[row].init_execute(function_type,
-              do_logging ? logging_type : components::component_invalid,
-              level, x, par);
+        BOOST_ASSERT(false);
       } else if ( par->integrator == 1 ) {
         result_data = rk_left_mesh[row].init_execute(function_type,
               do_logging ? logging_type : components::component_invalid,

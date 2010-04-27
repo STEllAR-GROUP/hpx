@@ -29,9 +29,6 @@ namespace hpx { namespace components { namespace amr
     private:
         typedef amr::server::functional_component base_type;
 
-        components::amr::amr_mesh_tapered child_mesh[3];
-        components::amr::amr_mesh_left child_left_mesh[3];
-
         components::amr::rk_left rk_left_mesh[7];
 
     public:
