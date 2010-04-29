@@ -94,11 +94,13 @@
      make copyable.
 */
 
-#if defined(STACKLESS_VERSION)
+#if defined(COROUTINE_STACKLESS_VERSION)
+
 #include <boost/coroutine/detail/context_stackless.hpp>
 namespace boost { namespace coroutines { namespace detail {
   typedef stackless::context_impl default_context_impl;
 } } }
+
 #else
 
 #if defined(__linux) || defined(linux) || defined(__linux__)

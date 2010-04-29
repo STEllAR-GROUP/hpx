@@ -129,6 +129,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\coroutine.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\context_stackless.hpp" />
     <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\exception.hpp" />
     <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\future.hpp" />
     <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\generator.hpp" />

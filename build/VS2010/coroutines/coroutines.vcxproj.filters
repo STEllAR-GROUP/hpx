@@ -122,6 +122,9 @@
     <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\tuple_traits.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\context_stackless.hpp">
+      <Filter>Header Files\Detail</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\..\external\coroutine\libs\coroutine\src\coroutine.cpp">
