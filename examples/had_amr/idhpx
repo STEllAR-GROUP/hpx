@@ -1,9 +1,9 @@
 [had_amr]
-nx0         = 60
-nt0         = 200
+nx0         = 33
+nt0         = 10
 
 minx0       =  0.0;
-maxx0       =  10.0;
+maxx0       =  15.0;
 
 lambda      = 0.15
 
@@ -12,14 +12,17 @@ delta  = 1.0
 R0     = 8.0
 PP     = 7
 
-ethreshold  = 0.1
+ethreshold  = 0.005
+eps         = 0.0
+fmr_radius  = -10.0
 
-allowedl     = 0
+allowedl     = 1
 stencilsize  = 3
 integrator   = 1
 linearbounds = 1
 loglevel     = 2
 output       = 1.0
+output_level = 1
 output_stdout = 1
 
-scheduler = 0
+scheduler = 1
