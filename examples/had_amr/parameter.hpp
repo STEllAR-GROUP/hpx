@@ -32,7 +32,7 @@ class Array3D {
 namespace hpx { namespace components { namespace amr 
 {
     /// Parameter structure
-    struct HPX_COMPONENT_EXPORT Parameter_impl : ::Par
+    struct HPX_EXPORT Parameter_impl : ::Par
     {
     private:
         friend class boost::serialization::access;
@@ -66,20 +66,17 @@ namespace hpx { namespace components { namespace amr
         }
     };
 
-    struct HPX_COMPONENT_EXPORT Parameter  
-    {
-//      boost::shared_ptr< Parameter_impl > p;
-//      Parameter() : p(new Parameter_impl) {
-//      }
-        Parameter_impl p;
-
+    struct HPX_EXPORT Parameter  {
+      boost::shared_ptr< Parameter_impl > p;
+      Parameter() : p(new Parameter_impl) {
+      }
       public:
         Parameter_impl * operator -> () {
-          return &p;
+          return p.get();
         }
 
         Parameter_impl const * operator -> () const {
-          return &p;
+          return p.get();
         }
 
       private:

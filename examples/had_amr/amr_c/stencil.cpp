@@ -138,10 +138,10 @@ namespace hpx { namespace components { namespace amr
         if (val[0]->level_ == 0 && val[0]->timestep_ < numsteps_ || val[0]->level_ > 0) {
 
             // call rk update 
-            int gft = rkupdate(&*vecval.begin(),resultval.get_ptr(),vecval.size(),boundary,bbox,compute_index,par.p);
+            int gft = rkupdate(&*vecval.begin(),resultval.get_ptr(),vecval.size(),boundary,bbox,compute_index,*par.p);
             BOOST_ASSERT(gft);
             // refine only after rk subcycles are finished (we don't refine in the midst of rk subcycles)
-            if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&*vecval.begin(),vecval.size(),&resultval->value_,resultval->level_,resultval->x_,compute_index,boundary,bbox,par.p);
+            if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&*vecval.begin(),vecval.size(),&resultval->value_,resultval->level_,resultval->x_,compute_index,boundary,bbox,*par.p);
             else resultval->refine_ = false;
 
             std::size_t allowedl = par->allowedl;
@@ -408,7 +408,7 @@ namespace hpx { namespace components { namespace amr
             vecval.push_back(mval[i-1].get_ptr());
             vecval.push_back(mval[i].get_ptr());
             vecval.push_back(mval[i+1].get_ptr());
-            mval[i]->refine_ = refinement(&*vecval.begin(),vecval.size(),&(mval[i]->value_),mval[i]->level_,mval[i]->x_,1,boundary,bbox,par.p);
+            mval[i]->refine_ = refinement(&*vecval.begin(),vecval.size(),&(mval[i]->value_),mval[i]->level_,mval[i]->x_,1,boundary,bbox,*par.p);
 
             // DEBUG
             if (log_)
@@ -547,7 +547,7 @@ namespace hpx { namespace components { namespace amr
                 components::stubs::memory_block::checkout(result));
 
             // call provided (external) function
-            generate_initial_data(val.get_ptr(), item, maxitems, row, level, x, par.p);
+            generate_initial_data(val.get_ptr(), item, maxitems, row, level, x, *par.p);
 
             if (log_ && par->loglevel > 1)         // send initial value to logging instance
                 stubs::logging::logentry(log_, val.get(), row,0, par);
