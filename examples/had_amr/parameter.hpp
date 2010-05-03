@@ -16,18 +16,6 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-class Array3D {
-    size_t m_width, m_height;
-    std::vector<int> m_data;
-  public:
-    Array3D(size_t x, size_t y, size_t z, int init = 0):
-         m_width(x), m_height(y), m_data(x*y*z, init)
-      {}
-    int& operator()(size_t x, size_t y, size_t z) {
-    return m_data.at(x + y * m_width + z * m_width * m_height);
-  }
-};
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
 {
@@ -62,7 +50,11 @@ namespace hpx { namespace components { namespace amr
             ar & fmr_radius;
             ar & output_level;
             ar & PP;
-
+            ar & dst_port;
+            ar & dst_src;
+            ar & dst_step;
+            ar & dst_size;
+            ar & src_size;
         }
     };
 

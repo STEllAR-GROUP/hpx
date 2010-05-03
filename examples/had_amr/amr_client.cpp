@@ -26,6 +26,309 @@ namespace po = boost::program_options;
 
 using namespace hpx;
 
+// prep_ports {{{
+    void prep_ports(Array3D &dst_port,Array3D &dst_src,
+                             Array3D &dst_step,Array3D &dst_size,Array3D &src_size)
+    {
+      int i,j;
+      int counter;
+
+      // vcolumn is the destination column number
+      // vstep is the destination step (or row) number
+      // vsrc_column is the source column number
+      // vsrc_step is the source step number
+      // vport is the output port number; increases consecutively
+      std::vector<int> vcolumn,vstep,vsrc_column,vsrc_step,vport;
+
+      // connect outputs for the zeroth row (the zeroth row outputs to the first row *and* the third row)
+      vsrc_step.push_back(0);vsrc_column.push_back(0);vstep.push_back(1);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(0);vsrc_column.push_back(0);vstep.push_back(1);vcolumn.push_back(0);vport.push_back(1);
+      vsrc_step.push_back(0);vsrc_column.push_back(0);vstep.push_back(1);vcolumn.push_back(1);vport.push_back(2);
+      vsrc_step.push_back(0);vsrc_column.push_back(0);vstep.push_back(3);vcolumn.push_back(1);vport.push_back(3);
+
+      vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(1);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(1);vcolumn.push_back(1);vport.push_back(1);
+      vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(1);vcolumn.push_back(2);vport.push_back(2);
+      vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(3);vcolumn.push_back(1);vport.push_back(3);
+      vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(3);vcolumn.push_back(2);vport.push_back(4);
+
+      i = 2;
+      counter = 0;
+      for (j=i-3;j<i+2;j++) {
+        if ( j >= 0 && j <= 14 ) {
+          vsrc_step.push_back(0);vsrc_column.push_back(i);vstep.push_back(1);vcolumn.push_back(j);vport.push_back(counter);
+          counter++;
+        }
+      }
+      i = 2;
+      counter = 4;
+      for (j=i-7;j<i+2;j++) {
+        if ( j > 0 && j < 10 ) {
+          vsrc_step.push_back(0);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(j);vport.push_back(counter);
+          counter++;
+        }
+      }
+
+      for (i=3;i<14;i++) {
+        counter = 0;
+        for (j=i-3;j<i+2;j++) {
+          if ( j >= 0 && j <= 14 ) {
+            vsrc_step.push_back(0);vsrc_column.push_back(i);vstep.push_back(1);vcolumn.push_back(j);vport.push_back(counter);
+            counter++;
+          }
+        }
+      }
+
+      for (i=3;i<14;i++) {
+        counter = 5;  // counter starts at 5 because this the first three output ports were already used in the lines above
+        for (j=i-7;j<i+2;j++) {
+          if ( j > 0 && j < 10 ) {
+            vsrc_step.push_back(0);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(j);vport.push_back(counter);
+            counter++;
+          }
+        }
+      }
+
+      i = 14;
+      counter = 0;
+      for (j=i-3;j<i+2;j++) {
+        if ( j >= 0 && j <= 14 ) {
+          vsrc_step.push_back(0);vsrc_column.push_back(i);vstep.push_back(1);vcolumn.push_back(j);vport.push_back(counter);
+          counter++;
+        }
+      }
+      i = 14;
+      counter = 4;
+      for (j=i-7;j<i+2;j++) {
+        if ( j > 0 && j < 10 ) {
+          vsrc_step.push_back(0);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(j);vport.push_back(counter);
+          counter++;
+        }
+      }
+
+      vsrc_step.push_back(0);vsrc_column.push_back(15);vstep.push_back(1);vcolumn.push_back(12);vport.push_back(0);
+      vsrc_step.push_back(0);vsrc_column.push_back(15);vstep.push_back(1);vcolumn.push_back(13);vport.push_back(1);
+      vsrc_step.push_back(0);vsrc_column.push_back(15);vstep.push_back(1);vcolumn.push_back(14);vport.push_back(2);
+      vsrc_step.push_back(0);vsrc_column.push_back(15);vstep.push_back(3);vcolumn.push_back(8);vport.push_back(3);
+      vsrc_step.push_back(0);vsrc_column.push_back(15);vstep.push_back(3);vcolumn.push_back(9);vport.push_back(4);
+
+      vsrc_step.push_back(0);vsrc_column.push_back(16);vstep.push_back(1);vcolumn.push_back(13);vport.push_back(0);
+      vsrc_step.push_back(0);vsrc_column.push_back(16);vstep.push_back(1);vcolumn.push_back(14);vport.push_back(1);
+      vsrc_step.push_back(0);vsrc_column.push_back(16);vstep.push_back(1);vcolumn.push_back(14);vport.push_back(2);
+      vsrc_step.push_back(0);vsrc_column.push_back(16);vstep.push_back(3);vcolumn.push_back(9);vport.push_back(3);
+
+      // connect outputs for the first row (the first row only outputs to the second row)
+      i = 0;
+      vsrc_step.push_back(1);vsrc_column.push_back(i);vstep.push_back(2);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(1);vsrc_column.push_back(i);vstep.push_back(2);vcolumn.push_back(0);vport.push_back(1);
+      vsrc_step.push_back(1);vsrc_column.push_back(i);vstep.push_back(2);vcolumn.push_back(1);vport.push_back(2);
+
+      for (i=1;i<14;i++) {
+        counter = 0;  
+        for (j=i-3;j<i+2;j++) {
+          if ( j >= 0 && j <= 12 ) {
+            vsrc_step.push_back(1);vsrc_column.push_back(i);vstep.push_back(2);vcolumn.push_back(j);vport.push_back(counter);
+            counter++;
+          }
+        }
+      }
+
+      i = 14;
+      vsrc_step.push_back(1);vsrc_column.push_back(i);vstep.push_back(2);vcolumn.push_back(11);vport.push_back(0);
+      vsrc_step.push_back(1);vsrc_column.push_back(i);vstep.push_back(2);vcolumn.push_back(12);vport.push_back(1);
+      vsrc_step.push_back(1);vsrc_column.push_back(i);vstep.push_back(2);vcolumn.push_back(12);vport.push_back(2);
+
+      // connect outputs for the second row (the second row only outputs to the third row)
+      i = 0;
+      vsrc_step.push_back(2);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(2);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(0);vport.push_back(1);
+      vsrc_step.push_back(2);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(1);vport.push_back(2);
+    
+      for (i=1;i<12;i++) {
+        counter = 0;  
+        for (j=i-3;j<i+2;j++) {
+          if ( j >= 0 && j <= 10 ) {
+            vsrc_step.push_back(2);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(j);vport.push_back(counter);
+            counter++;
+          }
+        }
+      }
+
+      i = 12;
+      vsrc_step.push_back(2);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(9);vport.push_back(0);
+      vsrc_step.push_back(2);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(10);vport.push_back(1);
+      vsrc_step.push_back(2);vsrc_column.push_back(i);vstep.push_back(3);vcolumn.push_back(10);vport.push_back(2);
+
+      // connect outputs for the third row (the third row outputs to the fourth row *and* the sixth row)
+      vsrc_step.push_back(3);vsrc_column.push_back(0);vstep.push_back(4);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(0);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(1);
+
+      vsrc_step.push_back(3);vsrc_column.push_back(1);vstep.push_back(4);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(1);vstep.push_back(4);vcolumn.push_back(1);vport.push_back(1);
+      vsrc_step.push_back(3);vsrc_column.push_back(1);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(2);
+      vsrc_step.push_back(3);vsrc_column.push_back(1);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(3);
+
+      vsrc_step.push_back(3);vsrc_column.push_back(2);vstep.push_back(4);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(2);vstep.push_back(4);vcolumn.push_back(1);vport.push_back(1);
+      vsrc_step.push_back(3);vsrc_column.push_back(2);vstep.push_back(4);vcolumn.push_back(2);vport.push_back(2);
+      vsrc_step.push_back(3);vsrc_column.push_back(2);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(3);
+      vsrc_step.push_back(3);vsrc_column.push_back(2);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(4);
+      vsrc_step.push_back(3);vsrc_column.push_back(2);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(5);
+
+      i = 3;
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(1);vport.push_back(1);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(2);vport.push_back(2);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(3);vport.push_back(3);
+
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(4);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(5);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(6);
+
+      for (i=4;i<7;i++) {
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-4);vport.push_back(0);
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-3);vport.push_back(1);
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-2);vport.push_back(2);
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-1);vport.push_back(3);
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i);vport.push_back(4);
+
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(5);
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(6);
+        vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(7);
+      }
+
+      i = 7;
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-4);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-3);vport.push_back(1);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-2);vport.push_back(2);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(4);vcolumn.push_back(i-1);vport.push_back(3);
+
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(4);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(5);
+      vsrc_step.push_back(3);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(6);
+
+      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(4);vcolumn.push_back(4);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(4);vcolumn.push_back(5);vport.push_back(1);
+      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(4);vcolumn.push_back(6);vport.push_back(2);
+      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(3);
+      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(4);
+      vsrc_step.push_back(3);vsrc_column.push_back(8);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(5);
+
+      vsrc_step.push_back(3);vsrc_column.push_back(9);vstep.push_back(4);vcolumn.push_back(5);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(9);vstep.push_back(4);vcolumn.push_back(6);vport.push_back(1);
+      vsrc_step.push_back(3);vsrc_column.push_back(9);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(2);
+      vsrc_step.push_back(3);vsrc_column.push_back(9);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(3);
+
+      vsrc_step.push_back(3);vsrc_column.push_back(10);vstep.push_back(4);vcolumn.push_back(6);vport.push_back(0);
+      vsrc_step.push_back(3);vsrc_column.push_back(10);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(1);
+
+      // connect outputs for the fourth row (the fourth row only outputs to the fifth row)
+      i = 0;
+      vsrc_step.push_back(4);vsrc_column.push_back(i);vstep.push_back(5);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(4);vsrc_column.push_back(i);vstep.push_back(5);vcolumn.push_back(0);vport.push_back(1);
+      vsrc_step.push_back(4);vsrc_column.push_back(i);vstep.push_back(5);vcolumn.push_back(1);vport.push_back(2);
+
+      for (i=1;i<6;i++) {
+        counter = 0;  
+        for (j=i-3;j<i+2;j++) {
+          if ( j >= 0 && j <= 4 ) {
+            vsrc_step.push_back(4);vsrc_column.push_back(i);vstep.push_back(5);vcolumn.push_back(j);vport.push_back(counter);
+            counter++;
+          }
+        }
+      }
+
+      i = 6;
+      vsrc_step.push_back(4);vsrc_column.push_back(i);vstep.push_back(5);vcolumn.push_back(3);vport.push_back(0);
+      vsrc_step.push_back(4);vsrc_column.push_back(i);vstep.push_back(5);vcolumn.push_back(4);vport.push_back(1);
+      vsrc_step.push_back(4);vsrc_column.push_back(i);vstep.push_back(5);vcolumn.push_back(4);vport.push_back(2);
+
+      // connect outputs for the fifth row (the fifth row only outputs to the sixth row)
+      i = 0;
+      vsrc_step.push_back(5);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(5);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(0);vport.push_back(1);
+      vsrc_step.push_back(5);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(2);
+
+      for (i=1;i<4;i++) {
+        counter = 0;  
+        for (j=i-3;j<i+2;j++) {
+          if ( j >= 0 && j <= 2 ) {
+            vsrc_step.push_back(5);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(j);vport.push_back(counter);
+            counter++;
+          }
+        }
+      }
+      i = 4;
+      vsrc_step.push_back(5);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(1);vport.push_back(0);
+      vsrc_step.push_back(5);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(1);
+      vsrc_step.push_back(5);vsrc_column.push_back(i);vstep.push_back(6);vcolumn.push_back(2);vport.push_back(2);
+
+      // connect outputs for the sixth row (the sixth row only outputs to the zeroth row)
+      for (i=0;i<6;i++) {
+        vsrc_step.push_back(6);vsrc_column.push_back(0);vstep.push_back(0);vcolumn.push_back(i);vport.push_back(i);
+        if ( i < 5 ) { 
+          vsrc_step.push_back(6);vsrc_column.push_back(1);vstep.push_back(0);vcolumn.push_back(i+6);vport.push_back(i);
+        }
+        vsrc_step.push_back(6);vsrc_column.push_back(2);vstep.push_back(0);vcolumn.push_back(i+11);vport.push_back(i);
+      }
+
+      // Create a ragged 3D array
+      for (j=0;j<vsrc_step.size();j++) {
+        int column,step,src_column,src_step,port;
+        src_column = vsrc_column[j]; src_step = vsrc_step[j];
+        column = vcolumn[j]; step = vstep[j];
+        port = vport[j];
+        dst_port( step,column,dst_size(step,column,0) ) = port;
+        dst_src(  step,column,dst_size(step,column,0) ) = src_column;
+        dst_step( step,column,dst_size(step,column,0) ) = src_step;
+        dst_size(step,column,0) += 1;
+        src_size(src_step,src_column,0) += 1;
+      }
+       
+      // sort the src step (or row) in descending order
+      int t1,k,kk;
+      int step,column;
+      for (j=0;j<vsrc_step.size();j++) {
+        step = vstep[j];
+        column = vcolumn[j];
+        for (kk=dst_size(step,column,0);kk>=0;kk--) {
+          for (k=0;k<kk-1;k++) {
+            if (dst_step( step,column,k) < dst_step( step,column,k+1) ) {
+              // swap
+              t1 = dst_step( step,column,k);
+              dst_step( step,column,k) = dst_step( step,column,k+1);
+              dst_step( step,column,k+1) = t1;
+  
+              // swap the src, port info too
+              t1 = dst_src( step,column,k);
+              dst_src( step,column,k) = dst_src( step,column,k+1);
+              dst_src( step,column,k+1) = t1;
+  
+              t1 = dst_port( step,column,k);
+              dst_port( step,column,k) = dst_port( step,column,k+1);
+              dst_port( step,column,k+1) = t1;
+            } else if ( dst_step( step,column,k) == dst_step( step,column,k+1) ) {
+              //sort the src column in ascending order if the step is the same
+              if (dst_src( step,column,k) > dst_src( step,column,k+1) ) {
+                t1 = dst_src( step,column,k);
+                dst_src( step,column,k) = dst_src( step,column,k+1);
+                dst_src( step,column,k+1) = t1;
+
+                // swap the src, port info too
+                t1 = dst_port( step,column,k);
+                dst_port( step,column,k) = dst_port( step,column,k+1);
+                dst_port( step,column,k+1) = t1;
+              }
+
+            }
+          }
+        }
+      }
+
+
+    }
+// }}}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
              components::amr::Parameter const& par)
@@ -348,6 +651,9 @@ int main(int argc, char* argv[])
               }
             }
         }
+
+        // prep amr ports
+        prep_ports(par->dst_port,par->dst_src,par->dst_step,par->dst_size,par->src_size);
 
         // derived parameters
         par->dx0 = (par->maxx0 - par->minx0)/(par->nx0-1);
