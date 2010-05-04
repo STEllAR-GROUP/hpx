@@ -7,7 +7,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
-#include "parameter.hpp"
+#include "../parameter.hpp"
 
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/shared_ptr.hpp>
