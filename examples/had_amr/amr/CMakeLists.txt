@@ -47,7 +47,7 @@ set(had_amr_HEADERS
 
 ###############################################################################
 set(had_amr_client_SOURCES
-    amr.cpp parameter.cpp)
+    amr.cpp )
 source_group("Source Files" 
     FILES ${had_amr_client_SOURCES})
 
