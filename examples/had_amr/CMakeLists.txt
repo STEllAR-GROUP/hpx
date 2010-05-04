@@ -26,7 +26,7 @@ endforeach()
 
 # define build target for this directory
 set(had_amr_client_SOURCES 
-    amr_client.cpp parameter.cpp )
+    amr_client.cpp)
 
 if (MPFR_FOUND ) 
     set(had_amr_client_SOURCES 
