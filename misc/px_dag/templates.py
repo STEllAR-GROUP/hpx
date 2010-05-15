@@ -9,6 +9,11 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+from namespaces import HPX
+from namespaces import RDF
+from namespaces import RUN
+from namespaces import PX
+
 from pyrple import bNode 
 from pyrple import Graph
 from pyrple import Literal
@@ -17,24 +22,13 @@ from pyrple import Triple
 
 import re
 
-RDF_URI = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-RDFS_URI = "http://www.w3.org/2000/01/rdf-schema#"
+RDF = RDF()
+HPX = HPX()
+PX = PX()
 
-PX_URI = "http://px.cct.lsu.edu/2010/05/px/"
-HPX_URI = "http://px.cct.lsu.edu/2010/05/hpx/"
+RUN = RUN("_:")
 
-RUN_URI = "http://px.cct.lsu.edu/run/XXX/"
-
-def uri(base, path):
-  return "<%s%s>" % (base, path)
-
-def search(event, template):
-  match = template.re.search(event['msg'])
-  if match:
-    template.fill(event, match.groups())
-    return True
-  else:
-    return False
+#####
 
 class ComponentLoaded():
   def __init__(self):
@@ -55,12 +49,12 @@ class ComponentLoaded():
   def as_rdf(self):
     triples = []
 
-    S = Node(uri(RUN_URI, 'component/'+self.__name))
-    P = Node(uri(RDF_URI, 'type'))
-    O = Node(uri(HPX_URI, 'Component'))
+    S = RUN.component(self.__name)
+    P = RDF.type()
+    O = HPX.Components()
     triples.append(Triple(S,P,O))
 
-    P = Node(uri(HPX_URI, 'componentId'))
+    P = HPX.componentId()
     O = Literal(self.__id)
     triples.append(Triple(S,P,O))
     
@@ -83,7 +77,7 @@ class RunOsThreads():
 
   def as_rdf(self):
     S = bNode('run')
-    P = Node(uri(HPX_URI, 'numOsThreads'))
+    P = HPX.numOsThreads()
     O = Literal(str(self.__num_threads))
     t = Triple(S,P,O)
 

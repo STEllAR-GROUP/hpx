@@ -1,7 +1,15 @@
 #!/usr/bin/python
-"""rdf.py - convert an HPX log file into an RDF graph
+"""log2rdf.py - convert an HPX log file into an RDF graph
 
-\tusage: python rdf.py <log-filename>
+Synopsis:
+\tpython rdf.py <log-file> [-t <rdf-format>] [-o <rdf-file>] [-d]
+
+Options:
+\t-o\tWrite RDF output to <file> instead of stdout.
+
+\t-t\tSet RDF output format to <rdf-format>. Options are 'rdfxml' for\n\t\tRDF/XML or 'ntriples'. Default is 'rdfxml'.
+
+\t-d\tWrite extra information about lines that were not processed.
 """
 
 # Copyright (c) 2010-2011 Dylan Stark
@@ -17,7 +25,14 @@ import re
 import sys
 
 from templates import script_templates
-from templates import search
+
+def search(event, template):
+  match = template.re.search(event['msg'])
+  if match:
+    template.fill(event, match.groups())
+    return True
+  else:
+    return False
 
 def process_event(event, model):
   found = False
