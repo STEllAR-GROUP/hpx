@@ -1,7 +1,5 @@
 #!/usr/bin/python
-"""rdf.py - convert an HPX log file into an RDF graph
-
-\tusage: python rdf.py <log-filename>
+"""templates.py - 
 """
 
 # Copyright (c) 2010-2011 Dylan Stark

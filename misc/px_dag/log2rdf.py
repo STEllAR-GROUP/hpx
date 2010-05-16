@@ -30,7 +30,6 @@ def process_event(event, model, show_missing):
   found = False
   for template in script_templates:
     if search(event, template):
-      print template.in_english()
       model += template.as_rdf()
       found = True
       break
@@ -63,10 +62,10 @@ def setup_options():
   parser.add_option("-o", "--outfile", dest="outfile",
                     help="write RDF output to FILE", metavar="FILE")
   parser.add_option("-f", "--outformat", dest="outformat",
-                    default="rdfxml",
+                    default="ntriples",
                     help="RDF output format: 'ntriples' [default] or 'rdfxml'")
   parser.add_option("-m", "--missing", action="store_true", 
-                    dest="show_missing", default="false",
+                    dest="show_missing", default=False,
                     help="Show unmatched log events (written to stderr).")
 
   return parser
