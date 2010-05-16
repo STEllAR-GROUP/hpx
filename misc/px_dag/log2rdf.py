@@ -26,7 +26,7 @@ def search(event, template):
   else:
     return False
 
-def process_event(event, model):
+def process_event(event, model, show_missing):
   found = False
   for template in script_templates:
     if search(event, template):
@@ -35,19 +35,27 @@ def process_event(event, model):
       found = True
       break
 
-  if not found:
-    pass #print "\tNo template for: %s" % (event['msg'])
+  if not found and show_missing:
+    sys.stderr.write("\tNo template for: %s\n" % (event['msg']))
 
-def run(log_filename):
+def run(options, log_filename):
   log = HpxLog(log_filename)
   model = Graph()
 
   for event in log.get_events():
-    process_event(event, model)
+    process_event(event, model, options.show_missing)
 
-  rdf_file = open("run.rdf", "w")
-  rdf_file.write(model.toRDFXML())
-  rdf_file.close()
+  out = sys.stdout
+  if options.outfile:
+    out = open(options.outfile, 'w')
+
+  if options.outformat == 'rdfxml':
+    out.write(model.toRDFXML())
+  elif options.outformat == 'ntriples':
+    out.write(model.serialize())
+  else:
+    sys.stderr.write("Unknown output format, defaulting to ntriples.\n")
+    out.write(model.serialize())
 
 def setup_options():
   usage = "usage: %prog [options] logfile"
@@ -56,10 +64,10 @@ def setup_options():
                     help="write RDF output to FILE", metavar="FILE")
   parser.add_option("-f", "--outformat", dest="outformat",
                     default="rdfxml",
-                    help="RDF output format: 'ntriples' or 'rdfxml' [default]")
+                    help="RDF output format: 'ntriples' [default] or 'rdfxml'")
   parser.add_option("-m", "--missing", action="store_true", 
                     dest="show_missing", default="false",
-                    help="Show unmatched log events.")
+                    help="Show unmatched log events (written to stderr).")
 
   return parser
 
@@ -69,7 +77,7 @@ if __name__=="__main__":
 
   if (len(args) == 1):
     log_filename = args[0]
-    run(log_filename)
+    run(options, log_filename)
   else:
     parser.print_help()
 
