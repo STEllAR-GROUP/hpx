@@ -1,15 +1,5 @@
 #!/usr/bin/python
 """log2rdf.py - convert an HPX log file into an RDF graph
-
-Synopsis:
-\tpython rdf.py <log-file> [-t <rdf-format>] [-o <rdf-file>] [-d]
-
-Options:
-\t-o\tWrite RDF output to <file> instead of stdout.
-
-\t-t\tSet RDF output format to <rdf-format>. Options are 'rdfxml' for\n\t\tRDF/XML or 'ntriples'. Default is 'rdfxml'.
-
-\t-d\tWrite extra information about lines that were not processed.
 """
 
 # Copyright (c) 2010-2011 Dylan Stark
@@ -18,6 +8,8 @@ Options:
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 from hpx_log import HpxLog
+
+from optparse import OptionParser
 
 from pyrple import Graph
 
@@ -57,10 +49,27 @@ def run(log_filename):
   rdf_file.write(model.toRDFXML())
   rdf_file.close()
 
+def setup_options():
+  usage = "usage: %prog [options] logfile"
+  parser = OptionParser(usage=usage)
+  parser.add_option("-o", "--outfile", dest="outfile",
+                    help="write RDF output to FILE", metavar="FILE")
+  parser.add_option("-f", "--outformat", dest="outformat",
+                    default="rdfxml",
+                    help="RDF output format: 'ntriples' or 'rdfxml' [default]")
+  parser.add_option("-m", "--missing", action="store_true", 
+                    dest="show_missing", default="false",
+                    help="Show unmatched log events.")
+
+  return parser
+
 if __name__=="__main__":
-  if (len(sys.argv) >= 2):
-    log_filename = sys.argv[1]
+  parser = setup_options()
+  (options, args) = parser.parse_args()
+
+  if (len(args) == 1):
+    log_filename = args[0]
     run(log_filename)
   else:
-    print __doc__
+    parser.print_help()
 
