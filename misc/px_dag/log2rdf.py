@@ -26,11 +26,13 @@ def search(event, template):
   else:
     return False
 
-def process_event(event, model, show_missing):
+def process_event(event, model, show_english, show_missing):
   found = False
   for template in script_templates:
     if search(event, template):
       model += template.as_rdf()
+      if show_english:
+        sys.stderr.write(template.in_english()+"\n")
       found = True
       break
 
@@ -42,7 +44,7 @@ def run(options, log_filename):
   model = Graph()
 
   for event in log.get_events():
-    process_event(event, model, options.show_missing)
+    process_event(event, model, options.show_english, options.show_missing)
 
   out = sys.stdout
   if options.outfile:
@@ -64,9 +66,12 @@ def setup_options():
   parser.add_option("-f", "--outformat", dest="outformat",
                     default="ntriples",
                     help="RDF output format: 'ntriples' [default] or 'rdfxml'")
+  parser.add_option("-e", "--english", action="store_true",
+                    dest="show_english", default=False,
+                    help="Show matched log events in 'plain English' (written to stderr)")
   parser.add_option("-m", "--missing", action="store_true", 
                     dest="show_missing", default=False,
-                    help="Show unmatched log events (written to stderr).")
+                    help="Show unmatched log events (written to stderr)")
 
   return parser
 
