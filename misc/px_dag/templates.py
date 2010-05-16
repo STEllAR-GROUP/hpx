@@ -49,7 +49,7 @@ class ComponentLoaded():
 
     S = RUN.component(self.__name)
     P = RDF.type()
-    O = HPX.Components()
+    O = HPX.Component()
     triples.append(Triple(S,P,O))
 
     P = HPX.componentId()
@@ -82,6 +82,35 @@ class RunOsThreads():
     G = Graph(triples=[t])
     return G
 
+class ThreadRegistered():
+  def __init__(self):
+    self.__gid = None
+    self.__action_name = None
+
+    regex = 'register_thread\(([^\)]+)\): initial_state\([^\)]+\), run_now\([^\)]+\), description\(([^\)]+)\)'
+    self.re = re.compile(regex)
+  
+  def fill(self, event, groups):
+    self.__gid = groups[0]
+    self.__action_name = groups[1]
+
+  def in_english(self):
+    str = "Action '%s' instantiated as thread '%s'." % (self.__action_name, self.__gid)
+    return str
+
+  def as_rdf(self):
+    action = RUN.action(self.__action_name)
+    action_name = Literal(self.__action_name)
+    thread = RUN.thread(self.__gid)
+
+    triples = [Triple(action, RDF.type(), HPX.Action()),
+               Triple(action, HPX.name(), action_name),
+               Triple(thread, RDF.type(), PX.Thread()),
+               Triple(thread, HPX.action(), action)]
+
+    G = Graph(triples=triples)
+    return G
+
 # Set templates to use
-script_templates = [ComponentLoaded(),RunOsThreads()]
+script_templates = [ComponentLoaded(),RunOsThreads(),ThreadRegistered()]
 
