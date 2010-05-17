@@ -52,6 +52,12 @@ class HpxLogEvent:
     self.__keys = ['thread', 'parent', 'time', 'count', 'level', 'module', 'msg']
     log_items = self.__log_line.split(None, 6)
 
+    # Hack: due to inconsistent format in HPX log files
+    if '[' in log_items[4] and '<' in log_items[4]:
+      log_items[6] = log_items[5] + ' ' + log_items[6]
+      log_items[5] = log_items[4][log_items[4].find('['):]
+      log_items[4] = log_items[4][:log_items[4].find('[')]
+
     values = [self.__clean_item(k,v) for (k,v) in zip(self.__keys,log_items)]
     self.__event = dict([[k,v] for (k,v) in zip(self.__keys, values)])
 
