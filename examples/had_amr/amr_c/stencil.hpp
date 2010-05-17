@@ -6,10 +6,6 @@
 #if !defined(HPX_COMPONENTS_AMR_STENCIL_OCT_17_2008_0847AM)
 #define HPX_COMPONENTS_AMR_STENCIL_OCT_17_2008_0847AM
 
-#include "../amr/amr_mesh.hpp"
-#include "../amr/amr_mesh_tapered.hpp"
-#include "../amr/amr_mesh_left.hpp"
-#include "../amr/rk_left.hpp"
 #include "../amr/server/functional_component.hpp"
 #include "stencil_data.hpp"
 
@@ -29,7 +25,7 @@ namespace hpx { namespace components { namespace amr
     private:
         typedef amr::server::functional_component base_type;
 
-        components::amr::rk_left rk_left_mesh[7];
+     //   components::amr::rk_left rk_left_mesh[7];
 
     public:
         typedef stencil wrapped_type;

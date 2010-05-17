@@ -15,8 +15,7 @@
 //#include "amr/stencil_value.hpp"
 #include "amr/dynamic_stencil_value.hpp"
 #include "amr/functional_component.hpp"
-#include "amr/amr_mesh.hpp"
-#include "amr/rk_mesh.hpp"
+#include "amr/unigrid_mesh.hpp"
 #include "amr_c/stencil.hpp"
 #include "amr_c/logging.hpp"
 
@@ -350,16 +349,13 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         hpx::util::high_resolution_timer t;
         std::vector<naming::id_type> result_data;
         
-        if ( par->integrator == 0 ) {
-           components::amr::amr_mesh mesh;
-           mesh.create(here);
-           result_data = mesh.init_execute(function_type, numvals, numsteps,
+        if ( par->integrator == 1 ) {
+            components::amr::unigrid_mesh unigrid_mesh;
+            unigrid_mesh.create(here);
+            result_data = unigrid_mesh.init_execute(function_type, numvals, numsteps,
                 do_logging ? logging_type : components::component_invalid, par);
-        } else if ( par->integrator == 1 ) {
-            components::amr::rk_mesh rk_mesh;
-            rk_mesh.create(here);
-            result_data = rk_mesh.init_execute(function_type, numvals, numsteps,
-                do_logging ? logging_type : components::component_invalid, par);
+        } else {
+          BOOST_ASSERT(false);
         }
         printf("Elapsed time: %f s\n", t.elapsed());
 
@@ -518,7 +514,7 @@ int main(int argc, char* argv[])
         if (vm.count("run_agas_server"))  // run the AGAS server instance here
             agas_server.reset(new agas_server_helper(agas_host, agas_port));
 
-        std::size_t numvals = 3;
+        std::size_t numvals = 8;
         if (vm.count("numvals"))
             numvals = vm["numvals"].as<std::size_t>();
 
@@ -529,7 +525,7 @@ int main(int argc, char* argv[])
         components::amr::Parameter par;
 
         // default pars
-        par->stencilsize = 3;
+        par->stencilsize = 7;
         par->integrator  = 1;
         par->allowedl    = 0;
         par->loglevel    = 0;
@@ -659,40 +655,11 @@ int main(int argc, char* argv[])
         par->dx0 = (par->maxx0 - par->minx0)/(par->nx0-1);
         par->dt0 = par->lambda*par->dx0;
 
-        // adjust domain so that there are 4 ghost zones to the left of minx0, which is always r=0
-        // so you can refine at r=0
-        par->minx0 = par->minx0 - 4.*par->dx0;
-        par->maxx0 = par->maxx0 - 4.*par->dx0;
-
-        if ( par->allowedl > 0 ) {
-          if ( par->linearbounds == 1 ) {
-            if ( par->integrator == 0 ) {
-              // Euler step
-              par->coarsestencilsize = par->stencilsize + 2;
-            } else if ( par->integrator == 1 ) {
-              // rk3 step
-              par->coarsestencilsize = par->stencilsize + 6;
-            } else {
-              // Not implemented yet
-              BOOST_ASSERT(false);
-            }
-          } else {
-            // Not implemented yet
-            BOOST_ASSERT(false);
-          }
-        } else {
-          par->coarsestencilsize = par->stencilsize;
-        }
-
         // The stencilsize needs to be odd
         BOOST_ASSERT(par->stencilsize%2 != 0 );
 
         if ( par->integrator == 1 ) {
           numsteps *= 3;  // three subcycles each step
-
-          // this ensures we always use rk_mesh instead of amr_mesh.
-          // rk_mesh has the special BC implemented in it which we need for this problem.
-          par->coarsestencilsize = par->stencilsize + 6;
         }
 
         // create output file to append to

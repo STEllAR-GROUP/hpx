@@ -10,11 +10,6 @@
 
 #include <math.h>
 
-#include "../amr/amr_mesh.hpp"
-#include "../amr/amr_mesh_tapered.hpp"
-#include "../amr/amr_mesh_left.hpp"
-#include "../amr/rk_left.hpp"
-
 #include "stencil.hpp"
 #include "logging.hpp"
 #include "stencil_data.hpp"
@@ -87,10 +82,10 @@ namespace hpx { namespace components { namespace amr
         int bbox[2];
 
         if ( val[0]->level_ == 0 ) {
-          if ( column == 4 ) {
+          if ( column == 0 ) {
             // indicate a physical boundary
             boundary = true;
-            compute_index = 1;
+            compute_index = 0;
             bbox[0] = 1;
             bbox[1] = 0;
           } else if ( column == par->nx0 - 1) {
@@ -99,41 +94,34 @@ namespace hpx { namespace components { namespace amr
             compute_index = vecval.size()-1;
             bbox[0] = 0;
             bbox[1] = 1;
-          } else if ( column == 0 ) {
-            compute_index = 0;
-          }
+          } else {
+            if ( (vecval.size()-1)%2 == 0 ) {
+              compute_index = (vecval.size()-1)/2;
+            } else {
+              if ( column == 1 ) {
+                boundary = true;
+                compute_index = 0;
+                bbox[0] = 2;
+                bbox[1] = 0;
+              } else {
+                BOOST_ASSERT(false);
+              }
+            } 
+          } 
         } 
 
-        if (vecval.size()%2 != 0 ) {
-          if ( gids.size() == 1 ) { 
-            resultval.get() = val[0].get();
-            return -1;
-          }
-          BOOST_ASSERT( (vecval.size())%2 == 1 );
-          if ( !boundary ) compute_index = (vecval.size()-1)/2;
-        } else {
-          // This should only happen at a physical boundary or the left edge of the mesh
-          BOOST_ASSERT( (column == 0 || boundary) );
-        }
+       // if ( gids.size() == 1 ) { 
+       //   resultval.get() = val[0].get();
+       //   return -1;
+       // }
 
         // update x position
         resultval->x_ = val[compute_index]->x_;
-
-        //boundary for r = 0
-        if ( floatcmp(resultval->x_,0.0) ) {
-          // indicate a physical boundary
-          boundary = true;
-          bbox[0] = 1;
-          bbox[1] = 0;
-        }
 
         // initialize result 
         resultval->overwrite_alloc_ = false;
         resultval->right_alloc_ = false;
         resultval->left_alloc_ = false;
-
-        // the first two input values should have the same timestep
-        BOOST_ASSERT(val[0]->timestep_== val[1]->timestep_);
 
         if (val[0]->level_ == 0 && val[0]->timestep_ < numsteps_ || val[0]->level_ > 0) {
 
@@ -141,30 +129,29 @@ namespace hpx { namespace components { namespace amr
             int gft = rkupdate(&*vecval.begin(),resultval.get_ptr(),vecval.size(),boundary,bbox,compute_index,*par.p);
             BOOST_ASSERT(gft);
             // refine only after rk subcycles are finished (we don't refine in the midst of rk subcycles)
-            if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&*vecval.begin(),vecval.size(),&resultval->value_,resultval->level_,resultval->x_,compute_index,boundary,bbox,*par.p);
-            else resultval->refine_ = false;
+            //if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&*vecval.begin(),vecval.size(),&resultval->value_,resultval->level_,resultval->x_,compute_index,boundary,bbox,*par.p);
+            //else resultval->refine_ = false;
 
             std::size_t allowedl = par->allowedl;
 
             // eliminate unrefinable cases
-            if ( gids.size() != 5 && par->stencilsize == 3 && par->integrator == 0 ) resultval->refine_ = false;
-            if ( par->stencilsize == 3 && par->integrator == 1 ) {
-              if ( gids.size() == vecval.size() && gids.size() != 9 ) resultval->refine_ = false; 
-              if ( gids.size() != vecval.size() && gids.size() - vecval.size() != 9 ) resultval->refine_ = false; 
-            }
+            //if ( par->stencilsize == 3 && par->integrator == 1 ) {
+            //  if ( gids.size() == vecval.size() && gids.size() != 9 ) resultval->refine_ = false; 
+            //  if ( gids.size() != vecval.size() && gids.size() - vecval.size() != 9 ) resultval->refine_ = false; 
+            //}
 
-            if ( resultval->refine_ && resultval->level_ < allowedl 
-                 && val[0]->timestep_ >= 1.e-6  ) {
-              finer_mesh_tapered(result, gids,vecval.size(), row, column, par);
-            } else {
-              resultval->overwrite_alloc_ = 0;
-            } 
+            //if ( resultval->refine_ && resultval->level_ < allowedl 
+            //     && val[0]->timestep_ >= 1.e-6  ) {
+            //  finer_mesh_tapered(result, gids,vecval.size(), row, column, par);
+            //} else {
+            //  resultval->overwrite_alloc_ = 0;
+            //} 
 
             // One special case: refining at time = 0
-            if ( resultval->refine_ && 
-                 val[0]->timestep_ < 1.e-6 && resultval->level_ < allowedl ) {
-              finer_mesh_initial(result, gids, resultval->level_+1, resultval->x_, row, column, par);
-            }
+            //if ( resultval->refine_ && 
+            //     val[0]->timestep_ < 1.e-6 && resultval->level_ < allowedl ) {
+            //  finer_mesh_initial(result, gids, resultval->level_+1, resultval->x_, row, column, par);
+            //}
 
             if (log_ && fmod(resultval->timestep_,par->output) < 1.e-6) 
                 stubs::logging::logentry(log_, resultval.get(), row,0, par);
@@ -214,9 +201,9 @@ namespace hpx { namespace components { namespace amr
           // Euler not supported anymore
           BOOST_ASSERT(false);
         } else if ( par->integrator == 1 ) {
-          if ( !rk_left_mesh[row].get_gid() ) {
-              rk_left_mesh[row].create(applier::get_applier().get_runtime_support_gid());
-          }
+         // if ( !rk_left_mesh[row].get_gid() ) {
+         //     rk_left_mesh[row].create(applier::get_applier().get_runtime_support_gid());
+         // }
         } else {
           BOOST_ASSERT(false);
         }
@@ -230,8 +217,8 @@ namespace hpx { namespace components { namespace amr
         if ( par->integrator == 0 ) {
           // Euler not supported anymore
         } else if ( par->integrator == 1 ) {
-          result_data =  rk_left_mesh[row].execute(initial_data, function_type,
-                do_logging ? logging_type : components::component_invalid,par);
+       //   result_data =  rk_left_mesh[row].execute(initial_data, function_type,
+       //         do_logging ? logging_type : components::component_invalid,par);
         } else {
           BOOST_ASSERT(false);
         }
@@ -459,9 +446,9 @@ namespace hpx { namespace components { namespace amr
       if ( par->integrator == 0 ) {
         BOOST_ASSERT(false);
       } else if ( par->integrator == 1 ) {
-        if ( !rk_left_mesh[row].get_gid() ) {
-            rk_left_mesh[row].create(here);
-        }
+      //  if ( !rk_left_mesh[row].get_gid() ) {
+      //      rk_left_mesh[row].create(here);
+      //  }
       } else {
         BOOST_ASSERT(false);
       }
@@ -475,9 +462,9 @@ namespace hpx { namespace components { namespace amr
       if ( par->integrator == 0 ) {
         BOOST_ASSERT(false);
       } else if ( par->integrator == 1 ) {
-        result_data = rk_left_mesh[row].init_execute(function_type,
-              do_logging ? logging_type : components::component_invalid,
-              level, x, par);
+      //  result_data = rk_left_mesh[row].init_execute(function_type,
+      //        do_logging ? logging_type : components::component_invalid,
+      //        level, x, par);
       } else {
         BOOST_ASSERT(false);
       }

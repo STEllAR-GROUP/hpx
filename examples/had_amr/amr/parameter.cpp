@@ -28,7 +28,6 @@ namespace hpx { namespace components { namespace amr
         ar & output_stdout;
         ar & stencilsize;
         ar & linearbounds;
-        ar & coarsestencilsize;
         ar & integrator;
         ar & nt0;
         ar & nx0;
