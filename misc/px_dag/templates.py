@@ -28,7 +28,17 @@ RUN = RUN("_:")
 
 #####
 
-class ComponentLoaded():
+class Template:
+  def fill(self, event, groups):
+    pass
+
+  def in_english(self): 
+    return ''
+
+  def as_rdf(self): 
+    return []
+
+class ComponentLoaded(Template):
   def __init__(self):
     self.__name = None
     self.__id = None
@@ -59,7 +69,7 @@ class ComponentLoaded():
     G = Graph(triples=triples)
     return G
 
-class RunOsThreads():
+class RunOsThreads(Template):
   def __init__(self):
     self.__num_threads = -1
 
@@ -82,12 +92,12 @@ class RunOsThreads():
     G = Graph(triples=[t])
     return G
 
-class ThreadRegistered():
+class ThreadThread(Template):
   def __init__(self):
     self.__gid = None
     self.__action_name = None
 
-    regex = 'register_thread\(([^\)]+)\): initial_state\([^\)]+\), run_now\([^\)]+\), description\(([^\)]+)\)'
+    regex = 'thread::thread\(([^\)]+)\), description\(([^\)]+)\)'
     self.re = re.compile(regex)
   
   def fill(self, event, groups):
@@ -111,6 +121,18 @@ class ThreadRegistered():
     G = Graph(triples=triples)
     return G
 
-# Set templates to use
-script_templates = [ComponentLoaded(),RunOsThreads(),ThreadRegistered()]
+# Templates for lines with no semantic value
 
+class ConnectionCache(Template):
+  regex = 'connection_cache: '
+  re = re.compile(regex)
+
+class Tfunc(Template):
+  regex = 'tfunc\([^\)]*\): '
+  re = re.compile(regex)
+
+# Set templates to use
+script_templates = [ComponentLoaded(),RunOsThreads(),ThreadThread()]
+
+# templates with no semantic value: useful for debugging or filtering
+script_templates += [ConnectionCache(),Tfunc()]

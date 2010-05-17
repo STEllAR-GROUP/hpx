@@ -32,7 +32,9 @@ def process_event(event, model, show_english, show_missing):
     if search(event, template):
       model += template.as_rdf()
       if show_english:
-        sys.stderr.write(template.in_english()+"\n")
+        eng = template.in_english()
+        if eng:
+          sys.stderr.write(eng + "\n")
       found = True
       break
 
