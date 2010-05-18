@@ -514,11 +514,11 @@ int main(int argc, char* argv[])
         if (vm.count("run_agas_server"))  // run the AGAS server instance here
             agas_server.reset(new agas_server_helper(agas_host, agas_port));
 
-        std::size_t numvals = 8;
+        std::size_t numvals = 33;
         if (vm.count("numvals"))
             numvals = vm["numvals"].as<std::size_t>();
 
-        std::size_t numsteps = 3;
+        std::size_t numsteps = 400;
         if (vm.count("numsteps"))
             numsteps = vm["numsteps"].as<std::size_t>();
 
@@ -528,15 +528,15 @@ int main(int argc, char* argv[])
         par->stencilsize = 7;
         par->integrator  = 1;
         par->allowedl    = 0;
-        par->loglevel    = 0;
+        par->loglevel    = 2;
         par->output      = 1.0;
         par->output_stdout = 1;
         par->lambda      = 0.15;
         par->nx0         = numvals;
         par->nt0         = numsteps;
         par->minx0       =   0.0;
-        par->maxx0       =  10.0;
-        par->ethreshold  =  0.1;
+        par->maxx0       =  15.0;
+        par->ethreshold  =  0.005;
         par->R0          =  8.0;
         par->amp         =  0.1;
         par->delta       =  1.0;
@@ -546,8 +546,8 @@ int main(int argc, char* argv[])
         par->output_level =  0;
 
         par->linearbounds = 1;
-        int scheduler = 0;  // default: global scheduler
-
+        int scheduler = 1;  // 0: global scheduler
+                            // 1: parallel scheduler
         std::string parfile;
         if (vm.count("parfile")) {
             parfile = vm["parfile"].as<std::string>();
