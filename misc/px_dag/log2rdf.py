@@ -16,8 +16,6 @@ from pyrple import Graph
 import re
 import sys
 
-from templates import script_templates
-
 def search(event, template):
   match = template.re.search(event['msg'])
   if match:
@@ -26,7 +24,7 @@ def search(event, template):
   else:
     return False
 
-def process_event(event, model, show_english, show_missing):
+def process_event(event, script_templates, model, show_english, show_missing):
   found = False
   for template in script_templates:
     if search(event, template):
@@ -42,11 +40,14 @@ def process_event(event, model, show_english, show_missing):
     sys.stderr.write("\tNo template for: %s\n" % (event['msg']))
 
 def run(options, log_filename):
+  filter = __import__(options.filter)
+
   log = HpxLog(log_filename)
   model = Graph()
 
   for event in log.get_events():
-    process_event(event, model, options.show_english, options.show_missing)
+    process_event(event, filter.script_templates, model, 
+                  options.show_english, options.show_missing)
 
   out = sys.stdout
   if options.outfile:
@@ -63,17 +64,20 @@ def run(options, log_filename):
 def setup_options():
   usage = "usage: %prog [options] logfile"
   parser = OptionParser(usage=usage)
-  parser.add_option("-o", "--outfile", dest="outfile",
-                    help="write RDF output to FILE", metavar="FILE")
-  parser.add_option("-f", "--outformat", dest="outformat",
-                    default="ntriples",
-                    help="RDF output format: 'ntriples' [default] or 'rdfxml'")
   parser.add_option("-e", "--english", action="store_true",
                     dest="show_english", default=False,
                     help="Show matched log events in 'plain English' (written to stderr)")
+  parser.add_option("-f", "--outformat", dest="outformat",
+                    default="ntriples",
+                    help="RDF output format: 'ntriples' [default] or 'rdfxml'")
   parser.add_option("-m", "--missing", action="store_true", 
                     dest="show_missing", default=False,
                     help="Show unmatched log events (written to stderr)")
+  parser.add_option("-o", "--outfile", dest="outfile",
+                    help="write RDF output to FILE", metavar="FILE")
+  parser.add_option("-x", "--filter", dest="filter",
+                    default="filter",
+                    help="set event filter")
 
   return parser
 

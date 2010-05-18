@@ -131,8 +131,3 @@ class Tfunc(Template):
   regex = 'tfunc\([^\)]*\): '
   re = re.compile(regex)
 
-# Set templates to use
-script_templates = [ComponentLoaded(),RunOsThreads(),ThreadThread()]
-
-# templates with no semantic value: useful for debugging or filtering
-script_templates += [ConnectionCache(),Tfunc()]
