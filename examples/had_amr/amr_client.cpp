@@ -659,7 +659,7 @@ int main(int argc, char* argv[])
         BOOST_ASSERT(par->stencilsize%2 != 0 );
 
         if ( par->integrator == 1 ) {
-          numsteps *= 3;  // three subcycles each step
+          numsteps *= 6;  // six subcycles each step
         }
 
         // create output file to append to

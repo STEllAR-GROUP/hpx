@@ -160,6 +160,11 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
       // increment subcycle counter
       result->iter_ = vecval[0]->iter_ + 1;
 
+      for (i=0;i<num_eqns;i++) {
+        result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
+        result->value_.phi[1][i] = vecval[compute_index]->value_.phi[1][i];
+      }
+
       // apply BC's nearat r=0
       if ( boundary && bbox[0] == 1 ) {
         // chi
@@ -173,12 +178,7 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
       } else if ( boundary && bbox[0] == 2 ) {
         // Phi
         result->value_.phi[1][1] = 0.5*vecval[compute_index+1]->value_.phi[1][1];
-      } else {
-        for (i=0;i<num_eqns;i++) {
-          result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
-          result->value_.phi[1][i] = vecval[compute_index]->value_.phi[1][i];
-        }
-      }
+      } 
 
       // no timestep update-- this is just a part of an rk subcycle
       result->timestep_ = vecval[0]->timestep_;
@@ -213,6 +213,11 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
       // reset rk subcycle counter
       result->iter_ = 0;
 
+      for (i=0;i<num_eqns;i++) {
+        result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
+        result->value_.phi[1][i] = vecval[compute_index]->value_.phi[1][i];
+      }
+
       // apply BC's nearat r=0
       if ( boundary && bbox[0] == 1 ) {
         // chi
@@ -226,12 +231,8 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
       } else if ( boundary && bbox[0] == 2 ) {
         // Phi
         result->value_.phi[0][1] = 0.5*vecval[compute_index+1]->value_.phi[0][1];
-      } else {
-        for (i=0;i<num_eqns;i++) {
-          result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
-          result->value_.phi[1][i] = vecval[compute_index]->value_.phi[1][i];
-        }
       }
+
       // Now comes the timestep update
       result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
     } else {
