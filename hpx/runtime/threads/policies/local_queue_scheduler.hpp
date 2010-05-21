@@ -102,6 +102,7 @@ namespace hpx { namespace threads { namespace policies
             if (queues_[num_thread]->get_next_thread(thrd))
                 return true;
 
+            // steal thread
             for (std::size_t i = 1; i < queues_.size(); ++i) {
                 std::size_t idx = (i + num_thread) % queues_.size();
                 if (queues_[idx]->get_next_thread(thrd))
@@ -145,8 +146,19 @@ namespace hpx { namespace threads { namespace policies
             std::size_t& idle_loop_count)
         {
             BOOST_ASSERT(num_thread < queues_.size());
-            return queues_[num_thread]->wait_or_add_new(
-                num_thread, running, idle_loop_count);
+
+            std::size_t added = 0;
+            bool result = queues_[num_thread]->wait_or_add_new(
+                num_thread, running, idle_loop_count, added);
+
+            // steal work items
+            for (std::size_t i = 1; 0 == added && i < queues_.size(); ++i) {
+                std::size_t idx = (i + num_thread) % queues_.size();
+                result = queues_[num_thread]->wait_or_add_new(
+                    idx, running, idle_loop_count, added, queues_[idx]);
+            }
+
+            return result;
         }
 
         /// This function gets called by the threadmanager whenever new work

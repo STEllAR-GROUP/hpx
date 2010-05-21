@@ -26,8 +26,8 @@ template<> struct is_integral_type<signed int> {typedef int test;};
 template<> struct is_integral_type<unsigned long> {typedef int test;};
 template<> struct is_integral_type<long> {typedef int test;};
 #ifdef BOOST_HAS_LONG_LONG
-template<> struct is_integral_type<unsigned long long> {typedef int test;};
-template<> struct is_integral_type<signed long long> {typedef int test;};
+template<> struct is_integral_type<boost::ulong_long_type> {typedef int test;};
+template<> struct is_integral_type<boost::long_long_type> {typedef int test;};
 #endif
 
 }

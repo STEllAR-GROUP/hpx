@@ -128,16 +128,16 @@ namespace hpx { namespace threads { namespace policies
     protected:
         ///////////////////////////////////////////////////////////////////////
         // add new threads if there is some amount of work available
-        bool add_new(long add_count)
+        std::size_t add_new(long add_count, thread_queue* addfrom)
         {
             if (0 == add_count)
-                return false;
+                return 0;
 
             long added = 0;
             task_description const* task = 0;
-            while (add_count-- && new_tasks_.dequeue(&task)) 
+            while (add_count-- && addfrom->new_tasks_.dequeue(&task)) 
             {
-                --new_tasks_count_;
+                --addfrom->new_tasks_count_;
 
                 // measure thread creation time
                 util::block_profiler_wrapper<add_new_tag> bp(add_new_logger_);
@@ -167,7 +167,8 @@ namespace hpx { namespace threads { namespace policies
                 // only insert the thread into the work-items queue if it is in 
                 // pending state
                 if (state == pending) {
-                    // pushing the new thread into the pending queue 
+                    // pushing the new thread into the pending queue of the
+                    // specified thread_queue
                     ++added;
                     work_items_.enqueue(t);
                     ++work_items_count_;
@@ -178,13 +179,13 @@ namespace hpx { namespace threads { namespace policies
             if (added) {
                 LTM_(info) << "add_new: added " << added << " tasks to queues";
             }
-            return added != 0;
+            return added;
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool add_new_if_possible()
+        bool add_new_if_possible(std::size_t& added, thread_queue* addfrom)
         {
-            if (new_tasks_.empty()) 
+            if (addfrom->new_tasks_.empty()) 
                 return false;
 
             // create new threads from pending tasks (if appropriate)
@@ -202,13 +203,16 @@ namespace hpx { namespace threads { namespace policies
                     return false;
                 }
             }
-            return add_new(add_count);
+
+            std::size_t addednew = add_new(add_count, addfrom);
+            added += addednew;
+            return addednew != 0;
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool add_new_always()
+        bool add_new_always(std::size_t& added, thread_queue* addfrom)
         {
-            if (new_tasks_.empty()) 
+            if (addfrom->new_tasks_.empty()) 
                 return false;
 
             // create new threads from pending tasks (if appropriate)
@@ -233,7 +237,10 @@ namespace hpx { namespace threads { namespace policies
                     return false;
                 }
             }
-            return add_new(add_count);
+
+            std::size_t addednew = add_new(add_count, addfrom);
+            added += addednew;
+            return addednew != 0;
         }
 
         /// This function makes sure all threads which are marked for deletion
@@ -359,8 +366,11 @@ namespace hpx { namespace threads { namespace policies
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
         bool wait_or_add_new(std::size_t num_thread, bool running, 
-            std::size_t& idle_loop_count)
+            std::size_t& idle_loop_count, std::size_t& added,
+            thread_queue* addfrom_ = 0)
         {
+            thread_queue* addfrom = addfrom_ ? addfrom_ : this;
+
             // only one dedicated OS thread is allowed to acquire the 
             // lock for the purpose of inserting the new threads into the 
             // thread-map and deleting all terminated threads
@@ -373,7 +383,7 @@ namespace hpx { namespace threads { namespace policies
                     cleanup_terminated();
 
                     // now, add new threads from the queue of task descriptions
-                    add_new_if_possible();    // calls notify_all
+                    add_new_if_possible(added, addfrom);    // calls notify_all
                 }
             }
 
@@ -400,7 +410,7 @@ namespace hpx { namespace threads { namespace policies
                            << ", threads left: " << thread_map_.size();
 
                 // stop running after all PX threads have been terminated
-                if (!add_new_always() && !running) {
+                if (!add_new_always(added, addfrom) && !running) {
                     // Before exiting each of the OS threads deletes the 
                     // remaining terminated PX threads 
                     if (cleanup_terminated()) {
@@ -431,7 +441,7 @@ namespace hpx { namespace threads { namespace policies
                         idle_loop_count = 0;
 
                         // dump list of suspended threads once a second
-                        if (LHPX_ENABLED(error) && new_tasks_.empty())
+                        if (LHPX_ENABLED(error) && addfrom->new_tasks_.empty())
                             detail::dump_suspended_threads(thread_map_);
 
                         // in any case we reactivate all pending threads
@@ -442,7 +452,7 @@ namespace hpx { namespace threads { namespace policies
                     bool timed_out = false;
                     {
                         namespace bpt = boost::posix_time;
-                        timed_out = !cond_.timed_wait(lk, bpt::milliseconds(5));
+                        timed_out = !cond_.timed_wait(lk, bpt::microseconds(10));
                         ++idle_loop_count;
                     }
 
@@ -451,7 +461,7 @@ namespace hpx { namespace threads { namespace policies
                     // make sure all pending new threads are properly queued
                     // but do that only if the lock has been acquired while 
                     // exiting the condition.wait() above
-                    if ((lk && add_new_always()) || timed_out)
+                    if ((lk && add_new_always(added, addfrom)) || timed_out)
                         break;
                 }
             }

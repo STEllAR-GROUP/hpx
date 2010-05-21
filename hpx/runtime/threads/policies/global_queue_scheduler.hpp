@@ -96,7 +96,8 @@ namespace hpx { namespace threads { namespace policies
         bool wait_or_add_new(std::size_t num_thread, bool running,
             std::size_t& idle_loop_count)
         {
-            return queue_.wait_or_add_new(num_thread, running, idle_loop_count);
+            std::size_t added = 0;
+            return queue_.wait_or_add_new(num_thread, running, idle_loop_count, added);
         }
 
         /// This function gets called by the threadmanager whenever new work
