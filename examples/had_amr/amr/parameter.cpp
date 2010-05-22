@@ -43,11 +43,7 @@ namespace hpx { namespace components { namespace amr
         ar & fmr_radius;
         ar & output_level;
         ar & PP;
-        ar & dst_port;
-        ar & dst_src;
-        ar & dst_step;
-        ar & dst_size;
-        ar & src_size;
+        ar & granularity;
     }
 
     // explicit instantiation for the correct archive types

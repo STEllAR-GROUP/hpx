@@ -58,12 +58,7 @@ struct Par {
       had_double_type fmr_radius;
       int output_level;
       int PP;
-      Array3D dst_port;
-      Array3D dst_src;
-      Array3D dst_step;
-      Array3D dst_size;
-      Array3D src_size;
-      Par() : dst_port(7,17,15),dst_src(7,17,15),dst_step(7,17,15),dst_size(7,17,1),src_size(7,17,1) {};
+      int granularity;
 };
 
 #if defined(__cplusplus)

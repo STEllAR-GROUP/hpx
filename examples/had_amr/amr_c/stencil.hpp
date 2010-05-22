@@ -85,9 +85,6 @@ namespace hpx { namespace components { namespace amr
         // debug routine
         void checkpoint(std::vector<naming::id_type> const& gids);
 
-        // debugging routine -- traverses the entire mesh available
-        void traverse_grid(naming::id_type const& start,int firstcall);
-
         bool left_tapered_mesh(std::vector<naming::id_type> const& gids, int row,int column, Parameter const& par);
 
         int left_tapered_prep_initial_data(std::vector<naming::id_type> & initial_data,

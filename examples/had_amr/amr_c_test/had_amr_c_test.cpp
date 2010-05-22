@@ -58,69 +58,59 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->left_alloc_ = 0;
     val->overwrite_alloc_ = 0;
 
+    //number of values per stencil_data
+    int i;
+    nodedata node;
+
     had_double_type dx;
     had_double_type xcoord;
 
     dx = par.dx0/pow(2.0,level);
-    if ( level == 0 ) {
-      xcoord = par.minx0 + item*dx;
-    } else {
-      // for tapered mesh
-      if (maxitems%2 == 0) {
-        printf("had_amr_test.cpp : generate initial data: Problem Level %d !\n",level);
-        exit(0);
-      } else {
-        xcoord = x + (item-((maxitems-1)/2))*dx;
-      }
-    }
 
-    had_double_type chi,Phi,Pi,Energy,r;
+    for (i=0;i<par.granularity;i++) {
 
-    r = xcoord;
-    chi = initial_chi(r,par);
-    Phi = initial_Phi(r,par);
-    Pi  = 0.0;
-    Energy = 0.5*r*r*(Pi*Pi + Phi*Phi) - r*r*pow(chi,par.PP+1)/(par.PP+1);
+      if ( level == 0 ) {
+        xcoord = par.minx0 + (par.granularity*item + i)*dx;
+      } 
 
-    if ( floatcmp(r,0.0) == 0 && r < 0.0 ) {
-      chi = -99999999.0;
-      Phi = -99999999.0;
-      Pi  = -99999999.0;
-      Energy = -99999999.0;
-    } else {
+      had_double_type chi,Phi,Pi,Energy,r;
+
+      r = xcoord;
       chi = initial_chi(r,par);
       Phi = initial_Phi(r,par);
       Pi  = 0.0;
       Energy = 0.5*r*r*(Pi*Pi + Phi*Phi) - r*r*pow(chi,par.PP+1)/(par.PP+1);
-    }
 
-    val->x_ = r;
-    val->value_.phi[0][0] = chi;
-    val->value_.phi[0][1] = Phi;
-    val->value_.phi[0][2] = Pi;
-    val->value_.phi[0][3] = Energy;
+      chi = initial_chi(r,par);
+      Phi = initial_Phi(r,par);
+      Pi  = 0.0;
+      Energy = 0.5*r*r*(Pi*Pi + Phi*Phi) - r*r*pow(chi,par.PP+1)/(par.PP+1);
+
+      val->x_.push_back(r);
+
+      node.phi[0][0] = chi;
+      node.phi[0][1] = Phi;
+      node.phi[0][2] = Pi;
+      node.phi[0][3] = Energy;
+
+      val->value_.push_back(node);
+    }
 
     return 1;
 }
 
-int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,int *bbox,int compute_index, Par const& par)
+int rkupdate(nodedata * vecval,stencil_data* result,int size,bool boundary,int *bbox,int compute_index, had_double_type dt, had_double_type dx, had_double_type timestep, Par const& par)
 {
-  // copy over the level info
-  result->level_ = vecval[0]->level_;
-
-  // count the subcycle
-  result->cycle_ = vecval[0]->cycle_ + 1;
-
-  // copy over index information
-  result->max_index_ = vecval[compute_index]->max_index_;
-  result->index_ = vecval[compute_index]->index_;
-
   // allocate some temporary arrays for calculating the rhs
   nodedata rhs;
-  int i;
+  int i,j;
 
-  had_double_type dt = par.dt0/pow(2.0,(int) vecval[0]->level_);
-  had_double_type dx = par.dx0/pow(2.0,(int) vecval[0]->level_);
+  for (j=compute_index;j<compute_index + par.granularity;j++) {
+    result->value_.push_back(vecval[j]);
+  }
+  result->timestep_ = timestep + dt;
+
+#if 0
 
   // Sanity check
   //for (i=0;i<size;i++) {
@@ -128,12 +118,12 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
   //}
   // std::cout << " iter " << vecval[0]->iter_ << std::endl;
   //  std::cout << "\n" << std::endl;
-  if ( size >= 2 ) {
-    if ( floatcmp(vecval[1]->x_ - vecval[0]->x_,dx) == 0 ) {
-      std::cout <<" PROBLEM with dx: "<<  dx << " x[1] " << vecval[1]->x_ << " x[0] " << vecval[0]->x_ << std::endl;
-      return 0;
-    }
-  }
+  //if ( size >= 2 ) {
+  //  if ( floatcmp(vecval[1]->x_ - vecval[0]->x_,dx) == 0 ) {
+  //    std::cout <<" PROBLEM with dx: "<<  dx << " x[1] " << vecval[1]->x_ << " x[0] " << vecval[0]->x_ << std::endl;
+  //    return 0;
+  //  }
+  //}
 
   if ( par.integrator == 1 ) { // rk3
 
@@ -141,18 +131,14 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
       // increment subcycle counter
       result->iter_ = vecval[0]->iter_ + 1;
 
-      // Energy
-      had_double_type chi = result->value_.phi[0][0];
-      had_double_type Phi = result->value_.phi[0][1];
-      had_double_type Pi  = result->value_.phi[0][2];
-      had_double_type r   = result->x_;
-      result->value_.phi[0][3] = 0.5*r*r*(Pi*Pi + Phi*Phi) - r*r*pow(chi,par.PP+1.0)/(par.PP+1.0);
+      for (j=0;j<par.granularity;j++) {    
 
-      calcrhs(&rhs,vecval,0,dx,size,boundary,bbox,compute_index,par);
+        calcrhs(&rhs,vecval,0,dx,size,boundary,bbox,compute_index,par);
 
-      for (i=0;i<num_eqns;i++) {
-        result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
-        result->value_.phi[1][i] = vecval[compute_index]->value_.phi[0][i] + rhs.phi[0][i]*dt;
+        for (i=0;i<num_eqns;i++) {
+          result->value_[j].phi[0][i] = vecval[compute_index]->value_[j].phi[0][i];
+          result->value_[j].phi[1][i] = vecval[compute_index]->value_[j].phi[0][i] + rhs.phi[0][i]*dt;
+        }
       }
       // no timestep update-- this is just a part of an rk subcycle
       result->timestep_ = vecval[0]->timestep_;
@@ -165,20 +151,22 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
         result->value_.phi[1][i] = vecval[compute_index]->value_.phi[1][i];
       }
 
-      // apply BC's nearat r=0
-      if ( boundary && bbox[0] == 1 ) {
-        // chi
-        result->value_.phi[1][0] = 4./3*vecval[compute_index+1]->value_.phi[1][0]
-                                  -1./3*vecval[compute_index+2]->value_.phi[1][0];
-
-        // Pi
-        result->value_.phi[1][2] = 4./3*vecval[compute_index+1]->value_.phi[1][2]
-                                  -1./3*vecval[compute_index+2]->value_.phi[1][2];
-
-      } else if ( boundary && bbox[0] == 2 ) {
-        // Phi
-        result->value_.phi[1][1] = 0.5*vecval[compute_index+1]->value_.phi[1][1];
-      } 
+      if ( par->granularity == 1 ) {
+        // apply BC's nearat r=0
+        if ( boundary && bbox[0] == 1 ) {
+          // chi
+          result->value_.phi[1][0] = 4./3*vecval[compute_index+1]->value_.phi[1][0]
+                                    -1./3*vecval[compute_index+2]->value_.phi[1][0];
+  
+          // Pi
+          result->value_.phi[1][2] = 4./3*vecval[compute_index+1]->value_.phi[1][2]
+                                    -1./3*vecval[compute_index+2]->value_.phi[1][2];
+  
+        } else if ( boundary && bbox[0] == 2 ) {
+          // Phi
+          result->value_.phi[1][1] = 0.5*vecval[compute_index+1]->value_.phi[1][1];
+        } 
+      }
 
       // no timestep update-- this is just a part of an rk subcycle
       result->timestep_ = vecval[0]->timestep_;
@@ -243,7 +231,7 @@ int rkupdate(stencil_data ** vecval,stencil_data* result,int size,bool boundary,
     printf(" PROBLEM : invalid integrator %d\n",par.integrator);
     return 0;
   }
-
+#endif
   return 1;
 }
 
@@ -253,7 +241,7 @@ void calcrhs(struct nodedata * rhs,
                 int flag, had_double_type dx, int size,
                 bool boundary,int *bbox,int compute_index, Par const& par)
 {
-
+#if 0
   had_double_type dr = dx;
   had_double_type r = vecval[compute_index]->x_;
   had_double_type chi = vecval[compute_index]->value_.phi[flag][0];
@@ -338,6 +326,7 @@ void calcrhs(struct nodedata * rhs,
       rhs->phi[0][3] = 0.0; // Energy rhs -- analysis variable
     }
   }
+#endif
 }
 
 had_double_type interp_quad(had_double_type y1,had_double_type y2,had_double_type y3,had_double_type y4,had_double_type y5,
@@ -416,7 +405,7 @@ int interpolation(had_double_type dst_x,struct nodedata *dst,
 
 bool refinement(stencil_data ** vecval, int size, struct nodedata *dst,int level,had_double_type r,int compute_index,bool boundary, int *bbox,Par const& par)
 {
-//#if 0
+#if 0
   had_double_type grad1,grad2,grad3,grad4;
   had_double_type dx = par.dx0/pow(2.0,(int) vecval[0]->level_);
 
@@ -444,9 +433,7 @@ bool refinement(stencil_data ** vecval, int size, struct nodedata *dst,int level
   } else {
     return false;
   }
-//#endif 
 
-#if 0
   // simple amplitude refinement
   had_double_type threshold;
   if ( level == 0 ) threshold = 0.15;

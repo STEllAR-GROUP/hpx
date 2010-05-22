@@ -415,110 +415,182 @@ namespace hpx { namespace components { namespace amr { namespace server
       int counter;
       int step,dst,dst2;
 
-      for (step=0;step<12;step = step + 2) {
-        dst = step+1;
+      if ( par->granularity == 1 ) {
+        // finest granularity possible {{{
+        for (step=0;step<12;step = step + 2) {
+          dst = step+1;
 
-        for (i=0;i<numvalues;i++) {
-          counter = 0;
+          for (i=0;i<numvalues;i++) {
+            counter = 0;
 
-          if ( i == 0 ) {
-            j = 0;
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-            counter++;
-            j = 1;
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-            counter++;
-          }
-          if ( i == 1 || i == 2 ) {
-            j = 1;
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-            counter++;
-            j = 2;
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-            counter++;
-          }
-          if ( i == 3 ) {
-            j = 2;
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-            counter++;
-          }
+            if ( i == 0 ) {
+              j = 0;
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+              counter++;
+              j = 1;
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+              counter++;
+            }
+            if ( i == 1 || i == 2 ) {
+              j = 1;
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+              counter++;
+              j = 2;
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+              counter++;
+            }
+            if ( i == 3 ) {
+              j = 2;
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+              counter++;
+            }
 
-          // seven 
-          for (j=i-3;j<i+4;j++) {
-            if ( j >=3 && j < numvalues-3 ) {
+            // seven 
+            for (j=i-3;j<i+4;j++) {
+              if ( j >=3 && j < numvalues-3 ) {
+                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+                counter++;
+              }
+            }
+
+            if ( i == numvalues-4 ) {
+              j = numvalues-3;
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+              counter++;
+            }
+
+            if ( i == numvalues-2 || i == numvalues-3 ) {
+              j = numvalues-3;
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+              counter++;
+              j = numvalues-2;
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+              counter++;
+              j = numvalues-1;
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+              counter++;
+            }
+
+            if ( i == numvalues-1 ) {
+              j = numvalues-2;
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+              counter++;
+              j = numvalues-1;
               vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
               counter++;
             }
           }
+        }
+        for (step=1;step<12;step = step + 2) {
+          dst = step+1;
+          if ( dst == 12 ) dst = 0;
 
-          if ( i == numvalues-4 ) {
-            j = numvalues-3;
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-            counter++;
-          }
+          // funky boundary condition
+          for (i=0;i<numvalues;i++) {
+            counter = 0;
 
-          if ( i == numvalues-2 || i == numvalues-3 ) {
-            j = numvalues-3;
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-            counter++;
-            j = numvalues-2;
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-            counter++;
-            j = numvalues-1;
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-            counter++;
-          }
+            if ( i == 0 || i == 1 || i == 2 ) {
+              j = 0;
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+              counter++;
+            }
 
-          if ( i == numvalues-1 ) {
-            j = numvalues-2;
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-            counter++;
-            j = numvalues-1;
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-            counter++;
-          }
+            if ( i == 0 ) {
+              j = 1;
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+              counter++;
+            }
 
-          // Now pass values needed for potential AMR refinement 
-#if 0
-          if ( step == 0 || step == 6 ) {
-            if ( step == 0 ) dst2 = 3;
-            if ( step == 6 ) dst2 = 0;
-            for (j=i-4;j<i+5;j++) {
-              if ( j >=4 && j < numvalues-4 ) {
-                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst2);vcolumn.push_back(j);vport.push_back(counter);
-                counter++;
-              }
+            if ( i == 2 ) {
+              j = 1;
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+              counter++;
+            }
+
+            if ( i >= 1 ) {
+              j = i;
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+              counter++;
             }
           }
-#endif
+        }
+        // }}}
+      } else if ( par->granularity == 2 ) {
+        // intermediate case  {{{
+        for (step=0;step<12;step = step + 2) {
+          dst = step+1;
+
+          for (i=0;i<numvalues;i++) {
+            counter = 0;
+
+            // five
+            for (j=i-2;j<i+3;j++) {
+              if ( j >=0 && j < numvalues ) {
+                if ( j == 1 && i == 3 ) {
+                } else if ( j == numvalues-2 && i == numvalues-4 ) {
+                } else if ( j == 0 && i == 2 ) {
+                } else if ( j == numvalues-1 && i == numvalues-3 ) {
+                } else {
+                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+                  counter++;
+                }
+              }
+            }
+
+          }
 
         }
-      }
-      for (step=1;step<12;step = step + 2) {
-        dst = step+1;
-        if ( dst == 12 ) dst = 0;
+        for (step=1;step<12;step = step + 2) {
+          dst = step+1;
+          if ( dst == 12 ) dst = 0;
 
-        // funky boundary condition
-        for (i=0;i<numvalues;i++) {
-          counter = 0;
+          // funky boundary condition
+          for (i=0;i<numvalues;i++) {
+            counter = 0;
 
-          if ( i == 0 || i == 1 || i == 2 ) {
-            j = 0;
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-            counter++;
-          }
-          if ( i == 2 ) {
-            j = 1;
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-            counter++;
-          }
+            if ( i == 1 ) {
+              j = 0;
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+              counter++;
+            }
 
-          if ( i >= 1 ) {
             j = i;
             vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
             counter++;
           }
         }
+        // }}}
+      } else if ( par->granularity > 2 ) {
+        // largest granularity possible {{{
+        for (step=0;step<12;step = step + 2) {
+          dst = step+1;
+
+          for (i=0;i<numvalues;i++) {
+            counter = 0;
+
+            // three 
+            for (j=i-1;j<i+2;j++) {
+              if ( j >=0 && j < numvalues ) {
+                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+                counter++;
+              }
+            }
+
+          }
+        }
+        for (step=1;step<12;step = step + 2) {
+          dst = step+1;
+          if ( dst == 12 ) dst = 0;
+
+          // no need for special communication for funky boundary condition
+          for (i=0;i<numvalues;i++) {
+            counter = 0;
+            j = i;
+            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+            counter++;
+          }
+        }
+        // }}}
       }
 
       // Create a ragged 3D array

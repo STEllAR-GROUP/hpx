@@ -40,8 +40,8 @@ struct stencil_data
     had_double_type timestep_;    // current time step
     int cycle_; // counts the number of subcycles
     size_t level_;    // refinement level
-    nodedata value_;            // current value
-    had_double_type x_;      // x coordinate value
+    std::vector< nodedata > value_;            // current value
+    std::vector< had_double_type > x_;      // x coordinate value
     int iter_;      // rk subcycle indicator
     gid overwrite_; // gid of overwrite stencil point
     gid right_;     // gid of right stencil point
