@@ -59,6 +59,9 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->left_alloc_ = 0;
     val->overwrite_alloc_ = 0;
 
+    val->x_.resize(par.granularity);
+    val->value_.resize(par.granularity);
+
     //number of values per stencil_data
     int i;
     nodedata node;
@@ -87,14 +90,14 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
       Pi  = 0.0;
       Energy = 0.5*r*r*(Pi*Pi + Phi*Phi) - r*r*pow(chi,par.PP+1)/(par.PP+1);
 
-      val->x_.push_back(r);
+      val->x_[i] = r;
 
       node.phi[0][0] = chi;
       node.phi[0][1] = Phi;
       node.phi[0][2] = Pi;
       node.phi[0][3] = Energy;
 
-      val->value_.push_back(node);
+      val->value_[i] = node;
     }
 
     return 1;
@@ -119,20 +122,20 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
   //}
   //result->timestep_ = timestep + 1.0;
   if ( iter == 0 ) {
-    for (j=compute_index;j<compute_index + par.granularity;j++) {
+    for (j=0;j<par.granularity;j++) {
       calcrhs(&rhs,vecval,vecx,0,dx,size,boundary,bbox,j,par);
       for (i=0;i<num_eqns;i++) {
-        work.phi[0][i] = vecval[j].phi[0][i];
-        work.phi[1][i] = vecval[j].phi[0][i] + rhs.phi[0][i]*dt;
+        work.phi[0][i] = vecval[j+compute_index].phi[0][i];
+        work.phi[1][i] = vecval[j+compute_index].phi[0][i] + rhs.phi[0][i]*dt;
       }
-      result->value_.push_back(work);
+      result->value_[j] = work;
     }
 
     // no timestep update-- this is just a part of an rk subcycle
     result->timestep_ = timestep;
   } else if ( iter == 1 || iter == 3) {
-    for (j=compute_index;j<compute_index + par.granularity;j++) {
-      result->value_.push_back(vecval[j]);
+    for (j=0;j<par.granularity;j++) {
+      result->value_[j] = vecval[j+compute_index];
     }
 
     // apply BC's nearat r=0
@@ -166,33 +169,33 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
     // no timestep update-- this is just a part of an rk subcycle
     result->timestep_ = timestep;
   } else if ( iter == 2 ) {
-    for (j=compute_index;j<compute_index + par.granularity;j++) {
+    for (j=0;j<par.granularity;j++) {
       calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j,par);
       for (i=0;i<num_eqns;i++) {
-        work.phi[0][i] = vecval[j].phi[0][i];
-        work.phi[1][i] = 0.75*vecval[j].phi[0][i]
-                        +0.25*vecval[j].phi[1][i] + rhs.phi[0][i]*dt;
+        work.phi[0][i] = vecval[j+compute_index].phi[0][i];
+        work.phi[1][i] = 0.75*vecval[j+compute_index].phi[0][i]
+                        +0.25*vecval[j+compute_index].phi[1][i] + rhs.phi[0][i]*dt;
       }
-      result->value_.push_back(work);
+      result->value_[j] = work;
     }
 
     // no timestep update-- this is just a part of an rk subcycle
     result->timestep_ = timestep;
   } else if ( iter == 4 ) {
-    for (j=compute_index;j<compute_index + par.granularity;j++) {
+    for (j=0;j<par.granularity;j++) {
       calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j,par);
       for (i=0;i<num_eqns;i++) {
-        work.phi[0][i] = 1./3*vecval[j].phi[0][i]
-                        +2./3*(vecval[j].phi[1][i] + rhs.phi[0][i]*dt);
+        work.phi[0][i] = 1./3*vecval[j+compute_index].phi[0][i]
+                        +2./3*(vecval[j+compute_index].phi[1][i] + rhs.phi[0][i]*dt);
       }
-      result->value_.push_back(work);
+      result->value_[j] = work;
     }
 
     // no timestep update-- this is just a part of an rk subcycle
     result->timestep_ = timestep;
   } else if ( iter == 5 ) {
-    for (j=compute_index;j<compute_index + par.granularity;j++) {
-      result->value_.push_back(vecval[j]);
+    for (j=0;j<par.granularity;j++) {
+      result->value_[j] = vecval[j];
     }
 
     // apply BC's nearat r=0
@@ -246,36 +249,36 @@ void calcrhs(struct nodedata * rhs,
   had_double_type diss_Phi = 0.0;
   had_double_type diss_Pi = 0.0;
 
-  if ( !boundary ) {
-    // the compute_index is not physical boundary; all points in stencilsize
-    // are available for computing the rhs.
+  // the compute_index is not physical boundary; all points in stencilsize
+  // are available for computing the rhs.
 
-    // Add  dissipation if size = 7
-    if ( size == 7 ) { 
-      diss_chi = -1./(64.*dr)*(  -vecval[compute_index-3].phi[flag][0]
-                              +6.*vecval[compute_index-2].phi[flag][0]
-                             -15.*vecval[compute_index-1].phi[flag][0]
-                             +20.*vecval[compute_index  ].phi[flag][0]
-                             -15.*vecval[compute_index+1].phi[flag][0]
-                              +6.*vecval[compute_index+2].phi[flag][0]
-                                 -vecval[compute_index+3].phi[flag][0] );
-      diss_Phi = -1./(64.*dr)*(  -vecval[compute_index-3].phi[flag][1]
-                              +6.*vecval[compute_index-2].phi[flag][1]
-                             -15.*vecval[compute_index-1].phi[flag][1]
-                             +20.*vecval[compute_index  ].phi[flag][1]
-                             -15.*vecval[compute_index+1].phi[flag][1]
-                              +6.*vecval[compute_index+2].phi[flag][1]
-                                 -vecval[compute_index+3].phi[flag][1] );
-      diss_Pi  = -1./(64.*dr)*(  -vecval[compute_index-3].phi[flag][2]
-                              +6.*vecval[compute_index-2].phi[flag][2]
-                             -15.*vecval[compute_index-1].phi[flag][2]
-                             +20.*vecval[compute_index  ].phi[flag][2]
-                             -15.*vecval[compute_index+1].phi[flag][2]
-                              +6.*vecval[compute_index+2].phi[flag][2]
-                                 -vecval[compute_index+3].phi[flag][2] );
-    }
+  // Add  dissipation if size = 7
+  if ( compute_index + 3 < size && compute_index - 3 >= 0 ) { 
+    diss_chi = -1./(64.*dr)*(  -vecval[compute_index-3].phi[flag][0]
+                            +6.*vecval[compute_index-2].phi[flag][0]
+                           -15.*vecval[compute_index-1].phi[flag][0]
+                           +20.*vecval[compute_index  ].phi[flag][0]
+                           -15.*vecval[compute_index+1].phi[flag][0]
+                            +6.*vecval[compute_index+2].phi[flag][0]
+                               -vecval[compute_index+3].phi[flag][0] );
+    diss_Phi = -1./(64.*dr)*(  -vecval[compute_index-3].phi[flag][1]
+                            +6.*vecval[compute_index-2].phi[flag][1]
+                            -15.*vecval[compute_index-1].phi[flag][1]
+                            +20.*vecval[compute_index  ].phi[flag][1]
+                            -15.*vecval[compute_index+1].phi[flag][1]
+                             +6.*vecval[compute_index+2].phi[flag][1]
+                                -vecval[compute_index+3].phi[flag][1] );
+    diss_Pi  = -1./(64.*dr)*(  -vecval[compute_index-3].phi[flag][2]
+                            +6.*vecval[compute_index-2].phi[flag][2]
+                           -15.*vecval[compute_index-1].phi[flag][2]
+                           +20.*vecval[compute_index  ].phi[flag][2]
+                           -15.*vecval[compute_index+1].phi[flag][2]
+                            +6.*vecval[compute_index+2].phi[flag][2]
+                               -vecval[compute_index+3].phi[flag][2] );
+  }
 
 
+  if ( compute_index + 1 < size && compute_index - 1 >= 0 ) { 
     had_double_type chi_np1 = vecval[compute_index+1].phi[flag][0];
     had_double_type chi_nm1 = vecval[compute_index-1].phi[flag][0];
 
@@ -296,23 +299,25 @@ void calcrhs(struct nodedata * rhs,
     rhs->phi[0][2] = 3.*( r2_Phi_np1 - r2_Phi_nm1 )/( pow(r+dr,3) - pow(r-dr,3) ) + pow(chi,par.PP) + par.eps*diss_Pi; // Pi rhs
 
     rhs->phi[0][3] = 0.; // Energy rhs
-  } else {
+  }
+
+  if (boundary ) {
     // boundary -- look at the bounding box (bbox) to decide which boundary it is
-    if ( bbox[0] == 1 ) {
+    if ( bbox[0] == 1 && compute_index == 0 ) {
       // we are at the left boundary  -- values are determined by quadratic fit, not evolution
 
       rhs->phi[0][0] = 0.0; // chi rhs -- chi is set by quadratic fit
       rhs->phi[0][1] = 0.0; // Phi rhs -- Phi-dot is always zero at r=0
       rhs->phi[0][2] = 0.0; // Pi rhs -- chi is set by quadratic fit
       rhs->phi[0][3] = 0.0; // Energy rhs -- analysis variable
+    }
+    if (bbox[1] == 1 && compute_index == size-1) {
 
-    } else if (bbox[1] == 1) {
+      had_double_type Phi_nm1 = vecval[size-1].phi[flag][1];
+      had_double_type Phi_nm2 = vecval[size-2].phi[flag][1];
 
-      had_double_type Phi_nm1 = vecval[compute_index-1].phi[flag][1];
-      had_double_type Phi_nm2 = vecval[compute_index-2].phi[flag][1];
-
-      had_double_type Pi_nm1 = vecval[compute_index-1].phi[flag][2];
-      had_double_type Pi_nm2 = vecval[compute_index-2].phi[flag][2];
+      had_double_type Pi_nm1 = vecval[size-1].phi[flag][2];
+      had_double_type Pi_nm2 = vecval[size-2].phi[flag][2];
 
       // we are at the right boundary 
       rhs->phi[0][0] = Pi;  // chi rhs

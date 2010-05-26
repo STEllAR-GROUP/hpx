@@ -76,20 +76,24 @@ namespace hpx { namespace components { namespace amr
         int bbox[2];
         int numvals = par->nx0/par->granularity;
 
+        // initialize bounding box
+        bbox[0] = 0;
+        bbox[1] = 0;
+
         if ( val[0]->level_ == 0 ) {
           if ( column == 0 ) {
             // indicate a physical boundary
             boundary = true;
             compute_index = 0;
             bbox[0] = 1;
-            bbox[1] = 0;
-          } else if ( column == numvals - 1) {
+           }
+          if ( column == numvals - 1) {
             // indicate a physical boundary
             boundary = true;
             compute_index = val.size()-1;
-            bbox[0] = 0;
             bbox[1] = 1;
-          } else {
+          } 
+          if ( !boundary ) {
             if ( (val.size()-1)%2 == 0 ) {
               compute_index = (val.size()-1)/2;
               if ( column == 1 && par->granularity == 1 ) {
@@ -133,6 +137,7 @@ namespace hpx { namespace components { namespace amr
             resultval->cycle_ = val[0]->cycle_ + 1;
             resultval->max_index_ = val[compute_index]->max_index_;
             resultval->index_ = val[compute_index]->index_;
+            resultval->value_.resize(par->granularity);
             had_double_type dt = par->dt0/pow(2.0,(int) val[0]->level_);
             had_double_type dx = par->dx0/pow(2.0,(int) val[0]->level_); 
             
