@@ -67,15 +67,8 @@ namespace hpx { namespace components { namespace amr
         int i,j;
         had_double_type timestep;
         std::vector< nodedata > vecval;
+        std::vector< had_double_type > vecx;
         resultval = get_memory_block_async(val,gids,result);
-
-
-        // put all data into a single array
-        for (i=0;i<val.size();i++) {
-          for (j=0;j<par->granularity;j++) {
-            vecval.push_back(val[i]->value_[j]);
-          }
-        }
 
         // Here we give the coordinate value to the result (prior to sending it to the user)
         int compute_index;
@@ -99,7 +92,7 @@ namespace hpx { namespace components { namespace amr
           } else {
             if ( (val.size()-1)%2 == 0 ) {
               compute_index = (val.size()-1)/2;
-              if ( column == 1 && par->granularity < 3 ) {
+              if ( column == 1 && par->granularity == 1 ) {
                 boundary = true;
                 bbox[0] = 2;
                 bbox[1] = 0;
@@ -116,6 +109,7 @@ namespace hpx { namespace components { namespace amr
         for (i=0;i<val.size();i++) {
           for (j=0;j<par->granularity;j++) {
             vecval.push_back(val[i]->value_[j]);
+            vecx.push_back(val[i]->x_[j]);
             if ( i == compute_index && adj_index == -1 ) {
               adj_index = count; 
             }
@@ -143,12 +137,17 @@ namespace hpx { namespace components { namespace amr
             had_double_type dx = par->dx0/pow(2.0,(int) val[0]->level_); 
             
             // call rk update 
-            int gft = rkupdate(&*vecval.begin(),resultval.get_ptr(),vecval.size(),
-                                 boundary,bbox,adj_index,dt,dx,val[0]->timestep_,*par.p);
+            int gft = rkupdate(&*vecval.begin(),resultval.get_ptr(),&*vecx.begin(),vecval.size(),
+                                 boundary,bbox,adj_index,dt,dx,val[0]->timestep_,
+                                 val[0]->iter_,val[0]->level_,*par.p);
             BOOST_ASSERT(gft);
 
             // increase the iteration counter
-            resultval->iter_ = val[0]->iter_ + 1;
+            if ( val[0]->iter_ == 5 ) {
+              resultval->iter_ = 0;
+            } else {
+              resultval->iter_ = val[0]->iter_ + 1;
+            }
 
             // refine only after rk subcycles are finished (we don't refine in the midst of rk subcycles)
             //if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&*vecval.begin(),vecval.size(),&resultval->value_,resultval->level_,resultval->x_,compute_index,boundary,bbox,*par.p);
@@ -175,7 +174,8 @@ namespace hpx { namespace components { namespace amr
             //  finer_mesh_initial(result, gids, resultval->level_+1, resultval->x_, row, column, par);
             //}
 
-            //if (log_ && fmod(resultval->timestep_,par->output) < 1.e-6) 
+           // if (par->loglevel > 1 && fmod(resultval->timestep_,par->output) < 1.e-6) 
+            if (par->loglevel > 1 ) 
                 stubs::logging::logentry(log_, resultval.get(), row,0, par);
         }
         else {

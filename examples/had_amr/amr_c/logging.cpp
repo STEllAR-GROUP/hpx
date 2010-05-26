@@ -34,8 +34,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         mutex_type::scoped_lock l(mtx_);
         int i;
 
-        //if ( par->output_stdout == 1 && val.iter_ == 0 ) {
-        //  if (fmod(val.timestep_,par->output) < 1.e-6) {
+        if ( par->output_stdout == 1 && val.iter_ == 0 ) {
+          if (fmod(val.timestep_,par->output) < 1.e-6) {
             for (i=0;i<par->granularity;i++) {
               std::cout << " AMR Level: " << val.level_ 
                         << " Timestep: " <<  val.timestep_ 
@@ -47,8 +47,8 @@ namespace hpx { namespace components { namespace amr { namespace server
                         << " x-coordinate: " << val.x_[i] 
                         << std::endl << std::flush ;
             }
-        //  }
-        //}
+          }
+        }
 
         // output to file "output.dat"
         FILE *fdata;

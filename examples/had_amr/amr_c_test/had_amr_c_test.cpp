@@ -25,7 +25,8 @@ int floatcmp(had_double_type x1,had_double_type x2) {
 }
 
 void calcrhs(struct nodedata * rhs,
-                stencil_data ** vecval,
+                nodedata * vecval,
+                had_double_type * vecx,
                 int flag, had_double_type dx, int size,
                 bool boundary,int *bbox,int compute_index, Par const& par);
 
@@ -99,154 +100,148 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     return 1;
 }
 
-int rkupdate(nodedata * vecval,stencil_data* result,int size,bool boundary,int *bbox,int compute_index, had_double_type dt, had_double_type dx, had_double_type timestep, Par const& par)
+int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int size,bool boundary,int *bbox,int compute_index, had_double_type dt, had_double_type dx, had_double_type timestep,int iter, int level, Par const& par)
 {
   // allocate some temporary arrays for calculating the rhs
-  nodedata rhs;
+  nodedata rhs,work;
   int i,j;
 
-  for (j=compute_index;j<compute_index + par.granularity;j++) {
-    result->value_.push_back(vecval[j]);
-  }
-  result->timestep_ = timestep + dt;
+  BOOST_ASSERT(par.integrator == 1);
 
-#if 0
-
-  // Sanity check
-  //for (i=0;i<size;i++) {
-  //  std::cout << vecval[i]->x_ << std::endl;
-  //}
-  // std::cout << " iter " << vecval[0]->iter_ << std::endl;
-  //  std::cout << "\n" << std::endl;
-  //if ( size >= 2 ) {
-  //  if ( floatcmp(vecval[1]->x_ - vecval[0]->x_,dx) == 0 ) {
-  //    std::cout <<" PROBLEM with dx: "<<  dx << " x[1] " << vecval[1]->x_ << " x[0] " << vecval[0]->x_ << std::endl;
-  //    return 0;
-  //  }
+  //for (i=0;i<num_eqns;i++) {
+  //  work.phi[0][i] = 0.1;
+  //  work.phi[1][i] = 0.1;
   //}
 
-  if ( par.integrator == 1 ) { // rk3
-
-    if ( vecval[0]->iter_ == 0 ) {
-      // increment subcycle counter
-      result->iter_ = vecval[0]->iter_ + 1;
-
-      for (j=0;j<par.granularity;j++) {    
-
-        calcrhs(&rhs,vecval,0,dx,size,boundary,bbox,compute_index,par);
-
-        for (i=0;i<num_eqns;i++) {
-          result->value_[j].phi[0][i] = vecval[compute_index]->value_[j].phi[0][i];
-          result->value_[j].phi[1][i] = vecval[compute_index]->value_[j].phi[0][i] + rhs.phi[0][i]*dt;
-        }
-      }
-      // no timestep update-- this is just a part of an rk subcycle
-      result->timestep_ = vecval[0]->timestep_;
-    } else if ( vecval[0]->iter_ == 1 || vecval[0]->iter_ == 3) {
-      // increment subcycle counter
-      result->iter_ = vecval[0]->iter_ + 1;
-
+  //for (j=compute_index;j<compute_index + par.granularity;j++) {
+    //result->value_.push_back(vecval[j]);
+  //  result->value_.push_back(work);
+  //}
+  //result->timestep_ = timestep + 1.0;
+  if ( iter == 0 ) {
+    for (j=compute_index;j<compute_index + par.granularity;j++) {
+      calcrhs(&rhs,vecval,vecx,0,dx,size,boundary,bbox,j,par);
       for (i=0;i<num_eqns;i++) {
-        result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
-        result->value_.phi[1][i] = vecval[compute_index]->value_.phi[1][i];
+        work.phi[0][i] = vecval[j].phi[0][i];
+        work.phi[1][i] = vecval[j].phi[0][i] + rhs.phi[0][i]*dt;
       }
+      result->value_.push_back(work);
+    }
 
-      if ( par->granularity == 1 ) {
-        // apply BC's nearat r=0
-        if ( boundary && bbox[0] == 1 ) {
-          // chi
-          result->value_.phi[1][0] = 4./3*vecval[compute_index+1]->value_.phi[1][0]
-                                    -1./3*vecval[compute_index+2]->value_.phi[1][0];
-  
-          // Pi
-          result->value_.phi[1][2] = 4./3*vecval[compute_index+1]->value_.phi[1][2]
-                                    -1./3*vecval[compute_index+2]->value_.phi[1][2];
-  
-        } else if ( boundary && bbox[0] == 2 ) {
-          // Phi
-          result->value_.phi[1][1] = 0.5*vecval[compute_index+1]->value_.phi[1][1];
-        } 
-      }
+    // no timestep update-- this is just a part of an rk subcycle
+    result->timestep_ = timestep;
+  } else if ( iter == 1 || iter == 3) {
+    for (j=compute_index;j<compute_index + par.granularity;j++) {
+      result->value_.push_back(vecval[j]);
+    }
 
-      // no timestep update-- this is just a part of an rk subcycle
-      result->timestep_ = vecval[0]->timestep_;
-    } else if ( vecval[0]->iter_ == 2 ) {
-      // increment subcycle counter
-      result->iter_ = vecval[0]->iter_ + 1;
-
-      calcrhs(&rhs,vecval,1,dx,size,boundary,bbox,compute_index,par);
-
-      for (i=0;i<num_eqns;i++) {
-        result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
-        result->value_.phi[1][i] = 0.75*vecval[compute_index]->value_.phi[0][i]
-                                  +0.25*vecval[compute_index]->value_.phi[1][i] + 0.25*rhs.phi[0][i]*dt;
-      }
-
-      // no timestep update-- this is just a part of an rk subcycle
-      result->timestep_ = vecval[0]->timestep_;
-    } else if ( vecval[0]->iter_ == 4 ) {
-      // increment subcycle counter
-      result->iter_ = vecval[0]->iter_ + 1;
-
-      calcrhs(&rhs,vecval,1,dx,size,boundary,bbox,compute_index,par);
-
-      for (i=0;i<num_eqns;i++) {
-        result->value_.phi[0][i] = 1./3*vecval[compute_index]->value_.phi[0][i]
-                                 +2./3*(vecval[compute_index]->value_.phi[1][i] + rhs.phi[0][i]*dt);
-      }
-
-      // no timestep update-- this is just a part of an rk subcycle
-      result->timestep_ = vecval[0]->timestep_;
-    } else if ( vecval[0]->iter_ == 5 ) {
-      // reset rk subcycle counter
-      result->iter_ = 0;
-
-      for (i=0;i<num_eqns;i++) {
-        result->value_.phi[0][i] = vecval[compute_index]->value_.phi[0][i];
-        result->value_.phi[1][i] = vecval[compute_index]->value_.phi[1][i];
-      }
-
-      // apply BC's nearat r=0
+    // apply BC's nearat r=0
+    if ( par.granularity == 1 ) {
       if ( boundary && bbox[0] == 1 ) {
         // chi
-        result->value_.phi[0][0] = 4./3*vecval[compute_index+1]->value_.phi[0][0]
-                                  -1./3*vecval[compute_index+2]->value_.phi[0][0];
-
+        result->value_[0].phi[1][0] = 4./3*vecval[compute_index+1].phi[1][0]
+                                     -1./3*vecval[compute_index+2].phi[1][0];
+   
         // Pi
-        result->value_.phi[0][2] = 4./3*vecval[compute_index+1]->value_.phi[0][2]
-                                  -1./3*vecval[compute_index+2]->value_.phi[0][2];
-
+        result->value_[0].phi[1][2] = 4./3*vecval[compute_index+1].phi[1][2]
+                                     -1./3*vecval[compute_index+2].phi[1][2];
+  
       } else if ( boundary && bbox[0] == 2 ) {
         // Phi
-        result->value_.phi[0][1] = 0.5*vecval[compute_index+1]->value_.phi[0][1];
-      }
-
-      // Now comes the timestep update
-      result->timestep_ = vecval[0]->timestep_ + 1.0/pow(2.0,(int) vecval[0]->level_);
+        result->value_[0].phi[1][1] = 0.5*vecval[compute_index+1].phi[1][1];
+      } 
     } else {
-      printf(" PROBLEM : invalid iter flag %d\n",vecval[0]->iter_);
-      return 0;
+      if ( boundary && bbox[0] == 1 ) {
+        // chi
+        result->value_[0].phi[1][0] = 4./3*vecval[compute_index+1].phi[1][0]
+                                     -1./3*vecval[compute_index+2].phi[1][0];
+        // Pi
+        result->value_[0].phi[1][2] = 4./3*vecval[compute_index+1].phi[1][2]
+                                                 -1./3*vecval[compute_index+2].phi[1][2];
+        // Phi
+        result->value_[1].phi[1][1] = 0.5*vecval[compute_index+2].phi[1][1];
+      } 
+    } 
+
+    // no timestep update-- this is just a part of an rk subcycle
+    result->timestep_ = timestep;
+  } else if ( iter == 2 ) {
+    for (j=compute_index;j<compute_index + par.granularity;j++) {
+      calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j,par);
+      for (i=0;i<num_eqns;i++) {
+        work.phi[0][i] = vecval[j].phi[0][i];
+        work.phi[1][i] = 0.75*vecval[j].phi[0][i]
+                        +0.25*vecval[j].phi[1][i] + rhs.phi[0][i]*dt;
+      }
+      result->value_.push_back(work);
     }
-  } else { 
-    printf(" PROBLEM : invalid integrator %d\n",par.integrator);
+
+    // no timestep update-- this is just a part of an rk subcycle
+    result->timestep_ = timestep;
+  } else if ( iter == 4 ) {
+    for (j=compute_index;j<compute_index + par.granularity;j++) {
+      calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j,par);
+      for (i=0;i<num_eqns;i++) {
+        work.phi[0][i] = 1./3*vecval[j].phi[0][i]
+                        +2./3*(vecval[j].phi[1][i] + rhs.phi[0][i]*dt);
+      }
+      result->value_.push_back(work);
+    }
+
+    // no timestep update-- this is just a part of an rk subcycle
+    result->timestep_ = timestep;
+  } else if ( iter == 5 ) {
+    for (j=compute_index;j<compute_index + par.granularity;j++) {
+      result->value_.push_back(vecval[j]);
+    }
+
+    // apply BC's nearat r=0
+    if ( par.granularity == 1 ) {
+      if ( boundary && bbox[0] == 1 ) {
+        // chi
+        result->value_[0].phi[0][0] = 4./3*vecval[compute_index+1].phi[0][0]
+                                     -1./3*vecval[compute_index+2].phi[0][0];
+   
+        // Pi
+        result->value_[0].phi[0][2] = 4./3*vecval[compute_index+1].phi[0][2]
+                                     -1./3*vecval[compute_index+2].phi[0][2];
+  
+      } else if ( boundary && bbox[0] == 2 ) {
+        // Phi
+        result->value_[0].phi[0][1] = 0.5*vecval[compute_index+1].phi[0][1];
+      } 
+    } else {
+      if ( boundary && bbox[0] == 1 ) {
+        // chi
+        result->value_[0].phi[0][0] = 4./3*vecval[compute_index+1].phi[0][0]
+                                     -1./3*vecval[compute_index+2].phi[0][0];
+        // Pi
+        result->value_[0].phi[0][2] = 4./3*vecval[compute_index+1].phi[0][2]
+                                     -1./3*vecval[compute_index+2].phi[0][2];
+        // Phi
+        result->value_[1].phi[0][1] = 0.5*vecval[compute_index+2].phi[0][1];
+      } 
+    } 
+    result->timestep_ = timestep + 1.0/pow(2.0,level);
+  } else {
+    printf(" PROBLEM : invalid iter flag %d\n",iter);
     return 0;
   }
-#endif
   return 1;
 }
 
 // This is a pointwise calculation: compute the rhs for point result given input values in array phi
 void calcrhs(struct nodedata * rhs,
-                stencil_data ** vecval,
+                nodedata * vecval,
+                had_double_type * vecx,
                 int flag, had_double_type dx, int size,
                 bool boundary,int *bbox,int compute_index, Par const& par)
 {
-#if 0
   had_double_type dr = dx;
-  had_double_type r = vecval[compute_index]->x_;
-  had_double_type chi = vecval[compute_index]->value_.phi[flag][0];
-  had_double_type Phi = vecval[compute_index]->value_.phi[flag][1];
-  had_double_type Pi =  vecval[compute_index]->value_.phi[flag][2];
+  had_double_type r = vecx[compute_index];
+  had_double_type chi = vecval[compute_index].phi[flag][0];
+  had_double_type Phi = vecval[compute_index].phi[flag][1];
+  had_double_type Pi =  vecval[compute_index].phi[flag][2];
   had_double_type diss_chi = 0.0;
   had_double_type diss_Phi = 0.0;
   had_double_type diss_Pi = 0.0;
@@ -257,40 +252,40 @@ void calcrhs(struct nodedata * rhs,
 
     // Add  dissipation if size = 7
     if ( size == 7 ) { 
-      diss_chi = -1./(64.*dr)*(  -vecval[compute_index-3]->value_.phi[flag][0]
-                              +6.*vecval[compute_index-2]->value_.phi[flag][0]
-                             -15.*vecval[compute_index-1]->value_.phi[flag][0]
-                             +20.*vecval[compute_index  ]->value_.phi[flag][0]
-                             -15.*vecval[compute_index+1]->value_.phi[flag][0]
-                              +6.*vecval[compute_index+2]->value_.phi[flag][0]
-                                 -vecval[compute_index+3]->value_.phi[flag][0] );
-      diss_Phi = -1./(64.*dr)*(  -vecval[compute_index-3]->value_.phi[flag][1]
-                              +6.*vecval[compute_index-2]->value_.phi[flag][1]
-                             -15.*vecval[compute_index-1]->value_.phi[flag][1]
-                             +20.*vecval[compute_index  ]->value_.phi[flag][1]
-                             -15.*vecval[compute_index+1]->value_.phi[flag][1]
-                              +6.*vecval[compute_index+2]->value_.phi[flag][1]
-                                 -vecval[compute_index+3]->value_.phi[flag][1] );
-      diss_Pi  = -1./(64.*dr)*(  -vecval[compute_index-3]->value_.phi[flag][2]
-                              +6.*vecval[compute_index-2]->value_.phi[flag][2]
-                             -15.*vecval[compute_index-1]->value_.phi[flag][2]
-                             +20.*vecval[compute_index  ]->value_.phi[flag][2]
-                             -15.*vecval[compute_index+1]->value_.phi[flag][2]
-                              +6.*vecval[compute_index+2]->value_.phi[flag][2]
-                                 -vecval[compute_index+3]->value_.phi[flag][2] );
+      diss_chi = -1./(64.*dr)*(  -vecval[compute_index-3].phi[flag][0]
+                              +6.*vecval[compute_index-2].phi[flag][0]
+                             -15.*vecval[compute_index-1].phi[flag][0]
+                             +20.*vecval[compute_index  ].phi[flag][0]
+                             -15.*vecval[compute_index+1].phi[flag][0]
+                              +6.*vecval[compute_index+2].phi[flag][0]
+                                 -vecval[compute_index+3].phi[flag][0] );
+      diss_Phi = -1./(64.*dr)*(  -vecval[compute_index-3].phi[flag][1]
+                              +6.*vecval[compute_index-2].phi[flag][1]
+                             -15.*vecval[compute_index-1].phi[flag][1]
+                             +20.*vecval[compute_index  ].phi[flag][1]
+                             -15.*vecval[compute_index+1].phi[flag][1]
+                              +6.*vecval[compute_index+2].phi[flag][1]
+                                 -vecval[compute_index+3].phi[flag][1] );
+      diss_Pi  = -1./(64.*dr)*(  -vecval[compute_index-3].phi[flag][2]
+                              +6.*vecval[compute_index-2].phi[flag][2]
+                             -15.*vecval[compute_index-1].phi[flag][2]
+                             +20.*vecval[compute_index  ].phi[flag][2]
+                             -15.*vecval[compute_index+1].phi[flag][2]
+                              +6.*vecval[compute_index+2].phi[flag][2]
+                                 -vecval[compute_index+3].phi[flag][2] );
     }
 
 
-    had_double_type chi_np1 = vecval[compute_index+1]->value_.phi[flag][0];
-    had_double_type chi_nm1 = vecval[compute_index-1]->value_.phi[flag][0];
+    had_double_type chi_np1 = vecval[compute_index+1].phi[flag][0];
+    had_double_type chi_nm1 = vecval[compute_index-1].phi[flag][0];
 
     rhs->phi[0][0] = Pi + par.eps*diss_chi; // chi rhs
 
-    had_double_type Pi_np1 = vecval[compute_index+1]->value_.phi[flag][2];
-    had_double_type Pi_nm1 = vecval[compute_index-1]->value_.phi[flag][2];
+    had_double_type Pi_np1 = vecval[compute_index+1].phi[flag][2];
+    had_double_type Pi_nm1 = vecval[compute_index-1].phi[flag][2];
 
-    had_double_type Phi_np1 = vecval[compute_index+1]->value_.phi[flag][1];
-    had_double_type Phi_nm1 = vecval[compute_index-1]->value_.phi[flag][1];
+    had_double_type Phi_np1 = vecval[compute_index+1].phi[flag][1];
+    had_double_type Phi_nm1 = vecval[compute_index-1].phi[flag][1];
 
     rhs->phi[0][1] = (Pi_np1 - Pi_nm1)/(2.*dr) + par.eps*diss_Phi; // Phi rhs
 
@@ -313,11 +308,11 @@ void calcrhs(struct nodedata * rhs,
 
     } else if (bbox[1] == 1) {
 
-      had_double_type Phi_nm1 = vecval[compute_index-1]->value_.phi[flag][1];
-      had_double_type Phi_nm2 = vecval[compute_index-2]->value_.phi[flag][1];
+      had_double_type Phi_nm1 = vecval[compute_index-1].phi[flag][1];
+      had_double_type Phi_nm2 = vecval[compute_index-2].phi[flag][1];
 
-      had_double_type Pi_nm1 = vecval[compute_index-1]->value_.phi[flag][2];
-      had_double_type Pi_nm2 = vecval[compute_index-2]->value_.phi[flag][2];
+      had_double_type Pi_nm1 = vecval[compute_index-1].phi[flag][2];
+      had_double_type Pi_nm2 = vecval[compute_index-2].phi[flag][2];
 
       // we are at the right boundary 
       rhs->phi[0][0] = Pi;  // chi rhs
@@ -326,7 +321,6 @@ void calcrhs(struct nodedata * rhs,
       rhs->phi[0][3] = 0.0; // Energy rhs -- analysis variable
     }
   }
-#endif
 }
 
 had_double_type interp_quad(had_double_type y1,had_double_type y2,had_double_type y3,had_double_type y4,had_double_type y5,
