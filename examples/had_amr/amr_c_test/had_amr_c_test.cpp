@@ -174,9 +174,10 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
       for (i=0;i<num_eqns;i++) {
         work.phi[0][i] = vecval[j+compute_index].phi[0][i];
         work.phi[1][i] = 0.75*vecval[j+compute_index].phi[0][i]
-                        +0.25*vecval[j+compute_index].phi[1][i] + rhs.phi[0][i]*dt;
+                        +0.25*vecval[j+compute_index].phi[1][i] + 0.25*rhs.phi[0][i]*dt;
       }
       result->value_[j] = work;
+
     }
 
     // no timestep update-- this is just a part of an rk subcycle
@@ -313,11 +314,11 @@ void calcrhs(struct nodedata * rhs,
     }
     if (bbox[1] == 1 && compute_index == size-1) {
 
-      had_double_type Phi_nm1 = vecval[size-1].phi[flag][1];
-      had_double_type Phi_nm2 = vecval[size-2].phi[flag][1];
+      had_double_type Phi_nm1 = vecval[size-2].phi[flag][1];
+      had_double_type Phi_nm2 = vecval[size-3].phi[flag][1];
 
-      had_double_type Pi_nm1 = vecval[size-1].phi[flag][2];
-      had_double_type Pi_nm2 = vecval[size-2].phi[flag][2];
+      had_double_type Pi_nm1 = vecval[size-2].phi[flag][2];
+      had_double_type Pi_nm2 = vecval[size-3].phi[flag][2];
 
       // we are at the right boundary 
       rhs->phi[0][0] = Pi;  // chi rhs
