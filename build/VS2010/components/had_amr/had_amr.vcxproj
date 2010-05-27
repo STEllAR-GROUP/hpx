@@ -163,6 +163,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\examples\had_amr\amr\amr.cpp" />
+    <ClCompile Include="..\..\..\..\examples\had_amr\amr\parameter.cpp" />
     <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\amr_mesh.cpp" />
     <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\amr_mesh_left.cpp" />
     <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\amr_mesh_tapered.cpp" />

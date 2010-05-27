@@ -169,6 +169,7 @@ namespace hpx
         typedef boost::coroutines::static_coroutine<
                 thread_function_type, boost::function<thread_function_type> 
         > coroutine_type;
+//         typedef boost::coroutines::coroutine<thread_function_type> coroutine_type;
         typedef coroutine_type::thread_id_type thread_id_type;
         typedef coroutine_type::self thread_self;
 

@@ -152,7 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\boost\libs\signals\src\named_slot_map.cpp" />
+    <ClCompile Include="..\..\..\..\..\boost\libs\signals\src\named_slot_map.cpp" />
     <ClCompile Include="..\..\..\src\exception_list.cpp" />
     <ClCompile Include="..\..\..\src\runtime.cpp" />
     <ClCompile Include="..\..\..\src\runtime\naming\bulk_resolver_client.cpp" />

@@ -185,10 +185,10 @@ namespace boost { namespace coroutines { namespace detail {
       typename coroutine_impl<CoroutineType, ContextImpl>::self_type*
   > coroutine_impl<CoroutineType, ContextImpl>::self_;
 
-  // This type augment coroutine_impl type with the type of the stored 
+  // This type augments coroutine_impl type with the type of the stored 
   // functor. The type of this object is erased right after construction
   // when it is assigned to a pointer to coroutine_impl. A deleter is
-  // passed down to make it sure that the correct derived type is deleted.
+  // passed down to make sure that the correct derived type is deleted.
   template<typename FunctorType, typename CoroutineType, typename ContextImpl>
   class coroutine_impl_wrapper :
     public coroutine_impl<CoroutineType, ContextImpl> {

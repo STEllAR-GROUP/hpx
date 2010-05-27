@@ -85,7 +85,7 @@ namespace hpx { namespace threads
         util::block_profiler_wrapper<register_thread_tag> bp(thread_logger_);
 
         // verify state
-        if (!running_) 
+        if (thread_count_ == 0) 
         {
             // threadmanager is not currently running
             HPX_THROWS_IF(ec, invalid_status,
@@ -140,7 +140,7 @@ namespace hpx { namespace threads
         util::block_profiler_wrapper<register_work_tag> bp(work_logger_);
 
         // verify state
-        if (!running_) 
+        if (thread_count_ == 0) 
         {
             // threadmanager is not currently running
             HPX_THROWS_IF(ec, invalid_status,
@@ -516,6 +516,29 @@ namespace hpx { namespace threads
         threadmanager_type& tm_;
     };
 
+    struct manage_active_thread_count
+    {
+        manage_active_thread_count(boost::atomic<long>& counter)
+          : has_exited_(false), counter_(counter)
+        {
+            ++counter_;
+        }
+        ~manage_active_thread_count()
+        {
+            if (!has_exited_)
+                --counter_;
+        }
+
+        void exit()
+        {
+            has_exited_ = true;
+            --counter_;
+        }
+
+        bool has_exited_;
+        boost::atomic<long>& counter_;
+    };
+
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         tfunc(std::size_t num_thread)
@@ -646,9 +669,8 @@ namespace hpx { namespace threads
     std::size_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         tfunc_impl(std::size_t num_thread)
     {
-#if HPX_DEBUG != 0
-        ++thread_count_;
-#endif
+        manage_active_thread_count count(thread_count_);
+
         std::size_t num_px_threads = 0;
         util::time_logger tl1("tfunc", num_thread);
         util::time_logger tl2("tfunc2", num_thread);
@@ -756,18 +778,19 @@ namespace hpx { namespace threads
                 tl1.tock();
             }
 
-            // if we need to terminate, unregister the counter first
-            if (!running_)
-                queue_length_counter.uninstall();
-
             // if nothing else has to be done either wait or terminate
             if (scheduler_.wait_or_add_new(num_thread, running_, idle_loop_count))
+            {
+                // if we need to terminate, unregister the counter first
+                queue_length_counter.uninstall();
+                count.exit();
                 break;
+            }
         }
 
 #if HPX_DEBUG != 0
         // the last OS thread is allowed to exit only if no more PX threads exist
-        BOOST_ASSERT(0 != --thread_count_ || !scheduler_.get_thread_count(num_thread));
+        BOOST_ASSERT(!scheduler_.get_thread_count(num_thread));
 #endif
         return num_px_threads;
     }

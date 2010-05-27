@@ -532,9 +532,7 @@ namespace hpx { namespace threads
         /// this thread manager has exactly as much threads as requested
         mutable mutex_type mtx_;            ///< mutex protecting the members
         boost::ptr_vector<boost::thread> threads_;
-#if HPX_DEBUG != 0
         boost::atomic<long> thread_count_;
-#endif
 
         bool running_;                      ///< thread manager has been started
         util::io_service_pool& timer_pool_; ///< used for timed set_state

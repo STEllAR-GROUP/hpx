@@ -281,7 +281,7 @@
     <ClCompile Include="..\..\..\src\util\init_ini_data.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\boost\libs\signals\src\named_slot_map.cpp">
+    <ClCompile Include="..\..\..\..\..\boost\libs\signals\src\named_slot_map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
