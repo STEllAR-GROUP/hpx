@@ -32,6 +32,9 @@ bool parse_commandline(char const* name, int argc, char *argv[],
             ("hpx,x", po::value<std::string>(), 
                 "the IP address the HPX parcelport is listening on (default "
                 "is localhost:7910), expected format: 192.168.1.1:7913")
+            ("localities,l", po::value<int>(), 
+                "the number of localities to wait for at application startup"
+                "(default is 1)")
             ("threads,t", po::value<int>(), 
                 "the number of operating system threads to spawn for this"
                 "HPX locality")
@@ -114,6 +117,7 @@ int main(int argc, char* argv[])
         boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
         int num_threads = 1;
         hpx::runtime::mode mode = hpx::runtime::worker;
+        int num_localities = 1;
 
         // extract IP address/port arguments
         if (vm.count("agas")) 
@@ -131,6 +135,9 @@ int main(int argc, char* argv[])
             std::cerr << "hpx_runtime: config option ignored, used for console "
                          "instance only\n";
         }
+
+        if (vm.count("localities"))
+            num_localities = vm["localities"].as<int>();
 
         // do we need to execute the HPX runtime
         bool no_hpx_runtime = vm.count("no_hpx_runtime") != 0;
@@ -160,7 +167,7 @@ int main(int argc, char* argv[])
 
             // the main thread will wait (block) for the shutdown action and 
             // the threadmanager is serving incoming requests in the meantime
-            rt.run(num_threads);
+            rt.run(num_threads, num_localities);
         }
     }
     catch (hpx::exception const& e) {

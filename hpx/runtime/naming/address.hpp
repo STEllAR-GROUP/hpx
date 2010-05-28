@@ -36,8 +36,9 @@ namespace hpx { namespace naming
           : type_(components::component_invalid), address_(0)
         {}
 
-        address(locality const& l)
-          : locality_(l), type_(components::component_invalid), address_(0) 
+        address(locality const& l, 
+                component_type t = components::component_invalid)
+          : locality_(l), type_(t), address_(0) 
         {}
 
         address(locality const& l, component_type t, void* lva)

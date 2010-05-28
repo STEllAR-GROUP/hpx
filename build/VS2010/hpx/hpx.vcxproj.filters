@@ -20,9 +20,6 @@
     <Filter Include="Header Files\C">
       <UniqueIdentifier>{c02d579a-4989-40cb-a696-acd72dc0651e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Config">
-      <UniqueIdentifier>{2bd75355-9018-4bac-90d2-39acc245d14c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Include">
       <UniqueIdentifier>{f40fb570-f766-4b6b-a2f6-d7e81a714a83}</UniqueIdentifier>
     </Filter>
@@ -140,6 +137,9 @@
     </Filter>
     <Filter Include="Header Files\Runtime\Threads\Detail">
       <UniqueIdentifier>{5ad0b7af-2e50-473a-8e1f-4314cc4a2a87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Include\Config">
+      <UniqueIdentifier>{2bd75355-9018-4bac-90d2-39acc245d14c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -290,16 +290,16 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\config\defaults.hpp">
-      <Filter>Header Files\Config</Filter>
+      <Filter>Header Files\Include\Config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\config\export_definitions.hpp">
-      <Filter>Header Files\Config</Filter>
+      <Filter>Header Files\Include\Config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\config\warnings_prefix.hpp">
-      <Filter>Header Files\Config</Filter>
+      <Filter>Header Files\Include\Config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\config\warnings_suffix.hpp">
-      <Filter>Header Files\Config</Filter>
+      <Filter>Header Files\Include\Config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\c\types.h">
       <Filter>Header Files\C</Filter>

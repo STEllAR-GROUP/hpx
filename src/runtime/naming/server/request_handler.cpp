@@ -110,7 +110,9 @@ namespace hpx { namespace naming { namespace server
                 else {
                     // the zero as last parameter means 'all' lsb gids
                     registry_.insert(registry_type::value_type(id, 
-                        registry_data_type(address(req.get_site()), 1, 0)));
+                        registry_data_type(address(
+                            req.get_site(), components::component_runtime_support), 
+                        1, 0)));
                 }
 
                 // The real prefix has to be used as the 32 most 
@@ -384,7 +386,9 @@ namespace hpx { namespace naming { namespace server
                 }
                 else {
                     registry_.insert(typename registry_type::value_type(id, 
-                        registry_data_type(address(req.get_site()), 1, 0)));
+                        registry_data_type(address(
+                            req.get_site(), components::component_runtime_support), 
+                        1, 0)));
                 }
 
                 // generate the new id range

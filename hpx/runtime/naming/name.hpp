@@ -292,12 +292,19 @@ namespace hpx { namespace naming
             {}
 
             bool is_local_cached() const;
+            bool is_cached() const;
             bool is_local();
             bool resolve(naming::address& addr);
             bool is_resolved() const { return address_; }
             void get_local_address(naming::address& addr) const
             {
                 BOOST_ASSERT(is_local_cached());
+                addr = address_;
+            }
+
+            void get_address_cached(naming::address& addr) const
+            {
+                BOOST_ASSERT(is_cached());
                 addr = address_;
             }
 
@@ -475,6 +482,10 @@ namespace hpx { namespace naming
         void get_local_address(naming::address& addr) const
         {
             return gid_->get_local_address(addr);
+        }
+        void get_address_cached(naming::address& addr) const
+        {
+            return gid_->get_address_cached(addr);
         }
 
         bool resolve(address& addr)

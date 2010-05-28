@@ -88,6 +88,12 @@ namespace hpx { namespace naming
             return address_ ? address_.locality_ == appl.here() : false;
         }
 
+        bool id_type_impl::is_cached() const
+        {
+            gid_type::mutex_type::scoped_lock l(this);
+            return address_ ? true : false;
+        }
+
         bool id_type_impl::is_local()
         {
             bool valid = false;

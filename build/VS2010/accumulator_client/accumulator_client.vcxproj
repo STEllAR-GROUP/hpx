@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{1AB4D536-BFF4-46C4-AB3E-C5BDBE70A339}</ProjectGuid>
+    <ProjectGuid>{48D1EA21-DF22-416F-BE61-F6D246CE8930}</ProjectGuid>
     <RootNamespace>accumulator_client</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>

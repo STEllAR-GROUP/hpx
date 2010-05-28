@@ -166,6 +166,8 @@ namespace hpx { namespace applier
                 HPX_THROW_EXCEPTION(unknown_component_address, 
                     "applier::address_is_local", HPX_OSSTREAM_GETSTRING(strm));
             }
+
+            id.get_address_cached(addr);
             return false;   // non-local
         }
 

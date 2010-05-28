@@ -59,7 +59,7 @@ threads::thread_state_enum hpx_main()
             accu.print();
         }
         else if (cmd == "query") {
-            std::cout << prefix << "> " << accu.query() << std::endl;
+            std::cout << accu.get_gid() << "> " << accu.query() << std::endl;
         }
         else if (cmd == "help") {
             std::cout << "commands: init, add [amount], print, query, help, quit" 
@@ -100,6 +100,9 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("hpx,x", po::value<std::string>(), 
                 "the IP address the HPX parcelport is listening on (default "
                 "is localhost:7910), expected format: 192.168.1.1:7913")
+            ("localities,l", po::value<int>(), 
+                "the number of localities to wait for at application startup"
+                "(default is 1)")
             ("threads,t", po::value<int>(), 
                 "the number of operating system threads to spawn for this"
                 "HPX locality")
@@ -176,6 +179,7 @@ int main(int argc, char* argv[])
         boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
         int num_threads = 1;
         hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
+        int num_localities = 1;
 
         // extract IP address/port arguments
         if (vm.count("agas")) 
@@ -190,6 +194,9 @@ int main(int argc, char* argv[])
         if (vm.count("worker"))
             mode = hpx::runtime::worker;
 
+        if (vm.count("localities"))
+            num_localities = vm["localities"].as<int>();
+
         // initialize and run the AGAS service, if appropriate
         std::auto_ptr<agas_server_helper> agas_server;
         if (vm.count("run_agas_server"))  // run the AGAS server instance here
@@ -197,7 +204,7 @@ int main(int argc, char* argv[])
 
         // initialize and start the HPX runtime
         runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
-        rt.run(hpx_main, num_threads);
+        rt.run(hpx_main, num_threads, num_localities);
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";
