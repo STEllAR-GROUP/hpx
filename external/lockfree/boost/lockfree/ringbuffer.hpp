@@ -200,6 +200,7 @@ template <typename T, size_t max_size>
 class ringbuffer:
     public detail::ringbuffer_internal<T>
 {
+    typedef std::size_t size_t;
     boost::array<T, max_size> array_;
 
 public:
@@ -228,6 +229,7 @@ template <typename T>
 class ringbuffer<T, 0>:
     public detail::ringbuffer_internal<T>
 {
+    typedef std::size_t size_t;
     size_t max_size_;
     scoped_array<T> array_;
 

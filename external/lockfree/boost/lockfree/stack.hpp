@@ -89,7 +89,7 @@ public:
         for (;;)
         {
             tagged_ptr_t old_tos = tos.load(memory_order_relaxed);
-            tagged_ptr_t new_tos (newnode, old_tos.get_tag() + 1);
+            tagged_ptr_t new_tos (newnode, old_tos.get_tag());
             newnode->next.set_ptr(old_tos.get_ptr());
 
             if (tos.compare_exchange_strong(old_tos, new_tos))

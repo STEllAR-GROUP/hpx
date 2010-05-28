@@ -186,7 +186,7 @@ public:
             tagged_ptr old_pool = pool_.load(memory_order_consume);
 
             freelist_node * new_pool_ptr = reinterpret_cast<freelist_node*>(node);
-            tagged_ptr new_pool (new_pool_ptr, old_pool.get_tag() + 1);
+            tagged_ptr new_pool (new_pool_ptr, old_pool.get_tag());
 
             new_pool->next.set_ptr(old_pool.get_ptr());
 
