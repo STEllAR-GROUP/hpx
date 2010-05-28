@@ -158,7 +158,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     check_symbol_exists(pthread_setaffinity_np "pthread.h"
         HAVE_PTHREAD_SETAFFINITY_NP)
     if(HAVE_PTHREAD_SETAFFINITY_NP)
-        add_definition(-DHAVE_PTHREAD_SETAFFINITY_NP)
+        add_definitions(-DHAVE_PTHREAD_SETAFFINITY_NP)
     endif()
 endif()
 
