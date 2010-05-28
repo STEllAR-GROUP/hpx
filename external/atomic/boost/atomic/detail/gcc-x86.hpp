@@ -361,8 +361,14 @@ public:
     {
         fence_before(success_order);
         T prev=expected;
+#if !defined(__PIC__)
         __asm__ __volatile__("lock cmpxchg8b %3\n" :
             "=A" (prev) : "b" ((long)desired), "c" ((long)(desired>>32)), "m" (i), "0" (prev) : "memory");
+#else
+        // -fPIC requires register EBX to be available to the compiler
+        __asm__ __volatile__("push %%ebx; movl %1,%%ebx; lock cmpxchg8b %3; pop %%ebx\n" :
+            "=A" (prev) : "m" ((long)desired), "c" ((long)(desired>>32)), "m" (i), "0" (prev) : "memory");
+#endif
         bool success=(prev==expected);
         if (success) fence_after(success_order);
         else fence_after(failure_order);
