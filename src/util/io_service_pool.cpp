@@ -115,6 +115,7 @@ namespace hpx { namespace util
         // Wait for all threads in the pool to exit.
         for (std::size_t i = 0; /*!stopped_ && */i < threads_.size(); ++i)
             threads_[i]->join();
+        threads_.clear();
     }
 
     void io_service_pool::stop()
@@ -123,6 +124,7 @@ namespace hpx { namespace util
             // Explicitly inform all work to exit.
             for (std::size_t i = 0; i < work_.size(); ++i)
                 work_[i].reset();
+            work_.clear();
 
             // Explicitly stop all io_services.
             for (std::size_t i = 0; !stopped_ && i < io_services_.size(); ++i)
@@ -137,7 +139,6 @@ namespace hpx { namespace util
         if (stopped_) {
             next_io_service_ = 0;
             threads_.clear();
-            io_services_.clear();
             work_.clear();
         }
     }
