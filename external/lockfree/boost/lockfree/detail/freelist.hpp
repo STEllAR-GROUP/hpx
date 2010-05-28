@@ -37,7 +37,8 @@ class dummy_freelist:
 public:
     T * allocate (void)
     {
-        return Alloc::allocate(1);
+        // we need to initialize the memory once
+        return new(Alloc::allocate(1)) T();
     }
 
     void deallocate (T * n)
@@ -70,6 +71,7 @@ public:
         for (std::size_t i = 0; i != initial_nodes; ++i)
         {
             T * node = detail::dummy_freelist<T, Alloc>::allocate();
+            node->~T();
             deallocate(node);
         }
     }
@@ -149,7 +151,8 @@ public:
         chunks = Alloc::allocate(max_nodes);
         for (std::size_t i = 0; i != max_nodes; ++i)
         {
-            T * node = chunks + i;
+            T * node = new(chunks + i) T();   // we need to initialize the memory once
+            node->~T();
             deallocate(node);
         }
     }
