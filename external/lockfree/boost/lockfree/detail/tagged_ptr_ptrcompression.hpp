@@ -62,7 +62,8 @@ private:
 
 public:
     /** uninitialized constructor */
-    tagged_ptr(void)//: ptr(0), tag(0)
+    tagged_ptr(void): 
+        ptr(0)
     {}
 
     /** copy constructor */

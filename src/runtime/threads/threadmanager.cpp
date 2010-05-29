@@ -57,10 +57,8 @@ namespace hpx { namespace threads
 
         thread_logger_("threadmanager_impl::register_thread"),
         work_logger_("threadmanager_impl::register_work"),
-        set_state_logger_("threadmanager_impl::set_state")
-#if HPX_DEBUG != 0
-      , thread_count_(0)
-#endif
+        set_state_logger_("threadmanager_impl::set_state"),
+        thread_count_(0)
     {
         LTM_(debug) << "threadmanager_impl ctor";
     }

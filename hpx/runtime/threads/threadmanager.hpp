@@ -17,9 +17,7 @@
 
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/lockfree/fifo.hpp>
-#if HPX_DEBUG != 0
 #include <boost/atomic.hpp>
-#endif
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
