@@ -17,6 +17,14 @@ using namespace hpx;
 namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
+// Helper routines
+
+inline hpx::naming::gid_type find_here(void)
+{
+    return hpx::applier::get_applier().get_runtime_support_raw_gid();
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // int fib(int n)
 // {
 //     if (n < 2) 
@@ -48,7 +56,7 @@ HPX_REGISTER_ACTION(fibonacci2_action);
 ///////////////////////////////////////////////////////////////////////////////
 int count_invocations = 0;    // global invocation counter
 
-int fib (naming::gid_type that_prefix, int n, int delay_coeff)
+int fib (naming::gid_type there, int n, int delay_coeff)
 {
     // count number of invocations
     ++count_invocations;
@@ -71,11 +79,9 @@ int fib (naming::gid_type that_prefix, int n, int delay_coeff)
 
     // execute the first fib() at the other locality, returning here afterwards
     // execute the second fib() here, forwarding the correct prefix
-    naming::gid_type this_prefix = applier::get_applier().get_runtime_support_raw_gid();
-    fibonacci_future n1(that_prefix, this_prefix, n - 1, delay_coeff);
-    fibonacci_future n2(this_prefix, that_prefix, n - 2, delay_coeff);
-
-//     std::cout << "*";
+    naming::gid_type here = find_here();
+    fibonacci_future n1(there, here, n - 1, delay_coeff);
+    fibonacci_future n2(here, there, n - 2, delay_coeff);
 
     return n1.get() + n2.get();
 }
@@ -100,25 +106,25 @@ int hpx_main(po::variables_map &vm)
         rt.get_config().get_entry("application.fibonacci2.argument", argument));
 
     // get list of all known localities
-    std::vector<naming::gid_type> prefixes;
+    std::vector<naming::gid_type> locales;
     applier::applier& appl = applier::get_applier();
 
-    naming::gid_type this_prefix = appl.get_runtime_support_raw_gid();
-    naming::gid_type that_prefix;
+    naming::gid_type here = find_here();
+    naming::gid_type there;
 
-    if (appl.get_remote_prefixes(prefixes)) {
+    if (appl.get_remote_prefixes(locales)) {
         // execute the fib() function on any of the remote localities
-        that_prefix = prefixes[0];
+        there = locales[0];
     }
     else {
         // execute the fib() function locally
-        that_prefix = this_prefix;
+        there = here;
     }
 
     {
         util::high_resolution_timer t;
         lcos::eager_future<fibonacci2_action> n(
-            that_prefix, this_prefix, argument, delay_coeff);
+            there, here, argument, delay_coeff);
         result = n.get();
         elapsed = t.elapsed();
     }
