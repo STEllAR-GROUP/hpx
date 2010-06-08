@@ -111,24 +111,15 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
 
   BOOST_ASSERT(par.integrator == 1);
 
-  //for (i=0;i<num_eqns;i++) {
-  //  work.phi[0][i] = 0.1;
-  //  work.phi[1][i] = 0.1;
-  //}
-
-  //for (j=compute_index;j<compute_index + par.granularity;j++) {
-    //result->value_.push_back(vecval[j]);
-  //  result->value_.push_back(work);
-  //}
-  //result->timestep_ = timestep + 1.0;
   if ( iter == 0 ) {
     for (j=0;j<par.granularity;j++) {
-      calcrhs(&rhs,vecval,vecx,0,dx,size,boundary,bbox,j,par);
+      calcrhs(&rhs,vecval,vecx,0,dx,size,boundary,bbox,j+compute_index,par);
       for (i=0;i<num_eqns;i++) {
         work.phi[0][i] = vecval[j+compute_index].phi[0][i];
         work.phi[1][i] = vecval[j+compute_index].phi[0][i] + rhs.phi[0][i]*dt;
       }
       result->value_[j] = work;
+
     }
 
     // no timestep update-- this is just a part of an rk subcycle
@@ -152,6 +143,7 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
       } else if ( boundary && bbox[0] == 2 ) {
         // Phi
         result->value_[0].phi[1][1] = 0.5*vecval[compute_index+1].phi[1][1];
+
       } 
     } else {
       if ( boundary && bbox[0] == 1 ) {
@@ -170,21 +162,20 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
     result->timestep_ = timestep;
   } else if ( iter == 2 ) {
     for (j=0;j<par.granularity;j++) {
-      calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j,par);
+      calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
       for (i=0;i<num_eqns;i++) {
         work.phi[0][i] = vecval[j+compute_index].phi[0][i];
         work.phi[1][i] = 0.75*vecval[j+compute_index].phi[0][i]
                         +0.25*vecval[j+compute_index].phi[1][i] + 0.25*rhs.phi[0][i]*dt;
       }
       result->value_[j] = work;
-
     }
 
     // no timestep update-- this is just a part of an rk subcycle
     result->timestep_ = timestep;
   } else if ( iter == 4 ) {
     for (j=0;j<par.granularity;j++) {
-      calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j,par);
+      calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
       for (i=0;i<num_eqns;i++) {
         work.phi[0][i] = 1./3*vecval[j+compute_index].phi[0][i]
                         +2./3*(vecval[j+compute_index].phi[1][i] + rhs.phi[0][i]*dt);
@@ -196,7 +187,7 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
     result->timestep_ = timestep;
   } else if ( iter == 5 ) {
     for (j=0;j<par.granularity;j++) {
-      result->value_[j] = vecval[j];
+      result->value_[j] = vecval[j+compute_index];
     }
 
     // apply BC's nearat r=0
@@ -213,6 +204,7 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
       } else if ( boundary && bbox[0] == 2 ) {
         // Phi
         result->value_[0].phi[0][1] = 0.5*vecval[compute_index+1].phi[0][1];
+
       } 
     } else {
       if ( boundary && bbox[0] == 1 ) {
@@ -280,6 +272,7 @@ void calcrhs(struct nodedata * rhs,
 
 
   if ( compute_index + 1 < size && compute_index - 1 >= 0 ) { 
+
     had_double_type chi_np1 = vecval[compute_index+1].phi[flag][0];
     had_double_type chi_nm1 = vecval[compute_index-1].phi[flag][0];
 
@@ -300,6 +293,7 @@ void calcrhs(struct nodedata * rhs,
     rhs->phi[0][2] = 3.*( r2_Phi_np1 - r2_Phi_nm1 )/( pow(r+dr,3) - pow(r-dr,3) ) + pow(chi,par.PP) + par.eps*diss_Pi; // Pi rhs
 
     rhs->phi[0][3] = 0.; // Energy rhs
+
   }
 
   if (boundary ) {
