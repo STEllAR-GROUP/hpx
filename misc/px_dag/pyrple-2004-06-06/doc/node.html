@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd" >
+
+<html xmlns="http://www.w3.org/1999/xhtml" 
+   xml:lang="en" >
+<head>
+<title>pyrple.node</title>
+<link type="text/css" rel="stylesheet" href="style.css" />
+</head>
+<body>
+<h1>pyrple.node</h1>
+
+<h2>Node()</h2>
+
+<p>Nodes are the smallest atomic parts of an RDF system. They come in 
+four different flavours: <strong>URI</strong>, <strong>bNode</strong>, 
+<strong>Literal</strong>, and <strong>Var</strong>. Each of these are 
+implemented as sub classes of Node.</p>
+
+<p>Generally, it is best, though not harmful, to use the sub classes of 
+Node when using pyrple. Indeed, the Node class constructor will always 
+return one of its four sub classes upon instantiation, and <em>never</em> 
+a plain node.</p>
+
+<h3>Usage</h3>
+<p>The sub classes of Node()--i.e. URI, bNode, Literal, and Var--must 
+be passed a plain value. It is recommended to use them instead of Node 
+when possible. Node() itself is handy for when parsing N-Triples files: 
+the Node() constructor must be passed a valid N-Triples term. It also 
+takes universally quantified variable syntax handy for queries and 
+borrowed from Notation3.</p>
+
+<p>For example:</p>
+
+<pre>
+>>> from pyrple import URI
+>>> u = URI('http://www.w3.org/')
+>>> u # its representation
+&lt;http://www.w3.org/>
+>>> str(u) # its __str__ value (also in u.ntval)
+'http://www.w3.org/'
+>>> u.ntval, u.value # its important attributes...
+('http://www.w3.org/', 'http://www.w3.org/')
+>>> 
+</pre>
+
+<p>Therefore, to get the N-Triples representation of Node or any subClass 
+thereof, use its __repr__ method (or repr(), or '%r' % node). To get its 
+value, use str(node) or node.value.</p>
+
+<p>Note that it's a URI, a Node, and a unicode string:</p>
+
+<pre>
+>>> type(u)
+&lt;class 'pyrple.node.URI'>
+>>> isinstance(u, Node) # it's a URI and a Node
+True
+>>> isinstance(u, unicode) # it's also a unicode string
+True
+</pre>
+
+<p>For the URI example, u.ntval and u.value are equivalent. The reason 
+why both are required becomes apparent when using the Literal class:</p>
+
+<pre>
+>>> from pyrple import Literal
+>>> lit = Literal('first line\nsecond line')
+>>> str(lit)
+'first line\\nsecond line'
+>>> lit.ntval, lit.value
+('first line\\nsecond line', 'first line\nsecond line')
+>>> 
+</pre>
+
+<p>lit.ntval is the N-Triples escaped version of the Literal's content, 
+and lit.value is the raw value of its content. Unless you're printing to 
+N-Triples, you'll probably want to access its raw value.</p>
+
+<pre>
+>>> from pyrple import Node
+>>> n = Node('&lt;http://www.w3.org/>')
+>>> n
+&lt;http://www.w3.org/>
+>>> type(n)
+&lt;class 'pyrple.URI'>
+>>> isinstance(n, Node)
+True
+>>> 
+</pre>
+
+<p>A Node will always have lang, dtype, string, and value properties.</p>
+
+<pre>
+>>> n.lang, n.dtype, n.string, n.value
+(None, None, 'http://www.w3.org/', 'http://www.w3.org/')
+>>> 
+</pre>
+
+<p>Node must be passed a single N-Triples encoded term; its sub classes 
+take unencoded terms.</p>
+
+<pre>
+>>> from rdf import Node, URI
+>>> URI('http://www.w3.org/')
+&lt;http://www.w3.org/>
+>>> Node('&lt;http://www.w3.org/>') == URI('http://www.w3.org/')
+True
+>>> 
+</pre>
+
+<p>Here's an example of what each of the sub classes of Node produce:-</p>
+
+<h3>URI()</h3>
+<pre>
+>>> URI('http://www.w3.org/')
+&lt;http://www.w3.org/>
+</pre>
+
+<h3>bNode()</h3>
+<pre>
+>>> bNode('blargh')
+_:blargh
+</pre>
+
+<h3>Literal</h3>
+<pre>
+>>> Literal('blargh')
+"blargh"
+>>> 
+</pre>
+
+<h3>Var()</h3>
+<pre>
+>>> Var('blargh')
+?blargh
+</pre>
+
+<p>Note again that they produce literals which are valid N-Triples terms, 
+except for Var, which is an extension borrowed from N3 and RDQL for the 
+purposes of querying.</p>
+
+</body>
+</html>
