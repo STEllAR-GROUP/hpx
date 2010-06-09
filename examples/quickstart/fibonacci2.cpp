@@ -17,12 +17,38 @@ using namespace hpx;
 namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Helper routines
+// Helpers
 
-inline hpx::naming::gid_type find_here(void)
+typedef hpx::naming::gid_type gid_type;
+
+inline gid_type find_here(void)
 {
     return hpx::applier::get_applier().get_runtime_support_raw_gid();
 }
+
+struct px
+{
+public:
+  px() 
+  {
+    applier::get_applier().get_remote_prefixes(localities_);
+    num_localities_ = localities_.size();
+  }
+
+  gid_type locality(int locality_id)
+  {
+    return localities_[locality_id];
+  }
+
+  int num_localities(void)
+  {
+    return num_localities_;
+  }
+
+private:
+  std::vector<gid_type> localities_;
+  int num_localities_;
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // int fib(int n)
@@ -45,23 +71,22 @@ inline hpx::naming::gid_type find_here(void)
 // }
 
 ///////////////////////////////////////////////////////////////////////////////
-int fib(naming::gid_type prefix, int n, int delay_coeff);
+int fib(gid_type prefix, int n, int delay_coeff);
 
 typedef 
-    actions::plain_result_action3<int, naming::gid_type, int, int, fib> 
+    actions::plain_result_action3<int, gid_type, int, int, fib> 
 fibonacci2_action;
+
+typedef lcos::eager_future<fibonacci2_action> fibonacci_future;
 
 HPX_REGISTER_ACTION(fibonacci2_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 int count_invocations = 0;    // global invocation counter
+inline void count_invocation(void) { ++count_invocations; }
 
-int fib (naming::gid_type there, int n, int delay_coeff)
+inline void do_busy_work(double delay_coeff)
 {
-    // count number of invocations
-    ++count_invocations;
-
-    // do some busy waiting, if requested
     if (delay_coeff) {
         util::high_resolution_timer t;
         double start_time = t.elapsed();
@@ -70,16 +95,23 @@ int fib (naming::gid_type there, int n, int delay_coeff)
             current = t.elapsed();
         } while (current - start_time < delay_coeff * 1e-6);
     }
+}
+
+int fib (gid_type there, int n, int delay_coeff)
+{
+    // count number of invocations
+    count_invocation();
+
+    // do some busy waiting, if requested
+    do_busy_work(delay_coeff);
 
     // here is the actual fibonacci calculation
     if (n < 2) 
         return n;
 
-    typedef lcos::eager_future<fibonacci2_action> fibonacci_future;
-
     // execute the first fib() at the other locality, returning here afterwards
     // execute the second fib() here, forwarding the correct prefix
-    naming::gid_type here = find_here();
+    gid_type here = find_here();
     fibonacci_future n1(there, here, n - 1, delay_coeff);
     fibonacci_future n2(here, there, n - 2, delay_coeff);
 
@@ -105,26 +137,14 @@ int hpx_main(po::variables_map &vm)
     argument = boost::lexical_cast<int>(
         rt.get_config().get_entry("application.fibonacci2.argument", argument));
 
-    // get list of all known localities
-    std::vector<naming::gid_type> locales;
-    applier::applier& appl = applier::get_applier();
+    px world;
 
-    naming::gid_type here = find_here();
-    naming::gid_type there;
-
-    if (appl.get_remote_prefixes(locales)) {
-        // execute the fib() function on any of the remote localities
-        there = locales[0];
-    }
-    else {
-        // execute the fib() function locally
-        there = here;
-    }
+    gid_type here = world.locality(0);
+    gid_type there = world.locality(1 % world.num_localities());
 
     {
         util::high_resolution_timer t;
-        lcos::eager_future<fibonacci2_action> n(
-            there, here, argument, delay_coeff);
+        fibonacci_future n(there, here, argument, delay_coeff);
         result = n.get();
         elapsed = t.elapsed();
     }
