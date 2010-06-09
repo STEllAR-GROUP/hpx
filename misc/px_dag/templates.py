@@ -111,13 +111,40 @@ class ThreadThread(Template):
   def as_rdf(self):
     action = RUN.action(self.__action_name)
     action_name = Literal(self.__action_name)
-    thread = RUN.thread(self.__gid)
+    thread = RUN.px_thread(self.__gid)
 
     triples = [Triple(action, RDF.type(), HPX.Action()),
                Triple(action, HPX.name(), action_name),
                Triple(thread, RDF.type(), PX.Thread()),
                Triple(thread, HPX.action(), action)]
 
+    G = Graph(triples=triples)
+    return G
+
+class NumHpxThreads(Template):
+  def __init__(self):
+    self.__id = None
+    self.__num_hpx_threads = None
+
+    regex = 'tfunc\(([^\)]+)\): end, executed (\d+) HPX threads'
+    self.re = re.compile(regex)
+  
+  def fill(self, event, groups):
+    self.__id = groups[0]
+    self.__num_hpx_threads = int(groups[1])
+
+  def in_english(self):
+    str = "HPX instance '%s' instantiated %d threads." % (self.__id, self.__num_hpx_threads)
+    return str
+
+  def as_rdf(self):
+    hpx_thread = RUN.hpx_thread(self.__id)
+    id = Literal(self.__id)
+    num_hpx_threads = Literal(str(self.__num_hpx_threads))
+
+    triples = [Triple(hpx_thread, HPX.name(), id),
+               Triple(hpx_thread, HPX.numHpxThreads(), num_hpx_threads)]
+  
     G = Graph(triples=triples)
     return G
 

@@ -31,10 +31,12 @@ class HPX(NS):
 
   def Action(self): return self.node('Action')
   def Component(self): return self.node('Component')
+  def Thread(self): return self.node('Thread')
 
   def action(self): return self.node('action')
   def componentId(self): return self.node('componentId')
   def name(self): return self.node('name')
+  def numHpxThreads(self): return self.node('numHpxThreads')
   def numOsThreads(self): return self.node('numOsThreads')
 
 class PX(NS):
@@ -48,5 +50,6 @@ class RUN(NS):
 
   def action(self, path): return self.item('action/', path)
   def component(self, path): return self.item('component/', path)
-  def thread(self, path): return self.item('thread/', path)
+  def hpx_thread(self, path): return self.item('hpx/thread/', path)
+  def px_thread(self, path): return self.item('px/thread/', path)
 
