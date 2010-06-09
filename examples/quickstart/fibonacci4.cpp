@@ -17,12 +17,38 @@ using namespace hpx;
 namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Helper routines
+// Helpers
 
-inline hpx::naming::gid_type find_here(void)
+typedef hpx::naming::gid_type gid_type;
+
+inline gid_type find_here(void)
 {
     return hpx::applier::get_applier().get_runtime_support_raw_gid();
 }
+
+struct px
+{
+public:
+  px() 
+  {
+    applier::get_applier().get_remote_prefixes(localities_);
+    num_localities_ = localities_.size();
+  }
+
+  gid_type locality(int locality_id)
+  {
+    return localities_[locality_id];
+  }
+
+  int num_localities(void)
+  {
+    return num_localities_;
+  }
+
+private:
+  std::vector<gid_type> localities_;
+  int num_localities_;
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // int fib(int n)
@@ -45,28 +71,30 @@ inline hpx::naming::gid_type find_here(void)
 // }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-typedef
-    std::vector<naming::gid_type>::const_iterator
-c_iter;
-
-int fib (c_iter locales, c_iter end, int arg, int n , int nmax, bool rhs, int delay_coeff);
+int fib(int n, int orig_arg, int delay_coeff);
+int fib_rhs(int n, int delay_coeff);
 
 typedef 
-    actions::plain_result_action7<int, c_iter, c_iter, int, int, int, bool, int, fib> 
-fibonacci3_action;
+    actions::plain_result_action3<int, int, int, int, fib> 
+fibonacci2_action;
 
-HPX_REGISTER_ACTION(fibonacci3_action);
+typedef 
+    actions::plain_result_action2<int, int, int, fib_rhs> 
+fibonacci2_rhs_action;
+
+
+typedef lcos::eager_future<fibonacci2_action> fibonacci_future;
+typedef lcos::eager_future<fibonacci2_rhs_action> fibonacci_rhs_future;
+
+HPX_REGISTER_ACTION(fibonacci2_action);
+HPX_REGISTER_ACTION(fibonacci2_rhs_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 int count_invocations = 0;    // global invocation counter
+inline void count_invocation(void) { ++count_invocations; }
 
-int fib (c_iter locales, c_iter end, int arg, int n , int nmax, bool rhs, int delay_coeff)
+inline void do_busy_work(double delay_coeff)
 {
-    // count number of invocations
-    ++count_invocations;
-
-    // do some busy waiting, if requested
     if (delay_coeff) {
         util::high_resolution_timer t;
         double start_time = t.elapsed();
@@ -75,35 +103,66 @@ int fib (c_iter locales, c_iter end, int arg, int n , int nmax, bool rhs, int de
             current = t.elapsed();
         } while (current - start_time < delay_coeff * 1e-6);
     }
+}
 
 
+int fib (int n, int orig_arg, int delay_coeff)
+{
+    // count number of invocations
+    count_invocation();
+
+    // do some busy waiting, if requested
+    do_busy_work(delay_coeff);
 
     // here is the actual fibonacci calculation
-    if (arg < 2) 
-        return arg;
+    if (n < 2) 
+        return n;
 
-    typedef lcos::eager_future<fibonacci3_action> fibonacci_future;
+    px world;
 
-    // execute the first fib() at the other locality, returning here afterwards
-    // execute the second fib() here, forwarding the correct prefix
-    naming::gid_type here = find_here();
+    gid_type here = find_here();
 
-    if ((locales == end)&&(!rhs))
-        locales--;
-    
-    if (rhs) {
-        fibonacci_future n1(here, locales, end, arg - 1, 0, 0, true, delay_coeff);
-        fibonacci_future n2(here, locales, end, arg - 2, 0, 0, true, delay_coeff);
+    std::vector<int> distribution;
+
+    int index;
+    for (index = 0; index < world.num_localities(); index++)
+        if (world.locality(index) == here)
+            break;
+
+    int num_to_spawn = orig_arg / world.num_localities();
+    int extra = orig_arg % world.num_localities();
+    for (int j = 0; j < world.num_localities(); j++)
+    {
+        for (int i = 0; i < num_to_spawn; i++)
+            distribution.push_back(j);
+        if (extra > 0) {
+                distribution.push_back(j);
+                extra--;
+            }
     }
-    else if (n > 0){
-        fibonacci_future n1(here, locales, end, arg - 1, n-1, nmax, false, delay_coeff);
-        fibonacci_future n2(here, locales, end, arg - 2, 0, 0, true, delay_coeff);
-    }
-    else if (n == 0) {
-        ++locales;
-        fibonacci_future n1((*locales), locales, end, arg - 1, nmax, nmax, false, delay_coeff);
-        fibonacci_future n2(here, locales, end, arg - 2, 0, 0, true, delay_coeff);
-    }
+
+    fibonacci_future n1(world.locality(distribution[index+1]),  n - 1, orig_arg, delay_coeff);
+    fibonacci_rhs_future n2(here,  n - 2, delay_coeff);
+
+    return n1.get() + n2.get();
+}
+
+int fib_rhs (int n, int delay_coeff)
+{
+    // count number of invocations
+    count_invocation();
+
+    // do some busy waiting, if requested
+    do_busy_work(delay_coeff);
+
+    // here is the actual fibonacci calculation
+    if (n < 2) 
+        return n;
+
+    gid_type here = find_here();
+
+    fibonacci_rhs_future n1(here,  n - 1, delay_coeff);
+    fibonacci_rhs_future n2(here,  n - 2, delay_coeff);
 
     return n1.get() + n2.get();
 }
@@ -116,6 +175,7 @@ int hpx_main(po::variables_map &vm)
     int result = 0;
     double elapsed = 0.0;
 
+
     // Process application-specific command-line options
     if (vm.count("value"))
         argument = vm["value"].as<int>();
@@ -125,42 +185,18 @@ int hpx_main(po::variables_map &vm)
     // try to get arguments from application configuration
     runtime& rt = get_runtime();
     argument = boost::lexical_cast<int>(
-        rt.get_config().get_entry("application.fibonacci3.argument", argument));
+        rt.get_config().get_entry("application.fibonacci2.argument", argument));
 
-    // get list of all known localities
-    std::vector<naming::gid_type> locales;
-    applier::applier& appl = applier::get_applier();
+    px world;
 
-    naming::gid_type here = find_here();
-
-    int n = 0;
-    int maxn = 0;
-    bool rhs = false;
-
-    if (appl.get_remote_prefixes(locales)) {
-        // execute the fib() function on any of the remote localities
-        locales.push_back(here);
-        n = argument/locales.size();
-        maxn = n;
-        if (argument % locales.size() > 0)
-            n++;
-    }
-    else {
-        // execute the fib() function locally
-        locales.push_back(here);
-        rhs = true;
-    }
+    gid_type here = world.locality(0);
 
     {
-      util::high_resolution_timer t;
-
-      lcos::eager_future<fibonacci3_action> n(
-  	     *(locales.begin()), locales.begin(), locales.end(), argument, n, nmax, rhs, delay_coeff);
-
-      result = n.get();
-      elapsed = t.elapsed();
+        util::high_resolution_timer t;
+        fibonacci_future n(here, argument, argument, delay_coeff);
+        result = n.get();
+        elapsed = t.elapsed();
     }
-    
 
     if (vm.count("csv"))
     {
@@ -185,8 +221,9 @@ int hpx_main(po::variables_map &vm)
 ///////////////////////////////////////////////////////////////////////////////
 bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
 {
+
     try {
-        po::options_description desc_cmdline ("Usage: fibonacci3 [options]");
+        po::options_description desc_cmdline ("Usage: fibonacci2 [options]");
         desc_cmdline.add_options()
             ("help,h", "print out program usage (this message)")
             ("run_agas_server,r", "run AGAS server as part of this runtime instance")
@@ -227,7 +264,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
         }
     }
     catch (std::exception const& e) {
-        std::cerr << "fibonacci3: exception caught: " << e.what() << std::endl;
+        std::cerr << "fibonacci2: exception caught: " << e.what() << std::endl;
         return false;
     }
     return true;
@@ -248,7 +285,7 @@ split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
         }
     }
     catch (boost::bad_lexical_cast const& /*e*/) {
-        std::cerr << "fibonacci3: illegal port number given: " << v.substr(p+1) << std::endl;
+        std::cerr << "fibonacci2: illegal port number given: " << v.substr(p+1) << std::endl;
         std::cerr << "           using default value instead: " << port << std::endl;
     }
 }
@@ -281,6 +318,7 @@ typedef hpx::threads::policies::local_queue_scheduler local_queue_policy;
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
+
     try {
         // analyze the command line
         po::variables_map vm;
@@ -314,7 +352,7 @@ int main(int argc, char* argv[])
         if (vm.count("worker")) {
             mode = hpx::runtime::worker;
             if (vm.count("config")) {
-                std::cerr << "fibonacci3: --config option ignored, used for console "
+                std::cerr << "fibonacci2: --config option ignored, used for console "
                              "instance only\n";
             }
         }
@@ -372,11 +410,11 @@ int main(int argc, char* argv[])
             BOOST_ASSERT(false);
     }
     catch (std::exception& e) {
-        std::cerr << "fibonacci3: std::exception caught: " << e.what() << "\n";
+        std::cerr << "fibonacci2: std::exception caught: " << e.what() << "\n";
         return -1;
     }
     catch (...) {
-        std::cerr << "fibonacci3: unexpected exception caught\n";
+        std::cerr << "fibonacci2: unexpected exception caught\n";
         return -2;
     }
     return 0;
