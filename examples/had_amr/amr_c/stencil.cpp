@@ -155,10 +155,10 @@ namespace hpx { namespace components { namespace amr
             }
 
             // refine only after rk subcycles are finished (we don't refine in the midst of rk subcycles)
-            //if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&*vecval.begin(),vecval.size(),&resultval->value_,resultval->level_,resultval->x_,compute_index,boundary,bbox,*par.p);
-            //else resultval->refine_ = false;
+            if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&*vecval.begin(),vecval.size(),resultval.get_ptr(),compute_index,boundary,bbox,*par.p);
+            else resultval->refine_ = false;
 
-            //std::size_t allowedl = par->allowedl;
+            std::size_t allowedl = par->allowedl;
 
             // eliminate unrefinable cases
             //if ( par->stencilsize == 3 && par->integrator == 1 ) {
@@ -166,21 +166,20 @@ namespace hpx { namespace components { namespace amr
             //  if ( gids.size() != vecval.size() && gids.size() - vecval.size() != 9 ) resultval->refine_ = false; 
             //}
 
-            //if ( resultval->refine_ && resultval->level_ < allowedl 
-            //     && val[0]->timestep_ >= 1.e-6  ) {
-            //  finer_mesh_tapered(result, gids,vecval.size(), row, column, par);
-            //} else {
-            //  resultval->overwrite_alloc_ = 0;
-            //} 
+            if ( resultval->refine_ && resultval->level_ < allowedl 
+                 && val[0]->timestep_ >= 1.e-6  ) {
+              finer_mesh_tapered(result, gids,vecval.size(), row, column, par);
+            } else {
+              resultval->overwrite_alloc_ = 0;
+            } 
 
             // One special case: refining at time = 0
-            //if ( resultval->refine_ && 
-            //     val[0]->timestep_ < 1.e-6 && resultval->level_ < allowedl ) {
-            //  finer_mesh_initial(result, gids, resultval->level_+1, resultval->x_, row, column, par);
-            //}
+            if ( resultval->refine_ && 
+                 val[0]->timestep_ < 1.e-6 && resultval->level_ < allowedl ) {
+              finer_mesh_initial(result, gids, resultval->level_+1,row, column, par);
+            }
 
-           // if (par->loglevel > 1 && fmod(resultval->timestep_,par->output) < 1.e-6) 
-            if (par->loglevel > 1 ) 
+            if (par->loglevel > 1 && fmod(resultval->timestep_,par->output) < 1.e-6) 
                 stubs::logging::logentry(log_, resultval.get(), row,0, par);
         }
         else {
@@ -465,7 +464,7 @@ namespace hpx { namespace components { namespace amr
     // Implement a finer mesh via interpolation of inter-mesh points
     // Compute the result value for the current time step
     int stencil::finer_mesh_initial(naming::id_type const& result, 
-        std::vector<naming::id_type> const& gids, std::size_t level, had_double_type x, 
+        std::vector<naming::id_type> const& gids, std::size_t level, 
         int row, int column, Parameter const& par) 
     {
 #if 0

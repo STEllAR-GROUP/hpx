@@ -397,7 +397,7 @@ int interpolation(had_double_type dst_x,struct nodedata *dst,
   return 1;
 }
 
-bool refinement(stencil_data ** vecval, int size, struct nodedata *dst,int level,had_double_type r,int compute_index,bool boundary, int *bbox,Par const& par)
+bool refinement(nodedata * vecval,int size, stencil_data* result,int compute_index,bool boundary, int *bbox,Par const& par)
 {
 #if 0
   had_double_type grad1,grad2,grad3,grad4;

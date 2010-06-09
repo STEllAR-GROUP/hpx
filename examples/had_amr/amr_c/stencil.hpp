@@ -57,7 +57,7 @@ namespace hpx { namespace components { namespace amr
         
         // this function creates a finer mesh from the initial data
         int finer_mesh_initial(naming::id_type const& result, 
-            std::vector<naming::id_type> const& gids, std::size_t level, had_double_type x,
+            std::vector<naming::id_type> const& gids, std::size_t level,
             int row, int column, Parameter const& par);
 
         /// The alloc function is supposed to create a new memory block instance 
