@@ -76,18 +76,18 @@ int fib_rhs(int n, int delay_coeff);
 
 typedef 
     actions::plain_result_action3<int, int, int, int, fib> 
-fibonacci2_action;
+fibonacci4_action;
 
 typedef 
     actions::plain_result_action2<int, int, int, fib_rhs> 
-fibonacci2_rhs_action;
+fibonacci4_rhs_action;
 
 
-typedef lcos::eager_future<fibonacci2_action> fibonacci_future;
-typedef lcos::eager_future<fibonacci2_rhs_action> fibonacci_rhs_future;
+typedef lcos::eager_future<fibonacci4_action> fibonacci_future;
+typedef lcos::eager_future<fibonacci4_rhs_action> fibonacci_rhs_future;
 
-HPX_REGISTER_ACTION(fibonacci2_action);
-HPX_REGISTER_ACTION(fibonacci2_rhs_action);
+HPX_REGISTER_ACTION(fibonacci4_action);
+HPX_REGISTER_ACTION(fibonacci4_rhs_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 int count_invocations = 0;    // global invocation counter
@@ -185,7 +185,7 @@ int hpx_main(po::variables_map &vm)
     // try to get arguments from application configuration
     runtime& rt = get_runtime();
     argument = boost::lexical_cast<int>(
-        rt.get_config().get_entry("application.fibonacci2.argument", argument));
+        rt.get_config().get_entry("application.fibonacci4.argument", argument));
 
     px world;
 
@@ -223,7 +223,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
 {
 
     try {
-        po::options_description desc_cmdline ("Usage: fibonacci2 [options]");
+        po::options_description desc_cmdline ("Usage: fibonacci4 [options]");
         desc_cmdline.add_options()
             ("help,h", "print out program usage (this message)")
             ("run_agas_server,r", "run AGAS server as part of this runtime instance")
@@ -264,7 +264,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
         }
     }
     catch (std::exception const& e) {
-        std::cerr << "fibonacci2: exception caught: " << e.what() << std::endl;
+        std::cerr << "fibonacci4: exception caught: " << e.what() << std::endl;
         return false;
     }
     return true;
@@ -285,7 +285,7 @@ split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
         }
     }
     catch (boost::bad_lexical_cast const& /*e*/) {
-        std::cerr << "fibonacci2: illegal port number given: " << v.substr(p+1) << std::endl;
+        std::cerr << "fibonacci4: illegal port number given: " << v.substr(p+1) << std::endl;
         std::cerr << "           using default value instead: " << port << std::endl;
     }
 }
@@ -352,7 +352,7 @@ int main(int argc, char* argv[])
         if (vm.count("worker")) {
             mode = hpx::runtime::worker;
             if (vm.count("config")) {
-                std::cerr << "fibonacci2: --config option ignored, used for console "
+                std::cerr << "fibonacci4: --config option ignored, used for console "
                              "instance only\n";
             }
         }
@@ -410,11 +410,11 @@ int main(int argc, char* argv[])
             BOOST_ASSERT(false);
     }
     catch (std::exception& e) {
-        std::cerr << "fibonacci2: std::exception caught: " << e.what() << "\n";
+        std::cerr << "fibonacci4: std::exception caught: " << e.what() << "\n";
         return -1;
     }
     catch (...) {
-        std::cerr << "fibonacci2: unexpected exception caught\n";
+        std::cerr << "fibonacci4: unexpected exception caught\n";
         return -2;
     }
     return 0;
