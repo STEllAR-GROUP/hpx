@@ -31,7 +31,6 @@ struct px
 public:
   px() 
   {
-    //applier::get_applier().get_remote_prefixes(localities_);
     applier::get_applier().get_agas_client().get_prefixes(localities_);
     num_localities_ = localities_.size();
   }
@@ -125,14 +124,12 @@ int fib (int n, int orig_arg, int delay_coeff)
 
     std::vector<int> distribution;
 
-    int index;
-    for (index = 0; index < world.num_localities(); index++)
-        if (world.locality(index) == here)
-            break;
+    int num_localities = world.num_localities();
+    
 
-    int num_to_spawn = orig_arg / world.num_localities();
-    int extra = orig_arg % world.num_localities();
-    for (int j = 0; j < world.num_localities(); j++)
+    int num_to_spawn = orig_arg / num_localities;
+    int extra = orig_arg % num_localities;
+    for (int j = 0; j < num_localities; j++)
     {
         for (int i = 0; i < num_to_spawn; i++)
             distribution.push_back(j);
@@ -142,7 +139,7 @@ int fib (int n, int orig_arg, int delay_coeff)
             }
     }
 
-    fibonacci_future n1(world.locality(distribution[index+1]),  n - 1, orig_arg, delay_coeff);
+    fibonacci_future n1(world.locality(distribution[(orig_arg-n)+1]),  n - 1, orig_arg, delay_coeff);
     fibonacci_rhs_future n2(here,  n - 2, delay_coeff);
 
     return n1.get() + n2.get();

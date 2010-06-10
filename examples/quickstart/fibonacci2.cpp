@@ -31,7 +31,7 @@ struct px
 public:
   px() 
   {
-    applier::get_applier().get_remote_prefixes(localities_);
+    applier::get_applier().get_agas_client().get_prefixes(localities_);
     num_localities_ = localities_.size();
   }
 
