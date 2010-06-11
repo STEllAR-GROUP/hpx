@@ -6,7 +6,6 @@
 #include <iostream>
 
 #include <hpx/hpx.hpp>
-#include <hpx/util/logging.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 
 #include <boost/program_options.hpp>
@@ -97,8 +96,6 @@ inline void do_busy_work(double delay_coeff)
 
 int fib (gid_type there, int n, int delay_coeff)
 {
-    LRT_(info) << "fib(" << n << ")";
-
     // do some busy waiting, if requested
     do_busy_work(delay_coeff);
 
@@ -145,6 +142,9 @@ int hpx_main(po::variables_map &vm)
         result = n.get();
         elapsed = t.elapsed();
     }
+
+    LAPP_(info) << "Elapsed time: " << elapsed;
+    LAPP_(info) << "Result: " << result;
 
     if (vm.count("csv"))
     {
