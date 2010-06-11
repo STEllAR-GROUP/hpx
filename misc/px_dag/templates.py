@@ -135,7 +135,7 @@ class NumHpxThreads(Template):
     self.__num_hpx_threads = int(groups[1])
 
   def in_english(self):
-    str = "HPX instance '%s' instantiated %d threads." % (self.__id, self.__num_hpx_threads)
+    str = "Thread '%s' on HPX instance '%s' instantiated %d threads." % (self.__id, self.__locality, self.__num_hpx_threads)
     return str
 
   def as_rdf(self):
