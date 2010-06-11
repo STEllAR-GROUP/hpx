@@ -140,10 +140,16 @@ class NumHpxThreads(Template):
 
   def as_rdf(self):
     hpx_thread = RUN.hpx_thread(self.__locality+'/'+ self.__id)
+    run_locality = RUN.locality(self.__locality)
+
     id = Literal(self.__id)
     num_hpx_threads = Literal(str(self.__num_hpx_threads))
+    locality = Literal(self.__locality)
 
-    triples = [Triple(hpx_thread, HPX.name(), id),
+    triples = [Triple(run_locality, RDF.type(), PX.Locality()),
+               Triple(run_locality, HPX.name(), locality),
+               Triple(hpx_thread, PX.locality(), run_locality),
+               Triple(hpx_thread, HPX.name(), id),
                Triple(hpx_thread, HPX.numHpxThreads(), num_hpx_threads)]
   
     G = Graph(triples=triples)

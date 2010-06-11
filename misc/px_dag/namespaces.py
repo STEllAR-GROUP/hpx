@@ -42,7 +42,10 @@ class HPX(NS):
 class PX(NS):
   URI = "http://px.cct.lsu.edu/2010/05/px/"
 
+  def Locality(self): return self.node('Locality')
   def Thread(self): return self.node('Thread')
+
+  def locality(self): return self.node('locality')
 
 class RUN(NS):
   def __init__(self, uri):
@@ -51,5 +54,6 @@ class RUN(NS):
   def action(self, path): return self.item('action/', path)
   def component(self, path): return self.item('component/', path)
   def hpx_thread(self, path): return self.item('hpx/thread/', path)
+  def locality(self, path): return self.item('locality/', path)
   def px_thread(self, path): return self.item('px/thread/', path)
 
