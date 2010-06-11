@@ -89,6 +89,7 @@ namespace hpx { namespace util
     #define LERR_(lvl)  LHPX_(lvl, " [ERR] ")   /* exceptions */
     #define LPT_(lvl)   LHPX_(lvl, "  [PT] ")   /* parcel transport */
     #define LAUX_(lvl)  LHPX_(lvl, " [AUX] ")   /* auxiliary */
+    #define LLCO_(lvl)  LHPX_(lvl, " [LCO] ")   /* lcos */
 
     ///////////////////////////////////////////////////////////////////////////
     // errors are logged in a special manner (always to cerr and additionally,

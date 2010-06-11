@@ -310,11 +310,11 @@ namespace hpx { namespace lcos { namespace detail
         log_on_exit(boost::shared_ptr<T> const& impl)
           : impl_(impl)
         {
-            LAPP_(info) << "future_value::get(" << impl_->get_gid() << ")";
+            LLCO_(info) << "future_value::get(" << impl_->get_gid() << ")";
         }
         ~log_on_exit()
         {
-            LAPP_(info) << "future_value::got(" << impl_->get_gid() << ")";
+            LLCO_(info) << "future_value::got(" << impl_->get_gid() << ")";
         }
         boost::shared_ptr<T> const& impl_;
     };
@@ -385,7 +385,7 @@ namespace hpx { namespace lcos
         future_value()
           : impl_(new wrapping_type(new wrapped_type()))
         {
-            LAPP_(info) << "future_value::future_value(" << impl_->get_gid() << ")";
+            LLCO_(info) << "future_value::future_value(" << impl_->get_gid() << ")";
         }
 
         /// \brief Return the global id of this \a future instance
@@ -465,7 +465,7 @@ namespace hpx { namespace lcos
         future_value()
           : impl_(new wrapping_type(new wrapped_type()))
         {
-            LAPP_(info) << "future_value<void>::future_value(" << impl_->get_gid() << ")";
+            LLCO_(info) << "future_value<void>::future_value(" << impl_->get_gid() << ")";
         }
 
         /// \brief Return the global id of this \a future instance
