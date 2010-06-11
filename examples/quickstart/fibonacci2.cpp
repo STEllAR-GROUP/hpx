@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include <hpx/hpx.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 
 #include <boost/program_options.hpp>
@@ -82,9 +83,6 @@ typedef lcos::eager_future<fibonacci2_action> fibonacci_future;
 HPX_REGISTER_ACTION(fibonacci2_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-int count_invocations = 0;    // global invocation counter
-inline void count_invocation(void) { ++count_invocations; }
-
 inline void do_busy_work(double delay_coeff)
 {
     if (delay_coeff) {
@@ -99,8 +97,7 @@ inline void do_busy_work(double delay_coeff)
 
 int fib (gid_type there, int n, int delay_coeff)
 {
-    // count number of invocations
-    count_invocation();
+    LRT_(info) << "fib(" << n << ")";
 
     // do some busy waiting, if requested
     do_busy_work(delay_coeff);
@@ -153,14 +150,11 @@ int hpx_main(po::variables_map &vm)
     {
       // write results as csv
       std::cout << argument << "," 
-        << elapsed << "," << result << "," << count_invocations 
-        << "," << elapsed/count_invocations << std::endl;
+        << elapsed << "," << result << "," << std::endl;
     }
     else {
       // write results the old fashioned way
       std::cout << "elapsed: " << elapsed << ", result: " << result << std::endl;
-      std::cout << "Number of invocations of fib(): " << count_invocations 
-                                                         << std::endl;
     }
 
     // initiate shutdown of the runtime systems on all localities
