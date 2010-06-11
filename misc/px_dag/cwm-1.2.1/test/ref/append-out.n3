@@ -1,0 +1,31 @@
+     @prefix : <#> .
+     @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+    
+      ( "only"  )
+         :append  (
+        () 
+        "only"  ) .
+      ( 1 
+        2  )
+         :append  (
+         (
+            1  )
+        2  ) .
+      ( 2  )
+         :append  (
+        () 
+        2  ) .
+    
+    :A0     :RESULT  (
+        "only"  ) .
+    
+    :A1     :RESULT  (
+        1 
+        2  ) .
+    
+    :B0     :append  (
+        () 
+        "onlyB"  );
+         rdf:first "onlyB";
+         rdf:rest () .
+    

@@ -1,0 +1,165 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module cwm</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>cwm</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/syosi/cvs-trunk/WWW/2000/10/swap/cwm.py">/home/syosi/cvs-trunk/WWW/2000/10/swap/cwm.py</a></font></td></tr></table>
+    <p><tt>$Id:&nbsp;cwm.py,v&nbsp;1.197&nbsp;2007/12/13&nbsp;15:38:39&nbsp;syosi&nbsp;Exp&nbsp;$<br>
+&nbsp;<br>
+Closed&nbsp;World&nbsp;Machine<br>
+&nbsp;<br>
+(also,&nbsp;in&nbsp;Wales,&nbsp;a&nbsp;valley&nbsp;&nbsp;-&nbsp;topologiclly&nbsp;a&nbsp;partially&nbsp;closed&nbsp;world&nbsp;perhaps?)<br>
+&nbsp;<br>
+This&nbsp;is&nbsp;an&nbsp;application&nbsp;which&nbsp;knows&nbsp;a&nbsp;certian&nbsp;amount&nbsp;of&nbsp;stuff&nbsp;and&nbsp;can&nbsp;manipulate<br>
+it.&nbsp;It&nbsp;uses&nbsp;llyn,&nbsp;a&nbsp;(forward&nbsp;chaining)&nbsp;query&nbsp;engine,&nbsp;not&nbsp;an&nbsp;(backward&nbsp;chaining)<br>
+inference&nbsp;engine:&nbsp;that&nbsp;is,&nbsp;it&nbsp;will&nbsp;apply&nbsp;all&nbsp;rules&nbsp;it&nbsp;can&nbsp;but&nbsp;won't&nbsp;figure&nbsp;out<br>
+which&nbsp;ones&nbsp;to&nbsp;apply&nbsp;to&nbsp;prove&nbsp;something.&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+License<br>
+-------<br>
+Cwm:&nbsp;<a href="http://www.w3.org/2000/10/swap/doc/cwm.html">http://www.w3.org/2000/10/swap/doc/cwm.html</a><br>
+&nbsp;<br>
+Copyright&nbsp;(c)&nbsp;2000-2004&nbsp;World&nbsp;Wide&nbsp;Web&nbsp;Consortium,&nbsp;(Massachusetts&nbsp;<br>
+Institute&nbsp;of&nbsp;Technology,&nbsp;European&nbsp;Research&nbsp;Consortium&nbsp;for&nbsp;Informatics&nbsp;<br>
+and&nbsp;Mathematics,&nbsp;Keio&nbsp;University).&nbsp;All&nbsp;Rights&nbsp;Reserved.&nbsp;This&nbsp;work&nbsp;is&nbsp;<br>
+distributed&nbsp;under&nbsp;the&nbsp;W3C&nbsp;Software&nbsp;License&nbsp;[1]&nbsp;in&nbsp;the&nbsp;hope&nbsp;that&nbsp;it&nbsp;<br>
+will&nbsp;be&nbsp;useful,&nbsp;but&nbsp;WITHOUT&nbsp;ANY&nbsp;WARRANTY;&nbsp;without&nbsp;even&nbsp;the&nbsp;implied&nbsp;<br>
+warranty&nbsp;of&nbsp;MERCHANTABILITY&nbsp;or&nbsp;FITNESS&nbsp;FOR&nbsp;A&nbsp;PARTICULAR&nbsp;PURPOSE.<br>
+&nbsp;<br>
+[1]&nbsp;<a href="http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231">http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231</a></tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#fffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="swap.RDFSink.html">swap.RDFSink</a><br>
+<a href="swap.diag.html">swap.diag</a><br>
+</td><td width="25%" valign=top><a href="swap.llyn.html">swap.llyn</a><br>
+<a href="swap.notation3.html">swap.notation3</a><br>
+</td><td width="25%" valign=top><a href="string.html">string</a><br>
+<a href="sys.html">sys</a><br>
+</td><td width="25%" valign=top><a href="swap.toXML.html">swap.toXML</a><br>
+<a href="swap.uripath.html">swap.uripath</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-chdir"><strong>chdir</strong></a>(...)</dt><dd><tt><a href="#-chdir">chdir</a>(path)<br>
+&nbsp;<br>
+Change&nbsp;the&nbsp;current&nbsp;working&nbsp;directory&nbsp;to&nbsp;the&nbsp;specified&nbsp;path.</tt></dd></dl>
+ <dl><dt><a name="-doCommand"><strong>doCommand</strong></a>()</dt><dd><tt>Command&nbsp;line&nbsp;RDF/N3&nbsp;tool<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&lt;command&gt;&nbsp;&lt;options&gt;&nbsp;&lt;steps&gt;&nbsp;[--with&nbsp;&lt;more&nbsp;args&gt;&nbsp;]<br>
+&nbsp;<br>
+options:<br>
+&nbsp;<br>
+--pipe&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Don't&nbsp;store,&nbsp;just&nbsp;pipe&nbsp;out&nbsp;*<br>
+&nbsp;<br>
+steps,&nbsp;in&nbsp;order&nbsp;left&nbsp;to&nbsp;right:<br>
+&nbsp;<br>
+--rdf&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input&nbsp;&amp;&nbsp;Output&nbsp;**&nbsp;in&nbsp;RDF/XML&nbsp;insead&nbsp;of&nbsp;n3&nbsp;from&nbsp;now&nbsp;on<br>
+--n3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input&nbsp;&amp;&nbsp;Output&nbsp;in&nbsp;N3&nbsp;from&nbsp;now&nbsp;on.&nbsp;(Default)<br>
+--rdf=flags&nbsp;&nbsp;&nbsp;Input&nbsp;&amp;&nbsp;Output&nbsp;**&nbsp;in&nbsp;RDF&nbsp;and&nbsp;set&nbsp;given&nbsp;RDF&nbsp;flags<br>
+--n3=flags&nbsp;&nbsp;&nbsp;&nbsp;Input&nbsp;&amp;&nbsp;Output&nbsp;in&nbsp;N3&nbsp;and&nbsp;set&nbsp;N3&nbsp;flags<br>
+--ntriples&nbsp;&nbsp;&nbsp;&nbsp;Input&nbsp;&amp;&nbsp;Output&nbsp;in&nbsp;NTriples&nbsp;(equiv&nbsp;--n3=usbpartane&nbsp;-bySubject&nbsp;-quiet)<br>
+--language=x&nbsp;&nbsp;Input&nbsp;&amp;&nbsp;Output&nbsp;in&nbsp;"x"&nbsp;(rdf,&nbsp;n3,&nbsp;etc)&nbsp;&nbsp;--rdf&nbsp;same&nbsp;as:&nbsp;--language=rdf<br>
+--languageOptions=y&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--n3=sp&nbsp;same&nbsp;as:&nbsp;&nbsp;--language=n3&nbsp;--languageOptions=sp<br>
+--ugly&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Store&nbsp;input&nbsp;and&nbsp;regurgitate,&nbsp;data&nbsp;only,&nbsp;fastest&nbsp;*<br>
+--bySubject&nbsp;&nbsp;&nbsp;Store&nbsp;input&nbsp;and&nbsp;regurgitate&nbsp;in&nbsp;subject&nbsp;order&nbsp;*<br>
+--no&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;No&nbsp;output&nbsp;*<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(default&nbsp;is&nbsp;to&nbsp;store&nbsp;and&nbsp;pretty&nbsp;print&nbsp;with&nbsp;anonymous&nbsp;nodes)&nbsp;*<br>
+--base=&lt;uri&gt;&nbsp;&nbsp;Set&nbsp;the&nbsp;base&nbsp;URI.&nbsp;Input&nbsp;or&nbsp;output&nbsp;is&nbsp;done&nbsp;as&nbsp;though&nbsp;theis&nbsp;were&nbsp;the&nbsp;document&nbsp;URI.<br>
+--closure=flags&nbsp;&nbsp;Control&nbsp;automatic&nbsp;lookup&nbsp;of&nbsp;identifiers&nbsp;(see&nbsp;below)<br>
+&lt;uri&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Load&nbsp;document.&nbsp;URI&nbsp;may&nbsp;be&nbsp;relative&nbsp;to&nbsp;current&nbsp;directory.<br>
+&nbsp;<br>
+--apply=foo&nbsp;&nbsp;&nbsp;Read&nbsp;rules&nbsp;from&nbsp;foo,&nbsp;apply&nbsp;to&nbsp;store,&nbsp;adding&nbsp;conclusions&nbsp;to&nbsp;store<br>
+--patch=foo&nbsp;&nbsp;&nbsp;Read&nbsp;patches&nbsp;from&nbsp;foo,&nbsp;applying&nbsp;insertions&nbsp;and&nbsp;deletions&nbsp;to&nbsp;store<br>
+--filter=foo&nbsp;&nbsp;Read&nbsp;rules&nbsp;from&nbsp;foo,&nbsp;apply&nbsp;to&nbsp;store,&nbsp;REPLACING&nbsp;store&nbsp;with&nbsp;conclusions<br>
+--query=foo&nbsp;&nbsp;&nbsp;Read&nbsp;a&nbsp;N3QL&nbsp;query&nbsp;from&nbsp;foo,&nbsp;apply&nbsp;it&nbsp;to&nbsp;the&nbsp;store,&nbsp;and&nbsp;replace&nbsp;the&nbsp;store&nbsp;with&nbsp;its&nbsp;conclusions<br>
+--sparql=foo&nbsp;&nbsp;&nbsp;Read&nbsp;a&nbsp;SPARQL&nbsp;query&nbsp;from&nbsp;foo,&nbsp;apply&nbsp;it&nbsp;to&nbsp;the&nbsp;store,&nbsp;and&nbsp;replace&nbsp;the&nbsp;store&nbsp;with&nbsp;its&nbsp;conclusions<br>
+--rules&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Apply&nbsp;rules&nbsp;in&nbsp;store&nbsp;to&nbsp;store,&nbsp;adding&nbsp;conclusions&nbsp;to&nbsp;store<br>
+--think&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;as&nbsp;-rules&nbsp;but&nbsp;continue&nbsp;until&nbsp;no&nbsp;more&nbsp;rule&nbsp;matches&nbsp;(or&nbsp;forever!)<br>
+--engine=otter&nbsp;use&nbsp;otter&nbsp;(in&nbsp;your&nbsp;$PATH)&nbsp;instead&nbsp;of&nbsp;llyn&nbsp;for&nbsp;linking,&nbsp;etc<br>
+--why&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Replace&nbsp;the&nbsp;store&nbsp;with&nbsp;an&nbsp;explanation&nbsp;of&nbsp;its&nbsp;contents<br>
+--why=u&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;proof&nbsp;tries&nbsp;to&nbsp;be&nbsp;shorter<br>
+--mode=flags&nbsp;&nbsp;Set&nbsp;modus&nbsp;operandi&nbsp;for&nbsp;inference&nbsp;(see&nbsp;below)<br>
+--reify&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Replace&nbsp;the&nbsp;statements&nbsp;in&nbsp;the&nbsp;store&nbsp;with&nbsp;statements&nbsp;describing&nbsp;them.<br>
+--dereify&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Undo&nbsp;the&nbsp;effects&nbsp;of&nbsp;--reify<br>
+--flatten&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reify&nbsp;only&nbsp;nested&nbsp;subexpressions&nbsp;(not&nbsp;top&nbsp;level)&nbsp;so&nbsp;that&nbsp;no&nbsp;{}&nbsp;remain.<br>
+--unflatten&nbsp;&nbsp;&nbsp;Undo&nbsp;the&nbsp;effects&nbsp;of&nbsp;--flatten<br>
+--think=foo&nbsp;&nbsp;&nbsp;as&nbsp;-apply=foo&nbsp;but&nbsp;continue&nbsp;until&nbsp;no&nbsp;more&nbsp;rule&nbsp;matches&nbsp;(or&nbsp;forever!)<br>
+--purge&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Remove&nbsp;from&nbsp;store&nbsp;any&nbsp;triple&nbsp;involving&nbsp;anything&nbsp;in&nbsp;class&nbsp;log:Chaff<br>
+--data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Remove&nbsp;all&nbsp;except&nbsp;plain&nbsp;RDF&nbsp;triples&nbsp;(formulae,&nbsp;forAll,&nbsp;etc)<br>
+--strings&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Dump&nbsp;:s&nbsp;to&nbsp;stdout&nbsp;ordered&nbsp;by&nbsp;:k&nbsp;whereever&nbsp;{&nbsp;:k&nbsp;log:outputString&nbsp;:s&nbsp;}<br>
+--crypto&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enable&nbsp;processing&nbsp;of&nbsp;crypto&nbsp;builtin&nbsp;functions.&nbsp;Requires&nbsp;python&nbsp;crypto.<br>
+--help&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print&nbsp;this&nbsp;message<br>
+--revision&nbsp;&nbsp;&nbsp;&nbsp;print&nbsp;CVS&nbsp;revision&nbsp;numbers&nbsp;of&nbsp;major&nbsp;modules<br>
+--chatty=50&nbsp;&nbsp;&nbsp;Verbose&nbsp;debugging&nbsp;output&nbsp;of&nbsp;questionable&nbsp;use,&nbsp;range&nbsp;0-99<br>
+--sparqlServer&nbsp;instead&nbsp;of&nbsp;outputting,&nbsp;start&nbsp;a&nbsp;SPARQL&nbsp;server&nbsp;on&nbsp;port&nbsp;8000&nbsp;of&nbsp;the&nbsp;store<br>
+--sparqlResults&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;After&nbsp;sparql&nbsp;query,&nbsp;print&nbsp;in&nbsp;sparqlResults&nbsp;format&nbsp;instead&nbsp;of&nbsp;rdf<br>
+&nbsp;<br>
+finally:<br>
+&nbsp;<br>
+--with&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pass&nbsp;any&nbsp;further&nbsp;arguments&nbsp;to&nbsp;the&nbsp;N3&nbsp;store&nbsp;as&nbsp;os:argv&nbsp;values<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;mutually&nbsp;exclusive<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**&nbsp;doesn't&nbsp;work&nbsp;for&nbsp;complex&nbsp;cases&nbsp;:-/<br>
+Examples:<br>
+&nbsp;&nbsp;cwm&nbsp;--rdf&nbsp;foo.rdf&nbsp;--n3&nbsp;--pipe&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Convert&nbsp;from&nbsp;rdf/xml&nbsp;to&nbsp;rdf/n3<br>
+&nbsp;&nbsp;cwm&nbsp;foo.n3&nbsp;bar.n3&nbsp;--think&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Combine&nbsp;data&nbsp;and&nbsp;find&nbsp;all&nbsp;deductions<br>
+&nbsp;&nbsp;cwm&nbsp;foo.n3&nbsp;--flat&nbsp;--n3=spart<br>
+&nbsp;<br>
+Mode&nbsp;flags&nbsp;affect&nbsp;inference&nbsp;extedning&nbsp;to&nbsp;the&nbsp;web:<br>
+&nbsp;r&nbsp;&nbsp;&nbsp;Needed&nbsp;to&nbsp;enable&nbsp;any&nbsp;remote&nbsp;stuff.<br>
+&nbsp;a&nbsp;&nbsp;&nbsp;When&nbsp;reading&nbsp;schema,&nbsp;also&nbsp;load&nbsp;rules&nbsp;pointed&nbsp;to&nbsp;by&nbsp;schema&nbsp;(requires&nbsp;r,&nbsp;s)<br>
+&nbsp;E&nbsp;&nbsp;&nbsp;Errors&nbsp;loading&nbsp;schemas&nbsp;of&nbsp;definitive&nbsp;documents&nbsp;are&nbsp;ignored<br>
+&nbsp;m&nbsp;&nbsp;&nbsp;Schemas&nbsp;and&nbsp;definitive&nbsp;documents&nbsp;laoded&nbsp;are&nbsp;merged&nbsp;into&nbsp;the&nbsp;meta&nbsp;knowledge<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(otherwise&nbsp;they&nbsp;are&nbsp;consulted&nbsp;independently)<br>
+&nbsp;s&nbsp;&nbsp;&nbsp;Read&nbsp;the&nbsp;schema&nbsp;for&nbsp;any&nbsp;predicate&nbsp;in&nbsp;a&nbsp;query.<br>
+&nbsp;u&nbsp;&nbsp;&nbsp;Generate&nbsp;unique&nbsp;ids&nbsp;using&nbsp;a&nbsp;run-specific<br>
+&nbsp;<br>
+Closure&nbsp;flags&nbsp;are&nbsp;set&nbsp;to&nbsp;cause&nbsp;the&nbsp;working&nbsp;formula&nbsp;to&nbsp;be&nbsp;automatically&nbsp;exapnded&nbsp;to<br>
+the&nbsp;closure&nbsp;under&nbsp;the&nbsp;operation&nbsp;of&nbsp;looking&nbsp;up:<br>
+&nbsp;<br>
+&nbsp;s&nbsp;&nbsp;&nbsp;the&nbsp;subject&nbsp;of&nbsp;a&nbsp;statement&nbsp;added<br>
+&nbsp;p&nbsp;&nbsp;&nbsp;the&nbsp;predicate&nbsp;of&nbsp;a&nbsp;statement&nbsp;added<br>
+&nbsp;o&nbsp;&nbsp;&nbsp;the&nbsp;object&nbsp;of&nbsp;a&nbsp;statement&nbsp;added<br>
+&nbsp;t&nbsp;&nbsp;&nbsp;the&nbsp;object&nbsp;of&nbsp;an&nbsp;rdf:type&nbsp;statement&nbsp;added<br>
+&nbsp;i&nbsp;&nbsp;&nbsp;any&nbsp;owl:imports&nbsp;documents<br>
+&nbsp;r&nbsp;&nbsp;&nbsp;any&nbsp;doc:rules&nbsp;documents<br>
+&nbsp;E&nbsp;&nbsp;&nbsp;errors&nbsp;are&nbsp;ignored&nbsp;---&nbsp;This&nbsp;is&nbsp;independant&nbsp;of&nbsp;--mode=E<br>
+&nbsp;<br>
+&nbsp;n&nbsp;&nbsp;&nbsp;Normalize&nbsp;IRIs&nbsp;to&nbsp;URIs<br>
+&nbsp;e&nbsp;&nbsp;&nbsp;Smush&nbsp;together&nbsp;any&nbsp;nodes&nbsp;which&nbsp;are&nbsp;=&nbsp;(owl:sameAs)<br>
+&nbsp;<br>
+See&nbsp;<a href="http://www.w3.org/2000/10/swap/doc/cwm">http://www.w3.org/2000/10/swap/doc/cwm</a>&nbsp;&nbsp;for&nbsp;more&nbsp;documentation.<br>
+&nbsp;<br>
+Setting&nbsp;the&nbsp;environment&nbsp;variable&nbsp;CWM_RDFLIB&nbsp;to&nbsp;1&nbsp;maked&nbsp;Cwm&nbsp;use&nbsp;rdflib&nbsp;to&nbsp;parse<br>
+rdf/xml&nbsp;files.&nbsp;Note&nbsp;that&nbsp;this&nbsp;requires&nbsp;rdflib.</tt></dd></dl>
+ <dl><dt><a name="-getcwd"><strong>getcwd</strong></a>(...)</dt><dd><tt><a href="#-getcwd">getcwd</a>()&nbsp;-&gt;&nbsp;path<br>
+&nbsp;<br>
+Return&nbsp;a&nbsp;string&nbsp;representing&nbsp;the&nbsp;current&nbsp;working&nbsp;directory.</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>cvsRevision</strong> = '$Revision: 1.197 $'<br>
+<strong>path</strong> = ['.', '/usr/lib/python2.4/site-packages/Cheesecake-0.6-py2.4.egg', '/usr/lib/python2.4/site-packages/setuptools-0.6c6-py2.4.egg', '/usr/lib/python2.4/site-packages/FuXi-0.85b.dev_r107-py2.4.egg', '/usr/lib/python2.4/site-packages/rdflib-2.4.0-py2.4-linux-i686.egg', '/usr/lib/python2.4/site-packages/storm-0.10-py2.4.egg', '/home/syosi/cvs-trunk/WWW/2000/10/swap', '/home/syosi/cvs-trunk/WWW/2000/10', '/usr/lib/python24.zip', '/usr/lib/python2.4', '/usr/lib/python2.4/plat-linux2', '/usr/lib/python2.4/lib-tk', '/usr/lib/python2.4/lib-dynload', '/usr/local/lib/python2.4/site-packages', '/usr/lib/python2.4/site-packages', '/usr/lib/python2.4/site-packages/HTMLgen', '/usr/lib/python2.4/site-packages/Numeric', '/usr/lib/python2.4/site-packages/PIL', '/usr/lib/python2.4/site-packages/cairo', '/usr/lib/python2.4/site-packages/gnuradio', ...]<br>
+<strong>qqq</strong> = '/home/syosi/cvs-trunk/WWW/2000/10/swap'<br>
+<strong>tracking</strong> = 0</td></tr></table>
+</body></html>

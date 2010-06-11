@@ -1,0 +1,241 @@
+     @prefix : <../daml-ex.n3#> .
+    @prefix con: <#> .
+    @prefix dpo: <http://www.daml.org/2001/03/daml+oil#> .
+    @prefix foo: <foo.n3#> .
+    @prefix inv: <../invalid-ex.n3#> .
+    @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    @prefix s: <http://www.w3.org/2000/01/rdf-schema#> .
+    @prefix v: <../schema-rules.n3#> .
+    
+     @forAll foo:F,
+                foo:G,
+                foo:d,
+                foo:x,
+                foo:y .
+    
+    foo:result     foo:is { @forAll con:_g0,
+                    con:_g1,
+                    con:_g2,
+                    con:_g3,
+                    con:_g4,
+                    con:_g5,
+                    con:_g6,
+                    con:_g7,
+                    con:_g8,
+                    con:_g9,
+                    con:_g10,
+                    con:_g11,
+                    v:c,
+                    v:c1,
+                    v:c2,
+                    v:p,
+                    v:p1,
+                    v:p2,
+                    v:x,
+                    v:y,
+                    v:z.
+             @forSome con:_g12 .
+        <../daml-ex.n3>     a dpo:Ontology;
+             dpo:comment "An example ontology";
+             dpo:imports <http://www.daml.org/2000/10/daml-ont>;
+             dpo:versionInfo "" .
+        :Adam     a dpo:Person;
+             dpo:comment "Adam is a person.";
+             dpo:label "Adam" .
+        :Animal     a dpo:Class;
+             dpo:comment """This class of animals is illustrative of a number of
+	ontological idioms.""";
+             dpo:label "Animal" .
+        :Car     a dpo:Class;
+             dpo:comment "no car is a person";
+             dpo:subClassOf con:_g12;
+             s:subClassOf con:_g12 .
+        :Female     a dpo:Class;
+             dpo:disjointFrom :Male;
+             dpo:subClassOf :Animal;
+             s:subClassOf :Animal .
+        :Height     a dpo:Class;
+             dpo:oneOf  (
+            :short
+            :medium
+            :tall ) .
+        :Male     a dpo:Class;
+             dpo:subClassOf :Animal;
+             s:subClassOf :Animal .
+        :Man     a dpo:Class;
+             dpo:subClassOf :Male,
+                    :Person;
+             s:subClassOf :Animal,
+                    :Male,
+                    :Person .
+        :Person     a dpo:Class;
+             dpo:comment "every person is a man or a woman";
+             dpo:disjointUnionOf  (
+            :Man
+            :Woman );
+             dpo:restrictedBy  [
+                 a dpo:Restriction;
+                 dpo:onProperty :parent;
+                 dpo:toClass :Person ];
+             dpo:subClassOf :Animal;
+             s:subClassOf :Animal .
+        :TallMan     a dpo:Class;
+             dpo:intersectionOf  (
+            :TallThing
+            :Man ) .
+        :TallThing     a dpo:Class;
+             dpo:restrictedBy  [
+                 a dpo:Restriction;
+                 dpo:onProperty :height;
+                 dpo:toValue :tall ] .
+        :Woman     a dpo:Class;
+             dpo:subClassOf :Female,
+                    :Person;
+             s:subClassOf :Animal,
+                    :Female,
+                    :Person .
+        :ancestor     a dpo:TransitiveProperty;
+             dpo:label "ancestor" .
+        :child     a dpo:Property;
+             dpo:inverseOf :parent .
+        :descendant     a dpo:TransitiveProperty .
+        :father     a dpo:Property;
+             dpo:cardinality "1";
+             dpo:range :Man;
+             dpo:subProperty :parent;
+             s:range :Man .
+        :height     a dpo:Property;
+             dpo:domain :Person;
+             dpo:range :Height;
+             s:domain :Person;
+             s:range :Height .
+        :mom     a dpo:Property;
+             = :mother .
+        :mother     a dpo:UniqueProperty;
+             dpo:range :Woman;
+             dpo:subProperty :parent;
+             s:range :Woman .
+        :occupation     a dpo:Property;
+             dpo:maxCardinality "1" .
+        :parent     a dpo:Property;
+             dpo:cardinality "2";
+             dpo:domain :Animal;
+             s:domain :Animal .
+        <../invalid-ex.n3>     dpo:imports <../daml-ex.n3> .
+        inv:alex     :father inv:joe .
+        inv:bill     :mother inv:joe .
+        inv:disjointTest     a :Animal,
+                    :Female,
+                    :Male,
+                    :Man,
+                    :Person,
+                    :Woman,
+                    v:schemaInconsistency .
+        inv:joe     a :Animal,
+                    :Female,
+                    :Male,
+                    :Man,
+                    :Person,
+                    :Woman,
+                    v:schemaInconsistency .
+        v:schemaInconsistency     dpo:subPropertyOf log:Falsehood;
+             s:subPropertyOf log:Falsehood .
+        dpo:domain     = s:domain .
+        dpo:range     = s:range .
+        dpo:subClassOf     = s:subClassOf .
+        dpo:subPropertyOf     = s:subPropertyOf .
+        s:subClassOf     a dpo:TransitiveProperty .
+        s:subPropertyOf     a dpo:TransitiveProperty .
+        con:_g12     a dpo:Class;
+             dpo:complementOf :Person .
+        {
+            v:p     a dpo:TransitiveProperty .
+            
+            }     log:implies { @forAll v:xx,
+                        v:yx,
+                        v:zx .
+            {
+                v:xx     v:p v:yx .
+                v:yx     v:p v:zx .
+                
+                }     log:implies {v:xx     v:p v:zx .
+                } .
+            } .
+        {
+            con:_g0     s:subClassOf con:_g1 .
+            con:_g1     s:subClassOf con:_g2 .
+            
+            }     log:implies {con:_g0     s:subClassOf con:_g2 .
+            } .
+        {
+            con:_g3     s:subPropertyOf con:_g4 .
+            con:_g4     s:subPropertyOf con:_g5 .
+            
+            }     log:implies {con:_g3     s:subPropertyOf con:_g5 .
+            } .
+        {
+            con:_g6     :descendant con:_g7 .
+            con:_g7     :descendant con:_g8 .
+            
+            }     log:implies {con:_g6     :descendant con:_g8 .
+            } .
+        {
+            con:_g9     :ancestor con:_g10 .
+            con:_g10     :ancestor con:_g11 .
+            
+            }     log:implies {con:_g9     :ancestor con:_g11 .
+            } .
+        {
+            v:c1     s:subClassOf v:c2 .
+            v:x     a v:c1 .
+            
+            }     log:implies {v:x     a v:c2 .
+            } .
+        {
+            v:p     s:domain v:c .
+            v:x     v:p v:y .
+            
+            }     log:implies {v:x     a v:c .
+            } .
+        {
+            v:p     s:range v:c .
+            v:x     v:p v:y .
+            
+            }     log:implies {v:y     a v:c .
+            } .
+        {
+            v:p1     s:range v:c .
+            v:p2     s:subPropertyOf v:p1 .
+            
+            }     log:implies {v:p2     s:range v:c .
+            } .
+        {
+            v:p1     = v:p2 .
+            v:x     v:p1 v:y .
+            
+            }     log:implies {v:x     v:p2 v:y .
+            } .
+        {
+            v:x     a v:y,
+                        v:z .
+            v:y     dpo:disjointFrom v:z .
+            
+            }     log:implies {v:x     a v:schemaInconsistency .
+            } .
+        } .
+    {
+         @forSome con:_g13,
+                    con:_g14,
+                    con:_g15 .
+          ( con:_g13
+            con:_g14
+            con:_g15 )
+             log:conjunction  [
+                 log:conclusion foo:G ] .
+        <../daml-ex.n3>     log:semantics con:_g13 .
+        <../invalid-ex.n3>     log:semantics con:_g14 .
+        <../schema-rules.n3>     log:semantics con:_g15 .
+        
+        }     log:implies {foo:result     foo:is foo:G .
+        } .
+    

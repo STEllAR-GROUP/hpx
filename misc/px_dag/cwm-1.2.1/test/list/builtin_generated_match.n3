@@ -1,0 +1,14 @@
+@keywords a, of, the, is, has, prefix .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+((q)) a Thing .
+
+{?X a Thing .
+ ?X rdf:rest ?Y}
+=>
+{?Y a Thing } .
+
+{?X a Thing;
+    rdf:first (?B)}
+=>
+{?B a GreatThing} .

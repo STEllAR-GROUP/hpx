@@ -1,0 +1,351 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module uripath</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>uripath</strong></big></big> (version $Id: uripath.html,v 1.13 2007/06/27 17:58:39 syosi Exp $)</font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/yosi/CVSROOT/WWW/2000/10/swap/uripath.py">/Users/yosi/CVSROOT/WWW/2000/10/swap/uripath.py</a></font></td></tr></table>
+    <p><tt>Uniform&nbsp;Resource&nbsp;Identifier&nbsp;(URI)&nbsp;path&nbsp;manipulation,<br>
+above&nbsp;the&nbsp;access&nbsp;layer<br>
+&nbsp;<br>
+The&nbsp;name&nbsp;of&nbsp;this&nbsp;module&nbsp;and&nbsp;the&nbsp;functions&nbsp;are&nbsp;somewhat<br>
+arbitrary;&nbsp;they&nbsp;hark&nbsp;to&nbsp;other&nbsp;parts&nbsp;of&nbsp;the&nbsp;python<br>
+library;&nbsp;e.g.&nbsp;uripath.<a href="#-join">join</a>()&nbsp;is&nbsp;somewhat&nbsp;like&nbsp;os.path.<a href="#-join">join</a>().<br>
+&nbsp;<br>
+REFERENCES<br>
+&nbsp;<br>
+&nbsp;&nbsp;Uniform&nbsp;Resource&nbsp;Identifiers&nbsp;(URI):&nbsp;Generic&nbsp;Syntax<br>
+&nbsp;&nbsp;<a href="http://www.ietf.org/rfc/rfc2396.txt">http://www.ietf.org/rfc/rfc2396.txt</a><br>
+&nbsp;<br>
+&nbsp;&nbsp;The&nbsp;Web&nbsp;Model:&nbsp;Information&nbsp;hiding&nbsp;and&nbsp;URI&nbsp;syntax&nbsp;(Jan&nbsp;98)<br>
+&nbsp;&nbsp;<a href="http://www.w3.org/DesignIssues/Model.html">http://www.w3.org/DesignIssues/Model.html</a><br>
+&nbsp;<br>
+&nbsp;&nbsp;URI&nbsp;API&nbsp;design&nbsp;[was:&nbsp;URI&nbsp;Test&nbsp;Suite]&nbsp;Dan&nbsp;Connolly&nbsp;(Sun,&nbsp;Aug&nbsp;12&nbsp;2001)<br>
+&nbsp;&nbsp;<a href="http://lists.w3.org/Archives/Public/uri/2001Aug/0021.html">http://lists.w3.org/Archives/Public/uri/2001Aug/0021.html</a></tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#fffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="os.html">os</a><br>
+</td><td width="25%" valign=top><a href="re.html">re</a><br>
+</td><td width="25%" valign=top><a href="string.html">string</a><br>
+</td><td width="25%" valign=top><a href="unittest.html">unittest</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="unittest.html#TestCase">unittest.TestCase</a>(<a href="__builtin__.html#object">__builtin__.object</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="uripath.html#Tests">Tests</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Tests">class <strong>Tests</strong></a>(<a href="unittest.html#TestCase">unittest.TestCase</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="uripath.html#Tests">Tests</a></dd>
+<dd><a href="unittest.html#TestCase">unittest.TestCase</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="Tests-testPaths"><strong>testPaths</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Tests-testRFCCases"><strong>testRFCCases</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Tests-testSplit"><strong>testSplit</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="unittest.html#TestCase">unittest.TestCase</a>:<br>
+<dl><dt><a name="Tests-__call__"><strong>__call__</strong></a>(self, *args, **kwds)</dt></dl>
+
+<dl><dt><a name="Tests-__init__"><strong>__init__</strong></a>(self, methodName<font color="#909090">='runTest'</font>)</dt><dd><tt>Create&nbsp;an&nbsp;instance&nbsp;of&nbsp;the&nbsp;class&nbsp;that&nbsp;will&nbsp;use&nbsp;the&nbsp;named&nbsp;test<br>
+method&nbsp;when&nbsp;executed.&nbsp;Raises&nbsp;a&nbsp;ValueError&nbsp;if&nbsp;the&nbsp;instance&nbsp;does<br>
+not&nbsp;have&nbsp;a&nbsp;method&nbsp;with&nbsp;the&nbsp;specified&nbsp;name.</tt></dd></dl>
+
+<dl><dt><a name="Tests-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Tests-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Tests-assertAlmostEqual"><strong>assertAlmostEqual</strong></a> = failUnlessAlmostEqual(self, first, second, places<font color="#909090">=7</font>, msg<font color="#909090">=None</font>)</dt><dd><tt>Fail&nbsp;if&nbsp;the&nbsp;two&nbsp;objects&nbsp;are&nbsp;unequal&nbsp;as&nbsp;determined&nbsp;by&nbsp;their<br>
+difference&nbsp;rounded&nbsp;to&nbsp;the&nbsp;given&nbsp;number&nbsp;of&nbsp;decimal&nbsp;places<br>
+(default&nbsp;7)&nbsp;and&nbsp;comparing&nbsp;to&nbsp;zero.<br>
+&nbsp;<br>
+Note&nbsp;that&nbsp;decimal&nbsp;places&nbsp;(from&nbsp;zero)&nbsp;are&nbsp;usually&nbsp;not&nbsp;the&nbsp;same<br>
+as&nbsp;significant&nbsp;digits&nbsp;(measured&nbsp;from&nbsp;the&nbsp;most&nbsp;signficant&nbsp;digit).</tt></dd></dl>
+
+<dl><dt><a name="Tests-assertAlmostEquals"><strong>assertAlmostEquals</strong></a> = failUnlessAlmostEqual(self, first, second, places<font color="#909090">=7</font>, msg<font color="#909090">=None</font>)</dt><dd><tt>Fail&nbsp;if&nbsp;the&nbsp;two&nbsp;objects&nbsp;are&nbsp;unequal&nbsp;as&nbsp;determined&nbsp;by&nbsp;their<br>
+difference&nbsp;rounded&nbsp;to&nbsp;the&nbsp;given&nbsp;number&nbsp;of&nbsp;decimal&nbsp;places<br>
+(default&nbsp;7)&nbsp;and&nbsp;comparing&nbsp;to&nbsp;zero.<br>
+&nbsp;<br>
+Note&nbsp;that&nbsp;decimal&nbsp;places&nbsp;(from&nbsp;zero)&nbsp;are&nbsp;usually&nbsp;not&nbsp;the&nbsp;same<br>
+as&nbsp;significant&nbsp;digits&nbsp;(measured&nbsp;from&nbsp;the&nbsp;most&nbsp;signficant&nbsp;digit).</tt></dd></dl>
+
+<dl><dt><a name="Tests-assertEqual"><strong>assertEqual</strong></a> = failUnlessEqual(self, first, second, msg<font color="#909090">=None</font>)</dt><dd><tt>Fail&nbsp;if&nbsp;the&nbsp;two&nbsp;objects&nbsp;are&nbsp;unequal&nbsp;as&nbsp;determined&nbsp;by&nbsp;the&nbsp;'=='<br>
+operator.</tt></dd></dl>
+
+<dl><dt><a name="Tests-assertEquals"><strong>assertEquals</strong></a> = failUnlessEqual(self, first, second, msg<font color="#909090">=None</font>)</dt><dd><tt>Fail&nbsp;if&nbsp;the&nbsp;two&nbsp;objects&nbsp;are&nbsp;unequal&nbsp;as&nbsp;determined&nbsp;by&nbsp;the&nbsp;'=='<br>
+operator.</tt></dd></dl>
+
+<dl><dt><a name="Tests-assertFalse"><strong>assertFalse</strong></a> = failIf(self, expr, msg<font color="#909090">=None</font>)</dt><dd><tt>Fail&nbsp;the&nbsp;test&nbsp;if&nbsp;the&nbsp;expression&nbsp;is&nbsp;true.</tt></dd></dl>
+
+<dl><dt><a name="Tests-assertNotAlmostEqual"><strong>assertNotAlmostEqual</strong></a> = failIfAlmostEqual(self, first, second, places<font color="#909090">=7</font>, msg<font color="#909090">=None</font>)</dt><dd><tt>Fail&nbsp;if&nbsp;the&nbsp;two&nbsp;objects&nbsp;are&nbsp;equal&nbsp;as&nbsp;determined&nbsp;by&nbsp;their<br>
+difference&nbsp;rounded&nbsp;to&nbsp;the&nbsp;given&nbsp;number&nbsp;of&nbsp;decimal&nbsp;places<br>
+(default&nbsp;7)&nbsp;and&nbsp;comparing&nbsp;to&nbsp;zero.<br>
+&nbsp;<br>
+Note&nbsp;that&nbsp;decimal&nbsp;places&nbsp;(from&nbsp;zero)&nbsp;are&nbsp;usually&nbsp;not&nbsp;the&nbsp;same<br>
+as&nbsp;significant&nbsp;digits&nbsp;(measured&nbsp;from&nbsp;the&nbsp;most&nbsp;signficant&nbsp;digit).</tt></dd></dl>
+
+<dl><dt><a name="Tests-assertNotAlmostEquals"><strong>assertNotAlmostEquals</strong></a> = failIfAlmostEqual(self, first, second, places<font color="#909090">=7</font>, msg<font color="#909090">=None</font>)</dt><dd><tt>Fail&nbsp;if&nbsp;the&nbsp;two&nbsp;objects&nbsp;are&nbsp;equal&nbsp;as&nbsp;determined&nbsp;by&nbsp;their<br>
+difference&nbsp;rounded&nbsp;to&nbsp;the&nbsp;given&nbsp;number&nbsp;of&nbsp;decimal&nbsp;places<br>
+(default&nbsp;7)&nbsp;and&nbsp;comparing&nbsp;to&nbsp;zero.<br>
+&nbsp;<br>
+Note&nbsp;that&nbsp;decimal&nbsp;places&nbsp;(from&nbsp;zero)&nbsp;are&nbsp;usually&nbsp;not&nbsp;the&nbsp;same<br>
+as&nbsp;significant&nbsp;digits&nbsp;(measured&nbsp;from&nbsp;the&nbsp;most&nbsp;signficant&nbsp;digit).</tt></dd></dl>
+
+<dl><dt><a name="Tests-assertNotEqual"><strong>assertNotEqual</strong></a> = failIfEqual(self, first, second, msg<font color="#909090">=None</font>)</dt><dd><tt>Fail&nbsp;if&nbsp;the&nbsp;two&nbsp;objects&nbsp;are&nbsp;equal&nbsp;as&nbsp;determined&nbsp;by&nbsp;the&nbsp;'=='<br>
+operator.</tt></dd></dl>
+
+<dl><dt><a name="Tests-assertNotEquals"><strong>assertNotEquals</strong></a> = failIfEqual(self, first, second, msg<font color="#909090">=None</font>)</dt><dd><tt>Fail&nbsp;if&nbsp;the&nbsp;two&nbsp;objects&nbsp;are&nbsp;equal&nbsp;as&nbsp;determined&nbsp;by&nbsp;the&nbsp;'=='<br>
+operator.</tt></dd></dl>
+
+<dl><dt><a name="Tests-assertRaises"><strong>assertRaises</strong></a> = failUnlessRaises(self, excClass, callableObj, *args, **kwargs)</dt><dd><tt>Fail&nbsp;unless&nbsp;an&nbsp;exception&nbsp;of&nbsp;class&nbsp;excClass&nbsp;is&nbsp;thrown<br>
+by&nbsp;callableObj&nbsp;when&nbsp;invoked&nbsp;with&nbsp;arguments&nbsp;args&nbsp;and&nbsp;keyword<br>
+arguments&nbsp;kwargs.&nbsp;If&nbsp;a&nbsp;different&nbsp;type&nbsp;of&nbsp;exception&nbsp;is<br>
+thrown,&nbsp;it&nbsp;will&nbsp;not&nbsp;be&nbsp;caught,&nbsp;and&nbsp;the&nbsp;test&nbsp;case&nbsp;will&nbsp;be<br>
+deemed&nbsp;to&nbsp;have&nbsp;suffered&nbsp;an&nbsp;error,&nbsp;exactly&nbsp;as&nbsp;for&nbsp;an<br>
+unexpected&nbsp;exception.</tt></dd></dl>
+
+<dl><dt><a name="Tests-assertTrue"><strong>assertTrue</strong></a> = failUnless(self, expr, msg<font color="#909090">=None</font>)</dt><dd><tt>Fail&nbsp;the&nbsp;test&nbsp;unless&nbsp;the&nbsp;expression&nbsp;is&nbsp;true.</tt></dd></dl>
+
+<dl><dt><a name="Tests-assert_"><strong>assert_</strong></a> = failUnless(self, expr, msg<font color="#909090">=None</font>)</dt><dd><tt>Fail&nbsp;the&nbsp;test&nbsp;unless&nbsp;the&nbsp;expression&nbsp;is&nbsp;true.</tt></dd></dl>
+
+<dl><dt><a name="Tests-countTestCases"><strong>countTestCases</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Tests-debug"><strong>debug</strong></a>(self)</dt><dd><tt>Run&nbsp;the&nbsp;test&nbsp;without&nbsp;collecting&nbsp;errors&nbsp;in&nbsp;a&nbsp;TestResult</tt></dd></dl>
+
+<dl><dt><a name="Tests-defaultTestResult"><strong>defaultTestResult</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Tests-fail"><strong>fail</strong></a>(self, msg<font color="#909090">=None</font>)</dt><dd><tt>Fail&nbsp;immediately,&nbsp;with&nbsp;the&nbsp;given&nbsp;message.</tt></dd></dl>
+
+<dl><dt><a name="Tests-failIf"><strong>failIf</strong></a>(self, expr, msg<font color="#909090">=None</font>)</dt><dd><tt>Fail&nbsp;the&nbsp;test&nbsp;if&nbsp;the&nbsp;expression&nbsp;is&nbsp;true.</tt></dd></dl>
+
+<dl><dt><a name="Tests-failIfAlmostEqual"><strong>failIfAlmostEqual</strong></a>(self, first, second, places<font color="#909090">=7</font>, msg<font color="#909090">=None</font>)</dt><dd><tt>Fail&nbsp;if&nbsp;the&nbsp;two&nbsp;objects&nbsp;are&nbsp;equal&nbsp;as&nbsp;determined&nbsp;by&nbsp;their<br>
+difference&nbsp;rounded&nbsp;to&nbsp;the&nbsp;given&nbsp;number&nbsp;of&nbsp;decimal&nbsp;places<br>
+(default&nbsp;7)&nbsp;and&nbsp;comparing&nbsp;to&nbsp;zero.<br>
+&nbsp;<br>
+Note&nbsp;that&nbsp;decimal&nbsp;places&nbsp;(from&nbsp;zero)&nbsp;are&nbsp;usually&nbsp;not&nbsp;the&nbsp;same<br>
+as&nbsp;significant&nbsp;digits&nbsp;(measured&nbsp;from&nbsp;the&nbsp;most&nbsp;signficant&nbsp;digit).</tt></dd></dl>
+
+<dl><dt><a name="Tests-failIfEqual"><strong>failIfEqual</strong></a>(self, first, second, msg<font color="#909090">=None</font>)</dt><dd><tt>Fail&nbsp;if&nbsp;the&nbsp;two&nbsp;objects&nbsp;are&nbsp;equal&nbsp;as&nbsp;determined&nbsp;by&nbsp;the&nbsp;'=='<br>
+operator.</tt></dd></dl>
+
+<dl><dt><a name="Tests-failUnless"><strong>failUnless</strong></a>(self, expr, msg<font color="#909090">=None</font>)</dt><dd><tt>Fail&nbsp;the&nbsp;test&nbsp;unless&nbsp;the&nbsp;expression&nbsp;is&nbsp;true.</tt></dd></dl>
+
+<dl><dt><a name="Tests-failUnlessAlmostEqual"><strong>failUnlessAlmostEqual</strong></a>(self, first, second, places<font color="#909090">=7</font>, msg<font color="#909090">=None</font>)</dt><dd><tt>Fail&nbsp;if&nbsp;the&nbsp;two&nbsp;objects&nbsp;are&nbsp;unequal&nbsp;as&nbsp;determined&nbsp;by&nbsp;their<br>
+difference&nbsp;rounded&nbsp;to&nbsp;the&nbsp;given&nbsp;number&nbsp;of&nbsp;decimal&nbsp;places<br>
+(default&nbsp;7)&nbsp;and&nbsp;comparing&nbsp;to&nbsp;zero.<br>
+&nbsp;<br>
+Note&nbsp;that&nbsp;decimal&nbsp;places&nbsp;(from&nbsp;zero)&nbsp;are&nbsp;usually&nbsp;not&nbsp;the&nbsp;same<br>
+as&nbsp;significant&nbsp;digits&nbsp;(measured&nbsp;from&nbsp;the&nbsp;most&nbsp;signficant&nbsp;digit).</tt></dd></dl>
+
+<dl><dt><a name="Tests-failUnlessEqual"><strong>failUnlessEqual</strong></a>(self, first, second, msg<font color="#909090">=None</font>)</dt><dd><tt>Fail&nbsp;if&nbsp;the&nbsp;two&nbsp;objects&nbsp;are&nbsp;unequal&nbsp;as&nbsp;determined&nbsp;by&nbsp;the&nbsp;'=='<br>
+operator.</tt></dd></dl>
+
+<dl><dt><a name="Tests-failUnlessRaises"><strong>failUnlessRaises</strong></a>(self, excClass, callableObj, *args, **kwargs)</dt><dd><tt>Fail&nbsp;unless&nbsp;an&nbsp;exception&nbsp;of&nbsp;class&nbsp;excClass&nbsp;is&nbsp;thrown<br>
+by&nbsp;callableObj&nbsp;when&nbsp;invoked&nbsp;with&nbsp;arguments&nbsp;args&nbsp;and&nbsp;keyword<br>
+arguments&nbsp;kwargs.&nbsp;If&nbsp;a&nbsp;different&nbsp;type&nbsp;of&nbsp;exception&nbsp;is<br>
+thrown,&nbsp;it&nbsp;will&nbsp;not&nbsp;be&nbsp;caught,&nbsp;and&nbsp;the&nbsp;test&nbsp;case&nbsp;will&nbsp;be<br>
+deemed&nbsp;to&nbsp;have&nbsp;suffered&nbsp;an&nbsp;error,&nbsp;exactly&nbsp;as&nbsp;for&nbsp;an<br>
+unexpected&nbsp;exception.</tt></dd></dl>
+
+<dl><dt><a name="Tests-id"><strong>id</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Tests-run"><strong>run</strong></a>(self, result<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="Tests-setUp"><strong>setUp</strong></a>(self)</dt><dd><tt>Hook&nbsp;method&nbsp;for&nbsp;setting&nbsp;up&nbsp;the&nbsp;test&nbsp;fixture&nbsp;before&nbsp;exercising&nbsp;it.</tt></dd></dl>
+
+<dl><dt><a name="Tests-shortDescription"><strong>shortDescription</strong></a>(self)</dt><dd><tt>Returns&nbsp;a&nbsp;one-line&nbsp;description&nbsp;of&nbsp;the&nbsp;test,&nbsp;or&nbsp;None&nbsp;if&nbsp;no<br>
+description&nbsp;has&nbsp;been&nbsp;provided.<br>
+&nbsp;<br>
+The&nbsp;default&nbsp;implementation&nbsp;of&nbsp;this&nbsp;method&nbsp;returns&nbsp;the&nbsp;first&nbsp;line&nbsp;of<br>
+the&nbsp;specified&nbsp;test&nbsp;method's&nbsp;docstring.</tt></dd></dl>
+
+<dl><dt><a name="Tests-tearDown"><strong>tearDown</strong></a>(self)</dt><dd><tt>Hook&nbsp;method&nbsp;for&nbsp;deconstructing&nbsp;the&nbsp;test&nbsp;fixture&nbsp;after&nbsp;testing&nbsp;it.</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="unittest.html#TestCase">unittest.TestCase</a>:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'TestCase' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>failureException</strong> = &lt;class exceptions.AssertionError&gt;<dd><tt>Assertion&nbsp;failed.</tt></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-base"><strong>base</strong></a>()</dt><dd><tt>The&nbsp;base&nbsp;URI&nbsp;for&nbsp;this&nbsp;process&nbsp;-&nbsp;the&nbsp;Web&nbsp;equiv&nbsp;of&nbsp;cwd<br>
+&nbsp;<br>
+Relative&nbsp;or&nbsp;abolute&nbsp;unix-standard&nbsp;filenames&nbsp;parsed&nbsp;relative&nbsp;to<br>
+this&nbsp;yeild&nbsp;the&nbsp;URI&nbsp;of&nbsp;the&nbsp;file.<br>
+If&nbsp;we&nbsp;had&nbsp;a&nbsp;reliable&nbsp;way&nbsp;of&nbsp;getting&nbsp;a&nbsp;computer&nbsp;name,<br>
+we&nbsp;should&nbsp;put&nbsp;it&nbsp;in&nbsp;the&nbsp;hostname&nbsp;just&nbsp;to&nbsp;prevent&nbsp;ambiguity</tt></dd></dl>
+ <dl><dt><a name="-canonical"><strong>canonical</strong></a>(str_in)</dt><dd><tt>Convert&nbsp;equivalent&nbsp;URIs&nbsp;(or&nbsp;parts)&nbsp;to&nbsp;the&nbsp;same&nbsp;string<br>
+&nbsp;<br>
+There&nbsp;are&nbsp;many&nbsp;differenet&nbsp;levels&nbsp;of&nbsp;URI&nbsp;canonicalization<br>
+which&nbsp;are&nbsp;possible.&nbsp;&nbsp;See&nbsp;<a href="http://www.ietf.org/rfc/rfc3986.txt">http://www.ietf.org/rfc/rfc3986.txt</a><br>
+Done:<br>
+-&nbsp;Converfting&nbsp;unicode&nbsp;IRI&nbsp;to&nbsp;utf-8<br>
+-&nbsp;Escaping&nbsp;all&nbsp;non-ASCII<br>
+-&nbsp;De-escaping,&nbsp;if&nbsp;escaped,&nbsp;ALPHA&nbsp;(%41-%5A&nbsp;and&nbsp;%61-%7A),&nbsp;DIGIT&nbsp;(%30-%39),<br>
+&nbsp;&nbsp;hyphen&nbsp;(%2D),&nbsp;period&nbsp;(%2E),&nbsp;underscore&nbsp;(%5F),&nbsp;or&nbsp;tilde&nbsp;(%7E)&nbsp;(Sect&nbsp;2.4)&nbsp;<br>
+-&nbsp;Making&nbsp;all&nbsp;escapes&nbsp;uppercase&nbsp;hexadecimal<br>
+Not&nbsp;done:<br>
+-&nbsp;Making&nbsp;URI&nbsp;scheme&nbsp;lowercase<br>
+-&nbsp;changing&nbsp;/./&nbsp;or&nbsp;&nbsp;/foo/../&nbsp;to&nbsp;/&nbsp;with&nbsp;care&nbsp;not&nbsp;to&nbsp;change&nbsp;host&nbsp;part<br>
+&nbsp;<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-canonical">canonical</a>("foo&nbsp;bar")<br>
+'foo%20bar'<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-canonical">canonical</a>(u'http:')<br>
+'http:'<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-canonical">canonical</a>('fran%c3%83%c2%a7ois')<br>
+'fran%C3%83%C2%A7ois'<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-canonical">canonical</a>('a')<br>
+'a'<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-canonical">canonical</a>('%4e')<br>
+'N'<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-canonical">canonical</a>('%9d')<br>
+'%9D'<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-canonical">canonical</a>('%2f')<br>
+'%2F'<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-canonical">canonical</a>('%2F')<br>
+'%2F'</tt></dd></dl>
+ <dl><dt><a name="-join"><strong>join</strong></a>(here, there)</dt><dd><tt>join&nbsp;an&nbsp;absolute&nbsp;URI&nbsp;and&nbsp;URI&nbsp;reference<br>
+(non-ascii&nbsp;characters&nbsp;are&nbsp;supported/doctested;<br>
+haven't&nbsp;checked&nbsp;the&nbsp;details&nbsp;of&nbsp;the&nbsp;IRI&nbsp;spec&nbsp;though)<br>
+&nbsp;<br>
+here&nbsp;is&nbsp;assumed&nbsp;to&nbsp;be&nbsp;absolute.<br>
+there&nbsp;is&nbsp;URI&nbsp;reference.<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-join">join</a>('<a href="http://example/x/y/z">http://example/x/y/z</a>',&nbsp;'../abc')<br>
+'<a href="http://example/x/abc">http://example/x/abc</a>'<br>
+&nbsp;<br>
+Raise&nbsp;ValueError&nbsp;if&nbsp;there&nbsp;uses&nbsp;relative&nbsp;path<br>
+syntax&nbsp;but&nbsp;here&nbsp;has&nbsp;no&nbsp;hierarchical&nbsp;path.<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-join">join</a>('mid:foo@example',&nbsp;'../foo')<br>
+Traceback&nbsp;(most&nbsp;recent&nbsp;call&nbsp;last):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;raise&nbsp;ValueError,&nbsp;here<br>
+ValueError:&nbsp;Base&nbsp;&lt;mid:foo@example&gt;&nbsp;has&nbsp;no&nbsp;slash&nbsp;after&nbsp;colon&nbsp;-&nbsp;with&nbsp;relative&nbsp;'../foo'.<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-join">join</a>('<a href="http://example/x/y/z">http://example/x/y/z</a>',&nbsp;'')<br>
+'<a href="http://example/x/y/z">http://example/x/y/z</a>'<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-join">join</a>('mid:foo@example',&nbsp;'#foo')<br>
+'mid:foo@example#foo'<br>
+&nbsp;<br>
+We&nbsp;grok&nbsp;IRIs<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;len(u'Andr\xe9')<br>
+5<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-join">join</a>('<a href="http://example.org/">http://example.org/</a>',&nbsp;u'#Andr\xe9')<br>
+u'<a href="http://example.org/#Andr\xe9">http://example.org/#Andr\xe9</a>'</tt></dd></dl>
+ <dl><dt><a name="-refTo"><strong>refTo</strong></a>(base, uri)</dt><dd><tt>figure&nbsp;out&nbsp;a&nbsp;relative&nbsp;URI&nbsp;reference&nbsp;from&nbsp;base&nbsp;to&nbsp;uri<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-refTo">refTo</a>('<a href="http://example/x/y/z">http://example/x/y/z</a>',&nbsp;'<a href="http://example/x/abc">http://example/x/abc</a>')<br>
+'../abc'<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-refTo">refTo</a>('file:/ex/x/y',&nbsp;'file:/ex/x/q/r#s')<br>
+'q/r#s'<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-refTo">refTo</a>(None,&nbsp;'<a href="http://ex/x/y">http://ex/x/y</a>')<br>
+'<a href="http://ex/x/y">http://ex/x/y</a>'<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-refTo">refTo</a>('<a href="http://ex/x/y">http://ex/x/y</a>',&nbsp;'<a href="http://ex/x/y">http://ex/x/y</a>')<br>
+''<br>
+&nbsp;<br>
+Note&nbsp;the&nbsp;relationship&nbsp;between&nbsp;refTo&nbsp;and&nbsp;join:<br>
+<a href="#-join">join</a>(x,&nbsp;<a href="#-refTo">refTo</a>(x,&nbsp;y))&nbsp;==&nbsp;y<br>
+which&nbsp;points&nbsp;out&nbsp;certain&nbsp;strings&nbsp;which&nbsp;cannot&nbsp;be&nbsp;URIs.&nbsp;e.g.<br>
+&gt;&gt;&gt;&nbsp;x='<a href="http://ex/x/y';y='http://ex/x/q:r';join(x">http://ex/x/y';y='http://ex/x/q:r';join(x</a>,&nbsp;<a href="#-refTo">refTo</a>(x,&nbsp;y))&nbsp;==&nbsp;y<br>
+0<br>
+&nbsp;<br>
+So&nbsp;'<a href="http://ex/x/q:r">http://ex/x/q:r</a>'&nbsp;is&nbsp;not&nbsp;a&nbsp;URI.&nbsp;Use&nbsp;'<a href="http://ex/x/q%3ar">http://ex/x/q%3ar</a>'&nbsp;instead:<br>
+&gt;&gt;&gt;&nbsp;x='<a href="http://ex/x/y';y='http://ex/x/q%3ar';join(x">http://ex/x/y';y='http://ex/x/q%3ar';join(x</a>,&nbsp;<a href="#-refTo">refTo</a>(x,&nbsp;y))&nbsp;==&nbsp;y<br>
+1<br>
+&nbsp;<br>
+This&nbsp;one&nbsp;checks&nbsp;that&nbsp;it&nbsp;uses&nbsp;a&nbsp;root-realtive&nbsp;one&nbsp;where&nbsp;that&nbsp;is<br>
+all&nbsp;they&nbsp;share.&nbsp;&nbsp;Now&nbsp;uses&nbsp;root-relative&nbsp;where&nbsp;no&nbsp;path&nbsp;is&nbsp;shared.<br>
+This&nbsp;is&nbsp;a&nbsp;matter&nbsp;of&nbsp;taste&nbsp;but&nbsp;tends&nbsp;to&nbsp;give&nbsp;more&nbsp;resilience&nbsp;IMHO<br>
+--&nbsp;and&nbsp;shorter&nbsp;paths<br>
+&nbsp;<br>
+Note&nbsp;that&nbsp;base&nbsp;may&nbsp;be&nbsp;None,&nbsp;meaning&nbsp;no&nbsp;base.&nbsp;&nbsp;In&nbsp;some&nbsp;situations,&nbsp;there<br>
+just&nbsp;ain't&nbsp;a&nbsp;base.&nbsp;Slife.&nbsp;In&nbsp;these&nbsp;cases,&nbsp;relTo&nbsp;returns&nbsp;the&nbsp;absolute&nbsp;value.<br>
+The&nbsp;axiom&nbsp;abs(,rel(b,x))=x&nbsp;still&nbsp;holds.<br>
+This&nbsp;saves&nbsp;people&nbsp;having&nbsp;to&nbsp;set&nbsp;the&nbsp;base&nbsp;to&nbsp;"bogus:".<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-refTo">refTo</a>('<a href="http://ex/x/y/z">http://ex/x/y/z</a>',&nbsp;'<a href="http://ex/r">http://ex/r</a>')<br>
+'/r'</tt></dd></dl>
+ <dl><dt><a name="-splitFrag"><strong>splitFrag</strong></a>(uriref)</dt><dd><tt>split&nbsp;a&nbsp;URI&nbsp;reference&nbsp;between&nbsp;the&nbsp;fragment&nbsp;and&nbsp;the&nbsp;rest.<br>
+&nbsp;<br>
+Punctuation&nbsp;is&nbsp;thrown&nbsp;away.<br>
+&nbsp;<br>
+e.g.<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-splitFrag">splitFrag</a>("abc#def")<br>
+('abc',&nbsp;'def')<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-splitFrag">splitFrag</a>("abcdef")<br>
+('abcdef',&nbsp;None)</tt></dd></dl>
+ <dl><dt><a name="-splitFragP"><strong>splitFragP</strong></a>(uriref, punct<font color="#909090">=0</font>)</dt><dd><tt>split&nbsp;a&nbsp;URI&nbsp;reference&nbsp;before&nbsp;the&nbsp;fragment<br>
+&nbsp;<br>
+Punctuation&nbsp;is&nbsp;kept.<br>
+&nbsp;<br>
+e.g.<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-splitFragP">splitFragP</a>("abc#def")<br>
+('abc',&nbsp;'#def')<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-splitFragP">splitFragP</a>("abcdef")<br>
+('abcdef',&nbsp;'')</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>URI_unreserved</strong> = 'ABCDEFGHIJJLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'<br>
+<strong>__version__</strong> = '$Id: uripath.html,v 1.13 2007/06/27 17:58:39 syosi Exp $'<br>
+<strong>commonHost</strong> = &lt;_sre.SRE_Pattern object&gt;</td></tr></table>
+</body></html>

@@ -1,0 +1,166 @@
+#  Dot format generation with Default values for GraphViz properties
+#
+
+@prefix str: <http://www.w3.org/2000/10/swap/string#>. 
+@prefix os: <http://www.w3.org/2000/10/swap/os#>. 
+@prefix gv: <http://www.w3.org/2001/02pd/gv#> .
+
+@prefix doc: <http://www.w3.org/2000/10/swap/pim/doc#>.  # Documentation control
+#@prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>. # Contact address book
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+#@prefix s: <http://www.w3.org/2000/01/rdf-schema#>.      # RDF Schema
+#@prefix ont:  <http://www.daml.org/2000/12/daml+oil#> .  # Ontology
+#@prefix rm:    <http://www.w3.org/2001/04/roadmap/vocab#>.   #  @@@@@@@@@@@@@
+
+@prefix w:  <http://www.w3.org/2001/04/roadmap/w3c#>.  # Specs
+
+@prefix st: <structure.n3#>.
+
+@prefix : <#>.
+@prefix todot: <#>.
+
+# @prefix h: <http://www.w3.org/1999/xhtml> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix org: <http://www.w3.org/2001/04/roadmap/org#> .  # Vocab for org structure
+
+
+
+@forAll :a, :b, :c, :d, :e,  :F, :g, :n, :n1, :n2, :p,
+                       :s, :s1, :s2, :s3, :s4, :u, :u1, :u2, :v, :x, :y, :z.
+
+# Should be moved to gv: schema:
+#
+#  The default values are not actually used, only the fact that they exist.
+#
+gv:label     gv:attributeName  "label"; gv:default "?label?"; a gv:nodeAttribute; a gv:edgeAttribute.
+gv:color     gv:attributeName  "color"; gv:default "black"; a gv:nodeAttribute; a gv:edgeAttribute.
+gv:fontcolor gv:attributeName  "fontcolor"; gv:default "black"; a gv:nodeAttribute.
+gv:fontname  gv:attributeName  "fontname"; gv:default "Times-Roman"; a gv:nodeAttribute.
+gv:shape     gv:attributeName  "shape";  gv:default "ellipse"; a gv:nodeAttribute.
+gv:style     gv:attributeName  "style";  gv:default "none"; a gv:nodeAttribute; a gv:edgeAttribute.
+gv:url       gv:attributeName  "url";    gv:default "none"; a gv:nodeAttribute.
+
+
+{ :x log:uri [is os:baseAbsolute of [is os:environ of "TARGET"]] } log:implies { :x a :target_resource }.
+
+{ :F is log:semantics of [a :target_resource] } log:implies { :F a :target }.
+
+# The following is the way historically the (a) root graph has been tagged using
+#    <> gv:diGraph :whatever   in the source.
+
+{ :F a :target.
+  :F log:includes {:x gv:digraph :g}
+} log:implies{:F :hasGraph :g. :g :source :x}.
+
+@prefix w3c: <http://www.w3.org/2001/04/roadmap/w3c#>.
+
+#{ :x a :target_resource; log:semantics :F.
+#  :F log:notIncludes { w3c:logic gv:fontcolor [] }} log:implies { :x a :OK1 }.
+#
+#
+#{ [a :target] log:notIncludes { w3c:logic gv:fontcolor [] }} log:implies { :foobar a :OK2 }.
+#
+#
+#{ :n log:equalTo w3c:logic.
+#  :p log:equalTo gv:color.
+# [a :target] log:notIncludes {  :n :p [] }} log:implies { :p :PROBLEM3 :n }.
+
+#{ :n log:equalTo w3c:logic.
+#  :p log:equalTo gv:color.
+# [a :target] log:notIncludes {  :n :p [] }} log:implies { :x a :PROBLEM35 }.
+#
+#{ :n log:equalTo w3c:logic.
+#  :p a gv:nodeAttribute.
+# [a :target] log:notIncludes {  :n :p [] }} log:implies { :p a :PROBLEM39 }.
+#
+#{ :n log:equalTo w3c:logic.
+#  :p a gv:nodeAttribute.
+# [a :target] log:notIncludes {  :n :p [] }} log:implies { :n :NODATAFOR :p }.
+
+
+
+#   Rules for creating GraphViz input format:
+#
+#
+#  Header:
+
+:result0 log:outputString """
+/* transformed by:                    */
+/*   Id: rdf2dot.xsl,v 1.13 2001/05/23 19:46:25 connolly Exp  */
+
+digraph i__1483 {
+label="W3C Technology Roadmap";
+""".
+
+
+# Nodes and default attributes:
+
+# The case where the value is not given, allow dot to supply default
+# though we could just as easily insert our own default value.
+
+ { :F a :target; :hasGraph :g; log:includes { :g gv:hasNode :n. }.
+ } log:implies { :F  :includesNode :n }.
+
+{  :p a gv:nodeAttribute.
+  :F a :target .
+  :F :includesNode :n; log:notIncludes { :n :p [] }.
+} log:implies { [:fornode :n; :property :p; :nstring ""] }.
+
+{ [a :target] :includesNode :n; log:includes { :n :p :v}.
+  :p a gv:nodeAttribute; gv:attributeName :x.
+  ( :x  "=\"" :v "\", " ) str:concatenation :s .
+  } log:implies {  [:fornode :n; :property :p; :nstring :s] }.
+
+
+
+#  Declarations of nodes:
+
+  {  [a :target] :includesNode :n; log:includes {:n gv:label :x}.  # Ignore nodes with no labels
+     :n log:uri :u.
+    [:fornode :n; :property gv:color; :nstring :s1].
+    [:fornode :n; :property gv:shape; :nstring :s2].
+    [:fornode :n; :property gv:style; :nstring :s3].
+    [:fornode :n; :property gv:url;   :nstring :s4].
+     ( " \"" :u "\" [ label=\""  :x "\", "  :s1 :s2 :s3 :s4  "];\n" ) str:concatenation :y.
+   } log:implies {
+        :result1 log:outputString :y.
+   }.
+
+
+
+########## Edges:
+
+ { [a :target] log:includes { :p a gv:EdgeProperty };
+               log:notIncludes { :p :e [] }.
+  :e a gv:edgeAttribute.
+} log:implies { [:edgeProp :p; :attribute :e; :string ""] }.
+ 
+ { [a :target] log:includes { :p a gv:EdgeProperty; :e :v }.
+  :e gv:attributeName :x.
+  (  :x  "=\"" :v "\", " ) str:concatenation :s .
+} log:implies { [:edgeProp :p; :attribute :e; :string :s] }.
+ 
+#  Declarations of edges in dot format:
+
+{   [a :target] :includesNode :n1, :n2;
+        log:includes {:p a gv:EdgeProperty. :n1  :p  :n2}. 
+    :n1  log:uri :u1.
+    :n2  log:uri :u2.
+    [ :edgeProp :p; :attribute gv:label; :string :s1].
+    [ :edgeProp :p; :attribute gv:color; :string :s2].
+    [ :edgeProp :p; :attribute gv:style; :string :s3].
+    ( "\""  :u1  "\" -> \"" :u2 "\"\n  [" :s1 :s2 :s3 " ]\n" ) str:concatenation :x
+  } log:implies { :result2 log:outputString :x }.
+
+#  Trailer:
+ :result9 log:outputString "\n}\n\n/*  End of generated .dot file.  */".
+
+
+
+
+# Cleanup:
+log:implies a log:Chaff.
+ 
+# ENDS
+

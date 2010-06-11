@@ -1,0 +1,4 @@
+@prefix : <aaa>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+:A :p1 "a" .
+:B :p2 "b"^^xsd:string, "hi" .

@@ -1,0 +1,13 @@
+@base <http://example.com/ontolgies>.
+
+<a> :b <foo/bar#baz>.
+
+@base <path/DFFERENT/>.
+
+<a2> :b2 <foo/bar#baz2>.
+
+@prefix : <#>.
+
+<d3> :b3 <e3>.
+
+#ends

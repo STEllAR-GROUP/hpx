@@ -1,0 +1,449 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module why</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>why</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/syosi/cvs-trunk/WWW/2000/10/swap/why.py">/home/syosi/cvs-trunk/WWW/2000/10/swap/why.py</a></font></td></tr></table>
+    <p><tt>$Id:&nbsp;why.py,v&nbsp;1.53&nbsp;2007/06/27&nbsp;17:58:39&nbsp;syosi&nbsp;Exp&nbsp;$<br>
+&nbsp;<br>
+A&nbsp;class&nbsp;for&nbsp;storing&nbsp;the&nbsp;reason&nbsp;why&nbsp;something&nbsp;is&nbsp;known.<br>
+The&nbsp;dontAsk&nbsp;constant&nbsp;reason&nbsp;is&nbsp;used&nbsp;as&nbsp;a&nbsp;reason&nbsp;for&nbsp;the&nbsp;explanations&nbsp;themselves-<br>
+&nbsp;we&nbsp;could&nbsp;make&nbsp;it&nbsp;more&nbsp;complicated&nbsp;here&nbsp;for&nbsp;the&nbsp;recursively&nbsp;minded&nbsp;but&nbsp;i&nbsp;don't<br>
+&nbsp;see&nbsp;the&nbsp;need&nbsp;at&nbsp;the&nbsp;moment.<br>
+&nbsp;<br>
+Assumes&nbsp;wwe&nbsp;are&nbsp;using&nbsp;the&nbsp;process-global&nbsp;store&nbsp;--&nbsp;uses&nbsp;Namespace()&nbsp;@@@</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#fffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="binascii.html">binascii</a><br>
+<a href="diag.html">diag</a><br>
+</td><td width="25%" valign=top><a href="md5.html">md5</a><br>
+<a href="string.html">string</a><br>
+</td><td width="25%" valign=top><a href="sys.html">sys</a><br>
+<a href="uripath.html">uripath</a><br>
+</td><td width="25%" valign=top><a href="urllib.html">urllib</a><br>
+<a href="weakref.html">weakref</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="why.html#Reason">Reason</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="why.html#Because">Because</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="why.html#BecauseOfCommandLine">BecauseOfCommandLine</a>
+</font></dt><dt><font face="helvetica, arial"><a href="why.html#BecauseOfData">BecauseOfData</a>
+</font></dt><dt><font face="helvetica, arial"><a href="why.html#BecauseOfExperience">BecauseOfExperience</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="why.html#BecauseBuiltIn">BecauseBuiltIn</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="why.html#BecauseIncludes">BecauseIncludes</a>
+</font></dt><dt><font face="helvetica, arial"><a href="why.html#BecauseSupports">BecauseSupports</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="why.html#BecauseOfRule">BecauseOfRule</a>
+</font></dt><dt><font face="helvetica, arial"><a href="why.html#BecauseSubexpression">BecauseSubexpression</a>
+</font></dt><dt><font face="helvetica, arial"><a href="why.html#KBReasonTracker">KBReasonTracker</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="why.html#BecauseMerge">BecauseMerge</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="why.html#Premise">Premise</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Because">class <strong>Because</strong></a>(<a href="why.html#Reason">Reason</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>For&nbsp;the&nbsp;reason&nbsp;given&nbsp;on&nbsp;the&nbsp;string.<br>
+This&nbsp;is&nbsp;a&nbsp;kinda&nbsp;end&nbsp;of&nbsp;the&nbsp;road&nbsp;reason.<br>
+&nbsp;<br>
+A&nbsp;nested&nbsp;reason&nbsp;can&nbsp;also&nbsp;be&nbsp;given.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Because-__init__"><strong>__init__</strong></a>(self, str, because<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="Because-explain"><strong>explain</strong></a>(self, ko, flags)</dt><dd><tt>Describe&nbsp;this&nbsp;reason&nbsp;to&nbsp;an&nbsp;RDF&nbsp;store<br>
+Returns&nbsp;the&nbsp;value&nbsp;of&nbsp;this&nbsp;reason&nbsp;as&nbsp;interned&nbsp;in&nbsp;the&nbsp;store.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="why.html#Reason">Reason</a>:<br>
+<dl><dt><a name="Because-meIn"><strong>meIn</strong></a>(self, ko)</dt><dd><tt>The&nbsp;representation&nbsp;of&nbsp;this&nbsp;object&nbsp;in&nbsp;the&nbsp;formula&nbsp;ko</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="BecauseBuiltIn">class <strong>BecauseBuiltIn</strong></a>(<a href="why.html#Reason">Reason</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#Because">Because</a>&nbsp;the&nbsp;built-in&nbsp;function&nbsp;given&nbsp;concluded&nbsp;so.<br>
+A&nbsp;nested&nbsp;reason&nbsp;for&nbsp;running&nbsp;the&nbsp;function&nbsp;must&nbsp;be&nbsp;given<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="BecauseBuiltIn-__init__"><strong>__init__</strong></a>(self, context, subj, pred, obj)</dt></dl>
+
+<dl><dt><a name="BecauseBuiltIn-explain"><strong>explain</strong></a>(self, ko, flags)</dt><dd><tt>This&nbsp;is&nbsp;just&nbsp;a&nbsp;plain&nbsp;fact&nbsp;-&nbsp;or&nbsp;was&nbsp;at&nbsp;the&nbsp;time.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="why.html#Reason">Reason</a>:<br>
+<dl><dt><a name="BecauseBuiltIn-meIn"><strong>meIn</strong></a>(self, ko)</dt><dd><tt>The&nbsp;representation&nbsp;of&nbsp;this&nbsp;object&nbsp;in&nbsp;the&nbsp;formula&nbsp;ko</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="BecauseIncludes">class <strong>BecauseIncludes</strong></a>(<a href="why.html#BecauseBuiltIn">BecauseBuiltIn</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#Because">Because</a>&nbsp;of&nbsp;the&nbsp;speific&nbsp;built-in&nbsp;log:includes<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="why.html#BecauseIncludes">BecauseIncludes</a></dd>
+<dd><a href="why.html#BecauseBuiltIn">BecauseBuiltIn</a></dd>
+<dd><a href="why.html#Reason">Reason</a></dd>
+</dl>
+<hr>
+Methods inherited from <a href="why.html#BecauseBuiltIn">BecauseBuiltIn</a>:<br>
+<dl><dt><a name="BecauseIncludes-__init__"><strong>__init__</strong></a>(self, context, subj, pred, obj)</dt></dl>
+
+<dl><dt><a name="BecauseIncludes-explain"><strong>explain</strong></a>(self, ko, flags)</dt><dd><tt>This&nbsp;is&nbsp;just&nbsp;a&nbsp;plain&nbsp;fact&nbsp;-&nbsp;or&nbsp;was&nbsp;at&nbsp;the&nbsp;time.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="why.html#Reason">Reason</a>:<br>
+<dl><dt><a name="BecauseIncludes-meIn"><strong>meIn</strong></a>(self, ko)</dt><dd><tt>The&nbsp;representation&nbsp;of&nbsp;this&nbsp;object&nbsp;in&nbsp;the&nbsp;formula&nbsp;ko</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="BecauseMerge">class <strong>BecauseMerge</strong></a>(<a href="why.html#KBReasonTracker">KBReasonTracker</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#Because">Because</a>&nbsp;this&nbsp;formula&nbsp;is&nbsp;a&nbsp;merging&nbsp;of&nbsp;others<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="why.html#BecauseMerge">BecauseMerge</a></dd>
+<dd><a href="why.html#KBReasonTracker">KBReasonTracker</a></dd>
+<dd><a href="why.html#Reason">Reason</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="BecauseMerge-__init__"><strong>__init__</strong></a>(self, f, set)</dt></dl>
+
+<dl><dt><a name="BecauseMerge-explain"><strong>explain</strong></a>(self, ko, flags)</dt></dl>
+
+<dl><dt><a name="BecauseMerge-newStatement"><strong>newStatement</strong></a>(self, s, why)</dt></dl>
+
+<hr>
+Methods inherited from <a href="why.html#KBReasonTracker">KBReasonTracker</a>:<br>
+<dl><dt><a name="BecauseMerge-explanation"><strong>explanation</strong></a>(self, ko<font color="#909090">=None</font>, flags<font color="#909090">=''</font>)</dt><dd><tt>Produce&nbsp;a&nbsp;justification&nbsp;for&nbsp;this&nbsp;formula&nbsp;into&nbsp;the&nbsp;output&nbsp;formula<br>
+&nbsp;<br>
+Creates&nbsp;an&nbsp;output&nbsp;formula&nbsp;if&nbsp;necessary.<br>
+returns&nbsp;it.<br>
+(This&nbsp;is&nbsp;different&nbsp;from&nbsp;reason.<a href="#BecauseMerge-explain">explain</a>(ko)&nbsp;which&nbsp;returns&nbsp;the&nbsp;reason)</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="why.html#Reason">Reason</a>:<br>
+<dl><dt><a name="BecauseMerge-meIn"><strong>meIn</strong></a>(self, ko)</dt><dd><tt>The&nbsp;representation&nbsp;of&nbsp;this&nbsp;object&nbsp;in&nbsp;the&nbsp;formula&nbsp;ko</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="BecauseOfCommandLine">class <strong>BecauseOfCommandLine</strong></a>(<a href="why.html#Because">Because</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#Because">Because</a>&nbsp;of&nbsp;the&nbsp;command&nbsp;line&nbsp;given&nbsp;in&nbsp;the&nbsp;string<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="why.html#BecauseOfCommandLine">BecauseOfCommandLine</a></dd>
+<dd><a href="why.html#Because">Because</a></dd>
+<dd><a href="why.html#Reason">Reason</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="BecauseOfCommandLine-explain"><strong>explain</strong></a>(self, ko, flags)</dt><dd><tt>Describe&nbsp;this&nbsp;reason&nbsp;to&nbsp;an&nbsp;RDF&nbsp;store<br>
+Returns&nbsp;the&nbsp;value&nbsp;of&nbsp;this&nbsp;reason&nbsp;as&nbsp;interned&nbsp;in&nbsp;the&nbsp;store.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="why.html#Because">Because</a>:<br>
+<dl><dt><a name="BecauseOfCommandLine-__init__"><strong>__init__</strong></a>(self, str, because<font color="#909090">=None</font>)</dt></dl>
+
+<hr>
+Methods inherited from <a href="why.html#Reason">Reason</a>:<br>
+<dl><dt><a name="BecauseOfCommandLine-meIn"><strong>meIn</strong></a>(self, ko)</dt><dd><tt>The&nbsp;representation&nbsp;of&nbsp;this&nbsp;object&nbsp;in&nbsp;the&nbsp;formula&nbsp;ko</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="BecauseOfData">class <strong>BecauseOfData</strong></a>(<a href="why.html#Because">Because</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Directly&nbsp;from&nbsp;data&nbsp;in&nbsp;the&nbsp;resource&nbsp;whose&nbsp;URI&nbsp;is&nbsp;the&nbsp;string.<br>
+&nbsp;<br>
+A&nbsp;nested&nbsp;reason&nbsp;can&nbsp;also&nbsp;be&nbsp;given,&nbsp;for&nbsp;why&nbsp;this&nbsp;resource&nbsp;was&nbsp;parsed.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="why.html#BecauseOfData">BecauseOfData</a></dd>
+<dd><a href="why.html#Because">Because</a></dd>
+<dd><a href="why.html#Reason">Reason</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="BecauseOfData-__init__"><strong>__init__</strong></a>(self, source, because<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="BecauseOfData-explain"><strong>explain</strong></a>(self, ko, flags)</dt><dd><tt>Describe&nbsp;this&nbsp;reason&nbsp;to&nbsp;an&nbsp;RDF&nbsp;store<br>
+Returns&nbsp;the&nbsp;value&nbsp;of&nbsp;this&nbsp;reason&nbsp;as&nbsp;interned&nbsp;in&nbsp;the&nbsp;store.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="why.html#Reason">Reason</a>:<br>
+<dl><dt><a name="BecauseOfData-meIn"><strong>meIn</strong></a>(self, ko)</dt><dd><tt>The&nbsp;representation&nbsp;of&nbsp;this&nbsp;object&nbsp;in&nbsp;the&nbsp;formula&nbsp;ko</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="BecauseOfExperience">class <strong>BecauseOfExperience</strong></a>(<a href="why.html#Because">Because</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Becase&nbsp;of&nbsp;the&nbsp;experience&nbsp;of&nbsp;this&nbsp;agent,&nbsp;as&nbsp;described&nbsp;in&nbsp;the&nbsp;string<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="why.html#BecauseOfExperience">BecauseOfExperience</a></dd>
+<dd><a href="why.html#Because">Because</a></dd>
+<dd><a href="why.html#Reason">Reason</a></dd>
+</dl>
+<hr>
+Methods inherited from <a href="why.html#Because">Because</a>:<br>
+<dl><dt><a name="BecauseOfExperience-__init__"><strong>__init__</strong></a>(self, str, because<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="BecauseOfExperience-explain"><strong>explain</strong></a>(self, ko, flags)</dt><dd><tt>Describe&nbsp;this&nbsp;reason&nbsp;to&nbsp;an&nbsp;RDF&nbsp;store<br>
+Returns&nbsp;the&nbsp;value&nbsp;of&nbsp;this&nbsp;reason&nbsp;as&nbsp;interned&nbsp;in&nbsp;the&nbsp;store.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="why.html#Reason">Reason</a>:<br>
+<dl><dt><a name="BecauseOfExperience-meIn"><strong>meIn</strong></a>(self, ko)</dt><dd><tt>The&nbsp;representation&nbsp;of&nbsp;this&nbsp;object&nbsp;in&nbsp;the&nbsp;formula&nbsp;ko</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="BecauseOfRule">class <strong>BecauseOfRule</strong></a>(<a href="why.html#Reason">Reason</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="BecauseOfRule-__init__"><strong>__init__</strong></a>(self, rule, bindings, knownExistentials, evidence, kb, because<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="BecauseOfRule-explain"><strong>explain</strong></a>(self, ko, flags)</dt><dd><tt>Describe&nbsp;this&nbsp;reason&nbsp;to&nbsp;an&nbsp;RDF&nbsp;store<br>
+Returns&nbsp;the&nbsp;value&nbsp;of&nbsp;this&nbsp;reason&nbsp;as&nbsp;interned&nbsp;in&nbsp;the&nbsp;store.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="why.html#Reason">Reason</a>:<br>
+<dl><dt><a name="BecauseOfRule-meIn"><strong>meIn</strong></a>(self, ko)</dt><dd><tt>The&nbsp;representation&nbsp;of&nbsp;this&nbsp;object&nbsp;in&nbsp;the&nbsp;formula&nbsp;ko</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="BecauseSubexpression">class <strong>BecauseSubexpression</strong></a>(<a href="why.html#Reason">Reason</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>This&nbsp;was&nbsp;generated&nbsp;as&nbsp;part&nbsp;of&nbsp;a&nbsp;calculatio&nbsp;of&nbsp;a&nbsp;subexpression.<br>
+&nbsp;<br>
+It&nbsp;is&nbsp;is&nbsp;not&nbsp;necessarily&nbsp;believed<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="BecauseSubexpression-explain"><strong>explain</strong></a>(self, ko, flags)</dt><dd><tt>Describe&nbsp;this&nbsp;reason&nbsp;to&nbsp;an&nbsp;RDF&nbsp;store<br>
+Returns&nbsp;the&nbsp;value&nbsp;of&nbsp;this&nbsp;reason&nbsp;as&nbsp;interned&nbsp;in&nbsp;the&nbsp;store.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="why.html#Reason">Reason</a>:<br>
+<dl><dt><a name="BecauseSubexpression-__init__"><strong>__init__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="BecauseSubexpression-meIn"><strong>meIn</strong></a>(self, ko)</dt><dd><tt>The&nbsp;representation&nbsp;of&nbsp;this&nbsp;object&nbsp;in&nbsp;the&nbsp;formula&nbsp;ko</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="BecauseSupports">class <strong>BecauseSupports</strong></a>(<a href="why.html#BecauseBuiltIn">BecauseBuiltIn</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#Because">Because</a>&nbsp;of&nbsp;the&nbsp;very&nbsp;special&nbsp;build-in&nbsp;log:supports<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="why.html#BecauseSupports">BecauseSupports</a></dd>
+<dd><a href="why.html#BecauseBuiltIn">BecauseBuiltIn</a></dd>
+<dd><a href="why.html#Reason">Reason</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="BecauseSupports-__init__"><strong>__init__</strong></a>(self, context, subj, conclusion, pred, obj, reason)</dt></dl>
+
+<dl><dt><a name="BecauseSupports-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="BecauseSupports-explain"><strong>explain</strong></a>(self, ko, flags)</dt><dd><tt>This&nbsp;is&nbsp;just&nbsp;a&nbsp;plain&nbsp;fact&nbsp;-&nbsp;or&nbsp;was&nbsp;at&nbsp;the&nbsp;time.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="why.html#Reason">Reason</a>:<br>
+<dl><dt><a name="BecauseSupports-meIn"><strong>meIn</strong></a>(self, ko)</dt><dd><tt>The&nbsp;representation&nbsp;of&nbsp;this&nbsp;object&nbsp;in&nbsp;the&nbsp;formula&nbsp;ko</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="KBReasonTracker">class <strong>KBReasonTracker</strong></a>(<a href="why.html#Reason">Reason</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;reason&nbsp;tracker&nbsp;tracks&nbsp;the&nbsp;reasons&nbsp;for&nbsp;the&nbsp;statements&nbsp;in&nbsp;its&nbsp;formula.<br>
+&nbsp;<br>
+Beware&nbsp;that&nbsp;when&nbsp;a&nbsp;new&nbsp;formula&nbsp;is<br>
+interned,&nbsp;the&nbsp;proofsOf&nbsp;dict&nbsp;must&nbsp;be&nbsp;informed&nbsp;that&nbsp;its&nbsp;identity&nbsp;has&nbsp;changed.<br>
+The&nbsp;ForumulaReason&nbsp;is&nbsp;informed&nbsp;of&nbsp;each&nbsp;statement&nbsp;added&nbsp;to&nbsp;the&nbsp;knowlege<br>
+base.<br>
+&nbsp;<br>
+A&nbsp;knowledge&nbsp;base&nbsp;(open&nbsp;formula)&nbsp;is&nbsp;made&nbsp;from&nbsp;the&nbsp;addition&nbsp;of&nbsp;forumlae,<br>
+which&nbsp;result&nbsp;from,&nbsp;for&nbsp;example&nbsp;parsing&nbsp;a&nbsp;document&nbsp;or&nbsp;doing&nbsp;inference.<br>
+Within&nbsp;such&nbsp;added&nbsp;formulae,&nbsp;there&nbsp;are&nbsp;variables,&nbsp;including&nbsp;bnodes,&nbsp;which<br>
+have&nbsp;a&nbsp;cetain&nbsp;scope.&nbsp;&nbsp;It&nbsp;is&nbsp;impossible&nbsp;to&nbsp;consider&nbsp;the&nbsp;process<br>
+as&nbsp;being&nbsp;one&nbsp;of&nbsp;simply&nbsp;adding&nbsp;statements,&nbsp;as&nbsp;the&nbsp;cross-reference&nbsp;of<br>
+the&nbsp;vaiables&nbsp;within&nbsp;the&nbsp;add&nbsp;formuls&nbsp;mst&nbsp;be&nbsp;preserved.&nbsp;<br>
+Variable&nbsp;renaming&nbsp;may&nbsp;occur&nbsp;as&nbsp;thr&nbsp;formula&nbsp;is&nbsp;added.&nbsp;<br>
+&nbsp;<br>
+When&nbsp;we&nbsp;track&nbsp;these&nbsp;operations&nbsp;for&nbsp;generating&nbsp;a&nbsp;proof,&nbsp;a&nbsp;proof&nbsp;reason<br>
+such&nbsp;as&nbsp;an&nbsp;<a href="#BecauseOfRule">BecauseOfRule</a>&nbsp;or&nbsp;<a href="#BecauseOfData">BecauseOfData</a>&nbsp;corresponds&nbsp;to&nbsp;an&nbsp;added&nbsp;formula.<br>
+The&nbsp;<a href="#KBReasonTracker">KBReasonTracker</a>&nbsp;tracks&nbsp;which&nbsp;statements&nbsp;in&nbsp;a&nbsp;&nbsp;formula&nbsp;came&nbsp;from&nbsp;which<br>
+addion&nbsp;operations.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="KBReasonTracker-__init__"><strong>__init__</strong></a>(self, formula<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="KBReasonTracker-explain"><strong>explain</strong></a>(self, ko, flags)</dt></dl>
+
+<dl><dt><a name="KBReasonTracker-explanation"><strong>explanation</strong></a>(self, ko<font color="#909090">=None</font>, flags<font color="#909090">=''</font>)</dt><dd><tt>Produce&nbsp;a&nbsp;justification&nbsp;for&nbsp;this&nbsp;formula&nbsp;into&nbsp;the&nbsp;output&nbsp;formula<br>
+&nbsp;<br>
+Creates&nbsp;an&nbsp;output&nbsp;formula&nbsp;if&nbsp;necessary.<br>
+returns&nbsp;it.<br>
+(This&nbsp;is&nbsp;different&nbsp;from&nbsp;reason.<a href="#KBReasonTracker-explain">explain</a>(ko)&nbsp;which&nbsp;returns&nbsp;the&nbsp;reason)</tt></dd></dl>
+
+<dl><dt><a name="KBReasonTracker-newStatement"><strong>newStatement</strong></a>(self, s, why)</dt></dl>
+
+<hr>
+Methods inherited from <a href="why.html#Reason">Reason</a>:<br>
+<dl><dt><a name="KBReasonTracker-meIn"><strong>meIn</strong></a>(self, ko)</dt><dd><tt>The&nbsp;representation&nbsp;of&nbsp;this&nbsp;object&nbsp;in&nbsp;the&nbsp;formula&nbsp;ko</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Premise">class <strong>Premise</strong></a>(<a href="why.html#Reason">Reason</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>For&nbsp;the&nbsp;reason&nbsp;given&nbsp;on&nbsp;the&nbsp;string.<br>
+This&nbsp;is&nbsp;a&nbsp;kinda&nbsp;end&nbsp;of&nbsp;the&nbsp;road&nbsp;reason.<br>
+It&nbsp;contais&nbsp;the&nbsp;info&nbsp;which&nbsp;was&nbsp;literally&nbsp;supplied&nbsp;as&nbsp;a&nbsp;premise.<br>
+&nbsp;<br>
+A&nbsp;nested&nbsp;reason&nbsp;can&nbsp;also&nbsp;be&nbsp;given.<br>
+<a href="#Because">Because</a>&nbsp;a&nbsp;premise&nbsp;has&nbsp;to&nbsp;be&nbsp;taken&nbsp;for&nbsp;granted,&nbsp;the&nbsp;tracker<br>
+has&nbsp;to&nbsp;tell&nbsp;a&nbsp;Premis&nbsp;what&nbsp;statements&nbsp;it&nbsp;has.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Premise-__init__"><strong>__init__</strong></a>(self, str, because<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="Premise-explain"><strong>explain</strong></a>(self, ko, flags)</dt><dd><tt>Describe&nbsp;this&nbsp;reason&nbsp;to&nbsp;an&nbsp;RDF&nbsp;store<br>
+Returns&nbsp;the&nbsp;value&nbsp;of&nbsp;this&nbsp;reason&nbsp;as&nbsp;interned&nbsp;in&nbsp;the&nbsp;store.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="why.html#Reason">Reason</a>:<br>
+<dl><dt><a name="Premise-meIn"><strong>meIn</strong></a>(self, ko)</dt><dd><tt>The&nbsp;representation&nbsp;of&nbsp;this&nbsp;object&nbsp;in&nbsp;the&nbsp;formula&nbsp;ko</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Reason">class <strong>Reason</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>The&nbsp;<a href="#Reason">Reason</a>&nbsp;class&nbsp;holds&nbsp;a&nbsp;reason&nbsp;for&nbsp;having&nbsp;some&nbsp;information.<br>
+Well,&nbsp;its&nbsp;subclasses&nbsp;actually&nbsp;do&nbsp;hold&nbsp;data.&nbsp;&nbsp;This&nbsp;class&nbsp;should&nbsp;not&nbsp;be&nbsp;used<br>
+itself&nbsp;to&nbsp;make&nbsp;instances.&nbsp;&nbsp;Reasons&nbsp;may&nbsp;be&nbsp;given&nbsp;to&nbsp;any&nbsp;functions&nbsp;which&nbsp;put<br>
+data&nbsp;into&nbsp;stores,&nbsp;is&nbsp;tracking&nbsp;or&nbsp;proof/explanation&nbsp;generation&nbsp;may&nbsp;be<br>
+required<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Reason-__init__"><strong>__init__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Reason-explain"><strong>explain</strong></a>(self, ko, flags)</dt><dd><tt>Describe&nbsp;this&nbsp;reason&nbsp;to&nbsp;an&nbsp;RDF&nbsp;store<br>
+Returns&nbsp;the&nbsp;value&nbsp;of&nbsp;this&nbsp;object&nbsp;as&nbsp;interned&nbsp;in&nbsp;the&nbsp;store.</tt></dd></dl>
+
+<dl><dt><a name="Reason-meIn"><strong>meIn</strong></a>(self, ko)</dt><dd><tt>The&nbsp;representation&nbsp;of&nbsp;this&nbsp;object&nbsp;in&nbsp;the&nbsp;formula&nbsp;ko</tt></dd></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-describeStatement"><strong>describeStatement</strong></a>(s_l, ko, flags)</dt><dd><tt>Describe&nbsp;the&nbsp;statement&nbsp;into&nbsp;the&nbsp;output&nbsp;formula&nbsp;ko</tt></dd></dl>
+ <dl><dt><a name="-explainFormula"><strong>explainFormula</strong></a>(f, flags<font color="#909090">=''</font>)</dt><dd><tt>Return&nbsp;the&nbsp;explanation&nbsp;formula&nbsp;for&nbsp;f</tt></dd></dl>
+ <dl><dt><a name="-explainStatement"><strong>explainStatement</strong></a>(s, ko, ss<font color="#909090">=None</font>, flags<font color="#909090">=''</font>)</dt></dl>
+ <dl><dt><a name="-explainStatements"><strong>explainStatements</strong></a>(s_l, ko, ss<font color="#909090">=None</font>, flags<font color="#909090">=''</font>)</dt></dl>
+ <dl><dt><a name="-formulaStandIn"><strong>formulaStandIn</strong></a>(self, ko, f, flags)<font color="#909090"><font face="helvetica, arial"> method of <a href="__builtin__.html#dict">__builtin__.dict</a> instance</font></font></dt></dl>
+ <dl><dt><a name="-getStatementReason"><strong>getStatementReason</strong></a>(s)</dt></dl>
+ <dl><dt><a name="-isTopLevel"><strong>isTopLevel</strong></a>(f)</dt></dl>
+ <dl><dt><a name="-newTopLevelFormula"><strong>newTopLevelFormula</strong></a>(f)</dt></dl>
+ <dl><dt><a name="-report"><strong>report</strong></a>(statement, why)</dt><dd><tt>Report&nbsp;a&nbsp;new&nbsp;statement&nbsp;to&nbsp;the&nbsp;reason&nbsp;tracking&nbsp;software<br>
+&nbsp;<br>
+This&nbsp;module&nbsp;stores&nbsp;the&nbsp;reasons.&nbsp;&nbsp;The&nbsp;store&nbsp;should&nbsp;call&nbsp;this<br>
+method&nbsp;to&nbsp;report&nbsp;new&nbsp;data.&nbsp;See&nbsp;the&nbsp;<a href="#KBReasonTracker">KBReasonTracker</a>&nbsp;class<br>
+&nbsp;<br>
+Most&nbsp;formulas&nbsp;don't&nbsp;need&nbsp;collectors.&nbsp;Let's&nbsp;see&nbsp;if&nbsp;we&nbsp;can&nbsp;change&nbsp;that.</tt></dd></dl>
+ <dl><dt><a name="-smushedFormula"><strong>smushedFormula</strong></a>(F, G)</dt><dd><tt>The&nbsp;formula&nbsp;F&nbsp;has&nbsp;been&nbsp;replaced&nbsp;by&nbsp;G<br>
+&nbsp;<br>
+<a href="#Because">Because</a>&nbsp;this&nbsp;module&nbsp;tracks&nbsp;formula&nbsp;in&nbsp;stores,&nbsp;if&nbsp;ever&nbsp;the&nbsp;address<br>
+of&nbsp;a&nbsp;formula&nbsp;is&nbsp;changed,&nbsp;that&nbsp;is&nbsp;(currently)&nbsp;when&nbsp;it&nbsp;is&nbsp;<br>
+canonicalized,&nbsp;then&nbsp;the&nbsp;fact&nbsp;must&nbsp;be&nbsp;reported&nbsp;here.</tt></dd></dl>
+ <dl><dt><a name="-sorted"><strong>sorted</strong></a>(...)</dt><dd><tt><a href="#-sorted">sorted</a>(iterable,&nbsp;cmp=None,&nbsp;key=None,&nbsp;reverse=False)&nbsp;--&gt;&nbsp;new&nbsp;sorted&nbsp;list</tt></dd></dl>
+ <dl><dt><a name="-subFormulaStandIn"><strong>subFormulaStandIn</strong></a>(self, ko, f, flags)<font color="#909090"><font face="helvetica, arial"> method of <a href="__builtin__.html#dict">__builtin__.dict</a> instance</font></font></dt></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>MAX_INLINE_SIZE</strong> = 10<br>
+<strong>REIFY_NS</strong> = 'http://www.w3.org/2004/06/rei#'<br>
+<strong>becauseSubexpression</strong> = &lt;why.BecauseSubexpression instance&gt;<br>
+<strong>dontAsk</strong> = &lt;why.Because instance&gt;<br>
+<strong>flagHelp</strong> = '<font color="#c040c0">\n</font>n           use iNdirect formulas when they get...ays give the :gives clause, even when not needed<font color="#c040c0">\n</font>'<br>
+<strong>log</strong> = &lt;myStore.Namespace object&gt;<br>
+<strong>proofsOf</strong> = &lt;WeakKeyDictionary at 1076571532&gt;<br>
+<strong>rdf</strong> = &lt;myStore.Namespace object&gt;<br>
+<strong>reason</strong> = &lt;myStore.Namespace object&gt;</td></tr></table>
+</body></html>

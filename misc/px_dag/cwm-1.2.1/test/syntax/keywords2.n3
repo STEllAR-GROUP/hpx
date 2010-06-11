@@ -1,0 +1,18 @@
+
+# Test the cwm quick variable declarations
+
+
+@keywords.   # Use no keywards
+
+
+@prefix : <foo.n3#>.  # Local stuff
+
+@forAll x, y, z.
+@forSome a, b, c.
+
+b a c.  # Should simply use a as a local symbol, NOT as rdf:type.
+
+
+# {x mother y. y sister z} => {x aunt z}.  Comented out 7/7/7 - separate formula testing elsewhere
+
+#ends

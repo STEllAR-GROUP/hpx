@@ -1,0 +1,55 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module diag</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>diag</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/yosi/CVSROOT/WWW/2000/10/swap/diag.py">/Users/yosi/CVSROOT/WWW/2000/10/swap/diag.py</a></font></td></tr></table>
+    <p><tt>Use&nbsp;this&nbsp;with&nbsp;diagnostics&nbsp;so&nbsp;that&nbsp;it&nbsp;can&nbsp;be&nbsp;changed&nbsp;as&nbsp;necessary<br>
+For&nbsp;example,&nbsp;sometimes&nbsp;want&nbsp;on&nbsp;stdout&nbsp;maybe&nbsp;or&nbsp;in&nbsp;a&nbsp;scroll&nbsp;window....<br>
+&nbsp;<br>
+Let's&nbsp;replace&nbsp;this&nbsp;with&nbsp;pythong&nbsp;logging&nbsp;stuff.<br>
+at&nbsp;least&nbsp;get&nbsp;it&nbsp;to&nbsp;the&nbsp;point&nbsp;where&nbsp;"make&nbsp;quick"&nbsp;in&nbsp;swap/test&nbsp;works.<br>
+&nbsp;<br>
+There&nbsp;is&nbsp;some&nbsp;wierd&nbsp;stuff&nbsp;here&nbsp;because&nbsp;TimBL&nbsp;and&nbsp;I&nbsp;couldn't<br>
+figure&nbsp;out&nbsp;how&nbsp;to&nbsp;share&nbsp;the&nbsp;chatty&nbsp;global&nbsp;across&nbsp;modules.<br>
+Surely&nbsp;Daniel&nbsp;K&nbsp;and&nbsp;DanC&nbsp;should&nbsp;be&nbsp;able&nbsp;figure&nbsp;that&nbsp;out.</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#fffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="os.html">os</a><br>
+</td><td width="25%" valign=top><a href="sys.html">sys</a><br>
+</td><td width="25%" valign=top><a href="traceback.html">traceback</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-printState"><strong>printState</strong></a>(prefix<font color="#909090">='#trace# '</font>)</dt><dd><tt>Output&nbsp;the&nbsp;(caller's)&nbsp;function&nbsp;name&nbsp;and&nbsp;local&nbsp;variables</tt></dd></dl>
+ <dl><dt><a name="-progress"><strong>progress</strong></a>(*args)</dt><dd><tt>##lineCount&nbsp;=&nbsp;[0]</tt></dd></dl>
+ <dl><dt><a name="-setTracking"><strong>setTracking</strong></a>(x)</dt></dl>
+ <dl><dt><a name="-setVerbosity"><strong>setVerbosity</strong></a>(x)</dt></dl>
+ <dl><dt><a name="-utf_8_encode"><strong>utf_8_encode</strong></a>(...)</dt></dl>
+ <dl><dt><a name="-verbosity"><strong>verbosity</strong></a>()</dt></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>chatty_flag</strong> = 0<br>
+<strong>file_list</strong> = []<br>
+<strong>print_all_file_names</strong> = 0<br>
+<strong>tracking</strong> = 0</td></tr></table>
+</body></html>

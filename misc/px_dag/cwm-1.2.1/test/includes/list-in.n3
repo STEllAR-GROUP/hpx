@@ -1,0 +1,13 @@
+@prefix li:  <http://www.w3.org/2000/10/swap/list#> .
+@keywords.
+
+{ ?x li:in (3 4 5) } => { ?x a RESULT1 }.
+
+
+{ ( joe fred amy ) li:member ?y  } => { ?y @a Friend }.
+
+
+
+{   ((3 4 5) (5 12 13))!li:member   li:member ?z } => { ?z a Pythagorean }.
+
+# ends

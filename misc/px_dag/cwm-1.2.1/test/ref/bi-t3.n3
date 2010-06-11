@@ -1,0 +1,23 @@
+     @prefix : <#> .
+     @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    
+    :test3     a :success .
+    {
+        {
+            :theSky     :is :blue .
+            
+            }     log:includes {:theSky     :is :blue .
+            } .
+        
+        }     log:implies {:test3     a :success .
+        } .
+    {
+        {
+            :theSky     :is :blue .
+            
+            }     log:notIncludes {:theSky     :is :blue .
+            } .
+        
+        }     log:implies {:test3_bis     a :FAILURE .
+        } .
+    

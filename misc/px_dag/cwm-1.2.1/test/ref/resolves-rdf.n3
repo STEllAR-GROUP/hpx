@@ -1,0 +1,15 @@
+     @prefix : <#> .
+     @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+     @prefix u: <http://www.w3.org/2000/01/rdf-schema#> .
+    
+    @forAll :x .
+    
+    <animal.rdf#Animal>     a :ClassInAnimal_rdf .
+    {
+        <animal.rdf>     log:semantics  [
+                 log:includes {:x     a u:Class .
+                } ] .
+        
+        }     log:implies {:x     a :ClassInAnimal_rdf .
+        } .
+    

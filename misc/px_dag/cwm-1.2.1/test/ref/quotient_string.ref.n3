@@ -1,0 +1,15 @@
+     @prefix : <#> .
+    @prefix math: <http://www.w3.org/2000/10/swap/math#> .
+    
+     @forAll :X .
+    
+    4.34782608696e+00     a :Answer .
+    {
+        
+          ( "10"
+            "2.3" )
+             math:quotient :X .
+        
+        }     <http://www.w3.org/2000/10/swap/log#implies> {:X     a :Answer .
+        } .
+    

@@ -1,0 +1,14 @@
+
+/* transformed by:                    */
+/*   Id: rdf2dot.xsl,v 1.13 2001/05/23 19:46:25 connolly Exp  */
+
+digraph i__1483 {
+label="W3C Technology Roadmap";
+ "http://www.w3.org/2001/04/roadmap/swws#k_dep" [ label="X depends on this", color="gold1", style="filled", ];
+ "http://www.w3.org/2001/04/roadmap/swws#k_something" [ label="the\nspec X", color="gold1", style="filled", ];
+"http://www.w3.org/2001/04/roadmap/swws#k_something" -> "http://www.w3.org/2001/04/roadmap/swws#k_dep"
+  [color="black",  ]
+
+}
+
+/*  End of generated .dot file.  */

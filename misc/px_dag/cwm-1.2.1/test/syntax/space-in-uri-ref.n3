@@ -1,0 +1,5 @@
+     @prefix : <http://example.com/baz#> .
+    
+    <http://example.com/foo%20bar>     a :C,
+                :D .
+    

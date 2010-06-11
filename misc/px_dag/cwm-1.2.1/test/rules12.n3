@@ -1,0 +1,27 @@
+#    Test filter in N3
+# Use
+# cwm rules12.n3 -think -filter=filter12.n3
+#  should conclude that  granpa is ancestor of bill
+# 
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix daml: <http://www.daml.org/2001/03/daml+oil#> .
+@prefix : <#> .
+@prefix rules: <#> .
+
+# SimplifiedDanC challenge  - simplied version of rules13.n3
+
+@forAll <#p> .
+
+{  <#p> a daml:TransitiveProperty . } log:implies
+
+{
+    @forAll <#x> , <#y> , <#z>.
+    { <#x> <#p> <#y>. <#y> <#p> <#z>. } log:implies { <#x> <#p> <#z>. }.
+} .
+
+
+<#ancestor>  a daml:TransitiveProperty .
+<#granpa> <#ancestor> <#pa> .
+<#pa> <#ancestor> <#bill> .
+
+

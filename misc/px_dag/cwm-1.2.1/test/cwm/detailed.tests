@@ -1,0 +1,22 @@
+# List of regression tests
+#
+#      Teset for cwm command line features
+#
+# Note: Command lines must be for running in the directory above.
+#
+@prefix : <#>.
+@prefix x: <#>.
+@prefix test: <http://www.w3.org/2000/10/swap/test.n3#>.
+@prefix dc:  <http://purl.org/dc/elements/1.1/>. # yuk - under protest - no hash
+
+
+
+:cwm001 a test:CwmTest;
+    test:referenceOutput <fam-thinkwith.ref>;
+    test:addressesProblemRaisedBy <>;
+    test:description   "Use think=rules.n3 to iterate using separate rules";
+    test:arguments     """cwm/fam.n3 --think=cwm/fam-rules.n3""".
+
+
+
+#ends

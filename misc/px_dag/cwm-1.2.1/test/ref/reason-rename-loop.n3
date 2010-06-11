@@ -1,0 +1,27 @@
+     @prefix : <http://example.com/swap/test/reason/rename-loop.n3#> .
+    @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    
+     @forAll :X,
+                :Y,
+                :Z .
+    {
+         @forAll :A .
+        :A     :b :c .
+        
+        }     a :Thing2 .
+    {
+         @forAll :A .
+        :A     :b :c .
+        
+        }     a :Thing .
+    {
+        :X     log:includes {
+              [      :b :Y ].
+            } .
+        :Z     a :Thing;
+             log:conclusion :X .
+        
+        }     log:implies {:X     a :Thing2 .
+        } .
+    
+

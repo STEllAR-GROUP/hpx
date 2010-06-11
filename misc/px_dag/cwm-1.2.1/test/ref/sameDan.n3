@@ -1,0 +1,114 @@
+     @prefix : <sameThing.n3#> .
+    @prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#> .
+    @prefix dc: <http://purl.org/dc/elements/1.1/> .
+    @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    @prefix ont: <http://www.daml.org/2001/03/daml+oil#> .
+    @prefix rcs: <http://www.w3.org/2001/03swell/rcs#> .
+    @prefix sam: <sameDan.n3#> .
+    
+     @forAll sam:x,
+                :p,
+                :q,
+                :x,
+                :y,
+                :z.
+         @forSome <#_g0> .
+    
+    <sameDan.n3>     dc:creator <#_g0>;
+         dc:description """rules for determining when two terms denote
+the same thing.""";
+         dc:relation <forgetDups.n3>;
+         dc:rights "copyright (c) 2001 W3C (MIT, Keio, INRIA)";
+         rcs:id "" .
+    
+    sam:test1     a sam:Success .
+    
+    <sameThing.n3>     dc:creator <#_g0>;
+         dc:description "substituion of equals for equals in triples, plus some rules for unambiguous/unique properties (@@that probably belong elsewhere)";
+         dc:relation <forgetDups.n3>;
+         dc:rights "copyright (c) 2001 W3C (MIT, Keio, INRIA)";
+         rcs:id "" .
+    
+    contact:homePageAddress     a ont:UnambiguousProperty .
+    
+    contact:mailbox     a ont:UnambiguousProperty .
+    
+    <#_g0>     sam:birthPlace sam:KC;
+         sam:hairColor sam:red;
+         contact:fullName "Dan Connolly";
+         contact:homePage <http://www.w3.org/People/Connolly/>;
+         contact:mailbox <mailto:connolly@w3.org>;
+         = <#_g0> .
+    {
+        :p     a ont:UnambiguousProperty .
+        
+        }     log:implies {{
+            :x     :p :z .
+            :y     :p :z .
+            
+            }     log:implies {:x     = :y .
+            } .
+        } .
+    {
+        :p     a ont:UniqueProperty .
+        
+        }     log:implies {{
+            :x     :p :y,
+                        :z .
+            
+            }     log:implies {:y     = :z .
+            } .
+        } .
+    {
+        :x     = :y .
+        
+        }     log:implies {:y     = :x .
+        } .
+    {
+        :x     = :z .
+        
+        }     log:implies {:x     = :z .
+        } .
+    {
+        sam:x     sam:birthPlace sam:KC;
+             sam:hairColor sam:red .
+        
+        }     log:implies {sam:test1     a sam:Success .
+        } .
+    {
+        :x     contact:homePageAddress :z .
+        :y     contact:homePageAddress :z .
+        
+        }     log:implies {:x     = :y .
+        } .
+    {
+        :x     contact:mailbox :z .
+        :y     contact:mailbox :z .
+        
+        }     log:implies {:x     = :y .
+        } .
+    {
+        :p     log:notEqualTo log:forAll,
+                    log:forSome;
+             = :q .
+        :x     :p :y .
+        
+        }     log:implies {:x     :q :y .
+        } .
+    {
+        :p     log:notEqualTo log:forAll,
+                    log:forSome .
+        :x     = :z;
+             :p :y .
+        
+        }     log:implies {:z     :p :y .
+        } .
+    {
+        :p     log:notEqualTo log:forAll,
+                    log:forSome .
+        :x     :p :y .
+        :y     = :z .
+        
+        }     log:implies {:x     :p :z .
+        } .
+    

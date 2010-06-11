@@ -1,0 +1,15 @@
+# test: make sure that the prefix isn't used when it can't be
+@prefix : <http://example.com/foo#>.
+
+
+<http://example.com/foo#hyphen-ated> <http://example.com/foo#dot.ted>
+<http://example.com/foo#hyphen-and.dot> .
+
+<http://example.com/foo#minus-_underscore> <http://example.com/foo#under_score>
+<http://example.com/foo#underscore_-minus> .
+
+<http://example.com/foo#a> <http://example.com/foo#b> <http://example.com/foo#c>.
+
+
+#end
+

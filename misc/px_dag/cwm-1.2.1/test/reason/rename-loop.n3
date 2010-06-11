@@ -1,0 +1,9 @@
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@forAll :Y .
+
+{@forAll :A . :A :b :c} a :Thing .
+
+{ ?Z a :Thing .
+  ?Z log:conclusion ?X .
+  ?X log:includes {_:a :b :Y} .
+} => {?X a :Thing2} .

@@ -1,0 +1,37 @@
+
+@prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>.
+@prefix rcs: <http://www.w3.org/2001/03swell/rcs#>.
+@prefix doc:  <http://www.w3.org/2000/10/swap/pim/doc#> .
+
+
+<>   rcs:id "$Id: endsWith.n3,v 1.3 2004/06/25 01:27:00 timbl Exp $";
+
+  doc:creator [ 
+	contact:fullName "Tim berners-Lee";
+	contact:homePage <http://www.w3.org/People/Berners-Lee/>;
+	contact:mailbox <mailto:timbl@w3.org>
+	].
+
+
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+@prefix string: <http://www.w3.org/2000/10/swap/string#>.
+@prefix : <#>.
+
+@forAll :x, :y, :z, :p, :q.
+
+{ "asdfghjkl" string:endsWith "jkl" } log:implies { :test1 a :success }.
+
+{ "asdfghjkl" string:endsWith "jkk" } log:implies { :test2 a :FAILURE }.
+
+{ "jkl" string:endsWith "jkl" } log:implies { :test3 a :success }.
+
+{ "asdfghjkl" string:endsWith "aaajkl" } log:implies { :test4 a :FAILURE }.
+
+{ "asdfjhkh" string:endsWith "asd" } log:implies { :test5 a :FAILURE }.
+
+{ "foobar" string:endsWith "" } log:implies { :test6 a :success }.
+
+{ "" string:endsWith "" } log:implies { :test7 a :success }.
+
+#ends
+

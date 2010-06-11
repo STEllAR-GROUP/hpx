@@ -1,0 +1,132 @@
+     @prefix : <#> .
+    @prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#> .
+    @prefix doc: <http://www.w3.org/2000/10/swap/pim/doc#> .
+    @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    @prefix rcs: <http://www.w3.org/2001/03swell/rcs#> .
+    @prefix string: <http://www.w3.org/2000/10/swap/string#> .
+    
+     @forAll :x .
+    
+    "asd#jkl"     :AS_FragID "asd%23jkl";
+         :AS_URI "asd#jkl" .
+    
+    "asd'jkl"     :AS_FragID "asd%27jkl";
+         :AS_URI "asd'jkl" .
+    
+    "asd(jkl"     :AS_FragID "asd%28jkl";
+         :AS_URI "asd(jkl" .
+    
+    "asd)jkl"     :AS_FragID "asd%29jkl";
+         :AS_URI "asd)jkl" .
+    
+    "asd-jkl"     :AS_FragID "asd-jkl";
+         :AS_URI "asd-jkl" .
+    
+    "asd.jkl"     :AS_FragID "asd.jkl";
+         :AS_URI "asd.jkl" .
+    
+    "asd/jkl"     :AS_FragID "asd/jkl";
+         :AS_URI "asd%2Fjkl" .
+    
+    "asd_jkl"     :AS_FragID "asd_jkl";
+         :AS_URI "asd_jkl" .
+    
+    "asd~jkl"     :AS_FragID "asd%7Ejkl";
+         :AS_URI "asd~jkl" .
+    
+    <>     doc:creator  [
+             contact:fullName "Tim berners-Lee";
+             contact:homePage <http://www.w3.org/People/Berners-Lee/>;
+             contact:mailbox <mailto:timbl@w3.org> ];
+         rcs:id "" .
+    {
+        "asd#jkl"     string:encodeForFragID :x .
+        
+        }     log:implies {"asd#jkl"     :AS_FragID :x .
+        } .
+    {
+        "asd#jkl"     string:encodeForURI :x .
+        
+        }     log:implies {"asd#jkl"     :AS_URI :x .
+        } .
+    {
+        "asd'jkl"     string:encodeForFragID :x .
+        
+        }     log:implies {"asd'jkl"     :AS_FragID :x .
+        } .
+    {
+        "asd'jkl"     string:encodeForURI :x .
+        
+        }     log:implies {"asd'jkl"     :AS_URI :x .
+        } .
+    {
+        "asd(jkl"     string:encodeForFragID :x .
+        
+        }     log:implies {"asd(jkl"     :AS_FragID :x .
+        } .
+    {
+        "asd(jkl"     string:encodeForURI :x .
+        
+        }     log:implies {"asd(jkl"     :AS_URI :x .
+        } .
+    {
+        "asd)jkl"     string:encodeForFragID :x .
+        
+        }     log:implies {"asd)jkl"     :AS_FragID :x .
+        } .
+    {
+        "asd)jkl"     string:encodeForURI :x .
+        
+        }     log:implies {"asd)jkl"     :AS_URI :x .
+        } .
+    {
+        "asd-jkl"     string:encodeForFragID :x .
+        
+        }     log:implies {"asd-jkl"     :AS_FragID :x .
+        } .
+    {
+        "asd-jkl"     string:encodeForURI :x .
+        
+        }     log:implies {"asd-jkl"     :AS_URI :x .
+        } .
+    {
+        "asd.jkl"     string:encodeForFragID :x .
+        
+        }     log:implies {"asd.jkl"     :AS_FragID :x .
+        } .
+    {
+        "asd.jkl"     string:encodeForURI :x .
+        
+        }     log:implies {"asd.jkl"     :AS_URI :x .
+        } .
+    {
+        "asd/jkl"     string:encodeForFragID :x .
+        
+        }     log:implies {"asd/jkl"     :AS_FragID :x .
+        } .
+    {
+        "asd/jkl"     string:encodeForURI :x .
+        
+        }     log:implies {"asd/jkl"     :AS_URI :x .
+        } .
+    {
+        "asd_jkl"     string:encodeForFragID :x .
+        
+        }     log:implies {"asd_jkl"     :AS_FragID :x .
+        } .
+    {
+        "asd_jkl"     string:encodeForURI :x .
+        
+        }     log:implies {"asd_jkl"     :AS_URI :x .
+        } .
+    {
+        "asd~jkl"     string:encodeForFragID :x .
+        
+        }     log:implies {"asd~jkl"     :AS_FragID :x .
+        } .
+    {
+        "asd~jkl"     string:encodeForURI :x .
+        
+        }     log:implies {"asd~jkl"     :AS_URI :x .
+        } .
+    

@@ -1,0 +1,65 @@
+#Processed by Id: cwm.py,v 1.82 2001/11/15 22:11:23 timbl Exp 
+        #    using base file:/cygdrive/c/devel/WWW/2001/04/roadmap/sw.rdf
+        
+#  Notation3 generation by
+#       notation3.py,v 1.98 2001/11/15 22:11:24 timbl Exp
+
+#   Base was: file:/cygdrive/c/devel/WWW/2001/04/roadmap/sw.rdf
+     @prefix : <http://www.w3.org/2001/04/roadmap/w3c#> .
+     @prefix doc: <http://www.w3.org/2000/10/swap/pim/doc.n3#> .
+     @prefix gv: <http://www.w3.org/2001/02pd/gv#> .
+     @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+     @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+     @prefix rm: <http://www.w3.org/2001/04/roadmap/vocab#> .
+     @prefix swws: <http://www.w3.org/2001/04/roadmap/swws#> .
+     @prefix u: <http://www.w3.org/2000/01/rdf-schema#> .
+     @prefix v: <http://www.w3.org/2001/04/roadmap/var#> .
+    
+    
+    <sw.n3>     doc:version "$Id: test.graph,v 1.2 2007/11/18 02:01:58 syosi Exp $";
+         gv:digraph swws:theGraph .
+    
+    @forAll swws:n1,
+                swws:n2,
+                swws:p,
+                swws:type,
+                v:n1,
+                v:n2,
+                v:p,
+                v:s .
+    
+    <w3c.n3>     doc:version "$Id: test.graph,v 1.2 2007/11/18 02:01:58 syosi Exp $" .
+    
+  
+    
+    swws:k_dep     a rm:current;
+         gv:color "gold1";
+         gv:label "X depends on this";
+         gv:style "filled" .
+    
+       
+    swws:k_something     a rm:current;
+         gv:color "gold1";
+         gv:label "the\\nspec X";
+         gv:style "filled";
+         rm:needs swws:k_dep .
+    
+    
+    swws:theGraph gv:hasNode swws:k_dep, swws:k_something;
+         gv:label "W3C Semantic Web Planned Components $Date: 2007/11/18 02:01:58 $";
+         gv:subgraph swws:key;
+         swws:likes rm:current,
+                rm:external,
+                rm:goal,
+                rm:planned,
+                rm:prototyped,
+                rm:subgoal .
+    
+   
+    rm:needs     a gv:EdgeProperty;
+         gv:color "black" .
+    
+    rm:prototypes     gv:color "green1";
+         gv:style "bold" .
+    
+#ENDS

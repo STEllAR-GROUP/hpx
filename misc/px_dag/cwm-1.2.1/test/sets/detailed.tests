@@ -1,0 +1,26 @@
+# List of regression tests
+#
+# - was in bash script retest.sh
+#
+@prefix : <#>.
+@prefix x: <#>.
+@prefix test: <http://www.w3.org/2000/10/swap/test.n3#>.
+
+
+
+:t1001 a test:CwmTest;
+    test:referenceOutput <sets-reified.n3>;
+    test:description   "parsing of N3 set syntax";
+    test:arguments     """-n3 sets/sets.n3""".
+
+:t1002 a test:CwmTest;
+    test:referenceOutput <sets-reified.n3>;
+    test:description   "parsing of N3 set reified syntax";
+    test:arguments     """ sets/sets-reified.n3""".
+
+:t1005 a test:CwmTest;
+    test:referenceOutput <set-builtins.ref>;
+    test:description   "cwm set builtins";
+    test:arguments     """ sets/set_ops.n3 --think --data""".
+
+#ends

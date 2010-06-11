@@ -1,0 +1,17 @@
+     @prefix : <#> .
+     @prefix aacl: <archAcl#> .
+     @prefix c: <http://www.w3.org/2000/10/swap/pim/contact#> .
+     @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+     @prefix string: <http://www.w3.org/2000/10/swap/string#> .
+    
+    @forAll :doc .
+    
+    <mailto:w3c-rdfcore-wg@w3.org>     c:archive <http://lists.w3.org/Archives/Public/w3c-rdfcore-wg/> .
+      [      c:mailbox <mailto:w3c-rdfcore-wg@w3.org> ].
+    {
+        :doc     log:uri  [
+                 string:startsWith "http://lists.w3.org/Archives/Public/" ] .
+        
+        }     log:implies {:doc     a aacl:PubliclyReadable .
+        } .
+    

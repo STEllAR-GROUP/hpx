@@ -1,0 +1,8 @@
+@prefix : <http://www.w3.org/2004/ql#>.
+@prefix q: <http://www.w3.org/2004/ql#>.
+@prefix ex: <http://www.example.com/foo#>.
+@prefix math: <http://www.w3.org/2000/10/swap/math#>.
+@keywords a.
+
+[] select { result is (?x ?y) };
+   where  { ?x a ex:Librarian;  ex:hairColor ?y }.

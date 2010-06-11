@@ -1,0 +1,150 @@
+<!-- 
+Derived from daml-ex.rdf which used old namespaces, but was an early common test
+
+The following message was in this daml-ex.rdf, dunno what it refers to - tbl
+@@@ WARNING THIS ATTRIBUES ATE SCREWED UP IN this daml-ex.rdf
+ -->
+<rdf:RDF
+  xmlns:rdf ="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns     ="http://www.w3.org/2002/07/owl#"
+  xmlns:dpo     ="http://www.w3.org/2002/07/owl#"
+  xmlns:ex  ="#"
+  >
+
+<Ontology about="">
+  <versionInfo>$Id: owl-ex.rdf,v 1.3 2004/06/21 16:53:34 syosi Exp $</versionInfo>
+  <comment>An example ontology</comment>
+  <imports resource="http://www.daml.org/2000/10/daml-ont"/>
+</Ontology>
+
+<Class ID="Animal">
+  <label>Animal</label>
+  <comment>This class of animals is illustrative of a number of
+	ontological idioms.</comment>
+</Class>
+
+<Class ID="Male">
+  <subClassOf resource="#Animal"/>
+</Class>
+
+<Class ID="Female">
+  <subClassOf resource="#Animal"/>
+  <disjointFrom resource="#Male"/>
+</Class>
+
+<Property ID="parent">
+  <domain resource="#Animal"/>
+  <cardinality>2</cardinality>
+</Property>
+
+<Class ID="Person">
+  <subClassOf resource="#Animal"/>
+  <restrictedBy>
+    <Restriction>
+      <onProperty resource="#parent"/>
+      <toClass resource="#Person"/>
+    </Restriction>
+  </restrictedBy>
+</Class>
+
+<Property ID="father">
+  <subProperty resource="#parent"/>
+  <range resource="#Man"/>
+  <cardinality>1</cardinality>
+</Property>
+
+<UniqueProperty ID="mother">
+  <subProperty resource="#parent"/>
+  <range resource="#Woman"/>
+</UniqueProperty>
+
+<!-- need an example for UnambiguousProperty -->
+
+<Property ID="child">
+  <inverseOf resource="#parent"/>
+</Property>
+
+<TransitiveProperty ID="ancestor">
+  <label>ancestor</label>
+</TransitiveProperty>
+
+<TransitiveProperty ID="descendant"/>
+
+<Property ID="mom">
+  <sameAs resource="#mother"/>
+</Property>
+
+<Property ID="occupation">
+  <maxCardinality>1</maxCardinality>
+</Property>
+
+<Class ID="Car">
+  <comment>no car is a person</comment>
+  <subClassOf>
+    <Class>
+      <complementOf resource="#Person"/>
+    </Class>
+  </subClassOf>
+</Class>
+
+<Class ID="Man">
+  <subClassOf resource="#Person"/>
+  <subClassOf resource="#Male"/>
+</Class>
+
+<Class ID="Woman">
+  <subClassOf resource="#Person"/>
+  <subClassOf resource="#Female"/>
+</Class>
+
+<Class about="#Person">
+  <comment>every person is a man or a woman</comment>
+  <disjointUnionOf parseType="rdf:collection">
+    <Class about="#Man"/>
+    <Class about="#Woman"/>
+  </disjointUnionOf>
+</Class>
+
+<Person ID="Adam">
+  <label>Adam</label>
+  <comment>Adam is a person.</comment>
+</Person>
+
+<Property ID="height">
+  <domain resource="#Person"/>
+  <range resource="#Height"/>
+</Property>
+
+<Class ID="Height">
+  <oneOf rdf:parseType="Collection">
+    <Height ID="short"/>
+    <Height ID="medium"/>
+    <Height ID="tall"/>
+  </oneOf>
+</Class>
+
+<Class ID="TallThing">
+  <restrictedBy>
+    <Restriction>
+      <onProperty resource="#height"/>
+      <toValue resource="#tall"/>
+    </Restriction>
+  </restrictedBy>
+</Class>
+
+<!-- @@ need example of hasValue qualification -->
+
+<!-- @@ lack Disjoint example -->
+
+<Class ID="TallMan">
+  <intersectionOf rdf:parseType="Collection">
+    <Class about="#TallThing"/>
+    <Class about="#Man"/>
+  </intersectionOf>
+</Class>
+
+<!-- @@ example of subProperty, label, comment, etc. from RDF/RDFS -->
+
+</rdf:RDF>
+
+

@@ -1,0 +1,12 @@
+@prefix : <http://www.w3.org/2004/ql#>.
+@prefix q: <http://www.w3.org/2004/ql#>.
+@prefix ex: <http://www.example.com/foo#>.
+@prefix math: <http://www.w3.org/2000/10/swap/math#>.
+@keywords a.
+
+ <> select { ?p ex:had ?t };
+   where  { [ a ex:Reading; ex:temp ?t; ex:place ?p].
+            ?t math:greaterThan 25 }.
+#___________________________________________
+#ex:London ex:had 26.
+#ex:Barcelona had 31. 

@@ -1,0 +1,15 @@
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+@prefix math: <http://www.w3.org/2000/10/swap/math#>.
+@prefix foo: <#>.
+@prefix : <#>.
+:joe :friend :kev; :height "1.6".
+
+# Currently (2002/12) the checker can't compare things with bnodes
+# with different identifiers and find them equal :-(
+
+#{?x :friend :kev; :height [math:greaterThan "1.3"]} => { ?x a :player }.
+
+{?x :friend :kev; :height ?h. ?h math:greaterThan "1.3"} => { ?x a :player }.
+
+# ends
+

@@ -1,0 +1,42 @@
+     @prefix : <foo.n3#> .
+    @prefix local: <#> .
+    @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    
+     @forAll :F,
+                :G,
+                :d,
+                :x,
+                :y .
+    
+    :fred     local:favoriteColor :blue .
+    
+    :test10a     a :success .
+    
+    :test10b     a :success .
+    {
+        :fred     local:favoriteColor :blue .
+        
+        }     log:implies {:test10b     a :success .
+        } .
+    {
+        <t10a.n3>     log:semantics :F .
+        :F     log:includes {:theSky     :is :blue .
+            } .
+        
+        }     log:implies {:test10a     a :success .
+        } .
+    {
+        <t10a.n3>     log:semantics :F .
+        :F     log:includes {:theSky     :is :green .
+            } .
+        
+        }     log:implies {:test10-bis     a :FAILURE .
+        } .
+    {
+        <t10a.n3>     log:semantics :F .
+        :F     log:includes {:theSky     :is :x .
+            } .
+        
+        }     log:implies {:fred     local:favoriteColor :x .
+        } .
+    

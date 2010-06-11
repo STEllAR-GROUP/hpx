@@ -1,0 +1,89 @@
+@prefix : <http://example.com/AV#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix gv: <http://www.w3.org/2001/02pd/gv#>.
+
+# The root
+
+:AV a rdfs:Class .
+:input a rdfs:Property .
+:output a rdfs:Property .
+:title a rdfs:Property .
+
+# Rules
+
+:catv a :AV;
+  :title "CATV" .
+
+:splitter a :AV;
+  :title "Splitter";
+  :output :ab .
+
+:selector a :AV;
+  :title "Signal Selector";
+  :output :tv .
+
+:cable a :AV;
+  :title "Cable Box";
+  :output :vcr .
+
+:vcr a :AV;
+  :title "VCR";
+  :output :ab .
+
+:ab a :AV;
+  :title "A/B Switch";
+  :output :selector .
+
+:tv a :AV;
+  :title "TV" .
+
+:dvd a :AV;
+  :title "DVD";
+  :output :selector .
+
+@forAll :p, :s, :o, :t .
+
+# Graph rules
+
+{ :p :output :s } log:implies { :p :solidEdge :s } .
+
+{ :p :title :s } log:implies { :p gv:label :s } .
+
+# Style rules
+
+{ :s a :AV } log:implies { :s gv:color "black";
+                              gv:shape "box" } .
+
+#{ :s a :DocumentSet } log:implies { :s gv:color "black";
+#                                       gv:shape "polygon";
+#                                       gv:sides "5" } .
+#
+#{ :s a :Result } log:implies { :s gv:color "blue";
+#                                   gv:style "filled";
+#                                   gv:fontcolor "white" } .
+#
+#{ :s a :Source } log:implies { :s gv:shape "Mdiamond" } .
+#
+#{ :s a :Optional } log:implies { :s gv:shape "diamond" } .
+#
+#{ :s a :Temporary } log:implies { :s gv:color "gray";
+#                                   gv:style "filled";
+#                                   gv:fontcolor "white" } .
+
+:solidEdge gv:style "solid" .
+:dottedEdge gv:style "dotted" .
+
+# The graph information
+
+<> gv:digraph [
+ gv:label "AV Diagram";
+
+ gv:subgraph [ 
+  gv:label "" ;
+  gv:hasNode :catv, :splitter, :cable, :vcr, :ab, :tv, :dvd;
+   gv:hasEdgeProperty :solidEdge ;
+   gv:hasEdgeProperty :dottedEdge ;
+ ]
+] .
+

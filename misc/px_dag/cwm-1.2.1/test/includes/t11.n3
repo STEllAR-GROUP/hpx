@@ -1,0 +1,155 @@
+# Test whether a schema mentions the predicates used in this data
+#  This involves searching in files for statements being present or absent.
+ 
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix s: <http://www.w3.org/2000/01/rdf-schema#> .
+# @prefix daml:  <http://www.daml.org/2000/10/daml-ont#> .
+# @prefix dpo:  <http://www.daml.org/2001/03/daml+oil#> .
+# @prefix ex:   <http://www.daml.org/2000/10/daml-ex#> .
+@prefix log:  <http://www.w3.org/2000/10/swap/log#> .
+
+@prefix : <foo.n3#>.  # Local stuff
+
+# @prefix foo: <http://www.w3.org/2000/10/swap/test/includes/foo.n3#>.  # Local stuff
+@prefix foo: <foo.n3#>.  # Local stuff
+
+# Usage:   cwm t11.n3 -think
+#
+# Output should conclude all test* a :success and no failures.
+#
+
+
+@forAll :d, :o, :p, :s, :S, :s1, :x, :y, :F, :G, :H.
+
+{<foo.n3> log:semantics :F .
+   :F log:includes { :blue a rdf:Property }} log:implies { :includesTest a :FAILURE}.
+
+{ <foo.n3> log:semantics :F .  
+ :F log:notIncludes { :blue a rdf:Property }} log:implies { :includesTest2 a :success}.
+
+{ <foo.n3> log:semantics :F .
+   :F log:includes { :is a rdf:Property }} log:implies { :includesTest3 a :success}.
+
+{ <foo.n3> log:semantics :F .  
+ :F log:notIncludes { :is a rdf:Property }} log:implies { :includesTest4 a :FAILURE}.
+
+
+{ <t10a.n3> log:semantics :F.
+  :F log:includes { :s :p :o}   } log:implies { :p a :UsedProperty } .
+#
+# Debug:
+#{ :blue log:semantics :F. } log:implies { :WE :FOUND :F }.
+#
+#{ :blue log:semantics :F.
+#  :F log:includes { :x s:isDefinedBy :y }} log:implies { :x :DEFINEDIN_BLUE_NS :y }.
+#
+#{ :blue log:semantics :F.
+#  :F log:includes { :x s:isDefinedBy :y }} log:implies { :x :DEFINEDIN_BLUE_NS :y }.
+#
+#{ :p a :UsedProperty .
+#  :p log:semantics :F.
+#                     } log:implies { :p :USED_AND_RESOLVES_TO :F }.
+
+#{ :p :USED_AND_RESOLVES_TO :F.
+#:F log:includes { :x s:isDefinedBy :y } } log:implies { :p :USED_AND_SOMETHING_DEFINED_IN :F }.
+#
+
+#
+#  The RDF and RDFS specs imply the following algorithm for the definitive schema corresponding
+#  to a Property :p.  (From Ralph Swick, whiteboard conversation)
+#
+
+{ :p a :UsedProperty .
+  :p log:semantics [log:includes { :p s:isDefinedBy :s }] } log:implies {:p :schema :s}.
+
+
+# We may need the schema as a formula too:
+
+{     :p :schema [ log:semantics :F ] } log:implies { :p :schemaFormula :F }. 
+
+#  If there is no schema found, then we flag a problem
+
+{ :p a :UsedProperty .
+  :p log:semantics [log:notIncludes { :p s:isDefinedBy [] }]
+} log:implies {:p a :ERROR_CANT_GET_SCHEMA}.
+
+
+
+
+{ :p a :UsedProperty .
+  :p log:semantics :F.
+  :F log:includes { :p s:isDefinedBy :s }.
+  :s log:semantics :G } log:implies { :p :schemaFormula :G }.
+
+# FYI
+{:p :schemaFormula :F.
+ :F log:includes { :p a rdf:Property }}log:implies { :p a :Property_declared } .
+
+# It is an error, we say, for something to be used as a Property but
+# not *explicitly* declared as such in the schema:
+
+{:p :schemaFormula :F.
+ :F log:notIncludes { :p a rdf:Property }}log:implies { :p a :ERROR_PROPERTY_NOT_DECLARED } .
+ 
+#{     :p :schema :s.
+#      :s log:semantics [log:notIncludes { :p a rdf:Property }].
+#} log:implies {
+#      :p a :ERROR_SPELLING_MISTAKE_MAYBE.  # ;-)
+#}.
+
+# Now we can find the schema, we can check whether the property is indeed
+# mentioned in the schema.
+# Exactly what we require of a schema is a good question.
+#  One answer is that
+#   (a)when the schema is found and combined with well-known general rules
+#      with inference that you can show that each of the predictes used is
+#      indeed declared as a property. This gets rid of spelling errors etc.
+#   (b)when the document is combined with the above, no condradiction
+#      can be found from anything being (eg) member of disjoint sets.
+#
+#{     :p :schema :s.
+#      :s log:semantics [log:includes { :p a rdf:Property }].
+#} log:implies {
+#      :p a :schema_defined_property4.  #
+#}.
+#
+#
+#{     :p :schema :s.
+#      :s log:semantics [log:notIncludes { :p a rdf:Property }].
+#} log:implies {
+#      :p a :ERROR_SPELLING_MISTAKE_MAYBE.  # ;-)
+#}.
+#
+
+log:implies a log:Chaff.  #  Clear out rules on -purge
+
+
+########################### Old stuff:
+
+#{ :p a :UsedProperty.
+#  :p log:semantics :H.
+# } log:impliesXX {:H a :schemaFormula }.
+
+#{ foo:is log:semantics :H.
+#   :H log:includes { foo:is a rdf:Property }
+#} log:implies { :H a :success1 }.
+
+#{ foo:is log:semantics :H.
+#   :H log:includes { foo:is a rdf:Property }
+#} log:implies { foo:is a :defined_as_prop_in_schema }.
+
+#{  :p a :UsedProperty.
+#   :p log:semantics :H.
+#   :H log:includes { :p a rdf:Property }
+#} log:implies { :p a :defined_as_property_in_ns_doc1 }.
+
+#{ <foo.n3#is> log:semantics :H.
+#  :H log:includes { :p s:isDefinedBy :x }} log:impliesXX { :p a :defined_in_schema2 .
+#    :p  :is_defined_in2 :x.
+#    :H :is :whatFooIsResolvedTo2 }.
+
+# { :p a :defined_in_schema.  :p a :UsedProperty } log:implies { :p a :UsedAndDefined }.
+
+
+ 
+#ends

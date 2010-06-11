@@ -1,0 +1,377 @@
+     @prefix : <#> .
+    @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    
+    log:implies     a log:Chaff .
+    {
+        {
+            :fee     :bar :baz .
+            
+            }     log:includes {:foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testa1d     a :FAILURE .
+        } .
+    {
+        {
+            :fee     :bar :baz .
+            
+            }     log:includes {this     log:forSome :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testa2d     a :success .
+        } .
+    {
+        {
+            :fee     :bar :baz .
+            
+            }     log:includes {this     log:forAll :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testa3d     a :FAILURE .
+        } .
+    {
+        {
+            :fee     :bar :baz .
+            
+            }     log:notIncludes {:foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testa1nd     a :success .
+        } .
+    {
+        {
+            :fee     :bar :baz .
+            
+            }     log:notIncludes {this     log:forSome :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testa2nd     a :FAILURE .
+        } .
+    {
+        {
+            :fee     :bar :baz .
+            
+            }     log:notIncludes {this     log:forAll :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testa3nd     a :success .
+        } .
+    {
+        {
+            :foo     :bar :baz .
+            
+            }     log:includes {:foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testa1     a :success .
+        } .
+    {
+        {
+            :foo     :bar :baz .
+            
+            }     log:includes {this     log:forSome :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testa2     a :success .
+        } .
+    {
+        {
+            :foo     :bar :baz .
+            
+            }     log:includes {this     log:forAll :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testa3     a :FAILURE .
+        } .
+    {
+        {
+            :foo     :bar :baz .
+            
+            }     log:notIncludes {:foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testa1n     a :FAILURE .
+        } .
+    {
+        {
+            :foo     :bar :baz .
+            
+            }     log:notIncludes {this     log:forSome :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testa2n     a :FAILURE .
+        } .
+    {
+        {
+            :foo     :bar :baz .
+            
+            }     log:notIncludes {this     log:forAll :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testa3n     a :success .
+        } .
+    {
+        {
+            this     log:forSome :fee .
+            :fee     :bar :baz .
+            
+            }     log:includes {:foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testb1d     a :FAILURE .
+        } .
+    {
+        {
+            this     log:forSome :fee .
+            :fee     :bar :baz .
+            
+            }     log:includes {this     log:forSome :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testb2d     a :success .
+        } .
+    {
+        {
+            this     log:forSome :fee .
+            :fee     :bar :baz .
+            
+            }     log:includes {this     log:forAll :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testb3d     a :FAILURE .
+        } .
+    {
+        {
+            this     log:forSome :fee .
+            :fee     :bar :baz .
+            
+            }     log:notIncludes {:foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testb1nd     a :success .
+        } .
+    {
+        {
+            this     log:forSome :fee .
+            :fee     :bar :baz .
+            
+            }     log:notIncludes {this     log:forSome :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testb2nd     a :FAILURE .
+        } .
+    {
+        {
+            this     log:forSome :fee .
+            :fee     :bar :baz .
+            
+            }     log:notIncludes {this     log:forAll :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testb3nd     a :success .
+        } .
+    {
+        {
+            this     log:forSome :foo .
+            :foo     :bar :baz .
+            
+            }     log:includes {:foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testb1     a :FAILURE .
+        } .
+    {
+        {
+            this     log:forSome :foo .
+            :foo     :bar :baz .
+            
+            }     log:includes {this     log:forSome :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testb2     a :success .
+        } .
+    {
+        {
+            this     log:forSome :foo .
+            :foo     :bar :baz .
+            
+            }     log:includes {this     log:forAll :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testb3     a :FAILURE .
+        } .
+    {
+        {
+            this     log:forSome :foo .
+            :foo     :bar :baz .
+            
+            }     log:notIncludes {:foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testb1n     a :success .
+        } .
+    {
+        {
+            this     log:forSome :foo .
+            :foo     :bar :baz .
+            
+            }     log:notIncludes {this     log:forSome :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testb2n     a :FAILURE .
+        } .
+    {
+        {
+            this     log:forSome :foo .
+            :foo     :bar :baz .
+            
+            }     log:notIncludes {this     log:forAll :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testb3n     a :success .
+        } .
+    {
+        {
+            this     log:forAll :fee .
+            :fee     :bar :baz .
+            
+            }     log:includes {this     log:forSome :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testc2d     a :success .
+        } .
+    {
+        {
+            this     log:forAll :fee .
+            :fee     :bar :baz .
+            
+            }     log:includes {:foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testc1d     a :success .
+        } .
+    {
+        {
+            this     log:forAll :fee .
+            :fee     :bar :baz .
+            
+            }     log:includes {this     log:forAll :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testc3d     a :success .
+        } .
+    {
+        {
+            this     log:forAll :fee .
+            :fee     :bar :baz .
+            
+            }     log:notIncludes {this     log:forSome :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testc2nd     a :FAILURE .
+        } .
+    {
+        {
+            this     log:forAll :fee .
+            :fee     :bar :baz .
+            
+            }     log:notIncludes {:foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testc1nd     a :FAILURE .
+        } .
+    {
+        {
+            this     log:forAll :fee .
+            :fee     :bar :baz .
+            
+            }     log:notIncludes {this     log:forAll :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testc3nd     a :FAILURE .
+        } .
+    {
+        {
+            this     log:forAll :foo .
+            :foo     :bar :baz .
+            
+            }     log:includes {this     log:forSome :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testc2     a :success .
+        } .
+    {
+        {
+            this     log:forAll :foo .
+            :foo     :bar :baz .
+            
+            }     log:includes {:foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testc1     a :success .
+        } .
+    {
+        {
+            this     log:forAll :foo .
+            :foo     :bar :baz .
+            
+            }     log:includes {this     log:forAll :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testc3     a :success .
+        } .
+    {
+        {
+            this     log:forAll :foo .
+            :foo     :bar :baz .
+            
+            }     log:notIncludes {this     log:forSome :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testc2n     a :FAILURE .
+        } .
+    {
+        {
+            this     log:forAll :foo .
+            :foo     :bar :baz .
+            
+            }     log:notIncludes {:foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testc1n     a :FAILURE .
+        } .
+    {
+        {
+            this     log:forAll :foo .
+            :foo     :bar :baz .
+            
+            }     log:notIncludes {this     log:forAll :foo .
+            :foo     :bar :baz .
+            } .
+        
+        }     log:implies {:testc3n     a :FAILURE .
+        } .
+    

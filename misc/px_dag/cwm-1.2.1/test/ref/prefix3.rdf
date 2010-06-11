@@ -1,0 +1,31 @@
+
+
+
+<rdf:RDF xmlns="http://nwalsh.com/pim/Palm/Calendar#"
+    xmlns:cal="http://nwalsh.com/pim/Palm/Calendar#"
+    xmlns:da="file:/home79536262/ndw/.xmlDate.rdf#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+
+    <rdf:Description rdf:about="http://nwalsh.com/pim/Palm/Calendar#_2002_2">
+        <da:appointments rdf:parseType="Resource">
+            <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq"/>
+            <rdf:_1 rdf:resource="file:/home79536262/ndw/.xmlDate.rdf#id166"/>
+            <rdf:_2 rdf:resource="file:/home79536262/ndw/.xmlDate.rdf#id172"/>
+            <rdf:_3 rdf:resource="file:/home79536262/ndw/.xmlDate.rdf#id93"/>
+            <rdf:_4 rdf:resource="file:/home79536262/ndw/.xmlDate.rdf#id193"/>
+            <rdf:_5 rdf:resource="file:/home79536262/ndw/.xmlDate.rdf#id192"/>
+            <rdf:_6 rdf:resource="file:/home79536262/ndw/.xmlDate.rdf#id104"/>
+            <rdf:_7 rdf:resource="file:/home79536262/ndw/.xmlDate.rdf#id157"/>
+            <rdf:_8 rdf:resource="file:/home79536262/ndw/.xmlDate.rdf#id32"/>
+        </da:appointments>
+        <month>2</month>
+        <year>2002</year>
+        <rdf:Seq rdf:parseType="Resource">
+            <rdf:_1 rdf:resource="http://nwalsh.com/pim/Palm/Calendar#_week_2002_2_1"/>
+            <rdf:_2 rdf:resource="http://nwalsh.com/pim/Palm/Calendar#_week_2002_2_2"/>
+            <rdf:_3 rdf:resource="http://nwalsh.com/pim/Palm/Calendar#_week_2002_2_3"/>
+            <rdf:_4 rdf:resource="http://nwalsh.com/pim/Palm/Calendar#_week_2002_2_4"/>
+            <rdf:_5 rdf:resource="http://nwalsh.com/pim/Palm/Calendar#_week_2002_2_5"/>
+        </rdf:Seq>
+    </rdf:Description>
+</rdf:RDF>

@@ -1,0 +1,35 @@
+# Test the log:includes function
+
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix s: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix daml:  <http://www.daml.org/2000/10/daml-ont#> .
+@prefix dpo:  <http://www.daml.org/2001/03/daml+oil#> .
+@prefix ex:   <http://www.daml.org/2000/10/daml-ex#> .
+@prefix log:  <http://www.w3.org/2000/10/swap/log#> .
+
+@prefix : <#>.  # Local stuff
+
+# Usage:   cwm includes.n3 -think
+#
+# Output should conclude all test* a :success and no failures.
+#
+
+log:includes a rdf:Property; s:comment
+""" The includes property indicates that one formula either
+is, or is a conjunction of several subformulae one of which is,
+the other forumla or its equivalent by the renaming of variables.
+
+It can be calculated if one knows the formulae involved.
+""".
+
+:a :b :c.
+
+
+
+# { :a :b :c } log:implies { :testa a :success } .
+ 
+
+{ [ :b :c ] } log:implies { :test2 a :success } .
+ 
+
+#ends

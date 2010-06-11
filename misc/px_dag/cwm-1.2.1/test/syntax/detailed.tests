@@ -1,0 +1,65 @@
+# List of regression tests
+#
+#      Syntax tests: details
+#
+# Note: Command lines must be for running in the directory above.
+#
+@prefix : <#>.
+@prefix x: <#>.
+@prefix test: <http://www.w3.org/2000/10/swap/test.n3#>.
+
+
+#:syn001 a test:ObsoleteCwmTest;
+#    test:referenceOutput <this-quantifiers-ref.n3>;
+#    test:description   "Can still read the old 'this log:forSome' syntax. Removed 2007-07-07";
+#    test:arguments     "syntax/this-quantifiers.n3".
+#
+#:syn002 a test:ObsoleteCwmTest;
+#    test:referenceOutput <this-rules-ref.n3>;
+#    test:description   "Can still read the old 'this log:forAll' syntax. Removed 2007-07-07";
+#    test:arguments     "syntax/this-rules.n3".
+
+:syn000 a test:CwmTest;       #  2007-09-11
+    test:referenceOutput <base-ref.n3>;
+    test:description   "The @base directive";
+    test:arguments     "syntax/base.n3".
+
+:syn005 a test:CwmTest;
+    test:referenceOutput <this-quantifiers-ref2.n3>;
+    test:description   "Can still gen the old 'this log:forSome' syntax";
+    test:arguments     "--n3=v includes/quantifiers.n3".
+
+:syn006 a test:CwmTest;
+    test:referenceOutput <this-rules-ref2.n3>;
+    test:description   "Can still gen the old 'this log:forAll' syntax";
+    test:arguments     "--n3=v rules13.n3".
+
+:syn007 a test:CwmTest;
+    test:referenceOutput <trailing-semicolon-ref.nt>;
+    test:description   "Propertylists can end in trailing semicolon.";
+    test:arguments     "--n3 syntax/trailing-semicolon.n3 --ntriples".
+
+
+:syn008 a test:CwmTest;
+    test:referenceOutput <decimal-ref.n3>;
+    test:description   "Math datatypes are parsed and generated correctly";
+    test:arguments     "--n3 syntax/decimal.n3".
+
+:syn009 a test:CwmTest;
+    test:referenceOutput <boolean-ref.n3>;
+    test:description   "Adding true and false to n3";
+    test:arguments     "--n3 syntax/boolean.n3".
+
+
+:syn010 a test:CwmTest;
+    test:referenceOutput <space-in-uri-ref.n3>;
+    test:description   "Canonicalize spaces in URIs (n3)";
+    test:arguments     "--n3 --closure=n syntax/space-in-uri.n3".
+
+:syn011 a test:CwmTest;
+    test:referenceOutput <space-in-uri-ref.n3>;
+    test:description   "Canonicalize spaces in URIs (rdf/xml)";
+    test:arguments     "--rdf --closure=n syntax/space-in-uri-rdf.rdf --n3".
+
+
+#ends

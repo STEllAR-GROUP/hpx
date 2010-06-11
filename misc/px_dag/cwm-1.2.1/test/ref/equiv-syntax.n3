@@ -1,0 +1,20 @@
+
+
+
+<rdf:RDF xmlns="http://purl.org/dc/elements/1.1/"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+
+    <rdf:Description rdf:about="">
+        <description>testing = short-hand syntax in N3.
+I'm adding this test in particular to track changes
+regarding which DAML+OIL namespace we use.
+
+</description>
+    </rdf:Description>
+
+    <rdf:Description rdf:about="#x">
+        <sameAs xmlns="http://www.w3.org/2002/07/owl#"
+            rdf:resource="#y"/>
+    </rdf:Description>
+</rdf:RDF>

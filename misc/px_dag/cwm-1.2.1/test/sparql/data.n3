@@ -1,0 +1,16 @@
+@prefix foaf:       <http://xmlns.com/foaf/0.1/> .
+@prefix rdf:        <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:	    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex:         <http://ns.example.org/#> .
+
+_:a  foaf:name       "Alice" .
+_:a  foaf:homepage   <http://work.example.org/alice/> .
+_:a  foaf:mbox       "" .
+_:a  ex:blurb       "<p xmlns=\"http://www.w3.org/1999/xhtml\">My name is <em>Alice</em></p>"^^rdf:XMLLiteral .
+_:a  foaf:knows      _:b .
+
+_:b  foaf:name       "Bob"@en .
+_:b  foaf:mbox       <mailto:bob@work.example.org> .
+_:b  foaf:homepage   <http://work.example.org/bob/> .
+_:b  ex:ageInYears   30 .
+_:b  foaf:knows      _:a .

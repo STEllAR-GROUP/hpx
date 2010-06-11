@@ -1,0 +1,38 @@
+# List of regression tests
+#
+#      Math tests
+#
+# Note: Command lines must be for running in the directory above.
+#
+@prefix : <#>.
+@prefix x: <#>.
+@prefix test: <http://www.w3.org/2000/10/swap/test.n3#>.
+@prefix dc:  <http://purl.org/dc/elements/1.1/>. # yuk - under protest - no hash
+
+# Math:
+
+:t10393 a test:CwmTest;
+    test:referenceOutput <../ref/math1.n3>;
+    test:description   "Various math builtins";
+    test:arguments     """math/math-test.n3 --think --data""".
+ 
+:t10394 a test:CwmTest;
+    test:referenceOutput <../math/trigo.ref.n3>;
+    test:description   "Various trig builtins";
+    test:arguments     """math/trigo-test.n3 --think --data""".
+ 
+:t10395 a test:CwmTest;
+    test:referenceOutput <../math/long.n3>;
+    test:description   "Various trig builtins";
+    test:arguments     """math/long.n3""".
+
+:t10396 a test:CwmTest;
+    test:referenceOutput <../ref/dec-div.ref.n3>;
+    test:description   "A bug was found in division with decimals";
+    test:arguments     """datatypes/dec-div.n3  --think""".
+
+:t10398 a test:CwmTest;
+    test:referenceOutput <../ref/quotient_string.ref.n3>;
+    test:description   "A bug was found in division with longs";
+    test:arguments     """math/quotient_string.n3  --think""".
+#ends

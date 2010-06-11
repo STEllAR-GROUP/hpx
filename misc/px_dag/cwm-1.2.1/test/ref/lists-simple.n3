@@ -1,0 +1,41 @@
+     @prefix : <http://example.com/test#> .
+    
+    ()     :verb0 :object0 .
+      ( "subj1"  )
+         :verb1 :object1 .
+      ( "subj2a" 
+        "subj2b"  )
+         :verb2 :object2 .
+    
+    :a_threebrackets     =  (
+         (
+             (
+                :fff  ) ) ) .
+    
+    :emptyList     = () .
+    
+    :listOf2Empties     =  (
+        () 
+        ()  ) .
+    
+    :nested     =  (
+        :first 
+        :second 
+         (
+            :left3 
+            :right3  )
+        :fourth  ) .
+    
+    :threeItems     =  (
+        :b 
+        :c 
+        :d  ) .
+    
+    :twoAnons     =  (
+         [
+                 a :mother ]
+         [
+                 a :father ] ) .
+      [      :anonVerb12 :anonObj12;
+             :verb12 :obj12 ].
+    

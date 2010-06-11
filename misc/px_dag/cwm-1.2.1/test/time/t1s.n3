@@ -1,0 +1,63 @@
+#   test cwm time built-ins
+#
+#  usage: cwm --think
+#
+#   The repeatable ones are tested. Ones that depend
+# on the actual time are in now.n3
+#
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix time: <http://www.w3.org/2000/10/swap/times#> .
+
+@prefix v: <#>.
+@prefix TEST: <TEST#>.
+@prefix : <#>.
+
+@forAll :f, :t, :x, :y, :z.
+
+"2002-06-22T22:09:32-05:00" a :TestDate.
+"2002-06-22T12:34Z" a :TestDate.
+"2002-06-22" a :TestDate.
+"2002-06" a :TestDate.
+"2002" a :TestDate.
+
+"2000-01-01T00:00:00Z" a :TestDate.
+"1999-12-31T23:59:59.99Z" a :TestDate.
+
+"year %Y month %M day %d date: %D" a :TestFormat.
+"" a :TestFormat.
+
+{ :y a :TestDate;  time:inSeconds :x } log:implies
+{ :y TEST:inSeconds :x }.
+
+{ :t time:inSeconds "1000000000"} log:implies
+{ :t TEST:inSeconds "1000000000"}.
+ 
+
+{ :y a :TestDate;  time:year :x } log:implies
+{ :y TEST:year :x }.
+
+{ :y a :TestDate;  time:month :x } log:implies
+{ :y TEST:month :x }.
+
+{ :y a :TestDate;  time:day :x } log:implies
+{ :y TEST:day :x }.
+
+{ :y a :TestDate;  time:hour :x } log:implies
+{ :y TEST:hour :x }.
+
+{ :y a :TestDate;  time:minute :x } log:implies
+{ :y TEST:minute :x }.
+
+{ :y a :TestDate;  time:second :x } log:implies
+{ :y TEST:second :x }.
+
+{ :y a :TestDate;  time:dayOfWeek :x } log:implies
+{ :y TEST:dayOfWeek :x }.
+
+{ :y a :TestDate;  time:timeZone :x } log:implies
+{ :y TEST:timeZone :x }.
+
+log:implies a log:Chaff.  # purge rules
+
+
+#ends

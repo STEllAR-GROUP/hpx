@@ -1,0 +1,18 @@
+     @prefix : <#> .
+     @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+     @prefix string: <http://www.w3.org/2000/10/swap/string#> .
+    
+    @forAll :s,
+                :x,
+                :y .
+    
+    "fred whatever "     a :RESULT .
+    {
+        
+          ( "fred" 
+            " whatever "  )
+             string:concatenation :s .
+        
+        }     log:implies {:s     a :RESULT .
+        } .
+    

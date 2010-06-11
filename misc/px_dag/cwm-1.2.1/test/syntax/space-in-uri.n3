@@ -1,0 +1,8 @@
+# See what a parser does with (a) a space and (b) an encoded space
+
+@prefix : <http://example.com/baz#>.
+
+<http://example.com/foo bar> a :C.
+<http://example.com/foo%20bar> a :D.
+
+#ends

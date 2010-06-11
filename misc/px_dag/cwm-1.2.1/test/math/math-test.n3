@@ -1,0 +1,111 @@
+# Author: sbp
+#  $Id: math-test.n3,v 1.6 2006/07/07 03:30:52 syosi Exp $
+
+@prefix : <#> .
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix math: <http://www.w3.org/2000/10/swap/math#> .
+@prefix string: <http://www.w3.org/2000/10/swap/string#> .
+
+@forAll :x , :y , :z .
+
+# Some simple rules
+
+# Obsolete - do not use:
+#{ :x math:sumOf ("3" "5") } => { :x :valueOf "3 + 5" } .
+#{ :x math:differenceOf ("8" "3") } => { :x :valueOf "8 - 3" } .
+#{ :x math:differenceOf ("8") } => { :x :valueOf "8 - (error?)" } .
+#{ :x math:factors ("5" "3" "2") } => { :x :valueOf "5 * 3 * 2" } .
+#{ :x math:quotientOf ("7" "2") } => { :x :valueOf "7 / 2" } .
+#{ :x math:remainderOf ("7" "2") } => { :x :valueOf "7 % 2" } .
+#{ :x math:negation "3" } => { :x :valueOf "3 negated" } .
+#{ "-3" math:negation :x } => { :x :valueOf "what -3's the - of" } .
+#{ :x math:exponentiationOf ("2" "10") } => { :x :valueOf "2^10" } .
+
+# Using strings:
+
+{ ("3" "5") math:sum :x } => { :x :valueOf "3 + 5" } .
+{ ("8" "3") math:difference :x} => { :x :valueOf "8 - 3" } .
+{ ("8") math:difference :x } => { :x :valueOf "8 - (error?)" } .
+{ ("5" "3" "2") math:product :x} => { :x :valueOf "5 * 3 * 2" } .
+{ :x is math:quotient of ("7" "2") } => { :x :valueOf "7 / 2" } .
+{ :x is math:remainder of ("7" "2") } => { :x :valueOf "7 % 2" } .
+{ :x math:negation "3" } => { :x :valueOf "3 negated" } .
+{ "-3" math:negation :x } => { :x :valueOf "what -3's the - of" } .
+{ :x is math:exponentiation of ("2" "10") } => { :x :valueOf "2^10" } .
+
+# using numbers:
+
+{ (3) math:sum :x } => { :x :valueOf "sum(3) = 3" } .
+{ (3 5) math:sum :x } => { :x :valueOf "3 + 5 = 8" } .
+{ (3 5 100) math:sum :x } => { :x :valueOf "3 + 5 + 100" } .
+{ (8 3) math:difference :x} => { :x :valueOf "8 - 3" } .
+# { (8) math:difference :x } => { :x :valueOf "8 - (error?)" } .
+{ (5 3 2) math:product :x} => { :x :valueOf "5 * 3 * 2" } .
+{ :x is math:quotient of (7 2) } => { :x :valueOf "7 / 2" } .
+{ :x is math:remainder of (7 2) } => { :x :valueOf "7 % 2" } .
+{ :x math:negation 3 } => { :x :valueOf "3 negated" } .
+{ -3 math:negation :x } => { :x :valueOf "what -3's the - of" } .
+{ :x is math:exponentiation of (2 10) } => { :x :valueOf "2^10" } .
+
+# Corner cases:
+
+{ () math:sum ?x } =>  { ?x :valuOf " () math:sum ?x  --- should be 0" }.
+{ () math:product ?x } =>  { ?x :valuOf " () math:product ?x  --- should be 1" }.
+
+# Check that comparison is really numeric and not string comparison
+
+{ "008" math:greaterThan "70" } => { :test10 a :FAILURE }.
+{ "70" math:greaterThan "008" } => { :test10 a :success }.
+
+# A nested rule
+
+{ :x is math:sum of (3 (8 3)!math:difference ) } 
+   => { :x :valueOf "3 + (8 - 3)" } .
+
+# Getting the amount of members in a list
+# List bug: See bug1.n3
+#
+#{ :x a :List; math:memberCount :y } => { :x :memberCount :y } .
+#("x" "y" "z") a :List .
+
+# An example implementation: error flagging a list with too many members
+
+#{ :x a :TwoItemedList; math:memberCount [ math:notEqualTo "2" ] } 
+#   => { :x :hasAn :Error } .
+
+#("p" "q") a :TwoItemedList .
+#("p" "q" "r") a :TwoItemedList .
+
+# Big test
+
+{ (	("7" "2")!math:quotient  
+   	(("7" "2")!math:remainder  "10000000")!math:exponentiation
+   	("a" "b" "c" "d" "e")!math:memberCount
+  ) math:sum ?x } => 
+{ ?x :valueOf "(7 / 2) + ((7 % 2)^10000000) + 5 [should be 9.5]" } .
+
+# Combinatorial test
+
+"3.1415926" a :testValue.
+3.1415926 a :testValue.
+"1729" a :testValue.
+1729 a :testValue.
+"0" a :testValue.
+0 a :testValue.
+"1.0e7" a :testValue.
+1.0e7 a :testValue.
+
+{ :x a :testValue. :y a :testValue.
+  (:x [ is math:difference of (:y :x)]) math:sum :y } => {:x :worksWith :y}.
+ 
+{ :x a :testValue. :y a :testValue.
+  :z is math:sum of (:x (:y :x)!math:difference).
+  :z math:notEqualTo :y } => {(:x :y) :SumDifferenceFAILS :z}.
+
+{ :x a :testValue. :y a :testValue.
+  (:x :y) math:sum :z.
+  (:x " + " :y " = " :z ) string:concatenation ?s
+} => { ?s a :RESULT }.
+
+#ends
+

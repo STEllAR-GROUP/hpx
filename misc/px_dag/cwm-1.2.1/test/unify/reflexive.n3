@@ -1,0 +1,6 @@
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix : <#>.
+
+:Steve :talksTo :Joe  .
+
+{ ?s :talksTo ?s } log:implies {?s :admits "I talk to myself"} .

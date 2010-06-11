@@ -1,0 +1,392 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module check</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>check</strong></big></big> (version Id: check.py,v 1.59 2007/06/26 02:36:15 syosi Exp )</font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/yosi/CVSROOT/WWW/2000/10/swap/check.py">/Users/yosi/CVSROOT/WWW/2000/10/swap/check.py</a></font></td></tr></table>
+    <p><tt>Check&nbsp;a&nbsp;proof<br>
+&nbsp;<br>
+This&nbsp;is&nbsp;a&nbsp;simple&nbsp;proof&nbsp;checker.&nbsp;&nbsp;It&nbsp;hasn't&nbsp;itself&nbsp;been&nbsp;proved,<br>
+and&nbsp;there&nbsp;are&nbsp;probably&nbsp;lots&nbsp;of&nbsp;ways&nbsp;to&nbsp;fool&nbsp;it&nbsp;especially&nbsp;as&nbsp;a&nbsp;deliberate<br>
+malicious&nbsp;attack.&nbsp;That&nbsp;is&nbsp;because&nbsp;there&nbsp;are&nbsp;simple&nbsp;things&nbsp;I&nbsp;may&nbsp;have&nbsp;forgotten<br>
+to&nbsp;check.<br>
+&nbsp;<br>
+Command&nbsp;line&nbsp;options&nbsp;for&nbsp;debug:<br>
+&nbsp;-v50&nbsp;&nbsp;&nbsp;Set&nbsp;verbosity&nbsp;to&nbsp;50&nbsp;(range&nbsp;is&nbsp;0&nbsp;-100)<br>
+&nbsp;-c50&nbsp;&nbsp;&nbsp;Set&nbsp;verbosity&nbsp;for&nbsp;inference&nbsp;done&nbsp;by&nbsp;cwm&nbsp;code&nbsp;to&nbsp;50<br>
+&nbsp;-p50&nbsp;&nbsp;&nbsp;Set&nbsp;verobsity&nbsp;when&nbsp;parsing&nbsp;top&nbsp;50&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;<br>
+@@for&nbsp;more&nbsp;command&nbsp;line&nbsp;options,&nbsp;see&nbsp;<a href="#-main">main</a>()&nbsp;in&nbsp;source</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#fffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="swap.diag.html">swap.diag</a><br>
+</td><td width="25%" valign=top><a href="swap.html">swap</a><br>
+</td><td width="25%" valign=top><a href="sys.html">sys</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="__builtin__.html#object">__builtin__.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="check.html#FormulaCache">FormulaCache</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="check.html#Checker">Checker</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="check.html#Policy">Policy</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="check.html#AllPremises">AllPremises</a>
+</font></dt><dt><font face="helvetica, arial"><a href="check.html#Assumption">Assumption</a>
+</font></dt><dt><font face="helvetica, arial"><a href="check.html#ParsingOK">ParsingOK</a>
+</font></dt></dl>
+</dd>
+</dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="exceptions.html#Exception">exceptions.Exception</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="check.html#InvalidProof">InvalidProof</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="check.html#LogicalFallacy">LogicalFallacy</a>
+</font></dt><dt><font face="helvetica, arial"><a href="check.html#PolicyViolation">PolicyViolation</a>
+</font></dt></dl>
+</dd>
+</dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="AllPremises">class <strong>AllPremises</strong></a>(<a href="check.html#Policy">Policy</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;useful&nbsp;testing&nbsp;policy&nbsp;is&nbsp;to&nbsp;accept&nbsp;all&nbsp;premises&nbsp;and&nbsp;no&nbsp;sources.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="check.html#AllPremises">AllPremises</a></dd>
+<dd><a href="check.html#Policy">Policy</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="AllPremises-__init__"><strong>__init__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="AllPremises-assumes"><strong>assumes</strong></a>(self, f)</dt></dl>
+
+<dl><dt><a name="AllPremises-documentOK"><strong>documentOK</strong></a>(self, f)</dt></dl>
+
+<hr>
+Data and other attributes inherited from <a href="check.html#Policy">Policy</a>:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'Policy' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Assumption">class <strong>Assumption</strong></a>(<a href="check.html#Policy">Policy</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="check.html#Assumption">Assumption</a></dd>
+<dd><a href="check.html#Policy">Policy</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="Assumption-__init__"><strong>__init__</strong></a>(self, premise)</dt></dl>
+
+<dl><dt><a name="Assumption-assumes"><strong>assumes</strong></a>(self, f)</dt></dl>
+
+<dl><dt><a name="Assumption-documentOK"><strong>documentOK</strong></a>(self, u)</dt></dl>
+
+<hr>
+Data and other attributes inherited from <a href="check.html#Policy">Policy</a>:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'Policy' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Checker">class <strong>Checker</strong></a>(<a href="check.html#FormulaCache">FormulaCache</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="check.html#Checker">Checker</a></dd>
+<dd><a href="check.html#FormulaCache">FormulaCache</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="Checker-__init__"><strong>__init__</strong></a>(self, proof)</dt><dd><tt>proof&nbsp;&nbsp;&nbsp;is&nbsp;the&nbsp;formula&nbsp;which&nbsp;contains&nbsp;the&nbsp;proof</tt></dd></dl>
+
+<dl><dt><a name="Checker-checkParsing"><strong>checkParsing</strong></a>(self, r, f, policy, level)</dt></dl>
+
+<dl><dt><a name="Checker-conjecture"><strong>conjecture</strong></a>(self)</dt><dd><tt>return&nbsp;the&nbsp;formula&nbsp;that&nbsp;is&nbsp;claimed&nbsp;to&nbsp;be&nbsp;proved&nbsp;and<br>
+the&nbsp;main&nbsp;justification&nbsp;step.</tt></dd></dl>
+
+<dl><dt><a name="Checker-report"><strong>report</strong></a>(self, out, f<font color="#909090">=None</font>, step<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="Checker-result"><strong>result</strong></a>(self, r, policy, level<font color="#909090">=0</font>)</dt><dd><tt>Get&nbsp;the&nbsp;result&nbsp;of&nbsp;a&nbsp;proof&nbsp;step.<br>
+&nbsp;<br>
+r&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;is&nbsp;the&nbsp;step&nbsp;to&nbsp;be&nbsp;checked;&nbsp;in&nbsp;the&nbsp;case&nbsp;of&nbsp;the&nbsp;root&nbsp;reason,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;proof.the(pred=rdf.type,&nbsp;obj=reason.Proof),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;as&nbsp;from&nbsp;`proofStep()`<br>
+&nbsp;<br>
+level&nbsp;&nbsp;&nbsp;is&nbsp;just&nbsp;the&nbsp;nesting&nbsp;level&nbsp;for&nbsp;diagnostic&nbsp;output<br>
+&nbsp;<br>
+Returns&nbsp;the&nbsp;formula&nbsp;proved<br>
+raises&nbsp;<a href="#InvalidProof">InvalidProof</a>&nbsp;(perhaps&nbsp;IOError,&nbsp;others)</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="check.html#FormulaCache">FormulaCache</a>:<br>
+<dl><dt><a name="Checker-get"><strong>get</strong></a>(self, uri)</dt></dl>
+
+<hr>
+Data and other attributes inherited from <a href="check.html#FormulaCache">FormulaCache</a>:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'FormulaCache' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="FormulaCache">class <strong>FormulaCache</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="FormulaCache-__init__"><strong>__init__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="FormulaCache-get"><strong>get</strong></a>(self, uri)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'FormulaCache' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="InvalidProof">class <strong>InvalidProof</strong></a>(<a href="exceptions.html#Exception">exceptions.Exception</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="InvalidProof-__init__"><strong>__init__</strong></a>(self, s, level<font color="#909090">=0</font>)</dt></dl>
+
+<dl><dt><a name="InvalidProof-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><a name="InvalidProof-__getitem__"><strong>__getitem__</strong></a>(...)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="LogicalFallacy">class <strong>LogicalFallacy</strong></a>(<a href="check.html#InvalidProof">InvalidProof</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="check.html#LogicalFallacy">LogicalFallacy</a></dd>
+<dd><a href="check.html#InvalidProof">InvalidProof</a></dd>
+<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
+</dl>
+<hr>
+Methods inherited from <a href="check.html#InvalidProof">InvalidProof</a>:<br>
+<dl><dt><a name="LogicalFallacy-__init__"><strong>__init__</strong></a>(self, s, level<font color="#909090">=0</font>)</dt></dl>
+
+<dl><dt><a name="LogicalFallacy-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><a name="LogicalFallacy-__getitem__"><strong>__getitem__</strong></a>(...)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="ParsingOK">class <strong>ParsingOK</strong></a>(<a href="check.html#Policy">Policy</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>When&nbsp;run&nbsp;from&nbsp;the&nbsp;command-line,&nbsp;the&nbsp;policy&nbsp;is&nbsp;that<br>
+all&nbsp;Parsing's&nbsp;are&nbsp;OK.<br>
+&nbsp;<br>
+Hmm...&nbsp;shouldn't&nbsp;it&nbsp;be&nbsp;only&nbsp;those&nbsp;that&nbsp;are&nbsp;mentioned<br>
+in&nbsp;the&nbsp;CommandLine&nbsp;step?<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="check.html#ParsingOK">ParsingOK</a></dd>
+<dd><a href="check.html#Policy">Policy</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="ParsingOK-assumes"><strong>assumes</strong></a>(self, f)</dt></dl>
+
+<dl><dt><a name="ParsingOK-documentOK"><strong>documentOK</strong></a>(self, u)</dt></dl>
+
+<hr>
+Data and other attributes inherited from <a href="check.html#Policy">Policy</a>:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'Policy' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Policy">class <strong>Policy</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>a&nbsp;proof-checking&nbsp;policy<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Policy-assumes"><strong>assumes</strong></a>(self, f)</dt><dd><tt>Check&nbsp;whether&nbsp;a&nbsp;formula&nbsp;is&nbsp;an&nbsp;axiom.<br>
+&nbsp;<br>
+Hmm...&nbsp;move&nbsp;checkBuiltin&nbsp;here?</tt></dd></dl>
+
+<dl><dt><a name="Policy-documentOK"><strong>documentOK</strong></a>(self, u)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'Policy' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="PolicyViolation">class <strong>PolicyViolation</strong></a>(<a href="check.html#InvalidProof">InvalidProof</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="check.html#PolicyViolation">PolicyViolation</a></dd>
+<dd><a href="check.html#InvalidProof">InvalidProof</a></dd>
+<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
+</dl>
+<hr>
+Methods inherited from <a href="check.html#InvalidProof">InvalidProof</a>:<br>
+<dl><dt><a name="PolicyViolation-__init__"><strong>__init__</strong></a>(self, s, level<font color="#909090">=0</font>)</dt></dl>
+
+<dl><dt><a name="PolicyViolation-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><a name="PolicyViolation-__getitem__"><strong>__getitem__</strong></a>(...)</dt></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-atomicFormulaTerms"><strong>atomicFormulaTerms</strong></a>(f)</dt><dd><tt>Check&nbsp;that&nbsp;a&nbsp;formula&nbsp;is&nbsp;atomic&nbsp;and&nbsp;return&nbsp;the&nbsp;p,&nbsp;s,&nbsp;o&nbsp;terms.<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-atomicFormulaTerms">atomicFormulaTerms</a>(_s2f("&lt;#sky&gt;&nbsp;&lt;#color&gt;&nbsp;&lt;#blue&gt;.",<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"<a href="http://example/stuff">http://example/stuff</a>"))<br>
+(color,&nbsp;sky,&nbsp;blue)</tt></dd></dl>
+ <dl><dt><a name="-checkBuiltin"><strong>checkBuiltin</strong></a>(r, f, checker, policy, level<font color="#909090">=0</font>)</dt><dd><tt>Check&nbsp;a&nbsp;built-in&nbsp;step.<br>
+@@hmm...&nbsp;integrate&nbsp;with&nbsp;<a href="#Policy">Policy</a>&nbsp;more?<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;soc&nbsp;=&nbsp;Namespace("<a href="http://example/socrates">http://example/socrates</a>#")<br>
+&gt;&gt;&gt;&nbsp;pf&nbsp;=&nbsp;_s2f(_TestBuiltinStep&nbsp;%&nbsp;'"a"&nbsp;list:in&nbsp;("b"&nbsp;"a"&nbsp;"c")',<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"<a href="http://example/socrates">http://example/socrates</a>")<br>
+&gt;&gt;&gt;&nbsp;f&nbsp;=&nbsp;<a href="#-checkBuiltin">checkBuiltin</a>(soc.step1,<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pf.the(subj=soc.step1,&nbsp;pred=reason.gives),<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#Checker">Checker</a>(pf),&nbsp;<a href="#AllPremises">AllPremises</a>())<br>
+&gt;&gt;&gt;&nbsp;len(f)<br>
+1<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;pf&nbsp;=&nbsp;_s2f(_TestBuiltinStep&nbsp;%&nbsp;'"abc"&nbsp;str:startsWith&nbsp;"a"',<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"<a href="http://example/socrates">http://example/socrates</a>")<br>
+&gt;&gt;&gt;&nbsp;f&nbsp;=&nbsp;<a href="#-checkBuiltin">checkBuiltin</a>(soc.step1,<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pf.the(subj=soc.step1,&nbsp;pred=reason.gives),<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#Checker">Checker</a>(pf),&nbsp;<a href="#AllPremises">AllPremises</a>())<br>
+&gt;&gt;&gt;&nbsp;len(f)<br>
+1<br>
+&nbsp;<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;pf&nbsp;=&nbsp;_s2f(_TestBuiltinStep&nbsp;%&nbsp;'"abc"&nbsp;str:startsWith&nbsp;"b"',<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"<a href="http://example/socrates">http://example/socrates</a>")<br>
+&gt;&gt;&gt;&nbsp;f&nbsp;=&nbsp;<a href="#-checkBuiltin">checkBuiltin</a>(soc.step1,<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pf.the(subj=soc.step1,&nbsp;pred=reason.gives),<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#Checker">Checker</a>(pf),&nbsp;<a href="#AllPremises">AllPremises</a>())<br>
+Traceback&nbsp;(most&nbsp;recent&nbsp;call&nbsp;last):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+<a href="#LogicalFallacy">LogicalFallacy</a>:&nbsp;Built-in&nbsp;fact&nbsp;does&nbsp;not&nbsp;give&nbsp;correct&nbsp;results:&nbsp;predicate:&nbsp;abc&nbsp;subject:&nbsp;str:startsWith&nbsp;<a href="__builtin__.html#object">object</a>:&nbsp;b&nbsp;result:&nbsp;None</tt></dd></dl>
+ <dl><dt><a name="-checkConjunction"><strong>checkConjunction</strong></a>(r, f, checker, policy, level)</dt></dl>
+ <dl><dt><a name="-checkExtraction"><strong>checkExtraction</strong></a>(r, f, checker, policy, level<font color="#909090">=0</font>)</dt><dd><tt>check&nbsp;an&nbsp;Extraction&nbsp;step.<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;soc&nbsp;=&nbsp;Namespace("<a href="http://example/socrates">http://example/socrates</a>#")<br>
+&gt;&gt;&gt;&nbsp;pf&nbsp;=&nbsp;_s2f(_TestCEstep,&nbsp;"<a href="http://example/socrates">http://example/socrates</a>")<br>
+&gt;&gt;&gt;&nbsp;<a href="#-checkExtraction">checkExtraction</a>(soc.step1,<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pf.the(subj=soc.step1,&nbsp;pred=reason.gives),<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#Checker">Checker</a>(pf),&nbsp;<a href="#AllPremises">AllPremises</a>())<br>
+{soc:socrates&nbsp;type&nbsp;soc:Man}</tt></dd></dl>
+ <dl><dt><a name="-checkGMP"><strong>checkGMP</strong></a>(r, f, checker, policy, level<font color="#909090">=0</font>)</dt><dd><tt>check&nbsp;a&nbsp;generalized&nbsp;modus&nbsp;ponens&nbsp;step.<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;soc&nbsp;=&nbsp;Namespace("<a href="http://example/socrates">http://example/socrates</a>#")<br>
+&gt;&gt;&gt;&nbsp;pf&nbsp;=&nbsp;_s2f(_TestGMPStep,&nbsp;"<a href="http://example/socrates">http://example/socrates</a>")<br>
+&gt;&gt;&gt;&nbsp;f&nbsp;=&nbsp;<a href="#-checkGMP">checkGMP</a>(soc.step1,&nbsp;None,&nbsp;<a href="#Checker">Checker</a>(pf),&nbsp;<a href="#AllPremises">AllPremises</a>())<br>
+&gt;&gt;&gt;&nbsp;f.n3String().strip()<br>
+u'@prefix&nbsp;:&nbsp;&lt;<a href="http://example/socrates">http://example/socrates</a>#&gt;&nbsp;.\n&nbsp;&nbsp;&nbsp;&nbsp;\n&nbsp;&nbsp;&nbsp;&nbsp;:socrates&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;:Mortal&nbsp;.'</tt></dd></dl>
+ <dl><dt><a name="-checkSupports"><strong>checkSupports</strong></a>(r, f, checker, policy, level)</dt></dl>
+ <dl><dt><a name="-fyi"><strong>fyi</strong></a>(str, level<font color="#909090">=0</font>, thresh<font color="#909090">=50</font>)</dt></dl>
+ <dl><dt><a name="-getSymbol"><strong>getSymbol</strong></a>(proof, x)</dt><dd><tt>De-reify&nbsp;a&nbsp;symbol:&nbsp;get&nbsp;the&nbsp;informatuion&nbsp;identifying&nbsp;it&nbsp;from&nbsp;the&nbsp;proof</tt></dd></dl>
+ <dl><dt><a name="-getTerm"><strong>getTerm</strong></a>(proof, x)</dt><dd><tt>De-reify&nbsp;a&nbsp;term:&nbsp;get&nbsp;the&nbsp;informatuion&nbsp;about&nbsp;it&nbsp;from&nbsp;the&nbsp;proof</tt></dd></dl>
+ <dl><dt><a name="-main"><strong>main</strong></a>(argv)</dt></dl>
+ <dl><dt><a name="-n3Entails"><strong>n3Entails</strong></a>(f, g, skipIncludes<font color="#909090">=0</font>, level<font color="#909090">=0</font>)</dt><dd><tt>Does&nbsp;f&nbsp;N3-entail&nbsp;g?<br>
+&nbsp;<br>
+First&nbsp;try&nbsp;indexed&nbsp;graph&nbsp;match&nbsp;algorithm,&nbsp;and&nbsp;if&nbsp;that&nbsp;fails,<br>
+unification.</tt></dd></dl>
+ <dl><dt><a name="-topLevelLoad"><strong>topLevelLoad</strong></a>(uri<font color="#909090">=None</font>, flags<font color="#909090">=''</font>)</dt></dl>
+ <dl><dt><a name="-usage"><strong>usage</strong></a>()</dt></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>OBJ</strong> = 3<br>
+<strong>PRED</strong> = 1<br>
+<strong>SUBJ</strong> = 2<br>
+<strong>__version__</strong> = 'Id: check.py,v 1.59 2007/06/26 02:36:15 syosi Exp '<br>
+<strong>chatty</strong> = 0<br>
+<strong>debugLevelForInference</strong> = 0<br>
+<strong>debugLevelForParsing</strong> = 0<br>
+<strong>knownReasons</strong> = set([Premise, Parsing, Inference, Conjunction, Fact, Extraction, ...])<br>
+<strong>log</strong> = &lt;swap.myStore.Namespace object&gt;<br>
+<strong>nameBlankNodes</strong> = 0<br>
+<strong>proofSteps</strong> = 0<br>
+<strong>rdf</strong> = &lt;swap.myStore.Namespace object&gt;<br>
+<strong>reason</strong> = &lt;swap.myStore.Namespace object&gt;<br>
+<strong>rei</strong> = &lt;swap.myStore.Namespace object&gt;</td></tr></table>
+</body></html>

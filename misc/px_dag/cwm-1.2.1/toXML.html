@@ -1,0 +1,447 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module toXML</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>toXML</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/syosi/cvs-trunk/WWW/2000/10/swap/toXML.py">/home/syosi/cvs-trunk/WWW/2000/10/swap/toXML.py</a></font></td></tr></table>
+    <p><tt>$Id: toXML.html,v 1.26 2007/11/18 02:01:57 syosi Exp $<br>
+&nbsp;<br>
+&nbsp;<br>
+This&nbsp;module&nbsp;implements&nbsp;basic&nbsp;sources&nbsp;and&nbsp;sinks&nbsp;for&nbsp;RDF&nbsp;data.<br>
+It&nbsp;defines&nbsp;a&nbsp;stream&nbsp;interface&nbsp;for&nbsp;such&nbsp;data.<br>
+It&nbsp;has&nbsp;a&nbsp;command&nbsp;line&nbsp;interface,&nbsp;can&nbsp;work&nbsp;as&nbsp;a&nbsp;web&nbsp;query&nbsp;engine,<br>
+and&nbsp;has&nbsp;built&nbsp;in&nbsp;test(),&nbsp;all&nbsp;of&nbsp;which&nbsp;demosntrate&nbsp;how&nbsp;it&nbsp;is&nbsp;used.<br>
+&nbsp;<br>
+To&nbsp;make&nbsp;a&nbsp;new&nbsp;RDF&nbsp;processor,&nbsp;subclass&nbsp;RDFSink.<br>
+&nbsp;<br>
+See&nbsp;also:<br>
+&nbsp;<br>
+Notation&nbsp;3<br>
+<a href="http://www.w3.org/DesignIssues/Notation3">http://www.w3.org/DesignIssues/Notation3</a><br>
+&nbsp;<br>
+Closed&nbsp;World&nbsp;Machine&nbsp;-&nbsp;and&nbsp;RDF&nbsp;Processor<br>
+http;//www.w3.org/2000/10/swap/cwm<br>
+&nbsp;<br>
+To&nbsp;DO:&nbsp;See&nbsp;also&nbsp;"@@"&nbsp;in&nbsp;comments<br>
+&nbsp;<br>
+Internationlization:<br>
+-&nbsp;Decode&nbsp;incoming&nbsp;N3&nbsp;file&nbsp;as&nbsp;unicode<br>
+-&nbsp;Encode&nbsp;outgoing&nbsp;file<br>
+-&nbsp;unicode&nbsp;\u&nbsp;&nbsp;(??)&nbsp;escapes&nbsp;in&nbsp;parse<br>
+-&nbsp;unicode&nbsp;\u&nbsp;&nbsp;(??)&nbsp;escapes&nbsp;in&nbsp;string&nbsp;output<br>
+&nbsp;<br>
+Note&nbsp;currently&nbsp;unicode&nbsp;strings&nbsp;work&nbsp;in&nbsp;this&nbsp;code<br>
+but&nbsp;fail&nbsp;when&nbsp;they&nbsp;are&nbsp;output&nbsp;into&nbsp;the&nbsp;python&nbsp;debugger<br>
+interactive&nbsp;window.<br>
+&nbsp;<br>
+______________________________________________<br>
+&nbsp;<br>
+Module&nbsp;originally&nbsp;by&nbsp;Dan&nbsp;Connolly.<br>
+TimBL&nbsp;added&nbsp;RDF&nbsp;stream&nbsp;model.</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#fffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="RDFSink.html">RDFSink</a><br>
+<a href="codecs.html">codecs</a><br>
+<a href="re.html">re</a><br>
+</td><td width="25%" valign=top><a href="string.html">string</a><br>
+<a href="sys.html">sys</a><br>
+<a href="triple_maker.html">triple_maker</a><br>
+</td><td width="25%" valign=top><a href="triple_maker.html">triple_maker</a><br>
+<a href="urllib.html">urllib</a><br>
+<a href="urlparse.html">urlparse</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="RDFSink.html#RDFStructuredOutput">RDFSink.RDFStructuredOutput</a>(<a href="RDFSink.html#RDFSink">RDFSink.RDFSink</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="toXML.html#ToRDF">ToRDF</a>
+</font></dt><dt><font face="helvetica, arial"><a href="toXML.html#tmToRDF">tmToRDF</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="toXML.html#XMLWriter">XMLWriter</a>
+</font></dt></dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="ToRDF">class <strong>ToRDF</strong></a>(<a href="RDFSink.html#RDFStructuredOutput">RDFSink.RDFStructuredOutput</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>keeps&nbsp;track&nbsp;of&nbsp;most&nbsp;recent&nbsp;subject,&nbsp;reuses&nbsp;it<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="toXML.html#ToRDF">ToRDF</a></dd>
+<dd><a href="RDFSink.html#RDFStructuredOutput">RDFSink.RDFStructuredOutput</a></dd>
+<dd><a href="RDFSink.html#RDFSink">RDFSink.RDFSink</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="ToRDF-__init__"><strong>__init__</strong></a>(self, outFp, thisURI<font color="#909090">=None</font>, base<font color="#909090">=None</font>, flags<font color="#909090">=''</font>)</dt><dd><tt>#@&nbsp;Not&nbsp;actually&nbsp;complete,&nbsp;and&nbsp;can&nbsp;encode&nbsp;anyway</tt></dd></dl>
+
+<dl><dt><a name="ToRDF-bind"><strong>bind</strong></a>(self, prefix, namespace)</dt></dl>
+
+<dl><dt><a name="ToRDF-dummyClone"><strong>dummyClone</strong></a>(self)</dt><dd><tt>retun&nbsp;a&nbsp;version&nbsp;of&nbsp;myself&nbsp;which&nbsp;will&nbsp;only&nbsp;count&nbsp;occurrences</tt></dd></dl>
+
+<dl><dt><a name="ToRDF-endAnonymous"><strong>endAnonymous</strong></a>(self, subject, verb)</dt></dl>
+
+<dl><dt><a name="ToRDF-endAnonymousNode"><strong>endAnonymousNode</strong></a>(self, subj<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="ToRDF-endDoc"><strong>endDoc</strong></a>(self, rootFormulaPair<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="ToRDF-endFormulaObject"><strong>endFormulaObject</strong></a>(self, pred, subj)</dt></dl>
+
+<dl><dt><a name="ToRDF-endFormulaSubject"><strong>endFormulaSubject</strong></a>(self, subj)</dt></dl>
+
+<dl><dt><a name="ToRDF-endListObject"><strong>endListObject</strong></a>(self, subject, verb)</dt></dl>
+
+<dl><dt><a name="ToRDF-endListSubject"><strong>endListSubject</strong></a>(self, subj)</dt></dl>
+
+<dl><dt><a name="ToRDF-flushStart"><strong>flushStart</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="ToRDF-makeComment"><strong>makeComment</strong></a>(self, str)</dt></dl>
+
+<dl><dt><a name="ToRDF-makeStatement"><strong>makeStatement</strong></a>(self, tuple, why<font color="#909090">=None</font>, aIsPossible<font color="#909090">=0</font>)</dt></dl>
+
+<dl><dt><a name="ToRDF-referenceTo"><strong>referenceTo</strong></a>(self, uri)</dt><dd><tt>Conditional&nbsp;relative&nbsp;URI</tt></dd></dl>
+
+<dl><dt><a name="ToRDF-startAnonymous"><strong>startAnonymous</strong></a>(self, tuple)</dt></dl>
+
+<dl><dt><a name="ToRDF-startAnonymousNode"><strong>startAnonymousNode</strong></a>(self, subj, isList<font color="#909090">=0</font>)</dt></dl>
+
+<dl><dt><a name="ToRDF-startDoc"><strong>startDoc</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="ToRDF-startFormulaObject"><strong>startFormulaObject</strong></a>(self, tuple)</dt></dl>
+
+<dl><dt><a name="ToRDF-startFormulaSubject"><strong>startFormulaSubject</strong></a>(self, context)</dt></dl>
+
+<dl><dt><a name="ToRDF-startListObject"><strong>startListObject</strong></a>(self, tuple, isList<font color="#909090">=0</font>)</dt></dl>
+
+<dl><dt><a name="ToRDF-startListSubject"><strong>startListSubject</strong></a>(self, subj)</dt></dl>
+
+<dl><dt><a name="ToRDF-startWithParseType"><strong>startWithParseType</strong></a>(self, parseType, tuple)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>flagDocumentation</strong> = '<font color="#c040c0">\n</font>Flags to control RDF/XML output (after --rdf=) ...e URIs.<font color="#c040c0">\n</font>z  - Allow relative URIs for namespaces<font color="#c040c0">\n\n</font>'</dl>
+
+<hr>
+Methods inherited from <a href="RDFSink.html#RDFSink">RDFSink.RDFSink</a>:<br>
+<dl><dt><a name="ToRDF-checkNewId"><strong>checkNewId</strong></a>(self, uri)</dt><dd><tt>The&nbsp;store&nbsp;can&nbsp;override&nbsp;this&nbsp;to&nbsp;raise&nbsp;an&nbsp;exception&nbsp;if&nbsp;the<br>
+id&nbsp;is&nbsp;not&nbsp;in&nbsp;fact&nbsp;new.&nbsp;This&nbsp;is&nbsp;useful&nbsp;because&nbsp;it&nbsp;is&nbsp;usfeul<br>
+to&nbsp;generate&nbsp;IDs&nbsp;with&nbsp;useful&nbsp;diagnostic&nbsp;ways&nbsp;but&nbsp;this&nbsp;lays&nbsp;them<br>
+open&nbsp;to&nbsp;possibly&nbsp;clashing&nbsp;in&nbsp;pathalogical&nbsp;cases.</tt></dd></dl>
+
+<dl><dt><a name="ToRDF-countNamespace"><strong>countNamespace</strong></a>(self, namesp)</dt><dd><tt>On&nbsp;output,&nbsp;count&nbsp;how&nbsp;many&nbsp;times&nbsp;each&nbsp;namespace&nbsp;is&nbsp;used</tt></dd></dl>
+
+<dl><dt><a name="ToRDF-genId"><strong>genId</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="ToRDF-intern"><strong>intern</strong></a>(self, something)</dt></dl>
+
+<dl><dt><a name="ToRDF-namespaceCounts"><strong>namespaceCounts</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="ToRDF-newBlankNode"><strong>newBlankNode</strong></a>(self, context, uri<font color="#909090">=None</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="ToRDF-newExistential"><strong>newExistential</strong></a>(self, context, uri<font color="#909090">=None</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="ToRDF-newFormula"><strong>newFormula</strong></a>(self, uri<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="ToRDF-newList"><strong>newList</strong></a>(self, l, context)</dt></dl>
+
+<dl><dt><a name="ToRDF-newLiteral"><strong>newLiteral</strong></a>(self, str, dt<font color="#909090">=None</font>, lang<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="ToRDF-newSymbol"><strong>newSymbol</strong></a>(self, uri)</dt></dl>
+
+<dl><dt><a name="ToRDF-newUniversal"><strong>newUniversal</strong></a>(self, context, uri<font color="#909090">=None</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="ToRDF-newXMLLiteral"><strong>newXMLLiteral</strong></a>(self, doc)</dt></dl>
+
+<dl><dt><a name="ToRDF-reopen"><strong>reopen</strong></a>(self)</dt><dd><tt>Un-End&nbsp;a&nbsp;document<br>
+&nbsp;<br>
+If&nbsp;you&nbsp;have&nbsp;added&nbsp;stuff&nbsp;to&nbsp;a&nbsp;document,&nbsp;thought&nbsp;you&nbsp;were&nbsp;done,&nbsp;and<br>
+then&nbsp;want&nbsp;to&nbsp;add&nbsp;more,&nbsp;call&nbsp;this&nbsp;to&nbsp;get&nbsp;back&nbsp;into&nbsp;the&nbsp;sate&nbsp;that&nbsp;makeSatement<br>
+is&nbsp;again&nbsp;acceptable.&nbsp;Remember&nbsp;to&nbsp;end&nbsp;the&nbsp;document&nbsp;again&nbsp;when&nbsp;done.</tt></dd></dl>
+
+<dl><dt><a name="ToRDF-setDefaultNamespace"><strong>setDefaultNamespace</strong></a>(self, uri)</dt><dd><tt>Pass&nbsp;on&nbsp;a&nbsp;binding&nbsp;hint&nbsp;for&nbsp;later&nbsp;use&nbsp;in&nbsp;output<br>
+&nbsp;<br>
+This&nbsp;really&nbsp;is&nbsp;just&nbsp;a&nbsp;hint.&nbsp;The&nbsp;parser&nbsp;calls&nbsp;this&nbsp;to&nbsp;pass&nbsp;on<br>
+the&nbsp;default&nbsp;namespace&nbsp;which&nbsp;it&nbsp;came&nbsp;across,&nbsp;as&nbsp;this&nbsp;is&nbsp;a<br>
+useful&nbsp;hint&nbsp;for&nbsp;a&nbsp;human&nbsp;readable&nbsp;prefix&nbsp;for&nbsp;output&nbsp;of&nbsp;the&nbsp;same<br>
+namespace.&nbsp;Otherwise,&nbsp;output&nbsp;processors&nbsp;will&nbsp;have&nbsp;to&nbsp;invent&nbsp;or<br>
+avoid&nbsp;useing&nbsp;namespaces,&nbsp;which&nbsp;will&nbsp;look&nbsp;ugly.</tt></dd></dl>
+
+<dl><dt><a name="ToRDF-setGenPrefix"><strong>setGenPrefix</strong></a>(self, genPrefix)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="XMLWriter">class <strong>XMLWriter</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>taken&nbsp;from<br>
+Id:&nbsp;tsv2xml.py,v&nbsp;1.1&nbsp;2000/10/02&nbsp;19:41:02&nbsp;connolly&nbsp;Exp&nbsp;connolly<br>
+&nbsp;<br>
+Takes&nbsp;as&nbsp;argument&nbsp;a&nbsp;writer&nbsp;which&nbsp;does&nbsp;the&nbsp;(eg&nbsp;utf-8)&nbsp;encoding<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="XMLWriter-__init__"><strong>__init__</strong></a>(self, encodingWriter, counter, squeaky<font color="#909090">=0</font>, version<font color="#909090">='1.0'</font>)</dt></dl>
+
+<dl><dt><a name="XMLWriter-closeTag"><strong>closeTag</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="XMLWriter-data"><strong>data</strong></a>(self, str)</dt></dl>
+
+<dl><dt><a name="XMLWriter-emptyElement"><strong>emptyElement</strong></a>(self, n, attrs<font color="#909090">=[]</font>, prefixes<font color="#909090">={}</font>)</dt></dl>
+
+<dl><dt><a name="XMLWriter-endDocument"><strong>endDocument</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="XMLWriter-endElement"><strong>endElement</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="XMLWriter-figurePrefix"><strong>figurePrefix</strong></a>(self, uriref, rawAttrs, prefixes)</dt></dl>
+
+<dl><dt><a name="XMLWriter-flushClose"><strong>flushClose</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="XMLWriter-indent"><strong>indent</strong></a>(self, extra<font color="#909090">=0</font>)</dt></dl>
+
+<dl><dt><a name="XMLWriter-makeComment"><strong>makeComment</strong></a>(self, str)</dt></dl>
+
+<dl><dt><a name="XMLWriter-makePI"><strong>makePI</strong></a>(self, str)</dt></dl>
+
+<dl><dt><a name="XMLWriter-newline"><strong>newline</strong></a>(self, howmany<font color="#909090">=1</font>)</dt></dl>
+
+<dl><dt><a name="XMLWriter-passXML"><strong>passXML</strong></a>(self, st)</dt></dl>
+
+<dl><dt><a name="XMLWriter-startElement"><strong>startElement</strong></a>(self, n, attrs<font color="#909090">=[]</font>, prefixes<font color="#909090">={}</font>)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>attrEsc</strong> = &lt;_sre.SRE_Pattern object&gt;</dl>
+
+<dl><dt><strong>dataEsc</strong> = &lt;_sre.SRE_Pattern object&gt;</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="tmToRDF">class <strong>tmToRDF</strong></a>(<a href="RDFSink.html#RDFStructuredOutput">RDFSink.RDFStructuredOutput</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Trying&nbsp;to&nbsp;do&nbsp;the&nbsp;same&nbsp;as&nbsp;above,&nbsp;using&nbsp;the&nbsp;TripleMaker&nbsp;interface<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="toXML.html#tmToRDF">tmToRDF</a></dd>
+<dd><a href="RDFSink.html#RDFStructuredOutput">RDFSink.RDFStructuredOutput</a></dd>
+<dd><a href="RDFSink.html#RDFSink">RDFSink.RDFSink</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="tmToRDF-IsOf"><strong>IsOf</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToRDF-__init__"><strong>__init__</strong></a>(self, outFp, thisURI<font color="#909090">=None</font>, base<font color="#909090">=None</font>, flags<font color="#909090">=''</font>)</dt></dl>
+
+<dl><dt><a name="tmToRDF-addAnonymous"><strong>addAnonymous</strong></a>(self, Id)</dt></dl>
+
+<dl><dt><a name="tmToRDF-addLiteral"><strong>addLiteral</strong></a>(self, lit, dt<font color="#909090">=None</font>, lang<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="tmToRDF-addNode"><strong>addNode</strong></a>(self, node, nameLess<font color="#909090">=0</font>)</dt></dl>
+
+<dl><dt><a name="tmToRDF-addQuestionMarkedSymbol"><strong>addQuestionMarkedSymbol</strong></a>(self, sym)</dt></dl>
+
+<dl><dt><a name="tmToRDF-addSymbol"><strong>addSymbol</strong></a>(self, sym)</dt></dl>
+
+<dl><dt><a name="tmToRDF-backwardPath"><strong>backwardPath</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToRDF-beginAnonymous"><strong>beginAnonymous</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToRDF-beginFormula"><strong>beginFormula</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToRDF-beginList"><strong>beginList</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToRDF-checkIsOf"><strong>checkIsOf</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToRDF-declareExistential"><strong>declareExistential</strong></a>(self, sym)</dt></dl>
+
+<dl><dt><a name="tmToRDF-declareUniversal"><strong>declareUniversal</strong></a>(self, sym)</dt></dl>
+
+<dl><dt><a name="tmToRDF-end"><strong>end</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToRDF-endAnonymous"><strong>endAnonymous</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToRDF-endFormula"><strong>endFormula</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToRDF-endList"><strong>endList</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToRDF-endStatement"><strong>endStatement</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToRDF-forewardPath"><strong>forewardPath</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToRDF-nodeIDize"><strong>nodeIDize</strong></a>(self, argument)</dt></dl>
+
+<dl><dt><a name="tmToRDF-referenceTo"><strong>referenceTo</strong></a>(self, uri)</dt><dd><tt>Conditional&nbsp;relative&nbsp;URI</tt></dd></dl>
+
+<dl><dt><a name="tmToRDF-start"><strong>start</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="RDFSink.html#RDFStructuredOutput">RDFSink.RDFStructuredOutput</a>:<br>
+<dl><dt><a name="tmToRDF-endAnonymousNode"><strong>endAnonymousNode</strong></a>(self, endAnonymousNode)</dt></dl>
+
+<dl><dt><a name="tmToRDF-endFormulaObject"><strong>endFormulaObject</strong></a>(self, pred, subj)</dt></dl>
+
+<dl><dt><a name="tmToRDF-endFormulaSubject"><strong>endFormulaSubject</strong></a>(self, subj)</dt></dl>
+
+<dl><dt><a name="tmToRDF-startAnonymous"><strong>startAnonymous</strong></a>(self, triple, isList<font color="#909090">=0</font>)</dt></dl>
+
+<dl><dt><a name="tmToRDF-startAnonymousNode"><strong>startAnonymousNode</strong></a>(self, subj)</dt></dl>
+
+<dl><dt><a name="tmToRDF-startFormulaObject"><strong>startFormulaObject</strong></a>(self, triple)</dt></dl>
+
+<dl><dt><a name="tmToRDF-startFormulaSubject"><strong>startFormulaSubject</strong></a>(self, context)</dt></dl>
+
+<hr>
+Methods inherited from <a href="RDFSink.html#RDFSink">RDFSink.RDFSink</a>:<br>
+<dl><dt><a name="tmToRDF-bind"><strong>bind</strong></a>(self, prefix, uri)</dt><dd><tt>Pass&nbsp;on&nbsp;a&nbsp;binding&nbsp;hint&nbsp;for&nbsp;later&nbsp;use&nbsp;in&nbsp;output<br>
+&nbsp;<br>
+This&nbsp;really&nbsp;is&nbsp;just&nbsp;a&nbsp;hint.&nbsp;The&nbsp;parser&nbsp;calls&nbsp;bind&nbsp;to&nbsp;pass&nbsp;on<br>
+the&nbsp;prefix&nbsp;which&nbsp;it&nbsp;came&nbsp;across,&nbsp;as&nbsp;this&nbsp;is&nbsp;a&nbsp;useful&nbsp;hint&nbsp;for<br>
+a&nbsp;human&nbsp;readable&nbsp;prefix&nbsp;for&nbsp;output&nbsp;of&nbsp;the&nbsp;same<br>
+namespace.&nbsp;Otherwise,&nbsp;output&nbsp;processors&nbsp;will&nbsp;have&nbsp;to&nbsp;invent&nbsp;or<br>
+avoid&nbsp;useing&nbsp;namespaces,&nbsp;which&nbsp;will&nbsp;look&nbsp;ugly</tt></dd></dl>
+
+<dl><dt><a name="tmToRDF-checkNewId"><strong>checkNewId</strong></a>(self, uri)</dt><dd><tt>The&nbsp;store&nbsp;can&nbsp;override&nbsp;this&nbsp;to&nbsp;raise&nbsp;an&nbsp;exception&nbsp;if&nbsp;the<br>
+id&nbsp;is&nbsp;not&nbsp;in&nbsp;fact&nbsp;new.&nbsp;This&nbsp;is&nbsp;useful&nbsp;because&nbsp;it&nbsp;is&nbsp;usfeul<br>
+to&nbsp;generate&nbsp;IDs&nbsp;with&nbsp;useful&nbsp;diagnostic&nbsp;ways&nbsp;but&nbsp;this&nbsp;lays&nbsp;them<br>
+open&nbsp;to&nbsp;possibly&nbsp;clashing&nbsp;in&nbsp;pathalogical&nbsp;cases.</tt></dd></dl>
+
+<dl><dt><a name="tmToRDF-countNamespace"><strong>countNamespace</strong></a>(self, namesp)</dt><dd><tt>On&nbsp;output,&nbsp;count&nbsp;how&nbsp;many&nbsp;times&nbsp;each&nbsp;namespace&nbsp;is&nbsp;used</tt></dd></dl>
+
+<dl><dt><a name="tmToRDF-endDoc"><strong>endDoc</strong></a>(self, rootFormulaPair)</dt><dd><tt>End&nbsp;a&nbsp;document<br>
+&nbsp;<br>
+Call&nbsp;this&nbsp;once&nbsp;only&nbsp;at&nbsp;the&nbsp;end&nbsp;of&nbsp;parsing&nbsp;so&nbsp;that&nbsp;the&nbsp;receiver&nbsp;can&nbsp;wrap<br>
+things&nbsp;up,&nbsp;oprimize,&nbsp;intern,&nbsp;index&nbsp;and&nbsp;so&nbsp;on.&nbsp;&nbsp;The&nbsp;pair&nbsp;given&nbsp;is&nbsp;the&nbsp;(type,&nbsp;value)<br>
+identifier&nbsp;of&nbsp;the&nbsp;root&nbsp;formula&nbsp;of&nbsp;the&nbsp;thing&nbsp;parsed.</tt></dd></dl>
+
+<dl><dt><a name="tmToRDF-genId"><strong>genId</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToRDF-intern"><strong>intern</strong></a>(self, something)</dt></dl>
+
+<dl><dt><a name="tmToRDF-makeComment"><strong>makeComment</strong></a>(self, str)</dt><dd><tt>This&nbsp;passes&nbsp;on&nbsp;a&nbsp;comment&nbsp;line&nbsp;which&nbsp;of&nbsp;course&nbsp;has&nbsp;no&nbsp;semantics.<br>
+&nbsp;<br>
+This&nbsp;is&nbsp;only&nbsp;useful&nbsp;in&nbsp;direct&nbsp;piping&nbsp;of&nbsp;parsers&nbsp;to&nbsp;output,&nbsp;to&nbsp;preserve<br>
+comments&nbsp;in&nbsp;the&nbsp;original&nbsp;file.</tt></dd></dl>
+
+<dl><dt><a name="tmToRDF-makeStatement"><strong>makeStatement</strong></a>(self, tuple, why<font color="#909090">=None</font>)</dt><dd><tt>add&nbsp;a&nbsp;statement&nbsp;to&nbsp;a&nbsp;stream/store.<br>
+&nbsp;<br>
+raises&nbsp;URISyntaxError&nbsp;on&nbsp;bad&nbsp;URIs<br>
+tuple&nbsp;is&nbsp;a&nbsp;quad&nbsp;(context,&nbsp;predicate,&nbsp;subject,&nbsp;object)&nbsp;of&nbsp;things&nbsp;generated&nbsp;by&nbsp;calls&nbsp;to&nbsp;newLiteral&nbsp;etc<br>
+why&nbsp;is&nbsp;reason&nbsp;for&nbsp;the&nbsp;statement.</tt></dd></dl>
+
+<dl><dt><a name="tmToRDF-namespaceCounts"><strong>namespaceCounts</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToRDF-newBlankNode"><strong>newBlankNode</strong></a>(self, context, uri<font color="#909090">=None</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="tmToRDF-newExistential"><strong>newExistential</strong></a>(self, context, uri<font color="#909090">=None</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="tmToRDF-newFormula"><strong>newFormula</strong></a>(self, uri<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="tmToRDF-newList"><strong>newList</strong></a>(self, l, context)</dt></dl>
+
+<dl><dt><a name="tmToRDF-newLiteral"><strong>newLiteral</strong></a>(self, str, dt<font color="#909090">=None</font>, lang<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="tmToRDF-newSymbol"><strong>newSymbol</strong></a>(self, uri)</dt></dl>
+
+<dl><dt><a name="tmToRDF-newUniversal"><strong>newUniversal</strong></a>(self, context, uri<font color="#909090">=None</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="tmToRDF-newXMLLiteral"><strong>newXMLLiteral</strong></a>(self, doc)</dt></dl>
+
+<dl><dt><a name="tmToRDF-reopen"><strong>reopen</strong></a>(self)</dt><dd><tt>Un-End&nbsp;a&nbsp;document<br>
+&nbsp;<br>
+If&nbsp;you&nbsp;have&nbsp;added&nbsp;stuff&nbsp;to&nbsp;a&nbsp;document,&nbsp;thought&nbsp;you&nbsp;were&nbsp;done,&nbsp;and<br>
+then&nbsp;want&nbsp;to&nbsp;add&nbsp;more,&nbsp;call&nbsp;this&nbsp;to&nbsp;get&nbsp;back&nbsp;into&nbsp;the&nbsp;sate&nbsp;that&nbsp;makeSatement<br>
+is&nbsp;again&nbsp;acceptable.&nbsp;Remember&nbsp;to&nbsp;end&nbsp;the&nbsp;document&nbsp;again&nbsp;when&nbsp;done.</tt></dd></dl>
+
+<dl><dt><a name="tmToRDF-setDefaultNamespace"><strong>setDefaultNamespace</strong></a>(self, uri)</dt><dd><tt>Pass&nbsp;on&nbsp;a&nbsp;binding&nbsp;hint&nbsp;for&nbsp;later&nbsp;use&nbsp;in&nbsp;output<br>
+&nbsp;<br>
+This&nbsp;really&nbsp;is&nbsp;just&nbsp;a&nbsp;hint.&nbsp;The&nbsp;parser&nbsp;calls&nbsp;this&nbsp;to&nbsp;pass&nbsp;on<br>
+the&nbsp;default&nbsp;namespace&nbsp;which&nbsp;it&nbsp;came&nbsp;across,&nbsp;as&nbsp;this&nbsp;is&nbsp;a<br>
+useful&nbsp;hint&nbsp;for&nbsp;a&nbsp;human&nbsp;readable&nbsp;prefix&nbsp;for&nbsp;output&nbsp;of&nbsp;the&nbsp;same<br>
+namespace.&nbsp;Otherwise,&nbsp;output&nbsp;processors&nbsp;will&nbsp;have&nbsp;to&nbsp;invent&nbsp;or<br>
+avoid&nbsp;useing&nbsp;namespaces,&nbsp;which&nbsp;will&nbsp;look&nbsp;ugly.</tt></dd></dl>
+
+<dl><dt><a name="tmToRDF-setGenPrefix"><strong>setGenPrefix</strong></a>(self, genPrefix)</dt></dl>
+
+<dl><dt><a name="tmToRDF-startDoc"><strong>startDoc</strong></a>(self)</dt></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-bNodePredicate"><strong>bNodePredicate</strong></a>()</dt></dl>
+ <dl><dt><a name="-dummyWrite"><strong>dummyWrite</strong></a>(x)</dt></dl>
+ <dl><dt><a name="-findLegal"><strong>findLegal</strong></a>(dict, str)</dt></dl>
+ <dl><dt><a name="-swap"><strong>swap</strong></a>(List, a, b)</dt></dl>
+ <dl><dt><a name="-xmldata"><strong>xmldata</strong></a>(write, str, markupChars)</dt></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>ADDED_HASH</strong> = '#'<br>
+<strong>ALL4</strong> = (0, 1, 2, 3)<br>
+<strong>ANONYMOUS</strong> = 3<br>
+<strong>CONTEXT</strong> = 0<br>
+<strong>DAML_LISTS</strong> = 1<br>
+<strong>DAML_NS</strong> = 'http://www.daml.org/2001/03/daml+oil#'<br>
+<strong>DAML_sameAs</strong> = (0, 'http://www.daml.org/2001/03/daml+oil#sameAs')<br>
+<strong>DAML_sameAs_URI</strong> = 'http://www.daml.org/2001/03/daml+oil#sameAs'<br>
+<strong>DPO_NS</strong> = 'http://www.daml.org/2001/03/daml+oil#'<br>
+<strong>FORMULA</strong> = 1<br>
+<strong>LITERAL</strong> = 2<br>
+<strong>LITERAL_DT</strong> = 21<br>
+<strong>LITERAL_LANG</strong> = 22<br>
+<strong>List_NS</strong> = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'<br>
+<strong>Logic_NS</strong> = 'http://www.w3.org/2000/10/swap/log#'<br>
+<strong>N3_Empty</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Empty')<br>
+<strong>N3_List</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#List')<br>
+<strong>N3_first</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#first')<br>
+<strong>N3_forAll_URI</strong> = 'http://www.w3.org/2000/10/swap/log#forAll'<br>
+<strong>N3_forSome_URI</strong> = 'http://www.w3.org/2000/10/swap/log#forSome'<br>
+<strong>N3_nil</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#nil')<br>
+<strong>N3_rest</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#rest')<br>
+<strong>NCNameChar</strong> = 0<br>
+<strong>NCNameStartChar</strong> = 1<br>
+<strong>NODE_MERGE_URI</strong> = 'http://www.w3.org/2000/10/swap/log#is'<br>
+<strong>OBJ</strong> = 3<br>
+<strong>PARTS</strong> = (1, 2, 3)<br>
+<strong>PRED</strong> = 1<br>
+<strong>RDF_NS_URI</strong> = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'<br>
+<strong>RDF_li</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#li')<br>
+<strong>RDF_spec</strong> = 'http://www.w3.org/TR/REC-rdf-syntax/'<br>
+<strong>RDF_type</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type')<br>
+<strong>RDF_type_URI</strong> = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'<br>
+<strong>SUBJ</strong> = 2<br>
+<strong>SYMBOL</strong> = 0<br>
+<strong>XMLLITERAL</strong> = 25<br>
+<strong>XML_NS_URI</strong> = 'http://www.w3.org/XML/1998/namespace'<br>
+<strong>option_noregen</strong> = 0<br>
+<strong>parsesTo_URI</strong> = 'http://www.w3.org/2000/10/swap/log#parsesTo'</td></tr></table>
+</body></html>

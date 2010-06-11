@@ -1,0 +1,35 @@
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>.
+@prefix rcs: <http://www.w3.org/2001/03swell/rcs#>.
+
+<> dc:description """substituion of equals for equals in triples, plus some rules for unambiguous/unique properties (@@that probably belong elsewhere)""";
+  rcs:id "$Id: sameThing.n3,v 1.6 2004/06/25 01:26:59 timbl Exp $";
+  dc:creator [ 
+	contact:fullName "Dan Connolly";
+	contact:homePage <http://www.w3.org/People/Connolly/>;
+	contact:mailbox <mailto:connolly@w3.org>
+	];
+  dc:relation <forgetDups.n3>; #@@ or is dc:relation a class of properties?
+				# should I be using rdfs:seeAlso?
+  dc:rights "copyright (c) 2001 W3C (MIT, Keio, INRIA)".
+
+@prefix ont:  <http://www.daml.org/2001/03/daml+oil#> .
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+@prefix : <#>.
+
+# These should be derivable from the axiomatic semantics for DAML+OIL
+
+@forAll :x, :y, :z, :p, :q.
+
+{ :x = :y } log:implies { :y = :x }. # symmetric
+{ :x = [ = :z] } log:implies { :x = :z }. # transitive
+{ :x :p :y. :x = :z. :p log:notEqualTo log:forAll, log:forSome} log:implies { :z :p :y }.
+{ :x :p :y. :p = :q. :p log:notEqualTo log:forAll, log:forSome} log:implies { :x :q :y }.
+{ :x :p :y. :y = :z. :p log:notEqualTo log:forAll, log:forSome} log:implies { :x :p :z }.
+
+{  :p a ont:UniqueProperty. } log:implies
+ { { :x :p :y. :x :p :z. } log:implies  { :y = :z } }.
+
+{  :p a ont:UnambiguousProperty. } log:implies
+ { { :x :p :z. :y :p :z. } log:implies  { :x = :y } }.
+

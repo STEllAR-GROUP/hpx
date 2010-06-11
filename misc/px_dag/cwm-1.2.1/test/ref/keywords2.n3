@@ -1,0 +1,11 @@
+     @prefix : <foo.n3#> .
+    
+     @forAll :x,
+                :y,
+                :z.
+         @forSome :a,
+                :b,
+                :c .
+    
+    :b     :a :c .
+    

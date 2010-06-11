@@ -1,0 +1,226 @@
+# Notation3 constrained to be RDF + a horn rules language
+#
+# BNF without tokenization
+#
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix bnf: <http://www.w3.org/2000/10/swap/grammar/bnf#>.
+@prefix rul: <http://www.w3.org/2000/10/swap/grammar/bnf-rules#>.
+@prefix : <http://www.w3.org/2000/10/swap/grammar/n3-rules#>.
+@prefix n3r: <http://www.w3.org/2000/10/swap/grammar/n3-rules#>.
+@prefix list: <http://www.w3.org/2000/10/swap/list#>.
+@prefix string: <http://www.w3.org/2000/10/swap/string#>.
+@keywords a, is, of.
+
+
+# Issues:
+# - see general ones in n3.n3
+# - Defining safe rules
+
+
+<> bnf:syntaxFor [ bnf:internetMediaType 
+		<http://www.w3.org/2003/mediatypes#application/n3>].
+
+# <> rdfsem:semanticsFor ""   .....
+
+# __________________________________________________________________
+#
+# The N3 Rukes Grammar
+
+n3document a rul:Used;
+	bnf:mustBeOneSequence(
+	
+		(
+			[ bnf:zeroOrMore declaration ]
+			[ bnf:zeroOrMore universal ]
+			[ bnf:zeroOrMore existential ]
+			statements_optional
+			bnf:eof
+		)
+	).
+
+statements_optional bnf:mustBeOneSequence (() ( statement_or_rule "." statements_optional )e ).
+
+
+statement_or_rule bnf:mustBeOneSequence( (statement) (rule) ).
+
+# Formula does NOT need period on last statement
+
+formulacontent bnf:mustBeOneSequence ((
+		[ bnf:zeroOrMore declaration ]
+		[ bnf:zeroOrMore existential ]
+		statementlist
+	)).
+
+
+statementlist bnf:mustBeOneSequence (
+		( )
+		( statement statementtail )
+	).
+
+statementtail bnf:mustBeOneSequence (
+		( )
+		( "." statementlist )
+	).
+
+universal bnf:mustBeOneSequence (
+		(
+			"@forAll"
+			[ bnf:commaSeparatedPeriodTerminatedListOf symbol ]
+		)).
+
+existential bnf:mustBeOneSequence(
+		(	 "@forSome" 
+			 [ bnf:commaSeparatedPeriodTerminatedListOf symbol ]
+		)).
+
+
+symbol bnf:mustBeOneSequence (
+		(explicituri)
+		(qname)
+	).
+
+declaration bnf:mustBeOneSequence(
+		( "@base" explicituri "." )
+		( "@prefix" qname explicituri "." )
+		( "@keywords" [ bnf:commaSeparatedPeriodTerminatedListOf barename ] )
+	).
+
+statement bnf:mustBeOneSequence(( subject propertylist )).
+
+rule bnf:mustBeOneSequence (
+	( "{" formulacontent "}" "=>" "{" formulacontent "}" )
+	).
+
+rule_safe bnf:mustBeOneSequence (
+	( "{" formulacontent "}" "=>" "{" formula_safe "}" )
+	).
+
+propertylist bnf:mustBeOneSequence (
+		( )
+		( verb  object objecttail propertylisttail )
+	).
+
+propertylisttail bnf:mustBeOneSequence (
+		( )
+		( ";" propertylist )
+	).
+
+
+objecttail bnf:mustBeOneSequence (
+		( )
+		( ","   object objecttail )
+	).
+
+
+verb bnf:mustBeOneSequence (
+		( prop )
+		( "@has" prop )
+		( "@is" prop "@of" )
+		( "@a" )
+		( "=" )
+	).
+
+prop bnf:mustBeOneSequence ((node)).
+
+subject bnf:mustBeOneSequence ((item)).
+
+object bnf:mustBeOneSequence ((item)).
+
+item bnf:mustBeOneSequence(
+		(path)
+	).
+
+
+path bnf:mustBeOneSequence(
+		( node pathtail )
+	).
+
+pathtail bnf:mustBeOneSequence(
+		(  )
+		( "!" path )
+		( "^" path )
+	).
+
+
+node bnf:mustBeOneSequence (
+		( symbol )
+		( variable )
+		( numericliteral )
+		( literal )
+		( "[" propertylist "]"  )
+		(  "("  itemlist ")"  )
+).
+
+node_safe bnf:mustBeOneSequence (
+		( symbol )
+		( variable )
+		( numericliteral )
+		( literal )
+).
+
+
+
+itemlist bnf:mustBeOneSequence (() (item itemlist)).
+ 
+literal bnf:mustBeOneSequence(( string dtlang)).
+
+dtlang bnf:mustBeOneSequence(  ()  ("@" langcode)  ("^^" symbol)).
+
+
+#______________________________________________________________________
+#
+#   TOKENS
+
+alphanumeric 	bnf:matches  	"[a-zA-Z][a-zA-Z0-9_]*";
+		bnf:canStartWith	"a".
+
+numericliteral	bnf:matches	"""[-+]?[0-9]+(\\.[0-9]+)?(e[-+]?[0-9]+)?""";
+		bnf:canStartWith 	"0", "-", "+".
+
+explicituri 	bnf:matches 	"<[^>].*>";
+		bnf:canStartWith 	"<".
+
+qname 		bnf:matches  	"(([a-zA-Z_][a-zA-Z0-9_]*)?:)?([a-zA-Z_][a-zA-Z0-9_]*)?";
+		bnf:canStartWith 	"a", "_".  # @@ etc
+
+barename 	bnf:matches  	"[a-zA-Z_][a-zA-Z0-9_]*";  # subset of qname
+		bnf:canStartWith 	"a", "_".  # @@ etc
+
+variable 	bnf:matches  	"\\?[a-zA-Z_][a-zA-Z0-9_]*";  # ? barename
+		bnf:canStartWith 	"?".  #
+
+langcode	bnf:matches  	"[a-zA-Z0-9]+(-[a-zA-Z0-9]+)?";
+		bnf:canStartWith 	"a".
+
+
+string		bnf:matches		"(\"\"\"[^\"\\\\]*(?:(?:\\\\.|\"(?!\"\"))[^\"\\\\]*)*\"\"\")|(\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\")";
+		bnf:canStartWith 	"\"".
+
+
+#____________________________________________________
+
+#  Axioms reducing the shortcut BNF terms to bnf:musBeOneSequence.
+
+{ ?x bnf:zeroOrMore ?y } => {?x bnf:mustBeOneSequence ( () (?y ?x) ) }.
+
+
+{ ?x bnf:commaSeparatedPeriodTerminatedListOf ?y } =>
+{
+	?x bnf:mustBeOneSequence (
+		( "." )
+		( "," ?y ?x )
+	)
+}.
+
+
+#  labelling of things which do not have explicit URIs:
+
+{ ?x bnf:zeroOrMore [ bnf:label ?y].
+	( ?y "_s" ) string:concatenation ?str } => { ?x bnf:label ?str }.
+
+{ ?x bnf:commaSeparatedPeriodTerminatedListOf [ bnf:label ?y].
+	( ?y "_csl" ) string:concatenation ?str } => { ?x bnf:label ?str }.
+
+
+#ends

@@ -1,0 +1,16 @@
+
+
+
+<web:RDF xmlns="http://example.com/xmlns/aggregation-demo#"
+    xmlns:agg="http://example.com/xmlns/aggregation-demo#"
+    xmlns:web="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+
+    <Q1Answer web:about="http://www.mozilla.org/">
+    </Q1Answer>
+
+    <Q1Answer web:about="http://www.w3.org/RDF/">
+    </Q1Answer>
+
+    <Q1Answer web:about="http://www.w3.org/XML/">
+    </Q1Answer>
+</web:RDF>

@@ -1,0 +1,8 @@
+     @prefix : <http://example.com/foo#> .
+    
+    :a     :b :c .
+    
+    :hyphen-ated     <http://example.com/foo#dot.ted> <http://example.com/foo#hyphen-and.dot> .
+    
+    :minus-_underscore     :under_score :underscore_-minus .
+    

@@ -1,0 +1,16 @@
+     @prefix : <http://example.com/swap/test/reason/single_gen.n3#> .
+    @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    
+     @forAll :X .
+    
+    :a     :b "A noun",
+                3.14159265359 .
+      [      a :Thing ].
+    {
+        :a     :b :X .
+        
+        }     log:implies { @forSome :_g_L2C17 .
+        :_g_L2C17     a :Thing .
+        } .
+    
+

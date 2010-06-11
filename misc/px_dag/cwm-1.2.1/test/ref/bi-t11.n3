@@ -1,0 +1,125 @@
+     @prefix : <foo.n3#> .
+    @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+    @prefix s: <http://www.w3.org/2000/01/rdf-schema#> .
+    
+     @forAll :F,
+                :G,
+                :H,
+                :S,
+                :d,
+                :o,
+                :p,
+                :s,
+                :s1,
+                :x,
+                :y .
+    
+    :blue     a :ERROR_PROPERTY_NOT_DECLARED,
+                :UsedProperty;
+         :schema <foo.n3>;
+         :schemaFormula {:blue     s:isDefinedBy <foo.n3> .
+        :is     a rdf:Property;
+             s:isDefinedBy <foo.n3> .
+        :theSky     s:isDefinedBy <foo.n3> .
+        } .
+    
+    :includesTest2     a :success .
+    
+    :includesTest3     a :success .
+    
+    :is     a :Property_declared,
+                :UsedProperty;
+         :schema <foo.n3>;
+         :schemaFormula {:blue     s:isDefinedBy <foo.n3> .
+        :is     a rdf:Property;
+             s:isDefinedBy <foo.n3> .
+        :theSky     s:isDefinedBy <foo.n3> .
+        } .
+    
+    :test_undefined     a :ERROR_CANT_GET_SCHEMA,
+                :UsedProperty .
+    
+    log:implies     a log:Chaff .
+    {
+        <foo.n3>     log:semantics :F .
+        :F     log:includes {:blue     a rdf:Property .
+            } .
+        
+        }     log:implies {:includesTest     a :FAILURE .
+        } .
+    {
+        <foo.n3>     log:semantics :F .
+        :F     log:includes {:is     a rdf:Property .
+            } .
+        
+        }     log:implies {:includesTest3     a :success .
+        } .
+    {
+        <foo.n3>     log:semantics :F .
+        :F     log:notIncludes {:blue     a rdf:Property .
+            } .
+        
+        }     log:implies {:includesTest2     a :success .
+        } .
+    {
+        <foo.n3>     log:semantics :F .
+        :F     log:notIncludes {:is     a rdf:Property .
+            } .
+        
+        }     log:implies {:includesTest4     a :FAILURE .
+        } .
+    {
+        <t10a.n3>     log:semantics :F .
+        :F     log:includes {:s     :p :o .
+            } .
+        
+        }     log:implies {:p     a :UsedProperty .
+        } .
+    {
+        :F     log:includes {:p     a rdf:Property .
+            } .
+        :p     :schemaFormula :F .
+        
+        }     log:implies {:p     a :Property_declared .
+        } .
+    {
+        :F     log:notIncludes {:p     a rdf:Property .
+            } .
+        :p     :schemaFormula :F .
+        
+        }     log:implies {:p     a :ERROR_PROPERTY_NOT_DECLARED .
+        } .
+    {
+        :p     :schema  [
+                 log:semantics :F ] .
+        
+        }     log:implies {:p     :schemaFormula :F .
+        } .
+    {
+        :p     a :UsedProperty;
+             log:semantics  [
+                 log:includes {:p     s:isDefinedBy :s .
+                } ] .
+        
+        }     log:implies {:p     :schema :s .
+        } .
+    {
+        :p     a :UsedProperty;
+             log:semantics  [
+                 log:notIncludes {:p     s:isDefinedBy  [
+                     ] .
+                } ] .
+        
+        }     log:implies {:p     a :ERROR_CANT_GET_SCHEMA .
+        } .
+    {
+        :F     log:includes {:p     s:isDefinedBy :s .
+            } .
+        :p     a :UsedProperty;
+             log:semantics :F .
+        :s     log:semantics :G .
+        
+        }     log:implies {:p     :schemaFormula :G .
+        } .
+    

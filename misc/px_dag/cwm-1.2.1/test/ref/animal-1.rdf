@@ -1,0 +1,16 @@
+
+
+
+<rdf:RDF xmlns="http://www.daml.org/2000/12/daml+oil#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+
+    <rdfs:Class rdf:about="#Animal">
+        <restrictedBy rdf:parseType="Resource">
+            <rdf:type rdf:resource="http://www.daml.org/2000/12/daml+oil#Restriction"/>
+            <cardinality>2</cardinality>
+            <onProperty rdf:resource="#parent"/>
+        </restrictedBy>
+        <rdfs:label>Animal</rdfs:label>
+    </rdfs:Class>
+</rdf:RDF>

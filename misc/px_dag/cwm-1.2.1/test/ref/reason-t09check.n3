@@ -1,0 +1,13 @@
+     @prefix : <http://example.com/swap/test/reason/t9.n3#> .
+    @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    
+    <http://example.com/swap/test/reason/a>     a <http://example.com/swap/test/reason/Success>;
+         <http://example.com/swap/test/reason/b> <http://example.com/swap/test/reason/c> .
+    {
+         @forSome :_g_L4C10 .
+        <http://example.com/swap/test/reason/a>     <http://example.com/swap/test/reason/b> :_g_L4C10 .
+        
+        }     log:implies {<http://example.com/swap/test/reason/a>     a <http://example.com/swap/test/reason/Success> .
+        } .
+    
+

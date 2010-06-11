@@ -1,0 +1,7 @@
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+@prefix foo: <#>.
+@prefix : <#>.
+:a :b :c.
+{:a ?y ?x} => { ?x ?y <c2> }.
+# ends
+

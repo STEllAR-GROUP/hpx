@@ -1,0 +1,10 @@
+     @prefix : <#> .
+     @prefix daml: <http://www.daml.org/2001/03/daml+oil#> .
+    
+    :ancestor     a daml:TransitiveProperty .
+    
+    :bill     :ancestor :granpa,
+                :pa .
+    
+    :pa     :ancestor :granpa .
+    

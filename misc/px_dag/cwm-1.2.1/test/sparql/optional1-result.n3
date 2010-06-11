@@ -1,0 +1,19 @@
+     @prefix : <http://www.w3.org/2000/10/swap/sparqlCwm#> .
+    {
+        "Bob"     :bound "foafName" .
+        <mailto:bob@work.example>     :bound "mbox" .
+        
+        }     a :Result .
+    {
+        "Eleanor"     :bound "gname" .
+        "Ella"     :bound "foafName" .
+        
+        }     a :Result .
+    {
+        "Alice"     :bound "foafName",
+                    "gname" .
+        "Hacker"     :bound "fname" .
+        <mailto:alice@work.example>     :bound "mbox" .
+        
+        }     a :Result .
+    

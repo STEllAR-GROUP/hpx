@@ -1,0 +1,108 @@
+#    Schema validator in N3
+#
+#   There is not on the semantic web a single meaning of
+# the term "schema valid", as one can make different choices
+# about what information is used for validation, and what lengths
+# are gone to to try to find inconsitencies. In general, one cannot
+# for any set of rules, just prove that a document does not violate
+# a given set of constraints.  However, we can set the bar at a
+# particular height. For example
+#  - Retrieve schemata for any namesapces used in the target
+#  - apply a given set of rules (a certian limite number of times?)
+#  - check the result has no inconsistencies.
+#
+# The basic strategy is that which ontology systems seem to assume:
+# Find all classes to which everything belongs, and deduce things from that.
+#
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix daml: <http://www.daml.org/2001/03/daml+oil#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+@prefix : <#> .       # For our use
+@prefix v: <#> .	# Hint for others use
+
+#
+# This is what we will flag:
+:schemaInconsistency daml:subPropertyOf log:Falsehood .
+
+@forAll <#p>, <#p1>, <#p2>,	# Properties
+	 <#c>, <#c1>, <#c2>.   # Classes
+
+@forAll <#x>, <#y>, <#z> .
+
+# The following is a su bset of the properties of =, which should not need stating.
+# But cwm currently doesn't know a lot about = inherently. @@
+
+{ <#x> <#p1> <#y> . <#p1> = <#p2> . } log:implies {<#x> <#p2> <#y> } . # Duh
+
+# Can deduce RDFS from daml versions:
+# (The example uses daml: and the groups seems to change its mind on which is best)
+
+daml:subPropertyOf = rdfs:subPropertyOf .
+daml:subClassOf = rdfs:subClassOf .
+daml:range 	= rdfs:range .
+daml:domain = rdfs:domain .
+
+
+
+# Implication of transitivity:
+
+
+{  <#p> a daml:TransitiveProperty . } log:implies
+
+{ @forAll <#xx> , <#yx> , <#zx>.
+  
+    { <#xx> <#p> <#yx>. <#yx> <#p> <#zx>. } log:implies { <#xx> <#p> <#zx>}
+ } .
+
+
+rdfs:subPropertyOf 	a daml:TransitiveProperty .
+
+rdfs:subClassOf 		a daml:TransitiveProperty .
+
+# Implication of subclass:
+
+
+{ 	<#x> a <#c1>.
+	<#c1> rdfs:subClassOf <#c2> . } log:implies  { <#x> a <#c2> } .
+
+# Implication of subPropertyOf:
+
+
+{ 	<#p1> has rdfs:range <#c>.
+	<#p2> rdfs:subPropertyOf <#p1> . } log:implies  { <#p2> has rdfs:range <#c> } .
+
+
+# Implication of Range and domain
+#  From domain to range
+
+{ 	<#p> rdfs:domain <#c>.
+	<#x> <#p> <#y> . } log:implies  { <#x> a <#c> } .
+
+{ 	<#p> rdfs:range <#c>.
+	<#x> <#p> <#y> . } log:implies  { <#y> a <#c> } .
+
+# From the above once can conclude the specific propagation rules
+# for of subclasss and subproperties, such as:
+#
+#rule1
+#	log:forAll <#x> <#y> ;
+#	a log:Truth;
+#	= {
+#    		{ <#x> rdfs:subProperty <#y>. <#y> rdfs:subProperty <#z>. } log:implies
+#			{ <#x> rdfs:subProperty <#z>. }
+#  	} .
+
+
+# The first NOT we come across is disjointWith:
+
+{ 	<#x> a <#y> .
+	<#x> a <#z> .
+	<#y> daml:disjointFrom <#z> } log:implies { <#x> a v:schemaInconsistency } .
+
+
+# <> daml:imports <rdfs.n3> . #?@@@@@@@@@@@
+
+
+
+

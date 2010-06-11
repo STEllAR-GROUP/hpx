@@ -1,0 +1,109 @@
+# List of regression tests
+#
+# - was in bash script retest.sh
+#
+@prefix : <#>.
+@prefix x: <#>.
+@prefix test: <http://www.w3.org/2000/10/swap/test.n3#>.
+
+#     test:shortFileName "lists-simple.n3";
+
+
+:t1001 a test:CwmTest;
+    test:referenceOutput <reify0.n3>;
+    test:description   "reify never. If this test fails, all the next are meaningless";
+    test:arguments     """-n3 rules13.n3""".
+
+:t1002 a test:CwmTest;
+    test:referenceOutput <reify1.n3>;
+    test:description   "simple reifying";
+    test:arguments     """-n3 reify/reify0.n3 --reify""".
+
+:t1003 a test:CwmTest;
+    test:referenceOutput <quantifiers.ref.n3>;
+    test:description   "reify a document with quantifiers";
+    test:arguments     """-n3 includes/quantifiers_limited.n3 --reify """.
+
+:t1004 a test:CwmTest, test:VerboseTest;   # Don't run with debug output on
+    test:referenceOutput <reify2.n3>;
+    test:description   "reify twice";
+    test:arguments     """-n3 reify/reify0.n3 --reify --reify""".
+
+:t1005 a test:CwmTest;
+    test:referenceOutput <reify0.n3>;
+    test:description   "reify, then dereify";
+    test:arguments     """-n3 reify/reify0.n3 --reify --dereify""".
+
+:t1007 a test:CwmTest;
+    test:referenceOutput <reify0.n3>;
+    test:description   "reify twice, then dereify twice";
+    test:arguments     """-n3 reify/reify0.n3 --reify --reify --dereify --dereify""".
+
+:t1009 a test:CwmTest;
+    test:referenceOutput <reify0.n3>;
+    test:description   "reify thrice, then dereify thrice";
+    test:arguments     """-n3 reify/reify0.n3 --reify --reify --reify --dereify --dereify --dereify""".
+
+:t1010 a test:CwmTest;
+    test:referenceOutput <dereify0.n3>;
+    test:description   "dereifying test 1";
+    test:arguments     """-n3 reify/reify1.n3 --dereify""".
+
+:t1012 a test:CwmTest;
+    test:referenceOutput <dereify0.n3>; 
+    test:description   "dereifying twice";
+    test:arguments     """-n3 reify/reify2.n3 --dereify --dereify""".
+
+:t1014 a test:CwmTest;
+    test:referenceOutput <dereify0.n3>; 
+    test:description   "dereifying thrice";
+    test:arguments     """-n3 reify/reify3.n3 --dereify --dereify --dereify""".
+
+:t1016 a test:CwmTest;
+    test:referenceOutput <dereify1.n3>; 
+    test:description   "dereifying test 2";
+    test:arguments     """-n3 reify/reify2.n3 --dereify""".
+
+:t1100 a test:CwmTest;
+    test:referenceOutput <flatten1.n3>;
+    test:description   "flatten test 1";
+    test:arguments     """-n3 reify/reify0.n3 --flatten""".
+
+#:t1102 a test:CwmTest;
+#    test:referenceOutput <flatten1.n3>;
+#    test:description   "flatten a flattened file";
+#    test:arguments     """-n3 reify/flatten1.n3 --flatten""".
+
+:t1101 a test:CwmTest;
+    test:referenceOutput <flatten1.n3>;
+    test:description   "flatten twice -- the second should do nothing";
+    test:arguments     """-n3 reify/reify0.n3 --flatten --flatten""".
+
+:t1103 a test:CwmTest;
+    test:referenceOutput <flatten0.n3>;
+    test:description   "unflatten a flattened file";
+    test:arguments     """-n3 reify/flatten1.n3 --unflatten""".
+
+
+#:t1018 a test:CwmTest;
+#    test:referenceOutput <dereify2.n3>; 
+#    test:description   "dereifying test 3";
+#    test:arguments     """-n3 reify/reify3.n3 --dereify""".
+
+#:t1020 a test:CwmTest;
+#    test:referenceOutput <reify2.n3>;
+#    test:description   "sanity check on serializing 1";
+#    test:arguments     """-n3 reify/reify1.n3 --reify""".
+
+#:t1025 a test:CwmTest;
+#    test:referenceOutput <reify3.n3>;
+#    test:description   "sanity check on serializing 2";
+#    test:arguments     """-n3 reify/reify2.n3 --reify""".
+
+#:t1027 a test:CwmTest;
+#    test:referenceOutput <reify3.n3>;
+#    test:description   "reify thrice";
+#    test:arguments     """-n3 reify/reify0.n3 --reify --reify --reify""".
+
+
+#ends

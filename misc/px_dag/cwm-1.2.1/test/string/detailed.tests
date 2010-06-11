@@ -1,0 +1,35 @@
+# List of regression tests
+#
+#      String tests
+#
+# Note: Command lines must be for running in the directory above.
+#
+@prefix : <#>.
+@prefix x: <#>.
+@prefix test: <http://www.w3.org/2000/10/swap/test.n3#>.
+@prefix dc:  <http://purl.org/dc/elements/1.1/>. # yuk - under protest - no hash
+
+
+
+
+:t103 a test:CwmTest;
+    test:referenceOutput <../ref/endsWith-out.n3>;
+    test:description   "string:endsWith";
+    test:arguments     """string/endsWith.n3 -rules""".
+
+:t104 a test:CwmTest;
+    test:referenceOutput <../ref/roughly-out.n3>;
+    test:description   "string:containsRoughly ignores case smart whitespace";
+    test:arguments     """string/roughly.n3 -rules""".
+
+:t108 a test:CwmTest;
+    test:referenceOutput <../ref/uriEncode.n3>;
+    test:description   "string:encodeForURI and encodeForFragID";
+    test:arguments     """string/uriEncode.n3 -rules""".
+
+
+
+
+
+
+#ends

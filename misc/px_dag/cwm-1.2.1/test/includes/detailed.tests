@@ -1,0 +1,26 @@
+# List of regression tests for this directory
+#
+#      Includes tests: details
+#
+# Note: Command lines must be for running in the directory above.
+#
+@prefix : <#>.
+@prefix x: <#>.
+@prefix test: <http://www.w3.org/2000/10/swap/test.n3#>.
+
+
+
+
+
+:listin a test:CwmTest;
+    test:referenceOutput <list-in-ref.n3>;
+    test:description   "Builtins for list membership, binding multiple values.";
+    test:arguments     "includes/list-in.n3 --think --data".
+
+
+:bnode a test:CwmTest;
+    test:referenceOutput <bnode-conclude-ref.n3>;
+    test:description   "Binding a bnode from a log:includes.";
+    test:arguments     "includes/bnodeConclude.n3 --think --data".
+
+#ends

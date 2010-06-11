@@ -1,0 +1,531 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module notation3</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>notation3</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/syosi/cvs-trunk/WWW/2000/10/swap/notation3.py">/home/syosi/cvs-trunk/WWW/2000/10/swap/notation3.py</a></font></td></tr></table>
+    <p><tt>$Id:&nbsp;notation3.py,v&nbsp;1.200&nbsp;2007/12/11&nbsp;21:18:08&nbsp;syosi&nbsp;Exp&nbsp;$<br>
+&nbsp;<br>
+&nbsp;<br>
+This&nbsp;module&nbsp;implements&nbsp;a&nbsp;Nptation3&nbsp;parser,&nbsp;and&nbsp;the&nbsp;final<br>
+part&nbsp;of&nbsp;a&nbsp;notation3&nbsp;serializer.<br>
+&nbsp;<br>
+See&nbsp;also:<br>
+&nbsp;<br>
+Notation&nbsp;3<br>
+<a href="http://www.w3.org/DesignIssues/Notation3">http://www.w3.org/DesignIssues/Notation3</a><br>
+&nbsp;<br>
+Closed&nbsp;World&nbsp;Machine&nbsp;-&nbsp;and&nbsp;RDF&nbsp;Processor<br>
+<a href="http://www.w3.org/2000/10/swap/cwm">http://www.w3.org/2000/10/swap/cwm</a><br>
+&nbsp;<br>
+To&nbsp;DO:&nbsp;See&nbsp;also&nbsp;"@@"&nbsp;in&nbsp;comments<br>
+&nbsp;<br>
+-&nbsp;Clean&nbsp;up&nbsp;interfaces<br>
+______________________________________________<br>
+&nbsp;<br>
+Module&nbsp;originally&nbsp;by&nbsp;Dan&nbsp;Connolly,&nbsp;includeing&nbsp;notation3<br>
+parser&nbsp;and&nbsp;RDF&nbsp;generator.&nbsp;TimBL&nbsp;added&nbsp;RDF&nbsp;stream&nbsp;model<br>
+and&nbsp;N3&nbsp;generation,&nbsp;replaced&nbsp;stream&nbsp;model&nbsp;with&nbsp;use<br>
+of&nbsp;common&nbsp;store/formula&nbsp;API.&nbsp;&nbsp;Yosi&nbsp;Scharf&nbsp;developped<br>
+the&nbsp;module,&nbsp;including&nbsp;tests&nbsp;and&nbsp;test&nbsp;harness.</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#fffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="RDFSink.html">RDFSink</a><br>
+<a href="codecs.html">codecs</a><br>
+<a href="diag.html">diag</a><br>
+</td><td width="25%" valign=top><a href="re.html">re</a><br>
+<a href="string.html">string</a><br>
+<a href="sys.html">sys</a><br>
+</td><td width="25%" valign=top><a href="triple_maker.html">triple_maker</a><br>
+<a href="types.html">types</a><br>
+<a href="uripath.html">uripath</a><br>
+</td><td width="25%" valign=top><a href="urllib.html">urllib</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="RDFSink.html#RDFSink">RDFSink.RDFSink</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="notation3.html#ToN3">ToN3</a>
+</font></dt><dt><font face="helvetica, arial"><a href="notation3.html#tmToN3">tmToN3</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="exceptions.html#SyntaxError">exceptions.SyntaxError</a>(<a href="exceptions.html#StandardError">exceptions.StandardError</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="notation3.html#BadSyntax">BadSyntax</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="notation3.html#SinkParser">SinkParser</a>
+</font></dt></dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="BadSyntax">class <strong>BadSyntax</strong></a>(<a href="exceptions.html#SyntaxError">exceptions.SyntaxError</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="notation3.html#BadSyntax">BadSyntax</a></dd>
+<dd><a href="exceptions.html#SyntaxError">exceptions.SyntaxError</a></dd>
+<dd><a href="exceptions.html#StandardError">exceptions.StandardError</a></dd>
+<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="BadSyntax-__init__"><strong>__init__</strong></a>(self, uri, lines, str, i, why)</dt></dl>
+
+<dl><dt><a name="BadSyntax-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<hr>
+Data and other attributes inherited from <a href="exceptions.html#SyntaxError">exceptions.SyntaxError</a>:<br>
+<dl><dt><strong>filename</strong> = None</dl>
+
+<dl><dt><strong>lineno</strong> = None</dl>
+
+<dl><dt><strong>msg</strong> = ''</dl>
+
+<dl><dt><strong>offset</strong> = None</dl>
+
+<dl><dt><strong>print_file_and_line</strong> = None</dl>
+
+<dl><dt><strong>text</strong> = None</dl>
+
+<hr>
+Methods inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><a name="BadSyntax-__getitem__"><strong>__getitem__</strong></a>(...)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SinkParser">class <strong>SinkParser</strong></a></font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="SinkParser-UEscape"><strong>UEscape</strong></a>(self, str, i, startline)</dt></dl>
+
+<dl><dt><a name="SinkParser-__init__"><strong>__init__</strong></a>(self, store, openFormula<font color="#909090">=None</font>, thisDoc<font color="#909090">=''</font>, baseURI<font color="#909090">=None</font>, genPrefix<font color="#909090">=''</font>, metaURI<font color="#909090">=None</font>, flags<font color="#909090">=''</font>, why<font color="#909090">=None</font>)</dt><dd><tt>note:&nbsp;namespace&nbsp;names&nbsp;should&nbsp;*not*&nbsp;end&nbsp;in&nbsp;#;<br>
+the&nbsp;#&nbsp;will&nbsp;get&nbsp;added&nbsp;during&nbsp;qname&nbsp;processing</tt></dd></dl>
+
+<dl><dt><a name="SinkParser-anonymousNode"><strong>anonymousNode</strong></a>(self, ln)</dt><dd><tt>Remember&nbsp;or&nbsp;generate&nbsp;a&nbsp;term&nbsp;for&nbsp;one&nbsp;of&nbsp;these&nbsp;_:&nbsp;anonymous&nbsp;nodes</tt></dd></dl>
+
+<dl><dt><a name="SinkParser-bareWord"><strong>bareWord</strong></a>(self, str, i, res)</dt><dd><tt>abc&nbsp;-&gt;&nbsp;:abc</tt></dd></dl>
+
+<dl><dt><a name="SinkParser-bind"><strong>bind</strong></a>(self, qn, uri)</dt></dl>
+
+<dl><dt><a name="SinkParser-blankNode"><strong>blankNode</strong></a>(self, uri<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="SinkParser-checkDot"><strong>checkDot</strong></a>(self, str, i)</dt></dl>
+
+<dl><dt><a name="SinkParser-commaSeparatedList"><strong>commaSeparatedList</strong></a>(self, str, j, res, what)</dt><dd><tt>return&nbsp;value:&nbsp;-1&nbsp;bad&nbsp;syntax;&nbsp;&gt;1&nbsp;new&nbsp;position&nbsp;in&nbsp;str<br>
+res&nbsp;has&nbsp;things&nbsp;found&nbsp;appended</tt></dd></dl>
+
+<dl><dt><a name="SinkParser-directive"><strong>directive</strong></a>(self, str, i)</dt></dl>
+
+<dl><dt><a name="SinkParser-directiveOrStatement"><strong>directiveOrStatement</strong></a>(self, str, h)</dt></dl>
+
+<dl><dt><a name="SinkParser-endDoc"><strong>endDoc</strong></a>(self)</dt><dd><tt>Signal&nbsp;end&nbsp;of&nbsp;document&nbsp;and&nbsp;stop&nbsp;parsing.&nbsp;returns&nbsp;formula</tt></dd></dl>
+
+<dl><dt><a name="SinkParser-feed"><strong>feed</strong></a>(self, octets)</dt><dd><tt>Feed&nbsp;an&nbsp;octet&nbsp;stream&nbsp;tothe&nbsp;parser<br>
+&nbsp;<br>
+if&nbsp;<a href="#BadSyntax">BadSyntax</a>&nbsp;is&nbsp;raised,&nbsp;the&nbsp;string<br>
+passed&nbsp;in&nbsp;the&nbsp;exception&nbsp;object&nbsp;is&nbsp;the<br>
+remainder&nbsp;after&nbsp;any&nbsp;statements&nbsp;have&nbsp;been&nbsp;parsed.<br>
+So&nbsp;if&nbsp;there&nbsp;is&nbsp;more&nbsp;data&nbsp;to&nbsp;feed&nbsp;to&nbsp;the<br>
+parser,&nbsp;it&nbsp;should&nbsp;be&nbsp;straightforward&nbsp;to&nbsp;recover.</tt></dd></dl>
+
+<dl><dt><a name="SinkParser-formula"><strong>formula</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="SinkParser-here"><strong>here</strong></a>(self, i)</dt><dd><tt>String&nbsp;generated&nbsp;from&nbsp;position&nbsp;in&nbsp;file<br>
+&nbsp;<br>
+This&nbsp;is&nbsp;for&nbsp;repeatability&nbsp;when&nbsp;refering&nbsp;people&nbsp;to&nbsp;bnodes&nbsp;in&nbsp;a&nbsp;document.<br>
+This&nbsp;has&nbsp;diagnostic&nbsp;uses&nbsp;less&nbsp;formally,&nbsp;as&nbsp;it&nbsp;should&nbsp;point&nbsp;one&nbsp;to&nbsp;which&nbsp;<br>
+bnode&nbsp;the&nbsp;arbitrary&nbsp;identifier&nbsp;actually&nbsp;is.&nbsp;It&nbsp;gives&nbsp;the<br>
+line&nbsp;and&nbsp;character&nbsp;number&nbsp;of&nbsp;the&nbsp;'['&nbsp;charcacter&nbsp;or&nbsp;path&nbsp;character<br>
+which&nbsp;introduced&nbsp;the&nbsp;blank&nbsp;node.&nbsp;The&nbsp;first&nbsp;blank&nbsp;node&nbsp;is&nbsp;boringly&nbsp;_L1C1.<br>
+It&nbsp;used&nbsp;to&nbsp;be&nbsp;used&nbsp;only&nbsp;for&nbsp;tracking,&nbsp;but&nbsp;for&nbsp;tests&nbsp;in&nbsp;general<br>
+it&nbsp;makes&nbsp;the&nbsp;canonical&nbsp;ordering&nbsp;of&nbsp;bnodes&nbsp;repeatable.</tt></dd></dl>
+
+<dl><dt><a name="SinkParser-item"><strong>item</strong></a>(self, str, i, res)</dt></dl>
+
+<dl><dt><a name="SinkParser-loadBuf"><strong>loadBuf</strong></a>(self, buf)</dt><dd><tt>Parses&nbsp;a&nbsp;buffer&nbsp;and&nbsp;returns&nbsp;its&nbsp;top&nbsp;level&nbsp;formula</tt></dd></dl>
+
+<dl><dt><a name="SinkParser-loadStream"><strong>loadStream</strong></a>(self, stream)</dt></dl>
+
+<dl><dt><a name="SinkParser-makeStatement"><strong>makeStatement</strong></a>(self, quadruple)</dt></dl>
+
+<dl><dt><a name="SinkParser-node"><strong>node</strong></a>(self, str, i, res, subjectAlready<font color="#909090">=None</font>)</dt><dd><tt>Parse&nbsp;the&nbsp;&lt;node&gt;&nbsp;production.<br>
+Space&nbsp;is&nbsp;now&nbsp;skipped&nbsp;once&nbsp;at&nbsp;the&nbsp;beginning<br>
+instead&nbsp;of&nbsp;in&nbsp;multipe&nbsp;calls&nbsp;to&nbsp;<a href="#SinkParser-skipSpace">skipSpace</a>().</tt></dd></dl>
+
+<dl><dt><a name="SinkParser-nodeOrLiteral"><strong>nodeOrLiteral</strong></a>(self, str, i, res)</dt></dl>
+
+<dl><dt><a name="SinkParser-object"><strong>object</strong></a>(self, str, i, res)</dt></dl>
+
+<dl><dt><a name="SinkParser-objectList"><strong>objectList</strong></a>(self, str, i, res)</dt></dl>
+
+<dl><dt><a name="SinkParser-path"><strong>path</strong></a>(self, str, i, res)</dt><dd><tt>Parse&nbsp;the&nbsp;path&nbsp;production.</tt></dd></dl>
+
+<dl><dt><a name="SinkParser-prop"><strong>prop</strong></a>(self, str, i, res)</dt></dl>
+
+<dl><dt><a name="SinkParser-property_list"><strong>property_list</strong></a>(self, str, i, subj)</dt><dd><tt>Parse&nbsp;property&nbsp;list<br>
+Leaves&nbsp;the&nbsp;terminating&nbsp;punctuation&nbsp;in&nbsp;the&nbsp;buffer</tt></dd></dl>
+
+<dl><dt><a name="SinkParser-qname"><strong>qname</strong></a>(self, str, i, res)</dt><dd><tt>xyz:def&nbsp;-&gt;&nbsp;('xyz',&nbsp;'def')<br>
+If&nbsp;not&nbsp;in&nbsp;keywords&nbsp;and&nbsp;keywordsSet:&nbsp;def&nbsp;-&gt;&nbsp;('',&nbsp;'def')<br>
+:def&nbsp;-&gt;&nbsp;('',&nbsp;'def')</tt></dd></dl>
+
+<dl><dt><a name="SinkParser-setKeywords"><strong>setKeywords</strong></a>(self, k)</dt><dd><tt>Takes&nbsp;a&nbsp;list&nbsp;of&nbsp;strings</tt></dd></dl>
+
+<dl><dt><a name="SinkParser-skipSpace"><strong>skipSpace</strong></a>(self, str, i)</dt><dd><tt>Skip&nbsp;white&nbsp;space,&nbsp;newlines&nbsp;and&nbsp;comments.<br>
+return&nbsp;-1&nbsp;if&nbsp;EOF,&nbsp;else&nbsp;position&nbsp;of&nbsp;first&nbsp;non-ws&nbsp;character</tt></dd></dl>
+
+<dl><dt><a name="SinkParser-startDoc"><strong>startDoc</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="SinkParser-statement"><strong>statement</strong></a>(self, str, i)</dt></dl>
+
+<dl><dt><a name="SinkParser-strconst"><strong>strconst</strong></a>(self, str, i, delim)</dt><dd><tt>parse&nbsp;an&nbsp;N3&nbsp;string&nbsp;constant&nbsp;delimited&nbsp;by&nbsp;delim.<br>
+return&nbsp;index,&nbsp;val</tt></dd></dl>
+
+<dl><dt><a name="SinkParser-subject"><strong>subject</strong></a>(self, str, i, res)</dt></dl>
+
+<dl><dt><a name="SinkParser-tok"><strong>tok</strong></a>(self, tok, str, i)</dt><dd><tt>Check&nbsp;for&nbsp;keyword.&nbsp;&nbsp;Space&nbsp;must&nbsp;have&nbsp;been&nbsp;stripped&nbsp;on&nbsp;entry&nbsp;and<br>
+we&nbsp;must&nbsp;not&nbsp;be&nbsp;at&nbsp;end&nbsp;of&nbsp;file.</tt></dd></dl>
+
+<dl><dt><a name="SinkParser-uEscape"><strong>uEscape</strong></a>(self, str, i, startline)</dt></dl>
+
+<dl><dt><a name="SinkParser-uriOf"><strong>uriOf</strong></a>(self, sym)</dt></dl>
+
+<dl><dt><a name="SinkParser-uri_ref2"><strong>uri_ref2</strong></a>(self, str, i, res)</dt><dd><tt>Generate&nbsp;uri&nbsp;from&nbsp;n3&nbsp;representation.<br>
+&nbsp;<br>
+Note&nbsp;that&nbsp;the&nbsp;RDF&nbsp;convention&nbsp;of&nbsp;directly&nbsp;concatenating<br>
+NS&nbsp;and&nbsp;local&nbsp;name&nbsp;is&nbsp;now&nbsp;used&nbsp;though&nbsp;I&nbsp;prefer&nbsp;inserting&nbsp;a&nbsp;'#'<br>
+to&nbsp;make&nbsp;the&nbsp;namesapces&nbsp;look&nbsp;more&nbsp;like&nbsp;what&nbsp;XML&nbsp;folks&nbsp;expect.</tt></dd></dl>
+
+<dl><dt><a name="SinkParser-variable"><strong>variable</strong></a>(self, str, i, res)</dt><dd><tt>?abc&nbsp;-&gt;&nbsp;<a href="#SinkParser-variable">variable</a>(:abc)</tt></dd></dl>
+
+<dl><dt><a name="SinkParser-verb"><strong>verb</strong></a>(self, str, i, res)</dt><dd><tt>has&nbsp;_prop_<br>
+is&nbsp;_prop_&nbsp;of<br>
+a<br>
+=<br>
+_prop_<br>
+&gt;-&nbsp;prop&nbsp;-&gt;<br>
+&lt;-&nbsp;prop&nbsp;-&lt;<br>
+_operator_</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="ToN3">class <strong>ToN3</strong></a>(<a href="RDFSink.html#RDFSink">RDFSink.RDFSink</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Serializer&nbsp;output&nbsp;sink&nbsp;for&nbsp;N3<br>
+&nbsp;<br>
+keeps&nbsp;track&nbsp;of&nbsp;most&nbsp;recent&nbsp;subject&nbsp;and&nbsp;predicate&nbsp;reuses&nbsp;them.<br>
+Adapted&nbsp;from&nbsp;Dan's&nbsp;ToRDFParser(Parser);<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="ToN3-__init__"><strong>__init__</strong></a>(self, write, base<font color="#909090">=None</font>, genPrefix<font color="#909090">=None</font>, noLists<font color="#909090">=0</font>, quiet<font color="#909090">=0</font>, flags<font color="#909090">=''</font>)</dt></dl>
+
+<dl><dt><a name="ToN3-bind"><strong>bind</strong></a>(self, prefixString, uri)</dt><dd><tt>Just&nbsp;accepting&nbsp;a&nbsp;convention&nbsp;here</tt></dd></dl>
+
+<dl><dt><a name="ToN3-dummyClone"><strong>dummyClone</strong></a>(self)</dt><dd><tt>retun&nbsp;a&nbsp;version&nbsp;of&nbsp;myself&nbsp;which&nbsp;will&nbsp;only&nbsp;count&nbsp;occurrences</tt></dd></dl>
+
+<dl><dt><a name="ToN3-endAnonymous"><strong>endAnonymous</strong></a>(self, subject, verb)</dt></dl>
+
+<dl><dt><a name="ToN3-endAnonymousNode"><strong>endAnonymousNode</strong></a>(self, subj<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="ToN3-endDoc"><strong>endDoc</strong></a>(self, rootFormulaPair<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="ToN3-endFormulaObject"><strong>endFormulaObject</strong></a>(self, pred, subj)</dt></dl>
+
+<dl><dt><a name="ToN3-endFormulaSubject"><strong>endFormulaSubject</strong></a>(self, subj)</dt></dl>
+
+<dl><dt><a name="ToN3-endListObject"><strong>endListObject</strong></a>(self, subject, verb)</dt></dl>
+
+<dl><dt><a name="ToN3-endListSubject"><strong>endListSubject</strong></a>(self, subj<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="ToN3-makeComment"><strong>makeComment</strong></a>(self, str)</dt></dl>
+
+<dl><dt><a name="ToN3-makeStatement"><strong>makeStatement</strong></a>(self, triple, why<font color="#909090">=None</font>, aIsPossible<font color="#909090">=1</font>)</dt></dl>
+
+<dl><dt><a name="ToN3-representationOf"><strong>representationOf</strong></a>(self, context, pair)</dt><dd><tt>Representation&nbsp;of&nbsp;a&nbsp;thing&nbsp;in&nbsp;the&nbsp;output&nbsp;stream<br>
+&nbsp;<br>
+Regenerates&nbsp;genids&nbsp;if&nbsp;required.<br>
+Uses&nbsp;prefix&nbsp;dictionary&nbsp;to&nbsp;use&nbsp;qname&nbsp;syntax&nbsp;if&nbsp;possible.</tt></dd></dl>
+
+<dl><dt><a name="ToN3-setDefaultNamespace"><strong>setDefaultNamespace</strong></a>(self, uri)</dt></dl>
+
+<dl><dt><a name="ToN3-startAnonymous"><strong>startAnonymous</strong></a>(self, triple)</dt></dl>
+
+<dl><dt><a name="ToN3-startAnonymousNode"><strong>startAnonymousNode</strong></a>(self, subj)</dt></dl>
+
+<dl><dt><a name="ToN3-startDoc"><strong>startDoc</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="ToN3-startFormulaObject"><strong>startFormulaObject</strong></a>(self, triple)</dt></dl>
+
+<dl><dt><a name="ToN3-startFormulaSubject"><strong>startFormulaSubject</strong></a>(self, context)</dt></dl>
+
+<dl><dt><a name="ToN3-startListObject"><strong>startListObject</strong></a>(self, triple)</dt></dl>
+
+<dl><dt><a name="ToN3-startListSubject"><strong>startListSubject</strong></a>(self, subj)</dt></dl>
+
+<dl><dt><a name="ToN3-writeEncoded"><strong>writeEncoded</strong></a>(self, str)</dt><dd><tt>Write&nbsp;a&nbsp;possibly&nbsp;unicode&nbsp;string&nbsp;out&nbsp;to&nbsp;the&nbsp;output</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>flagDocumentation</strong> = 'Flags for N3 output are as follows:-<font color="#c040c0">\n</font>        <font color="#c040c0">\n</font>a ...a existentially qualified explicitly named node.<font color="#c040c0">\n</font>'</dl>
+
+<hr>
+Methods inherited from <a href="RDFSink.html#RDFSink">RDFSink.RDFSink</a>:<br>
+<dl><dt><a name="ToN3-checkNewId"><strong>checkNewId</strong></a>(self, uri)</dt><dd><tt>The&nbsp;store&nbsp;can&nbsp;override&nbsp;this&nbsp;to&nbsp;raise&nbsp;an&nbsp;exception&nbsp;if&nbsp;the<br>
+id&nbsp;is&nbsp;not&nbsp;in&nbsp;fact&nbsp;new.&nbsp;This&nbsp;is&nbsp;useful&nbsp;because&nbsp;it&nbsp;is&nbsp;usfeul<br>
+to&nbsp;generate&nbsp;IDs&nbsp;with&nbsp;useful&nbsp;diagnostic&nbsp;ways&nbsp;but&nbsp;this&nbsp;lays&nbsp;them<br>
+open&nbsp;to&nbsp;possibly&nbsp;clashing&nbsp;in&nbsp;pathalogical&nbsp;cases.</tt></dd></dl>
+
+<dl><dt><a name="ToN3-countNamespace"><strong>countNamespace</strong></a>(self, namesp)</dt><dd><tt>On&nbsp;output,&nbsp;count&nbsp;how&nbsp;many&nbsp;times&nbsp;each&nbsp;namespace&nbsp;is&nbsp;used</tt></dd></dl>
+
+<dl><dt><a name="ToN3-genId"><strong>genId</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="ToN3-intern"><strong>intern</strong></a>(self, something)</dt></dl>
+
+<dl><dt><a name="ToN3-namespaceCounts"><strong>namespaceCounts</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="ToN3-newBlankNode"><strong>newBlankNode</strong></a>(self, context, uri<font color="#909090">=None</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="ToN3-newExistential"><strong>newExistential</strong></a>(self, context, uri<font color="#909090">=None</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="ToN3-newFormula"><strong>newFormula</strong></a>(self, uri<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="ToN3-newList"><strong>newList</strong></a>(self, l, context)</dt></dl>
+
+<dl><dt><a name="ToN3-newLiteral"><strong>newLiteral</strong></a>(self, str, dt<font color="#909090">=None</font>, lang<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="ToN3-newSymbol"><strong>newSymbol</strong></a>(self, uri)</dt></dl>
+
+<dl><dt><a name="ToN3-newUniversal"><strong>newUniversal</strong></a>(self, context, uri<font color="#909090">=None</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="ToN3-newXMLLiteral"><strong>newXMLLiteral</strong></a>(self, doc)</dt></dl>
+
+<dl><dt><a name="ToN3-reopen"><strong>reopen</strong></a>(self)</dt><dd><tt>Un-End&nbsp;a&nbsp;document<br>
+&nbsp;<br>
+If&nbsp;you&nbsp;have&nbsp;added&nbsp;stuff&nbsp;to&nbsp;a&nbsp;document,&nbsp;thought&nbsp;you&nbsp;were&nbsp;done,&nbsp;and<br>
+then&nbsp;want&nbsp;to&nbsp;add&nbsp;more,&nbsp;call&nbsp;this&nbsp;to&nbsp;get&nbsp;back&nbsp;into&nbsp;the&nbsp;sate&nbsp;that&nbsp;makeSatement<br>
+is&nbsp;again&nbsp;acceptable.&nbsp;Remember&nbsp;to&nbsp;end&nbsp;the&nbsp;document&nbsp;again&nbsp;when&nbsp;done.</tt></dd></dl>
+
+<dl><dt><a name="ToN3-setGenPrefix"><strong>setGenPrefix</strong></a>(self, genPrefix)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="tmToN3">class <strong>tmToN3</strong></a>(<a href="RDFSink.html#RDFSink">RDFSink.RDFSink</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="tmToN3-IsOf"><strong>IsOf</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToN3-__init__"><strong>__init__</strong></a>(self, write, base<font color="#909090">=None</font>, genPrefix<font color="#909090">=None</font>, noLists<font color="#909090">=0</font>, quiet<font color="#909090">=0</font>, flags<font color="#909090">=''</font>)</dt></dl>
+
+<dl><dt><a name="tmToN3-addAnonymous"><strong>addAnonymous</strong></a>(self, Id)</dt><dd><tt>If&nbsp;an&nbsp;anonymous&nbsp;shows&nbsp;up&nbsp;more&nbsp;than&nbsp;once,&nbsp;this&nbsp;is&nbsp;the<br>
+function&nbsp;to&nbsp;call</tt></dd></dl>
+
+<dl><dt><a name="tmToN3-addLiteral"><strong>addLiteral</strong></a>(self, lit, dt<font color="#909090">=None</font>, lang<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="tmToN3-addNode"><strong>addNode</strong></a>(self, node)</dt></dl>
+
+<dl><dt><a name="tmToN3-addQuestionMarkedSymbol"><strong>addQuestionMarkedSymbol</strong></a>(self, sym)</dt></dl>
+
+<dl><dt><a name="tmToN3-addSymbol"><strong>addSymbol</strong></a>(self, sym)</dt></dl>
+
+<dl><dt><a name="tmToN3-backwardPath"><strong>backwardPath</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToN3-beginAnonymous"><strong>beginAnonymous</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToN3-beginFormula"><strong>beginFormula</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToN3-beginList"><strong>beginList</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToN3-bind"><strong>bind</strong></a>(self, prefixString, uri)</dt><dd><tt>Just&nbsp;accepting&nbsp;a&nbsp;convention&nbsp;here</tt></dd></dl>
+
+<dl><dt><a name="tmToN3-checkIsOf"><strong>checkIsOf</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToN3-declareExistential"><strong>declareExistential</strong></a>(self, sym)</dt></dl>
+
+<dl><dt><a name="tmToN3-declareUniversal"><strong>declareUniversal</strong></a>(self, sym)</dt></dl>
+
+<dl><dt><a name="tmToN3-end"><strong>end</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToN3-endAnonymous"><strong>endAnonymous</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToN3-endFormula"><strong>endFormula</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToN3-endList"><strong>endList</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToN3-endStatement"><strong>endStatement</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToN3-forewardPath"><strong>forewardPath</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToN3-setDefaultNamespace"><strong>setDefaultNamespace</strong></a>(self, uri)</dt></dl>
+
+<dl><dt><a name="tmToN3-start"><strong>start</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToN3-symbolString"><strong>symbolString</strong></a>(self, value)</dt></dl>
+
+<dl><dt><a name="tmToN3-writeEncoded"><strong>writeEncoded</strong></a>(self, str)</dt><dd><tt>Write&nbsp;a&nbsp;possibly&nbsp;unicode&nbsp;string&nbsp;out&nbsp;to&nbsp;the&nbsp;output</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="RDFSink.html#RDFSink">RDFSink.RDFSink</a>:<br>
+<dl><dt><a name="tmToN3-checkNewId"><strong>checkNewId</strong></a>(self, uri)</dt><dd><tt>The&nbsp;store&nbsp;can&nbsp;override&nbsp;this&nbsp;to&nbsp;raise&nbsp;an&nbsp;exception&nbsp;if&nbsp;the<br>
+id&nbsp;is&nbsp;not&nbsp;in&nbsp;fact&nbsp;new.&nbsp;This&nbsp;is&nbsp;useful&nbsp;because&nbsp;it&nbsp;is&nbsp;usfeul<br>
+to&nbsp;generate&nbsp;IDs&nbsp;with&nbsp;useful&nbsp;diagnostic&nbsp;ways&nbsp;but&nbsp;this&nbsp;lays&nbsp;them<br>
+open&nbsp;to&nbsp;possibly&nbsp;clashing&nbsp;in&nbsp;pathalogical&nbsp;cases.</tt></dd></dl>
+
+<dl><dt><a name="tmToN3-countNamespace"><strong>countNamespace</strong></a>(self, namesp)</dt><dd><tt>On&nbsp;output,&nbsp;count&nbsp;how&nbsp;many&nbsp;times&nbsp;each&nbsp;namespace&nbsp;is&nbsp;used</tt></dd></dl>
+
+<dl><dt><a name="tmToN3-endDoc"><strong>endDoc</strong></a>(self, rootFormulaPair)</dt><dd><tt>End&nbsp;a&nbsp;document<br>
+&nbsp;<br>
+Call&nbsp;this&nbsp;once&nbsp;only&nbsp;at&nbsp;the&nbsp;end&nbsp;of&nbsp;parsing&nbsp;so&nbsp;that&nbsp;the&nbsp;receiver&nbsp;can&nbsp;wrap<br>
+things&nbsp;up,&nbsp;oprimize,&nbsp;intern,&nbsp;index&nbsp;and&nbsp;so&nbsp;on.&nbsp;&nbsp;The&nbsp;pair&nbsp;given&nbsp;is&nbsp;the&nbsp;(type,&nbsp;value)<br>
+identifier&nbsp;of&nbsp;the&nbsp;root&nbsp;formula&nbsp;of&nbsp;the&nbsp;thing&nbsp;parsed.</tt></dd></dl>
+
+<dl><dt><a name="tmToN3-genId"><strong>genId</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToN3-intern"><strong>intern</strong></a>(self, something)</dt></dl>
+
+<dl><dt><a name="tmToN3-makeComment"><strong>makeComment</strong></a>(self, str)</dt><dd><tt>This&nbsp;passes&nbsp;on&nbsp;a&nbsp;comment&nbsp;line&nbsp;which&nbsp;of&nbsp;course&nbsp;has&nbsp;no&nbsp;semantics.<br>
+&nbsp;<br>
+This&nbsp;is&nbsp;only&nbsp;useful&nbsp;in&nbsp;direct&nbsp;piping&nbsp;of&nbsp;parsers&nbsp;to&nbsp;output,&nbsp;to&nbsp;preserve<br>
+comments&nbsp;in&nbsp;the&nbsp;original&nbsp;file.</tt></dd></dl>
+
+<dl><dt><a name="tmToN3-makeStatement"><strong>makeStatement</strong></a>(self, tuple, why<font color="#909090">=None</font>)</dt><dd><tt>add&nbsp;a&nbsp;statement&nbsp;to&nbsp;a&nbsp;stream/store.<br>
+&nbsp;<br>
+raises&nbsp;URISyntaxError&nbsp;on&nbsp;bad&nbsp;URIs<br>
+tuple&nbsp;is&nbsp;a&nbsp;quad&nbsp;(context,&nbsp;predicate,&nbsp;subject,&nbsp;object)&nbsp;of&nbsp;things&nbsp;generated&nbsp;by&nbsp;calls&nbsp;to&nbsp;newLiteral&nbsp;etc<br>
+why&nbsp;is&nbsp;reason&nbsp;for&nbsp;the&nbsp;statement.</tt></dd></dl>
+
+<dl><dt><a name="tmToN3-namespaceCounts"><strong>namespaceCounts</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="tmToN3-newBlankNode"><strong>newBlankNode</strong></a>(self, context, uri<font color="#909090">=None</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="tmToN3-newExistential"><strong>newExistential</strong></a>(self, context, uri<font color="#909090">=None</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="tmToN3-newFormula"><strong>newFormula</strong></a>(self, uri<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="tmToN3-newList"><strong>newList</strong></a>(self, l, context)</dt></dl>
+
+<dl><dt><a name="tmToN3-newLiteral"><strong>newLiteral</strong></a>(self, str, dt<font color="#909090">=None</font>, lang<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="tmToN3-newSymbol"><strong>newSymbol</strong></a>(self, uri)</dt></dl>
+
+<dl><dt><a name="tmToN3-newUniversal"><strong>newUniversal</strong></a>(self, context, uri<font color="#909090">=None</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="tmToN3-newXMLLiteral"><strong>newXMLLiteral</strong></a>(self, doc)</dt></dl>
+
+<dl><dt><a name="tmToN3-reopen"><strong>reopen</strong></a>(self)</dt><dd><tt>Un-End&nbsp;a&nbsp;document<br>
+&nbsp;<br>
+If&nbsp;you&nbsp;have&nbsp;added&nbsp;stuff&nbsp;to&nbsp;a&nbsp;document,&nbsp;thought&nbsp;you&nbsp;were&nbsp;done,&nbsp;and<br>
+then&nbsp;want&nbsp;to&nbsp;add&nbsp;more,&nbsp;call&nbsp;this&nbsp;to&nbsp;get&nbsp;back&nbsp;into&nbsp;the&nbsp;sate&nbsp;that&nbsp;makeSatement<br>
+is&nbsp;again&nbsp;acceptable.&nbsp;Remember&nbsp;to&nbsp;end&nbsp;the&nbsp;document&nbsp;again&nbsp;when&nbsp;done.</tt></dd></dl>
+
+<dl><dt><a name="tmToN3-setGenPrefix"><strong>setGenPrefix</strong></a>(self, genPrefix)</dt></dl>
+
+<dl><dt><a name="tmToN3-startDoc"><strong>startDoc</strong></a>(self)</dt></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-backslashUify"><strong>backslashUify</strong></a>(ustr)</dt><dd><tt>Use&nbsp;URL&nbsp;encoding&nbsp;to&nbsp;return&nbsp;an&nbsp;ASCII&nbsp;string&nbsp;corresponding<br>
+to&nbsp;the&nbsp;given&nbsp;unicode</tt></dd></dl>
+ <dl><dt><a name="-dummy"><strong>dummy</strong></a>()</dt></dl>
+ <dl><dt><a name="-dummyWrite"><strong>dummyWrite</strong></a>(x)</dt></dl>
+ <dl><dt><a name="-hexify"><strong>hexify</strong></a>(ustr)</dt><dd><tt>Use&nbsp;URL&nbsp;encoding&nbsp;to&nbsp;return&nbsp;an&nbsp;ASCII&nbsp;string<br>
+corresponding&nbsp;to&nbsp;the&nbsp;given&nbsp;UTF8&nbsp;string<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;<a href="#-hexify">hexify</a>("<a href="http://example/a">http://example/a</a>&nbsp;b")<br>
+'<a href="http://example/a%20b">http://example/a%20b</a>'</tt></dd></dl>
+ <dl><dt><a name="-nothing"><strong>nothing</strong></a>()</dt></dl>
+ <dl><dt><a name="-stringToN3"><strong>stringToN3</strong></a>(str, singleLine<font color="#909090">=0</font>, flags<font color="#909090">=''</font>)</dt><dd><tt>#"</tt></dd></dl>
+ <dl><dt><a name="-stripCR"><strong>stripCR</strong></a>(str)</dt></dl>
+ <dl><dt><a name="-toBool"><strong>toBool</strong></a>(s)</dt></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>ADDED_HASH</strong> = '#'<br>
+<strong>ALL4</strong> = (0, 1, 2, 3)<br>
+<strong>ANONYMOUS</strong> = 3<br>
+<strong>BOOLEAN_DATATYPE</strong> = 'http://www.w3.org/2001/XMLSchema#boolean'<br>
+<strong>CONTEXT</strong> = 0<br>
+<strong>DAML_sameAs</strong> = (0, 'http://www.w3.org/2002/07/owl#sameAs')<br>
+<strong>DAML_sameAs_URI</strong> = 'http://www.w3.org/2002/07/owl#sameAs'<br>
+<strong>DECIMAL_DATATYPE</strong> = 'http://www.w3.org/2001/XMLSchema#decimal'<br>
+<strong>Escapes</strong> = {'"': '"', r'\': r'\', 'a': '<font color="#c040c0">\x07</font>', 'b': '<font color="#c040c0">\x08</font>', 'f': '<font color="#c040c0">\x0c</font>', 'n': '<font color="#c040c0">\n</font>', 'r': '<font color="#c040c0">\r</font>', 't': '<font color="#c040c0">\t</font>', 'v': '<font color="#c040c0">\x0b</font>'}<br>
+<strong>FLOAT_DATATYPE</strong> = 'http://www.w3.org/2001/XMLSchema#double'<br>
+<strong>INTEGER_DATATYPE</strong> = 'http://www.w3.org/2001/XMLSchema#integer'<br>
+<strong>LIST</strong> = 10000<br>
+<strong>LITERAL</strong> = 2<br>
+<strong>LITERAL_DT</strong> = 21<br>
+<strong>LITERAL_LANG</strong> = 22<br>
+<strong>LOG_implies_URI</strong> = 'http://www.w3.org/2000/10/swap/log#implies'<br>
+<strong>List_NS</strong> = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'<br>
+<strong>Logic_NS</strong> = 'http://www.w3.org/2000/10/swap/log#'<br>
+<strong>N3CommentCharacter</strong> = '#'<br>
+<strong>N3_Empty</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Empty')<br>
+<strong>N3_List</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#List')<br>
+<strong>N3_first</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#first')<br>
+<strong>N3_forAll_URI</strong> = 'http://www.w3.org/2000/10/swap/log#forAll'<br>
+<strong>N3_forSome_URI</strong> = 'http://www.w3.org/2000/10/swap/log#forSome'<br>
+<strong>N3_li</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#li')<br>
+<strong>N3_nil</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#nil')<br>
+<strong>N3_rest</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#rest')<br>
+<strong>OBJ</strong> = 3<br>
+<strong>PARTS</strong> = (1, 2, 3)<br>
+<strong>PRED</strong> = 1<br>
+<strong>QUESTION</strong> = 10001<br>
+<strong>RDF_NS_URI</strong> = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'<br>
+<strong>RDF_spec</strong> = 'http://www.w3.org/TR/REC-rdf-syntax/'<br>
+<strong>RDF_type</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type')<br>
+<strong>RDF_type_URI</strong> = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'<br>
+<strong>SUBJ</strong> = 2<br>
+<strong>SYMBOL</strong> = 0<br>
+<strong>XMLLITERAL</strong> = 25<br>
+<strong>becauseSubexpression</strong> = &lt;why.BecauseSubexpression instance&gt;<br>
+<strong>digitstring</strong> = &lt;_sre.SRE_Pattern object&gt;<br>
+<strong>eof</strong> = &lt;_sre.SRE_Pattern object&gt;<br>
+<strong>eol</strong> = &lt;_sre.SRE_Pattern object&gt;<br>
+<strong>forbidden1</strong> = &lt;_sre.SRE_Pattern object&gt;<br>
+<strong>forbidden2</strong> = &lt;_sre.SRE_Pattern object&gt;<br>
+<strong>interesting</strong> = &lt;_sre.SRE_Pattern object&gt;<br>
+<strong>langcode</strong> = &lt;_sre.SRE_Pattern object&gt;<br>
+<strong>number_syntax</strong> = &lt;_sre.SRE_Pattern object&gt;<br>
+<strong>option_noregen</strong> = 0<br>
+<strong>parsesTo_URI</strong> = 'http://www.w3.org/2000/10/swap/log#parsesTo'<br>
+<strong>signed_integer</strong> = &lt;_sre.SRE_Pattern object&gt;<br>
+<strong>wide_build</strong> = True<br>
+<strong>ws</strong> = &lt;_sre.SRE_Pattern object&gt;</td></tr></table>
+</body></html>

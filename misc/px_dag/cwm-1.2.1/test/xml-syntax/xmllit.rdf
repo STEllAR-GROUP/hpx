@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+
+<!--
+  Copyright World Wide Web Consortium, (Massachusetts Institute of
+  Technology, Institut National de Recherche en Informatique et en
+  Automatique, Keio University).
+ 
+  All Rights Reserved.
+ 
+  Please see the full Copyright clause at
+  <http://www.w3.org/Consortium/Legal/copyright-software.html>
+
+  Description: Visibly used namespaces must be included in XML
+         Literal values. Treatment of namespaces that are not 
+         visibly used (e.g. rdf: in this example) is implementation
+         dependent. Based on example from Issues List.
+
+
+  $Id: xmllit.rdf,v 1.1 2005/09/01 20:43:01 syosi Exp $
+
+-->
+<rdf:RDF xmlns="http://www.w3.org/1999/xhtml"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:html="http://NoHTML.example.org"
+   xmlns:my="http://my.example.org/">
+   <rdf:Description rdf:ID="John_Smith">
+    <my:Name rdf:parseType="Literal">
+      <html:h1 my:thing="hello">
+        <b><i>John</i></b>
+      </html:h1>
+   </my:Name>
+  </rdf:Description>
+</rdf:RDF>

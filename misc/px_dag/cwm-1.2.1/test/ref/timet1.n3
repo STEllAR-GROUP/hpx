@@ -1,0 +1,73 @@
+     @prefix : <TEST#> .
+    @prefix v: <#> .
+    
+     @forAll v:f,
+                v:t,
+                v:x,
+                v:y,
+                v:z .
+    
+    ""     a v:TestFormat .
+    
+    "1999-12-31T23:59:59.99Z"     a v:TestDate;
+         :day 31;
+         :dayOfWeek 4;
+         :hour 23;
+         :inSeconds 946684799.0e+00;
+         :minute 59;
+         :month 12;
+         :second 59;
+         :year 1999 .
+    
+    "2000-01-01T00:00:00Z"     a v:TestDate;
+         :day 1;
+         :dayOfWeek 5;
+         :hour 0;
+         :inSeconds 946684800.0e+00;
+         :minute 0;
+         :month 1;
+         :second 0;
+         :year 2000 .
+    
+    "2001-09-09T01:46:40Z"     :inSeconds "1000000000" .
+    
+    "2002"     a v:TestDate;
+         :dayOfWeek 1;
+         :inSeconds 1009843200.0e+00;
+         :year 2002 .
+    
+    "2002-06"     a v:TestDate;
+         :dayOfWeek 5;
+         :inSeconds 1022889600.0e+00;
+         :month 6;
+         :year 2002 .
+    
+    "2002-06-22"     a v:TestDate;
+         :day 22;
+         :dayOfWeek 5;
+         :inSeconds 1024704000.0e+00;
+         :month 6;
+         :year 2002 .
+    
+    "2002-06-22T12:34Z"     a v:TestDate;
+         :day 22;
+         :dayOfWeek 5;
+         :hour 12;
+         :inSeconds 1024749240.0e+00;
+         :minute 34;
+         :month 6;
+         :year 2002 .
+    
+    "2002-06-22T22:09:32-05:00"     a v:TestDate;
+         :day 22;
+         :dayOfWeek 6;
+         :hour 22;
+         :inSeconds 1024801772.0e+00;
+         :minute 9;
+         :month 6;
+         :second 32;
+         :timeZone "-05:00";
+         :year 2002 .
+    
+    "year %Y month %M day %d date: %D"     a v:TestFormat .
+    

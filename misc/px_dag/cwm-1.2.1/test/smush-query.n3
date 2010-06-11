@@ -1,0 +1,19 @@
+# http://rdfweb.org/2001/01/design/smush.html
+# (Q1) What are the technology interests of persons who own companies that have an ethical
+#     policy committment to the policy stated in the document
+#     http://dotherightthing.example.org/policy.xhtml 
+
+@prefix agg: <http://example.com/xmlns/aggregation-demo#>.
+@prefix : <http://www.w3.org/2000/10/swapt/test/smush-query#>.
+@prefix v: <http://www.w3.org/2000/10/swapt/test/smush-query#>.
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+
+@forAll :interest, :person, :company.
+
+{ :interest is agg:technologyInterest of :person.
+  :person is agg:owner of :company.
+  :company agg:ethicalPolicy
+	<http://dotherightthing.example.org/policy.xhtml>.
+}
+   =>
+{ :interest a agg:Q1Answer }.

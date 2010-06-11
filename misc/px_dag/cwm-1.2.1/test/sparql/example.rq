@@ -1,0 +1,13 @@
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX ex: <http://ns.example.org/#>
+
+SELECT ?x ?hpage ?name ?mbox ?age ?blurb ?friend
+#FROM <data.n3>
+WHERE { ?x foaf:name ?name .
+        ?x foaf:mbox ?mbox .
+        ?x foaf:homepage ?hpage .
+        ?x foaf:knows ?friend .
+        OPTIONAL { ?x ex:ageInYears ?age } .
+        OPTIONAL { ?x ex:blurb ?blurb }
+      }
+# ORDER BY ?name

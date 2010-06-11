@@ -1,0 +1,12 @@
+     @prefix : <#> .
+    
+    false     a :FalseBoolean .
+    
+    true     a :TrueBoolean .
+    
+    false     a :FalseBoolean2 .
+    
+    true     a :TrueBoolean2 .
+    
+    :true     a :JustASymbol .
+    

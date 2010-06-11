@@ -1,0 +1,18 @@
+
+
+
+<rdf:RDF xmlns="file://www.example.org/meeting_organization#"
+    xmlns:m="file://www.example.org/meeting_organization#"
+    xmlns:p="file://www.example.org/personal_details#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+
+    <rdf:Description rdf:about="file://meetings.example.com/cal#m1">
+        <homePage rdf:resource="file://meetings.example.com/m1/hp"/>
+    </rdf:Description>
+
+    <rdf:Description rdf:about="file://www.example.org/people#fred">
+        <attending rdf:resource="file://meetings.example.com/cal#m1"/>
+        <p:GivenName>Fred</p:GivenName>
+        <p:hasEmail rdf:resource="mailto:fred@example.com"/>
+    </rdf:Description>
+</rdf:RDF>

@@ -1,0 +1,12 @@
+     @prefix : <#> .
+     @prefix u: <http://www.example.org/utilities#> .
+    
+    :assumption     = {:fred     u:knows :john .
+        :john     u:knows :mary .
+        } .
+    
+    :conclusion     = {:fred     u:knows :mary .
+        } .
+    
+    :trivialTruth     = {} .
+    

@@ -1,0 +1,42 @@
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>.
+@prefix rcs: <http://www.w3.org/2001/03swell/rcs#>.
+
+<> dc:description """Test string:containsRoughly""";
+  rcs:id "$Id: roughly.n3,v 1.2 2004/06/25 01:27:00 timbl Exp $";
+  dc:creator [ 
+	contact:fullName "Tim berners-Lee";
+	contact:homePage <http://www.w3.org/People/Berners-Lee/>;
+	contact:mailbox <mailto:timbl@w3.org>
+	];
+  dc:rights "copyright (c) 2001 W3C (MIT, Keio, INRIA)".
+
+
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+@prefix string: <http://www.w3.org/2000/10/swap/string#>.
+@prefix : <#>.
+
+@forAll :x, :y, :z, :p, :q.
+
+{ "A green party" string:containsRoughly "green     Party" } log:implies { :test1 a :success }.
+
+{ "all good people to come to" string:containsRoughly "gooood" } log:implies { :test2 a :FAILURE }.
+
+{ "jkl" string:containsRoughly "jkl" } log:implies { :test3 a :success }.
+
+{ "foo" string:containsRoughly "foo bar" } log:implies { :test4 a :FAILURE }.
+
+{ "asd" string:containsRoughly "asdfjhkjhasd" } log:implies { :test5 a :FAILURE }.
+
+{ "" string:containsRoughly "" } log:implies { :test6 a :success }.
+
+{ "supercalifragilisticexpialidocious" string:containsRoughly "" } log:implies { :test7 a :success }.
+{ """THE
+	WIDE     
+	AND
+	THE
+	narrowEST
+	OF PLACES""" string:containsRoughly "wide and the" } log:implies { :test8 a :success }.
+
+#ends
+

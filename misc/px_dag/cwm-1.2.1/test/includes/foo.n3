@@ -1,0 +1,26 @@
+# Test whether a schema mentions the predicates used in this data
+#
+ 
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix s: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix log:  <http://www.w3.org/2000/10/swap/log#> .
+
+@prefix : <foo.n3#>.  # Local stuff
+
+@prefix foo: <foo.n3#>.  # Local stuff
+
+# Usage:   cwm t11.n3 -think
+#
+# Output should conclude all test* a :success and no failures.
+#
+
+foo:theSky s:isDefinedBy <> .
+
+foo:is a rdf:Property;
+      s:isDefinedBy <> .
+
+foo:blue s:isDefinedBy <> .
+
+#foo:red s:isDefinedBy <> .
+#
+#ends

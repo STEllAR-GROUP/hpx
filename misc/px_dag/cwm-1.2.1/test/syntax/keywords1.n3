@@ -1,0 +1,17 @@
+
+# Test the cwm quick variable declarations
+
+
+@prefix : <foo.n3#>.  # Local stuff
+@keywords .   # Use no keywards
+
+
+@forAll :x, :y, :z.
+@forSome :a, :b, :c.
+
+b a c.  # Should simply use a as a local symbol, NOT as rdf:type.
+
+
+#{ :x <#mother> :y. :y <#sister> :z } => { :x <#aunt> :z }.
+
+#ends

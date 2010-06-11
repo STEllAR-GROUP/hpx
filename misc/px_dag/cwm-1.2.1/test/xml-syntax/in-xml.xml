@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<metadata  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:s="http://mems-exchange.org/schema/file/1.0/"
+         xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title>  This is non-RDF content </title>
+  <rdf:RDF>
+    <rdf:Description rdf:about="%s">
+      <dc:Creator>%s</dc:Creator>
+      <s:Run>45</s:Run>
+    </rdf:Description>
+  </rdf:RDF>
+  <element />
+</metadata>

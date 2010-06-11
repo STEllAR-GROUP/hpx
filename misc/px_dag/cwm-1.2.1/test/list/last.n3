@@ -1,0 +1,30 @@
+# test list built in
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix : <#>.
+@prefix list: <http://www.w3.org/2000/10/swap/list#>.
+@keywords a.
+
+{ ( 1 2 3 4 5 6 ) list:last 6 } => { test1 a SUCCESS }.
+
+{ ( 1 2 3 4 5 "Z" ) list:last "Z" } => { test2 a SUCCESS }.
+
+{ ( "wrong"  "WongAgain"  "Success" ) list:last ?x }=>{ test3 isa ?x}.
+
+{ 1 list:in  (  1 2 3 4 5 ) } => { test4a a SUCCESS }.
+{ 2 list:in  (  1 2 3 4 5 ) } => { test4b a SUCCESS }.
+{ 3 list:in  (  1 2 3 4 5 ) } => { test4c a SUCCESS }.
+{ 4 list:in  (  1 2 3 4 5 ) } => { test4d a SUCCESS }.
+
+{ 1 list:in  () } => {  trap1 a FAILURE}.
+{ 0 list:in  (  1 2 3 4 5 ) } => { trap2 a FAILURE }.
+
+thing1 prop1 ( test5a test5b test5c ) .
+{ ?item list:in [ @is prop1 @of thing1 ] } => { ?item a SUCCESS } .
+
+( foo bar baz ) prop2 test6a .
+( foo ) prop2 test6b .
+( bar baz ) prop2 trap4 .
+{ foo list:in ?a_list .
+  ?a_list prop2 ?thing } => { ?thing a SUCCESS } .
+
+#ends

@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<web:RDF xmlns:web="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns="http://example.com/xmlns/aggregation-demo#" >
+
+
+<!-- a.rdf -->  
+
+<Company>
+ <corporateHomepage web:resource="http://megacorp.example.com/"/>
+ <name>MegaCorp Inc.</name>
+ <ticker>MEGA</ticker>
+ <owner>
+  <Person>
+   <name>Mr Mega</name>
+   <personalMailbox web:resource="mailto:mega@megacorp.example.com"/>
+   <personalHomepage web:resource="http://megacorp.example.com/~mega"/>
+   <age>50</age>
+  </Person>
+ </owner>
+</Company>
+
+
+<!--  b.rdf -->
+  
+<User>
+ <personalMailbox web:resource="mailto:mega@megacorp.example.com"/>
+ <technologyInterest web:resource="http://www.w3.org/XML/"/>
+ <technologyInterest web:resource="http://www.w3.org/RDF/"/>
+ <technologyInterest web:resource="http://www.mozilla.org/"/>
+</User>
+
+
+<!--  c.rdf -->
+  
+<Organisation>
+ <corporateHomepage web:resource="http://megacorp.example.com/"/>
+ <ethicalPolicy>
+   <PolicyStatement web:about="http://dotherightthing.example.org/policy.xhtml">
+    <title>Ethical Business Shared Guidelines 1.1</title>
+   </PolicyStatement>
+ </ethicalPolicy>
+</Organisation>
+
+
+
+</web:RDF>

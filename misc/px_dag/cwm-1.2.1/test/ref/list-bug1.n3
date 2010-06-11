@@ -1,0 +1,19 @@
+     @prefix : <#> .
+     @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    
+    @forAll :x,
+                :y .
+      ( <a> 
+        <b>  )
+         a <twoer> .
+    
+    <a>     :RESULT <b> .
+    {
+        
+          ( :x 
+            :y  )
+             a <twoer> .
+        
+        }     log:implies {:x     :RESULT :y .
+        } .
+    

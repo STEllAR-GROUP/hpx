@@ -1,0 +1,627 @@
+# List of regression tests
+#
+# - was in bash script retest.sh
+#
+@prefix : <#>.
+@prefix x: <#>.
+@prefix test: <http://www.w3.org/2000/10/swap/test.n3#>.
+@prefix dc:  <http://purl.org/dc/elements/1.1/>. # yuk - under protest - no hash
+
+
+# a  test:CwmProofTest must have output in N3.  It can't use --rdf=T etc for input.
+# retest.py will run a test as a proof test with -p if it is a test:CwmProofTest.
+
+:t1001 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/animal.n3>;
+    test:description   "Parse a small RDF file, generate N3";
+    test:arguments     """-rdf animal.rdf -n3""".
+
+:t1001b a test:CwmTest;
+    test:referenceOutput <ref/animal.n3>;
+    test:description   "Ignore superfluous #stuff at end of URI";
+    test:arguments    """ ref/animal.n3#something """ . 
+
+:t1001a a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/base64.n3>;
+    test:description   "Read a data: uri";
+    test:arguments     """'data:text/rdf+n3;charset=utf-8;base64,QHByZWZpeCBsb2c6IDxodHRwOi8vd3d3LnczLm9yZy8yMDAwLzEwL3N3YXAvbG9nIz4gLgp7fSA9PiB7OmEgOmIgOmN9IC4g'""".
+
+:t1002 a test:CwmTest;
+    test:referenceOutput <ref/animal-1.rdf>;
+    test:description   "Parse a small RDF file and regenerate RDF";
+    test:arguments     """-rdf=z animal.rdf""".
+
+:t1002a a test:CwmTest;
+    test:referenceOutput <ref/xml-redefine.rdf>;
+    test:description   "Do not redefine the xml: prefix";
+    test:arguments     """--n3 xml-syntax/xml_prefix.n3 --rdf""".
+
+:t1002b a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/xml-base3.n3>;
+    test:description   "Allow for relative xml:base";
+    test:arguments     """--rdf xml-syntax/xmlbase3.rdf --n3""".
+
+:t1002c a test:CwmTest;
+    test:referenceOutput <ref/xml-redefine2.rdf>;
+    test:description   "do not redefine xml: and xmlns: even if told to";
+    test:arguments     """--n3 xml-syntax/xml_prefix2.n3 --rdf""".
+
+:t1002d a test:CwmTest;
+    test:referenceOutput <ref/rdf-redefine.rdf>;
+    test:description   "Allow for redefinition of rdf:";
+    test:arguments     """--n3 xml-syntax/rdf_prefix.n3 --rdf""".
+
+:t1002e a test:CwmTest;
+    test:referenceOutput <ref/xmllit.nt>;
+    test:description   "rdf:parseType=\"Literal\"";
+    test:arguments     """--rdf xml-syntax/xmllit.rdf --ntriples""".
+
+:t1003 a test:CwmTest;
+    test:referenceOutput <ref/in-xml-t.n3>;
+    test:description   "Parse RDF embedded in foreign XML";
+    test:arguments     """--rdf=T xml-syntax/in-xml.xml -n3""".
+
+
+:t1004 a test:CwmTest;
+    test:referenceOutput <ref/in-xml.n3>;
+    test:description   "Ignore RDF embedded in foreign XML -> empty formula";
+    test:arguments     """--rdf xml-syntax/in-xml.xml -n3""".
+
+:t1005 a test:CwmTest;
+    test:referenceOutput <ref/reluri-1.rdf>;
+    test:description   "test generation of relative URIs";
+    test:arguments     """reluri-1.n3 --rdf""".
+
+:t1005a a test:CwmTest, test:CwmProofTest;
+	test:referenceOutput <ref/no-last-nl.n3>;
+	test:description	"An N3 file with no final newline character";
+	test:arguments		"syntax/no-last-nl.n3".
+
+:t1005b a test:CwmTest, test:CwmProofTest;
+	test:referenceOutput <ref/dot-dash.n3>;
+	test:description	"combinations of - and _ in identifiers";
+	test:arguments		"syntax/dot-dash.n3".
+
+:t1005c a test:CwmTest, test:CwmProofTest;
+	test:referenceOutput <ref/keywords1.n3>;
+	test:description	"@keywords in n3";
+	test:arguments		"syntax/keywords1.n3".
+
+:t1005d a test:CwmTest, test:CwmProofTest;
+	test:referenceOutput <ref/keywords2.n3>;
+	test:description	"using no keywords in n3";
+	test:arguments		"syntax/keywords2.n3".
+
+:t1005e a test:CwmTest, test:CwmProofTest;
+	test:referenceOutput <ref/djb1a-out.n3>;
+	test:description	"djb noticed a:b was parsed as rdf:type token";
+	test:arguments		"syntax/djb1a.n3".
+
+#:t1005h a test:CwmTest;
+#	test:referenceOutput <ref/data-ugly.n3>;
+#	test:description	"dumping data only fast with --ugly";
+#	test:arguments		"daml-ex.n3 rules12.n3 --ugly".
+
+:t1006 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/contexts-1.n3>;
+    test:description   	"Parse and generate simple contexts";
+    test:arguments     	"""contexts.n3""".
+
+:t1006a a test:CwmTest;
+    test:referenceOutput <ref/animal-1.rdf>;
+    test:description   	"reading data from stdin";
+    test:arguments     	"""-rdf=z < animal.rdf""".
+
+:t1007 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/anon-prop-1.n3>;
+    test:description   "Parse and regen anonymous property";
+    test:arguments     """anon-prop.n3""".
+
+:t1007a a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/bnode.n3>;
+    test:description   "Parse RDF/XML nodeID to N3";
+    test:arguments     """--rdf nodeID/ex1.rdf --n3""".
+
+:t1007b a test:CwmTest;
+    test:referenceOutput <ref/bnode.rdf>;
+    test:description   "Parse RDF/XML nodeID and regen RDF/XML";
+    test:arguments     """--rdf nodeID/ex1.rdf""".
+
+:t1007c a test:CwmTest;
+    test:referenceOutput <nodeID/classes.ref.rdf>;
+    test:description   "use nodeID's with classes";
+    test:arguments     """nodeID/classes.n3 -rdf""".
+
+:t1007d a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/anonymous_loop.ref>;
+    test:description   "A loop of anonymous nodes wasn't being printed at all";
+    test:arguments     """anonymous_loop.n3""".
+
+:t1008 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/daml-ont.n3>;
+    test:description   "Convert some RDF/XML into RDF/N3";
+    test:arguments     """daml-pref.n3 -rdf daml-ont.rdf -n3""".
+
+:t1008a a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/colon-in-uri.n3>;
+    test:description   "When rdf/xml localnames are not valid qNames";
+    test:arguments     """--rdf syntax/colon-in-uri.rdf --n3""".
+
+
+:t1009 a test:CwmTest;
+    test:referenceOutput <ref/strquot.n3>;
+    test:description   "N3 string quoting with escaping";
+    test:arguments     """-n3=e strquot.n3""".
+
+# Now in i18n/detailed.tests
+#
+#:t1009a a test:CwmTest, test:CwmProofTest;
+#    test:referenceOutput <ref/hiragana.n3>;
+#    test:description   "N3 string, qname and IRI with utf-8 non-ascii characters";
+#    test:arguments     "i18n/hiragana.n3".
+#
+#until i18n/detailed.tests are fully functional, the below will stay where it is
+
+:t1009aa a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/strquot_a.n3>;
+    test:description   "N3 string quoting with utf-8 literals";
+    test:arguments     """-n3 strquot.n3""".
+
+:t1009ab a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/n3string.n3>;
+    test:description   "log:n3string genertating utf-8 literals was double encoding";
+    test:arguments     """-n3 i18n/n3string.n3""".
+
+:t1009b a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <xml-syntax/non-ascii-pred.rdf>;
+    test:description   "XML to XML with utf-8 non-ascii characters";
+    test:arguments     "--rdf xml-syntax/non-ascii-pred.rdf".
+
+
+:t1010 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/path1.n3>;
+    test:description   "Path syntax, simple";
+    test:arguments     """syntax/path1.n3""".
+
+
+:t1011 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/path2.n3>;
+    test:description   "Path syntax, more";
+    test:arguments     """syntax/path2.n3""".
+
+:t10115 a test:CwmTest, test:CwmProofTest;
+	test:referenceOutput <ref/numbers.n3>;
+	test:description "Number syntax";
+	test:arguments  "syntax/numbers.n3".
+
+:t10116 a test:CwmTest, test:CwmProofTest;
+	test:referenceOutput <ref/numbers-n.n3>;
+	test:description "Number syntax suppressed on output";
+	test:arguments  "syntax/numbers.n3 --ntriples".
+
+#:t10117 a test:CwmTest, test:CwmProofTest;
+#	test:referenceOutput <ref/numbers.rdf>;
+#	test:description "Number syntax to RDF output";
+#	test:arguments  "syntax/numbers.n3 --rdf".
+
+:t1012 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/qvars1.n3>;
+    test:description   "Quick variable syntax, simple";
+    test:arguments     """syntax/qvars1.n3""".
+
+
+:t1013 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/qvars2.n3>;
+    test:description   "Quick variable syntax, more";
+    test:arguments     """syntax/qvars2.n3""".
+
+
+:t1014 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/lstring-out.n3>;
+    test:description   "N3 string nested triple quoting";
+    test:arguments     """--n3 syntax/lstring.n3""".
+
+
+:t1015 a test:CwmTest;
+    test:referenceOutput <ref/equiv-syntax.n3>;
+    test:description   "conversion of N3 = to RDF";
+    test:arguments     """-n3 equiv-syntax.n3 -rdf""".
+
+
+:t1016 a test:CwmTest;
+    test:referenceOutput <ref/piped-t016-out.n3>;
+    test:description   "Pipe mode for flat rdf and flat n3 to n3";
+    test:arguments     """--pipe --rdf animal.rdf owl-ex.rdf smush-examples.rdf --n3 daml-ont.n3""".
+
+
+:t1017 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/lists.n3>;
+    test:description   "parsing and generation of N3 list syntax";
+    test:arguments     """-n3 lists.n3""".
+
+
+:t1018 a test:CwmTest;
+    test:referenceOutput <ref/lists-simple-1.rdf>;
+    test:description   "conversion of subset of N3 list syntax to RDF";
+    test:arguments     """-n3 lists-simple.n3 -rdf""".
+
+:t1018a1 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/itemType.n3>;
+    test:description   "make sure typeNodes in RDF/XML Collections are parsed";
+    test:arguments     """-rdf list/itemType.rdf -n3""".
+
+
+#:t1018b1 a test:CwmTest, test:CwmProofTest;
+#    test:referenceOutput <ref/list-bug1.n3>;
+#    test:description   "List processing bug check 1";
+#    test:arguments     """list/list-bug1.n3 --think""".
+#
+#:t1018b2 a test:CwmTest, test:CwmProofTest;
+#    test:referenceOutput <ref/list-bug2.n3>;
+#    test:description   "List processing bug check 2";
+#    test:arguments     """list/list-bug2.n3 --think""".
+
+:t1019 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/prefix1.rdf>;
+    test:description   "Avoiding default namespace on attrs";
+    test:arguments     """-rdf norm/fix.rdf""".
+
+
+:t1020 a test:CwmTest;
+    test:referenceOutput <ref/prefix2.rdf>;
+    test:description   "Avoiding default namespace on attrs";
+    test:arguments     """-rdf norm/fix.rdf -rdf=d""".
+
+
+:t1021 a test:CwmTest;
+    test:referenceOutput <ref/prefix3.rdf>;
+    test:description   "Avoiding default namespace on attrs";
+    test:arguments     """-rdf norm/fix.rdf -rdf=p""".
+
+
+:t1022 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/daml-ex.n3>;
+    test:description   "Early DAML (now OWL) example in XML/RDF";
+    test:arguments     """-rdf owl-ex.rdf -n3""".
+
+
+#        Test log:implies rules:
+
+:t1023 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/rules12-1.n3>;
+    test:description   "log:implies Rules - try one iteration first.";
+    test:arguments     """rules12.n3 -rules""".
+
+
+:t1024 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/rules12-n.n3>;
+    test:description   "log:implies rules, iterating";
+    test:arguments     """rules12.n3 -think""".
+
+:t1024a a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <unify/reflexive-ref.n3>;
+    test:description   "match same variable twice in one statement";
+    test:arguments     """unify/reflexive.n3 -think""".
+
+
+# Removed, because the set of things done on --rules is rather indeterminate
+# in the case of a file in which ne rule can lead to another.
+#:t1025 a test:CwmTest, test:CwmProofTest;
+#    test:referenceOutput <ref/rules13-1.n3>;
+#    test:description   "log:implies rules more complex, with means, once";
+#    test:arguments     """--closure=T rules13.n3 --rules""".
+
+
+:t1026 a test:CwmTest;
+    test:referenceOutput <ref/rules13-n.n3>;
+    test:description   "log:implies and log:Truth rules, with means, many times";
+    test:arguments     """--closure=T rules13.n3 --think --data""".
+
+
+:t1027 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/two-route.n3>;
+    test:description   "test different rules giving same result";
+    test:arguments     """two-route.n3 -think""".
+
+
+:t1028 a test:CwmTest;
+    test:referenceOutput <ref/schema1.n3>;
+    test:description   "Schema validity 1";
+    test:arguments     """--closure=T daml-ex.n3 invalid-ex.n3 schema-rules.n3 -think""".
+
+
+:t1029 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/schema2.n3>;
+    test:description   "Schema validity using filtering out essential output";
+    test:arguments     """daml-ex.n3 invalid-ex.n3 schema-rules.n3 -think -filter=schema-filter.n3""".
+
+:t1029a a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/schema2.n3>;
+    test:description   "the --solve= option";
+    test:arguments     """daml-ex.n3 invalid-ex.n3 schema-rules.n3 --solve=schema-filter.n3""".
+
+:t1029b a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/schema2.n3>;
+    test:description   "log:filter should do the same thing as --filter";
+    test:arguments     """log-filter.n3 --think --data""".
+
+:t1029c a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/filter-bnode.n3>;
+    test:description   "--filter should work with bnodes";
+    test:arguments     "query/filter-bnodes.n3 --filter=query/trivial-filter.n3" .
+
+:t1030 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/underbarscope-out.n3>;
+    test:description   "The scope of _:me should be the formula";
+    test:arguments     """underbarscope.n3 --think""".
+
+:t103005 a 
+test:CwmTest;
+    test:referenceOutput <ref/genBnodeInNestedFormula-out.n3>;
+    test:description   "Generation of var. exist'ly quant'd in nested formulae";
+    test:arguments     """includes/genBnodeInNestedFormula.n3 --think""".
+
+#	Test output flags
+
+:t10301a a test:CwmTest;
+    test:referenceOutput <ref/animal-ntriples.n3>;
+    test:description	"Test the --ntriples output flag";
+    test:arguments	"--rdf animal.rdf --ntriples".
+
+:t10301b a test:CwmTest;
+    test:referenceOutput <ref/rules-flag-a.n3>;
+    test:description	"Test the --n3=a output flag";
+    test:arguments	"rules12.n3 --n3=a".
+
+:t10301c a test:CwmTest;
+    test:referenceOutput <ref/rules-flag-t.n3>;
+    test:description	"Test the --n3=t output flag";
+    test:arguments	"rules12.n3 --n3=t".
+
+#        Test list handling
+
+#:t1031 a test:CwmTest, test:CwmProofTest;
+#    test:referenceOutput <ref/li-r1.n3>;
+#    test:description   "Inference using lists";
+#    test:arguments     """list/r1.n3 -think""".
+
+
+#:t1032 a test:CwmTest, test:CwmProofTest;
+#    test:referenceOutput <ref/li-gk3.n3>;
+#    test:description   "Iterative ops on lists";
+#    test:arguments     """list/gk3.n3 -think""".
+
+#:t1032a a test:CwmTest, test:CwmProofTest;
+#    test:referenceOutput <ref/li-double.n3>;
+#    test:description   "Query with list with the same var in >once";
+#    test:arguments     """list/double.n3 -think""".
+
+
+#        Test builtins:
+
+:t1033 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/bi-t1.n3>;
+    test:description   "Simple use of log:includes";
+    test:arguments     """includes/t1.n3 -think""".
+
+
+:t1034 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/bi-t2.n3>;
+    test:description   "Simple use of log:includes";
+    test:arguments     """includes/t2.n3 -think""".
+
+
+:t1035 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/bi-t3.n3>;
+    test:description   "Simple use of log:includes";
+    test:arguments     """includes/t3.n3 -think""".
+
+
+:t1036 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/bi-t4.n3>;
+    test:description   "Simple use of log:includes - negative test";
+    test:arguments     """includes/t4.n3 -think""".
+
+
+:t1037 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/bi-t6.n3>;
+    test:description   "Simple use of log:includes";
+    test:arguments     """includes/t6.n3 --think""".
+
+
+# Can't query query for "forall x" 2003-07-28
+#:t1038 a test:CwmTest, test:CwmProofTest;
+#    test:referenceOutput <ref/bi-t7.n3>;
+#    test:description   "Simple use of log:includes";
+#    test:arguments     """includes/t7.n3 --think""".
+
+
+:t1039 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/bi-t8.n3>;
+    test:description   "Simple use of string built-ins";
+    test:arguments     """includes/t8.n3 --think""".
+
+:t1039a a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/includes-builtins.n3>;
+    test:description   "Builtins and log:includes";
+    test:arguments     """includes/builtins.n3 --think --data""".
+
+:t1040 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/bi-t9.n3>;
+    test:description   "Filter event by date using strcmp BI's";
+    test:arguments     """includes/t9br.n3 -think""".
+
+
+:t1041 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/bi-t10.n3>;
+    test:description   "log:resolvesTo and log:includes";
+    test:arguments     """includes/t10.n3 -think""".
+
+
+:t1042 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/bi-t11.n3>;
+    test:description   "log:resolvesTo and log:includes - schema checking";
+    test:arguments     """includes/t11.n3 -think""".
+
+
+
+:t1044 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/bi-quant.n3>;
+    test:description   "log:includes handling of univ./exist. quantifiers";
+    test:arguments     """includes/quantifiers_limited.n3 --think --purge-rules""".
+
+
+:t1045 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/bi-quant-imp.n3>;
+    test:description   "log:implies handling of quantifiers";
+    test:arguments     """includes/quant-implies.n3 --think""".
+
+
+:t1046 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/bi-concat.n3>;
+    test:description   "Test string concatetnation built-in";
+    test:arguments     """includes/concat.n3 --think --data""".
+
+
+:t1047 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/bi-uri-startswith.n3>;
+    test:description   "Dan's bug case with uri and startswith";
+    test:arguments     """includes/uri-startswith.n3 -think""".
+
+
+:t1048 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/resolves-rdf.n3>;
+    test:description   "log:resolvesTo with RDF/xml syntax";
+    test:arguments     """resolves-rdf.n3 -think""".
+
+:t1048a a test:CwmTest, test:CwmProofTest;
+	test:referenceOutput <includes/xsd.ref>;
+	test:description "Cwm builtins should support most xsd datatypes";
+	test:arguments  "includes/xsd.n3 --think --strings".
+
+:t1048b a test:CwmTest, test:CwmProofTest;
+	test:referenceOutput <includes/uri-object-invalid.n3>;
+	test:description "trying to match log:uri of a non-string simply matches None";
+	test:arguments  "includes/uri-object-invalid.n3 --think" .
+
+:t1049 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/sameDan.n3>;
+    test:description   "Smushing multiple descriptions of the same thing using log:lessThan, log:uri, daml:equivalentTo";
+    test:arguments     """sameDan.n3 sameThing.n3 --think --apply=forgetDups.n3 --purge --n3="/" """.
+
+#:t10495 a test:CwmTest, test:CwmProofTest;
+#    test:referenceOutput <ref/sameDan5.n3>;
+#    test:description   "Smushing multiple descriptions of the same thing using  owl:equivalentTo and --closure=e";
+#    test:arguments     """--closure=e sameDan.n3 on-add/unique.n3 --think --data""".
+
+:t10497 a test:CwmTest;
+    test:referenceOutput <ref/smush6.n3>;
+    test:description   "Smushing things which are = using --closure=e";
+    test:arguments     """--closure=e on-add/smush.n3 --data""".
+
+
+:t1050 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/timet1.n3>;
+    test:description   "basic ISo time handling functions";
+    test:arguments     """time/t1.n3 --think --purge""".
+
+:t1050s a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/timet1s.n3>;
+    test:description   "basic ISo time handling functions - stringy";
+    test:arguments     """time/t1s.n3 --think --purge""".
+
+
+:t1051 a test:CwmTest;
+    test:referenceOutput <ref/smush.rdf>;
+    test:description   "Data aggregation challenge from Jan 2001";
+    test:arguments     """--rdf smush-examples.rdf --n3 smush-schema.n3 sameThing.n3 --think --apply=forgetDups.n3 --purge --filter=smush-query.n3 --rdf""".
+
+
+:t1052 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/vblsNotURIs-out.n3>;
+    test:description   "Should not get URIs of anonymous nodes";
+    test:arguments     """--rdf animal.rdf --n3 vblsNotURIs.n3 --think""".
+
+
+:t1053 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/n3ExprFor-out.n3>;
+    test:description   "Parsing strings with n3ExprFor";
+    test:arguments     """includes/n3ExprFor.n3 --think""".
+
+
+:t1054 a test:CwmTest;
+    test:referenceOutput <ref/environ.n3>;
+    test:description   "Read operating system environment variable";
+    test:environment	"TEST_PARAMETER_1=TEST_VALUE_1";
+    test:arguments     """os/environ.n3 -think""".
+
+:t1055 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/roadmap-test.dot>;
+    test:description	"using notIncludes and --strings to make a graphviz file";
+    test:environment	"TARGET=roadmap/test.graph";
+    test:arguments	"""roadmap/todot.n3 --think --strings""".
+
+
+:t1056 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/conjunction.n3>;
+    test:description   "log:conjunction of formulae";
+    test:arguments     """includes/conjunction.n3 --think""".
+
+
+:t1057 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/conclusion.n3>;
+    test:description   "log:conclusion deductive closure";
+    test:arguments     """includes/conclusion.n3 --think""".
+
+
+:t1058 a test:CwmTest;
+    test:referenceOutput <ref/argv-1.n3>;
+    test:description   "os:argv argument values";
+    test:arguments     """os/argv.n3 --think --with foo bar baz""".
+
+
+:t1059 a test:CwmTest;
+    test:referenceOutput <ref/argv-2.n3>;
+    test:description   "os:argv argument other values";
+    test:arguments     """os/argv.n3 --think --with boof""".
+
+
+:t1060 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/colon-no-qname.n3>;
+    test:description     "don't make QNames with more than 1 colon";
+    test:arguments       """syntax/colon-no-qname.n3""".
+
+
+#:t1061 a test:CwmTest, test:CwmProofTest;
+#    test:referenceOutput <ref/bad-preds.n3>;
+#    test:description     "literals & formulae can't be predicates";
+#    test:arguments       """syntax/bad-preds.n3 --think""".
+
+
+:t1062 a test:CwmTest, test:CwmProofTest;
+    test:referenceOutput <ref/dtlit1.n3>;
+    test:description     "simple test for log:dtlit";
+    test:arguments       """dt/dtlit1.n3 --think""".
+
+
+:t1063 a test:CwmTest;
+    test:referenceOutput <ref/xml-syntax-basic-serialization.rdf>;
+    test:description     "extremely basic RDF serialization test";
+    test:arguments       """xml-syntax/basic-serialization.n3 --rdf""".
+
+
+#:t3001 a test:CwmTest, test:CwmProofTest;
+#    test:referenceOutput <ref/lbase-to-otter>;
+#    test:description   "Parse lbase, serialize as otter (no llyn involvement)";
+#    test:arguments     """--language=lbase lbase/note-long-example.lbase --language=otter""".
+    
+
+
+# Test proof generation -- see also the -p option of retest.py and all the test:CwmProofTest
+
+#:t2060 a test:CwmTest, test:CwmProofTest;
+#    test:referenceOutput <ref/reason-t5.n3>;
+#    test:description   "Proof for one simple rule";
+#    test:arguments     """reason/t5.n3 --think --base=foo --why""".
+
+#ends

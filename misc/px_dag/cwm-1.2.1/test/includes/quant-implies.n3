@@ -1,0 +1,30 @@
+#  Test of interactions of qualifiers with log:implies
+#
+#  $Id: quant-implies.n3,v 1.1 2003/01/29 21:13:27 timbl Exp $
+#
+# Usage: cwm quantifiers.n3 -think -purge
+#
+ 
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+
+@prefix : <#>.
+
+# 
+# The machine should, under --think, be able to conclude that
+# the eplicitly named day is great, and that the unnamed day is
+# great, without getting in a muddle over when to generate new
+# bodes. When conclusing "there is a God", however, it has to generate
+# a new bnode.
+#
+
+<#today> a <#Sunnyday>.
+
+[] a <#Sunnyday>, <#Birthday>.
+
+{ ?x a <#Sunnyday> } =>  { ?x a <#Greatday> }.
+
+{ ?x a <#Sunnyday> } =>  { [] a <#God> }.
+
+
+# ENDS
+

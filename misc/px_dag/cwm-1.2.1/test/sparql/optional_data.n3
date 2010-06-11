@@ -1,0 +1,25 @@
+
+
+@prefix foaf:       <http://xmlns.com/foaf/0.1/> .
+@prefix rdf:        <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:       <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcard:      <http://www.w3.org/2001/vcard-rdf/3.0#> .
+ 
+_:a  foaf:name     "Alice" .
+_:a  foaf:mbox     <mailto:alice@work.example> .
+_:a  vcard:N       _:x .
+
+_:x  vcard:Family  "Hacker" .
+_:x  vcard:Given   "Alice" .
+
+_:b  foaf:name     "Bob" .
+_:b  foaf:mbox     <mailto:bob@work.example> .
+_:b  foaf:N        _:z .
+
+_:z  vcard:Family  "Hacker" .
+
+_:e  foaf:name     "Ella" .
+_:e  vcard:N       _:y .
+
+_:y  vcard:Given   "Eleanor" .
+

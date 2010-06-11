@@ -1,0 +1,13 @@
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix v: <schema-rules.n3#> .
+@forAll :x, :y, :z .
+
+{(<daml-ex.n3>!log:semantics <invalid-ex.n3>!log:semantics <schema-rules.n3>!log:semantics)!log:conjunction log:conclusion ?x .
+ <schema-filter.n3> log:semantics ?y .
+ (?x ?y) log:filter :z
+} => 
+{:z a log:Truth}  .
+
+{ ?f a log:Truth . 
+  ?f log:includes {:x :y :z} .
+} => {:x :y :z} .

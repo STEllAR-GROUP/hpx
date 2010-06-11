@@ -1,0 +1,12 @@
+     @prefix : <#> .
+    
+         @forAll :a,
+                :b,
+                :c .
+    {
+        :a     :mother :b;
+             :sister :c .
+        
+        }     <http://www.w3.org/2000/10/swap/log#implies> {:b     :aunt :c .
+        } .
+    

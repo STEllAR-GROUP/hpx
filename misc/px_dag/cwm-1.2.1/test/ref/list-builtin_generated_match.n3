@@ -1,0 +1,9 @@
+     @prefix : <#> .
+    
+    ()     a :Thing .
+      (  (
+            :q  ) )
+         a :Thing .
+    
+    :q     a :GreatThing .
+    

@@ -1,0 +1,41 @@
+     @prefix : <#> .
+    
+      ( :bar 
+        :baz  )
+         :prop2 :trap4 .
+      ( :foo 
+        :bar 
+        :baz  )
+         :prop2 :test6a .
+      ( :foo  )
+         :prop2 :test6b .
+    
+    :test1     a :SUCCESS .
+    
+    :test2     a :SUCCESS .
+    
+    :test3     :isa "Success" .
+    
+    :test4a     a :SUCCESS .
+    
+    :test4b     a :SUCCESS .
+    
+    :test4c     a :SUCCESS .
+    
+    :test4d     a :SUCCESS .
+    
+    :test5a     a :SUCCESS .
+    
+    :test5b     a :SUCCESS .
+    
+    :test5c     a :SUCCESS .
+    
+    :test6a     a :SUCCESS .
+    
+    :test6b     a :SUCCESS .
+    
+    :thing1     :prop1  (
+        :test5a 
+        :test5b 
+        :test5c  ) .
+    

@@ -1,0 +1,26 @@
+#   Just see whether this can be input and re-output
+#
+# usage:     cwm lstring.n3 | cwm
+#
+@prefix : <#>.
+
+
+ """     @prefix : <http://www.w3.org/2000/10/swap/test/crypto/acc.n3#> .
+     @prefix crypto: <http://www.w3.org/2000/10/swap/crypto#> .
+     @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+     @prefix os: <http://www.w3.org/2000/10/swap/os#> .
+     @prefix string: <http://www.w3.org/2000/10/swap/string#> .
+    
+    \"\"\"
+MzE5MDcKCjM2ODkyMzAyMDE1MzgwMjY2NTU5MzgzNjMyMDQyOTM1Mjc4MDk3MzAwNzE4ODMzOTY3
+NTY3NTk1Njg5MjE2Mjk0NzkyMzUyNTQ3OTQzMjI4MjM2MDEwNjQwMTAyMjcxODk0OTY2MzgzNjQ1
+NDQyODQ5Njg3MzUzOTM2NzAyMTI5NDgxNDg4MzIxMzUyODEyMTc1NjIxNjE0NjE5Mzk2MDY4MjE2
+Nzk1MzY0NjAxNjE0MzM5NDYzOTIyMDMwMDE4NTEyODMyMTg0NDIyMzI3MzcxNzE5MjcxMzY0ODY1
+MjEzMzU1OTc4Nzk0OTIyMzQ4NDU5NTUxMTQ2MTcyNjE0MTk3ODI2NTg0NDA2Mzg2OTQwMTcwNTE4
+OTY0MDQzNzMxNzEyODc1OTk3NjAyNjE4ODUzNDQ1Mw=3D=3D
+\"\"\"     a :RequestKey;
+         :authorityName <Tiina>;
+         :junk "327462sjsdfjsakdhfkjsafd32164321" .
+""" a :test_string.
+    
+#ends

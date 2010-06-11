@@ -1,0 +1,79 @@
+#Processed by Id: cwm.py,v 1.171 2005/07/12 18:47:01 syosi Exp 
+        #    using base file:/home/syosi/mixing-eg1.xml
+        
+#  Notation3 generation by
+#       notation3.py,v 1.180 2005/06/09 21:05:14 syosi Exp
+
+#   Base was: file:/home/syosi/mixing-eg1.xml
+     @prefix : <#> .
+     @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+    
+     @forSome :_g0 .
+    
+    <http://upload.wikimedia.org/wikipedia/en/8/83/Suspension.bridge.bristol.arp.750pix.jpg>     a <http://xmlns.com/foaf/0.1/Image>;
+         <http://purl.org/dc/elements/1.1/description> "Clifton Suspension Bridge over the River Avon in Bristol, England. The bridge was designed by the great Victorian engineer Isambard Kingdom Brunel. Although not visible here, the Clifton Gorge below the bridge is about 240 feet deep (73 metres). Taken by Adrian Pingstone in October 2003 and released to the public domain.";
+         <http://purl.org/dc/elements/1.1/title> "Clifton Suspension Bridge over the River Avon in Bristol, England.";
+         <http://web.resource.org/cc/license> <http://creativecommons.org/licenses/publicdomain/>;
+         rdfs:seeAlso <http://www.kanzaki.com/test/exif2rdf?u=http%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fen%2F8%2F83%2FSuspension.bridge.bristol.arp.750pix.jpg> .
+    
+    <http://www.kanzaki.com/test/exif2rdf?u=http%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fen%2F8%2F83%2FSuspension.bridge.bristol.arp.750pix.jpg>     <http://purl.org/dc/elements/1.1/format> "application/rdf+xml" .
+      [      a <http://www.commonobjects.example.org/gmlrssMyObjectCollection>;
+             <http://www.commonobjects.example.org/gmlrssmembers>  (
+             [
+                     a <http://www.commonobjects.example.org/gmlrssBridge>;
+                     <http://www.commonobjects.example.org/gmlrsscenterLine>  (
+                     [
+                             a <http://www.opengis.net/gmlPoint>;
+                             <http://www.opengis.net/gmlpos> "400 400" ]
+                     [
+                             a <http://www.opengis.net/gmlPoint>;
+                             <http://www.opengis.net/gmlpos> "500 500" ]
+                     [
+                             a <http://www.opengis.net/gmlPoint>;
+                             <http://www.opengis.net/gmlpos> "600 600" ]
+                     [
+                             a <http://www.opengis.net/gmlPoint>;
+                             <http://www.opengis.net/gmlpos> "700 800" ] );
+                     <http://www.commonobjects.example.org/gmlrssdescription> "The Clifton Suspension Bridge is a suspension bridge spanning the Avon Gorge and linking Clifton in Bristol to Leigh Woods in North Somerset. Designed by Isambard Kingdom Brunel, it is a distinctive landmark that is often used as a symbol of Bristol. It is a grade I listed building.";
+                     <http://www.commonobjects.example.org/gmlrssname> "Clifton Suspension Bridge";
+                     <http://www.commonobjects.example.org/gmlrsstype> "suspension";
+                     <http://xmlns.com/foaf/0.1/depiction> <http://upload.wikimedia.org/wikipedia/en/8/83/Suspension.bridge.bristol.arp.750pix.jpg>;
+                     <http://xmlns.com/foaf/0.1/isPrimaryTopicOf> <http://en.wikipedia.org/wiki/Clifton_Suspension_Bridge>;
+                     <http://xmlns.com/foaf/0.1/maker> :_g0 ]
+             [
+                     a <http://www.commonobjects.example.org/gmlrssRailway>;
+                     <http://www.commonobjects.example.org/gmlrsscenterLine>  (
+                     [
+                             a <http://www.opengis.net/gmlPoint>;
+                             <http://www.opengis.net/gmlpos> "600 800" ]
+                     [
+                             a <http://www.opengis.net/gmlPoint>;
+                             <http://www.opengis.net/gmlpos> "600 700" ] );
+                     <http://www.commonobjects.example.org/gmlrssdescription> "Bristol Temple Meads is a railway station in Bristol, England. It is situated about a mile south-east of the city centre, and is the main station for central Bristol. Bristol's other main-line station, Bristol Parkway, is situated on the northern outskirts of the town.";
+                     <http://www.commonobjects.example.org/gmlrssname> "Bristol Temple Meads railway station";
+                     <http://xmlns.com/foaf/0.1/isPrimaryTopicOf> <http://en.wikipedia.org/wiki/Bristol_Temple_Meads>;
+                     <http://xmlns.com/foaf/0.1/maker> :_g0 ] );
+             <http://www.w3.org/2001/XMLSchema-instanceschemaLocation> "http://www.commonobjects.example.org/gmlrss/CommonObjectFramework.xsd" ].
+    
+    :_g0     a <http://xmlns.com/foaf/0.1/Person>;
+         <http://purl.org/vocab/bio/0.1/event>  [
+             a <http://purl.org/vocab/bio/0.1/Birth>;
+             <http://purl.org/vocab/bio/0.1/date> "1806-04-09";
+             <http://purl.org/vocab/bio/0.1/place> "Portsmouth, England" ],
+                 [
+             a <http://purl.org/vocab/bio/0.1/Death>;
+             <http://purl.org/vocab/bio/0.1/date> "1859-09-15" ];
+         <http://purl.org/vocab/bio/0.1/olb> "An important figure in the history of engineering, he was noted for the creation  of the Great Western Railway, a series of famous steamships, and important bridges.";
+         <http://purl.org/vocab/relationship/childOf>  [
+             a <http://xmlns.com/foaf/0.1/Person>;
+             <http://xmlns.com/foaf/0.1/isPrimaryTopicOf> <http://en.wikipedia.org/wiki/Marc_Isambard_Brunel>;
+             <http://xmlns.com/foaf/0.1/name> "Marc Isambard Brunel";
+             <http://xmlns.com/foaf/0.1/title> "Sir" ];
+         <http://www.commonobjects.example.org/gmlrssschoolHomepage> <http://www.unicaen.fr/>;
+         <http://xmlns.com/foaf/0.1/birthday> "04-09";
+         <http://xmlns.com/foaf/0.1/depiction> <http://upload.wikimedia.org/wikipedia/en/thumb/4/43/IKBrunelChains.jpg/387px-IKBrunelChains.jpg>;
+         <http://xmlns.com/foaf/0.1/gender> "male";
+         <http://xmlns.com/foaf/0.1/isPrimaryTopicOf> <http://en.wikipedia.org/wiki/Isambard_Kingdom_Brunel>;
+         <http://xmlns.com/foaf/0.1/name> "Isambard Kingdom Brunel" .
+    
+#ENDS

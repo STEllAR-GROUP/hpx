@@ -1,0 +1,15 @@
+     @prefix : <http://www.w3.org/2000/01/rdf-schema#> .
+     @prefix CIM: <http://iec.ch/TC57/2003/CIM-schema-cim10#> .
+     @prefix cims: <http://iec.ch/TC57/1999/rdf-schema-extensions-19990926#> .
+     @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+    
+    <http://iec.ch/TC57/2003/CIM-schema-cim10#AirCompressor.DrivenBy_C%20ombustionTurbine>     a rdf:Property;
+         cims:inverseRoleName <http://iec.ch/TC57/2003/CIM-schema-cim10#CombustionTurbine.Dri%20ves_AirCompressor>;
+         cims:multiplicity <http://iec.ch/TC57/1999/rdf-schema-extensions-19990926#M:1>;
+         cims:profile "Nerc";
+         :comment """A CAES air compressor is driven by combustion
+turbine""";
+         :domain CIM:AirCompressor;
+         :label "DrivenBy_CombustionTurbine"@en;
+         :range CIM:CombustionTurbine .
+    

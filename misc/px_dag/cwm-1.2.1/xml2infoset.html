@@ -1,0 +1,255 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module xml2infoset</title>
+<style type="text/css"><!--
+TT { font-family: lucidatypewriter, lucida console, courier }
+--></style></head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>xml2infoset</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/devel/WWW/2000/10/swap/xml2infoset.py">/devel/WWW/2000/10/swap/xml2infoset.py</a></font></td></tr></table>
+    <p><tt>#&nbsp;&nbsp;&nbsp;A&nbsp;parser&nbsp;for&nbsp;XML&nbsp;built&nbsp;on&nbsp;the&nbsp;xmllib&nbsp;XML&nbsp;parser.<br>
+#&nbsp;&nbsp;&nbsp;Hacked&nbsp;down&nbsp;from&nbsp;Dan&nbsp;Connolly's&nbsp;RDF&nbsp;parser&nbsp;which&nbsp;is&nbsp;much&nbsp;more&nbsp;complicated!<br>
+#&nbsp;&nbsp;&nbsp;To&nbsp;do:<br>
+#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Option&nbsp;of&nbsp;ordered&nbsp;listing&nbsp;with&nbsp;daml&nbsp;list&nbsp;of&nbsp;children&nbsp;&nbsp;and/or&nbsp;attrs!!<br>
+#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Option&nbsp;of&nbsp;replacing&nbsp;ln&nbsp;and&nbsp;ns&nbsp;with&nbsp;rdf:type&nbsp;ns#e_ln&nbsp;and&nbsp;ns#a_ln&nbsp;-&nbsp;see&nbsp;TAG&nbsp;issue&nbsp;(6?)<br>
+#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;maybe&nbsp;think&nbsp;about&nbsp;some&nbsp;real&nbsp;connection&nbsp;to&nbsp;XPath&nbsp;or&nbsp;infoset&nbsp;models&nbsp;and&nbsp;vocabulary</tt></p>
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#fffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="notation3.html">notation3</a><br>
+<a href="string.html">string</a><br>
+</td><td width="25%" valign=top><a href="urllib.html">urllib</a><br>
+<a href="urlparse.html">urlparse</a><br>
+</td><td width="25%" valign=top><a href="xmllib.html">xmllib</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="xmllib.html#XMLParser">xmllib.XMLParser</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="xml2infoset.html#RDFXMLParser">RDFXMLParser</a>
+</font></dt></dl>
+</dd>
+</dl>
+ 
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="RDFXMLParser">class <strong>RDFXMLParser</strong></a>(<a href="xmllib.html#XMLParser">xmllib.XMLParser</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2>&nbsp;</td></tr>
+<tr><td>&nbsp;&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="RDFXMLParser-__init__"><strong>__init__</strong></a>(self, sink, thisURI, **kw)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-_generate"><strong>_generate</strong></a>(self, str<font color="#909090">=''</font>)</dt><dd><tt>The&nbsp;string&nbsp;is&nbsp;just&nbsp;a&nbsp;debugging&nbsp;hint&nbsp;really</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-close"><strong>close</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-flush"><strong>flush</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-handle_cdata"><strong>handle_cdata</strong></a>(self, data)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-handle_comment"><strong>handle_comment</strong></a>(self, data)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-handle_data"><strong>handle_data</strong></a>(self, data)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-handle_doctype"><strong>handle_doctype</strong></a>(self, tag, pubid, syslit, data)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-handle_proc"><strong>handle_proc</strong></a>(self, name, data)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-handle_xml"><strong>handle_xml</strong></a>(self, encoding, standalone)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-load"><strong>load</strong></a>(self, uri, _baseURI<font color="#909090">=''</font>)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-pso"><strong>pso</strong></a>(self, pred, subj, obj)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-psv"><strong>psv</strong></a>(self, pred, subj, obj)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-syntax_error"><strong>syntax_error</strong></a>(self, message)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-tag2uri"><strong>tag2uri</strong></a>(self, str)</dt><dd><tt>&nbsp;Generate&nbsp;URI&nbsp;from&nbsp;tagname</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-unknown_charref"><strong>unknown_charref</strong></a>(self, ref)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-unknown_endtag"><strong>unknown_endtag</strong></a>(self, tag)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-unknown_entityref"><strong>unknown_entityref</strong></a>(self, ref)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-unknown_starttag"><strong>unknown_starttag</strong></a>(self, tag, attrs)</dt><dd><tt>&nbsp;Handle&nbsp;start&nbsp;tag.&nbsp;We&nbsp;register&nbsp;none&nbsp;so&nbsp;all&nbsp;are&nbsp;unknown</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-uriref"><strong>uriref</strong></a>(self, str)</dt><dd><tt>&nbsp;Generate&nbsp;uri&nbsp;from&nbsp;uriref&nbsp;in&nbsp;this&nbsp;document</tt></dd></dl>
+
+<hr>
+Data and non-method functions defined here:<br>
+<dl><dt><strong>__doc__</strong> = None</dl>
+
+<dl><dt><strong>__module__</strong> = 'xml2infoset'<dd><tt>str(object)&nbsp;-&gt;&nbsp;string<br>
+&nbsp;<br>
+Return&nbsp;a&nbsp;nice&nbsp;string&nbsp;representation&nbsp;of&nbsp;the&nbsp;object.<br>
+If&nbsp;the&nbsp;argument&nbsp;is&nbsp;a&nbsp;string,&nbsp;the&nbsp;return&nbsp;value&nbsp;is&nbsp;the&nbsp;same&nbsp;object.</tt></dl>
+
+<hr>
+Methods inherited from <a href="xmllib.html#XMLParser">xmllib.XMLParser</a>:<br>
+<dl><dt><a name="RDFXMLParser-_XMLParser__fixclass"><strong>_XMLParser__fixclass</strong></a> = __fixclass(self, kl)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-_XMLParser__fixdict"><strong>_XMLParser__fixdict</strong></a> = __fixdict(self, dict)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-_XMLParser__fixelements"><strong>_XMLParser__fixelements</strong></a> = __fixelements(self)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-feed"><strong>feed</strong></a>(self, data)</dt><dd><tt>#&nbsp;Interface&nbsp;--&nbsp;feed&nbsp;some&nbsp;data&nbsp;to&nbsp;the&nbsp;parser.&nbsp;&nbsp;Call&nbsp;this&nbsp;as<br>
+#&nbsp;often&nbsp;as&nbsp;you&nbsp;want,&nbsp;with&nbsp;as&nbsp;little&nbsp;or&nbsp;as&nbsp;much&nbsp;text&nbsp;as&nbsp;you<br>
+#&nbsp;want&nbsp;(may&nbsp;include&nbsp;'\n').&nbsp;&nbsp;(This&nbsp;just&nbsp;saves&nbsp;the&nbsp;text,&nbsp;all&nbsp;the<br>
+#&nbsp;processing&nbsp;is&nbsp;done&nbsp;by&nbsp;<a href="#RDFXMLParser-goahead">goahead</a>().)</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-finish_endtag"><strong>finish_endtag</strong></a>(self, tag)</dt><dd><tt>#&nbsp;Internal&nbsp;--&nbsp;finish&nbsp;processing&nbsp;of&nbsp;end&nbsp;tag</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-finish_starttag"><strong>finish_starttag</strong></a>(self, tagname, attrdict, method)</dt><dd><tt>#&nbsp;Internal&nbsp;--&nbsp;finish&nbsp;processing&nbsp;of&nbsp;start&nbsp;tag</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-goahead"><strong>goahead</strong></a>(self, end)</dt><dd><tt>#&nbsp;Internal&nbsp;--&nbsp;handle&nbsp;data&nbsp;as&nbsp;far&nbsp;as&nbsp;reasonable.&nbsp;&nbsp;May&nbsp;leave&nbsp;state<br>
+#&nbsp;and&nbsp;data&nbsp;to&nbsp;be&nbsp;processed&nbsp;by&nbsp;a&nbsp;subsequent&nbsp;call.&nbsp;&nbsp;If&nbsp;'end'&nbsp;is<br>
+#&nbsp;true,&nbsp;force&nbsp;handling&nbsp;all&nbsp;data&nbsp;as&nbsp;if&nbsp;followed&nbsp;by&nbsp;EOF&nbsp;marker.</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-handle_charref"><strong>handle_charref</strong></a>(self, name)</dt><dd><tt>#&nbsp;Example&nbsp;--&nbsp;handle&nbsp;character&nbsp;reference,&nbsp;no&nbsp;need&nbsp;to&nbsp;override</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-handle_endtag"><strong>handle_endtag</strong></a>(self, tag, method)</dt><dd><tt>#&nbsp;Overridable&nbsp;--&nbsp;handle&nbsp;end&nbsp;tag</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-handle_starttag"><strong>handle_starttag</strong></a>(self, tag, method, attrs)</dt><dd><tt>#&nbsp;Overridable&nbsp;--&nbsp;handle&nbsp;start&nbsp;tag</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-parse_attributes"><strong>parse_attributes</strong></a>(self, tag, i, j)</dt><dd><tt>#&nbsp;Internal&nbsp;--&nbsp;parse&nbsp;attributes&nbsp;between&nbsp;i&nbsp;and&nbsp;j</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-parse_cdata"><strong>parse_cdata</strong></a>(self, i)</dt><dd><tt>#&nbsp;Internal&nbsp;--&nbsp;handle&nbsp;CDATA&nbsp;tag,&nbsp;return&nbsp;length&nbsp;or&nbsp;-1&nbsp;if&nbsp;not&nbsp;terminated</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-parse_comment"><strong>parse_comment</strong></a>(self, i)</dt><dd><tt>#&nbsp;Internal&nbsp;--&nbsp;parse&nbsp;comment,&nbsp;return&nbsp;length&nbsp;or&nbsp;-1&nbsp;if&nbsp;not&nbsp;terminated</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-parse_doctype"><strong>parse_doctype</strong></a>(self, res)</dt><dd><tt>#&nbsp;Internal&nbsp;--&nbsp;handle&nbsp;DOCTYPE&nbsp;tag,&nbsp;return&nbsp;length&nbsp;or&nbsp;-1&nbsp;if&nbsp;not&nbsp;terminated</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-parse_endtag"><strong>parse_endtag</strong></a>(self, i)</dt><dd><tt>#&nbsp;Internal&nbsp;--&nbsp;parse&nbsp;endtag</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-parse_proc"><strong>parse_proc</strong></a>(self, i)</dt><dd><tt>#&nbsp;Internal&nbsp;--&nbsp;handle&nbsp;a&nbsp;processing&nbsp;instruction&nbsp;tag</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-parse_starttag"><strong>parse_starttag</strong></a>(self, i)</dt><dd><tt>#&nbsp;Internal&nbsp;--&nbsp;handle&nbsp;starttag,&nbsp;return&nbsp;length&nbsp;or&nbsp;-1&nbsp;if&nbsp;not&nbsp;terminated</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-reset"><strong>reset</strong></a>(self)</dt><dd><tt>#&nbsp;Interface&nbsp;--&nbsp;reset&nbsp;this&nbsp;instance.&nbsp;&nbsp;Loses&nbsp;all&nbsp;unprocessed&nbsp;data</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-setliteral"><strong>setliteral</strong></a>(self, *args)</dt><dd><tt>#&nbsp;For&nbsp;derived&nbsp;classes&nbsp;only&nbsp;--&nbsp;enter&nbsp;literal&nbsp;mode&nbsp;(CDATA)</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-setnomoretags"><strong>setnomoretags</strong></a>(self)</dt><dd><tt>#&nbsp;For&nbsp;derived&nbsp;classes&nbsp;only&nbsp;--&nbsp;enter&nbsp;literal&nbsp;mode&nbsp;(CDATA)&nbsp;till&nbsp;EOF</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-translate_references"><strong>translate_references</strong></a>(self, data, all<font color="#909090">=1</font>)</dt><dd><tt>#&nbsp;Interface&nbsp;--&nbsp;translate&nbsp;references</tt></dd></dl>
+
+<hr>
+Data and non-method functions inherited from <a href="xmllib.html#XMLParser">xmllib.XMLParser</a>:<br>
+<dl><dt><strong>_XMLParser__accept_missing_endtag_name</strong> = 0<dd><tt>int(x[,&nbsp;base])&nbsp;-&gt;&nbsp;integer<br>
+&nbsp;<br>
+Convert&nbsp;a&nbsp;string&nbsp;or&nbsp;number&nbsp;to&nbsp;an&nbsp;integer,&nbsp;if&nbsp;possible.&nbsp;&nbsp;A&nbsp;floating&nbsp;point<br>
+argument&nbsp;will&nbsp;be&nbsp;truncated&nbsp;towards&nbsp;zero&nbsp;(this&nbsp;does&nbsp;not&nbsp;include&nbsp;a&nbsp;string<br>
+representation&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;number!)&nbsp;&nbsp;When&nbsp;converting&nbsp;a&nbsp;string,&nbsp;use<br>
+the&nbsp;optional&nbsp;base.&nbsp;&nbsp;It&nbsp;is&nbsp;an&nbsp;error&nbsp;to&nbsp;supply&nbsp;a&nbsp;base&nbsp;when&nbsp;converting&nbsp;a<br>
+non-string.</tt></dl>
+
+<dl><dt><strong>_XMLParser__accept_unquoted_attributes</strong> = 0<dd><tt>int(x[,&nbsp;base])&nbsp;-&gt;&nbsp;integer<br>
+&nbsp;<br>
+Convert&nbsp;a&nbsp;string&nbsp;or&nbsp;number&nbsp;to&nbsp;an&nbsp;integer,&nbsp;if&nbsp;possible.&nbsp;&nbsp;A&nbsp;floating&nbsp;point<br>
+argument&nbsp;will&nbsp;be&nbsp;truncated&nbsp;towards&nbsp;zero&nbsp;(this&nbsp;does&nbsp;not&nbsp;include&nbsp;a&nbsp;string<br>
+representation&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;number!)&nbsp;&nbsp;When&nbsp;converting&nbsp;a&nbsp;string,&nbsp;use<br>
+the&nbsp;optional&nbsp;base.&nbsp;&nbsp;It&nbsp;is&nbsp;an&nbsp;error&nbsp;to&nbsp;supply&nbsp;a&nbsp;base&nbsp;when&nbsp;converting&nbsp;a<br>
+non-string.</tt></dl>
+
+<dl><dt><strong>_XMLParser__accept_utf8</strong> = 0<dd><tt>int(x[,&nbsp;base])&nbsp;-&gt;&nbsp;integer<br>
+&nbsp;<br>
+Convert&nbsp;a&nbsp;string&nbsp;or&nbsp;number&nbsp;to&nbsp;an&nbsp;integer,&nbsp;if&nbsp;possible.&nbsp;&nbsp;A&nbsp;floating&nbsp;point<br>
+argument&nbsp;will&nbsp;be&nbsp;truncated&nbsp;towards&nbsp;zero&nbsp;(this&nbsp;does&nbsp;not&nbsp;include&nbsp;a&nbsp;string<br>
+representation&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;number!)&nbsp;&nbsp;When&nbsp;converting&nbsp;a&nbsp;string,&nbsp;use<br>
+the&nbsp;optional&nbsp;base.&nbsp;&nbsp;It&nbsp;is&nbsp;an&nbsp;error&nbsp;to&nbsp;supply&nbsp;a&nbsp;base&nbsp;when&nbsp;converting&nbsp;a<br>
+non-string.</tt></dl>
+
+<dl><dt><strong>_XMLParser__map_case</strong> = 0<dd><tt>int(x[,&nbsp;base])&nbsp;-&gt;&nbsp;integer<br>
+&nbsp;<br>
+Convert&nbsp;a&nbsp;string&nbsp;or&nbsp;number&nbsp;to&nbsp;an&nbsp;integer,&nbsp;if&nbsp;possible.&nbsp;&nbsp;A&nbsp;floating&nbsp;point<br>
+argument&nbsp;will&nbsp;be&nbsp;truncated&nbsp;towards&nbsp;zero&nbsp;(this&nbsp;does&nbsp;not&nbsp;include&nbsp;a&nbsp;string<br>
+representation&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;number!)&nbsp;&nbsp;When&nbsp;converting&nbsp;a&nbsp;string,&nbsp;use<br>
+the&nbsp;optional&nbsp;base.&nbsp;&nbsp;It&nbsp;is&nbsp;an&nbsp;error&nbsp;to&nbsp;supply&nbsp;a&nbsp;base&nbsp;when&nbsp;converting&nbsp;a<br>
+non-string.</tt></dl>
+
+<dl><dt><strong>_XMLParser__xml_namespace_attributes</strong> = {'ns': None, 'prefix': None, 'src': None}<dd><tt>dict()&nbsp;-&gt;&nbsp;new&nbsp;empty&nbsp;dictionary.<br>
+dict(mapping)&nbsp;-&gt;&nbsp;new&nbsp;dictionary&nbsp;initialized&nbsp;from&nbsp;a&nbsp;mapping&nbsp;object's<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(key,&nbsp;value)&nbsp;pairs.<br>
+dict(seq)&nbsp;-&gt;&nbsp;new&nbsp;dictionary&nbsp;initialized&nbsp;as&nbsp;if&nbsp;via:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;d&nbsp;=&nbsp;{}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;k,&nbsp;v&nbsp;in&nbsp;seq:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d[k]&nbsp;=&nbsp;v</tt></dl>
+
+<dl><dt><strong>attributes</strong> = {}<dd><tt>dict()&nbsp;-&gt;&nbsp;new&nbsp;empty&nbsp;dictionary.<br>
+dict(mapping)&nbsp;-&gt;&nbsp;new&nbsp;dictionary&nbsp;initialized&nbsp;from&nbsp;a&nbsp;mapping&nbsp;object's<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(key,&nbsp;value)&nbsp;pairs.<br>
+dict(seq)&nbsp;-&gt;&nbsp;new&nbsp;dictionary&nbsp;initialized&nbsp;as&nbsp;if&nbsp;via:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;d&nbsp;=&nbsp;{}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;k,&nbsp;v&nbsp;in&nbsp;seq:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d[k]&nbsp;=&nbsp;v</tt></dl>
+
+<dl><dt><strong>elements</strong> = {}<dd><tt>dict()&nbsp;-&gt;&nbsp;new&nbsp;empty&nbsp;dictionary.<br>
+dict(mapping)&nbsp;-&gt;&nbsp;new&nbsp;dictionary&nbsp;initialized&nbsp;from&nbsp;a&nbsp;mapping&nbsp;object's<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(key,&nbsp;value)&nbsp;pairs.<br>
+dict(seq)&nbsp;-&gt;&nbsp;new&nbsp;dictionary&nbsp;initialized&nbsp;as&nbsp;if&nbsp;via:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;d&nbsp;=&nbsp;{}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;k,&nbsp;v&nbsp;in&nbsp;seq:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d[k]&nbsp;=&nbsp;v</tt></dl>
+
+<dl><dt><strong>entitydefs</strong> = {'amp': '&amp;#38;', 'apos': '&amp;#39;', 'gt': '&amp;#62;', 'lt': '&amp;#60;', 'quot': '&amp;#34;'}<dd><tt>dict()&nbsp;-&gt;&nbsp;new&nbsp;empty&nbsp;dictionary.<br>
+dict(mapping)&nbsp;-&gt;&nbsp;new&nbsp;dictionary&nbsp;initialized&nbsp;from&nbsp;a&nbsp;mapping&nbsp;object's<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(key,&nbsp;value)&nbsp;pairs.<br>
+dict(seq)&nbsp;-&gt;&nbsp;new&nbsp;dictionary&nbsp;initialized&nbsp;as&nbsp;if&nbsp;via:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;d&nbsp;=&nbsp;{}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;k,&nbsp;v&nbsp;in&nbsp;seq:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d[k]&nbsp;=&nbsp;v</tt></dl>
+
+</td></tr></table></td></tr></table>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;&nbsp;</td>
+<td width="100%"><dl><dt><a name="-test"><strong>test</strong></a>(args<font color="#909090">=None</font>)</dt></dl>
+</td></tr></table>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;&nbsp;</td>
+<td width="100%"><strong>DAML_ONT_NS</strong> = 'http://www.daml.org/2000/10/daml-ont#'<br>
+<strong>DPO_NS</strong> = 'http://www.daml.org/2001/03/daml+oil#'<br>
+<strong>LITERAL</strong> = 2<br>
+<strong>List_NS</strong> = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'<br>
+<strong>NS</strong> = 'http://www.w3.org/2000/10/swap/xml#'<br>
+<strong>RDF_IS</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#is')<br>
+<strong>RDF_NS_URI</strong> = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'<br>
+<strong>RDF_Specification</strong> = 'http://www.w3.org/TR/REC-rdf-syntax/'<br>
+<strong>STATE_DESCRIPTION</strong> = 'Description (have subject)'<br>
+<strong>STATE_LIST</strong> = 'within list'<br>
+<strong>STATE_LITERAL</strong> = 'within literal'<br>
+<strong>STATE_NOT_RDF</strong> = 'not RDF'<br>
+<strong>STATE_NOVALUE</strong> = 'no value'<br>
+<strong>STATE_NO_SUBJECT</strong> = 'no context'<br>
+<strong>STATE_VALUE</strong> = 'plain value'<br>
+<strong>SYMBOL</strong> = 0<br>
+<strong>__file__</strong> = './xml2infoset.py'<br>
+<strong>__name__</strong> = 'xml2infoset'<br>
+<strong>chatty</strong> = 0</td></tr></table>
+</body></html>

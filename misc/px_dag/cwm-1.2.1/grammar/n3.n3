@@ -1,0 +1,309 @@
+# Notation3 in Notation3
+# Context Free Grammar without tokenization
+#
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix cfg: <http://www.w3.org/2000/10/swap/grammar/bnf#>.
+@prefix rul: <http://www.w3.org/2000/10/swap/grammar/bnf-rules#>.
+@prefix : <http://www.w3.org/2000/10/swap/grammar/n3#>.
+@prefix n3: <http://www.w3.org/2000/10/swap/grammar/n3#>.
+@prefix list: <http://www.w3.org/2000/10/swap/list#>.
+@prefix string: <http://www.w3.org/2000/10/swap/string#>.
+@keywords a, is, of.
+
+
+# Issues:
+# - string token regexp not right  FIXED
+# - tokenizing rules in general: whitespace are not defined in n3.n3
+#   and it would be nice for the *entire* syntax description to be in RDF.
+# - encoding really needs specifying
+# - @keywords affects tokenizing
+# - comments (tokenizer deals with)
+# - We assume ASCII, in fact should use not notNameChars for i18n
+
+# tokenizing:
+# Absorb anything until end of regexp, then stil white space
+#  period followed IMMEDIATELY by an opener or name char is taken as "!".
+#  Except after a "." used instead of in those circumstances,
+#	ws may be inserted between tokens.
+#  WS MUST be inserted between tokens where ambiguity would arise.
+#  (possible ending characters of one and beginning characters overlap)
+#
+
+<> cfg:syntaxFor [ cfg:internetMediaType 
+		<http://www.w3.org/2003/mediatypes#application/n3>].
+
+# <> rdfsem:semanticsFor ""   .....
+
+# __________________________________________________________________
+#
+# The N3 Full Grammar
+
+
+language a cfg:Language;
+	cfg:document	document;
+	cfg:whiteSpace	"@@@@@".
+
+
+document a rul:Used;
+	cfg:mustBeOneSequence(
+	
+		(
+#			[ cfg:zeroOrMore declaration ]
+#			[ cfg:zeroOrMore universal ]
+#			[ cfg:zeroOrMore existential ]
+			statements_optional
+			cfg:eof
+		)
+	).
+
+statements_optional cfg:mustBeOneSequence (() ( statement "." statements_optional ) ).
+
+# Formula does NOT need period on last statement
+
+formulacontent cfg:mustBeOneSequence (
+		( statementlist )
+	).
+
+
+statementlist cfg:mustBeOneSequence (
+		( )
+		( statement statementtail )
+	).
+
+statementtail cfg:mustBeOneSequence (
+		( )
+		( "." statementlist )
+	).
+
+
+statement  cfg:mustBeOneSequence (
+		(declaration)
+		(universal)
+		(existential)
+		(simpleStatement)
+	).
+
+universal cfg:mustBeOneSequence (
+		(
+			"@forAll"
+			[ cfg:commaSeparatedListOf symbol ]
+		)).
+
+existential cfg:mustBeOneSequence(
+		(	 "@forSome" 
+			 [ cfg:commaSeparatedListOf symbol ]
+		)).
+
+
+declaration cfg:mustBeOneSequence(
+		( "@base" explicituri  )
+		( "@prefix" prefix explicituri  )
+		( "@keywords" [ cfg:commaSeparatedListOf barename ] )
+	).
+
+
+simpleStatement cfg:mustBeOneSequence(( subject propertylist )).
+
+propertylist cfg:mustBeOneSequence (
+		( )
+		( verb  object objecttail propertylisttail )
+	).
+
+propertylisttail cfg:mustBeOneSequence (
+		( )
+		( ";" propertylist )
+	).
+
+
+objecttail cfg:mustBeOneSequence (
+		( )
+		( ","   object objecttail )
+	).
+
+
+verb cfg:mustBeOneSequence (
+		( expression )
+		( "@has" expression )
+		( "@is" expression "@of" )
+		( "@a" )
+		( "=" )
+		( "=>" )
+		( "<=" ) 
+	).
+
+subject cfg:mustBeOneSequence ((expression)).
+
+object cfg:mustBeOneSequence ((expression)).
+
+expression cfg:mustBeOneSequence(
+		( pathitem pathtail )
+	).
+
+pathtail cfg:mustBeOneSequence(
+		(  )
+		( "!" expression )
+		( "^" expression )
+	).
+
+
+pathitem cfg:mustBeOneSequence (
+		( symbol )
+		( "{" formulacontent "}" )
+		( quickvariable )
+		( numericliteral )
+		( literal )
+		( "[" propertylist "]"  )
+		(  "("  pathlist ")"  )
+                ( boolean )
+#		( "@this" )	  #  Deprocated.  Was allowed for this log:forAll x
+).
+
+
+boolean cfg:mustBeOneSequence (
+                ( "@true" )
+                ( "@false" )
+) .
+
+pathlist cfg:mustBeOneSequence (() (expression pathlist)).
+
+symbol cfg:mustBeOneSequence (
+		(explicituri)
+		(qname)
+	).
+
+
+numericliteral cfg:mustBeOneSequence (
+          ( integer )
+          ( double )
+          ( decimal )
+) .
+
+literal cfg:mustBeOneSequence(( string dtlang)).
+
+dtlang cfg:mustBeOneSequence(  ()  ("@" langcode)  ("^^" symbol)).
+
+
+#______________________________________________________________________
+#
+#   TERMINALS
+#
+# "canStartWith" actually gives "a" for the whole class of alpha characters
+# and "0" for any of the digits 0-9.  This is used to build the branching
+# tables.
+# 
+integer 	cfg:matches	"""[-+]?[0-9]+""";
+		cfg:canStartWith 	"0", "-", "+".
+double	cfg:matches	"""[-+]?[0-9]+(\\.[0-9]+)?([eE][-+]?[0-9]+)""";
+		cfg:canStartWith 	"0", "-", "+".
+decimal	cfg:matches	"""[-+]?[0-9]+(\\.[0-9]+)?""";
+		cfg:canStartWith 	"0", "-", "+".
+
+#numericliteral	cfg:matches	"""[-+]?[0-9]+(\\.[0-9]+)?(e[-+]?[0-9]+)?""";
+#		cfg:canStartWith 	"0", "-", "+".
+
+explicituri 	cfg:matches 	"<[^>]*>";
+		cfg:canStartWith 	"<".
+
+prefix 		cfg:matches  	"([A-Z_a-z\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u02ff\u0370-\u037d\u037f-\u1fff\u200c-\u200d\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd\U00010000-\U000effff][\\-0-9A-Z_a-z\u00b7\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u037d\u037f-\u1fff\u200c-\u200d\u203f-\u2040\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd\U00010000-\U000effff]*)?:";
+		cfg:canStartWith 	"a", "_", ":".  # @@ etc unicode
+
+qname 		cfg:matches  	"(([A-Z_a-z\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u02ff\u0370-\u037d\u037f-\u1fff\u200c-\u200d\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd\U00010000-\U000effff][\\-0-9A-Z_a-z\u00b7\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u037d\u037f-\u1fff\u200c-\u200d\u203f-\u2040\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd\U00010000-\U000effff]*)?:)?[A-Z_a-z\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u02ff\u0370-\u037d\u037f-\u1fff\u200c-\u200d\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd\U00010000-\U000effff][\\-0-9A-Z_a-z\u00b7\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u037d\u037f-\u1fff\u200c-\u200d\u203f-\u2040\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd\U00010000-\U000effff]*";
+		cfg:canStartWith 	"a", "_", ":".  # @@ etc unicode
+
+# ASCII version:
+#barename 	cfg:matches  	"[a-zA-Z_][a-zA-Z0-9_]*";  # subset of qname
+#		cfg:canStartWith 	"a", "_".  # @@ etc
+
+# This is the XML1.1
+barename 	cfg:matches  	"[A-Z_a-z\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u02ff\u0370-\u037d\u037f-\u1fff\u200c-\u200d\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd\U00010000-\U000effff][\\-0-9A-Z_a-z\u00b7\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u037d\u037f-\u1fff\u200c-\u200d\u203f-\u2040\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd\U00010000-\U000effff]*";
+                cfg:canStartWith 	"a", "_".  # @@ etc .
+
+# as far as I can tell, the regexp should be
+# barename 	cfg:matches  	"[A-Z_a-z\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u02ff\u0370-\u037d\u037f-\u1fff\u200c-\u200d\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd\U00010000-\U000effff][\\-0-9A-Z_a-z\u00b7\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u037d\u037f-\u1fff\u200c-\u200d\u203f-\u2040\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd\U00010000-\U000effff]*" .
+#
+
+quickvariable 	cfg:matches  	"\\?[A-Z_a-z\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u02ff\u0370-\u037d\u037f-\u1fff\u200c-\u200d\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd\U00010000-\U000effff][\\-0-9A-Z_a-z\u00b7\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u037d\u037f-\u1fff\u200c-\u200d\u203f-\u2040\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd\U00010000-\U000effff]*";  # ? barename
+		cfg:canStartWith 	"?".  #
+
+# Maybe dtlang should just be part of string regexp?
+# Whitespace is not allowed
+
+# was: "[a-zA-Z][a-zA-Z0-9]*(-[a-zA-Z0-9]+)?";
+langcode	cfg:matches  	"[a-z]+(-[a-z0-9]+)*"; # http://www.w3.org/TR/rdf-testcases/#language
+		cfg:canStartWith 	"a".
+
+
+#               raw regexp single quoted would be   "([^"]|(\\"))*"
+# See:
+# 	$ PYTHONPATH=$SWAP python
+# 	>>> import tokenize 
+# 	>>> import notation3
+# 	>>> print notation3.stringToN3(tokenize.Double3)
+# 	"[^\"\\\\]*(?:(?:\\\\.|\"(?!\"\"))[^\"\\\\]*)*\"\"\""
+# 	>>> print notation3.stringToN3(tokenize.Double)
+# 	"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\""
+# After that we have to prefix with one or three opening \"  which
+# the python regexp doesn't have them.
+#
+# string3		cfg:matches		"\"\"\"[^\"\\\\]*(?:(?:\\\\.|\"(?!\"\"))[^\"\\\\]*)*\"\"\"".
+# string1		cfg:matches		"\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"".
+
+string		cfg:matches		"(\"\"\"[^\"\\\\]*(?:(?:\\\\.|\"(?!\"\"))[^\"\\\\]*)*\"\"\")|(\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\")";
+		cfg:canStartWith 	"\"".
+
+#____________________________________________________
+
+#  Axioms reducing the shortcut CFG terms to cfg:musBeOneSequence.
+
+{ ?x cfg:zeroOrMore ?y } => {?x cfg:mustBeOneSequence ( () (?y ?x) ) }.
+
+
+{ ?x cfg:commaSeparatedPeriodTerminatedListOf ?y } =>
+{
+	?x cfg:mustBeOneSequence (
+		( "." )
+		( ?y [cfg:CSLTail ?y]  )
+	)
+}.
+
+{ ?x cfg:CSLTail ?y } =>
+{
+	?x cfg:mustBeOneSequence (
+		( "." )
+		( "," ?y ?x )
+	)
+}.
+
+# Without the period
+
+{ ?x cfg:commaSeparatedListOf ?y } =>
+{
+	?x cfg:mustBeOneSequence (
+		(  )
+		( ?y [cfg:CSLTail2 ?y]  )
+	)
+}.
+
+{ ?x cfg:CSLTail2 ?y } =>
+{
+	?x cfg:mustBeOneSequence (
+		( )
+		( "," ?y ?x )
+	)
+}.
+
+
+#  labelling of things which do not have explicit URIs:
+
+{ ?x cfg:zeroOrMore [ cfg:label ?y].
+	( ?y "_s" ) string:concatenation ?str } => { ?x cfg:label ?str }.
+
+{ ?x cfg:commaSeparatedPeriodTerminatedListOf [ cfg:label ?y].
+	( ?y "_csl" ) string:concatenation ?str } => { ?x cfg:label ?str }.
+
+{ ?x cfg:CSLTail [ cfg:label ?y].
+	( ?y "_necsl" ) string:concatenation ?str } => { ?x cfg:label ?str }.
+
+
+#ends

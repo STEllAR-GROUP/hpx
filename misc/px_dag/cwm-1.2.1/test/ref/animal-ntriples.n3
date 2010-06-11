@@ -1,0 +1,13 @@
+    
+    <http://example.com/swap/test/animal.rdf#Animal>     <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
+    
+    <http://example.com/swap/test/animal.rdf#Animal>     <http://www.daml.org/2000/12/daml+oil#restrictedBy> _:L10C8 .
+    
+    <http://example.com/swap/test/animal.rdf#Animal>     <http://www.w3.org/2000/01/rdf-schema#label> "Animal" .
+    
+    _:L10C8     <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.daml.org/2000/12/daml+oil#Restriction> .
+    
+    _:L10C8     <http://www.daml.org/2000/12/daml+oil#cardinality> "2" .
+    
+    _:L10C8     <http://www.daml.org/2000/12/daml+oil#onProperty> <http://example.com/swap/test/animal.rdf#parent> .
+    

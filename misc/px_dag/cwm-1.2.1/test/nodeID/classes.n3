@@ -1,0 +1,9 @@
+@prefix log:  <http://www.w3.org/2000/10/swap/log#> .
+
+@forSome :_x .
+
+:yosi :likes :_x;
+   :eats :_x .
+
+:_x a :Thing;
+  :color :red .

@@ -1,0 +1,1154 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module sparql2cwm</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>sparql2cwm</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/syosi/cvs-trunk/WWW/2000/10/swap/sparql2cwm.py">/home/syosi/cvs-trunk/WWW/2000/10/swap/sparql2cwm.py</a></font></td></tr></table>
+    <p><tt>sparql2cwm<br>
+&nbsp;<br>
+This&nbsp;is&nbsp;meant&nbsp;to&nbsp;be&nbsp;used&nbsp;with&nbsp;a&nbsp;sparql.n3&nbsp;based&nbsp;SPARQL&nbsp;parser,&nbsp;to&nbsp;add&nbsp;the&nbsp;query&nbsp;to&nbsp;cwm<br>
+&nbsp;<br>
+$Id:&nbsp;sparql2cwm.py,v&nbsp;1.24&nbsp;2007/08/06&nbsp;16:13:56&nbsp;syosi&nbsp;Exp&nbsp;$</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#fffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="diag.html">diag</a><br>
+</td><td width="25%" valign=top><a href="uripath.html">uripath</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="__builtin__.html#dict">__builtin__.dict</a>(<a href="__builtin__.html#object">__builtin__.object</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="sparql2cwm.html#multimap">multimap</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="__builtin__.html#object">__builtin__.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="sparql2cwm.html#AST">AST</a>
+</font></dt><dt><font face="helvetica, arial"><a href="sparql2cwm.html#Coerce">Coerce</a>
+</font></dt><dt><font face="helvetica, arial"><a href="sparql2cwm.html#NotNot">NotNot</a>
+</font></dt><dt><font face="helvetica, arial"><a href="sparql2cwm.html#RulesMaker">RulesMaker</a>
+</font></dt><dt><font face="helvetica, arial"><a href="sparql2cwm.html#productionHandler">productionHandler</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="sparql2cwm.html#FilterExpr">FilterExpr</a>
+</font></dt><dt><font face="helvetica, arial"><a href="sparql2cwm.html#FromSparql">FromSparql</a>
+</font></dt></dl>
+</dd>
+</dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="__builtin__.html#tuple">__builtin__.tuple</a>(<a href="__builtin__.html#object">__builtin__.object</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="sparql2cwm.html#TripleHolder">TripleHolder</a>
+</font></dt><dt><font face="helvetica, arial"><a href="sparql2cwm.html#andExtra">andExtra</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="__builtin__.html#unicode">__builtin__.unicode</a>(<a href="__builtin__.html#basestring">__builtin__.basestring</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="sparql2cwm.html#typedThing">typedThing</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="AST">class <strong>AST</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="AST-__init__"><strong>__init__</strong></a>(self, ast, sink<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="AST-abbr"><strong>abbr</strong></a>(self, prodURI)</dt></dl>
+
+<dl><dt><a name="AST-onFinish"><strong>onFinish</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="AST-onStart"><strong>onStart</strong></a>(self, prod)</dt></dl>
+
+<dl><dt><a name="AST-onToken"><strong>onToken</strong></a>(self, prod, tok)</dt></dl>
+
+<dl><dt><a name="AST-prod"><strong>prod</strong></a>(self, thing)</dt></dl>
+
+<dl><dt><a name="AST-run"><strong>run</strong></a>(self)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'AST' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Coerce">class <strong>Coerce</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Coerce-__call__"><strong>__call__</strong></a>(self, expr, coerce<font color="#909090">=True</font>)</dt></dl>
+
+<dl><dt><a name="Coerce-__init__"><strong>__init__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Coerce-atom"><strong>atom</strong></a>(self, p, coerce)</dt></dl>
+
+<dl><dt><a name="Coerce-on_And"><strong>on_And</strong></a>(self, p, coerce)</dt></dl>
+
+<dl><dt><a name="Coerce-on_BoolVal"><strong>on_BoolVal</strong></a>(self, p, coerce)</dt></dl>
+
+<dl><dt><a name="Coerce-on_Boolean"><strong>on_Boolean</strong></a>(self, p, coerce)</dt></dl>
+
+<dl><dt><a name="Coerce-on_Bound"><strong>on_Bound</strong></a>(self, p, coerce)</dt></dl>
+
+<dl><dt><a name="Coerce-on_Not"><strong>on_Not</strong></a>(self, p, coerce)</dt></dl>
+
+<dl><dt><a name="Coerce-on_Or"><strong>on_Or</strong></a>(self, p, coerce)</dt></dl>
+
+<dl><dt><a name="Coerce-on_Regex"><strong>on_Regex</strong></a>(self, p, coerce)</dt></dl>
+
+<dl><dt><a name="Coerce-on_function"><strong>on_function</strong></a>(self, p, coerce)</dt></dl>
+
+<dl><dt><a name="Coerce-on_isBlank"><strong>on_isBlank</strong></a>(self, p, coerce)</dt></dl>
+
+<dl><dt><a name="Coerce-on_isLiteral"><strong>on_isLiteral</strong></a>(self, p, coerce)</dt></dl>
+
+<dl><dt><a name="Coerce-on_isURI"><strong>on_isURI</strong></a>(self, p, coerce)</dt></dl>
+
+<dl><dt><a name="Coerce-on_math"><strong>on_math</strong></a>(self, p, coerce)</dt></dl>
+
+<dl><dt><a name="Coerce-on_pred"><strong>on_pred</strong></a>(self, p, coerce)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'Coerce' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="FilterExpr">class <strong>FilterExpr</strong></a>(<a href="sparql2cwm.html#productionHandler">productionHandler</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="sparql2cwm.html#FilterExpr">FilterExpr</a></dd>
+<dd><a href="sparql2cwm.html#productionHandler">productionHandler</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="FilterExpr-__init__"><strong>__init__</strong></a>(self, store, parent)</dt></dl>
+
+<dl><dt><a name="FilterExpr-arithmetic"><strong>arithmetic</strong></a>(self, p, op)</dt></dl>
+
+<dl><dt><a name="FilterExpr-compare"><strong>compare</strong></a>(self, p, op)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_And"><strong>on_And</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_BoolVal"><strong>on_BoolVal</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_Boolean"><strong>on_Boolean</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_Bound"><strong>on_Bound</strong></a>(self, var)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_Literal"><strong>on_Literal</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_Not"><strong>on_Not</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_Number"><strong>on_Number</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_Or"><strong>on_Or</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_Regex"><strong>on_Regex</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_String"><strong>on_String</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_Var"><strong>on_Var</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_add"><strong>on_add</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_datatype"><strong>on_datatype</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_divide"><strong>on_divide</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_equal"><strong>on_equal</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_funcName"><strong>on_funcName</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_function"><strong>on_function</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_greater"><strong>on_greater</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_isNotURI"><strong>on_isNotURI</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_isURI"><strong>on_isURI</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_lang"><strong>on_lang</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_less"><strong>on_less</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_multiply"><strong>on_multiply</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_notBound"><strong>on_notBound</strong></a>(self, var)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_notEqual"><strong>on_notEqual</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_notGreater"><strong>on_notGreater</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_notLess"><strong>on_notLess</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_subtract"><strong>on_subtract</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-on_symbol"><strong>on_symbol</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FilterExpr-typeConvert"><strong>typeConvert</strong></a>(self, keepGoing, uri, val)</dt></dl>
+
+<hr>
+Methods inherited from <a href="sparql2cwm.html#productionHandler">productionHandler</a>:<br>
+<dl><dt><a name="FilterExpr-prod"><strong>prod</strong></a>(self, production)</dt></dl>
+
+<hr>
+Data and other attributes inherited from <a href="sparql2cwm.html#productionHandler">productionHandler</a>:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'productionHandler' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="FromSparql">class <strong>FromSparql</strong></a>(<a href="sparql2cwm.html#productionHandler">productionHandler</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="sparql2cwm.html#FromSparql">FromSparql</a></dd>
+<dd><a href="sparql2cwm.html#productionHandler">productionHandler</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="FromSparql-__init__"><strong>__init__</strong></a>(self, store, formula<font color="#909090">=None</font>, ve<font color="#909090">=0</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="FromSparql-absolutize"><strong>absolutize</strong></a>(self, uri)</dt></dl>
+
+<dl><dt><a name="FromSparql-anonymize"><strong>anonymize</strong></a>(self, formula, uri<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="FromSparql-makePatterns"><strong>makePatterns</strong></a>(self, f, node, patterns)</dt></dl>
+
+<dl><dt><a name="FromSparql-new_bnode"><strong>new_bnode</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_AdditiveExpression"><strong>on_AdditiveExpression</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_ArgList"><strong>on_ArgList</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_AskQuery"><strong>on_AskQuery</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_BaseDecl"><strong>on_BaseDecl</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_BlankNode"><strong>on_BlankNode</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_BlankNodePropertyList"><strong>on_BlankNodePropertyList</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_BooleanLiteral"><strong>on_BooleanLiteral</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_BrackettedExpression"><strong>on_BrackettedExpression</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_BuiltinCallExpression"><strong>on_BuiltinCallExpression</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_CallExpression"><strong>on_CallExpression</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_Collection"><strong>on_Collection</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_ConditionalAndExpression"><strong>on_ConditionalAndExpression</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_ConditionalOrExpression"><strong>on_ConditionalOrExpression</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_Constraint"><strong>on_Constraint</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_ConstructQuery"><strong>on_ConstructQuery</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_ConstructTemplate"><strong>on_ConstructTemplate</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_DatasetClause"><strong>on_DatasetClause</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_DefaultGraphClause"><strong>on_DefaultGraphClause</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_DescribeQuery"><strong>on_DescribeQuery</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_Expression"><strong>on_Expression</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_FunctionCall"><strong>on_FunctionCall</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_GraphGraphPattern"><strong>on_GraphGraphPattern</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_GraphNode"><strong>on_GraphNode</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_GraphPatternList"><strong>on_GraphPatternList</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_GraphPatternListTail"><strong>on_GraphPatternListTail</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_GraphPatternNotTriples"><strong>on_GraphPatternNotTriples</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_GraphPatternNotTriplesList"><strong>on_GraphPatternNotTriplesList</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_GraphPatternNotTriplesTail"><strong>on_GraphPatternNotTriplesTail</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_GraphTerm"><strong>on_GraphTerm</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_GroupGraphPattern"><strong>on_GroupGraphPattern</strong></a>(self, p, fromFilter<font color="#909090">=False</font>)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_GroupOrUnionGraphPattern"><strong>on_GroupOrUnionGraphPattern</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_IRIref"><strong>on_IRIref</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_IRIrefOrFunc"><strong>on_IRIrefOrFunc</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_LimitClause"><strong>on_LimitClause</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_MultiplicativeExpression"><strong>on_MultiplicativeExpression</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_NamedGraphClause"><strong>on_NamedGraphClause</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_NamelessBlank"><strong>on_NamelessBlank</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_NumericExpression"><strong>on_NumericExpression</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_NumericLiteral"><strong>on_NumericLiteral</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_Object"><strong>on_Object</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_ObjectList"><strong>on_ObjectList</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_OffsetClause"><strong>on_OffsetClause</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_OptionalGraphPattern"><strong>on_OptionalGraphPattern</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_OrderClause"><strong>on_OrderClause</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_OrderCondition"><strong>on_OrderCondition</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_PrefixDecl"><strong>on_PrefixDecl</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_PrimaryExpression"><strong>on_PrimaryExpression</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_Prolog"><strong>on_Prolog</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_PropertyList"><strong>on_PropertyList</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_PropertyListNotEmpty"><strong>on_PropertyListNotEmpty</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_QName"><strong>on_QName</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_Query"><strong>on_Query</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_RDFLiteral"><strong>on_RDFLiteral</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_RDFTerm"><strong>on_RDFTerm</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_RDFTermOrFunc"><strong>on_RDFTermOrFunc</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_RegexExpression"><strong>on_RegexExpression</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_RelationalExpression"><strong>on_RelationalExpression</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_SelectQuery"><strong>on_SelectQuery</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_SolutionModifier"><strong>on_SolutionModifier</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_SourceSelector"><strong>on_SourceSelector</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_String"><strong>on_String</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_Triples"><strong>on_Triples</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_Triples1"><strong>on_Triples1</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_Triples2"><strong>on_Triples2</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_Triples3"><strong>on_Triples3</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_TriplesNode"><strong>on_TriplesNode</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_UnaryExpression"><strong>on_UnaryExpression</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_ValueLogical"><strong>on_ValueLogical</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_Var"><strong>on_Var</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_VarOrBlankNodeOrIRIref"><strong>on_VarOrBlankNodeOrIRIref</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_VarOrIRIref"><strong>on_VarOrIRIref</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_VarOrTerm"><strong>on_VarOrTerm</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_Verb"><strong>on_Verb</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on_WhereClause"><strong>on_WhereClause</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QAND_E____QValueLogical_E__C"><strong>on__O_QAND_E____QValueLogical_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QASC_E__Or__QDESC_E__C"><strong>on__O_QASC_E__Or__QDESC_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QASC_E__Or__QDESC_E____QBrackettedExpression_E__C"><strong>on__O_QASC_E__Or__QDESC_E____QBrackettedExpression_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QBrackettedExpression_E__Or__QCallExpression_E__C"><strong>on__O_QBrackettedExpression_E__Or__QCallExpression_E__C</strong></a>(self, p)</dt><dd><tt>see&nbsp;normalize&nbsp;for&nbsp;an&nbsp;explanation&nbsp;of&nbsp;what&nbsp;we&nbsp;are&nbsp;doing</tt></dd></dl>
+
+<dl><dt><a name="FromSparql-on__O_QCOMMA_E____QExpression_E__C"><strong>on__O_QCOMMA_E____QExpression_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QCOMMA_E____QObjectList_E__C"><strong>on__O_QCOMMA_E____QObjectList_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QDTYPE_E____QIRIref_E__C"><strong>on__O_QDTYPE_E____QIRIref_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QDefaultGraphClause_E__Or__QNamedGraphClause_E__C"><strong>on__O_QDefaultGraphClause_E__Or__QNamedGraphClause_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QDot_E_Opt___QGraphPatternList_E__C"><strong>on__O_QDot_E_Opt___QGraphPatternList_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QDot_E____QGraphPatternList_E__C"><strong>on__O_QDot_E____QGraphPatternList_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QDot_E____QTriples_E_Opt_C"><strong>on__O_QDot_E____QTriples_E_Opt_C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QEQUAL_E____QNumericExpression_E__Or__QNEQUAL_E____QNumericExpression_E__Or__QLT_E____QNumericExpression_E__Or__QGT_E____QNumericExpression_E__Or__QLE_E____QNumericExpression_E__Or__QGE_E____QNumericExpression_E__C"><strong>on__O_QEQUAL_E____QNumericExpression_E__Or__QNEQUAL_E____QNumericExpression_E__Or__QLT_E____QNumericExpression_E__Or__QGT_E____QNumericExpression_E__Or__QLE_E____QNumericExpression_E__Or__QGE_E____QNumericExpression_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QExpression_E____QCOMMA_E____QExpression_E_Star_C"><strong>on__O_QExpression_E____QCOMMA_E____QExpression_E_Star_C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QFunctionCall_E__Or__QVar_E__Or__QBrackettedExpression_E__C"><strong>on__O_QFunctionCall_E__Or__QVar_E__Or__QBrackettedExpression_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QLANGTAG_E__Or__QDTYPE_E____QIRIref_E__C"><strong>on__O_QLANGTAG_E__Or__QDTYPE_E____QIRIref_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QOR_E____QConditionalAndExpression_E__C"><strong>on__O_QOR_E____QConditionalAndExpression_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QPLUS_E____QMultiplicativeExpression_E__Or__QMINUS_E____QMultiplicativeExpression_E__C"><strong>on__O_QPLUS_E____QMultiplicativeExpression_E__Or__QMINUS_E____QMultiplicativeExpression_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QSEMI_E____QPropertyList_E__C"><strong>on__O_QSEMI_E____QPropertyList_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QSelectQuery_E__Or__QConstructQuery_E__Or__QDescribeQuery_E__Or__QAskQuery_E__C"><strong>on__O_QSelectQuery_E__Or__QConstructQuery_E__Or__QDescribeQuery_E__Or__QAskQuery_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QTIMES_E____QUnaryExpression_E__Or__QDIVIDE_E____QUnaryExpression_E__C"><strong>on__O_QTIMES_E____QUnaryExpression_E__Or__QDIVIDE_E____QUnaryExpression_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QTriples1_E____QGraphPatternListTail_E__Or__QGraphPatternNotTriples_E____QGraphPatternNotTriplesTail_E__C"><strong>on__O_QTriples1_E____QGraphPatternListTail_E__Or__QGraphPatternNotTriples_E____QGraphPatternNotTriplesTail_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QUNION_E____QGroupGraphPattern_E__C"><strong>on__O_QUNION_E____QGroupGraphPattern_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QVarOrIRIref_E_Plus_Or__QTIMES_E__C"><strong>on__O_QVarOrIRIref_E_Plus_Or__QTIMES_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__O_QVar_E_Plus_Or__QTIMES_E__C"><strong>on__O_QVar_E_Plus_Or__QTIMES_E__C</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__QArgList_E_Opt"><strong>on__QArgList_E_Opt</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__QBaseDecl_E_Opt"><strong>on__QBaseDecl_E_Opt</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__QDISTINCT_E_Opt"><strong>on__QDISTINCT_E_Opt</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__QDatasetClause_E_Star"><strong>on__QDatasetClause_E_Star</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__QDot_E_Opt"><strong>on__QDot_E_Opt</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__QGraphNode_E_Plus"><strong>on__QGraphNode_E_Plus</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__QGraphNode_E_Star"><strong>on__QGraphNode_E_Star</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__QLimitClause_E_Opt"><strong>on__QLimitClause_E_Opt</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__QOffsetClause_E_Opt"><strong>on__QOffsetClause_E_Opt</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__QOrderClause_E_Opt"><strong>on__QOrderClause_E_Opt</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__QOrderCondition_E_Plus"><strong>on__QOrderCondition_E_Plus</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__QPrefixDecl_E_Star"><strong>on__QPrefixDecl_E_Star</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__QPropertyListNotEmpty_E_Opt"><strong>on__QPropertyListNotEmpty_E_Opt</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__QTriples_E_Opt"><strong>on__QTriples_E_Opt</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__QVarOrIRIref_E_Plus"><strong>on__QVarOrIRIref_E_Plus</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__QVar_E_Plus"><strong>on__QVar_E_Plus</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__QWHERE_E_Opt"><strong>on__QWHERE_E_Opt</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__QWhereClause_E_Opt"><strong>on__QWhereClause_E_Opt</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__Q_O_QAND_E____QValueLogical_E__C_E_Star"><strong>on__Q_O_QAND_E____QValueLogical_E__C_E_Star</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__Q_O_QCOMMA_E____QExpression_E__C_E_Opt"><strong>on__Q_O_QCOMMA_E____QExpression_E__C_E_Opt</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__Q_O_QCOMMA_E____QExpression_E__C_E_Star"><strong>on__Q_O_QCOMMA_E____QExpression_E__C_E_Star</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__Q_O_QCOMMA_E____QObjectList_E__C_E_Opt"><strong>on__Q_O_QCOMMA_E____QObjectList_E__C_E_Opt</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__Q_O_QDot_E____QGraphPatternList_E__C_E_Opt"><strong>on__Q_O_QDot_E____QGraphPatternList_E__C_E_Opt</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__Q_O_QDot_E____QTriples_E_Opt_C_E_Opt"><strong>on__Q_O_QDot_E____QTriples_E_Opt_C_E_Opt</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__Q_O_QEQUAL_E____QNumericExpression_E__Or__QNEQUAL_E____QNumericExpression_E__Or__QLT_E____QNumericExpression_E__Or__QGT_E____QNumericExpression_E__Or__QLE_E____QNumericExpression_E__Or__QGE_E____QNumericExpression_E__C_E_Opt"><strong>on__Q_O_QEQUAL_E____QNumericExpression_E__Or__QNEQUAL_E____QNumericExpression_E__Or__QLT_E____QNumericExpression_E__Or__QGT_E____QNumericExpression_E__Or__QLE_E____QNumericExpression_E__Or__QGE_E____QNumericExpression_E__C_E_Opt</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__Q_O_QExpression_E____QCOMMA_E____QExpression_E_Star_C_E_Opt"><strong>on__Q_O_QExpression_E____QCOMMA_E____QExpression_E_Star_C_E_Opt</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__Q_O_QLANGTAG_E__Or__QDTYPE_E____QIRIref_E__C_E_Opt"><strong>on__Q_O_QLANGTAG_E__Or__QDTYPE_E____QIRIref_E__C_E_Opt</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__Q_O_QOR_E____QConditionalAndExpression_E__C_E_Star"><strong>on__Q_O_QOR_E____QConditionalAndExpression_E__C_E_Star</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__Q_O_QPLUS_E____QMultiplicativeExpression_E__Or__QMINUS_E____QMultiplicativeExpression_E__C_E_Star"><strong>on__Q_O_QPLUS_E____QMultiplicativeExpression_E__Or__QMINUS_E____QMultiplicativeExpression_E__C_E_Star</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__Q_O_QSEMI_E____QPropertyList_E__C_E_Opt"><strong>on__Q_O_QSEMI_E____QPropertyList_E__C_E_Opt</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__Q_O_QTIMES_E____QUnaryExpression_E__Or__QDIVIDE_E____QUnaryExpression_E__C_E_Star"><strong>on__Q_O_QTIMES_E____QUnaryExpression_E__Or__QDIVIDE_E____QUnaryExpression_E__C_E_Star</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__Q_O_QTriples1_E____QGraphPatternListTail_E__Or__QGraphPatternNotTriples_E____QGraphPatternNotTriplesTail_E__C_E_Opt"><strong>on__Q_O_QTriples1_E____QGraphPatternListTail_E__Or__QGraphPatternNotTriples_E____QGraphPatternNotTriplesTail_E__C_E_Opt</strong></a>(self, p)</dt></dl>
+
+<dl><dt><a name="FromSparql-on__Q_O_QUNION_E____QGroupGraphPattern_E__C_E_Star"><strong>on__Q_O_QUNION_E____QGroupGraphPattern_E__C_E_Star</strong></a>(self, p)</dt></dl>
+
+<hr>
+Methods inherited from <a href="sparql2cwm.html#productionHandler">productionHandler</a>:<br>
+<dl><dt><a name="FromSparql-prod"><strong>prod</strong></a>(self, production)</dt></dl>
+
+<hr>
+Data and other attributes inherited from <a href="sparql2cwm.html#productionHandler">productionHandler</a>:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'productionHandler' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="NotNot">class <strong>NotNot</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>This&nbsp;class&nbsp;is&nbsp;used&nbsp;to&nbsp;figure&nbsp;out&nbsp;the&nbsp;inverses&nbsp;of&nbsp;all&nbsp;SPARQL&nbsp;boolean&nbsp;tests,&nbsp;and&nbsp;invert&nbsp;all&nbsp;functions<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="NotNot-__call__"><strong>__call__</strong></a>(self, expr, inv<font color="#909090">=False</font>, Ored<font color="#909090">=False</font>)</dt></dl>
+
+<dl><dt><a name="NotNot-__init__"><strong>__init__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="NotNot-atom"><strong>atom</strong></a>(self, p, inv, ored)</dt></dl>
+
+<dl><dt><a name="NotNot-expr"><strong>expr</strong></a>(self, p, inv, ored)</dt></dl>
+
+<dl><dt><a name="NotNot-on_And"><strong>on_And</strong></a>(self, p, inv, ored)</dt></dl>
+
+<dl><dt><a name="NotNot-on_BoolVal"><strong>on_BoolVal</strong></a>(self, p, inv, ored)</dt></dl>
+
+<dl><dt><a name="NotNot-on_Not"><strong>on_Not</strong></a>(self, p, inv, ored)</dt></dl>
+
+<dl><dt><a name="NotNot-on_Or"><strong>on_Or</strong></a>(self, p, inv, ored)</dt></dl>
+
+<dl><dt><a name="NotNot-on_Regex"><strong>on_Regex</strong></a>(self, p, inv, ored)</dt></dl>
+
+<dl><dt><a name="NotNot-on_notMatches"><strong>on_notMatches</strong></a>(self, p, inv)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'NotNot' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>inverse_operators</strong> = {'Bound': 'notBound', 'equal': 'notEqual', 'greater': 'notGreater', 'isBlank': 'isNotBlank', 'isLiteral': 'isNotLiteral', 'isNotBlank': 'isBlank', 'isNotLiteral': 'isLiteral', 'isNotURI': 'isURI', 'isURI': 'isNotURI', 'less': 'notLess', ...}</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="RulesMaker">class <strong>RulesMaker</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="RulesMaker-__init__"><strong>__init__</strong></a>(self, ns)</dt></dl>
+
+<dl><dt><a name="RulesMaker-find_vars"><strong>find_vars</strong></a>(self, vars, f)</dt></dl>
+
+<dl><dt><a name="RulesMaker-implications"><strong>implications</strong></a>(self, query, formula, totalResult)</dt></dl>
+
+<dl><dt><a name="RulesMaker-matching_subformula"><strong>matching_subformula</strong></a>(self, retF, illegals, F)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'RulesMaker' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="TripleHolder">class <strong>TripleHolder</strong></a>(<a href="__builtin__.html#tuple">__builtin__.tuple</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="sparql2cwm.html#TripleHolder">TripleHolder</a></dd>
+<dd><a href="__builtin__.html#tuple">__builtin__.tuple</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Static methods defined here:<br>
+<dl><dt><a name="TripleHolder-__new__"><strong>__new__</strong></a>(cls, *args, **keywords)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<hr>
+Methods inherited from <a href="__builtin__.html#tuple">__builtin__.tuple</a>:<br>
+<dl><dt><a name="TripleHolder-__add__"><strong>__add__</strong></a>(...)</dt><dd><tt>x.<a href="#TripleHolder-__add__">__add__</a>(y)&nbsp;&lt;==&gt;&nbsp;x+y</tt></dd></dl>
+
+<dl><dt><a name="TripleHolder-__contains__"><strong>__contains__</strong></a>(...)</dt><dd><tt>x.<a href="#TripleHolder-__contains__">__contains__</a>(y)&nbsp;&lt;==&gt;&nbsp;y&nbsp;in&nbsp;x</tt></dd></dl>
+
+<dl><dt><a name="TripleHolder-__eq__"><strong>__eq__</strong></a>(...)</dt><dd><tt>x.<a href="#TripleHolder-__eq__">__eq__</a>(y)&nbsp;&lt;==&gt;&nbsp;x==y</tt></dd></dl>
+
+<dl><dt><a name="TripleHolder-__ge__"><strong>__ge__</strong></a>(...)</dt><dd><tt>x.<a href="#TripleHolder-__ge__">__ge__</a>(y)&nbsp;&lt;==&gt;&nbsp;x&gt;=y</tt></dd></dl>
+
+<dl><dt><a name="TripleHolder-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#TripleHolder-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="TripleHolder-__getitem__"><strong>__getitem__</strong></a>(...)</dt><dd><tt>x.<a href="#TripleHolder-__getitem__">__getitem__</a>(y)&nbsp;&lt;==&gt;&nbsp;x[y]</tt></dd></dl>
+
+<dl><dt><a name="TripleHolder-__getnewargs__"><strong>__getnewargs__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="TripleHolder-__getslice__"><strong>__getslice__</strong></a>(...)</dt><dd><tt>x.<a href="#TripleHolder-__getslice__">__getslice__</a>(i,&nbsp;j)&nbsp;&lt;==&gt;&nbsp;x[i:j]<br>
+&nbsp;<br>
+Use&nbsp;of&nbsp;negative&nbsp;indices&nbsp;is&nbsp;not&nbsp;supported.</tt></dd></dl>
+
+<dl><dt><a name="TripleHolder-__gt__"><strong>__gt__</strong></a>(...)</dt><dd><tt>x.<a href="#TripleHolder-__gt__">__gt__</a>(y)&nbsp;&lt;==&gt;&nbsp;x&gt;y</tt></dd></dl>
+
+<dl><dt><a name="TripleHolder-__hash__"><strong>__hash__</strong></a>(...)</dt><dd><tt>x.<a href="#TripleHolder-__hash__">__hash__</a>()&nbsp;&lt;==&gt;&nbsp;hash(x)</tt></dd></dl>
+
+<dl><dt><a name="TripleHolder-__iter__"><strong>__iter__</strong></a>(...)</dt><dd><tt>x.<a href="#TripleHolder-__iter__">__iter__</a>()&nbsp;&lt;==&gt;&nbsp;iter(x)</tt></dd></dl>
+
+<dl><dt><a name="TripleHolder-__le__"><strong>__le__</strong></a>(...)</dt><dd><tt>x.<a href="#TripleHolder-__le__">__le__</a>(y)&nbsp;&lt;==&gt;&nbsp;x&lt;=y</tt></dd></dl>
+
+<dl><dt><a name="TripleHolder-__len__"><strong>__len__</strong></a>(...)</dt><dd><tt>x.<a href="#TripleHolder-__len__">__len__</a>()&nbsp;&lt;==&gt;&nbsp;len(x)</tt></dd></dl>
+
+<dl><dt><a name="TripleHolder-__lt__"><strong>__lt__</strong></a>(...)</dt><dd><tt>x.<a href="#TripleHolder-__lt__">__lt__</a>(y)&nbsp;&lt;==&gt;&nbsp;x&lt;y</tt></dd></dl>
+
+<dl><dt><a name="TripleHolder-__mul__"><strong>__mul__</strong></a>(...)</dt><dd><tt>x.<a href="#TripleHolder-__mul__">__mul__</a>(n)&nbsp;&lt;==&gt;&nbsp;x*n</tt></dd></dl>
+
+<dl><dt><a name="TripleHolder-__ne__"><strong>__ne__</strong></a>(...)</dt><dd><tt>x.<a href="#TripleHolder-__ne__">__ne__</a>(y)&nbsp;&lt;==&gt;&nbsp;x!=y</tt></dd></dl>
+
+<dl><dt><a name="TripleHolder-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#TripleHolder-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
+
+<dl><dt><a name="TripleHolder-__rmul__"><strong>__rmul__</strong></a>(...)</dt><dd><tt>x.<a href="#TripleHolder-__rmul__">__rmul__</a>(n)&nbsp;&lt;==&gt;&nbsp;n*x</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="andExtra">class <strong>andExtra</strong></a>(<a href="__builtin__.html#tuple">__builtin__.tuple</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="sparql2cwm.html#andExtra">andExtra</a></dd>
+<dd><a href="__builtin__.html#tuple">__builtin__.tuple</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="andExtra-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+<hr>
+Static methods defined here:<br>
+<dl><dt><a name="andExtra-__new__"><strong>__new__</strong></a>(cls, val, extra)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<hr>
+Methods inherited from <a href="__builtin__.html#tuple">__builtin__.tuple</a>:<br>
+<dl><dt><a name="andExtra-__add__"><strong>__add__</strong></a>(...)</dt><dd><tt>x.<a href="#andExtra-__add__">__add__</a>(y)&nbsp;&lt;==&gt;&nbsp;x+y</tt></dd></dl>
+
+<dl><dt><a name="andExtra-__contains__"><strong>__contains__</strong></a>(...)</dt><dd><tt>x.<a href="#andExtra-__contains__">__contains__</a>(y)&nbsp;&lt;==&gt;&nbsp;y&nbsp;in&nbsp;x</tt></dd></dl>
+
+<dl><dt><a name="andExtra-__eq__"><strong>__eq__</strong></a>(...)</dt><dd><tt>x.<a href="#andExtra-__eq__">__eq__</a>(y)&nbsp;&lt;==&gt;&nbsp;x==y</tt></dd></dl>
+
+<dl><dt><a name="andExtra-__ge__"><strong>__ge__</strong></a>(...)</dt><dd><tt>x.<a href="#andExtra-__ge__">__ge__</a>(y)&nbsp;&lt;==&gt;&nbsp;x&gt;=y</tt></dd></dl>
+
+<dl><dt><a name="andExtra-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#andExtra-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="andExtra-__getitem__"><strong>__getitem__</strong></a>(...)</dt><dd><tt>x.<a href="#andExtra-__getitem__">__getitem__</a>(y)&nbsp;&lt;==&gt;&nbsp;x[y]</tt></dd></dl>
+
+<dl><dt><a name="andExtra-__getnewargs__"><strong>__getnewargs__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="andExtra-__getslice__"><strong>__getslice__</strong></a>(...)</dt><dd><tt>x.<a href="#andExtra-__getslice__">__getslice__</a>(i,&nbsp;j)&nbsp;&lt;==&gt;&nbsp;x[i:j]<br>
+&nbsp;<br>
+Use&nbsp;of&nbsp;negative&nbsp;indices&nbsp;is&nbsp;not&nbsp;supported.</tt></dd></dl>
+
+<dl><dt><a name="andExtra-__gt__"><strong>__gt__</strong></a>(...)</dt><dd><tt>x.<a href="#andExtra-__gt__">__gt__</a>(y)&nbsp;&lt;==&gt;&nbsp;x&gt;y</tt></dd></dl>
+
+<dl><dt><a name="andExtra-__hash__"><strong>__hash__</strong></a>(...)</dt><dd><tt>x.<a href="#andExtra-__hash__">__hash__</a>()&nbsp;&lt;==&gt;&nbsp;hash(x)</tt></dd></dl>
+
+<dl><dt><a name="andExtra-__iter__"><strong>__iter__</strong></a>(...)</dt><dd><tt>x.<a href="#andExtra-__iter__">__iter__</a>()&nbsp;&lt;==&gt;&nbsp;iter(x)</tt></dd></dl>
+
+<dl><dt><a name="andExtra-__le__"><strong>__le__</strong></a>(...)</dt><dd><tt>x.<a href="#andExtra-__le__">__le__</a>(y)&nbsp;&lt;==&gt;&nbsp;x&lt;=y</tt></dd></dl>
+
+<dl><dt><a name="andExtra-__len__"><strong>__len__</strong></a>(...)</dt><dd><tt>x.<a href="#andExtra-__len__">__len__</a>()&nbsp;&lt;==&gt;&nbsp;len(x)</tt></dd></dl>
+
+<dl><dt><a name="andExtra-__lt__"><strong>__lt__</strong></a>(...)</dt><dd><tt>x.<a href="#andExtra-__lt__">__lt__</a>(y)&nbsp;&lt;==&gt;&nbsp;x&lt;y</tt></dd></dl>
+
+<dl><dt><a name="andExtra-__mul__"><strong>__mul__</strong></a>(...)</dt><dd><tt>x.<a href="#andExtra-__mul__">__mul__</a>(n)&nbsp;&lt;==&gt;&nbsp;x*n</tt></dd></dl>
+
+<dl><dt><a name="andExtra-__ne__"><strong>__ne__</strong></a>(...)</dt><dd><tt>x.<a href="#andExtra-__ne__">__ne__</a>(y)&nbsp;&lt;==&gt;&nbsp;x!=y</tt></dd></dl>
+
+<dl><dt><a name="andExtra-__rmul__"><strong>__rmul__</strong></a>(...)</dt><dd><tt>x.<a href="#andExtra-__rmul__">__rmul__</a>(n)&nbsp;&lt;==&gt;&nbsp;n*x</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="multimap">class <strong>multimap</strong></a>(<a href="__builtin__.html#dict">__builtin__.dict</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;class&nbsp;to&nbsp;handle&nbsp;where&nbsp;each&nbsp;element&nbsp;maps&nbsp;to&nbsp;a&nbsp;set&nbsp;of&nbsp;elements<br>
+&nbsp;<br>
+It&nbsp;would&nbsp;perhaps&nbsp;be&nbsp;simpler&nbsp;to&nbsp;have&nbsp;used&nbsp;<a href="__builtin__.html#dict">dict</a>.<a href="#multimap-setdefault">setdefault</a>(),&nbsp;but&nbsp;this&nbsp;has&nbsp;the<br>
+advantage&nbsp;of&nbsp;merging&nbsp;instead&nbsp;of&nbsp;nesting&nbsp;sets<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="sparql2cwm.html#multimap">multimap</a></dd>
+<dd><a href="__builtin__.html#dict">__builtin__.dict</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="multimap-__add__"><strong>__add__</strong></a>(self, other)</dt></dl>
+
+<dl><dt><a name="multimap-__init__"><strong>__init__</strong></a>(self, olddict<font color="#909090">={}</font>, **values)</dt></dl>
+
+<dl><dt><a name="multimap-__setitem__"><strong>__setitem__</strong></a>(self, key, value)</dt></dl>
+
+<dl><dt><a name="multimap-translate"><strong>translate</strong></a>(self, fromkey, tokey)</dt></dl>
+
+<dl><dt><a name="multimap-update"><strong>update</strong></a>(self, other<font color="#909090">={}</font>, **values)</dt></dl>
+
+<hr>
+Class methods defined here:<br>
+<dl><dt><a name="multimap-fromTuples"><strong>fromTuples</strong></a> = <a href="#multimap-_fromTuples">_fromTuples</a>(cls, iterator)<font color="#909090"><font face="helvetica, arial"> from <a href="__builtin__.html#type">__builtin__.type</a></font></font></dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'multimap' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>innerSet</strong> = &lt;class 'sparql2cwm.innerSet'&gt;</dl>
+
+<hr>
+Methods inherited from <a href="__builtin__.html#dict">__builtin__.dict</a>:<br>
+<dl><dt><a name="multimap-__cmp__"><strong>__cmp__</strong></a>(...)</dt><dd><tt>x.<a href="#multimap-__cmp__">__cmp__</a>(y)&nbsp;&lt;==&gt;&nbsp;cmp(x,y)</tt></dd></dl>
+
+<dl><dt><a name="multimap-__contains__"><strong>__contains__</strong></a>(...)</dt><dd><tt>D.<a href="#multimap-__contains__">__contains__</a>(k)&nbsp;-&gt;&nbsp;True&nbsp;if&nbsp;D&nbsp;has&nbsp;a&nbsp;key&nbsp;k,&nbsp;else&nbsp;False</tt></dd></dl>
+
+<dl><dt><a name="multimap-__delitem__"><strong>__delitem__</strong></a>(...)</dt><dd><tt>x.<a href="#multimap-__delitem__">__delitem__</a>(y)&nbsp;&lt;==&gt;&nbsp;del&nbsp;x[y]</tt></dd></dl>
+
+<dl><dt><a name="multimap-__eq__"><strong>__eq__</strong></a>(...)</dt><dd><tt>x.<a href="#multimap-__eq__">__eq__</a>(y)&nbsp;&lt;==&gt;&nbsp;x==y</tt></dd></dl>
+
+<dl><dt><a name="multimap-__ge__"><strong>__ge__</strong></a>(...)</dt><dd><tt>x.<a href="#multimap-__ge__">__ge__</a>(y)&nbsp;&lt;==&gt;&nbsp;x&gt;=y</tt></dd></dl>
+
+<dl><dt><a name="multimap-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#multimap-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="multimap-__getitem__"><strong>__getitem__</strong></a>(...)</dt><dd><tt>x.<a href="#multimap-__getitem__">__getitem__</a>(y)&nbsp;&lt;==&gt;&nbsp;x[y]</tt></dd></dl>
+
+<dl><dt><a name="multimap-__gt__"><strong>__gt__</strong></a>(...)</dt><dd><tt>x.<a href="#multimap-__gt__">__gt__</a>(y)&nbsp;&lt;==&gt;&nbsp;x&gt;y</tt></dd></dl>
+
+<dl><dt><a name="multimap-__hash__"><strong>__hash__</strong></a>(...)</dt><dd><tt>x.<a href="#multimap-__hash__">__hash__</a>()&nbsp;&lt;==&gt;&nbsp;hash(x)</tt></dd></dl>
+
+<dl><dt><a name="multimap-__iter__"><strong>__iter__</strong></a>(...)</dt><dd><tt>x.<a href="#multimap-__iter__">__iter__</a>()&nbsp;&lt;==&gt;&nbsp;iter(x)</tt></dd></dl>
+
+<dl><dt><a name="multimap-__le__"><strong>__le__</strong></a>(...)</dt><dd><tt>x.<a href="#multimap-__le__">__le__</a>(y)&nbsp;&lt;==&gt;&nbsp;x&lt;=y</tt></dd></dl>
+
+<dl><dt><a name="multimap-__len__"><strong>__len__</strong></a>(...)</dt><dd><tt>x.<a href="#multimap-__len__">__len__</a>()&nbsp;&lt;==&gt;&nbsp;len(x)</tt></dd></dl>
+
+<dl><dt><a name="multimap-__lt__"><strong>__lt__</strong></a>(...)</dt><dd><tt>x.<a href="#multimap-__lt__">__lt__</a>(y)&nbsp;&lt;==&gt;&nbsp;x&lt;y</tt></dd></dl>
+
+<dl><dt><a name="multimap-__ne__"><strong>__ne__</strong></a>(...)</dt><dd><tt>x.<a href="#multimap-__ne__">__ne__</a>(y)&nbsp;&lt;==&gt;&nbsp;x!=y</tt></dd></dl>
+
+<dl><dt><a name="multimap-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#multimap-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
+
+<dl><dt><a name="multimap-clear"><strong>clear</strong></a>(...)</dt><dd><tt>D.<a href="#multimap-clear">clear</a>()&nbsp;-&gt;&nbsp;None.&nbsp;&nbsp;Remove&nbsp;all&nbsp;items&nbsp;from&nbsp;D.</tt></dd></dl>
+
+<dl><dt><a name="multimap-copy"><strong>copy</strong></a>(...)</dt><dd><tt>D.<a href="#multimap-copy">copy</a>()&nbsp;-&gt;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;D</tt></dd></dl>
+
+<dl><dt><a name="multimap-get"><strong>get</strong></a>(...)</dt><dd><tt>D.<a href="#multimap-get">get</a>(k[,d])&nbsp;-&gt;&nbsp;D[k]&nbsp;if&nbsp;k&nbsp;in&nbsp;D,&nbsp;else&nbsp;d.&nbsp;&nbsp;d&nbsp;defaults&nbsp;to&nbsp;None.</tt></dd></dl>
+
+<dl><dt><a name="multimap-has_key"><strong>has_key</strong></a>(...)</dt><dd><tt>D.<a href="#multimap-has_key">has_key</a>(k)&nbsp;-&gt;&nbsp;True&nbsp;if&nbsp;D&nbsp;has&nbsp;a&nbsp;key&nbsp;k,&nbsp;else&nbsp;False</tt></dd></dl>
+
+<dl><dt><a name="multimap-items"><strong>items</strong></a>(...)</dt><dd><tt>D.<a href="#multimap-items">items</a>()&nbsp;-&gt;&nbsp;list&nbsp;of&nbsp;D's&nbsp;(key,&nbsp;value)&nbsp;pairs,&nbsp;as&nbsp;2-tuples</tt></dd></dl>
+
+<dl><dt><a name="multimap-iteritems"><strong>iteritems</strong></a>(...)</dt><dd><tt>D.<a href="#multimap-iteritems">iteritems</a>()&nbsp;-&gt;&nbsp;an&nbsp;iterator&nbsp;over&nbsp;the&nbsp;(key,&nbsp;value)&nbsp;items&nbsp;of&nbsp;D</tt></dd></dl>
+
+<dl><dt><a name="multimap-iterkeys"><strong>iterkeys</strong></a>(...)</dt><dd><tt>D.<a href="#multimap-iterkeys">iterkeys</a>()&nbsp;-&gt;&nbsp;an&nbsp;iterator&nbsp;over&nbsp;the&nbsp;keys&nbsp;of&nbsp;D</tt></dd></dl>
+
+<dl><dt><a name="multimap-itervalues"><strong>itervalues</strong></a>(...)</dt><dd><tt>D.<a href="#multimap-itervalues">itervalues</a>()&nbsp;-&gt;&nbsp;an&nbsp;iterator&nbsp;over&nbsp;the&nbsp;values&nbsp;of&nbsp;D</tt></dd></dl>
+
+<dl><dt><a name="multimap-keys"><strong>keys</strong></a>(...)</dt><dd><tt>D.<a href="#multimap-keys">keys</a>()&nbsp;-&gt;&nbsp;list&nbsp;of&nbsp;D's&nbsp;keys</tt></dd></dl>
+
+<dl><dt><a name="multimap-pop"><strong>pop</strong></a>(...)</dt><dd><tt>D.<a href="#multimap-pop">pop</a>(k[,d])&nbsp;-&gt;&nbsp;v,&nbsp;remove&nbsp;specified&nbsp;key&nbsp;and&nbsp;return&nbsp;the&nbsp;corresponding&nbsp;value<br>
+If&nbsp;key&nbsp;is&nbsp;not&nbsp;found,&nbsp;d&nbsp;is&nbsp;returned&nbsp;if&nbsp;given,&nbsp;otherwise&nbsp;KeyError&nbsp;is&nbsp;raised</tt></dd></dl>
+
+<dl><dt><a name="multimap-popitem"><strong>popitem</strong></a>(...)</dt><dd><tt>D.<a href="#multimap-popitem">popitem</a>()&nbsp;-&gt;&nbsp;(k,&nbsp;v),&nbsp;remove&nbsp;and&nbsp;return&nbsp;some&nbsp;(key,&nbsp;value)&nbsp;pair&nbsp;as&nbsp;a<br>
+2-<a href="__builtin__.html#tuple">tuple</a>;&nbsp;but&nbsp;raise&nbsp;KeyError&nbsp;if&nbsp;D&nbsp;is&nbsp;empty</tt></dd></dl>
+
+<dl><dt><a name="multimap-setdefault"><strong>setdefault</strong></a>(...)</dt><dd><tt>D.<a href="#multimap-setdefault">setdefault</a>(k[,d])&nbsp;-&gt;&nbsp;D.<a href="#multimap-get">get</a>(k,d),&nbsp;also&nbsp;set&nbsp;D[k]=d&nbsp;if&nbsp;k&nbsp;not&nbsp;in&nbsp;D</tt></dd></dl>
+
+<dl><dt><a name="multimap-values"><strong>values</strong></a>(...)</dt><dd><tt>D.<a href="#multimap-values">values</a>()&nbsp;-&gt;&nbsp;list&nbsp;of&nbsp;D's&nbsp;values</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="__builtin__.html#dict">__builtin__.dict</a>:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object&gt;<dd><tt>T.<a href="#multimap-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+<dl><dt><strong>fromkeys</strong> = &lt;built-in method fromkeys of type object&gt;<dd><tt><a href="__builtin__.html#dict">dict</a>.<a href="#multimap-fromkeys">fromkeys</a>(S[,v])&nbsp;-&gt;&nbsp;New&nbsp;<a href="__builtin__.html#dict">dict</a>&nbsp;with&nbsp;keys&nbsp;from&nbsp;S&nbsp;and&nbsp;values&nbsp;equal&nbsp;to&nbsp;v.<br>
+v&nbsp;defaults&nbsp;to&nbsp;None.</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="productionHandler">class <strong>productionHandler</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="productionHandler-prod"><strong>prod</strong></a>(self, production)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'productionHandler' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="typedThing">class <strong>typedThing</strong></a>(<a href="__builtin__.html#unicode">__builtin__.unicode</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="sparql2cwm.html#typedThing">typedThing</a></dd>
+<dd><a href="__builtin__.html#unicode">__builtin__.unicode</a></dd>
+<dd><a href="__builtin__.html#basestring">__builtin__.basestring</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="typedThing-__call__"><strong>__call__</strong></a>(self)</dt></dl>
+
+<hr>
+Static methods defined here:<br>
+<dl><dt><a name="typedThing-__new__"><strong>__new__</strong></a>(cls, val, retType<font color="#909090">=None</font>, ArgTypes<font color="#909090">=[]</font>, trueOnError<font color="#909090">=False</font>)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'typedThing' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+
+<hr>
+Methods inherited from <a href="__builtin__.html#unicode">__builtin__.unicode</a>:<br>
+<dl><dt><a name="typedThing-__add__"><strong>__add__</strong></a>(...)</dt><dd><tt>x.<a href="#typedThing-__add__">__add__</a>(y)&nbsp;&lt;==&gt;&nbsp;x+y</tt></dd></dl>
+
+<dl><dt><a name="typedThing-__cmp__"><strong>__cmp__</strong></a>(...)</dt><dd><tt>x.<a href="#typedThing-__cmp__">__cmp__</a>(y)&nbsp;&lt;==&gt;&nbsp;cmp(x,y)</tt></dd></dl>
+
+<dl><dt><a name="typedThing-__contains__"><strong>__contains__</strong></a>(...)</dt><dd><tt>x.<a href="#typedThing-__contains__">__contains__</a>(y)&nbsp;&lt;==&gt;&nbsp;y&nbsp;in&nbsp;x</tt></dd></dl>
+
+<dl><dt><a name="typedThing-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#typedThing-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="typedThing-__getitem__"><strong>__getitem__</strong></a>(...)</dt><dd><tt>x.<a href="#typedThing-__getitem__">__getitem__</a>(y)&nbsp;&lt;==&gt;&nbsp;x[y]</tt></dd></dl>
+
+<dl><dt><a name="typedThing-__getnewargs__"><strong>__getnewargs__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="typedThing-__getslice__"><strong>__getslice__</strong></a>(...)</dt><dd><tt>x.<a href="#typedThing-__getslice__">__getslice__</a>(i,&nbsp;j)&nbsp;&lt;==&gt;&nbsp;x[i:j]<br>
+&nbsp;<br>
+Use&nbsp;of&nbsp;negative&nbsp;indices&nbsp;is&nbsp;not&nbsp;supported.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-__hash__"><strong>__hash__</strong></a>(...)</dt><dd><tt>x.<a href="#typedThing-__hash__">__hash__</a>()&nbsp;&lt;==&gt;&nbsp;hash(x)</tt></dd></dl>
+
+<dl><dt><a name="typedThing-__len__"><strong>__len__</strong></a>(...)</dt><dd><tt>x.<a href="#typedThing-__len__">__len__</a>()&nbsp;&lt;==&gt;&nbsp;len(x)</tt></dd></dl>
+
+<dl><dt><a name="typedThing-__mod__"><strong>__mod__</strong></a>(...)</dt><dd><tt>x.<a href="#typedThing-__mod__">__mod__</a>(y)&nbsp;&lt;==&gt;&nbsp;x%y</tt></dd></dl>
+
+<dl><dt><a name="typedThing-__mul__"><strong>__mul__</strong></a>(...)</dt><dd><tt>x.<a href="#typedThing-__mul__">__mul__</a>(n)&nbsp;&lt;==&gt;&nbsp;x*n</tt></dd></dl>
+
+<dl><dt><a name="typedThing-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#typedThing-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
+
+<dl><dt><a name="typedThing-__rmod__"><strong>__rmod__</strong></a>(...)</dt><dd><tt>x.<a href="#typedThing-__rmod__">__rmod__</a>(y)&nbsp;&lt;==&gt;&nbsp;y%x</tt></dd></dl>
+
+<dl><dt><a name="typedThing-__rmul__"><strong>__rmul__</strong></a>(...)</dt><dd><tt>x.<a href="#typedThing-__rmul__">__rmul__</a>(n)&nbsp;&lt;==&gt;&nbsp;n*x</tt></dd></dl>
+
+<dl><dt><a name="typedThing-__str__"><strong>__str__</strong></a>(...)</dt><dd><tt>x.<a href="#typedThing-__str__">__str__</a>()&nbsp;&lt;==&gt;&nbsp;str(x)</tt></dd></dl>
+
+<dl><dt><a name="typedThing-capitalize"><strong>capitalize</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-capitalize">capitalize</a>()&nbsp;-&gt;&nbsp;<a href="__builtin__.html#unicode">unicode</a><br>
+&nbsp;<br>
+Return&nbsp;a&nbsp;capitalized&nbsp;version&nbsp;of&nbsp;S,&nbsp;i.e.&nbsp;make&nbsp;the&nbsp;first&nbsp;character<br>
+have&nbsp;upper&nbsp;case.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-center"><strong>center</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-center">center</a>(width[,&nbsp;fillchar])&nbsp;-&gt;&nbsp;<a href="__builtin__.html#unicode">unicode</a><br>
+&nbsp;<br>
+Return&nbsp;S&nbsp;centered&nbsp;in&nbsp;a&nbsp;Unicode&nbsp;string&nbsp;of&nbsp;length&nbsp;width.&nbsp;Padding&nbsp;is<br>
+done&nbsp;using&nbsp;the&nbsp;specified&nbsp;fill&nbsp;character&nbsp;(default&nbsp;is&nbsp;a&nbsp;space)</tt></dd></dl>
+
+<dl><dt><a name="typedThing-count"><strong>count</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-count">count</a>(sub[,&nbsp;start[,&nbsp;end]])&nbsp;-&gt;&nbsp;int<br>
+&nbsp;<br>
+Return&nbsp;the&nbsp;number&nbsp;of&nbsp;occurrences&nbsp;of&nbsp;substring&nbsp;sub&nbsp;in&nbsp;Unicode&nbsp;string<br>
+S[start:end].&nbsp;&nbsp;Optional&nbsp;arguments&nbsp;start&nbsp;and&nbsp;end&nbsp;are<br>
+interpreted&nbsp;as&nbsp;in&nbsp;slice&nbsp;notation.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-decode"><strong>decode</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-decode">decode</a>([encoding[,errors]])&nbsp;-&gt;&nbsp;string&nbsp;or&nbsp;<a href="__builtin__.html#unicode">unicode</a><br>
+&nbsp;<br>
+Decodes&nbsp;S&nbsp;using&nbsp;the&nbsp;codec&nbsp;registered&nbsp;for&nbsp;encoding.&nbsp;encoding&nbsp;defaults<br>
+to&nbsp;the&nbsp;default&nbsp;encoding.&nbsp;errors&nbsp;may&nbsp;be&nbsp;given&nbsp;to&nbsp;set&nbsp;a&nbsp;different&nbsp;error<br>
+handling&nbsp;scheme.&nbsp;Default&nbsp;is&nbsp;'strict'&nbsp;meaning&nbsp;that&nbsp;encoding&nbsp;errors&nbsp;raise<br>
+a&nbsp;UnicodeDecodeError.&nbsp;Other&nbsp;possible&nbsp;values&nbsp;are&nbsp;'ignore'&nbsp;and&nbsp;'replace'<br>
+as&nbsp;well&nbsp;as&nbsp;any&nbsp;other&nbsp;name&nbsp;registerd&nbsp;with&nbsp;codecs.register_error&nbsp;that&nbsp;is<br>
+able&nbsp;to&nbsp;handle&nbsp;UnicodeDecodeErrors.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-encode"><strong>encode</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-encode">encode</a>([encoding[,errors]])&nbsp;-&gt;&nbsp;string&nbsp;or&nbsp;<a href="__builtin__.html#unicode">unicode</a><br>
+&nbsp;<br>
+Encodes&nbsp;S&nbsp;using&nbsp;the&nbsp;codec&nbsp;registered&nbsp;for&nbsp;encoding.&nbsp;encoding&nbsp;defaults<br>
+to&nbsp;the&nbsp;default&nbsp;encoding.&nbsp;errors&nbsp;may&nbsp;be&nbsp;given&nbsp;to&nbsp;set&nbsp;a&nbsp;different&nbsp;error<br>
+handling&nbsp;scheme.&nbsp;Default&nbsp;is&nbsp;'strict'&nbsp;meaning&nbsp;that&nbsp;encoding&nbsp;errors&nbsp;raise<br>
+a&nbsp;UnicodeEncodeError.&nbsp;Other&nbsp;possible&nbsp;values&nbsp;are&nbsp;'ignore',&nbsp;'replace'&nbsp;and<br>
+'xmlcharrefreplace'&nbsp;as&nbsp;well&nbsp;as&nbsp;any&nbsp;other&nbsp;name&nbsp;registered&nbsp;with<br>
+codecs.register_error&nbsp;that&nbsp;can&nbsp;handle&nbsp;UnicodeEncodeErrors.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-endswith"><strong>endswith</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-endswith">endswith</a>(suffix[,&nbsp;start[,&nbsp;end]])&nbsp;-&gt;&nbsp;bool<br>
+&nbsp;<br>
+Return&nbsp;True&nbsp;if&nbsp;S&nbsp;ends&nbsp;with&nbsp;the&nbsp;specified&nbsp;suffix,&nbsp;False&nbsp;otherwise.<br>
+With&nbsp;optional&nbsp;start,&nbsp;test&nbsp;S&nbsp;beginning&nbsp;at&nbsp;that&nbsp;position.<br>
+With&nbsp;optional&nbsp;end,&nbsp;stop&nbsp;comparing&nbsp;S&nbsp;at&nbsp;that&nbsp;position.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-expandtabs"><strong>expandtabs</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-expandtabs">expandtabs</a>([tabsize])&nbsp;-&gt;&nbsp;<a href="__builtin__.html#unicode">unicode</a><br>
+&nbsp;<br>
+Return&nbsp;a&nbsp;copy&nbsp;of&nbsp;S&nbsp;where&nbsp;all&nbsp;tab&nbsp;characters&nbsp;are&nbsp;expanded&nbsp;using&nbsp;spaces.<br>
+If&nbsp;tabsize&nbsp;is&nbsp;not&nbsp;given,&nbsp;a&nbsp;tab&nbsp;size&nbsp;of&nbsp;8&nbsp;characters&nbsp;is&nbsp;assumed.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-find"><strong>find</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-find">find</a>(sub&nbsp;[,start&nbsp;[,end]])&nbsp;-&gt;&nbsp;int<br>
+&nbsp;<br>
+Return&nbsp;the&nbsp;lowest&nbsp;index&nbsp;in&nbsp;S&nbsp;where&nbsp;substring&nbsp;sub&nbsp;is&nbsp;found,<br>
+such&nbsp;that&nbsp;sub&nbsp;is&nbsp;contained&nbsp;within&nbsp;s[start,end].&nbsp;&nbsp;Optional<br>
+arguments&nbsp;start&nbsp;and&nbsp;end&nbsp;are&nbsp;interpreted&nbsp;as&nbsp;in&nbsp;slice&nbsp;notation.<br>
+&nbsp;<br>
+Return&nbsp;-1&nbsp;on&nbsp;failure.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-index"><strong>index</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-index">index</a>(sub&nbsp;[,start&nbsp;[,end]])&nbsp;-&gt;&nbsp;int<br>
+&nbsp;<br>
+Like&nbsp;S.<a href="#typedThing-find">find</a>()&nbsp;but&nbsp;raise&nbsp;ValueError&nbsp;when&nbsp;the&nbsp;substring&nbsp;is&nbsp;not&nbsp;found.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-isalnum"><strong>isalnum</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-isalnum">isalnum</a>()&nbsp;-&gt;&nbsp;bool<br>
+&nbsp;<br>
+Return&nbsp;True&nbsp;if&nbsp;all&nbsp;characters&nbsp;in&nbsp;S&nbsp;are&nbsp;alphanumeric<br>
+and&nbsp;there&nbsp;is&nbsp;at&nbsp;least&nbsp;one&nbsp;character&nbsp;in&nbsp;S,&nbsp;False&nbsp;otherwise.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-isalpha"><strong>isalpha</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-isalpha">isalpha</a>()&nbsp;-&gt;&nbsp;bool<br>
+&nbsp;<br>
+Return&nbsp;True&nbsp;if&nbsp;all&nbsp;characters&nbsp;in&nbsp;S&nbsp;are&nbsp;alphabetic<br>
+and&nbsp;there&nbsp;is&nbsp;at&nbsp;least&nbsp;one&nbsp;character&nbsp;in&nbsp;S,&nbsp;False&nbsp;otherwise.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-isdecimal"><strong>isdecimal</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-isdecimal">isdecimal</a>()&nbsp;-&gt;&nbsp;bool<br>
+&nbsp;<br>
+Return&nbsp;True&nbsp;if&nbsp;there&nbsp;are&nbsp;only&nbsp;decimal&nbsp;characters&nbsp;in&nbsp;S,<br>
+False&nbsp;otherwise.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-isdigit"><strong>isdigit</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-isdigit">isdigit</a>()&nbsp;-&gt;&nbsp;bool<br>
+&nbsp;<br>
+Return&nbsp;True&nbsp;if&nbsp;all&nbsp;characters&nbsp;in&nbsp;S&nbsp;are&nbsp;digits<br>
+and&nbsp;there&nbsp;is&nbsp;at&nbsp;least&nbsp;one&nbsp;character&nbsp;in&nbsp;S,&nbsp;False&nbsp;otherwise.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-islower"><strong>islower</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-islower">islower</a>()&nbsp;-&gt;&nbsp;bool<br>
+&nbsp;<br>
+Return&nbsp;True&nbsp;if&nbsp;all&nbsp;cased&nbsp;characters&nbsp;in&nbsp;S&nbsp;are&nbsp;lowercase&nbsp;and&nbsp;there&nbsp;is<br>
+at&nbsp;least&nbsp;one&nbsp;cased&nbsp;character&nbsp;in&nbsp;S,&nbsp;False&nbsp;otherwise.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-isnumeric"><strong>isnumeric</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-isnumeric">isnumeric</a>()&nbsp;-&gt;&nbsp;bool<br>
+&nbsp;<br>
+Return&nbsp;True&nbsp;if&nbsp;there&nbsp;are&nbsp;only&nbsp;numeric&nbsp;characters&nbsp;in&nbsp;S,<br>
+False&nbsp;otherwise.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-isspace"><strong>isspace</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-isspace">isspace</a>()&nbsp;-&gt;&nbsp;bool<br>
+&nbsp;<br>
+Return&nbsp;True&nbsp;if&nbsp;all&nbsp;characters&nbsp;in&nbsp;S&nbsp;are&nbsp;whitespace<br>
+and&nbsp;there&nbsp;is&nbsp;at&nbsp;least&nbsp;one&nbsp;character&nbsp;in&nbsp;S,&nbsp;False&nbsp;otherwise.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-istitle"><strong>istitle</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-istitle">istitle</a>()&nbsp;-&gt;&nbsp;bool<br>
+&nbsp;<br>
+Return&nbsp;True&nbsp;if&nbsp;S&nbsp;is&nbsp;a&nbsp;titlecased&nbsp;string&nbsp;and&nbsp;there&nbsp;is&nbsp;at&nbsp;least&nbsp;one<br>
+character&nbsp;in&nbsp;S,&nbsp;i.e.&nbsp;upper-&nbsp;and&nbsp;titlecase&nbsp;characters&nbsp;may&nbsp;only<br>
+follow&nbsp;uncased&nbsp;characters&nbsp;and&nbsp;lowercase&nbsp;characters&nbsp;only&nbsp;cased&nbsp;ones.<br>
+Return&nbsp;False&nbsp;otherwise.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-isupper"><strong>isupper</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-isupper">isupper</a>()&nbsp;-&gt;&nbsp;bool<br>
+&nbsp;<br>
+Return&nbsp;True&nbsp;if&nbsp;all&nbsp;cased&nbsp;characters&nbsp;in&nbsp;S&nbsp;are&nbsp;uppercase&nbsp;and&nbsp;there&nbsp;is<br>
+at&nbsp;least&nbsp;one&nbsp;cased&nbsp;character&nbsp;in&nbsp;S,&nbsp;False&nbsp;otherwise.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-join"><strong>join</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-join">join</a>(sequence)&nbsp;-&gt;&nbsp;<a href="__builtin__.html#unicode">unicode</a><br>
+&nbsp;<br>
+Return&nbsp;a&nbsp;string&nbsp;which&nbsp;is&nbsp;the&nbsp;concatenation&nbsp;of&nbsp;the&nbsp;strings&nbsp;in&nbsp;the<br>
+sequence.&nbsp;&nbsp;The&nbsp;separator&nbsp;between&nbsp;elements&nbsp;is&nbsp;S.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-ljust"><strong>ljust</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-ljust">ljust</a>(width[,&nbsp;fillchar])&nbsp;-&gt;&nbsp;int<br>
+&nbsp;<br>
+Return&nbsp;S&nbsp;left&nbsp;justified&nbsp;in&nbsp;a&nbsp;Unicode&nbsp;string&nbsp;of&nbsp;length&nbsp;width.&nbsp;Padding&nbsp;is<br>
+done&nbsp;using&nbsp;the&nbsp;specified&nbsp;fill&nbsp;character&nbsp;(default&nbsp;is&nbsp;a&nbsp;space).</tt></dd></dl>
+
+<dl><dt><a name="typedThing-lower"><strong>lower</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-lower">lower</a>()&nbsp;-&gt;&nbsp;<a href="__builtin__.html#unicode">unicode</a><br>
+&nbsp;<br>
+Return&nbsp;a&nbsp;copy&nbsp;of&nbsp;the&nbsp;string&nbsp;S&nbsp;converted&nbsp;to&nbsp;lowercase.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-lstrip"><strong>lstrip</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-lstrip">lstrip</a>([chars])&nbsp;-&gt;&nbsp;<a href="__builtin__.html#unicode">unicode</a><br>
+&nbsp;<br>
+Return&nbsp;a&nbsp;copy&nbsp;of&nbsp;the&nbsp;string&nbsp;S&nbsp;with&nbsp;leading&nbsp;whitespace&nbsp;removed.<br>
+If&nbsp;chars&nbsp;is&nbsp;given&nbsp;and&nbsp;not&nbsp;None,&nbsp;remove&nbsp;characters&nbsp;in&nbsp;chars&nbsp;instead.<br>
+If&nbsp;chars&nbsp;is&nbsp;a&nbsp;str,&nbsp;it&nbsp;will&nbsp;be&nbsp;converted&nbsp;to&nbsp;<a href="__builtin__.html#unicode">unicode</a>&nbsp;before&nbsp;stripping</tt></dd></dl>
+
+<dl><dt><a name="typedThing-replace"><strong>replace</strong></a>(...)</dt><dd><tt>S.replace&nbsp;(old,&nbsp;new[,&nbsp;maxsplit])&nbsp;-&gt;&nbsp;<a href="__builtin__.html#unicode">unicode</a><br>
+&nbsp;<br>
+Return&nbsp;a&nbsp;copy&nbsp;of&nbsp;S&nbsp;with&nbsp;all&nbsp;occurrences&nbsp;of&nbsp;substring<br>
+old&nbsp;replaced&nbsp;by&nbsp;new.&nbsp;&nbsp;If&nbsp;the&nbsp;optional&nbsp;argument&nbsp;maxsplit&nbsp;is<br>
+given,&nbsp;only&nbsp;the&nbsp;first&nbsp;maxsplit&nbsp;occurrences&nbsp;are&nbsp;replaced.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-rfind"><strong>rfind</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-rfind">rfind</a>(sub&nbsp;[,start&nbsp;[,end]])&nbsp;-&gt;&nbsp;int<br>
+&nbsp;<br>
+Return&nbsp;the&nbsp;highest&nbsp;index&nbsp;in&nbsp;S&nbsp;where&nbsp;substring&nbsp;sub&nbsp;is&nbsp;found,<br>
+such&nbsp;that&nbsp;sub&nbsp;is&nbsp;contained&nbsp;within&nbsp;s[start,end].&nbsp;&nbsp;Optional<br>
+arguments&nbsp;start&nbsp;and&nbsp;end&nbsp;are&nbsp;interpreted&nbsp;as&nbsp;in&nbsp;slice&nbsp;notation.<br>
+&nbsp;<br>
+Return&nbsp;-1&nbsp;on&nbsp;failure.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-rindex"><strong>rindex</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-rindex">rindex</a>(sub&nbsp;[,start&nbsp;[,end]])&nbsp;-&gt;&nbsp;int<br>
+&nbsp;<br>
+Like&nbsp;S.<a href="#typedThing-rfind">rfind</a>()&nbsp;but&nbsp;raise&nbsp;ValueError&nbsp;when&nbsp;the&nbsp;substring&nbsp;is&nbsp;not&nbsp;found.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-rjust"><strong>rjust</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-rjust">rjust</a>(width[,&nbsp;fillchar])&nbsp;-&gt;&nbsp;<a href="__builtin__.html#unicode">unicode</a><br>
+&nbsp;<br>
+Return&nbsp;S&nbsp;right&nbsp;justified&nbsp;in&nbsp;a&nbsp;Unicode&nbsp;string&nbsp;of&nbsp;length&nbsp;width.&nbsp;Padding&nbsp;is<br>
+done&nbsp;using&nbsp;the&nbsp;specified&nbsp;fill&nbsp;character&nbsp;(default&nbsp;is&nbsp;a&nbsp;space).</tt></dd></dl>
+
+<dl><dt><a name="typedThing-rsplit"><strong>rsplit</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-rsplit">rsplit</a>([sep&nbsp;[,maxsplit]])&nbsp;-&gt;&nbsp;list&nbsp;of&nbsp;strings<br>
+&nbsp;<br>
+Return&nbsp;a&nbsp;list&nbsp;of&nbsp;the&nbsp;words&nbsp;in&nbsp;S,&nbsp;using&nbsp;sep&nbsp;as&nbsp;the<br>
+delimiter&nbsp;string,&nbsp;starting&nbsp;at&nbsp;the&nbsp;end&nbsp;of&nbsp;the&nbsp;string&nbsp;and<br>
+working&nbsp;to&nbsp;the&nbsp;front.&nbsp;&nbsp;If&nbsp;maxsplit&nbsp;is&nbsp;given,&nbsp;at&nbsp;most&nbsp;maxsplit<br>
+splits&nbsp;are&nbsp;done.&nbsp;If&nbsp;sep&nbsp;is&nbsp;not&nbsp;specified,&nbsp;any&nbsp;whitespace&nbsp;string<br>
+is&nbsp;a&nbsp;separator.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-rstrip"><strong>rstrip</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-rstrip">rstrip</a>([chars])&nbsp;-&gt;&nbsp;<a href="__builtin__.html#unicode">unicode</a><br>
+&nbsp;<br>
+Return&nbsp;a&nbsp;copy&nbsp;of&nbsp;the&nbsp;string&nbsp;S&nbsp;with&nbsp;trailing&nbsp;whitespace&nbsp;removed.<br>
+If&nbsp;chars&nbsp;is&nbsp;given&nbsp;and&nbsp;not&nbsp;None,&nbsp;remove&nbsp;characters&nbsp;in&nbsp;chars&nbsp;instead.<br>
+If&nbsp;chars&nbsp;is&nbsp;a&nbsp;str,&nbsp;it&nbsp;will&nbsp;be&nbsp;converted&nbsp;to&nbsp;<a href="__builtin__.html#unicode">unicode</a>&nbsp;before&nbsp;stripping</tt></dd></dl>
+
+<dl><dt><a name="typedThing-split"><strong>split</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-split">split</a>([sep&nbsp;[,maxsplit]])&nbsp;-&gt;&nbsp;list&nbsp;of&nbsp;strings<br>
+&nbsp;<br>
+Return&nbsp;a&nbsp;list&nbsp;of&nbsp;the&nbsp;words&nbsp;in&nbsp;S,&nbsp;using&nbsp;sep&nbsp;as&nbsp;the<br>
+delimiter&nbsp;string.&nbsp;&nbsp;If&nbsp;maxsplit&nbsp;is&nbsp;given,&nbsp;at&nbsp;most&nbsp;maxsplit<br>
+splits&nbsp;are&nbsp;done.&nbsp;If&nbsp;sep&nbsp;is&nbsp;not&nbsp;specified&nbsp;or&nbsp;is&nbsp;None,<br>
+any&nbsp;whitespace&nbsp;string&nbsp;is&nbsp;a&nbsp;separator.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-splitlines"><strong>splitlines</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-splitlines">splitlines</a>([keepends]])&nbsp;-&gt;&nbsp;list&nbsp;of&nbsp;strings<br>
+&nbsp;<br>
+Return&nbsp;a&nbsp;list&nbsp;of&nbsp;the&nbsp;lines&nbsp;in&nbsp;S,&nbsp;breaking&nbsp;at&nbsp;line&nbsp;boundaries.<br>
+Line&nbsp;breaks&nbsp;are&nbsp;not&nbsp;included&nbsp;in&nbsp;the&nbsp;resulting&nbsp;list&nbsp;unless&nbsp;keepends<br>
+is&nbsp;given&nbsp;and&nbsp;true.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-startswith"><strong>startswith</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-startswith">startswith</a>(prefix[,&nbsp;start[,&nbsp;end]])&nbsp;-&gt;&nbsp;bool<br>
+&nbsp;<br>
+Return&nbsp;True&nbsp;if&nbsp;S&nbsp;starts&nbsp;with&nbsp;the&nbsp;specified&nbsp;prefix,&nbsp;False&nbsp;otherwise.<br>
+With&nbsp;optional&nbsp;start,&nbsp;test&nbsp;S&nbsp;beginning&nbsp;at&nbsp;that&nbsp;position.<br>
+With&nbsp;optional&nbsp;end,&nbsp;stop&nbsp;comparing&nbsp;S&nbsp;at&nbsp;that&nbsp;position.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-strip"><strong>strip</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-strip">strip</a>([chars])&nbsp;-&gt;&nbsp;<a href="__builtin__.html#unicode">unicode</a><br>
+&nbsp;<br>
+Return&nbsp;a&nbsp;copy&nbsp;of&nbsp;the&nbsp;string&nbsp;S&nbsp;with&nbsp;leading&nbsp;and&nbsp;trailing<br>
+whitespace&nbsp;removed.<br>
+If&nbsp;chars&nbsp;is&nbsp;given&nbsp;and&nbsp;not&nbsp;None,&nbsp;remove&nbsp;characters&nbsp;in&nbsp;chars&nbsp;instead.<br>
+If&nbsp;chars&nbsp;is&nbsp;a&nbsp;str,&nbsp;it&nbsp;will&nbsp;be&nbsp;converted&nbsp;to&nbsp;<a href="__builtin__.html#unicode">unicode</a>&nbsp;before&nbsp;stripping</tt></dd></dl>
+
+<dl><dt><a name="typedThing-swapcase"><strong>swapcase</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-swapcase">swapcase</a>()&nbsp;-&gt;&nbsp;<a href="__builtin__.html#unicode">unicode</a><br>
+&nbsp;<br>
+Return&nbsp;a&nbsp;copy&nbsp;of&nbsp;S&nbsp;with&nbsp;uppercase&nbsp;characters&nbsp;converted&nbsp;to&nbsp;lowercase<br>
+and&nbsp;vice&nbsp;versa.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-title"><strong>title</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-title">title</a>()&nbsp;-&gt;&nbsp;<a href="__builtin__.html#unicode">unicode</a><br>
+&nbsp;<br>
+Return&nbsp;a&nbsp;titlecased&nbsp;version&nbsp;of&nbsp;S,&nbsp;i.e.&nbsp;words&nbsp;start&nbsp;with&nbsp;title&nbsp;case<br>
+characters,&nbsp;all&nbsp;remaining&nbsp;cased&nbsp;characters&nbsp;have&nbsp;lower&nbsp;case.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-translate"><strong>translate</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-translate">translate</a>(table)&nbsp;-&gt;&nbsp;<a href="__builtin__.html#unicode">unicode</a><br>
+&nbsp;<br>
+Return&nbsp;a&nbsp;copy&nbsp;of&nbsp;the&nbsp;string&nbsp;S,&nbsp;where&nbsp;all&nbsp;characters&nbsp;have&nbsp;been&nbsp;mapped<br>
+through&nbsp;the&nbsp;given&nbsp;translation&nbsp;table,&nbsp;which&nbsp;must&nbsp;be&nbsp;a&nbsp;mapping&nbsp;of<br>
+Unicode&nbsp;ordinals&nbsp;to&nbsp;Unicode&nbsp;ordinals,&nbsp;Unicode&nbsp;strings&nbsp;or&nbsp;None.<br>
+Unmapped&nbsp;characters&nbsp;are&nbsp;left&nbsp;untouched.&nbsp;Characters&nbsp;mapped&nbsp;to&nbsp;None<br>
+are&nbsp;deleted.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-upper"><strong>upper</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-upper">upper</a>()&nbsp;-&gt;&nbsp;<a href="__builtin__.html#unicode">unicode</a><br>
+&nbsp;<br>
+Return&nbsp;a&nbsp;copy&nbsp;of&nbsp;S&nbsp;converted&nbsp;to&nbsp;uppercase.</tt></dd></dl>
+
+<dl><dt><a name="typedThing-zfill"><strong>zfill</strong></a>(...)</dt><dd><tt>S.<a href="#typedThing-zfill">zfill</a>(width)&nbsp;-&gt;&nbsp;<a href="__builtin__.html#unicode">unicode</a><br>
+&nbsp;<br>
+Pad&nbsp;a&nbsp;numeric&nbsp;string&nbsp;x&nbsp;with&nbsp;zeros&nbsp;on&nbsp;the&nbsp;left,&nbsp;to&nbsp;fill&nbsp;a&nbsp;field<br>
+of&nbsp;the&nbsp;specified&nbsp;width.&nbsp;The&nbsp;string&nbsp;x&nbsp;is&nbsp;never&nbsp;truncated.</tt></dd></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-abbr"><strong>abbr</strong></a>(prodURI)</dt></dl>
+ <dl><dt><a name="-getExtra"><strong>getExtra</strong></a>(ex)</dt></dl>
+ <dl><dt><a name="-getTrueOnError"><strong>getTrueOnError</strong></a>(ex)</dt></dl>
+ <dl><dt><a name="-getType"><strong>getType</strong></a>(ex)</dt></dl>
+ <dl><dt><a name="-intConvert"><strong>intConvert</strong></a>(self, keepGoing, val)</dt></dl>
+ <dl><dt><a name="-makeSafeVal"><strong>makeSafeVal</strong></a>(val, (subj, pred, obj), safeVersion<font color="#909090">=False</font>)</dt></dl>
+ <dl><dt><a name="-makeTriple"><strong>makeTriple</strong></a>(subj, pred, obj, safeVersion<font color="#909090">=False</font>)</dt></dl>
+ <dl><dt><a name="-makeTripleObjList"><strong>makeTripleObjList</strong></a>(subj, pred, obj)</dt></dl>
+ <dl><dt><a name="-normalize"><strong>normalize</strong></a>(expr)</dt><dd><tt>The&nbsp;mapping&nbsp;from&nbsp;SPARQL&nbsp;syntax&nbsp;to&nbsp;n3&nbsp;is&nbsp;decidedly&nbsp;nontrivial<br>
+at&nbsp;this&nbsp;point,&nbsp;we&nbsp;have&nbsp;done&nbsp;the&nbsp;first&nbsp;step,&nbsp;building&nbsp;an&nbsp;<a href="#AST">AST</a>&nbsp;that&nbsp;is&nbsp;(relatively)&nbsp;independant&nbsp;of&nbsp;all&nbsp;of&nbsp;the&nbsp;oddities&nbsp;that<br>
+you&nbsp;get&nbsp;from&nbsp;the&nbsp;grammar<br>
+&nbsp;<br>
+Normalize&nbsp;does&nbsp;a&nbsp;couple&nbsp;of&nbsp;top&nbsp;down&nbsp;transforms&nbsp;on&nbsp;the&nbsp;tree.&nbsp;The&nbsp;first&nbsp;is&nbsp;a&nbsp;type&nbsp;determiner;&nbsp;it&nbsp;determines&nbsp;what<br>
+needs&nbsp;to&nbsp;be&nbsp;coerced&nbsp;to&nbsp;a&nbsp;boolean.&nbsp;The&nbsp;second&nbsp;does&nbsp;boolean&nbsp;logic&nbsp;and&nbsp;pushes&nbsp;``not''s&nbsp;all&nbsp;the&nbsp;way&nbsp;in.<br>
+&nbsp;<br>
+After&nbsp;normalize,&nbsp;the&nbsp;last&nbsp;bottom&nbsp;up&nbsp;step&nbsp;to&nbsp;generate&nbsp;the&nbsp;n3&nbsp;can&nbsp;be&nbsp;done.</tt></dd></dl>
+ <dl><dt><a name="-on_Boolean_Gen"><strong>on_Boolean_Gen</strong></a>(true, false)</dt></dl>
+ <dl><dt><a name="-reason2"><strong>reason2</strong></a> = value(self, newVal<font color="#909090">=None</font>)<font color="#909090"><font face="helvetica, arial"> method of <a href="__builtin__.html#list">__builtin__.list</a> instance</font></font></dt></dl>
+ <dl><dt><a name="-sparqlLookup"><strong>sparqlLookup</strong></a>(uri, server, property)</dt></dl>
+ <dl><dt><a name="-unEscape"><strong>unEscape</strong></a>(string)</dt></dl>
+ <dl><dt><a name="-value"><strong>value</strong></a>(self, newVal<font color="#909090">=None</font>)</dt></dl>
+ <dl><dt><a name="-verbose"><strong>verbose</strong></a> = value(self, newVal<font color="#909090">=None</font>)<font color="#909090"><font face="helvetica, arial"> method of <a href="__builtin__.html#list">__builtin__.list</a> instance</font></font></dt></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>AND</strong> = u'And'<br>
+<strong>NOT</strong> = u'Not'<br>
+<strong>OR</strong> = u'Or'<br>
+<strong>ORED_AND</strong> = u'And'<br>
+<strong>ORED_NOT</strong> = u'Not'<br>
+<strong>SPARQL_NS</strong> = 'http://www.w3.org/2000/10/swap/sparqlCwm'<br>
+<strong>knownFunctions</strong> = {'http://www.w3.org/2001/XMLSchema#integer': &lt;function intConvert&gt;}</td></tr></table>
+</body></html>

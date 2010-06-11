@@ -1,0 +1,393 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module RDFSink</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>RDFSink</strong></big></big> (version $Id: RDFSink.html,v 1.22 2007/06/27 17:58:39 syosi Exp $)</font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/yosi/CVSROOT/WWW/2000/10/swap/RDFSink.py">/Users/yosi/CVSROOT/WWW/2000/10/swap/RDFSink.py</a></font></td></tr></table>
+    <p><tt><a href="#RDFSink">RDFSink</a>&nbsp;--&nbsp;RDF&nbsp;parser/serializer/store&nbsp;interface<br>
+&nbsp;<br>
+This&nbsp;is&nbsp;a&nbsp;simple&nbsp;API&nbsp;for&nbsp;a&nbsp;push-stream&nbsp;of&nbsp;RDF&nbsp;data.&nbsp;It&nbsp;doesn't&nbsp;use<br>
+a&nbsp;particular&nbsp;classof&nbsp;obejcts,&nbsp;but&nbsp;just&nbsp;uses&nbsp;python&nbsp;pairs.<br>
+It&nbsp;is&nbsp;kinda&nbsp;crude&nbsp;but&nbsp;it&nbsp;does&nbsp;allow&nbsp;for&nbsp;example&nbsp;data&nbsp;to&nbsp;be&nbsp;squirted&nbsp;efficiently&nbsp;<br>
+between&nbsp;modules&nbsp;which&nbsp;use&nbsp;different&nbsp;python&nbsp;classes&nbsp;for&nbsp;RDF.<br>
+&nbsp;<br>
+HISTORY<br>
+&nbsp;<br>
+This&nbsp;module&nbsp;was&nbsp;factored&nbsp;out&nbsp;of&nbsp;notation3.py<br>
+&nbsp;<br>
+REFERENCES<br>
+&nbsp;&nbsp;Python&nbsp;Style&nbsp;Guide<br>
+&nbsp;&nbsp;Author:&nbsp;Guido&nbsp;van&nbsp;Rossum<br>
+&nbsp;&nbsp;<a href="http://www.python.org/doc/essays/styleguide.html">http://www.python.org/doc/essays/styleguide.html</a></tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#fffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="uripath.html">uripath</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="RDFSink.html#RDFSink">RDFSink</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="RDFSink.html#RDFStructuredOutput">RDFStructuredOutput</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="RDFSink.html#TracingRDFSink">TracingRDFSink</a>
+</font></dt><dt><font face="helvetica, arial"><a href="exceptions.html#ValueError">exceptions.ValueError</a>(<a href="exceptions.html#StandardError">exceptions.StandardError</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="RDFSink.html#URISyntaxError">URISyntaxError</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="RDFSink">class <strong>RDFSink</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>interface&nbsp;to&nbsp;connect&nbsp;modules&nbsp;in&nbsp;RDF&nbsp;processing.<br>
+OBSOLETE<br>
+&nbsp;<br>
+This&nbsp;is&nbsp;a&nbsp;superclass&nbsp;for&nbsp;other&nbsp;RDF&nbsp;processors&nbsp;which&nbsp;accept&nbsp;RDF&nbsp;events<br>
+or&nbsp;indeed&nbsp;Swell&nbsp;events.&nbsp;It&nbsp;is&nbsp;superceded,&nbsp;effectively,&nbsp;by&nbsp;the&nbsp;class&nbsp;Formula,<br>
+as&nbsp;a&nbsp;sink&nbsp;of&nbsp;data&nbsp;and&nbsp;a&nbsp;soiurce&nbsp;of&nbsp;new&nbsp;symbols.<br>
+&nbsp;<br>
+Keeps&nbsp;track&nbsp;of&nbsp;prefixes.<br>
+&nbsp;<br>
+This&nbsp;interface&nbsp;has&nbsp;the&nbsp;advantage&nbsp;that&nbsp;it&nbsp;does&nbsp;n&nbsp;ot&nbsp;have&nbsp;any&nbsp;dependencies<br>
+on&nbsp;object&nbsp;types,&nbsp;it&nbsp;is&nbsp;really&nbsp;one-way&nbsp;(easily&nbsp;serialized&nbsp;as&nbsp;no&nbsp;return&nbsp;values).<br>
+It&nbsp;has&nbsp;the&nbsp;disadvantages&nbsp;that<br>
+&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;It&nbsp;uses&nbsp;the&nbsp;pseudoproperties&nbsp;log:forSome&nbsp;and&nbsp;log:forAll&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;make&nbsp;variables,&nbsp;which&nbsp;is&nbsp;a&nbsp;bit&nbsp;of&nbsp;a&nbsp;kludge.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;It&nbsp;may&nbsp;involve&nbsp;on&nbsp;the&nbsp;receiver&nbsp;side&nbsp;the&nbsp;same&nbsp;thing&nbsp;being&nbsp;interned<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;many&nbsp;times,&nbsp;which&nbsp;wastes&nbsp;time&nbsp;searching&nbsp;hash&nbsp;tables.<br>
+The&nbsp;superclass&nbsp;handles&nbsp;common&nbsp;functions&nbsp;such&nbsp;as&nbsp;craeting&nbsp;new&nbsp;arbitray<br>
+identifiers<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="RDFSink-__init__"><strong>__init__</strong></a>(self, genPrefix<font color="#909090">=None</font>)</dt><dd><tt>If&nbsp;you&nbsp;give&nbsp;it&nbsp;a&nbsp;URI&nbsp;prefix&nbsp;to&nbsp;use&nbsp;for&nbsp;generated&nbsp;IDs&nbsp;it<br>
+will&nbsp;use&nbsp;one;&nbsp;otherwise,&nbsp;it&nbsp;will&nbsp;use&nbsp;the&nbsp;name&nbsp;of&nbsp;an&nbsp;imaginary&nbsp;temporary&nbsp;file<br>
+in&nbsp;the&nbsp;current&nbsp;directory.</tt></dd></dl>
+
+<dl><dt><a name="RDFSink-bind"><strong>bind</strong></a>(self, prefix, uri)</dt><dd><tt>Pass&nbsp;on&nbsp;a&nbsp;binding&nbsp;hint&nbsp;for&nbsp;later&nbsp;use&nbsp;in&nbsp;output<br>
+&nbsp;<br>
+This&nbsp;really&nbsp;is&nbsp;just&nbsp;a&nbsp;hint.&nbsp;The&nbsp;parser&nbsp;calls&nbsp;bind&nbsp;to&nbsp;pass&nbsp;on<br>
+the&nbsp;prefix&nbsp;which&nbsp;it&nbsp;came&nbsp;across,&nbsp;as&nbsp;this&nbsp;is&nbsp;a&nbsp;useful&nbsp;hint&nbsp;for<br>
+a&nbsp;human&nbsp;readable&nbsp;prefix&nbsp;for&nbsp;output&nbsp;of&nbsp;the&nbsp;same<br>
+namespace.&nbsp;Otherwise,&nbsp;output&nbsp;processors&nbsp;will&nbsp;have&nbsp;to&nbsp;invent&nbsp;or<br>
+avoid&nbsp;useing&nbsp;namespaces,&nbsp;which&nbsp;will&nbsp;look&nbsp;ugly</tt></dd></dl>
+
+<dl><dt><a name="RDFSink-checkNewId"><strong>checkNewId</strong></a>(self, uri)</dt><dd><tt>The&nbsp;store&nbsp;can&nbsp;override&nbsp;this&nbsp;to&nbsp;raise&nbsp;an&nbsp;exception&nbsp;if&nbsp;the<br>
+id&nbsp;is&nbsp;not&nbsp;in&nbsp;fact&nbsp;new.&nbsp;This&nbsp;is&nbsp;useful&nbsp;because&nbsp;it&nbsp;is&nbsp;usfeul<br>
+to&nbsp;generate&nbsp;IDs&nbsp;with&nbsp;useful&nbsp;diagnostic&nbsp;ways&nbsp;but&nbsp;this&nbsp;lays&nbsp;them<br>
+open&nbsp;to&nbsp;possibly&nbsp;clashing&nbsp;in&nbsp;pathalogical&nbsp;cases.</tt></dd></dl>
+
+<dl><dt><a name="RDFSink-countNamespace"><strong>countNamespace</strong></a>(self, namesp)</dt><dd><tt>On&nbsp;output,&nbsp;count&nbsp;how&nbsp;many&nbsp;times&nbsp;each&nbsp;namespace&nbsp;is&nbsp;used</tt></dd></dl>
+
+<dl><dt><a name="RDFSink-endDoc"><strong>endDoc</strong></a>(self, rootFormulaPair)</dt><dd><tt>End&nbsp;a&nbsp;document<br>
+&nbsp;<br>
+Call&nbsp;this&nbsp;once&nbsp;only&nbsp;at&nbsp;the&nbsp;end&nbsp;of&nbsp;parsing&nbsp;so&nbsp;that&nbsp;the&nbsp;receiver&nbsp;can&nbsp;wrap<br>
+things&nbsp;up,&nbsp;oprimize,&nbsp;intern,&nbsp;index&nbsp;and&nbsp;so&nbsp;on.&nbsp;&nbsp;The&nbsp;pair&nbsp;given&nbsp;is&nbsp;the&nbsp;(type,&nbsp;value)<br>
+identifier&nbsp;of&nbsp;the&nbsp;root&nbsp;formula&nbsp;of&nbsp;the&nbsp;thing&nbsp;parsed.</tt></dd></dl>
+
+<dl><dt><a name="RDFSink-genId"><strong>genId</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RDFSink-intern"><strong>intern</strong></a>(self, something)</dt></dl>
+
+<dl><dt><a name="RDFSink-makeComment"><strong>makeComment</strong></a>(self, str)</dt><dd><tt>This&nbsp;passes&nbsp;on&nbsp;a&nbsp;comment&nbsp;line&nbsp;which&nbsp;of&nbsp;course&nbsp;has&nbsp;no&nbsp;semantics.<br>
+&nbsp;<br>
+This&nbsp;is&nbsp;only&nbsp;useful&nbsp;in&nbsp;direct&nbsp;piping&nbsp;of&nbsp;parsers&nbsp;to&nbsp;output,&nbsp;to&nbsp;preserve<br>
+comments&nbsp;in&nbsp;the&nbsp;original&nbsp;file.</tt></dd></dl>
+
+<dl><dt><a name="RDFSink-makeStatement"><strong>makeStatement</strong></a>(self, tuple, why<font color="#909090">=None</font>)</dt><dd><tt>add&nbsp;a&nbsp;statement&nbsp;to&nbsp;a&nbsp;stream/store.<br>
+&nbsp;<br>
+raises&nbsp;<a href="#URISyntaxError">URISyntaxError</a>&nbsp;on&nbsp;bad&nbsp;URIs<br>
+tuple&nbsp;is&nbsp;a&nbsp;quad&nbsp;(context,&nbsp;predicate,&nbsp;subject,&nbsp;object)&nbsp;of&nbsp;things&nbsp;generated&nbsp;by&nbsp;calls&nbsp;to&nbsp;newLiteral&nbsp;etc<br>
+why&nbsp;is&nbsp;reason&nbsp;for&nbsp;the&nbsp;statement.</tt></dd></dl>
+
+<dl><dt><a name="RDFSink-namespaceCounts"><strong>namespaceCounts</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RDFSink-newBlankNode"><strong>newBlankNode</strong></a>(self, context, uri<font color="#909090">=None</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="RDFSink-newExistential"><strong>newExistential</strong></a>(self, context, uri<font color="#909090">=None</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="RDFSink-newFormula"><strong>newFormula</strong></a>(self, uri<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="RDFSink-newList"><strong>newList</strong></a>(self, l, context)</dt></dl>
+
+<dl><dt><a name="RDFSink-newLiteral"><strong>newLiteral</strong></a>(self, str, dt<font color="#909090">=None</font>, lang<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="RDFSink-newSymbol"><strong>newSymbol</strong></a>(self, uri)</dt></dl>
+
+<dl><dt><a name="RDFSink-newUniversal"><strong>newUniversal</strong></a>(self, context, uri<font color="#909090">=None</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="RDFSink-newXMLLiteral"><strong>newXMLLiteral</strong></a>(self, doc)</dt></dl>
+
+<dl><dt><a name="RDFSink-reopen"><strong>reopen</strong></a>(self)</dt><dd><tt>Un-End&nbsp;a&nbsp;document<br>
+&nbsp;<br>
+If&nbsp;you&nbsp;have&nbsp;added&nbsp;stuff&nbsp;to&nbsp;a&nbsp;document,&nbsp;thought&nbsp;you&nbsp;were&nbsp;done,&nbsp;and<br>
+then&nbsp;want&nbsp;to&nbsp;add&nbsp;more,&nbsp;call&nbsp;this&nbsp;to&nbsp;get&nbsp;back&nbsp;into&nbsp;the&nbsp;sate&nbsp;that&nbsp;makeSatement<br>
+is&nbsp;again&nbsp;acceptable.&nbsp;Remember&nbsp;to&nbsp;end&nbsp;the&nbsp;document&nbsp;again&nbsp;when&nbsp;done.</tt></dd></dl>
+
+<dl><dt><a name="RDFSink-setDefaultNamespace"><strong>setDefaultNamespace</strong></a>(self, uri)</dt><dd><tt>Pass&nbsp;on&nbsp;a&nbsp;binding&nbsp;hint&nbsp;for&nbsp;later&nbsp;use&nbsp;in&nbsp;output<br>
+&nbsp;<br>
+This&nbsp;really&nbsp;is&nbsp;just&nbsp;a&nbsp;hint.&nbsp;The&nbsp;parser&nbsp;calls&nbsp;this&nbsp;to&nbsp;pass&nbsp;on<br>
+the&nbsp;default&nbsp;namespace&nbsp;which&nbsp;it&nbsp;came&nbsp;across,&nbsp;as&nbsp;this&nbsp;is&nbsp;a<br>
+useful&nbsp;hint&nbsp;for&nbsp;a&nbsp;human&nbsp;readable&nbsp;prefix&nbsp;for&nbsp;output&nbsp;of&nbsp;the&nbsp;same<br>
+namespace.&nbsp;Otherwise,&nbsp;output&nbsp;processors&nbsp;will&nbsp;have&nbsp;to&nbsp;invent&nbsp;or<br>
+avoid&nbsp;useing&nbsp;namespaces,&nbsp;which&nbsp;will&nbsp;look&nbsp;ugly.</tt></dd></dl>
+
+<dl><dt><a name="RDFSink-setGenPrefix"><strong>setGenPrefix</strong></a>(self, genPrefix)</dt></dl>
+
+<dl><dt><a name="RDFSink-startDoc"><strong>startDoc</strong></a>(self)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="RDFStructuredOutput">class <strong>RDFStructuredOutput</strong></a>(<a href="RDFSink.html#RDFSink">RDFSink</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="RDFStructuredOutput-endAnonymous"><strong>endAnonymous</strong></a>(self, subject, verb)</dt></dl>
+
+<dl><dt><a name="RDFStructuredOutput-endAnonymousNode"><strong>endAnonymousNode</strong></a>(self, endAnonymousNode)</dt></dl>
+
+<dl><dt><a name="RDFStructuredOutput-endFormulaObject"><strong>endFormulaObject</strong></a>(self, pred, subj)</dt></dl>
+
+<dl><dt><a name="RDFStructuredOutput-endFormulaSubject"><strong>endFormulaSubject</strong></a>(self, subj)</dt></dl>
+
+<dl><dt><a name="RDFStructuredOutput-startAnonymous"><strong>startAnonymous</strong></a>(self, triple, isList<font color="#909090">=0</font>)</dt></dl>
+
+<dl><dt><a name="RDFStructuredOutput-startAnonymousNode"><strong>startAnonymousNode</strong></a>(self, subj)</dt></dl>
+
+<dl><dt><a name="RDFStructuredOutput-startFormulaObject"><strong>startFormulaObject</strong></a>(self, triple)</dt></dl>
+
+<dl><dt><a name="RDFStructuredOutput-startFormulaSubject"><strong>startFormulaSubject</strong></a>(self, context)</dt></dl>
+
+<hr>
+Methods inherited from <a href="RDFSink.html#RDFSink">RDFSink</a>:<br>
+<dl><dt><a name="RDFStructuredOutput-__init__"><strong>__init__</strong></a>(self, genPrefix<font color="#909090">=None</font>)</dt><dd><tt>If&nbsp;you&nbsp;give&nbsp;it&nbsp;a&nbsp;URI&nbsp;prefix&nbsp;to&nbsp;use&nbsp;for&nbsp;generated&nbsp;IDs&nbsp;it<br>
+will&nbsp;use&nbsp;one;&nbsp;otherwise,&nbsp;it&nbsp;will&nbsp;use&nbsp;the&nbsp;name&nbsp;of&nbsp;an&nbsp;imaginary&nbsp;temporary&nbsp;file<br>
+in&nbsp;the&nbsp;current&nbsp;directory.</tt></dd></dl>
+
+<dl><dt><a name="RDFStructuredOutput-bind"><strong>bind</strong></a>(self, prefix, uri)</dt><dd><tt>Pass&nbsp;on&nbsp;a&nbsp;binding&nbsp;hint&nbsp;for&nbsp;later&nbsp;use&nbsp;in&nbsp;output<br>
+&nbsp;<br>
+This&nbsp;really&nbsp;is&nbsp;just&nbsp;a&nbsp;hint.&nbsp;The&nbsp;parser&nbsp;calls&nbsp;bind&nbsp;to&nbsp;pass&nbsp;on<br>
+the&nbsp;prefix&nbsp;which&nbsp;it&nbsp;came&nbsp;across,&nbsp;as&nbsp;this&nbsp;is&nbsp;a&nbsp;useful&nbsp;hint&nbsp;for<br>
+a&nbsp;human&nbsp;readable&nbsp;prefix&nbsp;for&nbsp;output&nbsp;of&nbsp;the&nbsp;same<br>
+namespace.&nbsp;Otherwise,&nbsp;output&nbsp;processors&nbsp;will&nbsp;have&nbsp;to&nbsp;invent&nbsp;or<br>
+avoid&nbsp;useing&nbsp;namespaces,&nbsp;which&nbsp;will&nbsp;look&nbsp;ugly</tt></dd></dl>
+
+<dl><dt><a name="RDFStructuredOutput-checkNewId"><strong>checkNewId</strong></a>(self, uri)</dt><dd><tt>The&nbsp;store&nbsp;can&nbsp;override&nbsp;this&nbsp;to&nbsp;raise&nbsp;an&nbsp;exception&nbsp;if&nbsp;the<br>
+id&nbsp;is&nbsp;not&nbsp;in&nbsp;fact&nbsp;new.&nbsp;This&nbsp;is&nbsp;useful&nbsp;because&nbsp;it&nbsp;is&nbsp;usfeul<br>
+to&nbsp;generate&nbsp;IDs&nbsp;with&nbsp;useful&nbsp;diagnostic&nbsp;ways&nbsp;but&nbsp;this&nbsp;lays&nbsp;them<br>
+open&nbsp;to&nbsp;possibly&nbsp;clashing&nbsp;in&nbsp;pathalogical&nbsp;cases.</tt></dd></dl>
+
+<dl><dt><a name="RDFStructuredOutput-countNamespace"><strong>countNamespace</strong></a>(self, namesp)</dt><dd><tt>On&nbsp;output,&nbsp;count&nbsp;how&nbsp;many&nbsp;times&nbsp;each&nbsp;namespace&nbsp;is&nbsp;used</tt></dd></dl>
+
+<dl><dt><a name="RDFStructuredOutput-endDoc"><strong>endDoc</strong></a>(self, rootFormulaPair)</dt><dd><tt>End&nbsp;a&nbsp;document<br>
+&nbsp;<br>
+Call&nbsp;this&nbsp;once&nbsp;only&nbsp;at&nbsp;the&nbsp;end&nbsp;of&nbsp;parsing&nbsp;so&nbsp;that&nbsp;the&nbsp;receiver&nbsp;can&nbsp;wrap<br>
+things&nbsp;up,&nbsp;oprimize,&nbsp;intern,&nbsp;index&nbsp;and&nbsp;so&nbsp;on.&nbsp;&nbsp;The&nbsp;pair&nbsp;given&nbsp;is&nbsp;the&nbsp;(type,&nbsp;value)<br>
+identifier&nbsp;of&nbsp;the&nbsp;root&nbsp;formula&nbsp;of&nbsp;the&nbsp;thing&nbsp;parsed.</tt></dd></dl>
+
+<dl><dt><a name="RDFStructuredOutput-genId"><strong>genId</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RDFStructuredOutput-intern"><strong>intern</strong></a>(self, something)</dt></dl>
+
+<dl><dt><a name="RDFStructuredOutput-makeComment"><strong>makeComment</strong></a>(self, str)</dt><dd><tt>This&nbsp;passes&nbsp;on&nbsp;a&nbsp;comment&nbsp;line&nbsp;which&nbsp;of&nbsp;course&nbsp;has&nbsp;no&nbsp;semantics.<br>
+&nbsp;<br>
+This&nbsp;is&nbsp;only&nbsp;useful&nbsp;in&nbsp;direct&nbsp;piping&nbsp;of&nbsp;parsers&nbsp;to&nbsp;output,&nbsp;to&nbsp;preserve<br>
+comments&nbsp;in&nbsp;the&nbsp;original&nbsp;file.</tt></dd></dl>
+
+<dl><dt><a name="RDFStructuredOutput-makeStatement"><strong>makeStatement</strong></a>(self, tuple, why<font color="#909090">=None</font>)</dt><dd><tt>add&nbsp;a&nbsp;statement&nbsp;to&nbsp;a&nbsp;stream/store.<br>
+&nbsp;<br>
+raises&nbsp;<a href="#URISyntaxError">URISyntaxError</a>&nbsp;on&nbsp;bad&nbsp;URIs<br>
+tuple&nbsp;is&nbsp;a&nbsp;quad&nbsp;(context,&nbsp;predicate,&nbsp;subject,&nbsp;object)&nbsp;of&nbsp;things&nbsp;generated&nbsp;by&nbsp;calls&nbsp;to&nbsp;newLiteral&nbsp;etc<br>
+why&nbsp;is&nbsp;reason&nbsp;for&nbsp;the&nbsp;statement.</tt></dd></dl>
+
+<dl><dt><a name="RDFStructuredOutput-namespaceCounts"><strong>namespaceCounts</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RDFStructuredOutput-newBlankNode"><strong>newBlankNode</strong></a>(self, context, uri<font color="#909090">=None</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="RDFStructuredOutput-newExistential"><strong>newExistential</strong></a>(self, context, uri<font color="#909090">=None</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="RDFStructuredOutput-newFormula"><strong>newFormula</strong></a>(self, uri<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="RDFStructuredOutput-newList"><strong>newList</strong></a>(self, l, context)</dt></dl>
+
+<dl><dt><a name="RDFStructuredOutput-newLiteral"><strong>newLiteral</strong></a>(self, str, dt<font color="#909090">=None</font>, lang<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="RDFStructuredOutput-newSymbol"><strong>newSymbol</strong></a>(self, uri)</dt></dl>
+
+<dl><dt><a name="RDFStructuredOutput-newUniversal"><strong>newUniversal</strong></a>(self, context, uri<font color="#909090">=None</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="RDFStructuredOutput-newXMLLiteral"><strong>newXMLLiteral</strong></a>(self, doc)</dt></dl>
+
+<dl><dt><a name="RDFStructuredOutput-reopen"><strong>reopen</strong></a>(self)</dt><dd><tt>Un-End&nbsp;a&nbsp;document<br>
+&nbsp;<br>
+If&nbsp;you&nbsp;have&nbsp;added&nbsp;stuff&nbsp;to&nbsp;a&nbsp;document,&nbsp;thought&nbsp;you&nbsp;were&nbsp;done,&nbsp;and<br>
+then&nbsp;want&nbsp;to&nbsp;add&nbsp;more,&nbsp;call&nbsp;this&nbsp;to&nbsp;get&nbsp;back&nbsp;into&nbsp;the&nbsp;sate&nbsp;that&nbsp;makeSatement<br>
+is&nbsp;again&nbsp;acceptable.&nbsp;Remember&nbsp;to&nbsp;end&nbsp;the&nbsp;document&nbsp;again&nbsp;when&nbsp;done.</tt></dd></dl>
+
+<dl><dt><a name="RDFStructuredOutput-setDefaultNamespace"><strong>setDefaultNamespace</strong></a>(self, uri)</dt><dd><tt>Pass&nbsp;on&nbsp;a&nbsp;binding&nbsp;hint&nbsp;for&nbsp;later&nbsp;use&nbsp;in&nbsp;output<br>
+&nbsp;<br>
+This&nbsp;really&nbsp;is&nbsp;just&nbsp;a&nbsp;hint.&nbsp;The&nbsp;parser&nbsp;calls&nbsp;this&nbsp;to&nbsp;pass&nbsp;on<br>
+the&nbsp;default&nbsp;namespace&nbsp;which&nbsp;it&nbsp;came&nbsp;across,&nbsp;as&nbsp;this&nbsp;is&nbsp;a<br>
+useful&nbsp;hint&nbsp;for&nbsp;a&nbsp;human&nbsp;readable&nbsp;prefix&nbsp;for&nbsp;output&nbsp;of&nbsp;the&nbsp;same<br>
+namespace.&nbsp;Otherwise,&nbsp;output&nbsp;processors&nbsp;will&nbsp;have&nbsp;to&nbsp;invent&nbsp;or<br>
+avoid&nbsp;useing&nbsp;namespaces,&nbsp;which&nbsp;will&nbsp;look&nbsp;ugly.</tt></dd></dl>
+
+<dl><dt><a name="RDFStructuredOutput-setGenPrefix"><strong>setGenPrefix</strong></a>(self, genPrefix)</dt></dl>
+
+<dl><dt><a name="RDFStructuredOutput-startDoc"><strong>startDoc</strong></a>(self)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="TracingRDFSink">class <strong>TracingRDFSink</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>An&nbsp;implementation&nbsp;of&nbsp;the&nbsp;<a href="#RDFSink">RDFSink</a>&nbsp;interface&nbsp;which&nbsp;helps&nbsp;me<br>
+understand&nbsp;it,&nbsp;especially&nbsp;how&nbsp;it&nbsp;gets&nbsp;used&nbsp;by&nbsp;parsers&nbsp;vs.&nbsp;by&nbsp;an<br>
+RDF&nbsp;store.&nbsp;&nbsp;&nbsp;&nbsp;[&nbsp;-sandro&nbsp;]<br>
+&nbsp;<br>
+Set&nbsp;.backing&nbsp;to&nbsp;be&nbsp;some&nbsp;other&nbsp;<a href="#RDFSink">RDFSink</a>&nbsp;if&nbsp;you&nbsp;want&nbsp;to&nbsp;get&nbsp;proper<br>
+results&nbsp;while&nbsp;tracing.<br>
+&nbsp;<br>
+Try:<br>
+&nbsp;<br>
+bash-2.04$&nbsp;python&nbsp;cwm.py&nbsp;test/rules12.n3&nbsp;--language=trace<br>
+bash-2.04$&nbsp;python&nbsp;cwm.py&nbsp;--pipe&nbsp;test/rules12.n3&nbsp;--language=trace<br>
+bash-2.04$&nbsp;python&nbsp;cwm.py&nbsp;test/rules12.n3&nbsp;--bySubject&nbsp;--language=trace<br>
+&nbsp;<br>
+...&nbsp;and&nbsp;see&nbsp;the&nbsp;different&nbsp;outputs<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="TracingRDFSink-__init__"><strong>__init__</strong></a>(self, outURI, base<font color="#909090">=None</font>, flags<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="TracingRDFSink-bind"><strong>bind</strong></a>(self, prefix, uri)</dt></dl>
+
+<dl><dt><a name="TracingRDFSink-endDoc"><strong>endDoc</strong></a>(self, rootFormulaPair<font color="#909090">='&lt;&lt;strangely omitted&gt;&gt;'</font>)</dt></dl>
+
+<dl><dt><a name="TracingRDFSink-endFormulaObject"><strong>endFormulaObject</strong></a>(self, pred, subj)</dt></dl>
+
+<dl><dt><a name="TracingRDFSink-endFormulaSubject"><strong>endFormulaSubject</strong></a>(self, subj)</dt></dl>
+
+<dl><dt><a name="TracingRDFSink-makeComment"><strong>makeComment</strong></a>(self, comment)</dt></dl>
+
+<dl><dt><a name="TracingRDFSink-makeStatement"><strong>makeStatement</strong></a>(self, tuple, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="TracingRDFSink-newFormula"><strong>newFormula</strong></a>(self, uri<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="TracingRDFSink-newLiteral"><strong>newLiteral</strong></a>(self, str, dt<font color="#909090">=None</font>, lang<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="TracingRDFSink-newSymbol"><strong>newSymbol</strong></a>(self, uri)</dt></dl>
+
+<dl><dt><a name="TracingRDFSink-setDefaultNamespace"><strong>setDefaultNamespace</strong></a>(self, ns)</dt></dl>
+
+<dl><dt><a name="TracingRDFSink-startDoc"><strong>startDoc</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="TracingRDFSink-startFormulaObject"><strong>startFormulaObject</strong></a>(self, triple)</dt></dl>
+
+<dl><dt><a name="TracingRDFSink-startFormulaSubject"><strong>startFormulaSubject</strong></a>(self, context)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="URISyntaxError">class <strong>URISyntaxError</strong></a>(<a href="exceptions.html#ValueError">exceptions.ValueError</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;parameter&nbsp;is&nbsp;passed&nbsp;to&nbsp;a&nbsp;routine&nbsp;that&nbsp;requires&nbsp;a&nbsp;URI&nbsp;reference<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="RDFSink.html#URISyntaxError">URISyntaxError</a></dd>
+<dd><a href="exceptions.html#ValueError">exceptions.ValueError</a></dd>
+<dd><a href="exceptions.html#StandardError">exceptions.StandardError</a></dd>
+<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
+</dl>
+<hr>
+Methods inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><a name="URISyntaxError-__getitem__"><strong>__getitem__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="URISyntaxError-__init__"><strong>__init__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="URISyntaxError-__str__"><strong>__str__</strong></a>(...)</dt></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-getpid"><strong>getpid</strong></a>(...)</dt><dd><tt><a href="#-getpid">getpid</a>()&nbsp;-&gt;&nbsp;pid<br>
+&nbsp;<br>
+Return&nbsp;the&nbsp;current&nbsp;process&nbsp;id</tt></dd></dl>
+ <dl><dt><a name="-runNamespace"><strong>runNamespace</strong></a>()</dt><dd><tt>Return&nbsp;a&nbsp;URI&nbsp;suitable&nbsp;as&nbsp;a&nbsp;namespace&nbsp;for&nbsp;run-local&nbsp;objects</tt></dd></dl>
+ <dl><dt><a name="-time"><strong>time</strong></a>(...)</dt><dd><tt><a href="#-time">time</a>()&nbsp;-&gt;&nbsp;floating&nbsp;point&nbsp;number<br>
+&nbsp;<br>
+Return&nbsp;the&nbsp;current&nbsp;time&nbsp;in&nbsp;seconds&nbsp;since&nbsp;the&nbsp;Epoch.<br>
+Fractions&nbsp;of&nbsp;a&nbsp;second&nbsp;may&nbsp;be&nbsp;present&nbsp;if&nbsp;the&nbsp;system&nbsp;clock&nbsp;provides&nbsp;them.</tt></dd></dl>
+ <dl><dt><a name="-uniqueURI"><strong>uniqueURI</strong></a>()</dt><dd><tt>A&nbsp;unique&nbsp;URI</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>ALL4</strong> = (0, 1, 2, 3)<br>
+<strong>ANONYMOUS</strong> = 3<br>
+<strong>CONTEXT</strong> = 0<br>
+<strong>DAML_sameAs_URI</strong> = 'http://www.w3.org/2002/07/owl#sameAs'<br>
+<strong>FORMULA</strong> = 1<br>
+<strong>LITERAL</strong> = 2<br>
+<strong>LITERAL_DT</strong> = 21<br>
+<strong>LITERAL_LANG</strong> = 22<br>
+<strong>List_NS</strong> = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'<br>
+<strong>Logic_NS</strong> = 'http://www.w3.org/2000/10/swap/log#'<br>
+<strong>N3_Empty</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Empty')<br>
+<strong>N3_List</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#List')<br>
+<strong>N3_first</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#first')<br>
+<strong>N3_li</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#li')<br>
+<strong>N3_nil</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#nil')<br>
+<strong>N3_rest</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#rest')<br>
+<strong>NODE_MERGE_URI</strong> = 'http://www.w3.org/2000/10/swap/log#is'<br>
+<strong>OBJ</strong> = 3<br>
+<strong>OWL_NS</strong> = 'http://www.w3.org/2002/07/owl#'<br>
+<strong>PARTS</strong> = (1, 2, 3)<br>
+<strong>PRED</strong> = 1<br>
+<strong>RDF_NS_URI</strong> = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'<br>
+<strong>RDF_spec</strong> = 'http://www.w3.org/TR/REC-rdf-syntax/'<br>
+<strong>RDF_type_URI</strong> = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'<br>
+<strong>SUBJ</strong> = 2<br>
+<strong>SYMBOL</strong> = 0<br>
+<strong>XMLLITERAL</strong> = 25<br>
+<strong>__version__</strong> = '$Id: RDFSink.html,v 1.22 2007/06/27 17:58:39 syosi Exp $'<br>
+<strong>environ</strong> = {'XDG_DATA_HOME': '/Users/yosi/.local/share', 'T...P', 'SGML_CATALOG_FILES': '/sw/etc/sgml/catalog'}<br>
+<strong>forAllSym</strong> = 'http://www.w3.org/2000/10/swap/log#forAll'<br>
+<strong>forSomeSym</strong> = 'http://www.w3.org/2000/10/swap/log#forSome'<br>
+<strong>nextu</strong> = 0<br>
+<strong>parsesTo_URI</strong> = 'http://www.w3.org/2000/10/swap/log#parsesTo'<br>
+<strong>runNamespaceValue</strong> = None</td></tr></table>
+</body></html>

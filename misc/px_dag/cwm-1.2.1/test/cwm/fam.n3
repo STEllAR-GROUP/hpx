@@ -1,0 +1,10 @@
+@prefix : <fam.n3#>.
+@keywords is, of, a.
+
+albert begat bill, bevan.
+bill begat carol, charlie.
+bertha begat carol, charlie.
+bevan begat chaude, christine.
+christine begat david, diana, douglas.
+
+#ends

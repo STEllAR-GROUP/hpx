@@ -1,0 +1,26 @@
+     @prefix : <v#> .
+     @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    
+    @forAll :a,
+                :b,
+                :c,
+                :x,
+                :y,
+                :z .
+    
+    "one"     a :SUCCESS .
+    
+    "two"     a :SUCCESS .
+      ( "one" 
+        "two"  )
+         a :whatever .
+    {
+        
+          ( :a 
+            :b  )
+             a :whatever .
+        
+        }     log:implies {:a     a :SUCCESS .
+        :b     a :SUCCESS .
+        } .
+    

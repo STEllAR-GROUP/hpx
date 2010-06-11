@@ -1,0 +1,19 @@
+# Test the cwm quick variable expressions
+
+#@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+#@prefix s: <http://www.w3.org/2000/01/rdf-schema#> .
+#@prefix daml:  <http://www.daml.org/2000/10/daml-ont#> .
+#@prefix fam:  <http://www.daml.example.org/2001/03/fam#> .
+#@prefix lang:   <http://www.daml.example.org/2000/10/lang#> .
+#@prefix log:  <http://www.w3.org/2000/10/swap/log#> .
+#@prefix math:  <http://www.w3.org/2000/10/swap/math#> .
+#@prefix  lang:  <http://www.w3.example.org/2000/10/swap/lang#> .
+
+#@prefix : <foo.n3#>.  # Local stuff
+#@prefix foo: <foo.n3#>.  # Local stuff
+
+
+
+{ ?a <#mother> ?b; <#sister> ?c } => { ?b <#aunt> ?c }.
+
+#ends

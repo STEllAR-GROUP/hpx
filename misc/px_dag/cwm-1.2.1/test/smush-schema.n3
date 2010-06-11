@@ -1,0 +1,23 @@
+# from http://rdfweb.org/2001/01/design/smush.html
+# see also: #rdfig 20 Jul 2001.
+
+@prefix : <http://www.w3.org/2000/10/swapt/test/smush-schema#>.
+@prefix v: <http://www.w3.org/2000/10/swapt/test/smush-schema#>.
+@prefix agg: <http://example.com/xmlns/aggregation-demo#>.
+
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+
+
+# :UniquelyIdentifyingProperty has since
+#  been called daml+oil:UnambiguousProperty.
+# but let's not mix DAML into this...
+
+@forAll :p, :x, :y, :z.
+
+{  :p a agg:UniquelyIdentifyingProperty. } log:implies
+ { { :x :p :z. :y :p :z. } log:implies  { :x = :y } }.
+
+agg:personalMailbox a agg:UniquelyIdentifyingProperty.
+agg:personalHomepage a agg:UniquelyIdentifyingProperty.
+agg:corporateHomepage a agg:UniquelyIdentifyingProperty.
+

@@ -1,0 +1,23 @@
+# Test the cwm builtins
+
+#@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+#@prefix s: <http://www.w3.org/2000/01/rdf-schema#> .
+#@prefix daml:  <http://www.daml.org/2000/10/daml-ont#> .
+@prefix fam:  <http://www.daml.example.org/2001/03/fam#> .
+#@prefix ex:   <http://www.daml.org/2000/10/daml-ex#> .
+#@prefix log:  <http://www.w3.org/2000/10/swap/log#> .
+
+@prefix : <foo.n3#>.  # Local stuff
+@prefix foo: <foo.n3#>.  # Local stuff
+
+# Usage:   See t10.n3   
+#
+# Output should conclude all test* a :success and no failures.
+#
+
+
+  :albert!fam:mother fam:sister :auntieAnne .
+ 
+  :albert^fam:father fam:sister  :nieceBertha .
+
+#ends

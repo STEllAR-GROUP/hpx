@@ -1,0 +1,19 @@
+# example knowledge base
+
+@prefix q: <http://www.w3.org/2004/ql#>.
+@prefix ex: <http://www.example.com/foo#>.
+@prefix : <http://www.example.com/foo#>.
+@prefix math: <http://www.w3.org/2000/10/swap/math#>.
+@keywords a.
+
+
+[] a Reading; temp 26; ex:place London.
+[] a Reading; temp 21; ex:place Helsinki.
+[] a Reading; temp -10; ex:place Boston.
+[] a Reading; temp 31; ex:place Barcelona.
+
+Joe a Librarian; hairColor "black"; phone "+1 234 555 6789".
+Mary a Librarian; hairColor "red".
+Phil a FilmStar; hairColor "green".
+
+#ends

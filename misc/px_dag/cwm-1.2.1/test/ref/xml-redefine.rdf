@@ -1,0 +1,20 @@
+
+
+
+<rdf:RDF xmlns="http://example.com/m#"
+    xmlns:Wxml="http://example.com/xml#"
+    xmlns:a="http://example.com/m#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+
+    <rdf:Description rdf:about="http://example.com/m#a">
+        <b rdf:resource="http://example.com/m#c"/>
+    </rdf:Description>
+
+    <Wxml:P rdf:about="http://example.com/m#q">
+        <Wxml:v rdf:resource="http://example.com/xml#r"/>
+    </Wxml:P>
+
+    <rdf:Description rdf:about="http://example.com/m#y">
+        <n rdf:resource="http://example.com/m#i"/>
+    </rdf:Description>
+</rdf:RDF>

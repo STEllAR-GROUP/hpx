@@ -1,0 +1,116 @@
+# Convert BNF in RDF to HTML
+
+#
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix bnf: <http://www.w3.org/2000/10/swap/grammar/bnf#>.
+@prefix rul: <http://www.w3.org/2000/10/swap/grammar/bnf-rules#>.
+@prefix : <http://www.w3.org/2000/10/swap/grammar/bnf2html#>.
+@prefix h: <http://www.w3.org/2000/10/swap/grammar/bnf2html#>.
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+@prefix string: <http://www.w3.org/2000/10/swap/string#>.
+@keywords a, is, of.
+
+
+
+
+("0" 0) log:outputString 
+"""<html>
+<head>
+   <title>BNF</title>
+</head>
+<body>
+  <h1>BNF</h1>
+  <p>Productions are in normal type, linked to their definitions.<br />
+    <em>Regular expressions are in italics</em><br />
+    <b><code>Literal characters in quoted in bold</code></b><br />
+    <em>void</em> means an empty production.
+  </p>
+  <dl>
+""".
+
+("~~" 9) log:outputString """
+</dl>
+</html>
+""".
+
+
+
+#  Find all possible sequences for each term
+#
+{ ?x bnf:mustBeOneSequence ?y} => { ?x optionTail ?y; a Production}.
+
+{ ?x bnf:matches [] } => { ?x a Production}.
+
+{?x optionTail [rdf:first ?y; rdf:rest ?z]} => {
+	?x 	bnf:canBeSequence ?y;
+		optionTail ?z.
+	?y a Sequence}.
+
+# Label every trailing subseqeunce
+
+{ ?seq a Sequence } => { ?seq a SequenceTail }.
+{ ?seq a SequenceTail; rdf:rest ?s2 } => { ?s2 a SequenceTail }.
+
+# Literal are referenced but no labels for LHS  @@ escaped
+
+{ ?seq a SequenceTail; rdf:first ?x.
+	?x log:rawType log:Literal.
+	( "<b><code>\"" ?x "\"</code></b>" ) string:concatenation ?ref.
+} => { ?x  reference ?ref }.
+
+############	
+{ 	?x a Production.
+  	?x log:uri ?u.
+  	(?u ".*#(.*)") string:scrape ?lab.
+} =>  {
+	?x bnf:label ?lab.
+}.  
+
+
+{ 	?x a Production; bnf:label ?lab.
+	( "<a href='#" ?lab "'>" ?lab "</a>" ) string:concatenation ?ref.
+  	( "  <dt><a name='" ?lab "'>" ?lab "</a></dt><dd>\n" )
+		string:concatenation ?start.
+  } =>  {
+	?x reference ?ref.
+	(?lab 0) log:outputString ?start.
+	(?lab 9) log:outputString "\t</dd>\n".
+}.  
+
+############
+
+() seqlabel "<em>void</em>".
+
+bnf:eof  reference "<em>EOF</em>".
+
+# Start it, skipping use of the seqlabel of ():
+
+{ 	?seq a SequenceTail; rdf:first ?x; rdf:rest ().
+	?x reference ?lab1.
+} => { ?seq seqlabel  ?lab1 }.
+
+# This one takes forever:
+{ 	?seq a SequenceTail; rdf:first ?x; rdf:rest ?tail.
+	?x reference ?lab1.
+	?tail seqlabel ?lab2; rdf:rest [].  # Non-null
+	(?lab1 " " ?lab2) string:concatenation ?str
+} => { ?seq seqlabel  ?str }.
+
+{?x bnf:label ?lab; bnf:canBeSequence [seqlabel ?seqlab].
+("\t\t<p>" ?seqlab "</p>\n" ) string:concatenation ?para
+} => {(?lab 5) log:outputString ?para}.
+
+
+{ 	[] a Production;
+	   bnf:label ?lab;
+	   bnf:matches ?regexp.
+	( "\t<p><em>" ?regexp "</em></p>\n") string:concatenation ?regpara.
+}=>{
+	(?lab 6) log:outputString ?regpara.
+	
+}.
+
+
+
+#end

@@ -1,0 +1,27 @@
+# Isolating a bug
+# The problem was gtaht the rule didn't fire if vraible :a
+# occured twice in the same list.
+
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+@prefix string: <http://www.w3.org/2000/10/swap/string#>.
+@prefix os: <http://www.w3.org/2000/10/swap/os#>.
+@prefix : <#>.
+
+
+@forAll :a, :s.
+
+"Ostrich" a :foobar.
+
+{
+:a a :foobar.
+   ( 
+ :a
+
+ :a
+
+    ) string:concatenation :s.
+
+}=>{ "00" log:outputString :s }.
+
+#ends
+

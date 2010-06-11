@@ -1,0 +1,16 @@
+     @prefix : <#> .
+    
+     @forAll :x.
+         @forSome :_g0 .
+    
+    :_g0     a :Mother;
+         :name "Mary";
+         :says {:You     :listenTo :_g0 .
+        } .
+    {
+        :x     a :Mother .
+        
+        }     <http://www.w3.org/2000/10/swap/log#implies> {:x     :says {:You     :listenTo :x .
+            } .
+        } .
+    

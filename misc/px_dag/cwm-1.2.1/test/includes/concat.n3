@@ -1,0 +1,75 @@
+# Test the string:concatenation function
+#
+# The earlier tests were written with a historical string:concat which is the INVERSE!!
+# Please use string:concatenation -- or think of a better name for its inverse.
+
+#@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+#@prefix s: <http://www.w3.org/2000/01/rdf-schema#> .
+#@prefix daml:  <http://www.daml.org/2000/10/daml-ont#> .
+#@prefix dpo:  <http://www.daml.org/2001/03/daml+oil#> .
+#@prefix ex:   <http://www.daml.org/2000/10/daml-ex#> .
+
+@prefix log:  <http://www.w3.org/2000/10/swap/log#> .
+@prefix string:  <http://www.w3.org/2000/10/swap/string#> .
+@prefix : <#>.  # Local stuff
+
+# Usage:   cwm t13.n3 -think
+#
+# Output should conclude all test* a :success and no failures.
+#
+
+#@forAll :x.
+
+@forAll :x, :y, :z.
+
+{ ""  string:concat () } log:implies {:test13a a :success}.
+
+{ :x  string:concat () } log:implies {:emptyString :is :x}.
+{ :emptyString :is "" } log:implies { :test13b a :success }.
+
+{ :x string:concat ( "foo" ) }  log:implies { :fooString :is :x }.
+{ :fooString :is "foo" } log:implies { :test13c a :success }.
+
+{ :x  string:concat ("World" [string:concat ("W" "i" "d" "e")] "Web") } log:implies {:www :is :x}.
+{ :www :is "WorldWideWeb" } log:implies { :test13d a :success }.
+
+{ :x  string:concat ("World" "Wide" "Web") } log:implies {:www2 :is :x}.
+{ :www2 :is "WorldWideWeb" } log:implies { :test13e a :success }.
+
+{ :x  string:concat ("World" :y "Web").
+  :y  string:concat ( "W" "I" "D""E").
+ } log:implies {:www3:is :x}.
+{ :www3 :is "WorldWIDEWeb" } log:implies { :test13f a :success }.
+
+
+{ "" log:equalTo [ string:concat () ]  } log:implies {:test13g a :success}.
+
+{ "one" log:equalTo [ string:concat () ]  } log:implies {:test13a_bis a :FAILURE}.
+
+{ "" log:equalTo [ string:concat ( "one" ) ].} log:implies {:test13b_bis a :FAILURE}.
+
+{ "one" log:equalTo [ string:concat ( "World" "Wide" "Web" ) ]}
+    log:implies {:test13c_bis a :FAILURE}.
+
+{ :x is string:concatenation of (
+      "World"
+      [is string:concatenation of ("W" "i" "d" "e")]
+      "Web") } log:implies {:www5 :is :x}.
+{ :www5 :is "WorldWideWeb" } log:implies { :test13h a :success }.
+
+{
+ :test13a a :success.
+ :test13b a :success.
+ :test13c a :success.
+ :test13d a :success.
+ :test13e a :success.
+ :test13f a :success.
+ :test13g a :success.
+ :test13h a :success.
+} log:implies { :TEST13 a :success }.
+
+log:implies a log:Chaff.  # Purge will remove rules
+
+# ends
+
+

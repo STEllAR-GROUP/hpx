@@ -1,0 +1,560 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <title>Cwm features wished for and done</title>
+  <meta name="generator" content="amaya 8.5, see http://www.w3.org/Amaya/" />
+  <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+<div class="noprint">
+<p><a href="/">W3C</a> | <a href="/2001/sw/Overview.html">Semantic Web</a> |
+<a href="/2000/01/sw/Overview.html">Advanced Development</a> | <a
+href="/2000/10/swap/">SWAP</a> | <a href="/2000/10/swap/doc/">Tutorial</a> |
+Comparing Formats</p>
+</div>
+
+<h1><a href="../../../../DesignIssues/Notation3.html"><img alt="n3"
+style="float: right" src="../../../../RDF/icons/n3_small" /></a> <a
+href="cwm">Cwm</a> Changes</h1>
+
+<p>See also:</p>
+<ul>
+  <li><a href="../admin/bugStatus.html">Outstanding bugs.</a> Bugs (and some
+    small requests for enhancement) are tracked in RDF.</li>
+  <li><a href="plans.html">Release Roadmap</a>. The list of longer term
+    enhanecements and some release planning.</li>
+</ul>
+
+
+<p>@@which release?</p>
+<ul>
+  <li>--think --filter combination. The application of rules to the
+    [notional] deductive closure of a formula is a function which is equally
+    valid in forward and backward chaining systems. Providing it will allow
+    the same problems to be tackled by different techniques, and different
+    systems and clones. (written - yosi)</li>
+</ul>
+
+<h2>Release 1.1rc1</h2>
+
+<p>see <a href="http://lists.w3.org/Archives/Public/public-cwm-announce/2005JulSep/0000.html">11 Aug announcement</a></p>
+<h4>Performance Improvements</h4>
+<ul>
+  <li>Cwm now uses Python Sets instead of lists to store many things</li>
+  <li>Speed improvements to some tests are orders of magnitude</li>
+  <li>Output is not as stable as it once was</li>
+</ul>
+
+<h4>Python 2.3 or later now required</h4>
+
+<p>Used for Sets</p>
+
+<h4>Experimental SPARQL Server support</h4>
+
+<p>Cwm can now run as a SPARQL server. This includes:</p>
+<ul>
+  <li>A preview cwm --sparqlServer, which runs a server on port 8000</li>
+  <li>cwm --sparql=, which behaves like --query=</li>
+  <li>builtins for doing sparql queries from within n3.</li>
+</ul>
+
+<h4>RDF/XML serialization fixes</h4>
+
+<p>A few strange bugs in rdf:xml serialization, many related to the rdf:
+prefix or xml: prefix, have been fixed</p>
+
+<h4>delta exit statuses</h4>
+
+<p>delta now returns with similar exit statuses as the diff utility for
+plaintext files. An exit status of 0 means no differences between the
+<q>from</q> and <q>to</q> graphs were found. An exit status of 1 means some
+differences were found. An exit status of 2 means differences were not
+computed for some reason.</p>
+
+<h2>Release 1.0</h2>
+
+<h4>delta and cwm --patch</h4>
+<ul>
+  <li>diff.py is renamed delta.py to avoid confusion with diff(1).</li>
+  <li>delta.py now will make a difference file even in cases where nodes
+    cannot be be uniquely identified (from [inverse] function properties) but
+    can be uniquely identified in the context of the graph. So, delta.py can
+    generate weak deltas rather than strong ones under these
+  circumstances.</li>
+  <li>Bug fix to cwm's --patch function.</li>
+</ul>
+
+<h4>General bugfixes</h4>
+
+<p>Fixes in decimal support</p>
+
+<p>A bug introduced into 0.8.0 where cwm crashed if no input files were
+specified has been fixed</p>
+
+<h4>Other</h4>
+
+<p>A crude hack in WebAccess.py allows a local file system to be used instead
+of a given website. The intent is to clean this up in the future.</p>
+
+<p>There has been much work on a grammar for n3. grammar/n3.n3 is the
+grammar, grammar/predictiveParser.n3 can understand it.</p>
+
+<h4>RDF/XML support changes</h4>
+<ul>
+  <li>cwm's rdf/xml output will now output any file that can be outputted in
+    xml 1.0. Failing that, it will output it in xml 1.1. Failing that, it
+    will throw an exception. The previous behavior of generating empty tags
+    was a bug.</li>
+  <li>Cwm will throw an excpetion if told to output rdf/xml for a file that
+    uses literals as subjects</li>
+  <li>Tests have been added for rdflib. It is now supported to a degree.</li>
+  <li>Cwm now successfully fails to parse all but four of the rdf negative
+    parser tests</li>
+</ul>
+
+<h4>Performance improvements</h4>
+
+<p>Performance work has resulted in some tasks taking 1/10 the time that they
+used to. Much more work is planned in this regard.</p>
+
+<h4>Packaging</h4>
+
+<p>Cwm now uses python's distutils for distribution. This allows for
+installation of cwm. As an added bonus, there are now rpm's, windows
+installers.</p>
+
+<h4>Flatten support</h4>
+
+<p>--flatten and --unflatten have been rewritten, replacing the old --flat.
+Flatten minimally reifies an n3 file to make it an rdf graph. Note that the
+graph may still fail to serialize as rdf, due to literals as subjects.</p>
+
+<h2 id="rel0.8">Release 0.8</h2>
+<ul>
+  <li><a
+    href="http://lists.w3.org/Archives/Public/public-cwm-announce/2004JulSep/0000.html">Release
+    0.8.0 and bug summary</a> of Mon, 12 Jul 2004 11:57:37 -0400</li>
+  <li><a href="http://www.w3.org/2000/10/swap/cwm.tar.gz">cwm.tar.gz</a> for
+    cwm-0.8</li>
+</ul>
+
+<p>This release has some bugfixes, as well as some changed and new
+functionality.</p>
+
+<h4>General bugfixes</h4>
+
+<p>Cwm will now do the expected thing on log:uri if given an invalid URI
+string.</p>
+
+<p>An integer over the platforms native integer size will no longer crash
+Cwm.</p>
+
+<p>Cwm now understands most xsd datatyped for use in builtins.</p>
+
+<p>By setting the environment variable CWM_RDFLIB to 1, cwm will use rdflib
+to parse rdf/xml files. Note that this is unsupported, may break in the
+future, and requrires rdflib be installed. Rdflib supports some rdf features
+Cwm's parser does not, so this may be useful to you notwithstanding</p>
+
+<h4>BNodes scope changes</h4>
+
+<p>BNodes given names using the _: notation now have formula scope, not
+document scope.</p>
+
+<h4>Release / Test changes</h4>
+
+<p>Cwm is now released in a new file, cwm.tar.gz, which, while being a
+fraction of the size of the old cwm.tgz, still includes a complete set of
+tests. It was discovered that Cwm was not actually running all of its tests.
+This has been fixed, and the tests have been split into tests guarenteed to
+work in the .tar.gz file (offline) and those which will not.</p>
+
+<h4>N3QL support</h4>
+
+<p>N3QL support. Initial support for <a
+href="../../../../DesignIssues/N3QL.html">N3QL</a> query language handling in
+cwm. command line looks like: <code>cwm <em>myKB.n3</em>
+--query=<em>myquery.n3ql</em></code>. Initial test case in <a
+href="../test/ql/detailed.tests">swap/test/ql/detailed.tests</a></p>
+
+<h4>N3 serialization changes</h4>
+
+<p>The default output form is <code>@forAll</code>, not <code>this
+log:forAll</code>, <code>@forSome</code>, not <code>this log:forSome</code>.
+Use --n3=v to force the old obsolete form for variable declations. The parser
+has for a long time and will for some time support both forms.</p>
+
+<h4>Reification support</h4>
+
+<p>Reification, after being broken for almost a year, has been rewritten and
+is better than ever. See <a
+href="../test/reify/detailed.tests">reify/detailed.tests</a>The options, as
+always, are --reify and --dereify. The tests for this are now in. There is
+insufficient documentation for this feature, and it has not been completely
+tested, so there may yet be bugs in it. If there is demand for it, fixing the
+--flatten feature should be possible now.</p>
+
+<p>2004/6/23:</p>
+
+<h4>MIME type changes</h4>
+
+<p><strong>Mime type</strong> for Notation3 switched to text/rdf+n3. This
+could be a major change. The application for application/n3 never seemed to
+get anywhere with IANA anyway. Text has the advantage that browsers will by
+default dispaly it, and N3 is designed to be readable. Downside is that if it
+not ASCII, then you must include the charset specification in the mime type.
+This must be UTF-8, and notation3 is always utf-8.</p>
+
+<h2>Release 0.7.3</h2>
+
+<h4>HTTP errors</h4>
+
+<p>Cwm now correctly identifies HTTP 404 errors, throwing an exception, and
+does not try to parse the returned (HTML) file.</p>
+
+<h4>Reflexive statements now work</h4>
+
+<p>An n3 statement which references the same universal quantifier twice now
+does the right thing.</p>
+
+<h2>Release 0.7.2</h2>
+
+<p>Ooops - nodeID was misspelled nodeid on RDF/XML output.</p>
+
+<h4>Patch functionality</h4>
+
+<p>The <code>--patch=<em>patchfile</em></code> command line argument allows a
+patch file to be applied to the knowledge base (current working formula). See
+the <a href="../../../../DesignIssues/Diff">Diff, Patch, Update and Sync</a>
+note in the <em>Design Issues</em> series on the motivation for exchanging
+difference files, and how they work. Diff files can in certain specific
+circumstances (a well-labeled graph) be produced by the diff.py program
+included with this distribution. The new tests are in
+$SWAP/test/delta/detailed.tests</p>
+
+<h4>Internationization undefined, Numerics canonicalized</h4>
+
+<p>The i18n/detailed.tests have been removed from the test harness. They were
+not right, and URI/ IRI issues are not clear yet. It is not clear whether cwm
+should URI-canonicalize, or IRI-canonicalize. (My instinct is that it should
+- Tim).</p>
+
+<p>Cwm does not canonicalize numerical (xsd:double and xsd:integer) values on
+N3 output. It uses python's str(float(s)) and str(int(s)). The effect is to
+reduce some over-precision in the output.</p>
+
+<h2>Release 0.7.1, 2004-03-04</h2>
+
+<h4>RDF Parser improved</h4>
+
+<p>The cwm regresssion test now incorporates the RDF Core Positive Parser
+Tests except for those which deal with reification or with XML literals. In
+the process, xml:base supposrt was added in the parser.</p>
+
+<p><a
+href="http://www.w3.org/2000/10/rdf-tests/rdfcore/rdf-element-not-mandatory/test001.rdf"></a><a
+href="http://www.w3.org/2000/10/rdf-tests/rdfcore/rdf-element-not-mandatory/test001.rdf">A
+new test</a> found in the updated core tests requires RDF to be parsed even
+when there is no enveloping &lt;rdf:RDF&gt; tag, even if the outermost
+element is a typed node production, and so not something in the RDF namespace
+at all. This makes rdf much less self-describing, and makes it more dangerous
+that one might parse say an HTML file as RDF by accident. Use with care. If
+need this feature, use the --rdf=R flag.</p>
+
+<p>The RDF core tests are done with --rdf=RT to make the parser parse naked
+RDF or RDF buried in foreign XML..</p>
+
+<h4>nodeid generated on RDF output</h4>
+
+<p>This has been a missing feature of the RDF generator for a while. The
+nodeid feature allows bnodes to be output in RDF/XML. I may not have got this
+right, as I don't have RDF generation tests, only RDF parse tests.</p>
+
+<h4>Ordering of output</h4>
+
+<p>The ordering of Terms has been changed. Automatically generated terms with
+no URIs sort after anything which has a URI.</p>
+
+<p>This will change the order of N3 and RDF/XML output but does not change
+its semantics.s</p>
+
+<h4>Namespace prefix smarts on output</h4>
+
+<p>Cwm now does output in a two-pass process. This makes its counting of the
+number of occurrences of namespaces more acurate, which determines the
+default namespace it choses. This does take more time, though not as long as
+the previous method of working out which was going to be most common. To skip
+this process, use the "d" flag on output (N3 or RDF/XML) to suppress the use
+of a default namespace.</p>
+
+<p>Because this counting is now accurate, it now suppresses namespace prefix
+declarations which are not actually needed in the output.</p>
+
+<p>Cwm will also make up prefixes when it needs them for a namespace, and
+none of the input data uses one. It peeks into the the namespace URI, and
+looks around for a short string after the last "/", adding numbers if
+necessary to make the prefix unique.</p>
+
+<h4>Namespaces without hashes</h4>
+
+<p>Cwm when writing N3 not normally use namespace names for URIs which do not
+have a "#". Including a "/" in the flags overrides this.</p>
+
+<p>cwm mydcdata.n3 --n3="/"</p>
+
+<p>Namespaces which end in "/" lead (in my opinion) to an unfortunate
+confusion between the RDF propoerties and the HTTP document they identify.
+This is related to W3C TAG Issue httpRange-14.</p>
+
+<h4>ValueError: You cannot use 'this' except as subject of forAll or
+forSome</h4>
+
+<p>The "this" syntax in a formula refers to the formula itself. It was used
+for thr pseudo-statements this log:forSome x, and this log;forAll y.</p>
+
+<p>In a few rare cases it actually was used to refer logically to the formula
+itself. A classic is of course { this a log:falseHood }. I decided that this
+was going to make more problems than it would solve. The psudostatements have
+gone anway (in response to popular request), they became just syntax. And the
+@forAll syntax has been introduced as the way to go. So with this release,
+while you can still like many N3 files use this to qualify variables, you
+can't use it for anything else.</p>
+
+<h3>Release 0.7, 2004-02-04</h3>
+
+<p>Release 0.7. 2004-02-04: This is a first numbered release. After much
+discussion we picked 0.7 as the number. Added a CVS tag rel-0-7, so that if
+you have the source through CVS, you up- or down-grade to this by</p>
+<pre>cvs update -r rel-0-7</pre>
+
+<p>The idea is that this release has a well-defined set of bugs, and that we
+work toward a more community-supported platform with time.</p>
+<ol>
+  <li>The set of open bugs or request for enhancements (RFEs) which have been
+    sent to the list are now available, every time we run make, in an
+    iCalendar format <a href="../admin/N3-Bugs.ics">ToDo list</a>. . This at
+    least tracks the outstanding one. Those for which a "[closed] Re: ..."
+    response exists are given <em>Completed</em> status.</li>
+  <li>A few have actually been closed. Closure now where appropiate involves
+    including a suitable test in the regression tests. This test currently
+    includes all the n3 format files detailed.tests in subdirectories of
+    $SWAP/test.</li>
+  <li>New mailing lists have been made.
+    <dl>
+      <dt><a
+      href="http://lists.w3.org/Archives/Public/public-cwm-announce">public-cwm-announce</a></dt>
+        <dd>This low-traffic is for announcements about releases of cwm
+          software.</dd>
+      <dt><a
+      href="http://lists.w3.org/Archives/public/public-cwm-bugs/">public-cwm-bugs</a><a></a></dt>
+        <dd>This is for the announcement and brief discussion/clarification
+          of cwm bugs. A mail with subject [closed] Re: .... marks a thread
+          as closed. We may make this protocol more sophistiucaed with time.
+          If responding to only use mailers which send the refernce headers
+          so that the threads on this mail ling list work. For new threads,
+          please make the subject line informative, and use the word "bug" or
+          "RFE" as appopriate. The current plan is to review changes in this
+          monthly and send it to the announce list</dd>
+      <dt><a
+      href="http://lists.w3.org/Archives/Public/pub;ic-www-talk/">public-cwm-talk</a></dt>
+        <dd>Discussion by users and/or developers of the use and abuse of
+          project software.</dd>
+    </dl>
+  </li>
+</ol>
+
+<h3>Changes 2003-09</h3>
+<ol>
+  <li>More on-added functionality: --closure=e <strong>smushes</strong> nodes
+    which are = into one. That is any time the working formula (knowledge
+    base) has a triple added where a = b, the store with "e" in the closure
+    mode will replace all occurrences of b with a. When chosing which of the
+    two to use as the node, the preference will be to literals or lists or
+    formulae, then to symbols with URIs (lexically lowest prefered, e.g.
+    &lt;a&gt; rather than &lt;b&gt;), then blank nodes. It will remember the
+    quality.</li>
+  <li>--closure=T makes the adding of a triple {<em>F</em> a log:Truth} where
+    F is a formula to cause the content of F to be loaded into the knowledge
+    base.</li>
+  <li>The ordering of terms has been fixed so that all constants literals,
+    lsits amd formula should all appear before any symbols in a listing.
+    <p>(code is formula.compareTerm())</p>
+  </li>
+</ol>
+
+<h2>Cwm Changes 2003/08</h2>
+
+<p>At this point cwm made a number of changes at once, so we document them
+here.</p>
+
+<p><small><code>@prefix test:
+&lt;http://www.w3.org/2000/10/swap/test/regression#&gt;.</code></small></p>
+<ol>
+  <li><p>The <strong>namespaces</strong> used for lists changed from DAML to
+    RDF. The namespace used for "=" switched to OWL. DAML and DAML+OIL are
+    used no more, though we remember them fondly. This change actually
+    shouldn't change much in many applications, where files use the
+    collection syntax in RDF or the () and = syntaxes in N3. It does affect
+    the order of statements cwm uses to pretty-print files.</p>
+  </li>
+  <li><strong>Lists</strong> are handled differently internally. This is a
+    bit of a an experiment. Instead of being stored in their first/rest forms
+    in the graph, complete lists are stored as List objects. Thse are first
+    class objects. .
+    <ul>
+      <li>You can match against lists. Unification of formlae will catch
+        identical lists such as ( &lt;a&gt; &lt;b&gt; ) matching against (
+        &lt;a&gt; &lt;b&gt; ) because Lists are interned, and also unify ( ?x
+        ?y ) with ( &lt;a&gt; &lt;b&gt; ). This still does not work , however
+        with formulae. Watch this space, though,as this may change.</li>
+      <li>The list-handling is not complete when constructing lists. (test
+        that fail: test/list/gk*.n3 -- sorry Graham!). Lists generated are
+        currently not available to be queried. rdf:first and rdf:rest are
+        built-in functions which work to dismantle lists, but currently
+        <strong>not to build them</strong>. or, that is, you can build them
+        but you can't directly query them... watch this space. Hopefully this
+        will be fixed, and the lists will behave just as thoug the actual
+        graph contained rdf:first and rdf:rest triples (but be more
+        efficient).</li>
+      <li>You should be able to generate lists from built-ins if you are
+        making new built-in functions. Just return a python sequence from
+        evaluateObject().</li>
+      <li>The unification (query) engine was complicated by the fact that
+        lists in the antecedent can be assumed as all lists exist by axiom.
+        The last release of llyn had a bug (<code>test:t1018b2</code>) with
+        that - and wrapping my head round that caused me to decide it was
+        time for the change. It is nowsimpler in that regard.</li>
+      <li>In canonical comparisons, Lists are greater than literals and
+        smaller than formulae. This may affect the ordering of cwm-generated
+        files. Lists currently compare element by element, or if elements
+        match, shortest is smallest.</li>
+    </ul>
+  </li>
+  <li><strong>New option --data</strong> strips the store down to an RDF
+    graph, losing universal variables (forAll's) and any statements which
+    mentoin nested formulae. --purge-rules is now deprocated and does the
+    same thing. (--purge-rules sed to be a just remove things menioning
+    forAll or implies.)</li>
+  <li><strong>Generated Ids</strong> have in the past been generated relative
+    to the current input file (or base) like &lt;#_g0&gt;. This had two
+    problems. The first is that purists point outthat cwm is assertingthings
+    about the user's namespace which aren't necessarily true - why does cwm
+    have the right to do this? The second is pragmatic: when two files
+    already with cwm-generated genids were re-processed using cwm, it could
+    under some cases end up reusing the same id. Now, cwm makes up, by
+    default, much more resilient ones. It imagines a file called something
+    like .run-19435661734.7651234 in the local directory, and uses that
+    file's local space for its names. If you don't like this (eg for
+    repeatable testing) you can set an environment variable
+    <code><strong>CWM_RUN_NS</strong></code> to something like "#", which
+    will create the original behaviour, or a specific namespace you know you
+    won't reuse in related work.</li>
+</ol>
+
+<p>More changes 2003-08-25</p>
+<ol>
+  <li>2003-08 Pretty printing split from llyn.py to pretty.py. Interface may
+    change. Pretty printing should be faster now - for some runs it was
+    taking a lot longer than the parsing and inference steps. It had never
+    been designed for speed, but it was getting ridiculous.</li>
+  <li>2003-08-30 List processing improved. test/list/append.n3 works,
+    reverse.n3 doesn't yet. substituteEquals supported by all Terms, does
+    substituton of equals, used in compbaintion with F._redirection which is
+    a dictionary of aliases. Preparing for handling of equality and smushing
+    of nodes.</li>
+</ol>
+
+<h3>For python cwm developers</h3>
+<ol>
+  <li>The store is being separated into components. llyn.py was too big. The
+    idea is to be able to support a redland underlying store in the future.
+    The unification engine which includes the built-in function operation now
+    uses the store's api to access the store without peeking into
+  internals.</li>
+  <li>thing.py split into myStore.py and term.py</li>
+  <li>It used to be that the universal and existential variables in a formula
+    were stored in forAll and forSome psudo-property triples. This was
+    basically a kludge. One had to be always aware that the pseudoproperties
+    didn't act like real ones (no substitution for = etc). So now the lists
+    of variables have goene into the formula objects. This should make it
+    much easir for people tofollow whatis happeningin the code, and removes
+    all kinds of special case code.</li>
+</ol>
+
+<h2>Getting an old version</h2>
+
+<p>You can get the old version before these 2.0 changes using CVS, by
+checking out with the tag oldLists .</p>
+
+<p><code>cvs update -r oldLists</code></p>
+
+<h3>Features done earlier</h3>
+
+<p>Done ==== - sucking in the schema (http library?)</p>
+
+<p>--schemas ; - to know about r1 see r2;</p>
+
+<p>- split Query engine out as subclass of RDFStore? (DWC) SQL-equivalent
+client</p>
+
+<p>- split out separate modules: CGI interface, command-line stuff, built-ins
+(DWC 30Aug2001)</p>
+
+<p>- (test/retest.sh is another/better list of completed functionality
+--DWC)</p>
+
+<p>- BUG: a [ b c ] d. gets improperly output. See anon-pred</p>
+
+<p>- Separate the store hash table from the parser.</p>
+
+<p>- DONE - regeneration of genids on output.</p>
+
+<p>- DONE - repreentation of genids and foralls in model - regression test</p>
+
+<p>- DONE (once!) Manipulation: { } as notation for bag of statements - DONE
+- filter -DONE - graph match</p>
+
+<p>-DONE - recursive dump of nested bags</p>
+
+<p>- DONE - semi-reification - reifying only subexpressions</p>
+
+<p>- DONE - Bug :x :y :z as data should match [ :y :z ] as query. Fixed by
+stripping forSomes from top of query.</p>
+
+<p>- BUG: {} is a context but that is lost on output!!! statements not
+enough. See foo2.n3 - change existential representation :-( to make context a
+real conjunction again? (the forSome triple is special in that you can't
+remove it and reduce info) - filter out duplicate conclusions</p>
+
+<p>- BUG! - DONE - Validation: validate domain and range constraints against
+closure of classes and mutually disjoint classes.</p>
+
+<p>- Use unambiguous property to infer synomnyms (see sameDan.n3 test case in
+test/retest.sh)</p>
+
+<p>- schema validation - done partly but no "no schema for xx predicate".
+ULTILS WE HAVE DONE</p>
+
+<p>- includes(expr1, expr2) (cf &gt;= , dixitInterAlia )</p>
+
+<p>- indirectlyImplies(expr1, expr2)</p>
+
+<p>- startsWith(x,y)</p>
+
+<p>- uri(x, str)</p>
+
+<p>- usesNamespace(x,y) # find transitive closure for validation - awful
+function in reality</p>
+
+<div class="noprint">
+<hr />
+
+<p>$Id: changes.html,v 1.48 2005/11/03 22:25:04 connolly Exp $</p>
+</div>
+</body>
+</html>

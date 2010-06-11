@@ -1,0 +1,20 @@
+# test the handling os lists which are bound as other things get calculated
+#
+# use with --think
+
+@prefix : <#>.
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+@prefix math: <http://www.w3.org/2000/10/swap/math#>.
+
+@forAll :x, :y.
+
+
+# Cause llyn to search the store for a list:
+
+
+{   ?x  math:negation 1.
+   ( ?x 5 ) math:sum ?y  }  => { ?y a :RESULT }.
+
+{ 4 a :RESULT } => { :THIS_TEST a :SUCCESS }.
+
+#

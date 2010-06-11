@@ -1,0 +1,7 @@
+     @prefix : <invalid-ex.n3#> .
+     @prefix v: <schema-rules.n3#> .
+    
+    :disjointTest     a v:schemaInconsistency .
+    
+    :joe     a v:schemaInconsistency .
+    

@@ -1,0 +1,42 @@
+     @prefix : <vblsNotURIs.n3#> .
+    @prefix ani: <animal.rdf#> .
+    @prefix d12: <http://www.daml.org/2000/12/daml+oil#> .
+    @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+    
+     @forAll :i,
+                :o .
+    
+    ani:Animal     a rdfs:Class;
+         d12:restrictedBy  [
+             a :Found,
+                    d12:Restriction;
+             d12:cardinality "2";
+             d12:onProperty ani:parent ];
+         rdfs:label "Animal" .
+    
+    <vblsNotURIs.n3>     <http://purl.org/dc/elements/1.1/description> """test that log:uri only
+gives URIs that somebody actually used, not variable names
+
+run it ala:
+ python cwm.py --rdf test/animal.rdf --n3 test/vblsNotURIs.n3 --think
+""";
+         <http://purl.org/dc/elements/1.1/version> "" .
+    
+    :x     d12:restrictedBy  [
+             a :Found,
+                    :Something ] .
+    {
+        
+          [      d12:restrictedBy :o ].
+        
+        }     log:implies {:o     a :Found .
+        } .
+    {
+        
+          [      d12:restrictedBy :o ].
+        :o     log:uri :i .
+        
+        }     log:implies {:o     :called :i .
+        } .
+    

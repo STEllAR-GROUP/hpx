@@ -1,0 +1,33 @@
+#    Schema validator in N3
+#
+#   There is not on the semantic web a single meaning of
+# the term "schema valid", as one can make different choices
+# about what information is used for validation, and what lengths
+# are gone to to try to find inconsitencies. In general, one cannot
+# for any set of rules, just prove that a document does not violate
+# a given set of constraints.  However, we can set the bar at a
+# particular height. For example
+#  - Retrieve schemata for any namesapces used in the target
+#  - apply a given set of rules (a certian limite number of times?)
+#  - check the result has no inconsistencies.
+#
+# See schema-rules.n3
+#
+#  This file just filters out the error messages from everything else.
+#
+
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+#bind daml: <http://www.daml.org/2001/03/daml+oil> .
+#bind : <> .       # For our use
+@prefix val: <schema-rules.n3#> .	# Hint for others use
+
+#
+# This is what we will flag:
+# @@@ neater syntax for this
+# @@@ way of specifiying the whole process in one file.
+
+@forAll <#x> .
+{<#x> a val:schemaInconsistency} log:implies {<#x> a val:schemaInconsistency}.
+
+
+# ENDS

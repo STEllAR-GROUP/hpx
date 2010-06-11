@@ -1,0 +1,12 @@
+<rdf:RDF
+  xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+  xmlns='http://example/palmagent/danger#'>
+<event rdf:about='#2414'>
+  <reminders rdf:parseType='Collection'>
+    <reminders_item>
+      <seconds_prior rdf:datatype='http://www.w3.org/2001/XMLSchema#integer'>432000</seconds_prior>
+    </reminders_item>
+    <rdf:Description rdf:about="http://example/foo#"/>
+  </reminders>
+</event>
+</rdf:RDF>

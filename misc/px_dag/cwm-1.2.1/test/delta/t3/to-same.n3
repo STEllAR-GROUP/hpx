@@ -1,0 +1,4 @@
+@prefix : <from.n3#> .
+
+:a :b _:x .
+_:x :c :d .

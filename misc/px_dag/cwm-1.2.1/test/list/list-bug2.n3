@@ -1,0 +1,21 @@
+# test the handling os lists which are bound as other things get calculated
+
+@prefix : <#>.
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+@prefix string: <http://www.w3.org/2000/10/swap/string#>.
+
+@forAll :x, :y.
+
+
+# Cause llyn to search the store for a list:
+( "1"  ) .
+
+{
+#   <http://example.com/>  log:uri  ?u.
+   ( "fred"  " whatever ") string:concatenation ?s
+} => { ?s a :RESULT }.
+
+
+# Result should be
+#        "fred whatever "     a :RESULT .
+#

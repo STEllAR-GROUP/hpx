@@ -1,0 +1,133 @@
+$Id: README,v 1.11 2005/11/21 22:19:31 vkolovsk Exp $
+
+Cwm is a general-purpose data processor for the semantic  
+web, somewhat like sed, awk, etc. for text files or XSLT for XML. 
+It is a forward chaining reasoner which can be used for querying, 
+checking, transforming and filtering information. Its core 
+language is RDF, extended to include rules, and it uses RDF/XML 
+or RDF/N3 (see Notation3 Primer) serializations as required.
+
+To find out more about Cwm, visit 
+ http://www.w3.org/2000/10/swap/doc/cwm
+
+== Getting Started ==
+
+Unpack this tarball in a useful place. cd to that directory and type:
+  cd test; make post-install
+at the command line. It should spend a while testing to make sure
+the program is working.
+
+The test files should give you a good idea of commands to get 
+Cwm to work. 
+
+If you run ./setup.py install, it will install cwm. Other possibilities 
+are evident from running ./setup.py --help-commands
+
+If a test fails: There are three possiblilities:
+	1. Your Python setup is borked / sufficiently different from the
+		one used in development. This is a distinct possiblility.
+		It is also possibly a bug in our code, if your we should 
+		in fact be supporting you platform. 
+	2. You tarball was corrupted / not generated properly. This is 
+		also a distinct possiblility. The latter case is a bug.
+	3. We knowingly published a version of Cwm that failed our own tests.
+		This is highly unlikely.
+
+
+== What's New In this Release (1.2.0) ==
+For a complete list of changes, look at doc/changes.html
+
+Release 1.2.0
+== Proof updates
+  Putting --why at the end of a command line will generate a proof,
+and has had much debugging.
+
+== General bugfixes.
+
+
+Release 1.1.0 (never released)
+
+==Performance Improvements
+    * Cwm now uses Python Sets instead of lists to store many things
+    * Speed improvements to some tests are orders of magnitude
+    * Output is not as stable as it once was
+
+==Python 2.3 or later now required
+Used for Sets
+
+==Experimental SPARQL Server support
+Cwm can now run as a SPARQL server. This includes:
+    * A preview cwm --sparqlServer, which runs a server on port 8000
+    * cwm --sparql=, which behaves like --query=
+    * builtins for doing sparql queries from within n3.
+
+==RDF/XML serialization fixes
+A few strange bugs in rdf:xml serialization, many related to the rdf: prefix or xml: prefix, have been fixed
+
+==delta exit statuses
+delta now returns with similar exit statuses as the diff utility for plaintext files. An exit status of 0 means no differences between the from and to graphs were found. An exit status of 1 means some differences were found. An exit status of 2 means differences were not computed for some reason.
+
+Release 1.0.0
+
+==General bugfixes
+Fixes in decimal support
+A bug introduced into 0.8.0 where cwm crashed if no input files were specified has been fixed
+
+==delta and cwm --patch
+diff.py is renamed delta.py to avoid confusion with diff(1).
+delta.py now will make a difference file even in cases where nodes cannot be be uniquely identified (from [inverse] function properties) but can be uniquely identified in the context of the graph. So, delta.py can generate weak deltas rather than strong ones under these circumstances.
+Bug fix to cwm's --patch function.
+
+==RDF/XML support changes
+cwm's rdf/xml output will now output any file that can be outputted in xml 1.0. Failing that, it will output it in xml 1.1. Failing that, it will throw an exception. The previous behavior of generating empty tags was a bug.
+Cwm will throw an excpetion if told to output rdf/xml for a file that uses literals as subjects
+Tests have been added for rdflib. It is now supported to a degree.
+Cwm now successfully fails to parse all but four of the rdf negative parser tests
+
+==Performance improvements
+Performance work has resulted in some tasks taking 1/10 the time that they used to. Much more work is planned in this regard.
+
+==Packaging
+Cwm now uses python's distutils for distribution. This allows for installation of cwm. As an added bonus, there are now rpm's, windows installers
+.
+==Flatten support
+--flatten and --unflatten have been rewritten, replacing the old --flat. Flatten minimally reifies an n3 file to make it an rdf graph. Note that the graph may still fail to serialize as rdf, due to literals as subjects
+
+==Other
+A crude hack in WebAccess.py allows a local file system to be used instead of a given website. The intent is to clean this up in the future.
+There has been much work on a grammar for n3. grammar/n3.n3 is the grammar, grammar/predictiveParser.n3 can understand it. 
+
+
+
+== Submitting Bugs ==
+
+Cwm is very much a work in progress and has many bugs. 
+Some of them we already know about. Cwm bugs are tracked
+on the public Cwm bug mail list, 
+http://lists.w3.org/Archives/Public/public-cwm-bugs/ . Submit
+any bugs you find there, assuming they have not already been
+submitted. Reply to a previous bug report if you have something
+to add. 
+
+== License ==
+
+cwm is open source. Share and Enjoy.
+For details, see the attached files, LICENSE.n3 and LICENSE
+
+== Contributors ==
+Tim Berners-Lee
+Dan Connolly
+Sean Palmer
+Mark Nottingham
+Eric Prud'hommeaux
+Sandro Hawke
+Dan Brickley
+Karl Dubost
+Yosi Scharf
+
+Development of cwm is supported in part by funding 
+from US Defense Advanced Research Projects Agency 
+(DARPA) and Air Force Research Laboratory, Air 
+Force Materiel Command, USAF, under agreement 
+number F30602-00-2-0593, "Semantic Web Development".
+

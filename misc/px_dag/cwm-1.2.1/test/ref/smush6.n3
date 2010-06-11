@@ -1,0 +1,43 @@
+     @prefix : <#> .
+    
+    "86%"     :is :TooDamp .
+    
+    34     :is :TooHot .
+      ( 1 
+        2 
+        3  )
+         :is :ListOfThreeNumbers .
+      ( 20 
+        20  )
+         :is :OkVision .
+    
+    <>     a :testFile .
+    
+    :Grey     = :Gray .
+    
+    :a     a :Hatchback;
+         :color :Gray .
+    
+    :b     = :a .
+    
+    :c     :color :Gray .
+    
+    :colour     = :color .
+    
+    :firstThree     =  (
+        1 
+        2 
+        3  ) .
+    
+    :node1     :called "Bnode1" .
+    
+    :theHumidity     = "86%" .
+    
+    :theTemperature     = 34 .
+    
+    :vision     =  (
+        20 
+        20  ) .
+      [      a :Gentleman,
+                    :Scholar ].
+    

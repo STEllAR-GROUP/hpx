@@ -1,0 +1,12 @@
+#  Test that you can have a final semicolon ';' in a propertylist
+
+# DJB pointed out that it is useful,
+# and it always was acceptable to the original n3 parser.
+
+@keywords.
+
+b c d;.
+
+e f [g h; i j;].
+
+# ends

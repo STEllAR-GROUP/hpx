@@ -1,0 +1,9 @@
+     @prefix : <http://example/palmagent/danger#> .
+    
+    <#2414>     a :event;
+         :reminders  (
+         [
+                 a :reminders_item;
+                 :seconds_prior 432000 ]
+        <http://example/foo#>  ) .
+    

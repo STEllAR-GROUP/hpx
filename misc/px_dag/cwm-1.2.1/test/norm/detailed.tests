@@ -1,0 +1,29 @@
+# List of regression tests
+#
+# - was in bash script retest.sh
+#
+@prefix : <#>.
+@prefix x: <#>.
+@prefix test: <http://www.w3.org/2000/10/swap/test.n3#>.
+@prefix dc:  <http://purl.org/dc/elements/1.1/>. # yuk - under protest - no hash
+
+
+
+:norm10 a test:CwmTest;
+    test:shortFileName "norm-av1.n3";
+    test:description   "Bug with RDF output in bySubject mode";
+    test:arguments     """norm/av.n3 --think --base=bogus: --purge --rdf --bySubject""".
+
+:norm11 a test:CwmTest;
+    test:shortFileName "norm-av2.n3";
+    test:description   "Bug with --chatty=200 after --base=bogus:";
+    test:arguments     """norm/av.n3 --think --base=bogus: --purge --chatty=200 --rdf --bySubject""".
+
+:norm12 a test:CwmTest;
+    test:referenceOutput <t-200401-unicode.ref>;
+    test:description   "Unicode non-ascii characters in RDF/XML";
+    test:arguments     """--rdf norm/t-200401-unicode.rdf""".
+
+
+
+#ends

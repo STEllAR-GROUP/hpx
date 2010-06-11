@@ -1,0 +1,61 @@
+
+@prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>.
+@prefix rcs: <http://www.w3.org/2001/03swell/rcs#>.
+@prefix doc:  <http://www.w3.org/2000/10/swap/pim/doc#> .
+
+
+<>   rcs:id "$Id: uriEncode.n3,v 1.1 2006/01/05 16:02:13 timbl Exp $";
+
+  doc:creator [ 
+	contact:fullName "Tim berners-Lee";
+	contact:homePage <http://www.w3.org/People/Berners-Lee/>;
+	contact:mailbox <mailto:timbl@w3.org>
+	].
+
+
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+@prefix string: <http://www.w3.org/2000/10/swap/string#>.
+@prefix : <#>.
+
+{ "asd#jkl" string:encodeForURI ?x } log:implies { "asd#jkl" :AS_URI ?x }.
+
+{ "asd/jkl" string:encodeForURI ?x } log:implies { "asd/jkl" :AS_URI ?x }.
+
+{ "asd(jkl" string:encodeForURI ?x } log:implies { "asd(jkl" :AS_URI ?x }.
+
+{ "asd'jkl" string:encodeForURI ?x } log:implies { "asd'jkl" :AS_URI ?x }.
+
+{ "asd)jkl" string:encodeForURI ?x } log:implies { "asd)jkl" :AS_URI ?x }.
+
+{ "asd_jkl" string:encodeForURI ?x } log:implies { "asd_jkl" :AS_URI ?x }.
+
+{ "asd~jkl" string:encodeForURI ?x } log:implies { "asd~jkl" :AS_URI ?x }.
+
+{ "asd-jkl" string:encodeForURI ?x } log:implies { "asd-jkl" :AS_URI ?x }.
+
+{ "asd.jkl" string:encodeForURI ?x } log:implies { "asd.jkl" :AS_URI ?x }.
+
+###
+
+
+{ "asd#jkl" string:encodeForFragID ?x } log:implies { "asd#jkl" :AS_FragID ?x }.
+
+{ "asd/jkl" string:encodeForFragID ?x } log:implies { "asd/jkl" :AS_FragID ?x }.
+
+{ "asd(jkl" string:encodeForFragID ?x } log:implies { "asd(jkl" :AS_FragID ?x }.
+
+{ "asd'jkl" string:encodeForFragID ?x } log:implies { "asd'jkl" :AS_FragID ?x }.
+
+{ "asd)jkl" string:encodeForFragID ?x } log:implies { "asd)jkl" :AS_FragID ?x }.
+
+{ "asd_jkl" string:encodeForFragID ?x } log:implies { "asd_jkl" :AS_FragID ?x }.
+
+{ "asd~jkl" string:encodeForFragID ?x } log:implies { "asd~jkl" :AS_FragID ?x }.
+
+{ "asd-jkl" string:encodeForFragID ?x } log:implies { "asd-jkl" :AS_FragID ?x }.
+
+{ "asd.jkl" string:encodeForFragID ?x } log:implies { "asd.jkl" :AS_FragID ?x }.
+
+
+#ends
+

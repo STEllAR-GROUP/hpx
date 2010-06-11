@@ -1,0 +1,160 @@
+@prefix : <#>.
+@prefix x: <#>.
+@prefix test: <http://www.w3.org/2000/10/swap/test.n3#>.
+@prefix dc:  <http://purl.org/dc/elements/1.1/>. # yuk - under protest - no hash
+@prefix n3test: <http://www.w3.org/2004/11/n3test#> .
+@prefix grammar: <http://www.w3.org/2000/10/swap/grammar/> .
+
+:n3_10001 a n3test:PositiveParserTest;
+        n3test:inputDocument <syntax/no-last-nl.n3> ;
+	n3test:outputDocument <n3/n3parser.tests_n3_10001.nt> ;
+        n3test:description "An N3 file with no final newline character" .
+
+:n3_10002 a n3test:PositiveParserTest;
+	n3test:description	"combinations of - and _ in identifiers";
+	n3test:outputDocument <n3/n3parser.tests_n3_10002.nt> ;
+	n3test:inputDocument		<syntax/dot-dash.n3> .
+
+:n3_10003 a n3test:PositiveParserTest;
+	n3test:description	"@keywords in n3";
+	n3test:outputDocument <n3/n3parser.tests_n3_10003.nt> ;
+	n3test:inputDocument		<syntax/keywords1.n3> .
+
+:n3_10004 a n3test:PositiveParserTest;
+	n3test:description	"using no keywords in n3";
+	n3test:outputDocument <n3/n3parser.tests_n3_10004.nt> ;
+	n3test:inputDocument		<syntax/keywords2.n3>.
+
+:n3_10005 a n3test:PositiveParserTest;
+	n3test:description	"djb noticed a:b was parsed as rdf:type token";
+	n3test:outputDocument <n3/n3parser.tests_n3_10005.nt> ;
+	n3test:inputDocument		<syntax/djb1a.n3>.
+
+:n3_10006 a n3test:PositiveParserTest;
+	n3test:description	"we might as well be nice and self-referential";
+	n3test:outputDocument <n3/n3parser.tests_n3_10006.nt> ;
+	n3test:inputDocument		<>.
+
+:n3_10007 a n3test:PositiveParserTest;
+    n3test:description   	"Parse and generate simple contexts";
+	n3test:outputDocument <n3/n3parser.tests_n3_10007.nt> ;
+    n3test:inputDocument     	<contexts.n3>.
+
+:n3_10008 a n3test:PositiveParserTest;
+    n3test:description   "Parse and regen anonymous property";
+	n3test:outputDocument <n3/n3parser.tests_n3_10008.nt> ;
+    n3test:inputDocument     <anon-prop.n3> .
+
+:n3_10009 a n3test:PositiveParserTest;
+    n3test:description   "N3 string quoting with escaping";
+	n3test:outputDocument <n3/n3parser.tests_n3_10009.nt> ;
+    n3test:inputDocument     <strquot.n3> .
+
+:n3_10010 a n3test:PositiveParserTest;
+    n3test:description   "N3 string, qname and IRI with utf-8 non-ascii characters";
+    n3test:inputDocument     <i18n/hiragana.n3> .
+
+:n3_10011 a n3test:PositiveParserTest;
+    n3test:description   "Path syntax, simple";
+	n3test:outputDocument <n3/n3parser.tests_n3_10011.nt> ;
+    n3test:inputDocument     <syntax/path1.n3> .
+
+
+:n3_10012 a n3test:PositiveParserTest;
+    n3test:description   "Path syntax, more";
+	n3test:outputDocument <n3/n3parser.tests_n3_10012.nt> ;
+    n3test:inputDocument     <syntax/path2.n3> .
+
+:n3_10013 a n3test:PositiveParserTest;
+	n3test:description "Number syntax";
+	n3test:outputDocument <n3/n3parser.tests_n3_10013.nt> ;
+	n3test:inputDocument  <syntax/numbers.n3> .
+
+:n3_10014 a n3test:PositiveParserTest;
+    n3test:description   "Quick variable syntax, simple";
+	n3test:outputDocument <n3/n3parser.tests_n3_10014.nt> ;
+    n3test:inputDocument  <syntax/qvars1.n3> .
+
+:n3_10015 a n3test:PositiveParserTest;
+    n3test:description   "Quick variable syntax, more";
+	n3test:outputDocument <n3/n3parser.tests_n3_10015.nt> ;
+    n3test:inputDocument  <syntax/qvars2.n3> .
+
+:n3_10016 a n3test:PositiveParserTest;
+    n3test:description   "N3 string nested triple quoting";
+	n3test:outputDocument <n3/n3parser.tests_n3_10016.nt> ;
+    n3test:inputDocument  <syntax/lstring.n3> .
+
+:n3_10017 a n3test:PositiveParserTest;
+    n3test:description    "parsing and generation of N3 list syntax";
+	n3test:outputDocument <n3/n3parser.tests_n3_10017.nt> ;
+    n3test:inputDocument  <lists.n3> .
+
+:n3_10018 a n3test:PositiveParserTest;
+    n3test:description    "Propertylists can end in trailing semicolon.";
+	n3test:outputDocument <n3/n3parser.tests_n3_10018.nt> ;
+    n3test:inputDocument  <syntax/trailing-semicolon.n3> .
+
+:n3_10021 a n3test:PositiveParserTest;
+	n3test:description "Are we exceeding a maximum recursion limit or two?";
+	n3test:inputDocument <syntax/too-nested.n3> .
+
+:n3_10025 a n3test:PositiveParserTest;
+    n3test:description    "The = keyword";
+#	n3test:outputDocument <n3/n3parser.tests_n3_10020.nt> ;
+    n3test:inputDocument  <syntax/equals1.n3> .
+
+:n3_10026 a n3test:PositiveParserTest;
+    n3test:description    "The = keyword";
+#	n3test:outputDocument <n3/n3parser.tests_n3_10020.nt> ;
+    n3test:inputDocument  <syntax/equals2.n3> .
+
+:n3_10027 a n3test:PositiveParserTest;
+    n3test:description    "A statement that says nothing at all";
+#	n3test:outputDocument <n3/n3parser.tests_n3_10020.nt> ;
+    n3test:inputDocument  <syntax/zero-predicates.n3> .
+
+:n3_20028 a n3test:NegativeParserTest;
+    n3test:description    "A statement that says nothing at all";
+#	n3test:outputDocument <n3/n3parser.tests_n3_10020.nt> ;
+    n3test:inputDocument  <syntax/zero-objects.n3> .
+
+
+
+:n3_20000 a n3test:NegativeParserTest;
+    n3test:description    "something that isn't n3";
+    n3test:inputDocument  <tests-work.txt> .
+
+
+:n3_20001 a n3test:NegativeParserTest;
+    n3test:description    "@keywords is not a valid predicate";
+    n3test:inputDocument  <syntax/neg-keywords3.n3> .
+
+
+:n3_20002 a n3test:NegativeParserTest;
+    n3test:description    "single quoted strings are illegal";
+    n3test:inputDocument  <syntax/neg-single-quote.n3> .
+
+:n3_20003 a n3test:NegativeParserTest;
+    n3test:description    "The `this' keyword is no longer legal ";
+    n3test:inputDocument  <syntax/neg-thisadoc.n3> .
+
+:n3_20004 a n3test:NegativeParserTest;
+    n3test:description    "A predicate cannot be a literal, I hope";
+    n3test:inputDocument  <syntax/neg-literal-predicate.n3> .
+
+:n3_20005 a n3test:NegativeParserTest;
+    n3test:description    "A predicate cannot be a formula, I hope";
+    n3test:inputDocument  <syntax/neg-formula-predicate.n3> .
+
+:n3_10019 a n3test:NegativeParserTest;
+    n3test:description    "Can still read the old 'this log:forSome' syntax?";
+	n3test:outputDocument <n3/n3parser.tests_n3_10019.nt> ;
+    n3test:inputDocument  <syntax/this-quantifiers.n3> .
+
+:n3_10020 a n3test:NegativeParserTest;
+    n3test:description    "Can still read the old 'this log:forAll' syntax";
+	n3test:outputDocument <n3/n3parser.tests_n3_10020.nt> ;
+    n3test:inputDocument  <syntax/this-rules.n3> .
+
+

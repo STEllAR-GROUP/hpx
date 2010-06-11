@@ -1,0 +1,20 @@
+# $Id: construct.n3,v 1.1 2003/09/14 18:30:23 timbl Exp $
+#
+#  When you construct lists, if someone has labelled the 
+#  node which is a list, then we note the equality between the list
+#  and the symbol.
+#
+
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix log:      <http://www.w3.org/2000/10/swap/log#> .
+@prefix :         <#> .
+
+:A rdf:first 1; rdf:rest ().
+
+:B rdf:first 1; rdf:rest ( 2 3 ).
+
+:C rdf:first 1; rdf:rest ( 2 3 ); a :ListOfIntegers.
+
+
+# ends

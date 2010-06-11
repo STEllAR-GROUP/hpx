@@ -1,0 +1,10 @@
+
+
+
+<rdf:RDF xmlns="http://example.com/swap/test/xml-syntax/basic-serialization.n3#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+
+    <rdf:Description rdf:about="#s">
+        <p rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3</p>
+    </rdf:Description>
+</rdf:RDF>

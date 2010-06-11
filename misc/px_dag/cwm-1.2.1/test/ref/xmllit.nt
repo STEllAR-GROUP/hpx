@@ -1,0 +1,3 @@
+    
+    <http://example.com/swap/test/xml-syntax/xmllit.rdf#John_Smith>     <http://my.example.org/Name> "\n      <html:h1 xmlns:html=\"http://NoHTML.example.org\" xmlns:my=\"http://my.example.org/\" my:thing=\"hello\">\n        <b xmlns=\"http://www.w3.org/1999/xhtml\"><i>John</i></b>\n      </html:h1>\n   "^^<http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral> .
+    

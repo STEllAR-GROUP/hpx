@@ -1,0 +1,18 @@
+     @prefix : <#> .
+    
+    "Le chat"@fr     :is "The french phrase 'Le chat'" .
+    
+    "800/600"^^<http://example.com/types#rational>     :is "800/600 with datatype http://example.com/types#rational" .
+    
+    2.0     :is "The number 2.0",
+                "The number 2.0 expressed with extra trailing zeroes" .
+    
+    2000.0e+00     :is "The double precision floating point 2.0e3" .
+    
+    -2     :is "The integer -2" .
+    
+    0     :is "Zero" .
+    
+    2     :is "The integer 2",
+                "The integer 2 expressed with leading zeroes" .
+    

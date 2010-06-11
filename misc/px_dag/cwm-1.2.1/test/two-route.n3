@@ -1,0 +1,38 @@
+#    Double conclusion test
+#
+#  I had/ve a problem that the engine would conclude a rule
+# and add it to the store even though it matched one already there.
+# This is a test case to get to the bottom of that one.
+#
+#  cwm double-concludion.n3 -size -rules -size -rules -size
+#
+# should show the store not growing after the first application of the rules.
+#
+#
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix daml: <http://www.daml.org/2001/03/daml+oil#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+@prefix : <foo#> .       # For our use
+@prefix v: <foo#> .	# Hint for others use
+
+
+
+@forAll :x, :y, :z.	#
+
+:sky :color :blue.
+
+:grass :color :blue.
+
+:sky :sounds :quiet.
+:grass :sounds :quiet.
+
+{ :x :color :blue } log:implies { :x :is :relaxing }.
+
+{ :x :sounds :quiet } log:implies { :x :is :relaxing }.
+
+
+
+
+
+#ends

@@ -1,0 +1,17 @@
+     @prefix : <#> .
+     @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    
+    @forAll :x .
+    
+    :test4     a :success .
+    
+    :thesis     :is {:theSky     :is :blue .
+        } .
+    {
+        :thesis     :is :x .
+        :x     log:notIncludes {:theSky     :is :green .
+            } .
+        
+        }     log:implies {:test4     a :success .
+        } .
+    

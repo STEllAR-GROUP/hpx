@@ -1,0 +1,296 @@
+# Base URI of process is file:///dev/swap/test/
+# Input from  file:/dev/swap/test/daml-pref.n3
+# Input from  http://www.daml.org/2001/03/daml-ont
+
+#  Notation3 generation by
+#  $Id: daml-ont.n3,v 1.5 2002/08/07 14:32:21 timbl Exp $
+
+     @prefix : <http://www.daml.org/2001/03/daml-ont#> .
+     @prefix ont: <http://www.daml.org/2001/03/daml-ont#> .
+     @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+     @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+    
+    <> ont:versionInfo "$Id: daml-ont.n3,v 1.5 2002/08/07 14:32:21 timbl Exp $";
+         ont:imports <http://www.w3.org/2000/01/rdf-schema>;
+         a ont:Ontology .
+    
+    ont:first a ont:Property;
+         ont:domain ont:List .
+    
+    ont:UniqueProperty a ont:Class;
+         ont:label "UniqueProperty";
+         ont:comment """compare with maxCardinality=1; e.g. integer successor:
+	if P is a UniqueProperty, then
+	if P(x, y) and P(x, z) then y=z.
+	aka functional.
+  """;
+         ont:subClassOf ont:Property .
+    
+    ont:subClassOf a ont:Property;
+         ont:samePropertyAs <http://www.w3.org/2000/01/rdf-schema#subClassOf> .
+    
+    ont:unionOf a ont:Property;
+         ont:label "unionOf";
+         ont:comment """
+    for unionOf(X, Y) read: X is the union of the classes in the list Y;
+    i.e. if something is in any of the classes in Y, it's in X, and vice versa.
+    cf OIL OR""";
+         ont:domain ont:Class;
+         ont:range ont:List .
+    
+    ont:Disjoint a ont:Class;
+         ont:label "Disjoint";
+         ont:subClassOf ont:List;
+         ont:comment """for type(L, Disjoint) read: the classes in L are
+  pairwise disjoint.
+
+  i.e. if type(L, Disjoint), and C1 in L and C2 in L, then disjointWith(C1, C2).
+  """ .
+    
+    ont:UnambiguousProperty a ont:Class;
+         ont:label "UnambiguousProperty";
+         ont:comment """if P is an UnambiguousProperty, then
+	if P(x, y) and P(z, y) then x=z.
+	aka injective.
+	e.g. if nameOfMonth(m, "Feb")
+	and nameOfMonth(n, "Feb") then m and n are the same month.
+  """;
+         ont:subClassOf ont:Property .
+    
+    ont:intersectionOf a ont:Property;
+         ont:comment """
+    for intersectionOf(X, Y) read: X is the intersection of the classes in the list Y;
+    i.e. if something is in all the classes in Y, then it's in X, and vice versa.
+cf OIL AND""";
+         ont:domain ont:Class;
+         ont:range ont:List .
+    
+    ont:restrictedBy a ont:Property;
+         ont:label "restrictedBy";
+         ont:comment """for restrictedBy(C, R), read: C is restricted by R; i.e. the
+	restriction R applies to c;
+
+        if onProperty(R, P) and toValue(R, V)
+        then for every i in C, we have P(i, V).
+
+        if onProperty(R, P) and toClass(R, C2)
+        then for every i in C and for all j, if P(i, j) then type(j, C2).
+  """;
+         ont:domain ont:Class;
+         ont:range ont:Restriction .
+    
+    ont:minCardinality a ont:Property;
+         ont:comment """for minCardinality(P, N) read: P has minimum cardinality N; i.e.
+    everything x in the domain of P has at least N things y such that P(x, y).
+  """;
+         ont:domain ont:Property .
+    
+    ont:item a ont:Property;
+         ont:comment """for item(L, I) read: I is an item in L; either first(L, I)
+    or item(R, I) where rest(L, R).""";
+         ont:domain ont:List .
+    
+    ont:value a ont:Property;
+         ont:samePropertyAs rdf:value .
+    
+    ont:cardinality a ont:Property;
+         ont:label "cardinality";
+         ont:comment """for cardinality(P, N) read: P has cardinality N; i.e.
+    everything x in the domain of P has N things y such that P(x, y).
+  """;
+         ont:domain ont:Property .
+    
+    ont:default a ont:Property;
+         ont:label "default";
+         ont:comment """default(X, Y) suggests that Y be considered a/the default
+	value for the X property. This can be considered
+	documentation (ala label, comment) but we don't specify
+	any logical impact.
+  """ .
+    
+    ont:oneOf a ont:Property;
+         ont:comment """for oneOf(C, L) read everything in C is one of the
+     things in L;
+     This lets us define classes by enumerating the members.
+  """;
+         ont:domain ont:Class;
+         ont:range ont:List .
+    
+    ont:Restriction a ont:Class .
+    
+    ont:disjointWith a ont:Property;
+         ont:label "disjointWith";
+         ont:comment """for disjointWith(X, Y) read: X and Y have no members
+	in common.
+  """;
+         ont:domain ont:Class;
+         ont:range ont:Class .
+    
+    ont:equivalentTo a ont:Property;
+         ont:comment """for equivalentTo(X, Y), read X is an equivalent term to Y.
+  """ .
+    
+    ont:TransitiveProperty a ont:Class .
+    
+    ont:Property a ont:Class;
+         ont:sameClassAs rdf:Property .
+    
+    ont:Qualification a ont:Class .
+    
+    ont:sameClassAs a ont:Property;
+         ont:subPropertyOf ont:equivalentTo,
+                ont:subClassOf .
+    
+    ont:Thing a ont:Class;
+         ont:label "Thing";
+         ont:comment "The most general class in DAML." .
+    
+    ont:List a ont:Class;
+         ont:subClassOf rdf:Seq .
+    
+    ont:versionInfo a ont:Property;
+         ont:label "versionInfo";
+         ont:comment """generally, a string giving information about this
+	version; e.g. RCS/CVS keywords
+  """ .
+    
+    ont:range a ont:Property;
+         ont:samePropertyAs <http://www.w3.org/2000/01/rdf-schema#range> .
+    
+    ont:subPropertyOf a ont:Property;
+         ont:samePropertyAs <http://www.w3.org/2000/01/rdf-schema#subPropertyOf>;
+         ont:subPropertyOf <http://www.w3.org/2000/01/rdf-schema#subPropertyOf> .
+    
+    ont:seeAlso a ont:Property;
+         ont:samePropertyAs <http://www.w3.org/2000/01/rdf-schema#seeAlso> .
+    
+    ont:Class a ont:Class;
+         ont:sameClassAs <http://www.w3.org/2000/01/rdf-schema#Class> .
+    
+    ont:type a ont:Property;
+         ont:samePropertyAs rdf:type .
+    
+    ont:Ontology a ont:Class;
+         ont:label "Ontology";
+         ont:comment """An Ontology is a document that describes
+	a vocabulary of terms for communication between
+	(human and) automated agents.
+  """ .
+    
+    ont:Nothing a ont:Class;
+         ont:comment "the class with no things in it.";
+         ont:complementOf ont:Thing .
+    
+    ont:maxCardinality a ont:Property;
+         ont:label "maxCardinality";
+         ont:comment """for maxCardinality(P, N) read: P has maximum cardinality N; i.e.
+    everything x in the domain of P has at most N things y such that P(x, y).
+  """;
+         ont:domain ont:Property .
+    
+    ont:label a ont:Property;
+         ont:samePropertyAs <http://www.w3.org/2000/01/rdf-schema#label> .
+    
+    ont:onProperty a ont:Property;
+         ont:comment """for onProperty(R, P), read:
+   R is a restriction/qualification on P.""";
+         ont:domain ont:Restriction,
+                ont:Qualification;
+         ont:range ont:Property .
+    
+    ont:hasValue a ont:Property;
+         ont:label "hasValue";
+         ont:comment """for hasValue(Q, C), read: Q is a hasValue
+   qualification to C.""";
+         ont:domain ont:Qualification;
+         ont:range ont:Class .
+    
+    ont:inverseOf a ont:Property;
+         ont:comment """for inverseOf(R, S) read: R is the inverse of S; i.e.
+     if R(x, y) then S(y, x) and vice versa.""";
+         ont:domain ont:Property;
+         ont:range ont:Property .
+    
+    ont:toValue a ont:Property;
+         ont:comment "for toValue(R, V), read: R is a restriction to V.";
+         ont:domain ont:Restriction;
+         ont:range ont:Class .
+    
+    ont:Empty a ont:Class;
+         ont:asClass ont:Nothing .
+    
+    ont:isDefinedBy a ont:Property;
+         ont:samePropertyAs <http://www.w3.org/2000/01/rdf-schema#isDefinedBy>;
+         ont:subPropertyOf ont:seeAlso .
+    
+    ont:qualifiedBy a ont:Property;
+         ont:label "qualifiedBy";
+         ont:comment """for qualifiedBy(C, Q), read: C is qualified by Q; i.e. the
+	qualification Q applies to C;
+
+        if onProperty(Q, P) and hasValue(Q, C2)
+        then for every i in C, there is some V
+	so that type(V, C2) and P(i, V).
+  """;
+         ont:domain ont:Class;
+         ont:range ont:Qualification .
+    
+    ont:samePropertyAs a ont:Property;
+         ont:subPropertyOf ont:equivalentTo,
+                ont:subPropertyOf .
+    
+    ont:Literal a ont:Class;
+         ont:sameClassAs <http://www.w3.org/2000/01/rdf-schema#Literal> .
+    
+    ont:rest a ont:Property;
+         ont:domain ont:List;
+         ont:range ont:List .
+    
+    ont:imports a ont:Property;
+         ont:label "imports";
+         ont:comment """for imports(X, Y) read: X imports Y;
+	i.e. X asserts the* contents of Y by reference;
+	i.e. if imports(X, Y) and you believe X and Y says something,
+	then you should believe it.
+
+	Note: "the contents" is, in the general case,
+	an il-formed definite description. Different
+	interactions with a resource may expose contents
+	that vary with time, data format, preferred language,
+	requestor credentials, etc. So for "the contents",
+	read "any contents".
+  """ .
+    
+    ont:complementOf a ont:Property;
+         ont:comment """
+    for complementOf(X, Y) read: X is the complement of Y; if something is in Y,
+    then it's not in X, and vice versa.
+cf OIL NOT""";
+         ont:domain ont:Class;
+         ont:range ont:Class .
+    
+    ont:toClass a ont:Property;
+         ont:comment "for toClass(R, C), read: R is a restriction to C.";
+         ont:domain ont:Restriction;
+         ont:range ont:Class .
+    
+    ont:disjointUnionOf a ont:Property;
+         ont:label "disjointUnionOf";
+         ont:domain ont:Class;
+         ont:range ont:List;
+         ont:comment """
+
+    for disjointUnionOf(X, Y) read: X is the disjoint union of the classes in
+    the list Y: (a) for any c1 and c2 in Y, disjointWith(c1, c2),
+    and (b) i.e. if something is in any of the classes in Y, it's
+    in X, and vice versa.
+
+    cf OIL disjoint-covered
+  """ .
+    
+    ont:domain a ont:Property;
+         ont:samePropertyAs <http://www.w3.org/2000/01/rdf-schema#domain> .
+    
+    ont:comment a ont:Property;
+         ont:samePropertyAs <http://www.w3.org/2000/01/rdf-schema#comment> .
+    

@@ -1,0 +1,5 @@
+@keywords is, of, a.
+@prefix : <dtlit1#>.
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+
+{ ("2005-03-30T11:00:00" tz) log:dtlit ?X } => { ?X a Answer }.

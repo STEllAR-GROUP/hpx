@@ -1,0 +1,16 @@
+     @prefix : <#> .
+     @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    
+    :TEST1     a :success .
+    {
+        {
+            :foo     :bar  [
+                     :baz :bam ] .
+            
+            }     log:includes {:foo     :bar  [
+                     :baz :bam ] .
+            } .
+        
+        }     log:implies {:TEST1     a :success .
+        } .
+    

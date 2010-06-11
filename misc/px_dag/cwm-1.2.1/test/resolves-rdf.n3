@@ -1,0 +1,11 @@
+@prefix : <#>.
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix u: <http://www.w3.org/2000/01/rdf-schema#>.
+
+@forAll :x.
+
+#{ <rdfs.n3> log:semantics [ log:includes { :x a u:Class } ]}
+#  log:implies { :x a :ClassInrdfs_n3 }.
+
+{ <animal.rdf> log:semantics [ log:includes { :x a u:Class } ]}
+  log:implies { :x a :ClassInAnimal_rdf }.

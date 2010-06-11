@@ -1,0 +1,16 @@
+     @prefix : <http://example.com/swap/test/reason/t5.n3#> .
+    @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    
+     @forAll :x,
+                :y .
+    
+    :a     :b :c .
+    
+    :c     :b <http://example.com/swap/test/reason/c2> .
+    {
+        :a     :y :x .
+        
+        }     log:implies {:x     :y <http://example.com/swap/test/reason/c2> .
+        } .
+    
+

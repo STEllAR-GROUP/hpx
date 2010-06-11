@@ -1,0 +1,6 @@
+     @prefix : <http://www.example.com/foo#> .
+    
+    :Barcelona     :had 31 .
+    
+    :London     :had 26 .
+    

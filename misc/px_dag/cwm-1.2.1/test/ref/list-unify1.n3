@@ -1,0 +1,6 @@
+     @prefix : <#> .
+    
+    4     a :RESULT .
+    
+    :THIS_TEST     a :SUCCESS .
+    

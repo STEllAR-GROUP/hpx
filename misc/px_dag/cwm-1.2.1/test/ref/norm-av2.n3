@@ -1,0 +1,119 @@
+
+
+
+<rdf:RDF xmlns="http://www.w3.org/2001/02pd/gv#"
+    xmlns:AV="http://example.com/AV#"
+    xmlns:gv="http://www.w3.org/2001/02pd/gv#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+
+    <rdf:Description rdf:about="http://example.com/swap/test/norm/av.n3">
+        <digraph rdf:nodeID="b1"/>
+    </rdf:Description>
+
+    <rdfs:Class rdf:about="http://example.com/AV#AV">
+    </rdfs:Class>
+
+    <AV:AV rdf:about="http://example.com/AV#ab">
+        <AV:output rdf:resource="http://example.com/AV#selector"/>
+        <AV:solidEdge rdf:resource="http://example.com/AV#selector"/>
+        <AV:title>A/B Switch</AV:title>
+        <color>black</color>
+        <label>A/B Switch</label>
+        <shape>box</shape>
+    </AV:AV>
+
+    <AV:AV rdf:about="http://example.com/AV#cable">
+        <AV:output rdf:resource="http://example.com/AV#vcr"/>
+        <AV:solidEdge rdf:resource="http://example.com/AV#vcr"/>
+        <AV:title>Cable Box</AV:title>
+        <color>black</color>
+        <label>Cable Box</label>
+        <shape>box</shape>
+    </AV:AV>
+
+    <AV:AV rdf:about="http://example.com/AV#catv">
+        <AV:title>CATV</AV:title>
+        <color>black</color>
+        <label>CATV</label>
+        <shape>box</shape>
+    </AV:AV>
+
+    <rdf:Description rdf:about="http://example.com/AV#dottedEdge">
+        <style>dotted</style>
+    </rdf:Description>
+
+    <AV:AV rdf:about="http://example.com/AV#dvd">
+        <AV:output rdf:resource="http://example.com/AV#selector"/>
+        <AV:solidEdge rdf:resource="http://example.com/AV#selector"/>
+        <AV:title>DVD</AV:title>
+        <color>black</color>
+        <label>DVD</label>
+        <shape>box</shape>
+    </AV:AV>
+
+    <rdfs:Property rdf:about="http://example.com/AV#input">
+    </rdfs:Property>
+
+    <rdfs:Property rdf:about="http://example.com/AV#output">
+    </rdfs:Property>
+
+    <AV:AV rdf:about="http://example.com/AV#selector">
+        <AV:output rdf:resource="http://example.com/AV#tv"/>
+        <AV:solidEdge rdf:resource="http://example.com/AV#tv"/>
+        <AV:title>Signal Selector</AV:title>
+        <color>black</color>
+        <label>Signal Selector</label>
+        <shape>box</shape>
+    </AV:AV>
+
+    <rdf:Description rdf:about="http://example.com/AV#solidEdge">
+        <style>solid</style>
+    </rdf:Description>
+
+    <AV:AV rdf:about="http://example.com/AV#splitter">
+        <AV:output rdf:resource="http://example.com/AV#ab"/>
+        <AV:solidEdge rdf:resource="http://example.com/AV#ab"/>
+        <AV:title>Splitter</AV:title>
+        <color>black</color>
+        <label>Splitter</label>
+        <shape>box</shape>
+    </AV:AV>
+
+    <rdfs:Property rdf:about="http://example.com/AV#title">
+    </rdfs:Property>
+
+    <AV:AV rdf:about="http://example.com/AV#tv">
+        <AV:title>TV</AV:title>
+        <color>black</color>
+        <label>TV</label>
+        <shape>box</shape>
+    </AV:AV>
+
+    <AV:AV rdf:about="http://example.com/AV#vcr">
+        <AV:output rdf:resource="http://example.com/AV#ab"/>
+        <AV:solidEdge rdf:resource="http://example.com/AV#ab"/>
+        <AV:title>VCR</AV:title>
+        <color>black</color>
+        <label>VCR</label>
+        <shape>box</shape>
+    </AV:AV>
+
+    <rdf:Description rdf:nodeID="b1">
+        <label>AV Diagram</label>
+        <subgraph rdf:nodeID="b2"/>
+    </rdf:Description>
+
+    <rdf:Description rdf:nodeID="b2">
+        <hasEdgeProperty rdf:resource="http://example.com/AV#dottedEdge"/>
+        <hasEdgeProperty rdf:resource="http://example.com/AV#solidEdge"/>
+        <hasNode rdf:resource="http://example.com/AV#ab"/>
+        <hasNode rdf:resource="http://example.com/AV#cable"/>
+        <hasNode rdf:resource="http://example.com/AV#catv"/>
+        <hasNode rdf:resource="http://example.com/AV#dvd"/>
+        <hasNode rdf:resource="http://example.com/AV#splitter"/>
+        <hasNode rdf:resource="http://example.com/AV#tv"/>
+        <hasNode rdf:resource="http://example.com/AV#vcr"/>
+        <label></label>
+    </rdf:Description>
+</rdf:RDF>

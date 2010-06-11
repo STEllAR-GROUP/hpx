@@ -1,0 +1,62 @@
+     @prefix : <#> .
+     @prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#> .
+     @prefix doc: <http://www.w3.org/2000/10/swap/pim/doc#> .
+     @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+     @prefix rcs: <http://www.w3.org/2001/03swell/rcs#> .
+     @prefix string: <http://www.w3.org/2000/10/swap/string#> .
+    
+    @forAll :p,
+                :q,
+                :x,
+                :y,
+                :z .
+    
+    <>     doc:creator  [
+             contact:fullName "Tim berners-Lee";
+             contact:homePage <http://www.w3.org/People/Berners-Lee/>;
+             contact:mailbox <mailto:timbl@w3.org> ];
+         rcs:id "" .
+    
+    :test1     a :success .
+    
+    :test3     a :success .
+    
+    :test6     a :success .
+    
+    :test7     a :success .
+    {
+        ""     string:endsWith "" .
+        
+        }     log:implies {:test7     a :success .
+        } .
+    {
+        "asdfghjkl"     string:endsWith "aaajkl" .
+        
+        }     log:implies {:test4     a :FAILURE .
+        } .
+    {
+        "asdfghjkl"     string:endsWith "jkk" .
+        
+        }     log:implies {:test2     a :FAILURE .
+        } .
+    {
+        "asdfghjkl"     string:endsWith "jkl" .
+        
+        }     log:implies {:test1     a :success .
+        } .
+    {
+        "asdfjhkh"     string:endsWith "asd" .
+        
+        }     log:implies {:test5     a :FAILURE .
+        } .
+    {
+        "foobar"     string:endsWith "" .
+        
+        }     log:implies {:test6     a :success .
+        } .
+    {
+        "jkl"     string:endsWith "jkl" .
+        
+        }     log:implies {:test3     a :success .
+        } .
+    

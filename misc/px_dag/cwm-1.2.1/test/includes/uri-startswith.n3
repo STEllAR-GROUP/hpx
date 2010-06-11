@@ -1,0 +1,46 @@
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+@prefix string: <http://www.w3.org/2000/10/swap/string#>.
+@prefix c: <http://www.w3.org/2000/10/swap/pim/contact#>.
+@prefix org: <http://www.w3.org/2001/04/roadmap/org#>.
+@prefix w3c: <http://www.w3.org/2000/04/mem-news/w3c-process#>.
+@prefix : <archAcl#>.
+@prefix aacl: <archAcl#>.
+@prefix v: <#>.
+
+
+[ c:mailbox
+  [ = <mailto:w3c-rdfcore-wg@w3.org>;
+    c:archive <http://lists.w3.org/Archives/Public/w3c-rdfcore-wg/> ]
+].
+
+@forAll v:doc.
+
+{ v:doc log:uri [ string:startsWith "http://lists.w3.org/Archives/Public/" ] }
+  log:implies { v:doc a :PubliclyReadable }.
+
+
+###########
+#
+# Here's what I see when I try this test case:
+#
+# connolly@shoal:~/w3ccvs/WWW/2000/10/swap/test/includes$ python2 ../../cwm.py uri-startswith.n3 --think
+# #Processed by Id: cwm.py,v 1.54 2001/06/01 07:50:20 connolly Exp 
+#         #    using base file:/home/connolly/w3ccvs/WWW/2000/10/swap/test/includes/uri-startswith.n3
+# #   @@@@@@@@@ State is 20, q length 1
+# #   @@ Current item:  20)  _formula ::       _g3? startsWith ttp://lists.w3.org/Archives/Public .  consts=[1, 0, 3]  vars=[2] short=1
+# #        20)  _formula ::       doc?      uri      _g3? .  consts=[1, 0]  vars=[2, 3] short=1
+#
+#        Traceback (most recent call last):
+#  File "../../cwm.py", line 2334, in ?
+#    doCommand()
+#  File "../../cwm.py", line 2284, in doCommand
+#    step = _store.applyRules(workingContext, workingContext)
+#  File "../../cwm.py", line 1160, in applyRules
+#    found = self.tryRule(s, workingContext, targetContext, _variables)
+#  File "../../cwm.py", line 1228, in tryRule
+#    self.conclude, ( self, conclusions, targetContext, _outputVariables))
+#  File "../../cwm.py", line 1389, in match
+#    return self.query(queue, variables, existentials, smartIn, action, param, bindings, newBindings, justOne)
+#  File "../../cwm.py", line 1588, in query
+#    raise internalError # We have something in an unknown state in the queue
+# NameError: There is no variable named 'internalError'

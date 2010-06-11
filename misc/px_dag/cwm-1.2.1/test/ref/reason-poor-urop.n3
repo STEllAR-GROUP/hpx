@@ -1,0 +1,26 @@
+     @prefix : <http://example.com/swap/test/reason/poor-urop.n3#> .
+    @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    @prefix owl: <http://www.w3.org/2002/07/owl#> .
+    
+     @forAll :O,
+                :O2,
+                :P,
+                :P2,
+                :S,
+                :S2 .
+    
+    owl:sameAs     a owl:SymmetricProperty .
+    {
+         @forSome :_g_L14C13,
+                    :_g_L16C12 .
+        <http://example.com/swap/test/reason/danc.n3>     log:semantics :_g_L16C12 .
+        :_g_L14C13     log:supports {:S     :P :O .
+            } .
+        :_g_L16C12     log:supports {:S     :P :O .
+            } .
+        <http://example.com/swap/test/reason/timbl.n3>     log:semantics :_g_L14C13 .
+        
+        }     log:implies {:S     :P :O .
+        } .
+    
+

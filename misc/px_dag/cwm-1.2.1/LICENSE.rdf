@@ -1,0 +1,19 @@
+
+<!-- Processed by Id: cwm.py,v 1.96 2002/06/07 20:07:17 timbl Exp -->
+<!--     using base file:/devel/WWW/2000/10/swap/LICENSE.n3-->
+
+
+<rdf:RDF xmlns="http://www.w3.org/2000/10/swap/pim/doc#"
+    xmlns:doc="http://www.w3.org/2000/10/swap/pim/doc#"
+    xmlns:log="http://www.w3.org/2000/10/swap/log#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:s="http://www.w3.org/2000/01/rdf-schema#">
+
+    <OpenSourceLicense rdf:about="">
+        <s:comment>Share and Enjoy. Open Source license:
+Copyright (c) 2000,1,2 W3C (MIT, INRIA, Keio)
+Copyright other contributers mentioned in individual files.
+http://www.w3.org/Consortium/Legal/copyright-software-19980720</s:comment>
+        <subLicense rdf:resource="http://www.w3.org/Consortium/Legal/copyright-software-19980720"/>
+    </OpenSourceLicense>
+</rdf:RDF>

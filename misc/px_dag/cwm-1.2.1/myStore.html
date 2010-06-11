@@ -1,0 +1,197 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module myStore</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>myStore</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/syosi/cvs-trunk/WWW/2000/10/swap/myStore.py">/home/syosi/cvs-trunk/WWW/2000/10/swap/myStore.py</a></font></td></tr></table>
+    <p><tt>$Id: myStore.html,v 1.13 2007/11/18 02:01:56 syosi Exp $<br>
+&nbsp;<br>
+Process-global&nbsp;store<br>
+&nbsp;<br>
+Global&nbsp;variables&nbsp;are&nbsp;often&nbsp;a&nbsp;bad&nbsp;idea.&nbsp;However,&nbsp;the&nbsp;majority&nbsp;of&nbsp;cwm<br>
+applications&nbsp;involve&nbsp;just&nbsp;one&nbsp;RDF&nbsp;store.&nbsp;One&nbsp;store&nbsp;can&nbsp;contain&nbsp;many<br>
+formulae.&nbsp;&nbsp;The&nbsp;main&nbsp;thing&nbsp;which&nbsp;these&nbsp;formulae&nbsp;of&nbsp;the&nbsp;same&nbsp;store&nbsp;share<br>
+is&nbsp;the&nbsp;index&nbsp;with&nbsp;which&nbsp;names&nbsp;and&nbsp;strings&nbsp;are&nbsp;interned.&nbsp;&nbsp;Within&nbsp;a<br>
+store,&nbsp;you&nbsp;can&nbsp;compare&nbsp;things&nbsp;by&nbsp;comparing&nbsp;memory&nbsp;addresses&nbsp;rather<br>
+than&nbsp;the&nbsp;whole&nbsp;tring,&nbsp;uri&nbsp;or&nbsp;list.<br>
+&nbsp;<br>
+Therefore,&nbsp;it&nbsp;is&nbsp;normal&nbsp;to&nbsp;just&nbsp;use&nbsp;one&nbsp;store.&nbsp;&nbsp;When&nbsp;you&nbsp;do&nbsp;this,&nbsp;the<br>
+store&nbsp;paremeter&nbsp;to&nbsp;most&nbsp;methods&nbsp;beceomes&nbsp;unnecessary,&nbsp;and&nbsp;you&nbsp;get&nbsp;a<br>
+simpler&nbsp;API.&nbsp;&nbsp;That&nbsp;is&nbsp;what&nbsp;this&nbsp;module&nbsp;does.&nbsp;If&nbsp;you&nbsp;import&nbsp;it,&nbsp;you<br>
+will&nbsp;get&nbsp;a&nbsp;global&nbsp;store.&nbsp;This&nbsp;will&nbsp;not&nbsp;stop&nbsp;you&nbsp;using&nbsp;other&nbsp;stores.<br>
+&nbsp;<br>
+You&nbsp;also&nbsp;get&nbsp;the&nbsp;<a href="#Namespace">Namespace</a>()&nbsp;class&nbsp;which&nbsp;allows&nbsp;you&nbsp;to&nbsp;generate<br>
+symbols&nbsp;easily.<br>
+&nbsp;<br>
+History:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Spilt&nbsp;off&nbsp;from&nbsp;&nbsp;thing.py&nbsp;2003-08-19<br>
+&nbsp;<br>
+$Log: myStore.html,v $
+Revision 1.13  2007/11/18 02:01:56  syosi
+closer to getting release process to run
+
+only problem in tests now is double-proof.n3
+<br>
+Revision&nbsp;1.14&nbsp;&nbsp;2007/08/06&nbsp;16:13:56&nbsp;&nbsp;syosi<br>
+A&nbsp;month&nbsp;of&nbsp;changes<br>
+&nbsp;<br>
+Revision&nbsp;1.13&nbsp;&nbsp;2007/06/26&nbsp;02:36:15&nbsp;&nbsp;syosi<br>
+fix&nbsp;tabs<br>
+&nbsp;<br>
+Revision&nbsp;1.12&nbsp;&nbsp;2005/10/24&nbsp;16:58:38&nbsp;&nbsp;timbl<br>
+--n3=B&nbsp;flag&nbsp;introduced.&nbsp;--why&nbsp;improved&nbsp;but&nbsp;not&nbsp;perfect.<br>
+&nbsp;<br>
+Revision&nbsp;1.11&nbsp;&nbsp;2004/08/08&nbsp;01:44:49&nbsp;&nbsp;syosi<br>
+undo&nbsp;what&nbsp;I&nbsp;did&nbsp;last&nbsp;thing&nbsp;Friday.&nbsp;Those&nbsp;changes&nbsp;are&nbsp;nowhere&nbsp;near&nbsp;ready&nbsp;for&nbsp;the&nbsp;trunk<br>
+&nbsp;<br>
+Revision&nbsp;1.9&nbsp;&nbsp;2004/07/29&nbsp;16:16:11&nbsp;&nbsp;syosi<br>
+rdflib&nbsp;tests&nbsp;in&nbsp;the&nbsp;default&nbsp;test&nbsp;suite<br>
+&nbsp;<br>
+Revision&nbsp;1.8&nbsp;&nbsp;2004/04/19&nbsp;13:32:22&nbsp;&nbsp;connolly<br>
+trap&nbsp;__special_names__&nbsp;in&nbsp;<a href="#Namespace">Namespace</a>.__getattr__&nbsp;so<br>
+that&nbsp;pychecker&nbsp;can&nbsp;work<br>
+&nbsp;<br>
+Revision&nbsp;1.7&nbsp;&nbsp;2004/03/21&nbsp;04:24:35&nbsp;&nbsp;timbl<br>
+(See&nbsp;doc/changes.html)<br>
+on&nbsp;xml&nbsp;output,&nbsp;nodeID&nbsp;was&nbsp;incorrectly&nbsp;spelled.<br>
+update.py&nbsp;provides&nbsp;cwm's&nbsp;--patch&nbsp;option.<br>
+diff.py&nbsp;as&nbsp;independent&nbsp;progrem&nbsp;generates&nbsp;patch&nbsp;files&nbsp;for&nbsp;cwm&nbsp;--patch<br>
+&nbsp;<br>
+Revision&nbsp;1.6&nbsp;&nbsp;2004/03/09&nbsp;23:55:50&nbsp;&nbsp;connolly<br>
+updated&nbsp;load&nbsp;to&nbsp;track&nbsp;change&nbsp;in&nbsp;llyn<br>
+&nbsp;<br>
+Revision&nbsp;1.5&nbsp;&nbsp;2004/03/06&nbsp;20:39:38&nbsp;&nbsp;timbl<br>
+See&nbsp;<a href="http://www.w3.org/2000/10/swap/doc/changes.html">http://www.w3.org/2000/10/swap/doc/changes.html</a>&nbsp;for&nbsp;details<br>
+-&nbsp;Regresssion&nbsp;test&nbsp;incorporates&nbsp;the&nbsp;RDF&nbsp;Core&nbsp;Positive&nbsp;Parser&nbsp;Tests&nbsp;except&nbsp;XMLLiteral&nbsp;&amp;&nbsp;reification<br>
+-&nbsp;xml:base&nbsp;support&nbsp;was&nbsp;added&nbsp;in&nbsp;the&nbsp;parser.<br>
+-&nbsp;Use&nbsp;the&nbsp;--rdf=R&nbsp;flag&nbsp;to&nbsp;allow&nbsp;RDF&nbsp;to&nbsp;be&nbsp;parsed&nbsp;even&nbsp;when&nbsp;there&nbsp;is&nbsp;no&nbsp;enveloping&nbsp;&lt;rdf:RDF&gt;&nbsp;tag<br>
+-&nbsp;nodeid&nbsp;generated&nbsp;on&nbsp;RDF&nbsp;output<br>
+-&nbsp;Automatically&nbsp;generated&nbsp;terms&nbsp;with&nbsp;no&nbsp;URIs&nbsp;sort&nbsp;after&nbsp;anything&nbsp;which&nbsp;has&nbsp;a&nbsp;URI.<br>
+-&nbsp;<a href="#Namespace">Namespace</a>&nbsp;prefix&nbsp;smarts&nbsp;on&nbsp;output&nbsp;-&nbsp;default&nbsp;ns&nbsp;used&nbsp;for&nbsp;that&nbsp;most&nbsp;frequently&nbsp;used.<br>
+-&nbsp;suppresses&nbsp;namespace&nbsp;prefix&nbsp;declarations&nbsp;which&nbsp;are&nbsp;not&nbsp;actually&nbsp;needed&nbsp;in&nbsp;the&nbsp;output.<br>
+-&nbsp;Cwm&nbsp;will&nbsp;also&nbsp;make&nbsp;up&nbsp;prefixes&nbsp;when&nbsp;it&nbsp;needs&nbsp;them&nbsp;for&nbsp;a&nbsp;namespace,&nbsp;and&nbsp;none&nbsp;of&nbsp;the&nbsp;input&nbsp;data&nbsp;uses&nbsp;one.-<br>
+-&nbsp;Will&nbsp;not&nbsp;use&nbsp;namespace&nbsp;names&nbsp;for&nbsp;URIs&nbsp;which&nbsp;do&nbsp;not&nbsp;have&nbsp;a&nbsp;"#".&nbsp;Including&nbsp;a&nbsp;"/"&nbsp;in&nbsp;the&nbsp;flags&nbsp;overrides.<br>
+&nbsp;<br>
+Revision&nbsp;1.4&nbsp;&nbsp;2004/01/29&nbsp;21:10:39&nbsp;&nbsp;timbl<br>
+ooops&nbsp;-&nbsp;ref&nbsp;to&nbsp;SYMBOL<br>
+&nbsp;<br>
+Revision&nbsp;1.3&nbsp;&nbsp;2004/01/28&nbsp;23:03:00&nbsp;&nbsp;connolly<br>
+-&nbsp;added&nbsp;unit&nbsp;tests&nbsp;to&nbsp;confirm&nbsp;that&nbsp;symbol&nbsp;functions&nbsp;take&nbsp;ustrings<br>
+-&nbsp;wrapped&nbsp;some&nbsp;comments&nbsp;at&nbsp;79&nbsp;chars<br>
+&nbsp;&nbsp;per&nbsp;<a href="http://www.python.org/doc/essays/styleguide.html">http://www.python.org/doc/essays/styleguide.html</a></tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#fffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="uripath.html">uripath</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="__builtin__.html#object">__builtin__.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="myStore.html#Namespace">Namespace</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Namespace">class <strong>Namespace</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;shortcut&nbsp;for&nbsp;getting&nbsp;a&nbsp;symbols&nbsp;as&nbsp;interned&nbsp;by&nbsp;the&nbsp;default&nbsp;store<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;RDF&nbsp;=&nbsp;<a href="#Namespace">Namespace</a>('<a href="http://www.w3.org/1999/02/22-rdf-syntax-ns">http://www.w3.org/1999/02/22-rdf-syntax-ns</a>#')<br>
+&gt;&gt;&gt;&nbsp;x&nbsp;=&nbsp;RDF.type<br>
+&gt;&gt;&gt;&nbsp;y&nbsp;=&nbsp;RDF.type<br>
+&gt;&gt;&gt;&nbsp;x&nbsp;is&nbsp;y<br>
+1<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Namespace-__getattr__"><strong>__getattr__</strong></a>(self, lname)</dt><dd><tt>get&nbsp;the&nbsp;lname&nbsp;Symbol&nbsp;in&nbsp;this&nbsp;namespace.<br>
+&nbsp;<br>
+lname&nbsp;--&nbsp;an&nbsp;XML&nbsp;name&nbsp;(limited&nbsp;to&nbsp;URI&nbsp;characters)<br>
+I&nbsp;hope&nbsp;this&nbsp;is&nbsp;only&nbsp;called&nbsp;*after*&nbsp;the&nbsp;ones&nbsp;defines&nbsp;above&nbsp;have&nbsp;been&nbsp;checked</tt></dd></dl>
+
+<dl><dt><a name="Namespace-__getitem__"><strong>__getitem__</strong></a> = <a href="#Namespace-sym">sym</a>(self, lname)</dt></dl>
+
+<dl><dt><a name="Namespace-__init__"><strong>__init__</strong></a>(self, name, store<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="Namespace-sym"><strong>sym</strong></a>(self, lname)</dt><dd><tt>For&nbsp;getting&nbsp;a&nbsp;symbol&nbsp;for&nbsp;an&nbsp;expression,&nbsp;rather&nbsp;than&nbsp;a&nbsp;constant.<br>
+For,&nbsp;and&nbsp;from,&nbsp;pim/toIcal.py</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'Namespace' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-bind"><strong>bind</strong></a>(prefix, uri)</dt></dl>
+ <dl><dt><a name="-existential"><strong>existential</strong></a>(str, context, uri)</dt><dd><tt>Create&nbsp;or&nbsp;reuse,&nbsp;in&nbsp;the&nbsp;default&nbsp;store,&nbsp;a&nbsp;new&nbsp;named&nbsp;variable<br>
+existentially&nbsp;qualified&nbsp;within&nbsp;the&nbsp;given<br>
+formula&nbsp;as&nbsp;context,&nbsp;and&nbsp;return&nbsp;it&nbsp;for&nbsp;future&nbsp;use</tt></dd></dl>
+ <dl><dt><a name="-formula"><strong>formula</strong></a>()</dt><dd><tt>Create&nbsp;or&nbsp;reuse,&nbsp;in&nbsp;the&nbsp;default&nbsp;store,&nbsp;a&nbsp;new&nbsp;empty&nbsp;formula&nbsp;(triple&nbsp;people&nbsp;think:&nbsp;triple&nbsp;store)<br>
+and&nbsp;return&nbsp;it&nbsp;for&nbsp;future&nbsp;use</tt></dd></dl>
+ <dl><dt><a name="-intern"><strong>intern</strong></a>(v)</dt></dl>
+ <dl><dt><a name="-literal"><strong>literal</strong></a>(str, dt<font color="#909090">=None</font>, lang<font color="#909090">=None</font>)</dt><dd><tt>Create&nbsp;or&nbsp;reuse,&nbsp;in&nbsp;the&nbsp;default&nbsp;store,&nbsp;an&nbsp;interned&nbsp;version&nbsp;of<br>
+the&nbsp;given&nbsp;literal&nbsp;string&nbsp;and&nbsp;return&nbsp;it&nbsp;for&nbsp;future&nbsp;use<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;x&nbsp;=&nbsp;<a href="#-literal">literal</a>("#Andr\xe9")<br>
+&gt;&gt;&gt;&nbsp;y&nbsp;=&nbsp;<a href="#-literal">literal</a>("#Andr\xe9")<br>
+&gt;&gt;&gt;&nbsp;x&nbsp;is&nbsp;y<br>
+1</tt></dd></dl>
+ <dl><dt><a name="-load"><strong>load</strong></a>(uri<font color="#909090">=None</font>, openFormula<font color="#909090">=None</font>, contentType<font color="#909090">=None</font>, remember<font color="#909090">=1</font>, flags<font color="#909090">=''</font>)</dt><dd><tt>Get&nbsp;and&nbsp;parse&nbsp;document.&nbsp;&nbsp;Guesses&nbsp;format&nbsp;if&nbsp;necessary.<br>
+&nbsp;<br>
+uri:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;None,&nbsp;load&nbsp;from&nbsp;standard&nbsp;input.<br>
+remember:&nbsp;if&nbsp;1,&nbsp;store&nbsp;as&nbsp;metadata&nbsp;the&nbsp;relationship&nbsp;between&nbsp;this&nbsp;URI&nbsp;and&nbsp;this&nbsp;formula.<br>
+&nbsp;<br>
+Returns:&nbsp;&nbsp;top-level&nbsp;formula&nbsp;of&nbsp;the&nbsp;parsed&nbsp;document.<br>
+Raises:&nbsp;&nbsp;&nbsp;IOError,&nbsp;SyntaxError,&nbsp;DocumentError</tt></dd></dl>
+ <dl><dt><a name="-loadMany"><strong>loadMany</strong></a>(uris, openFormula<font color="#909090">=None</font>, referer<font color="#909090">=None</font>)</dt><dd><tt>Load&nbsp;a&nbsp;number&nbsp;of&nbsp;resources&nbsp;into&nbsp;the&nbsp;same&nbsp;formula<br>
+&nbsp;<br>
+Returns:&nbsp;&nbsp;top-level&nbsp;formula&nbsp;of&nbsp;the&nbsp;parsed&nbsp;information.<br>
+Raises:&nbsp;&nbsp;&nbsp;IOError,&nbsp;SyntaxError,&nbsp;DocumentError</tt></dd></dl>
+ <dl><dt><a name="-setStore"><strong>setStore</strong></a>(s)</dt><dd><tt>Set&nbsp;the&nbsp;process-global&nbsp;default&nbsp;store&nbsp;to&nbsp;be&nbsp;used&nbsp;when&nbsp;an&nbsp;explicit&nbsp;store&nbsp;is&nbsp;not</tt></dd></dl>
+ <dl><dt><a name="-setStoreClass"><strong>setStoreClass</strong></a>(c)</dt><dd><tt>Set&nbsp;the&nbsp;process-global&nbsp;class&nbsp;to&nbsp;be&nbsp;used&nbsp;to&nbsp;generate&nbsp;a&nbsp;new&nbsp;store&nbsp;if&nbsp;needed</tt></dd></dl>
+ <dl><dt><a name="-symbol"><strong>symbol</strong></a>(uri)</dt><dd><tt>Create&nbsp;or&nbsp;reuse&nbsp;an&nbsp;interned&nbsp;version&nbsp;of&nbsp;the&nbsp;given&nbsp;symbol<br>
+in&nbsp;the&nbsp;default&nbsp;store.&nbsp;and&nbsp;return&nbsp;it&nbsp;for&nbsp;future&nbsp;use<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;x&nbsp;=&nbsp;<a href="#-symbol">symbol</a>(u'<a href="http://example.org/#Andr\xe9">http://example.org/#Andr\xe9</a>')<br>
+&gt;&gt;&gt;&nbsp;y&nbsp;=&nbsp;<a href="#-symbol">symbol</a>(u'<a href="http://example.org/#Andr\xe9">http://example.org/#Andr\xe9</a>')<br>
+&gt;&gt;&gt;&nbsp;x&nbsp;is&nbsp;y<br>
+1</tt></dd></dl>
+ <dl><dt><a name="-universal"><strong>universal</strong></a>(str, context, uri)</dt><dd><tt>Create&nbsp;or&nbsp;reuse,&nbsp;in&nbsp;the&nbsp;default&nbsp;store,&nbsp;a&nbsp;named&nbsp;variable<br>
+universally&nbsp;qualified&nbsp;within&nbsp;the&nbsp;given<br>
+formula&nbsp;as&nbsp;context,&nbsp;and&nbsp;return&nbsp;it&nbsp;for&nbsp;future&nbsp;use</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>store</strong> = None<br>
+<strong>storeClass</strong> = None</td></tr></table>
+</body></html>

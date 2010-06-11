@@ -1,0 +1,563 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module sax2rdf</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>sax2rdf</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/syosi/cvs-trunk/WWW/2000/10/swap/sax2rdf.py">/home/syosi/cvs-trunk/WWW/2000/10/swap/sax2rdf.py</a></font></td></tr></table>
+    <p><tt>&nbsp;&nbsp;A&nbsp;parser&nbsp;for&nbsp;RDF/XML&nbsp;built&nbsp;on&nbsp;the&nbsp;sax2&nbsp;interface;<br>
+&nbsp;&nbsp;derived&nbsp;from&nbsp;a&nbsp;parser&nbsp;for&nbsp;RDF/XML&nbsp;built&nbsp;on&nbsp;the&nbsp;xmllib&nbsp;XML&nbsp;parser.<br>
+&nbsp;<br>
+&nbsp;&nbsp;To&nbsp;do:&nbsp;Passing&nbsp;on&nbsp;namesapce&nbsp;bindings!<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(dwc:&nbsp;@@huh?)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(tbl:&nbsp;The&nbsp;bind&nbsp;call&nbsp;in&nbsp;the&nbsp;RDF&nbsp;stream&nbsp;API&nbsp;is&nbsp;used&nbsp;to&nbsp;pass<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;on&nbsp;the&nbsp;prefixes&nbsp;found,&nbsp;as&nbsp;hints&nbsp;only&nbsp;for&nbsp;generating&nbsp;readable&nbsp;output&nbsp;code)<br>
+&nbsp;<br>
+&nbsp;&nbsp;-&nbsp;Add&nbsp;parsing&nbsp;of&nbsp;RDF&nbsp;bags<br>
+&nbsp;<br>
+&nbsp;parses&nbsp;DAML_ONT_NS&nbsp;or&nbsp;List_NS&nbsp;lists,&nbsp;generates&nbsp;List_NS<br>
+&nbsp;<br>
+&nbsp;References:<br>
+&nbsp;<br>
+&nbsp;Python/XML&nbsp;HOWTO<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;Python/XML&nbsp;Special&nbsp;Interest&nbsp;Group<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;xml-sig@python.org&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(edited&nbsp;by&nbsp;amk1@bigfoot.com)<br>
+&nbsp;<a href="http://py-howto.sourceforge.net/xml-howto/xml-howto.html">http://py-howto.sourceforge.net/xml-howto/xml-howto.html</a><br>
+&nbsp;<br>
+&nbsp;<a href="http://www.megginson.com/SAX/applications.html#python.parsers">http://www.megginson.com/SAX/applications.html#python.parsers</a><br>
+&nbsp;<a href="http://www.python.org/sigs/xml-sig/">http://www.python.org/sigs/xml-sig/</a><br>
+&nbsp;<br>
+&nbsp;How&nbsp;to&nbsp;on&nbsp;xmllib:<br>
+&nbsp;<a href="http://www.python.org/doc/howto/xml/node7.html">http://www.python.org/doc/howto/xml/node7.html</a><br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;RDF&nbsp;grammar&nbsp;<a href="http://www.w3.org/TR/rdf-syntax-grammar/">http://www.w3.org/TR/rdf-syntax-grammar/</a>&nbsp;esp&nbsp;sections&nbsp;6&nbsp;and&nbsp;7<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+#####################################&nbsp;SAX&nbsp;pointers<br>
+&nbsp;First&nbsp;hit&nbsp;on&nbsp;Python&nbsp;SAX&nbsp;parser<br>
+&nbsp;<a href="http://www.gca.org/papers/xmleurope2000/papers/s28-04.html#N84395">http://www.gca.org/papers/xmleurope2000/papers/s28-04.html#N84395</a><br>
+&nbsp;<br>
+&nbsp;Howto&nbsp;use&nbsp;SAX&nbsp;in&nbsp;python:<br>
+&nbsp;<a href="http://www.python.org/doc/howto/xml/SAX.html">http://www.python.org/doc/howto/xml/SAX.html</a></tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#fffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="RDFSink.html">RDFSink</a><br>
+<a href="diag.html">diag</a><br>
+</td><td width="25%" valign=top><a href="isXML.html">isXML</a><br>
+<a href="string.html">string</a><br>
+</td><td width="25%" valign=top><a href="sys.html">sys</a><br>
+<a href="uripath.html">uripath</a><br>
+</td><td width="25%" valign=top><a href="_xmlplus.html">_xmlplus</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="exceptions.html#SyntaxError">exceptions.SyntaxError</a>(<a href="exceptions.html#StandardError">exceptions.StandardError</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="sax2rdf.html#BadSyntax">BadSyntax</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="xml.sax.handler.html#ContentHandler">xml.sax.handler.ContentHandler</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="sax2rdf.html#RDFHandler">RDFHandler</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="sax2rdf.html#RDFXMLParser">RDFXMLParser</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="sax2rdf.html#XMLDOMParser">XMLDOMParser</a>
+</font></dt></dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="BadSyntax">class <strong>BadSyntax</strong></a>(<a href="exceptions.html#SyntaxError">exceptions.SyntaxError</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="sax2rdf.html#BadSyntax">BadSyntax</a></dd>
+<dd><a href="exceptions.html#SyntaxError">exceptions.SyntaxError</a></dd>
+<dd><a href="exceptions.html#StandardError">exceptions.StandardError</a></dd>
+<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="BadSyntax-__init__"><strong>__init__</strong></a>(self, info, message)</dt></dl>
+
+<dl><dt><a name="BadSyntax-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<hr>
+Data and other attributes inherited from <a href="exceptions.html#SyntaxError">exceptions.SyntaxError</a>:<br>
+<dl><dt><strong>filename</strong> = None</dl>
+
+<dl><dt><strong>lineno</strong> = None</dl>
+
+<dl><dt><strong>msg</strong> = ''</dl>
+
+<dl><dt><strong>offset</strong> = None</dl>
+
+<dl><dt><strong>print_file_and_line</strong> = None</dl>
+
+<dl><dt><strong>text</strong> = None</dl>
+
+<hr>
+Methods inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><a name="BadSyntax-__getitem__"><strong>__getitem__</strong></a>(...)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="RDFHandler">class <strong>RDFHandler</strong></a>(<a href="xml.sax.handler.html#ContentHandler">xml.sax.handler.ContentHandler</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>RDF&nbsp;Parser&nbsp;using&nbsp;SAX&nbsp;API&nbsp;for&nbsp;XML&nbsp;parsing<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="RDFHandler-__init__"><strong>__init__</strong></a>(self, sink, openFormula, thisDoc, baseURI<font color="#909090">=None</font>, flags<font color="#909090">=''</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="RDFHandler-characters"><strong>characters</strong></a>(self, data)</dt></dl>
+
+<dl><dt><a name="RDFHandler-endDocument"><strong>endDocument</strong></a>(self, f<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="RDFHandler-endElementNS"><strong>endElementNS</strong></a>(self, name, qname)</dt><dd><tt>Handle&nbsp;end&nbsp;element&nbsp;event</tt></dd></dl>
+
+<dl><dt><a name="RDFHandler-endPrefixMapping"><strong>endPrefixMapping</strong></a>(self, prefix)</dt></dl>
+
+<dl><dt><a name="RDFHandler-flush"><strong>flush</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RDFHandler-idAboutAttr"><strong>idAboutAttr</strong></a>(self, attrs)</dt><dd><tt>set&nbsp;up&nbsp;subject&nbsp;and&nbsp;maybe&nbsp;context&nbsp;from&nbsp;attributes</tt></dd></dl>
+
+<dl><dt><a name="RDFHandler-literal_element_end"><strong>literal_element_end</strong></a>(self, name, qname)</dt></dl>
+
+<dl><dt><a name="RDFHandler-literal_element_end_DOM"><strong>literal_element_end_DOM</strong></a>(self, name, qname)</dt></dl>
+
+<dl><dt><a name="RDFHandler-literal_element_start"><strong>literal_element_start</strong></a>(self, name, qname, attrs)</dt></dl>
+
+<dl><dt><a name="RDFHandler-literal_element_start_DOM"><strong>literal_element_start_DOM</strong></a>(self, name, qname, attrs)</dt></dl>
+
+<dl><dt><a name="RDFHandler-literal_element_start_DOM_OLD"><strong>literal_element_start_DOM_OLD</strong></a>(self, name, qname, attrs)</dt></dl>
+
+<dl><dt><a name="RDFHandler-newBlankNode"><strong>newBlankNode</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RDFHandler-processingInstruction"><strong>processingInstruction</strong></a>(self, name, data)</dt></dl>
+
+<dl><dt><a name="RDFHandler-startElementNS"><strong>startElementNS</strong></a>(self, name, qname, attrs)</dt><dd><tt>Handle&nbsp;start&nbsp;tag.</tt></dd></dl>
+
+<dl><dt><a name="RDFHandler-startPrefixMapping"><strong>startPrefixMapping</strong></a>(self, prefix, uri)</dt><dd><tt>Performance&nbsp;note:<br>
+We&nbsp;make&nbsp;a&nbsp;new&nbsp;dictionary&nbsp;for&nbsp;every&nbsp;binding.<br>
+This&nbsp;makes&nbsp;lookup&nbsp;quick&nbsp;and&nbsp;easy,&nbsp;but<br>
+it&nbsp;takes&nbsp;extra&nbsp;space&nbsp;and&nbsp;more&nbsp;time&nbsp;to<br>
+set&nbsp;up&nbsp;a&nbsp;new&nbsp;binding.</tt></dd></dl>
+
+<dl><dt><a name="RDFHandler-uriref"><strong>uriref</strong></a>(self, str)</dt><dd><tt>Generate&nbsp;uri&nbsp;from&nbsp;uriref&nbsp;in&nbsp;this&nbsp;document<br>
+unicode&nbsp;strings&nbsp;OK.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="xml.sax.handler.html#ContentHandler">xml.sax.handler.ContentHandler</a>:<br>
+<dl><dt><a name="RDFHandler-endElement"><strong>endElement</strong></a>(self, name)</dt><dd><tt>Signals&nbsp;the&nbsp;end&nbsp;of&nbsp;an&nbsp;element&nbsp;in&nbsp;non-namespace&nbsp;mode.<br>
+&nbsp;<br>
+The&nbsp;name&nbsp;parameter&nbsp;contains&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;element&nbsp;type,&nbsp;just<br>
+as&nbsp;with&nbsp;the&nbsp;startElement&nbsp;event.</tt></dd></dl>
+
+<dl><dt><a name="RDFHandler-ignorableWhitespace"><strong>ignorableWhitespace</strong></a>(self, whitespace)</dt><dd><tt>Receive&nbsp;notification&nbsp;of&nbsp;ignorable&nbsp;whitespace&nbsp;in&nbsp;element&nbsp;content.<br>
+&nbsp;<br>
+Validating&nbsp;Parsers&nbsp;must&nbsp;use&nbsp;this&nbsp;method&nbsp;to&nbsp;report&nbsp;each&nbsp;chunk<br>
+of&nbsp;ignorable&nbsp;whitespace&nbsp;(see&nbsp;the&nbsp;W3C&nbsp;XML&nbsp;1.0&nbsp;recommendation,<br>
+section&nbsp;2.10):&nbsp;non-validating&nbsp;parsers&nbsp;may&nbsp;also&nbsp;use&nbsp;this&nbsp;method<br>
+if&nbsp;they&nbsp;are&nbsp;capable&nbsp;of&nbsp;parsing&nbsp;and&nbsp;using&nbsp;content&nbsp;models.<br>
+&nbsp;<br>
+SAX&nbsp;parsers&nbsp;may&nbsp;return&nbsp;all&nbsp;contiguous&nbsp;whitespace&nbsp;in&nbsp;a&nbsp;single<br>
+chunk,&nbsp;or&nbsp;they&nbsp;may&nbsp;split&nbsp;it&nbsp;into&nbsp;several&nbsp;chunks;&nbsp;however,&nbsp;all<br>
+of&nbsp;the&nbsp;characters&nbsp;in&nbsp;any&nbsp;single&nbsp;event&nbsp;must&nbsp;come&nbsp;from&nbsp;the&nbsp;same<br>
+external&nbsp;entity,&nbsp;so&nbsp;that&nbsp;the&nbsp;Locator&nbsp;provides&nbsp;useful<br>
+information.<br>
+&nbsp;<br>
+The&nbsp;application&nbsp;must&nbsp;not&nbsp;attempt&nbsp;to&nbsp;read&nbsp;from&nbsp;the&nbsp;array<br>
+outside&nbsp;of&nbsp;the&nbsp;specified&nbsp;range.</tt></dd></dl>
+
+<dl><dt><a name="RDFHandler-setDocumentLocator"><strong>setDocumentLocator</strong></a>(self, locator)</dt><dd><tt>Called&nbsp;by&nbsp;the&nbsp;parser&nbsp;to&nbsp;give&nbsp;the&nbsp;application&nbsp;a&nbsp;locator&nbsp;for<br>
+locating&nbsp;the&nbsp;origin&nbsp;of&nbsp;document&nbsp;events.<br>
+&nbsp;<br>
+SAX&nbsp;parsers&nbsp;are&nbsp;strongly&nbsp;encouraged&nbsp;(though&nbsp;not&nbsp;absolutely<br>
+required)&nbsp;to&nbsp;supply&nbsp;a&nbsp;locator:&nbsp;if&nbsp;it&nbsp;does&nbsp;so,&nbsp;it&nbsp;must&nbsp;supply<br>
+the&nbsp;locator&nbsp;to&nbsp;the&nbsp;application&nbsp;by&nbsp;invoking&nbsp;this&nbsp;method&nbsp;before<br>
+invoking&nbsp;any&nbsp;of&nbsp;the&nbsp;other&nbsp;methods&nbsp;in&nbsp;the&nbsp;DocumentHandler<br>
+interface.<br>
+&nbsp;<br>
+The&nbsp;locator&nbsp;allows&nbsp;the&nbsp;application&nbsp;to&nbsp;determine&nbsp;the&nbsp;end<br>
+position&nbsp;of&nbsp;any&nbsp;document-related&nbsp;event,&nbsp;even&nbsp;if&nbsp;the&nbsp;parser&nbsp;is<br>
+not&nbsp;reporting&nbsp;an&nbsp;error.&nbsp;Typically,&nbsp;the&nbsp;application&nbsp;will&nbsp;use<br>
+this&nbsp;information&nbsp;for&nbsp;reporting&nbsp;its&nbsp;own&nbsp;errors&nbsp;(such&nbsp;as<br>
+character&nbsp;content&nbsp;that&nbsp;does&nbsp;not&nbsp;match&nbsp;an&nbsp;application's<br>
+business&nbsp;rules).&nbsp;The&nbsp;information&nbsp;returned&nbsp;by&nbsp;the&nbsp;locator&nbsp;is<br>
+probably&nbsp;not&nbsp;sufficient&nbsp;for&nbsp;use&nbsp;with&nbsp;a&nbsp;search&nbsp;engine.<br>
+&nbsp;<br>
+Note&nbsp;that&nbsp;the&nbsp;locator&nbsp;will&nbsp;return&nbsp;correct&nbsp;information&nbsp;only<br>
+during&nbsp;the&nbsp;invocation&nbsp;of&nbsp;the&nbsp;events&nbsp;in&nbsp;this&nbsp;interface.&nbsp;The<br>
+application&nbsp;should&nbsp;not&nbsp;attempt&nbsp;to&nbsp;use&nbsp;it&nbsp;at&nbsp;any&nbsp;other&nbsp;time.</tt></dd></dl>
+
+<dl><dt><a name="RDFHandler-skippedEntity"><strong>skippedEntity</strong></a>(self, name)</dt><dd><tt>Receive&nbsp;notification&nbsp;of&nbsp;a&nbsp;skipped&nbsp;entity.<br>
+&nbsp;<br>
+The&nbsp;Parser&nbsp;will&nbsp;invoke&nbsp;this&nbsp;method&nbsp;once&nbsp;for&nbsp;each&nbsp;entity<br>
+skipped.&nbsp;Non-validating&nbsp;processors&nbsp;may&nbsp;skip&nbsp;entities&nbsp;if&nbsp;they<br>
+have&nbsp;not&nbsp;seen&nbsp;the&nbsp;declarations&nbsp;(because,&nbsp;for&nbsp;example,&nbsp;the<br>
+entity&nbsp;was&nbsp;declared&nbsp;in&nbsp;an&nbsp;external&nbsp;DTD&nbsp;subset).&nbsp;All&nbsp;processors<br>
+may&nbsp;skip&nbsp;external&nbsp;entities,&nbsp;depending&nbsp;on&nbsp;the&nbsp;values&nbsp;of&nbsp;the<br>
+<a href="http://xml.org/sax/features/external-general-entities">http://xml.org/sax/features/external-general-entities</a>&nbsp;and&nbsp;the<br>
+<a href="http://xml.org/sax/features/external-parameter-entities">http://xml.org/sax/features/external-parameter-entities</a><br>
+properties.</tt></dd></dl>
+
+<dl><dt><a name="RDFHandler-startDocument"><strong>startDocument</strong></a>(self)</dt><dd><tt>Receive&nbsp;notification&nbsp;of&nbsp;the&nbsp;beginning&nbsp;of&nbsp;a&nbsp;document.<br>
+&nbsp;<br>
+The&nbsp;SAX&nbsp;parser&nbsp;will&nbsp;invoke&nbsp;this&nbsp;method&nbsp;only&nbsp;once,&nbsp;before&nbsp;any<br>
+other&nbsp;methods&nbsp;in&nbsp;this&nbsp;interface&nbsp;or&nbsp;in&nbsp;DTDHandler&nbsp;(except&nbsp;for<br>
+setDocumentLocator).</tt></dd></dl>
+
+<dl><dt><a name="RDFHandler-startElement"><strong>startElement</strong></a>(self, name, attrs)</dt><dd><tt>Signals&nbsp;the&nbsp;start&nbsp;of&nbsp;an&nbsp;element&nbsp;in&nbsp;non-namespace&nbsp;mode.<br>
+&nbsp;<br>
+The&nbsp;name&nbsp;parameter&nbsp;contains&nbsp;the&nbsp;raw&nbsp;XML&nbsp;1.0&nbsp;name&nbsp;of&nbsp;the<br>
+element&nbsp;type&nbsp;as&nbsp;a&nbsp;string&nbsp;and&nbsp;the&nbsp;attrs&nbsp;parameter&nbsp;holds&nbsp;an<br>
+instance&nbsp;of&nbsp;the&nbsp;Attributes&nbsp;class&nbsp;containing&nbsp;the&nbsp;attributes&nbsp;of<br>
+the&nbsp;element.</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="RDFXMLParser">class <strong>RDFXMLParser</strong></a>(<a href="sax2rdf.html#RDFHandler">RDFHandler</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>XML/RDF&nbsp;parser&nbsp;based&nbsp;on&nbsp;sax&nbsp;XML&nbsp;interface<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="sax2rdf.html#RDFXMLParser">RDFXMLParser</a></dd>
+<dd><a href="sax2rdf.html#RDFHandler">RDFHandler</a></dd>
+<dd><a href="xml.sax.handler.html#ContentHandler">xml.sax.handler.ContentHandler</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="RDFXMLParser-__init__"><strong>__init__</strong></a>(self, sink, openFormula, thisDoc<font color="#909090">=None</font>, flags<font color="#909090">=''</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-close"><strong>close</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-feed"><strong>feed</strong></a>(self, data)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-loadStream"><strong>loadStream</strong></a>(self, stream)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>flagDocumentation</strong> = '<font color="#c040c0">\n</font>    Flags to control RDF/XML INPUT (after --rdf...t of RDF inc. datatypes, xml:lang, and nodeIds.<font color="#c040c0">\n\n</font>'</dl>
+
+<hr>
+Methods inherited from <a href="sax2rdf.html#RDFHandler">RDFHandler</a>:<br>
+<dl><dt><a name="RDFXMLParser-characters"><strong>characters</strong></a>(self, data)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-endDocument"><strong>endDocument</strong></a>(self, f<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-endElementNS"><strong>endElementNS</strong></a>(self, name, qname)</dt><dd><tt>Handle&nbsp;end&nbsp;element&nbsp;event</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-endPrefixMapping"><strong>endPrefixMapping</strong></a>(self, prefix)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-flush"><strong>flush</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-idAboutAttr"><strong>idAboutAttr</strong></a>(self, attrs)</dt><dd><tt>set&nbsp;up&nbsp;subject&nbsp;and&nbsp;maybe&nbsp;context&nbsp;from&nbsp;attributes</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-literal_element_end"><strong>literal_element_end</strong></a>(self, name, qname)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-literal_element_end_DOM"><strong>literal_element_end_DOM</strong></a>(self, name, qname)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-literal_element_start"><strong>literal_element_start</strong></a>(self, name, qname, attrs)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-literal_element_start_DOM"><strong>literal_element_start_DOM</strong></a>(self, name, qname, attrs)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-literal_element_start_DOM_OLD"><strong>literal_element_start_DOM_OLD</strong></a>(self, name, qname, attrs)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-newBlankNode"><strong>newBlankNode</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-processingInstruction"><strong>processingInstruction</strong></a>(self, name, data)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-startElementNS"><strong>startElementNS</strong></a>(self, name, qname, attrs)</dt><dd><tt>Handle&nbsp;start&nbsp;tag.</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-startPrefixMapping"><strong>startPrefixMapping</strong></a>(self, prefix, uri)</dt><dd><tt>Performance&nbsp;note:<br>
+We&nbsp;make&nbsp;a&nbsp;new&nbsp;dictionary&nbsp;for&nbsp;every&nbsp;binding.<br>
+This&nbsp;makes&nbsp;lookup&nbsp;quick&nbsp;and&nbsp;easy,&nbsp;but<br>
+it&nbsp;takes&nbsp;extra&nbsp;space&nbsp;and&nbsp;more&nbsp;time&nbsp;to<br>
+set&nbsp;up&nbsp;a&nbsp;new&nbsp;binding.</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-uriref"><strong>uriref</strong></a>(self, str)</dt><dd><tt>Generate&nbsp;uri&nbsp;from&nbsp;uriref&nbsp;in&nbsp;this&nbsp;document<br>
+unicode&nbsp;strings&nbsp;OK.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="xml.sax.handler.html#ContentHandler">xml.sax.handler.ContentHandler</a>:<br>
+<dl><dt><a name="RDFXMLParser-endElement"><strong>endElement</strong></a>(self, name)</dt><dd><tt>Signals&nbsp;the&nbsp;end&nbsp;of&nbsp;an&nbsp;element&nbsp;in&nbsp;non-namespace&nbsp;mode.<br>
+&nbsp;<br>
+The&nbsp;name&nbsp;parameter&nbsp;contains&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;element&nbsp;type,&nbsp;just<br>
+as&nbsp;with&nbsp;the&nbsp;startElement&nbsp;event.</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-ignorableWhitespace"><strong>ignorableWhitespace</strong></a>(self, whitespace)</dt><dd><tt>Receive&nbsp;notification&nbsp;of&nbsp;ignorable&nbsp;whitespace&nbsp;in&nbsp;element&nbsp;content.<br>
+&nbsp;<br>
+Validating&nbsp;Parsers&nbsp;must&nbsp;use&nbsp;this&nbsp;method&nbsp;to&nbsp;report&nbsp;each&nbsp;chunk<br>
+of&nbsp;ignorable&nbsp;whitespace&nbsp;(see&nbsp;the&nbsp;W3C&nbsp;XML&nbsp;1.0&nbsp;recommendation,<br>
+section&nbsp;2.10):&nbsp;non-validating&nbsp;parsers&nbsp;may&nbsp;also&nbsp;use&nbsp;this&nbsp;method<br>
+if&nbsp;they&nbsp;are&nbsp;capable&nbsp;of&nbsp;parsing&nbsp;and&nbsp;using&nbsp;content&nbsp;models.<br>
+&nbsp;<br>
+SAX&nbsp;parsers&nbsp;may&nbsp;return&nbsp;all&nbsp;contiguous&nbsp;whitespace&nbsp;in&nbsp;a&nbsp;single<br>
+chunk,&nbsp;or&nbsp;they&nbsp;may&nbsp;split&nbsp;it&nbsp;into&nbsp;several&nbsp;chunks;&nbsp;however,&nbsp;all<br>
+of&nbsp;the&nbsp;characters&nbsp;in&nbsp;any&nbsp;single&nbsp;event&nbsp;must&nbsp;come&nbsp;from&nbsp;the&nbsp;same<br>
+external&nbsp;entity,&nbsp;so&nbsp;that&nbsp;the&nbsp;Locator&nbsp;provides&nbsp;useful<br>
+information.<br>
+&nbsp;<br>
+The&nbsp;application&nbsp;must&nbsp;not&nbsp;attempt&nbsp;to&nbsp;read&nbsp;from&nbsp;the&nbsp;array<br>
+outside&nbsp;of&nbsp;the&nbsp;specified&nbsp;range.</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-setDocumentLocator"><strong>setDocumentLocator</strong></a>(self, locator)</dt><dd><tt>Called&nbsp;by&nbsp;the&nbsp;parser&nbsp;to&nbsp;give&nbsp;the&nbsp;application&nbsp;a&nbsp;locator&nbsp;for<br>
+locating&nbsp;the&nbsp;origin&nbsp;of&nbsp;document&nbsp;events.<br>
+&nbsp;<br>
+SAX&nbsp;parsers&nbsp;are&nbsp;strongly&nbsp;encouraged&nbsp;(though&nbsp;not&nbsp;absolutely<br>
+required)&nbsp;to&nbsp;supply&nbsp;a&nbsp;locator:&nbsp;if&nbsp;it&nbsp;does&nbsp;so,&nbsp;it&nbsp;must&nbsp;supply<br>
+the&nbsp;locator&nbsp;to&nbsp;the&nbsp;application&nbsp;by&nbsp;invoking&nbsp;this&nbsp;method&nbsp;before<br>
+invoking&nbsp;any&nbsp;of&nbsp;the&nbsp;other&nbsp;methods&nbsp;in&nbsp;the&nbsp;DocumentHandler<br>
+interface.<br>
+&nbsp;<br>
+The&nbsp;locator&nbsp;allows&nbsp;the&nbsp;application&nbsp;to&nbsp;determine&nbsp;the&nbsp;end<br>
+position&nbsp;of&nbsp;any&nbsp;document-related&nbsp;event,&nbsp;even&nbsp;if&nbsp;the&nbsp;parser&nbsp;is<br>
+not&nbsp;reporting&nbsp;an&nbsp;error.&nbsp;Typically,&nbsp;the&nbsp;application&nbsp;will&nbsp;use<br>
+this&nbsp;information&nbsp;for&nbsp;reporting&nbsp;its&nbsp;own&nbsp;errors&nbsp;(such&nbsp;as<br>
+character&nbsp;content&nbsp;that&nbsp;does&nbsp;not&nbsp;match&nbsp;an&nbsp;application's<br>
+business&nbsp;rules).&nbsp;The&nbsp;information&nbsp;returned&nbsp;by&nbsp;the&nbsp;locator&nbsp;is<br>
+probably&nbsp;not&nbsp;sufficient&nbsp;for&nbsp;use&nbsp;with&nbsp;a&nbsp;search&nbsp;engine.<br>
+&nbsp;<br>
+Note&nbsp;that&nbsp;the&nbsp;locator&nbsp;will&nbsp;return&nbsp;correct&nbsp;information&nbsp;only<br>
+during&nbsp;the&nbsp;invocation&nbsp;of&nbsp;the&nbsp;events&nbsp;in&nbsp;this&nbsp;interface.&nbsp;The<br>
+application&nbsp;should&nbsp;not&nbsp;attempt&nbsp;to&nbsp;use&nbsp;it&nbsp;at&nbsp;any&nbsp;other&nbsp;time.</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-skippedEntity"><strong>skippedEntity</strong></a>(self, name)</dt><dd><tt>Receive&nbsp;notification&nbsp;of&nbsp;a&nbsp;skipped&nbsp;entity.<br>
+&nbsp;<br>
+The&nbsp;Parser&nbsp;will&nbsp;invoke&nbsp;this&nbsp;method&nbsp;once&nbsp;for&nbsp;each&nbsp;entity<br>
+skipped.&nbsp;Non-validating&nbsp;processors&nbsp;may&nbsp;skip&nbsp;entities&nbsp;if&nbsp;they<br>
+have&nbsp;not&nbsp;seen&nbsp;the&nbsp;declarations&nbsp;(because,&nbsp;for&nbsp;example,&nbsp;the<br>
+entity&nbsp;was&nbsp;declared&nbsp;in&nbsp;an&nbsp;external&nbsp;DTD&nbsp;subset).&nbsp;All&nbsp;processors<br>
+may&nbsp;skip&nbsp;external&nbsp;entities,&nbsp;depending&nbsp;on&nbsp;the&nbsp;values&nbsp;of&nbsp;the<br>
+<a href="http://xml.org/sax/features/external-general-entities">http://xml.org/sax/features/external-general-entities</a>&nbsp;and&nbsp;the<br>
+<a href="http://xml.org/sax/features/external-parameter-entities">http://xml.org/sax/features/external-parameter-entities</a><br>
+properties.</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-startDocument"><strong>startDocument</strong></a>(self)</dt><dd><tt>Receive&nbsp;notification&nbsp;of&nbsp;the&nbsp;beginning&nbsp;of&nbsp;a&nbsp;document.<br>
+&nbsp;<br>
+The&nbsp;SAX&nbsp;parser&nbsp;will&nbsp;invoke&nbsp;this&nbsp;method&nbsp;only&nbsp;once,&nbsp;before&nbsp;any<br>
+other&nbsp;methods&nbsp;in&nbsp;this&nbsp;interface&nbsp;or&nbsp;in&nbsp;DTDHandler&nbsp;(except&nbsp;for<br>
+setDocumentLocator).</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-startElement"><strong>startElement</strong></a>(self, name, attrs)</dt><dd><tt>Signals&nbsp;the&nbsp;start&nbsp;of&nbsp;an&nbsp;element&nbsp;in&nbsp;non-namespace&nbsp;mode.<br>
+&nbsp;<br>
+The&nbsp;name&nbsp;parameter&nbsp;contains&nbsp;the&nbsp;raw&nbsp;XML&nbsp;1.0&nbsp;name&nbsp;of&nbsp;the<br>
+element&nbsp;type&nbsp;as&nbsp;a&nbsp;string&nbsp;and&nbsp;the&nbsp;attrs&nbsp;parameter&nbsp;holds&nbsp;an<br>
+instance&nbsp;of&nbsp;the&nbsp;Attributes&nbsp;class&nbsp;containing&nbsp;the&nbsp;attributes&nbsp;of<br>
+the&nbsp;element.</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="XMLDOMParser">class <strong>XMLDOMParser</strong></a>(<a href="sax2rdf.html#RDFXMLParser">RDFXMLParser</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>XML&nbsp;format&nbsp;to&nbsp;RDF&nbsp;Graph&nbsp;parser&nbsp;based&nbsp;on&nbsp;sax&nbsp;XML&nbsp;interface<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="sax2rdf.html#XMLDOMParser">XMLDOMParser</a></dd>
+<dd><a href="sax2rdf.html#RDFXMLParser">RDFXMLParser</a></dd>
+<dd><a href="sax2rdf.html#RDFHandler">RDFHandler</a></dd>
+<dd><a href="xml.sax.handler.html#ContentHandler">xml.sax.handler.ContentHandler</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="XMLDOMParser-__init__"><strong>__init__</strong></a>(self, thisDoc<font color="#909090">=None</font>, flags<font color="#909090">=''</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<hr>
+Methods inherited from <a href="sax2rdf.html#RDFXMLParser">RDFXMLParser</a>:<br>
+<dl><dt><a name="XMLDOMParser-close"><strong>close</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="XMLDOMParser-feed"><strong>feed</strong></a>(self, data)</dt></dl>
+
+<dl><dt><a name="XMLDOMParser-loadStream"><strong>loadStream</strong></a>(self, stream)</dt></dl>
+
+<hr>
+Data and other attributes inherited from <a href="sax2rdf.html#RDFXMLParser">RDFXMLParser</a>:<br>
+<dl><dt><strong>flagDocumentation</strong> = '<font color="#c040c0">\n</font>    Flags to control RDF/XML INPUT (after --rdf...t of RDF inc. datatypes, xml:lang, and nodeIds.<font color="#c040c0">\n\n</font>'</dl>
+
+<hr>
+Methods inherited from <a href="sax2rdf.html#RDFHandler">RDFHandler</a>:<br>
+<dl><dt><a name="XMLDOMParser-characters"><strong>characters</strong></a>(self, data)</dt></dl>
+
+<dl><dt><a name="XMLDOMParser-endDocument"><strong>endDocument</strong></a>(self, f<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="XMLDOMParser-endElementNS"><strong>endElementNS</strong></a>(self, name, qname)</dt><dd><tt>Handle&nbsp;end&nbsp;element&nbsp;event</tt></dd></dl>
+
+<dl><dt><a name="XMLDOMParser-endPrefixMapping"><strong>endPrefixMapping</strong></a>(self, prefix)</dt></dl>
+
+<dl><dt><a name="XMLDOMParser-flush"><strong>flush</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="XMLDOMParser-idAboutAttr"><strong>idAboutAttr</strong></a>(self, attrs)</dt><dd><tt>set&nbsp;up&nbsp;subject&nbsp;and&nbsp;maybe&nbsp;context&nbsp;from&nbsp;attributes</tt></dd></dl>
+
+<dl><dt><a name="XMLDOMParser-literal_element_end"><strong>literal_element_end</strong></a>(self, name, qname)</dt></dl>
+
+<dl><dt><a name="XMLDOMParser-literal_element_end_DOM"><strong>literal_element_end_DOM</strong></a>(self, name, qname)</dt></dl>
+
+<dl><dt><a name="XMLDOMParser-literal_element_start"><strong>literal_element_start</strong></a>(self, name, qname, attrs)</dt></dl>
+
+<dl><dt><a name="XMLDOMParser-literal_element_start_DOM"><strong>literal_element_start_DOM</strong></a>(self, name, qname, attrs)</dt></dl>
+
+<dl><dt><a name="XMLDOMParser-literal_element_start_DOM_OLD"><strong>literal_element_start_DOM_OLD</strong></a>(self, name, qname, attrs)</dt></dl>
+
+<dl><dt><a name="XMLDOMParser-newBlankNode"><strong>newBlankNode</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="XMLDOMParser-processingInstruction"><strong>processingInstruction</strong></a>(self, name, data)</dt></dl>
+
+<dl><dt><a name="XMLDOMParser-startElementNS"><strong>startElementNS</strong></a>(self, name, qname, attrs)</dt><dd><tt>Handle&nbsp;start&nbsp;tag.</tt></dd></dl>
+
+<dl><dt><a name="XMLDOMParser-startPrefixMapping"><strong>startPrefixMapping</strong></a>(self, prefix, uri)</dt><dd><tt>Performance&nbsp;note:<br>
+We&nbsp;make&nbsp;a&nbsp;new&nbsp;dictionary&nbsp;for&nbsp;every&nbsp;binding.<br>
+This&nbsp;makes&nbsp;lookup&nbsp;quick&nbsp;and&nbsp;easy,&nbsp;but<br>
+it&nbsp;takes&nbsp;extra&nbsp;space&nbsp;and&nbsp;more&nbsp;time&nbsp;to<br>
+set&nbsp;up&nbsp;a&nbsp;new&nbsp;binding.</tt></dd></dl>
+
+<dl><dt><a name="XMLDOMParser-uriref"><strong>uriref</strong></a>(self, str)</dt><dd><tt>Generate&nbsp;uri&nbsp;from&nbsp;uriref&nbsp;in&nbsp;this&nbsp;document<br>
+unicode&nbsp;strings&nbsp;OK.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="xml.sax.handler.html#ContentHandler">xml.sax.handler.ContentHandler</a>:<br>
+<dl><dt><a name="XMLDOMParser-endElement"><strong>endElement</strong></a>(self, name)</dt><dd><tt>Signals&nbsp;the&nbsp;end&nbsp;of&nbsp;an&nbsp;element&nbsp;in&nbsp;non-namespace&nbsp;mode.<br>
+&nbsp;<br>
+The&nbsp;name&nbsp;parameter&nbsp;contains&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;element&nbsp;type,&nbsp;just<br>
+as&nbsp;with&nbsp;the&nbsp;startElement&nbsp;event.</tt></dd></dl>
+
+<dl><dt><a name="XMLDOMParser-ignorableWhitespace"><strong>ignorableWhitespace</strong></a>(self, whitespace)</dt><dd><tt>Receive&nbsp;notification&nbsp;of&nbsp;ignorable&nbsp;whitespace&nbsp;in&nbsp;element&nbsp;content.<br>
+&nbsp;<br>
+Validating&nbsp;Parsers&nbsp;must&nbsp;use&nbsp;this&nbsp;method&nbsp;to&nbsp;report&nbsp;each&nbsp;chunk<br>
+of&nbsp;ignorable&nbsp;whitespace&nbsp;(see&nbsp;the&nbsp;W3C&nbsp;XML&nbsp;1.0&nbsp;recommendation,<br>
+section&nbsp;2.10):&nbsp;non-validating&nbsp;parsers&nbsp;may&nbsp;also&nbsp;use&nbsp;this&nbsp;method<br>
+if&nbsp;they&nbsp;are&nbsp;capable&nbsp;of&nbsp;parsing&nbsp;and&nbsp;using&nbsp;content&nbsp;models.<br>
+&nbsp;<br>
+SAX&nbsp;parsers&nbsp;may&nbsp;return&nbsp;all&nbsp;contiguous&nbsp;whitespace&nbsp;in&nbsp;a&nbsp;single<br>
+chunk,&nbsp;or&nbsp;they&nbsp;may&nbsp;split&nbsp;it&nbsp;into&nbsp;several&nbsp;chunks;&nbsp;however,&nbsp;all<br>
+of&nbsp;the&nbsp;characters&nbsp;in&nbsp;any&nbsp;single&nbsp;event&nbsp;must&nbsp;come&nbsp;from&nbsp;the&nbsp;same<br>
+external&nbsp;entity,&nbsp;so&nbsp;that&nbsp;the&nbsp;Locator&nbsp;provides&nbsp;useful<br>
+information.<br>
+&nbsp;<br>
+The&nbsp;application&nbsp;must&nbsp;not&nbsp;attempt&nbsp;to&nbsp;read&nbsp;from&nbsp;the&nbsp;array<br>
+outside&nbsp;of&nbsp;the&nbsp;specified&nbsp;range.</tt></dd></dl>
+
+<dl><dt><a name="XMLDOMParser-setDocumentLocator"><strong>setDocumentLocator</strong></a>(self, locator)</dt><dd><tt>Called&nbsp;by&nbsp;the&nbsp;parser&nbsp;to&nbsp;give&nbsp;the&nbsp;application&nbsp;a&nbsp;locator&nbsp;for<br>
+locating&nbsp;the&nbsp;origin&nbsp;of&nbsp;document&nbsp;events.<br>
+&nbsp;<br>
+SAX&nbsp;parsers&nbsp;are&nbsp;strongly&nbsp;encouraged&nbsp;(though&nbsp;not&nbsp;absolutely<br>
+required)&nbsp;to&nbsp;supply&nbsp;a&nbsp;locator:&nbsp;if&nbsp;it&nbsp;does&nbsp;so,&nbsp;it&nbsp;must&nbsp;supply<br>
+the&nbsp;locator&nbsp;to&nbsp;the&nbsp;application&nbsp;by&nbsp;invoking&nbsp;this&nbsp;method&nbsp;before<br>
+invoking&nbsp;any&nbsp;of&nbsp;the&nbsp;other&nbsp;methods&nbsp;in&nbsp;the&nbsp;DocumentHandler<br>
+interface.<br>
+&nbsp;<br>
+The&nbsp;locator&nbsp;allows&nbsp;the&nbsp;application&nbsp;to&nbsp;determine&nbsp;the&nbsp;end<br>
+position&nbsp;of&nbsp;any&nbsp;document-related&nbsp;event,&nbsp;even&nbsp;if&nbsp;the&nbsp;parser&nbsp;is<br>
+not&nbsp;reporting&nbsp;an&nbsp;error.&nbsp;Typically,&nbsp;the&nbsp;application&nbsp;will&nbsp;use<br>
+this&nbsp;information&nbsp;for&nbsp;reporting&nbsp;its&nbsp;own&nbsp;errors&nbsp;(such&nbsp;as<br>
+character&nbsp;content&nbsp;that&nbsp;does&nbsp;not&nbsp;match&nbsp;an&nbsp;application's<br>
+business&nbsp;rules).&nbsp;The&nbsp;information&nbsp;returned&nbsp;by&nbsp;the&nbsp;locator&nbsp;is<br>
+probably&nbsp;not&nbsp;sufficient&nbsp;for&nbsp;use&nbsp;with&nbsp;a&nbsp;search&nbsp;engine.<br>
+&nbsp;<br>
+Note&nbsp;that&nbsp;the&nbsp;locator&nbsp;will&nbsp;return&nbsp;correct&nbsp;information&nbsp;only<br>
+during&nbsp;the&nbsp;invocation&nbsp;of&nbsp;the&nbsp;events&nbsp;in&nbsp;this&nbsp;interface.&nbsp;The<br>
+application&nbsp;should&nbsp;not&nbsp;attempt&nbsp;to&nbsp;use&nbsp;it&nbsp;at&nbsp;any&nbsp;other&nbsp;time.</tt></dd></dl>
+
+<dl><dt><a name="XMLDOMParser-skippedEntity"><strong>skippedEntity</strong></a>(self, name)</dt><dd><tt>Receive&nbsp;notification&nbsp;of&nbsp;a&nbsp;skipped&nbsp;entity.<br>
+&nbsp;<br>
+The&nbsp;Parser&nbsp;will&nbsp;invoke&nbsp;this&nbsp;method&nbsp;once&nbsp;for&nbsp;each&nbsp;entity<br>
+skipped.&nbsp;Non-validating&nbsp;processors&nbsp;may&nbsp;skip&nbsp;entities&nbsp;if&nbsp;they<br>
+have&nbsp;not&nbsp;seen&nbsp;the&nbsp;declarations&nbsp;(because,&nbsp;for&nbsp;example,&nbsp;the<br>
+entity&nbsp;was&nbsp;declared&nbsp;in&nbsp;an&nbsp;external&nbsp;DTD&nbsp;subset).&nbsp;All&nbsp;processors<br>
+may&nbsp;skip&nbsp;external&nbsp;entities,&nbsp;depending&nbsp;on&nbsp;the&nbsp;values&nbsp;of&nbsp;the<br>
+<a href="http://xml.org/sax/features/external-general-entities">http://xml.org/sax/features/external-general-entities</a>&nbsp;and&nbsp;the<br>
+<a href="http://xml.org/sax/features/external-parameter-entities">http://xml.org/sax/features/external-parameter-entities</a><br>
+properties.</tt></dd></dl>
+
+<dl><dt><a name="XMLDOMParser-startDocument"><strong>startDocument</strong></a>(self)</dt><dd><tt>Receive&nbsp;notification&nbsp;of&nbsp;the&nbsp;beginning&nbsp;of&nbsp;a&nbsp;document.<br>
+&nbsp;<br>
+The&nbsp;SAX&nbsp;parser&nbsp;will&nbsp;invoke&nbsp;this&nbsp;method&nbsp;only&nbsp;once,&nbsp;before&nbsp;any<br>
+other&nbsp;methods&nbsp;in&nbsp;this&nbsp;interface&nbsp;or&nbsp;in&nbsp;DTDHandler&nbsp;(except&nbsp;for<br>
+setDocumentLocator).</tt></dd></dl>
+
+<dl><dt><a name="XMLDOMParser-startElement"><strong>startElement</strong></a>(self, name, attrs)</dt><dd><tt>Signals&nbsp;the&nbsp;start&nbsp;of&nbsp;an&nbsp;element&nbsp;in&nbsp;non-namespace&nbsp;mode.<br>
+&nbsp;<br>
+The&nbsp;name&nbsp;parameter&nbsp;contains&nbsp;the&nbsp;raw&nbsp;XML&nbsp;1.0&nbsp;name&nbsp;of&nbsp;the<br>
+element&nbsp;type&nbsp;as&nbsp;a&nbsp;string&nbsp;and&nbsp;the&nbsp;attrs&nbsp;parameter&nbsp;holds&nbsp;an<br>
+instance&nbsp;of&nbsp;the&nbsp;Attributes&nbsp;class&nbsp;containing&nbsp;the&nbsp;attributes&nbsp;of<br>
+the&nbsp;element.</tt></dd></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-XMLtoDOM"><strong>XMLtoDOM</strong></a>(str)</dt></dl>
+ <dl><dt><a name="-test"><strong>test</strong></a>(args<font color="#909090">=None</font>)</dt></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>ANONYMOUS</strong> = 3<br>
+<strong>DAML_ONT_NS</strong> = 'http://www.daml.org/2000/10/daml-ont#'<br>
+<strong>DPO_NS</strong> = 'http://www.daml.org/2001/03/daml+oil#'<br>
+<strong>FORMULA</strong> = 1<br>
+<strong>List_NS</strong> = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'<br>
+<strong>NODE_MERGE_URI</strong> = 'http://www.w3.org/2000/10/swap/log#is'<br>
+<strong>OWL_NS</strong> = 'http://www.w3.org/2002/07/owl#'<br>
+<strong>RDF_NS_URI</strong> = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'<br>
+<strong>RDF_Specification</strong> = 'http://www.w3.org/TR/REC-rdf-syntax/'<br>
+<strong>STATE_DESCRIPTION</strong> = 'Description (have subject)'<br>
+<strong>STATE_LIST</strong> = 'within list'<br>
+<strong>STATE_LITERAL</strong> = 'within XML literal'<br>
+<strong>STATE_NOT_RDF</strong> = 'not RDF'<br>
+<strong>STATE_NOVALUE</strong> = 'no value'<br>
+<strong>STATE_NO_SUBJECT</strong> = 'no context'<br>
+<strong>STATE_OUTERMOST</strong> = 'outermost level'<br>
+<strong>STATE_VALUE</strong> = 'plain value'<br>
+<strong>XMLLiteralsAsDomTrees</strong> = 1<br>
+<strong>XML_NS_URI</strong> = 'http://www.w3.org/XML/1998/namespace'<br>
+<strong>a</strong> = 'bagID'<br>
+<strong>coreSyntaxTerms</strong> = ['RDF', 'ID', 'about', 'parseType', 'resource', 'nodeID', 'datatype']<br>
+<strong>feature_namespaces</strong> = 'http://xml.org/sax/features/namespaces'<br>
+<strong>nodeElementExceptions</strong> = {'http://www.w3.org/1999/02/22-rdf-syntax-ns#ID': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#RDF': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#about': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#aboutEach': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#aboutEachPrefix': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#bagID': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#datatype': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#li': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#nodeID': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#parseType': True, ...}<br>
+<strong>oldTerms</strong> = ['aboutEach', 'aboutEachPrefix', 'bagID']<br>
+<strong>propertyAttributeExceptions</strong> = {'http://www.w3.org/1999/02/22-rdf-syntax-ns#Description': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#ID': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#RDF': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#about': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#aboutEach': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#aboutEachPrefix': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#bagID': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#datatype': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#li': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#nodeID': True, ...}<br>
+<strong>propertyElementExceptions</strong> = {'http://www.w3.org/1999/02/22-rdf-syntax-ns#Description': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#ID': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#RDF': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#about': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#aboutEach': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#aboutEachPrefix': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#bagID': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#datatype': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#nodeID': True, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#parseType': True, ...}<br>
+<strong>syntaxTerms</strong> = ['RDF', 'ID', 'about', 'parseType', 'resource', 'nodeID', 'datatype', 'Description', 'li']<br>
+<strong>tracking</strong> = 0</td></tr></table>
+</body></html>

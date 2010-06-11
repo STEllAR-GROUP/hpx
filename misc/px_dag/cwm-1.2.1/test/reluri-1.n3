@@ -1,0 +1,10 @@
+@prefix p:  <file://www.example.org/personal_details#> .
+@prefix m:  <file://www.example.org/meeting_organization#> .
+
+<file://www.example.org/people#fred>
+	p:GivenName  	"Fred";
+	p:hasEmail 		<mailto:fred@example.com>;
+	m:attending 	<file://meetings.example.com/cal#m1> .
+
+<file://meetings.example.com/cal#m1>
+	m:homePage 		<file://meetings.example.com/m1/hp> .

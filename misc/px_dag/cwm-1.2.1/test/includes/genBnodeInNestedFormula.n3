@@ -1,0 +1,8 @@
+@keywords a, is, of, this.
+@prefix : <#>.
+
+[  a Mother; name "Mary" ].
+
+@forAll :x .
+{ :x  a Mother } => {  :x  says { You listenTo :x }}.
+

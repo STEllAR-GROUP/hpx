@@ -1,0 +1,103 @@
+     @prefix : <http://www.w3.org/2002/07/owl#> .
+     @prefix ex: <#> .
+    
+    <>     a :Ontology;
+         :comment "An example ontology";
+         :imports <http://www.daml.org/2000/10/daml-ont>;
+         :versionInfo "" .
+    
+    ex:Adam     a :Person;
+         :comment "Adam is a person.";
+         :label "Adam" .
+    
+    ex:Animal     a :Class;
+         :comment """This class of animals is illustrative of a number of
+	ontological idioms.""";
+         :label "Animal" .
+    
+    ex:Car     a :Class;
+         :comment "no car is a person";
+         :subClassOf  [
+             a :Class;
+             :complementOf ex:Person ] .
+    
+    ex:Female     a :Class;
+         :disjointFrom ex:Male;
+         :subClassOf ex:Animal .
+    
+    ex:Height     a :Class;
+         :oneOf  (
+        ex:short 
+        ex:medium 
+        ex:tall  ) .
+    
+    ex:Male     a :Class;
+         :subClassOf ex:Animal .
+    
+    ex:Man     a :Class;
+         :subClassOf ex:Male,
+                ex:Person .
+    
+    ex:Person     a :Class;
+         :comment "every person is a man or a woman";
+         :disjointUnionOf  (
+        ex:Man 
+        ex:Woman  );
+         :restrictedBy  [
+             a :Restriction;
+             :onProperty ex:parent;
+             :toClass ex:Person ];
+         :subClassOf ex:Animal .
+    
+    ex:TallMan     a :Class;
+         :intersectionOf  (
+        ex:TallThing 
+        ex:Man  ) .
+    
+    ex:TallThing     a :Class;
+         :restrictedBy  [
+             a :Restriction;
+             :onProperty ex:height;
+             :toValue ex:tall ] .
+    
+    ex:Woman     a :Class;
+         :subClassOf ex:Female,
+                ex:Person .
+    
+    ex:ancestor     a :TransitiveProperty;
+         :label "ancestor" .
+    
+    ex:child     a :Property;
+         :inverseOf ex:parent .
+    
+    ex:descendant     a :TransitiveProperty .
+    
+    ex:father     a :Property;
+         :cardinality "1";
+         :range ex:Man;
+         :subProperty ex:parent .
+    
+    ex:height     a :Property;
+         :domain ex:Person;
+         :range ex:Height .
+    
+    ex:medium     a :Height .
+    
+    ex:mom     a :Property;
+         = ex:mother .
+    
+    ex:mother     a :UniqueProperty;
+         :range ex:Woman;
+         :subProperty ex:parent .
+    
+    ex:occupation     a :Property;
+         :maxCardinality "1" .
+    
+    ex:parent     a :Property;
+         :cardinality "2";
+         :domain ex:Animal .
+    
+    ex:short     a :Height .
+    
+    ex:tall     a :Height .
+    

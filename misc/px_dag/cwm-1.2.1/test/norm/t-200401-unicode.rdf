@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+	 xmlns:dc="http://purl.org/dc/elements/1.1/" 
+	 xmlns:t="http://norman.walsh.name/knows/taxonomy#">
+   <rdf:Description rdf:about="http://norman.walsh.name/2004/01/26/trackback">
+      <dc:rights>Copyright © 2004 Norman Walsh. All rights reserved.</dc:rights>
+   </rdf:Description>
+   <rdf:Description rdf:about="http://norman.walsh.name/knows/taxonomy#PersonName;GideAndré">
+      <t:firstname>André</t:firstname>
+   </rdf:Description>
+</rdf:RDF>

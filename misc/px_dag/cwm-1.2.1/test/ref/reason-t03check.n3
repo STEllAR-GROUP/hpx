@@ -1,0 +1,13 @@
+     @prefix : <http://example.com/swap/test/reason/t3.n3#> .
+    @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    
+    :a     :b :c .
+    
+    :a2     :b2 :c2 .
+    {
+        :a     :b :c .
+        
+        }     log:implies {:a2     :b2 :c2 .
+        } .
+    
+

@@ -1,0 +1,15 @@
+
+
+
+<rdf:RDF xmlns="http://example.com/swap/test/nodeID/classes.n3#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+
+    <Thing rdf:nodeID="b1">
+        <color rdf:resource="#red"/>
+    </Thing>
+
+    <rdf:Description rdf:about="#yosi">
+        <eats rdf:nodeID="b1"/>
+        <likes rdf:nodeID="b1"/>
+    </rdf:Description>
+</rdf:RDF>

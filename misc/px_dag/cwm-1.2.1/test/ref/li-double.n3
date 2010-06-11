@@ -1,0 +1,20 @@
+     @prefix : <#> .
+     @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+     @prefix string: <http://www.w3.org/2000/10/swap/string#> .
+    
+    @forAll :a,
+                :s .
+    
+    "00"     log:outputString "OstrichOstrich" .
+    
+    "Ostrich"     a :foobar .
+    {
+        
+          ( :a 
+            :a  )
+             string:concatenation :s .
+        :a     a :foobar .
+        
+        }     log:implies {"00"     log:outputString :s .
+        } .
+    

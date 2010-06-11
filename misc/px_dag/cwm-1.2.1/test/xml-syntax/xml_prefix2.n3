@@ -1,0 +1,9 @@
+@prefix xml: <http://example.com/xml#> .
+@prefix a: <http://example.com/m#> .
+@prefix xmlns: <http://example.com/xmlns#> .
+
+a:a a:b a:c . 
+a:y a:n a:i . 
+a:q a :P;
+ xml:v xml:r;
+ xmlns:w xmlns:t . 

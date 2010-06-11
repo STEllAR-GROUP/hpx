@@ -1,0 +1,8 @@
+<#x> = <#y>.
+
+@prefix dc: <http://purl.org/dc/elements/1.1/>.
+<> dc:description """testing = short-hand syntax in N3.
+I'm adding this test in particular to track changes
+regarding which DAML+OIL namespace we use.
+$Id: equiv-syntax.n3,v 1.1 2001/05/09 15:06:36 connolly Exp $
+""".

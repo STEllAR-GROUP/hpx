@@ -1,0 +1,9 @@
+    
+    <http://example.com/swap/test/syntax/trailing-semicolon.n3#b>     <http://example.com/swap/test/syntax/trailing-semicolon.n3#c> <http://example.com/swap/test/syntax/trailing-semicolon.n3#d> .
+    
+    <http://example.com/swap/test/syntax/trailing-semicolon.n3#e>     <http://example.com/swap/test/syntax/trailing-semicolon.n3#f> _:L9C5 .
+    
+    _:L9C5     <http://example.com/swap/test/syntax/trailing-semicolon.n3#g> <http://example.com/swap/test/syntax/trailing-semicolon.n3#h> .
+    
+    _:L9C5     <http://example.com/swap/test/syntax/trailing-semicolon.n3#i> <http://example.com/swap/test/syntax/trailing-semicolon.n3#j> .
+    

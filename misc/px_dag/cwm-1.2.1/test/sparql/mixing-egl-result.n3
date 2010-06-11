@@ -1,0 +1,13 @@
+     @prefix : <http://www.w3.org/2000/10/swap/sparqlCwm#> .
+    {
+        "400 400"     :bound "a" .
+        "500 500"     :bound "b" .
+        "Clifton Suspension Bridge"     :bound "name" .
+        "Isambard Kingdom Brunel"     :bound "maker" .
+        "The Clifton Suspension Bridge is a suspension bridge spanning the Avon Gorge and linking Clifton in Bristol to Leigh Woods in North Somerset. Designed by Isambard Kingdom Brunel, it is a distinctive landmark that is often used as a symbol of Bristol. It is a grade I listed building."     :bound "desc" .
+        <http://creativecommons.org/licenses/publicdomain/>     :bound "license" .
+        <http://upload.wikimedia.org/wikipedia/en/8/83/Suspension.bridge.bristol.arp.750pix.jpg>     :bound "featurepic" .
+        <http://upload.wikimedia.org/wikipedia/en/thumb/4/43/IKBrunelChains.jpg/387px-IKBrunelChains.jpg>     :bound "makerpic" .
+        
+        }     a :Result .
+    

@@ -1,0 +1,2 @@
+@prefix rdf: <http://example.com#> .
+:a rdf:b :c . 

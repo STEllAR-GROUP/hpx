@@ -1,0 +1,19 @@
+    
+    "Le chat"@fr     <http://example.com/swap/test/syntax/numbers.n3#is> "The french phrase 'Le chat'" .
+    
+    "800/600"^^<http://example.com/types#rational>     <http://example.com/swap/test/syntax/numbers.n3#is> "800/600 with datatype http://example.com/types#rational" .
+    
+    "2"^^<http://www.w3.org/2001/XMLSchema#decimal>     <http://example.com/swap/test/syntax/numbers.n3#is> "The number 2.0" .
+    
+    "2"^^<http://www.w3.org/2001/XMLSchema#decimal>     <http://example.com/swap/test/syntax/numbers.n3#is> "The number 2.0 expressed with extra trailing zeroes" .
+    
+    "2000.0"^^<http://www.w3.org/2001/XMLSchema#double>     <http://example.com/swap/test/syntax/numbers.n3#is> "The double precision floating point 2.0e3" .
+    
+    "-2"^^<http://www.w3.org/2001/XMLSchema#integer>     <http://example.com/swap/test/syntax/numbers.n3#is> "The integer -2" .
+    
+    "0"^^<http://www.w3.org/2001/XMLSchema#integer>     <http://example.com/swap/test/syntax/numbers.n3#is> "Zero" .
+    
+    "2"^^<http://www.w3.org/2001/XMLSchema#integer>     <http://example.com/swap/test/syntax/numbers.n3#is> "The integer 2" .
+    
+    "2"^^<http://www.w3.org/2001/XMLSchema#integer>     <http://example.com/swap/test/syntax/numbers.n3#is> "The integer 2 expressed with leading zeroes" .
+    

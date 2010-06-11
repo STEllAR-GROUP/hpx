@@ -1,0 +1,22 @@
+# List of regression tests
+#
+#      Internationalization tests
+#
+# Note: Command lines must be for running in the directory above.
+#
+@prefix : <#>.
+@prefix x: <#>.
+@prefix test: <http://www.w3.org/2000/10/swap/test.n3#>.
+
+
+
+:t001 a test:CwmTest;
+    test:originalRequest
+      <http://lists.w3.org/Archives/Public/www-archive/2001Oct/0022.html>;
+    test:referenceOutput <t1.ref.ntriples>;
+    test:description   "No newline in NTriples";
+    test:arguments     "ntriples/t1.n3 --ntriples".
+
+
+
+#ends

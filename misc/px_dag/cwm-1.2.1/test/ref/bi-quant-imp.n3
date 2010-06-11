@@ -1,0 +1,21 @@
+     @prefix : <#> .
+     @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    
+    @forAll :x .
+    
+    :today     a :Greatday,
+                :Sunnyday .
+      [      a :Birthday,
+                    :Greatday,
+                    :Sunnyday ].
+    
+      [      a :God ].
+    {
+        :x     a :Sunnyday .
+        
+        }     log:implies {:x     a :Greatday .
+        },
+                {
+          [      a :God ].
+        } .
+    

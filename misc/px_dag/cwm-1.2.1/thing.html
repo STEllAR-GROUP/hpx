@@ -1,0 +1,1134 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module thing</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>thing</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/yosi/CVSROOT/WWW/2000/10/swap/thing.py">/Users/yosi/CVSROOT/WWW/2000/10/swap/thing.py</a></font></td></tr></table>
+    <p><tt>$Id: thing.html,v 1.23 2007/06/27 17:58:39 syosi Exp $<br>
+&nbsp;<br>
+OBSOLETE<br>
+&nbsp;This&nbsp;module&nbsp;was&nbsp;too&nbsp;much&nbsp;of&nbsp;a&nbsp;mixture.&nbsp;See<br>
+&nbsp;<br>
+&nbsp;-&nbsp;myStore.py&nbsp;to&nbsp;import&nbsp;to&nbsp;set&nbsp;up&nbsp;a&nbsp;default&nbsp;store&nbsp;for&nbsp;your&nbsp;program,&nbsp;and&nbsp;<a href="#Namespace">Namespace</a>.<br>
+&nbsp;-&nbsp;term.py&nbsp;to&nbsp;define&nbsp;the&nbsp;class&nbsp;of&nbsp;<a href="#Term">Term</a>&nbsp;and&nbsp;some&nbsp;subclasses.<br>
+&nbsp;<br>
+Was:&nbsp;Interning&nbsp;of&nbsp;URIs&nbsp;and&nbsp;strings&nbsp;for&nbsp;storage&nbsp;in&nbsp;SWAP&nbsp;store<br>
+&nbsp;<br>
+Includes:<br>
+&nbsp;-&nbsp;template&nbsp;classes&nbsp;for&nbsp;builtins</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#fffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="binascii.html">binascii</a><br>
+<a href="md5.html">md5</a><br>
+</td><td width="25%" valign=top><a href="string.html">string</a><br>
+<a href="sys.html">sys</a><br>
+</td><td width="25%" valign=top><a href="uripath.html">uripath</a><br>
+<a href="urllib.html">urllib</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="__builtin__.html#object">__builtin__.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="thing.html#Namespace">Namespace</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="thing.html#Term">Term</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="thing.html#CompoundTerm">CompoundTerm</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="thing.html#List">List</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="thing.html#EmptyList">EmptyList</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="thing.html#FragmentNil">FragmentNil</a>(<a href="thing.html#EmptyList">EmptyList</a>, <a href="thing.html#Fragment">Fragment</a>)
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="thing.html#NonEmptyList">NonEmptyList</a>
+</font></dt></dl>
+</dd>
+</dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="thing.html#Fragment">Fragment</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="thing.html#Anonymous">Anonymous</a>
+</font></dt><dt><font face="helvetica, arial"><a href="thing.html#BuiltIn">BuiltIn</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="thing.html#Function">Function</a>
+</font></dt><dt><font face="helvetica, arial"><a href="thing.html#HeavyBuiltIn">HeavyBuiltIn</a>
+</font></dt><dt><font face="helvetica, arial"><a href="thing.html#LightBuiltIn">LightBuiltIn</a>
+</font></dt><dt><font face="helvetica, arial"><a href="thing.html#ReverseFunction">ReverseFunction</a>
+</font></dt></dl>
+</dd>
+</dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="thing.html#Literal">Literal</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="thing.html#Integer">Integer</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="thing.html#Symbol">Symbol</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Anonymous">class <strong>Anonymous</strong></a>(<a href="thing.html#Fragment">Fragment</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="thing.html#Anonymous">Anonymous</a></dd>
+<dd><a href="thing.html#Fragment">Fragment</a></dd>
+<dd><a href="thing.html#Term">Term</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="Anonymous-__init__"><strong>__init__</strong></a>(self, resource, fragid)</dt></dl>
+
+<dl><dt><a name="Anonymous-asPair"><strong>asPair</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Anonymous-generated"><strong>generated</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Fragment">Fragment</a>:<br>
+<dl><dt><a name="Anonymous-reification"><strong>reification</strong></a>(self, sink, why<font color="#909090">=None</font>)</dt><dd><tt>Describe&nbsp;myself&nbsp;in&nbsp;RDF&nbsp;to&nbsp;the&nbsp;given&nbsp;context<br>
+&nbsp;<br>
+[&nbsp;reify:uri&nbsp;"<a href="http://example.org/#whatever">http://example.org/#whatever</a>"]</tt></dd></dl>
+
+<dl><dt><a name="Anonymous-representation"><strong>representation</strong></a>(self, base<font color="#909090">=None</font>)</dt><dd><tt>Optimize&nbsp;output&nbsp;if&nbsp;prefixes&nbsp;available</tt></dd></dl>
+
+<dl><dt><a name="Anonymous-uriref"><strong>uriref</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Anonymous-uriref2"><strong>uriref2</strong></a>(self, base)</dt></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Term">Term</a>:<br>
+<dl><dt><a name="Anonymous-__repr__"><strong>__repr__</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;only&nbsp;used&nbsp;for&nbsp;debugging&nbsp;output&nbsp;-&nbsp;it&nbsp;can&nbsp;be&nbsp;ambiguous,<br>
+as&nbsp;it&nbsp;is&nbsp;is&nbsp;deliberately&nbsp;short&nbsp;to&nbsp;make&nbsp;debug&nbsp;printout&nbsp;readable.</tt></dd></dl>
+
+<dl><dt><a name="Anonymous-occurringIn"><strong>occurringIn</strong></a>(self, vars)</dt></dl>
+
+<dl><dt><a name="Anonymous-qname"><strong>qname</strong></a>(self)</dt><dd><tt>Output&nbsp;XML&nbsp;qnames&nbsp;[<a href="http://www.w3.org/TR/REC-xml-names/#NT-QName">http://www.w3.org/TR/REC-xml-names/#NT-QName</a>].<br>
+This&nbsp;should&nbsp;be&nbsp;beefed&nbsp;up&nbsp;to&nbsp;guarantee&nbsp;unambiguity&nbsp;(see&nbsp;__repr__&nbsp;documentation).</tt></dd></dl>
+
+<dl><dt><a name="Anonymous-substitution"><strong>substitution</strong></a>(self, bindings, why<font color="#909090">=None</font>)</dt><dd><tt>Return&nbsp;this&nbsp;or&nbsp;a&nbsp;version&nbsp;of&nbsp;me&nbsp;with&nbsp;subsitution&nbsp;made</tt></dd></dl>
+
+<dl><dt><a name="Anonymous-unify"><strong>unify</strong></a>(self, other, vars, existentials, bindings)</dt><dd><tt>Unify&nbsp;this&nbsp;which&nbsp;may&nbsp;contain&nbsp;variables&nbsp;with&nbsp;the&nbsp;other,<br>
+which&nbsp;may&nbsp;contain&nbsp;existentials&nbsp;but&nbsp;not&nbsp;variables.<br>
+Return&nbsp;0&nbsp;if&nbsp;impossible.<br>
+Return&nbsp;[(var1,&nbsp;val1),&nbsp;(var2,val2)...]&nbsp;if&nbsp;match</tt></dd></dl>
+
+<dl><dt><a name="Anonymous-value"><strong>value</strong></a>(self)</dt><dd><tt>As&nbsp;a&nbsp;python&nbsp;value&nbsp;-&nbsp;by&nbsp;default,&nbsp;none&nbsp;exists,&nbsp;use&nbsp;self</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="BuiltIn">class <strong>BuiltIn</strong></a>(<a href="thing.html#Fragment">Fragment</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>This&nbsp;class&nbsp;is&nbsp;a&nbsp;supercalss&nbsp;to&nbsp;any&nbsp;builtin&nbsp;predicate&nbsp;in&nbsp;cwm.<br>
+&nbsp;<br>
+A&nbsp;binary&nbsp;operator&nbsp;can&nbsp;calculate&nbsp;truth&nbsp;value&nbsp;given&nbsp;2&nbsp;arguments<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="thing.html#BuiltIn">BuiltIn</a></dd>
+<dd><a href="thing.html#Fragment">Fragment</a></dd>
+<dd><a href="thing.html#Term">Term</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="BuiltIn-__init__"><strong>__init__</strong></a>(self, resource, fragid)</dt></dl>
+
+<dl><dt><a name="BuiltIn-eval"><strong>eval</strong></a>(self, subj, obj, queue, bindings, proof, query)</dt><dd><tt>This&nbsp;function&nbsp;which&nbsp;has&nbsp;access&nbsp;to&nbsp;the&nbsp;store,&nbsp;unless&nbsp;overridden,<br>
+calls&nbsp;a&nbsp;simpler&nbsp;one&nbsp;which&nbsp;uses&nbsp;python&nbsp;conventions.<br>
+&nbsp;<br>
+To&nbsp;reduce&nbsp;confusion,&nbsp;the&nbsp;inital&nbsp;ones&nbsp;called&nbsp;with&nbsp;the&nbsp;internals&nbsp;available<br>
+use&nbsp;abreviations&nbsp;"eval",&nbsp;"subj"&nbsp;etc&nbsp;while&nbsp;the&nbsp;python-style&nbsp;ones&nbsp;use&nbsp;evaluate,&nbsp;subject,&nbsp;etc.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Fragment">Fragment</a>:<br>
+<dl><dt><a name="BuiltIn-generated"><strong>generated</strong></a>(self)</dt><dd><tt>A&nbsp;generated&nbsp;identifier?<br>
+This&nbsp;arises&nbsp;when&nbsp;a&nbsp;document&nbsp;is&nbsp;parsed&nbsp;and&nbsp;a&nbsp;arbitrary<br>
+name&nbsp;is&nbsp;made&nbsp;up&nbsp;to&nbsp;represent&nbsp;a&nbsp;node&nbsp;with&nbsp;no&nbsp;known&nbsp;URI.<br>
+It&nbsp;is&nbsp;useful&nbsp;to&nbsp;know&nbsp;that&nbsp;its&nbsp;ID&nbsp;has&nbsp;no&nbsp;use&nbsp;outside&nbsp;that<br>
+context.</tt></dd></dl>
+
+<dl><dt><a name="BuiltIn-reification"><strong>reification</strong></a>(self, sink, why<font color="#909090">=None</font>)</dt><dd><tt>Describe&nbsp;myself&nbsp;in&nbsp;RDF&nbsp;to&nbsp;the&nbsp;given&nbsp;context<br>
+&nbsp;<br>
+[&nbsp;reify:uri&nbsp;"<a href="http://example.org/#whatever">http://example.org/#whatever</a>"]</tt></dd></dl>
+
+<dl><dt><a name="BuiltIn-representation"><strong>representation</strong></a>(self, base<font color="#909090">=None</font>)</dt><dd><tt>Optimize&nbsp;output&nbsp;if&nbsp;prefixes&nbsp;available</tt></dd></dl>
+
+<dl><dt><a name="BuiltIn-uriref"><strong>uriref</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="BuiltIn-uriref2"><strong>uriref2</strong></a>(self, base)</dt></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Term">Term</a>:<br>
+<dl><dt><a name="BuiltIn-__repr__"><strong>__repr__</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;only&nbsp;used&nbsp;for&nbsp;debugging&nbsp;output&nbsp;-&nbsp;it&nbsp;can&nbsp;be&nbsp;ambiguous,<br>
+as&nbsp;it&nbsp;is&nbsp;is&nbsp;deliberately&nbsp;short&nbsp;to&nbsp;make&nbsp;debug&nbsp;printout&nbsp;readable.</tt></dd></dl>
+
+<dl><dt><a name="BuiltIn-asPair"><strong>asPair</strong></a>(self)</dt><dd><tt>Representation&nbsp;in&nbsp;an&nbsp;earlier&nbsp;format,&nbsp;being&nbsp;phased&nbsp;out&nbsp;2002/08<br>
+&nbsp;<br>
+The&nbsp;first&nbsp;part&nbsp;of&nbsp;the&nbsp;pair&nbsp;is&nbsp;a&nbsp;constant&nbsp;number&nbsp;represnting&nbsp;the&nbsp;type<br>
+see&nbsp;RDFSink.py.&nbsp;&nbsp;the&nbsp;second&nbsp;is&nbsp;the&nbsp;value&nbsp;--&nbsp;uri&nbsp;for&nbsp;symbols,&nbsp;string&nbsp;for&nbsp;literals</tt></dd></dl>
+
+<dl><dt><a name="BuiltIn-occurringIn"><strong>occurringIn</strong></a>(self, vars)</dt></dl>
+
+<dl><dt><a name="BuiltIn-qname"><strong>qname</strong></a>(self)</dt><dd><tt>Output&nbsp;XML&nbsp;qnames&nbsp;[<a href="http://www.w3.org/TR/REC-xml-names/#NT-QName">http://www.w3.org/TR/REC-xml-names/#NT-QName</a>].<br>
+This&nbsp;should&nbsp;be&nbsp;beefed&nbsp;up&nbsp;to&nbsp;guarantee&nbsp;unambiguity&nbsp;(see&nbsp;__repr__&nbsp;documentation).</tt></dd></dl>
+
+<dl><dt><a name="BuiltIn-substitution"><strong>substitution</strong></a>(self, bindings, why<font color="#909090">=None</font>)</dt><dd><tt>Return&nbsp;this&nbsp;or&nbsp;a&nbsp;version&nbsp;of&nbsp;me&nbsp;with&nbsp;subsitution&nbsp;made</tt></dd></dl>
+
+<dl><dt><a name="BuiltIn-unify"><strong>unify</strong></a>(self, other, vars, existentials, bindings)</dt><dd><tt>Unify&nbsp;this&nbsp;which&nbsp;may&nbsp;contain&nbsp;variables&nbsp;with&nbsp;the&nbsp;other,<br>
+which&nbsp;may&nbsp;contain&nbsp;existentials&nbsp;but&nbsp;not&nbsp;variables.<br>
+Return&nbsp;0&nbsp;if&nbsp;impossible.<br>
+Return&nbsp;[(var1,&nbsp;val1),&nbsp;(var2,val2)...]&nbsp;if&nbsp;match</tt></dd></dl>
+
+<dl><dt><a name="BuiltIn-value"><strong>value</strong></a>(self)</dt><dd><tt>As&nbsp;a&nbsp;python&nbsp;value&nbsp;-&nbsp;by&nbsp;default,&nbsp;none&nbsp;exists,&nbsp;use&nbsp;self</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="CompoundTerm">class <strong>CompoundTerm</strong></a>(<a href="thing.html#Term">Term</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;compound&nbsp;term&nbsp;has&nbsp;occurrences&nbsp;of&nbsp;terms&nbsp;within&nbsp;it.<br>
+Examples:&nbsp;<a href="#List">List</a>,&nbsp;Formula<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods inherited from <a href="thing.html#Term">Term</a>:<br>
+<dl><dt><a name="CompoundTerm-__init__"><strong>__init__</strong></a>(self, store<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="CompoundTerm-__repr__"><strong>__repr__</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;only&nbsp;used&nbsp;for&nbsp;debugging&nbsp;output&nbsp;-&nbsp;it&nbsp;can&nbsp;be&nbsp;ambiguous,<br>
+as&nbsp;it&nbsp;is&nbsp;is&nbsp;deliberately&nbsp;short&nbsp;to&nbsp;make&nbsp;debug&nbsp;printout&nbsp;readable.</tt></dd></dl>
+
+<dl><dt><a name="CompoundTerm-asPair"><strong>asPair</strong></a>(self)</dt><dd><tt>Representation&nbsp;in&nbsp;an&nbsp;earlier&nbsp;format,&nbsp;being&nbsp;phased&nbsp;out&nbsp;2002/08<br>
+&nbsp;<br>
+The&nbsp;first&nbsp;part&nbsp;of&nbsp;the&nbsp;pair&nbsp;is&nbsp;a&nbsp;constant&nbsp;number&nbsp;represnting&nbsp;the&nbsp;type<br>
+see&nbsp;RDFSink.py.&nbsp;&nbsp;the&nbsp;second&nbsp;is&nbsp;the&nbsp;value&nbsp;--&nbsp;uri&nbsp;for&nbsp;symbols,&nbsp;string&nbsp;for&nbsp;literals</tt></dd></dl>
+
+<dl><dt><a name="CompoundTerm-generated"><strong>generated</strong></a>(self)</dt><dd><tt>Boolean&nbsp;Is&nbsp;this&nbsp;thing&nbsp;a&nbsp;genid&nbsp;-&nbsp;is&nbsp;its&nbsp;name&nbsp;arbitrary?</tt></dd></dl>
+
+<dl><dt><a name="CompoundTerm-occurringIn"><strong>occurringIn</strong></a>(self, vars)</dt></dl>
+
+<dl><dt><a name="CompoundTerm-qname"><strong>qname</strong></a>(self)</dt><dd><tt>Output&nbsp;XML&nbsp;qnames&nbsp;[<a href="http://www.w3.org/TR/REC-xml-names/#NT-QName">http://www.w3.org/TR/REC-xml-names/#NT-QName</a>].<br>
+This&nbsp;should&nbsp;be&nbsp;beefed&nbsp;up&nbsp;to&nbsp;guarantee&nbsp;unambiguity&nbsp;(see&nbsp;__repr__&nbsp;documentation).</tt></dd></dl>
+
+<dl><dt><a name="CompoundTerm-representation"><strong>representation</strong></a>(self, base<font color="#909090">=None</font>)</dt><dd><tt>The&nbsp;string&nbsp;represnting&nbsp;this&nbsp;in&nbsp;N3</tt></dd></dl>
+
+<dl><dt><a name="CompoundTerm-substitution"><strong>substitution</strong></a>(self, bindings, why<font color="#909090">=None</font>)</dt><dd><tt>Return&nbsp;this&nbsp;or&nbsp;a&nbsp;version&nbsp;of&nbsp;me&nbsp;with&nbsp;subsitution&nbsp;made</tt></dd></dl>
+
+<dl><dt><a name="CompoundTerm-unify"><strong>unify</strong></a>(self, other, vars, existentials, bindings)</dt><dd><tt>Unify&nbsp;this&nbsp;which&nbsp;may&nbsp;contain&nbsp;variables&nbsp;with&nbsp;the&nbsp;other,<br>
+which&nbsp;may&nbsp;contain&nbsp;existentials&nbsp;but&nbsp;not&nbsp;variables.<br>
+Return&nbsp;0&nbsp;if&nbsp;impossible.<br>
+Return&nbsp;[(var1,&nbsp;val1),&nbsp;(var2,val2)...]&nbsp;if&nbsp;match</tt></dd></dl>
+
+<dl><dt><a name="CompoundTerm-value"><strong>value</strong></a>(self)</dt><dd><tt>As&nbsp;a&nbsp;python&nbsp;value&nbsp;-&nbsp;by&nbsp;default,&nbsp;none&nbsp;exists,&nbsp;use&nbsp;self</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="EmptyList">class <strong>EmptyList</strong></a>(<a href="thing.html#List">List</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="thing.html#EmptyList">EmptyList</a></dd>
+<dd><a href="thing.html#List">List</a></dd>
+<dd><a href="thing.html#CompoundTerm">CompoundTerm</a></dd>
+<dd><a href="thing.html#Term">Term</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="EmptyList-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="EmptyList-newList"><strong>newList</strong></a>(self, value)</dt></dl>
+
+<dl><dt><a name="EmptyList-occurringIn"><strong>occurringIn</strong></a>(self, vars)</dt></dl>
+
+<dl><dt><a name="EmptyList-substitution"><strong>substitution</strong></a>(self, bindings, why<font color="#909090">=None</font>)</dt><dd><tt>Return&nbsp;this&nbsp;or&nbsp;a&nbsp;version&nbsp;of&nbsp;me&nbsp;with&nbsp;subsitution&nbsp;made</tt></dd></dl>
+
+<dl><dt><a name="EmptyList-unify"><strong>unify</strong></a>(self, other, vars, existentials, bindings)</dt><dd><tt>Unify&nbsp;this&nbsp;which&nbsp;may&nbsp;contain&nbsp;variables&nbsp;with&nbsp;the&nbsp;other,<br>
+which&nbsp;may&nbsp;contain&nbsp;existentials&nbsp;but&nbsp;not&nbsp;variables.<br>
+Return&nbsp;0&nbsp;if&nbsp;impossible.<br>
+Return&nbsp;[(var1,&nbsp;val1),&nbsp;(var2,val2)...]&nbsp;if&nbsp;match</tt></dd></dl>
+
+<dl><dt><a name="EmptyList-uriref"><strong>uriref</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="EmptyList-value"><strong>value</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#List">List</a>:<br>
+<dl><dt><a name="EmptyList-__init__"><strong>__init__</strong></a>(self, store, first, rest)</dt></dl>
+
+<dl><dt><a name="EmptyList-__iter__"><strong>__iter__</strong></a>(self)</dt><dd><tt>The&nbsp;internal&nbsp;method&nbsp;which&nbsp;allows&nbsp;one&nbsp;to&nbsp;iterate&nbsp;over&nbsp;the&nbsp;statements<br>
+as&nbsp;though&nbsp;a&nbsp;formula&nbsp;were&nbsp;a&nbsp;sequence.</tt></dd></dl>
+
+<dl><dt><a name="EmptyList-asSequence"><strong>asSequence</strong></a>(self)</dt><dd><tt>Convert&nbsp;to&nbsp;a&nbsp;python&nbsp;sequence&nbsp;-&nbsp;NOT&nbsp;recursive</tt></dd></dl>
+
+<dl><dt><a name="EmptyList-precededBy"><strong>precededBy</strong></a>(self, first)</dt></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Term">Term</a>:<br>
+<dl><dt><a name="EmptyList-asPair"><strong>asPair</strong></a>(self)</dt><dd><tt>Representation&nbsp;in&nbsp;an&nbsp;earlier&nbsp;format,&nbsp;being&nbsp;phased&nbsp;out&nbsp;2002/08<br>
+&nbsp;<br>
+The&nbsp;first&nbsp;part&nbsp;of&nbsp;the&nbsp;pair&nbsp;is&nbsp;a&nbsp;constant&nbsp;number&nbsp;represnting&nbsp;the&nbsp;type<br>
+see&nbsp;RDFSink.py.&nbsp;&nbsp;the&nbsp;second&nbsp;is&nbsp;the&nbsp;value&nbsp;--&nbsp;uri&nbsp;for&nbsp;symbols,&nbsp;string&nbsp;for&nbsp;literals</tt></dd></dl>
+
+<dl><dt><a name="EmptyList-generated"><strong>generated</strong></a>(self)</dt><dd><tt>Boolean&nbsp;Is&nbsp;this&nbsp;thing&nbsp;a&nbsp;genid&nbsp;-&nbsp;is&nbsp;its&nbsp;name&nbsp;arbitrary?</tt></dd></dl>
+
+<dl><dt><a name="EmptyList-qname"><strong>qname</strong></a>(self)</dt><dd><tt>Output&nbsp;XML&nbsp;qnames&nbsp;[<a href="http://www.w3.org/TR/REC-xml-names/#NT-QName">http://www.w3.org/TR/REC-xml-names/#NT-QName</a>].<br>
+This&nbsp;should&nbsp;be&nbsp;beefed&nbsp;up&nbsp;to&nbsp;guarantee&nbsp;unambiguity&nbsp;(see&nbsp;__repr__&nbsp;documentation).</tt></dd></dl>
+
+<dl><dt><a name="EmptyList-representation"><strong>representation</strong></a>(self, base<font color="#909090">=None</font>)</dt><dd><tt>The&nbsp;string&nbsp;represnting&nbsp;this&nbsp;in&nbsp;N3</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Fragment">class <strong>Fragment</strong></a>(<a href="thing.html#Term">Term</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;<a href="#Term">Term</a>&nbsp;which&nbsp;DOES&nbsp;have&nbsp;a&nbsp;fragment&nbsp;id&nbsp;in&nbsp;its&nbsp;URI<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Fragment-__init__"><strong>__init__</strong></a>(self, resource, fragid)</dt></dl>
+
+<dl><dt><a name="Fragment-generated"><strong>generated</strong></a>(self)</dt><dd><tt>A&nbsp;generated&nbsp;identifier?<br>
+This&nbsp;arises&nbsp;when&nbsp;a&nbsp;document&nbsp;is&nbsp;parsed&nbsp;and&nbsp;a&nbsp;arbitrary<br>
+name&nbsp;is&nbsp;made&nbsp;up&nbsp;to&nbsp;represent&nbsp;a&nbsp;node&nbsp;with&nbsp;no&nbsp;known&nbsp;URI.<br>
+It&nbsp;is&nbsp;useful&nbsp;to&nbsp;know&nbsp;that&nbsp;its&nbsp;ID&nbsp;has&nbsp;no&nbsp;use&nbsp;outside&nbsp;that<br>
+context.</tt></dd></dl>
+
+<dl><dt><a name="Fragment-reification"><strong>reification</strong></a>(self, sink, why<font color="#909090">=None</font>)</dt><dd><tt>Describe&nbsp;myself&nbsp;in&nbsp;RDF&nbsp;to&nbsp;the&nbsp;given&nbsp;context<br>
+&nbsp;<br>
+[&nbsp;reify:uri&nbsp;"<a href="http://example.org/#whatever">http://example.org/#whatever</a>"]</tt></dd></dl>
+
+<dl><dt><a name="Fragment-representation"><strong>representation</strong></a>(self, base<font color="#909090">=None</font>)</dt><dd><tt>Optimize&nbsp;output&nbsp;if&nbsp;prefixes&nbsp;available</tt></dd></dl>
+
+<dl><dt><a name="Fragment-uriref"><strong>uriref</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Fragment-uriref2"><strong>uriref2</strong></a>(self, base)</dt></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Term">Term</a>:<br>
+<dl><dt><a name="Fragment-__repr__"><strong>__repr__</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;only&nbsp;used&nbsp;for&nbsp;debugging&nbsp;output&nbsp;-&nbsp;it&nbsp;can&nbsp;be&nbsp;ambiguous,<br>
+as&nbsp;it&nbsp;is&nbsp;is&nbsp;deliberately&nbsp;short&nbsp;to&nbsp;make&nbsp;debug&nbsp;printout&nbsp;readable.</tt></dd></dl>
+
+<dl><dt><a name="Fragment-asPair"><strong>asPair</strong></a>(self)</dt><dd><tt>Representation&nbsp;in&nbsp;an&nbsp;earlier&nbsp;format,&nbsp;being&nbsp;phased&nbsp;out&nbsp;2002/08<br>
+&nbsp;<br>
+The&nbsp;first&nbsp;part&nbsp;of&nbsp;the&nbsp;pair&nbsp;is&nbsp;a&nbsp;constant&nbsp;number&nbsp;represnting&nbsp;the&nbsp;type<br>
+see&nbsp;RDFSink.py.&nbsp;&nbsp;the&nbsp;second&nbsp;is&nbsp;the&nbsp;value&nbsp;--&nbsp;uri&nbsp;for&nbsp;symbols,&nbsp;string&nbsp;for&nbsp;literals</tt></dd></dl>
+
+<dl><dt><a name="Fragment-occurringIn"><strong>occurringIn</strong></a>(self, vars)</dt></dl>
+
+<dl><dt><a name="Fragment-qname"><strong>qname</strong></a>(self)</dt><dd><tt>Output&nbsp;XML&nbsp;qnames&nbsp;[<a href="http://www.w3.org/TR/REC-xml-names/#NT-QName">http://www.w3.org/TR/REC-xml-names/#NT-QName</a>].<br>
+This&nbsp;should&nbsp;be&nbsp;beefed&nbsp;up&nbsp;to&nbsp;guarantee&nbsp;unambiguity&nbsp;(see&nbsp;__repr__&nbsp;documentation).</tt></dd></dl>
+
+<dl><dt><a name="Fragment-substitution"><strong>substitution</strong></a>(self, bindings, why<font color="#909090">=None</font>)</dt><dd><tt>Return&nbsp;this&nbsp;or&nbsp;a&nbsp;version&nbsp;of&nbsp;me&nbsp;with&nbsp;subsitution&nbsp;made</tt></dd></dl>
+
+<dl><dt><a name="Fragment-unify"><strong>unify</strong></a>(self, other, vars, existentials, bindings)</dt><dd><tt>Unify&nbsp;this&nbsp;which&nbsp;may&nbsp;contain&nbsp;variables&nbsp;with&nbsp;the&nbsp;other,<br>
+which&nbsp;may&nbsp;contain&nbsp;existentials&nbsp;but&nbsp;not&nbsp;variables.<br>
+Return&nbsp;0&nbsp;if&nbsp;impossible.<br>
+Return&nbsp;[(var1,&nbsp;val1),&nbsp;(var2,val2)...]&nbsp;if&nbsp;match</tt></dd></dl>
+
+<dl><dt><a name="Fragment-value"><strong>value</strong></a>(self)</dt><dd><tt>As&nbsp;a&nbsp;python&nbsp;value&nbsp;-&nbsp;by&nbsp;default,&nbsp;none&nbsp;exists,&nbsp;use&nbsp;self</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="FragmentNil">class <strong>FragmentNil</strong></a>(<a href="thing.html#EmptyList">EmptyList</a>, <a href="thing.html#Fragment">Fragment</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>This&nbsp;is&nbsp;unique&nbsp;in&nbsp;being&nbsp;both&nbsp;a&nbsp;symbol&nbsp;and&nbsp;a&nbsp;list<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="thing.html#FragmentNil">FragmentNil</a></dd>
+<dd><a href="thing.html#EmptyList">EmptyList</a></dd>
+<dd><a href="thing.html#List">List</a></dd>
+<dd><a href="thing.html#CompoundTerm">CompoundTerm</a></dd>
+<dd><a href="thing.html#Term">Term</a></dd>
+<dd><a href="thing.html#Fragment">Fragment</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="FragmentNil-__init__"><strong>__init__</strong></a>(self, resource, fragid)</dt></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#EmptyList">EmptyList</a>:<br>
+<dl><dt><a name="FragmentNil-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="FragmentNil-newList"><strong>newList</strong></a>(self, value)</dt></dl>
+
+<dl><dt><a name="FragmentNil-occurringIn"><strong>occurringIn</strong></a>(self, vars)</dt></dl>
+
+<dl><dt><a name="FragmentNil-substitution"><strong>substitution</strong></a>(self, bindings, why<font color="#909090">=None</font>)</dt><dd><tt>Return&nbsp;this&nbsp;or&nbsp;a&nbsp;version&nbsp;of&nbsp;me&nbsp;with&nbsp;subsitution&nbsp;made</tt></dd></dl>
+
+<dl><dt><a name="FragmentNil-unify"><strong>unify</strong></a>(self, other, vars, existentials, bindings)</dt><dd><tt>Unify&nbsp;this&nbsp;which&nbsp;may&nbsp;contain&nbsp;variables&nbsp;with&nbsp;the&nbsp;other,<br>
+which&nbsp;may&nbsp;contain&nbsp;existentials&nbsp;but&nbsp;not&nbsp;variables.<br>
+Return&nbsp;0&nbsp;if&nbsp;impossible.<br>
+Return&nbsp;[(var1,&nbsp;val1),&nbsp;(var2,val2)...]&nbsp;if&nbsp;match</tt></dd></dl>
+
+<dl><dt><a name="FragmentNil-uriref"><strong>uriref</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="FragmentNil-value"><strong>value</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#List">List</a>:<br>
+<dl><dt><a name="FragmentNil-__iter__"><strong>__iter__</strong></a>(self)</dt><dd><tt>The&nbsp;internal&nbsp;method&nbsp;which&nbsp;allows&nbsp;one&nbsp;to&nbsp;iterate&nbsp;over&nbsp;the&nbsp;statements<br>
+as&nbsp;though&nbsp;a&nbsp;formula&nbsp;were&nbsp;a&nbsp;sequence.</tt></dd></dl>
+
+<dl><dt><a name="FragmentNil-asSequence"><strong>asSequence</strong></a>(self)</dt><dd><tt>Convert&nbsp;to&nbsp;a&nbsp;python&nbsp;sequence&nbsp;-&nbsp;NOT&nbsp;recursive</tt></dd></dl>
+
+<dl><dt><a name="FragmentNil-precededBy"><strong>precededBy</strong></a>(self, first)</dt></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Term">Term</a>:<br>
+<dl><dt><a name="FragmentNil-asPair"><strong>asPair</strong></a>(self)</dt><dd><tt>Representation&nbsp;in&nbsp;an&nbsp;earlier&nbsp;format,&nbsp;being&nbsp;phased&nbsp;out&nbsp;2002/08<br>
+&nbsp;<br>
+The&nbsp;first&nbsp;part&nbsp;of&nbsp;the&nbsp;pair&nbsp;is&nbsp;a&nbsp;constant&nbsp;number&nbsp;represnting&nbsp;the&nbsp;type<br>
+see&nbsp;RDFSink.py.&nbsp;&nbsp;the&nbsp;second&nbsp;is&nbsp;the&nbsp;value&nbsp;--&nbsp;uri&nbsp;for&nbsp;symbols,&nbsp;string&nbsp;for&nbsp;literals</tt></dd></dl>
+
+<dl><dt><a name="FragmentNil-generated"><strong>generated</strong></a>(self)</dt><dd><tt>Boolean&nbsp;Is&nbsp;this&nbsp;thing&nbsp;a&nbsp;genid&nbsp;-&nbsp;is&nbsp;its&nbsp;name&nbsp;arbitrary?</tt></dd></dl>
+
+<dl><dt><a name="FragmentNil-qname"><strong>qname</strong></a>(self)</dt><dd><tt>Output&nbsp;XML&nbsp;qnames&nbsp;[<a href="http://www.w3.org/TR/REC-xml-names/#NT-QName">http://www.w3.org/TR/REC-xml-names/#NT-QName</a>].<br>
+This&nbsp;should&nbsp;be&nbsp;beefed&nbsp;up&nbsp;to&nbsp;guarantee&nbsp;unambiguity&nbsp;(see&nbsp;__repr__&nbsp;documentation).</tt></dd></dl>
+
+<dl><dt><a name="FragmentNil-representation"><strong>representation</strong></a>(self, base<font color="#909090">=None</font>)</dt><dd><tt>The&nbsp;string&nbsp;represnting&nbsp;this&nbsp;in&nbsp;N3</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Fragment">Fragment</a>:<br>
+<dl><dt><a name="FragmentNil-reification"><strong>reification</strong></a>(self, sink, why<font color="#909090">=None</font>)</dt><dd><tt>Describe&nbsp;myself&nbsp;in&nbsp;RDF&nbsp;to&nbsp;the&nbsp;given&nbsp;context<br>
+&nbsp;<br>
+[&nbsp;reify:uri&nbsp;"<a href="http://example.org/#whatever">http://example.org/#whatever</a>"]</tt></dd></dl>
+
+<dl><dt><a name="FragmentNil-uriref2"><strong>uriref2</strong></a>(self, base)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Function">class <strong>Function</strong></a>(<a href="thing.html#BuiltIn">BuiltIn</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;function&nbsp;is&nbsp;a&nbsp;builtin&nbsp;which&nbsp;can&nbsp;calculate&nbsp;its&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;given&nbsp;its&nbsp;subject.<br>
+&nbsp;<br>
+To&nbsp;get&nbsp;cwm&nbsp;to&nbsp;invoke&nbsp;it&nbsp;this&nbsp;way,&nbsp;your&nbsp;built-in&nbsp;must&nbsp;be&nbsp;a&nbsp;subclass&nbsp;of&nbsp;<a href="#Function">Function</a>.<br>
+I&nbsp;may&nbsp;make&nbsp;changes&nbsp;to&nbsp;clean&nbsp;up&nbsp;the&nbsp;parameters&nbsp;of&nbsp;these&nbsp;methods&nbsp;below&nbsp;some&nbsp;day.&nbsp;-tbl<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="thing.html#Function">Function</a></dd>
+<dd><a href="thing.html#BuiltIn">BuiltIn</a></dd>
+<dd><a href="thing.html#Fragment">Fragment</a></dd>
+<dd><a href="thing.html#Term">Term</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="Function-__init__"><strong>__init__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Function-eval"><strong>eval</strong></a>(self, subj, obj, queue, bindings, proof, query)</dt></dl>
+
+<dl><dt><a name="Function-evalObj"><strong>evalObj</strong></a>(self, subj, queue, bindings, proof, query)</dt><dd><tt>This&nbsp;function&nbsp;which&nbsp;has&nbsp;access&nbsp;to&nbsp;the&nbsp;store,&nbsp;unless&nbsp;overridden,<br>
+calls&nbsp;a&nbsp;simpler&nbsp;one&nbsp;which&nbsp;uses&nbsp;python&nbsp;conventions.<br>
+&nbsp;<br>
+To&nbsp;reduce&nbsp;confusion,&nbsp;the&nbsp;inital&nbsp;ones&nbsp;called&nbsp;with&nbsp;the&nbsp;internals&nbsp;available<br>
+use&nbsp;abreviations&nbsp;"eval",&nbsp;"subj"&nbsp;etc&nbsp;while&nbsp;the&nbsp;python-style&nbsp;ones&nbsp;use&nbsp;"evaluate",&nbsp;"subject",&nbsp;etc.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Fragment">Fragment</a>:<br>
+<dl><dt><a name="Function-generated"><strong>generated</strong></a>(self)</dt><dd><tt>A&nbsp;generated&nbsp;identifier?<br>
+This&nbsp;arises&nbsp;when&nbsp;a&nbsp;document&nbsp;is&nbsp;parsed&nbsp;and&nbsp;a&nbsp;arbitrary<br>
+name&nbsp;is&nbsp;made&nbsp;up&nbsp;to&nbsp;represent&nbsp;a&nbsp;node&nbsp;with&nbsp;no&nbsp;known&nbsp;URI.<br>
+It&nbsp;is&nbsp;useful&nbsp;to&nbsp;know&nbsp;that&nbsp;its&nbsp;ID&nbsp;has&nbsp;no&nbsp;use&nbsp;outside&nbsp;that<br>
+context.</tt></dd></dl>
+
+<dl><dt><a name="Function-reification"><strong>reification</strong></a>(self, sink, why<font color="#909090">=None</font>)</dt><dd><tt>Describe&nbsp;myself&nbsp;in&nbsp;RDF&nbsp;to&nbsp;the&nbsp;given&nbsp;context<br>
+&nbsp;<br>
+[&nbsp;reify:uri&nbsp;"<a href="http://example.org/#whatever">http://example.org/#whatever</a>"]</tt></dd></dl>
+
+<dl><dt><a name="Function-representation"><strong>representation</strong></a>(self, base<font color="#909090">=None</font>)</dt><dd><tt>Optimize&nbsp;output&nbsp;if&nbsp;prefixes&nbsp;available</tt></dd></dl>
+
+<dl><dt><a name="Function-uriref"><strong>uriref</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Function-uriref2"><strong>uriref2</strong></a>(self, base)</dt></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Term">Term</a>:<br>
+<dl><dt><a name="Function-__repr__"><strong>__repr__</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;only&nbsp;used&nbsp;for&nbsp;debugging&nbsp;output&nbsp;-&nbsp;it&nbsp;can&nbsp;be&nbsp;ambiguous,<br>
+as&nbsp;it&nbsp;is&nbsp;is&nbsp;deliberately&nbsp;short&nbsp;to&nbsp;make&nbsp;debug&nbsp;printout&nbsp;readable.</tt></dd></dl>
+
+<dl><dt><a name="Function-asPair"><strong>asPair</strong></a>(self)</dt><dd><tt>Representation&nbsp;in&nbsp;an&nbsp;earlier&nbsp;format,&nbsp;being&nbsp;phased&nbsp;out&nbsp;2002/08<br>
+&nbsp;<br>
+The&nbsp;first&nbsp;part&nbsp;of&nbsp;the&nbsp;pair&nbsp;is&nbsp;a&nbsp;constant&nbsp;number&nbsp;represnting&nbsp;the&nbsp;type<br>
+see&nbsp;RDFSink.py.&nbsp;&nbsp;the&nbsp;second&nbsp;is&nbsp;the&nbsp;value&nbsp;--&nbsp;uri&nbsp;for&nbsp;symbols,&nbsp;string&nbsp;for&nbsp;literals</tt></dd></dl>
+
+<dl><dt><a name="Function-occurringIn"><strong>occurringIn</strong></a>(self, vars)</dt></dl>
+
+<dl><dt><a name="Function-qname"><strong>qname</strong></a>(self)</dt><dd><tt>Output&nbsp;XML&nbsp;qnames&nbsp;[<a href="http://www.w3.org/TR/REC-xml-names/#NT-QName">http://www.w3.org/TR/REC-xml-names/#NT-QName</a>].<br>
+This&nbsp;should&nbsp;be&nbsp;beefed&nbsp;up&nbsp;to&nbsp;guarantee&nbsp;unambiguity&nbsp;(see&nbsp;__repr__&nbsp;documentation).</tt></dd></dl>
+
+<dl><dt><a name="Function-substitution"><strong>substitution</strong></a>(self, bindings, why<font color="#909090">=None</font>)</dt><dd><tt>Return&nbsp;this&nbsp;or&nbsp;a&nbsp;version&nbsp;of&nbsp;me&nbsp;with&nbsp;subsitution&nbsp;made</tt></dd></dl>
+
+<dl><dt><a name="Function-unify"><strong>unify</strong></a>(self, other, vars, existentials, bindings)</dt><dd><tt>Unify&nbsp;this&nbsp;which&nbsp;may&nbsp;contain&nbsp;variables&nbsp;with&nbsp;the&nbsp;other,<br>
+which&nbsp;may&nbsp;contain&nbsp;existentials&nbsp;but&nbsp;not&nbsp;variables.<br>
+Return&nbsp;0&nbsp;if&nbsp;impossible.<br>
+Return&nbsp;[(var1,&nbsp;val1),&nbsp;(var2,val2)...]&nbsp;if&nbsp;match</tt></dd></dl>
+
+<dl><dt><a name="Function-value"><strong>value</strong></a>(self)</dt><dd><tt>As&nbsp;a&nbsp;python&nbsp;value&nbsp;-&nbsp;by&nbsp;default,&nbsp;none&nbsp;exists,&nbsp;use&nbsp;self</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="HeavyBuiltIn">class <strong>HeavyBuiltIn</strong></a>(<a href="thing.html#BuiltIn">BuiltIn</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;heavy&nbsp;built-in&nbsp;is&nbsp;fast&nbsp;and&nbsp;is&nbsp;calculated&nbsp;late,&nbsp;after&nbsp;searching&nbsp;the&nbsp;store<br>
+to&nbsp;see&nbsp;if&nbsp;the&nbsp;answer&nbsp;is&nbsp;already&nbsp;in&nbsp;it.<br>
+&nbsp;<br>
+Make&nbsp;your&nbsp;built-in&nbsp;a&nbsp;subclass&nbsp;of&nbsp;either&nbsp;this&nbsp;or&nbsp;LightBultIn&nbsp;to&nbsp;tell&nbsp;cwm&nbsp;when&nbsp;to<br>
+run&nbsp;it.&nbsp;&nbsp;Going&nbsp;out&nbsp;onto&nbsp;the&nbsp;web&nbsp;or&nbsp;net&nbsp;counts&nbsp;as&nbsp;Heavy.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="thing.html#HeavyBuiltIn">HeavyBuiltIn</a></dd>
+<dd><a href="thing.html#BuiltIn">BuiltIn</a></dd>
+<dd><a href="thing.html#Fragment">Fragment</a></dd>
+<dd><a href="thing.html#Term">Term</a></dd>
+</dl>
+<hr>
+Methods inherited from <a href="thing.html#BuiltIn">BuiltIn</a>:<br>
+<dl><dt><a name="HeavyBuiltIn-__init__"><strong>__init__</strong></a>(self, resource, fragid)</dt></dl>
+
+<dl><dt><a name="HeavyBuiltIn-eval"><strong>eval</strong></a>(self, subj, obj, queue, bindings, proof, query)</dt><dd><tt>This&nbsp;function&nbsp;which&nbsp;has&nbsp;access&nbsp;to&nbsp;the&nbsp;store,&nbsp;unless&nbsp;overridden,<br>
+calls&nbsp;a&nbsp;simpler&nbsp;one&nbsp;which&nbsp;uses&nbsp;python&nbsp;conventions.<br>
+&nbsp;<br>
+To&nbsp;reduce&nbsp;confusion,&nbsp;the&nbsp;inital&nbsp;ones&nbsp;called&nbsp;with&nbsp;the&nbsp;internals&nbsp;available<br>
+use&nbsp;abreviations&nbsp;"eval",&nbsp;"subj"&nbsp;etc&nbsp;while&nbsp;the&nbsp;python-style&nbsp;ones&nbsp;use&nbsp;evaluate,&nbsp;subject,&nbsp;etc.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Fragment">Fragment</a>:<br>
+<dl><dt><a name="HeavyBuiltIn-generated"><strong>generated</strong></a>(self)</dt><dd><tt>A&nbsp;generated&nbsp;identifier?<br>
+This&nbsp;arises&nbsp;when&nbsp;a&nbsp;document&nbsp;is&nbsp;parsed&nbsp;and&nbsp;a&nbsp;arbitrary<br>
+name&nbsp;is&nbsp;made&nbsp;up&nbsp;to&nbsp;represent&nbsp;a&nbsp;node&nbsp;with&nbsp;no&nbsp;known&nbsp;URI.<br>
+It&nbsp;is&nbsp;useful&nbsp;to&nbsp;know&nbsp;that&nbsp;its&nbsp;ID&nbsp;has&nbsp;no&nbsp;use&nbsp;outside&nbsp;that<br>
+context.</tt></dd></dl>
+
+<dl><dt><a name="HeavyBuiltIn-reification"><strong>reification</strong></a>(self, sink, why<font color="#909090">=None</font>)</dt><dd><tt>Describe&nbsp;myself&nbsp;in&nbsp;RDF&nbsp;to&nbsp;the&nbsp;given&nbsp;context<br>
+&nbsp;<br>
+[&nbsp;reify:uri&nbsp;"<a href="http://example.org/#whatever">http://example.org/#whatever</a>"]</tt></dd></dl>
+
+<dl><dt><a name="HeavyBuiltIn-representation"><strong>representation</strong></a>(self, base<font color="#909090">=None</font>)</dt><dd><tt>Optimize&nbsp;output&nbsp;if&nbsp;prefixes&nbsp;available</tt></dd></dl>
+
+<dl><dt><a name="HeavyBuiltIn-uriref"><strong>uriref</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="HeavyBuiltIn-uriref2"><strong>uriref2</strong></a>(self, base)</dt></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Term">Term</a>:<br>
+<dl><dt><a name="HeavyBuiltIn-__repr__"><strong>__repr__</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;only&nbsp;used&nbsp;for&nbsp;debugging&nbsp;output&nbsp;-&nbsp;it&nbsp;can&nbsp;be&nbsp;ambiguous,<br>
+as&nbsp;it&nbsp;is&nbsp;is&nbsp;deliberately&nbsp;short&nbsp;to&nbsp;make&nbsp;debug&nbsp;printout&nbsp;readable.</tt></dd></dl>
+
+<dl><dt><a name="HeavyBuiltIn-asPair"><strong>asPair</strong></a>(self)</dt><dd><tt>Representation&nbsp;in&nbsp;an&nbsp;earlier&nbsp;format,&nbsp;being&nbsp;phased&nbsp;out&nbsp;2002/08<br>
+&nbsp;<br>
+The&nbsp;first&nbsp;part&nbsp;of&nbsp;the&nbsp;pair&nbsp;is&nbsp;a&nbsp;constant&nbsp;number&nbsp;represnting&nbsp;the&nbsp;type<br>
+see&nbsp;RDFSink.py.&nbsp;&nbsp;the&nbsp;second&nbsp;is&nbsp;the&nbsp;value&nbsp;--&nbsp;uri&nbsp;for&nbsp;symbols,&nbsp;string&nbsp;for&nbsp;literals</tt></dd></dl>
+
+<dl><dt><a name="HeavyBuiltIn-occurringIn"><strong>occurringIn</strong></a>(self, vars)</dt></dl>
+
+<dl><dt><a name="HeavyBuiltIn-qname"><strong>qname</strong></a>(self)</dt><dd><tt>Output&nbsp;XML&nbsp;qnames&nbsp;[<a href="http://www.w3.org/TR/REC-xml-names/#NT-QName">http://www.w3.org/TR/REC-xml-names/#NT-QName</a>].<br>
+This&nbsp;should&nbsp;be&nbsp;beefed&nbsp;up&nbsp;to&nbsp;guarantee&nbsp;unambiguity&nbsp;(see&nbsp;__repr__&nbsp;documentation).</tt></dd></dl>
+
+<dl><dt><a name="HeavyBuiltIn-substitution"><strong>substitution</strong></a>(self, bindings, why<font color="#909090">=None</font>)</dt><dd><tt>Return&nbsp;this&nbsp;or&nbsp;a&nbsp;version&nbsp;of&nbsp;me&nbsp;with&nbsp;subsitution&nbsp;made</tt></dd></dl>
+
+<dl><dt><a name="HeavyBuiltIn-unify"><strong>unify</strong></a>(self, other, vars, existentials, bindings)</dt><dd><tt>Unify&nbsp;this&nbsp;which&nbsp;may&nbsp;contain&nbsp;variables&nbsp;with&nbsp;the&nbsp;other,<br>
+which&nbsp;may&nbsp;contain&nbsp;existentials&nbsp;but&nbsp;not&nbsp;variables.<br>
+Return&nbsp;0&nbsp;if&nbsp;impossible.<br>
+Return&nbsp;[(var1,&nbsp;val1),&nbsp;(var2,val2)...]&nbsp;if&nbsp;match</tt></dd></dl>
+
+<dl><dt><a name="HeavyBuiltIn-value"><strong>value</strong></a>(self)</dt><dd><tt>As&nbsp;a&nbsp;python&nbsp;value&nbsp;-&nbsp;by&nbsp;default,&nbsp;none&nbsp;exists,&nbsp;use&nbsp;self</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Integer">class <strong>Integer</strong></a>(<a href="thing.html#Literal">Literal</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="thing.html#Integer">Integer</a></dd>
+<dd><a href="thing.html#Literal">Literal</a></dd>
+<dd><a href="thing.html#Term">Term</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="Integer-__init__"><strong>__init__</strong></a>(self, store, str)</dt></dl>
+
+<dl><dt><a name="Integer-__int__"><strong>__int__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Integer-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Integer-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Integer-representation"><strong>representation</strong></a>(self, base<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="Integer-value"><strong>value</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Literal">Literal</a>:<br>
+<dl><dt><a name="Integer-asHashURI"><strong>asHashURI</strong></a>(self)</dt><dd><tt>return&nbsp;a&nbsp;md5:&nbsp;URI&nbsp;for&nbsp;this&nbsp;literal.<br>
+Hmm...&nbsp;encoding...&nbsp;assuming&nbsp;utf8?&nbsp;@@test&nbsp;this.<br>
+Hmm...&nbsp;for&nbsp;a&nbsp;class&nbsp;of&nbsp;literals&nbsp;including&nbsp;this&nbsp;one,<br>
+strictly&nbsp;speaking.</tt></dd></dl>
+
+<dl><dt><a name="Integer-asPair"><strong>asPair</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Integer-occurringIn"><strong>occurringIn</strong></a>(self, vars)</dt></dl>
+
+<dl><dt><a name="Integer-reification"><strong>reification</strong></a>(self, sink, why<font color="#909090">=None</font>)</dt><dd><tt>Describe&nbsp;myself&nbsp;in&nbsp;RDF&nbsp;to&nbsp;the&nbsp;given&nbsp;context<br>
+&nbsp;<br>
+[&nbsp;reify:value&nbsp;"un&nbsp;expression&nbsp;quelconque"@fr&nbsp;]</tt></dd></dl>
+
+<dl><dt><a name="Integer-substitution"><strong>substitution</strong></a>(self, bindings, why<font color="#909090">=None</font>)</dt><dd><tt>Return&nbsp;this&nbsp;or&nbsp;a&nbsp;version&nbsp;of&nbsp;me&nbsp;with&nbsp;subsitution&nbsp;made</tt></dd></dl>
+
+<dl><dt><a name="Integer-unify"><strong>unify</strong></a>(self, other, vars, existentials, bindings)</dt><dd><tt>Unify&nbsp;this&nbsp;which&nbsp;may&nbsp;contain&nbsp;variables&nbsp;with&nbsp;the&nbsp;other,<br>
+which&nbsp;may&nbsp;contain&nbsp;existentials&nbsp;but&nbsp;not&nbsp;variables.<br>
+Return&nbsp;0&nbsp;if&nbsp;impossible.<br>
+Return&nbsp;[(var1,&nbsp;val1),&nbsp;(var2,val2)...]&nbsp;if&nbsp;match</tt></dd></dl>
+
+<dl><dt><a name="Integer-uriref"><strong>uriref</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Term">Term</a>:<br>
+<dl><dt><a name="Integer-generated"><strong>generated</strong></a>(self)</dt><dd><tt>Boolean&nbsp;Is&nbsp;this&nbsp;thing&nbsp;a&nbsp;genid&nbsp;-&nbsp;is&nbsp;its&nbsp;name&nbsp;arbitrary?</tt></dd></dl>
+
+<dl><dt><a name="Integer-qname"><strong>qname</strong></a>(self)</dt><dd><tt>Output&nbsp;XML&nbsp;qnames&nbsp;[<a href="http://www.w3.org/TR/REC-xml-names/#NT-QName">http://www.w3.org/TR/REC-xml-names/#NT-QName</a>].<br>
+This&nbsp;should&nbsp;be&nbsp;beefed&nbsp;up&nbsp;to&nbsp;guarantee&nbsp;unambiguity&nbsp;(see&nbsp;__repr__&nbsp;documentation).</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="LightBuiltIn">class <strong>LightBuiltIn</strong></a>(<a href="thing.html#BuiltIn">BuiltIn</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;light&nbsp;built-in&nbsp;is&nbsp;fast&nbsp;and&nbsp;is&nbsp;calculated&nbsp;immediately&nbsp;before&nbsp;searching&nbsp;the&nbsp;store.<br>
+&nbsp;<br>
+Make&nbsp;your&nbsp;built-in&nbsp;a&nbsp;subclass&nbsp;of&nbsp;either&nbsp;this&nbsp;or&nbsp;HeavyBultIn&nbsp;to&nbsp;tell&nbsp;cwm&nbsp;when&nbsp;to<br>
+run&nbsp;it.&nbsp;&nbsp;Going&nbsp;out&nbsp;onto&nbsp;the&nbsp;web&nbsp;or&nbsp;net&nbsp;counts&nbsp;as&nbsp;heavy.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="thing.html#LightBuiltIn">LightBuiltIn</a></dd>
+<dd><a href="thing.html#BuiltIn">BuiltIn</a></dd>
+<dd><a href="thing.html#Fragment">Fragment</a></dd>
+<dd><a href="thing.html#Term">Term</a></dd>
+</dl>
+<hr>
+Methods inherited from <a href="thing.html#BuiltIn">BuiltIn</a>:<br>
+<dl><dt><a name="LightBuiltIn-__init__"><strong>__init__</strong></a>(self, resource, fragid)</dt></dl>
+
+<dl><dt><a name="LightBuiltIn-eval"><strong>eval</strong></a>(self, subj, obj, queue, bindings, proof, query)</dt><dd><tt>This&nbsp;function&nbsp;which&nbsp;has&nbsp;access&nbsp;to&nbsp;the&nbsp;store,&nbsp;unless&nbsp;overridden,<br>
+calls&nbsp;a&nbsp;simpler&nbsp;one&nbsp;which&nbsp;uses&nbsp;python&nbsp;conventions.<br>
+&nbsp;<br>
+To&nbsp;reduce&nbsp;confusion,&nbsp;the&nbsp;inital&nbsp;ones&nbsp;called&nbsp;with&nbsp;the&nbsp;internals&nbsp;available<br>
+use&nbsp;abreviations&nbsp;"eval",&nbsp;"subj"&nbsp;etc&nbsp;while&nbsp;the&nbsp;python-style&nbsp;ones&nbsp;use&nbsp;evaluate,&nbsp;subject,&nbsp;etc.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Fragment">Fragment</a>:<br>
+<dl><dt><a name="LightBuiltIn-generated"><strong>generated</strong></a>(self)</dt><dd><tt>A&nbsp;generated&nbsp;identifier?<br>
+This&nbsp;arises&nbsp;when&nbsp;a&nbsp;document&nbsp;is&nbsp;parsed&nbsp;and&nbsp;a&nbsp;arbitrary<br>
+name&nbsp;is&nbsp;made&nbsp;up&nbsp;to&nbsp;represent&nbsp;a&nbsp;node&nbsp;with&nbsp;no&nbsp;known&nbsp;URI.<br>
+It&nbsp;is&nbsp;useful&nbsp;to&nbsp;know&nbsp;that&nbsp;its&nbsp;ID&nbsp;has&nbsp;no&nbsp;use&nbsp;outside&nbsp;that<br>
+context.</tt></dd></dl>
+
+<dl><dt><a name="LightBuiltIn-reification"><strong>reification</strong></a>(self, sink, why<font color="#909090">=None</font>)</dt><dd><tt>Describe&nbsp;myself&nbsp;in&nbsp;RDF&nbsp;to&nbsp;the&nbsp;given&nbsp;context<br>
+&nbsp;<br>
+[&nbsp;reify:uri&nbsp;"<a href="http://example.org/#whatever">http://example.org/#whatever</a>"]</tt></dd></dl>
+
+<dl><dt><a name="LightBuiltIn-representation"><strong>representation</strong></a>(self, base<font color="#909090">=None</font>)</dt><dd><tt>Optimize&nbsp;output&nbsp;if&nbsp;prefixes&nbsp;available</tt></dd></dl>
+
+<dl><dt><a name="LightBuiltIn-uriref"><strong>uriref</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="LightBuiltIn-uriref2"><strong>uriref2</strong></a>(self, base)</dt></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Term">Term</a>:<br>
+<dl><dt><a name="LightBuiltIn-__repr__"><strong>__repr__</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;only&nbsp;used&nbsp;for&nbsp;debugging&nbsp;output&nbsp;-&nbsp;it&nbsp;can&nbsp;be&nbsp;ambiguous,<br>
+as&nbsp;it&nbsp;is&nbsp;is&nbsp;deliberately&nbsp;short&nbsp;to&nbsp;make&nbsp;debug&nbsp;printout&nbsp;readable.</tt></dd></dl>
+
+<dl><dt><a name="LightBuiltIn-asPair"><strong>asPair</strong></a>(self)</dt><dd><tt>Representation&nbsp;in&nbsp;an&nbsp;earlier&nbsp;format,&nbsp;being&nbsp;phased&nbsp;out&nbsp;2002/08<br>
+&nbsp;<br>
+The&nbsp;first&nbsp;part&nbsp;of&nbsp;the&nbsp;pair&nbsp;is&nbsp;a&nbsp;constant&nbsp;number&nbsp;represnting&nbsp;the&nbsp;type<br>
+see&nbsp;RDFSink.py.&nbsp;&nbsp;the&nbsp;second&nbsp;is&nbsp;the&nbsp;value&nbsp;--&nbsp;uri&nbsp;for&nbsp;symbols,&nbsp;string&nbsp;for&nbsp;literals</tt></dd></dl>
+
+<dl><dt><a name="LightBuiltIn-occurringIn"><strong>occurringIn</strong></a>(self, vars)</dt></dl>
+
+<dl><dt><a name="LightBuiltIn-qname"><strong>qname</strong></a>(self)</dt><dd><tt>Output&nbsp;XML&nbsp;qnames&nbsp;[<a href="http://www.w3.org/TR/REC-xml-names/#NT-QName">http://www.w3.org/TR/REC-xml-names/#NT-QName</a>].<br>
+This&nbsp;should&nbsp;be&nbsp;beefed&nbsp;up&nbsp;to&nbsp;guarantee&nbsp;unambiguity&nbsp;(see&nbsp;__repr__&nbsp;documentation).</tt></dd></dl>
+
+<dl><dt><a name="LightBuiltIn-substitution"><strong>substitution</strong></a>(self, bindings, why<font color="#909090">=None</font>)</dt><dd><tt>Return&nbsp;this&nbsp;or&nbsp;a&nbsp;version&nbsp;of&nbsp;me&nbsp;with&nbsp;subsitution&nbsp;made</tt></dd></dl>
+
+<dl><dt><a name="LightBuiltIn-unify"><strong>unify</strong></a>(self, other, vars, existentials, bindings)</dt><dd><tt>Unify&nbsp;this&nbsp;which&nbsp;may&nbsp;contain&nbsp;variables&nbsp;with&nbsp;the&nbsp;other,<br>
+which&nbsp;may&nbsp;contain&nbsp;existentials&nbsp;but&nbsp;not&nbsp;variables.<br>
+Return&nbsp;0&nbsp;if&nbsp;impossible.<br>
+Return&nbsp;[(var1,&nbsp;val1),&nbsp;(var2,val2)...]&nbsp;if&nbsp;match</tt></dd></dl>
+
+<dl><dt><a name="LightBuiltIn-value"><strong>value</strong></a>(self)</dt><dd><tt>As&nbsp;a&nbsp;python&nbsp;value&nbsp;-&nbsp;by&nbsp;default,&nbsp;none&nbsp;exists,&nbsp;use&nbsp;self</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="List">class <strong>List</strong></a>(<a href="thing.html#CompoundTerm">CompoundTerm</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="thing.html#List">List</a></dd>
+<dd><a href="thing.html#CompoundTerm">CompoundTerm</a></dd>
+<dd><a href="thing.html#Term">Term</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="List-__init__"><strong>__init__</strong></a>(self, store, first, rest)</dt></dl>
+
+<dl><dt><a name="List-__iter__"><strong>__iter__</strong></a>(self)</dt><dd><tt>The&nbsp;internal&nbsp;method&nbsp;which&nbsp;allows&nbsp;one&nbsp;to&nbsp;iterate&nbsp;over&nbsp;the&nbsp;statements<br>
+as&nbsp;though&nbsp;a&nbsp;formula&nbsp;were&nbsp;a&nbsp;sequence.</tt></dd></dl>
+
+<dl><dt><a name="List-asSequence"><strong>asSequence</strong></a>(self)</dt><dd><tt>Convert&nbsp;to&nbsp;a&nbsp;python&nbsp;sequence&nbsp;-&nbsp;NOT&nbsp;recursive</tt></dd></dl>
+
+<dl><dt><a name="List-occurringIn"><strong>occurringIn</strong></a>(self, vars)</dt><dd><tt>Which&nbsp;variables&nbsp;in&nbsp;the&nbsp;list&nbsp;occur&nbsp;in&nbsp;this&nbsp;list?</tt></dd></dl>
+
+<dl><dt><a name="List-precededBy"><strong>precededBy</strong></a>(self, first)</dt></dl>
+
+<dl><dt><a name="List-substitution"><strong>substitution</strong></a>(self, bindings, why<font color="#909090">=None</font>)</dt><dd><tt>Return&nbsp;this&nbsp;or&nbsp;a&nbsp;version&nbsp;of&nbsp;me&nbsp;with&nbsp;subsitution&nbsp;made</tt></dd></dl>
+
+<dl><dt><a name="List-uriref"><strong>uriref</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="List-value"><strong>value</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Term">Term</a>:<br>
+<dl><dt><a name="List-__repr__"><strong>__repr__</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;only&nbsp;used&nbsp;for&nbsp;debugging&nbsp;output&nbsp;-&nbsp;it&nbsp;can&nbsp;be&nbsp;ambiguous,<br>
+as&nbsp;it&nbsp;is&nbsp;is&nbsp;deliberately&nbsp;short&nbsp;to&nbsp;make&nbsp;debug&nbsp;printout&nbsp;readable.</tt></dd></dl>
+
+<dl><dt><a name="List-asPair"><strong>asPair</strong></a>(self)</dt><dd><tt>Representation&nbsp;in&nbsp;an&nbsp;earlier&nbsp;format,&nbsp;being&nbsp;phased&nbsp;out&nbsp;2002/08<br>
+&nbsp;<br>
+The&nbsp;first&nbsp;part&nbsp;of&nbsp;the&nbsp;pair&nbsp;is&nbsp;a&nbsp;constant&nbsp;number&nbsp;represnting&nbsp;the&nbsp;type<br>
+see&nbsp;RDFSink.py.&nbsp;&nbsp;the&nbsp;second&nbsp;is&nbsp;the&nbsp;value&nbsp;--&nbsp;uri&nbsp;for&nbsp;symbols,&nbsp;string&nbsp;for&nbsp;literals</tt></dd></dl>
+
+<dl><dt><a name="List-generated"><strong>generated</strong></a>(self)</dt><dd><tt>Boolean&nbsp;Is&nbsp;this&nbsp;thing&nbsp;a&nbsp;genid&nbsp;-&nbsp;is&nbsp;its&nbsp;name&nbsp;arbitrary?</tt></dd></dl>
+
+<dl><dt><a name="List-qname"><strong>qname</strong></a>(self)</dt><dd><tt>Output&nbsp;XML&nbsp;qnames&nbsp;[<a href="http://www.w3.org/TR/REC-xml-names/#NT-QName">http://www.w3.org/TR/REC-xml-names/#NT-QName</a>].<br>
+This&nbsp;should&nbsp;be&nbsp;beefed&nbsp;up&nbsp;to&nbsp;guarantee&nbsp;unambiguity&nbsp;(see&nbsp;__repr__&nbsp;documentation).</tt></dd></dl>
+
+<dl><dt><a name="List-representation"><strong>representation</strong></a>(self, base<font color="#909090">=None</font>)</dt><dd><tt>The&nbsp;string&nbsp;represnting&nbsp;this&nbsp;in&nbsp;N3</tt></dd></dl>
+
+<dl><dt><a name="List-unify"><strong>unify</strong></a>(self, other, vars, existentials, bindings)</dt><dd><tt>Unify&nbsp;this&nbsp;which&nbsp;may&nbsp;contain&nbsp;variables&nbsp;with&nbsp;the&nbsp;other,<br>
+which&nbsp;may&nbsp;contain&nbsp;existentials&nbsp;but&nbsp;not&nbsp;variables.<br>
+Return&nbsp;0&nbsp;if&nbsp;impossible.<br>
+Return&nbsp;[(var1,&nbsp;val1),&nbsp;(var2,val2)...]&nbsp;if&nbsp;match</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Literal">class <strong>Literal</strong></a>(<a href="thing.html#Term">Term</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;<a href="#Literal">Literal</a>&nbsp;is&nbsp;a&nbsp;representation&nbsp;of&nbsp;an&nbsp;RDF&nbsp;literal<br>
+&nbsp;<br>
+really,&nbsp;data:text/rdf+n3;%22hello%22&nbsp;==&nbsp;"hello"&nbsp;but&nbsp;who<br>
+wants&nbsp;to&nbsp;store&nbsp;it&nbsp;that&nbsp;way?&nbsp;&nbsp;Maybe&nbsp;we&nbsp;do...&nbsp;at&nbsp;least&nbsp;in&nbsp;theory&nbsp;and&nbsp;maybe<br>
+practice&nbsp;but,&nbsp;for&nbsp;now,&nbsp;we&nbsp;keep&nbsp;them&nbsp;in&nbsp;separate&nbsp;subclases&nbsp;of&nbsp;<a href="#Term">Term</a>.<br>
+An&nbsp;RDF&nbsp;literal&nbsp;has&nbsp;a&nbsp;value&nbsp;-&nbsp;by&nbsp;default&nbsp;a&nbsp;string,&nbsp;and&nbsp;a&nbsp;datattype,&nbsp;and&nbsp;a&nbsp;language<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Literal-__init__"><strong>__init__</strong></a>(self, store, string, dt<font color="#909090">=None</font>, lang<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="Literal-__int__"><strong>__int__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Literal-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Literal-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Literal-asHashURI"><strong>asHashURI</strong></a>(self)</dt><dd><tt>return&nbsp;a&nbsp;md5:&nbsp;URI&nbsp;for&nbsp;this&nbsp;literal.<br>
+Hmm...&nbsp;encoding...&nbsp;assuming&nbsp;utf8?&nbsp;@@test&nbsp;this.<br>
+Hmm...&nbsp;for&nbsp;a&nbsp;class&nbsp;of&nbsp;literals&nbsp;including&nbsp;this&nbsp;one,<br>
+strictly&nbsp;speaking.</tt></dd></dl>
+
+<dl><dt><a name="Literal-asPair"><strong>asPair</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Literal-occurringIn"><strong>occurringIn</strong></a>(self, vars)</dt></dl>
+
+<dl><dt><a name="Literal-reification"><strong>reification</strong></a>(self, sink, why<font color="#909090">=None</font>)</dt><dd><tt>Describe&nbsp;myself&nbsp;in&nbsp;RDF&nbsp;to&nbsp;the&nbsp;given&nbsp;context<br>
+&nbsp;<br>
+[&nbsp;reify:value&nbsp;"un&nbsp;expression&nbsp;quelconque"@fr&nbsp;]</tt></dd></dl>
+
+<dl><dt><a name="Literal-representation"><strong>representation</strong></a>(self, base<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="Literal-substitution"><strong>substitution</strong></a>(self, bindings, why<font color="#909090">=None</font>)</dt><dd><tt>Return&nbsp;this&nbsp;or&nbsp;a&nbsp;version&nbsp;of&nbsp;me&nbsp;with&nbsp;subsitution&nbsp;made</tt></dd></dl>
+
+<dl><dt><a name="Literal-unify"><strong>unify</strong></a>(self, other, vars, existentials, bindings)</dt><dd><tt>Unify&nbsp;this&nbsp;which&nbsp;may&nbsp;contain&nbsp;variables&nbsp;with&nbsp;the&nbsp;other,<br>
+which&nbsp;may&nbsp;contain&nbsp;existentials&nbsp;but&nbsp;not&nbsp;variables.<br>
+Return&nbsp;0&nbsp;if&nbsp;impossible.<br>
+Return&nbsp;[(var1,&nbsp;val1),&nbsp;(var2,val2)...]&nbsp;if&nbsp;match</tt></dd></dl>
+
+<dl><dt><a name="Literal-uriref"><strong>uriref</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Literal-value"><strong>value</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Term">Term</a>:<br>
+<dl><dt><a name="Literal-generated"><strong>generated</strong></a>(self)</dt><dd><tt>Boolean&nbsp;Is&nbsp;this&nbsp;thing&nbsp;a&nbsp;genid&nbsp;-&nbsp;is&nbsp;its&nbsp;name&nbsp;arbitrary?</tt></dd></dl>
+
+<dl><dt><a name="Literal-qname"><strong>qname</strong></a>(self)</dt><dd><tt>Output&nbsp;XML&nbsp;qnames&nbsp;[<a href="http://www.w3.org/TR/REC-xml-names/#NT-QName">http://www.w3.org/TR/REC-xml-names/#NT-QName</a>].<br>
+This&nbsp;should&nbsp;be&nbsp;beefed&nbsp;up&nbsp;to&nbsp;guarantee&nbsp;unambiguity&nbsp;(see&nbsp;__repr__&nbsp;documentation).</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Namespace">class <strong>Namespace</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;shortcut&nbsp;for&nbsp;getting&nbsp;a&nbsp;symbols&nbsp;as&nbsp;interned&nbsp;by&nbsp;the&nbsp;default&nbsp;store<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;RDF&nbsp;=&nbsp;<a href="#Namespace">Namespace</a>('<a href="http://www.w3.org/1999/02/22-rdf-syntax-ns">http://www.w3.org/1999/02/22-rdf-syntax-ns</a>#')<br>
+&gt;&gt;&gt;&nbsp;RDF.type<br>
+'<a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#type">http://www.w3.org/1999/02/22-rdf-syntax-ns#type</a>'<br>
+&gt;&gt;&gt;&nbsp;RDF.type&nbsp;is&nbsp;RDF.type<br>
+1<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Namespace-__getattr__"><strong>__getattr__</strong></a>(self, lname)</dt><dd><tt>get&nbsp;the&nbsp;lname&nbsp;<a href="#Symbol">Symbol</a>&nbsp;in&nbsp;this&nbsp;namespace.<br>
+&nbsp;<br>
+lname&nbsp;--&nbsp;an&nbsp;XML&nbsp;name&nbsp;(limited&nbsp;to&nbsp;URI&nbsp;characters)<br>
+I&nbsp;hope&nbsp;this&nbsp;is&nbsp;only&nbsp;called&nbsp;*after*&nbsp;the&nbsp;ones&nbsp;defines&nbsp;above&nbsp;have&nbsp;been&nbsp;checked</tt></dd></dl>
+
+<dl><dt><a name="Namespace-__init__"><strong>__init__</strong></a>(self, name)</dt></dl>
+
+<dl><dt><a name="Namespace-sym"><strong>sym</strong></a>(self, lname)</dt><dd><tt>For&nbsp;getting&nbsp;a&nbsp;symbol&nbsp;for&nbsp;an&nbsp;expression,&nbsp;rather&nbsp;than&nbsp;a&nbsp;constant.<br>
+For,&nbsp;and&nbsp;from,&nbsp;pim/toIcal.py</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'Namespace' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="NonEmptyList">class <strong>NonEmptyList</strong></a>(<a href="thing.html#List">List</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="thing.html#NonEmptyList">NonEmptyList</a></dd>
+<dd><a href="thing.html#List">List</a></dd>
+<dd><a href="thing.html#CompoundTerm">CompoundTerm</a></dd>
+<dd><a href="thing.html#Term">Term</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="NonEmptyList-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="NonEmptyList-unify"><strong>unify</strong></a>(self, other, vars, existentials, bindings)</dt><dd><tt>Unify&nbsp;this&nbsp;which&nbsp;may&nbsp;contain&nbsp;variables&nbsp;with&nbsp;the&nbsp;other,<br>
+which&nbsp;may&nbsp;contain&nbsp;existentials&nbsp;but&nbsp;not&nbsp;variables.<br>
+Return&nbsp;0&nbsp;if&nbsp;impossible.<br>
+Return&nbsp;[(var1,&nbsp;val1),&nbsp;(var2,val2)...]&nbsp;if&nbsp;match</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#List">List</a>:<br>
+<dl><dt><a name="NonEmptyList-__init__"><strong>__init__</strong></a>(self, store, first, rest)</dt></dl>
+
+<dl><dt><a name="NonEmptyList-__iter__"><strong>__iter__</strong></a>(self)</dt><dd><tt>The&nbsp;internal&nbsp;method&nbsp;which&nbsp;allows&nbsp;one&nbsp;to&nbsp;iterate&nbsp;over&nbsp;the&nbsp;statements<br>
+as&nbsp;though&nbsp;a&nbsp;formula&nbsp;were&nbsp;a&nbsp;sequence.</tt></dd></dl>
+
+<dl><dt><a name="NonEmptyList-asSequence"><strong>asSequence</strong></a>(self)</dt><dd><tt>Convert&nbsp;to&nbsp;a&nbsp;python&nbsp;sequence&nbsp;-&nbsp;NOT&nbsp;recursive</tt></dd></dl>
+
+<dl><dt><a name="NonEmptyList-occurringIn"><strong>occurringIn</strong></a>(self, vars)</dt><dd><tt>Which&nbsp;variables&nbsp;in&nbsp;the&nbsp;list&nbsp;occur&nbsp;in&nbsp;this&nbsp;list?</tt></dd></dl>
+
+<dl><dt><a name="NonEmptyList-precededBy"><strong>precededBy</strong></a>(self, first)</dt></dl>
+
+<dl><dt><a name="NonEmptyList-substitution"><strong>substitution</strong></a>(self, bindings, why<font color="#909090">=None</font>)</dt><dd><tt>Return&nbsp;this&nbsp;or&nbsp;a&nbsp;version&nbsp;of&nbsp;me&nbsp;with&nbsp;subsitution&nbsp;made</tt></dd></dl>
+
+<dl><dt><a name="NonEmptyList-uriref"><strong>uriref</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="NonEmptyList-value"><strong>value</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Term">Term</a>:<br>
+<dl><dt><a name="NonEmptyList-asPair"><strong>asPair</strong></a>(self)</dt><dd><tt>Representation&nbsp;in&nbsp;an&nbsp;earlier&nbsp;format,&nbsp;being&nbsp;phased&nbsp;out&nbsp;2002/08<br>
+&nbsp;<br>
+The&nbsp;first&nbsp;part&nbsp;of&nbsp;the&nbsp;pair&nbsp;is&nbsp;a&nbsp;constant&nbsp;number&nbsp;represnting&nbsp;the&nbsp;type<br>
+see&nbsp;RDFSink.py.&nbsp;&nbsp;the&nbsp;second&nbsp;is&nbsp;the&nbsp;value&nbsp;--&nbsp;uri&nbsp;for&nbsp;symbols,&nbsp;string&nbsp;for&nbsp;literals</tt></dd></dl>
+
+<dl><dt><a name="NonEmptyList-generated"><strong>generated</strong></a>(self)</dt><dd><tt>Boolean&nbsp;Is&nbsp;this&nbsp;thing&nbsp;a&nbsp;genid&nbsp;-&nbsp;is&nbsp;its&nbsp;name&nbsp;arbitrary?</tt></dd></dl>
+
+<dl><dt><a name="NonEmptyList-qname"><strong>qname</strong></a>(self)</dt><dd><tt>Output&nbsp;XML&nbsp;qnames&nbsp;[<a href="http://www.w3.org/TR/REC-xml-names/#NT-QName">http://www.w3.org/TR/REC-xml-names/#NT-QName</a>].<br>
+This&nbsp;should&nbsp;be&nbsp;beefed&nbsp;up&nbsp;to&nbsp;guarantee&nbsp;unambiguity&nbsp;(see&nbsp;__repr__&nbsp;documentation).</tt></dd></dl>
+
+<dl><dt><a name="NonEmptyList-representation"><strong>representation</strong></a>(self, base<font color="#909090">=None</font>)</dt><dd><tt>The&nbsp;string&nbsp;represnting&nbsp;this&nbsp;in&nbsp;N3</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="ReverseFunction">class <strong>ReverseFunction</strong></a>(<a href="thing.html#BuiltIn">BuiltIn</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;reverse&nbsp;function&nbsp;is&nbsp;a&nbsp;builtin&nbsp;which&nbsp;can&nbsp;calculate&nbsp;its&nbsp;subject&nbsp;given&nbsp;its&nbsp;<a href="__builtin__.html#object">object</a>.<br>
+&nbsp;<br>
+To&nbsp;get&nbsp;cwm&nbsp;to&nbsp;invoke&nbsp;it&nbsp;this&nbsp;way,&nbsp;your&nbsp;built-in&nbsp;must&nbsp;be&nbsp;a&nbsp;subclass&nbsp;of&nbsp;<a href="#ReverseFunction">ReverseFunction</a>.<br>
+If&nbsp;a&nbsp;function&nbsp;(like&nbsp;log:uri&nbsp;for&nbsp;example)&nbsp;is&nbsp;a&nbsp;two-way&nbsp;&nbsp;(1:1)&nbsp;builtin,&nbsp;it&nbsp;should&nbsp;be&nbsp;declared<br>
+a&nbsp;subclass&nbsp;of&nbsp;<a href="#Function">Function</a>&nbsp;and&nbsp;<a href="#ReverseFunction">ReverseFunction</a>.&nbsp;Then,&nbsp;cwm&nbsp;will&nbsp;call&nbsp;it&nbsp;either&nbsp;way&nbsp;as&nbsp;needed<br>
+in&nbsp;trying&nbsp;to&nbsp;resolve&nbsp;a&nbsp;query.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="thing.html#ReverseFunction">ReverseFunction</a></dd>
+<dd><a href="thing.html#BuiltIn">BuiltIn</a></dd>
+<dd><a href="thing.html#Fragment">Fragment</a></dd>
+<dd><a href="thing.html#Term">Term</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="ReverseFunction-__init__"><strong>__init__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="ReverseFunction-eval"><strong>eval</strong></a>(self, subj, obj, queue, bindings, proof, query)</dt></dl>
+
+<dl><dt><a name="ReverseFunction-evalSubj"><strong>evalSubj</strong></a>(self, obj, queue, bindings, proof, query)</dt><dd><tt>This&nbsp;function&nbsp;which&nbsp;has&nbsp;access&nbsp;to&nbsp;the&nbsp;store,&nbsp;unless&nbsp;overridden,<br>
+calls&nbsp;a&nbsp;simpler&nbsp;one&nbsp;which&nbsp;uses&nbsp;python&nbsp;conventions</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Fragment">Fragment</a>:<br>
+<dl><dt><a name="ReverseFunction-generated"><strong>generated</strong></a>(self)</dt><dd><tt>A&nbsp;generated&nbsp;identifier?<br>
+This&nbsp;arises&nbsp;when&nbsp;a&nbsp;document&nbsp;is&nbsp;parsed&nbsp;and&nbsp;a&nbsp;arbitrary<br>
+name&nbsp;is&nbsp;made&nbsp;up&nbsp;to&nbsp;represent&nbsp;a&nbsp;node&nbsp;with&nbsp;no&nbsp;known&nbsp;URI.<br>
+It&nbsp;is&nbsp;useful&nbsp;to&nbsp;know&nbsp;that&nbsp;its&nbsp;ID&nbsp;has&nbsp;no&nbsp;use&nbsp;outside&nbsp;that<br>
+context.</tt></dd></dl>
+
+<dl><dt><a name="ReverseFunction-reification"><strong>reification</strong></a>(self, sink, why<font color="#909090">=None</font>)</dt><dd><tt>Describe&nbsp;myself&nbsp;in&nbsp;RDF&nbsp;to&nbsp;the&nbsp;given&nbsp;context<br>
+&nbsp;<br>
+[&nbsp;reify:uri&nbsp;"<a href="http://example.org/#whatever">http://example.org/#whatever</a>"]</tt></dd></dl>
+
+<dl><dt><a name="ReverseFunction-representation"><strong>representation</strong></a>(self, base<font color="#909090">=None</font>)</dt><dd><tt>Optimize&nbsp;output&nbsp;if&nbsp;prefixes&nbsp;available</tt></dd></dl>
+
+<dl><dt><a name="ReverseFunction-uriref"><strong>uriref</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="ReverseFunction-uriref2"><strong>uriref2</strong></a>(self, base)</dt></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Term">Term</a>:<br>
+<dl><dt><a name="ReverseFunction-__repr__"><strong>__repr__</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;only&nbsp;used&nbsp;for&nbsp;debugging&nbsp;output&nbsp;-&nbsp;it&nbsp;can&nbsp;be&nbsp;ambiguous,<br>
+as&nbsp;it&nbsp;is&nbsp;is&nbsp;deliberately&nbsp;short&nbsp;to&nbsp;make&nbsp;debug&nbsp;printout&nbsp;readable.</tt></dd></dl>
+
+<dl><dt><a name="ReverseFunction-asPair"><strong>asPair</strong></a>(self)</dt><dd><tt>Representation&nbsp;in&nbsp;an&nbsp;earlier&nbsp;format,&nbsp;being&nbsp;phased&nbsp;out&nbsp;2002/08<br>
+&nbsp;<br>
+The&nbsp;first&nbsp;part&nbsp;of&nbsp;the&nbsp;pair&nbsp;is&nbsp;a&nbsp;constant&nbsp;number&nbsp;represnting&nbsp;the&nbsp;type<br>
+see&nbsp;RDFSink.py.&nbsp;&nbsp;the&nbsp;second&nbsp;is&nbsp;the&nbsp;value&nbsp;--&nbsp;uri&nbsp;for&nbsp;symbols,&nbsp;string&nbsp;for&nbsp;literals</tt></dd></dl>
+
+<dl><dt><a name="ReverseFunction-occurringIn"><strong>occurringIn</strong></a>(self, vars)</dt></dl>
+
+<dl><dt><a name="ReverseFunction-qname"><strong>qname</strong></a>(self)</dt><dd><tt>Output&nbsp;XML&nbsp;qnames&nbsp;[<a href="http://www.w3.org/TR/REC-xml-names/#NT-QName">http://www.w3.org/TR/REC-xml-names/#NT-QName</a>].<br>
+This&nbsp;should&nbsp;be&nbsp;beefed&nbsp;up&nbsp;to&nbsp;guarantee&nbsp;unambiguity&nbsp;(see&nbsp;__repr__&nbsp;documentation).</tt></dd></dl>
+
+<dl><dt><a name="ReverseFunction-substitution"><strong>substitution</strong></a>(self, bindings, why<font color="#909090">=None</font>)</dt><dd><tt>Return&nbsp;this&nbsp;or&nbsp;a&nbsp;version&nbsp;of&nbsp;me&nbsp;with&nbsp;subsitution&nbsp;made</tt></dd></dl>
+
+<dl><dt><a name="ReverseFunction-unify"><strong>unify</strong></a>(self, other, vars, existentials, bindings)</dt><dd><tt>Unify&nbsp;this&nbsp;which&nbsp;may&nbsp;contain&nbsp;variables&nbsp;with&nbsp;the&nbsp;other,<br>
+which&nbsp;may&nbsp;contain&nbsp;existentials&nbsp;but&nbsp;not&nbsp;variables.<br>
+Return&nbsp;0&nbsp;if&nbsp;impossible.<br>
+Return&nbsp;[(var1,&nbsp;val1),&nbsp;(var2,val2)...]&nbsp;if&nbsp;match</tt></dd></dl>
+
+<dl><dt><a name="ReverseFunction-value"><strong>value</strong></a>(self)</dt><dd><tt>As&nbsp;a&nbsp;python&nbsp;value&nbsp;-&nbsp;by&nbsp;default,&nbsp;none&nbsp;exists,&nbsp;use&nbsp;self</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Symbol">class <strong>Symbol</strong></a>(<a href="thing.html#Term">Term</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;<a href="#Term">Term</a>&nbsp;which&nbsp;has&nbsp;no&nbsp;fragment<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Symbol-__init__"><strong>__init__</strong></a>(self, uri, store<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="Symbol-internAnonymous"><strong>internAnonymous</strong></a>(r, fragid)</dt></dl>
+
+<dl><dt><a name="Symbol-internFrag"><strong>internFrag</strong></a>(self, fragid, thetype)</dt></dl>
+
+<dl><dt><a name="Symbol-reification"><strong>reification</strong></a>(self, sink, why<font color="#909090">=None</font>)</dt><dd><tt>Describe&nbsp;myself&nbsp;in&nbsp;RDF&nbsp;to&nbsp;the&nbsp;given&nbsp;context<br>
+&nbsp;<br>
+[&nbsp;reify:uri&nbsp;"<a href="http://example.org/whatever">http://example.org/whatever</a>"]</tt></dd></dl>
+
+<dl><dt><a name="Symbol-uriref"><strong>uriref</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Symbol-uriref2"><strong>uriref2</strong></a>(self, base)</dt></dl>
+
+<hr>
+Methods inherited from <a href="thing.html#Term">Term</a>:<br>
+<dl><dt><a name="Symbol-__repr__"><strong>__repr__</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;only&nbsp;used&nbsp;for&nbsp;debugging&nbsp;output&nbsp;-&nbsp;it&nbsp;can&nbsp;be&nbsp;ambiguous,<br>
+as&nbsp;it&nbsp;is&nbsp;is&nbsp;deliberately&nbsp;short&nbsp;to&nbsp;make&nbsp;debug&nbsp;printout&nbsp;readable.</tt></dd></dl>
+
+<dl><dt><a name="Symbol-asPair"><strong>asPair</strong></a>(self)</dt><dd><tt>Representation&nbsp;in&nbsp;an&nbsp;earlier&nbsp;format,&nbsp;being&nbsp;phased&nbsp;out&nbsp;2002/08<br>
+&nbsp;<br>
+The&nbsp;first&nbsp;part&nbsp;of&nbsp;the&nbsp;pair&nbsp;is&nbsp;a&nbsp;constant&nbsp;number&nbsp;represnting&nbsp;the&nbsp;type<br>
+see&nbsp;RDFSink.py.&nbsp;&nbsp;the&nbsp;second&nbsp;is&nbsp;the&nbsp;value&nbsp;--&nbsp;uri&nbsp;for&nbsp;symbols,&nbsp;string&nbsp;for&nbsp;literals</tt></dd></dl>
+
+<dl><dt><a name="Symbol-generated"><strong>generated</strong></a>(self)</dt><dd><tt>Boolean&nbsp;Is&nbsp;this&nbsp;thing&nbsp;a&nbsp;genid&nbsp;-&nbsp;is&nbsp;its&nbsp;name&nbsp;arbitrary?</tt></dd></dl>
+
+<dl><dt><a name="Symbol-occurringIn"><strong>occurringIn</strong></a>(self, vars)</dt></dl>
+
+<dl><dt><a name="Symbol-qname"><strong>qname</strong></a>(self)</dt><dd><tt>Output&nbsp;XML&nbsp;qnames&nbsp;[<a href="http://www.w3.org/TR/REC-xml-names/#NT-QName">http://www.w3.org/TR/REC-xml-names/#NT-QName</a>].<br>
+This&nbsp;should&nbsp;be&nbsp;beefed&nbsp;up&nbsp;to&nbsp;guarantee&nbsp;unambiguity&nbsp;(see&nbsp;__repr__&nbsp;documentation).</tt></dd></dl>
+
+<dl><dt><a name="Symbol-representation"><strong>representation</strong></a>(self, base<font color="#909090">=None</font>)</dt><dd><tt>The&nbsp;string&nbsp;represnting&nbsp;this&nbsp;in&nbsp;N3</tt></dd></dl>
+
+<dl><dt><a name="Symbol-substitution"><strong>substitution</strong></a>(self, bindings, why<font color="#909090">=None</font>)</dt><dd><tt>Return&nbsp;this&nbsp;or&nbsp;a&nbsp;version&nbsp;of&nbsp;me&nbsp;with&nbsp;subsitution&nbsp;made</tt></dd></dl>
+
+<dl><dt><a name="Symbol-unify"><strong>unify</strong></a>(self, other, vars, existentials, bindings)</dt><dd><tt>Unify&nbsp;this&nbsp;which&nbsp;may&nbsp;contain&nbsp;variables&nbsp;with&nbsp;the&nbsp;other,<br>
+which&nbsp;may&nbsp;contain&nbsp;existentials&nbsp;but&nbsp;not&nbsp;variables.<br>
+Return&nbsp;0&nbsp;if&nbsp;impossible.<br>
+Return&nbsp;[(var1,&nbsp;val1),&nbsp;(var2,val2)...]&nbsp;if&nbsp;match</tt></dd></dl>
+
+<dl><dt><a name="Symbol-value"><strong>value</strong></a>(self)</dt><dd><tt>As&nbsp;a&nbsp;python&nbsp;value&nbsp;-&nbsp;by&nbsp;default,&nbsp;none&nbsp;exists,&nbsp;use&nbsp;self</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Term">class <strong>Term</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>The&nbsp;<a href="#Term">Term</a>&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;represents&nbsp;an&nbsp;RDF&nbsp;term.<br>
+&nbsp;<br>
+It&nbsp;is&nbsp;interned&nbsp;for&nbsp;speed&nbsp;of&nbsp;processing&nbsp;by&nbsp;the&nbsp;store.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Term-__init__"><strong>__init__</strong></a>(self, store<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="Term-__repr__"><strong>__repr__</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;only&nbsp;used&nbsp;for&nbsp;debugging&nbsp;output&nbsp;-&nbsp;it&nbsp;can&nbsp;be&nbsp;ambiguous,<br>
+as&nbsp;it&nbsp;is&nbsp;is&nbsp;deliberately&nbsp;short&nbsp;to&nbsp;make&nbsp;debug&nbsp;printout&nbsp;readable.</tt></dd></dl>
+
+<dl><dt><a name="Term-asPair"><strong>asPair</strong></a>(self)</dt><dd><tt>Representation&nbsp;in&nbsp;an&nbsp;earlier&nbsp;format,&nbsp;being&nbsp;phased&nbsp;out&nbsp;2002/08<br>
+&nbsp;<br>
+The&nbsp;first&nbsp;part&nbsp;of&nbsp;the&nbsp;pair&nbsp;is&nbsp;a&nbsp;constant&nbsp;number&nbsp;represnting&nbsp;the&nbsp;type<br>
+see&nbsp;RDFSink.py.&nbsp;&nbsp;the&nbsp;second&nbsp;is&nbsp;the&nbsp;value&nbsp;--&nbsp;uri&nbsp;for&nbsp;symbols,&nbsp;string&nbsp;for&nbsp;literals</tt></dd></dl>
+
+<dl><dt><a name="Term-generated"><strong>generated</strong></a>(self)</dt><dd><tt>Boolean&nbsp;Is&nbsp;this&nbsp;thing&nbsp;a&nbsp;genid&nbsp;-&nbsp;is&nbsp;its&nbsp;name&nbsp;arbitrary?</tt></dd></dl>
+
+<dl><dt><a name="Term-occurringIn"><strong>occurringIn</strong></a>(self, vars)</dt></dl>
+
+<dl><dt><a name="Term-qname"><strong>qname</strong></a>(self)</dt><dd><tt>Output&nbsp;XML&nbsp;qnames&nbsp;[<a href="http://www.w3.org/TR/REC-xml-names/#NT-QName">http://www.w3.org/TR/REC-xml-names/#NT-QName</a>].<br>
+This&nbsp;should&nbsp;be&nbsp;beefed&nbsp;up&nbsp;to&nbsp;guarantee&nbsp;unambiguity&nbsp;(see&nbsp;__repr__&nbsp;documentation).</tt></dd></dl>
+
+<dl><dt><a name="Term-representation"><strong>representation</strong></a>(self, base<font color="#909090">=None</font>)</dt><dd><tt>The&nbsp;string&nbsp;represnting&nbsp;this&nbsp;in&nbsp;N3</tt></dd></dl>
+
+<dl><dt><a name="Term-substitution"><strong>substitution</strong></a>(self, bindings, why<font color="#909090">=None</font>)</dt><dd><tt>Return&nbsp;this&nbsp;or&nbsp;a&nbsp;version&nbsp;of&nbsp;me&nbsp;with&nbsp;subsitution&nbsp;made</tt></dd></dl>
+
+<dl><dt><a name="Term-unify"><strong>unify</strong></a>(self, other, vars, existentials, bindings)</dt><dd><tt>Unify&nbsp;this&nbsp;which&nbsp;may&nbsp;contain&nbsp;variables&nbsp;with&nbsp;the&nbsp;other,<br>
+which&nbsp;may&nbsp;contain&nbsp;existentials&nbsp;but&nbsp;not&nbsp;variables.<br>
+Return&nbsp;0&nbsp;if&nbsp;impossible.<br>
+Return&nbsp;[(var1,&nbsp;val1),&nbsp;(var2,val2)...]&nbsp;if&nbsp;match</tt></dd></dl>
+
+<dl><dt><a name="Term-value"><strong>value</strong></a>(self)</dt><dd><tt>As&nbsp;a&nbsp;python&nbsp;value&nbsp;-&nbsp;by&nbsp;default,&nbsp;none&nbsp;exists,&nbsp;use&nbsp;self</tt></dd></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-bNode"><strong>bNode</strong></a>(str, context)</dt><dd><tt>Create&nbsp;or&nbsp;reuse,&nbsp;in&nbsp;the&nbsp;default&nbsp;store,&nbsp;a&nbsp;new&nbsp;unnamed&nbsp;node&nbsp;within&nbsp;the&nbsp;given<br>
+formula&nbsp;as&nbsp;context,&nbsp;and&nbsp;return&nbsp;it&nbsp;for&nbsp;future&nbsp;use</tt></dd></dl>
+ <dl><dt><a name="-existential"><strong>existential</strong></a>(str, context, uri)</dt><dd><tt>Create&nbsp;or&nbsp;reuse,&nbsp;in&nbsp;the&nbsp;default&nbsp;store,&nbsp;a&nbsp;new&nbsp;named&nbsp;variable<br>
+existentially&nbsp;qualified&nbsp;within&nbsp;the&nbsp;given<br>
+formula&nbsp;as&nbsp;context,&nbsp;and&nbsp;return&nbsp;it&nbsp;for&nbsp;future&nbsp;use</tt></dd></dl>
+ <dl><dt><a name="-formula"><strong>formula</strong></a>()</dt><dd><tt>Create&nbsp;or&nbsp;reuse,&nbsp;in&nbsp;the&nbsp;default&nbsp;store,&nbsp;a&nbsp;new&nbsp;empty&nbsp;formula&nbsp;(triple&nbsp;people&nbsp;think:&nbsp;triple&nbsp;store)<br>
+and&nbsp;return&nbsp;it&nbsp;for&nbsp;future&nbsp;use</tt></dd></dl>
+ <dl><dt><a name="-literal"><strong>literal</strong></a>(str, dt<font color="#909090">=None</font>, lang<font color="#909090">=None</font>)</dt><dd><tt>Create&nbsp;or&nbsp;reuse,&nbsp;in&nbsp;the&nbsp;default&nbsp;store,&nbsp;an&nbsp;interned&nbsp;version&nbsp;of&nbsp;the&nbsp;given&nbsp;literal&nbsp;string<br>
+and&nbsp;return&nbsp;it&nbsp;for&nbsp;future&nbsp;use</tt></dd></dl>
+ <dl><dt><a name="-load"><strong>load</strong></a>(uri<font color="#909090">=None</font>, contentType<font color="#909090">=None</font>, formulaURI<font color="#909090">=None</font>, remember<font color="#909090">=1</font>)</dt><dd><tt>Get&nbsp;and&nbsp;parse&nbsp;document.&nbsp;&nbsp;Guesses&nbsp;format&nbsp;if&nbsp;necessary.<br>
+&nbsp;<br>
+uri:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;None,&nbsp;load&nbsp;from&nbsp;standard&nbsp;input.<br>
+remember:&nbsp;if&nbsp;1,&nbsp;store&nbsp;as&nbsp;metadata&nbsp;the&nbsp;relationship&nbsp;between&nbsp;this&nbsp;URI&nbsp;and&nbsp;this&nbsp;formula.<br>
+&nbsp;<br>
+Returns:&nbsp;&nbsp;top-level&nbsp;formula&nbsp;of&nbsp;the&nbsp;parsed&nbsp;document.<br>
+Raises:&nbsp;&nbsp;&nbsp;IOError,&nbsp;SyntaxError,&nbsp;DocumentError</tt></dd></dl>
+ <dl><dt><a name="-loadMany"><strong>loadMany</strong></a>(uris)</dt><dd><tt>Load&nbsp;a&nbsp;number&nbsp;of&nbsp;resources&nbsp;into&nbsp;the&nbsp;same&nbsp;formula<br>
+&nbsp;<br>
+Returns:&nbsp;&nbsp;top-level&nbsp;formula&nbsp;of&nbsp;the&nbsp;parsed&nbsp;information.<br>
+Raises:&nbsp;&nbsp;&nbsp;IOError,&nbsp;SyntaxError,&nbsp;DocumentError</tt></dd></dl>
+ <dl><dt><a name="-merge"><strong>merge</strong></a>(a, b)</dt><dd><tt>Merge&nbsp;sorted&nbsp;sequences<br>
+&nbsp;<br>
+The&nbsp;fact&nbsp;that&nbsp;the&nbsp;sequences&nbsp;are&nbsp;sorted&nbsp;makes&nbsp;this&nbsp;faster</tt></dd></dl>
+ <dl><dt><a name="-setStore"><strong>setStore</strong></a>(s)</dt><dd><tt>Set&nbsp;the&nbsp;process-global&nbsp;default&nbsp;store&nbsp;to&nbsp;be&nbsp;used&nbsp;when&nbsp;an&nbsp;explicit&nbsp;store&nbsp;is&nbsp;not</tt></dd></dl>
+ <dl><dt><a name="-setStoreClass"><strong>setStoreClass</strong></a>(c)</dt><dd><tt>Set&nbsp;the&nbsp;process-global&nbsp;class&nbsp;to&nbsp;be&nbsp;used&nbsp;to&nbsp;generate&nbsp;a&nbsp;new&nbsp;store&nbsp;if&nbsp;needed</tt></dd></dl>
+ <dl><dt><a name="-symbol"><strong>symbol</strong></a>(uri)</dt><dd><tt>Create&nbsp;or&nbsp;reuse,&nbsp;in&nbsp;the&nbsp;default&nbsp;store,&nbsp;an&nbsp;interned&nbsp;version&nbsp;of&nbsp;the&nbsp;given&nbsp;symbol<br>
+and&nbsp;return&nbsp;it&nbsp;for&nbsp;future&nbsp;use</tt></dd></dl>
+ <dl><dt><a name="-universal"><strong>universal</strong></a>(str, context, uri)</dt><dd><tt>Create&nbsp;or&nbsp;reuse,&nbsp;in&nbsp;the&nbsp;default&nbsp;store,&nbsp;a&nbsp;named&nbsp;variable<br>
+universally&nbsp;qualified&nbsp;within&nbsp;the&nbsp;given<br>
+formula&nbsp;as&nbsp;context,&nbsp;and&nbsp;return&nbsp;it&nbsp;for&nbsp;future&nbsp;use</tt></dd></dl>
+ <dl><dt><a name="-uri_encode"><strong>uri_encode</strong></a>(str)</dt><dd><tt>untested&nbsp;-&nbsp;this&nbsp;must&nbsp;be&nbsp;in&nbsp;a&nbsp;standard&nbsp;library&nbsp;somewhere</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>ALL4</strong> = (0, 1, 2, 3)<br>
+<strong>ANONYMOUS</strong> = 3<br>
+<strong>BOUNDLISTS</strong> = 4<br>
+<strong>CONSTS</strong> = 2<br>
+<strong>CONTEXT</strong> = 0<br>
+<strong>FORMULA</strong> = 1<br>
+<strong>INFINITY</strong> = 1000000000<br>
+<strong>LITERAL</strong> = 2<br>
+<strong>LITERAL_URI_prefix</strong> = 'data:text/rdf+n3;'<br>
+<strong>List_NS</strong> = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'<br>
+<strong>Logic_NS</strong> = 'http://www.w3.org/2000/10/swap/log#'<br>
+<strong>OBJ</strong> = 3<br>
+<strong>PARTS</strong> = (1, 2, 3)<br>
+<strong>PRED</strong> = 1<br>
+<strong>QUAD</strong> = 5<br>
+<strong>SHORT</strong> = 1<br>
+<strong>STATE</strong> = 0<br>
+<strong>SUBJ</strong> = 2<br>
+<strong>SYMBOL</strong> = 0<br>
+<strong>VARS</strong> = 3<br>
+<strong>generators</strong> = _Feature((2, 2, 0, 'alpha', 1), (2, 3, 0, 'final', 0), 4096)<br>
+<strong>reify</strong> = &lt;thing.Namespace object&gt;<br>
+<strong>store</strong> = None<br>
+<strong>storeClass</strong> = None<br>
+<strong>subcontext_cache_context</strong> = None<br>
+<strong>subcontext_cache_subcontexts</strong> = None</td></tr></table>
+</body></html>

@@ -1,0 +1,10 @@
+# QNames cannot have any colons other than the one separating the prefix from
+# the local name. Therefore, in dealing with <b:c#v:d>, cwm should leave the
+# URI intact instead of trying to reduce it to a qname.
+#
+# Issue originally raised in the following bug:
+# http://lists.w3.org/Archives/Public/public-cwm-bugs/2004Nov/0011
+
+@prefix a: <b:c#> .
+
+a:q <b:c#v:d> <b:c#r> .

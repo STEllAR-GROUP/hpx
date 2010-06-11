@@ -1,0 +1,6 @@
+# Testing proof generation and checking.  Filter for t9.n3 when testing filter
+
+{ ?x a <Success> } => { ?x a <GreaterSuccess> }.
+
+# ends
+

@@ -1,0 +1,13 @@
+# This licence is used for files in this distribution.
+
+@prefix doc:<http://www.w3.org/2000/10/swap/pim/doc#>.
+@prefix s: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<> a doc:OpenSourceLicense;
+  doc:subLicense <http://www.w3.org/Consortium/Legal/copyright-software-19980720>;
+   s:comment """Share and Enjoy. Open Source license:
+Copyright (c) 2000,1,2 W3C (MIT, INRIA, Keio)
+Copyright other contributers mentioned in individual files.
+http://www.w3.org/Consortium/Legal/copyright-software-19980720""".
+
+# ends

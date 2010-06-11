@@ -1,0 +1,11 @@
+     @prefix : <http://www.daml.org/2000/12/daml+oil#> .
+     @prefix ani: <#> .
+     @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+    
+    ani:Animal     a rdfs:Class;
+         :restrictedBy  [
+             a :Restriction;
+             :cardinality "2";
+             :onProperty ani:parent ];
+         rdfs:label "Animal" .
+    

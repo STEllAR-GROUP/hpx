@@ -1,0 +1,104 @@
+# List of regression tests
+#
+# - was in bash script retest.sh
+#
+@prefix : <#>.
+@prefix x: <#>.
+@prefix test: <http://www.w3.org/2000/10/swap/test.n3#>.
+
+
+
+:t1017 a test:CwmTest;
+    test:shortFileName "lists-simple.n3";
+    test:description   "parsing and generation of N3 list syntax";
+    test:arguments     """-n3 lists-simple.n3""".
+
+
+:t1018 a test:CwmTest;
+    test:shortFileName "lists-simple-1.rdf";
+    test:description   "conversion of N3 list syntax to RDF";
+    test:arguments     """-n3 lists-simple.n3 -rdf""".
+
+:t1018b1 a test:CwmTest;
+    test:shortFileName "list-bug1.n3";
+    test:description   "List processing bug check 1";
+    test:arguments     """list/list-bug1.n3 --think""".
+
+:t1018b2 a test:CwmTest;
+    test:shortFileName "list-bug2.n3";
+    test:description   "List processing bug check 2";
+    test:arguments     """list/list-bug2.n3 --think""".
+
+:t1020 a  test:CwmTest;
+    test:shortFileName "list-construct.n3";
+    test:description   "What to do with URI-labelled lists";
+    test:arguments     """list/construct.n3""".
+
+:t1021 a  test:CwmTest;
+    test:shortFileName "bnode_in_list_in_list.ref";
+    test:description   "Anonymous nodes in nested lists";
+    test:arguments     """list/bnode_in_list_in_list.n3""".
+
+
+#        Test list handling in inference
+
+:t1031 a test:CwmTest;
+    test:shortFileName "li-r1.n3";
+    test:description   "Inference using lists";
+    test:arguments     """list/r1.n3 -think""".
+
+
+#:t1032 a test:CwmTest;
+#    test:shortFileName "li-gk3.n3";
+#    test:description   "Iterative ops on lists";
+#    test:arguments     """list/gk3.n3 -think""".
+
+:t1032a a test:CwmTest;
+    test:shortFileName "li-double.n3";
+    test:description   "Query with list with the same var in >once";
+    test:arguments     """list/double.n3 -think""".
+
+
+:t2004u1 a test:CwmTest;
+    test:shortFileName "list-unify1.n3";
+    test:description   "List unification 1";
+    test:arguments     """list/unify1.n3 --think --data""".
+	
+:t2004u2 a test:CwmTest;
+    test:shortFileName "list-unify2.n3";
+    test:description   "List unification 2 - variable in list";
+    test:arguments     """list/unify1.n3 --think --data""".
+	
+:t2004u3 a test:CwmTest;
+    test:shortFileName "list-unify3.n3";
+    test:description   "List unification 3 - nested lists";
+    test:arguments     """list/unify1.n3 --think --data""".
+
+:t2004u4 a test:CwmTest;
+    test:shortFileName "list-unify4.n3";
+    test:description   "List unification 4 - nested lists";
+    test:arguments     """list/unify4.n3 --think --data""".
+
+:t2004u5 a test:CwmTest;
+    test:shortFileName "list-unify5.n3";
+    test:description   "List unification 5 - multiple values";
+    test:arguments     """list/unify4.n3 --think --data""".
+
+:t2005 a test:CwmTest;
+    test:shortFileName "append-out.n3";
+    test:description   "Iterative ops on lists";
+    test:arguments     """list/append.n3 --think --data""".
+
+# Test other builtins
+	
+:t2006 a test:CwmTest;
+    test:shortFileName "list-last.n3";
+    test:description   "last, in builtins on lists";
+    test:arguments     """list/last.n3 --think --data""".
+
+:t2007 a test:CwmTest;
+    test:shortFileName "list-builtin_generated_match.n3";
+    test:description   "last, in builtins on lists";
+    test:arguments     """list/builtin_generated_match.n3 --think --data""".
+
+#ends

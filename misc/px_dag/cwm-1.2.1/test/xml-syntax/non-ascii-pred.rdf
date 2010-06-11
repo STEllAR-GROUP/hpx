@@ -1,0 +1,14 @@
+
+
+
+<rdf:RDF xmlns="http://example.com/swap/test/includes/non-ascii.n3#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+
+    <rdf:Description rdf:about="#my">
+        <name>Joerg</name>
+    </rdf:Description>
+
+    <rdf:Description rdf:about="#僕">
+        <名前>ヨーク</名前>
+    </rdf:Description>
+</rdf:RDF>

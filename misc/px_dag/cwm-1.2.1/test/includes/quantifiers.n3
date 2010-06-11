@@ -1,0 +1,164 @@
+#  Test of interactions of qualifiers with log:includes
+#
+#  $Id: quantifiers.n3,v 1.3 2004/06/25 01:27:00 timbl Exp $
+#
+# Usage: cwm quantifiers.n3 -think -purge
+#  Should give 18 successes and no failures.
+#
+ 
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+
+@prefix : <#>.
+@prefix qu: <#>.
+
+
+# 
+# Basically,  forall x G(x) implies G(x) which implies forSome X G(x). 
+# log:includes should allow the stronger statement to "include" the weaker one.
+#
+{{ :foo :bar :baz } log:includes { @forSome :foo. :foo :bar :baz }}
+   log:implies { :testa2 a :success }. # Originally failed
+
+
+
+{{ @forSome :foo. :foo :bar :baz } log:includes {@forSome :foo. :foo :bar :baz }}
+  log:implies { :testb2 a :success }.
+
+{{ @forAll :foo. :foo :bar :baz } log:includes {@forSome :foo. :foo :bar :baz }}
+  log:implies { :testc2 a :success }.  # Originally failed
+
+
+
+{{ :foo :bar :baz } log:includes { :foo :bar :baz }}
+  log:implies { :testa1 a :success }.
+
+{{ @forSome :foo. :foo :bar :baz } log:includes { :foo :bar :baz }}
+  log:implies { :testb1 a :FAILURE }.    # Originally failed, STILL FAILS.
+
+{{ @forAll :foo. :foo :bar :baz } log:includes { :foo :bar :baz }}
+  log:implies { :testc1 a :success }.
+
+
+
+{{ :foo :bar :baz } log:includes {@forAll :foo. :foo :bar :baz }}
+   log:implies { :testa3 a :FAILURE }.
+
+{{ @forSome :foo. :foo :bar :baz } log:includes {@forAll :foo.  :foo :bar :baz }}
+  log:implies { :testb3 a :FAILURE }.
+
+{{ @forAll :foo. :foo :bar :baz } log:includes {@forAll :foo.  :foo :bar :baz }}
+  log:implies { :testc3 a :success }.
+
+
+#   Negative tests:
+
+
+
+{{ :foo :bar :baz } log:notIncludes { @forSome :foo. :foo :bar :baz }}
+   log:implies { :testa2n a :FAILURE }.# Originally failed
+
+{{ @forSome :foo. :foo :bar :baz } log:notIncludes {@forSome :foo. :foo :bar :baz }}
+  log:implies { :testb2n a :FAILURE }. 
+
+{{ @forAll :foo. :foo :bar :baz } log:notIncludes {@forSome :foo. :foo :bar :baz }}
+  log:implies { :testc2n a :FAILURE }. # Originally failed
+
+
+
+{{ :foo :bar :baz } log:notIncludes { :foo :bar :baz }}
+  log:implies { :testa1n a :FAILURE }.
+
+{{ @forSome :foo. :foo :bar :baz } log:notIncludes { :foo :bar :baz }}
+  log:implies { :testb1n a :success }.
+
+{{ @forAll :foo. :foo :bar :baz } log:notIncludes { :foo :bar :baz }}
+  log:implies { :testc1n a :FAILURE }.
+
+
+
+{{ :foo :bar :baz } log:notIncludes {@forAll :foo. :foo :bar :baz }}
+   log:implies { :testa3n a :success }.
+
+{{ @forSome :foo. :foo :bar :baz } log:notIncludes {@forAll :foo.  :foo :bar :baz }}
+  log:implies { :testb3n a :success }.
+
+{{ @forAll :foo. :foo :bar :baz } log:notIncludes {@forAll :foo.  :foo :bar :baz }}
+  log:implies { :testc3n a :FAILURE }.
+
+
+
+######################## Versions with different identifiers:
+
+
+{{ :fee :bar :baz } log:includes { @forSome :foo. :foo :bar :baz }}
+   log:implies { :testa2d a :success }. # Originally failed
+
+{{ @forSome :fee. :fee :bar :baz } log:includes {@forSome :foo. :foo :bar :baz }}
+  log:implies { :testb2d a :success }.
+
+{{ @forAll :fee. :fee :bar :baz } log:includes {@forSome :foo. :foo :bar :baz }}
+  log:implies { :testc2d a :success }.  # Originally failed
+
+
+
+{{ :fee :bar :baz } log:includes { :foo :bar :baz }}
+  log:implies { :testa1d a :FAILURE }.
+
+{{ @forSome :fee. :fee :bar :baz } log:includes { :foo :bar :baz }}
+  log:implies { :testb1d a :FAILURE }.    # Originally failed
+
+{{ @forAll :fee. :fee :bar :baz } log:includes { :foo :bar :baz }}
+  log:implies { :testc1d a :success }.
+
+
+
+{{ :fee :bar :baz } log:includes {@forAll :foo. :foo :bar :baz }}
+   log:implies { :testa3d a :FAILURE }.
+
+{{ @forSome :fee. :fee :bar :baz } log:includes {@forAll :foo.  :foo :bar :baz }}
+  log:implies { :testb3d a :FAILURE }.
+
+{{ @forAll :fee. :fee :bar :baz } log:includes {@forAll :foo.  :foo :bar :baz }}
+  log:implies { :testc3d a :success }.
+
+
+#   Negative tests:
+
+
+
+{{ :fee :bar :baz } log:notIncludes { @forSome :foo. :foo :bar :baz }}
+   log:implies { :testa2nd a :FAILURE }.     # Originally failed
+
+{{ @forSome :fee. :fee :bar :baz } log:notIncludes {@forSome :foo. :foo :bar :baz }}
+  log:implies { :testb2nd a :FAILURE }. 
+
+{{ @forAll :fee. :fee :bar :baz } log:notIncludes {@forSome :foo. :foo :bar :baz }}
+  log:implies { :testc2nd a :FAILURE }.    # Originally failed
+
+
+{{ :fee :bar :baz } log:notIncludes { :foo :bar :baz }}
+  log:implies { :testa1nd a :success }.
+
+{{ @forSome :fee. :fee :bar :baz } log:notIncludes { :foo :bar :baz }}
+  log:implies { :testb1nd a :success }.
+
+{{ @forAll :fee. :fee :bar :baz } log:notIncludes { :foo :bar :baz }}
+  log:implies { :testc1nd a :FAILURE }.  # Originally failed, STILL FAILS 
+
+
+
+{{ :fee :bar :baz } log:notIncludes {@forAll :foo. :foo :bar :baz }}
+   log:implies { :testa3nd a :success }.
+
+{{ @forSome :fee. :fee :bar :baz } log:notIncludes {@forAll :foo.  :foo :bar :baz }}
+  log:implies { :testb3nd a :success }.
+
+{{ @forAll :fee. :fee :bar :baz } log:notIncludes {@forAll :foo.  :foo :bar :baz }}
+  log:implies { :testc3nd a :FAILURE }.
+
+
+
+log:implies a log:Chaff.  # Purge input rules
+
+# ENDS
+

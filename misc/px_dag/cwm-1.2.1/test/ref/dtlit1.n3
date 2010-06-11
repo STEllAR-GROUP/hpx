@@ -1,0 +1,16 @@
+     @prefix : <dtlit1#> .
+     @prefix dtlit: <#> .
+     @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    
+     @forAll dtlit:X .
+    
+    "2005-03-30T11:00:00"^^:tz     a :Answer .
+    {
+        
+          ( "2005-03-30T11:00:00" 
+            :tz  )
+             log:dtlit dtlit:X .
+        
+        }     log:implies {dtlit:X     a :Answer .
+        } .
+    

@@ -1,0 +1,26 @@
+     @prefix : <#> .
+    
+    :testa1     a :success .
+    
+    :testa1nd     a :success .
+    
+    :testa2     a :success .
+    
+    :testa2d     a :success .
+    
+    :testb1n     a :success .
+    
+    :testb1nd     a :success .
+    
+    :testb2     a :success .
+    
+    :testb2d     a :success .
+    
+    :testc1n     a :FAILURE .
+    
+    :testc1nd     a :FAILURE .
+    
+    :testc2     a :success .
+    
+    :testc2d     a :success .
+    

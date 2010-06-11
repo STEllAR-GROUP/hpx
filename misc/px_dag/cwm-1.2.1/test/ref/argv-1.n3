@@ -1,0 +1,55 @@
+     @prefix : <#> .
+     @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+     @prefix os: <http://www.w3.org/2000/10/swap/os#> .
+    
+     @forAll :x .
+    
+    :test1     a :sucess .
+    
+    :test2     a :sucess .
+    
+    :test3     a :sucess .
+    
+    :test_param_1     :is "foo" .
+    {
+        "1"     os:argv "foo" .
+        
+        }     log:implies {:test1     a :sucess .
+        } .
+    {
+        "1"     os:argv "foot" .
+        
+        }     log:implies {:test1b     a :FAILURE .
+        } .
+    {
+        "3"     os:argv "baz" .
+        
+        }     log:implies {:test3     a :sucess .
+        } .
+    {
+        "THIS is not a valid number"     os:argv :x .
+        
+        }     log:implies {:test4     a :FAILURE .
+        } .
+    {
+        1     os:argv :x .
+        
+        }     log:implies {:test_param_1     :is :x .
+        } .
+    {
+        2     os:argv "bar" .
+        
+        }     log:implies {:test2     a :sucess .
+        } .
+    {
+        4     os:argv :x .
+        
+        }     log:implies {:test3     a :FAILURE .
+        } .
+    {
+        "1"     os:argv  [
+                 log:notEqualTo "foo" ] .
+        
+        }     log:implies {:test1c     a :FAILURE .
+        } .
+    

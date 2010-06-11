@@ -1,0 +1,16 @@
+# Example using daml-ex ontology
+#  but with invalid things
+
+     @prefix ex: <daml-ex.n3#> .
+     @prefix daml: <http://www.daml.org/2001/03/daml+oil#> .
+     @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+     @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+<> daml:imports <daml-ex.n3>.
+
+
+<#disjointTest> a ex:Man; a ex:Woman.  # Can't be both.
+
+<#joe> is ex:father of <#alex>; is ex:mother of <#bill>. # Same, but less direct.
+    
+#ENDS

@@ -1,0 +1,27 @@
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+{ {} log:includes {:a log:equalTo :a} } => { :test1n a :Failure} .
+
+{ {} log:includes {{:a :b :c} log:includes {}} } => { :test2n a :Failure} .
+
+{ {} log:notIncludes {:a log:equalTo :a} } => { :test1 a :Success} .
+
+{ { :foo :bar (1 2) } log:includes { :foo :bar [rdf:first []]} }
+		 => {:test2 a :Success} .
+
+{ { :foo :bar (1 2) } log:notIncludes { :foo :bar [rdf:first []]} }
+		 => {:test2 a :FAILURE} .
+
+
+{ {} log:notIncludes {:a log:equalTo :a} } => { :test3 a :Success} .
+
+# All lists exist and non-empty lists have firsts.
+# For cwm this shows up as the list (1 2) being a List datatype,
+# and the rdf:first builtin which extracts its first element.
+# rdf:first works even with a plain log:includes because the
+# rdf:first property is part of the RDF model of a list.
+
+{   {} log:includes  {   (1 2) rdf:first [] } }  => { :test4 a :Success }.
+
+# ends

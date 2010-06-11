@@ -1,0 +1,25 @@
+     @prefix : <foo#> .
+     @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    
+    @forAll :x,
+                :y,
+                :z .
+    
+    :grass     :color :blue;
+         :is :relaxing;
+         :sounds :quiet .
+    
+    :sky     :color :blue;
+         :is :relaxing;
+         :sounds :quiet .
+    {
+        :x     :color :blue .
+        
+        }     log:implies {:x     :is :relaxing .
+        } .
+    {
+        :x     :sounds :quiet .
+        
+        }     log:implies {:x     :is :relaxing .
+        } .
+    

@@ -1,0 +1,25 @@
+# delta/detailed.tests - tests of delta
+#
+# N.B. Beware in writing test:arguments; all tests are run in the directory
+# above this one.
+
+@prefix : <#>.
+@prefix test: <http://www.w3.org/2000/10/swap/test.n3#>.
+
+:t001 a test:CwmTest;
+
+    test:referenceOutput <t2/smushed-regen.ref.ntriples>;
+    test:description   "Reconsitute file from patch.";
+    test:arguments     "delta/t2/from-smushed.n3 --patch=delta/t2/smushed-patch.n3 --ntriples".
+	
+:t3 a test:CwmTest ;
+    test:referenceOutput <t3/output.n3> ;
+    test:description     "exit status test" ;
+    test:arguments       "delta/t3/test.n3 --think --with `../delta.py -f delta/t3/from.n3 -t delta/t3/to-same.n3 &> /dev/null; echo $?` `../delta.py -f delta/t3/from.n3 -t delta/t3/to-diff.n3 &> /dev/null; echo $?`" .
+    
+:t4 a test:CwmTest ;
+    test:referenceOutput <t4/output.n3> ;
+    test:description     "granularity cmdline option test" ;
+    test:arguments       """delta/t4/test.n3 --think --with "`../delta.py -f delta/t4/from.n3 -t delta/t4/to.n3`" "`../delta.py -g 1 -f delta/t4/from.n3 -t delta/t4/to.n3`" "`../delta.py --granularity=1 -f delta/t4/from.n3 -t delta/t4/to.n3`" "`../delta.py -g 0 -f delta/t4/from.n3 -t delta/t4/to.n3`" "`../delta.py --granularity=0 -f delta/t4/from.n3 -t delta/t4/to.n3`" """ .
+
+#ENDS

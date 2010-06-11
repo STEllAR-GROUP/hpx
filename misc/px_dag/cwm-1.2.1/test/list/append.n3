@@ -1,0 +1,40 @@
+# $Id: append.n3,v 1.1 2003/08/30 18:04:16 timbl Exp $
+
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix log:      <http://www.w3.org/2000/10/swap/log#> .
+@prefix :         <#> .
+
+#{ ?A :append ( ?L  ?X ) => 
+
+{ 
+  ?A :append ( [ rdf:first ?H ; rdf:rest ?T ] ?S ) .
+}
+	=>
+{ 
+  ?A rdf:first ?H ;
+     rdf:rest  [ :append ( ?T ?S ) ] .
+} .
+
+
+{ 
+  ?A :append ( () ?S ) .
+}
+	=>
+{ 
+  ?A rdf:first ?S ;
+     rdf:rest  () .
+} .
+
+
+# Test cases
+
+ :A0 :RESULT  [ :append ( ()  "only" ) ].
+ :B0 :append ( ()  "onlyB" ) .
+
+ :A1 :RESULT [ :append (  ( 1 ) 2 ) ] .
+
+#:A2 :append (  :A1 "L2" ) .
+
+#:A3 :append (  :A1 "L3" ) .
+

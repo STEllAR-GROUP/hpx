@@ -1,0 +1,186 @@
+# List of regression tests for $SWAP/test/reason
+
+@prefix : <#>.
+@prefix x: <#>.
+@prefix test: <http://www.w3.org/2000/10/swap/test.n3#>.
+@prefix dc:  <http://purl.org/dc/elements/1.1/>. # yuk - under protest - no hash
+
+
+# Test proof generation -- see also the -p option of retest.py
+
+# Commented out the tests which are not checks, as proof format itself is not
+# so stable or guarantted yet and the proofs tend to serialize with unordered
+# bnodes
+
+:t01proof
+# a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-t01proof.n3>;
+    test:description   "Proof for just loading a file";
+    test:arguments     """reason/t1.n3 --think --base=foo --why""".
+
+:t01zcheck a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-t01check.n3>;
+    test:description   "Proof for just loading a file";
+    test:arguments     """reason/t1.n3 --think --base=foo --why | python ../check.py""".
+
+:t02proof
+# a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-t02proof.n3>;
+    test:description   "Proof for just loading a file";
+    test:arguments     """reason/t2.n3 --think --base=foo --why""".
+
+:t02zcheck a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-t02check.n3>;
+    test:description   "Proof for just loading a file";
+    test:arguments     """reason/t2.n3 --think --base=foo --why | python ../check.py""".
+
+:t03proof
+# a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-t03proof.n3>;
+    test:description   "Proof for just loading a file";
+    test:arguments     """reason/t3.n3 --think --base=foo --why""".
+
+:t03zcheck a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-t03check.n3>;
+    test:description   "Proof for just loading a file";
+    test:arguments     """reason/t3.n3 --think --base=foo --why | python ../check.py""".
+
+:t04proof
+#  a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-t04proof.n3>;
+    test:description   "Proof for just loading a file";
+    test:arguments     """reason/t4.n3 --think --base=foo --why""".
+
+:t04zcheck a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-t04check.n3>;
+    test:description   "Proof for just loading a file";
+    test:arguments     """reason/t4.n3 --think --base=foo --why | python ../check.py""".
+
+:t05proof
+# a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-t05proof.n3>;
+    test:description   "Proof for a little inference";
+    test:arguments     """reason/t5.n3 --think --base=foo --why""".
+
+:t05zcheck a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-t05check.n3>;
+    test:description   "Proof for a little inference";
+    test:arguments     """reason/t5.n3 --think --base=foo --why | python ../check.py""".
+
+
+:t06proof
+# a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-t06proof.n3>;
+    test:description   "Proof for a little inference";
+    test:arguments     """reason/t6.n3 --think --base=foo --why""".
+
+:t06zcheck a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-t06check.n3>;
+    test:description   "Proof for a little inference";
+    test:arguments     """reason/t6.n3 --think --base=foo --why | python ../check.py""".
+
+# This is equiv of others but easier to explain with famous example
+:socrates a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/socrates.n3>;
+    test:description   "Proof with basic modus ponens";
+    test:arguments     """reason/socrates.n3 --think --base=foo --why | python ../check.py""".
+
+:t07zcheck a test:CwmTest;
+        test:workingDirectory <../>;
+        test:referenceOutput <../ref/reason-single-gen.n3>;
+        test:description "make sure a proof does not split anonymous nodes unnecessarily";
+        test:arguments """reason/single_gen.n3 --think --base=foo --why | python ../check.py""" .
+
+
+:t08proof
+# a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-t08proof.n3>;
+    test:description   "Proof for inference, --n3=B to name BNodes";
+    test:arguments     """--n3=B reason/t8.n3 --think --base=foo --why""".
+
+:t08zcheck a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-t08check.n3>;
+    test:description   "Proof for inference, --n3=B to name BNodes (check proof)";
+    test:arguments     """--n3=B reason/t8.n3 --think --base=foo --why | python ../check.py""".
+
+:t09proof
+# a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-t09proof.n3>;
+    test:description   "Proof for a little inference - binding Bnode to symbol";
+    test:arguments     """--n3=B reason/t9.n3 --think --base=foo --why""".
+
+:t09qcheck a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-t09check.n3>;
+    test:description   "Proof for a little inference";
+    test:arguments     """--n3=B reason/t9.n3 --think --base=foo --why | python ../check.py""".
+
+
+:t09wf
+# a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-t09filter.n3>;
+    test:description   "Proof with filter - binding Bnode to symbol";
+    test:arguments     """--n3=B reason/t9.n3 --think --filter=reason/f9.n3 --base=foo --why""".
+
+:t09zf a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-t09filtercheck.n3>;
+    test:description   "Proof with filter (check)";
+    test:arguments     """--n3=B reason/t9.n3 --think --filter=reason/f9.n3 --base=foo --why | python ../check.py""".
+
+
+:t10 a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-rename-loop.n3>;
+    test:description   "Renaming can lead to loops if not careful";
+    test:arguments     """--n3=eiouB reason/rename-loop.n3 --think --base=foo --why | python ../check.py""".
+
+:t11 a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-poor-urop.n3>;
+    test:description   "Smushing of equal formulas can lead to proof issues";
+    test:arguments     """--n3=eiouB reason/poor-urop.n3 --think --base=foo --why | python ../check.py""".
+
+:t12 
+#a test:CwmTest; # too unstable!
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/double-proof.n3>;
+    test:description   "Are we splitting bNodes in proofs with no good reason?";
+    test:arguments     """--ntriples reason/double.n3 --think --base=foo --why --flatten | ../cant.py""".
+
+
+:t90check a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/reason-t90check.n3>;
+    test:description   "Proof bug: used to make cyclic proof. (long)";
+    test:arguments     """--n3=B includes/conclusion.n3 --think --base=foo --why | python ../check.py""".
+
+
+#:t99 a test:
+#
+# http://www.w3.org/2000/10/swap/test/includes/conclusion.n3
+
+#:t2060 a test:CwmTest;
+#    test:workingDirectory  <../>;
+#    test:referenceOutput <../ref/reason-tretst.n3>;
+#    test:description   "Proof for one simple rule";
+#    test:arguments     """reason/t5.n3 --think --base=foo --why""".
+
+#

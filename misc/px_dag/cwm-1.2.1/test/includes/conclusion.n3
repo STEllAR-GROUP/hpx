@@ -1,0 +1,42 @@
+# Test the log:includes function
+
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix s: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix daml:  <http://www.daml.org/2000/10/daml-ont#> .
+@prefix dpo:  <http://www.daml.org/2001/03/daml+oil#> .
+@prefix ex:   <http://www.daml.org/2000/10/daml-ex#> .
+@prefix log:  <http://www.w3.org/2000/10/swap/log#> .
+
+@prefix foo: <foo.n3#>.  # Local stuff
+@prefix : <foo.n3#>.  # Local stuff
+
+@prefix local: <t10.n3#>.
+
+# Usage:   cwm conclusion.n3 -think
+#
+# See also t10a.n3  foo.n3
+#
+# Output should be (in "result" formula) the same as for the cwm command below.
+#
+
+
+
+@forAll :d, :x, :y, :F, :G.
+
+
+# Conjunction junction, what's your're function?  - schoolhouse rock.
+# Conjunction of a list of formulae is the logical AND of them, ie
+# the set of statements which contains each of the statements in each of the
+# conjoined formulae.
+
+{ ( [ is log:semantics of <../daml-ex.n3> ] 
+    [ is log:semantics of <../invalid-ex.n3> ]
+    [ is log:semantics of <../schema-rules.n3> ] )
+        log:conjunction [ log:conclusion :G]}
+                                 log:implies { :result :is :G }. 
+
+# The above is a much more complicated way of writing the cwm
+# command line  "cwm daml-ex.n3 invalid-ex.n3 schema-rules.n3 --think".
+#
+
+#ends

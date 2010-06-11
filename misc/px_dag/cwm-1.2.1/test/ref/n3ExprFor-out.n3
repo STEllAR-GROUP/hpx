@@ -1,0 +1,14 @@
+     @prefix : <#> .
+     @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    
+    @forAll :x .
+    
+    :Blargh_b     :semantics {<http://example.com/#x>     <http://example.com/#y> <http://example.com/#z> .
+        } .
+    {
+        """@prefix : <http://example.com/#>.
+   :x :y :z ."""     log:n3ExprFor :x .
+        
+        }     log:implies {:Blargh_b     :semantics :x .
+        } .
+    

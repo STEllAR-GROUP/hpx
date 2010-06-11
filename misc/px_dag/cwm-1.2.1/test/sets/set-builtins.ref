@@ -1,0 +1,287 @@
+     @prefix : <#> .
+     @prefix owl: <http://www.w3.org/2002/07/owl#> .
+    
+      [      owl:oneOf ();
+             a :intersection;
+             :intersectionOf  (
+             [
+                     owl:oneOf  (
+                    1 
+                    2  ) ]
+             [
+                     owl:oneOf  (
+                    :a 
+                    :b  ) ] ),
+                     (
+             [
+                     owl:oneOf  (
+                    :a 
+                    :b  ) ]
+             [
+                     owl:oneOf  (
+                    1 
+                    2  ) ] ) ].
+    
+      [      owl:oneOf  (
+            1  );
+             a :Difference,
+                    :intersection;
+             :differenceOf  (
+             [
+                     owl:oneOf  (
+                    1 
+                    :a  ) ]
+             [
+                     owl:oneOf  (
+                    :a 
+                    :b  ) ] );
+             :intersectionOf  (
+             [
+                     owl:oneOf  (
+                    1 
+                    2  ) ]
+             [
+                     owl:oneOf  (
+                    1 
+                    :a  ) ] ),
+                     (
+             [
+                     owl:oneOf  (
+                    1 
+                    :a  ) ]
+             [
+                     owl:oneOf  (
+                    1 
+                    2  ) ] ) ].
+    
+      [      owl:oneOf  (
+            2  );
+             a :Difference;
+             :differenceOf  (
+             [
+                     owl:oneOf  (
+                    1 
+                    2  ) ]
+             [
+                     owl:oneOf  (
+                    1 
+                    :a  ) ] ) ].
+    
+      [      owl:oneOf  (
+            1 
+            2  );
+             a :Difference,
+                    :Set;
+             :differenceOf  (
+             [
+                     owl:oneOf  (
+                    1 
+                    2  ) ]
+             [
+                     owl:oneOf  (
+                    :a 
+                    :b  ) ] ) ].
+    
+      [      owl:oneOf  (
+            :a  );
+             a :Difference,
+                    :intersection;
+             :differenceOf  (
+             [
+                     owl:oneOf  (
+                    1 
+                    :a  ) ]
+             [
+                     owl:oneOf  (
+                    1 
+                    2  ) ] );
+             :intersectionOf  (
+             [
+                     owl:oneOf  (
+                    1 
+                    :a  ) ]
+             [
+                     owl:oneOf  (
+                    :a 
+                    :b  ) ] ),
+                     (
+             [
+                     owl:oneOf  (
+                    :a 
+                    :b  ) ]
+             [
+                     owl:oneOf  (
+                    1 
+                    :a  ) ] ) ].
+    
+      [      owl:oneOf  (
+            1 
+            :a  );
+             a :Set ].
+    
+      [      owl:oneOf  (
+            2 
+            :a  );
+             a :SymmetricDifference;
+             :symmetricDifferenceOf  (
+             [
+                     owl:oneOf  (
+                    1 
+                    2  ) ]
+             [
+                     owl:oneOf  (
+                    1 
+                    :a  ) ] ),
+                     (
+             [
+                     owl:oneOf  (
+                    1 
+                    :a  ) ]
+             [
+                     owl:oneOf  (
+                    1 
+                    2  ) ] ) ].
+    
+      [      owl:oneOf  (
+            1 
+            2 
+            :a  );
+             a :Union;
+             :unionOf  (
+             [
+                     owl:oneOf  (
+                    1 
+                    2  ) ]
+             [
+                     owl:oneOf  (
+                    1 
+                    :a  ) ] ),
+                     (
+             [
+                     owl:oneOf  (
+                    1 
+                    :a  ) ]
+             [
+                     owl:oneOf  (
+                    1 
+                    2  ) ] ) ].
+    
+      [      owl:oneOf  (
+            :b  );
+             a :Difference;
+             :differenceOf  (
+             [
+                     owl:oneOf  (
+                    :a 
+                    :b  ) ]
+             [
+                     owl:oneOf  (
+                    1 
+                    :a  ) ] ) ].
+    
+      [      owl:oneOf  (
+            1 
+            :b  );
+             a :SymmetricDifference;
+             :symmetricDifferenceOf  (
+             [
+                     owl:oneOf  (
+                    1 
+                    :a  ) ]
+             [
+                     owl:oneOf  (
+                    :a 
+                    :b  ) ] ),
+                     (
+             [
+                     owl:oneOf  (
+                    :a 
+                    :b  ) ]
+             [
+                     owl:oneOf  (
+                    1 
+                    :a  ) ] ) ].
+    
+      [      owl:oneOf  (
+            :a 
+            :b  );
+             a :Difference,
+                    :Set;
+             :differenceOf  (
+             [
+                     owl:oneOf  (
+                    :a 
+                    :b  ) ]
+             [
+                     owl:oneOf  (
+                    1 
+                    2  ) ] ) ].
+    
+      [      owl:oneOf  (
+            1 
+            :a 
+            :b  );
+             a :Union;
+             :unionOf  (
+             [
+                     owl:oneOf  (
+                    1 
+                    :a  ) ]
+             [
+                     owl:oneOf  (
+                    :a 
+                    :b  ) ] ),
+                     (
+             [
+                     owl:oneOf  (
+                    :a 
+                    :b  ) ]
+             [
+                     owl:oneOf  (
+                    1 
+                    :a  ) ] ) ].
+    
+      [      owl:oneOf  (
+            1 
+            2 
+            :a 
+            :b  );
+             a :SymmetricDifference,
+                    :Union;
+             :symmetricDifferenceOf  (
+             [
+                     owl:oneOf  (
+                    1 
+                    2  ) ]
+             [
+                     owl:oneOf  (
+                    :a 
+                    :b  ) ] ),
+                     (
+             [
+                     owl:oneOf  (
+                    :a 
+                    :b  ) ]
+             [
+                     owl:oneOf  (
+                    1 
+                    2  ) ] );
+             :unionOf  (
+             [
+                     owl:oneOf  (
+                    1 
+                    2  ) ]
+             [
+                     owl:oneOf  (
+                    :a 
+                    :b  ) ] ),
+                     (
+             [
+                     owl:oneOf  (
+                    :a 
+                    :b  ) ]
+             [
+                     owl:oneOf  (
+                    1 
+                    2  ) ] ) ].
+    

@@ -1,0 +1,11 @@
+
+
+
+<ns:RDF xmlns:ns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://example.com#"
+    xmlns:rdf="http://example.com#">
+
+    <ns:Description ns:about="#a">
+        <b ns:resource="#c"/>
+    </ns:Description>
+</ns:RDF>

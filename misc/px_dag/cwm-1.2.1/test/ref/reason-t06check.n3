@@ -1,0 +1,19 @@
+     @prefix : <http://example.com/swap/test/reason/t6.n3#> .
+    @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    @prefix math: <http://www.w3.org/2000/10/swap/math#> .
+    
+     @forAll :h,
+                :x .
+    
+    :joe     a :player;
+         :friend :kev;
+         :height "1.6" .
+    {
+        :h     math:greaterThan "1.3" .
+        :x     :friend :kev;
+             :height :h .
+        
+        }     log:implies {:x     a :player .
+        } .
+    
+

@@ -1,0 +1,16 @@
+     @prefix : <#> .
+     @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    
+     @forSome :x .
+    
+    <>     a :Success .
+    
+    :x     log:notEqualTo  [
+             a :Thing1 ] .
+    {
+        
+          [      log:equalTo :x ].
+        
+        }     log:implies {<>     a :Success .
+        } .
+    

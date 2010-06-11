@@ -1,0 +1,139 @@
+#
+# Baccus - Naur Form (BNF) vocabulary
+#
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix bnf: <http://www.w3.org/2000/10/swap/grammar/bnf#>.
+@prefix : <http://www.w3.org/2000/10/swap/grammar/bnf-rules#>.
+@prefix rul: <http://www.w3.org/2000/10/swap/grammar/bnf-rules#>.
+@prefix n3: <http://www.w3.org/2000/10/swap/grammar/n3#>.
+@prefix list: <http://www.w3.org/2000/10/swap/list#>.
+@prefix doc: <http://www.w3.org/2000/10/swap/pim/doc#>.
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+@prefix string: <http://www.w3.org/2000/10/swap/string#>.
+@keywords a, is, of.
+
+#_____________________________________
+
+# Shorthand expansion into BNF
+
+#{ ?x bnf:zeroOrMore ?y } => {
+#    ?x bnf:mustBeOneSequence (
+##		( )
+#		( ?y ?x )
+#	) 
+#}.
+#
+#{ ?x bnf:mustBe ?y } => {?x bnf:mustBeOneSequence ((?y))}.
+#
+# Axioms relating the definite (open world) form to the indefinte (closed world) 
+#(better words?) form:
+#
+#{ ?x bnf:mustBe ?y } => { ?x bnf:mustBeOneSequence (( ?y )) }.
+#
+
+# Enumerate options:
+
+{ ?x bnf:mustBeOneSequence ?y} => { ?x optionTail ?y }.
+
+{?x optionTail [rdf:first ?y; rdf:rest ?z]} => {
+	?x 	bnf:branch [ bnf:sequence ?y];
+		optionTail ?z.
+  }.
+
+{ ?x bnf:branch [bnf:sequence ?y] } =>  { ?y sequenceTail ?y }.
+
+sequenceTail a log:Chaff.
+optionTail a log:Chaff.
+
+{ ?x sequenceTail [ rdf:rest ?z ] } => { ?x sequenceTail ?z }.
+
+# What productions can follow each other?
+# This is used for working out when to 
+
+{ ?x sequenceTail [ rdf:first ?y; rdf:rest [ rdf:first ?z ]] } =>
+	{ ?y bnf:canPrecede ?z }.
+
+{	?x bnf:branch [
+	    bnf:sequence [
+		list:last ?y]].
+	?x bnf:canPrecede ?z} =>
+	{ ?y bnf:canPrecede ?z }.
+
+{ 	?x bnf:canPrecede ?y.
+	?y bnf:branch [ bnf:sequence () ].
+	?y bnf:canPrecede ?z.
+} => {
+
+	?x bnf:canPrecede ?z.
+}.
+
+
+bnf:eof bnf:canStartWith "@EOFDUMMY". #  @@ kludge
+
+# Have to separate the next three rules or cwm seems to
+# get screwed up and assume there is no solution @@@
+ 
+{ ?x bnf:branch [bnf:sequence [ rdf:first ?y ]].
+  }  => { ?x bnf:TEST ?y }.
+
+{ ?x bnf:TEST ?y .
+  ?y log:rawType log:Literal. }  => { ?x bnf:canStartWithLiteral ?y }.
+
+{ ?x bnf:canStartWithLiteral ?y .
+#  (?y "(.).*")  string:scrape ?c     # Use whole string
+ }  => { ?y bnf:canStartWith ?y }.
+
+#______________________________________________________________
+
+
+
+# Rules for determining branching
+
+# A branch has  a sequence, which is the given BNF production, and
+# one or more conditions, which are the strings on which to consider
+# that branch.  N3 is a langauge in whch the look-ahead often is only
+# one character, and may allways be a constsnt string rather than a 
+# regexp (check).
+
+# A branchTail is a sequnece which a branch could start with
+{ 	?x bnf:branch ?b.
+	?b bnf:sequence ?s.
+} => {
+	?b bnf:branchTail ?s.
+}.
+
+{	?b bnf:branchTail ?s.
+	?s rdf:first [ bnf:branch [ bnf:sequence () ]];
+           rdf:rest ?t
+} => {
+	?b bnf:branchTail ?t.
+}. 
+
+
+{ 	?x bnf:branch ?b.
+	?b bnf:branchTail ?s.
+	?s rdf:first [bnf:canStartWith ?y].
+} => {
+	?x bnf:canStartWith ?y.
+	?b bnf:condition ?y.
+}.
+
+
+
+{ 	?x bnf:branch ?b;
+	    bnf:canPrecede ?z.
+	?z log:rawType log:Literal.
+	?b bnf:sequence ().
+} =>  { ?b bnf:condition ?z}.
+
+{ 	?x bnf:branch ?b;
+	    bnf:canPrecede [bnf:canStartWith ?z].
+	?b bnf:sequence ().
+} =>  { ?b bnf:condition ?z}.
+
+
+
+
+#ends

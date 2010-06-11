@@ -1,0 +1,19 @@
+@prefix r:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix s: <http://www.w3.org/2000/01/rdf-schema#> .
+
+@prefix doc: <http://www.w3.org/2000/10/swap/pim/doc#> .
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix daml: <http://www.daml.org/2001/03/daml+oil#> .
+@prefix xml: <http://www.w3.org/2000/10/swap/xml#> .
+@prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#> .
+
+@prefix : <v#>.
+
+@forAll :a, :b, :c, :x, :y, :z.
+
+( "one"  "two" ) a :whatever.
+
+{ (:a :b) a :whatever } log:implies { :a a :SUCCESS. :b a :SUCCESS }.
+
+# { :x a :whatever } log:implies { :x :is """ The list ( "one"  "two" )""" }.
+

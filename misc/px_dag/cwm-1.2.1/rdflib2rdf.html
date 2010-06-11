@@ -1,0 +1,137 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module rdflib2rdf</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>rdflib2rdf</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/syosi/CVS-local/WWW/2000/10/swap/rdflib2rdf.py">/home/syosi/CVS-local/WWW/2000/10/swap/rdflib2rdf.py</a></font></td></tr></table>
+    <p><tt>This&nbsp;rdflib2rdf&nbsp;module&nbsp;provides&nbsp;code&nbsp;for&nbsp;glueing&nbsp;rdflib's&nbsp;rdf/xml<br>
+parser&nbsp;to&nbsp;cwm.<br>
+&nbsp;<br>
+STATUS:<br>
+&nbsp;<br>
+First&nbsp;pass,&nbsp;partially&nbsp;working,&nbsp;some&nbsp;questions.<br>
+&nbsp;<br>
+&nbsp;<br>
+QUESTIONS:<br>
+&nbsp;<br>
+Does&nbsp;the&nbsp;context&nbsp;need&nbsp;to&nbsp;change&nbsp;per&nbsp;bag?&nbsp;I&nbsp;have&nbsp;assumed&nbsp;for&nbsp;the&nbsp;moment<br>
+not,&nbsp;as&nbsp;it&nbsp;breaks&nbsp;(or&nbsp;complicates)&nbsp;the&nbsp;interface&nbsp;between&nbsp;the&nbsp;parser<br>
+and&nbsp;the&nbsp;store.<br>
+&nbsp;<br>
+Is&nbsp;there&nbsp;already&nbsp;or&nbsp;is&nbsp;there&nbsp;any&nbsp;interest&nbsp;in&nbsp;a&nbsp;<a href="#ContextSink">ContextSink</a>&nbsp;interface<br>
+to&nbsp;simplify&nbsp;the&nbsp;interface&nbsp;between&nbsp;the&nbsp;parser&nbsp;and&nbsp;the&nbsp;store?&nbsp;If<br>
+desired,&nbsp;I&nbsp;would&nbsp;be&nbsp;happy&nbsp;to&nbsp;help&nbsp;with&nbsp;any&nbsp;refactors&nbsp;that&nbsp;would&nbsp;be<br>
+needed.&nbsp;To&nbsp;better&nbsp;describe&nbsp;what&nbsp;I&nbsp;am&nbsp;thinking,&nbsp;I&nbsp;have&nbsp;implemented&nbsp;a<br>
+<a href="#ContextSink">ContextSink</a>&nbsp;enough&nbsp;to&nbsp;serve&nbsp;the&nbsp;purpose&nbsp;needed&nbsp;for&nbsp;this&nbsp;module.<br>
+&nbsp;<br>
+Is&nbsp;urlparse.urljoin&nbsp;from&nbsp;the&nbsp;Python&nbsp;standard&nbsp;library&nbsp;buggy?&nbsp;RDFLib<br>
+uses&nbsp;urlparse.urljoin&nbsp;and&nbsp;I&nbsp;noticed&nbsp;that&nbsp;the&nbsp;differences&nbsp;between&nbsp;it<br>
+and&nbsp;uriparse.join&nbsp;are&nbsp;causing&nbsp;the&nbsp;test&nbsp;cases&nbsp;to&nbsp;fail&nbsp;(export<br>
+PYTHONPATH=..;python2.3&nbsp;retest.py&nbsp;-n&nbsp;-f&nbsp;regression.n3).&nbsp;For&nbsp;example:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;file:/devel/WWW/2000/10/swap/test/animal.rdf#<br>
+&nbsp;&nbsp;&nbsp;&nbsp;vs.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;file:///devel/WWW/2000/10/swap/test/animal.rdf#<br>
+&nbsp;<br>
+Not&nbsp;really&nbsp;a&nbsp;question&nbsp;but...&nbsp;RDFLib's&nbsp;RDF/XML&nbsp;parser&nbsp;at&nbsp;the&nbsp;moment<br>
+does&nbsp;not&nbsp;make&nbsp;it&nbsp;easy&nbsp;to&nbsp;get&nbsp;to&nbsp;the&nbsp;namespace&nbsp;binding&nbsp;information.&nbsp;And<br>
+the&nbsp;way&nbsp;sax2rdf&nbsp;currently&nbsp;calls&nbsp;bind&nbsp;it&nbsp;looks&nbsp;like&nbsp;there&nbsp;will&nbsp;be<br>
+issues&nbsp;if&nbsp;a&nbsp;prefix&nbsp;gets&nbsp;redefined.&nbsp;Here&nbsp;is&nbsp;a&nbsp;question&nbsp;re:<br>
+this...&nbsp;should&nbsp;passing&nbsp;the&nbsp;namespace&nbsp;information&nbsp;to&nbsp;the&nbsp;store&nbsp;be&nbsp;a<br>
+[mandatory]&nbsp;part&nbsp;of&nbsp;the&nbsp;interface?&nbsp;or&nbsp;does&nbsp;it&nbsp;cause&nbsp;to&nbsp;much&nbsp;grief&nbsp;in<br>
+practice&nbsp;not&nbsp;too?<br>
+&nbsp;<br>
+&nbsp;<br>
+TO&nbsp;RUN:&nbsp;(cwm&nbsp;with&nbsp;rdflib's&nbsp;rdf/xml&nbsp;parser)<br>
+&nbsp;<br>
+Double&nbsp;check&nbsp;that&nbsp;you&nbsp;have&nbsp;rdflib-1.2.x&nbsp;installed&nbsp;:)<br>
+&nbsp;&nbsp;*&nbsp;Download&nbsp;from&nbsp;<a href="http://rdflib.net/stable/">http://rdflib.net/stable/</a><br>
+&nbsp;&nbsp;*&nbsp;extract<br>
+&nbsp;&nbsp;*&nbsp;cd&nbsp;root&nbsp;of&nbsp;distribution<br>
+&nbsp;&nbsp;*&nbsp;python2.2&nbsp;setup.py&nbsp;install<br>
+&nbsp;<br>
+Change&nbsp;the&nbsp;following&nbsp;line&nbsp;in&nbsp;cwm.py&nbsp;from:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;sax2rdf.<a href="#RDFXMLParser">RDFXMLParser</a>(...<br>
+to:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;rdflib2rdf.<a href="#RDFXMLParser">RDFXMLParser</a>(...<br>
+&nbsp;<br>
+--eikeon,&nbsp;<a href="http://eikeon.com/">http://eikeon.com/</a></tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#fffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="diag.html">diag</a><br>
+</td><td width="25%" valign=top><a href="uripath.html">uripath</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="rdflib2rdf.html#RDFXMLParser">RDFXMLParser</a>
+</font></dt><dt><font face="helvetica, arial"><a href="__builtin__.html#object">__builtin__.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="rdflib2rdf.html#ContextSink">ContextSink</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="ContextSink">class <strong>ContextSink</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="ContextSink-__init__"><strong>__init__</strong></a>(self, sink, openFormula, thisDoc<font color="#909090">=None</font>, flags<font color="#909090">=''</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="ContextSink-makeStatement"><strong>makeStatement</strong></a>(self, (predicate, subject, object))</dt></dl>
+
+<dl><dt><a name="ContextSink-newBlankNode"><strong>newBlankNode</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="ContextSink-newLiteral"><strong>newLiteral</strong></a>(self, s)</dt></dl>
+
+<dl><dt><a name="ContextSink-newSymbol"><strong>newSymbol</strong></a>(self, uri)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'ContextSink' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="RDFXMLParser">class <strong>RDFXMLParser</strong></a></font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="RDFXMLParser-__init__"><strong>__init__</strong></a>(self, sink, formulaURI, thisDoc, flags<font color="#909090">=''</font>, why<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-add"><strong>add</strong></a>(self, (s, p, o))</dt><dd><tt>Add&nbsp;triple&nbsp;to&nbsp;the&nbsp;sink&nbsp;(rdflib.syntax.parser.Parser&nbsp;calls<br>
+this&nbsp;method).</tt></dd></dl>
+
+<dl><dt><a name="RDFXMLParser-feed"><strong>feed</strong></a>(self, buffer)</dt></dl>
+
+<dl><dt><a name="RDFXMLParser-load"><strong>load</strong></a>(self, uri, baseURI<font color="#909090">=''</font>)</dt></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>FORMULA</strong> = 1</td></tr></table>
+</body></html>

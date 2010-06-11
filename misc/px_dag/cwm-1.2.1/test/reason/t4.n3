@@ -1,0 +1,6 @@
+@prefix : <#>.
+
+:a :b :c.
+{:a :b ?x} => { ?x :d :e }.
+# ends
+

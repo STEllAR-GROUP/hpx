@@ -1,0 +1,10 @@
+     @prefix : <http://www.example.com/foo#> .
+     @prefix q: <http://www.w3.org/2004/ql#> .
+    
+    q:result     q:is  (
+        :Joe 
+        "black"  ),
+                 (
+        :Mary 
+        "red"  ) .
+    

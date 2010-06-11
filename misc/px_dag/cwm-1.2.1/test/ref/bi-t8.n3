@@ -1,0 +1,95 @@
+     @prefix : <#> .
+     @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+     @prefix string: <http://www.w3.org/2000/10/swap/string#> .
+    
+    :testh1     a :success .
+    
+    :testh2     a :success .
+    
+    :testh3     a :success .
+    
+    :testh4     a :success .
+    
+    :testh5     a :success .
+    
+    :testh6     a :success .
+    
+    :testh7     a :success .
+    
+    :testh8     a :success .
+    {
+        "a"     string:startsWith "abc" .
+        
+        }     log:implies {:testh_7     a :FAILURE .
+        } .
+    {
+        "aaa"     string:greaterThan "abc" .
+        
+        }     log:implies {:testh_2     a :FAILURE .
+        } .
+    {
+        "aaa"     string:lessThan "abc" .
+        
+        }     log:implies {:testh4     a :success .
+        } .
+    {
+        "aaa"     string:notGreaterThan "abc" .
+        
+        }     log:implies {:testh3     a :success .
+        } .
+    {
+        "aaa"     string:notLessThan "abc" .
+        
+        }     log:implies {:testh_6     a :FAILURE .
+        } .
+    {
+        "abc"     string:greaterThan "aaa" .
+        
+        }     log:implies {:testh1     a :success .
+        } .
+    {
+        "abc"     string:greaterThan "abc" .
+        
+        }     log:implies {:testh_1     a :FAILURE .
+        } .
+    {
+        "abc"     string:lessThan "aaa" .
+        
+        }     log:implies {:testh_4     a :FAILURE .
+        } .
+    {
+        "abc"     string:lessThan "abc" .
+        
+        }     log:implies {:testh_5     a :FAILURE .
+        } .
+    {
+        "abc"     string:notGreaterThan "aaa" .
+        
+        }     log:implies {:testh_3     a :FAILURE .
+        } .
+    {
+        "abc"     string:notGreaterThan "abc" .
+        
+        }     log:implies {:testh2     a :success .
+        } .
+    {
+        "abc"     string:notLessThan "aaa" .
+        
+        }     log:implies {:testh5     a :success .
+        } .
+    {
+        "abc"     string:notLessThan "abc" .
+        
+        }     log:implies {:testh6     a :success .
+        } .
+    {
+        "abc"     string:startsWith "a" .
+        
+        }     log:implies {:testh7     a :success .
+        } .
+    {
+        "def"     string:startsWith "def" .
+        
+        }     log:implies {:testh8     a :success .
+        } .
+    

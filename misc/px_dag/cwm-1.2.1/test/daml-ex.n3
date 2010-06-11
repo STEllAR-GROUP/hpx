@@ -1,0 +1,107 @@
+#Processed by Id: cwm.py,v 1.44 2001/05/19 03:39:00 timbl Exp 
+        #    using base file:/cygdrive/c/devel/WWW/2000/10/swap/test/daml-ex.rdf
+        
+#  Notation3 generation by
+#       notation3.py,v 1.76 2001/05/19 03:39:00 timbl Exp
+
+#   Base was: file:/cygdrive/c/devel/WWW/2000/10/swap/test/daml-ex.rdf
+     @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+     @prefix daml: <http://www.daml.org/2001/03/daml+oil#> .
+     @prefix : <#> .
+     @prefix ex: <#> .
+    
+    :Adam     a daml:Person;
+         daml:comment "Adam is a person.";
+         daml:label "Adam" .
+    
+    :Animal     a daml:Class;
+         daml:comment """This class of animals is illustrative of a number of
+	ontological idioms.""";
+         daml:label "Animal" .
+    
+    :Car     a daml:Class;
+         daml:comment "no car is a person";
+         daml:subClassOf  [
+             a daml:Class;
+             daml:complementOf :Person ] .
+    
+    :Female     a daml:Class;
+         daml:disjointFrom :Male;
+         daml:subClassOf :Animal .
+    
+    :Height     a daml:Class;
+         daml:oneOf  (
+        :short 
+        :medium 
+        :tall  ) .
+    
+    :Male     a daml:Class;
+         daml:subClassOf :Animal .
+    
+    :Man     a daml:Class;
+         daml:subClassOf :Male,
+                :Person .
+    
+    :Person     a daml:Class;
+         daml:comment "every person is a man or a woman";
+         daml:disjointUnionOf  (
+        :Man 
+        :Woman  );
+         daml:restrictedBy  [
+             a daml:Restriction;
+             daml:onProperty :parent;
+             daml:toClass :Person ];
+         daml:subClassOf :Animal .
+    
+    :TallMan     a daml:Class;
+         daml:intersectionOf  (
+        :TallThing 
+        :Man  ) .
+    
+    :TallThing     a daml:Class;
+         daml:restrictedBy  [
+             a daml:Restriction;
+             daml:onProperty :height;
+             daml:toValue :tall ] .
+    
+    :Woman     a daml:Class;
+         daml:subClassOf :Female,
+                :Person .
+    
+    :ancestor     a daml:TransitiveProperty;
+         daml:label "ancestor" .
+    
+    :child     a daml:Property;
+         daml:inverseOf :parent .
+    
+    :descendant     a daml:TransitiveProperty .
+    
+    :father     a daml:Property;
+         daml:cardinality "1";
+         daml:range :Man;
+         daml:subProperty :parent .
+    
+    :height     a daml:Property;
+         daml:domain :Person;
+         daml:range :Height .
+    
+    :mom     a daml:Property;
+         = :mother .
+    
+    :mother     a daml:UniqueProperty;
+         daml:range :Woman;
+         daml:subProperty :parent .
+    
+    :occupation     a daml:Property;
+         daml:maxCardinality "1" .
+    
+    :parent     a daml:Property;
+         daml:cardinality "2";
+         daml:domain :Animal .
+    
+    <>     a daml:Ontology;
+         daml:comment "An example ontology";
+         daml:imports <http://www.daml.org/2000/10/daml-ont>;
+         daml:versionInfo "$Id: daml-ex.n3,v 1.5 2001/05/21 03:11:59 timbl Exp $" .
+    
+ #ENDS

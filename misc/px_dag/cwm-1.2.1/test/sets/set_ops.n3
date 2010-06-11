@@ -1,0 +1,32 @@
+@prefix set: <http://www.w3.org/2000/10/swap/set#> .
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+
+{$ :a, :b $} a :Set .
+{$ 1, 2 $} a :Set .
+{$ :a, 1 $} a :Set .
+
+{ ?x a :Set . 
+  ?y a :Set .
+  ?x log:notEqualTo ?y .
+  (?x ?y) set:union ?z .
+} => {?z a :Union; :unionOf (?x ?y)} .
+
+{ ?x a :Set .
+  ?y a :Set . 
+  ?x log:notEqualTo ?y .
+  (?x ?y) set:symmetricDifference ?z .
+} => {?z a :SymmetricDifference; :symmetricDifferenceOf (?x ?y)} .
+
+{ ?x a :Set . 
+  ?y a :Set .
+  ?x log:notEqualTo ?y .
+  (?x ?y) set:difference ?z .
+} => {?z a :Difference; :differenceOf (?x ?y)} .
+
+
+{ ?x a :Set . 
+  ?y a :Set .
+  ?x log:notEqualTo ?y .
+  (?x ?y) set:intersection ?z .
+} => {?z a :intersection; :intersectionOf (?x ?y)} .
+

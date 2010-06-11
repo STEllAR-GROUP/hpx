@@ -1,0 +1,38 @@
+@prefix math: <http://www.w3.org/2000/10/swap/math#> .
+@prefix k: <http://opencyc.sourceforge.net/daml/cyc.daml#>.
+@prefix m: <http://www.w3.org/2000/10/swap/pim/currency@@#>.
+@prefix qif: <http://www.w3.org/2000/10/swap/pim/qif#> .
+@prefix xsdt: <http://www.w3.org/2001/XMLSchema#>.
+@prefix time: <http://www.w3.org/2000/10/swap/time#> .
+
+@prefix : <#>.
+
+
+:exch1     k:startingDate  [
+                 xsdt:date  "2004-08-08" ];
+             m:buyCurrency m:USD;
+             m:sellCurrency m:CAD.
+
+{ ?X is math:quotient of ("2.3" "1.2") } => { :exch1 m:rate ?X }.
+
+:priceCAD m:priceCurrency m:CAD.
+qif:amount m:priceCurrency m:USD.
+
+
+:trx :priceCAD "12.43";
+             k:startingDate  [
+                 xsdt:date  "2004-08-12" ] .
+
+
+{
+  ?P m:priceCurrency ?FOREIGN.
+  qif:amount m:priceCurrency ?NATIVE.
+  ?EXCH m:sellCurrency ?FOREIGN; m:buyCurrency ?NATIVE; m:rate ?RATE;
+     k:startingDate [ xsdt:date [ time:year ?Y; time:month ?M ]].
+
+  ?TRX ?P ?QTY;
+     k:startingDate [ xsdt:date [ time:year ?Y; time:month ?M ]].
+
+  (?QTY ?RATE) math:quotient ?Q2.
+} => { ?TRX qif:amount ?Q2 }.
+

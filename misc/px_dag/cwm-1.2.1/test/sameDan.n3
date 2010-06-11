@@ -1,0 +1,32 @@
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>.
+@prefix rcs: <http://www.w3.org/2001/03swell/rcs#>.
+
+<> dc:description """rules for determining when two terms denote
+the same thing.""";
+  rcs:id "$Id: sameDan.n3,v 1.3 2004/06/25 01:26:59 timbl Exp $";
+  dc:creator [ 
+	contact:fullName "Dan Connolly";
+	contact:homePage <http://www.w3.org/People/Connolly/>;
+	contact:mailbox <mailto:connolly@w3.org>
+	];
+  dc:relation <forgetDups.n3>; #@@ or is dc:relation a class of properties?
+				# should I be using rdfs:seeAlso?
+  dc:rights "copyright (c) 2001 W3C (MIT, Keio, INRIA)".
+
+
+@prefix ont:  <http://www.daml.org/2001/03/daml+oil#> .
+@prefix : <#>.
+
+contact:mailbox a ont:UnambiguousProperty.
+contact:homePageAddress a ont:UnambiguousProperty.
+
+[ contact:mailbox <mailto:connolly@w3.org> ] :hairColor :red.
+[ contact:mailbox <mailto:connolly@w3.org> ] :birthPlace :KC.
+
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+
+@forAll :x.
+
+{ :x :hairColor :red; :birthPlace :KC }
+  log:implies { :test1 a :Success }.

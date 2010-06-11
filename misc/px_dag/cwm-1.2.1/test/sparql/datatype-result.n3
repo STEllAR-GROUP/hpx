@@ -1,0 +1,6 @@
+     @prefix : <http://www.w3.org/2000/10/swap/sparqlCwm#> .
+    {
+        <aaaB>     :bound "s" .
+        
+        }     a :Result .
+    

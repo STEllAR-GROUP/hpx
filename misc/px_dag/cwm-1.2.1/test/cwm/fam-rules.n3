@@ -1,0 +1,9 @@
+@prefix : <fam.n3#>.
+@keywords is, of, a.
+
+{ ?x begat ?y } => { ?y ancestor ?x }.
+
+{ ?x ancestor ?y. ?y ancestor ?z } => { ?x ancestor ?z }.
+
+#ends
+ 

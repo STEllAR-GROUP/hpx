@@ -1,0 +1,51 @@
+# Test the log:includes function
+
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix s: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix daml:  <http://www.daml.org/2000/10/daml-ont#> .
+@prefix dpo:  <http://www.daml.org/2001/03/daml+oil#> .
+@prefix ex:   <http://www.daml.org/2000/10/daml-ex#> .
+@prefix log:  <http://www.w3.org/2000/10/swap/log#> .
+
+@prefix foo: <foo.n3#>.  # Local stuff
+@prefix : <foo.n3#>.  # Local stuff
+
+@prefix local: <t10.n3#>.
+
+# Usage:   cwm t10.n3 -think
+#
+# See also t10a.n3  foo.n3
+#
+# Output should conclude all test* a :success and no failures.
+#
+
+
+@forAll :d, :x, :y, :F, :G.
+
+{ <t10a.n3> log:semantics :F.
+  :F log:includes { :theSky :is :blue}   } log:implies { :test10a a :success } .
+ 
+{ <t10a.n3> log:semantics :F.
+  :F log:includes { :theSky :is :green}   } log:implies { :test10-bis a :FAILURE } .
+ 
+{ <t10a.n3> log:semantics :F.
+  :F log:includes { :theSky :is :x}   } log:implies { :fred local:favoriteColor :x  } .
+
+{ :fred local:favoriteColor :blue } log:implies { :test10b a :success}.
+ 
+#-----------------------------------
+#
+#  This illustrates the inabilaty of cwm to do backward chaining
+#
+#
+#{ :d log:semantics :F .
+#  :F  log:includes :G } log:implies  {  :doc local:says :G }. 
+#
+#{ <t10a.n3> local:says { :theSky :is :blue } } log:implies {:test_SURPRISE a :success}.
+
+
+# Not to mention:
+# { :d log:signedBy :k. :d local:says :F } log:means { :k log:guarantees :F }.
+
+
+#ends

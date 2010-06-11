@@ -1,0 +1,42 @@
+#    Test filter in N3
+#
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix daml: <http://www.daml.org/2001/03/daml+oil#> .
+@prefix : <#> .
+@prefix rules: <#> .
+
+# Full DanC challenge
+
+
+@forAll <#a>, <#b>, <#p> .
+
+{  <#p> a daml:TransitiveProperty . } :means
+{
+  { @forAll <#x> , <#y> , <#z>.
+    { <#x> <#p> <#y>. <#y> <#p> <#z>. } log:implies { <#x> <#p> <#z>. }
+  } a log:Truth.
+} .
+
+
+
+# Intoduce a symmetric implication for convienience
+{ <#a> :means <#b>. }  log:implies {	<#a> log:implies <#b> .
+					<#b> log:implies <#a> . } .
+  
+{   <#a> log:implies <#b> .
+    <#b> log:implies <#a> . }  log:implies  { <#a> :means <#b>. }  . 
+
+# and in fact, though it is not axiomatic...
+#
+#{ <#x> :means <#y>. }  :means {	<#x> log:implies <#y> .
+#					<#y> log:implies <#x> . } . 
+#
+
+
+<#ancestor>  a daml:TransitiveProperty .
+
+# (Was the wrong way around for a long time, just confused people.)
+<#pa> <#ancestor> <#granpa> .
+<#bill> <#ancestor> <#pa> .
+
+#ends

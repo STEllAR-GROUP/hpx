@@ -1,0 +1,7 @@
+     @prefix : <http://www.w3.org/2000/10/swap/sparqlCwm#> .
+    {
+        "SPARQL Tutorial"     :bound "title" .
+        42     :bound "price" .
+        
+        }     a :Result .
+    

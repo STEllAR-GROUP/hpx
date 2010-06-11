@@ -1,0 +1,13 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+@keywords a, true .
+
+#true isNot false .
+
+:true a  JustASymbol.
+true  a  TrueBoolean2.
+
+@false a :FalseBoolean2 . 
+
+"1"^^xsd:boolean a TrueBoolean .
+"0"^^xsd:boolean a FalseBoolean .

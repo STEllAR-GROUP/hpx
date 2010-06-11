@@ -1,0 +1,10 @@
+     @prefix : <#> .
+    
+    :test1     a :Success .
+    
+    :test2     a :Success .
+    
+    :test3     a :Success .
+    
+    :test4     a :Success .
+    

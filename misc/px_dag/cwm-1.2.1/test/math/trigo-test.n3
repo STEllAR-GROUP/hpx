@@ -1,0 +1,52 @@
+# Author: karl
+#  $Id: trigo-test.n3,v 1.7 2004/06/24 20:22:51 syosi Exp $
+
+@prefix : <#> .
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix math: <http://www.w3.org/2000/10/swap/math#> .
+@prefix string: <http://www.w3.org/2000/10/swap/string#> .
+
+@keywords a, is, of.  #cwm post 2003/08
+ 
+# A math test to see if it works here:
+
+#{ ("3" "5") math:sum ?x } => { ?x :valueOf "3 + 5" } .
+
+# test sine, cosine, arcsine, arcosine
+
+
+0 a TestValue, NonPiTestValue.
+0.23 a TestValue, NonPiTestValue.
+-0.707 a TestValue, NonPiTestValue.
+1.23 a TestValue, NonPiTestValue.
+3.14159265358979323846 a TestValue.
+
+
+
+# test very simple
+{ 0 math:asin ?x } => { ?x :valueOf "asin(0) = 0" } .
+{ 1 math:acos ?x } => { ?x :valueOf "acos(1) = 0" } .
+
+{ ?x a NonPiTestValue; math:sin ?y} => {?x SIN ?y}.
+{ ?x a TestValue; is math:sin of ?y} => {?x ASIN ?y}.
+
+{ ?x a TestValue; math:cos ?y} => {?x COS ?y}.
+{ ?x a TestValue; is math:cos of ?y} => {?x ACOS ?y}.
+
+{ ?x a NonPiTestValue; math:tan ?y} => {?x TAN ?y}.
+{ ?x a TestValue; is math:tan of ?y} => {?x ATAN ?y}.
+
+{ ?x a TestValue; math:sinh ?y} => {?x SINH ?y}.
+{ ?x a TestValue; is math:sinh of ?y} => {?x ASINH ?y}.
+
+{ ?x a TestValue; math:cosh ?y} => {?x COSH ?y}.
+{ ?x a TestValue; is math:cosh of ?y} => {?x ACOSH ?y}.
+
+{ ?x a TestValue; math:tanh ?y} => {?x TANH ?y}.
+{ ?x a TestValue; is math:tanh of ?y} => {?x ATANH ?y}.
+
+
+#{ 0 math:acos ?x } => { ?x :valueOf "acos(0) = 1.57079632679" } .
+#{ 1 math:asin ?x } => { ?x :valueOf "asin(1) = 1.57079632679" } .
+#{ 3.14159265358979323846  math:cos ?x } => { ?x :valueOf "cos(Pi) = -1" } .
+

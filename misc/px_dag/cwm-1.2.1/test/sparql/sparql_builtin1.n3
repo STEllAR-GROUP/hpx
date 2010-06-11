@@ -1,0 +1,4 @@
+@prefix sparql: <http://www.w3.org/2000/10/swap/sparqlCwm#> .
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+
+{(<data.n3>!log:semantics <example.rq>!sparql:semantics) sparql:query ?x} => {"1" log:outputString ?x} .

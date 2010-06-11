@@ -1,0 +1,8 @@
+# Used in regression.n3#t1063
+#
+# An extremely basic RDF/XML serialization test.
+#
+# Issue originally raised in the following bug:
+# http://lists.w3.org/Archives/Public/public-cwm-bugs/2005Jan/0004
+
+<#s> <#p> 3.

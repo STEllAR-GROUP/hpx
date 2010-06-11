@@ -1,0 +1,101 @@
+#
+# Context-free grammar (CFG) vocabulary
+#
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix cfg: <http://www.w3.org/2000/10/swap/grammar/bnf#>.
+@prefix : <http://www.w3.org/2000/10/swap/grammar/n3#>.
+@prefix n3: <http://www.w3.org/2000/10/swap/grammar/n3#>.
+@prefix list: <http://www.w3.org/2000/10/swap/list#>.
+@prefix doc: <http://www.w3.org/2000/10/swap/pim/doc#>.
+@prefix dc: <http://purl.org/dc/elements/1.1/>.
+
+@keywords a, is, of.
+
+<http://www.w3.org/2000/10/swap/grammar/bnf> doc:rules <bnf-rules>;
+    dc:creator <http://www.w3.org/People/Berners-Lee/card#i>;
+    rdfs:comment """
+    This ontology contains terms for defining a context-free grammar.
+    The basic property is mustBeOneSequence which is equivalent to
+    the expression of a production in the original simple BNF.
+    Rules can be used to convert into and out of shorthand forms such
+    as optional, repeating and token-separated list forms.
+    Terminals are described either as a string, which is represented by itself,
+    or are defined by a regular expression using cfg:matches. 
+    """.
+
+#cfg:canBeSequence a rdf:Property;
+#	rdfs:domain cfg:Term; rdfs:range cfg:SequenceOfProductions;
+#	rdfs:comment
+#"""If you use cfg:canBeSequence to define a BNF vocabulary, then the reader
+#has to assume that all possible productions are in the BNF file (or, generally,
+#in the N3 formula) you are dealing with.
+#Other possible vocabularies would explicitly list the "canBeSequence as a set of
+#cfg:mustBeOneSequence"
+#""".
+#
+#cfg:canBe rdfs:domain cfg:Term; rdfs:range cfg:Production.
+
+cfg:mustBeOneSequence a rdf:Property;
+	rdfs:label "productions";
+	rdfs:domain cfg:Production; rdfs:range cfg:ListOfSequencesOfProductions;
+	rdfs:comment
+
+"""This is the core property you need to define a BNF production.
+It defines the list of the only sequences to which a given 
+term may expand.  Each sequence is just a list of other productions in order.
+""".
+
+cfg:Token rdfs:subClassOf cfg:Production;
+	rdfs:label "token";
+	rdfs:comment """A terminal, aka atomic, production,
+	defined as string or regexp""".
+
+cfg:matches	 a rdf:Property;
+		rdfs:label "matches";
+		rdfs:domain cfg:Token;
+		rdfs:range  cfg:RegularExpression;
+		rdfs:comment """The given token is defined by the
+		regular expression which a token must match""".
+
+cfg:canStartWith  a rdf:Property;
+		rdfs:domain cfg:Production;
+		rdfs:label "can start with";
+		rdfs:comment """The production can only start with the given
+		representative character. In the case that a token starts
+		with always the same character, that is the one given.
+		In th eevent that it can start with alpha character, 'a'
+		is given; if it can start with a numeric, '0' is given
+		as the value for this predicate.  This predicate is used
+		only when a predictive parser is possible and desired.""";
+		rdfs:range cfg:String.
+
+# Sugar
+
+cfg:zeroOrMore 
+	rdfs:label "zero or more";
+	rdfs:domain cfg:Term; rdfs:range cfg:Production.
+
+
+cfg:commaSeparatedPeriodTerminatedListOf
+	rdfs:label "comma-separated period-terminated list of";
+	rdfs:domain cfg:Production;
+	rdfs:range cfg:Production.
+
+cfg:mustBe    
+	rdfs:domain cfg:Production;
+	rdfs:range cfg:Production.
+	
+# Meta
+
+cfg:syntaxFor a rdf:Property;
+    rdfs:domain	cfg:Production;
+    rdfs:label "language";
+    rdfs:range	cfg:Language.
+    
+cfg:internetMediaType a rdf:Property;
+    rdf:domain cfg:Language;
+    rdfs:label "internet media type".
+
+#ends

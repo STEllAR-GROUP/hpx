@@ -1,0 +1,148 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module pretty</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>pretty</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/syosi/cvs-trunk/WWW/2000/10/swap/pretty.py">/home/syosi/cvs-trunk/WWW/2000/10/swap/pretty.py</a></font></td></tr></table>
+    <p><tt>$Id: pretty.html,v 1.18 2007/11/18 02:01:56 syosi Exp $<br>
+&nbsp;<br>
+Printing&nbsp;of&nbsp;N3&nbsp;and&nbsp;RDF&nbsp;formulae<br>
+&nbsp;<br>
+20003-8-20&nbsp;split&nbsp;offf&nbsp;from&nbsp;llyn.py<br>
+&nbsp;<br>
+This&nbsp;is&nbsp;or&nbsp;was&nbsp;<a href="http://www.w3.org/2000/10/swap/pretty.py">http://www.w3.org/2000/10/swap/pretty.py</a></tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#fffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="diag.html">diag</a><br>
+</td><td width="25%" valign=top><a href="string.html">string</a><br>
+</td><td width="25%" valign=top><a href="types.html">types</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="exceptions.html#Exception">exceptions.Exception</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="pretty.html#TooMuchRecursion">TooMuchRecursion</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="pretty.html#Serializer">Serializer</a>
+</font></dt></dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Serializer">class <strong>Serializer</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;serializer&nbsp;to&nbsp;serialize&nbsp;the&nbsp;formula&nbsp;F&nbsp;into&nbsp;the&nbsp;given<br>
+abstract&nbsp;syntax&nbsp;sink<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Serializer-__init__"><strong>__init__</strong></a>(self, F, sink, flags<font color="#909090">=''</font>, sorting<font color="#909090">=0</font>)</dt></dl>
+
+<dl><dt><a name="Serializer-dumpBySubject"><strong>dumpBySubject</strong></a>(self, sorting<font color="#909090">=1</font>)</dt><dd><tt>Dump&nbsp;one&nbsp;formula&nbsp;only&nbsp;by&nbsp;order&nbsp;of&nbsp;subject&nbsp;except<br>
+forSome's&nbsp;first&nbsp;for&nbsp;n3=a&nbsp;mode</tt></dd></dl>
+
+<dl><dt><a name="Serializer-dumpChronological"><strong>dumpChronological</strong></a>(self)</dt><dd><tt>Fast&nbsp;as&nbsp;possible.&nbsp;Only&nbsp;dumps&nbsp;data.&nbsp;No&nbsp;formulae&nbsp;or&nbsp;universals.</tt></dd></dl>
+
+<dl><dt><a name="Serializer-dumpFormulaContents"><strong>dumpFormulaContents</strong></a>(self, context, sink, sorting, equals<font color="#909090">=0</font>)</dt><dd><tt>Iterates&nbsp;over&nbsp;statements&nbsp;in&nbsp;formula,&nbsp;bunching&nbsp;them&nbsp;up&nbsp;into&nbsp;a&nbsp;set<br>
+for&nbsp;each&nbsp;subject.</tt></dd></dl>
+
+<dl><dt><a name="Serializer-dumpLists"><strong>dumpLists</strong></a>(self)</dt><dd><tt>Dump&nbsp;lists&nbsp;out&nbsp;as&nbsp;first&nbsp;and&nbsp;rest.&nbsp;Not&nbsp;used&nbsp;in&nbsp;pretty.</tt></dd></dl>
+
+<dl><dt><a name="Serializer-dumpNested"><strong>dumpNested</strong></a>(self)</dt><dd><tt>Iterates&nbsp;over&nbsp;all&nbsp;URIs&nbsp;ever&nbsp;seen&nbsp;looking&nbsp;for&nbsp;statements</tt></dd></dl>
+
+<dl><dt><a name="Serializer-dumpPrefixes"><strong>dumpPrefixes</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Serializer-dumpStatement"><strong>dumpStatement</strong></a>(self, sink, triple, sorting)</dt><dd><tt>Dump&nbsp;one&nbsp;statement,&nbsp;including&nbsp;structure&nbsp;within&nbsp;object</tt></dd></dl>
+
+<dl><dt><a name="Serializer-dumpVariables"><strong>dumpVariables</strong></a>(self, context, sink, sorting<font color="#909090">=1</font>, pretty<font color="#909090">=0</font>, dataOnly<font color="#909090">=0</font>)</dt><dd><tt>Dump&nbsp;the&nbsp;forAlls&nbsp;and&nbsp;the&nbsp;forSomes&nbsp;at&nbsp;the&nbsp;top&nbsp;of&nbsp;a&nbsp;formula</tt></dd></dl>
+
+<dl><dt><a name="Serializer-selectDefaultPrefix"><strong>selectDefaultPrefix</strong></a>(self, printFunction)</dt><dd><tt>Symbol&nbsp;whose&nbsp;fragments&nbsp;have&nbsp;the&nbsp;most&nbsp;occurrences.<br>
+we&nbsp;suppress&nbsp;the&nbsp;RDF&nbsp;namespace&nbsp;itself&nbsp;because&nbsp;the&nbsp;XML&nbsp;syntax<br>
+has&nbsp;problems&nbsp;with&nbsp;it&nbsp;being&nbsp;default&nbsp;as&nbsp;it&nbsp;is&nbsp;used&nbsp;for&nbsp;attributes.<br>
+&nbsp;<br>
+This&nbsp;also&nbsp;outputs&nbsp;the&nbsp;prefixes.</tt></dd></dl>
+
+<dl><dt><a name="Serializer-tmDumpNested"><strong>tmDumpNested</strong></a>(self)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="TooMuchRecursion">class <strong>TooMuchRecursion</strong></a>(<a href="exceptions.html#Exception">exceptions.Exception</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><a name="TooMuchRecursion-__getitem__"><strong>__getitem__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="TooMuchRecursion-__init__"><strong>__init__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="TooMuchRecursion-__str__"><strong>__str__</strong></a>(...)</dt></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-auPair"><strong>auPair</strong></a>(x)</dt><dd><tt>Encode&nbsp;as&nbsp;object-free&nbsp;form&nbsp;for&nbsp;unparser&nbsp;interface</tt></dd></dl>
+ <dl><dt><a name="-auxPairs"><strong>auxPairs</strong></a>(t)</dt></dl>
+ <dl><dt><a name="-canItbeABNode"><strong>canItbeABNode</strong></a>(formula, symbol)</dt></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>ALL4</strong> = (0, 1, 2, 3)<br>
+<strong>ANONYMOUS</strong> = 3<br>
+<strong>BNodePossibles</strong> = None<br>
+<strong>CONTEXT</strong> = 0<br>
+<strong>DAML_sameAs_URI</strong> = 'http://www.w3.org/2002/07/owl#sameAs'<br>
+<strong>FLOAT_DATATYPE</strong> = 'http://www.w3.org/2001/XMLSchema#double'<br>
+<strong>INTEGER_DATATYPE</strong> = 'http://www.w3.org/2001/XMLSchema#integer'<br>
+<strong>LITERAL</strong> = 2<br>
+<strong>LITERAL_DT</strong> = 21<br>
+<strong>LITERAL_LANG</strong> = 22<br>
+<strong>List_NS</strong> = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'<br>
+<strong>Logic_NS</strong> = 'http://www.w3.org/2000/10/swap/log#'<br>
+<strong>META_NS_URI</strong> = 'http://www.w3.org/2000/10/swap/meta#'<br>
+<strong>N3_Empty</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Empty')<br>
+<strong>N3_List</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#List')<br>
+<strong>N3_first</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#first')<br>
+<strong>N3_nil</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#nil')<br>
+<strong>N3_rest</strong> = (0, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#rest')<br>
+<strong>OBJ</strong> = 3<br>
+<strong>OWL_NS</strong> = 'http://www.w3.org/2002/07/owl#'<br>
+<strong>PARTS</strong> = (1, 2, 3)<br>
+<strong>PRED</strong> = 1<br>
+<strong>RDF_NS_URI</strong> = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'<br>
+<strong>RDF_type_URI</strong> = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'<br>
+<strong>STRING_NS_URI</strong> = 'http://www.w3.org/2000/10/swap/string#'<br>
+<strong>SUBJ</strong> = 2<br>
+<strong>SYMBOL</strong> = 0<br>
+<strong>XMLLITERAL</strong> = 25<br>
+<strong>cvsRevision</strong> = '$Revision: 1.18 $'<br>
+<strong>forAllSym</strong> = 'http://www.w3.org/2000/10/swap/log#forAll'<br>
+<strong>forSomeSym</strong> = 'http://www.w3.org/2000/10/swap/log#forSome'<br>
+<strong>prefixchars</strong> = 'abcdefghijklmnopqustuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'<br>
+<strong>tracking</strong> = 0</td></tr></table>
+</body></html>

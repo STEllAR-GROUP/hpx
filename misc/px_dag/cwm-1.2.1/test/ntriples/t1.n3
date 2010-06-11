@@ -1,0 +1,8 @@
+# See http://lists.w3.org/Archives/Public/www-archive/2001Oct/0022.html
+#
+@prefix : <http://infomesh.net/2001/10/test-uri/#> .
+
+:a :b """Some data on
+two lines""" .
+
+#ends

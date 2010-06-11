@@ -1,0 +1,8 @@
+     @prefix : <#> .
+    
+    <http://example.com/a>     :b <http://example.com/foo/bar#baz> .
+    
+    <http://example.com/path/DFFERENT/a2>     :b2 <http://example.com/path/DFFERENT/foo/bar#baz2> .
+    
+    <http://example.com/path/DFFERENT/d3>     <http://example.com/path/DFFERENT/#b3> <http://example.com/path/DFFERENT/e3> .
+    

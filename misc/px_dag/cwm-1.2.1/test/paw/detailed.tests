@@ -1,0 +1,26 @@
+# List of regression tests for $SWAP/test/reason
+
+@prefix : <#>.
+@prefix x: <#>.
+@prefix test: <http://www.w3.org/2000/10/swap/test.n3#>.
+@prefix dc:  <http://purl.org/dc/elements/1.1/>. # yuk - under protest - no hash
+
+
+# Tests for PAW -- see also the -p option of retest.py
+
+
+
+
+:t01check a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/paw-t01check.n3>;
+    test:description   "main paw example";
+    test:arguments     """--closure=e --rdf http://dig.csail.mit.edu/2005/09/rein/examples/judy-req.rdf --n3 http://dig.csail.mit.edu/2005/09/rein/engine.n3 --think --filter="http://dig.csail.mit.edu/2005/09/rein/filter.n3" --why | python ../check.py""".
+
+
+
+:t02check a test:CwmTest;
+    test:workingDirectory  <../>;
+    test:referenceOutput <../ref/paw-t02check.n3>;
+    test:description   "main paw lean example";
+    test:arguments     """--closure=e --n3=Bir paw/alice-req2.n3 http://dig.csail.mit.edu/2006/06/rein/src/lean-engine.n3 --think --filter="http://dig.csail.mit.edu/2006/06/rein/src/lean-filter.n3" --why | python ../check.py """.

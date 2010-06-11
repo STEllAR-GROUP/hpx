@@ -1,0 +1,20 @@
+PREFIX : <http://www.commonobjects.example.org/gmlrss>
+PREFIX gml: <http://www.opengis.net/gml>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX cc: <http://web.resource.org/cc/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX wikipedia: <http://en.wikipedia.org/wiki/>
+
+SELECT DISTINCT ?name ?desc ?featurepic ?maker ?makerpic ?license ?a ?b
+WHERE 
+{
+	[ :name ?name ;
+	  :description ?desc ;
+	  foaf:depiction ?featurepic ;
+ 	  foaf:isPrimaryTopicOf wikipedia:Clifton_Suspension_Bridge ;
+	  foaf:maker [ foaf:name ?maker; foaf:depiction ?makerpic ] ;
+          :centerLine [ rdf:first [ gml:pos ?a ]; rdf:rest [ rdf:first [ gml:pos ?b]]] #.
+        ] .
+	?featurepic cc:license ?license ;
+}
+ 

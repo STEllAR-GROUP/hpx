@@ -1,0 +1,8 @@
+     @prefix : <#> .
+    
+         @forSome :_g0 .
+    
+    :anySubj     :_g0 :anyObj .
+    
+    :_g0     :propProp "red" .
+    

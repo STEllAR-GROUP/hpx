@@ -1,0 +1,16 @@
+
+
+
+<rdf:RDF xmlns="http://example.org/stuff/1.0/"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:ex="http://example.org/stuff/1.0/"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+
+    <rdf:Description rdf:about="http://www.w3.org/TR/rdf-syntax-grammar">
+        <editor rdf:parseType="Resource">
+            <fullName>Dave Beckett</fullName>
+            <homePage rdf:resource="http://purl.org/net/dajobe/"/>
+        </editor>
+        <dc:title>RDF/XML Syntax Specification (Revised)</dc:title>
+    </rdf:Description>
+</rdf:RDF>

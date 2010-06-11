@@ -1,0 +1,22 @@
+# List of regression tests
+#
+#      N3QL tests: details
+#
+# Note: Command lines must be for running in the directory above.
+#
+@prefix : <#>.
+@prefix x: <#>.
+@prefix test: <http://www.w3.org/2000/10/swap/test.n3#>.
+
+
+:QL_00 a test:CwmTest;
+    test:referenceOutput <t00-ref.n3>;
+    test:description   "Basic query";
+    test:arguments     "ql/kb1.n3 --query=ql/t00.n3".
+
+:QL_01 a test:CwmTest;
+    test:referenceOutput <t01-ref.n3>;
+    test:description   "Basic query plus an arithmetic constraint";
+    test:arguments     "ql/kb1.n3 --query=ql/t01.n3".
+
+#ends

@@ -1,0 +1,25 @@
+     @prefix : <#> .
+     @prefix daml: <http://www.daml.org/2001/03/daml+oil#> .
+     @prefix log: <http://www.w3.org/2000/10/swap/log#> .
+    
+         @forAll :p .
+    
+    :ancestor     <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> daml:TransitiveProperty .
+    
+    :granpa     :ancestor :pa .
+    
+    :pa     :ancestor :bill .
+    {
+        :p     <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> daml:TransitiveProperty .
+        
+        }     log:implies {     @forAll :x,
+                    :y,
+                    :z .
+        {
+            :x     :p :y .
+            :y     :p :z .
+            
+            }     log:implies {:x     :p :z .
+            } .
+        } .
+    

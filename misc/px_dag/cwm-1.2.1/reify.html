@@ -1,0 +1,79 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module reify</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>reify</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/syosi/cvs-trunk/WWW/2000/10/swap/reify.py">/home/syosi/cvs-trunk/WWW/2000/10/swap/reify.py</a></font></td></tr></table>
+    <p><tt>Functions&nbsp;to&nbsp;reify&nbsp;and&nbsp;dereify&nbsp;a&nbsp;graph.<br>
+These&nbsp;functions&nbsp;should&nbsp;be&nbsp;perfect&nbsp;inverses&nbsp;of&nbsp;each&nbsp;other.<br>
+&nbsp;<br>
+The&nbsp;strategy&nbsp;used&nbsp;is&nbsp;different&nbsp;from&nbsp;that&nbsp;of&nbsp;the&nbsp;reifier<br>
+in&nbsp;notation3.py,&nbsp;that&nbsp;tries&nbsp;to&nbsp;reify&nbsp;what&nbsp;it&nbsp;outputs.<br>
+This&nbsp;simply&nbsp;puts&nbsp;the&nbsp;reification&nbsp;into&nbsp;the&nbsp;sink&nbsp;given,<br>
+or&nbsp;a&nbsp;new&nbsp;one,&nbsp;depending&nbsp;on&nbsp;the&nbsp;function&nbsp;called.<br>
+$Id:&nbsp;reify.py,v&nbsp;1.19&nbsp;2007/12/11&nbsp;21:18:08&nbsp;syosi&nbsp;Exp&nbsp;$</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#fffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="diag.html">diag</a><br>
+</td><td width="25%" valign=top><a href="uripath.html">uripath</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-dereification"><strong>dereification</strong></a>(x, f, sink, bnodes<font color="#909090">={}</font>, xList<font color="#909090">=[]</font>)</dt></dl>
+ <dl><dt><a name="-dereify"><strong>dereify</strong></a>(formula, sink<font color="#909090">=None</font>, xList<font color="#909090">=[]</font>)</dt><dd><tt>####&nbsp;Alternative&nbsp;method<br>
+#&nbsp;Shortcuts&nbsp;are&nbsp;too&nbsp;messy&nbsp;and&nbsp;don't&nbsp;work&nbsp;with&nbsp;lists</tt></dd></dl>
+ <dl><dt><a name="-flatten"><strong>flatten</strong></a>(formula)</dt><dd><tt>Flatten&nbsp;a&nbsp;formula<br>
+&nbsp;<br>
+This&nbsp;will&nbsp;minimally&nbsp;change&nbsp;a&nbsp;formula&nbsp;to&nbsp;make&nbsp;it&nbsp;valid&nbsp;RDF<br>
+flattening&nbsp;a&nbsp;flattened&nbsp;formula&nbsp;should&nbsp;thus&nbsp;be&nbsp;the&nbsp;unity</tt></dd></dl>
+ <dl><dt><a name="-reify"><strong>reify</strong></a>(formula)</dt><dd><tt>Reify&nbsp;a&nbsp;formula<br>
+&nbsp;<br>
+Returns&nbsp;an&nbsp;RDF&nbsp;formula&nbsp;with&nbsp;the&nbsp;same&nbsp;semantics<br>
+as&nbsp;the&nbsp;given&nbsp;formula</tt></dd></dl>
+ <dl><dt><a name="-unflatten"><strong>unflatten</strong></a>(formula, sink<font color="#909090">=None</font>)</dt><dd><tt>Undo&nbsp;the&nbsp;effects&nbsp;of&nbsp;the&nbsp;flatten&nbsp;function.<br>
+&nbsp;<br>
+Note&nbsp;that&nbsp;this&nbsp;still&nbsp;requires&nbsp;helper&nbsp;methods&nbsp;scattered&nbsp;throughout&nbsp;the<br>
+Term&nbsp;heriarchy.&nbsp;<br>
+&nbsp;<br>
+Our&nbsp;life&nbsp;is&nbsp;made&nbsp;much&nbsp;more&nbsp;difficult&nbsp;by&nbsp;the&nbsp;necessity&nbsp;of&nbsp;removing&nbsp;all<br>
+triples&nbsp;that&nbsp;have&nbsp;been&nbsp;dereified&nbsp;---&nbsp;this&nbsp;required&nbsp;a&nbsp;modification&nbsp;to&nbsp;<a href="#-dereification">dereification</a>()</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>ALL4</strong> = (0, 1, 2, 3)<br>
+<strong>CONTEXT</strong> = 0<br>
+<strong>Mixin</strong> = &lt;mixin.mixinClass object&gt;<br>
+<strong>OBJ</strong> = 3<br>
+<strong>PARTS</strong> = (1, 2, 3)<br>
+<strong>PRED</strong> = 1<br>
+<strong>RDF_type_URI</strong> = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'<br>
+<strong>REIFY_NS</strong> = 'http://www.w3.org/2004/06/rei#'<br>
+<strong>SUBJ</strong> = 2<br>
+<strong>owlOneOf</strong> = 'http://www.w3.org/2002/07/owl#oneOf'<br>
+<strong>rAnonymousNode</strong> = &lt;mixin.mixinClass object&gt;<br>
+<strong>rFormula</strong> = &lt;mixin.mixinClass object&gt;<br>
+<strong>rLabelledNode</strong> = &lt;mixin.mixinClass object&gt;<br>
+<strong>rList</strong> = &lt;mixin.mixinClass object&gt;<br>
+<strong>rLiteral</strong> = &lt;mixin.mixinClass object&gt;<br>
+<strong>rN3Set</strong> = &lt;mixin.mixinClass object&gt;<br>
+<strong>rTerm</strong> = &lt;mixin.mixinClass object&gt;<br>
+<strong>reifyNS</strong> = 'http://www.w3.org/2004/06/rei#'</td></tr></table>
+</body></html>

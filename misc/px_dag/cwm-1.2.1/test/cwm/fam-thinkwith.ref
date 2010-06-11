@@ -1,0 +1,45 @@
+     @prefix : <#> .
+    
+    :albert     :begat :bevan,
+                :bill .
+    
+    :bertha     :begat :carol,
+                :charlie .
+    
+    :bevan     :ancestor :albert;
+         :begat :chaude,
+                :christine .
+    
+    :bill     :ancestor :albert;
+         :begat :carol,
+                :charlie .
+    
+    :carol     :ancestor :albert,
+                :bertha,
+                :bill .
+    
+    :charlie     :ancestor :albert,
+                :bertha,
+                :bill .
+    
+    :chaude     :ancestor :albert,
+                :bevan .
+    
+    :christine     :ancestor :albert,
+                :bevan;
+         :begat :david,
+                :diana,
+                :douglas .
+    
+    :david     :ancestor :albert,
+                :bevan,
+                :christine .
+    
+    :diana     :ancestor :albert,
+                :bevan,
+                :christine .
+    
+    :douglas     :ancestor :albert,
+                :bevan,
+                :christine .
+    
