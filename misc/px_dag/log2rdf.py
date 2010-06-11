@@ -7,14 +7,15 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+import re
+import sys
+
 from hpx_log import HpxLog
 
 from optparse import OptionParser
 
+sys.path.append('./external')
 from pyrple import Graph
-
-import re
-import sys
 
 def search(event, template):
   match = template.re.search(event['msg'])
