@@ -128,16 +128,9 @@ int fib (int n, int orig_arg, int delay_coeff)
     
 
     int num_to_spawn = orig_arg / num_localities;
-    int extra = orig_arg % num_localities;
-    for (int j = 0; j < num_localities; j++)
-    {
-        for (int i = 0; i < num_to_spawn; i++)
+    for (int i = 0; i < num_to_spawn+1; i++)
+        for (int j = 0; j < num_localities; j++)
             distribution.push_back(j);
-        if (extra > 0) {
-                distribution.push_back(j);
-                extra--;
-            }
-    }
 
     fibonacci_future n1(world.locality(distribution[(orig_arg-n)+1]),  n - 1, orig_arg, delay_coeff);
     fibonacci_rhs_future n2(here,  n - 2, delay_coeff);
