@@ -39,15 +39,16 @@ def process_event(event, script_templates, model, show_english, show_missing):
   if not found and show_missing:
     sys.stderr.write("\tNo template for: %s\n" % (event['msg']))
 
-def run(options, log_filename):
+def run(options, log_filenames):
   filter = __import__(options.filter)
 
-  log = HpxLog(log_filename)
   model = Graph()
+  for log_filename in log_filenames:
+    log = HpxLog(log_filename)
 
-  for event in log.get_events():
-    process_event(event, filter.script_templates, model, 
-                  options.show_english, options.show_missing)
+    for event in log.get_events():
+      process_event(event, filter.script_templates, model, 
+                    options.show_english, options.show_missing)
 
   if options.query:
     sys.path.append('./queries')
@@ -70,7 +71,7 @@ def run(options, log_filename):
     out.write(model.serialize())
 
 def setup_options():
-  usage = "usage: %prog [options] logfile"
+  usage = "usage: %prog [options] logfile ..."
   parser = OptionParser(usage=usage)
   parser.add_option("-e", "--english", action="store_true",
                     dest="show_english", default=False,
@@ -95,9 +96,9 @@ if __name__=="__main__":
   parser = setup_options()
   (options, args) = parser.parse_args()
 
-  if (len(args) == 1):
-    log_filename = args[0]
-    run(options, log_filename)
+  if (len(args) > 0):
+    log_filenames = args
+    run(options, log_filenames)
   else:
     parser.print_help()
 
