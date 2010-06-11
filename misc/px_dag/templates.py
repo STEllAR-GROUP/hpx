@@ -130,6 +130,7 @@ class NumHpxThreads(Template):
     self.re = re.compile(regex)
   
   def fill(self, event, groups):
+    self.__locality = event['thread'][0]
     self.__id = groups[0]
     self.__num_hpx_threads = int(groups[1])
 
@@ -138,7 +139,7 @@ class NumHpxThreads(Template):
     return str
 
   def as_rdf(self):
-    hpx_thread = RUN.hpx_thread(self.__id)
+    hpx_thread = RUN.hpx_thread(self.__locality+'/'+ self.__id)
     id = Literal(self.__id)
     num_hpx_threads = Literal(str(self.__num_hpx_threads))
 
