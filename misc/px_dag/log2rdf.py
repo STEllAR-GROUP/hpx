@@ -49,6 +49,14 @@ def run(options, log_filename):
     process_event(event, filter.script_templates, model, 
                   options.show_english, options.show_missing)
 
+  if options.query:
+    sys.path.append('./queries')
+
+    query = __import__(options.query)
+    query_outfile = 'query.csv'
+
+    results = query.query(model, query_outfile)
+
   out = sys.stdout
   if options.outfile:
     out = open(options.outfile, 'w')
@@ -75,6 +83,8 @@ def setup_options():
                     help="Show unmatched log events (written to stderr)")
   parser.add_option("-o", "--outfile", dest="outfile",
                     help="write RDF output to FILE", metavar="FILE")
+  parser.add_option("-q", "--query", dest="query",
+                    help="run query on KB")
   parser.add_option("-x", "--filter", dest="filter",
                     default="filter",
                     help="set event filter")
