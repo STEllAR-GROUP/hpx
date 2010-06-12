@@ -79,6 +79,12 @@ _GNUPLOT_TERMINAL_POSTSCRIPT_DEFAULTS = {\
 'fontname' : '"Helvetica"',
 'fontsize' : ''}
 
+_GNUPLOT_BOXWIDTH = """\
+set boxwidth %(boxwidth)s\
+"""
+_GNUPLOT_BOXWIDTH_DEFAULTS = {\
+'boxwidth' : '0.25'}
+
 _GNUPLOT_KEY = """\
 set key %(on)s\
 """ 
@@ -113,6 +119,12 @@ _GNUPLOT_XRANGE = """\
 set xrange [%(range)s]\
 """
 _GNUPLOT_XRANGE_DEFAULTS = {\
+'range'    : ''}
+
+_GNUPLOT_YRANGE = """\
+set yrange [%(range)s]\
+"""
+_GNUPLOT_YRANGE_DEFAULTS = {\
 'range'    : ''}
 
 _GNUPLOT_XTICS = """\
@@ -358,12 +370,14 @@ class Gnuplot(Plot):
       Plot.__init__(self, name)
       self.gnuplotPath = gnuplotPath
       self.termPostscript()
+      self.boxwidth()
       self.key()
       self.title(titleText = name)
       self.cXlabel = ""
       self.cYlabel = ""
       self.cZlabel = ""
       self.cXrange = ""
+      self.cYrange = ""
       self.cPlot = ""
       self.cXtics = ""
       self.cYtics = ""
@@ -389,6 +403,9 @@ class Gnuplot(Plot):
       self.cTerm = self._getString(_GNUPLOT_TERMINAL_POSTSCRIPT,
                                    _GNUPLOT_TERMINAL_POSTSCRIPT_DEFAULTS,
                                    params)
+   def boxwidth(self, **params):
+      self.cBoxwidth = self._getString(_GNUPLOT_BOXWIDTH,
+                                       _GNUPLOT_BOXWIDTH_DEFAULTS, params)
    def key(self, **params):
       self.cKey = self._getString(_GNUPLOT_KEY, _GNUPLOT_KEY_DEFAULTS, params)
 
@@ -414,6 +431,11 @@ class Gnuplot(Plot):
    def xrange(self, **params):
       self.cXrange = self._getString(_GNUPLOT_XRANGE,
                                      _GNUPLOT_XRANGE_DEFAULTS,
+                                     params)
+
+   def yrange(self, **params):
+      self.cYrange = self._getString(_GNUPLOT_YRANGE,
+                                     _GNUPLOT_YRANGE_DEFAULTS,
                                      params)
 
    def _tics(self, ticDict, index):
@@ -528,10 +550,11 @@ class Gnuplot(Plot):
       self.styleList.append(params)
 
    def __str__(self):
-      return self.cTerm + "\n" + self.cKey + "\n" + self.cTitle + "\n" + \
+      return self.cTerm + "\n" + self.cBoxwidth + "\n" + self.cKey + "\n" + \
+             self.cTitle + "\n" + \
              self.cXtics + "\n" + self.cYtics + "\n" + \
              self.cXlabel + "\n" + self.cYlabel + "\n" + self.cZlabel + "\n"+ \
-             self.cXrange + "\n" + \
+             self.cXrange + "\n" + self.cYrange + "\n" + \
              self.cPlot
 
    def write(self, fileName = None):
