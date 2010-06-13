@@ -399,6 +399,12 @@ int interpolation(had_double_type dst_x,struct nodedata *dst,
 
 bool refinement(nodedata * vecval,int size, stencil_data* result,int compute_index,bool boundary, int *bbox,Par const& par)
 {
+  int j;
+  for (j=0;j<par.granularity;j++) {
+    if ( result->x_[j] < par.fmr_radius ) return true;
+  }
+  return false;
+
 #if 0
   had_double_type grad1,grad2,grad3,grad4;
   had_double_type dx = par.dx0/pow(2.0,(int) vecval[0]->level_);

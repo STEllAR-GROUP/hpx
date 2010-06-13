@@ -18,30 +18,30 @@
 #include "../functional_component.hpp"
 #include "../../parameter.hpp"
 
-#include "unigrid_mesh.hpp"
+#include "uni_amr.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::amr::server::unigrid_mesh had_unigrid_mesh_type;
+typedef hpx::components::amr::server::uni_amr had_uni_amr_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
-HPX_REGISTER_ACTION_EX(had_unigrid_mesh_type::init_execute_action, had_unigrid_mesh_init_execute_action);
-HPX_REGISTER_ACTION_EX(had_unigrid_mesh_type::execute_action, had_unigrid_mesh_execute_action);
+HPX_REGISTER_ACTION_EX(had_uni_amr_type::init_execute_action, had_uni_amr_init_execute_action);
+HPX_REGISTER_ACTION_EX(had_uni_amr_type::execute_action, had_uni_amr_execute_action);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<had_unigrid_mesh_type>, had_unigrid_mesh);
-HPX_DEFINE_GET_COMPONENT_TYPE(had_unigrid_mesh_type);
+    hpx::components::simple_component<had_uni_amr_type>, had_uni_amr);
+HPX_DEFINE_GET_COMPONENT_TYPE(had_uni_amr_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server 
 {
-    unigrid_mesh::unigrid_mesh()
+    uni_amr::uni_amr()
       : numvalues_(0)
     {}
 
     ///////////////////////////////////////////////////////////////////////////////
     // Initialize functional components by setting the logging component to use
-    void unigrid_mesh::init(distributed_iterator_range_type const& functions,
+    void uni_amr::init(distributed_iterator_range_type const& functions,
         distributed_iterator_range_type const& logging, std::size_t numsteps)
     {
         components::distributing_factory::iterator_type function = functions.first;
@@ -60,7 +60,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     ///////////////////////////////////////////////////////////////////////////////
     // Create functional components, one for each data point, use those to 
     // initialize the stencil value instances
-    void unigrid_mesh::init_stencils(distributed_iterator_range_type const& stencils,
+    void uni_amr::init_stencils(distributed_iterator_range_type const& stencils,
         distributed_iterator_range_type const& functions, int static_step, 
         int numvalues, Parameter const& par)
     {
@@ -81,7 +81,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             namespace stubs = components::amr::stubs;
             BOOST_ASSERT(function != functions.second);
 
-            //std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
+            std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
             stubs::dynamic_stencil_value::set_functional_component(*stencil,
                                          *function, static_step, column, dst_size(static_step,column,0),src_size(static_step,column,0), par);
         }
@@ -90,7 +90,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
     ///////////////////////////////////////////////////////////////////////////////
     // Get gids of output ports of all functions
-    void unigrid_mesh::get_output_ports(
+    void uni_amr::get_output_ports(
         distributed_iterator_range_type const& stencils,
         std::vector<std::vector<naming::id_type> >& outputs)
     {
@@ -128,7 +128,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         return (idx < 0) ? (idx + maxidx) % maxidx : idx % maxidx;
     }
 
-    void unigrid_mesh::connect_input_ports(
+    void uni_amr::connect_input_ports(
         components::distributing_factory::result_type const* stencils,
         std::vector<std::vector<std::vector<naming::id_type> > > const& outputs,
         Parameter const& par)
@@ -173,7 +173,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    void unigrid_mesh::prepare_initial_data(
+    void uni_amr::prepare_initial_data(
         distributed_iterator_range_type const& functions, 
         std::vector<naming::id_type>& initial_data,
         Parameter const& par)
@@ -200,7 +200,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
     ///////////////////////////////////////////////////////////////////////////////
     // do actual work
-    void unigrid_mesh::execute(
+    void uni_amr::execute(
         components::distributing_factory::iterator_range_type const& stencils, 
         std::vector<naming::id_type> const& initial_data, 
         std::vector<naming::id_type>& result_data)
@@ -229,7 +229,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     
     ///////////////////////////////////////////////////////////////////////////////
     // 
-    void unigrid_mesh::start_row(
+    void uni_amr::start_row(
         components::distributing_factory::iterator_range_type const& stencils)
     {
         // start the execution of all stencil stencils (data items)
@@ -253,7 +253,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     /// This is the main entry point of this component. 
-    std::vector<naming::id_type> unigrid_mesh::init_execute(
+    std::vector<naming::id_type> uni_amr::init_execute(
         components::component_type function_type, std::size_t numvalues, 
         std::size_t numsteps,
         components::component_type logging_type, Parameter const& par)
@@ -328,7 +328,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     /// This the other entry point of this component. 
-    std::vector<naming::id_type> unigrid_mesh::execute(
+    std::vector<naming::id_type> uni_amr::execute(
         std::vector<naming::id_type> const& initial_data,
         components::component_type function_type, std::size_t numvalues, 
         std::size_t numsteps,
@@ -398,7 +398,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         return result_data;
     }
 
-    void unigrid_mesh::prep_ports(Array3D &dst_port,Array3D &dst_src,
+    void uni_amr::prep_ports(Array3D &dst_port,Array3D &dst_src,
                                   Array3D &dst_step,Array3D &dst_size,Array3D &src_size,int numvalues,Parameter const& par)
     {
       int i,j;
@@ -415,152 +415,7 @@ namespace hpx { namespace components { namespace amr { namespace server
       int counter;
       int step,dst,dst2;
 
-      if ( par->granularity == 1 ) {
-        // finest granularity possible {{{
-        for (step=0;step<12;step = step + 2) {
-          dst = step+1;
-
-          for (i=0;i<numvalues;i++) {
-            counter = 0;
-
-            if ( i == 0 ) {
-              j = 0;
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-              j = 1;
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-            }
-            if ( i == 1 || i == 2 ) {
-              j = 1;
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-              j = 2;
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-            }
-            if ( i == 3 ) {
-              j = 2;
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-            }
-
-            // seven 
-            for (j=i-3;j<i+4;j++) {
-              if ( j >=3 && j < numvalues-3 ) {
-                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-                counter++;
-              }
-            }
-
-            if ( i == numvalues-4 ) {
-              j = numvalues-3;
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-            }
-
-            if ( i == numvalues-2 || i == numvalues-3 ) {
-              j = numvalues-3;
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-              j = numvalues-2;
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-              j = numvalues-1;
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-            }
-
-            if ( i == numvalues-1 ) {
-              j = numvalues-2;
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-              j = numvalues-1;
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-            }
-          }
-        }
-        for (step=1;step<12;step = step + 2) {
-          dst = step+1;
-          if ( dst == 12 ) dst = 0;
-
-          // funky boundary condition
-          for (i=0;i<numvalues;i++) {
-            counter = 0;
-
-            if ( i == 0 || i == 1 || i == 2 ) {
-              j = 0;
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-            }
-
-            if ( i == 0 ) {
-              j = 1;
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-            }
-
-            if ( i == 2 ) {
-              j = 1;
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-            }
-
-            if ( i >= 1 ) {
-              j = i;
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-            }
-          }
-        }
-        // }}}
-      } else if ( par->granularity == 2 ) {
-        // intermediate case  {{{
-        for (step=0;step<12;step = step + 2) {
-          dst = step+1;
-
-          for (i=0;i<numvalues;i++) {
-            counter = 0;
-
-            // five
-            for (j=i-2;j<i+3;j++) {
-              if ( j >=0 && j < numvalues ) {
-                if ( j == 1 && i == 3 ) {
-                } else if ( j == numvalues-2 && i == numvalues-4 ) {
-                } else if ( j == 0 && i == 2 ) {
-                } else if ( j == numvalues-1 && i == numvalues-3 ) {
-                } else {
-                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-                  counter++;
-                }
-              }
-            }
-
-          }
-
-        }
-        for (step=1;step<12;step = step + 2) {
-          dst = step+1;
-          if ( dst == 12 ) dst = 0;
-
-          // funky boundary condition
-          for (i=0;i<numvalues;i++) {
-            counter = 0;
-
-            if ( i == 1 ) {
-              j = 0;
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-            }
-
-            j = i;
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-            counter++;
-          }
-        }
-        // }}}
-      } else if ( par->granularity > 2 ) {
+      if ( par->granularity == par->nx0 ) {
         // largest granularity possible {{{
         for (step=0;step<12;step = step + 2) {
           dst = step+1;
@@ -574,15 +429,6 @@ namespace hpx { namespace components { namespace amr { namespace server
                 vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
                 counter++;
               }
-            }
-
-            // extra output for step 0 and step 6
-            if ( step == 0 || step == 6 ) {
-              if (step == 0 ) dst2 = 6;
-              else dst2 = 0;
-              j = i;
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst2);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
             }
           }
         }

@@ -14,6 +14,7 @@
 #include "logging.hpp"
 #include "stencil_data.hpp"
 #include "stencil_functions.hpp"
+#include "../amr/uni_amr.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
@@ -62,7 +63,7 @@ namespace hpx { namespace components { namespace amr
 
         // get all input memory_block_data instances
         access_memory_block<stencil_data> resultval;
-        std::vector<access_memory_block<stencil_data> > val;
+        std::vector<access_memory_block<stencil_data> > val,tval;
 
         int i,j;
         had_double_type timestep;
@@ -80,7 +81,16 @@ namespace hpx { namespace components { namespace amr
         bbox[0] = 0;
         bbox[1] = 0;
 
-        if ( val[0]->level_ == 0 ) {
+        //std::cout << " TEST " << val[0]->iter_ << " " << val[val.size()-1]->iter_ << " " << val.size() << std::endl;
+        if ( val[0]->iter_ != val[val.size()-1]->iter_ ) {
+          for (i=0;i<val.size();i++) {
+            if ( val[0]->iter_ == val[i]->iter_ ) tval.push_back(val[i]);
+          }
+        } else {
+          for (i=0;i<val.size();i++) tval.push_back(val[i]);
+        }
+
+        if ( tval[0]->level_ == 0 ) {
           if ( column == 0 ) {
             // indicate a physical boundary
             boundary = true;
@@ -90,12 +100,12 @@ namespace hpx { namespace components { namespace amr
           if ( column == numvals - 1) {
             // indicate a physical boundary
             boundary = true;
-            compute_index = val.size()-1;
+            compute_index = tval.size()-1;
             bbox[1] = 1;
           } 
           if ( !boundary ) {
-            if ( (val.size()-1)%2 == 0 ) {
-              compute_index = (val.size()-1)/2;
+            if ( (tval.size()-1)%2 == 0 ) {
+              compute_index = (tval.size()-1)/2;
               if ( column == 1 && par->granularity == 1 ) {
                 boundary = true;
                 bbox[0] = 2;
@@ -110,10 +120,10 @@ namespace hpx { namespace components { namespace amr
         // put all data into a single array
         int count;
         int adj_index = -1;
-        for (i=0;i<val.size();i++) {
+        for (i=0;i<tval.size();i++) {
           for (j=0;j<par->granularity;j++) {
-            vecval.push_back(val[i]->value_[j]);
-            vecx.push_back(val[i]->x_[j]);
+            vecval.push_back(tval[i]->value_[j]);
+            vecx.push_back(tval[i]->x_[j]);
             if ( i == compute_index && adj_index == -1 ) {
               adj_index = count; 
             }
@@ -122,7 +132,7 @@ namespace hpx { namespace components { namespace amr
         }
 
         for (j=0;j<par->granularity;j++) {
-          resultval->x_.push_back(val[compute_index]->x_[j]);
+          resultval->x_.push_back(tval[compute_index]->x_[j]);
         }
 
         // initialize result 
@@ -135,8 +145,8 @@ namespace hpx { namespace components { namespace amr
             // copy over critical info
             resultval->level_ = val[0]->level_;
             resultval->cycle_ = val[0]->cycle_ + 1;
-            resultval->max_index_ = val[compute_index]->max_index_;
-            resultval->index_ = val[compute_index]->index_;
+            resultval->max_index_ = tval[compute_index]->max_index_;
+            resultval->index_ = tval[compute_index]->index_;
             resultval->value_.resize(par->granularity);
             had_double_type dt = par->dt0/pow(2.0,(int) val[0]->level_);
             had_double_type dx = par->dx0/pow(2.0,(int) val[0]->level_); 
