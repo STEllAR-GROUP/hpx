@@ -81,7 +81,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             namespace stubs = components::amr::stubs;
             BOOST_ASSERT(function != functions.second);
 
-            std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
+            //std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
             stubs::dynamic_stencil_value::set_functional_component(*stencil,
                                          *function, static_step, column, dst_size(static_step,column,0),src_size(static_step,column,0), par);
         }
@@ -176,6 +176,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     void uni_amr::prepare_initial_data(
         distributed_iterator_range_type const& functions, 
         std::vector<naming::id_type>& initial_data,
+        std::size_t level, had_double_type xmin,
         Parameter const& par)
     {
         typedef std::vector<lcos::future_value<naming::id_type> > lazyvals_type;
@@ -187,7 +188,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         for (std::size_t i = 0; function != functions.second; ++function, ++i)
         {
             lazyvals.push_back(components::amr::stubs::functional_component::
-                alloc_data_async(*function, i, numvalues_, 0, 0, 0.0, par));
+                alloc_data_async(*function, i, numvalues_, 0, level, xmin, par));
         }
 
         // now wait for the results
@@ -254,9 +255,10 @@ namespace hpx { namespace components { namespace amr { namespace server
     ///////////////////////////////////////////////////////////////////////////
     /// This is the main entry point of this component. 
     std::vector<naming::id_type> uni_amr::init_execute(
-        components::component_type function_type, std::size_t numvalues, 
-        std::size_t numsteps,
-        components::component_type logging_type, Parameter const& par)
+        components::component_type function_type,
+        components::component_type logging_type, 
+        std::size_t level, had_double_type xmin,
+        Parameter const& par)
     {
         std::vector<naming::id_type> result_data;
 
@@ -265,12 +267,22 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         typedef components::distributing_factory::result_type result_type;
 
+        int numsteps = 2*6;  // six subcycles each step
+        int numvalues;
+
         // create a distributing factory locally
         components::distributing_factory factory;
         factory.create(applier::get_applier().get_runtime_support_gid());
 
-        // create a couple of stencil (functional) components and twice the 
-        // amount of stencil_value components
+        // numvalues depends on the user defined granularity
+        if ( par->nx0 == par->granularity) {
+          numvalues = 1;
+        } else if ( par->granularity == 1 ) {
+          numvalues = 17;
+        } else {
+          std::cerr << " Adjustable granularity for AMR still under construction " << std::endl;
+          BOOST_ASSERT(false);
+        }
         numvalues_ = numvalues;
         result_type functions = factory.create_components(function_type, numvalues);
         result_type stencils[12] = 
@@ -312,7 +324,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // prepare initial data
         std::vector<naming::id_type> initial_data;
-        prepare_initial_data(locality_results(functions), initial_data, par);
+        prepare_initial_data(locality_results(functions), initial_data, level,xmin, par);
 
         // do actual work
         execute(locality_results(stencils[0]), initial_data, result_data);

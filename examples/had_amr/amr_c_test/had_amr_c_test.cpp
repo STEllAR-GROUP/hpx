@@ -45,7 +45,7 @@ had_double_type initial_Phi(had_double_type r,Par const& par) {
 
 ///////////////////////////////////////////////////////////////////////////
 int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
-    int level, had_double_type x, Par const& par)
+    int level, had_double_type xmin, Par const& par)
 {
     // provide initial data for the given data value 
     val->max_index_ = maxitems;
@@ -73,9 +73,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
 
     for (i=0;i<par.granularity;i++) {
 
-      if ( level == 0 ) {
-        xcoord = par.minx0 + (par.granularity*item + i)*dx;
-      } 
+      xcoord = xmin + (par.granularity*item + i)*dx;
 
       had_double_type chi,Phi,Pi,Energy,r;
 

@@ -176,17 +176,17 @@ namespace hpx { namespace components { namespace amr
             //  if ( gids.size() != vecval.size() && gids.size() - vecval.size() != 9 ) resultval->refine_ = false; 
             //}
 
-            if ( resultval->refine_ && resultval->level_ < allowedl 
-                 && val[0]->timestep_ >= 1.e-6  ) {
-              finer_mesh_tapered(result, gids,vecval.size(), row, column, par);
-            } else {
-              resultval->overwrite_alloc_ = 0;
-            } 
+            //if ( resultval->refine_ && resultval->level_ < allowedl 
+            //     && val[0]->timestep_ >= 1.e-6  ) {
+            //  finer_mesh_tapered(result, gids,vecval.size(), row, column, par);
+            //} else {
+            //  resultval->overwrite_alloc_ = 0;
+            //} 
 
             // One special case: refining at time = 0
             if ( resultval->refine_ && 
                  val[0]->timestep_ < 1.e-6 && resultval->level_ < allowedl ) {
-              finer_mesh_initial(result, gids, resultval->level_+1,row, column, par);
+              finer_mesh_initial(result, gids, resultval->level_+1,resultval->x_[0],row, column, par);
             }
 
             if (par->loglevel > 1 && fmod(resultval->timestep_,par->output) < 1.e-6) 
@@ -474,26 +474,15 @@ namespace hpx { namespace components { namespace amr
     // Implement a finer mesh via interpolation of inter-mesh points
     // Compute the result value for the current time step
     int stencil::finer_mesh_initial(naming::id_type const& result, 
-        std::vector<naming::id_type> const& gids, std::size_t level, 
+        std::vector<naming::id_type> const& gids, std::size_t level, had_double_type xmin, 
         int row, int column, Parameter const& par) 
     {
-#if 0
       // the initial data for the child mesh comes from the parent mesh
       naming::id_type here = applier::get_applier().get_runtime_support_gid();
       components::component_type logging_type =
                 components::get_component_type<components::amr::server::logging>();
       components::component_type function_type =
                 components::get_component_type<components::amr::stencil>();
-
-      if ( par->integrator == 0 ) {
-        BOOST_ASSERT(false);
-      } else if ( par->integrator == 1 ) {
-      //  if ( !rk_left_mesh[row].get_gid() ) {
-      //      rk_left_mesh[row].create(here);
-      //  }
-      } else {
-        BOOST_ASSERT(false);
-      }
 
       bool do_logging = false;
       if ( par->loglevel > 0 ) {
@@ -504,15 +493,15 @@ namespace hpx { namespace components { namespace amr
       if ( par->integrator == 0 ) {
         BOOST_ASSERT(false);
       } else if ( par->integrator == 1 ) {
-      //  result_data = rk_left_mesh[row].init_execute(function_type,
-      //        do_logging ? logging_type : components::component_invalid,
-      //        level, x, par);
+        components::amr::uni_amr uni_amr_mesh;
+        uni_amr_mesh.create(here);
+        result_data = uni_amr_mesh.init_execute(function_type,
+              do_logging ? logging_type : components::component_invalid,
+              level, xmin, par);
       } else {
         BOOST_ASSERT(false);
       }
 
-
-      //  using mesh_left
       access_memory_block<stencil_data> overwrite, resultval;
       int mid; 
       if ( (result_data.size())%2 == 1 ) {
@@ -521,12 +510,16 @@ namespace hpx { namespace components { namespace amr
         BOOST_ASSERT(false);
       }
 
+#if 0
+      // INJECTION 
       boost::tie(overwrite, resultval) = 
           get_memory_block_async<stencil_data>(result_data[mid], result);
 
  
       // overwrite the coarse point computation
-      resultval->value_ = overwrite->value_;
+      for (j=0;j<par->granularity;j++) {
+        resultval->value_[j] = overwrite->value_[j];
+      }
  
       resultval->overwrite_alloc_ = true;
       resultval->overwrite_ = result_data[mid];
@@ -542,20 +535,21 @@ namespace hpx { namespace components { namespace amr
       resultval->left_alloc_ = false;
 
       // DEBUG -- log the right/left points computed
-      access_memory_block<stencil_data> amb1 = 
-                         hpx::components::stubs::memory_block::get(result_data[0]);
-      access_memory_block<stencil_data> amb2 = 
-                         hpx::components::stubs::memory_block::get(result_data[result_data.size()-1]);
-      if (log_) {
-          stubs::logging::logentry(log_, amb1.get(), row,1, par);
-          stubs::logging::logentry(log_, amb2.get(), row,1, par);
-      }
+      //access_memory_block<stencil_data> amb1 = 
+      //                   hpx::components::stubs::memory_block::get(result_data[0]);
+      //access_memory_block<stencil_data> amb2 = 
+      //                   hpx::components::stubs::memory_block::get(result_data[result_data.size()-1]);
+      //if (log_) {
+      //    stubs::logging::logentry(log_, amb1.get(), row,1, par);
+      //    stubs::logging::logentry(log_, amb2.get(), row,1, par);
+      //}
+#endif
 
       for (std::size_t i = 1; i < result_data.size()-1; ++i) {
         // free all but the overwrite and end value
         if ( i != mid ) components::stubs::memory_block::free(result_data[i]);
       }
-#endif
+
       return 0;
     }
 

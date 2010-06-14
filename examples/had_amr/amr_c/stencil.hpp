@@ -8,6 +8,7 @@
 
 #include "../amr/server/functional_component.hpp"
 #include "stencil_data.hpp"
+#include "../amr/uni_amr.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
@@ -25,7 +26,7 @@ namespace hpx { namespace components { namespace amr
     private:
         typedef amr::server::functional_component base_type;
 
-     //   components::amr::rk_left rk_left_mesh[7];
+        //components::amr::uni_amr uni_amr_mesh[12];
 
     public:
         typedef stencil wrapped_type;
@@ -57,7 +58,7 @@ namespace hpx { namespace components { namespace amr
         
         // this function creates a finer mesh from the initial data
         int finer_mesh_initial(naming::id_type const& result, 
-            std::vector<naming::id_type> const& gids, std::size_t level,
+            std::vector<naming::id_type> const& gids, std::size_t level, had_double_type xmin,
             int row, int column, Parameter const& par);
 
         /// The alloc function is supposed to create a new memory block instance 
