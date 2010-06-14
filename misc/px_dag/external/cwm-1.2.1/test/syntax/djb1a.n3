@@ -1,3 +1,0 @@
-@prefix : <http://example.org/base1#> .
-@prefix a: <http://example.org/base2#> .
-a:a a:b a:c.

@@ -1,8 +1,0 @@
-# Testing proof generation and checking.
-
-<a> <b> <c>.
-
-{<a> <b> []} => { <a> a <Success> }.
-
-# ends
-

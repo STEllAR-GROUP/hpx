@@ -1,4 +1,0 @@
-     @prefix : <http://example.org/base2#> .
-    
-    :a     :b :c .
-    
