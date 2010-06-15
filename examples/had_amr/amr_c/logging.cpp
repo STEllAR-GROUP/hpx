@@ -36,7 +36,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         if ( par->output_stdout == 1 && val.iter_ == 0 ) {
           if (fmod(val.timestep_,par->output) < 1.e-6) {
-            for (i=0;i<par->granularity;i++) {
+            for (i=0;i<pow(2,val.level_)*par->granularity;i++) {
               std::cout << " AMR Level: " << val.level_ 
                         << " Timestep: " <<  val.timestep_ 
                         << " Time: " << val.timestep_*par->dx0*par->lambda  
@@ -54,7 +54,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         FILE *fdata;
         if ( logcode == 0 && val.iter_ == 0 ) {
           if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {
-            for (i=0;i<par->granularity;i++) {
+            for (i=0;i<pow(2,val.level_)*par->granularity;i++) {
               std::string x_str = convert(val.x_[i]);
               std::string chi_str = convert(val.value_[i].phi[0][0]);
               std::string Phi_str = convert(val.value_[i].phi[0][1]);
