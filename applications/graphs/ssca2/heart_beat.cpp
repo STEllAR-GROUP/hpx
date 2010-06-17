@@ -81,7 +81,7 @@ int monitor(double frequency, double duration, double rate)
               hpx::performance_counters::counter_value value;
               value =
                   hpx::performance_counters::stubs::
-                    performance_counter::get_value(naming::id_type(gid, naming::id_type::unmanaged));
+                    performance_counter::get_value(gid);
 
               if (hpx::performance_counters::status_valid_data == value.status_)
               {
