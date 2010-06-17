@@ -285,7 +285,11 @@ int main(int argc, char* argv[])
         // initialize and start the HPX runtime
         runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
         if (mode == hpx::runtime::worker) {
-            rt.run(num_threads, num_localities);
+            rt.run(boost::bind(hpx_main, delay*1.0e-6,
+                               frequency*1.0e-6,
+                               duration*1.0e-6,
+                               rate*1.0e-6),
+                   num_threads, num_localities);
         }
         else {
             // if we've got a configuration file (as console) we read it in,
