@@ -112,17 +112,18 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
 
   // TEST
   //if ( level > 0 ) {
-  //  for (j=0;j<pow(2,level)*par.granularity;j++) {
-  //    for (i=0;i<num_eqns;i++) {
-  //      work.phi[0][i] = vecval[j+compute_index].phi[0][i];
-  //      work.phi[1][i] = vecval[j+compute_index].phi[0][i];
-  //    }
-  //    result->value_[j] = work;
-  //  }
-  //  result->timestep_ = timestep + 1.0;
-  //  return 1;
+    for (j=0;j<pow(2,level)*par.granularity;j++) {
+      for (i=0;i<num_eqns;i++) {
+        work.phi[0][i] = vecval[j+compute_index].phi[0][i];
+        work.phi[1][i] = vecval[j+compute_index].phi[0][i];
+      }
+      result->value_[j] = work;
+    }
+    result->timestep_ = timestep + 1.0;
+    return 1;
   //}
 
+#if 0
   if ( iter == 0 ) {
     for (j=0;j<pow(2,level)*par.granularity;j++) {
       calcrhs(&rhs,vecval,vecx,0,dx,size,boundary,bbox,j+compute_index,par);
@@ -236,6 +237,7 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
     return 0;
   }
   return 1;
+#endif
 }
 
 // This is a pointwise calculation: compute the rhs for point result given input values in array phi
