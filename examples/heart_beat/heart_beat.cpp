@@ -31,14 +31,15 @@ HPX_REGISTER_ACTION(monitor_action);
 
 int monitor(double frequency, double duration, double rate)
 {
-  typedef hpx::naming::id_type gid_type;
+  typedef hpx::naming::id_type id_type;
+  typedef hpx::naming::gid_type gid_type;
   typedef std::vector<gid_type> gids_type;
   typedef util::high_resolution_timer timer_type;
 
   hpx::naming::resolver_client const& agas =
       hpx::applier::get_applier().get_agas_client();
 
-  gid_type here = applier::get_applier().get_runtime_support_gid();
+  gid_type here = applier::get_applier().get_runtime_support_raw_gid();
 
   // Build full performance counter name
   std::string queue("/queue(");
@@ -101,16 +102,16 @@ int monitor(double frequency, double duration, double rate)
 int hpx_main(double delay, double frequency, double duration, double rate)
 {
     // Delay
-    util::high_resolution_timer t;
-    double start_time = t.elapsed();
-    double current = 0;
-    do {
-        current = t.elapsed();
-    } while (current - start_time < delay);
-
-    naming::id_type here = applier::get_applier().get_runtime_support_gid();
+    //util::high_resolution_timer t;
+    //double start_time = t.elapsed();
+    //double current = 0;
+    //do {
+    //    current = t.elapsed();
+    //} while (current - start_time < delay);
 
     std::cout << "Heart beat monitor, yo!" << std::endl;
+
+    naming::id_type here = applier::get_applier().get_runtime_support_gid();
 
     lcos::eager_future<monitor_action> n(here,
                                          duration,
@@ -141,6 +142,9 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("hpx,x", po::value<std::string>(), 
                 "the IP address the HPX parcelport is listening on (default "
                 "is localhost:7910), expected format: 192.168.1.1:7913")
+            ("localities,l", po::value<int>(), 
+                "the number of localities to wait for at application startup"
+                "(default is 1)")
             ("threads,t", po::value<int>(), 
                 "the number of operating system threads to spawn for this"
                 "HPX locality")
@@ -235,6 +239,7 @@ int main(int argc, char* argv[])
         std::string hpx_host("localhost"), agas_host;
         boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
         int num_threads = 1;
+        int num_localities = 1;
         hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
 
         // extract IP address/port arguments
@@ -246,6 +251,9 @@ int main(int argc, char* argv[])
 
         if (vm.count("threads"))
             num_threads = vm["threads"].as<int>();
+
+        if (vm.count("localities"))
+            num_localities = vm["localities"].as<int>();
 
         if (vm.count("worker")) {
             mode = hpx::runtime::worker;
@@ -277,7 +285,7 @@ int main(int argc, char* argv[])
         // initialize and start the HPX runtime
         runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
         if (mode == hpx::runtime::worker) {
-            rt.run(num_threads);
+            rt.run(num_threads, num_localities);
         }
         else {
             // if we've got a configuration file (as console) we read it in,
@@ -292,7 +300,7 @@ int main(int argc, char* argv[])
                                frequency*1.0e-6,
                                duration*1.0e-6,
                                rate*1.0e-6),
-                   num_threads);
+                   num_threads, num_localities);
 
         }
     }
