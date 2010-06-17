@@ -425,7 +425,7 @@ namespace hpx { namespace components { namespace amr { namespace server
       //using namespace boost::assign;
 
       int counter;
-      int step,dst,dst2;
+      int step,dst/*,dst2*/;
 
       if ( par->granularity == par->nx0 ) {
         // largest granularity possible {{{

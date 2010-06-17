@@ -112,11 +112,11 @@ portable_binary_iarchive::init(unsigned int flags){
             );
         // make sure the version of the reading archive library can
         // support the format of the archive being read
-        boost::archive::version_type input_library_version;
+        boost::archive::version_type input_library_version(0);
         * this >> input_library_version;
 
         // extra little .t is to get around borland quirk
-        if(boost::archive::BOOST_ARCHIVE_VERSION() < input_library_version.t)
+        if(boost::archive::BOOST_ARCHIVE_VERSION() < input_library_version)
             boost::serialization::throw_exception(
                 boost::archive::archive_exception(
                     boost::archive::archive_exception::unsupported_version

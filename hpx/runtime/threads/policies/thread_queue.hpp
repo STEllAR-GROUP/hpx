@@ -452,7 +452,7 @@ namespace hpx { namespace threads { namespace policies
                     bool timed_out = false;
                     {
                         namespace bpt = boost::posix_time;
-                        timed_out = !cond_.timed_wait(lk, bpt::microseconds(10));
+                        timed_out = !cond_.timed_wait(lk, bpt::microseconds(10*idle_loop_count));
                         ++idle_loop_count;
                     }
 

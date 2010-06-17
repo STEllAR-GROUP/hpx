@@ -21,6 +21,7 @@
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/version.hpp>
+#include <boost/serialization/tracking.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

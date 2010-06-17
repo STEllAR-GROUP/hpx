@@ -250,6 +250,7 @@ namespace hpx
             boost::bind(&runtime_impl::run_helper, this, func, boost::ref(result_)), 
             "hpx_main");
         thread_manager_.register_thread(data);
+        this->runtime::start();
 
         LRT_(info) << "runtime_impl: started using "  << num_threads << " OS threads";
 
@@ -344,7 +345,8 @@ namespace hpx
         boost::condition cond;
         boost::mutex::scoped_lock l(mtx);
         parcel_port_.get_io_service_pool().get_io_service().post(
-            boost::bind(&runtime_impl::stopped, this, blocking, boost::ref(cond)));
+            boost::bind(&runtime_impl::stopped, this, blocking, 
+                boost::ref(cond), boost::ref(mtx)));
         cond.wait(l);
 
         // stop the rest of the system
@@ -358,8 +360,10 @@ namespace hpx
     // a PX thread!
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::stopped(
-        bool blocking, boost::condition& cond)
+        bool blocking, boost::condition& cond, boost::mutex& mtx)
     {
+        boost::mutex::scoped_lock l(mtx);
+
         // unregister the runtime_support and memory instances from the AGAS 
         // ignore errors, as AGAS might be down already
         error_code ec;

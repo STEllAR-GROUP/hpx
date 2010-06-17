@@ -57,7 +57,8 @@ namespace hpx
         runtime(naming::resolver_client& agas_client) 
           : counters_(agas_client),
             ini_(util::detail::get_logging_data()),
-            instance_number_(++instance_number_counter_)
+            instance_number_(++instance_number_counter_),
+            stopped_(true)
         {}
 
         /// \brief Manage list of functions to call on exit
@@ -81,14 +82,28 @@ namespace hpx
             return counters_;
         }
 
+        /// \brief Manage runtime 'stopped' state
+        void start()
+        {
+            stopped_ = false;
+        }
+
         /// \brief Call all registered on_exit functions
         void stop()
         {
+            stopped_ = true;
+
             typedef boost::function<void()> value_type;
 
             boost::mutex::scoped_lock l(on_exit_functions_mtx_);
             BOOST_FOREACH(value_type f, on_exit_functions_)
                 f();
+        }
+
+        /// This accessor returns whether the runtime instance has been stopped
+        bool stopped() const
+        {
+            return stopped_;
         }
 
         // the TSS holds a pointer to the runtime associated with a given 
@@ -126,6 +141,8 @@ namespace hpx
 
         long instance_number_;
         static boost::detail::atomic_count instance_number_counter_;
+
+        bool stopped_;
     };
 
     /// \class runtime_impl runtime.hpp hpx/runtime.hpp
@@ -279,7 +296,7 @@ namespace hpx
         ///                   return immediately. Use a second call to stop 
         ///                   with this parameter set to \a true to wait for 
         ///                   all internal work to be completed.
-        void stopped(bool blocking, boost::condition& cond);
+        void stopped(bool blocking, boost::condition& cond, boost::mutex& mtx);
 
         /// \brief Report a non-recoverable error to the runtime system
         ///
@@ -387,7 +404,7 @@ namespace hpx
         {
             return parcel_port_.here();
         }
-
+        
     private:
         void init_tss();
         void deinit_tss();

@@ -3,6 +3,7 @@
   <PropertyGroup Label="UserMacros">
     <BOOST_ROOT>$(HPX_BOOST_ROOT)</BOOST_ROOT>
     <TBB_ROOT>$(HPX_TBB_ROOT)</TBB_ROOT>
+    <BUILD_OPTIONS>$(HPX_BUILD_OPTIONS)</BUILD_OPTIONS>
   </PropertyGroup>
   <PropertyGroup>
     <_ProjectFileVersion>10.0.21006.1</_ProjectFileVersion>
@@ -18,6 +19,9 @@
       <AdditionalIncludeDirectories>$(TBB_ROOT)\include;$(BOOST_ROOT);$(HPX_ROOT);$(HPX_ROOT)\external\cache;$(HPX_ROOT)\external\chrono;$(HPX_ROOT)\external\coroutine;$(HPX_ROOT)\external\endian;$(HPX_ROOT)\external\singleton;$(HPX_ROOT)\external\function_types;$(HPX_ROOT)\external\math;$(HPX_ROOT)\external\logging;$(HPX_ROOT)\external\exception;$(HPX_ROOT)\external\lockfree;$(HPX_ROOT)\external\plugin;$(HPX_ROOT)\external\atomic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;HPX_PREFIX="$(HPX_ROOT)/bin64";HPX_USE_TBB=0;HPX_USE_LOCKFREE=1;BOOST_COROUTINE_USE_FIBERS=1;BOOST_SERIALIZATION_DYN_LINK;BOOST_COROUTINE_USE_ATOMIC_COUNT;BOOST_CHRONO_NO_LIB;BOOST_USE_WINDOWS_H;HPX_DEBUG_WRAPPER_HEAP=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4267;4503;4251;4275;4094;4180;4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalOptions>$(BUILD_OPTIONS) %(AdditionalOptions)</AdditionalOptions>
+      <MinimalRebuild>
+      </MinimalRebuild>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(BOOST_ROOT)\stage64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -46,6 +50,9 @@ xcopy /Y/F "$(TargetDir)\$(TargetName).lib" "$(HPX_ROOT)\bin64\libs"
     <BuildMacro Include="TBB_ROOT">
       <Value>$(TBB_ROOT)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="BUILD_OPTIONS">
+      <Value>$(BUILD_OPTIONS)</Value>
     </BuildMacro>
   </ItemGroup>
 </Project>

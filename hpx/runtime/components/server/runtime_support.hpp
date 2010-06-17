@@ -193,6 +193,8 @@ namespace hpx { namespace components { namespace server
         /// called locally only
         void stopped();
 
+        bool was_stopped() const { return stopped_; }
+
     protected:
         // Load all components from the ini files found in the configuration
         void load_components(util::section& ini, naming::gid_type const& prefix, 

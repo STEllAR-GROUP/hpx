@@ -367,7 +367,7 @@ namespace hpx { namespace threads
         void stop (bool blocking = true);
 
         /// \brief Return whether the thread manager is still running
-        bool is_running() const { return running_; }
+        bool is_running() const { return thread_count_ != 0 || running_; }
 
         /// The set_state function is part of the thread related API and allows
         /// to change the state of one of the threads managed by this 

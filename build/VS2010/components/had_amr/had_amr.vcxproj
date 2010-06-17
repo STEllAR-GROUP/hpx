@@ -111,7 +111,6 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;HAD_AMR_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -164,39 +163,25 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\examples\had_amr\amr\amr.cpp" />
     <ClCompile Include="..\..\..\..\examples\had_amr\amr\parameter.cpp" />
-    <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\amr_mesh.cpp" />
-    <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\amr_mesh_left.cpp" />
-    <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\amr_mesh_tapered.cpp" />
     <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\dynamic_stencil_value.cpp" />
     <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\functional_component.cpp" />
-    <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\rk_left.cpp" />
-    <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\rk_mesh.cpp" />
     <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\stencil_value_out_adaptor.cpp" />
-    <ClCompile Include="..\..\..\..\examples\had_amr\parameter.cpp" />
+    <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\unigrid_mesh.cpp" />
+    <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\uni_amr.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\amr_mesh.hpp" />
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\amr_mesh_left.hpp" />
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\amr_mesh_tapered.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\dynamic_stencil_value.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\functional_component.hpp" />
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\rk_mesh.hpp" />
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\amr_mesh_left.hpp" />
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\amr_mesh_tapered.hpp" />
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\rk_left.hpp" />
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\rk_mesh.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\stencil_value_in_adaptor.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\stencil_value_out_adaptor.hpp" />
+    <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\unigrid_mesh.hpp" />
+    <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\uni_amr.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\stencil_value.hpp" />
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\amr_mesh.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\dynamic_stencil_value.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\dynamic_stencil_value_impl.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\functional_component.hpp" />
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\stubs\amr_mesh.hpp" />
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\stubs\amr_mesh_left.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\stubs\dynamic_stencil_value.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\stubs\functional_component.hpp" />
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\stubs\rk_mesh.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\stubs\stencil_value.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\parameter.h" />
     <ClInclude Include="..\..\..\..\examples\had_amr\parameter.hpp" />

@@ -120,11 +120,16 @@ protected:
     void load(std::string & t){
         this->primitive_base_t::load(t);
     }
-    #ifndef BOOST_NO_STD_WSTRING
+#if BOOST_VERSION >= 104400
+    void load(boost::archive::class_id_type & t){
+        this->primitive_base_t::load(t);
+    }
+#endif
+#ifndef BOOST_NO_STD_WSTRING
     void load(std::wstring & t){
         this->primitive_base_t::load(t);
     }
-    #endif
+#endif
     void load(float & t){
         this->primitive_base_t::load(t);
         // floats not supported

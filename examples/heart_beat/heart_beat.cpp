@@ -83,6 +83,8 @@ int monitor(double frequency, double duration, double rate)
               // Adjust rate of pinging values
               double delay_start = t.elapsed();
               do {
+                  if (hpx::get_runtime().stopped())
+                      return 0;
                   current_time = t.elapsed();
               } while(current_time - delay_start < rate);
           } while (current_time - monitor_start < duration);

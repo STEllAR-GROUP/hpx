@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/server/raw_counter.hpp>
@@ -12,11 +12,19 @@
 #include <boost/chrono/chrono.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace performance_counters { namespace server
+{
+    components::component_type base_performance_counter::value = 
+        components::component_invalid;
+}}}
+
+///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::managed_component<
     hpx::performance_counters::server::raw_counter
 > raw_counter_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(raw_counter_type, raw_counter);
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
+    raw_counter_type, raw_counter, "base_performance_counter");
 
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::performance_counters::server::raw_counter);
 

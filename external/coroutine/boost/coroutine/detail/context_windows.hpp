@@ -31,6 +31,7 @@
 #include <windows.h>
 #include <winnt.h>
 #include <boost/config.hpp>
+#include <boost/version.hpp>
 #include <boost/assert.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/throw_exception.hpp>
@@ -188,7 +189,12 @@ namespace boost {namespace coroutines {
         if (0 == m_ctx) {
           boost::throw_exception(boost::system::system_error(
               boost::system::error_code(
-                  GetLastError(), boost::system::system_category
+                  GetLastError(), 
+#if BOOST_VERSION >= 104400
+                  boost::system::system_category()
+#else
+                  boost::system::system_category
+#endif
               )
           ));
         }

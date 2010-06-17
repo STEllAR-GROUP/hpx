@@ -22,21 +22,20 @@ namespace hpx { namespace components
 
         // LCO's
         component_base_lco = 3,         ///< the base of all LCO's not waiting on a value
+        component_last,
+
         component_base_lco_with_value = 
-            ((1 << 16) | component_base_lco),
+            ((4 << 16) | component_base_lco),
                                         ///< base LCO's blocking on a value
         component_future =              ///< a future executing the action and 
                                         ///< allowing to wait for the result
-            ((2 << 16) | component_base_lco),
+            ((5 << 16) | component_base_lco),
         component_value_adaptor = 5,    ///< an adaptor to access specific slot of an LCO
         component_barrier =             ///< a LCO implementing a barrier
-            ((3 << 16) | component_base_lco),
+            ((6 << 16) | component_base_lco),
         component_thread =              ///< a ParalleX thread
-            ((4 << 16) | component_base_lco),
+            ((7 << 16) | component_base_lco),
 
-        component_performance_counter = 7,  ///< the base of all performance counters
-
-        component_last,
         component_first_dynamic = component_last
     };
 

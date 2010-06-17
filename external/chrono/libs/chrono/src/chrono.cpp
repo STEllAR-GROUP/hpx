@@ -9,6 +9,7 @@
 // the library is being built (possibly exporting rather than importing code)
 #define BOOST_CHRONO_SOURCE 
 
+#include <boost/version.hpp>
 #include <boost/chrono/chrono.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/throw_exception.hpp>
@@ -54,7 +55,13 @@ namespace chrono
     {
       DWORD cause = (nanosecs_per_tic <= 0.0L ? ERROR_NOT_SUPPORTED : ::GetLastError());
       boost::throw_exception(
-        system::system_error( cause, system::system_category, "chrono::monotonic_clock" ));
+        system::system_error( cause, 
+#if BOOST_VERSION >= 104400
+          system::system_category(), 
+#else
+          system::system_category, 
+#endif
+          "chrono::monotonic_clock" ));
     }
 
     return time_point(duration(
@@ -69,7 +76,12 @@ namespace chrono
     if ( nanosecs_per_tic <= 0.0L || !QueryPerformanceCounter( &pcount ) )
     {
       DWORD cause = (nanosecs_per_tic <= 0.0L ? ERROR_NOT_SUPPORTED : ::GetLastError());
-      ec.assign( cause, system::system_category );
+      ec.assign( cause, 
+#if BOOST_VERSION >= 104400
+          system::system_category()); 
+#else
+          system::system_category);
+#endif
       return time_point(duration(0));
     }
 

@@ -66,7 +66,7 @@ namespace hpx { namespace components { namespace amr
         std::vector<access_memory_block<stencil_data> > val,tval;
 
         int i,j;
-        had_double_type timestep;
+//         had_double_type timestep;
         std::vector< nodedata > vecval;
         std::vector< had_double_type > vecx;
         resultval = get_memory_block_async(val,gids,result);
@@ -76,7 +76,7 @@ namespace hpx { namespace components { namespace amr
         bool boundary = false;
         int bbox[2];
         int numvals = par->nx0/par->granularity;
-        int asize = (int) pow(2,val[0]->level_);
+        int asize = (int) pow(2.,(int)val[0]->level_);
 
         // initialize bounding box
         bbox[0] = 0;
@@ -119,7 +119,7 @@ namespace hpx { namespace components { namespace amr
         } 
 
         // put all data into a single array
-        int count;
+        int count = 0;
         int adj_index = -1;
         for (i=0;i<tval.size();i++) {
           for (j=0;j<asize*par->granularity;j++) {
@@ -324,8 +324,8 @@ namespace hpx { namespace components { namespace amr
         return true;
       }
       BOOST_ASSERT(false);
-      return false;
 #endif
+      return false;
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -20,7 +20,10 @@ namespace hpx { namespace util
     performance_counters::counter_status remove_counter_type(
         performance_counters::counter_info const& info, error_code& ec)
     {
-        return get_runtime().get_counter_registry().remove_counter_type(info, ec);
+        // the runtime might not be available any more
+        runtime* rt = get_runtime_ptr();
+        return rt ? rt->get_counter_registry().remove_counter_type(info, ec) : 
+            performance_counters::status_generic_error;
     }
 
     performance_counters::counter_status add_counter(
@@ -47,6 +50,5 @@ namespace hpx { namespace util
         return get_runtime().get_counter_registry().remove_counter(
             info, id, ec);
     }
-
 }}
 

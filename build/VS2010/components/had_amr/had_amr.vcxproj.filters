@@ -23,15 +23,6 @@
     <ClCompile Include="..\..\..\..\examples\had_amr\amr\amr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\amr_mesh.cpp">
-      <Filter>Source Files\Server</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\amr_mesh_left.cpp">
-      <Filter>Source Files\Server</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\amr_mesh_tapered.cpp">
-      <Filter>Source Files\Server</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\dynamic_stencil_value.cpp">
       <Filter>Source Files\Server</Filter>
     </ClCompile>
@@ -41,40 +32,22 @@
     <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\stencil_value_out_adaptor.cpp">
       <Filter>Source Files\Server</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\rk_left.cpp">
-      <Filter>Source Files\Server</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\rk_mesh.cpp">
-      <Filter>Source Files\Server</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\examples\had_amr\parameter.cpp">
+    <ClCompile Include="..\..\..\..\examples\had_amr\amr\parameter.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\uni_amr.cpp">
+      <Filter>Source Files\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\unigrid_mesh.cpp">
+      <Filter>Source Files\Server</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\amr_mesh.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\amr_mesh_left.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\amr_mesh_tapered.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\dynamic_stencil_value.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\functional_component.hpp">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\amr_mesh.hpp">
-      <Filter>Header Files\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\amr_mesh_left.hpp">
-      <Filter>Header Files\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\amr_mesh_tapered.hpp">
-      <Filter>Header Files\Server</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\dynamic_stencil_value.hpp">
       <Filter>Header Files\Server</Filter>
@@ -87,12 +60,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\stencil_value.hpp">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\stubs\amr_mesh.hpp">
-      <Filter>Header Files\Stubs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\stubs\amr_mesh_left.hpp">
-      <Filter>Header Files\Stubs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\stubs\dynamic_stencil_value.hpp">
       <Filter>Header Files\Stubs</Filter>
@@ -109,23 +76,17 @@
     <ClInclude Include="..\..\..\..\examples\had_amr\parameter.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\rk_left.hpp">
-      <Filter>Header Files\Server</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\stencil_value_in_adaptor.hpp">
       <Filter>Header Files\Server</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\stencil_value_out_adaptor.hpp">
       <Filter>Header Files\Server</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\rk_mesh.hpp">
+    <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\uni_amr.hpp">
       <Filter>Header Files\Server</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\stubs\rk_mesh.hpp">
-      <Filter>Header Files\Stubs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\rk_mesh.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\unigrid_mesh.hpp">
+      <Filter>Header Files\Server</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
