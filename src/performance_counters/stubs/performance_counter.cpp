@@ -10,7 +10,7 @@
 namespace hpx { namespace performance_counters { namespace stubs
 {
     lcos::future_value<counter_info> performance_counter::get_info_async(
-        naming::id_type const& targetgid)
+        naming::gid_type const& targetgid)
     {
         // Create an eager_future, execute the required action,
         // we simply return the initialized future_value, the caller needs
@@ -20,7 +20,7 @@ namespace hpx { namespace performance_counters { namespace stubs
     }
 
     lcos::future_value<counter_value> performance_counter::get_value_async(
-        naming::id_type const& targetgid)
+        naming::gid_type const& targetgid)
     {
         // Create an eager_future, execute the required action,
         // we simply return the initialized future_value, the caller needs
@@ -29,12 +29,12 @@ namespace hpx { namespace performance_counters { namespace stubs
         return lcos::eager_future<action_type, counter_value>(targetgid);
     }
 
-    counter_info performance_counter::get_info(naming::id_type const& targetgid)
+    counter_info performance_counter::get_info(naming::gid_type const& targetgid)
     {
         return get_info_async(targetgid).get();
     }
 
-    counter_value performance_counter::get_value(naming::id_type const& targetgid)
+    counter_value performance_counter::get_value(naming::gid_type const& targetgid)
     {
         return get_value_async(targetgid).get();
     }
