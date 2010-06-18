@@ -14,21 +14,27 @@ namespace hpx { namespace components { namespace server
 {
     /// placeholder type allowing to integrate the plain action templates
     /// with the existing component based action template infrastructure
+    template <typename Action>
     struct plain_function
     {
+        static component_type value;
+
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
         // to associate this component with a given action.
         static component_type get_component_type() 
         { 
-            // plain functions are in main memory namespace
-            return component_runtime_support; 
+            return value; 
         }
-        static void set_component_type(component_type) 
+        static void set_component_type(component_type type) 
         { 
+            value = type;
         }
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Action>
+    component_type plain_function<Action>::value = component_invalid;
 }}}
 
 #endif

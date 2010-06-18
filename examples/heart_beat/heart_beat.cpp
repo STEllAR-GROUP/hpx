@@ -7,6 +7,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/components/plain_component_factory.hpp>
 
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
@@ -27,7 +28,7 @@ namespace po = boost::program_options;
 //
 // Currently only monitors "this" locality, and never stops :-).
 
-HPX_REGISTER_ACTION(monitor_action);
+HPX_REGISTER_PLAIN_ACTION(monitor_action);
 
 int monitor(double frequency, double duration, double rate)
 {
@@ -122,7 +123,7 @@ int hpx_main(double delay, double frequency, double duration, double rate)
     n.get();
       
     // initiate shutdown of the runtime systems on all localities
-    components::stubs::runtime_support::shutdown_all();
+//     components::stubs::runtime_support::shutdown_all();
 
     return 0;
 }

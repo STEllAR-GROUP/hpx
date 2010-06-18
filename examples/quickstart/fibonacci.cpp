@@ -7,6 +7,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/components/plain_component_factory.hpp>
 
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
@@ -43,7 +44,7 @@ typedef
     actions::plain_result_action3<int, naming::gid_type, int, int, fib> 
 fibonacci_action;
 
-HPX_REGISTER_ACTION(fibonacci_action);
+HPX_REGISTER_PLAIN_ACTION(fibonacci_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 int count_invocations = 0;    // global invocation counter
@@ -94,8 +95,10 @@ int hpx_main(int argument, int delay_coeff, int& result, double& elapsed)
 
     naming::gid_type this_prefix = appl.get_runtime_support_raw_gid();
     naming::gid_type that_prefix;
+    components::component_type type = 
+        components::get_component_type<components::server::plain_function<fibonacci_action> >();
 
-    if (appl.get_remote_prefixes(prefixes)) {
+    if (appl.get_remote_prefixes(prefixes, type)) {
         // execute the fib() function on any of the remote localities
         that_prefix = prefixes[0];
     }

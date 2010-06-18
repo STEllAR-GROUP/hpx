@@ -114,13 +114,16 @@ namespace hpx { namespace applier
         ///
         /// \param prefixes [out] The reference to a vector of id_types filled
         ///                 by the function.
+        /// \param type     [in] The type of the component which needs to exist
+        ///                 on the returned localities.
         ///
         /// \returns The function returns \a true if there is at least one 
         ///          remote locality known to the AGASservice 
         ///          (!prefixes.empty()).
-        bool get_remote_prefixes(std::vector<naming::gid_type>& prefixes) const
+        bool get_remote_prefixes(std::vector<naming::gid_type>& prefixes,
+            components::component_type type = components::component_invalid) const
         {
-            return parcel_handler_.get_remote_prefixes(prefixes);
+            return parcel_handler_.get_remote_prefixes(prefixes, type);
         }
 
         /// By convention the runtime_support has a gid identical to the prefix 

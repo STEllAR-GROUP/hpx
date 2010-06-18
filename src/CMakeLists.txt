@@ -128,6 +128,7 @@ set (hpxlib_components_HEADERS
     ${hpx_SOURCE_DIR}/hpx/runtime/components/console_logging.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/derived_component_factory.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/memory_block.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/components/plain_component_factory.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/runtime_support.hpp)
 source_group("Header Files\\runtime\\components" 
     FILES ${hpxlib_components_HEADERS})
@@ -315,7 +316,6 @@ set (hpxlib_components_server_SOURCES
     ${hpx_SOURCE_DIR}/src/runtime/components/server/console_logging.cpp
     ${hpx_SOURCE_DIR}/src/runtime/components/server/memory.cpp
     ${hpx_SOURCE_DIR}/src/runtime/components/server/memory_block.cpp
-    ${hpx_SOURCE_DIR}/src/runtime/components/server/plain_function.cpp
     ${hpx_SOURCE_DIR}/src/runtime/components/server/runtime_support.cpp)
 source_group ("Source Files\\runtime\\components\\server" 
     FILES ${hpxlib_components_server_SOURCES})

@@ -25,7 +25,6 @@ namespace hpx { namespace components
                 dst, naming::get_prefix_from_gid(src), e);
         }
     }
-
 }}
 
 #endif

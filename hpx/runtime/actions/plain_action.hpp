@@ -61,16 +61,16 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
 
     // zero argument version
-    template <typename Result, Result (*F)()>
+    template <typename Result, Result (*F)(), typename Derived>
     class plain_base_result_action0 
       : public action<
-            components::server::plain_function, function_result_action_arg0, 
-            boost::fusion::vector<> 
+            components::server::plain_function<Derived>, 
+            function_result_action_arg0, boost::fusion::vector<> 
         >
     {
         typedef action<
-            components::server::plain_function, function_result_action_arg0, 
-            boost::fusion::vector<> 
+            components::server::plain_function<Derived>, 
+            function_result_action_arg0, boost::fusion::vector<> 
         > base_type;
 
     public:
@@ -154,10 +154,12 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, Result (*F)()>
     class plain_result_action0 
-      : public plain_base_result_action0<Result, F>
+      : public plain_base_result_action0<Result, F, 
+            plain_result_action0<Result, F> >
     {
     private:
-        typedef plain_base_result_action0<Result, F> base_type;
+        typedef plain_base_result_action0<Result, F, plain_result_action0> 
+            base_type;
 
     public:
         plain_result_action0()
@@ -218,10 +220,12 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, Result (*F)()>
     class plain_direct_result_action0 
-      : public plain_base_result_action0<Result, F>
+      : public plain_base_result_action0<Result, F, 
+            plain_direct_result_action0<Result, F> >
     {
     private:
-        typedef plain_base_result_action0<Result, F> base_type;
+        typedef plain_base_result_action0<
+            Result, F, plain_direct_result_action0> base_type;
 
     public:
         plain_direct_result_action0()
@@ -297,17 +301,17 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     //  zero parameter version, no result value
-    template <void (*F)()>
+    template <void (*F)(), typename Derived>
     class plain_base_action0 
       : public action<
-            components::server::plain_function, function_action_arg0, 
-            boost::fusion::vector<> 
+            components::server::plain_function<Derived>, 
+            function_action_arg0, boost::fusion::vector<> 
         >
     {
     private:
         typedef action<
-            components::server::plain_function, function_action_arg0, 
-            boost::fusion::vector<> 
+            components::server::plain_function<Derived>, 
+            function_action_arg0, boost::fusion::vector<> 
         > base_type;
 
     public:
@@ -386,10 +390,11 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <void (*F)()>
-    class plain_action0 : public plain_base_action0<F>
+    class plain_action0 
+      : public plain_base_action0<F, plain_action0<F> >
     {
     private:
-        typedef plain_base_action0<F> base_type;
+        typedef plain_base_action0<F, plain_action0> base_type;
 
     public:
         plain_action0()
@@ -449,10 +454,11 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <void (*F)()>
-    class plain_direct_action0 : public plain_base_action0<F>
+    class plain_direct_action0 
+      : public plain_base_action0<F, plain_direct_action0<F> >
     {
     private:
-        typedef plain_base_action0<F> base_type;
+        typedef plain_base_action0<F, plain_direct_action0> base_type;
 
     public:
         plain_direct_action0()

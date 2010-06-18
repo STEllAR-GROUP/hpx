@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/util.hpp>
+#include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 
@@ -42,7 +43,9 @@ namespace hpx { namespace components { namespace server
     }
 }}}
 
+///////////////////////////////////////////////////////////////////////////////
 // This must be in global namespace
-HPX_REGISTER_ACTION_EX(hpx::components::server::console_error_sink_action,
+HPX_REGISTER_PLAIN_ACTION_EX(
+    hpx::components::server::console_error_sink_action, 
     console_error_sink_action);
 

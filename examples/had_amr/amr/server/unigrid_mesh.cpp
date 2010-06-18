@@ -413,7 +413,7 @@ namespace hpx { namespace components { namespace amr { namespace server
       //using namespace boost::assign;
 
       int counter;
-      int step,dst,dst2;
+      int step,dst/*,dst2*/;
 #if 0
       if ( par->granularity == 1 ) {
         // finest granularity possible {{{

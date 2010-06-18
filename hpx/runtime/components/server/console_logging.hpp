@@ -57,7 +57,6 @@ namespace hpx { namespace components { namespace server
     typedef actions::plain_direct_action3<
         logging_destination, int, std::string const&, console_logging
     > console_logging_action;
-
 }}}
 
 #endif

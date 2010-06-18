@@ -24,7 +24,6 @@ namespace hpx { namespace components { namespace server
     typedef actions::plain_direct_action2<
         boost::uint32_t, boost::exception_ptr const&, console_error_sink
     > console_error_sink_action;
-
 }}}
 
 #endif

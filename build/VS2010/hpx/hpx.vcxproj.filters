@@ -203,9 +203,6 @@
     <ClCompile Include="..\..\..\src\runtime\components\server\memory_block.cpp">
       <Filter>Source Files\Runtime\Applier\Components\Server</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\components\server\plain_function.cpp">
-      <Filter>Source Files\Runtime\Applier\Components\Server</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\components\server\runtime_support.cpp">
       <Filter>Source Files\Runtime\Applier\Components\Server</Filter>
     </ClCompile>
@@ -732,6 +729,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\util\spinlock_pool.hpp">
       <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\components\plain_component_factory.hpp">
+      <Filter>Header Files\Runtime\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

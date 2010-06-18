@@ -188,7 +188,6 @@
     <ClCompile Include="..\..\..\src\runtime\components\server\console_logging.cpp" />
     <ClCompile Include="..\..\..\src\runtime\components\server\memory.cpp" />
     <ClCompile Include="..\..\..\src\runtime\components\server\memory_block.cpp" />
-    <ClCompile Include="..\..\..\src\runtime\components\server\plain_function.cpp" />
     <ClCompile Include="..\..\..\src\runtime\components\server\runtime_support.cpp" />
     <ClCompile Include="..\..\..\src\lcos\base_lco.cpp" />
     <ClCompile Include="..\..\..\src\performance_counters\counters.cpp" />
@@ -216,6 +215,7 @@
     <ClInclude Include="..\..\..\hpx\runtime\components\component_registry.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\component_registry_base.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\constructor_argument.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\plain_component_factory.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\naming\bulk_resolver_client.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\naming\detail\resolver_do_undo.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\naming\server\request_handler_registry.hpp" />

@@ -138,11 +138,13 @@ namespace hpx { namespace parcelset
     }
 
     bool parcelhandler::get_remote_prefixes(
-        std::vector<naming::gid_type>& prefixes) const
+        std::vector<naming::gid_type>& prefixes, 
+        components::component_type type) const
     {
         std::vector<naming::gid_type> allprefixes;
-        bool result = resolver_.get_prefixes(allprefixes);
-        if (!result) return false;
+        error_code ec;
+        bool result = resolver_.get_prefixes(allprefixes, type, ec);
+        if (ec || !result) return false;
 
         using boost::lambda::_1;
         std::remove_copy_if(allprefixes.begin(), allprefixes.end(), 

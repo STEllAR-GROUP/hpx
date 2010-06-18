@@ -112,7 +112,7 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
 
   // TEST
   //if ( level > 0 ) {
-    for (j=0;j<pow(2,level)*par.granularity;j++) {
+    for (j=0;j<pow(2.,level)*par.granularity;j++) {
       for (i=0;i<num_eqns;i++) {
         work.phi[0][i] = vecval[j+compute_index].phi[0][i];
         work.phi[1][i] = vecval[j+compute_index].phi[0][i];
