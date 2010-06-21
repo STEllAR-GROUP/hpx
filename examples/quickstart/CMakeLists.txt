@@ -16,5 +16,6 @@ endforeach()
 add_hpx_executable(fibonacci SOURCES fibonacci.cpp)
 add_hpx_executable(fibonacci2 SOURCES fibonacci2.cpp)
 add_hpx_executable(fibonacci3 SOURCES fibonacci3.cpp)
-add_hpx_executable(quicksort SOURCES quicksort.cpp)
+add_hpx_executable(fibonacci4 SOURCES fibonacci4.cpp)
+#add_hpx_executable(quicksort SOURCES quicksort.cpp)
 
