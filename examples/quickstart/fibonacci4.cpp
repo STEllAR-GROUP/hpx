@@ -7,6 +7,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/components/plain_component_factory.hpp>
 
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
@@ -86,8 +87,8 @@ fibonacci4_rhs_action;
 typedef lcos::eager_future<fibonacci4_action> fibonacci_future;
 typedef lcos::eager_future<fibonacci4_rhs_action> fibonacci_rhs_future;
 
-HPX_REGISTER_ACTION(fibonacci4_action);
-HPX_REGISTER_ACTION(fibonacci4_rhs_action);
+HPX_REGISTER_PLAIN_ACTION(fibonacci4_action);
+HPX_REGISTER_PLAIN_ACTION(fibonacci4_rhs_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 int count_invocations = 0;    // global invocation counter

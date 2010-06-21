@@ -7,6 +7,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/components/plain_component_factory.hpp>
 
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
@@ -79,7 +80,7 @@ fibonacci2_action;
 
 typedef lcos::eager_future<fibonacci2_action> fibonacci_future;
 
-HPX_REGISTER_ACTION(fibonacci2_action);
+HPX_REGISTER_PLAIN_ACTION(fibonacci2_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 inline void do_busy_work(double delay_coeff)

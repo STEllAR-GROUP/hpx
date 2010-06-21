@@ -7,6 +7,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/components/plain_component_factory.hpp>
 
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
@@ -51,7 +52,7 @@ typedef
     actions::plain_result_action3<int, naming::gid_type, int, int, fib> 
 fibonacci2_action;
 
-HPX_REGISTER_ACTION(fibonacci2_action);
+HPX_REGISTER_PLAIN_ACTION(fibonacci2_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 int count_invocations = 0;    // global invocation counter
