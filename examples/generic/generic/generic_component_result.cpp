@@ -7,6 +7,8 @@
 // related facilities.
 
 #include <hpx/hpx.hpp>
+#include <hpx/runtime/components/plain_component_factory.hpp>
+
 #include <boost/serialization/export.hpp>
 
 #include "generic_component_result.hpp"

@@ -7,6 +7,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/components/plain_component_factory.hpp>
 
 #include <boost/detail/lightweight_test.hpp>
 #include <boost/serialization/serialization.hpp>
