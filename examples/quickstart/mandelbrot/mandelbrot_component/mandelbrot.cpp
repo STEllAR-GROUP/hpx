@@ -47,5 +47,5 @@ mandelbrot::result mandelbrot_func(mandelbrot::data const& data)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION(mandelbrot_action);
+HPX_REGISTER_PLAIN_ACTION(mandelbrot_action);
 

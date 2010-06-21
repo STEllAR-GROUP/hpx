@@ -31,7 +31,7 @@ int remote_error()
 }
 
 typedef actions::plain_result_action0<int, remote_error> remote_error_action;
-HPX_REGISTER_ACTION(remote_error_action);
+HPX_REGISTER_PLAIN_ACTION(remote_error_action);
 
 int throw_error_remotely()
 {

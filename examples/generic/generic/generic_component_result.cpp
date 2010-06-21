@@ -22,6 +22,6 @@ double generate_number()
 ///////////////////////////////////////////////////////////////////////////////
 // Define all additional facilities needed for the generate_number_wrapper 
 // component.
-HPX_REGISTER_ACTION(generate_number_action);
+HPX_REGISTER_PLAIN_ACTION(generate_number_action);
 
 

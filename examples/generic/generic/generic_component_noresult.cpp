@@ -20,5 +20,5 @@ void print_number(double arg)
     std::cout << arg << std::endl;
 }
 
-HPX_REGISTER_ACTION(print_number_action);
+HPX_REGISTER_PLAIN_ACTION(print_number_action);
 
