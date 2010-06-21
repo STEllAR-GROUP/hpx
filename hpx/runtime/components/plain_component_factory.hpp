@@ -12,6 +12,7 @@
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_registry.hpp>
 #include <hpx/runtime/components/server/manage_component.hpp>
+#include <hpx/runtime/components/server/plain_function.hpp>
 #include <hpx/util/ini.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
