@@ -11,7 +11,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         parcelset 
         generic
         quickstart
-        #heart_beat
+        heart_beat
        )
 else()
     set(example_SUBDIRS 
@@ -21,7 +21,7 @@ else()
         naming 
         parcelset
         quickstart
-        #heart_beat
+        heart_beat
        )
 endif()
 
