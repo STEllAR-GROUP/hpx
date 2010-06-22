@@ -82,6 +82,13 @@ namespace hpx { namespace threads
             reinterpret_cast<thread*>(self->get_thread_id())->get_parent_thread_id() : 0;
     }
 
+    std::size_t get_parent_phase()
+    {
+        thread_self* self = get_self_ptr();
+        return (0 != self) ?
+            reinterpret_cast<thread*>(self->get_thread_id())->get_parent_thread_phase() : 0;
+    }
+
     boost::uint32_t get_parent_prefix()
     {
         thread_self* self = get_self_ptr();

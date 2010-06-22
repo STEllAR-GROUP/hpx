@@ -22,7 +22,7 @@ namespace hpx { namespace threads
         thread_init_data(F f, char const* desc = 0, 
                 naming::address::address_type lva = 0) 
           : func(f), description(desc), 
-            lva(lva), parent_prefix(0), parent_id(0)
+            lva(lva), parent_prefix(0), parent_id(0), parent_phase(0)
         {}
 
         boost::function<threads::thread_function_type> func;
@@ -30,6 +30,7 @@ namespace hpx { namespace threads
         naming::address::address_type lva;
         boost::uint32_t parent_prefix;
         threads::thread_id_type parent_id;
+        std::size_t parent_phase;
     };
 }}
 

@@ -32,6 +32,7 @@
     action(BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         : arguments_(BOOST_PP_ENUM_PARAMS(N, arg)), 
           parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())), 
+          parent_phase_(threads::get_parent_phase()),
           parent_locality_(applier::get_prefix_id())
     {}
 

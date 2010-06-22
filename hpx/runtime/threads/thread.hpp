@@ -42,6 +42,7 @@ namespace hpx { namespace threads { namespace detail
             description_(init_data.description), 
             lco_description_(""),
             parent_thread_id_(init_data.parent_id),
+            parent_thread_phase_(init_data.parent_phase),
             parent_locality_prefix_(init_data.parent_prefix),
             component_id_(init_data.lva),
             marked_state_(unknown)
@@ -51,7 +52,10 @@ namespace hpx { namespace threads { namespace detail
             if (0 == parent_thread_id_) {
                 thread_self* self = get_self_ptr();
                 if (self)
+                {
                     parent_thread_id_ = self->get_thread_id();
+                    parent_thread_phase_ = self->get_thread_phase();
+                }
             }
             if (0 == parent_locality_prefix_) 
                 parent_locality_prefix_ = applier::get_prefix_id();
@@ -63,7 +67,8 @@ namespace hpx { namespace threads { namespace detail
         /// constructor empty
         thread()
           : coroutine_(function_type(), 0), description_(""), lco_description_(0),
-            parent_locality_prefix_(0), parent_thread_id_(0), component_id_(0)
+            parent_locality_prefix_(0), parent_thread_id_(0), 
+            parent_thread_phase_(0), component_id_(0)
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
         }
@@ -179,6 +184,10 @@ namespace hpx { namespace threads { namespace detail
         {
             return parent_thread_id_;
         }
+        std::size_t get_parent_thread_phase() const
+        {
+            return parent_thread_phase_;
+        }
         naming::address::address_type get_component_id() const
         {
             return component_id_;
@@ -231,6 +240,7 @@ namespace hpx { namespace threads { namespace detail
 
         boost::uint32_t parent_locality_prefix_;
         thread_id_type parent_thread_id_;
+        std::size_t parent_thread_phase_;
         naming::address::address_type const component_id_;
         mutable thread_state marked_state_;
 
@@ -333,6 +343,13 @@ namespace hpx { namespace threads
         {
             detail::thread const* t = get();
             return t ? t->get_parent_thread_id() : 0;
+        }
+
+        /// Return the phase of the parent thread
+        std::size_t get_parent_thread_phase() const
+        {
+            detail::thread const* t = get();
+            return t ? t->get_parent_thread_phase() : 0;
         }
 
         /// Return the id of the component this thread is running in

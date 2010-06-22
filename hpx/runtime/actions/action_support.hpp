@@ -122,6 +122,9 @@ namespace hpx { namespace actions
         /// Return the thread id of the parent thread
         virtual threads::thread_id_type get_parent_thread_id() const = 0;
 
+        /// Return the thread phase of the parent thread
+        virtual std::size_t get_parent_thread_phase() const = 0;
+
         /// Return all data needed for thread initialization
         virtual threads::thread_init_data& 
         get_thread_init_data(naming::address::address_type lva,
@@ -172,13 +175,14 @@ namespace hpx { namespace actions
 
         // construct an action from its arguments
         action() 
-          : arguments_(), parent_id_(0), parent_locality_(0)
+          : arguments_(), parent_id_(0), parent_phase_(0), parent_locality_(0)
         {}
 
         template <typename Arg0>
         action(Arg0 const& arg0) 
           : arguments_(arg0), 
             parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())), 
+            parent_phase_(threads::get_parent_phase()),
             parent_locality_(applier::get_prefix_id())
         {}
 
@@ -341,6 +345,12 @@ namespace hpx { namespace actions
             return reinterpret_cast<threads::thread_id_type>(parent_id_);
         }
 
+        /// Return the phase of the parent thread
+        std::size_t get_parent_thread_phase() const
+        {
+            return parent_phase_;
+        }
+
         void enumerate_argument_gids(enum_gid_handler_type f)
         {
             boost::fusion::any(arguments_, enum_gid_handler(f));
@@ -356,12 +366,14 @@ namespace hpx { namespace actions
             util::serialize_sequence(ar, arguments_);
             ar & parent_locality_;
             ar & parent_id_;
+            ar & parent_phase_;
         }
 
     protected:
         arguments_type arguments_;
         boost::uint32_t parent_locality_;
         std::size_t parent_id_;
+        std::size_t parent_phase_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

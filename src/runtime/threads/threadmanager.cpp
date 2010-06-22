@@ -113,7 +113,10 @@ namespace hpx { namespace threads
         if (0 == data.parent_id) {
             thread_self* self = get_self_ptr();
             if (self)
+            {
                 data.parent_id = self->get_thread_id();
+                data.parent_phase = self->get_thread_phase();
+            }
         }
         if (0 == data.parent_prefix) 
             data.parent_prefix = applier::get_prefix_id();
@@ -172,7 +175,10 @@ namespace hpx { namespace threads
         if (0 == data.parent_id) {
             thread_self* self = get_self_ptr();
             if (self)
+            {
                 data.parent_id = self->get_thread_id();
+                data.parent_phase = self->get_thread_phase();
+            }
         }
         if (0 == data.parent_prefix) 
             data.parent_prefix = applier::get_prefix_id();

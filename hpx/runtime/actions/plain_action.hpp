@@ -199,6 +199,7 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(lva);
             data.description = detail::get_action_name<plain_result_action0>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             return data;
         }
@@ -212,6 +213,7 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(cont, lva);
             data.description = detail::get_action_name<plain_result_action0>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             return data;
         }
@@ -281,6 +283,7 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(lva);
             data.description = detail::get_action_name<plain_direct_result_action0>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             return data;
         }
@@ -294,6 +297,7 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(cont, lva);
             data.description = detail::get_action_name<plain_direct_result_action0>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             return data;
         }
@@ -434,6 +438,7 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(lva);
             data.description = detail::get_action_name<plain_action0>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             return data;
         }
@@ -447,6 +452,7 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(cont, lva);
             data.description = detail::get_action_name<plain_action0>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             return data;
         }
@@ -515,6 +521,7 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(lva);
             data.description = detail::get_action_name<plain_direct_action0>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             return data;
         }
@@ -528,6 +535,7 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(cont, lva);
             data.description = detail::get_action_name<plain_direct_action0>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             return data;
         }

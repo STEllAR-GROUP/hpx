@@ -190,6 +190,11 @@ namespace hpx
         /// PX thread).
         HPX_API_EXPORT thread_id_type get_parent_id();
 
+        /// The function \a get_parent_phase returns the PX phase of the 
+        /// currents thread parent (or zero if the current thread is not a 
+        /// PX thread).
+        HPX_API_EXPORT std::size_t get_parent_phase();
+
         /// The function \a get_parent_prefix returns the id of the locality of
         /// the currents thread parent (or zero if the current thread is not a 
         /// PX thread).

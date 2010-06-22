@@ -220,6 +220,7 @@
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
             data.description = detail::get_action_name<BOOST_PP_CAT(plain_result_action, N)>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             return data;
         }
@@ -234,6 +235,7 @@
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
             data.description = detail::get_action_name<BOOST_PP_CAT(plain_result_action, N)>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             return data;
         }
@@ -322,6 +324,7 @@
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
             data.description = detail::get_action_name<BOOST_PP_CAT(plain_direct_result_action, N)>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             return data;
         }
@@ -336,6 +339,7 @@
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
             data.description = detail::get_action_name<BOOST_PP_CAT(plain_direct_result_action, N)>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             return data;
         }
@@ -519,6 +523,7 @@
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
             data.description = detail::get_action_name<BOOST_PP_CAT(plain_action, N)>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             return data;
         }
@@ -533,6 +538,7 @@
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
             data.description = detail::get_action_name<BOOST_PP_CAT(plain_action, N)>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             return data;
         }
@@ -619,6 +625,7 @@
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
             data.description = detail::get_action_name<BOOST_PP_CAT(plain_direct_action, N)>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             return data;
         }
@@ -633,6 +640,7 @@
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
             data.description = detail::get_action_name<BOOST_PP_CAT(plain_direct_action, N)>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             return data;
         }

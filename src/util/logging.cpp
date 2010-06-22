@@ -228,6 +228,31 @@ namespace hpx { namespace util
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    // custom formatter: PX parent thread phase
+    struct parent_thread_phase 
+      : boost::logging::formatter::class_<
+            parent_thread_phase, 
+            boost::logging::formatter::implement_op_equal::no_context
+        > 
+    {
+        void operator()(param str) const 
+        {
+            std::size_t parent_phase = threads::get_parent_phase();
+            if (0 != parent_phase) {
+                // called from inside a PX thread 
+                std::stringstream out;
+                out << std::hex << std::setw(2) << std::setfill('0') 
+                    << parent_phase;
+                str.prepend_string(out.str());
+            }
+            else {
+                // called from outside a PX thread 
+                str.prepend_string("--");
+            }
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     // custom formatter: PX component id of current thread
     struct thread_component_id 
       : boost::logging::formatter::class_<
@@ -319,6 +344,7 @@ namespace hpx { namespace util
             agas_logger()->writer().replace_formatter("pxthread", thread_id());
             agas_logger()->writer().replace_formatter("pxphase", thread_phase());
             agas_logger()->writer().replace_formatter("pxparent", parent_thread_id());
+            agas_logger()->writer().replace_formatter("pxparentphase", parent_thread_phase());
             agas_logger()->writer().replace_formatter("parentloc", parent_thread_locality());
             agas_logger()->writer().replace_formatter("pxcomponent", thread_component_id());
             agas_logger()->mark_as_initialized();
@@ -366,6 +392,7 @@ namespace hpx { namespace util
             timing_logger()->writer().replace_formatter("pxthread", thread_id());
             timing_logger()->writer().replace_formatter("pxphase", thread_phase());
             timing_logger()->writer().replace_formatter("pxparent", parent_thread_id());
+            timing_logger()->writer().replace_formatter("pxparentphase", parent_thread_phase());
             timing_logger()->writer().replace_formatter("parentloc", parent_thread_locality());
             timing_logger()->writer().replace_formatter("pxcomponent", thread_component_id());
             timing_logger()->mark_as_initialized();
@@ -415,6 +442,7 @@ namespace hpx { namespace util
             hpx_logger()->writer().replace_formatter("pxthread", thread_id());
             hpx_logger()->writer().replace_formatter("pxphase", thread_phase());
             hpx_logger()->writer().replace_formatter("pxparent", parent_thread_id());
+            hpx_logger()->writer().replace_formatter("pxparentphase", parent_thread_phase());
             hpx_logger()->writer().replace_formatter("parentloc", parent_thread_locality());
             hpx_logger()->writer().replace_formatter("pxcomponent", thread_component_id());
             hpx_logger()->mark_as_initialized();
@@ -428,6 +456,7 @@ namespace hpx { namespace util
             hpx_error_logger()->writer().replace_formatter("pxthread", thread_id());
             hpx_error_logger()->writer().replace_formatter("pxphase", thread_phase());
             hpx_error_logger()->writer().replace_formatter("pxparent", parent_thread_id());
+            hpx_error_logger()->writer().replace_formatter("pxparentphase", parent_thread_phase());
             hpx_error_logger()->writer().replace_formatter("parentloc", parent_thread_locality());
             hpx_error_logger()->writer().replace_formatter("pxcomponent", thread_component_id());
             hpx_error_logger()->mark_as_initialized();
@@ -447,6 +476,7 @@ namespace hpx { namespace util
             hpx_error_logger()->writer().replace_formatter("pxthread", thread_id());
             hpx_error_logger()->writer().replace_formatter("pxphase", thread_phase());
             hpx_error_logger()->writer().replace_formatter("pxparent", parent_thread_id());
+            hpx_error_logger()->writer().replace_formatter("pxparentphase", parent_thread_phase());
             hpx_error_logger()->writer().replace_formatter("parentloc", parent_thread_locality());
             hpx_error_logger()->writer().replace_formatter("pxcomponent", thread_component_id());
             hpx_error_logger()->mark_as_initialized();
@@ -496,6 +526,7 @@ namespace hpx { namespace util
             app_logger()->writer().replace_formatter("pxthread", thread_id());
             app_logger()->writer().replace_formatter("pxphase", thread_phase());
             app_logger()->writer().replace_formatter("pxparent", parent_thread_id());
+            app_logger()->writer().replace_formatter("pxparentphase", parent_thread_phase());
             app_logger()->writer().replace_formatter("parentloc", parent_thread_locality());
             app_logger()->writer().replace_formatter("pxcomponent", thread_component_id());
             app_logger()->mark_as_initialized();
@@ -683,7 +714,7 @@ namespace hpx { namespace util { namespace detail
                     "destination = ${HPX_LOGDESTINATION:console}",
                     "format = ${HPX_LOGFORMAT:"
                         "(T%locality%/%pxthread%.%pxphase%/%pxcomponent%) "
-                        "P%parentloc%/%pxparent% %time%(" HPX_TIMEFORMAT 
+                        "P%parentloc%/%pxparent%.%pxparentphase% %time%(" HPX_TIMEFORMAT 
                         ") [%idx%]|\\n}",
 
                 // general console logging
@@ -698,7 +729,7 @@ namespace hpx { namespace util { namespace detail
                     "destination = ${HPX_TIMING_LOGDESTINATION:console}",
                     "format = ${HPX_TIMING_LOGFORMAT:"
                         "(T%locality%/%pxthread%.%pxphase%/%pxcomponent%) "
-                        "P%parentloc%/%pxparent% %time%(" HPX_TIMEFORMAT 
+                        "P%parentloc%/%pxparent%.%pxparentphase% %time%(" HPX_TIMEFORMAT 
                         ") [%idx%] [TIM] |\\n}",
 
                 // console logging related to timing
@@ -714,7 +745,7 @@ namespace hpx { namespace util { namespace detail
                     "destination = ${HPX_AGAS_LOGDESTINATION:file(hpx.agas.$[system.pid].log)}",
                     "format = ${HPX_AGAS_LOGFORMAT:"
                         "(T%locality%/%pxthread%.%pxphase%/%pxcomponent%) "
-                        "P%parentloc%/%pxparent% %time%(" HPX_TIMEFORMAT 
+                        "P%parentloc%/%pxparent%.%pxparentphase% %time%(" HPX_TIMEFORMAT 
                         ") [%idx%][AGAS] |\\n}",
 
                 // console logging related to AGAS
@@ -729,7 +760,7 @@ namespace hpx { namespace util { namespace detail
                     "destination = ${HPX_APP_LOGDESTINATION:console}",
                     "format = ${HPX_APP_LOGFORMAT:"
                       "(T%locality%/%pxthread%.%pxphase%/%pxcomponent%) "
-                      "P%parentloc%/%pxparent% %time%(" HPX_TIMEFORMAT 
+                      "P%parentloc%/%pxparent%.%pxparentphase% %time%(" HPX_TIMEFORMAT 
                       ") [%idx%] [APP] |\\n}",
 
                 // console logging related to applications

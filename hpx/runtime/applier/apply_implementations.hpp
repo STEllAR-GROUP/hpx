@@ -124,7 +124,9 @@
         // Determine whether the gid is local or remote
         naming::address addr;
         if (hpx::applier::get_applier().address_is_local(gid, addr))
+        {
             return apply_l<Action>(c, addr, BOOST_PP_ENUM_PARAMS(N, arg));
+        }
 
         // apply remotely
         return apply_r<Action>(addr, c, gid, BOOST_PP_ENUM_PARAMS(N, arg));
