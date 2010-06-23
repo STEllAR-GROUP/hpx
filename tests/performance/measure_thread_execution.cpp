@@ -10,6 +10,7 @@
 
 using namespace hpx;
 namespace po = boost::program_options;
+double globald = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 // this is a empty test thread
@@ -17,6 +18,14 @@ threads::thread_state_enum null_thread(threads::thread_state_ex_enum)
 {
 //     naming::id_type gid = 
 //         appl.get_thread_manager().get_thread_gid(self.get_thread_id(), appl);
+//     util::high_resolution_timer timer;
+    double d = 0.;
+    for (int i = 0; i < 2000; ++i)
+    {
+        d += 1/(2.* i + 1);
+    }
+    globald = d;
+//     std::cout << timer.elapsed() << std::endl;
     return threads::terminated;
 }
 
@@ -195,7 +204,8 @@ int main(int argc, char* argv[])
                 num_threads);
             elapsed = timer.elapsed();
         }
-        std::cout << elapsed/num_hpx_threads <<std::endl;
+        std::cout << elapsed /*/num_hpx_threads*/ << std::endl;
+        std::cout << globald << std::endl;
     }
 
     catch (std::exception& e) {
