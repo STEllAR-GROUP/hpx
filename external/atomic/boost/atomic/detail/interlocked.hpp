@@ -102,9 +102,11 @@ private:
 
 extern "C" boost::int64_t __cdecl _InterlockedExchangeAdd64(boost::int64_t volatile *, boost::int64_t);
 extern "C" boost::int64_t __cdecl _InterlockedExchange64(boost::int64_t volatile *, boost::int64_t);
+extern "C" boost::int64_t __cdecl _InterlockedCompareExchange64(boost::int64_t volatile *, boost::int64_t, boost::int64_t);
 
 # pragma intrinsic( _InterlockedExchangeAdd64 )
 # pragma intrinsic( _InterlockedExchange64 )
+# pragma intrinsic( _InterlockedCompareExchange64 )
 
 template<typename T>
 class atomic_interlocked_64 {
@@ -132,7 +134,7 @@ public:
         memory_order failure_order) volatile
     {
         T prev=expected;
-        expected=(T)_InterlockedExchange64((boost::int64_t *)(&i), (boost::int64_t)desired, (boost::int64_t)expected);
+        expected=(T)_InterlockedCompareExchange64((boost::int64_t *)(&i), (boost::int64_t)desired, (boost::int64_t)expected);
         bool success=(prev==expected);
         return success;
     }
