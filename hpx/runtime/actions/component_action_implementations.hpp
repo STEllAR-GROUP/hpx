@@ -273,6 +273,7 @@
         static Result execute_function(naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
+            LTM_(debug) << "Executing direct component action with result.";
             return (get_lva<Component>::call(lva)->*F)(
                 BOOST_PP_ENUM_PARAMS(N, arg));
         }
@@ -376,6 +377,7 @@
             naming::address::address_type lva, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
+            LTM_(debug) << "Executing component action.";
             (get_lva<Component>::call(lva)->*F)(BOOST_PP_ENUM_PARAMS(N, arg));
             return threads::terminated;
         }
@@ -568,6 +570,9 @@
         static util::unused_type execute_function(naming::address::address_type lva, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
+            LTM_(debug) << "Executing direct component action("
+                        << detail::get_action_name<BOOST_PP_CAT(direct_action, N)>()
+                        << ")";
             (get_lva<Component>::call(lva)->*F)(BOOST_PP_ENUM_PARAMS(N, arg));
             return util::unused;
         }

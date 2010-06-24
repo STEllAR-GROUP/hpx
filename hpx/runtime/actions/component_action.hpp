@@ -211,6 +211,7 @@ namespace hpx { namespace actions
         ///
         static Result execute_function(naming::address::address_type lva)
         {
+            LTM_(debug) << "Executing direct component action with result.";
             return (get_lva<Component>::call(lva)->*F)();
         }
 
@@ -294,6 +295,7 @@ namespace hpx { namespace actions
         static threads::thread_state_enum 
         thread_function(naming::address::address_type lva)
         {
+            LTM_(debug) << "Executing component action.";
             (get_lva<Component>::call(lva)->*F)();      // just call the function
             return threads::terminated;
         }
@@ -437,6 +439,8 @@ namespace hpx { namespace actions
         ///
         static util::unused_type execute_function(naming::address::address_type lva)
         {
+            LTM_(debug) << "Executing direct component action("
+                        << detail::get_action_name<direct_action0>() << ")";
             (get_lva<Component>::call(lva)->*F)();
             return util::unused;
         }

@@ -78,6 +78,7 @@
         static threads::thread_state_enum thread_function(
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
+            LTM_(debug) << "Executing action.";
             F(BOOST_PP_ENUM_PARAMS(N, arg));
             return threads::terminated;
         }
@@ -278,6 +279,7 @@
             naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
+            LTM_(debug) << "Executing direct action.";
             return F(BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
@@ -385,6 +387,7 @@
         static threads::thread_state_enum thread_function(
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
+            LTM_(debug) << "Executing action.";
             F(BOOST_PP_ENUM_PARAMS(N, arg));
             return threads::terminated;
         }
@@ -579,6 +582,7 @@
         static util::unused_type execute_function(naming::address::address_type lva, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
+            LTM_(debug) << "Executing direct action.";
             F(BOOST_PP_ENUM_PARAMS(N, arg));
             return util::unused;
         }

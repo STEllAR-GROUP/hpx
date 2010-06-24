@@ -85,6 +85,7 @@ namespace hpx { namespace actions
         static threads::thread_state_enum 
         thread_function(threads::thread_state_ex_enum)
         {
+            LTM_(debug) << "Executing action.";
             F();      // call the function, ignoring the return value
             return threads::terminated;
         }
@@ -239,6 +240,7 @@ namespace hpx { namespace actions
         ///
         static Result execute_function(naming::address::address_type lva)
         {
+            LTM_(debug) << "Executing direct action.";
             return F();
         }
 
@@ -330,6 +332,7 @@ namespace hpx { namespace actions
         static threads::thread_state_enum 
         thread_function(threads::thread_state_ex_enum)
         {
+            LTM_(debug) << "Executing action.";
             F();      // just call the function
             return threads::terminated;
         }
@@ -476,6 +479,7 @@ namespace hpx { namespace actions
         ///
         static util::unused_type execute_function(naming::address::address_type lva)
         {
+            LTM_(debug) << "Executing direct action.";
             F();
             return util::unused;
         }

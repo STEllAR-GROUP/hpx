@@ -220,6 +220,7 @@ namespace hpx { namespace actions
             boost::tuple<Func> func)
         {
             try {
+                LTM_(debug) << "Executing action with continuation.";
                 boost::get<0>(func)();
                 cont->trigger();
             }
@@ -262,6 +263,7 @@ namespace hpx { namespace actions
             boost::tuple<Func> func)
         {
             try {
+                LTM_(debug) << "Executing action with continuation.";
                 cont->trigger(boost::get<0>(func)());
             }
             catch (hpx::exception const&) {
