@@ -26,20 +26,66 @@
 //      1  if the operation fails to update memory
 // <Rm> Specifies the register containing the word to be stored to memory.
 // <Rn> Specifies the register containing the address.
+// Rd must not be the same register is Rm or Rn.
 //
 // ARM v7 is like ARM v6 plus:
 // There are half-word and byte versions of the LDREX and STREX instructions,
 // LDREXH, LDREXB, STREXH and STREXB.
+// There are also double-word versions, LDREXD and STREXD.
+// (Actually it looks like these are available from version 6k onwards.)
+// FIXME these are not yet used; should be mostly a matter of copy-and-paste.
 // I think you can supply an immediate offset to the address.
 //
-// A memory barrier is effected using a "co-processor 15" instruction.
+// A memory barrier is effected using a "co-processor 15" instruction, 
+// though a separate assembler mnemonic is available for it in v7.
 
 namespace boost {
 namespace detail {
 namespace atomic {
 
 
-#define BOOST_ATOMIC_ARM_DMB "mcr\tp15, 0, r0, c7, c10, 5"
+// "Thumb 1" is a subset of the ARM instruction set that uses a 16-bit encoding.  It
+// doesn't include all instructions and in particular it doesn't include the co-processor
+// instruction used for the memory barrier or the load-locked/store-conditional 
+// instructions.  So, if we're compiling in "Thumb 1" mode, we need to wrap all of our 
+// asm blocks with code to temporarily change to ARM mode.
+//
+// You can only change between ARM and Thumb modes when branching using the bx instruction. 
+// bx takes an address specified in a register.  The least significant bit of the address 
+// indicates the mode, so 1 is added to indicate that the destination code is Thumb. 
+// A temporary register is needed for the address and is passed as an argument to these 
+// macros.  It must be one of the "low" registers accessible to Thumb code, specified 
+// usng the "l" attribute in the asm statement.
+//
+// Architecture v7 introduces "Thumb 2", which does include (almost?) all of the ARM 
+// instruction set.  So in v7 we don't need to change to ARM mode; we can write "universal 
+// assembler" which will assemble to Thumb 2 or ARM code as appropriate.  The only thing 
+// we need to do to make this "universal" assembler mode work is to insert "IT" instructions 
+// to annotate the conditional instructions.  These are ignored in other modes (e.g. v6), 
+// so they can always be present.
+
+#if defined(__thumb__) && !defined(__ARM_ARCH_7A__)
+// FIXME also other v7 variants.
+#define BOOST_ATOMIC_ARM_ASM_START(TMPREG) "adr " #TMPREG ", 1f\n" "bx " #TMPREG "\n" ".arm\n" ".align 4\n" "1: "
+#define BOOST_ATOMIC_ARM_ASM_END(TMPREG)   "adr " #TMPREG ", 1f + 1\n" "bx " #TMPREG "\n" ".thumb\n" ".align 2\n" "1: "
+
+#else
+// The tmpreg is wasted in this case, which is non-optimal.
+#define BOOST_ATOMIC_ARM_ASM_START(TMPREG)
+#define BOOST_ATOMIC_ARM_ASM_END(TMPREG)
+#endif
+
+
+#if defined(__ARM_ARCH_7A__)
+// FIXME ditto.
+#define BOOST_ATOMIC_ARM_DMB "dmb\n"
+#else
+#define BOOST_ATOMIC_ARM_DMB "mcr\tp15, 0, r0, c7, c10, 5\n"
+#endif
+
+// There is also a "Data Synchronisation Barrier" DSB; this exists in v6 as another co-processor
+// instruction like the above.
+
 
 static inline void fence_before(memory_order order)
 {
@@ -48,7 +94,13 @@ static inline void fence_before(memory_order order)
 		case memory_order_release:
 		case memory_order_acq_rel:
 		case memory_order_seq_cst:
-			__asm__ __volatile__ (BOOST_ATOMIC_ARM_DMB ::: "memory");
+			int brtmp;
+			__asm__ __volatile__ (
+				BOOST_ATOMIC_ARM_ASM_START(%0)
+				BOOST_ATOMIC_ARM_DMB
+				BOOST_ATOMIC_ARM_ASM_END(%0)
+				: "=&l" (brtmp) :: "memory"
+			);
 		default:;
 	}
 }
@@ -60,7 +112,13 @@ static inline void fence_after(memory_order order)
 		case memory_order_acquire:
 		case memory_order_acq_rel:
 		case memory_order_seq_cst:
-			__asm__ __volatile__ (BOOST_ATOMIC_ARM_DMB ::: "memory");
+			int brtmp;
+			__asm__ __volatile__ (
+				BOOST_ATOMIC_ARM_ASM_START(%0)
+				BOOST_ATOMIC_ARM_DMB
+				BOOST_ATOMIC_ARM_ASM_END(%0)
+				: "=&l" (brtmp) :: "memory"
+			);
 		case memory_order_consume:
 			__asm__ __volatile__ ("" ::: "memory");
 		default:;
@@ -97,15 +155,18 @@ public:
 		int success;
 		int tmp;
 		__asm__ __volatile__(
+			BOOST_ATOMIC_ARM_ASM_START(%2)
 			"mov     %1, #0\n"        // success = 0
 			"ldrex   %0, [%3]\n"      // expected' = *(&i)
 			"teq     %0, %4\n"        // flags = expected'==expected
+			"ittt    eq\n"
 			"strexeq %2, %5, [%3]\n"  // if (flags.equal) *(&i) = desired, tmp = !OK
 			"teqeq   %2, #0\n"        // if (flags.equal) flags = tmp==0
 			"moveq   %1, #1\n"        // if (flags.equal) success = 1
+			BOOST_ATOMIC_ARM_ASM_END(%2)
 				: "=&r" (expected),  // %0
 				  "=&r" (success),   // %1
-				  "=&r" (tmp)        // %2
+				  "=&l" (tmp)        // %2
                                 : "r" (&i),          // %3
 				  "r" (expected),    // %4
 				  "r" ((int)desired) // %5
@@ -124,14 +185,17 @@ protected:
 		T original, tmp;
 		int tmp2;
 		__asm__ __volatile__(
+			BOOST_ATOMIC_ARM_ASM_START(%2)
 			"1: ldrex %0, [%3]\n"      // original = *(&i)
 			"add      %1, %0, %4\n"    // tmp = original + c
 			"strex    %2, %1, [%3]\n"  // *(&i) = tmp;  tmp2 = !OK
 			"teq      %2, #0\n"        // flags = tmp2==0
+			"it       ne\n"
 			"bne      1b\n"            // if (!flags.equal) goto 1
+			BOOST_ATOMIC_ARM_ASM_END(%2)
 				: "=&r" (original), // %0
 				  "=&r" (tmp),      // %1
-				  "=&r" (tmp2)      // %2
+				  "=&l" (tmp2)      // %2
 				: "r" (&i),         // %3
 				  "r" (c)           // %4
 				: "cc"
@@ -145,14 +209,17 @@ protected:
 		T original, tmp;
 		int tmp2;
 		__asm__ __volatile__(
+			BOOST_ATOMIC_ARM_ASM_START(%2)
 			"1: ldrex %0, [%3]\n"      // original = *(&i)
 			"add      %1, %0, #1\n"    // tmp = original + 1
 			"strex    %2, %1, [%3]\n"  // *(&i) = tmp;  tmp2 = !OK
 			"teq      %2, #0\n"        // flags = tmp2==0
+			"it       ne\n"
 			"bne      1b\n"            // if (!flags.equal) goto 1
+			BOOST_ATOMIC_ARM_ASM_END(%2)
 				: "=&r" (original), // %0
 				  "=&r" (tmp),      // %1
-				  "=&r" (tmp2)      // %2
+				  "=&l" (tmp2)      // %2
 				: "r" (&i)          // %3
 				: "cc"
 			);
@@ -165,14 +232,17 @@ protected:
 		T original, tmp;
 		int tmp2;
 		__asm__ __volatile__(
+			BOOST_ATOMIC_ARM_ASM_START(%2)
 			"1: ldrex %0, [%3]\n"      // original = *(&i)
 			"sub      %1, %0, #1\n"    // tmp = original - 1
 			"strex    %2, %1, [%3]\n"  // *(&i) = tmp;  tmp2 = !OK
 			"teq      %2, #0\n"        // flags = tmp2==0
+			"it       ne\n"
 			"bne      1b\n"            // if (!flags.equal) goto 1
+			BOOST_ATOMIC_ARM_ASM_END(%2)
 				: "=&r" (original), // %0
 				  "=&r" (tmp),      // %1
-				  "=&r" (tmp2)      // %2
+				  "=&l" (tmp2)      // %2
 				: "r" (&i)          // %3
 				: "cc"
 			);
@@ -221,5 +291,9 @@ typedef build_exchange<atomic_arm_4<void *> > platform_atomic_address;
 }
 }
 }
+
+#undef BOOST_ATOMIC_ARM_ASM_START
+#undef BOOST_ATOMIC_ARM_ASM_END
+
 
 #endif
