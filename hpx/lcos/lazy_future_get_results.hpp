@@ -43,7 +43,7 @@
     {
         // initialize the remote operation
         hpx::applier::apply_c<Action>(
-            this->get_gid(naming::id_type::unmanaged), gid, 
+            this->get_gid(), gid, 
             BOOST_PP_ENUM_PARAMS(N, arg));
 
         // wait for the result (yield control)
