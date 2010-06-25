@@ -72,11 +72,11 @@ private:
 // }
 
 ///////////////////////////////////////////////////////////////////////////////
-int fib(int n, int orig_arg, int delay_coeff);
+int fib(int n, int delay_coeff);
 int fib_rhs(int n, int delay_coeff);
 
 typedef 
-    actions::plain_result_action3<int, int, int, int, fib> 
+    actions::plain_result_action2<int, int, int, fib> 
 fibonacci4_action;
 
 typedef 
@@ -107,7 +107,7 @@ inline void do_busy_work(double delay_coeff)
 }
 
 
-int fib (int n, int orig_arg, int delay_coeff)
+int fib (int n, int delay_coeff)
 {
     // count number of invocations
     count_invocation();
@@ -123,20 +123,31 @@ int fib (int n, int orig_arg, int delay_coeff)
 
     gid_type here = find_here();
 
-    std::vector<int> distribution;
+    int i;
 
-    int num_localities = world.num_localities();
+
+    for (i = 0; i < world.num_localities(); ++i)
+    {
+        if (world.locality(i).get_msb() == here.get_msb())
+            break;
+    }
+
+
     
+    if (i+1 != world.num_localities())
+    {
+        fibonacci_future n1(world.locality(i+1), n - 1, delay_coeff);
+        fibonacci_rhs_future n2(here,  n - 2, delay_coeff);
+        return n1.get() + n2.get();
+    }
+    else
+    {
+        fibonacci_rhs_future n1(here,  n - 1, delay_coeff);
+        fibonacci_rhs_future n2(here,  n - 2, delay_coeff);
+        return n1.get() + n2.get();
+    }
 
-    int num_to_spawn = orig_arg / num_localities;
-    for (int i = 0; i < num_to_spawn+1; i++)
-        for (int j = 0; j < num_localities; j++)
-            distribution.push_back(j);
-
-    fibonacci_future n1(world.locality(distribution[(orig_arg-n)+1]),  n - 1, orig_arg, delay_coeff);
-    fibonacci_rhs_future n2(here,  n - 2, delay_coeff);
-
-    return n1.get() + n2.get();
+    return -1;
 }
 
 int fib_rhs (int n, int delay_coeff)
@@ -185,7 +196,7 @@ int hpx_main(po::variables_map &vm)
 
     {
         util::high_resolution_timer t;
-        fibonacci_future n(here, argument, argument, delay_coeff);
+        fibonacci_future n(here, argument, delay_coeff);
         result = n.get();
         elapsed = t.elapsed();
     }
