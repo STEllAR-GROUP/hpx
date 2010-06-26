@@ -98,7 +98,7 @@ namespace hpx { namespace lcos
         {
             // initialize the operation
             hpx::applier::apply_c<Action>(
-                this->get_gid(naming::id_type::unmanaged), gid);
+                this->get_gid(), gid);
 
             // wait for the result (yield control)
             return (*this->impl_)->get_data(0);
@@ -128,7 +128,7 @@ namespace hpx { namespace lcos
         {
             // initialize the operation
             hpx::applier::apply_c<Action>(
-                this->get_gid(naming::id_type::unmanaged), gid, arg0);
+                this->get_gid(), gid, arg0);
 
             // wait for the result (yield control)
             return (*this->impl_)->get_data(0);
@@ -191,7 +191,7 @@ namespace hpx { namespace lcos
 
             // initialize the remote operation
             hpx::applier::apply_c<Action>(
-                addr, this->get_gid(naming::id_type::unmanaged), gid);
+                addr, this->get_gid(), gid);
 
             // wait for the result (yield control)
             return (*this->impl_)->get_data(0);
