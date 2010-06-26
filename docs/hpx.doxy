@@ -50,8 +50,8 @@ SYMBOL_CACHE_SIZE      = 0
 #---------------------------------------------------------------------------
 # Build related configuration options
 #---------------------------------------------------------------------------
-EXTRACT_ALL            = NO
-EXTRACT_PRIVATE        = NO
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
 EXTRACT_STATIC         = YES
 EXTRACT_LOCAL_CLASSES  = YES
 EXTRACT_LOCAL_METHODS  = YES
@@ -126,17 +126,66 @@ FILE_PATTERNS          = *.c \
                          *.f90
 RECURSIVE              = YES
 EXCLUDE                = ../.svn \
-                         ../hpx/actions/.svn \
-                         ../hpx/applier/.svn \
+                         ../applications \
+                         ../build \
+                         ../docs \
+                         ../examples \
+                         ../external \
+                         ../misc \
+                         ../tests \
+                         ../tools \
+                         ../hpx/c/.svn \
                          ../hpx/components/.svn \
-                         ../hpx/components/server/.svn \
-                         ../hpx/components/stubs/.svn \
-                         ../hpx/naming/server/.svn \
-                         ../hpx/naming/.svn \
-                         ../hpx/parcelset/server/.svn \
-                         ../hpx/parcelset/.svn \
-                         ../hpx/threadmanager/.svn \
-                         ../hpx/util/.svn
+                         ../hpx/components/distributed_map/.svn \
+                         ../hpx/components/distributed_map/server/.svn \
+                         ../hpx/components/distributed_map/stubs/.svn \
+                         ../hpx/components/distributed_set/.svn \
+                         ../hpx/components/distributed_set/server/.svn \
+                         ../hpx/components/distributed_set/stubs/.svn \
+                         ../hpx/components/graph/.svn \
+                         ../hpx/components/graph/server/.svn \
+                         ../hpx/components/graph/stubs/.svn \
+                         ../hpx/components/performance_counters/.svn \
+                         ../hpx/components/performance_counters/server/.svn \
+                         ../hpx/components/performance_counters/stubs/.svn \
+                         ../hpx/config/.svn \
+                         ../hpx/include/.svn \
+                         ../hpx/components/lcos/.svn \
+                         ../hpx/components/lcos/server/.svn \
+                         ../hpx/components/lcos/stubs/.svn \
+                         ../hpx/runtime/.svn \
+                         ../hpx/runtime/actions/.svn \
+                         ../hpx/runtime/applier/.svn \
+                         ../hpx/runtime/components/.svn \
+                         ../hpx/runtime/components/server/.svn \
+                         ../hpx/runtime/components/stubs/.svn \
+                         ../hpx/runtime/naming/.svn \
+                         ../hpx/runtime/naming/server/.svn \
+                         ../hpx/runtime/naming/detail/.svn \
+                         ../hpx/runtime/parcelset/.svn \
+                         ../hpx/runtime/parcelset/server/.svn \
+                         ../hpx/runtime/threads/.svn \
+                         ../hpx/runtime/threads/policies/.svn \
+                         ../hpx/runtime/threads/detail/.svn \
+                         ../hpx/util/.svn \
+                         ../src/.svn \
+                         ../src/lcos/.svn \
+                         ../src/performance_counters/.svn \
+                         ../src/performance_counters/server/.svn \
+                         ../src/performance_counters/stubs/.svn \
+                         ../src/runtime/.svn \
+                         ../src/runtime/actions/.svn \
+                         ../src/runtime/applier/.svn \
+                         ../src/runtime/components/.svn \
+                         ../src/runtime/components/server/.svn \
+                         ../src/runtime/naming/.svn \
+                         ../src/runtime/naming/server/.svn \
+                         ../src/runtime/naming/detail/.svn \
+                         ../src/runtime/parcelset/.svn \
+                         ../src/runtime/parcelset/server/.svn \
+                         ../src/runtime/threads/.svn \
+                         ../src/runtime/.svn \
+                         ../src/util/.svn \
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = 
 EXCLUDE_SYMBOLS        = 
