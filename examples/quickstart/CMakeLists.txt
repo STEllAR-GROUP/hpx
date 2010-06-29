@@ -19,5 +19,6 @@ add_hpx_executable(fibonacci3 SOURCES fibonacci3.cpp)
 add_hpx_executable(fibonacci4 SOURCES fibonacci4.cpp)
 add_hpx_executable(fibonacci4_phased SOURCES fibonacci4_phased.cpp)
 add_hpx_executable(fibonacci2_memo SOURCES fibonacci2_memo.cpp)
+add_hpx_executable(fibonacci2_thunk SOURCES fibonacci2_thunk.cpp)
 #add_hpx_executable(quicksort SOURCES quicksort.cpp)
 

@@ -60,7 +60,10 @@ set (hpxlib_lcos_HEADERS
     ${hpx_SOURCE_DIR}/hpx/lcos/lazy_future_get_results_direct.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/local_barrier.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/mutex.hpp
-    ${hpx_SOURCE_DIR}/hpx/lcos/recursive_mutex.hpp)
+    ${hpx_SOURCE_DIR}/hpx/lcos/recursive_mutex.hpp
+    ${hpx_SOURCE_DIR}/hpx/lcos/thunk.hpp
+    ${hpx_SOURCE_DIR}/hpx/lcos/thunk_constructors.hpp
+    ${hpx_SOURCE_DIR}/hpx/lcos/thunk_constructors_direct.hpp)
 source_group("Header Files\\lcos" 
     FILES ${hpxlib_lcos_HEADERS})
 

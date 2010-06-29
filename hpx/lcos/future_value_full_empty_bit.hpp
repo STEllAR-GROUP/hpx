@@ -70,6 +70,13 @@ namespace hpx { namespace lcos { namespace detail
             data_->set_empty();
         }
 
+        /// Return whether or not the data is available for this
+        /// \a future_value.
+        bool is_data()
+        {
+            return !(data_->is_empty());
+        }
+
         /// Get the result of the requested action. This call blocks (yields 
         /// control) if the result is not ready. As soon as the result has been 
         /// returned and the waiting thread has been re-scheduled by the thread
@@ -198,6 +205,13 @@ namespace hpx { namespace lcos { namespace detail
         void reset()
         {
             data_->set_empty();
+        }
+
+        /// Return whether or not the data is available for this
+        /// \a future_value.
+        bool is_data()
+        {
+            return !(data_->is_empty());
         }
 
         /// Get the result of the requested action. This call blocks (yields 
