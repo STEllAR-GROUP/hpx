@@ -733,6 +733,15 @@
     <ClInclude Include="..\..\..\hpx\runtime\components\plain_component_factory.hpp">
       <Filter>Header Files\Runtime\Components</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\thunk.hpp">
+      <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\thunk_constructors.hpp">
+      <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\thunk_constructors_direct.hpp">
+      <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\CMakeLists.txt">

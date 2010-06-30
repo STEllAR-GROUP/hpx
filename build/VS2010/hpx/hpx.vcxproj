@@ -208,6 +208,9 @@
     <ClInclude Include="..\..\..\hpx\lcos\local_barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\server\barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\stubs\barrier.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\thunk.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\thunk_constructors.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\thunk_constructors_direct.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\actions\action_registry.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\actions\manage_object_action.hpp" />

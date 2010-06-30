@@ -17,7 +17,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(TBB_ROOT)\include;$(BOOST_ROOT);$(HPX_ROOT);$(HPX_ROOT)\external\cache;$(HPX_ROOT)\external\chrono;$(HPX_ROOT)\external\coroutine;$(HPX_ROOT)\external\endian;$(HPX_ROOT)\external\singleton;$(HPX_ROOT)\external\function_types;$(HPX_ROOT)\external\math;$(HPX_ROOT)\external\logging;$(HPX_ROOT)\external\exception;$(HPX_ROOT)\external\lockfree;$(HPX_ROOT)\external\plugin;$(HPX_ROOT)\external\atomic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;HPX_PREFIX="$(HPX_ROOT)/bin64";HPX_USE_TBB=0;HPX_USE_LOCKFREE=1;BOOST_COROUTINE_USE_FIBERS=1;BOOST_SERIALIZATION_DYN_LINK;BOOST_COROUTINE_USE_ATOMIC_COUNT;BOOST_CHRONO_NO_LIB;BOOST_USE_WINDOWS_H;HPX_DEBUG_WRAPPER_HEAP=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;HPX_PREFIX="$(HPX_ROOT)/bin64/$(Configuration)";HPX_USE_TBB=0;HPX_USE_LOCKFREE=1;BOOST_COROUTINE_USE_FIBERS=1;BOOST_SERIALIZATION_DYN_LINK;BOOST_COROUTINE_USE_ATOMIC_COUNT;BOOST_CHRONO_NO_LIB;BOOST_USE_WINDOWS_H;HPX_DEBUG_WRAPPER_HEAP=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4267;4503;4251;4275;4094;4180;4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <AdditionalOptions>$(BUILD_OPTIONS) %(AdditionalOptions)</AdditionalOptions>
       <MinimalRebuild>
@@ -28,13 +28,14 @@
     </Link>
     <CustomBuildStep>
       <Command>if not exist "$(HPX_ROOT)\bin64" mkdir "$(HPX_ROOT)\bin64"
-if not exist "$(HPX_ROOT)\bin64\lib" mkdir "$(HPX_ROOT)\bin64\lib"
-if not exist "$(HPX_ROOT)\bin64\libs" mkdir "$(HPX_ROOT)\bin64\libs"
-xcopy /Y/F "$(TargetPath)" "$(HPX_ROOT)\bin64\lib"
-xcopy /Y/F "$(TargetDir)\$(TargetName).pdb" "$(HPX_ROOT)\bin64\lib"
-xcopy /Y/F "$(TargetDir)\$(TargetName).lib" "$(HPX_ROOT)\bin64\libs"
+if not exist "$(HPX_ROOT)\bin64\$(Configuration)" mkdir "$(HPX_ROOT)\bin64\$(Configuration)"
+if not exist "$(HPX_ROOT)\bin64\$(Configuration)\lib" mkdir "$(HPX_ROOT)\bin64\$(Configuration)\lib"
+if not exist "$(HPX_ROOT)\bin64\$(Configuration)\libs" mkdir "$(HPX_ROOT)\bin64\$(Configuration)\libs"
+xcopy /Y/F "$(TargetPath)" "$(HPX_ROOT)\bin64\$(Configuration)\lib"
+xcopy /Y/F "$(TargetDir)\$(TargetName).pdb" "$(HPX_ROOT)\bin64\$(Configuration)\lib"
+xcopy /Y/F "$(TargetDir)\$(TargetName).lib" "$(HPX_ROOT)\bin64\$(Configuration)\libs"
 </Command>
-      <Outputs>$(HPX_ROOT)\bin64\lib\$(TargetFileName);$(HPX_ROOT)\bin64\lib\$(TargetName).pdb;%(Outputs)</Outputs>
+      <Outputs>$(HPX_ROOT)\bin64\$(Configuration)\lib\$(TargetFileName);$(HPX_ROOT)\bin64\$(Configuration)\lib\$(TargetName).pdb;%(Outputs)</Outputs>
       <Inputs>$(TargetPath)</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>

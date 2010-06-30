@@ -19,11 +19,12 @@
     </ClCompile>
     <CustomBuildStep>
       <Command>if not exist "$(HPX_ROOT)\bin64" mkdir "$(HPX_ROOT)\bin64"
-if not exist "$(HPX_ROOT)\bin64\lib" mkdir "$(HPX_ROOT)\bin64\lib"
-xcopy /Y/F "$(TargetPath)" "$(HPX_ROOT)\bin64\lib"
-xcopy /Y/F "$(TargetDir)\$(TargetName).pdb" "$(HPX_ROOT)\bin64\lib"
+if not exist "$(HPX_ROOT)\bin64\$(Configuration)" mkdir "$(HPX_ROOT)\bin64\$(Configuration)"
+if not exist "$(HPX_ROOT)\bin64\$(Configuration)\lib" mkdir "$(HPX_ROOT)\bin64\$(Configuration)\lib"
+xcopy /Y/F "$(TargetPath)" "$(HPX_ROOT)\bin64\$(Configuration)\lib"
+xcopy /Y/F "$(TargetDir)\$(TargetName).pdb" "$(HPX_ROOT)\bin64\$(Configuration)\lib"
 </Command>
-      <Outputs>$(HPX_ROOT)\bin64\lib\$(TargetFileName);%(Outputs)</Outputs>
+      <Outputs>$(HPX_ROOT)\bin64\$(Configuration)\lib\$(TargetFileName);%(Outputs)</Outputs>
     </CustomBuildStep>
     <Link />
   </ItemDefinitionGroup>
