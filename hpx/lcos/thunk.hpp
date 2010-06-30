@@ -115,6 +115,11 @@ namespace hpx { namespace lcos
         static void invoke(hpx::lcos::thunk<Action,Result> *th, 
                            naming::id_type const& gid)
         {
+            // FIXME: Simultaneous calls to invokeN() methods may result in
+            // multiple calls to apply(). This is a benign race condition,
+            // as the underlying FEB prevents the action from being called
+            // more than once; but it would be more efficient to reduce the
+            // number of calls to apply().
             if (!((*th->impl_)->is_data()))
               th->apply(gid);
         }
