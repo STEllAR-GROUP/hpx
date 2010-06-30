@@ -64,23 +64,21 @@
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     thunk(naming::gid_type const& gid, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-      : apply_logger_("thunk_direct::apply")
-    {
-        closure_ = boost::bind(
+      : apply_logger_("thunk_direct::apply"),
+        closure_(boost::bind(
             BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N, Arg)>, 
             this, naming::id_type(gid, naming::id_type::unmanaged), 
-            BOOST_PP_ENUM_PARAMS(N, arg));
-    }
+            BOOST_PP_ENUM_PARAMS(N, arg)))
+    { }
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     thunk(naming::id_type const& gid, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-      : apply_logger_("thunk_direct::apply")
-    {
-        closure_ = boost::bind(
+      : apply_logger_("thunk_direct::apply"),
+        closure_(boost::bind(
             BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N, Arg)>, 
             this, gid,
-            BOOST_PP_ENUM_PARAMS(N, arg));
-    }
+            BOOST_PP_ENUM_PARAMS(N, arg)))
+    { }
 
 #undef N
 

@@ -72,7 +72,7 @@ namespace hpx { namespace lcos
         /// this instance its member function \a apply needs to be directly
         /// called.
         thunk()
-          : apply_logger_("thunk::apply")
+          : apply_logger_("thunk::apply"), closure_(0)
         {}
 
         /// Get the result of the requested action. This call invokes the 
@@ -128,17 +128,14 @@ namespace hpx { namespace lcos
         ///               thunk instance (as it has to be sent along 
         ///               with the action as the continuation parameter).
         thunk(naming::gid_type const& gid)
-          : apply_logger_("thunk::apply")
-        {
-            closure_ = boost::bind(
-                invoke, this, naming::id_type(gid, naming::id_type::unmanaged));
-        }
+          : apply_logger_("thunk::apply"),
+            closure_(boost::bind(invoke, this, 
+                     naming::id_type(gid, naming::id_type::unmanaged)))
+        { }
         thunk(naming::id_type const& gid)
-          : apply_logger_("thunk::apply")
-        {
-            closure_ = boost::bind(
-                invoke, this, gid);
-        }
+          : apply_logger_("thunk::apply"),
+            closure_(boost::bind(invoke, this, gid))
+        { }
 
         /// The apply function starts the asynchronous operations encapsulated
         /// by this eager future.
@@ -190,18 +187,15 @@ namespace hpx { namespace lcos
         ///               with the action as the continuation parameter).
         template <typename Arg0>
         thunk(naming::gid_type const& gid, Arg0 const& arg0)
-          : apply_logger_("thunk::apply")
-        {
-            closure_ = boost::bind(
-                invoke1<Arg0>, this, 
-                naming::id_type(gid, naming::id_type::unmanaged), arg0);
-        }
+          : apply_logger_("thunk::apply"),
+            closure_(boost::bind(invoke1<Arg0>, this, 
+                naming::id_type(gid, naming::id_type::unmanaged), arg0))
+        { }
         template <typename Arg0>
         thunk(naming::id_type const& gid, Arg0 const& arg0)
-          : apply_logger_("thunk::apply")
-        {
-            closure_ = boost::bind(invoke1<Arg0>, this, gid, arg0);
-        }
+          : apply_logger_("thunk::apply"),
+            closure_(boost::bind(invoke1<Arg0>, this, gid, arg0))
+        { }
 
         // pull in remaining constructors
         #include <hpx/lcos/thunk_constructors.hpp>
@@ -294,16 +288,14 @@ namespace hpx { namespace lcos
         ///               thunk instance (as it has to be sent along 
         ///               with the action as the continuation parameter).
         thunk(naming::gid_type const& gid)
-          : apply_logger_("thunk_direct::apply")
-        {
-            closure_ = boost::bind(
-                invoke, naming::id_type(gid, naming::id_type::unmanaged));
-        }
+          : apply_logger_("thunk_direct::apply"),
+            closure_(boost::bind(invoke, 
+                naming::id_type(gid, naming::id_type::unmanaged)))
+        { }
         thunk(naming::id_type const& gid)
-          : apply_logger_("thunk_direct::apply")
-        {
-            closure_ = boost::bind(invoke, this, gid);
-        }
+          : apply_logger_("thunk_direct::apply"),
+            closure_(boost::bind(invoke, this, gid))
+        { }
 
         /// The apply function starts the asynchronous operations encapsulated
         /// by this eager future.
@@ -368,18 +360,15 @@ namespace hpx { namespace lcos
         ///               with the action as the continuation parameter).
         template <typename Arg0>
         thunk(naming::gid_type const& gid, Arg0 const& arg0)
-          : apply_logger_("thunk_direct::apply")
-        {
-            closure_ = boost::bind(
-                invoke1, this, 
-                naming::id_type(gid, naming::id_type::unmanaged), arg0);
-        }
+          : apply_logger_("thunk_direct::apply"),
+            closure_(boost::bind(invoke1, this, 
+                naming::id_type(gid, naming::id_type::unmanaged), arg0))
+        { }
         template <typename Arg0>
         thunk(naming::id_type const& gid, Arg0 const& arg0)
-          : apply_logger_("thunk_direct::apply")
-        {
-            closure_ = boost::bind(invoke1, this, gid, arg0);
-        }
+          : apply_logger_("thunk_direct::apply"),
+            closure_(boost::bind(invoke1, this, gid, arg0))
+        { }
 
         // pull in remaining constructors
         #include <hpx/lcos/thunk_constructors_direct.hpp>
