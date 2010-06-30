@@ -413,8 +413,8 @@ namespace hpx { namespace components { namespace amr { namespace server
       //using namespace boost::assign;
 
       int counter;
-      int step,dst/*,dst2*/;
-#if 0
+      int step,dst,dst2;
+
       if ( par->granularity == 1 ) {
         // finest granularity possible {{{
         for (step=0;step<12;step = step + 2) {
@@ -600,7 +600,9 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
         // }}}
       }
-#endif
+
+#if 0
+        // Embarassingly parallel TEST
         for (step=0;step<12;step++) {
           dst = step+1;
           if ( dst == 12 ) dst = 0;
@@ -613,6 +615,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             counter++;
           }
         }
+#endif
 
       // Create a ragged 3D array
       for (j=0;j<vsrc_step.size();j++) {

@@ -84,10 +84,13 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
       Pi  = 0.0;
       Energy = 0.5*r*r*(Pi*Pi + Phi*Phi) - r*r*pow(chi,par.PP+1)/(par.PP+1);
 
-      chi = initial_chi(r,par);
-      Phi = initial_Phi(r,par);
-      Pi  = 0.0;
-      Energy = 0.5*r*r*(Pi*Pi + Phi*Phi) - r*r*pow(chi,par.PP+1)/(par.PP+1);
+      // Add some busy work to see if race condition can be eliminated
+      double d = 0.;
+      for (int ii = 0; ii < 2000; ++ii)
+      {
+         d += 1/(2.* ii + 1);
+      }
+      Energy = d;
 
       val->x_[i] = r;
 
@@ -110,6 +113,7 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
 
   BOOST_ASSERT(par.integrator == 1);
 
+#if 0
   // TEST
   //if ( level > 0 ) {
     for (j=0;j<pow(2.,level)*par.granularity;j++) {
@@ -122,8 +126,18 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
     result->timestep_ = timestep + 1.0;
     return 1;
   //}
+#endif
+ 
+    // Add busywork TEST
+    double d = 0.;
+    for (int i = 0; i < 2000; ++i)
+    {
+       d += 1/(2.* i + 1);
+    }
+    result->value_[0].phi[0][3] = d;
+    // END TEST
 
-#if 0
+//#if 0
   if ( iter == 0 ) {
     for (j=0;j<pow(2.,level)*par.granularity;j++) {
       calcrhs(&rhs,vecval,vecx,0,dx,size,boundary,bbox,j+compute_index,par);
@@ -237,7 +251,7 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
     return 0;
   }
   return 1;
-#endif
+//#endif
 }
 
 // This is a pointwise calculation: compute the rhs for point result given input values in array phi
