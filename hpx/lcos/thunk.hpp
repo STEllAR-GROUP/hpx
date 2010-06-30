@@ -170,11 +170,10 @@ namespace hpx { namespace lcos
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the
         ///               apply operation for the embedded action.
         template <typename Arg0>
-        static void invoke1(hpx::lcos::thunk<Action,Result> *th, 
-                            naming::id_type const& gid, Arg0 const arg0)
+        void invoke1(naming::id_type const& gid, Arg0 const arg0)
         {
-            if (!((*th->impl_)->is_data()))
-                th->apply(gid, arg0);
+            if (!((*this->impl_)->is_data()))
+                this->apply(gid, arg0);
         }
 
     public:
@@ -198,13 +197,13 @@ namespace hpx { namespace lcos
         template <typename Arg0>
         thunk(naming::gid_type const& gid, Arg0 const& arg0)
           : apply_logger_("thunk::apply"),
-            closure_(boost::bind(invoke1<Arg0>, this, 
+            closure_(boost::bind(invoke1, this, 
                 naming::id_type(gid, naming::id_type::unmanaged), arg0))
         { }
         template <typename Arg0>
         thunk(naming::id_type const& gid, Arg0 const& arg0)
           : apply_logger_("thunk::apply"),
-            closure_(boost::bind(invoke1<Arg0>, this, gid, arg0))
+            closure_(boost::bind(invoke1, this, gid, arg0))
         { }
 
         // pull in remaining constructors
