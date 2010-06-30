@@ -51,6 +51,7 @@
         }
     }
 
+private:
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     static void BOOST_PP_CAT(invoke,N)(
         hpx::lcos::thunk<Action,Result> *th, 
@@ -61,6 +62,7 @@
             th->apply(gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
+public:
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     thunk(naming::gid_type const& gid, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))

@@ -99,6 +99,7 @@ namespace hpx { namespace lcos
             hpx::applier::apply_c<Action>(this->get_gid(), gid);
         }
 
+    private:
         /// Invoke the action if the data is not ready.
         ///
         /// \param th     [in] The thunk.
@@ -112,6 +113,7 @@ namespace hpx { namespace lcos
               th->apply(gid);
         }
 
+    public:
         /// Construct a new \a thunk instance. The \a thread 
         /// supplied to the function \a thunk#get will be 
         /// notified as soon as the result of the operation associated with 
@@ -151,6 +153,7 @@ namespace hpx { namespace lcos
             hpx::applier::apply_c<Action>(this->get_gid(), gid, arg0);
         }
 
+    private:
         /// Invoke the action if the data is not ready.
         ///
         /// \param th     [in] The thunk.
@@ -168,6 +171,7 @@ namespace hpx { namespace lcos
                 th->apply(gid, arg0);
         }
 
+    public:
         /// Construct a new \a thunk instance. The \a thread 
         /// supplied to the function \a thunk#get will be 
         /// notified as soon as the result of the operation associated with 
@@ -259,6 +263,7 @@ namespace hpx { namespace lcos
             }
         }
 
+    private:
         /// Invoke the action if the data is not ready.
         ///
         /// \param th     [in] The thunk.
@@ -272,6 +277,7 @@ namespace hpx { namespace lcos
               th->apply(gid);
         }
 
+    public:
         /// Construct a new \a thunk instance. The \a thread 
         /// supplied to the function \a thunk#get will be 
         /// notified as soon as the result of the operation associated with 
@@ -324,6 +330,7 @@ namespace hpx { namespace lcos
             }
         }
 
+    private:
         /// Invoke the action if the data is not ready.
         ///
         /// \param th     [in] The thunk.
@@ -341,6 +348,7 @@ namespace hpx { namespace lcos
                 th->apply(gid, arg0);
         }
 
+    public:
         /// Construct a new \a thunk instance. The \a thread 
         /// supplied to the function \a thunk#get will be 
         /// notified as soon as the result of the operation associated with 
