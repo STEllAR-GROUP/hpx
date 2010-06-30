@@ -120,11 +120,17 @@ protected:
     void save(const std::string & t){
         this->primitive_base_t::save(t);
     }
-    #ifndef BOOST_NO_STD_WSTRING
+#if BOOST_VERSION >= 104400
+    void load(boost::archive::class_id_type & t){
+        boost::intmax_t l = t;
+        save_impl(l, sizeof(boost::intmax_t));
+    }
+#endif
+#ifndef BOOST_NO_STD_WSTRING
     void save(const std::wstring & t){
         this->primitive_base_t::save(t);
     }
-    #endif
+#endif
     void save(const float & t){
         this->primitive_base_t::save(t);
         // floats not supported

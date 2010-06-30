@@ -122,7 +122,9 @@ protected:
     }
 #if BOOST_VERSION >= 104400
     void load(boost::archive::class_id_type & t){
-        this->primitive_base_t::load(t);
+        boost::intmax_t l;
+        load_impl(l, sizeof(boost::intmax_t));
+        t = boost::archive::class_id_type(std::size_t(l));
     }
 #endif
 #ifndef BOOST_NO_STD_WSTRING
