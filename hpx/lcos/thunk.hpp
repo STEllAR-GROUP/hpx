@@ -82,6 +82,12 @@ namespace hpx { namespace lcos
         /// will return.
         Result get() const
         {
+            if (!closure_)
+            {
+                boost::throw_exception(
+                    std::logic_error("Closure uninitialized"));
+            }
+
             closure_();
 
             // wait for the result (yield control)
@@ -233,6 +239,12 @@ namespace hpx { namespace lcos
         /// will return.
         Result get() const
         {
+            if (!closure_)
+            {
+                boost::throw_exception(
+                    std::logic_error("Closure uninitialized"));
+            }
+
             closure_();
 
             // wait for the result (yield control)
