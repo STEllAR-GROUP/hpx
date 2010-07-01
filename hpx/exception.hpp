@@ -50,6 +50,7 @@ namespace hpx
         duplicate_console = 19,
         no_registered_console = 20,
         startup_timed_out = 21,
+        uninitialized_value = 22,
         last_error
     };
 
@@ -77,6 +78,7 @@ namespace hpx
         "duplicate_console",
         "no_registered_console",
         "startup_timed_out",
+        "uninitialized_value",
         ""
     };
 
@@ -110,6 +112,7 @@ namespace hpx
                 case lock_error:
                 case duplicate_console:
                 case no_registered_console:
+                case uninitialized_value:
                 case startup_timed_out:
                     return std::string("HPX(") + error_names[value] + ")";
 

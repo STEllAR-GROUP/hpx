@@ -84,8 +84,8 @@ namespace hpx { namespace lcos
         {
             if (!closure_)
             {
-                boost::throw_exception(
-                    std::logic_error("Closure uninitialized"));
+                HPX_THROW_EXCEPTION(uninitialized_value,
+                    "thunk::closure_", "closure not properly initialized");
             }
 
             closure_();
@@ -245,8 +245,8 @@ namespace hpx { namespace lcos
         {
             if (!closure_)
             {
-                boost::throw_exception(
-                    std::logic_error("Closure uninitialized"));
+                HPX_THROW_EXCEPTION(uninitialized_value,
+                    "thunk::closure_", "closure not properly initialized");
             }
 
             closure_();
