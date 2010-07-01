@@ -295,6 +295,11 @@ namespace hpx
             typename Result = typename Action::result_type,
             typename DirectExecute = typename Action::direct_execution> 
         class thunk;
+
+        template <typename Action, 
+            typename Result = typename Action::result_type,
+            typename DirectExecute = typename Action::direct_execution> 
+        class contin;
     }
 
     /// \namespace util
