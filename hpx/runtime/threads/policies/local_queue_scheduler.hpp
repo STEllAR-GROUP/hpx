@@ -43,15 +43,42 @@ namespace hpx { namespace threads { namespace policies
         // the scheduler type takes two initialization parameters: 
         //    the number of queues
         //    the maxcount per queue
-        typedef std::pair<std::size_t, std::size_t> init_parameter_type;
+        struct init_parameter
+        {
+            init_parameter()
+              : num_queues_(1), 
+                max_queue_thread_count_(max_thread_count),
+                numa_sensitive_(false)
+            {}
+
+            init_parameter(std::size_t num_queues, 
+                    std::size_t max_queue_thread_count, 
+                    bool numa_sensitive = false) 
+              : num_queues_(num_queues), 
+                max_queue_thread_count_(max_queue_thread_count),
+                numa_sensitive_(numa_sensitive)
+            {}
+
+            init_parameter(std::pair<std::size_t, std::size_t> const& init)
+              : num_queues_(init.first), 
+                max_queue_thread_count_(init.second),
+                numa_sensitive_(false)
+            {}
+
+            std::size_t num_queues_;
+            std::size_t max_queue_thread_count_;
+            bool numa_sensitive_;
+        };
+        typedef init_parameter init_parameter_type;
 
         local_queue_scheduler(init_parameter_type const& init)
-          : queues_(init.first), 
-            curr_queue_(0)
+          : queues_(init.num_queues_), 
+            curr_queue_(0),
+            numa_sensitive_(init.numa_sensitive_)
         {
-            BOOST_ASSERT(init.first != 0);
-            for (std::size_t i = 0; i < init.first; ++i) 
-                queues_[i] = new thread_queue(init.second);
+            BOOST_ASSERT(init.num_queues_ != 0);
+            for (std::size_t i = 0; i < init.num_queues_; ++i) 
+                queues_[i] = new thread_queue(init.max_queue_thread_count_);
         }
 
         ~local_queue_scheduler()
@@ -59,6 +86,8 @@ namespace hpx { namespace threads { namespace policies
             for (std::size_t i = 0; i < queues_.size(); ++i) 
                 delete queues_[i];
         }
+
+        bool numa_sensitive() const { return numa_sensitive_; }
 
         ///////////////////////////////////////////////////////////////////////
         // This returns the current length of the queues (work items and new items)
@@ -193,6 +222,7 @@ namespace hpx { namespace threads { namespace policies
     private:
         std::vector<thread_queue*> queues_;   ///< this manages all the PX threads
         std::size_t curr_queue_;
+        bool numa_sensitive_;
     };
 
 }}}

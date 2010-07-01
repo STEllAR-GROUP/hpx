@@ -14,7 +14,23 @@ namespace hpx { namespace threads
 {
 #if defined(BOOST_WINDOWS)
 
-    bool set_affinity(boost::thread& thrd, std::size_t num_thread)
+    inline std::size_t least_significant_bit(std::size_t mask)
+    {
+        if (mask) {
+            int c = 0;    // will count v's trailing zero bits
+
+            // Set mask's trailing 0s to 1s and zero rest
+            mask = (mask ^ (mask - 1)) >> 1;
+            for (/**/; mask; ++c)
+                mask >>= 1;
+
+            return std::size_t(1) << c;
+        }
+        return std::size_t(1);
+    }
+
+    bool set_affinity(boost::thread& thrd, std::size_t num_thread, 
+        bool numa_sensitive)
     {
         unsigned int num_of_cores = boost::thread::hardware_concurrency();
         if (0 == num_of_cores)
@@ -25,17 +41,36 @@ namespace hpx { namespace threads
         if (GetProcessAffinityMask(GetCurrentProcess(), &process_affinity, 
               &system_affinity))
         {
-            DWORD_PTR mask = 0x1 << affinity;
-            while (!(mask & process_affinity)) {
-                mask <<= 1;
-                if (0 == mask)
-                    mask = 0x01;
+            ULONG numa_nodes = 0;
+            if (numa_sensitive && GetNumaHighestNodeNumber(&numa_nodes)) {
+                ++numa_nodes;
+
+                ULONG numa_node = affinity % numa_nodes;
+                DWORD_PTR node_affinity = 0;
+                if (!GetNumaNodeProcessorMask(numa_node, &node_affinity))
+                    return false;
+
+                DWORD_PTR mask = least_significant_bit(node_affinity) << (affinity / numa_nodes);
+                while (!(mask & node_affinity)) {
+                    mask <<= 1LL;
+                    if (0 == mask)
+                        mask = 0x01LL;
+                }
+                return SetThreadAffinityMask(thrd.native_handle(), mask) != 0;
             }
-            return SetThreadAffinityMask(thrd.native_handle(), mask) != 0;
+            else {
+                DWORD_PTR mask = least_significant_bit(process_affinity) << affinity;
+                while (!(mask & process_affinity)) {
+                    mask <<= 1LL;
+                    if (0 == mask)
+                        mask = 0x01LL;
+                }
+                return SetThreadAffinityMask(thrd.native_handle(), mask) != 0;
+            }
         }
         return false;
     }
-    inline bool set_affinity(std::size_t affinity)
+    inline bool set_affinity(std::size_t affinity, bool numa_sensitive)
     {
         return true;
     }
@@ -52,11 +87,12 @@ namespace hpx { namespace threads
     #include <mach/thread_policy.h>
 #endif
 
-    inline bool set_affinity(boost::thread& thrd, std::size_t affinity)
+    inline bool set_affinity(boost::thread& thrd, std::size_t affinity, 
+        bool numa_sensitive)
     {
         return true;
     }
-    inline bool set_affinity(std::size_t num_thread)
+    inline bool set_affinity(std::size_t num_thread, bool numa_sensitive)
     {
 #ifdef AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
         thread_extended_policy_data_t epolicy;
@@ -89,11 +125,12 @@ namespace hpx { namespace threads
     #include <sys/syscall.h>
     #include <sys/types.h>
 
-    inline bool set_affinity(boost::thread& thrd, std::size_t num_thread)
+    inline bool set_affinity(boost::thread& thrd, std::size_t num_thread, 
+        bool numa_sensitive)
     {
         return true;
     }
-    bool set_affinity(std::size_t num_thread)
+    bool set_affinity(std::size_t num_thread, bool numa_sensitive)
     {
         std::size_t num_of_cores = boost::thread::hardware_concurrency();
         if (0 == num_of_cores)

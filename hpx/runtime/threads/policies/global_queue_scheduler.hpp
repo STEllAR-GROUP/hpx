@@ -46,6 +46,8 @@ namespace hpx { namespace threads { namespace policies
           : queue_((0 == max_count) ? max_thread_count : max_count)
         {}
 
+        bool numa_sensitive() const { return false; }
+
         ///////////////////////////////////////////////////////////////////////
         // This returns the current length of the queues (work items and new items)
         boost::int64_t get_queue_lengths(std::size_t num_thread = std::size_t(-1)) const

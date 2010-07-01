@@ -681,7 +681,7 @@ namespace hpx { namespace threads
 
         // the thread with number zero is the master
         bool is_master_thread = (0 == num_thread) ? true : false;
-        set_affinity(num_thread);     // set affinity on Linux systems
+        set_affinity(num_thread, scheduler_.numa_sensitive());     // set affinity on Linux systems
 
         // register performance counters
         manage_counter queue_length_counter; 
@@ -830,7 +830,7 @@ namespace hpx { namespace threads
                     boost::bind(&threadmanager_impl::tfunc, this, num_threads)));
 
                 // set the new threads affinity (on Windows systems)
-                set_affinity(threads_.back(), num_threads);
+                set_affinity(threads_.back(), num_threads, scheduler_.numa_sensitive());
             }
 
             // start timer pool as well

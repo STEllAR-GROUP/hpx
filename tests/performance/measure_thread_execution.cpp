@@ -12,6 +12,8 @@ using namespace hpx;
 namespace po = boost::program_options;
 double globald = 0;
 
+int number_of_iterations = 0;
+
 ///////////////////////////////////////////////////////////////////////////////
 // this is a empty test thread
 threads::thread_state_enum null_thread(threads::thread_state_ex_enum)
@@ -20,7 +22,7 @@ threads::thread_state_enum null_thread(threads::thread_state_ex_enum)
 //         appl.get_thread_manager().get_thread_gid(self.get_thread_id(), appl);
 //     util::high_resolution_timer timer;
     double d = 0.;
-    for (int i = 0; i < 2000; ++i)
+    for (int i = 0; i < number_of_iterations; ++i)
     {
         d += 1/(2.* i + 1);
     }
@@ -75,6 +77,9 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("local,l", po::value<int>(), 
                 "use local thread scheduler with this number of queues"
                 " (default is to use global thread scheduler)")
+            ("workload,W", po::value<int>(), 
+                "the number of additional iterations creating workload (default: 0)")
+            ("numa_sensitive,n", "distribute os-threads across NUMA nodes")
         ;
 
         po::store(po::command_line_parser(argc, argv)
@@ -175,6 +180,9 @@ int main(int argc, char* argv[])
         if (vm.count("worker"))
             mode = hpx::runtime::worker;
 
+        if (vm.count("workload"))
+            number_of_iterations = vm["workload"].as<int>();
+
         // initialize and run the AGAS service, if appropriate
         std::auto_ptr<agas_server_helper> agas_server;
         if (vm.count("run_agas_server"))  // run the AGAS server instance here
@@ -194,7 +202,9 @@ int main(int argc, char* argv[])
         }
         else {
             // initialize and start the HPX runtime
-            std::pair<std::size_t, std::size_t> init(/*vm["local"].as<int>()*/num_threads, 0);
+            local_runtime_type::scheduling_policy_type::init_parameter_type init(
+                /*vm["local"].as<int>()*/num_threads, 0, 
+                vm.count("numa_sensitive") != 0);
             local_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, 
                 mode, init);
 
