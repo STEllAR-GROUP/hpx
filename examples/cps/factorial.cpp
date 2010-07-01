@@ -109,7 +109,9 @@ typedef hpx::lcos::contin<identity_action> identity_contin;
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(po::variables_map &vm)
 {
-    gid_type here = find_here();
+    int n = 0;
+    if (vm.count("value"))
+      n = vm["value"].as<int>();
 
     {
         std::cout << ">>> k1 = identity" << std::endl;
@@ -138,6 +140,15 @@ int hpx_main(po::variables_map &vm)
 
         std::cout << ">>> print k3" << std::endl;
         std::cout << k3.get() << std::endl;
+
+        std::cout << ">>> kn = identity" << std::endl;
+        identity_contin kn;
+
+        std::cout << ">>> factorial(" << n << ", kn)" << std::endl;
+        apply<factorial_action>(n, kn.gid());
+
+        std::cout << ">>> print kn" << std::endl;
+        std::cout << kn.get() << std::endl;
     }
 
     // initiate shutdown of the runtime systems on all localities
