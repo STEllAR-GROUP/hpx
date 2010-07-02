@@ -262,10 +262,10 @@ namespace boost { namespace coroutines { namespace detail {
           tinfo = boost::current_exception();
         }
         this->do_return(status, tinfo);
-      } while (m_state == super_type::ctx_running);
+      } while (this->m_state == super_type::ctx_running);
 
       // should not get here, never
-      BOOST_ASSERT(m_state == super_type::ctx_running);
+      BOOST_ASSERT(this->m_state == super_type::ctx_running);
     }
 
 private:

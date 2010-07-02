@@ -150,7 +150,7 @@ public:
         pool_(tagged_ptr(NULL, 0)), total_nodes(max_nodes)
     {
         chunks = Alloc::allocate(max_nodes);
-        std::memset(node, '\0', max_nodes*sizeof(T));
+        std::memset(chunks, '\0', max_nodes*sizeof(T));
 
         for (std::size_t i = 0; i != max_nodes; ++i)
         {
