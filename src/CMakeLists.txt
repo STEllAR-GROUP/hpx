@@ -48,6 +48,7 @@ set (hpxlib_lcos_HEADERS
     ${hpx_SOURCE_DIR}/hpx/lcos/condition.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/contin.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/counting_semaphore.hpp
+    ${hpx_SOURCE_DIR}/hpx/lcos/dataflow_variable.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/eager_future.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/eager_future_constructors.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/eager_future_constructors_direct.hpp

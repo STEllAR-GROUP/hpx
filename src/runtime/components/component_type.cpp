@@ -25,6 +25,7 @@ namespace hpx { namespace components
             "component_value_adaptor",
             "component_barrier",
             "component_thread",
+            "component_dataflow_variable",
         };
     }
 

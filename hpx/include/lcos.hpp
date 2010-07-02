@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/contin.hpp>
+#include <hpx/lcos/dataflow_variable.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/lcos/lazy_future.hpp>
 #include <hpx/lcos/thunk.hpp>

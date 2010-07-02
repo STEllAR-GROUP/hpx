@@ -62,7 +62,7 @@ inline void trigger(id_type k, Arg0 arg0)
 //     else:
 //         factorial_aux(n-1, n*a, k)
 //
-// >>> k = identity
+// >>> k = dataflow_variable()
 // >>> factorial(3, k)
 //
 // >>> print k
@@ -93,62 +93,54 @@ void factorial(int n, id_type k)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int identity(int);
-typedef actions::plain_result_action1<int, int, identity> 
-    identity_action;
-HPX_REGISTER_PLAIN_ACTION(identity_action);
-
-int identity(int n)
-{
-  return n;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-typedef hpx::lcos::contin<identity_action> identity_contin;
+typedef hpx::lcos::dataflow_variable<int,int> dataflow_int_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(po::variables_map &vm)
 {
-    int n = 0;
+    int n = -1;
     if (vm.count("value"))
       n = vm["value"].as<int>();
 
     {
-        std::cout << ">>> k1 = identity" << std::endl;
-        identity_contin k1;
+        std::cout << ">>> k1 = dataflow_variable()" << std::endl;
+        dataflow_int_type k1;
 
         std::cout << ">>> factorial(0, k1)" << std::endl;
-        apply<factorial_action>(0, k1.gid());
+        apply<factorial_action>(0, k1.get_gid());
 
         std::cout << ">>> print k1" << std::endl;
         std::cout << k1.get() << std::endl;
 
-        std::cout << ">>> k2 = identity" << std::endl;
-        identity_contin k2;
+        std::cout << ">>> k2 = dataflow()" << std::endl;
+        dataflow_int_type k2;
 
         std::cout << ">>> factorial(1, k2)" << std::endl;
-        apply<factorial_action>(1, k2.gid());
+        apply<factorial_action>(1, k2.get_gid());
 
         std::cout << ">>> print k2" << std::endl;
         std::cout << k2.get() << std::endl;
 
-        std::cout << ">>> k3 = identity" << std::endl;
-        identity_contin k3;
+        std::cout << ">>> k3 = dataflow()" << std::endl;
+        dataflow_int_type k3;
 
         std::cout << ">>> factorial(3, k3)" << std::endl;
-        apply<factorial_action>(3, k3.gid());
+        apply<factorial_action>(3, k3.get_gid());
 
         std::cout << ">>> print k3" << std::endl;
         std::cout << k3.get() << std::endl;
 
-        std::cout << ">>> kn = identity" << std::endl;
-        identity_contin kn;
+        if (n >= 0)
+        {
+          std::cout << ">>> kn = dataflow()" << std::endl;
+          dataflow_int_type kn;
 
-        std::cout << ">>> factorial(" << n << ", kn)" << std::endl;
-        apply<factorial_action>(n, kn.gid());
+          std::cout << ">>> factorial(" << n << ", kn)" << std::endl;
+          apply<factorial_action>(n, kn.get_gid());
 
-        std::cout << ">>> print kn" << std::endl;
-        std::cout << kn.get() << std::endl;
+          std::cout << ">>> print kn" << std::endl;
+          std::cout << kn.get() << std::endl;
+        }
     }
 
     // initiate shutdown of the runtime systems on all localities

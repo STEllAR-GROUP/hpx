@@ -35,6 +35,8 @@ namespace hpx { namespace components
             ((6 << 16) | component_base_lco),
         component_thread =              ///< a ParalleX thread
             ((7 << 16) | component_base_lco),
+        component_dataflow_variable =   ///< a LCO implementing dataflow var.
+            ((8 << 16) | component_base_lco),
 
         component_first_dynamic = component_last
     };
