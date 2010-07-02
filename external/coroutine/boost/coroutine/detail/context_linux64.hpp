@@ -52,7 +52,7 @@ namespace boost { namespace coroutines {
 
     class ia64_gcc_context_impl;
 
-    class ia64_gcc_context_impl_base 
+    class ia64_gcc_context_impl_base : detail::context_impl_base 
     {
     public:
       ia64_gcc_context_impl_base() {}

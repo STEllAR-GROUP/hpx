@@ -21,6 +21,7 @@ namespace po = boost::program_options;
 // Helpers
 
 typedef hpx::naming::gid_type gid_type;
+typedef hpx::naming::id_type id_type;
 
 inline gid_type find_here(void)
 {
@@ -72,10 +73,10 @@ private:
 // }
 
 ///////////////////////////////////////////////////////////////////////////////
-int fib(gid_type d, int n, int delay_coeff);
+int fib(id_type d, int n, int delay_coeff);
 
 typedef 
-    actions::plain_result_action3<int, gid_type, int, int, fib> 
+    actions::plain_result_action3<int, id_type, int, int, fib> 
 fibonacci2_memo_action;
 
 typedef lcos::lazy_future<fibonacci2_memo_action> fibonacci_future;
@@ -95,7 +96,7 @@ inline void do_busy_work(double delay_coeff)
     }
 }
 
-int fib (gid_type d, int n, int delay_coeff)
+int fib (id_type d, int n, int delay_coeff)
 {
     // do some busy waiting, if requested
     do_busy_work(delay_coeff);
@@ -104,8 +105,7 @@ int fib (gid_type d, int n, int delay_coeff)
     if (n < 2) 
         return n;
 
-    naming::id_type d_hack(d, naming::id_type::unmanaged);
-    components::memory_block mb(d_hack);
+    components::memory_block mb(d);
     components::access_memory_block<fibonacci_future> data(mb.get());
     fibonacci_future* fibs = data.get_ptr();
 
@@ -153,14 +153,19 @@ int hpx_main(po::variables_map &vm)
         //std::size_t size = sizeof(fibonacci_future);
         for (int i=argument; i>=0; --i)
         {
-          fibs[i] = fibonacci_future();
+          new (&fibs[i]) fibonacci_future();
         }
 
+        id_type g (mb.get_gid());
         for (int i=0; i<=argument; ++i)
         {
-          result = fibs[i].get(mb.get_gid().get_gid(),
-          mb.get_gid().get_gid(), i, delay_coeff);
+          result = fibs[i].get(g, g, i, delay_coeff);
           std::cout << "result = " << result << std::endl;
+        }
+
+        for (int i=argument; i>=0; --i)
+        {
+          fibs[i].~fibonacci_future();
         }
 
         mb.free();

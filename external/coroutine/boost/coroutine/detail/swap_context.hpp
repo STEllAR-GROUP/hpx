@@ -28,11 +28,24 @@
 
 #ifndef BOOST_COROUTINE_SWAP_CONTEXT_HPP_20060611
 #define BOOST_COROUTINE_SWAP_CONTEXT_HPP_20060611
-namespace boost{ namespace coroutines { namespace detail {
+
+namespace boost { namespace coroutines { namespace detail 
+{
   class default_hint {};
   class yield_hint: public default_hint {};
   class yield_to_hint: public default_hint {};
   class invoke_hint: public default_hint {};
   
-} } }
+  /////////////////////////////////////////////////////////////////////////////
+  // This is the base class of all context implementations, it holds a single
+  // dummy pointer which is used by the coroutine cache implementation to
+  // build a linked list of available items
+  struct context_impl_base
+  {
+      context_impl_base() : dummy(0) {}
+      void* dummy;
+  };
+
+}}}
+
 #endif

@@ -92,7 +92,8 @@ namespace boost {namespace coroutines {
      * If not initialized it can only be swapped out, not in 
      * (at that point it will be initialized).
      */
-    class fibers_context_impl_base {
+    class fibers_context_impl_base : detail::context_impl_base 
+    {
     public:
       /**
        * Create an empty context. 

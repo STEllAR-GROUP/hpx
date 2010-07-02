@@ -26,32 +26,11 @@ namespace boost
 {
 namespace lockfree
 {
-namespace detail
-{
-
-template <typename T, typename Alloc = std::allocator<T> >
-class dummy_freelist:
-    private boost::noncopyable,
-    private Alloc
-{
-public:
-    T * allocate (void)
-    {
-        // we need to initialize the memory once
-        return new(Alloc::allocate(1)) T();
-    }
-
-    void deallocate (T * n)
-    {
-        Alloc::deallocate(n, 1);
-    }
-};
-
-} /* namespace detail */
 
 template <typename T, typename Alloc = std::allocator<T> >
 class caching_freelist:
-    private detail::dummy_freelist<T, Alloc>
+    private boost::noncopyable,
+    private Alloc
 {
     struct freelist_node
     {
@@ -70,8 +49,8 @@ public:
     {
         for (std::size_t i = 0; i != initial_nodes; ++i)
         {
-            T * node = detail::dummy_freelist<T, Alloc>::allocate();
-            node->~T();
+            T * node = Alloc::allocate(1);   // initialize once
+            std::memset(node, '\0', sizeof(T));
             deallocate(node);
         }
     }
@@ -87,8 +66,30 @@ public:
         {
             tagged_ptr old_pool = pool_.load(memory_order_consume);
 
-            if (!old_pool.get_ptr())
-                return detail::dummy_freelist<T, Alloc>::allocate();
+            if (!old_pool.get_ptr()) {
+                T* node = Alloc::allocate(1);   // initialize once
+                std::memset(node, '\0', sizeof(T));
+                return node;
+            }
+
+            freelist_node * new_pool_ptr = old_pool->next.get_ptr();
+            tagged_ptr new_pool (new_pool_ptr, old_pool.get_tag() + 1);
+
+            if (pool_.compare_exchange_strong(old_pool, new_pool)) {
+                void * ptr = old_pool.get_ptr();
+                return reinterpret_cast<T*>(ptr);
+            }
+        }
+    }
+
+    T* get(void)
+    {
+        for(;;)
+        {
+            tagged_ptr old_pool = pool_.load(memory_order_consume);
+
+            if (!old_pool.get_ptr()) 
+                return NULL;
 
             freelist_node * new_pool_ptr = old_pool->next.get_ptr();
             tagged_ptr new_pool (new_pool_ptr, old_pool.get_tag() + 1);
@@ -126,7 +127,7 @@ private:
         {
             void * n = current.get_ptr();
             current = current->next;
-            detail::dummy_freelist<T, Alloc>::deallocate(reinterpret_cast<T*>(n));
+            Alloc::deallocate(reinterpret_cast<T*>(n), 1);
         }
     }
 
@@ -149,10 +150,11 @@ public:
         pool_(tagged_ptr(NULL, 0)), total_nodes(max_nodes)
     {
         chunks = Alloc::allocate(max_nodes);
+        std::memset(node, '\0', max_nodes*sizeof(T));
+
         for (std::size_t i = 0; i != max_nodes; ++i)
         {
-            T * node = new(chunks + i) T();   // we need to initialize the memory once
-            node->~T();
+            T* node = chunks + i;   // initialize once
             deallocate(node);
         }
     }

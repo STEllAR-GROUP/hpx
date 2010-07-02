@@ -40,8 +40,10 @@
 #include <boost/coroutine/detail/coroutine_accessor.hpp>
 #include <boost/coroutine/detail/context_base.hpp>
 #include <boost/coroutine/detail/self.hpp>
+#include <boost/coroutine/detail/static.hpp>
 
 #include <boost/config.hpp>
+#include <boost/lockfree/detail/freelist.hpp>
 
 #if defined(BOOST_WINDOWS)
 # define BOOST_COROUTINE_SYMBOL_EXPORT      __declspec(dllexport)
@@ -108,8 +110,8 @@ namespace boost { namespace coroutines { namespace detail {
     template<typename Functor>
     static inline pointer create(Functor, thread_id_type, std::ptrdiff_t);
 
-    template<typename Functor>
-    static inline void rebind(pointer, Functor, thread_id_type);
+//     template<typename Functor>
+//     static inline void rebind(pointer, Functor, thread_id_type);
 
     void bind_args(arg_slot_type* arg) {
       m_arg = arg;
@@ -185,6 +187,33 @@ namespace boost { namespace coroutines { namespace detail {
       typename coroutine_impl<CoroutineType, ContextImpl>::self_type*
   > coroutine_impl<CoroutineType, ContextImpl>::self_;
 
+  /////////////////////////////////////////////////////////////////////////////
+  template <typename Coroutine>
+  struct coroutine_heap
+  {
+      ~coroutine_heap()
+      {
+          Coroutine* next = heap_.get();
+          while (next) {
+              delete next;
+              next = heap_.get();
+          }
+      }
+
+      Coroutine* allocate()
+      {
+          return heap_.get();
+      }
+
+      void deallocate(Coroutine* p)
+      {
+          heap_.deallocate(p);
+      }
+
+      lockfree::caching_freelist<Coroutine> heap_;
+  };
+
+  /////////////////////////////////////////////////////////////////////////////
   // This type augments coroutine_impl type with the type of the stored 
   // functor. The type of this object is erased right after construction
   // when it is assigned to a pointer to coroutine_impl. A deleter is
@@ -194,7 +223,7 @@ namespace boost { namespace coroutines { namespace detail {
     public coroutine_impl<CoroutineType, ContextImpl> {
   public:
     typedef coroutine_impl_wrapper<FunctorType, CoroutineType, ContextImpl> 
-    type;
+        type;
     typedef CoroutineType coroutine_type;
     typedef typename CoroutineType::result_type result_type;
     typedef coroutine_impl<CoroutineType, ContextImpl> super_type;
@@ -212,24 +241,31 @@ namespace boost { namespace coroutines { namespace detail {
       typedef typename super_type::context_exit_status
         context_exit_status;
       context_exit_status status = super_type::ctx_exited_return;
-      boost::exception_ptr tinfo;
-      try {
-        this->check_exit_state();
-        do_call<result_type>();
-      } catch (exit_exception const&) {
-        status = super_type::ctx_exited_exit;
-        tinfo = boost::current_exception();
-      } catch (boost::exception const&) {
-        status = super_type::ctx_exited_abnormally;
-        tinfo = boost::current_exception();
-      } catch (std::exception const&) {
-        status = super_type::ctx_exited_abnormally;
-        tinfo = boost::current_exception();
-      } catch (...) {
-        status = super_type::ctx_exited_abnormally;
-        tinfo = boost::current_exception();
-      }
-      this->do_return(status, tinfo);
+
+      // loop as long this coroutine has been rebound
+      do {
+        boost::exception_ptr tinfo;
+        try {
+          this->check_exit_state();
+          do_call<result_type>();
+        } catch (exit_exception const&) {
+          status = super_type::ctx_exited_exit;
+          tinfo = boost::current_exception();
+        } catch (boost::exception const&) {
+          status = super_type::ctx_exited_abnormally;
+          tinfo = boost::current_exception();
+        } catch (std::exception const&) {
+          status = super_type::ctx_exited_abnormally;
+          tinfo = boost::current_exception();
+        } catch (...) {
+          status = super_type::ctx_exited_abnormally;
+          tinfo = boost::current_exception();
+        }
+        this->do_return(status, tinfo);
+      } while (m_state == super_type::ctx_running);
+
+      // should not get here, never
+      BOOST_ASSERT(m_state == super_type::ctx_running);
     }
 
 private:
@@ -305,10 +341,35 @@ private:
       this->bind_result(&*this->m_result_last);
     }
 
+    static inline void destroy(type* p);
+
     void rebind(FunctorType f, thread_id_type id)
     {
         m_fun = f;
         this->super_type::rebind(id);
+    }
+
+  private:
+    // the memory for the threads is managed by a lockfree caching_freelist
+    typedef coroutine_heap<coroutine_impl_wrapper> heap_type;
+
+    struct heap_tag {};
+
+    static heap_type& get_heap()
+    {
+        // ensure thread-safe initialization
+        static_<heap_type, heap_tag> heap;
+        return heap.get();
+    }
+
+  public:
+    static coroutine_impl_wrapper* allocate()
+    {
+        return get_heap().allocate();
+    }
+    static void deallocate(coroutine_impl_wrapper* wrapper)
+    {
+        get_heap().deallocate(wrapper);
     }
 
     FunctorType m_fun;
@@ -320,22 +381,36 @@ private:
   typename 
   coroutine_impl<CoroutineType, ContextImpl>::pointer
   coroutine_impl<CoroutineType, ContextImpl>::
-  create(Functor f, thread_id_type id = 0, std::ptrdiff_t stack_size = default_stack_size) {
-    return new coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl>
-      (f, id, stack_size);      
+  create(Functor f, thread_id_type id = 0, std::ptrdiff_t stack_size = default_stack_size) 
+  {
+      typedef coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl>
+          wrapper_type;
+
+      wrapper_type* wrapper = wrapper_type::allocate();
+      if (NULL == wrapper)
+          return new wrapper_type(f, id, stack_size);
+
+      wrapper->rebind(f, id);
+      return wrapper;
   }
 
-  template<typename CoroutineType, typename ContextImpl>
-  template<typename Functor>
+//   template<typename Functor>
+//   inline void 
+//   coroutine_impl<CoroutineType, ContextImpl>::rebind(
+//       typename coroutine_impl<CoroutineType, ContextImpl>::pointer p,
+//       Functor f, thread_id_type id) 
+//   {
+//       typedef 
+//           coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl> 
+//       derived_type;
+//       boost::static_pointer_cast<derived_type>(p)->rebind(f, id);
+//   }
+
+  template<typename Functor, typename CoroutineType, typename ContextImpl>
   inline void 
-  coroutine_impl<CoroutineType, ContextImpl>::rebind(
-      typename coroutine_impl<CoroutineType, ContextImpl>::pointer p,
-      Functor f, thread_id_type id) 
+  coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl>::destroy(type* p)
   {
-      typedef 
-          coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl> 
-      derived_type;
-      boost::static_pointer_cast<derived_type>(p)->rebind(f, id);
+      deallocate(p);
   }
 
 } } }

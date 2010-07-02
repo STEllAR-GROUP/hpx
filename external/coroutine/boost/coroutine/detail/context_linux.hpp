@@ -171,7 +171,8 @@ namespace boost { namespace coroutines {
       std::abort();
     }
 
-    class ia32_gcc_context_impl_base {
+    class ia32_gcc_context_impl_base  : detail::context_impl_base 
+    {
     public:
       ia32_gcc_context_impl_base() {};
 

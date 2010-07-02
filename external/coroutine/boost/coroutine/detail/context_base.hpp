@@ -56,7 +56,8 @@
 #include <boost/coroutine/exception.hpp>
 #include <boost/coroutine/detail/noreturn.hpp>
 namespace boost { namespace coroutines { namespace detail {
- 
+
+  /////////////////////////////////////////////////////////////////////////////
   const std::ptrdiff_t default_stack_size = -1;
 
   template<typename ContextImpl>
@@ -376,6 +377,7 @@ namespace boost { namespace coroutines { namespace detail {
       m_state = ctx_ready;
       m_exit_state = ctx_exit_not_requested;
       m_exit_status = ctx_not_exited;
+      m_type_info.reset();
     }
 
     // Cause the coroutine to exit if 
@@ -397,7 +399,7 @@ namespace boost { namespace coroutines { namespace detail {
       do_yield();
     }
 
-  private:
+  protected:
 
     // Nothrow.
     void do_yield() throw() {
@@ -413,8 +415,9 @@ namespace boost { namespace coroutines { namespace detail {
     }
 
     template<typename ActualCtx>
-    static void deleter (const type* ctx){
-      delete static_cast<ActualCtx*>(const_cast<type*>(ctx));
+    static void deleter (const type* ctx)
+    {
+        ActualCtx::destroy(static_cast<ActualCtx*>(const_cast<type*>(ctx)));
     }
             
     typedef typename context_impl::context_impl_base ctx_type;

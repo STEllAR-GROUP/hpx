@@ -44,7 +44,7 @@ namespace boost { namespace coroutines {
 
     class stackless_context_impl;
 
-    class stackless_context_impl_base 
+    class stackless_context_impl_base : detail::context_impl_base  
     {
     protected:
       typedef void (*trampoline_type)(void*);

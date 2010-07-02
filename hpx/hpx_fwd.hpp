@@ -166,10 +166,10 @@ namespace hpx
         typedef thread_state_enum thread_function_type(thread_state_ex_enum);
 
         ///////////////////////////////////////////////////////////////////////
-        typedef boost::coroutines::static_coroutine<
-                thread_function_type, boost::function<thread_function_type> 
-        > coroutine_type;
-//         typedef boost::coroutines::coroutine<thread_function_type> coroutine_type;
+//         typedef boost::coroutines::static_coroutine<
+//                 thread_function_type, boost::function<thread_function_type> 
+//         > coroutine_type;
+        typedef boost::coroutines::coroutine<thread_function_type> coroutine_type;
         typedef coroutine_type::thread_id_type thread_id_type;
         typedef coroutine_type::self thread_self;
 

@@ -159,7 +159,7 @@ namespace boost { namespace coroutines {
      * (at that point it will be initialized).
      *
      */
-    class ucontext_context_impl_base 
+    class ucontext_context_impl_base : detail::context_impl_base  
     {
     public:
       ucontext_context_impl_base()

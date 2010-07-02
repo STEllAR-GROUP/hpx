@@ -59,7 +59,7 @@ namespace boost { namespace coroutines {
       std::abort();
     }
 
-    class ia64_win_context_impl_base 
+    class ia64_win_context_impl_base : detail::context_impl_base  
     {
     public:
       ia64_win_context_impl_base() : m_sp(0) {}
