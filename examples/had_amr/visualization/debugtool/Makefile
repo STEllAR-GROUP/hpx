@@ -8,19 +8,19 @@
 ########
 
 # The commands to call the C and C++ compilers
-CC = icc 
-C++ = icc 
+CC = gcc 
+C++ = g++ 
 F90 = ifort
 
 # Where to find the include files:
-INCLUDE = -I/usr/local/include 
+INCLUDE = -I/home/manderson/rnpl/include -I/home/manderson/mpfr/include
 
 # library directory
-LIB_DIR = -L/usr/local/lib 
+LIB_DIR = -L/home/manderson/rnpl/lib 
 
 #LDLIBS = -lida.$(ARCH) -lshared.$(ARCH) -lnvecserial.$(ARCH) -lm
 #LDLIBS = -lcvodes.$(ARCH) -lshared.$(ARCH) -lnvecserial.$(ARCH) -lm -lhdf5
-LDLIBS = -L/opt/intel/fce/10.0.023/lib  -lifcore 
+LDLIBS = -lbbhutil  -lm /home/manderson/mpfr/lib/libmpfr.a /usr/lib64/libgmp.a
 
 CFLAGS = $(INCLUDE) $(LIB_DIR)
 ########
@@ -33,10 +33,10 @@ CFLAGS = $(INCLUDE) $(LIB_DIR)
 PROG = debug
 
 # Object files that go into the final executable
-OBJS = debug.o
+OBJS = debug.o mpreal.o
 
 # Header files 
-HDRS =
+HDRS = mpreal.h
 
 ########
 # Finally, the commands that actually make stuff
@@ -48,7 +48,7 @@ HDRS =
 
 # re-link the program when the object files change
 $(PROG):  $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) $(LDLIBS) -o $(PROG) 
+	$(C++) $(CFLAGS) $(OBJS) $(LDLIBS) -o $(PROG) 
 
 clean:
 	rm -f debug *.o *.sdf *.matlab *.idl core*
@@ -68,6 +68,6 @@ dataclean:
 # change a C++ object file whenever the corresponding source file
 # or any of the header files changes
 %.o : %.cpp $(HDRS) 
-	$(CC) -c $(CFLAGS) $<
+	$(C++) -c $(CFLAGS) $<
 %.o : %.f $(HDRS) 
 	$(F90) -c $<
