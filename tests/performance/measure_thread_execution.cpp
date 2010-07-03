@@ -224,7 +224,7 @@ int main(int argc, char* argv[])
             elapsed = timer.elapsed();
         }
 
-        std::cout << elapsed << std::endl;
+        std::cout << elapsed << " " << elapsed/num_hpx_threads << std::endl;
     }
 
     catch (std::exception& e) {
