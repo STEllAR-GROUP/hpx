@@ -16,18 +16,21 @@ int number_of_iterations = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 // this is a empty test thread
-threads::thread_state_enum null_thread(threads::thread_state_ex_enum)
+inline double delay()
 {
-//     naming::id_type gid = 
-//         appl.get_thread_manager().get_thread_gid(self.get_thread_id(), appl);
-//     util::high_resolution_timer timer;
     double d = 0.;
     for (int i = 0; i < number_of_iterations; ++i)
     {
         d += 1/(2.* i + 1);
     }
-    globald = d;
-//     std::cout << timer.elapsed() << std::endl;
+    return d;
+}
+
+threads::thread_state_enum null_thread(threads::thread_state_ex_enum)
+{
+//     naming::id_type gid = 
+//         appl.get_thread_manager().get_thread_gid(self.get_thread_id(), appl);
+    globald = delay();
     return threads::terminated;
 }
 
@@ -189,6 +192,12 @@ int main(int argc, char* argv[])
             agas_server.reset(new agas_server_helper(agas_host, agas_port));
 
         util::high_resolution_timer timer;
+        globald = delay();
+        double delayed = timer.elapsed();
+
+        std::cout << num_threads << "," << num_hpx_threads << "," 
+                  << delayed << ",";
+
         double elapsed = 0;
         if (!vm.count("local")) {
             // initialize and start the HPX runtime
@@ -214,8 +223,8 @@ int main(int argc, char* argv[])
                 num_threads);
             elapsed = timer.elapsed();
         }
-        std::cout << elapsed /*/num_hpx_threads*/ << std::endl;
-        std::cout << globald << std::endl;
+
+        std::cout << elapsed << std::endl;
     }
 
     catch (std::exception& e) {
