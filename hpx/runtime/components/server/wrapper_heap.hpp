@@ -71,6 +71,7 @@ namespace hpx { namespace components { namespace detail
 #if !defined(_DEBUG)
         struct tag {};
         typedef hpx::util::spinlock_pool<tag> mutex_type;
+        typedef typename mutex_type::scoped_lock scoped_lock;
 #else
         typedef boost::mutex mutex_type;
 #endif
@@ -128,7 +129,7 @@ namespace hpx { namespace components { namespace detail
         bool alloc(T** result, std::size_t count = 1)
         {
 #if !defined(_DEBUG)
-            mutex_type::scoped_lock l(this);
+            scoped_lock l(this);
 #else
             mutex_type::scoped_lock l(mtx_);
 #endif
@@ -158,7 +159,7 @@ namespace hpx { namespace components { namespace detail
             BOOST_ASSERT(did_alloc(p));
 
 #if !defined(_DEBUG)
-            mutex_type::scoped_lock l(this);
+            scoped_lock l(this);
 #else
             mutex_type::scoped_lock l(mtx_);
 #endif
@@ -203,7 +204,7 @@ namespace hpx { namespace components { namespace detail
             value_type* addr = static_cast<value_type*>(pool_->address());
             if (!base_gid_) {
 #if !defined(_DEBUG)
-                mutex_type::scoped_lock l(this);
+                scoped_lock l(this);
 #else
                 mutex_type::scoped_lock l(mtx_);
 #endif
