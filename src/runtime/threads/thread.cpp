@@ -25,33 +25,48 @@ namespace hpx { namespace threads { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct thread_tag {};
+//     struct thread_tag {};
+// 
+//     // the used pool allocator doesn't need to be protected by a mutex as the
+//     // allocation always happens from inside the creation of the component
+//     // wrapper, which by itself is already protected by a mutex
+//     typedef boost::singleton_pool<
+//         thread_tag, sizeof(thread),
+//         boost::default_user_allocator_new_delete,
+//         boost::details::pool::null_mutex,
+//         0xFFFF                                      // start with 64k objects
+//     > pool_type;
 
-    // the used pool allocator doesn't need to be protected by a mutex as the
-    // allocation always happens from inside the creation of the component
-    // wrapper, which by itself is already protected by a mutex
-    typedef boost::singleton_pool<
-        thread_tag, sizeof(thread),
-        boost::default_user_allocator_new_delete,
-        boost::details::pool::default_mutex,
-        0xFFFF                                      // start with 64k objects
-    > pool_type;
-
-    void *thread::operator new(std::size_t size)
+    void *thread::operator new(std::size_t size, 
+        boost::object_pool<detail::thread>& pool)
     {
         BOOST_ASSERT(sizeof(thread) == size);
 
-        void *ret = pool_type::malloc();
+        void *ret = pool.malloc();
         if (0 == ret)
             boost::throw_exception(std::bad_alloc());
         return ret;
     }
 
+    void *thread::operator new(std::size_t size)
+    {
+        return NULL;
+    }
+
+    void thread::operator delete(void *p, 
+        boost::object_pool<detail::thread>& pool)
+    {
+        if (0 != p) 
+            pool.free(reinterpret_cast<detail::thread*>(p));
+    }
+
     void thread::operator delete(void *p, std::size_t size)
     {
         BOOST_ASSERT(sizeof(thread) == size);
-        if (0 != p) 
-            pool_type::free(p);
+        if (0 != p) {
+            detail::thread* pt = reinterpret_cast<detail::thread*>(p);
+            pt->pool_->free(pt);
+        }
     }
 
 }}}

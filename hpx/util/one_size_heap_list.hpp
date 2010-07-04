@@ -11,6 +11,7 @@
 
 #include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/atomic.hpp>
 
 #include <hpx/config.hpp>
 
@@ -19,7 +20,7 @@ namespace hpx { namespace util
 {
     /////////////////////////////////////////////////////////////////////////////
     //  a list of one_size_heap's
-    template<typename Heap, typename Mutex = boost::mutex>
+    template<typename Heap>
     class one_size_heap_list 
     {
     public:
@@ -36,6 +37,12 @@ namespace hpx { namespace util
             heap_step = heap_type::heap_step,   // default grow step
             heap_size = heap_type::heap_size    // size of the object
         };
+
+        typedef boost::shared_mutex mutex_type;
+        typedef boost::shared_lock<mutex_type> shared_lock_type;
+        typedef boost::upgrade_lock<mutex_type> upgrade_lock_type;
+        typedef boost::upgrade_to_unique_lock<mutex_type> upgraded_lock_type;
+        typedef boost::unique_lock<mutex_type> unique_lock_type;
 
     public:
     // ctor/dtor
@@ -78,48 +85,56 @@ namespace hpx { namespace util
             if (0 == count)
                 throw std::bad_alloc();   // this doesn't make sense for us
 
-            typename Mutex::scoped_lock guard (mtx_);
+            value_type *p = NULL;
+            {
+                shared_lock_type guard(mtx_);
 
-            alloc_count_ += (int)count;
-            if (alloc_count_-free_count_ > max_alloc_count_)
-                max_alloc_count_ = alloc_count_-free_count_;
+                for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it) 
+                {
+                    if ((*it)->alloc(&p, count)) {
+                        // update statistics
+                        alloc_count_ += (int)count;
+                        if (alloc_count_-free_count_ > max_alloc_count_)
+                            max_alloc_count_.store(alloc_count_-free_count_);
 
-            for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it) {
-                value_type *p = NULL;
-
-                try {
-                    p = (*it)->alloc(count);
-                }
-                catch (std::bad_alloc const&) {
-                    /**/;
-                }
-
-                if (NULL != p) {
-                    // will be used as first heap in the future
-                    if (it != heap_list_.begin())
-                        heap_list_.splice(heap_list_.begin(), heap_list_, it);  
-                    return p;
-                }
-                else {
-                    LOSH_(info) 
-                        << "one_size_heap_list (" 
-                        << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-                        << "): failed to allocate from heap (" << (*it)->heap_count_ 
-                        << "), allocated: " << (*it)->size() << ", free'd: " 
-                        << (*it)->free_size() << ".";
+    //                     // will be used as first heap in the future
+    //                     if (it != heap_list_.begin()) {
+    //                         // acquire exclusive access
+    //                         upgraded_lock_type ul (guard); 
+    //                         heap_list_.splice(heap_list_.begin(), heap_list_, it);  
+    //                     }
+                        return p;
+                    }
+                    else {
+                        LOSH_(info) 
+                            << "one_size_heap_list (" 
+                            << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
+                            << "): failed to allocate from heap (" << (*it)->heap_count_ 
+                            << "), allocated: " << (*it)->size() << ", free'd: " 
+                            << (*it)->free_size() << ".";
+                    }
                 }
             }
 
             // create new heap
-            iterator itnew = heap_list_.insert(heap_list_.begin(),
-                typename list_type::value_type(
-                    new heap_type(class_name_.c_str(), false, true, 
-                            heap_count_+1, heap_step
-                        )
-                ));
+            {
+                // acquire exclusive access
+                unique_lock_type ul (mtx_); 
 
-            if (itnew == heap_list_.end())
-                throw std::bad_alloc();   // insert failed
+                iterator itnew = heap_list_.insert(heap_list_.begin(),
+                    typename list_type::value_type(
+                        new heap_type(class_name_.c_str(), false, true, 
+                                heap_count_+1, heap_step
+                            )
+                    ));
+
+                if (itnew == heap_list_.end())
+                    throw std::bad_alloc();   // insert failed
+
+                bool result = (*itnew)->alloc(&p, count);
+                if (!result || NULL == p)
+                    throw std::bad_alloc();   // snh 
+            }
 
             ++heap_count_;
             LOSH_(info) 
@@ -128,17 +143,15 @@ namespace hpx { namespace util
                 << "): creating new heap (" << heap_count_ 
                 << "), size of heap_list: " << heap_list_.size() << ".";
 
-            value_type* p = (*itnew)->alloc(count);
-            if (NULL == p)
-                throw std::bad_alloc();   // snh 
             return p;
         }
 
         void free(void* p, std::size_t count = 1)
         {
-            typename Mutex::scoped_lock guard (mtx_);
+            if (NULL == p)
+                return;
 
-            free_count_ += (int)count;
+            shared_lock_type guard (mtx_);
 
             // find heap which allocated this pointer
             iterator it = heap_list_.begin();
@@ -146,28 +159,38 @@ namespace hpx { namespace util
                 if ((*it)->did_alloc(p)) {
                     (*it)->free(p, count);
 
+                    free_count_ += (int)count;
+
                     if ((*it)->is_empty()) {
                         LOSH_(info) 
                             << "one_size_heap_list (" 
                             << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
                             << "): freeing empty heap (" << (*it)->heap_count_ << ").";
 
+                        // acquire exclusive access
+                        guard.unlock();
+
+                        unique_lock_type ul (mtx_); 
                         heap_list_.erase (it);
                     }
-                    else if (it != heap_list_.begin() && (*it)->has_allocatable_slots()) {
-                        // move the heap to the front if it has empty slots
-                        heap_list_.splice (heap_list_.begin(), heap_list_, it);
-                    }
+//                     else if (it != heap_list_.begin() && (*it)->has_allocatable_slots()) {
+//                         // move the heap to the front if it has empty slots
+// 
+//                         // acquire exclusive access
+//                         upgraded_lock_type ul (guard); 
+//                         heap_list_.splice (heap_list_.begin(), heap_list_, it);
+//                     }
                     return;
                 }
             }
-            BOOST_ASSERT(it != heap_list_.end());   // no heap found
+            BOOST_ASSERT(false);   // no heap found
         }
 
         bool did_alloc(void* p) const
         {
-            typename Mutex::scoped_lock guard (mtx_);
-            for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it) {
+            shared_lock_type guard (mtx_);
+            for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it) 
+            {
                 if ((*it)->did_alloc(p)) 
                     return true;
             }
@@ -175,15 +198,15 @@ namespace hpx { namespace util
         }
 
     protected:
-        Mutex mtx_;
+        mutex_type mtx_;
         list_type heap_list_;
 
     public:
-        std::string class_name_;
-        unsigned long alloc_count_;
-        unsigned long free_count_;
-        unsigned long heap_count_;
-        unsigned long max_alloc_count_;
+        std::string const class_name_;
+        boost::atomic<unsigned long> alloc_count_;
+        boost::atomic<unsigned long> free_count_;
+        boost::atomic<unsigned long> heap_count_;
+        boost::atomic<unsigned long> max_alloc_count_;
     };
 
 }} // namespace hpx::util

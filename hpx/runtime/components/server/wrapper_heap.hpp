@@ -18,6 +18,9 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
+#if !defined(_DEBUG)
+#include <hpx/util/spinlock_pool.hpp>
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace detail 
@@ -65,6 +68,13 @@ namespace hpx { namespace components { namespace detail
         };
 #endif
 
+#if !defined(_DEBUG)
+        struct tag {};
+        typedef hpx::util::spinlock_pool<tag> mutex_type;
+#else
+        typedef boost::mutex mutex_type;
+#endif
+
         typedef boost::aligned_storage<sizeof(value_type),
             boost::alignment_of<value_type>::value> storage_type;
 //         storage_type data;
@@ -89,6 +99,9 @@ namespace hpx { namespace components { namespace detail
                 step_ = heap_step;
             else 
                 step_ = ((step_ + heap_step - 1)/heap_step)*heap_step;
+
+            if (!init_pool())
+                throw std::bad_alloc();
         }
 
         wrapper_heap()
@@ -98,6 +111,8 @@ namespace hpx { namespace components { namespace detail
             alloc_count_(0), free_count_(0), heap_count_(0)
         {
             BOOST_ASSERT(sizeof(storage_type) == heap_size);
+            if (!init_pool())
+                throw std::bad_alloc();
         }
 
         ~wrapper_heap()
@@ -110,10 +125,15 @@ namespace hpx { namespace components { namespace detail
         bool is_empty() const { return NULL == pool_; }
         bool has_allocatable_slots() const { return first_free_ < pool_+size_; }
 
-        T* alloc(std::size_t count = 1)
+        bool alloc(T** result, std::size_t count = 1)
         {
+#if !defined(_DEBUG)
+            mutex_type::scoped_lock l(this);
+#else
+            mutex_type::scoped_lock l(mtx_);
+#endif
             if (!ensure_pool(count))
-                return NULL;
+                return false;
 
             alloc_count_ += (int)count;
 
@@ -128,15 +148,20 @@ namespace hpx { namespace components { namespace detail
             debug::fill_bytes(p, initial_value, count*sizeof(storage_type));
 #endif
             BOOST_ASSERT(free_size_ >= 0);
-            return p;
+
+            *result = p;
+            return true;
         }
 
         void free(void *p, std::size_t count = 1)
         {
             BOOST_ASSERT(did_alloc(p));
 
-            free_count_ += (int)count;
-
+#if !defined(_DEBUG)
+            mutex_type::scoped_lock l(this);
+#else
+            mutex_type::scoped_lock l(mtx_);
+#endif
             storage_type* p1 = static_cast<storage_type*>(p);
 
             BOOST_ASSERT(NULL != pool_ && p1 >= pool_);
@@ -151,6 +176,7 @@ namespace hpx { namespace components { namespace detail
             // give memory back to pool
             debug::fill_bytes(p1->address(), freed_value, sizeof(storage_type));
 #endif
+            free_count_ += (int)count;
             free_size_ += (int)count;
 
             // release the pool if this one was the last allocated item
@@ -158,6 +184,7 @@ namespace hpx { namespace components { namespace detail
         }
         bool did_alloc (void *p) const
         {
+            // no lock is necessary here as all involved variables are immutable
             return NULL != pool_ && NULL != p && pool_ <= p && p < pool_ + size_;
         }
 
@@ -175,6 +202,12 @@ namespace hpx { namespace components { namespace detail
 
             value_type* addr = static_cast<value_type*>(pool_->address());
             if (!base_gid_) {
+#if !defined(_DEBUG)
+                mutex_type::scoped_lock l(this);
+#else
+                mutex_type::scoped_lock l(mtx_);
+#endif
+
                 // store a pointer to the AGAS client
                 hpx::applier::applier& appl = hpx::applier::get_applier();
                 get_agas_client_ = &appl.get_agas_client();
@@ -258,7 +291,7 @@ namespace hpx { namespace components { namespace detail
 
         bool ensure_pool(std::size_t count)
         {
-            if (NULL == pool_ && !init_pool())
+            if (NULL == pool_)
                 return false;
             if (first_free_ + count > pool_+size_) 
                 return false;
@@ -275,16 +308,16 @@ namespace hpx { namespace components { namespace detail
             if (NULL == pool_) 
                 return false;
 
+            first_free_ = pool_;
+            size_ = s / heap_size;
+            free_size_ = (int)size_;
+
             LOSH_(info) 
                 << "wrapper_heap (" 
                 << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
                 << "): init_pool (" << std::hex << pool_ << ")" 
                 << " size: " << s << ".";
 
-            s /= heap_size;
-            first_free_ = pool_;
-            size_ = s;
-            free_size_ = (int)size_;
             return true;
         }
 
@@ -322,8 +355,12 @@ namespace hpx { namespace components { namespace detail
         naming::gid_type base_gid_;
         naming::resolver_client const* get_agas_client_;
 
+#if defined(_DEBUG)
+        mutable mutex_type mtx_;
+#endif
+
     public:
-        std::string class_name_;
+        std::string const class_name_;
         int alloc_count_;
         int free_count_;
         int heap_count_;

@@ -14,6 +14,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/coroutine/coroutine.hpp>
+#include <boost/pool/object_pool.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -35,7 +36,7 @@ namespace hpx { namespace threads { namespace detail
 
     public:
         thread(thread_init_data const& init_data, thread_id_type id, 
-               thread_state_enum newstate)
+               thread_state_enum newstate, boost::object_pool<thread>& pool)
           : coroutine_(init_data.func, id), 
             current_state_(thread_state(newstate)), 
             current_state_ex_(thread_state_ex(wait_signaled)),
@@ -45,7 +46,8 @@ namespace hpx { namespace threads { namespace detail
             parent_thread_phase_(init_data.parent_phase),
             parent_locality_prefix_(init_data.parent_prefix),
             component_id_(init_data.lva),
-            marked_state_(unknown)
+            marked_state_(unknown),
+            pool_(&pool)
         {
             // store the thread id of the parent thread, mainly for debugging 
             // purposes
@@ -68,7 +70,7 @@ namespace hpx { namespace threads { namespace detail
         thread()
           : coroutine_(function_type(), 0), description_(""), lco_description_(0),
             parent_locality_prefix_(0), parent_thread_id_(0), 
-            parent_thread_phase_(0), component_id_(0)
+            parent_thread_phase_(0), component_id_(0), pool_(0)
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
         }
@@ -203,6 +205,11 @@ namespace hpx { namespace threads { namespace detail
         }
 
         // threads use a specialized allocator for fast creation/destruction
+        static void *operator new(std::size_t size, 
+            boost::object_pool<detail::thread>&);
+        static void operator delete(void *p, 
+            boost::object_pool<detail::thread>&);
+
         static void *operator new(std::size_t size);
         static void operator delete(void *p, std::size_t size);
 
@@ -245,6 +252,8 @@ namespace hpx { namespace threads { namespace detail
         mutable thread_state marked_state_;
 
         mutable naming::id_type id_;    // that's our gid
+
+        boost::object_pool<detail::thread>* pool_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -296,9 +305,10 @@ namespace hpx { namespace threads
         ///                 \a thread will be associated with.
         /// \param newstate [in] The initial thread state this instance will
         ///                 be initialized with.
-        thread(thread_init_data const& init_data, 
+        thread(thread_init_data const& init_data,
+                boost::object_pool<detail::thread>& pool, 
                 thread_state_enum new_state = init)
-          : base_type(new detail::thread(init_data, This(), new_state))
+          : base_type(new (pool) detail::thread(init_data, This(), new_state, pool))
         {
             LTM_(debug) << "thread::thread(" << this << "), description(" 
                         << init_data.description << ")";

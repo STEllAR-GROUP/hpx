@@ -15,10 +15,10 @@ namespace hpx { namespace components { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     // list of managed_component heaps
-    template<typename Heap, typename Mutex = boost::mutex>
-    class wrapper_heap_list : public util::one_size_heap_list<Heap, Mutex>
+    template<typename Heap>
+    class wrapper_heap_list : public util::one_size_heap_list<Heap>
     {
-        typedef util::one_size_heap_list<Heap, Mutex> base_type;
+        typedef util::one_size_heap_list<Heap> base_type;
 
     public:
         wrapper_heap_list(component_type type)
@@ -28,7 +28,7 @@ namespace hpx { namespace components { namespace detail
         ///
         naming::gid_type get_gid(void* p)
         {
-            typename Mutex::scoped_lock guard (this->mtx_);
+            typename base_type::shared_lock_type guard (this->mtx_);
 
             typedef typename base_type::const_iterator iterator;
             iterator end = this->heap_list_.end();

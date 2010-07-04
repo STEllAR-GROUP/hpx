@@ -145,7 +145,7 @@ namespace hpx { namespace threads { namespace policies
                 // create the new thread
                 thread_state_enum state = boost::get<1>(*task);
                 std::auto_ptr<threads::thread> thrd (
-                    new threads::thread(boost::get<0>(*task), state));
+                    new threads::thread(boost::get<0>(*task), memory_pool_, state));
 
                 delete task;
 
@@ -294,10 +294,10 @@ namespace hpx { namespace threads { namespace policies
             thread_state_enum initial_state, bool run_now, error_code& ec)
         {
             if (run_now) {
-                std::auto_ptr<threads::thread> thrd (
-                    new threads::thread(data, initial_state));
-
                 mutex_type::scoped_lock lk(mtx_);
+
+                std::auto_ptr<threads::thread> thrd (
+                    new threads::thread(data, memory_pool_, initial_state));
 
                 // add a new entry in the map for this thread
                 thread_id_type id = thrd->get_thread_id();
@@ -529,6 +529,8 @@ namespace hpx { namespace threads { namespace policies
         std::size_t max_count_;             ///< maximum number of existing PX-threads
         task_items_type new_tasks_;         ///< list of new tasks to run
         boost::atomic<long> new_tasks_count_;     ///< count of new tasks to run
+
+        boost::object_pool<threads::detail::thread> memory_pool_;
 
         util::block_profiler<add_new_tag> add_new_logger_;
     };
