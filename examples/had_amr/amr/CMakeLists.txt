@@ -6,7 +6,6 @@
 ###############################################################################
 set(had_amr_client_HEADERS
     unigrid_mesh.hpp
-    uni_amr.hpp
     functional_component.hpp
     dynamic_stencil_value.hpp)
 source_group("Header Files" 
@@ -14,7 +13,6 @@ source_group("Header Files"
 
 set(had_amr_stubs_HEADERS
     stubs/unigrid_mesh.hpp
-    stubs/uni_amr.hpp
     stubs/functional_component.hpp
     stubs/dynamic_stencil_value.hpp)
 source_group("Header Files\\Stubs" 
@@ -22,7 +20,6 @@ source_group("Header Files\\Stubs"
 
 set(had_amr_server_HEADERS
     server/unigrid_mesh.hpp
-    server/uni_amr.hpp
     server/functional_component.hpp
     server/stencil_value_in_adaptor.hpp
     server/stencil_value_out_adaptor.hpp
@@ -44,7 +41,6 @@ source_group("Source Files"
 
 set(had_amr_server_SOURCES
     server/unigrid_mesh.cpp
-    server/uni_amr.cpp
     server/functional_component.cpp
     server/stencil_value_out_adaptor.cpp
     server/dynamic_stencil_value.cpp)

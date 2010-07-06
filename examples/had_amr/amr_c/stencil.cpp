@@ -14,7 +14,7 @@
 #include "logging.hpp"
 #include "stencil_data.hpp"
 #include "stencil_functions.hpp"
-#include "../amr/uni_amr.hpp"
+#include "../amr/unigrid_mesh.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
@@ -82,7 +82,6 @@ namespace hpx { namespace components { namespace amr
         bbox[0] = 0;
         bbox[1] = 0;
 
-        //std::cout << " TEST " << val[0]->iter_ << " " << val[val.size()-1]->iter_ << " " << val.size() << std::endl;
         if ( val[0]->iter_ != val[val.size()-1]->iter_ ) {
           for (i=0;i<val.size();i++) {
             if ( val[0]->iter_ == val[i]->iter_ ) tval.push_back(val[i]);
@@ -90,6 +89,7 @@ namespace hpx { namespace components { namespace amr
         } else {
           for (i=0;i<val.size();i++) tval.push_back(val[i]);
         }
+        //std::cout << " TEST " << val[0]->iter_ << " " << val[val.size()-1]->iter_ << " " << val.size() << " " << tval.size() << std::endl;
 
         if ( tval[0]->level_ == 0 ) {
           if ( column == 0 ) {
@@ -488,14 +488,27 @@ namespace hpx { namespace components { namespace amr
       }
 
       std::vector<naming::id_type> result_data;
+      int numsteps = 2 * 6; // six subcycles each step
+      int numvals;
+      if ( par->granularity == 1 ) {
+        numvals = 15;
+      } else if ( par->granularity == 2 ) {
+        numvals = 9;
+      } else {
+        numvals = 5;
+      }
+
       if ( par->integrator == 0 ) {
         BOOST_ASSERT(false);
       } else if ( par->integrator == 1 ) {
-        components::amr::uni_amr uni_amr_mesh;
-        uni_amr_mesh.create(here);
-        result_data = uni_amr_mesh.init_execute(function_type,
-              do_logging ? logging_type : components::component_invalid,
-              level, xmin, par);
+        //result_data = uni_amr_mesh.init_execute(function_type,
+        //      do_logging ? logging_type : components::component_invalid,
+        //      level, xmin, par);
+        hpx::components::amr::unigrid_mesh unigrid_mesh;
+        unigrid_mesh.create(here);
+        result_data = unigrid_mesh.init_execute(function_type, numvals, numsteps,
+              do_logging ? logging_type : components::component_invalid,level,xmin, par);
+
       } else {
         BOOST_ASSERT(false);
       }

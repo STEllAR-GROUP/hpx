@@ -324,6 +324,12 @@ void calcrhs(struct nodedata * rhs,
 
     rhs->phi[0][3] = 0.; // Energy rhs
 
+  } else {
+    // tapered point or boundary ( boundary case taken care of below )
+    rhs->phi[0][0] = 0.0; // chi rhs -- chi is set by quadratic fit
+    rhs->phi[0][1] = 0.0; // Phi rhs -- Phi-dot is always zero at r=0
+    rhs->phi[0][2] = 0.0; // Pi rhs -- chi is set by quadratic fit
+    rhs->phi[0][3] = 0.0; // Energy rhs -- analysis variable
   }
 
   if (boundary ) {

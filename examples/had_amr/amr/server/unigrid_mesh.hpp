@@ -46,7 +46,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::vector<naming::id_type> init_execute(
             components::component_type function_type, std::size_t numvalues, 
             std::size_t numsteps,
-            components::component_type logging_type, Parameter const& par);
+            components::component_type logging_type, 
+            std::size_t level, had_double_type xmin, Parameter const& par);
 
         std::vector<naming::id_type> execute(
             std::vector<naming::id_type> const& initialdata,
@@ -58,10 +59,12 @@ namespace hpx { namespace components { namespace amr { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::result_action5<
+        typedef hpx::actions::result_action7<
             unigrid_mesh, std::vector<naming::id_type>, unigrid_mesh_init_execute, 
             components::component_type, std::size_t, std::size_t,
-            components::component_type, Parameter const&, &unigrid_mesh::init_execute
+            components::component_type,
+            std::size_t,had_double_type,
+            Parameter const&, &unigrid_mesh::init_execute
         > init_execute_action;
 
         typedef hpx::actions::result_action6<
@@ -83,6 +86,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         void prepare_initial_data(
             distributed_iterator_range_type const& functions, 
             std::vector<naming::id_type>& initial_data,
+            std::size_t level, had_double_type xmin,
             Parameter const& par);
 
         static void init_stencils(

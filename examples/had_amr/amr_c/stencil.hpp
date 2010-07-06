@@ -8,7 +8,7 @@
 
 #include "../amr/server/functional_component.hpp"
 #include "stencil_data.hpp"
-#include "../amr/uni_amr.hpp"
+#include "../amr/unigrid_mesh.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
@@ -25,8 +25,6 @@ namespace hpx { namespace components { namespace amr
     {
     private:
         typedef amr::server::functional_component base_type;
-
-        //components::amr::uni_amr uni_amr_mesh[12];
 
     public:
         typedef stencil wrapped_type;

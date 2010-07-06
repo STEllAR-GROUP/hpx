@@ -46,11 +46,16 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         hpx::util::high_resolution_timer t;
         std::vector<naming::id_type> result_data;
         
+        // start with coarse mesh
+        int level = 0;
+
+        // we are in spherical symmetry, r=0 is the smallest radial domain point             
+        had_double_type xmin = 0.0;
         if ( par->integrator == 1 ) {
             components::amr::unigrid_mesh unigrid_mesh;
             unigrid_mesh.create(here);
             result_data = unigrid_mesh.init_execute(function_type, numvals, numsteps,
-                do_logging ? logging_type : components::component_invalid, par);
+                do_logging ? logging_type : components::component_invalid,level,xmin, par);
         } else {
           BOOST_ASSERT(false);
         }
