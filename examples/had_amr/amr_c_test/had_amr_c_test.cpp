@@ -12,6 +12,8 @@
 #include "../had_config.hpp"
 #include <stdio.h>
 
+int WORK = 0;
+
 // local functions
 int floatcmp(had_double_type x1,had_double_type x2) {
   // compare to floating point numbers
@@ -84,9 +86,9 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
       Pi  = 0.0;
       Energy = 0.5*r*r*(Pi*Pi + Phi*Phi) - r*r*pow(chi,par.PP+1)/(par.PP+1);
 
-      // Add some busy work to see if race condition can be eliminated
+      // TEST Add some busy work to see if race condition can be eliminated
       double d = 0.;
-      for (int ii = 0; ii < 2000; ++ii)
+      for (int ii = 0; ii < WORK; ++ii)
       {
          d += 1/(2.* ii + 1);
       }
@@ -130,7 +132,7 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
  
     // Add busywork TEST
     double d = 0.;
-    for (int i = 0; i < 2000; ++i)
+    for (int i = 0; i < WORK; ++i)
     {
        d += 1/(2.* i + 1);
     }
