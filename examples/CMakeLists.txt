@@ -10,7 +10,7 @@ set(example_SUBDIRS
     #had_amr 
     #naming 
     #parcelset
-    #quickstart
+    quickstart
     #heart_beat
    )
 
