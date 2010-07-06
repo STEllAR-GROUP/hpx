@@ -116,6 +116,37 @@ namespace hpx { namespace components { namespace amr
               BOOST_ASSERT(false);
             }
           }
+        } else {
+          int maxsize;
+          if ( par->granularity == 1 ) maxsize = 15;
+          else if ( par->granularity == 2 ) maxsize = 9;
+          else maxsize = 5;
+           
+
+          if ( column == 0 ) {
+            // indicate a physical boundary
+            boundary = true;
+            compute_index = 0;
+            bbox[0] = 1;
+           }
+          if ( column == maxsize - 1) {
+            // indicate a physical boundary
+            boundary = true;
+            compute_index = tval.size()-1;
+            bbox[1] = 1;
+          } 
+          if ( !boundary ) {
+            if ( (tval.size()-1)%2 == 0 ) {
+              compute_index = (tval.size()-1)/2;
+              if ( column == 1 && par->granularity == 1 ) {
+                boundary = true;
+                bbox[0] = 2;
+                bbox[1] = 0;
+              }
+            } else {
+              BOOST_ASSERT(false);
+            }
+          }
         } 
 
         // put all data into a single array
