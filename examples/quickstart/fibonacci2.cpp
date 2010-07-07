@@ -6,6 +6,8 @@
 #include <iostream>
 
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
+
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 
@@ -13,8 +15,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/export.hpp>
-
-#include <runtime/hpx_init.hpp>
 
 using namespace hpx;
 namespace po = boost::program_options;
