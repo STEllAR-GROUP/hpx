@@ -56,7 +56,7 @@ public:
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
       : apply_logger_("thunk::apply"),
         closure_(boost::bind(
-            &thunk::BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N, Arg)>, 
+          &thunk::template BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N,Arg)>, 
             this_(), naming::id_type(gid, naming::id_type::unmanaged), 
             BOOST_PP_ENUM_PARAMS(N, arg)))
     { }
@@ -65,7 +65,7 @@ public:
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
       : apply_logger_("thunk::apply"),
         closure_(boost::bind(
-            &thunk::BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N, Arg)>, 
+          &thunk::template BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N,Arg)>, 
             this_(), gid,
             BOOST_PP_ENUM_PARAMS(N, arg)))
     { }

@@ -205,13 +205,13 @@ namespace hpx { namespace lcos
         template <typename Arg0>
         thunk(naming::gid_type const& gid, Arg0 const& arg0)
           : apply_logger_("thunk::apply"),
-            closure_(boost::bind(&thunk::invoke1<Arg0>, this_(), 
+            closure_(boost::bind(&thunk::template invoke1<Arg0>, this_(), 
                 naming::id_type(gid, naming::id_type::unmanaged), arg0))
         { }
         template <typename Arg0>
         thunk(naming::id_type const& gid, Arg0 const& arg0)
           : apply_logger_("thunk::apply"),
-            closure_(boost::bind(&thunk::invoke1<Arg0>, this_(), gid, arg0))
+            closure_(boost::bind(&thunk::template invoke1<Arg0>, this_(), gid, arg0))
         { }
 
         // pull in remaining constructors
