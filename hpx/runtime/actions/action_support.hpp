@@ -161,12 +161,14 @@ namespace hpx { namespace actions
         base_action::enum_gid_handler_type f_;
     };
 
-    template <typename Component, int Action, typename Arguments>
+    template <typename Component, int Action, typename Arguments, 
+        typename Derived>
     class action : public base_action
     {
     public:
         typedef Component component_type;
         typedef Arguments arguments_type;
+        typedef Derived derived_type;
         typedef util::unused_type result_type;
 
         // This is the action code (id) of this action. It is exposed to allow 
@@ -379,11 +381,12 @@ namespace hpx { namespace actions
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <int N, typename Component, int Action, typename Arguments>
+    template <int N, typename Component, int Action, typename Arguments, 
+        typename Derived>
     inline typename boost::fusion::result_of::at_c<
-        typename action<Component, Action, Arguments>::arguments_type const, N
+        typename action<Component, Action, Arguments, Derived>::arguments_type const, N
     >::type 
-    get(action<Component, Action, Arguments> const& args) 
+    get(action<Component, Action, Arguments, Derived> const& args) 
     { 
         return args.get<N>(); 
     }

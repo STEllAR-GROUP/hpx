@@ -37,12 +37,12 @@ namespace hpx { namespace actions
     // zero argument version
     template <
         typename Component, typename Result, int Action, 
-        Result (Component::*F)()
-    >
+        Result (Component::*F)(), typename Derived>
     class base_result_action0 
-      : public action<Component, Action, boost::fusion::vector<> >
+      : public action<Component, Action, boost::fusion::vector<>, Derived>
     {
-        typedef action<Component, Action, boost::fusion::vector<> > base_type;
+        typedef action<Component, Action, boost::fusion::vector<>, Derived> 
+            base_type;
 
     public:
         base_result_action0()
@@ -126,13 +126,14 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, typename Result, int Action, 
-        Result (Component::*F)()
-    >
+        Result (Component::*F)()>
     class result_action0 
-      : public base_result_action0<Component, Result, Action, F>
+      : public base_result_action0<Component, Result, Action, F,
+            result_action0<Component, Result, Action, F> >
     {
     private:
-        typedef base_result_action0<Component, Result, Action, F> base_type;
+        typedef base_result_action0<
+            Component, Result, Action, F, result_action0> base_type;
 
     public:
         result_action0()
@@ -193,13 +194,14 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, typename Result, int Action, 
-        Result (Component::*F)()
-    >
+        Result (Component::*F)()>
     class direct_result_action0 
-      : public base_result_action0<Component, Result, Action, F>
+      : public base_result_action0<Component, Result, Action, F,
+            direct_result_action0<Component, Result, Action, F> >
     {
     private:
-        typedef base_result_action0<Component, Result, Action, F> base_type;
+        typedef base_result_action0<
+            Component, Result, Action, F, direct_result_action0> base_type;
 
     public:
         direct_result_action0()
@@ -276,12 +278,14 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     //  zero parameter version, no result value
-    template <typename Component, int Action, void (Component::*F)()>
+    template <typename Component, int Action, void (Component::*F)(), 
+        typename Derived>
     class base_action0 
-      : public action<Component, Action, boost::fusion::vector<> >
+      : public action<Component, Action, boost::fusion::vector<>, Derived>
     {
     private:
-        typedef action<Component, Action, boost::fusion::vector<> > base_type;
+        typedef action<Component, Action, boost::fusion::vector<>, Derived> 
+            base_type;
 
     public:
         base_action0()
@@ -361,10 +365,11 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, int Action, void (Component::*F)()>
-    class action0 : public base_action0<Component, Action, F>
+    class action0 
+      : public base_action0<Component, Action, F, action0<Component, Action, F> >
     {
     private:
-        typedef base_action0<Component, Action, F> base_type;
+        typedef base_action0<Component, Action, F, action0> base_type;
 
     public:
         action0()
@@ -424,10 +429,12 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, int Action, void (Component::*F)()>
-    class direct_action0 : public base_action0<Component, Action, F>
+    class direct_action0 
+      : public base_action0<Component, Action, F,  
+            direct_action0<Component, Action, F> >
     {
     private:
-        typedef base_action0<Component, Action, F> base_type;
+        typedef base_action0<Component, Action, F, direct_action0> base_type;
 
     public:
         direct_action0()

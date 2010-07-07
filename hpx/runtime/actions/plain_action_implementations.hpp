@@ -49,15 +49,15 @@
       : public action<
             components::server::plain_function<Derived>, 
             BOOST_PP_CAT(function_result_action_arg, N), 
-            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QULIFIERS, _)> 
-        >
+            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QULIFIERS, _)>,
+            Derived>
     {
     private:
         typedef action<
             components::server::plain_function<Derived>, 
             BOOST_PP_CAT(function_result_action_arg, N), 
-            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QULIFIERS, _)> 
-        > base_type;
+            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QULIFIERS, _)>,
+            Derived> base_type;
 
     public:
         BOOST_PP_CAT(plain_base_result_action, N)() 
@@ -162,8 +162,7 @@
     //  N parameter version, direct execution with result
     template <
         typename Result, BOOST_PP_ENUM_PARAMS(N, typename T), 
-        Result (*F)(BOOST_PP_ENUM_PARAMS(N, T))
-    >
+        Result (*F)(BOOST_PP_ENUM_PARAMS(N, T))>
     class BOOST_PP_CAT(plain_result_action, N)
       : public BOOST_PP_CAT(plain_base_result_action, N)<Result, 
           BOOST_PP_ENUM_PARAMS(N, T), F, 
@@ -172,8 +171,7 @@
     private:
         typedef BOOST_PP_CAT(plain_base_result_action, N)<
             Result, BOOST_PP_ENUM_PARAMS(N, T), F, 
-            BOOST_PP_CAT(plain_result_action, N)> 
-        base_type;
+            BOOST_PP_CAT(plain_result_action, N)> base_type;
 
     public:
         BOOST_PP_CAT(plain_result_action, N)()
@@ -246,8 +244,7 @@
     //  N parameter version, direct execution with result
     template <
         typename Result, BOOST_PP_ENUM_PARAMS(N, typename T), 
-        Result (*F)(BOOST_PP_ENUM_PARAMS(N, T))
-    >
+        Result (*F)(BOOST_PP_ENUM_PARAMS(N, T))>
     class BOOST_PP_CAT(plain_direct_result_action, N)
       : public BOOST_PP_CAT(plain_base_result_action, N)<Result, 
           BOOST_PP_ENUM_PARAMS(N, T), F, 
@@ -256,8 +253,7 @@
     private:
         typedef BOOST_PP_CAT(plain_base_result_action, N)<
             Result, BOOST_PP_ENUM_PARAMS(N, T), F,
-            BOOST_PP_CAT(plain_direct_result_action, N)> 
-        base_type;
+            BOOST_PP_CAT(plain_direct_result_action, N)> base_type;
 
     public:
         BOOST_PP_CAT(plain_direct_result_action, N)()
@@ -351,22 +347,20 @@
     //  N parameter version, no result type
     template <
         BOOST_PP_ENUM_PARAMS(N, typename T),
-        void (*F)(BOOST_PP_ENUM_PARAMS(N, T)),
-        typename Derived
-    >
+        void (*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>
     class BOOST_PP_CAT(plain_base_action, N)
       : public action<
             components::server::plain_function<Derived>,
             BOOST_PP_CAT(function_action_arg, N), 
-            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QULIFIERS, _)> 
-        >
+            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QULIFIERS, _)>,
+            Derived>
     {
     private:
         typedef action<
             components::server::plain_function<Derived>, 
             BOOST_PP_CAT(function_action_arg, N), 
-            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QULIFIERS, _)> 
-        > base_type;
+            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QULIFIERS, _)>,
+            Derived> base_type;
 
     public:
         BOOST_PP_CAT(plain_base_action, N)() 
@@ -467,13 +461,11 @@
     ///////////////////////////////////////////////////////////////////////////
     template <
         BOOST_PP_ENUM_PARAMS(N, typename T), 
-        void (*F)(BOOST_PP_ENUM_PARAMS(N, T))
-    >
+        void (*F)(BOOST_PP_ENUM_PARAMS(N, T))>
     class BOOST_PP_CAT(plain_action, N)
       : public BOOST_PP_CAT(plain_base_action, N)<
             BOOST_PP_ENUM_PARAMS(N, T), F, 
-            BOOST_PP_CAT(plain_action, N)<BOOST_PP_ENUM_PARAMS(N, T), F>
-        >
+            BOOST_PP_CAT(plain_action, N)<BOOST_PP_ENUM_PARAMS(N, T), F> >
     {
     private:
         typedef BOOST_PP_CAT(plain_base_action, N)<
@@ -550,13 +542,11 @@
     ///////////////////////////////////////////////////////////////////////////
     template <
         BOOST_PP_ENUM_PARAMS(N, typename T),
-        void (*F)(BOOST_PP_ENUM_PARAMS(N, T))
-    >
+        void (*F)(BOOST_PP_ENUM_PARAMS(N, T))>
     class BOOST_PP_CAT(plain_direct_action, N)
       : public BOOST_PP_CAT(plain_base_action, N)<
             BOOST_PP_ENUM_PARAMS(N, T), F,
-            BOOST_PP_CAT(plain_direct_action, N)<BOOST_PP_ENUM_PARAMS(N, T), F>
-        >
+            BOOST_PP_CAT(plain_direct_action, N)<BOOST_PP_ENUM_PARAMS(N, T), F> >
     {
     private:
         typedef BOOST_PP_CAT(plain_base_action, N)<

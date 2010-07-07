@@ -30,7 +30,7 @@
 
 #define N BOOST_PP_ITERATION()
 #define HPX_ACTION_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n) this->get<n>()
-#define HPX_REMOVE_QULIFIERS(z, n, data)                                      \
+#define HPX_REMOVE_QUALIFIERS(z, n, data)                                     \
         BOOST_PP_COMMA_IF(n)                                                  \
         typename detail::remove_qualifiers<BOOST_PP_CAT(T, n)>::type          \
     /**/
@@ -42,19 +42,18 @@
     template <
         typename Component, typename Result, int Action, 
         BOOST_PP_ENUM_PARAMS(N, typename T),
-        Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))
-    >
+        Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>
     class BOOST_PP_CAT(base_result_action, N)
       : public action<
             Component, Action, 
-            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QULIFIERS, _)> 
-        >
+            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
+            Derived>
     {
     private:
         typedef action<
             Component, Action, 
-            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QULIFIERS, _)> 
-        > base_type;
+            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
+            Derived> base_type;
 
     public:
         BOOST_PP_CAT(base_result_action, N)() 
@@ -162,16 +161,18 @@
     template <
         typename Component, typename Result, int Action, 
         BOOST_PP_ENUM_PARAMS(N, typename T), 
-        Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))
-    >
+        Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))>
     class BOOST_PP_CAT(result_action, N)
-      : public BOOST_PP_CAT(base_result_action, N)<Component, Result, Action, 
-          BOOST_PP_ENUM_PARAMS(N, T), F>
+      : public BOOST_PP_CAT(base_result_action, N)<
+            Component, Result, Action, 
+            BOOST_PP_ENUM_PARAMS(N, T), F, 
+            BOOST_PP_CAT(result_action, N)<
+                Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F> >
     {
     private:
         typedef BOOST_PP_CAT(base_result_action, N)<
-            Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F> 
-        base_type;
+            Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F,
+            BOOST_PP_CAT(result_action, N)> base_type;
 
     public:
         BOOST_PP_CAT(result_action, N)()
@@ -246,13 +247,16 @@
         Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))
     >
     class BOOST_PP_CAT(direct_result_action, N)
-      : public BOOST_PP_CAT(base_result_action, N)<Component, Result, Action, 
-          BOOST_PP_ENUM_PARAMS(N, T), F>
+      : public BOOST_PP_CAT(base_result_action, N)<
+            Component, Result, Action, 
+            BOOST_PP_ENUM_PARAMS(N, T), F,
+            BOOST_PP_CAT(direct_result_action, N)<
+                Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F> >
     {
     private:
         typedef BOOST_PP_CAT(base_result_action, N)<
-            Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F> 
-        base_type;
+            Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F,
+            BOOST_PP_CAT(direct_result_action, N)> base_type;
 
     public:
         BOOST_PP_CAT(direct_result_action, N)()
@@ -343,19 +347,18 @@
     //  N parameter version, no result type
     template <
         typename Component, int Action, BOOST_PP_ENUM_PARAMS(N, typename T),
-        void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))
-    >
+        void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>
     class BOOST_PP_CAT(base_action, N)
       : public action<
             Component, Action, 
-            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QULIFIERS, _)> 
-        >
+            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
+            Derived>
     {
     private:
         typedef action<
             Component, Action, 
-            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QULIFIERS, _)> 
-        > base_type;
+            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
+            Derived> base_type;
 
     public:
         BOOST_PP_CAT(base_action, N)() 
@@ -459,17 +462,17 @@
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, int Action, BOOST_PP_ENUM_PARAMS(N, typename T),
-        void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))
-    >
+        void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))>
     class BOOST_PP_CAT(action, N)
       : public BOOST_PP_CAT(base_action, N)<
-            Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F
-        >
+            Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, 
+            BOOST_PP_CAT(action, N)<
+                Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F> >
     {
     private:
         typedef BOOST_PP_CAT(base_action, N)<
-            Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F> 
-        base_type;
+            Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, 
+            BOOST_PP_CAT(action, N)> base_type;
 
     public:
         BOOST_PP_CAT(action, N)()
@@ -539,17 +542,17 @@
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, int Action, BOOST_PP_ENUM_PARAMS(N, typename T),
-        void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))
-    >
+        void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))>
     class BOOST_PP_CAT(direct_action, N)
       : public BOOST_PP_CAT(base_action, N)<
-            Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F
-        >
+            Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F,
+            BOOST_PP_CAT(direct_action, N)<
+                Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F> >
     {
     private:
         typedef BOOST_PP_CAT(base_action, N)<
-            Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F> 
-        base_type;
+            Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F,
+            BOOST_PP_CAT(direct_action, N)> base_type;
 
     public:
         BOOST_PP_CAT(direct_action, N)()
@@ -640,7 +643,7 @@
 
 #undef HPX_GUID_ARGUMENT1
 #undef HPX_GUID_ARGUMENT2
-#undef HPX_REMOVE_QULIFIERS
+#undef HPX_REMOVE_QUALIFIERS
 #undef HPX_ACTION_ARGUMENT
 #undef N
 
