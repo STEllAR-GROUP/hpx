@@ -17,17 +17,17 @@ HPX Tutorial
 </div>
 
 <p>
-On this page I will guide you through installing HPX, writing a simple factorial example using HPX constructs and then running it!
+This tutorial will guide you through installing HPX, running the Fibonacci example (<a href="page2.html">Page 2</a>), and writing a simple factorial example using HPX constructs (<a href="page3.html">Page 3</a>)!
 </p>
 <p>
-If you have any issues following this tutorial or have compilation related errors, please feel free to post to the gopx@cct.lsu.edu mailing list.
+If you have any issues following this tutorial or have compilation related errors, please feel free to post to the <a href="mailto:gopx@cct.lsu.edu">GoPX mailing list</a>.
 </p>
 <p>
 The first step is to download Boost. Boost is a set of libraries that HPX relies on to work.
 <br>
 Now we will download the latest stable version of Boost (1.43 at the time of this writing) and install it.
 <br>
-For convenience sake I set some environment variables (to keep from writing out the full path). You should save these environment variables in your .bash_profile so you always have them.
+For convenience sake I set some environment variables (to keep from writing out the full path). You should save these environment variables in your <code>~/.bash_profile</code> so you always have them.
 </p>
 <pre style="white-space: pre-wrap;">
 $ cd $HOME
@@ -39,18 +39,19 @@ $ cd boost_1_43_0
 $ export BOOST=$HOME/usr/local/boost
 $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BOOST/lib
 $ mkdir -p $BOOST
-$ ./bootstrap.sh --prefix=$BOOST --with-libraries=date_time,filesystem,program_options,regex,serialization,system,signals,thread,graph 2&gt; bootstrap.err &gt; bootstrap.out
+$ ./bootstrap.sh --prefix=$BOOST --with-libraries=date_time,filesystem,program_options,regex,serialization,system,signals,thread 2&gt; bootstrap.err &gt; bootstrap.out
 $ head bootstrap.err &amp;&amp; tail bootstrap.out
 $ ./bjam 2&gt; bjam.err &gt; bjam.out
 $ head bjam.err &amp;&amp; tail bjam.out
 $ ./bjam install 2&gt; bjam.install.err &gt; bjam.install.out
 $ head bjam.install.err &amp;&amp; tail bjam.install.out
-// Update your ~/.bash_profile to include the $BOOST and $LD_LIBRARY_PATH variable
 </pre>
 <p>
-Congratulations! You have installed Boost! Now we will download and install HPX. Again we will set some environmental variables for convenience sake which you should include in your .bash_profile
+Congratulations! You have installed Boost! 
+Now, update your <code>~/.bash_profile</code> to include the <code>BOOST</code> environment variable, and to update the <code>LD_LIBRARY_PATH</code>. 
+Now we will download and install HPX. Again we will set some environmental variables for convenience sake which you should include in your <code>~/.bash_profile</code>.
 <br>
-You should have the program cmake (you can check by running 'which cmake', if nothing shows up then you need to install it). If you don't have cmake, click <a href="cmake_install.html">here</a> for detailed instructions on how to install it.
+You should have the program <code>cmake</code> (you can check by running '<code>which cmake</code>', if nothing shows up then you need to install it). If you don't have <code>cmake</code>, click <a href="cmake_install.html">here</a> for detailed instructions on how to install it.
 </p>
 <pre>
 $ cd $HOME/projects
@@ -64,10 +65,11 @@ $ make 2> make.err > make.out
 $ head make.err && tail make.out
 $ make install 2> make.install.err > make.install.out
 $ head make.install.err && tail make.install.out
-// Update ~/.bash_profile to include $HPX_HEAD and $LD_LIBRARY_PATH
 </pre>
 <p>
-Congratulations! You have installed HPX! To test your installation you can run the fibonacci example included with HPX. 
+Congratulations! You have installed HPX!
+Now, update your <code>~/.bash_profile</code> to include the <code>HPX_HEAD</code> environment variable, and to update the <code>LD_LIBRARY_PATH</code>. 
+To test your installation you can run the fibonacci example included with HPX. 
 </p>
 <pre>
 $ cd $HPX_HEAD/bin

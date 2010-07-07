@@ -17,7 +17,7 @@ HPX Command Line Structure
 </div>
 
 <p>
-On the <a href="index.html">previous page</a> you saw that you invoked the fibonacci example with the arguments "-r -t 1". Those were arguments to the HPX runtime telling it what to do. For every time you run a program compiled with the HPX runtime you need to specifiy "-r". This tells the runtime to start the AGAS service (Addressed Global Address Space). In general you can use these command line options with any program compiled with the HPX runtime
+On the <a href="page1.html">previous page</a> you saw that you invoked the fibonacci example with the arguments "<code>-r -t 1</code>". Those were arguments to the HPX runtime telling it what to do. For every time you run a program compiled with the HPX runtime you need to specifiy "<code>-r</code>". This tells the runtime to start the AGAS service (Active Global Address Space). In general you can use these command line options with any program compiled with the HPX runtime.
 </p>
 <table cellpadding="10">
   <tr>
@@ -26,43 +26,43 @@ On the <a href="index.html">previous page</a> you saw that you invoked the fibon
     <td>Description of Option</td>
   </tr>
   <tr>
-    <td>-r</td>
+    <td><code>-r</code></td>
     <td>no arguments</td>
     <td>Starts the AGAS service, required on at least one locality</td>
   </tr>
   <tr>
-    <td>-t</td>
+    <td><code>-t</code></td>
     <td>number of threads</td>
     <td>Tells the runtime to spawn X operating system threads for this locality</td>
   </tr>
   <tr>
-    <td>-w</td>
+    <td><code>-w</code></td>
     <td>no arguments</td>
     <td>Tells the runtime to run this instance in worker mode (for all localities not running the AGAS service)
   </tr>
   <tr>
-    <td>-l</td>
+    <td><code>-l</code></td>
     <td>number of localities</td>
     <td>The number of localities to wait for in this run</td>
   </tr>
   <tr>
-    <td>-a</td>
+    <td><code>-a</code></td>
     <td>IP address and port of AGAS</td>
-    <td>Specifies the IP address of the locality running the AGAS service, format is 192.168.1.1:7777</td>
+    <td>Specifies the IP address of the locality running the AGAS service, format is <code>192.168.1.1:7777</code></td>
   </tr>
   <tr>
-    <td>-x</td>
+    <td><code>-x</code></td>
     <td>IP address and port of parcelport</td>
-    <td>Specifies the IP address of this locality's parcelport. e.g localhost:7778</td>
+    <td>Specifies the IP address of this locality's parcelport. e.g <code>localhost:7778</code></td>
   </tr>
 </table>
 
 <p>
-For a complete listing of command line options, run a program compiled with HPX with the -h option.
+For a complete listing of command line options, run a program compiled with HPX with the <code>-h</code> option.
 <br>
-In general, if you only run on one locality the -r and -t options will be the only ones you use.
+In general, if you only run with one locality the <code>-r</code> and <code>-t</code> options will be the only ones you use.
 <br>
-If I wanted to set up a local two locality run of fibonacci I would need to open up two terminals and type this:
+If I wanted to set up a (virtual) two locality run of <code>fibonacci</code> I would need to open up two terminals and type this:
 </p>
 <pre>
 # On the first terminal

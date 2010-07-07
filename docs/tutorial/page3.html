@@ -17,9 +17,11 @@ Creating our first HPX program
 </div>
 
 <p>
-One of the fundamental concepts of HPX is the notion of a future value. We can create a future value and then when we need it call a get() function on it. With this in mind we will create a factorial program that will use futures instead of recursion to calculate the factorial.
+One of the fundamental concepts of HPX is the notion of a "future", or "future value".
+We can create a future value and then when we need it call a <code>get()</code> function on it. 
+With this in mind we will create a mutlithreaded factorial program that will use futures to spawn asynchronous actions to calculate the factorial of a given value.
 <br>
-The first step in creating our program is to open up your favorite text editor and create the file "factorial.cpp" in the $HPX_HEAD/examples/quickstart/ folder
+The first step in creating our program is to open up your favorite text editor and create the file "<code>$HPX_HEAD/examples/quickstart/factorial.cpp</code>".
 <br>
 The first thing we will do in this file is to include all of the header files we need.
 </p>
@@ -43,7 +45,7 @@ namespace po = boost::program_options;
 </pre>
 <p>
 As you can see we include quite a number of things from hpx and boost. 
-Next we will include a typedef and a helper function
+Next we will include a typedef and a helper function.
 </p>
 <pre>
 typedef hpx::naming::gid_type gid_type;
@@ -55,18 +57,20 @@ inline gid_type find_here(void)
 </pre>
 
 <p>
-We made the gid_type (global id type) from hpx::naming a little shorter to write and included a helper function that returns the gid of the locality we are running on.
+We made the <code>gid_type</code> (global id type) from <code>hpx::naming</code> a little shorter to write and included a helper function that returns the gid of the locality we are running on.
+These aid in the keeping the example code readable.
 <br>
-Now we will define our factorial function, to refresh your memory here is the regular recursive version.
+Now we will define our factorial function.
+To refresh your memory here is the regular recursive version.
 </p>
 <pre>
 // Not part of the HPX version of factorial
-double fact(double n)
-{
-    if (n == 0)
-        return 1;
-    return n * fact(n-1);
-}
+// double fact(double n)
+// {
+//     if (n == 0)
+//         return 1;
+//     return n * fact(n-1);
+// }
 </pre>
 <p>
 In order to use our future construct we need to package up this function in an HPX action. Actions are work that can be spawned by the runtime system. So we will declare our function prototype and package it into an action.
@@ -105,9 +109,12 @@ double fact(double n)
 }
 </pre>
 <p>
-Not too bad so far! We created the future and then immediately tried to return it. However we could have done some other stuff in between and then when we called return it would have tried to get the value. Since this is an eager future, the action is created when we create the future. If we had done a lot of stuff in between creating the future and then calling future.get() we likely would have already had the value available!
+Not too bad so far! We created the future and then immediately tried to get the value of it. 
+However we could have done some other stuff in between and then when we called <code>future.get()</code> it would have tried to get the value. Since this is an eager future, the action is created when we create the future. If we had done a lot of stuff in between creating the future and then calling <code>future.get()</code> we likely would have already had the value available!
 <br>
-Now you might want to jump to int main() and start coding. But we have to do some things first in order to make sure the runtime is set up correctly. Just like main() is the entry point for any program there is an hpx_main() that is required and it is the entry point for any HPX program. We use the Program Option library from Boost in order to easily process our command line options, as well as those for the runtime so we will use that in order to pass in the value to calculate.
+Now you might want to jump to defining <code>main()</code>, but we have to do some things first in order to make sure the runtime is set up correctly. 
+Just like <code>main()</code> is the entry point for any C/C++ program, there is an <code>hpx_main()</code> that is the entry point for any HPX program. 
+We use the Program Option library from Boost in order to easily process our command line options, as well as those for the runtime so we will use that in order to pass in the value to calculate.
 </p>
 <pre>
 int hpx_main(po::variables_map &amp;vm)
@@ -136,7 +143,7 @@ int hpx_main(po::variables_map &amp;vm)
 <p>
 Not too complicated, the only tricky thing is to make sure we properly shut down the runtime. We only wrote this program to work with just one locality, but if we had more then we would need to have that last statement or else they other localities would hang.
 <br>
-Now we write int main(). Since all of the work for our program is in hpx_main, we only use main for declaring which command line arguments we want to support and then initialize the runtime system.
+Now we write <code>main()</code>. Since all of the work for our program is in <code>hpx_main()</code>, we only use <code>main()</code> for declaring which command line arguments we want to support and then initialize the runtime system.
 </p>
 <pre>
 int main(int argc, char* argv[])
@@ -155,7 +162,7 @@ int main(int argc, char* argv[])
 }
 </pre>
 <p>
-Congratulations! You have written your very first HPX program. Now in order to compile and run it we have to tell the HPX build system to build it. Since HPX uses CMake as its build system, we open up the CMakeLists.txt in the same directory as our factorial.cpp (which should be in $HPX_HEAD/examples/quickstart).
+Congratulations! You have written your very first HPX program. Now in order to compile and run it we have to tell the HPX build system to build it. Since HPX uses CMake as its build system, we open up the <code>$HPX_HEAD/examples/quickstart/CMakeLists.txt</code>.
 <br>
 Add the following line in the file:
 </p>
