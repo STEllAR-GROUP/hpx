@@ -299,7 +299,9 @@ namespace hpx { namespace actions
         static threads::thread_state_enum 
         thread_function(naming::address::address_type lva)
         {
-            LTM_(debug) << "Executing component action.";
+            LTM_(debug) << "Executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ").";
             (get_lva<Component>::call(lva)->*F)();      // just call the function
             return threads::terminated;
         }
