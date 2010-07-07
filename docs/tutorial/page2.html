@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>HPX Tutorial - Page 2</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+</head>
+
+<body>
+<div style="width:80%;margin-right:auto;margin-left:auto;">
+<p>
+<a href="index.html">home</a> | <a href="page1.html">back</a> | <a href="page3.html">next</a>
+</p>
+<div style="text-align:center;">
+<h2>
+HPX Command Line Structure
+</h2>
+</div>
+
+<p>
+On the <a href="index.html">previous page</a> you saw that you invoked the fibonacci example with the arguments "-r -t 1". Those were arguments to the HPX runtime telling it what to do. For every time you run a program compiled with the HPX runtime you need to specifiy "-r". This tells the runtime to start the AGAS service (Addressed Global Address Space). In general you can use these command line options with any program compiled with the HPX runtime
+</p>
+<table cellpadding="10">
+  <tr>
+    <td>Command Line Option</td>
+    <td>Arguments to Option</td>
+    <td>Description of Option</td>
+  </tr>
+  <tr>
+    <td>-r</td>
+    <td>no arguments</td>
+    <td>Starts the AGAS service, required on at least one locality</td>
+  </tr>
+  <tr>
+    <td>-t</td>
+    <td>number of threads</td>
+    <td>Tells the runtime to spawn X operating system threads for this locality</td>
+  </tr>
+  <tr>
+    <td>-w</td>
+    <td>no arguments</td>
+    <td>Tells the runtime to run this instance in worker mode (for all localities not running the AGAS service)
+  </tr>
+  <tr>
+    <td>-l</td>
+    <td>number of localities</td>
+    <td>The number of localities to wait for in this run</td>
+  </tr>
+  <tr>
+    <td>-a</td>
+    <td>IP address and port of AGAS</td>
+    <td>Specifies the IP address of the locality running the AGAS service, format is 192.168.1.1:7777</td>
+  </tr>
+  <tr>
+    <td>-x</td>
+    <td>IP address and port of parcelport</td>
+    <td>Specifies the IP address of this locality's parcelport. e.g localhost:7778</td>
+  </tr>
+</table>
+
+<p>
+For a complete listing of command line options, run a program compiled with HPX with the -h option.
+<br>
+In general, if you only run on one locality the -r and -t options will be the only ones you use.
+<br>
+If I wanted to set up a local two locality run of fibonacci I would need to open up two terminals and type this:
+</p>
+<pre>
+# On the first terminal
+$ ./fibonacci -r -t 1 -a localhost:7777 -x localhost:7778 -l 2
+# On the second terminal
+$ ./fibonacci -w -t 1 -a localhost:7777 -x localhost:7779
+</pre>
+<p>
+Now that you know how to run HPX from the commandline lets program our first HPX example!
+<br>
+Continue on to <a href="page3.html">Page 3</a>.
+</p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>HPX Tutorial - Page 3</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+</head>
+
+<body>
+<div style="width:80%;margin-right:auto;margin-left:auto;">
+<p>
+<a href="index.html">home</a> | <a href="page2.html">back</a>
+</p>
+<div style="text-align:center;">
+<h2>
+Creating our first HPX program
+</h2>
+</div>
+
+<p>
+One of the fundamental concepts of HPX is the notion of a future value. We can create a future value and then when we need it call a get() function on it. With this in mind we will create a factorial program that will use futures instead of recursion to calculate the factorial.
+<br>
+The first step in creating our program is to open up your favorite text editor and create the file "factorial.cpp" in the $HPX_HEAD/examples/quickstart/ folder
+<br>
+The first thing we will do in this file is to include all of the header files we need.
+</p>
+<pre>
+// factorial.cpp
+
+#include &lt;iostream&gt;
+
+#include &lt;hpx/hpx.hpp&gt;
+#include &lt;hpx/runtime/actions/plain_action.hpp&gt;
+#include &lt;hpx/runtime/components/plain_component_factory.hpp&gt;
+#include &lt;hpx/hpx_init.hpp&gt;
+
+#include &lt;boost/program_options.hpp&gt;
+#include &lt;boost/lexical_cast.hpp&gt;
+#include &lt;boost/serialization/serialization.hpp&gt;
+#include &lt;boost/serialization/export.hpp&gt;
+
+using namespace hpx;
+namespace po = boost::program_options;
+</pre>
+<p>
+As you can see we include quite a number of things from hpx and boost. 
+Next we will include a typedef and a helper function
+</p>
+<pre>
+typedef hpx::naming::gid_type gid_type;
+
+inline gid_type find_here(void)
+{
+        return hpx::applier::get_applier().get_runtime_support_raw_gid();
+}
+</pre>
+
+<p>
+We made the gid_type (global id type) from hpx::naming a little shorter to write and included a helper function that returns the gid of the locality we are running on.
+<br>
+Now we will define our factorial function, to refresh your memory here is the regular recursive version.
+</p>
+<pre>
+// Not part of the HPX version of factorial
+double fact(double n)
+{
+    if (n == 0)
+        return 1;
+    return n * fact(n-1);
+}
+</pre>
+<p>
+In order to use our future construct we need to package up this function in an HPX action. Actions are work that can be spawned by the runtime system. So we will declare our function prototype and package it into an action.
+</p>
+<pre>
+double fact(double n);
+
+typedef
+    actions::plain_result_action1&lt;double, double, fact&gt;
+factorial_action;
+
+HPX_REGISTER_PLAIN_ACTION(factorial_action);
+</pre>
+<p>
+With this bit of code we have created our factorial action and registered it with the runtime system. Now since we have the action we can create our future construct.
+</p>
+<pre>
+typedef lcos::eager_future&lt;factorial_action&gt; factorial_future;
+</pre>
+<p>
+Now that we have our future construct available, we can code our function! This is what the HPX factorial function looks like.
+</p>
+<pre>
+double fact(double n)
+{
+    if (n == 0)
+        return 1;
+
+    // We have to specify which locality to spawn this future on,
+    // and we want to spawn it on this locality
+    gid_type here = find_here();
+
+    factorial_future future(here, n - 1);
+
+    return n * future.get();
+}
+</pre>
+<p>
+Not too bad so far! We created the future and then immediately tried to return it. However we could have done some other stuff in between and then when we called return it would have tried to get the value. Since this is an eager future, the action is created when we create the future. If we had done a lot of stuff in between creating the future and then calling future.get() we likely would have already had the value available!
+<br>
+Now you might want to jump to int main() and start coding. But we have to do some things first in order to make sure the runtime is set up correctly. Just like main() is the entry point for any program there is an hpx_main() that is required and it is the entry point for any HPX program. We use the Program Option library from Boost in order to easily process our command line options, as well as those for the runtime so we will use that in order to pass in the value to calculate.
+</p>
+<pre>
+int hpx_main(po::variables_map &amp;vm)
+{
+    double argument = 6; // Default value to calculate is 6
+    double result = 0; // Where we will store our result
+
+    // Now we process our command line option
+    if (vm.count("value"))
+        argument = vm["value"].as&lt;double&gt;();
+
+    gid_type here = find_here();
+
+    factorial_future future(here, argument);
+
+    result = future.get();
+
+    std::cout &lt;&lt; "Result: " &lt;&lt; result &lt;&lt; std::endl;
+
+    // Make sure to properly shut down the runtime for all localities
+    components::stubs::runtime_support::shutdown_all();
+
+    return 0;
+}
+</pre>
+<p>
+Not too complicated, the only tricky thing is to make sure we properly shut down the runtime. We only wrote this program to work with just one locality, but if we had more then we would need to have that last statement or else they other localities would hang.
+<br>
+Now we write int main(). Since all of the work for our program is in hpx_main, we only use main for declaring which command line arguments we want to support and then initialize the runtime system.
+</p>
+<pre>
+int main(int argc, char* argv[])
+{
+    // Configure application-specific options
+    po::options_description
+        desc_commandline("Usage: factorial [hpx_options] [options]");
+    desc_commandline.add_options()
+        ("value,v", po::value&lt;double&gt;(),
+         "the number to be used as the argument to fact (default is 6)")
+        ;
+
+    // Initialize and run HPX, hpx_init calls hpx_main so we don't need to
+    int retcode = hpx_init(desc_commandline, argc, argv);
+    return retcode;
+}
+</pre>
+<p>
+Congratulations! You have written your very first HPX program. Now in order to compile and run it we have to tell the HPX build system to build it. Since HPX uses CMake as its build system, we open up the CMakeLists.txt in the same directory as our factorial.cpp (which should be in $HPX_HEAD/examples/quickstart).
+<br>
+Add the following line in the file:
+</p>
+<pre>
+add_hpx_executable(factorial SOURCES factorial.cpp)
+</pre>
+<p>
+Now that you have told the build system that we have a new executable to build, all we have to do is type
+</p>
+<pre>
+$ cd $HPX_HEAD/examples/quickstart
+$ make install
+</pre>
+<p>
+If all goes well then you will have compiled your first HPX program! To run it type
+</p>
+<pre>
+$ ./factorial -r -t 1
+Result: 720
+$ ./factorial -r -t 1 -v 8
+Result: 40320
+</pre>
+<p>
+That is it for this tutorial! Please take a look at the other examples and our doxygen to learn even more about HPX.
+<br><br>
+--Phillip LeBlanc
+</p>
+</div>
+</body>
+</html>
