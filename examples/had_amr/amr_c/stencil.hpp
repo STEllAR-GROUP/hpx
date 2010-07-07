@@ -76,22 +76,8 @@ namespace hpx { namespace components { namespace amr
         /// floating point comparison (for coordinates)
         int floatcmp(had_double_type x1,had_double_type x2);
 
-        // debug routine
-        int testpoint(access_memory_block<stencil_data> const& val,
-                                naming::id_type const& gid);
-
-
-        // debug routine
-        void checkpoint(std::vector<naming::id_type> const& gids);
-
-        bool left_tapered_mesh(std::vector<naming::id_type> const& gids, int row,int column, Parameter const& par);
-
-        int left_tapered_prep_initial_data(std::vector<naming::id_type> & initial_data,
+        int prep_initial_data(std::vector<naming::id_type> & initial_data,
                     std::vector<naming::id_type> const& gids,int vecvalsize, int row,int column, Parameter const& par);
-
-        int right_tapered_prep_initial_data(std::vector<naming::id_type> & initial_data,
-                    std::vector<naming::id_type> const& gids,int vecvalsize, int row,int column, Parameter const& par);
-
 
     private:
         std::size_t numsteps_;

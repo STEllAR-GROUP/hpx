@@ -118,34 +118,32 @@ namespace hpx { namespace components { namespace amr
           }
         } else {
           int maxsize;
-          if ( par->granularity == 1 ) maxsize = 15;
+          if ( par->granularity == 1 ) maxsize = 17;
           else if ( par->granularity == 2 ) maxsize = 9;
-          else maxsize = 5;
+          else maxsize = 6;
            
-
-          if ( column == 0 ) {
-            // indicate a physical boundary
-            boundary = true;
+          if ( column == 0  ) {
             compute_index = 0;
-            bbox[0] = 1;
-           }
-          if ( column == maxsize - 1) {
+          } else if ( column == maxsize - 1) {
+            compute_index = tval.size()-1;
+          } else if ( (tval.size()-1)%2 == 0 ) {
+            compute_index = (tval.size()-1)/2;
+          } else {
+            BOOST_ASSERT(false);
+          } 
+
+          // Decide if the compute_index point is a boundary
+          if ( floatcmp(0.0,tval[compute_index]->x_[0]) ) {
             // indicate a physical boundary
             boundary = true;
-            compute_index = tval.size()-1;
+            bbox[0] = 1;
+          } else if ( column == 1 && par->granularity == 1 && floatcmp(0.0,tval[compute_index-1]->x_[0]) ) {
+            boundary = true;
+            bbox[0] = 2;
+            bbox[1] = 0;
+          } else if ( column == maxsize-1 && floatcmp(par->maxx0,tval[compute_index]->x_[par->granularity-1]) ) {
+            boundary = true;
             bbox[1] = 1;
-          } 
-          if ( !boundary ) {
-            if ( (tval.size()-1)%2 == 0 ) {
-              compute_index = (tval.size()-1)/2;
-              if ( column == 1 && par->granularity == 1 ) {
-                boundary = true;
-                bbox[0] = 2;
-                bbox[1] = 0;
-              }
-            } else {
-              BOOST_ASSERT(false);
-            }
           }
         } 
 
@@ -166,11 +164,6 @@ namespace hpx { namespace components { namespace amr
         for (j=0;j<asize*par->granularity;j++) {
           resultval->x_.push_back(tval[compute_index]->x_[j]);
         }
-
-        // initialize result 
-        resultval->overwrite_alloc_ = false;
-        resultval->right_alloc_ = false;
-        resultval->left_alloc_ = false;
 
         if (val[0]->level_ == 0 && val[0]->timestep_ < numsteps_ || val[0]->level_ > 0) {
 
@@ -202,18 +195,10 @@ namespace hpx { namespace components { namespace amr
 
             std::size_t allowedl = par->allowedl;
 
-            // eliminate unrefinable cases
-            //if ( par->stencilsize == 3 && par->integrator == 1 ) {
-            //  if ( gids.size() == vecval.size() && gids.size() != 9 ) resultval->refine_ = false; 
-            //  if ( gids.size() != vecval.size() && gids.size() - vecval.size() != 9 ) resultval->refine_ = false; 
-            //}
-
-            //if ( resultval->refine_ && resultval->level_ < allowedl 
-            //     && val[0]->timestep_ >= 1.e-6  ) {
-            //  finer_mesh_tapered(result, gids,vecval.size(), row, column, par);
-            //} else {
-            //  resultval->overwrite_alloc_ = 0;
-            //} 
+         //   if ( resultval->refine_ && resultval->level_ < allowedl 
+         //        && val[0]->timestep_ >= 1.e-6  ) {
+         //     finer_mesh_tapered(result, gids,vecval.size(), row, column, par);
+         //   }
 
             // One special case: refining at time = 0
             if ( resultval->refine_ && 
@@ -246,259 +231,162 @@ namespace hpx { namespace components { namespace amr
     int stencil::finer_mesh_tapered(naming::id_type const& result, 
         std::vector<naming::id_type> const& gids,int vecvalsize, int row,int column, Parameter const& par) 
     {
-#if 0
-      naming::id_type gval[9];
-      access_memory_block<stencil_data> mval[9];
+      //naming::id_type gval[9];
+      //access_memory_block<stencil_data> mval[9];
 
-      bool left = left_tapered_mesh(gids,row,column,par);
+      std::vector<naming::id_type> initial_data;
 
-      if ( left ) {
-        // -------------------- Left (unbiased) Tapered Mesh --------------------------
-        std::vector<naming::id_type> initial_data;
-        left_tapered_prep_initial_data(initial_data,gids,vecvalsize,row,column,par);
+      naming::id_type here = applier::get_applier().get_runtime_support_gid();
+      components::component_type logging_type =
+                components::get_component_type<components::amr::server::logging>();
+      components::component_type function_type =
+                components::get_component_type<components::amr::stencil>();
 
-        // mesh object setup
-        components::component_type logging_type =
-                  components::get_component_type<components::amr::server::logging>();
-        components::component_type function_type =
-                  components::get_component_type<components::amr::stencil>();
-        // create the mesh only if you need to, otherwise reuse (reduce overhead)
-        if ( par->integrator == 0 ) {
-          // Euler not supported anymore
-          BOOST_ASSERT(false);
-        } else if ( par->integrator == 1 ) {
-         // if ( !rk_left_mesh[row].get_gid() ) {
-         //     rk_left_mesh[row].create(applier::get_applier().get_runtime_support_gid());
-         // }
-        } else {
-          BOOST_ASSERT(false);
-        }
+      bool do_logging = false;
+      if ( par->loglevel > 0 ) {
+        do_logging = true;
+      }
 
-        bool do_logging = false;
-        if ( par->loglevel > 0 ) {
-          do_logging = true;
-        }
-
-        std::vector<naming::id_type> result_data;
-        if ( par->integrator == 0 ) {
-          // Euler not supported anymore
-        } else if ( par->integrator == 1 ) {
-       //   result_data =  rk_left_mesh[row].execute(initial_data, function_type,
-       //         do_logging ? logging_type : components::component_invalid,par);
-        } else {
-          BOOST_ASSERT(false);
-        }
-  
-        // -------------------------------------------------------------------
-        // You get 3 values out: left, center, and right -- that's it.  overwrite the coarse grid point and
-        // tell the neighbors to remember the left and right values.
-        access_memory_block<stencil_data> overwrite, resultval;
-        int mid; 
-        if ( (result_data.size())%2 == 1 ) {
-          mid = (result_data.size()-1)/2;
-        } else {
-          BOOST_ASSERT(false);
-        }
-        boost::tie(overwrite, resultval) = 
-            get_memory_block_async<stencil_data>(result_data[mid], result);
-
-        // overwrite the coarse point computation
-        resultval->value_ = overwrite->value_;
-
-        resultval->overwrite_alloc_ = true;
-        resultval->overwrite_ = result_data[mid];
-
-        // remember neighbor value
-        overwrite->right_alloc_ = true;
-        overwrite->right_ = result_data[result_data.size()-1];
-
-        overwrite->left_alloc_ = true;
-        overwrite->left_ = result_data[0];
-
-        // DEBUG -- log the right/left points computed
-        access_memory_block<stencil_data> amb1 = 
-                       hpx::components::stubs::memory_block::get(result_data[0]);
-        if (log_)
-            stubs::logging::logentry(log_, amb1.get(), row,1, par);
-
-        access_memory_block<stencil_data> amb2 = 
-                       hpx::components::stubs::memory_block::get(result_data[result_data.size()-1]);
-        if (log_)
-            stubs::logging::logentry(log_, amb2.get(), row,1, par);
-
-        // release result data
-        for (std::size_t i = 1; i < result_data.size()-1; ++i) { 
-          if ( i != mid ) components::stubs::memory_block::free(result_data[i]);
-        }
+      std::vector<naming::id_type> result_data;
+      int numsteps = 2 * 6; // six subcycles each step
+      int numvals;
+      if ( par->granularity == 1 ) {
+        numvals = 17;
+      } else if ( par->granularity == 2 ) {
+        numvals = 9;
       } else {
-        // -------------------- Right (biased) Tapered Mesh --------------------------
-        // not implemented
-        BOOST_ASSERT(false);
+        numvals = 6;
       }
-#endif
-      return 0;
-    }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Decide whether to use a left or right biased tapered mesh
-    bool stencil::left_tapered_mesh(std::vector<naming::id_type> const& gids, int row,int column, Parameter const& par) 
-    {
-#if 0
-      if ( par->integrator == 0 ) {
-        BOOST_ASSERT(false);
-        //access_memory_block<stencil_data> edge1,edge2;
-        //boost::tie(edge1,edge2) = get_memory_block_async<stencil_data>(gids[0],gids[1]);
-        //if ( !edge1->refine_ || !edge2->refine_ || (row == 1 && column == 1) ) 
-        //    return true;
-        //return false;
-      } else if (par->integrator == 1) {
-        return true;
+      hpx::components::amr::unigrid_mesh unigrid_mesh;
+      unigrid_mesh.create(here);
+
+      result_data = unigrid_mesh.execute(initial_data,function_type, numvals, numsteps,
+            do_logging ? logging_type : components::component_invalid, par);
+
+      for (std::size_t i = 0; i < result_data.size(); ++i) {
+        // free all
+        components::stubs::memory_block::free(result_data[i]);
       }
-      BOOST_ASSERT(false);
-#endif
-      return false;
+
+      return 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // Prep initial data for left (unbiased) tapered mesh
-    int stencil::left_tapered_prep_initial_data(std::vector<naming::id_type> & initial_data, 
+    int stencil::prep_initial_data(std::vector<naming::id_type> & initial_data, 
         std::vector<naming::id_type> const& gids,int vecvalsize, int row,int column, Parameter const& par) 
     {
 #if 0
       int i;
-      if ( par->integrator == 0 ) {
-        // not implemented
-        BOOST_ASSERT(false);
-      } else if (par->integrator == 1) {
-        // rk3 {{{
-        BOOST_ASSERT(gids.size()-vecvalsize == 9 || gids.size() == 9);
-        naming::id_type gval[17];
-        access_memory_block<stencil_data> mval[17];
+      naming::id_type gval[17];
+      access_memory_block<stencil_data> mval[17];
 
-        // inputs may include different timestamps; separate these out
-        int std_index;
-        if ( gids.size() != vecvalsize ) {
-          std_index = vecvalsize;
-        } else {
-          std_index = 0;
-        }
-        boost::tie(gval[0], gval[2], gval[4], gval[6], gval[8]) = 
-                        components::wait(components::stubs::memory_block::clone_async(gids[std_index]), 
-                             components::stubs::memory_block::clone_async(gids[std_index+1]),
-                             components::stubs::memory_block::clone_async(gids[std_index+2]),
-                             components::stubs::memory_block::clone_async(gids[std_index+3]),
-                             components::stubs::memory_block::clone_async(gids[std_index+4]));
-        boost::tie(gval[10], gval[12], gval[14], gval[16]) = 
-                        components::wait(components::stubs::memory_block::clone_async(gids[std_index+5]), 
-                             components::stubs::memory_block::clone_async(gids[std_index+6]),
-                             components::stubs::memory_block::clone_async(gids[std_index+7]),
-                             components::stubs::memory_block::clone_async(gids[std_index+8]));
-        boost::tie(gval[1], gval[3], gval[5],gval[7]) = 
-                    components::wait(components::stubs::memory_block::clone_async(gids[4]), 
-                    components::stubs::memory_block::clone_async(gids[4]),
-                    components::stubs::memory_block::clone_async(gids[4]),
-                    components::stubs::memory_block::clone_async(gids[4]));
-        boost::tie(gval[9], gval[11], gval[13],gval[15]) = 
-                    components::wait(components::stubs::memory_block::clone_async(gids[4]), 
-                    components::stubs::memory_block::clone_async(gids[4]),
-                    components::stubs::memory_block::clone_async(gids[4]),
-                    components::stubs::memory_block::clone_async(gids[4]));
-        boost::tie(mval[0], mval[2], mval[4], mval[6], mval[8]) = 
-          get_memory_block_async<stencil_data>(gval[0], gval[2], gval[4], gval[6], gval[8]);
-        boost::tie(mval[10], mval[12], mval[14], mval[16]) = 
-          get_memory_block_async<stencil_data>(gval[10], gval[12], gval[14], gval[16]);
-
-        // the edge of the AMR mesh has been reached.  
-        // Use the left mesh class instead of standard tapered
-        boost::tie(mval[1], mval[3], mval[5],mval[7]) = 
-            get_memory_block_async<stencil_data>(gval[1], gval[3], gval[5],gval[7]);
-        boost::tie(mval[9], mval[11], mval[13],mval[15]) = 
-            get_memory_block_async<stencil_data>(gval[9], gval[11], gval[13],gval[15]);
-
-        for (i=0;i<17;i++) {
-          // increase the level by one
-          ++mval[i]->level_;
-          mval[i]->index_ = i;
-
-          mval[i]->iter_ = 0;
-        }
-
-        // this updates the coordinate position
-        for (i=1;i<17;i=i+2) {
-          mval[i]->x_ = 0.5*(mval[i-1]->x_+mval[i+1]->x_);
-        }
-
-        // unset alloc on these gids
-        for (i=1;i<17;i=i+2) {
-          mval[i]->left_alloc_ = false;
-          mval[i]->right_alloc_ = false;
-          mval[i]->overwrite_alloc_ = false;
-        }
-
-        // avoid interpolation if possible
-        int s;
-        bool boundary = false;
-        int bbox[2];
-        s = 0;
-        for (i=1;i<17;i=i+2) {
-          s = findpoint(mval[i-1],mval[i+1],mval[i]);
-          if ( s == 0 ) { 
-            std::vector< had_double_type > x_val;
-            std::vector< nodedata > n_val;
-            x_val.push_back(mval[0]->x_); n_val.push_back(mval[0]->value_);
-            x_val.push_back(mval[2]->x_); n_val.push_back(mval[2]->value_);
-            x_val.push_back(mval[4]->x_); n_val.push_back(mval[4]->value_);
-            x_val.push_back(mval[6]->x_); n_val.push_back(mval[6]->value_);
-            x_val.push_back(mval[8]->x_); n_val.push_back(mval[8]->value_);
-            x_val.push_back(mval[10]->x_); n_val.push_back(mval[10]->value_);
-            x_val.push_back(mval[12]->x_); n_val.push_back(mval[12]->value_);
-            x_val.push_back(mval[14]->x_); n_val.push_back(mval[14]->value_);
-            x_val.push_back(mval[16]->x_); n_val.push_back(mval[16]->value_);
-            // pass in everything -- let the user decide how to interpolate using all the available anchors
-            int gft = interpolation(mval[i]->x_,&(mval[i]->value_),
-                          &*x_val.begin(),x_val.size(),
-                          &*n_val.begin(),n_val.size());
-            BOOST_ASSERT(gft);
-
-            std::vector< stencil_data * > vecval;
-            vecval.push_back(mval[i-1].get_ptr());
-            vecval.push_back(mval[i].get_ptr());
-            vecval.push_back(mval[i+1].get_ptr());
-            mval[i]->refine_ = refinement(&*vecval.begin(),vecval.size(),&(mval[i]->value_),mval[i]->level_,mval[i]->x_,1,boundary,bbox,*par.p);
-
-            // DEBUG
-            if (log_)
-                stubs::logging::logentry(log_, mval[i].get(), row,2, par);
-          }
-        }
-
-        for (i=0;i<17;i++) {
-          initial_data.push_back(gval[i]);
-        }
-        // }}}
+      // inputs may include different timestamps; separate these out
+      int std_index;
+      if ( gids.size() != vecvalsize ) {
+        std_index = vecvalsize;
+      } else {
+        std_index = 0;
       }
-#endif
+
+      boost::tie(gval[0], gval[2], gval[4], gval[6], gval[8]) = 
+                      components::wait(components::stubs::memory_block::clone_async(gids[std_index]), 
+                           components::stubs::memory_block::clone_async(gids[std_index+1]),
+                           components::stubs::memory_block::clone_async(gids[std_index+2]),
+                           components::stubs::memory_block::clone_async(gids[std_index+3]),
+                           components::stubs::memory_block::clone_async(gids[std_index+4]));
+      boost::tie(gval[10], gval[12], gval[14], gval[16]) = 
+                      components::wait(components::stubs::memory_block::clone_async(gids[std_index+5]), 
+                           components::stubs::memory_block::clone_async(gids[std_index+6]),
+                           components::stubs::memory_block::clone_async(gids[std_index+7]),
+                           components::stubs::memory_block::clone_async(gids[std_index+8]));
+      boost::tie(gval[1], gval[3], gval[5],gval[7]) = 
+                  components::wait(components::stubs::memory_block::clone_async(gids[4]), 
+                  components::stubs::memory_block::clone_async(gids[4]),
+                  components::stubs::memory_block::clone_async(gids[4]),
+                  components::stubs::memory_block::clone_async(gids[4]));
+      boost::tie(gval[9], gval[11], gval[13],gval[15]) = 
+                  components::wait(components::stubs::memory_block::clone_async(gids[4]), 
+                  components::stubs::memory_block::clone_async(gids[4]),
+                  components::stubs::memory_block::clone_async(gids[4]),
+                  components::stubs::memory_block::clone_async(gids[4]));
+      boost::tie(mval[0], mval[2], mval[4], mval[6], mval[8]) = 
+        get_memory_block_async<stencil_data>(gval[0], gval[2], gval[4], gval[6], gval[8]);
+      boost::tie(mval[10], mval[12], mval[14], mval[16]) = 
+        get_memory_block_async<stencil_data>(gval[10], gval[12], gval[14], gval[16]);
+
+      // the edge of the AMR mesh has been reached.  
+      // Use the left mesh class instead of standard tapered
+      boost::tie(mval[1], mval[3], mval[5],mval[7]) = 
+          get_memory_block_async<stencil_data>(gval[1], gval[3], gval[5],gval[7]);
+      boost::tie(mval[9], mval[11], mval[13],mval[15]) = 
+          get_memory_block_async<stencil_data>(gval[9], gval[11], gval[13],gval[15]);
+
+      for (i=0;i<17;i++) {
+        // increase the level by one
+        ++mval[i]->level_;
+        mval[i]->index_ = i;
+
+        mval[i]->iter_ = 0;
+      }
+
+      // this updates the coordinate position
+      for (i=1;i<17;i=i+2) {
+        mval[i]->x_ = 0.5*(mval[i-1]->x_+mval[i+1]->x_);
+      }
+
+      // unset alloc on these gids
+      for (i=1;i<17;i=i+2) {
+        mval[i]->left_alloc_ = false;
+        mval[i]->right_alloc_ = false;
+        mval[i]->overwrite_alloc_ = false;
+      }
+
+      // avoid interpolation if possible
+      int s;
+      bool boundary = false;
+      int bbox[2];
+      s = 0;
+      for (i=1;i<17;i=i+2) {
+        s = findpoint(mval[i-1],mval[i+1],mval[i]);
+        if ( s == 0 ) { 
+          std::vector< had_double_type > x_val;
+          std::vector< nodedata > n_val;
+          x_val.push_back(mval[0]->x_); n_val.push_back(mval[0]->value_);
+          x_val.push_back(mval[2]->x_); n_val.push_back(mval[2]->value_);
+          x_val.push_back(mval[4]->x_); n_val.push_back(mval[4]->value_);
+          x_val.push_back(mval[6]->x_); n_val.push_back(mval[6]->value_);
+          x_val.push_back(mval[8]->x_); n_val.push_back(mval[8]->value_);
+          x_val.push_back(mval[10]->x_); n_val.push_back(mval[10]->value_);
+          x_val.push_back(mval[12]->x_); n_val.push_back(mval[12]->value_);
+          x_val.push_back(mval[14]->x_); n_val.push_back(mval[14]->value_);
+          x_val.push_back(mval[16]->x_); n_val.push_back(mval[16]->value_);
+          // pass in everything -- let the user decide how to interpolate using all the available anchors
+          int gft = interpolation(mval[i]->x_,&(mval[i]->value_),
+                        &*x_val.begin(),x_val.size(),
+                        &*n_val.begin(),n_val.size());
+          BOOST_ASSERT(gft);
+
+          std::vector< stencil_data * > vecval;
+          vecval.push_back(mval[i-1].get_ptr());
+          vecval.push_back(mval[i].get_ptr());
+          vecval.push_back(mval[i+1].get_ptr());
+          mval[i]->refine_ = refinement(&*vecval.begin(),vecval.size(),&(mval[i]->value_),mval[i]->level_,mval[i]->x_,1,boundary,bbox,*par.p);
+
+          // DEBUG
+          if (log_)
+              stubs::logging::logentry(log_, mval[i].get(), row,2, par);
+        }
+      }
+
+      for (i=0;i<17;i++) {
+        initial_data.push_back(gval[i]);
+      }
       return 0;
+#endif
     }
     
-    ///////////////////////////////////////////////////////////////////////////
-    // Prep initial data for right biased tapered mesh
-    int stencil::right_tapered_prep_initial_data(std::vector<naming::id_type> & initial_data, 
-        std::vector<naming::id_type> const& gids,int vecvalsize, int row,int column, Parameter const& par) 
-    {
-#if 0
-      int i;
-      if ( par->integrator == 0 ) {
-        // not implemented yet
-        BOOST_ASSERT(false);
-      } else if (par->integrator == 1) {
-        // not implemented yet
-        BOOST_ASSERT(false);
-      }
-#endif
-      return 0;
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // Implement a finer mesh via interpolation of inter-mesh points
     // Compute the result value for the current time step
@@ -522,74 +410,21 @@ namespace hpx { namespace components { namespace amr
       int numsteps = 2 * 6; // six subcycles each step
       int numvals;
       if ( par->granularity == 1 ) {
-        numvals = 15;
+        numvals = 17;
       } else if ( par->granularity == 2 ) {
         numvals = 9;
       } else {
-        numvals = 5;
+        numvals = 6;
       }
 
-      if ( par->integrator == 0 ) {
-        BOOST_ASSERT(false);
-      } else if ( par->integrator == 1 ) {
-        //result_data = uni_amr_mesh.init_execute(function_type,
-        //      do_logging ? logging_type : components::component_invalid,
-        //      level, xmin, par);
-        hpx::components::amr::unigrid_mesh unigrid_mesh;
-        unigrid_mesh.create(here);
-        result_data = unigrid_mesh.init_execute(function_type, numvals, numsteps,
-              do_logging ? logging_type : components::component_invalid,level,xmin, par);
+      hpx::components::amr::unigrid_mesh unigrid_mesh;
+      unigrid_mesh.create(here);
+      result_data = unigrid_mesh.init_execute(function_type, numvals, numsteps,
+            do_logging ? logging_type : components::component_invalid,level,xmin, par);
 
-      } else {
-        BOOST_ASSERT(false);
-      }
-
-      access_memory_block<stencil_data> overwrite, resultval;
-      int mid; 
-      if ( (result_data.size())%2 == 1 ) {
-        mid = (result_data.size()-1)/2;
-      } else {
-        BOOST_ASSERT(false);
-      }
-
-#if 0
-      // INJECTION 
-      boost::tie(overwrite, resultval) = 
-          get_memory_block_async<stencil_data>(result_data[mid], result);
-
- 
-      // overwrite the coarse point computation
-      for (j=0;j<par->granularity;j++) {
-        resultval->value_[j] = overwrite->value_[j];
-      }
- 
-      resultval->overwrite_alloc_ = true;
-      resultval->overwrite_ = result_data[mid];
-   
-      // remember neighbor value
-      overwrite->right_alloc_ = true;
-      overwrite->right_ = result_data[0];
-
-      overwrite->left_alloc_ = true;
-      overwrite->left_ = result_data[result_data.size()-1];
-
-      resultval->right_alloc_ = false;
-      resultval->left_alloc_ = false;
-
-      // DEBUG -- log the right/left points computed
-      //access_memory_block<stencil_data> amb1 = 
-      //                   hpx::components::stubs::memory_block::get(result_data[0]);
-      //access_memory_block<stencil_data> amb2 = 
-      //                   hpx::components::stubs::memory_block::get(result_data[result_data.size()-1]);
-      //if (log_) {
-      //    stubs::logging::logentry(log_, amb1.get(), row,1, par);
-      //    stubs::logging::logentry(log_, amb2.get(), row,1, par);
-      //}
-#endif
-
-      for (std::size_t i = 1; i < result_data.size()-1; ++i) {
-        // free all but the overwrite and end value
-        if ( i != mid ) components::stubs::memory_block::free(result_data[i]);
+      for (std::size_t i = 0; i < result_data.size(); ++i) {
+        // free all
+        components::stubs::memory_block::free(result_data[i]);
       }
 
       return 0;
@@ -736,51 +571,6 @@ namespace hpx { namespace components { namespace amr
     {
         numsteps_ = numsteps;
         log_ = logging;
-    }
-
-    // This routine is for debugging
-    int stencil::testpoint(access_memory_block<stencil_data> const& val,
-                            naming::id_type const& gid)
-    {
-#if 0
-       if ( floatcmp(val->x_,3.3333333333333333) == 1 ) {
-          // printf(" TEST overwrite %d timestep: %g index %d id %d level %d x %g right_alloc %d left_alloc %d refine %d\n",
-          //     val->overwrite_alloc_,val->timestep_,
-          //     val->index_, gid.get_gid().get_lsb(),val->level_,
-          //     val->x_,val->right_alloc_,val->left_alloc_,val->refine_);
-           //if ( gid.id_lsb_ == 549233 ) {
-           //  return 1;
-           //}
-       }
-#endif
-       return 0;
-    }
-
-    // This routine is for debugging
-    void stencil::checkpoint(std::vector<naming::id_type> const& gids)
-    {
-      int i;
-      for (i=0;i<gids.size();i++) {
-        access_memory_block<stencil_data> amb = hpx::components::stubs::memory_block::get(gids[i]);
-     //   printf(" gid: %d location: %g overwrite: %d\n", gids[i].get_gid().get_lsb(), amb->x_, amb->overwrite_alloc_);
-        if ( amb->overwrite_alloc_ == 1 ) {
-          access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb->overwrite_);
-     //     printf(" overwrite      location: %g overwrite: %d : %d %d : level %d\n",amb2->x_,amb2->overwrite_alloc_,amb2->left_alloc_,amb2->right_alloc_,amb2->level_);
-          if ( amb2->overwrite_alloc_ == 1 ) {
-            access_memory_block<stencil_data> amb3 = hpx::components::stubs::memory_block::get(amb2->overwrite_);
-     //     printf("  overwrite overwrite    location: %g overwrite: %d : %d %d : level %d\n",amb3->x_,amb3->overwrite_alloc_,amb3->left_alloc_,amb3->right_alloc_,amb3->level_);
-          }
-          if ( amb2->right_alloc_ == 1 ) {
-            access_memory_block<stencil_data> amb3 = hpx::components::stubs::memory_block::get(amb2->right_);
-     //     printf(" overwrite right       location: %g overwrite: %d : %d %d : level %d\n",amb3->x_,amb3->overwrite_alloc_,amb3->left_alloc_,amb3->right_alloc_,amb3->level_);
-          }
-          if ( amb2->left_alloc_ == 1 ) {
-            access_memory_block<stencil_data> amb3 = hpx::components::stubs::memory_block::get(amb2->left_);
-     //     printf(" overwrite left       location: %g overwrite: %d : %d %d : level %d\n",amb3->x_,amb3->overwrite_alloc_,amb3->left_alloc_,amb3->right_alloc_,amb3->level_);
-          }
-        }
-      }
-
     }
 
 }}}
