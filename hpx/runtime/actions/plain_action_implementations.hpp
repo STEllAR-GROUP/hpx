@@ -30,7 +30,7 @@
 
 #define N BOOST_PP_ITERATION()
 #define HPX_ACTION_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n) this->get<n>()
-#define HPX_REMOVE_QULIFIERS(z, n, data)                                      \
+#define HPX_REMOVE_QUALIFIERS(z, n, data)                                     \
         BOOST_PP_COMMA_IF(n)                                                  \
         typename detail::remove_qualifiers<BOOST_PP_CAT(T, n)>::type          \
     /**/
@@ -49,14 +49,14 @@
       : public action<
             components::server::plain_function<Derived>, 
             BOOST_PP_CAT(function_result_action_arg, N), 
-            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QULIFIERS, _)>,
+            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived>
     {
     private:
         typedef action<
             components::server::plain_function<Derived>, 
             BOOST_PP_CAT(function_result_action_arg, N), 
-            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QULIFIERS, _)>,
+            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived> base_type;
 
     public:
@@ -352,14 +352,14 @@
       : public action<
             components::server::plain_function<Derived>,
             BOOST_PP_CAT(function_action_arg, N), 
-            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QULIFIERS, _)>,
+            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived>
     {
     private:
         typedef action<
             components::server::plain_function<Derived>, 
             BOOST_PP_CAT(function_action_arg, N), 
-            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QULIFIERS, _)>,
+            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived> base_type;
 
     public:
@@ -642,7 +642,7 @@
 
 #undef HPX_GUID_ARGUMENT1
 #undef HPX_GUID_ARGUMENT2
-#undef HPX_REMOVE_QULIFIERS
+#undef HPX_REMOVE_QUALIFIERS
 #undef HPX_ACTION_ARGUMENT
 #undef N
 
