@@ -124,6 +124,9 @@ namespace hpx { namespace lcos
               th->apply(gid);
         }
 
+        // suppress warning about using this in constructor base initializer list
+        thunk* this_() { return this; }
+
     public:
         /// Construct a new \a thunk instance. The \a thread 
         /// supplied to the function \a thunk#get will be 
@@ -142,12 +145,12 @@ namespace hpx { namespace lcos
         ///               with the action as the continuation parameter).
         thunk(naming::gid_type const& gid)
           : apply_logger_("thunk::apply"),
-            closure_(boost::bind(invoke, this, 
+            closure_(boost::bind(&thunk::invoke, this_(), 
                      naming::id_type(gid, naming::id_type::unmanaged)))
         { }
         thunk(naming::id_type const& gid)
           : apply_logger_("thunk::apply"),
-            closure_(boost::bind(invoke, this, gid))
+            closure_(boost::bind(&thunk::invoke, this_(), gid))
         { }
 
         /// The apply function starts the asynchronous operations encapsulated
@@ -202,13 +205,13 @@ namespace hpx { namespace lcos
         template <typename Arg0>
         thunk(naming::gid_type const& gid, Arg0 const& arg0)
           : apply_logger_("thunk::apply"),
-            closure_(boost::bind(invoke1, this, 
+            closure_(boost::bind(&thunk::invoke1<Arg0>, this_(), 
                 naming::id_type(gid, naming::id_type::unmanaged), arg0))
         { }
         template <typename Arg0>
         thunk(naming::id_type const& gid, Arg0 const& arg0)
           : apply_logger_("thunk::apply"),
-            closure_(boost::bind(invoke1, this, gid, arg0))
+            closure_(boost::bind(&thunk::invoke1<Arg0>, this_(), gid, arg0))
         { }
 
         // pull in remaining constructors

@@ -16,7 +16,7 @@
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
-    "hpx/lcos/thunk_constructors.hpp"))                                \
+    "hpx/lcos/thunk_constructors.hpp"))                                       \
     /**/
     
 #include BOOST_PP_ITERATE()
@@ -56,8 +56,8 @@ public:
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
       : apply_logger_("thunk::apply"),
         closure_(boost::bind(
-            BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N, Arg)>, 
-            this, naming::id_type(gid, naming::id_type::unmanaged), 
+            &thunk::BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N, Arg)>, 
+            this_(), naming::id_type(gid, naming::id_type::unmanaged), 
             BOOST_PP_ENUM_PARAMS(N, arg)))
     { }
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
@@ -65,8 +65,8 @@ public:
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
       : apply_logger_("thunk::apply"),
         closure_(boost::bind(
-            BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N, Arg)>, 
-            this, gid,
+            &thunk::BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N, Arg)>, 
+            this_(), gid,
             BOOST_PP_ENUM_PARAMS(N, arg)))
     { }
 
