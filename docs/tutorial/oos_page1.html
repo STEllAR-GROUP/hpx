@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>HPX Tutorial | Configuring an Out of Source Build</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+</head>
+
+<body>
+<div style="width:80%;margin-right:auto;margin-left:auto;">
+<p>
+<a href="index.html">home</a>
+</p>
+<div style="text-align:center;">
+<h2>
+Configuring an Out of Source Build
+</h2>
+</div>
+
+<p>
+This tutorial will cover how to install HPX using an out of source build.
+If you have never installed HPX before (or are doing a fresh install) you need to make sure you have the Boost library.
+For detailed instructions on how to install the Boost library, please take a look at the tutorial <a href="page1.html">HPX Installation</a>.
+After you have Boost and <a href="cmake_install.html">CMake</a> installed you can proceed with this tutorial.
+</p>
+<p>
+Using an Out of Source build has many advantages over an in-source build.
+If you plan on modifying source code in HPX or working on an application within the HPX directory then having an out of source build is extremely helpful.
+It allows you to keep your source code clean without have the build files clutter up the directory.
+Also, if you plan on committing back with SVN then commands such as <code>svn status</code> will only show files that you have modified and not complain about the build files.
+If you want to wipe out the build files completely, its a simple matter of deleting that directory.
+Another nice property is that you can have multiple builds based on the same source code.
+For example, if you wanted a Debug build and a Release build off of the same source code you could do that.
+</p>
+<p>
+In the <a href="page1.html">Getting Started with HPX tutorial</a> the user creates an in-source build.
+The command that the user runs with CMake (essentially <code>cmake .</code>) tells CMake to build in the current directory.
+To tell CMake to build in a different directory, we just change the "<code>.</code>" to the directory we want.
+</p>
+<p>
+We will checkout the latest version of HPX, but first we will set some environment variables and set up our directory structure.
+(Note: the choosing of the names 'projects', 'build' and 'hpx_head' are completely arbitrary, if you want to put them in different places or use different names you can.)
+Be sure to include these variables in your <code>~/.bash_profile</code>.
+</p>
+<pre>
+$ export HPX_HEAD=$HOME/projects/hpx_head
+$ export HPX_BUILD=$HOME/build/hpx_head
+$ export HPX=$HOME/usr/local/hpx
+$ export PATH=$PATH:$HPX/bin
+$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HPX/lib
+$ mkdir -p $HPX_HEAD $HPX_BUILD $HPX
+</pre>
+<p>
+Now we will checkout the latest version of HPX with SVN.
+</p>
+<pre>
+$ cd $HOME/projects
+$ svn checkout https://svn.cct.lsu.edu/repos/projects/parallex/trunk/hpx hpx_head
+</pre>
+<p>
+Since we have the HPX source code, we will hop over to our build directory and tell CMake to configure our build system.
+</p>
+<pre>
+$ cd $HPX_BUILD
+$ cmake -DCMAKE_PREFIX=$HPX -DBOOST_ROOT=$BOOST $HPX_HEAD 2&gt; cmake.err &gt; cmake.out
+$ head cmake.err &amp;&amp; tail cmake.out
+$ make 2&gt; make.err &gt; make.out
+$ head make.err &amp;&amp; tail make.out
+$ make install 2&gt; make.install.err &gt; make.install.out
+$ head make.install.err &amp;&amp; make.install.out
+</pre>
+<p>
+If you have gotten this far without errors then you have sucessfully configured an out of source HPX build.
+</p>
+<p>
+If you are interested in learning how to configure a Debug or Release version of an HPX build see <a href="oos_page2.html">Page 2</a>.
+</p>
+
+</div>
+</body>
+</html>
