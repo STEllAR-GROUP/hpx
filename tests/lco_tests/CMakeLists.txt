@@ -9,7 +9,9 @@ set(TESTS
     local_barrier_tests 
     full_empty_tests 
     counting_semaphore_test
-    mutex_tests)
+    mutex_tests
+    thunk_tests
+   )
 
 # build and install each of the tests
 foreach(test ${TESTS})
