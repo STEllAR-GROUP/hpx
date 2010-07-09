@@ -5,10 +5,11 @@
 
 # just recurse into all components subdirectories and execute the scripts there
 set(component_SUDIRS 
-    distributed_set
-    distributed_map
-    graph
-    distributing_factory)
+    #distributed_set
+    #distributed_map
+    #graph
+    #distributing_factory
+   )
 
 foreach(subdir ${component_SUDIRS})
     add_subdirectory(${subdir})
