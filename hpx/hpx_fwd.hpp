@@ -269,7 +269,7 @@ namespace hpx
     namespace lcos
     {
         class base_lco;
-        template <typename Result> 
+        template <typename Result, typename RemoteResult> 
         class base_lco_with_value;
 
         template <typename Result>

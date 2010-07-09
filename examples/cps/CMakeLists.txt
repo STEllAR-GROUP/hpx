@@ -7,4 +7,5 @@
 
 # define build targets for this directory
 add_hpx_executable(factorial SOURCES factorial.cpp)
+add_hpx_executable(factorial_get SOURCES factorial_get.cpp)
 

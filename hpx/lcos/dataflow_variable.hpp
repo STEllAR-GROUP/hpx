@@ -24,7 +24,7 @@
 namespace hpx { namespace lcos { namespace detail 
 {
     template <typename Value, typename RemoteValue>
-    struct get_value
+    struct find_value
     {
         static Value call(RemoteValue const& rhs)
         {
@@ -33,7 +33,7 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     template <typename Value>
-    struct get_value<Value, Value>
+    struct find_value<Value, Value>
     {
         static Value const& call(Value const& rhs)
         {
@@ -49,7 +49,7 @@ namespace hpx { namespace lcos { namespace detail
     /// Note: we do not support partial values nor unification, so a
     /// variable should only be set once.
     template <typename Value, typename RemoteValue>
-    class dataflow_variable : public lcos::base_lco_with_value<RemoteValue>
+    class dataflow_variable : public lcos::base_lco_with_value<Value,RemoteValue>
     {
     protected:
         typedef Value value_type;
@@ -100,7 +100,7 @@ namespace hpx { namespace lcos { namespace detail
         // non-successful)
         void bind(RemoteValue const& value)
         {
-            data_.set(data_type(get_value<Value, RemoteValue>::call(value)));
+            data_.set(data_type(find_value<Value, RemoteValue>::call(value)));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -110,6 +110,11 @@ namespace hpx { namespace lcos { namespace detail
         void set_result(RemoteValue const& value)
         {
             bind(value);
+        }
+
+        Value get_value()
+        {
+            return read();
         }
 
         template <typename ManagedType>
@@ -137,7 +142,7 @@ namespace hpx { namespace lcos { namespace detail
     /// variable should only be set once.
     template<>
     class dataflow_variable<naming::id_type, naming::gid_type>
-      : public lcos::base_lco_with_value<naming::gid_type>
+      : public lcos::base_lco_with_value<naming::id_type, naming::gid_type>
     {
     protected:
         typedef naming::id_type value_type;
@@ -198,6 +203,11 @@ namespace hpx { namespace lcos { namespace detail
         void set_result(naming::gid_type const& value)
         {
             bind(value);
+        }
+
+        value_type get_value()
+        {
+            return read();
         }
 
         template <typename ManagedType>

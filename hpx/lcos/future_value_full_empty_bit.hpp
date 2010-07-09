@@ -44,7 +44,7 @@ namespace hpx { namespace lcos { namespace detail
     /// A future_value can be used by a single thread to invoke a (remote) 
     /// action and wait for the result. 
     template <typename Result, typename RemoteResult, int N>
-    class future_value : public lcos::base_lco_with_value<RemoteResult>
+    class future_value : public lcos::base_lco_with_value<Result, RemoteResult>
     {
     private:
         // make sure N is in a reasonable range
@@ -164,6 +164,11 @@ namespace hpx { namespace lcos { namespace detail
             set_error(0, e);        // set the received error
         }
 
+        Result get_value()
+        {
+            return get_data(0);
+        }
+
         template <typename ManagedType>
         naming::id_type const& get_gid(ManagedType* p) const
         {
@@ -186,7 +191,7 @@ namespace hpx { namespace lcos { namespace detail
     /// value (a gid_type) into a managed id_type.
     template <int N>
     class future_value<naming::id_type, naming::gid_type, N>
-      : public lcos::base_lco_with_value<naming::gid_type>
+      : public lcos::base_lco_with_value<naming::id_type, naming::gid_type>
     {
     private:
         // make sure N is in a reasonable range
@@ -301,6 +306,11 @@ namespace hpx { namespace lcos { namespace detail
             set_error(0, e);        // set the received error
         }
 
+        result_type get_value()
+        {
+            return get_data(0);
+        }
+
         template <typename ManagedType>
         naming::id_type const& get_gid(ManagedType* p) const
         {
@@ -402,12 +412,6 @@ namespace hpx { namespace lcos
             LLCO_(info) << "future_value::future_value(" << impl_->get_gid() << ")";
         }
 
-        /// \brief Return the global id of this \a future instance
-        naming::id_type const& get_gid() const
-        {
-            return (*impl_)->get_gid(impl_.get());
-        }
-
         /// \brief Return the full address of this \a future instance
 //         bool get_full_address(naming::full_address& fa) const
 //         {
@@ -422,6 +426,12 @@ namespace hpx { namespace lcos
         }
 
     public:
+        /// \brief Return the global id of this \a future instance
+        naming::id_type const& get_gid() const
+        {
+            return (*impl_)->get_gid(impl_.get());
+        }
+
         typedef Result result_type;
 
         ~future_value()
@@ -482,12 +492,6 @@ namespace hpx { namespace lcos
             LLCO_(info) << "future_value<void>::future_value(" << impl_->get_gid() << ")";
         }
 
-        /// \brief Return the global id of this \a future instance
-        naming::id_type const& get_gid() const
-        {
-            return (*impl_)->get_gid(impl_.get());
-        }
-
         /// \brief Return the full address of this \a future instance
 //         bool get_full_address(naming::full_address& fa) const
 //         {
@@ -502,6 +506,12 @@ namespace hpx { namespace lcos
         }
 
     public:
+        /// \brief Return the global id of this \a future instance
+        naming::id_type const& get_gid() const
+        {
+            return (*impl_)->get_gid(impl_.get());
+        }
+
         typedef util::unused_type result_type;
 
         ~future_value()

@@ -20,7 +20,8 @@ namespace hpx { namespace lcos
     {
         lco_set_event = 0,
         lco_set_result = 1,
-        lco_set_error = 2
+        lco_set_error = 2,
+        lco_get_value = 3,
     };
 
     /// \class base_lco base_lco.hpp hpx/lcos/base_lco.hpp
@@ -111,12 +112,12 @@ namespace hpx { namespace lcos
     /// 
     /// The \a base_lco_with_value class is the common base class for all LCO's 
     /// synchronizing on a value. 
-    /// The \a Result template argument should be set to the type of the 
+    /// The \a RemoteResult template argument should be set to the type of the 
     /// argument expected for the set_result action.
     ///
-    /// \tparam Result The type of the result value to be carried back to the 
-    ///                LCO instance.
-    template <typename Result>
+    /// \tparam RemoteResult The type of the result value to be carried back 
+    /// to the LCO instance.
+    template <typename Result,typename RemoteResult=Result>
     class base_lco_with_value : public base_lco
     {
     protected:
@@ -126,10 +127,17 @@ namespace hpx { namespace lcos
 
         virtual void set_event()
         {
-            return set_result(Result());
+            return set_result(RemoteResult());
         }
 
-        virtual void set_result (Result const& result) = 0;
+        virtual void set_result (RemoteResult const& result) = 0;
+
+        virtual Result get_event()
+        {
+            return get_value();
+        }
+
+        virtual Result get_value() = 0;
 
     public:
         // components must contain a typedef for wrapping_type defining the
@@ -155,9 +163,14 @@ namespace hpx { namespace lcos
         ///
         /// \returns      The thread state the calling thread needs to be set
         ///               to after returning from this function.
-        void set_result_nonvirt (Result const& result) 
+        void set_result_nonvirt (RemoteResult const& result) 
         {
             set_result(result);
+        }
+
+        Result get_value_nonvirt()
+        {
+            return get_value();
         }
 
         /// Each of the exposed functions needs to be encapsulated into an action
@@ -167,12 +180,17 @@ namespace hpx { namespace lcos
         /// The \a set_result_action may be used to trigger any LCO instances
         /// while carrying an additional parameter of any type.
         ///
-        /// \param Result [in] The type of the result to be transferred back to 
+        /// \param RemoteResult [in] The type of the result to be transferred back to 
         ///               this LCO instance.
         typedef hpx::actions::direct_action1<
-            base_lco_with_value, lco_set_result, Result const&, 
+            base_lco_with_value, lco_set_result, RemoteResult const&, 
             &base_lco_with_value::set_result_nonvirt
         > set_result_action;
+
+        typedef hpx::actions::direct_result_action0<
+            base_lco_with_value, Result, lco_get_value,
+            &base_lco_with_value::get_value_nonvirt
+        > get_value_action;
     };
 
     /// \class base_lco_with_value base_lco.hpp hpx/lcos/base_lco.hpp
@@ -183,7 +201,7 @@ namespace hpx { namespace lcos
     /// \tparam void This specialization expects no result value and is almost
     ///              completely equivalent to the plain \a base_lco.
     template <>
-    class base_lco_with_value<void> : public base_lco
+    class base_lco_with_value<void,void> : public base_lco
     {
     protected:
         /// Destructor, needs to be virtual to allow for clean destruction of
