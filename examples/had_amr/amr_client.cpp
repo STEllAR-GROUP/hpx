@@ -247,6 +247,7 @@ int main(int argc, char* argv[])
         par->fmr_radius  =  -999.0;
         par->output_level =  0;
         par->granularity =  1;
+        par->ghostwidth  =  0;
 
         par->linearbounds = 1;
         int scheduler = 1;  // 0: global scheduler
@@ -353,6 +354,14 @@ int main(int argc, char* argv[])
                 par->granularity = atoi(tmp.c_str());
                 if ( par->granularity < 1 ) {
                   std::cerr << " Problem: granularity must be at least 1 : " << par->granularity << std::endl;
+                  BOOST_ASSERT(false);
+                }
+              }
+              if ( sec->has_entry("ghostwidth") ) {
+                std::string tmp = sec->get_entry("ghostwidth");
+                par->ghostwidth = atoi(tmp.c_str());
+                if ( par->ghostwidth < 0 || par->ghostwidth%2 != 0 ) {
+                  std::cerr << " Problem: ghostwidth has to be at least 0 and be even : " << par->ghostwidth << std::endl;
                   BOOST_ASSERT(false);
                 }
               }

@@ -59,6 +59,7 @@ struct Par {
       int output_level;
       int PP;
       int granularity;
+      int ghostwidth;
 };
 
 #if defined(__cplusplus)

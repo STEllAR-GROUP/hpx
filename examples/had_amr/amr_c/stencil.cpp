@@ -117,14 +117,9 @@ namespace hpx { namespace components { namespace amr
             }
           }
         } else {
-          int maxsize;
-          if ( par->granularity == 1 ) maxsize = 17;
-          else if ( par->granularity == 2 ) maxsize = 9;
-          else maxsize = 6;
-           
           if ( column == 0  ) {
             compute_index = 0;
-          } else if ( column == maxsize - 1) {
+          } else if ( column == val[0]->max_index_ - 1) {
             compute_index = tval.size()-1;
           } else if ( (tval.size()-1)%2 == 0 ) {
             compute_index = (tval.size()-1)/2;
@@ -141,7 +136,7 @@ namespace hpx { namespace components { namespace amr
             boundary = true;
             bbox[0] = 2;
             bbox[1] = 0;
-          } else if ( column == maxsize-1 && floatcmp(par->maxx0,tval[compute_index]->x_[par->granularity-1]) ) {
+          } else if ( column == val[0]->max_index_-1 && floatcmp(par->maxx0,tval[compute_index]->x_[par->granularity-1]) ) {
             boundary = true;
             bbox[1] = 1;
           }
@@ -408,14 +403,19 @@ namespace hpx { namespace components { namespace amr
 
       std::vector<naming::id_type> result_data;
       int numsteps = 2 * 6; // six subcycles each step
-      int numvals;
-      if ( par->granularity == 1 ) {
-        numvals = 17;
-      } else if ( par->granularity == 2 ) {
-        numvals = 9;
-      } else {
-        numvals = 6;
-      }
+
+      int left_half;  // this variable depends upon how close we are to the origin, r=0
+      int std_ghostwidth = 8; // standard tapering for stencilsize=7
+      had_double_type dx = par->dx0/pow(2.0,level);
+      double tmp = (double) ( xmin- par->minx0)/dx; // we have to have an intermediate cast on account of mpfr 
+      left_half = (int) tmp;
+      if ( left_half > par->ghostwidth/2 + 8 ) left_half = par->ghostwidth/2 + std_ghostwidth;
+
+      int almost_numvals = left_half + par->ghostwidth/2 + 2*par->granularity-1 + std_ghostwidth;
+
+      // to find numvals, divide almost_numvals by the granularity
+      int remainder = almost_numvals%par->granularity;
+      int numvals = (almost_numvals+remainder)/par->granularity;
 
       hpx::components::amr::unigrid_mesh unigrid_mesh;
       unigrid_mesh.create(here);
