@@ -10,7 +10,7 @@ set(TESTS
     full_empty_tests 
     counting_semaphore_test
     mutex_tests
-    thunk_tests
+    lazy_future_tests
    )
 
 # build and install each of the tests

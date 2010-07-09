@@ -5,8 +5,8 @@
 
 #ifndef BOOST_PP_IS_ITERATING
 
-#if !defined(HPX_LCOS_THUNK_CONSTRUCTORS_DIRECT_JUL_01_2008_0116PM)
-#define HPX_LCOS_THUNK_CONSTRUCTORS_DIRECT_JUL_01_2008_0116PM
+#if !defined(HPX_LCOS_LAZY_FUTURE_CONSTRUCTORS_DIRECT_JUL_01_2008_0116PM)
+#define HPX_LCOS_LAZY_FUTURE_CONSTRUCTORS_DIRECT_JUL_01_2008_0116PM
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
@@ -16,7 +16,7 @@
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
-    "hpx/lcos/thunk_constructors_direct.hpp"))                         \
+    "hpx/lcos/lazy_future_constructors_direct.hpp"))                         \
     /**/
     
 #include BOOST_PP_ITERATE()
@@ -34,7 +34,7 @@
     void apply(naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        util::block_profiler_wrapper<thunk_direct_tag> bp(apply_logger_);
+        util::block_profiler_wrapper<lazy_future_direct_tag> bp(apply_logger_);
 
         naming::address addr;
         if (hpx::applier::get_applier().address_is_local(gid, addr)) {
@@ -54,7 +54,7 @@
 private:
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     static void BOOST_PP_CAT(invoke,N)(
-        hpx::lcos::thunk<Action,Result> *th, 
+        hpx::lcos::lazy_future<Action,Result> *th, 
         naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
@@ -64,18 +64,18 @@ private:
 
 public:
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    thunk(naming::gid_type const& gid, 
+    lazy_future(naming::gid_type const& gid, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-      : apply_logger_("thunk_direct::apply"),
+      : apply_logger_("lazy_future_direct::apply"),
         closure_(boost::bind(
             BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N, Arg)>, 
             this, naming::id_type(gid, naming::id_type::unmanaged), 
             BOOST_PP_ENUM_PARAMS(N, arg)))
     { }
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    thunk(naming::id_type const& gid, 
+    lazy_future(naming::id_type const& gid, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-      : apply_logger_("thunk_direct::apply"),
+      : apply_logger_("lazy_future_direct::apply"),
         closure_(boost::bind(
             BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N, Arg)>, 
             this, gid,

@@ -76,11 +76,11 @@ int fib(gid_type prefix, int n, int delay_coeff);
 
 typedef 
     actions::plain_result_action3<int, gid_type, int, int, fib> 
-fibonacci2_thunk_action;
+fibonacci2_lazy_future_action;
 
-typedef lcos::thunk<fibonacci2_thunk_action> fibonacci_future;
+typedef lcos::lazy_future<fibonacci2_lazy_future_action> fibonacci_future;
 
-HPX_REGISTER_PLAIN_ACTION(fibonacci2_thunk_action);
+HPX_REGISTER_PLAIN_ACTION(fibonacci2_lazy_future_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 inline void do_busy_work(double delay_coeff)
@@ -130,7 +130,7 @@ int hpx_main(po::variables_map &vm)
     // try to get arguments from application configuration
     runtime& rt = get_runtime();
     argument = boost::lexical_cast<int>(
-        rt.get_config().get_entry("application.fibonacci2_thunk.argument", argument));
+        rt.get_config().get_entry("application.fibonacci2_lazy_future.argument", argument));
 
     px world;
 
@@ -168,7 +168,7 @@ int hpx_main(po::variables_map &vm)
 bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
 {
     try {
-        po::options_description desc_cmdline ("Usage: fibonacci2_thunk [options]");
+        po::options_description desc_cmdline ("Usage: fibonacci2_lazy_future [options]");
         desc_cmdline.add_options()
             ("help,h", "print out program usage (this message)")
             ("run_agas_server,r", "run AGAS server as part of this runtime instance")
@@ -209,7 +209,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
         }
     }
     catch (std::exception const& e) {
-        std::cerr << "fibonacci2_thunk: exception caught: " << e.what() << std::endl;
+        std::cerr << "fibonacci2_lazy_future: exception caught: " << e.what() << std::endl;
         return false;
     }
     return true;
@@ -230,7 +230,7 @@ split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
         }
     }
     catch (boost::bad_lexical_cast const& /*e*/) {
-        std::cerr << "fibonacci2_thunk: illegal port number given: " << v.substr(p+1) << std::endl;
+        std::cerr << "fibonacci2_lazy_future: illegal port number given: " << v.substr(p+1) << std::endl;
         std::cerr << "           using default value instead: " << port << std::endl;
     }
 }
@@ -296,7 +296,7 @@ int main(int argc, char* argv[])
         if (vm.count("worker")) {
             mode = hpx::runtime::worker;
             if (vm.count("config")) {
-                std::cerr << "fibonacci2_thunk: --config option ignored, used for console "
+                std::cerr << "fibonacci2_lazy_future: --config option ignored, used for console "
                              "instance only\n";
             }
         }
@@ -354,11 +354,11 @@ int main(int argc, char* argv[])
             BOOST_ASSERT(false);
     }
     catch (std::exception& e) {
-        std::cerr << "fibonacci2_thunk: std::exception caught: " << e.what() << "\n";
+        std::cerr << "fibonacci2_lazy_future: std::exception caught: " << e.what() << "\n";
         return -1;
     }
     catch (...) {
-        std::cerr << "fibonacci2_thunk: unexpected exception caught\n";
+        std::cerr << "fibonacci2_lazy_future: unexpected exception caught\n";
         return -2;
     }
     return 0;

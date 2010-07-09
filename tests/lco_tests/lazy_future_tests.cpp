@@ -72,9 +72,9 @@ typedef actions::plain_result_action2<int, int, int, sum> sum_action;
 HPX_REGISTER_PLAIN_ACTION(sum_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef lcos::thunk<zero_action> zero_thunk;
-typedef lcos::thunk<identity_action> identity_thunk;
-typedef lcos::thunk<sum_action> sum_thunk;
+typedef lcos::lazy_future<zero_action> zero_lazy_future;
+typedef lcos::lazy_future<identity_action> identity_lazy_future;
+typedef lcos::lazy_future<sum_action> sum_lazy_future;
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(po::variables_map &vm)
@@ -83,7 +83,7 @@ int hpx_main(po::variables_map &vm)
 
     {
         std::cout << ">>> z = zero()" << std::endl;
-        zero_thunk zero(here);
+        zero_lazy_future zero(here);
 
         std::cout << ">>> print z" << std::endl;
         std::cout << zero.get() << std::endl;
@@ -97,7 +97,7 @@ int hpx_main(po::variables_map &vm)
 
     {
         std::cout << ">>> id = identity(42)" << std::endl;
-        identity_thunk identity(here, 42);
+        identity_lazy_future identity(here, 42);
 
         std::cout << ">>> print id" << std::endl;
         std::cout << identity.get() << std::endl;
@@ -111,7 +111,7 @@ int hpx_main(po::variables_map &vm)
 
     {
         std::cout << ">>> s = sum(42,42)" << std::endl;
-        sum_thunk sum(here, 42, 42);
+        sum_lazy_future sum(here, 42, 42);
 
         std::cout << ">>> print s" << std::endl;
         std::cout << sum.get() << std::endl;

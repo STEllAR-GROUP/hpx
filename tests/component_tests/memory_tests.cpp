@@ -72,9 +72,9 @@ int hpx_main()
     BOOST_TEST(result1 == value);
 
     // read the value back from memory (using a lazy_future)
-    lcos::lazy_future<load_action_type> lf;
+    lcos::lazy_future<load_action_type> lf(memid, boost::uint64_t(&value));
 
-    boost::uint32_t result2 = lf.get(memid, boost::uint64_t(&value));
+    boost::uint32_t result2 = lf.get();
     BOOST_TEST(result2 == value);
 
     // initiate shutdown of the runtime system
