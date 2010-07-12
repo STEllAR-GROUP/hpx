@@ -8,7 +8,7 @@ set(component_SUDIRS
     #distributed_set
     #distributed_map
     #graph
-    distributing_factory
+    #distributing_factory
    )
 
 foreach(subdir ${component_SUDIRS})
