@@ -12,7 +12,8 @@
 #include "../had_config.hpp"
 #include <stdio.h>
 
-int WORK = 0;
+// TEST
+//int WORK = 0;
 
 // local functions
 int floatcmp(had_double_type x1,had_double_type x2) {
@@ -61,31 +62,27 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->left_alloc_ = 0;
     val->overwrite_alloc_ = 0;
 
-    int asize = (int) pow(2.,level);
-    val->x_.resize(par.granularity*asize);
-    val->value_.resize(par.granularity*asize);
+    val->x_.resize(par.granularity);
+    val->value_.resize(par.granularity);
 
     //number of values per stencil_data
     int i;
     nodedata node;
 
+    had_double_type chi,Phi,Pi,Energy,r;
     had_double_type dx;
-    had_double_type xcoord;
 
     dx = par.dx0/pow(2.0,level);
 
-    for (i=0;i<pow(2.,level)*par.granularity;i++) {
+    for (i=0;i<par.granularity;i++) {
+      r = xmin + (par.granularity*item + i)*dx;
 
-      xcoord = xmin + (pow(2.,level)*par.granularity*item + i)*dx;
-
-      had_double_type chi,Phi,Pi,Energy,r;
-
-      r = xcoord;
       chi = initial_chi(r,par);
       Phi = initial_Phi(r,par);
       Pi  = 0.0;
       Energy = 0.5*r*r*(Pi*Pi + Phi*Phi) - r*r*pow(chi,par.PP+1)/(par.PP+1);
 
+#if 0
       // TEST Add some busy work to see if race condition can be eliminated
       double d = 0.;
       for (int ii = 0; ii < WORK; ++ii)
@@ -93,6 +90,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
          d += 1/(2.* ii + 1);
       }
       Energy = d;
+#endif
 
       val->x_[i] = r;
 
@@ -130,6 +128,7 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
   //}
 #endif
  
+#if 0
     // Add busywork TEST
     double d = 0.;
     for (int i = 0; i < WORK; ++i)
@@ -138,10 +137,11 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
     }
     result->value_[0].phi[0][3] = d;
     // END TEST
+#endif
 
 //#if 0
   if ( iter == 0 ) {
-    for (j=0;j<pow(2.,level)*par.granularity;j++) {
+    for (j=0;j<par.granularity;j++) {
       calcrhs(&rhs,vecval,vecx,0,dx,size,boundary,bbox,j+compute_index,par);
       for (i=0;i<num_eqns;i++) {
         work.phi[0][i] = vecval[j+compute_index].phi[0][i];
@@ -154,7 +154,7 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
     // no timestep update-- this is just a part of an rk subcycle
     result->timestep_ = timestep;
   } else if ( iter == 1 || iter == 3) {
-    for (j=0;j<pow(2.,level)*par.granularity;j++) {
+    for (j=0;j<par.granularity;j++) {
       result->value_[j] = vecval[j+compute_index];
     }
 
@@ -190,7 +190,7 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
     // no timestep update-- this is just a part of an rk subcycle
     result->timestep_ = timestep;
   } else if ( iter == 2 ) {
-    for (j=0;j<pow(2.,level)*par.granularity;j++) {
+    for (j=0;j<par.granularity;j++) {
       calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
       for (i=0;i<num_eqns;i++) {
         work.phi[0][i] = vecval[j+compute_index].phi[0][i];
@@ -203,7 +203,7 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
     // no timestep update-- this is just a part of an rk subcycle
     result->timestep_ = timestep;
   } else if ( iter == 4 ) {
-    for (j=0;j<pow(2.,level)*par.granularity;j++) {
+    for (j=0;j<par.granularity;j++) {
       calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
       for (i=0;i<num_eqns;i++) {
         work.phi[0][i] = 1./3*vecval[j+compute_index].phi[0][i]
@@ -215,7 +215,7 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
     // no timestep update-- this is just a part of an rk subcycle
     result->timestep_ = timestep;
   } else if ( iter == 5 ) {
-    for (j=0;j<pow(2.,level)*par.granularity;j++) {
+    for (j=0;j<par.granularity;j++) {
       result->value_[j] = vecval[j+compute_index];
     }
 

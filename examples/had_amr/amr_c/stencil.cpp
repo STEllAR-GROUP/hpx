@@ -76,7 +76,6 @@ namespace hpx { namespace components { namespace amr
         bool boundary = false;
         int bbox[2];
         int numvals = par->nx0/par->granularity;
-        int asize = (int) pow(2.,(int)val[0]->level_);
 
         // initialize bounding box
         bbox[0] = 0;
@@ -146,7 +145,7 @@ namespace hpx { namespace components { namespace amr
         int count = 0;
         int adj_index = -1;
         for (i=0;i<tval.size();i++) {
-          for (j=0;j<asize*par->granularity;j++) {
+          for (j=0;j<par->granularity;j++) {
             vecval.push_back(tval[i]->value_[j]);
             vecx.push_back(tval[i]->x_[j]);
             if ( i == compute_index && adj_index == -1 ) {
@@ -156,7 +155,7 @@ namespace hpx { namespace components { namespace amr
           }
         }
 
-        for (j=0;j<asize*par->granularity;j++) {
+        for (j=0;j<par->granularity;j++) {
           resultval->x_.push_back(tval[compute_index]->x_[j]);
         }
 
@@ -167,7 +166,7 @@ namespace hpx { namespace components { namespace amr
             resultval->cycle_ = val[0]->cycle_ + 1;
             resultval->max_index_ = tval[compute_index]->max_index_;
             resultval->index_ = tval[compute_index]->index_;
-            resultval->value_.resize(asize*par->granularity);
+            resultval->value_.resize(par->granularity);
             had_double_type dt = par->dt0/pow(2.0,(int) val[0]->level_);
             had_double_type dx = par->dx0/pow(2.0,(int) val[0]->level_); 
             
