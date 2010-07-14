@@ -150,46 +150,20 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
       result->value_[j] = work;
 
     }
-
-    // no timestep update-- this is just a part of an rk subcycle
-    result->timestep_ = timestep;
-  } else if ( iter == 1 || iter == 3) {
-    for (j=0;j<par.granularity;j++) {
-      result->value_[j] = vecval[j+compute_index];
+    if ( boundary && bbox[0] == 1 ) {
+      // chi
+      result->value_[0].phi[1][0] = 4./3*result->value_[1].phi[1][0]
+                                   -1./3*result->value_[2].phi[1][0];
+      // Pi
+      result->value_[0].phi[1][2] = 4./3*result->value_[1].phi[1][2]
+                                   -1./3*result->value_[2].phi[1][2];
+      // Phi
+      result->value_[1].phi[1][1] = 0.5*result->value_[2].phi[1][1];
     }
 
-    // apply BC's nearat r=0
-    if ( par.granularity == 1 ) {
-      if ( boundary && bbox[0] == 1 ) {
-        // chi
-        result->value_[0].phi[1][0] = 4./3*vecval[compute_index+1].phi[1][0]
-                                     -1./3*vecval[compute_index+2].phi[1][0];
-   
-        // Pi
-        result->value_[0].phi[1][2] = 4./3*vecval[compute_index+1].phi[1][2]
-                                     -1./3*vecval[compute_index+2].phi[1][2];
-  
-      } else if ( boundary && bbox[0] == 2 ) {
-        // Phi
-        result->value_[0].phi[1][1] = 0.5*vecval[compute_index+1].phi[1][1];
-
-      } 
-    } else {
-      if ( boundary && bbox[0] == 1 ) {
-        // chi
-        result->value_[0].phi[1][0] = 4./3*vecval[compute_index+1].phi[1][0]
-                                     -1./3*vecval[compute_index+2].phi[1][0];
-        // Pi
-        result->value_[0].phi[1][2] = 4./3*vecval[compute_index+1].phi[1][2]
-                                                 -1./3*vecval[compute_index+2].phi[1][2];
-        // Phi
-        result->value_[1].phi[1][1] = 0.5*vecval[compute_index+2].phi[1][1];
-      } 
-    } 
-
     // no timestep update-- this is just a part of an rk subcycle
     result->timestep_ = timestep;
-  } else if ( iter == 2 ) {
+  } else if ( iter == 1 ) {
     for (j=0;j<par.granularity;j++) {
       calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
       for (i=0;i<num_eqns;i++) {
@@ -200,9 +174,20 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
       result->value_[j] = work;
     }
 
+    if ( boundary && bbox[0] == 1 ) {
+      // chi
+      result->value_[0].phi[1][0] = 4./3*result->value_[1].phi[1][0]
+                                   -1./3*result->value_[2].phi[1][0];
+      // Pi
+      result->value_[0].phi[1][2] = 4./3*result->value_[1].phi[1][2]
+                                   -1./3*result->value_[2].phi[1][2];
+      // Phi
+      result->value_[1].phi[1][1] = 0.5*result->value_[2].phi[1][1];
+    }
+
     // no timestep update-- this is just a part of an rk subcycle
     result->timestep_ = timestep;
-  } else if ( iter == 4 ) {
+  } else if ( iter == 2 ) {
     for (j=0;j<par.granularity;j++) {
       calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
       for (i=0;i<num_eqns;i++) {
@@ -211,42 +196,18 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
       }
       result->value_[j] = work;
     }
-
-    // no timestep update-- this is just a part of an rk subcycle
-    result->timestep_ = timestep;
-  } else if ( iter == 5 ) {
-    for (j=0;j<par.granularity;j++) {
-      result->value_[j] = vecval[j+compute_index];
-    }
-
-    // apply BC's nearat r=0
-    if ( par.granularity == 1 ) {
-      if ( boundary && bbox[0] == 1 ) {
-        // chi
-        result->value_[0].phi[0][0] = 4./3*vecval[compute_index+1].phi[0][0]
-                                     -1./3*vecval[compute_index+2].phi[0][0];
-   
-        // Pi
-        result->value_[0].phi[0][2] = 4./3*vecval[compute_index+1].phi[0][2]
-                                     -1./3*vecval[compute_index+2].phi[0][2];
-  
-      } else if ( boundary && bbox[0] == 2 ) {
-        // Phi
-        result->value_[0].phi[0][1] = 0.5*vecval[compute_index+1].phi[0][1];
-
-      } 
-    } else {
-      if ( boundary && bbox[0] == 1 ) {
-        // chi
-        result->value_[0].phi[0][0] = 4./3*vecval[compute_index+1].phi[0][0]
-                                     -1./3*vecval[compute_index+2].phi[0][0];
-        // Pi
-        result->value_[0].phi[0][2] = 4./3*vecval[compute_index+1].phi[0][2]
-                                     -1./3*vecval[compute_index+2].phi[0][2];
-        // Phi
-        result->value_[1].phi[0][1] = 0.5*vecval[compute_index+2].phi[0][1];
-      } 
+    if ( boundary && bbox[0] == 1 ) {
+      // chi
+      result->value_[0].phi[0][0] = 4./3*result->value_[1].phi[0][0]
+                                   -1./3*result->value_[2].phi[0][0];
+      // Pi
+      result->value_[0].phi[0][2] = 4./3*result->value_[1].phi[0][2]
+                                   -1./3*result->value_[2].phi[0][2];
+      // Phi
+      result->value_[1].phi[0][1] = 0.5*result->value_[2].phi[0][1];
     } 
+
+    // timestep update
     result->timestep_ = timestep + 1.0/pow(2.0,level);
   } else {
     printf(" PROBLEM : invalid iter flag %d\n",iter);

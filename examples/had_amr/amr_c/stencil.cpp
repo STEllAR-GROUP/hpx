@@ -106,11 +106,6 @@ namespace hpx { namespace components { namespace amr
           if ( !boundary ) {
             if ( (tval.size()-1)%2 == 0 ) {
               compute_index = (tval.size()-1)/2;
-              if ( column == 1 && par->granularity == 1 ) {
-                boundary = true;
-                bbox[0] = 2;
-                bbox[1] = 0;
-              }
             } else {
               BOOST_ASSERT(false);
             }
@@ -131,10 +126,6 @@ namespace hpx { namespace components { namespace amr
             // indicate a physical boundary
             boundary = true;
             bbox[0] = 1;
-          } else if ( column == 1 && par->granularity == 1 && floatcmp(0.0,tval[compute_index-1]->x_[0]) ) {
-            boundary = true;
-            bbox[0] = 2;
-            bbox[1] = 0;
           } else if ( column == val[0]->max_index_-1 && floatcmp(par->maxx0,tval[compute_index]->x_[par->granularity-1]) ) {
             boundary = true;
             bbox[1] = 1;
@@ -177,7 +168,7 @@ namespace hpx { namespace components { namespace amr
             BOOST_ASSERT(gft);
 
             // increase the iteration counter
-            if ( val[0]->iter_ == 5 ) {
+            if ( val[0]->iter_ == 2 ) {
               resultval->iter_ = 0;
             } else {
               resultval->iter_ = val[0]->iter_ + 1;
@@ -189,10 +180,10 @@ namespace hpx { namespace components { namespace amr
 
             std::size_t allowedl = par->allowedl;
 
-         //   if ( resultval->refine_ && resultval->level_ < allowedl 
-         //        && val[0]->timestep_ >= 1.e-6  ) {
-         //     finer_mesh_tapered(result, gids,vecval.size(), row, column, par);
-         //   }
+            if ( resultval->refine_ && resultval->level_ < allowedl 
+                 && val[0]->timestep_ >= 1.e-6  ) {
+              finer_mesh(result, gids,vecval.size(),resultval->level_+1,resultval->x_[0], row, column, par);
+            }
 
             // One special case: refining at time = 0
             if ( resultval->refine_ && 
@@ -222,8 +213,9 @@ namespace hpx { namespace components { namespace amr
     ///////////////////////////////////////////////////////////////////////////
     // Implement a finer mesh via interpolation of inter-mesh points
     // Compute the result value for the current time step
-    int stencil::finer_mesh_tapered(naming::id_type const& result, 
-        std::vector<naming::id_type> const& gids,int vecvalsize, int row,int column, Parameter const& par) 
+    int stencil::finer_mesh(naming::id_type const& result, 
+        std::vector<naming::id_type> const& gids,int vecvalsize, std::size_t level, had_double_type xmin, 
+        int row,int column, Parameter const& par) 
     {
       //naming::id_type gval[9];
       //access_memory_block<stencil_data> mval[9];
@@ -242,16 +234,23 @@ namespace hpx { namespace components { namespace amr
       }
 
       std::vector<naming::id_type> result_data;
-      int numsteps = 2 * 6; // six subcycles each step
-      int numvals;
-      if ( par->granularity == 1 ) {
-        numvals = 17;
-      } else if ( par->granularity == 2 ) {
-        numvals = 9;
-      } else {
-        numvals = 6;
-      }
+      int numsteps = 2 * 3; // three subcycles each step
 
+      int left_half;  // this variable depends upon how close we are to the origin, r=0
+      int std_ghostwidth = 8; // standard tapering for stencilsize=7
+      had_double_type dx = par->dx0/pow(2.0,level);
+      double tmp = (double) ( xmin- par->minx0)/dx; // we have to have an intermediate cast on account of mpfr 
+      left_half = (int) tmp;
+      if ( left_half > par->ghostwidth/2 + 8 ) left_half = par->ghostwidth/2 + std_ghostwidth;
+
+      int almost_numvals = left_half + par->ghostwidth/2 + 2*par->granularity-1 + std_ghostwidth;
+
+      // to find numvals, divide almost_numvals by the granularity
+      int remainder = almost_numvals%par->granularity;
+      int numvals = (almost_numvals+remainder)/par->granularity;
+
+     // prep_initial_data(initial_data,gids,vecvalsize,row,column,numvals,par);
+#if 0
       hpx::components::amr::unigrid_mesh unigrid_mesh;
       unigrid_mesh.create(here);
 
@@ -263,13 +262,14 @@ namespace hpx { namespace components { namespace amr
         components::stubs::memory_block::free(result_data[i]);
       }
 
+#endif
       return 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // Prep initial data for left (unbiased) tapered mesh
     int stencil::prep_initial_data(std::vector<naming::id_type> & initial_data, 
-        std::vector<naming::id_type> const& gids,int vecvalsize, int row,int column, Parameter const& par) 
+        std::vector<naming::id_type> const& gids,int vecvalsize, int row,int column,int numvals, Parameter const& par) 
     {
 #if 0
       int i;
@@ -369,16 +369,16 @@ namespace hpx { namespace components { namespace amr
           mval[i]->refine_ = refinement(&*vecval.begin(),vecval.size(),&(mval[i]->value_),mval[i]->level_,mval[i]->x_,1,boundary,bbox,*par.p);
 
           // DEBUG
-          if (log_)
-              stubs::logging::logentry(log_, mval[i].get(), row,2, par);
+          //if (log_)
+          //    stubs::logging::logentry(log_, mval[i].get(), row,2, par);
         }
       }
 
       for (i=0;i<17;i++) {
         initial_data.push_back(gval[i]);
       }
-      return 0;
 #endif
+      return 0;
     }
     
     ///////////////////////////////////////////////////////////////////////////
@@ -401,7 +401,7 @@ namespace hpx { namespace components { namespace amr
       }
 
       std::vector<naming::id_type> result_data;
-      int numsteps = 2 * 6; // six subcycles each step
+      int numsteps = 2 * 3; // three subcycles each step
 
       int left_half;  // this variable depends upon how close we are to the origin, r=0
       int std_ghostwidth = 8; // standard tapering for stencilsize=7

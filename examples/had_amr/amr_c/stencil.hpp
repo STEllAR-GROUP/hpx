@@ -49,8 +49,9 @@ namespace hpx { namespace components { namespace amr
 
         // this function creates a finer mesh from 3 input gids and evolves that
         // finer mesh for two steps.
-        int finer_mesh_tapered(naming::id_type const& result, 
+        int finer_mesh(naming::id_type const& result, 
             std::vector<naming::id_type> const& gids,int vecvalsize,
+            std::size_t level, had_double_type xmin,
             int row, int column,
             Parameter const& par);
         
@@ -77,7 +78,8 @@ namespace hpx { namespace components { namespace amr
         int floatcmp(had_double_type x1,had_double_type x2);
 
         int prep_initial_data(std::vector<naming::id_type> & initial_data,
-                    std::vector<naming::id_type> const& gids,int vecvalsize, int row,int column, Parameter const& par);
+                    std::vector<naming::id_type> const& gids,int vecvalsize, 
+                    int row,int column,int numvals, Parameter const& par);
 
     private:
         std::size_t numsteps_;

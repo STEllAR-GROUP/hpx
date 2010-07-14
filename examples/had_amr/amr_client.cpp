@@ -246,7 +246,7 @@ int main(int argc, char* argv[])
         par->eps         =  0.0;
         par->fmr_radius  =  -999.0;
         par->output_level =  0;
-        par->granularity =  1;
+        par->granularity =  3;
         par->ghostwidth  =  0;
 
         par->linearbounds = 1;
@@ -352,8 +352,8 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("granularity") ) {
                 std::string tmp = sec->get_entry("granularity");
                 par->granularity = atoi(tmp.c_str());
-                if ( par->granularity < 1 ) {
-                  std::cerr << " Problem: granularity must be at least 1 : " << par->granularity << std::endl;
+                if ( par->granularity < 3 ) {
+                  std::cerr << " Problem: granularity must be at least 3 : " << par->granularity << std::endl;
                   BOOST_ASSERT(false);
                 }
               }
@@ -383,7 +383,7 @@ int main(int argc, char* argv[])
         BOOST_ASSERT(par->stencilsize%2 != 0 );
 
         if ( par->integrator == 1 ) {
-          numsteps *= 6;  // six subcycles each step
+          numsteps *= 3;  // three subcycles each step
         }
 
         // create output file to append to
