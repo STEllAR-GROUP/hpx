@@ -117,7 +117,7 @@ namespace hpx { namespace lcos
     ///
     /// \tparam RemoteResult The type of the result value to be carried back 
     /// to the LCO instance.
-    template <typename Result,typename RemoteResult=Result>
+    template <typename Result, typename RemoteResult>
     class base_lco_with_value : public base_lco
     {
     protected:
@@ -201,7 +201,7 @@ namespace hpx { namespace lcos
     /// \tparam void This specialization expects no result value and is almost
     ///              completely equivalent to the plain \a base_lco.
     template <>
-    class base_lco_with_value<void,void> : public base_lco
+    class base_lco_with_value<void, void> : public base_lco
     {
     protected:
         /// Destructor, needs to be virtual to allow for clean destruction of
