@@ -34,8 +34,6 @@
         BOOST_PP_COMMA_IF(n)                                                  \
         typename detail::remove_qualifiers<BOOST_PP_CAT(T, n)>::type          \
     /**/
-#define HPX_GUID_ARGUMENT1(z, n, data) (typename BOOST_PP_CAT(T, n))
-#define HPX_GUID_ARGUMENT2(z, n, data) (BOOST_PP_CAT(T, n))
 
     ///////////////////////////////////////////////////////////////////////////
     //  N parameter version, with result
@@ -641,8 +639,6 @@
         }
     };
 
-#undef HPX_GUID_ARGUMENT1
-#undef HPX_GUID_ARGUMENT2
 #undef HPX_REMOVE_QUALIFIERS
 #undef HPX_ACTION_ARGUMENT
 #undef N
