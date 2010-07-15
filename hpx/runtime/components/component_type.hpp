@@ -37,6 +37,8 @@ namespace hpx { namespace components
             ((7 << 16) | component_base_lco),
         component_dataflow_variable =   ///< a LCO implementing dataflow var.
             ((8 << 16) | component_base_lco),
+        component_thunk =               ///< a LCO implementing a thunk
+            ((9 << 16) | component_base_lco_with_value),
 
         component_first_dynamic = component_last
     };

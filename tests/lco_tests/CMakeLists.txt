@@ -5,12 +5,13 @@
 
 # LCO tests
 set(TESTS 
-    barrier_tests 
-    local_barrier_tests 
-    full_empty_tests 
-    counting_semaphore_test
-    mutex_tests
-    lazy_future_tests
+    #barrier_tests 
+    #local_barrier_tests 
+    #full_empty_tests 
+    #counting_semaphore_test
+    #mutex_tests
+    #lazy_future_tests
+    thunk_tests
    )
 
 # build and install each of the tests

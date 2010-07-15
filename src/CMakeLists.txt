@@ -63,6 +63,9 @@ set (hpxlib_lcos_HEADERS
     ${hpx_SOURCE_DIR}/hpx/lcos/local_barrier.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/mutex.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/recursive_mutex.hpp
+    ${hpx_SOURCE_DIR}/hpx/lcos/thunk.hpp
+    ${hpx_SOURCE_DIR}/hpx/lcos/thunk_client_constructors.hpp
+    ${hpx_SOURCE_DIR}/hpx/lcos/thunk_constructors.hpp
     )
 source_group("Header Files\\lcos" 
     FILES ${hpxlib_lcos_HEADERS})
@@ -273,7 +276,8 @@ source_group ("Source Files"
 
 # lcos
 set (hpxlib_lcos_SOURCES
-    ${hpx_SOURCE_DIR}/src/lcos/base_lco.cpp)
+    ${hpx_SOURCE_DIR}/src/lcos/base_lco.cpp
+    )
 source_group ("Source Files\\lcos" 
     FILES ${hpxlib_lcos_SOURCES})
 
