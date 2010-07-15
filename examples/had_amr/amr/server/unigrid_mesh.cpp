@@ -406,7 +406,6 @@ namespace hpx { namespace components { namespace amr { namespace server
       int counter;
       int step,dst,dst2;
 
-      // largest granularity possible {{{
       for (step=0;step<6;step = step + 1) {
         dst = step+1;
         if ( dst == 6 ) dst = 0;
@@ -426,13 +425,18 @@ namespace hpx { namespace components { namespace amr { namespace server
           if ( step == 0 || step == 3 ) {
             if (step == 0 ) dst2 = 3;
             else dst2 = 0;
-            j = i;
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst2);vcolumn.push_back(j);vport.push_back(counter);
-            counter++;
+
+            // three 
+            for (j=i-1;j<i+2;j++) {
+              if ( j >=0 && j < numvalues ) {
+                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst2);vcolumn.push_back(j);vport.push_back(counter);
+                counter++;
+              }
+            }
+
           }
         }
       }
-      // }}}
 
       // Create a ragged 3D array
       for (j=0;j<vsrc_step.size();j++) {

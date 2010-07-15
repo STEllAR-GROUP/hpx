@@ -182,13 +182,13 @@ namespace hpx { namespace components { namespace amr
 
             if ( resultval->refine_ && resultval->level_ < allowedl 
                  && val[0]->timestep_ >= 1.e-6  ) {
-              finer_mesh(result, gids,vecval.size(),resultval->level_+1,resultval->x_[0], row, column, par);
+              finer_mesh(result, gids,vecval.size(),tval.size(),resultval->level_+1,resultval->x_[0], row, column, par);
             }
 
             // One special case: refining at time = 0
             if ( resultval->refine_ && 
                  val[0]->timestep_ < 1.e-6 && resultval->level_ < allowedl ) {
-              finer_mesh_initial(result, gids, resultval->level_+1,resultval->x_[0],row, column, par);
+              finer_mesh_initial(result, tval.size(), resultval->level_+1,resultval->x_[0],row, column, par);
             }
 
             if (par->loglevel > 1 && fmod(resultval->timestep_,par->output) < 1.e-6) 
@@ -214,7 +214,8 @@ namespace hpx { namespace components { namespace amr
     // Implement a finer mesh via interpolation of inter-mesh points
     // Compute the result value for the current time step
     int stencil::finer_mesh(naming::id_type const& result, 
-        std::vector<naming::id_type> const& gids,int vecvalsize, std::size_t level, had_double_type xmin, 
+        std::vector<naming::id_type> const& gids,
+        std::size_t vecvalsize,std::size_t size, std::size_t level, had_double_type xmin, 
         int row,int column, Parameter const& par) 
     {
       //naming::id_type gval[9];
@@ -236,88 +237,91 @@ namespace hpx { namespace components { namespace amr
       std::vector<naming::id_type> result_data;
       int numsteps = 2 * 3; // three subcycles each step
 
-      int left_half;  // this variable depends upon how close we are to the origin, r=0
-      int std_ghostwidth = 8; // standard tapering for stencilsize=7
-      had_double_type dx = par->dx0/pow(2.0,level);
-      double tmp = (double) ( xmin- par->minx0)/dx; // we have to have an intermediate cast on account of mpfr 
-      left_half = (int) tmp;
-      if ( left_half > par->ghostwidth/2 + 8 ) left_half = par->ghostwidth/2 + std_ghostwidth;
+      int numvals;
 
-      int almost_numvals = left_half + par->ghostwidth/2 + 2*par->granularity-1 + std_ghostwidth;
+      numvals = 2*size-1;
+      BOOST_ASSERT(size*par->granularity == vecvalsize);
 
-      // to find numvals, divide almost_numvals by the granularity
-      int remainder = almost_numvals%par->granularity;
-      int numvals = (almost_numvals+remainder)/par->granularity;
+      // TEST
+      int i;
+      naming::id_type gval[5];
+      access_memory_block<stencil_data> mval[5];
+      if ( size == 3 ) {
+        boost::tie(gval[0],gval[1],gval[2],gval[3],gval[4]) = components::wait(components::stubs::memory_block::clone_async(gids[0]), 
+                                                              components::stubs::memory_block::clone_async(gids[0]),
+                                                              components::stubs::memory_block::clone_async(gids[1]),
+                                                              components::stubs::memory_block::clone_async(gids[1]),
+                                                              components::stubs::memory_block::clone_async(gids[2]));
 
-     // prep_initial_data(initial_data,gids,vecvalsize,row,column,numvals,par);
-#if 0
-      hpx::components::amr::unigrid_mesh unigrid_mesh;
-      unigrid_mesh.create(here);
+        boost::tie(mval[0], mval[1], mval[2],mval[3],mval[4]) = 
+          get_memory_block_async<stencil_data>(gval[0], gval[1], gval[2], gval[3],gval[4]);
 
-      result_data = unigrid_mesh.execute(initial_data,function_type, numvals, numsteps,
-            do_logging ? logging_type : components::component_invalid, par);
+        for (i=0;i<2*size-1;i++) {
+          // increase the level by one
+          ++mval[i]->level_;
+          mval[i]->index_ = i;
+          mval[i]->iter_ = 0;
+          mval[i]->max_index_ = 2*size-1;
+        }
 
-      for (std::size_t i = 0; i < result_data.size(); ++i) {
-        // free all
-        components::stubs::memory_block::free(result_data[i]);
+        for (i=0;i<2*size-1;i++) {
+          initial_data.push_back(gval[i]);
+        }
+
+//      prep_initial_data(initial_data,gids,vecvalsize,size,row,column,numvals,par);
+
+        hpx::components::amr::unigrid_mesh unigrid_mesh;
+        unigrid_mesh.create(here);
+
+        result_data = unigrid_mesh.execute(initial_data,function_type, numvals, numsteps,
+              do_logging ? logging_type : components::component_invalid, par);
+
+        for (std::size_t i = 0; i < result_data.size(); ++i) {
+          // free all
+          components::stubs::memory_block::free(result_data[i]);
+        }
+
       }
+      // END TEST
 
-#endif
       return 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // Prep initial data for left (unbiased) tapered mesh
     int stencil::prep_initial_data(std::vector<naming::id_type> & initial_data, 
-        std::vector<naming::id_type> const& gids,int vecvalsize, int row,int column,int numvals, Parameter const& par) 
+        std::vector<naming::id_type> const& gids,std::size_t vecvalsize,std::size_t size, 
+                    int row,int column,int numvals, Parameter const& par) 
     {
 #if 0
       int i;
-      naming::id_type gval[17];
-      access_memory_block<stencil_data> mval[17];
+      naming::id_type gval[2];
+      access_memory_block<stencil_data> mval[2];
 
       // inputs may include different timestamps; separate these out
       int std_index;
       if ( gids.size() != vecvalsize ) {
-        std_index = vecvalsize;
+        std_index = size;
       } else {
         std_index = 0;
       }
 
-      boost::tie(gval[0], gval[2], gval[4], gval[6], gval[8]) = 
+      if ( size == 2) {
+        boost::tie(gval[0]) = 
+                      components::wait(components::stubs::memory_block::clone_async(gids[std_index])); 
+
+        boost::tie(mval[0], mval[1]) = 
+          get_memory_block_async<stencil_data>(gval[0], gids[std_index+1]);
+      
+      } else if ( size == 3 ) {
+        boost::tie(gval[0], gval[1]) = 
                       components::wait(components::stubs::memory_block::clone_async(gids[std_index]), 
-                           components::stubs::memory_block::clone_async(gids[std_index+1]),
-                           components::stubs::memory_block::clone_async(gids[std_index+2]),
-                           components::stubs::memory_block::clone_async(gids[std_index+3]),
-                           components::stubs::memory_block::clone_async(gids[std_index+4]));
-      boost::tie(gval[10], gval[12], gval[14], gval[16]) = 
-                      components::wait(components::stubs::memory_block::clone_async(gids[std_index+5]), 
-                           components::stubs::memory_block::clone_async(gids[std_index+6]),
-                           components::stubs::memory_block::clone_async(gids[std_index+7]),
-                           components::stubs::memory_block::clone_async(gids[std_index+8]));
-      boost::tie(gval[1], gval[3], gval[5],gval[7]) = 
-                  components::wait(components::stubs::memory_block::clone_async(gids[4]), 
-                  components::stubs::memory_block::clone_async(gids[4]),
-                  components::stubs::memory_block::clone_async(gids[4]),
-                  components::stubs::memory_block::clone_async(gids[4]));
-      boost::tie(gval[9], gval[11], gval[13],gval[15]) = 
-                  components::wait(components::stubs::memory_block::clone_async(gids[4]), 
-                  components::stubs::memory_block::clone_async(gids[4]),
-                  components::stubs::memory_block::clone_async(gids[4]),
-                  components::stubs::memory_block::clone_async(gids[4]));
-      boost::tie(mval[0], mval[2], mval[4], mval[6], mval[8]) = 
-        get_memory_block_async<stencil_data>(gval[0], gval[2], gval[4], gval[6], gval[8]);
-      boost::tie(mval[10], mval[12], mval[14], mval[16]) = 
-        get_memory_block_async<stencil_data>(gval[10], gval[12], gval[14], gval[16]);
+                           components::stubs::memory_block::clone_async(gids[std_index+1]));
+        boost::tie(mval[0], mval[1], mval[2]) = 
+          get_memory_block_async<stencil_data>(gval[0], gval[1], gids[std_index+1]);
+      }
 
-      // the edge of the AMR mesh has been reached.  
-      // Use the left mesh class instead of standard tapered
-      boost::tie(mval[1], mval[3], mval[5],mval[7]) = 
-          get_memory_block_async<stencil_data>(gval[1], gval[3], gval[5],gval[7]);
-      boost::tie(mval[9], mval[11], mval[13],mval[15]) = 
-          get_memory_block_async<stencil_data>(gval[9], gval[11], gval[13],gval[15]);
-
-      for (i=0;i<17;i++) {
+      for (i=0;i<2*size-1;i++) {
         // increase the level by one
         ++mval[i]->level_;
         mval[i]->index_ = i;
@@ -325,18 +329,26 @@ namespace hpx { namespace components { namespace amr
         mval[i]->iter_ = 0;
       }
 
-      // this updates the coordinate position
-      for (i=1;i<17;i=i+2) {
-        mval[i]->x_ = 0.5*(mval[i-1]->x_+mval[i+1]->x_);
+      for (i=0;i<2*size-1;i++) {
+        for (j=0;j<par->granularity;j++) {
+        }
       }
 
+
+      // this updates the coordinate position
+      //for (i=1;i<2*size-1;i=i+2) {
+      //  mval[i]->x_ = 0.5*(mval[i-1]->x_+mval[i+1]->x_);
+      //}
+
       // unset alloc on these gids
-      for (i=1;i<17;i=i+2) {
+      for (i=1;i<2*size-1;i=i+2) {
         mval[i]->left_alloc_ = false;
         mval[i]->right_alloc_ = false;
         mval[i]->overwrite_alloc_ = false;
       }
+#endif
 
+#if 0
       // avoid interpolation if possible
       int s;
       bool boundary = false;
@@ -374,10 +386,10 @@ namespace hpx { namespace components { namespace amr
         }
       }
 
-      for (i=0;i<17;i++) {
+      for (i=0;i<2*size-1;i++) {
         initial_data.push_back(gval[i]);
       }
-#endif
+      #endif
       return 0;
     }
     
@@ -385,7 +397,7 @@ namespace hpx { namespace components { namespace amr
     // Implement a finer mesh via interpolation of inter-mesh points
     // Compute the result value for the current time step
     int stencil::finer_mesh_initial(naming::id_type const& result, 
-        std::vector<naming::id_type> const& gids, std::size_t level, had_double_type xmin, 
+        std::size_t size, std::size_t level, had_double_type xmin, 
         int row, int column, Parameter const& par) 
     {
       // the initial data for the child mesh comes from the parent mesh
@@ -402,19 +414,9 @@ namespace hpx { namespace components { namespace amr
 
       std::vector<naming::id_type> result_data;
       int numsteps = 2 * 3; // three subcycles each step
+      int numvals;
 
-      int left_half;  // this variable depends upon how close we are to the origin, r=0
-      int std_ghostwidth = 8; // standard tapering for stencilsize=7
-      had_double_type dx = par->dx0/pow(2.0,level);
-      double tmp = (double) ( xmin- par->minx0)/dx; // we have to have an intermediate cast on account of mpfr 
-      left_half = (int) tmp;
-      if ( left_half > par->ghostwidth/2 + 8 ) left_half = par->ghostwidth/2 + std_ghostwidth;
-
-      int almost_numvals = left_half + par->ghostwidth/2 + 2*par->granularity-1 + std_ghostwidth;
-
-      // to find numvals, divide almost_numvals by the granularity
-      int remainder = almost_numvals%par->granularity;
-      int numvals = (almost_numvals+remainder)/par->granularity;
+      numvals = 2*size-1;
 
       hpx::components::amr::unigrid_mesh unigrid_mesh;
       unigrid_mesh.create(here);

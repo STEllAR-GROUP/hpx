@@ -58,9 +58,9 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->level_= level;
     val->iter_ = 0;
     val->refine_= false;
-    val->right_alloc_ = 0;
-    val->left_alloc_ = 0;
-    val->overwrite_alloc_ = 0;
+    val->right_alloc_ = false;
+    val->left_alloc_ = false;
+    val->overwrite_alloc_ = false;
 
     val->x_.resize(par.granularity);
     val->value_.resize(par.granularity);
@@ -397,7 +397,7 @@ int interpolation(had_double_type dst_x,struct nodedata *dst,
 bool refinement(nodedata * vecval,int size, stencil_data* result,int compute_index,bool boundary, int *bbox,Par const& par)
 {
   int j;
-  for (j=0;j<pow(2.,(int)result->level_)*par.granularity;j++) {
+  for (j=0;j<par.granularity;j++) {
     if ( result->x_[j] < par.fmr_radius ) return true;
   }
   return false;
