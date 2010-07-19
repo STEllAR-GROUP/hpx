@@ -118,6 +118,7 @@ namespace hpx { namespace components { namespace amr
           } else if ( (tval.size()-1)%2 == 0 ) {
             compute_index = (tval.size()-1)/2;
           } else {
+            std::cout << " TEST " << column << " tval " << tval.size() << " x " << tval[0]->x_[0] << std::endl;
             BOOST_ASSERT(false);
           } 
 
@@ -166,6 +167,8 @@ namespace hpx { namespace components { namespace amr
                                  boundary,bbox,adj_index,dt,dx,val[0]->timestep_,
                                  val[0]->iter_,val[0]->level_,*par.p);
             BOOST_ASSERT(gft);
+  
+            //BOOST_ASSERT(resultval->FLAG_TEST != 666);
 
             // increase the iteration counter
             if ( val[0]->iter_ == 2 ) {
@@ -218,9 +221,6 @@ namespace hpx { namespace components { namespace amr
         std::size_t vecvalsize,std::size_t size, std::size_t level, had_double_type xmin, 
         int row,int column, Parameter const& par) 
     {
-      //naming::id_type gval[9];
-      //access_memory_block<stencil_data> mval[9];
-
       std::vector<naming::id_type> initial_data;
 
       naming::id_type here = applier::get_applier().get_runtime_support_gid();
@@ -242,47 +242,18 @@ namespace hpx { namespace components { namespace amr
       numvals = 2*size-1;
       BOOST_ASSERT(size*par->granularity == vecvalsize);
 
-      // TEST
-      int i;
-      naming::id_type gval[5];
-      access_memory_block<stencil_data> mval[5];
-      if ( size == 3 ) {
-        boost::tie(gval[0],gval[1],gval[2],gval[3],gval[4]) = components::wait(components::stubs::memory_block::clone_async(gids[0]), 
-                                                              components::stubs::memory_block::clone_async(gids[0]),
-                                                              components::stubs::memory_block::clone_async(gids[1]),
-                                                              components::stubs::memory_block::clone_async(gids[1]),
-                                                              components::stubs::memory_block::clone_async(gids[2]));
+      prep_initial_data(initial_data,gids,vecvalsize,size,row,column,numvals,par);
 
-        boost::tie(mval[0], mval[1], mval[2],mval[3],mval[4]) = 
-          get_memory_block_async<stencil_data>(gval[0], gval[1], gval[2], gval[3],gval[4]);
+      hpx::components::amr::unigrid_mesh unigrid_mesh;
+      unigrid_mesh.create(here);
 
-        for (i=0;i<2*size-1;i++) {
-          // increase the level by one
-          ++mval[i]->level_;
-          mval[i]->index_ = i;
-          mval[i]->iter_ = 0;
-          mval[i]->max_index_ = 2*size-1;
-        }
+      result_data = unigrid_mesh.execute(initial_data,function_type, numvals, numsteps,
+            do_logging ? logging_type : components::component_invalid, par);
 
-        for (i=0;i<2*size-1;i++) {
-          initial_data.push_back(gval[i]);
-        }
-
-//      prep_initial_data(initial_data,gids,vecvalsize,size,row,column,numvals,par);
-
-        hpx::components::amr::unigrid_mesh unigrid_mesh;
-        unigrid_mesh.create(here);
-
-        result_data = unigrid_mesh.execute(initial_data,function_type, numvals, numsteps,
-              do_logging ? logging_type : components::component_invalid, par);
-
-        for (std::size_t i = 0; i < result_data.size(); ++i) {
-          // free all
-          components::stubs::memory_block::free(result_data[i]);
-        }
-
+      for (std::size_t i = 0; i < result_data.size(); ++i) {
+        // free all
+        components::stubs::memory_block::free(result_data[i]);
       }
-      // END TEST
 
       return 0;
     }
@@ -293,60 +264,121 @@ namespace hpx { namespace components { namespace amr
         std::vector<naming::id_type> const& gids,std::size_t vecvalsize,std::size_t size, 
                     int row,int column,int numvals, Parameter const& par) 
     {
-#if 0
-      int i;
-      naming::id_type gval[2];
-      access_memory_block<stencil_data> mval[2];
+      int i,j,k;
+      naming::id_type gval[5];
+      access_memory_block<stencil_data> mval[5];
 
-      // inputs may include different timestamps; separate these out
       int std_index;
       if ( gids.size() != vecvalsize ) {
         std_index = size;
       } else {
         std_index = 0;
       }
-
-      if ( size == 2) {
-        boost::tie(gval[0]) = 
-                      components::wait(components::stubs::memory_block::clone_async(gids[std_index])); 
-
-        boost::tie(mval[0], mval[1]) = 
-          get_memory_block_async<stencil_data>(gval[0], gids[std_index+1]);
-      
-      } else if ( size == 3 ) {
-        boost::tie(gval[0], gval[1]) = 
-                      components::wait(components::stubs::memory_block::clone_async(gids[std_index]), 
-                           components::stubs::memory_block::clone_async(gids[std_index+1]));
-        boost::tie(mval[0], mval[1], mval[2]) = 
-          get_memory_block_async<stencil_data>(gval[0], gval[1], gids[std_index+1]);
+      if ( size == 3 ) {
+        boost::tie(gval[0],gval[1],gval[2],gval[3],gval[4]) = components::wait(components::stubs::memory_block::clone_async(gids[std_index]), 
+                                                                               components::stubs::memory_block::clone_async(gids[std_index+1]),
+                                                                               components::stubs::memory_block::clone_async(gids[std_index+2]),
+                                                                               components::stubs::memory_block::clone_async(gids[std_index]),
+                                                                               components::stubs::memory_block::clone_async(gids[std_index]));
+        boost::tie(mval[0],mval[1],mval[2],mval[3],mval[4]) = 
+          get_memory_block_async<stencil_data>(gval[0], gval[1], gval[2], gval[3], gval[4]);
+      } else if ( size == 2 ) {
+        boost::tie(gval[0],gval[1],gval[2]) = components::wait(components::stubs::memory_block::clone_async(gids[std_index]), 
+                                                                       components::stubs::memory_block::clone_async(gids[std_index+1]),
+                                                                       components::stubs::memory_block::clone_async(gids[std_index]));
+        boost::tie(mval[0],mval[1],mval[2]) = 
+          get_memory_block_async<stencil_data>(gval[0], gval[1], gval[2]);
+      } else {
+        BOOST_ASSERT(false);
       }
 
       for (i=0;i<2*size-1;i++) {
         // increase the level by one
         ++mval[i]->level_;
         mval[i]->index_ = i;
-
         mval[i]->iter_ = 0;
+        mval[i]->max_index_ = 2*size-1;
       }
 
-      for (i=0;i<2*size-1;i++) {
+      // work arrays
+      std::vector<had_double_type> phi,x;
+      phi.resize(size*par->granularity*num_eqns);
+      x.resize(size*par->granularity);
+      for (i=0;i<size;i++) {
         for (j=0;j<par->granularity;j++) {
+          x[j + i*par->granularity] = mval[i]->x_[j];
+          for (k=0;k<num_eqns;k++) {
+            phi[k + num_eqns*(j+i*par->granularity)] = mval[i]->value_[j].phi[0][k];
+          }
         }
       }
 
-
-      // this updates the coordinate position
-      //for (i=1;i<2*size-1;i=i+2) {
-      //  mval[i]->x_ = 0.5*(mval[i-1]->x_+mval[i+1]->x_);
+      // interpolate
+      //for (i=1;i<2*size-2;i = i+2) {
+      //  mval[i]->left_alloc_ = false;
+      //  mval[i]->right_alloc_ = false;
+      //  mval[i]->overwrite_alloc_ = false;
+      //
+      //  for (j=0;j<par->granularity;j++) {
+      //    for (k=0;k<num_eqns;k++) {
+      //      mval[i]->value_[j].phi[0][k] = 0.5*(mval[i-1]->value_[j].phi[0][k] + mval[i+1]->value_[j].phi[0][k]);  
+      //    }
+      //    mval[i]->x_[j] = 0.5*(mval[i-1]->x_[j] + mval[i+1]->x_[j]);  
+      //  }
       //}
+      std::size_t count=0;
+      std::size_t count_i=0;
+      std::size_t count_j=0;
+      for (i=0;i<2*size-1;i++) {
+        for (j=0;j<par->granularity;j++) {
 
-      // unset alloc on these gids
-      for (i=1;i<2*size-1;i=i+2) {
-        mval[i]->left_alloc_ = false;
-        mval[i]->right_alloc_ = false;
-        mval[i]->overwrite_alloc_ = false;
+          if ( count%2 == 0 ) {
+            mval[i]->x_[j] = x[count_j+count_i*par->granularity];
+            for (k=0;k<num_eqns;k++) {
+              mval[i]->value_[j].phi[0][k] = phi[k + num_eqns*(count_j + count_i*par->granularity)];
+            }
+            count_j++;
+            if ( count_j == par->granularity ) { 
+              count_j = 0;
+              count_i++;
+            }
+          }
+          count++;
+        }
       }
-#endif
+
+      // interpolate
+      count = 0;
+      for (i=0;i<2*size-1;i++) {
+        for (j=0;j<par->granularity;j++) {
+
+          if ( count%2 == 1 ) {
+            if ( j > 0 && j < par->granularity-1 ) {
+              mval[i]->x_[j] = 0.5*(mval[i]->x_[j-1] + mval[i]->x_[j+1]);
+              for (k=0;k<num_eqns;k++) {
+                mval[i]->value_[j].phi[0][k] = 0.5*(mval[i]->value_[j-1].phi[0][k] + mval[i]->value_[j+1].phi[0][k] );
+              }
+            } else if ( j+1 == par->granularity && i+1 < 2*size-1 ) {
+              mval[i]->x_[j] = 0.5*(mval[i]->x_[j-1] + mval[i+1]->x_[0]);
+              for (k=0;k<num_eqns;k++) {
+                mval[i]->value_[j].phi[0][k] = 0.5*(mval[i]->value_[j-1].phi[0][k] + mval[i+1]->value_[0].phi[0][k] );
+              }
+            } else if ( j == 0 && i-1 >= 0 ) {
+              mval[i]->x_[j] = 0.5*(mval[i-1]->x_[par->granularity-1] + mval[i]->x_[j+1]);
+              for (k=0;k<num_eqns;k++) {
+                mval[i]->value_[j].phi[0][k] = 0.5*(mval[i-1]->value_[par->granularity-1].phi[0][k] + mval[i]->value_[j+1].phi[0][k] );
+              }
+            } else {
+              BOOST_ASSERT(false);
+            }
+          }
+          count++;
+        }
+      }
+
+      for (i=0;i<2*size-1;i++) {
+        initial_data.push_back(gval[i]);
+      }
 
 #if 0
       // avoid interpolation if possible
