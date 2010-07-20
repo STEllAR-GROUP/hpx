@@ -99,8 +99,7 @@ namespace hpx { namespace lcos { namespace detail
         };
 
         typedef boost::intrusive::member_hook<
-            queue_entry, queue_entry::hook_type,
-            &queue_entry::list_hook_
+            queue_entry, queue_entry::hook_type, &queue_entry::list_hook_
         > list_option_type;
 
         typedef boost::intrusive::slist<
@@ -123,6 +122,7 @@ namespace hpx { namespace lcos { namespace detail
                 mutex_type::scoped_lock l(this);
                 while (!queue_.empty()) {
                     threads::thread_id_type id = queue_.front().id_;
+                    queue_.front().id_ = 0;
                     queue_.pop_front();
 
                     // we know that the id is actually the pointer to the thread
@@ -187,17 +187,24 @@ namespace hpx { namespace lcos { namespace detail
             queue_entry e(id);
             queue_.push_back(e);
 
-            util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+            queue_type::const_iterator last = queue_.last();
+            bool result = false;
 
-            // timeout at the given time, if appropriate
-            if (!wait_until.is_not_a_date_time()) 
-                threads::set_thread_state(id, wait_until);
+            {
+                util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
 
-            // if this timed out, return true
-            return threads::wait_timeout == self.yield(threads::suspended);
-            // queue_entry goes out of scope (removes itself 
-            // from the list, re-acquiring the unlocked mutex before 
-            // doing so)
+                // timeout at the given time, if appropriate
+                if (!wait_until.is_not_a_date_time()) 
+                    threads::set_thread_state(id, wait_until);
+
+                // if this timed out, return true
+                result = threads::wait_timeout == self.yield(threads::suspended);
+            }
+
+            if (e.id_)
+                queue_.erase(last);     // remove entry from queue
+
+            return result;
         }
 
         void set_event()
@@ -205,6 +212,7 @@ namespace hpx { namespace lcos { namespace detail
             mutex_type::scoped_lock l(this);
             if (!queue_.empty()) {
                 threads::thread_id_type id = queue_.front().id_;
+                queue_.front().id_ = 0;
                 queue_.pop_front();
 
                 l.unlock();
@@ -251,7 +259,7 @@ namespace hpx { namespace lcos { namespace detail
                 // wait for lock to get available
                 bool lock_acquired = false;
                 do {
-                    if (wait_for_single_object()) 
+                    if (wait_for_single_object(wait_until)) 
                     {
                         // if this timed out, just return false
                         --active_count_;
@@ -286,7 +294,7 @@ namespace hpx { namespace lcos { namespace detail
         typedef boost::detail::try_lock_wrapper<mutex> scoped_try_lock;
 
     private:
-        boost::atomic_uint32_t active_count_;
+        boost::atomic<boost::uint32_t> active_count_;
         queue_type queue_;
         boost::uint32_t pending_events_;
         char const* const description_;

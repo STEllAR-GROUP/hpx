@@ -63,7 +63,7 @@ namespace hpx { namespace lcos { namespace server
         typedef boost::intrusive::slist<
             barrier_queue_entry, slist_option_type, 
             boost::intrusive::cache_last<true>, 
-            boost::intrusive::constant_time_size<true>
+            boost::intrusive::constant_time_size<false>
         > queue_type;
 
     public:
@@ -111,9 +111,15 @@ namespace hpx { namespace lcos { namespace server
 
                 barrier_queue_entry e(id);
                 queue_.push_back(e);
+                queue_type::const_iterator last = queue_.last();
 
-                util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                self.yield(threads::suspended);
+                {
+                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                    self.yield(threads::suspended);
+                }
+
+                if (e.id_)
+                    queue_.erase(last);     // remove entry from queue
             }
             else {
             // slist::swap has a bug in Boost 1.35.0
@@ -121,6 +127,7 @@ namespace hpx { namespace lcos { namespace server
                 // release the threads
                 while (!queue_.empty()) {
                     threads::thread_id_type id = queue_.front().id_;
+                    queue_.front().id_ = 0;
                     queue_.pop_front();
                     set_thread_state(id, threads::pending);
                 }
@@ -133,6 +140,7 @@ namespace hpx { namespace lcos { namespace server
                 // release the threads
                 while (!queue.empty()) {
                     threads::thread_id_type id = queue.front().id_;
+                    queue.front().id_ = 0;
                     queue.pop_front();
                     set_thread_state(id, threads::pending);
                 }

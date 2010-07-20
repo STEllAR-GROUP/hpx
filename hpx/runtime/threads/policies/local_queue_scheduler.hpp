@@ -22,6 +22,7 @@
 #include <boost/lockfree/fifo.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/atomic.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
@@ -52,7 +53,7 @@ namespace hpx { namespace threads { namespace policies
             {}
 
             init_parameter(std::size_t num_queues, 
-                    std::size_t max_queue_thread_count, 
+                    std::size_t max_queue_thread_count = max_thread_count, 
                     bool numa_sensitive = false) 
               : num_queues_(num_queues), 
                 max_queue_thread_count_(max_queue_thread_count),
@@ -221,7 +222,7 @@ namespace hpx { namespace threads { namespace policies
 
     private:
         std::vector<thread_queue*> queues_;   ///< this manages all the PX threads
-        std::size_t curr_queue_;
+        boost::atomic<std::size_t> curr_queue_;
         bool numa_sensitive_;
     };
 

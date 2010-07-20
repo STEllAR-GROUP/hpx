@@ -73,6 +73,7 @@ namespace hpx { namespace util { namespace detail
             scoped_lock l(this);
             while (!queue.empty()) {
                 threads::thread_id_type id = queue.front().id_;
+                queue.front().id_ = 0;
                 queue.pop_front();
 
                 // we know that the id is actually the pointer to the thread
@@ -149,8 +150,14 @@ namespace hpx { namespace util { namespace detail
                 queue_entry f(id);
                 read_queue_.push_back(f);
 
-                util::unlock_the_lock<scoped_lock> ul(l);
-                self.yield(threads::suspended);
+                typename queue_type::const_iterator last = read_queue_.last();
+                {
+                    // yield this thread
+                    util::unlock_the_lock<scoped_lock> ul(l);
+                    self.yield(threads::suspended);
+                }
+                if (f.id_) 
+                    read_queue_.erase(last);     // remove entry from queue
             }
 
             // copy the data to the destination
@@ -174,8 +181,14 @@ namespace hpx { namespace util { namespace detail
                 queue_entry f(id);
                 read_queue_.push_back(f);
 
-                util::unlock_the_lock<scoped_lock> ul(l);
-                self.yield(threads::suspended);
+                typename queue_type::const_iterator last = read_queue_.last();
+                {
+                    // yield this thread
+                    util::unlock_the_lock<scoped_lock> ul(l);
+                    self.yield(threads::suspended);
+                }
+                if (f.id_) 
+                    read_queue_.erase(last);     // remove entry from queue
             }
         }
 
@@ -197,11 +210,14 @@ namespace hpx { namespace util { namespace detail
                 queue_entry f(id);
                 read_and_empty_queue_.push_back(f);
 
-                // yield this thread
+                typename queue_type::const_iterator last = read_and_empty_queue_.last();
                 {
+                    // yield this thread
                     util::unlock_the_lock<scoped_lock> ul(l);
                     self.yield(threads::suspended);
                 }
+                if (f.id_) 
+                    read_and_empty_queue_.erase(last);     // remove entry from queue
 
                 // copy the data to the destination
                 if (get_address() != &dest) 
@@ -231,9 +247,14 @@ namespace hpx { namespace util { namespace detail
                 queue_entry f(id);
                 read_and_empty_queue_.push_back(f);
 
-                // yield this thread
-                util::unlock_the_lock<scoped_lock> ul(l);
-                self.yield(threads::suspended);
+                typename queue_type::const_iterator last = read_and_empty_queue_.last();
+                {
+                    // yield this thread
+                    util::unlock_the_lock<scoped_lock> ul(l);
+                    self.yield(threads::suspended);
+                }
+                if (f.id_) 
+                    read_and_empty_queue_.erase(last);     // remove entry from queue
             }
             else {
                 set_empty_locked();   // state_ = empty
@@ -258,8 +279,14 @@ namespace hpx { namespace util { namespace detail
                 queue_entry f(id);
                 write_queue_.push_back(f);
 
-                util::unlock_the_lock<scoped_lock> ul(l);
-                self.yield(threads::suspended);
+                typename queue_type::const_iterator last = write_queue_.last();
+                {
+                    // yield this thread
+                    util::unlock_the_lock<scoped_lock> ul(l);
+                    self.yield(threads::suspended);
+                }
+                if (f.id_) 
+                    write_queue_.erase(last);     // remove entry from queue
             }
 
             // set the data
@@ -286,8 +313,14 @@ namespace hpx { namespace util { namespace detail
                 queue_entry f(id);
                 write_queue_.push_back(f);
 
-                util::unlock_the_lock<scoped_lock> ul(l);
-                self.yield(threads::suspended);
+                typename queue_type::const_iterator last = write_queue_.last();
+                {
+                    // yield this thread
+                    util::unlock_the_lock<scoped_lock> ul(l);
+                    self.yield(threads::suspended);
+                }
+                if (f.id_) 
+                    write_queue_.erase(last);     // remove entry from queue
             }
 
             // make sure the entry is full
@@ -332,6 +365,7 @@ namespace hpx { namespace util { namespace detail
 
             if (!write_queue_.empty()) {
                 threads::thread_id_type id = write_queue_.front().id_;
+                write_queue_.front().id_ = 0;
                 write_queue_.pop_front();
                 threads::set_thread_state(id, threads::pending);
                 threads::set_thread_lco_description(id);
@@ -349,6 +383,7 @@ namespace hpx { namespace util { namespace detail
             // handle all threads waiting for the block to become full
             while (!read_queue_.empty()) {
                 threads::thread_id_type id = read_queue_.front().id_;
+                read_queue_.front().id_ = 0;
                 read_queue_.pop_front();
                 threads::set_thread_state(id, threads::pending);
                 threads::set_thread_lco_description(id);
@@ -358,6 +393,7 @@ namespace hpx { namespace util { namespace detail
             // for the block to become full
             if (!read_and_empty_queue_.empty()) {
                 threads::thread_id_type id = read_and_empty_queue_.front().id_;
+                read_and_empty_queue_.front().id_ = 0;
                 read_and_empty_queue_.pop_front();
                 threads::set_thread_state(id, threads::pending);
                 threads::set_thread_lco_description(id);

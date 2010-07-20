@@ -116,15 +116,19 @@ namespace hpx { namespace util
                     int generational_count = condemmed->second.second;
                     std::pair<map_iterator, map_iterator> mpos = 
                         index_.equal_range(*(condemmed->second.first));
+                    BOOST_ASSERT(mpos.first != mpos.second);
+
+                    bool found = false;
                     for(/**/; mpos.first != mpos.second; ++mpos.first)
                     {
                         if (mpos.first->second.second == generational_count)
                         {
                             index_.erase(mpos.first);
+                            found = true;
                             break;
                         }
                     }
-                    BOOST_ASSERT(mpos.first != mpos.second);
+                    BOOST_ASSERT(found);
 
                     cont_.erase(condemmed); 
                     --s;

@@ -49,7 +49,7 @@ BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
 namespace hpx 
 {
     ///////////////////////////////////////////////////////////////////////////
-    boost::detail::atomic_count runtime::instance_number_counter_(-1);
+    boost::atomic<int> runtime::instance_number_counter_(-1);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy> 
@@ -60,11 +60,11 @@ namespace hpx
       : runtime(agas_client_),
         result_(0), mode_(locality_mode), 
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
-            boost::bind(&runtime_impl::deinit_tss, This())), 
+            boost::bind(&runtime_impl::deinit_tss, This()), "agas_client_pool"), 
         parcel_pool_(boost::bind(&runtime_impl::init_tss, This()),
-            boost::bind(&runtime_impl::deinit_tss, This())), 
+            boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"), 
         timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
-            boost::bind(&runtime_impl::deinit_tss, This())),
+            boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         agas_client_(agas_pool_, naming::locality(agas_address, agas_port), 
             ini_, mode_ == console),
         parcel_port_(parcel_pool_, naming::locality(address, port)),
@@ -92,11 +92,11 @@ namespace hpx
       : runtime(agas_client_),
         result_(0), mode_(locality_mode), 
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
-            boost::bind(&runtime_impl::deinit_tss, This())), 
+            boost::bind(&runtime_impl::deinit_tss, This()), "agas_client_pool"), 
         parcel_pool_(boost::bind(&runtime_impl::init_tss, This()),
-            boost::bind(&runtime_impl::deinit_tss, This())), 
+            boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"), 
         timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
-            boost::bind(&runtime_impl::deinit_tss, This())),
+            boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         agas_client_(agas_pool_, agas_address, ini_, mode_ == console),
         parcel_port_(parcel_pool_, address),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
@@ -123,11 +123,11 @@ namespace hpx
       : runtime(agas_client_),
         result_(0), mode_(locality_mode), 
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
-            boost::bind(&runtime_impl::deinit_tss, This())), 
+            boost::bind(&runtime_impl::deinit_tss, This()), "agas_client_pool"), 
         parcel_pool_(boost::bind(&runtime_impl::init_tss, This()),
-            boost::bind(&runtime_impl::deinit_tss, This())), 
+            boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"), 
         timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
-            boost::bind(&runtime_impl::deinit_tss, This())),
+            boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         agas_client_(agas_pool_, ini_, mode_ == console),
         parcel_port_(parcel_pool_, address),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
@@ -349,8 +349,8 @@ namespace hpx
                 boost::ref(cond), boost::ref(mtx)));
         cond.wait(l);
 
-        // stop the rest of the system
-        parcel_port_.stop(blocking);        // stops parcel_pool_ as well
+//         // stop the rest of the system
+//         parcel_port_.stop(blocking);        // stops parcel_pool_ as well
 
         deinit_tss();
     }
@@ -363,6 +363,12 @@ namespace hpx
         bool blocking, boost::condition& cond, boost::mutex& mtx)
     {
         boost::mutex::scoped_lock l(mtx);
+        cond.notify_all();                  // we're done now
+
+        // wait for thread manager to exit
+        runtime_support_.stopped();         // re-activate shutdown PX-thread 
+
+        thread_manager_.stop(blocking);     // wait for thread manager
 
         // unregister the runtime_support and memory instances from the AGAS 
         // ignore errors, as AGAS might be down already
@@ -370,17 +376,10 @@ namespace hpx
         agas_client_.unbind(applier_.get_runtime_support_raw_gid(), ec);
         agas_client_.unbind(applier_.get_memory_raw_gid(), ec);
 
-        // wait for thread manager to exit
-        runtime_support_.stopped();         // re-activate main thread 
-        thread_manager_.stop(blocking);     // wait for thread manager
-
         // this disables all logging from the main thread
         deinit_tss();
 
         LRT_(info) << "runtime_impl: stopped all services";
-
-        // we're done now
-        cond.notify_all();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -414,6 +413,8 @@ namespace hpx
         // now wait for everything to finish
         int result = wait();
         stop();
+
+        parcel_port_.stop();      // stops parcelport for sure
         return result;
     }
 
@@ -428,6 +429,8 @@ namespace hpx
         // now wait for everything to finish
         int result = wait();
         stop();
+
+        parcel_port_.stop();      // stops parcelport for sure
         return result;
     }
 

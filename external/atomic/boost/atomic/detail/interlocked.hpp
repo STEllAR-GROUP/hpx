@@ -100,6 +100,16 @@ private:
 
 # if defined(_M_IA64) || defined(_M_AMD64)
 
+#if defined( BOOST_USE_WINDOWS_H )
+
+# include <windows.h>
+
+# define BOOST_INTERLOCKED_EXCHANGE_ADD64 InterlockedExchangeAdd64
+# define BOOST_INTERLOCKED_EXCHANGE64 InterlockedExchange64
+# define BOOST_INTERLOCKED_COMPARE_EXCHANGE64 InterlockedCompareExchange64
+
+#else
+
 extern "C" boost::int64_t __cdecl _InterlockedExchangeAdd64(boost::int64_t volatile *, boost::int64_t);
 extern "C" boost::int64_t __cdecl _InterlockedExchange64(boost::int64_t volatile *, boost::int64_t);
 extern "C" boost::int64_t __cdecl _InterlockedCompareExchange64(boost::int64_t volatile *, boost::int64_t, boost::int64_t);
@@ -107,6 +117,12 @@ extern "C" boost::int64_t __cdecl _InterlockedCompareExchange64(boost::int64_t v
 # pragma intrinsic( _InterlockedExchangeAdd64 )
 # pragma intrinsic( _InterlockedExchange64 )
 # pragma intrinsic( _InterlockedCompareExchange64 )
+
+# define BOOST_INTERLOCKED_EXCHANGE_ADD64 _InterlockedExchangeAdd64
+# define BOOST_INTERLOCKED_EXCHANGE64 _InterlockedExchange64
+# define BOOST_INTERLOCKED_COMPARE_EXCHANGE64 _InterlockedCompareExchange64
+
+#endif
 
 template<typename T>
 class atomic_interlocked_64 {
@@ -134,7 +150,7 @@ public:
         memory_order failure_order) volatile
     {
         T prev=expected;
-        expected=(T)_InterlockedCompareExchange64((boost::int64_t *)(&i), (boost::int64_t)desired, (boost::int64_t)expected);
+        expected=(T)BOOST_INTERLOCKED_COMPARE_EXCHANGE64((boost::int64_t *)(&i), (boost::int64_t)desired, (boost::int64_t)expected);
         bool success=(prev==expected);
         return success;
     }
@@ -148,11 +164,11 @@ public:
     }
     T exchange(T r, memory_order order=memory_order_seq_cst) volatile
     {
-        return (T)_InterlockedExchange64((boost::int64_t *)&i, (boost::int64_t)r);
+        return (T)BOOST_INTERLOCKED_EXCHANGE64((boost::int64_t *)&i, (boost::int64_t)r);
     }
     T fetch_add(T c, memory_order order=memory_order_seq_cst) volatile
     {
-      return (T)_InterlockedExchangeAdd64((boost::int64_t *)&i, c);
+      return (T)BOOST_INTERLOCKED_EXCHANGE_ADD64((boost::int64_t *)&i, c);
     }
     
     bool is_lock_free(void) const volatile {return true;}

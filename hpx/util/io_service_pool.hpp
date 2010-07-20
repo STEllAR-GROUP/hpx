@@ -32,7 +32,8 @@ namespace hpx { namespace util
         ///                 requests
         /// \param start_thread
         ///                 [in] 
-        explicit io_service_pool(std::size_t pool_size = 1,
+        explicit io_service_pool(std::size_t pool_size = 2,
+            char const* pool_name = "",
             boost::function<void()> on_start_thread = boost::function<void()>(),
             boost::function<void()> on_stop_thread = boost::function<void()>());
 
@@ -40,7 +41,8 @@ namespace hpx { namespace util
         /// \param start_thread
         ///                 [in] 
         explicit io_service_pool(boost::function<void()> on_start_thread,
-            boost::function<void()> on_stop_thread = boost::function<void()>());
+            boost::function<void()> on_stop_thread = boost::function<void()>(),
+            char const* pool_name = "");
 
         /// \brief Run all io_service objects in the pool. If join_threads is true
         ///        this will also wait for all threads to complete
@@ -88,6 +90,8 @@ namespace hpx { namespace util
         /// call this for each thread start/stop
         boost::function<void()> on_start_thread_;
         boost::function<void()> on_stop_thread_;
+
+        char const* pool_name_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

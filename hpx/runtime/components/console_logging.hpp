@@ -37,10 +37,12 @@ namespace hpx { namespace components
                 // log all pending messages first
                 mutex_type::scoped_lock l(mtx_, boost::defer_lock);
                 if (l.try_lock()) {
-                    BOOST_FOREACH(std::string const& s, pending_) 
-                        console_logging_locked(prefix, dest, level, s);
-                    std::vector<std::string>().swap(pending_);
+                    std::vector<std::string> pending;
+                    pending.swap(pending_);
                     has_pending_ = false;
+
+                    BOOST_FOREACH(std::string const& s, pending) 
+                        console_logging_locked(prefix, dest, level, s);
                 }
             }
         }

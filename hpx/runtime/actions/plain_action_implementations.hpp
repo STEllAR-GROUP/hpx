@@ -273,7 +273,10 @@
             naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            LTM_(debug) << "Executing direct action.";
+            LTM_(debug) << "Executing direct action" 
+                        << detail::get_action_name<
+                              BOOST_PP_CAT(plain_direct_result_action, N)>()
+                        << ".";
             return F(BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
@@ -570,7 +573,10 @@
         static util::unused_type execute_function(naming::address::address_type lva, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            LTM_(debug) << "Executing direct action.";
+            LTM_(debug) << "Executing direct action" 
+                        << detail::get_action_name<
+                              BOOST_PP_CAT(plain_direct_action, N)>()
+                        << ".";
             F(BOOST_PP_ENUM_PARAMS(N, arg));
             return util::unused;
         }

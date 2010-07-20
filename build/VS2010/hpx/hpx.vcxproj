@@ -189,7 +189,9 @@
     <ClCompile Include="..\..\..\src\runtime\components\server\memory.cpp" />
     <ClCompile Include="..\..\..\src\runtime\components\server\memory_block.cpp" />
     <ClCompile Include="..\..\..\src\runtime\components\server\runtime_support.cpp" />
-    <ClCompile Include="..\..\..\src\lcos\base_lco.cpp" />
+    <ClCompile Include="..\..\..\src\lcos\base_lco.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\performance_counters\counters.cpp" />
     <ClCompile Include="..\..\..\src\performance_counters\registry.cpp" />
     <ClCompile Include="..\..\..\src\performance_counters\stubs\performance_counter.cpp" />
@@ -205,6 +207,7 @@
     <ClInclude Include="..\..\..\hpx\exception_list.hpp" />
     <ClInclude Include="..\..\..\hpx\hpx.hpp" />
     <ClInclude Include="..\..\..\hpx\hpx_fwd.hpp" />
+    <ClInclude Include="..\..\..\hpx\hpx_init.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\local_barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\server\barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\stubs\barrier.hpp" />

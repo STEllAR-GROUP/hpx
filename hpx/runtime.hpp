@@ -61,6 +61,13 @@ namespace hpx
             stopped_(true)
         {}
 
+        ~runtime()
+        {
+            // allow to reuse instance number if this was the only instance
+            if (0 == instance_number_counter_)
+                --instance_number_counter_;
+        }
+
         /// \brief Manage list of functions to call on exit
         void on_exit(boost::function<void()> f)
         {
@@ -140,7 +147,7 @@ namespace hpx
         util::runtime_configuration ini_;
 
         long instance_number_;
-        static boost::detail::atomic_count instance_number_counter_;
+        static boost::atomic<int> instance_number_counter_;
 
         bool stopped_;
     };

@@ -201,8 +201,9 @@ int hpx_init(po::options_description& desc_cmdline, int argc, char* argv[])
         rt.run(num_threads, num_localities);
       }
     }
-    else
-      BOOST_ASSERT(false);
+    else {
+      throw std::logic_error("bad value for parameter --queuing/-q");
+    }
   }
   catch (std::exception& e) {
     std::cerr << "hpx_init: std::exception caught: " << e.what() << "\n";

@@ -117,7 +117,7 @@ struct test_lock_times_out_if_other_thread_has_lock
     void locking_thread(boost::uint64_t id)
     {
         Lock lock (m, boost::defer_lock);
-        lock.timed_lock(boost::posix_time::milliseconds(50));
+        lock.timed_lock(boost::posix_time::milliseconds(5));
 
         boost::lock_guard<hpx::lcos::mutex> lk(done_mutex);
         locked = lock.owns_lock();
@@ -127,7 +127,7 @@ struct test_lock_times_out_if_other_thread_has_lock
 
     void locking_thread_through_constructor(boost::uint64_t id)
     {
-        Lock lock(m, boost::posix_time::milliseconds(50));
+        Lock lock(m, boost::posix_time::milliseconds(5));
 
         boost::lock_guard<hpx::lcos::mutex> lk(done_mutex);
         locked = lock.owns_lock();
@@ -145,7 +145,7 @@ struct test_lock_times_out_if_other_thread_has_lock
         locked = false;
         done = false;
 
-        naming::id_type this_(applier::get_applier().get_runtime_support_gid());
+        naming::gid_type this_(applier::get_applier().get_runtime_support_raw_gid());
         this_.set_lsb(this);
 
         threads::thread_self& self = threads::get_self();
@@ -156,10 +156,10 @@ struct test_lock_times_out_if_other_thread_has_lock
         {
             {
                 // create timeout thread
-                threads::set_thread_state(id, boost::posix_time::seconds(1));
+                threads::set_thread_state(id, boost::posix_time::seconds(3));
 
                 // suspend this thread waiting for test to happen
-                self.yield(threads::suspended);
+                BOOST_TEST(threads::wait_timeout != self.yield(threads::suspended));
 
                 BOOST_TEST(done);
                 BOOST_TEST(!locked);
@@ -371,26 +371,26 @@ void do_test_recursive_timed_mutex(int num_tests)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int num_threads, int num_tests)
 {
-    applier::register_work_nullary(
-        boost::bind(&do_test_mutex, num_tests), "do_test_mutex");
-    applier::register_work_nullary(
-        boost::bind(&do_test_try_mutex, num_tests), "do_test_try_mutex");
+//     applier::register_work_nullary(
+//         boost::bind(&do_test_mutex, num_tests), "do_test_mutex");
+//     applier::register_work_nullary(
+//         boost::bind(&do_test_try_mutex, num_tests), "do_test_try_mutex");
     if (num_threads > 1) {
         applier::register_work_nullary(
             boost::bind(&do_test_timed_mutex, num_tests), "do_test_timed_mutex");
     }
-
-    applier::register_work_nullary(
-        boost::bind(&do_test_recursive_mutex, num_tests), 
-            "do_test_recursive_mutex");
-    applier::register_work_nullary(
-        boost::bind(&do_test_recursive_try_mutex, num_tests), 
-            "do_test_recursive_try_mutex");
-    if (num_threads > 1) {
-        applier::register_work_nullary(
-            boost::bind(&do_test_recursive_timed_mutex, num_tests), 
-                "do_test_recursive_timed_mutex");
-    }
+// 
+//     applier::register_work_nullary(
+//         boost::bind(&do_test_recursive_mutex, num_tests), 
+//             "do_test_recursive_mutex");
+//     applier::register_work_nullary(
+//         boost::bind(&do_test_recursive_try_mutex, num_tests), 
+//             "do_test_recursive_try_mutex");
+//     if (num_threads > 1) {
+//         applier::register_work_nullary(
+//             boost::bind(&do_test_recursive_timed_mutex, num_tests), 
+//                 "do_test_recursive_timed_mutex");
+//     }
 
     // initiate shutdown of the runtime system
     components::stubs::runtime_support::shutdown_all();
@@ -420,8 +420,13 @@ bool parse_commandline(char const* name, int argc, char *argv[],
             ("threads,t", po::value<int>(), 
                 "the number of operating system threads to spawn for this"
                 "HPX locality")
+            ("concurrency,c", po::value<int>(), 
+                "the number of concurrent tests to run (default: 1)")
             ("num_tests,n", po::value<int>(), 
                 "the number of times to repeat the test (default: 1)")
+            ("queueing,q", po::value<std::string>(),
+                "the queue scheduling policy to use, options are 'global' "
+                " and 'local' (default is 'global')")
         ;
 
         po::store(po::command_line_parser(argc, argv)
@@ -447,7 +452,7 @@ class agas_server_helper
 {
 public:
     agas_server_helper(std::string host, boost::uint16_t port)
-      : agas_pool_(), agas_(agas_pool_, host, port)
+      : agas_pool_(2, "agas_server_pool"), agas_(agas_pool_, host, port)
     {
         agas_.run(false);
     }
@@ -481,8 +486,63 @@ split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// this is the runtime type we use in this application
-typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
+void run_global(std::string hpx_host, boost::uint16_t hpx_port, 
+    std::string dgas_host, boost::uint16_t dgas_port, hpx::runtime::mode mode,
+    int num_threads, int num_tests, int concurrency)
+{
+    typedef hpx::threads::policies::global_queue_scheduler queue_policy;
+    typedef hpx::runtime_impl<queue_policy> runtime_type;
+
+    if (0 == num_threads) {
+        int num_of_cores = boost::thread::hardware_concurrency();
+        runtime_type rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
+        for (int t = 0; t < num_tests; ++t) {
+            for (int i = 1; i <= 2*num_of_cores; ++i) { 
+                rt.run(boost::bind(&hpx_main, i, concurrency), i);
+                std::cerr << ".";
+            }
+        }
+        std::cerr << "\n";
+    }
+    else {
+        runtime_type rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
+        for (int t = 0; t < num_tests; ++t) {
+            rt.run(boost::bind(&hpx_main, num_threads, concurrency), num_threads);
+            std::cerr << ".";
+        }
+        std::cerr << "\n";
+    }
+}
+
+void run_local(std::string hpx_host, boost::uint16_t hpx_port, 
+    std::string dgas_host, boost::uint16_t dgas_port, hpx::runtime::mode mode,
+    int num_threads, int num_tests, int concurrency)
+{
+    typedef hpx::threads::policies::local_queue_scheduler queue_policy;
+    typedef hpx::runtime_impl<queue_policy> runtime_type;
+
+    if (0 == num_threads) {
+        int num_of_cores = boost::thread::hardware_concurrency();
+        for (int i = 1; i <= 2*num_of_cores; ++i) { 
+            queue_policy::init_parameter_type init(i);
+            runtime_type rt(hpx_host, hpx_port, dgas_host, dgas_port, mode, init);
+            for (int t = 0; t < num_tests; ++t) {
+                rt.run(boost::bind(&hpx_main, i, concurrency), i);
+                std::cerr << ".";
+            }
+        }
+        std::cerr << "\n";
+    }
+    else {
+        queue_policy::init_parameter_type init(num_threads);
+        runtime_type rt(hpx_host, hpx_port, dgas_host, dgas_port, mode, init);
+        for (int t = 0; t < num_tests; ++t) {
+            rt.run(boost::bind(&hpx_main, num_threads, concurrency), num_threads);
+            std::cerr << ".";
+        }
+        std::cerr << "\n";
+    }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
@@ -499,6 +559,8 @@ int main(int argc, char* argv[])
         hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
         int num_threads = 0;
         int num_tests = 1;
+        int concurrency = 1;
+        std::string queueing("global");
 
         // extract IP address/port arguments
         if (vm.count("agas")) 
@@ -516,30 +578,28 @@ int main(int argc, char* argv[])
         if (vm.count("num_tests"))
             num_tests = vm["num_tests"].as<int>();
 
+        if (vm.count("concurrency"))
+            concurrency = vm["concurrency"].as<int>();
+
+        if (vm.count("queueing"))
+            queueing = vm["queueing"].as<std::string>();
+
         // initialize and run the DGAS service, if appropriate
         std::auto_ptr<agas_server_helper> dgas_server;
         if (vm.count("run_agas_server"))  // run the AGAS server instance here
             dgas_server.reset(new agas_server_helper(dgas_host, dgas_port));
 
         // start the HPX runtime using different numbers of threads
-        if (0 == num_threads) {
-            int num_of_cores = boost::thread::hardware_concurrency();
-            runtime_type rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
-            for (int t = 0; t < num_tests; ++t) {
-                for (int i = 1; i <= 2*num_of_cores; ++i) { 
-                    rt.run(boost::bind(&hpx_main, i, num_tests), i);
-                    std::cerr << ".";
-                }
-            }
-            std::cerr << "\n";
+        if (queueing == "global") {
+            run_global(hpx_host, hpx_port, dgas_host, dgas_port, mode,
+                num_threads, num_tests, concurrency);
+        }
+        else if (queueing == "local") {
+            run_local(hpx_host, hpx_port, dgas_host, dgas_port, mode,
+                num_threads, num_tests, concurrency);
         }
         else {
-            runtime_type rt(hpx_host, hpx_port, dgas_host, dgas_port, mode);
-            for (int t = 0; t < num_tests; ++t) {
-                rt.run(boost::bind(&hpx_main, num_threads, num_tests), num_threads);
-                std::cerr << ".";
-            }
-            std::cerr << "\n";
+            throw std::logic_error("bad value for parameter --queuing/-q");
         }
     }
     catch (std::exception& e) {

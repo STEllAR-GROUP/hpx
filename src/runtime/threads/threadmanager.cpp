@@ -875,13 +875,13 @@ namespace hpx { namespace threads
                     threads_[i].join();
                 }
                 threads_.clear();
-            }
 
-            LTM_(info) << "stop: stopping timer pool"; 
-            timer_pool_.stop();             // stop timer pool as well
-            if (blocking) {
-                timer_pool_.join();
-                timer_pool_.clear();
+                LTM_(info) << "stop: stopping timer pool"; 
+                timer_pool_.stop();             // stop timer pool as well
+                if (blocking) {
+                    timer_pool_.join();
+                    timer_pool_.clear();
+                }
             }
         }
     }

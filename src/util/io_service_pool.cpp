@@ -20,10 +20,11 @@
 namespace hpx { namespace util
 {
     io_service_pool::io_service_pool(std::size_t pool_size, 
-            boost::function<void()> on_start_thread,
+            char const* pool_name, boost::function<void()> on_start_thread,
             boost::function<void()> on_stop_thread)
       : next_io_service_(0), stopped_(false), pool_size_(pool_size),
-        on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread)
+        on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread),
+        pool_name_(pool_name)
     {
         if (pool_size == 0)
             throw std::runtime_error("io_service_pool size is 0");
@@ -40,14 +41,18 @@ namespace hpx { namespace util
     }
 
     io_service_pool::io_service_pool(boost::function<void()> on_start_thread,
-            boost::function<void()> on_stop_thread)
-      : next_io_service_(0), stopped_(false), pool_size_(1),
-        on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread)
+            boost::function<void()> on_stop_thread, char const* pool_name)
+      : next_io_service_(0), stopped_(false), pool_size_(2),
+        on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread),
+        pool_name_(pool_name)
     {
-        io_service_ptr io_service(new boost::asio::io_service);
-        work_ptr work(new boost::asio::io_service::work(*io_service));
-        io_services_.push_back(io_service);
-        work_.push_back(work);
+        for (std::size_t i = 0; i < pool_size_; ++i)
+        {
+            io_service_ptr io_service(new boost::asio::io_service);
+            work_ptr work(new boost::asio::io_service::work(*io_service));
+            io_services_.push_back(io_service);
+            work_.push_back(work);
+        }
     }
 
     void io_service_pool::thread_run(int index)
@@ -78,6 +83,10 @@ namespace hpx { namespace util
         // Create a pool of threads to run all of the io_services.
         if (!threads_.empty())   // should be called only once
         {
+            BOOST_ASSERT(pool_size_ == io_services_.size());
+            BOOST_ASSERT(threads_.size() == io_services_.size());
+            BOOST_ASSERT(work_.size() == io_services_.size());
+
             if (join_threads) 
                 join();
             return false;
@@ -88,22 +97,31 @@ namespace hpx { namespace util
         if (!io_services_.empty())
             clear();
 
-        for (std::size_t i = 0; i < pool_size_; ++i)
+        if (io_services_.empty()) 
         {
-            io_service_ptr io_service(new boost::asio::io_service);
-            work_ptr work(new boost::asio::io_service::work(*io_service));
-            io_services_.push_back(io_service);
-            work_.push_back(work);
+            for (std::size_t i = 0; i < pool_size_; ++i)
+            {
+                io_service_ptr io_service(new boost::asio::io_service);
+                work_ptr work(new boost::asio::io_service::work(*io_service));
+                io_services_.push_back(io_service);
+                work_.push_back(work);
+            }
         }
 
-        for (std::size_t i = 0; i < io_services_.size(); ++i)
+        for (std::size_t i = 0; i < pool_size_; ++i)
         {
             boost::shared_ptr<boost::thread> thread(new boost::thread(
                 boost::bind(&io_service_pool::thread_run, this, i)));
             threads_.push_back(thread);
         }
 
+        next_io_service_ = 0;
         stopped_ = false;
+
+        BOOST_ASSERT(pool_size_ == io_services_.size());
+        BOOST_ASSERT(threads_.size() == io_services_.size());
+        BOOST_ASSERT(work_.size() == io_services_.size());
+
         if (join_threads)
             join();
 
@@ -140,6 +158,7 @@ namespace hpx { namespace util
             next_io_service_ = 0;
             threads_.clear();
             work_.clear();
+            io_services_.clear();
         }
     }
 
@@ -148,7 +167,7 @@ namespace hpx { namespace util
         // Use a round-robin scheme to choose the next io_service to use.
         boost::asio::io_service& io_service = *io_services_[next_io_service_];
         ++next_io_service_;
-        if (next_io_service_ == io_services_.size())
+        if (next_io_service_ == pool_size_)
             next_io_service_ = 0;
         return io_service;
     }

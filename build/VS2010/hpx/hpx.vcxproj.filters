@@ -742,6 +742,9 @@
     <ClInclude Include="..\..\..\hpx\lcos\thunk_constructors_direct.hpp">
       <Filter>Header Files\LCOs</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hpx\hpx_init.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\CMakeLists.txt">
