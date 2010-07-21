@@ -1,0 +1,208 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>HPX Tutorial - Page 4</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+</head>
+
+<body>
+<div style="width:80%;margin-right:auto;margin-left:auto;">
+<p>
+<a href="index.html">home</a> | <a href="page3.html">back</a>
+</p>
+<div style="text-align:center;">
+<h2>
+Example: Writing an HPX Component
+</h2>
+</div>
+
+<p>
+<br>
+An HPX component is a kind of remote object. Unlike the simple HPX
+Action of the previous lesson, a component can have state. Because
+the component is a more complex entity, a lot more boiler plate code
+is required. To assist in creation of the boiler plate, you can use
+the pxi preprocessor.
+<br><br>
+The PXI preprocessor can be found in the Parallex svn tree as a
+sibling to HPX (pxi_preprocessor). Building is performed with cmake, and it requires
+at least Boost 1.43.
+<br><br>
+Underneath the pxi_preprocessor directory is another called "examples".
+In here you will find a sort of "hello world" for components. Follow these
+steps to build your own component:
+<ol>
+<li>
+The starting point is the .pxi file. For this example we have a file called,
+unimaginatively, A.pxi.
+<pre style='border: solid; padding: 4pt'>
+// Comments are like this
+component A { 
+    // Fields have types and, optionally, initial values.
+    int a = 3;
+    int b = 9;
+    int *n; 
+
+    // Methods can only be prototypes. No actual code can go here.
+    int bar();
+    void print(std::string);
+    void setb(int);
+    int getb();
+}
+</pre>
+Running pxipp on this file produces A.cpp and A.hpp. These files
+contain all the boiler plate code for the component.
+</li>
+<li>
+Your next job is to fill in the actions for the methods. You do
+this in a file named A_impl.hpp (substitute A for whatever name your
+you chose for your component). In this case, my implementation file
+looks like this:
+<pre style='border: solid; padding: 4pt'>
+int A::server::bar() {
+    return 666;
+}
+
+void A::server::print(std::string s) {
+    std::cout &lt;&lt; s &lt;&lt; std::endl;
+}
+
+void A::server::setb(int nb) {
+    b = nb; 
+}
+
+int A::server::getb() {
+    return b;
+}
+</pre>
+This code looks very similar to what you would write for the 
+implementation of a C++ class, except the name is a little different.
+Instead of "int A::bar() { ... }"
+we have to write "int A::server::bar() { ... }"
+</li>
+<li>
+Next we'll need a main program that calls and makes use of
+our new component. I'm going to follow the naming convention I've
+been using and name this file A_main.cpp. Unfortunately, there's some
+boiler plate here which pxipp does not save you from.
+<pre style='border: solid; padding: 4pt'>
+#include "A.hpp"
+#include &lt;hpx/hpx_init.hpp>
+#include &lt;hpx/runtime/components/component_type.hpp>
+
+int
+hpx_main(po::variables_map& vm) 
+{
+    // get a prefix
+    hpx::naming::gid_type prefix(
+        hpx::applier::get_applier().get_runtime_support_raw_gid());
+
+    // create a gid
+    hpx::naming::id_type agid(
+        prefix,
+        hpx::naming::id_type::unmanaged);
+
+    // instantiate a client
+    A::client cli;
+
+    // connect the client to a gid
+    cli.create(agid);
+
+    // start using the client
+    cli.print("hello, world");
+    std::cout << cli.bar() << std::endl;
+    std::string s("hello, world");
+    cli.setb(12);
+    std::cout << "cli=" << (int)cli.getb() << std::endl;
+    cli.print(s);
+
+    A::client cli2(cli.get_gid());
+    std::cout << "cli2=" << (int)cli2.getb() << std::endl;
+
+    hpx::components::stubs::runtime_support::shutdown_all();
+    return hpx::threads::terminated;
+}
+
+int main(int argc, char* argv[])
+{
+  // Configure application-specific options
+  po::options_description 
+      desc_commandline("Usage: A_exe [hpx_options]");
+
+  // Initialize and run HPX
+  int retcode = hpx_init(desc_commandline, argc, argv); 
+  return retcode;
+}
+</pre>
+Note that I use the hpx_init() package to startup hpx
+and process the arguments. This isn't strictly necessary,
+but is a good idea.
+</li>
+<li>
+We're still not done. We have to compile and link the
+code for the component into a shared library. Then we
+have to compile and link our executable and tell the
+HPX runtime how to find it.
+
+Fortunately, HPX helps us out with these tasks.
+
+The "add_hpx_component" is used to build the shared
+library for the componet.
+
+The "add_hpx_executable" builds the exe file.
+
+Here's the Cmake file that carries out our tasks.
+
+<pre style='border: solid; padding: 4pt'>
+project(preprocessor_example)
+cmake_minimum_required(VERSION 2.6)
+
+set(HPX_MAJOR_VERSION 0)
+set(HPX_MINOR_VERSION 2)
+set(HPX_PATCH_LEVEL   0)
+set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
+set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
+
+include($ENV{HPX_ROOT}/share/cmake/Hpx.cmake)
+
+find_program(pxipp_exe
+    NAMES pxipp
+    PATHS $ENV{HOME}/bin ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/.. ..
+    DOC "PXI Preprocessor")
+message("PXI Preprocessor: ${pxipp_exe}")
+add_custom_command(
+    OUTPUT A.cpp A.hpp
+    DEPENDS A.pxi
+    COMMAND ${pxipp_exe} A.pxi)
+
+add_hpx_component(A SOURCES A.cpp HEADERS A.hpp A_impl.hpp)
+add_hpx_executable(A SOURCES A_main.cpp DEPENDENCIES A_component)
+</pre>
+Notice that that you
+don't need to tell the system how to find Boost, or figure out the steps for linking
+either the shared library, or your executable. All you have to do is set the HPX_ROOT
+variable to point to your HPX installation.
+</li>
+<li>
+There are numerous ways to tell the HPX runtime about how to find your newly created
+component. My personal favorite is to place two files in the directory you're working
+in. The first is '.hpx.ini'
+<pre style='border: solid; padding: 4pt'>
+[hpx]
+ini_path = ${ini_path}:.
+</pre>
+The second is named for the component itself, A.ini
+<pre style='border: solid; padding: 4pt'>
+[hpx.components.A]
+name = A
+path = .
+</pre>
+</li>
+</ol>
+
+<br><br>
+--Steve Brandt
+</p>
+</div>
+</body>
+</html>
