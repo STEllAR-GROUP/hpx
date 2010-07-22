@@ -89,6 +89,7 @@ namespace hpx { namespace lcos
                 mutex_type::scoped_lock l(this);
                 while (!queue_.empty()) {
                     threads::thread_id_type id = queue_.front().id_;
+                    queue_.front().id_ = 0;
                     queue_.pop_front();
 
                     // we know that the id is actually the pointer to the thread
@@ -117,13 +118,19 @@ namespace hpx { namespace lcos
                 threads::thread_self& self = threads::get_self();
                 threads::thread_id_type id = self.get_thread_id();
 
-                threads::set_thread_lco_description(id, "counting::semaphore");
+                threads::set_thread_lco_description(id, "lcos::counting_semaphore");
 
-                queue_entry f(id);
-                queue_.push_back(f);
+                queue_entry e(id);
+                queue_.push_back(e);
+                queue_type::const_iterator last = queue_.last();
 
-                util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                self.yield(threads::suspended);
+                {
+                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                    self.yield(threads::suspended);
+                }
+
+                if (e.id_)
+                    queue_.erase(last);     // remove entry from queue
             }
 
             value_ -= count;
@@ -144,6 +151,7 @@ namespace hpx { namespace lcos
                 // slist::swap has a bug in Boost 1.35.0
                 while (!queue_.empty()) {
                     threads::thread_id_type id = queue_.front().id_;
+                    queue_.front().id_ = 0;
                     queue_.pop_front();
                     threads::set_thread_state(id, threads::pending);
                 }
@@ -156,6 +164,7 @@ namespace hpx { namespace lcos
                 // release the threads
                 while (!queue.empty()) {
                     threads::thread_id_type id = queue.front().id_;
+                    queue.front().id_ = 0;
                     queue.pop_front();
                     threads::set_thread_state(id, threads::pending);
                     threads::set_thread_lco_description(id);

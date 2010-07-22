@@ -78,6 +78,8 @@ namespace hpx { namespace lcos
             if (queue_.size() < number_of_threads_-1) {
                 threads::thread_id_type id = self.get_thread_id();
 
+                threads::set_thread_lco_description(id, "lcos::local_barrier");
+
                 local_barrier_queue_entry e(id);
                 queue_.push_back(e);
                 queue_type::const_iterator last = queue_.last();
