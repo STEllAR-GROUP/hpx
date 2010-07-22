@@ -42,7 +42,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // The eval and is_last_timestep functions have to be overloaded by any
         // functional component derived from this class
         virtual int eval(naming::id_type const&, 
-            std::vector<naming::id_type> const&, int, int,Parameter const&)
+            std::vector<naming::id_type> const&, std::size_t, std::size_t,Parameter const&)
         {
             // This shouldn't ever be called. If you're seeing this assertion 
             // you probably forgot to overload this function in your stencil 
@@ -85,7 +85,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// time step value based on the result values of the previous time 
         /// steps.
         int eval_nonvirt(naming::id_type const& result, 
-            std::vector<naming::id_type> const& gids, int row, int column,Parameter const& par)
+            std::vector<naming::id_type> const& gids, std::size_t row, std::size_t column,Parameter const& par)
         {
             return eval(result, gids, row, column,par);
         }
@@ -114,7 +114,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         typedef hpx::actions::result_action5<
             functional_component, int, functional_component_eval, 
             naming::id_type const&, std::vector<naming::id_type> const&, 
-            int, int,Parameter const&,&functional_component::eval_nonvirt
+            std::size_t, std::size_t,Parameter const&,&functional_component::eval_nonvirt
         > eval_action;
 
         typedef hpx::actions::action2<

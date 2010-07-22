@@ -29,7 +29,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         // functional component derived from this class
         static lcos::future_value<int> eval_async(naming::id_type const& gid, 
             naming::id_type const& result, 
-            std::vector<naming::id_type> const& gids, int row, int column,
+            std::vector<naming::id_type> const& gids, std::size_t row, std::size_t column,
             Parameter const& par)
         {
             // Create an eager_future, execute the required action,

@@ -44,7 +44,7 @@ namespace hpx { namespace components { namespace amr
         /// is a vector of gids referencing the memory blocks of the results of
         /// previous time step.
         int eval(naming::id_type const& result, 
-            std::vector<naming::id_type> const& gids, int row, int column,
+            std::vector<naming::id_type> const& gids, std::size_t row, std::size_t column,
             Parameter const& par);
 
         // this function creates a finer mesh from 3 input gids and evolves that
@@ -52,13 +52,13 @@ namespace hpx { namespace components { namespace amr
         int finer_mesh(naming::id_type const& result, 
             std::vector<naming::id_type> const& gids,std::size_t vecvalsize,std::size_t size,
             std::size_t level, had_double_type xmin,
-            int row, int column,
+            std::size_t compute_index,std::size_t row, std::size_t column,
             Parameter const& par);
         
         // this function creates a finer mesh from the initial data
         int finer_mesh_initial(naming::id_type const& result, 
             std::size_t size, std::size_t level, had_double_type xmin,
-            int row, int column, Parameter const& par);
+            std::size_t compute_index,std::size_t row, std::size_t column, Parameter const& par);
 
         /// The alloc function is supposed to create a new memory block instance 
         /// suitable for storing all data needed for a single time step. 
@@ -80,7 +80,10 @@ namespace hpx { namespace components { namespace amr
         int prep_initial_data(std::vector<naming::id_type> & initial_data,
                     std::vector<naming::id_type> const& gids,
                     std::size_t vecvalsize, std::size_t size,
-                    int row,int column,int numvals, Parameter const& par);
+                    std::size_t row,std::size_t column,std::size_t numvals, Parameter const& par);
+
+        int prep_restriction_data(std::vector<naming::id_type> & result_data,
+                                  std::size_t compute_index,std::size_t numvals,std::size_t size,Parameter const& par);
 
     private:
         std::size_t numsteps_;
