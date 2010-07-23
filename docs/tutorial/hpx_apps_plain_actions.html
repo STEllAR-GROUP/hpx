@@ -20,12 +20,21 @@ Writing an HPX Application with Plain Actions
 One of the fundamental concepts of HPX is the notion of a "future", or "future value".
 We can create a future value and then when we need it call a <code>get()</code> function on it. 
 With this in mind we will create a mutlithreaded factorial program that will use futures to spawn asynchronous actions to calculate the factorial of a given value.
-<br>
-The first step in creating our program is to open up your favorite text editor and create the file "<code>$HPX_HEAD/examples/quickstart/factorial.cpp</code>".
-<br>
+</p>
+<p>
+Navigate to the directory you want to create your factorial, for this tutorial I am going to create a folder in my home directory called <code>factorial</code> and create the file <code>factorial.cpp</code> in there.
+Note that I use vim, but you can use whatever text editor you want to edit the file.
+</p>
+<pre style='border:solid; padding: 4pt;'>
+$ cd
+$ mkdir factorial
+$ cd factorial
+$ vim factorial.cpp
+</pre>
+<p>
 The first thing we will do in this file is to include all of the header files we need.
 </p>
-<pre>
+<pre style='border: solid; padding: 4pt'>
 // factorial.cpp
 
 #include &lt;iostream&gt;
@@ -47,7 +56,7 @@ namespace po = boost::program_options;
 As you can see we include quite a number of things from hpx and boost. 
 Next we will include a typedef and a helper function.
 </p>
-<pre>
+<pre style='border: solid; padding: 4pt'>
 typedef hpx::naming::gid_type gid_type;
 
 inline gid_type find_here(void)
@@ -63,7 +72,7 @@ These aid in the keeping the example code readable.
 Now we will define our factorial function.
 To refresh your memory here is the regular recursive version.
 </p>
-<pre>
+<pre style='border: solid; padding: 4pt'>
 // Not part of the HPX version of factorial
 // double fact(double n)
 // {
@@ -75,7 +84,7 @@ To refresh your memory here is the regular recursive version.
 <p>
 In order to use our future construct we need to package up this function in an HPX action. Actions are work that can be spawned by the runtime system. So we will declare our function prototype and package it into an action.
 </p>
-<pre>
+<pre style='border: solid; padding: 4pt'>
 double fact(double n);
 
 typedef
@@ -87,13 +96,13 @@ HPX_REGISTER_PLAIN_ACTION(factorial_action);
 <p>
 With this bit of code we have created our factorial action and registered it with the runtime system. Now since we have the action we can create our future construct.
 </p>
-<pre>
+<pre style='border: solid; padding: 4pt'>
 typedef lcos::eager_future&lt;factorial_action&gt; factorial_future;
 </pre>
 <p>
 Now that we have our future construct available, we can code our function! This is what the HPX factorial function looks like.
 </p>
-<pre>
+<pre style='border: solid; padding: 4pt'>
 double fact(double n)
 {
     if (n == 0)
@@ -116,7 +125,7 @@ Now you might want to jump to defining <code>main()</code>, but we have to do so
 Just like <code>main()</code> is the entry point for any C/C++ program, there is an <code>hpx_main()</code> that is the entry point for any HPX program. 
 We use the Program Option library from Boost in order to easily process our command line options, as well as those for the runtime so we will use that in order to pass in the value to calculate.
 </p>
-<pre>
+<pre style='border: solid; padding: 4pt'>
 int hpx_main(po::variables_map &amp;vm)
 {
     double argument = 6; // Default value to calculate is 6
@@ -145,7 +154,7 @@ Not too complicated, the only tricky thing is to make sure we properly shut down
 <br>
 Now we write <code>main()</code>. Since all of the work for our program is in <code>hpx_main()</code>, we only use <code>main()</code> for declaring which command line arguments we want to support and then initialize the runtime system.
 </p>
-<pre>
+<pre style='border: solid; padding: 4pt'>
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
@@ -162,24 +171,77 @@ int main(int argc, char* argv[])
 }
 </pre>
 <p>
-Congratulations! You have written your very first HPX program. Now in order to compile and run it we have to tell the HPX build system to build it. Since HPX uses CMake as its build system, we open up the <code>$HPX_HEAD/examples/quickstart/CMakeLists.txt</code>.
-<br>
-Add the following line in the file:
+Congratulations!
+You have written your very first HPX program.
+Now in order to compile and run it we have to tell CMake to integrate with the HPX build system to build it.
+Now when you save the file, go back into the directory we just made and create the file <code>CMakeLists.txt</code>.
 </p>
-<pre>
-add_hpx_executable(factorial SOURCES factorial.cpp)
+<pre style='border: solid; padding: 4pt;'>
+$ cd ~/factorial
+$ vim CMakeLists.txt
 </pre>
 <p>
-Now that you have told the build system that we have a new executable to build, all we have to do is type
+In this file we are going to add the following lines.
 </p>
-<pre>
-$ cd $HPX_HEAD/examples/quickstart
+<pre style='border: solid; padding: 4pt;'>
+project(factorial_example)
+cmake_minimum_required(VERSION 2.6)
+
+set(HPX_MAJOR_VERSION 0)
+set(HPX_MINOR_VERSION 2)
+set(HPX_PATCH_LEVEL   0)
+set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
+set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
+
+include($ENV{HPX_ROOT}/share/cmake/Hpx.cmake)
+include($ENV{BOOST})
+
+# set default cmake build type to RelWithDebInfo (None Debug Release RelWithDebInfo MinSizeRel)
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+endif()
+
+add_hpx_executable(fibonacci2 SOURCES fibonacci2.cpp)
+</pre>
+<p>
+It is important to note that you need to have the environment variable HPX_ROOT set.
+In this case, HPX_ROOT should point to wherever the HPX files are being installed to.
+This will vary based on whether you have an in-source build or an out-of-source build.
+If you have an in-source build, then you should be able to set HPX_ROOT to be HPX_HEAD (if you followed the <a href="hpx_install.html">Installing HPX tutorial</a>).
+</p>
+<pre style='border: solid; padding: 4pt;'>
+$ export HPX_ROOT=$HPX_HEAD
+</pre>
+<p>
+If you have an out-of-source build, and you followed the <a href="oos_page1.html">Out of Source build tutorial</a>, then you need to set HPX_ROOT to point to HPX like this.
+</p>
+<pre style='border: solid; padding: 4pt;'>
+$ export HPX_ROOT=$HPX
+</pre>
+<p>
+Now that you have told CMake to build our executable, we are going to build our file in a separate directory.
+(We could build it in the same directory, but for any real applications work you would want these to be separate, see the Out of Source build tutorial for reasons).
+I will call the directory <code>build_factorial</code> and put it in the home directory.
+</p>
+<pre style='border: solid; padding: 4pt'>
+$ cd
+$ mkdir build_factorial
+$ cd build_factorial
+</pre>
+<p>
+Now that we have our build directory, we will call the appropriate CMake commands and then make commands.
+Note that you need to have the BOOST environment variable set (look in <a href="hpx_install.html">Installing HPX tutorial</a>).
+</p>
+<pre style='border: solid; padding: 4pt'>
+$ cd ~/build_factorial
+$ cmake ../factorial/ -DBOOST_ROOT=$BOOST -DCMAKE_INSTALL_PREFIX=`pwd`
 $ make install
 </pre>
 <p>
 If all goes well then you will have compiled your first HPX program! To run it type
 </p>
-<pre>
+<pre style='border: solid; padding: 4pt'>
+$ cd ~/build_factorial/bin
 $ ./factorial -r -t 1
 Result: 720
 $ ./factorial -r -t 1 -v 8
@@ -187,7 +249,8 @@ Result: 40320
 </pre>
 <p>
 That is it for this tutorial! Please take a look at the other examples and our doxygen to learn even more about HPX.
-<br><br>
+</p>
+<p>
 --Phillip LeBlanc
 </p>
 </div>
