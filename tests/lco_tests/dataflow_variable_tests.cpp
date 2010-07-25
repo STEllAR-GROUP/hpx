@@ -42,15 +42,16 @@ inline gid_type find_there(void)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void print(id_type d_id)
+int print(id_type d_id)
 {
-  typedef typename 
-      lcos::template base_lco_with_value<int>::get_value_action get_action;
+  typedef lcos::base_lco_with_value<int>::get_value_action get_action;
 
   std::cout << "print> print d" << std::endl;
   std::cout << lcos::eager_future<get_action>(d_id).get() << std::endl;
+
+  return 0;
 }
-typedef actions::plain_action1<id_type, print> print_action;
+typedef actions::plain_result_action1<int, id_type, print> print_action;
 HPX_REGISTER_PLAIN_ACTION(print_action);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -70,16 +71,21 @@ int hpx_main(po::variables_map &vm)
         dataflow_int_type d1;
 
         std::cout << ">>> spawning { print d1 } here" << std::endl; 
-        hpx::applier::apply<print_action>(here, d1.get_gid());
+        lcos::future_value<int> 
+            local_spawn(lcos::eager_future<print_action>(here, d1.get_gid()));
 
-        std::cout << ">>> spawning { print d1 } here" << std::endl; 
-        hpx::applier::apply<print_action>(here, d1.get_gid());
-
-        std::cout << ">>> spawning { print d1 } here" << std::endl; 
-        hpx::applier::apply<print_action>(here, d1.get_gid());
+        std::cout << ">>> spawning { print d1 } there" << std::endl; 
+        lcos::future_value<int> 
+            remote_spawn(lcos::eager_future<print_action>(there, d1.get_gid()));
 
         std::cout << ">>> bind(d1, 42)" << std::endl;
-        actions::continuation(d1).trigger<int>(42);
+        actions::continuation(d1.get_gid()).trigger<int>(42);
+
+        // We have to use the eager_future here in order to make sure the
+        // spawned action has completed before we let the dataflow_variable
+        // go out of scope and destruct.
+        local_spawn.get();
+        remote_spawn.get();
     }
 
     // initiate shutdown of the runtime systems on all localities

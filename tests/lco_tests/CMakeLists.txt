@@ -11,8 +11,8 @@ set(TESTS
     #counting_semaphore_test
     #mutex_tests
     #lazy_future_tests
-    thunk_tests
-    dataflow_variable_tests
+    #thunk_tests
+    #dataflow_variable_tests
    )
 
 # build and install each of the tests
