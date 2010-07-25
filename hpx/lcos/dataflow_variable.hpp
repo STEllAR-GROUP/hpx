@@ -61,20 +61,6 @@ namespace hpx { namespace lcos { namespace detail
 
         dataflow_variable() {}
 
-        /// Reset the future_value to allow to restart an asynchronous 
-        /// operation. Allows any subsequent set_data operation to succeed.
-        //void reset()
-        //{
-        //    data_->set_empty();
-        //}
-
-        /// Return whether or not the data is available for this
-        /// \a future_value.
-        //bool is_data()
-        //{
-        //    return !(data_->is_empty());
-        //}
-
         /// Get the value bound to the dataflow variable. The calling
         /// thread is suspended if the variable is uninitialized. When the
         /// variable becomes bound, all waiting threads will be reactivated.
@@ -96,8 +82,9 @@ namespace hpx { namespace lcos { namespace detail
             return boost::get<value_type>(d);
         };
 
-        // helper functions for setting data (if successful) or the error (if
-        // non-successful)
+        /// Bind the variable with a value.
+        ///
+        /// \param value  [in] The value to bind with the variable.
         void bind(RemoteValue const& value)
         {
             data_.set(data_type(find_value<Value, RemoteValue>::call(value)));
@@ -106,7 +93,6 @@ namespace hpx { namespace lcos { namespace detail
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        // bind the value to the dataflow variable
         void set_result(RemoteValue const& value)
         {
             bind(value);
@@ -152,20 +138,6 @@ namespace hpx { namespace lcos { namespace detail
     public:
         dataflow_variable() {}
 
-        /// Reset the future_value to allow to restart an asynchronous 
-        /// operation. Allows any subsequent set_data operation to succeed.
-        //void reset()
-        //{
-        //    data_->set_empty();
-        //}
-
-        /// Return whether or not the data is available for this
-        /// \a future_value.
-        //bool is_data()
-        //{
-        //    return !(data_->is_empty());
-        //}
-
         /// Get the value bound to the dataflow variable. The calling
         /// thread is suspended if the variable is uninitialized. When the
         /// variable becomes bound, all waiting threads will be reactivated.
@@ -187,19 +159,17 @@ namespace hpx { namespace lcos { namespace detail
             return boost::get<naming::id_type>(d);
         };
 
-        // helper functions for setting data (if successful) or the error (if
-        // non-successful)
+        /// Bind the variable with a value.
+        ///
+        /// \param value  [in] The value to bind with the variable.
         void bind(naming::gid_type const& value)
         {
-            // store the value as a managed id
             data_.set(
                 data_type(naming::id_type(value, naming::id_type::managed)));
         }
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
-
-        // trigger the future, set the value
         void set_result(naming::gid_type const& value)
         {
             bind(value);
@@ -231,40 +201,14 @@ namespace hpx { namespace lcos { namespace detail
 namespace hpx { namespace lcos 
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class future_value future_value.hpp hpx/lcos/future_value.hpp
+    /// \class dataflow_variable dataflow_variable.hpp 
+    ///     hpx/lcos/dataflow_variable.hpp
     ///
-    /// A future_value can be used by a single \a thread to invoke a 
-    /// (remote) action and wait for the value. The value is expected to be 
-    /// sent back to the future_value using the LCO's set_event action
-    ///
-    /// A future_value is one of the simplest synchronization primitives 
-    /// provided by HPX. It allows to synchronize on a eager evaluated remote
-    /// operation returning a value of the type \a Value. The \a future_value
-    /// allows to synchronize exactly one \a thread (the one passed during 
-    /// construction time).
-    ///
-    /// \code
-    ///     // Create the future_value (the expected value is a id_type)
-    ///     lcos::future_value<naming::id_type> f;
-    ///
-    ///     // initiate the action supplying the future_value as a 
-    ///     // continuation
-    ///     applier_.appy<some_action>(new continuation(f.get_gid()), ...);
-    ///
-    ///     // Wait for the value to be returned, yielding control 
-    ///     // in the meantime.
-    ///     naming::id_type value = f.get(thread_self);
-    ///     // ...
-    /// \endcode
+    /// A dataflow_variable can be used to synchronize multiple threads on 
+    /// the availability of a value. 
     ///
     /// \tparam Value   The template parameter \a Value defines the type this 
-    ///                  future_value is expected to return from 
-    ///                  \a future_value#get.
-    ///
-    /// \note            The action executed using the future_value as a 
-    ///                  continuation must return a value of a type convertible 
-    ///                  to the type as specified by the template parameter 
-    ///                  \a Value
+    ///                  dataflow_variable is expected to be bound with
     template <typename Value>
     struct dataflow_variable_remote_value
       : boost::mpl::identity<Value>
@@ -278,42 +222,15 @@ namespace hpx { namespace lcos
         typedef components::managed_component<wrapped_type> wrapping_type;
 
     public:
-        /// Construct a new \a future instance. The supplied 
-        /// \a thread will be notified as soon as the value of the 
-        /// operation associated with this future instance has been 
-        /// returned.
-        /// 
-        /// \note         The value of the requested operation is expected to 
-        ///               be returned as the first parameter using a 
-        ///               \a base_lco#set_value action. Any error has to be 
-        ///               reported using a \a base_lco::set_error action. The 
-        ///               target for either of these actions has to be this 
-        ///               future instance (as it has to be sent along 
-        ///               with the action as the continuation parameter).
         dataflow_variable()
           : impl_(new wrapping_type(new wrapped_type()))
-        {
-            LLCO_(info) << "dataflow_variable::dataflow_variable(" << impl_->get_gid() << ")";
-        }
+        {}
 
         /// \brief Return the global id of this \a future instance
         naming::id_type const& get_gid() const
         {
             return (*impl_)->get_gid(impl_.get());
         }
-
-        /// \brief Return the full address of this \a future instance
-//         bool get_full_address(naming::full_address& fa) const
-//         {
-//             return impl_->get_full_address(fa);
-//         }
-
-        /// Reset the future_value to allow to restart an asynchronous 
-        /// operation. Allows any subsequent set_data operation to succeed.
-        //void reset()
-        //{
-        //    (*impl_)->reset();
-        //}
 
     public:
         typedef Value value_type;
@@ -322,10 +239,10 @@ namespace hpx { namespace lcos
         {}
 
     public:
-        /// Get the value of the requested action. This call blocks (yields 
+        /// Get the value of the dataflow_variable. This call blocks (yields 
         /// control) if the value is not ready. As soon as the value has been 
-        /// returned and the waiting thread has been re-scheduled by the thread
-        /// manager the function \a eager_future#get will return.
+        /// bound and the waiting thread has been re-scheduled by the thread
+        /// manager the function \a dataflow_variable#get will return.
         ///
         /// \param self   [in] The \a thread which will be unconditionally
         ///               blocked (yielded) while waiting for the value. 
@@ -359,23 +276,9 @@ namespace hpx { namespace lcos
         typedef components::managed_component<wrapped_type> wrapping_type;
 
     public:
-        /// Construct a new \a future instance. The supplied 
-        /// \a thread will be notified as soon as the value of the 
-        /// operation associated with this future instance has been 
-        /// returned.
-        /// 
-        /// \note         The value of the requested operation is expected to 
-        ///               be returned as the first parameter using a 
-        ///               \a base_lco#set_value action. Any error has to be 
-        ///               reported using a \a base_lco::set_error action. The 
-        ///               target for either of these actions has to be this 
-        ///               future instance (as it has to be sent along 
-        ///               with the action as the continuation parameter).
         dataflow_variable()
           : impl_(new wrapping_type(new wrapped_type()))
-        {
-            LLCO_(info) << "dataflow_variable<void>::dataflow_variable(" << impl_->get_gid() << ")";
-        }
+        {}
 
         /// \brief Return the global id of this \a future instance
         naming::id_type const& get_gid() const
@@ -383,29 +286,16 @@ namespace hpx { namespace lcos
             return (*impl_)->get_gid(impl_.get());
         }
 
-        /// \brief Return the full address of this \a future instance
-//         bool get_full_address(naming::full_address& fa) const
-//         {
-//             return impl_->get_full_address(fa);
-//         }
-
-        /// Reset the future_value to allow to restart an asynchronous 
-        /// operation. Allows any subsequent set_data operation to succeed.
-        //void reset()
-        //{
-        //    (*impl_)->reset();
-        //}
-
     public:
         typedef util::unused_type value_type;
 
         ~dataflow_variable()
         {}
 
-        /// Get the value of the requested action. This call blocks (yields 
+        /// Get the value of the dataflow_variable. This call blocks (yields 
         /// control) if the value is not ready. As soon as the value has been 
-        /// returned and the waiting thread has been re-scheduled by the thread
-        /// manager the function \a eager_future#get will return.
+        /// bound and the waiting thread has been re-scheduled by the thread
+        /// manager the function \a dataflow_variable#get will return.
         ///
         /// \param self   [in] The \a thread which will be unconditionally
         ///               blocked (yielded) while waiting for the value. 
