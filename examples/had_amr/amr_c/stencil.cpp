@@ -75,7 +75,6 @@ namespace hpx { namespace components { namespace amr
         int compute_index;
         bool boundary = false;
         int bbox[2];
-        int numvals = par->nx0/par->granularity;
 
         // initialize bounding box
         bbox[0] = 0;
@@ -90,6 +89,7 @@ namespace hpx { namespace components { namespace amr
         }
 
         if ( tval[0]->level_ == 0 ) {
+          int numvals = par->nx0/par->granularity;
           if ( column == 0 ) {
             // indicate a physical boundary
             boundary = true;
@@ -125,7 +125,7 @@ namespace hpx { namespace components { namespace amr
             // indicate a physical boundary
             boundary = true;
             bbox[0] = 1;
-          } else if ( column == val[0]->max_index_-1 && floatcmp(par->maxx0,tval[compute_index]->x_[par->granularity-1]) ) {
+          } else if ( column == val[0]->max_index_-1 && floatcmp(par->maxx0,tval[compute_index]->x_[tval[compute_index]->granularity-1]) ) {
             boundary = true;
             bbox[1] = 1;
           }
@@ -135,7 +135,7 @@ namespace hpx { namespace components { namespace amr
         std::size_t count = 0;
         std::size_t adj_index = -1;
         for (i=0;i<tval.size();i++) {
-          for (j=0;j<par->granularity;j++) {
+          for (j=0;j<tval[i]->granularity;j++) {
             vecval.push_back(tval[i]->value_[j]);
             vecx.push_back(tval[i]->x_[j]);
             if ( i == compute_index && adj_index == -1 ) {
@@ -145,7 +145,7 @@ namespace hpx { namespace components { namespace amr
           }
         }
 
-        for (j=0;j<par->granularity;j++) {
+        for (j=0;j<tval[compute_index]->granularity;j++) {
           resultval->x_.push_back(tval[compute_index]->x_[j]);
         }
 
@@ -160,8 +160,9 @@ namespace hpx { namespace components { namespace amr
             resultval->level_ = val[0]->level_;
             resultval->cycle_ = val[0]->cycle_ + 1;
             resultval->max_index_ = tval[compute_index]->max_index_;
+            resultval->granularity = tval[compute_index]->granularity;
             resultval->index_ = tval[compute_index]->index_;
-            resultval->value_.resize(par->granularity);
+            resultval->value_.resize(tval[compute_index]->granularity);
             had_double_type dt = par->dt0/pow(2.0,(int) val[0]->level_);
             had_double_type dx = par->dx0/pow(2.0,(int) val[0]->level_); 
             
@@ -188,7 +189,7 @@ namespace hpx { namespace components { namespace amr
                  && val[0]->timestep_ >= 1.e-6  ) {
               finer_mesh(result, gids,vecval.size(),tval.size(),resultval->level_+1,resultval->x_[0], compute_index, row, column, par);
             } else {
-              resultval->overwrite_alloc_ = 0;
+              resultval->overwrite_alloc_ = false;
             }
 
             // One special case: refining at time = 0
@@ -242,8 +243,8 @@ namespace hpx { namespace components { namespace amr
 
       std::size_t numvals;
 
-      numvals = 2*size-1;
-      BOOST_ASSERT(size*par->granularity == vecvalsize);
+      numvals = 2*size;
+      //BOOST_ASSERT(size*par->granularity == vecvalsize);
 
       prep_initial_data(initial_data,gids,vecvalsize,size,row,column,numvals,par);
 
@@ -256,51 +257,28 @@ namespace hpx { namespace components { namespace amr
       // prepare for restriction
       prep_restriction_data(result_data,compute_index,numvals,size,par);
 
-#if 0
-      // prepare for restriction
-      std::size_t mid;
-      if ( size == 3 ) {
-        mid = size;
-      } else if ( size == 2 ) {
-        if (compute_index == 0) mid = 0;
-        else mid = numvals-1;
-      } else {
-        BOOST_ASSERT(false);
-      }
-
       access_memory_block<stencil_data> left,overwrite,right, resultval;
-      if ( size == 3 ) {
-        boost::tie(left,overwrite,right, resultval) =
-              get_memory_block_async<stencil_data>(result_data[mid-1],result_data[mid],result_data[mid+1], result);
-      } else if ( size == 2 && mid == 0 ) {
-        boost::tie(overwrite,right, resultval) =
-              get_memory_block_async<stencil_data>(result_data[mid],result_data[mid+1], result);
-      } else if ( size == 2 && mid == numvals-1 ) {
-        boost::tie(left,overwrite, resultval) =
-              get_memory_block_async<stencil_data>(result_data[mid-1],result_data[mid], result);
-      } else {
-        BOOST_ASSERT(false);
-      }
+      boost::tie(overwrite, resultval) =
+            get_memory_block_async<stencil_data>(result_data[compute_index], result);
 
       resultval->overwrite_alloc_ = true;
-    // restriction
-    //  resultval->value_ = overwrite->value_;
+      resultval->overwrite_ = result_data[compute_index];
+      //resultval->value_ = overwrite->value_;
  
       // remember neighbors
-      if ( mid != numvals-1 ) {
-        overwrite->right_alloc_ = true;
-        overwrite->right_ = result_data[mid+1];
-      } else {
-        overwrite->right_alloc_ = false;
-      }
-
-      if ( mid != 0 ) {
+      if ( compute_index > 0 ) {
         overwrite->left_alloc_ = true;
-        overwrite->left_ = result_data[0];
+        overwrite->left_ = result_data[compute_index-1];
       } else {
         overwrite->left_alloc_ = false;
       }
-#endif
+
+      if ( compute_index < size-1 ) {
+        overwrite->right_alloc_ = true;
+        overwrite->right_ = result_data[compute_index+1];
+      } else {
+        overwrite->right_alloc_ = false;
+      }
 
       //for (std::size_t i = 0; i < result_data.size(); ++i) {
         // free all
@@ -314,6 +292,7 @@ namespace hpx { namespace components { namespace amr
     int stencil::prep_restriction_data(std::vector<naming::id_type> & result_data,
                           std::size_t compute_index,std::size_t numvals,std::size_t size, Parameter const& par)
     {
+
       std::vector<access_memory_block<stencil_data> > mval;
       get_memory_block_async(mval,result_data);
       int i,j,k;
@@ -324,7 +303,7 @@ namespace hpx { namespace components { namespace amr
       x.resize(numvals*par->granularity);
 
       for (i=0;i<numvals;i++) {
-        for (j=0;j<par->granularity;j++) {
+        for (j=0;j<mval[i]->granularity;j++) {
           x[j + i*par->granularity] = mval[i]->x_[j];
           for (k=0;k<num_eqns;k++) {
             phi[k + num_eqns*(j+i*par->granularity)] = mval[i]->value_[j].phi[0][k];
@@ -336,34 +315,34 @@ namespace hpx { namespace components { namespace amr
       std::size_t count1 = 0;
       std::size_t count2 = 0;
       std::size_t step1 = 0;
-      std::size_t step2;
+      std::size_t step2 = size;
 
-      if ( size == 3 ) step2 = 3;
-      else if ( size == 2 ) step2 = 2;
-      else {
-        BOOST_ASSERT(false);
-      }
-#if 0
       for (i=0;i<numvals;i++) {
-        for (j=0;j<par->granularity;j++) {
+        for (j=0;j<mval[i]->granularity;j++) {
           if (count%2 == 0) {
+            if ( step1 == numvals ) {
+              BOOST_ASSERT(false);
+            }
             mval[step1]->x_[count1] = x[j+i*par->granularity];
             for (k=0;k<num_eqns;k++) {
               mval[step1]->value_[count1].phi[0][k] = phi[k + num_eqns*(j+i*par->granularity)];
             }
             count1++;
-            if (count1 == par->granularity) {
+            if (count1 == mval[step1]->granularity) {
               count1 = 0;
               step1++;
             }
             
           } else {
+            if ( step2 == numvals ) {
+              BOOST_ASSERT(false);
+            }
             mval[step2]->x_[count2] = x[j+i*par->granularity];
             for (k=0;k<num_eqns;k++) {
               mval[step2]->value_[count2].phi[0][k] = phi[k + num_eqns*(j+i*par->granularity)];
             }
             count2++;
-            if (count2 == par->granularity) {
+            if (count2 == mval[step2]->granularity) {
               count2 = 0;
               step2++;
             }
@@ -371,7 +350,6 @@ namespace hpx { namespace components { namespace amr
           count++;
         }
       }
-#endif
 
       return 0;
     };
@@ -383,8 +361,8 @@ namespace hpx { namespace components { namespace amr
                     std::size_t row,std::size_t column,std::size_t numvals, Parameter const& par) 
     {
       int i,j,k;
-      naming::id_type gval[5];
-      access_memory_block<stencil_data> mval[5];
+      naming::id_type gval[6];
+      access_memory_block<stencil_data> mval[6];
 
       int std_index;
       if ( gids.size() != vecvalsize ) {
@@ -392,109 +370,95 @@ namespace hpx { namespace components { namespace amr
       } else {
         std_index = 0;
       }
+
       if ( size == 3 ) {
-        boost::tie(gval[0],gval[1],gval[2],gval[3],gval[4]) = components::wait(components::stubs::memory_block::clone_async(gids[std_index]), 
+        boost::tie(gval[0],gval[1],gval[2],gval[3],gval[4],gval[5]) = components::wait(components::stubs::memory_block::clone_async(gids[std_index]), 
                                                                                components::stubs::memory_block::clone_async(gids[std_index+1]),
                                                                                components::stubs::memory_block::clone_async(gids[std_index+2]),
                                                                                components::stubs::memory_block::clone_async(gids[std_index]),
+                                                                               components::stubs::memory_block::clone_async(gids[std_index]),
                                                                                components::stubs::memory_block::clone_async(gids[std_index]));
-        boost::tie(mval[0],mval[1],mval[2],mval[3],mval[4]) = 
-          get_memory_block_async<stencil_data>(gval[0], gval[1], gval[2], gval[3], gval[4]);
+        boost::tie(mval[0],mval[1],mval[2],mval[3],mval[4],mval[5]) = 
+          get_memory_block_async<stencil_data>(gval[0], gval[1], gval[2], gval[3], gval[4],gval[5]);
+   
       } else if ( size == 2 ) {
-        boost::tie(gval[0],gval[1],gval[2]) = components::wait(components::stubs::memory_block::clone_async(gids[std_index]), 
-                                                                       components::stubs::memory_block::clone_async(gids[std_index+1]),
-                                                                       components::stubs::memory_block::clone_async(gids[std_index]));
-        boost::tie(mval[0],mval[1],mval[2]) = 
-          get_memory_block_async<stencil_data>(gval[0], gval[1], gval[2]);
+        boost::tie(gval[0],gval[1],gval[2],gval[3]) = components::wait(components::stubs::memory_block::clone_async(gids[std_index]), 
+                                                       components::stubs::memory_block::clone_async(gids[std_index+1]),
+                                                       components::stubs::memory_block::clone_async(gids[std_index]),
+                                                       components::stubs::memory_block::clone_async(gids[std_index]));
+
+        boost::tie(mval[0],mval[1],mval[2],mval[3]) = 
+          get_memory_block_async<stencil_data>(gval[0], gval[1],gval[2],gval[3]);
+
       } else {
         BOOST_ASSERT(false);
       }
 
-      for (i=0;i<2*size-1;i++) {
+      for (i=0;i<2*size;i++) {
         // increase the level by one
         ++mval[i]->level_;
         mval[i]->index_ = i;
         mval[i]->iter_ = 0;
-        mval[i]->max_index_ = 2*size-1;
-      }
-
-      // work arrays
-      std::vector<had_double_type> phi,x;
-      phi.resize(size*par->granularity*num_eqns);
-      x.resize(size*par->granularity);
-      for (i=0;i<size;i++) {
-        for (j=0;j<par->granularity;j++) {
-          x[j + i*par->granularity] = mval[i]->x_[j];
-          for (k=0;k<num_eqns;k++) {
-            phi[k + num_eqns*(j+i*par->granularity)] = mval[i]->value_[j].phi[0][k];
-          }
+        mval[i]->max_index_ = 2*size;
+        if ( i > size ) {
+          mval[i]->left_alloc_ = false;
+          mval[i]->right_alloc_ = false;
+          mval[i]->overwrite_alloc_ = false;
         }
       }
 
-      // interpolate
-      //for (i=1;i<2*size-2;i = i+2) {
-      //  mval[i]->left_alloc_ = false;
-      //  mval[i]->right_alloc_ = false;
-      //  mval[i]->overwrite_alloc_ = false;
-      //
-      //  for (j=0;j<par->granularity;j++) {
-      //    for (k=0;k<num_eqns;k++) {
-      //      mval[i]->value_[j].phi[0][k] = 0.5*(mval[i-1]->value_[j].phi[0][k] + mval[i+1]->value_[j].phi[0][k]);  
-      //    }
-      //    mval[i]->x_[j] = 0.5*(mval[i-1]->x_[j] + mval[i+1]->x_[j]);  
+      // the last gid of the AMR mesh has a slightly smaller granularity
+      mval[2*size-1]->granularity = mval[2*size-1]->granularity-1;
+
+      // interpolate x values
+      for (i=0;i<size;i++) {
+        for (j=0;j<mval[i]->granularity-1;j++) {
+          mval[i+size]->x_[j] = 0.5*(mval[i]->x_[j] + mval[i]->x_[j+1]); 
+        }
+
+        if ( mval[i+size]->granularity > mval[i]->granularity-1 ) {
+          // last point to fill
+          BOOST_ASSERT(i+1 < size );
+          mval[i+size]->x_[ mval[i+size]->granularity-1 ] = 0.5*(mval[i]->x_[mval[i]->granularity-1] + mval[i+1]->x_[0]);
+        }
+      }
+
+      // all x values should be interpolated now
+      // TEST
+      //for (i=0;i<2*size;i++) {
+      //  for (j=0;j<mval[i]->granularity;j++) {
+      //    std::cout << " TEST x " << i << " " << j << " out of " << mval[i]->granularity << " x: " << mval[i]->x_[j] << std::endl;
       //  }
       //}
-      std::size_t count=0;
-      std::size_t count_i=0;
-      std::size_t count_j=0;
-      for (i=0;i<2*size-1;i++) {
-        for (j=0;j<par->granularity;j++) {
-
-          if ( count%2 == 0 ) {
-            mval[i]->x_[j] = x[count_j+count_i*par->granularity];
+      
+      int s;
+      for (i=0;i<size;i++) {
+        s = findpoint(mval[i],mval[i+1],mval[i+size]);
+        // TEST
+        s = 0;
+        //std::cout << " TEST findpoint s: " << s << " i " << i << std::endl;
+        if ( s == 0 ) { 
+          // point not found -- interpolate
+          for (j=0;j<mval[i]->granularity-1;j++) {
             for (k=0;k<num_eqns;k++) {
-              mval[i]->value_[j].phi[0][k] = phi[k + num_eqns*(count_j + count_i*par->granularity)];
-            }
-            count_j++;
-            if ( count_j == par->granularity ) { 
-              count_j = 0;
-              count_i++;
+              mval[i+size]->value_[j].phi[0][k] = 0.5*(mval[i]->value_[j].phi[0][k] + mval[i]->value_[j+1].phi[0][k] );
             }
           }
-          count++;
+
+          if ( mval[i+size]->granularity > mval[i]->granularity-1 ) {
+            // last point to fill
+            BOOST_ASSERT(i+1 < size );
+            mval[i+size]->x_[ mval[i+size]->granularity-1 ] = 0.5*(mval[i]->x_[mval[i]->granularity-1] + mval[i+1]->x_[0]);
+            for (k=0;k<num_eqns;k++) {
+              mval[i+size]->value_[ mval[i+size]->granularity-1  ].phi[0][k] = 
+                                                     0.5*(mval[i]->value_[mval[i]->granularity-1].phi[0][k] + mval[i+1]->value_[0].phi[0][k]);
+            }
+          }
+
         }
       }
 
-      // interpolate
-      count = 0;
-      for (i=0;i<2*size-1;i++) {
-        for (j=0;j<par->granularity;j++) {
-
-          if ( count%2 == 1 ) {
-            if ( j > 0 && j < par->granularity-1 ) {
-              mval[i]->x_[j] = 0.5*(mval[i]->x_[j-1] + mval[i]->x_[j+1]);
-              for (k=0;k<num_eqns;k++) {
-                mval[i]->value_[j].phi[0][k] = 0.5*(mval[i]->value_[j-1].phi[0][k] + mval[i]->value_[j+1].phi[0][k] );
-              }
-            } else if ( j+1 == par->granularity && i+1 < 2*size-1 ) {
-              mval[i]->x_[j] = 0.5*(mval[i]->x_[j-1] + mval[i+1]->x_[0]);
-              for (k=0;k<num_eqns;k++) {
-                mval[i]->value_[j].phi[0][k] = 0.5*(mval[i]->value_[j-1].phi[0][k] + mval[i+1]->value_[0].phi[0][k] );
-              }
-            } else if ( j == 0 && i-1 >= 0 ) {
-              mval[i]->x_[j] = 0.5*(mval[i-1]->x_[par->granularity-1] + mval[i]->x_[j+1]);
-              for (k=0;k<num_eqns;k++) {
-                mval[i]->value_[j].phi[0][k] = 0.5*(mval[i-1]->value_[par->granularity-1].phi[0][k] + mval[i]->value_[j+1].phi[0][k] );
-              }
-            } else {
-              BOOST_ASSERT(false);
-            }
-          }
-          count++;
-        }
-      }
-
-      for (i=0;i<2*size-1;i++) {
+      for (i=0;i<2*size;i++) {
         initial_data.push_back(gval[i]);
       }
 
@@ -566,52 +530,39 @@ namespace hpx { namespace components { namespace amr
       int numsteps = 2 * 3; // three subcycles each step
       int numvals;
 
-      numvals = 2*size-1;
+      numvals = 2*size;
 
       hpx::components::amr::unigrid_mesh unigrid_mesh;
       unigrid_mesh.create(here);
       result_data = unigrid_mesh.init_execute(function_type, numvals, numsteps,
             do_logging ? logging_type : components::component_invalid,level,xmin, par);
 
-#if 0
-      std::size_t mid;
-      if ( size == 3 ) {
-        mid = size;
-      } else if ( size == 2 ) {
-        if (compute_index == 0) mid = 0;
-        else mid = numvals-1;
-      } else {
-        BOOST_ASSERT(false);
-      }
+      // prepare for restriction
+      prep_restriction_data(result_data,compute_index,numvals,size,par);
 
-      access_memory_block<stencil_data> overwrite, resultval;
+      access_memory_block<stencil_data> left,overwrite,right, resultval;
       boost::tie(overwrite, resultval) =
-            get_memory_block_async<stencil_data>(result_data[mid], result);
+            get_memory_block_async<stencil_data>(result_data[compute_index], result);
 
       resultval->overwrite_alloc_ = true;
-      resultval->value_ = overwrite->value_;
+      resultval->overwrite_ = result_data[compute_index];
+      //resultval->value_ = overwrite->value_;
  
       // remember neighbors
-      if ( mid != numvals-1 ) {
-        overwrite->right_alloc_ = true;
-        overwrite->right_ = result_data[mid+1];
-      } else {
-        overwrite->right_alloc_ = false;
-      }
-
-      if ( mid != 0 ) {
+      if ( compute_index > 0 ) {
         overwrite->left_alloc_ = true;
-        overwrite->left_ = result_data[0];
+        overwrite->left_ = result_data[compute_index-1];
       } else {
         overwrite->left_alloc_ = false;
       }
 
-      //for (std::size_t i = 0; i < result_data.size(); ++i) {
-        // free all
-      //  components::stubs::memory_block::free(result_data[i]);
-      //}
+      if ( compute_index < size-1 ) {
+        overwrite->right_alloc_ = true;
+        overwrite->right_ = result_data[compute_index+1];
+      } else {
+        overwrite->right_alloc_ = false;
+      }
 
-#endif
       return 0;
     }
 
@@ -644,9 +595,9 @@ namespace hpx { namespace components { namespace amr
                            access_memory_block<stencil_data> const& anchor_to_the_right, 
                            access_memory_block<stencil_data> & resultval) 
     {
-#if 0
       // the pinball machine
       int s = 0;
+      int sup = resultval->granularity-1;
       access_memory_block<stencil_data> amb0;
       amb0 = anchor_to_the_left;
       if (s == 0 && amb0->overwrite_alloc_ == 1) {
@@ -655,7 +606,7 @@ namespace hpx { namespace components { namespace amr
         // look around
         if ( amb1->right_alloc_ == 1 ) {
           access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->right_);
-          if ( floatcmp(amb2->x_,resultval->x_) ) {
+          if ( floatcmp(amb2->x_[0],resultval->x_[0]) || floatcmp(amb2->x_[0],resultval->x_[sup]) ) {
             resultval->value_ = amb2->value_;
             resultval->refine_ = amb2->refine_;
             // transfer overwrite information as well
@@ -677,7 +628,7 @@ namespace hpx { namespace components { namespace amr
 
         if ( s == 0 && amb1->left_alloc_) {
           access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->left_);
-          if ( floatcmp(amb2->x_,resultval->x_) ) {
+          if ( floatcmp(amb2->x_[0],resultval->x_[0]) || floatcmp(amb2->x_[0],resultval->x_[sup]) ) {
             resultval->value_ = amb2->value_;
             resultval->refine_ = amb2->refine_;
             // transfer overwrite information as well
@@ -706,7 +657,7 @@ namespace hpx { namespace components { namespace amr
         // look around
         if ( amb1->right_alloc_ == 1 ) {
           access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->right_);
-          if ( floatcmp(amb2->x_,resultval->x_) ) {
+          if ( floatcmp(amb2->x_[0],resultval->x_[0]) || floatcmp(amb2->x_[0],resultval->x_[sup]) ) {
             resultval->value_ = amb2->value_;
             resultval->refine_ = amb2->refine_;
             // transfer overwrite information as well
@@ -727,7 +678,7 @@ namespace hpx { namespace components { namespace amr
 
         if (s == 0 && amb1->left_alloc_) {
           access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->left_);
-          if ( floatcmp(amb2->x_,resultval->x_) ) {
+          if ( floatcmp(amb2->x_[0],resultval->x_[0]) || floatcmp(amb2->x_[0],resultval->x_[sup]) ) {
             resultval->value_ = amb2->value_;
             resultval->refine_ = amb2->refine_;
             // transfer overwrite information as well
@@ -748,8 +699,6 @@ namespace hpx { namespace components { namespace amr
       }
 
       return s;
-#endif
-      return 0;
     }
 
     void stencil::init(std::size_t numsteps, naming::id_type const& logging)

@@ -62,6 +62,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->left_alloc_ = false;
     val->overwrite_alloc_ = false;
 
+    val->granularity = par.granularity;
     val->x_.resize(par.granularity);
     val->value_.resize(par.granularity);
 
@@ -141,7 +142,7 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
 
 //#if 0
   if ( iter == 0 ) {
-    for (j=0;j<par.granularity;j++) {
+    for (j=0;j<result->granularity;j++) {
       calcrhs(&rhs,vecval,vecx,0,dx,size,boundary,bbox,j+compute_index,par);
       for (i=0;i<num_eqns;i++) {
         work.phi[0][i] = vecval[j+compute_index].phi[0][i];
@@ -164,7 +165,7 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
     // no timestep update-- this is just a part of an rk subcycle
     result->timestep_ = timestep;
   } else if ( iter == 1 ) {
-    for (j=0;j<par.granularity;j++) {
+    for (j=0;j<result->granularity;j++) {
       calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
       for (i=0;i<num_eqns;i++) {
         work.phi[0][i] = vecval[j+compute_index].phi[0][i];
@@ -188,7 +189,7 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
     // no timestep update-- this is just a part of an rk subcycle
     result->timestep_ = timestep;
   } else if ( iter == 2 ) {
-    for (j=0;j<par.granularity;j++) {
+    for (j=0;j<result->granularity;j++) {
       calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
       for (i=0;i<num_eqns;i++) {
         work.phi[0][i] = 1./3*vecval[j+compute_index].phi[0][i]
@@ -397,7 +398,7 @@ int interpolation(had_double_type dst_x,struct nodedata *dst,
 bool refinement(nodedata * vecval,int size, stencil_data* result,int compute_index,bool boundary, int *bbox,Par const& par)
 {
   int j;
-  for (j=0;j<par.granularity;j++) {
+  for (j=0;j<result->granularity;j++) {
     if ( result->x_[j] < par.fmr_radius ) return true;
   }
   return false;
