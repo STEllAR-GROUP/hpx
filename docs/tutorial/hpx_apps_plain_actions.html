@@ -54,21 +54,6 @@ namespace po = boost::program_options;
 </pre>
 <p>
 As you can see we include quite a number of things from hpx and boost. 
-Next we will include a typedef and a helper function.
-</p>
-<pre style='border: solid; padding: 4pt'>
-typedef hpx::naming::gid_type gid_type;
-
-inline gid_type find_here(void)
-{
-        return hpx::applier::get_applier().get_runtime_support_raw_gid();
-}
-</pre>
-
-<p>
-We made the <code>gid_type</code> (global id type) from <code>hpx::naming</code> a little shorter to write and included a helper function that returns the gid of the locality we are running on.
-These aid in the keeping the example code readable.
-<br>
 Now we will define our factorial function.
 To refresh your memory here is the regular recursive version.
 </p>
@@ -109,10 +94,11 @@ double fact(double n)
         return 1;
 
     // We have to specify which locality to spawn this future on,
-    // and we want to spawn it on this locality
-    gid_type here = find_here();
+    // and we want to spawn it on the logical 'next' locality
+    // (if there is one)
+    naming::gid_type there = get_runtime().next();
 
-    factorial_future future(here, n - 1);
+    factorial_future future(there, n - 1);
 
     return n * future.get();
 }
@@ -135,7 +121,7 @@ int hpx_main(po::variables_map &amp;vm)
     if (vm.count("value"))
         argument = vm["value"].as&lt;double&gt;();
 
-    gid_type here = find_here();
+    naming::gid_type here = get_runtime().here();
 
     factorial_future future(here, argument);
 
@@ -150,8 +136,9 @@ int hpx_main(po::variables_map &amp;vm)
 }
 </pre>
 <p>
-Not too complicated, the only tricky thing is to make sure we properly shut down the runtime. We only wrote this program to work with just one locality, but if we had more then we would need to have that last statement or else they other localities would hang.
-<br>
+Not too complicated, the only tricky thing is to make sure we properly shut down the runtime.
+</p>
+<p>
 Now we write <code>main()</code>. Since all of the work for our program is in <code>hpx_main()</code>, we only use <code>main()</code> for declaring which command line arguments we want to support and then initialize the runtime system.
 </p>
 <pre style='border: solid; padding: 4pt'>
