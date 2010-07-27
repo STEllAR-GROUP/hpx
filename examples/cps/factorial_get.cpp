@@ -20,32 +20,12 @@ using namespace hpx;
 namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Helpers
-typedef hpx::naming::id_type id_type;
-typedef hpx::naming::gid_type gid_type;
-
-// For a multi-locality run, this returns some locality that is not L0 
-// (where the main thread was spawned). This guarantees that the "get()"
-// of the factorial value at the tail end of the recursion is remote.
-inline gid_type find_somewhere_but_home(int i)
-{
-  std::vector<gid_type> locales;
-  hpx::applier::get_applier().get_agas_client().get_prefixes(locales);
-
-  int location = i%locales.size();
-  if (location == 0 && locales.size() > 1)
-    location = 1;
-
-  return locales[location];
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // More helpers
 template<typename Action, typename Arg0>
 inline void apply(Arg0 arg0, id_type k, id_type h)
 {
   naming::id_type 
-      somewhere(find_somewhere_but_home(arg0), naming::id_type::unmanaged);
+      somewhere(get_runtime().get_process().next(), naming::id_type::unmanaged);
   hpx::applier::apply<Action>(somewhere, arg0, k, h);
 }
 
@@ -53,7 +33,7 @@ template<typename Action, typename Arg0, typename Arg1>
 inline void apply(Arg0 arg0, Arg1 arg1, id_type k, id_type h)
 {
   naming::id_type 
-      somewhere(find_somewhere_but_home(arg0), naming::id_type::unmanaged);
+      somewhere(get_runtime().get_process().next(), naming::id_type::unmanaged);
   hpx::applier::apply<Action>(somewhere, arg0, arg1, k, h);
 }
 

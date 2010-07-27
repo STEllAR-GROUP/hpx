@@ -16,6 +16,18 @@
 using namespace hpx;
 namespace po = boost::program_options;
 
+///////////////////////////////////////////////////////////////////////////////
+// Helpers
+typedef hpx::naming::id_type id_type;
+typedef hpx::naming::gid_type gid_type;
+
+inline gid_type find_here(void)
+{
+  return get_runtime().get_process().here();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 int hpx_main(po::variables_map &vm);
 
 bool parse_commandline(po::options_description& app_options, int argc, char *argv[], po::variables_map& vm)

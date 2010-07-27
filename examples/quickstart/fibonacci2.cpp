@@ -80,7 +80,7 @@ int fib (gid_type there, int n, int delay_coeff)
 
     // execute the first fib() at the other locality, returning here afterwards
     // execute the second fib() here, forwarding the correct prefix
-    gid_type here = get_runtime().here();
+    gid_type here = get_runtime().get_process().here();
     fibonacci_future n1(there, here, n - 1, delay_coeff);
     fibonacci_future n2(here, there, n - 2, delay_coeff);
 
@@ -106,8 +106,9 @@ int hpx_main(po::variables_map &vm)
     argument = boost::lexical_cast<int>(
         rt.get_config().get_entry("application.fibonacci2.argument", argument));
 
-    gid_type here = get_runtime().here();
-    gid_type there = get_runtime().next();
+    process my_proc(get_runtime().get_process());
+    gid_type here = my_proc.here();
+    gid_type there = my_proc.next();
 
     {
         util::high_resolution_timer t;
