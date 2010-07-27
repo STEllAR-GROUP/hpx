@@ -23,35 +23,6 @@ namespace po = boost::program_options;
 // Helpers
 typedef hpx::naming::gid_type gid_type;
 
-inline gid_type find_here(void)
-{
-    return hpx::applier::get_applier().get_runtime_support_raw_gid();
-}
-
-struct px
-{
-public:
-  px() 
-  {
-    applier::get_applier().get_agas_client().get_prefixes(localities_);
-    num_localities_ = localities_.size();
-  }
-
-  gid_type locality(int locality_id)
-  {
-    return localities_[locality_id];
-  }
-
-  int num_localities(void)
-  {
-    return num_localities_;
-  }
-
-private:
-  std::vector<gid_type> localities_;
-  int num_localities_;
-};
-
 ///////////////////////////////////////////////////////////////////////////////
 // int fib(int n)
 // {
@@ -109,7 +80,7 @@ int fib (gid_type there, int n, int delay_coeff)
 
     // execute the first fib() at the other locality, returning here afterwards
     // execute the second fib() here, forwarding the correct prefix
-    gid_type here = find_here();
+    gid_type here = get_runtime().here();
     fibonacci_future n1(there, here, n - 1, delay_coeff);
     fibonacci_future n2(here, there, n - 2, delay_coeff);
 
@@ -135,10 +106,8 @@ int hpx_main(po::variables_map &vm)
     argument = boost::lexical_cast<int>(
         rt.get_config().get_entry("application.fibonacci2.argument", argument));
 
-    px world;
-
-    gid_type here = world.locality(0);
-    gid_type there = world.locality(1 % world.num_localities());
+    gid_type here = get_runtime().here();
+    gid_type there = get_runtime().next();
 
     {
         util::high_resolution_timer t;

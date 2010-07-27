@@ -245,6 +245,28 @@ namespace hpx
             }
         }
 
+        // Set localities prefixes once per runtime instance. This should
+        // work fine until we support adding and removing localities.
+        {
+          std::size_t here_lid;
+          naming::gid_type tmp_here(applier_.get_runtime_support_raw_gid());
+
+          std::vector<naming::gid_type> tmp_localities;
+          agas_client_.get_prefixes(tmp_localities);
+
+          for (int i = 0; i< tmp_localities.size(); i++)
+          {
+            naming::gid_type there = tmp_localities[i];
+            if (tmp_here.get_msb() == there.get_msb())
+            {
+              here_lid = i;
+              break;
+            }
+          }
+
+          this->runtime::set_localities(here_lid, tmp_localities);
+        }
+
         // register the given main function with the thread manager
         threads::thread_init_data data(
             boost::bind(&runtime_impl::run_helper, this, func, boost::ref(result_)), 

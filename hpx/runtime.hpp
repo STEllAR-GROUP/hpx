@@ -132,12 +132,57 @@ namespace hpx
             return (std::size_t)instance_number_;
         }
 
+        ////////////////////////////////////////////////////////////////////////
+        // Locality helpers
+        void set_localities(std::size_t here_lid,
+                            std::vector<naming::gid_type>& localities)
+        {
+            here_lid_ = here_lid;
+            for (int i=0; i<localities.size(); i++)
+              localities_.push_back(localities[i]);
+        }
+
+        std::vector<naming::gid_type> const& get_localities(void) const
+        {
+          return localities_;
+        }
+
+        // Return the GID of this locality
+        naming::gid_type here() const
+        {
+            return localities_[here_lid_];
+        }
+
+        // Return the GID of the locality with the given logical ID 
+        naming::gid_type there(std::size_t lid) const
+        {
+            lid = lid % localities_.size();
+            return localities_[lid];
+        }
+
+        // Return the GID of the "next" locality in the circular list
+        // of localities
+        naming::gid_type next(void) const
+        {
+            return there(here_lid_+1);
+        }
+
+        // Return the GID of the "previous" locality in the circular list
+        // of localities
+        naming::gid_type prev(void) const
+        {
+            return there(here_lid_ == 0 ? localities_.size()-1 : here_lid_-1);
+        }
+
     protected:
         void init_tss();
         void deinit_tss();
 
     protected:
         performance_counters::registry counters_;
+
+        std::size_t here_lid_;
+        std::vector<naming::gid_type> localities_;
 
         // list of functions to call on exit
         typedef std::vector<boost::function<void()> > on_exit_type;
