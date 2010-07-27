@@ -91,8 +91,8 @@ typedef hpx::lcos::dataflow_variable<int,int> dataflow_int_type;
 int hpx_main(po::variables_map &vm)
 {
     int n = -1;
-    if (vm.count("value"))
-      n = vm["value"].as<int>();
+    
+    get_option(vm, "value", n);
 
     {
         std::cout << ">>> k1 = dataflow_variable()" << std::endl;

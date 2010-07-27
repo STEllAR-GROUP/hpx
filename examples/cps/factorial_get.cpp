@@ -117,8 +117,8 @@ typedef hpx::lcos::dataflow_variable<int,int> dataflow_int_type;
 int hpx_main(po::variables_map &vm)
 {
     int n = 0;
-    if (vm.count("value"))
-      n = vm["value"].as<int>();
+
+    get_option(vm, "value", n);
 
     // Create DFV to guard against premature termination of main thread
     dataflow_int_type halt;
