@@ -95,16 +95,9 @@ int hpx_main(po::variables_map &vm)
     int result = 0;
     double elapsed = 0.0;
 
-    // Process application-specific command-line options
-    if (vm.count("value"))
-        argument = vm["value"].as<int>();
-    if (vm.count("busywait"))
-        delay_coeff = vm["busywait"].as<int>();
-
-    // Try to get arguments from application configuration
-    runtime& rt = get_runtime();
-    argument = boost::lexical_cast<int>(
-        rt.get_config().get_entry("application.fibonacci2.argument", argument));
+    //// Process application-specific command-line options
+    get_option(vm, "value", argument, "application.fibonacci2.argument");
+    get_option(vm, "busywait", delay_coeff);
 
     process my_proc(get_runtime().get_process());
     gid_type here = my_proc.here();

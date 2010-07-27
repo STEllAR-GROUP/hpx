@@ -27,6 +27,21 @@ inline gid_type find_here(void)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename T>
+inline void get_option(po::variables_map& vm, 
+                       std::string const name, 
+                       T& x, 
+                       std::string const app_name="")
+{
+  if (vm.count(name)) 
+    x = vm[name].as<T>();
+
+  if ("" != app_name)
+    x = boost::lexical_cast<T>(
+        get_runtime().get_config().get_entry(app_name, x));
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 int hpx_main(po::variables_map &vm);
 
