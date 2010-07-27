@@ -264,7 +264,7 @@ namespace hpx
             }
           }
 
-          this->runtime::set_localities(here_lid, tmp_localities);
+          this->runtime::get_process().set_localities(here_lid, tmp_localities);
         }
 
         // register the given main function with the thread manager

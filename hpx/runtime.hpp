@@ -33,6 +33,65 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx 
 {
+    struct process {
+    protected:
+        friend class hpx::runtime_impl<
+            hpx::threads::policies::global_queue_scheduler, 
+            hpx::threads::policies::callback_notifier>;
+        
+        friend class hpx::runtime_impl<
+            hpx::threads::policies::local_queue_scheduler, 
+            hpx::threads::policies::callback_notifier>;
+
+        void set_localities(std::size_t here_lid,
+                            std::vector<naming::gid_type>& localities)
+        {
+            BOOST_ASSERT(0 == localities_.size());
+            here_lid_ = here_lid;
+            for (int i=0; i<localities.size(); i++)
+              localities_.push_back(localities[i]);
+        }
+
+    public:
+        // Return the number of localities allocated to this process
+        std::size_t const size() const
+        {
+            return localities_.size();
+        }
+
+        // Return the GID of this locality
+        naming::gid_type const here() const
+        {
+            return localities_[here_lid_];
+        }
+
+        // Return the GID of the locality with the given logical ID 
+        naming::gid_type const there(std::size_t lid) const
+        {
+            lid = lid % localities_.size();
+            return localities_[lid];
+        }
+
+        // Return the GID of the "next" locality in the circular list
+        // of localities
+        naming::gid_type const next(void) const
+        {
+            return there(here_lid_+1);
+        }
+
+        // Return the GID of the "previous" locality in the circular list
+        // of localities
+        naming::gid_type const prev(void) const
+        {
+            return there(here_lid_ == 0 ? localities_.size()-1 : here_lid_-1);
+        }
+
+    private:
+        // Locality information
+        std::size_t here_lid_;
+        std::vector<naming::gid_type> localities_;
+    };
+
     /// \class runtime runtime.hpp hpx/runtime.hpp
     class HPX_EXPORT runtime
     {
@@ -132,46 +191,9 @@ namespace hpx
             return (std::size_t)instance_number_;
         }
 
-        ////////////////////////////////////////////////////////////////////////
-        // Locality helpers
-        void set_localities(std::size_t here_lid,
-                            std::vector<naming::gid_type>& localities)
+        process& get_process(void)
         {
-            here_lid_ = here_lid;
-            for (int i=0; i<localities.size(); i++)
-              localities_.push_back(localities[i]);
-        }
-
-        std::vector<naming::gid_type> const& get_localities(void) const
-        {
-          return localities_;
-        }
-
-        // Return the GID of this locality
-        naming::gid_type here() const
-        {
-            return localities_[here_lid_];
-        }
-
-        // Return the GID of the locality with the given logical ID 
-        naming::gid_type there(std::size_t lid) const
-        {
-            lid = lid % localities_.size();
-            return localities_[lid];
-        }
-
-        // Return the GID of the "next" locality in the circular list
-        // of localities
-        naming::gid_type next(void) const
-        {
-            return there(here_lid_+1);
-        }
-
-        // Return the GID of the "previous" locality in the circular list
-        // of localities
-        naming::gid_type prev(void) const
-        {
-            return there(here_lid_ == 0 ? localities_.size()-1 : here_lid_-1);
+            return process_;
         }
 
     protected:
@@ -181,8 +203,7 @@ namespace hpx
     protected:
         performance_counters::registry counters_;
 
-        std::size_t here_lid_;
-        std::vector<naming::gid_type> localities_;
+        process process_;
 
         // list of functions to call on exit
         typedef std::vector<boost::function<void()> > on_exit_type;
