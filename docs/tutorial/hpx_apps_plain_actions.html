@@ -96,16 +96,18 @@ double fact(double n)
     // We have to specify which locality to spawn this future on,
     // and we want to spawn it on the logical 'next' locality
     // (if there is one)
-    naming::gid_type there = get_runtime().next();
+    gid_type next = get_runtime().get_process().next();
 
-    factorial_future future(there, n - 1);
+    factorial_future future(next, n - 1);
 
     return n * future.get();
 }
 </pre>
 <p>
 Not too bad so far! We created the future and then immediately tried to get the value of it. 
-However we could have done some other stuff in between and then when we called <code>future.get()</code> it would have tried to get the value. Since this is an eager future, the action is created when we create the future. If we had done a lot of stuff in between creating the future and then calling <code>future.get()</code> we likely would have already had the value available!
+However we could have done some other stuff in between and then when we called <code>future.get()</code> it would have tried to get the value.
+Since this is an eager future, the action is created when we create the future. 
+If we had done a lot of stuff in between creating the future and then calling <code>future.get()</code> we likely would have already had the value available!
 <br>
 Now you might want to jump to defining <code>main()</code>, but we have to do some things first in order to make sure the runtime is set up correctly. 
 Just like <code>main()</code> is the entry point for any C/C++ program, there is an <code>hpx_main()</code> that is the entry point for any HPX program. 
@@ -117,11 +119,13 @@ int hpx_main(po::variables_map &amp;vm)
     double argument = 6; // Default value to calculate is 6
     double result = 0; // Where we will store our result
 
-    // Now we process our command line option
-    if (vm.count("value"))
-        argument = vm["value"].as&lt;double&gt;();
+    // Now we process our command line option, which stores its value in
+    // argument
+    get_option(vm, "value", argument);
 
-    naming::gid_type here = get_runtime().here();
+    // We use the helper method provided in hpx_init.hpp called
+    // "find_here()" to find the locality we are on
+    gid_type here = find_here();
 
     factorial_future future(here, argument);
 
