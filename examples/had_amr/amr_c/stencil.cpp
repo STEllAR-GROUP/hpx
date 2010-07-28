@@ -263,21 +263,20 @@ namespace hpx { namespace components { namespace amr
 
       resultval->overwrite_alloc_ = true;
       resultval->overwrite_ = result_data[compute_index];
-      //resultval->value_ = overwrite->value_;
+      resultval->value_ = overwrite->value_;
  
       // remember neighbors
-      if ( compute_index > 0 ) {
-        overwrite->left_alloc_ = true;
-        overwrite->left_ = result_data[compute_index-1];
-      } else {
+      if ( size == 2 ) {
         overwrite->left_alloc_ = false;
-      }
-
-      if ( compute_index < size-1 ) {
         overwrite->right_alloc_ = true;
-        overwrite->right_ = result_data[compute_index+1];
+        overwrite->right_ = result_data[compute_index+size];
+      } else if ( size == 3 ) {
+        overwrite->left_alloc_ = true;
+        overwrite->left_ = result_data[compute_index+size-1];
+        overwrite->right_alloc_ = true;
+        overwrite->right_ = result_data[compute_index+size];
       } else {
-        overwrite->right_alloc_ = false;
+        BOOST_ASSERT(false);
       }
 
       //for (std::size_t i = 0; i < result_data.size(); ++i) {
@@ -394,49 +393,31 @@ namespace hpx { namespace components { namespace amr
         BOOST_ASSERT(false);
       }
 
+      had_double_type dx = mval[0]->x_[1]- mval[0]->x_[0];
+
+      // the last gid of the AMR mesh has a slightly smaller granularity
+      mval[2*size-1]->granularity = mval[2*size-1]->granularity-1;
+
       for (i=0;i<2*size;i++) {
         // increase the level by one
         ++mval[i]->level_;
         mval[i]->index_ = i;
         mval[i]->iter_ = 0;
         mval[i]->max_index_ = 2*size;
-        if ( i > size ) {
+        if ( i >= size ) {
           mval[i]->left_alloc_ = false;
           mval[i]->right_alloc_ = false;
           mval[i]->overwrite_alloc_ = false;
+          for (j=0;j<mval[i]->granularity;j++) {
+            mval[i]->x_[j]  = mval[i-size]->x_[j] + 0.5*dx;
+          }
         }
       }
 
-      // the last gid of the AMR mesh has a slightly smaller granularity
-      mval[2*size-1]->granularity = mval[2*size-1]->granularity-1;
-
-      // interpolate x values
-      for (i=0;i<size;i++) {
-        for (j=0;j<mval[i]->granularity-1;j++) {
-          mval[i+size]->x_[j] = 0.5*(mval[i]->x_[j] + mval[i]->x_[j+1]); 
-        }
-
-        if ( mval[i+size]->granularity > mval[i]->granularity-1 ) {
-          // last point to fill
-          BOOST_ASSERT(i+1 < size );
-          mval[i+size]->x_[ mval[i+size]->granularity-1 ] = 0.5*(mval[i]->x_[mval[i]->granularity-1] + mval[i+1]->x_[0]);
-        }
-      }
-
-      // all x values should be interpolated now
-      // TEST
-      //for (i=0;i<2*size;i++) {
-      //  for (j=0;j<mval[i]->granularity;j++) {
-      //    std::cout << " TEST x " << i << " " << j << " out of " << mval[i]->granularity << " x: " << mval[i]->x_[j] << std::endl;
-      //  }
-      //}
-      
       int s;
       for (i=0;i<size;i++) {
         s = findpoint(mval[i],mval[i+1],mval[i+size]);
-        // TEST
-        s = 0;
-        //std::cout << " TEST findpoint s: " << s << " i " << i << std::endl;
+        //std::cout << " TEST findpoint s: " << s << " i " << i << " " << mval[i]->overwrite_alloc_ << std::endl;
         if ( s == 0 ) { 
           // point not found -- interpolate
           for (j=0;j<mval[i]->granularity-1;j++) {
@@ -457,53 +438,73 @@ namespace hpx { namespace components { namespace amr
 
         }
       }
+  
+      // re-order things so they can be used
+      std::vector<had_double_type> phi,x;
+      phi.resize(2*size*par->granularity*num_eqns);
+      x.resize(2*size*par->granularity);
+
+      std::size_t ct = 0;
+      std::size_t ct1 = 0;
+      std::size_t stp1 = 0;
+      std::size_t ct2 = 0;
+      std::size_t stp2 = size;
+      std::size_t ct3 = 0;
+      std::size_t stp3 = 0;
+      for (i=0;i<2*size;i++) {
+        for (j=0;j<mval[i]->granularity;j++) {
+          if (ct%2 == 0) {
+            x[ct3 + stp3*par->granularity] = mval[stp1]->x_[ct1];
+            for (k=0;k<num_eqns;k++) {
+              phi[k + num_eqns*(ct3+stp3*par->granularity)] = mval[stp1]->value_[ct1].phi[0][k];
+            }
+            ct1++;
+            if ( ct1 == mval[stp1]->granularity ) {
+              stp1++;
+              ct1 = 0;
+            }
+          } else {
+            x[ct3 + stp3*par->granularity] = mval[stp2]->x_[ct2];
+            for (k=0;k<num_eqns;k++) {
+              phi[k + num_eqns*(ct3+stp3*par->granularity)] = mval[stp2]->value_[ct2].phi[0][k];
+            }
+            ct2++;
+            if ( ct2 == mval[stp2]->granularity ) {
+              stp2++;
+              ct2 = 0;
+            }
+          } 
+          ct++;
+
+          ct3++;
+          if ( ct3 == par->granularity ) {
+            stp3++;
+            ct3 = 0;
+          }
+        }
+      }
+
+      std::size_t count = 0;
+      std::size_t step = 0;
+
+      for (i=0;i<2*size;i++) {
+        for (j=0;j<mval[i]->granularity;j++) {
+          mval[i]->x_[j] = x[count+step*par->granularity];
+          for (k=0;k<num_eqns;k++) {
+            mval[i]->value_[j].phi[0][k] = phi[k + num_eqns*(count+step*par->granularity)];
+          }
+          count++;
+          if ( count == par->granularity ) {
+            step++;
+            count=0 ;
+          }
+        }
+      }
 
       for (i=0;i<2*size;i++) {
         initial_data.push_back(gval[i]);
       }
 
-#if 0
-      // avoid interpolation if possible
-      int s;
-      bool boundary = false;
-      int bbox[2];
-      s = 0;
-      for (i=1;i<17;i=i+2) {
-        s = findpoint(mval[i-1],mval[i+1],mval[i]);
-        if ( s == 0 ) { 
-          std::vector< had_double_type > x_val;
-          std::vector< nodedata > n_val;
-          x_val.push_back(mval[0]->x_); n_val.push_back(mval[0]->value_);
-          x_val.push_back(mval[2]->x_); n_val.push_back(mval[2]->value_);
-          x_val.push_back(mval[4]->x_); n_val.push_back(mval[4]->value_);
-          x_val.push_back(mval[6]->x_); n_val.push_back(mval[6]->value_);
-          x_val.push_back(mval[8]->x_); n_val.push_back(mval[8]->value_);
-          x_val.push_back(mval[10]->x_); n_val.push_back(mval[10]->value_);
-          x_val.push_back(mval[12]->x_); n_val.push_back(mval[12]->value_);
-          x_val.push_back(mval[14]->x_); n_val.push_back(mval[14]->value_);
-          x_val.push_back(mval[16]->x_); n_val.push_back(mval[16]->value_);
-          // pass in everything -- let the user decide how to interpolate using all the available anchors
-          int gft = interpolation(mval[i]->x_,&(mval[i]->value_),
-                        &*x_val.begin(),x_val.size(),
-                        &*n_val.begin(),n_val.size());
-          BOOST_ASSERT(gft);
-
-          std::vector< stencil_data * > vecval;
-          vecval.push_back(mval[i-1].get_ptr());
-          vecval.push_back(mval[i].get_ptr());
-          vecval.push_back(mval[i+1].get_ptr());
-          mval[i]->refine_ = refinement(&*vecval.begin(),vecval.size(),&(mval[i]->value_),mval[i]->level_,mval[i]->x_,1,boundary,bbox,*par.p);
-
-          // DEBUG
-          //if (log_)
-          //    stubs::logging::logentry(log_, mval[i].get(), row,2, par);
-        }
-      }
-
-      for (i=0;i<2*size-1;i++) {
-        initial_data.push_back(gval[i]);
-      }
-      #endif
       return 0;
     }
     
@@ -546,21 +547,20 @@ namespace hpx { namespace components { namespace amr
 
       resultval->overwrite_alloc_ = true;
       resultval->overwrite_ = result_data[compute_index];
-      //resultval->value_ = overwrite->value_;
+      resultval->value_ = overwrite->value_;
  
       // remember neighbors
-      if ( compute_index > 0 ) {
-        overwrite->left_alloc_ = true;
-        overwrite->left_ = result_data[compute_index-1];
-      } else {
+      if ( size == 2 ) {
         overwrite->left_alloc_ = false;
-      }
-
-      if ( compute_index < size-1 ) {
         overwrite->right_alloc_ = true;
-        overwrite->right_ = result_data[compute_index+1];
+        overwrite->right_ = result_data[compute_index+size];
+      } else if ( size == 3 ) {
+        overwrite->left_alloc_ = true;
+        overwrite->left_ = result_data[compute_index+size-1];
+        overwrite->right_alloc_ = true;
+        overwrite->right_ = result_data[compute_index+size];
       } else {
-        overwrite->right_alloc_ = false;
+        BOOST_ASSERT(false);
       }
 
       return 0;
