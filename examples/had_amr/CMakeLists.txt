@@ -9,6 +9,11 @@ set(had_amr_SUDIRS
     amr amr_c amr_c_test)
 
 find_package(GMP)
+find_package(SDF)
+
+if(SDF_FOUND)
+    include_directories(${SDF_INCLUDE_DIR})
+endif()
 
 if(GMP_FOUND)
     add_definitions(-DGMP_FOUND)
@@ -50,6 +55,12 @@ if(GMP_FOUND)
             ${had_amr_DEPENDENCIES}
             ${MPFR_LIBRARY})
     endif()
+endif()
+
+if(SDF_FOUND)
+    set(had_amr_DEPENDENCIES 
+        ${had_amr_DEPENDENCIES}
+        ${SDF_LIBRARY})
 endif()
 
 add_hpx_executable(had_amr_client 

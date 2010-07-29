@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <hpx/hpx.hpp>
+#include <sdf.h>
 
 #include "logging.hpp"
 
@@ -52,9 +53,21 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // output to file "output.dat"
         FILE *fdata;
+        std::vector<double> x,Phi,chi,Pi,energy;
+        double datatime;
+        int shape[3];
+        char cnames[80];
+        sprintf(cnames,"r");
         if ( logcode == 0 && val.iter_ == 0 ) {
           if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {
             for (i=0;i<val.granularity;i++) {
+              x.push_back(val.x_[i]);
+              chi.push_back(val.value_[i].phi[0][0]);
+              Phi.push_back(val.value_[i].phi[0][1]);
+              Pi.push_back(val.value_[i].phi[0][2]);
+              energy.push_back(val.value_[i].phi[0][3]);
+              datatime = val.timestep_*par->dx0*par->lambda;
+
               std::string x_str = convert(val.x_[i]);
               std::string chi_str = convert(val.value_[i].phi[0][0]);
               std::string Phi_str = convert(val.value_[i].phi[0][1]);
@@ -78,6 +91,11 @@ namespace hpx { namespace components { namespace amr { namespace server
               fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),energy_str.c_str());
               fclose(fdata);
             }
+            shape[0] = x.size(); 
+            gft_out_full("chi",datatime,shape,cnames,1,&*x.begin(),&*chi.begin());
+            gft_out_full("Phi",datatime,shape,cnames,1,&*x.begin(),&*Phi.begin());
+            gft_out_full("Pi",datatime,shape,cnames,1,&*x.begin(),&*Pi.begin());
+            gft_out_full("energy",datatime,shape,cnames,1,&*x.begin(),&*energy.begin());
           }
         }
 #if 0
