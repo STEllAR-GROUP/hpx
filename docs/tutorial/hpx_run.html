@@ -1,0 +1,194 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>
+Using hpx_run.py to do multi-locality runs
+</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+</head>
+
+<body>
+<div style="width:80%;margin-right:auto;margin-left:auto;">
+<p>
+<a href="index.html">home</a> | <a href="hpx_run_advanced.html">next</a>
+</p>
+<div style="text-align:center;">
+<h2>
+Using hpx_run.py to do multi-locality runs
+</h2>
+</div>
+
+<p>
+By now you have gotten your feet wet; installing HPX in source and out of source, getting a feel for how application and component development works and playing around with running HPX programs using a variety of different command line options.
+If you have experimented with multi-locality runs you know that it is a bit of a pain to setup, you have to open up as many terminals as you want localities, make sure you set all the command line options just right for each one.
+This is all good and fine for maybe 2 or 3, but for a truly distributed run you might want as many as 64 localities.
+How do you do this without opening up 64 terminals?
+The answer is by learning the usage of hpx_run.py.
+</p>
+
+<p>
+Essentially hpx_run.py automates the process of setting up each runtime instance, which leads to less human errors when doing multi-locality runs.
+If you have used MPI before you might want to liken our hpx_run.py to their mpirun.
+Indeed there are some similarities, but there are a few "gotchas" that you will want to pay attention to throughout this tutorial. 
+</p>
+
+<p>
+The hpx_run.py script is located in the parallex SVN at trunk/projects/hpx_run.
+If you haven't already, you should checkout this directory and put it in your path (so you can easily run hpx_run.py).
+The rest of this tutorial is going to assume that the HPX examples are being built and are in your path (by default <code>fibonacci</code> is the only example being built, you may need to edit HPX/examples/quickstart/CMakeLists.txt to uncomment the other examples).
+</p>
+
+<p>
+Once you have gotten hpx_run.py, its time to start using it!
+Lets see what options we have available to use by running hpx_run.py with the help flag.
+</p>
+
+<pre style='border:solid; padding: 4pt;'>
+$ hpx_run.py -h
+usage: hpx_run.py [options] command
+
+options:
+  -h, --help            show this help message and exit
+  -a APP_LOGLEVEL, --app_logging=APP_LOGLEVEL
+                        Enable application logging at specified level (default
+                        0)
+  -d, --debug           Put run in debug mode
+  -g, --use_gdb         Execute local runtimes in GDB
+  -o HPX_LOGLEVEL, --hpx_logging=HPX_LOGLEVEL
+                        Enable HPX logging at specified level (default 0)
+  -l LOCALITIES, --localities=LOCALITIES
+                        Specify homogeneous locality layout
+  -m MACHINE_FILE, --machinefile=MACHINE_FILE
+                        Set resources based on machine file (e.g.,
+                        PBS_NODEFILE)
+  -p BASE_PORT, --port=BASE_PORT
+                        Set base port (default 2222)
+  -s, --shhh            Suppress most output
+</pre>
+
+<p>
+The bare minimum you need to run an HPX application using this script is to supply the program name and the locality setup.
+For now we are going to use one locality and one thread, to do this run all you need to type is:
+</p>
+
+<pre style='border:solid; padding: 4pt;'>
+$ hpx_run.py -l 1:1 "fibonacci"
+System view:
+        1 nodes:
+        Node 'node0' with 1 cores
+
+Locality set:
+        1 localities:
+        Locality 'L0' with 1 threads
+
+Distributed runtime:
+        1 local instances:
+        Runtime 'rts0' with 1 threads
+
+Runtime 'rts0' stdout:
+elapsed: 0.018269, result: 55
+
+Runtime 'rts0' quit
+</pre>
+
+<p>
+You have successfully run your first HPX program using hpx_run.py!
+All you need to do to make this a multi-locality run is to change the locality layout.
+When you specify '-l' you need to supply two options, the number of localities and the number of threads with a colon in between.
+For example <code>-l 2:1</code> would run with two localities and 1 thread.
+Specifying <code>-l 4:8</code> would run with four localities and 8 threads.
+Now lets do a run with two localities and two threads for fibonacci.
+</p>
+
+<pre style='border:solid; padding: 4pt;'>
+$ hpx_run.py -l 2:2 "fibonacci"
+System view:
+        2 nodes:
+        Node 'node1' with 2 cores
+        Node 'node0' with 2 cores
+
+Locality set:
+        2 localities:
+        Locality 'L0' with 2 threads
+        Locality 'L1' with 2 threads
+
+Distributed runtime:
+        2 local instances:
+        Runtime 'rts1' with 2 threads
+        Runtime 'rts0' with 2 threads
+
+Runtime 'rts0' quit
+Runtime 'rts1' stdout:
+elapsed: 0.1188, result: 55
+
+Runtime 'rts1' quit
+</pre>
+
+<p>
+By now you might have noticed that we are enclosing the program in quotes.
+The reason for this is so that we can specify command line arguments to the program itself without interfering with the command line arguments to hpx_run.py.
+For example, we can change the value of fibonacci to calculate using the <code>-v</code> option.
+This time I'm going to run fibonacci4 with 4 localities and 8 threads each and a value of '20'.
+</p>
+
+<pre style='border:solid; padding: 4pt;'>
+$ hpx_run -l 4:8 "fibonacci4 -v 20"
+System view:
+        4 nodes:
+        Node 'node1' with 8 cores
+        Node 'node0' with 8 cores
+        Node 'node3' with 8 cores
+        Node 'node2' with 8 cores
+
+Locality set:
+        4 localities:
+        Locality 'L2' with 8 threads
+        Locality 'L3' with 8 threads
+        Locality 'L0' with 8 threads
+        Locality 'L1' with 8 threads
+
+Distributed runtime:
+        4 local instances:
+        Runtime 'rts3' with 8 threads
+        Runtime 'rts2' with 8 threads
+        Runtime 'rts1' with 8 threads
+        Runtime 'rts0' with 8 threads
+
+Runtime 'rts0' quit
+Runtime 'rts1' quit
+Runtime 'rts2' quit
+Runtime 'rts3' stdout:
+elapsed: 1.83268, result: 6765
+Number of invocations of fib(): 9790
+
+Runtime 'rts3' quit
+</pre>
+
+<p>
+Just with the <code>-l</code> option in hpx_run.py you have automated a ton of work for yourself!
+Even if all you do is single locality runs, using this to automatically set up the runtime can be a huge timesaver.
+</p>
+<p>
+Up until now we have been running locally, which is fine for testing your code to see if it works.
+However, the true benefit of having localities is to be able to use multiple physical resources in your computation.
+To this extent hpx_run.py allows you to specify a machine file (usually by $PBS_NODEFILE, but you can specify your own file if you want) which will construct its "System view" and will automatically allocate all system resources to your computation.
+The only real difference is a change in options to hpx_run.py which I illustrate below.
+</p>
+
+<pre style='border:solid; padding: 4pt;'>
+// This is the command to run inside of a PBS job
+$ hpx_run.py -m $PBS_NODEFILE "fibonacci4 -v 20"
+</pre>
+
+<p>
+You can optionally specify the <code>-l</code> option with a machine file to only use part of the resources allocated to you, if you want to.
+</p>
+
+<p>
+Well those are the basics for using hpx_run.py to do multi-locality runs.
+See the next installment in this tutorial for some problems you might run into as well as mastering the other options.
+</p>
+
+</div>
+</body>
+</html>

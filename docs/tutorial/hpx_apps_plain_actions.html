@@ -134,7 +134,7 @@ int hpx_main(po::variables_map &amp;vm)
     std::cout &lt;&lt; "Result: " &lt;&lt; result &lt;&lt; std::endl;
 
     // Make sure to properly shut down the runtime for all localities
-    components::stubs::runtime_support::shutdown_all();
+    hpx_finalize();
 
     return 0;
 }
