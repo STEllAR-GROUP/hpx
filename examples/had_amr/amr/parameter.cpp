@@ -26,7 +26,6 @@ namespace hpx { namespace components { namespace amr
         ar & loglevel;
         ar & output;
         ar & output_stdout;
-        ar & stencilsize;
         ar & linearbounds;
         ar & integrator;
         ar & nt0;
@@ -44,7 +43,6 @@ namespace hpx { namespace components { namespace amr
         ar & output_level;
         ar & PP;
         ar & granularity;
-        ar & ghostwidth;
     }
 
     // explicit instantiation for the correct archive types

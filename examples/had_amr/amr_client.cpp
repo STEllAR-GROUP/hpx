@@ -227,7 +227,6 @@ int main(int argc, char* argv[])
         components::amr::Parameter par;
 
         // default pars
-        par->stencilsize = 7;
         par->integrator  = 1;
         par->allowedl    = 0;
         par->loglevel    = 2;
@@ -247,7 +246,6 @@ int main(int argc, char* argv[])
         par->fmr_radius  =  -999.0;
         par->output_level =  0;
         par->granularity =  3;
-        par->ghostwidth  =  0;
 
         par->linearbounds = 1;
         int scheduler = 1;  // 0: global scheduler
@@ -282,10 +280,6 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("output_level") ) {
                 std::string tmp = sec->get_entry("output_level");
                 par->output_level = atoi(tmp.c_str());
-              }
-              if ( sec->has_entry("stencilsize") ) {
-                std::string tmp = sec->get_entry("stencilsize");
-                par->stencilsize = atoi(tmp.c_str());
               }
               if ( sec->has_entry("integrator") ) {
                 std::string tmp = sec->get_entry("integrator");
@@ -357,14 +351,6 @@ int main(int argc, char* argv[])
                   BOOST_ASSERT(false);
                 }
               }
-              if ( sec->has_entry("ghostwidth") ) {
-                std::string tmp = sec->get_entry("ghostwidth");
-                par->ghostwidth = atoi(tmp.c_str());
-                if ( par->ghostwidth < 0 || par->ghostwidth%2 != 0 ) {
-                  std::cerr << " Problem: ghostwidth has to be at least 0 and be even : " << par->ghostwidth << std::endl;
-                  BOOST_ASSERT(false);
-                }
-              }
             }
         }
 
@@ -378,9 +364,6 @@ int main(int argc, char* argv[])
 
         par->dx0 = (par->maxx0 - par->minx0)/(par->nx0-1);
         par->dt0 = par->lambda*par->dx0;
-
-        // The stencilsize needs to be odd
-        BOOST_ASSERT(par->stencilsize%2 != 0 );
 
         if ( par->integrator == 1 ) {
           numsteps *= 3;  // three subcycles each step

@@ -136,7 +136,6 @@ namespace hpx { namespace components { namespace amr { namespace server
         typedef components::distributing_factory::result_type result_type;
 
         int j;
-        BOOST_ASSERT(par->stencilsize == 7 );
         std::size_t numvals = outputs[0].size();
 
         int memsize;
