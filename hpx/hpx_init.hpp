@@ -26,6 +26,11 @@ inline gid_type find_here(void)
   return get_runtime().get_process().here();
 }
 
+inline void hpx_finalize(void)
+{
+  components::stubs::runtime_support::shutdown_all();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
 inline void get_option(po::variables_map& vm, 

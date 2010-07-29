@@ -8,6 +8,7 @@ set(test_SUBDIRS
     #applier_tests 
     #component_tests 
     #lco_tests 
+    #multilocality_tests
     #performance 
     #performance_counters 
     #threadmanager_tests
