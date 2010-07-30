@@ -6,6 +6,7 @@
 set(application_SUBDIRS 
     #mstack
     #graphs
+    hplpx
    )
 
 foreach(subdir ${application_SUBDIRS})
