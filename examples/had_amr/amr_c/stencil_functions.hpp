@@ -26,6 +26,8 @@ HPX_COMPONENT_EXPORT int interpolation(had_double_type dst_x,struct nodedata *ds
 
 HPX_COMPONENT_EXPORT bool refinement(nodedata * val,int size,stencil_data* result,int,bool boundary, int *bbox,Par const& par);
 
+HPX_COMPONENT_EXPORT int initial_data_aux(stencil_data* val,Par const& par);
+
 HPX_COMPONENT_EXPORT int rkupdate(nodedata * val, stencil_data* result, had_double_type *vecx, int size,bool boundary,int *bbox,int compute_index,had_double_type, had_double_type,had_double_type,int iter,int level, Par const& par);
 
 #endif

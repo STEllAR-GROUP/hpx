@@ -12,9 +12,6 @@
 #include "../had_config.hpp"
 #include <stdio.h>
 
-// TEST
-//int WORK = 0;
-
 // local functions
 int floatcmp(had_double_type x1,had_double_type x2) {
   // compare to floating point numbers
@@ -83,16 +80,6 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
       Pi  = 0.0;
       Energy = 0.5*r*r*(Pi*Pi + Phi*Phi) - r*r*pow(chi,par.PP+1)/(par.PP+1);
 
-#if 0
-      // TEST Add some busy work to see if race condition can be eliminated
-      double d = 0.;
-      for (int ii = 0; ii < WORK; ++ii)
-      {
-         d += 1/(2.* ii + 1);
-      }
-      Energy = d;
-#endif
-
       val->x_[i] = r;
 
       node.phi[0][0] = chi;
@@ -106,6 +93,30 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     return 1;
 }
 
+int initial_data_aux(stencil_data* val, Par const& par)
+{
+    int i;
+    nodedata node;
+ 
+    had_double_type r,chi,Phi,Pi,Energy;
+    for (i=0;i<val->granularity;i++) {
+      r = val->x_[i];
+
+      chi = initial_chi(r,par);
+      Phi = initial_Phi(r,par);
+      Pi  = 0.0;
+      Energy = 0.5*r*r*(Pi*Pi + Phi*Phi) - r*r*pow(chi,par.PP+1)/(par.PP+1);
+
+      node.phi[0][0] = chi;
+      node.phi[0][1] = Phi;
+      node.phi[0][2] = Pi;
+      node.phi[0][3] = Energy;
+
+      val->value_[i] = node;
+    }
+    return 1;
+}
+
 int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int size,bool boundary,int *bbox,int compute_index, had_double_type dt, had_double_type dx, had_double_type timestep,int iter, int level, Par const& par)
 {
   // allocate some temporary arrays for calculating the rhs
@@ -114,33 +125,6 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
 
   BOOST_ASSERT(par.integrator == 1);
 
-#if 0
-  // TEST
-  //if ( level > 0 ) {
-    for (j=0;j<pow(2.,level)*par.granularity;j++) {
-      for (i=0;i<num_eqns;i++) {
-        work.phi[0][i] = vecval[j+compute_index].phi[0][i];
-        work.phi[1][i] = vecval[j+compute_index].phi[0][i];
-      }
-      result->value_[j] = work;
-    }
-    result->timestep_ = timestep + 1.0;
-    return 1;
-  //}
-#endif
- 
-#if 0
-    // Add busywork TEST
-    double d = 0.;
-    for (int i = 0; i < WORK; ++i)
-    {
-       d += 1/(2.* i + 1);
-    }
-    result->value_[0].phi[0][3] = d;
-    // END TEST
-#endif
-
-//#if 0
   if ( iter == 0 ) {
     for (j=0;j<result->granularity;j++) {
       calcrhs(&rhs,vecval,vecx,0,dx,size,boundary,bbox,j+compute_index,par);
@@ -215,7 +199,6 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
     return 0;
   }
   return 1;
-//#endif
 }
 
 // This is a pointwise calculation: compute the rhs for point result given input values in array phi
