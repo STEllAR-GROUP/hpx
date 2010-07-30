@@ -26,7 +26,7 @@ using namespace hpx;
 namespace po = boost::program_options;
 
 ////////////////////////////////////////////////////////////////////////////////
-typedef std::size_t size_type;
+typedef int size_type;
 typedef lcos::future_value<size_type> future_size_type;
 typedef std::vector<future_size_type> future_sizes_type;
 
@@ -49,7 +49,12 @@ size_type hits(size_type throws)
       num_hits++;
   }
 
-  std::cout << num_hits << " hits for " << throws << " throws" << std::endl;
+  std::string out(
+      boost::lexical_cast<std::string>(num_hits)
+      + " hits for "
+      + boost::lexical_cast<std::string>(throws)
+      + " throws\n");
+  std::cout << out;
 
   return num_hits;
 }
@@ -58,7 +63,7 @@ HPX_REGISTER_PLAIN_ACTION(hits_action);
 
 size_type local_hits(size_type throws, size_type granularity)
 {
-  size_type local_throws = throws / granularity;
+  size_type const local_throws = throws / granularity;
 
   gid_type here = find_here();
 
@@ -96,12 +101,14 @@ int hpx_main(po::variables_map &vm)
   {
     util::high_resolution_timer t;
 
+    size_type const local_throws = throws / my_proc.size();
+
     future_sizes_type hits;
     for (size_type lid = 0; lid < my_proc.size(); lid++)
     {
       hits.push_back(
           lcos::eager_future<local_hits_action>(
-            my_proc.there(lid), throws, granularity));
+            my_proc.there(lid), local_throws, granularity));
     }
 
     size_type total_hits = 0;
