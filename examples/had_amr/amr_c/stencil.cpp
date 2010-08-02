@@ -392,7 +392,7 @@ namespace hpx { namespace components { namespace amr
       had_double_type dx = mval[0]->x_[1]- mval[0]->x_[0];
 
       // the last gid of the AMR mesh has a slightly smaller granularity
-      mval[2*size-1]->granularity = mval[2*size-1]->granularity-1;
+      mval[2*size-1]->granularity = mval[size-1]->granularity-1;
 
       for (i=0;i<2*size;i++) {
         // increase the level by one
@@ -430,10 +430,9 @@ namespace hpx { namespace components { namespace amr
           if ( mval[i+size]->granularity > mval[i]->granularity-1 ) {
             // last point to fill
             BOOST_ASSERT(i+1 < size );
-            mval[i+size]->x_[ mval[i+size]->granularity-1 ] = 0.5*(mval[i]->x_[mval[i]->granularity-1] + mval[i+1]->x_[0]);
             for (k=0;k<num_eqns;k++) {
               mval[i+size]->value_[ mval[i+size]->granularity-1  ].phi[0][k] = 
-                                                     0.5*(mval[i]->value_[mval[i]->granularity-1].phi[0][k] + mval[i+1]->value_[0].phi[0][k]);
+                                    0.5*(mval[i]->value_[mval[i]->granularity-1].phi[0][k] + mval[i+1]->value_[0].phi[0][k]);
             }
           }
 
