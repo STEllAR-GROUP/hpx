@@ -17,10 +17,6 @@ HPX Command Line Structure
 </div>
 
 <p>
-On the <a href="hpx_install.html">previous page</a> you saw that you invoked the fibonacci example with the arguments "<code>-r -t 1</code>".
-Those were arguments to the HPX runtime telling it what to do.
-For every time you run a program compiled with the HPX runtime you need to specifiy "<code>-r</code>".
-This tells the runtime to start the AGAS service (Active Global Address Space).
 In general you can use these command line options with any program compiled with the HPX runtime.
 </p>
 <table cellpadding="10">
@@ -64,7 +60,7 @@ In general you can use these command line options with any program compiled with
 <p>
 For a complete listing of command line options, run a program compiled with HPX with the <code>-h</code> option.
 <br>
-In general, if you only run with one locality the <code>-r</code> and <code>-t</code> options will be the only ones you use.
+In general, if you only run with one locality the <code>-t</code> option will be the only one you use.
 <br>
 If I wanted to set up a (virtual) two locality run of <code>fibonacci</code> I would need to open up two terminals and type this:
 </p>
