@@ -5,7 +5,6 @@
 
 set(application_SUBDIRS 
     #mstack
-    #graphs
     #hplpx
    )
 
