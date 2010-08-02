@@ -12,9 +12,9 @@ using namespace std;
 namespace po=boost::program_options;
 
 //the size of the matrix
-unsigned int SIZE = 1000;
+unsigned int SIZE = 1024;
 unsigned int ABSIZE = 512;
-unsigned int BSIZE = 249;
+unsigned int BSIZE = 250;
 double ERROR = 0;
 
 /*This small program is used to perform LU decomposition on a randomly
@@ -90,11 +90,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("csv,s", "generate statistics of the run in comma separated format")
             ("blocksize,b", po::value<int>(),
                 "blocksize correlates to the amount of work performed by each "
-		"thread during gaussian elimination. The blocksize specified must "
-		"be greater than 2 or else the algorithm may not generate a "
-		"correct solution for the matrix(default is 249)  ***At present, "
-		"there is a bug in the code which occurs if the blocksize divides "
-		"evenly into the total size***")
+		"thread during gaussian elimination (default is 256)")
 	    ("allocblock,A", po::value<int>(),
 		"allocblock effects the amount of work each thread performs "
 		"during memory allocation, initialization, and during the "
@@ -207,7 +203,7 @@ int main(int argc, char* argv[]){
         	}
 
 		if(vm.count("blocksize")){
-		    if((vm["blocksize"].as<int>() > 2) && (vm["blocksize"].as<int>() <= SIZE)){
+		    if((vm["blocksize"].as<int>() > 0) && (vm["blocksize"].as<int>() <= SIZE)){
 			BSIZE = vm["blocksize"].as<int>();
 		    }
 		    else{

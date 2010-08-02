@@ -402,7 +402,10 @@ namespace hpx { namespace components { namespace server
 		//performing computations
 		top_futures.clear();
 		left_futures.clear();
-		for(unsigned int i = toprow;i<toprow+blocksize;i++){
+
+		if(toprow+offset<rows){farrow = toprow + blocksize;}
+		else{farrow = rows;}
+		for(unsigned int i = toprow;i<farrow;i++){
 			free(leftdata[i]);
 			free(factordata[i]);
 		}
@@ -425,7 +428,7 @@ namespace hpx { namespace components { namespace server
 	unsigned int i, j, k;
 	double f_factor;
 
-	if(endr + blocksize > rows){
+	if(endr + blocksize >= rows){
 		endr = rows;
 		endc = rows + 1;
 	}
