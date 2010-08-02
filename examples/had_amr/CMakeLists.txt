@@ -12,6 +12,7 @@ find_package(GMP)
 find_package(SDF)
 
 if(SDF_FOUND)
+    add_definitions(-DSDF_FOUND)
     include_directories(${SDF_INCLUDE_DIR})
 endif()
 

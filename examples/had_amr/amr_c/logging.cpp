@@ -5,7 +5,10 @@
 
 #include <iostream>
 #include <hpx/hpx.hpp>
+
+#if defined(SDF_FOUND)
 #include <sdf.h>
+#endif
 
 #include "logging.hpp"
 
@@ -91,11 +94,13 @@ namespace hpx { namespace components { namespace amr { namespace server
               fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),energy_str.c_str());
               fclose(fdata);
             }
+#if defined(SDF_FOUND)
             shape[0] = x.size(); 
             gft_out_full("chi",datatime,shape,cnames,1,&*x.begin(),&*chi.begin());
             gft_out_full("Phi",datatime,shape,cnames,1,&*x.begin(),&*Phi.begin());
             gft_out_full("Pi",datatime,shape,cnames,1,&*x.begin(),&*Pi.begin());
             gft_out_full("energy",datatime,shape,cnames,1,&*x.begin(),&*energy.begin());
+#endif
           }
         }
 #if 0
