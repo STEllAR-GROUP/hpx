@@ -186,7 +186,8 @@ int hpx_init(po::options_description& desc_cmdline, int argc, char* argv[])
 
     // initialize and run the AGAS service, if appropriate
     std::auto_ptr<agas_server_helper> agas_server;
-    if (vm.count("run_agas_server"))  // run the AGAS server instance here
+    // run the AGAS server instance here
+    if (vm.count("run_agas_server") || num_localities == 1)  
       agas_server.reset(new agas_server_helper(agas_host, agas_port));
 
     // initialize and start the HPX runtime
