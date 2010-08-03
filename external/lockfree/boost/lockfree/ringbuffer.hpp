@@ -13,7 +13,6 @@
 
 #ifndef BOOST_LOCKFREE_RINGBUFFER_HPP_INCLUDED
 #define BOOST_LOCKFREE_RINGBUFFER_HPP_INCLUDED
-
 #include <boost/atomic.hpp>
 #include <boost/array.hpp>
 #include <boost/noncopyable.hpp>
@@ -36,6 +35,7 @@ template <typename T>
 class ringbuffer_internal:
     boost::noncopyable
 {
+#ifndef BOOST_DOXYGEN_INVOKED
     typedef std::size_t size_t;
     static const int padding_size = BOOST_LOCKFREE_CACHELINE_BYTES - sizeof(size_t);
     atomic<size_t> write_index_;
@@ -67,19 +67,20 @@ protected:
     static size_t write_available(size_t write_index, size_t read_index, size_t max_size)
     {
         size_t ret = read_index - write_index - 1;
-        if (write_index > read_index)
+        if (write_index >= read_index)
             ret += max_size;
         return ret;
     }
 
     bool enqueue(T const & t, T * buffer, size_t max_size)
     {
-        size_t next = next_index(write_index_.load(memory_order_acquire), max_size);
+        size_t write_index = write_index_.load(memory_order_acquire);
+        size_t next = next_index(write_index, max_size);
 
         if (next == read_index_.load(memory_order_acquire))
             return false; /* ringbuffer is full */
 
-        buffer[next] = t;
+        buffer[write_index] = t;
 
         write_index_.store(next, memory_order_release);
 
@@ -93,8 +94,8 @@ protected:
         if (empty(write_index, read_index))
             return false;
 
+        *ret = buffer[read_index];
         size_t next = next_index(read_index, max_size);
-        *ret = buffer[next];
         read_index_.store(next, memory_order_release);
         return true;
     }
@@ -168,20 +169,31 @@ protected:
         read_index_.store(new_read_index, memory_order_release);
         return output_count;
     }
+#endif
 
 
 public:
+    /** reset the ringbuffer
+     *
+     * \warning Not thread-safe, use for debugging purposes only
+     * */
     void reset(void)
     {
         write_index_.store(0, memory_order_relaxed);
         read_index_.store(0, memory_order_release);
     }
 
+    /**
+     * \return true, if ringbuffer is empty.
+     *
+     * \warning Not thread-safe, use for debugging purposes only
+     * */
     bool empty(void)
     {
         return empty(write_index_.load(memory_order_relaxed), read_index_.load(memory_order_relaxed));
     }
 
+    //! \copydoc boost::lockfree::fifo::is_lock_free
     bool is_lock_free(void) const
     {
         return write_index_.is_lock_free() && read_index_.is_lock_free();
@@ -204,21 +216,48 @@ class ringbuffer:
     boost::array<T, max_size> array_;
 
 public:
+    /** Enqueues object t to the ringbuffer. Enqueueing may fail, if the ringbuffer is full.
+     *
+     * \return true, if the enqueue operation is successful.
+     *
+     * */
     bool enqueue(T const & t)
     {
         return detail::ringbuffer_internal<T>::enqueue(t, array_.c_array(), max_size);
     }
 
+    /** Dequeue object from ringbuffer.
+     *
+     * If dequeue operation is successful, object is written to memory location denoted by ret.
+     *
+     * \return true, if the dequeue operation is successful, false if ringbuffer was empty.
+     *
+     */
     bool dequeue(T * ret)
     {
         return detail::ringbuffer_internal<T>::dequeue(ret, array_.c_array(), max_size);
     }
 
+    /** Enqueues size objects from the array t to the ringbuffer.
+     *
+     *  Enqueueing may fail, if the ringbuffer is full.
+     *
+     * \return number of enqueued items
+     *
+     * \note Thread-safe and non-blocking
+     */
     size_t enqueue(T const * t, size_t size)
     {
         return detail::ringbuffer_internal<T>::enqueue(t, size, array_.c_array(), max_size);
     }
 
+    /** Dequeue a maximum of size objects from ringbuffer.
+     *
+     * If dequeue operation is successful, object is written to memory location denoted by ret.
+     *
+     * \return number of dequeued items
+     *
+     * */
     size_t dequeue(T * ret, size_t size)
     {
         return detail::ringbuffer_internal<T>::dequeue(ret, size, array_.c_array(), max_size);
@@ -234,25 +273,53 @@ class ringbuffer<T, 0>:
     scoped_array<T> array_;
 
 public:
+    //! Constructs a ringbuffer for max_size elements
     explicit ringbuffer(size_t max_size):
         max_size_(max_size), array_(new T[max_size])
     {}
 
+    /** Enqueues object t to the ringbuffer. Enqueueing may fail, if the ringbuffer is full.
+     *
+     * \return true, if the enqueue operation is successful.
+     *
+     * */
     bool enqueue(T const & t)
     {
         return detail::ringbuffer_internal<T>::enqueue(t, array_.get(), max_size_);
     }
 
+    /** Dequeue object from ringbuffer.
+     *
+     * If dequeue operation is successful, object is written to memory location denoted by ret.
+     *
+     * \return true, if the dequeue operation is successful, false if ringbuffer was empty.
+     *
+     */
     bool dequeue(T * ret)
     {
         return detail::ringbuffer_internal<T>::dequeue(ret, array_.get(), max_size_);
     }
 
+    /** Enqueues size objects from the array t to the ringbuffer.
+     *
+     *  Enqueueing may fail, if the ringbuffer is full.
+     *
+     * \Returns number of enqueued items
+     *
+     * \note Thread-safe and non-blocking
+     */
     size_t enqueue(T const * t, size_t size)
     {
         return detail::ringbuffer_internal<T>::enqueue(t, size, array_.get(), max_size_);
     }
 
+    /** Dequeue a maximum of size objects from ringbuffer.
+     *
+     * If dequeue operation is successful, object is written to memory location denoted by ret.
+     *
+     * \return number of dequeued items
+     *
+     * */
     size_t dequeue(T * ret, size_t size)
     {
         return detail::ringbuffer_internal<T>::dequeue(ret, size, array_.get(), max_size_);

@@ -12,6 +12,7 @@
 #define BOOST_LOCKFREE_FREELIST_HPP_INCLUDED
 
 #include <boost/lockfree/detail/tagged_ptr.hpp>
+
 #include <boost/atomic.hpp>
 #include <boost/noncopyable.hpp>
 

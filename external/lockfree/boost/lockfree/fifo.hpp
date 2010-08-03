@@ -39,6 +39,8 @@ template <typename T, typename freelist_t, typename Alloc>
 class fifo:
     boost::noncopyable
 {
+private:
+#ifndef BOOST_DOXYGEN_INVOKED
     BOOST_STATIC_ASSERT(boost::is_pod<T>::value);
 
     struct BOOST_LOCKFREE_CACHELINE_ALIGNMENT node
@@ -79,25 +81,38 @@ class fifo:
         head_.store(dummy_node, memory_order_relaxed);
         tail_.store(dummy_node, memory_order_release);
     }
+#endif
 
 public:
+    /**
+     * \return true, if implementation is lock-free.
+     *
+     * \warning \b Warning: It only checks, if the fifo head node is lockfree. on most platforms, this should be sufficient, though
+     * */
     const bool is_lock_free (void) const
     {
         return head_.is_lock_free();
     }
 
+    //! Construct fifo, initially allocates 128 nodes
     fifo(void):
         pool(128)
     {
         initialize();
     }
 
+    //! Construct fifo with a number of initially allocated fifo nodes.
     explicit fifo(std::size_t initial_nodes):
         pool(initial_nodes)
     {
         initialize();
     }
 
+    /** Destroys fifo, free all nodes from freelist.
+     *
+     *  \warning not threadsafe
+     *
+     * */
     ~fifo(void)
     {
         if (!empty())
@@ -112,11 +127,23 @@ public:
         dealloc_node(head_.load(memory_order_relaxed).get_ptr());
     }
 
+    /**
+     * \return true, if fifo is empty.
+     *
+     * \warning Not thread-safe, use for debugging purposes only
+     * */
     bool empty(void)
     {
         return head_.load().get_ptr() == tail_.load().get_ptr();
     }
 
+    /** Enqueues object t to the fifo. Enqueueing may fail, if the freelist is not able to allocate a new fifo node.
+     *
+     * \returns true, if the enqueue operation is successful.
+     *
+     * \note Thread-safe and non-blocking
+     * \warning \b Warning: May block if node needs to be allocated from the operating system
+     * */
     bool enqueue(T const & t)
     {
         node * n = alloc_node(t);
@@ -146,6 +173,15 @@ public:
         }
     }
 
+    /** Dequeue object from fifo.
+     *
+     * if dequeue operation is successful, object is written to memory location denoted by ret.
+     *
+     * \returns true, if the dequeue operation is successful, false if fifo was empty.
+     *
+     * \note Thread-safe and non-blocking
+     *
+     * */
     bool dequeue (T * ret)
     {
         for (;;)
@@ -179,6 +215,7 @@ public:
     }
 
 private:
+#ifndef BOOST_DOXYGEN_INVOKED
     node * alloc_node(void)
     {
         node * chunk = pool.allocate();
@@ -206,13 +243,22 @@ private:
     char padding2[padding_size];
 
     pool_t pool;
+#endif
 };
 
 } /* namespace detail */
 
-/** lockfree fifo
+/** The fifo class provides a multi-writer/multi-reader fifo, enqueueing and dequeueing is lockfree,
+ *  construction/destruction has to be synchronized. It uses a freelist for memory management,
+ *  freed nodes are pushed to the freelist, but not returned to the os. This may result in leaking memory.
  *
- *  - wrapper for detail::fifo
+ *  The memory management of the fifo can be controlled via its freelist_t template argument. Two different
+ *  freelists can be used. struct caching_freelist_t selects a caching freelist, which can allocate more nodes
+ *  from the operating system, and struct static_freelist_t uses a fixed-sized freelist. With a fixed-sized
+ *  freelist, the enqueue operation may fail, while with a caching freelist, the enqueue operation may block.
+ *
+ *  \b Limitation: The fifo class is limited to PODs
+ *
  * */
 template <typename T,
           typename freelist_t = caching_freelist_t,
@@ -222,24 +268,26 @@ class fifo:
     public detail::fifo<T, freelist_t, Alloc>
 {
 public:
+    //! Construct fifo, initially allocates 128 nodes
     fifo(void)
     {}
 
+    //! Construct fifo with a number of initially allocated fifo nodes.
     explicit fifo(std::size_t initial_nodes):
         detail::fifo<T, freelist_t, Alloc>(initial_nodes)
     {}
 };
 
 
-/** lockfree fifo, template specialization for pointer-types
+/** template specialization of the boost::lockfree::fifo class for pointer arguments.
  *
- *  - wrapper for detail::fifo
- *  - overload dequeue to support smart pointers
+ *  it supports dequeue operations to stl/boost-style smart pointers
  * */
 template <typename T, typename freelist_t, typename Alloc>
 class fifo<T*, freelist_t, Alloc>:
     public detail::fifo<T*, freelist_t, Alloc>
 {
+#ifndef BOOST_DOXYGEN_INVOKED
     typedef detail::fifo<T*, freelist_t, Alloc> fifo_t;
 
     template <typename smart_ptr>
@@ -252,36 +300,62 @@ class fifo<T*, freelist_t, Alloc>:
             ptr.reset(result);
         return success;
     }
+#endif
 
 public:
+    //! Construct fifo, initially allocates 128 nodes
     fifo(void)
     {}
 
+    //! Construct fifo with a number of initially allocated fifo nodes.
     explicit fifo(std::size_t initial_nodes):
         fifo_t(initial_nodes)
     {}
 
-    bool enqueue(T * t)
-    {
-        return fifo_t::enqueue(t);
-    }
-
+    //! \copydoc detail::fifo::dequeue
     bool dequeue (T ** ret)
     {
         return fifo_t::dequeue(ret);
     }
 
+    /** Dequeue object from fifo to std::auto_ptr
+     *
+     * if dequeue operation is successful, object is written to memory location denoted by ret.
+     *
+     * \returns true, if the dequeue operation is successful, false if fifo was empty.
+     *
+     * \note Thread-safe and non-blocking
+     *
+     * */
     bool dequeue (std::auto_ptr<T> & ret)
     {
         return dequeue_smart_ptr(ret);
     }
 
+    /** Dequeue object from fifo to boost::scoped_ptr
+     *
+     * if dequeue operation is successful, object is written to memory location denoted by ret.
+     *
+     * \returns true, if the dequeue operation is successful, false if fifo was empty.
+     *
+     * \note Thread-safe and non-blocking
+     *
+     * */
     bool dequeue (boost::scoped_ptr<T> & ret)
     {
         BOOST_STATIC_ASSERT(sizeof(boost::scoped_ptr<T>) == sizeof(T*));
         return dequeue(reinterpret_cast<T**>((void*)&ret));
     }
 
+    /** Dequeue object from fifo to boost::shared_ptr
+     *
+     * if dequeue operation is successful, object is written to memory location denoted by ret.
+     *
+     * \returns true, if the dequeue operation is successful, false if fifo was empty.
+     *
+     * \note Thread-safe and non-blocking
+     *
+     * */
     bool dequeue (boost::shared_ptr<T> & ret)
     {
         return dequeue_smart_ptr(ret);

@@ -43,7 +43,7 @@ static inline void full_fence(void)
             __asm__ __volatile__("mfence" ::: "memory");
 #else
             /* could use mfence iff i686, but it does not appear to matter much */
-            __asm__ __volatile__("lock addl $0, (%%esp)"  ::: "memory");
+            __asm__ __volatile__("lock; addl $0, (%%esp)"  ::: "memory");
 #endif
 }
 
@@ -102,7 +102,7 @@ public:
     {
         fence_before(success_order);
         T prev=expected;
-        __asm__ __volatile__("lock cmpxchgb %1, %2\n" : "=a" (prev) : "q" (desired), "m" (i), "a" (expected) : "memory");
+        __asm__ __volatile__("lock; cmpxchgb %1, %2\n" : "=a" (prev) : "q" (desired), "m" (i), "a" (expected) : "memory");
         bool success=(prev==expected);
         if (success) fence_after(success_order);
         else fence_after(failure_order);
@@ -119,12 +119,12 @@ public:
     }
     T exchange(T r, memory_order order=memory_order_seq_cst) volatile
     {
-        __asm__ __volatile__("xchgb %0, %1\n" : "=r" (r) : "m"(i), "0" (r) : "memory");
+        __asm__ __volatile__("xchgb %0, %1\n" : "=q" (r) : "m"(i), "0" (r) : "memory");
         return r;
     }
     T fetch_add(T c, memory_order order=memory_order_seq_cst) volatile
     {
-        __asm__ __volatile__("lock xaddb %0, %1" : "+r" (c), "+m" (i) :: "memory");
+        __asm__ __volatile__("lock; xaddb %0, %1" : "+q" (c), "+m" (i) :: "memory");
         return c;
     }
 
@@ -171,7 +171,7 @@ public:
     {
         fence_before(success_order);
         T prev=expected;
-        __asm__ __volatile__("lock cmpxchgw %1, %2\n" : "=a" (prev) : "q" (desired), "m" (i), "a" (expected) : "memory");
+        __asm__ __volatile__("lock; cmpxchgw %1, %2\n" : "=a" (prev) : "q" (desired), "m" (i), "a" (expected) : "memory");
         bool success=(prev==expected);
         if (success) fence_after(success_order);
         else fence_after(failure_order);
@@ -193,7 +193,7 @@ public:
     }
     T fetch_add(T c, memory_order order=memory_order_seq_cst) volatile
     {
-        __asm__ __volatile__("lock xaddw %0, %1" : "+r" (c), "+m" (i) :: "memory");
+        __asm__ __volatile__("lock; xaddw %0, %1" : "+r" (c), "+m" (i) :: "memory");
         return c;
     }
 
@@ -240,7 +240,7 @@ public:
     {
         fence_before(success_order);
         T prev=expected;
-        __asm__ __volatile__("lock cmpxchgl %1, %2\n" : "=a" (prev) : "q" (desired), "m" (i), "a" (expected) : "memory");
+        __asm__ __volatile__("lock; cmpxchgl %1, %2\n" : "=a" (prev) : "q" (desired), "m" (i), "a" (expected) : "memory");
         bool success=(prev==expected);
         if (success) fence_after(success_order);
         else fence_after(failure_order);
@@ -262,7 +262,7 @@ public:
     }
     T fetch_add(T c, memory_order order=memory_order_seq_cst) volatile
     {
-        __asm__ __volatile__("lock xaddl %0, %1" : "+r" (c), "+m" (i) :: "memory");
+        __asm__ __volatile__("lock; xaddl %0, %1" : "+r" (c), "+m" (i) :: "memory");
         return c;
     }
 
@@ -310,7 +310,7 @@ public:
     {
         fence_before(success_order);
         T prev=expected;
-        __asm__ __volatile__("lock cmpxchgq %1, %2\n" : "=a" (prev) : "q" (desired), "m" (i), "a" (expected) : "memory");
+        __asm__ __volatile__("lock; cmpxchgq %1, %2\n" : "=a" (prev) : "q" (desired), "m" (i), "a" (expected) : "memory");
         bool success=(prev==expected);
         if (success) fence_after(success_order);
         else fence_after(failure_order);
@@ -332,7 +332,7 @@ public:
     }
     T fetch_add(T c, memory_order order=memory_order_seq_cst) volatile
     {
-        __asm__ __volatile__("lock xaddq %0, %1" : "+r" (c), "+m" (i) :: "memory");
+        __asm__ __volatile__("lock; xaddq %0, %1" : "+r" (c), "+m" (i) :: "memory");
         return c;
     }
 
@@ -362,11 +362,11 @@ public:
         fence_before(success_order);
         T prev=expected;
 #if !defined(__PIC__)
-        __asm__ __volatile__("lock cmpxchg8b %3\n" :
+        __asm__ __volatile__("lock; cmpxchg8b %3\n" :
             "=A" (prev) : "b" ((long)desired), "c" ((long)(desired>>32)), "m" (i), "0" (prev) : "memory");
 #else
         // -fPIC requires register EBX to be available to the compiler
-        __asm__ __volatile__("push %%ebx; movl %1,%%ebx; lock cmpxchg8b %3; pop %%ebx\n" :
+        __asm__ __volatile__("push %%ebx; movl %1,%%ebx; lock; cmpxchg8b %3; pop %%ebx\n" :
             "=A" (prev) : "m" ((long)desired), "c" ((long)(desired>>32)), "m" (i), "0" (prev) : "memory");
 #endif
         bool success=(prev==expected);
