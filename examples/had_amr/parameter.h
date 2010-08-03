@@ -41,7 +41,6 @@ struct Par {
       int loglevel;
       had_double_type output;
       int output_stdout;
-      int stencilsize;
       int linearbounds;
       int integrator;
       int nx0;
@@ -59,7 +58,6 @@ struct Par {
       int output_level;
       int PP;
       int granularity;
-      int ghostwidth;
 };
 
 #if defined(__cplusplus)

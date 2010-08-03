@@ -154,6 +154,15 @@ namespace hpx { namespace components { namespace amr
         resultval->right_alloc_ = false;
         resultval->left_alloc_ = false;
 
+        // DEBUG
+        char description[80];
+        double dasx = (double) resultval->x_[0];
+        double dast = (double) resultval->timestep_;
+        sprintf(description,"x: %g t: %g level: %d",dasx,dast,val[0]->level_);
+        threads::thread_self& self = threads::get_self();
+        threads::thread_id_type id = self.get_thread_id();
+        threads::set_thread_description(id,description);
+
         if (val[0]->level_ == 0 && val[0]->timestep_ < numsteps_ || val[0]->level_ > 0) {
 
             // copy over critical info
