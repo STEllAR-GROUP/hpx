@@ -95,6 +95,7 @@ namespace hpx { namespace threads
     ///                   thread is not known to the threadmanager the return 
     ///                   value will be the string "<unknown>".
     HPX_API_EXPORT std::string get_thread_description(thread_id_type id);
+    HPX_API_EXPORT void set_thread_description(thread_id_type id, char const* desc);
 
     HPX_API_EXPORT std::string get_thread_lco_description(thread_id_type id);
     HPX_API_EXPORT void set_thread_lco_description(thread_id_type id, char const* desc = "");

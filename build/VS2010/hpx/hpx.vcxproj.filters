@@ -102,12 +102,6 @@
     <Filter Include="Source Files\Runtime\Applier">
       <UniqueIdentifier>{a50d407f-0be4-4312-a8fc-e91c812bd838}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Runtime\Applier\Components">
-      <UniqueIdentifier>{5fcbae02-6b64-4509-ab64-5c002b032b5e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Runtime\Applier\Components\Server">
-      <UniqueIdentifier>{c1cfc809-0781-465d-808d-06554754c0a9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Runtime\Naming">
       <UniqueIdentifier>{397e8e4b-17e9-479b-9ce9-996c6a84db45}</UniqueIdentifier>
     </Filter>
@@ -140,6 +134,12 @@
     </Filter>
     <Filter Include="Header Files\Include\Config">
       <UniqueIdentifier>{2bd75355-9018-4bac-90d2-39acc245d14c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\Components">
+      <UniqueIdentifier>{5fcbae02-6b64-4509-ab64-5c002b032b5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\Components\Server">
+      <UniqueIdentifier>{c1cfc809-0781-465d-808d-06554754c0a9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -186,25 +186,25 @@
       <Filter>Source Files\Runtime\Applier</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\components\component_type.cpp">
-      <Filter>Source Files\Runtime\Applier\Components</Filter>
+      <Filter>Source Files\Runtime\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\components\server\console_error_sink.cpp">
-      <Filter>Source Files\Runtime\Applier\Components\Server</Filter>
+      <Filter>Source Files\Runtime\Components\Server</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\components\server\console_error_sink_singleton.cpp">
-      <Filter>Source Files\Runtime\Applier\Components\Server</Filter>
+      <Filter>Source Files\Runtime\Components\Server</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\components\server\console_logging.cpp">
-      <Filter>Source Files\Runtime\Applier\Components\Server</Filter>
+      <Filter>Source Files\Runtime\Components\Server</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\components\server\memory.cpp">
-      <Filter>Source Files\Runtime\Applier\Components\Server</Filter>
+      <Filter>Source Files\Runtime\Components\Server</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\components\server\memory_block.cpp">
-      <Filter>Source Files\Runtime\Applier\Components\Server</Filter>
+      <Filter>Source Files\Runtime\Components\Server</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\components\server\runtime_support.cpp">
-      <Filter>Source Files\Runtime\Applier\Components\Server</Filter>
+      <Filter>Source Files\Runtime\Components\Server</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\naming\address.cpp">
       <Filter>Source Files\Runtime\Naming</Filter>
@@ -278,7 +278,7 @@
     <ClCompile Include="..\..\..\src\util\init_ini_data.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\boost\libs\signals\src\named_slot_map.cpp">
+    <ClCompile Include="..\..\..\..\..\boost\libs\signals\src\named_slot_map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -744,6 +744,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\hpx_init.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\random.hpp">
+      <Filter>Header Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

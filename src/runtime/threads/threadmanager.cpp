@@ -291,7 +291,7 @@ namespace hpx { namespace threads
     /// threadmanager_impl
     template <typename SchedulingPolicy, typename NotificationPolicy>
     std::string threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        get_description(thread_id_type id)
+        get_description(thread_id_type id) const
     {
         // we know that the id is actually the pointer to the thread
         thread* thrd = reinterpret_cast<thread*>(id);
@@ -299,8 +299,18 @@ namespace hpx { namespace threads
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        set_description(thread_id_type id, char const* desc)
+    {
+        // we know that the id is actually the pointer to the thread
+        thread* thrd = reinterpret_cast<thread*>(id);
+        if (thrd->get()) 
+            thrd->set_description(desc);
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
     std::string threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        get_lco_description(thread_id_type id)
+        get_lco_description(thread_id_type id) const
     {
         // we know that the id is actually the pointer to the thread
         thread* thrd = reinterpret_cast<thread*>(id);

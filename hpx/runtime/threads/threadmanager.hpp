@@ -158,9 +158,10 @@ namespace hpx { namespace threads
         ///                 thread referenced by the \a id parameter. If the 
         ///                 thread is not known to the threadmanager the return 
         ///                 value will be the string "<unknown>".
-        virtual std::string get_description(thread_id_type id) = 0;
+        virtual std::string get_description(thread_id_type id) const = 0;
+        virtual void set_description(thread_id_type id, char const* desc = "") = 0;
 
-        virtual std::string get_lco_description(thread_id_type id) = 0;
+        virtual std::string get_lco_description(thread_id_type id) const = 0;
         virtual void set_lco_description(thread_id_type id, char const* desc = "") = 0;
 
         /// The function \a register_work adds a new work item to the thread 
@@ -473,9 +474,10 @@ namespace hpx { namespace threads
         ///                 thread referenced by the \a id parameter. If the 
         ///                 thread is not known to the threadmanager the return 
         ///                 value will be the string "<unknown>".
-        std::string get_description(thread_id_type id);
+        std::string get_description(thread_id_type id) const;
+        void set_description(thread_id_type id, char const* desc = "");
 
-        std::string get_lco_description(thread_id_type id);
+        std::string get_lco_description(thread_id_type id) const;
         void set_lco_description(thread_id_type id, char const* desc = "");
 
     protected:

@@ -152,7 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\boost\libs\signals\src\named_slot_map.cpp" />
+    <ClCompile Include="..\..\..\..\..\boost\libs\signals\src\named_slot_map.cpp" />
     <ClCompile Include="..\..\..\src\exception_list.cpp" />
     <ClCompile Include="..\..\..\src\runtime.cpp" />
     <ClCompile Include="..\..\..\src\runtime\naming\bulk_resolver_client.cpp" />
@@ -226,6 +226,7 @@
     <ClInclude Include="..\..\..\hpx\runtime\naming\detail\resolver_do_undo.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\naming\server\request_handler_registry.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\detail\tagged_thread_state.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\random.hpp" />
     <ClInclude Include="..\..\..\hpx\util\spinlock_pool.hpp" />
     <ClInclude Include="..\..\..\hpx\version.hpp" />
     <ClInclude Include="..\..\..\hpx\util\asio_util.hpp" />

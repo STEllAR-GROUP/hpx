@@ -164,14 +164,18 @@ namespace hpx { namespace threads { namespace detail
             return coroutine_.get_thread_phase();
         }
  
-        char const* const get_description() const
+        char const* get_description() const
         {
-            return description_;
+            return description_.c_str();
+        }
+        void set_description(char const* desc) 
+        {
+            description_ = desc;
         }
 
         char const* get_lco_description() const
         {
-            return lco_description_;
+            return lco_description_.c_str();
         }
         void set_lco_description(char const* lco_description)
         {
@@ -242,8 +246,8 @@ namespace hpx { namespace threads { namespace detail
         mutable boost::atomic<thread_state_ex> current_state_ex_;
 
         // all of the following is debug/logging support information
-        char const* const description_;
-        char const* lco_description_;
+        std::string description_;
+        std::string lco_description_;
 
         boost::uint32_t parent_locality_prefix_;
         thread_id_type parent_thread_id_;
@@ -490,10 +494,16 @@ namespace hpx { namespace threads
         }
 
         /// \brief Get the (optional) description of this thread
-        char const* const get_description() const
+        char const* get_description() const
         {
             detail::thread const* t = get();
             return t ? t->get_description() : "<terminated>";
+        }
+        void set_description(char const* desc = "") 
+        {
+            detail::thread* t = get();
+            if (t) 
+                t->set_description(desc);
         }
 
         char const* get_lco_description() const
