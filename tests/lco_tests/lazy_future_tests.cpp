@@ -126,6 +126,8 @@ int hpx_main(po::variables_map &vm)
     // initiate shutdown of the runtime systems on all localities
     components::stubs::runtime_support::shutdown_all();
 
+    std::cout << "Test passed" << std::endl;
+
     return 0;
 }
 

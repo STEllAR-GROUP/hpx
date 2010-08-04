@@ -185,3 +185,15 @@ macro(ADD_HPX_EXECUTABLE name)
 
 endmacro(ADD_HPX_EXECUTABLE)
 
+###############################################################################
+# This macro allows to setup tests
+macro(ADD_HPX_TEST name)
+  ADD_TEST(NAME ${name} COMMAND ${name} "-r")
+  SET_TESTS_PROPERTIES(${name} 
+                       PROPERTIES FAIL_REGULAR_EXPRESSION
+                       "ERROR;FAIL;Test failed")
+  SET_TESTS_PROPERTIES(${name} 
+                       PROPERTIES PASS_REGULAR_EXPRESSION 
+                       "Test passed")
+endmacro(ADD_HPX_TEST)
+

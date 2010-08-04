@@ -35,6 +35,12 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
+# Enable testing
+if("$ENV{HPX_TESTS}" STREQUAL "all")
+  ENABLE_TESTING()
+  SET(CMAKE_SKIP_RPATH TRUE)
+endif("$ENV{HPX_TESTS}" STREQUAL "all")
+
 # We need to use Boost, namely the following Boost libraries
 set(Boost_FIND_VERSION_EXACT OFF)
 #set(Boost_FIND_VERSION_MAJOR 1)

@@ -131,6 +131,8 @@ int hpx_main(po::variables_map &vm)
 
   hpx_finalize();
 
+  std::cout << "Test passed" << std::endl;
+
   return 0;
 }
 

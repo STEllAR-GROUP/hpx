@@ -20,28 +20,6 @@ using namespace hpx;
 namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Helpers
-
-typedef hpx::naming::id_type id_type;
-typedef hpx::naming::gid_type gid_type;
-
-inline gid_type find_here(void)
-{
-    return hpx::applier::get_applier().get_runtime_support_raw_gid();
-}
-
-inline gid_type find_there(void)
-{
-    std::vector<gid_type> localities;
-    applier::get_applier().get_remote_prefixes(localities);
-
-    if (localities.size() > 0)
-        return localities[0];
-    else
-        return find_here();
-}
-
-///////////////////////////////////////////////////////////////////////////////
 int print(id_type d_id)
 {
   typedef lcos::base_lco_with_value<int>::get_value_action get_action;
@@ -61,7 +39,8 @@ typedef hpx::lcos::dataflow_variable<int,int> dataflow_int_type;
 int hpx_main(po::variables_map &vm)
 {
     id_type here = naming::id_type(find_here(), naming::id_type::unmanaged);
-    id_type there = naming::id_type(find_there(), naming::id_type::unmanaged);
+    id_type there = naming::id_type(
+	get_runtime().get_process().next(), naming::id_type::unmanaged);
 
     std::cout << ">>> print here, there" << std::endl;
     std::cout << here << " " << there << std::endl << std::endl;
@@ -89,7 +68,9 @@ int hpx_main(po::variables_map &vm)
     }
 
     // initiate shutdown of the runtime systems on all localities
-    components::stubs::runtime_support::shutdown_all();
+    hpx_finalize();
+
+    std::cout << "Test passed" << std::endl;
 
     return 0;
 }
