@@ -37,8 +37,8 @@ endif()
 
 # Enable testing
 if("$ENV{HPX_TESTS}" STREQUAL "all")
-  ENABLE_TESTING()
   SET(CMAKE_SKIP_RPATH TRUE)
+  ENABLE_TESTING()
 endif("$ENV{HPX_TESTS}" STREQUAL "all")
 
 # We need to use Boost, namely the following Boost libraries

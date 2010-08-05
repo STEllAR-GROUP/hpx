@@ -188,12 +188,75 @@ endmacro(ADD_HPX_EXECUTABLE)
 ###############################################################################
 # This macro allows to setup tests
 macro(ADD_HPX_TEST name)
-  ADD_TEST(NAME ${name} COMMAND ${name} "-r")
-  SET_TESTS_PROPERTIES(${name} 
+  parse_arguments(${name}
+                  "TEST;APP;HPX"
+                  "DEBUG"
+                  ${ARGN}
+                 )
+  set(app_list ${name} ${${name}_APP})
+  string(REPLACE ";" " " app_command "${app_list}")
+
+  message("Adding test: " ${name} "_" ${${name}_TEST})
+
+  ADD_TEST(
+      NAME ${name}_${${name}_TEST}
+      COMMAND 
+          ${hpx_SOURCE_DIR}/tools/hpx_run.py 
+          "${app_command}"
+          ${${name}_HPX})
+
+  SET_TESTS_PROPERTIES(${name}_${${name}_TEST}
                        PROPERTIES FAIL_REGULAR_EXPRESSION
                        "ERROR;FAIL;Test failed")
-  SET_TESTS_PROPERTIES(${name} 
+  SET_TESTS_PROPERTIES(${name}_${${name}_TEST}
                        PROPERTIES PASS_REGULAR_EXPRESSION 
                        "Test passed")
 endmacro(ADD_HPX_TEST)
+
+macro(ADD_HPX_TEST_SWEEP name)
+  parse_arguments(${name}
+                  "APP;HPX"
+                  "DEBUG"
+                  ${ARGN}
+                 )
+  set(app_list ${name} ${${name}_APP})
+  string(REPLACE ";" " " app_command "${app_list}")
+
+  set(max_localities 1)
+  if(NOT $ENV{HPX_TESTS_MAX_LOCALITIES} STREQUAL "")
+    if($ENV{HPX_TESTS_MAX_LOCALITIES} GREATER "1")
+      set(max_localities $ENV{HPX_TESTS_MAX_LOCALITIES})
+    endif($ENV{HPX_TESTS_MAX_LOCALITIES} GREATER "1")
+  endif(NOT $ENV{HPX_TESTS_MAX_LOCALITIES} STREQUAL "")
+
+  set(max_cores 1)
+  if(NOT $ENV{HPX_TESTS_MAX_CORES} STREQUAL "")
+    if($ENV{HPX_TESTS_MAX_CORES} GREATER "1")
+      set(max_cores $ENV{HPX_TESTS_MAX_CORES})
+    endif($ENV{HPX_TESTS_MAX_CORES} GREATER "1")
+  endif(NOT $ENV{HPX_TESTS_MAX_CORES} STREQUAL "")
+
+  math(EXPR max_limit "${max_localities} * ${max_cores}")
+  if(NOT $ENV{HPX_TESTS_MAX_LIMIT} STREQUAL "")
+    if($ENV{HPX_TESTS_MAX_LIMIT} GREATER "1")
+      set(max_limit $ENV{HPX_TESTS_MAX_LIMIT})
+    endif($ENV{HPX_TESTS_MAX_LIMIT} GREATER "1")
+  endif(NOT $ENV{HPX_TESTS_MAX_LIMIT} STREQUAL "")
+
+  set(num_localities 1)
+  while(NOT ${num_localities} GREATER ${max_localities})
+    set(num_cores 1)
+    while(NOT ${num_cores} GREATER ${max_cores})
+      math(EXPR required "${num_localities} * ${num_cores}")
+      if(NOT ${required} GREATER ${max_limit})
+        add_hpx_test(${test} 
+                     TEST ${num_localities}_${num_cores}
+                     APP ${${name}_APP}
+                     HPX -l ${num_localities}:${num_cores} ${${name}_HPX})
+      endif(NOT ${required} GREATER ${max_limit})
+      math(EXPR num_cores "${num_cores} * 2")
+    endwhile(NOT ${num_cores} GREATER ${max_cores})
+    math(EXPR num_localities "${num_localities} * 2")
+  endwhile(NOT ${num_localities} GREATER ${max_localities})
+endmacro(ADD_HPX_TEST_SWEEP)
 

@@ -19,6 +19,6 @@ set(TESTS
 foreach(test ${TESTS})
     set(${test}_SOURCES ${test}.cpp)
     add_hpx_executable(${test} SOURCES ${${test}_SOURCES})
-    add_hpx_test(${test})
+    add_hpx_test(${test} TEST 1_1 HPX -l 1:1 -s)
 endforeach()
 
