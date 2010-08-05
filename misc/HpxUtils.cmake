@@ -193,10 +193,12 @@ macro(ADD_HPX_TEST name)
                   "DEBUG"
                   ${ARGN}
                  )
+
   set(app_list ${name} ${${name}_APP})
   string(REPLACE ";" " " app_command "${app_list}")
 
-  message("Adding test: " ${name} "_" ${${name}_TEST})
+  string(REGEX REPLACE ".*/([^/]*)$" "\\1" simple_name ${name})
+  message("Adding test: " ${simple_name} "_" ${${name}_TEST})
 
   ADD_TEST(
       NAME ${name}_${${name}_TEST}
@@ -219,8 +221,6 @@ macro(ADD_HPX_TEST_SWEEP name)
                   "DEBUG"
                   ${ARGN}
                  )
-  set(app_list ${name} ${${name}_SWEEP_APP})
-  string(REPLACE ";" " " app_command "${app_list}")
 
   set(max_localities 1)
   if(NOT $ENV{HPX_TESTS_MAX_LOCALITIES} STREQUAL "")
@@ -249,7 +249,7 @@ macro(ADD_HPX_TEST_SWEEP name)
     while(NOT ${num_cores} GREATER ${max_cores})
       math(EXPR required "${num_localities} * ${num_cores}")
       if(NOT ${required} GREATER ${max_limit})
-        add_hpx_test(${test} 
+        add_hpx_test(${name}
                      TEST ${num_localities}_${num_cores}
                      APP ${${name}_SWEEP_APP}
                      HPX -l ${num_localities}:${num_cores} ${${name}_SWEEP_HPX})
