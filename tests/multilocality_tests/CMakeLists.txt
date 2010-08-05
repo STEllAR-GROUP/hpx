@@ -12,5 +12,5 @@ foreach(test ${TESTS})
   set(${test}_SOURCES ${test}.cpp)
   add_hpx_executable(${test} SOURCES ${${test}_SOURCES})
 
-  add_hpx_test_sweep(${test} APP --throws 1000000 HPX -s)
+  add_hpx_test_sweep(${test} SWEEP_APP --throws 10000000 SWEEP_HPX -s)
 endforeach()

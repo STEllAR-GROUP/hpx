@@ -215,11 +215,11 @@ endmacro(ADD_HPX_TEST)
 
 macro(ADD_HPX_TEST_SWEEP name)
   parse_arguments(${name}
-                  "APP;HPX"
+                  "SWEEP_APP;SWEEP_HPX"
                   "DEBUG"
                   ${ARGN}
                  )
-  set(app_list ${name} ${${name}_APP})
+  set(app_list ${name} ${${name}_SWEEP_APP})
   string(REPLACE ";" " " app_command "${app_list}")
 
   set(max_localities 1)
@@ -251,8 +251,8 @@ macro(ADD_HPX_TEST_SWEEP name)
       if(NOT ${required} GREATER ${max_limit})
         add_hpx_test(${test} 
                      TEST ${num_localities}_${num_cores}
-                     APP ${${name}_APP}
-                     HPX -l ${num_localities}:${num_cores} ${${name}_HPX})
+                     APP ${${name}_SWEEP_APP}
+                     HPX -l ${num_localities}:${num_cores} ${${name}_SWEEP_HPX})
       endif(NOT ${required} GREATER ${max_limit})
       math(EXPR num_cores "${num_cores} * 2")
     endwhile(NOT ${num_cores} GREATER ${max_cores})
