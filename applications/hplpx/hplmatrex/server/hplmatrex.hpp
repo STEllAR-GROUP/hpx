@@ -248,7 +248,6 @@ namespace hpx { namespace components { namespace server
     //LUsolve is simply a wrapper function for LUfactor and LUbacksubst
     double HPLMatrex::LUsolve(){
 	pivot();
-	print();
 	LUdivide();
 
 	//allocate memory space to store the solution
@@ -279,7 +278,7 @@ namespace hpx { namespace components { namespace server
 	//values to compute the final pivot array
 	for(unsigned int i=0;i<rows-1;i++){
 	    max_row = i;
-	    max = fabs(truedata[pivotarr[i]][i]);
+	    max = std::fabs(truedata[pivotarr[i]][i]);
 	    temp_piv = pivotarr[i];
 	    for(unsigned int j=i+1;j<rows;j++){
 		temp = std::fabs(truedata[pivotarr[j]][i]);
