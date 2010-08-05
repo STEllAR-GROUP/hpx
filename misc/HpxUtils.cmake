@@ -198,19 +198,20 @@ macro(ADD_HPX_TEST name)
   string(REPLACE ";" " " app_command "${app_list}")
 
   string(REGEX REPLACE ".*/([^/]*)$" "\\1" simple_name ${name})
-  message("Adding test: " ${simple_name} "_" ${${name}_TEST})
+  set(simple_name ${simple_name}_${${name}_TEST})
+  message("Adding test: " ${simple_name})
 
   ADD_TEST(
-      NAME ${name}_${${name}_TEST}
+      NAME ${simple_name}
       COMMAND 
           ${hpx_SOURCE_DIR}/tools/hpx_run.py 
           "${app_command}"
           ${${name}_HPX})
 
-  SET_TESTS_PROPERTIES(${name}_${${name}_TEST}
+  SET_TESTS_PROPERTIES(${simple_name}
                        PROPERTIES FAIL_REGULAR_EXPRESSION
                        "ERROR;FAIL;Test failed")
-  SET_TESTS_PROPERTIES(${name}_${${name}_TEST}
+  SET_TESTS_PROPERTIES(${simple_name}
                        PROPERTIES PASS_REGULAR_EXPRESSION 
                        "Test passed")
 endmacro(ADD_HPX_TEST)
