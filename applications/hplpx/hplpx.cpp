@@ -13,16 +13,23 @@ namespace po=boost::program_options;
 
 //the size of the matrix
 unsigned int SIZE = 1024;
-unsigned int BSIZE = 512;
+unsigned int ABSIZE = 256;
+unsigned int BSIZE = 250;
 double ERROR = 0;
 
-/*This is the first implementation of a program to solve LU decomposition
-without use of partial pivoting.  The matrix generated is random, and the
-values are spread over a large range, diminishing the need for partial
-pivoting.*/
+/*This small program is used to perform LU decomposition on a randomly
+generated matrix.  Unlike the standard HPL algorithm, partial pivoting
+is not implemented.  This is for simplicity and takes into account
+the fact that partial pivoting is rarely needed for randomly generated
+matrices.  Upon completion of the computations, the error of the
+generated solution is calculated and displayed as both cumulative
+error and average error per part of solution, as well as the total
+execution time from just before starting the AGAS server to the
+statistical printout.*/
+
 //////////////////////////////////////////////////////////////////
-//This is where the matrix-like data structure is created and
-//the call to the computation function occurs.
+//this is where the data structure is created and the computation
+//function is called
 int hpx_main(){
 	int i,j,t=0;
 
@@ -41,7 +48,7 @@ int hpx_main(){
 
 	dat.create(naming::id_type(prefix,naming::id_type::unmanaged));
 
-	dat.construct(SIZE,SIZE+1,BSIZE);
+	dat.construct(SIZE,SIZE+1,ABSIZE,BSIZE);
 
 	ERROR = dat.LUsolve();
 	dat.destruct();
@@ -76,15 +83,20 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "HPX locality")
             ("queueing,q", po::value<std::string>(),
                 "the queue scheduling policy to use, options are 'global' "
-                " and 'local' (default is 'global')")
+                "and 'local' (default is 'global')")
             ("size,S", po::value<int>(),
-                "the height of the n x n+1 matrix generated(default is 1024)")
+                "the height of the n x n+1 matrix generated, where n is the height "
+		"and the minimum size value is 3(default is 1024)")
             ("csv,s", "generate statistics of the run in comma separated format")
             ("blocksize,b", po::value<int>(),
                 "blocksize correlates to the amount of work performed by each "
-		"thread, and input values are rounded down to the nearest power "
-		"of 2. A blocksize of 1 corresponds to the minimal amount of "
-		"work(default is 512)");
+		"thread during gaussian elimination (default is 256)")
+	    ("allocblock,A", po::value<int>(),
+		"allocblock effects the amount of work each thread performs "
+		"during memory allocation, initialization, and during the "
+		"final correctness check.  Only powers of 2 are accepted, "
+		"all other values will be rounded down to the nearest power of 2"
+		"(default is 256)");
 
         po::store(po::command_line_parser(argc, argv)
             .options(desc_cmdline).run(), vm);
@@ -200,6 +212,16 @@ int main(int argc, char* argv[]){
 		    }
 		}
 
+                if(vm.count("allocblock")){
+                    if((vm["allocblock"].as<int>() > 0) && (vm["allocblock"].as<int>() <= SIZE)){
+                        ABSIZE = vm["allocblock"].as<int>();
+                    }
+                    else{
+                        std::cerr<<"warning: --allocblock option ignored, input value is "
+                                "invalid, using default\n";
+                    }
+                }
+
 		//now that the parameters have been set, we get a start time for the timing
 		//of the application
 		ptime start(microsec_clock::local_time());
@@ -208,7 +230,6 @@ int main(int argc, char* argv[]){
 		std::auto_ptr<agas_server_helper> agas_server;
 		if(vm.count("run_agas_server"))
 			agas_server.reset(new agas_server_helper(agas_host, agas_port));
-
 		//define the runtime type
 		if(queueing == "global"){
 			typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler>
@@ -256,11 +277,14 @@ int main(int argc, char* argv[]){
 		//output the results
                	if(vm.count("csv")){
             	    std::cout<<num_threads<<","<<SIZE<<","<<BSIZE<<","<<ERROR<<","
-			<<ptime(microsec_clock::local_time()) - start<<std::endl;
+			<<ERROR/SIZE<<","<<ptime(microsec_clock::local_time())-start
+			<<std::endl;
 	        }
                 else{
-                    std::cout<<"total error in solution: "<<ERROR<<std::endl<<"time elapsed: "
-                        <<ptime(microsec_clock::local_time()) - start<<std::endl;
+                    std::cout<<"total error: "
+			<<ERROR<<std::endl<<"average error: "<<ERROR/SIZE<<std::endl
+			<<"time elapsed: "<<ptime(microsec_clock::local_time())-start
+			<<std::endl;
                 }
 	}
 	catch(std::exception& e){

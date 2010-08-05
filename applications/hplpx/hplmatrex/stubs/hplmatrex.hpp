@@ -1,7 +1,7 @@
 #ifndef _HPLMATREX_STUBS_HPP
 #define _HPLMATREX_STUBS_HPP
 
-/*This is the HPLMatrix stub file.
+/*This is the HPLMatrex3 stub file.
 */
 
 #include <hpx/runtime/naming/name.hpp>
@@ -17,10 +17,10 @@ namespace hpx { namespace components { namespace stubs
     struct HPLMatrex : stub_base<server::HPLMatrex>
     {
 	//constructor and destructor
-	static int construct(naming::id_type gid, 
-	    unsigned int h, unsigned int w, unsigned int bs){
+	static int construct(naming::id_type gid, unsigned int h,
+	    unsigned int w, unsigned int ab, unsigned int bs){
 		return lcos::eager_future<server::HPLMatrex::construct_action,
-		    int>(gid,gid,h,w,bs).get();
+		    int>(gid,gid,h,w,ab,bs).get();
 	}
 	static void destruct(naming::id_type gid)
 	{

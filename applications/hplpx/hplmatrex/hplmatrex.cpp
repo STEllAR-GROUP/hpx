@@ -21,10 +21,6 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
 	hpx::components::server::HPLMatrex::destruct_action,HPLdestruct_action);
 HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatrex::mkvec_action,HPLmkvek_action);
-HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatrex::allocate_action,HPLallocate_action);
-HPX_REGISTER_ACTION_EX(
 	hpx::components::server::HPLMatrex::assign_action,HPLassign_action);
 HPX_REGISTER_ACTION_EX(
 	hpx::components::server::HPLMatrex::set_action,HPLset_action);
@@ -33,9 +29,13 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
 	hpx::components::server::HPLMatrex::solve_action,HPLsolve_action);
 HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatrex::gauss_action,HPLgauss_action);
+	hpx::components::server::HPLMatrex::swap_action,HPLswap_action);
 HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatrex::gline_action,HPLgline_action);
+	hpx::components::server::HPLMatrex::gtop_action,HPLgtop_action);
+HPX_REGISTER_ACTION_EX(
+	hpx::components::server::HPLMatrex::gleft_action,HPLgleft_action);
+HPX_REGISTER_ACTION_EX(
+	hpx::components::server::HPLMatrex::gtrail_action,HPLgtrail_action);
 HPX_REGISTER_ACTION_EX(
 	hpx::components::server::HPLMatrex::bsubst_action,HPLbsubst_action);
 HPX_REGISTER_ACTION_EX(

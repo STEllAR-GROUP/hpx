@@ -1,7 +1,7 @@
 #ifndef _HPLMATREX_HPP
 #define _HPLMATREX_HPP
 
-/*This is the HPLMatrix interface header file.
+/*This is the HPLMatrex3 interface header file.
 In order to keep things simple, only operations necessary
 to to perform LUP decomposition are declared, which is
 basically just constructors, assignment operators, 
@@ -30,9 +30,9 @@ namespace hpx { namespace components
 	}
 
 	//initialization function
-	int construct(unsigned int h, unsigned int w, unsigned int bs){
+	int construct(unsigned int h, unsigned int w, unsigned int ab, unsigned int bs){
 		BOOST_ASSERT(gid_);
-		return this->base_type::construct(gid_,h,w,bs);
+		return this->base_type::construct(gid_,h,w,ab,bs);
 	}
 
 	//operators for assignment and data access
