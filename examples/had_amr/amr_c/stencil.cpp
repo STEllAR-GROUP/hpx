@@ -158,7 +158,7 @@ namespace hpx { namespace components { namespace amr
         char description[80];
         double dasx = (double) resultval->x_[0];
         double dast = (double) resultval->timestep_;
-        sprintf(description,"x: %g t: %g level: %d",dasx,dast,val[0]->level_);
+        snprintf(description,sizeof(description),"x: %g t: %g level: %d",dasx,dast,val[0]->level_);
         threads::thread_self& self = threads::get_self();
         threads::thread_id_type id = self.get_thread_id();
         threads::set_thread_description(id,description);
@@ -213,8 +213,11 @@ namespace hpx { namespace components { namespace amr
         if ( val[0]->level_ > 0 ) {
           return 0;
         } else {
+          BOOST_ASSERT(numsteps_%6 == 0);
           int t = resultval->cycle_;
           int r = numsteps_ - t;
+          int m = r/3;
+          std::cout << " TEST t " << t << " r " << r << " numsteps " << numsteps_ << " m " << m << std::endl;
           return r;
         }
     }

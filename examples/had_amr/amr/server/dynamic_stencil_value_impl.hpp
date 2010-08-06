@@ -151,8 +151,10 @@ namespace hpx { namespace components { namespace amr { namespace server
         // from the previous time step, computing the result of the current
         // time step and storing the computed value in the memory_block 
         // referenced by value_gid_
-        int timesteps_to_go = row_ + 1;
-        while (timesteps_to_go > row_) {
+        //int timesteps_to_go = row_ + 1;
+        //while (timesteps_to_go > row_) 
+        int timesteps_to_go = 1;
+        while (timesteps_to_go > 0) {
             // start acquire operations on input ports
             for (std::size_t i = 0; i < instencilsize_; ++i)
                 in_[i]->aquire_value();         // non-blocking!
