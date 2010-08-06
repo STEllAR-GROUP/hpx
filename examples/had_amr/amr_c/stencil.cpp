@@ -216,9 +216,9 @@ namespace hpx { namespace components { namespace amr
           BOOST_ASSERT(numsteps_%6 == 0);
           int t = resultval->cycle_;
           int r = numsteps_ - t;
-          int m = r/3;
+          int m = r/6;
           std::cout << " TEST t " << t << " r " << r << " numsteps " << numsteps_ << " m " << m << std::endl;
-          return r;
+          return m;
         }
     }
 

@@ -134,9 +134,6 @@ namespace hpx { namespace components { namespace amr { namespace server
         > start_action;
 
     private:
-        bool more_to_go(int timesteps_to_go);
-        bool calc_timestep(int timesteps_to_go);
-
         bool is_called_;                              // is one of the 'main' stencils
         threads::thread_id_type driver_thread_;
 

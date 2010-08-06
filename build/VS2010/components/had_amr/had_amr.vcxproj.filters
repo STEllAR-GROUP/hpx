@@ -35,9 +35,6 @@
     <ClCompile Include="..\..\..\..\examples\had_amr\amr\parameter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\uni_amr.cpp">
-      <Filter>Source Files\Server</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\unigrid_mesh.cpp">
       <Filter>Source Files\Server</Filter>
     </ClCompile>
@@ -80,9 +77,6 @@
       <Filter>Header Files\Server</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\stencil_value_out_adaptor.hpp">
-      <Filter>Header Files\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\uni_amr.hpp">
       <Filter>Header Files\Server</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\unigrid_mesh.hpp">
