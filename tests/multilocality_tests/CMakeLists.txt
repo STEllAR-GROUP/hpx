@@ -5,6 +5,7 @@
 
 # Multilocality tests
 set(TESTS
+    startup_test
     cpi_test
    )
 set(TESTS_dir ${hpx_BINARY_DIR}/tests/multilocality_tests)
@@ -12,8 +13,11 @@ set(TESTS_dir ${hpx_BINARY_DIR}/tests/multilocality_tests)
 foreach(test ${TESTS})
   set(${test}_SOURCES ${test}.cpp)
   add_hpx_executable(${test} SOURCES ${${test}_SOURCES})
-  add_hpx_test_sweep(
-      ${TESTS_dir}/${test} 
-      SWEEP_APP --throws 10000000 
-      SWEEP_HPX -s)
 endforeach()
+
+# Add to testing suite
+add_hpx_test_sweep(${TESTS_dir}/startup_test)
+add_hpx_test_sweep(
+    ${TESTS_dir}/cpi_test
+    SWEEP_APP --throws 10000000 
+    SWEEP_HPX -s)
