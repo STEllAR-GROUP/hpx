@@ -61,7 +61,7 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         // debug helper function, logs all suspended threads
-        inline void dump_suspended_threads(
+        inline void dump_suspended_threads(std::size_t num_thread,
             boost::ptr_map<thread_id_type, threads::thread>& tm)
         {
             typedef boost::ptr_map<thread_id_type, threads::thread> thread_map_type;
@@ -76,7 +76,8 @@ namespace hpx { namespace threads { namespace policies
                 if (state != thrd->get_marked_state()) {
                     // log each thread only once
                     if (!logged_headline) {
-                        LTM_(error) << "Listing suspended threads while queues are empty:";
+                        LTM_(error) << "Listing suspended threads while queue ("
+                                    << num_thread << ") is empty:";
                         logged_headline = true;
                     }
 
@@ -442,7 +443,7 @@ namespace hpx { namespace threads { namespace policies
 
                         // dump list of suspended threads once a second
                         if (LHPX_ENABLED(error) && addfrom->new_tasks_.empty())
-                            detail::dump_suspended_threads(thread_map_);
+                            detail::dump_suspended_threads(num_thread, thread_map_);
 
                         // in any case we reactivate all pending threads
                         if (reactivate_pending_threads())
