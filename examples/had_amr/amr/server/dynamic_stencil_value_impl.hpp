@@ -127,6 +127,16 @@ namespace hpx { namespace components { namespace amr { namespace server
         return result;
     }
 
+    inline bool dynamic_stencil_value::more_to_go(int timesteps_to_go) {
+      if ( is_called_ ) return timesteps_to_go >= 0;
+      return timesteps_to_go > 0;
+    }   
+
+    inline bool dynamic_stencil_value::calc_timestep(int timesteps_to_go) {
+      if ( is_called_ ) return timesteps_to_go > 0;
+      return true;
+    }   
+
     ///////////////////////////////////////////////////////////////////////////
     // The main thread function loops through all operations of the time steps
     // to be handled by this instance:
@@ -154,7 +164,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         //int timesteps_to_go = row_ + 1;
         //while (timesteps_to_go > row_) 
         int timesteps_to_go = 1;
-        while (timesteps_to_go > 0) {
+        while ( more_to_go(timesteps_to_go) ) {
             // start acquire operations on input ports
             for (std::size_t i = 0; i < instencilsize_; ++i)
                 in_[i]->aquire_value();         // non-blocking!
@@ -166,17 +176,19 @@ namespace hpx { namespace components { namespace amr { namespace server
             // Compute the next value, store it in value_gids_[0]
             // The eval action returns an integer allowing to finish 
             // computation (>0: still to go, 0: last step, <0: overdone)
-            timesteps_to_go = eval_helper::call(functional_gid_, 
-                value_gids_[0], row_, column_, in_, par_);
+            if ( calc_timestep(timesteps_to_go) ) {
+              timesteps_to_go = eval_helper::call(functional_gid_, 
+                  value_gids_[0], row_, column_, in_, par_);
+            }
 
             // we're done if this is exactly the last time-step and we are not 
             // supposed to return the final value, no need to wait for further
             // input anymore
-            if (timesteps_to_go < 0 && !is_called) {
-                // exit immediately, 'this' might have been destructed already
-                free_helper_sync(value_gid_to_be_freed);
-                return threads::thread_state(threads::terminated);
-            }
+            //if (timesteps_to_go < 0 && !is_called) {
+            //    // exit immediately, 'this' might have been destructed already
+            //    free_helper_sync(value_gid_to_be_freed);
+            //    return threads::thread_state(threads::terminated);
+            //}
 
             // Wait for all output threads to have read the current value.
             // On the first time step the semaphore is preset to allow 
