@@ -58,7 +58,7 @@ namespace hpx { namespace threads
         thread_logger_("threadmanager_impl::register_thread"),
         work_logger_("threadmanager_impl::register_work"),
         set_state_logger_("threadmanager_impl::set_state"),
-        thread_count_(0)
+        startup_(NULL), thread_count_(0)
     {
         LTM_(debug) << "threadmanager_impl ctor";
     }
@@ -72,6 +72,7 @@ namespace hpx { namespace threads
                 stop();
             threads_.clear();
         }
+        delete startup_;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -557,6 +558,9 @@ namespace hpx { namespace threads
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         tfunc(std::size_t num_thread)
     {
+        // wait for all threads to start up before before starting px work
+        startup_->wait();   
+
         // manage the number of this thread in its TSS
         init_tss_helper<SchedulingPolicy, NotificationPolicy> 
             tss_helper(*this, num_thread);
@@ -831,6 +835,9 @@ namespace hpx { namespace threads
         running_ = false;
         try {
             // run threads and wait for initialization to complete
+            BOOST_ASSERT (NULL == startup_);
+            startup_ = new boost::barrier(num_threads+1);   
+
             running_ = true;
             while (num_threads-- != 0) {
                 LTM_(info) << "run: create OS thread: " << num_threads; 
@@ -845,11 +852,18 @@ namespace hpx { namespace threads
 
             // start timer pool as well
             timer_pool_.run(false);
+            startup_->wait();
         }
         catch (std::exception const& e) {
             LTM_(fatal) << "run: failed with:" << e.what(); 
+
+            // trigger the barrier
+            while (num_threads-- != 0 && !startup_->wait())
+                ;
+
             stop();
             threads_.clear();
+
             return false;
         }
 
@@ -894,6 +908,8 @@ namespace hpx { namespace threads
                 }
             }
         }
+        delete startup_;
+        startup_ = NULL;
     }
 
     ///////////////////////////////////////////////////////////////////////////

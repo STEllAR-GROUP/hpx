@@ -530,7 +530,9 @@ namespace hpx { namespace threads
 
     private:
         /// this thread manager has exactly as much threads as requested
-        mutable mutex_type mtx_;            ///< mutex protecting the members
+        mutable mutex_type mtx_;                    ///< mutex protecting the members
+        boost::barrier* startup_;                   ///< startup synchronization
+
         boost::ptr_vector<boost::thread> threads_;
         boost::atomic<long> thread_count_;
 
