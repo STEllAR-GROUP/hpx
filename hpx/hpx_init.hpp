@@ -145,6 +145,7 @@ typedef hpx::threads::policies::local_queue_scheduler local_queue_policy;
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_init(po::options_description& desc_cmdline, int argc, char* argv[])
 {
+  int result = 0;
   try
   {
     // analyze the command line
@@ -205,11 +206,10 @@ int hpx_init(po::options_description& desc_cmdline, int argc, char* argv[])
 
       // Run this runtime instance
       if (mode != hpx::runtime::worker) {
-        rt.run(boost::bind(hpx_main, vm), num_threads, num_localities);
+        result = rt.run(boost::bind(hpx_main, vm), num_threads, num_localities);
       }
-      else
-      {
-        rt.run(num_threads, num_localities);
+      else {
+        result = rt.run(num_threads, num_localities);
       }
     }
     else if (queueing == "local")
@@ -227,11 +227,10 @@ int hpx_init(po::options_description& desc_cmdline, int argc, char* argv[])
 
       // Run this runtime instance
       if (mode != hpx::runtime::worker) {
-        rt.run(boost::bind(hpx_main, vm), num_threads, num_localities);
+        result = rt.run(boost::bind(hpx_main, vm), num_threads, num_localities);
       }
-      else
-      {
-        rt.run(num_threads, num_localities);
+      else {
+        result = rt.run(num_threads, num_localities);
       }
     }
     else {
@@ -246,6 +245,7 @@ int hpx_init(po::options_description& desc_cmdline, int argc, char* argv[])
     std::cerr << "hpx_init: unexpected exception caught\n";
     return -2;
   }
+  return result;
 }
 
 #endif
