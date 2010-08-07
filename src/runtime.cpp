@@ -248,23 +248,31 @@ namespace hpx
         // Set localities prefixes once per runtime instance. This should
         // work fine until we support adding and removing localities.
         {
-          std::size_t here_lid;
-          naming::gid_type tmp_here(applier_.get_runtime_support_raw_gid());
+            std::size_t here_lid = std::size_t(-1);
+            naming::gid_type tmp_here(applier_.get_runtime_support_raw_gid());
 
-          std::vector<naming::gid_type> tmp_localities;
-          agas_client_.get_prefixes(tmp_localities);
+            std::vector<naming::gid_type> tmp_localities;
+            agas_client_.get_prefixes(tmp_localities);
 
-          for (int i = 0; i< tmp_localities.size(); i++)
-          {
-            naming::gid_type there = tmp_localities[i];
-            if (tmp_here.get_msb() == there.get_msb())
+            for (std::size_t i = 0; i < tmp_localities.size(); ++i)
             {
-              here_lid = i;
-              break;
+                if (tmp_here.get_msb() == tmp_localities[i].get_msb())
+                {
+                    here_lid = i;
+                    break;
+                }
             }
-          }
 
-          this->runtime::get_process().set_localities(here_lid, tmp_localities);
+            if (here_lid == std::size_t(-1))
+            {
+                HPX_OSSTREAM strm;
+                strm << "failed to find prefix of this locality: " 
+                     << tmp_here;
+                HPX_THROW_EXCEPTION(startup_timed_out, "runtime::run", 
+                    HPX_OSSTREAM_GETSTRING(strm));
+            }
+
+            this->runtime::get_process().set_localities(here_lid, tmp_localities);
         }
 
         // register the given main function with the thread manager
