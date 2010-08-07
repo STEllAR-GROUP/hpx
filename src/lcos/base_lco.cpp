@@ -68,6 +68,12 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<hpx::util::section>::get_value_action,
     get_value_action_section);
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<hpx::util::unused_type>::set_result_action,
+    set_result_action_void);
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<hpx::util::unused_type>::get_value_action,
+    get_value_action_void);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco);
@@ -78,6 +84,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<std::vector<hpx::na
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<double>);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<int>);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<hpx::util::section>);
+HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<hpx::util::unused_type>);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Barrier

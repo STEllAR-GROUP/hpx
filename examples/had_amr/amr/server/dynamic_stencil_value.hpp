@@ -96,11 +96,12 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         /// Set the gid of the component implementing the actual time evolution
         /// functionality
-        void set_functional_component(naming::id_type const& gid, int row, 
+        util::unused_type 
+        set_functional_component(naming::id_type const& gid, int row, 
             int column, int instencilsize, int outstencilsize, 
             Parameter const& par);
 
-        void start();
+        util::unused_type start();
 
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
@@ -122,15 +123,16 @@ namespace hpx { namespace components { namespace amr { namespace server
             &dynamic_stencil_value::connect_input_ports
         > connect_input_ports_action;
 
-        typedef hpx::actions::action6<
-            dynamic_stencil_value, dynamic_stencil_value_set_functional_component, 
+        typedef hpx::actions::result_action6<
+            dynamic_stencil_value, util::unused_type,
+            dynamic_stencil_value_set_functional_component, 
             naming::id_type const&, int, int, int, int, Parameter const&,
             &dynamic_stencil_value::set_functional_component
         > set_functional_component_action;
 
-        typedef hpx::actions::action0<
-            dynamic_stencil_value, dynamic_stencil_value_start, 
-            &dynamic_stencil_value::start
+        typedef hpx::actions::result_action0<
+            dynamic_stencil_value, util::unused_type, 
+            dynamic_stencil_value_start, &dynamic_stencil_value::start
         > start_action;
 
     private:

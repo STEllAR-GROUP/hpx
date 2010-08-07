@@ -28,6 +28,11 @@ namespace hpx { namespace util
             ar & e;
         }
 
+        template <typename Archive>
+        static void serialize(Archive& ar, unused_type& e, boost::mpl::false_)
+        {
+        }
+
         template <typename Archive, typename Element>
         static void serialize(Archive& ar, Element& e, boost::mpl::true_)
         {

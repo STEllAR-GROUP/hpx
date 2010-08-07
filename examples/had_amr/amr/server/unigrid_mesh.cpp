@@ -76,16 +76,25 @@ namespace hpx { namespace components { namespace amr { namespace server
         Array3D src_size(6,numvalues,1);
         prep_ports(dst_port,dst_src,dst_step,dst_size,src_size,numvalues,par);
 
+        // start an asynchronous operation for each of the stencil value instances
+        typedef std::vector<lcos::future_value<void> > lazyvals_type;
+        lazyvals_type lazyvals;
+
         for (int column = 0; stencil != stencils.second; ++stencil, ++function, ++column)
         {
             namespace stubs = components::amr::stubs;
             BOOST_ASSERT(function != functions.second);
 
             //std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
-            stubs::dynamic_stencil_value::set_functional_component(*stencil,
-                                         *function, static_step, column, dst_size(static_step,column,0),src_size(static_step,column,0), par);
+            lazyvals.push_back(
+                stubs::dynamic_stencil_value::set_functional_component_async(
+                    *stencil, *function, static_step, column, 
+                    dst_size(static_step, column, 0), 
+                    src_size(static_step, column, 0), par));
         }
         BOOST_ASSERT(function == functions.second);
+
+        wait(lazyvals);   // now wait for the results
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -108,12 +117,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                 get_output_ports_async(*stencil));
         }
 
-        // now wait for the results
-        lazyvals_type::iterator lend = lazyvals.end();
-        for (lazyvals_type::iterator lit = lazyvals.begin(); lit != lend; ++lit) 
-        {
-            outputs.push_back((*lit).get());
-        }
+        wait(lazyvals, outputs);      // now wait for the results
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -161,8 +165,9 @@ namespace hpx { namespace components { namespace amr { namespace server
 
                 std::vector<naming::id_type> output_ports;
 
-                for (j=0;j<dst_size(step,i,0);j++) {
-                  output_ports.push_back(outputs[dst_step(step,i,j)][dst_src(step,i,j)][dst_port( step,i,j)]);
+                for (j = 0; j < dst_size(step, i, 0); ++j) {
+                    output_ports.push_back(
+                        outputs[dst_step(step,i,j)][dst_src(step,i,j)][dst_port( step,i,j)]);
                 }
 
                 components::amr::stubs::dynamic_stencil_value::
@@ -190,12 +195,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                 alloc_data_async(*function, i, numvalues_, 0, level, xmin, par));
         }
 
-        // now wait for the results
-        lazyvals_type::iterator lend = lazyvals.end();
-        for (lazyvals_type::iterator lit = lazyvals.begin(); lit != lend; ++lit) 
-        {
-            initial_data.push_back((*lit).get());
-        }
+        wait (lazyvals, initial_data);      // now wait for the results
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -219,12 +219,7 @@ namespace hpx { namespace components { namespace amr { namespace server
           //      call_async(*stencil, initial_data[i]));
         }
 
-        // now wait for the results
-        lazyvals_type::iterator lend = lazyvals.end();
-        for (lazyvals_type::iterator lit = lazyvals.begin(); lit != lend; ++lit) 
-        {
-            result_data.push_back((*lit).get());
-        }
+        wait (lazyvals, result_data);      // now wait for the results
     }
     
     ///////////////////////////////////////////////////////////////////////////////
@@ -233,7 +228,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         components::distributing_factory::iterator_range_type const& stencils)
     {
         // start the execution of all stencil stencils (data items)
-        typedef std::vector<lcos::future_value< void > > lazyvals_type;
+        typedef std::vector<lcos::future_value<void> > lazyvals_type;
 
         lazyvals_type lazyvals;
         components::distributing_factory::iterator_type stencil = stencils.first;
@@ -243,12 +238,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                 start_async(*stencil));
         }
 
-        // now wait for the results
-        lazyvals_type::iterator lend = lazyvals.end();
-        for (lazyvals_type::iterator lit = lazyvals.begin(); lit != lend; ++lit) 
-        {
-            (*lit).get();
-        }
+        wait (lazyvals);      // now wait for the results
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -263,7 +253,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::vector<naming::id_type> result_data;
 
         components::component_type stencil_type = 
-            components::get_component_type<components::amr::server::dynamic_stencil_value >();
+            components::get_component_type<components::amr::server::dynamic_stencil_value>();
 
         typedef components::distributing_factory::result_type result_type;
 
@@ -294,21 +284,24 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         int i;
         // initialize stencil_values using the stencil (functional) components
-        for (i=0;i<6;i++) init_stencils(locality_results(stencils[i]), locality_results(functions), i, numvalues, par);
+        for (i = 0; i < 6; ++i) 
+            init_stencils(locality_results(stencils[i]), locality_results(functions), i, numvalues, par);
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(6);
-        for (i=0;i<6;i++) get_output_ports(locality_results(stencils[i]), outputs[i]);
+        for (i = 0; i < 6; ++i) 
+            get_output_ports(locality_results(stencils[i]), outputs[i]);
 
         // connect output gids with corresponding stencil inputs
         connect_input_ports(stencils, outputs,par);
 
         // for loop over second row ; call start for each
-        for (i=1;i<6;i++) start_row(locality_results(stencils[i]));
+        for (i = 1; i < 6; ++i) 
+            start_row(locality_results(stencils[i]));
 
         // prepare initial data
         std::vector<naming::id_type> initial_data;
-        prepare_initial_data(locality_results(functions), initial_data,level,xmin, par);
+        prepare_initial_data(locality_results(functions), initial_data, level, xmin, par);
 
         // do actual work
         execute(locality_results(stencils[0]), initial_data, result_data);
@@ -316,7 +309,9 @@ namespace hpx { namespace components { namespace amr { namespace server
         // free all allocated components (we can do that synchronously)
         if (!logging.empty())
             factory.free_components_sync(logging);
-        for (i=5;i>=0;i--) factory.free_components_sync(stencils[i]);
+
+        for (i = 5; i >= 0; --i) 
+            factory.free_components_sync(stencils[i]);
         factory.free_components_sync(functions);
 
         return result_data;

@@ -89,7 +89,7 @@ namespace hpx { namespace components { namespace amr
         /// Subset of set_functional_component functionality
         void start()
         {
-            this->base_type::start_async(this->gid_);
+            this->base_type::start(this->gid_);
         }
     };
 

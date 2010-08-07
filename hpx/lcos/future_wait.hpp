@@ -40,21 +40,30 @@ namespace hpx { namespace components
         return boost::make_tuple(f1.get(), f2.get());
     }
 
-    template <typename T1, typename TR1>
-    inline void
-    wait (std::vector<lcos::future_value<T1, TR1> > const& v, std::vector<TR1>& r)
-    {
-        typedef lcos::future_value<T1, TR1> value_type;
-        BOOST_FOREACH(value_type const& f, v)
-            r.push_back(f.get());
-    }
-
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (3, HPX_WAIT_ARGUMENT_LIMIT,                                          \
     "hpx/lcos/future_wait.hpp"))                                              \
     /**/
 
 #include BOOST_PP_ITERATE()
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename TR>
+    inline void
+    wait (std::vector<lcos::future_value<T, TR> > const& v, std::vector<TR>& r)
+    {
+        typedef lcos::future_value<T, TR> value_type;
+        BOOST_FOREACH(value_type const& f, v)
+            r.push_back(f.get());
+    }
+
+    inline void
+    wait (std::vector<lcos::future_value<void> > const& v)
+    {
+        typedef lcos::future_value<void> value_type;
+        BOOST_FOREACH(value_type const& f, v)
+            f.get();
+    }
 
 }}
 

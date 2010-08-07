@@ -84,15 +84,24 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         /// Set the gid of the component implementing the actual time evolution
         /// functionality
-        static void set_functional_component(naming::id_type const& gid, 
+        static lcos::future_value<void> 
+        set_functional_component_async(naming::id_type const& gid, 
             naming::id_type const& functiongid, int row, int column,
             int instencilsize, int outstencilsize, Parameter const& par)
         {
             typedef
                 amr::server::dynamic_stencil_value::set_functional_component_action 
             action_type;
-            applier::apply<action_type>(gid, functiongid, row, column, 
-                instencilsize, outstencilsize, par);
+            return lcos::eager_future<action_type, void>(gid, functiongid, row, 
+                column, instencilsize, outstencilsize, par);
+        }
+
+        static void set_functional_component(naming::id_type const& gid, 
+            naming::id_type const& functiongid, int row, int column,
+            int instencilsize, int outstencilsize, Parameter const& par)
+        {
+            set_functional_component_async(gid, functiongid, row, 
+                column, instencilsize, outstencilsize, par).get();
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -103,6 +112,11 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             typedef amr::server::dynamic_stencil_value::start_action 
                 action_type;
             return lcos::eager_future<action_type, void>(gid);
+        }
+
+        static void start(naming::id_type const& gid)
+        {
+            start_async(gid).get();
         }
     };
 

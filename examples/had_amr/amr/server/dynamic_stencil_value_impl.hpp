@@ -93,7 +93,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // this needs to have been initialized
         if (-1 == instencilsize_ || -1 == outstencilsize_) {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "dynamic_stencil_value::connect_input_ports ", 
+                "dynamic_stencil_value::call", 
                 "this instance has not been initialized yet");
             return naming::invalid_id;
         }
@@ -236,7 +236,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // this needs to have been initialized
         if (-1 == instencilsize_ || -1 == outstencilsize_) {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "dynamic_stencil_value::connect_input_ports ", 
+                "dynamic_stencil_value::get_output_ports", 
                 "this instance has not been initialized yet");
             return gids;
         }
@@ -253,14 +253,14 @@ namespace hpx { namespace components { namespace amr { namespace server
         // this needs to have been initialized
         if (-1 == instencilsize_ || -1 == outstencilsize_) {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "dynamic_stencil_value::connect_input_ports ", 
+                "dynamic_stencil_value::connect_input_ports", 
                 "this instance has not been initialized yet");
             return;
         }
 
         if (gids.size() < instencilsize_) {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "dynamic_stencil_value::connect_input_ports ", 
+                "dynamic_stencil_value::connect_input_ports", 
                 "insufficient number of gid's supplied");
             return;
         }
@@ -270,7 +270,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline void 
+    inline util::unused_type 
     dynamic_stencil_value::set_functional_component(naming::id_type const& gid,
         int row, int column, int instencilsize, int outstencilsize,
         Parameter const& par)
@@ -302,10 +302,11 @@ namespace hpx { namespace components { namespace amr { namespace server
                     boost::bind(&dynamic_stencil_value::get_value, this, i)),
                     naming::id_type::managed);
         }
+        return util::unused;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline void 
+    inline util::unused_type 
     dynamic_stencil_value::start()
     {
         // if all inputs have been bound already we need to start the driver 
@@ -323,6 +324,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                     "dynamic_stencil_value::main");
             }
         }
+        return util::unused;
     }
 
 }}}}
