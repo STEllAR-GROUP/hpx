@@ -58,9 +58,6 @@ namespace hpx { namespace components { namespace amr { namespace server
         FILE *fdata;
         std::vector<double> x,Phi,chi,Pi,energy;
         double datatime;
-        int shape[3];
-        char cnames[80];
-        sprintf(cnames,"r");
         if ( logcode == 0 && val.iter_ == 0 ) {
           if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {
             for (i=0;i<val.granularity;i++) {
@@ -95,6 +92,8 @@ namespace hpx { namespace components { namespace amr { namespace server
               fclose(fdata);
             }
 #if defined(SDF_FOUND)
+            int shape[3];
+            char cnames[80] = { "r" };
             shape[0] = x.size(); 
             gft_out_full("chi",datatime,shape,cnames,1,&*x.begin(),&*chi.begin());
             gft_out_full("Phi",datatime,shape,cnames,1,&*x.begin(),&*Phi.begin());
