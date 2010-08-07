@@ -55,16 +55,10 @@
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\functional_component.hpp">
       <Filter>Header Files\Server</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\stencil_value.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\stubs\dynamic_stencil_value.hpp">
       <Filter>Header Files\Stubs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\stubs\functional_component.hpp">
-      <Filter>Header Files\Stubs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\stubs\stencil_value.hpp">
       <Filter>Header Files\Stubs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\examples\had_amr\parameter.h">

@@ -174,13 +174,11 @@
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\stencil_value_in_adaptor.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\stencil_value_out_adaptor.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\unigrid_mesh.hpp" />
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\stencil_value.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\dynamic_stencil_value.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\dynamic_stencil_value_impl.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\functional_component.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\stubs\dynamic_stencil_value.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\stubs\functional_component.hpp" />
-    <ClInclude Include="..\..\..\..\examples\had_amr\amr\stubs\stencil_value.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\parameter.h" />
     <ClInclude Include="..\..\..\..\examples\had_amr\parameter.hpp" />
   </ItemGroup>
