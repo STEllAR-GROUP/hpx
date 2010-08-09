@@ -50,7 +50,7 @@
 /**/
 #endif // gcc 3.3
   
-#elif defined (BOOST_MSVC)
+#elif defined (BOOST_MSVC) || defined(BOOST_INTEL)
 
 #define BOOST_COROUTINE_NORETURN(function)                                    \
     __declspec(noreturn) function                                             \

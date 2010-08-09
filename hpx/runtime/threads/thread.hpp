@@ -37,7 +37,7 @@ namespace hpx { namespace threads { namespace detail
     public:
         thread(thread_init_data const& init_data, thread_id_type id, 
                thread_state_enum newstate, boost::object_pool<thread>& pool)
-          : coroutine_(init_data.func, id), 
+          : coroutine_(coroutine_type::impl_type::create(init_data.func, id)), 
             current_state_(thread_state(newstate)), 
             current_state_ex_(thread_state_ex(wait_signaled)),
             description_(init_data.description), 
@@ -68,7 +68,8 @@ namespace hpx { namespace threads { namespace detail
         /// by a factory (runtime_support) instance, we can leave this 
         /// constructor empty
         thread()
-          : coroutine_(function_type(), 0), description_(""), lco_description_(0),
+          : coroutine_(coroutine_type::impl_type::create(function_type())), 
+            description_(""), lco_description_(0),
             parent_locality_prefix_(0), parent_thread_id_(0), 
             parent_thread_phase_(0), component_id_(0), pool_(0)
         {
@@ -241,7 +242,6 @@ namespace hpx { namespace threads { namespace detail
 
     private:
         coroutine_type coroutine_;
-
         mutable boost::atomic<thread_state> current_state_;
         mutable boost::atomic<thread_state_ex> current_state_ex_;
 
@@ -256,7 +256,6 @@ namespace hpx { namespace threads { namespace detail
         mutable thread_state marked_state_;
 
         mutable naming::id_type id_;    // that's our gid
-
         boost::object_pool<detail::thread>* pool_;
     };
 

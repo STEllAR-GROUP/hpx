@@ -108,7 +108,8 @@ namespace boost { namespace coroutines { namespace detail {
     } 
 
     template<typename Functor>
-    static inline pointer create(Functor, thread_id_type, std::ptrdiff_t);
+    static inline pointer create(Functor, thread_id_type = 0, 
+        std::ptrdiff_t = default_stack_size);
 
 //     template<typename Functor>
 //     static inline void rebind(pointer, Functor, thread_id_type);
@@ -378,10 +379,9 @@ private:
   template<typename CoroutineType, typename ContextImpl>
   template<typename Functor>
   inline
-  typename 
-  coroutine_impl<CoroutineType, ContextImpl>::pointer
+  typename coroutine_impl<CoroutineType, ContextImpl>::pointer
   coroutine_impl<CoroutineType, ContextImpl>::
-  create(Functor f, thread_id_type id = 0, std::ptrdiff_t stack_size = default_stack_size) 
+      create(Functor f, thread_id_type id, std::ptrdiff_t stack_size) 
   {
       typedef coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl>
           wrapper_type;
