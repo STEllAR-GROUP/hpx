@@ -249,6 +249,9 @@ namespace hpx { namespace threads
             return thread_state(unknown);
         }
 
+        if (&ec != &throws)
+            ec = make_success_code();
+
         return app->get_thread_manager().set_state(id, state, stateex);
     }
 
@@ -265,6 +268,9 @@ namespace hpx { namespace threads
                 "global applier object is not accessible");
             return invalid_thread_id;
         }
+
+        if (&ec != &throws)
+            ec = make_success_code();
 
         return app->get_thread_manager().set_state(at_time, id, state, stateex);
     }
@@ -283,6 +289,9 @@ namespace hpx { namespace threads
             return invalid_thread_id;
         }
 
+        if (&ec != &throws)
+            ec = make_success_code();
+
         return app->get_thread_manager().set_state(after, id, state, stateex);
     }
 
@@ -297,6 +306,9 @@ namespace hpx { namespace threads
                 "global applier object is not accessible");
             return thread_state(unknown);
         }
+
+        if (&ec != &throws)
+            ec = make_success_code();
 
         return app->get_thread_manager().get_state(id);
     }
@@ -313,6 +325,9 @@ namespace hpx { namespace threads
             return std::string();
         }
 
+        if (&ec != &throws)
+            ec = make_success_code();
+
         return app->get_thread_manager().get_description(id);
     }
     void set_thread_description(thread_id_type id, char const* desc, 
@@ -326,6 +341,9 @@ namespace hpx { namespace threads
                 "global applier object is not accessible");
             return;
         }
+
+        if (&ec != &throws)
+            ec = make_success_code();
 
         app->get_thread_manager().set_description(id, desc);
     }
@@ -341,6 +359,9 @@ namespace hpx { namespace threads
             return std::string();
         }
 
+        if (&ec != &throws)
+            ec = make_success_code();
+
         return app->get_thread_manager().get_lco_description(id);
     }
     void set_thread_lco_description(thread_id_type id, char const* desc, 
@@ -354,6 +375,9 @@ namespace hpx { namespace threads
                 "global applier object is not accessible");
             return;
         }
+
+        if (&ec != &throws)
+            ec = make_success_code();
 
         app->get_thread_manager().set_lco_description(id, desc);
     }
@@ -369,6 +393,9 @@ namespace hpx { namespace threads
                 "global applier object is not accessible");
             return naming::invalid_id;
         }
+
+        if (&ec != &throws)
+            ec = make_success_code();
 
         return app->get_thread_manager().get_thread_gid(id);
     }
