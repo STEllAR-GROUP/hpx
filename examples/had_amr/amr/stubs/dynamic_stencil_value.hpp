@@ -72,13 +72,20 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         /// Connect the destinations given by the provided gid's with the 
         /// corresponding input ports associated with this \a dynamic_stencil_value 
         /// instance.
-        static void connect_input_ports(naming::id_type const& gid, 
+        static lcos::future_value<void> 
+        connect_input_ports_async(naming::id_type const& gid, 
             std::vector<naming::id_type> const& gids)
         {
             typedef 
                 amr::server::dynamic_stencil_value::connect_input_ports_action 
             action_type;
-            applier::apply<action_type>(gid, gids);
+            return lcos::eager_future<action_type, void>(gid, gids);
+        }
+
+        static void connect_input_ports(naming::id_type const& gid, 
+            std::vector<naming::id_type> const& gids)
+        {
+            connect_input_ports_async(gid, gids).get();
         }
 
         ///////////////////////////////////////////////////////////////////////

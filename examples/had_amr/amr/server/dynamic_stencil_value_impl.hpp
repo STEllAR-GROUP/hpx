@@ -247,7 +247,8 @@ namespace hpx { namespace components { namespace amr { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline void dynamic_stencil_value::connect_input_ports(
+    inline util::unused_type 
+    dynamic_stencil_value::connect_input_ports(
         std::vector<naming::id_type> const& gids)
     {
         // this needs to have been initialized
@@ -255,18 +256,20 @@ namespace hpx { namespace components { namespace amr { namespace server
             HPX_THROW_EXCEPTION(bad_parameter,
                 "dynamic_stencil_value::connect_input_ports", 
                 "this instance has not been initialized yet");
-            return;
+            return util::unused;
         }
 
         if (gids.size() < instencilsize_) {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "dynamic_stencil_value::connect_input_ports", 
                 "insufficient number of gid's supplied");
-            return;
+            return util::unused;
         }
 
         for (std::size_t i = 0; i < instencilsize_; ++i)
             in_[i]->connect(gids[i]);
+
+        return util::unused;
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -92,7 +92,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// Connect the destinations given by the provided gid's with the 
         /// corresponding input ports associated with this \a dynamic_stencil_value 
         /// instance.
-        void connect_input_ports(std::vector<naming::id_type> const& gids);
+        util::unused_type 
+        connect_input_ports(std::vector<naming::id_type> const& gids);
 
         /// Set the gid of the component implementing the actual time evolution
         /// functionality
@@ -117,8 +118,9 @@ namespace hpx { namespace components { namespace amr { namespace server
             &dynamic_stencil_value::get_output_ports
         > get_output_ports_action;
 
-        typedef hpx::actions::action1<
-            dynamic_stencil_value, dynamic_stencil_value_connect_input_ports, 
+        typedef hpx::actions::result_action1<
+            dynamic_stencil_value, util::unused_type, 
+            dynamic_stencil_value_connect_input_ports, 
             std::vector<naming::id_type> const&,
             &dynamic_stencil_value::connect_input_ports
         > connect_input_ports_action;

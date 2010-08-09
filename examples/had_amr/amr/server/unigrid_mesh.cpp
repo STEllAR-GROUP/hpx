@@ -67,8 +67,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         components::distributing_factory::iterator_type stencil = stencils.first;
         components::distributing_factory::iterator_type function = functions.first;
 
-        int memsize;
-        memsize = 6;
+        int memsize = 6;
         Array3D dst_port(6,numvalues,memsize);
         Array3D dst_src(6,numvalues,memsize);
         Array3D dst_step(6,numvalues,memsize);
@@ -127,53 +126,48 @@ namespace hpx { namespace components { namespace amr { namespace server
     // Currently we have exactly one stencil_value instance per data point, where 
     // the output ports of a stencil_value are connected to the input ports of the 
     // direct neighbors of itself.
-    inline std::size_t mod(int idx, std::size_t maxidx)
-    {
-        return (idx < 0) ? (idx + maxidx) % maxidx : idx % maxidx;
-    }
-
     void unigrid_mesh::connect_input_ports(
         components::distributing_factory::result_type const* stencils,
         std::vector<std::vector<std::vector<naming::id_type> > > const& outputs,
         Parameter const& par)
     {
         typedef components::distributing_factory::result_type result_type;
+        typedef std::vector<lcos::future_value<void> > lazyvals_type;
 
-        int j;
         std::size_t numvals = outputs[0].size();
 
-        int memsize;
-        memsize = 6;
+        int memsize = 6;
+        Array3D dst_port(6, numvals, memsize);
+        Array3D dst_src(6, numvals, memsize);
+        Array3D dst_step(6, numvals, memsize);
+        Array3D dst_size(6, numvals, 1);
+        Array3D src_size(6, numvals, 1);
+        prep_ports(dst_port, dst_src, dst_step, dst_size, src_size, numvals, par);
 
-        Array3D dst_port(6,numvals,memsize);
-        Array3D dst_src(6,numvals,memsize);
-        Array3D dst_step(6,numvals,memsize);
-        Array3D dst_size(6,numvals,1);
-        Array3D src_size(6,numvals,1);
-        prep_ports(dst_port,dst_src,dst_step,dst_size,src_size,numvals,par);
-
+        lazyvals_type lazyvals;
 
         int steps = (int)outputs.size();
         for (int step = 0; step < steps; ++step) 
         {
             components::distributing_factory::iterator_range_type r = 
                 locality_results(stencils[step]);
+
             components::distributing_factory::iterator_type stencil = r.first;
             for (int i = 0; stencil != r.second; ++stencil, ++i)
             {
-                using namespace boost::assign;
-
                 std::vector<naming::id_type> output_ports;
 
-                for (j = 0; j < dst_size(step, i, 0); ++j) {
+                for (int j = 0; j < dst_size(step, i, 0); ++j) {
                     output_ports.push_back(
-                        outputs[dst_step(step,i,j)][dst_src(step,i,j)][dst_port( step,i,j)]);
+                        outputs[dst_step(step,i,j)][dst_src(step,i,j)][dst_port(step,i,j)]);
                 }
 
-                components::amr::stubs::dynamic_stencil_value::
-                    connect_input_ports(*stencil, output_ports);
+                lazyvals.push_back(components::amr::stubs::dynamic_stencil_value::
+                    connect_input_ports_async(*stencil, output_ports));
             }
         }
+
+        wait (lazyvals);      // now wait for the results
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -282,21 +276,20 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         init(locality_results(functions), locality_results(logging), numsteps);
 
-        int i;
         // initialize stencil_values using the stencil (functional) components
-        for (i = 0; i < 6; ++i) 
+        for (int i = 0; i < 6; ++i) 
             init_stencils(locality_results(stencils[i]), locality_results(functions), i, numvalues, par);
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(6);
-        for (i = 0; i < 6; ++i) 
+        for (int i = 0; i < 6; ++i) 
             get_output_ports(locality_results(stencils[i]), outputs[i]);
 
         // connect output gids with corresponding stencil inputs
         connect_input_ports(stencils, outputs,par);
 
         // for loop over second row ; call start for each
-        for (i = 1; i < 6; ++i) 
+        for (int i = 1; i < 6; ++i) 
             start_row(locality_results(stencils[i]));
 
         // prepare initial data
@@ -310,7 +303,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         if (!logging.empty())
             factory.free_components_sync(logging);
 
-        for (i = 5; i >= 0; --i) 
+        for (int i = 0; i < 6; ++i) 
             factory.free_components_sync(stencils[i]);
         factory.free_components_sync(functions);
 
@@ -357,19 +350,21 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         init(locality_results(functions), locality_results(logging), numsteps);
 
-        int i;
         // initialize stencil_values using the stencil (functional) components
-        for (i=0;i<6;i++) init_stencils(locality_results(stencils[i]), locality_results(functions), i, numvalues, par);
+        for (int i = 0; i < 6; ++i) 
+            init_stencils(locality_results(stencils[i]), locality_results(functions), i, numvalues, par);
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(6);
-        for (i=0;i<6;i++) get_output_ports(locality_results(stencils[i]), outputs[i]);
+        for (int i = 0; i < 6; ++i) 
+            get_output_ports(locality_results(stencils[i]), outputs[i]);
 
         // connect output gids with corresponding stencil inputs
         connect_input_ports(stencils, outputs,par);
 
         // for loop over second row ; call start for each
-        for (i=1;i<6;i++) start_row(locality_results(stencils[i]));
+        for (int i = 1; i < 6; ++i) 
+            start_row(locality_results(stencils[i]));
 
         // do actual work
         execute(locality_results(stencils[0]), initial_data, result_data);
@@ -377,7 +372,9 @@ namespace hpx { namespace components { namespace amr { namespace server
         // free all allocated components (we can do that synchronously)
         if (!logging.empty())
             factory.free_components_sync(logging);
-        for (i=5;i>=0;i--) factory.free_components_sync(stencils[i]);
+
+        for (int i = 0; i < 6; ++i) 
+            factory.free_components_sync(stencils[i]);
         factory.free_components_sync(functions);
 
         return result_data;
