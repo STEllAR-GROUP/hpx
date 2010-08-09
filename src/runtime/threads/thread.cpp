@@ -48,7 +48,7 @@ namespace hpx { namespace threads { namespace detail
         return ret;
     }
 
-    void *thread::operator new(std::size_t size)
+    void *thread::operator new(std::size_t size) throw()
     {
         return NULL;
     }
