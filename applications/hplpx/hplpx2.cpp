@@ -13,7 +13,7 @@ namespace po=boost::program_options;
 
 //the size of the matrix
 unsigned int SIZE = 1024;
-unsigned int ABSIZE = 512;
+unsigned int ABSIZE = 256;
 unsigned int BSIZE = 250;
 double ERROR = 0;
 
