@@ -11,7 +11,6 @@
 #include <iosfwd>
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/util.hpp>
 
@@ -137,7 +136,6 @@ namespace hpx
                 return "";
             }
         };
-
     } // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -273,49 +271,13 @@ namespace hpx
         typedef boost::error_info<struct tag_throw_line, int> throw_line;
 
         template <typename Exception>
-        void throw_exception(Exception const& e, char const* func, 
-            std::string const& file, int line)
-        {
-            threads::thread_self* self = threads::get_self_ptr();
-            if (NULL != self) {
-                threads::thread_id_type id = self->get_thread_id();
-                throw boost::enable_current_exception(
-                    boost::enable_error_info(e) 
-                        << boost::throw_function(func) 
-                        << throw_thread_name(threads::get_thread_description(id))
-                        << throw_file(file) << throw_line(line));
-            }
-            else {
-                throw boost::enable_current_exception(
-                    boost::enable_error_info(e) 
-                        << boost::throw_function(func) 
-                        << throw_file(file) << throw_line(line));
-            }
-        }
+        HPX_EXPORT void throw_exception(Exception const& e, char const* func, 
+            std::string const& file, int line);
 
         template <typename Exception>
-        void throw_exception(Exception const& e, std::string const& func, 
-            std::string const& file, int line)
-        {
-            threads::thread_self* self = threads::get_self_ptr();
-            if (NULL != self) {
-                threads::thread_id_type id = self->get_thread_id();
-                throw boost::enable_current_exception(
-                    boost::enable_error_info(e) 
-                        << throw_function(func) 
-                        << throw_thread_name(threads::get_thread_description(id))
-                        << throw_file(file) << throw_line(line));
-            }
-            else {
-                throw boost::enable_current_exception(
-                    boost::enable_error_info(e) 
-                        << throw_function(func) 
-                        << throw_file(file) << throw_line(line));
-            }
-        }
+        HPX_EXPORT void throw_exception(Exception const& e, 
+            std::string const& func, std::string const& file, int line);
     }
-
-///////////////////////////////////////////////////////////////////////////////
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -331,7 +293,6 @@ namespace boost { namespace system
     { 
         static const bool value = true; 
     };
-
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -217,7 +217,7 @@ namespace hpx { namespace components { namespace amr
           int t = resultval->cycle_;
           int r = numsteps_ - t;
           int m = r/6;
-          std::cout << " TEST t " << t << " r " << r << " numsteps " << numsteps_ << " m " << m << std::endl;
+//           std::cout << " TEST t " << t << " r " << r << " numsteps " << numsteps_ << " m " << m << std::endl;
           return m;
         }
     }

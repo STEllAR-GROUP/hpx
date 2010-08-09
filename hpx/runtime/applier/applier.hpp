@@ -220,31 +220,39 @@ namespace hpx { namespace applier
     /// \brief Create a new \a thread using the given function as the 
     ///        work to be executed
     ///
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
+    ///
     HPX_API_EXPORT threads::thread_id_type register_thread_nullary(
         boost::function<void()> const& func, char const* description = "",  
         threads::thread_state_enum initial_state = threads::pending, 
-        bool run_now = true);
+        bool run_now = true, error_code& ec = throws);
 
     HPX_API_EXPORT threads::thread_id_type register_thread(
         boost::function<void(threads::thread_state_ex)> const& func, 
         char const* description = "",  
         threads::thread_state_enum initial_state = threads::pending, 
-        bool run_now = true);
+        bool run_now = true, error_code& ec = throws);
 
     HPX_API_EXPORT threads::thread_id_type register_thread_plain(
         boost::function<threads::thread_function_type> const& func,
         char const* description = "", 
         threads::thread_state_enum initial_state = threads::pending, 
-        bool run_now = true);
+        bool run_now = true, error_code& ec = throws);
 
     HPX_API_EXPORT threads::thread_id_type register_thread_plain(
         threads::thread_init_data& data,
         threads::thread_state_enum initial_state = threads::pending, 
-        bool run_now = true);
+        bool run_now = true, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new \a thread using the given function as the 
     ///        work to be executed
+    ///
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
     ///
     HPX_API_EXPORT void register_work_nullary(
         boost::function<void()> const& func, char const* description = "", 

@@ -12,6 +12,8 @@
 #define HPX_LCOS_MUTEX_JUN_23_2008_0530PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/unlock_lock.hpp>
 

@@ -29,13 +29,14 @@ namespace hpx { namespace naming
         {
             // decrement global reference count for the given gid, delete it
             // if this was the last reference
-            components::component_type t = components::component_invalid;
             boost::uint32_t credits = get_credit_from_gid(*p);
-
             BOOST_ASSERT(0 != credits);
             
+            applier::applier* app = applier::get_applier_ptr();
+
             error_code ec;
-            if (0 == applier::get_applier().get_agas_client().decref(*p, t, credits, ec))
+            components::component_type t = components::component_invalid;
+            if (app && 0 == app->get_agas_client().decref(*p, t, credits, ec))
             {
                 components::stubs::runtime_support::free_component_sync(t, *p);
             }
@@ -52,8 +53,6 @@ namespace hpx { namespace naming
             boost::uint32_t credits = get_credit_from_gid(*p);
             if (0 != credits) 
             {
-                BOOST_ASSERT(applier::get_applier_ptr());
-
                 // We take over the ownership of the gid_type object here
                 // as the shared_ptr is assuming it has been properly deleted 
                 // already. The actual deletion happens in the decrement_refcnt

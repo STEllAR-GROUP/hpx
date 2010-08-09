@@ -269,6 +269,7 @@ set (hpxlib_HEADERS
 ###############################################################################
 # global
 set (hpxlib_global_SOURCES
+    ${hpx_SOURCE_DIR}/src/exception.cpp
     ${hpx_SOURCE_DIR}/src/exception_list.cpp
     ${hpx_SOURCE_DIR}/src/runtime.cpp)
 source_group ("Source Files" 

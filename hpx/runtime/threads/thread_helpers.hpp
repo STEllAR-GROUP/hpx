@@ -7,6 +7,8 @@
 #define HPX_THREAD_HELPERS_NOV_15_2008_0504PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
+
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/exception_ptr.hpp>
@@ -23,6 +25,9 @@ namespace hpx { namespace threads
     /// \param state      [in] The new state to be set for the thread 
     ///                   referenced by the \a id parameter.
     /// \param stateex
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
     ///
     /// \returns          This function returns the previous state of the 
     ///                   thread referenced by the \a id parameter. It will 
@@ -38,7 +43,8 @@ namespace hpx { namespace threads
     ///                   function returns \a thread_state#active in this case. 
     HPX_API_EXPORT thread_state set_thread_state(thread_id_type id, 
         thread_state_enum state = pending, 
-        thread_state_ex_enum stateex = wait_signaled);
+        thread_state_ex_enum stateex = wait_signaled,
+        hpx::error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////
     /// \brief  Set the thread state of the \a thread referenced by the 
@@ -54,12 +60,16 @@ namespace hpx { namespace threads
     ///                   referenced by the \a id parameter.
     /// \param state_ex   [in] The new extended state to be set for the 
     ///                   thread referenced by the \a id parameter.
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
     ///
     /// \returns
     HPX_API_EXPORT thread_id_type set_thread_state(thread_id_type id, 
         boost::posix_time::ptime const& at_time, 
         thread_state_enum state = pending, 
-        thread_state_ex_enum stateex = wait_timeout);
+        thread_state_ex_enum stateex = wait_timeout,
+        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief  Set the thread state of the \a thread referenced by the 
@@ -75,12 +85,16 @@ namespace hpx { namespace threads
     ///                   referenced by the \a id parameter.
     /// \param state_ex   [in] The new extended state to be set for the 
     ///                   thread referenced by the \a id parameter.
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
     ///
     /// \returns
     HPX_API_EXPORT thread_id_type set_thread_state(thread_id_type id, 
         boost::posix_time::time_duration const& after_duration,
         thread_state_enum state = pending, 
-        thread_state_ex_enum stateex = wait_timeout);
+        thread_state_ex_enum stateex = wait_timeout,
+        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_thread_description is part of the thread related API 
@@ -89,16 +103,23 @@ namespace hpx { namespace threads
     ///
     /// \param id         [in] The thread id of the thread the state should 
     ///                   be modified for.
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
     ///
     /// \returns          This function returns the description of the 
     ///                   thread referenced by the \a id parameter. If the 
     ///                   thread is not known to the threadmanager the return 
     ///                   value will be the string "<unknown>".
-    HPX_API_EXPORT std::string get_thread_description(thread_id_type id);
-    HPX_API_EXPORT void set_thread_description(thread_id_type id, char const* desc);
+    HPX_API_EXPORT std::string get_thread_description(thread_id_type id,
+        error_code& ec = throws);
+    HPX_API_EXPORT void set_thread_description(thread_id_type id, 
+        char const* desc = "", error_code& ec = throws);
 
-    HPX_API_EXPORT std::string get_thread_lco_description(thread_id_type id);
-    HPX_API_EXPORT void set_thread_lco_description(thread_id_type id, char const* desc = "");
+    HPX_API_EXPORT std::string get_thread_lco_description(thread_id_type id,
+        error_code& ec = throws);
+    HPX_API_EXPORT void set_thread_lco_description(thread_id_type id, 
+        char const* desc = "", error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_thread_gid is part of the thread related API 
@@ -107,12 +128,16 @@ namespace hpx { namespace threads
     ///
     /// \param id         [in] The thread id of the thread the state should 
     ///                   be modified for.
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
     ///
     /// \returns          This function returns the GID of the 
     ///                   thread referenced by the \a id parameter. If the 
     ///                   thread is not known to the threadmanager the return 
     ///                   value will be \a naming::invalid_id.
-    HPX_API_EXPORT naming::id_type const& get_thread_gid(thread_id_type id);
+    HPX_API_EXPORT naming::id_type const& get_thread_gid(thread_id_type id,
+        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_thread_state is part of the thread related API 
@@ -121,12 +146,16 @@ namespace hpx { namespace threads
     ///
     /// \param id         [in] The thread id of the thread the state should 
     ///                   be modified for.
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
     ///
     /// \returns          This function returns the thread state of the 
     ///                   thread referenced by the \a id parameter. If the 
     ///                   thread is not known to the threadmanager the return 
     ///                   value will be \a terminated.
-    HPX_API_EXPORT thread_state get_thread_state(thread_id_type id);
+    HPX_API_EXPORT thread_state get_thread_state(thread_id_type id,
+        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
 //     HPX_API_EXPORT void report_error(boost::exception_ptr const& e);

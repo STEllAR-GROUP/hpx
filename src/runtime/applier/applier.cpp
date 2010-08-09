@@ -4,7 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/include/applier.hpp>
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/lcos/eager_future.hpp>
@@ -33,16 +35,6 @@ namespace hpx { namespace applier
         return create_async(targetgid, type, count).get();
     }
 
-    //
-//     void destroy (components::component_type type, naming::id_type const& gid)
-//     {
-//         typedef 
-//             components::server::runtime_support::free_component_action 
-//         action_type;
-//         hpx::applier::apply<action_type>(
-//             hpx::applier::get_applier().get_runtime_support_raw_gid(), type, gid);
-//     }
-
     ///////////////////////////////////////////////////////////////////////////
     static inline threads::thread_state thread_function(
         boost::function<void(threads::thread_state_ex)> const& func)
@@ -61,39 +53,77 @@ namespace hpx { namespace applier
     ///////////////////////////////////////////////////////////////////////////
     threads::thread_id_type register_thread_nullary(
         boost::function<void()> const& func, char const* desc, 
-        threads::thread_state_enum state, bool run_now)
+        threads::thread_state_enum state, bool run_now, error_code& ec)
     {
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status, 
+                "hpx::applier::register_thread_nullary", 
+                "global applier object is not accessible");
+            return threads::invalid_thread_id;
+        }
+
         threads::thread_init_data data(
             boost::bind(&thread_function_nullary, func), desc);
-        return hpx::applier::get_applier().get_thread_manager().register_thread(
-            data, state, run_now);
+        return app->get_thread_manager().
+            register_thread(data, state, run_now, ec);
     }
 
     threads::thread_id_type register_thread(
         boost::function<void(threads::thread_state_ex)> const& func, 
-        char const* desc, threads::thread_state_enum state, bool run_now)
+        char const* desc, threads::thread_state_enum state, bool run_now,
+        error_code& ec)
     {
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status, 
+                "hpx::applier::register_thread", 
+                "global applier object is not accessible");
+            return threads::invalid_thread_id;
+        }
+
         threads::thread_init_data data(
             boost::bind(&thread_function, func), desc);
-        return hpx::applier::get_applier().get_thread_manager().register_thread(
-            data, state, run_now);
+        return app->get_thread_manager().
+            register_thread(data, state, run_now, ec);
     }
 
     threads::thread_id_type register_thread_plain(
         boost::function<threads::thread_function_type> const& func,
-        char const* desc, threads::thread_state_enum state, bool run_now)
+        char const* desc, threads::thread_state_enum state, bool run_now,
+        error_code& ec)
     {
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status, 
+                "hpx::applier::register_thread_plain", 
+                "global applier object is not accessible");
+            return threads::invalid_thread_id;
+        }
+
         threads::thread_init_data data(func, desc);
-        return hpx::applier::get_applier().get_thread_manager().register_thread(
-            data, state, run_now);
+        return app->get_thread_manager().
+            register_thread(data, state, run_now, ec);
     }
 
     threads::thread_id_type register_thread_plain(
         threads::thread_init_data& data, threads::thread_state_enum state, 
-        bool run_now)
+        bool run_now, error_code& ec)
     {
-        return hpx::applier::get_applier().get_thread_manager().register_thread(
-            data, state, run_now);
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status, 
+                "hpx::applier::register_thread_plain", 
+                "global applier object is not accessible");
+            return threads::invalid_thread_id;
+        }
+
+        return app->get_thread_manager().
+            register_thread(data, state, run_now, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -101,20 +131,36 @@ namespace hpx { namespace applier
         boost::function<void()> const& func, char const* desc, 
         threads::thread_state_enum state, error_code& ec)
     {
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status, 
+                "hpx::applier::register_work_nullary", 
+                "global applier object is not accessible");
+            return;
+        }
+
         threads::thread_init_data data(
             boost::bind(&thread_function_nullary, func), desc);
-        hpx::applier::get_applier().get_thread_manager().
-            register_work(data, state, ec);
+        app->get_thread_manager().register_work(data, state, ec);
     }
 
     void register_work(
         boost::function<void(threads::thread_state_ex)> const& func, 
         char const* desc, threads::thread_state_enum state, error_code& ec)
     {
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status, 
+                "hpx::applier::register_work", 
+                "global applier object is not accessible");
+            return;
+        }
+
         threads::thread_init_data data(
             boost::bind(&thread_function, func), desc);
-        hpx::applier::get_applier().get_thread_manager().
-            register_work(data, state, ec);
+        app->get_thread_manager().register_work(data, state, ec);
     }
 
     void register_work_plain(
@@ -122,17 +168,33 @@ namespace hpx { namespace applier
         char const* desc, naming::address::address_type lva,
         threads::thread_state_enum state, error_code& ec)
     {
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status, 
+                "hpx::applier::register_work_plain", 
+                "global applier object is not accessible");
+            return;
+        }
+
         threads::thread_init_data data(func, desc, lva);
-        hpx::applier::get_applier().get_thread_manager().
-            register_work(data, state, ec);
+        app->get_thread_manager().register_work(data, state, ec);
     }
 
     void register_work_plain(
         threads::thread_init_data& data, threads::thread_state_enum state,
         error_code& ec)
     {
-        hpx::applier::get_applier().get_thread_manager().
-            register_work(data, state, ec);
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status, 
+                "hpx::applier::register_work_plain", 
+                "global applier object is not accessible");
+            return;
+        }
+
+        app->get_thread_manager().register_work(data, state, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -176,58 +238,138 @@ namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
     thread_state set_thread_state(thread_id_type id, thread_state_enum state,
-        thread_state_ex_enum stateex)
+        thread_state_ex_enum stateex, error_code& ec)
     {
-        return hpx::applier::get_applier().get_thread_manager().
-            set_state(id, state, stateex);
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status, 
+                "hpx::applier::set_thread_state", 
+                "global applier object is not accessible");
+            return thread_state(unknown);
+        }
+
+        return app->get_thread_manager().set_state(id, state, stateex);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     thread_id_type set_thread_state(thread_id_type id, 
         boost::posix_time::ptime const& at_time, thread_state_enum state,
-        thread_state_ex_enum stateex)
+        thread_state_ex_enum stateex, error_code& ec)
     {
-        return hpx::applier::get_applier().get_thread_manager().
-            set_state(at_time, id, state, stateex);
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status, 
+                "hpx::applier::set_thread_state", 
+                "global applier object is not accessible");
+            return invalid_thread_id;
+        }
+
+        return app->get_thread_manager().set_state(at_time, id, state, stateex);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     thread_id_type set_thread_state(thread_id_type id, 
         boost::posix_time::time_duration const& after, thread_state_enum state,
-        thread_state_ex_enum stateex)
+        thread_state_ex_enum stateex, error_code& ec)
     {
-        return hpx::applier::get_applier().get_thread_manager().
-            set_state(after, id, state, stateex);
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status, 
+                "hpx::applier::set_thread_state", 
+                "global applier object is not accessible");
+            return invalid_thread_id;
+        }
+
+        return app->get_thread_manager().set_state(after, id, state, stateex);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    thread_state get_thread_state(thread_id_type id)
+    thread_state get_thread_state(thread_id_type id, error_code& ec)
     {
-        return hpx::applier::get_applier().get_thread_manager().get_state(id);
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status, 
+                "hpx::applier::get_thread_state", 
+                "global applier object is not accessible");
+            return thread_state(unknown);
+        }
+
+        return app->get_thread_manager().get_state(id);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::string get_thread_description(thread_id_type id)
+    std::string get_thread_description(thread_id_type id, error_code& ec)
     {
-        return hpx::applier::get_applier().get_thread_manager().get_description(id);
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status, 
+                "hpx::applier::get_thread_description", 
+                "global applier object is not accessible");
+            return std::string();
+        }
+
+        return app->get_thread_manager().get_description(id);
     }
-    void set_thread_description(thread_id_type id, char const* desc)
+    void set_thread_description(thread_id_type id, char const* desc, 
+        error_code& ec)
     {
-        return hpx::applier::get_applier().get_thread_manager().set_description(id, desc);
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status, 
+                "hpx::applier::set_thread_description", 
+                "global applier object is not accessible");
+            return;
+        }
+
+        app->get_thread_manager().set_description(id, desc);
     }
 
-    std::string get_thread_lco_description(thread_id_type id)
+    std::string get_thread_lco_description(thread_id_type id, error_code& ec)
     {
-        return hpx::applier::get_applier().get_thread_manager().get_lco_description(id);
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status, 
+                "hpx::applier::get_thread_lco_description", 
+                "global applier object is not accessible");
+            return std::string();
+        }
+
+        return app->get_thread_manager().get_lco_description(id);
     }
-    void set_thread_lco_description(thread_id_type id, char const* desc)
+    void set_thread_lco_description(thread_id_type id, char const* desc, 
+        error_code& ec)
     {
-        return hpx::applier::get_applier().get_thread_manager().set_lco_description(id, desc);
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status, 
+                "hpx::applier::set_thread_lco_description", 
+                "global applier object is not accessible");
+            return;
+        }
+
+        app->get_thread_manager().set_lco_description(id, desc);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    naming::id_type const& get_thread_gid(thread_id_type id)
+    naming::id_type const& get_thread_gid(thread_id_type id, error_code& ec)
     {
-        return hpx::applier::get_applier().get_thread_manager().get_thread_gid(id);
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status, 
+                "hpx::applier::get_thread_gid", 
+                "global applier object is not accessible");
+            return naming::invalid_id;
+        }
+
+        return app->get_thread_manager().get_thread_gid(id);
     }
 }}
