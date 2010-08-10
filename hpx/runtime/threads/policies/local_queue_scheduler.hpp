@@ -79,7 +79,7 @@ namespace hpx { namespace threads { namespace policies
         {
             BOOST_ASSERT(init.num_queues_ != 0);
             for (std::size_t i = 0; i < init.num_queues_; ++i) 
-                queues_[i] = new thread_queue(init.max_queue_thread_count_);
+                queues_[i] = new thread_queue<false>(init.max_queue_thread_count_);
         }
 
         ~local_queue_scheduler()
@@ -221,7 +221,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
     private:
-        std::vector<thread_queue*> queues_;   ///< this manages all the PX threads
+        std::vector<thread_queue<false>*> queues_;   ///< this manages all the PX threads
         boost::atomic<std::size_t> curr_queue_;
         bool numa_sensitive_;
     };

@@ -125,7 +125,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
     private:
-        thread_queue queue_;                ///< this manages all the threads
+        thread_queue<true> queue_;                ///< this manages all the threads
     };
 
 }}}

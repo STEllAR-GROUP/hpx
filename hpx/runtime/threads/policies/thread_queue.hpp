@@ -99,6 +99,7 @@ namespace hpx { namespace threads { namespace policies
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    template <bool Global>
     class thread_queue
     {
     private:
@@ -173,7 +174,7 @@ namespace hpx { namespace threads { namespace policies
                     ++added;
                     work_items_.enqueue(t);
                     ++work_items_count_;
-                    cond_.notify_all();         // wake up sleeping threads
+                    do_some_work();         // wake up sleeping threads
                 }
             }
 
@@ -346,7 +347,7 @@ namespace hpx { namespace threads { namespace policies
         {
             work_items_.enqueue(thrd);
             ++work_items_count_;
-            cond_.notify_all();         // wake up sleeping threads
+            do_some_work();         // wake up sleeping threads
         }
 
         /// Destroy the passed thread as it has been terminated
@@ -411,12 +412,13 @@ namespace hpx { namespace threads { namespace policies
                            << ", threads left: " << thread_map_.size();
 
                 // stop running after all PX threads have been terminated
-                if (!add_new_always(added, addfrom) && !running) {
+                bool added_new = add_new_always(added, addfrom);
+                if (!added_new && !running) {
                     // Before exiting each of the OS threads deletes the 
                     // remaining terminated PX threads 
                     if (cleanup_terminated()) {
                         // we don't have any registered work items anymore
-                        cond_.notify_all();   // notify possibly waiting threads
+                        do_some_work();       // notify possibly waiting threads
                         terminate = true;
                         break;                // terminate scheduling loop
                     }
@@ -428,6 +430,9 @@ namespace hpx { namespace threads { namespace policies
                     cleanup_terminated();
                 }
 
+                if (added_new)
+                    break;    // we got work, exit loop
+
                 // Wait until somebody needs some action (if no new work 
                 // arrived in the meantime).
                 // Ask again if queues are empty to avoid race conditions (we 
@@ -437,7 +442,8 @@ namespace hpx { namespace threads { namespace policies
                     LTM_(info) << "tfunc(" << num_thread 
                                << "): queues empty, entering wait";
 
-                    if (idle_loop_count > 200) {
+                    if (idle_loop_count > 200) 
+                    {
                         // reset idle loop count
                         idle_loop_count = 0;
 
@@ -449,12 +455,13 @@ namespace hpx { namespace threads { namespace policies
                         if (reactivate_pending_threads())
                             break;    // we got work, exit loop
                     }
+                    ++idle_loop_count;
 
-                    bool timed_out = false;
+                    bool timed_out = true;
+                    if (Global) 
                     {
                         namespace bpt = boost::posix_time;
                         timed_out = !cond_.timed_wait(lk, bpt::microseconds(10*idle_loop_count));
-                        ++idle_loop_count;
                     }
 
                     LTM_(info) << "tfunc(" << num_thread << "): exiting wait";
@@ -489,7 +496,7 @@ namespace hpx { namespace threads { namespace policies
 
                     work_items_.enqueue(const_cast<threads::thread*>(thrd));
                     ++work_items_count_;
-                    cond_.notify_all();         // wake up sleeping threads
+                    do_some_work();         // wake up sleeping threads
 
                     added_one = true;
                 }
@@ -502,7 +509,8 @@ namespace hpx { namespace threads { namespace policies
         /// possibly idleing OS threads
         void do_some_work()
         {
-            cond_.notify_all();
+            if (Global)
+                cond_.notify_all();
         }
 
         ///////////////////////////////////////////////////////////////////////
