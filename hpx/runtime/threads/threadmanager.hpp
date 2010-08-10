@@ -159,10 +159,10 @@ namespace hpx { namespace threads
         ///                 thread is not known to the threadmanager the return 
         ///                 value will be the string "<unknown>".
         virtual std::string get_description(thread_id_type id) const = 0;
-        virtual void set_description(thread_id_type id, char const* desc = "") = 0;
+        virtual void set_description(thread_id_type id, char const* desc = 0) = 0;
 
         virtual std::string get_lco_description(thread_id_type id) const = 0;
-        virtual void set_lco_description(thread_id_type id, char const* desc = "") = 0;
+        virtual void set_lco_description(thread_id_type id, char const* desc = 0) = 0;
 
         /// The function \a register_work adds a new work item to the thread 
         /// manager. It doesn't immediately create a new \a thread, it just adds 
@@ -188,13 +188,6 @@ namespace hpx { namespace threads
         ///               hpx#bad_parameter exception).
         /// \param parent_prefix
         /// \param parent thread id
-//         virtual void
-//         register_work(boost::function<thread_function_type> const& func,
-//             char const* const description = "", 
-//             thread_state initial_state = pending, 
-//             boost::uint32_t parent_prefix = 0, 
-//             thread_id_type parent_id = 0) = 0;
-
         virtual void
         register_work(thread_init_data& data, 
             thread_state_enum initial_state = pending,
@@ -231,11 +224,6 @@ namespace hpx { namespace threads
         ///
         /// \returns      The function returns the thread id of the newly 
         ///               created thread. 
-//         virtual thread_id_type 
-//         register_thread(boost::function<thread_function_type> const& threadfunc, 
-//             char const* const description = "", 
-//             thread_state initial_state = pending, bool run_now = true) = 0;
-
         virtual thread_id_type 
         register_thread(thread_init_data& data, 
             thread_state_enum initial_state = pending, 
@@ -465,10 +453,10 @@ namespace hpx { namespace threads
         ///                 thread is not known to the threadmanager the return 
         ///                 value will be the string "<unknown>".
         std::string get_description(thread_id_type id) const;
-        void set_description(thread_id_type id, char const* desc = "");
+        void set_description(thread_id_type id, char const* desc = 0);
 
         std::string get_lco_description(thread_id_type id) const;
-        void set_lco_description(thread_id_type id, char const* desc = "");
+        void set_lco_description(thread_id_type id, char const* desc = 0);
 
     protected:
         // this is the thread function executing the work items in the queue

@@ -23,6 +23,7 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 #include <hpx/lcos/base_lco.hpp>
+#include <hpx/util/spinlock_pool.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -33,6 +34,9 @@ namespace hpx { namespace threads { namespace detail
     class thread : public lcos::base_lco, private boost::noncopyable
     {
         typedef boost::function<thread_function_type> function_type;
+        
+        struct tag {};
+        typedef hpx::util::spinlock_pool<tag> mutex_type;
 
     public:
         thread(thread_init_data const& init_data, thread_id_type id, 
@@ -40,7 +44,7 @@ namespace hpx { namespace threads { namespace detail
           : coroutine_(coroutine_type::impl_type::create(init_data.func, id)), 
             current_state_(thread_state(newstate)), 
             current_state_ex_(thread_state_ex(wait_signaled)),
-            description_(init_data.description), 
+            description_(init_data.description ? init_data.description : ""), 
             lco_description_(""),
             parent_thread_id_(init_data.parent_id),
             parent_thread_phase_(init_data.parent_phase),
@@ -69,7 +73,7 @@ namespace hpx { namespace threads { namespace detail
         /// constructor empty
         thread()
           : coroutine_(coroutine_type::impl_type::create(function_type())), 
-            description_(""), lco_description_(0),
+            description_(""), lco_description_(""),
             parent_locality_prefix_(0), parent_thread_id_(0), 
             parent_thread_phase_(0), component_id_(0), pool_(0)
         {
@@ -165,22 +169,32 @@ namespace hpx { namespace threads { namespace detail
             return coroutine_.get_thread_phase();
         }
  
-        char const* get_description() const
+        std::string get_description() const
         {
-            return description_.c_str();
+            mutex_type::scoped_lock l(this);
+            return description_;
         }
         void set_description(char const* desc) 
         {
-            description_ = desc;
+            mutex_type::scoped_lock l(this);
+            if (desc)
+                description_ = desc;
+            else
+                description_.clear();
         }
 
-        char const* get_lco_description() const
+        std::string get_lco_description() const
         {
-            return lco_description_.c_str();
+            mutex_type::scoped_lock l(this);
+            return lco_description_;
         }
         void set_lco_description(char const* lco_description)
         {
-            lco_description_ = lco_description;
+            mutex_type::scoped_lock l(this);
+            if (lco_description) 
+                lco_description_ = lco_description;
+            else
+                lco_description_.clear();
         }
 
         boost::uint32_t get_parent_locality_prefix() const
@@ -316,16 +330,6 @@ namespace hpx { namespace threads
             LTM_(debug) << "thread::thread(" << this << "), description(" 
                         << init_data.description << ")";
         }
-
-//         thread(boost::function<thread_function_type> threadfunc, 
-//               thread_state new_state = init, char const* const desc = "",
-//               thread_id_type parent_id = 0, boost::uint32_t parent_prefix = 0)
-//           : base_type(new detail::thread(threadfunc, This(), new_state, desc, 
-//                 parent_id, parent_prefix))
-//         {
-//             LTM_(debug) << "thread::thread(" << this << "), description(" 
-//                         << desc << ")";
-//         }
 
         ~thread() 
         {
@@ -493,24 +497,24 @@ namespace hpx { namespace threads
         }
 
         /// \brief Get the (optional) description of this thread
-        char const* get_description() const
+        std::string get_description() const
         {
             detail::thread const* t = get();
             return t ? t->get_description() : "<terminated>";
         }
-        void set_description(char const* desc = "") 
+        void set_description(char const* desc = 0) 
         {
             detail::thread* t = get();
             if (t) 
                 t->set_description(desc);
         }
 
-        char const* get_lco_description() const
+        std::string get_lco_description() const
         {
             detail::thread const* t = get();
             return t ? t->get_lco_description() : "<terminated>";
         }
-        void set_lco_description(char const* lco_description = "")
+        void set_lco_description(char const* lco_description = 0)
         {
             detail::thread* t = get();
             if (t) 

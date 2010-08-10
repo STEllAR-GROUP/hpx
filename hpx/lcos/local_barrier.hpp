@@ -100,7 +100,8 @@ namespace hpx { namespace lcos
                     threads::thread_id_type id = queue_.front().id_;
                     queue_.front().id_ = 0;
                     queue_.pop_front();
-                    set_thread_state(id, threads::pending);
+                    threads::set_thread_lco_description(id);
+                    threads::set_thread_state(id, threads::pending);
                 }
 #else
                 // swap the list
@@ -113,7 +114,8 @@ namespace hpx { namespace lcos
                     threads::thread_id_type id = queue.front().id_;
                     queue.front().id_ = 0;
                     queue.pop_front();
-                    set_thread_state(id, threads::pending);
+                    threads::set_thread_lco_description(id);
+                    threads::set_thread_state(id, threads::pending);
                 }
 #endif
             }

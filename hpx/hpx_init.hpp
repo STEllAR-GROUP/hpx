@@ -41,7 +41,7 @@ inline void get_option(po::variables_map& vm,
   if (vm.count(name)) 
     x = vm[name].as<T>();
 
-  if ("" != app_name)
+  if (!app_name.empty())
     x = boost::lexical_cast<T>(
         get_runtime().get_config().get_entry(app_name, x));
 }

@@ -218,8 +218,8 @@ namespace hpx { namespace lcos { namespace detail
                 queue_.pop_front();
 
                 l.unlock();
-                threads::set_thread_state(id, threads::pending);
                 threads::set_thread_lco_description(id);
+                threads::set_thread_state(id, threads::pending);
             }
             else if (active_count_.load(boost::memory_order_acquire) & ~lock_flag_value) {
                 ++pending_events_;

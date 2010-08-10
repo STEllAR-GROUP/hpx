@@ -367,8 +367,8 @@ namespace hpx { namespace util { namespace detail
                 threads::thread_id_type id = write_queue_.front().id_;
                 write_queue_.front().id_ = 0;
                 write_queue_.pop_front();
-                threads::set_thread_state(id, threads::pending);
                 threads::set_thread_lco_description(id);
+                threads::set_thread_state(id, threads::pending);
                 set_full_locked();    // state_ = full
             }
 
@@ -385,8 +385,8 @@ namespace hpx { namespace util { namespace detail
                 threads::thread_id_type id = read_queue_.front().id_;
                 read_queue_.front().id_ = 0;
                 read_queue_.pop_front();
-                threads::set_thread_state(id, threads::pending);
                 threads::set_thread_lco_description(id);
+                threads::set_thread_state(id, threads::pending);
             }
 
             // since we got full now we need to re-activate one thread waiting
@@ -395,8 +395,8 @@ namespace hpx { namespace util { namespace detail
                 threads::thread_id_type id = read_and_empty_queue_.front().id_;
                 read_and_empty_queue_.front().id_ = 0;
                 read_and_empty_queue_.pop_front();
-                threads::set_thread_state(id, threads::pending);
                 threads::set_thread_lco_description(id);
+                threads::set_thread_state(id, threads::pending);
                 set_empty_locked();   // state_ = empty
             }
 

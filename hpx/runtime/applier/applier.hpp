@@ -225,19 +225,19 @@ namespace hpx { namespace applier
     ///                   the function will throw on error instead.
     ///
     HPX_API_EXPORT threads::thread_id_type register_thread_nullary(
-        boost::function<void()> const& func, char const* description = "",  
+        boost::function<void()> const& func, char const* description = 0,  
         threads::thread_state_enum initial_state = threads::pending, 
         bool run_now = true, error_code& ec = throws);
 
     HPX_API_EXPORT threads::thread_id_type register_thread(
         boost::function<void(threads::thread_state_ex)> const& func, 
-        char const* description = "",  
+        char const* description = 0,  
         threads::thread_state_enum initial_state = threads::pending, 
         bool run_now = true, error_code& ec = throws);
 
     HPX_API_EXPORT threads::thread_id_type register_thread_plain(
         boost::function<threads::thread_function_type> const& func,
-        char const* description = "", 
+        char const* description = 0, 
         threads::thread_state_enum initial_state = threads::pending, 
         bool run_now = true, error_code& ec = throws);
 
@@ -255,19 +255,19 @@ namespace hpx { namespace applier
     ///                   the function will throw on error instead.
     ///
     HPX_API_EXPORT void register_work_nullary(
-        boost::function<void()> const& func, char const* description = "", 
+        boost::function<void()> const& func, char const* description = 0, 
         threads::thread_state_enum initial_state = threads::pending, 
         error_code& ec = throws);
 
     HPX_API_EXPORT void register_work(
         boost::function<void(threads::thread_state_ex)> const& func, 
-        char const* description = "", 
+        char const* description = 0, 
         threads::thread_state_enum initial_state = threads::pending, 
         error_code& ec = throws);
 
     HPX_API_EXPORT void register_work_plain(
         boost::function<threads::thread_function_type> const& func,
-        char const* description = "", naming::address::address_type lva = 0,
+        char const* description = 0, naming::address::address_type lva = 0,
         threads::thread_state_enum initial_state = threads::pending, 
         error_code& ec = throws);
 

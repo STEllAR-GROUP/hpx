@@ -114,12 +114,12 @@ namespace hpx { namespace threads
     HPX_API_EXPORT std::string get_thread_description(thread_id_type id,
         error_code& ec = throws);
     HPX_API_EXPORT void set_thread_description(thread_id_type id, 
-        char const* desc = "", error_code& ec = throws);
+        char const* desc = 0, error_code& ec = throws);
 
     HPX_API_EXPORT std::string get_thread_lco_description(thread_id_type id,
         error_code& ec = throws);
     HPX_API_EXPORT void set_thread_lco_description(thread_id_type id, 
-        char const* desc = "", error_code& ec = throws);
+        char const* desc = 0, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_thread_gid is part of the thread related API 
