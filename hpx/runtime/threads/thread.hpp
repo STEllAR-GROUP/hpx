@@ -215,7 +215,7 @@ namespace hpx { namespace threads { namespace detail
         static void operator delete(void *p, 
             boost::object_pool<detail::thread>&);
 
-        static void *operator new(std::size_t size);
+        static void *operator new(std::size_t size) throw();
         static void operator delete(void *p, std::size_t size);
 
     public:
