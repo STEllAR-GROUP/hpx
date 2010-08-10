@@ -67,18 +67,18 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static void init(naming::id_type const& gid, std::size_t numsteps, 
+        static lcos::future_value<void>  
+        init_async(naming::id_type const& gid, std::size_t numsteps, 
             naming::id_type const& val)
         {
             typedef amr::server::functional_component::init_action action_type;
-            applier::apply<action_type>(gid, numsteps, val);
+            return lcos::eager_future<action_type, void>(gid, numsteps, val);
         }
 
-        static void init_sync(naming::id_type const& gid, 
+        static void init(naming::id_type const& gid, 
             std::size_t numsteps, naming::id_type const& val)
         {
-            typedef amr::server::functional_component::init_action action_type;
-            lcos::eager_future<action_type>(gid, numsteps, val).get();
+            init_async(gid, numsteps, val).get();
         }
     };
 

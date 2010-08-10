@@ -42,7 +42,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         // The eval and is_last_timestep functions have to be overloaded by any
         // functional component derived from this class
         virtual int eval(naming::id_type const&, 
-            std::vector<naming::id_type> const&, std::size_t, std::size_t,Parameter const&)
+            std::vector<naming::id_type> const&, std::size_t, std::size_t,
+            Parameter const&)
         {
             // This shouldn't ever be called. If you're seeing this assertion 
             // you probably forgot to overload this function in your stencil 
@@ -52,8 +53,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
 
         virtual naming::id_type alloc_data(int item, int maxitems, int row,
-            std::size_t level, had_double_type x, 
-            Parameter const& par)
+            std::size_t level, had_double_type x, Parameter const&)
         {
             // This shouldn't ever be called. If you're seeing this assertion 
             // you probably forgot to overload this function in your stencil 
@@ -85,7 +85,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// time step value based on the result values of the previous time 
         /// steps.
         int eval_nonvirt(naming::id_type const& result, 
-            std::vector<naming::id_type> const& gids, std::size_t row, std::size_t column,Parameter const& par)
+            std::vector<naming::id_type> const& gids, std::size_t row, 
+            std::size_t column, Parameter const& par)
         {
             return eval(result, gids, row, column,par);
         }
@@ -96,9 +97,11 @@ namespace hpx { namespace components { namespace amr { namespace server
             return alloc_data(item, maxitems, row, level, x, par);
         }
 
-        void init_nonvirt(std::size_t numsteps, naming::id_type const& gid)
+        util::unused_type 
+        init_nonvirt(std::size_t numsteps, naming::id_type const& gid)
         {
             init(numsteps, gid);
+            return util::unused;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -106,7 +109,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::result_action6<
-            functional_component, naming::id_type, functional_component_alloc_data, 
+            functional_component, naming::id_type, 
+            functional_component_alloc_data, 
             int, int, int, std::size_t, had_double_type, Parameter const&, 
             &functional_component::alloc_data_nonvirt
         > alloc_data_action;
@@ -114,12 +118,14 @@ namespace hpx { namespace components { namespace amr { namespace server
         typedef hpx::actions::result_action5<
             functional_component, int, functional_component_eval, 
             naming::id_type const&, std::vector<naming::id_type> const&, 
-            std::size_t, std::size_t,Parameter const&,&functional_component::eval_nonvirt
+            std::size_t, std::size_t,Parameter const&,
+            &functional_component::eval_nonvirt
         > eval_action;
 
-        typedef hpx::actions::action2<
-            functional_component, functional_component_init, 
-            std::size_t, naming::id_type const&, &functional_component::init_nonvirt
+        typedef hpx::actions::result_action2<
+            functional_component, util::unused_type, functional_component_init, 
+            std::size_t, naming::id_type const&, 
+            &functional_component::init_nonvirt
         > init_action;
     };
 

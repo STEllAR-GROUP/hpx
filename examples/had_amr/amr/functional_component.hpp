@@ -72,11 +72,6 @@ namespace hpx { namespace components { namespace amr
         {
             this->base_type::init(this->gid_, numsteps, val);
         }
-
-        void init_sync(std::size_t numsteps, naming::id_type const& val)
-        {
-            this->base_type::init_sync(this->gid_, numsteps, val);
-        }
     };
 
 }}}

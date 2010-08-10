@@ -9,7 +9,6 @@
 
 #include <boost/bind.hpp>
 #include <boost/assert.hpp>
-#include <boost/assign/std/vector.hpp>
 
 #include <algorithm>
 
@@ -27,17 +26,14 @@ namespace hpx { namespace components { namespace amr { namespace server
         template <typename Adaptor>
         static int
         call(naming::id_type const& gid, naming::id_type const& value_gid, 
-            int row, int column, Adaptor &in,Parameter const& par)
+            int row, int column, Adaptor &in, Parameter const& par)
         {
-            using namespace boost::assign;
-
-            std::vector<naming::id_type> input_gids;
-            for (std::size_t i = 0; i < in.size(); ++i) {
-                input_gids += in[i]->get();
-            }
+            std::vector<naming::id_type> input_gids(in.size());
+            for (std::size_t i = 0; i < in.size(); ++i) 
+                input_gids[i] = in[i]->get();
 
             return components::amr::stubs::functional_component::eval(
-                gid, value_gid, input_gids, row, column,par);
+                gid, value_gid, input_gids, row, column, par);
         }
     };
 
@@ -151,8 +147,6 @@ namespace hpx { namespace components { namespace amr { namespace server
         // from the previous time step, computing the result of the current
         // time step and storing the computed value in the memory_block 
         // referenced by value_gid_
-        //int timesteps_to_go = row_ + 1;
-        //while (timesteps_to_go > row_) 
         int timesteps_to_go = 1;
         while (timesteps_to_go > 0) {
             // start acquire operations on input ports
@@ -168,15 +162,6 @@ namespace hpx { namespace components { namespace amr { namespace server
             // computation (>0: still to go, 0: last step, <0: overdone)
             timesteps_to_go = eval_helper::call(functional_gid_, 
                 value_gids_[0], row_, column_, in_, par_);
-
-            // we're done if this is exactly the last time-step and we are not 
-            // supposed to return the final value, no need to wait for further
-            // input anymore
-            //if (timesteps_to_go < 0 && !is_called) {
-            //    // exit immediately, 'this' might have been destructed already
-            //    free_helper_sync(value_gid_to_be_freed);
-            //    return threads::thread_state(threads::terminated);
-            //}
 
             // Wait for all output threads to have read the current value.
             // On the first time step the semaphore is preset to allow 
@@ -241,8 +226,10 @@ namespace hpx { namespace components { namespace amr { namespace server
             return gids;
         }
 
+        gids.resize(outstencilsize_);
         for (std::size_t i = 0; i < outstencilsize_; ++i)
-            gids.push_back(out_[i]);
+            gids[i] = out_[i];
+
         return gids;
     }
 

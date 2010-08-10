@@ -25,8 +25,10 @@ typedef hpx::components::amr::server::unigrid_mesh had_unigrid_mesh_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
-HPX_REGISTER_ACTION_EX(had_unigrid_mesh_type::init_execute_action, had_unigrid_mesh_init_execute_action);
-HPX_REGISTER_ACTION_EX(had_unigrid_mesh_type::execute_action, had_unigrid_mesh_execute_action);
+HPX_REGISTER_ACTION_EX(had_unigrid_mesh_type::init_execute_action, 
+    had_unigrid_mesh_init_execute_action);
+HPX_REGISTER_ACTION_EX(had_unigrid_mesh_type::execute_action, 
+    had_unigrid_mesh_execute_action);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<had_unigrid_mesh_type>, had_unigrid_mesh);
@@ -50,11 +52,16 @@ namespace hpx { namespace components { namespace amr { namespace server
         if (logging.first != logging.second)
             log = *logging.first;
 
+        typedef std::vector<lcos::future_value<void> > lazyvals_type;
+        lazyvals_type lazyvals;
+
         for (/**/; function != functions.second; ++function)
         {
-            components::amr::stubs::functional_component::
-                init(*function, numsteps, log);
+            lazyvals.push_back(components::amr::stubs::functional_component::
+                init_async(*function, numsteps, log));
         }
+
+        wait(lazyvals);   // now wait for the initialization to happen
     }
 
     ///////////////////////////////////////////////////////////////////////////////
