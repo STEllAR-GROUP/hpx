@@ -72,7 +72,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         }
         */
 
-        boost::this_thread::sleep(boost::posix_time::seconds(3)); 
+//         boost::this_thread::sleep(boost::posix_time::seconds(3)); 
 
         for (std::size_t i = 0; i < result_data.size(); ++i)
             components::stubs::memory_block::free(result_data[i]);

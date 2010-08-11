@@ -20,7 +20,6 @@
 #include <boost/atomic.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/lockfree/fifo.hpp>
-#include <boost/ptr_container/ptr_map.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
@@ -62,15 +61,21 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         // debug helper function, logs all suspended threads
         inline void dump_suspended_threads(std::size_t num_thread,
-            boost::ptr_map<thread_id_type, threads::thread>& tm)
+            std::set<thread_id_type>& tm, std::size_t& idle_loop_count)
         {
-            typedef boost::ptr_map<thread_id_type, threads::thread> thread_map_type;
+            if (idle_loop_count++ < 2000)
+                return;
+
+            // reset idle loop count
+            idle_loop_count = 0;
+
+            typedef std::set<thread_id_type> thread_map_type;
 
             bool logged_headline = false;
             thread_map_type::const_iterator end = tm.end();
             for (thread_map_type::const_iterator it = tm.begin(); it != end; ++it)
             {
-                threads::thread const* thrd = (*it).second;
+                threads::thread const* thrd = static_cast<threads::thread*>(*it);
                 threads::thread_state state = thrd->get_state();
 
                 if (state != thrd->get_marked_state()) {
@@ -83,7 +88,7 @@ namespace hpx { namespace threads { namespace policies
 
                     LTM_(error) << get_thread_state_name(state) 
                                 << "(" << std::hex << std::setw(8) 
-                                    << std::setfill('0') << (*it).first 
+                                    << std::setfill('0') << (*it) 
                                 << "." << std::hex << std::setw(2) 
                                     << std::setfill('0') << thrd->get_thread_phase() 
                                 << "/" << std::hex << std::setw(8) 
@@ -118,7 +123,7 @@ namespace hpx { namespace threads { namespace policies
         typedef boost::lockfree::fifo<thread*> work_items_type;
 
         // this is the type of a map holding all threads (except depleted ones)
-        typedef boost::ptr_map<thread_id_type, thread> thread_map_type;
+        typedef std::set<thread_id_type> thread_map_type;
 
         // this is the type of the queue of new tasks not yet converted to
         // threads
@@ -154,7 +159,7 @@ namespace hpx { namespace threads { namespace policies
                 // add the new entry to the map of all threads
                 thread_id_type id = thrd->get_thread_id();
                 std::pair<thread_map_type::iterator, bool> p =
-                    thread_map_.insert(id, thrd.get());
+                    thread_map_.insert(id);
 
                 if (!p.second) {
                     HPX_THROW_EXCEPTION(hpx::no_success, 
@@ -187,7 +192,7 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         bool add_new_if_possible(std::size_t& added, thread_queue* addfrom)
         {
-            if (addfrom->new_tasks_.empty()) 
+            if (0 == addfrom->new_tasks_count_) 
                 return false;
 
             // create new threads from pending tasks (if appropriate)
@@ -214,7 +219,7 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         bool add_new_always(std::size_t& added, thread_queue* addfrom)
         {
-            if (addfrom->new_tasks_.empty()) 
+            if (0 == addfrom->new_tasks_count_) 
                 return false;
 
             // create new threads from pending tasks (if appropriate)
@@ -249,7 +254,7 @@ namespace hpx { namespace threads { namespace policies
         /// (state is terminated) are properly destroyed
         bool cleanup_terminated()
         {
-            if (!terminated_items_.empty()) {
+            {
                 long delete_count = max_delete_count;   // delete only this much threads
                 thread_id_type todelete;
                 while (delete_count && terminated_items_.dequeue(&todelete)) 
@@ -304,7 +309,7 @@ namespace hpx { namespace threads { namespace policies
                 // add a new entry in the map for this thread
                 thread_id_type id = thrd->get_thread_id();
                 std::pair<thread_map_type::iterator, bool> p =
-                    thread_map_.insert(id, thrd.get());
+                    thread_map_.insert(id);
 
                 if (!p.second) {
                     HPX_THROWS_IF(ec, hpx::no_success, 
@@ -326,8 +331,8 @@ namespace hpx { namespace threads { namespace policies
 
             // do not execute the work, but register a task description for 
             // later thread creation
-            new_tasks_.enqueue(new task_description(data, initial_state));
             ++new_tasks_count_;
+            new_tasks_.enqueue(new task_description(data, initial_state));
             return invalid_thread_id;     // thread has not been created yet
         }
 
@@ -376,7 +381,7 @@ namespace hpx { namespace threads { namespace policies
             // only one dedicated OS thread is allowed to acquire the 
             // lock for the purpose of inserting the new threads into the 
             // thread-map and deleting all terminated threads
-            {
+            if (Global && 0 == num_thread) {
                 // first clean up terminated threads
                 detail::try_lock_wrapper<mutex_type> lk(mtx_);
                 if (lk) {
@@ -390,7 +395,7 @@ namespace hpx { namespace threads { namespace policies
             }
 
             bool terminate = false;
-            while (work_items_.empty()) {
+            while (0 == work_items_count_) {
                 // No obvious work has to be done, so a lock won't hurt too much
                 // but we lock only one of the threads, assuming this thread
                 // will do the maintenance
@@ -430,40 +435,29 @@ namespace hpx { namespace threads { namespace policies
                     cleanup_terminated();
                 }
 
-                if (added_new)
+                if (!Global || added_new) {
+                    // dump list of suspended threads once a second
+                    if (!Global && LHPX_ENABLED(error) && addfrom->new_tasks_.empty())
+                        detail::dump_suspended_threads(num_thread, thread_map_, idle_loop_count);
+
                     break;    // we got work, exit loop
+                }
 
                 // Wait until somebody needs some action (if no new work 
                 // arrived in the meantime).
                 // Ask again if queues are empty to avoid race conditions (we 
                 // needed to lock anyways...), this way no notify_all() gets lost
-                if (work_items_.empty())
-                {
+                if (0 == work_items_count_) {
                     LTM_(info) << "tfunc(" << num_thread 
                                << "): queues empty, entering wait";
 
-                    if (idle_loop_count > 200) 
-                    {
-                        // reset idle loop count
-                        idle_loop_count = 0;
+                    // dump list of suspended threads once a second
+                    if (LHPX_ENABLED(error) && addfrom->new_tasks_.empty())
+                        detail::dump_suspended_threads(num_thread, thread_map_, idle_loop_count);
 
-                        // dump list of suspended threads once a second
-                        if (LHPX_ENABLED(error) && addfrom->new_tasks_.empty())
-                            detail::dump_suspended_threads(num_thread, thread_map_);
-
-                        // in any case we reactivate all pending threads
-                        if (reactivate_pending_threads())
-                            break;    // we got work, exit loop
-                    }
-                    ++idle_loop_count;
-
-                    bool timed_out = true;
-                    if (Global) 
-                    {
-                        namespace bpt = boost::posix_time;
-                        timed_out = !cond_.timed_wait(lk, bpt::microseconds(10*idle_loop_count));
-                    }
-
+                    namespace bpt = boost::posix_time;
+                    bool timed_out = !cond_.timed_wait(lk, bpt::microseconds(10*idle_loop_count));
+                        
                     LTM_(info) << "tfunc(" << num_thread << "): exiting wait";
 
                     // make sure all pending new threads are properly queued
@@ -474,34 +468,6 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
             return terminate;
-        }
-
-        /// Look through thread map and put all active threads into the queue 
-        /// of work items
-        bool reactivate_pending_threads()
-        {
-            typedef boost::ptr_map<thread_id_type, threads::thread> thread_map_type;
-
-            bool added_one = false;
-            thread_map_type::const_iterator end = thread_map_.end();
-            for (thread_map_type::const_iterator it = thread_map_.begin(); 
-                 it != end; ++it)
-            {
-                threads::thread const* thrd = (*it).second;
-                if (threads::pending == thrd->get_state()) {
-                    LTM_(fatal) << "reactivating pending thread: " 
-                                << get_thread_state_name(thrd->get_state()) 
-                                << "(" << (*it).first << "): "
-                                << thrd->get_description();
-
-                    work_items_.enqueue(const_cast<threads::thread*>(thrd));
-                    ++work_items_count_;
-                    do_some_work();         // wake up sleeping threads
-
-                    added_one = true;
-                }
-            }
-            return added_one;
         }
 
         /// This function gets called by the threadmanager whenever new work

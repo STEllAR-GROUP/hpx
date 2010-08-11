@@ -713,7 +713,7 @@ namespace hpx { namespace threads
         while (true) {
             // Get the next PX thread from the queue
             thread* thrd = NULL;
-            if (scheduler_.get_next_thread(num_thread, &thrd)) {
+            if (scheduler_.get_next_thread(num_thread, running_, idle_loop_count, &thrd)) {
                 idle_loop_count = 0;
                 tl1.tick();
 
@@ -797,7 +797,7 @@ namespace hpx { namespace threads
             }
 
             // if nothing else has to be done either wait or terminate
-            if (scheduler_.wait_or_add_new(num_thread, running_, idle_loop_count))
+            else if (scheduler_.wait_or_add_new(num_thread, running_, idle_loop_count))
             {
                 // if we need to terminate, unregister the counter first
                 queue_length_counter.uninstall();
