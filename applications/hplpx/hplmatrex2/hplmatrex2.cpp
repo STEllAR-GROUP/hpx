@@ -12,33 +12,33 @@
 HPX_REGISTER_COMPONENT_MODULE();
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-	hpx::components::simple_component<hpx::components::server::HPLMatrex2>,
-	HPLMatrex2);
+	hpx::components::simple_component<hpx::components::server::HPLMatreX2>,
+	HPLMatreX2);
 
 //Register the actions
 HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatrex2::construct_action,HPLconstruct_action);
+	hpx::components::server::HPLMatreX2::construct_action,HPLconstruct_action);
 HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatrex2::destruct_action,HPLdestruct_action);
+	hpx::components::server::HPLMatreX2::destruct_action,HPLdestruct_action);
 HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatrex2::assign_action,HPLassign_action);
+	hpx::components::server::HPLMatreX2::assign_action,HPLassign_action);
 HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatrex2::set_action,HPLset_action);
+	hpx::components::server::HPLMatreX2::set_action,HPLset_action);
 HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatrex2::get_action,HPLget_action);
+	hpx::components::server::HPLMatreX2::get_action,HPLget_action);
 HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatrex2::solve_action,HPLsolve_action);
+	hpx::components::server::HPLMatreX2::solve_action,HPLsolve_action);
 HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatrex2::swap_action,HPLswap_action);
+	hpx::components::server::HPLMatreX2::swap_action,HPLswap_action);
 HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatrex2::gtop_action,HPLgtop_action);
+	hpx::components::server::HPLMatreX2::gtop_action,HPLgtop_action);
 HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatrex2::gleft_action,HPLgleft_action);
+	hpx::components::server::HPLMatreX2::gleft_action,HPLgleft_action);
 HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatrex2::gtrail_action,HPLgtrail_action);
+	hpx::components::server::HPLMatreX2::gtrail_action,HPLgtrail_action);
 HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatrex2::bsubst_action,HPLbsubst_action);
+	hpx::components::server::HPLMatreX2::bsubst_action,HPLbsubst_action);
 HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatrex2::check_action,HPLcheck_action);
+	hpx::components::server::HPLMatreX2::check_action,HPLcheck_action);
 
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::HPLMatrex2);
+HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::HPLMatreX2);

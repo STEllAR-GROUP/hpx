@@ -1,7 +1,7 @@
 #ifndef _HPLMATREX2_HPP
 #define _HPLMATREX2_HPP
 
-/*This is the HPLMatrex2 interface header file.
+/*This is the HPLMatreX2 interface header file.
 In order to keep things simple, only operations necessary
 to to perform LUP decomposition are declared, which is
 basically just constructors, assignment operators, 
@@ -15,15 +15,15 @@ a destructor, and access operators.
 
 namespace hpx { namespace components
 {
-    class HPLMatrex2 : public client_base<HPLMatrex2, stubs::HPLMatrex2>
+    class HPLMatreX2 : public client_base<HPLMatreX2, stubs::HPLMatreX2>
     {
 	typedef
-	    client_base<HPLMatrex2, stubs::HPLMatrex2> base_type;
+	    client_base<HPLMatreX2, stubs::HPLMatreX2> base_type;
 
     public:
 	//constructors and destructor
-	HPLMatrex2(){}
-	HPLMatrex2(naming::id_type gid) : base_type(gid){}
+	HPLMatreX2(){}
+	HPLMatreX2(naming::id_type gid) : base_type(gid){}
 	void destruct(){
 		BOOST_ASSERT(gid_);
 		return this->base_type::destruct(gid_);

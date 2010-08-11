@@ -43,8 +43,8 @@ int hpx_main(){
 		prefix = appl.get_runtime_support_raw_gid();
 	}
 
-	using hpx::components::HPLMatrex2;
-	HPLMatrex2 dat;
+	using hpx::components::HPLMatreX2;
+	HPLMatreX2 dat;
 
 	dat.create(naming::id_type(prefix,naming::id_type::unmanaged));
 

@@ -1,7 +1,7 @@
 #ifndef _HPLMATREX2_SERVER_HPP
 #define _HPLMATREX2_SERVER_HPP
 
-/*This is the HPLMatrex2 class implementation header file.
+/*This is the HPLMatreX2 class implementation header file.
 In order to keep things simple, only operations necessary
 to to perform LUP decomposition are declared, which is
 basically just constructors, assignment operators,
@@ -24,7 +24,7 @@ a destructor, and access operators.
 
 namespace hpx { namespace components { namespace server
 {
-    class HPX_COMPONENT_EXPORT HPLMatrex2 : public simple_component_base<HPLMatrex2>
+    class HPX_COMPONENT_EXPORT HPLMatreX2 : public simple_component_base<HPLMatreX2>
     {
     public:
 	//enumerate all of the actions that will(or can) be employed
@@ -44,10 +44,10 @@ namespace hpx { namespace components { namespace server
         };
 
 	//constructors and destructor
-	HPLMatrex2(){}
+	HPLMatreX2(){}
 	int construct(naming::id_type gid, unsigned int h, unsigned int w,
 		unsigned int ab, unsigned int bs);
-	~HPLMatrex2(){destruct();}
+	~HPLMatreX2(){destruct();}
 	void destruct();
 
 	//operators for assignment and leftdata access
@@ -89,63 +89,63 @@ namespace hpx { namespace components { namespace server
     public:
 	//here we define the actions that will be used
 	//the construct function
-	typedef actions::result_action5<HPLMatrex2, int, hpl_construct, naming::id_type,
+	typedef actions::result_action5<HPLMatreX2, int, hpl_construct, naming::id_type,
 		unsigned int, unsigned int, unsigned int, unsigned int,
-		&HPLMatrex2::construct> construct_action;
+		&HPLMatreX2::construct> construct_action;
 	//the destruct function
-	typedef actions::action0<HPLMatrex2, hpl_destruct,
-		&HPLMatrex2::destruct> destruct_action;
+	typedef actions::action0<HPLMatreX2, hpl_destruct,
+		&HPLMatreX2::destruct> destruct_action;
 	 //the assign function
-	typedef actions::result_action3<HPLMatrex2, int, hpl_assign, unsigned int,
-		unsigned int, bool, &HPLMatrex2::assign> assign_action;
+	typedef actions::result_action3<HPLMatreX2, int, hpl_assign, unsigned int,
+		unsigned int, bool, &HPLMatreX2::assign> assign_action;
 	//the get function
-	typedef actions::result_action2<HPLMatrex2, double, hpl_get, unsigned int,
-        	unsigned int, &HPLMatrex2::get> get_action;
+	typedef actions::result_action2<HPLMatreX2, double, hpl_get, unsigned int,
+        	unsigned int, &HPLMatreX2::get> get_action;
 	//the set function
-	typedef actions::action3<HPLMatrex2, hpl_set, unsigned int,
-        	unsigned int, double, &HPLMatrex2::set> set_action;
+	typedef actions::action3<HPLMatreX2, hpl_set, unsigned int,
+        	unsigned int, double, &HPLMatreX2::set> set_action;
 	//the solve function
-	typedef actions::result_action0<HPLMatrex2, double, hpl_solve,
-		&HPLMatrex2::LUsolve> solve_action;
+	typedef actions::result_action0<HPLMatreX2, double, hpl_solve,
+		&HPLMatreX2::LUsolve> solve_action;
 	 //the swap function
-	typedef actions::result_action2<HPLMatrex2, int, hpl_swap, unsigned int,
-		unsigned int, &HPLMatrex2::swap> swap_action;
+	typedef actions::result_action2<HPLMatreX2, int, hpl_swap, unsigned int,
+		unsigned int, &HPLMatreX2::swap> swap_action;
 	//the top gaussian function
-	typedef actions::result_action2<HPLMatrex2, int, hpl_gtop, unsigned int,
-		unsigned int, &HPLMatrex2::LUgausstop> gtop_action;
+	typedef actions::result_action2<HPLMatreX2, int, hpl_gtop, unsigned int,
+		unsigned int, &HPLMatreX2::LUgausstop> gtop_action;
 	//the left side gaussian function
-	typedef actions::result_action2<HPLMatrex2, int, hpl_gleft, unsigned int,
-		unsigned int, &HPLMatrex2::LUgaussleft> gleft_action;
+	typedef actions::result_action2<HPLMatreX2, int, hpl_gleft, unsigned int,
+		unsigned int, &HPLMatreX2::LUgaussleft> gleft_action;
 	//the trailing submatrix gaussian function
-	typedef actions::result_action3<HPLMatrex2, int, hpl_gtrail, unsigned int,
-		unsigned int, unsigned int, &HPLMatrex2::LUgausstrail> gtrail_action;
+	typedef actions::result_action3<HPLMatreX2, int, hpl_gtrail, unsigned int,
+		unsigned int, unsigned int, &HPLMatreX2::LUgausstrail> gtrail_action;
 	//backsubstitution function
-	typedef actions::result_action0<HPLMatrex2, int, hpl_bsubst,
-		&HPLMatrex2::LUbacksubst> bsubst_action;
+	typedef actions::result_action0<HPLMatreX2, int, hpl_bsubst,
+		&HPLMatreX2::LUbacksubst> bsubst_action;
 	//checksolve function
-	typedef actions::result_action3<HPLMatrex2, double, hpl_check, unsigned int,
-		unsigned int, bool, &HPLMatrex2::checksolve> check_action;
+	typedef actions::result_action3<HPLMatreX2, double, hpl_check, unsigned int,
+		unsigned int, bool, &HPLMatreX2::checksolve> check_action;
 
 	//here begins the definitions of most of the future types that will be used
 	//the first of which is for assign action
-	typedef lcos::eager_future<server::HPLMatrex2::assign_action> assign_future;
+	typedef lcos::eager_future<server::HPLMatreX2::assign_action> assign_future;
 
 	//Here is the swap future, which works the same way as the assign future
-	typedef lcos::eager_future<server::HPLMatrex2::swap_action> swap_future;
+	typedef lcos::eager_future<server::HPLMatreX2::swap_action> swap_future;
 
 	//the backsubst future is used to make sure all computations are complete before
 	//returning from LUsolve, to avoid killing processes and erasing the leftdata while
 	//it is still being worked on
-	typedef lcos::eager_future<server::HPLMatrex2::bsubst_action> bsubst_future;
+	typedef lcos::eager_future<server::HPLMatreX2::bsubst_action> bsubst_future;
 
 	//the final future type for the class is used for checking the accuracy of
 	//the results of the LU decomposition
-	typedef lcos::eager_future<server::HPLMatrex2::check_action> check_future;
+	typedef lcos::eager_future<server::HPLMatreX2::check_action> check_future;
     };
 //////////////////////////////////////////////////////////////////////////////////////
 
     //the constructor initializes the matrix
-    int HPLMatrex2::construct(naming::id_type gid, unsigned int h, unsigned int w,
+    int HPLMatreX2::construct(naming::id_type gid, unsigned int h, unsigned int w,
 		unsigned int ab, unsigned int bs){
 // / / /initialize class variables/ / / / / / / / / / / /
 	if(ab > std::ceil(((float)h)*.5)){
@@ -179,7 +179,7 @@ namespace hpx { namespace components { namespace server
 	allocate();
 
 	//here we initialize the the matrix
-//	lcos::eager_future<server::HPLMatrex2::assign_action>
+//	lcos::eager_future<server::HPLMatreX2::assign_action>
 //		assign_future(gid,(unsigned int)0,offset,false);
 	assign(1,1,true);
 	//initialize the pivot array
@@ -191,7 +191,7 @@ namespace hpx { namespace components { namespace server
     }
 
     //allocate() allocates memory space for the matrix
-    void HPLMatrex2::allocate(){
+    void HPLMatreX2::allocate(){
 	for(unsigned int i = 0;i < rows;i++){
 	    truedata[i] = (double*) std::malloc(columns*sizeof(double));
 	    factordata[i] = (double*) std::malloc(2*blocksize*sizeof(double));
@@ -202,7 +202,7 @@ namespace hpx { namespace components { namespace server
     }
 
     //assign gives values to the empty elements of the array
-    int HPLMatrex2::assign(unsigned int row, unsigned int offset, bool complete){
+    int HPLMatreX2::assign(unsigned int row, unsigned int offset, bool complete){
 	for(unsigned int i=0;i<rows;i++){
 	    for(unsigned int j=0;j<columns;j++){
 		truedata[i][j] = (double) (rand() % 1000);
@@ -212,7 +212,7 @@ namespace hpx { namespace components { namespace server
     }
 
     //the destructor frees the memory
-    void HPLMatrex2::destruct(){
+    void HPLMatreX2::destruct(){
 	unsigned int i;
 	for(i=0;i<rows;i++){
 		free(truedata[i]);
@@ -232,17 +232,17 @@ namespace hpx { namespace components { namespace server
 
 //DEBUGGING FUNCTIONS/////////////////////////////////////////////////
     //get() gives back an element in the original matrix
-    double HPLMatrex2::get(unsigned int row, unsigned int col){
+    double HPLMatreX2::get(unsigned int row, unsigned int col){
 	return truedata[row][col];
     }
 
     //set() assigns a value to an element in all matrices
-    void HPLMatrex2::set(unsigned int row, unsigned int col, double val){
+    void HPLMatreX2::set(unsigned int row, unsigned int col, double val){
 	truedata[row][col] = val;
     }
 
     //print out the matrix
-    void HPLMatrex2::print(){
+    void HPLMatreX2::print(){
 	for(int i = 0;i < rows; i++){
 	    for(int j = 0;j < columns; j++){
 		std::cout<<datablock[i/blocksize][j/blocksize]->get(i%blocksize,j%blocksize)<<" ";
@@ -251,7 +251,7 @@ namespace hpx { namespace components { namespace server
 	}
 	    std::cout<<std::endl;
     }
-    void HPLMatrex2::print2(){
+    void HPLMatreX2::print2(){
 	for(int i = 0;i < rows; i++){
 	    int temp=0;
 	    while(temp + blocksize <= i){temp+=blocksize;}
@@ -265,7 +265,7 @@ namespace hpx { namespace components { namespace server
 //END DEBUGGING FUNCTIONS/////////////////////////////////////////////
 
     //LUsolve is simply a wrapper function for LUfactor and LUbacksubst
-    double HPLMatrex2::LUsolve(){
+    double HPLMatreX2::LUsolve(){
 	pivot();
 	LUdivide();
 	//allocate memory space to store the solution
@@ -284,7 +284,7 @@ namespace hpx { namespace components { namespace server
     //pivot() finds the pivot element of each column and stores it. All
     //pivot elements are found before any swapping takes place so that
     //the swapping can occur in parallel
-    void HPLMatrex2::pivot(){
+    void HPLMatreX2::pivot(){
 	unsigned int max, max_row;
 	unsigned int temp_piv;
 	double temp;
@@ -317,7 +317,7 @@ namespace hpx { namespace components { namespace server
     //swap() creates the datablocks and reorders the original
     //truedata matrix when assigning the initial values to the datablocks
     //according to the pivotarr data.  truedata itself remains unchanged
-    int HPLMatrex2::swap(unsigned int brow, unsigned int bcol){
+    int HPLMatreX2::swap(unsigned int brow, unsigned int bcol){
 	bool onbottom=false,onright=false;
 	unsigned int temp = rows/blocksize;
 	unsigned int numrows = blocksize, numcols = blocksize;
@@ -337,10 +337,10 @@ namespace hpx { namespace components { namespace server
     //although the process of properly dividing up the computations across
     //the different blocks using slightly different functions does require
     //the delegation provided by this wrapper
-    void HPLMatrex2::LUdivide(){
-	typedef lcos::eager_future<server::HPLMatrex2::gtop_action> gtop_future;
-	typedef lcos::eager_future<server::HPLMatrex2::gleft_action> gleft_future;
-	typedef lcos::eager_future<server::HPLMatrex2::gtrail_action> gtrail_future;
+    void HPLMatreX2::LUdivide(){
+	typedef lcos::eager_future<server::HPLMatreX2::gtop_action> gtop_future;
+	typedef lcos::eager_future<server::HPLMatreX2::gleft_action> gleft_future;
+	typedef lcos::eager_future<server::HPLMatreX2::gtrail_action> gtrail_future;
 
 	std::vector<gtop_future> top_futures;
 	std::vector<gleft_future> left_futures;
@@ -408,7 +408,7 @@ namespace hpx { namespace components { namespace server
     //LUgausscorner peforms gaussian elimination on the topleft corner block
     //of data that has not yet completed all of it's gaussian elimination
     //computations. Once complete, this block will need no further computations
-    void HPLMatrex2::LUgausscorner(unsigned int iter){
+    void HPLMatreX2::LUgausscorner(unsigned int iter){
 	unsigned int fac_i = 0;
 	unsigned int i, j, k;
 	unsigned int offset = iter*blocksize;
@@ -433,7 +433,7 @@ namespace hpx { namespace components { namespace server
     //LUgausstop performs gaussian elimination on the topmost row of blocks
     //that have not yet finished all gaussian elimination computation.
     //Once complete, these blocks will no longer need further computations
-    int HPLMatrex2::LUgausstop(unsigned int iter, unsigned int bcol){
+    int HPLMatreX2::LUgausstop(unsigned int iter, unsigned int bcol){
 	unsigned int i,j,k;
 	unsigned int fac_i = 0;
 	unsigned int offset = iter*blocksize;
@@ -453,7 +453,7 @@ namespace hpx { namespace components { namespace server
     //LUgaussleft performs gaussian elimination on the leftmost column of blocks
     //that have not yet finished all gaussian elimination computation.
     //Upon completion, no further computations need be done on these blocks.
-    int HPLMatrex2::LUgaussleft(unsigned int brow, unsigned int iter){
+    int HPLMatreX2::LUgaussleft(unsigned int brow, unsigned int iter){
 	unsigned int i,j,k;
 	unsigned int fac_i = 0;
 	unsigned int offset = brow*blocksize;
@@ -477,7 +477,7 @@ namespace hpx { namespace components { namespace server
     //the blocks operated on during the current iteration of the Gaussian elimination
     //computations. These blocks will still require further computations to be
     //performed in future iterations.
-    int HPLMatrex2::LUgausstrail(unsigned int brow, unsigned int bcol, unsigned int iter){
+    int HPLMatreX2::LUgausstrail(unsigned int brow, unsigned int bcol, unsigned int iter){
 	unsigned int i,j,k;
 	unsigned int fac_i = 0;
 	unsigned int offset = brow*blocksize;
@@ -500,7 +500,7 @@ namespace hpx { namespace components { namespace server
 
     //this is an implementation of back substitution modified for use on
     //multiple datablocks instead of a single large data structure
-    int HPLMatrex2::LUbacksubst(){
+    int HPLMatreX2::LUbacksubst(){
 	//i,j,k,l standard loop variables, row and col keep
 	//track of where the loops would be in terms of a single
 	//large data structure; using it allows addition
@@ -541,7 +541,7 @@ namespace hpx { namespace components { namespace server
 
     //finally, this function checks the accuracy of the LU computation a few rows at
     //a time
-    double HPLMatrex2::checksolve(unsigned int row, unsigned int offset, bool complete){
+    double HPLMatreX2::checksolve(unsigned int row, unsigned int offset, bool complete){
 	double toterror = 0;	//total error from all checks
 
         //futures is used to allow this thread to continue spinning off new threads
