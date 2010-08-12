@@ -212,40 +212,43 @@ namespace hpx { namespace components { namespace stubs
         }
 
         /// Destroy an existing component
-        static void free_component(components::component_type type, 
-            naming::gid_type const& gid) 
-        {
-            typedef server::runtime_support::free_component_action action_type;
-
-            // Determine whether the gid of the component to delete is local or 
-            // remote
-            naming::address addr;
-            applier::applier& appl = hpx::applier::get_applier();
-            if (appl.address_is_local(gid, addr)) {
-                // apply locally
-                applier::detail::apply_helper2<
-                    action_type, components::component_type, naming::gid_type
-                >::call(appl.get_runtime_support_raw_gid().get_lsb(), type, gid);
-            }
-            else {
-                // apply remotely
-                // zero address will be interpreted as a reference to the 
-                // remote runtime support object
-                addr.address_ = 0;
-                addr.type_ = components::component_runtime_support;
-                hpx::applier::apply_r<action_type>(addr, naming::invalid_id, type, gid);
-            }
-        }
+//         static void free_component(components::component_type type, 
+//             naming::gid_type const& gid) 
+//         {
+//             typedef server::runtime_support::free_component_action action_type;
+// 
+//             // Determine whether the gid of the component to delete is local or 
+//             // remote
+//             naming::address addr;
+//             applier::applier& appl = hpx::applier::get_applier();
+//             naming::resolver_client const& agas = appl.get_agas_client();
+//             if (agas.is_smp_mode() || appl.address_is_local(gid, addr)) {
+//                 // apply locally
+//                 applier::detail::apply_helper2<
+//                     action_type, components::component_type, naming::gid_type
+//                 >::call(appl.get_runtime_support_raw_gid().get_lsb(), type, gid);
+//             }
+//             else {
+//                 // apply remotely
+//                 // zero address will be interpreted as a reference to the 
+//                 // remote runtime support object
+//                 addr.address_ = 0;
+//                 addr.type_ = components::component_runtime_support;
+//                 hpx::applier::apply_r<action_type>(addr, naming::invalid_id, type, gid);
+//             }
+//         }
 
         static void free_component_sync(components::component_type type, 
             naming::gid_type const& gid) 
         {
             typedef server::runtime_support::free_component_action action_type;
 
-            // Determine whether the gid of the component to delete is local or remote
+            // Determine whether the gid of the component to delete is local or
+            // remote
             naming::address addr;
             applier::applier& appl = hpx::applier::get_applier();
-            if (appl.address_is_local(gid, addr)) {
+            naming::resolver_client const& agas = appl.get_agas_client();
+            if (agas.is_smp_mode() || appl.address_is_local(gid, addr)) {
                 // apply locally
                 applier::detail::apply_helper2<
                     action_type, components::component_type, naming::gid_type

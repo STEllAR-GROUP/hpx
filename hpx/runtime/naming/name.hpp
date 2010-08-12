@@ -291,21 +291,25 @@ namespace hpx { namespace naming
               : gid_type(msb_id, lsb_id), address_(l, type, a)
             {}
 
-            bool is_local_cached() const;
+            bool is_local_cached();
             bool is_cached() const;
             bool is_local();
             bool resolve(naming::address& addr);
             bool is_resolved() const { return address_; }
-            void get_local_address(naming::address& addr) const
+            bool get_local_address(naming::address& addr) 
             {
-                BOOST_ASSERT(is_local_cached());
+                if (!is_local_cached() && !resolve())
+                    return false;
                 addr = address_;
+                return true;
             }
 
-            void get_address_cached(naming::address& addr) const
+            bool get_address_cached(naming::address& addr) const
             {
-                BOOST_ASSERT(is_cached());
+                if (!is_cached())
+                    return false;
                 addr = address_;
+                return true;
             }
 
             // cached resolved address
@@ -479,11 +483,11 @@ namespace hpx { namespace naming
         {
             return gid_->is_local();
         }
-        void get_local_address(naming::address& addr) const
+        bool get_local_address(naming::address& addr) const
         {
             return gid_->get_local_address(addr);
         }
-        void get_address_cached(naming::address& addr) const
+        bool get_address_cached(naming::address& addr) const
         {
             return gid_->get_address_cached(addr);
         }

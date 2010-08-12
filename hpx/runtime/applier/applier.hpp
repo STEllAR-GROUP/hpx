@@ -159,7 +159,13 @@ namespace hpx { namespace applier
             naming::address& addr) const
         {
             if (id.is_local()) {    // address gets resolved if not already
-                id.get_local_address(addr);
+                if (!id.get_local_address(addr)) {
+                    HPX_OSSTREAM strm;
+                    strm << "gid" << id.get_gid();
+                    HPX_THROW_EXCEPTION(invalid_status, 
+                        "applier::address_is_local", 
+                        HPX_OSSTREAM_GETSTRING(strm));
+                }
                 return true;
             }
 
@@ -170,7 +176,13 @@ namespace hpx { namespace applier
                     "applier::address_is_local", HPX_OSSTREAM_GETSTRING(strm));
             }
 
-            id.get_address_cached(addr);
+            if (!id.get_address_cached(addr)) {
+                HPX_OSSTREAM strm;
+                strm << "gid" << id.get_gid();
+                HPX_THROW_EXCEPTION(invalid_status, 
+                    "applier::address_is_local", 
+                    HPX_OSSTREAM_GETSTRING(strm));
+            }
             return false;   // non-local
         }
 

@@ -735,6 +735,9 @@ namespace hpx { namespace naming
         ///        locality
         bool is_console() const { return isconsole_; }
 
+        /// \brief Returns whether this resolver_client runs in SMP mode
+        bool is_smp_mode() const { return local_only_; }
+
     protected:
         friend class bulk_resolver_client;
 

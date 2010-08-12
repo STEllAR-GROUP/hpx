@@ -80,7 +80,7 @@ namespace hpx { namespace naming
             delete p;   // delete local gid representation only
         }
 
-        bool id_type_impl::is_local_cached() const
+        bool id_type_impl::is_local_cached() 
         {
             applier::applier& appl = applier::get_applier();
             gid_type::mutex_type::scoped_lock l(this);
@@ -95,6 +95,9 @@ namespace hpx { namespace naming
 
         bool id_type_impl::is_local()
         {
+            if (applier::get_applier().get_agas_client().is_smp_mode())
+                return true;
+
             bool valid = false;
             {
                 gid_type::mutex_type::scoped_lock l(this);
