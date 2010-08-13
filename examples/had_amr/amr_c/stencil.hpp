@@ -49,10 +49,11 @@ namespace hpx { namespace components { namespace amr
 
         // this function creates a finer mesh from 3 input gids and evolves that
         // finer mesh for two steps.
-        int finer_mesh(naming::id_type const& result, 
-            std::vector<naming::id_type> const& gids,std::size_t vecvalsize,std::size_t size,
-            std::size_t level, had_double_type xmin,
-            std::size_t compute_index,std::size_t row, std::size_t column,
+        int finer_mesh(std::vector<naming::id_type> const& gids,
+            access_memory_block<stencil_data>& resultval, 
+            std::vector<access_memory_block<stencil_data> >& val,
+            std::size_t vecvalsize,std::size_t size, 
+            std::size_t compute_index, std::size_t row, std::size_t column, 
             Parameter const& par);
         
         /// The alloc function is supposed to create a new memory block instance 
@@ -73,12 +74,12 @@ namespace hpx { namespace components { namespace amr
         int floatcmp(had_double_type x1,had_double_type x2);
 
         int prep_initial_data(std::vector<naming::id_type> & initial_data,
-                    std::vector<naming::id_type> const& gids,
-                    std::size_t vecvalsize, std::size_t size,
-                    std::size_t row,std::size_t column,std::size_t numvals, Parameter const& par);
+            std::vector<naming::id_type> const& gids,
+            std::size_t vecvalsize, std::size_t size,
+            std::size_t row,std::size_t column,std::size_t numvals, Parameter const& par);
 
         int prep_restriction_data(std::vector<naming::id_type> & result_data,
-                                  std::size_t compute_index,std::size_t numvals,std::size_t size,Parameter const& par);
+            std::size_t numvals,std::size_t size,Parameter const& par);
 
     private:
         std::size_t numsteps_;

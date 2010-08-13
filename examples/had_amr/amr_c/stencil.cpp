@@ -59,33 +59,27 @@ namespace hpx { namespace components { namespace amr
                 return -1;
         }
 
-        // start asynchronous get operations
+        // get all input and result memory_block_data instances
+        std::vector<access_memory_block<stencil_data> > val, tval;
+        access_memory_block<stencil_data> resultval = 
+            get_memory_block_async(val, gids, result);
 
-        // get all input memory_block_data instances
-        access_memory_block<stencil_data> resultval;
-        std::vector<access_memory_block<stencil_data> > val,tval;
-
-        int i,j;
-//         had_double_type timestep;
-        std::vector< nodedata > vecval;
-        std::vector< had_double_type > vecx;
-        resultval = get_memory_block_async(val,gids,result);
+        // --> lock resultval, val[all] here
 
         // Here we give the coordinate value to the result (prior to sending it to the user)
         int compute_index;
         bool boundary = false;
-        int bbox[2];
-
-        // initialize bounding box
-        bbox[0] = 0;
-        bbox[1] = 0;
+        int bbox[2] = { 0, 0 };   // initialize bounding box
 
         if ( val[0]->iter_ != val[val.size()-1]->iter_ ) {
-          for (i=0;i<val.size();i++) {
-            if ( val[0]->iter_ == val[i]->iter_ ) tval.push_back(val[i]);
+          for (int i = 0; i < val.size(); i++) {
+            if ( val[0]->iter_ == val[i]->iter_ ) 
+                tval.push_back(val[i]);
           }
-        } else {
-          for (i=0;i<val.size();i++) tval.push_back(val[i]);
+        } 
+        else {
+          for (int i = 0; i < val.size(); i++) 
+              tval.push_back(val[i]);
         }
 
         if ( tval[0]->level_ == 0 ) {
@@ -109,7 +103,8 @@ namespace hpx { namespace components { namespace amr
               BOOST_ASSERT(false);
             }
           }
-        } else {
+        } 
+        else {
           if ( column == 0  ) {
             compute_index = 0;
           } else if ( column == val[0]->max_index_ - 1) {
@@ -132,10 +127,13 @@ namespace hpx { namespace components { namespace amr
         } 
 
         // put all data into a single array
+        std::vector< had_double_type > vecx;
+        std::vector< nodedata > vecval;
+
         std::size_t count = 0;
         std::size_t adj_index = -1;
-        for (i=0;i<tval.size();i++) {
-          for (j=0;j<tval[i]->granularity;j++) {
+        for (int i = 0; i < tval.size(); i++) {
+          for (int j = 0; j < tval[i]->granularity; j++) {
             vecval.push_back(tval[i]->value_[j]);
             vecx.push_back(tval[i]->x_[j]);
             if ( i == compute_index && adj_index == -1 ) {
@@ -145,7 +143,7 @@ namespace hpx { namespace components { namespace amr
           }
         }
 
-        for (j=0;j<tval[compute_index]->granularity;j++) {
+        for (int j = 0; j < tval[compute_index]->granularity; j++) {
           resultval->x_.push_back(tval[compute_index]->x_[j]);
         }
 
@@ -163,7 +161,7 @@ namespace hpx { namespace components { namespace amr
         threads::thread_id_type id = self.get_thread_id();
         threads::set_thread_description(id,description);
 
-        if (val[0]->level_ == 0 && val[0]->timestep_ < numsteps_ || val[0]->level_ > 0) {
+        if ((val[0]->level_ == 0 && val[0]->timestep_ < numsteps_) || val[0]->level_ > 0) {
 
             // copy over critical info
             resultval->level_ = val[0]->level_;
@@ -183,25 +181,37 @@ namespace hpx { namespace components { namespace amr
   
             // increase the iteration counter
             if ( val[0]->iter_ == 2 ) {
-              resultval->iter_ = 0;
-            } else {
-              resultval->iter_ = val[0]->iter_ + 1;
+                resultval->iter_ = 0;
+            } 
+            else {
+                resultval->iter_ = val[0]->iter_ + 1;
             }
 
             // refine only after rk subcycles are finished (we don't refine in the midst of rk subcycles)
-            if ( resultval->iter_ == 0 ) resultval->refine_ = refinement(&*vecval.begin(),vecval.size(),resultval.get_ptr(),compute_index,boundary,bbox,*par.p);
-            else resultval->refine_ = false;
-
-            std::size_t allowedl = par->allowedl;
-
-            if ( resultval->refine_ && resultval->level_ < allowedl ) {
-              finer_mesh(result, gids,vecval.size(),tval.size(),resultval->level_+1,resultval->x_[0], compute_index, row, column, par);
-            } else {
-              resultval->overwrite_alloc_ = false;
+            if ( resultval->iter_ == 0 ) {
+                resultval->refine_ = refinement(&*vecval.begin(), vecval.size(),
+                    resultval.get_ptr(),compute_index,boundary,bbox,*par.p);
+            }
+            else {
+                resultval->refine_ = false;
             }
 
-            if (par->loglevel > 1 && fmod(resultval->timestep_,par->output) < 1.e-6) 
-                stubs::logging::logentry(log_, resultval.get(), row,0, par);
+            if ( resultval->refine_ && resultval->level_ < par->allowedl ) {
+                // --> unlock resultval, val[all]
+                finer_mesh(gids, resultval, val, vecval.size(), tval.size(),
+                    compute_index, row, column, par);
+                // --> lock resultval, val[all]
+            } 
+            else {
+                resultval->overwrite_alloc_ = false;
+            }
+
+            if (par->loglevel > 1 && fmod(resultval->timestep_, par->output) < 1.e-6) {
+                // make copy of: resultval.get()
+                // --> unlock resultval here
+                stubs::logging::logentry(log_, resultval.get(), row, 0, par);
+                // --> re-lock resultval here
+            }
         }
         else {
             // the last time step has been reached, just copy over the data
@@ -211,8 +221,9 @@ namespace hpx { namespace components { namespace amr
         // set return value difference between actual and required number of
         // timesteps (>0: still to go, 0: last step, <0: overdone)
         if ( val[0]->level_ > 0 ) {
-          return 0;
-        } else {
+            return 0;
+        } 
+        else {
           BOOST_ASSERT(numsteps_%6 == 0);
           int t = resultval->cycle_;
           int r = numsteps_ - t;
@@ -225,49 +236,43 @@ namespace hpx { namespace components { namespace amr
     ///////////////////////////////////////////////////////////////////////////
     // Implement a finer mesh via interpolation of inter-mesh points
     // Compute the result value for the current time step
-    int stencil::finer_mesh(naming::id_type const& result, 
-        std::vector<naming::id_type> const& gids,
-        std::size_t vecvalsize,std::size_t size, std::size_t level, had_double_type xmin, 
-        std::size_t compute_index, std::size_t row,std::size_t column, Parameter const& par) 
+    int stencil::finer_mesh(std::vector<naming::id_type> const& gids,
+        access_memory_block<stencil_data>& resultval,
+        std::vector<access_memory_block<stencil_data> >& val,   // needed for locking purposes only
+        std::size_t vecvalsize, std::size_t size, 
+        std::size_t compute_index, std::size_t row, std::size_t column, 
+        Parameter const& par) 
     {
-      std::vector<naming::id_type> initial_data;
-
       naming::id_type here = applier::get_applier().get_runtime_support_gid();
       components::component_type logging_type =
-                components::get_component_type<components::amr::server::logging>();
+          components::get_component_type<components::amr::server::logging>();
       components::component_type function_type =
-                components::get_component_type<components::amr::stencil>();
+          components::get_component_type<components::amr::stencil>();
 
-      bool do_logging = false;
-      if ( par->loglevel > 0 ) {
-        do_logging = true;
-      }
+      std::size_t numsteps = 2 * 3;     // three subcycles each step
+      std::size_t numvals = 2 * size;
 
-
-      std::vector<naming::id_type> result_data;
-      std::size_t numsteps = 2 * 3; // three subcycles each step
-
-      std::size_t numvals;
-
-
-      numvals = 2*size;
       //BOOST_ASSERT(size*par->granularity == vecvalsize);
 
-      prep_initial_data(initial_data,gids,vecvalsize,size,row,column,numvals,par);
+      // --> lock val[all]
+      std::vector<naming::id_type> initial_data;
+      prep_initial_data(initial_data, gids, vecvalsize, size, row, column, numvals, par);
+      // --> unlock val[all]
 
       hpx::components::amr::unigrid_mesh unigrid_mesh;
       unigrid_mesh.create(here);
 
-      result_data = unigrid_mesh.execute(initial_data,function_type, numvals, numsteps,
-            do_logging ? logging_type : components::component_invalid, par);
+      std::vector<naming::id_type> result_data = 
+          unigrid_mesh.execute(initial_data, function_type, numvals, numsteps, 
+              (par->loglevel > 0) ? logging_type : components::component_invalid, par);
 
       // prepare for restriction
-      prep_restriction_data(result_data,compute_index,numvals,size,par);
+      prep_restriction_data(result_data, numvals, size, par);
 
-      access_memory_block<stencil_data> left,overwrite,right, resultval;
-      boost::tie(overwrite, resultval) =
-            get_memory_block_async<stencil_data>(result_data[compute_index], result);
+      access_memory_block<stencil_data> overwrite = 
+          hpx::components::stubs::memory_block::get(result_data[compute_index]);
 
+      // --> lock result_data[compute_index], resultval here
       resultval->overwrite_alloc_ = true;
       resultval->overwrite_ = result_data[compute_index];
       resultval->value_ = overwrite->value_;
@@ -277,41 +282,40 @@ namespace hpx { namespace components { namespace amr
         overwrite->left_alloc_ = false;
         overwrite->right_alloc_ = true;
         overwrite->right_ = result_data[compute_index+size];
-      } else if ( size == 3 ) {
+      } 
+      else if ( size == 3 ) {
         overwrite->left_alloc_ = true;
         overwrite->left_ = result_data[compute_index+size-1];
         overwrite->right_alloc_ = true;
         overwrite->right_ = result_data[compute_index+size];
-      } else {
+      } 
+      else {
         BOOST_ASSERT(false);
       }
-
-      //for (std::size_t i = 0; i < result_data.size(); ++i) {
-        // free all
-      //  components::stubs::memory_block::free(result_data[i]);
-      //}
+      // --> unlock result_data[compute_index], resultval here
 
       return 0;
     }
     ///////////////////////////////////////////////////////////////////////////
     // Prep restriction data 
-    int stencil::prep_restriction_data(std::vector<naming::id_type> & result_data,
-                          std::size_t compute_index,std::size_t numvals,std::size_t size, Parameter const& par)
+    int stencil::prep_restriction_data(
+        std::vector<naming::id_type> & result_data,
+        std::size_t numvals, std::size_t size, Parameter const& par)
     {
-
       std::vector<access_memory_block<stencil_data> > mval;
-      get_memory_block_async(mval,result_data);
-      int i,j,k;
+      get_memory_block_async(mval, result_data);
+
+      // --> lock mval[all] here
 
       BOOST_ASSERT(numvals == result_data.size());
       std::vector<had_double_type> phi,x;
       phi.resize(numvals*par->granularity*num_eqns);
       x.resize(numvals*par->granularity);
 
-      for (i=0;i<numvals;i++) {
-        for (j=0;j<mval[i]->granularity;j++) {
+      for (int i = 0; i < numvals; i++) {
+        for (int j = 0; j < mval[i]->granularity; j++) {
           x[j + i*par->granularity] = mval[i]->x_[j];
-          for (k=0;k<num_eqns;k++) {
+          for (int k = 0; k < num_eqns; k++) {
             phi[k + num_eqns*(j+i*par->granularity)] = mval[i]->value_[j].phi[0][k];
           }
         }
@@ -323,14 +327,14 @@ namespace hpx { namespace components { namespace amr
       std::size_t step1 = 0;
       std::size_t step2 = size;
 
-      for (i=0;i<numvals;i++) {
-        for (j=0;j<mval[i]->granularity;j++) {
-          if (count%2 == 0) {
+      for (int i = 0; i < numvals; i++) {
+        for (int j = 0; j < mval[i]->granularity; j++) {
+          if (count % 2 == 0) {
             if ( step1 == numvals ) {
               BOOST_ASSERT(false);
             }
             mval[step1]->x_[count1] = x[j+i*par->granularity];
-            for (k=0;k<num_eqns;k++) {
+            for (int k = 0; k < num_eqns; k++) {
               mval[step1]->value_[count1].phi[0][k] = phi[k + num_eqns*(j+i*par->granularity)];
             }
             count1++;
@@ -344,7 +348,7 @@ namespace hpx { namespace components { namespace amr
               BOOST_ASSERT(false);
             }
             mval[step2]->x_[count2] = x[j+i*par->granularity];
-            for (k=0;k<num_eqns;k++) {
+            for (int k = 0; k < num_eqns; k++) {
               mval[step2]->value_[count2].phi[0][k] = phi[k + num_eqns*(j+i*par->granularity)];
             }
             count2++;
@@ -356,6 +360,7 @@ namespace hpx { namespace components { namespace amr
           count++;
         }
       }
+      // --> unlock mval[all] here
 
       return 0;
     };
@@ -363,13 +368,12 @@ namespace hpx { namespace components { namespace amr
     ///////////////////////////////////////////////////////////////////////////
     // Prep initial data 
     int stencil::prep_initial_data(std::vector<naming::id_type> & initial_data, 
-        std::vector<naming::id_type> const& gids,std::size_t vecvalsize,std::size_t size, 
-                    std::size_t row,std::size_t column,std::size_t numvals, Parameter const& par) 
+        std::vector<naming::id_type> const& gids, std::size_t vecvalsize, 
+        std::size_t size, std::size_t row, std::size_t column, 
+        std::size_t numvals, Parameter const& par) 
     {
-      int i,j,k;
       naming::id_type gval[6];
       access_memory_block<stencil_data> mval[6];
-
 
       int std_index;
       if ( gids.size() != vecvalsize ) {
@@ -379,34 +383,42 @@ namespace hpx { namespace components { namespace amr
       }
 
       if ( size == 3 ) {
-        boost::tie(gval[0],gval[1],gval[2],gval[3],gval[4],gval[5]) = components::wait(components::stubs::memory_block::clone_async(gids[std_index]), 
-                                                                               components::stubs::memory_block::clone_async(gids[std_index+1]),
-                                                                               components::stubs::memory_block::clone_async(gids[std_index+2]),
-                                                                               components::stubs::memory_block::clone_async(gids[std_index]),
-                                                                               components::stubs::memory_block::clone_async(gids[std_index]),
-                                                                               components::stubs::memory_block::clone_async(gids[std_index]));
-        boost::tie(mval[0],mval[1],mval[2],mval[3],mval[4],mval[5]) = 
-          get_memory_block_async<stencil_data>(gval[0], gval[1], gval[2], gval[3], gval[4],gval[5]);
+        boost::tie(gval[0], gval[1], gval[2], gval[3], gval[4], gval[5]) = 
+            components::wait(
+                components::stubs::memory_block::clone_async(gids[std_index]), 
+                components::stubs::memory_block::clone_async(gids[std_index+1]),
+                components::stubs::memory_block::clone_async(gids[std_index+2]),
+                components::stubs::memory_block::clone_async(gids[std_index]),
+                components::stubs::memory_block::clone_async(gids[std_index]),
+                components::stubs::memory_block::clone_async(gids[std_index]));
+        boost::tie(mval[0], mval[1], mval[2], mval[3], mval[4], mval[5]) = 
+          get_memory_block_async<stencil_data>(gval[0], gval[1], gval[2], gval[3], gval[4], gval[5]);
    
-      } else if ( size == 2 ) {
-        boost::tie(gval[0],gval[1],gval[2],gval[3]) = components::wait(components::stubs::memory_block::clone_async(gids[std_index]), 
-                                                       components::stubs::memory_block::clone_async(gids[std_index+1]),
-                                                       components::stubs::memory_block::clone_async(gids[std_index]),
-                                                       components::stubs::memory_block::clone_async(gids[std_index]));
+      } 
+      else if ( size == 2 ) {
+        boost::tie(gval[0], gval[1], gval[2], gval[3]) = 
+            components::wait(
+                components::stubs::memory_block::clone_async(gids[std_index]), 
+                components::stubs::memory_block::clone_async(gids[std_index+1]),
+                components::stubs::memory_block::clone_async(gids[std_index]),
+                components::stubs::memory_block::clone_async(gids[std_index]));
 
-        boost::tie(mval[0],mval[1],mval[2],mval[3]) = 
-          get_memory_block_async<stencil_data>(gval[0], gval[1],gval[2],gval[3]);
+        boost::tie(mval[0], mval[1], mval[2], mval[3]) = 
+          get_memory_block_async<stencil_data>(gval[0], gval[1], gval[2], gval[3]);
 
-      } else {
+      } 
+      else {
         BOOST_ASSERT(false);
       }
+
+      // --> lock mval[all] here
 
       had_double_type dx = mval[0]->x_[1]- mval[0]->x_[0];
 
       // the last gid of the AMR mesh has a slightly smaller granularity
       mval[2*size-1]->granularity = mval[size-1]->granularity-1;
 
-      for (i=0;i<2*size;i++) {
+      for (int i = 0; i < 2*size; i++) {
         // increase the level by one
         ++mval[i]->level_;
         mval[i]->index_ = i;
@@ -416,15 +428,14 @@ namespace hpx { namespace components { namespace amr
           mval[i]->left_alloc_ = false;
           mval[i]->right_alloc_ = false;
           mval[i]->overwrite_alloc_ = false;
-          for (j=0;j<mval[i]->granularity;j++) {
+          for (int j = 0; j < mval[i]->granularity; j++) {
             mval[i]->x_[j]  = mval[i-size]->x_[j] + 0.5*dx;
           }
         }
       }
 
-      int s;
-      for (i=0;i<size;i++) {
-        s = findpoint(mval[i],mval[i+1],mval[i+size]);
+      for (int i = 0; i < size; i++) {
+        int s = findpoint(mval[i],mval[i+1],mval[i+size]);
         //std::cout << " TEST findpoint s: " << s << " i " << i << " " << mval[i]->overwrite_alloc_ << " x " << mval[i+size]->x_[0] << std::endl;
         if ( mval[0]->timestep_ < 1.e-6 ) {
           // don't interpolate initial data
@@ -433,8 +444,8 @@ namespace hpx { namespace components { namespace amr
         }
         if ( s == 0 ) { 
           // point not found -- interpolate
-          for (j=0;j<mval[i]->granularity-1;j++) {
-            for (k=0;k<num_eqns;k++) {
+          for (int j = 0; j < mval[i]->granularity-1; j++) {
+            for (int k = 0; k < num_eqns; k++) {
               mval[i+size]->value_[j].phi[0][k] = 0.5*(mval[i]->value_[j].phi[0][k] + mval[i]->value_[j+1].phi[0][k] );
             }
           }
@@ -442,17 +453,16 @@ namespace hpx { namespace components { namespace amr
           if ( mval[i+size]->granularity > mval[i]->granularity-1 ) {
             // last point to fill
             BOOST_ASSERT(i+1 < size );
-            for (k=0;k<num_eqns;k++) {
+            for (int k = 0; k < num_eqns; k++) {
               mval[i+size]->value_[ mval[i+size]->granularity-1  ].phi[0][k] = 
-                                    0.5*(mval[i]->value_[mval[i]->granularity-1].phi[0][k] + mval[i+1]->value_[0].phi[0][k]);
+                0.5*(mval[i]->value_[mval[i]->granularity-1].phi[0][k] + mval[i+1]->value_[0].phi[0][k]);
             }
           }
-
         }
       }
   
       // re-order things so they can be used
-      std::vector<had_double_type> phi,x;
+      std::vector<had_double_type> phi, x;
       phi.resize(2*size*par->granularity*num_eqns);
       x.resize(2*size*par->granularity);
 
@@ -463,11 +473,11 @@ namespace hpx { namespace components { namespace amr
       std::size_t stp2 = size;
       std::size_t ct3 = 0;
       std::size_t stp3 = 0;
-      for (i=0;i<2*size;i++) {
-        for (j=0;j<mval[i]->granularity;j++) {
-          if (ct%2 == 0) {
+      for (int i = 0; i < 2*size; i++) {
+        for (int j = 0; j < mval[i]->granularity; j++) {
+          if (ct % 2 == 0) {
             x[ct3 + stp3*par->granularity] = mval[stp1]->x_[ct1];
-            for (k=0;k<num_eqns;k++) {
+            for (int k = 0; k < num_eqns; k++) {
               phi[k + num_eqns*(ct3+stp3*par->granularity)] = mval[stp1]->value_[ct1].phi[0][k];
             }
             ct1++;
@@ -477,7 +487,7 @@ namespace hpx { namespace components { namespace amr
             }
           } else {
             x[ct3 + stp3*par->granularity] = mval[stp2]->x_[ct2];
-            for (k=0;k<num_eqns;k++) {
+            for (int k = 0; k < num_eqns; k++) {
               phi[k + num_eqns*(ct3+stp3*par->granularity)] = mval[stp2]->value_[ct2].phi[0][k];
             }
             ct2++;
@@ -499,27 +509,31 @@ namespace hpx { namespace components { namespace amr
       std::size_t count = 0;
       std::size_t step = 0;
 
-      for (i=0;i<2*size;i++) {
-        for (j=0;j<mval[i]->granularity;j++) {
+      for (int i = 0; i < 2*size; i++) {
+        for (int j = 0; j < mval[i]->granularity; j++) {
           mval[i]->x_[j] = x[count+step*par->granularity];
-          for (k=0;k<num_eqns;k++) {
+          for (int k = 0; k < num_eqns; k++) {
             mval[i]->value_[j].phi[0][k] = phi[k + num_eqns*(count+step*par->granularity)];
           }
           count++;
           if ( count == par->granularity ) {
             step++;
-            count=0 ;
+            count = 0;
           }
         }
       }
+      // --> unlock mval[all] here
 
       if ( mval[0]->timestep_ < 1.e-6 && par->loglevel > 1) {
-        for (i=0;i<2*size;i++) {
+        for (int i = 0; i < 2*size; i++) {
+          // make a copy of: mval[i].get()
+          // --> unlock mval[i] here
           stubs::logging::logentry(log_, mval[i].get(),0,0, par);
+          // --> lock mval[i] here
         }
       }
 
-      for (i=0;i<2*size;i++) {
+      for (int i = 0; i < 2*size; i++) {
         initial_data.push_back(gval[i]);
       }
 
