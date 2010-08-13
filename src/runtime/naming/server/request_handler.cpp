@@ -158,24 +158,48 @@ namespace hpx { namespace naming { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Mutex>
-    inline void lock_helper(Mutex&, typename Mutex::scoped_lock& l)
+    namespace detail
     {
-        l.lock();
-    }
-    inline void lock_helper(boost::detail::spinlock& m, boost::detail::spinlock::scoped_lock&)
-    {
-        m.lock();
-    }
+        template <typename Mutex>
+        inline void 
+        lock_helper(Mutex&, typename Mutex::scoped_lock& l)
+        {
+            l.lock();
+        }
+        inline void 
+        lock_helper(boost::detail::spinlock& m, boost::detail::spinlock::scoped_lock&)
+        {
+            m.lock();
+        }
 
-    template <typename Mutex>
-    inline void unlock_helper(Mutex&, typename Mutex::scoped_lock& l)
-    {
-        l.unlock();
-    }
-    inline void unlock_helper(boost::detail::spinlock& m, boost::detail::spinlock::scoped_lock&)
-    {
-        m.unlock();
+        template <typename Mutex>
+        inline void 
+        unlock_helper(Mutex&, typename Mutex::scoped_lock& l)
+        {
+            l.unlock();
+        }
+        inline void 
+        unlock_helper(boost::detail::spinlock& m, boost::detail::spinlock::scoped_lock&)
+        {
+            m.unlock();
+        }
+
+        template <typename Mutex>
+        struct unlocker
+        {
+            unlocker(Mutex& m, typename Mutex::scoped_lock& l) 
+              : m_(m), l_(l) 
+            {
+                unlock_helper(m, l);
+            }
+            ~unlocker()
+            {
+                lock_helper(m_, l_);
+            }
+
+            Mutex& m_;
+            typename Mutex::scoped_lock& l_;
+        };
     }
 
     template <typename Mutex>
@@ -198,7 +222,7 @@ namespace hpx { namespace naming { namespace server
                 }
             }
             else {
-                unlock_helper(registry_mtx_, l);
+                detail::unlocker<Mutex> ul(registry_mtx_, l);
 
                 // return prefixes which have a factory for the given type
                 typename mutex_type::scoped_lock fl(component_types_mtx_);
@@ -208,8 +232,6 @@ namespace hpx { namespace naming { namespace server
                 {
                     prefixes.push_back((*p.first).second);
                 }
-
-                lock_helper(registry_mtx_, l);
             }
 
             rep = reply(prefixes, prefixes.empty() ? no_success : success); 
