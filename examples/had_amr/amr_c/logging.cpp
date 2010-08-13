@@ -102,30 +102,41 @@ namespace hpx { namespace components { namespace amr { namespace server
 #endif
           }
         }
-#if 0
+
         // Debugging measures
         // output file to "logcode1.dat"
         if ( logcode == 1 ) {
-          std::string x_str = convert(val.x_);
-          std::string chi_str = convert(val.value_.phi[0][0]);
-          std::string time_str = convert(val.timestep_*par->dx0*par->lambda);
+          for (i=0;i<val.granularity;i++) {
+            x.push_back(val.x_[i]);
+            chi.push_back(val.value_[i].phi[0][0]);
+            datatime = val.timestep_*par->dx0*par->lambda;
 
-          fdata = fopen("logcode1.dat","a");
-          fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),chi_str.c_str());
-          fclose(fdata);
+            std::string x_str = convert(val.x_[i]);
+            std::string chi_str = convert(val.value_[i].phi[0][0]);
+            std::string time_str = convert(val.timestep_*par->dx0*par->lambda);
+
+            fdata = fopen("logcode1.dat","a");
+            fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),chi_str.c_str());
+            fclose(fdata);
+          }
         }
         //
         // output file to "logcode2.dat"
         if ( logcode == 2 ) {
-          std::string x_str = convert(val.x_);
-          std::string chi_str = convert(val.value_.phi[0][0]);
-          std::string time_str = convert(val.timestep_*par->dx0*par->lambda);
+          for (i=0;i<val.granularity;i++) {
+            x.push_back(val.x_[i]);
+            chi.push_back(val.value_[i].phi[0][0]);
+            datatime = val.timestep_*par->dx0*par->lambda;
 
-          fdata = fopen("logcode2.dat","a");
-          fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),chi_str.c_str());
-          fclose(fdata);
+            std::string x_str = convert(val.x_[i]);
+            std::string chi_str = convert(val.value_[i].phi[0][0]);
+            std::string time_str = convert(val.timestep_*par->dx0*par->lambda);
+
+            fdata = fopen("logcode2.dat","a");
+            fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),chi_str.c_str());
+            fclose(fdata);
+          }
         }
-#endif
     }
 
 }}}}

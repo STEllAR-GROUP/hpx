@@ -25,9 +25,8 @@ namespace hpx { namespace components { namespace amr
     {
     }
 
-    int stencil::floatcmp(had_double_type x1,had_double_type x2) {
-      // compare to floating point numbers
-      had_double_type epsilon = 1.e-8;
+    int stencil::floatcmp(had_double_type x1,had_double_type x2,had_double_type epsilon = 1.e-8) {
+      // compare two floating point numbers
       if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
         // the numbers are close enough for coordinate comparison
         return 1;
@@ -150,7 +149,6 @@ namespace hpx { namespace components { namespace amr
         // initialize result 
         resultval->overwrite_alloc_ = false;
         resultval->right_alloc_ = false;
-        resultval->left_alloc_ = false;
 
         // DEBUG
         char description[80];
@@ -276,23 +274,16 @@ namespace hpx { namespace components { namespace amr
       resultval->overwrite_alloc_ = true;
       resultval->overwrite_ = result_data[compute_index];
       resultval->value_ = overwrite->value_;
- 
+
       // remember neighbors
-      if ( size == 2 ) {
-        overwrite->left_alloc_ = false;
-        overwrite->right_alloc_ = true;
-        overwrite->right_ = result_data[compute_index+size];
-      } 
-      else if ( size == 3 ) {
-        overwrite->left_alloc_ = true;
-        overwrite->left_ = result_data[compute_index+size-1];
-        overwrite->right_alloc_ = true;
-        overwrite->right_ = result_data[compute_index+size];
-      } 
-      else {
-        BOOST_ASSERT(false);
-      }
+      overwrite->right_alloc_ = true;
+      overwrite->right_ = result_data[compute_index+size];
       // --> unlock result_data[compute_index], resultval here
+
+      // DEBUG
+      access_memory_block<stencil_data> amb1 =
+                       hpx::components::stubs::memory_block::get(result_data[compute_index+size]);
+      stubs::logging::logentry(log_, amb1.get(), row,1, par);
 
       return 0;
     }
@@ -415,6 +406,11 @@ namespace hpx { namespace components { namespace amr
 
       had_double_type dx = mval[0]->x_[1]- mval[0]->x_[0];
 
+      // make sure the cloned gids have a consistent granularity
+      //for (i=0;i<size;i++) {
+      //  mval[i+size]->granularity = mval[i]->granularity;
+      //}
+
       // the last gid of the AMR mesh has a slightly smaller granularity
       mval[2*size-1]->granularity = mval[size-1]->granularity-1;
 
@@ -425,7 +421,6 @@ namespace hpx { namespace components { namespace amr
         mval[i]->iter_ = 0;
         mval[i]->max_index_ = 2*size;
         if ( i >= size ) {
-          mval[i]->left_alloc_ = false;
           mval[i]->right_alloc_ = false;
           mval[i]->overwrite_alloc_ = false;
           for (int j = 0; j < mval[i]->granularity; j++) {
@@ -443,6 +438,16 @@ namespace hpx { namespace components { namespace amr
           s = 1;
         }
         if ( s == 0 ) { 
+          // DEBUG
+          stubs::logging::logentry(log_, mval[i+size].get(), row,2, par);
+
+          // TEST
+          //if ( floatcmp(mval[i+size]->x_[0],2.60593,1.e-4) ) {
+          //  std::cout << " TEST neighbors: " << mval[i]->x_[0] << " " << mval[i+1]->x_[0] << std::endl;
+          //  BOOST_ASSERT(false);
+         // }
+          // END TEST
+          
           // point not found -- interpolate
           for (int j = 0; j < mval[i]->granularity-1; j++) {
             for (int k = 0; k < num_eqns; k++) {
@@ -599,28 +604,6 @@ namespace hpx { namespace components { namespace amr
             }
           }
         }
-
-        if ( s == 0 && amb1->left_alloc_) {
-          access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->left_);
-          if ( floatcmp(amb2->x_[0],resultval->x_[0]) || floatcmp(amb2->x_[0],resultval->x_[sup]) ) {
-            resultval->value_ = amb2->value_;
-            resultval->refine_ = amb2->refine_;
-            // transfer overwrite information as well
-            if ( amb2->overwrite_alloc_) {
-              resultval->overwrite_alloc_ = true;
-              resultval->overwrite_ = amb2->overwrite_;
-            }
-            s = 1;
-            return s;
-          } else {
-            if ( amb2->x_ > resultval->x_ ) {
-              s = findpoint(amb1,amb2,resultval);
-            } else {
-              s = findpoint(amb2,amb1,resultval);
-            }
-          }
-        }
-
       }
 
 
@@ -637,27 +620,6 @@ namespace hpx { namespace components { namespace amr
             // transfer overwrite information as well
             if ( amb2->overwrite_alloc_ == 1 ) {
               resultval->overwrite_alloc_ = 1;
-              resultval->overwrite_ = amb2->overwrite_;
-            }
-            s = 1;
-            return s;
-          } else {
-            if ( amb2->x_ > resultval->x_ ) {
-              s = findpoint(amb1,amb2,resultval);
-            } else {
-              s = findpoint(amb2,amb1,resultval);
-            }
-          }
-        }
-
-        if (s == 0 && amb1->left_alloc_) {
-          access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->left_);
-          if ( floatcmp(amb2->x_[0],resultval->x_[0]) || floatcmp(amb2->x_[0],resultval->x_[sup]) ) {
-            resultval->value_ = amb2->value_;
-            resultval->refine_ = amb2->refine_;
-            // transfer overwrite information as well
-            if ( amb2->overwrite_alloc_) {
-              resultval->overwrite_alloc_ = true;
               resultval->overwrite_ = amb2->overwrite_;
             }
             s = 1;

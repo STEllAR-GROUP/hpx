@@ -46,10 +46,8 @@ struct stencil_data
     size_t iter_;      // rk subcycle indicator
     gid overwrite_; // gid of overwrite stencil point
     gid right_;     // gid of right stencil point
-    gid left_;      // gid of left stencil point
     bool overwrite_alloc_;
     bool right_alloc_;
-    bool left_alloc_;
     bool refine_;     // whether to refine
 
 #if defined(__cplusplus)
@@ -61,8 +59,8 @@ private:
     void serialize(Archive & ar, const unsigned int version)
     {
         ar & max_index_ & index_ & timestep_ & cycle_ & level_ & value_;
-        ar & x_ & iter_ & overwrite_ & right_ & left_;
-        ar & overwrite_alloc_ & right_alloc_ & left_alloc_ & refine_; 
+        ar & x_ & iter_ & overwrite_ & right_;
+        ar & overwrite_alloc_ & right_alloc_ & refine_; 
     }
 #endif
 };

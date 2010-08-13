@@ -71,7 +71,7 @@ namespace hpx { namespace components { namespace amr
                       access_memory_block<stencil_data> & resultval);
 
         /// floating point comparison (for coordinates)
-        int floatcmp(had_double_type x1,had_double_type x2);
+        int floatcmp(had_double_type x1,had_double_type x2,had_double_type epsilon);
 
         int prep_initial_data(std::vector<naming::id_type> & initial_data,
             std::vector<naming::id_type> const& gids,
