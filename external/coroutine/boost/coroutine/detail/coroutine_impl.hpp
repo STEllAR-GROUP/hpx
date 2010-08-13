@@ -43,7 +43,6 @@
 #include <boost/coroutine/detail/static.hpp>
 
 #include <boost/config.hpp>
-#include <boost/lockfree/detail/freelist.hpp>
 
 #if defined(BOOST_WINDOWS)
 # define BOOST_COROUTINE_SYMBOL_EXPORT      __declspec(dllexport)
@@ -62,23 +61,25 @@
 # define  BOOST_COROUTINE_EXPORT       BOOST_COROUTINE_SYMBOL_IMPORT
 #endif
 
-namespace boost { namespace coroutines { namespace detail {
-        
+namespace boost { namespace coroutines { namespace detail 
+{
+  /////////////////////////////////////////////////////////////////////////////
   // This class augment the contest_base class with
   // the coroutine signature type.
   // This is mostly just a place to put
   // typesafe argument and result type pointers.
-  template<typename CoroutineType, typename ContextImpl>
+  template<typename CoroutineType, typename ContextImpl,
+      template <typename> class Heap>
   class coroutine_impl:
     public context_base<ContextImpl>
   {
   public:
-    template<typename DerivedType, typename ResultType>
+    template <typename DerivedType, typename ResultType>
     friend class add_result;
 
     typedef ContextImpl context_impl;
     typedef CoroutineType coroutine_type;
-    typedef coroutine_impl<coroutine_type, context_impl> type;
+    typedef coroutine_impl<coroutine_type, context_impl, Heap> type;
     typedef context_base<context_impl> context_base_;
     typedef typename coroutine_type::arg_slot_type arg_slot_type;
     typedef typename coroutine_type::result_type result_type;
@@ -183,13 +184,14 @@ namespace boost { namespace coroutines { namespace detail {
   };
 
   // the TSS holds a pointer to the self instance as stored on the stack
-  template<typename CoroutineType, typename ContextImpl>
+  template<typename CoroutineType, typename ContextImpl,
+      template <typename> class Heap>
   boost::thread_specific_ptr<
-      typename coroutine_impl<CoroutineType, ContextImpl>::self_type*
-  > coroutine_impl<CoroutineType, ContextImpl>::self_;
+      typename coroutine_impl<CoroutineType, ContextImpl, Heap>::self_type*
+  > coroutine_impl<CoroutineType, ContextImpl, Heap>::self_;
 
   /////////////////////////////////////////////////////////////////////////////
-  template <typename Coroutine>
+  template <typename Coroutine, template <typename> class Heap>
   struct coroutine_heap
   {
       ~coroutine_heap()
@@ -211,7 +213,7 @@ namespace boost { namespace coroutines { namespace detail {
           heap_.deallocate(p);
       }
 
-      lockfree::caching_freelist<Coroutine> heap_;
+      Heap<Coroutine> heap_;
   };
 
   /////////////////////////////////////////////////////////////////////////////
@@ -219,15 +221,17 @@ namespace boost { namespace coroutines { namespace detail {
   // functor. The type of this object is erased right after construction
   // when it is assigned to a pointer to coroutine_impl. A deleter is
   // passed down to make sure that the correct derived type is deleted.
-  template<typename FunctorType, typename CoroutineType, typename ContextImpl>
+  template<typename FunctorType, typename CoroutineType, typename ContextImpl,
+      template <typename> class Heap>
   class coroutine_impl_wrapper :
-    public coroutine_impl<CoroutineType, ContextImpl> {
+    public coroutine_impl<CoroutineType, ContextImpl, Heap> 
+  {
   public:
-    typedef coroutine_impl_wrapper<FunctorType, CoroutineType, ContextImpl> 
-        type;
+    typedef coroutine_impl_wrapper<
+        FunctorType, CoroutineType, ContextImpl, Heap> type;
     typedef CoroutineType coroutine_type;
     typedef typename CoroutineType::result_type result_type;
-    typedef coroutine_impl<CoroutineType, ContextImpl> super_type;
+    typedef coroutine_impl<CoroutineType, ContextImpl, Heap> super_type;
     typedef typename super_type::thread_id_type thread_id_type;
 
     typedef FunctorType functor_type;
@@ -352,7 +356,7 @@ private:
 
   private:
     // the memory for the threads is managed by a lockfree caching_freelist
-    typedef coroutine_heap<coroutine_impl_wrapper> heap_type;
+    typedef coroutine_heap<coroutine_impl_wrapper, Heap> heap_type;
 
     struct heap_tag {};
 
@@ -376,15 +380,14 @@ private:
     FunctorType m_fun;
   };
 
-  template<typename CoroutineType, typename ContextImpl>
+  template<typename CoroutineType, typename ContextImpl, template <typename> class Heap>
   template<typename Functor>
-  inline
-  typename coroutine_impl<CoroutineType, ContextImpl>::pointer
-  coroutine_impl<CoroutineType, ContextImpl>::
+  inline typename coroutine_impl<CoroutineType, ContextImpl, Heap>::pointer
+  coroutine_impl<CoroutineType, ContextImpl, Heap>::
       create(Functor f, thread_id_type id, std::ptrdiff_t stack_size) 
   {
-      typedef coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl>
-          wrapper_type;
+      typedef coroutine_impl_wrapper<
+          Functor, CoroutineType, ContextImpl, Heap> wrapper_type;
 
       wrapper_type* wrapper = wrapper_type::allocate();
       if (NULL == wrapper)
@@ -394,21 +397,10 @@ private:
       return wrapper;
   }
 
-//   template<typename Functor>
-//   inline void 
-//   coroutine_impl<CoroutineType, ContextImpl>::rebind(
-//       typename coroutine_impl<CoroutineType, ContextImpl>::pointer p,
-//       Functor f, thread_id_type id) 
-//   {
-//       typedef 
-//           coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl> 
-//       derived_type;
-//       boost::static_pointer_cast<derived_type>(p)->rebind(f, id);
-//   }
-
-  template<typename Functor, typename CoroutineType, typename ContextImpl>
+  template<typename Functor, typename CoroutineType, typename ContextImpl,
+      template <typename> class Heap>
   inline void 
-  coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl>::destroy(type* p)
+  coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl, Heap>::destroy(type* p)
   {
       deallocate(p);
   }

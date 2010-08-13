@@ -210,6 +210,7 @@
     <ClInclude Include="..\..\..\hpx\hpx_init.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\local_barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\server\barrier.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\server\future.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\stubs\barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\thunk.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\thunk_constructors.hpp" />

@@ -748,6 +748,9 @@
     <ClInclude Include="..\..\..\hpx\util\random.hpp">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\server\future.hpp">
+      <Filter>Header Files\LCOs\Server</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\CMakeLists.txt">

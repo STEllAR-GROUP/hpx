@@ -134,17 +134,17 @@ namespace hpx { namespace threads { namespace policies
             if (queues_[num_thread]->get_next_thread(thrd))
                 return true;
 
-            // no work available, try to fill our own queue
-            // this favors filling a queue over stealing other work
-            std::size_t added = 0;
-            bool result = queues_[num_thread]->wait_or_add_new(
-                num_thread, running, idle_loop_count, added);
-
-            if (result) return false;   // terminated
-
-            // retry this queue if work has been added
-            if (added && queues_[num_thread]->get_next_thread(thrd))
-                return true;     // more work available now
+//             // no work available, try to fill our own queue
+//             // this favors filling a queue over stealing other work
+//             std::size_t added = 0;
+//             bool result = queues_[num_thread]->wait_or_add_new(
+//                 num_thread, running, idle_loop_count, added);
+// 
+//             if (result) return false;   // terminated
+// 
+//             // retry this queue if work has been added
+//             if (added && queues_[num_thread]->get_next_thread(thrd))
+//                 return true;     // more work available now
 
             // steal thread from other queue
             for (std::size_t i = 1; i < queues_.size(); ++i) {
@@ -169,10 +169,13 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Destroy the passed thread as it has been terminated
-        void destroy_thread(threads::thread* thrd)
+        bool destroy_thread(threads::thread* thrd)
         {
-            for (std::size_t i = 0; i < queues_.size(); ++i)
-                queues_[i]->destroy_thread(thrd);
+            for (std::size_t i = 0; i < queues_.size(); ++i) {
+                if (queues_[i]->destroy_thread(thrd))
+                    return true;
+            }
+            return false;
         }
 
         /// Return the number of existing threads, regardless of their state

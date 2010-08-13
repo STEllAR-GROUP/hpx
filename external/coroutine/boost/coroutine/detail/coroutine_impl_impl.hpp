@@ -16,8 +16,9 @@
 
 namespace boost { namespace coroutines { namespace detail {
 
-    template<typename CoroutineType, typename ContextImpl>
-    void coroutine_impl<CoroutineType, ContextImpl>::set_self(self_type* self)
+    template<typename CoroutineType, typename ContextImpl, 
+        template <typename> class Heap>
+    void coroutine_impl<CoroutineType, ContextImpl, Heap>::set_self(self_type* self)
     {
         if (NULL == self_.get())
             self_.reset(new self_type* (self));
@@ -25,9 +26,10 @@ namespace boost { namespace coroutines { namespace detail {
             *self_ = self;
     }
 
-    template<typename CoroutineType, typename ContextImpl>
-    typename coroutine_impl<CoroutineType, ContextImpl>::self_type* 
-    coroutine_impl<CoroutineType, ContextImpl>::get_self()
+    template<typename CoroutineType, typename ContextImpl,
+        template <typename> class Heap>
+    typename coroutine_impl<CoroutineType, ContextImpl, Heap>::self_type* 
+    coroutine_impl<CoroutineType, ContextImpl, Heap>::get_self()
     {
         return (NULL == self_.get()) ? NULL : *self_;
     }

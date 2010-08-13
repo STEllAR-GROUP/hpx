@@ -15,6 +15,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/coroutine/coroutine.hpp>
 #include <boost/pool/object_pool.hpp>
+#include <boost/lockfree/detail/freelist.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -27,21 +28,56 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
+#include <stack>
+
 namespace hpx { namespace threads { namespace detail
 {
+    struct tag {};
+    typedef hpx::util::spinlock_pool<tag> thread_mutex_type;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename CoroutineImpl>
+    struct coroutine_allocator
+    {
+        ~coroutine_allocator()
+        {
+            CoroutineImpl* next = get();
+            while (next) {
+                delete next;
+                next = get();
+            }
+        }
+
+        CoroutineImpl* get()
+        {
+            thread_mutex_type::scoped_lock l(this);
+            if (heap_.empty())
+                return NULL;
+
+            CoroutineImpl* next = heap_.top();
+            heap_.pop();
+            return next;
+        }
+
+        void deallocate(CoroutineImpl* c)
+        {
+            thread_mutex_type::scoped_lock l(this);
+            heap_.push(c);
+        }
+
+        std::stack<CoroutineImpl*> heap_;
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     // This is the representation of a ParalleX thread
     class thread : public lcos::base_lco, private boost::noncopyable
     {
         typedef boost::function<thread_function_type> function_type;
         
-        struct tag {};
-        typedef hpx::util::spinlock_pool<tag> mutex_type;
-
     public:
         thread(thread_init_data const& init_data, thread_id_type id, 
                thread_state_enum newstate, boost::object_pool<thread>& pool)
-          : coroutine_(coroutine_type::impl_type::create(init_data.func, id)), 
+          : coroutine_(init_data.func, id), //coroutine_type::impl_type::create(init_data.func, id)), 
             current_state_(thread_state(newstate)), 
             current_state_ex_(thread_state_ex(wait_signaled)),
             description_(init_data.description ? init_data.description : ""), 
@@ -72,7 +108,7 @@ namespace hpx { namespace threads { namespace detail
         /// by a factory (runtime_support) instance, we can leave this 
         /// constructor empty
         thread()
-          : coroutine_(coroutine_type::impl_type::create(function_type())), 
+          : coroutine_(function_type(), 0), //coroutine_type::impl_type::create(function_type())), 
             description_(""), lco_description_(""),
             parent_locality_prefix_(0), parent_thread_id_(0), 
             parent_thread_phase_(0), component_id_(0), pool_(0)
@@ -171,12 +207,12 @@ namespace hpx { namespace threads { namespace detail
  
         std::string get_description() const
         {
-            mutex_type::scoped_lock l(this);
+            thread_mutex_type::scoped_lock l(this);
             return description_;
         }
         void set_description(char const* desc) 
         {
-            mutex_type::scoped_lock l(this);
+            thread_mutex_type::scoped_lock l(this);
             if (desc)
                 description_ = desc;
             else
@@ -185,12 +221,12 @@ namespace hpx { namespace threads { namespace detail
 
         std::string get_lco_description() const
         {
-            mutex_type::scoped_lock l(this);
+            thread_mutex_type::scoped_lock l(this);
             return lco_description_;
         }
         void set_lco_description(char const* lco_description)
         {
-            mutex_type::scoped_lock l(this);
+            thread_mutex_type::scoped_lock l(this);
             if (lco_description) 
                 lco_description_ = lco_description;
             else
@@ -231,6 +267,12 @@ namespace hpx { namespace threads { namespace detail
 
         static void *operator new(std::size_t size) throw();
         static void operator delete(void *p, std::size_t size);
+
+        ///////////////////////////////////////////////////////////////////////
+        bool is_created_from(void* pool) const
+        {
+            return pool_ == pool;
+        }
 
     public:
         // action support
@@ -532,6 +574,13 @@ namespace hpx { namespace threads
         {
             detail::thread const* t = get();
             return t ? t->get_marked_state() : thread_state(unknown);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        bool is_created_from(void* pool) const
+        {
+            detail::thread const* t = get();
+            return t ? t->is_created_from(pool) : false;
         }
     };
 

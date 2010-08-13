@@ -20,6 +20,7 @@
 #include <boost/atomic.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/lockfree/fifo.hpp>
+#include <boost/ptr_container/ptr_map.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
@@ -61,7 +62,8 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         // debug helper function, logs all suspended threads
         inline void dump_suspended_threads(std::size_t num_thread,
-            std::set<thread_id_type>& tm, std::size_t& idle_loop_count)
+            boost::ptr_map<thread_id_type, threads::thread>& tm,
+            std::size_t& idle_loop_count)
         {
             if (idle_loop_count++ < 2000)
                 return;
@@ -69,13 +71,13 @@ namespace hpx { namespace threads { namespace policies
             // reset idle loop count
             idle_loop_count = 0;
 
-            typedef std::set<thread_id_type> thread_map_type;
+            typedef boost::ptr_map<thread_id_type, threads::thread> thread_map_type;
 
             bool logged_headline = false;
             thread_map_type::const_iterator end = tm.end();
             for (thread_map_type::const_iterator it = tm.begin(); it != end; ++it)
             {
-                threads::thread const* thrd = static_cast<threads::thread*>(*it);
+                threads::thread const* thrd = (*it).second;
                 threads::thread_state state = thrd->get_state();
 
                 if (state != thrd->get_marked_state()) {
@@ -88,7 +90,7 @@ namespace hpx { namespace threads { namespace policies
 
                     LTM_(error) << get_thread_state_name(state) 
                                 << "(" << std::hex << std::setw(8) 
-                                    << std::setfill('0') << (*it) 
+                                    << std::setfill('0') << (*it).first 
                                 << "." << std::hex << std::setw(2) 
                                     << std::setfill('0') << thrd->get_thread_phase() 
                                 << "/" << std::hex << std::setw(8) 
@@ -123,7 +125,7 @@ namespace hpx { namespace threads { namespace policies
         typedef boost::lockfree::fifo<thread*> work_items_type;
 
         // this is the type of a map holding all threads (except depleted ones)
-        typedef std::set<thread_id_type> thread_map_type;
+        typedef boost::ptr_map<thread_id_type, thread> thread_map_type;
 
         // this is the type of the queue of new tasks not yet converted to
         // threads
@@ -159,7 +161,7 @@ namespace hpx { namespace threads { namespace policies
                 // add the new entry to the map of all threads
                 thread_id_type id = thrd->get_thread_id();
                 std::pair<thread_map_type::iterator, bool> p =
-                    thread_map_.insert(id);
+                    thread_map_.insert(id, thrd.get());
 
                 if (!p.second) {
                     HPX_THROW_EXCEPTION(hpx::no_success, 
@@ -309,7 +311,7 @@ namespace hpx { namespace threads { namespace policies
                 // add a new entry in the map for this thread
                 thread_id_type id = thrd->get_thread_id();
                 std::pair<thread_map_type::iterator, bool> p =
-                    thread_map_.insert(id);
+                    thread_map_.insert(id, thrd.get());
 
                 if (!p.second) {
                     HPX_THROWS_IF(ec, hpx::no_success, 
@@ -356,10 +358,14 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Destroy the passed thread as it has been terminated
-        void destroy_thread(threads::thread* thrd)
+        bool destroy_thread(threads::thread* thrd)
         {
-            thread_id_type id = thrd->get_thread_id();
-            terminated_items_.enqueue(id);
+            if (thrd->is_created_from(&memory_pool_)) {
+                thread_id_type id = thrd->get_thread_id();
+                terminated_items_.enqueue(id);
+                return true;
+            }
+            return false;
         }
 
         /// Return the number of existing threads, regardless of their state

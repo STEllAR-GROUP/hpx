@@ -81,9 +81,9 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Destroy the passed thread as it has been terminated
-        void destroy_thread(threads::thread* thrd)
+        bool destroy_thread(threads::thread* thrd)
         {
-            queue_.destroy_thread(thrd);
+            return queue_.destroy_thread(thrd);
         }
 
         /// Return the number of existing threads, regardless of their state

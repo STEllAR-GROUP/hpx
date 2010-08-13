@@ -19,7 +19,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace server 
 {
-    /// \class barrier barrier.hpp hpx/lcos/barrier.hpp
+    /// \class barrier barrier.hpp hpx/lcos/server/barrier.hpp
     ///
     /// A barrier can be used to synchronize a specific number of threads, 
     /// blocking all of the entering threads until all of the threads have 
