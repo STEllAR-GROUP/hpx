@@ -56,7 +56,6 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->iter_ = 0;
     val->refine_= false;
     val->right_alloc_ = false;
-    val->left_alloc_ = false;
     val->overwrite_alloc_ = false;
 
     val->granularity = par.granularity;
@@ -386,10 +385,10 @@ bool refinement(nodedata * vecval,int size, stencil_data* result,int compute_ind
   }
 
   // refine on center of left moving pulse: R0 - time 
-  had_double_type time = result->timestep_*par.dx0*par.lambda;
-  for (j=0;j<result->granularity;j++) {
-    if ( result->x_[j] < fabs(par.R0 - time) + 3.0 && result->x_[j] > fabs(par.R0 - time) - 3.0 ) return true;
-  }
+  //had_double_type time = result->timestep_*par.dx0*par.lambda;
+  //for (j=0;j<result->granularity;j++) {
+  //  if ( result->x_[j] < fabs(par.R0 - time) + 3.0 && result->x_[j] > fabs(par.R0 - time) - 3.0 ) return true;
+  //}
    
   return false;
 
