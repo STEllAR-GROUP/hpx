@@ -281,9 +281,19 @@ namespace hpx { namespace components { namespace amr
       // --> unlock result_data[compute_index], resultval here
 
       // DEBUG
-      access_memory_block<stencil_data> amb1 =
-                       hpx::components::stubs::memory_block::get(result_data[compute_index+size]);
-      stubs::logging::logentry(log_, amb1.get(), row,1, par);
+      if ( par->loglevel > 0 ) {
+        access_memory_block<stencil_data> amb1 =
+                         hpx::components::stubs::memory_block::get(result_data[compute_index+size]);
+        stubs::logging::logentry(log_, amb1.get(), row,1, par);
+      }
+
+      // TEST
+      //if ( floatcmp(amb1->x_[0],2.60593,1.e-4) ) {
+      //  std::cout << "WRITE TEST : " << amb1->x_[0] << " time " << amb1->timestep_  << std::endl;
+      //  std::cout << "WRITE TEST neighbor : " << resultval->x_[0] << " chi value " << resultval->value_[0].phi[0][0] << std::endl;
+      //  std::cout << " level " << resultval->level_  << " dx " << amb1->x_[0] - resultval->x_[0] << std::endl;
+      //}
+      // END TEST
 
       return 0;
     }
@@ -439,13 +449,18 @@ namespace hpx { namespace components { namespace amr
         }
         if ( s == 0 ) { 
           // DEBUG
-          stubs::logging::logentry(log_, mval[i+size].get(), row,2, par);
+          if ( par->loglevel > 0 ) {
+            stubs::logging::logentry(log_, mval[i+size].get(), row,2, par);
+          }
 
           // TEST
           //if ( floatcmp(mval[i+size]->x_[0],2.60593,1.e-4) ) {
-          //  std::cout << " TEST neighbors: " << mval[i]->x_[0] << " " << mval[i+1]->x_[0] << std::endl;
-          //  BOOST_ASSERT(false);
-         // }
+          //  std::cout << " TEST neighbors: " << mval[i]->x_[0] << " " << mval[i+1]->x_[0] << " i " << i << " size " << size << std::endl;
+          //  std::cout << " TEST alloc: " << mval[i]->overwrite_alloc_ << " right alloc " << mval[i]->right_alloc_ << " timestep " << mval[i+size]->timestep_ << " level " << mval[i+size]->level_ << std::endl;
+        //std::cout << "TEST chi value " << mval[i]->value_[0].phi[0][0] << std::endl;
+        //    std::cout << " TEST: dx " << mval[i+size]->x_[0] - mval[i]->x_[0]  << std::endl;
+        //    BOOST_ASSERT(false);
+        //  }
           // END TEST
           
           // point not found -- interpolate
