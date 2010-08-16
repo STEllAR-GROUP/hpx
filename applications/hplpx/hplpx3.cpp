@@ -91,9 +91,9 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("csv,s", "generate statistics of the run in comma separated format")
             ("blocksize,b", po::value<int>(),
                 "blocksize correlates to the amount of work performed by each "
-		"thread during gaussian elimination (default is 256)")
+		"thread during gaussian elimination (default is 48)")
 	    ("allocblock,A", po::value<int>(),
-		"allocblock effects the amount of work each thread performs "
+		"allocblock affects the amount of work each thread performs "
 		"during memory allocation, initialization, and during the "
 		"final correctness check.  Only powers of 2 are accepted, "
 		"all other values will be rounded down to the nearest power of 2"

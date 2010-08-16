@@ -47,7 +47,7 @@ namespace hpx { namespace components { namespace server
 	~HPLMatreX3(){destruct();}
 	void destruct();
 
-	//operators for assignment and leftdata access
+	//functions for assignment and leftdata access
 	double get(unsigned int row, unsigned int col);
 	void set(unsigned int row, unsigned int col, double val);
 

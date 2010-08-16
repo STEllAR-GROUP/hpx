@@ -45,7 +45,6 @@ int hpx_main(){
 
 	using hpx::components::HPLMatreX2;
 	HPLMatreX2 dat;
-
 	dat.create(naming::id_type(prefix,naming::id_type::unmanaged));
 
 	dat.construct(SIZE,SIZE+1,ABSIZE,BSIZE);
@@ -92,7 +91,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "blocksize correlates to the size of each data block in the "
 		"non-static matrix used for computations (default is 256)")
 	    ("allocblock,A", po::value<int>(),
-		"allocblock effects the amount of work each thread performs "
+		"allocblock affects the amount of work each thread performs "
 		"during memory allocation, initialization, and during the "
 		"final correctness check.  Only powers of 2 are accepted, "
 		"all other values will be rounded down to the nearest power of 2"
@@ -159,7 +158,6 @@ int main(int argc, char* argv[]){
 		if(!parse_commandline(argc, argv, vm)){
 			return -1;
 		}
-
 		//initialize information
 		std::string hpx_host("localhost"), agas_host;
 		boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;

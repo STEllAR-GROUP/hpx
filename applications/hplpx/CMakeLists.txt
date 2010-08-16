@@ -3,8 +3,8 @@
 
 # recurse into all components subdirectories and execute the scripts there
 set(lud_SUDIRS
-    #hplmatrex
-    #hplmatrex2
+#    hplmatrex
+#    hplmatrex2
     hplmatrex3
 #    hplmatrex4
    )
