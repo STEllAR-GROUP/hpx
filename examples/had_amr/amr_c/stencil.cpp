@@ -14,6 +14,7 @@
 #include "logging.hpp"
 #include "stencil_data.hpp"
 #include "stencil_functions.hpp"
+#include "stencil_data_locking.hpp"
 #include "../amr/unigrid_mesh.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -63,7 +64,8 @@ namespace hpx { namespace components { namespace amr
         access_memory_block<stencil_data> resultval = 
             get_memory_block_async(val, gids, result);
 
-        // --> lock resultval, val[all] here
+        // lock all user defined data elements, will be unlocked at function exit
+        scoped_values_lock<lcos::mutex> l(resultval, val);
 
         // Here we give the coordinate value to the result (prior to sending it to the user)
         int compute_index;
@@ -195,20 +197,19 @@ namespace hpx { namespace components { namespace amr
             }
 
             if ( resultval->refine_ && resultval->level_ < par->allowedl ) {
-                // --> unlock resultval, val[all]
+                unlock_scoped_values_lock<lcos::mutex> ul(l);
                 finer_mesh(gids, resultval, val, vecval.size(), tval.size(),
                     compute_index, row, column, par);
-                // --> lock resultval, val[all]
             } 
             else {
                 resultval->overwrite_alloc_ = false;
             }
 
             if (par->loglevel > 1 && fmod(resultval->timestep_, par->output) < 1.e-6) {
-                // make copy of: resultval.get()
-                // --> unlock resultval here
-                stubs::logging::logentry(log_, resultval.get(), row, 0, par);
-                // --> re-lock resultval here
+                stencil_data data (resultval.get());
+
+                unlock_scoped_values_lock<lcos::mutex> ul(l);
+                stubs::logging::logentry(log_, data, row, 0, par);
             }
         }
         else {
@@ -236,7 +237,7 @@ namespace hpx { namespace components { namespace amr
     // Compute the result value for the current time step
     int stencil::finer_mesh(std::vector<naming::id_type> const& gids,
         access_memory_block<stencil_data>& resultval,
-        std::vector<access_memory_block<stencil_data> >& val,   // needed for locking purposes only
+        std::vector<access_memory_block<stencil_data> >& vals,   // needed for locking purposes only
         std::size_t vecvalsize, std::size_t size, 
         std::size_t compute_index, std::size_t row, std::size_t column, 
         Parameter const& par) 
@@ -252,10 +253,12 @@ namespace hpx { namespace components { namespace amr
 
       //BOOST_ASSERT(size*par->granularity == vecvalsize);
 
-      // --> lock val[all]
       std::vector<naming::id_type> initial_data;
-      prep_initial_data(initial_data, gids, vecvalsize, size, row, column, numvals, par);
-      // --> unlock val[all]
+
+      {
+          scoped_values_lock<lcos::mutex> l(vals);
+          prep_initial_data(initial_data, gids, vecvalsize, size, row, column, numvals, par);
+      }
 
       hpx::components::amr::unigrid_mesh unigrid_mesh;
       unigrid_mesh.create(here);
@@ -270,15 +273,17 @@ namespace hpx { namespace components { namespace amr
       access_memory_block<stencil_data> overwrite = 
           hpx::components::stubs::memory_block::get(result_data[compute_index]);
 
-      // --> lock result_data[compute_index], resultval here
-      resultval->overwrite_alloc_ = true;
-      resultval->overwrite_ = result_data[compute_index];
-      resultval->value_ = overwrite->value_;
+      {
+          scoped_values_lock<lcos::mutex> l(overwrite, resultval);
 
-      // remember neighbors
-      overwrite->right_alloc_ = true;
-      overwrite->right_ = result_data[compute_index+size];
-      // --> unlock result_data[compute_index], resultval here
+          resultval->overwrite_alloc_ = true;
+          resultval->overwrite_ = result_data[compute_index];
+          resultval->value_ = overwrite->value_;
+
+          // remember neighbors
+          overwrite->right_alloc_ = true;
+          overwrite->right_ = result_data[compute_index+size];
+      }
 
       // DEBUG
       if ( par->loglevel > 0 ) {
@@ -306,7 +311,7 @@ namespace hpx { namespace components { namespace amr
       std::vector<access_memory_block<stencil_data> > mval;
       get_memory_block_async(mval, result_data);
 
-      // --> lock mval[all] here
+      scoped_values_lock<lcos::mutex> l(mval);
 
       BOOST_ASSERT(numvals == result_data.size());
       std::vector<had_double_type> phi,x;
@@ -361,7 +366,6 @@ namespace hpx { namespace components { namespace amr
           count++;
         }
       }
-      // --> unlock mval[all] here
 
       return 0;
     };
@@ -374,7 +378,7 @@ namespace hpx { namespace components { namespace amr
         std::size_t numvals, Parameter const& par) 
     {
       naming::id_type gval[6];
-      access_memory_block<stencil_data> mval[6];
+      std::vector<access_memory_block<stencil_data> > mval;
 
       int std_index;
       if ( gids.size() != vecvalsize ) {
@@ -392,6 +396,8 @@ namespace hpx { namespace components { namespace amr
                 components::stubs::memory_block::clone_async(gids[std_index]),
                 components::stubs::memory_block::clone_async(gids[std_index]),
                 components::stubs::memory_block::clone_async(gids[std_index]));
+
+        mval.resize(6);
         boost::tie(mval[0], mval[1], mval[2], mval[3], mval[4], mval[5]) = 
           get_memory_block_async<stencil_data>(gval[0], gval[1], gval[2], gval[3], gval[4], gval[5]);
    
@@ -404,40 +410,41 @@ namespace hpx { namespace components { namespace amr
                 components::stubs::memory_block::clone_async(gids[std_index]),
                 components::stubs::memory_block::clone_async(gids[std_index]));
 
+        mval.resize(4);
         boost::tie(mval[0], mval[1], mval[2], mval[3]) = 
           get_memory_block_async<stencil_data>(gval[0], gval[1], gval[2], gval[3]);
-
       } 
       else {
         BOOST_ASSERT(false);
       }
 
-      // --> lock mval[all] here
+      {
+        scoped_values_lock<lcos::mutex> l(mval);
 
-      had_double_type dx = mval[0]->x_[1]- mval[0]->x_[0];
+        had_double_type dx = mval[0]->x_[1]- mval[0]->x_[0];
 
-      // make sure the cloned gids have a consistent granularity
-      //for (i=0;i<size;i++) {
-      //  mval[i+size]->granularity = mval[i]->granularity;
-      //}
+        // make sure the cloned gids have a consistent granularity
+        //for (i=0;i<size;i++) {
+        //  mval[i+size]->granularity = mval[i]->granularity;
+        //}
 
-      // the last gid of the AMR mesh has a slightly smaller granularity
-      mval[2*size-1]->granularity = mval[size-1]->granularity-1;
+        // the last gid of the AMR mesh has a slightly smaller granularity
+        mval[2*size-1]->granularity = mval[size-1]->granularity-1;
 
-      for (int i = 0; i < 2*size; i++) {
-        // increase the level by one
-        ++mval[i]->level_;
-        mval[i]->index_ = i;
-        mval[i]->iter_ = 0;
-        mval[i]->max_index_ = 2*size;
-        if ( i >= size ) {
-          mval[i]->right_alloc_ = false;
-          mval[i]->overwrite_alloc_ = false;
-          for (int j = 0; j < mval[i]->granularity; j++) {
-            mval[i]->x_[j]  = mval[i-size]->x_[j] + 0.5*dx;
+        for (int i = 0; i < 2*size; i++) {
+          // increase the level by one
+          ++mval[i]->level_;
+          mval[i]->index_ = i;
+          mval[i]->iter_ = 0;
+          mval[i]->max_index_ = 2*size;
+          if ( i >= size ) {
+            mval[i]->right_alloc_ = false;
+            mval[i]->overwrite_alloc_ = false;
+            for (int j = 0; j < mval[i]->granularity; j++) {
+              mval[i]->x_[j]  = mval[i-size]->x_[j] + 0.5*dx;
+            }
           }
         }
-      }
 
       for (int i = 0; i < size; i++) {
         int s = findpoint(mval[i],mval[i+1],mval[i+size]);
@@ -463,93 +470,90 @@ namespace hpx { namespace components { namespace amr
         //  }
           // END TEST
           
-          // point not found -- interpolate
-          for (int j = 0; j < mval[i]->granularity-1; j++) {
-            for (int k = 0; k < num_eqns; k++) {
-              mval[i+size]->value_[j].phi[0][k] = 0.5*(mval[i]->value_[j].phi[0][k] + mval[i]->value_[j+1].phi[0][k] );
+            // point not found -- interpolate
+            for (int j = 0; j < mval[i]->granularity-1; j++) {
+              for (int k = 0; k < num_eqns; k++) {
+                mval[i+size]->value_[j].phi[0][k] = 0.5*(mval[i]->value_[j].phi[0][k] + mval[i]->value_[j+1].phi[0][k] );
+              }
             }
-          }
 
-          if ( mval[i+size]->granularity > mval[i]->granularity-1 ) {
-            // last point to fill
-            BOOST_ASSERT(i+1 < size );
-            for (int k = 0; k < num_eqns; k++) {
-              mval[i+size]->value_[ mval[i+size]->granularity-1  ].phi[0][k] = 
-                0.5*(mval[i]->value_[mval[i]->granularity-1].phi[0][k] + mval[i+1]->value_[0].phi[0][k]);
+            if ( mval[i+size]->granularity > mval[i]->granularity-1 ) {
+              // last point to fill
+              BOOST_ASSERT(i+1 < size );
+              for (int k = 0; k < num_eqns; k++) {
+                mval[i+size]->value_[ mval[i+size]->granularity-1  ].phi[0][k] = 
+                  0.5*(mval[i]->value_[mval[i]->granularity-1].phi[0][k] + mval[i+1]->value_[0].phi[0][k]);
+              }
             }
           }
         }
-      }
   
-      // re-order things so they can be used
-      std::vector<had_double_type> phi, x;
-      phi.resize(2*size*par->granularity*num_eqns);
-      x.resize(2*size*par->granularity);
+        // re-order things so they can be used
+        std::vector<had_double_type> phi, x;
+        phi.resize(2*size*par->granularity*num_eqns);
+        x.resize(2*size*par->granularity);
 
-      std::size_t ct = 0;
-      std::size_t ct1 = 0;
-      std::size_t stp1 = 0;
-      std::size_t ct2 = 0;
-      std::size_t stp2 = size;
-      std::size_t ct3 = 0;
-      std::size_t stp3 = 0;
-      for (int i = 0; i < 2*size; i++) {
-        for (int j = 0; j < mval[i]->granularity; j++) {
-          if (ct % 2 == 0) {
-            x[ct3 + stp3*par->granularity] = mval[stp1]->x_[ct1];
-            for (int k = 0; k < num_eqns; k++) {
-              phi[k + num_eqns*(ct3+stp3*par->granularity)] = mval[stp1]->value_[ct1].phi[0][k];
-            }
-            ct1++;
-            if ( ct1 == mval[stp1]->granularity ) {
-              stp1++;
-              ct1 = 0;
-            }
-          } else {
-            x[ct3 + stp3*par->granularity] = mval[stp2]->x_[ct2];
-            for (int k = 0; k < num_eqns; k++) {
-              phi[k + num_eqns*(ct3+stp3*par->granularity)] = mval[stp2]->value_[ct2].phi[0][k];
-            }
-            ct2++;
-            if ( ct2 == mval[stp2]->granularity ) {
-              stp2++;
-              ct2 = 0;
-            }
-          } 
-          ct++;
+        std::size_t ct = 0;
+        std::size_t ct1 = 0;
+        std::size_t stp1 = 0;
+        std::size_t ct2 = 0;
+        std::size_t stp2 = size;
+        std::size_t ct3 = 0;
+        std::size_t stp3 = 0;
+        for (int i = 0; i < 2*size; i++) {
+          for (int j = 0; j < mval[i]->granularity; j++) {
+            if (ct % 2 == 0) {
+              x[ct3 + stp3*par->granularity] = mval[stp1]->x_[ct1];
+              for (int k = 0; k < num_eqns; k++) {
+                phi[k + num_eqns*(ct3+stp3*par->granularity)] = mval[stp1]->value_[ct1].phi[0][k];
+              }
+              ct1++;
+              if ( ct1 == mval[stp1]->granularity ) {
+                stp1++;
+                ct1 = 0;
+              }
+            } else {
+              x[ct3 + stp3*par->granularity] = mval[stp2]->x_[ct2];
+              for (int k = 0; k < num_eqns; k++) {
+                phi[k + num_eqns*(ct3+stp3*par->granularity)] = mval[stp2]->value_[ct2].phi[0][k];
+              }
+              ct2++;
+              if ( ct2 == mval[stp2]->granularity ) {
+                stp2++;
+                ct2 = 0;
+              }
+            } 
+            ct++;
 
-          ct3++;
-          if ( ct3 == par->granularity ) {
-            stp3++;
-            ct3 = 0;
+            ct3++;
+            if ( ct3 == par->granularity ) {
+              stp3++;
+              ct3 = 0;
+            }
+          }
+        }
+
+        std::size_t count = 0;
+        std::size_t step = 0;
+
+        for (int i = 0; i < 2*size; i++) {
+          for (int j = 0; j < mval[i]->granularity; j++) {
+            mval[i]->x_[j] = x[count+step*par->granularity];
+            for (int k = 0; k < num_eqns; k++) {
+              mval[i]->value_[j].phi[0][k] = phi[k + num_eqns*(count+step*par->granularity)];
+            }
+            count++;
+            if ( count == par->granularity ) {
+              step++;
+              count = 0;
+            }
           }
         }
       }
-
-      std::size_t count = 0;
-      std::size_t step = 0;
-
-      for (int i = 0; i < 2*size; i++) {
-        for (int j = 0; j < mval[i]->granularity; j++) {
-          mval[i]->x_[j] = x[count+step*par->granularity];
-          for (int k = 0; k < num_eqns; k++) {
-            mval[i]->value_[j].phi[0][k] = phi[k + num_eqns*(count+step*par->granularity)];
-          }
-          count++;
-          if ( count == par->granularity ) {
-            step++;
-            count = 0;
-          }
-        }
-      }
-      // --> unlock mval[all] here
 
       if ( mval[0]->timestep_ < 1.e-6 && par->loglevel > 1) {
         for (int i = 0; i < 2*size; i++) {
-          // make a copy of: mval[i].get()
-          // --> unlock mval[i] here
           stubs::logging::logentry(log_, mval[i].get(),0,0, par);
-          // --> lock mval[i] here
         }
       }
 

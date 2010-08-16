@@ -165,6 +165,7 @@
     <ClInclude Include="..\..\..\..\examples\had_amr\amr_c\logging.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr_c\stencil.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr_c\stencil_data.hpp" />
+    <ClInclude Include="..\..\..\..\examples\had_amr\amr_c\stencil_data_locking.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr_c\stencil_functions.hpp" />
   </ItemGroup>
   <ItemGroup>

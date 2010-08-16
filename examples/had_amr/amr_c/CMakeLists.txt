@@ -7,6 +7,7 @@ set(had_amr_c_HEADERS
     logging.hpp
     stencil.hpp
     stencil_data.hpp
+    stencil_data_locking.hpp
     stencil_functions.hpp)
 
 set(had_amr_c_SOURCES

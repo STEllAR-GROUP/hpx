@@ -6,18 +6,18 @@
 #if !defined(HPX_COMPONENTS_AMR_STENCIL_DATA_NOV_10_2008_0719PM)
 #define HPX_COMPONENTS_AMR_STENCIL_DATA_NOV_10_2008_0719PM
 
-#if defined(__cplusplus)
 #include <boost/serialization/serialization.hpp>
-#endif
+#include <vector>
 
 #include <hpx/c/types.h>
+#include <hpx/lcos/mutex.hpp>
+
 #include "../had_config.hpp"
 
 struct nodedata
 {
-  had_double_type phi[2][num_eqns];
+    had_double_type phi[2][num_eqns];
  
-#if defined(__cplusplus)
 private:
     // serialization support
     friend class boost::serialization::access;
@@ -27,13 +27,55 @@ private:
     {
         ar & phi;
     }
-#endif
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 struct stencil_data 
 {
+    stencil_data() 
+      : max_index_(0), index_(0), timestep_(0), cycle_(0), granularity(0),
+        level_(0), iter_(0), overwrite_alloc_(false), right_alloc_(false),
+        left_alloc_(false), refine_(false)
+    {}
     ~stencil_data() {}
+
+    stencil_data(stencil_data const& rhs)
+      : max_index_(rhs.max_index_), index_(rhs.index_), 
+        timestep_(rhs.timestep_), cycle_(rhs.cycle_), 
+        granularity(rhs.granularity), level_(rhs.level_), 
+        value_(rhs.value_), x_(rhs.x_), iter_(rhs.iter_), 
+        overwrite_(rhs.overwrite_), right_(rhs.right_), left_(rhs.left_),
+        overwrite_alloc_(rhs.overwrite_alloc_), right_alloc_(rhs.right_alloc_),
+        left_alloc_(rhs.left_alloc_), refine_(rhs.refine_)
+    {
+        // intentionally do not copy mutex, new copy will have it's own mutex
+    }
+
+    stencil_data& operator=(stencil_data const& rhs)
+    {
+        if (this != &rhs) {
+            max_index_ = rhs.max_index_;
+            index_ = rhs.index_;
+            timestep_ = rhs.timestep_;
+            cycle_ = rhs.cycle_; 
+            granularity = rhs.granularity;
+            level_ = rhs.level_;
+            value_ = rhs.value_;
+            x_ = rhs.x_; 
+            iter_= rhs.iter_; 
+            overwrite_ = rhs.overwrite_;
+            right_ = rhs.right_;
+            left_ = rhs.left_;
+            overwrite_alloc_= rhs.overwrite_alloc_;
+            right_alloc_ = rhs.right_alloc_;
+            left_alloc_ = rhs.left_alloc_;
+            refine_ = rhs.refine_;
+            // intentionally do not copy mutex, new copy will have it's own mutex
+        }
+        return *this;
+    }
+
+    hpx::lcos::mutex mtx_;    // lock for this data block
 
     size_t max_index_;   // overall number of data points
     size_t index_;       // sequential number of this data point (0 <= index_ < max_values_)
@@ -46,11 +88,12 @@ struct stencil_data
     size_t iter_;      // rk subcycle indicator
     gid overwrite_; // gid of overwrite stencil point
     gid right_;     // gid of right stencil point
+    gid left_;      // gid of left stencil point
     bool overwrite_alloc_;
     bool right_alloc_;
+    bool left_alloc_;
     bool refine_;     // whether to refine
 
-#if defined(__cplusplus)
 private:
     // serialization support
     friend class boost::serialization::access;
@@ -59,10 +102,9 @@ private:
     void serialize(Archive & ar, const unsigned int version)
     {
         ar & max_index_ & index_ & timestep_ & cycle_ & level_ & value_;
-        ar & x_ & iter_ & overwrite_ & right_;
-        ar & overwrite_alloc_ & right_alloc_ & refine_; 
+        ar & x_ & iter_ & overwrite_ & right_ & left_;
+        ar & overwrite_alloc_ & right_alloc_ & left_alloc_ & refine_; 
     }
-#endif
 };
 
 typedef struct stencil_data stencil_data;
