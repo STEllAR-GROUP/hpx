@@ -39,6 +39,9 @@
 #include <boost/archive/detail/common_iarchive.hpp>
 #include <boost/archive/shared_ptr_helper.hpp>
 #include <boost/archive/detail/register_archive.hpp>
+#if BOOST_VERSION >= 104400
+#include <boost/serialization/item_version_type.hpp>
+#endif
 
 #include <hpx/util/portable_binary_archive.hpp>
 
@@ -112,7 +115,7 @@ protected:
     // default fall through for any types not specified here
     template<class T>
     void load(T & t){
-        boost::intmax_t l;
+        boost::intmax_t l = 0;
         load_impl(l, sizeof(T));
         // use cast to avoid compile time warning
         t = static_cast<T>(l);
@@ -122,9 +125,34 @@ protected:
     }
 #if BOOST_VERSION >= 104400
     void load(boost::archive::class_id_type & t){
-        boost::intmax_t l;
-        load_impl(l, sizeof(boost::intmax_t));
+        boost::intmax_t l = 0;
+        load_impl(l, sizeof(boost::int16_t));
         t = boost::archive::class_id_type(std::size_t(l));
+    }
+    void load(boost::archive::object_id_type & t){
+        boost::intmax_t l = 0;
+        load_impl(l, sizeof(boost::uint32_t));
+        t = boost::archive::object_id_type((unsigned int)(l));
+    }
+    void load(boost::archive::tracking_type & t){
+        bool l = false;
+        this->primitive_base_t::load(l);
+        t = boost::archive::tracking_type(l);
+    }
+    void load(boost::archive::version_type & t){
+        boost::intmax_t l = 0;
+        load_impl(l, sizeof(boost::uint32_t));
+        t = boost::archive::version_type((unsigned int)(l));
+    }
+    void load(boost::archive::library_version_type & t){
+        boost::intmax_t l = 0;
+        load_impl(l, sizeof(boost::uint16_t));
+        t = boost::archive::library_version_type((unsigned int)(l));
+    }
+    void load(boost::serialization::item_version_type & t){
+        boost::intmax_t l = 0;
+        load_impl(l, sizeof(boost::intmax_t));
+        t = boost::serialization::item_version_type((unsigned int)(l));
     }
 #endif
 #ifndef BOOST_NO_STD_WSTRING
@@ -136,7 +164,7 @@ protected:
         this->primitive_base_t::load(t);
         // floats not supported
         //BOOST_STATIC_ASSERT(false);
-    }
+    } 
     void load(double & t){
         this->primitive_base_t::load(t);
         // doubles not supported
@@ -148,6 +176,7 @@ protected:
     void load(unsigned char & t){
         this->primitive_base_t::load(t);
     }
+
     // intermediate level to support override of operators
     // for templates in the absence of partial function 
     // template ordering
