@@ -1,4 +1,4 @@
-#include "hplmatrex2/hplmatrex2.hpp"
+#include "hplmatrex3/hplmatrex3.hpp"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/program_options.hpp>
@@ -12,10 +12,11 @@ using namespace std;
 namespace po=boost::program_options;
 
 //the size of the matrix
-unsigned int SIZE = 1024;
+unsigned int SIZE = 1000;
 unsigned int ABSIZE = 256;
-unsigned int BSIZE = 256;
+unsigned int BSIZE = 48;
 double ERROR = 0;
+
 
 /*This small program is used to perform LU decomposition on a randomly
 generated matrix.  Unlike the standard HPL algorithm, partial pivoting
@@ -31,7 +32,7 @@ statistical printout.*/
 //this is where the data structure is created and the computation
 //function is called
 int hpx_main(){
-	int i,j,t=0;
+	int i,j,t=0; //for debugging
 
 	std::vector<naming::gid_type> prefixes;
 	applier::applier& appl = applier::get_applier();
@@ -43,8 +44,8 @@ int hpx_main(){
 		prefix = appl.get_runtime_support_raw_gid();
 	}
 
-	using hpx::components::HPLMatreX2;
-	HPLMatreX2 dat;
+	using hpx::components::HPLMatreX3;
+	HPLMatreX3 dat;
 
 	dat.create(naming::id_type(prefix,naming::id_type::unmanaged));
 
@@ -89,8 +90,8 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
 		"and the minimum size value is 3(default is 1024)")
             ("csv,s", "generate statistics of the run in comma separated format")
             ("blocksize,b", po::value<int>(),
-                "blocksize correlates to the size of each data block in the "
-		"non-static matrix used for computations (default is 256)")
+                "blocksize correlates to the amount of work performed by each "
+		"thread during gaussian elimination (default is 256)")
 	    ("allocblock,A", po::value<int>(),
 		"allocblock effects the amount of work each thread performs "
 		"during memory allocation, initialization, and during the "
