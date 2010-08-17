@@ -151,14 +151,14 @@ public:
         if (n == NULL)
             return false;
 
-        tagged_ptr_t tail_tmp;
         for (;;)
         {
             tagged_ptr_t tail = tail_.load(memory_order_acquire);
             tagged_ptr_t next = tail->next.load(memory_order_acquire);
             node * next_ptr = next.get_ptr();
 
-            if (likely(tail == (tail_tmp = tail_.load(memory_order_acquire))))
+            tagged_ptr_t tail_tmp = tail_.load(memory_order_acquire);
+            if (likely(tail == tail_tmp))
             {
                 if (next_ptr == 0)
                 {
@@ -187,13 +187,13 @@ public:
     {
         for (;;)
         {
-            tagged_ptr_t head_tmp; 
             tagged_ptr_t head = head_.load(memory_order_acquire);
             tagged_ptr_t tail = tail_.load(memory_order_acquire);
             tagged_ptr_t next = head->next.load(memory_order_acquire);
             node * next_ptr = next.get_ptr();
 
-            if (likely(head == (head_tmp = head_.load(memory_order_acquire))))
+            tagged_ptr_t head_tmp = head_.load(memory_order_acquire);
+            if (likely(head == head_tmp))
             {
                 if (head.get_ptr() == tail.get_ptr())
                 {
