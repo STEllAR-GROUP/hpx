@@ -79,8 +79,9 @@ namespace hpx { namespace threads { namespace policies
             {
                 threads::thread const* thrd = (*it).second;
                 threads::thread_state state = thrd->get_state();
+                threads::thread_state marked_state = thrd->get_marked_state();
 
-                if (state != thrd->get_marked_state()) {
+                if (state != marked_state) {
                     // log each thread only once
                     if (!logged_headline) {
                         LTM_(error) << "Listing suspended threads while queue ("
