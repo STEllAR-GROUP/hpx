@@ -213,65 +213,65 @@ install(
     DIRECTORY hpx/                    # install all hpx header files
     DESTINATION include/hpx 
     FILES_MATCHING PATTERN "*.h*"
-    REGEX ".svn" EXCLUDE
-    REGEX "CMakeFiles" EXCLUDE)
+    PATTERN ".svn" EXCLUDE
+    PATTERN "CMakeFiles" EXCLUDE)
 install(
     DIRECTORY misc/               # install all hpx build utility files
     DESTINATION share/cmake 
     FILES_MATCHING PATTERN "*.cmake"
-    REGEX "hpx_log" EXCLUDE
-    REGEX "pxdm" EXCLUDE
-    REGEX ".svn" EXCLUDE
-    REGEX "CMakeFiles" EXCLUDE)
+    PATTERN "hpx_log" EXCLUDE
+    PATTERN "pxdm" EXCLUDE
+    PATTERN ".svn" EXCLUDE
+    PATTERN "CMakeFiles" EXCLUDE)
 
 # install external dependencies
 install(
     DIRECTORY external/cache/boost
     DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
-    REGEX ".svn" EXCLUDE)
+    PATTERN ".svn" EXCLUDE)
 install(
     DIRECTORY external/chrono/boost
     DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
-    REGEX ".svn" EXCLUDE)
+    PATTERN ".svn" EXCLUDE)
 install(
     DIRECTORY external/coroutine/boost
     DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
-    REGEX ".svn" EXCLUDE)
+    PATTERN ".svn" EXCLUDE)
 install(
     DIRECTORY external/atomic/boost
     DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
-    REGEX ".svn" EXCLUDE)
+    PATTERN ".svn" EXCLUDE)
 install(
     DIRECTORY external/endian/boost
     DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
-    REGEX ".svn" EXCLUDE)
+    PATTERN ".svn" EXCLUDE)
 if(${Boost_MINOR_VERSION} LESS 36)
     install(
         DIRECTORY external/exception/boost
         DESTINATION include
         FILES_MATCHING PATTERN "*.hpp"
-        REGEX ".svn" EXCLUDE)
+        PATTERN ".svn" EXCLUDE)
 endif()
 install(
     DIRECTORY external/lockfree/boost
     DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
-    REGEX ".svn" EXCLUDE)
+    PATTERN ".svn" EXCLUDE)
 install(
     DIRECTORY external/logging/boost
     DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
-    REGEX ".svn" EXCLUDE)
+    PATTERN ".svn" EXCLUDE)
 install(
     DIRECTORY external/plugin/boost
     DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
-    REGEX ".svn" EXCLUDE)
+    PATTERN ".svn" EXCLUDE)
 
 # export build settings
 include(CMakeExportBuildSettings)
