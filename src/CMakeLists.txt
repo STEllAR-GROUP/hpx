@@ -395,6 +395,13 @@ if (CMAKE_COMPILER_IS_GNUCXX)
         ${hpxlib_SOURCES} 
         ${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp)
 endif()
+if (XIAR)   # Intel compiler
+  if(UNIX)
+    SET(hpxlib_SOURCES 
+        ${hpxlib_SOURCES} 
+        ${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp)
+  endif()
+endif()
 
 # Boost Chrono sources (as long as this library is not in Boost)
 set (hpxlib_SOURCES 
