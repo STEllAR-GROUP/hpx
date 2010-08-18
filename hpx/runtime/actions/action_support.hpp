@@ -20,7 +20,9 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/remove_reference.hpp>
+#include <boost/serialization/base_object.hpp>
 #include <boost/serialization/void_cast.hpp>
+#include <boost/serialization/access.hpp>
 
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
