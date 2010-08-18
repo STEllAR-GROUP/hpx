@@ -30,14 +30,12 @@ namespace hpx { namespace components { namespace server
         enum actions{
                 hpl_construct=0,
                 hpl_destruct=1,
-                hpl_assign=2,
-                hpl_get=3,
-                hpl_set=4,
-                hpl_solve=5,
-		hpl_swap=6,
-		hpl_ghub=7,
-		hpl_bsubst=8,
-		hpl_check=9
+                hpl_get=2,
+                hpl_set=3,
+                hpl_solve=4,
+		hpl_ghub=5,
+		hpl_bsubst=6,
+		hpl_check=7
         };
 
 	//constructors and destructor
@@ -56,7 +54,7 @@ namespace hpx { namespace components { namespace server
 
     private:
 	void allocate();
-	int assign(unsigned int row, unsigned int offset, bool complete);
+	int assign();
 	void pivot();
 	int swap(unsigned int brow, unsigned int bcol);
 	void LUdivide();
@@ -68,7 +66,6 @@ namespace hpx { namespace components { namespace server
 	int LUbacksubst();
 	double checksolve(unsigned int row, unsigned int offset, bool complete);
 	void print();
-	void print2();
 
 	int rows;			//number of rows in the matrix
 	int brows;			//number of rows of blocks in the matrix
@@ -92,9 +89,6 @@ namespace hpx { namespace components { namespace server
 	//the destruct function
 	typedef actions::action0<HPLMatreX3, hpl_destruct,
 		&HPLMatreX3::destruct> destruct_action;
-	 //the assign function
-	typedef actions::result_action3<HPLMatreX3, int, hpl_assign, unsigned int,
-		unsigned int, bool, &HPLMatreX3::assign> assign_action;
 	//the get function
 	typedef actions::result_action2<HPLMatreX3, double, hpl_get, unsigned int,
         	unsigned int, &HPLMatreX3::get> get_action;
@@ -104,9 +98,6 @@ namespace hpx { namespace components { namespace server
 	//the solve function
 	typedef actions::result_action0<HPLMatreX3, double, hpl_solve,
 		&HPLMatreX3::LUsolve> solve_action;
-	 //the swap function
-	typedef actions::result_action2<HPLMatreX3, int, hpl_swap, unsigned int,
-		unsigned int, &HPLMatreX3::swap> swap_action;
 	//the top gaussian function
 	typedef actions::result_action4<HPLMatreX3, int, hpl_ghub, unsigned int,
 		unsigned int, unsigned int, bool, &HPLMatreX3::LUgausshub> ghub_action;
@@ -120,9 +111,6 @@ namespace hpx { namespace components { namespace server
 	//here begins the definitions of most of the future types that will be used
 	//the first of which is for assign action
 	typedef lcos::eager_future<server::HPLMatreX3::assign_action> assign_future;
-
-	//Here is the swap future, which works the same way as the assign future
-	typedef lcos::eager_future<server::HPLMatreX3::swap_action> swap_future;
 
 	//the backsubst future is used to make sure all computations are complete before
 	//returning from LUsolve, to avoid killing processes and erasing the leftdata while
@@ -166,16 +154,14 @@ namespace hpx { namespace components { namespace server
 	h=std::ceil(((float)h)*.5);
 	while(offset < h){offset *= 2;}
 
+	//allocate the data
 	allocate();
 
-	//here we initialize the the matrix
-//	lcos::eager_future<server::HPLMatreX3::assign_action>
-//		assign_future(gid,(unsigned int)0,offset,false);
-	assign(1,1,true);
+	//assign initial values to the truedata
+	assign();
+
 	//initialize the pivot array
 	for(i=0;i<rows;i++){pivotarr[i]=i;}
-	//make sure that everything has been allocated their memory
-//	assign_future.get();
 
 	return 1;
     }
@@ -192,7 +178,7 @@ namespace hpx { namespace components { namespace server
     }
 
     //assign gives values to the empty elements of the array
-    int HPLMatreX3::assign(unsigned int row, unsigned int offset, bool complete){
+    int HPLMatreX3::assign(){
 	for(unsigned int i=0;i<rows;i++){
 	    for(unsigned int j=0;j<columns;j++){
 		truedata[i][j] = (double) (rand() % 1000);
@@ -241,17 +227,6 @@ namespace hpx { namespace components { namespace server
 	}
 	    std::cout<<std::endl;
     }
-    void HPLMatreX3::print2(){
-	for(int i = 0;i < rows; i++){
-	    int temp=0;
-	    while(temp + blocksize <= i){temp+=blocksize;}
-	    for(int j = temp;j < columns; j++){
-		std::cout<<datablock[i/blocksize][j/blocksize]->get(i%blocksize,j%blocksize)<<" ";
-	    }
-	    std::cout<<std::endl;
-	}
-	    std::cout<<std::endl;
-    }
 //END DEBUGGING FUNCTIONS/////////////////////////////////////////////
 
     //LUsolve is simply a wrapper function for LUfactor and LUbacksubst
@@ -273,15 +248,16 @@ namespace hpx { namespace components { namespace server
 
     //pivot() finds the pivot element of each column and stores it. All
     //pivot elements are found before any swapping takes place so that
-    //the swapping can occur in parallel
+    //the amount of swapping performed is minimized
     void HPLMatreX3::pivot(){
 	unsigned int max, max_row;
 	unsigned int temp_piv;
 	double temp;
 	unsigned int h = std::ceil(((float)rows)*.5);
 
-	//This first section of the pivot() function finds all of the pivot
-	//values to compute the final pivot array
+	//by using pivotarr[] we can obtain all pivot values
+	//without actually needing to swap any rows until
+	//creating the datablock matrix
 	for(unsigned int i=0;i<rows-1;i++){
 	    max_row = i;
 	    max = fabs(truedata[pivotarr[i]][i]);
@@ -295,15 +271,6 @@ namespace hpx { namespace components { namespace server
 	    }
 	    pivotarr[i] = pivotarr[max_row];
 	    pivotarr[max_row] = temp_piv;
-	}
-
-	//initialize the first row and column of blocks
-	//for the datablock array
-	for(int i=0;i<brows;i++){
-		swap(i,0);
-	}
-	for(int i=1;i<bcolumns;i++){
-		swap(0,i);
 	}
     }
 
@@ -331,10 +298,18 @@ namespace hpx { namespace components { namespace server
     void HPLMatreX3::LUdivide(){
 	typedef lcos::eager_future<server::HPLMatreX3::ghub_action> ghub_future;
 
-	std::vector<ghub_future> hub_futures;
-	unsigned int iteration = 0;
-	unsigned int brow, bcol, temp;
-//	std::cout<<"BEGIN\n";
+	std::vector<ghub_future> hub_futures;	//used to determine when all work completes
+	unsigned int iteration = 0;		//the iteration of the Gaussian elimination
+	unsigned int brow, bcol, temp;		//various helping variables
+
+	//initialize the first row and column of blocks
+	//for the datablock array
+	for(int i=0;i<brows;i++){
+		swap(i,0);
+	}
+	for(int i=1;i<bcolumns;i++){
+		swap(0,i);
+	}
 
 	do{
 		hub_futures.clear();
@@ -359,6 +334,7 @@ namespace hpx { namespace components { namespace server
 		//while the row and column are being processed, go ahead and create
 		//the next row and column in memory
 		temp = iteration+1;
+		//by using temp, we don't need to calculate iteration+1 for each call
 		for(int i = temp;i<brows;i++){swap(i,temp);}
 		for(int i=temp+1;i<bcolumns;i++){swap(temp,i);}
 
@@ -397,25 +373,25 @@ namespace hpx { namespace components { namespace server
 			gf.get();
 		}
 	}while(iteration < brows);
-//	std::cout<<"END\n";
     }
 
     //LUgausshub() is a wrapper function for the gaussian elimination of a single data block.
     //it delegates which Gaussian elimination function should be performed when.
     int HPLMatreX3::LUgausshub(unsigned int brow, unsigned int bcol, unsigned int iter, bool final){
-//	std::cout<<"BEGINhub\n";
 	if(final){
 	    if(brow < bcol){LUgausstop(brow,bcol);}
 	    else{LUgaussleft(brow,bcol);}
 	    datablock[brow][bcol]->increment();
 	}
+	//if this is not the final iteration, then the location of the block on the matrix is
+	//irrelevant, as the block needs to catch up to the final iteration through several
+	//calls to LUgausstrail
 	else{
 	    while(iter > datablock[brow][bcol]->getiteration()){
 		LUgausstrail(brow,bcol,datablock[brow][bcol]->getiteration());
 		datablock[brow][bcol]->increment();
 	    }
 	}
-//	std::cout<<"ENDhub\n";
 	return 1;
     }
 

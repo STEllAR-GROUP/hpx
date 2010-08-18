@@ -21,15 +21,11 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
 	hpx::components::server::HPLMatreX3::destruct_action,HPLdestruct_action);
 HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatreX3::assign_action,HPLassign_action);
-HPX_REGISTER_ACTION_EX(
 	hpx::components::server::HPLMatreX3::set_action,HPLset_action);
 HPX_REGISTER_ACTION_EX(
 	hpx::components::server::HPLMatreX3::get_action,HPLget_action);
 HPX_REGISTER_ACTION_EX(
 	hpx::components::server::HPLMatreX3::solve_action,HPLsolve_action);
-HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatreX3::swap_action,HPLswap_action);
 HPX_REGISTER_ACTION_EX(
 	hpx::components::server::HPLMatreX3::ghub_action,HPLghub_action);
 HPX_REGISTER_ACTION_EX(
