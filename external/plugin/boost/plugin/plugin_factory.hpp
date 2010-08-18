@@ -57,6 +57,27 @@ namespace boost { namespace plugin {
                 if (!libname.empty())
                     str << " in the shared library '" << libname << "'.";
 
+                if (!e.empty()) {
+                    str << ", existing classes: ";
+
+                    bool first = true;
+                    typename exported_plugins_type::iterator end = e.end();
+                    for (typename exported_plugins_type::iterator it = e.begin();
+                         it != end; ++it)
+                    {
+                        if (first) {
+                            str << (*it).first;
+                            first = false;
+                        }
+                        else {
+                            str << ", " << (*it).first;
+                        }
+                    }
+                }
+                else {
+                    str << ", no classes exist";
+                }
+
                 throw std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str));
             }
         }
