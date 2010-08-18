@@ -297,10 +297,13 @@ namespace hpx { namespace components { namespace server
 	    pivotarr[max_row] = temp_piv;
 	}
 
+	//initialize the first row and column of blocks
+	//for the datablock array
 	for(int i=0;i<brows;i++){
-		for(int j=0;j<bcolumns;j++){
-			swap(i,j);
-		}
+		swap(i,0);
+	}
+	for(int i=1;i<bcolumns;i++){
+		swap(0,i);
 	}
     }
 
@@ -330,7 +333,7 @@ namespace hpx { namespace components { namespace server
 
 	std::vector<ghub_future> hub_futures;
 	unsigned int iteration = 0;
-	unsigned int brow, bcol;
+	unsigned int brow, bcol, temp;
 //	std::cout<<"BEGIN\n";
 
 	do{
@@ -352,6 +355,12 @@ namespace hpx { namespace components { namespace server
 				brow++;
 			}
 		}
+
+		//while the row and column are being processed, go ahead and create
+		//the next row and column in memory
+		temp = iteration+1;
+		for(int i = temp;i<brows;i++){swap(i,temp);}
+		for(int i=temp+1;i<bcolumns;i++){swap(temp,i);}
 
 		//NEXT make sure that the corner block is ready to run its final
 		//iteration of gaussian elimination
