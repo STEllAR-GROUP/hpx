@@ -13,6 +13,8 @@
 #error This file requires compilation with gcc.
 #endif
 
+#include <boost/config.hpp>
+
 /*
  *  This file should really be a plain assembler file.
  *  Unfortunately Boost.Build v2 doesn't handle asm files (yet).
@@ -46,8 +48,14 @@
 //     NOTE: popl is slightly better than mov+add to pop registers
 //           so is pushl rather than mov+sub.
 
+#if defined(BOOST_INTEL)
+#define VOLATILE /**/         // some versions don't like the volatile
+#else
+#define VOLATILE volatile
+#endif
+
 #define BOOST_COROUTINE_SWAPCONTEXT(name)                                     \
-    asm volatile (                                                            \
+    asm VOLATILE (                                                            \
         ".text \n\t"                                                          \
         ".align 16\n"                                                         \
         ".globl " #name "\n\t"                                                \
