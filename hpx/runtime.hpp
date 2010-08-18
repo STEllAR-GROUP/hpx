@@ -23,6 +23,7 @@
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/itt_notify.hpp>
 
 #include <boost/foreach.hpp>
 #include <boost/thread/tss.hpp>
@@ -54,19 +55,19 @@ namespace hpx
 
     public:
         // Return the number of localities allocated to this process
-        std::size_t const size() const
+        std::size_t size() const
         {
             return localities_.size();
         }
 
         // Return the GID of this locality
-        naming::gid_type const here() const
+        naming::gid_type here() const
         {
             return localities_[here_lid_];
         }
 
         // Return the GID of the locality with the given logical ID 
-        naming::gid_type const there(std::size_t lid) const
+        naming::gid_type there(std::size_t lid) const
         {
             lid = lid % localities_.size();
             return localities_[lid];
@@ -74,14 +75,14 @@ namespace hpx
 
         // Return the GID of the "next" locality in the circular list
         // of localities
-        naming::gid_type const next(void) const
+        naming::gid_type next(void) const
         {
             return there(here_lid_+1);
         }
 
         // Return the GID of the "previous" locality in the circular list
         // of localities
-        naming::gid_type const prev(void) const
+        naming::gid_type prev(void) const
         {
             return there(here_lid_ == 0 ? localities_.size()-1 : here_lid_-1);
         }
@@ -118,13 +119,17 @@ namespace hpx
             ini_(util::detail::get_logging_data()),
             instance_number_(++instance_number_counter_),
             stopped_(true)
-        {}
+        {
+            util::init_itt_api();
+        }
 
         ~runtime()
         {
             // allow to reuse instance number if this was the only instance
-            if (0 == instance_number_counter_)
+            if (0 == instance_number_counter_) {
                 --instance_number_counter_;
+                util::deinit_itt_api();
+            }
         }
 
         /// \brief Manage list of functions to call on exit

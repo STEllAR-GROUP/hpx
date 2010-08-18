@@ -31,6 +31,8 @@
 #endif
 #include <cstddef>
 
+#include <hpx/util/itt_notify.hpp>
+
 namespace hpx { namespace util
 {
     template <typename Tag> 
@@ -59,22 +61,26 @@ namespace hpx { namespace util
 
             explicit scoped_lock( void const * pv ): sp_( spinlock_for( pv ) )
             {
-                sp_.lock();
+                lock();
             }
 
             ~scoped_lock()
             {
-                sp_.unlock();
+                unlock();
             }
 
             void lock()
             {
+                HPX_ITT_SYNC_PREPARE(&sp_);
                 sp_.lock();
+                HPX_ITT_SYNC_ACQUIRED(&sp_);
             }
 
             void unlock()
             {
+                HPX_ITT_SYNC_RELEASING(&sp_);
                 sp_.unlock();
+                HPX_ITT_SYNC_RELEASED(&sp_);
             }
         };
     };

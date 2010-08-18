@@ -57,8 +57,8 @@ set(Boost_COMPONENTS_NEEDED
     thread)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_ADDITIONAL_VERSIONS 
-    "1.43.0" "1.43" "1.42.0" "1.42" "1.41.0" "1.41" "1.40.0" "1.40" 
-    "1.39.0" "1.39")
+    "1.44.0" "1.44" "1.43.0" "1.43" "1.42.0" "1.42" "1.41.0" "1.41" 
+    "1.40.0" "1.40" "1.39.0" "1.39")
 
 find_package(Boost 1.33.1 COMPONENTS ${Boost_COMPONENTS_NEEDED})
 
@@ -158,6 +158,7 @@ endif()
 if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
     add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
+    add_definitions(-DHPX_DONT_USE_ITT)
 
     # check for availability of pthread_setaffinity_np()
     include(CheckSymbolExists)

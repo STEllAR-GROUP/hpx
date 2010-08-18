@@ -185,7 +185,7 @@
 
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
+        char const* get_action_name() const
         {
             return detail::get_action_name<BOOST_PP_CAT(result_action, N)>();
         }
@@ -328,7 +328,7 @@
 
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
+        char const* get_action_name() const
         {
             return detail::get_action_name<BOOST_PP_CAT(direct_result_action, N)>();
         }
@@ -485,7 +485,7 @@
 
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
+        char const* get_action_name() const
         {
             return detail::get_action_name<BOOST_PP_CAT(action, N)>();
         }
@@ -599,7 +599,7 @@
     private:
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
+        char const* get_action_name() const
         {
             return detail::get_action_name<BOOST_PP_CAT(direct_action, N)>();
         }

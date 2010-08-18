@@ -141,7 +141,7 @@ namespace hpx { namespace actions
 
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
+        char const* get_action_name() const
         {
             return detail::get_action_name<result_action0>();
         }
@@ -238,7 +238,7 @@ namespace hpx { namespace actions
     private:
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
+        char const* get_action_name() const
         {
             return detail::get_action_name<direct_result_action0>();
         }
@@ -379,7 +379,7 @@ namespace hpx { namespace actions
 
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
+        char const* get_action_name() const
         {
             return detail::get_action_name<action0>();
         }
@@ -475,7 +475,7 @@ namespace hpx { namespace actions
     private:
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
+        char const* get_action_name() const
         {
             return detail::get_action_name<direct_action0>();
         }

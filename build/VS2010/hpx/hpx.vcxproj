@@ -56,6 +56,7 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
     <Import Project="..\hpx64.props" />
+    <Import Project="..\hpx64_release.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
@@ -161,6 +162,7 @@
     <ClCompile Include="..\..\..\src\util\ini.cpp" />
     <ClCompile Include="..\..\..\src\util\init_ini_data.cpp" />
     <ClCompile Include="..\..\..\src\util\io_service_pool.cpp" />
+    <ClCompile Include="..\..\..\src\util\itt_notify.cpp" />
     <ClCompile Include="..\..\..\src\util\logging.cpp" />
     <ClCompile Include="..\..\..\src\util\performance_counters.cpp" />
     <ClCompile Include="..\..\..\src\util\runtime_configuration.cpp" />
@@ -227,8 +229,11 @@
     <ClInclude Include="..\..\..\hpx\runtime\naming\detail\resolver_do_undo.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\naming\server\request_handler_registry.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\detail\tagged_thread_state.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\itt_notify.hpp" />
     <ClInclude Include="..\..\..\hpx\util\random.hpp" />
     <ClInclude Include="..\..\..\hpx\util\spinlock_pool.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\tools_api\internal\ittnotify.h" />
+    <ClInclude Include="..\..\..\hpx\util\tools_api\ittnotify.h" />
     <ClInclude Include="..\..\..\hpx\version.hpp" />
     <ClInclude Include="..\..\..\hpx\util\asio_util.hpp" />
     <ClInclude Include="..\..\..\hpx\util\block_profiler.hpp" />

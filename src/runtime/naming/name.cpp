@@ -95,8 +95,8 @@ namespace hpx { namespace naming
 
         bool id_type_impl::is_local()
         {
-            if (applier::get_applier().get_agas_client().is_smp_mode())
-                return true;
+//             if (applier::get_applier().get_agas_client().is_smp_mode())
+//                 return true;
 
             bool valid = false;
             {
@@ -108,6 +108,7 @@ namespace hpx { namespace naming
                 return false;
 
             applier::applier& appl = applier::get_applier();
+            gid_type::mutex_type::scoped_lock l(this);
             return address_.locality_ == appl.here();
         }
 
@@ -153,7 +154,7 @@ namespace hpx { namespace naming
                 address_ = addr;
                 return true;
             }
-            return false;
+            return appl.get_agas_client().resolve(*this, addr, true, ec);
         }
     }   // detail
 

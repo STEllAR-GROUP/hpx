@@ -45,7 +45,7 @@ namespace hpx { namespace actions
         };
 
         template <typename Action>
-        HPX_ALWAYS_EXPORT char const* const get_action_name();
+        HPX_ALWAYS_EXPORT char const* get_action_name();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -75,7 +75,7 @@ namespace hpx { namespace actions
 
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
-        virtual char const* const get_action_name() const = 0;
+        virtual char const* get_action_name() const = 0;
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
@@ -329,7 +329,7 @@ namespace hpx { namespace actions
 
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
-        char const* const get_action_name() const
+        char const* get_action_name() const
         {
             return "<Unknown action type>";
         }
@@ -415,7 +415,7 @@ namespace hpx { namespace actions
 #define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
         namespace hpx { namespace actions { namespace detail {                \
             template<> HPX_ALWAYS_EXPORT                                      \
-            char const* const get_action_name<action>()                       \
+            char const* get_action_name<action>()                             \
             { return BOOST_PP_STRINGIZE(action); }                            \
         }}}                                                                   \
     /**/

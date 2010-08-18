@@ -247,6 +247,17 @@ namespace hpx { namespace components { namespace amr
     ///////////////////////////////////////////////////////////////////////////
     // helper allowing to do a scoping lock of several mutex's at once 
     // unlock and re-lock on exit
+    struct compare_mutexes
+    {
+        template <typename Mutex>
+        bool operator()(
+            boost::reference_wrapper<Mutex> const& lhs, 
+            boost::reference_wrapper<Mutex> const& rhs) const
+        {
+            return lhs.get_pointer() < rhs.get_pointer();
+        }
+    };
+
     template <typename Mutex>
     struct scoped_values_lock
     {
@@ -257,8 +268,7 @@ namespace hpx { namespace components { namespace amr
             BOOST_FOREACH(access_memory_block<stencil_data>& val, values)
                 mutexes_.push_back(boost::ref(val->mtx_));
 
-            std::sort(mutexes_.begin(), mutexes_.end(), 
-                boost::bind(&boost::reference_wrapper<Mutex>::get_pointer, _1));
+            std::sort(mutexes_.begin(), mutexes_.end(), compare_mutexes());
 
             detail::lock(mutexes_);
         }
@@ -271,8 +281,7 @@ namespace hpx { namespace components { namespace amr
                 mutexes_.push_back(boost::ref(val->mtx_));
             mutexes_.push_back(boost::ref(value->mtx_));
 
-            std::sort(mutexes_.begin(), mutexes_.end(), 
-                boost::bind(&boost::reference_wrapper<Mutex>::get_pointer, _1));
+            std::sort(mutexes_.begin(), mutexes_.end(), compare_mutexes());
 
             detail::lock(mutexes_);
         }
@@ -284,8 +293,7 @@ namespace hpx { namespace components { namespace amr
             mutexes_.push_back(boost::ref(value1->mtx_));
             mutexes_.push_back(boost::ref(value2->mtx_));
 
-            std::sort(mutexes_.begin(), mutexes_.end(), 
-                boost::bind(&boost::reference_wrapper<Mutex>::get_pointer, _1));
+            std::sort(mutexes_.begin(), mutexes_.end(), compare_mutexes());
 
             detail::lock(mutexes_);
         }

@@ -226,6 +226,7 @@ set (hpxlib_util_HEADERS
     ${hpx_SOURCE_DIR}/hpx/util/high_resolution_timer.hpp
     ${hpx_SOURCE_DIR}/hpx/util/ini.hpp
     ${hpx_SOURCE_DIR}/hpx/util/init_ini_data.hpp
+	${hpx_SOURCE_DIR}/hpx/util/itt_notify.hpp
     ${hpx_SOURCE_DIR}/hpx/util/io_service_pool.hpp
     ${hpx_SOURCE_DIR}/hpx/util/logging.hpp
     ${hpx_SOURCE_DIR}/hpx/util/one_size_heap_list.hpp
@@ -365,6 +366,7 @@ set (hpxlib_util_SOURCES
     ${hpx_SOURCE_DIR}/src/util/asio_util.cpp
     ${hpx_SOURCE_DIR}/src/util/ini.cpp
     ${hpx_SOURCE_DIR}/src/util/init_ini_data.cpp
+	${hpx_SOURCE_DIR}/src/util/itt_notify.cpp
     ${hpx_SOURCE_DIR}/src/util/io_service_pool.cpp
     ${hpx_SOURCE_DIR}/src/util/logging.cpp
     ${hpx_SOURCE_DIR}/src/util/performance_counters.cpp

@@ -275,6 +275,7 @@ namespace hpx { namespace naming
           : public gid_type
         {
             explicit id_type_impl (boost::uint64_t lsb_id = 0) 
+              : gid_type(0, lsb_id)
             {}
 
             explicit id_type_impl (boost::uint64_t msb_id, boost::uint64_t lsb_id) 

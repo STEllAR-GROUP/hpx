@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/unlock_lock.hpp>
+#include <hpx/util/itt_notify.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/noncopyable.hpp>
@@ -113,7 +114,9 @@ namespace hpx { namespace lcos { namespace detail
     public:
         mutex(char const* const description)
           : active_count_(0), pending_events_(0), description_(description)
-        {}
+        {
+            HPX_ITT_SYNC_CREATE(this, "lcos::mutex", description);
+        }
 
         ~mutex()
         {
@@ -135,9 +138,11 @@ namespace hpx { namespace lcos { namespace detail
                 }
             }
             BOOST_ASSERT(queue_.empty());
+            HPX_ITT_SYNC_DESTROY(this);
         }
 
-        bool try_lock()
+    protected:
+        bool try_lock_internal()
         {
             return !interlocked_bit_test_and_set(active_count_, lock_flag_bit);
         }
@@ -226,10 +231,27 @@ namespace hpx { namespace lcos { namespace detail
             }
         }
 
+    public:
+        bool try_lock()
+        {
+            HPX_ITT_SYNC_PREPARE(this);
+            bool got_lock = try_lock_internal();
+            if (got_lock) {
+                HPX_ITT_SYNC_ACQUIRED(this);
+            }
+            else {
+                HPX_ITT_SYNC_CANCEL(this);
+            }
+            return got_lock;
+        }
+
         void lock()
         {
-            if (try_lock())
+            HPX_ITT_SYNC_PREPARE(this);
+            if (try_lock_internal()) {
+                HPX_ITT_SYNC_ACQUIRED(this);
                 return;
+            }
 
             boost::uint32_t old_count = 
                 active_count_.load(boost::memory_order_acquire);
@@ -245,12 +267,16 @@ namespace hpx { namespace lcos { namespace detail
                     lock_acquired = !(old_count & lock_flag_value);
                 } while (!lock_acquired);
             }
+            HPX_ITT_SYNC_ACQUIRED(this);
         }
 
         bool timed_lock(::boost::system_time const& wait_until)
         {
-            if (try_lock())
+            HPX_ITT_SYNC_PREPARE(this);
+            if (try_lock_internal()) {
+                HPX_ITT_SYNC_ACQUIRED(this);
                 return true;
+            }
 
             boost::uint32_t old_count = 
                 active_count_.load(boost::memory_order_acquire);
@@ -265,12 +291,14 @@ namespace hpx { namespace lcos { namespace detail
                     {
                         // if this timed out, just return false
                         --active_count_;
+                        HPX_ITT_SYNC_CANCEL(this);
                         return false;
                     }
                     clear_waiting_and_try_lock(old_count);
                     lock_acquired = !(old_count & lock_flag_value);
                 } while (!lock_acquired);
             }
+            HPX_ITT_SYNC_ACQUIRED(this);
             return true;
         }
 
@@ -287,9 +315,11 @@ namespace hpx { namespace lcos { namespace detail
 
         void unlock()
         {
+            HPX_ITT_SYNC_RELEASING(this);
             BOOST_ASSERT(active_count_ & lock_flag_value);
             active_count_ += lock_flag_value;
             set_event();
+            HPX_ITT_SYNC_RELEASED(this);
         }
 
         typedef boost::unique_lock<mutex> scoped_lock;
@@ -301,7 +331,6 @@ namespace hpx { namespace lcos { namespace detail
         boost::uint32_t pending_events_;
         char const* const description_;
     };
-
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
