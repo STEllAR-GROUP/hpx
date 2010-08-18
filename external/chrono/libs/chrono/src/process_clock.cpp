@@ -88,7 +88,13 @@ namespace boost
       {
         assert( 0 && "error handling not implemented yet" );
 
-        ec = system::error_code( errno, system::system_category );
+        ec = system::error_code( errno, 
+#if BOOST_VERSION >= 104400
+            system::system_category(), 
+#else
+            system::system_category,
+#endif
+        );
         times_.real = times_.system = times_.user = nanoseconds(-1);
       }
       else
@@ -105,7 +111,13 @@ namespace boost
         else
         {
         assert( 0 && "error handling not implemented yet" );
-          ec = system::error_code( errno, system::system_category );
+          ec = system::error_code( errno, 
+#if BOOST_VERSION >= 104400
+            system::system_category(), 
+#else
+            system::system_category,
+#endif
+          );
           times_.real = times_.user = times_.system = nanoseconds(-1);
         }
       }

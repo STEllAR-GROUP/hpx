@@ -279,7 +279,13 @@ namespace chrono
     if ( ::clock_gettime( CLOCK_REALTIME, &ts ) )
     {
       boost::throw_exception(
-        system::system_error( errno, system::system_category, "chrono::system_clock" ));
+        system::system_error( errno, 
+#if BOOST_VERSION >= 104400
+            system::system_category(), 
+#else
+            system::system_category,
+#endif
+            "chrono::system_clock" ));
     }
 
     return time_point(duration(
@@ -291,7 +297,13 @@ namespace chrono
     timespec ts;
     if ( ::clock_gettime( CLOCK_REALTIME, &ts ) )
     {
-      ec.assign( errno, system::system_category );
+      ec.assign( errno, 
+#if BOOST_VERSION >= 104400
+            system::system_category() 
+#else
+            system::system_category
+#endif
+      );
       return time_point();
     }
 
@@ -320,7 +332,13 @@ namespace chrono
     if ( ::clock_gettime( CLOCK_MONOTONIC, &ts ) )
     {
       boost::throw_exception(
-        system::system_error( errno, system::system_category, "chrono::monotonic_clock" ));
+        system::system_error( errno, 
+#if BOOST_VERSION >= 104400
+            system::system_category(), 
+#else
+            system::system_category,
+#endif
+            "chrono::monotonic_clock" ));
     }
 
     return time_point(duration(
@@ -332,7 +350,13 @@ namespace chrono
     timespec ts;
     if ( ::clock_gettime( CLOCK_MONOTONIC, &ts ) )
     {
-      ec.assign( errno, system::system_category );
+      ec.assign( errno, 
+#if BOOST_VERSION >= 104400
+            system::system_category(), 
+#else
+            system::system_category,
+#endif
+      );
       return time_point();
     }
 
