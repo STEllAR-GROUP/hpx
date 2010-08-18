@@ -352,9 +352,9 @@ namespace chrono
     {
       ec.assign( errno, 
 #if BOOST_VERSION >= 104400
-            system::system_category(), 
+            system::system_category()
 #else
-            system::system_category,
+            system::system_category
 #endif
       );
       return time_point();
