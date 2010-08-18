@@ -168,6 +168,21 @@ if(CMAKE_COMPILER_IS_GNUCXX)
         add_definitions(-DHAVE_PTHREAD_SETAFFINITY_NP)
     endif()
 endif()
+if(XIAR)    # Intel compiler
+  if(UNIX)
+    add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
+    add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
+    add_definitions(-DHPX_DONT_USE_ITT)
+
+    # check for availability of pthread_setaffinity_np()
+    include(CheckSymbolExists)
+    check_symbol_exists(pthread_setaffinity_np "pthread.h"
+        HAVE_PTHREAD_SETAFFINITY_NP)
+    if(HAVE_PTHREAD_SETAFFINITY_NP)
+        add_definitions(-DHAVE_PTHREAD_SETAFFINITY_NP)
+    endif()
+  endif()
+endif()
 
 # additional preprocessor definitions
 add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT)
