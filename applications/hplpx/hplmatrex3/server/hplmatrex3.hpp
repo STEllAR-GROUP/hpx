@@ -108,10 +108,6 @@ namespace hpx { namespace components { namespace server
 	typedef actions::result_action3<HPLMatreX3, double, hpl_check, unsigned int,
 		unsigned int, bool, &HPLMatreX3::checksolve> check_action;
 
-	//here begins the definitions of most of the future types that will be used
-	//the first of which is for assign action
-	typedef lcos::eager_future<server::HPLMatreX3::assign_action> assign_future;
-
 	//the backsubst future is used to make sure all computations are complete before
 	//returning from LUsolve, to avoid killing processes and erasing the leftdata while
 	//it is still being worked on
