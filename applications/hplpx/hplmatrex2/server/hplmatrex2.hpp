@@ -393,7 +393,7 @@ namespace hpx { namespace components { namespace server
 		}
 		for(unsigned int i = iteration*blocksize;
 		    i<std::min((int)((iteration+1)*blocksize),rows);i++){
-			free(factordata[i]);
+			delete[] factordata[i];
 		}
 
 		iteration++;

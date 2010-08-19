@@ -328,14 +328,17 @@ namespace hpx { namespace components { namespace server
 		}
 
 		//while the row and column are being processed, go ahead and create
-		//the next row and column in memory and delete unneeded blocks
+		//the next row and column in memory and delete no longer needed data
 		temp = iteration+1;
-		//by using temp, we don't need to calculate iteration+1 for each call
+		//by using temp, we don't need to calculate iteration+-1 for each call
 		for(int i = temp;i<brows;i++){swap(i,temp);}
 		for(int i=temp+1;i<bcolumns;i++){swap(temp,i);}
 		if(iteration > 0){
 			temp -= 2;
 			for(int i=iteration;i<brows;i++){delete datablock[i][temp];}
+			for(int i=temp*blocksize;i<iteration*blocksize;i++){
+				delete[] factordata[i];
+			}
 		}
 
 		//NEXT make sure that the corner block is ready to run its final
