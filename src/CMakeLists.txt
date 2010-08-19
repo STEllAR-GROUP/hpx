@@ -226,7 +226,7 @@ set (hpxlib_util_HEADERS
     ${hpx_SOURCE_DIR}/hpx/util/high_resolution_timer.hpp
     ${hpx_SOURCE_DIR}/hpx/util/ini.hpp
     ${hpx_SOURCE_DIR}/hpx/util/init_ini_data.hpp
-	${hpx_SOURCE_DIR}/hpx/util/itt_notify.hpp
+    ${hpx_SOURCE_DIR}/hpx/util/itt_notify.hpp
     ${hpx_SOURCE_DIR}/hpx/util/io_service_pool.hpp
     ${hpx_SOURCE_DIR}/hpx/util/logging.hpp
     ${hpx_SOURCE_DIR}/hpx/util/one_size_heap_list.hpp
@@ -366,7 +366,7 @@ set (hpxlib_util_SOURCES
     ${hpx_SOURCE_DIR}/src/util/asio_util.cpp
     ${hpx_SOURCE_DIR}/src/util/ini.cpp
     ${hpx_SOURCE_DIR}/src/util/init_ini_data.cpp
-	${hpx_SOURCE_DIR}/src/util/itt_notify.cpp
+    ${hpx_SOURCE_DIR}/src/util/itt_notify.cpp
     ${hpx_SOURCE_DIR}/src/util/io_service_pool.cpp
     ${hpx_SOURCE_DIR}/src/util/logging.cpp
     ${hpx_SOURCE_DIR}/src/util/performance_counters.cpp
@@ -389,18 +389,11 @@ set (hpxlib_SOURCES
     ${hpxlib_threadmanager_SOURCES}
     ${hpxlib_util_SOURCES})
 
-# add source file from coroutine library (needed for gcc only)
-if (CMAKE_COMPILER_IS_GNUCXX)
+# add source file from coroutine library 
+if (CMAKE_COMPILER_IS_GNUCXX OR (XIAR AND UNIX))   # gcc or Intel
     SET(hpxlib_SOURCES 
         ${hpxlib_SOURCES} 
         ${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp)
-endif()
-if (XIAR)   # Intel compiler
-  if(UNIX)
-    SET(hpxlib_SOURCES 
-        ${hpxlib_SOURCES} 
-        ${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp)
-  endif()
 endif()
 
 # Boost Chrono sources (as long as this library is not in Boost)

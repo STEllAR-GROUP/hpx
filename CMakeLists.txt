@@ -57,8 +57,8 @@ set(Boost_COMPONENTS_NEEDED
     thread)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_ADDITIONAL_VERSIONS 
-    "1.44.0" "1.44" "1.43.0" "1.43" "1.42.0" "1.42" "1.41.0" "1.41" 
-    "1.40.0" "1.40" "1.39.0" "1.39")
+    "1.44.0" "1.44" "1.44.0" "1.44" "1.43.0" "1.43" "1.42.0" "1.42" 
+    "1.41.0" "1.41" "1.40.0" "1.40" "1.39.0" "1.39")
 
 find_package(Boost 1.33.1 COMPONENTS ${Boost_COMPONENTS_NEEDED})
 
@@ -67,8 +67,9 @@ if(Boost_FOUND)
         ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}
         " (${Boost_INCLUDE_DIR})")
 else()
-    message(FATAL "Boost installation not found. Please specify the Boost"
-        "installation directory using -DBOOST_ROOT=...\nReason for error:\n" ${Boost_ERROR_REASON})
+    message(FATAL ": Boost installation not found. Please specify the Boost\n"
+           "       installation directory using -DBOOST_ROOT=...\n"
+           "Reason for error:\n" ${Boost_ERROR_REASON})
 endif()
 
 include_directories(${Boost_INCLUDE_DIR})
@@ -155,7 +156,7 @@ if(MSVC)
     endif()
 endif()
 
-if(CMAKE_COMPILER_IS_GNUCXX)
+if(CMAKE_COMPILER_IS_GNUCXX OR (XIAR AND UNIX))   # gcc or Intel
     add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
     add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
     add_definitions(-DHPX_DONT_USE_ITT)
@@ -167,21 +168,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     if(HAVE_PTHREAD_SETAFFINITY_NP)
         add_definitions(-DHAVE_PTHREAD_SETAFFINITY_NP)
     endif()
-endif()
-if(XIAR)    # Intel compiler
-  if(UNIX)
-    add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
-    add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
-    add_definitions(-DHPX_DONT_USE_ITT)
-
-    # check for availability of pthread_setaffinity_np()
-    include(CheckSymbolExists)
-    check_symbol_exists(pthread_setaffinity_np "pthread.h"
-        HAVE_PTHREAD_SETAFFINITY_NP)
-    if(HAVE_PTHREAD_SETAFFINITY_NP)
-        add_definitions(-DHAVE_PTHREAD_SETAFFINITY_NP)
-    endif()
-  endif()
 endif()
 
 # additional preprocessor definitions
