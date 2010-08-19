@@ -334,10 +334,15 @@ namespace hpx { namespace threads
     thread_state_enum threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         wake_timer_thread (thread_id_type id, 
             thread_state_enum newstate, thread_state_ex_enum newstate_ex, 
-            thread_id_type timer_id) 
+            thread_id_type timer_id, 
+            boost::shared_ptr<boost::atomic<bool> > triggered) 
     {
-        // first trigger the requested set_state 
-        set_state(id, newstate, newstate_ex);
+        bool oldvalue = false;
+        if (triggered->compare_exchange_strong(oldvalue, true))
+        {
+            // timer has not been canceled yet, trigger the requested set_state 
+            set_state(id, newstate, newstate_ex);
+        }
 
         // then re-activate the thread holding the deadline_timer
         set_state(timer_id, pending, wait_timeout);
@@ -358,9 +363,12 @@ namespace hpx { namespace threads
         thread_self& self = get_self();
         thread_id_type self_id = self.get_thread_id();
 
+        boost::shared_ptr<boost::atomic<bool> > triggered(
+            new boost::atomic<bool>(false));
+
         thread_init_data data(
             boost::bind(&threadmanager_impl::wake_timer_thread, this, id, 
-                newstate, newstate_ex, self_id), 
+                newstate, newstate_ex, self_id, triggered), 
             "wake_timer");
         thread_id_type wake_id = register_thread(data, suspended);
 
@@ -372,7 +380,16 @@ namespace hpx { namespace threads
             thread_state(pending), thread_state_ex(wait_timeout)));
 
         // this waits for the thread to be reactivated when the timer fired
-        self.yield(suspended);
+        // if it returns 'signalled' the timer has been canceled, otherwise 
+        // the tiler fired and the wake_timer_thread above has been executed
+        bool oldvalue = false;
+        if (wait_timeout != self.yield(suspended) && 
+            triggered->compare_exchange_strong(oldvalue, true))
+        {
+            // wake_timer_thread has not been executed yet, cancel timer
+            t.cancel();
+        }
+
         return terminated;
     }
 

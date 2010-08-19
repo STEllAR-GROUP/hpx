@@ -159,6 +159,7 @@ namespace hpx
             wait_unknown = -1,
             wait_signaled = 0,  ///< The thread has been signaled
             wait_timeout = 1,   ///< The thread has been reactivated after a timeout
+            wait_terminate = 2, ///< The thread needs to be terminated
         };
 
         typedef threads::detail::tagged_thread_state<thread_state_ex_enum> thread_state_ex;

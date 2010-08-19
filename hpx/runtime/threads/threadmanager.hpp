@@ -488,7 +488,8 @@ namespace hpx { namespace threads
         /// the required action.
         thread_state_enum wake_timer_thread (thread_id_type id, 
             thread_state_enum newstate, thread_state_ex_enum newstate_ex, 
-            thread_id_type timer_id);
+            thread_id_type timer_id, 
+            boost::shared_ptr<boost::atomic<bool> > triggered);
 
         /// This thread function initiates the required set_state action (on 
         /// behalf of one of the threadmanager#set_state functions).
