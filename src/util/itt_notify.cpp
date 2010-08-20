@@ -4,161 +4,137 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/itt_notify.hpp>
 
 #if defined(HPX_USE_ITT)
 
-#include <hpx/util/static.hpp>
-#include <hpx/util/itt_notify.hpp>
-
-#include <boost/shared_ptr.hpp>
-#include <boost/function.hpp>
-#include <boost/plugin.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/stringize.hpp>
-#include <boost/filesystem.hpp>
-
-#include <list>
+#include <ittnotify.h>
+#include <internal/ittnotify.h>
 
 ///////////////////////////////////////////////////////////////////////////////
-// This file initializes the stubs which can be used to dynamically load and 
-// call the itt-notify functions connecting the HPX synchronization objects
-// with the Intel Inspector Tool
-namespace hpx { namespace util
+#define HPX_INTERNAL_ITT_SYNC_CREATE(obj, type, name)                         \
+    if (__itt_sync_createA_ptr) {                                             \
+        __itt_sync_createA_ptr(                                               \
+            const_cast<void*>(static_cast<volatile void*>(obj)),              \
+                type, name, __itt_attr_mutex);                                \
+    }                                                                         \
+    /**/
+#define HPX_INTERNAL_ITT_SYNC(fname, obj)                                     \
+    if (__itt_ ## fname ## _ptr) {                                            \
+        __itt_ ## fname ## _ptr(                                              \
+            const_cast<void*>(static_cast<volatile void*>(obj)));             \
+    }                                                                         \
+    /**/
+#define HPX_INTERNAL_ITT_SYNC_RENAME(obj, name)                               \
+    if (__itt_sync_renameA_ptr) {                                             \
+        __itt_sync_renameA_ptr(                                               \
+            const_cast<void*>(static_cast<volatile void*>(obj)), name);       \
+    }                                                                         \
+    /**/
+
+#define HPX_INTERNAL_ITT_THREAD_SET_NAME(name)                                \
+    if (__itt_thread_set_name_ptr) __itt_thread_set_name_ptr(name)            \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_INTERNAL_STACK_CREATE()                                           \
+    __itt_stack_caller_create_ptr ?                                           \
+        __itt_stack_caller_create_ptr() : (__itt_caller)0                     \
+    /**/
+#define HPX_INTERNAL_STACK_ENTER(ctx)                                         \
+    if (__itt_stack_callee_enter_ptr) { __itt_stack_callee_enter_ptr(ctx); }  \
+    /**/
+#define HPX_INTERNAL_STACK_LEAVE(ctx)                                         \
+    if (__itt_stack_callee_leave_ptr) { __itt_stack_callee_leave_ptr(ctx); }  \
+    /**/
+#define HPX_INTERNAL_STACK_DESTROY(ctx)                                       \
+    if (__itt_stack_caller_destroy_ptr && ctx != (__itt_caller)0) {           \
+        __itt_stack_caller_destroy_ptr(ctx);                                  \
+    }                                                                         \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
+#if defined(BOOST_MSVC) \
+    || defined(__BORLANDC__) \
+    || (defined(__MWERKS__) && defined(_WIN32) && (__MWERKS__ >= 0x3000)) \
+    || (defined(__ICL) && defined(_MSC_EXTENSIONS) && (_MSC_VER >= 1200))
+
+#if HPX_ITT_AMPLIFIER != 0
+#pragma comment(lib, "libittnotify_amplifier.lib")
+#else
+#pragma comment(lib, "libittnotify_inspector.lib")
+#endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_INTERNAL_ITT_SYNC_PREPARE(obj)           HPX_INTERNAL_ITT_SYNC(sync_prepare, obj)
+#define HPX_INTERNAL_ITT_SYNC_CANCEL(obj)            HPX_INTERNAL_ITT_SYNC(sync_cancel, obj)
+#define HPX_INTERNAL_ITT_SYNC_ACQUIRED(obj)          HPX_INTERNAL_ITT_SYNC(sync_acquired, obj)
+#define HPX_INTERNAL_ITT_SYNC_RELEASING(obj)         HPX_INTERNAL_ITT_SYNC(sync_releasing, obj)
+#define HPX_INTERNAL_ITT_SYNC_RELEASED(obj)          ((void)0) //HPX_INTERNAL_ITT_SYNC(sync_released, obj)
+#define HPX_INTERNAL_ITT_SYNC_DESTROY(obj)           HPX_INTERNAL_ITT_SYNC(sync_destroy, obj)
+
+///////////////////////////////////////////////////////////////////////////////
+void itt_sync_create(void *addr, const char* objtype, const char* objname)
 {
-    namespace detail
-    {
-        struct init_itt
-        {
-            typedef void (*function_pointer_type)();
-            typedef boost::function<void(function_pointer_type)> deleter_type;
-            typedef boost::remove_pointer<function_pointer_type>::type 
-                function_type;
-            typedef std::map<std::string, boost::shared_ptr<function_type> >
-                entry_map_type;
+    HPX_INTERNAL_ITT_SYNC_CREATE(addr, objtype, objname);
+}
 
-            init_itt() : libitt_(0)
-            {
-                namespace fs = boost::filesystem;
-                try {
-                    fs::path p("libittnotify");
-                    p.replace_extension(HPX_SHARED_LIB_EXTENSION);
-                    libitt_ = new boost::plugin::dll(p.string());
-                }
-                catch (std::logic_error const&) {
-                    libitt_ = 0;
-                }
-            }
+void itt_sync_rename(void* addr, const char* objname)
+{
+    HPX_INTERNAL_ITT_SYNC_RENAME(addr, objname);
+}
 
-            ~init_itt()
-            {
-                loaded_entries_.clear();
-                delete libitt_;
-            }
+void itt_sync_prepare(void* addr)
+{
+    HPX_INTERNAL_ITT_SYNC_PREPARE(addr);
+}
 
-            template <typename FuncType>
-            FuncType load(char const* funcname)
-            {
-                if (0 == libitt_)
-                    return 0;
+void itt_sync_acquired(void* addr)
+{
+    HPX_INTERNAL_ITT_SYNC_ACQUIRED(addr);
+}
 
-                try {
-                    std::pair<function_pointer_type, deleter_type> p = 
-                        libitt_->get<function_pointer_type, deleter_type>(funcname);
-                    if (p.first) {
-                        loaded_entries_.insert(
-                            entry_map_type::value_type(funcname,
-                                boost::shared_ptr<function_type>(p.first, p.second)
-                            ));
-                    }
-                    return reinterpret_cast<FuncType>(p.first);
-                }
-                catch (std::logic_error const&) {
-                    return 0;
-                }
-            }
+void itt_sync_cancel(void* addr)
+{
+    HPX_INTERNAL_ITT_SYNC_CANCEL(addr);
+}
 
-            bool unload(char const* funcname)
-            {
-                entry_map_type::iterator it = loaded_entries_.find(funcname);
-                if (it == loaded_entries_.end())
-                    return false;
+void itt_sync_releasing(void* addr)
+{
+    HPX_INTERNAL_ITT_SYNC_RELEASING(addr);
+}
 
-                loaded_entries_.erase(it);
-                return true;
-            }
+void itt_sync_released(void* addr)
+{
+    HPX_INTERNAL_ITT_SYNC_RELEASED(addr);
+}
 
-            boost::plugin::dll* libitt_;
-            entry_map_type loaded_entries_;
-        };
-
-        init_itt& get_itt_init()
-        {
-            static_<init_itt> itt_init_;
-            return itt_init_.get();
-        }
-    }
-
-#define HPX_ITT_INIT(init, f)                                                 \
-    ITTNOTIFY_NAME(f) = init.load<BOOST_PP_CAT(ITTNOTIFY_NAME(f), _t)>(       \
-        BOOST_PP_STRINGIZE_I(__itt_ ## f))                                    \
-    /**/
-#define HPX_ITT_DEINIT(init, f)                                               \
-    init.unload(BOOST_PP_STRINGIZE_I(__itt_ ## f));                           \
-    ITTNOTIFY_NAME(f) = 0                                                     \
-    /**/
-
-    // initialize stub object to call into the ittnotify library, if present
-    void init_itt_api()
-    {
-        detail::init_itt& init = detail::get_itt_init();
-
-#if defined(BOOST_WINDOWS)
-        HPX_ITT_INIT(init, sync_createA);
-#else
-        HPX_ITT_INIT(init, sync_create);
-#endif
-        HPX_ITT_INIT(init, sync_prepare);
-        HPX_ITT_INIT(init, sync_cancel);
-        HPX_ITT_INIT(init, sync_acquired);
-        HPX_ITT_INIT(init, sync_releasing);
-        HPX_ITT_INIT(init, sync_released);
-        HPX_ITT_INIT(init, sync_destroy);
-    }
-
-    // de-initialize stub objects
-    void deinit_itt_api()
-    {
-        detail::init_itt& init = detail::get_itt_init();
-
-#if defined(BOOST_WINDOWS)
-        HPX_ITT_DEINIT(init, sync_createA);
-#else
-        HPX_ITT_DEINIT(init, sync_create);
-#endif
-        HPX_ITT_DEINIT(init, sync_prepare);
-        HPX_ITT_DEINIT(init, sync_cancel);
-        HPX_ITT_DEINIT(init, sync_acquired);
-        HPX_ITT_DEINIT(init, sync_releasing);
-        HPX_ITT_DEINIT(init, sync_released);
-        HPX_ITT_DEINIT(init, sync_destroy);
-    }
-}}
+void itt_sync_destroy(void* addr)
+{
+    HPX_INTERNAL_ITT_SYNC_DESTROY(addr);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_ITT_DEFINE_STUB(name)                                             \
-    BOOST_PP_CAT(ITTNOTIFY_NAME(name), _t) ITTNOTIFY_NAME(name) = 0           \
-    /**/
+__itt_caller itt_stack_create()
+{
+    return HPX_INTERNAL_STACK_CREATE();
+}
 
-#if defined(BOOST_WINDOWS)
-HPX_ITT_DEFINE_STUB(sync_createA);
-#else
-HPX_ITT_DEFINE_STUB(sync_create);
-#endif
-HPX_ITT_DEFINE_STUB(sync_prepare);
-HPX_ITT_DEFINE_STUB(sync_cancel);
-HPX_ITT_DEFINE_STUB(sync_acquired);
-HPX_ITT_DEFINE_STUB(sync_releasing);
-HPX_ITT_DEFINE_STUB(sync_released);
-HPX_ITT_DEFINE_STUB(sync_destroy);
+void itt_stack_enter(__itt_caller ctx)
+{
+    HPX_INTERNAL_STACK_ENTER(ctx);
+}
+
+void itt_stack_leave(__itt_caller ctx)
+{
+    HPX_INTERNAL_STACK_LEAVE(ctx);
+}
+
+void itt_stack_destroy(__itt_caller ctx)
+{
+    HPX_INTERNAL_STACK_DESTROY(ctx);
+}
 
 #endif // HPX_USE_ITT
+

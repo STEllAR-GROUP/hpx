@@ -13,6 +13,7 @@
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/time_logger.hpp>
 #include <hpx/util/performance_counters.hpp>
+#include <hpx/util/itt_notify.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
@@ -699,11 +700,57 @@ namespace hpx { namespace threads
                    << info;
     }
 
+#if defined(HPX_USE_ITT)
+    struct itt_caller_context
+    {
+        itt_caller_context() 
+          : itt_context_(0)
+        {
+            HPX_ITT_STACK_CREATE(itt_context_);
+        }
+        ~itt_caller_context()
+        {
+            HPX_ITT_STACK_DESTROY(itt_context_);
+        }
+
+        struct ___itt_caller* itt_context_;
+    };
+
+    struct caller_context
+    {
+        caller_context(itt_caller_context& ctx) 
+          : ctx_(ctx) 
+        {
+            HPX_ITT_STACK_CALLEE_ENTER(ctx_.itt_context_);
+        }
+        ~caller_context()
+        {
+            HPX_ITT_STACK_CALLEE_LEAVE(ctx_.itt_context_);
+        }
+
+        itt_caller_context& ctx_;
+    };
+#else
+    struct itt_caller_context
+    {
+        itt_caller_context() {}
+        ~itt_caller_context() {}
+    };
+
+    struct caller_context
+    {
+        caller_context(itt_caller_context&) {}
+        ~caller_context() {}
+    };
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     std::size_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         tfunc_impl(std::size_t num_thread)
     {
+        itt_caller_context ctx_;        // helper for itt support
+
         manage_active_thread_count count(thread_count_);
 
         std::size_t num_px_threads = 0;
@@ -754,7 +801,10 @@ namespace hpx { namespace threads
                             // thread returns new required state
                             // store the returned state in the thread
                             tl2.tick();
-                            thrd_stat = (*thrd)();
+                            {
+                                caller_context ctx (ctx_);      // itt support
+                                thrd_stat = (*thrd)();
+                            }
                             tl2.tock();
                             ++num_px_threads;
                         }

@@ -23,7 +23,6 @@
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/itt_notify.hpp>
 
 #include <boost/foreach.hpp>
 #include <boost/thread/tss.hpp>
@@ -120,16 +119,13 @@ namespace hpx
             instance_number_(++instance_number_counter_),
             stopped_(true)
         {
-            util::init_itt_api();
         }
 
         ~runtime()
         {
             // allow to reuse instance number if this was the only instance
-            if (0 == instance_number_counter_) {
+            if (0 == instance_number_counter_) 
                 --instance_number_counter_;
-                util::deinit_itt_api();
-            }
         }
 
         /// \brief Manage list of functions to call on exit

@@ -116,6 +116,7 @@ namespace hpx { namespace lcos { namespace detail
           : active_count_(0), pending_events_(0), description_(description)
         {
             HPX_ITT_SYNC_CREATE(this, "lcos::mutex", description);
+            HPX_ITT_SYNC_RENAME(this, "lcos::mutex");
         }
 
         ~mutex()

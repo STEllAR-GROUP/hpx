@@ -125,6 +125,7 @@ namespace hpx { namespace threads { namespace detail
         static components::component_type get_component_type();
         static void set_component_type(components::component_type);
 
+    public:
         thread_state_enum execute()
         {
             thread_state_ex_enum current_state_ex = get_state_ex();

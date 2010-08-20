@@ -8,74 +8,56 @@
 
 #include <hpx/config.hpp>
 
-///////////////////////////////////////////////////////////////////////////////
+struct ___itt_caller;
+
 #if defined(HPX_USE_ITT)
 
-#define ITT_EXPORT HPX_EXPORT
-
-#include <hpx/util/tools_api/ittnotify.h>
-#include <hpx/util/tools_api/internal/ittnotify.h>
-
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_ITT_SYNC_CREATE(obj, type, name)                                  \
-    if (__itt_sync_create_ptr)                                                \
-        __itt_sync_create(obj, type, name, __itt_attr_mutex)                  \
-    /**/
-#define HPX_ITT_SYNC(name, obj)                                               \
-    if (__itt_ ## name ## _ptr) {                                             \
-        __itt_ ## name ## _ptr(                                               \
-            const_cast<void*>(static_cast<volatile void*>(obj)));             \
-    }                                                                         \
-    /**/
-#define HPX_ITT_SYNC_SET_NAME(obj, type, name)                                \
-    if (__itt_sync_set_name_ptr) {                                            \
-        __itt_sync_set_name_ptr(                                              \
-            const_cast<void*>(static_cast<volatile void*>(obj)),              \
-                type, name, __itt_attr_mutex);                                \
-    }                                                                         \
-    /**/
+HPX_EXPORT void itt_sync_create(void* addr, const char* objtype, const char* objname);
+HPX_EXPORT void itt_sync_rename(void* addr, const char* name);
+HPX_EXPORT void itt_sync_prepare(void* addr);
+HPX_EXPORT void itt_sync_acquired(void* addr);
+HPX_EXPORT void itt_sync_cancel(void* addr);
+HPX_EXPORT void itt_sync_releasing(void* addr);
+HPX_EXPORT void itt_sync_released(void* addr);
+HPX_EXPORT void itt_sync_destroy(void* addr);
 
-#define HPX_ITT_THREAD_SET_NAME(name)                                         \
-    if (__itt_thread_set_name_ptr) __itt_thread_set_name_ptr(name)            \
-    /**/
-
-// #define HPX_ITT_STACK_CREATE(obj)             obj = __itt_stack_caller_create()
-// #define HPX_ITT_STACK(name, obj)              __itt_stack_ ## name(obj)
-
-namespace hpx { namespace util
-{
-    HPX_EXPORT void init_itt_api();
-    HPX_EXPORT void deinit_itt_api();
-}}
+HPX_EXPORT ___itt_caller* itt_stack_create();
+HPX_EXPORT void itt_stack_enter(___itt_caller* ctx);
+HPX_EXPORT void itt_stack_leave(___itt_caller* ctx);
+HPX_EXPORT void itt_stack_destroy(___itt_caller* ctx);
 
 #else
 
-#define HPX_ITT_SYNC_CREATE(obj, type, name)    ((void)0)
-#define HPX_ITT_SYNC(name, obj)                 ((void)0)
-#define HPX_ITT_SYNC_SET_NAME(obj, type, name)  ((void)0)
+inline void itt_sync_create(void* addr, const char* objtype, const char* objname) {}
+inline void itt_sync_rename(void* addr, const char* name) {}
+inline void itt_sync_prepare(void* addr) {}
+inline void itt_sync_acquired(void* addr) {}
+inline void itt_sync_cancel(void* addr) {}
+inline void itt_sync_releasing(void* addr) {}
+inline void itt_sync_released(void* addr) {}
+inline void itt_sync_destroy(void* addr) {}
 
-#define HPX_ITT_THREAD_SET_NAME(name)           ((void)0)
-// #define HPX_ITT_SYNC_CREATE(obj, type, name)  ((void)0)
-// #define HPX_ITT_STACK_CREATE(obj)             ((void)0)
-// #define HPX_ITT_STACK(name, obj)              ((void)0)
+inline ___itt_caller* itt_stack_create() {}
+inline void itt_stack_enter(___itt_caller* ctx) {}
+inline void itt_stack_leave(___itt_caller* ctx) {}
+inline void itt_stack_destroy(___itt_caller* ctx) {}
 
-namespace hpx { namespace util
-{
-    inline void init_itt_api() {}
-    inline void deinit_itt_api() {}
-}}
+#endif // HPX_USE_ITT
 
-#endif
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_ITT_SYNC_CREATE(obj, type, name)  itt_sync_create(obj, type, name)
+#define HPX_ITT_SYNC_RENAME(obj, name)        itt_sync_rename(obj, name)
+#define HPX_ITT_SYNC_PREPARE(obj)             itt_sync_prepare(obj)
+#define HPX_ITT_SYNC_CANCEL(obj)              itt_sync_cancel(obj)
+#define HPX_ITT_SYNC_ACQUIRED(obj)            itt_sync_acquired(obj)
+#define HPX_ITT_SYNC_RELEASING(obj)           itt_sync_releasing(obj)
+#define HPX_ITT_SYNC_RELEASED(obj)            itt_sync_released(obj)
+#define HPX_ITT_SYNC_DESTROY(obj)             itt_sync_destroy(obj)
 
-#define HPX_ITT_SYNC_PREPARE(obj)           HPX_ITT_SYNC(sync_prepare, obj)
-#define HPX_ITT_SYNC_CANCEL(obj)            HPX_ITT_SYNC(sync_cancel, obj)
-#define HPX_ITT_SYNC_ACQUIRED(obj)          HPX_ITT_SYNC(sync_acquired, obj)
-#define HPX_ITT_SYNC_RELEASING(obj)         HPX_ITT_SYNC(sync_releasing, obj)
-#define HPX_ITT_SYNC_RELEASED(obj)          HPX_ITT_SYNC(sync_released, obj)
-#define HPX_ITT_SYNC_DESTROY(obj)           HPX_ITT_SYNC(sync_destroy, obj)
-
-// #define HPX_ITT_STACK_ENTER(obj)              HPX_ITT_STACK(callee_enter, obj)
-// #define HPX_ITT_STACK_LEAVE(obj)              HPX_ITT_STACK(callee_leave, obj)
-// #define HPX_ITT_STACK_DESTROY(obj)            HPX_ITT_STACK(caller_destroy, obj)
+#define HPX_ITT_STACK_CREATE(ctx)             ctx = itt_stack_create()
+#define HPX_ITT_STACK_CALLEE_ENTER(ctx)       itt_stack_enter(ctx)
+#define HPX_ITT_STACK_CALLEE_LEAVE(ctx)       itt_stack_leave(ctx)
+#define HPX_ITT_STACK_DESTROY(ctx)            itt_stack_destroy(ctx)
 
 #endif
