@@ -56,20 +56,7 @@ namespace hpx { namespace components { namespace detail
 //         }
 
     private:
-        // dummy structure implementing the Lockable concept
-        struct no_mutex
-        {
-            struct no_lock
-            {
-                no_lock(no_mutex&) {}
-                void lock() {}
-                void unlock() {}
-            };
-
-            typedef no_lock scoped_lock;
-        };
-
-        util::unique_ids<no_mutex> id_range_;
+        util::unique_ids id_range_;
     };
 
 }}} // namespace hpx::components::detail

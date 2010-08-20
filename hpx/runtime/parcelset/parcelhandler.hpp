@@ -413,7 +413,7 @@ namespace hpx { namespace parcelset
         server::parcelhandler_queue parcels_;
 
         /// The site current range of ids to be used for id_type instances
-        util::unique_ids<> id_range_;
+        util::unique_ids id_range_;
 
         /// This is the timer instance for this parcelhandler
         double startup_time_;

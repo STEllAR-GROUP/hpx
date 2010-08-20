@@ -71,10 +71,10 @@ namespace hpx { namespace components { namespace detail
 #if !defined(_DEBUG)
         struct tag {};
         typedef hpx::util::spinlock_pool<tag> mutex_type;
-        typedef typename mutex_type::scoped_lock scoped_lock;
 #else
         typedef boost::mutex mutex_type;
 #endif
+        typedef typename mutex_type::scoped_lock scoped_lock;
 
         typedef boost::aligned_storage<sizeof(value_type),
             boost::alignment_of<value_type>::value> storage_type;
@@ -131,7 +131,7 @@ namespace hpx { namespace components { namespace detail
 #if !defined(_DEBUG)
             scoped_lock l(this);
 #else
-            mutex_type::scoped_lock l(mtx_);
+            scoped_lock l(mtx_);
 #endif
             if (!ensure_pool(count))
                 return false;
@@ -161,7 +161,7 @@ namespace hpx { namespace components { namespace detail
 #if !defined(_DEBUG)
             scoped_lock l(this);
 #else
-            mutex_type::scoped_lock l(mtx_);
+            scoped_lock l(mtx_);
 #endif
             storage_type* p1 = static_cast<storage_type*>(p);
 
@@ -195,9 +195,8 @@ namespace hpx { namespace components { namespace detail
         ///
         /// \note  The pointer given by the parameter \a p must have been 
         ///        allocated by this instance of a \a wrapper_heap
-        template <typename Mutex>
         naming::gid_type 
-        get_gid(util::unique_ids<Mutex>& ids, void* p) 
+        get_gid(util::unique_ids& ids, void* p) 
         {
             BOOST_ASSERT(did_alloc(p));
 
@@ -206,7 +205,7 @@ namespace hpx { namespace components { namespace detail
 #if !defined(_DEBUG)
                 scoped_lock l(this);
 #else
-                mutex_type::scoped_lock l(mtx_);
+                scoped_lock l(mtx_);
 #endif
 
                 // store a pointer to the AGAS client

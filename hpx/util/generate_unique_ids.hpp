@@ -12,15 +12,17 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/util/spinlock_pool.hpp>
+#include <hpx/util/unlock_lock.hpp>
 
 namespace hpx { namespace util
 {
     /// The unique_ids class is a type responsible for generating 
     /// unique ids for components, parcels, threads etc.
-    template <typename Mutex = boost::mutex>
     class unique_ids 
     {
-        typedef Mutex mutex_type;
+        struct tag {};
+        typedef hpx::util::spinlock_pool<tag> mutex_type;
 
         /// size of the id range returned by command_getidrange
         /// FIXME: is this a policy?
@@ -36,13 +38,23 @@ namespace hpx { namespace util
             naming::resolver_client const& resolver, std::size_t count = 1)
         {
             // create a new id
-            typename mutex_type::scoped_lock l(mtx_);
+            mutex_type::scoped_lock l(this);
 
             // ensure next_id doesn't overflow
             if (lower_ + count > upper_) 
             {
-                resolver.get_id_range(here, 
-                    (std::max)(std::size_t(range_delta), count), lower_, upper_);
+                naming::gid_type lower;
+                naming::gid_type upper;
+
+                {
+                    unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                    resolver.get_id_range(here, 
+                        (std::max)(std::size_t(range_delta), count), 
+                        lower, upper);
+                }
+
+                lower_ = lower;
+                upper_ = upper;
             }
 
             naming::gid_type result = lower_;
@@ -51,8 +63,6 @@ namespace hpx { namespace util
         }
 
     private:
-        mutex_type mtx_;
-
         /// The range of available ids for components
         naming::gid_type lower_;
         naming::gid_type upper_;
