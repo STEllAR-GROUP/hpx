@@ -156,7 +156,7 @@ namespace hpx { namespace components { namespace amr
         char description[80];
         double dasx = (double) resultval->x_[0];
         double dast = (double) resultval->timestep_;
-        snprintf(description,sizeof(description),"x: %g t: %g level: %d",dasx,dast,val[0]->level_);
+        _snprintf(description,sizeof(description),"x: %g t: %g level: %d",dasx,dast,val[0]->level_);
         threads::thread_self& self = threads::get_self();
         threads::thread_id_type id = self.get_thread_id();
         threads::set_thread_description(id,description);
@@ -588,12 +588,10 @@ namespace hpx { namespace components { namespace amr
               overalloc[ct3 + stp3*par->granularity] = mval[stp2]->overalloc_[ct2];
               rightalloc[ct3 + stp3*par->granularity] = mval[stp2]->rightalloc_[ct2];
               if ( overalloc[ct3 + stp3*par->granularity] == 1 ) {
-                //over[ct3 + stp3*par->granularity] = mval[stp2]->over_[ct2];
-                BOOST_ASSERT(false);
+                over[ct3 + stp3*par->granularity] = mval[stp2]->over_[ct2];
               }
               if ( rightalloc[ct3 + stp3*par->granularity] == 1 ) {
-                //right[ct3 + stp3*par->granularity] = mval[stp2]->tright_[ct2];
-                BOOST_ASSERT(false);
+                right[ct3 + stp3*par->granularity] = mval[stp2]->tright_[ct2];
               }
             //  if ( mval[stp2]->overalloc_[ct2] == 1 ) {
             //    std::cout << " TEST " << over[ct3 + stp3*par->granularity] << std::endl;
@@ -641,7 +639,8 @@ namespace hpx { namespace components { namespace amr
             // TEST
             if ( mval[i]->value_[j].phi[0][0] > 60.0 ) {
               std::cout << " TEST!! " << mval[i]->value_[j].phi[0][0] << " overwrite " << mval[i]->overwrite_alloc_ << " i " << i << std::endl;
-            }
+              std::cout << " TEST!! -- follow up " << mval[i]->overalloc_[j] << std::endl;
+			}
             // END TEST
             count++;
             if ( count == par->granularity ) {
