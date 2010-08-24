@@ -67,7 +67,6 @@ namespace hpx { namespace components { namespace amr
         void init(std::size_t, naming::id_type const&);
 
         int findpoint(access_memory_block<stencil_data> const& lookright,
-                      access_memory_block<stencil_data> const& lookleft,
                       access_memory_block<stencil_data> & resultval);
 
         /// floating point comparison (for coordinates)

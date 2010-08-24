@@ -316,12 +316,12 @@ namespace hpx { namespace components { namespace amr
         stubs::logging::logentry(log_, amb1.get(), row,1, par);
 
         // TEST
-        if ( floatcmp(amb1->x_[0],2.60593,1.e-4) && amb1->timestep_ > 0.9 ) {
-          resultval->value_[0].phi[0][0] = 63.1415926;
-          std::cout << "WRITE TEST : " << amb1->x_[0] << " time " << amb1->timestep_  << std::endl;
-          std::cout << "WRITE TEST neighbor : " << resultval->x_[0] << " overwrite alloc: " << resultval->overwrite_alloc_ << " chi value " << resultval->value_[0].phi[0][0] << std::endl;
-          std::cout << " result level " << resultval->level_ << " " << amb1->level_  <<" dx " << amb1->x_[0] - resultval->x_[0] << std::endl;
-        }
+        //if ( floatcmp(amb1->x_[0],2.60593,1.e-4) && amb1->timestep_ > 0.9 ) {
+        //  resultval->value_[0].phi[0][0] = 63.1415926;
+        //  std::cout << "WRITE TEST : " << amb1->x_[0] << " time " << amb1->timestep_  << std::endl;
+        //  std::cout << "WRITE TEST neighbor : " << resultval->x_[0] << " overwrite alloc: " << resultval->overwrite_alloc_ << " chi value " << resultval->value_[0].phi[0][0] << std::endl;
+        //  std::cout << " result level " << resultval->level_ << " " << amb1->level_  <<" dx " << amb1->x_[0] - resultval->x_[0] << std::endl;
+        //}
         // END TEST
 
       }
@@ -351,9 +351,9 @@ namespace hpx { namespace components { namespace amr
             phi[k + num_eqns*(j+i*par->granularity)] = mval[i]->value_[j].phi[0][k];
           }
           // TEST
-          if ( phi[0 + num_eqns*(j+i*par->granularity)] > 60.0 ) {
-            std::cout << " TEST TEST TEST " << phi[0 + num_eqns*(j+i*par->granularity)] << std::endl;
-          }
+          //if ( phi[0 + num_eqns*(j+i*par->granularity)] > 60.0 ) {
+          //  std::cout << " TEST TEST TEST " << phi[0 + num_eqns*(j+i*par->granularity)] << std::endl;
+          //}
           // END TEST
         }
       }
@@ -499,7 +499,7 @@ namespace hpx { namespace components { namespace amr
         // END TEST
 
       for (int i = 0; i < size; i++) {
-        int s = findpoint(mval[i],mval[i+1],mval[i+size]);
+        int s = findpoint(mval[i],mval[i+size]);
         //std::cout << " TEST findpoint s: " << s << " i " << i << " " << mval[i]->overwrite_alloc_ << " x " << mval[i+size]->x_[0] << std::endl;
         if ( mval[0]->timestep_ < 1.e-6 ) {
           // don't interpolate initial data
@@ -513,13 +513,13 @@ namespace hpx { namespace components { namespace amr
           }
 
           // TEST
-          if ( floatcmp(mval[i+size]->x_[0],2.60593,1.e-4) ) {
-            std::cout << " TEST neighbor: " << mval[i]->x_[0] << " alloc: " << mval[i]->overwrite_alloc_ << std::endl;
-            std::cout << " timestep " << mval[i]->timestep_ << " level " << mval[i]->level_ << std::endl;
-            std::cout << "TEST chi value " << mval[i]->value_[0].phi[0][0] << std::endl;
-            std::cout << " TEST: dx " << mval[i+size]->x_[0] - mval[i]->x_[0]  << std::endl;
-            BOOST_ASSERT(false);
-          }
+          //if ( floatcmp(mval[i+size]->x_[0],2.60593,1.e-4) ) {
+          //  std::cout << " TEST neighbor: " << mval[i]->x_[0] << " alloc: " << mval[i]->overwrite_alloc_ << std::endl;
+          //  std::cout << " timestep " << mval[i]->timestep_ << " level " << mval[i]->level_ << std::endl;
+          //  std::cout << "TEST chi value " << mval[i]->value_[0].phi[0][0] << std::endl;
+          //  std::cout << " TEST: dx " << mval[i+size]->x_[0] - mval[i]->x_[0]  << std::endl;
+          //  BOOST_ASSERT(false);
+          //}
           // END TEST
           
             // point not found -- interpolate
@@ -574,9 +574,9 @@ namespace hpx { namespace components { namespace amr
                 phi[k + num_eqns*(ct3+stp3*par->granularity)] = mval[stp1]->value_[ct1].phi[0][k];
               }
               // TEST
-              if ( phi[0 + num_eqns*(ct3+stp3*par->granularity)] > 60.0 ) {
-                std::cout << " TEST A " << phi[0 + num_eqns*(ct3+stp3*par->granularity)] << " overwrite " << mval[stp1]->overwrite_alloc_ << " stp1 " << stp1 << std::endl;
-              }
+              //if ( phi[0 + num_eqns*(ct3+stp3*par->granularity)] > 60.0 ) {
+              //  std::cout << " TEST A " << phi[0 + num_eqns*(ct3+stp3*par->granularity)] << " overwrite " << mval[stp1]->overwrite_alloc_ << " stp1 " << stp1 << std::endl;
+              //}
               // END TEST
               ct1++;
               if ( ct1 == mval[stp1]->granularity ) {
@@ -607,9 +607,9 @@ namespace hpx { namespace components { namespace amr
                 phi[k + num_eqns*(ct3+stp3*par->granularity)] = mval[stp2]->value_[ct2].phi[0][k];
               }
               // TEST
-              if ( phi[0 + num_eqns*(ct3+stp3*par->granularity)] > 60.0 ) {
-                std::cout << " TEST B " << phi[0 + num_eqns*(ct3+stp3*par->granularity)] << " overwrite " << mval[stp2]->overwrite_alloc_ << std::endl;
-              }
+              //if ( phi[0 + num_eqns*(ct3+stp3*par->granularity)] > 60.0 ) {
+              //  std::cout << " TEST B " << phi[0 + num_eqns*(ct3+stp3*par->granularity)] << " overwrite " << mval[stp2]->overwrite_alloc_ << std::endl;
+              //}
               // END TEST
               ct2++;
               if ( ct2 == mval[stp2]->granularity ) {
@@ -633,14 +633,22 @@ namespace hpx { namespace components { namespace amr
         for (int i = 0; i < 2*size; i++) {
           for (int j = 0; j < mval[i]->granularity; j++) {
             mval[i]->x_[j] = x[count+step*par->granularity];
+			mval[i]->overalloc_[j] = overalloc[count+step*par->granularity];
+			mval[i]->rightalloc_[j] = rightalloc[count+step*par->granularity];
+			if ( overalloc[count+step*par->granularity] == 1 ) {
+			  mval[i]->over_[j] = over[count+step*par->granularity];
+			}
+			if ( rightalloc[count+step*par->granularity] == 1 ) {
+			  mval[i]->tright_[j] = right[count+step*par->granularity];
+			}
             for (int k = 0; k < num_eqns; k++) {
               mval[i]->value_[j].phi[0][k] = phi[k + num_eqns*(count+step*par->granularity)];
             }
             // TEST
-            if ( mval[i]->value_[j].phi[0][0] > 60.0 ) {
-              std::cout << " TEST!! " << mval[i]->value_[j].phi[0][0] << " overwrite " << mval[i]->overwrite_alloc_ << " i " << i << std::endl;
-              std::cout << " TEST!! -- follow up " << mval[i]->overalloc_[j] << std::endl;
-			}
+            //if ( mval[i]->value_[j].phi[0][0] > 60.0 ) {
+            //  std::cout << " TEST!! " << mval[i]->value_[j].phi[0][0] << " overwrite " << mval[i]->overwrite_alloc_ << " i " << i << std::endl;
+            //  std::cout << " TEST!! -- follow up " << mval[i]->overalloc_[j] << std::endl;
+			//}
             // END TEST
             count++;
             if ( count == par->granularity ) {
@@ -690,69 +698,39 @@ namespace hpx { namespace components { namespace amr
     }
 
     int stencil::findpoint(access_memory_block<stencil_data> const& anchor_to_the_left,
-                           access_memory_block<stencil_data> const& anchor_to_the_right, 
                            access_memory_block<stencil_data> & resultval) 
     {
       // the pinball machine
       int s = 0;
       int sup = resultval->granularity-1;
       access_memory_block<stencil_data> amb0;
-      amb0 = anchor_to_the_left;
-      if (s == 0 && amb0->overwrite_alloc_ == 1) {
-        access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->overwrite_);
+	  amb0 = anchor_to_the_left;
+      for (int j=0;j<amb0->granularity;j++) {
+		if (s == 0 && amb0->overalloc_[j] == 1) {
+		  access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->over_[j]);
 
-        // look around
-        if ( amb1->right_alloc_ == 1 ) {
-          access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->right_);
-          if ( floatcmp(amb2->x_[0],resultval->x_[0]) || floatcmp(amb2->x_[0],resultval->x_[sup]) ) {
-            resultval->value_ = amb2->value_;
-            resultval->refine_ = amb2->refine_;
-            // transfer overwrite information as well
-            if ( amb2->overwrite_alloc_ == 1 ) {
-              resultval->overwrite_alloc_ = 1;
-              resultval->overwrite_ = amb2->overwrite_;
-            }
+		  // look around
+		  if ( amb1->rightalloc_[j] == 1 ) {
+			access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->tright_[j]);
+			if ( floatcmp(amb2->x_[0],resultval->x_[0]) || floatcmp(amb2->x_[0],resultval->x_[sup]) ) {
+			  resultval->value_ = amb2->value_;
+			  resultval->refine_ = amb2->refine_;
+			  // transfer overwrite information as well
+			  resultval->overalloc_ = amb2->overalloc_;
+			  resultval->over_ = amb2->over_;
 
-            s = 1;
-            return s;
-          } else {
-            if ( amb2->x_ > resultval->x_ ) {
-              s = findpoint(amb1,amb2,resultval);
-            } else {
-              s = findpoint(amb2,amb1,resultval);
-            }
-          }
-        }
-      }
-
-
-      amb0 = anchor_to_the_right;
-      if (s == 0 && amb0->overwrite_alloc_ == 1) {
-        access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->overwrite_);
-
-        // look around
-        if ( amb1->right_alloc_ == 1 ) {
-          access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->right_);
-          if ( floatcmp(amb2->x_[0],resultval->x_[0]) || floatcmp(amb2->x_[0],resultval->x_[sup]) ) {
-            resultval->value_ = amb2->value_;
-            resultval->refine_ = amb2->refine_;
-            // transfer overwrite information as well
-            if ( amb2->overwrite_alloc_ == 1 ) {
-              resultval->overwrite_alloc_ = 1;
-              resultval->overwrite_ = amb2->overwrite_;
-            }
-            s = 1;
-            return s;
-          } else {
-            if ( amb2->x_ > resultval->x_ ) {
-              s = findpoint(amb1,amb2,resultval);
-            } else {
-              s = findpoint(amb2,amb1,resultval);
-            }
-          }
-        }
-      }
-
+			  s = 1;
+			  return s;
+			} else {
+			  if ( amb2->x_[0] > resultval->x_[0] ) {
+				s = findpoint(amb1,resultval);
+			  } else {
+				s = findpoint(amb2,resultval);
+			  }
+			}
+		  }
+		}
+	  }
       return s;
     }
 
