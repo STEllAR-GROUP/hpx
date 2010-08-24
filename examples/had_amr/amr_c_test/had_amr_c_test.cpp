@@ -55,8 +55,6 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->level_= level;
     val->iter_ = 0;
     val->refine_= false;
-    val->right_alloc_ = false;
-    val->overwrite_alloc_ = false;
 
     val->granularity = par.granularity;
     val->x_.resize(par.granularity);
@@ -65,7 +63,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->overalloc_.resize(par.granularity);
     val->rightalloc_.resize(par.granularity);
     val->over_.resize(par.granularity);
-    val->tright_.resize(par.granularity);
+    val->right_.resize(par.granularity);
 
     //number of values per stencil_data
     int i;
