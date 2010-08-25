@@ -425,8 +425,8 @@ namespace hpx { namespace components { namespace amr
                 components::stubs::memory_block::clone_async(gids[std_index+1]),
                 components::stubs::memory_block::clone_async(gids[std_index+2]),
                 components::stubs::memory_block::clone_async(gids[std_index]),
-                components::stubs::memory_block::clone_async(gids[std_index]),
-                components::stubs::memory_block::clone_async(gids[std_index]));
+                components::stubs::memory_block::clone_async(gids[std_index+1]),
+                components::stubs::memory_block::clone_async(gids[std_index+2]));
 
         mval.resize(6);
         boost::tie(mval[0], mval[1], mval[2], mval[3], mval[4], mval[5]) = 
@@ -438,7 +438,7 @@ namespace hpx { namespace components { namespace amr
                 components::stubs::memory_block::clone_async(gids[std_index]), 
                 components::stubs::memory_block::clone_async(gids[std_index+1]),
                 components::stubs::memory_block::clone_async(gids[std_index]),
-                components::stubs::memory_block::clone_async(gids[std_index]));
+                components::stubs::memory_block::clone_async(gids[std_index+1]));
 
         mval.resize(4);
         boost::tie(mval[0], mval[1], mval[2], mval[3]) = 
@@ -478,6 +478,13 @@ namespace hpx { namespace components { namespace amr
             }
           }
         }
+        // TEST
+        for (int i = 0; i < 2*size; i++) {
+          if ( mval[i]->value_.size() < mval[i]->granularity ) {
+            std::cout << " TEST TEST A " << mval[i]->value_.size() << " " << mval[i]->granularity << " i " << i << " x size " << mval[i]->x_.size() << std::endl;
+          }
+        }
+        // END TEST
 
         for (int i = 0; i < size; i++) {
           int s = findpoint(mval[i],mval[i+size]);
@@ -521,6 +528,14 @@ namespace hpx { namespace components { namespace amr
         over.resize(2*size*par->granularity);
         right.resize(2*size*par->granularity);
 
+        // TEST
+        for (int i = 0; i < 2*size; i++) {
+          if ( mval[i]->value_.size() < mval[i]->granularity ) {
+            std::cout << " TEST TEST B " << mval[i]->value_.size() << " " << mval[i]->granularity << " i " << i << " x size " << mval[i]->x_.size() << std::endl;
+          }
+        }
+        // END TEST
+
         std::size_t ct = 0;
         std::size_t ct1 = 0;
         std::size_t stp1 = 0;
@@ -559,8 +574,11 @@ namespace hpx { namespace components { namespace amr
                 right[ct3 + stp3*par->granularity] = mval[stp2]->right_[ct2];
               }
               for (int k = 0; k < num_eqns; k++) {
+      std::cout << " TEST EEE i " << i << " j " << j << " k " << k << " stp2 " << stp2 << " ct2 " << ct2 << std::endl;
+      std::cout << " TEST EEEE phi size " << phi.size() << " phi index " << k + num_eqns*(ct3+stp3*par->granularity) << " mval size " << mval.size() << " index " << stp2 << " value size " << mval[stp2]->value_.size() << " value index " << ct2 << " granularity " << mval[stp2]->granularity << std::endl;
                 phi[k + num_eqns*(ct3+stp3*par->granularity)] = mval[stp2]->value_[ct2].phi[0][k];
               }
+      std::cout << " TEST F i " << i << " j " << j << std::endl;
               ct2++;
               if ( ct2 == mval[stp2]->granularity ) {
                 stp2++;
