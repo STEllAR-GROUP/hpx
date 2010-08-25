@@ -314,12 +314,27 @@ namespace hpx { namespace components { namespace amr
 
       BOOST_ASSERT(numvals == result_data.size());
       std::vector<had_double_type> phi,x;
+      std::vector<int> overalloc,rightalloc;
+      std::vector<naming::id_type> over,right;
       phi.resize(numvals*par->granularity*num_eqns);
       x.resize(numvals*par->granularity);
+      overalloc.resize(2*size*par->granularity);
+      rightalloc.resize(2*size*par->granularity);
+      over.resize(2*size*par->granularity);
+      right.resize(2*size*par->granularity);
 
       for (int i = 0; i < numvals; i++) {
         for (int j = 0; j < mval[i]->granularity; j++) {
           x[j + i*par->granularity] = mval[i]->x_[j];
+
+          overalloc[j + i*par->granularity] = mval[i]->overalloc_[j];
+          rightalloc[j + i*par->granularity] = mval[i]->rightalloc_[j];
+          if ( mval[i]->overalloc_[j] == 1 ) {
+            over[j + i*par->granularity] = mval[i]->over_[j];
+          }
+          if ( mval[i]->rightalloc_[j] == 1 ) {
+            right[j + i*par->granularity] = mval[i]->right_[j];
+          }
           for (int k = 0; k < num_eqns; k++) {
             phi[k + num_eqns*(j+i*par->granularity)] = mval[i]->value_[j].phi[0][k];
           }
@@ -339,6 +354,14 @@ namespace hpx { namespace components { namespace amr
               BOOST_ASSERT(false);
             }
             mval[step1]->x_[count1] = x[j+i*par->granularity];
+            mval[step1]->overalloc_[count1] = overalloc[j+i*par->granularity];
+            mval[step1]->rightalloc_[count1] = rightalloc[j+i*par->granularity];
+            if ( overalloc[j+i*par->granularity] == 1 ) {
+              mval[step1]->over_[count1] = over[j+i*par->granularity];
+            }
+            if ( rightalloc[j+i*par->granularity] == 1 ) {
+              mval[step1]->right_[count1] = right[j+i*par->granularity];
+            }
             for (int k = 0; k < num_eqns; k++) {
               mval[step1]->value_[count1].phi[0][k] = phi[k + num_eqns*(j+i*par->granularity)];
             }
@@ -354,6 +377,14 @@ namespace hpx { namespace components { namespace amr
               BOOST_ASSERT(false);
             }
             mval[step2]->x_[count2] = x[j+i*par->granularity];
+            mval[step2]->overalloc_[count2] = overalloc[j+i*par->granularity];
+            mval[step2]->rightalloc_[count2] = rightalloc[j+i*par->granularity];
+            if ( overalloc[j+i*par->granularity] == 1 ) {
+              mval[step2]->over_[count2] = over[j+i*par->granularity];
+            }
+            if ( rightalloc[j+i*par->granularity] == 1 ) {
+              mval[step2]->right_[count2] = right[j+i*par->granularity];
+            }
             for (int k = 0; k < num_eqns; k++) {
               mval[step2]->value_[count2].phi[0][k] = phi[k + num_eqns*(j+i*par->granularity)];
             }
@@ -461,18 +492,6 @@ namespace hpx { namespace components { namespace amr
               stubs::logging::logentry(log_, mval[i+size].get(), row,2, par);
             }
 
-            // TEST
-            if ( floatcmp(mval[i+size]->x_[0],2.60593,1.e-4) ) {
-              for (int j=0;j<mval[i]->granularity;j++) {
-                std::cout << " TEST neighbor new alloc: " << mval[i]->overalloc_[j] << std::endl;
-              }
-              std::cout << " timestep " << mval[i]->timestep_ << " level " << mval[i]->level_ << std::endl;
-              std::cout << "TEST chi value " << mval[i]->value_[0].phi[0][0] << std::endl;
-              std::cout << " TEST: dx " << mval[i+size]->x_[0] - mval[i]->x_[0]  << std::endl;
-              BOOST_ASSERT(false);
-            }
-            // END TEST
-          
             // point not found -- interpolate
             for (int j = 0; j < mval[i]->granularity-1; j++) {
               for (int k = 0; k < num_eqns; k++) {
@@ -629,34 +648,17 @@ namespace hpx { namespace components { namespace amr
       int s = 0;
       access_memory_block<stencil_data> amb0;
       amb0 = anchor_to_the_left;
-      int log = 0;
-      if ( floatcmp(resultval->x_[0],2.60593,1.e-4) ) {
-        log = 1;
-       //  for (int j=0;j<amb0->granularity;j++) {
-       //    std::cout << " TEST findpoint " << amb0->overalloc_[j] << std::endl;
-       //  }
-      }
 
       for (int j=0;j<amb0->granularity;j++) {
         if (s == 0 && amb0->overalloc_[j] == 1) {
           access_memory_block<stencil_data> amb1 = hpx::components::stubs::memory_block::get(amb0->over_[j]);
-          if ( log == 1 ) { 
-            std::cout << " TEST overwrite x: " << amb1->x_[0] << " compare with " << resultval->x_[0] << std::endl;
-          }
 
           // look around
           if ( amb1->rightalloc_[j] == 1 ) {
             access_memory_block<stencil_data> amb2 = hpx::components::stubs::memory_block::get(amb1->right_[j]);
 
-            if ( log == 1 ) { 
-              for (int k=0;k<amb2->granularity;k++) {
-                std::cout << " TEST right x: " << amb2->x_[k] << " compare with " << resultval->x_[0] << " right-over alloc " << amb2->overalloc_[k] << " level " << amb2->level_ << std::endl;
-                
-              }
-            }
-
             for (int k=0;k<amb2->granularity;k++) {
-              if ( floatcmp(amb2->x_[j],resultval->x_[0]) ) {
+              if ( floatcmp(amb2->x_[k],resultval->x_[0]) ) {
                 resultval->value_ = amb2->value_;
                 resultval->refine_ = amb2->refine_;
                 // transfer overwrite information as well
