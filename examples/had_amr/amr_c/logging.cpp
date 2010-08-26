@@ -122,20 +122,19 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
         //
         // output file to "logcode2.dat"
-        if ( logcode == 2 ) {
-          for (i=0;i<val.granularity;i++) {
-            x.push_back(val.x_[i]);
-            chi.push_back(val.value_[i].phi[0][0]);
-            datatime = val.timestep_*par->dx0*par->lambda;
+        if ( logcode >= 2 ) {
+		  int element = logcode-2;
+          x.push_back(val.x_[element]);
+          chi.push_back(val.value_[element].phi[0][0]);
+          datatime = val.timestep_*par->dx0*par->lambda;
 
-            std::string x_str = convert(val.x_[i]);
-            std::string chi_str = convert(val.value_[i].phi[0][0]);
-            std::string time_str = convert(val.timestep_*par->dx0*par->lambda);
+          std::string x_str = convert(val.x_[element]);
+          std::string chi_str = convert(val.value_[element].phi[0][0]);
+          std::string time_str = convert(val.timestep_*par->dx0*par->lambda);
 
-            fdata = fopen("logcode2.dat","a");
-            fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),chi_str.c_str());
-            fclose(fdata);
-          }
+          fdata = fopen("logcode2.dat","a");
+          fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),chi_str.c_str());
+          fclose(fdata);
         }
     }
 
