@@ -60,11 +60,6 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->x_.resize(par.granularity);
     val->value_.resize(par.granularity);
 
-    val->overalloc_.resize(par.granularity);
-    val->rightalloc_.resize(par.granularity);
-    val->over_.resize(par.granularity);
-    val->right_.resize(par.granularity);
-
     //number of values per stencil_data
     int i;
     nodedata node;
@@ -75,9 +70,6 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     dx = par.dx0/pow(2.0,level);
 
     for (i=0;i<par.granularity;i++) {
-      val->overalloc_[i] = 0;
-      val->rightalloc_[i] = 0;
-
       r = xmin + (par.granularity*item + i)*dx;
 
       chi = initial_chi(r,par);

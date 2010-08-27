@@ -66,9 +66,6 @@ namespace hpx { namespace components { namespace amr
         /// The init function initializes this stencil point
         void init(std::size_t, naming::id_type const&);
 
-        int findpoint(access_memory_block<stencil_data> const& lookright,
-                      access_memory_block<stencil_data> & resultval,int element);
-
         /// floating point comparison (for coordinates)
         int floatcmp(had_double_type x1,had_double_type x2,had_double_type epsilon);
 
