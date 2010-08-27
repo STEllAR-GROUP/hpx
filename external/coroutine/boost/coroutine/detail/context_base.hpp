@@ -414,7 +414,7 @@ namespace boost { namespace coroutines { namespace detail {
       swap_context(m_caller, *this, detail::invoke_hint());
     }
 
-    template<typename ActualCtx>
+    template <typename ActualCtx>
     static void deleter (const type* ctx)
     {
         ActualCtx::destroy(static_cast<ActualCtx*>(const_cast<type*>(ctx)));

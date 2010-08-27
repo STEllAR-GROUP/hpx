@@ -61,9 +61,9 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         // debug helper function, logs all suspended threads
+        template <typename Map>
         inline void dump_suspended_threads(std::size_t num_thread,
-            boost::ptr_map<thread_id_type, threads::thread>& tm,
-            std::size_t& idle_loop_count)
+            Map& tm, std::size_t& idle_loop_count)
         {
             if (idle_loop_count++ < 2000)
                 return;
@@ -71,11 +71,9 @@ namespace hpx { namespace threads { namespace policies
             // reset idle loop count
             idle_loop_count = 0;
 
-            typedef boost::ptr_map<thread_id_type, threads::thread> thread_map_type;
-
             bool logged_headline = false;
-            thread_map_type::const_iterator end = tm.end();
-            for (thread_map_type::const_iterator it = tm.begin(); it != end; ++it)
+            typename Map::const_iterator end = tm.end();
+            for (typename Map::const_iterator it = tm.begin(); it != end; ++it)
             {
                 threads::thread const* thrd = (*it).second;
                 threads::thread_state state = thrd->get_state();
@@ -126,7 +124,9 @@ namespace hpx { namespace threads { namespace policies
         typedef boost::lockfree::fifo<thread*> work_items_type;
 
         // this is the type of a map holding all threads (except depleted ones)
-        typedef boost::ptr_map<thread_id_type, thread> thread_map_type;
+        typedef boost::ptr_map<
+            thread_id_type, thread, std::less<thread_id_type>, heap_clone_allocator
+        > thread_map_type;
 
         // this is the type of the queue of new tasks not yet converted to
         // threads
@@ -155,7 +155,8 @@ namespace hpx { namespace threads { namespace policies
                 // create the new thread
                 thread_state_enum state = boost::get<1>(*task);
                 std::auto_ptr<threads::thread> thrd (
-                    new threads::thread(boost::get<0>(*task), memory_pool_, state));
+                    new (memory_pool_) threads::thread(
+                        boost::get<0>(*task), memory_pool_, state));
 
                 delete task;
 
@@ -307,7 +308,8 @@ namespace hpx { namespace threads { namespace policies
                 mutex_type::scoped_lock lk(mtx_);
 
                 std::auto_ptr<threads::thread> thrd (
-                    new threads::thread(data, memory_pool_, initial_state));
+                    new (memory_pool_) threads::thread(
+                        data, memory_pool_, initial_state));
 
                 // add a new entry in the map for this thread
                 thread_id_type id = thrd->get_thread_id();
@@ -512,7 +514,8 @@ namespace hpx { namespace threads { namespace policies
         task_items_type new_tasks_;         ///< list of new tasks to run
         boost::atomic<long> new_tasks_count_;     ///< count of new tasks to run
 
-        boost::object_pool<threads::detail::thread> memory_pool_;
+        threads::thread_pool memory_pool_;  ///< OS thread local memory pools for
+                                            ///< PX-threads 
 
         util::block_profiler<add_new_tag> add_new_logger_;
     };

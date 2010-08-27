@@ -25,24 +25,11 @@ namespace hpx { namespace threads { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-//     struct thread_tag {};
-// 
-//     // the used pool allocator doesn't need to be protected by a mutex as the
-//     // allocation always happens from inside the creation of the component
-//     // wrapper, which by itself is already protected by a mutex
-//     typedef boost::singleton_pool<
-//         thread_tag, sizeof(thread),
-//         boost::default_user_allocator_new_delete,
-//         boost::details::pool::null_mutex,
-//         0xFFFF                                      // start with 64k objects
-//     > pool_type;
-
-    void *thread::operator new(std::size_t size, 
-        boost::object_pool<detail::thread>& pool)
+    void *thread::operator new(std::size_t size, thread_pool& pool)
     {
-        BOOST_ASSERT(sizeof(thread) == size);
+        BOOST_ASSERT(sizeof(detail::thread) == size);
 
-        void *ret = pool.malloc();
+        void *ret = pool.detail_pool_.malloc();
         if (0 == ret)
             boost::throw_exception(std::bad_alloc());
         return ret;
@@ -50,30 +37,60 @@ namespace hpx { namespace threads { namespace detail
 
     void *thread::operator new(std::size_t size) throw()
     {
-        return NULL;
+        return NULL;    // won't be ever used
     }
 
-    void thread::operator delete(void *p, 
-        boost::object_pool<detail::thread>& pool)
+    void thread::operator delete(void *p, thread_pool& pool)
     {
         if (0 != p) 
-            pool.free(reinterpret_cast<detail::thread*>(p));
+            pool.detail_pool_.free(reinterpret_cast<detail::thread*>(p));
     }
 
     void thread::operator delete(void *p, std::size_t size)
     {
-        BOOST_ASSERT(sizeof(thread) == size);
+        BOOST_ASSERT(sizeof(detail::thread) == size);
         if (0 != p) {
             detail::thread* pt = reinterpret_cast<detail::thread*>(p);
-            pt->pool_->free(pt);
+            pt->pool_->detail_pool_.free(pt);
         }
     }
-
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads 
 {
+    ///////////////////////////////////////////////////////////////////////////
+    // This overload will be called by the ptr_map<> used in the thread_queue
+    // whenever an instance of a threads::thread needs to be deleted. We 
+    // provide this overload as we need to extract the thread_pool from the 
+    // thread instance the moment before it gets deleted
+    void delete_clone(threads::thread const* t)
+    {
+        if (0 != t) {
+            threads::thread_pool* pool = t->get()->pool_;
+            boost::checked_delete(t); // delete the normal way, memory does not get freed
+            pool->pool_.free(const_cast<threads::thread*>(t));        
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void* thread::operator new(std::size_t size, thread_pool& pool)
+    {
+        BOOST_ASSERT(sizeof(thread) == size);
+
+        void *ret = pool.pool_.alloc();
+        if (0 == ret)
+            boost::throw_exception(std::bad_alloc());
+        return ret;
+    }
+
+    void thread::operator delete(void *p, thread_pool& pool)
+    {
+        if (0 != p) 
+            pool.pool_.free(reinterpret_cast<thread*>(p));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     thread_self& get_self()
     {
         return *thread_self::impl_type/*::super_type*/::get_self();

@@ -30,6 +30,36 @@
 
 #include <stack>
 
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace threads 
+{
+    struct thread_pool;    // forward declaration only
+    class thread;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // This overload will be called by the ptr_map<> used in the thread_queue
+    // whenever an instance of a threads::thread needs to be deleted. We 
+    // provide this overload as we need to extract the thread_pool from the 
+    // thread instance the moment before it gets deleted
+    void delete_clone(threads::thread const*);
+
+    // This is a policy instance for the boost::ptr_map used to store the 
+    // pointers to the threads::thread instances
+    struct heap_clone_allocator
+    {
+        static threads::thread* allocate_clone(threads::thread const& t) 
+        { 
+            BOOST_ASSERT(false);    // will not be called, ever
+            return 0;
+        }
+        static void deallocate_clone(threads::thread const* t)
+        {
+            delete_clone(t);
+        }
+    };
+}}
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace detail
 {
     struct tag {};
@@ -39,15 +69,6 @@ namespace hpx { namespace threads { namespace detail
     template <typename CoroutineImpl>
     struct coroutine_allocator
     {
-        ~coroutine_allocator()
-        {
-            CoroutineImpl* next = get();
-            while (next) {
-                delete next;
-                next = get();
-            }
-        }
-
         CoroutineImpl* get()
         {
             thread_mutex_type::scoped_lock l(this);
@@ -76,7 +97,7 @@ namespace hpx { namespace threads { namespace detail
         
     public:
         thread(thread_init_data const& init_data, thread_id_type id, 
-               thread_state_enum newstate, boost::object_pool<thread>& pool)
+               thread_state_enum newstate, thread_pool& pool)
           : coroutine_(init_data.func, id), //coroutine_type::impl_type::create(init_data.func, id)), 
             current_state_(thread_state(newstate)), 
             current_state_ex_(thread_state_ex(wait_signaled)),
@@ -261,10 +282,8 @@ namespace hpx { namespace threads { namespace detail
         }
 
         // threads use a specialized allocator for fast creation/destruction
-        static void *operator new(std::size_t size, 
-            boost::object_pool<detail::thread>&);
-        static void operator delete(void *p, 
-            boost::object_pool<detail::thread>&);
+        static void *operator new(std::size_t size, thread_pool&);
+        static void operator delete(void *p, thread_pool&);
 
         static void *operator new(std::size_t size) throw();
         static void operator delete(void *p, std::size_t size);
@@ -298,6 +317,9 @@ namespace hpx { namespace threads { namespace detail
         }
 
     private:
+        friend class threads::thread;
+        friend void threads::delete_clone(threads::thread const*);
+
         coroutine_type coroutine_;
         mutable boost::atomic<thread_state> current_state_;
         mutable boost::atomic<thread_state_ex> current_state_ex_;
@@ -313,15 +335,16 @@ namespace hpx { namespace threads { namespace detail
         mutable thread_state marked_state_;
 
         mutable naming::id_type id_;    // that's our gid
-        boost::object_pool<detail::thread>* pool_;
+        thread_pool* pool_;
     };
-
-///////////////////////////////////////////////////////////////////////////////
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads 
 {
+    // forward declaration only
+    struct thread_pool;
+
     ///////////////////////////////////////////////////////////////////////////
     /// \class thread thread.hpp hpx/runtime/threads/thread.hpp
     ///
@@ -365,14 +388,8 @@ namespace hpx { namespace threads
         ///                 \a thread will be associated with.
         /// \param newstate [in] The initial thread state this instance will
         ///                 be initialized with.
-        thread(thread_init_data const& init_data,
-                boost::object_pool<detail::thread>& pool, 
-                thread_state_enum new_state = init)
-          : base_type(new (pool) detail::thread(init_data, This(), new_state, pool))
-        {
-            LTM_(debug) << "thread::thread(" << this << "), description(" 
-                        << init_data.description << ")";
-        }
+        inline thread(thread_init_data const& init_data, thread_pool& pool, 
+            thread_state_enum new_state = init);
 
         ~thread() 
         {
@@ -380,6 +397,38 @@ namespace hpx { namespace threads
                         << get()->get_description() << ")";
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        // memory management
+        // threads use a specialized allocator for fast creation/destruction
+
+        /// \brief  The memory for thread objects is managed by a class  
+        ///         specific allocator. This allocator uses a OS-thread local,
+        ///         one size heap implementation, ensuring fast memory 
+        ///         allocation. Additionally the heap registers the allocated  
+        ///         thread instance with the AGAS service.
+        ///
+        /// \param size   [in] The parameter \a size is supplied by the 
+        ///               compiler and contains the number of bytes to allocate.
+        static void* operator new(std::size_t size, thread_pool&);
+        static void operator delete(void *p, thread_pool&);
+
+        /// This operator new() needs to be defined, but won't ever be called
+        static void* operator new(std::size_t) throw() { return NULL; }
+        static void operator delete(void*, std::size_t)
+        {
+            // we do not delete the memory here as it will be done in the 
+            // boost::delete_clone() function (see thread.cpp)
+        }
+
+        /// \brief  The placement operator new has to be overloaded as well 
+        ///         (the global placement operators are hidden because of the 
+        ///         new/delete overloads above).
+        static void* operator new(std::size_t, void *p) { return p; }
+        /// \brief  This operator delete is called only if the placement new 
+        ///         fails.
+        static void operator delete(void*, void*) {}
+
+        ///////////////////////////////////////////////////////////////////////
         thread_id_type get_thread_id() const
         {
             return const_cast<thread*>(this);
@@ -588,6 +637,57 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     thread_id_type const invalid_thread_id = 0;
 
+    ///////////////////////////////////////////////////////////////////////////
+    // This is a special helper class encapsulating the memory pools used for
+    // \a threads::thread and \a threads::detail::thread
+    struct thread_pool
+    {
+        typedef components::detail::wrapper_heap_list<
+            components::detail::fixed_wrapper_heap<threads::thread> > 
+        heap_type;
+        typedef boost::object_pool<threads::detail::thread> detail_heap_type;
+
+        thread_pool() 
+          : pool_(threads::detail::thread::get_component_type()) 
+        {}
+
+        heap_type pool_;
+        detail_heap_type detail_pool_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline thread::thread(thread_init_data const& init_data,
+            thread_pool& pool, thread_state_enum new_state)
+      : thread::base_type(new (pool) detail::thread(
+            init_data, This(), new_state, pool))
+    {
+        LTM_(debug) << "thread::thread(" << this << "), description(" 
+                    << init_data.description << ")";
+    }
+}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace components 
+{
+    ///////////////////////////////////////////////////////////////////////////
+    // specialization of heap factory for threads::thread, this is a dummy 
+    // implementation as the memory for threads::thread is managed externally
+    // by the pool object stored in the thread_queue
+    template <>
+    struct heap_factory<threads::detail::thread, threads::thread>
+    {
+        static threads::thread* alloc(std::size_t count = 1)
+        {
+            return 0;
+        }
+        static void free(void* p, std::size_t count = 1)
+        {
+        }
+        static naming::gid_type get_gid(void* p)
+        {
+            return naming::invalid_gid;
+        }
+    };
 }}
 
 #include <hpx/config/warnings_suffix.hpp>

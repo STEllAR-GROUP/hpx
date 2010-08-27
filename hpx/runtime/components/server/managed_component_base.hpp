@@ -74,6 +74,38 @@ namespace hpx { namespace components
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Component, typename Derived>
+    struct heap_factory
+    {
+        // the memory for the wrappers is managed by a one_size_heap_list
+        typedef detail::wrapper_heap_list<
+            detail::fixed_wrapper_heap<Derived> > heap_type;
+
+        struct wrapper_heap_tag {};
+
+        static heap_type& get_heap()
+        {
+            // ensure thread-safe initialization
+            util::static_<heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT> 
+                heap(Component::get_component_type());
+            return heap.get(get_runtime_instance_number());
+        }
+
+        static Derived* alloc(std::size_t count = 1)
+        {
+            return get_heap().alloc(count);
+        }
+        static void free(void* p, std::size_t count = 1)
+        {
+            get_heap().free(p, count);
+        }
+        static naming::gid_type get_gid(void* p)
+        {
+            return get_heap().get_gid(p);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     /// \class managed_component managed_component.hpp hpx/runtime/components/server/managed_component.hpp
     ///
     /// The managed_component template is used as a indirection layer 
@@ -198,20 +230,7 @@ namespace hpx { namespace components
         }
 
     protected:
-        // the memory for the wrappers is managed by a one_size_heap_list
-        typedef detail::wrapper_heap_list<
-            detail::fixed_wrapper_heap<derived_type> > 
-        heap_type;
-
-        struct wrapper_heap_tag {};
-
-        static heap_type& get_heap()
-        {
-            // ensure thread-safe initialization
-            util::static_<heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT> 
-                heap(get_component_type());
-            return heap.get(get_runtime_instance_number());
-        }
+        typedef heap_factory<Component, derived_type> heap_type;
 
     public:
         /// \brief  The memory for managed_component objects is managed by 
@@ -226,7 +245,10 @@ namespace hpx { namespace components
         {
             if (size > sizeof(managed_component))
                 return ::operator new(size);
-            return get_heap().alloc();
+            derived_type* p = heap_type::alloc();
+            if (NULL == p) 
+                boost::throw_exception(std::bad_alloc());
+            return p;
         }
         static void operator delete(void* p, std::size_t size)
         {
@@ -237,7 +259,7 @@ namespace hpx { namespace components
                 ::operator delete(p);
                 return;
             }
-            get_heap().free(p);
+            heap_type::free(p);
         }
 
         /// \brief  The placement operator new has to be overloaded as well 
@@ -257,7 +279,10 @@ namespace hpx { namespace components
         static derived_type* create(std::size_t count)
         {
             // allocate the memory
-            derived_type* p = get_heap().alloc(count);
+            derived_type* p = heap_type::alloc(count);
+            if (NULL == p) 
+                boost::throw_exception(std::bad_alloc());
+
             if (1 == count)
                 return new (p) derived_type();
 
@@ -279,7 +304,7 @@ namespace hpx { namespace components
                     curr->finalize();
                     curr->~derived_type();
                 }
-                get_heap().free(p, count);     // free memory
+                heap_type::free(p, count);     // free memory
                 throw;      // rethrow
             }
             return p;
@@ -292,7 +317,8 @@ namespace hpx { namespace components
         static derived_type*                                                  \
         create_one(BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))               \
         {                                                                     \
-            derived_type* p = get_heap().alloc();                             \
+            derived_type* p = heap_type::alloc();                             \
+            if (NULL == p) boost::throw_exception(std::bad_alloc());          \
             return new (p) derived_type(BOOST_PP_ENUM_PARAMS(N, t));          \
         }                                                                     \
     /**/
@@ -324,7 +350,7 @@ namespace hpx { namespace components
             }
 
             // free memory itself
-            get_heap().free(p, count);
+            heap_type::free(p, count);
         }
 
         /// \brief  The function \a get_factory_properties is used to 
@@ -345,13 +371,6 @@ namespace hpx { namespace components
         {
             return get_checked()->get_gid(this);
         }
-
-        ///
-//         bool get_full_address(naming::full_address& fa) const
-//         {
-//             return get_heap().
-//                 get_full_address(const_cast<managed_component*>(this), fa);
-//         }
 
         ///////////////////////////////////////////////////////////////////////
         // The managed_component behaves just like the wrapped object
@@ -379,7 +398,7 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         naming::gid_type get_base_gid() const
         {
-            return get_heap().get_gid(const_cast<managed_component*>(this));
+            return heap_type::get_gid(const_cast<managed_component*>(this));
         }
 
     protected:

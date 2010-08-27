@@ -701,6 +701,7 @@ namespace hpx { namespace threads
     }
 
 #if defined(HPX_USE_ITT)
+    ///////////////////////////////////////////////////////////////////////////
     struct itt_caller_context
     {
         itt_caller_context() 
@@ -730,7 +731,73 @@ namespace hpx { namespace threads
 
         itt_caller_context& ctx_;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct itt_frame_context
+    {
+        itt_frame_context(char const* name) 
+          : itt_frame_(0)
+        {
+            HPX_ITT_FRAME_CREATE(itt_frame_, name);
+            HPX_ITT_FRAME_BEGIN(itt_frame_);
+        }
+        ~itt_frame_context()
+        {
+            HPX_ITT_FRAME_END(itt_frame_);
+            HPX_ITT_FRAME_DESTROY(itt_frame_);
+        }
+
+        struct __itt_frame_t* itt_frame_;
+    };
+
+    struct undo_frame_context
+    {
+        undo_frame_context(itt_frame_context& frame) 
+          : frame_(frame) 
+        {
+            HPX_ITT_FRAME_END(frame_.itt_frame_);
+        }
+        ~undo_frame_context() 
+        {
+            HPX_ITT_FRAME_BEGIN(frame_.itt_frame_);
+        }
+
+        itt_frame_context& frame_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct itt_mark_context
+    {
+        itt_mark_context(char const* name) 
+          : itt_mark_(0), name_(name)
+        {
+            HPX_ITT_MARK_CREATE(itt_mark_, name);
+        }
+        ~itt_mark_context()
+        {
+            HPX_ITT_MARK_OFF(itt_mark_);
+        }
+
+        int itt_mark_;
+        char const* name_;
+    };
+
+    struct undo_mark_context
+    {
+        undo_mark_context(itt_mark_context& mark) 
+          : mark_(mark) 
+        {
+            HPX_ITT_MARK_OFF(mark_.itt_mark_);
+        }
+        ~undo_mark_context() 
+        {
+            HPX_ITT_MARK_CREATE(mark_.itt_mark_, mark_.name_);
+        }
+
+        itt_mark_context& mark_;
+    };
 #else
+    ///////////////////////////////////////////////////////////////////////////
     struct itt_caller_context
     {
         itt_caller_context() {}
@@ -742,6 +809,32 @@ namespace hpx { namespace threads
         caller_context(itt_caller_context&) {}
         ~caller_context() {}
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct itt_frame_context
+    {
+        itt_frame_context(char const* name) {}
+        ~itt_frame_context() {}
+    };
+
+    struct undo_frame_context
+    {
+        undo_frame_context(itt_frame_context&) {}
+        ~undo_frame_context() {}
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct itt_mark_context
+    {
+        itt_mark_context(char const* name) {}
+        ~itt_mark_context() {}
+    };
+
+    struct undo_mark_context
+    {
+        undo_mark_context(itt_mark_context&) {}
+        ~undo_mark_context() {}
+    };
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
@@ -750,6 +843,7 @@ namespace hpx { namespace threads
         tfunc_impl(std::size_t num_thread)
     {
         itt_caller_context ctx_;        // helper for itt support
+        itt_mark_context mark_ ("threadmanager");
 
         manage_active_thread_count count(thread_count_);
 
@@ -802,7 +896,9 @@ namespace hpx { namespace threads
                             // store the returned state in the thread
                             tl2.tick();
                             {
-                                caller_context ctx (ctx_);      // itt support
+                                undo_mark_context mark (mark_);  // itt support
+                                caller_context ctx (ctx_);
+
                                 thrd_stat = (*thrd)();
                             }
                             tl2.tock();

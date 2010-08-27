@@ -56,9 +56,13 @@
 #endif
 
 #if defined(BOOST_COROUTINE_EXPORTS)
-# define  BOOST_COROUTINE_EXPORT       BOOST_COROUTINE_SYMBOL_EXPORT
+# define BOOST_COROUTINE_EXPORT       BOOST_COROUTINE_SYMBOL_EXPORT
 #else
-# define  BOOST_COROUTINE_EXPORT       BOOST_COROUTINE_SYMBOL_IMPORT
+# define BOOST_COROUTINE_EXPORT       BOOST_COROUTINE_SYMBOL_IMPORT
+#endif
+
+#if !defined(BOOST_COROUTINE_NUM_HEAPS)
+# define BOOST_COROUTINE_NUM_HEAPS    41
 #endif
 
 namespace boost { namespace coroutines { namespace detail 
@@ -360,21 +364,21 @@ private:
 
     struct heap_tag {};
 
-    static heap_type& get_heap()
+    static heap_type& get_heap(std::size_t i)
     {
         // ensure thread-safe initialization
-        static_<heap_type, heap_tag> heap;
-        return heap.get();
+        static_<heap_type, heap_tag, BOOST_COROUTINE_NUM_HEAPS> heap;
+        return heap.get(i);
     }
 
   public:
-    static coroutine_impl_wrapper* allocate()
+    static coroutine_impl_wrapper* allocate(std::size_t i)
     {
-        return get_heap().allocate();
+        return get_heap(i).allocate();
     }
-    static void deallocate(coroutine_impl_wrapper* wrapper)
+    static void deallocate(coroutine_impl_wrapper* wrapper, std::size_t i)
     {
-        get_heap().deallocate(wrapper);
+        get_heap(i).deallocate(wrapper);
     }
 
     FunctorType m_fun;
@@ -389,7 +393,8 @@ private:
       typedef coroutine_impl_wrapper<
           Functor, CoroutineType, ContextImpl, Heap> wrapper_type;
 
-      wrapper_type* wrapper = wrapper_type::allocate();
+      wrapper_type* wrapper = wrapper_type::allocate(
+          (std::size_t(id)/8) % BOOST_COROUTINE_NUM_HEAPS);
       if (NULL == wrapper)
           return new wrapper_type(f, id, stack_size);
 
@@ -402,7 +407,7 @@ private:
   inline void 
   coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl, Heap>::destroy(type* p)
   {
-      deallocate(p);
+      deallocate(p, (std::size_t(p->get_thread_id())/8) % BOOST_COROUTINE_NUM_HEAPS);
   }
 
 } } }

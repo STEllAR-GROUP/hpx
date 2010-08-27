@@ -37,20 +37,43 @@
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_INTERNAL_STACK_CREATE()                                           \
+#define HPX_INTERNAL_ITT_STACK_CREATE()                                       \
     __itt_stack_caller_create_ptr ?                                           \
         __itt_stack_caller_create_ptr() : (__itt_caller)0                     \
     /**/
-#define HPX_INTERNAL_STACK_ENTER(ctx)                                         \
+#define HPX_INTERNAL_ITT_STACK_ENTER(ctx)                                     \
     if (__itt_stack_callee_enter_ptr) { __itt_stack_callee_enter_ptr(ctx); }  \
     /**/
-#define HPX_INTERNAL_STACK_LEAVE(ctx)                                         \
+#define HPX_INTERNAL_ITT_STACK_LEAVE(ctx)                                     \
     if (__itt_stack_callee_leave_ptr) { __itt_stack_callee_leave_ptr(ctx); }  \
     /**/
-#define HPX_INTERNAL_STACK_DESTROY(ctx)                                       \
+#define HPX_INTERNAL_ITT_STACK_DESTROY(ctx)                                   \
     if (__itt_stack_caller_destroy_ptr && ctx != (__itt_caller)0) {           \
         __itt_stack_caller_destroy_ptr(ctx);                                  \
     }                                                                         \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_INTERNAL_ITT_FRAME_CREATE(name)                                   \
+    __itt_frame_create_ptr ? __itt_frame_create_ptr(name) : (__itt_frame)0    \
+    /**/
+#define HPX_INTERNAL_ITT_FRAME_BEGIN(frame)                                   \
+    if (__itt_frame_begin_ptr) { __itt_frame_begin_ptr(frame); }              \
+    /**/
+#define HPX_INTERNAL_ITT_FRAME_END(frame)                                     \
+    if (__itt_frame_end_ptr) { __itt_frame_end_ptr(frame); }                  \
+    /**/
+#define HPX_INTERNAL_ITT_FRAME_DESTROY(frame) ((void)0)
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_INTERNAL_ITT_MARK_CREATE(name)                                    \
+    __itt_mark_create_ptr ? __itt_mark_create_ptr(name) : 0                   \
+    /**/
+#define HPX_INTERNAL_ITT_MARK_OFF(mark)                                       \
+    if (__itt_mark_off_ptr) { __itt_mark_off_ptr(mark); }                     \
+    /**/
+#define HPX_INTERNAL_ITT_MARK(mark, parameter)                                \
+    if (__itt_mark_ptr) { __itt_mark_ptr(mark, parameter); }                  \
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -118,22 +141,59 @@ void itt_sync_destroy(void* addr)
 ///////////////////////////////////////////////////////////////////////////////
 __itt_caller itt_stack_create()
 {
-    return HPX_INTERNAL_STACK_CREATE();
+    return HPX_INTERNAL_ITT_STACK_CREATE();
 }
 
 void itt_stack_enter(__itt_caller ctx)
 {
-    HPX_INTERNAL_STACK_ENTER(ctx);
+    HPX_INTERNAL_ITT_STACK_ENTER(ctx);
 }
 
 void itt_stack_leave(__itt_caller ctx)
 {
-    HPX_INTERNAL_STACK_LEAVE(ctx);
+    HPX_INTERNAL_ITT_STACK_LEAVE(ctx);
 }
 
 void itt_stack_destroy(__itt_caller ctx)
 {
-    HPX_INTERNAL_STACK_DESTROY(ctx);
+    HPX_INTERNAL_ITT_STACK_DESTROY(ctx);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+__itt_frame_t* itt_frame_create(char const* name)
+{
+    return HPX_INTERNAL_ITT_FRAME_CREATE(name);
+}
+
+void itt_frame_begin(__itt_frame_t* frame)
+{
+    HPX_INTERNAL_ITT_FRAME_BEGIN(frame);
+}
+
+void itt_frame_end(__itt_frame_t* frame)
+{
+    HPX_INTERNAL_ITT_FRAME_END(frame);
+}
+
+void itt_frame_destroy(__itt_frame_t* frame)
+{
+    HPX_INTERNAL_ITT_FRAME_DESTROY(frame);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+int itt_mark_create(char const* name)
+{
+    return HPX_INTERNAL_ITT_MARK_CREATE(name);
+}
+
+void itt_mark_off(int mark)
+{
+    HPX_INTERNAL_ITT_MARK_OFF(mark);
+}
+
+void itt_mark(int mark, char const* par)
+{
+    HPX_INTERNAL_ITT_MARK(mark, par);
 }
 
 #endif // HPX_USE_ITT
