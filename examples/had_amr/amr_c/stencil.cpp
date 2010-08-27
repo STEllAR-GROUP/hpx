@@ -478,23 +478,17 @@ namespace hpx { namespace components { namespace amr
             }
           }
         }
-        // TEST
-        for (int i = 0; i < 2*size; i++) {
-          if ( mval[i]->value_.size() < mval[i]->granularity ) {
-            std::cout << " TEST TEST A " << mval[i]->value_.size() << " " << mval[i]->granularity << " i " << i << " x size " << mval[i]->x_.size() << std::endl;
-          }
-        }
-        // END TEST
         for (int i = 0; i < size; i++) {
-		  for (int k=0;k<mval[i+size]->granularity;k++) {
+          for (int k=0;k<mval[i+size]->granularity;k++) {
             int s;
-			if ( mval[0]->timestep_ < 1.e-6 ) {
+	    if ( mval[0]->timestep_ < 1.e-6 ) {
               // don't interpolate initial data
               initial_data_aux(mval[i+size].get_ptr(),*par.p);
               s = 1;
             } else {
-			  s = findpoint(mval[i],mval[i+size],k);
-			}
+	   //   s = findpoint(mval[i],mval[i+size],k);
+              s = 0;
+            }
             if ( s == 0 ) { 
               // DEBUG
               if ( par->loglevel > 0 ) {
@@ -502,17 +496,18 @@ namespace hpx { namespace components { namespace amr
               }
 
               // point not found -- interpolate
-			  for (int k = 0; k < num_eqns; k++) {
+	      for (int kk = 0; kk < num_eqns; kk++) {
                 if ( k+1 < mval[i]->granularity ) {
-			      mval[i+size]->value_[k].phi[0][k] = 0.5*(mval[i]->value_[k].phi[0][k] + mval[i]->value_[k+1].phi[0][k] );
-			    } else {
-                   mval[i+size]->value_[k].phi[0][k] = 0.5*(mval[i]->value_[mval[i]->value_.size()-1].phi[0][k] + mval[i+1]->value_[0].phi[0][k] );
+	          mval[i+size]->value_[k].phi[0][kk] = 0.5*(mval[i]->value_[k].phi[0][kk] + mval[i]->value_[k+1].phi[0][kk] );
+	        } else {
+                  BOOST_ASSERT(i+1 < size);
+                  BOOST_ASSERT(k == mval[i]->granularity-1);
+                  mval[i+size]->value_[k].phi[0][kk] = 0.5*(mval[i]->value_[k].phi[0][kk] + mval[i+1]->value_[0].phi[0][kk] );
                 }
-			  } 
-			}
+	      } 
+	    }
           }
         }
-		
   
         // re-order things so they can be used
         std::vector<had_double_type> phi, x;
@@ -524,14 +519,6 @@ namespace hpx { namespace components { namespace amr
         rightalloc.resize(2*size*par->granularity);
         over.resize(2*size*par->granularity);
         right.resize(2*size*par->granularity);
-
-		// TEST
-        for (int i = 0; i < 2*size; i++) {
-          if ( mval[i]->value_.size() < mval[i]->granularity ) {
-            std::cout << " TEST TEST B " << mval[i]->value_.size() << " " << mval[i]->granularity << " i " << i << " x size " << mval[i]->x_.size() << std::endl;
-          }
-        }
-        // END TEST
 
         std::size_t ct = 0;
         std::size_t ct1 = 0;
@@ -693,7 +680,7 @@ namespace hpx { namespace components { namespace amr
             }
           }
         }
-	  }
+      }
       return s;
     }
 
