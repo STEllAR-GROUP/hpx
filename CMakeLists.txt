@@ -159,7 +159,6 @@ endif()
 if(CMAKE_COMPILER_IS_GNUCXX OR (XIAR AND UNIX))   # gcc or Intel
     add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
     add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
-    add_definitions(-DHPX_DONT_USE_ITT)
 
     # check for availability of pthread_setaffinity_np()
     include(CheckSymbolExists)

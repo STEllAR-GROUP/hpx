@@ -35,7 +35,7 @@
 
 namespace hpx { namespace util
 {
-#if defined(HPX_USE_ITT)
+#if HPX_USE_ITT != 0
     namespace detail
     {
         template <typename Tag> 
@@ -52,7 +52,7 @@ namespace hpx { namespace util
     {
     private:
         static boost::detail::spinlock pool_[ 41 ];
-#if defined(HPX_USE_ITT)
+#if HPX_USE_ITT != 0
         static detail::itt_spinlock_init<Tag> init_;
 #endif
 
@@ -126,7 +126,7 @@ namespace hpx { namespace util
         BOOST_DETAIL_SPINLOCK_INIT
     };
 
-#if defined(HPX_USE_ITT)
+#if HPX_USE_ITT != 0
     namespace detail
     {
         template <typename Tag> 

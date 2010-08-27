@@ -6,7 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/itt_notify.hpp>
 
-#if defined(HPX_USE_ITT)
+#if HPX_USE_ITT != 0
 
 #include <ittnotify.h>
 #include <internal/ittnotify.h>

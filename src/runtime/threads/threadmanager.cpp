@@ -700,7 +700,7 @@ namespace hpx { namespace threads
                    << info;
     }
 
-#if defined(HPX_USE_ITT)
+#if HPX_USE_ITT != 0
     ///////////////////////////////////////////////////////////////////////////
     struct itt_caller_context
     {

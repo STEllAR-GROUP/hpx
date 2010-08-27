@@ -11,7 +11,7 @@
 struct ___itt_caller;
 struct __itt_frame_t;
 
-#if defined(HPX_USE_ITT)
+#if HPX_USE_ITT != 0
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_EXPORT void itt_sync_create(void* addr, const char* objtype, const char* objname);
