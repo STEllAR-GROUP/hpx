@@ -1,7 +1,7 @@
 #ifndef _HPLMATREX_STUBS_HPP
 #define _HPLMATREX_STUBS_HPP
 
-/*This is the HPLMatreX3 stub file.
+/*This is the HPLMatreX stub file.
 */
 
 #include <hpx/runtime/naming/name.hpp>

@@ -177,7 +177,7 @@ namespace hpx { namespace components { namespace server
     int HPLMatreX3::assign(){
 	for(unsigned int i=0;i<rows;i++){
 	    for(unsigned int j=0;j<columns;j++){
-		truedata[i][j] = (double) (rand() % 1000);
+		truedata[i][j] = (double)(rand() % 1000);
 	    }
 	}
 	return 1;
@@ -221,7 +221,7 @@ namespace hpx { namespace components { namespace server
 	    }
 	    std::cout<<std::endl;
 	}
-	    std::cout<<std::endl;
+	std::cout<<std::endl;
     }
 //END DEBUGGING FUNCTIONS/////////////////////////////////////////////
 
@@ -494,18 +494,14 @@ namespace hpx { namespace components { namespace server
 		    for(k=datablock[i][j]->getcolumns()-((j>=bcolumns-1)?(2):(1));k>=0;k--){
 			for(l=datablock[i][j]->getrows()-1;l>=0;l--){
                 	    solution[row+l]-=datablock[i][j]->get(l,k)*solution[col+k];
-			datablock[i][j]->set(l,k,3333);
             	}   }   }
 		//this block of code following the else statement handles all data blocks
 		//that do include elements on the diagonal
 		else{
 		    for(k=datablock[i][i]->getcolumns()-((i==bcolumns-1)?(2):(1));k>=0;k--){
 			solution[row+k]/=datablock[i][i]->get(k,k);
-			datablock[i][i]->set(k,k,9999);
-//			std::cout<<solution[row+k]<<std::endl;
 			for(l=k-1;l>=0;l--){
                 	    solution[row+l]-=datablock[i][i]->get(l,k)*solution[col+k];
-			datablock[i][i]->set(l,k,3333);
         }   }	}   }	}
 
 	return 1;
