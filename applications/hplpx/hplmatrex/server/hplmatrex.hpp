@@ -276,7 +276,7 @@ namespace hpx { namespace components { namespace server
 
 	//allocate memory space to store the solution
 	solution = (double*) std::malloc(rows*sizeof(double));
-std::cout<<"before back\n";
+//std::cout<<"before back\n";
 	bsubst_future bsub(_gid);
 
 	unsigned int h = std::ceil(((float)rows)*.5);
@@ -375,23 +375,23 @@ std::cout<<"before back\n";
 				wait = true;
 			}   }
 			if(!wait){
-std::cout<<i<<","<<i<<" beginning\n";
+//std::cout<<i<<","<<i<<" beginning\n";
 			    main_futures.push_back(gmain_future(_gid,i,i,temp,0));
 			    datablock[i][i]->setbusy();
 //			    applier::apply<gmain_action>(_gid,i,i,temp,0);
 			    for(j=i-1;j>temp;j--){
-std::cout<<i<<","<<j<<" beginning\n";
+//std::cout<<i<<","<<j<<" beginning\n";
 	    			main_futures.push_back(gmain_future(_gid,i,j,temp,0));
 				datablock[i][j]->setbusy();
-std::cout<<j<<","<<i<<" beginning\n";
+//std::cout<<j<<","<<i<<" beginning\n";
 	    			main_futures.push_back(gmain_future(_gid,j,i,temp,0));
 				datablock[j][i]->setbusy();
 	    }	}	}   }
 	    iteration = datablock[brows-1][brows-1]->getiteration()+1;
 	}
 	//wait for the last of the computations to finish
-std::cout<<"WHY AM I HERE?\n";
 	while(datablock[brows-1][brows-1]->getbusy()){}
+	main_futures.back().get();
     }
 
     //LUgaussmain is a wrapper function which is used so that only one type of action
@@ -410,11 +410,10 @@ std::cout<<"WHY AM I HERE?\n";
 //std::cout<<iter+1<<"after while "<<datablock[iter+1][iter+1]->getiteration()<<"\n";
 		    if(iter+1 == brow){LUgaussmain(brow,bcol,brow,2);}
 		    else{LUgaussmain(brow,bcol,bcol,3);}
-		}
-	}
+	}	}
 	datablock[brow][bcol]->update();
 //std::cout<<brow<<","<<bcol<<" completed\n";
-print3();
+//print3();
 	return 1;
     }
 
