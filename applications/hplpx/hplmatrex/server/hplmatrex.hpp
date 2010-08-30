@@ -347,7 +347,7 @@ std::cout<<"before back\n";
 	unsigned int iteration = 1;
 	unsigned int brow, bcol, temp;
 	unsigned int i,j;
-int count = 0;
+
 	//the first corner and top row and left columns must have gaussian elimination
 	//initiated explicitly
 	LUgausscorner(0);
@@ -359,26 +359,34 @@ int count = 0;
 	}
 
 	//this is the main loop of the LUdivide function
-	while(iteration < brows-1){
+	while(iteration < brows){
 	    for(i=iteration;i<brows;i++){
-count++;
 		temp = datablock[i][i]->getiteration();
 		if(temp+1 == datablock[temp][i]->getiteration() &&
 		   temp+1 == datablock[i][temp]->getiteration() &&
 		   !datablock[i][i]->getbusy()){
-//std::cout<<i<<" is "<<temp<<" at "<<count<<"\n";
-//std::cout<<"above is "<<datablock[temp][i]->getiteration()<<"\n";
-//std::cout<<"left is "<<datablock[i][temp]->getiteration()<<"\n";
-		        main_futures.push_back(gmain_future(_gid,i,i,temp,0));
-			datablock[i][i]->setbusy();
-//			applier::apply<gmain_action>(_gid,i,i,temp,0);
+			bool wait = false;
+			//double check the iteration of datablock[i][i]
+			if(datablock[i][i]->getiteration() >= i){wait = true;}
+			//make sure all necessary cells have completed
 			for(j=i-1;j>temp;j--){
-	    		    main_futures.push_back(gmain_future(_gid,i,j,temp,0));
-			    datablock[i][j]->setbusy();
-	    		    main_futures.push_back(gmain_future(_gid,j,i,temp,0));
-			    datablock[j][i]->setbusy();
-//std::cout<<i<<","<<j<<"\n";
-	    }	}	}
+			    if(datablock[i][j]->getbusy() ||
+			       datablock[j][i]->getbusy()){
+				wait = true;
+			}   }
+			if(!wait){
+std::cout<<i<<","<<i<<" beginning\n";
+			    main_futures.push_back(gmain_future(_gid,i,i,temp,0));
+			    datablock[i][i]->setbusy();
+//			    applier::apply<gmain_action>(_gid,i,i,temp,0);
+			    for(j=i-1;j>temp;j--){
+std::cout<<i<<","<<j<<" beginning\n";
+	    			main_futures.push_back(gmain_future(_gid,i,j,temp,0));
+				datablock[i][j]->setbusy();
+std::cout<<j<<","<<i<<" beginning\n";
+	    			main_futures.push_back(gmain_future(_gid,j,i,temp,0));
+				datablock[j][i]->setbusy();
+	    }	}	}   }
 	    iteration = datablock[brows-1][brows-1]->getiteration()+1;
 	}
 	//wait for the last of the computations to finish
@@ -405,7 +413,7 @@ std::cout<<"WHY AM I HERE?\n";
 		}
 	}
 	datablock[brow][bcol]->update();
-std::cout<<brow<<","<<bcol<<" completed\n";
+//std::cout<<brow<<","<<bcol<<" completed\n";
 print3();
 	return 1;
     }
