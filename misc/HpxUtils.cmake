@@ -155,9 +155,9 @@ macro(ADD_HPX_EXECUTABLE name)
 
     add_definitions(-DHPX_APPLICATION_EXPORTS)
 
-   if(UNIX)
-        set(hpx_LIBRARIES ${hpx_LIBRARIES} rt pthread)
-   endif()
+if(UNIX)
+    set(hpx_LIBRARIES ${hpx_LIBRARIES} rt pthread)
+endif()
 
     # add the executable build target
     add_executable(${name}_exe 

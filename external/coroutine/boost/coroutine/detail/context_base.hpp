@@ -377,7 +377,11 @@ namespace boost { namespace coroutines { namespace detail {
       m_state = ctx_ready;
       m_exit_state = ctx_exit_not_requested;
       m_exit_status = ctx_not_exited;
+#if BOOST_VERSION <= 104200
+      m_type_info = boost::exception_ptr();
+#else
       m_type_info.reset();
+#endif
     }
 
     // Cause the coroutine to exit if 
