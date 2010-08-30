@@ -37,8 +37,8 @@ endif()
 
 # Enable testing
 if("$ENV{HPX_TESTS}" STREQUAL "all")
-  SET(CMAKE_SKIP_RPATH TRUE)
-  ENABLE_TESTING()
+    set(CMAKE_SKIP_RPATH TRUE)
+    ENABLE_TESTING()
 endif("$ENV{HPX_TESTS}" STREQUAL "all")
 
 # We need to use Boost, namely the following Boost libraries
@@ -150,7 +150,7 @@ if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
     add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
     # suppress certain warnings
-    add_definitions(-wd4251 -wd4231 -wd4275 -wd4660 -wd4094 -wd4267 -wd4180)
+    add_definitions(-wd4251 -wd4231 -wd4275 -wd4660 -wd4094 -wd4267 -wd4180 -wd4244)
     if(CMAKE_CL_64)
         add_definitions(-DBOOST_COROUTINE_USE_FIBERS)
     endif()
