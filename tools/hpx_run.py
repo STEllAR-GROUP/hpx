@@ -563,6 +563,10 @@ if __name__=="__main__":
   parser = setup_options()
   (options, args) = parser.parse_args()
 
+  # Check for PBS_NODEFILE environment variable
+  if not options.machine_file:
+    options.machine_file = os.getenv("PBS_NODEFILE")
+
   if (len(args) > 0):
     run(options, args)
   else:
