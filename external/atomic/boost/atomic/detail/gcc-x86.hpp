@@ -366,8 +366,14 @@ public:
             "=A" (prev) : "b" ((long)desired), "c" ((long)(desired>>32)), "m" (i), "0" (prev) : "memory");
 #else
         // -fPIC requires register EBX to be available to the compiler
+
+        // note: when trying to use explicit casts for %1 to inform compiler 
+        // about its 32-bit size, the results are wrong (unnecessary
+        // dereference). Passing an unmodified "desired" as the argument 
+        // seems to yield the cleanest assembly code, despite T being larger 
+        // than 4 bytes.
         __asm__ __volatile__("push %%ebx; movl %1,%%ebx; lock; cmpxchg8b %3; pop %%ebx\n" :
-            "=A" (prev) : "m" ((long)desired), "c" ((long)(desired>>32)), "m" (i), "0" (prev) : "memory");
+			     "=A" (prev) : "m" (desired), "c" ((long)(desired>>32)), "m" (i), "0" (prev) : "memory");
 #endif
         bool success=(prev==expected);
         if (success) fence_after(success_order);
