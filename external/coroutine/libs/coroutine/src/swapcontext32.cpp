@@ -70,6 +70,7 @@
         ".text \n\t"                                                          \
         ".align 16\n\t"                                                       \
         ".globl " #name "\n\t"                                                \
+        ".type " #name ", @function\n\t"                                      \
     #name":\n\t"                                                              \
         "movl  16(%edx), %ecx\n\t"                                            \
         "pushl %ebp\n\t"                                                      \
