@@ -60,18 +60,16 @@ namespace hpx { namespace components { namespace server
 	int assign(unsigned int row, unsigned int offset, bool complete);
 	void pivot();
 	int swap(unsigned int brow, unsigned int bcol);
-	void LUdivide();
 	void LUgausscorner(unsigned int iter);
 	void LUgausstop(unsigned int iter, unsigned int bcol);
 	void LUgaussleft(unsigned int brow, unsigned int iter);
 	void LUgausstrail(unsigned int brow, unsigned int bcol, unsigned int iter);
-	int LUgaussmain(unsigned int brow, unsigned int bcol, unsigned int iter,
+	int LUgaussmain(unsigned int brow, unsigned int bcol, int iter,
 		unsigned int type);
 	int LUbacksubst();
 	double checksolve(unsigned int row, unsigned int offset, bool complete);
 	void print();
 	void print2();
-	void print3();
 
 	int rows;			//number of rows in the matrix
 	int brows;			//number of rows of blocks in the matrix
@@ -113,7 +111,7 @@ namespace hpx { namespace components { namespace server
 		unsigned int, &HPLMatreX::swap> swap_action;
 	//the main gaussian function
 	typedef actions::result_action4<HPLMatreX, int, hpl_gmain, unsigned int, unsigned
-		int, unsigned int, unsigned int, &HPLMatreX::LUgaussmain> gmain_action;
+		int, int, unsigned int, &HPLMatreX::LUgaussmain> gmain_action;
 	//backsubstitution function
 	typedef actions::result_action0<HPLMatreX, int, hpl_bsubst,
 		&HPLMatreX::LUbacksubst> bsubst_action;
@@ -128,6 +126,9 @@ namespace hpx { namespace components { namespace server
 	//Here is the swap future, which works the same way as the assign future
 	typedef lcos::eager_future<server::HPLMatreX::swap_action> swap_future;
 
+	//This future corresponds to the Gaussian elimination functions
+	typedef lcos::eager_future<server::HPLMatreX::gmain_action> gmain_future;
+
 	//the backsubst future is used to make sure all computations are complete before
 	//returning from LUsolve, to avoid killing processes and erasing the leftdata while
 	//it is still being worked on
@@ -136,6 +137,16 @@ namespace hpx { namespace components { namespace server
 	//the final future type for the class is used for checking the accuracy of
 	//the results of the LU decomposition
 	typedef lcos::eager_future<server::HPLMatreX::check_action> check_future;
+
+//***//
+	//central_futures is an array of pointers to future which needs to be kept global
+	//to this class and is used to represent LUgausscorner inducing gmain_futures
+	gmain_future** central_futures;
+
+	//top_futures and left_futures are 2d arrays of pointers to futures similar to
+	//central_futures
+	gmain_future*** top_futures;
+	gmain_future*** left_futures;
     };
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -156,16 +167,19 @@ namespace hpx { namespace components { namespace server
 
 // / / / / / / / / / / / / / / / / / / / / / / / / / / /
 
-	int i; 			 //just counting variable
+	int i,j; 			 //just counting variable
 	unsigned int offset = 1; //the initial offset used for the memory handling algorithm
 
+	central_futures = (gmain_future**) std::malloc(brows*sizeof(gmain_future*));
+	left_futures = (gmain_future***) std::malloc(brows*sizeof(gmain_future**));
+	top_futures = (gmain_future***) std::malloc(brows*sizeof(gmain_future**));
 	datablock = (LUblock***) std::malloc(brows*sizeof(LUblock**));
 	factordata = (double**) std::malloc(h*sizeof(double*));
 	truedata = (double**) std::malloc(h*sizeof(double*));
 	pivotarr = (int*) std::malloc(h*sizeof(int));
 	srand(time(NULL));
 
-	//by making offset a power of two, the allocate and assign functions
+	//by making offset a power of two, the assign functions
 	//are much simpler than they would be otherwise
 	h=std::ceil(((float)h)*.5);
 	while(offset < h){offset *= 2;}
@@ -173,15 +187,20 @@ namespace hpx { namespace components { namespace server
 	allocate();
 
 	//here we initialize the the matrix
-//	lcos::eager_future<server::HPLMatreX::assign_action>
-//		assign_future(gid,(unsigned int)0,offset,false);
-	assign(1,1,true);
+	lcos::eager_future<server::HPLMatreX::assign_action>
+		assign_future(gid,(unsigned int)0,offset,false);
 	//initialize the pivot array
 	for(i=0;i<rows;i++){pivotarr[i]=i;}
+	for(i=0;i<brows;i++){
+		central_futures[i] = NULL;
+		for(j=0;j<i;j++){
+			left_futures[i][j] = NULL;
+		}
+		for(j=0;j<brows-i-1;j++){
+			top_futures[i][j] = NULL;
+	}	}
 	//make sure that everything has been allocated their memory
-//	assign_future.get();
-
-	return 1;
+	return assign_future.get();
     }
 
     //allocate() allocates memory space for the matrix
@@ -192,16 +211,41 @@ namespace hpx { namespace components { namespace server
 	}
 	for(unsigned int i = 0;i < brows;i++){
 	    datablock[i] = (LUblock**)std::malloc(brows*sizeof(LUblock*));
+	    top_futures[i] = (gmain_future**)std::malloc((brows-i-1)*sizeof(gmain_future*));
+	    left_futures[i] = (gmain_future**)std::malloc(i*sizeof(gmain_future*));
 	}
     }
 
     //assign gives values to the empty elements of the array
     int HPLMatreX::assign(unsigned int row, unsigned int offset, bool complete){
-	for(unsigned int i=0;i<rows;i++){
-	    for(unsigned int j=0;j<columns;j++){
-		truedata[i][j] = (double) (rand() % 1000);
-	    }
+        //futures is used to allow this thread to continue spinning off new threads
+        //while other threads work, and is checked at the end to make certain all
+        //threads are completed before returning.
+        std::vector<assign_future> futures;
+
+	//create multiple futures which in turn create more futures
+        while(!complete){
+            if(offset <= 1){
+                if(row + offset < rows){
+                    futures.push_back(assign_future(_gid,row+offset,offset,true));
+                }
+                complete = true;
+            }
+            else{
+                if(row + offset < rows){
+                    futures.push_back(assign_future(_gid,row+offset,offset*.5,false));
+                }
+                offset*=.5;
+            }
+        }
+	for(unsigned int i=0;i<columns;i++){
+	    truedata[row][i] = (double) (rand() % 1000);
 	}
+
+	//once all spun off futures are complete we are done
+        BOOST_FOREACH(assign_future af, futures){
+                af.get();
+        }
 	return 1;
     }
 
@@ -258,25 +302,20 @@ namespace hpx { namespace components { namespace server
 	}
 	    std::cout<<std::endl;
     }
-    void HPLMatreX::print3(){
-	for(int i = 0;i<brows;i++){
-	    for(int j=0;j<brows;j++){
-		std::cout<<datablock[i][j]->getiteration()<<" ";
-	    }
-	    std::cout<<std::endl;
-	}
-	std::cout<<std::endl;
-    }
 //END DEBUGGING FUNCTIONS/////////////////////////////////////////////
 
     //LUsolve is simply a wrapper function for LUfactor and LUbacksubst
     double HPLMatreX::LUsolve(){
+	//first perform partial pivoting
 	pivot();
-	LUdivide();
+
+	//to initiate the Gaussian elimination, create a future to obtain the final
+	//set of computations we will need
+	gmain_future main_future(_gid,brows-1,brows-1,brows-1,1);
+	main_future.get();
 
 	//allocate memory space to store the solution
 	solution = (double*) std::malloc(rows*sizeof(double));
-//std::cout<<"before back\n";
 	bsubst_future bsub(_gid);
 
 	unsigned int h = std::ceil(((float)rows)*.5);
@@ -336,84 +375,48 @@ namespace hpx { namespace components { namespace server
 	}   }
     }
 
-    //LUdivide is a wrapper function for the gaussian elimination functions,
-    //although the process of properly dividing up the computations across
-    //the different blocks using slightly different functions does require
-    //the delegation provided by this wrapper
-    void HPLMatreX::LUdivide(){
-	typedef lcos::eager_future<server::HPLMatreX::gmain_action> gmain_future;
-
-	std::vector<gmain_future> main_futures;
-	unsigned int iteration = 1;
-	unsigned int brow, bcol, temp;
-	unsigned int i,j;
-
-	//the first corner and top row and left columns must have gaussian elimination
-	//initiated explicitly
-	LUgausscorner(0);
-	for(i=1;i<brows;i++){
-	    main_futures.push_back(gmain_future(_gid,0,i,0,2));
-	    datablock[0][i]->setbusy();
-	    main_futures.push_back(gmain_future(_gid,i,0,0,3));
-	    datablock[i][0]->setbusy();
-	}
-
-	//this is the main loop of the LUdivide function
-	while(iteration < brows){
-	    for(i=iteration;i<brows;i++){
-		temp = datablock[i][i]->getiteration();
-		if(temp+1 == datablock[temp][i]->getiteration() &&
-		   temp+1 == datablock[i][temp]->getiteration() &&
-		   !datablock[i][i]->getbusy()){
-			bool wait = false;
-			//double check the iteration of datablock[i][i]
-			if(datablock[i][i]->getiteration() >= i){wait = true;}
-			//make sure all necessary cells have completed
-			for(j=i-1;j>temp;j--){
-			    if(datablock[i][j]->getbusy() ||
-			       datablock[j][i]->getbusy()){
-				wait = true;
-			}   }
-			if(!wait){
-//std::cout<<i<<","<<i<<" beginning\n";
-			    main_futures.push_back(gmain_future(_gid,i,i,temp,0));
-			    datablock[i][i]->setbusy();
-//			    applier::apply<gmain_action>(_gid,i,i,temp,0);
-			    for(j=i-1;j>temp;j--){
-//std::cout<<i<<","<<j<<" beginning\n";
-	    			main_futures.push_back(gmain_future(_gid,i,j,temp,0));
-				datablock[i][j]->setbusy();
-//std::cout<<j<<","<<i<<" beginning\n";
-	    			main_futures.push_back(gmain_future(_gid,j,i,temp,0));
-				datablock[j][i]->setbusy();
-	    }	}	}   }
-	    iteration = datablock[brows-1][brows-1]->getiteration()+1;
-	}
-	//wait for the last of the computations to finish
-	while(datablock[brows-1][brows-1]->getbusy()){}
-	main_futures.back().get();
-    }
-
     //LUgaussmain is a wrapper function which is used so that only one type of action
-    //is needed during LUdivide instead of four types of actions
-    int HPLMatreX::LUgaussmain(unsigned int brow,unsigned int bcol,unsigned int iter,
+    //is needed instead of four types of actions
+    int HPLMatreX::LUgaussmain(unsigned int brow,unsigned int bcol,int iter,
 	    unsigned int type){
-	if(type == 1){LUgausscorner(iter);}
-	else if(type == 2){LUgausstop(iter,bcol);}
-	else if(type == 3){LUgaussleft(brow,iter);}
+	//if the following conditional is true, then there is nothing to do
+	if(type == 0 && (brow == 0 || bcol == 0) || iter < 0){return 1;}
+
+	//we will need to create a future to perform LUgausstrail regardless
+	//of what this current function instance will compute
+	gmain_future trail_future(_gid,brow,bcol,iter-1,0);
+	if(type == 1){
+		trail_future.get();
+		LUgausscorner(iter);
+	}
+	else if(type == 2){
+		if(central_futures[iter] == NULL){
+			central_futures[iter] = new gmain_future(_gid,iter,iter,iter,1);
+		}
+		trail_future.get();
+		central_futures[iter]->get();
+		LUgausstop(iter,bcol);
+	}
+	else if(type == 3){
+		if(central_futures[iter] == NULL){
+			central_futures[iter] = new gmain_future(_gid,iter,iter,iter,1);
+		}
+		trail_future.get();
+		central_futures[iter]->get();
+		LUgaussleft(brow,iter);
+	}
 	else{
+		if(top_futures[iter][bcol-iter-1] == NULL){
+			top_futures[iter][bcol-iter-1] = new gmain_future(_gid,iter,bcol,iter,2);
+		}
+		if(left_futures[brow][iter] == NULL){
+			left_futures[brow][iter] = new gmain_future(_gid,brow,iter,iter,3);
+		}
+		trail_future.get();
+		top_futures[iter][bcol-iter-1]->get();
+		left_futures[brow][iter]->get();
 		LUgausstrail(brow,bcol,iter);
-		if(iter+1 == brow && brow == bcol){LUgaussmain(brow,bcol,brow,1);}
-		else if(iter+1 == brow || iter+1 == bcol){
-//std::cout<<iter+1<<"before while "<<datablock[iter+1][iter+1]->getiteration()<<"\n";
-		    while(datablock[iter+1][iter+1]->getiteration() <= iter+1){}
-//std::cout<<iter+1<<"after while "<<datablock[iter+1][iter+1]->getiteration()<<"\n";
-		    if(iter+1 == brow){LUgaussmain(brow,bcol,brow,2);}
-		    else{LUgaussmain(brow,bcol,bcol,3);}
-	}	}
-	datablock[brow][bcol]->update();
-//std::cout<<brow<<","<<bcol<<" completed\n";
-//print3();
+	}
 	return 1;
     }
 
