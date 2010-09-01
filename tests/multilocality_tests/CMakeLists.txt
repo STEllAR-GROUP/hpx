@@ -16,8 +16,10 @@ foreach(test ${TESTS})
 endforeach()
 
 # Add to testing suite
-add_hpx_test_sweep(${TESTS_dir}/startup_test)
+add_hpx_test_sweep(
+    ${TESTS_dir}/startup_test
+    SWEEP_HPX -s -c startup_test)
 add_hpx_test_sweep(
     ${TESTS_dir}/cpi_test
     SWEEP_APP --throws 10000000 
-    SWEEP_HPX -s)
+    SWEEP_HPX -s -c cpi_test)

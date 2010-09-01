@@ -187,7 +187,7 @@ class DistributedRuntime(dict):
         self[runtime_id].load(node,locality)
 
       del R[0]
-  
+
   def start(self, command, options):
     # Setup environment
     environment = Environment()
@@ -238,6 +238,11 @@ class DistributedRuntime(dict):
         for runtime in self.values():
           runtime.start()
       else:
+        # Clean up any hanging runs. This is necessary because a hanging HPX
+        # runtime might be holding a port that we need.
+        if len(options.clean) > 0:
+          self.__pre_clean(options.clean)
+
         cleanup_file = open("cleanup.%d.sh" % (os.getpid()), 'w')
         cleanup_file.write("#!/bin/bash\n\n")
         for runtime in self.values():
@@ -280,6 +285,14 @@ class DistributedRuntime(dict):
 
     return pid
 
+  def __pre_clean(self, app_name):
+    for runtime in self.values():
+      clean_cmd = "kill \-n 9 \`ps ax | grep %s | grep -v hpx_run | grep -v ctest | grep -v grep | awk '//{print \$1}'\`" % (app_name)
+      ssh_cmd = "ssh %s \"%s\"" % (runtime.node.name, clean_cmd)
+
+      process = subprocess.Popen(ssh_cmd, shell=True, stdout=subprocess.PIPE)
+      (stdout, stderr) = process.communicate()
+
 class LocalRuntime:
   """
   An instance of a local runtime system.
@@ -308,7 +321,7 @@ class LocalRuntime:
     repr = "Local runtime instance '%s':\n" % (self.id)
     repr += "\tHPX command: %s\n" % (self.hpx_command)
     repr += "\tEnvironment: %s\n" % (self.environment)
-    if not self.environment.is_virtual:
+    if self.environment and not self.environment.is_virtual:
       command = '\\"'.join(hpx_command.split('"'))
       repr += "\tSSH: ssh %s \"%s %s\"" % (node_name, environment, command)
 
@@ -528,6 +541,10 @@ def setup_options():
                     action="store", type="int",
                     dest="app_loglevel", default=0,
                     help="Enable application logging at specified level (default 0)")
+  parser.add_option("-c", "--clean",
+                    action="store", type="string",
+                    dest="clean", default="",
+                    help="Adds support for cleaning up failed runs")
   parser.add_option("-d", "--debug",
                     action="store_true",
                     dest="debug_mode", default=False,
