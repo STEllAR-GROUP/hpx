@@ -239,7 +239,7 @@ namespace hpx { namespace actions
         ///
         static Result execute_function(naming::address::address_type lva)
         {
-            LTM_(debug) << "Executing direct action" 
+            LTM_(debug) << "Executing direct action " 
                         << detail::get_action_name<plain_direct_result_action0>()
                         << ".";
             return F();
@@ -479,7 +479,7 @@ namespace hpx { namespace actions
         ///
         static util::unused_type execute_function(naming::address::address_type lva)
         {
-            LTM_(debug) << "Executing direct action" 
+            LTM_(debug) << "Executing direct action " 
                         << detail::get_action_name<plain_direct_action0>()
                         << ".";
             F();
