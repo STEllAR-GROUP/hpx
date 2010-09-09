@@ -384,40 +384,73 @@ namespace hpx { namespace components { namespace server
 	//if the following conditional is true, then there is nothing to do
 	if(type == 0 && (brow == 0 || bcol == 0) || iter < 0){return 1;}
 
+	//used to decide if a new future needs to be made or not
+	bool made = true;
 	//we will need to create a future to perform LUgausstrail regardless
 	//of what this current function instance will compute
 	gmain_future trail_future(_gid,brow,bcol,iter-1,0);
-//	lcos::mutex::scoped_lock l(mtex);
 	if(type == 1){
 		trail_future.get();
 		LUgausscorner(iter);
 	}
 	else if(type == 2){
-		if(central_futures[iter] == NULL){
+/*		{
+		    lcos::mutex::scoped_lock l(mtex);
+		    if(central_futures[iter] == NULL){
+			made = false;
+			central_futures[iter] = 0
+		    }
+		}
+		if(!made){
+*/		{
+		    lcos::mutex::scoped_lock l(mtex);
+		    if(central_futures[iter] == NULL){
 std::cout<<"make central "<<iter<<","<<iter<<" "<<iter<<"\n";
 			central_futures[iter] = new gmain_future(_gid,iter,iter,iter,1);
+		    }
 		}
 		trail_future.get();
 		central_futures[iter]->get();
 		LUgausstop(iter,bcol);
 	}
 	else if(type == 3){
-		if(central_futures[iter] == NULL){
+/*		{
+		    lcos::mutex::scoped_lock l(mtex);
+		    if(central_futures[iter] == NULL){
+			made = false;
+			central_futures[iter] = 0
+		    }
+		}
+		if(!made){
+*/		{
+		    lcos::mutex::scoped_lock l(mtex);
+		    if(central_futures[iter] == NULL){
 std::cout<<"make central "<<iter<<","<<iter<<" "<<iter<<"\n";
 			central_futures[iter] = new gmain_future(_gid,iter,iter,iter,1);
+		    }
 		}
 		trail_future.get();
 		central_futures[iter]->get();
 		LUgaussleft(brow,iter);
 	}
 	else{
-		if(top_futures[iter][bcol-iter-1] == NULL){
+/*		{
+		    lcos::mutex::scoped_lock l(mtex);
+		    if(top_futures[iter][bcol-iter-1] == NULL){
+			made = false;
+			top_futures[iter][bcol-iter-1] = 0;
+		    }
+		}
+*/		{
+		    lcos::mutex::scoped_lock l(mtex);
+		    if(top_futures[iter][bcol-iter-1] == NULL){
 std::cout<<"make top "<<iter<<","<<bcol<<" "<<iter<<"\n";
 			top_futures[iter][bcol-iter-1] = new gmain_future(_gid,iter,bcol,iter,2);
-		}
-		if(left_futures[brow][iter] == NULL){
+		    }
+		    if(left_futures[brow][iter] == NULL){
 std::cout<<"make left "<<brow<<","<<iter<<" "<<iter<<"\n";
 			left_futures[brow][iter] = new gmain_future(_gid,brow,iter,iter,3);
+		    }
 		}
 		trail_future.get();
 		top_futures[iter][bcol-iter-1]->get();
