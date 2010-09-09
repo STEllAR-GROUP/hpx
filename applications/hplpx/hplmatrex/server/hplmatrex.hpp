@@ -84,6 +84,7 @@ namespace hpx { namespace components { namespace server
         double* solution;		//for storing the solution
 	int* pivotarr;			//array for storing pivot elements
 					//(maps original rows to pivoted rows)
+	lcos::mutex mtex;		//mutex
 
     public:
 	//here we define the actions that will be used
@@ -155,13 +156,13 @@ namespace hpx { namespace components { namespace server
 		unsigned int ab, unsigned int bs){
 // / / /initialize class variables/ / / / / / / / / / / /
 	if(ab > std::ceil(((float)h)*.5)){
-		allocblock=std::ceil(((float)h)*.5);}
+		allocblock=(int)std::ceil(((float)h)*.5);}
 	else{allocblock=ab;}
 	if(bs > h){
 		blocksize=h;}
 	else{blocksize=bs;}
 	rows=h;
-	brows=std::floor((float)h/blocksize);
+	brows=(int)std::floor((float)h/blocksize);
 	columns=w;
 	_gid = gid;
 
@@ -181,7 +182,7 @@ namespace hpx { namespace components { namespace server
 
 	//by making offset a power of two, the assign functions
 	//are much simpler than they would be otherwise
-	h=std::ceil(((float)h)*.5);
+	h=(unsigned int)std::ceil(((float)h)*.5);
 	while(offset < h){offset *= 2;}
 
 	allocate();
@@ -233,9 +234,10 @@ namespace hpx { namespace components { namespace server
             }
             else{
                 if(row + offset < rows){
-                    futures.push_back(assign_future(_gid,row+offset,offset*.5,false));
+                    futures.push_back(assign_future(_gid,row+offset,
+			(unsigned int)(offset*.5),false));
                 }
-                offset*=.5;
+                offset = (unsigned int)(offset*.5);
             }
         }
 	for(unsigned int i=0;i<columns;i++){
@@ -318,7 +320,7 @@ namespace hpx { namespace components { namespace server
 	solution = (double*) std::malloc(rows*sizeof(double));
 	bsubst_future bsub(_gid);
 
-	unsigned int h = std::ceil(((float)rows)*.5);
+	unsigned int h = (unsigned int)std::ceil(((float)rows)*.5);
 	unsigned int offset = 1;
 	while(offset < h){offset *= 2;}
 	bsub.get();
@@ -334,18 +336,18 @@ namespace hpx { namespace components { namespace server
 	unsigned int max, max_row;
 	unsigned int temp_piv;
 	double temp;
-	unsigned int h = std::ceil(((float)rows)*.5);
+	unsigned int h = (unsigned int)std::ceil(((float)rows)*.5);
 
 	//This first section of the pivot() function finds all of the pivot
 	//values to compute the final pivot array
 	for(unsigned int i=0;i<rows-1;i++){
 	    max_row = i;
-	    max = fabs(truedata[pivotarr[i]][i]);
+	    max = (unsigned int)fabs(truedata[pivotarr[i]][i]);
 	    temp_piv = pivotarr[i];
 	    for(unsigned int j=i+1;j<rows;j++){
-		temp = fabs(truedata[pivotarr[j]][i]);
+		temp = (unsigned int)fabs(truedata[pivotarr[j]][i]);
 		if(temp > max){
-		    max = temp;
+		    max = (unsigned int)temp;
 		    max_row = j;
 	    }	}
 	    pivotarr[i] = pivotarr[max_row];
@@ -385,12 +387,14 @@ namespace hpx { namespace components { namespace server
 	//we will need to create a future to perform LUgausstrail regardless
 	//of what this current function instance will compute
 	gmain_future trail_future(_gid,brow,bcol,iter-1,0);
+//	lcos::mutex::scoped_lock l(mtex);
 	if(type == 1){
 		trail_future.get();
 		LUgausscorner(iter);
 	}
 	else if(type == 2){
 		if(central_futures[iter] == NULL){
+std::cout<<"make central "<<iter<<","<<iter<<" "<<iter<<"\n";
 			central_futures[iter] = new gmain_future(_gid,iter,iter,iter,1);
 		}
 		trail_future.get();
@@ -399,6 +403,7 @@ namespace hpx { namespace components { namespace server
 	}
 	else if(type == 3){
 		if(central_futures[iter] == NULL){
+std::cout<<"make central "<<iter<<","<<iter<<" "<<iter<<"\n";
 			central_futures[iter] = new gmain_future(_gid,iter,iter,iter,1);
 		}
 		trail_future.get();
@@ -407,9 +412,11 @@ namespace hpx { namespace components { namespace server
 	}
 	else{
 		if(top_futures[iter][bcol-iter-1] == NULL){
+std::cout<<"make top "<<iter<<","<<bcol<<" "<<iter<<"\n";
 			top_futures[iter][bcol-iter-1] = new gmain_future(_gid,iter,bcol,iter,2);
 		}
 		if(left_futures[brow][iter] == NULL){
+std::cout<<"make left "<<brow<<","<<iter<<" "<<iter<<"\n";
 			left_futures[brow][iter] = new gmain_future(_gid,brow,iter,iter,3);
 		}
 		trail_future.get();
@@ -559,9 +566,10 @@ namespace hpx { namespace components { namespace server
             }
             else{
                 if(row + offset < rows){
-                    futures.push_back(check_future(_gid,row+offset,offset*.5,false));
+			futures.push_back(check_future(_gid,row+offset,
+				(unsigned int)(offset*.5),false));
                 }
-                offset*=.5;
+                offset = (unsigned int)(offset*.5);
             }
         }
 
