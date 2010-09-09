@@ -394,18 +394,9 @@ namespace hpx { namespace components { namespace server
 		LUgausscorner(iter);
 	}
 	else if(type == 2){
-/*		{
+		{
 		    lcos::mutex::scoped_lock l(mtex);
 		    if(central_futures[iter] == NULL){
-			made = false;
-			central_futures[iter] = 0
-		    }
-		}
-		if(!made){
-*/		{
-		    lcos::mutex::scoped_lock l(mtex);
-		    if(central_futures[iter] == NULL){
-std::cout<<"make central "<<iter<<","<<iter<<" "<<iter<<"\n";
 			central_futures[iter] = new gmain_future(_gid,iter,iter,iter,1);
 		    }
 		}
@@ -414,18 +405,9 @@ std::cout<<"make central "<<iter<<","<<iter<<" "<<iter<<"\n";
 		LUgausstop(iter,bcol);
 	}
 	else if(type == 3){
-/*		{
+		{
 		    lcos::mutex::scoped_lock l(mtex);
 		    if(central_futures[iter] == NULL){
-			made = false;
-			central_futures[iter] = 0
-		    }
-		}
-		if(!made){
-*/		{
-		    lcos::mutex::scoped_lock l(mtex);
-		    if(central_futures[iter] == NULL){
-std::cout<<"make central "<<iter<<","<<iter<<" "<<iter<<"\n";
 			central_futures[iter] = new gmain_future(_gid,iter,iter,iter,1);
 		    }
 		}
@@ -434,21 +416,12 @@ std::cout<<"make central "<<iter<<","<<iter<<" "<<iter<<"\n";
 		LUgaussleft(brow,iter);
 	}
 	else{
-/*		{
+		{
 		    lcos::mutex::scoped_lock l(mtex);
 		    if(top_futures[iter][bcol-iter-1] == NULL){
-			made = false;
-			top_futures[iter][bcol-iter-1] = 0;
-		    }
-		}
-*/		{
-		    lcos::mutex::scoped_lock l(mtex);
-		    if(top_futures[iter][bcol-iter-1] == NULL){
-std::cout<<"make top "<<iter<<","<<bcol<<" "<<iter<<"\n";
 			top_futures[iter][bcol-iter-1] = new gmain_future(_gid,iter,bcol,iter,2);
 		    }
 		    if(left_futures[brow][iter] == NULL){
-std::cout<<"make left "<<brow<<","<<iter<<" "<<iter<<"\n";
 			left_futures[brow][iter] = new gmain_future(_gid,brow,iter,iter,3);
 		    }
 		}
