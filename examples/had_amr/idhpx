@@ -1,9 +1,8 @@
 [had_amr]
-nx0         = 96
-nt0         = 50
-granularity = 3
+nx0         = 60
+nt0         = 400
+granularity = 15
 
-minx0       =  0.0;
 maxx0       =  15.0;
 
 lambda      = 0.15
@@ -14,15 +13,14 @@ R0     = 8.0
 PP     = 7
 
 ethreshold  = 0.005
-eps         = 0.15
-fmr_radius  = 8.0
+eps         = 0.3
+fmr_radius  = 3.00001
 
 allowedl     = 0
-stencilsize  = 7
 integrator   = 1
 linearbounds = 1
 loglevel     = 2
-output       = 50.0
+output       = 1.0
 output_level = 0
 output_stdout = 1
 
