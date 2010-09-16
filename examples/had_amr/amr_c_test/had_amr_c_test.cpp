@@ -391,10 +391,12 @@ bool refinement(nodedata * vecval,int size, stencil_data* result,int compute_ind
   }
 
   // refine on center of left moving pulse: R0 - time 
-  //had_double_type time = result->timestep_*par.dx0*par.lambda;
-  //for (j=0;j<result->granularity;j++) {
-  //  if ( result->x_[j] < fabs(par.R0 - time) + 3.0 && result->x_[j] > fabs(par.R0 - time) - 3.0 ) return true;
-  //}
+  if ( par.fmr_radius < 0.0 ) {
+    had_double_type time = result->timestep_*par.dx0*par.lambda;
+    for (j=0;j<result->granularity;j++) {
+      if ( result->x_[j] < fabs(par.R0 - time) + 3.0 && result->x_[j] > fabs(par.R0 - time) - 3.0 ) return true;
+    }
+  }
    
   return false;
 

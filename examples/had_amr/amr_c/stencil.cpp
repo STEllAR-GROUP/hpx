@@ -481,6 +481,7 @@ namespace hpx { namespace components { namespace amr
 
         for (int i = 0; i < size; i++) {
           int s = findpoint(mval[i],mval[i+size]);
+          //int s = 0;
           if ( mval[0]->timestep_ < 1.e-6 ) {
             // don't interpolate initial data
             initial_data_aux(mval[i+size].get_ptr(),*par.p);
