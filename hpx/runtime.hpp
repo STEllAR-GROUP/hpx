@@ -53,6 +53,12 @@ namespace hpx
         }
 
     public:
+        // Return the set of localities
+        std::vector<naming::gid_type>& localities(void)
+        {
+            return localities_;
+        }
+
         // Return the number of localities allocated to this process
         std::size_t size() const
         {
