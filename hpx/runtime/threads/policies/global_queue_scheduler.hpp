@@ -60,9 +60,9 @@ namespace hpx { namespace threads { namespace policies
         // pending
         thread_id_type create_thread(thread_init_data& data, 
             thread_state_enum initial_state, bool run_now, error_code& ec,
-            std::size_t num_thread = std::size_t(-1))
+            std::size_t num_thread)
         {
-            return queue_.create_thread(data, initial_state, run_now, ec);
+            return queue_.create_thread(data, initial_state, run_now, num_thread, ec);
         }
 
         /// Return the next thread to be executed, return false if non is 
@@ -70,14 +70,13 @@ namespace hpx { namespace threads { namespace policies
         bool get_next_thread(std::size_t num_thread, bool running,
             std::size_t& idle_loop_count, threads::thread** thrd)
         {
-            return queue_.get_next_thread(thrd);
+            return queue_.get_next_thread(thrd, num_thread);
         }
 
         /// Schedule the passed thread
-        void schedule_thread(threads::thread* thrd, 
-            std::size_t num_thread = std::size_t(-1))
+        void schedule_thread(threads::thread* thrd, std::size_t num_thread)
         {
-            queue_.schedule_thread(thrd);
+            queue_.schedule_thread(thrd, num_thread);
         }
 
         /// Destroy the passed thread as it has been terminated

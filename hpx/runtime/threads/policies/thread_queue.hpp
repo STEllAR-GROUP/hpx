@@ -28,6 +28,29 @@ namespace hpx { namespace threads { namespace policies
     struct add_new_tag {};
 
     ///////////////////////////////////////////////////////////////////////////
+    typedef boost::lockfree::fifo<thread*> work_item_queue_type;
+
+    inline void 
+    enqueue(work_item_queue_type& work_items, thread* thrd, 
+        std::size_t num_thread)
+    {
+        work_items.enqueue(thrd);
+    }
+
+    inline bool 
+    dequeue(work_item_queue_type& work_items, thread** thrd, 
+        std::size_t num_thread)
+    {
+        return work_items.dequeue(thrd);
+    }
+
+    inline bool 
+    empty(work_item_queue_type& work_items, std::size_t num_thread)
+    {
+        return work_items.empty();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Fifo>
     inline void log_fifo_statistics(Fifo const& q, char const* const desc)
     {
@@ -121,7 +144,7 @@ namespace hpx { namespace threads { namespace policies
         typedef boost::mutex mutex_type;
 
         // this is the type of the queues of new or pending threads
-        typedef boost::lockfree::fifo<thread*> work_items_type;
+        typedef work_item_queue_type work_items_type;
 
         // this is the type of a map holding all threads (except depleted ones)
         typedef boost::ptr_map<
@@ -138,7 +161,8 @@ namespace hpx { namespace threads { namespace policies
     protected:
         ///////////////////////////////////////////////////////////////////////
         // add new threads if there is some amount of work available
-        std::size_t add_new(long add_count, thread_queue* addfrom)
+        std::size_t add_new(long add_count, thread_queue* addfrom, 
+            std::size_t num_thread)
         {
             if (0 == add_count)
                 return 0;
@@ -181,7 +205,7 @@ namespace hpx { namespace threads { namespace policies
                     // pushing the new thread into the pending queue of the
                     // specified thread_queue
                     ++added;
-                    work_items_.enqueue(t);
+                    enqueue(work_items_, t, num_thread);
                     ++work_items_count_;
                     do_some_work();         // wake up sleeping threads
                 }
@@ -194,7 +218,8 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool add_new_if_possible(std::size_t& added, thread_queue* addfrom)
+        bool add_new_if_possible(std::size_t& added, thread_queue* addfrom,
+            std::size_t num_thread)
         {
             if (0 == addfrom->new_tasks_count_) 
                 return false;
@@ -215,13 +240,14 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
 
-            std::size_t addednew = add_new(add_count, addfrom);
+            std::size_t addednew = add_new(add_count, addfrom, num_thread);
             added += addednew;
             return addednew != 0;
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool add_new_always(std::size_t& added, thread_queue* addfrom)
+        bool add_new_always(std::size_t& added, thread_queue* addfrom,
+            std::size_t num_thread)
         {
             if (0 == addfrom->new_tasks_count_) 
                 return false;
@@ -240,7 +266,7 @@ namespace hpx { namespace threads { namespace policies
                     if (add_count > max_add_new_count)
                         add_count = max_add_new_count;
                 }
-                else if (work_items_.empty()) {
+                else if (empty(work_items_, num_thread)) {
                     add_count = min_add_new_count;    // add this number of threads
                     max_count_ += min_add_new_count;  // increase max_count
                 }
@@ -249,7 +275,7 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
 
-            std::size_t addednew = add_new(add_count, addfrom);
+            std::size_t addednew = add_new(add_count, addfrom, num_thread);
             added += addednew;
             return addednew != 0;
         }
@@ -302,7 +328,8 @@ namespace hpx { namespace threads { namespace policies
         // create a new thread and schedule it if the initial state is equal to 
         // pending
         thread_id_type create_thread(thread_init_data& data, 
-            thread_state_enum initial_state, bool run_now, error_code& ec)
+            thread_state_enum initial_state, bool run_now, 
+            std::size_t num_thread, error_code& ec)
         {
             if (run_now) {
                 mutex_type::scoped_lock lk(mtx_);
@@ -325,7 +352,7 @@ namespace hpx { namespace threads { namespace policies
 
                 // push the new thread in the pending queue thread
                 if (initial_state == pending) 
-                    schedule_thread(thrd.get());
+                    schedule_thread(thrd.get(), num_thread);
 
                 do_some_work();       // try to execute the new work item
                 thrd.release();       // release ownership to the map
@@ -343,9 +370,9 @@ namespace hpx { namespace threads { namespace policies
 
         /// Return the next thread to be executed, return false if non is 
         /// available
-        bool get_next_thread(threads::thread** thrd)
+        bool get_next_thread(threads::thread** thrd, std::size_t num_thread)
         {
-            if (work_items_.dequeue(thrd)) {
+            if (dequeue(work_items_, thrd, num_thread)) {
                 --work_items_count_;
                 return true;
             }
@@ -353,9 +380,9 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Schedule the passed thread
-        void schedule_thread(threads::thread* thrd)
+        void schedule_thread(threads::thread* thrd, std::size_t num_thread)
         {
-            work_items_.enqueue(thrd);
+            enqueue(work_items_, thrd, num_thread);
             ++work_items_count_;
             do_some_work();         // wake up sleeping threads
         }
@@ -399,7 +426,7 @@ namespace hpx { namespace threads { namespace policies
                     cleanup_terminated();
 
                     // now, add new threads from the queue of task descriptions
-                    add_new_if_possible(added, addfrom);    // calls notify_all
+                    add_new_if_possible(added, addfrom, num_thread);    // calls notify_all
                 }
             }
 
@@ -426,7 +453,7 @@ namespace hpx { namespace threads { namespace policies
                            << ", threads left: " << thread_map_.size();
 
                 // stop running after all PX threads have been terminated
-                bool added_new = add_new_always(added, addfrom);
+                bool added_new = add_new_always(added, addfrom, num_thread);
                 if (!added_new && !running) {
                     // Before exiting each of the OS threads deletes the 
                     // remaining terminated PX threads 
@@ -472,7 +499,7 @@ namespace hpx { namespace threads { namespace policies
                     // make sure all pending new threads are properly queued
                     // but do that only if the lock has been acquired while 
                     // exiting the condition.wait() above
-                    if ((lk && add_new_always(added, addfrom)) || timed_out)
+                    if ((lk && add_new_always(added, addfrom, num_thread)) || timed_out)
                         break;
                 }
             }

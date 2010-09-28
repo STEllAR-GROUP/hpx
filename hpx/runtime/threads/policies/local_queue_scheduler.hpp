@@ -112,16 +112,16 @@ namespace hpx { namespace threads { namespace policies
         // pending
         thread_id_type create_thread(thread_init_data& data, 
             thread_state_enum initial_state, bool run_now, error_code& ec,
-            std::size_t num_thread = std::size_t(-1))
+            std::size_t num_thread)
         {
             if (std::size_t(-1) != num_thread) {
                 BOOST_ASSERT(num_thread < queues_.size());
                 return queues_[num_thread]->create_thread(data, initial_state, 
-                    run_now, ec);
+                    run_now, num_thread, ec);
             }
 
             return queues_[++curr_queue_ % queues_.size()]->create_thread(
-                data, initial_state, run_now, ec);
+                data, initial_state, run_now, num_thread, ec);
         }
 
         /// Return the next thread to be executed, return false if non is 
@@ -131,7 +131,7 @@ namespace hpx { namespace threads { namespace policies
         {
             // first try to get the next thread from our own queue
             BOOST_ASSERT(num_thread < queues_.size());
-            if (queues_[num_thread]->get_next_thread(thrd))
+            if (queues_[num_thread]->get_next_thread(thrd, num_thread))
                 return true;
 
 //             // no work available, try to fill our own queue
@@ -149,22 +149,21 @@ namespace hpx { namespace threads { namespace policies
             // steal thread from other queue
             for (std::size_t i = 1; i < queues_.size(); ++i) {
                 std::size_t idx = (i + num_thread) % queues_.size();
-                if (queues_[idx]->get_next_thread(thrd))
+                if (queues_[idx]->get_next_thread(thrd, num_thread))
                     return true;
             }
             return false;
         }
 
         /// Schedule the passed thread
-        void schedule_thread(threads::thread* thrd, 
-            std::size_t num_thread = std::size_t(-1))
+        void schedule_thread(threads::thread* thrd, std::size_t num_thread)
         {
             if (std::size_t(-1) != num_thread) {
                 BOOST_ASSERT(num_thread < queues_.size());
-                queues_[num_thread]->schedule_thread(thrd);
+                queues_[num_thread]->schedule_thread(thrd, num_thread);
             }
             else {
-                queues_[++curr_queue_ % queues_.size()]->schedule_thread(thrd);
+                queues_[++curr_queue_ % queues_.size()]->schedule_thread(thrd, num_thread);
             }
         }
 
