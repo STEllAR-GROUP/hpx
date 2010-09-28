@@ -153,7 +153,7 @@ int main(int argc,char* argv[]) {
 
     int m,mm;
     m  = global_nx1-2*j;
-    mm = m/2;
+    mm = (m-1)/2;
 
     for (k=0;k<numprocs;k++) {
         
@@ -313,7 +313,7 @@ int main(int argc,char* argv[]) {
           exit(0);
         }
 
-        if ( coarse_id[j] == fine_id[j] ) {
+        if ( coarse_id[j] == fine_id[j] && myid == fine_id[j] ) {
           // no communication necessary
           _chi[m-1-myid*nx1+gz_offset ] = chi[mm-myid*nx0+gz_offset];
           _Phi[m-1-myid*nx1+gz_offset ] = Phi[mm-myid*nx0+gz_offset];
