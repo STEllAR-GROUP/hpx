@@ -270,7 +270,7 @@ namespace hpx { namespace threads
         thrd->set_state_ex(new_state_ex);
 
         if (new_state == pending) {
-            scheduler_.schedule_thread(thrd);
+            scheduler_.schedule_thread(thrd, get_thread_num());
             do_some_work();
         }
 
