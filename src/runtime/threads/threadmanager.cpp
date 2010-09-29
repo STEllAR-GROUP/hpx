@@ -1002,19 +1002,24 @@ namespace hpx { namespace threads
             startup_ = new boost::barrier(num_threads+1);   
 
             running_ = true;
-            while (num_threads-- != 0) {
-                LTM_(info) << "run: create OS thread: " << num_threads; 
+
+            std::size_t thread_num = num_threads;
+            while (thread_num-- != 0) {
+                LTM_(info) << "run: create OS thread: " << thread_num; 
 
                 // create a new thread
                 threads_.push_back(new boost::thread(
-                    boost::bind(&threadmanager_impl::tfunc, this, num_threads)));
+                    boost::bind(&threadmanager_impl::tfunc, this, thread_num)));
 
                 // set the new threads affinity (on Windows systems)
-                set_affinity(threads_.back(), num_threads, scheduler_.numa_sensitive());
+                set_affinity(threads_.back(), thread_num, scheduler_.numa_sensitive());
             }
 
             // start timer pool as well
             timer_pool_.run(false);
+            
+            // the main thread needs to have a unique thread_num
+            init_tss(thread_num);
             startup_->wait();
         }
         catch (std::exception const& e) {
@@ -1039,6 +1044,8 @@ namespace hpx { namespace threads
         stop (bool blocking)
     {
         LTM_(info) << "stop: blocking(" << std::boolalpha << blocking << ")"; 
+
+        deinit_tss();
 
         mutex_type::scoped_lock l(mtx_);
         if (!threads_.empty()) {
