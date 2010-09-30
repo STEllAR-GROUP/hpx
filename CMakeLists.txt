@@ -117,6 +117,11 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}"
 
 message(STATUS "HPX will be installed to: " ${CMAKE_INSTALL_PREFIX})
 
+# top-level defines related to hardware support
+set(HPX_HW_ACCELERATION 0
+    CACHE BOOL "Compile in support for hardware acceleration")
+mark_as_advanced(HPX_HW_ACCELERATION)
+
 # global library configuration
 add_definitions(-DHPX_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 add_definitions(-DHPX_USE_LOCKFREE=1)
@@ -195,6 +200,23 @@ if(UNIX)
     set(component_LIBRARY_PREFIX "hpx_component_")
 endif()
 
+# hardware support, if available
+if(HPX_HW_ACCELERATION)
+    find_package(PXACCEL)
+    if(PXACCEL_FOUND)
+        message(STATUS "Hardware acceleration framework found in ${PXACCEL_ROOT}")
+        add_definitions(-DHPX_ACCEL_QUEUING)
+	include_directories(${PXACCEL_INC_DIR})
+	set(pxaccel_LIBRARIES pciutil pciaccess)
+	link_directories(${PXACCEL_LIB_DIR})
+    else()
+        message(FATAL ": Hardware acceleration support was requested, but the related access\n"
+                "library was not found. Please make sure that PXACCEL_ROOT points to the top\n"
+                "installation directory of the acceleration, framework, or unset the\n"
+                "HPX_HW_ACCELERATION variable in cmake.")
+    endif()
+endif()
+
 # Recurse into some subdirectories. This does not actually cause another cmake 
 # executable to run. The same process will walk through the project's entire 
 # directory structure.
@@ -206,7 +228,7 @@ add_subdirectory(hpx/components)
 # executables depend on libraries above
 add_subdirectory(tests)
 add_subdirectory(examples)
-add_subdirectory(applications)
+#add_subdirectory(applications)
 add_subdirectory(runtime)
 
 # installation instructions
