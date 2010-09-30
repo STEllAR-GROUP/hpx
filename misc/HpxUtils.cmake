@@ -178,7 +178,8 @@ endif()
     target_link_libraries(
         ${name}_exe                           # executable
         ${${name}_DEPENDENCIES}               # components it depends on
-        ${hpx_LIBRARIES} ${Boost_LIBRARIES})  # libraries it depends on
+        ${hpx_LIBRARIES} ${Boost_LIBRARIES}   # libraries it depends on
+        ${pxaccel_LIBRARIES})
 
     # installation instructions
     install(TARGETS ${name}_exe
