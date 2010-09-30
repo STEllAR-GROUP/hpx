@@ -6,8 +6,11 @@
 #if !defined(HPX_RUNTIME_THREAD_AFFINITY_NOV_11_2008_0711PM)
 #define HPX_RUNTIME_THREAD_AFFINITY_NOV_11_2008_0711PM
 
+#include <hpx/hpx.hpp>
 #include <hpx/hpx_fwd.hpp>
+
 #include <boost/thread.hpp>
+#include <boost/lexical_cast.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
@@ -140,7 +143,39 @@ namespace hpx { namespace threads
         CPU_ZERO(&cpu);
 
         // limit this thread to one of the cores
-        std::size_t affinity = num_thread % num_of_cores;
+        std::size_t num_blocks = 1;
+        std::size_t num_cores = num_of_cores;
+
+        num_blocks = boost::lexical_cast<std::size_t>(
+            get_runtime().get_config().get_entry("system_topology.num_blocks",
+                                                 num_blocks));
+        num_cores = boost::lexical_cast<std::size_t>(
+            get_runtime().get_config().get_entry("system_topology.num_cores",
+                                                 num_cores));
+
+        // Check sanity
+        assert(num_blocks * num_cores == num_of_cores);
+
+        // Choose thread mapping function and determine affinity
+        std::string thread_map = "linear";
+        thread_map = get_runtime().get_config().get_entry(
+            "system_topology.thread_map", thread_map);
+
+        std::size_t affinity;
+        if (thread_map == "linear")
+        {
+          affinity = (num_thread) % num_of_cores;
+        }
+        else if (thread_map == "block_striped")
+        {
+          affinity = (num_thread/num_blocks)
+                      + (num_cores * (num_thread % num_blocks));
+        }
+        else
+        {
+          assert(0);
+        }
+
         CPU_SET(affinity, &cpu);
 #if defined(HAVE_PTHREAD_SETAFFINITY_NP)
         if (0 == pthread_setaffinity_np(pthread_self(), sizeof(cpu), &cpu))
