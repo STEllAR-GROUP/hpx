@@ -22,13 +22,45 @@
 #include <boost/lockfree/fifo.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
 
+#ifdef HPX_ACCEL_QUEUING
+#   include "hpx/runtime/threads/policies/accel_fifo.hpp"
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
     struct add_new_tag {};
 
     ///////////////////////////////////////////////////////////////////////////
+#ifdef HPX_ACCEL_QUEUING
+    // hardware accelerated queuing
+    typedef accel::fifo<thread *> work_item_queue_type;
+
+    inline void 
+    enqueue(work_item_queue_type& work_items, thread* thrd, 
+        std::size_t num_thread)
+    {
+        //printf("enqueue invoked by thread %ld\n", num_thread);
+        work_items.enqueue(thrd, num_thread+1);
+    }
+
+    inline bool 
+    dequeue(work_item_queue_type& work_items, thread** thrd, 
+        std::size_t num_thread)
+    {
+        return work_items.dequeue(thrd, num_thread+1);
+    }
+
+    inline bool 
+    empty(work_item_queue_type& work_items, std::size_t num_thread)
+    {
+        return work_items.empty(num_thread+1);
+    }
+
+#else
+    // software queuing
     typedef boost::lockfree::fifo<thread*> work_item_queue_type;
+
 
     inline void 
     enqueue(work_item_queue_type& work_items, thread* thrd, 
@@ -49,6 +81,8 @@ namespace hpx { namespace threads { namespace policies
     {
         return work_items.empty();
     }
+
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Fifo>
