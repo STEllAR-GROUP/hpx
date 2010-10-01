@@ -41,20 +41,20 @@ namespace hpx { namespace threads { namespace policies
         std::size_t num_thread)
     {
         //printf("enqueue invoked by thread %ld\n", num_thread);
-        work_items.enqueue(thrd, num_thread+1);
+        work_items.enqueue(thrd, num_thread);
     }
 
     inline bool 
     dequeue(work_item_queue_type& work_items, thread** thrd, 
         std::size_t num_thread)
     {
-        return work_items.dequeue(thrd, num_thread+1);
+        return work_items.dequeue(thrd, num_thread);
     }
 
     inline bool 
     empty(work_item_queue_type& work_items, std::size_t num_thread)
     {
-        return work_items.empty(num_thread+1);
+        return work_items.empty(num_thread);
     }
 
 #else
