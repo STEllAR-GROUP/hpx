@@ -33,7 +33,7 @@ CFLAGS = -O3  -I$(INCLUDE) -L$(LIB_DIR)
 PROG = mytest
 
 # Object files that go into the final executable
-OBJS = test.o
+OBJS = test.o parse.o
 
 # Header files 
 HDRS =

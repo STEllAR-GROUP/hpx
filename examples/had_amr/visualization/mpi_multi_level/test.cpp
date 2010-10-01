@@ -7,6 +7,7 @@
 #include <math.h>
 #include <sdf.h>
 #include <mpi.h>
+#include "parse.h"
 using namespace std;
 
 int initial_data(int offset,
@@ -16,7 +17,7 @@ int initial_data(int offset,
                  std::vector<double> &chi,
                  std::vector<double> &Phi,
                  std::vector<double> &Pi,
-                 std::vector<double> &energy,int,double,int);
+                 std::vector<double> &energy,int,double,int,double, double, double);
 
 int calc_rhs(int numprocs,
              int myid,
@@ -36,6 +37,7 @@ int communicate(int numprocs,
 int finer_mesh(int numprocs,
                int myid,
                int timestep,
+               int nlevels,
                double time,
                int gw,
                std::vector< double > *r,
@@ -58,32 +60,143 @@ int finer_mesh(int numprocs,
                int gz_offset,
                int PP, double eps, int level);
 
-const int nlevels = 4;
+const int maxlevels = 20;
 
 int main(int argc,char* argv[]) {
 
   int myid,numprocs;
+  Record *list;
 
   MPI_Init(&argc,&argv);
   MPI_Comm_size(MPI_COMM_WORLD,&numprocs);
   MPI_Comm_rank(MPI_COMM_WORLD,&myid); 
 
-  std::vector< double > r[nlevels];
-  std::vector< double > chi[nlevels],chi_np1[nlevels],rhs_chi[nlevels];
-  std::vector< double > Phi[nlevels],Phi_np1[nlevels],rhs_Phi[nlevels];
-  std::vector< double > Pi[nlevels],Pi_np1[nlevels],rhs_Pi[nlevels];
-  std::vector< double > energy[nlevels];
+  int i,j,k,count;
+  int global_nx[maxlevels];
+  int nx[maxlevels];
+  int nlevels;
+  /****** DEFAULT PARAMETERS **********/
+  int allowedl = 1;
+  global_nx[0] = 500;
+  int nt0 = 3200;
+  int output_every = 10;
+  double eps = 0.3;
+  int PP = 7;
+  double lambda = 0.15;
+  double max_r = 15.0;
+  double amp = 0.172;
+  double delta = 1.0;
+  double R0 = 8.0;
+  /****************/
+
+  if ( argc < 2 ) {
+    std::cerr << " Paramter file required " << std::endl;
+    exit(0);
+  }
+
+  list = Parse(argv[1],'=');
+  if ( list == NULL ) {
+    std::cerr << " Parameter file open error : " << argv[1] << " not found " << std::endl;
+    exit(0);
+  }
+
+  if ( GetInt(list, "allowedl", &allowedl) == 0) {
+    std::cerr << " Parameter allowedl not found, using default " << std::endl;
+  } 
+  nlevels = allowedl + 1;
+
+  int tmp_nx0;
+  if ( GetInt(list, "nx0", &tmp_nx0) == 0) {
+    std::cerr << " Parameter nx0 not found, using default " << std::endl;
+    global_nx[0] = tmp_nx0;
+  }
+  if ( GetInt(list, "nt0", &nt0) == 0) {
+    std::cerr << " Parameter nt0 not found, using default " << std::endl;
+  }
+  if ( GetInt(list, "output_every", &output_every) == 0) {
+    std::cerr << " Parameter output_every not found, using default " << std::endl;
+  }
+  if ( GetInt(list, "PP", &PP) == 0) {
+    std::cerr << " Parameter PP not found, using default " << std::endl;
+  }
+  if ( GetDouble(list, "eps", &eps) == 0) {
+    std::cerr << " Parameter eps not found, using default " << std::endl;
+  }
+  if ( GetDouble(list, "lambda", &lambda) == 0) {
+    std::cerr << " Parameter lambda not found, using default " << std::endl;
+  }
+  if ( GetDouble(list, "max_r", &max_r) == 0) {
+    std::cerr << " Parameter max_r not found, using default " << std::endl;
+  }
+  if ( GetDouble(list, "amp", &amp) == 0) {
+    std::cerr << " Parameter amp not found, using default " << std::endl;
+  }
+  if ( GetDouble(list, "delta", &delta) == 0) {
+    std::cerr << " Parameter delta not found, using default " << std::endl;
+  }
+  if ( GetDouble(list, "R0", &R0) == 0) {
+    std::cerr << " Parameter R0 not found, using default " << std::endl;
+  }
+
+  double refine_level[maxlevels];
+  // initialize
+  for (i=0;i<maxlevels;i++) {
+    refine_level[i] = -100.0;
+  }
+  char tmpname[80];
+  for (i=0;i<maxlevels;i++) {
+    sprintf(tmpname,"refine_level_%d",i);
+    GetDouble(list, tmpname, &refine_level[i]);
+  }
+
+  if ( myid == 0 ) {
+    // print out parameters
+    std::cout << " allowedl     : " <<  allowedl << std::endl;
+    std::cout << " nx0          : " <<  global_nx[0] << std::endl;
+    std::cout << " nt0          : " <<  nt0 << std::endl;
+    std::cout << " output_every : " <<  output_every << std::endl;
+    std::cout << " lambda       : " <<  lambda << std::endl;
+    std::cout << " PP           : " <<  PP << std::endl;
+    std::cout << " max_r        : " <<  max_r << std::endl;
+    std::cout << " eps          : " <<  eps << std::endl;
+    std::cout << " amp          : " <<  amp << std::endl;
+    std::cout << " delta        : " <<  delta << std::endl;
+    std::cout << " R0           : " <<  R0 << std::endl;
+    for (i=0;i<nlevels;i++) {
+      if ( refine_level[i] > -100.0 ) {
+        sprintf(tmpname,"refine_level_%d",i);
+        std::cout << tmpname <<  "  : " << refine_level[i] << std::endl;
+      } 
+    }
+  }
+
+  std::vector< double > r[maxlevels];
+  std::vector< double > chi[maxlevels],chi_np1[maxlevels],rhs_chi[maxlevels];
+  std::vector< double > Phi[maxlevels],Phi_np1[maxlevels],rhs_Phi[maxlevels];
+  std::vector< double > Pi[maxlevels],Pi_np1[maxlevels],rhs_Pi[maxlevels];
+  std::vector< double > energy[maxlevels];
 
   char cnames[80];
-  int i,j,k,count;
   int gw = 10;
 
-  int global_nx[nlevels];
-  int nx[nlevels];
-
-  global_nx[0] = 500;
   for (i=1;i<nlevels;i++) {
-    global_nx[i] = 141;
+    if ( refine_level[i-1] > -100.0 ) {
+      int tmp = fabs(refine_level[i-1])*global_nx[i-1];
+      if ( tmp%2 == 0 ) {
+        global_nx[i] = tmp+1;
+      } else {
+        global_nx[i] = tmp;
+      }
+    } else {
+      global_nx[i] = 141;
+    }
+  }
+ 
+  // print out grid size breakdown
+  if ( myid == 0 ) {
+    for (i=0;i<nlevels;i++) {
+      std::cout << "Level " << i << " nx : " << global_nx[i] << std::endl;
+    }
   }
 
   if ( global_nx[0]%numprocs != 0 ) {
@@ -100,31 +213,27 @@ int main(int argc,char* argv[]) {
   double t1,t2;
   t1 = MPI_Wtime();
 
-  // CODiss 
-  double eps = 0.3;
-  int nt0 = 1600;
   double time = 0.0;
-  int shape[nlevels][3];
-  int PP = 7;
+  int shape[maxlevels][3];
 
-  double dx[nlevels];
-  double dt[nlevels];
-  dx[0] = 15.0/(global_nx[0]-1);
-  dt[0] = 0.15*dx[0];
+  double dx[maxlevels];
+  double dt[maxlevels];
+  dx[0] = max_r/(global_nx[0]-1);
+  dt[0] = lambda*dx[0];
   for (i=1;i<nlevels;i++) {
     dx[i] = 0.5*dx[i-1];
     dt[i] = 0.5*dt[i-1];
   }
 
-  initial_data(nx[0]*myid,numprocs,myid,r[0],chi[0],Phi[0],Pi[0],energy[0],nx[0],dx[0],PP);
+  initial_data(nx[0]*myid,numprocs,myid,r[0],chi[0],Phi[0],Pi[0],energy[0],nx[0],dx[0],PP,amp,delta,R0);
 
   for (i=1;i<nlevels;i++) {
     if ( numprocs == 1 ) {
-      initial_data(nx[i]*myid,numprocs,myid,r[i],chi[i],Phi[i],Pi[i],energy[i],global_nx[i],dx[i],PP);
+      initial_data(nx[i]*myid,numprocs,myid,r[i],chi[i],Phi[i],Pi[i],energy[i],global_nx[i],dx[i],PP,amp,delta,R0);
     } else if ( myid == numprocs-1 ) {
-      initial_data(nx[i]*myid,numprocs,myid,r[i],chi[i],Phi[i],Pi[i],energy[i],nx[i]+1,dx[i],PP);
+      initial_data(nx[i]*myid,numprocs,myid,r[i],chi[i],Phi[i],Pi[i],energy[i],nx[i]+1,dx[i],PP,amp,delta,R0);
     } else {
-      initial_data(nx[i]*myid,numprocs,myid,r[i],chi[i],Phi[i],Pi[i],energy[i],nx[i],dx[i],PP);
+      initial_data(nx[i]*myid,numprocs,myid,r[i],chi[i],Phi[i],Pi[i],energy[i],nx[i],dx[i],PP,amp,delta,R0);
     }
   }
 
@@ -148,7 +257,7 @@ int main(int argc,char* argv[]) {
   if ( myid != 0 ) gz_offset = 3;
 
   // figure out ghostwidth communication
-  std::vector<int> coarse_id[nlevels], fine_id[nlevels];
+  std::vector<int> coarse_id[maxlevels], fine_id[maxlevels];
   for (i=1;i<nlevels;i++) {
     coarse_id[i].resize(gw/2);
     fine_id[i].resize(gw/2);
@@ -182,7 +291,7 @@ int main(int argc,char* argv[]) {
   // figure out injection communication
   // injecting -- overwrite coarse mesh points with finer mesh result
 
-  std::vector<int> restrict_coarse[nlevels], restrict_fine[nlevels];
+  std::vector<int> restrict_coarse[maxlevels], restrict_fine[maxlevels];
   for (i=1;i<nlevels;i++) {
     count = 0;
 
@@ -215,7 +324,7 @@ int main(int argc,char* argv[]) {
   // finished with the injection communication setup
 
   // update rhs over non-ghostzone sites
-  int lower[nlevels],upper[nlevels];
+  int lower[maxlevels],upper[maxlevels];
   for (i=0;i<nlevels;i++) {
     if (myid == 0 && numprocs == 1) {
       lower[i] = 1;
@@ -292,8 +401,10 @@ int main(int argc,char* argv[]) {
 
      // }}}
 
-    finer_mesh(numprocs,myid,i,i*dt[0],gw,r,chi,Phi,Pi,chi_np1,Phi_np1,Pi_np1,rhs_chi,rhs_Phi,rhs_Pi,
+    if ( nlevels > 1 ) {
+      finer_mesh(numprocs,myid,nlevels,i,i*dt[0],gw,r,chi,Phi,Pi,chi_np1,Phi_np1,Pi_np1,rhs_chi,rhs_Phi,rhs_Pi,
                fine_id,coarse_id,restrict_coarse,restrict_fine,nx,dt,lower,upper,global_nx,gz_offset,PP,eps,1);
+    }
 
     chi[0].swap(chi_np1[0]);
     Phi[0].swap(Phi_np1[0]);
@@ -303,15 +414,19 @@ int main(int argc,char* argv[]) {
     communicate(numprocs,myid,r[0],Phi[0]);
     communicate(numprocs,myid,r[0],Pi[0]);
 
-    sprintf(basename,"chi0");
-    sprintf(filename,"%d%s",myid,basename);
-    gft_out_full(filename,dt[0]*(i+1),shape[0],cnames,1,&*r[0].begin(),&*chi[0].begin());
-    sprintf(basename,"Phi0");
-    sprintf(filename,"%d%s",myid,basename);
-    gft_out_full(filename,dt[0]*(i+1),shape[0],cnames,1,&*r[0].begin(),&*Phi[0].begin());
-    sprintf(basename,"Pi0");
-    sprintf(filename,"%d%s",myid,basename);
-    gft_out_full(filename,dt[0]*(i+1),shape[0],cnames,1,&*r[0].begin(),&*Pi[0].begin());
+    if ( i%output_every == 0 ) {
+      for (int level=0;level<nlevels;level++) {
+        sprintf(basename,"chi%d",level);
+        sprintf(filename,"%d%s",myid,basename);
+        gft_out_full(filename,dt[0]*(i+1),shape[level],cnames,1,&*r[level].begin(),&*chi[level].begin());
+        sprintf(basename,"Phi%d",level);
+        sprintf(filename,"%d%s",myid,basename);
+        gft_out_full(filename,dt[0]*(i+1),shape[level],cnames,1,&*r[level].begin(),&*Phi[level].begin());
+        sprintf(basename,"Pi%d",level);
+        sprintf(filename,"%d%s",myid,basename);
+        gft_out_full(filename,dt[0]*(i+1),shape[level],cnames,1,&*r[level].begin(),&*Pi[level].begin());
+      }
+    }
   }
   t2 = MPI_Wtime();
   if ( myid == 0 ) {
@@ -324,6 +439,7 @@ int main(int argc,char* argv[]) {
 
 int finer_mesh(int numprocs,
                int myid,
+               int nlevels,
                int timestep,
                double time,
                int gw,
@@ -477,7 +593,7 @@ int finer_mesh(int numprocs,
      // }}}
 
       if ( level < nlevels-1 ) {
-        finer_mesh(numprocs,myid,timestep+k,time + k*dt[level],gw,r,chi,Phi,Pi,chi_np1,Phi_np1,Pi_np1,rhs_chi,rhs_Phi,rhs_Pi,
+        finer_mesh(numprocs,myid,nlevels,timestep+k,time + k*dt[level],gw,r,chi,Phi,Pi,chi_np1,Phi_np1,Pi_np1,rhs_chi,rhs_Phi,rhs_Pi,
                  fine_id,coarse_id,restrict_coarse,restrict_fine,nx,dt,lower,upper,global_nx,gz_offset,PP,eps,level+1);
       }
 
@@ -488,7 +604,7 @@ int finer_mesh(int numprocs,
       communicate(numprocs,myid,r[level],chi[level]);
       communicate(numprocs,myid,r[level],Phi[level]);
       communicate(numprocs,myid,r[level],Pi[level]);
-
+#if 0
       sprintf(basename,"chi%d",level);
       sprintf(filename,"%d%s",myid,basename);
       gft_out_full(filename,time+(k+1)*dt[level],shape,cnames,1,&*r[level].begin(),&*chi[level].begin());
@@ -498,6 +614,7 @@ int finer_mesh(int numprocs,
       sprintf(basename,"Pi%d",level);
       sprintf(filename,"%d%s",myid,basename);
       gft_out_full(filename,time+(k+1)*dt[level],shape,cnames,1,&*r[level].begin(),&*Pi[level].begin());
+#endif
     }
 
     // injecting -- overwrite coarse mesh points with finer mesh result {{{
@@ -545,7 +662,8 @@ int initial_data(int offset,
                  std::vector<double> &chi,
                  std::vector<double> &Phi,
                  std::vector<double> &Pi,
-                 std::vector<double> &energy,int nx0,double dx,int PP) {
+                 std::vector<double> &energy,int nx0,double dx,int PP,
+                 double amp, double delta, double R0) {
 
 
   int i;
@@ -567,10 +685,6 @@ int initial_data(int offset,
     r.push_back((offset+nx0-1+2)*dx);
     r.push_back((offset+nx0-1+3)*dx);
   }
-
-  double amp = 0.01;
-  double delta = 1.0;
-  double R0 = 8.0;
 
   for (i=0;i<r.size();i++) {
     chi.push_back(amp*exp(-(r[i]-R0)*(r[i]-R0)/(delta*delta)));  
@@ -656,7 +770,7 @@ int calc_rhs(int numprocs,
     rhs_chi[i] = Pi[i] + eps*diss_chi[i];
     rhs_Phi[i] = 1./(2.*dr) * ( Pi[i+1] - Pi[i-1] ) + eps*diss_Phi[i];
     rhs_Pi[i]  = 3 * ( r[i+1]*r[i+1]*Phi[i+1] - r[i-1]*r[i-1]*Phi[i-1] )/( pow(r[i+1],3) - pow(r[i-1],3) )
-                    + 0.0*pow(chi[i],PP) + eps*diss_Pi[i]; // + 1.e-8*diss_chi[0];
+                    + pow(chi[i],PP) + eps*diss_Pi[i]; // + 1.e-8*diss_chi[0];
   }
 
   //std::cout << " TEST right boundary " << r.size()-1 << std::endl;
