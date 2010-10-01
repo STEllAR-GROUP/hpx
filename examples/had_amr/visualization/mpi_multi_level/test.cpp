@@ -105,10 +105,8 @@ int main(int argc,char* argv[]) {
   } 
   nlevels = allowedl + 1;
 
-  int tmp_nx0;
-  if ( GetInt(list, "nx0", &tmp_nx0) == 0) {
+  if ( GetInt(list, "nx0", &global_nx[0]) == 0) {
     std::cerr << " Parameter nx0 not found, using default " << std::endl;
-    global_nx[0] = tmp_nx0;
   }
   if ( GetInt(list, "nt0", &nt0) == 0) {
     std::cerr << " Parameter nt0 not found, using default " << std::endl;
@@ -342,6 +340,8 @@ int main(int argc,char* argv[]) {
   }
 
   for (i=0;i<nt0;i++) {
+
+    if ( myid == 0 && i%(10*output_every) == 0 ) std::cout << " Step " << i << " of " << nt0 << std::endl;
 
      // Coarse mesh evolution {{{
      // ------------------------------- iter 1
