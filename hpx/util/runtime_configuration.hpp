@@ -44,6 +44,9 @@ namespace hpx { namespace util
 
         // Can be set to true if we are only going to run HPX in one locality.
         bool get_agas_smp_mode() const;
+
+        // Can be set to true if we want to use the ITT notify tools API 
+        bool get_itt_notify_mode() const;
     };
 
 }}

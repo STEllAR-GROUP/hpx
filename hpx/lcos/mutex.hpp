@@ -217,13 +217,11 @@ namespace hpx { namespace lcos { namespace detail
 
         void set_event()
         {
-            mutex_type::scoped_lock l(this);
             if (!queue_.empty()) {
                 threads::thread_id_type id = queue_.front().id_;
                 queue_.front().id_ = 0;
                 queue_.pop_front();
 
-                l.unlock();
                 threads::set_thread_lco_description(id);
                 threads::set_thread_state(id, threads::pending);
             }
@@ -317,9 +315,13 @@ namespace hpx { namespace lcos { namespace detail
         void unlock()
         {
             HPX_ITT_SYNC_RELEASING(this);
-            BOOST_ASSERT(active_count_ & lock_flag_value);
-            active_count_ += lock_flag_value;
-            set_event();
+            {
+                mutex_type::scoped_lock l(this);
+
+                BOOST_ASSERT(active_count_ & lock_flag_value);
+                active_count_ += lock_flag_value;
+                set_event();
+            }
             HPX_ITT_SYNC_RELEASED(this);
         }
 

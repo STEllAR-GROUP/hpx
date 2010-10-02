@@ -204,6 +204,20 @@ namespace hpx { namespace threads { namespace policies
                     idx, running, idle_loop_count, added, queues_[idx]);
             }
 
+            // no new work is available, are we deadlocked?
+            if (0 == added && 0 == num_thread && LHPX_ENABLED(error)) {
+                bool suspended_only = true;
+
+                for (std::size_t i = 0; suspended_only && i < queues_.size(); ++i) {
+                    suspended_only = queues_[i]->dump_suspended_threads(
+                        i, idle_loop_count);
+                }
+
+                if (suspended_only) {
+                    LTM_(error) << "queue(" << num_thread << "): "
+                                << "no new work available, are we deadlocked?";
+                }
+            }
             return result;
         }
 

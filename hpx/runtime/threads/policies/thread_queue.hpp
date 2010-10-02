@@ -118,15 +118,19 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         // debug helper function, logs all suspended threads
+        // this returns true if all threads in the map are currently suspended
         template <typename Map>
-        inline void dump_suspended_threads(std::size_t num_thread,
+        inline bool dump_suspended_threads(std::size_t num_thread,
             Map& tm, std::size_t& idle_loop_count)
         {
-            if (idle_loop_count++ < 2000)
-                return;
+            if (idle_loop_count++ < HPX_IDLE_LOOP_COUNT_MAX)
+                return false;
 
             // reset idle loop count
             idle_loop_count = 0;
+
+            bool result = false;
+            bool collect_suspended = true;
 
             bool logged_headline = false;
             typename Map::const_iterator end = tm.end();
@@ -144,7 +148,8 @@ namespace hpx { namespace threads { namespace policies
                         logged_headline = true;
                     }
 
-                    LTM_(error) << get_thread_state_name(state) 
+                    LTM_(error) << "queue(" << num_thread << "): "
+                                << get_thread_state_name(state) 
                                 << "(" << std::hex << std::setw(8) 
                                     << std::setfill('0') << (*it).first 
                                 << "." << std::hex << std::setw(2) 
@@ -157,7 +162,19 @@ namespace hpx { namespace threads { namespace policies
                                 << ": " << thrd->get_lco_description();
                     thrd->set_marked_state(state);
                 }
+
+                // result should be true if we found only suspended threads
+                if (collect_suspended) {
+                    if (state.get_state() == threads::suspended) {
+                        result = true;    // at least one is suspended
+                    }
+                    else if (state.get_state() == threads::active) {
+                        result = false;   // one is active, no deadlock (yet)
+                        collect_suspended = false;
+                    }
+                }
             }
+            return result;
         }
     }
 
@@ -166,6 +183,9 @@ namespace hpx { namespace threads { namespace policies
     class thread_queue
     {
     private:
+        // we use a simple mutex to protect the data members for now
+        typedef boost::mutex mutex_type;
+
         // Add this number of threads to the work items queue each time the 
         // function \a add_new() is called if the queue is empty.
         enum { 
@@ -173,9 +193,6 @@ namespace hpx { namespace threads { namespace policies
             max_add_new_count = 100,
             max_delete_count = 100
         };
-
-        // we use a simple mutex to protect the data members for now
-        typedef boost::mutex mutex_type;
 
         // this is the type of the queues of new or pending threads
         typedef work_item_queue_type work_items_type;
@@ -505,9 +522,12 @@ namespace hpx { namespace threads { namespace policies
                     cleanup_terminated();
                 }
 
-                if (!Global || added_new) {
+                if (!Global)
+                    break;
+
+                if (added_new) {
                     // dump list of suspended threads once a second
-                    if (!Global && LHPX_ENABLED(error) && addfrom->new_tasks_.empty())
+                    if (LHPX_ENABLED(error) && addfrom->new_tasks_.empty())
                         detail::dump_suspended_threads(num_thread, thread_map_, idle_loop_count);
 
                     break;    // we got work, exit loop
@@ -550,6 +570,15 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
+        bool dump_suspended_threads(std::size_t num_thread
+          , std::size_t& idle_loop_count)
+        {
+            mutex_type::scoped_lock lk(mtx_);
+            return detail::dump_suspended_threads(num_thread, thread_map_
+              , idle_loop_count);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread) {}
         void on_stop_thread(std::size_t num_thread)
         {
@@ -563,6 +592,8 @@ namespace hpx { namespace threads { namespace policies
         void on_error(std::size_t num_thread, boost::exception_ptr const& e) {}
 
     private:
+        friend class local_queue_scheduler;
+
         mutable mutex_type mtx_;            ///< mutex protecting the members
         boost::condition cond_;             ///< used to trigger some action
 

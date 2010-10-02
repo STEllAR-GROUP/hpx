@@ -6,6 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/init_ini_data.hpp>
+#include <hpx/util/itt_notify.hpp>
 
 #include <boost/assign/std/vector.hpp>
 #include <boost/preprocessor/stringize.hpp>
@@ -41,7 +42,8 @@ namespace hpx { namespace util
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_CACHE_SIZE) "}",
             "connectioncachesize = ${HPX_AGAS_CONNECTION_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_MAX_AGAS_CONNECTION_CACHE_SIZE) "}",
-            "smp_mode = ${HPX_AGAS_SMP_MODE:0}"
+            "smp_mode = ${HPX_AGAS_SMP_MODE:0}",
+            "use_ittnotify = $(HPX_USE_ITTNOTIFY:0}"
 
             // create default ini entries for memory_block component hosted in 
             // the main hpx shared library
@@ -103,6 +105,9 @@ namespace hpx { namespace util
             this->parse("static prefill defaults", prefill);
 
         post_initialize_ini(*this);
+
+        // set global config options
+        use_ittnotifiy_api = get_itt_notify_mode();
     }
 
     // AGAS configuration information has to be stored in the global hpx.agas
@@ -186,6 +191,18 @@ namespace hpx { namespace util
             if (NULL != sec) {
                 return boost::lexical_cast<int>(
                     sec->get_entry("smp_mode", "0")) ? true : false;
+            }
+        }
+        return false;
+    }
+
+    bool runtime_configuration::get_itt_notify_mode() const
+    {
+        if (has_section("hpx")) {
+            util::section const* sec = get_section("hpx");
+            if (NULL != sec) {
+                return boost::lexical_cast<int>(
+                    sec->get_entry("use_ittnotify", "0")) ? true : false;
             }
         }
         return false;
