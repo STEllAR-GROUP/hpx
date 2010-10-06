@@ -122,6 +122,32 @@ namespace hpx { namespace components { namespace server
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
+#ifdef STACKLESS_COROUTINE
+        typedef hpx::actions::direct_result_action1<
+            runtime_support, int,
+            runtime_support_factory_properties, components::component_type,
+            &runtime_support::factory_properties
+        > factory_properties_action;
+
+        typedef hpx::actions::direct_result_action2<
+            runtime_support, naming::gid_type, runtime_support_create_component,
+            components::component_type, std::size_t,
+            &runtime_support::create_component
+        > create_component_action;
+
+        typedef hpx::actions::direct_result_action2<
+            runtime_support, naming::gid_type,
+            runtime_support_create_one_component,
+            components::component_type, constructor_argument const&,
+            &runtime_support::create_one_component
+        > create_one_component_action;
+
+        typedef hpx::actions::direct_result_action2<
+            runtime_support, naming::gid_type, runtime_support_create_memory_block,
+            std::size_t, hpx::actions::manage_object_action_base const&,
+            &runtime_support::create_memory_block
+        > create_memory_block_action;
+#else
         typedef hpx::actions::result_action1<
             runtime_support, int, 
             runtime_support_factory_properties, components::component_type, 
@@ -146,7 +172,7 @@ namespace hpx { namespace components { namespace server
             std::size_t, hpx::actions::manage_object_action_base const&,
             &runtime_support::create_memory_block
         > create_memory_block_action;
-
+#endif
         typedef hpx::actions::direct_action2<
             runtime_support, runtime_support_free_component, 
             components::component_type, naming::gid_type const&, 
