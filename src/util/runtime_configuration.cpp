@@ -107,7 +107,9 @@ namespace hpx { namespace util
         post_initialize_ini(*this);
 
         // set global config options
+#if HPX_USE_ITT == 1
         use_ittnotifiy_api = get_itt_notify_mode();
+#endif
     }
 
     // AGAS configuration information has to be stored in the global hpx.agas
