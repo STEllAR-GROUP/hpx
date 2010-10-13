@@ -114,7 +114,6 @@ namespace hpx { namespace components { namespace amr { namespace server
                                     Array3D &dst_step,Array3D &dst_size,
                                     Array3D &src_size,std::size_t num_rows,
                                     std::vector<std::size_t> &each_row, std::vector<std::size_t> &level_row,
-                                    std::vector<std::size_t> &level_begin, std::vector<std::size_t> &level_end,
                                     Parameter const& par);
 
     private:

@@ -321,10 +321,10 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("granularity") ) {
                 std::string tmp = sec->get_entry("granularity");
                 par->granularity = atoi(tmp.c_str());
-                if ( par->granularity < 3 ) {
-                  std::cerr << " Problem: granularity must be at least 3 : " << par->granularity << std::endl;
-                  BOOST_ASSERT(false);
-                }
+               // if ( par->granularity < 3 ) {
+               //   std::cerr << " Problem: granularity must be at least 3 : " << par->granularity << std::endl;
+               //   BOOST_ASSERT(false);
+               // }
               }
               for (int i=0;i<par->allowedl;i++) {
                 char tmpname[80];
@@ -341,13 +341,11 @@ int main(int argc, char* argv[])
         
         // derived parameters
         if ( nx0%par->granularity != 0 ) {
-           std::cerr << " Problem: nx0 must be a multiple of the specified granularity;  nx0: " << nx0 << " granularity: " <<  par->granularity << std::endl;
-           BOOST_ASSERT(false);
+          std::cerr << " PROBLEM : nx0 must be divisible by the granularity " << std::endl;
+          std::cerr << " nx0 " << nx0 << " granularity " << par->granularity << std::endl;
+          BOOST_ASSERT(false);
         }
         par->nx0 = nx0/par->granularity;
-
-        par->dx0 = (par->maxx0 - par->minx0)/(par->nx0*par->granularity-1);
-        par->dt0 = par->lambda*par->dx0;
 
         par->nx[0] = par->nx0;
         for (int i=1;i<par->allowedl+1;i++) {
@@ -358,12 +356,36 @@ int main(int argc, char* argv[])
           std::cout << " TEST nx " << par->nx[i] << " i " << i << std::endl;
         }
 
-        // figure out the number of points
-        numvals = par->nx[par->allowedl];
-        for (int i=par->allowedl-1;i>=0;i--) {
-          // remove duplicates
-          numvals += par->nx[i] - (par->nx[i+1]+1)/2;
+        for (int j=0;j<=par->allowedl;j++) {
+          par->rowsize.push_back(par->nx[par->allowedl]);
+          for (int i=par->allowedl-1;i>=j;i--) {
+            // remove duplicates
+            par->rowsize[j] += par->nx[i] - (par->nx[i+1]+1)/2;
+          }
         }
+
+        for (int j=0;j<=par->allowedl;j++) {
+          if ( j != par->allowedl ) par->level_begin.push_back(par->rowsize[j+1]);
+          else par->level_begin.push_back(0);
+          par->level_end.push_back(par->rowsize[j]);
+        }
+
+        had_double_type tmp = 0.0;
+        for (int j=par->allowedl;j>0;j--) {
+          tmp += (par->level_end[j]-par->level_begin[j])*par->granularity/pow(2.0,j);
+        }
+
+        for (int j=par->level_begin[0];j<par->rowsize[0]-1;j++) {
+          tmp += par->granularity;
+        }
+
+        par->dx0 = (par->maxx0 - par->minx0)/(tmp + par->granularity-1);
+
+        //par->dx0 = (par->maxx0 - par->minx0)/((par->nx0-1)*par->granularity);
+        par->dt0 = par->lambda*par->dx0;
+
+        // figure out the number of points
+        numvals = par->rowsize[0];
 
         numsteps = numsteps*3 - 2;
 

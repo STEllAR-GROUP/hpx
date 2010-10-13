@@ -65,47 +65,33 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     had_double_type chi,Phi,Pi,Energy,r;
     had_double_type dx;
 
-    std::vector<std::size_t> rowsize;
-    for (int j=0;j<=par.allowedl;j++) {
-      rowsize.push_back(par.nx[par.allowedl]);
-      for (int i=par.allowedl-1;i>=j;i--) {
-       // remove duplicates
-       rowsize[j] += par.nx[i] - (par.nx[i+1]+1)/2;
-      }
-    }
-  
-    // vectors level_begin and level_end indicate the level to which a particular index belongs
-    std::vector<std::size_t> level_begin, level_end;
-    for (int j=0;j<=par.allowedl;j++) {
-      if ( j != par.allowedl ) level_begin.push_back(rowsize[j+1]);
-      else level_begin.push_back(0);
-      level_end.push_back(rowsize[j]);
-    }
-
     // find out what level we are at
     std::size_t level = -1;
     for (int j=0;j<=par.allowedl;j++) {
-      if (item >= level_begin[j] && item < level_end[j] ) {
+      if (item >= par.level_begin[j] && item < par.level_end[j] ) {
         level = j; 
         break;
       }    
     }
     BOOST_ASSERT(level >= 0);
 
+    std::cout << " TEST item " << item << " level " << level << std::endl;
+
     val->level_= level;
     dx = par.dx0/pow(2.0,level);
 
     had_double_type r_start = 0.0;
-    for (int j=0;j<level;j++) {
-      r_start += (level_end[j]-level_begin[j])*par.granularity*par.dx0/pow(2.0,j);
+    for (int j=par.allowedl;j>level;j--) {
+      r_start += (par.level_end[j]-par.level_begin[j])*par.granularity*par.dx0/pow(2.0,j);
     }
-    for (int j=level_begin[level];j<item;j++) {
+    for (int j=par.level_begin[level];j<item;j++) {
       r_start += dx*par.granularity;
     }
 
-    std::cout << " TEST r_start " << r_start << " item " << item << " dx " << dx << std::endl;
+    //std::cout << " TEST r_start " << r_start << " item " << item << " dx " << dx << std::endl;
     for (i=0;i<par.granularity;i++) {
       r = r_start + i*dx;
+      std::cout << " TEST r " << r << std::endl;
 
       chi = initial_chi(r,par);
       Phi = initial_Phi(r,par);

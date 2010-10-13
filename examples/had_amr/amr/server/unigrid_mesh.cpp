@@ -262,25 +262,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         // number of points in a row that includes all levels down to the coarsest, level=0; 
         // similarly, rowsize[1] indicates the total number of points in a row that includes
         // all finer levels down to level=1.
-        std::vector<std::size_t> rowsize;
-        for (int j=0;j<=par->allowedl;j++) {
-          rowsize.push_back(par->nx[par->allowedl]);
-          for (int i=par->allowedl-1;i>=j;i--) {
-            // remove duplicates
-            rowsize[j] += par->nx[i] - (par->nx[i+1]+1)/2;
-          }
-        }
 
         // vectors level_begin and level_end indicate the level to which a particular index belongs
-        std::vector<std::size_t> level_begin, level_end;
-        for (int j=0;j<=par->allowedl;j++) {
-          if ( j != par->allowedl ) level_begin.push_back(rowsize[j+1]);    
-          else level_begin.push_back(0);
-          level_end.push_back(rowsize[j]);
-        }
-        //for (int j=0;j<=par->allowedl;j++) {
-        //  std::cout << " TEST j " << j << " begin " << level_begin[j] << " end " << level_end[j] << std::endl;
-        //}
 
         // The vector each_row connects the rowsize vector with each of the 3*2^nlevel rows.
         // The pattern is as follows: 
@@ -328,9 +311,9 @@ namespace hpx { namespace components { namespace amr { namespace server
               break;
             }
           }
-          each_row.push_back(rowsize[level]);
-          each_row.push_back(rowsize[level]);
-          each_row.push_back(rowsize[level]);
+          each_row.push_back(par->rowsize[level]);
+          each_row.push_back(par->rowsize[level]);
+          each_row.push_back(par->rowsize[level]);
         }
 
         std::vector<result_type> stencils;
@@ -353,7 +336,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         Array3D dst_size(num_rows,each_row[0],1);
         Array3D src_size(num_rows,each_row[0],1);
         prep_ports(dst_port,dst_src,dst_step,dst_size,src_size,
-                   num_rows,each_row,level_row,level_begin,level_end,par);
+                   num_rows,each_row,level_row,par);
 
         // initialize stencil_values using the stencil (functional) components
         for (int i = 0; i < num_rows; ++i) 
@@ -473,7 +456,6 @@ namespace hpx { namespace components { namespace amr { namespace server
     void unigrid_mesh::prep_ports(Array3D &dst_port,Array3D &dst_src,
                                   Array3D &dst_step,Array3D &dst_size,Array3D &src_size,std::size_t num_rows,
                                   std::vector<std::size_t> &each_row,std::vector<std::size_t> &level_row,
-                                  std::vector<std::size_t> &level_begin,std::vector<std::size_t> &level_end,
                                   Parameter const& par)
     {
       int i,j;
@@ -534,7 +516,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             // discover what level to which this point belongs
             int level = -1;
             for (j=0;j<=par->allowedl;j++) {
-              if ( i >= level_begin[j] && i < level_end[j] ) {
+              if ( i >= par->level_begin[j] && i < par->level_end[j] ) {
                 level = j;
                 break;
               }
@@ -543,7 +525,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
             // only communicate between points on the same level
             for (j=i-1;j<i+2;j++) {
-              if ( j >=level_begin[level] && j < level_end[level] ) {
+              if ( j >=par->level_begin[level] && j < par->level_end[level] ) {
                 vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
                 counter++;
               }
