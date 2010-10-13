@@ -44,22 +44,20 @@ namespace hpx { namespace components { namespace amr
             std::size_t numvalues, std::size_t numsteps,
            // components::component_type logging_type = components::component_invalid,
             components::component_type logging_type, 
-            std::size_t level, had_double_type xmin,
             Parameter const& par)
         {
             return this->base_type::init_execute_async(this->gid_, function_type,
-                numvalues, numsteps, logging_type,level,xmin,par);
+                numvalues, numsteps, logging_type,par);
         }
 
         std::vector<naming::id_type> 
         init_execute(components::component_type function_type, 
             std::size_t numvalues, std::size_t numsteps,
             components::component_type logging_type,
-            std::size_t level, had_double_type xmin,
             Parameter const& par)
         {
             return this->base_type::init_execute(this->gid_, function_type,
-                numvalues, numsteps,logging_type,level,xmin,par);
+                numvalues, numsteps,logging_type,par);
         }
 
         // The eval and is_last_timestep functions have to be overloaded by any

@@ -42,9 +42,10 @@ struct Par {
       had_double_type output;
       int output_stdout;
       int linearbounds;
-      int integrator;
       int nx0;
       int nt0;
+      int nx[maxlevels];
+      had_double_type refine_level[maxlevels];
       had_double_type minx0;
       had_double_type maxx0;
       had_double_type dx0;
@@ -54,7 +55,6 @@ struct Par {
       had_double_type delta;
       had_double_type amp;
       had_double_type eps;
-      had_double_type fmr_radius;
       int output_level;
       int PP;
       int granularity;

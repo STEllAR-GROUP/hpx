@@ -46,19 +46,11 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         hpx::util::high_resolution_timer t;
         std::vector<naming::id_type> result_data;
         
-        // start with coarse mesh
-        int level = 0;
-
         // we are in spherical symmetry, r=0 is the smallest radial domain point             
-        had_double_type xmin = 0.0;
-        if ( par->integrator == 1 ) {
-            components::amr::unigrid_mesh unigrid_mesh;
-            unigrid_mesh.create(here);
-            result_data = unigrid_mesh.init_execute(function_type, numvals, numsteps,
-                do_logging ? logging_type : components::component_invalid,level,xmin, par);
-        } else {
-          BOOST_ASSERT(false);
-        }
+        components::amr::unigrid_mesh unigrid_mesh;
+        unigrid_mesh.create(here);
+        result_data = unigrid_mesh.init_execute(function_type, numvals, numsteps,
+            do_logging ? logging_type : components::component_invalid,par);
         printf("Elapsed time: %f s\n", t.elapsed());
 
         // get some output memory_block_data instances
@@ -102,8 +94,6 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("threads,t", po::value<int>(), 
                 "the number of operating system threads to spawn for this"
                 "HPX locality")
-            ("numvals,n", po::value<std::size_t>(), 
-                "the number of data points to use for the computation")
             ("dist,d", po::value<std::string>(), 
                 "random distribution type (uniform or normal)")
             ("numsteps,s", po::value<std::size_t>(), 
@@ -216,9 +206,7 @@ int main(int argc, char* argv[])
         if (vm.count("run_agas_server"))  // run the AGAS server instance here
             agas_server.reset(new agas_server_helper(agas_host, agas_port));
 
-        std::size_t numvals = -1;
-        if (vm.count("numvals"))
-            numvals = vm["numvals"].as<std::size_t>();
+        std::size_t numvals;
 
         std::size_t numsteps = 400;
         if (vm.count("numsteps"))
@@ -227,13 +215,12 @@ int main(int argc, char* argv[])
         components::amr::Parameter par;
 
         // default pars
-        par->integrator  = 1;
         par->allowedl    = 0;
         par->loglevel    = 2;
         par->output      = 1.0;
         par->output_stdout = 1;
         par->lambda      = 0.15;
-        par->nx0         = 33;
+        int nx0          = 33;
         par->nt0         = numsteps;
         par->minx0       =   0.0;
         par->maxx0       =  15.0;
@@ -243,9 +230,12 @@ int main(int argc, char* argv[])
         par->delta       =  1.0;
         par->PP          =  7;
         par->eps         =  0.0;
-        par->fmr_radius  =  -999.0;
         par->output_level =  0;
         par->granularity =  3;
+        for (int i=0;i<maxlevels;i++) {
+          // default
+          par->refine_level[i] = 1.5;
+        }
 
         par->linearbounds = 1;
         int scheduler = 1;  // 0: global scheduler
@@ -281,24 +271,13 @@ int main(int argc, char* argv[])
                 std::string tmp = sec->get_entry("output_level");
                 par->output_level = atoi(tmp.c_str());
               }
-              if ( sec->has_entry("integrator") ) {
-                std::string tmp = sec->get_entry("integrator");
-                par->integrator = atoi(tmp.c_str());
-                if ( par->integrator < 0 || par->integrator > 1 ) BOOST_ASSERT(false); 
-              }
               if ( sec->has_entry("linearbounds") ) {
                 std::string tmp = sec->get_entry("linearbounds");
                 par->linearbounds = atoi(tmp.c_str());
               }
               if ( sec->has_entry("nx0") ) {
                 std::string tmp = sec->get_entry("nx0");
-                par->nx0 = atoi(tmp.c_str());
-                // over-ride command line argument if present
-                numvals = par->nx0;
-                if ( par->nx0 < 16 ) {
-                  std::cout << " Problem: you need to increase nx0 to at least 16 !" << std::endl;
-                  BOOST_ASSERT(false);
-                }
+                nx0 = atoi(tmp.c_str());
               }
               if ( sec->has_entry("nt0") ) {
                 std::string tmp = sec->get_entry("nt0");
@@ -339,10 +318,6 @@ int main(int argc, char* argv[])
                 std::string tmp = sec->get_entry("eps");
                 par->eps = atof(tmp.c_str());
               }
-              if ( sec->has_entry("fmr_radius") ) {
-                std::string tmp = sec->get_entry("fmr_radius");
-                par->fmr_radius = atof(tmp.c_str());
-              }
               if ( sec->has_entry("granularity") ) {
                 std::string tmp = sec->get_entry("granularity");
                 par->granularity = atoi(tmp.c_str());
@@ -351,23 +326,46 @@ int main(int argc, char* argv[])
                   BOOST_ASSERT(false);
                 }
               }
+              for (int i=0;i<par->allowedl;i++) {
+                char tmpname[80];
+                sprintf(tmpname,"refine_level_%d",i);
+                if ( sec->has_entry(tmpname) ) {
+                  std::string tmp = sec->get_entry(tmpname);
+                  par->refine_level[i] = atof(tmp.c_str());
+                }
+              }
+
             }
         }
 
+        
         // derived parameters
-        if ( par->nx0 % par->granularity == 0 ) {
-          numvals = par->nx0/par->granularity;
-        } else {
-          std::cerr << " Problem granularity is not a factor of nx0! nx0: " << par->nx0 << " granularity: " << par->granularity << std::endl;
-          BOOST_ASSERT(false);
+        if ( nx0%par->granularity != 0 ) {
+           std::cerr << " Problem: nx0 must be a multiple of the specified granularity;  nx0: " << nx0 << " granularity: " <<  par->granularity << std::endl;
+           BOOST_ASSERT(false);
         }
+        par->nx0 = nx0/par->granularity;
 
-        par->dx0 = (par->maxx0 - par->minx0)/(par->nx0-1);
+        par->dx0 = (par->maxx0 - par->minx0)/(par->nx0*par->granularity-1);
         par->dt0 = par->lambda*par->dx0;
 
-        if ( par->integrator == 1 ) {
-          numsteps *= 3;  // three subcycles each step
+        par->nx[0] = par->nx0;
+        for (int i=1;i<par->allowedl+1;i++) {
+          par->nx[i] = int(par->refine_level[i-1]*par->nx[i-1]);
+          if ( par->nx[i]%2 == 0 ) {
+            par->nx[i] += 1;
+          }
+          std::cout << " TEST nx " << par->nx[i] << " i " << i << std::endl;
         }
+
+        // figure out the number of points
+        numvals = par->nx[par->allowedl];
+        for (int i=par->allowedl-1;i>=0;i--) {
+          // remove duplicates
+          numvals += par->nx[i] - (par->nx[i+1]+1)/2;
+        }
+
+        numsteps = numsteps*3 - 2;
 
         // create output file to append to
         FILE *fdata;

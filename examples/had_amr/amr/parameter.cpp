@@ -27,9 +27,10 @@ namespace hpx { namespace components { namespace amr
         ar & output;
         ar & output_stdout;
         ar & linearbounds;
-        ar & integrator;
         ar & nt0;
         ar & nx0;
+        ar & nx;
+        ar & refine_level;
         ar & minx0;
         ar & maxx0;
         ar & dx0;
@@ -39,7 +40,6 @@ namespace hpx { namespace components { namespace amr
         ar & delta;
         ar & amp;
         ar & eps;
-        ar & fmr_radius;
         ar & output_level;
         ar & PP;
         ar & granularity;

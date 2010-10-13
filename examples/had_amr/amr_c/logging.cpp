@@ -44,7 +44,6 @@ namespace hpx { namespace components { namespace amr { namespace server
               std::cout << " AMR Level: " << val.level_ 
                         << " Timestep: " <<  val.timestep_ 
                         << " Time: " << val.timestep_*par->dx0*par->lambda  
-                        << " refine?: " << val.refine_ 
                         << " row: " << row 
                         << " index: " << val.index_ 
                         << " Value: " << val.value_[i].phi[0][0] 

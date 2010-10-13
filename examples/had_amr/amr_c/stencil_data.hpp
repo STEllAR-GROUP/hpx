@@ -34,8 +34,7 @@ struct stencil_data
 {
     stencil_data() 
       : max_index_(0), index_(0), timestep_(0), cycle_(0), granularity(0),
-        level_(0), iter_(0), 
-        refine_(false)
+        level_(0), iter_(0)
     {}
     ~stencil_data() {}
 
@@ -43,10 +42,8 @@ struct stencil_data
       : max_index_(rhs.max_index_), index_(rhs.index_), 
         timestep_(rhs.timestep_), cycle_(rhs.cycle_), 
         granularity(rhs.granularity), level_(rhs.level_), 
-        value_(rhs.value_), x_(rhs.x_),overalloc_(rhs.overalloc_),
-        rightalloc_(rhs.rightalloc_), iter_(rhs.iter_), 
-        right_(rhs.right_),over_(rhs.over_),
-        refine_(rhs.refine_)
+        value_(rhs.value_), x_(rhs.x_),
+        iter_(rhs.iter_)
     {
         // intentionally do not copy mutex, new copy will have it's own mutex
     }
@@ -62,12 +59,7 @@ struct stencil_data
             level_ = rhs.level_;
             value_ = rhs.value_;
             x_ = rhs.x_; 
-            overalloc_ = rhs.overalloc_; 
-            rightalloc_ = rhs.rightalloc_; 
-            over_ = rhs.over_; 
-            right_ = rhs.right_; 
             iter_= rhs.iter_; 
-            refine_ = rhs.refine_;
             // intentionally do not copy mutex, new copy will have it's own mutex
         }
         return *this;
@@ -81,14 +73,9 @@ struct stencil_data
     size_t cycle_; // counts the number of subcycles
     size_t granularity;
     size_t level_;    // refinement level
-    std::vector< int > overalloc_;           
-    std::vector< int > rightalloc_;          
-    std::vector< gid > over_;           
-    std::vector< gid > right_;          
     std::vector< nodedata > value_;            // current value
     std::vector< had_double_type > x_;      // x coordinate value
     size_t iter_;      // rk subcycle indicator
-    bool refine_;     // whether to refine
 
 private:
     // serialization support
@@ -98,8 +85,7 @@ private:
     void serialize(Archive & ar, const unsigned int version)
     {
         ar & max_index_ & index_ & timestep_ & cycle_ & level_ & value_;
-        ar & x_ & iter_ & right_ & over_ & overalloc_ & rightalloc_ ;
-        ar & refine_; 
+        ar & x_ & iter_;
     }
 };
 

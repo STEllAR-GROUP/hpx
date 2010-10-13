@@ -45,25 +45,18 @@ had_double_type initial_Phi(had_double_type r,Par const& par) {
 
 ///////////////////////////////////////////////////////////////////////////
 int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
-    int level, had_double_type xmin, Par const& par)
+    Par const& par)
 {
     // provide initial data for the given data value 
     val->max_index_ = maxitems;
     val->index_ = item;
     val->timestep_ = 0;
     val->cycle_ = 0;
-    val->level_= level;
     val->iter_ = 0;
-    val->refine_= false;
 
     val->granularity = par.granularity;
     val->x_.resize(par.granularity);
     val->value_.resize(par.granularity);
-
-    val->overalloc_.resize(par.granularity);
-    val->rightalloc_.resize(par.granularity);
-    val->over_.resize(par.granularity);
-    val->right_.resize(par.granularity);
 
     //number of values per stencil_data
     int i;
@@ -72,13 +65,47 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     had_double_type chi,Phi,Pi,Energy,r;
     had_double_type dx;
 
+    std::vector<std::size_t> rowsize;
+    for (int j=0;j<=par.allowedl;j++) {
+      rowsize.push_back(par.nx[par.allowedl]);
+      for (int i=par.allowedl-1;i>=j;i--) {
+       // remove duplicates
+       rowsize[j] += par.nx[i] - (par.nx[i+1]+1)/2;
+      }
+    }
+  
+    // vectors level_begin and level_end indicate the level to which a particular index belongs
+    std::vector<std::size_t> level_begin, level_end;
+    for (int j=0;j<=par.allowedl;j++) {
+      if ( j != par.allowedl ) level_begin.push_back(rowsize[j+1]);
+      else level_begin.push_back(0);
+      level_end.push_back(rowsize[j]);
+    }
+
+    // find out what level we are at
+    std::size_t level = -1;
+    for (int j=0;j<=par.allowedl;j++) {
+      if (item >= level_begin[j] && item < level_end[j] ) {
+        level = j; 
+        break;
+      }    
+    }
+    BOOST_ASSERT(level >= 0);
+
+    val->level_= level;
     dx = par.dx0/pow(2.0,level);
 
-    for (i=0;i<par.granularity;i++) {
-      val->overalloc_[i] = 0;
-      val->rightalloc_[i] = 0;
+    had_double_type r_start = 0.0;
+    for (int j=0;j<level;j++) {
+      r_start += (level_end[j]-level_begin[j])*par.granularity*par.dx0/pow(2.0,j);
+    }
+    for (int j=level_begin[level];j<item;j++) {
+      r_start += dx*par.granularity;
+    }
 
-      r = xmin + (par.granularity*item + i)*dx;
+    std::cout << " TEST r_start " << r_start << " item " << item << " dx " << dx << std::endl;
+    for (i=0;i<par.granularity;i++) {
+      r = r_start + i*dx;
 
       chi = initial_chi(r,par);
       Phi = initial_Phi(r,par);
@@ -98,37 +125,11 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     return 1;
 }
 
-int initial_data_aux(stencil_data* val, Par const& par)
-{
-    int i;
-    nodedata node;
- 
-    had_double_type r,chi,Phi,Pi,Energy;
-    for (i=0;i<val->granularity;i++) {
-      r = val->x_[i];
-
-      chi = initial_chi(r,par);
-      Phi = initial_Phi(r,par);
-      Pi  = 0.0;
-      Energy = 0.5*r*r*(Pi*Pi + Phi*Phi) - r*r*pow(chi,par.PP+1)/(par.PP+1);
-
-      node.phi[0][0] = chi;
-      node.phi[0][1] = Phi;
-      node.phi[0][2] = Pi;
-      node.phi[0][3] = Energy;
-
-      val->value_[i] = node;
-    }
-    return 1;
-}
-
 int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int size,bool boundary,int *bbox,int compute_index, had_double_type dt, had_double_type dx, had_double_type timestep,int iter, int level, Par const& par)
 {
   // allocate some temporary arrays for calculating the rhs
   nodedata rhs,work;
   int i,j;
-
-  BOOST_ASSERT(par.integrator == 1);
 
   if ( iter == 0 ) {
     for (j=0;j<result->granularity;j++) {
@@ -282,6 +283,11 @@ void calcrhs(struct nodedata * rhs,
     rhs->phi[0][3] = 0.0; // Energy rhs -- analysis variable
   }
 
+  // busy work to test scaling
+  //for (int i=0;i<500;i++) {
+  //  rhs->phi[0][3] += i*(rhs->phi[0][2]+rhs->phi[0][3])/500.0;
+  //}
+
   if (boundary ) {
     // boundary -- look at the bounding box (bbox) to decide which boundary it is
     if ( bbox[0] == 1 && compute_index == 0 ) {
@@ -308,141 +314,3 @@ void calcrhs(struct nodedata * rhs,
     }
   }
 }
-
-had_double_type interp_quad(had_double_type y1,had_double_type y2,had_double_type y3,had_double_type y4,had_double_type y5,
-                            had_double_type x, 
-                            had_double_type x1,had_double_type x2,had_double_type x3,had_double_type x4,had_double_type x5) {
-  had_double_type xx1 = x - x1;
-  had_double_type xx2 = x - x2;
-  had_double_type xx3 = x - x3;
-  had_double_type xx4 = x - x4;
-  had_double_type xx5 = x - x5;
-  had_double_type result = xx2*xx3*xx4*xx5*y1/( (x1-x2)*(x1-x3)*(x1-x4)*(x1-x5) )
-                + xx1*xx3*xx4*xx5*y2/( (x2-x1)*(x2-x3)*(x2-x4)*(x2-x5) )
-                + xx1*xx2*xx4*xx5*y3/( (x3-x1)*(x3-x2)*(x3-x4)*(x3-x5) )
-                + xx1*xx2*xx3*xx5*y4/( (x4-x1)*(x4-x2)*(x4-x3)*(x4-x5) )
-                + xx1*xx2*xx3*xx4*y5/( (x5-x1)*(x5-x2)*(x5-x3)*(x5-x4) );
-
-  return result;
-}                 
-
-int interpolation(had_double_type dst_x,struct nodedata *dst,
-                  had_double_type * x_val, int xsize,
-                  nodedata * n_val, int nsize)
-{
-  int i,j,start_index;
-
-  // sanity check
-  if ( x_val[0] > dst_x || x_val[xsize-1] < dst_x ) return 0;
-
-  // specific to spherical symmetry
-  if ( dst_x < 0.0 ) {
-    for (i=0;i<num_eqns;i++) {
-      dst->phi[0][i] = 1.e8;
-      dst->phi[1][i] = 1.e8;
-    }
-    return 1;
-  }
-
-  // quad interp at AMR boundaries
-  // find the point nearest dst_x
-  for (i=0;i<xsize;i++) {
-    if ( x_val[i] > dst_x ) break;
-  }
-
-  if ( i > 1 && i < xsize-2 ) {
-    start_index = i-2;
-  } else if ( i <= 1 ) {
-    start_index = 0;
-  } else if ( i >= xsize-2 ) {
-    start_index = xsize-5;
-  } else {
-    // this shouldn't happen
-    return 0;
-  }
-  j = i;
-
-  // linear interpolation at boundaries
-  for (i=0;i<num_eqns;i++) {
-    dst->phi[0][i] = 0.5*(n_val[j-1].phi[0][i] + n_val[j].phi[0][i]);
-#if 0
-    dst->phi[0][i] = interp_quad(n_val[start_index].phi[0][i],
-                                 n_val[start_index+1].phi[0][i],
-                                 n_val[start_index+2].phi[0][i],
-                                 n_val[start_index+3].phi[0][i],
-                                 n_val[start_index+4].phi[0][i],
-                                 dst_x,
-                                 x_val[start_index],
-                                 x_val[start_index+1],
-                                 x_val[start_index+2],
-                                 x_val[start_index+3],
-                                 x_val[start_index+4]);
-#endif
-  }
-
-  return 1;
-}
-
-bool refinement(nodedata * vecval,int size, stencil_data* result,int compute_index,bool boundary, int *bbox,Par const& par)
-{
-  int j;
-  for (j=0;j<result->granularity;j++) {
-    if ( result->x_[j] < par.fmr_radius ) return true;
-  }
-
-  // refine on center of left moving pulse: R0 - time 
-  if ( par.fmr_radius < 0.0 ) {
-    had_double_type time = result->timestep_*par.dx0*par.lambda;
-    for (j=0;j<result->granularity;j++) {
-      if ( result->x_[j] < fabs(par.R0 - time) + 3.0 && result->x_[j] > fabs(par.R0 - time) - 3.0 ) return true;
-    }
-  }
-   
-  return false;
-
-#if 0
-  had_double_type grad1,grad2,grad3,grad4;
-  had_double_type dx = par.dx0/pow(2.0,(int) vecval[0]->level_);
-
-  if ( r < par.fmr_radius ) return true;
-  else return false;
-
-  if ( compute_index > 0 && compute_index < size-1 && !boundary ) {
-    // gradient detector
-    grad1 = (vecval[compute_index+1]->value_.phi[0][0] - vecval[compute_index-1]->value_.phi[0][0])/(2.*dx);
-    grad2 = (vecval[compute_index+1]->value_.phi[0][1] - vecval[compute_index-1]->value_.phi[0][1])/(2.*dx);
-    grad3 = (vecval[compute_index+1]->value_.phi[0][2] - vecval[compute_index-1]->value_.phi[0][2])/(2.*dx);
-    grad4 = (vecval[compute_index+1]->value_.phi[0][3] - vecval[compute_index-1]->value_.phi[0][3])/(2.*dx);
-
-    if ( sqrt( grad1*grad1 + grad2*grad2 + grad3*grad3 + grad4*grad4 ) > par.ethreshold ) return true;
-    else return false;
-  } if ( boundary && bbox[0] == 1 ) {
-    // gradient detector
-    grad1 = (vecval[compute_index+1]->value_.phi[0][0] - vecval[compute_index]->value_.phi[0][0])/(dx);
-    grad2 = (vecval[compute_index+1]->value_.phi[0][1] - vecval[compute_index]->value_.phi[0][1])/(dx);
-    grad3 = (vecval[compute_index+1]->value_.phi[0][2] - vecval[compute_index]->value_.phi[0][2])/(dx);
-    grad4 = (vecval[compute_index+1]->value_.phi[0][3] - vecval[compute_index]->value_.phi[0][3])/(dx);
-
-    if ( sqrt( grad1*grad1 + grad2*grad2 + grad3*grad3 + grad4*grad4 ) > par.ethreshold ) return true;
-    return false;
-  } else {
-    return false;
-  }
-
-  // simple amplitude refinement
-  had_double_type threshold;
-  if ( level == 0 ) threshold = 0.15;
-  if ( level == 1 ) threshold = 0.25;
-  if ( level == 2 ) threshold = 0.21;
-  if ( level == 3 ) threshold = 0.33;
-  if ( level == 4 ) threshold = 0.45;
-
-  if ( dst->phi[0][0] > threshold || 
-       dst->phi[0][1] > threshold || 
-       dst->phi[0][2] > threshold || 
-       dst->phi[0][3] > threshold ) return true;
-  else return false;
-#endif
-}
-
-

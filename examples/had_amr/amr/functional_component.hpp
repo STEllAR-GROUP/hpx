@@ -54,17 +54,19 @@ namespace hpx { namespace components { namespace amr
 
         ///////////////////////////////////////////////////////////////////////
         lcos::future_value<naming::id_type> alloc_data_async(int item,
-            int maxitems, int row, std::size_t level, had_double_type xmin, Parameter const& par)
+            int maxitems, int row,
+            Parameter const& par)
         {
             return this->base_type::alloc_data_async(this->gid_, item, 
-                maxitems, row, level, xmin, par);
+                maxitems, row, par);
         }
 
         naming::id_type alloc_data(int item, int maxitems,
-            int row, std::size_t level, had_double_type xmin, Parameter const& par)
+            int row,
+            Parameter const& par)
         {
             return this->base_type::alloc_data(this->gid_, item, maxitems, 
-                row, level, xmin, par);
+                row, par);
         }
 
         ///////////////////////////////////////////////////////////////////////

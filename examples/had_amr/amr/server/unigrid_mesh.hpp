@@ -47,7 +47,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             components::component_type function_type, std::size_t numvalues, 
             std::size_t numsteps,
             components::component_type logging_type, 
-            std::size_t level, had_double_type xmin, Parameter const& par);
+            Parameter const& par);
 
         std::vector<naming::id_type> execute(
             std::vector<naming::id_type> const& initialdata,
@@ -59,11 +59,10 @@ namespace hpx { namespace components { namespace amr { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::result_action7<
+        typedef hpx::actions::result_action5<
             unigrid_mesh, std::vector<naming::id_type>, unigrid_mesh_init_execute, 
             components::component_type, std::size_t, std::size_t,
             components::component_type,
-            std::size_t,had_double_type,
             Parameter const&, &unigrid_mesh::init_execute
         > init_execute_action;
 
@@ -86,13 +85,14 @@ namespace hpx { namespace components { namespace amr { namespace server
         void prepare_initial_data(
             distributed_iterator_range_type const& functions, 
             std::vector<naming::id_type>& initial_data,
-            std::size_t level, had_double_type xmin,
+            std::size_t numvalues,
             Parameter const& par);
 
         static void init_stencils(
             distributed_iterator_range_type const& stencils,
             distributed_iterator_range_type const& functions, int static_step, 
-            int numvalues,Parameter const& par);
+            Array3D &dst_port,Array3D &dst_src,Array3D &dst_step,
+            Array3D &dst_size,Array3D &src_size,Parameter const& par);
 
         static void get_output_ports(
             distributed_iterator_range_type const& stencils,
@@ -101,6 +101,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         static void connect_input_ports(
             components::distributing_factory::result_type const* stencils,
             std::vector<std::vector<std::vector<naming::id_type> > > const& outputs,
+            Array3D &dst_size,Array3D &dst_step,Array3D &dst_src,Array3D &dst_port,
             Parameter const& par);
 
         static void execute(distributed_iterator_range_type const& stencils, 
@@ -111,10 +112,12 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         static void prep_ports(Array3D &dst_port,Array3D &dst_src,
                                     Array3D &dst_step,Array3D &dst_size,
-                                    Array3D &src_size,int numvalues,Parameter const& par);
+                                    Array3D &src_size,std::size_t num_rows,
+                                    std::vector<std::size_t> &each_row, std::vector<std::size_t> &level_row,
+                                    std::vector<std::size_t> &level_begin, std::vector<std::size_t> &level_end,
+                                    Parameter const& par);
 
     private:
-        std::size_t numvalues_;
     };
 
 }}}}

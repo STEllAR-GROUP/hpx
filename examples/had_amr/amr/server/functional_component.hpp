@@ -53,7 +53,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
 
         virtual naming::id_type alloc_data(int item, int maxitems, int row,
-            std::size_t level, had_double_type x, Parameter const&)
+            Parameter const&)
         {
             // This shouldn't ever be called. If you're seeing this assertion 
             // you probably forgot to overload this function in your stencil 
@@ -92,9 +92,9 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
 
         naming::id_type alloc_data_nonvirt(int item, int maxitems, int row,
-            std::size_t level, had_double_type x, Parameter const& par)
+            Parameter const& par)
         {
-            return alloc_data(item, maxitems, row, level, x, par);
+            return alloc_data(item, maxitems, row, par);
         }
 
         util::unused_type 
@@ -108,10 +108,11 @@ namespace hpx { namespace components { namespace amr { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::result_action6<
+        typedef hpx::actions::result_action4<
             functional_component, naming::id_type, 
             functional_component_alloc_data, 
-            int, int, int, std::size_t, had_double_type, Parameter const&, 
+            int, int, int,
+            Parameter const&, 
             &functional_component::alloc_data_nonvirt
         > alloc_data_action;
 
