@@ -58,8 +58,11 @@ struct Par {
       int output_level;
       int PP;
       int granularity;
+      int ghostwidth;
+      int extra_nx;
       std::vector<std::size_t> rowsize;
       std::vector<std::size_t> level_begin, level_end;
+      std::vector<std::size_t> ghostwidth_array;
 };
 
 #if defined(__cplusplus)

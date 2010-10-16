@@ -53,6 +53,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->timestep_ = 0;
     val->cycle_ = 0;
     val->iter_ = 0;
+    val->ghostwidth_ = 0; // ghostwidth indicator
 
     val->granularity = par.granularity;
     val->x_.resize(par.granularity);
@@ -73,9 +74,16 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
         break;
       }    
     }
-    BOOST_ASSERT(level >= 0);
 
-    std::cout << " TEST item " << item << " level " << level << std::endl;
+    // identify the ghostwidth points
+    for (int i=0;i<par.ghostwidth_array.size();i++) {
+      if ( item == par.ghostwidth_array[i] ) {
+        val->ghostwidth_ = 1;
+        level--;
+        break;
+      }
+    }
+    BOOST_ASSERT(level >= 0);
 
     val->level_= level;
     dx = par.dx0/pow(2.0,level);
@@ -91,7 +99,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     //std::cout << " TEST r_start " << r_start << " item " << item << " dx " << dx << std::endl;
     for (i=0;i<par.granularity;i++) {
       r = r_start + i*dx;
-      std::cout << " TEST r " << r << std::endl;
+      std::cout << " TEST item " << item << " " << r << " level " << level << std::endl; 
 
       chi = initial_chi(r,par);
       Phi = initial_Phi(r,par);
