@@ -53,7 +53,6 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->timestep_ = 0;
     val->cycle_ = 0;
     val->iter_ = 0;
-    val->ghostwidth_ = 0; // ghostwidth indicator
 
     val->granularity = par.granularity;
     val->x_.resize(par.granularity);
@@ -78,7 +77,6 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     // identify the ghostwidth points
     for (int i=0;i<par.ghostwidth_array.size();i++) {
       if ( item == par.ghostwidth_array[i] ) {
-        val->ghostwidth_ = 1;
         level--;
         break;
       }
