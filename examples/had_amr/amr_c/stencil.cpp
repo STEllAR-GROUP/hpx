@@ -284,6 +284,7 @@ namespace hpx { namespace components { namespace amr
 
             // copy over critical info
 
+            resultval->x_.resize(resultval->granularity);
             resultval->value_.resize(resultval->granularity);
             //had_double_type dt = par->dt0/pow(2.0,(int) val[compute_index]->level_);
             //had_double_type dx = par->dx0/pow(2.0,(int) val[compute_index]->level_); 
@@ -316,6 +317,7 @@ namespace hpx { namespace components { namespace amr
                       num_erased++;
                     }
                   }
+                 
 
                   resultval->granularity = par->granularity;
 
@@ -342,10 +344,12 @@ namespace hpx { namespace components { namespace amr
  
         // set return value difference between actual and required number of
         // timesteps (>0: still to go, 0: last step, <0: overdone)
-        int t = resultval->cycle_;
-        int r = numsteps_ - t;
+        return 1;
+         // int t = resultval->cycle_/3;
+         // int r = numsteps_ - t;
+          //int r = numsteps_ - row;
         //std::cout << " TEST r " << r << std::endl;
-        return r;
+        //return r;
     }
 
     hpx::actions::manage_object_action<stencil_data> const manage_stencil_data =

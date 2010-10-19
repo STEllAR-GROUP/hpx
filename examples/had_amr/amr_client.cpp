@@ -422,7 +422,9 @@ int main(int argc, char* argv[])
         // figure out the number of points
         numvals = par->rowsize[0];
 
-        numsteps = numsteps*3 - 2;
+        //had_double_type tmp2 = 3*pow(2,par->allowedl);
+        //int num_rows = (int) tmp2;
+        //numsteps = numsteps*3 - 2;
 
         // create output file to append to
         FILE *fdata;
