@@ -53,6 +53,8 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->timestep_ = 0;
     val->cycle_ = 0;
     val->iter_ = 0;
+    val->gw_iter_ = 0;
+    val->ghostwidth_ = 0;
 
     val->granularity = par.granularity;
     val->x_.resize(par.granularity);
@@ -77,6 +79,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     // identify the ghostwidth points
     for (int i=0;i<par.ghostwidth_array.size();i++) {
       if ( item == par.ghostwidth_array[i] ) {
+        val->ghostwidth_ = 1; 
         level--;
         break;
       }
@@ -88,9 +91,9 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
 
     had_double_type r_start = 0.0;
     for (int j=par.allowedl;j>level;j--) {
-      r_start += (par.level_end[j]-par.level_begin[j])*par.granularity*par.dx0/pow(2.0,j);
+      r_start += (par.alt_level_end[j]-par.alt_level_begin[j])*par.granularity*par.dx0/pow(2.0,j);
     }
-    for (int j=par.level_begin[level];j<item;j++) {
+    for (int j=par.alt_level_begin[level];j<item;j++) {
       r_start += dx*par.granularity;
     }
 

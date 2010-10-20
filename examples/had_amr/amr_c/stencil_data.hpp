@@ -34,7 +34,7 @@ struct stencil_data
 {
     stencil_data() 
       : max_index_(0), index_(0), timestep_(0), cycle_(0), granularity(0),
-        level_(0), iter_(0),g_startx_(0),g_endx_(0),g_dx_(0)
+        level_(0), iter_(0),gw_iter_(0),g_startx_(0),g_endx_(0),g_dx_(0),ghostwidth_(0)
     {}
     ~stencil_data() {}
 
@@ -43,7 +43,8 @@ struct stencil_data
         timestep_(rhs.timestep_), cycle_(rhs.cycle_), 
         granularity(rhs.granularity), level_(rhs.level_), 
         value_(rhs.value_), x_(rhs.x_),
-        iter_(rhs.iter_),g_startx_(rhs.g_startx_),g_endx_(rhs.g_endx_),g_dx_(rhs.g_dx_)
+        iter_(rhs.iter_),gw_iter_(rhs.iter_),
+        g_startx_(rhs.g_startx_),g_endx_(rhs.g_endx_),g_dx_(rhs.g_dx_),ghostwidth_(rhs.ghostwidth_)
     {
         // intentionally do not copy mutex, new copy will have it's own mutex
     }
@@ -60,9 +61,11 @@ struct stencil_data
             value_ = rhs.value_;
             x_ = rhs.x_; 
             iter_= rhs.iter_; 
+            gw_iter_= rhs.gw_iter_; 
             g_startx_= rhs.g_startx_; 
             g_endx_= rhs.g_endx_; 
             g_dx_= rhs.g_dx_; 
+            ghostwidth_= rhs.ghostwidth_; 
             // intentionally do not copy mutex, new copy will have it's own mutex
         }
         return *this;
@@ -79,9 +82,11 @@ struct stencil_data
     std::vector< nodedata > value_;            // current value
     std::vector< had_double_type > x_;      // x coordinate value
     size_t iter_;      // rk subcycle indicator
+    size_t gw_iter_;      // subcycle indicator
     had_double_type g_startx_;
     had_double_type g_endx_;
     had_double_type g_dx_;
+    size_t ghostwidth_;
 
 private:
     // serialization support
@@ -91,7 +96,7 @@ private:
     void serialize(Archive & ar, const unsigned int version)
     {
         ar & max_index_ & index_ & timestep_ & cycle_ & level_ & value_;
-        ar & x_ & iter_ & g_startx_ & g_endx_ & g_dx_;
+        ar & x_ & iter_ & gw_iter_ & g_startx_ & g_endx_ & g_dx_ & ghostwidth_;
     }
 };
 

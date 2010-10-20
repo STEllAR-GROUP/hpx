@@ -131,6 +131,7 @@ namespace hpx { namespace components { namespace amr
           }
         }
 
+        resultval->x_.resize(0);
         for (int j = 0; j < val[compute_index]->granularity; j++) {
           resultval->x_.push_back(val[compute_index]->x_[j]);
         }
@@ -147,8 +148,9 @@ namespace hpx { namespace components { namespace amr
         resultval->g_startx_ = val[compute_index]->g_startx_;
         resultval->g_endx_ = val[compute_index]->g_endx_;
         resultval->g_dx_ = val[compute_index]->g_dx_;
+        resultval->ghostwidth_ = val[compute_index]->ghostwidth_;
 
-        if ( val[compute_index]->iter_ == 0 && val.size() == 3 ) {
+        if ( val[compute_index]->gw_iter_ == 0 && val.size() == 3 ) {
           // ghostwidth {{{
           // ghostwidth interpolation can only occur when rows contain aligned timesteps are aligned
           // During other iterations, points are treated as artificial boundaries and eventually tapered.
@@ -166,6 +168,8 @@ namespace hpx { namespace components { namespace amr
 
             // There are two cases:  you either have to interpolate val[1] and val[2] or just val[1]
             if ( val[0]->level_ != val[1]->level_ && val[1]->level_ == val[2]->level_ ) {
+              // this is a ghostwidth point
+              BOOST_ASSERT(val[compute_index]->ghostwidth_ == 1);
               // CASE I
               // -------------------------------
               // interpolate val[1] and val[2]
@@ -201,22 +205,22 @@ namespace hpx { namespace components { namespace amr
               }
 
               // temporarily change granularity size
-              resultval->granularity = val[0]->granularity + 2*val[1]->granularity-1;
+              resultval->granularity = 2*val[1]->granularity + 2*val[2]->granularity-1;
+              resultval->x_.resize(resultval->granularity);
+              for (int j = 0; j < resultval->granularity; j++) {
+                resultval->x_[j] = alt_vecx[j+adj_index];
+              }
 
-              // the new adj_index is 0 to accomodate the larger granularity of val[compute_index].
-              // The larger granularity is needed since we won't receive communication from the finer level (val[0])
-              // for another 3 rk cycles.  Thus tapering is necessary.
-              adj_index = 0;
-
-              // treat the left point as an artificial boundary as per tapering
+              // treat the point as a right artificial boundary as per tapering
               boundary = true;
-              bbox[0] = 1;
-              bbox[1] = 0;
+              bbox[0] = 0;
+              bbox[1] = 1;
 
               vecx.swap(alt_vecx);
               vecval.swap(alt_vecval);
 
             } else if (val[2]->level_ != val[1]->level_ && val[0]->level_ == val[1]->level_ ) {
+              BOOST_ASSERT(val[2]->ghostwidth_ == 1);
               // CASE II
               // -------------------------------
               // interpolate val[2]
@@ -253,20 +257,37 @@ namespace hpx { namespace components { namespace amr
                 count++;
               }
 
-              // temporarily change granularity size
-              resultval->granularity = val[1]->granularity + 2*val[2]->granularity-1;
-
-              // treat the rightmost point as an artificial boundary
-              boundary = true;
-              bbox[0] = 0;
-              bbox[1] = 1;
-
               vecx.swap(alt_vecx);
               vecval.swap(alt_vecval);
             } else {
               // the case of interpolating val[0] and val[2] but not va[1] should not happen
               BOOST_ASSERT(false);
             }
+          }
+          // }}}
+        }
+        if ( val[compute_index]->iter_ == 0 && val.size() == 3 ) {
+          // more ghostwidth {{{
+          if ( val[0]->level_ == val[1]->level_ && val[1]->level_ != val[2]->level_ && val[0]->ghostwidth_ == 1 ) {
+            BOOST_ASSERT(compute_index == 1);
+
+            resultval->g_startx_ = val[compute_index]->x_[0];
+            resultval->g_endx_ = val[compute_index]->x_[val[compute_index]->granularity-1];
+            resultval->g_dx_ = val[compute_index]->x_[1]-val[compute_index]->x_[0];
+
+            // increase val[1] ghostwidth size
+            resultval->granularity = val[0]->granularity + val[1]->granularity;
+            resultval->x_.resize(resultval->granularity);
+            adj_index = 0;
+
+            for (int j = 0; j < resultval->granularity; j++) {
+              resultval->x_[j] = vecx[j];
+            }
+
+            // treat the point as a left artificial boundary as per tapering
+            boundary = true;
+            bbox[0] = 1;
+            bbox[1] = 0;
           }
           // }}}
         }
@@ -299,35 +320,67 @@ namespace hpx { namespace components { namespace amr
                                  val[compute_index]->iter_,val[compute_index]->level_,*par.p);
 
             BOOST_ASSERT(gft);
-  
+
             // increase the iteration counter
             if ( val[compute_index]->iter_ == 2 ) {
                 resultval->iter_ = 0;
 
                 if ( resultval->granularity != par->granularity ) {
-                  // tapering {{{
-                  int count = 0;
-                  int num_erased = 0;
-                  for (int j=0;j<resultval->granularity;j++) {
-                    if ( floatcmp(resultval->x_[j],resultval->g_startx_ + count*resultval->g_dx_) == 1 ) {
-                      count++;
-                    } else {
-                      resultval->x_.erase(resultval->x_.begin()+j-num_erased);
-                      resultval->value_.erase(resultval->value_.begin()+j-num_erased);
-                      num_erased++;
+                  BOOST_ASSERT(val.size() == 2);
+                  if ( bbox[0] == 1 ) { // left boundary
+                    // ghostwidth resizing
+                    // tapering {{{
+                    int count = 0;
+                    for (int j=resultval->x_.size()-1;j>=0;j--) {
+                      if ( floatcmp(resultval->x_[j],resultval->g_endx_ - count*resultval->g_dx_) == 1 ) {
+                        count++;
+                      }  else {
+                        resultval->x_.erase(resultval->x_.begin()+j);
+                        resultval->value_.erase(resultval->value_.begin()+j);
+                      }
                     }
+
+                    resultval->granularity = par->granularity;
+
+                    BOOST_ASSERT(floatcmp(resultval->x_[0],resultval->g_startx_) == 1);
+                    BOOST_ASSERT(floatcmp(resultval->x_[par->granularity-1],resultval->g_endx_) == 1);
+                    BOOST_ASSERT(resultval->x_.size() == par->granularity);
+                    // }}}
                   }
-                 
-
-                  resultval->granularity = par->granularity;
-
-                  BOOST_ASSERT(floatcmp(resultval->x_[resultval->granularity-1],resultval->g_endx_) == 1);
-                  BOOST_ASSERT(resultval->x_.size() == par->granularity);
-                  // }}}
                 }
+               
             } 
             else {
                 resultval->iter_ = val[compute_index]->iter_ + 1;
+            }
+
+            // ghostwidth resizing
+            if ( val[compute_index]->gw_iter_ == 5 ) {
+                resultval->gw_iter_ = 0;
+
+                if ( resultval->granularity != par->granularity ) {
+                  BOOST_ASSERT(val.size() == 2);
+                  // tapering {{{
+
+                  int count = 0;
+                  for (int j=resultval->x_.size()-1;j>=0;j--) {
+                    if ( floatcmp(resultval->x_[j],resultval->g_endx_ - count*resultval->g_dx_) == 1 ) {
+                      count++;
+                    }  else {
+                      resultval->x_.erase(resultval->x_.begin()+j);
+                      resultval->value_.erase(resultval->value_.begin()+j);
+                    }
+                  }
+
+                  resultval->granularity = par->granularity;
+
+                  BOOST_ASSERT(floatcmp(resultval->x_[0],resultval->g_startx_) == 1);
+                  BOOST_ASSERT(floatcmp(resultval->x_[par->granularity-1],resultval->g_endx_) == 1);
+                  BOOST_ASSERT(resultval->x_.size() == par->granularity);
+                  // }}}
+                }
+            } else {
+                resultval->gw_iter_ = val[compute_index]->gw_iter_ + 1;
             }
 
             if (par->loglevel > 1 && fmod(resultval->timestep_, par->output) < 1.e-6) {
