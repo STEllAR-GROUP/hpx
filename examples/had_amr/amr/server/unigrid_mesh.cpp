@@ -83,7 +83,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             namespace stubs = components::amr::stubs;
             BOOST_ASSERT(function != functions.second);
 
-            std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
+            //std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
             //if ( dst_size(static_step,column,0) == 1 ) {
             //  std::cout << "                      in row:  " << dst_step(static_step,column,0) << " in column " << dst_src(static_step,column,0) << std::endl;
             //}

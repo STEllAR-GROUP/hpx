@@ -97,10 +97,8 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
       r_start += dx*par.granularity;
     }
 
-    //std::cout << " TEST r_start " << r_start << " item " << item << " dx " << dx << std::endl;
     for (i=0;i<par.granularity;i++) {
       r = r_start + i*dx;
-      std::cout << " TEST item " << item << " " << r << " level " << level << std::endl; 
 
       chi = initial_chi(r,par);
       Phi = initial_Phi(r,par);

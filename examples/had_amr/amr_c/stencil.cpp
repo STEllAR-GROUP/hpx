@@ -307,17 +307,19 @@ namespace hpx { namespace components { namespace amr
 
             resultval->x_.resize(resultval->granularity);
             resultval->value_.resize(resultval->granularity);
-            //had_double_type dt = par->dt0/pow(2.0,(int) val[compute_index]->level_);
-            //had_double_type dx = par->dx0/pow(2.0,(int) val[compute_index]->level_); 
-            // compute dx and dt this way because ghostwidth points have a level listed that
-            // is 1 smaller than the way they are evolved
-            had_double_type dx = vecx[1]-vecx[0];
-            had_double_type dt = par->lambda*dx;
+
+            int level = val[compute_index]->level_;
+            if ( val[compute_index]->ghostwidth_ == 1 ) {
+              level++;
+            }
+
+            had_double_type dt = par->dt0/pow(2.0,level);
+            had_double_type dx = par->dx0/pow(2.0,level); 
 
             // call rk update 
             int gft = rkupdate(&*vecval.begin(),resultval.get_ptr(),&*vecx.begin(),vecval.size(),
                                  boundary,bbox,adj_index,dt,dx,val[compute_index]->timestep_,
-                                 val[compute_index]->iter_,val[compute_index]->level_,*par.p);
+                                 val[compute_index]->iter_,level,*par.p);
 
             BOOST_ASSERT(gft);
 
