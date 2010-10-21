@@ -399,12 +399,8 @@ namespace hpx { namespace components { namespace amr
  
         // set return value difference between actual and required number of
         // timesteps (>0: still to go, 0: last step, <0: overdone)
+        if ( floatcmp(resultval->timestep_,par->nt0) == 1 ) return 0;
         return 1;
-         // int t = resultval->cycle_/3;
-         // int r = numsteps_ - t;
-          //int r = numsteps_ - row;
-        //std::cout << " TEST r " << r << std::endl;
-        //return r;
     }
 
     hpx::actions::manage_object_action<stencil_data> const manage_stencil_data =
