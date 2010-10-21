@@ -10,13 +10,12 @@
 #include "mpreal.h"
 #include "serialize_mpreal.hpp"
 
-const int maxlevels = 20;
-
 //typedef mpfr::mpreal had_double_type;
 typedef double had_double_type;
 #else
 typedef double had_double_type;
 #endif
 const int num_eqns = 4;
+const int maxlevels = 20;
 
 #endif
