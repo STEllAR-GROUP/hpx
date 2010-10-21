@@ -252,7 +252,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // amount of stencil_value components
         result_type functions = factory.create_components(function_type, numvalues);
 
-        had_double_type tmp = 3*pow(2,par->allowedl);
+        had_double_type tmp = 3*pow(2.0,par->allowedl);
         int num_rows = (int) tmp;
 
         // Each row potentially has a different number of points depending on the
@@ -301,7 +301,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         for (int i=0;i<num_rows;i=i+3) {
           int level = -1;
           for (int j=par->allowedl;j>=0;j--) {
-            tmp = pow(2,j);
+            tmp = pow(2.0,j);
             int tmp2 = (int) tmp; 
             if ( i%tmp2 == 0 ) {
               level = par->allowedl-j;
@@ -384,9 +384,9 @@ namespace hpx { namespace components { namespace amr { namespace server
     {
         BOOST_ASSERT(false);
         // This routine is deprecated currently
-#if 0
-        std::vector<naming::id_type> result_data;
 
+        std::vector<naming::id_type> result_data;
+#if 0
         components::component_type stencil_type = 
             components::get_component_type<components::amr::server::dynamic_stencil_value >();
 
@@ -449,8 +449,9 @@ namespace hpx { namespace components { namespace amr { namespace server
         for (int i = 0; i < num_rows; ++i) 
             factory.free_components_sync(stencils[i]);
         factory.free_components_sync(functions);
-        return result_data;
 #endif
+		return result_data;
+
     }
 
     void unigrid_mesh::prep_ports(Array3D &dst_port,Array3D &dst_src,
@@ -470,7 +471,7 @@ namespace hpx { namespace components { namespace amr { namespace server
       //using namespace boost::assign;
 
       int counter;
-      int step,dst,dst2;
+      int step,dst;
       int found;
 
       //for (step=0;step<num_rows;step = step + 1) {

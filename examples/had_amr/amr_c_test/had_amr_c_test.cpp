@@ -87,7 +87,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     BOOST_ASSERT(level >= 0);
 
     val->level_= level;
-    dx = par.dx0/pow(2.0,level);
+    dx = par.dx0/pow(2.0,(int) level);
 
     had_double_type r_start = 0.0;
     for (int j=par.allowedl;j>level;j--) {
