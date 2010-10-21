@@ -268,7 +268,7 @@ namespace hpx { namespace components { namespace amr
         }
         if ( val[compute_index]->iter_ == 0 && val.size() == 3 ) {
           // more ghostwidth {{{
-          if ( val[0]->level_ == val[1]->level_ && val[1]->level_ != val[2]->level_ && val[0]->ghostwidth_ == 1 ) {
+          if ( val[0]->level_ == val[1]->level_ && val[1]->level_ == val[2]->level_ && val[0]->ghostwidth_ == 1 ) {
             BOOST_ASSERT(compute_index == 1);
 
             resultval->g_startx_ = val[compute_index]->x_[0];
@@ -332,7 +332,7 @@ namespace hpx { namespace components { namespace amr
                     // tapering {{{
                     int count = 0;
                     for (int j=resultval->x_.size()-1;j>=0;j--) {
-                      if ( floatcmp(resultval->x_[j],resultval->g_endx_ - count*resultval->g_dx_) == 1 ) {
+                      if ( floatcmp(resultval->x_[j],resultval->g_endx_ - count*resultval->g_dx_) == 1 && count < par->granularity) {
                         count++;
                       }  else {
                         resultval->x_.erase(resultval->x_.begin()+j);
