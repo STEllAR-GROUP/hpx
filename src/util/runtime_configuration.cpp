@@ -42,8 +42,10 @@ namespace hpx { namespace util
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_CACHE_SIZE) "}",
             "connectioncachesize = ${HPX_AGAS_CONNECTION_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_MAX_AGAS_CONNECTION_CACHE_SIZE) "}",
-            "smp_mode = ${HPX_AGAS_SMP_MODE:0}",
-            "use_ittnotify = $(HPX_USE_ITTNOTIFY:0}"
+#if HPX_USE_ITT == 1
+            "use_ittnotify = $(HPX_USE_ITTNOTIFY:0}",
+#endif
+            "smp_mode = ${HPX_AGAS_SMP_MODE:0}"
 
             // create default ini entries for memory_block component hosted in 
             // the main hpx shared library
@@ -200,6 +202,7 @@ namespace hpx { namespace util
 
     bool runtime_configuration::get_itt_notify_mode() const
     {
+#if HPX_USE_ITT == 1
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
@@ -207,6 +210,7 @@ namespace hpx { namespace util
                     sec->get_entry("use_ittnotify", "0")) ? true : false;
             }
         }
+#endif
         return false;
     }
 
