@@ -399,7 +399,9 @@ namespace hpx { namespace components { namespace amr
  
         // set return value difference between actual and required number of
         // timesteps (>0: still to go, 0: last step, <0: overdone)
-        if ( floatcmp(resultval->timestep_,par->nt0) == 1 ) return 0;
+        if ( val[compute_index]->timestep_ >= par->nt0-1 ) {
+          return 0;
+        }
         return 1;
     }
 
