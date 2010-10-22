@@ -25,6 +25,7 @@
 #pragma warning ( disable : 4355)
 #endif 
 
+#include <boost/version.hpp>
 #include <boost/logging/detail/fwd.hpp>
 #include <boost/logging/detail/manipulator.hpp>
 #include <boost/logging/format/destination/convert_destination.hpp>
@@ -80,7 +81,11 @@ namespace detail {
             namespace fs = boost::filesystem;
             if ( fs::path::default_name_check_writable() )
                 // so that we don't get exceptions
+#if BOOST_VERSION >= 104400
+                fs::path::default_name_check( boost::filesystem2::no_check);
+#else
                 fs::path::default_name_check( fs::no_check);
+#endif
 
             restart();
         }
