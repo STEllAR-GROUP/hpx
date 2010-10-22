@@ -206,9 +206,9 @@ if(HPX_HW_ACCELERATION)
     if(PXACCEL_FOUND)
         message(STATUS "Hardware acceleration framework found in ${PXACCEL_ROOT}")
         add_definitions(-DHPX_ACCEL_QUEUING)
-	include_directories(${PXACCEL_INC_DIR})
-	set(pxaccel_LIBRARIES pciutil pciaccess)
-	link_directories(${PXACCEL_LIB_DIR})
+    include_directories(${PXACCEL_INC_DIR})
+    set(pxaccel_LIBRARIES pciutil pciaccess)
+    link_directories(${PXACCEL_LIB_DIR})
     else()
         message(FATAL ": Hardware acceleration support was requested, but the related access\n"
                 "library was not found. Please make sure that PXACCEL_ROOT points to the top\n"

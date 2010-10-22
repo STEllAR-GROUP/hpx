@@ -156,7 +156,10 @@ macro(ADD_HPX_EXECUTABLE name)
     add_definitions(-DHPX_APPLICATION_EXPORTS)
 
 if(UNIX)
-    set(hpx_LIBRARIES ${hpx_LIBRARIES} rt pthread)
+    set(hpx_LIBRARIES ${hpx_LIBRARIES} pthread)
+    if(NOT CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        set(hpx_LIBRARIES ${hpx_LIBRARIES} rt)
+    endif()
 endif()
 
     # add the executable build target
