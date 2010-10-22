@@ -65,12 +65,24 @@
    NOTE: popl is slightly better than mov+add to pop registers
    so is pushl rather than mov+sub.
    */
+
+// Different systems interpret the specified alignment differently. Some 
+// interpret the number verbatim, others as the power of 2.
+
+#if defined(__APPLE__)
+#define BOOST_COROUTINE_ALIGNMENT 4
+#define BOOST_COROUTINE_TYPE_DIRECTIVE(name)
+#else
+#define BOOST_COROUTINE_ALIGNMENT 16
+#define BOOST_COROUTINE_TYPE_DIRECTIVE(name) ".type " #name ", @function\n\t"
+#endif
+
 #define BOOST_COROUTINE_swapcontext(name)                                     \
     asm volatile (                                                            \
         ".text \n\t"                                                          \
-        ".align 16\n\t"                                                       \
+        ".align " BOOST_COROUTINE_ALIGNMENT " \n\t"                           \
         ".globl " #name "\n\t"                                                \
-        ".type " #name ", @function\n\t"                                      \
+        BOOST_COROUTINE_TYPE_DIRECTIVE(name)                                  \
     #name":\n\t"                                                              \
         "movl  16(%edx), %ecx\n\t"                                            \
         "pushl %ebp\n\t"                                                      \

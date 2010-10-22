@@ -54,10 +54,12 @@
 #define VOLATILE volatile
 #endif
 
+// Note: .align 4 below means alignment at 2^4 boundary (16 bytes
+
 #define BOOST_COROUTINE_SWAPCONTEXT(name)                                     \
     asm VOLATILE (                                                            \
         ".text \n\t"                                                          \
-        ".align 16\n"                                                         \
+        ".align 4\n"                                                          \
         ".globl " #name "\n\t"                                                \
         ".type " #name ", @function\n\t"                                      \
     #name ":\n\t"                                                             \
