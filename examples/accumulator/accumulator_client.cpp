@@ -53,7 +53,7 @@ threads::thread_state_enum hpx_main()
         else if (cmd == "add") {
             std::string arg;
             std::cin >> arg;
-            accu.add(boost::lexical_cast<double>(arg));
+            accu.add(boost::lexical_cast<unsigned long>(arg));
         }
         else if (cmd == "print") {
             accu.print();

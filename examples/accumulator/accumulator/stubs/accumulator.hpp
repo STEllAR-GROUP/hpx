@@ -28,7 +28,7 @@ namespace hpx { namespace components { namespace stubs
         /// with the given \a gid. This is a non-blocking call. The caller 
         /// needs to call \a future_value#get on the return value of 
         /// this function to obtain the result as returned by the accumulator.
-        static lcos::future_value<double> query_async(naming::id_type const& gid) 
+        static lcos::future_value<unsigned long> query_async(naming::id_type const& gid) 
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized eager_future, the caller needs
@@ -40,7 +40,7 @@ namespace hpx { namespace components { namespace stubs
         /// Query the current value of the server#accumulator instance 
         /// with the given \a gid. Block for the current accumulator value to 
         /// be returned.
-        static double query(naming::id_type const& gid) 
+        static unsigned long query(naming::id_type const& gid) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the future_value
@@ -56,7 +56,7 @@ namespace hpx { namespace components { namespace stubs
 
         /// Add the given number to the server#accumulator instance 
         /// with the given \a gid
-        static void add (naming::id_type gid, double arg) 
+        static void add (naming::id_type gid, unsigned long arg) 
         {
             applier::apply<server::accumulator::add_action>(gid, arg);
         }

@@ -58,13 +58,13 @@ namespace hpx { namespace components { namespace server
         }
 
         /// Add the given number to the accumulator
-        void add (double arg) 
+        void add (unsigned long arg) 
         {
             arg_ += arg;
         }
 
         /// Return the current value to the caller
-        double query() 
+        unsigned long query() 
         {
             return arg_;
         }
@@ -86,11 +86,11 @@ namespace hpx { namespace components { namespace server
         > init_action;
 
         typedef hpx::actions::action1<
-            accumulator, accumulator_add, double, &accumulator::add
+            accumulator, accumulator_add, unsigned long, &accumulator::add
         > add_action;
 
         typedef hpx::actions::result_action0<
-            accumulator, double, accumulator_query_value, &accumulator::query
+            accumulator, unsigned long, accumulator_query_value, &accumulator::query
         > query_action;
 
         typedef hpx::actions::action0<
@@ -98,7 +98,7 @@ namespace hpx { namespace components { namespace server
         > print_action;
 
     private:
-        double arg_;
+        unsigned long arg_;
     };
 
 }}}

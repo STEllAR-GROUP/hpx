@@ -42,7 +42,7 @@ namespace hpx { namespace components
         }
 
         /// Add the given number to the accumulator
-        void add (double arg) 
+        void add (unsigned long arg) 
         {
             BOOST_ASSERT(gid_);
             this->base_type::add(gid_, arg);
@@ -56,14 +56,14 @@ namespace hpx { namespace components
         }
 
         /// Query the current value of the accumulator
-        double query() 
+        unsigned long query() 
         {
             BOOST_ASSERT(gid_);
             return this->base_type::query(gid_);
         }
 
         /// Asynchronously query the current value of the accumulator
-        lcos::future_value<double> query_async() 
+        lcos::future_value<unsigned long> query_async() 
         {
             return this->base_type::query_async(gid_);
         }
