@@ -42,3 +42,10 @@ HPX_REGISTER_ACTION_EX(
     accumulator_print_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(accumulator_type::wrapped_type);
 
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<unsigned long>::set_result_action,
+    set_result_action_long);
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<unsigned long>::get_value_action,
+    get_value_action_long);
+HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<unsigned long>);
