@@ -45,7 +45,7 @@ struct Par {
       int nx0;
       int nt0;
       int nx[maxlevels];
-      had_double_type refine_level[maxlevels];
+      double refine_level[maxlevels];
       had_double_type minx0;
       had_double_type maxx0;
       had_double_type dx0;

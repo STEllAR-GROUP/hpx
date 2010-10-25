@@ -396,7 +396,6 @@ namespace hpx { namespace components { namespace amr
             // the last time step has been reached, just copy over the data
             resultval.get() = val[compute_index].get();
         }
- 
         // set return value difference between actual and required number of
         // timesteps (>0: still to go, 0: last step, <0: overdone)
         if ( val[compute_index]->timestep_ >= par->nt0-1 ) {

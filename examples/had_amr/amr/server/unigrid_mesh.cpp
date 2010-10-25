@@ -237,6 +237,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         components::component_type logging_type,
         Parameter const& par)
     {
+        //hpx::util::high_resolution_timer t;
         std::vector<naming::id_type> result_data;
 
         components::component_type stencil_type = 
@@ -252,7 +253,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // amount of stencil_value components
         result_type functions = factory.create_components(function_type, numvalues);
 
-        had_double_type tmp = 3*pow(2.0,par->allowedl);
+        double tmp = 3*pow(2.0,par->allowedl);
         int num_rows = (int) tmp;
 
         // Each row potentially has a different number of points depending on the
@@ -360,6 +361,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         prepare_initial_data(locality_results(functions), initial_data, 
                              each_row[0],par);
 
+        //std::cout << " Startup grid cost " << t.elapsed() << std::endl;
         // do actual work
         execute(locality_results(stencils[0]), initial_data, result_data);
 
