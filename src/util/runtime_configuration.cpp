@@ -32,6 +32,9 @@ namespace hpx { namespace util
             "[hpx]",
             "location = ${HPX_LOCATION:$[system.prefix]}",
             "ini_path = $[hpx.location]/share/hpx/ini",
+#if HPX_USE_ITT == 1
+            "use_ittnotify = ${HPX_USE_ITTNOTIFY:0}",
+#endif
 
             "[hpx.agas]",
             "address = ${HPX_AGAS_SERVER_ADRESS:" 
@@ -42,9 +45,6 @@ namespace hpx { namespace util
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_CACHE_SIZE) "}",
             "connectioncachesize = ${HPX_AGAS_CONNECTION_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_MAX_AGAS_CONNECTION_CACHE_SIZE) "}",
-#if HPX_USE_ITT == 1
-            "use_ittnotify = $(HPX_USE_ITTNOTIFY:0}",
-#endif
             "smp_mode = ${HPX_AGAS_SMP_MODE:0}"
 
             // create default ini entries for memory_block component hosted in 

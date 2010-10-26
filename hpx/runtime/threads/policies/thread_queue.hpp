@@ -272,8 +272,8 @@ namespace hpx { namespace threads { namespace policies
         bool add_new_if_possible(std::size_t& added, thread_queue* addfrom,
             std::size_t num_thread)
         {
-            if (0 == addfrom->new_tasks_count_) 
-                return false;
+//             if (0 == addfrom->new_tasks_count_) 
+//                 return false;
 
             // create new threads from pending tasks (if appropriate)
             long add_count = -1;                  // default is no constraint
@@ -300,8 +300,8 @@ namespace hpx { namespace threads { namespace policies
         bool add_new_always(std::size_t& added, thread_queue* addfrom,
             std::size_t num_thread)
         {
-            if (0 == addfrom->new_tasks_count_) 
-                return false;
+//             if (0 == addfrom->new_tasks_count_) 
+//                 return false;
 
             // create new threads from pending tasks (if appropriate)
             long add_count = -1;                  // default is no constraint
