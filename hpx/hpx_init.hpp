@@ -26,12 +26,6 @@ inline gid_type find_here(void)
   return get_runtime().get_process().here();
 }
 
-inline void hpx_finalize(void)
-{
-  components::stubs::runtime_support::shutdown_all();
-}
-
-///////////////////////////////////////////////////////////////////////////////
 template <typename T>
 inline void get_option(po::variables_map& vm, 
                        std::string const name, 
@@ -44,6 +38,32 @@ inline void get_option(po::variables_map& vm,
   if (!app_name.empty())
     x = boost::lexical_cast<T>(
         get_runtime().get_config().get_entry(app_name, x));
+}
+
+template <typename T>
+inline void get_option(T& x, std::string const app_name)
+{
+  if (!app_name.empty())
+    x = boost::lexical_cast<T>(
+        get_runtime().get_config().get_entry(app_name, x));
+}
+
+inline void hpx_finalize(void)
+{
+  double wait_time = 0.0;
+  get_option(wait_time, "hpx.finalize_wait_time");
+
+  if (wait_time)
+  {
+    hpx::util::high_resolution_timer t;
+    double start_time = t.elapsed();
+    double current = 0;
+    do {
+      current = t.elapsed();
+    } while (current - start_time < wait_time * 1e-6);
+  }
+
+  components::stubs::runtime_support::shutdown_all();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
