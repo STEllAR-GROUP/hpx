@@ -511,7 +511,7 @@ int finer_mesh(int numprocs,
     MPI_Request request;
     int shape[3];
     shape[0] = r[level].size();
-
+  
     // fill ghostzones {{{
     if ( timestep != 0 && 1==1) {
       // fill the last gw points in the finer mesh using the coarse mesh 
@@ -567,9 +567,11 @@ int finer_mesh(int numprocs,
             chi[level][m-1-myid*nx[level]+gz_offset] = rbuffer[0];
             Phi[level][m-1-myid*nx[level]+gz_offset] = rbuffer[1];
             Pi[level][m-1-myid*nx[level]+gz_offset] = rbuffer[2];
-            chi[level][m-myid*nx[level]+gz_offset] = 0.5*rbuffer[0]+0.5*rbuffer[3];
-            Phi[level][m-myid*nx[level]+gz_offset] = 0.5*rbuffer[1]+0.5*rbuffer[4];
-            Pi[level][m-myid*nx[level]+gz_offset] = 0.5*rbuffer[2]+0.5*rbuffer[5];
+            if ( m-myid*nx[level]+gz_offset < chi[level].size() ) {
+              chi[level][m-myid*nx[level]+gz_offset] = 0.5*rbuffer[0]+0.5*rbuffer[3];
+              Phi[level][m-myid*nx[level]+gz_offset] = 0.5*rbuffer[1]+0.5*rbuffer[4];
+              Pi[level][m-myid*nx[level]+gz_offset] = 0.5*rbuffer[2]+0.5*rbuffer[5];
+            }
           }
         }
 
@@ -799,12 +801,6 @@ int calc_rhs(int numprocs,
     }
   }
 
-  // TEST busy work to test scaling
-  //int maxnum = (int) 1000*r.size();
-  //for (int i=0;i<maxnum;i++) {
-  //  diss_chi[0] += i*(diss_Phi[0]+diss_chi[0])/maxnum;
-  //}
-
   int lower;
   int upper;
 
@@ -829,7 +825,6 @@ int calc_rhs(int numprocs,
                     + pow(chi[i],PP) + eps*diss_Pi[i]; // + 1.e-8*diss_chi[0];
   }
 
-  //std::cout << " TEST right boundary " << r.size()-1 << std::endl;
   if ( myid == numprocs-1 ) {
     i = r.size()-1;
     rhs_chi[i] = Pi[i];
