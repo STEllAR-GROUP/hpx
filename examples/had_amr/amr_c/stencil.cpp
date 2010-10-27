@@ -301,7 +301,7 @@ namespace hpx { namespace components { namespace amr
         //threads::thread_id_type id = self.get_thread_id();
         //threads::set_thread_description(id,description);
 
-        if (val[compute_index]->timestep_ < numsteps_) {
+        if (val[compute_index]->timestep_ < (int)numsteps_) {
 
             // copy over critical info
 

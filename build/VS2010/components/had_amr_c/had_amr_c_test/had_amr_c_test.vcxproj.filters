@@ -17,9 +17,15 @@
     <ClCompile Include="..\..\..\..\..\examples\had_amr\amr_c_test\rand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\..\examples\had_amr\mpreal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\examples\had_amr\amr_c_test\rand.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\examples\had_amr\mpreal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

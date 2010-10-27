@@ -32,11 +32,13 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
     <Import Project="..\hpx64_application.props" />
     <Import Project="..\hpx64_release.props" />
+    <Import Project="..\components\had_amr\had_amr.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|X64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
     <Import Project="..\hpx64_application.props" />
     <Import Project="..\hpx64_debug.props" />
+    <Import Project="..\components\had_amr\had_amr.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
@@ -88,6 +90,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\examples\had_amr\amr_client.cpp" />
+    <ClCompile Include="..\..\..\examples\had_amr\mpreal.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\components\distributing_factory\distributing_factory.vcxproj">
@@ -114,6 +117,17 @@
       <Project>{163e7f8f-1a47-488f-ab83-21183a70b0bd}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="My Amplifier Results\r000hs\r000hs.ampl" />
+    <None Include="My Amplifier Results\r001cc\r001cc.ampl" />
+    <None Include="My Amplifier Results\r002lw\r002lw.ampl" />
+    <None Include="My Amplifier Results\r003hs\r003hs.ampl" />
+    <None Include="My Amplifier Results\r004hs\r004hs.ampl" />
+    <None Include="My Amplifier Results\r005hs\r005hs.ampl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\examples\had_amr\mpreal.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

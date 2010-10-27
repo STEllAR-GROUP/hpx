@@ -4,6 +4,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HPX Examples", "HPX Examples", "{C24E2A49-8928-4C5E-81F6-CB0918294C0D}"
 	ProjectSection(SolutionItems) = preProject
 		..\..\examples\CMakeLists.txt = ..\..\examples\CMakeLists.txt
+		..\..\examples\had_amr\had_config.hpp = ..\..\examples\had_amr\had_config.hpp
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HPX Runtime", "HPX Runtime", "{03B1522E-0ACA-4BE6-B935-A7EBD550C896}"

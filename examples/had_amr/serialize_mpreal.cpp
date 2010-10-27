@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2010 Hartmut Kaiser, Richard D Guidry Jr
+//  Copyright (c) 2007-2010 Hartmut Kaiser
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -31,16 +31,16 @@ namespace boost { namespace serialization
     ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
 #if HPX_USE_PORTABLE_ARCHIVES != 0
-    template HPX_EXPORT 
+    template HPX_COMPONENT_EXPORT 
     void save(hpx::util::portable_binary_oarchive&, mpfr::mpreal const& d, unsigned int version);
 
-    template HPX_EXPORT 
+    template HPX_COMPONENT_EXPORT 
     void load(hpx::util::portable_binary_iarchive&, mpfr::mpreal& d, unsigned int version);
 #else
-    template HPX_EXPORT 
+    template HPX_COMPONENT_EXPORT 
     void save(boost::archive::binary_oarchive&, mpfr::mpreal const& d, unsigned int version);
 
-    template HPX_EXPORT 
+    template HPX_COMPONENT_EXPORT 
     void load(boost::archive::binary_iarchive&, mpfr::mpreal& d, unsigned int version);
 #endif
 }}

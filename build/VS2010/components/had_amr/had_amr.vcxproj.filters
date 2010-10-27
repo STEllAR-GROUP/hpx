@@ -38,6 +38,12 @@
     <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\unigrid_mesh.cpp">
       <Filter>Source Files\Server</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\examples\had_amr\serialize_mpreal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\examples\had_amr\mpreal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\dynamic_stencil_value.hpp">
@@ -75,6 +81,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\unigrid_mesh.hpp">
       <Filter>Header Files\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\examples\had_amr\mpreal.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
