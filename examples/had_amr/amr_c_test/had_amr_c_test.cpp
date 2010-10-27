@@ -25,8 +25,8 @@ int floatcmp(had_double_type x1,had_double_type x2) {
 }
 
 void calcrhs(struct nodedata * rhs,
-                nodedata * vecval,
-                had_double_type * vecx,
+                std::vector< nodedata > &vecval,
+                std::vector< had_double_type > &vecx,
                 int flag, had_double_type dx, int size,
                 bool boundary,int *bbox,int compute_index, Par const& par);
 
@@ -118,7 +118,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     return 1;
 }
 
-int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int size,bool boundary,int *bbox,int compute_index, had_double_type dt, had_double_type dx, had_double_type timestep,int iter, int level, Par const& par)
+int rkupdate(std::vector< nodedata > &vecval,stencil_data* result,std::vector< had_double_type > &vecx,int size,bool boundary,int *bbox,int compute_index, had_double_type dt, had_double_type dx, had_double_type timestep,int iter, int level, Par const& par)
 {
   // allocate some temporary arrays for calculating the rhs
   nodedata rhs,work;
@@ -144,7 +144,6 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
       // Phi
       result->value_[1].phi[1][1] = 0.5*result->value_[2].phi[1][1];
     }
-
     // no timestep update-- this is just a part of an rk subcycle
     result->timestep_ = timestep;
   } else if ( iter == 1 ) {
@@ -168,7 +167,6 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
       // Phi
       result->value_[1].phi[1][1] = 0.5*result->value_[2].phi[1][1];
     }
-
     // no timestep update-- this is just a part of an rk subcycle
     result->timestep_ = timestep;
   } else if ( iter == 2 ) {
@@ -180,6 +178,7 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
       }
       result->value_[j] = work;
     }
+
     if ( boundary && bbox[0] == 1 ) {
       // chi
       result->value_[0].phi[0][0] = 4./3*result->value_[1].phi[0][0]
@@ -202,8 +201,8 @@ int rkupdate(nodedata * vecval,stencil_data* result,had_double_type * vecx,int s
 
 // This is a pointwise calculation: compute the rhs for point result given input values in array phi
 void calcrhs(struct nodedata * rhs,
-                nodedata * vecval,
-                had_double_type * vecx,
+                std::vector< nodedata > &vecval,
+                std::vector< had_double_type > &vecx,
                 int flag, had_double_type dx, int size,
                 bool boundary,int *bbox,int compute_index, Par const& par)
 {

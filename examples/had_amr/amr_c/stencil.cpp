@@ -304,7 +304,6 @@ namespace hpx { namespace components { namespace amr
         if (val[compute_index]->timestep_ < (int)numsteps_) {
 
             // copy over critical info
-
             resultval->x_.resize(resultval->granularity);
             resultval->value_.resize(resultval->granularity);
 
@@ -317,7 +316,7 @@ namespace hpx { namespace components { namespace amr
             had_double_type dx = par->dx0/pow(2.0,level); 
 
             // call rk update 
-            int gft = rkupdate(&*vecval.begin(),resultval.get_ptr(),&*vecx.begin(),vecval.size(),
+            int gft = rkupdate(vecval,resultval.get_ptr(),vecx,vecval.size(),
                                  boundary,bbox,adj_index,dt,dx,val[compute_index]->timestep_,
                                  val[compute_index]->iter_,level,*par.p);
 
