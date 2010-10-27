@@ -1,0 +1,19 @@
+
+nx0 = 500
+nt0 = 400
+allowedl = 1
+lambda = 0.15
+eps = 0.3
+amp = 0.17206
+delta = 1.0
+R0 = 8.0
+PP = 7
+max_r = 15.0
+output_every = 10
+refine_level_0 = -1.0
+refine_level_1 = -1.0
+refine_level_2 = -1.0
+refine_level_3 = -1.0
+refine_level_4 = -1.25
+refine_level_5 = -1.25
+refine_level_6 = -1.25
