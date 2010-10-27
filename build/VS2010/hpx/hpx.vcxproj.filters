@@ -798,5 +798,8 @@
     <MASM Include="..\..\..\external\lockfree\libs\lockfree\src\CAS2.asm">
       <Filter>Assembly Files</Filter>
     </MASM>
+    <MASM Include="..\..\..\external\coroutine\libs\coroutine\src\switch_to_fiber.asm">
+      <Filter>Assembly Files</Filter>
+    </MASM>
   </ItemGroup>
 </Project>

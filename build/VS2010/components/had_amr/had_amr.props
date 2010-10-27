@@ -12,7 +12,7 @@
       <PreprocessorDefinitions>MPFR_FOUND=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(HPX_MPIR_ROOT)/dll/x64/$(Configuration);$(HPX_MPFR_ROOT)/build.vc10/lib/x64/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(HPX_MPIR_ROOT)/dll/x64/$(Configuration);$(HPX_MPFR_ROOT)/build.vc10/dll/x64/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>mpfr.lib;mpir.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

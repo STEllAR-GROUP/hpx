@@ -125,6 +125,9 @@
     <None Include="My Amplifier Results\r003hs\r003hs.ampl" />
     <None Include="My Amplifier Results\r004hs\r004hs.ampl" />
     <None Include="My Amplifier Results\r005hs\r005hs.ampl" />
+    <None Include="My Amplifier Results\r006hs\r006hs.ampl" />
+    <None Include="My Amplifier Results\r007lw\r007lw.ampl" />
+    <None Include="My Amplifier Results\r008lw\r008lw.ampl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\examples\had_amr\mpreal.h" />

@@ -126,6 +126,13 @@
     <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\wait_impl.hpp" />
     <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\yield_result_type.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\external\coroutine\libs\coroutine\src\switch_to_fiber.asm">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

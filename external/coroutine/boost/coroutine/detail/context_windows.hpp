@@ -40,6 +40,8 @@
 #include <boost/coroutine/exception.hpp>
 #include <boost/coroutine/detail/swap_context.hpp>
 
+extern "C" void switch_to_fiber(void* lpFiber) throw();
+
 namespace boost {namespace coroutines {
 
   // On Windows we need a special preparation for the main coroutines thread 
@@ -120,13 +122,15 @@ namespace boost {namespace coroutines {
       void 
       swap_context(fibers_context_impl_base& from, 
                    const fibers_context_impl_base& to,
-                   default_hint) {
+                   default_hint) 
+      {
         if(!is_fiber()) {
           BOOST_ASSERT(from.m_ctx == 0);
           from.m_ctx = ConvertThreadToFiber(0);
           BOOST_ASSERT(from.m_ctx != 0);
 
-          SwitchToFiber(to.m_ctx); 
+          switch_to_fiber(to.m_ctx); 
+//          SwitchToFiber(to.m_ctx); 
 
           BOOL result = ConvertFiberToThread();
           BOOST_ASSERT(result);
@@ -136,7 +140,8 @@ namespace boost {namespace coroutines {
           bool call_from_main = from.m_ctx == 0;
           if(call_from_main)
             from.m_ctx = GetCurrentFiber();
-          SwitchToFiber(to.m_ctx); 
+          switch_to_fiber(to.m_ctx); 
+//          SwitchToFiber(to.m_ctx); 
           if(call_from_main)
             from.m_ctx = 0;
         }

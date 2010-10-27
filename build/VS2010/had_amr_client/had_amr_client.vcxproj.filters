@@ -34,6 +34,21 @@
     <None Include="My Amplifier Results\r003hs\r003hs.ampl">
       <Filter>My Amplifier Results</Filter>
     </None>
+    <None Include="My Amplifier Results\r004hs\r004hs.ampl">
+      <Filter>My Amplifier Results</Filter>
+    </None>
+    <None Include="My Amplifier Results\r005hs\r005hs.ampl">
+      <Filter>My Amplifier Results</Filter>
+    </None>
+    <None Include="My Amplifier Results\r006hs\r006hs.ampl">
+      <Filter>My Amplifier Results</Filter>
+    </None>
+    <None Include="My Amplifier Results\r007lw\r007lw.ampl">
+      <Filter>My Amplifier Results</Filter>
+    </None>
+    <None Include="My Amplifier Results\r008lw\r008lw.ampl">
+      <Filter>My Amplifier Results</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\examples\had_amr\mpreal.h">
