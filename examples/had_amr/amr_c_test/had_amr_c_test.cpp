@@ -61,7 +61,6 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->value_.resize(par.granularity);
 
     //number of values per stencil_data
-    int i;
     nodedata node;
 
     // find out what level we are at
@@ -94,13 +93,16 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
       r_start += dx*par.granularity;
     }
 
-    for (i=0;i<par.granularity;i++) {
+    static had_double_type const c_0 = 0.0;
+    static had_double_type const c_0_5 = 0.5;
+
+    for (int i=0;i<par.granularity;i++) {
       had_double_type r = r_start + i*dx;
 
       had_double_type chi = initial_chi(r,par);
       had_double_type Phi = initial_Phi(r,par);
-      had_double_type Pi  = 0.0;
-      had_double_type Energy = 0.5* r*r * (Pi*Pi + Phi*Phi) - r*r * pow(chi, par.PP+1)/(par.PP+1);
+      had_double_type Pi  = c_0;
+      had_double_type Energy = c_0_5* r*r * (Pi*Pi + Phi*Phi) - r*r * pow(chi, par.PP+1)/(par.PP+1);
 
       val->x_[i] = r;
 
@@ -124,6 +126,14 @@ int rkupdate(std::vector< nodedata > const& vecval, stencil_data* result,
   // allocate some temporary arrays for calculating the rhs
   nodedata rhs,work;
 
+  static had_double_type const c_0_75 = 0.75;
+  static had_double_type const c_0_5 = 0.5;
+  static had_double_type const c_0_25 = 0.25;
+
+  static had_double_type const c_4_3 = had_double_type(4.)/had_double_type(3.);
+  static had_double_type const c_2_3 = had_double_type(2.)/had_double_type(3.);
+  static had_double_type const c_1_3 = had_double_type(1.)/had_double_type(3.);
+
   if ( iter == 0 ) {
     for (int j=0;  j<result->granularity;j++) {
       calcrhs(&rhs,vecval,vecx,0,dx,size,boundary,bbox,j+compute_index,par);
@@ -136,13 +146,13 @@ int rkupdate(std::vector< nodedata > const& vecval, stencil_data* result,
     }
     if ( boundary && bbox[0] == 1 ) {
       // chi
-      result->value_[0].phi[1][0] = 4./3*result->value_[1].phi[1][0]
-                                   -1./3*result->value_[2].phi[1][0];
+      result->value_[0].phi[1][0] = c_4_3*result->value_[1].phi[1][0]
+                                   -c_1_3*result->value_[2].phi[1][0];
       // Pi
-      result->value_[0].phi[1][2] = 4./3*result->value_[1].phi[1][2]
-                                   -1./3*result->value_[2].phi[1][2];
+      result->value_[0].phi[1][2] = c_4_3*result->value_[1].phi[1][2]
+                                   -c_1_3*result->value_[2].phi[1][2];
       // Phi
-      result->value_[1].phi[1][1] = 0.5*result->value_[2].phi[1][1];
+      result->value_[1].phi[1][1] = c_0_5*result->value_[2].phi[1][1];
     }
     // no timestep update-- this is just a part of an rk subcycle
     result->timestep_ = timestep;
@@ -152,21 +162,21 @@ int rkupdate(std::vector< nodedata > const& vecval, stencil_data* result,
       calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
       for (int i=0; i<num_eqns; i++) {
         work.phi[0][i] = vecval[j+compute_index].phi[0][i];
-        work.phi[1][i] = 0.75*vecval[j+compute_index].phi[0][i]
-                        +0.25*vecval[j+compute_index].phi[1][i] + 0.25*rhs.phi[0][i]*dt;
+        work.phi[1][i] = c_0_75*vecval[j+compute_index].phi[0][i]
+                        +c_0_25*vecval[j+compute_index].phi[1][i] + c_0_25*rhs.phi[0][i]*dt;
       }
       result->value_[j] = work;
     }
 
     if ( boundary && bbox[0] == 1 ) {
       // chi
-      result->value_[0].phi[1][0] = 4./3*result->value_[1].phi[1][0]
-                                   -1./3*result->value_[2].phi[1][0];
+      result->value_[0].phi[1][0] = c_4_3*result->value_[1].phi[1][0]
+                                   -c_1_3*result->value_[2].phi[1][0];
       // Pi
-      result->value_[0].phi[1][2] = 4./3*result->value_[1].phi[1][2]
-                                   -1./3*result->value_[2].phi[1][2];
+      result->value_[0].phi[1][2] = c_4_3*result->value_[1].phi[1][2]
+                                   -c_1_3*result->value_[2].phi[1][2];
       // Phi
-      result->value_[1].phi[1][1] = 0.5*result->value_[2].phi[1][1];
+      result->value_[1].phi[1][1] = c_0_5*result->value_[2].phi[1][1];
     }
     // no timestep update-- this is just a part of an rk subcycle
     result->timestep_ = timestep;
@@ -175,21 +185,21 @@ int rkupdate(std::vector< nodedata > const& vecval, stencil_data* result,
     for (int j=0; j<result->granularity; j++) {
       calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
       for (int i=0; i<num_eqns; i++) {
-        work.phi[0][i] = 1./3*vecval[j+compute_index].phi[0][i]
-                        +2./3*(vecval[j+compute_index].phi[1][i] + rhs.phi[0][i]*dt);
+        work.phi[0][i] = c_1_3*vecval[j+compute_index].phi[0][i]
+                        +c_2_3*(vecval[j+compute_index].phi[1][i] + rhs.phi[0][i]*dt);
       }
       result->value_[j] = work;
     }
 
     if ( boundary && bbox[0] == 1 ) {
       // chi
-      result->value_[0].phi[0][0] = 4./3*result->value_[1].phi[0][0]
-                                   -1./3*result->value_[2].phi[0][0];
+      result->value_[0].phi[0][0] = c_4_3*result->value_[1].phi[0][0]
+                                   -c_1_3*result->value_[2].phi[0][0];
       // Pi
-      result->value_[0].phi[0][2] = 4./3*result->value_[1].phi[0][2]
-                                   -1./3*result->value_[2].phi[0][2];
+      result->value_[0].phi[0][2] = c_4_3*result->value_[1].phi[0][2]
+                                   -c_1_3*result->value_[2].phi[0][2];
       // Phi
-      result->value_[1].phi[0][1] = 0.5*result->value_[2].phi[0][1];
+      result->value_[1].phi[0][1] = c_0_5*result->value_[2].phi[0][1];
     } 
 
     // timestep update
@@ -221,29 +231,35 @@ void calcrhs(struct nodedata * rhs,
   // the compute_index is not physical boundary; all points in stencilsize
   // are available for computing the rhs.
 
+  static had_double_type const c_m1 = -1.;
+  static had_double_type const c_6 = 6.;
+  static had_double_type const c_15 = 15.;
+  static had_double_type const c_20 = 20.;
+  static had_double_type const c_64 = 64.;
+
   // Add  dissipation if size = 7
   if ( compute_index + 3 < size && compute_index - 3 >= 0 ) { 
-    diss_chi = -1./(64.*dr)*(  -vecval[compute_index-3].phi[flag][0]
-                            +6.*vecval[compute_index-2].phi[flag][0]
-                           -15.*vecval[compute_index-1].phi[flag][0]
-                           +20.*chi //vecval[compute_index  ].phi[flag][0]
-                           -15.*vecval[compute_index+1].phi[flag][0]
-                            +6.*vecval[compute_index+2].phi[flag][0]
-                               -vecval[compute_index+3].phi[flag][0] );
-    diss_Phi = -1./(64.*dr)*(  -vecval[compute_index-3].phi[flag][1]
-                            +6.*vecval[compute_index-2].phi[flag][1]
-                            -15.*vecval[compute_index-1].phi[flag][1]
-                            +20.*Phi //vecval[compute_index  ].phi[flag][1]
-                            -15.*vecval[compute_index+1].phi[flag][1]
-                             +6.*vecval[compute_index+2].phi[flag][1]
-                                -vecval[compute_index+3].phi[flag][1] );
-    diss_Pi  = -1./(64.*dr)*(  -vecval[compute_index-3].phi[flag][2]
-                            +6.*vecval[compute_index-2].phi[flag][2]
-                           -15.*vecval[compute_index-1].phi[flag][2]
-                           +20.*Pi //vecval[compute_index  ].phi[flag][2]
-                           -15.*vecval[compute_index+1].phi[flag][2]
-                            +6.*vecval[compute_index+2].phi[flag][2]
-                               -vecval[compute_index+3].phi[flag][2] );
+    diss_chi = c_m1/(c_64*dr)*(  -vecval[compute_index-3].phi[flag][0]
+                             +c_6*vecval[compute_index-2].phi[flag][0]
+                            -c_15*vecval[compute_index-1].phi[flag][0]
+                            +c_20*chi //vecval[compute_index  ].phi[flag][0]
+                            -c_15*vecval[compute_index+1].phi[flag][0]
+                             +c_6*vecval[compute_index+2].phi[flag][0]
+                                -vecval[compute_index+3].phi[flag][0] );
+    diss_Phi = c_m1/(c_64*dr)*(  -vecval[compute_index-3].phi[flag][1]
+                             +c_6*vecval[compute_index-2].phi[flag][1]
+                             -c_15*vecval[compute_index-1].phi[flag][1]
+                             +c_20*Phi //vecval[compute_index  ].phi[flag][1]
+                             -c_15*vecval[compute_index+1].phi[flag][1]
+                              +c_6*vecval[compute_index+2].phi[flag][1]
+                                 -vecval[compute_index+3].phi[flag][1] );
+    diss_Pi  = c_m1/(c_64*dr)*(  -vecval[compute_index-3].phi[flag][2]
+                             +c_6*vecval[compute_index-2].phi[flag][2]
+                            -c_15*vecval[compute_index-1].phi[flag][2]
+                            +c_20*Pi //vecval[compute_index  ].phi[flag][2]
+                            -c_15*vecval[compute_index+1].phi[flag][2]
+                             +c_6*vecval[compute_index+2].phi[flag][2]
+                                -vecval[compute_index+3].phi[flag][2] );
   }
 
 
