@@ -58,7 +58,7 @@ namespace hpx { namespace components { namespace amr
         void init(std::size_t, naming::id_type const&);
 
         /// floating point comparison (for coordinates)
-        int floatcmp(had_double_type x1,had_double_type x2,had_double_type epsilon);
+        static bool floatcmp(had_double_type const& x1,had_double_type const& x2);
     private:
         std::size_t numsteps_;
         naming::id_type log_;

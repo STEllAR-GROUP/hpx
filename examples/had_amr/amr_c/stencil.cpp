@@ -26,13 +26,15 @@ namespace hpx { namespace components { namespace amr
     {
     }
 
-    int stencil::floatcmp(had_double_type x1,had_double_type x2,had_double_type epsilon = 1.e-8) {
+    inline bool 
+    stencil::floatcmp(had_double_type const& x1, had_double_type const& x2) {
       // compare two floating point numbers
+      static had_double_type const epsilon = 1.e-8;
       if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
         // the numbers are close enough for coordinate comparison
-        return 1;
+        return true;
       } else {
-        return 0;
+        return false;
       }
     }
         

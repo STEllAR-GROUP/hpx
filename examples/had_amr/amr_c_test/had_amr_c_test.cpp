@@ -38,9 +38,9 @@ inline had_double_type initial_chi(had_double_type const& r,Par const& par)
 
 inline had_double_type initial_Phi(had_double_type const& r,Par const& par) 
 {
-
   // Phi is the r derivative of chi
-  return par.amp*exp( -(r-par.R0)*(r-par.R0)/(par.delta*par.delta) ) * ( -2.*(r-par.R0)/(par.delta*par.delta) );
+  static had_double_type const c_m2 = -2.;
+  return par.amp*exp( -(r-par.R0)*(r-par.R0)/(par.delta*par.delta) ) * ( c_m2*(r-par.R0)/(par.delta*par.delta) );
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -219,23 +219,27 @@ void calcrhs(struct nodedata * rhs,
                 int flag, had_double_type const& dx, int size,
                 bool boundary, int *bbox,int compute_index, Par const& par)
 {
+  static had_double_type const c_m1 = -1.;
+  static had_double_type const c_2 = 2.;
+  static had_double_type const c_3 = 3.;
+  static had_double_type const c_4 = 4.;
+  static had_double_type const c_6 = 6.;
+  static had_double_type const c_15 = 15.;
+  static had_double_type const c_20 = 20.;
+  static had_double_type const c_64 = 64.;
+  static had_double_type const c_0 = 0.;
+
   had_double_type const& dr = dx;
   had_double_type const& r = vecx[compute_index];
   had_double_type const& chi = vecval[compute_index].phi[flag][0];
   had_double_type const& Phi = vecval[compute_index].phi[flag][1];
   had_double_type const& Pi =  vecval[compute_index].phi[flag][2];
-  had_double_type diss_chi = 0.0;
-  had_double_type diss_Phi = 0.0;
-  had_double_type diss_Pi = 0.0;
+  had_double_type diss_chi = c_0;
+  had_double_type diss_Phi = c_0;
+  had_double_type diss_Pi = c_0;
 
   // the compute_index is not physical boundary; all points in stencilsize
   // are available for computing the rhs.
-
-  static had_double_type const c_m1 = -1.;
-  static had_double_type const c_6 = 6.;
-  static had_double_type const c_15 = 15.;
-  static had_double_type const c_20 = 20.;
-  static had_double_type const c_64 = 64.;
 
   // Add  dissipation if size = 7
   if ( compute_index + 3 < size && compute_index - 3 >= 0 ) { 
@@ -245,13 +249,13 @@ void calcrhs(struct nodedata * rhs,
                             +c_20*chi //vecval[compute_index  ].phi[flag][0]
                             -c_15*vecval[compute_index+1].phi[flag][0]
                              +c_6*vecval[compute_index+2].phi[flag][0]
-                                -vecval[compute_index+3].phi[flag][0] );
+                                 -vecval[compute_index+3].phi[flag][0] );
     diss_Phi = c_m1/(c_64*dr)*(  -vecval[compute_index-3].phi[flag][1]
                              +c_6*vecval[compute_index-2].phi[flag][1]
-                             -c_15*vecval[compute_index-1].phi[flag][1]
-                             +c_20*Phi //vecval[compute_index  ].phi[flag][1]
-                             -c_15*vecval[compute_index+1].phi[flag][1]
-                              +c_6*vecval[compute_index+2].phi[flag][1]
+                            -c_15*vecval[compute_index-1].phi[flag][1]
+                            +c_20*Phi //vecval[compute_index  ].phi[flag][1]
+                            -c_15*vecval[compute_index+1].phi[flag][1]
+                             +c_6*vecval[compute_index+2].phi[flag][1]
                                  -vecval[compute_index+3].phi[flag][1] );
     diss_Pi  = c_m1/(c_64*dr)*(  -vecval[compute_index-3].phi[flag][2]
                              +c_6*vecval[compute_index-2].phi[flag][2]
@@ -259,7 +263,7 @@ void calcrhs(struct nodedata * rhs,
                             +c_20*Pi //vecval[compute_index  ].phi[flag][2]
                             -c_15*vecval[compute_index+1].phi[flag][2]
                              +c_6*vecval[compute_index+2].phi[flag][2]
-                                -vecval[compute_index+3].phi[flag][2] );
+                                 -vecval[compute_index+3].phi[flag][2] );
   }
 
 
@@ -276,23 +280,23 @@ void calcrhs(struct nodedata * rhs,
     had_double_type const& Phi_np1 = vecval[compute_index+1].phi[flag][1];
     had_double_type const& Phi_nm1 = vecval[compute_index-1].phi[flag][1];
 
-    rhs->phi[0][1] = (Pi_np1 - Pi_nm1)/(2.*dr) + par.eps*diss_Phi; // Phi rhs
+    rhs->phi[0][1] = (Pi_np1 - Pi_nm1)/(c_2*dr) + par.eps*diss_Phi; // Phi rhs
 
     had_double_type const& r2_Phi_np1 = (r+dr)*(r+dr)*Phi_np1;
     had_double_type const& r2_Phi_nm1 = (r-dr)*(r-dr)*Phi_nm1;
 
 
-    rhs->phi[0][2] = 3.*( r2_Phi_np1 - r2_Phi_nm1 )/( pow(r+dr,3) - pow(r-dr,3) ) + pow(chi,par.PP) + par.eps*diss_Pi; // Pi rhs
+    rhs->phi[0][2] = c_3*( r2_Phi_np1 - r2_Phi_nm1 )/( pow(r+dr,3) - pow(r-dr,3) ) + pow(chi,par.PP) + par.eps*diss_Pi; // Pi rhs
 
-    rhs->phi[0][3] = 0.; // Energy rhs
+    rhs->phi[0][3] = c_0; // Energy rhs
 
   } 
   else {
     // tapered point or boundary ( boundary case taken care of below )
-    rhs->phi[0][0] = 0.0; // chi rhs -- chi is set by quadratic fit
-    rhs->phi[0][1] = 0.0; // Phi rhs -- Phi-dot is always zero at r=0
-    rhs->phi[0][2] = 0.0; // Pi rhs -- chi is set by quadratic fit
-    rhs->phi[0][3] = 0.0; // Energy rhs -- analysis variable
+    rhs->phi[0][0] = c_0; // chi rhs -- chi is set by quadratic fit
+    rhs->phi[0][1] = c_0; // Phi rhs -- Phi-dot is always zero at r=0
+    rhs->phi[0][2] = c_0; // Pi rhs -- chi is set by quadratic fit
+    rhs->phi[0][3] = c_0; // Energy rhs -- analysis variable
   }
 
   // busy work to test scaling
@@ -305,10 +309,10 @@ void calcrhs(struct nodedata * rhs,
     if ( bbox[0] == 1 && compute_index == 0 ) {
       // we are at the left boundary  -- values are determined by quadratic fit, not evolution
 
-      rhs->phi[0][0] = 0.0; // chi rhs -- chi is set by quadratic fit
-      rhs->phi[0][1] = 0.0; // Phi rhs -- Phi-dot is always zero at r=0
-      rhs->phi[0][2] = 0.0; // Pi rhs -- chi is set by quadratic fit
-      rhs->phi[0][3] = 0.0; // Energy rhs -- analysis variable
+      rhs->phi[0][0] = c_0; // chi rhs -- chi is set by quadratic fit
+      rhs->phi[0][1] = c_0; // Phi rhs -- Phi-dot is always zero at r=0
+      rhs->phi[0][2] = c_0; // Pi rhs -- chi is set by quadratic fit
+      rhs->phi[0][3] = c_0; // Energy rhs -- analysis variable
     }
     if (bbox[1] == 1 && compute_index == size-1) {
 
@@ -320,9 +324,9 @@ void calcrhs(struct nodedata * rhs,
 
       // we are at the right boundary 
       rhs->phi[0][0] = Pi;  // chi rhs
-      rhs->phi[0][1] = -(3.*Phi - 4.*Phi_nm1 + Phi_nm2)/(2.*dr) - Phi/r;    // Phi rhs
-      rhs->phi[0][2] = -Pi/r - (3.*Pi - 4.*Pi_nm1 + Pi_nm2)/(2.*dr);      // Pi rhs
-      rhs->phi[0][3] = 0.0; // Energy rhs -- analysis variable
+      rhs->phi[0][1] = -(c_3*Phi - c_4*Phi_nm1 + Phi_nm2)/(c_2*dr) - Phi/r;    // Phi rhs
+      rhs->phi[0][2] = -Pi/r - (c_3*Pi - c_4*Pi_nm1 + Pi_nm2)/(c_2*dr);      // Pi rhs
+      rhs->phi[0][3] = c_0; // Energy rhs -- analysis variable
     }
   }
 }
