@@ -13,9 +13,10 @@
 #include <stdio.h>
 
 // local functions
-int floatcmp(had_double_type x1,had_double_type x2) {
+inline int floatcmp(had_double_type const& x1, had_double_type const& x2) 
+{
   // compare to floating point numbers
-  had_double_type epsilon = 1.e-8;
+  static had_double_type const epsilon = 1.e-8;
   if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
     // the numbers are close enough for coordinate comparison
     return 1;
@@ -25,22 +26,21 @@ int floatcmp(had_double_type x1,had_double_type x2) {
 }
 
 void calcrhs(struct nodedata * rhs,
-                std::vector< nodedata > &vecval,
-                std::vector< had_double_type > &vecx,
-                int flag, had_double_type dx, int size,
-                bool boundary,int *bbox,int compute_index, Par const& par);
+                std::vector< nodedata > const& vecval,
+                std::vector< had_double_type > const& vecx,
+                int flag, had_double_type const& dx, int size,
+                bool boundary, int *bbox,int compute_index, Par const& par);
 
-had_double_type initial_chi(had_double_type r,Par const& par) {
-  had_double_type chi = par.amp*exp( -(r-par.R0)*(r-par.R0)/(par.delta*par.delta) );   
-  return chi;
+inline had_double_type initial_chi(had_double_type const& r,Par const& par) 
+{
+  return par.amp*exp( -(r-par.R0)*(r-par.R0)/(par.delta*par.delta) );   
 }
 
-had_double_type initial_Phi(had_double_type r,Par const& par) {
+inline had_double_type initial_Phi(had_double_type const& r,Par const& par) 
+{
 
   // Phi is the r derivative of chi
-  had_double_type Phi = par.amp*exp( -(r-par.R0)*(r-par.R0)/(par.delta*par.delta) ) * ( -2.*(r-par.R0)/(par.delta*par.delta) );
-
-  return Phi;
+  return par.amp*exp( -(r-par.R0)*(r-par.R0)/(par.delta*par.delta) ) * ( -2.*(r-par.R0)/(par.delta*par.delta) );
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -64,9 +64,6 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     int i;
     nodedata node;
 
-    had_double_type chi,Phi,Pi,Energy,r;
-    had_double_type dx;
-
     // find out what level we are at
     std::size_t level = -1;
     for (int j=0;j<=par.allowedl;j++) {
@@ -87,7 +84,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     BOOST_ASSERT(level >= 0);
 
     val->level_= level;
-    dx = par.dx0/pow(2.0,(int) level);
+    had_double_type dx = par.dx0/pow(2.0,(int) level);
 
     had_double_type r_start = 0.0;
     for (int j=par.allowedl;j>level;j--) {
@@ -98,12 +95,12 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     }
 
     for (i=0;i<par.granularity;i++) {
-      r = r_start + i*dx;
+      had_double_type r = r_start + i*dx;
 
-      chi = initial_chi(r,par);
-      Phi = initial_Phi(r,par);
-      Pi  = 0.0;
-      Energy = 0.5*r*r*(Pi*Pi + Phi*Phi) - r*r*pow(chi,par.PP+1)/(par.PP+1);
+      had_double_type chi = initial_chi(r,par);
+      had_double_type Phi = initial_Phi(r,par);
+      had_double_type Pi  = 0.0;
+      had_double_type Energy = 0.5* r*r * (Pi*Pi + Phi*Phi) - r*r * pow(chi, par.PP+1)/(par.PP+1);
 
       val->x_[i] = r;
 
@@ -118,16 +115,19 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     return 1;
 }
 
-int rkupdate(std::vector< nodedata > &vecval,stencil_data* result,std::vector< had_double_type > &vecx,int size,bool boundary,int *bbox,int compute_index, had_double_type dt, had_double_type dx, had_double_type timestep,int iter, int level, Par const& par)
+int rkupdate(std::vector< nodedata > const& vecval, stencil_data* result, 
+  std::vector< had_double_type > const& vecx, int size, bool boundary,
+  int *bbox, int compute_index, 
+  had_double_type const& dt, had_double_type const& dx, had_double_type const& timestep,
+  int iter, int level, Par const& par)
 {
   // allocate some temporary arrays for calculating the rhs
   nodedata rhs,work;
-  int i,j;
 
   if ( iter == 0 ) {
-    for (j=0;j<result->granularity;j++) {
+    for (int j=0;  j<result->granularity;j++) {
       calcrhs(&rhs,vecval,vecx,0,dx,size,boundary,bbox,j+compute_index,par);
-      for (i=0;i<num_eqns;i++) {
+      for (int i=0; i<num_eqns; i++) {
         work.phi[0][i] = vecval[j+compute_index].phi[0][i];
         work.phi[1][i] = vecval[j+compute_index].phi[0][i] + rhs.phi[0][i]*dt;
       }
@@ -146,10 +146,11 @@ int rkupdate(std::vector< nodedata > &vecval,stencil_data* result,std::vector< h
     }
     // no timestep update-- this is just a part of an rk subcycle
     result->timestep_ = timestep;
-  } else if ( iter == 1 ) {
-    for (j=0;j<result->granularity;j++) {
+  } 
+  else if ( iter == 1 ) {
+    for (int j=0; j<result->granularity; j++) {
       calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
-      for (i=0;i<num_eqns;i++) {
+      for (int i=0; i<num_eqns; i++) {
         work.phi[0][i] = vecval[j+compute_index].phi[0][i];
         work.phi[1][i] = 0.75*vecval[j+compute_index].phi[0][i]
                         +0.25*vecval[j+compute_index].phi[1][i] + 0.25*rhs.phi[0][i]*dt;
@@ -169,10 +170,11 @@ int rkupdate(std::vector< nodedata > &vecval,stencil_data* result,std::vector< h
     }
     // no timestep update-- this is just a part of an rk subcycle
     result->timestep_ = timestep;
-  } else if ( iter == 2 ) {
-    for (j=0;j<result->granularity;j++) {
+  } 
+  else if ( iter == 2 ) {
+    for (int j=0; j<result->granularity; j++) {
       calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
-      for (i=0;i<num_eqns;i++) {
+      for (int i=0; i<num_eqns; i++) {
         work.phi[0][i] = 1./3*vecval[j+compute_index].phi[0][i]
                         +2./3*(vecval[j+compute_index].phi[1][i] + rhs.phi[0][i]*dt);
       }
@@ -192,7 +194,8 @@ int rkupdate(std::vector< nodedata > &vecval,stencil_data* result,std::vector< h
 
     // timestep update
     result->timestep_ = timestep + 1.0/pow(2.0,level);
-  } else {
+  } 
+  else {
     printf(" PROBLEM : invalid iter flag %d\n",iter);
     return 0;
   }
@@ -201,16 +204,16 @@ int rkupdate(std::vector< nodedata > &vecval,stencil_data* result,std::vector< h
 
 // This is a pointwise calculation: compute the rhs for point result given input values in array phi
 void calcrhs(struct nodedata * rhs,
-                std::vector< nodedata > &vecval,
-                std::vector< had_double_type > &vecx,
-                int flag, had_double_type dx, int size,
-                bool boundary,int *bbox,int compute_index, Par const& par)
+                std::vector< nodedata > const& vecval,
+                std::vector< had_double_type > const& vecx,
+                int flag, had_double_type const& dx, int size,
+                bool boundary, int *bbox,int compute_index, Par const& par)
 {
-  had_double_type dr = dx;
-  had_double_type r = vecx[compute_index];
-  had_double_type chi = vecval[compute_index].phi[flag][0];
-  had_double_type Phi = vecval[compute_index].phi[flag][1];
-  had_double_type Pi =  vecval[compute_index].phi[flag][2];
+  had_double_type const& dr = dx;
+  had_double_type const& r = vecx[compute_index];
+  had_double_type const& chi = vecval[compute_index].phi[flag][0];
+  had_double_type const& Phi = vecval[compute_index].phi[flag][1];
+  had_double_type const& Pi =  vecval[compute_index].phi[flag][2];
   had_double_type diss_chi = 0.0;
   had_double_type diss_Phi = 0.0;
   had_double_type diss_Pi = 0.0;
@@ -223,21 +226,21 @@ void calcrhs(struct nodedata * rhs,
     diss_chi = -1./(64.*dr)*(  -vecval[compute_index-3].phi[flag][0]
                             +6.*vecval[compute_index-2].phi[flag][0]
                            -15.*vecval[compute_index-1].phi[flag][0]
-                           +20.*vecval[compute_index  ].phi[flag][0]
+                           +20.*chi //vecval[compute_index  ].phi[flag][0]
                            -15.*vecval[compute_index+1].phi[flag][0]
                             +6.*vecval[compute_index+2].phi[flag][0]
                                -vecval[compute_index+3].phi[flag][0] );
     diss_Phi = -1./(64.*dr)*(  -vecval[compute_index-3].phi[flag][1]
                             +6.*vecval[compute_index-2].phi[flag][1]
                             -15.*vecval[compute_index-1].phi[flag][1]
-                            +20.*vecval[compute_index  ].phi[flag][1]
+                            +20.*Phi //vecval[compute_index  ].phi[flag][1]
                             -15.*vecval[compute_index+1].phi[flag][1]
                              +6.*vecval[compute_index+2].phi[flag][1]
                                 -vecval[compute_index+3].phi[flag][1] );
     diss_Pi  = -1./(64.*dr)*(  -vecval[compute_index-3].phi[flag][2]
                             +6.*vecval[compute_index-2].phi[flag][2]
                            -15.*vecval[compute_index-1].phi[flag][2]
-                           +20.*vecval[compute_index  ].phi[flag][2]
+                           +20.*Pi //vecval[compute_index  ].phi[flag][2]
                            -15.*vecval[compute_index+1].phi[flag][2]
                             +6.*vecval[compute_index+2].phi[flag][2]
                                -vecval[compute_index+3].phi[flag][2] );
@@ -246,28 +249,29 @@ void calcrhs(struct nodedata * rhs,
 
   if ( compute_index + 1 < size && compute_index - 1 >= 0 ) { 
 
-    had_double_type chi_np1 = vecval[compute_index+1].phi[flag][0];
-    had_double_type chi_nm1 = vecval[compute_index-1].phi[flag][0];
+    had_double_type const& chi_np1 = vecval[compute_index+1].phi[flag][0];
+    had_double_type const& chi_nm1 = vecval[compute_index-1].phi[flag][0];
 
     rhs->phi[0][0] = Pi + par.eps*diss_chi; // chi rhs
 
-    had_double_type Pi_np1 = vecval[compute_index+1].phi[flag][2];
-    had_double_type Pi_nm1 = vecval[compute_index-1].phi[flag][2];
+    had_double_type const& Pi_np1 = vecval[compute_index+1].phi[flag][2];
+    had_double_type const& Pi_nm1 = vecval[compute_index-1].phi[flag][2];
 
-    had_double_type Phi_np1 = vecval[compute_index+1].phi[flag][1];
-    had_double_type Phi_nm1 = vecval[compute_index-1].phi[flag][1];
+    had_double_type const& Phi_np1 = vecval[compute_index+1].phi[flag][1];
+    had_double_type const& Phi_nm1 = vecval[compute_index-1].phi[flag][1];
 
     rhs->phi[0][1] = (Pi_np1 - Pi_nm1)/(2.*dr) + par.eps*diss_Phi; // Phi rhs
 
-    had_double_type r2_Phi_np1 = (r+dr)*(r+dr)*Phi_np1;
-    had_double_type r2_Phi_nm1 = (r-dr)*(r-dr)*Phi_nm1;
+    had_double_type const& r2_Phi_np1 = (r+dr)*(r+dr)*Phi_np1;
+    had_double_type const& r2_Phi_nm1 = (r-dr)*(r-dr)*Phi_nm1;
 
 
     rhs->phi[0][2] = 3.*( r2_Phi_np1 - r2_Phi_nm1 )/( pow(r+dr,3) - pow(r-dr,3) ) + pow(chi,par.PP) + par.eps*diss_Pi; // Pi rhs
 
     rhs->phi[0][3] = 0.; // Energy rhs
 
-  } else {
+  } 
+  else {
     // tapered point or boundary ( boundary case taken care of below )
     rhs->phi[0][0] = 0.0; // chi rhs -- chi is set by quadratic fit
     rhs->phi[0][1] = 0.0; // Phi rhs -- Phi-dot is always zero at r=0
@@ -292,11 +296,11 @@ void calcrhs(struct nodedata * rhs,
     }
     if (bbox[1] == 1 && compute_index == size-1) {
 
-      had_double_type Phi_nm1 = vecval[size-2].phi[flag][1];
-      had_double_type Phi_nm2 = vecval[size-3].phi[flag][1];
+      had_double_type const& Phi_nm1 = vecval[size-2].phi[flag][1];
+      had_double_type const& Phi_nm2 = vecval[size-3].phi[flag][1];
 
-      had_double_type Pi_nm1 = vecval[size-2].phi[flag][2];
-      had_double_type Pi_nm2 = vecval[size-3].phi[flag][2];
+      had_double_type const& Pi_nm1 = vecval[size-2].phi[flag][2];
+      had_double_type const& Pi_nm2 = vecval[size-3].phi[flag][2];
 
       // we are at the right boundary 
       rhs->phi[0][0] = Pi;  // chi rhs

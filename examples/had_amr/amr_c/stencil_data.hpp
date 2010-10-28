@@ -95,7 +95,7 @@ private:
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
-        ar & max_index_ & index_ & timestep_ & cycle_ & level_ & value_;
+        ar & max_index_ & index_ & timestep_ & cycle_ & granularity & level_ & value_;
         ar & x_ & iter_ & gw_iter_ & g_startx_ & g_endx_ & g_dx_ & ghostwidth_;
     }
 };
