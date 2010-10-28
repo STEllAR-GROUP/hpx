@@ -126,6 +126,8 @@ int rkupdate(std::vector< nodedata > const& vecval, stencil_data* result,
   // allocate some temporary arrays for calculating the rhs
   nodedata rhs,work;
 
+  static had_double_type const c_1 = 1.;
+  static had_double_type const c_2 = 2.;
   static had_double_type const c_0_75 = 0.75;
   static had_double_type const c_0_5 = 0.5;
   static had_double_type const c_0_25 = 0.25;
@@ -134,23 +136,37 @@ int rkupdate(std::vector< nodedata > const& vecval, stencil_data* result,
   static had_double_type const c_2_3 = had_double_type(2.)/had_double_type(3.);
   static had_double_type const c_1_3 = had_double_type(1.)/had_double_type(3.);
 
+  had_double_type tmp;
+
   if ( iter == 0 ) {
     for (int j=0;  j<result->granularity;j++) {
       calcrhs(&rhs,vecval,vecx,0,dx,size,boundary,bbox,j+compute_index,par);
       for (int i=0; i<num_eqns; i++) {
         work.phi[0][i] = vecval[j+compute_index].phi[0][i];
-        work.phi[1][i] = vecval[j+compute_index].phi[0][i] + rhs.phi[0][i]*dt;
+      //  work.phi[1][i] = vecval[j+compute_index].phi[0][i] + rhs.phi[0][i]*dt;
+        // uglify
+        work.phi[1][i] = dt;
+        work.phi[1][i] *= rhs.phi[0][i];
+        work.phi[1][i] += vecval[j+compute_index].phi[0][i];
       }
       result->value_[j] = work;
 
     }
     if ( boundary && bbox[0] == 1 ) {
       // chi
-      result->value_[0].phi[1][0] = c_4_3*result->value_[1].phi[1][0]
-                                   -c_1_3*result->value_[2].phi[1][0];
+      //result->value_[0].phi[1][0] = c_4_3*result->value_[1].phi[1][0]
+      //                             -c_1_3*result->value_[2].phi[1][0];
+      // uglify
+      result->value_[0].phi[1][0] = c_4_3*result->value_[1].phi[1][0];
+      result->value_[0].phi[1][0] -= c_1_3*result->value_[2].phi[1][0];
+
       // Pi
-      result->value_[0].phi[1][2] = c_4_3*result->value_[1].phi[1][2]
-                                   -c_1_3*result->value_[2].phi[1][2];
+      //result->value_[0].phi[1][2] = c_4_3*result->value_[1].phi[1][2]
+      //                             -c_1_3*result->value_[2].phi[1][2];
+      // uglify
+      result->value_[0].phi[1][2] = c_4_3*result->value_[1].phi[1][2];
+      result->value_[0].phi[1][2] -= -c_1_3*result->value_[2].phi[1][2];
+
       // Phi
       result->value_[1].phi[1][1] = c_0_5*result->value_[2].phi[1][1];
     }
@@ -162,19 +178,37 @@ int rkupdate(std::vector< nodedata > const& vecval, stencil_data* result,
       calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
       for (int i=0; i<num_eqns; i++) {
         work.phi[0][i] = vecval[j+compute_index].phi[0][i];
-        work.phi[1][i] = c_0_75*vecval[j+compute_index].phi[0][i]
-                        +c_0_25*vecval[j+compute_index].phi[1][i] + c_0_25*rhs.phi[0][i]*dt;
+        //work.phi[1][i] = c_0_75*vecval[j+compute_index].phi[0][i]
+        //                +c_0_25*vecval[j+compute_index].phi[1][i] + c_0_25*rhs.phi[0][i]*dt;
+        // uglify
+        tmp = dt;
+        tmp *= c_0_25;
+        tmp *= rhs.phi[0][i];
+        work.phi[1][i] = vecval[j+compute_index].phi[1][i];
+        work.phi[1][i] *= c_0_25;
+        work.phi[1][i] += tmp;
+        tmp = c_0_75;
+        tmp *= vecval[j+compute_index].phi[0][i];
+        work.phi[1][i] += tmp;
       }
       result->value_[j] = work;
     }
 
     if ( boundary && bbox[0] == 1 ) {
       // chi
-      result->value_[0].phi[1][0] = c_4_3*result->value_[1].phi[1][0]
-                                   -c_1_3*result->value_[2].phi[1][0];
+      //result->value_[0].phi[1][0] = c_4_3*result->value_[1].phi[1][0]
+      //                             -c_1_3*result->value_[2].phi[1][0];
+      // uglify
+      result->value_[0].phi[1][0] = c_4_3*result->value_[1].phi[1][0];
+      result->value_[0].phi[1][0] -= c_1_3*result->value_[2].phi[1][0];
+
       // Pi
-      result->value_[0].phi[1][2] = c_4_3*result->value_[1].phi[1][2]
-                                   -c_1_3*result->value_[2].phi[1][2];
+      //result->value_[0].phi[1][2] = c_4_3*result->value_[1].phi[1][2]
+      //                             -c_1_3*result->value_[2].phi[1][2];
+      // uglify
+      result->value_[0].phi[1][2] = c_4_3*result->value_[1].phi[1][2];
+      result->value_[0].phi[1][2] -= c_1_3*result->value_[2].phi[1][2];
+
       // Phi
       result->value_[1].phi[1][1] = c_0_5*result->value_[2].phi[1][1];
     }
@@ -185,25 +219,44 @@ int rkupdate(std::vector< nodedata > const& vecval, stencil_data* result,
     for (int j=0; j<result->granularity; j++) {
       calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
       for (int i=0; i<num_eqns; i++) {
-        work.phi[0][i] = c_1_3*vecval[j+compute_index].phi[0][i]
-                        +c_2_3*(vecval[j+compute_index].phi[1][i] + rhs.phi[0][i]*dt);
+        //work.phi[0][i] = c_1_3*vecval[j+compute_index].phi[0][i]
+        //                +c_2_3*(vecval[j+compute_index].phi[1][i] + rhs.phi[0][i]*dt);
+        // uglify
+        tmp = c_1_3;
+        tmp *= vecval[j+compute_index].phi[0][i];
+        work.phi[0][i] = dt;
+        work.phi[0][i] *= rhs.phi[0][i];
+        work.phi[0][i] += vecval[j+compute_index].phi[1][i];
+        work.phi[0][i] *= c_2_3;
+        work.phi[0][i] += tmp;
       }
       result->value_[j] = work;
     }
 
     if ( boundary && bbox[0] == 1 ) {
       // chi
-      result->value_[0].phi[0][0] = c_4_3*result->value_[1].phi[0][0]
-                                   -c_1_3*result->value_[2].phi[0][0];
+      //result->value_[0].phi[0][0] = c_4_3*result->value_[1].phi[0][0]
+      //                             -c_1_3*result->value_[2].phi[0][0];
+      // uglify
+      result->value_[0].phi[0][0] = c_4_3*result->value_[1].phi[0][0];
+      result->value_[0].phi[0][0] -= c_1_3*result->value_[2].phi[0][0];
       // Pi
-      result->value_[0].phi[0][2] = c_4_3*result->value_[1].phi[0][2]
-                                   -c_1_3*result->value_[2].phi[0][2];
+      //result->value_[0].phi[0][2] = c_4_3*result->value_[1].phi[0][2]
+      //                             -c_1_3*result->value_[2].phi[0][2];
+      // uglify
+      result->value_[0].phi[0][2] = c_4_3*result->value_[1].phi[0][2];
+      result->value_[0].phi[0][2] -= c_1_3*result->value_[2].phi[0][2];
       // Phi
       result->value_[1].phi[0][1] = c_0_5*result->value_[2].phi[0][1];
     } 
 
     // timestep update
-    result->timestep_ = timestep + 1.0/pow(2.0,level);
+    //result->timestep_ = timestep + 1.0/pow(2.0,level);
+    // uglify
+    tmp = pow(c_2,level);
+    result->timestep_ = c_1;
+    result->timestep_ /= tmp;
+    result->timestep_ += timestep;
   } 
   else {
     printf(" PROBLEM : invalid iter flag %d\n",iter);
